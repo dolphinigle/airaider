@@ -45,45 +45,87 @@ AI Raider has two nested loops: the **macro loop** (Fort Phase) and the **micro 
                           (loop repeats)
 ```
 
-## Macro loop — Fort Phase
+## Macro loop — Fort Phase (the **camp day cycle**)
 
-The Fort Phase is when the player is *the lord*. There is no real-time pressure. The player can:
+The Fort Phase is when the player is *the lord*. It is a **day-based cycle**: each day, the player allocates their heroes (and followers) to camp activities or outside opportunities, then clicks **End Day**. Time advances; consequences resolve; a new day appears with new offers, news, and pressures.
 
-### Build and theme
+This replaces aistronghold's "End Week" tick. It is finer-grained (one day per decision) and *every day is a decision*, not a passive timer.
 
-- Construct new rooms (some are unique, some can be built multiple times).
-- Apply a **theme** to a room (player-provided string; AI derives compatible follower traits). Themes are the trait-matching surface.
+### The camp screen — a scene, not a menu
+
+Per the [fiction-forward UI principle](RAID_DESIGN.md#presentation--fiction-forward-ui), the camp screen is presented as a **scene**: heroes around the fire, captives in a hut, news being delivered by a gate-watch. Everything the player can do appears as a visible thing-in-the-scene, not a menu item.
+
+### A day's actions
+
+Each day the player sees:
+
+1. **News and offers** brought in overnight (intel about caravans, traders arriving, faction messengers, weather, ambient threats). Some are time-limited; some persist.
+2. **Around-the-camp activities** for heroes:
+   - **Rest** (single action — *do not split into variants per the no-false-choices rule*). Recovers Fatigue.
+   - **Question a captive** (Wits-led; extracts intel).
+   - **Break a captive** (Brawn/intimidation; converts captive to follower, fails into escape + Heat).
+   - **Drill captives** (multi-day; produces a new follower).
+   - **Other meaningful camp work TBD** — must each pass the "will the player genuinely deliberate?" test.
+3. **Outside-camp opportunities** — short raids, scouting trips, side jobs, trading. Each consumes hero stamina and accrues Fatigue.
+4. **Follower duty assignments** (one-time setup, no daily decision once placed): gate-watch, kitchen-help, gallows-keeper, etc. Each follower in a duty provides a passive camp effect.
+
+### Hero allocation rules
+
+- Each hero takes **one action per day**.
+- Heroes left **idle** auto-recover **+1 Fatigue** passively (issue: at Fatigue 0 this is wasted — see [Open issues](RAID_DESIGN.md#open-issues-logged-from-playtest)).
+- Outside-camp opportunities consume Fatigue at the per-scenario rate from the raid economy.
+
+### Build and theme (inherited from aistronghold, unchanged shape)
+
+- Construct new rooms (some unique, some buildable multiple times).
+- Apply a **theme** to a room; themes determine which follower traits earn bonus prestige.
 - Upgrade rooms.
+- **New in airaider:** rooms double as Fatigue-recovery facilities. A bath-house, drinking hall, women's quarters, or chapel each modify how heroes unwind. This is the concrete bridge from the inherited fort layer to the new raid layer.
 
 ### Staff
 
-- Assign followers to rooms. Each follower contributes prestige; followers whose traits match the room's theme contribute *bonus* prestige.
+- Assign followers to rooms / duties. Each follower contributes prestige and a passive camp effect; followers whose traits match a theme contribute *bonus* prestige.
 - Display artifacts in rooms (flat prestige).
 - Equip heroes with artifacts (changes raid options, not fort prestige).
 
 ### Plan the next raid
 
-- Browse available **Raid Leads** (analog of Quest Leads). Leads are hooks: "Excavate the buried ruins", "Investigate the smuggler's cove". Each lead has a level, difficulty, rarity, related story.
-- Pursuing a lead generates the full Raid (AI generates the introductory hook, the map's flavor, the kind of encounters expected). The raid is then ready to play.
-- Pick a party of heroes to bring. Party size is bounded (proposed 3–5; see [OPEN_QUESTIONS.md](OPEN_QUESTIONS.md)).
+- Browse available **Raid Leads** (analog of aistronghold's Quest Leads). Leads are hooks: "Pay-chest moving north in 9 days", "Christian funerary procession passes Caesina tomorrow", "Frontier governor's tax-equestrian sleeps at the Three-Pines mansio tonight." Each lead has an estimated take, a Heat cost, an optional deadline, and required minimum bench depth.
+- Pursuing a lead generates the full raid (AI flavors the scenarios, engine generates structure).
+- Pick a party (typically 2–4 heroes from your roster).
 - Launch.
+
+### Long-horizon targets pull the loop forward
+
+A locked design observation from playtest: every campaign should always surface **1–3 active "big targets"** with a future deadline (e.g. "pay-chest in 9 days"). These give the player something to *plan around* across many days — turning Rest, Drill, and Scout decisions from idle filler into purposeful preparation. Without a big target visible, the camp loop drifts into busy-work.
+
+### Passive pressure: factions and reputation
+
+The world reacts to the player's actions even on quiet days. Examples implemented in playtest:
+- **Heat** rises with each raid and falls with quiet days. High Heat brings investigators (Centurion Petillius in the playtest example) who close on the camp over real days, eventually triggering a defensive raid.
+- **Prestige in local villages** rises when raids align with peasant sentiment (burning a Roman official) and falls when they don't.
+- **Faction offers** appear unprompted (a slave-buyer arrives, a deserter offers service, a rival warlord sends a demand).
 
 ### Why not "end week"?
 
-AI Stronghold used a weekly tick so that all assigned missions could resolve in parallel. In AI Raider missions are played, not assigned. There is nothing to advance time *for* — fort changes happen instantly, and a raid is its own session. So time advances **per raid**, not per week. (Some systems may still use "raids-since-X" as a soft clock; see [OPEN_QUESTIONS.md](OPEN_QUESTIONS.md).)
+aistronghold used a weekly tick so that all assigned missions could resolve in parallel. In airaider the **day** is the tick, and *each day is a decision*. No invisible passage of time; no batched resolution. The player feels the calendar advancing because they advanced it themselves, one allocation at a time.
 
 ## Micro loop — Raid Phase
 
-The Raid Phase is when the player is *the raid leader*. The player controls the party directly.
+The Raid Phase is when the player is *the raid leader*. The player controls the party directly. The mechanic is fully specified in [RAID_DESIGN.md](RAID_DESIGN.md); summarised here:
 
-What a raid contains, mechanically, is still open (see [RAID_DESIGN.md](RAID_DESIGN.md)), but the *shape* of a raid is fixed:
+A raid is a sequence of **3–5 scenarios**. Each scenario is presented as a scene with one or more slots; the player assigns heroes to slots from their party; the engine resolves a **Narrated Pool** check (stat + tag + AI-generated narration line per contribution); outcome band fires. The **climax scenario** offers 2–3 distinct approaches with meaningfully different consequences.
 
-1. **Entry.** Brief setup screen: the lead's hook, the map, the party. Last chance to swap loadout.
-2. **Exploration / Encounters.** Several decision points (combat, traps, choices, social, treasure). Player navigates; not every node must be cleared.
-3. **Pressure mechanic.** Something pushes the player to not dawdle (resource attrition, escalating danger, a "noise" meter, etc. — see Open Questions). Without pressure there is no push-vs-retreat tension.
-4. **Loot-or-leave checkpoints.** The player chooses when to extract. Extracting early = less loot but safer. Pushing deeper = more loot but compounding risk.
-5. **Boss / climax (optional per lead).** Some leads have a fixed end; others are pure expeditions.
-6. **Exit.** Successful extraction, partial loot, or wipe.
+Pressure is twofold: in-raid **Stamina** (each hero has 3 charges per raid, 1 per assignment) and between-raid **Fatigue** (raids exhaust heroes; they need camp time to unwind before the next).
+
+The *shape* of a raid is fixed:
+
+1. **Entry.** The lead's hook, the chosen party, last chance to equip. Launch.
+2. **Setup scenarios (1–3).** Single approach each. Build momentum.
+3. **Climax scenario.** Multiple approaches; the payoff choice the raid built toward.
+4. **Exit.** Resolution screen with loot, captives, fatigue, heat, and an AI epilogue.
+
+There is no separate "extract or push" toggle — the choice lives inside *which heroes you commit at each scenario* and *which approach you pick at the climax*.
 
 ### Outcome shape
 
