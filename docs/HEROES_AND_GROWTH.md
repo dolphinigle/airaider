@@ -39,7 +39,6 @@ Hero {
 
   # Equipment (cards held in this hero's personal room — see Equipment section below)
   equipped: { weapon: EquipmentCardId?, armor: EquipmentCardId?, rings: [EquipmentCardId] }
-  equipped: [ArtifactId]
 
   # Transient state (engine-owned)
   stamina: int                    # 0..3, in-raid charges
