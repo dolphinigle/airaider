@@ -123,13 +123,24 @@ A **Lead** is a near-zero-cost placeholder for a potential quest. It exists so t
 
 ```yaml
 Lead:
+  rarity: enum           # common / uncommon / rare / legendary
   difficulty_class: int  # L1–L20, gates which heroes can pursue
   reward_budget: int     # reroll budget for loot at pursuit time
   region: string         # opaque label for now (full region system = future TODO)
   expiry_days: int       # disappears from the board if not pursued
+  arc_id: string?        # nullable. If set, quest generation uses arc context.
 ```
 
-**No archetype, no hook, no prose.** A lead is just an opportunity-with-numbers. UI displays a lead as `Lead · {region} · L{dc} · ~{reward}g · {expiry}d`. That is the whole lead.
+**No archetype, no hook, no prose** beyond what `rarity` and `arc_id` imply. A lead is an opportunity-with-numbers. UI displays a lead as `Lead [rarity] · {region} · L{dc} · ~{reward} · {expiry}d`, with a visible arc marker when `arc_id` is set.
+
+### Rarity (locked)
+
+`common / uncommon / rare / legendary`. Higher rarity means:
+- bigger reward variance (the `~{reward}` shown is an estimate; rare/legendary spread is wider)
+- more chance of equipment drops at completion
+- more chance the pursued quest will turn out to **seed a new Arc** ("this is bigger than expected — a new questline opens")
+
+Common leads dominate the board; legendary leads are events.
 
 ### Why no archetype (in MVP)
 
@@ -149,22 +160,73 @@ Region is a string label for now. A real region/world-geography system (regional
 4. **Assign heroes** to the Quest is a separate decision. The player can now see the quest's scenarios (or at least their threshold/stat-pool shapes) and picks a party with full information. This is the play decision.
 5. Quest plays out via Narrated Pool resolution. Reward at the end uses the lead's `reward_budget` via the canonical reward-as-budget pattern.
 
-**Pursued Quests expire fast** (proposal: ~2 days to assign and play, else the quest lapses with no penalty beyond the lost opportunity). This is the natural rate-limiter — players who pursue gratuitously will see most of their quests lapse unplayed. No hard cap needed.
+**Pursued Quests expire fast** (proposal: ~2 days to assign and play, else the quest lapses with no penalty beyond the lost opportunity). This is the natural rate-limiter — players who pursue gratuitously will see most of their quests lapse unplayed. **No quest tray cap.** Expiry alone is the rate-limiter; players who pursue more than they can play simply waste lapsed quests, and learn from it.
 
 ### Pursue vs Assign — why split them
 
 - **Pursue is psychological commit, not tactical commit.** "I want this job" decision happens first; "who do I send" decision happens after seeing the actual quest content.
 - **Player makes a better-informed party choice.** They can match heroes to the specific scenario stat-pools they'll actually face.
 - **Quest expiry is the rate-limiter.** Pursuing too many = most lapse unplayed = wasted AI on the player's own clock. Self-correcting; no hard cap needed.
-- **Imperfect-info tension still exists**, just shifted earlier: the *pursue* decision is the gamble (am I willing to dedicate ~2 in-game days and a slot in my quest tray to find out what this is?).
+- **Imperfect-info tension still exists**, just shifted earlier: the *pursue* decision is the gamble (am I willing to dedicate ~2 in-game days to find out what this is, given I can only play so many?).
 
-### Why the lead system as a whole works
+## Arcs — the AI-coherence trick for questlines (Locked)
 
-- **Token-cheap board:** many leads can sit on the board for the cost of one real quest. Unpursued leads expire harmlessly.
-- **Scouting becomes a distinct mechanic:** cunning/social heroes (e.g. `silver-tongue`, `road-bred`) can spend an action to **scout a lead** — engine reveals 1–2 hints about the lead before pursuit. A non-combat use of cunning heroes that doesn't compete with raid slots.
-- **Premise is invented at pursuit, not catalogued.** The AI invents what kind of job each lead actually is. Pattern-recognition fun still exists (after enough hours the player has a feel for what L1 leads in Greythorn tend to be), but every individual lead is unique.
+A generic lead has no story context — the AI invents the whole premise at pursuit. That's fine for one-off jobs, but two related quests in the same campaign will contradict each other (different NPCs, different facts). To get **questlines that feel like episodes of a series, not random encounters**, the engine wraps related quests in an **Arc**.
 
-### Story Beats — the deliberate exception
+### Arc data shape
+
+```yaml
+Arc:
+  id: string
+  rarity: enum             # common / uncommon / rare / legendary
+  trigger: enum            # campaign_start / hero_event / prestige_tier /
+                           #   region_event / quest_outcome / faction_milestone
+  premise: string          # 1–2 paragraphs. Generated ONCE at arc-spawn.
+                           # The "world bible" for everything in this arc.
+  cast: [NamedNPC]         # starts empty; populated as quests in the arc are played
+  locations: [PlaceName]   # populated organically as quests reveal them
+  plot_state: string       # short status; updated after each quest in arc resolves
+                           # ("the reeve still doesn't know it was Vannis")
+  quests_planned: int      # 3–7 typical; rare arcs longer; legendary epic-length
+  quests_completed: int
+  reward_on_completion: { gold, equipment, hero, fort_milestone, ... }
+```
+
+### The coherence trick (the actual mechanism)
+
+When a quest is generated **inside an arc** (the pursued Lead has `arc_id` set), the AI prompt includes:
+
+1. Standard lead metadata (rarity, difficulty, region).
+2. `Arc.premise` — the established world-bible paragraph.
+3. `Arc.cast` — names + 1-line descriptions of any NPCs already introduced in this arc.
+4. `Arc.locations` — places already established in this arc.
+5. `Arc.plot_state` — what's happened so far.
+
+The AI is instructed: *"This quest is part of the arc above. Use established characters/places/facts; advance the plot state by introducing one new beat."*
+
+After the quest resolves, the engine:
+- Extracts any newly-named NPCs and places, appends them to `Arc.cast` / `Arc.locations` (this can be a separate small AI call or a structured-output field).
+- Updates `Arc.plot_state` with a one-line summary of what just happened.
+- Increments `Arc.quests_completed`.
+
+Result: arc quests reference recurring NPCs, build on prior outcomes, escalate cleanly. The trick is **cheap** — one shared paragraph reused across N quests in the arc.
+
+### Arc rarity
+
+- **Common** — short 3-quest minor side-arc. May introduce one recurring NPC.
+- **Uncommon** — 4–5 quests, introduces a recurring named NPC and a recurring location.
+- **Rare** — 5–7 quests, regional impact, may permanently change a region's behavior.
+- **Legendary** — epic, multi-tier, gates major content, may include a unique hero unlock or major fort milestone.
+
+### Multiple arcs in parallel
+
+A campaign can have **several arcs running at once** (matches `PROGRESSION_AND_PAYOFF.md` "multiple story arcs in parallel"). Arc-tied leads appear on the board with a visible arc marker so the player knows which leads belong to which arc and how arcs are progressing. Generic (non-arc) leads still spawn alongside arc leads.
+
+### The Starting Campaign Arc is just Arc #1
+
+The §12 "Starting Campaign Arc" in `CORE_CONCEPTS.md` is the first Arc, with `trigger = campaign_start` and `premise` rooted in the starting party's situation. Same mechanism; no special case in code.
+
+### Story Beats — exception that fits the arc model
 
 A **Story Beat** is a quest that exists because of a previous outcome, a character arc, or a fort milestone. Story Beats **bypass the lead-stub system** and are **fully generated at trigger time**:
 

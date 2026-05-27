@@ -334,17 +334,69 @@ This guarantees no hero is ever idle, feeds new leads into the raid loop, and gi
 
 A **Lead** is a **cheap stub** placed on the job board so the player has many visible options without burning AI tokens on quests they won't pursue.
 
-- **Lead = `{difficulty_class, reward_budget, region, expiry_days}`.** That's it — **no archetype, no hook, no prose** in the MVP. A lead is just an opportunity-with-numbers. UI displays as `Lead · {region} · L{dc} · ~{reward}g · {expiry}d`. 100% engine-generated, zero AI.
-- **Pursue Lead** is a free, instant, zero-hero-cost action. It fires the AI quest-gen and turns the Lead stub into a real Quest (visible scenarios, NPCs, named loot, twists). **Assign heroes** is a separate decision made with full info on the now-visible Quest. **Pursued Quests expire fast** (~2 days) — natural rate-limiter against gratuitous pursuit.
+- **Lead = `{rarity, difficulty_class, reward_budget, region, expiry_days}`.** No archetype, no hook, no prose. A lead is opportunity-with-numbers. UI displays as `Lead [rarity] · {region} · L{dc} · ~{reward} · {expiry}d`. 100% engine-generated, zero AI.
+- **Rarity (locked):** common / uncommon / rare / legendary. Higher rarity = bigger reward variance, more equipment chance, more chance the pursued quest will turn out to seed a new Arc ("this is bigger than expected").
+- **Pursue Lead** is a free, instant, zero-hero-cost action. It fires the AI quest-gen and turns the Lead stub into a real Quest (visible scenarios, NPCs, named loot, twists). **Assign heroes** is a separate decision made with full info on the now-visible Quest. **Pursued Quests expire fast** (~2 days) — natural rate-limiter against gratuitous pursuit. **No tray cap.** Expiry alone is the rate-limiter; pursuing too many just lapses them.
 - **Archetype categories are a future layer**, not MVP. If play reveals that the AI generates samey jobs (5 bandit ambushes in a row) or that players want tactical "I want a bandit-camp-shape job specifically" choices, *then* we add a hand-authored archetype enum back. Earn the complexity before introducing it.
 - **Region is a string label for now.** A real region/world-geography system is a future design problem — flagged as a known headache.
 - **The full quest content is generated AT COMMIT TIME.** Until the player commits a party, no scenarios, NPCs, named loot, or twists exist. This is the **only token-saving justification** for having leads as a distinct concept.
 - **Commit-with-imperfect-info tension** is intentional but shifted: the player sees difficulty + reward magnitude + region on the lead board. **Pursuing** a lead (free, instant, zero hero cost) fires the AI and produces a real **Quest** with visible scenarios. **Assigning heroes** to the Quest is a separate decision made with full info. The "imperfect info" gamble is now on the *pursue* step — am I willing to spend a slot in my quest tray (and the ~2-day quest expiry clock) to find out what this lead actually is? **Lead-scouting** (a cunning-hero action) can reveal 1–2 hints about the lead before pursuit.
 - **Lead-finding** is a separate action category — errands like *drink in town*, *patrol the trade road*, *scout a village* roll **new leads onto the board.** Action → fills board (vs lead-scouting: action → reduces uncertainty on a known lead). Both serve idle cunning/social heroes; both are scenario cards. Without a lead-finding cadence the board would go empty and the camp loop would stall.
 
-**Story Beats** are the deliberate exception: quests that exist because of a prior outcome, character arc, or fort milestone. They **bypass the lead-stub flow** and are **fully generated at trigger time** (player intent is high; story coherence requires it). They can appear on the board next to leads (UI parity) but are full Quest objects under the hood. Engine distinguishes via `lead.kind = stub | story_beat`.
+**Story Beats** are the deliberate exception: quests that exist because of a prior outcome, character arc, or fort milestone. They **bypass the lead-stub flow** and are **fully generated at trigger time** (player intent is high; story coherence requires it). They can appear on the board next to leads (UI parity) but are full Quest objects under the hood. Engine distinguishes via `lead.kind = stub | story_beat`. Most Story Beats live inside an **Arc** (see §11c).
 
 Full spec: see `RAID_DESIGN.md` § Leads.
+
+---
+
+## 11c. Arcs — the AI-coherence trick for questlines 🔒
+
+A **generic lead** (§11b) has no story context — the AI invents the whole premise at pursuit. That's fine for one-off jobs, but it means two related quests in the same campaign will contradict each other (different NPCs, different facts). To get **questlines that feel like episodes of a series, not random encounters**, the engine wraps related quests in an **Arc**.
+
+### Arc data shape
+
+```yaml
+Arc:
+  id: string
+  rarity: enum             # common / uncommon / rare / legendary
+  trigger: enum            # campaign_start / hero_event / prestige_tier /
+                           #   region_event / quest_outcome / faction_milestone
+  premise: string          # 1–2 paragraphs. Generated ONCE at arc-spawn.
+                           # The "world bible" for everything in this arc.
+  cast: [NamedNPC]         # starts empty; populated as quests in the arc are played
+  locations: [PlaceName]   # populated organically as quests reveal them
+  plot_state: string       # short status summary; updated after each quest resolves
+                           # ("the reeve still doesn't know it was Vannis")
+  quests_planned: int      # 3–7 typical; rare arcs longer; legendary epic-length
+  quests_completed: int
+  reward_on_completion: { gold, equipment, hero, fort_milestone, ... }
+```
+
+### The coherence trick
+
+When a quest is generated **inside an arc**, the AI prompt includes:
+1. Standard lead metadata (difficulty, region).
+2. `Arc.premise` — the established world-bible paragraph.
+3. `Arc.cast` — names + 1-line descriptions of NPCs already introduced.
+4. `Arc.locations` — places already established.
+5. `Arc.plot_state` — what's happened so far.
+
+The AI is instructed: *"This quest is part of the arc above. Use established characters/places/facts; advance the plot state by introducing one new beat."* Result: arc quests reference recurring NPCs, build on prior outcomes, escalate cleanly. The trick is **cheap** — one shared paragraph reused across N quests.
+
+### Arc rarity
+
+- **Common** — small 3-quest minor side-arc.
+- **Uncommon** — 4–5 quests, introduces a recurring named NPC.
+- **Rare** — 5–7 quests, regional impact, may permanently change a region.
+- **Legendary** — epic, multi-tier, gates major content, may include a unique hero unlock.
+
+### Multiple arcs in parallel
+
+A campaign can have **several arcs running at once** (matches `PROGRESSION_AND_PAYOFF.md` "multiple story arcs in parallel"). Arc-tied quests appear on the lead board with a small visible marker so the player knows which quests belong to which arc. Generic leads still spawn alongside them.
+
+### The Starting Campaign Arc is Arc #1
+
+The §12 "Starting Campaign Arc" is just the first Arc, with `trigger = campaign_start` and `premise` rooted in the starting party's situation. Same mechanism, no special case in code.
 
 ---
 
