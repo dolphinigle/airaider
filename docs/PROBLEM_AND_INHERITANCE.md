@@ -36,19 +36,19 @@ The remake replaces the middle layer (auto-resolved mission narrative) with a **
 These designs are explicitly inherited from AI Stronghold. They worked and we are not rebuilding them.
 
 1. **Fort as the only source of Prestige.** Prestige = Σ(Room Prestige). Quests/raids do not grant Prestige directly. See [FORT_AND_PRESTIGE.md](FORT_AND_PRESTIGE.md).
-2. **Rooms have themes; themes set follower trait compatibility; matched followers give bonus prestige.** The "perfect follower for this room" RNG dopamine is the central meta-game payoff.
-3. **Followers and artifacts as the RNG payoff.** Raid loot is followers (for fort) and artifacts (for fort display or hero equipment), with randomized traits and AI-generated flavor. This is the ARPG-style dopamine generator.
+2. **Rooms have themes; themes set follower tag compatibility; matched followers give bonus prestige.** The "perfect follower for this room" RNG dopamine is the central meta-game payoff.
+3. **Followers and artifacts as the RNG payoff.** Raid loot is followers (for fort) and artifacts (for fort display or hero equipment), with randomized tags and AI-generated flavor. This is the ARPG-style dopamine generator.
 4. **Stories as persistent narrative threads** that influence which raid leads appear, not as primary content. Stories accumulate state from raid outcomes.
 5. **Quest Leads → Quests** pursuit model. The player decides which leads to pursue; pursuit consumes time/resources; the resulting raid is what you actually play.
-6. **Trait + attribute system for entities.** Traits are tags (no values); attributes are numbers. Used for compatibility (rooms ↔ followers) and for raid mechanics (heroes ↔ encounters).
+6. **Tag + attribute system for entities.** (Inherited concept from aistronghold's "traits" — renamed to **tags** in airaider and extended with a tier/rarity model; see HEROES_AND_GROWTH.md.) Tags are labels; attributes are numbers. Used for compatibility (rooms ↔ followers, equipment ↔ rooms) and for raid mechanics (heroes ↔ scenarios).
 7. **Everything is a "Thing" with an ID.** Central registry pattern. Mods drop in JSON.
 8. **AI generates flavor; mechanics are deterministic.** AI writes names, descriptions, post-raid epilogues. AI does not decide outcomes.
 
 ## What we replace (Locked)
 
 1. **Auto-resolved missions → player-controlled raids.** This is the headline change. The raid is a real play session. See [RAID_DESIGN.md](RAID_DESIGN.md) (currently Open).
-2. **Quest "role slots with trait requirements" as the central mechanic → heroes as playable units.** Traits still matter (they unlock options, modify abilities, gate certain raids), but the primary question becomes "can I play this raid well with this party?" not "do my heroes satisfy the trait checklist?".
-3. **Hero injury / death as a number-flag → hero state earned through play.** A hero's scars, traumas, and signature abilities come from raids the player ran. Permadeath is possible.
+2. **Quest "role slots with trait requirements" as the central mechanic → heroes as playable units.** Tags still matter (they unlock options, modify abilities, gate certain raids), but the primary question becomes "can I play this raid well with this party?" not "do my heroes satisfy the tag checklist?".
+3. **Hero injury / death as a number-flag → hero state earned through play.** A hero's tags (including scar-origin tags), traumas, and signature abilities come from raids the player ran. Permadeath is possible.
 4. **Week-based turn → run-based turn.** "End Week" becomes "Return from Raid". A raid takes as long as the raid takes; back at the fort the player decides when to launch the next one. See [GAMEPLAY_LOOP.md](GAMEPLAY_LOOP.md).
 
 ## What is still open

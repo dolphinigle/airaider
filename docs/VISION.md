@@ -20,7 +20,7 @@ The two layers feed each other:
 ## Design pillars
 
 1. **Agency comes from the raid.** The player's most-felt choices happen during raids — positioning, ability use, when to push, when to retreat, who to sacrifice. Stats matter, but the player's decisions matter more.
-2. **Heroes are characters, not stat blocks.** Each hero accumulates meaning through *how the player used them*: scars from a raid they barely survived, a rival they made when the player chose one over the other, a signature ability the player leaned on. AI-generated personality + traits give a starting hook; play makes them yours.
+2. **Heroes are characters, not stat blocks.** Each hero accumulates meaning through *how the player used them*: tags earned from a raid they barely survived, a rival they made when the player chose one over the other, a signature ability the player leaned on. AI-generated personality + starting tags give a starting hook; play makes them yours.
 3. **The fort is where payoff lives.** The dopamine loop of "I found the perfect follower for the Candy Kitchen" is preserved verbatim from AI Stronghold. The fort is a trophy case as much as a workshop.
 4. **No infinite grind path.** You cannot bypass the fort by grinding raids (raids do not grant Prestige directly). You cannot bypass raids by optimizing the fort (better rooms unlock better raid leads, not better raid outcomes). Both layers are mandatory.
 5. **AI generates flavor, not mechanics.** AI writes the room's name, the hero's backstory, the raid's introductory hook, the post-raid epilogue. Mechanics — success, failure, damage, loot tables — are deterministic and inspectable.
@@ -35,7 +35,7 @@ The two layers feed each other:
 
 ## What "winning" feels like
 
-- Coming home from a raid with a legendary artifact whose traits perfectly match an empty slot in your Throne Room.
+- Coming home from a raid with a legendary artifact whose tags perfectly match an empty slot in your Throne Room.
 - Watching a hero you have leaned on for 20 raids finally hit a level where their signature ability changes how you play.
 - Losing a beloved hero on a raid you pushed too far, and naming the next recruit after them.
 - Looking at your fort screen and feeling that every room *means* something — every follower in it was found, not bought.

@@ -15,7 +15,7 @@ Singleton. Contains rooms. Prestige is computed (`Σ room.prestige`), never stor
 An instance of a RoomType. Properties:
 - `roomTypeId` — the blueprint.
 - `level` — upgrade level.
-- `theme` — player-provided string (e.g. "Candy Kingdom", "Sunken Library"). AI derives compatible traits from this.
+- `theme` — player-provided string (e.g. "Candy Kingdom", "Sunken Library"). AI derives compatible tags from this.
 - `assignedFollowerIds`, `displayedArtifactIds` — what's in it.
 
 ### RoomType
@@ -24,7 +24,7 @@ Blueprint loaded from JSON. Defines base prestige, upgrade tracks, max followers
 
 ### Theme
 
-Free-text on a room. The AI generates a list of compatible traits the first time it sees a theme. Compatible follower traits in this room → bonus prestige.
+Free-text on a room. The AI generates a list of compatible tags the first time it sees a theme. Compatible follower tags in this room → bonus prestige. (See HEROES_AND_GROWTH.md for the unified tag model — these are the same tags heroes carry.)
 
 ## Prestige calculation (inherited)
 
@@ -32,17 +32,17 @@ Free-text on a room. The AI generates a list of compatible traits the first time
 Fort Prestige = Σ Room Prestige
 
 Room Prestige = base_prestige(roomType, level)
-              + Σ follower.prestige × theme_multiplier(follower.traits, room.theme)
+              + Σ follower.prestige × theme_multiplier(follower.tags, room.theme)
               + Σ artifact.prestige
 ```
 
-Followers in matching rooms can multiply their contribution substantially. Achieving the cap requires finding a follower whose traits closely match a room's theme — this is the **RNG dopamine loop** the game is built around.
+Followers in matching rooms can multiply their contribution substantially. Achieving the cap requires finding a follower whose tags closely match a room's theme — this is the **RNG dopamine loop** the game is built around.
 
 ## What changes vs. AI Stronghold
 
 ### 1. Heroes can be retired into rooms
 
-In AI Stronghold heroes were a separate category from followers and could not be assigned to rooms. In AI Raider a hero can be **retired**: they leave the raid roster and become a permanent room occupant. Their prestige contribution is computed from their level, gear, and **history** (number of raids survived, scars earned).
+In AI Stronghold heroes were a separate category from followers and could not be assigned to rooms. In AI Raider a hero can be **retired**: they leave the raid roster and become a permanent room occupant. Their prestige contribution is computed from their level, gear, and **history** (number of raids survived, tags earned).
 
 This gives veteran heroes a meaningful end-of-life. A favorite hero you no longer want to risk becomes a centerpiece of the fort.
 

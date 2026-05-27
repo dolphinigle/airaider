@@ -27,7 +27,7 @@ The same pattern applies to:
 - **Scenario stat thresholds** — engine sets threshold *number*; AI describes what the obstacle *is*.
 - **Recruitment** — engine sets recruit level/tag count; AI fills in name, backstory, tag names.
 - **Loot generation** — engine sets item tier; AI names the item.
-- **Consequence narration** — engine sets the mechanical effect (a scar, a wound, -1 loyalty); AI narrates *why*.
+- **Consequence narration** — engine sets the mechanical effect (a new tag, a wound, -1 loyalty); AI narrates *why*.
 
 This pattern means the game is **always balanced** (numbers are in code) and **always fresh** (fiction is in AI). Neither layer can corrupt the other's job.
 
@@ -157,7 +157,7 @@ Inherited distinction from aistronghold, now load-bearing:
 
 ## Hero state during a raid
 - **Wounds** taken at scenario failure persist into Fatigue or, in catastrophic outcomes, into death (configurable; see [HEROES_AND_GROWTH.md](HEROES_AND_GROWTH.md)).
-- **Scars** earned at specific catastrophic-band events become permanent tags (see HEROES_AND_GROWTH).
+- **Scar-origin tags** earned at specific catastrophic-band events are permanent. Engine sets the tier and modifier; AI names them (e.g. `crypt-walker`, `lone-survivor`, `burned`). See HEROES_AND_GROWTH for the unified tag model.
 - **Captives** taken in a raid arrive at the camp as a new inventory type (sellable / ransomable / breakable into followers).
 
 ## What the player must always see
@@ -186,4 +186,4 @@ If the player can't answer "who do I send and what happens if it goes wrong?", t
 ## What is NOT in this doc (deferred)
 - Specific scenario *content* (what scenarios exist, what tags exist) — content design comes after the engine is locked.
 - The camp/Lord-layer screen design — covered in [GAMEPLAY_LOOP.md](GAMEPLAY_LOOP.md).
-- Hero progression specifics (scars, earned tags, renown) — covered in [HEROES_AND_GROWTH.md](HEROES_AND_GROWTH.md).
+- Hero progression specifics (earned tags, renown) — covered in [HEROES_AND_GROWTH.md](HEROES_AND_GROWTH.md).

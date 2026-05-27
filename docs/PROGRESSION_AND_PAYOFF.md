@@ -8,12 +8,12 @@ This doc covers the meta-progression and dopamine economy. The principles are in
 
 The headline payoff in AI Raider is the same as in AI Stronghold:
 
-> *"I found a follower whose traits perfectly match my Sunken Library. Equip, place, watch prestige jump. Feels like a Path of Exile drop."*
+> *"I found a follower whose tags perfectly match my Sunken Library. Equip, place, watch prestige jump. Feels like a Path of Exile drop."*
 
 This is the engagement engine. It works because:
 
-1. **Randomization creates value.** Followers and artifacts have randomized traits and AI-flavored backstory.
-2. **Perfect-match pursuit.** Rooms have themes. Matching traits give bonus prestige. The hunt is for the perfect fit.
+1. **Randomization creates value.** Followers and artifacts have randomized tags and AI-flavored backstory.
+2. **Perfect-match pursuit.** Rooms have themes. Matching tags give bonus prestige. The hunt is for the perfect fit.
 3. **Tiered access.** Higher prestige unlocks higher-tier raid leads, which drop higher-tier loot. The loop tightens its own progression.
 
 ## Progression triangle
@@ -33,7 +33,7 @@ Three interlocking systems, each gating the others:
 
 - **Prestige unlocks raid leads.** Higher prestige → higher-tier leads available.
 - **Raid leads test heroes.** Each raid is a play-skill challenge for the party.
-- **Heroes earn XP and scars from raids.** Heroes grow not just numerically but characterfully.
+- **Heroes earn XP and new tags from raids.** Heroes grow not just numerically but characterfully.
 - **Loot from raids feeds the fort.** Followers and artifacts and resources flow into the prestige machine.
 - **Loop tightens at every tier.**
 
@@ -48,14 +48,14 @@ Each raid yields some combination of:
 | Reward type | Used for | Rarity model |
 |---|---|---|
 | Resources (gold, wood, etc.) | Building / upgrading rooms | Bulk, common |
-| Artifacts | Display in fort OR equip on heroes | Trait-randomized, tiered rarity |
-| Followers | Assign to themed rooms | Trait-randomized, tiered rarity |
+| Artifacts | Display in fort OR equip on heroes | Tag-randomized, tiered rarity |
+| Followers | Assign to themed rooms | Tag-randomized, tiered rarity |
 | Hero XP | Hero progression | Scaled to raid difficulty |
-| Scars | Hero individuality | Event-triggered, not chosen |
+| Earned tags | Hero individuality (including scar-origin tags) | Event-triggered, not chosen |
 | Story progression | Future raid leads | Narrative-driven |
 | New raid leads | Future content | Event/story-driven |
 
-Reward value scales with raid tier; the *kind* of reward also shifts (a tier-1 raid mostly gives resources and a chance at a common follower; a tier-5 raid mostly gives artifacts and hero scars/abilities and rare follower chances).
+Reward value scales with raid tier; the *kind* of reward also shifts (a tier-1 raid mostly gives resources and a chance at a common follower; a tier-5 raid mostly gives artifacts and hero tags/abilities and rare follower chances).
 
 ### The reroll budget (inherited)
 

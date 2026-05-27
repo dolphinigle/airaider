@@ -45,7 +45,7 @@ The hero level cap is intentionally soft (see `HEROES_AND_GROWTH.md`): a player 
 │                       RESOLUTION                                 │
 │                                                                  │
 │   Loot is distributed (followers, artifacts, resources, leads)   │
-│   Hero state updated (XP, scars, traumas, deaths)                │
+│   Hero state updated (XP, new tags, traumas, deaths)              │
 │   Related stories advance                                        │
 │   New raid leads may appear                                      │
 │                                                                  │
@@ -90,13 +90,13 @@ The errand system guarantees there is never a "useless turn" for any hero — ev
 ### Build and theme (inherited from aistronghold, unchanged shape)
 
 - Construct new rooms (some unique, some buildable multiple times).
-- Apply a **theme** to a room; themes determine which follower traits earn bonus prestige.
+- Apply a **theme** to a room; themes determine which follower tags earn bonus prestige.
 - Upgrade rooms.
 - **New in airaider:** rooms double as Fatigue-recovery facilities. A bath-house, drinking hall, women's quarters, or chapel each modify how heroes unwind. This is the concrete bridge from the inherited fort layer to the new raid layer.
 
 ### Staff
 
-- Assign followers to rooms / duties. Each follower contributes prestige and a passive camp effect; followers whose traits match a theme contribute *bonus* prestige.
+- Assign followers to rooms / duties. Each follower contributes prestige and a passive camp effect; followers whose tags match a theme contribute *bonus* prestige.
 - Display artifacts in rooms (flat prestige).
 - **Each hero has a personal room.** The room doubles as the hero's equipment screen: artifacts and gear cards placed in that room are simultaneously prestige sources for the camp AND that hero's equipped loadout (see HEROES_AND_GROWTH.md Equipment section). This unifies aistronghold's room/artifact system with airaider's lean equipment model — no parallel inventory exists.
 - Equip heroes with equipment cards (placed into their personal room — changes raid options, also contributes to fort prestige).
@@ -158,16 +158,16 @@ There is no separate "extract or push" toggle — the choice lives inside *which
 
 ### Outcome shape
 
-- **Clean success:** all objectives, full loot, no scars.
-- **Partial:** some objectives, some loot, possibly scars or trauma.
-- **Failure:** raid aborted, minimal loot, likely scars.
+- **Clean success:** all objectives, full loot, no new negative tags.
+- **Partial:** some objectives, some loot, possibly new tags (some scar-origin, some neutral).
+- **Failure:** raid aborted, minimal loot, likely scar-origin tags or traumas.
 - **Wipe:** party lost. Heroes may die (configurable), artifacts on them may be lost or recoverable on a later "recovery" raid.
 
 ## Resolution
 
 After the raid the game returns to the fort and applies consequences:
 - Loot enters inventory; followers are added to the unassigned roster; artifacts are available to display or equip.
-- Heroes gain XP. Heroes may gain **scars** (persistent traits with mechanical effect) or **traumas** (psychological state that affects future raids until healed).
+- Heroes gain XP. Heroes may gain **new tags** (often `scar`-origin tags for raid-acquired ones, with mixed mechanical effect) or **traumas** (psychological state that affects future raids until healed).
 - Related stories advance (state update, history entry, possibly new lead generation).
 - AI generates a short **epilogue** summarising what happened in narrative form. The player consumed the *event*; the AI just decorates it.
 
