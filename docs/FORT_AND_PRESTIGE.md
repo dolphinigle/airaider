@@ -1,32 +1,66 @@
 # Fort and Prestige
 
-**Status:** Draft (inherited from AI Stronghold; locked unless explicitly reopened)
+**Status:** Locked. Diverges from AI Stronghold's flat-list room model in favor of a 2D side-view cross-section ("Tiers" model). Theme/tag-matching, prestige formula, and JSON-defined RoomTypes are all inherited unchanged.
 
-The fort layer is taken almost wholesale from AI Stronghold because it worked. This doc is short on purpose: it summarizes inherited design and only flags what changes. For deep detail, refer back to AI Stronghold's `FORT_AND_ROOM_DESIGN.md` until those are mirrored here.
+## Locked principle: hand-authored content, AI flavor only
 
-## Core concepts (inherited)
+**Every RoomType is hand-authored in JSON.** AI generates only:
+- The `theme` string on a built room instance (player-prompted or AI-suggested).
+- The flavor narration describing the room and what happens in it.
 
-### Fort
+AI never invents new RoomTypes, never adjusts base prestige or slot widths, never gates on mechanics. This is the universal "engine owns numbers, AI owns flavor" rule applied to rooms. Moddability: shipping content + community mods both come through JSON.
 
-Singleton. Contains rooms. Prestige is computed (`Σ room.prestige`), never stored.
+## Spatial model — side-view 2D cross-section
 
-### Room
+The fort is a **2D grid of cells** rendered as a side-view cross-section of a hill-fort. Always entirely visible (zoom out to see the silhouette; zoom in to interact). No view switching, no wing tabs.
 
-An instance of a RoomType. Properties:
-- `roomTypeId` — the blueprint.
-- `level` — upgrade level.
-- `theme` — player-provided string (e.g. "Candy Kingdom", "Sunken Library"). AI derives compatible tags from this.
-- `assignedFollowerIds`, `displayedArtifactIds` — what's in it.
+- **Cell coordinates:** `(tier, x)`. `tier = 0` is ground level; `tier > 0` is upper floors built up; `tier < 0` is cellar levels carved down.
+- **Cells have one of three states:** empty (unbuilt void), opened (paid for, available), occupied (part of a room).
+- **Expansion** = paying gold + wood to open a new cell adjacent to any already-opened cell. **Cost scales** with total opened cells (inherited `BaseCost × Multiplier^N` formula). There is no prestige unlock gate on cells — expansion is pure economic pressure.
+- **No tier names, no tier themes, no architectural personality.** Tiers are spatial coordinates only. AI uses raw spatial language ("above the hall", "leftmost on the ground floor", "the cellar's far end") freely.
 
-### RoomType
+## Rooms
 
-Blueprint loaded from JSON. Defines base prestige, upgrade tracks, max followers, max items, max copies.
+A `Room` instance occupies a `width × height` rectangle of opened, currently-empty cells in a single tier.
 
-### Theme
+- **Widths: 1, 2, or 3.** Declared per RoomType in JSON. Examples: bedroom = 1, armory = 2, great hall = 3.
+- **Heights: 1 (default) or 2.** Almost all rooms are height-1. A small hand-authored set (~3) of monumental, `maxCopies: 1` rooms are height-2 (Great Hall, Reliquary, Cathedral-type endgame trophies). Height-2 rooms span across one tier and the one above.
+- **Properties (inherited):** `roomTypeId`, `level`, `theme`, `assignedFollowerIds`, `displayedArtifactIds`.
 
-Free-text on a room. The AI generates a list of compatible tags the first time it sees a theme. Compatible follower tags in this room → bonus prestige. (See HEROES_AND_GROWTH.md for the unified tag model — these are the same tags heroes carry.)
+### Adjacency
 
-## Prestige calculation (inherited)
+Two rooms are **adjacent** when one's outer cell-boundary touches another's. Within a tier this is left↔right neighbors (most common). For monumental height-2 rooms, adjacency also exists on the upper tier.
+
+When adjacent rooms share at least one tag in their themes, both rooms get **+20% prestige**. This is the spatial puzzle: optimizing room placement so themed clusters form, while still respecting `maxCopies` constraints and slot scarcity.
+
+### RoomType (JSON-declared)
+
+```json
+{
+  "thingId": "room_type:armory",
+  "type": "room_type",
+  "name": "Armory",
+  "width": 2,
+  "height": 1,
+  "maxCopies": 2,
+  "basePrestige": 8,
+  "maxFollowers": 2,
+  "maxItems": 4,
+  "themePromptHint": "weapons, training, war",
+  "upgradeTrack": [...],
+  "raidBuff": { ... optional ... }
+}
+```
+
+## Theme
+
+Free-text on a room instance. The AI generates a list of compatible tags the first time it sees a theme. Compatible follower/equipment tags in this room → bonus prestige. (See HEROES_AND_GROWTH.md for the unified tag model — these are the same tags heroes carry.)
+
+### Theme (legacy section)
+
+This concept is now covered above in "Rooms · Theme". The free-text + AI-derived-compatible-tags pattern is unchanged from AI Stronghold.
+
+## Prestige calculation
 
 ```
 Fort Prestige = Σ Room Prestige
@@ -34,9 +68,12 @@ Fort Prestige = Σ Room Prestige
 Room Prestige = base_prestige(roomType, level)
               + Σ follower.prestige × theme_multiplier(follower.tags, room.theme)
               + Σ artifact.prestige
+              × adjacency_bonus                          (1.0 to 1.4 — see below)
 ```
 
-Followers in matching rooms can multiply their contribution substantially. Achieving the cap requires finding a follower whose tags closely match a room's theme — this is the **RNG dopamine loop** the game is built around.
+**Adjacency bonus:** for each adjacent room sharing at least one theme-tag, multiply this room's prestige by 1.20. Stacks multiplicatively but capped at ~×1.40 to prevent runaway chains.
+
+Followers in matching rooms can multiply their contribution substantially. Achieving the cap requires finding a follower whose tags closely match a room's theme AND placing that room next to thematically matching neighbours — this is the **RNG + spatial-puzzle dopamine loop** the game is built around.
 
 ## What changes vs. AI Stronghold
 
@@ -72,7 +109,15 @@ Locked. Raids do not grant prestige directly. This was the most important load-b
 
 The raid layer feeds prestige *only* by feeding the fort the inputs (followers, artifacts) that the player then has to place into rooms.
 
-## What is still open
+### 4. Spatial 2D fort layout (NEW model — Tiers cross-section)
+
+AI Stronghold treated the fort as a flat list of rooms. AI Raider replaces this with a hand-authored 2D side-view cross-section (see "Spatial model" above). Adjacency-based prestige bonuses become a core puzzle layer; expansion is cost-driven rather than prestige-gated.
+
+### 5. Variable room sizes
+
+AI Stronghold rooms were uniform abstract entries. AI Raider rooms occupy `width × height` cell rectangles, hand-authored per RoomType. Width 1/2/3 is common; a handful of unique monumental rooms are height-2. This makes packing into the fort a Tetris-like decision on top of theme matching.
+
+## Open questions
 
 - **Room upgrade costs vs. raid economy:** how much does upgrading a Library cost in raid currency? Needs balance pass after raid design is locked.
 - **Hero retirement formula:** prestige value of a retired hero is interesting — should it dominate? Should it cap at a follower's value?

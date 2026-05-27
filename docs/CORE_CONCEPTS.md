@@ -42,6 +42,7 @@ Same pattern applies to: scenario thresholds, recruitment, loot generation, cons
 5. **Prestige comes only from rooms.** Raids do NOT grant prestige directly. Raids grant *inputs* (followers, artifacts, gold, leads) that the player then *places* into rooms to make prestige. This forces engagement with both layers.
 6. **Both layers are mandatory.** You cannot bypass the raid by optimizing the fort. You cannot bypass the fort by grinding raids. Both feed each other.
 7. **AI generates flavor, not mechanics.** Restated for emphasis. Mechanics are deterministic and inspectable.
+8. **All content types are hand-authored in JSON.** RoomTypes, ScenarioTemplates, ErrandTemplates, EquipmentTemplates — all declared in JSON and shippable/moddable. AI never invents content types or adjusts their mechanics. AI only generates: theme strings, names, prose, narration, tag labels (within engine-set tier/weight constraints).
 
 ---
 
@@ -212,15 +213,20 @@ Heroes, followers, equipment, rooms, scenarios — every card carries tags from 
 
 ---
 
-## 9. Equipment 🔒 (principles) / 🟡 (deep room design)
+## 9. Equipment 🔒 (principles) / 🛠 (deep room design)
 
 **Locked principles:**
 
 - Equipment **is a card** (cards-as-universal-abstraction).
-- Equipment **lives in the hero's personal room** — re-using aistronghold's room system as dual-role artifact display (prestige source AND equipped loadout). **No per-hero inventory bloat.**
+- Equipment **lives in the hero's personal room** (Hero's Bedroom RoomType, width 1). The room IS the loadout — no per-hero inventory bloat.
+- Personal bedrooms are **built like any other room** (pay gold+wood, place into an opened cell). Heroes without a bedroom sleep in the shared Bedroll Pit and cannot equip anything.
+- Equipment slot count **scales with bedroom level:**
+  - L1 Quarters → 1 weapon slot
+  - L2 Chamber → +1 armor slot
+  - L3 Captain's Den → +2 ring slots
 - Equipment uses **level, not tier.** A piece is "Centurion's Helm L18." Equippable by any hero of level ≥ piece level. Higher-level heroes wearing low-level gear is allowed.
 - Equipment has **rarity** — `common / uncommon / rare / legendary`. (This is the *only* rarity word in airaider; scenarios use `difficulty_class`.)
-- **Lean slot count — proposed: weapon + armor + 1–2 rings.** Rings predominantly grant tags; weapons/armor grant stats and sometimes tags. Exact count Open.
+- **Slot ceiling = weapon + armor + 2 rings = 4 pieces.** Rings predominantly grant tags; weapons/armor grant stats and sometimes tags.
 - Equipment data **feeds AI narration.** When a scenario fires, equipped cards' names and flavor are in the AI prompt so prose can reference them (*"Drust hefts the named axe Iron-Tongue..."*).
 
 **Data shape:**
@@ -236,43 +242,55 @@ EquipmentCard:
   tags_granted: [tag]                   # nonzero for ring; sometimes weapon
 ```
 
-**Open (big TODO):** exact slot count, room layout (puzzle vs flat list), artifact-pool unification with aistronghold's existing room/artifact system, artifact transfer between rooms, dead-hero room inheritance.
+**Open (smaller TODO now that the shape is locked):** exact upgrade costs per bedroom level (subject to balance pass), artifact transfer between rooms, dead-hero room inheritance (proposal: bedroom becomes a memorial niche, contributes small permanent prestige, may display one artifact).
 
 ---
 
 ## 10. Camp / Fort 🔒
 
-**Inherited from aistronghold** (almost verbatim; the system works):
+**Inherited from aistronghold** (shape preserved):
 
 - Singleton **Fort** contains **Rooms**.
 - Each Room: `roomTypeId, level, theme (free-text), assignedFollowerIds, displayedArtifactIds`.
 - **Theme** is a free-text label; AI derives compatible tags from it the first time. Followers/equipment with matching tags get prestige multipliers.
+- **RoomTypes are hand-authored in JSON.** AI never invents room types or mechanics — only generates the `theme` string and narration flavor.
 - **Prestige formula:**
   ```
   Fort Prestige = Σ Room Prestige
-  Room Prestige = base_prestige(roomType, level)
-                + Σ follower.prestige × theme_multiplier(follower.tags, room.theme)
-                + Σ artifact.prestige
+  Room Prestige = ( base_prestige(roomType, level)
+                  + Σ follower.prestige × theme_multiplier(follower.tags, room.theme)
+                  + Σ artifact.prestige )
+                  × adjacency_bonus                  # 1.0 to ~1.4
   ```
 
-**Airaider-specific changes:**
+**Airaider-specific spatial model (NEW):**
+
+The fort is a **2D side-view cross-section** of a hill-fort. Always entirely visible (zoom out to see silhouette; zoom in to interact). No view switching.
+
+- Cell coordinates: `(tier, x)`. `tier=0` ground; `tier>0` upper floors; `tier<0` cellars.
+- Cells are **empty / opened / occupied**. Expansion = paying gold+wood to open a cell adjacent to any opened cell. Cost scales (`BaseCost × Multiplier^N`). **No prestige gate** on cell expansion — pure economic pressure.
+- **No tier names, no tier themes.** Tiers are spatial coordinates. AI uses raw spatial vocabulary ("above the hall", "the cellar's far end").
+- Rooms occupy `width × height` rectangles:
+  - Widths: **1, 2, or 3** (declared per RoomType in JSON).
+  - Heights: **1** for almost all rooms; a small hand-authored set (~3) of monumental `maxCopies: 1` rooms are **height-2** (Great Hall, Reliquary, Cathedral-type endgame trophies).
+- **Adjacency = +20% prestige to both rooms** whose outer cells touch AND share at least one theme-tag. Caps around ×1.40 to prevent runaway chains.
+
+**Other airaider-specific changes:**
 
 1. **Heroes can be retired into rooms.** Their prestige contribution = level + gear + history. A favorite hero you no longer want to risk becomes a fort centerpiece.
-2. **Each hero has a personal room** that doubles as their equipment loadout (see §9).
+2. **Each hero can have a personal room (Hero's Bedroom RoomType, width 1).** Built like any other room (must pay, must place); housing equipment slots that unlock by room level (L1=weapon, L2=+armor, L3=+2 rings). Heroes without a bedroom sleep in the Bedroll Pit (utility, 0 equip slots).
 3. **Some rooms grant raid-side buffs** (e.g. Apothecary L3+ → start raid with N healing potions). Small, single-buff-per-category. The fort *matters* during a raid without auto-resolving it.
 4. **No "End Week" tick.** Day cycle; wound/trauma healing is measured in raids-completed (not real time).
 
-**Prestige tiers** (target 20+ tiers; exact count Open):
+**Progression beats come from room-types unlocking at prestige tiers**, not from spatial unlocks. Target 20+ prestige tiers, each unlocking qualitatively new RoomTypes (Watchtower, Reliquary, Scriptorium, Forge, Throne Room, etc.) and new raid leads. Variety, not number-growth, carries 200+ hours.
 
 | Band | Sample tiers | What unlocks |
 |---|---|---|
-| Survival | Hideout, Outlaw Den | Lone-traveler raids, caravan ambushes |
-| Mid-banditry | Brigand Hold, Bandit Lord | Villa raids, town strikes, gladiator recruiting |
-| Warlord | Regional Warlord, Frontier Rival | Legion engagements, local nobles parley |
-| Power-broker | Shadow King, Kingmaker | Assassination contracts, court intrigue |
-| Empire-scale | Open Rebellion, Empire Challenger | Province campaigns, endgame politics |
-
-Each tier should add something *qualitatively new* — variety, not number-growth, carries 200+ hours.
+| Survival | Hideout, Outlaw Den | Lone-traveler raids, caravan ambushes; basic RoomTypes (Hall, Bedroll Pit, Bedroom) |
+| Mid-banditry | Brigand Hold, Bandit Lord | Villa raids, town strikes; Armory, Sparring Post, Apothecary |
+| Warlord | Regional Warlord, Frontier Rival | Legion engagements; Watchtower, Scriptorium, Forge |
+| Power-broker | Shadow King, Kingmaker | Assassination contracts; Reliquary (monumental), private Captain's Quarters |
+| Empire-scale | Open Rebellion, Empire Challenger | Province campaigns; Throne Room (monumental), Cathedral (monumental) |
 
 ---
 
@@ -455,11 +473,12 @@ None are gated by a final boss; they are personal completion states. An optional
 
 ## 23. Big TODOs (not yet designed)
 
-- **Room/equipment deep design.** Slot count, room-as-equipment layout, artifact-pool unification, dead-hero inheritance.
 - **Balance numbers.** First-pass CSVs in `airaider/balance/`.
 - **Earned-tag triggers.** What engine events award new tags, AI prompt structure, frequency.
 - **Per-level reward model.** Auto-stat-up vs every-5-levels pick — proposed but not locked.
-- **Concrete prestige tier ladder.** Target 20+ tiers; need content design.
+- **Concrete prestige tier ladder.** Target 20+ tiers; need content design naming each tier and what RoomTypes/leads it unlocks.
 - **Errand catalog.** ~10–15 errand templates.
 - **Scenario content.** What scenarios exist, written.
 - **Tag content pool.** Initial AI prompt seeds for tag naming.
+- **RoomType catalogue.** The full JSON list of room types, their widths/heights/costs/effects.
+- **Monumental room set.** The ~3 height-2 endgame rooms (proposed: Great Hall, Reliquary, Throne Room) — exact effects and unlock tiers.
