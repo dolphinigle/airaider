@@ -115,6 +115,52 @@ Examples (each is just a scenario card playable from the camp scene into a hero-
 
 This solves the "what does an idle hero do?" problem (every hero always has a use), feeds new leads into the main raid loop (so errands aren't dead weight), and gives the AI more storytelling beats per campaign hour. It also formalises the camp-day activities listed in `GAMEPLAY_LOOP.md` — most of them are simply errands.
 
+## Leads — cheap stubs, AI-generated on commit (Locked)
+
+A **Lead** is a near-zero-cost placeholder for a potential quest. It exists so the game can have a rich, populated *job board* without burning AI tokens on quests the player will never pursue.
+
+### Data shape
+
+```yaml
+Lead:
+  archetype: enum        # ~15–20 hand-authored archetypes in JSON
+                         # e.g. coin_wagon, bandit_camp, lost_heir, haunted_ruin,
+                         #      noble_debt, smuggler_run, ruin_delve, escort_caravan
+  difficulty_class: int  # L1–L20, gates which heroes can pursue
+  reward_budget: int     # reroll budget for loot at pursuit time
+  region: string         # short region label (Greythorn outskirts, Pine Hollow…)
+  expiry_days: int       # disappears from the board if not pursued
+  hook: string           # one sentence. Optional AI flavor, or pulled from
+                         # a hand-authored per-archetype hook pool. Cheap or free.
+```
+
+### Generation flow
+
+1. **Engine rolls** a lead: archetype, difficulty, region, budget, expiry. (Zero AI.)
+2. **Optional**: one *very small* AI call (or hook-pool pick) produces the one-line hook.
+3. Lead sits on the **board**, visible to the player.
+4. **On commit:** the player assigns a party (1+ heroes). *Only now* does the engine fire the full quest-generation prompt: the lead's archetype + difficulty + region + budget seed an AI call that produces the actual scenarios, NPCs, named loot, twists, and per-scenario narration.
+5. The generated quest plays out via the Narrated Pool resolution above. Reward at the end uses the lead's `reward_budget` via the canonical reward-as-budget pattern.
+
+### Why this works
+
+- **Token-cheap board:** dozens of leads can sit on the board for the cost of one real quest. Unpursued leads expire harmlessly.
+- **Commit-with-imperfect-info tension:** the player sees archetype + difficulty + reward budget but not the *specific* scenario shapes. Committing a hero is a real bet.
+- **Scouting becomes a distinct mechanic:** cunning/social heroes (e.g. `silver-tongue`, `road-bred`) can spend an action to **scout a lead** — engine reveals 1–2 scenario hints before commit. A non-combat use of cunning heroes that doesn't compete with raid slots.
+- **Archetypes are public, scenarios are private.** Players learn what "coin wagon" tends to mean over time (pattern recognition is the fun); but each individual coin-wagon raid still has unique AI-generated specifics.
+
+### Story Beats — the deliberate exception
+
+A **Story Beat** is a quest that exists because of a previous outcome, a character arc, or a fort milestone. Story Beats **bypass the lead-stub system** and are **fully generated at trigger time**:
+
+- Player intent is already high (no wasted generation).
+- Story coherence *requires* the quest to be written with knowledge of what came before.
+- Hiding details from a player already committed to a narrative adds friction, not tension.
+
+Story Beats can still **appear on the board** alongside leads (UI parity), but under the hood they are fully realized Quest objects, not stubs. Their hook line is usually richer and more specific (*"Lord Kessel has summoned Vannis to court — the favor he owes is due."*).
+
+Engine distinguishes the two via `lead.kind = stub | story_beat`. AI cost lives where player intent lives.
+
 ## Presentation — *fiction-forward UI*
 
 **Locked principle (design rule):** *Never show the player a menu when you can show them a scene.*
