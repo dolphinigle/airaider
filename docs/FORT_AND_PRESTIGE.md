@@ -16,7 +16,7 @@ The fort is a **2D grid of cells** rendered as a side-view cross-section of a hi
 
 - **Cell coordinates:** `(tier, x)`. `tier = 0` is ground level; `tier > 0` is upper floors built up; `tier < 0` is cellar levels carved down.
 - **Cells have one of three states:** empty (unbuilt void), opened (paid for, available), occupied (part of a room).
-- **Expansion** = paying gold + wood to open a new cell adjacent to any already-opened cell. **Cost scales** with total opened cells (inherited `BaseCost × Multiplier^N` formula). There is no prestige unlock gate on cells — expansion is pure economic pressure.
+- **Expansion** = paying **gold** to open a new cell adjacent to any already-opened cell. **Cost scales** with total opened cells (inherited `BaseCost × Multiplier^N` formula). There is no prestige unlock gate on cells — expansion is pure economic pressure. **Gold is the only tracked construction resource** — no wood, no stone, no second bar.
 - **No tier names, no tier themes, no architectural personality.** Tiers are spatial coordinates only. AI uses raw spatial language ("above the hall", "leftmost on the ground floor", "the cellar's far end") freely.
 
 ## Rooms

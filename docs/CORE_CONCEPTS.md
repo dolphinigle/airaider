@@ -219,7 +219,7 @@ Heroes, followers, equipment, rooms, scenarios — every card carries tags from 
 
 - Equipment **is a card** (cards-as-universal-abstraction).
 - Equipment **lives in the hero's personal room** (Hero's Bedroom RoomType, width 1). The room IS the loadout — no per-hero inventory bloat.
-- Personal bedrooms are **built like any other room** (pay gold+wood, place into an opened cell). Heroes without a bedroom sleep in the shared Bedroll Pit and cannot equip anything.
+- Personal bedrooms are **built like any other room** (pay gold, place into an opened cell). Heroes without a bedroom sleep in the shared Bunkroom and cannot equip anything.
 - Equipment slot count **scales with bedroom level:**
   - L1 Quarters → 1 weapon slot
   - L2 Chamber → +1 armor slot
@@ -277,7 +277,7 @@ These don't overlap mechanically — placement is a designable strategy layer; f
 The fort is a **2D side-view cross-section** of a hill-fort. Always entirely visible (zoom out to see silhouette; zoom in to interact). No view switching.
 
 - Cell coordinates: `(tier, x)`. `tier=0` ground; `tier>0` upper floors; `tier<0` cellars.
-- Cells are **empty / opened / occupied**. Expansion = paying gold+wood to open a cell adjacent to any opened cell. Cost scales (`BaseCost × Multiplier^N`). **No prestige gate** on cell expansion — pure economic pressure.
+- Cells are **empty / opened / occupied**. Expansion = paying gold to open a cell adjacent to any opened cell. Cost scales (`BaseCost × Multiplier^N`). **No prestige gate** on cell expansion — pure economic pressure.
 - **No tier names, no tier themes.** Tiers are spatial coordinates. AI uses raw spatial vocabulary ("above the hall", "the cellar's far end").
 - Rooms occupy `width × height` rectangles:
   - Widths: **1, 2, or 3** (declared per RoomType in JSON).
@@ -350,7 +350,7 @@ This makes **roster depth a real strategic resource** — you NEED 6–10 captai
 
 | Reward type | Used for | Rarity model |
 |---|---|---|
-| Resources (gold, wood) | Build/upgrade rooms | Bulk, common |
+| Gold | Build/upgrade rooms; the only construction & operating resource | Bulk, common |
 | Artifacts | Display in fort OR equip on heroes | Tag-randomized, tiered rarity |
 | Followers | Assign to themed rooms | Tag-randomized, tiered rarity |
 | Hero XP | Hero progression | Scaled to raid difficulty |
@@ -361,6 +361,8 @@ This makes **roster depth a real strategic resource** — you NEED 6–10 captai
 **Reroll budget pattern (inherited):** lead's `rewardValue` is a reroll budget; higher-value leads generate more candidate drops and keep the best. Engine of rarity.
 
 **The locked constraint:** raids generate *inputs* to the prestige machine; they do not generate prestige directly.
+
+**Single resource (locked):** **gold** is the only tracked construction/operating resource. No wood, stone, or other resource bars. Errand variety comes from fiction (timber runs, escorts, debt collection) and from which hero tags shine — they all pay gold. Specific scenarios may demand named *plot-token items* (e.g. "3 cured planks for the gate"), but those are quest objects, not a global bar.
 
 ---
 

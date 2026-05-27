@@ -47,7 +47,7 @@ Each raid yields some combination of:
 
 | Reward type | Used for | Rarity model |
 |---|---|---|
-| Resources (gold, wood, etc.) | Building / upgrading rooms | Bulk, common |
+| Gold (sole construction resource) | Building / upgrading rooms | Bulk, common |
 | Artifacts | Display in fort OR equip on heroes | Tag-randomized, tiered rarity |
 | Followers | Assign to themed rooms | Tag-randomized, tiered rarity |
 | Hero XP | Hero progression | Scaled to raid difficulty |
