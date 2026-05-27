@@ -123,34 +123,37 @@ A **Lead** is a near-zero-cost placeholder for a potential quest. It exists so t
 
 ```yaml
 Lead:
-  archetype: enum        # ~15–20 hand-authored archetypes in JSON
-                         # e.g. coin_wagon, bandit_camp, lost_heir, haunted_ruin,
-                         #      noble_debt, smuggler_run, ruin_delve, escort_caravan
   difficulty_class: int  # L1–L20, gates which heroes can pursue
   reward_budget: int     # reroll budget for loot at pursuit time
-  region: string         # short region label (Greythorn outskirts, Pine Hollow…)
+  region: string         # opaque label for now (full region system = future TODO)
   expiry_days: int       # disappears from the board if not pursued
 ```
 
-**No hook field, no prose, zero AI.** UI displays a lead as `{Archetype} · {region} · L{dc} · ~{reward}g · {expiry}d`. That is the whole lead.
+**No archetype, no hook, no prose.** A lead is just an opportunity-with-numbers. UI displays a lead as `Lead · {region} · L{dc} · ~{reward}g · {expiry}d`. That is the whole lead.
 
-### Why no hook prose
+### Why no archetype (in MVP)
 
-Even a templated atmospheric string ("bandits in the forest, local bounty posted") narrows the AI's creative window at commit time — "local bounty posted" forces the generated quest to involve a local bounty. The archetype name alone (`bandit_camp`) already carries categorical steering, which is intentional and necessary (the player must know they're picking a bandit-camp-shape job vs a haunted-ruin-shape job). Any *additional* prose steering is gratuitous and we remove it.
+Even a categorical archetype tag (`bandit_camp`, `haunted_ruin`) steers the AI's commit-time generation. For MVP we strip that too: commit-time AI gets only difficulty + reward + region + party composition, and invents the entire premise — including what kind of job this is — from scratch.
+
+If play reveals the AI generates samey jobs (5 bandit ambushes in a row) OR players develop appetite for tactical "I want a bandit-camp-shape job specifically" decisions, *then* we layer a hand-authored archetype enum back in. Earn the complexity before introducing it.
+
+### Region is provisional
+
+Region is a string label for now. A real region/world-geography system (regional reputations, travel time, hostile vs friendly zones) is a future design problem — flagged as a known headache, not yet locked.
 
 ### Generation flow
 
-1. **Engine rolls** a lead: archetype, difficulty, region, budget, expiry. (Zero AI.)
-2. Lead sits on the **board**, visible to the player as `{Archetype} · {region} · L{dc} · ~{reward}g · {expiry}d`.
-3. **On commit:** the player assigns a party (1+ heroes). *Only now* does the engine fire the full quest-generation prompt: the lead's archetype + difficulty + region + budget + party seed an AI call that produces the actual scenarios, NPCs, named loot, twists, and per-scenario narration.
+1. **Engine rolls** a lead: difficulty, region, budget, expiry. (Zero AI.)
+2. Lead sits on the **board**, visible to the player as `Lead · {region} · L{dc} · ~{reward}g · {expiry}d`.
+3. **On commit:** the player assigns a party (1+ heroes). *Only now* does the engine fire the full quest-generation prompt: difficulty + region + budget + party seed an AI call that produces the actual scenarios, NPCs, named loot, twists, and per-scenario narration — including inventing what *kind* of job this is.
 4. The generated quest plays out via the Narrated Pool resolution above. Reward at the end uses the lead's `reward_budget` via the canonical reward-as-budget pattern.
 
 ### Why this works
 
 - **Token-cheap board:** dozens of leads can sit on the board for the cost of one real quest. Unpursued leads expire harmlessly.
-- **Commit-with-imperfect-info tension:** the player sees archetype + difficulty + reward budget but not the *specific* scenario shapes. Committing a hero is a real bet.
+- **Commit-with-imperfect-info tension:** the player sees difficulty + reward budget + region but not the specific premise or scenario shapes. Committing a hero is a real bet.
 - **Scouting becomes a distinct mechanic:** cunning/social heroes (e.g. `silver-tongue`, `road-bred`) can spend an action to **scout a lead** — engine reveals 1–2 scenario hints before commit. A non-combat use of cunning heroes that doesn't compete with raid slots.
-- **Archetypes are public, scenarios are private.** Players learn what "coin wagon" tends to mean over time (pattern recognition is the fun); but each individual coin-wagon raid still has unique AI-generated specifics.
+- **Premise is invented at commit, not catalogued.** The AI invents what kind of job each lead actually is. Pattern-recognition fun still exists (after enough hours the player has a feel for what L1 leads in Greythorn tend to be), but every individual lead is unique.
 
 ### Story Beats — the deliberate exception
 
