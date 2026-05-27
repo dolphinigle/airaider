@@ -131,11 +131,17 @@ Lead:
   region: string         # short region label (Greythorn outskirts, Pine Hollow…)
   expiry_days: int       # disappears from the board if not pursued
   hook: string           # one sentence, atmospheric only. Pulled from a
-                         # per-archetype hook pool. MUST NOT name NPCs, specific
-                         # locations beyond region, occupations, hiding places,
-                         # or any plot specifics. The hook evokes vibe; the
-                         # quest invents the people and twists at commit time.
+                         # per-archetype hook pool with {region} substitution.
+                         # 100% engine; NO AI call is ever made for a lead.
+                         # MUST NOT name NPCs, specific locations beyond region,
+                         # occupations, hiding places, or any plot specifics.
+                         # The hook evokes vibe; the quest invents people and
+                         # twists at commit time.
 ```
+
+### Leads are zero-AI (locked)
+
+**No AI call is ever made for a lead.** Archetypes, hook pools, and region labels are all hand-authored in JSON. The engine rolls, substitutes `{region}`, and displays. AI cost happens *only* at commit, when the full quest is generated. If lead generation cost any AI at all — even a tiny hook call — the token-saving justification for leads as a distinct concept weakens.
 
 ### Hook rule (locked)
 
@@ -148,7 +154,7 @@ Hooks are **atmospheric**, not **narrative**. They evoke region + risk + vibe. T
 ### Generation flow
 
 1. **Engine rolls** a lead: archetype, difficulty, region, budget, expiry. (Zero AI.)
-2. **Optional**: one *very small* AI call (or hook-pool pick) produces the one-line hook.
+2. **Optional**: one *very small* AI call (or hook-pool pick) produces the one-line hook. **Locked: hook is pure template-pool pick, ZERO AI.**
 3. Lead sits on the **board**, visible to the player.
 4. **On commit:** the player assigns a party (1+ heroes). *Only now* does the engine fire the full quest-generation prompt: the lead's archetype + difficulty + region + budget seed an AI call that produces the actual scenarios, NPCs, named loot, twists, and per-scenario narration.
 5. The generated quest plays out via the Narrated Pool resolution above. Reward at the end uses the lead's `reward_budget` via the canonical reward-as-budget pattern.
