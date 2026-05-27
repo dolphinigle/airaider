@@ -1,6 +1,6 @@
 # Raid Design
 
-**Status:** Locked (core), Open (long-term arc, defensive raids, equipment, hero level range)
+**Status:** Locked (core, balance shape, equipment principles, difficulty class). Open (long-term arc, defensive raids, equipment slot count + room reshape, exact balance coefficients).
 
 The raid system is the central agency layer of AI Raider. This document records the **locked core loop** as resolved through design conversation and self-playtest (see [issue #1](https://github.com/dolphinigle/airaider/issues/1) for the full trace). Sections marked Open are pending later design rounds.
 
@@ -65,17 +65,37 @@ The **climax scenario** of each raid offers **2–3 distinct approaches** with m
 
 This concentrates real branching at the *payoff* moment, like a Slay-the-Spire boss or a Disco-Elysium confrontation. Setup scenarios build momentum; the climax delivers the choice.
 
-## Raid difficulty — *required_level, asymmetric penalty* (Locked)
+## Raid difficulty — *required_level + difficulty_class* (Locked)
 
-Every raid carries a single difficulty number: `required_level: int` (1 through ~50, scaling with content tier). There is **no separate Easy/Standard/Hard/Lethal axis** — that would double-count what level already expresses.
+Every raid scenario carries two difficulty numbers:
+
+- `required_level: int` (1 through ~50) — the *power* axis. Sets the threshold's center.
+- `difficulty_class: enum { standard, hard, legendary }` — the *optimization-pressure* axis. Sets the threshold's tightness coefficient.
+
+| difficulty_class | threshold coefficient | What it asks of the player |
+|---|---|---|
+| **Standard** | 1.0 | Any hero at required_level with average tags clears reliably. The bread-and-butter content. |
+| **Hard** | 1.3 | Hero at required_level needs OPTIMAL tag match to clear. Suboptimal tag → partial. Over-level can flex through with raw stats + gear. |
+| **Legendary** | 1.6 | Even optimal tag at required_level is partial. Need over-level OR multiple matching tags OR best gear OR all three. The "this is the boss" content. |
+
+This is **not** the dropped Easy/Standard/Hard/Lethal axis. That one was a *power* duplicate of level (so it was dropped). `difficulty_class` is instead an *optimization-pressure* axis: hard/legendary scenarios reward party-building and gear-investment, and legitimately let high-level heroes "flex" through low-required-level legendary content if they're well-equipped.
 
 **Penalty rules (engine-owned):**
-- **Hero level ≥ required:** no penalty. The hero contributes normally.
-- **Hero level < required:** **−2 to that hero's contribution per level of gap.** Also increases the catastrophe-band chance for the scenario.
-- **Endgame implication:** some endgame raids will exceed any reasonable hero level. Players are *expected* to absorb some under-level penalty as part of strategy — that is the point. It forces party diversity and risk acceptance, not just sending the highest-level hero.
+- **Hero level ≥ required:** no penalty from level. Difficulty_class still tightens the threshold.
+- **Hero level < required:** **−2 to that hero's contribution per level of gap.** Also increases the catastrophe-band chance.
+- **Endgame implication:** some endgame raids will exceed any reasonable hero level. Players are *expected* to absorb some under-level penalty as part of strategy.
 
-**Why asymmetric (no over-level penalty):**
-- Darkest Dungeon caps over-level engagement because their endgame *requires* the player to face hard content. Airaider's 200h+ campaign means the player will often have a level-30 hero with nothing better to do than clear a level-5 errand for easy gold. That should be *allowed* — but the **opportunity cost** of using that hero for trivial work (instead of an errand of their own caliber, or a real raid) is the natural balancing pressure. No need for a hard cap.
+**Why no over-level penalty:**
+- Airaider's 200h+ campaign means the player will often have a level-30 hero with nothing better to do than clear a level-5 errand for easy gold. That should be *allowed* — but the **opportunity cost** of using that hero for trivial work is the natural balancing pressure. No need for a hard cap.
+
+## Equipment principles (Locked. Deep design Open — see Open issues)
+
+- **Equipment is a card** (cards-as-universal-abstraction holds).
+- **Equipment lives in a hero's personal room** (no per-hero inventory bloat — see GAMEPLAY_LOOP.md camp/room section). The room is the equipment screen.
+- **Equipment uses level, not tiers.** A "Centurion's Helm L18" reads cleanly.
+- **Equipment has rarity:** common / uncommon / rare / legendary. Engine-set; gates effect magnitude and drop rate.
+- **Slot count is lean — proposed weapon + armor + 1–2 rings.** Rings tend to grant tags; weapons and armor grant stats and sometimes tags. Exact slot count is Open.
+- **Equipment data feeds AI narration.** When a scenario fires, the prompt to the AI includes the equipped cards' names and flavor so the narration can reference them concretely (*"Drust swings the named axe Iron-Tongue..."*). This is part of the engine-AI handoff.
 
 ## Errands — long-clock scenarios for idle heroes (Locked)
 
@@ -158,9 +178,10 @@ If the player can't answer "who do I send and what happens if it goes wrong?", t
 - **Defensive raids.** When enemies attack the camp, the same engine should handle "your gate is a slot, your wall is a scenario card." Probably trivial — confirm.
 - **AI narration variety.** Each tag firing 30+ times across a campaign must not feel repetitive. Likely: each tag has 5–10 narration templates rotated by AI with a short memory of recent uses.
 - **Earned tags.** Late-game heroes need new tags from earned events ("centurion-slayer"), not only their starting 3. This is the primary long-term hero progression.
-- **Hero level curve specifics.** Soft cap ~40, hard cap ~100 locked. Exact stat-growth and tag-multiplier formulas per level deferred to first prototype balance pass.
-- **Equipment system rethink.** The inherited "slot + artifact" model from aistronghold needs full rethink in light of the engine/AI split. Open questions: how does equipment interact with tags? Are items also cards? Is equipment tier-gated by hero level (D-D style) or fiction-gated (you can only wield a centurion's blade if you've killed one)? Does AI generate item names within engine-set tiers (reward-as-budget pattern applies)?
+- **Hero level curve specifics.** Soft cap ~40, no hard cap locked. Exact stat-growth and tag-multiplier formulas per level deferred to first prototype balance pass (see `docs/BALANCE.md`).
+- **Equipment + room deep design.** Principles are locked (equipment is a card, lives in hero's room, has level + rarity, lean slot count, feeds AI narration). Open: exact slot count (weapon + armor + N rings?), the room/decor system reshape from aistronghold (rooms are now BOTH prestige sources AND hero equipment), the artifact pool unification, how artifact transfer between rooms works, what happens to a dead hero's room.
 - **Prestige tier count.** Target 20+ tiers as content modes (see GAMEPLAY_LOOP.md). Final count depends on how many room/content modes get designed.
+- **Stat-too-low handling.** Locked: contributions can go negative, floored at −3, AI narrates as fictional failure ("Sextus stands there glowering, contributing nothing useful: −1"). No hard wall on participation.
 
 ## What is NOT in this doc (deferred)
 - Specific scenario *content* (what scenarios exist, what tags exist) — content design comes after the engine is locked.

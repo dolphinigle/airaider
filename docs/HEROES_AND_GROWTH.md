@@ -1,6 +1,6 @@
 # Heroes and Growth
 
-**Status:** Partially Locked. Equipment system and exact level range are Open (see `RAID_DESIGN.md` for the top-tier architecture principle this document follows).
+**Status:** Partially Locked. Equipment principles are locked; equipment deep design (slot count, room reshape) is Open. Exact level curve coefficients are Open. (See `RAID_DESIGN.md` for the top-tier architecture principle this document follows.)
 
 The central failure of AI Stronghold's hero system: a hero was a name attached to a stat block, and stats determined missions automatically. The player never *did* anything with the hero, so the hero never *meant* anything. AI Raider's hero design is built around fixing that.
 
@@ -36,7 +36,8 @@ Hero {
   # Scars (hybrid: stat effects are engine-owned; description is AI-owned)
   scars: [Scar]                   # rare, max 3 before forced retirement
 
-  # Equipment (TBD — system needs rethink, see RAID_DESIGN open issues)
+  # Equipment (cards held in this hero's personal room — see Equipment section below)
+  equipped: { weapon: EquipmentCardId?, armor: EquipmentCardId?, rings: [EquipmentCardId] }
   equipped: [ArtifactId]
 
   # Transient state (engine-owned)
@@ -60,13 +61,13 @@ The `history` field is important. It is the hero's *story*, written by the engin
 
 ### Hero levels (Locked: soft cap ~40, hard cap ~100)
 
-Levels exist as a Darkest-Dungeon-style explicit progression metric. They are visible to the player and drive numeric scaling: stat growth, tag modifier multiplier, equipment tier gating, and raid level matching.
+Levels exist as a Darkest-Dungeon-style explicit progression metric. They are visible to the player and drive numeric scaling: stat growth, tag modifier multiplier, equipment level gating, and raid level matching.
 
 **Level shape (Locked):**
 - **Levels 1–6: early-game scaffolding.** Stat-relevant; cleared in the first ~10 hours of play. Acts as the "tutorial-to-competent" curve.
 - **Levels 6–40: mid-to-late game.** Each level gives small but visible gains; XP requirement scales slowly. This is where most progression-feel lives across a 200h+ campaign.
-- **Soft cap ~40.** XP requirements past 40 grow steeply. Most players will plateau their main heroes around 40–45.
-- **Hard cap ~100 (theoretical).** Reachable only with obscene investment; serves as a long-term flex for the most-loved heroes. Most heroes will never approach it. This guarantees number-go-up dopamine *forever* without forcing it.
+- **Soft cap ~40.** XP requirements past 40 grow steeply (geometric). Most players will plateau their main heroes around 40–45.
+- **No hard cap.** Levels go up indefinitely; the steep XP curve is its own ceiling. A beloved hero in a 500h save might reach L60+ but it costs obscene investment.
 - **Realistic ceiling ~45.** Where a long-running veteran tops out under normal play.
 
 **Why this shape:** the campaign is targeted at **200h+** (see `GAMEPLAY_LOOP.md`). A short MAX_LEVEL like 6 would leave 190h of post-cap play with no number-go-up dopamine. A long curve with a soft cap solves both: the engine math stays bounded (multipliers tied to `min(level, 50)` say), but the visible level number keeps creeping up so the player always has *something* to show for hours of play.
@@ -74,7 +75,7 @@ Levels exist as a Darkest-Dungeon-style explicit progression metric. They are vi
 **Per-level effects (engine-owned, exact table TBD):**
 - Stat growth: tiny per-level (avg +0.1 to a stat), so a level-40 hero is only +4 in any one stat over a level-1. Heroes still differentiate by tags, not stats.
 - Tag modifier multiplier: small per-level, e.g. `tag_mod × (1 + 0.02 × level)`. Compounds across many tags but never explodes.
-- Equipment tier unlock: T1 from L1, T2 from L8, T3 from L18, T4 from L30, T5 from L45.
+- Equipment level gating: a hero of level L can equip equipment of level ≤ L. (Example pieces might exist at L1, L8, L18, L30, L45 as natural drops, but the gate is just "level ≤".)
 - XP curve: geometric-ish. ~1–2h play to L6, ~30h to L20, ~80h to L40, ~∞ to L100.
 
 **Open questions on level curve:**
@@ -149,17 +150,43 @@ The engine sets the recruit's level, attribute rolls, and tag count for that tie
 
 Newly recruited heroes start with **0 loyalty** and may defect early if treated badly. This counterbalances their starting power so they are not strictly superior to long-serving veterans.
 
-## Equipment (OPEN — needs full rethink)
+## Equipment (Principles Locked. Deep design Open.)
 
-The inherited aistronghold model (slots holding `ArtifactId` references) does not yet fit the airaider design. Open questions to resolve before this section can be locked:
+**Locked principles:**
 
-- **Are items cards too?** Cards-as-universal-abstraction suggests yes. Equipping = playing an item-card into a hero-slot.
-- **Tier-gated by level, or fiction-gated?** D-D-style level gating is simple but flat (`T2 gear requires level 3+`). Fiction gating is richer (`you can only wield a centurion's blade after you've killed a centurion`) but harder to balance.
-- **How does equipment interact with tags?** Does an axe grant a temporary `axe-and-shield` tag for the duration of equip? Or its own modifier independent of tags?
-- **Reward-as-budget for loot:** the engine sets an item value/tier; the AI names and flavors it. This part is clear.
-- **Slot count and decision weight:** 3 slots (weapon/armor/trinket) like D-D, or fewer for less bookkeeping?
+- **Equipment is a card.** Cards-as-universal-abstraction holds: every equipment piece is a card with the same data shape pattern as hero/follower/scenario cards.
+- **Equipment lives in the hero's personal room** (see GAMEPLAY_LOOP.md camp/room section). The room is the equipment screen. This re-purposes aistronghold's room system as a dual-role artifact display: rooms grant camp prestige AND act as that hero's equipped gear loadout. **No per-hero inventory bloat** — if it's not in the room, the hero doesn't have it.
+- **Equipment uses level, not tier.** A piece is "Centurion's Helm L18" — same `level` field shape as heroes. No T1/T2/T3 jargon. The piece can be equipped by any hero of level ≥ its level. Higher-level heroes wearing low-level gear is allowed (the piece's bonus is small relative to the hero's growth, so it's self-balancing).
+- **Equipment has rarity** — engine-set: `common` / `uncommon` / `rare` / `legendary`. Rarity scales the magnitude of the bonus and the rate at which it drops from raids. (This is the *only* rarity word in airaider. Scenarios use `difficulty_class` instead — see RAID_DESIGN.md.)
+- **Lean slot count — proposed:** `weapon`, `armor`, and `rings` (1–2). Weapons and armor give stat bonuses (small) and sometimes tag activations. Rings predominantly grant tags. Exact count is Open.
+- **Equipment data feeds AI narration.** When a scenario fires, the engine includes the equipped cards' names and flavor in the AI prompt for that hero. The narration can then reference them concretely (*"Drust hefts the named axe Iron-Tongue..."*). Equipment is not just a stat — it's an AI-visible prop.
 
-Until these are resolved, treat the `equipped: [ArtifactId]` field in the data model as a placeholder. See [issue #1](https://github.com/dolphinigle/airaider/issues/1) for the live discussion.
+**Equipment card data shape (sketch):**
+
+```yaml
+EquipmentCard:
+  id: <opaque>
+  type: 'equipment'
+  name: string                            # AI-generated, engine-validated for length
+  flavor: string                          # AI-generated, fed back into narration prompts
+  level: int                              # 1..50ish, must be ≤ hero level to equip
+  rarity: enum { common, uncommon, rare, legendary }   # engine-owned
+  slot: enum { weapon, armor, ring }      # engine-owned
+  stat_bonus: { brawn: int, cunning: int, wits: int }  # engine-owned; nonzero for weapon/armor; usually zero for ring
+  tags_granted: [tag]                     # engine-owned; usually nonzero for ring; sometimes for weapon
+  origin: string                          # AI-generated; where/how it was acquired
+```
+
+**Open (deferred — big TODO):**
+
+- Exact slot count (`weapon + armor + 1 ring` vs `weapon + armor + 2 rings` vs another shape).
+- How the room *displays* and *gates* equipment. Is the room layout itself a puzzle (slot positioning)? Or is it a flat list?
+- The full artifact-pool unification with aistronghold's existing room/artifact concepts. Rooms in airaider now play two roles (prestige source + hero equipment) — that needs careful design.
+- How artifact transfer between rooms works (player-driven gear rebalance among heroes).
+- What happens to a dead hero's room — inheritance moment? Gear redistributes? Successor occupies?
+- Whether scenarios that fictionally take place "in camp" can see room contents to weave them in.
+
+This deep design is deferred. The above principles are sufficient to write balance numbers and stub UI around. See [issue #1](https://github.com/dolphinigle/airaider/issues/1) for the live discussion.
 
 ## Relationship to followers
 

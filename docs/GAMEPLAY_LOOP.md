@@ -10,7 +10,7 @@ Target campaign length: **200+ hours**.
 
 - **First ~10 hours**: early game. Hero levels climb 1→6. Player learns the systems, runs P0–P1 raids, settles a starter camp.
 - **Hours ~10 to ~50**: mid game. Levels climb 6→20. Camp expands through mid prestige tiers. Most systems are unlocked. Hero deaths start mattering.
-- **Hours ~50+**: endgame, where most play happens. Levels creep slowly 20→40+, soft cap around 40, theoretical hard cap ~100. Prestige climbs through high tiers, unlocking diplomatic / political / faction-scale content. The number-go-up curve never quite finishes; the content variety is what carries the time.
+- **Hours ~50+**: endgame, where most play happens. Levels creep slowly 20→40+, soft cap around 40, no hard cap. Prestige climbs through high tiers, unlocking diplomatic / political / faction-scale content. The number-go-up curve never quite finishes; the content variety is what carries the time.
 
 The hero level cap is intentionally soft (see `HEROES_AND_GROWTH.md`): a player who loves a hero can keep grinding them up forever in tiny increments, but the *intended* loop is "hit ~L40 in the mid-late game and then play *with* that hero across diverse endgame content."
 
@@ -98,7 +98,8 @@ The errand system guarantees there is never a "useless turn" for any hero — ev
 
 - Assign followers to rooms / duties. Each follower contributes prestige and a passive camp effect; followers whose traits match a theme contribute *bonus* prestige.
 - Display artifacts in rooms (flat prestige).
-- Equip heroes with artifacts (changes raid options, not fort prestige).
+- **Each hero has a personal room.** The room doubles as the hero's equipment screen: artifacts and gear cards placed in that room are simultaneously prestige sources for the camp AND that hero's equipped loadout (see HEROES_AND_GROWTH.md Equipment section). This unifies aistronghold's room/artifact system with airaider's lean equipment model — no parallel inventory exists.
+- Equip heroes with equipment cards (placed into their personal room — changes raid options, also contributes to fort prestige).
 
 ### Plan the next raid
 
