@@ -35,9 +35,9 @@ These two interact. Smaller party + shorter raid = "one more raid" rhythm. Bigge
 
 Is the default mode permadeath, or is wounded-instead-of-dead the default with permadeath as a hardcore option? Affects emotional weight and onboarding difficulty.
 
-### Q5. Pressure mechanic
+### Q5. Pressure mechanic — **RESOLVED**
 
-Which push-vs-retreat lever does the raid use? Light/torch attrition, noise meter, supply burn, time-of-day clock, pursuer? Pick one primary lever; possibly one secondary.
+**Resolution:** Quest expiry + daily upkeep (hero wages, follower upkeep, room income) are the only pressures. **No Heat, no clock-timers, no closing-NPC.** See `CORE_CONCEPTS.md` §14a. Battle Brothers uses the same model. Cozy-strategic, not FOMO. (Moved to Resolved.)
 
 ### Q6. New hero starting level
 
@@ -83,6 +83,30 @@ Probably no. Confirming: no multiplayer, no async fort-sharing, no leaderboards 
 
 Single-file save. Save-anywhere. Cloud sync via Steam/GOG only. No anti-cheat. Confirming.
 
+### Q16. Per-scenario decision density (P1)
+
+Each scenario currently = one drag-drop + (climax only) approach pick. That's ~5 decisions per 15-min raid. Risk: feels passive ("drag-drop-watch-read") and may bore players by hour 10.
+
+Rejected fix: tactical spend-verbs (gold/captive/item reroll). User judged them as accounting fiddle, not real decisions.
+
+Candidate real fixes (deferred to first playtest):
+- Deeper scenario archetypes (solo / negotiation / stealth-silent-abort / pair-combo / race-clock).
+- More mid-scenario forks (engine-offered 2-way during resolution: "push through (+2 Cunning) or hold (+2 Brawn)?").
+- More setup-scenarios offering approach picks (currently only climax branches).
+- *Future-explorations escape valve:* per-hero deck-builder sub-game (Slay-the-Spire style). Massive design surface; only consider if vertical slice proves the loop is too thin.
+
+Decision: don't fix preemptively. Build vertical slice as currently locked. If playtest reveals genuine decision-deficit, pick from the above.
+
+### Q17. Hero-deck sub-game (P2 — future exploration only)
+
+User suggested: each hero owns a small card-deck; heroes form a party-deck; the deck is played in "battles" or "negotiations" (à la Slay the Spire).
+
+Pros: would solve Q16 elegantly (5–8 card-play decisions per scenario).
+Cons: doubles the design surface; conflicts with the Narrated-Pool philosophy where the math is small/hidden and the AI narration is the central surface; turns the game into "deckbuilder with fort meta."
+
+Decision: not now, not for vertical slice. If post-VS playtest shows Q16 is severe, revisit.
+
 ## Resolved (move entries here as they get decided)
 
-*(none yet)*
+### Q5. Pressure mechanic — RESOLVED
+Quest expiry + daily upkeep (hero wages, follower upkeep, room income). No Heat, no clock-timers, no closing-NPC. See `CORE_CONCEPTS.md` §14a.

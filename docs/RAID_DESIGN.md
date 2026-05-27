@@ -293,6 +293,17 @@ For any scenario, the UI must always communicate:
 
 If the player can't answer "who do I send and what happens if it goes wrong?", the UI has failed.
 
+## Failure punishment — lost time (Locked)
+
+A failed or lapsed raid/quest costs the player **time only**, not reputation:
+
+- Heroes return Fatigued; may carry traumas; may die in wipes (mode-dependent).
+- The days spent pursuing / playing / recovering are gone — those days **also accrued wages** (see `CORE_CONCEPTS.md` §14a), which is the real economic bite.
+- **No permanent regional reputation damage.** No hostile NPCs spawn from failure. No content locks.
+- **Arc-tied failures** delay the arc by one quest-slot and update `Arc.plot_state` to reflect the failure ("the reeve survived the attempt; the next quest in this arc will factor that in"). The arc itself does not collapse.
+
+Cozy-strategic, not punishing. Players never feel a single bad raid ruined a region.
+
 ## Open issues (logged from playtest)
 
 - **Stat-pools per scenario, not single stats.** A scenario must declare which stat(s) heroes can lean on, possibly with fallbacks (e.g. "Wits, or Cunning at –1"). Single-stat scenarios punish spiky heroes unfairly.

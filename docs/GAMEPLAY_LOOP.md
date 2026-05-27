@@ -128,12 +128,20 @@ Approximate tier shape (exact count is **Open** — target 20+ tiers, depends on
 
 Each tier should add something *qualitatively new* to the play surface. A tier that only adds bigger numbers does not earn its slot.
 
-### Passive pressure: factions and reputation
+### Passive pressure: daily upkeep (Locked)
 
-The world reacts to the player's actions even on quiet days. Examples implemented in playtest:
-- **Heat** rises with each raid and falls with quiet days. High Heat brings investigators (Centurion Petillius in the playtest example) who close on the camp over real days, eventually triggering a defensive raid.
-- **Prestige in local villages** rises when raids align with peasant sentiment (burning a Roman official) and falls when they don't.
-- **Faction offers** appear unprompted (a slave-buyer arrives, a deserter offers service, a rival warlord sends a demand).
+**The day-clock has teeth via *upkeep*, not a Heat/timer/closing-NPC mechanic.** See `CORE_CONCEPTS.md` §14a.
+
+- **Hero wages** scale with hero level. Idle high-level heroes bleed gold.
+- **Follower upkeep** per occupied housing room.
+- **Room income** offsets (workshops, mills, taverns).
+- Treasury at zero on End Day → loyalty drops → defection risk if sustained.
+
+**No FOMO clocks.** The game is meant to feel cozy-strategic. Pressure comes from "can I afford this roster?" not "the timer is running out."
+
+Quiet days are still allowed (and economically punished mildly), so players can build/plan without anxiety.
+
+Faction offers and ambient news may still appear as flavor — but they are *opportunities*, not closing threats.
 
 ### Why not "end week"?
 

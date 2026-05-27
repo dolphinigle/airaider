@@ -446,6 +446,22 @@ This makes **roster depth a real strategic resource** — you NEED 6–10 captai
 
 ---
 
+## 14a. Daily upkeep — the pressure mechanic 🔒
+
+**No timer clocks. No Heat. No closing-NPC.** Quest expiry and **daily upkeep** are the *only* pressures on the player. The game is meant to feel cozy-strategic, not FOMO-stressful.
+
+Upkeep gives the day-clock teeth without rushing the player. Battle Brothers uses the same model.
+
+- **Hero wages.** Each active hero costs `base_wage + level_coeff × level` gold per day. Higher-level / higher-renown heroes cost more (loyalty is rented, not given). **Retired heroes** (placed in rooms) cost **zero** — retirement becomes an economically attractive late-game move, reinforcing the "fort as trophy case" payoff.
+- **Follower upkeep.** Each occupied follower-housing room incurs a small daily food/bedding cost. Unhoused followers don't exist (housing capacity is the hard cap).
+- **Room income.** Some RoomTypes generate small passive daily gold (workshop, mill, smithy, tavern). `net_daily = room_income − hero_wages − follower_upkeep`.
+- **Wage-failure consequences.** If treasury can't cover End-Day wages, loyalty drops across the roster. A hero at loyalty 0 may defect. **Not a death spiral**: selling a captive, finishing an errand, retiring a hero, or pursuing a paying quest all stabilize quickly.
+- **Why this works without a timer:** the player feels economic pressure every day without a counting-down clock. Hoarding heroes leaks gold. Keeping heroes earning thrives. Retiring veterans into rooms gives prestige AND cuts wages — perfect alignment with the trophy-castle endgame.
+
+Exact wage/upkeep/income numbers are balance-pass (see §23).
+
+---
+
 ## 15. Death and trauma 🔒
 
 - **Default mode:** downed hero in a successful raid = wounded (long heal). Downed in a wipe = dead unless rescued.
@@ -453,6 +469,16 @@ This makes **roster depth a real strategic resource** — you NEED 6–10 captai
 - **Mercy mode:** dying heroes are merely retired.
 - Dead heroes get a Hall-of-Fallen entry — loss → fort trophy, on-pillar.
 - **Traumas** are temporary mental states from bad raid events; healable at fort (Chapel, Apothecary, Tavern). Distinct from scar-origin tags (which are permanent).
+
+### Failure punishment model 🔒
+
+**Failure costs *time*, not reputation.** When a quest fails, lapses, or a raid wipes:
+- Heroes return Fatigued and may carry traumas; in catastrophic-band outcomes, scar-origin tags or death (mode-dependent).
+- **No permanent regional/faction reputation damage.** No hostile-NPC invasions. No locked-out content.
+- **The bite is the days you sunk in.** Pursuing a 2-day-expiry quest, playing it, and failing on day 3 = ~3 days of wages, fatigue, opportunity cost. That's the punishment. Sufficient.
+- **Arc-tied quest failures** delay the arc by 1 quest-slot but do not destroy the arc. The arc's plot_state updates ("the attempt on the reeve failed; he's more cautious now") and the next arc-quest factors that context in.
+
+This keeps the game cozy-strategic, not punishing. Players never feel a region/faction has been "ruined" by one bad raid.
 
 ---
 
@@ -571,6 +597,9 @@ None are gated by a final boss; they are personal completion states. An optional
 
 ## 23. Big TODOs (not yet designed)
 
+- **Drop-rate floor / pity tuning.** The drop-loop dopamine (find a follower/equipment with tags that perfectly match an existing themed room) is the locked anti-boredom engine (see `PROGRESSION_AND_PAYOFF.md`). New players must hit their first "perfect match" moment within ~3 raids or the loop never lands. Needs a soft pity-floor in early game.
+- **Per-scenario decision density (Open).** Currently each scenario = one drag-drop + a closing climax-approach pick. That's ~5 decisions per 15-min raid, which may feel passive. Tactical spend-verbs (gold/captive/item reroll) were rejected as accounting fiddle. Real fix — deeper scenario archetypes, more mid-scenario forks, or eventually a hero-deck sub-game — deferred to first playtest. See `OPEN_QUESTIONS.md` Q16.
+- **Wage / upkeep / room-income numbers.** Daily upkeep is the locked pressure mechanic (§14a); exact wage formula and room-income table need balance pass.
 - **Balance numbers.** First-pass CSVs in `airaider/balance/`.
 - **Earned-tag triggers.** What engine events award new tags, AI prompt structure, frequency.
 - **Per-level reward model.** Auto-stat-up vs every-5-levels pick — proposed but not locked.
