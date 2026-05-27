@@ -31,7 +31,18 @@ A `Room` instance occupies a `width × height` rectangle of opened, currently-em
 
 Two rooms are **adjacent** when one's outer cell-boundary touches another's. Within a tier this is left↔right neighbors (most common). For monumental height-2 rooms, adjacency also exists on the upper tier.
 
-When adjacent rooms share at least one tag in their themes, both rooms get **+20% prestige**. This is the spatial puzzle: optimizing room placement so themed clusters form, while still respecting `maxCopies` constraints and slot scarcity.
+Adjacency bonuses come from **hand-authored RoomType pairs**, declared per RoomType in JSON. Examples:
+- Kitchen ↔ Dining Room: +25%
+- Library ↔ Scriptorium: +20%
+- Armory ↔ Sparring Post: +20%
+- Armory ↔ Forge: +15%
+- Dungeon ↔ Interrogation Room: +30%
+
+There is **no generic theme-tag adjacency between rooms** — adjacency is exclusively between explicit RoomType pairs. This keeps placement strategy designable and learnable.
+
+**Hero bedroom adjacency (planned, for late-game min-maxing):** a Hero's Bedroom gets bonus prestige when adjacent to a room whose RoomType is in that hero's `tag_preferred_neighbors` set (derived from the hero's own tags). Different heroes want different neighbors. Numbers TBD.
+
+Adjacency bonuses stack multiplicatively, capped at ~×1.50 to prevent runaway chains.
 
 ### RoomType (JSON-declared)
 
@@ -48,9 +59,26 @@ When adjacent rooms share at least one tag in their themes, both rooms get **+20
   "maxItems": 4,
   "themePromptHint": "weapons, training, war",
   "upgradeTrack": [...],
+  "adjacency_bonuses": {
+    "room_type:sparring_post": 20,
+    "room_type:forge": 15
+  },
   "raidBuff": { ... optional ... }
 }
 ```
+
+## Housing and assignment (cap mechanics)
+
+**Cards that occupy the fort have two separate mechanics:** housing (caps total count) and assignment (drives prestige). Both apply to followers and captives; heroes use a simplified version.
+
+| Card type | Housing mechanic (cap) | Assignment mechanic (prestige) |
+|---|---|---|
+| **Heroes** | 1 Hero's Bedroom per hero (or 1 Bunkroom slot for un-roomed heroes). Bedroom is a normal RoomType; Bunkroom is the starter shared-housing RoomType, vestigial once dedicated bedrooms cover the roster. | Heroes "work" on raids; their bedroom's RoomType-specific prestige formula factors in level, gear, history, and tag-match adjacency. |
+| **Followers** | Total follower cap = Σ capacity of follower-housing RoomTypes built (e.g. `Servants' Quarters` cap 5, `Barracks` cap 10, `Common Room` cap 3). Follower with no housing slot can't be retained. | Followers can be optionally *assigned* to a work room (Kitchen, Library, Armory, etc.). An assigned follower contributes prestige scaled by tag overlap with the room's theme. Housed-but-idle followers count toward cap but contribute no prestige. |
+| **Captives** | Need at least one Dungeon-type RoomType. Captive cap = Σ capacity of dungeon-type rooms. | Captives have no work assignment. Their value is ransom/sale/conversion-to-follower. |
+| **Equipment / artifacts** | Held in their owner-hero's bedroom (per equip slot rules) OR displayed in any room with `maxItems > 0`. | Equipped on a hero adds to that hero's contribution in raids; displayed artifacts add flat prestige to their room. |
+
+**Housing rooms ≠ work rooms.** A follower lives in Servants' Quarters AND works in the Kitchen. Two different rooms, two different RoomTypes.
 
 ## Theme
 
@@ -65,15 +93,21 @@ This concept is now covered above in "Rooms · Theme". The free-text + AI-derive
 ```
 Fort Prestige = Σ Room Prestige
 
-Room Prestige = base_prestige(roomType, level)
-              + Σ follower.prestige × theme_multiplier(follower.tags, room.theme)
-              + Σ artifact.prestige
-              × adjacency_bonus                          (1.0 to 1.4 — see below)
+Room Prestige = ( base_prestige(roomType, level)
+                + Σ follower.prestige × theme_multiplier(follower.tags, room.theme)
+                + Σ artifact.prestige
+                + retired_hero.prestige (if bedroom housing retired hero)
+                + hero_present.prestige × hero_bedroom_tag_match (if bedroom)
+                )
+                × adjacency_bonus   # product of RoomType-pair bonuses
+                                    # capped at ~×1.50
 ```
 
-**Adjacency bonus:** for each adjacent room sharing at least one theme-tag, multiply this room's prestige by 1.20. Stacks multiplicatively but capped at ~×1.40 to prevent runaway chains.
+**Two prestige pressures, kept distinct:**
+- *Theme-tag matching* — assigning the right follower (whose tags overlap a room's theme) to the right work room. **Inherited core dopamine loop.** Drives roster decisions.
+- *RoomType-pair adjacency* — placing the right rooms next to each other. **New layer.** Drives spatial decisions.
 
-Followers in matching rooms can multiply their contribution substantially. Achieving the cap requires finding a follower whose tags closely match a room's theme AND placing that room next to thematically matching neighbours — this is the **RNG + spatial-puzzle dopamine loop** the game is built around.
+These don't overlap mechanically — placement is a hand-authored, learnable strategy layer; follower matching is RNG-discovery joy. Both stack on top of `base_prestige`.
 
 ## What changes vs. AI Stronghold
 

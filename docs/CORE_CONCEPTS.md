@@ -259,9 +259,18 @@ EquipmentCard:
   Fort Prestige = Σ Room Prestige
   Room Prestige = ( base_prestige(roomType, level)
                   + Σ follower.prestige × theme_multiplier(follower.tags, room.theme)
-                  + Σ artifact.prestige )
-                  × adjacency_bonus                  # 1.0 to ~1.4
+                  + Σ artifact.prestige
+                  + retired_hero.prestige (if bedroom)
+                  + hero_present.prestige × hero_bedroom_tag_match (if bedroom)
+                  )
+                  × adjacency_bonus                  # RoomType-pair pairs, capped ~×1.50
   ```
+
+**Two prestige pressures, kept distinct:**
+- *Theme-tag matching* — assigning followers whose tags overlap a room's theme into that work room. **Inherited core dopamine loop.** RNG discovery joy.
+- *RoomType-pair adjacency* — placing the right rooms next to each other. **New layer.** Hand-authored, learnable. Each RoomType JSON declares which other RoomTypes give it adjacency bonus.
+
+These don't overlap mechanically — placement is a designable strategy layer; follower matching is RNG joy.
 
 **Airaider-specific spatial model (NEW):**
 
@@ -273,12 +282,19 @@ The fort is a **2D side-view cross-section** of a hill-fort. Always entirely vis
 - Rooms occupy `width × height` rectangles:
   - Widths: **1, 2, or 3** (declared per RoomType in JSON).
   - Heights: **1** for almost all rooms; a small hand-authored set (~3) of monumental `maxCopies: 1` rooms are **height-2** (Great Hall, Reliquary, Cathedral-type endgame trophies).
-- **Adjacency = +20% prestige to both rooms** whose outer cells touch AND share at least one theme-tag. Caps around ×1.40 to prevent runaway chains.
+- **Adjacency = RoomType-pair hand-authored bonuses.** Each RoomType JSON declares which other RoomType IDs grant it +X% prestige when adjacent (Kitchen↔Dining +25%, Library↔Scriptorium +20%, Armory↔Sparring Post +20%, etc.). **Not** generic theme-tag adjacency — placement strategy is designable and learnable. Late-game min-max layer: a Hero's Bedroom gains bonus when adjacent to room types that match that hero's tags.
+
+**Housing and assignment (two separate mechanics):**
+
+- **Heroes:** 1 Hero's Bedroom per hero, or 1 Bunkroom slot for un-roomed heroes. Bunkroom is the starter shared-housing RoomType.
+- **Followers:** Total cap = Σ capacity of follower-housing RoomTypes (Servants' Quarters, Barracks, Common Room, ...). A housed follower may be *assigned* to a separate work room (Kitchen, Library, etc.) for theme-tag prestige. Housing room ≠ work room.
+- **Captives:** Total cap = Σ capacity of Dungeon-type rooms. No work assignment; captives have ransom/sale/conversion value.
+- **Equipment / artifacts:** Equipped in their hero's bedroom (per slot rules) or displayed in any room with `maxItems > 0`.
 
 **Other airaider-specific changes:**
 
 1. **Heroes can be retired into rooms.** Their prestige contribution = level + gear + history. A favorite hero you no longer want to risk becomes a fort centerpiece.
-2. **Each hero can have a personal room (Hero's Bedroom RoomType, width 1).** Built like any other room (must pay, must place); housing equipment slots that unlock by room level (L1=weapon, L2=+armor, L3=+2 rings). Heroes without a bedroom sleep in the Bedroll Pit (utility, 0 equip slots).
+2. **Each hero can have a personal room (Hero's Bedroom RoomType, width 1).** Built like any other room (must pay, must place). Equipment slots unlock by bedroom level (L1=weapon, L2=+armor, L3=+2 rings). **Bedroom is a recruit-license:** a hero must have either a dedicated Bedroom OR a Bunkroom slot to be retained. The total bedroom + bunkroom slots = your hero roster cap (concrete spatial pressure, not abstract).
 3. **Some rooms grant raid-side buffs** (e.g. Apothecary L3+ → start raid with N healing potions). Small, single-buff-per-category. The fort *matters* during a raid without auto-resolving it.
 4. **No "End Week" tick.** Day cycle; wound/trauma healing is measured in raids-completed (not real time).
 
