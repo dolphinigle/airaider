@@ -130,9 +130,20 @@ Lead:
   reward_budget: int     # reroll budget for loot at pursuit time
   region: string         # short region label (Greythorn outskirts, Pine Hollow…)
   expiry_days: int       # disappears from the board if not pursued
-  hook: string           # one sentence. Optional AI flavor, or pulled from
-                         # a hand-authored per-archetype hook pool. Cheap or free.
+  hook: string           # one sentence, atmospheric only. Pulled from a
+                         # per-archetype hook pool. MUST NOT name NPCs, specific
+                         # locations beyond region, occupations, hiding places,
+                         # or any plot specifics. The hook evokes vibe; the
+                         # quest invents the people and twists at commit time.
 ```
+
+### Hook rule (locked)
+
+Hooks are **atmospheric**, not **narrative**. They evoke region + risk + vibe. They do NOT name NPCs, locations beyond region, occupations, hiding places, or plot specifics. Two leads of the same archetype in the same region should be **functionally interchangeable** from the hook alone — the actual people, places, and twists are invented *only at commit time*. Otherwise the hook half-writes the quest and the token saving evaporates.
+
+- ❌ *"Old Murch the tanner owes Lord Kessel and hides silver under his hides."*
+- ✅ *"A debt-dodger in the west quarter — small purse, easy work."*
+- ✅ *"Bandits in the eastern forest. Local bounty posted."*
 
 ### Generation flow
 
