@@ -130,34 +130,20 @@ Lead:
   reward_budget: int     # reroll budget for loot at pursuit time
   region: string         # short region label (Greythorn outskirts, Pine Hollow…)
   expiry_days: int       # disappears from the board if not pursued
-  hook: string           # one sentence, atmospheric only. Pulled from a
-                         # per-archetype hook pool with {region} substitution.
-                         # 100% engine; NO AI call is ever made for a lead.
-                         # MUST NOT name NPCs, specific locations beyond region,
-                         # occupations, hiding places, or any plot specifics.
-                         # The hook evokes vibe; the quest invents people and
-                         # twists at commit time.
 ```
 
-### Leads are zero-AI (locked)
+**No hook field, no prose, zero AI.** UI displays a lead as `{Archetype} · {region} · L{dc} · ~{reward}g · {expiry}d`. That is the whole lead.
 
-**No AI call is ever made for a lead.** Archetypes, hook pools, and region labels are all hand-authored in JSON. The engine rolls, substitutes `{region}`, and displays. AI cost happens *only* at commit, when the full quest is generated. If lead generation cost any AI at all — even a tiny hook call — the token-saving justification for leads as a distinct concept weakens.
+### Why no hook prose
 
-### Hook rule (locked)
-
-Hooks are **atmospheric**, not **narrative**. They evoke region + risk + vibe. They do NOT name NPCs, locations beyond region, occupations, hiding places, or plot specifics. Two leads of the same archetype in the same region should be **functionally interchangeable** from the hook alone — the actual people, places, and twists are invented *only at commit time*. Otherwise the hook half-writes the quest and the token saving evaporates.
-
-- ❌ *"Old Murch the tanner owes Lord Kessel and hides silver under his hides."*
-- ✅ *"A debt-dodger in the west quarter — small purse, easy work."*
-- ✅ *"Bandits in the eastern forest. Local bounty posted."*
+Even a templated atmospheric string ("bandits in the forest, local bounty posted") narrows the AI's creative window at commit time — "local bounty posted" forces the generated quest to involve a local bounty. The archetype name alone (`bandit_camp`) already carries categorical steering, which is intentional and necessary (the player must know they're picking a bandit-camp-shape job vs a haunted-ruin-shape job). Any *additional* prose steering is gratuitous and we remove it.
 
 ### Generation flow
 
 1. **Engine rolls** a lead: archetype, difficulty, region, budget, expiry. (Zero AI.)
-2. **Optional**: one *very small* AI call (or hook-pool pick) produces the one-line hook. **Locked: hook is pure template-pool pick, ZERO AI.**
-3. Lead sits on the **board**, visible to the player.
-4. **On commit:** the player assigns a party (1+ heroes). *Only now* does the engine fire the full quest-generation prompt: the lead's archetype + difficulty + region + budget seed an AI call that produces the actual scenarios, NPCs, named loot, twists, and per-scenario narration.
-5. The generated quest plays out via the Narrated Pool resolution above. Reward at the end uses the lead's `reward_budget` via the canonical reward-as-budget pattern.
+2. Lead sits on the **board**, visible to the player as `{Archetype} · {region} · L{dc} · ~{reward}g · {expiry}d`.
+3. **On commit:** the player assigns a party (1+ heroes). *Only now* does the engine fire the full quest-generation prompt: the lead's archetype + difficulty + region + budget + party seed an AI call that produces the actual scenarios, NPCs, named loot, twists, and per-scenario narration.
+4. The generated quest plays out via the Narrated Pool resolution above. Reward at the end uses the lead's `reward_budget` via the canonical reward-as-budget pattern.
 
 ### Why this works
 
