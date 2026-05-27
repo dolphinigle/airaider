@@ -145,15 +145,24 @@ Region is a string label for now. A real region/world-geography system (regional
 
 1. **Engine rolls** a lead: difficulty, region, budget, expiry. (Zero AI.)
 2. Lead sits on the **board**, visible to the player as `Lead · {region} · L{dc} · ~{reward}g · {expiry}d`.
-3. **On commit:** the player assigns a party (1+ heroes). *Only now* does the engine fire the full quest-generation prompt: difficulty + region + budget + party seed an AI call that produces the actual scenarios, NPCs, named loot, twists, and per-scenario narration — including inventing what *kind* of job this is.
-4. The generated quest plays out via the Narrated Pool resolution above. Reward at the end uses the lead's `reward_budget` via the canonical reward-as-budget pattern.
+3. **Pursue Lead** is a free, instant action: zero hero cost, zero turns. The engine fires the full quest-generation AI call (difficulty + region + budget + nothing else). The Lead stub disappears; a **Quest** object appears on the Quest tray with scenarios, NPCs, named loot, twists, narration — everything.
+4. **Assign heroes** to the Quest is a separate decision. The player can now see the quest's scenarios (or at least their threshold/stat-pool shapes) and picks a party with full information. This is the play decision.
+5. Quest plays out via Narrated Pool resolution. Reward at the end uses the lead's `reward_budget` via the canonical reward-as-budget pattern.
 
-### Why this works
+**Pursued Quests expire fast** (proposal: ~2 days to assign and play, else the quest lapses with no penalty beyond the lost opportunity). This is the natural rate-limiter — players who pursue gratuitously will see most of their quests lapse unplayed. No hard cap needed.
 
-- **Token-cheap board:** dozens of leads can sit on the board for the cost of one real quest. Unpursued leads expire harmlessly.
-- **Commit-with-imperfect-info tension:** the player sees difficulty + reward budget + region but not the specific premise or scenario shapes. Committing a hero is a real bet.
-- **Scouting becomes a distinct mechanic:** cunning/social heroes (e.g. `silver-tongue`, `road-bred`) can spend an action to **scout a lead** — engine reveals 1–2 scenario hints before commit. A non-combat use of cunning heroes that doesn't compete with raid slots.
-- **Premise is invented at commit, not catalogued.** The AI invents what kind of job each lead actually is. Pattern-recognition fun still exists (after enough hours the player has a feel for what L1 leads in Greythorn tend to be), but every individual lead is unique.
+### Pursue vs Assign — why split them
+
+- **Pursue is psychological commit, not tactical commit.** "I want this job" decision happens first; "who do I send" decision happens after seeing the actual quest content.
+- **Player makes a better-informed party choice.** They can match heroes to the specific scenario stat-pools they'll actually face.
+- **Quest expiry is the rate-limiter.** Pursuing too many = most lapse unplayed = wasted AI on the player's own clock. Self-correcting; no hard cap needed.
+- **Imperfect-info tension still exists**, just shifted earlier: the *pursue* decision is the gamble (am I willing to dedicate ~2 in-game days and a slot in my quest tray to find out what this is?).
+
+### Why the lead system as a whole works
+
+- **Token-cheap board:** many leads can sit on the board for the cost of one real quest. Unpursued leads expire harmlessly.
+- **Scouting becomes a distinct mechanic:** cunning/social heroes (e.g. `silver-tongue`, `road-bred`) can spend an action to **scout a lead** — engine reveals 1–2 hints about the lead before pursuit. A non-combat use of cunning heroes that doesn't compete with raid slots.
+- **Premise is invented at pursuit, not catalogued.** The AI invents what kind of job each lead actually is. Pattern-recognition fun still exists (after enough hours the player has a feel for what L1 leads in Greythorn tend to be), but every individual lead is unique.
 
 ### Story Beats — the deliberate exception
 
