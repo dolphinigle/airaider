@@ -1,8 +1,35 @@
 # Raid Design
 
-**Status:** Locked (core), Open (long-term arc, defensive raids)
+**Status:** Locked (core), Open (long-term arc, defensive raids, equipment, hero level range)
 
 The raid system is the central agency layer of AI Raider. This document records the **locked core loop** as resolved through design conversation and self-playtest (see [issue #1](https://github.com/dolphinigle/airaider/issues/1) for the full trace). Sections marked Open are pending later design rounds.
+
+## Top-tier architecture principle — *Engine owns numbers, AI owns flavor*
+
+This is the single most important rule the project commits to. It applies to every system in the game, not just raids.
+
+- **Engine (deterministic code)** owns: all numbers, all balance, all probabilities, all gold/stat/level/threshold/reward amounts, all hard rules. Tunable in spreadsheets.
+- **AI (generative model)** owns: all names, voices, prose, character lines, scenario flavor, *type* of reward, narrative consequences, hero personalities, tag *labels*.
+- **Engine → AI handoff** is via a **numeric envelope**: the engine declares a budget or constraint, the AI fills it with meaning, the engine validates the result.
+
+### Reward-as-budget pattern (canonical example of the split)
+
+Whenever a raid produces a reward, the flow is:
+
+1. **Engine computes a reward budget** from the raid's difficulty and outcome band.
+   > *"This was a difficulty-3 raid that closed in band B (partial). Reward budget = 80 gold-equivalent."*
+2. **AI splits the budget into meaningful pieces of fiction.**
+   > *"50g in a leather pouch + a 25g-value captive merchant + a 5g trinket. Here's the scene where they're discovered."*
+3. **Engine validates** (totals match within ±10%, item types are legal, captives go to the captive table, etc.).
+4. **Engine commits** the rewards to the game state.
+
+The same pattern applies to:
+- **Scenario stat thresholds** — engine sets threshold *number*; AI describes what the obstacle *is*.
+- **Recruitment** — engine sets recruit level/tag count; AI fills in name, backstory, tag names.
+- **Loot generation** — engine sets item tier; AI names the item.
+- **Consequence narration** — engine sets the mechanical effect (a scar, a wound, -1 loyalty); AI narrates *why*.
+
+This pattern means the game is **always balanced** (numbers are in code) and **always fresh** (fiction is in AI). Neither layer can corrupt the other's job.
 
 ## The core action — *cards into scenario slots*
 
@@ -102,7 +129,8 @@ If the player can't answer "who do I send and what happens if it goes wrong?", t
 - **Defensive raids.** When enemies attack the camp, the same engine should handle "your gate is a slot, your wall is a scenario card." Probably trivial — confirm.
 - **AI narration variety.** Each tag firing 30+ times across a campaign must not feel repetitive. Likely: each tag has 5–10 narration templates rotated by AI with a short memory of recent uses.
 - **Earned tags.** Late-game heroes need new tags from earned events ("centurion-slayer"), not only their starting 3. This is the primary long-term hero progression.
-- **Stat-block leveling — yes or no?** Inherited from aistronghold but in tension with the design pillars. See dedicated discussion thread in issue #1.
+- **Hero level range — why N?** Levels are locked in (D-D-style explicit metric, engine-owned). Open: what's the right MAX_LEVEL? D-D uses 0–6; airaider's choice must be justified by campaign length, content tiers (P0–P3 camp prestige × difficulty tiers), and XP curve. See HEROES_AND_GROWTH.md.
+- **Equipment system rethink.** The inherited "slot + artifact" model from aistronghold needs full rethink in light of the engine/AI split. Open questions: how does equipment interact with tags? Are items also cards? Is equipment tier-gated by hero level (D-D style) or fiction-gated (you can only wield a centurion's blade if you've killed one)? Does AI generate item names within engine-set tiers (reward-as-budget pattern applies)?
 
 ## What is NOT in this doc (deferred)
 - Specific scenario *content* (what scenarios exist, what tags exist) — content design comes after the engine is locked.
