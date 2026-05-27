@@ -1,8 +1,18 @@
 # Gameplay Loop
 
-**Status:** Draft
+**Status:** Locked (campaign shape, loop structure). Open (exact prestige tier count, errand catalog).
 
-AI Raider has two nested loops: the **macro loop** (Fort Phase) and the **micro loop** (Raid Phase). They share the same heroes, items and stories, but they are different games to play.
+AI Raider has two nested loops: the **macro loop** (Camp Phase) and the **micro loop** (Raid Phase). They share the same heroes, items and stories, but they are different games to play.
+
+## Campaign shape (Locked)
+
+Target campaign length: **200+ hours**.
+
+- **First ~10 hours**: early game. Hero levels climb 1→6. Player learns the systems, runs P0–P1 raids, settles a starter camp.
+- **Hours ~10 to ~50**: mid game. Levels climb 6→20. Camp expands through mid prestige tiers. Most systems are unlocked. Hero deaths start mattering.
+- **Hours ~50+**: endgame, where most play happens. Levels creep slowly 20→40+, soft cap around 40, theoretical hard cap ~100. Prestige climbs through high tiers, unlocking diplomatic / political / faction-scale content. The number-go-up curve never quite finishes; the content variety is what carries the time.
+
+The hero level cap is intentionally soft (see `HEROES_AND_GROWTH.md`): a player who loves a hero can keep grinding them up forever in tiny increments, but the *intended* loop is "hit ~L40 in the mid-late game and then play *with* that hero across diverse endgame content."
 
 ## Top-level diagram
 
@@ -60,14 +70,16 @@ Per the [fiction-forward UI principle](RAID_DESIGN.md#presentation--fiction-forw
 Each day the player sees:
 
 1. **News and offers** brought in overnight (intel about caravans, traders arriving, faction messengers, weather, ambient threats). Some are time-limited; some persist.
-2. **Around-the-camp activities** for heroes:
-   - **Rest** (single action — *do not split into variants per the no-false-choices rule*). Recovers Fatigue.
-   - **Question a captive** (Wits-led; extracts intel).
-   - **Break a captive** (Brawn/intimidation; converts captive to follower, fails into escape + Heat).
-   - **Drill captives** (multi-day; produces a new follower).
-   - **Other meaningful camp work TBD** — must each pass the "will the player genuinely deliberate?" test.
-3. **Outside-camp opportunities** — short raids, scouting trips, side jobs, trading. Each consumes hero stamina and accrues Fatigue.
-4. **Follower duty assignments** (one-time setup, no daily decision once placed): gate-watch, kitchen-help, gallows-keeper, etc. Each follower in a duty provides a passive camp effect.
+2. **Errands** for heroes (see [RAID_DESIGN.md § Errands](RAID_DESIGN.md#errands--long-clock-scenarios-for-idle-heroes-locked)). These are long-clock scenario cards: patrol the road, drink in town, train recruits, run a protection racket, personal errand. Each commits a hero for N days; the engine resolves at the end of the clock with AI flavor.
+3. **Camp-and-captive interactions** that need a hero today: question a captive, break a captive, lead the morning drill. Also expressed as scenario cards but with a 1-day clock.
+4. **Outside-camp opportunities** — short raids and full raids; pursue a raid lead. Each consumes hero stamina and accrues Fatigue.
+5. **Follower duty assignments** (one-time setup, no daily decision once placed): gate-watch, kitchen-help, gallows-keeper, etc. Each follower in a duty provides a passive camp effect.
+
+The core insight: **almost every "daily activity" is just a scenario card with a clock**. Errand scenarios, camp scenarios, raid scenarios — same engine, different clocks. The player drags hero-cards onto scenario-slots; the engine resolves; the AI narrates. The fiction-forward UI displays them all as visible things in the camp scene.
+
+### Idle heroes always have something to do
+
+The errand system guarantees there is never a "useless turn" for any hero — even a fully-rested L40 veteran can take a high-level personal errand or a protection racket. The opportunity cost of using a high-level hero on a trivial errand is its own balancing pressure (that hero isn't available for the next real raid).
 
 ### Hero allocation rules
 
@@ -97,7 +109,23 @@ Each day the player sees:
 
 ### Long-horizon targets pull the loop forward
 
-A locked design observation from playtest: every campaign should always surface **1–3 active "big targets"** with a future deadline (e.g. "pay-chest in 9 days"). These give the player something to *plan around* across many days — turning Rest, Drill, and Scout decisions from idle filler into purposeful preparation. Without a big target visible, the camp loop drifts into busy-work.
+A locked design observation from playtest: every campaign should always surface **1–3 active "big targets"** with a future deadline (e.g. "pay-chest in 9 days"). These give the player something to *plan around* across many days — turning errand and camp decisions from idle filler into purposeful preparation. Without a big target visible, the camp loop drifts into busy-work.
+
+### Camp prestige — many tiers, content unlocks not power unlocks (Open)
+
+Camp prestige is the campaign's long-arc progression. Each prestige tier unlocks **new content types** (new cards, new errands, new raid leads, new diplomatic options), not merely "stronger versions of the same raids." This is what makes 200+ hours viable: variety, not number-growth.
+
+Approximate tier shape (exact count is **Open** — target 20+ tiers, depends on how many rooms/content modes we end up designing):
+
+| Tier band | Example tiers | What unlocks |
+|---|---|---|
+| Survival | Hideout, Outlaw Den | Lone-traveler raids, caravan ambushes |
+| Mid-banditry | Brigand Hold, Bandit Lord | Villa raids, town strikes, gladiator recruiting |
+| Warlord | Regional Warlord, Frontier Rival | Legion engagements, local nobles parley, proxy wars |
+| Power-broker | Shadow King, Kingmaker | Assassination contracts, court intrigue minigame |
+| Empire-scale | Open Rebellion, Empire Challenger | Province campaigns, march-on-Rome arc, endgame politics |
+
+Each tier should add something *qualitatively new* to the play surface. A tier that only adds bigger numbers does not earn its slot.
 
 ### Passive pressure: factions and reputation
 

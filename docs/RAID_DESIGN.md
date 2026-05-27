@@ -65,6 +65,36 @@ The **climax scenario** of each raid offers **2–3 distinct approaches** with m
 
 This concentrates real branching at the *payoff* moment, like a Slay-the-Spire boss or a Disco-Elysium confrontation. Setup scenarios build momentum; the climax delivers the choice.
 
+## Raid difficulty — *required_level, asymmetric penalty* (Locked)
+
+Every raid carries a single difficulty number: `required_level: int` (1 through ~50, scaling with content tier). There is **no separate Easy/Standard/Hard/Lethal axis** — that would double-count what level already expresses.
+
+**Penalty rules (engine-owned):**
+- **Hero level ≥ required:** no penalty. The hero contributes normally.
+- **Hero level < required:** **−2 to that hero's contribution per level of gap.** Also increases the catastrophe-band chance for the scenario.
+- **Endgame implication:** some endgame raids will exceed any reasonable hero level. Players are *expected* to absorb some under-level penalty as part of strategy — that is the point. It forces party diversity and risk acceptance, not just sending the highest-level hero.
+
+**Why asymmetric (no over-level penalty):**
+- Darkest Dungeon caps over-level engagement because their endgame *requires* the player to face hard content. Airaider's 200h+ campaign means the player will often have a level-30 hero with nothing better to do than clear a level-5 errand for easy gold. That should be *allowed* — but the **opportunity cost** of using that hero for trivial work (instead of an errand of their own caliber, or a real raid) is the natural balancing pressure. No need for a hard cap.
+
+## Errands — long-clock scenarios for idle heroes (Locked)
+
+An **errand** is just a **scenario card** (cards-as-universal-abstraction) with two distinguishing properties:
+
+1. **Long clock:** resolves over multiple days (not within a raid). The hero is committed for the duration.
+2. **Auto-resolve:** the engine runs the resolution at the end of the clock; no per-day player interaction is needed.
+
+Errands use the same Narrated Pool engine as raid scenarios. Same required_level rules. Same outcome bands. Same AI narration. They are **scenarios with a different *clock*, not a different *system***.
+
+Examples (each is just a scenario card playable from the camp scene into a hero-slot):
+- *Patrol the trade road* — Lv 2 errand, 2 days, small gold + rumor chance.
+- *Drink in town* — Lv 1 errand, 1 day, recovers Fatigue faster + chance of lead.
+- *Train recruits* — Lv 3 errand, 3 days, accelerates XP for new heroes.
+- *Personal errand* — hero-specific, generated from backstory, may earn a new tag.
+- *Run a protection racket on a village* — ongoing errand, passive gold + raises local infamy.
+
+This solves the "what does an idle hero do?" problem (every hero always has a use), feeds new leads into the main raid loop (so errands aren't dead weight), and gives the AI more storytelling beats per campaign hour. It also formalises the camp-day activities listed in `GAMEPLAY_LOOP.md` — most of them are simply errands.
+
 ## Presentation — *fiction-forward UI*
 
 **Locked principle (design rule):** *Never show the player a menu when you can show them a scene.*
@@ -123,14 +153,14 @@ If the player can't answer "who do I send and what happens if it goes wrong?", t
 ## Open issues (logged from playtest)
 
 - **Stat-pools per scenario, not single stats.** A scenario must declare which stat(s) heroes can lean on, possibly with fallbacks (e.g. "Wits, or Cunning at –1"). Single-stat scenarios punish spiky heroes unfairly.
-- **Fully-rested heroes need useful work.** When all heroes are at Fatigue 0, "Rest" is a wasted token. Likely fix: auto-rest at F0, and add a few meaningful daily camp activities that are always available.
-- **Variety in the camp loop.** Repeating the same camp screen 15 days in a row will fatigue the player. Needs rotating events, seasonal shifts, faction reactions.
-- **Long-term arc structure.** The core loop entertains for ~20 hours. To carry a campaign, the game needs escalating ambition (bandit → regional warlord → frontier rival). See [OPEN_QUESTIONS.md](OPEN_QUESTIONS.md).
+- **Variety in the camp loop.** Even with errands, repeating the same camp screen 100+ days in a row will fatigue the player. Needs rotating events, seasonal shifts, faction reactions, prestige-tier content rotation.
+- **Long-term arc structure.** With a 200h+ campaign, escalating ambition (bandit → regional warlord → empire challenger) must be paced through the prestige tier ladder. Concrete tier-content design is open.
 - **Defensive raids.** When enemies attack the camp, the same engine should handle "your gate is a slot, your wall is a scenario card." Probably trivial — confirm.
 - **AI narration variety.** Each tag firing 30+ times across a campaign must not feel repetitive. Likely: each tag has 5–10 narration templates rotated by AI with a short memory of recent uses.
 - **Earned tags.** Late-game heroes need new tags from earned events ("centurion-slayer"), not only their starting 3. This is the primary long-term hero progression.
-- **Hero level range — why N?** Levels are locked in (D-D-style explicit metric, engine-owned). Open: what's the right MAX_LEVEL? D-D uses 0–6; airaider's choice must be justified by campaign length, content tiers (P0–P3 camp prestige × difficulty tiers), and XP curve. See HEROES_AND_GROWTH.md.
+- **Hero level curve specifics.** Soft cap ~40, hard cap ~100 locked. Exact stat-growth and tag-multiplier formulas per level deferred to first prototype balance pass.
 - **Equipment system rethink.** The inherited "slot + artifact" model from aistronghold needs full rethink in light of the engine/AI split. Open questions: how does equipment interact with tags? Are items also cards? Is equipment tier-gated by hero level (D-D style) or fiction-gated (you can only wield a centurion's blade if you've killed one)? Does AI generate item names within engine-set tiers (reward-as-budget pattern applies)?
+- **Prestige tier count.** Target 20+ tiers as content modes (see GAMEPLAY_LOOP.md). Final count depends on how many room/content modes get designed.
 
 ## What is NOT in this doc (deferred)
 - Specific scenario *content* (what scenarios exist, what tags exist) — content design comes after the engine is locked.

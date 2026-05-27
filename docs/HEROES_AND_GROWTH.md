@@ -58,15 +58,29 @@ Hero {
 
 The `history` field is important. It is the hero's *story*, written by the engine from events and rendered by AI for the fort hero screen. This is how a hero becomes a character the player cares about — by literally showing them their shared history.
 
-### Hero levels (Locked: they exist. Open: exact range and curve)
+### Hero levels (Locked: soft cap ~40, hard cap ~100)
 
-Levels exist as a Darkest-Dungeon-style explicit progression metric. They are visible to the player and drive all numeric scaling: stat growth, tag modifier multiplier, equipment tier gating, and raid difficulty matching. **Why levels exist:** without a concrete metric, balancing reward amounts and scenario thresholds against hero power becomes intractable, and recruitment level relative to existing roster becomes ambiguous.
+Levels exist as a Darkest-Dungeon-style explicit progression metric. They are visible to the player and drive numeric scaling: stat growth, tag modifier multiplier, equipment tier gating, and raid level matching.
 
-**Open questions on level range:**
-- Why MAX_LEVEL = 6 (D-D's choice) vs. 10 or 20? D-D's 0–6 is short and tightly tuned; any chosen number must be *justified* by campaign length and content tiers, not picked arbitrarily.
-- How many raids per level (XP curve)?
-- How does stat growth per level interact with the starting-stat range?
-- See [issue #1](https://github.com/dolphinigle/airaider/issues/1) for live debate.
+**Level shape (Locked):**
+- **Levels 1–6: early-game scaffolding.** Stat-relevant; cleared in the first ~10 hours of play. Acts as the "tutorial-to-competent" curve.
+- **Levels 6–40: mid-to-late game.** Each level gives small but visible gains; XP requirement scales slowly. This is where most progression-feel lives across a 200h+ campaign.
+- **Soft cap ~40.** XP requirements past 40 grow steeply. Most players will plateau their main heroes around 40–45.
+- **Hard cap ~100 (theoretical).** Reachable only with obscene investment; serves as a long-term flex for the most-loved heroes. Most heroes will never approach it. This guarantees number-go-up dopamine *forever* without forcing it.
+- **Realistic ceiling ~45.** Where a long-running veteran tops out under normal play.
+
+**Why this shape:** the campaign is targeted at **200h+** (see `GAMEPLAY_LOOP.md`). A short MAX_LEVEL like 6 would leave 190h of post-cap play with no number-go-up dopamine. A long curve with a soft cap solves both: the engine math stays bounded (multipliers tied to `min(level, 50)` say), but the visible level number keeps creeping up so the player always has *something* to show for hours of play.
+
+**Per-level effects (engine-owned, exact table TBD):**
+- Stat growth: tiny per-level (avg +0.1 to a stat), so a level-40 hero is only +4 in any one stat over a level-1. Heroes still differentiate by tags, not stats.
+- Tag modifier multiplier: small per-level, e.g. `tag_mod × (1 + 0.02 × level)`. Compounds across many tags but never explodes.
+- Equipment tier unlock: T1 from L1, T2 from L8, T3 from L18, T4 from L30, T5 from L45.
+- XP curve: geometric-ish. ~1–2h play to L6, ~30h to L20, ~80h to L40, ~∞ to L100.
+
+**Open questions on level curve:**
+- Exact stat-growth and tag-multiplier formulas (defer to first prototype).
+- XP rewards per raid by raid level (defer to balance pass).
+- How over-leveled heroes interact with low-level content (see `RAID_DESIGN.md` under-level penalty — there is *no* over-level penalty).
 
 ## Tags (the core differentiator, supersedes earlier "traits" notion)
 
@@ -119,16 +133,17 @@ New heroes come from:
 2. **Camp attractors** — high-prestige camps attract higher-tier hero candidates.
 3. **Story-gated** — certain story arcs introduce specific named heroes.
 
-**Recruit level scales with camp prestige tier** (engine-owned):
+**Recruit level scales with camp prestige tier** (engine-owned). The exact table is TBD because prestige tier count itself is open (target ~20+ tiers — see `GAMEPLAY_LOOP.md`). The scaling rule is approximately `recruit_level ≈ floor(prestige_tier × 2)` with a range `[recruit_level − 2, recruit_level]`:
 
-| Camp Prestige | Recruit level range | Who shows up (AI flavor) |
+| Prestige | Recruit level | Who shows up (AI flavor) |
 |---|---|---|
-| P0 Bandit Camp | 1 | Escaped slaves, broken auxiliaries, road-bandits. People with nothing left. |
-| P1 Outlaw Den | 1–2 | Veteran deserters, freed gladiators, debt-fugitive merchants. |
-| P2 Brigand Hold | 2–4 | Sellswords, disgraced centurions, foreign mercenaries. |
-| P3 Bandit Kingdom | 3–5 | Ex-legates, gladiator champions, exiled nobles, foreign warlords. |
+| P0 Hideout | 1 | Escaped slaves, broken auxiliaries. People with nothing left. |
+| P2 Brigand Hold | 2–4 | Sellswords, disgraced centurions. |
+| P5 Frontier Rival | 8–10 | Foreign mercenaries, ex-tribunes. |
+| P10 (late) | 18–20 | Veteran warlords, exiled generals. |
+| P15+ (endgame) | 28–30+ | Living legends, broken kings, gladiator champions. |
 
-The engine sets the recruit's level, attribute rolls, and tag count for that tier. The AI generates the name, backstory, and the *labels* of each tag — explaining *why* this person is at this level (their pre-game history). This means high-prestige camps attract pre-grown veterans, fictionally justified, without a "grind from level 1" tax.
+The engine sets the recruit's level, attribute rolls, and tag count for that tier. The AI generates the name, backstory, and the *labels* of each tag — explaining *why* this person is at this level (their pre-game history). High-prestige camps attract pre-grown veterans, fictionally justified, without a "grind from level 1" tax.
 
 **Roster cap:** active heroes capped (number TBD, ~6 candidate). Recruiting forces a real choice: bench, retire, or refuse. Veterans stay relevant via **shared relationships, loyalty, and camp-tied renown** that a new recruit lacks.
 
