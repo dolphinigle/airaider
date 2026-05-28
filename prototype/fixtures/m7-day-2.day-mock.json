@@ -30,7 +30,7 @@
             "temp:brave"
           ],
           "coinsContributed": 3,
-          "fatigue": 1,
+          "fatigue": 0,
           "fatiguePenalty": 0
         }
       ],
@@ -67,10 +67,10 @@
     }
   ],
   "finalFatigue": {
-    "marek": 2,
+    "marek": 1,
     "veska": 1,
     "imogen": 0,
-    "dren": 1
+    "dren": 0
   },
   "errandsDispatched": [],
   "errandsResolved": [],
@@ -95,16 +95,17 @@
     "seasonIndex": 0
   },
   "dailyEvent": {
-    "id": "thaw-market-day",
-    "label": "Lowmark market day",
-    "narration": "First market of the thaw. Wool, salt, and rumour change hands; the fort's name comes up only twice, and both times approvingly.",
+    "id": "any-bard-passes-through",
+    "label": "A bard passes through",
+    "narration": "A travelling singer takes a hot meal and leaves a long ballad about the fort's last raid. Not all of it true; the better for that.",
     "weight": 1,
     "seasons": [
-      "thaw"
+      "thaw",
+      "high"
     ],
     "effect": {
-      "goldDelta": 2,
-      "fatigueDelta": 0,
+      "goldDelta": -1,
+      "fatigueDelta": -1,
       "reputationDeltas": [
         {
           "factionId": "lowmark-guild",
@@ -113,18 +114,5 @@
       ]
     }
   },
-  "fortHints": [
-    {
-      "id": "winter-larder",
-      "name": "Winter Larder",
-      "cost": 3,
-      "description": "Salted meat, pickled roots, and a locked door. Frost seasons sting less."
-    },
-    {
-      "id": "chapel",
-      "name": "Wayside Chapel",
-      "cost": 4,
-      "description": "A small stone chapel for the dead. The living sleep a little easier."
-    }
-  ]
+  "fortHints": []
 }

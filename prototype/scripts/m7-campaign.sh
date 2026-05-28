@@ -26,7 +26,10 @@ for D in 1 2 3 4 5; do
     npm run --silent fort -- "$ROSTER" upgrade reinforced-palisade
   fi
   if [ "$D" = "3" ]; then
-    npm run --silent fort -- "$ROSTER" upgrade smithy
+    # Smithy may be unaffordable depending on which daily events fired;
+    # the demo is still useful if the purchase is rejected, so don't
+    # abort the script if it does.
+    npm run --silent fort -- "$ROSTER" upgrade smithy || echo "(smithy purchase skipped this run)"
   fi
 done
 

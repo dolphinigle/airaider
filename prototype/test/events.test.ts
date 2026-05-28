@@ -93,4 +93,22 @@ describe('M7.4 daily events', () => {
     });
     expect(r.dailyEvent).toBeNull();
   });
+
+  it('chapel-gated event surfaces in frost when chapel is owned', () => {
+    const eligible = eligibleEvents(catalog, {
+      dayCount: 1, season: 'frost', fortUpgrades: ['chapel'],
+    });
+    expect(eligible.some((e) => e.id === 'frost-chapel-vigil')).toBe(true);
+    const withoutChapel = eligibleEvents(catalog, {
+      dayCount: 1, season: 'frost', fortUpgrades: [],
+    });
+    expect(withoutChapel.some((e) => e.id === 'frost-chapel-vigil')).toBe(false);
+  });
+
+  it('every season has at least two eligible bare-fort events', () => {
+    for (const s of ['thaw', 'high', 'wane', 'frost'] as const) {
+      const pool = eligibleEvents(catalog, { dayCount: 1, season: s, fortUpgrades: [] });
+      expect(pool.length).toBeGreaterThanOrEqual(2);
+    }
+  });
 });

@@ -51,6 +51,60 @@
       "narration": "The smith works two nights running and the kit comes off the rack sharper than it went on. Coin clinks into the fort chest.",
       "requiresUpgrades": ["smithy"],
       "effect": { "goldDelta": 1, "fatigueDelta": 0, "reputationDeltas": [] }
+    },
+    {
+      "id": "thaw-refugees-at-gate",
+      "label": "Refugees at the gate",
+      "narration": "A dozen thaw-traveled families crowd the lower gate, asking for shelter and a fire. The fort feeds them and word travels.",
+      "seasons": ["thaw"],
+      "weight": 2,
+      "effect": { "goldDelta": -1, "fatigueDelta": 0, "reputationDeltas": [{ "factionId": "lowmark-guild", "delta": 1 }] }
+    },
+    {
+      "id": "high-merchant-caravan",
+      "label": "Merchant caravan stops over",
+      "narration": "A guild caravan halts for the night, paying gate-tax in fresh coin and gossip from the Coast Road.",
+      "seasons": ["high"],
+      "weight": 2,
+      "effect": { "goldDelta": 3, "fatigueDelta": 0, "reputationDeltas": [{ "factionId": "lowmark-guild", "delta": 1 }] }
+    },
+    {
+      "id": "wane-tollgang-pressure",
+      "label": "Toll-gang riders at the bridge",
+      "narration": "Black Hill riders sit horsed on the far bank of the Lowmark bridge for an hour, then turn back. A message, not an attack.",
+      "seasons": ["wane"],
+      "effect": { "goldDelta": 0, "fatigueDelta": 1, "reputationDeltas": [{ "factionId": "black-hill-gang", "delta": -1 }] }
+    },
+    {
+      "id": "wane-grain-fire",
+      "label": "Stable-yard grain fire",
+      "narration": "A spark in the straw and half a barrel of oats is ash before the buckets reach it. No one hurt, but the chest is lighter.",
+      "seasons": ["wane"],
+      "effect": { "goldDelta": -2, "fatigueDelta": 1, "reputationDeltas": [] }
+    },
+    {
+      "id": "frost-chapel-vigil",
+      "label": "Chapel vigil for the dead",
+      "narration": "The wayside chapel fills for the long-night vigil. Old grievances are spoken aloud, then set down on the stone floor and left there.",
+      "seasons": ["frost"],
+      "requiresUpgrades": ["chapel"],
+      "effect": { "goldDelta": 0, "fatigueDelta": -1, "reputationDeltas": [] }
+    },
+    {
+      "id": "frost-wolves-at-the-walls",
+      "label": "Wolves at the walls",
+      "narration": "Snow-driven wolves circle the lower yard three nights running. The watch lights extra braziers and sleeps poorly.",
+      "seasons": ["frost"],
+      "requiresMissingUpgrades": ["watch-tower"],
+      "effect": { "goldDelta": 0, "fatigueDelta": 1, "reputationDeltas": [] }
+    },
+    {
+      "id": "any-bard-passes-through",
+      "label": "A bard passes through",
+      "narration": "A travelling singer takes a hot meal and leaves a long ballad about the fort's last raid. Not all of it true; the better for that.",
+      "seasons": ["thaw", "high"],
+      "weight": 1,
+      "effect": { "goldDelta": -1, "fatigueDelta": -1, "reputationDeltas": [{ "factionId": "lowmark-guild", "delta": 1 }] }
     }
   ]
 }

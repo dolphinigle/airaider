@@ -67,10 +67,10 @@
     }
   ],
   "finalFatigue": {
-    "marek": 2,
+    "marek": 1,
     "veska": 2,
     "imogen": 1,
-    "dren": 1
+    "dren": 0
   },
   "errandsDispatched": [],
   "errandsResolved": [],
@@ -89,15 +89,15 @@
     "seasonIndex": 0
   },
   "dailyEvent": {
-    "id": "thaw-market-day",
-    "label": "Lowmark market day",
-    "narration": "First market of the thaw. Wool, salt, and rumour change hands; the fort's name comes up only twice, and both times approvingly.",
-    "weight": 1,
+    "id": "thaw-refugees-at-gate",
+    "label": "Refugees at the gate",
+    "narration": "A dozen thaw-traveled families crowd the lower gate, asking for shelter and a fire. The fort feeds them and word travels.",
+    "weight": 2,
     "seasons": [
       "thaw"
     ],
     "effect": {
-      "goldDelta": 2,
+      "goldDelta": -1,
       "fatigueDelta": 0,
       "reputationDeltas": [
         {
@@ -107,24 +107,5 @@
       ]
     }
   },
-  "fortHints": [
-    {
-      "id": "winter-larder",
-      "name": "Winter Larder",
-      "cost": 3,
-      "description": "Salted meat, pickled roots, and a locked door. Frost seasons sting less."
-    },
-    {
-      "id": "chapel",
-      "name": "Wayside Chapel",
-      "cost": 4,
-      "description": "A small stone chapel for the dead. The living sleep a little easier."
-    },
-    {
-      "id": "smithy",
-      "name": "Garrison Smithy",
-      "cost": 6,
-      "description": "A working forge for arms and armour. Mercs leave better kitted than they arrive."
-    }
-  ]
+  "fortHints": []
 }

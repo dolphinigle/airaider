@@ -89,15 +89,15 @@
     "seasonIndex": 0
   },
   "dailyEvent": {
-    "id": "thaw-market-day",
-    "label": "Lowmark market day",
-    "narration": "First market of the thaw. Wool, salt, and rumour change hands; the fort's name comes up only twice, and both times approvingly.",
-    "weight": 1,
+    "id": "thaw-refugees-at-gate",
+    "label": "Refugees at the gate",
+    "narration": "A dozen thaw-traveled families crowd the lower gate, asking for shelter and a fire. The fort feeds them and word travels.",
+    "weight": 2,
     "seasons": [
       "thaw"
     ],
     "effect": {
-      "goldDelta": 2,
+      "goldDelta": -1,
       "fatigueDelta": 0,
       "reputationDeltas": [
         {

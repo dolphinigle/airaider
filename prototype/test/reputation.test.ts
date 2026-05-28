@@ -54,9 +54,10 @@ describe('M5.5 reputation surfacing', () => {
 
   it('day-loop applies reputationDeltas to the roster', async () => {
     const roster = newRoster([...mercs.values()]);
-    // Park the roster in 'wane' so the M7.4 daily event roll cannot touch
-    // reputation (only wane-harvest-tithes is eligible there, gold-only).
-    roster.dayCount = 60;
+    // Park the roster in 'frost' so the M7.4 daily event roll cannot touch
+    // reputation. Eligible frost events (supplies-thin, larder-holds,
+    // chapel-vigil, wolves-at-walls) only move gold + fatigue.
+    roster.dayCount = 90;
     const dayFixture = {
       id: 'day-rep',
       name: 'Rep test',

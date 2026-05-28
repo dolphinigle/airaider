@@ -150,23 +150,29 @@ Outputs:
 - `fixtures/m7-day-{1..5}.day-mock.json` — committed mock transcripts
 - `fixtures/m7-campaign-roster.final.json` — terminal state
 
-What you'll see across the 5 days:
+What you'll see across the 5 days (events vary by day-count seed; the
+committed mock transcripts capture one deterministic run):
 - **Season transition** thaw (days 28-30) → high (days 31-32)
-- **Daily events**: `thaw-market-day` fires on each of the three thaw
-  days (+2g, +1 lowmark-guild rep), then `high-bandit-scouts` fires
-  the two high-summer days (no watch-tower owned ⇒ -1g, +1 fatigue)
+- **Daily events** drawn from `data/events.json` filtered by season +
+  owned/missing fort upgrades. The committed run shows refugees /
+  bard / refugees during the thaw, then two quiet-summer days once
+  the season turns. Other seeds will surface market days, bandit
+  scouts (no watch-tower owned), merchant caravans, or worse.
 - **Mid-campaign fort upgrades**: after day 1 the fort buys
-  `reinforced-palisade` (L1→L2, -5g), after day 3 it buys `smithy`
-  (L2→L3, -6g). From day 4 onward every scenario silently gets
-  +1 coin from the smithy.
-- **Veterancy**: marek and veska both cross from rookie → veteran
-  on the way through (PROMOTIONS block in the transcript).
-- **Bond formation**: marek ↔ veska hit BOND_THRESHOLD=3 on day 2
-  and the bond persists for the rest of the run (BONDS FORMED block).
+  `reinforced-palisade` (L1→L2, -5g). The script then tries to buy
+  `smithy` after day 3 — depending on which events fired the gold
+  may not stretch, so the demo also exercises the "insufficient gold"
+  rejection path.
+- **Veterancy**: marek and veska both promote rookie → veteran
+  (PROMOTIONS block in the transcript).
+- **Bond formation**: marek ↔ veska hit BOND_THRESHOLD=3 on day 2 and
+  the bond persists for the rest of the run (BONDS FORMED block).
+- **Fort hint**: every day where the chest can still afford an
+  upgrade ends with a `FORT HINT:` block listing the legal purchases.
 
-Final roster (committed): fort L3 with [reinforced-palisade, smithy],
-gold -1 (overspent on upgrades), reputation `lowmark-guild: +3`,
-marek/veska both veteran with xp 13 and 4 shared co-deployments.
+Final roster (committed): fort L2 with [reinforced-palisade],
+gold -2 (overspent), reputation `lowmark-guild: +3`, marek/veska both
+veteran with xp 13 and 4 shared co-deployments.
 
 ## M6 systems at a glance
 
