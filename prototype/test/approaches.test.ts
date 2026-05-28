@@ -4,11 +4,11 @@ import { MockScenarioLLM } from '../src/llm/mock.js';
 import type { FixtureScenario, ScenarioApproach } from '../src/scenarios.js';
 import type { Merc } from '../src/types.js';
 
-const mockMerc = (id: string, tags: string[] = [], physical = 3): Merc => ({
+const mockMerc = (id: string, tags: string[] = [], physical: 1 | 2 | 3 | 4 | 5 | 6 | 7 = 3): Merc => ({
   id,
   name: id[0]!.toUpperCase() + id.slice(1),
   attrs: { physical, agility: 3, intelligence: 3, charisma: 3, willpower: 3 },
-  tags: tags.map((t) => ({ id: t, label: t, tier: 'common', rarity: 'common' as const })),
+  tags: tags.map((t) => ({ id: t, label: t, category: t.split(':')[0] ?? 'misc', tier: 3, rarity: 'common' as const })),
   veterancy: 0,
   wage: 1,
   hp: 3,
