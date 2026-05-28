@@ -43,6 +43,13 @@ export function renderDayTranscript(day: DayResolution): string {
     const marker = fat >= 2 ? '⚠' : ' ';
     lines.push(`   ${marker} ${mercId}: ${fat}`);
   }
+  if (day.promotions.length > 0) {
+    lines.push('');
+    lines.push(' PROMOTIONS:');
+    for (const p of day.promotions) {
+      lines.push(`   ★ ${p.mercId}: ${p.fromTier} → ${p.toTier}  (xp ${p.xpAfter})`);
+    }
+  }
   lines.push(DBAR);
   return lines.join('\n');
 }

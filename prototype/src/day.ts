@@ -14,6 +14,7 @@ import {
 } from './resolver.js';
 import type { Roster, RosterPendingErrand } from './roster.js';
 import { dispatchErrand, resolveDueErrands } from './errands.js';
+import { applyVeterancyXp, type Promotion } from './veterancy.js';
 
 const DaySchema = z.object({
   id: z.string().min(1),
@@ -58,6 +59,8 @@ export interface DayResolution {
   errandsDispatched: RosterPendingErrand[];
   /** M5.4: errands that returned and were resolved today. */
   errandsResolved: ScenarioResolution[];
+  /** M6.1: veterancy tier crossings during the day (roster-mode only). */
+  promotions: Promotion[];
 }
 
 /**
@@ -74,6 +77,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   const scenarioResolutions: ScenarioResolution[] = [];
   const errandsDispatched: RosterPendingErrand[] = [];
   const errandsResolved: ScenarioResolution[] = [];
+  const promotions: Promotion[] = [];
   const reputationOf = roster
     ? (factionId: string): number => roster.reputation[factionId] ?? 0
     : undefined;
@@ -95,6 +99,9 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
       errandsResolved.push(r);
       scenarioResolutions.push(r);
       applyDeltas(r);
+      if (roster) {
+        promotions.push(...applyVeterancyXp(roster, r.slotContributions.map((sc) => sc.mercId), r.band));
+      }
       // Errands cost 1 fatigue per participating merc on return day.
       for (const a of r.slotContributions) {
         fatigue.set(a.mercId, (fatigue.get(a.mercId) ?? 0) + 1);
@@ -140,6 +147,9 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     const resolution = await resolveScenario({ scenario, assignments, llm, rng, fatigueOf, reputationOf });
     scenarioResolutions.push(resolution);
     applyDeltas(resolution);
+    if (roster) {
+      promotions.push(...applyVeterancyXp(roster, assignments.map((a) => a.merc.id), resolution.band));
+    }
 
     for (const a of assignments) {
       fatigue.set(a.merc.id, (fatigue.get(a.merc.id) ?? 0) + 1);
@@ -156,5 +166,6 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     finalFatigue,
     errandsDispatched,
     errandsResolved,
+    promotions,
   };
 }
