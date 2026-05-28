@@ -26,6 +26,10 @@
       "coinsContributed": 3
     }
   ],
+  "synergy": {
+    "pairs": [],
+    "bonusCoins": 0
+  },
   "baseCoinBudget": 3,
   "coinsActual": 3,
   "rollFaces": [

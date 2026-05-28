@@ -13,36 +13,51 @@ import { MockScenarioLLM } from '../src/llm/mock.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 
+const FIXTURES = [
+  'raid-01.json',
+  'raid-02-recruit.json',
+  'raid-03-captive.json',
+  'raid-04-build.json',
+  'raid-05-tavern.json',
+];
+
 /**
- * Golden-file snapshot test. The committed transcript-mock.json is the
- * source of truth; if it changes, the test will fail and you must intentionally
- * regenerate by running `npm run scenario fixtures/raid-01.json`.
+ * Golden-file snapshot test. The committed transcript-mock.json files are the
+ * source of truth; if a snapshot changes, the test will fail and you must
+ * intentionally regenerate via:
+ *   npm run scenario -- fixtures/<name>.json
  */
-describe('fixture: raid-01 (mock)', () => {
-  it('matches the committed mock transcript exactly', async () => {
-    const tags = loadTags(join(ROOT, 'data', 'tags.json'));
-    const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
-    const fixture = loadScenario(join(ROOT, 'fixtures', 'raid-01.json'));
+describe('fixture snapshots (mock)', () => {
+  const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+  const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
 
-    const assignments: Assignment[] = fixture.assignments!.map((a) => ({
-      slotId: a.slotId,
-      merc: mercs.get(a.mercId)!,
-    }));
+  for (const fname of FIXTURES) {
+    it(`${fname} matches its committed mock transcript`, async () => {
+      const fixture = loadScenario(join(ROOT, 'fixtures', fname));
+      const assignments: Assignment[] = fixture.assignments!.map((a) => ({
+        slotId: a.slotId,
+        merc: mercs.get(a.mercId)!,
+      }));
 
-    const actual = await resolveScenario({
-      scenario: fixture,
-      assignments,
-      llm: new MockScenarioLLM(),
-      rng: rngFromString(fixture.seed!),
-    });
+      const actual = await resolveScenario({
+        scenario: fixture,
+        assignments,
+        llm: new MockScenarioLLM(),
+        rng: rngFromString(fixture.seed!),
+      });
 
-    const goldenPath = join(ROOT, 'fixtures', 'raid-01.transcript-mock.json');
-    if (!existsSync(goldenPath)) {
-      throw new Error(
-        `Golden transcript missing at ${goldenPath}. Generate with: npm run scenario fixtures/raid-01.json`,
+      const goldenPath = join(
+        ROOT,
+        'fixtures',
+        fname.replace(/\.json$/, '.transcript-mock.json'),
       );
-    }
-    const expected = JSON.parse(readFileSync(goldenPath, 'utf8'));
-    expect(actual).toEqual(expected);
-  });
+      if (!existsSync(goldenPath)) {
+        throw new Error(
+          `Golden transcript missing at ${goldenPath}. Generate with: npm run scenario -- fixtures/${fname}`,
+        );
+      }
+      const expected = JSON.parse(readFileSync(goldenPath, 'utf8'));
+      expect(actual).toEqual(expected);
+    });
+  }
 });

@@ -1,0 +1,64 @@
+{
+  "scenarioId": "raid-05",
+  "title": "The Recruits' Drinking Match",
+  "target": "hold a long night of drinking that closes ranks between the two newest hands without ending in a brawl",
+  "archetype": "tavern",
+  "partySize": 2,
+  "slotContributions": [
+    {
+      "slotId": "hold-liquor",
+      "mercId": "marek",
+      "attrUsed": "physical",
+      "attrScore": 5,
+      "tagsMatched": [
+        "temp:brave"
+      ],
+      "coinsContributed": 3
+    },
+    {
+      "slotId": "keep-songs-going",
+      "mercId": "dren",
+      "attrUsed": "willpower",
+      "attrScore": 4,
+      "tagsMatched": [
+        "temp:brave"
+      ],
+      "coinsContributed": 3
+    }
+  ],
+  "synergy": {
+    "pairs": [
+      {
+        "mercA": "marek",
+        "mercB": "dren",
+        "sharedTagId": "temp:brave"
+      }
+    ],
+    "bonusCoins": 1
+  },
+  "baseCoinBudget": 4,
+  "coinsActual": 5,
+  "rollFaces": [
+    "tails",
+    "tails",
+    "tails",
+    "heads",
+    "heads"
+  ],
+  "heads": 2,
+  "tails": 3,
+  "band": "unfavorable",
+  "bandReason": "2/5 heads (split — pessimistic default)",
+  "contributions": [
+    {
+      "mercId": "marek",
+      "line": "[mock] Marek (Male) takes on \"out-drink the younger recruits without making it a contest of pride\"."
+    },
+    {
+      "mercId": "dren",
+      "line": "[mock] Dren (Male) takes on \"keep the songs and stories rolling past the bitter hour\"."
+    }
+  ],
+  "outcomeNarrative": "[mock] A bruised partial; hold a long night of drinking that closes ranks between the two newest hands without ending in a brawl slips half-grasped, but no one is broken.",
+  "llmName": "mock"
+}

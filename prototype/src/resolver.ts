@@ -25,6 +25,11 @@ export interface SlotContribution {
   coinsContributed: number;
 }
 
+export interface PartySynergy {
+  pairs: Array<{ mercA: string; mercB: string; sharedTagId: string }>;
+  bonusCoins: number;
+}
+
 export interface ScenarioResolution {
   scenarioId: string;
   title: string;
@@ -32,6 +37,7 @@ export interface ScenarioResolution {
   archetype: string;
   partySize: number;
   slotContributions: SlotContribution[];
+  synergy: PartySynergy;
   baseCoinBudget: number;
   coinsActual: number;
   rollFaces: string[];
@@ -42,6 +48,38 @@ export interface ScenarioResolution {
   contributions: Array<{ mercId: string; line: string }>;
   outcomeNarrative: string;
   llmName: string;
+}
+
+/**
+ * M1 party-pair synergy:
+ *   For every pair of party mercs that shares a `pers:*` or `temp:*` tag,
+ *   add +1 coin to the pool. Total synergy bonus capped at SYNERGY_CAP.
+ *   `gender:*` and `bg:*` tags are deliberately excluded — those create
+ *   natural cohorts (all soldiers, all women) that shouldn't compound.
+ *
+ * 🟡 OPEN (logged): which tag categories count, tier-weighted bonus,
+ *   inter-tag synergies (e.g. brave + cautious creating "balanced pair").
+ */
+export const SYNERGY_CAP = 3;
+const SYNERGY_PREFIXES = ['pers:', 'temp:'] as const;
+
+export function computePartySynergy(assignments: Assignment[]): PartySynergy {
+  const pairs: PartySynergy['pairs'] = [];
+  for (let i = 0; i < assignments.length; i++) {
+    for (let j = i + 1; j < assignments.length; j++) {
+      const a = assignments[i]!.merc;
+      const b = assignments[j]!.merc;
+      const aTagIds = new Set(a.tags.map((t) => t.id));
+      for (const tag of b.tags) {
+        if (!SYNERGY_PREFIXES.some((p) => tag.id.startsWith(p))) continue;
+        if (aTagIds.has(tag.id)) {
+          pairs.push({ mercA: a.id, mercB: b.id, sharedTagId: tag.id });
+        }
+      }
+    }
+  }
+  const bonusCoins = Math.min(SYNERGY_CAP, pairs.length);
+  return { pairs, bonusCoins };
 }
 
 /**
@@ -95,11 +133,13 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
     );
   }
   const slotContributions = computeSlotContributions(scenario, assignments);
-  const summed = slotContributions.reduce((s, c) => s + c.coinsContributed, 0);
+  const synergy = computePartySynergy(assignments);
+  const summed =
+    slotContributions.reduce((s, c) => s + c.coinsContributed, 0) + synergy.bonusCoins;
   const partyBonus = Math.max(0, assignments.length - scenario.partySize.min);
   const coinsActual = Math.max(
     1,
-    Math.min(MAX_COINS, Math.min(summed, scenario.coinBudget + partyBonus)),
+    Math.min(MAX_COINS, Math.min(summed, scenario.coinBudget + partyBonus + synergy.bonusCoins)),
   );
   const { roll, band } = resolveCoins(coinsActual, rng);
 
@@ -111,6 +151,7 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
     slots: scenario.slots,
     band: band.band,
     bandReason: band.reason,
+    synergy,
   };
   const narration = await llm.narrate(req);
 
@@ -121,6 +162,7 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
     archetype: scenario.archetype,
     partySize: assignments.length,
     slotContributions,
+    synergy,
     baseCoinBudget: scenario.coinBudget,
     coinsActual,
     rollFaces: roll.faces,

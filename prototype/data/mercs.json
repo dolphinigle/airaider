@@ -43,5 +43,35 @@
     "veterancy": 0,
     "wage": 1,
     "hp": 3
+  },
+  {
+    "id": "dren",
+    "name": "Dren",
+    "attrs": {
+      "physical": 4,
+      "agility": 5,
+      "intelligence": 3,
+      "charisma": 2,
+      "willpower": 4
+    },
+    "tagIds": ["gender:male", "bg:soldier", "temp:brave", "phys:quick"],
+    "veterancy": 2,
+    "wage": 1,
+    "hp": 3
+  },
+  {
+    "id": "veska",
+    "name": "Veska",
+    "attrs": {
+      "physical": 2,
+      "agility": 3,
+      "intelligence": 6,
+      "charisma": 3,
+      "willpower": 5
+    },
+    "tagIds": ["gender:female", "bg:scholar", "pers:stoic"],
+    "veterancy": 0,
+    "wage": 1,
+    "hp": 3
   }
 ]

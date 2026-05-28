@@ -83,6 +83,7 @@ export class OpenAIScenarioLLM implements ScenarioLLM {
         })),
       })),
       resolution: { band: req.band, reason: req.bandReason },
+      synergy: req.synergy ?? { pairs: [], bonusCoins: 0 },
       instructions:
         'Produce a JSON object matching the schema. One contribution line per party merc, in the order given.',
     };

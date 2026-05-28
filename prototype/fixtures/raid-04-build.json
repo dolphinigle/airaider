@@ -1,0 +1,27 @@
+{
+  "id": "raid-04",
+  "archetype": "build",
+  "title": "Watchtower at the Pass",
+  "target": "commission a new watchtower at the southern pass before winter closes the road",
+  "slots": [
+    {
+      "id": "design",
+      "description": "draft the structure so it actually stands through the spring melt",
+      "preferredAttr": "intelligence",
+      "preferredTags": ["bg:scholar"]
+    },
+    {
+      "id": "oversee",
+      "description": "keep the crew honest and the timber straight",
+      "preferredAttr": "willpower",
+      "preferredTags": ["temp:brave"]
+    }
+  ],
+  "partySize": { "min": 2, "max": 2 },
+  "coinBudget": 4,
+  "assignments": [
+    { "slotId": "design", "mercId": "veska" },
+    { "slotId": "oversee", "mercId": "marek" }
+  ],
+  "seed": "raid-04-deterministic"
+}

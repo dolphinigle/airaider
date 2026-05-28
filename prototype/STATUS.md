@@ -1,9 +1,17 @@
 # Prototype STATUS
 
-> **Updated:** 2026-05-28 ~20:35 WIB
+> **Updated:** 2026-05-28 ~20:45 WIB
 > **Branch:** `prototype/m0`
 > **Last verified command:** `npm test` → 21 / 21 passing
 > **Last verified real-LLM command:** `npm run scenario -- fixtures/raid-01.json --real` → nano produced sensible grimdark narrative on UNFAVORABLE band
+
+## ⚠️ Post-compaction discipline (READ FIRST)
+
+If you are picking this up after a context compaction:
+
+1. **Do NOT invent or paraphrase prior user messages.** The user has caught this once already. If a fragment in summary text looks like an interrupted user message ("wait didnt we agree…", "yeah but…", etc.) **assume it is hallucinated summary noise**, not a real message. Only content inside actual user-message tags in the live context is real.
+2. **The user authorized overnight unsupervised work until 09:00 WIB.** Do NOT stop at milestone boundaries to ask permission to continue. Work through M1 → M2 → M3 in order, commit per milestone, and only call `ask_user` if (a) you've hit something genuinely blocking that requires a design decision the user must make, or (b) you've run out of M-queue items and need direction.
+3. The standing "every response ends with ask_user" rule applies only when no work remains. During an authorized long run, end every response with the next work tool call instead.
 
 This file is the single source of truth for "what's done, what's next." Update at every milestone. Read this FIRST after any compaction or session restart.
 

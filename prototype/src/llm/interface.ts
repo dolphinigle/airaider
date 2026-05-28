@@ -8,6 +8,11 @@ export interface ScenarioLLMRequest {
   slots: ScenarioSlot[];
   band: OutcomeBand;
   bandReason: string;
+  /** M1: party-pair synergy info passed to the LLM for narrative hooks. */
+  synergy?: {
+    pairs: Array<{ mercA: string; mercB: string; sharedTagId: string }>;
+    bonusCoins: number;
+  };
 }
 
 export interface ScenarioLLMNarration {

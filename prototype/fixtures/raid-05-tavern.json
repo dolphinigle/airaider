@@ -1,0 +1,27 @@
+{
+  "id": "raid-05",
+  "archetype": "tavern",
+  "title": "The Recruits' Drinking Match",
+  "target": "hold a long night of drinking that closes ranks between the two newest hands without ending in a brawl",
+  "slots": [
+    {
+      "id": "hold-liquor",
+      "description": "out-drink the younger recruits without making it a contest of pride",
+      "preferredAttr": "physical",
+      "preferredTags": ["temp:brave"]
+    },
+    {
+      "id": "keep-songs-going",
+      "description": "keep the songs and stories rolling past the bitter hour",
+      "preferredAttr": "willpower",
+      "preferredTags": ["temp:brave"]
+    }
+  ],
+  "partySize": { "min": 2, "max": 2 },
+  "coinBudget": 4,
+  "assignments": [
+    { "slotId": "hold-liquor", "mercId": "marek" },
+    { "slotId": "keep-songs-going", "mercId": "dren" }
+  ],
+  "seed": "raid-05-deterministic"
+}

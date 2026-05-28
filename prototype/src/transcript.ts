@@ -21,6 +21,12 @@ export function renderTranscript(r: ScenarioResolution): string {
     if (c) lines.push(`      "${c.line}"`);
   }
   lines.push('');
+  if (r.synergy.bonusCoins > 0) {
+    const pairStrs = r.synergy.pairs.map(
+      (p) => `${p.mercA}+${p.mercB} share ${p.sharedTagId}`,
+    );
+    lines.push(`SYNERGY:   +${r.synergy.bonusCoins} (${pairStrs.join('; ')})`);
+  }
   const coinPlural = r.coinsActual === 1 ? 'coin' : 'coins';
   lines.push(`COIN POOL: ${r.coinsActual} ${coinPlural} (budget ${r.baseCoinBudget})`);
   lines.push(

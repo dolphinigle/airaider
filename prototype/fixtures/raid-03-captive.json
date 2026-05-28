@@ -1,0 +1,27 @@
+{
+  "id": "raid-03",
+  "archetype": "captive",
+  "title": "The Brigand's Tongue",
+  "target": "wring the location of the bandit cache out of the prisoner before dawn",
+  "slots": [
+    {
+      "id": "intimidate",
+      "description": "lean on him hard enough to break the false calm",
+      "preferredAttr": "physical",
+      "preferredTags": ["phys:muscular", "temp:brave"]
+    },
+    {
+      "id": "read-lies",
+      "description": "catch the contradictions when his story shifts",
+      "preferredAttr": "willpower",
+      "preferredTags": ["pers:stoic"]
+    }
+  ],
+  "partySize": { "min": 2, "max": 2 },
+  "coinBudget": 5,
+  "assignments": [
+    { "slotId": "intimidate", "mercId": "marek" },
+    { "slotId": "read-lies", "mercId": "veska" }
+  ],
+  "seed": "raid-03-deterministic"
+}

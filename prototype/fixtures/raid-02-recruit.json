@@ -1,0 +1,27 @@
+{
+  "id": "raid-02",
+  "archetype": "recruit",
+  "title": "The Coward at the Crossroads",
+  "target": "decide whether to hire the deserter loitering outside the chapel",
+  "slots": [
+    {
+      "id": "read-character",
+      "description": "watch his hands and his eyes for the lies he is rehearsing",
+      "preferredAttr": "intelligence",
+      "preferredTags": ["pers:stoic"]
+    },
+    {
+      "id": "persuade",
+      "description": "draw out his true reason for fleeing his old company",
+      "preferredAttr": "charisma",
+      "preferredTags": ["pers:charming"]
+    }
+  ],
+  "partySize": { "min": 2, "max": 2 },
+  "coinBudget": 4,
+  "assignments": [
+    { "slotId": "read-character", "mercId": "veska" },
+    { "slotId": "persuade", "mercId": "imogen" }
+  ],
+  "seed": "raid-02-deterministic"
+}
