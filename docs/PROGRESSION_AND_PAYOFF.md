@@ -1,6 +1,18 @@
 # Progression and Payoff
 
-**Status:** Draft (inherited core; locked principles)
+> ⚠️ **PARTIALLY SUPERSEDED — see `CANONICAL_DESIGN.md` §3 (validated dopamine ladder) and §4 (loss-flavor taxonomy).**
+>
+> Major refinements from this doc:
+> - The dopamine loop here was inherited from AI Stronghold's binary-loyalty era. **Binary loyalty was rejected** (CANONICAL §2.13).
+> - The recruit/loot/progression triangle is now grounded in the **PoE-style tag rarity × tier system** (CANONICAL §2.5-§2.6)
+> - The 200-day sim **validated** that common→uncommon→rare→legendary dopamine spikes occur as designed (CANONICAL §3)
+> - A new **loss-flavor taxonomy** emerged from sim: tragic-grief / heroic-sacrifice / bitter-exit / bittersweet-promotion (CANONICAL §4)
+> - **God-combo scaling principle** locked: multi-merc tag stacks produce rewards scaled to the stake-tier (CANONICAL §5)
+> - **Constraint-bearing rare tags** principle locked: high-tier tags flip constraints into superpowers (CANONICAL §6)
+>
+> What's still in force: the inherited core dopamine principle from AI Stronghold, the progression triangle as conceptual frame.
+>
+> **Status:** Partially superseded.
 
 This doc covers the meta-progression and dopamine economy. The principles are inherited from AI Stronghold's `GAME_PROGRESSION.md` and remain the spine of the game. The only structural change is *what the player does* between drops — they now play raids instead of clicking End Week.
 

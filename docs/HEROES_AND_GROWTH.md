@@ -1,6 +1,19 @@
 # Heroes and Growth
 
-**Status:** Partially Locked. Equipment principles are locked; equipment deep design (slot count, room reshape) is Open. Exact level curve coefficients are Open. (See `RAID_DESIGN.md` for the top-tier architecture principle this document follows.)
+> ⚠️ **SUPERSEDED — see `CANONICAL_DESIGN.md` §2.2-§2.6 for current state.**
+>
+> Terminology and structural changes from this doc:
+> - "Heroes" → **mercenaries** (project-wide terminology lock)
+> - Attribute set was open here → **5 attributes locked: Physical / Agility / Intelligence / Charisma / Willpower** (CANONICAL §2.3)
+> - Tag system here was early PoE-tier sketch → **fully locked PoE-style unified vocabulary, ~50-100 base tags, rarity × tier (T1-T5)** (CANONICAL §2.5-§2.6)
+> - Tag-vs-attribute boundary was fuzzy → **locked: tags are natural-affinity, mostly fixed at hire; attributes are scalars read by resolution** (CANONICAL §2.2)
+> - "Earned-through-experience" tags here → **REMOVED from the schema**; AI writes earned-flavor in bios, not into tag structure (CANONICAL §2.5)
+> - Equipment open questions here → **artifact economy is partially locked** (CANONICAL §2.9); drop economy still 🟡
+> - Wage system unspeced here → **flat wage, constraint is bedrooms** (CANONICAL §2.7)
+>
+> What's still in force from this doc: the "engine owns numbers, AI owns flavor" decomposition for every hero field; the principle that growth happens through risk (no safe XP grind — TRAIN scenario removed); equipment as a meaningful pickup loop.
+>
+> **Status:** Superseded.
 
 The central failure of AI Stronghold's hero system: a hero was a name attached to a stat block, and stats determined missions automatically. The player never *did* anything with the hero, so the hero never *meant* anything. AI Raider's hero design is built around fixing that.
 
