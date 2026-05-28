@@ -12,6 +12,8 @@ import { loadMercs } from './mercs.js';
 import { newRoster, loadRoster, saveRoster, type Roster } from './roster.js';
 import { reputationTier } from './reputation.js';
 import { statusAlerts, watchTowerForecast } from './rosterAlerts.js';
+import { seasonFor, DAYS_PER_SEASON } from './season.js';
+import { loadQuests } from './quests.js';
 
 function main(): void {
   const [cmd, pathArg] = process.argv.slice(2);
@@ -53,7 +55,10 @@ function main(): void {
 
 function printRoster(r: Roster, path: string): void {
   console.log(`Roster @ ${path}`);
-  console.log(`  day ${r.dayCount}   gold ${r.gold}g   v${r.schemaVersion}`);
+  const sc = seasonFor(r.dayCount);
+  console.log(`  day ${r.dayCount}   gold ${r.gold}g   season:${sc.season}(d${sc.dayOfSeason}/${DAYS_PER_SEASON})   v${r.schemaVersion}`);
+  const upg = r.fort.upgrades.length > 0 ? `  upgrades:[${r.fort.upgrades.join(',')}]` : '';
+  console.log(`  fort: level ${r.fort.level}${upg}`);
   if (Object.keys(r.reputation).length > 0) {
     const rep = Object.entries(r.reputation)
       .map(([k, v]) => `${k}:${v}(${reputationTier(v)})`)
@@ -103,6 +108,33 @@ function printRoster(r: Roster, path: string): void {
     console.log(`\nFort log (last ${tail.length} of ${r.fortLog.length}):`);
     for (const e of tail) {
       console.log(`  day ${e.day}  [${e.kind}]  ${e.message}`);
+    }
+  }
+  // M15.2: active + recently-completed quest summary so the player
+  // can see what's on the docket without crossing to `npm run quests`.
+  if (r.activeQuests.length > 0 || r.completedQuests.length > 0) {
+    try {
+      const catalog = loadQuests(new URL('../data/quests.json', import.meta.url).pathname);
+      if (r.activeQuests.length > 0) {
+        console.log(`\nActive quests (${r.activeQuests.length}):`);
+        for (const aq of r.activeQuests) {
+          const q = catalog.get(aq.questId);
+          const name = q?.name ?? aq.questId;
+          const total = q?.stages.length ?? 0;
+          const stageName = q?.stages[aq.stageIndex]?.scenarioId ?? '?';
+          console.log(`  ◆ ${name} [${aq.questId}]  stage ${aq.stageIndex + 1}/${total} → ${stageName}`);
+        }
+      }
+      if (r.completedQuests.length > 0) {
+        const tail = r.completedQuests.slice(-3);
+        console.log(`\nCompleted quests (last ${tail.length} of ${r.completedQuests.length}):`);
+        for (const cq of tail) {
+          const q = catalog.get(cq.questId);
+          console.log(`  ✓ ${q?.name ?? cq.questId} [${cq.questId}]  (day ${cq.dayCompleted})`);
+        }
+      }
+    } catch {
+      // catalog missing or malformed — silently skip the section
     }
   }
 }
