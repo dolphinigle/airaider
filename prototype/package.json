@@ -11,6 +11,7 @@
     "scenario": "tsx src/cli.ts",
     "day": "tsx src/cliDay.ts",
     "recruit": "tsx src/cliRecruit.ts",
+    "captive": "tsx src/cliCaptive.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"

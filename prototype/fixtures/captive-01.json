@@ -1,0 +1,12 @@
+{
+  "captive": {
+    "id": "captive-dren-deserter",
+    "name": "Kael Vurst",
+    "archetype": "deserter",
+    "backstory": "A wagon-guard who broke during the raid on the merchant's column and ran. The party caught him three nights later, hiding in a culvert outside the old mill. He claims his cousin runs cattle in the Lowmark and can pay.",
+    "notoriety": 2,
+    "tagIds": ["gender:male", "bg:soldier", "pers:cynical", "phys:scarred"]
+  },
+  "fortName": "Crow's Wing",
+  "partyMercIds": ["marek", "veska"]
+}

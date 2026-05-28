@@ -1,0 +1,128 @@
+{
+  "captiveId": "captive-dren-deserter",
+  "captiveName": "Kael Vurst",
+  "fortName": "Crow's Wing",
+  "llm": "openai-captive:gpt-4.1-nano",
+  "dispositions": [
+    {
+      "action": "ransom",
+      "effect": {
+        "action": "ransom",
+        "goldDelta": 20,
+        "reputationGain": "mercenary",
+        "captiveRemoved": true
+      },
+      "narration": {
+        "outcomeNarrative": "The fort's officials write formal requests, sending a messenger with the ransom sum of twenty coins. Kael Vurst, the scarred deserting soldier, is returned to his cousin in Lowmark, the paperwork a dull, necessary task. Marek and Veska oversee the exchange, the process as bleak and pragmatic as expected.",
+        "captiveLine": "My cousin will pay, just don't leave me here."
+      }
+    },
+    {
+      "action": "sell",
+      "effect": {
+        "action": "sell",
+        "goldDelta": 10,
+        "reputationGain": "ruthless",
+        "captiveRemoved": true
+      },
+      "narration": {
+        "outcomeNarrative": "The fort's trader arranges the sale with a cold efficiency, exchanging a modest sum for Kael Vurst. The transaction is discreet, with no fuss or celebration. Kael, a scarred deserter and cynical soldier, is handed over with a faint sense of utility—another pawn in the mercenary’s grim ledger.",
+        "captiveLine": "'I was just trying to survive, but this is how it ends.'"
+      }
+    },
+    {
+      "action": "display",
+      "effect": {
+        "action": "display",
+        "goldDelta": 0,
+        "reputationGain": "feared",
+        "captiveRemoved": true
+      },
+      "narration": {
+        "outcomeNarrative": "The display is brutal and public, a stark reminder of the consequences for desertion. Kael Vurst, his face scarred and eyes hollow, is paraded in chains before the gathered mercenaries and villagers. Marek and Veska watch with hardened expressions as the spectacle unfolds, reinforcing the fort's ruthless reputation.",
+        "captiveLine": "'My cousin can pay, I swear it, just let me go'."
+      }
+    },
+    {
+      "action": "recruit",
+      "effect": {
+        "action": "recruit",
+        "goldDelta": 0,
+        "reputationGain": "mercenary",
+        "captiveRemoved": false,
+        "recruitedAs": {
+          "id": "recruit-captive-dren-deserter",
+          "name": "Kael Vurst",
+          "attrs": {
+            "physical": 3,
+            "agility": 3,
+            "intelligence": 3,
+            "charisma": 2,
+            "willpower": 2
+          },
+          "tags": [
+            {
+              "id": "gender:male",
+              "category": "gender",
+              "rarity": "common",
+              "tier": 5,
+              "mutexGroup": "gender",
+              "label": "Male"
+            },
+            {
+              "id": "bg:soldier",
+              "category": "background",
+              "rarity": "common",
+              "tier": 5,
+              "mutexGroup": "background",
+              "attrBias": {
+                "physical": 1
+              },
+              "label": "Soldier"
+            },
+            {
+              "id": "pers:cynical",
+              "category": "personality",
+              "rarity": "common",
+              "tier": 4,
+              "attrBias": {
+                "intelligence": 1
+              },
+              "label": "Cynical"
+            },
+            {
+              "id": "phys:scarred",
+              "category": "physicality",
+              "rarity": "common",
+              "tier": 4,
+              "attrBias": {
+                "willpower": 1
+              },
+              "label": "Scarred"
+            }
+          ],
+          "veterancy": 0,
+          "wage": 1,
+          "hp": 3
+        }
+      },
+      "narration": {
+        "outcomeNarrative": "The fort's recruiter, Marek, eyes Kael Vurst, the scarred deserter, with a pragmatic glance. He knows the man’s cynical nature and past as a soldier. With a quick nod, Marek signals acceptance, understanding well enough that Kael's compliance is likely shallow but sufficient for now. Veska notes the man's claim about his cousin, but the decision is pragmatic—every hand counts.",
+        "captiveLine": "Cousin’s cattle can pay, if I’m given the chance."
+      }
+    },
+    {
+      "action": "execute",
+      "effect": {
+        "action": "execute",
+        "goldDelta": 0,
+        "reputationGain": "just",
+        "captiveRemoved": true
+      },
+      "narration": {
+        "outcomeNarrative": "The execution is swift and devoid of ceremony. Kael Vurst's life ends in the dust, his cynicism fading with his last breath. The soldiers stand silently, their faces unreadable as the weight of the act settles over them. The fort's reputation remains unchanged, the cruel efficiency of justice reaffirmed in their eyes.",
+        "captiveLine": "My cousin's cattle will be your burden now."
+      }
+    }
+  ]
+}

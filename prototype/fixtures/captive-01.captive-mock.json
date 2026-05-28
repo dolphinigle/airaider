@@ -1,0 +1,128 @@
+{
+  "captiveId": "captive-dren-deserter",
+  "captiveName": "Kael Vurst",
+  "fortName": "Crow's Wing",
+  "llm": "mock-captive",
+  "dispositions": [
+    {
+      "action": "ransom",
+      "effect": {
+        "action": "ransom",
+        "goldDelta": 20,
+        "reputationGain": "mercenary",
+        "captiveRemoved": true
+      },
+      "narration": {
+        "outcomeNarrative": "[mock] Kael Vurst's people pay. +20g. The fort is known as a paying market.",
+        "captiveLine": "[mock] \"Kael Vurst: 'My uncle will hear of this courtesy.'\""
+      }
+    },
+    {
+      "action": "sell",
+      "effect": {
+        "action": "sell",
+        "goldDelta": 10,
+        "reputationGain": "ruthless",
+        "captiveRemoved": true
+      },
+      "narration": {
+        "outcomeNarrative": "[mock] You sell Kael Vurst to a passing slaver. +10g. No one in the yard meets your eye.",
+        "captiveLine": "[mock] \"Kael Vurst says nothing as the chain changes hands.\""
+      }
+    },
+    {
+      "action": "display",
+      "effect": {
+        "action": "display",
+        "goldDelta": 0,
+        "reputationGain": "feared",
+        "captiveRemoved": true
+      },
+      "narration": {
+        "outcomeNarrative": "[mock] Kael Vurst hangs in a cage at the gate. The next caravan asks fewer questions.",
+        "captiveLine": "[mock] \"Kael Vurst: 'You'll regret leaving me up here in the wind.'\""
+      }
+    },
+    {
+      "action": "recruit",
+      "effect": {
+        "action": "recruit",
+        "goldDelta": 0,
+        "reputationGain": "mercenary",
+        "captiveRemoved": false,
+        "recruitedAs": {
+          "id": "recruit-captive-dren-deserter",
+          "name": "Kael Vurst",
+          "attrs": {
+            "physical": 3,
+            "agility": 3,
+            "intelligence": 3,
+            "charisma": 2,
+            "willpower": 2
+          },
+          "tags": [
+            {
+              "id": "gender:male",
+              "category": "gender",
+              "rarity": "common",
+              "tier": 5,
+              "mutexGroup": "gender",
+              "label": "Male"
+            },
+            {
+              "id": "bg:soldier",
+              "category": "background",
+              "rarity": "common",
+              "tier": 5,
+              "mutexGroup": "background",
+              "attrBias": {
+                "physical": 1
+              },
+              "label": "Soldier"
+            },
+            {
+              "id": "pers:cynical",
+              "category": "personality",
+              "rarity": "common",
+              "tier": 4,
+              "attrBias": {
+                "intelligence": 1
+              },
+              "label": "Cynical"
+            },
+            {
+              "id": "phys:scarred",
+              "category": "physicality",
+              "rarity": "common",
+              "tier": 4,
+              "attrBias": {
+                "willpower": 1
+              },
+              "label": "Scarred"
+            }
+          ],
+          "veterancy": 0,
+          "wage": 1,
+          "hp": 3
+        }
+      },
+      "narration": {
+        "outcomeNarrative": "[mock] Kael Vurst takes the oath. Loyalty: thin.",
+        "captiveLine": "[mock] \"Kael Vurst: 'I take the coin. I keep one eye on the door.'\""
+      }
+    },
+    {
+      "action": "execute",
+      "effect": {
+        "action": "execute",
+        "goldDelta": 0,
+        "reputationGain": "just",
+        "captiveRemoved": true
+      },
+      "narration": {
+        "outcomeNarrative": "[mock] You execute Kael Vurst at first light. The crows arrive on schedule.",
+        "captiveLine": "[mock] \"Kael Vurst does not beg. That is something.\""
+      }
+    }
+  ]
+}
