@@ -5,6 +5,9 @@ dist/
 .env.*
 *.env
 coverage/
+# M17.1: saveRoster .bak snapshots are local-only; don't commit them.
+fixtures/.tmp-*.bak
+fixtures/*.bak
 
 # Real-LLM transcripts: gitignore the auto-suffixed ones; curated samples
 # (e.g. fixtures/raid-01.transcript-real.json) may be force-added for review.
