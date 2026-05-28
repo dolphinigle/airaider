@@ -141,5 +141,6 @@
   "captiveUpkeep": {
     "count": 0,
     "goldSpent": 0
-  }
+  },
+  "captiveEscapes": []
 }

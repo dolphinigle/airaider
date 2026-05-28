@@ -166,6 +166,14 @@ export interface DayResolution {
    * Both 0 when no captives are held or in roster-less mode.
    */
   captiveUpkeep: { count: number; goldSpent: number };
+  /**
+   * M11.7: captive escape attempts. Each captive currently held rolls a
+   * deterministic escape chance equal to `notoriety * 10%` (so a notoriety-5
+   * captive escapes 50% of days, while notoriety-1 escapes ~10%). Successful
+   * escapes remove the captive from `roster.captives` and append a fortLog
+   * note. Empty array in roster-less mode or when no captives are held.
+   */
+  captiveEscapes: Array<{ captiveId: string; captiveName: string; notoriety: number }>;
 }
 
 /**
@@ -558,6 +566,31 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     newFortLogEntries.push(entry);
   }
 
+  // M11.7: captive escape attempts. After upkeep is paid (captive may still
+  // bolt the same day they cost food); chance per captive = notoriety * 10%.
+  // Deterministic seeded by day so re-running yields the same outcome.
+  const captiveEscapes: Array<{ captiveId: string; captiveName: string; notoriety: number }> = [];
+  if (roster && roster.captives.length > 0) {
+    const escapeRng = rngFromString(`captive-escape-${roster.dayCount}`);
+    const survivors: typeof roster.captives = [];
+    for (const c of roster.captives) {
+      const chance = Math.min(1, Math.max(0, c.notoriety * 0.1));
+      if (escapeRng() < chance) {
+        captiveEscapes.push({ captiveId: c.id, captiveName: c.name, notoriety: c.notoriety });
+        const entry: FortLogEntry = {
+          day: roster.dayCount + 1,
+          kind: 'note',
+          message: `Captive escaped: ${c.name} (notoriety ${c.notoriety}) slipped the guards`,
+        };
+        appendFortLog(roster, entry);
+        newFortLogEntries.push(entry);
+      } else {
+        survivors.push(c);
+      }
+    }
+    roster.captives = survivors;
+  }
+
   return {
     dayId: day.id,
     dayName: day.name,
@@ -582,5 +615,6 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     lowMorale,
     questsStirred,
     captiveUpkeep,
+    captiveEscapes,
   };
 }

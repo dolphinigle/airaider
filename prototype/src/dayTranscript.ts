@@ -145,6 +145,13 @@ export function renderDayTranscript(day: DayResolution): string {
     lines.push('');
     lines.push(` CAPTIVE UPKEEP: −${day.captiveUpkeep.goldSpent}g  (${day.captiveUpkeep.count} captive${day.captiveUpkeep.count === 1 ? '' : 's'})`);
   }
+  if (day.captiveEscapes && day.captiveEscapes.length > 0) {
+    lines.push('');
+    lines.push(` CAPTIVE ESCAPES:`);
+    for (const e of day.captiveEscapes) {
+      lines.push(`   ☓ ${e.captiveName} (notoriety ${e.notoriety}) slipped the guards`);
+    }
+  }
   lines.push(DBAR);
   return lines.join('\n');
 }

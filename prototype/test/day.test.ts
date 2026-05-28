@@ -642,3 +642,81 @@ describe('M11.5 daily captive upkeep', () => {
     expect(r.gold).toBeLessThanOrEqual(-1);
   });
 });
+
+describe('M11.7 captive escape attempts', () => {
+  const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+  const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+  const dayPath = join(ROOT, 'fixtures', 'day-01.json');
+  const day = loadDay(dayPath);
+
+  function makeCaptive(id: string, notor = 1) {
+    return { id, name: id, archetype: 'thug', backstory: '', tags: [], notoriety: notor };
+  }
+
+  it('captiveEscapes is empty when no captives held', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!]);
+    const out = await resolveDay({
+      day: { ...day, scenarios: [] as string[] } as any,
+      dayPath, mercs, llm: new MockScenarioLLM(), roster: r,
+    });
+    expect(out.captiveEscapes).toEqual([]);
+  });
+
+  it('notoriety-5 captive almost always escapes; notoriety-1 almost never does (statistical)', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    let high = 0, low = 0;
+    for (let d = 0; d < 50; d++) {
+      const r = newRoster([mercs.get('marek')!]);
+      r.dayCount = d;
+      r.captives.push(makeCaptive('hi', 5), makeCaptive('lo', 1));
+      const out = await resolveDay({
+        day: { ...day, scenarios: [] as string[] } as any,
+        dayPath, mercs, llm: new MockScenarioLLM(), roster: r,
+      });
+      if (out.captiveEscapes.some((e) => e.captiveId === 'hi')) high++;
+      if (out.captiveEscapes.some((e) => e.captiveId === 'lo')) low++;
+    }
+    expect(high).toBeGreaterThan(low + 10);
+    expect(low).toBeLessThan(25);
+    expect(high).toBeGreaterThan(15);
+  });
+
+  it('escaped captive is removed from roster.captives and logged', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    // Search day seeds until we find one where the notoriety-5 captive escapes.
+    let foundEscape = false;
+    for (let d = 0; d < 50 && !foundEscape; d++) {
+      const r = newRoster([mercs.get('marek')!]);
+      r.dayCount = d;
+      r.captives.push(makeCaptive('cap', 5));
+      const out = await resolveDay({
+        day: { ...day, scenarios: [] as string[] } as any,
+        dayPath, mercs, llm: new MockScenarioLLM(), roster: r,
+      });
+      if (out.captiveEscapes.length === 1) {
+        foundEscape = true;
+        expect(out.captiveEscapes[0]!.captiveId).toBe('cap');
+        expect(out.captiveEscapes[0]!.notoriety).toBe(5);
+        expect(r.captives.find((c) => c.id === 'cap')).toBeUndefined();
+        expect(r.fortLog.some((e) => e.message.startsWith('Captive escaped:') && e.message.includes('cap'))).toBe(true);
+      }
+    }
+    expect(foundEscape).toBe(true);
+  });
+
+  it('escape outcome is deterministic for the same dayCount', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const make = () => {
+      const r = newRoster([mercs.get('marek')!]);
+      r.dayCount = 7;
+      r.captives.push(makeCaptive('a', 5), makeCaptive('b', 5), makeCaptive('c', 5));
+      return r;
+    };
+    const r1 = make();
+    const r2 = make();
+    const o1 = await resolveDay({ day: { ...day, scenarios: [] as string[] } as any, dayPath, mercs, llm: new MockScenarioLLM(), roster: r1 });
+    const o2 = await resolveDay({ day: { ...day, scenarios: [] as string[] } as any, dayPath, mercs, llm: new MockScenarioLLM(), roster: r2 });
+    expect(o1.captiveEscapes.map((e) => e.captiveId).sort()).toEqual(o2.captiveEscapes.map((e) => e.captiveId).sort());
+  });
+});
