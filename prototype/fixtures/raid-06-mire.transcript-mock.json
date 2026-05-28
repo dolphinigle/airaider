@@ -81,5 +81,6 @@
   ],
   "outcomeNarrative": "[mock] A bruised partial; retrieve the iron coffer the priest of Sevrenne dropped when the bog took him, before the next moon slips half-grasped, but no one is broken.",
   "llmName": "mock",
-  "casualties": []
+  "casualties": [],
+  "reputationDeltas": []
 }

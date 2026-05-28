@@ -58,5 +58,6 @@
   ],
   "outcomeNarrative": "[mock] A bruised partial; find out why no smoke has risen from Stelm village in eight days, and bring word back to the fort slips half-grasped, but no one is broken.",
   "llmName": "mock",
-  "casualties": []
+  "casualties": [],
+  "reputationDeltas": []
 }

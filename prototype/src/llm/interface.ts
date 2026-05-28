@@ -15,6 +15,8 @@ export interface ScenarioLLMRequest {
   };
   /** M5.3: chosen approach for a multi-approach scenario. */
   approach?: { id: string; label: string; summary: string; narrativeHint?: string };
+  /** M5.5: factions involved in this scenario and the roster's current standing. */
+  factionContext?: Array<{ factionId: string; summary?: string; currentStanding: number }>;
 }
 
 export interface ScenarioLLMNarration {

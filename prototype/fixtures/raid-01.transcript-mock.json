@@ -57,5 +57,6 @@
   ],
   "outcomeNarrative": "[mock] A bruised partial; recover the salt-merchant's wagon from the brigands camped at the Crow's Ford slips half-grasped, but no one is broken.",
   "llmName": "mock",
-  "casualties": []
+  "casualties": [],
+  "reputationDeltas": []
 }

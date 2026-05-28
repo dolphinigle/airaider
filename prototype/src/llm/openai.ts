@@ -89,10 +89,14 @@ export class OpenAIScenarioLLM implements ScenarioLLM {
       resolution: { band: req.band, reason: req.bandReason },
       synergy: req.synergy ?? { pairs: [], bonusCoins: 0 },
       approach: req.approach ?? null,
+      factionContext: req.factionContext ?? [],
       instructions:
         'Produce a JSON object matching the schema. One contribution line per party merc, in the order given.' +
         (req.approach
           ? ` The player chose the "${req.approach.label}" approach (${req.approach.summary}). Let this colour every contribution line and the outcome narrative; refer to the approach by feel, not by name.`
+          : '') +
+        (req.factionContext && req.factionContext.length > 0
+          ? ` The factions involved are: ${req.factionContext.map((f) => `${f.factionId} (current standing ${f.currentStanding}${f.summary ? '; ' + f.summary : ''})`).join('; ')}. Refer to them by name in the outcome and let prior standing colour reactions.`
           : ''),
     };
 

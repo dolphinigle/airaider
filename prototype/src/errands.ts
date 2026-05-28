@@ -53,10 +53,11 @@ export async function resolveDueErrands(args: {
   mercs: Map<string, Merc>;
   llm: ScenarioLLM;
   fatigueOf?: (mercId: string) => number;
+  reputationOf?: (factionId: string) => number;
   /** Base path used to resolve scenarioPath when it is relative. */
   basePath: string;
 }): Promise<ScenarioResolution[]> {
-  const { roster, currentDay, mercs, llm, fatigueOf, basePath } = args;
+  const { roster, currentDay, mercs, llm, fatigueOf, reputationOf, basePath } = args;
   const due = roster.pendingErrands.filter((e) => e.returnsOnDay <= currentDay);
   const remaining = roster.pendingErrands.filter((e) => e.returnsOnDay > currentDay);
   const out: ScenarioResolution[] = [];
@@ -85,7 +86,7 @@ export async function resolveDueErrands(args: {
       }
     }
     const rng = rngFromString(e.seedSource);
-    const resolution = await resolveScenario({ scenario, assignments, llm, rng, fatigueOf });
+    const resolution = await resolveScenario({ scenario, assignments, llm, rng, fatigueOf, reputationOf });
     out.push(resolution);
   }
   roster.pendingErrands = remaining;

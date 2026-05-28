@@ -76,5 +76,6 @@
   "llmName": "mock",
   "casualties": [],
   "approachId": "assault",
-  "approachLabel": "Open assault on the tower"
+  "approachLabel": "Open assault on the tower",
+  "reputationDeltas": []
 }

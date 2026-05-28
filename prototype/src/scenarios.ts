@@ -50,6 +50,16 @@ const ScenarioSchema = z.object({
   defaultApproachId: z.string().optional(),
   /** M5.4: if > 0, this scenario is an errand that returns N days after dispatch. */
   daysToResolve: z.number().int().min(0).max(14).optional(),
+  /** M5.5: factions whose standing this scenario touches. */
+  factionContext: z.array(z.object({
+    factionId: z.string().min(1),
+    /** Short one-liner shown to the LLM about why this faction cares. */
+    summary: z.string().optional(),
+    deltaOnFavorable: z.number().int().optional(),
+    deltaOnCatastrophicFavorable: z.number().int().optional(),
+    deltaOnUnfavorable: z.number().int().optional(),
+    deltaOnCatastrophic: z.number().int().optional(),
+  })).optional(),
 });
 
 export type FixtureScenario = z.infer<typeof ScenarioSchema>;

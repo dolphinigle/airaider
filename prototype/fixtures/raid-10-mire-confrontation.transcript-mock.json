@@ -77,5 +77,6 @@
   ],
   "outcomeNarrative": "[mock] A bruised partial; answer the bog-touched envoy at the cairn — kill, bargain, or be carried back into the reeds slips half-grasped, but no one is broken.",
   "llmName": "mock",
-  "casualties": []
+  "casualties": [],
+  "reputationDeltas": []
 }

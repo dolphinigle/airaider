@@ -1,0 +1,52 @@
+{
+  "id": "raid-13-guild-shipment",
+  "archetype": "contract",
+  "title": "The Lowmark Guild Shipment",
+  "target": "escort a Lowmark Merchant Guild caravan past the Black Hill toll-gang — they remember the company that turned the gang loose two seasons ago",
+  "slots": [
+    {
+      "id": "spear",
+      "description": "ride point with the caravan-master; stand if they stand",
+      "preferredAttr": "physical",
+      "preferredTags": ["bg:soldier"]
+    },
+    {
+      "id": "voice",
+      "description": "negotiate with the toll-gang's headman before steel comes out",
+      "preferredAttr": "charisma",
+      "preferredTags": ["pers:charming"]
+    },
+    {
+      "id": "scout",
+      "description": "ride ahead, mark the ambush spots before the wagons reach them",
+      "preferredAttr": "agility",
+      "preferredTags": ["phys:quick"]
+    }
+  ],
+  "partySize": { "min": 3, "max": 3 },
+  "coinBudget": 5,
+  "assignments": [
+    { "slotId": "spear", "mercId": "marek" },
+    { "slotId": "voice", "mercId": "imogen" },
+    { "slotId": "scout", "mercId": "dren" }
+  ],
+  "seed": "raid-13-guild-shipment",
+  "factionContext": [
+    {
+      "factionId": "lowmark-guild",
+      "summary": "the merchant guild that holds the salt-roads ledger; a clean run earns them owing you",
+      "deltaOnFavorable": 1,
+      "deltaOnCatastrophicFavorable": 2,
+      "deltaOnUnfavorable": 0,
+      "deltaOnCatastrophic": -1
+    },
+    {
+      "factionId": "black-hill-gang",
+      "summary": "the toll-gang; spilling their blood costs you their forbearance on later jobs",
+      "deltaOnFavorable": -1,
+      "deltaOnCatastrophicFavorable": -2,
+      "deltaOnUnfavorable": 0,
+      "deltaOnCatastrophic": 1
+    }
+  ]
+}

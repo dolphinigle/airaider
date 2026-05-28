@@ -45,6 +45,14 @@ export function renderTranscript(r: ScenarioResolution): string {
   lines.push('');
   lines.push('OUTCOME:');
   lines.push(`  ${r.outcomeNarrative}`);
+  if (r.reputationDeltas.length > 0) {
+    lines.push('');
+    lines.push('REPUTATION:');
+    for (const d of r.reputationDeltas) {
+      const sign = d.delta > 0 ? '+' : '';
+      lines.push(`  ${d.factionId}: ${sign}${d.delta}`);
+    }
+  }
   lines.push('');
   lines.push(`[narrated by ${r.llmName}]`);
   lines.push(BAR);

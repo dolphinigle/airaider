@@ -1,0 +1,96 @@
+{
+  "scenarioId": "raid-13-guild-shipment",
+  "title": "The Lowmark Guild Shipment",
+  "target": "escort a Lowmark Merchant Guild caravan past the Black Hill toll-gang — they remember the company that turned the gang loose two seasons ago",
+  "archetype": "contract",
+  "partySize": 3,
+  "slotContributions": [
+    {
+      "slotId": "spear",
+      "mercId": "marek",
+      "attrUsed": "physical",
+      "attrScore": 5,
+      "tagsMatched": [
+        "bg:soldier"
+      ],
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    },
+    {
+      "slotId": "voice",
+      "mercId": "imogen",
+      "attrUsed": "charisma",
+      "attrScore": 5,
+      "tagsMatched": [
+        "pers:charming"
+      ],
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    },
+    {
+      "slotId": "scout",
+      "mercId": "dren",
+      "attrUsed": "agility",
+      "attrScore": 5,
+      "tagsMatched": [
+        "phys:quick"
+      ],
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    }
+  ],
+  "synergy": {
+    "pairs": [
+      {
+        "mercA": "marek",
+        "mercB": "dren",
+        "sharedTagId": "temp:brave"
+      }
+    ],
+    "bonusCoins": 1
+  },
+  "baseCoinBudget": 5,
+  "coinsActual": 6,
+  "rollFaces": [
+    "heads",
+    "heads",
+    "tails",
+    "heads",
+    "tails",
+    "heads"
+  ],
+  "heads": 4,
+  "tails": 2,
+  "band": "favorable",
+  "bandReason": "4/6 heads (favorable)",
+  "contributions": [
+    {
+      "mercId": "marek",
+      "line": "Marek keeps his eyes on the horizon, his brawny frame tense as he rides point, ready for any sign of trouble."
+    },
+    {
+      "mercId": "imogen",
+      "line": "Imogen diplomatically tries to smooth things over with the toll-gang's headman, her charm a thin veneer over her wariness."
+    },
+    {
+      "mercId": "dren",
+      "line": "Dren scouts ahead, his quick feet and sharp eyes marking ambush spots with practiced ease, whispering warnings to the others."
+    }
+  ],
+  "outcomeNarrative": "Thanks to Marek's steady presence, Imogen's tact, and Dren's vigilance, the caravan passes the Black Hill toll-gang without bloodshed; the Lowmark Guild recognizes your effort with a favorable outcome, and the gang's patience is worn thin.",
+  "llmName": "openai:gpt-4.1-nano",
+  "casualties": [],
+  "reputationDeltas": [
+    {
+      "factionId": "lowmark-guild",
+      "delta": 1
+    },
+    {
+      "factionId": "black-hill-gang",
+      "delta": -1
+    }
+  ]
+}

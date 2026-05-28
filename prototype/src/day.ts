@@ -74,17 +74,27 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   const scenarioResolutions: ScenarioResolution[] = [];
   const errandsDispatched: RosterPendingErrand[] = [];
   const errandsResolved: ScenarioResolution[] = [];
+  const reputationOf = roster
+    ? (factionId: string): number => roster.reputation[factionId] ?? 0
+    : undefined;
+  const applyDeltas = (r: ScenarioResolution): void => {
+    if (!roster) return;
+    for (const d of r.reputationDeltas) {
+      roster.reputation[d.factionId] = (roster.reputation[d.factionId] ?? 0) + d.delta;
+    }
+  };
 
   // M5.4: resolve any errands due TODAY before processing today's scenarios.
   // Use roster.dayCount + 1 as "current day" since the loop hasn't bumped it yet.
   if (roster) {
     const currentDay = roster.dayCount + 1;
     const dueResolutions = await resolveDueErrands({
-      roster, currentDay, mercs, llm, fatigueOf, basePath: dayPath,
+      roster, currentDay, mercs, llm, fatigueOf, reputationOf, basePath: dayPath,
     });
     for (const r of dueResolutions) {
       errandsResolved.push(r);
       scenarioResolutions.push(r);
+      applyDeltas(r);
       // Errands cost 1 fatigue per participating merc on return day.
       for (const a of r.slotContributions) {
         fatigue.set(a.mercId, (fatigue.get(a.mercId) ?? 0) + 1);
@@ -127,8 +137,9 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
       ? rngFor(scenario, i)
       : rngFromString(scenario.seed ?? scenario.id);
 
-    const resolution = await resolveScenario({ scenario, assignments, llm, rng, fatigueOf });
+    const resolution = await resolveScenario({ scenario, assignments, llm, rng, fatigueOf, reputationOf });
     scenarioResolutions.push(resolution);
+    applyDeltas(resolution);
 
     for (const a of assignments) {
       fatigue.set(a.merc.id, (fatigue.get(a.merc.id) ?? 0) + 1);

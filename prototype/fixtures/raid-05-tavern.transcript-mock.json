@@ -65,5 +65,6 @@
   ],
   "outcomeNarrative": "[mock] A bruised partial; hold a long night of drinking that closes ranks between the two newest hands without ending in a brawl slips half-grasped, but no one is broken.",
   "llmName": "mock",
-  "casualties": []
+  "casualties": [],
+  "reputationDeltas": []
 }

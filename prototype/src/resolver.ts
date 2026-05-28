@@ -18,6 +18,8 @@ export interface ResolutionInput {
   fatigueOf?: (mercId: string) => number;
   /** M5.3: id of the chosen approach (must match scenario.approaches[].id). */
   approachId?: string;
+  /** M5.5: current reputation per faction id (read-only). */
+  reputationOf?: (factionId: string) => number;
 }
 
 export interface SlotContribution {
@@ -70,6 +72,8 @@ export interface ScenarioResolution {
   /** M5.3: which approach was chosen (if the scenario offers any). */
   approachId?: string;
   approachLabel?: string;
+  /** M5.5: reputation deltas owed to the roster from this resolution. */
+  reputationDeltas: Array<{ factionId: string; delta: number }>;
 }
 
 /**
@@ -167,7 +171,7 @@ export function computeSlotContributions(
 }
 
 export async function resolveScenario(input: ResolutionInput): Promise<ScenarioResolution> {
-  const { scenario, assignments, llm, rng, fatigueOf, approachId } = input;
+  const { scenario, assignments, llm, rng, fatigueOf, approachId, reputationOf } = input;
   if (
     assignments.length < scenario.partySize.min ||
     assignments.length > scenario.partySize.max
@@ -255,8 +259,28 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
     approach: approach ? {
       id: approach.id, label: approach.label, summary: approach.summary, narrativeHint: approach.narrativeHint,
     } : undefined,
+    factionContext: scenario.factionContext?.map((f) => ({
+      factionId: f.factionId,
+      summary: f.summary,
+      currentStanding: reputationOf ? reputationOf(f.factionId) : 0,
+    })),
   };
   const narration = await llm.narrate(req);
+
+  // M5.5: compute reputation deltas for this band.
+  const reputationDeltas: Array<{ factionId: string; delta: number }> = [];
+  if (scenario.factionContext) {
+    for (const f of scenario.factionContext) {
+      let delta = 0;
+      switch (band.band) {
+        case 'favorable': delta = f.deltaOnFavorable ?? 0; break;
+        case 'catastrophic-favorable': delta = f.deltaOnCatastrophicFavorable ?? f.deltaOnFavorable ?? 0; break;
+        case 'unfavorable': delta = f.deltaOnUnfavorable ?? 0; break;
+        case 'catastrophic': delta = f.deltaOnCatastrophic ?? f.deltaOnUnfavorable ?? 0; break;
+      }
+      if (delta !== 0) reputationDeltas.push({ factionId: f.factionId, delta });
+    }
+  }
 
   return {
     scenarioId: scenario.id,
@@ -279,5 +303,6 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
     casualties,
     approachId: approach?.id,
     approachLabel: approach?.label,
+    reputationDeltas,
   };
 }

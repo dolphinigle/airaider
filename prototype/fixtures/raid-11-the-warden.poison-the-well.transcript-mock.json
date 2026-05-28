@@ -76,5 +76,6 @@
   "llmName": "mock",
   "casualties": [],
   "approachId": "poison-the-well",
-  "approachLabel": "Poison the well, take the tower at dusk"
+  "approachLabel": "Poison the well, take the tower at dusk",
+  "reputationDeltas": []
 }

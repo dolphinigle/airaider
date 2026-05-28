@@ -76,5 +76,6 @@
   "llmName": "mock",
   "casualties": [],
   "approachId": "parley",
-  "approachLabel": "Parley under the Sevrenne sign"
+  "approachLabel": "Parley under the Sevrenne sign",
+  "reputationDeltas": []
 }
