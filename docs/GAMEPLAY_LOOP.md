@@ -1,6 +1,16 @@
 # Gameplay Loop
 
-**Status:** Locked (campaign shape, loop structure). Open (exact prestige tier count, errand catalog).
+> ⚠️ **PARTIALLY SUPERSEDED — see `CANONICAL_DESIGN.md` §3 (validated 200-day dopamine ladder) and §2.10 (prestige tiers).**
+>
+> Updates from this doc:
+> - "Heroes" → **mercenaries** (terminology lock)
+> - Prestige tier count was open here → **validated P0→P4 with sim data** (CANONICAL §2.10); tiers beyond P4 still 🟡
+> - Errand catalog was open here → still 🟡 but the scenario-archetype shape is informed by sim (contract / recruit / captive / build / tavern)
+> - Campaign length target of 200+ days is **validated** end-to-end (CANONICAL §3)
+>
+> What's still in force: the macro/micro loop split (camp phase + raid phase), the campaign-length target, the high-level day cadence.
+>
+> **Status:** Partially superseded.
 
 AI Raider has two nested loops: the **macro loop** (Camp Phase) and the **micro loop** (Raid Phase). They share the same heroes, items and stories, but they are different games to play.
 

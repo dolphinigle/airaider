@@ -1,6 +1,17 @@
 # Raid Design
 
-**Status:** Locked (core, balance shape, equipment principles, difficulty class). Open (long-term arc, defensive raids, equipment slot count + room reshape, exact balance coefficients).
+> ⚠️ **PARTIALLY SUPERSEDED — see `CANONICAL_DESIGN.md` for current state.**
+>
+> The core resolution mechanic described here as "Narrated Pool" has been **replaced by the Sultan-coin §17 mechanism** (CANONICAL §2.1). The Narrated Pool was a coin-flip-with-spend model; the Sultan-coin is a 4-hidden-band flip with "author the target, not the threshold." If you read about Narrated Pool here, translate to Sultan-coin.
+>
+> Other major changes from this doc:
+> - The TRAIN scenario (mentioned as a safe XP grind path) was **removed** (CANONICAL §2.12)
+> - Party-size minimum is now **2 for raids** with `target_heads += (party_size − 2)` (CANONICAL §2.12)
+> - Building takes NO scenario slot and has NO quality penalty (CANONICAL §2.11) — supersedes any per-building resolve roll
+>
+> What's still in force from this doc: the top-tier "Engine owns numbers, AI owns flavor" principle (now CANONICAL §1), the leads/arcs structure, the equipment principles, the failure-as-lost-time framing.
+>
+> **Status:** Partially superseded.
 
 The raid system is the central agency layer of AI Raider. This document records the **locked core loop** as resolved through design conversation and self-playtest (see [issue #1](https://github.com/dolphinigle/airaider/issues/1) for the full trace). Sections marked Open are pending later design rounds.
 

@@ -1,6 +1,24 @@
 # Core Concepts — AI Raider
 
-**Status:** Locked synthesis (the load-bearing decisions). For the rationale behind each principle, see the individual design docs cited inline.
+> ⚠️ **SUPERSEDED — read `CANONICAL_DESIGN.md` instead.**
+>
+> This document was the previous single-file synthesis but predates the 200-day validation sim. Most of its load-bearing decisions have been refined or replaced:
+> - "Heroes" → **mercenaries**
+> - "Narrated Pool" → **Sultan-coin §17 resolution**
+> - Attribute set was not finalized here → **5 attributes locked: Physical / Agility / Intelligence / Charisma / Willpower** (see CANONICAL §2.3)
+> - Tag system here is partial → **PoE-style unified vocabulary + rarity × tier locked** (CANONICAL §2.5-§2.6)
+> - Wage system was unspeced here → **flat wage locked** (CANONICAL §2.7)
+> - Loyalty was binary here → **rejected; replaced by personality mutex + permadeath + rivalries** (CANONICAL §2.13)
+>
+> What's still in force from this doc: the engine-owns-numbers / AI-owns-flavor principle, the JSON-defined RoomType model (FORT_AND_PRESTIGE.md), the high-level dopamine loop shape (now superseded in detail by CANONICAL §3).
+>
+> Read this only for historical context or to cross-check a specific decision's evolution.
+
+---
+
+**Status:** SUPERSEDED. Original content preserved below.
+
+For the rationale behind each principle, see the individual design docs cited inline.
 
 This is a **single-file bootstrap** of everything an AI (or a new collaborator) needs to know to reason about AI Raider end-to-end. Read this first; only descend into the detail docs (`RAID_DESIGN.md`, `HEROES_AND_GROWTH.md`, `GAMEPLAY_LOOP.md`, `FORT_AND_PRESTIGE.md`, `PROGRESSION_AND_PAYOFF.md`, `PROBLEM_AND_INHERITANCE.md`, `VISION.md`) when you need to dig into a specific subsystem.
 
