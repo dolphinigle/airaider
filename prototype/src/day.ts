@@ -19,6 +19,8 @@ import { applyVeterancyXp, type Promotion } from './veterancy.js';
 import { recordCoDeployment, bondedPairsOf, type BondFormation } from './bonds.js';
 import { seasonFor, type SeasonClock } from './season.js';
 import { loadEventCatalog, rollEventForDay, type DailyEvent } from './events.js';
+import { loadTags } from './tags.js';
+import { refreshHirePool, HIRE_REFRESH_INTERVAL_DAYS, type HirePoolEntry } from './tavern.js';
 import { reputationTier } from './reputation.js';
 
 /** M9.1: wages are paid every Nth day (CANONICAL §2.7 flat-wage rule). */
@@ -118,6 +120,12 @@ export interface DayResolution {
    * fort is solvent or has no mercs.
    */
   desertions: Array<{ mercId: string; reason: string }>;
+  /**
+   * M10.2: hire-pool entries added by the day's auto-refresh. Non-empty
+   * only on days where `(dayCount+1)` is a multiple of
+   * HIRE_REFRESH_INTERVAL_DAYS (7) AND the pool is below target size.
+   */
+  tavernRefresh: HirePoolEntry[];
   /**
    * M7.6: fort log entries appended during THIS day (currently only the
    * daily-event entry; upgrade purchases happen via the fort CLI, not the day
@@ -384,6 +392,20 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     }
   }
 
+  // M10.2: weekly tavern auto-refresh. Top up the hire pool on the same
+  // cadence as payday (every HIRE_REFRESH_INTERVAL_DAYS days). Uses a
+  // deterministic RNG seeded on the absolute day so two runs of the same
+  // saved game land on the same bench.
+  const tavernRefresh: HirePoolEntry[] = [];
+  if (roster) {
+    const currentDay = roster.dayCount + 1;
+    if (currentDay % HIRE_REFRESH_INTERVAL_DAYS === 0) {
+      const tagPool = loadTags(new URL('../data/tags.json', import.meta.url).pathname);
+      const rng = rngFromString(`tavern-day-${currentDay}`);
+      tavernRefresh.push(...refreshHirePool(roster, rng, tagPool, currentDay));
+    }
+  }
+
   // M7.5: compute affordable fort upgrades as of end-of-day so the
   // transcript can nudge the player with a FORT HINT block.
   let fortHints: Pick<FortUpgrade, 'id' | 'name' | 'cost' | 'description'>[] = [];
@@ -415,5 +437,6 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     wagesPaid,
     wagesTotalPaid,
     desertions,
+    tavernRefresh,
   };
 }

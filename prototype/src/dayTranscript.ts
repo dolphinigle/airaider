@@ -116,6 +116,13 @@ export function renderDayTranscript(day: DayResolution): string {
       lines.push(`   ☠ ${d.mercId} walks out — ${d.reason}`);
     }
   }
+  if (day.tavernRefresh.length > 0) {
+    lines.push('');
+    lines.push(` TAVERN (${day.tavernRefresh.length} new on the bench):`);
+    for (const e of day.tavernRefresh) {
+      lines.push(`   ⚑ ${e.merc.name} (${e.merc.id})  ${e.price}g`);
+    }
+  }
   lines.push(DBAR);
   return lines.join('\n');
 }

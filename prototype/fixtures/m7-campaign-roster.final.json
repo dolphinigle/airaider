@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 9,
+  "schemaVersion": 10,
   "dayCount": 32,
   "gold": 0,
   "reputation": {
@@ -103,5 +103,80 @@
       "message": "Quiet summer day  fatigue -1"
     }
   ],
-  "consecutiveDebtDays": 0
+  "consecutiveDebtDays": 0,
+  "hirePool": [
+    {
+      "merc": {
+        "id": "tavern-28-1",
+        "name": "Joran",
+        "attrs": {
+          "physical": 3,
+          "agility": 3,
+          "intelligence": 3,
+          "charisma": 4,
+          "willpower": 7
+        },
+        "tagIds": [
+          "gender:male",
+          "bg:soldier",
+          "temp:brave",
+          "phys:quick",
+          "pers:stoic"
+        ],
+        "veterancy": 0,
+        "wage": 1,
+        "hp": 3
+      },
+      "price": 5,
+      "postedDay": 28
+    },
+    {
+      "merc": {
+        "id": "tavern-28-2",
+        "name": "Kelle",
+        "attrs": {
+          "physical": 4,
+          "agility": 4,
+          "intelligence": 2,
+          "charisma": 2,
+          "willpower": 5
+        },
+        "tagIds": [
+          "gender:female",
+          "bg:smith",
+          "temp:brave",
+          "phys:frail"
+        ],
+        "veterancy": 0,
+        "wage": 1,
+        "hp": 3
+      },
+      "price": 7,
+      "postedDay": 28
+    },
+    {
+      "merc": {
+        "id": "tavern-28-3",
+        "name": "Yorrick",
+        "attrs": {
+          "physical": 3,
+          "agility": 4,
+          "intelligence": 3,
+          "charisma": 5,
+          "willpower": 4
+        },
+        "tagIds": [
+          "gender:male",
+          "bg:hunter",
+          "temp:brave",
+          "pers:loyal"
+        ],
+        "veterancy": 0,
+        "wage": 1,
+        "hp": 3
+      },
+      "price": 6,
+      "postedDay": 28
+    }
+  ]
 }

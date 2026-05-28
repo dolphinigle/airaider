@@ -121,5 +121,6 @@
   "woundHealing": [],
   "wagesPaid": [],
   "wagesTotalPaid": 0,
-  "desertions": []
+  "desertions": [],
+  "tavernRefresh": []
 }

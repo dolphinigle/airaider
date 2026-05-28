@@ -331,3 +331,48 @@ describe('M9.3 debt suspends fatigue recovery', () => {
     expect(out.fatigueRecoverySuspended).toBe(false);
   });
 });
+
+describe('M10.2 weekly tavern auto-refresh', () => {
+  const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+  const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+  const dayPath = join(ROOT, 'fixtures', 'day-01.json');
+  const day = loadDay(dayPath);
+
+  it('refreshes the bench on days divisible by 7', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!]);
+    r.gold = 20;
+    r.dayCount = 6; // currentDay = 7
+    expect(r.hirePool).toEqual([]);
+    const out = await resolveDay({ day: { ...day, scenarios: [] as string[] } as any, dayPath, mercs, llm: new MockScenarioLLM(), roster: r });
+    expect(out.tavernRefresh.length).toBeGreaterThan(0);
+    expect(r.hirePool.length).toBeGreaterThan(0);
+  });
+
+  it('does not refresh on non-weekly days', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!]);
+    r.gold = 20;
+    r.dayCount = 0; // currentDay = 1
+    const out = await resolveDay({ day: { ...day, scenarios: [] as string[] } as any, dayPath, mercs, llm: new MockScenarioLLM(), roster: r });
+    expect(out.tavernRefresh).toEqual([]);
+    expect(r.hirePool).toEqual([]);
+  });
+
+  it('is deterministic across runs of the same saved day', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r1 = newRoster([mercs.get('marek')!]);
+    const r2 = newRoster([mercs.get('marek')!]);
+    r1.gold = r2.gold = 20;
+    r1.dayCount = r2.dayCount = 6;
+    const o1 = await resolveDay({ day: { ...day, scenarios: [] as string[] } as any, dayPath, mercs, llm: new MockScenarioLLM(), roster: r1 });
+    const o2 = await resolveDay({ day: { ...day, scenarios: [] as string[] } as any, dayPath, mercs, llm: new MockScenarioLLM(), roster: r2 });
+    expect(o1.tavernRefresh.map((e) => e.merc.id)).toEqual(o2.tavernRefresh.map((e) => e.merc.id));
+    expect(o1.tavernRefresh.map((e) => e.price)).toEqual(o2.tavernRefresh.map((e) => e.price));
+  });
+
+  it('roster-less day loop produces no refresh', async () => {
+    const out = await resolveDay({ day, dayPath, mercs, llm: new MockScenarioLLM() });
+    expect(out.tavernRefresh).toEqual([]);
+  });
+});

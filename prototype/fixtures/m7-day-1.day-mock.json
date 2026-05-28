@@ -156,5 +156,197 @@
     }
   ],
   "wagesTotalPaid": 4,
-  "desertions": []
+  "desertions": [],
+  "tavernRefresh": [
+    {
+      "merc": {
+        "id": "tavern-28-1",
+        "name": "Joran",
+        "attrs": {
+          "physical": 3,
+          "agility": 3,
+          "intelligence": 3,
+          "charisma": 4,
+          "willpower": 7
+        },
+        "tags": [
+          {
+            "id": "gender:male",
+            "category": "gender",
+            "rarity": "common",
+            "tier": 5,
+            "mutexGroup": "gender",
+            "label": "Male"
+          },
+          {
+            "id": "bg:soldier",
+            "category": "background",
+            "rarity": "common",
+            "tier": 5,
+            "mutexGroup": "background",
+            "attrBias": {
+              "physical": 1
+            },
+            "label": "Soldier"
+          },
+          {
+            "id": "temp:brave",
+            "category": "personality:temperament",
+            "rarity": "common",
+            "tier": 4,
+            "mutexGroup": "temperament",
+            "attrBias": {
+              "willpower": 1
+            },
+            "label": "Brave"
+          },
+          {
+            "id": "phys:quick",
+            "category": "physicality",
+            "rarity": "common",
+            "tier": 3,
+            "attrBias": {
+              "agility": 1
+            },
+            "label": "Light-Footed"
+          },
+          {
+            "id": "pers:stoic",
+            "category": "personality",
+            "rarity": "uncommon",
+            "tier": 2,
+            "attrBias": {
+              "willpower": 1
+            },
+            "label": "Stoic"
+          }
+        ],
+        "veterancy": 0,
+        "wage": 1,
+        "hp": 3
+      },
+      "price": 5,
+      "postedDay": 28
+    },
+    {
+      "merc": {
+        "id": "tavern-28-2",
+        "name": "Kelle",
+        "attrs": {
+          "physical": 4,
+          "agility": 4,
+          "intelligence": 2,
+          "charisma": 2,
+          "willpower": 5
+        },
+        "tags": [
+          {
+            "id": "gender:female",
+            "category": "gender",
+            "rarity": "common",
+            "tier": 5,
+            "mutexGroup": "gender",
+            "label": "Female"
+          },
+          {
+            "id": "bg:smith",
+            "category": "background",
+            "rarity": "uncommon",
+            "tier": 3,
+            "mutexGroup": "background",
+            "attrBias": {
+              "physical": 1
+            },
+            "label": "Smith"
+          },
+          {
+            "id": "temp:brave",
+            "category": "personality:temperament",
+            "rarity": "common",
+            "tier": 4,
+            "mutexGroup": "temperament",
+            "attrBias": {
+              "willpower": 1
+            },
+            "label": "Brave"
+          },
+          {
+            "id": "phys:frail",
+            "category": "physicality",
+            "rarity": "common",
+            "tier": 5,
+            "attrBias": {
+              "physical": -1
+            },
+            "label": "Frail"
+          }
+        ],
+        "veterancy": 0,
+        "wage": 1,
+        "hp": 3
+      },
+      "price": 7,
+      "postedDay": 28
+    },
+    {
+      "merc": {
+        "id": "tavern-28-3",
+        "name": "Yorrick",
+        "attrs": {
+          "physical": 3,
+          "agility": 4,
+          "intelligence": 3,
+          "charisma": 5,
+          "willpower": 4
+        },
+        "tags": [
+          {
+            "id": "gender:male",
+            "category": "gender",
+            "rarity": "common",
+            "tier": 5,
+            "mutexGroup": "gender",
+            "label": "Male"
+          },
+          {
+            "id": "bg:hunter",
+            "category": "background",
+            "rarity": "common",
+            "tier": 4,
+            "mutexGroup": "background",
+            "attrBias": {
+              "agility": 1
+            },
+            "label": "Hunter"
+          },
+          {
+            "id": "temp:brave",
+            "category": "personality:temperament",
+            "rarity": "common",
+            "tier": 4,
+            "mutexGroup": "temperament",
+            "attrBias": {
+              "willpower": 1
+            },
+            "label": "Brave"
+          },
+          {
+            "id": "pers:loyal",
+            "category": "personality",
+            "rarity": "uncommon",
+            "tier": 3,
+            "attrBias": {
+              "willpower": 1
+            },
+            "label": "Loyal"
+          }
+        ],
+        "veterancy": 0,
+        "wage": 1,
+        "hp": 3
+      },
+      "price": 6,
+      "postedDay": 28
+    }
+  ]
 }
