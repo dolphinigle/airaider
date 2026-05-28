@@ -11,6 +11,7 @@ import { loadTags } from './tags.js';
 import { loadMercs } from './mercs.js';
 import { newRoster, loadRoster, saveRoster, type Roster } from './roster.js';
 import { reputationTier } from './reputation.js';
+import { statusAlerts } from './rosterAlerts.js';
 
 function main(): void {
   const [cmd, pathArg] = process.argv.slice(2);
@@ -59,6 +60,15 @@ function printRoster(r: Roster, path: string): void {
       .join('  ');
     console.log(`  reputation: ${rep}`);
   }
+
+  // M15.1: status alert lines — surface debt, morale, payday/refresh
+  // countdowns so the player isn't surprised by next-day mechanics.
+  const alerts = statusAlerts(r);
+  if (alerts.length > 0) {
+    console.log('  alerts:');
+    for (const a of alerts) console.log(`    ${a}`);
+  }
+
   console.log('━'.repeat(63));
   console.log(`Mercs (${r.mercs.length}):`);
   for (const m of r.mercs) {
@@ -66,7 +76,15 @@ function printRoster(r: Roster, path: string): void {
     const fatigue = st && st.fatigue > 0 ? `  fatigue:${st.fatigue}` : '';
     const dmg = st && st.hpDamage > 0 ? `  hp-${st.hpDamage}` : '';
     const vGain = st && st.veterancyGain > 0 ? `  v+${st.veterancyGain}` : '';
-    console.log(`  • ${m.name} [${m.id}]${fatigue}${dmg}${vGain}`);
+    const tier = st && st.tier !== 'rookie' ? `  ${st.tier}` : '';
+    console.log(`  • ${m.name} [${m.id}]${tier}${fatigue}${dmg}${vGain}`);
+  }
+  if (r.hirePool.length > 0) {
+    console.log(`\nTavern bench (${r.hirePool.length}):`);
+    for (const e of r.hirePool) {
+      const vet = e.startingTier && e.startingTier !== 'rookie' ? ` ${e.startingTier}` : '';
+      console.log(`  ⚑ ${e.merc.name} [${e.merc.id}]${vet}  ${e.price}g  (posted day ${e.postedDay})`);
+    }
   }
   if (r.captives.length > 0) {
     console.log(`\nCaptives held (${r.captives.length}):`);
@@ -82,5 +100,12 @@ function printRoster(r: Roster, path: string): void {
     }
   }
 }
+
+/**
+ * M15.1: derive a short list of status alert lines from the roster.
+ * Surfaces debt streak, low morale, upcoming payday, and upcoming
+ * tavern refresh so the player can plan ahead.
+ */
+// statusAlerts moved to ./rosterAlerts.ts for testability.
 
 main();

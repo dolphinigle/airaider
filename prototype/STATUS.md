@@ -2,7 +2,7 @@
 
 > **Updated:** 2026-05-29 ~00:50 WIB
 > **Branch:** `prototype/m0`
-> **Last verified command:** `npm test` → 213 / 213 passing
+> **Last verified command:** `npm test` → 217 / 217 passing
 > **Last verified real-LLM command:** raid-13-guild-shipment with favorable seed — narrator awarded +1 to `lowmark-guild` and −1 to `black-hill-gang` and called out both factions by name in the outcome line (`fixtures/raid-13-guild-shipment.favorable.transcript-real.json`).
 
 ## ⚠️ Post-compaction discipline (READ FIRST)
@@ -118,6 +118,7 @@ Day loop with fatigue accumulation.
 - [x] M8.1 Reputation tiers + ally coin bonus (commit `5b3e14e`). `src/reputation.ts` introduces `ReputationTier ∈ {ally, friendly, neutral, hostile, enemy}` at thresholds ±5 / ±3 / 0. `allyCoinBonus(factionContext, reputationOf)` returns +1 coin per ally-tier faction listed in the scenario's factionContext (stacks at the sum stage; clamp now includes the bonus). LLM factionContext payload gains `standingTier` so the narrator can color the scene. `npm run roster show` now prints `lowmark-guild:6(ally)` style tier next to each reputation entry. 4 new tests (157 then 159 total). Hostile/enemy tiers narrative-only this milestone — punitive enemy event slated for M8.2.
 - [x] M7.3 Recruit gated by fort level (commit pending). `effectOf(captive, action, ctx?)` gains optional `EffectContext` with `fortLevel`. When action is `recruit` AND `ctx.fortLevel < RECRUIT_MIN_FORT_LEVEL (=2)`, the effect is marked `blocked: { reason }` instead of producing a recruited merc — captive stays. `cliCaptive` gains a `--fort-level=N` flag and renders `→ BLOCKED (...)` in the transcript when applicable. No prior caller breaks: omitting `ctx` preserves original recruit semantics (used by existing tests and fixtures). 4 new tests (166 total).
 - [ ] M7.3 Recruit gated by fort level (deferred — captive→recruit refactor)
+- [x] M15.1 Roster status alerts (commit pending). `src/rosterAlerts.ts` exports `statusAlerts(roster)` returning short alert lines: debt streak warning, payday countdown when ≤2 days away, tavern refresh countdown when ≤2 days away AND bench below `HIRE_POOL_TARGET_SIZE`. `npm run roster show` renders an `alerts:` block under the header, plus a `Tavern bench (N):` listing and the merc's veterancy tier next to each name. Extracted into its own module so tests can import without triggering the cliRoster main(). 4 new tests (217 total).
 
 
 
