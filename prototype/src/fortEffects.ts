@@ -16,6 +16,10 @@
 //   - chapel               : M7.12 — heals 1 hpDamage at end-of-day for
 //                            every idle (non-deployed, non-on-errand) merc
 //                            with hpDamage > 0
+//   - smithy (M7.13)       : also reduces catastrophic casualty hpDamage
+//                            by 1 (floor 0), on top of its flat coin bonus
+//   - winter-larder (M7.13): in frost season, idle mercs recover 2 fatigue
+//                            instead of 1 at end-of-day
 
 import type { Season } from './season.js';
 
@@ -62,4 +66,27 @@ export function palisadeBlocksCasualty(effects: FortEffects | undefined): boolea
  */
 export function chapelHealsWounds(effects: FortEffects | undefined): boolean {
   return !!effects?.upgradeIds.has('chapel');
+}
+
+/**
+ * M7.13: smithy reduces casualty hp damage by 1 (floor 0). Better armour
+ * means lighter wounds even on a catastrophic raid. Returns the amount of
+ * hp damage the smithy absorbs (currently always 1 when present).
+ */
+export function smithyCasualtyReduction(effects: FortEffects | undefined): number {
+  return effects?.upgradeIds.has('smithy') ? 1 : 0;
+}
+
+/**
+ * M7.13: in frost season the winter-larder lets idle mercs recover an
+ * extra fatigue point (2 total instead of 1). Returns the per-merc
+ * recovery amount for the given season.
+ */
+export function fatigueRecoveryAmount(
+  effects: FortEffects | undefined,
+  season: Season | undefined,
+): number {
+  const winterLarder = !!effects?.upgradeIds.has('winter-larder');
+  if (winterLarder && season === 'frost') return 2;
+  return 1;
 }

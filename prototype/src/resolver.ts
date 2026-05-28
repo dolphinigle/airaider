@@ -3,7 +3,7 @@ import type { Rng } from './rng.js';
 import { resolveCoins, MAX_COINS } from './sultan.js';
 import type { ScenarioLLM, ScenarioLLMRequest } from './llm/interface.js';
 import type { FixtureScenario } from './scenarios.js';
-import { fortEffectsFor, flatCoinBonus, slotCoinBonus, negativeSeasonClamped, palisadeBlocksCasualty } from './fortEffects.js';
+import { fortEffectsFor, flatCoinBonus, slotCoinBonus, negativeSeasonClamped, palisadeBlocksCasualty, smithyCasualtyReduction } from './fortEffects.js';
 import { allyCoinBonus, reputationTier } from './reputation.js';
 
 export interface Assignment {
@@ -321,7 +321,9 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
         return x.mercId.localeCompare(y.mercId);
       });
     if (candidates.length > 0) {
-      const damage = palisadeBlocksCasualty(fortEffects) ? 0 : 1;
+      const palisade = palisadeBlocksCasualty(fortEffects);
+      const smithyAbsorb = smithyCasualtyReduction(fortEffects);
+      const damage = palisade ? 0 : Math.max(0, 1 - smithyAbsorb);
       if (damage > 0) {
         casualties.push({
           mercId: candidates[0]!.mercId,

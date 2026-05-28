@@ -11,6 +11,7 @@ import { MockScenarioLLM } from '../src/llm/mock.js';
 import {
   fortEffectsFor, flatCoinBonus, slotCoinBonus,
   negativeSeasonClamped, palisadeBlocksCasualty,
+  smithyCasualtyReduction, fatigueRecoveryAmount,
 } from '../src/fortEffects.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -120,5 +121,20 @@ describe('M7.1 fort upgrade effects', () => {
     });
     // raid-01 has a 'sentry' slot ⇒ +1
     expect(withTower.coinsActual).toBe(base.coinsActual + 1);
+  });
+});
+
+describe('M7.13 smithy casualty reduction + winter-larder frost recovery', () => {
+  it('smithyCasualtyReduction is 1 with smithy, 0 without', () => {
+    expect(smithyCasualtyReduction(fortEffectsFor(['smithy']))).toBe(1);
+    expect(smithyCasualtyReduction(fortEffectsFor([]))).toBe(0);
+    expect(smithyCasualtyReduction(undefined)).toBe(0);
+  });
+
+  it('fatigueRecoveryAmount doubles in frost with winter-larder', () => {
+    expect(fatigueRecoveryAmount(fortEffectsFor(['winter-larder']), 'frost')).toBe(2);
+    expect(fatigueRecoveryAmount(fortEffectsFor(['winter-larder']), 'thaw')).toBe(1);
+    expect(fatigueRecoveryAmount(fortEffectsFor([]), 'frost')).toBe(1);
+    expect(fatigueRecoveryAmount(undefined, 'frost')).toBe(1);
   });
 });

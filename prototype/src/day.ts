@@ -19,7 +19,7 @@ import { applyVeterancyXp, type Promotion } from './veterancy.js';
 import { recordCoDeployment, bondedPairsOf, type BondFormation } from './bonds.js';
 import { seasonFor, type SeasonClock } from './season.js';
 import { loadEventCatalog, rollEventForDay, type DailyEvent } from './events.js';
-import { fortEffectsFor, chapelHealsWounds } from './fortEffects.js';
+import { fortEffectsFor, chapelHealsWounds, fatigueRecoveryAmount } from './fortEffects.js';
 import { affordableUpgrades, loadFortCatalog, type FortUpgrade } from './fort.js';
 
 const DaySchema = z.object({
@@ -249,11 +249,16 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     }
     const onErrand = new Set<string>();
     for (const e of roster.pendingErrands) for (const id of e.partyMercIds) onErrand.add(id);
+    // M7.13: winter-larder doubles fatigue recovery during frost.
+    const recoverAmount = fatigueRecoveryAmount(
+      fortEffectsFor(roster.fort.upgrades),
+      season,
+    );
     for (const m of roster.mercs) {
       if (deployed.has(m.id) || onErrand.has(m.id)) continue;
       const before = fatigue.get(m.id) ?? 0;
       if (before <= 0) continue;
-      const after = before - 1;
+      const after = Math.max(0, before - recoverAmount);
       fatigue.set(m.id, after);
       fatigueRecovery.push({ mercId: m.id, before, after });
     }
