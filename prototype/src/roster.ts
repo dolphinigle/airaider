@@ -63,8 +63,24 @@ const CompletedQuestSchema = z.object({
   dayCompleted: z.number().int().min(0),
 });
 
+const PendingErrandSchema = z.object({
+  /** Unique id of this dispatched errand instance (scenarioId + dispatchedOnDay). */
+  errandId: z.string().min(1),
+  scenarioId: z.string().min(1),
+  /** Path to the scenario fixture, relative to the day file's fixtures dir, or absolute. */
+  scenarioPath: z.string().min(1),
+  /** Mercs sent on the errand (locked out of other duty). */
+  partyMercIds: z.array(z.string().min(1)).min(1),
+  /** Day the errand was dispatched. */
+  dispatchedOnDay: z.number().int().min(0),
+  /** Day on which the errand resolves (return + outcome). */
+  returnsOnDay: z.number().int().min(0),
+  /** Seed for the scenario RNG; locked at dispatch so the outcome is deterministic. */
+  seedSource: z.string().min(1),
+});
+
 const RoasterSchema = z.object({
-  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3)]).default(3),
+  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]).default(4),
   dayCount: z.number().int().min(0).default(0),
   gold: z.number().int().default(0),
   reputation: z.record(z.string(), z.number().int()).default({}),
@@ -80,16 +96,19 @@ const RoasterSchema = z.object({
   activeQuests: z.array(ActiveQuestSchema).default([]),
   /** M5.2: finished quest arcs. v3+. */
   completedQuests: z.array(CompletedQuestSchema).default([]),
+  /** M5.4: errands dispatched but not yet returned. v4+. */
+  pendingErrands: z.array(PendingErrandSchema).default([]),
 });
 
 export type RosterMercState = z.infer<typeof MercStateSchema>;
 export type RosterDeceased = z.infer<typeof DeceasedSchema>;
 export type RosterActiveQuest = z.infer<typeof ActiveQuestSchema>;
 export type RosterCompletedQuest = z.infer<typeof CompletedQuestSchema>;
+export type RosterPendingErrand = z.infer<typeof PendingErrandSchema>;
 export type RosterFile = z.infer<typeof RoasterSchema>;
 
 export interface Roster {
-  schemaVersion: 3;
+  schemaVersion: 4;
   dayCount: number;
   gold: number;
   reputation: Record<string, number>;
@@ -104,11 +123,13 @@ export interface Roster {
   activeQuests: RosterActiveQuest[];
   /** M5.2: finished quest arcs. */
   completedQuests: RosterCompletedQuest[];
+  /** M5.4: errands in flight. */
+  pendingErrands: RosterPendingErrand[];
 }
 
 export function newRoster(initialMercs: Merc[]): Roster {
   return {
-    schemaVersion: 3,
+    schemaVersion: 4,
     dayCount: 0,
     gold: 0,
     reputation: {},
@@ -118,6 +139,7 @@ export function newRoster(initialMercs: Merc[]): Roster {
     deceased: [],
     activeQuests: [],
     completedQuests: [],
+    pendingErrands: [],
   };
 }
 
@@ -171,7 +193,7 @@ export function loadRoster(
   }));
 
   return {
-    schemaVersion: 3,
+    schemaVersion: 4,
     dayCount: parsed.dayCount,
     gold: parsed.gold,
     reputation: parsed.reputation,
@@ -181,6 +203,7 @@ export function loadRoster(
     deceased: parsed.deceased,
     activeQuests: parsed.activeQuests,
     completedQuests: parsed.completedQuests,
+    pendingErrands: parsed.pendingErrands,
   };
 }
 
@@ -208,7 +231,7 @@ export function saveRoster(
     }
   }
   const file: RosterFile = {
-    schemaVersion: 3,
+    schemaVersion: 4,
     dayCount: roster.dayCount,
     gold: roster.gold,
     reputation: roster.reputation,
@@ -226,6 +249,7 @@ export function saveRoster(
     deceased: roster.deceased,
     activeQuests: roster.activeQuests,
     completedQuests: roster.completedQuests,
+    pendingErrands: roster.pendingErrands,
   };
   writeFileSync(path, JSON.stringify(file, null, 2) + '\n', 'utf8');
 }

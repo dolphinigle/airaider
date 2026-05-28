@@ -194,5 +194,7 @@
     "marek": 3,
     "roselle": 1,
     "veska": 2
-  }
+  },
+  "errandsDispatched": [],
+  "errandsResolved": []
 }

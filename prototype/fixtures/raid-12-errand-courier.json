@@ -1,0 +1,27 @@
+{
+  "id": "raid-12-errand-courier",
+  "archetype": "contract",
+  "title": "Courier to Lowmark",
+  "target": "ride the sealed dispatch to the Lowmark guildhouse and return with the countersigned writ — a four-day round trip through the salt-roads",
+  "slots": [
+    {
+      "id": "rider",
+      "description": "carry the satchel, set the pace, do not lose the seal",
+      "preferredAttr": "agility",
+      "preferredTags": ["phys:quick"]
+    },
+    {
+      "id": "second",
+      "description": "second on the road — talk past tolls, watch the rider's back",
+      "preferredAttr": "charisma"
+    }
+  ],
+  "partySize": { "min": 2, "max": 2 },
+  "coinBudget": 4,
+  "assignments": [
+    { "slotId": "rider", "mercId": "dren" },
+    { "slotId": "second", "mercId": "imogen" }
+  ],
+  "seed": "raid-12-errand-courier",
+  "daysToResolve": 4
+}

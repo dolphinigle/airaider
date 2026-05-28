@@ -133,7 +133,7 @@ async function main(): Promise<void> {
     llm = new MockScenarioLLM();
   }
 
-  const resolution = await resolveDay({ day, dayPath: dayAbs, mercs: mercsForDay, llm, initialFatigue });
+  const resolution = await resolveDay({ day, dayPath: dayAbs, mercs: mercsForDay, llm, initialFatigue, roster });
 
   console.log(renderDayTranscript(resolution));
 

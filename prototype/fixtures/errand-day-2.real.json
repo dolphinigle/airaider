@@ -1,0 +1,84 @@
+{
+  "dayId": "day-errand-2",
+  "dayName": "Day 2 — couriers still on the road",
+  "scenarios": [
+    {
+      "scenarioId": "raid-05",
+      "title": "The Recruits' Drinking Match",
+      "target": "hold a long night of drinking that closes ranks between the two newest hands without ending in a brawl",
+      "archetype": "tavern",
+      "partySize": 2,
+      "slotContributions": [
+        {
+          "slotId": "hold-liquor",
+          "mercId": "marek",
+          "attrUsed": "physical",
+          "attrScore": 5,
+          "tagsMatched": [
+            "temp:brave"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 1,
+          "fatiguePenalty": 0
+        },
+        {
+          "slotId": "keep-songs-going",
+          "mercId": "dren",
+          "attrUsed": "willpower",
+          "attrScore": 4,
+          "tagsMatched": [
+            "temp:brave"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 1,
+          "fatiguePenalty": 0
+        }
+      ],
+      "synergy": {
+        "pairs": [
+          {
+            "mercA": "marek",
+            "mercB": "dren",
+            "sharedTagId": "temp:brave"
+          }
+        ],
+        "bonusCoins": 1
+      },
+      "baseCoinBudget": 4,
+      "coinsActual": 5,
+      "rollFaces": [
+        "tails",
+        "tails",
+        "tails",
+        "heads",
+        "heads"
+      ],
+      "heads": 2,
+      "tails": 3,
+      "band": "unfavorable",
+      "bandReason": "2/5 heads (split — pessimistic default)",
+      "contributions": [
+        {
+          "mercId": "marek",
+          "line": "Marek, muscles tense but keeping a steady hand, out-drinks the younger recruits, his notched coin shining faintly in the tavern's dim light."
+        },
+        {
+          "mercId": "dren",
+          "line": "Dren, eyes sharp and quick, keeps the songs going with a grim smile, refusing to let fatigue dull his willpower."
+        }
+      ],
+      "outcomeNarrative": "The night drags on with heavy drinking and stories, neither side ending in a brawl, though the split in morale leaves the outcome unfavorable.",
+      "llmName": "openai:gpt-4.1-nano",
+      "casualties": []
+    }
+  ],
+  "finalFatigue": {
+    "marek": 2,
+    "roselle": 1,
+    "imogen": 1,
+    "dren": 2,
+    "veska": 0
+  },
+  "errandsDispatched": [],
+  "errandsResolved": []
+}

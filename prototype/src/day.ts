@@ -12,6 +12,8 @@ import {
   type Assignment,
   type ScenarioResolution,
 } from './resolver.js';
+import type { Roster, RosterPendingErrand } from './roster.js';
+import { dispatchErrand, resolveDueErrands } from './errands.js';
 
 const DaySchema = z.object({
   id: z.string().min(1),
@@ -42,6 +44,8 @@ export interface DayResolutionInput {
   rngFor?: (scenario: FixtureScenario, index: number) => Rng;
   /** Optional starting fatigue per merc (carries over from previous days). */
   initialFatigue?: Map<string, number>;
+  /** M5.4: roster carries pending errands; if provided, errands are dispatched/resolved. */
+  roster?: Roster;
 }
 
 export interface DayResolution {
@@ -50,6 +54,10 @@ export interface DayResolution {
   scenarios: ScenarioResolution[];
   /** Final fatigue per merc after the whole day. */
   finalFatigue: Record<string, number>;
+  /** M5.4: errands dispatched today (informational; not yet resolved). */
+  errandsDispatched: RosterPendingErrand[];
+  /** M5.4: errands that returned and were resolved today. */
+  errandsResolved: ScenarioResolution[];
 }
 
 /**
@@ -58,12 +66,31 @@ export interface DayResolution {
  * computeSlotContributions applies a penalty when fatigue ≥ FATIGUE_THRESHOLD.
  */
 export async function resolveDay(input: DayResolutionInput): Promise<DayResolution> {
-  const { day, dayPath, mercs, llm, rngFor, initialFatigue } = input;
+  const { day, dayPath, mercs, llm, rngFor, initialFatigue, roster } = input;
   const fatigue = new Map<string, number>(initialFatigue ?? []);
   const fatigueOf = (mercId: string): number => fatigue.get(mercId) ?? 0;
 
   const fixturesDir = dirname(resolve(dayPath));
   const scenarioResolutions: ScenarioResolution[] = [];
+  const errandsDispatched: RosterPendingErrand[] = [];
+  const errandsResolved: ScenarioResolution[] = [];
+
+  // M5.4: resolve any errands due TODAY before processing today's scenarios.
+  // Use roster.dayCount + 1 as "current day" since the loop hasn't bumped it yet.
+  if (roster) {
+    const currentDay = roster.dayCount + 1;
+    const dueResolutions = await resolveDueErrands({
+      roster, currentDay, mercs, llm, fatigueOf, basePath: dayPath,
+    });
+    for (const r of dueResolutions) {
+      errandsResolved.push(r);
+      scenarioResolutions.push(r);
+      // Errands cost 1 fatigue per participating merc on return day.
+      for (const a of r.slotContributions) {
+        fatigue.set(a.mercId, (fatigue.get(a.mercId) ?? 0) + 1);
+      }
+    }
+  }
 
   for (let i = 0; i < day.scenarios.length; i++) {
     const scenarioRelOrAbs = day.scenarios[i]!;
@@ -76,6 +103,19 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
         `Day ${day.id}: scenario ${scenario.id} has no assignments; the day loop requires them.`,
       );
     }
+
+    // M5.4: if this is an errand and we have a roster, dispatch instead of resolve.
+    if (roster && scenario.daysToResolve && scenario.daysToResolve > 0) {
+      const partyMercIds = scenario.assignments.map((a) => a.mercId);
+      const errand = dispatchErrand({
+        roster, scenario, scenarioPath: scenarioRelOrAbs, partyMercIds,
+      });
+      errandsDispatched.push(errand);
+      // Day-of departure costs 1 fatigue per merc (travel).
+      for (const id of partyMercIds) fatigue.set(id, (fatigue.get(id) ?? 0) + 1);
+      continue;
+    }
+
     const assignments: Assignment[] = scenario.assignments.map((a) => {
       const merc = mercs.get(a.mercId);
       if (!merc) {
@@ -103,5 +143,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     dayName: day.name,
     scenarios: scenarioResolutions,
     finalFatigue,
+    errandsDispatched,
+    errandsResolved,
   };
 }

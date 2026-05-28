@@ -1,0 +1,6 @@
+{
+  "id": "day-errand-1",
+  "name": "Day 1 — dispatch the courier",
+  "scenarios": ["raid-12-errand-courier.json", "raid-01.json"],
+  "seed": "day-errand-1"
+}

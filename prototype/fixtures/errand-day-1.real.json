@@ -1,0 +1,89 @@
+{
+  "dayId": "day-errand-1",
+  "dayName": "Day 1 — dispatch the courier",
+  "scenarios": [
+    {
+      "scenarioId": "raid-01",
+      "title": "The Merchant's Lost Wagon",
+      "target": "recover the salt-merchant's wagon from the brigands camped at the Crow's Ford",
+      "archetype": "contract",
+      "partySize": 2,
+      "slotContributions": [
+        {
+          "slotId": "lock",
+          "mercId": "marek",
+          "attrUsed": "physical",
+          "attrScore": 5,
+          "tagsMatched": [
+            "phys:muscular"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 0,
+          "fatiguePenalty": 0
+        },
+        {
+          "slotId": "sentry",
+          "mercId": "roselle",
+          "attrUsed": "agility",
+          "attrScore": 6,
+          "tagsMatched": [
+            "phys:quick"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 0,
+          "fatiguePenalty": 0
+        }
+      ],
+      "synergy": {
+        "pairs": [],
+        "bonusCoins": 0
+      },
+      "baseCoinBudget": 3,
+      "coinsActual": 3,
+      "rollFaces": [
+        "tails",
+        "heads",
+        "tails"
+      ],
+      "heads": 1,
+      "tails": 2,
+      "band": "unfavorable",
+      "bandReason": "1/3 heads (unfavorable)",
+      "contributions": [
+        {
+          "mercId": "marek",
+          "line": "Marek's brawny strength cracks the iron lock, but his fatigue dulls his reflexes just enough to make him cautious."
+        },
+        {
+          "mercId": "roselle",
+          "line": "Roselle's quick, cautious steps slip past the brigand sentry, her familiarity with border work guiding her."
+        }
+      ],
+      "outcomeNarrative": "Marek's brute force finally yields the lock, yet his fatigue hampers his timing; Roselle's careful approach avoids detection, but the camp's alertness remains high.",
+      "llmName": "openai:gpt-4.1-nano",
+      "casualties": []
+    }
+  ],
+  "finalFatigue": {
+    "marek": 1,
+    "roselle": 1,
+    "imogen": 1,
+    "dren": 1,
+    "veska": 0
+  },
+  "errandsDispatched": [
+    {
+      "errandId": "raid-12-errand-courier@d0",
+      "scenarioId": "raid-12-errand-courier",
+      "scenarioPath": "raid-12-errand-courier.json",
+      "partyMercIds": [
+        "dren",
+        "imogen"
+      ],
+      "dispatchedOnDay": 0,
+      "returnsOnDay": 4,
+      "seedSource": "raid-12-errand-courier"
+    }
+  ],
+  "errandsResolved": []
+}

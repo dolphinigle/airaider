@@ -7,18 +7,32 @@ export function renderDayTranscript(day: DayResolution): string {
   const lines: string[] = [];
   lines.push(DBAR);
   lines.push(` DAY: ${day.dayName}  [${day.dayId}]`);
-  lines.push(` ${day.scenarios.length} scenarios planned`);
+  lines.push(` ${day.scenarios.length} scenarios (incl. ${day.errandsResolved.length} returning errand(s)), ${day.errandsDispatched.length} errand(s) dispatched`);
   lines.push(DBAR);
   lines.push('');
-  for (let i = 0; i < day.scenarios.length; i++) {
-    lines.push(`>>> Scenario ${i + 1}/${day.scenarios.length}`);
+  if (day.errandsResolved.length > 0) {
+    lines.push(`>>> Errands that returned today:`);
+    for (const r of day.errandsResolved) lines.push(`     • ${r.scenarioId} — ${r.title}`);
     lines.push('');
-    lines.push(renderTranscript(day.scenarios[i]!));
-    const cas = day.scenarios[i]!.casualties;
+  }
+  for (let i = 0; i < day.scenarios.length; i++) {
+    const sc = day.scenarios[i]!;
+    const isErrand = day.errandsResolved.includes(sc);
+    lines.push(`>>> Scenario ${i + 1}/${day.scenarios.length}${isErrand ? '  [errand return]' : ''}`);
+    lines.push('');
+    lines.push(renderTranscript(sc));
+    const cas = sc.casualties;
     if (cas && cas.length > 0) {
       lines.push('');
       lines.push('  CASUALTIES:');
       for (const c of cas) lines.push(`    ☠ ${c.mercId} takes ${c.damage} (${c.reason})`);
+    }
+    lines.push('');
+  }
+  if (day.errandsDispatched.length > 0) {
+    lines.push('>>> Errands dispatched today (resolve later):');
+    for (const e of day.errandsDispatched) {
+      lines.push(`     • ${e.scenarioId} → returns on day ${e.returnsOnDay} (party: ${e.partyMercIds.join(', ')})`);
     }
     lines.push('');
   }

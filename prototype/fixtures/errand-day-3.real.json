@@ -1,0 +1,77 @@
+{
+  "dayId": "day-errand-3",
+  "dayName": "Day 3 — still no word from Lowmark",
+  "scenarios": [
+    {
+      "scenarioId": "raid-04",
+      "title": "Watchtower at the Pass",
+      "target": "commission a new watchtower at the southern pass before winter closes the road",
+      "archetype": "build",
+      "partySize": 2,
+      "slotContributions": [
+        {
+          "slotId": "design",
+          "mercId": "veska",
+          "attrUsed": "intelligence",
+          "attrScore": 6,
+          "tagsMatched": [
+            "bg:scholar"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 0,
+          "fatiguePenalty": 0
+        },
+        {
+          "slotId": "oversee",
+          "mercId": "marek",
+          "attrUsed": "willpower",
+          "attrScore": 4,
+          "tagsMatched": [
+            "temp:brave"
+          ],
+          "coinsContributed": 2,
+          "fatigue": 2,
+          "fatiguePenalty": 1
+        }
+      ],
+      "synergy": {
+        "pairs": [],
+        "bonusCoins": 0
+      },
+      "baseCoinBudget": 4,
+      "coinsActual": 4,
+      "rollFaces": [
+        "heads",
+        "tails",
+        "heads",
+        "tails"
+      ],
+      "heads": 2,
+      "tails": 2,
+      "band": "unfavorable",
+      "bandReason": "2/4 heads (split — pessimistic default)",
+      "contributions": [
+        {
+          "mercId": "veska",
+          "line": "Veska meticulously drafted the plans, aware that even a slight miscalculation could cause the whole structure to buckle during the spring melt."
+        },
+        {
+          "mercId": "marek",
+          "line": "Despite his fatigue, Marek kept a watchful eye on the timber, knowing that a single crooked beam could doom the tower."
+        }
+      ],
+      "outcomeNarrative": "Veska's precise calculations and Marek's stern oversight couldn't prevent the crew from rushing and taking shortcuts, leading to the tower's fragile construction.",
+      "llmName": "openai:gpt-4.1-nano",
+      "casualties": []
+    }
+  ],
+  "finalFatigue": {
+    "marek": 3,
+    "roselle": 1,
+    "imogen": 1,
+    "dren": 2,
+    "veska": 1
+  },
+  "errandsDispatched": [],
+  "errandsResolved": []
+}

@@ -48,6 +48,8 @@ const ScenarioSchema = z.object({
   approaches: z.array(ApproachSchema).optional(),
   /** Default approach id (used if --approach not supplied). */
   defaultApproachId: z.string().optional(),
+  /** M5.4: if > 0, this scenario is an errand that returns N days after dispatch. */
+  daysToResolve: z.number().int().min(0).max(14).optional(),
 });
 
 export type FixtureScenario = z.infer<typeof ScenarioSchema>;
