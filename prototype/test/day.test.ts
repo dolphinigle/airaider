@@ -289,6 +289,38 @@ describe('M9.2 debt-driven desertion', () => {
     const out = await resolveDay({ day, dayPath, mercs, llm: new MockScenarioLLM() });
     expect(out.desertions).toEqual([]);
   });
+
+  // M9.6: bonds defer desertion — bonded mercs are last to walk out.
+  it('M9.6: prefers the unbonded merc when one is available', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!, mercs.get('veska')!]);
+    // marek + veska bonded (both at BOND_THRESHOLD=3 co-deployments)
+    r.states.get('marek')!.coDeployments = { veska: 3 };
+    r.states.get('veska')!.coDeployments = { marek: 3 };
+    // add a fresh unbonded third merc
+    const dren = mercs.get('dren')!;
+    r.mercs.push(dren);
+    r.states.set(dren.id, { id: dren.id, fatigue: 0, hpDamage: 0, veterancyGain: 0, xp: 0, tier: 'rookie', coDeployments: {} });
+    r.gold = -1;
+    r.consecutiveDebtDays = 2;
+    r.dayCount = 0;
+    const out = await runDebtDay(r);
+    expect(out.desertions.length).toBe(1);
+    expect(out.desertions[0]!.mercId).toBe('dren');
+  });
+
+  it('M9.6: bonded merc still leaves when all remaining mercs are bonded', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!, mercs.get('veska')!]);
+    r.states.get('marek')!.coDeployments = { veska: 3 };
+    r.states.get('veska')!.coDeployments = { marek: 3 };
+    r.gold = -1;
+    r.consecutiveDebtDays = 2;
+    r.dayCount = 0;
+    const out = await runDebtDay(r);
+    expect(out.desertions.length).toBe(1);
+    expect(out.desertions[0]!.reason).toContain('no unbonded mercs left');
+  });
 });
 
 describe('M9.3 debt suspends fatigue recovery', () => {

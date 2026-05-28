@@ -411,23 +411,39 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     }
     if (roster.consecutiveDebtDays >= DEBT_DESERTION_THRESHOLD_DAYS && roster.mercs.length > 0) {
       const tierRank: Record<string, number> = { rookie: 0, veteran: 1, grizzled: 2 };
+      // M9.6: bonded mercs are last to walk out — comradeship buys time.
+      // bondedPairs is a Set of pairKey strings ("a|b"); decode into ids.
+      const bondedSet = new Set<string>();
+      const bondCount = new Map<string, number>();
+      for (const key of bondedPairs ?? []) {
+        const [a, b] = key.split('|');
+        if (!a || !b) continue;
+        bondedSet.add(a); bondedSet.add(b);
+        bondCount.set(a, (bondCount.get(a) ?? 0) + 1);
+        bondCount.set(b, (bondCount.get(b) ?? 0) + 1);
+      }
       const candidates = roster.mercs.map((m) => {
         const st = roster.states.get(m.id);
         return {
           merc: m,
+          bondCount: bondCount.get(m.id) ?? 0,
           tier: tierRank[st?.tier ?? 'rookie'] ?? 0,
           xp: st?.xp ?? 0,
         };
       });
       candidates.sort((a, b) => {
+        if (a.bondCount !== b.bondCount) return a.bondCount - b.bondCount;
         if (a.tier !== b.tier) return a.tier - b.tier;
         if (a.xp !== b.xp) return a.xp - b.xp;
         return a.merc.id.localeCompare(b.merc.id);
       });
       const leaving = candidates[0]!.merc;
+      const wasBonded = bondedSet.has(leaving.id);
       desertions.push({
         mercId: leaving.id,
-        reason: `unpaid for ${roster.consecutiveDebtDays} days`,
+        reason: wasBonded
+          ? `unpaid for ${roster.consecutiveDebtDays} days (no unbonded mercs left to walk first)`
+          : `unpaid for ${roster.consecutiveDebtDays} days`,
       });
       roster.mercs = roster.mercs.filter((m) => m.id !== leaving.id);
       roster.states.delete(leaving.id);
