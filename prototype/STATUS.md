@@ -1,9 +1,9 @@
 # Prototype STATUS
 
-> **Updated:** 2026-05-28 ~20:45 WIB
+> **Updated:** 2026-05-28 ~21:30 WIB
 > **Branch:** `prototype/m0`
-> **Last verified command:** `npm test` → 21 / 21 passing
-> **Last verified real-LLM command:** `npm run scenario -- fixtures/raid-01.json --real` → nano produced sensible grimdark narrative on UNFAVORABLE band
+> **Last verified command:** `npm test` → 58 / 58 passing
+> **Last verified real-LLM command:** 3-day campaign run (`day-01` → `day-02` → `day-03`) against persistent roster — fatigue accumulated to Marek 5 / Veska 5 by day 3 and nano referenced it in narration.
 
 ## ⚠️ Post-compaction discipline (READ FIRST)
 
@@ -69,20 +69,23 @@ Day loop with fatigue accumulation.
 - [x] 5 day-loop tests: fatigue accrual, penalty trigger, no-penalty for fresh mercs, determinism, golden snapshot
 - [x] Tests now 37 / 37 ✅
 
-## Milestone M3 — IN PROGRESS
+## Milestone M3 — DONE ✅
 
 - [x] M3.1 Pass fatigue to LLM request so narration can reference yesterday's exertion (commit `2f41546`)
 - [x] M3.2 Tag-rarity-aware recruit pool generator + 10 new tags incl. 1 legendary (commit `ac9fe75`)
 - [x] M3.3 Captive cycle (5 outcomes: ransom / sell / display / recruit / execute) (commit `6802c8e`)
-- [x] M3.4 Roster JSON persistence (save/load across days; `npm run day -- ... --roster=PATH`)
+- [x] M3.4 Roster JSON persistence (save/load across days; `npm run day -- ... --roster=PATH`) (commit `54abccc`)
 - [ ] Llama 3.3 70B via Groq A/B (BLOCKED: no GROQ_API_KEY)
 
-## Milestone M4 — STILL DEFERRED
+## Milestone M4 — DONE ✅ (overnight)
 
-- [ ] Multi-day quest arc seeded by rare tag (mini Sevrenne pattern)
-- [ ] Climax scenario with multiple approaches
-- [ ] Errand long-clock scenarios
-- [ ] Wounds / permadeath math
+- [x] M4.1 Three new themed raid fixtures (raid-06-mire, raid-07-plague, raid-08-tax-riot) + mock/real transcripts (commits `46d4a8a`, `02d383d`)
+- [x] M4.2 Merc backstories woven into LLM payload (commit `dadae6a`) — `backstory?: string` on Merc, threaded through OpenAI scenario prompt with anchor-one-detail directive
+- [x] M4.3 3-day campaign demo with persistent roster (commit `5fd7c72`) — `day-01` → `day-02` → `day-03` against `fixtures/campaign-roster.json`, 8 nano-narrated scenarios in sequence, cumulative fatigue
+- [x] M4.4 `SAMPLES.md` morning-handoff doc — navigation guide to every committed transcript
+- [ ] Multi-day quest arc seeded by rare tag (still deferred)
+- [ ] Climax scenario with multiple approaches (still deferred)
+- [ ] Wounds / permadeath math (still deferred)
 
 
 
