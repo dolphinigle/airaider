@@ -121,6 +121,22 @@
       "weight": 2,
       "requiresEnemyFaction": true,
       "effect": { "goldDelta": 0, "fatigueDelta": 1, "reputationDeltas": [] }
+    },
+    {
+      "id": "captive-sympathizer-bribe",
+      "label": "Captive sympathizer at the gate",
+      "narration": "A hooded figure — kin or comrade of a notorious captive — slips coin to a sentry to look the other way during the dawn shift. The captive stays, but the purse is lighter.",
+      "weight": 2,
+      "requiresCaptiveNotorietyMin": 4,
+      "effect": { "goldDelta": -3, "fatigueDelta": 0, "reputationDeltas": [] }
+    },
+    {
+      "id": "captive-rescue-probe",
+      "label": "Rescue attempt thwarted",
+      "narration": "Friends of a notorious captive test the night walls. The watch turns them back, but a long hard hour of crossbow drill leaves the fort tired.",
+      "weight": 1,
+      "requiresCaptiveNotorietyMin": 5,
+      "effect": { "goldDelta": 0, "fatigueDelta": 1, "reputationDeltas": [] }
     }
   ]
 }

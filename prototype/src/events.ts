@@ -45,6 +45,12 @@ const EventSchema = z.object({
    * faction at enemy tier (standing ≤ −5). Used to gate punitive events.
    */
   requiresEnemyFaction: z.boolean().optional(),
+  /**
+   * M11.3: if set, only fires when the roster currently holds at least one
+   * captive whose notoriety is ≥ this threshold. Used to gate
+   * sympathizer / rescue-attempt events.
+   */
+  requiresCaptiveNotorietyMin: z.number().int().min(0).optional(),
   effect: EventEffectSchema.default({ goldDelta: 0, fatigueDelta: 0, reputationDeltas: [] }),
 });
 
@@ -70,6 +76,12 @@ export interface EventRollContext {
    * When omitted or empty, events with `requiresEnemyFaction` are filtered out.
    */
   enemyFactions?: Iterable<string>;
+  /**
+   * M11.3: highest captive notoriety the roster currently holds (0 if none).
+   * Events with `requiresCaptiveNotorietyMin` are filtered out unless this
+   * value is at least that threshold.
+   */
+  maxCaptiveNotoriety?: number;
 }
 
 export function eligibleEvents(catalog: DailyEvent[], ctx: EventRollContext): DailyEvent[] {
@@ -80,6 +92,7 @@ export function eligibleEvents(catalog: DailyEvent[], ctx: EventRollContext): Da
     if (e.requiresUpgrades && !e.requiresUpgrades.every((u) => upgrades.has(u))) return false;
     if (e.requiresMissingUpgrades && e.requiresMissingUpgrades.some((u) => upgrades.has(u))) return false;
     if (e.requiresEnemyFaction && enemies.size === 0) return false;
+    if (e.requiresCaptiveNotorietyMin !== undefined && (ctx.maxCaptiveNotoriety ?? 0) < e.requiresCaptiveNotorietyMin) return false;
     return true;
   });
 }

@@ -146,3 +146,48 @@ describe('M8.2 enemy-tier punitive events', () => {
     expect(pool.map((e) => e.id)).toEqual(['generic']);
   });
 });
+
+describe('M11.3 captive notoriety event gate', () => {
+  const catalog = [
+    {
+      id: 'sympathizer', label: 's', narration: 'n', weight: 1,
+      requiresCaptiveNotorietyMin: 4,
+      effect: { goldDelta: -3, fatigueDelta: 0, reputationDeltas: [] },
+    },
+    {
+      id: 'rescue', label: 'r', narration: 'n', weight: 1,
+      requiresCaptiveNotorietyMin: 5,
+      effect: { goldDelta: 0, fatigueDelta: 1, reputationDeltas: [] },
+    },
+    {
+      id: 'generic', label: 'g', narration: 'n', weight: 1,
+      effect: { goldDelta: 0, fatigueDelta: 0, reputationDeltas: [] },
+    },
+  ];
+
+  it('filters out captive-gated events when no captives present', () => {
+    const ctx = { dayCount: 1, season: undefined, fortUpgrades: [] };
+    const pool = eligibleEvents(catalog as any, ctx);
+    expect(pool.map((e) => e.id)).toEqual(['generic']);
+  });
+
+  it('admits sympathizer at notoriety 4 but not rescue', () => {
+    const ctx = { dayCount: 1, season: undefined, fortUpgrades: [], maxCaptiveNotoriety: 4 };
+    const pool = eligibleEvents(catalog as any, ctx);
+    expect(pool.map((e) => e.id).sort()).toEqual(['generic', 'sympathizer']);
+  });
+
+  it('admits both at notoriety 5+', () => {
+    const ctx = { dayCount: 1, season: undefined, fortUpgrades: [], maxCaptiveNotoriety: 6 };
+    const pool = eligibleEvents(catalog as any, ctx);
+    expect(pool.map((e) => e.id).sort()).toEqual(['generic', 'rescue', 'sympathizer']);
+  });
+
+  it('seed catalog contains the two captive events', () => {
+    const path = new URL('../data/events.json', import.meta.url).pathname;
+    const seedCatalog = loadEventCatalog(path);
+    const ids = seedCatalog.map((e) => e.id);
+    expect(ids).toContain('captive-sympathizer-bribe');
+    expect(ids).toContain('captive-rescue-probe');
+  });
+});

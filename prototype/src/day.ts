@@ -193,11 +193,14 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     for (const [factionId, standing] of Object.entries(roster.reputation)) {
       if (reputationTier(standing) === 'enemy') enemyFactions.push(factionId);
     }
+    // M11.3: highest captive notoriety on the roster unlocks sympathizer events.
+    const maxCaptiveNotoriety = roster.captives.reduce((m, c) => Math.max(m, c.notoriety), 0);
     dailyEvent = rollEventForDay(catalog, {
       dayCount: roster.dayCount + 1,
       season,
       fortUpgrades: fortUpgrades ?? [],
       enemyFactions,
+      maxCaptiveNotoriety,
     });
     if (dailyEvent) {
       const eff = dailyEvent.effect;

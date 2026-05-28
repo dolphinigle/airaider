@@ -54,11 +54,13 @@ export function watchTowerForecast(
     if (reputationTier(standing) === 'enemy') enemyFactions.push(factionId);
   }
   const catalog = loadEventCatalog(catalogPath);
+  const maxCaptiveNotoriety = r.captives.reduce((m, c) => Math.max(m, c.notoriety), 0);
   const ev: DailyEvent | null = rollEventForDay(catalog, {
     dayCount: nextDay,
     season,
     fortUpgrades: r.fort.upgrades,
     enemyFactions,
+    maxCaptiveNotoriety,
   });
   if (!ev) return null;
   const eff = ev.effect;
