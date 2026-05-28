@@ -68,17 +68,18 @@
   "contributions": [
     {
       "mercId": "marek",
-      "line": "Marek pushes through the sucking pools with grim determination, his muscular frame straining against the mud."
+      "line": "Marek's muscular effort pushes through the sucking pools, lantern flickering but steady."
     },
     {
       "mercId": "veska",
-      "line": "Veska traces the priest’s last footprints with stoic patience, following the tar-smell into the gloom."
+      "line": "Veska's sharp eyes trace the priest’s last footprints, scent of tar guiding her cold mind."
     },
     {
       "mercId": "dren",
-      "line": "Dren keeps watch at the rear, alert for shadows circling in the reeds, ready to sound the alarm."
+      "line": "Dren keeps watch with quick movements, listening for the shapes circling in the reeds."
     }
   ],
-  "outcomeNarrative": "Split in the team leaves them vulnerable, but Marek and Dren’s bravery grants a narrow edge in the grim odds.",
-  "llmName": "openai:gpt-4.1-nano"
+  "outcomeNarrative": "Their combined effort splits the silence as Marek’s strength clears a path, Veska’s analysis narrows down the trail, and Dren’s vigilance keeps them alive amid the shadows.",
+  "llmName": "openai:gpt-4.1-nano",
+  "casualties": []
 }

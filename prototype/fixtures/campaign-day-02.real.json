@@ -72,19 +72,20 @@
       "contributions": [
         {
           "mercId": "marek",
-          "line": "Marek, muscles tense and face grim, pushes through the sucking pools despite his fatigue, clutching the notched coin tightly."
-        },
-        {
-          "mercId": "veska",
-          "line": "Veska studies the tar-smell carefully, her sharp eyes tracing the priest’s last footsteps in the muddy mire."
+          "line": "Marek, despite his fatigue and brawny build, pushes through the sucking pools with grim determination, lantern flickering."
         },
         {
           "mercId": "dren",
-          "line": "Dren, quick-footed and steady, keeps watch behind the party, eyes darting for any signs of lurking shapes in the reeds."
+          "line": "Dren keeps watch with quick, cautious movements, eyes darting through the reeds, ready for anything."
+        },
+        {
+          "mercId": "veska",
+          "line": "Veska follows the tar-smell with calculated patience, trusting her intelligence to lead the way."
         }
       ],
-      "outcomeNarrative": "The split decision led to a cautious approach, but the swamp’s treachery wore down even the bravest, and the party's chances are diminished.",
-      "llmName": "openai:gpt-4.1-nano"
+      "outcomeNarrative": "The split in the group’s efforts leaves them uncertain, but Marek and Dren's bravery keeps the search alive, even if Veska's calculations don't fully pay off.",
+      "llmName": "openai:gpt-4.1-nano",
+      "casualties": []
     },
     {
       "scenarioId": "raid-02",
@@ -137,15 +138,16 @@
       "contributions": [
         {
           "mercId": "veska",
-          "line": "Veska studies his eyes and hands, skeptical of the panic-driven lies he's likely rehearsing."
+          "line": "Veska's sharp eyes watch the deserter's twitching hands, noting the flicker of deception in his gaze."
         },
         {
           "mercId": "imogen",
-          "line": "Imogen leans in, her voice calm and persuasive, probing for the real reason he ran from his old squad."
+          "line": "Imogen leans in with a warm smile, gently probing for the true reason he fled, her charm softening the tension."
         }
       ],
-      "outcomeNarrative": "Veska's sharp eyes catch the faint tremor in the deserter’s hands, confirming his nerves, while Imogen’s charm uncovers a desperate desire to escape shame rather than cowardice. Their combined effort convinces enough to give him a chance, though trust remains fragile.",
-      "llmName": "openai:gpt-4.1-nano"
+      "outcomeNarrative": "Veska's skepticism uncovers inconsistencies, and Imogen's charm convinces the deserter to reveal his fears, leading the party to decide on a cautious hire.",
+      "llmName": "openai:gpt-4.1-nano",
+      "casualties": []
     },
     {
       "scenarioId": "raid-05",
@@ -205,15 +207,16 @@
       "contributions": [
         {
           "mercId": "marek",
-          "line": "Marek, muscles tense and eyes dull, hoists his mug high, out-drinking the younger recruits with stubborn grit despite his fatigue."
+          "line": "Marek leans heavily on his brawny frame, out-drinking Dren with a grim, steady resolve, still eyeing the empty bottle."
         },
         {
           "mercId": "dren",
-          "line": "Dren, with a faint smirk and a quick sip, keeps the songs and stories going, wary but determined not to show fatigue."
+          "line": "Dren, quick and unyielding, matches Marek's pace but keeps his stories brief, his cold stare never quite softening."
         }
       ],
-      "outcomeNarrative": "The night drags on as Marek's brawn and Dren's willpower push the drinks and stories past the bitter hour, but the division remains — fatigue and mistrust linger, leaving the mood fractured.",
-      "llmName": "openai:gpt-4.1-nano"
+      "outcomeNarrative": "Despite their fatigue and the tension from past scars, Marek's strength and Dren's resolve keep the night from spiraling into violence, forging a fragile camaraderie over shared drinks.",
+      "llmName": "openai:gpt-4.1-nano",
+      "casualties": []
     }
   ],
   "finalFatigue": {

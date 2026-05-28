@@ -53,15 +53,16 @@
       "contributions": [
         {
           "mercId": "roselle",
-          "line": "Roselle slips through the underbrush, her light-footedness helping her stay unseen as she approaches the silent village."
+          "line": "Roselle carefully steps through the underbrush, her light-footed agility keeping her unseen as she approaches the village."
         },
         {
           "mercId": "imogen",
-          "line": "Imogen kneels by a charred corpse, her cult's knowledge hinting at a cursed fire from a malevolent force lingering in the ruins."
+          "line": "Imogen kneels among the fallen, her keen eyes reading the marks on the bodies for signs of what killed them and whether the danger still lurks."
         }
       ],
-      "outcomeNarrative": "Roselle's cautious approach reveals no signs of movement, but Imogen's examination uncovers signs of a supernatural blaze that still smolders unseen, explaining the silence.",
-      "llmName": "openai:gpt-4.1-nano"
+      "outcomeNarrative": "The villagers were struck down swiftly and silently, most likely by a lurking predator or unseen force, explaining the silence and absence of smoke.",
+      "llmName": "openai:gpt-4.1-nano",
+      "casualties": []
     },
     {
       "scenarioId": "raid-08-tax-riot",
@@ -127,19 +128,20 @@
       "contributions": [
         {
           "mercId": "imogen",
-          "line": "I step forward, voice steady but respectful, reminding them of the promise of winter supplies, not empty words."
+          "line": "With a calm, measured voice, Imogen reminds the crowd that the fort’s promises are often hollow, but the stability of their pay depends on keeping the yard running."
         },
         {
           "mercId": "dren",
-          "line": "I stand firm at my shoulder, eyes scanning the rowdy crowd for the loudest and least listening, ready to act if needed."
+          "line": "Dren stands firm with his blade sheathed, eyeing the loudest men and subtly positioning himself to intervene if things turn violent."
         },
         {
           "mercId": "veska",
-          "line": "I analyze the crowd with a cold eye, noting which men are angry and which are just bored, calculating the best move."
+          "line": "Veska studies the crowd’s mood through her notes, quietly calculating how long the riot can be sustained before it costs the fort its contracts."
         }
       ],
-      "outcomeNarrative": "Imogen's charm and calm steadied the crowd enough to listen; Dren's presence kept the rowdy men in check, and Veska's observations identified the key agitators, preventing escalation.",
-      "llmName": "openai:gpt-4.1-nano"
+      "outcomeNarrative": "Imogen's words sow a cautious quiet among the crew, while Dren's watchful stance discourages escalation; Veska’s calculations confirm the riot won’t last long enough to threaten the yard's contracts.",
+      "llmName": "openai:gpt-4.1-nano",
+      "casualties": []
     }
   ],
   "finalFatigue": {

@@ -48,13 +48,14 @@
   "contributions": [
     {
       "mercId": "marek",
-      "line": "Marek's brute strength helps crack the iron lock, but the effort leaves him more worn than usual."
+      "line": "Marek, with his brawny build and soldier's grit, manages to crack the strongbox's lock, but the effort leaves him visibly fatigued."
     },
     {
       "mercId": "roselle",
-      "line": "Roselle's keen eye and quick feet slip past the treeline sentry with cautious precision, avoiding detection."
+      "line": "Roselle, cautious and quick-footed, slips past the brigand sentry unnoticed, her sharp eyes catching every shadow."
     }
   ],
-  "outcomeNarrative": "Despite their efforts, the brigands are more alert than expected; Marek's exhaustion and Roselle's caution aren't enough to beat the odds.",
-  "llmName": "openai:gpt-4.1-nano"
+  "outcomeNarrative": "The team barely pulls off the break-in; Marek's strength opens the lock but costs him, while Roselle's agility ensures the sentry remains unaware, yet the overall effort is strained and tense.",
+  "llmName": "openai:gpt-4.1-nano",
+  "casualties": []
 }

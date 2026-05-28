@@ -59,5 +59,6 @@
     }
   ],
   "outcomeNarrative": "[mock] The party brings it off cleanly: wring the location of the bandit cache out of the prisoner before dawn.",
-  "llmName": "mock"
+  "llmName": "mock",
+  "casualties": []
 }

@@ -49,13 +49,14 @@
   "contributions": [
     {
       "mercId": "roselle",
-      "line": "Roselle quietly slips along the cart-path, her light-footed agility helping her stay unseen as she approaches the silent village."
+      "line": "Roselle carefully approaches the village by the cart-path, her quick feet and cautious nature keeping her hidden from whatever waits."
     },
     {
       "mercId": "imogen",
-      "line": "Imogen carefully examines the remains of the dead, noting signs of sudden death and the absence of recent activity, suggesting the threat has moved on."
+      "line": "Imogen examines the corpses, noting that they were killed by a disease that still lingers in the air, suggesting the threat hasn't left."
     }
   ],
-  "outcomeNarrative": "The silent village suggests a swift, unseen threat; Roselle's cautious approach avoided alerting whatever lurked nearby, while Imogen's reading indicates the danger has already left or was never present.",
-  "llmName": "openai:gpt-4.1-nano"
+  "outcomeNarrative": "The mercs' cautious approach and detailed examination reveal a village struck by a lingering illness, not a hostile force, explaining the silence and lack of smoke.",
+  "llmName": "openai:gpt-4.1-nano",
+  "casualties": []
 }

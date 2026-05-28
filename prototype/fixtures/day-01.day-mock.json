@@ -60,7 +60,8 @@
         }
       ],
       "outcomeNarrative": "[mock] A bruised partial; recover the salt-merchant's wagon from the brigands camped at the Crow's Ford slips half-grasped, but no one is broken.",
-      "llmName": "mock"
+      "llmName": "mock",
+      "casualties": []
     },
     {
       "scenarioId": "raid-03",
@@ -123,7 +124,8 @@
         }
       ],
       "outcomeNarrative": "[mock] The party brings it off cleanly: wring the location of the bandit cache out of the prisoner before dawn.",
-      "llmName": "mock"
+      "llmName": "mock",
+      "casualties": []
     },
     {
       "scenarioId": "raid-04",
@@ -184,7 +186,8 @@
         }
       ],
       "outcomeNarrative": "[mock] A bruised partial; commission a new watchtower at the southern pass before winter closes the road slips half-grasped, but no one is broken.",
-      "llmName": "mock"
+      "llmName": "mock",
+      "casualties": []
     }
   ],
   "finalFatigue": {

@@ -62,17 +62,18 @@
   "contributions": [
     {
       "mercId": "imogen",
-      "line": "I speak plainly, reminding the crew that the fort’s promises are thin, and their patience thinner."
+      "line": "With a calm tone, Imogen reminds the crowd that the fort’s promises are fragile and that violence will only tighten their chains."
     },
     {
       "mercId": "dren",
-      "line": "Dren stands firm at the shoulder, his sword ready but silent, a silent reminder of the cost of violence."
+      "line": "Dren stands firm, shoulder to shoulder with his weapon, his eyes scanning the loudest men for signs of weakness or hesitation."
     },
     {
       "mercId": "veska",
-      "line": "Veska observes quietly, assessing who’s likely to listen and who’s just loudest in their anger."
+      "line": "Veska quietly assesses the crowd's mood, her mind calculating the minimum effort needed to diffuse the riot without promising what can't be kept."
     }
   ],
-  "outcomeNarrative": "Imogen’s words, backed by Dren’s steady presence and Veska’s keen eyes, manage to cool the worst of the crowd, convincing most to stand down without further bloodshed.",
-  "llmName": "openai:gpt-4.1-nano"
+  "outcomeNarrative": "Imogen’s words sow doubt among the loudest, Dren's presence discourages escalation, and Veska’s analysis guides their actions, leading to a tense but ultimately peaceful resolution.",
+  "llmName": "openai:gpt-4.1-nano",
+  "casualties": []
 }

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "dayCount": 3,
   "gold": 0,
   "reputation": {},
@@ -43,5 +43,6 @@
       "veterancyGain": 0
     }
   ],
-  "captives": []
+  "captives": [],
+  "deceased": []
 }

@@ -49,13 +49,14 @@
   "contributions": [
     {
       "mercId": "veska",
-      "line": "Veska watches the deserter's hands tremble, noting the nervous flick of his eyes, and maintains her cold, calculating stare."
+      "line": "Veska's sharp eyes catch the flicker of nervousness behind the deserter’s eyes, confirming her suspicion of deceit."
     },
     {
       "mercId": "imogen",
-      "line": "Imogen leans in slightly, her charming tone questioning his true reason for fleeing, trying to catch any inconsistency in his story."
+      "line": "Imogen leans in, her charming tone gently probing the true reason he ran, hoping to find a shred of honesty buried beneath his fear."
     }
   ],
-  "outcomeNarrative": "Imogen's calm probing uncovers the deserter's desperation, convincing the others he might not be as dangerous as he appears, leading to a favorable decision.",
-  "llmName": "openai:gpt-4.1-nano"
+  "outcomeNarrative": "Veska's meticulous scrutiny and Imogen's empathetic persuasion reveal the deserter's guilt and desperation, convincing the party to dismiss him without risk.",
+  "llmName": "openai:gpt-4.1-nano",
+  "casualties": []
 }

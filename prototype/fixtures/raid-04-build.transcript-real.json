@@ -49,13 +49,14 @@
   "contributions": [
     {
       "mercId": "veska",
-      "line": "Veska meticulously drafts the structure, relying on her sharp intelligence to ensure it withstands the spring melt."
+      "line": "Veska meticulously drafts the structural design, relying on her sharp intelligence to ensure it withstands the spring melt."
     },
     {
       "mercId": "marek",
-      "line": "Marek keeps a wary eye on the crew, his soldier's discipline trying to mask his fatigue as he insists the timber remains true."
+      "line": "Marek keeps a firm eye on the timber, demanding straightness and honesty from the crew despite his fatigue."
     }
   ],
-  "outcomeNarrative": "The crew's efforts are divided; Veska's precise design is sound, but Marek's oversight falters under fatigue, leading to a shaky build that might not hold through winter.",
-  "llmName": "openai:gpt-4.1-nano"
+  "outcomeNarrative": "The crew's fatigue and the split in leadership slowed progress, leaving the watchtower vulnerable to the coming thaw.",
+  "llmName": "openai:gpt-4.1-nano",
+  "casualties": []
 }

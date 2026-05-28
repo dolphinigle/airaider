@@ -36,6 +36,15 @@ export interface PartySynergy {
   bonusCoins: number;
 }
 
+/** M5.1: a wound inflicted on a party merc during a scenario. */
+export interface Casualty {
+  mercId: string;
+  /** HP damage dealt to the merc in this scenario. */
+  damage: number;
+  /** Why the wound landed (tied to the band). */
+  reason: string;
+}
+
 export interface ScenarioResolution {
   scenarioId: string;
   title: string;
@@ -54,6 +63,8 @@ export interface ScenarioResolution {
   contributions: Array<{ mercId: string; line: string }>;
   outcomeNarrative: string;
   llmName: string;
+  /** M5.1: wounds inflicted during this scenario (empty if none). */
+  casualties: Casualty[];
 }
 
 /**
@@ -171,6 +182,28 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
   );
   const { roll, band } = resolveCoins(coinsActual, rng);
 
+  // M5.1: on catastrophic band, the most-fatigued party member takes 1 HP.
+  // Deterministic tiebreak: highest fatigueAtStart, then lowest mercId.
+  const casualties: Casualty[] = [];
+  if (band.band === 'catastrophic') {
+    const candidates = assignments
+      .map((a) => ({
+        mercId: a.merc.id,
+        fatigue: fatigueOf ? fatigueOf(a.merc.id) : 0,
+      }))
+      .sort((x, y) => {
+        if (y.fatigue !== x.fatigue) return y.fatigue - x.fatigue;
+        return x.mercId.localeCompare(y.mercId);
+      });
+    if (candidates.length > 0) {
+      casualties.push({
+        mercId: candidates[0]!.mercId,
+        damage: 1,
+        reason: 'catastrophic-band wound',
+      });
+    }
+  }
+
   const req: ScenarioLLMRequest = {
     scenarioTitle: scenario.title,
     scenarioTarget: scenario.target,
@@ -205,5 +238,6 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
     contributions: narration.contributions,
     outcomeNarrative: narration.outcomeNarrative,
     llmName: llm.name,
+    casualties,
   };
 }

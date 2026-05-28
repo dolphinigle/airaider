@@ -57,5 +57,6 @@
     }
   ],
   "outcomeNarrative": "[mock] The party brings it off cleanly: decide whether to hire the deserter loitering outside the chapel.",
-  "llmName": "mock"
+  "llmName": "mock",
+  "casualties": []
 }

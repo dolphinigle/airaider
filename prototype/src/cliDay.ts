@@ -129,8 +129,19 @@ async function main(): Promise<void> {
       s.fatigue = fatigue;
       roster.states.set(mercId, s);
     }
+    // M5.1: apply casualties from each scenario in order.
+    const { applyCasualties } = await import('./roster.js');
+    const allCasualties = resolution.scenarios.flatMap((s) => s.casualties);
+    const killed = applyCasualties(roster, allCasualties);
+    if (allCasualties.length > 0) {
+      console.log(`\nWounds inflicted: ${allCasualties.length}`);
+      for (const c of allCasualties) {
+        const dead = killed.includes(c.mercId) ? '  ☠ PERMADEATH' : '';
+        console.log(`   • ${c.mercId} took ${c.damage} (${c.reason})${dead}`);
+      }
+    }
     saveRoster(rosterAbs, roster, mercs);
-    console.log(`\nUpdated roster → ${rosterAbs}  (day ${roster.dayCount}, ${roster.mercs.length} mercs)`);
+    console.log(`\nUpdated roster → ${rosterAbs}  (day ${roster.dayCount}, ${roster.mercs.length} mercs, ${roster.deceased.length} deceased)`);
   }
 
   if (args.writeTranscript) {

@@ -14,6 +14,12 @@ export function renderDayTranscript(day: DayResolution): string {
     lines.push(`>>> Scenario ${i + 1}/${day.scenarios.length}`);
     lines.push('');
     lines.push(renderTranscript(day.scenarios[i]!));
+    const cas = day.scenarios[i]!.casualties;
+    if (cas && cas.length > 0) {
+      lines.push('');
+      lines.push('  CASUALTIES:');
+      for (const c of cas) lines.push(`    ☠ ${c.mercId} takes ${c.damage} (${c.reason})`);
+    }
     lines.push('');
   }
   lines.push(DBAR);

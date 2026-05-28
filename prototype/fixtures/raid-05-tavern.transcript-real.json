@@ -56,13 +56,14 @@
   "contributions": [
     {
       "mercId": "marek",
-      "line": "Marek, with his brawny build and steady willpower, keeps pace, eyes unflinching as he outdrinks the youngest."
+      "line": "Marek, muscles tense from years of soldiering, leans back and downs a shot, eyes flickering with cautious pride."
     },
     {
       "mercId": "dren",
-      "line": "Dren, quick and brave, matches Marek's stubbornness, pouring another round with a faint smirk, despite the cold fatigue from past skirmishes."
+      "line": "Dren, quick and sharp, keeps the stories flowing, his voice steady despite the burn."
     }
   ],
-  "outcomeNarrative": "The night drags on with neither side yielding, Marek's physical strength and Dren's quick wit earning them a grudging respect, but the split still lingers, the weight of unspoken stories thick in the air.",
-  "llmName": "openai:gpt-4.1-nano"
+  "outcomeNarrative": "Marek's brawny resolve and Dren's quick wit keep the night lively, but the split in their outlooks hints at lingering mistrust, though a shared bravery earns them a coin.",
+  "llmName": "openai:gpt-4.1-nano",
+  "casualties": []
 }

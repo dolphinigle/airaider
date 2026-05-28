@@ -51,13 +51,14 @@
   "contributions": [
     {
       "mercId": "marek",
-      "line": "Marek grips the prisoner’s collar, voice low and steady, pressing him to break before dawn."
+      "line": "Marek's brawny fist presses into the prisoner's collar, forcing him to meet the hard stare of a soldier who fought at Greyford."
     },
     {
       "mercId": "veska",
-      "line": "Veska watches the prisoner’s eyes, catching the flicker of doubt and contradiction in his story."
+      "line": "Veska's sharp eyes catch the flicker of inconsistency, her voice calm but pointed as she questions the prisoner."
     }
   ],
-  "outcomeNarrative": "Marek's physical pressure and Veska's sharp eye expose enough lies to crack the prisoner’s composure; he finally reveals the bandit cache's location.",
-  "llmName": "openai:gpt-4.1-nano"
+  "outcomeNarrative": "Marek's intimidation cracks the prisoner's false calm, while Veska's keen eye spots the shifting story, bringing the truth closer.",
+  "llmName": "openai:gpt-4.1-nano",
+  "casualties": []
 }

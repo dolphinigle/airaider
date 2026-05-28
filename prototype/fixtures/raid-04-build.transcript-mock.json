@@ -57,5 +57,6 @@
     }
   ],
   "outcomeNarrative": "[mock] A bruised partial; commission a new watchtower at the southern pass before winter closes the road slips half-grasped, but no one is broken.",
-  "llmName": "mock"
+  "llmName": "mock",
+  "casualties": []
 }
