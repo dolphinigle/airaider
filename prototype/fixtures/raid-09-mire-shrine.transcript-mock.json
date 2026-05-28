@@ -1,0 +1,76 @@
+{
+  "scenarioId": "raid-09-mire-shrine",
+  "title": "The Shrine the Coffer Pointed To",
+  "target": "open the buried Sevrenne shrine on the south spit of the mire before the bog-cultists rebury it",
+  "archetype": "contract",
+  "partySize": 3,
+  "slotContributions": [
+    {
+      "slotId": "dig",
+      "mercId": "marek",
+      "attrUsed": "physical",
+      "attrScore": 5,
+      "tagsMatched": [
+        "phys:muscular"
+      ],
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    },
+    {
+      "slotId": "read",
+      "mercId": "veska",
+      "attrUsed": "intelligence",
+      "attrScore": 6,
+      "tagsMatched": [
+        "bg:scholar"
+      ],
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    },
+    {
+      "slotId": "ward",
+      "mercId": "imogen",
+      "attrUsed": "willpower",
+      "attrScore": 4,
+      "tagsMatched": [],
+      "coinsContributed": 2,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    }
+  ],
+  "synergy": {
+    "pairs": [],
+    "bonusCoins": 0
+  },
+  "baseCoinBudget": 4,
+  "coinsActual": 4,
+  "rollFaces": [
+    "heads",
+    "tails",
+    "heads",
+    "heads"
+  ],
+  "heads": 3,
+  "tails": 1,
+  "band": "favorable",
+  "bandReason": "3/4 heads (favorable)",
+  "contributions": [
+    {
+      "mercId": "marek",
+      "line": "[mock] Marek (Male) takes on \"clear the peat off the lid without breaking the salt-line\"."
+    },
+    {
+      "mercId": "veska",
+      "line": "[mock] Veska (Female) takes on \"read the bind-script on the lid before it darkens again\"."
+    },
+    {
+      "mercId": "imogen",
+      "line": "[mock] Imogen (Female) takes on \"stand the salt-line against whatever is curious in the reeds\"."
+    }
+  ],
+  "outcomeNarrative": "[mock] The party brings it off cleanly: open the buried Sevrenne shrine on the south spit of the mire before the bog-cultists rebury it.",
+  "llmName": "mock",
+  "casualties": []
+}

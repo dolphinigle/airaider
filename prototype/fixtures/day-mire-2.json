@@ -1,0 +1,6 @@
+{
+  "id": "day-mire-2",
+  "name": "The Shrine Beneath the Salt",
+  "scenarios": ["raid-09-mire-shrine.json"],
+  "seed": "day-mire-2-deterministic"
+}

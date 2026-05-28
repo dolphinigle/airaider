@@ -1,0 +1,6 @@
+{
+  "id": "day-mire-1",
+  "name": "The Coffer in the Reeds",
+  "scenarios": ["raid-06-mire.json"],
+  "seed": "day-mire-1-deterministic"
+}

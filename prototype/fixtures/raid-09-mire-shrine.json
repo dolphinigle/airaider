@@ -1,0 +1,55 @@
+{
+  "id": "raid-09-mire-shrine",
+  "archetype": "contract",
+  "title": "The Shrine the Coffer Pointed To",
+  "target": "open the buried Sevrenne shrine on the south spit of the mire before the bog-cultists rebury it",
+  "slots": [
+    {
+      "id": "dig",
+      "description": "clear the peat off the lid without breaking the salt-line",
+      "preferredAttr": "physical",
+      "preferredTags": [
+        "phys:muscular",
+        "bg:peasant"
+      ]
+    },
+    {
+      "id": "read",
+      "description": "read the bind-script on the lid before it darkens again",
+      "preferredAttr": "intelligence",
+      "preferredTags": [
+        "bg:scholar",
+        "bg:priest"
+      ]
+    },
+    {
+      "id": "ward",
+      "description": "stand the salt-line against whatever is curious in the reeds",
+      "preferredAttr": "willpower",
+      "preferredTags": [
+        "pers:stoic",
+        "temp:brave"
+      ]
+    }
+  ],
+  "partySize": {
+    "min": 3,
+    "max": 3
+  },
+  "coinBudget": 4,
+  "assignments": [
+    {
+      "slotId": "dig",
+      "mercId": "marek"
+    },
+    {
+      "slotId": "read",
+      "mercId": "veska"
+    },
+    {
+      "slotId": "ward",
+      "mercId": "imogen"
+    }
+  ],
+  "seed": "raid-09-mire-shrine-deterministic"
+}

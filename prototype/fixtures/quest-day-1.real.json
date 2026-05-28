@@ -1,0 +1,98 @@
+{
+  "dayId": "day-mire-1",
+  "dayName": "The Coffer in the Reeds",
+  "scenarios": [
+    {
+      "scenarioId": "raid-06-mire",
+      "title": "The Mire's Tribute",
+      "target": "retrieve the iron coffer the priest of Sevrenne dropped when the bog took him, before the next moon",
+      "archetype": "contract",
+      "partySize": 3,
+      "slotContributions": [
+        {
+          "slotId": "wade",
+          "mercId": "marek",
+          "attrUsed": "physical",
+          "attrScore": 5,
+          "tagsMatched": [
+            "phys:muscular"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 0,
+          "fatiguePenalty": 0
+        },
+        {
+          "slotId": "track",
+          "mercId": "veska",
+          "attrUsed": "intelligence",
+          "attrScore": 6,
+          "tagsMatched": [
+            "bg:scholar"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 0,
+          "fatiguePenalty": 0
+        },
+        {
+          "slotId": "watch",
+          "mercId": "dren",
+          "attrUsed": "willpower",
+          "attrScore": 4,
+          "tagsMatched": [
+            "temp:brave"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 0,
+          "fatiguePenalty": 0
+        }
+      ],
+      "synergy": {
+        "pairs": [
+          {
+            "mercA": "marek",
+            "mercB": "dren",
+            "sharedTagId": "temp:brave"
+          }
+        ],
+        "bonusCoins": 1
+      },
+      "baseCoinBudget": 4,
+      "coinsActual": 5,
+      "rollFaces": [
+        "heads",
+        "tails",
+        "heads",
+        "heads",
+        "tails"
+      ],
+      "heads": 3,
+      "tails": 2,
+      "band": "unfavorable",
+      "bandReason": "3/5 heads (split — pessimistic default)",
+      "contributions": [
+        {
+          "mercId": "marek",
+          "line": "Marek, with his brawny build and soldier's grit, pushes through the sucking pools, lantern steady despite the mud."
+        },
+        {
+          "mercId": "veska",
+          "line": "Veska, eyes sharp and calculating, traces the priest’s last footprints by the faint tar-smell, piecing together the route."
+        },
+        {
+          "mercId": "dren",
+          "line": "Dren, quick-footed and brave, holds the rear, eyes alert for anything circling in the reeds, ready to strike."
+        }
+      ],
+      "outcomeNarrative": "Their combined resolve and bravery keep the team moving, but the swamp’s murk and shadows threaten to drown their efforts; the split in their heads signals caution.",
+      "llmName": "openai:gpt-4.1-nano",
+      "casualties": []
+    }
+  ],
+  "finalFatigue": {
+    "marek": 1,
+    "veska": 1,
+    "imogen": 0,
+    "dren": 1,
+    "roselle-mire": 0
+  }
+}

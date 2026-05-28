@@ -1,0 +1,94 @@
+{
+  "dayId": "day-mire-3",
+  "dayName": "Cairn Under the Broken Moon",
+  "scenarios": [
+    {
+      "scenarioId": "raid-10-mire-confrontation",
+      "title": "Cairn Under the Broken Moon",
+      "target": "answer the bog-touched envoy at the cairn — kill, bargain, or be carried back into the reeds",
+      "archetype": "contract",
+      "partySize": 3,
+      "slotContributions": [
+        {
+          "slotId": "front",
+          "mercId": "marek",
+          "attrUsed": "physical",
+          "attrScore": 5,
+          "tagsMatched": [
+            "phys:muscular",
+            "temp:brave"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 2,
+          "fatiguePenalty": 1
+        },
+        {
+          "slotId": "speak",
+          "mercId": "imogen",
+          "attrUsed": "charisma",
+          "attrScore": 5,
+          "tagsMatched": [
+            "bg:priest",
+            "pers:charming"
+          ],
+          "coinsContributed": 4,
+          "fatigue": 1,
+          "fatiguePenalty": 0
+        },
+        {
+          "slotId": "hold",
+          "mercId": "veska",
+          "attrUsed": "willpower",
+          "attrScore": 5,
+          "tagsMatched": [
+            "pers:stoic"
+          ],
+          "coinsContributed": 2,
+          "fatigue": 2,
+          "fatiguePenalty": 1
+        }
+      ],
+      "synergy": {
+        "pairs": [],
+        "bonusCoins": 0
+      },
+      "baseCoinBudget": 5,
+      "coinsActual": 5,
+      "rollFaces": [
+        "tails",
+        "tails",
+        "heads",
+        "heads",
+        "tails"
+      ],
+      "heads": 2,
+      "tails": 3,
+      "band": "unfavorable",
+      "bandReason": "2/5 heads (split — pessimistic default)",
+      "contributions": [
+        {
+          "mercId": "marek",
+          "line": "Marek grips his notched coin tightly, eyes burning with fatigue as he keeps the envoy's reach at bay, muscles tense from exhaustion."
+        },
+        {
+          "mercId": "imogen",
+          "line": "Imogen steps forward, her voice calm but edged with warning as she names the bog-thing in the old tongue, her charm trying to hold the envoy's attention."
+        },
+        {
+          "mercId": "veska",
+          "line": "Veska maintains her stance, her willpower focused on holding the salt-ring closed despite her fatigue, eyes fixed on the reeds bending the wrong way."
+        }
+      ],
+      "outcomeNarrative": "The envoy's patience breaks as Marek's brawn and Imogen's words fail to sway it, and Veska's steadfast will keeps the salt intact—yet the bog-touched remains unyielding.",
+      "llmName": "openai:gpt-4.1-nano",
+      "casualties": []
+    }
+  ],
+  "finalFatigue": {
+    "marek": 3,
+    "veska": 3,
+    "imogen": 2,
+    "dren": 1,
+    "roselle-mire": 0
+  }
+}

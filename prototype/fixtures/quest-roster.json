@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 3,
+  "dayCount": 3,
+  "gold": 80,
+  "reputation": {
+    "sevrenne-grateful": 1
+  },
+  "rosterMercIds": [
+    "marek",
+    "veska",
+    "imogen",
+    "dren"
+  ],
+  "generatedMercs": [
+    {
+      "id": "roselle-mire",
+      "name": "Roselle of the Mire",
+      "attrs": {
+        "physical": 3,
+        "agility": 6,
+        "intelligence": 4,
+        "charisma": 3,
+        "willpower": 3
+      },
+      "tagIds": [
+        "gender:female",
+        "bg:peasant",
+        "temp:cautious",
+        "phys:quick",
+        "pers:touched-by-the-mire"
+      ],
+      "veterancy": 1,
+      "wage": 1,
+      "hp": 3
+    }
+  ],
+  "mercStates": [
+    {
+      "id": "marek",
+      "fatigue": 3,
+      "hpDamage": 0,
+      "veterancyGain": 0
+    },
+    {
+      "id": "veska",
+      "fatigue": 3,
+      "hpDamage": 0,
+      "veterancyGain": 0
+    },
+    {
+      "id": "imogen",
+      "fatigue": 2,
+      "hpDamage": 0,
+      "veterancyGain": 0
+    },
+    {
+      "id": "dren",
+      "fatigue": 1,
+      "hpDamage": 0,
+      "veterancyGain": 0
+    },
+    {
+      "id": "roselle-mire",
+      "fatigue": 0,
+      "hpDamage": 0,
+      "veterancyGain": 0
+    }
+  ],
+  "captives": [],
+  "deceased": [],
+  "activeQuests": [],
+  "completedQuests": [
+    {
+      "questId": "echoes-of-the-mire",
+      "dayCompleted": 3
+    }
+  ]
+}

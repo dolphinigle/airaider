@@ -1,0 +1,6 @@
+{
+  "id": "day-mire-3",
+  "name": "Cairn Under the Broken Moon",
+  "scenarios": ["raid-10-mire-confrontation.json"],
+  "seed": "day-mire-3-deterministic"
+}

@@ -1,0 +1,81 @@
+{
+  "scenarioId": "raid-10-mire-confrontation",
+  "title": "Cairn Under the Broken Moon",
+  "target": "answer the bog-touched envoy at the cairn — kill, bargain, or be carried back into the reeds",
+  "archetype": "contract",
+  "partySize": 3,
+  "slotContributions": [
+    {
+      "slotId": "front",
+      "mercId": "marek",
+      "attrUsed": "physical",
+      "attrScore": 5,
+      "tagsMatched": [
+        "phys:muscular",
+        "temp:brave"
+      ],
+      "coinsContributed": 4,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    },
+    {
+      "slotId": "speak",
+      "mercId": "imogen",
+      "attrUsed": "charisma",
+      "attrScore": 5,
+      "tagsMatched": [
+        "bg:priest",
+        "pers:charming"
+      ],
+      "coinsContributed": 4,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    },
+    {
+      "slotId": "hold",
+      "mercId": "veska",
+      "attrUsed": "willpower",
+      "attrScore": 5,
+      "tagsMatched": [
+        "pers:stoic"
+      ],
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    }
+  ],
+  "synergy": {
+    "pairs": [],
+    "bonusCoins": 0
+  },
+  "baseCoinBudget": 5,
+  "coinsActual": 5,
+  "rollFaces": [
+    "tails",
+    "tails",
+    "heads",
+    "heads",
+    "tails"
+  ],
+  "heads": 2,
+  "tails": 3,
+  "band": "unfavorable",
+  "bandReason": "2/5 heads (split — pessimistic default)",
+  "contributions": [
+    {
+      "mercId": "marek",
+      "line": "[mock] Marek (Male) takes on \"stand the envoy's first reach, eye to the cracked-clay mask\"."
+    },
+    {
+      "mercId": "imogen",
+      "line": "[mock] Imogen (Female) takes on \"name the bog-thing in the old tongue, the one that costs to say\"."
+    },
+    {
+      "mercId": "veska",
+      "line": "[mock] Veska (Female) takes on \"hold the salt-ring closed while the reeds bend the wrong way\"."
+    }
+  ],
+  "outcomeNarrative": "[mock] A bruised partial; answer the bog-touched envoy at the cairn — kill, bargain, or be carried back into the reeds slips half-grasped, but no one is broken.",
+  "llmName": "mock",
+  "casualties": []
+}

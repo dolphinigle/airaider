@@ -1,0 +1,29 @@
+[
+  {
+    "id": "echoes-of-the-mire",
+    "name": "Echoes of the Mire",
+    "seededByTag": "pers:touched-by-the-mire",
+    "summary": "The bog gave back a name nobody wanted to say aloud. Whoever carries its mark will draw the rest.",
+    "stages": [
+      {
+        "id": "stage-0-coffer",
+        "scenarioId": "raid-06-mire",
+        "summary": "Recover the iron coffer the priest of Sevrenne lost to the bog."
+      },
+      {
+        "id": "stage-1-shrine",
+        "scenarioId": "raid-09-mire-shrine",
+        "summary": "Open the shrine the coffer's seal pointed to, before the cult moves the bones."
+      },
+      {
+        "id": "stage-2-confrontation",
+        "scenarioId": "raid-10-mire-confrontation",
+        "summary": "Confront the bog-touched envoy at the cairn under the broken moon."
+      }
+    ],
+    "rewardOnComplete": {
+      "goldDelta": 80,
+      "reputationGain": "sevrenne-grateful"
+    }
+  }
+]

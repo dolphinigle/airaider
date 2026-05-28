@@ -11,6 +11,7 @@ import { MockScenarioLLM } from './llm/mock.js';
 import { OpenAIScenarioLLM } from './llm/openai.js';
 import type { ScenarioLLM } from './llm/interface.js';
 import { loadRoster, saveRoster, rosterExists } from './roster.js';
+import { loadQuests, findStirrableQuests, stirQuest, carrierOf, advanceQuestsForScenario } from './quests.js';
 
 interface CliArgs {
   dayPath: string;
@@ -92,6 +93,9 @@ async function main(): Promise<void> {
   let mercsForDay: Map<string, import('./types.js').Merc> = mercs;
   let initialFatigue: Map<string, number> | undefined;
   const rosterAbs = args.rosterPath ? resolve(args.rosterPath) : undefined;
+  const questCatalog = (() => {
+    try { return loadQuests(join(dataDir, 'quests.json')); } catch { return new Map(); }
+  })();
   if (rosterAbs) {
     if (rosterExists(rosterAbs)) {
       roster = loadRoster(rosterAbs, mercs, tags);
@@ -103,6 +107,17 @@ async function main(): Promise<void> {
     }
     mercsForDay = new Map(roster.mercs.map((m) => [m.id, m]));
     initialFatigue = new Map([...roster.states.values()].map((s) => [s.id, s.fatigue]));
+
+    // M5.2: auto-stir any quest whose seeded tag is now carried.
+    if (questCatalog.size > 0) {
+      const stirrable = findStirrableQuests(roster, questCatalog);
+      for (const q of stirrable) {
+        const carrier = carrierOf(roster, q.seededByTag);
+        stirQuest(roster, q, carrier);
+        console.log(`\n  ✦ Quest stirred: "${q.name}" (carried by ${carrier ?? 'unknown'})`);
+        console.log(`    ${q.summary}`);
+      }
+    }
   }
 
   let llm: ScenarioLLM;
@@ -140,8 +155,22 @@ async function main(): Promise<void> {
         console.log(`   • ${c.mercId} took ${c.damage} (${c.reason})${dead}`);
       }
     }
+    // M5.2: advance quest stages for any scenario id matching an active quest stage.
+    if (questCatalog.size > 0) {
+      for (const s of resolution.scenarios) {
+        const { advanced, completed } = advanceQuestsForScenario(roster, s.scenarioId, questCatalog);
+        for (const a of advanced) {
+          const q = questCatalog.get(a.questId);
+          console.log(`\n  ✦ Quest "${q?.name ?? a.questId}" stage ${a.fromStage} → ${a.toStage}: ${q?.stages[a.toStage]?.summary ?? ''}`);
+        }
+        for (const c of completed) {
+          const q = questCatalog.get(c.questId);
+          console.log(`\n  ✦✦ Quest COMPLETED: "${q?.name ?? c.questId}"  reward: +${q?.rewardOnComplete.goldDelta ?? 0} gold, +1 rep ${q?.rewardOnComplete.reputationGain ?? ''}`);
+        }
+      }
+    }
     saveRoster(rosterAbs, roster, mercs);
-    console.log(`\nUpdated roster → ${rosterAbs}  (day ${roster.dayCount}, ${roster.mercs.length} mercs, ${roster.deceased.length} deceased)`);
+    console.log(`\nUpdated roster → ${rosterAbs}  (day ${roster.dayCount}, ${roster.mercs.length} mercs, ${roster.deceased.length} deceased, ${roster.activeQuests.length} active quests, ${roster.completedQuests.length} completed)`);
   }
 
   if (args.writeTranscript) {

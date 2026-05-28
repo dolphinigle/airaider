@@ -51,8 +51,20 @@ const DeceasedSchema = z.object({
   reason: z.string(),
 });
 
+const ActiveQuestSchema = z.object({
+  questId: z.string(),
+  stageIndex: z.number().int().min(0),
+  seededByMercId: z.string().optional(),
+  stirredOnDay: z.number().int().min(0),
+});
+
+const CompletedQuestSchema = z.object({
+  questId: z.string(),
+  dayCompleted: z.number().int().min(0),
+});
+
 const RoasterSchema = z.object({
-  schemaVersion: z.union([z.literal(1), z.literal(2)]).default(2),
+  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3)]).default(3),
   dayCount: z.number().int().min(0).default(0),
   gold: z.number().int().default(0),
   reputation: z.record(z.string(), z.number().int()).default({}),
@@ -64,14 +76,20 @@ const RoasterSchema = z.object({
   captives: z.array(CaptiveSchema).default([]),
   /** M5.1: mercs who have died permanently. v2+. */
   deceased: z.array(DeceasedSchema).default([]),
+  /** M5.2: in-progress quest arcs. v3+. */
+  activeQuests: z.array(ActiveQuestSchema).default([]),
+  /** M5.2: finished quest arcs. v3+. */
+  completedQuests: z.array(CompletedQuestSchema).default([]),
 });
 
 export type RosterMercState = z.infer<typeof MercStateSchema>;
 export type RosterDeceased = z.infer<typeof DeceasedSchema>;
+export type RosterActiveQuest = z.infer<typeof ActiveQuestSchema>;
+export type RosterCompletedQuest = z.infer<typeof CompletedQuestSchema>;
 export type RosterFile = z.infer<typeof RoasterSchema>;
 
 export interface Roster {
-  schemaVersion: 2;
+  schemaVersion: 3;
   dayCount: number;
   gold: number;
   reputation: Record<string, number>;
@@ -82,11 +100,15 @@ export interface Roster {
   captives: Captive[];
   /** M5.1: permadeath log. */
   deceased: RosterDeceased[];
+  /** M5.2: in-progress quest arcs. */
+  activeQuests: RosterActiveQuest[];
+  /** M5.2: finished quest arcs. */
+  completedQuests: RosterCompletedQuest[];
 }
 
 export function newRoster(initialMercs: Merc[]): Roster {
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     dayCount: 0,
     gold: 0,
     reputation: {},
@@ -94,6 +116,8 @@ export function newRoster(initialMercs: Merc[]): Roster {
     states: new Map(initialMercs.map((m) => [m.id, { id: m.id, fatigue: 0, hpDamage: 0, veterancyGain: 0 }])),
     captives: [],
     deceased: [],
+    activeQuests: [],
+    completedQuests: [],
   };
 }
 
@@ -147,7 +171,7 @@ export function loadRoster(
   }));
 
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     dayCount: parsed.dayCount,
     gold: parsed.gold,
     reputation: parsed.reputation,
@@ -155,6 +179,8 @@ export function loadRoster(
     states,
     captives,
     deceased: parsed.deceased,
+    activeQuests: parsed.activeQuests,
+    completedQuests: parsed.completedQuests,
   };
 }
 
@@ -182,7 +208,7 @@ export function saveRoster(
     }
   }
   const file: RosterFile = {
-    schemaVersion: 2,
+    schemaVersion: 3,
     dayCount: roster.dayCount,
     gold: roster.gold,
     reputation: roster.reputation,
@@ -198,6 +224,8 @@ export function saveRoster(
       tagIds: c.tags.map((t) => t.id),
     })),
     deceased: roster.deceased,
+    activeQuests: roster.activeQuests,
+    completedQuests: roster.completedQuests,
   };
   writeFileSync(path, JSON.stringify(file, null, 2) + '\n', 'utf8');
 }

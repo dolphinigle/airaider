@@ -1,0 +1,55 @@
+{
+  "id": "raid-10-mire-confrontation",
+  "archetype": "contract",
+  "title": "Cairn Under the Broken Moon",
+  "target": "answer the bog-touched envoy at the cairn \u2014 kill, bargain, or be carried back into the reeds",
+  "slots": [
+    {
+      "id": "front",
+      "description": "stand the envoy's first reach, eye to the cracked-clay mask",
+      "preferredAttr": "physical",
+      "preferredTags": [
+        "phys:muscular",
+        "temp:brave"
+      ]
+    },
+    {
+      "id": "speak",
+      "description": "name the bog-thing in the old tongue, the one that costs to say",
+      "preferredAttr": "charisma",
+      "preferredTags": [
+        "bg:priest",
+        "pers:charming"
+      ]
+    },
+    {
+      "id": "hold",
+      "description": "hold the salt-ring closed while the reeds bend the wrong way",
+      "preferredAttr": "willpower",
+      "preferredTags": [
+        "pers:stoic",
+        "temp:cautious"
+      ]
+    }
+  ],
+  "partySize": {
+    "min": 3,
+    "max": 3
+  },
+  "coinBudget": 5,
+  "assignments": [
+    {
+      "slotId": "front",
+      "mercId": "marek"
+    },
+    {
+      "slotId": "speak",
+      "mercId": "imogen"
+    },
+    {
+      "slotId": "hold",
+      "mercId": "veska"
+    }
+  ],
+  "seed": "raid-10-mire-confrontation-deterministic"
+}

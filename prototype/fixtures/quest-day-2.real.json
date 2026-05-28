@@ -1,0 +1,89 @@
+{
+  "dayId": "day-mire-2",
+  "dayName": "The Shrine Beneath the Salt",
+  "scenarios": [
+    {
+      "scenarioId": "raid-09-mire-shrine",
+      "title": "The Shrine the Coffer Pointed To",
+      "target": "open the buried Sevrenne shrine on the south spit of the mire before the bog-cultists rebury it",
+      "archetype": "contract",
+      "partySize": 3,
+      "slotContributions": [
+        {
+          "slotId": "dig",
+          "mercId": "marek",
+          "attrUsed": "physical",
+          "attrScore": 5,
+          "tagsMatched": [
+            "phys:muscular"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 1,
+          "fatiguePenalty": 0
+        },
+        {
+          "slotId": "read",
+          "mercId": "veska",
+          "attrUsed": "intelligence",
+          "attrScore": 6,
+          "tagsMatched": [
+            "bg:scholar"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 1,
+          "fatiguePenalty": 0
+        },
+        {
+          "slotId": "ward",
+          "mercId": "imogen",
+          "attrUsed": "willpower",
+          "attrScore": 4,
+          "tagsMatched": [],
+          "coinsContributed": 2,
+          "fatigue": 0,
+          "fatiguePenalty": 0
+        }
+      ],
+      "synergy": {
+        "pairs": [],
+        "bonusCoins": 0
+      },
+      "baseCoinBudget": 4,
+      "coinsActual": 4,
+      "rollFaces": [
+        "heads",
+        "tails",
+        "heads",
+        "heads"
+      ],
+      "heads": 3,
+      "tails": 1,
+      "band": "favorable",
+      "bandReason": "3/4 heads (favorable)",
+      "contributions": [
+        {
+          "mercId": "marek",
+          "line": "Marek used his muscular build to carefully clear the peat off the salt-line, mindful not to break it."
+        },
+        {
+          "mercId": "veska",
+          "line": "Veska studied the bind-script, her sharp eyes deciphering the ancient symbols with cold precision."
+        },
+        {
+          "mercId": "imogen",
+          "line": "Imogen stood firm, ready to ward off any curiosity from the reeds, her willpower holding steady."
+        }
+      ],
+      "outcomeNarrative": "The team managed to expose the lid without disturbing the salt-line, and Veska's reading revealed the shrine's sealed curse, prompting a cautious retreat.",
+      "llmName": "openai:gpt-4.1-nano",
+      "casualties": []
+    }
+  ],
+  "finalFatigue": {
+    "marek": 2,
+    "veska": 2,
+    "imogen": 1,
+    "dren": 1,
+    "roselle-mire": 0
+  }
+}
