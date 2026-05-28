@@ -180,6 +180,10 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   const tierOf = roster
     ? (mercId: string) => roster.states.get(mercId)?.tier
     : undefined;
+  // M9.8: scenario-narrator hint — survivor still grieving a bond partner.
+  const recentlyLostBondPartnerOf = roster
+    ? (mercId: string) => roster.states.get(mercId)?.recentGriefPartner
+    : undefined;
 
   const fixturesDir = dirname(resolve(dayPath));
   const scenarioResolutions: ScenarioResolution[] = [];
@@ -312,7 +316,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
       ? rngFor(scenario, i)
       : rngFromString(scenario.seed ?? scenario.id);
 
-    const resolution = await resolveScenario({ scenario, assignments, llm, rng, fatigueOf, reputationOf, bondedPairs, season, fortUpgrades, tierOf });
+    const resolution = await resolveScenario({ scenario, assignments, llm, rng, fatigueOf, reputationOf, bondedPairs, season, fortUpgrades, tierOf, recentlyLostBondPartnerOf });
     scenarioResolutions.push(resolution);
     applyDeltas(resolution);
     if (roster) {

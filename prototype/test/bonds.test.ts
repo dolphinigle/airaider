@@ -8,7 +8,8 @@ import { loadMercs } from '../src/mercs.js';
 import { loadScenario } from '../src/scenarios.js';
 import { newRoster, loadRoster, saveRoster } from '../src/roster.js';
 import {
-  BOND_THRESHOLD, BOND_GRIEF_FATIGUE, bondedPairsOf, pairKey, recordCoDeployment, applyBondGrief,
+  BOND_THRESHOLD, BOND_GRIEF_FATIGUE, BOND_GRIEF_HINT_WINDOW_DAYS,
+  bondedPairsOf, pairKey, recordCoDeployment, applyBondGrief, pruneStaleGriefHints,
 } from '../src/bonds.js';
 import { computePartySynergy, resolveScenario, type Assignment } from '../src/resolver.js';
 import { rngFromString } from '../src/rng.js';
@@ -164,5 +165,62 @@ describe('M9.7 bond grief', () => {
     const out = applyBondGrief(r, ['marek'], bondsBefore);
     expect(out).toEqual([]);
     expect(r.states.get('veska')!.fatigue).toBe(0);
+  });
+});
+
+describe('M9.8 recent-grief LLM hint', () => {
+  const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+  const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+
+  function makeBondedRoster() {
+    const r = newRoster([mercs.get('marek')!, mercs.get('veska')!]);
+    r.states.get('marek')!.coDeployments = { veska: BOND_THRESHOLD };
+    r.states.get('veska')!.coDeployments = { marek: BOND_THRESHOLD };
+    return r;
+  }
+
+  it('exports BOND_GRIEF_HINT_WINDOW_DAYS = 7', () => {
+    expect(BOND_GRIEF_HINT_WINDOW_DAYS).toBe(7);
+  });
+
+  it('stamps survivor with recentGriefPartner (deceased name) and recentGriefDay', () => {
+    const r = makeBondedRoster();
+    r.dayCount = 12;
+    const bondsBefore = bondedPairsOf(r);
+    r.mercs = r.mercs.filter((m) => m.id !== 'marek');
+    r.states.delete('marek');
+    r.deceased.push({ id: 'marek', name: 'Marek', dayDied: 12, reason: 'wound' });
+    applyBondGrief(r, ['marek'], bondsBefore);
+    const st = r.states.get('veska')!;
+    expect(st.recentGriefPartner).toBe('Marek');
+    expect(st.recentGriefDay).toBe(12);
+  });
+
+  it('falls back to deceased id if deceased name is missing', () => {
+    const r = makeBondedRoster();
+    const bondsBefore = bondedPairsOf(r);
+    r.mercs = r.mercs.filter((m) => m.id !== 'marek');
+    r.states.delete('marek');
+    // deliberately do NOT push to r.deceased
+    applyBondGrief(r, ['marek'], bondsBefore);
+    expect(r.states.get('veska')!.recentGriefPartner).toBe('marek');
+  });
+
+  it('pruneStaleGriefHints clears entries beyond the window', () => {
+    const r = makeBondedRoster();
+    const st = r.states.get('veska')!;
+    st.recentGriefPartner = 'Marek';
+    st.recentGriefDay = 5;
+    // 5 + 7 = 12; day 12 is still within window, day 13 is past it.
+    expect(pruneStaleGriefHints(r, 12)).toBe(0);
+    expect(r.states.get('veska')!.recentGriefPartner).toBe('Marek');
+    expect(pruneStaleGriefHints(r, 13)).toBe(1);
+    expect(r.states.get('veska')!.recentGriefPartner).toBeUndefined();
+    expect(r.states.get('veska')!.recentGriefDay).toBeUndefined();
+  });
+
+  it('pruneStaleGriefHints leaves untouched states alone', () => {
+    const r = makeBondedRoster();
+    expect(pruneStaleGriefHints(r, 100)).toBe(0);
   });
 });

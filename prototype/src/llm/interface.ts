@@ -20,6 +20,12 @@ export interface ScenarioLLMRequest {
      * array when no bonds in-party.
      */
     bondedPartyMercIds?: string[];
+    /**
+     * M9.8: name of a bonded partner this merc lost recently (within the
+     * grief window). Lets the narrator paint the merc's posture / lines
+     * with a grief beat without engine cost. Omitted when no recent loss.
+     */
+    recentlyLostBondPartner?: string;
   }>;
   slots: ScenarioSlot[];
   band: OutcomeBand;

@@ -87,6 +87,10 @@ export function bondedPairsOf(roster: Roster): Set<string> {
  */
 export const BOND_GRIEF_FATIGUE = 2;
 
+/** M9.8: number of days after a bond loss during which the survivor still
+ *  carries a `recentlyLostBondPartner` flavor hint to the scenario LLM. */
+export const BOND_GRIEF_HINT_WINDOW_DAYS = 7;
+
 export function applyBondGrief(
   roster: Roster,
   killedIds: Iterable<string>,
@@ -95,6 +99,13 @@ export function applyBondGrief(
 ): Array<{ survivorId: string; deceasedId: string; before: number; after: number }> {
   const out: Array<{ survivorId: string; deceasedId: string; before: number; after: number }> = [];
   const killSet = new Set(killedIds);
+  // M9.8: build an id->name map so we can stamp the deceased's NAME on the
+  // survivor for the scenario-narrator hint. The deceased has been moved
+  // to roster.deceased by applyCasualties before this runs.
+  const nameOf = (id: string): string | undefined => {
+    const d = roster.deceased.find((x) => x.id === id);
+    return d?.name;
+  };
   for (const deadId of killSet) {
     for (const key of bondsBefore) {
       const [a, b] = key.split('|');
@@ -103,15 +114,37 @@ export function applyBondGrief(
       if (a === deadId) other = b;
       else if (b === deadId) other = a;
       if (!other) continue;
-      // skip if the partner is also dead (mutual KO — no grief, both gone)
       if (killSet.has(other)) continue;
       if (!roster.mercs.find((m) => m.id === other)) continue;
       const st = roster.states.get(other);
       if (!st) continue;
       const before = st.fatigue;
       st.fatigue = before + griefAmount;
+      // M9.8: stamp survivor with grief hint (most recent only; if they were
+      // already grieving someone else this day, overwrite with the latest).
+      const deceasedName = nameOf(deadId) ?? deadId;
+      st.recentGriefPartner = deceasedName;
+      st.recentGriefDay = roster.dayCount;
       out.push({ survivorId: other, deceasedId: deadId, before, after: st.fatigue });
     }
   }
   return out;
+}
+
+/**
+ * M9.8: clear stale grief hints whose `recentGriefDay` is older than
+ * `BOND_GRIEF_HINT_WINDOW_DAYS` relative to `currentDay`. Call this at
+ * end-of-day after dayCount has been advanced.
+ */
+export function pruneStaleGriefHints(roster: Roster, currentDay: number, windowDays: number = BOND_GRIEF_HINT_WINDOW_DAYS): number {
+  let cleared = 0;
+  for (const st of roster.states.values()) {
+    if (st.recentGriefDay === undefined) continue;
+    if (currentDay - st.recentGriefDay > windowDays) {
+      delete st.recentGriefDay;
+      delete st.recentGriefPartner;
+      cleared++;
+    }
+  }
+  return cleared;
 }

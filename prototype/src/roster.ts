@@ -29,6 +29,11 @@ const MercStateSchema = z.object({
   tier: z.enum(['rookie', 'veteran', 'grizzled']).default('rookie'),
   /** M6.2: co-deployment counters keyed by partner merc id. v6+. */
   coDeployments: z.record(z.string(), z.number().int().min(0)).default({}),
+  /** M9.8: name of a bonded partner this merc lost (most recent only),
+   *  passed to the LLM as a `recentlyLostBondPartner` flavor hint. Cleared
+   *  automatically `BOND_GRIEF_HINT_WINDOW_DAYS` days after `recentGriefDay`. */
+  recentGriefPartner: z.string().optional(),
+  recentGriefDay: z.number().int().min(0).optional(),
 });
 
 const GeneratedMercSchema = z.object({

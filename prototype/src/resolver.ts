@@ -33,6 +33,13 @@ export interface ResolutionInput {
    * their own slot, grizzled adds +2. Rookie (or absent) leaves it alone.
    */
   tierOf?: (mercId: string) => import('./veterancy.js').VeterancyTier | undefined;
+  /**
+   * M9.8: per-merc lookup for a recently-lost bond partner's NAME. When
+   * present, the scenario LLM gets `party[].recentlyLostBondPartner` as a
+   * flavor hint so the narrator can paint grief beats. Day loop pulls this
+   * from `roster.states.get(id)?.recentGriefPartner`.
+   */
+  recentlyLostBondPartnerOf?: (mercId: string) => string | undefined;
 }
 
 export interface SlotContribution {
@@ -348,12 +355,16 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
         }
       }
       const tier = input.tierOf ? input.tierOf(a.merc.id) : undefined;
+      const recentlyLostBondPartner = input.recentlyLostBondPartnerOf
+        ? input.recentlyLostBondPartnerOf(a.merc.id)
+        : undefined;
       return {
         merc: a.merc,
         assignedSlotId: a.slotId,
         fatigueAtStart: fatigueOf ? fatigueOf(a.merc.id) : 0,
         ...(tier ? { tier } : {}),
         ...(bondedPartyMercIds.length > 0 ? { bondedPartyMercIds } : {}),
+        ...(recentlyLostBondPartner ? { recentlyLostBondPartner } : {}),
       };
     }),
     slots: scenario.slots,

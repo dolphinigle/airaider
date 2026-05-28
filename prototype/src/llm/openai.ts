@@ -23,6 +23,7 @@ Rules:
 - Reference \`fatigueAtStart\` when it is >= 2: the merc is visibly worn (the bruise from yesterday, dull reflexes, short patience).
 - When a merc has \`tier: "veteran"\` or \`"grizzled"\`, lean into their experience (they read the moment, they've done this before); rookies should feel green by contrast.
 - When two party members appear in each other's \`bondedPartyMercIds\`, give them ONE shared beat — they cover each other, finish each other's read, move as a pair.
+- When a merc has \`recentlyLostBondPartner\` set, paint ONE quiet grief beat into their contribution (a flinch, a half-glance to where the partner would have stood, a curt line) — do not name the dead unless natural; do not eulogize.
 - When a merc has a non-empty \`backstory\`, you may anchor their contribution line in ONE small concrete detail from it (an object, a place, a habit) — do not summarize the backstory verbatim.
 - No purple prose. No "destiny." No omniscient narrator.
 - Output must be valid JSON matching the provided schema.`;
@@ -74,13 +75,14 @@ export class OpenAIScenarioLLM implements ScenarioLLM {
         description: s.description,
         preferredAttr: s.preferredAttr,
       })),
-      party: req.party.map(({ merc, assignedSlotId, fatigueAtStart, tier, bondedPartyMercIds }) => ({
+      party: req.party.map(({ merc, assignedSlotId, fatigueAtStart, tier, bondedPartyMercIds, recentlyLostBondPartner }) => ({
         id: merc.id,
         name: merc.name,
         assignedSlotId,
         fatigueAtStart: fatigueAtStart ?? 0,
         tier: tier ?? 'rookie',
         bondedPartyMercIds: bondedPartyMercIds ?? [],
+        recentlyLostBondPartner: recentlyLostBondPartner ?? null,
         attrs: merc.attrs,
         backstory: merc.backstory ?? '',
         tags: merc.tags.map((t) => ({

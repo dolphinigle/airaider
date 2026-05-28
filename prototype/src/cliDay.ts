@@ -185,6 +185,10 @@ async function main(): Promise<void> {
         }
       }
     }
+    // M9.8: clear stale grief hints once the window has expired so the
+    // narrator doesn't keep painting old losses.
+    const { pruneStaleGriefHints } = await import('./bonds.js');
+    pruneStaleGriefHints(roster, roster.dayCount);
     // M5.2: advance quest stages for any scenario id matching an active quest stage.
     if (questCatalog.size > 0) {
       for (const s of resolution.scenarios) {
