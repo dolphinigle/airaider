@@ -444,3 +444,34 @@ describe('M9.4 low-morale suspends new bond formation', () => {
     expect(out.lowMorale).toBe(false);
   });
 });
+
+describe('M9.5 fort log entries for payday and desertion', () => {
+  const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+  const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+  const dayPath = join(ROOT, 'fixtures', 'day-01.json');
+  const day = loadDay(dayPath);
+
+  it('appends a Payday note to fortLog on weekly payday', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!]);
+    r.gold = 20;
+    r.dayCount = 6; // currentDay = 7
+    await resolveDay({ day: { ...day, scenarios: [] as string[] } as any, dayPath, mercs, llm: new MockScenarioLLM(), roster: r });
+    const payEntries = r.fortLog.filter((e) => e.message.startsWith('Payday'));
+    expect(payEntries.length).toBe(1);
+    expect(payEntries[0]!.day).toBe(7);
+    expect(payEntries[0]!.kind).toBe('note');
+  });
+
+  it('appends a Desertion note to fortLog when a merc walks out', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!, mercs.get('imogen')!]);
+    r.gold = -5;
+    r.consecutiveDebtDays = 2; // one more debt day triggers desertion
+    await resolveDay({ day: { ...day, scenarios: [] as string[] } as any, dayPath, mercs, llm: new MockScenarioLLM(), roster: r });
+    const desEntries = r.fortLog.filter((e) => e.message.startsWith('Desertion'));
+    expect(desEntries.length).toBe(1);
+    expect(desEntries[0]!.kind).toBe('note');
+    expect(r.mercs.length).toBe(1); // one merc gone
+  });
+});

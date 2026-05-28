@@ -373,6 +373,13 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
         wagesTotalPaid += m.wage;
       }
       roster.gold -= wagesTotalPaid;
+      const payEntry: FortLogEntry = {
+        day: currentDay,
+        kind: 'note',
+        message: `Payday: ${wagesTotalPaid}g wages to ${wagesPaid.length} merc${wagesPaid.length === 1 ? '' : 's'} (gold ${roster.gold}g)`,
+      };
+      appendFortLog(roster, payEntry);
+      newFortLogEntries.push(payEntry);
     }
   }
 
@@ -410,6 +417,13 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
       roster.mercs = roster.mercs.filter((m) => m.id !== leaving.id);
       roster.states.delete(leaving.id);
       roster.consecutiveDebtDays = 0;
+      const desertEntry: FortLogEntry = {
+        day: roster.dayCount + 1,
+        kind: 'note',
+        message: `Desertion: ${leaving.name} (${leaving.id}) walked out — unpaid wages`,
+      };
+      appendFortLog(roster, desertEntry);
+      newFortLogEntries.push(desertEntry);
     }
   }
 

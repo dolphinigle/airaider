@@ -1,6 +1,6 @@
 {
   "dayId": "m7-day-1",
-  "dayName": "Last Days of Thaw \u2014 Tavern at the Crow's Wing",
+  "dayName": "Last Days of Thaw — Tavern at the Crow's Wing",
   "scenarios": [
     {
       "scenarioId": "raid-05",
@@ -62,7 +62,7 @@
       "heads": 2,
       "tails": 3,
       "band": "unfavorable",
-      "bandReason": "2/5 heads (split \u2014 pessimistic default)",
+      "bandReason": "2/5 heads (split — pessimistic default)",
       "contributions": [
         {
           "mercId": "marek",
@@ -132,6 +132,11 @@
       "day": 28,
       "kind": "event",
       "message": "Refugees at the gate  -1g  lowmark-guild +1"
+    },
+    {
+      "day": 28,
+      "kind": "note",
+      "message": "Payday: 4g wages to 4 mercs (gold 7g)"
     }
   ],
   "fatigueRecovery": [],

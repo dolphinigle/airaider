@@ -79,6 +79,11 @@
     },
     {
       "day": 28,
+      "kind": "note",
+      "message": "Payday: 4g wages to 4 mercs (gold 7g)"
+    },
+    {
+      "day": 28,
       "kind": "upgrade",
       "message": "Purchased Reinforced Palisade for 5g (fort → L2)."
     },
