@@ -405,3 +405,42 @@ describe('M10.3 stale tavern listings drop off in day loop', () => {
     for (const e of r.hirePool) expect(e.postedDay).toBe(28);
   });
 });
+
+describe('M9.4 low-morale suspends new bond formation', () => {
+  const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+  const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+  const dayPath = join(ROOT, 'fixtures', 'day-01.json');
+  const day = loadDay(dayPath);
+
+  it('lowMorale=false and bonds advance when not in debt', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!, mercs.get('roselle')!, mercs.get('veska')!]);
+    r.gold = 20;
+    expect(r.consecutiveDebtDays).toBe(0);
+    const scenarioDay = { ...day } as any;
+    const out = await resolveDay({ day: scenarioDay, dayPath, mercs, llm: new MockScenarioLLM(), roster: r });
+    expect(out.lowMorale).toBe(false);
+    let total = 0;
+    for (const s of r.states.values()) total += Object.values(s.coDeployments).reduce((a, b) => a + b, 0);
+    expect(total).toBeGreaterThan(0);
+  });
+
+  it('lowMorale=true and bond counters do NOT advance when in debt', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!, mercs.get('roselle')!, mercs.get('veska')!]);
+    r.gold = 20;
+    r.consecutiveDebtDays = 1;
+    const scenarioDay = { ...day } as any;
+    const out = await resolveDay({ day: scenarioDay, dayPath, mercs, llm: new MockScenarioLLM(), roster: r });
+    expect(out.lowMorale).toBe(true);
+    expect(out.bondsFormed).toEqual([]);
+    let total = 0;
+    for (const s of r.states.values()) total += Object.values(s.coDeployments).reduce((a, b) => a + b, 0);
+    expect(total).toBe(0);
+  });
+
+  it('roster-less day loop reports lowMorale=false', async () => {
+    const out = await resolveDay({ day, dayPath, mercs, llm: new MockScenarioLLM() });
+    expect(out.lowMorale).toBe(false);
+  });
+});

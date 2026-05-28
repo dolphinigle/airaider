@@ -116,6 +116,10 @@ export function renderDayTranscript(day: DayResolution): string {
       lines.push(`   ☠ ${d.mercId} walks out — ${d.reason}`);
     }
   }
+  if (day.lowMorale) {
+    lines.push('');
+    lines.push(' MORALE: low (fort in debt — no new bonds form today)');
+  }
   if (day.tavernRefresh.length > 0) {
     lines.push('');
     lines.push(` TAVERN (${day.tavernRefresh.length} new on the bench):`);

@@ -135,5 +135,6 @@
   "wagesTotalPaid": 0,
   "desertions": [],
   "tavernRefresh": [],
-  "tavernExpired": []
+  "tavernExpired": [],
+  "lowMorale": false
 }

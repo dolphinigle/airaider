@@ -231,5 +231,6 @@
   "desertions": [],
   "fatigueRecoverySuspended": false,
   "tavernRefresh": [],
-  "tavernExpired": []
+  "tavernExpired": [],
+  "lowMorale": false
 }

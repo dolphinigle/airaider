@@ -133,6 +133,12 @@ export interface DayResolution {
    */
   tavernExpired: HirePoolEntry[];
   /**
+   * M9.4: true when the fort entered the day already in debt
+   * (`consecutiveDebtDays > 0`). While low-morale is set, bond
+   * co-deployment counters do not advance — see bondsFormed.
+   */
+  lowMorale: boolean;
+  /**
    * M7.6: fort log entries appended during THIS day (currently only the
    * daily-event entry; upgrade purchases happen via the fort CLI, not the day
    * loop). Empty in roster-less mode.
@@ -215,6 +221,15 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     }
   };
 
+  // M9.4: when the fort enters the day already in debt, mercs are too
+  // miserable to deepen relationships — bond co-deployment counters do
+  // not advance. Existing bonds are unaffected.
+  const lowMorale = !!roster && roster.consecutiveDebtDays > 0;
+  const bondRecord = (party: readonly string[]): BondFormation[] => {
+    if (!roster || lowMorale) return [];
+    return recordCoDeployment(roster, party);
+  };
+
   // M5.4: resolve any errands due TODAY before processing today's scenarios.
   // Use roster.dayCount + 1 as "current day" since the loop hasn't bumped it yet.
   if (roster) {
@@ -228,7 +243,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
       applyDeltas(r);
       if (roster) {
         promotions.push(...applyVeterancyXp(roster, r.slotContributions.map((sc) => sc.mercId), r.band));
-        bondsFormed.push(...recordCoDeployment(roster, r.slotContributions.map((sc) => sc.mercId)));
+        bondsFormed.push(...bondRecord(r.slotContributions.map((sc) => sc.mercId)));
       }
       // Errands cost 1 fatigue per participating merc on return day.
       for (const a of r.slotContributions) {
@@ -277,7 +292,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     applyDeltas(resolution);
     if (roster) {
       promotions.push(...applyVeterancyXp(roster, assignments.map((a) => a.merc.id), resolution.band));
-      bondsFormed.push(...recordCoDeployment(roster, assignments.map((a) => a.merc.id)));
+      bondsFormed.push(...bondRecord(assignments.map((a) => a.merc.id)));
     }
 
     for (const a of assignments) {
@@ -448,5 +463,6 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     desertions,
     tavernRefresh,
     tavernExpired,
+    lowMorale,
   };
 }

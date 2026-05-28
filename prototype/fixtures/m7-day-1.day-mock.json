@@ -349,5 +349,6 @@
       "postedDay": 28
     }
   ],
-  "tavernExpired": []
+  "tavernExpired": [],
+  "lowMorale": false
 }
