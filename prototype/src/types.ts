@@ -47,9 +47,9 @@ export interface Merc {
   wage: number;
   /** Simple 0-3 HP for prototype. Permadeath math is OPEN (CANONICAL §7 #2/#6). */
   hp: number;
+  /** Optional flavor: 1-3 sentence personal history. Passed to LLM for richer narration. */
+  backstory?: string;
 }
-
-// --- Scenario ---
 
 export type ScenarioArchetype = 'contract' | 'recruit' | 'captive' | 'build' | 'tavern';
 

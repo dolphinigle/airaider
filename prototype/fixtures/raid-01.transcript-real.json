@@ -13,7 +13,9 @@
       "tagsMatched": [
         "phys:muscular"
       ],
-      "coinsContributed": 3
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
     },
     {
       "slotId": "sentry",
@@ -23,7 +25,9 @@
       "tagsMatched": [
         "phys:quick"
       ],
-      "coinsContributed": 3
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
     }
   ],
   "synergy": {
@@ -44,13 +48,13 @@
   "contributions": [
     {
       "mercId": "marek",
-      "line": "Marek, with his soldier's brawn, struggles to crack the iron strongbox's lock, but the rust is tough."
+      "line": "Marek's brute strength helps crack the iron lock, but the effort leaves him more worn than usual."
     },
     {
       "mercId": "roselle",
-      "line": "Roselle, nimble and cautious, tries to slip past the brigand sentry, but he hears her and alerts the camp."
+      "line": "Roselle's keen eye and quick feet slip past the treeline sentry with cautious precision, avoiding detection."
     }
   ],
-  "outcomeNarrative": "The brigands catch wind of the intrusion, forcing the mercs into a hasty retreat, leaving the salt-merchant's wagon behind.",
+  "outcomeNarrative": "Despite their efforts, the brigands are more alert than expected; Marek's exhaustion and Roselle's caution aren't enough to beat the odds.",
   "llmName": "openai:gpt-4.1-nano"
 }

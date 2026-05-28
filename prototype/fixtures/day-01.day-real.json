@@ -52,14 +52,14 @@
       "contributions": [
         {
           "mercId": "marek",
-          "line": "Marek, the brave soldier, bats away the lock's rusted hinges with his muscular grip, but the stubborn mechanism refuses to yield."
+          "line": "Marek's brute strength helps crack the iron strongbox, but his fatigue makes him impatient and rough."
         },
         {
           "mercId": "roselle",
-          "line": "Roselle, the cautious peasant, slips silently past the brigand sentry, her quick steps barely disturbing the underbrush."
+          "line": "Roselle's quick reflexes and cautious nature allow her to slip past the brigand sentry, though she keeps a wary eye on the shadows."
         }
       ],
-      "outcomeNarrative": "Marek's brute strength fails to crack the stubborn lock, while Roselle's stealth keeps her hidden from the sentry, but neither can force the situation entirely alone.",
+      "outcomeNarrative": "Their efforts are hampered by fatigue and hesitation, leaving the lock unbroken and the sentry undisturbed, ensuring the brigands remain alert.",
       "llmName": "openai:gpt-4.1-nano"
     },
     {
@@ -115,14 +115,14 @@
       "contributions": [
         {
           "mercId": "marek",
-          "line": "Marek, the soldier, leans in hard, his muscular frame intimidating the trembling prisoner into silence."
+          "line": "Marek's muscular frame leans into the prisoner, voice rough as he demands the truth, eyes cold and unyielding."
         },
         {
           "mercId": "veska",
-          "line": "Veska, the scholar, catches the subtle shifts in the prisoner's story, spotting the inconsistencies."
+          "line": "Veska carefully catches the shifting lies, her analytical gaze probing the prisoner's stories for cracks and inconsistencies."
         }
       ],
-      "outcomeNarrative": "Marek's physical pressure and Veska's keen eye break the false calm, forcing the prisoner to reveal the bandit's location before dawn.",
+      "outcomeNarrative": "Marek's brutal pressure causes the prisoner to falter, revealing a key detail about the bandit's hideout. Veska's sharp reading confirms the deception, guiding the team closer to their goal.",
       "llmName": "openai:gpt-4.1-nano"
     },
     {
@@ -176,14 +176,14 @@
       "contributions": [
         {
           "mercId": "veska",
-          "line": "Veska's meticulous plans for the tower's foundation are hampered by her fatigue, making her overly cautious and slow."
+          "line": "Veska's meticulous calculations reveal the timber's flaws, but her fatigue dulls her sharp eye."
         },
         {
           "mercId": "marek",
-          "line": "Marek's stubborn oversight is marred by his tiredness, leading to distracted decision-making and a shaky timber frame."
+          "line": "Marek's brawny strength keeps the logs aligned, though his fatigue makes him impatient with the crew."
         }
       ],
-      "outcomeNarrative": "Despite their efforts, the crew's fatigue and pessimism cause the structure to be poorly aligned, risking failure when the melt begins.",
+      "outcomeNarrative": "The team struggles to maintain cohesion, with Veska's precise plans sidelined by fatigue and Marek's forceful oversight causing friction, leading to a fragile structure that may not hold through the spring melt.",
       "llmName": "openai:gpt-4.1-nano"
     }
   ],

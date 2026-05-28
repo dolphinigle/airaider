@@ -16,6 +16,7 @@ const MercSchema = z.object({
   veterancy: z.number().int().min(0).max(5).default(0),
   wage: z.number().int().min(0).default(1),
   hp: z.number().int().min(0).max(3).default(3),
+  backstory: z.string().optional(),
 });
 
 export function loadMercs(path: string, tagPool: Map<string, Tag>): Map<string, Merc> {
@@ -38,6 +39,7 @@ export function loadMercs(path: string, tagPool: Map<string, Tag>): Map<string, 
       veterancy: r.veterancy,
       wage: r.wage,
       hp: r.hp,
+      backstory: r.backstory,
     });
   }
   return m;

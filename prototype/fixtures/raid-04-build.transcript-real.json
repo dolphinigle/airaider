@@ -13,7 +13,9 @@
       "tagsMatched": [
         "bg:scholar"
       ],
-      "coinsContributed": 3
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
     },
     {
       "slotId": "oversee",
@@ -23,7 +25,9 @@
       "tagsMatched": [
         "temp:brave"
       ],
-      "coinsContributed": 3
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
     }
   ],
   "synergy": {
@@ -45,13 +49,13 @@
   "contributions": [
     {
       "mercId": "veska",
-      "line": "Veska's meticulous planning falters as the timber they select bends and warps under the strain of the winter melt."
+      "line": "Veska meticulously drafts the structure, relying on her sharp intelligence to ensure it withstands the spring melt."
     },
     {
       "mercId": "marek",
-      "line": "Marek's leadership is undermined by the crew's doubts, as his brawny presence fails to keep the construction on schedule amid the cold."
+      "line": "Marek keeps a wary eye on the crew, his soldier's discipline trying to mask his fatigue as he insists the timber remains true."
     }
   ],
-  "outcomeNarrative": "The watchtower's construction suffers from poor material choices and wavering leadership, leaving it vulnerable to the coming thaw.",
+  "outcomeNarrative": "The crew's efforts are divided; Veska's precise design is sound, but Marek's oversight falters under fatigue, leading to a shaky build that might not hold through winter.",
   "llmName": "openai:gpt-4.1-nano"
 }

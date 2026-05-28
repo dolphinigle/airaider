@@ -13,7 +13,9 @@
       "tagsMatched": [
         "temp:brave"
       ],
-      "coinsContributed": 3
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
     },
     {
       "slotId": "keep-songs-going",
@@ -23,7 +25,9 @@
       "tagsMatched": [
         "temp:brave"
       ],
-      "coinsContributed": 3
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
     }
   ],
   "synergy": {
@@ -52,13 +56,13 @@
   "contributions": [
     {
       "mercId": "marek",
-      "line": "Marek, with his brawny build and soldier's grit, keeps pace with the drinks, outlasting the younger recruits."
+      "line": "Marek, with his brawny build and steady willpower, keeps pace, eyes unflinching as he outdrinks the youngest."
     },
     {
       "mercId": "dren",
-      "line": "Dren, quick and brave, matches Marek's drinking with a steady resolve, fueling the song's chorus."
+      "line": "Dren, quick and brave, matches Marek's stubbornness, pouring another round with a faint smirk, despite the cold fatigue from past skirmishes."
     }
   ],
-  "outcomeNarrative": "Despite their fatigue, Marek's physical endurance and Dren's willpower unite them, closing the night with camaraderie rather than conflict, though the outcome remains uncertain.",
+  "outcomeNarrative": "The night drags on with neither side yielding, Marek's physical strength and Dren's quick wit earning them a grudging respect, but the split still lingers, the weight of unspoken stories thick in the air.",
   "llmName": "openai:gpt-4.1-nano"
 }

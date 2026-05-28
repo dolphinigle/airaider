@@ -2,76 +2,51 @@
   {
     "id": "marek",
     "name": "Marek",
-    "attrs": {
-      "physical": 5,
-      "agility": 2,
-      "intelligence": 3,
-      "charisma": 3,
-      "willpower": 4
-    },
+    "attrs": { "physical": 5, "agility": 2, "intelligence": 3, "charisma": 3, "willpower": 4 },
     "tagIds": ["gender:male", "bg:soldier", "temp:brave", "phys:muscular"],
     "veterancy": 1,
     "wage": 1,
-    "hp": 3
+    "hp": 3,
+    "backstory": "Discharged from a count's levy after the company was broken at Greyford. He keeps a small notched coin from a man he killed at sixteen and does not speak of why."
   },
   {
     "id": "roselle",
     "name": "Roselle",
-    "attrs": {
-      "physical": 3,
-      "agility": 6,
-      "intelligence": 4,
-      "charisma": 3,
-      "willpower": 3
-    },
+    "attrs": { "physical": 3, "agility": 6, "intelligence": 4, "charisma": 3, "willpower": 3 },
     "tagIds": ["gender:female", "bg:peasant", "temp:cautious", "phys:quick"],
     "veterancy": 1,
     "wage": 1,
-    "hp": 3
+    "hp": 3,
+    "backstory": "Grew up running goods over the Frostmark border for her uncle. The work taught her where to step and when not to look back. She owes the uncle money."
   },
   {
     "id": "imogen",
     "name": "Imogen",
-    "attrs": {
-      "physical": 2,
-      "agility": 3,
-      "intelligence": 4,
-      "charisma": 5,
-      "willpower": 4
-    },
+    "attrs": { "physical": 2, "agility": 3, "intelligence": 4, "charisma": 5, "willpower": 4 },
     "tagIds": ["gender:female", "bg:priest", "pers:charming"],
     "veterancy": 0,
     "wage": 1,
-    "hp": 3
+    "hp": 3,
+    "backstory": "A novice of the Sevrenne cult who was sent down from the cloister for asking the wrong question. She still wears the rope belt under her shirt out of habit."
   },
   {
     "id": "dren",
     "name": "Dren",
-    "attrs": {
-      "physical": 4,
-      "agility": 5,
-      "intelligence": 3,
-      "charisma": 2,
-      "willpower": 4
-    },
+    "attrs": { "physical": 4, "agility": 5, "intelligence": 3, "charisma": 2, "willpower": 4 },
     "tagIds": ["gender:male", "bg:soldier", "temp:brave", "phys:quick"],
     "veterancy": 2,
     "wage": 1,
-    "hp": 3
+    "hp": 3,
+    "backstory": "Served two terms in the Lowmark riders and walked away with a stiff knee and a cold opinion of officers. The fort feeds him; that is enough."
   },
   {
     "id": "veska",
     "name": "Veska",
-    "attrs": {
-      "physical": 2,
-      "agility": 3,
-      "intelligence": 6,
-      "charisma": 3,
-      "willpower": 5
-    },
+    "attrs": { "physical": 2, "agility": 3, "intelligence": 6, "charisma": 3, "willpower": 5 },
     "tagIds": ["gender:female", "bg:scholar", "pers:stoic"],
     "veterancy": 0,
     "wage": 1,
-    "hp": 3
+    "hp": 3,
+    "backstory": "Read accounts for a Lowmark merchant house for nine years before the houses' books got too clean to look at. She prefers numbers to people and is rarely fooled twice."
   }
 ]

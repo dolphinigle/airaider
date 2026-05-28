@@ -14,7 +14,9 @@
         "phys:muscular",
         "temp:brave"
       ],
-      "coinsContributed": 4
+      "coinsContributed": 4,
+      "fatigue": 0,
+      "fatiguePenalty": 0
     },
     {
       "slotId": "read-lies",
@@ -24,7 +26,9 @@
       "tagsMatched": [
         "pers:stoic"
       ],
-      "coinsContributed": 3
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
     }
   ],
   "synergy": {
@@ -47,13 +51,13 @@
   "contributions": [
     {
       "mercId": "marek",
-      "line": "Marek's muscular presence and soldier's grit force the prisoner into trembling silence, his false calm cracking."
+      "line": "Marek grips the prisoner’s collar, voice low and steady, pressing him to break before dawn."
     },
     {
       "mercId": "veska",
-      "line": "Veska's sharp eyes catch inconsistencies in the man's story, her stoic patience wearing him down."
+      "line": "Veska watches the prisoner’s eyes, catching the flicker of doubt and contradiction in his story."
     }
   ],
-  "outcomeNarrative": "Between Marek's intimidation and Veska's keen perception, the prisoner faltered, revealing the bandit cache's location before dawn.",
+  "outcomeNarrative": "Marek's physical pressure and Veska's sharp eye expose enough lies to crack the prisoner’s composure; he finally reveals the bandit cache's location.",
   "llmName": "openai:gpt-4.1-nano"
 }

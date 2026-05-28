@@ -13,7 +13,9 @@
       "tagsMatched": [
         "pers:stoic"
       ],
-      "coinsContributed": 3
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
     },
     {
       "slotId": "persuade",
@@ -23,7 +25,9 @@
       "tagsMatched": [
         "pers:charming"
       ],
-      "coinsContributed": 3
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
     }
   ],
   "synergy": {
@@ -45,13 +49,13 @@
   "contributions": [
     {
       "mercId": "veska",
-      "line": "Veska's keen eyes catch the slight twitch in his hand, betraying his rehearsed lies."
+      "line": "Veska watches the deserter's hands tremble, noting the nervous flick of his eyes, and maintains her cold, calculating stare."
     },
     {
       "mercId": "imogen",
-      "line": "Imogen's warm smile and gentle tone coax out his real reason for fleeing, revealing desperation."
+      "line": "Imogen leans in slightly, her charming tone questioning his true reason for fleeing, trying to catch any inconsistency in his story."
     }
   ],
-  "outcomeNarrative": "Veska's sharp perception and Imogen's charm uncover the deserter's true fear, convincing the team to take a chance on him despite the risks.",
+  "outcomeNarrative": "Imogen's calm probing uncovers the deserter's desperation, convincing the others he might not be as dangerous as he appears, leading to a favorable decision.",
   "llmName": "openai:gpt-4.1-nano"
 }
