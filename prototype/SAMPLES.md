@@ -32,6 +32,11 @@ If you only read three files, read these:
 | `raid-06-mire.json` | Bog recovery; sets up future `pers:touched-by-the-mire` arc. | Cautious slog through swamp; mention of half-claimed bodies. |
 | `raid-07-plague.json` | Stelm village plague investigation (Roselle + Imogen). | Imogen finds disease signs; unfavorable. |
 | `raid-08-tax-riot.json` | Build-archetype crowd-control (Imogen charm + Dren presence). | Crowd held; favorable. |
+| `raid-09-mire-shrine.json` | Stage 2 of the Mire quest arc. | Half-glimpsed shrine; carrier of `pers:touched-by-the-mire` reacts. |
+| `raid-10-mire-confrontation.json` | Stage 3 / final of the Mire arc. | Confrontation with the thing under the bog; quest closes. |
+| `raid-11-the-warden.json` | Climax with three approaches (assault / parley / poison-the-well). | Per-approach transcripts: `raid-11-the-warden.<approach>.transcript-real.json`. |
+| `raid-12-errand-courier.json` | 4-day round-trip errand to Lowmark. | `daysToResolve=4` — dispatched on day 1, returns on day 4. |
+| `raid-13-guild-shipment.json` | Two-faction reputation contract (Lowmark Guild vs Black Hill toll-gang). | Favorable seed awards +1 / −1; narrator names both factions (`raid-13-guild-shipment.favorable.transcript-real.json`). |
 
 ## Day-loop transcripts
 
@@ -74,14 +79,61 @@ for showing that the LLM produces tonally distinct outputs per action.
 the 22-tag vocabulary at `data/tags.json`. No fixture committed because the
 generator is RNG-deterministic on seed; reproduce locally to inspect.
 
+## Multi-day quest arc — "Echoes of the Mire" (M5.2)
+
+Carrier of legendary tag `pers:touched-by-the-mire` auto-stirs the quest on
+day 1 and the three stages advance in sequence. Run as:
+
+```sh
+npm run day -- fixtures/quest-day-1.json --real --roster=fixtures/quest-roster.json
+npm run day -- fixtures/quest-day-2.json --real --roster=fixtures/quest-roster.json
+npm run day -- fixtures/quest-day-3.json --real --roster=fixtures/quest-roster.json
+npm run quests -- show fixtures/quest-roster.json
+```
+
+Real transcripts: `quest-day-{1,2,3}.real.json`. Final roster shows the
+quest in `completedQuests[]`.
+
+## Climax with three approaches — "The Warden of Greyford" (M5.3)
+
+`raid-11-the-warden.json` offers three approaches with different
+`slotModifiers` (coin bonuses + tag requirements). Run a specific approach
+with `--approach=<id>`; committed real transcripts:
+
+| Approach | Transcript |
+|---|---|
+| assault | `raid-11-the-warden.assault.transcript-real.json` |
+| parley | `raid-11-the-warden.parley.transcript-real.json` |
+| poison-the-well | `raid-11-the-warden.poison-the-well.transcript-real.json` |
+
+## Errand long-clock — "The Lowmark Courier" (M5.4)
+
+`raid-12-errand-courier.json` has `daysToResolve: 4`. Dispatched on day 1
+and silent on days 2–3 (the merc shows up in roster `pendingErrands[]`);
+resolves at the start of day 4. Real-LLM 4-day demo: `errand-day-{1..4}.real.json`
+against `errand-roster.json`. Day 4 transcript carries the return narration.
+
+## Reputation deltas — "Lowmark Guild Shipment" (M5.5)
+
+`raid-13-guild-shipment.json` carries `factionContext[]` for the Lowmark
+merchant guild and the Black Hill toll-gang; favorable outcome → +1 / −1,
+catastrophic-favorable → +2 / −2, unfavorable falls through to 0 / 0,
+catastrophic → −1 / +1 (mirror). Run with the favorable seed:
+
+```sh
+npm run scenario -- fixtures/raid-13-guild-shipment.json --seed morning --real
+```
+
+Real transcript: `raid-13-guild-shipment.favorable.transcript-real.json`.
+The REPUTATION block lists both deltas; nano weaves both factions into
+the outcome line.
+
 ## What is NOT yet shown
 
-- Wounds / permadeath math (HP exists in roster schema but no scenario yet
-  inflicts damage).
-- Reputation tracking beyond what captive actions write.
-- Multi-day quest arcs (each scenario is still atomic).
-- Legendary tag `pers:touched-by-the-mire` only exists in the vocabulary;
-  no merc carries it yet.
+- Veterancy / merc progression across days.
+- Merc-merc relationship tags accumulated through co-deployment.
+- Weather / season clock layered over the day loop.
+- Fort-level upgrades that mutate the recruit pool or scenario menu.
 - GUI of any kind. Prototype is console-only by design.
 
 ## How to regenerate (cheap & safe)

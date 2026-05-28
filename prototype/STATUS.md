@@ -1,9 +1,9 @@
 # Prototype STATUS
 
-> **Updated:** 2026-05-28 ~21:30 WIB
+> **Updated:** 2026-05-28 ~22:00 WIB
 > **Branch:** `prototype/m0`
-> **Last verified command:** `npm test` → 58 / 58 passing
-> **Last verified real-LLM command:** 3-day campaign run (`day-01` → `day-02` → `day-03`) against persistent roster — fatigue accumulated to Marek 5 / Veska 5 by day 3 and nano referenced it in narration.
+> **Last verified command:** `npm test` → 85 / 85 passing
+> **Last verified real-LLM command:** raid-13-guild-shipment with favorable seed — narrator awarded +1 to `lowmark-guild` and −1 to `black-hill-gang` and called out both factions by name in the outcome line (`fixtures/raid-13-guild-shipment.favorable.transcript-real.json`).
 
 ## ⚠️ Post-compaction discipline (READ FIRST)
 
@@ -82,10 +82,15 @@ Day loop with fatigue accumulation.
 - [x] M4.1 Three new themed raid fixtures (raid-06-mire, raid-07-plague, raid-08-tax-riot) + mock/real transcripts (commits `46d4a8a`, `02d383d`)
 - [x] M4.2 Merc backstories woven into LLM payload (commit `dadae6a`) — `backstory?: string` on Merc, threaded through OpenAI scenario prompt with anchor-one-detail directive
 - [x] M4.3 3-day campaign demo with persistent roster (commit `5fd7c72`) — `day-01` → `day-02` → `day-03` against `fixtures/campaign-roster.json`, 8 nano-narrated scenarios in sequence, cumulative fatigue
-- [x] M4.4 `SAMPLES.md` morning-handoff doc — navigation guide to every committed transcript
-- [ ] Multi-day quest arc seeded by rare tag (still deferred)
-- [ ] Climax scenario with multiple approaches (still deferred)
-- [ ] Wounds / permadeath math (still deferred)
+- [x] M4.4 `SAMPLES.md` morning-handoff doc — navigation guide to every committed transcript (commit `c2478ea`)
+
+## Milestone M5 — DONE ✅ (overnight, all five)
+
+- [x] M5.1 Wounds / permadeath math (commit `91251ed`). HP threading on merc + roster (schema v1 → v2 with `deceased[]`), resolver writes `casualties[]`, transcript surfaces wounds, deterministic-seed tests for crit-fail trigger / favorable no-op / permadeath removal.
+- [x] M5.2 Multi-day quest arcs (commit `787db7a`). `Quest` schema, `pers:touched-by-the-mire` seeds the "Echoes of the Mire" 3-stage arc (raid-06 → raid-09-mire-shrine → raid-10-mire-confrontation), roster schema v2 → v3 (`activeQuests[]` / `completedQuests[]`), auto-stir + auto-advance in day loop, `npm run quests -- show <roster>` CLI, 3-day real-LLM demo (`quest-day-{1..3}.real.json`).
+- [x] M5.3 Climax scenario with multi-approach selection (commit `50bef42`, typecheck fix `d469c3e`). `ScenarioApproach { id, label, slots, slotModifiers }` with per-slot `coinDelta` / `requireTag`; `raid-11-the-warden` ships three approaches (assault / parley / poison-the-well); CLI `--approach=<id>`; mock + real transcripts per approach.
+- [x] M5.4 Errand long-clock scenarios (commit `8a6112e`). Scenarios gain `daysToResolve`; roster schema v3 → v4 with `pendingErrands[]`; `dispatchErrand` / `resolveDueErrands` integrated into day loop; `raid-12-errand-courier` (4-day round trip to Lowmark) + real-LLM demo where the errand fires on day 4.
+- [x] M5.5 Reputation surfacing in scenarios (commit `74de9d6`). `factionContext[]` with per-band deltas (with catastrophic→unfavorable and catastrophic-favorable→favorable fallbacks); resolver emits `reputationDeltas[]`; transcript renders REPUTATION block; LLM prompt receives faction summary + current standing; day loop mutates `roster.reputation` after each scenario + errand return; `raid-13-guild-shipment` demo with Lowmark Guild vs Black Hill toll-gang.
 
 
 
