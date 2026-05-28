@@ -87,6 +87,9 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   const { day, dayPath, mercs, llm, rngFor, initialFatigue, roster } = input;
   const fatigue = new Map<string, number>(initialFatigue ?? []);
   const fatigueOf = (mercId: string): number => fatigue.get(mercId) ?? 0;
+  const tierOf = roster
+    ? (mercId: string) => roster.states.get(mercId)?.tier
+    : undefined;
 
   const fixturesDir = dirname(resolve(dayPath));
   const scenarioResolutions: ScenarioResolution[] = [];
@@ -137,7 +140,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   if (roster) {
     const currentDay = roster.dayCount + 1;
     const dueResolutions = await resolveDueErrands({
-      roster, currentDay, mercs, llm, fatigueOf, reputationOf, bondedPairs, season, fortUpgrades, basePath: dayPath,
+      roster, currentDay, mercs, llm, fatigueOf, reputationOf, bondedPairs, season, fortUpgrades, tierOf, basePath: dayPath,
     });
     for (const r of dueResolutions) {
       errandsResolved.push(r);
@@ -189,7 +192,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
       ? rngFor(scenario, i)
       : rngFromString(scenario.seed ?? scenario.id);
 
-    const resolution = await resolveScenario({ scenario, assignments, llm, rng, fatigueOf, reputationOf, bondedPairs, season, fortUpgrades });
+    const resolution = await resolveScenario({ scenario, assignments, llm, rng, fatigueOf, reputationOf, bondedPairs, season, fortUpgrades, tierOf });
     scenarioResolutions.push(resolution);
     applyDeltas(resolution);
     if (roster) {

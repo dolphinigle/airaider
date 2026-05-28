@@ -27,6 +27,11 @@ export interface ResolutionInput {
   season?: import('./season.js').Season;
   /** M7.1: ids of fort upgrades active on this run. */
   fortUpgrades?: Iterable<string>;
+  /**
+   * M7.8: veterancy tier lookup for the day loop. Veteran adds +1 coin to
+   * their own slot, grizzled adds +2. Rookie (or absent) leaves it alone.
+   */
+  tierOf?: (mercId: string) => import('./veterancy.js').VeterancyTier | undefined;
 }
 
 export interface SlotContribution {
@@ -40,6 +45,10 @@ export interface SlotContribution {
   fatigue: number;
   /** M2: coins shaved off due to fatigue ≥ FATIGUE_THRESHOLD. */
   fatiguePenalty: number;
+  /** M7.8: bonus coins added because the merc is veteran/grizzled (0 for rookie). */
+  tierBonus: number;
+  /** M7.8: tier looked up via tierOf (null if no lookup was provided). */
+  tier: import('./veterancy.js').VeterancyTier | null;
 }
 
 export interface PartySynergy {
@@ -103,7 +112,16 @@ export const FATIGUE_PENALTY = 1;
 export interface SlotContribOptions {
   /** If provided, returns the merc's current fatigue at scenario start. */
   fatigueOf?: (mercId: string) => number;
+  /** M7.8: optional tier lookup for the slot occupant. */
+  tierOf?: (mercId: string) => import('./veterancy.js').VeterancyTier | undefined;
 }
+
+/** M7.8: per-tier flat coin bonus added on top of the slot's base contribution. */
+export const TIER_COIN_BONUS: Record<import('./veterancy.js').VeterancyTier, number> = {
+  rookie: 0,
+  veteran: 1,
+  grizzled: 2,
+};
 
 export function computePartySynergy(
   assignments: Assignment[],
@@ -179,9 +197,19 @@ export function computeSlotContributions(
         coins = Math.max(1, coins - FATIGUE_PENALTY);
       }
     }
+    let tier: import('./veterancy.js').VeterancyTier | null = null;
+    let tierBonus = 0;
+    if (opts.tierOf) {
+      const t = opts.tierOf(merc.id);
+      if (t) {
+        tier = t;
+        tierBonus = TIER_COIN_BONUS[t];
+        coins += tierBonus;
+      }
+    }
     return {
       slotId, mercId: merc.id, attrUsed, attrScore, tagsMatched,
-      coinsContributed: coins, fatigue, fatiguePenalty,
+      coinsContributed: coins, fatigue, fatiguePenalty, tierBonus, tier,
     };
   });
 }
@@ -209,7 +237,7 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
     }
   }
 
-  const slotContributions = computeSlotContributions(scenario, assignments, { fatigueOf });
+  const slotContributions = computeSlotContributions(scenario, assignments, { fatigueOf, tierOf: input.tierOf });
 
   // M5.3: apply per-slot approach modifiers.
   if (approach?.slotModifiers) {

@@ -58,10 +58,12 @@ export async function resolveDueErrands(args: {
   bondedPairs?: Set<string>;
   fortUpgrades?: Iterable<string>;
   season?: import('./season.js').Season;
+  /** M7.8: tier lookup passthrough. */
+  tierOf?: (mercId: string) => import('./veterancy.js').VeterancyTier | undefined;
   /** Base path used to resolve scenarioPath when it is relative. */
   basePath: string;
 }): Promise<ScenarioResolution[]> {
-  const { roster, currentDay, mercs, llm, fatigueOf, reputationOf, bondedPairs, season, fortUpgrades, basePath } = args;
+  const { roster, currentDay, mercs, llm, fatigueOf, reputationOf, bondedPairs, season, fortUpgrades, tierOf, basePath } = args;
   const due = roster.pendingErrands.filter((e) => e.returnsOnDay <= currentDay);
   const remaining = roster.pendingErrands.filter((e) => e.returnsOnDay > currentDay);
   const out: ScenarioResolution[] = [];
@@ -90,7 +92,7 @@ export async function resolveDueErrands(args: {
       }
     }
     const rng = rngFromString(e.seedSource);
-    const resolution = await resolveScenario({ scenario, assignments, llm, rng, fatigueOf, reputationOf, bondedPairs, season, fortUpgrades });
+    const resolution = await resolveScenario({ scenario, assignments, llm, rng, fatigueOf, reputationOf, bondedPairs, season, fortUpgrades, tierOf });
     out.push(resolution);
   }
   roster.pendingErrands = remaining;

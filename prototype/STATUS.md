@@ -2,7 +2,7 @@
 
 > **Updated:** 2026-05-28 ~22:40 WIB
 > **Branch:** `prototype/m0`
-> **Last verified command:** `npm test` → 131 / 131 passing
+> **Last verified command:** `npm test` → 138 / 138 passing
 > **Last verified real-LLM command:** raid-13-guild-shipment with favorable seed — narrator awarded +1 to `lowmark-guild` and −1 to `black-hill-gang` and called out both factions by name in the outcome line (`fixtures/raid-13-guild-shipment.favorable.transcript-real.json`).
 
 ## ⚠️ Post-compaction discipline (READ FIRST)
@@ -104,7 +104,12 @@ Day loop with fatigue accumulation.
 - [x] M7.1 Fort upgrade mechanical effects (commit `0c0e85d`). `src/fortEffects.ts` exposes pure helpers: `flatCoinBonus` (smithy +1 if any merc deployed), `slotCoinBonus` (watch-tower +1 per `sentry`/`scout`/`watch` slot), `negativeSeasonClamped` (winter-larder zeros negative season modifiers), `palisadeBlocksCasualty` (catastrophic damage clauses dropped). Threaded into the resolver via `ResolutionInput.fortUpgrades`; day.ts + errands.ts pass `roster.fort.upgrades`. Chapel is narrative-only. 7 new tests (123 total).
 - [x] M7.4 Daily events table (commit `40485aa`). `src/events.ts` rolls one entry per day from `data/events.json`, filtered by current season + `requiresUpgrades[]` / `requiresMissingUpgrades[]`, weighted-sampled, deterministic via `rngFromString('event-<dayCount>')`. Effects: `goldDelta` added to `roster.gold`, `fatigueDelta` applied to every merc (clamped at 0), `reputationDeltas[]` merged. Surfaces as a `DAILY EVENT` block at the top of the day transcript. Seven seed events spanning all four seasons; `bandit-scouts` gated by missing watch-tower. 8 new tests (131 total).
 - [x] M7.2 Multi-day campaign demo (commit pending — fixtures + script). `scripts/m7-campaign.sh` runs a deterministic 5-day campaign on `fixtures/m7-campaign-roster.json` (dayCount 27 → 32) that exercises every M6 + M7 system: thaw → high season transition, daily-event swap (`thaw-market-day` × 3 → `high-bandit-scouts` × 2), mid-campaign upgrade purchases (palisade after day 1, smithy after day 3), marek/veska promotion to veteran, and marek↔veska bond formation. Committed mock transcripts at `fixtures/m7-day-{1..5}.day-mock.json` and final roster at `fixtures/m7-campaign-roster.final.json`.
+- [x] M7.5 Affordable fort upgrade hint (commit `c1f0c3c`). `affordableUpgrades(catalog, fort, gold)` in `src/fort.ts` returns the catalog entries the roster could buy right now, ordered by cost then id. `resolveDay` populates `DayResolution.fortHints` whenever a roster is present, and `dayTranscript.ts` renders a `FORT HINT:` block after BONDS FORMED. 3 new tests (134 total).
+- [x] M7.7 Event catalog expansion (commit `7219db6`). `data/events.json` 7 → 14 entries spanning all four seasons more densely: refugees (wane), merchant-caravan (thaw), tollgang-pressure (high), grain-fire (wane), chapel-vigil (gated on chapel), wolves-at-walls (frost, watch-tower-missing), bard (thaw/high). 2 new tests + the wane reputation-park fixture moved to frost (136 total).
+- [x] M7.x foot-gun fix (commit `c966079`). `npm run day` / `npm run scenario` now refuse to overwrite the default-path transcript unless `--out`, `--force`, or `--no-write` is given. cliDay checks both early (pre-side-effect) and at write time. Caught while playtesting on a fresh roster — the old behaviour silently clobbered the committed `fixtures/day-01.day-mock.json` golden.
+- [x] M7.8 Veterancy tier feeds the coin pool (commit pending). `ResolutionInput.tierOf?` (and `SlotContribOptions.tierOf`) wires `roster.states.get(id).tier` into `computeSlotContributions`: veteran adds +1 coin to their own slot, grizzled +2, rookie unchanged. Bonus stacks on top of base, attr, and tag bonuses but does NOT bypass the fatigue floor (slot still ≥ 1 coin pre-tier). `SlotContribution` gains `tier` + `tierBonus` fields, threaded through day.ts + errands.ts; transcript renders `[veteran, +1]` next to the slot. All 9 raid + day-01 mock goldens regenerated. 2 new tests (138 total).
 - [ ] M7.3 Recruit gated by fort level (deferred — captive→recruit refactor)
+- [ ] M7.6 Persistent fort log (`roster.fortLog: string[]`, schema v7 → v8)
 
 
 

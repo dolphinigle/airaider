@@ -20,9 +20,11 @@ export function renderTranscript(r: ScenarioResolution): string {
         : sc.fatigue > 0
         ? ` [fatigue ${sc.fatigue}]`
         : '';
+    const tierStr =
+      sc.tierBonus > 0 ? ` [${sc.tier}, +${sc.tierBonus}]` : '';
     const coinPlural = sc.coinsContributed === 1 ? 'coin' : 'coins';
     lines.push(
-      `  • ${sc.mercId} → slot:${sc.slotId}${attrStr}${tagStr}${fatStr} (${sc.coinsContributed} ${coinPlural})`,
+      `  • ${sc.mercId} → slot:${sc.slotId}${attrStr}${tagStr}${fatStr}${tierStr} (${sc.coinsContributed} ${coinPlural})`,
     );
     if (c) lines.push(`      "${c.line}"`);
   }

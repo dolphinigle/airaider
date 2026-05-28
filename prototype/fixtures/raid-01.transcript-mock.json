@@ -15,7 +15,9 @@
       ],
       "coinsContributed": 3,
       "fatigue": 0,
-      "fatiguePenalty": 0
+      "fatiguePenalty": 0,
+      "tierBonus": 0,
+      "tier": null
     },
     {
       "slotId": "sentry",
@@ -27,7 +29,9 @@
       ],
       "coinsContributed": 3,
       "fatigue": 0,
-      "fatiguePenalty": 0
+      "fatiguePenalty": 0,
+      "tierBonus": 0,
+      "tier": null
     }
   ],
   "synergy": {

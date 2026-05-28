@@ -16,7 +16,9 @@
       ],
       "coinsContributed": 4,
       "fatigue": 0,
-      "fatiguePenalty": 0
+      "fatiguePenalty": 0,
+      "tierBonus": 0,
+      "tier": null
     },
     {
       "slotId": "examine",
@@ -28,7 +30,9 @@
       ],
       "coinsContributed": 3,
       "fatigue": 0,
-      "fatiguePenalty": 0
+      "fatiguePenalty": 0,
+      "tierBonus": 0,
+      "tier": null
     }
   ],
   "synergy": {

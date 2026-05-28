@@ -47,6 +47,52 @@ describe('computeSlotContributions', () => {
     const contrib = computeSlotContributions(fixture, [{ slotId: 'lock', merc: imogen }]);
     expect(contrib[0]!.coinsContributed).toBe(1);
   });
+
+  it('M7.8 veteran tier adds +1 coin, grizzled +2, rookie 0', () => {
+    const tags = loadTags(TAGS_PATH);
+    const mercs = loadMercs(MERCS_PATH, tags);
+    const fixture = loadScenario(join(ROOT, 'fixtures', 'raid-01.json'));
+    const marek = mercs.get('marek')!;
+    const tierOf = (id: string): 'rookie' | 'veteran' | 'grizzled' =>
+      id === 'marek' ? 'veteran' : 'rookie';
+    const vet = computeSlotContributions(fixture, [{ slotId: 'lock', merc: marek }], { tierOf });
+    expect(vet[0]!.tier).toBe('veteran');
+    expect(vet[0]!.tierBonus).toBe(1);
+    expect(vet[0]!.coinsContributed).toBe(4); // 3 base + 1 veteran
+
+    const grizOf = (): 'grizzled' => 'grizzled';
+    const griz = computeSlotContributions(fixture, [{ slotId: 'lock', merc: marek }], { tierOf: grizOf });
+    expect(griz[0]!.tierBonus).toBe(2);
+    expect(griz[0]!.coinsContributed).toBe(5); // 3 base + 2 grizzled
+
+    // No tierOf at all → tier null, no bonus.
+    const none = computeSlotContributions(fixture, [{ slotId: 'lock', merc: marek }]);
+    expect(none[0]!.tier).toBeNull();
+    expect(none[0]!.tierBonus).toBe(0);
+    expect(none[0]!.coinsContributed).toBe(3);
+
+    // Rookie returns 0 bonus.
+    const rookieOnly = (): 'rookie' => 'rookie';
+    const rookie = computeSlotContributions(fixture, [{ slotId: 'lock', merc: marek }], { tierOf: rookieOnly });
+    expect(rookie[0]!.tier).toBe('rookie');
+    expect(rookie[0]!.tierBonus).toBe(0);
+    expect(rookie[0]!.coinsContributed).toBe(3);
+  });
+
+  it('M7.8 tier bonus does not break the fatigue penalty floor of 1', () => {
+    const tags = loadTags(TAGS_PATH);
+    const mercs = loadMercs(MERCS_PATH, tags);
+    const fixture = loadScenario(join(ROOT, 'fixtures', 'raid-01.json'));
+    const imogen = mercs.get('imogen')!;
+    // imogen base on lock = 1 coin. Fatigued she floors to 1. Veteran +1 → 2.
+    const contrib = computeSlotContributions(fixture, [{ slotId: 'lock', merc: imogen }], {
+      fatigueOf: () => 3,
+      tierOf: () => 'veteran',
+    });
+    expect(contrib[0]!.fatiguePenalty).toBe(1);
+    expect(contrib[0]!.tierBonus).toBe(1);
+    expect(contrib[0]!.coinsContributed).toBe(2); // max(1, 1-1) + 1 tier
+  });
 });
 
 describe('resolveScenario (with MockScenarioLLM)', () => {
