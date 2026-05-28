@@ -3,6 +3,7 @@ import type { Rng } from './rng.js';
 import { resolveCoins, MAX_COINS } from './sultan.js';
 import type { ScenarioLLM, ScenarioLLMRequest } from './llm/interface.js';
 import type { FixtureScenario } from './scenarios.js';
+import { fortEffectsFor, flatCoinBonus, slotCoinBonus, negativeSeasonClamped, palisadeBlocksCasualty } from './fortEffects.js';
 
 export interface Assignment {
   slotId: string;
@@ -24,6 +25,8 @@ export interface ResolutionInput {
   bondedPairs?: Set<string>;
   /** M6.3: current season; if set with a scenario.seasonModifier, applies a flat coin delta. */
   season?: import('./season.js').Season;
+  /** M7.1: ids of fort upgrades active on this run. */
+  fortUpgrades?: Iterable<string>;
 }
 
 export interface SlotContribution {
@@ -225,16 +228,23 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
   }
 
   const synergy = computePartySynergy(assignments, input.bondedPairs);
-  const seasonDelta =
+  const fortEffects = fortEffectsFor(input.fortUpgrades);
+  const rawSeasonDelta =
     input.season && scenario.seasonModifier
       ? (scenario.seasonModifier[input.season] ?? 0)
       : 0;
+  const seasonDelta = rawSeasonDelta < 0 && negativeSeasonClamped(fortEffects, input.season)
+    ? 0
+    : rawSeasonDelta;
+  const fortFlat = flatCoinBonus(fortEffects);
+  const fortSlot = slotCoinBonus(fortEffects, scenario.slots.map((s) => s.id));
+  const fortBonus = fortFlat + fortSlot;
   const summed =
-    slotContributions.reduce((s, c) => s + c.coinsContributed, 0) + synergy.bonusCoins + seasonDelta;
+    slotContributions.reduce((s, c) => s + c.coinsContributed, 0) + synergy.bonusCoins + seasonDelta + fortBonus;
   const partyBonus = Math.max(0, assignments.length - scenario.partySize.min);
   const coinsActual = Math.max(
     1,
-    Math.min(MAX_COINS, Math.min(summed, scenario.coinBudget + partyBonus + synergy.bonusCoins + Math.max(0, seasonDelta))),
+    Math.min(MAX_COINS, Math.min(summed, scenario.coinBudget + partyBonus + synergy.bonusCoins + Math.max(0, seasonDelta) + fortBonus)),
   );
   const { roll, band } = resolveCoins(coinsActual, rng);
 
@@ -252,11 +262,14 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
         return x.mercId.localeCompare(y.mercId);
       });
     if (candidates.length > 0) {
-      casualties.push({
-        mercId: candidates[0]!.mercId,
-        damage: 1,
-        reason: 'catastrophic-band wound',
-      });
+      const damage = palisadeBlocksCasualty(fortEffects) ? 0 : 1;
+      if (damage > 0) {
+        casualties.push({
+          mercId: candidates[0]!.mercId,
+          damage,
+          reason: 'catastrophic-band wound',
+        });
+      }
     }
   }
 

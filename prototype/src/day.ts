@@ -88,6 +88,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   const bondedPairs = roster ? bondedPairsOf(roster) : undefined;
   const seasonClock: SeasonClock | null = roster ? seasonFor(roster.dayCount) : null;
   const season = seasonClock?.season;
+  const fortUpgrades = roster ? roster.fort.upgrades : undefined;
   const reputationOf = roster
     ? (factionId: string): number => roster.reputation[factionId] ?? 0
     : undefined;
@@ -103,7 +104,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   if (roster) {
     const currentDay = roster.dayCount + 1;
     const dueResolutions = await resolveDueErrands({
-      roster, currentDay, mercs, llm, fatigueOf, reputationOf, bondedPairs, season, basePath: dayPath,
+      roster, currentDay, mercs, llm, fatigueOf, reputationOf, bondedPairs, season, fortUpgrades, basePath: dayPath,
     });
     for (const r of dueResolutions) {
       errandsResolved.push(r);
@@ -155,7 +156,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
       ? rngFor(scenario, i)
       : rngFromString(scenario.seed ?? scenario.id);
 
-    const resolution = await resolveScenario({ scenario, assignments, llm, rng, fatigueOf, reputationOf, bondedPairs, season });
+    const resolution = await resolveScenario({ scenario, assignments, llm, rng, fatigueOf, reputationOf, bondedPairs, season, fortUpgrades });
     scenarioResolutions.push(resolution);
     applyDeltas(resolution);
     if (roster) {
