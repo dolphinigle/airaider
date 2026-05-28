@@ -1,0 +1,78 @@
+{
+  "scenarioId": "raid-08-tax-riot",
+  "title": "Bread for the Yard",
+  "target": "settle the wage-riot at the Crow's Wing yard before it costs the fort its winter contracts",
+  "archetype": "build",
+  "partySize": 3,
+  "slotContributions": [
+    {
+      "slotId": "speak",
+      "mercId": "imogen",
+      "attrUsed": "charisma",
+      "attrScore": 5,
+      "tagsMatched": [
+        "pers:charming",
+        "bg:priest"
+      ],
+      "coinsContributed": 4,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    },
+    {
+      "slotId": "loom",
+      "mercId": "dren",
+      "attrUsed": "physical",
+      "attrScore": 4,
+      "tagsMatched": [
+        "temp:brave"
+      ],
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    },
+    {
+      "slotId": "thinking",
+      "mercId": "veska",
+      "attrUsed": "intelligence",
+      "attrScore": 6,
+      "tagsMatched": [
+        "bg:scholar"
+      ],
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    }
+  ],
+  "synergy": {
+    "pairs": [],
+    "bonusCoins": 0
+  },
+  "baseCoinBudget": 4,
+  "coinsActual": 4,
+  "rollFaces": [
+    "heads",
+    "tails",
+    "heads",
+    "heads"
+  ],
+  "heads": 3,
+  "tails": 1,
+  "band": "favorable",
+  "bandReason": "3/4 heads (favorable)",
+  "contributions": [
+    {
+      "mercId": "imogen",
+      "line": "I speak plainly, reminding the crew that the fort’s promises are thin, and their patience thinner."
+    },
+    {
+      "mercId": "dren",
+      "line": "Dren stands firm at the shoulder, his sword ready but silent, a silent reminder of the cost of violence."
+    },
+    {
+      "mercId": "veska",
+      "line": "Veska observes quietly, assessing who’s likely to listen and who’s just loudest in their anger."
+    }
+  ],
+  "outcomeNarrative": "Imogen’s words, backed by Dren’s steady presence and Veska’s keen eyes, manage to cool the worst of the crowd, convincing most to stand down without further bloodshed.",
+  "llmName": "openai:gpt-4.1-nano"
+}

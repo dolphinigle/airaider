@@ -1,0 +1,27 @@
+{
+  "id": "raid-07-plague",
+  "archetype": "contract",
+  "title": "The Quiet Village",
+  "target": "find out why no smoke has risen from Stelm village in eight days, and bring word back to the fort",
+  "slots": [
+    {
+      "id": "approach",
+      "description": "enter the village by the cart-path without being seen by whatever waits",
+      "preferredAttr": "agility",
+      "preferredTags": ["phys:quick", "temp:cautious"]
+    },
+    {
+      "id": "examine",
+      "description": "read the dead — what killed Stelm, and is it still here",
+      "preferredAttr": "intelligence",
+      "preferredTags": ["bg:scholar", "bg:priest"]
+    }
+  ],
+  "partySize": { "min": 2, "max": 2 },
+  "coinBudget": 3,
+  "assignments": [
+    { "slotId": "approach", "mercId": "roselle" },
+    { "slotId": "examine", "mercId": "imogen" }
+  ],
+  "seed": "raid-07-plague-deterministic"
+}

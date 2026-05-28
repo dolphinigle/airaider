@@ -1,0 +1,61 @@
+{
+  "scenarioId": "raid-07-plague",
+  "title": "The Quiet Village",
+  "target": "find out why no smoke has risen from Stelm village in eight days, and bring word back to the fort",
+  "archetype": "contract",
+  "partySize": 2,
+  "slotContributions": [
+    {
+      "slotId": "approach",
+      "mercId": "roselle",
+      "attrUsed": "agility",
+      "attrScore": 6,
+      "tagsMatched": [
+        "phys:quick",
+        "temp:cautious"
+      ],
+      "coinsContributed": 4,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    },
+    {
+      "slotId": "examine",
+      "mercId": "imogen",
+      "attrUsed": "intelligence",
+      "attrScore": 4,
+      "tagsMatched": [
+        "bg:priest"
+      ],
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    }
+  ],
+  "synergy": {
+    "pairs": [],
+    "bonusCoins": 0
+  },
+  "baseCoinBudget": 3,
+  "coinsActual": 3,
+  "rollFaces": [
+    "tails",
+    "tails",
+    "heads"
+  ],
+  "heads": 1,
+  "tails": 2,
+  "band": "unfavorable",
+  "bandReason": "1/3 heads (unfavorable)",
+  "contributions": [
+    {
+      "mercId": "roselle",
+      "line": "[mock] Roselle (Female) takes on \"enter the village by the cart-path without being seen by whatever waits\"."
+    },
+    {
+      "mercId": "imogen",
+      "line": "[mock] Imogen (Female) takes on \"read the dead — what killed Stelm, and is it still here\"."
+    }
+  ],
+  "outcomeNarrative": "[mock] A bruised partial; find out why no smoke has risen from Stelm village in eight days, and bring word back to the fort slips half-grasped, but no one is broken.",
+  "llmName": "mock"
+}

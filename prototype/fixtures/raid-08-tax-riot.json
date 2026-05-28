@@ -1,0 +1,34 @@
+{
+  "id": "raid-08-tax-riot",
+  "archetype": "build",
+  "title": "Bread for the Yard",
+  "target": "settle the wage-riot at the Crow's Wing yard before it costs the fort its winter contracts",
+  "slots": [
+    {
+      "id": "speak",
+      "description": "address the angry crew without making promises the fort cannot keep",
+      "preferredAttr": "charisma",
+      "preferredTags": ["pers:charming", "bg:priest"]
+    },
+    {
+      "id": "loom",
+      "description": "stand visibly armed at the speaker's shoulder",
+      "preferredAttr": "physical",
+      "preferredTags": ["phys:muscular", "temp:brave"]
+    },
+    {
+      "id": "thinking",
+      "description": "spot which men are loudest and which are listening",
+      "preferredAttr": "intelligence",
+      "preferredTags": ["pers:cynical", "bg:scholar"]
+    }
+  ],
+  "partySize": { "min": 3, "max": 3 },
+  "coinBudget": 4,
+  "assignments": [
+    { "slotId": "speak", "mercId": "imogen" },
+    { "slotId": "loom", "mercId": "dren" },
+    { "slotId": "thinking", "mercId": "veska" }
+  ],
+  "seed": "raid-08-tax-riot-deterministic"
+}

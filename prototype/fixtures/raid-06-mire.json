@@ -1,0 +1,34 @@
+{
+  "id": "raid-06-mire",
+  "archetype": "contract",
+  "title": "The Mire's Tribute",
+  "target": "retrieve the iron coffer the priest of Sevrenne dropped when the bog took him, before the next moon",
+  "slots": [
+    {
+      "id": "wade",
+      "description": "wade the sucking pools without losing the lantern",
+      "preferredAttr": "physical",
+      "preferredTags": ["phys:muscular", "temp:reckless"]
+    },
+    {
+      "id": "track",
+      "description": "follow the priest's last footprints by the tar-smell",
+      "preferredAttr": "intelligence",
+      "preferredTags": ["bg:hunter", "bg:scholar"]
+    },
+    {
+      "id": "watch",
+      "description": "hold the rear while shapes circle in the reeds",
+      "preferredAttr": "willpower",
+      "preferredTags": ["temp:brave", "pers:stoic"]
+    }
+  ],
+  "partySize": { "min": 3, "max": 3 },
+  "coinBudget": 4,
+  "assignments": [
+    { "slotId": "wade", "mercId": "marek" },
+    { "slotId": "track", "mercId": "veska" },
+    { "slotId": "watch", "mercId": "dren" }
+  ],
+  "seed": "raid-06-mire-deterministic"
+}

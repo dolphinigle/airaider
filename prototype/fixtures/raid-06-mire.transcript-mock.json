@@ -1,0 +1,84 @@
+{
+  "scenarioId": "raid-06-mire",
+  "title": "The Mire's Tribute",
+  "target": "retrieve the iron coffer the priest of Sevrenne dropped when the bog took him, before the next moon",
+  "archetype": "contract",
+  "partySize": 3,
+  "slotContributions": [
+    {
+      "slotId": "wade",
+      "mercId": "marek",
+      "attrUsed": "physical",
+      "attrScore": 5,
+      "tagsMatched": [
+        "phys:muscular"
+      ],
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    },
+    {
+      "slotId": "track",
+      "mercId": "veska",
+      "attrUsed": "intelligence",
+      "attrScore": 6,
+      "tagsMatched": [
+        "bg:scholar"
+      ],
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    },
+    {
+      "slotId": "watch",
+      "mercId": "dren",
+      "attrUsed": "willpower",
+      "attrScore": 4,
+      "tagsMatched": [
+        "temp:brave"
+      ],
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    }
+  ],
+  "synergy": {
+    "pairs": [
+      {
+        "mercA": "marek",
+        "mercB": "dren",
+        "sharedTagId": "temp:brave"
+      }
+    ],
+    "bonusCoins": 1
+  },
+  "baseCoinBudget": 4,
+  "coinsActual": 5,
+  "rollFaces": [
+    "heads",
+    "tails",
+    "heads",
+    "heads",
+    "tails"
+  ],
+  "heads": 3,
+  "tails": 2,
+  "band": "unfavorable",
+  "bandReason": "3/5 heads (split — pessimistic default)",
+  "contributions": [
+    {
+      "mercId": "marek",
+      "line": "[mock] Marek (Male) takes on \"wade the sucking pools without losing the lantern\"."
+    },
+    {
+      "mercId": "veska",
+      "line": "[mock] Veska (Female) takes on \"follow the priest's last footprints by the tar-smell\"."
+    },
+    {
+      "mercId": "dren",
+      "line": "[mock] Dren (Male) takes on \"hold the rear while shapes circle in the reeds\"."
+    }
+  ],
+  "outcomeNarrative": "[mock] A bruised partial; retrieve the iron coffer the priest of Sevrenne dropped when the bog took him, before the next moon slips half-grasped, but no one is broken.",
+  "llmName": "mock"
+}
