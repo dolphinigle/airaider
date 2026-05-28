@@ -12,6 +12,15 @@ import { loadRoster, saveRoster, rosterExists } from './roster.js';
 import { loadQuests, stirQuest, carrierOf } from './quests.js';
 
 function dataDirFor(rosterPath: string): string {
+  // First preference: the package's own data/ directory (resolved relative
+  // to this source file). This works for any roster path the user passes
+  // in. The original implementation derived data/ from the roster's
+  // parent-parent dir, which broke when the roster lived outside the
+  // prototype tree (e.g. /tmp/pt.json -> looked at /data/tags.json).
+  const here = fileURLToPath(import.meta.url);
+  const packaged = resolve(dirname(here), '..', 'data');
+  if (existsSync(join(packaged, 'tags.json'))) return packaged;
+  // Fallback for callers who really want a roster-co-located data dir.
   return resolve(dirname(rosterPath), '..', 'data');
 }
 
