@@ -14,6 +14,7 @@ import { reputationTier } from './reputation.js';
 import { statusAlerts, watchTowerForecast } from './rosterAlerts.js';
 import { seasonFor, DAYS_PER_SEASON } from './season.js';
 import { loadQuests } from './quests.js';
+import { bondedPairsOf } from './bonds.js';
 
 function main(): void {
   const [cmd, pathArg] = process.argv.slice(2);
@@ -89,6 +90,18 @@ function printRoster(r: Roster, path: string): void {
     const vGain = st && st.veterancyGain > 0 ? `  v+${st.veterancyGain}` : '';
     const tier = st && st.tier !== 'rookie' ? `  ${st.tier}` : '';
     console.log(`  • ${m.name} [${m.id}]${tier}${fatigue}${dmg}${vGain}`);
+  }
+  // M16.1: surface currently-bonded pairs so the player can see emergent
+  // comradeship. Bonded pairs are derived from co-deployment counters.
+  const bondKeys = bondedPairsOf(r);
+  if (bondKeys.size > 0) {
+    const nameOf = (id: string): string => r.mercs.find((m) => m.id === id)?.name ?? id;
+    console.log(`\nBonded pairs (${bondKeys.size}):`);
+    for (const key of [...bondKeys].sort()) {
+      const [a, b] = key.split('|');
+      if (!a || !b) continue;
+      console.log(`  ⤬ ${nameOf(a)} [${a}] ⇔ ${nameOf(b)} [${b}]`);
+    }
   }
   if (r.hirePool.length > 0) {
     console.log(`\nTavern bench (${r.hirePool.length}):`);
