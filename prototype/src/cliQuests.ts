@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { loadTags } from './tags.js';
 import { loadMercs } from './mercs.js';
 import { loadRoster, saveRoster, rosterExists } from './roster.js';
-import { loadQuests, stirQuest, carrierOf } from './quests.js';
+import { loadQuests, stirQuest, abandonQuest, carrierOf } from './quests.js';
 
 function dataDirFor(rosterPath: string): string {
   // First preference: the package's own data/ directory (resolved relative
@@ -30,6 +30,7 @@ function printUsage(): void {
   npm run quests -- list
   npm run quests -- show <roster.json>
   npm run quests -- stir <roster.json> <quest-id>
+  npm run quests -- abandon <roster.json> <quest-id>
 `,
   );
 }
@@ -108,6 +109,20 @@ async function main(): Promise<void> {
     stirQuest(roster, q, carrier);
     saveRoster(rosterPath, roster, mercsPool);
     console.log(`Stirred "${q.name}" on ${rosterPath} (carrier: ${carrier ?? 'unknown'})`);
+    return;
+  }
+
+  if (sub === 'abandon') {
+    const questId = args[2];
+    if (!questId) { printUsage(); process.exit(2); }
+    const result = abandonQuest(roster, questId, catalog);
+    if (!result) {
+      console.error(`No active quest with id "${questId}" on this roster.`);
+      process.exit(4);
+    }
+    saveRoster(rosterPath, roster, mercsPool);
+    console.log(`Abandoned "${result.questName}" (${result.questId}) at stage ${result.stageIndex}.`);
+    console.log(`  Reputation: ${result.reputationFaction} −${result.reputationPenalty} (now ${roster.reputation[result.reputationFaction] ?? 0}).`);
     return;
   }
 

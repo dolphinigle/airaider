@@ -10,6 +10,8 @@ import {
   advanceQuestsForScenario,
   carrierOf,
   findEnemyFactionStirrableQuests,
+  abandonQuest,
+  QUEST_ABANDON_REPUTATION_PENALTY,
 } from '../src/quests.js';
 import type { Merc } from '../src/types.js';
 
@@ -124,5 +126,47 @@ describe('M13.1 enemy-faction quest auto-stir', () => {
     const stirrable = findEnemyFactionStirrableQuests(r, catalog, ['lowmark-guild']);
     // echoes-of-the-mire has only seededByTag, not seededByEnemyFaction
     expect(stirrable.map((q) => q.id)).not.toContain('echoes-of-the-mire');
+  });
+});
+
+describe('M13.3 quest abandonment', () => {
+  const tags = loadTags(TAGS_PATH);
+  const mercs = loadMercs(MERCS_PATH, tags);
+  const catalog = loadQuests(QUESTS_PATH);
+
+  it('drops an active quest and applies the reputation penalty', () => {
+    const marek = mercs.get('marek')!;
+    const r = newRoster([marek]);
+    const q = [...catalog.values()].find((qq) => qq.seededByEnemyFaction === 'lowmark-guild')!;
+    stirQuest(r, q, undefined);
+    expect(r.activeQuests.some((a) => a.questId === q.id)).toBe(true);
+    const factionBefore = r.reputation[q.rewardOnComplete.reputationGain] ?? 0;
+    const res = abandonQuest(r, q.id, catalog);
+    expect(res).toBeDefined();
+    expect(res!.questId).toBe(q.id);
+    expect(res!.reputationFaction).toBe(q.rewardOnComplete.reputationGain);
+    expect(res!.reputationPenalty).toBe(QUEST_ABANDON_REPUTATION_PENALTY);
+    expect(r.activeQuests.some((a) => a.questId === q.id)).toBe(false);
+    expect(r.completedQuests.some((c) => c.questId === q.id)).toBe(false);
+    expect(r.reputation[q.rewardOnComplete.reputationGain]).toBe(
+      factionBefore - QUEST_ABANDON_REPUTATION_PENALTY,
+    );
+  });
+
+  it('returns undefined when the quest is not active', () => {
+    const marek = mercs.get('marek')!;
+    const r = newRoster([marek]);
+    const res = abandonQuest(r, 'nonexistent-quest', catalog);
+    expect(res).toBeUndefined();
+  });
+
+  it('does not abandon completed quests', () => {
+    const marek = mercs.get('marek')!;
+    const r = newRoster([marek]);
+    const q = [...catalog.values()][0]!;
+    r.completedQuests.push({ questId: q.id, dayCompleted: 1 });
+    const res = abandonQuest(r, q.id, catalog);
+    expect(res).toBeUndefined();
+    expect(r.completedQuests.some((c) => c.questId === q.id)).toBe(true);
   });
 });

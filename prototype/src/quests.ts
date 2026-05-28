@@ -149,3 +149,47 @@ export function advanceQuestsForScenario(
   roster.activeQuests = still;
   return { advanced, completed };
 }
+
+/** M13.3: penalty applied (per quest) when the player abandons an active quest. */
+export const QUEST_ABANDON_REPUTATION_PENALTY = 1;
+
+export interface QuestAbandonResult {
+  questId: string;
+  questName: string;
+  stageIndex: number;
+  reputationFaction: string;
+  reputationPenalty: number;
+}
+
+/**
+ * M13.3: drop an active quest by id, applying a small reputation penalty
+ * to the faction whose standing would have benefited on completion. The
+ * abandoned quest is NOT moved to `completedQuests` — it simply vanishes
+ * from `activeQuests` and remains stirrable again later if its seed
+ * condition recurs (legendary-tag carrier still on roster, or enemy
+ * faction still at enemy tier next day).
+ *
+ * Returns the abandon record, or `undefined` if no active quest with
+ * that id was found.
+ */
+export function abandonQuest(
+  roster: Roster,
+  questId: string,
+  catalog: Map<string, Quest>,
+  penalty: number = QUEST_ABANDON_REPUTATION_PENALTY,
+): QuestAbandonResult | undefined {
+  const idx = roster.activeQuests.findIndex((q) => q.questId === questId);
+  if (idx < 0) return undefined;
+  const aq = roster.activeQuests[idx]!;
+  const q = catalog.get(questId);
+  const factionId = q?.rewardOnComplete.reputationGain ?? 'unknown';
+  roster.activeQuests.splice(idx, 1);
+  roster.reputation[factionId] = (roster.reputation[factionId] ?? 0) - penalty;
+  return {
+    questId,
+    questName: q?.name ?? questId,
+    stageIndex: aq.stageIndex,
+    reputationFaction: factionId,
+    reputationPenalty: penalty,
+  };
+}
