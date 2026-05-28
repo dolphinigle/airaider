@@ -27,6 +27,8 @@ const MercStateSchema = z.object({
   xp: z.number().int().min(0).default(0),
   /** M6.1: derived from xp, persisted for convenience. v5+. */
   tier: z.enum(['rookie', 'veteran', 'grizzled']).default('rookie'),
+  /** M6.2: co-deployment counters keyed by partner merc id. v6+. */
+  coDeployments: z.record(z.string(), z.number().int().min(0)).default({}),
 });
 
 const GeneratedMercSchema = z.object({
@@ -84,7 +86,7 @@ const PendingErrandSchema = z.object({
 });
 
 const RoasterSchema = z.object({
-  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5)]).default(5),
+  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6)]).default(6),
   dayCount: z.number().int().min(0).default(0),
   gold: z.number().int().default(0),
   reputation: z.record(z.string(), z.number().int()).default({}),
@@ -112,7 +114,7 @@ export type RosterPendingErrand = z.infer<typeof PendingErrandSchema>;
 export type RosterFile = z.infer<typeof RoasterSchema>;
 
 export interface Roster {
-  schemaVersion: 5;
+  schemaVersion: 6;
   dayCount: number;
   gold: number;
   reputation: Record<string, number>;
@@ -133,12 +135,12 @@ export interface Roster {
 
 export function newRoster(initialMercs: Merc[]): Roster {
   return {
-    schemaVersion: 5,
+    schemaVersion: 6,
     dayCount: 0,
     gold: 0,
     reputation: {},
     mercs: initialMercs,
-    states: new Map(initialMercs.map((m) => [m.id, { id: m.id, fatigue: 0, hpDamage: 0, veterancyGain: 0, xp: 0, tier: 'rookie' }])),
+    states: new Map(initialMercs.map((m) => [m.id, { id: m.id, fatigue: 0, hpDamage: 0, veterancyGain: 0, xp: 0, tier: 'rookie', coDeployments: {} }])),
     captives: [],
     deceased: [],
     activeQuests: [],
@@ -181,7 +183,7 @@ export function loadRoster(
     parsed.mercStates.map((s) => [s.id, s]),
   );
   for (const m of mercs) {
-    if (!states.has(m.id)) states.set(m.id, { id: m.id, fatigue: 0, hpDamage: 0, veterancyGain: 0, xp: 0, tier: 'rookie' });
+    if (!states.has(m.id)) states.set(m.id, { id: m.id, fatigue: 0, hpDamage: 0, veterancyGain: 0, xp: 0, tier: 'rookie', coDeployments: {} });
   }
   const captives: Captive[] = parsed.captives.map((c) => ({
     id: c.id,
@@ -197,7 +199,7 @@ export function loadRoster(
   }));
 
   return {
-    schemaVersion: 5,
+    schemaVersion: 6,
     dayCount: parsed.dayCount,
     gold: parsed.gold,
     reputation: parsed.reputation,
@@ -235,7 +237,7 @@ export function saveRoster(
     }
   }
   const file: RosterFile = {
-    schemaVersion: 5,
+    schemaVersion: 6,
     dayCount: roster.dayCount,
     gold: roster.gold,
     reputation: roster.reputation,
@@ -272,7 +274,7 @@ export function applyCaptiveEffect(
   if (effect.recruitedAs) {
     roster.mercs.push(effect.recruitedAs);
     roster.states.set(effect.recruitedAs.id, {
-      id: effect.recruitedAs.id, fatigue: 0, hpDamage: 0, veterancyGain: 0, xp: 0, tier: 'rookie',
+      id: effect.recruitedAs.id, fatigue: 0, hpDamage: 0, veterancyGain: 0, xp: 0, tier: 'rookie', coDeployments: {},
     });
     roster.captives = roster.captives.filter((c) => c.id !== captive.id);
   }
@@ -294,7 +296,7 @@ export function applyCasualties(
     if (!merc) continue;
     const state =
       roster.states.get(c.mercId) ??
-      { id: c.mercId, fatigue: 0, hpDamage: 0, veterancyGain: 0, xp: 0, tier: 'rookie' as const };
+      { id: c.mercId, fatigue: 0, hpDamage: 0, veterancyGain: 0, xp: 0, tier: 'rookie' as const, coDeployments: {} };
     state.hpDamage += c.damage;
     roster.states.set(c.mercId, state);
     if (state.hpDamage >= merc.hp) {

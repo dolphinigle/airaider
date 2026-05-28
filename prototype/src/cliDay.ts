@@ -140,7 +140,7 @@ async function main(): Promise<void> {
   if (roster && rosterAbs) {
     roster.dayCount += 1;
     for (const [mercId, fatigue] of Object.entries(resolution.finalFatigue)) {
-      const s = roster.states.get(mercId) ?? { id: mercId, fatigue: 0, hpDamage: 0, veterancyGain: 0, xp: 0, tier: 'rookie' as const };
+      const s = roster.states.get(mercId) ?? { id: mercId, fatigue: 0, hpDamage: 0, veterancyGain: 0, xp: 0, tier: 'rookie' as const, coDeployments: {} };
       s.fatigue = fatigue;
       roster.states.set(mercId, s);
     }

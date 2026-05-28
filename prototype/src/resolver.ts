@@ -20,6 +20,8 @@ export interface ResolutionInput {
   approachId?: string;
   /** M5.5: current reputation per faction id (read-only). */
   reputationOf?: (factionId: string) => number;
+  /** M6.2: set of bonded pair keys (use `bonds.pairKey`). */
+  bondedPairs?: Set<string>;
 }
 
 export interface SlotContribution {
@@ -98,7 +100,10 @@ export interface SlotContribOptions {
   fatigueOf?: (mercId: string) => number;
 }
 
-export function computePartySynergy(assignments: Assignment[]): PartySynergy {
+export function computePartySynergy(
+  assignments: Assignment[],
+  bondedPairs?: Set<string>,
+): PartySynergy {
   const pairs: PartySynergy['pairs'] = [];
   for (let i = 0; i < assignments.length; i++) {
     for (let j = i + 1; j < assignments.length; j++) {
@@ -109,6 +114,12 @@ export function computePartySynergy(assignments: Assignment[]): PartySynergy {
         if (!SYNERGY_PREFIXES.some((p) => tag.id.startsWith(p))) continue;
         if (aTagIds.has(tag.id)) {
           pairs.push({ mercA: a.id, mercB: b.id, sharedTagId: tag.id });
+        }
+      }
+      if (bondedPairs) {
+        const key = a.id < b.id ? `${a.id}|${b.id}` : `${b.id}|${a.id}`;
+        if (bondedPairs.has(key)) {
+          pairs.push({ mercA: a.id, mercB: b.id, sharedTagId: 'bond:trusts' });
         }
       }
     }
@@ -211,7 +222,7 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
     }
   }
 
-  const synergy = computePartySynergy(assignments);
+  const synergy = computePartySynergy(assignments, input.bondedPairs);
   const summed =
     slotContributions.reduce((s, c) => s + c.coinsContributed, 0) + synergy.bonusCoins;
   const partyBonus = Math.max(0, assignments.length - scenario.partySize.min);

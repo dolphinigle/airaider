@@ -15,6 +15,7 @@ import {
 import type { Roster, RosterPendingErrand } from './roster.js';
 import { dispatchErrand, resolveDueErrands } from './errands.js';
 import { applyVeterancyXp, type Promotion } from './veterancy.js';
+import { recordCoDeployment, bondedPairsOf, type BondFormation } from './bonds.js';
 
 const DaySchema = z.object({
   id: z.string().min(1),
@@ -61,6 +62,8 @@ export interface DayResolution {
   errandsResolved: ScenarioResolution[];
   /** M6.1: veterancy tier crossings during the day (roster-mode only). */
   promotions: Promotion[];
+  /** M6.2: pairs that crossed the bond threshold today (roster-mode only). */
+  bondsFormed: BondFormation[];
 }
 
 /**
@@ -78,6 +81,8 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   const errandsDispatched: RosterPendingErrand[] = [];
   const errandsResolved: ScenarioResolution[] = [];
   const promotions: Promotion[] = [];
+  const bondsFormed: BondFormation[] = [];
+  const bondedPairs = roster ? bondedPairsOf(roster) : undefined;
   const reputationOf = roster
     ? (factionId: string): number => roster.reputation[factionId] ?? 0
     : undefined;
@@ -101,6 +106,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
       applyDeltas(r);
       if (roster) {
         promotions.push(...applyVeterancyXp(roster, r.slotContributions.map((sc) => sc.mercId), r.band));
+        bondsFormed.push(...recordCoDeployment(roster, r.slotContributions.map((sc) => sc.mercId)));
       }
       // Errands cost 1 fatigue per participating merc on return day.
       for (const a of r.slotContributions) {
@@ -144,11 +150,12 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
       ? rngFor(scenario, i)
       : rngFromString(scenario.seed ?? scenario.id);
 
-    const resolution = await resolveScenario({ scenario, assignments, llm, rng, fatigueOf, reputationOf });
+    const resolution = await resolveScenario({ scenario, assignments, llm, rng, fatigueOf, reputationOf, bondedPairs });
     scenarioResolutions.push(resolution);
     applyDeltas(resolution);
     if (roster) {
       promotions.push(...applyVeterancyXp(roster, assignments.map((a) => a.merc.id), resolution.band));
+      bondsFormed.push(...recordCoDeployment(roster, assignments.map((a) => a.merc.id)));
     }
 
     for (const a of assignments) {
@@ -167,5 +174,6 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     errandsDispatched,
     errandsResolved,
     promotions,
+    bondsFormed,
   };
 }

@@ -50,6 +50,13 @@ export function renderDayTranscript(day: DayResolution): string {
       lines.push(`   ★ ${p.mercId}: ${p.fromTier} → ${p.toTier}  (xp ${p.xpAfter})`);
     }
   }
+  if (day.bondsFormed.length > 0) {
+    lines.push('');
+    lines.push(' BONDS FORMED:');
+    for (const b of day.bondsFormed) {
+      lines.push(`   ⚭ ${b.mercA} ↔ ${b.mercB}  (day ${b.onDay})`);
+    }
+  }
   lines.push(DBAR);
   return lines.join('\n');
 }

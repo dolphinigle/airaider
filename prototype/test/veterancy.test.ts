@@ -85,7 +85,7 @@ describe('M6.1 veterancy progression', () => {
       // Save round-trips as v5.
       saveRoster(TMP, loaded, mercs);
       const onDisk = JSON.parse(readFileSync(TMP, 'utf8'));
-      expect(onDisk.schemaVersion).toBe(5);
+      expect(onDisk.schemaVersion).toBe(6);
       expect(onDisk.mercStates[0].tier).toBe('rookie');
     } finally {
       if (existsSync(TMP)) rmSync(TMP);
