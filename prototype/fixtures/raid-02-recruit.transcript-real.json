@@ -1,0 +1,57 @@
+{
+  "scenarioId": "raid-02",
+  "title": "The Coward at the Crossroads",
+  "target": "decide whether to hire the deserter loitering outside the chapel",
+  "archetype": "recruit",
+  "partySize": 2,
+  "slotContributions": [
+    {
+      "slotId": "read-character",
+      "mercId": "veska",
+      "attrUsed": "intelligence",
+      "attrScore": 6,
+      "tagsMatched": [
+        "pers:stoic"
+      ],
+      "coinsContributed": 3
+    },
+    {
+      "slotId": "persuade",
+      "mercId": "imogen",
+      "attrUsed": "charisma",
+      "attrScore": 5,
+      "tagsMatched": [
+        "pers:charming"
+      ],
+      "coinsContributed": 3
+    }
+  ],
+  "synergy": {
+    "pairs": [],
+    "bonusCoins": 0
+  },
+  "baseCoinBudget": 4,
+  "coinsActual": 4,
+  "rollFaces": [
+    "tails",
+    "heads",
+    "heads",
+    "heads"
+  ],
+  "heads": 3,
+  "tails": 1,
+  "band": "favorable",
+  "bandReason": "3/4 heads (favorable)",
+  "contributions": [
+    {
+      "mercId": "veska",
+      "line": "Veska's keen eyes catch the slight twitch in his hand, betraying his rehearsed lies."
+    },
+    {
+      "mercId": "imogen",
+      "line": "Imogen's warm smile and gentle tone coax out his real reason for fleeing, revealing desperation."
+    }
+  ],
+  "outcomeNarrative": "Veska's sharp perception and Imogen's charm uncover the deserter's true fear, convincing the team to take a chance on him despite the risks.",
+  "llmName": "openai:gpt-4.1-nano"
+}

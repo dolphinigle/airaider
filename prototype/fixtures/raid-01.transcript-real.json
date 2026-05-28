@@ -26,6 +26,10 @@
       "coinsContributed": 3
     }
   ],
+  "synergy": {
+    "pairs": [],
+    "bonusCoins": 0
+  },
   "baseCoinBudget": 3,
   "coinsActual": 3,
   "rollFaces": [
@@ -40,13 +44,13 @@
   "contributions": [
     {
       "mercId": "marek",
-      "line": "Marek's brute strength failed to crack the stubborn iron lock despite his muscular build."
+      "line": "Marek, with his soldier's brawn, struggles to crack the iron strongbox's lock, but the rust is tough."
     },
     {
       "mercId": "roselle",
-      "line": "Roselle's cautious approach was betrayed by her overconfidence, and she was spotted slipping past the sentry."
+      "line": "Roselle, nimble and cautious, tries to slip past the brigand sentry, but he hears her and alerts the camp."
     }
   ],
-  "outcomeNarrative": "The brigands caught wind of the attempt, forcing the mercenaries into a hasty retreat with the wagon still in enemy hands.",
+  "outcomeNarrative": "The brigands catch wind of the intrusion, forcing the mercs into a hasty retreat, leaving the salt-merchant's wagon behind.",
   "llmName": "openai:gpt-4.1-nano"
 }

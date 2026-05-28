@@ -1,0 +1,59 @@
+{
+  "scenarioId": "raid-03",
+  "title": "The Brigand's Tongue",
+  "target": "wring the location of the bandit cache out of the prisoner before dawn",
+  "archetype": "captive",
+  "partySize": 2,
+  "slotContributions": [
+    {
+      "slotId": "intimidate",
+      "mercId": "marek",
+      "attrUsed": "physical",
+      "attrScore": 5,
+      "tagsMatched": [
+        "phys:muscular",
+        "temp:brave"
+      ],
+      "coinsContributed": 4
+    },
+    {
+      "slotId": "read-lies",
+      "mercId": "veska",
+      "attrUsed": "willpower",
+      "attrScore": 5,
+      "tagsMatched": [
+        "pers:stoic"
+      ],
+      "coinsContributed": 3
+    }
+  ],
+  "synergy": {
+    "pairs": [],
+    "bonusCoins": 0
+  },
+  "baseCoinBudget": 5,
+  "coinsActual": 5,
+  "rollFaces": [
+    "heads",
+    "heads",
+    "tails",
+    "heads",
+    "heads"
+  ],
+  "heads": 4,
+  "tails": 1,
+  "band": "favorable",
+  "bandReason": "4/5 heads (favorable)",
+  "contributions": [
+    {
+      "mercId": "marek",
+      "line": "Marek's muscular presence and soldier's grit force the prisoner into trembling silence, his false calm cracking."
+    },
+    {
+      "mercId": "veska",
+      "line": "Veska's sharp eyes catch inconsistencies in the man's story, her stoic patience wearing him down."
+    }
+  ],
+  "outcomeNarrative": "Between Marek's intimidation and Veska's keen perception, the prisoner faltered, revealing the bandit cache's location before dawn.",
+  "llmName": "openai:gpt-4.1-nano"
+}
