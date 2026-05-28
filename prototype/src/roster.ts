@@ -369,9 +369,15 @@ export function applyCaptiveEffect(
     roster.captives = roster.captives.filter((c) => c.id !== captive.id);
   }
   if (effect.recruitedAs) {
-    roster.mercs.push(effect.recruitedAs);
-    roster.states.set(effect.recruitedAs.id, {
-      id: effect.recruitedAs.id, fatigue: 0, hpDamage: 0, veterancyGain: 0, xp: 0, tier: 'rookie', coDeployments: {},
+    // M11.2: recruited captives are posted to the tavern bench at a
+    // discount price (effect.benchPrice). The player must still pay to
+    // hire them via the normal tavern flow; until then they sit on the
+    // bench. The captive record is consumed.
+    const price = effect.benchPrice ?? 1;
+    roster.hirePool.push({
+      merc: effect.recruitedAs,
+      price,
+      postedDay: roster.dayCount,
     });
     roster.captives = roster.captives.filter((c) => c.id !== captive.id);
   }

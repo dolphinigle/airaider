@@ -101,3 +101,28 @@ describe('M7.3 recruit gated by fort level', () => {
     expect(e.recruitedAs).toBeDefined();
   });
 });
+
+describe('M11.2 captive recruit lands on tavern bench', () => {
+  it('successful recruit returns a benchPrice paired with recruitedAs', () => {
+    const e = effectOf(KAEL, 'recruit');
+    expect(e.recruitedAs).toBeDefined();
+    expect(e.benchPrice).toBeDefined();
+    expect(e.benchPrice).toBeGreaterThan(0);
+  });
+
+  it('benchPrice scales with notoriety but stays at a discount vs base price', () => {
+    const low = { ...KAEL, notoriety: 1 };
+    const high = { ...KAEL, notoriety: 5 };
+    const lo = effectOf(low, 'recruit').benchPrice!;
+    const hi = effectOf(high, 'recruit').benchPrice!;
+    expect(lo).toBeLessThan(hi);
+    // HIRE_BASE_PRICE is 5 — low-notoriety captives undercut it.
+    expect(lo).toBeLessThan(5);
+  });
+
+  it('blocked recruit (fort too low) carries no benchPrice', () => {
+    const e = effectOf(KAEL, 'recruit', { fortLevel: 1 });
+    expect(e.blocked).toBeDefined();
+    expect(e.benchPrice).toBeUndefined();
+  });
+});

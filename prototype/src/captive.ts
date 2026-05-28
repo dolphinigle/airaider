@@ -35,8 +35,14 @@ export interface CaptiveEffect {
   reputationGain: 'merciful' | 'mercenary' | 'feared' | 'just' | 'ruthless';
   /** If true, the captive is consumed (no longer in roster / world). */
   captiveRemoved: boolean;
-  /** If set, the captive joins the player roster as a fresh merc (loyalty 0). */
+  /** If set, the captive joins the player roster as a fresh merc (loyalty 0).
+   *  M11.2: when accompanied by `benchPrice`, the captive is dropped onto
+   *  the tavern bench at that discount price instead of straight into the
+   *  active roster — the player still has to pay to hire them. */
   recruitedAs?: Merc;
+  /** M11.2: discount price at which `recruitedAs` is posted to the hire
+   *  bench. Always present when `recruitedAs` is, set by `effectOf`. */
+  benchPrice?: number;
   /**
    * M7.3: when set, the disposition is unavailable in the current fort
    * context (e.g. recruit blocked because fort level is too low). The
@@ -48,6 +54,13 @@ export interface CaptiveEffect {
 
 /** M7.3: minimum fort level required to take on a captive as a recruit. */
 export const RECRUIT_MIN_FORT_LEVEL = 2;
+
+/** M11.2: discount price (gold) at which a recruited captive is posted to the
+ *  tavern bench. Scales with notoriety but consistently undercuts the standard
+ *  HIRE_BASE_PRICE (5g) for low-notoriety captives. */
+export function captiveBenchPrice(notoriety: number): number {
+  return Math.max(1, notoriety + 1);
+}
 
 export interface EffectContext {
   /** When provided AND action='recruit', a fortLevel below the minimum
@@ -101,6 +114,7 @@ export function effectOf(
         reputationGain: 'mercenary',
         captiveRemoved: false,
         recruitedAs: captiveToMerc(captive),
+        benchPrice: captiveBenchPrice(captive.notoriety),
       };
     case 'execute':
       return {

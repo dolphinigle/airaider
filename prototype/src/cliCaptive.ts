@@ -144,7 +144,7 @@ function printTranscript(t: {
     const gold = e.goldDelta > 0 ? `+${e.goldDelta}g` : (e.goldDelta < 0 ? `${e.goldDelta}g` : '0g');
     const tail = e.blocked
       ? `  → BLOCKED (${e.blocked.reason})`
-      : (e.recruitedAs ? '  → recruited' : '');
+      : (e.recruitedAs ? `  → posted to tavern bench @ ${e.benchPrice}g` : '');
     console.log(`\n[${d.action.toUpperCase()}]  ${gold}  rep:${e.reputationGain}` + tail);
     console.log(`  ${d.narration.outcomeNarrative}`);
     console.log(`  ${d.narration.captiveLine}`);

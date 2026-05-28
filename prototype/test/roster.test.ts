@@ -59,12 +59,16 @@ describe('roster persistence', () => {
     r.captives.push(captive);
     const effect = effectOf(captive, 'recruit');
     applyCaptiveEffect(r, captive, effect);
-    expect(r.mercs.some((m) => m.id === 'recruit-cap1')).toBe(true);
+    expect(r.hirePool.some((h) => h.merc.id === 'recruit-cap1')).toBe(true);
+    expect(r.mercs.some((m) => m.id === 'recruit-cap1')).toBe(false);
     expect(r.captives.length).toBe(0);
+    const benched = r.hirePool.find((h) => h.merc.id === 'recruit-cap1')!;
+    expect(benched.price).toBeGreaterThan(0);
+    expect(benched.price).toBeLessThan(5); // discounted vs HIRE_BASE_PRICE
     const p = join(tmp, 'r.json');
     saveRoster(p, r, basePool);
     const reloaded = loadRoster(p, basePool, tags);
-    expect(reloaded.mercs.some((m) => m.id === 'recruit-cap1' && m.name === 'Kael')).toBe(true);
+    expect(reloaded.hirePool.some((h) => h.merc.id === 'recruit-cap1' && h.merc.name === 'Kael')).toBe(true);
     rmSync(tmp, { recursive: true, force: true });
   });
 
