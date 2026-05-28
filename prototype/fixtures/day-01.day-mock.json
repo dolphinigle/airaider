@@ -224,5 +224,6 @@
   "dailyEvent": null,
   "fortHints": [],
   "newFortLogEntries": [],
-  "fatigueRecovery": []
+  "fatigueRecovery": [],
+  "woundHealing": []
 }

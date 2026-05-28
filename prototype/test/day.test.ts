@@ -106,3 +106,61 @@ describe('M7.10 end-of-day fatigue recovery', () => {
     expect(out.finalFatigue['marek']).toBe(3);
   });
 });
+
+describe('M7.12 chapel wound healing', () => {
+  it('idle merc with hpDamage > 0 heals 1 when chapel built', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+    const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+    const dayPath = join(ROOT, 'fixtures', 'day-01.json');
+    const day = loadDay(dayPath);
+    const r = newRoster([...mercs.values()]);
+    r.fort.upgrades.push('chapel');
+    r.states.get('imogen')!.hpDamage = 2; // imogen is idle in day-01
+    r.states.get('dren')!.hpDamage = 0;   // dren idle but no wound
+    const initialFatigue = new Map<string, number>([...r.states.entries()].map(([id, s]) => [id, s.fatigue]));
+    const out = await resolveDay({ day, dayPath, mercs, llm: new MockScenarioLLM(), roster: r, initialFatigue });
+    const imo = out.woundHealing.find((x) => x.mercId === 'imogen');
+    expect(imo).toEqual({ mercId: 'imogen', before: 2, after: 1 });
+    expect(out.woundHealing.some((x) => x.mercId === 'dren')).toBe(false);
+    expect(r.states.get('imogen')!.hpDamage).toBe(1);
+  });
+
+  it('does NOT heal without chapel', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+    const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+    const dayPath = join(ROOT, 'fixtures', 'day-01.json');
+    const day = loadDay(dayPath);
+    const r = newRoster([...mercs.values()]);
+    r.states.get('imogen')!.hpDamage = 2;
+    const initialFatigue = new Map<string, number>([...r.states.entries()].map(([id, s]) => [id, s.fatigue]));
+    const out = await resolveDay({ day, dayPath, mercs, llm: new MockScenarioLLM(), roster: r, initialFatigue });
+    expect(out.woundHealing).toEqual([]);
+    expect(r.states.get('imogen')!.hpDamage).toBe(2);
+  });
+
+  it('does NOT heal deployed mercs even with chapel', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+    const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+    const dayPath = join(ROOT, 'fixtures', 'day-01.json');
+    const day = loadDay(dayPath);
+    const r = newRoster([...mercs.values()]);
+    r.fort.upgrades.push('chapel');
+    r.states.get('marek')!.hpDamage = 2; // marek IS deployed in day-01
+    const initialFatigue = new Map<string, number>([...r.states.entries()].map(([id, s]) => [id, s.fatigue]));
+    const out = await resolveDay({ day, dayPath, mercs, llm: new MockScenarioLLM(), roster: r, initialFatigue });
+    expect(out.woundHealing.some((x) => x.mercId === 'marek')).toBe(false);
+    expect(r.states.get('marek')!.hpDamage).toBe(2);
+  });
+
+  it('returns empty woundHealing in roster-less mode', async () => {
+    const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+    const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+    const dayPath = join(ROOT, 'fixtures', 'day-01.json');
+    const day = loadDay(dayPath);
+    const out = await resolveDay({ day, dayPath, mercs, llm: new MockScenarioLLM() });
+    expect(out.woundHealing).toEqual([]);
+  });
+});

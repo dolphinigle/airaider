@@ -19,6 +19,7 @@ import { applyVeterancyXp, type Promotion } from './veterancy.js';
 import { recordCoDeployment, bondedPairsOf, type BondFormation } from './bonds.js';
 import { seasonFor, type SeasonClock } from './season.js';
 import { loadEventCatalog, rollEventForDay, type DailyEvent } from './events.js';
+import { fortEffectsFor, chapelHealsWounds } from './fortEffects.js';
 import { affordableUpgrades, loadFortCatalog, type FortUpgrade } from './fort.js';
 
 const DaySchema = z.object({
@@ -83,6 +84,11 @@ export interface DayResolution {
    * in roster-less mode.
    */
   fatigueRecovery: Array<{ mercId: string; before: number; after: number }>;
+  /**
+   * M7.12: end-of-day wound healing from the chapel. Empty unless the fort
+   * has the chapel upgrade AND idle mercs had hpDamage > 0.
+   */
+  woundHealing: Array<{ mercId: string; before: number; after: number }>;
   /**
    * M7.6: fort log entries appended during THIS day (currently only the
    * daily-event entry; upgrade purchases happen via the fort CLI, not the day
@@ -256,6 +262,30 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   const finalFatigue: Record<string, number> = {};
   for (const [k, v] of fatigue) finalFatigue[k] = v;
 
+  // M7.12: chapel wound healing. Mirrors fatigue recovery — idle mercs with
+  // hpDamage > 0 heal 1 hp damage if the fort has the chapel upgrade. The
+  // healed value is mutated directly onto the roster state (single source
+  // of truth for hp damage; cliDay does NOT round-trip hpDamage the way it
+  // does fatigue, because hp damage already lives on roster.states).
+  const woundHealing: Array<{ mercId: string; before: number; after: number }> = [];
+  if (roster && chapelHealsWounds(fortEffectsFor(roster.fort.upgrades))) {
+    const deployed = new Set<string>();
+    for (const sr of scenarioResolutions) {
+      for (const sc of sr.slotContributions) deployed.add(sc.mercId);
+    }
+    const onErrand = new Set<string>();
+    for (const e of roster.pendingErrands) for (const id of e.partyMercIds) onErrand.add(id);
+    for (const m of roster.mercs) {
+      if (deployed.has(m.id) || onErrand.has(m.id)) continue;
+      const state = roster.states.get(m.id);
+      if (!state || state.hpDamage <= 0) continue;
+      const before = state.hpDamage;
+      state.hpDamage = before - 1;
+      woundHealing.push({ mercId: m.id, before, after: state.hpDamage });
+    }
+  }
+
+
   // M7.5: compute affordable fort upgrades as of end-of-day so the
   // transcript can nudge the player with a FORT HINT block.
   let fortHints: Pick<FortUpgrade, 'id' | 'name' | 'cost' | 'description'>[] = [];
@@ -282,5 +312,6 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     fortHints,
     newFortLogEntries,
     fatigueRecovery,
+    woundHealing,
   };
 }

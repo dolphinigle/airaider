@@ -13,7 +13,9 @@
 //                            (better kit, sharper blades)
 //   - watch-tower          : +1 coin per scenario slot whose id contains
 //                            'sentry', 'scout', or 'watch' (sightlines)
-//   - chapel               : narrative-only; no resolver effect (yet)
+//   - chapel               : M7.12 — heals 1 hpDamage at end-of-day for
+//                            every idle (non-deployed, non-on-errand) merc
+//                            with hpDamage > 0
 
 import type { Season } from './season.js';
 
@@ -51,4 +53,13 @@ export function slotCoinBonus(effects: FortEffects | undefined, slotIds: string[
 /** True if reinforced-palisade reduces catastrophic damage to zero. */
 export function palisadeBlocksCasualty(effects: FortEffects | undefined): boolean {
   return !!effects?.upgradeIds.has('reinforced-palisade');
+}
+
+/**
+ * M7.12: True if the wayside chapel grants end-of-day wound healing for
+ * idle (non-deployed, non-on-errand) mercs. One hp damage is healed per
+ * qualifying merc per day.
+ */
+export function chapelHealsWounds(effects: FortEffects | undefined): boolean {
+  return !!effects?.upgradeIds.has('chapel');
 }
