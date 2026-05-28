@@ -112,3 +112,35 @@ describe('M7.4 daily events', () => {
     }
   });
 });
+
+describe('M8.2 enemy-tier punitive events', () => {
+  const catalog = [
+    {
+      id: 'punitive', label: 'p', narration: 'n', weight: 1,
+      requiresEnemyFaction: true,
+      effect: { goldDelta: -2, fatigueDelta: 0, reputationDeltas: [] },
+    },
+    {
+      id: 'generic', label: 'g', narration: 'n', weight: 1,
+      effect: { goldDelta: 0, fatigueDelta: 0, reputationDeltas: [] },
+    },
+  ];
+
+  it('filters out punitive events when no enemy faction present', () => {
+    const ctx = { dayCount: 1, season: undefined, fortUpgrades: [] };
+    const pool = eligibleEvents(catalog as any, ctx);
+    expect(pool.map((e) => e.id)).toEqual(['generic']);
+  });
+
+  it('includes punitive events when an enemy faction is present', () => {
+    const ctx = { dayCount: 1, season: undefined, fortUpgrades: [], enemyFactions: ['black-hill-gang'] };
+    const pool = eligibleEvents(catalog as any, ctx);
+    expect(pool.map((e) => e.id).sort()).toEqual(['generic', 'punitive']);
+  });
+
+  it('treats an empty enemyFactions iterable the same as none', () => {
+    const ctx = { dayCount: 1, season: undefined, fortUpgrades: [], enemyFactions: [] };
+    const pool = eligibleEvents(catalog as any, ctx);
+    expect(pool.map((e) => e.id)).toEqual(['generic']);
+  });
+});

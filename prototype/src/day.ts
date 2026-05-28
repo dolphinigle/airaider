@@ -19,6 +19,7 @@ import { applyVeterancyXp, type Promotion } from './veterancy.js';
 import { recordCoDeployment, bondedPairsOf, type BondFormation } from './bonds.js';
 import { seasonFor, type SeasonClock } from './season.js';
 import { loadEventCatalog, rollEventForDay, type DailyEvent } from './events.js';
+import { reputationTier } from './reputation.js';
 import { fortEffectsFor, chapelHealsWounds, fatigueRecoveryAmount } from './fortEffects.js';
 import { affordableUpgrades, loadFortCatalog, type FortUpgrade } from './fort.js';
 
@@ -127,10 +128,16 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   let dailyEvent: DailyEvent | null = null;
   if (roster) {
     const catalog = loadEventCatalog(new URL('../data/events.json', import.meta.url).pathname);
+    // M8.2: enemy-tier factions on this roster unlock punitive events.
+    const enemyFactions: string[] = [];
+    for (const [factionId, standing] of Object.entries(roster.reputation)) {
+      if (reputationTier(standing) === 'enemy') enemyFactions.push(factionId);
+    }
     dailyEvent = rollEventForDay(catalog, {
       dayCount: roster.dayCount + 1,
       season,
       fortUpgrades: fortUpgrades ?? [],
+      enemyFactions,
     });
     if (dailyEvent) {
       const eff = dailyEvent.effect;

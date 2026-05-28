@@ -40,6 +40,11 @@ const EventSchema = z.object({
   requiresUpgrades: z.array(z.string()).optional(),
   /** If set, only fires when NONE of these upgrade ids are present. */
   requiresMissingUpgrades: z.array(z.string()).optional(),
+  /**
+   * M8.2: if true, only fires when the roster currently has at least one
+   * faction at enemy tier (standing ≤ −5). Used to gate punitive events.
+   */
+  requiresEnemyFaction: z.boolean().optional(),
   effect: EventEffectSchema.default({ goldDelta: 0, fatigueDelta: 0, reputationDeltas: [] }),
 });
 
@@ -60,14 +65,21 @@ export interface EventRollContext {
   dayCount: number;
   season: Season | undefined;
   fortUpgrades: Iterable<string>;
+  /**
+   * M8.2: roster faction ids currently at enemy tier (standing ≤ −5).
+   * When omitted or empty, events with `requiresEnemyFaction` are filtered out.
+   */
+  enemyFactions?: Iterable<string>;
 }
 
 export function eligibleEvents(catalog: DailyEvent[], ctx: EventRollContext): DailyEvent[] {
   const upgrades = new Set(ctx.fortUpgrades);
+  const enemies = new Set(ctx.enemyFactions ?? []);
   return catalog.filter((e) => {
     if (e.seasons && (!ctx.season || !e.seasons.includes(ctx.season))) return false;
     if (e.requiresUpgrades && !e.requiresUpgrades.every((u) => upgrades.has(u))) return false;
     if (e.requiresMissingUpgrades && e.requiresMissingUpgrades.some((u) => upgrades.has(u))) return false;
+    if (e.requiresEnemyFaction && enemies.size === 0) return false;
     return true;
   });
 }

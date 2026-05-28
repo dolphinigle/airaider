@@ -105,6 +105,22 @@
       "seasons": ["thaw", "high"],
       "weight": 1,
       "effect": { "goldDelta": -1, "fatigueDelta": -1, "reputationDeltas": [{ "factionId": "lowmark-guild", "delta": 1 }] }
+    },
+    {
+      "id": "enemy-bounty-posters",
+      "label": "Bounty posters",
+      "narration": "Sworn enemies of the fort nail bounty bills to every coaching inn for a week's ride. A handful of stipends quietly disappear before payday.",
+      "weight": 2,
+      "requiresEnemyFaction": true,
+      "effect": { "goldDelta": -2, "fatigueDelta": 0, "reputationDeltas": [] }
+    },
+    {
+      "id": "enemy-night-raid-probe",
+      "label": "Night-raid probe",
+      "narration": "A small probing raid in the dark hours — no breach, but the watch is roused twice and nobody sleeps right the next day.",
+      "weight": 2,
+      "requiresEnemyFaction": true,
+      "effect": { "goldDelta": 0, "fatigueDelta": 1, "reputationDeltas": [] }
     }
   ]
 }

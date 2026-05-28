@@ -1,8 +1,8 @@
 # Prototype STATUS
 
-> **Updated:** 2026-05-28 ~22:40 WIB
+> **Updated:** 2026-05-28 ~23:05 WIB
 > **Branch:** `prototype/m0`
-> **Last verified command:** `npm test` → 153 / 153 passing
+> **Last verified command:** `npm test` → 162 / 162 passing
 > **Last verified real-LLM command:** raid-13-guild-shipment with favorable seed — narrator awarded +1 to `lowmark-guild` and −1 to `black-hill-gang` and called out both factions by name in the outcome line (`fixtures/raid-13-guild-shipment.favorable.transcript-real.json`).
 
 ## ⚠️ Post-compaction discipline (READ FIRST)
@@ -113,6 +113,9 @@ Day loop with fatigue accumulation.
 - [x] M7.9 Bond reduces fatigue penalty (commit pending). When a slot occupant is bonded with any other merc in the same party, their fatigue penalty is softened by 1 (floor 0). `SlotContribOptions.bondedPairs` added; `SlotContribution.bondFatigueRelief: number` surfaces the per-slot effect; transcript renders `[fatigued N, −X, bond +1]` (or `[fatigued N, bond +1]` when the penalty was fully cancelled). All 9 raid + day-01 goldens regenerated with the new field. 3 new tests (147 total).
 - [x] M7.11 LLM narrator gets tier + bond context (commit pending). `ScenarioLLMRequest.party[i]` gained optional `tier: 'rookie'|'veteran'|'grizzled'` and `bondedPartyMercIds: string[]`, populated by `resolveScenario` from `input.tierOf` + `input.bondedPairs`. OpenAI system prompt instructs the narrator to lean into veteran/grizzled experience and give bonded pairs one shared beat. Mock LLM ignores the new fields (goldens unchanged). Closes Q11b. 2 new tests (149 total).
 - [x] M7.12 Chapel heals idle wounds (commit pending). The chapel fort upgrade — narrative-only since M7.1 — now grants 1 hpDamage healing at end-of-day for every roster merc who is idle (not deployed today, not on a pending errand) and has hpDamage > 0. `DayResolution.woundHealing: {mercId, before, after}[]` surfaces the per-merc effect; `dayTranscript` renders `CHAPEL HEALING (−1 hp damage):`. New helper `chapelHealsWounds(effects)` in fortEffects. Healing mutates `roster.states[id].hpDamage` directly (the hp damage field already round-trips on the live roster, unlike fatigue which uses initialFatigue). 4 new tests (153 total).
+- [x] M7.13 Smithy/winter-larder secondary effects (commit `b559bdc`). `smithyCasualtyReduction(effects)` subtracts 1 from catastrophic casualty hp damage (floor 0), stacking with the existing +1 flat coin; combined with the base damage of 1 this effectively cancels the single wound. `fatigueRecoveryAmount(effects, season)` returns 2 (instead of 1) when winter-larder is present AND season is frost — idle mercs recover twice as fast through the deep cold. Both behaviors are pure helpers in fortEffects.ts and exercised by 2 unit tests; no fixture regen required. (159 total)
+- [x] M8.1 Reputation tiers + ally coin bonus (commit `5b3e14e`). `src/reputation.ts` introduces `ReputationTier ∈ {ally, friendly, neutral, hostile, enemy}` at thresholds ±5 / ±3 / 0. `allyCoinBonus(factionContext, reputationOf)` returns +1 coin per ally-tier faction listed in the scenario's factionContext (stacks at the sum stage; clamp now includes the bonus). LLM factionContext payload gains `standingTier` so the narrator can color the scene. `npm run roster show` now prints `lowmark-guild:6(ally)` style tier next to each reputation entry. 4 new tests (157 then 159 total). Hostile/enemy tiers narrative-only this milestone — punitive enemy event slated for M8.2.
+- [x] M8.2 Enemy-tier punitive events (commit pending). `events.json` schema gains optional `requiresEnemyFaction: boolean`; `EventRollContext` gains optional `enemyFactions: Iterable<string>`. `eligibleEvents` filters out punitive events unless at least one enemy-tier faction is present. `resolveDay` computes the roster's enemy-tier factions via `reputationTier` and passes them in. Two new catalog entries: `enemy-bounty-posters` (−2 gold) and `enemy-night-raid-probe` (+1 fatigue to all). 3 new tests (162 total).
 - [ ] M7.3 Recruit gated by fort level (deferred — captive→recruit refactor)
 
 
