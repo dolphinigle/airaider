@@ -13,6 +13,8 @@ export interface ScenarioLLMRequest {
     pairs: Array<{ mercA: string; mercB: string; sharedTagId: string }>;
     bonusCoins: number;
   };
+  /** M5.3: chosen approach for a multi-approach scenario. */
+  approach?: { id: string; label: string; summary: string; narrativeHint?: string };
 }
 
 export interface ScenarioLLMNarration {

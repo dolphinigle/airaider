@@ -1,0 +1,80 @@
+{
+  "scenarioId": "raid-11-the-warden",
+  "title": "The Warden of Greyford",
+  "target": "remove the Warden of Greyford — the petty tyrant who broke Marek's old company — from the watch-tower he holds with twenty pikemen",
+  "archetype": "contract",
+  "partySize": 3,
+  "slotContributions": [
+    {
+      "slotId": "lead",
+      "mercId": "marek",
+      "attrUsed": "willpower",
+      "attrScore": 4,
+      "tagsMatched": [
+        "bg:soldier"
+      ],
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    },
+    {
+      "slotId": "edge",
+      "mercId": "veska",
+      "attrUsed": "physical",
+      "attrScore": 2,
+      "tagsMatched": [],
+      "coinsContributed": 1,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    },
+    {
+      "slotId": "tongue",
+      "mercId": "imogen",
+      "attrUsed": "charisma",
+      "attrScore": 5,
+      "tagsMatched": [
+        "pers:charming",
+        "bg:priest"
+      ],
+      "coinsContributed": 5,
+      "fatigue": 0,
+      "fatiguePenalty": 0
+    }
+  ],
+  "synergy": {
+    "pairs": [],
+    "bonusCoins": 0
+  },
+  "baseCoinBudget": 5,
+  "coinsActual": 5,
+  "rollFaces": [
+    "tails",
+    "heads",
+    "tails",
+    "heads",
+    "heads"
+  ],
+  "heads": 3,
+  "tails": 2,
+  "band": "unfavorable",
+  "bandReason": "3/5 heads (split — pessimistic default)",
+  "contributions": [
+    {
+      "mercId": "imogen",
+      "line": "Imogen steps forward, her tone measured and calm, offering terms while subtly displaying her cult's insignia."
+    },
+    {
+      "mercId": "veska",
+      "line": "Veska stays back, eyes the door for guards or surprises, ready if violence becomes necessary."
+    },
+    {
+      "mercId": "marek",
+      "line": "Marek keeps his hand near his blade, listening intently and weighing the petty tyrant’s words, prepared for betrayal."
+    }
+  ],
+  "outcomeNarrative": "The Warden, guarded and dismissive, agrees to surrender once Imogen’s calm diplomacy convinces him that resistance is futile, though the tension remains thick.",
+  "llmName": "openai:gpt-4.1-nano",
+  "casualties": [],
+  "approachId": "parley",
+  "approachLabel": "Parley under the Sevrenne sign"
+}

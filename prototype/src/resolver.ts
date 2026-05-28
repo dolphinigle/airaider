@@ -16,6 +16,8 @@ export interface ResolutionInput {
   rng: Rng;
   /** M2: fatigue lookup for the day loop. */
   fatigueOf?: (mercId: string) => number;
+  /** M5.3: id of the chosen approach (must match scenario.approaches[].id). */
+  approachId?: string;
 }
 
 export interface SlotContribution {
@@ -65,6 +67,9 @@ export interface ScenarioResolution {
   llmName: string;
   /** M5.1: wounds inflicted during this scenario (empty if none). */
   casualties: Casualty[];
+  /** M5.3: which approach was chosen (if the scenario offers any). */
+  approachId?: string;
+  approachLabel?: string;
 }
 
 /**
@@ -162,7 +167,7 @@ export function computeSlotContributions(
 }
 
 export async function resolveScenario(input: ResolutionInput): Promise<ScenarioResolution> {
-  const { scenario, assignments, llm, rng, fatigueOf } = input;
+  const { scenario, assignments, llm, rng, fatigueOf, approachId } = input;
   if (
     assignments.length < scenario.partySize.min ||
     assignments.length > scenario.partySize.max
@@ -171,7 +176,37 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
       `Party size ${assignments.length} not in [${scenario.partySize.min}, ${scenario.partySize.max}]`,
     );
   }
+
+  // M5.3: resolve approach (if any). Pick explicit > default > undefined.
+  let approach: import('./scenarios.js').ScenarioApproach | undefined;
+  if (scenario.approaches && scenario.approaches.length > 0) {
+    const pickId = approachId ?? scenario.defaultApproachId ?? scenario.approaches[0]!.id;
+    approach = scenario.approaches.find((a) => a.id === pickId);
+    if (!approach) {
+      throw new Error(
+        `Unknown approach id ${pickId} for scenario ${scenario.id}; valid: ${scenario.approaches.map((a) => a.id).join(', ')}`,
+      );
+    }
+  }
+
   const slotContributions = computeSlotContributions(scenario, assignments, { fatigueOf });
+
+  // M5.3: apply per-slot approach modifiers.
+  if (approach?.slotModifiers) {
+    for (const sc of slotContributions) {
+      const mod = approach.slotModifiers[sc.slotId];
+      if (!mod) continue;
+      if (typeof mod.coinDelta === 'number') {
+        sc.coinsContributed = Math.max(1, sc.coinsContributed + mod.coinDelta);
+      }
+      if (mod.requireTag) {
+        const assn = assignments.find((a) => a.slotId === sc.slotId);
+        const carries = !!assn?.merc.tags.some((t) => t.id === mod.requireTag);
+        if (!carries) sc.coinsContributed = Math.max(1, sc.coinsContributed - 1);
+      }
+    }
+  }
+
   const synergy = computePartySynergy(assignments);
   const summed =
     slotContributions.reduce((s, c) => s + c.coinsContributed, 0) + synergy.bonusCoins;
@@ -217,6 +252,9 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
     band: band.band,
     bandReason: band.reason,
     synergy,
+    approach: approach ? {
+      id: approach.id, label: approach.label, summary: approach.summary, narrativeHint: approach.narrativeHint,
+    } : undefined,
   };
   const narration = await llm.narrate(req);
 
@@ -239,5 +277,7 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
     outcomeNarrative: narration.outcomeNarrative,
     llmName: llm.name,
     casualties,
+    approachId: approach?.id,
+    approachLabel: approach?.label,
   };
 }

@@ -1,0 +1,67 @@
+{
+  "id": "raid-11-the-warden",
+  "archetype": "contract",
+  "title": "The Warden of Greyford",
+  "target": "remove the Warden of Greyford — the petty tyrant who broke Marek's old company — from the watch-tower he holds with twenty pikemen",
+  "slots": [
+    {
+      "id": "lead",
+      "description": "set the plan, hold the party together when it sours",
+      "preferredAttr": "willpower",
+      "preferredTags": ["bg:soldier"]
+    },
+    {
+      "id": "edge",
+      "description": "the violence end — door, blade, body in the way",
+      "preferredAttr": "physical",
+      "preferredTags": ["phys:muscular", "phys:quick"]
+    },
+    {
+      "id": "tongue",
+      "description": "talk, listen, lie to the people inside the tower",
+      "preferredAttr": "charisma",
+      "preferredTags": ["pers:charming", "bg:priest"]
+    }
+  ],
+  "partySize": { "min": 3, "max": 3 },
+  "coinBudget": 5,
+  "assignments": [
+    { "slotId": "lead", "mercId": "marek" },
+    { "slotId": "edge", "mercId": "veska" },
+    { "slotId": "tongue", "mercId": "imogen" }
+  ],
+  "seed": "raid-11-the-warden",
+  "defaultApproachId": "assault",
+  "approaches": [
+    {
+      "id": "assault",
+      "label": "Open assault on the tower",
+      "summary": "Hit the gate at dawn with everyone you have. Brutal, loud, and over fast — if it works.",
+      "slotModifiers": {
+        "edge": { "coinDelta": 1 },
+        "tongue": { "coinDelta": -1 }
+      },
+      "narrativeHint": "Mud, blood on the threshold, the smell of pitch. No room for pretty words."
+    },
+    {
+      "id": "parley",
+      "label": "Parley under the Sevrenne sign",
+      "summary": "Walk up under truce, ask for terms, take him alive if you can. Imogen carries the cult's authority into the room.",
+      "slotModifiers": {
+        "tongue": { "coinDelta": 1, "requireTag": "bg:priest" },
+        "edge": { "coinDelta": -1 }
+      },
+      "narrativeHint": "Cold light through narrow windows. A man who has read too many ledgers, and the silence between two sentences."
+    },
+    {
+      "id": "poison-the-well",
+      "label": "Poison the well, take the tower at dusk",
+      "summary": "Veska puts taintroot in the cistern before the night-meal. By the late watch half the garrison is doubled over and you walk in.",
+      "slotModifiers": {
+        "edge": { "coinDelta": 1, "requireTag": "phys:quick" },
+        "lead": { "coinDelta": -1 }
+      },
+      "narrativeHint": "The wet sound of men retching in the dark. Nothing clean about this one — measure it by who walks out."
+    }
+  ]
+}

@@ -20,6 +20,7 @@ interface CliArgs {
   outPath?: string;
   seed?: string;
   writeTranscript: boolean;
+  approachId?: string;
 }
 
 function parseArgs(argv: string[]): CliArgs {
@@ -30,6 +31,7 @@ function parseArgs(argv: string[]): CliArgs {
   let outPath: string | undefined;
   let seed: string | undefined;
   let writeTranscript = true;
+  let approachId: string | undefined;
   for (let i = 0; i < args.length; i++) {
     const a = args[i]!;
     if (a === '--real') useReal = true;
@@ -42,6 +44,11 @@ function parseArgs(argv: string[]): CliArgs {
     } else if (a === '--seed') {
       i++;
       seed = args[i];
+    } else if (a === '--approach') {
+      i++;
+      approachId = args[i];
+    } else if (a.startsWith('--approach=')) {
+      approachId = a.slice('--approach='.length);
     } else if (a === '--no-write') writeTranscript = false;
     else if (a === '--help' || a === '-h') {
       printUsage();
@@ -53,7 +60,7 @@ function parseArgs(argv: string[]): CliArgs {
     printUsage();
     process.exit(2);
   }
-  return { fixturePath, useReal, model, outPath, seed, writeTranscript };
+  return { fixturePath, useReal, model, outPath, seed, writeTranscript, approachId };
 }
 
 function printUsage(): void {
@@ -64,6 +71,7 @@ function printUsage(): void {
   --real           Use real OpenAI; needs OPENAI_API_KEY (read from ~/.airaider/openai.env or env)
   --model NAME     Override OpenAI model (default gpt-4.1-nano)
   --seed STR       Override the deterministic RNG seed
+  --approach ID    For multi-approach scenarios, pick approach by id (e.g. assault|parley|poison)
   --out PATH       Override transcript output path
   --no-write       Don't write a transcript JSON file (still prints to stdout)
 `,
@@ -116,7 +124,9 @@ async function main(): Promise<void> {
     llm = new MockScenarioLLM();
   }
 
-  const resolution = await resolveScenario({ scenario: fixture, assignments, llm, rng });
+  const resolution = await resolveScenario({
+    scenario: fixture, assignments, llm, rng, approachId: args.approachId,
+  });
 
   console.log(renderTranscript(resolution));
 

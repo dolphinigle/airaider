@@ -34,6 +34,9 @@ export function renderTranscript(r: ScenarioResolution): string {
     lines.push(`SYNERGY:   +${r.synergy.bonusCoins} (${pairStrs.join('; ')})`);
   }
   const coinPlural = r.coinsActual === 1 ? 'coin' : 'coins';
+  if (r.approachLabel) {
+    lines.push(`APPROACH:  ${r.approachLabel}  (${r.approachId})`);
+  }
   lines.push(`COIN POOL: ${r.coinsActual} ${coinPlural} (budget ${r.baseCoinBudget})`);
   lines.push(
     `FLIP:      ${r.rollFaces.map((f) => (f === 'heads' ? 'H' : 'T')).join(' ')}   → ${r.heads}H ${r.tails}T`,

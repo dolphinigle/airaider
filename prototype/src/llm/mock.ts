@@ -10,18 +10,19 @@ export class MockScenarioLLM implements ScenarioLLM {
   readonly name = 'mock';
 
   async narrate(req: ScenarioLLMRequest): Promise<ScenarioLLMNarration> {
+    const approachPrefix = req.approach ? `[${req.approach.id}] ` : '';
     const contributions = req.party.map(({ merc, assignedSlotId }) => {
       const slot = req.slots.find((s) => s.id === assignedSlotId);
       const tag = merc.tags[0]?.label ?? 'plain';
       const desc = slot?.description ?? assignedSlotId;
       return {
         mercId: merc.id,
-        line: `[mock] ${merc.name} (${tag}) takes on "${desc}".`,
+        line: `[mock] ${approachPrefix}${merc.name} (${tag}) takes on "${desc}".`,
       };
     });
     return {
       contributions,
-      outcomeNarrative: mockOutcome(req.band, req.scenarioTarget),
+      outcomeNarrative: `${approachPrefix}${mockOutcome(req.band, req.scenarioTarget)}`,
     };
   }
 }
