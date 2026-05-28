@@ -20,7 +20,7 @@ import { recordCoDeployment, bondedPairsOf, type BondFormation } from './bonds.j
 import { seasonFor, type SeasonClock } from './season.js';
 import { loadEventCatalog, rollEventForDay, type DailyEvent } from './events.js';
 import { loadTags } from './tags.js';
-import { refreshHirePool, HIRE_REFRESH_INTERVAL_DAYS, type HirePoolEntry } from './tavern.js';
+import { refreshHirePool, dropStaleListings, HIRE_REFRESH_INTERVAL_DAYS, type HirePoolEntry } from './tavern.js';
 import { reputationTier } from './reputation.js';
 
 /** M9.1: wages are paid every Nth day (CANONICAL §2.7 flat-wage rule). */
@@ -126,6 +126,12 @@ export interface DayResolution {
    * HIRE_REFRESH_INTERVAL_DAYS (7) AND the pool is below target size.
    */
   tavernRefresh: HirePoolEntry[];
+  /**
+   * M10.3: hire-pool entries that aged off the bench this refresh because
+   * their postedDay is older than HIRE_LISTING_TTL_DAYS. Always [] off the
+   * refresh cadence (and in roster-less mode).
+   */
+  tavernExpired: HirePoolEntry[];
   /**
    * M7.6: fort log entries appended during THIS day (currently only the
    * daily-event entry; upgrade purchases happen via the fort CLI, not the day
@@ -397,11 +403,14 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   // deterministic RNG seeded on the absolute day so two runs of the same
   // saved game land on the same bench.
   const tavernRefresh: HirePoolEntry[] = [];
+  const tavernExpired: HirePoolEntry[] = [];
   if (roster) {
     const currentDay = roster.dayCount + 1;
     if (currentDay % HIRE_REFRESH_INTERVAL_DAYS === 0) {
       const tagPool = loadTags(new URL('../data/tags.json', import.meta.url).pathname);
       const rng = rngFromString(`tavern-day-${currentDay}`);
+      // capture aged-off entries before refresh refills the slots
+      tavernExpired.push(...dropStaleListings(roster, currentDay));
       tavernRefresh.push(...refreshHirePool(roster, rng, tagPool, currentDay));
     }
   }
@@ -438,5 +447,6 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     wagesTotalPaid,
     desertions,
     tavernRefresh,
+    tavernExpired,
   };
 }

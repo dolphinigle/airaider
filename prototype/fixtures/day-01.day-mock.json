@@ -230,5 +230,6 @@
   "wagesTotalPaid": 0,
   "desertions": [],
   "fatigueRecoverySuspended": false,
-  "tavernRefresh": []
+  "tavernRefresh": [],
+  "tavernExpired": []
 }

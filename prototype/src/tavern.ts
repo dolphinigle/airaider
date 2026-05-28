@@ -23,6 +23,8 @@ export const HIRE_POOL_TARGET_SIZE = 3;
 export const HIRE_REFRESH_INTERVAL_DAYS = 7;
 /** Base hire price. */
 export const HIRE_BASE_PRICE = 5;
+/** M10.3: bench entries older than this drop off at the next refresh. */
+export const HIRE_LISTING_TTL_DAYS = 14;
 
 /**
  * Top up the roster's hire pool to HIRE_POOL_TARGET_SIZE. Returns the new
@@ -30,8 +32,10 @@ export const HIRE_BASE_PRICE = 5;
  * RNG to derive each new merc + price jitter. Each new entry's `postedDay`
  * is set to `currentDay`.
  *
- * Existing entries are preserved; refreshes do not displace stale postings
- * (a future M10.x can age them out).
+ * M10.3: before topping up, drops entries whose `postedDay` is older than
+ * `HIRE_LISTING_TTL_DAYS` ago — they wander off to drink elsewhere. The
+ * dropped entries are returned via a separate function (see
+ * `dropStaleListings`) so callers / tests can observe them.
  */
 export function refreshHirePool(
   roster: Roster,
@@ -39,6 +43,7 @@ export function refreshHirePool(
   tagPool: Map<string, Tag>,
   currentDay: number,
 ): HirePoolEntry[] {
+  dropStaleListings(roster, currentDay);
   const added: HirePoolEntry[] = [];
   const existing = new Set<string>(roster.hirePool.map((e) => e.merc.id));
   for (const m of roster.mercs) existing.add(m.id);
@@ -57,6 +62,26 @@ export function refreshHirePool(
     added.push(entry);
   }
   return added;
+}
+
+/**
+ * M10.3: remove hire-pool entries older than HIRE_LISTING_TTL_DAYS.
+ * Returns the dropped entries (so callers can surface them in transcripts
+ * or fort log). Mutates `roster.hirePool` in place.
+ */
+export function dropStaleListings(
+  roster: Roster,
+  currentDay: number,
+): HirePoolEntry[] {
+  const dropped: HirePoolEntry[] = [];
+  roster.hirePool = roster.hirePool.filter((e) => {
+    if (currentDay - e.postedDay > HIRE_LISTING_TTL_DAYS) {
+      dropped.push(e);
+      return false;
+    }
+    return true;
+  });
+  return dropped;
 }
 
 export class HireError extends Error {

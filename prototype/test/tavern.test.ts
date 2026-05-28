@@ -144,3 +144,42 @@ describe('M10.1 tavern hire pool', () => {
     }
   });
 });
+
+describe('M10.3 stale listing aging', () => {
+  it('exports HIRE_LISTING_TTL_DAYS = 14', async () => {
+    const { HIRE_LISTING_TTL_DAYS } = await import('../src/tavern.js');
+    expect(HIRE_LISTING_TTL_DAYS).toBe(14);
+  });
+
+  it('dropStaleListings removes entries older than TTL', async () => {
+    const { dropStaleListings } = await import('../src/tavern.js');
+    const r = newRoster([mercs.get('marek')!]);
+    refreshHirePool(r, mulberry32(1), tags, 7);
+    expect(r.hirePool.length).toBe(3);
+    // currentDay 22 is 15 days after postedDay 7 → all stale
+    const dropped = dropStaleListings(r, 22);
+    expect(dropped.length).toBe(3);
+    expect(r.hirePool.length).toBe(0);
+  });
+
+  it('dropStaleListings keeps entries within TTL', async () => {
+    const { dropStaleListings } = await import('../src/tavern.js');
+    const r = newRoster([mercs.get('marek')!]);
+    refreshHirePool(r, mulberry32(1), tags, 7);
+    const dropped = dropStaleListings(r, 21); // exactly 14 days old — keep
+    expect(dropped).toEqual([]);
+    expect(r.hirePool.length).toBe(3);
+  });
+
+  it('refreshHirePool ages off + tops up in one pass', async () => {
+    const r = newRoster([mercs.get('marek')!]);
+    refreshHirePool(r, mulberry32(1), tags, 7);
+    const oldIds = r.hirePool.map((e) => e.merc.id);
+    refreshHirePool(r, mulberry32(99), tags, 22); // 15 days later → wipe + refill
+    expect(r.hirePool.length).toBe(3);
+    for (const e of r.hirePool) {
+      expect(e.postedDay).toBe(22);
+      expect(oldIds).not.toContain(e.merc.id);
+    }
+  });
+});

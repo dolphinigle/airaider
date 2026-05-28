@@ -123,6 +123,13 @@ export function renderDayTranscript(day: DayResolution): string {
       lines.push(`   ⚑ ${e.merc.name} (${e.merc.id})  ${e.price}g`);
     }
   }
+  if (day.tavernExpired.length > 0) {
+    lines.push('');
+    lines.push(` TAVERN (${day.tavernExpired.length} drifted off):`);
+    for (const e of day.tavernExpired) {
+      lines.push(`   ✗ ${e.merc.name} (${e.merc.id}) — tired of waiting`);
+    }
+  }
   lines.push(DBAR);
   return lines.join('\n');
 }

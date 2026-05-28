@@ -376,3 +376,32 @@ describe('M10.2 weekly tavern auto-refresh', () => {
     expect(out.tavernRefresh).toEqual([]);
   });
 });
+
+describe('M10.3 stale tavern listings drop off in day loop', () => {
+  const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+  const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+  const dayPath = join(ROOT, 'fixtures', 'day-01.json');
+  const day = loadDay(dayPath);
+
+  it('exposes tavernExpired:[] on a no-refresh day', async () => {
+    const out = await resolveDay({ day, dayPath, mercs, llm: new MockScenarioLLM() });
+    expect(out.tavernExpired).toEqual([]);
+  });
+
+  it('drops stale entries during weekly refresh', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const { refreshHirePool } = await import('../src/tavern.js');
+    const { mulberry32 } = await import('../src/rng.js');
+    const r = newRoster([mercs.get('marek')!]);
+    r.gold = 20;
+    // Seed bench from day 7 with stale entries
+    refreshHirePool(r, mulberry32(1), tags, 7);
+    expect(r.hirePool.length).toBe(3);
+    r.dayCount = 27; // next currentDay = 28 → 21 days after postedDay 7, > TTL 14
+    const out = await resolveDay({ day: { ...day, scenarios: [] as string[] } as any, dayPath, mercs, llm: new MockScenarioLLM(), roster: r });
+    expect(out.tavernExpired.length).toBe(3);
+    expect(out.tavernRefresh.length).toBe(3);
+    expect(r.hirePool.length).toBe(3);
+    for (const e of r.hirePool) expect(e.postedDay).toBe(28);
+  });
+});
