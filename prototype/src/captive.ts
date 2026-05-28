@@ -37,9 +37,29 @@ export interface CaptiveEffect {
   captiveRemoved: boolean;
   /** If set, the captive joins the player roster as a fresh merc (loyalty 0). */
   recruitedAs?: Merc;
+  /**
+   * M7.3: when set, the disposition is unavailable in the current fort
+   * context (e.g. recruit blocked because fort level is too low). The
+   * effect's other fields are zeroed out / suppressed and the LLM gets a
+   * "blocked" hint so the narrator can render the refusal in flavor.
+   */
+  blocked?: { reason: string };
 }
 
-export function effectOf(captive: Captive, action: CaptiveAction): CaptiveEffect {
+/** M7.3: minimum fort level required to take on a captive as a recruit. */
+export const RECRUIT_MIN_FORT_LEVEL = 2;
+
+export interface EffectContext {
+  /** When provided AND action='recruit', a fortLevel below the minimum
+   *  blocks the recruit and the captive remains. */
+  fortLevel?: number;
+}
+
+export function effectOf(
+  captive: Captive,
+  action: CaptiveAction,
+  ctx: EffectContext = {},
+): CaptiveEffect {
   const notor = captive.notoriety;
   switch (action) {
     case 'ransom':
@@ -64,6 +84,17 @@ export function effectOf(captive: Captive, action: CaptiveAction): CaptiveEffect
         captiveRemoved: true,
       };
     case 'recruit':
+      if (ctx.fortLevel !== undefined && ctx.fortLevel < RECRUIT_MIN_FORT_LEVEL) {
+        return {
+          action,
+          goldDelta: 0,
+          reputationGain: 'mercenary',
+          captiveRemoved: false,
+          blocked: {
+            reason: `fort level ${ctx.fortLevel} below required ${RECRUIT_MIN_FORT_LEVEL} for recruit`,
+          },
+        };
+      }
       return {
         action,
         goldDelta: 0,

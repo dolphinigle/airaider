@@ -75,3 +75,29 @@ describe('captive cycle', () => {
     expect(a).toEqual(b);
   });
 });
+
+describe('M7.3 recruit gated by fort level', () => {
+  it('blocks recruit when fortLevel < 2', () => {
+    const e = effectOf(KAEL, 'recruit', { fortLevel: 1 });
+    expect(e.blocked).toBeDefined();
+    expect(e.recruitedAs).toBeUndefined();
+    expect(e.captiveRemoved).toBe(false);
+  });
+
+  it('allows recruit when fortLevel >= 2', () => {
+    const e = effectOf(KAEL, 'recruit', { fortLevel: 2 });
+    expect(e.blocked).toBeUndefined();
+    expect(e.recruitedAs).toBeDefined();
+  });
+
+  it('does not affect other dispositions when fortLevel is low', () => {
+    expect(effectOf(KAEL, 'ransom', { fortLevel: 1 }).blocked).toBeUndefined();
+    expect(effectOf(KAEL, 'execute', { fortLevel: 1 }).blocked).toBeUndefined();
+  });
+
+  it('keeps prior recruit behavior when no fortLevel is provided', () => {
+    const e = effectOf(KAEL, 'recruit');
+    expect(e.blocked).toBeUndefined();
+    expect(e.recruitedAs).toBeDefined();
+  });
+});

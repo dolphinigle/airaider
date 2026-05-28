@@ -34,6 +34,7 @@ interface Args {
   real: boolean;
   model?: string;
   out?: string;
+  fortLevel?: number;
 }
 
 function parseArgs(argv: string[]): Args {
@@ -44,6 +45,7 @@ function parseArgs(argv: string[]): Args {
     else if (a === '--real') args.real = true;
     else if (a.startsWith('--model=')) args.model = a.slice(8);
     else if (a.startsWith('--out=')) args.out = a.slice(6);
+    else if (a.startsWith('--fort-level=')) args.fortLevel = parseInt(a.slice(13), 10);
     else if (!a.startsWith('--') && !args.fixture) args.fixture = a;
   }
   if (!args.fixture) throw new Error('captive: missing <fixture.json>');
@@ -106,7 +108,7 @@ async function main(): Promise<void> {
   };
 
   for (const action of actions) {
-    const effect = effectOf(captive, action);
+    const effect = effectOf(captive, action, { fortLevel: args.fortLevel });
     const narration = await llm.narrate({
       captive,
       action,
@@ -140,7 +142,10 @@ function printTranscript(t: {
   for (const d of t.dispositions) {
     const e = d.effect;
     const gold = e.goldDelta > 0 ? `+${e.goldDelta}g` : (e.goldDelta < 0 ? `${e.goldDelta}g` : '0g');
-    console.log(`\n[${d.action.toUpperCase()}]  ${gold}  rep:${e.reputationGain}` + (e.recruitedAs ? '  → recruited' : ''));
+    const tail = e.blocked
+      ? `  → BLOCKED (${e.blocked.reason})`
+      : (e.recruitedAs ? '  → recruited' : '');
+    console.log(`\n[${d.action.toUpperCase()}]  ${gold}  rep:${e.reputationGain}` + tail);
     console.log(`  ${d.narration.outcomeNarrative}`);
     console.log(`  ${d.narration.captiveLine}`);
   }
