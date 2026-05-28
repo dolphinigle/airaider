@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Secrets — NEVER commit
+.env
+.env.*
+*.env
+secrets/
+~/.airaider/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test coverage
+coverage/
+
+# Real-LLM transcripts: gitignored by default, but ONE per fixture may be force-added
+# (`git add -f`) so reviewers can SEE actual narrative output without rerunning.
+# Pattern below ignores by default; the curated samples are committed explicitly.
+prototype/fixtures/*.transcript-real-auto.json
+

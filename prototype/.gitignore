@@ -1,0 +1,12 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.env
+.env.*
+*.env
+coverage/
+
+# Real-LLM transcripts: gitignore the auto-suffixed ones; curated samples
+# (e.g. fixtures/raid-01.transcript-real.json) may be force-added for review.
+fixtures/*.transcript-real-auto.json
+

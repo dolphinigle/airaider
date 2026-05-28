@@ -1,0 +1,103 @@
+[
+  {
+    "id": "gender:male",
+    "category": "gender",
+    "rarity": "common",
+    "tier": 5,
+    "mutexGroup": "gender",
+    "label": "Male"
+  },
+  {
+    "id": "gender:female",
+    "category": "gender",
+    "rarity": "common",
+    "tier": 5,
+    "mutexGroup": "gender",
+    "label": "Female"
+  },
+  {
+    "id": "bg:soldier",
+    "category": "background",
+    "rarity": "common",
+    "tier": 5,
+    "mutexGroup": "background",
+    "attrBias": { "physical": 1 },
+    "label": "Soldier"
+  },
+  {
+    "id": "bg:peasant",
+    "category": "background",
+    "rarity": "common",
+    "tier": 5,
+    "mutexGroup": "background",
+    "label": "Peasant"
+  },
+  {
+    "id": "bg:scholar",
+    "category": "background",
+    "rarity": "uncommon",
+    "tier": 3,
+    "mutexGroup": "background",
+    "attrBias": { "intelligence": 1 },
+    "label": "Scholar"
+  },
+  {
+    "id": "bg:priest",
+    "category": "background",
+    "rarity": "rare",
+    "tier": 2,
+    "mutexGroup": "background",
+    "attrBias": { "charisma": 1, "willpower": 1 },
+    "label": "Priest"
+  },
+  {
+    "id": "temp:brave",
+    "category": "personality:temperament",
+    "rarity": "common",
+    "tier": 4,
+    "mutexGroup": "temperament",
+    "attrBias": { "willpower": 1 },
+    "label": "Brave"
+  },
+  {
+    "id": "temp:cautious",
+    "category": "personality:temperament",
+    "rarity": "common",
+    "tier": 4,
+    "mutexGroup": "temperament",
+    "attrBias": { "intelligence": 1 },
+    "label": "Cautious"
+  },
+  {
+    "id": "phys:muscular",
+    "category": "physicality",
+    "rarity": "common",
+    "tier": 2,
+    "attrBias": { "physical": 1 },
+    "label": "Brawny"
+  },
+  {
+    "id": "phys:quick",
+    "category": "physicality",
+    "rarity": "common",
+    "tier": 3,
+    "attrBias": { "agility": 1 },
+    "label": "Light-Footed"
+  },
+  {
+    "id": "pers:charming",
+    "category": "personality",
+    "rarity": "uncommon",
+    "tier": 3,
+    "attrBias": { "charisma": 1 },
+    "label": "Charming"
+  },
+  {
+    "id": "pers:stoic",
+    "category": "personality",
+    "rarity": "uncommon",
+    "tier": 2,
+    "attrBias": { "willpower": 1 },
+    "label": "Stoic"
+  }
+]

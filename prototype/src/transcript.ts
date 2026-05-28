@@ -1,0 +1,37 @@
+import type { ScenarioResolution } from './resolver.js';
+
+const BAR = '═══════════════════════════════════════════════════════════════';
+
+export function renderTranscript(r: ScenarioResolution): string {
+  const lines: string[] = [];
+  lines.push(BAR);
+  lines.push(` SCENARIO: ${r.title}  [${r.archetype}]`);
+  lines.push(` Target: ${r.target}`);
+  lines.push(BAR);
+  lines.push('');
+  lines.push('PARTY:');
+  for (const sc of r.slotContributions) {
+    const c = r.contributions.find((x) => x.mercId === sc.mercId);
+    const tagStr = sc.tagsMatched.length ? ` +tags:${sc.tagsMatched.join(',')}` : '';
+    const attrStr = sc.attrUsed ? ` ${sc.attrUsed}=${sc.attrScore}` : '';
+    const coinPlural = sc.coinsContributed === 1 ? 'coin' : 'coins';
+    lines.push(
+      `  • ${sc.mercId} → slot:${sc.slotId}${attrStr}${tagStr} (${sc.coinsContributed} ${coinPlural})`,
+    );
+    if (c) lines.push(`      "${c.line}"`);
+  }
+  lines.push('');
+  const coinPlural = r.coinsActual === 1 ? 'coin' : 'coins';
+  lines.push(`COIN POOL: ${r.coinsActual} ${coinPlural} (budget ${r.baseCoinBudget})`);
+  lines.push(
+    `FLIP:      ${r.rollFaces.map((f) => (f === 'heads' ? 'H' : 'T')).join(' ')}   → ${r.heads}H ${r.tails}T`,
+  );
+  lines.push(`BAND:      ${r.band.toUpperCase()}  (${r.bandReason})`);
+  lines.push('');
+  lines.push('OUTCOME:');
+  lines.push(`  ${r.outcomeNarrative}`);
+  lines.push('');
+  lines.push(`[narrated by ${r.llmName}]`);
+  lines.push(BAR);
+  return lines.join('\n');
+}

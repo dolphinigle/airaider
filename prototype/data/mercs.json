@@ -1,0 +1,47 @@
+[
+  {
+    "id": "marek",
+    "name": "Marek",
+    "attrs": {
+      "physical": 5,
+      "agility": 2,
+      "intelligence": 3,
+      "charisma": 3,
+      "willpower": 4
+    },
+    "tagIds": ["gender:male", "bg:soldier", "temp:brave", "phys:muscular"],
+    "veterancy": 1,
+    "wage": 1,
+    "hp": 3
+  },
+  {
+    "id": "roselle",
+    "name": "Roselle",
+    "attrs": {
+      "physical": 3,
+      "agility": 6,
+      "intelligence": 4,
+      "charisma": 3,
+      "willpower": 3
+    },
+    "tagIds": ["gender:female", "bg:peasant", "temp:cautious", "phys:quick"],
+    "veterancy": 1,
+    "wage": 1,
+    "hp": 3
+  },
+  {
+    "id": "imogen",
+    "name": "Imogen",
+    "attrs": {
+      "physical": 2,
+      "agility": 3,
+      "intelligence": 4,
+      "charisma": 5,
+      "willpower": 4
+    },
+    "tagIds": ["gender:female", "bg:priest", "pers:charming"],
+    "veterancy": 0,
+    "wage": 1,
+    "hp": 3
+  }
+]

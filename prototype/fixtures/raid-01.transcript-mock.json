@@ -1,0 +1,52 @@
+{
+  "scenarioId": "raid-01",
+  "title": "The Merchant's Lost Wagon",
+  "target": "recover the salt-merchant's wagon from the brigands camped at the Crow's Ford",
+  "archetype": "contract",
+  "partySize": 2,
+  "slotContributions": [
+    {
+      "slotId": "lock",
+      "mercId": "marek",
+      "attrUsed": "physical",
+      "attrScore": 5,
+      "tagsMatched": [
+        "phys:muscular"
+      ],
+      "coinsContributed": 3
+    },
+    {
+      "slotId": "sentry",
+      "mercId": "roselle",
+      "attrUsed": "agility",
+      "attrScore": 6,
+      "tagsMatched": [
+        "phys:quick"
+      ],
+      "coinsContributed": 3
+    }
+  ],
+  "baseCoinBudget": 3,
+  "coinsActual": 3,
+  "rollFaces": [
+    "tails",
+    "heads",
+    "tails"
+  ],
+  "heads": 1,
+  "tails": 2,
+  "band": "unfavorable",
+  "bandReason": "1/3 heads (unfavorable)",
+  "contributions": [
+    {
+      "mercId": "marek",
+      "line": "[mock] Marek (Male) takes on \"crack the wagon's iron strongbox lock\"."
+    },
+    {
+      "mercId": "roselle",
+      "line": "[mock] Roselle (Female) takes on \"slip past the brigand sentry at the treeline\"."
+    }
+  ],
+  "outcomeNarrative": "[mock] A bruised partial; recover the salt-merchant's wagon from the brigands camped at the Crow's Ford slips half-grasped, but no one is broken.",
+  "llmName": "mock"
+}

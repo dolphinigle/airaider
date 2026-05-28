@@ -1,0 +1,27 @@
+{
+  "id": "raid-01",
+  "archetype": "contract",
+  "title": "The Merchant's Lost Wagon",
+  "target": "recover the salt-merchant's wagon from the brigands camped at the Crow's Ford",
+  "slots": [
+    {
+      "id": "lock",
+      "description": "crack the wagon's iron strongbox lock",
+      "preferredAttr": "physical",
+      "preferredTags": ["phys:muscular"]
+    },
+    {
+      "id": "sentry",
+      "description": "slip past the brigand sentry at the treeline",
+      "preferredAttr": "agility",
+      "preferredTags": ["phys:quick"]
+    }
+  ],
+  "partySize": { "min": 2, "max": 2 },
+  "coinBudget": 3,
+  "assignments": [
+    { "slotId": "lock", "mercId": "marek" },
+    { "slotId": "sentry", "mercId": "roselle" }
+  ],
+  "seed": "raid-01-deterministic"
+}
