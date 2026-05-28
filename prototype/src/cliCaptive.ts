@@ -11,7 +11,7 @@ import { loadTags } from './tags.js';
 import { loadMercs } from './mercs.js';
 import type { Tag } from './types.js';
 import type { Captive, CaptiveAction } from './captive.js';
-import { CAPTIVE_ACTIONS, effectOf } from './captive.js';
+import { CAPTIVE_ACTIONS, effectOf, FORMER_CAPTIVE_TAG_ID } from './captive.js';
 import { MockCaptiveLLM, OpenAICaptiveLLM, type CaptiveLLM } from './llm/captiveLLM.js';
 
 const FixtureSchema = z.object({
@@ -108,7 +108,10 @@ async function main(): Promise<void> {
   };
 
   for (const action of actions) {
-    const effect = effectOf(captive, action, { fortLevel: args.fortLevel });
+    const effect = effectOf(captive, action, {
+      fortLevel: args.fortLevel,
+      formerCaptiveTag: tagPool.get(FORMER_CAPTIVE_TAG_ID),
+    });
     const narration = await llm.narrate({
       captive,
       action,

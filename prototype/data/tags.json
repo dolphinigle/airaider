@@ -128,6 +128,14 @@
     "label": "Noble Bastard"
   },
   {
+    "id": "bg:former-captive",
+    "category": "background",
+    "rarity": "uncommon",
+    "tier": 3,
+    "attrBias": { "willpower": 1, "charisma": -1 },
+    "label": "Former Captive"
+  },
+  {
     "id": "phys:frail",
     "category": "physicality",
     "rarity": "common",

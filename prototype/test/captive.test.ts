@@ -126,3 +126,40 @@ describe('M11.2 captive recruit lands on tavern bench', () => {
     expect(e.benchPrice).toBeUndefined();
   });
 });
+
+describe('M11.6 recruit carries bg:former-captive tag', () => {
+  const FORMER_TAG = {
+    id: 'bg:former-captive', category: 'background', rarity: 'uncommon' as const,
+    tier: 3 as const, label: 'Former Captive',
+  };
+
+  it('appends the supplied formerCaptiveTag to the recruited merc', () => {
+    const e = effectOf(KAEL, 'recruit', { formerCaptiveTag: FORMER_TAG });
+    expect(e.recruitedAs).toBeDefined();
+    expect(e.recruitedAs!.tags.some((t) => t.id === 'bg:former-captive')).toBe(true);
+  });
+
+  it('does not append when the tag is not supplied (backward-compat)', () => {
+    const e = effectOf(KAEL, 'recruit');
+    expect(e.recruitedAs!.tags.some((t) => t.id === 'bg:former-captive')).toBe(false);
+  });
+
+  it('does not duplicate the tag if the captive already carries it', () => {
+    const captive: Captive = { ...KAEL, tags: [FORMER_TAG] };
+    const e = effectOf(captive, 'recruit', { formerCaptiveTag: FORMER_TAG });
+    const count = e.recruitedAs!.tags.filter((t) => t.id === 'bg:former-captive').length;
+    expect(count).toBe(1);
+  });
+
+  it('preserves the captive\'s pre-existing tags alongside former-captive', () => {
+    const soldier = {
+      id: 'bg:soldier', category: 'background', rarity: 'common' as const,
+      tier: 5 as const, label: 'Soldier',
+    };
+    const captive: Captive = { ...KAEL, tags: [soldier] };
+    const e = effectOf(captive, 'recruit', { formerCaptiveTag: FORMER_TAG });
+    const ids = e.recruitedAs!.tags.map((t) => t.id);
+    expect(ids).toContain('bg:soldier');
+    expect(ids).toContain('bg:former-captive');
+  });
+});

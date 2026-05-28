@@ -55,6 +55,10 @@ export interface CaptiveEffect {
 /** M7.3: minimum fort level required to take on a captive as a recruit. */
 export const RECRUIT_MIN_FORT_LEVEL = 2;
 
+/** M11.6: canonical tag id appended to a captive who gets recruited; lives in
+ *  data/tags.json so it survives a roster round-trip via the tag pool. */
+export const FORMER_CAPTIVE_TAG_ID = 'bg:former-captive';
+
 /** M11.2: discount price (gold) at which a recruited captive is posted to the
  *  tavern bench. Scales with notoriety but consistently undercuts the standard
  *  HIRE_BASE_PRICE (5g) for low-notoriety captives. */
@@ -66,6 +70,10 @@ export interface EffectContext {
   /** When provided AND action='recruit', a fortLevel below the minimum
    *  blocks the recruit and the captive remains. */
   fortLevel?: number;
+  /** M11.6: when provided AND action='recruit', this tag is appended to
+   *  the recruit's tag list so the captive's backstory carries into
+   *  future scenarios as the `bg:former-captive` (or similar) tag. */
+  formerCaptiveTag?: Tag;
 }
 
 export function effectOf(
@@ -113,7 +121,7 @@ export function effectOf(
         goldDelta: 0,
         reputationGain: 'mercenary',
         captiveRemoved: false,
-        recruitedAs: captiveToMerc(captive),
+        recruitedAs: captiveToMerc(captive, ctx.formerCaptiveTag),
         benchPrice: captiveBenchPrice(captive.notoriety),
       };
     case 'execute':
@@ -126,14 +134,22 @@ export function effectOf(
   }
 }
 
-function captiveToMerc(c: Captive): Merc {
+function captiveToMerc(c: Captive, formerCaptiveTag?: Tag): Merc {
+  // M11.6: append `bg:former-captive` (or whatever tag the caller supplied)
+  // so the captive's prior life carries into LLM scenario prompts. Deduped
+  // by tag id to keep the tag list canonical.
+  const tagIds = new Set(c.tags.map((t) => t.id));
+  const tags = [...c.tags];
+  if (formerCaptiveTag && !tagIds.has(formerCaptiveTag.id)) {
+    tags.push(formerCaptiveTag);
+  }
   return {
     id: `recruit-${c.id}`,
     name: c.name,
     attrs: {
       physical: 3, agility: 3, intelligence: 3, charisma: 2, willpower: 2,
     },
-    tags: c.tags,
+    tags,
     veterancy: 0,
     wage: 1,
     hp: 3,
