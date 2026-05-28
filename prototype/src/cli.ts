@@ -21,6 +21,7 @@ interface CliArgs {
   seed?: string;
   writeTranscript: boolean;
   approachId?: string;
+  force: boolean;
 }
 
 function parseArgs(argv: string[]): CliArgs {
@@ -32,6 +33,7 @@ function parseArgs(argv: string[]): CliArgs {
   let seed: string | undefined;
   let writeTranscript = true;
   let approachId: string | undefined;
+  let force = false;
   for (let i = 0; i < args.length; i++) {
     const a = args[i]!;
     if (a === '--real') useReal = true;
@@ -50,6 +52,7 @@ function parseArgs(argv: string[]): CliArgs {
     } else if (a.startsWith('--approach=')) {
       approachId = a.slice('--approach='.length);
     } else if (a === '--no-write') writeTranscript = false;
+    else if (a === '--force') force = true;
     else if (a === '--help' || a === '-h') {
       printUsage();
       process.exit(0);
@@ -60,12 +63,12 @@ function parseArgs(argv: string[]): CliArgs {
     printUsage();
     process.exit(2);
   }
-  return { fixturePath, useReal, model, outPath, seed, writeTranscript, approachId };
+  return { fixturePath, useReal, model, outPath, seed, writeTranscript, approachId, force };
 }
 
 function printUsage(): void {
   console.error(
-    `Usage: npm run scenario -- <fixture.json> [--real] [--model gpt-4.1-nano] [--seed STR] [--out path] [--no-write]
+    `Usage: npm run scenario -- <fixture.json> [--real] [--model gpt-4.1-nano] [--seed STR] [--out path] [--no-write] [--force]
 
   <fixture.json>   Path to scenario fixture (e.g. fixtures/raid-01.json)
   --real           Use real OpenAI; needs OPENAI_API_KEY (read from ~/.airaider/openai.env or env)
@@ -74,6 +77,7 @@ function printUsage(): void {
   --approach ID    For multi-approach scenarios, pick approach by id (e.g. assault|parley|poison)
   --out PATH       Override transcript output path
   --no-write       Don't write a transcript JSON file (still prints to stdout)
+  --force          Allow overwriting an existing transcript at the default path
 `,
   );
 }
@@ -132,9 +136,15 @@ async function main(): Promise<void> {
 
   if (args.writeTranscript) {
     const defaultName = args.useReal ? 'transcript-real' : 'transcript-mock';
+    const usingDefault = args.outPath == null;
     const out =
       args.outPath ??
       join(dirname(fixtureAbs), `${basename(fixtureAbs, '.json')}.${defaultName}.json`);
+    if (usingDefault && existsSync(out) && !args.force) {
+      console.error(`\nRefusing to overwrite existing transcript at ${out}.`);
+      console.error(`Pass --out PATH to write elsewhere, --force to overwrite, or --no-write to skip.`);
+      process.exit(3);
+    }
     writeFileSync(out, JSON.stringify(resolution, null, 2) + '\n');
     console.log(`\nWrote: ${out}`);
   }

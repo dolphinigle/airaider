@@ -20,6 +20,7 @@ interface CliArgs {
   outPath?: string;
   writeTranscript: boolean;
   rosterPath?: string;
+  force: boolean;
 }
 
 function parseArgs(argv: string[]): CliArgs {
@@ -30,6 +31,7 @@ function parseArgs(argv: string[]): CliArgs {
   let outPath: string | undefined;
   let writeTranscript = true;
   let rosterPath: string | undefined;
+  let force = false;
   for (let i = 0; i < args.length; i++) {
     const a = args[i]!;
     if (a === '--real') useReal = true;
@@ -41,6 +43,7 @@ function parseArgs(argv: string[]): CliArgs {
       outPath = args[i];
     } else if (a.startsWith('--roster=')) rosterPath = a.slice('--roster='.length);
     else if (a === '--no-write') writeTranscript = false;
+    else if (a === '--force') force = true;
     else if (a === '--help' || a === '-h') {
       printUsage();
       process.exit(0);
@@ -51,12 +54,12 @@ function parseArgs(argv: string[]): CliArgs {
     printUsage();
     process.exit(2);
   }
-  return { dayPath, useReal, model, outPath, writeTranscript, rosterPath };
+  return { dayPath, useReal, model, outPath, writeTranscript, rosterPath, force };
 }
 
 function printUsage(): void {
   console.error(
-    `Usage: npm run day -- <day.json> [--real] [--model gpt-4.1-nano] [--out path] [--no-write] [--roster=PATH]
+    `Usage: npm run day -- <day.json> [--real] [--model gpt-4.1-nano] [--out path] [--no-write] [--roster=PATH] [--force]
 
   <day.json>       Path to day fixture (e.g. fixtures/day-01.json)
   --real           Use real OpenAI; needs OPENAI_API_KEY
@@ -64,6 +67,7 @@ function printUsage(): void {
   --out PATH       Override transcript output path
   --no-write       Don't write a transcript JSON file (still prints to stdout)
   --roster=PATH    Load/save persistent roster state (creates if missing)
+  --force          Allow overwriting an existing transcript file at the default path
 `,
   );
 }
@@ -84,6 +88,20 @@ async function main(): Promise<void> {
 
   const dayAbs = resolve(args.dayPath);
   const dataDir = resolve(dirname(dayAbs), '..', 'data');
+
+  // M7.x bug fix: do the overwrite check BEFORE running the day so that
+  // side effects (roster mutation, real-LLM cost) are skipped when the
+  // transcript can't be written. The same check is repeated in the write
+  // block below as a belt-and-braces.
+  if (args.writeTranscript && args.outPath == null) {
+    const defaultName = args.useReal ? 'day-real' : 'day-mock';
+    const candidate = join(dirname(dayAbs), `${basename(dayAbs, '.json')}.${defaultName}.json`);
+    if (existsSync(candidate) && !args.force) {
+      console.error(`Refusing to overwrite existing transcript at ${candidate}.`);
+      console.error(`Pass --out PATH to write elsewhere, --force to overwrite, or --no-write to skip.`);
+      process.exit(3);
+    }
+  }
 
   const tags = loadTags(join(dataDir, 'tags.json'));
   const mercs = loadMercs(join(dataDir, 'mercs.json'), tags);
@@ -175,9 +193,17 @@ async function main(): Promise<void> {
 
   if (args.writeTranscript) {
     const defaultName = args.useReal ? 'day-real' : 'day-mock';
+    const usingDefault = args.outPath == null;
     const out =
       args.outPath ??
       join(dirname(dayAbs), `${basename(dayAbs, '.json')}.${defaultName}.json`);
+    // M7.x bug fix: refuse to clobber an existing default-path transcript
+    // (often a committed golden) unless --force or an explicit --out was given.
+    if (usingDefault && existsSync(out) && !args.force) {
+      console.error(`\nRefusing to overwrite existing transcript at ${out}.`);
+      console.error(`Pass --out PATH to write elsewhere, --force to overwrite, or --no-write to skip.`);
+      process.exit(3);
+    }
     writeFileSync(out, JSON.stringify(resolution, null, 2) + '\n');
     console.log(`\nWrote: ${out}`);
   }
