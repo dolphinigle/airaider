@@ -91,6 +91,12 @@ export interface DayResolution {
    */
   fatigueRecovery: Array<{ mercId: string; before: number; after: number }>;
   /**
+   * M9.3: true when end-of-day fatigue recovery was skipped because the
+   * fort entered this day already in debt (roster.consecutiveDebtDays > 0).
+   * Always false in roster-less mode.
+   */
+  fatigueRecoverySuspended: boolean;
+  /**
    * M7.12: end-of-day wound healing from the chapel. Empty unless the fort
    * has the chapel upgrade AND idle mercs had hpDamage > 0.
    */
@@ -271,7 +277,11 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   // computed against the post-deployment fatigue map but BEFORE finalFatigue
   // is exported, so the saved roster reflects the recovered values.
   const fatigueRecovery: Array<{ mercId: string; before: number; after: number }> = [];
-  if (roster) {
+  // M9.3: when the fort enters the day already in debt (consecutiveDebtDays
+  // > 0 at end of LAST day), morale rots and idle mercs do not shed fatigue.
+  // Recovery still runs in roster-less mode (no debt concept there).
+  const recoverySuspended = !!roster && roster.consecutiveDebtDays > 0;
+  if (roster && !recoverySuspended) {
     const deployed = new Set<string>();
     for (const sr of scenarioResolutions) {
       for (const sc of sr.slotContributions) deployed.add(sc.mercId);
@@ -400,6 +410,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     fortHints,
     newFortLogEntries,
     fatigueRecovery,
+    fatigueRecoverySuspended: recoverySuspended,
     woundHealing,
     wagesPaid,
     wagesTotalPaid,

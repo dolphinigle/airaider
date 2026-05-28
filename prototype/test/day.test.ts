@@ -290,3 +290,44 @@ describe('M9.2 debt-driven desertion', () => {
     expect(out.desertions).toEqual([]);
   });
 });
+
+describe('M9.3 debt suspends fatigue recovery', () => {
+  const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+  const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+  const dayPath = join(ROOT, 'fixtures', 'day-01.json');
+  const day = loadDay(dayPath);
+
+  it('skips recovery when roster enters day with consecutiveDebtDays > 0', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('imogen')!]); // imogen is idle in day-01
+    r.states.get('imogen')!.fatigue = 2;
+    r.consecutiveDebtDays = 1;
+    r.gold = -2; // keep negative so post-day counter stays high; no payday
+    r.dayCount = 0;
+    const initialFatigue = new Map([['imogen', 2]]);
+    const out = await resolveDay({ day, dayPath, mercs, llm: new MockScenarioLLM(), roster: r, initialFatigue });
+    expect(out.fatigueRecovery).toEqual([]);
+    expect(out.fatigueRecoverySuspended).toBe(true);
+    expect(out.finalFatigue['imogen']).toBe(2);
+  });
+
+  it('recovers fatigue normally when not in debt', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('imogen')!]);
+    r.states.get('imogen')!.fatigue = 2;
+    r.consecutiveDebtDays = 0;
+    r.gold = 5;
+    r.dayCount = 0;
+    const initialFatigue = new Map([['imogen', 2]]);
+    const out = await resolveDay({ day, dayPath, mercs, llm: new MockScenarioLLM(), roster: r, initialFatigue });
+    expect(out.fatigueRecoverySuspended).toBe(false);
+    expect(out.fatigueRecovery.length).toBe(1);
+    expect(out.fatigueRecovery[0]!.mercId).toBe('imogen');
+    expect(out.fatigueRecovery[0]!.before).toBeGreaterThan(out.fatigueRecovery[0]!.after);
+  });
+
+  it('roster-less mode reports fatigueRecoverySuspended=false', async () => {
+    const out = await resolveDay({ day, dayPath, mercs, llm: new MockScenarioLLM() });
+    expect(out.fatigueRecoverySuspended).toBe(false);
+  });
+});

@@ -91,6 +91,9 @@ export function renderDayTranscript(day: DayResolution): string {
     for (const r of day.fatigueRecovery) {
       lines.push(`   ☾ ${r.mercId}: ${r.before} → ${r.after}`);
     }
+  } else if (day.fatigueRecoverySuspended) {
+    lines.push('');
+    lines.push(' RECOVERY: suspended (fort in debt — no rest)');
   }
   if (day.newFortLogEntries.length > 0) {
     lines.push('');
