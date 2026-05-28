@@ -4,7 +4,23 @@ export interface ScenarioLLMRequest {
   scenarioTitle: string;
   scenarioTarget: string;
   archetype: string;
-  party: Array<{ merc: Merc; assignedSlotId: string; fatigueAtStart?: number }>;
+  party: Array<{
+    merc: Merc;
+    assignedSlotId: string;
+    fatigueAtStart?: number;
+    /**
+     * M7.11: veterancy tier label ('rookie' | 'veteran' | 'grizzled') passed
+     * to the narrator so prose can lean on the merc's experience. Optional —
+     * omitted from roster-less scenario runs.
+     */
+    tier?: 'rookie' | 'veteran' | 'grizzled';
+    /**
+     * M7.11: ids of other party members this merc is bonded with. Lets the
+     * narrator give bonded duos shared beats ("they moved as one"). Empty
+     * array when no bonds in-party.
+     */
+    bondedPartyMercIds?: string[];
+  }>;
   slots: ScenarioSlot[];
   band: OutcomeBand;
   bandReason: string;

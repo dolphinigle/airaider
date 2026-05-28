@@ -333,11 +333,24 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
     scenarioTitle: scenario.title,
     scenarioTarget: scenario.target,
     archetype: scenario.archetype,
-    party: assignments.map((a) => ({
-      merc: a.merc,
-      assignedSlotId: a.slotId,
-      fatigueAtStart: fatigueOf ? fatigueOf(a.merc.id) : 0,
-    })),
+    party: assignments.map((a) => {
+      const bondedPartyMercIds: string[] = [];
+      if (input.bondedPairs) {
+        for (const other of assignments) {
+          if (other.merc.id === a.merc.id) continue;
+          const key = a.merc.id < other.merc.id ? `${a.merc.id}|${other.merc.id}` : `${other.merc.id}|${a.merc.id}`;
+          if (input.bondedPairs.has(key)) bondedPartyMercIds.push(other.merc.id);
+        }
+      }
+      const tier = input.tierOf ? input.tierOf(a.merc.id) : undefined;
+      return {
+        merc: a.merc,
+        assignedSlotId: a.slotId,
+        fatigueAtStart: fatigueOf ? fatigueOf(a.merc.id) : 0,
+        ...(tier ? { tier } : {}),
+        ...(bondedPartyMercIds.length > 0 ? { bondedPartyMercIds } : {}),
+      };
+    }),
     slots: scenario.slots,
     band: band.band,
     bandReason: band.reason,

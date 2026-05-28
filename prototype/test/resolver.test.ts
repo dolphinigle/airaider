@@ -197,3 +197,66 @@ describe('resolveScenario (with MockScenarioLLM)', () => {
     }
   });
 });
+
+describe('M7.11 LLM request enrichment', () => {
+  it('passes tier and bondedPartyMercIds for each assigned merc', async () => {
+    const tags = loadTags(TAGS_PATH);
+    const mercs = loadMercs(MERCS_PATH, tags);
+    const fixture = loadScenario(join(ROOT, 'fixtures', 'raid-01.json'));
+    const assignments: Assignment[] = fixture.assignments!.map((a) => ({
+      slotId: a.slotId,
+      merc: mercs.get(a.mercId)!,
+    }));
+    let captured: import('../src/llm/interface.js').ScenarioLLMRequest | undefined;
+    const recordingLLM: import('../src/llm/interface.js').ScenarioLLM = {
+      name: 'recording',
+      async narrate(req) {
+        captured = req;
+        return { contributions: req.party.map((p) => ({ mercId: p.merc.id, line: 'x' })), outcomeNarrative: 'x' };
+      },
+    };
+    const a = assignments[0]!.merc.id;
+    const b = assignments[1]!.merc.id;
+    const bondKey = a < b ? `${a}|${b}` : `${b}|${a}`;
+    await resolveScenario({
+      scenario: fixture,
+      assignments,
+      llm: recordingLLM,
+      rng: rngFromString(fixture.seed!),
+      bondedPairs: new Set<string>([bondKey]),
+      tierOf: (id) => (id === a ? 'veteran' : 'rookie'),
+    });
+    expect(captured).toBeDefined();
+    const pa = captured!.party.find((p) => p.merc.id === a)!;
+    const pb = captured!.party.find((p) => p.merc.id === b)!;
+    expect(pa.tier).toBe('veteran');
+    expect(pb.tier).toBe('rookie');
+    expect(pa.bondedPartyMercIds).toEqual([b]);
+    expect(pb.bondedPartyMercIds).toEqual([a]);
+  });
+
+  it('omits tier/bondedPartyMercIds when roster context not provided', async () => {
+    const tags = loadTags(TAGS_PATH);
+    const mercs = loadMercs(MERCS_PATH, tags);
+    const fixture = loadScenario(join(ROOT, 'fixtures', 'raid-01.json'));
+    const assignments: Assignment[] = fixture.assignments!.map((a) => ({
+      slotId: a.slotId,
+      merc: mercs.get(a.mercId)!,
+    }));
+    let captured: import('../src/llm/interface.js').ScenarioLLMRequest | undefined;
+    const recordingLLM: import('../src/llm/interface.js').ScenarioLLM = {
+      name: 'recording',
+      async narrate(req) {
+        captured = req;
+        return { contributions: req.party.map((p) => ({ mercId: p.merc.id, line: 'x' })), outcomeNarrative: 'x' };
+      },
+    };
+    await resolveScenario({
+      scenario: fixture, assignments, llm: recordingLLM, rng: rngFromString(fixture.seed!),
+    });
+    for (const p of captured!.party) {
+      expect(p.tier).toBeUndefined();
+      expect(p.bondedPartyMercIds).toBeUndefined();
+    }
+  });
+});

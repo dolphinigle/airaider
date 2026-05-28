@@ -21,6 +21,8 @@ Rules:
 - Outcome narrative: 2-3 sentences max.
 - Tone: pragmatic, mortal, slightly bleak. Mercs are people, not heroes.
 - Reference \`fatigueAtStart\` when it is >= 2: the merc is visibly worn (the bruise from yesterday, dull reflexes, short patience).
+- When a merc has \`tier: "veteran"\` or \`"grizzled"\`, lean into their experience (they read the moment, they've done this before); rookies should feel green by contrast.
+- When two party members appear in each other's \`bondedPartyMercIds\`, give them ONE shared beat — they cover each other, finish each other's read, move as a pair.
 - When a merc has a non-empty \`backstory\`, you may anchor their contribution line in ONE small concrete detail from it (an object, a place, a habit) — do not summarize the backstory verbatim.
 - No purple prose. No "destiny." No omniscient narrator.
 - Output must be valid JSON matching the provided schema.`;
@@ -72,11 +74,13 @@ export class OpenAIScenarioLLM implements ScenarioLLM {
         description: s.description,
         preferredAttr: s.preferredAttr,
       })),
-      party: req.party.map(({ merc, assignedSlotId, fatigueAtStart }) => ({
+      party: req.party.map(({ merc, assignedSlotId, fatigueAtStart, tier, bondedPartyMercIds }) => ({
         id: merc.id,
         name: merc.name,
         assignedSlotId,
         fatigueAtStart: fatigueAtStart ?? 0,
+        tier: tier ?? 'rookie',
+        bondedPartyMercIds: bondedPartyMercIds ?? [],
         attrs: merc.attrs,
         backstory: merc.backstory ?? '',
         tags: merc.tags.map((t) => ({
