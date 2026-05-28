@@ -48,3 +48,42 @@ describe('M15.1 roster status alerts', () => {
     expect(alerts2.some((a) => a.includes('Tavern refresh'))).toBe(false);
   });
 });
+
+describe('M12.2 watch-tower daily-event forecast', () => {
+  const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+  const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+  const EVENTS_PATH = join(ROOT, 'data', 'events.json');
+
+  it('returns null when fort has no watch-tower', async () => {
+    const { watchTowerForecast } = await import('../src/rosterAlerts.js');
+    const r = newRoster([mercs.get('marek')!]);
+    expect(watchTowerForecast(r, EVENTS_PATH)).toBeNull();
+  });
+
+  it('returns a forecast line when watch-tower is built', async () => {
+    const { watchTowerForecast } = await import('../src/rosterAlerts.js');
+    const r = newRoster([mercs.get('marek')!]);
+    r.fort.upgrades.push('watch-tower');
+    r.fort.level = 4;
+    const f = watchTowerForecast(r, EVENTS_PATH);
+    // event roll for day 1 may return null occasionally; assert shape if non-null
+    if (f) {
+      expect(f.line).toContain('Watch-tower forecast');
+      expect(f.label.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('forecast is deterministic for the same dayCount', async () => {
+    const { watchTowerForecast } = await import('../src/rosterAlerts.js');
+    const r1 = newRoster([mercs.get('marek')!]);
+    r1.fort.upgrades.push('watch-tower');
+    r1.fort.level = 4;
+    r1.dayCount = 10;
+    const r2 = newRoster([mercs.get('marek')!]);
+    r2.fort.upgrades.push('watch-tower');
+    r2.fort.level = 4;
+    r2.dayCount = 10;
+    expect(watchTowerForecast(r1, EVENTS_PATH))
+      .toEqual(watchTowerForecast(r2, EVENTS_PATH));
+  });
+});

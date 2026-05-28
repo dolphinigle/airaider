@@ -11,7 +11,7 @@ import { loadTags } from './tags.js';
 import { loadMercs } from './mercs.js';
 import { newRoster, loadRoster, saveRoster, type Roster } from './roster.js';
 import { reputationTier } from './reputation.js';
-import { statusAlerts } from './rosterAlerts.js';
+import { statusAlerts, watchTowerForecast } from './rosterAlerts.js';
 
 function main(): void {
   const [cmd, pathArg] = process.argv.slice(2);
@@ -64,6 +64,12 @@ function printRoster(r: Roster, path: string): void {
   // M15.1: status alert lines — surface debt, morale, payday/refresh
   // countdowns so the player isn't surprised by next-day mechanics.
   const alerts = statusAlerts(r);
+  // M12.2: watch-tower forecast appended as an alert when the upgrade is owned.
+  const forecast = watchTowerForecast(
+    r,
+    new URL('../data/events.json', import.meta.url).pathname,
+  );
+  if (forecast) alerts.push(forecast.line);
   if (alerts.length > 0) {
     console.log('  alerts:');
     for (const a of alerts) console.log(`    ${a}`);
