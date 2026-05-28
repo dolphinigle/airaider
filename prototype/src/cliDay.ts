@@ -10,6 +10,7 @@ import { renderDayTranscript } from './dayTranscript.js';
 import { MockScenarioLLM } from './llm/mock.js';
 import { OpenAIScenarioLLM } from './llm/openai.js';
 import type { ScenarioLLM } from './llm/interface.js';
+import { loadRoster, saveRoster, rosterExists } from './roster.js';
 
 interface CliArgs {
   dayPath: string;
@@ -17,6 +18,7 @@ interface CliArgs {
   model?: string;
   outPath?: string;
   writeTranscript: boolean;
+  rosterPath?: string;
 }
 
 function parseArgs(argv: string[]): CliArgs {
@@ -26,6 +28,7 @@ function parseArgs(argv: string[]): CliArgs {
   let model: string | undefined;
   let outPath: string | undefined;
   let writeTranscript = true;
+  let rosterPath: string | undefined;
   for (let i = 0; i < args.length; i++) {
     const a = args[i]!;
     if (a === '--real') useReal = true;
@@ -35,7 +38,8 @@ function parseArgs(argv: string[]): CliArgs {
     } else if (a === '--out') {
       i++;
       outPath = args[i];
-    } else if (a === '--no-write') writeTranscript = false;
+    } else if (a.startsWith('--roster=')) rosterPath = a.slice('--roster='.length);
+    else if (a === '--no-write') writeTranscript = false;
     else if (a === '--help' || a === '-h') {
       printUsage();
       process.exit(0);
@@ -46,18 +50,19 @@ function parseArgs(argv: string[]): CliArgs {
     printUsage();
     process.exit(2);
   }
-  return { dayPath, useReal, model, outPath, writeTranscript };
+  return { dayPath, useReal, model, outPath, writeTranscript, rosterPath };
 }
 
 function printUsage(): void {
   console.error(
-    `Usage: npm run day -- <day.json> [--real] [--model gpt-4.1-nano] [--out path] [--no-write]
+    `Usage: npm run day -- <day.json> [--real] [--model gpt-4.1-nano] [--out path] [--no-write] [--roster=PATH]
 
   <day.json>       Path to day fixture (e.g. fixtures/day-01.json)
   --real           Use real OpenAI; needs OPENAI_API_KEY
   --model NAME     Override OpenAI model (default gpt-4.1-nano)
   --out PATH       Override transcript output path
   --no-write       Don't write a transcript JSON file (still prints to stdout)
+  --roster=PATH    Load/save persistent roster state (creates if missing)
 `,
   );
 }
@@ -83,6 +88,23 @@ async function main(): Promise<void> {
   const mercs = loadMercs(join(dataDir, 'mercs.json'), tags);
   const day = loadDay(dayAbs);
 
+  let roster: ReturnType<typeof loadRoster> | undefined;
+  let mercsForDay: Map<string, import('./types.js').Merc> = mercs;
+  let initialFatigue: Map<string, number> | undefined;
+  const rosterAbs = args.rosterPath ? resolve(args.rosterPath) : undefined;
+  if (rosterAbs) {
+    if (rosterExists(rosterAbs)) {
+      roster = loadRoster(rosterAbs, mercs, tags);
+      console.log(`Loaded roster: ${rosterAbs}  (day ${roster.dayCount} → ${roster.dayCount + 1})`);
+    } else {
+      const { newRoster } = await import('./roster.js');
+      roster = newRoster([...mercs.values()]);
+      console.log(`Initialized roster: ${rosterAbs}`);
+    }
+    mercsForDay = new Map(roster.mercs.map((m) => [m.id, m]));
+    initialFatigue = new Map([...roster.states.values()].map((s) => [s.id, s.fatigue]));
+  }
+
   let llm: ScenarioLLM;
   if (args.useReal) {
     llm = new OpenAIScenarioLLM({
@@ -96,9 +118,20 @@ async function main(): Promise<void> {
     llm = new MockScenarioLLM();
   }
 
-  const resolution = await resolveDay({ day, dayPath: dayAbs, mercs, llm });
+  const resolution = await resolveDay({ day, dayPath: dayAbs, mercs: mercsForDay, llm, initialFatigue });
 
   console.log(renderDayTranscript(resolution));
+
+  if (roster && rosterAbs) {
+    roster.dayCount += 1;
+    for (const [mercId, fatigue] of Object.entries(resolution.finalFatigue)) {
+      const s = roster.states.get(mercId) ?? { id: mercId, fatigue: 0, hpDamage: 0, veterancyGain: 0 };
+      s.fatigue = fatigue;
+      roster.states.set(mercId, s);
+    }
+    saveRoster(rosterAbs, roster, mercs);
+    console.log(`\nUpdated roster → ${rosterAbs}  (day ${roster.dayCount}, ${roster.mercs.length} mercs)`);
+  }
 
   if (args.writeTranscript) {
     const defaultName = args.useReal ? 'day-real' : 'day-mock';

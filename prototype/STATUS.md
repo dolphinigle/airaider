@@ -69,16 +69,13 @@ Day loop with fatigue accumulation.
 - [x] 5 day-loop tests: fatigue accrual, penalty trigger, no-penalty for fresh mercs, determinism, golden snapshot
 - [x] Tests now 37 / 37 ✅
 
-## Milestone M3 — DEFERRED / IN PROGRESS
+## Milestone M3 — IN PROGRESS
 
-Pick from these in priority order if time / Opus budget permits before 09:00 WIB:
-
-- [ ] Pass fatigue to LLM request so narration can reference yesterday's exertion ("the bruise on Marek's shoulder from the wagon job slows him")
-- [ ] Rare/legendary tag in the tag vocabulary (currently only common / uncommon / rare; no legendary present)
-- [ ] Tag-rarity-aware recruit pool generator (random merc gen using `attrBias` and tier weights)
-- [ ] Roster JSON persistence (save/load across days)
-- [ ] Captive cycle (5 outcomes: ransom / sell / display / recruit / execute)
-- [ ] Llama 3.3 70B via Groq A/B (requires GROQ_API_KEY which we don't have)
+- [x] M3.1 Pass fatigue to LLM request so narration can reference yesterday's exertion (commit `2f41546`)
+- [x] M3.2 Tag-rarity-aware recruit pool generator + 10 new tags incl. 1 legendary (commit `ac9fe75`)
+- [x] M3.3 Captive cycle (5 outcomes: ransom / sell / display / recruit / execute) (commit `6802c8e`)
+- [x] M3.4 Roster JSON persistence (save/load across days; `npm run day -- ... --roster=PATH`)
+- [ ] Llama 3.3 70B via Groq A/B (BLOCKED: no GROQ_API_KEY)
 
 ## Milestone M4 — STILL DEFERRED
 

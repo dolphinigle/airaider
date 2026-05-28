@@ -40,6 +40,8 @@ export interface DayResolutionInput {
    * Pass a custom one to test reproducibility.
    */
   rngFor?: (scenario: FixtureScenario, index: number) => Rng;
+  /** Optional starting fatigue per merc (carries over from previous days). */
+  initialFatigue?: Map<string, number>;
 }
 
 export interface DayResolution {
@@ -56,8 +58,8 @@ export interface DayResolution {
  * computeSlotContributions applies a penalty when fatigue ≥ FATIGUE_THRESHOLD.
  */
 export async function resolveDay(input: DayResolutionInput): Promise<DayResolution> {
-  const { day, dayPath, mercs, llm, rngFor } = input;
-  const fatigue = new Map<string, number>();
+  const { day, dayPath, mercs, llm, rngFor, initialFatigue } = input;
+  const fatigue = new Map<string, number>(initialFatigue ?? []);
   const fatigueOf = (mercId: string): number => fatigue.get(mercId) ?? 0;
 
   const fixturesDir = dirname(resolve(dayPath));
