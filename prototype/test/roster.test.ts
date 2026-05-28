@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
-import { mkdtempSync, rmSync, existsSync } from 'node:fs';
+import { mkdtempSync, rmSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadTags } from '../src/tags.js';
 import { loadMercs } from '../src/mercs.js';
@@ -95,6 +95,25 @@ describe('roster persistence', () => {
     const { writeFileSync } = await import('node:fs');
     writeFileSync(p, JSON.stringify(broken));
     expect(() => loadRoster(p, basePool, tags)).toThrow(/unknown base merc/);
+    rmSync(tmp, { recursive: true, force: true });
+  });
+
+  // M17.1: saveRoster now writes a .bak snapshot of the prior file (if any)
+  // before overwriting, so the player can recover from a corrupted save.
+  it('saveRoster writes <path>.bak on overwrite', () => {
+    const p = join(tmp, 'r.json');
+    const r1 = newRoster([]);
+    r1.gold = 11;
+    saveRoster(p, r1, basePool);
+    expect(existsSync(`${p}.bak`)).toBe(false); // no prior file
+    const r2 = newRoster([]);
+    r2.gold = 99;
+    saveRoster(p, r2, basePool);
+    expect(existsSync(`${p}.bak`)).toBe(true);
+    const bak = JSON.parse(readFileSync(`${p}.bak`, 'utf8'));
+    expect(bak.gold).toBe(11);
+    const cur = JSON.parse(readFileSync(p, 'utf8'));
+    expect(cur.gold).toBe(99);
     rmSync(tmp, { recursive: true, force: true });
   });
 });

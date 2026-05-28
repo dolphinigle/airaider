@@ -5,7 +5,7 @@
 // id PLUS any generated/recruited mercs in full), per-merc fatigue and hp,
 // veterancy, captives currently held, gold, reputation counters, and day#.
 
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
 import { z } from 'zod';
 import type { Merc, Tag } from './types.js';
 import type { Captive, CaptiveEffect } from './captive.js';
@@ -354,6 +354,17 @@ export function saveRoster(
       ...(e.startingXp !== undefined ? { startingXp: e.startingXp } : {}),
     })),
   };
+  // M17.1: defensive backup. If a roster file already exists at this path,
+  // copy it to `<path>.bak` before overwriting so a corrupted save (or an
+  // unwanted mutation) can be recovered manually. Best-effort: failures
+  // (e.g. read-only fs) are swallowed so they never block the actual save.
+  if (existsSync(path)) {
+    try {
+      copyFileSync(path, `${path}.bak`);
+    } catch {
+      // ignore — backup is best-effort
+    }
+  }
   writeFileSync(path, JSON.stringify(file, null, 2) + '\n', 'utf8');
 }
 
