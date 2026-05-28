@@ -18,6 +18,7 @@ import { applyVeterancyXp, type Promotion } from './veterancy.js';
 import { recordCoDeployment, bondedPairsOf, type BondFormation } from './bonds.js';
 import { seasonFor, type SeasonClock } from './season.js';
 import { loadEventCatalog, rollEventForDay, type DailyEvent } from './events.js';
+import { affordableUpgrades, loadFortCatalog, type FortUpgrade } from './fort.js';
 
 const DaySchema = z.object({
   id: z.string().min(1),
@@ -70,6 +71,11 @@ export interface DayResolution {
   seasonClock: SeasonClock | null;
   /** M7.4: daily event rolled at the start of the day (null if none / roster-less). */
   dailyEvent: DailyEvent | null;
+  /**
+   * M7.5: fort upgrades affordable as of end-of-day (roster-mode only).
+   * Empty if none. The dayTranscript surfaces these as a FORT HINT block.
+   */
+  fortHints: Pick<FortUpgrade, 'id' | 'name' | 'cost' | 'description'>[];
 }
 
 /**
@@ -199,6 +205,18 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   const finalFatigue: Record<string, number> = {};
   for (const [k, v] of fatigue) finalFatigue[k] = v;
 
+  // M7.5: compute affordable fort upgrades as of end-of-day so the
+  // transcript can nudge the player with a FORT HINT block.
+  let fortHints: Pick<FortUpgrade, 'id' | 'name' | 'cost' | 'description'>[] = [];
+  if (roster) {
+    const fortCatalog = loadFortCatalog(
+      new URL('../data/fort-upgrades.json', import.meta.url).pathname,
+    );
+    fortHints = affordableUpgrades(fortCatalog, roster.fort, roster.gold).map((u) => ({
+      id: u.id, name: u.name, cost: u.cost, description: u.description,
+    }));
+  }
+
   return {
     dayId: day.id,
     dayName: day.name,
@@ -210,5 +228,6 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     bondsFormed,
     seasonClock,
     dailyEvent,
+    fortHints,
   };
 }

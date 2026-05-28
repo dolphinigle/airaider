@@ -86,3 +86,24 @@ export function purchaseUpgrade(input: PurchaseInput): { ok: true; result: Purch
     result: { fort: nextFort, gold: gold - upgrade.cost, upgrade, leveledUp },
   };
 }
+
+/**
+ * M7.5: enumerate upgrades that the fort can legally purchase right now
+ * (not already owned, level requirement met, gold suffices). Sorted by
+ * ascending cost so the cheapest hint can be surfaced first.
+ */
+export function affordableUpgrades(
+  catalog: Map<string, FortUpgrade>,
+  fort: FortState,
+  gold: number,
+): FortUpgrade[] {
+  const out: FortUpgrade[] = [];
+  for (const u of catalog.values()) {
+    if (fort.upgrades.includes(u.id)) continue;
+    if (u.requiresLevel != null && fort.level < u.requiresLevel) continue;
+    if (gold < u.cost) continue;
+    out.push(u);
+  }
+  out.sort((a, b) => a.cost - b.cost || a.id.localeCompare(b.id));
+  return out;
+}

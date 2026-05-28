@@ -101,3 +101,35 @@ describe('M6.4 fort upgrades', () => {
     expect(r.fort).toEqual({ level: 1, upgrades: [] });
   });
 });
+
+describe('M7.5 affordable upgrade hints', () => {
+  const catalog = loadFortCatalog(join(ROOT, 'data', 'fort-upgrades.json'));
+
+  it('lists only unowned, level-met, gold-met upgrades sorted by cost', async () => {
+    const { affordableUpgrades } = await import('../src/fort.js');
+    // L1 fort, 5g: reinforced-palisade (5g) and winter-larder (3g) qualify;
+    // smithy/chapel need L2; watch-tower needs L3. Sorted by cost asc.
+    const hints = affordableUpgrades(catalog, { level: 1, upgrades: [] }, 5);
+    expect(hints.map((u) => u.id)).toEqual(['winter-larder', 'reinforced-palisade']);
+  });
+
+  it('excludes already-owned upgrades and respects level gates', async () => {
+    const { affordableUpgrades } = await import('../src/fort.js');
+    const hints = affordableUpgrades(
+      catalog,
+      { level: 2, upgrades: ['reinforced-palisade'] },
+      99,
+    );
+    const ids = hints.map((u) => u.id);
+    expect(ids).not.toContain('reinforced-palisade');
+    expect(ids).toContain('smithy');
+    // watch-tower needs L3 → still gated out.
+    expect(ids).not.toContain('watch-tower');
+  });
+
+  it('returns [] when no upgrade is affordable', async () => {
+    const { affordableUpgrades } = await import('../src/fort.js');
+    const hints = affordableUpgrades(catalog, { level: 1, upgrades: [] }, 0);
+    expect(hints).toEqual([]);
+  });
+});

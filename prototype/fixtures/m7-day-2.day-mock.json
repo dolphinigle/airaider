@@ -112,5 +112,19 @@
         }
       ]
     }
-  }
+  },
+  "fortHints": [
+    {
+      "id": "winter-larder",
+      "name": "Winter Larder",
+      "cost": 3,
+      "description": "Salted meat, pickled roots, and a locked door. Frost seasons sting less."
+    },
+    {
+      "id": "chapel",
+      "name": "Wayside Chapel",
+      "cost": 4,
+      "description": "A small stone chapel for the dead. The living sleep a little easier."
+    }
+  ]
 }

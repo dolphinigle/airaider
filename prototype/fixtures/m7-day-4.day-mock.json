@@ -105,5 +105,6 @@
       "fatigueDelta": 1,
       "reputationDeltas": []
     }
-  }
+  },
+  "fortHints": []
 }

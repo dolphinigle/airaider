@@ -71,6 +71,13 @@ export function renderDayTranscript(day: DayResolution): string {
       lines.push(`   ⚭ ${b.mercA} ↔ ${b.mercB}  (day ${b.onDay})`);
     }
   }
+  if (day.fortHints.length > 0) {
+    lines.push('');
+    lines.push(' FORT HINT: affordable upgrade(s) — run `npm run fort -- <roster> upgrade <id>`');
+    for (const h of day.fortHints) {
+      lines.push(`   ⌂ ${h.id} (${h.cost}g) — ${h.name}`);
+    }
+  }
   lines.push(DBAR);
   return lines.join('\n');
 }

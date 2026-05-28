@@ -203,5 +203,6 @@
   "promotions": [],
   "bondsFormed": [],
   "seasonClock": null,
-  "dailyEvent": null
+  "dailyEvent": null,
+  "fortHints": []
 }

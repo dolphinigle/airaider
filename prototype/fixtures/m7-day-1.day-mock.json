@@ -106,5 +106,19 @@
         }
       ]
     }
-  }
+  },
+  "fortHints": [
+    {
+      "id": "winter-larder",
+      "name": "Winter Larder",
+      "cost": 3,
+      "description": "Salted meat, pickled roots, and a locked door. Frost seasons sting less."
+    },
+    {
+      "id": "reinforced-palisade",
+      "name": "Reinforced Palisade",
+      "cost": 5,
+      "description": "Heavy timbers and iron ties around the perimeter. Raids hit the gate, not the wall."
+    }
+  ]
 }
