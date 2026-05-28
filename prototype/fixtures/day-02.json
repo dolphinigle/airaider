@@ -1,0 +1,10 @@
+{
+  "id": "day-02",
+  "name": "Word from the Mire",
+  "scenarios": [
+    "raid-06-mire.json",
+    "raid-02-recruit.json",
+    "raid-05-tavern.json"
+  ],
+  "seed": "day-02-deterministic"
+}

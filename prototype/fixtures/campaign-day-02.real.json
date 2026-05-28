@@ -1,0 +1,226 @@
+{
+  "dayId": "day-02",
+  "dayName": "Word from the Mire",
+  "scenarios": [
+    {
+      "scenarioId": "raid-06-mire",
+      "title": "The Mire's Tribute",
+      "target": "retrieve the iron coffer the priest of Sevrenne dropped when the bog took him, before the next moon",
+      "archetype": "contract",
+      "partySize": 3,
+      "slotContributions": [
+        {
+          "slotId": "wade",
+          "mercId": "marek",
+          "attrUsed": "physical",
+          "attrScore": 5,
+          "tagsMatched": [
+            "phys:muscular"
+          ],
+          "coinsContributed": 2,
+          "fatigue": 3,
+          "fatiguePenalty": 1
+        },
+        {
+          "slotId": "track",
+          "mercId": "veska",
+          "attrUsed": "intelligence",
+          "attrScore": 6,
+          "tagsMatched": [
+            "bg:scholar"
+          ],
+          "coinsContributed": 2,
+          "fatigue": 2,
+          "fatiguePenalty": 1
+        },
+        {
+          "slotId": "watch",
+          "mercId": "dren",
+          "attrUsed": "willpower",
+          "attrScore": 4,
+          "tagsMatched": [
+            "temp:brave"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 0,
+          "fatiguePenalty": 0
+        }
+      ],
+      "synergy": {
+        "pairs": [
+          {
+            "mercA": "marek",
+            "mercB": "dren",
+            "sharedTagId": "temp:brave"
+          }
+        ],
+        "bonusCoins": 1
+      },
+      "baseCoinBudget": 4,
+      "coinsActual": 5,
+      "rollFaces": [
+        "heads",
+        "tails",
+        "heads",
+        "heads",
+        "tails"
+      ],
+      "heads": 3,
+      "tails": 2,
+      "band": "unfavorable",
+      "bandReason": "3/5 heads (split — pessimistic default)",
+      "contributions": [
+        {
+          "mercId": "marek",
+          "line": "Marek, muscles tense and face grim, pushes through the sucking pools despite his fatigue, clutching the notched coin tightly."
+        },
+        {
+          "mercId": "veska",
+          "line": "Veska studies the tar-smell carefully, her sharp eyes tracing the priest’s last footsteps in the muddy mire."
+        },
+        {
+          "mercId": "dren",
+          "line": "Dren, quick-footed and steady, keeps watch behind the party, eyes darting for any signs of lurking shapes in the reeds."
+        }
+      ],
+      "outcomeNarrative": "The split decision led to a cautious approach, but the swamp’s treachery wore down even the bravest, and the party's chances are diminished.",
+      "llmName": "openai:gpt-4.1-nano"
+    },
+    {
+      "scenarioId": "raid-02",
+      "title": "The Coward at the Crossroads",
+      "target": "decide whether to hire the deserter loitering outside the chapel",
+      "archetype": "recruit",
+      "partySize": 2,
+      "slotContributions": [
+        {
+          "slotId": "read-character",
+          "mercId": "veska",
+          "attrUsed": "intelligence",
+          "attrScore": 6,
+          "tagsMatched": [
+            "pers:stoic"
+          ],
+          "coinsContributed": 2,
+          "fatigue": 3,
+          "fatiguePenalty": 1
+        },
+        {
+          "slotId": "persuade",
+          "mercId": "imogen",
+          "attrUsed": "charisma",
+          "attrScore": 5,
+          "tagsMatched": [
+            "pers:charming"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 0,
+          "fatiguePenalty": 0
+        }
+      ],
+      "synergy": {
+        "pairs": [],
+        "bonusCoins": 0
+      },
+      "baseCoinBudget": 4,
+      "coinsActual": 4,
+      "rollFaces": [
+        "tails",
+        "heads",
+        "heads",
+        "heads"
+      ],
+      "heads": 3,
+      "tails": 1,
+      "band": "favorable",
+      "bandReason": "3/4 heads (favorable)",
+      "contributions": [
+        {
+          "mercId": "veska",
+          "line": "Veska studies his eyes and hands, skeptical of the panic-driven lies he's likely rehearsing."
+        },
+        {
+          "mercId": "imogen",
+          "line": "Imogen leans in, her voice calm and persuasive, probing for the real reason he ran from his old squad."
+        }
+      ],
+      "outcomeNarrative": "Veska's sharp eyes catch the faint tremor in the deserter’s hands, confirming his nerves, while Imogen’s charm uncovers a desperate desire to escape shame rather than cowardice. Their combined effort convinces enough to give him a chance, though trust remains fragile.",
+      "llmName": "openai:gpt-4.1-nano"
+    },
+    {
+      "scenarioId": "raid-05",
+      "title": "The Recruits' Drinking Match",
+      "target": "hold a long night of drinking that closes ranks between the two newest hands without ending in a brawl",
+      "archetype": "tavern",
+      "partySize": 2,
+      "slotContributions": [
+        {
+          "slotId": "hold-liquor",
+          "mercId": "marek",
+          "attrUsed": "physical",
+          "attrScore": 5,
+          "tagsMatched": [
+            "temp:brave"
+          ],
+          "coinsContributed": 2,
+          "fatigue": 4,
+          "fatiguePenalty": 1
+        },
+        {
+          "slotId": "keep-songs-going",
+          "mercId": "dren",
+          "attrUsed": "willpower",
+          "attrScore": 4,
+          "tagsMatched": [
+            "temp:brave"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 1,
+          "fatiguePenalty": 0
+        }
+      ],
+      "synergy": {
+        "pairs": [
+          {
+            "mercA": "marek",
+            "mercB": "dren",
+            "sharedTagId": "temp:brave"
+          }
+        ],
+        "bonusCoins": 1
+      },
+      "baseCoinBudget": 4,
+      "coinsActual": 5,
+      "rollFaces": [
+        "tails",
+        "tails",
+        "tails",
+        "heads",
+        "heads"
+      ],
+      "heads": 2,
+      "tails": 3,
+      "band": "unfavorable",
+      "bandReason": "2/5 heads (split — pessimistic default)",
+      "contributions": [
+        {
+          "mercId": "marek",
+          "line": "Marek, muscles tense and eyes dull, hoists his mug high, out-drinking the younger recruits with stubborn grit despite his fatigue."
+        },
+        {
+          "mercId": "dren",
+          "line": "Dren, with a faint smirk and a quick sip, keeps the songs and stories going, wary but determined not to show fatigue."
+        }
+      ],
+      "outcomeNarrative": "The night drags on as Marek's brawn and Dren's willpower push the drinks and stories past the bitter hour, but the division remains — fatigue and mistrust linger, leaving the mood fractured.",
+      "llmName": "openai:gpt-4.1-nano"
+    }
+  ],
+  "finalFatigue": {
+    "marek": 5,
+    "roselle": 1,
+    "imogen": 1,
+    "dren": 2,
+    "veska": 4
+  }
+}

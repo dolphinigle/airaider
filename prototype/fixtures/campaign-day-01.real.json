@@ -1,0 +1,197 @@
+{
+  "dayId": "day-01",
+  "dayName": "First Day at the Crow's Wing",
+  "scenarios": [
+    {
+      "scenarioId": "raid-01",
+      "title": "The Merchant's Lost Wagon",
+      "target": "recover the salt-merchant's wagon from the brigands camped at the Crow's Ford",
+      "archetype": "contract",
+      "partySize": 2,
+      "slotContributions": [
+        {
+          "slotId": "lock",
+          "mercId": "marek",
+          "attrUsed": "physical",
+          "attrScore": 5,
+          "tagsMatched": [
+            "phys:muscular"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 0,
+          "fatiguePenalty": 0
+        },
+        {
+          "slotId": "sentry",
+          "mercId": "roselle",
+          "attrUsed": "agility",
+          "attrScore": 6,
+          "tagsMatched": [
+            "phys:quick"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 0,
+          "fatiguePenalty": 0
+        }
+      ],
+      "synergy": {
+        "pairs": [],
+        "bonusCoins": 0
+      },
+      "baseCoinBudget": 3,
+      "coinsActual": 3,
+      "rollFaces": [
+        "tails",
+        "heads",
+        "tails"
+      ],
+      "heads": 1,
+      "tails": 2,
+      "band": "unfavorable",
+      "bandReason": "1/3 heads (unfavorable)",
+      "contributions": [
+        {
+          "mercId": "marek",
+          "line": "Marek fumbles with the iron lock, his brawny hands unsteady from fatigue, but his soldier's grit keeps him trying."
+        },
+        {
+          "mercId": "roselle",
+          "line": "Roselle, crouching in the shadows, inches past the sentry with her quick feet and cautious eyes, avoiding any noise."
+        }
+      ],
+      "outcomeNarrative": "Despite their efforts, the lock proves stubborn and the sentry's alertness is too sharp; their infiltration is thwarted, leaving the wagon still out of reach.",
+      "llmName": "openai:gpt-4.1-nano"
+    },
+    {
+      "scenarioId": "raid-03",
+      "title": "The Brigand's Tongue",
+      "target": "wring the location of the bandit cache out of the prisoner before dawn",
+      "archetype": "captive",
+      "partySize": 2,
+      "slotContributions": [
+        {
+          "slotId": "intimidate",
+          "mercId": "marek",
+          "attrUsed": "physical",
+          "attrScore": 5,
+          "tagsMatched": [
+            "phys:muscular",
+            "temp:brave"
+          ],
+          "coinsContributed": 4,
+          "fatigue": 1,
+          "fatiguePenalty": 0
+        },
+        {
+          "slotId": "read-lies",
+          "mercId": "veska",
+          "attrUsed": "willpower",
+          "attrScore": 5,
+          "tagsMatched": [
+            "pers:stoic"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 0,
+          "fatiguePenalty": 0
+        }
+      ],
+      "synergy": {
+        "pairs": [],
+        "bonusCoins": 0
+      },
+      "baseCoinBudget": 5,
+      "coinsActual": 5,
+      "rollFaces": [
+        "heads",
+        "heads",
+        "tails",
+        "heads",
+        "heads"
+      ],
+      "heads": 4,
+      "tails": 1,
+      "band": "favorable",
+      "bandReason": "4/5 heads (favorable)",
+      "contributions": [
+        {
+          "mercId": "marek",
+          "line": "Marek's brawny fist presses into the prisoner's collar, demanding the truth with a soldier's grit."
+        },
+        {
+          "mercId": "veska",
+          "line": "Veska's sharp eyes catch inconsistencies in the prisoner’s story, her calm tone probing for slips."
+        }
+      ],
+      "outcomeNarrative": "Marek's physical intimidation rattles the prisoner enough to crack his false calm, while Veska's keen reading exposes contradictions; together, they force the bandit's secret from him.",
+      "llmName": "openai:gpt-4.1-nano"
+    },
+    {
+      "scenarioId": "raid-04",
+      "title": "Watchtower at the Pass",
+      "target": "commission a new watchtower at the southern pass before winter closes the road",
+      "archetype": "build",
+      "partySize": 2,
+      "slotContributions": [
+        {
+          "slotId": "design",
+          "mercId": "veska",
+          "attrUsed": "intelligence",
+          "attrScore": 6,
+          "tagsMatched": [
+            "bg:scholar"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 1,
+          "fatiguePenalty": 0
+        },
+        {
+          "slotId": "oversee",
+          "mercId": "marek",
+          "attrUsed": "willpower",
+          "attrScore": 4,
+          "tagsMatched": [
+            "temp:brave"
+          ],
+          "coinsContributed": 2,
+          "fatigue": 2,
+          "fatiguePenalty": 1
+        }
+      ],
+      "synergy": {
+        "pairs": [],
+        "bonusCoins": 0
+      },
+      "baseCoinBudget": 4,
+      "coinsActual": 4,
+      "rollFaces": [
+        "heads",
+        "tails",
+        "heads",
+        "tails"
+      ],
+      "heads": 2,
+      "tails": 2,
+      "band": "unfavorable",
+      "bandReason": "2/4 heads (split — pessimistic default)",
+      "contributions": [
+        {
+          "mercId": "veska",
+          "line": "Veska meticulously drafts the structure, her sharp eye catching flaws in the timber before they become a problem."
+        },
+        {
+          "mercId": "marek",
+          "line": "Marek, despite fatigue darkening his eyes, keeps a wary watch over the crew, his brawny frame tense and alert."
+        }
+      ],
+      "outcomeNarrative": "Veska's precise planning prevents major flaws in the design, but Marek's strained oversight fails to rally the crew, leading to a half-finished tower that won't hold through the spring melt.",
+      "llmName": "openai:gpt-4.1-nano"
+    }
+  ],
+  "finalFatigue": {
+    "marek": 3,
+    "roselle": 1,
+    "imogen": 0,
+    "dren": 0,
+    "veska": 2
+  }
+}

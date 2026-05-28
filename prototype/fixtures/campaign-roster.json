@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "dayCount": 3,
+  "gold": 0,
+  "reputation": {},
+  "rosterMercIds": [
+    "marek",
+    "roselle",
+    "imogen",
+    "dren",
+    "veska"
+  ],
+  "generatedMercs": [],
+  "mercStates": [
+    {
+      "id": "marek",
+      "fatigue": 5,
+      "hpDamage": 0,
+      "veterancyGain": 0
+    },
+    {
+      "id": "roselle",
+      "fatigue": 2,
+      "hpDamage": 0,
+      "veterancyGain": 0
+    },
+    {
+      "id": "imogen",
+      "fatigue": 3,
+      "hpDamage": 0,
+      "veterancyGain": 0
+    },
+    {
+      "id": "dren",
+      "fatigue": 3,
+      "hpDamage": 0,
+      "veterancyGain": 0
+    },
+    {
+      "id": "veska",
+      "fatigue": 5,
+      "hpDamage": 0,
+      "veterancyGain": 0
+    }
+  ],
+  "captives": []
+}

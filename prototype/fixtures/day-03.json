@@ -1,0 +1,9 @@
+{
+  "id": "day-03",
+  "name": "The Stelm Road Turns Sour",
+  "scenarios": [
+    "raid-07-plague.json",
+    "raid-08-tax-riot.json"
+  ],
+  "seed": "day-03-deterministic"
+}
