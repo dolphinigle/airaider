@@ -128,5 +128,7 @@
       "after": 0
     }
   ],
-  "woundHealing": []
+  "woundHealing": [],
+  "wagesPaid": [],
+  "wagesTotalPaid": 0
 }

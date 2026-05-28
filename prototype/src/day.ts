@@ -20,6 +20,9 @@ import { recordCoDeployment, bondedPairsOf, type BondFormation } from './bonds.j
 import { seasonFor, type SeasonClock } from './season.js';
 import { loadEventCatalog, rollEventForDay, type DailyEvent } from './events.js';
 import { reputationTier } from './reputation.js';
+
+/** M9.1: wages are paid every Nth day (CANONICAL §2.7 flat-wage rule). */
+export const WAGE_INTERVAL_DAYS = 7;
 import { fortEffectsFor, chapelHealsWounds, fatigueRecoveryAmount } from './fortEffects.js';
 import { affordableUpgrades, loadFortCatalog, type FortUpgrade } from './fort.js';
 
@@ -90,6 +93,15 @@ export interface DayResolution {
    * has the chapel upgrade AND idle mercs had hpDamage > 0.
    */
   woundHealing: Array<{ mercId: string; before: number; after: number }>;
+  /**
+   * M9.1: weekly payday. Non-empty only on days where `(dayCount+1)`
+   * is a multiple of WAGE_INTERVAL_DAYS (7) AND the roster has mercs.
+   * Each entry records one merc's wage; `wagesTotalPaid` is the sum
+   * deducted from `roster.gold` (gold may go negative — debt is allowed
+   * for now; future milestones will add desertion / morale loss).
+   */
+  wagesPaid: Array<{ mercId: string; wage: number }>;
+  wagesTotalPaid: number;
   /**
    * M7.6: fort log entries appended during THIS day (currently only the
    * daily-event entry; upgrade purchases happen via the fort CLI, not the day
@@ -298,6 +310,23 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   }
 
 
+  // M9.1: weekly payday. Every WAGE_INTERVAL_DAYS the fort pays out the
+  // sum of wages for the current roster. Flat-wage rule (CANONICAL §2.7)
+  // means every merc costs the same regardless of stats/tags. Debt is
+  // tolerated for now — gold may go negative.
+  const wagesPaid: Array<{ mercId: string; wage: number }> = [];
+  let wagesTotalPaid = 0;
+  if (roster) {
+    const currentDay = roster.dayCount + 1;
+    if (currentDay % WAGE_INTERVAL_DAYS === 0 && roster.mercs.length > 0) {
+      for (const m of roster.mercs) {
+        wagesPaid.push({ mercId: m.id, wage: m.wage });
+        wagesTotalPaid += m.wage;
+      }
+      roster.gold -= wagesTotalPaid;
+    }
+  }
+
   // M7.5: compute affordable fort upgrades as of end-of-day so the
   // transcript can nudge the player with a FORT HINT block.
   let fortHints: Pick<FortUpgrade, 'id' | 'name' | 'cost' | 'description'>[] = [];
@@ -325,5 +354,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     newFortLogEntries,
     fatigueRecovery,
     woundHealing,
+    wagesPaid,
+    wagesTotalPaid,
   };
 }

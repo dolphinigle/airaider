@@ -79,7 +79,9 @@ describe('M7.4 daily events', () => {
     // Either frost-supplies-thin (no larder) or frost-larder-holds (has larder).
     expect(['frost-supplies-thin', 'frost-larder-holds']).toContain(r.dailyEvent.id);
     if (r.dailyEvent.id === 'frost-supplies-thin') {
-      expect(roster.gold).toBe(4);
+      // M9.1: dayCount=90 → currentDay=91 which is %7==0, so wages
+      // (marek + veska = 2g) are also deducted on top of the event's −1g.
+      expect(roster.gold).toBe(5 - 1 - 2);
     }
   });
 

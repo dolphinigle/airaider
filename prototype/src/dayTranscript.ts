@@ -99,6 +99,13 @@ export function renderDayTranscript(day: DayResolution): string {
       lines.push(`   ▸ day ${e.day}  [${e.kind}]  ${e.message}`);
     }
   }
+  if (day.wagesPaid.length > 0) {
+    lines.push('');
+    lines.push(` PAYDAY (−${day.wagesTotalPaid}g, ${day.wagesPaid.length} merc${day.wagesPaid.length === 1 ? '' : 's'}):`);
+    for (const w of day.wagesPaid) {
+      lines.push(`   ⛁ ${w.mercId}: −${w.wage}g`);
+    }
+  }
   lines.push(DBAR);
   return lines.join('\n');
 }

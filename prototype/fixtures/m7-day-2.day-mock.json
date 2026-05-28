@@ -129,5 +129,7 @@
     }
   ],
   "fatigueRecovery": [],
-  "woundHealing": []
+  "woundHealing": [],
+  "wagesPaid": [],
+  "wagesTotalPaid": 0
 }

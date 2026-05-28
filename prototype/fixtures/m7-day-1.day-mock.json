@@ -135,5 +135,24 @@
     }
   ],
   "fatigueRecovery": [],
-  "woundHealing": []
+  "woundHealing": [],
+  "wagesPaid": [
+    {
+      "mercId": "marek",
+      "wage": 1
+    },
+    {
+      "mercId": "veska",
+      "wage": 1
+    },
+    {
+      "mercId": "imogen",
+      "wage": 1
+    },
+    {
+      "mercId": "dren",
+      "wage": 1
+    }
+  ],
+  "wagesTotalPaid": 4
 }

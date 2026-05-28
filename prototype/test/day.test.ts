@@ -164,3 +164,58 @@ describe('M7.12 chapel wound healing', () => {
     expect(out.woundHealing).toEqual([]);
   });
 });
+
+describe('M9.1 weekly payday', () => {
+  const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+  const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+  const dayPath = join(ROOT, 'fixtures', 'day-01.json');
+  const day = loadDay(dayPath);
+
+  it('deducts sum of wages on a day divisible by 7', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const { WAGE_INTERVAL_DAYS } = await import('../src/day.js');
+    expect(WAGE_INTERVAL_DAYS).toBe(7);
+    const r = newRoster([mercs.get('marek')!, mercs.get('veska')!, mercs.get('dren')!]);
+    r.gold = 10;
+    r.dayCount = 6; // currentDay = 7
+    const goldBefore = r.gold;
+    const out = await resolveDay({ day: { ...day, scenarios: [] as string[] } as any, dayPath, mercs, llm: new MockScenarioLLM(), roster: r });
+    expect(out.wagesPaid.length).toBe(3);
+    expect(out.wagesTotalPaid).toBe(3);
+    // Daily event may also adjust gold; assert wage portion specifically.
+    const eventGold = out.dailyEvent?.effect.goldDelta ?? 0;
+    expect(r.gold).toBe(goldBefore + eventGold - out.wagesTotalPaid);
+  });
+
+  it('does not deduct wages on non-payday', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!]);
+    r.gold = 5;
+    r.dayCount = 0; // currentDay = 1
+    const goldBefore = r.gold;
+    const out = await resolveDay({ day: { ...day, scenarios: [] as string[] } as any, dayPath, mercs, llm: new MockScenarioLLM(), roster: r });
+    expect(out.wagesPaid).toEqual([]);
+    expect(out.wagesTotalPaid).toBe(0);
+    const eventGold = out.dailyEvent?.effect.goldDelta ?? 0;
+    expect(r.gold).toBe(goldBefore + eventGold);
+  });
+
+  it('roster-less day loop produces no wages', async () => {
+    const out = await resolveDay({ day, dayPath, mercs, llm: new MockScenarioLLM() });
+    expect(out.wagesPaid).toEqual([]);
+    expect(out.wagesTotalPaid).toBe(0);
+  });
+
+  it('allows gold to go negative (debt) on payday', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!, mercs.get('veska')!]);
+    r.gold = 1;
+    r.dayCount = 13; // currentDay = 14
+    const goldBefore = r.gold;
+    const out = await resolveDay({ day: { ...day, scenarios: [] as string[] } as any, dayPath, mercs, llm: new MockScenarioLLM(), roster: r });
+    expect(out.wagesTotalPaid).toBe(2);
+    const eventGold = out.dailyEvent?.effect.goldDelta ?? 0;
+    expect(r.gold).toBe(goldBefore + eventGold - 2);
+    expect(r.gold).toBeLessThanOrEqual(0);
+  });
+});
