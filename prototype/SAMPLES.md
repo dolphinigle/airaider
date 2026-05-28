@@ -37,6 +37,7 @@ If you only read three files, read these:
 | `raid-11-the-warden.json` | Climax with three approaches (assault / parley / poison-the-well). | Per-approach transcripts: `raid-11-the-warden.<approach>.transcript-real.json`. |
 | `raid-12-errand-courier.json` | 4-day round-trip errand to Lowmark. | `daysToResolve=4` — dispatched on day 1, returns on day 4. |
 | `raid-13-guild-shipment.json` | Two-faction reputation contract (Lowmark Guild vs Black Hill toll-gang). | Favorable seed awards +1 / −1; narrator names both factions (`raid-13-guild-shipment.favorable.transcript-real.json`). |
+| `raid-14-frostwatch.json` | Build scenario carrying `seasonModifier:{high:+1, frost:−2}`. | Demonstrates the M6.3 season clock — coin pool visibly shrinks when run in `frost` and lifts in `high`. |
 
 ## Day-loop transcripts
 
@@ -130,11 +131,29 @@ the outcome line.
 
 ## What is NOT yet shown
 
-- Veterancy / merc progression across days.
-- Merc-merc relationship tags accumulated through co-deployment.
-- Weather / season clock layered over the day loop.
-- Fort-level upgrades that mutate the recruit pool or scenario menu.
+- Multi-day campaign-scale demos using M6.x systems together (the M6
+  systems are individually demonstrated by their unit tests + the
+  raid-14 fixture, but no scripted multi-day demo run is committed yet).
 - GUI of any kind. Prototype is console-only by design.
+
+## M6 systems at a glance
+
+- **Veterancy (M6.1)** — `mercState.xp` accrues per scenario / errand;
+  promotions surface as a `PROMOTIONS` block in the day transcript.
+  Roster schema **v5+**.
+- **Co-deployment bonds (M6.2)** — `mercState.coDeployments` counts
+  shared scenarios per partner; at `BOND_THRESHOLD=3` a `bond:trusts`
+  synergy pair is injected and a `BONDS FORMED` block appears in the
+  day transcript. Roster schema **v6+**.
+- **Season clock (M6.3)** — `src/season.ts` derives the current
+  `{season, dayOfSeason}` from `roster.dayCount`; scenarios with
+  `seasonModifier` apply a flat coin add when their season is active.
+  Demo: `fixtures/raid-14-frostwatch.json`. *No schema bump* — purely
+  derived.
+- **Fort upgrades (M6.4)** — `roster.fort = {level, upgrades[]}`,
+  catalog at `data/fort-upgrades.json`. Drive it via
+  `npm run fort -- <roster.json> list` and
+  `npm run fort -- <roster.json> upgrade <id>`. Schema **v7+**.
 
 ## How to regenerate (cheap & safe)
 

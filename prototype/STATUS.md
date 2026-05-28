@@ -92,6 +92,13 @@ Day loop with fatigue accumulation.
 - [x] M5.4 Errand long-clock scenarios (commit `8a6112e`). Scenarios gain `daysToResolve`; roster schema v3 → v4 with `pendingErrands[]`; `dispatchErrand` / `resolveDueErrands` integrated into day loop; `raid-12-errand-courier` (4-day round trip to Lowmark) + real-LLM demo where the errand fires on day 4.
 - [x] M5.5 Reputation surfacing in scenarios (commit `74de9d6`). `factionContext[]` with per-band deltas (with catastrophic→unfavorable and catastrophic-favorable→favorable fallbacks); resolver emits `reputationDeltas[]`; transcript renders REPUTATION block; LLM prompt receives faction summary + current standing; day loop mutates `roster.reputation` after each scenario + errand return; `raid-13-guild-shipment` demo with Lowmark Guild vs Black Hill toll-gang.
 
+## Milestone M6 — DONE ✅ (overnight, all four)
+
+- [x] M6.1 Veterancy progression (commit `da13ee5`). `mercState.xp` + `tier ∈ {rookie, veteran, grizzled}`; XP awarded per band (favorable 2, catastrophic-favorable 3, unfavorable 1, catastrophic 1); thresholds 10 / 25; one-shot PROMOTIONS block in day transcript; roster schema v4 → v5 with default-based migration; 8 new tests (93 total).
+- [x] M6.2 Co-deployment bonds (commit `67cdf9e`). `mercState.coDeployments` counts shared scenarios; after `BOND_THRESHOLD=3` shared deployments a `bond:trusts` synergy pair is injected; BONDS FORMED block in day transcript; roster schema v5 → v6; 8 new tests (101 total).
+- [x] M6.3 Season clock (commit `1c6ec28`). `src/season.ts` derives `seasonClock = {season, dayOfSeason}` from `roster.dayCount` (no schema bump); 4 seasons × 30 days each; scenarios may carry `seasonModifier:{thaw,high,wane,frost}` flat coin deltas; LLM prompt picks up season for narration colour; `fixtures/raid-14-frostwatch.json` build scenario with frost penalty / high-summer bonus; 6 new tests (107 total).
+- [x] M6.4 Fort upgrade hooks (commit `391265e`). Roster schema v6 → v7 adds `fort: {level, upgrades[]}` (level≥1, defaults via Zod so v6 rosters load cleanly). `data/fort-upgrades.json` catalog of 5 upgrades (Reinforced Palisade L1→2, Winter Larder, Smithy L2→3, Chapel L2, Watch Tower L3→4) with cost + `requiresLevel` gates and an optional `levelsUp` flag. New `npm run fort -- <roster.json> list|upgrade <id>` CLI with friendly error reporting for already-owned / insufficient-gold / level-locked. 9 new tests (116 total).
+
 
 
 ---
