@@ -59,6 +59,7 @@ export function findStirrableQuests(
   const out: Quest[] = [];
   for (const q of catalog.values()) {
     if (active.has(q.id) || completed.has(q.id)) continue;
+    if (isOnAbandonCooldown(roster, q.id)) continue;
     if (q.seededByTag && carriedTags.has(q.seededByTag)) out.push(q);
   }
   return out;
@@ -81,6 +82,7 @@ export function findEnemyFactionStirrableQuests(
   const out: Quest[] = [];
   for (const q of catalog.values()) {
     if (active.has(q.id) || completed.has(q.id)) continue;
+    if (isOnAbandonCooldown(roster, q.id)) continue;
     if (q.seededByEnemyFaction && enemies.has(q.seededByEnemyFaction)) out.push(q);
   }
   return out;
@@ -152,6 +154,16 @@ export function advanceQuestsForScenario(
 
 /** M13.3: penalty applied (per quest) when the player abandons an active quest. */
 export const QUEST_ABANDON_REPUTATION_PENALTY = 1;
+/** M13.4: cooldown in days after abandoning a quest before it can be
+ *  auto-stirred again (by tag carrier or enemy-faction tier). */
+export const QUEST_ABANDON_COOLDOWN_DAYS = 5;
+
+/** M13.4: true if `questId` is currently within its abandonment cooldown
+ *  on the given roster. */
+export function isOnAbandonCooldown(roster: Roster, questId: string): boolean {
+  const c = roster.abandonedQuests.find((a) => a.questId === questId);
+  return !!c && roster.dayCount < c.cooldownUntilDay;
+}
 
 export interface QuestAbandonResult {
   questId: string;
@@ -185,6 +197,12 @@ export function abandonQuest(
   const factionId = q?.rewardOnComplete.reputationGain ?? 'unknown';
   roster.activeQuests.splice(idx, 1);
   roster.reputation[factionId] = (roster.reputation[factionId] ?? 0) - penalty;
+  // M13.4: stamp/refresh cooldown so the quest can't auto-stir for the
+  // next QUEST_ABANDON_COOLDOWN_DAYS days.
+  const cooldownUntilDay = roster.dayCount + QUEST_ABANDON_COOLDOWN_DAYS;
+  const existing = roster.abandonedQuests.find((a) => a.questId === questId);
+  if (existing) existing.cooldownUntilDay = cooldownUntilDay;
+  else roster.abandonedQuests.push({ questId, cooldownUntilDay });
   return {
     questId,
     questName: q?.name ?? questId,

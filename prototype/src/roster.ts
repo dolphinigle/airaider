@@ -142,6 +142,13 @@ const RoasterSchema = z.object({
   consecutiveDebtDays: z.number().int().min(0).default(0),
   /** M10.1: persistent tavern hire pool. v10+. */
   hirePool: z.array(HirePoolEntrySchema).default([]),
+  /** M13.4: cooldowns for quests abandoned via abandonQuest. While
+   *  `roster.dayCount < cooldownUntilDay`, the questId is excluded from
+   *  both tag-stirring and enemy-faction-stirring finders. v11+. */
+  abandonedQuests: z.array(z.object({
+    questId: z.string(),
+    cooldownUntilDay: z.number().int().min(0),
+  })).default([]),
 });
 
 export type RosterMercState = z.infer<typeof MercStateSchema>;
@@ -178,6 +185,8 @@ export interface Roster {
   consecutiveDebtDays: number;
   /** M10.1: tavern hire pool — generated bench of hireable mercs with prices. */
   hirePool: import('./tavern.js').HirePoolEntry[];
+  /** M13.4: quest abandonment cooldowns. */
+  abandonedQuests: Array<{ questId: string; cooldownUntilDay: number }>;
 }
 
 /**
@@ -208,6 +217,7 @@ export function newRoster(initialMercs: Merc[]): Roster {
     fortLog: [],
     consecutiveDebtDays: 0,
     hirePool: [],
+    abandonedQuests: [],
   };
 }
 
@@ -294,6 +304,7 @@ export function loadRoster(
       ...(e.startingTier ? { startingTier: e.startingTier } : {}),
       ...(e.startingXp !== undefined ? { startingXp: e.startingXp } : {}),
     })),
+    abandonedQuests: parsed.abandonedQuests,
   };
 }
 
@@ -358,6 +369,7 @@ export function saveRoster(
       ...(e.startingTier ? { startingTier: e.startingTier } : {}),
       ...(e.startingXp !== undefined ? { startingXp: e.startingXp } : {}),
     })),
+    abandonedQuests: roster.abandonedQuests,
   };
   // M17.1: defensive backup. If a roster file already exists at this path,
   // copy it to `<path>.bak` before overwriting so a corrupted save (or an

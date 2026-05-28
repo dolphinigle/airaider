@@ -11,7 +11,9 @@ import {
   carrierOf,
   findEnemyFactionStirrableQuests,
   abandonQuest,
+  isOnAbandonCooldown,
   QUEST_ABANDON_REPUTATION_PENALTY,
+  QUEST_ABANDON_COOLDOWN_DAYS,
 } from '../src/quests.js';
 import type { Merc } from '../src/types.js';
 
@@ -168,5 +170,59 @@ describe('M13.3 quest abandonment', () => {
     const res = abandonQuest(r, q.id, catalog);
     expect(res).toBeUndefined();
     expect(r.completedQuests.some((c) => c.questId === q.id)).toBe(true);
+  });
+});
+
+describe('M13.4 quest abandonment cooldown', () => {
+  const tags = loadTags(TAGS_PATH);
+  const mercs = loadMercs(MERCS_PATH, tags);
+  const catalog = loadQuests(QUESTS_PATH);
+  const marek = mercs.get('marek')!;
+
+  it('exports cooldown days = 5', () => {
+    expect(QUEST_ABANDON_COOLDOWN_DAYS).toBe(5);
+  });
+
+  it('stamps abandonedQuests entry with cooldownUntilDay', () => {
+    const r = newRoster([marek]);
+    r.dayCount = 10;
+    const q = [...catalog.values()].find((qq) => qq.seededByEnemyFaction === 'lowmark-guild')!;
+    stirQuest(r, q, undefined);
+    abandonQuest(r, q.id, catalog);
+    const entry = r.abandonedQuests.find((a) => a.questId === q.id);
+    expect(entry).toBeDefined();
+    expect(entry!.cooldownUntilDay).toBe(10 + QUEST_ABANDON_COOLDOWN_DAYS);
+    expect(isOnAbandonCooldown(r, q.id)).toBe(true);
+  });
+
+  it('blocks enemy-faction auto-stir while cooldown is active, allows after', () => {
+    const r = newRoster([marek]);
+    r.dayCount = 10;
+    const q = [...catalog.values()].find((qq) => qq.seededByEnemyFaction === 'lowmark-guild')!;
+    stirQuest(r, q, undefined);
+    abandonQuest(r, q.id, catalog);
+    // Still day 10 — would normally re-stir if faction is enemy tier.
+    expect(findEnemyFactionStirrableQuests(r, catalog, [q.seededByEnemyFaction!]))
+      .not.toContainEqual(q);
+    // Bump past the cooldown.
+    r.dayCount = 10 + QUEST_ABANDON_COOLDOWN_DAYS;
+    expect(findEnemyFactionStirrableQuests(r, catalog, [q.seededByEnemyFaction!]))
+      .toContainEqual(q);
+    expect(isOnAbandonCooldown(r, q.id)).toBe(false);
+  });
+
+  it('abandoning the same quest again refreshes the cooldown window', () => {
+    const r = newRoster([marek]);
+    r.dayCount = 10;
+    const q = [...catalog.values()].find((qq) => qq.seededByEnemyFaction === 'lowmark-guild')!;
+    stirQuest(r, q, undefined);
+    abandonQuest(r, q.id, catalog);
+    // Re-stir then re-abandon further along the timeline.
+    r.dayCount = 13;
+    stirQuest(r, q, undefined);
+    abandonQuest(r, q.id, catalog);
+    expect(r.abandonedQuests.filter((a) => a.questId === q.id)).toHaveLength(1);
+    expect(r.abandonedQuests.find((a) => a.questId === q.id)!.cooldownUntilDay)
+      .toBe(13 + QUEST_ABANDON_COOLDOWN_DAYS);
   });
 });
