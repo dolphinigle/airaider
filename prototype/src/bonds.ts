@@ -74,3 +74,44 @@ export function bondedPairsOf(roster: Roster): Set<string> {
   }
   return set;
 }
+
+/**
+ * M9.7 — bond grief. For every merc in `killedIds`, find their surviving
+ * bond-partners (per `bondsBefore`, a Set of pairKeys captured BEFORE
+ * applyCasualties stripped the deceased states) and add `griefAmount`
+ * fatigue to each survivor. Returns the per-survivor delta records so
+ * callers can render a grief block.
+ *
+ * Multiple bond losses stack additively on the same survivor. The
+ * survivor's fatigue is the only field mutated; no caps applied here.
+ */
+export const BOND_GRIEF_FATIGUE = 2;
+
+export function applyBondGrief(
+  roster: Roster,
+  killedIds: Iterable<string>,
+  bondsBefore: Set<string>,
+  griefAmount: number = BOND_GRIEF_FATIGUE,
+): Array<{ survivorId: string; deceasedId: string; before: number; after: number }> {
+  const out: Array<{ survivorId: string; deceasedId: string; before: number; after: number }> = [];
+  const killSet = new Set(killedIds);
+  for (const deadId of killSet) {
+    for (const key of bondsBefore) {
+      const [a, b] = key.split('|');
+      if (!a || !b) continue;
+      let other: string | null = null;
+      if (a === deadId) other = b;
+      else if (b === deadId) other = a;
+      if (!other) continue;
+      // skip if the partner is also dead (mutual KO — no grief, both gone)
+      if (killSet.has(other)) continue;
+      if (!roster.mercs.find((m) => m.id === other)) continue;
+      const st = roster.states.get(other);
+      if (!st) continue;
+      const before = st.fatigue;
+      st.fatigue = before + griefAmount;
+      out.push({ survivorId: other, deceasedId: deadId, before, after: st.fatigue });
+    }
+  }
+  return out;
+}

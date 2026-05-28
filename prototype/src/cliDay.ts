@@ -164,6 +164,9 @@ async function main(): Promise<void> {
     }
     // M5.1: apply casualties from each scenario in order.
     const { applyCasualties } = await import('./roster.js');
+    const { bondedPairsOf, applyBondGrief } = await import('./bonds.js');
+    // M9.7: capture bonds BEFORE applyCasualties strips the deceased state.
+    const bondsBefore = bondedPairsOf(roster);
     const allCasualties = resolution.scenarios.flatMap((s) => s.casualties);
     const killed = applyCasualties(roster, allCasualties);
     if (allCasualties.length > 0) {
@@ -171,6 +174,15 @@ async function main(): Promise<void> {
       for (const c of allCasualties) {
         const dead = killed.includes(c.mercId) ? '  ☠ PERMADEATH' : '';
         console.log(`   • ${c.mercId} took ${c.damage} (${c.reason})${dead}`);
+      }
+    }
+    if (killed.length > 0) {
+      const griefs = applyBondGrief(roster, killed, bondsBefore);
+      if (griefs.length > 0) {
+        console.log(`\nBond grief (+${griefs[0]!.after - griefs[0]!.before} fatigue per loss):`);
+        for (const g of griefs) {
+          console.log(`   ⤬ ${g.survivorId} mourns ${g.deceasedId}: fatigue ${g.before} → ${g.after}`);
+        }
       }
     }
     // M5.2: advance quest stages for any scenario id matching an active quest stage.

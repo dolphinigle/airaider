@@ -8,7 +8,7 @@ import { loadMercs } from '../src/mercs.js';
 import { loadScenario } from '../src/scenarios.js';
 import { newRoster, loadRoster, saveRoster } from '../src/roster.js';
 import {
-  BOND_THRESHOLD, bondedPairsOf, pairKey, recordCoDeployment,
+  BOND_THRESHOLD, BOND_GRIEF_FATIGUE, bondedPairsOf, pairKey, recordCoDeployment, applyBondGrief,
 } from '../src/bonds.js';
 import { computePartySynergy, resolveScenario, type Assignment } from '../src/resolver.js';
 import { rngFromString } from '../src/rng.js';
@@ -116,5 +116,53 @@ describe('M6.2 co-deployment bonds', () => {
       mercs, llm: new MockScenarioLLM(),
     });
     expect(r.bondsFormed).toEqual([]);
+  });
+});
+
+describe('M9.7 bond grief', () => {
+  const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+  const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+
+  it('exports BOND_GRIEF_FATIGUE = 2', () => {
+    expect(BOND_GRIEF_FATIGUE).toBe(2);
+  });
+
+  it('survivor of a bonded pair gains +2 fatigue when partner dies', () => {
+    const r = newRoster([mercs.get('marek')!, mercs.get('veska')!]);
+    r.states.get('marek')!.coDeployments = { veska: BOND_THRESHOLD };
+    r.states.get('veska')!.coDeployments = { marek: BOND_THRESHOLD };
+    const bondsBefore = bondedPairsOf(r);
+    expect(bondsBefore.size).toBe(1);
+    // marek dies; veska survives — simulate by removing marek mercs+state.
+    r.mercs = r.mercs.filter((m) => m.id !== 'marek');
+    r.states.delete('marek');
+    r.deceased.push({ id: 'marek', name: 'Marek', dayDied: 1, reason: 'wound' });
+    const out = applyBondGrief(r, ['marek'], bondsBefore);
+    expect(out.length).toBe(1);
+    expect(out[0]!.survivorId).toBe('veska');
+    expect(out[0]!.deceasedId).toBe('marek');
+    expect(r.states.get('veska')!.fatigue).toBe(2);
+  });
+
+  it('no grief entry when both bonded mercs die together', () => {
+    const r = newRoster([mercs.get('marek')!, mercs.get('veska')!]);
+    r.states.get('marek')!.coDeployments = { veska: BOND_THRESHOLD };
+    r.states.get('veska')!.coDeployments = { marek: BOND_THRESHOLD };
+    const bondsBefore = bondedPairsOf(r);
+    r.mercs = [];
+    r.states.clear();
+    const out = applyBondGrief(r, ['marek', 'veska'], bondsBefore);
+    expect(out).toEqual([]);
+  });
+
+  it('no grief when killed merc had no bonds', () => {
+    const r = newRoster([mercs.get('marek')!, mercs.get('veska')!]);
+    const bondsBefore = bondedPairsOf(r);
+    expect(bondsBefore.size).toBe(0);
+    r.mercs = r.mercs.filter((m) => m.id !== 'marek');
+    r.states.delete('marek');
+    const out = applyBondGrief(r, ['marek'], bondsBefore);
+    expect(out).toEqual([]);
+    expect(r.states.get('veska')!.fatigue).toBe(0);
   });
 });
