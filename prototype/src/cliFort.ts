@@ -6,7 +6,7 @@
 import { resolve } from 'node:path';
 import { loadTags } from './tags.js';
 import { loadMercs } from './mercs.js';
-import { loadRoster, saveRoster } from './roster.js';
+import { loadRoster, saveRoster, appendFortLog } from './roster.js';
 import { loadFortCatalog, purchaseUpgrade } from './fort.js';
 
 async function main(): Promise<void> {
@@ -51,6 +51,11 @@ async function main(): Promise<void> {
     }
     roster.fort = res.result.fort;
     roster.gold = res.result.gold;
+    appendFortLog(roster, {
+      day: roster.dayCount,
+      kind: 'upgrade',
+      message: `Purchased ${upgrade.name} for ${upgrade.cost}g${res.result.leveledUp ? ` (fort → L${roster.fort.level})` : ''}.`,
+    });
     saveRoster(rosterPath, roster, mercPool);
     console.log(`Purchased ${upgrade.name} (${upgrade.id}) for ${upgrade.cost}g.`);
     if (res.result.leveledUp) console.log(`Fort leveled up → L${roster.fort.level}.`);

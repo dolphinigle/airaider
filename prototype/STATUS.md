@@ -2,7 +2,7 @@
 
 > **Updated:** 2026-05-28 ~22:40 WIB
 > **Branch:** `prototype/m0`
-> **Last verified command:** `npm test` → 138 / 138 passing
+> **Last verified command:** `npm test` → 141 / 141 passing
 > **Last verified real-LLM command:** raid-13-guild-shipment with favorable seed — narrator awarded +1 to `lowmark-guild` and −1 to `black-hill-gang` and called out both factions by name in the outcome line (`fixtures/raid-13-guild-shipment.favorable.transcript-real.json`).
 
 ## ⚠️ Post-compaction discipline (READ FIRST)
@@ -108,8 +108,8 @@ Day loop with fatigue accumulation.
 - [x] M7.7 Event catalog expansion (commit `7219db6`). `data/events.json` 7 → 14 entries spanning all four seasons more densely: refugees (wane), merchant-caravan (thaw), tollgang-pressure (high), grain-fire (wane), chapel-vigil (gated on chapel), wolves-at-walls (frost, watch-tower-missing), bard (thaw/high). 2 new tests + the wane reputation-park fixture moved to frost (136 total).
 - [x] M7.x foot-gun fix (commit `c966079`). `npm run day` / `npm run scenario` now refuse to overwrite the default-path transcript unless `--out`, `--force`, or `--no-write` is given. cliDay checks both early (pre-side-effect) and at write time. Caught while playtesting on a fresh roster — the old behaviour silently clobbered the committed `fixtures/day-01.day-mock.json` golden.
 - [x] M7.8 Veterancy tier feeds the coin pool (commit pending). `ResolutionInput.tierOf?` (and `SlotContribOptions.tierOf`) wires `roster.states.get(id).tier` into `computeSlotContributions`: veteran adds +1 coin to their own slot, grizzled +2, rookie unchanged. Bonus stacks on top of base, attr, and tag bonuses but does NOT bypass the fatigue floor (slot still ≥ 1 coin pre-tier). `SlotContribution` gains `tier` + `tierBonus` fields, threaded through day.ts + errands.ts; transcript renders `[veteran, +1]` next to the slot. All 9 raid + day-01 mock goldens regenerated. 2 new tests (138 total).
+- [x] M7.6 Persistent fort log (commit pending). Roster schema v7 → v8 adds `fortLog: { day, kind: 'upgrade'|'event'|'note', message }[]`, bounded to `FORT_LOG_MAX = 50` via `appendFortLog`. Wired into `cliFort upgrade` (upgrade entries) and `day.resolveDay` (daily-event entries). `DayResolution.newFortLogEntries` exposes the entries appended this day; `dayTranscript` renders them as a `FORT LOG (today):` block before the bottom border, and `npm run roster show` tails the last 5 entries. Legacy v7 rosters load cleanly with `fortLog = []`. 3 new tests (141 total).
 - [ ] M7.3 Recruit gated by fort level (deferred — captive→recruit refactor)
-- [ ] M7.6 Persistent fort log (`roster.fortLog: string[]`, schema v7 → v8)
 
 
 

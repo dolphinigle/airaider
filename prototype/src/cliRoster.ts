@@ -71,6 +71,13 @@ function printRoster(r: Roster, path: string): void {
       console.log(`  • ${c.name} [${c.id}]  ${c.archetype}  notoriety:${c.notoriety}`);
     }
   }
+  if (r.fortLog.length > 0) {
+    const tail = r.fortLog.slice(-5);
+    console.log(`\nFort log (last ${tail.length} of ${r.fortLog.length}):`);
+    for (const e of tail) {
+      console.log(`  day ${e.day}  [${e.kind}]  ${e.message}`);
+    }
+  }
 }
 
 main();

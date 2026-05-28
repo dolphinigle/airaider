@@ -19,7 +19,9 @@
           ],
           "coinsContributed": 3,
           "fatigue": 0,
-          "fatiguePenalty": 0
+          "fatiguePenalty": 0,
+          "tierBonus": 0,
+          "tier": "rookie"
         },
         {
           "slotId": "oversee",
@@ -31,7 +33,9 @@
           ],
           "coinsContributed": 3,
           "fatigue": 0,
-          "fatiguePenalty": 0
+          "fatiguePenalty": 0,
+          "tierBonus": 0,
+          "tier": "rookie"
         }
       ],
       "synergy": {
@@ -114,5 +118,12 @@
       ]
     }
   },
-  "fortHints": []
+  "fortHints": [],
+  "newFortLogEntries": [
+    {
+      "day": 29,
+      "kind": "event",
+      "message": "A bard passes through  -1g  fatigue -1  lowmark-guild +1"
+    }
+  ]
 }

@@ -90,8 +90,17 @@ const FortStateSchema = z.object({
   upgrades: z.array(z.string()).default([]),
 });
 
+const FortLogEntrySchema = z.object({
+  day: z.number().int().min(0),
+  kind: z.enum(['upgrade', 'event', 'note']),
+  message: z.string().min(1),
+});
+
+/** M7.6: keep the persistent fort log bounded so save files stay small. */
+export const FORT_LOG_MAX = 50;
+
 const RoasterSchema = z.object({
-  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6), z.literal(7)]).default(7),
+  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6), z.literal(7), z.literal(8)]).default(8),
   dayCount: z.number().int().min(0).default(0),
   gold: z.number().int().default(0),
   reputation: z.record(z.string(), z.number().int()).default({}),
@@ -111,6 +120,8 @@ const RoasterSchema = z.object({
   pendingErrands: z.array(PendingErrandSchema).default([]),
   /** M6.4: fort upgrade state (level + purchased upgrade ids). v7+. */
   fort: FortStateSchema.default({ level: 1, upgrades: [] }),
+  /** M7.6: persistent fort log (upgrades + daily events). v8+. */
+  fortLog: z.array(FortLogEntrySchema).default([]),
 });
 
 export type RosterMercState = z.infer<typeof MercStateSchema>;
@@ -118,10 +129,11 @@ export type RosterDeceased = z.infer<typeof DeceasedSchema>;
 export type RosterActiveQuest = z.infer<typeof ActiveQuestSchema>;
 export type RosterCompletedQuest = z.infer<typeof CompletedQuestSchema>;
 export type RosterPendingErrand = z.infer<typeof PendingErrandSchema>;
+export type FortLogEntry = z.infer<typeof FortLogEntrySchema>;
 export type RosterFile = z.infer<typeof RoasterSchema>;
 
 export interface Roster {
-  schemaVersion: 7;
+  schemaVersion: 8;
   dayCount: number;
   gold: number;
   reputation: Record<string, number>;
@@ -140,11 +152,24 @@ export interface Roster {
   pendingErrands: RosterPendingErrand[];
   /** M6.4: fort upgrade state. */
   fort: { level: number; upgrades: string[] };
+  /** M7.6: persistent fort log entries (latest at the end, trimmed to FORT_LOG_MAX). */
+  fortLog: FortLogEntry[];
+}
+
+/**
+ * M7.6: append a log entry to the roster's fortLog, trimming the head
+ * so the list never exceeds FORT_LOG_MAX entries.
+ */
+export function appendFortLog(roster: Roster, entry: FortLogEntry): void {
+  roster.fortLog.push(entry);
+  if (roster.fortLog.length > FORT_LOG_MAX) {
+    roster.fortLog.splice(0, roster.fortLog.length - FORT_LOG_MAX);
+  }
 }
 
 export function newRoster(initialMercs: Merc[]): Roster {
   return {
-    schemaVersion: 7,
+    schemaVersion: 8,
     dayCount: 0,
     gold: 0,
     reputation: {},
@@ -156,6 +181,7 @@ export function newRoster(initialMercs: Merc[]): Roster {
     completedQuests: [],
     pendingErrands: [],
     fort: { level: 1, upgrades: [] },
+    fortLog: [],
   };
 }
 
@@ -209,7 +235,7 @@ export function loadRoster(
   }));
 
   return {
-    schemaVersion: 7,
+    schemaVersion: 8,
     dayCount: parsed.dayCount,
     gold: parsed.gold,
     reputation: parsed.reputation,
@@ -221,6 +247,7 @@ export function loadRoster(
     completedQuests: parsed.completedQuests,
     pendingErrands: parsed.pendingErrands,
     fort: parsed.fort,
+    fortLog: parsed.fortLog,
   };
 }
 
@@ -248,7 +275,7 @@ export function saveRoster(
     }
   }
   const file: RosterFile = {
-    schemaVersion: 7,
+    schemaVersion: 8,
     dayCount: roster.dayCount,
     gold: roster.gold,
     reputation: roster.reputation,
@@ -268,6 +295,7 @@ export function saveRoster(
     completedQuests: roster.completedQuests,
     pendingErrands: roster.pendingErrands,
     fort: roster.fort,
+    fortLog: roster.fortLog,
   };
   writeFileSync(path, JSON.stringify(file, null, 2) + '\n', 'utf8');
 }

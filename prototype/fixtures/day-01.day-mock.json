@@ -216,5 +216,6 @@
   "bondsFormed": [],
   "seasonClock": null,
   "dailyEvent": null,
-  "fortHints": []
+  "fortHints": [],
+  "newFortLogEntries": []
 }

@@ -82,7 +82,7 @@ describe('M6.4 fort upgrades', () => {
     roster.fort = { level: 2, upgrades: ['reinforced-palisade', 'winter-larder'] };
     saveRoster(path, roster, mercPool);
     const reloaded = loadRoster(path, mercPool, tagPool);
-    expect(reloaded.schemaVersion).toBe(7);
+    expect(reloaded.schemaVersion).toBe(8);
     expect(reloaded.fort.level).toBe(2);
     expect(reloaded.fort.upgrades).toEqual(['reinforced-palisade', 'winter-larder']);
   });
@@ -131,5 +131,56 @@ describe('M7.5 affordable upgrade hints', () => {
     const { affordableUpgrades } = await import('../src/fort.js');
     const hints = affordableUpgrades(catalog, { level: 1, upgrades: [] }, 0);
     expect(hints).toEqual([]);
+  });
+});
+
+describe('M7.6 persistent fort log', () => {
+  it('appendFortLog adds entries and trims to FORT_LOG_MAX', async () => {
+    const { appendFortLog, FORT_LOG_MAX } = await import('../src/roster.js');
+    const tagPool = loadTags(join(ROOT, 'data', 'tags.json'));
+    const mercPool = loadMercs(join(ROOT, 'data', 'mercs.json'), tagPool);
+    const r = newRoster([...mercPool.values()].slice(0, 1));
+    for (let i = 0; i < FORT_LOG_MAX + 7; i++) {
+      appendFortLog(r, { day: i, kind: 'note', message: `entry ${i}` });
+    }
+    expect(r.fortLog.length).toBe(FORT_LOG_MAX);
+    // Oldest entries should have been trimmed off the head.
+    expect(r.fortLog[0]!.message).toBe('entry 7');
+    expect(r.fortLog[r.fortLog.length - 1]!.message).toBe(`entry ${FORT_LOG_MAX + 6}`);
+  });
+
+  it('roster v7 → v8 migration defaults fortLog to []', () => {
+    const tagPool = loadTags(join(ROOT, 'data', 'tags.json'));
+    const mercPool = loadMercs(join(ROOT, 'data', 'mercs.json'), tagPool);
+    const dir = mkdtempSync(join(tmpdir(), 'fort-v7-'));
+    const path = join(dir, 'r.json');
+    writeFileSync(path, JSON.stringify({
+      schemaVersion: 7, dayCount: 0, gold: 0, reputation: {},
+      rosterMercIds: [], generatedMercs: [], mercStates: [], captives: [],
+      deceased: [], activeQuests: [], completedQuests: [], pendingErrands: [],
+      fort: { level: 1, upgrades: [] },
+    }));
+    const r = loadRoster(path, mercPool, tagPool);
+    expect(r.fortLog).toEqual([]);
+    expect(r.schemaVersion).toBe(8);
+  });
+
+  it('fortLog survives a save/load round-trip', () => {
+    const tagPool = loadTags(join(ROOT, 'data', 'tags.json'));
+    const mercPool = loadMercs(join(ROOT, 'data', 'mercs.json'), tagPool);
+    const dir = mkdtempSync(join(tmpdir(), 'fort-log-rt-'));
+    const path = join(dir, 'r.json');
+    const r = newRoster([...mercPool.values()].slice(0, 1));
+    r.fortLog = [
+      { day: 1, kind: 'upgrade', message: 'Purchased Reinforced Palisade for 5g (fort → L2).' },
+      { day: 2, kind: 'event', message: 'thaw-market-day  +1g' },
+    ];
+    saveRoster(path, r, mercPool);
+    const onDisk = JSON.parse(readFileSync(path, 'utf8'));
+    expect(onDisk.fortLog).toHaveLength(2);
+    const reloaded = loadRoster(path, mercPool, tagPool);
+    expect(reloaded.fortLog).toHaveLength(2);
+    expect(reloaded.fortLog[0]!.kind).toBe('upgrade');
+    expect(reloaded.fortLog[1]!.kind).toBe('event');
   });
 });

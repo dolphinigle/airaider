@@ -17,9 +17,11 @@
           "tagsMatched": [
             "bg:scholar"
           ],
-          "coinsContributed": 3,
+          "coinsContributed": 4,
           "fatigue": 0,
-          "fatiguePenalty": 0
+          "fatiguePenalty": 0,
+          "tierBonus": 1,
+          "tier": "veteran"
         },
         {
           "slotId": "oversee",
@@ -29,9 +31,11 @@
           "tagsMatched": [
             "temp:brave"
           ],
-          "coinsContributed": 3,
+          "coinsContributed": 4,
           "fatigue": 0,
-          "fatiguePenalty": 0
+          "fatiguePenalty": 0,
+          "tierBonus": 1,
+          "tier": "veteran"
         }
       ],
       "synergy": {
@@ -102,5 +106,12 @@
       "reputationDeltas": []
     }
   },
-  "fortHints": []
+  "fortHints": [],
+  "newFortLogEntries": [
+    {
+      "day": 32,
+      "kind": "event",
+      "message": "Quiet summer day  fatigue -1"
+    }
+  ]
 }

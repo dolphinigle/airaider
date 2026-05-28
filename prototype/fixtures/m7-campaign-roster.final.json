@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 7,
+  "schemaVersion": 8,
   "dayCount": 32,
   "gold": -2,
   "reputation": {
@@ -70,5 +70,37 @@
     "upgrades": [
       "reinforced-palisade"
     ]
-  }
+  },
+  "fortLog": [
+    {
+      "day": 28,
+      "kind": "event",
+      "message": "Refugees at the gate  -1g  lowmark-guild +1"
+    },
+    {
+      "day": 28,
+      "kind": "upgrade",
+      "message": "Purchased Reinforced Palisade for 5g (fort → L2)."
+    },
+    {
+      "day": 29,
+      "kind": "event",
+      "message": "A bard passes through  -1g  fatigue -1  lowmark-guild +1"
+    },
+    {
+      "day": 30,
+      "kind": "event",
+      "message": "Refugees at the gate  -1g  lowmark-guild +1"
+    },
+    {
+      "day": 31,
+      "kind": "event",
+      "message": "Quiet summer day  fatigue -1"
+    },
+    {
+      "day": 32,
+      "kind": "event",
+      "message": "Quiet summer day  fatigue -1"
+    }
+  ]
 }

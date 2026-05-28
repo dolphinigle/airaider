@@ -19,7 +19,9 @@
           ],
           "coinsContributed": 3,
           "fatigue": 0,
-          "fatiguePenalty": 0
+          "fatiguePenalty": 0,
+          "tierBonus": 0,
+          "tier": "rookie"
         },
         {
           "slotId": "keep-songs-going",
@@ -31,7 +33,9 @@
           ],
           "coinsContributed": 3,
           "fatigue": 0,
-          "fatiguePenalty": 0
+          "fatiguePenalty": 0,
+          "tierBonus": 0,
+          "tier": "rookie"
         }
       ],
       "synergy": {
@@ -119,6 +123,13 @@
       "name": "Reinforced Palisade",
       "cost": 5,
       "description": "Heavy timbers and iron ties around the perimeter. Raids hit the gate, not the wall."
+    }
+  ],
+  "newFortLogEntries": [
+    {
+      "day": 28,
+      "kind": "event",
+      "message": "Refugees at the gate  -1g  lowmark-guild +1"
     }
   ]
 }

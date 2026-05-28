@@ -12,7 +12,8 @@ import {
   type Assignment,
   type ScenarioResolution,
 } from './resolver.js';
-import type { Roster, RosterPendingErrand } from './roster.js';
+import type { Roster, RosterPendingErrand, FortLogEntry } from './roster.js';
+import { appendFortLog } from './roster.js';
 import { dispatchErrand, resolveDueErrands } from './errands.js';
 import { applyVeterancyXp, type Promotion } from './veterancy.js';
 import { recordCoDeployment, bondedPairsOf, type BondFormation } from './bonds.js';
@@ -76,6 +77,12 @@ export interface DayResolution {
    * Empty if none. The dayTranscript surfaces these as a FORT HINT block.
    */
   fortHints: Pick<FortUpgrade, 'id' | 'name' | 'cost' | 'description'>[];
+  /**
+   * M7.6: fort log entries appended during THIS day (currently only the
+   * daily-event entry; upgrade purchases happen via the fort CLI, not the day
+   * loop). Empty in roster-less mode.
+   */
+  newFortLogEntries: FortLogEntry[];
 }
 
 /**
@@ -97,6 +104,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   const errandsResolved: ScenarioResolution[] = [];
   const promotions: Promotion[] = [];
   const bondsFormed: BondFormation[] = [];
+  const newFortLogEntries: FortLogEntry[] = [];
   const bondedPairs = roster ? bondedPairsOf(roster) : undefined;
   const seasonClock: SeasonClock | null = roster ? seasonFor(roster.dayCount) : null;
   const season = seasonClock?.season;
@@ -123,6 +131,17 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
       for (const d of eff.reputationDeltas) {
         roster.reputation[d.factionId] = (roster.reputation[d.factionId] ?? 0) + d.delta;
       }
+      const parts: string[] = [`${dailyEvent.label}`];
+      if (eff.goldDelta !== 0) parts.push(`${eff.goldDelta > 0 ? '+' : ''}${eff.goldDelta}g`);
+      if (eff.fatigueDelta !== 0) parts.push(`fatigue ${eff.fatigueDelta > 0 ? '+' : ''}${eff.fatigueDelta}`);
+      for (const d of eff.reputationDeltas) parts.push(`${d.factionId} ${d.delta > 0 ? '+' : ''}${d.delta}`);
+      const entry: FortLogEntry = {
+        day: roster.dayCount + 1,
+        kind: 'event',
+        message: parts.join('  '),
+      };
+      appendFortLog(roster, entry);
+      newFortLogEntries.push(entry);
     }
   }
   const reputationOf = roster
@@ -232,5 +251,6 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     seasonClock,
     dailyEvent,
     fortHints,
+    newFortLogEntries,
   };
 }

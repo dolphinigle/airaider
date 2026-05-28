@@ -19,7 +19,9 @@
           ],
           "coinsContributed": 3,
           "fatigue": 1,
-          "fatiguePenalty": 0
+          "fatiguePenalty": 0,
+          "tierBonus": 0,
+          "tier": "rookie"
         },
         {
           "slotId": "persuade",
@@ -31,7 +33,9 @@
           ],
           "coinsContributed": 3,
           "fatigue": 0,
-          "fatiguePenalty": 0
+          "fatiguePenalty": 0,
+          "tierBonus": 0,
+          "tier": "rookie"
         }
       ],
       "synergy": {
@@ -107,5 +111,12 @@
       ]
     }
   },
-  "fortHints": []
+  "fortHints": [],
+  "newFortLogEntries": [
+    {
+      "day": 30,
+      "kind": "event",
+      "message": "Refugees at the gate  -1g  lowmark-guild +1"
+    }
+  ]
 }

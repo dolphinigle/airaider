@@ -78,6 +78,13 @@ export function renderDayTranscript(day: DayResolution): string {
       lines.push(`   ⌂ ${h.id} (${h.cost}g) — ${h.name}`);
     }
   }
+  if (day.newFortLogEntries.length > 0) {
+    lines.push('');
+    lines.push(' FORT LOG (today):');
+    for (const e of day.newFortLogEntries) {
+      lines.push(`   ▸ day ${e.day}  [${e.kind}]  ${e.message}`);
+    }
+  }
   lines.push(DBAR);
   return lines.join('\n');
 }

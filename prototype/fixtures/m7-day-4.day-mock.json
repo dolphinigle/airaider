@@ -17,9 +17,11 @@
           "tagsMatched": [
             "temp:brave"
           ],
-          "coinsContributed": 3,
+          "coinsContributed": 4,
           "fatigue": 0,
-          "fatiguePenalty": 0
+          "fatiguePenalty": 0,
+          "tierBonus": 1,
+          "tier": "veteran"
         },
         {
           "slotId": "keep-songs-going",
@@ -31,7 +33,9 @@
           ],
           "coinsContributed": 3,
           "fatigue": 0,
-          "fatiguePenalty": 0
+          "fatiguePenalty": 0,
+          "tierBonus": 0,
+          "tier": "rookie"
         }
       ],
       "synergy": {
@@ -102,5 +106,12 @@
       "reputationDeltas": []
     }
   },
-  "fortHints": []
+  "fortHints": [],
+  "newFortLogEntries": [
+    {
+      "day": 31,
+      "kind": "event",
+      "message": "Quiet summer day  fatigue -1"
+    }
+  ]
 }
