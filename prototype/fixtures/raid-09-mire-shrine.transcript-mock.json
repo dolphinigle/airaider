@@ -15,7 +15,10 @@
       ],
       "coinsContributed": 3,
       "fatigue": 0,
-      "fatiguePenalty": 0
+      "fatiguePenalty": 0,
+      "tierBonus": 0,
+      "tier": null,
+      "bondFatigueRelief": 0
     },
     {
       "slotId": "read",
@@ -27,7 +30,10 @@
       ],
       "coinsContributed": 3,
       "fatigue": 0,
-      "fatiguePenalty": 0
+      "fatiguePenalty": 0,
+      "tierBonus": 0,
+      "tier": null,
+      "bondFatigueRelief": 0
     },
     {
       "slotId": "ward",
@@ -37,7 +43,10 @@
       "tagsMatched": [],
       "coinsContributed": 2,
       "fatigue": 0,
-      "fatiguePenalty": 0
+      "fatiguePenalty": 0,
+      "tierBonus": 0,
+      "tier": null,
+      "bondFatigueRelief": 0
     }
   ],
   "synergy": {

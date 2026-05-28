@@ -2,7 +2,7 @@
 
 > **Updated:** 2026-05-28 ~22:40 WIB
 > **Branch:** `prototype/m0`
-> **Last verified command:** `npm test` → 144 / 144 passing
+> **Last verified command:** `npm test` → 147 / 147 passing
 > **Last verified real-LLM command:** raid-13-guild-shipment with favorable seed — narrator awarded +1 to `lowmark-guild` and −1 to `black-hill-gang` and called out both factions by name in the outcome line (`fixtures/raid-13-guild-shipment.favorable.transcript-real.json`).
 
 ## ⚠️ Post-compaction discipline (READ FIRST)
@@ -110,6 +110,7 @@ Day loop with fatigue accumulation.
 - [x] M7.8 Veterancy tier feeds the coin pool (commit pending). `ResolutionInput.tierOf?` (and `SlotContribOptions.tierOf`) wires `roster.states.get(id).tier` into `computeSlotContributions`: veteran adds +1 coin to their own slot, grizzled +2, rookie unchanged. Bonus stacks on top of base, attr, and tag bonuses but does NOT bypass the fatigue floor (slot still ≥ 1 coin pre-tier). `SlotContribution` gains `tier` + `tierBonus` fields, threaded through day.ts + errands.ts; transcript renders `[veteran, +1]` next to the slot. All 9 raid + day-01 mock goldens regenerated. 2 new tests (138 total).
 - [x] M7.6 Persistent fort log (commit pending). Roster schema v7 → v8 adds `fortLog: { day, kind: 'upgrade'|'event'|'note', message }[]`, bounded to `FORT_LOG_MAX = 50` via `appendFortLog`. Wired into `cliFort upgrade` (upgrade entries) and `day.resolveDay` (daily-event entries). `DayResolution.newFortLogEntries` exposes the entries appended this day; `dayTranscript` renders them as a `FORT LOG (today):` block before the bottom border, and `npm run roster show` tails the last 5 entries. Legacy v7 rosters load cleanly with `fortLog = []`. 3 new tests (141 total).
 - [x] M7.10 End-of-day fatigue recovery (commit pending). `resolveDay` now decrements fatigue by 1 (floor 0) at end-of-day for every roster merc who is neither deployed today (in any scenario / errand dispatch) nor currently on a pending errand. Tracked as `DayResolution.fatigueRecovery: {mercId, before, after}[]`; rendered as a `RECOVERY (rested, −1 fatigue):` block in the day transcript when non-empty. Roster-less mode returns an empty array. m7-campaign demo now exhibits recoveries on day 3+. 3 new tests (144 total).
+- [x] M7.9 Bond reduces fatigue penalty (commit pending). When a slot occupant is bonded with any other merc in the same party, their fatigue penalty is softened by 1 (floor 0). `SlotContribOptions.bondedPairs` added; `SlotContribution.bondFatigueRelief: number` surfaces the per-slot effect; transcript renders `[fatigued N, −X, bond +1]` (or `[fatigued N, bond +1]` when the penalty was fully cancelled). All 9 raid + day-01 goldens regenerated with the new field. 3 new tests (147 total).
 - [ ] M7.3 Recruit gated by fort level (deferred — captive→recruit refactor)
 
 

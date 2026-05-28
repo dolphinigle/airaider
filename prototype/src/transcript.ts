@@ -16,7 +16,9 @@ export function renderTranscript(r: ScenarioResolution): string {
     const attrStr = sc.attrUsed ? ` ${sc.attrUsed}=${sc.attrScore}` : '';
     const fatStr =
       sc.fatiguePenalty > 0
-        ? ` [fatigued ${sc.fatigue}, −${sc.fatiguePenalty}]`
+        ? ` [fatigued ${sc.fatigue}, −${sc.fatiguePenalty}${sc.bondFatigueRelief > 0 ? ', bond +1' : ''}]`
+        : sc.bondFatigueRelief > 0
+        ? ` [fatigued ${sc.fatigue}, bond +1]`
         : sc.fatigue > 0
         ? ` [fatigue ${sc.fatigue}]`
         : '';

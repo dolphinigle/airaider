@@ -15,7 +15,10 @@
       ],
       "coinsContributed": 3,
       "fatigue": 0,
-      "fatiguePenalty": 0
+      "fatiguePenalty": 0,
+      "tierBonus": 0,
+      "tier": null,
+      "bondFatigueRelief": 0
     },
     {
       "slotId": "voice",
@@ -27,7 +30,10 @@
       ],
       "coinsContributed": 3,
       "fatigue": 0,
-      "fatiguePenalty": 0
+      "fatiguePenalty": 0,
+      "tierBonus": 0,
+      "tier": null,
+      "bondFatigueRelief": 0
     },
     {
       "slotId": "scout",
@@ -39,7 +45,10 @@
       ],
       "coinsContributed": 3,
       "fatigue": 0,
-      "fatiguePenalty": 0
+      "fatiguePenalty": 0,
+      "tierBonus": 0,
+      "tier": null,
+      "bondFatigueRelief": 0
     }
   ],
   "synergy": {

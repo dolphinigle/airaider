@@ -18,7 +18,8 @@
       "fatigue": 0,
       "fatiguePenalty": 0,
       "tierBonus": 0,
-      "tier": null
+      "tier": null,
+      "bondFatigueRelief": 0
     },
     {
       "slotId": "loom",
@@ -32,7 +33,8 @@
       "fatigue": 0,
       "fatiguePenalty": 0,
       "tierBonus": 0,
-      "tier": null
+      "tier": null,
+      "bondFatigueRelief": 0
     },
     {
       "slotId": "thinking",
@@ -46,7 +48,8 @@
       "fatigue": 0,
       "fatiguePenalty": 0,
       "tierBonus": 0,
-      "tier": null
+      "tier": null,
+      "bondFatigueRelief": 0
     }
   ],
   "synergy": {

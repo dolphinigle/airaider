@@ -49,6 +49,12 @@ export interface SlotContribution {
   tierBonus: number;
   /** M7.8: tier looked up via tierOf (null if no lookup was provided). */
   tier: import('./veterancy.js').VeterancyTier | null;
+  /**
+   * M7.9: coins added back to this slot because the merc is bonded with at
+   * least one other party member, which reduces the fatigue penalty by 1
+   * (floor 0). Always 0 when fatiguePenalty was already 0.
+   */
+  bondFatigueRelief: number;
 }
 
 export interface PartySynergy {
@@ -114,6 +120,12 @@ export interface SlotContribOptions {
   fatigueOf?: (mercId: string) => number;
   /** M7.8: optional tier lookup for the slot occupant. */
   tierOf?: (mercId: string) => import('./veterancy.js').VeterancyTier | undefined;
+  /**
+   * M7.9: known bonded-pair keys (use `bonds.pairKey`). When a slot occupant
+   * is bonded with any other merc in the same party, their fatigue penalty
+   * is reduced by 1 (floor 0). Surfaces as `SlotContribution.bondFatigueRelief`.
+   */
+  bondedPairs?: Set<string>;
 }
 
 /** M7.8: per-tier flat coin bonus added on top of the slot's base contribution. */
@@ -190,11 +202,26 @@ export function computeSlotContributions(
     }
     let fatigue = 0;
     let fatiguePenalty = 0;
+    let bondFatigueRelief = 0;
     if (opts.fatigueOf) {
       fatigue = opts.fatigueOf(merc.id);
       if (fatigue >= FATIGUE_THRESHOLD) {
         fatiguePenalty = FATIGUE_PENALTY;
-        coins = Math.max(1, coins - FATIGUE_PENALTY);
+        // M7.9: if any other merc in this party is bonded with us, soften
+        // the penalty by 1 (floor 0). Bond relief never raises the slot
+        // above its pre-fatigue value.
+        if (opts.bondedPairs && fatiguePenalty > 0) {
+          const bonded = assignments.some(({ merc: other }) => {
+            if (other.id === merc.id) return false;
+            const key = merc.id < other.id ? `${merc.id}|${other.id}` : `${other.id}|${merc.id}`;
+            return opts.bondedPairs!.has(key);
+          });
+          if (bonded) {
+            bondFatigueRelief = 1;
+            fatiguePenalty = Math.max(0, fatiguePenalty - 1);
+          }
+        }
+        coins = Math.max(1, coins - fatiguePenalty);
       }
     }
     let tier: import('./veterancy.js').VeterancyTier | null = null;
@@ -210,6 +237,7 @@ export function computeSlotContributions(
     return {
       slotId, mercId: merc.id, attrUsed, attrScore, tagsMatched,
       coinsContributed: coins, fatigue, fatiguePenalty, tierBonus, tier,
+      bondFatigueRelief,
     };
   });
 }
@@ -237,7 +265,7 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
     }
   }
 
-  const slotContributions = computeSlotContributions(scenario, assignments, { fatigueOf, tierOf: input.tierOf });
+  const slotContributions = computeSlotContributions(scenario, assignments, { fatigueOf, tierOf: input.tierOf, bondedPairs: input.bondedPairs });
 
   // M5.3: apply per-slot approach modifiers.
   if (approach?.slotModifiers) {

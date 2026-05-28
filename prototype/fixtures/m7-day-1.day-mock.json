@@ -21,7 +21,8 @@
           "fatigue": 0,
           "fatiguePenalty": 0,
           "tierBonus": 0,
-          "tier": "rookie"
+          "tier": "rookie",
+          "bondFatigueRelief": 0
         },
         {
           "slotId": "keep-songs-going",
@@ -35,7 +36,8 @@
           "fatigue": 0,
           "fatiguePenalty": 0,
           "tierBonus": 0,
-          "tier": "rookie"
+          "tier": "rookie",
+          "bondFatigueRelief": 0
         }
       ],
       "synergy": {

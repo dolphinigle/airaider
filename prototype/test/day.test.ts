@@ -82,7 +82,7 @@ describe('M7.10 end-of-day fatigue recovery', () => {
     // marek/roselle/veska). Give her fatigue=2, expect 1 after the day.
     r.states.get('imogen')!.fatigue = 2;
     // Dren also not in day-01; fatigue=0 stays 0 (no entry).
-    const initialFatigue: Array<[string, number]> = [...r.states.entries()].map(([id, s]) => [id, s.fatigue]);
+    const initialFatigue = new Map<string, number>([...r.states.entries()].map(([id, s]) => [id, s.fatigue]));
     const out = await resolveDay({ day, dayPath, mercs, llm: new MockScenarioLLM(), roster: r, initialFatigue });
     const imogenRec = out.fatigueRecovery.find((x) => x.mercId === 'imogen');
     expect(imogenRec).toEqual({ mercId: 'imogen', before: 2, after: 1 });

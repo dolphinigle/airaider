@@ -21,7 +21,8 @@
           "fatigue": 0,
           "fatiguePenalty": 0,
           "tierBonus": 1,
-          "tier": "veteran"
+          "tier": "veteran",
+          "bondFatigueRelief": 0
         },
         {
           "slotId": "oversee",
@@ -35,7 +36,8 @@
           "fatigue": 0,
           "fatiguePenalty": 0,
           "tierBonus": 1,
-          "tier": "veteran"
+          "tier": "veteran",
+          "bondFatigueRelief": 0
         }
       ],
       "synergy": {

@@ -93,6 +93,59 @@ describe('computeSlotContributions', () => {
     expect(contrib[0]!.tierBonus).toBe(1);
     expect(contrib[0]!.coinsContributed).toBe(2); // max(1, 1-1) + 1 tier
   });
+
+  it('M7.9 bonded partner in party reduces fatiguePenalty by 1', () => {
+    const tags = loadTags(TAGS_PATH);
+    const mercs = loadMercs(MERCS_PATH, tags);
+    const fixture = loadScenario(join(ROOT, 'fixtures', 'raid-01.json'));
+    const marek = mercs.get('marek')!;
+    const roselle = mercs.get('roselle')!;
+    const bonded = new Set<string>([marek.id < roselle.id ? `${marek.id}|${roselle.id}` : `${roselle.id}|${marek.id}`]);
+    // Both fatigued ≥ 2 → both would lose 1 coin; bond softens to 0.
+    const contrib = computeSlotContributions(
+      fixture,
+      [{ slotId: 'lock', merc: marek }, { slotId: 'sentry', merc: roselle }],
+      { fatigueOf: () => 2, bondedPairs: bonded },
+    );
+    const m = contrib.find((c) => c.mercId === marek.id)!;
+    const r = contrib.find((c) => c.mercId === roselle.id)!;
+    expect(m.bondFatigueRelief).toBe(1);
+    expect(m.fatiguePenalty).toBe(0);
+    expect(r.bondFatigueRelief).toBe(1);
+    expect(r.fatiguePenalty).toBe(0);
+  });
+
+  it('M7.9 bond relief is 0 when no other party member is bonded', () => {
+    const tags = loadTags(TAGS_PATH);
+    const mercs = loadMercs(MERCS_PATH, tags);
+    const fixture = loadScenario(join(ROOT, 'fixtures', 'raid-01.json'));
+    const marek = mercs.get('marek')!;
+    const roselle = mercs.get('roselle')!;
+    // empty bonded set
+    const contrib = computeSlotContributions(
+      fixture,
+      [{ slotId: 'lock', merc: marek }, { slotId: 'sentry', merc: roselle }],
+      { fatigueOf: () => 2, bondedPairs: new Set<string>() },
+    );
+    const m = contrib.find((c) => c.mercId === marek.id)!;
+    expect(m.bondFatigueRelief).toBe(0);
+    expect(m.fatiguePenalty).toBe(1);
+  });
+
+  it('M7.9 no relief when fresh (penalty was already 0)', () => {
+    const tags = loadTags(TAGS_PATH);
+    const mercs = loadMercs(MERCS_PATH, tags);
+    const fixture = loadScenario(join(ROOT, 'fixtures', 'raid-01.json'));
+    const marek = mercs.get('marek')!;
+    const roselle = mercs.get('roselle')!;
+    const bonded = new Set<string>([marek.id < roselle.id ? `${marek.id}|${roselle.id}` : `${roselle.id}|${marek.id}`]);
+    const contrib = computeSlotContributions(
+      fixture,
+      [{ slotId: 'lock', merc: marek }, { slotId: 'sentry', merc: roselle }],
+      { fatigueOf: () => 0, bondedPairs: bonded },
+    );
+    expect(contrib.every((c) => c.bondFatigueRelief === 0)).toBe(true);
+  });
 });
 
 describe('resolveScenario (with MockScenarioLLM)', () => {

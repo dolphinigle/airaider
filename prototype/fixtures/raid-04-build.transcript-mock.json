@@ -17,7 +17,8 @@
       "fatigue": 0,
       "fatiguePenalty": 0,
       "tierBonus": 0,
-      "tier": null
+      "tier": null,
+      "bondFatigueRelief": 0
     },
     {
       "slotId": "oversee",
@@ -31,7 +32,8 @@
       "fatigue": 0,
       "fatiguePenalty": 0,
       "tierBonus": 0,
-      "tier": null
+      "tier": null,
+      "bondFatigueRelief": 0
     }
   ],
   "synergy": {

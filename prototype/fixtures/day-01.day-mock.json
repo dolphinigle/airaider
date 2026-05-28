@@ -21,7 +21,8 @@
           "fatigue": 0,
           "fatiguePenalty": 0,
           "tierBonus": 0,
-          "tier": null
+          "tier": null,
+          "bondFatigueRelief": 0
         },
         {
           "slotId": "sentry",
@@ -35,7 +36,8 @@
           "fatigue": 0,
           "fatiguePenalty": 0,
           "tierBonus": 0,
-          "tier": null
+          "tier": null,
+          "bondFatigueRelief": 0
         }
       ],
       "synergy": {
@@ -88,7 +90,8 @@
           "fatigue": 1,
           "fatiguePenalty": 0,
           "tierBonus": 0,
-          "tier": null
+          "tier": null,
+          "bondFatigueRelief": 0
         },
         {
           "slotId": "read-lies",
@@ -102,7 +105,8 @@
           "fatigue": 0,
           "fatiguePenalty": 0,
           "tierBonus": 0,
-          "tier": null
+          "tier": null,
+          "bondFatigueRelief": 0
         }
       ],
       "synergy": {
@@ -156,7 +160,8 @@
           "fatigue": 1,
           "fatiguePenalty": 0,
           "tierBonus": 0,
-          "tier": null
+          "tier": null,
+          "bondFatigueRelief": 0
         },
         {
           "slotId": "oversee",
@@ -170,7 +175,8 @@
           "fatigue": 2,
           "fatiguePenalty": 1,
           "tierBonus": 0,
-          "tier": null
+          "tier": null,
+          "bondFatigueRelief": 0
         }
       ],
       "synergy": {

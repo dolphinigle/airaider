@@ -16,7 +16,10 @@
       ],
       "coinsContributed": 4,
       "fatigue": 0,
-      "fatiguePenalty": 0
+      "fatiguePenalty": 0,
+      "tierBonus": 0,
+      "tier": null,
+      "bondFatigueRelief": 0
     },
     {
       "slotId": "speak",
@@ -29,7 +32,10 @@
       ],
       "coinsContributed": 4,
       "fatigue": 0,
-      "fatiguePenalty": 0
+      "fatiguePenalty": 0,
+      "tierBonus": 0,
+      "tier": null,
+      "bondFatigueRelief": 0
     },
     {
       "slotId": "hold",
@@ -41,7 +47,10 @@
       ],
       "coinsContributed": 3,
       "fatigue": 0,
-      "fatiguePenalty": 0
+      "fatiguePenalty": 0,
+      "tierBonus": 0,
+      "tier": null,
+      "bondFatigueRelief": 0
     }
   ],
   "synergy": {
