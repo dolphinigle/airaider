@@ -4,7 +4,7 @@ export interface ScenarioLLMRequest {
   scenarioTitle: string;
   scenarioTarget: string;
   archetype: string;
-  party: Array<{ merc: Merc; assignedSlotId: string }>;
+  party: Array<{ merc: Merc; assignedSlotId: string; fatigueAtStart?: number }>;
   slots: ScenarioSlot[];
   band: OutcomeBand;
   bandReason: string;

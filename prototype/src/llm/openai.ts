@@ -20,6 +20,7 @@ Rules:
 - Keep each contribution line to one tight sentence.
 - Outcome narrative: 2-3 sentences max.
 - Tone: pragmatic, mortal, slightly bleak. Mercs are people, not heroes.
+- Reference \`fatigueAtStart\` when it is >= 2: the merc is visibly worn (the bruise from yesterday, dull reflexes, short patience).
 - No purple prose. No "destiny." No omniscient narrator.
 - Output must be valid JSON matching the provided schema.`;
 
@@ -70,10 +71,11 @@ export class OpenAIScenarioLLM implements ScenarioLLM {
         description: s.description,
         preferredAttr: s.preferredAttr,
       })),
-      party: req.party.map(({ merc, assignedSlotId }) => ({
+      party: req.party.map(({ merc, assignedSlotId, fatigueAtStart }) => ({
         id: merc.id,
         name: merc.name,
         assignedSlotId,
+        fatigueAtStart: fatigueAtStart ?? 0,
         attrs: merc.attrs,
         tags: merc.tags.map((t) => ({
           id: t.id,

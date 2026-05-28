@@ -175,7 +175,11 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
     scenarioTitle: scenario.title,
     scenarioTarget: scenario.target,
     archetype: scenario.archetype,
-    party: assignments.map((a) => ({ merc: a.merc, assignedSlotId: a.slotId })),
+    party: assignments.map((a) => ({
+      merc: a.merc,
+      assignedSlotId: a.slotId,
+      fatigueAtStart: fatigueOf ? fatigueOf(a.merc.id) : 0,
+    })),
     slots: scenario.slots,
     band: band.band,
     bandReason: band.reason,

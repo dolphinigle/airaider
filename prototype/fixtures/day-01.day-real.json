@@ -52,14 +52,14 @@
       "contributions": [
         {
           "mercId": "marek",
-          "line": "Marek's brute strength failed to crack the lock, but his brawny build kept him ready for a quick retreat."
+          "line": "Marek, the brave soldier, bats away the lock's rusted hinges with his muscular grip, but the stubborn mechanism refuses to yield."
         },
         {
           "mercId": "roselle",
-          "line": "Roselle's cautious approach was compromised when she slipped, alerting the brigand at the treeline."
+          "line": "Roselle, the cautious peasant, slips silently past the brigand sentry, her quick steps barely disturbing the underbrush."
         }
       ],
-      "outcomeNarrative": "The brigands' alertness paid off as Roselle's slip was noticed, forcing the team into a hasty retreat with the wagon still lost.",
+      "outcomeNarrative": "Marek's brute strength fails to crack the stubborn lock, while Roselle's stealth keeps her hidden from the sentry, but neither can force the situation entirely alone.",
       "llmName": "openai:gpt-4.1-nano"
     },
     {
@@ -115,14 +115,14 @@
       "contributions": [
         {
           "mercId": "marek",
-          "line": "Marek's physical intimidation pushes the prisoner to crack, revealing a shaky lie about the cache's location."
+          "line": "Marek, the soldier, leans in hard, his muscular frame intimidating the trembling prisoner into silence."
         },
         {
           "mercId": "veska",
-          "line": "Veska's sharp eyes catch the inconsistencies in the prisoner's story, confirming the lie and pushing him to reveal the truth."
+          "line": "Veska, the scholar, catches the subtle shifts in the prisoner's story, spotting the inconsistencies."
         }
       ],
-      "outcomeNarrative": "With Marek's brute force and Veska's keen perception, the prisoner yields the location of the bandit cache before dawn, though not without some broken pride.",
+      "outcomeNarrative": "Marek's physical pressure and Veska's keen eye break the false calm, forcing the prisoner to reveal the bandit's location before dawn.",
       "llmName": "openai:gpt-4.1-nano"
     },
     {
@@ -176,14 +176,14 @@
       "contributions": [
         {
           "mercId": "veska",
-          "line": "Veska’s meticulous drafts prove inadequate against the unpredictable winter melt, despite her intelligence."
+          "line": "Veska's meticulous plans for the tower's foundation are hampered by her fatigue, making her overly cautious and slow."
         },
         {
           "mercId": "marek",
-          "line": "Marek struggles to keep the crew honest and timber straight, his willpower tested by the looming delay."
+          "line": "Marek's stubborn oversight is marred by his tiredness, leading to distracted decision-making and a shaky timber frame."
         }
       ],
-      "outcomeNarrative": "The split decision leaves the watchtower's stability uncertain; the crew's doubts grow as the season shifts.",
+      "outcomeNarrative": "Despite their efforts, the crew's fatigue and pessimism cause the structure to be poorly aligned, risking failure when the melt begins.",
       "llmName": "openai:gpt-4.1-nano"
     }
   ],
