@@ -10,6 +10,7 @@ import { existsSync } from 'node:fs';
 import { loadTags } from './tags.js';
 import { loadMercs } from './mercs.js';
 import { newRoster, loadRoster, saveRoster, type Roster } from './roster.js';
+import { reputationTier } from './reputation.js';
 
 function main(): void {
   const [cmd, pathArg] = process.argv.slice(2);
@@ -53,7 +54,9 @@ function printRoster(r: Roster, path: string): void {
   console.log(`Roster @ ${path}`);
   console.log(`  day ${r.dayCount}   gold ${r.gold}g   v${r.schemaVersion}`);
   if (Object.keys(r.reputation).length > 0) {
-    const rep = Object.entries(r.reputation).map(([k, v]) => `${k}:${v}`).join('  ');
+    const rep = Object.entries(r.reputation)
+      .map(([k, v]) => `${k}:${v}(${reputationTier(v)})`)
+      .join('  ');
     console.log(`  reputation: ${rep}`);
   }
   console.log('━'.repeat(63));

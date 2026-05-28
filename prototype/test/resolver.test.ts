@@ -260,3 +260,25 @@ describe('M7.11 LLM request enrichment', () => {
     }
   });
 });
+
+describe('M8.1 ally reputation bonus', () => {
+  it('adds +1 coin per ally-tier faction in factionContext', async () => {
+    const tags = loadTags(TAGS_PATH);
+    const mercs = loadMercs(MERCS_PATH, tags);
+    const fixture = loadScenario(join(ROOT, 'fixtures', 'raid-13-guild-shipment.json'));
+    const assignments: Assignment[] = fixture.assignments!.map((a) => ({
+      slotId: a.slotId,
+      merc: mercs.get(a.mercId)!,
+    }));
+    const llm = new MockScenarioLLM();
+    const base = await resolveScenario({
+      scenario: fixture, assignments, llm, rng: rngFromString(fixture.seed!),
+      reputationOf: () => 0,
+    });
+    const withAlly = await resolveScenario({
+      scenario: fixture, assignments, llm, rng: rngFromString(fixture.seed!),
+      reputationOf: (id) => (id === 'lowmark-guild' ? 5 : 0),
+    });
+    expect(withAlly.coinsActual).toBe(base.coinsActual + 1);
+  });
+});

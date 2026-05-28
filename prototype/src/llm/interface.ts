@@ -32,7 +32,13 @@ export interface ScenarioLLMRequest {
   /** M5.3: chosen approach for a multi-approach scenario. */
   approach?: { id: string; label: string; summary: string; narrativeHint?: string };
   /** M5.5: factions involved in this scenario and the roster's current standing. */
-  factionContext?: Array<{ factionId: string; summary?: string; currentStanding: number }>;
+  factionContext?: Array<{
+    factionId: string;
+    summary?: string;
+    currentStanding: number;
+    /** M8.1: tier label derived from currentStanding for narrator color. */
+    standingTier?: 'ally' | 'friendly' | 'neutral' | 'hostile' | 'enemy';
+  }>;
   /** M6.3: in-game season ('thaw' | 'high' | 'wane' | 'frost'). */
   season?: 'thaw' | 'high' | 'wane' | 'frost';
 }

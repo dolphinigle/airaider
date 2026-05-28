@@ -4,6 +4,7 @@ import { resolveCoins, MAX_COINS } from './sultan.js';
 import type { ScenarioLLM, ScenarioLLMRequest } from './llm/interface.js';
 import type { FixtureScenario } from './scenarios.js';
 import { fortEffectsFor, flatCoinBonus, slotCoinBonus, negativeSeasonClamped, palisadeBlocksCasualty } from './fortEffects.js';
+import { allyCoinBonus, reputationTier } from './reputation.js';
 
 export interface Assignment {
   slotId: string;
@@ -295,12 +296,14 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
   const fortFlat = flatCoinBonus(fortEffects);
   const fortSlot = slotCoinBonus(fortEffects, scenario.slots.map((s) => s.id));
   const fortBonus = fortFlat + fortSlot;
+  // M8.1: +1 coin per allied faction in this scenario's factionContext.
+  const allyBonus = allyCoinBonus(scenario.factionContext, reputationOf);
   const summed =
-    slotContributions.reduce((s, c) => s + c.coinsContributed, 0) + synergy.bonusCoins + seasonDelta + fortBonus;
+    slotContributions.reduce((s, c) => s + c.coinsContributed, 0) + synergy.bonusCoins + seasonDelta + fortBonus + allyBonus;
   const partyBonus = Math.max(0, assignments.length - scenario.partySize.min);
   const coinsActual = Math.max(
     1,
-    Math.min(MAX_COINS, Math.min(summed, scenario.coinBudget + partyBonus + synergy.bonusCoins + Math.max(0, seasonDelta) + fortBonus)),
+    Math.min(MAX_COINS, Math.min(summed, scenario.coinBudget + partyBonus + synergy.bonusCoins + Math.max(0, seasonDelta) + fortBonus + allyBonus)),
   );
   const { roll, band } = resolveCoins(coinsActual, rng);
 
@@ -358,11 +361,15 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
     approach: approach ? {
       id: approach.id, label: approach.label, summary: approach.summary, narrativeHint: approach.narrativeHint,
     } : undefined,
-    factionContext: scenario.factionContext?.map((f) => ({
-      factionId: f.factionId,
-      summary: f.summary,
-      currentStanding: reputationOf ? reputationOf(f.factionId) : 0,
-    })),
+    factionContext: scenario.factionContext?.map((f) => {
+      const standing = reputationOf ? reputationOf(f.factionId) : 0;
+      return {
+        factionId: f.factionId,
+        summary: f.summary,
+        currentStanding: standing,
+        standingTier: reputationTier(standing),
+      };
+    }),
     season: input.season,
   };
   const narration = await llm.narrate(req);

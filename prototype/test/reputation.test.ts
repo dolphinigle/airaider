@@ -10,6 +10,7 @@ import { rngFromString } from '../src/rng.js';
 import { MockScenarioLLM } from '../src/llm/mock.js';
 import { newRoster } from '../src/roster.js';
 import { loadDay, resolveDay } from '../src/day.js';
+import { reputationTier, allyCoinBonus } from '../src/reputation.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -92,5 +93,37 @@ describe('M5.5 reputation surfacing', () => {
     expect(captured.factionContext).toBeDefined();
     const lowmark = captured.factionContext.find((f: any) => f.factionId === 'lowmark-guild');
     expect(lowmark.currentStanding).toBe(3);
+  });
+});
+
+describe('M8.1 reputation tier classification', () => {
+  it('classifies standings into the five tiers', () => {
+    
+    expect(reputationTier(10)).toBe('ally');
+    expect(reputationTier(5)).toBe('ally');
+    expect(reputationTier(4)).toBe('friendly');
+    expect(reputationTier(3)).toBe('friendly');
+    expect(reputationTier(2)).toBe('neutral');
+    expect(reputationTier(0)).toBe('neutral');
+    expect(reputationTier(-2)).toBe('neutral');
+    expect(reputationTier(-3)).toBe('hostile');
+    expect(reputationTier(-4)).toBe('hostile');
+    expect(reputationTier(-5)).toBe('enemy');
+    expect(reputationTier(-100)).toBe('enemy');
+  });
+
+  it('allyCoinBonus gives +1 per ally-tier faction', () => {
+    
+    const ctx = [{ factionId: 'a' }, { factionId: 'b' }, { factionId: 'c' }];
+    const rep = (id: string) => ({ a: 5, b: 3, c: 9 } as Record<string, number>)[id] ?? 0;
+    expect(allyCoinBonus(ctx, rep)).toBe(2);
+  });
+
+  it('allyCoinBonus returns 0 with no allies', () => {
+    
+    expect(allyCoinBonus(undefined, () => 100)).toBe(0);
+    expect(allyCoinBonus([{ factionId: 'a' }], undefined)).toBe(0);
+    expect(allyCoinBonus([{ factionId: 'a' }], () => 0)).toBe(0);
+    expect(allyCoinBonus([{ factionId: 'a' }], () => -10)).toBe(0);
   });
 });
