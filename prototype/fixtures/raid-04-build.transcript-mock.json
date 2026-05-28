@@ -13,7 +13,9 @@
       "tagsMatched": [
         "bg:scholar"
       ],
-      "coinsContributed": 3
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
     },
     {
       "slotId": "oversee",
@@ -23,7 +25,9 @@
       "tagsMatched": [
         "temp:brave"
       ],
-      "coinsContributed": 3
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
     }
   ],
   "synergy": {

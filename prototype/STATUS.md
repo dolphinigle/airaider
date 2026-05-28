@@ -40,34 +40,54 @@ End-to-end console raid resolution, both mock + real OpenAI, snapshot-tested.
 - [x] README explains console=prototype, GUI=later
 - [x] OPEN_QUESTIONS.md seeded
 
----
+## Milestone M1 — DONE ✅
 
-## Milestone M1 — NEXT (stretch attempted this session)
+All 5 scenario archetypes covered + party-pair synergy.
 
-Goal: prove the engine across all 5 scenario archetypes + add tag-on-tag party synergy.
+- [x] Add 2 mercs (Dren — male/soldier/brave/quick; Veska — female/scholar/stoic)
+- [x] Fixture `raid-02-recruit.json` ("The Coward at the Crossroads")
+- [x] Fixture `raid-03-captive.json` ("The Brigand's Tongue")
+- [x] Fixture `raid-04-build.json` ("Watchtower at the Pass")
+- [x] Fixture `raid-05-tavern.json` ("The Recruits' Drinking Match") — synergy demo
+- [x] Golden mock + real sample per fixture, all committed
+- [x] Parameterized snapshot test over all 5 fixtures
+- [x] Tag-on-tag synergy: +1 coin per pair of party mercs sharing a `pers:*` or `temp:*` tag, capped at `SYNERGY_CAP=3`
+- [x] Synergy unit tests (7 tests)
+- [x] Transcript shows SYNERGY line when fired
 
-- [ ] Fixture: `raid-02-recruit.json` (tavern recruit interview, archetype: `recruit`)
-- [ ] Fixture: `raid-03-captive.json` (interrogating a captured human, archetype: `captive`)
-- [ ] Fixture: `raid-04-build.json` (commissioning a new room, archetype: `build`) — *note CANONICAL §2.11 says construction takes no scenario slot; this fixture exists to validate the archetype's narrative shape only*
-- [ ] Fixture: `raid-05-tavern.json` (downtime/morale, archetype: `tavern`)
-- [ ] Golden mock + real sample per fixture
-- [ ] Snapshot tests for each
-- [ ] Add "tag-on-tag" pairwise bonus: +1 coin per pair of party mercs sharing a personality / temperament tag (CANONICAL §5 god-combo seed)
-- [ ] Add veterancy contribution: V≥2 grants +1 coin once per scenario
-- [ ] Tune budget formulas as needed based on fixture playthroughs
+## Milestone M2 — DONE ✅
 
-## Milestone M2 — DEFERRED (probably not tonight)
+Day loop with fatigue accumulation.
 
-- [ ] Day loop: campaign harness — multi-scenario per day, fatigue tick
-- [ ] Roster persistence (save/load JSON)
-- [ ] Multi-day quest arc seeded by rare/legendary tag (mini Sevrenne pattern)
+- [x] `Day` schema + `loadDay` + `resolveDay` (`src/day.ts`)
+- [x] Per-merc fatigue accumulation across scenarios
+- [x] Fatigue penalty: at-start fatigue ≥ `FATIGUE_THRESHOLD=2` ⇒ −1 coin to that merc's slot (floor 1)
+- [x] Day-level CLI: `npm run day -- fixtures/day-01.json [--real]` (`src/cliDay.ts`)
+- [x] Day transcript renderer with day-end fatigue summary (`src/dayTranscript.ts`)
+- [x] `fixtures/day-01.json` ("First Day at the Crow's Wing"): raid-01 → raid-03 → raid-04, marek used in all three (demonstrates fatigue penalty on scenario 3)
+- [x] Mock day golden + real day sample (committed at `fixtures/day-01.day-mock.json` and `day-01.day-real.json`)
+- [x] 5 day-loop tests: fatigue accrual, penalty trigger, no-penalty for fresh mercs, determinism, golden snapshot
+- [x] Tests now 37 / 37 ✅
 
-## Milestone M3 — DEFERRED
+## Milestone M3 — DEFERRED / IN PROGRESS
 
-- [ ] Llama 3.3 70B via Groq (A/B against nano on narrative-heavy fixtures)
-- [ ] Captive cycle (ransom/sell/display/recruit/execute)
-- [ ] Basic prestige tier ticks
-- [ ] Tag-rarity-aware recruit pool generator
+Pick from these in priority order if time / Opus budget permits before 09:00 WIB:
+
+- [ ] Pass fatigue to LLM request so narration can reference yesterday's exertion ("the bruise on Marek's shoulder from the wagon job slows him")
+- [ ] Rare/legendary tag in the tag vocabulary (currently only common / uncommon / rare; no legendary present)
+- [ ] Tag-rarity-aware recruit pool generator (random merc gen using `attrBias` and tier weights)
+- [ ] Roster JSON persistence (save/load across days)
+- [ ] Captive cycle (5 outcomes: ransom / sell / display / recruit / execute)
+- [ ] Llama 3.3 70B via Groq A/B (requires GROQ_API_KEY which we don't have)
+
+## Milestone M4 — STILL DEFERRED
+
+- [ ] Multi-day quest arc seeded by rare tag (mini Sevrenne pattern)
+- [ ] Climax scenario with multiple approaches
+- [ ] Errand long-clock scenarios
+- [ ] Wounds / permadeath math
+
+
 
 ---
 

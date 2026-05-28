@@ -9,6 +9,7 @@
   },
   "scripts": {
     "scenario": "tsx src/cli.ts",
+    "day": "tsx src/cliDay.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"

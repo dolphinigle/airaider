@@ -13,7 +13,9 @@
       "tagsMatched": [
         "phys:muscular"
       ],
-      "coinsContributed": 3
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
     },
     {
       "slotId": "sentry",
@@ -23,7 +25,9 @@
       "tagsMatched": [
         "phys:quick"
       ],
-      "coinsContributed": 3
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
     }
   ],
   "synergy": {

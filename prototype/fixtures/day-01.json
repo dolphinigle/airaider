@@ -1,0 +1,10 @@
+{
+  "id": "day-01",
+  "name": "First Day at the Crow's Wing",
+  "scenarios": [
+    "raid-01.json",
+    "raid-03-captive.json",
+    "raid-04-build.json"
+  ],
+  "seed": "day-01-deterministic"
+}

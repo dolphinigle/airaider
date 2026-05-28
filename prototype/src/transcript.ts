@@ -14,9 +14,15 @@ export function renderTranscript(r: ScenarioResolution): string {
     const c = r.contributions.find((x) => x.mercId === sc.mercId);
     const tagStr = sc.tagsMatched.length ? ` +tags:${sc.tagsMatched.join(',')}` : '';
     const attrStr = sc.attrUsed ? ` ${sc.attrUsed}=${sc.attrScore}` : '';
+    const fatStr =
+      sc.fatiguePenalty > 0
+        ? ` [fatigued ${sc.fatigue}, −${sc.fatiguePenalty}]`
+        : sc.fatigue > 0
+        ? ` [fatigue ${sc.fatigue}]`
+        : '';
     const coinPlural = sc.coinsContributed === 1 ? 'coin' : 'coins';
     lines.push(
-      `  • ${sc.mercId} → slot:${sc.slotId}${attrStr}${tagStr} (${sc.coinsContributed} ${coinPlural})`,
+      `  • ${sc.mercId} → slot:${sc.slotId}${attrStr}${tagStr}${fatStr} (${sc.coinsContributed} ${coinPlural})`,
     );
     if (c) lines.push(`      "${c.line}"`);
   }

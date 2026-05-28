@@ -14,7 +14,9 @@
         "phys:muscular",
         "temp:brave"
       ],
-      "coinsContributed": 4
+      "coinsContributed": 4,
+      "fatigue": 0,
+      "fatiguePenalty": 0
     },
     {
       "slotId": "read-lies",
@@ -24,7 +26,9 @@
       "tagsMatched": [
         "pers:stoic"
       ],
-      "coinsContributed": 3
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
     }
   ],
   "synergy": {

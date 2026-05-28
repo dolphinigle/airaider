@@ -13,7 +13,9 @@
       "tagsMatched": [
         "pers:stoic"
       ],
-      "coinsContributed": 3
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
     },
     {
       "slotId": "persuade",
@@ -23,7 +25,9 @@
       "tagsMatched": [
         "pers:charming"
       ],
-      "coinsContributed": 3
+      "coinsContributed": 3,
+      "fatigue": 0,
+      "fatiguePenalty": 0
     }
   ],
   "synergy": {

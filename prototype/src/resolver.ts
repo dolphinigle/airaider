@@ -14,6 +14,8 @@ export interface ResolutionInput {
   assignments: Assignment[];
   llm: ScenarioLLM;
   rng: Rng;
+  /** M2: fatigue lookup for the day loop. */
+  fatigueOf?: (mercId: string) => number;
 }
 
 export interface SlotContribution {
@@ -23,6 +25,10 @@ export interface SlotContribution {
   attrScore: number;
   tagsMatched: string[];
   coinsContributed: number;
+  /** M2: merc's fatigue at scenario start (0 if no fatigue source). */
+  fatigue: number;
+  /** M2: coins shaved off due to fatigue ≥ FATIGUE_THRESHOLD. */
+  fatiguePenalty: number;
 }
 
 export interface PartySynergy {
@@ -63,6 +69,15 @@ export interface ScenarioResolution {
 export const SYNERGY_CAP = 3;
 const SYNERGY_PREFIXES = ['pers:', 'temp:'] as const;
 
+/** M2 fatigue: at-start fatigue ≥ FATIGUE_THRESHOLD applies −1 to that merc's slot. */
+export const FATIGUE_THRESHOLD = 2;
+export const FATIGUE_PENALTY = 1;
+
+export interface SlotContribOptions {
+  /** If provided, returns the merc's current fatigue at scenario start. */
+  fatigueOf?: (mercId: string) => number;
+}
+
 export function computePartySynergy(assignments: Assignment[]): PartySynergy {
   const pairs: PartySynergy['pairs'] = [];
   for (let i = 0; i < assignments.length; i++) {
@@ -97,6 +112,7 @@ export function computePartySynergy(assignments: Assignment[]): PartySynergy {
 export function computeSlotContributions(
   scenario: FixtureScenario,
   assignments: Assignment[],
+  opts: SlotContribOptions = {},
 ): SlotContribution[] {
   return assignments.map(({ slotId, merc }) => {
     const slot = scenario.slots.find((s) => s.id === slotId);
@@ -118,12 +134,24 @@ export function computeSlotContributions(
         }
       }
     }
-    return { slotId, mercId: merc.id, attrUsed, attrScore, tagsMatched, coinsContributed: coins };
+    let fatigue = 0;
+    let fatiguePenalty = 0;
+    if (opts.fatigueOf) {
+      fatigue = opts.fatigueOf(merc.id);
+      if (fatigue >= FATIGUE_THRESHOLD) {
+        fatiguePenalty = FATIGUE_PENALTY;
+        coins = Math.max(1, coins - FATIGUE_PENALTY);
+      }
+    }
+    return {
+      slotId, mercId: merc.id, attrUsed, attrScore, tagsMatched,
+      coinsContributed: coins, fatigue, fatiguePenalty,
+    };
   });
 }
 
 export async function resolveScenario(input: ResolutionInput): Promise<ScenarioResolution> {
-  const { scenario, assignments, llm, rng } = input;
+  const { scenario, assignments, llm, rng, fatigueOf } = input;
   if (
     assignments.length < scenario.partySize.min ||
     assignments.length > scenario.partySize.max
@@ -132,7 +160,7 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
       `Party size ${assignments.length} not in [${scenario.partySize.min}, ${scenario.partySize.max}]`,
     );
   }
-  const slotContributions = computeSlotContributions(scenario, assignments);
+  const slotContributions = computeSlotContributions(scenario, assignments, { fatigueOf });
   const synergy = computePartySynergy(assignments);
   const summed =
     slotContributions.reduce((s, c) => s + c.coinsContributed, 0) + synergy.bonusCoins;

@@ -61,6 +61,10 @@ Format: each entry says **(a)** what the question is, **(b)** what M0 currently 
 - **Now:** `veterancy: 0-5` in JSON; engine ignores it.
 - **Conservative fallback:** wire into M1 as a small "+1 coin once per scenario if V ≥ 2".
 
+### Q11b. Day-level fatigue is not surfaced to the LLM
+- **Now (M2):** the engine tracks fatigue and applies a coin penalty, and the transcript shows `[fatigued N, −P]`, but the LLM request does not include fatigue. The narration therefore can't say "Marek is dragging from yesterday's intimidation."
+- **Conservative fallback:** add a `fatigueAtStart` field to `ScenarioLLMRequest.party[i]` and pass it through `resolveScenario`. Small, low-risk; deferred only to keep M2 focused.
+
 ---
 
 ## LLM layer
