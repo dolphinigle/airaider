@@ -102,7 +102,7 @@ describe('M6.2 co-deployment bonds', () => {
       expect(loaded.states.get('marek')!.coDeployments).toEqual({});
       saveRoster(TMP, loaded, mercs);
       const onDisk = JSON.parse(readFileSync(TMP, 'utf8'));
-      expect(onDisk.schemaVersion).toBe(9);
+      expect(onDisk.schemaVersion).toBe(10);
       expect(onDisk.mercStates[0].coDeployments).toEqual({});
     } finally {
       if (existsSync(TMP)) rmSync(TMP);

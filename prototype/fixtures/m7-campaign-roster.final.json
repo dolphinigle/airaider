@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 8,
+  "schemaVersion": 9,
   "dayCount": 32,
   "gold": 0,
   "reputation": {
@@ -102,5 +102,6 @@
       "kind": "event",
       "message": "Quiet summer day  fatigue -1"
     }
-  ]
+  ],
+  "consecutiveDebtDays": 0
 }

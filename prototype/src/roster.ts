@@ -50,6 +50,13 @@ const CaptiveSchema = z.object({
   tagIds: z.array(z.string()),
 });
 
+/** M10.1: persisted form of a tavern hire-pool entry. v10+. */
+const HirePoolEntrySchema = z.object({
+  merc: GeneratedMercSchema,
+  price: z.number().int().min(0),
+  postedDay: z.number().int().min(0),
+});
+
 const DeceasedSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -100,7 +107,7 @@ const FortLogEntrySchema = z.object({
 export const FORT_LOG_MAX = 50;
 
 const RoasterSchema = z.object({
-  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6), z.literal(7), z.literal(8), z.literal(9)]).default(9),
+  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6), z.literal(7), z.literal(8), z.literal(9), z.literal(10)]).default(10),
   dayCount: z.number().int().min(0).default(0),
   gold: z.number().int().default(0),
   reputation: z.record(z.string(), z.number().int()).default({}),
@@ -124,6 +131,8 @@ const RoasterSchema = z.object({
   fortLog: z.array(FortLogEntrySchema).default([]),
   /** M9.2: consecutive days the fort has ended with gold < 0. v9+. */
   consecutiveDebtDays: z.number().int().min(0).default(0),
+  /** M10.1: persistent tavern hire pool. v10+. */
+  hirePool: z.array(HirePoolEntrySchema).default([]),
 });
 
 export type RosterMercState = z.infer<typeof MercStateSchema>;
@@ -135,7 +144,7 @@ export type FortLogEntry = z.infer<typeof FortLogEntrySchema>;
 export type RosterFile = z.infer<typeof RoasterSchema>;
 
 export interface Roster {
-  schemaVersion: 9;
+  schemaVersion: 10;
   dayCount: number;
   gold: number;
   reputation: Record<string, number>;
@@ -158,6 +167,8 @@ export interface Roster {
   fortLog: FortLogEntry[];
   /** M9.2: consecutive days ended in debt (gold < 0). Resets to 0 on a non-debt day or after a desertion. */
   consecutiveDebtDays: number;
+  /** M10.1: tavern hire pool — generated bench of hireable mercs with prices. */
+  hirePool: import('./tavern.js').HirePoolEntry[];
 }
 
 /**
@@ -173,7 +184,7 @@ export function appendFortLog(roster: Roster, entry: FortLogEntry): void {
 
 export function newRoster(initialMercs: Merc[]): Roster {
   return {
-    schemaVersion: 9,
+    schemaVersion: 10,
     dayCount: 0,
     gold: 0,
     reputation: {},
@@ -187,6 +198,7 @@ export function newRoster(initialMercs: Merc[]): Roster {
     fort: { level: 1, upgrades: [] },
     fortLog: [],
     consecutiveDebtDays: 0,
+    hirePool: [],
   };
 }
 
@@ -240,7 +252,7 @@ export function loadRoster(
   }));
 
   return {
-    schemaVersion: 9,
+    schemaVersion: 10,
     dayCount: parsed.dayCount,
     gold: parsed.gold,
     reputation: parsed.reputation,
@@ -254,6 +266,23 @@ export function loadRoster(
     fort: parsed.fort,
     fortLog: parsed.fortLog,
     consecutiveDebtDays: parsed.consecutiveDebtDays,
+    hirePool: parsed.hirePool.map((e) => ({
+      merc: {
+        id: e.merc.id,
+        name: e.merc.name,
+        attrs: e.merc.attrs as import('./types.js').AttributeBlock,
+        tags: e.merc.tagIds.map((tid) => {
+          const t = tagPool.get(tid);
+          if (!t) throw new Error(`roster: unknown tag id ${tid} in hire pool merc ${e.merc.id}`);
+          return t;
+        }),
+        veterancy: e.merc.veterancy,
+        wage: e.merc.wage,
+        hp: e.merc.hp,
+      },
+      price: e.price,
+      postedDay: e.postedDay,
+    })),
   };
 }
 
@@ -281,7 +310,7 @@ export function saveRoster(
     }
   }
   const file: RosterFile = {
-    schemaVersion: 9,
+    schemaVersion: 10,
     dayCount: roster.dayCount,
     gold: roster.gold,
     reputation: roster.reputation,
@@ -303,6 +332,19 @@ export function saveRoster(
     fort: roster.fort,
     fortLog: roster.fortLog,
     consecutiveDebtDays: roster.consecutiveDebtDays,
+    hirePool: roster.hirePool.map((e) => ({
+      merc: {
+        id: e.merc.id,
+        name: e.merc.name,
+        attrs: e.merc.attrs,
+        tagIds: e.merc.tags.map((t) => t.id),
+        veterancy: e.merc.veterancy,
+        wage: e.merc.wage,
+        hp: e.merc.hp,
+      },
+      price: e.price,
+      postedDay: e.postedDay,
+    })),
   };
   writeFileSync(path, JSON.stringify(file, null, 2) + '\n', 'utf8');
 }

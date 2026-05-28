@@ -1,6 +1,6 @@
 {
   "dayId": "m7-day-5",
-  "dayName": "Long Summer Afternoon \u2014 Final Build",
+  "dayName": "Long Summer Afternoon — Final Build",
   "scenarios": [
     {
       "scenarioId": "raid-04",
@@ -62,7 +62,7 @@
       "heads": 3,
       "tails": 2,
       "band": "unfavorable",
-      "bandReason": "3/5 heads (split \u2014 pessimistic default)",
+      "bandReason": "3/5 heads (split — pessimistic default)",
       "contributions": [
         {
           "mercId": "veska",
@@ -117,9 +117,9 @@
     }
   ],
   "fatigueRecovery": [],
+  "fatigueRecoverySuspended": false,
   "woundHealing": [],
   "wagesPaid": [],
   "wagesTotalPaid": 0,
-  "desertions": [],
-  "fatigueRecoverySuspended": false
+  "desertions": []
 }

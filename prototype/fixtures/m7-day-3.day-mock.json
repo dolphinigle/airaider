@@ -1,6 +1,6 @@
 {
   "dayId": "m7-day-3",
-  "dayName": "Summer Reaches \u2014 Recruit at the Gate",
+  "dayName": "Summer Reaches — Recruit at the Gate",
   "scenarios": [
     {
       "scenarioId": "raid-02",
@@ -128,9 +128,9 @@
       "after": 0
     }
   ],
+  "fatigueRecoverySuspended": false,
   "woundHealing": [],
   "wagesPaid": [],
   "wagesTotalPaid": 0,
-  "desertions": [],
-  "fatigueRecoverySuspended": false
+  "desertions": []
 }
