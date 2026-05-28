@@ -201,5 +201,6 @@
   "errandsDispatched": [],
   "errandsResolved": [],
   "promotions": [],
-  "bondsFormed": []
+  "bondsFormed": [],
+  "seasonClock": null
 }

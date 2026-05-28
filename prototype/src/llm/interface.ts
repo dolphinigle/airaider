@@ -17,6 +17,8 @@ export interface ScenarioLLMRequest {
   approach?: { id: string; label: string; summary: string; narrativeHint?: string };
   /** M5.5: factions involved in this scenario and the roster's current standing. */
   factionContext?: Array<{ factionId: string; summary?: string; currentStanding: number }>;
+  /** M6.3: in-game season ('thaw' | 'high' | 'wane' | 'frost'). */
+  season?: 'thaw' | 'high' | 'wane' | 'frost';
 }
 
 export interface ScenarioLLMNarration {

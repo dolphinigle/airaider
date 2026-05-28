@@ -22,6 +22,8 @@ export interface ResolutionInput {
   reputationOf?: (factionId: string) => number;
   /** M6.2: set of bonded pair keys (use `bonds.pairKey`). */
   bondedPairs?: Set<string>;
+  /** M6.3: current season; if set with a scenario.seasonModifier, applies a flat coin delta. */
+  season?: import('./season.js').Season;
 }
 
 export interface SlotContribution {
@@ -223,12 +225,16 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
   }
 
   const synergy = computePartySynergy(assignments, input.bondedPairs);
+  const seasonDelta =
+    input.season && scenario.seasonModifier
+      ? (scenario.seasonModifier[input.season] ?? 0)
+      : 0;
   const summed =
-    slotContributions.reduce((s, c) => s + c.coinsContributed, 0) + synergy.bonusCoins;
+    slotContributions.reduce((s, c) => s + c.coinsContributed, 0) + synergy.bonusCoins + seasonDelta;
   const partyBonus = Math.max(0, assignments.length - scenario.partySize.min);
   const coinsActual = Math.max(
     1,
-    Math.min(MAX_COINS, Math.min(summed, scenario.coinBudget + partyBonus + synergy.bonusCoins)),
+    Math.min(MAX_COINS, Math.min(summed, scenario.coinBudget + partyBonus + synergy.bonusCoins + Math.max(0, seasonDelta))),
   );
   const { roll, band } = resolveCoins(coinsActual, rng);
 
@@ -275,6 +281,7 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
       summary: f.summary,
       currentStanding: reputationOf ? reputationOf(f.factionId) : 0,
     })),
+    season: input.season,
   };
   const narration = await llm.narrate(req);
 

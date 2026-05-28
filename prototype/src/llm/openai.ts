@@ -90,6 +90,7 @@ export class OpenAIScenarioLLM implements ScenarioLLM {
       synergy: req.synergy ?? { pairs: [], bonusCoins: 0 },
       approach: req.approach ?? null,
       factionContext: req.factionContext ?? [],
+      season: req.season ?? null,
       instructions:
         'Produce a JSON object matching the schema. One contribution line per party merc, in the order given.' +
         (req.approach
@@ -97,6 +98,9 @@ export class OpenAIScenarioLLM implements ScenarioLLM {
           : '') +
         (req.factionContext && req.factionContext.length > 0
           ? ` The factions involved are: ${req.factionContext.map((f) => `${f.factionId} (current standing ${f.currentStanding}${f.summary ? '; ' + f.summary : ''})`).join('; ')}. Refer to them by name in the outcome and let prior standing colour reactions.`
+          : '') +
+        (req.season
+          ? ` The season is "${req.season}" — work this into the atmosphere (thaw=mud and runoff, high=long hot days, wane=harvest and short tempers, frost=biting cold and short days).`
           : ''),
     };
 

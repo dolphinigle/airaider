@@ -8,6 +8,9 @@ export function renderDayTranscript(day: DayResolution): string {
   lines.push(DBAR);
   lines.push(` DAY: ${day.dayName}  [${day.dayId}]`);
   lines.push(` ${day.scenarios.length} scenarios (incl. ${day.errandsResolved.length} returning errand(s)), ${day.errandsDispatched.length} errand(s) dispatched`);
+  if (day.seasonClock) {
+    lines.push(` Season: ${day.seasonClock.season}  (day ${day.seasonClock.dayOfSeason}/30)`);
+  }
   lines.push(DBAR);
   lines.push('');
   if (day.errandsResolved.length > 0) {

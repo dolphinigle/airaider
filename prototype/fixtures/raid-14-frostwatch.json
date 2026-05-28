@@ -1,0 +1,33 @@
+{
+  "id": "raid-14-frostwatch",
+  "archetype": "build",
+  "title": "Frostwatch Repairs",
+  "target": "shore up the north palisade before the next blizzard buries the gate",
+  "slots": [
+    {
+      "id": "design",
+      "description": "draft the bracing pattern and tally the timber",
+      "preferredAttr": "intelligence",
+      "preferredTags": ["bg:scholar"]
+    },
+    {
+      "id": "labour",
+      "description": "drive the heavy timbers into the half-frozen ground",
+      "preferredAttr": "physical",
+      "preferredTags": ["bg:soldier"]
+    }
+  ],
+  "partySize": { "min": 2, "max": 2 },
+  "coinBudget": 5,
+  "assignments": [
+    { "slotId": "design", "mercId": "veska" },
+    { "slotId": "labour", "mercId": "marek" }
+  ],
+  "seed": "raid-14-frostwatch",
+  "seasonModifier": {
+    "thaw": 0,
+    "high": 1,
+    "wane": 0,
+    "frost": -2
+  }
+}

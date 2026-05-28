@@ -60,6 +60,13 @@ const ScenarioSchema = z.object({
     deltaOnUnfavorable: z.number().int().optional(),
     deltaOnCatastrophic: z.number().int().optional(),
   })).optional(),
+  /** M6.3: per-season flat coin adjustment to the scenario pool. */
+  seasonModifier: z.object({
+    thaw: z.number().int().optional(),
+    high: z.number().int().optional(),
+    wane: z.number().int().optional(),
+    frost: z.number().int().optional(),
+  }).optional(),
 });
 
 export type FixtureScenario = z.infer<typeof ScenarioSchema>;

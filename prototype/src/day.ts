@@ -16,6 +16,7 @@ import type { Roster, RosterPendingErrand } from './roster.js';
 import { dispatchErrand, resolveDueErrands } from './errands.js';
 import { applyVeterancyXp, type Promotion } from './veterancy.js';
 import { recordCoDeployment, bondedPairsOf, type BondFormation } from './bonds.js';
+import { seasonFor, type SeasonClock } from './season.js';
 
 const DaySchema = z.object({
   id: z.string().min(1),
@@ -64,6 +65,8 @@ export interface DayResolution {
   promotions: Promotion[];
   /** M6.2: pairs that crossed the bond threshold today (roster-mode only). */
   bondsFormed: BondFormation[];
+  /** M6.3: season clock at the time of this day (roster-mode only; null otherwise). */
+  seasonClock: SeasonClock | null;
 }
 
 /**
@@ -83,6 +86,8 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   const promotions: Promotion[] = [];
   const bondsFormed: BondFormation[] = [];
   const bondedPairs = roster ? bondedPairsOf(roster) : undefined;
+  const seasonClock: SeasonClock | null = roster ? seasonFor(roster.dayCount) : null;
+  const season = seasonClock?.season;
   const reputationOf = roster
     ? (factionId: string): number => roster.reputation[factionId] ?? 0
     : undefined;
@@ -98,7 +103,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   if (roster) {
     const currentDay = roster.dayCount + 1;
     const dueResolutions = await resolveDueErrands({
-      roster, currentDay, mercs, llm, fatigueOf, reputationOf, basePath: dayPath,
+      roster, currentDay, mercs, llm, fatigueOf, reputationOf, bondedPairs, season, basePath: dayPath,
     });
     for (const r of dueResolutions) {
       errandsResolved.push(r);
@@ -150,7 +155,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
       ? rngFor(scenario, i)
       : rngFromString(scenario.seed ?? scenario.id);
 
-    const resolution = await resolveScenario({ scenario, assignments, llm, rng, fatigueOf, reputationOf, bondedPairs });
+    const resolution = await resolveScenario({ scenario, assignments, llm, rng, fatigueOf, reputationOf, bondedPairs, season });
     scenarioResolutions.push(resolution);
     applyDeltas(resolution);
     if (roster) {
@@ -175,5 +180,6 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     errandsResolved,
     promotions,
     bondsFormed,
+    seasonClock,
   };
 }
