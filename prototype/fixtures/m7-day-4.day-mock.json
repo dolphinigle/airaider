@@ -79,7 +79,7 @@
   ],
   "finalFatigue": {
     "marek": 1,
-    "veska": 1,
+    "veska": 0,
     "imogen": 0,
     "dren": 1
   },
@@ -112,6 +112,13 @@
       "day": 31,
       "kind": "event",
       "message": "Quiet summer day  fatigue -1"
+    }
+  ],
+  "fatigueRecovery": [
+    {
+      "mercId": "veska",
+      "before": 1,
+      "after": 0
     }
   ]
 }

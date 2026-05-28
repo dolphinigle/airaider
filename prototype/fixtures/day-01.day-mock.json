@@ -217,5 +217,6 @@
   "seasonClock": null,
   "dailyEvent": null,
   "fortHints": [],
-  "newFortLogEntries": []
+  "newFortLogEntries": [],
+  "fatigueRecovery": []
 }

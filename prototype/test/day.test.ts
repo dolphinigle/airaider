@@ -63,4 +63,46 @@ describe('day loop (M2)', () => {
     const expected = JSON.parse(readFileSync(goldenPath, 'utf8'));
     expect(actual).toEqual(expected);
   });
+
+  it('M7.10 fatigueRecovery is empty in roster-less mode', async () => {
+    const r = await run();
+    expect(r.fatigueRecovery).toEqual([]);
+  });
+});
+
+describe('M7.10 end-of-day fatigue recovery', () => {
+  it('non-deployed merc with fatigue > 0 recovers 1 (floor 0)', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+    const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+    const dayPath = join(ROOT, 'fixtures', 'day-01.json');
+    const day = loadDay(dayPath);
+    const r = newRoster([...mercs.values()]);
+    // Imogen is NOT deployed in day-01 (raid-01, raid-03, raid-04 use
+    // marek/roselle/veska). Give her fatigue=2, expect 1 after the day.
+    r.states.get('imogen')!.fatigue = 2;
+    // Dren also not in day-01; fatigue=0 stays 0 (no entry).
+    const initialFatigue: Array<[string, number]> = [...r.states.entries()].map(([id, s]) => [id, s.fatigue]);
+    const out = await resolveDay({ day, dayPath, mercs, llm: new MockScenarioLLM(), roster: r, initialFatigue });
+    const imogenRec = out.fatigueRecovery.find((x) => x.mercId === 'imogen');
+    expect(imogenRec).toEqual({ mercId: 'imogen', before: 2, after: 1 });
+    const drenRec = out.fatigueRecovery.find((x) => x.mercId === 'dren');
+    expect(drenRec).toBeUndefined();
+    // And the saved finalFatigue reflects the recovery.
+    expect(out.finalFatigue['imogen']).toBe(1);
+  });
+
+  it('deployed mercs do NOT recover (they only accumulated fatigue today)', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+    const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+    const dayPath = join(ROOT, 'fixtures', 'day-01.json');
+    const day = loadDay(dayPath);
+    const r = newRoster([...mercs.values()]);
+    const out = await resolveDay({ day, dayPath, mercs, llm: new MockScenarioLLM(), roster: r });
+    // marek is in every scenario today — must NOT appear in recovery.
+    expect(out.fatigueRecovery.some((x) => x.mercId === 'marek')).toBe(false);
+    // marek finishes at fatigue 3 (3 scenarios), no recovery applied.
+    expect(out.finalFatigue['marek']).toBe(3);
+  });
 });

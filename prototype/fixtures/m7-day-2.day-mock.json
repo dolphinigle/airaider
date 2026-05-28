@@ -125,5 +125,6 @@
       "kind": "event",
       "message": "A bard passes through  -1g  fatigue -1  lowmark-guild +1"
     }
-  ]
+  ],
+  "fatigueRecovery": []
 }

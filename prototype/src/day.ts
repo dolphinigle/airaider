@@ -78,6 +78,12 @@ export interface DayResolution {
    */
   fortHints: Pick<FortUpgrade, 'id' | 'name' | 'cost' | 'description'>[];
   /**
+   * M7.10: fatigue recovery applied at end-of-day. Each entry is one merc
+   * who was idle (not deployed, not on errand) and shed 1 fatigue. Empty
+   * in roster-less mode.
+   */
+  fatigueRecovery: Array<{ mercId: string; before: number; after: number }>;
+  /**
    * M7.6: fort log entries appended during THIS day (currently only the
    * daily-event entry; upgrade purchases happen via the fort CLI, not the day
    * loop). Empty in roster-less mode.
@@ -224,6 +230,29 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     }
   }
 
+  // M7.10: end-of-day fatigue recovery. Mercs who neither deployed today
+  // (no slot contribution in any scenarioResolution) nor are currently on an
+  // errand (busy travelling) recover 1 fatigue, floored at 0. Recovery is
+  // computed against the post-deployment fatigue map but BEFORE finalFatigue
+  // is exported, so the saved roster reflects the recovered values.
+  const fatigueRecovery: Array<{ mercId: string; before: number; after: number }> = [];
+  if (roster) {
+    const deployed = new Set<string>();
+    for (const sr of scenarioResolutions) {
+      for (const sc of sr.slotContributions) deployed.add(sc.mercId);
+    }
+    const onErrand = new Set<string>();
+    for (const e of roster.pendingErrands) for (const id of e.partyMercIds) onErrand.add(id);
+    for (const m of roster.mercs) {
+      if (deployed.has(m.id) || onErrand.has(m.id)) continue;
+      const before = fatigue.get(m.id) ?? 0;
+      if (before <= 0) continue;
+      const after = before - 1;
+      fatigue.set(m.id, after);
+      fatigueRecovery.push({ mercId: m.id, before, after });
+    }
+  }
+
   const finalFatigue: Record<string, number> = {};
   for (const [k, v] of fatigue) finalFatigue[k] = v;
 
@@ -252,5 +281,6 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     dailyEvent,
     fortHints,
     newFortLogEntries,
+    fatigueRecovery,
   };
 }

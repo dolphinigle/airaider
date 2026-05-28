@@ -113,5 +113,6 @@
       "kind": "event",
       "message": "Quiet summer day  fatigue -1"
     }
-  ]
+  ],
+  "fatigueRecovery": []
 }

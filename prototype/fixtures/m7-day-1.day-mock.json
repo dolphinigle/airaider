@@ -131,5 +131,6 @@
       "kind": "event",
       "message": "Refugees at the gate  -1g  lowmark-guild +1"
     }
-  ]
+  ],
+  "fatigueRecovery": []
 }
