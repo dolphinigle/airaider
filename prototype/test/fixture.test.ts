@@ -19,6 +19,9 @@ const FIXTURES = [
   'raid-03-captive.json',
   'raid-04-build.json',
   'raid-05-tavern.json',
+  'raid-06-mire.json',
+  'raid-07-plague.json',
+  'raid-08-tax-riot.json',
 ];
 
 /**
