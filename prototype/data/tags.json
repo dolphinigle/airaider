@@ -99,5 +99,88 @@
     "tier": 2,
     "attrBias": { "willpower": 1 },
     "label": "Stoic"
+  },
+  {
+    "id": "bg:hunter",
+    "category": "background",
+    "rarity": "common",
+    "tier": 4,
+    "mutexGroup": "background",
+    "attrBias": { "agility": 1 },
+    "label": "Hunter"
+  },
+  {
+    "id": "bg:smith",
+    "category": "background",
+    "rarity": "uncommon",
+    "tier": 3,
+    "mutexGroup": "background",
+    "attrBias": { "physical": 1 },
+    "label": "Smith"
+  },
+  {
+    "id": "bg:noble-bastard",
+    "category": "background",
+    "rarity": "rare",
+    "tier": 2,
+    "mutexGroup": "background",
+    "attrBias": { "charisma": 1, "intelligence": 1 },
+    "label": "Noble Bastard"
+  },
+  {
+    "id": "phys:frail",
+    "category": "physicality",
+    "rarity": "common",
+    "tier": 5,
+    "attrBias": { "physical": -1 },
+    "label": "Frail"
+  },
+  {
+    "id": "phys:scarred",
+    "category": "physicality",
+    "rarity": "common",
+    "tier": 4,
+    "attrBias": { "willpower": 1 },
+    "label": "Scarred"
+  },
+  {
+    "id": "pers:greedy",
+    "category": "personality",
+    "rarity": "common",
+    "tier": 4,
+    "label": "Greedy"
+  },
+  {
+    "id": "pers:cynical",
+    "category": "personality",
+    "rarity": "common",
+    "tier": 4,
+    "attrBias": { "intelligence": 1 },
+    "label": "Cynical"
+  },
+  {
+    "id": "pers:loyal",
+    "category": "personality",
+    "rarity": "uncommon",
+    "tier": 3,
+    "attrBias": { "willpower": 1 },
+    "label": "Loyal"
+  },
+  {
+    "id": "temp:reckless",
+    "category": "personality:temperament",
+    "rarity": "common",
+    "tier": 4,
+    "mutexGroup": "temperament",
+    "attrBias": { "physical": 1 },
+    "label": "Reckless"
+  },
+  {
+    "id": "pers:touched-by-the-mire",
+    "category": "personality",
+    "rarity": "legendary",
+    "tier": 1,
+    "attrBias": { "willpower": 2, "charisma": -1 },
+    "label": "Touched by the Mire"
   }
 ]
