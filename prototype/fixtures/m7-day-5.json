@@ -1,0 +1,6 @@
+{
+  "id": "m7-day-5",
+  "name": "Long Summer Afternoon — Final Build",
+  "scenarios": ["raid-04-build.json"],
+  "seed": "m7-day-5"
+}

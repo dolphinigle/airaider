@@ -1,0 +1,6 @@
+{
+  "id": "m7-day-3",
+  "name": "Summer Reaches — Recruit at the Gate",
+  "scenarios": ["raid-02-recruit.json"],
+  "seed": "m7-day-3"
+}

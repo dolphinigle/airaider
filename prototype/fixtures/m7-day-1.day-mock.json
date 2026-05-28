@@ -1,0 +1,110 @@
+{
+  "dayId": "m7-day-1",
+  "dayName": "Last Days of Thaw — Tavern at the Crow's Wing",
+  "scenarios": [
+    {
+      "scenarioId": "raid-05",
+      "title": "The Recruits' Drinking Match",
+      "target": "hold a long night of drinking that closes ranks between the two newest hands without ending in a brawl",
+      "archetype": "tavern",
+      "partySize": 2,
+      "slotContributions": [
+        {
+          "slotId": "hold-liquor",
+          "mercId": "marek",
+          "attrUsed": "physical",
+          "attrScore": 5,
+          "tagsMatched": [
+            "temp:brave"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 0,
+          "fatiguePenalty": 0
+        },
+        {
+          "slotId": "keep-songs-going",
+          "mercId": "dren",
+          "attrUsed": "willpower",
+          "attrScore": 4,
+          "tagsMatched": [
+            "temp:brave"
+          ],
+          "coinsContributed": 3,
+          "fatigue": 0,
+          "fatiguePenalty": 0
+        }
+      ],
+      "synergy": {
+        "pairs": [
+          {
+            "mercA": "marek",
+            "mercB": "dren",
+            "sharedTagId": "temp:brave"
+          }
+        ],
+        "bonusCoins": 1
+      },
+      "baseCoinBudget": 4,
+      "coinsActual": 5,
+      "rollFaces": [
+        "tails",
+        "tails",
+        "tails",
+        "heads",
+        "heads"
+      ],
+      "heads": 2,
+      "tails": 3,
+      "band": "unfavorable",
+      "bandReason": "2/5 heads (split — pessimistic default)",
+      "contributions": [
+        {
+          "mercId": "marek",
+          "line": "[mock] Marek (Male) takes on \"out-drink the younger recruits without making it a contest of pride\"."
+        },
+        {
+          "mercId": "dren",
+          "line": "[mock] Dren (Male) takes on \"keep the songs and stories rolling past the bitter hour\"."
+        }
+      ],
+      "outcomeNarrative": "[mock] A bruised partial; hold a long night of drinking that closes ranks between the two newest hands without ending in a brawl slips half-grasped, but no one is broken.",
+      "llmName": "mock",
+      "casualties": [],
+      "reputationDeltas": []
+    }
+  ],
+  "finalFatigue": {
+    "marek": 1,
+    "veska": 0,
+    "imogen": 0,
+    "dren": 1
+  },
+  "errandsDispatched": [],
+  "errandsResolved": [],
+  "promotions": [],
+  "bondsFormed": [],
+  "seasonClock": {
+    "season": "thaw",
+    "dayOfSeason": 28,
+    "seasonIndex": 0
+  },
+  "dailyEvent": {
+    "id": "thaw-market-day",
+    "label": "Lowmark market day",
+    "narration": "First market of the thaw. Wool, salt, and rumour change hands; the fort's name comes up only twice, and both times approvingly.",
+    "weight": 1,
+    "seasons": [
+      "thaw"
+    ],
+    "effect": {
+      "goldDelta": 2,
+      "fatigueDelta": 0,
+      "reputationDeltas": [
+        {
+          "factionId": "lowmark-guild",
+          "delta": 1
+        }
+      ]
+    }
+  }
+}

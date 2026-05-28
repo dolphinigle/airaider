@@ -1,8 +1,8 @@
 # Prototype STATUS
 
-> **Updated:** 2026-05-28 ~22:00 WIB
+> **Updated:** 2026-05-28 ~22:40 WIB
 > **Branch:** `prototype/m0`
-> **Last verified command:** `npm test` → 85 / 85 passing
+> **Last verified command:** `npm test` → 131 / 131 passing
 > **Last verified real-LLM command:** raid-13-guild-shipment with favorable seed — narrator awarded +1 to `lowmark-guild` and −1 to `black-hill-gang` and called out both factions by name in the outcome line (`fixtures/raid-13-guild-shipment.favorable.transcript-real.json`).
 
 ## ⚠️ Post-compaction discipline (READ FIRST)
@@ -98,6 +98,13 @@ Day loop with fatigue accumulation.
 - [x] M6.2 Co-deployment bonds (commit `67cdf9e`). `mercState.coDeployments` counts shared scenarios; after `BOND_THRESHOLD=3` shared deployments a `bond:trusts` synergy pair is injected; BONDS FORMED block in day transcript; roster schema v5 → v6; 8 new tests (101 total).
 - [x] M6.3 Season clock (commit `1c6ec28`). `src/season.ts` derives `seasonClock = {season, dayOfSeason}` from `roster.dayCount` (no schema bump); 4 seasons × 30 days each; scenarios may carry `seasonModifier:{thaw,high,wane,frost}` flat coin deltas; LLM prompt picks up season for narration colour; `fixtures/raid-14-frostwatch.json` build scenario with frost penalty / high-summer bonus; 6 new tests (107 total).
 - [x] M6.4 Fort upgrade hooks (commit `391265e`). Roster schema v6 → v7 adds `fort: {level, upgrades[]}` (level≥1, defaults via Zod so v6 rosters load cleanly). `data/fort-upgrades.json` catalog of 5 upgrades (Reinforced Palisade L1→2, Winter Larder, Smithy L2→3, Chapel L2, Watch Tower L3→4) with cost + `requiresLevel` gates and an optional `levelsUp` flag. New `npm run fort -- <roster.json> list|upgrade <id>` CLI with friendly error reporting for already-owned / insufficient-gold / level-locked. 9 new tests (116 total).
+
+## Milestone M7 — IN PROGRESS
+
+- [x] M7.1 Fort upgrade mechanical effects (commit `0c0e85d`). `src/fortEffects.ts` exposes pure helpers: `flatCoinBonus` (smithy +1 if any merc deployed), `slotCoinBonus` (watch-tower +1 per `sentry`/`scout`/`watch` slot), `negativeSeasonClamped` (winter-larder zeros negative season modifiers), `palisadeBlocksCasualty` (catastrophic damage clauses dropped). Threaded into the resolver via `ResolutionInput.fortUpgrades`; day.ts + errands.ts pass `roster.fort.upgrades`. Chapel is narrative-only. 7 new tests (123 total).
+- [x] M7.4 Daily events table (commit `40485aa`). `src/events.ts` rolls one entry per day from `data/events.json`, filtered by current season + `requiresUpgrades[]` / `requiresMissingUpgrades[]`, weighted-sampled, deterministic via `rngFromString('event-<dayCount>')`. Effects: `goldDelta` added to `roster.gold`, `fatigueDelta` applied to every merc (clamped at 0), `reputationDeltas[]` merged. Surfaces as a `DAILY EVENT` block at the top of the day transcript. Seven seed events spanning all four seasons; `bandit-scouts` gated by missing watch-tower. 8 new tests (131 total).
+- [x] M7.2 Multi-day campaign demo (commit pending — fixtures + script). `scripts/m7-campaign.sh` runs a deterministic 5-day campaign on `fixtures/m7-campaign-roster.json` (dayCount 27 → 32) that exercises every M6 + M7 system: thaw → high season transition, daily-event swap (`thaw-market-day` × 3 → `high-bandit-scouts` × 2), mid-campaign upgrade purchases (palisade after day 1, smithy after day 3), marek/veska promotion to veteran, and marek↔veska bond formation. Committed mock transcripts at `fixtures/m7-day-{1..5}.day-mock.json` and final roster at `fixtures/m7-campaign-roster.final.json`.
+- [ ] M7.3 Recruit gated by fort level (deferred — captive→recruit refactor)
 
 
 

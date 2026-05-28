@@ -1,0 +1,6 @@
+{
+  "id": "m7-day-1",
+  "name": "Last Days of Thaw — Tavern at the Crow's Wing",
+  "scenarios": ["raid-05-tavern.json"],
+  "seed": "m7-day-1"
+}

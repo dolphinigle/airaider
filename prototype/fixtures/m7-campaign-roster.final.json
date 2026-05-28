@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 7,
+  "dayCount": 32,
+  "gold": -1,
+  "reputation": {
+    "lowmark-guild": 3
+  },
+  "rosterMercIds": [
+    "marek",
+    "veska",
+    "imogen",
+    "dren"
+  ],
+  "generatedMercs": [],
+  "mercStates": [
+    {
+      "id": "marek",
+      "fatigue": 6,
+      "hpDamage": 0,
+      "veterancyGain": 0,
+      "xp": 13,
+      "tier": "veteran",
+      "coDeployments": {
+        "veska": 4,
+        "dren": 2
+      }
+    },
+    {
+      "id": "veska",
+      "fatigue": 5,
+      "hpDamage": 0,
+      "veterancyGain": 0,
+      "xp": 13,
+      "tier": "veteran",
+      "coDeployments": {
+        "marek": 4,
+        "imogen": 1
+      }
+    },
+    {
+      "id": "imogen",
+      "fatigue": 3,
+      "hpDamage": 0,
+      "veterancyGain": 0,
+      "xp": 6,
+      "tier": "rookie",
+      "coDeployments": {
+        "veska": 1
+      }
+    },
+    {
+      "id": "dren",
+      "fatigue": 4,
+      "hpDamage": 0,
+      "veterancyGain": 0,
+      "xp": 6,
+      "tier": "rookie",
+      "coDeployments": {
+        "marek": 2
+      }
+    }
+  ],
+  "captives": [],
+  "deceased": [],
+  "activeQuests": [],
+  "completedQuests": [],
+  "pendingErrands": [],
+  "fort": {
+    "level": 3,
+    "upgrades": [
+      "reinforced-palisade",
+      "smithy"
+    ]
+  }
+}

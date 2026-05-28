@@ -1,0 +1,6 @@
+{
+  "id": "m7-day-2",
+  "name": "Cusp of High Summer — Watchtower Build",
+  "scenarios": ["raid-04-build.json"],
+  "seed": "m7-day-2"
+}

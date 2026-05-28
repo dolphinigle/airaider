@@ -1,0 +1,6 @@
+{
+  "id": "m7-day-4",
+  "name": "Crow's Wing Bar Brawl",
+  "scenarios": ["raid-05-tavern.json"],
+  "seed": "m7-day-4"
+}

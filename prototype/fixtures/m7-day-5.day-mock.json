@@ -1,0 +1,109 @@
+{
+  "dayId": "m7-day-5",
+  "dayName": "Long Summer Afternoon — Final Build",
+  "scenarios": [
+    {
+      "scenarioId": "raid-04",
+      "title": "Watchtower at the Pass",
+      "target": "commission a new watchtower at the southern pass before winter closes the road",
+      "archetype": "build",
+      "partySize": 2,
+      "slotContributions": [
+        {
+          "slotId": "design",
+          "mercId": "veska",
+          "attrUsed": "intelligence",
+          "attrScore": 6,
+          "tagsMatched": [
+            "bg:scholar"
+          ],
+          "coinsContributed": 2,
+          "fatigue": 4,
+          "fatiguePenalty": 1
+        },
+        {
+          "slotId": "oversee",
+          "mercId": "marek",
+          "attrUsed": "willpower",
+          "attrScore": 4,
+          "tagsMatched": [
+            "temp:brave"
+          ],
+          "coinsContributed": 2,
+          "fatigue": 5,
+          "fatiguePenalty": 1
+        }
+      ],
+      "synergy": {
+        "pairs": [
+          {
+            "mercA": "veska",
+            "mercB": "marek",
+            "sharedTagId": "bond:trusts"
+          }
+        ],
+        "bonusCoins": 1
+      },
+      "baseCoinBudget": 4,
+      "coinsActual": 6,
+      "rollFaces": [
+        "heads",
+        "tails",
+        "heads",
+        "tails",
+        "heads",
+        "heads"
+      ],
+      "heads": 4,
+      "tails": 2,
+      "band": "favorable",
+      "bandReason": "4/6 heads (favorable)",
+      "contributions": [
+        {
+          "mercId": "veska",
+          "line": "[mock] Veska (Female) takes on \"draft the structure so it actually stands through the spring melt\"."
+        },
+        {
+          "mercId": "marek",
+          "line": "[mock] Marek (Male) takes on \"keep the crew honest and the timber straight\"."
+        }
+      ],
+      "outcomeNarrative": "[mock] The party brings it off cleanly: commission a new watchtower at the southern pass before winter closes the road.",
+      "llmName": "mock",
+      "casualties": [],
+      "reputationDeltas": []
+    }
+  ],
+  "finalFatigue": {
+    "marek": 6,
+    "veska": 5,
+    "imogen": 3,
+    "dren": 4
+  },
+  "errandsDispatched": [],
+  "errandsResolved": [],
+  "promotions": [],
+  "bondsFormed": [],
+  "seasonClock": {
+    "season": "high",
+    "dayOfSeason": 2,
+    "seasonIndex": 1
+  },
+  "dailyEvent": {
+    "id": "high-bandit-scouts",
+    "label": "Bandit scouts on the ridge",
+    "narration": "A rider out of the hills, then another. They mark the watchposts and ride on. Whatever they wanted, they found it.",
+    "weight": 1,
+    "seasons": [
+      "high"
+    ],
+    "requiresMissingUpgrades": [
+      "watch-tower"
+    ],
+    "effect": {
+      "goldDelta": -1,
+      "fatigueDelta": 1,
+      "reputationDeltas": []
+    }
+  }
+}

@@ -131,10 +131,42 @@ the outcome line.
 
 ## What is NOT yet shown
 
-- Multi-day campaign-scale demos using M6.x systems together (the M6
-  systems are individually demonstrated by their unit tests + the
-  raid-14 fixture, but no scripted multi-day demo run is committed yet).
 - GUI of any kind. Prototype is console-only by design.
+
+## M7 5-day campaign demo (mock, deterministic)
+
+A scripted demo that exercises every M6 + M7 system in one run.
+
+Reproduce: `bash scripts/m7-campaign.sh` (no API key needed).
+
+Inputs:
+- `fixtures/m7-campaign-roster.json` — starting roster (dayCount 27,
+  gold 6, marek/veska/imogen/dren on the rolls, marek+veska already
+  share 2 co-deployments)
+- `fixtures/m7-day-{1..5}.json` — 5 one-scenario days
+  (tavern, build, recruit, tavern, build)
+
+Outputs:
+- `fixtures/m7-day-{1..5}.day-mock.json` — committed mock transcripts
+- `fixtures/m7-campaign-roster.final.json` — terminal state
+
+What you'll see across the 5 days:
+- **Season transition** thaw (days 28-30) → high (days 31-32)
+- **Daily events**: `thaw-market-day` fires on each of the three thaw
+  days (+2g, +1 lowmark-guild rep), then `high-bandit-scouts` fires
+  the two high-summer days (no watch-tower owned ⇒ -1g, +1 fatigue)
+- **Mid-campaign fort upgrades**: after day 1 the fort buys
+  `reinforced-palisade` (L1→L2, -5g), after day 3 it buys `smithy`
+  (L2→L3, -6g). From day 4 onward every scenario silently gets
+  +1 coin from the smithy.
+- **Veterancy**: marek and veska both cross from rookie → veteran
+  on the way through (PROMOTIONS block in the transcript).
+- **Bond formation**: marek ↔ veska hit BOND_THRESHOLD=3 on day 2
+  and the bond persists for the rest of the run (BONDS FORMED block).
+
+Final roster (committed): fort L3 with [reinforced-palisade, smithy],
+gold -1 (overspent on upgrades), reputation `lowmark-guild: +3`,
+marek/veska both veteran with xp 13 and 4 shared co-deployments.
 
 ## M6 systems at a glance
 
@@ -154,6 +186,21 @@ the outcome line.
   catalog at `data/fort-upgrades.json`. Drive it via
   `npm run fort -- <roster.json> list` and
   `npm run fort -- <roster.json> upgrade <id>`. Schema **v7+**.
+
+## M7 mechanics
+
+- **Fort effects (M7.1)** — `src/fortEffects.ts` aggregates the per-scenario
+  bonuses derived from the owned upgrades. Currently:
+  - `smithy` → +1 flat coin to every scenario when any merc participates
+  - `watch-tower` → +1 coin per `sentry` / `scout` / `watch` slot
+  - `winter-larder` → negative season modifier clamped to 0 (cancels frost penalties)
+  - `reinforced-palisade` → catastrophic damage clauses zeroed
+  - `chapel` → narrative-only (no resolver effect)
+- **Daily events (M7.4)** — `src/events.ts` rolls one entry from
+  `data/events.json` per day, filtered by current season + owned/missing
+  upgrades, weighted, seeded by `rngFromString('event-<dayCount>')`.
+  Effects: `goldDelta`, `fatigueDelta` (every merc), `reputationDeltas`.
+  Surfaces as a `DAILY EVENT` block at the top of the transcript.
 
 ## How to regenerate (cheap & safe)
 
