@@ -100,7 +100,7 @@ const FortLogEntrySchema = z.object({
 export const FORT_LOG_MAX = 50;
 
 const RoasterSchema = z.object({
-  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6), z.literal(7), z.literal(8)]).default(8),
+  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6), z.literal(7), z.literal(8), z.literal(9)]).default(9),
   dayCount: z.number().int().min(0).default(0),
   gold: z.number().int().default(0),
   reputation: z.record(z.string(), z.number().int()).default({}),
@@ -122,6 +122,8 @@ const RoasterSchema = z.object({
   fort: FortStateSchema.default({ level: 1, upgrades: [] }),
   /** M7.6: persistent fort log (upgrades + daily events). v8+. */
   fortLog: z.array(FortLogEntrySchema).default([]),
+  /** M9.2: consecutive days the fort has ended with gold < 0. v9+. */
+  consecutiveDebtDays: z.number().int().min(0).default(0),
 });
 
 export type RosterMercState = z.infer<typeof MercStateSchema>;
@@ -133,7 +135,7 @@ export type FortLogEntry = z.infer<typeof FortLogEntrySchema>;
 export type RosterFile = z.infer<typeof RoasterSchema>;
 
 export interface Roster {
-  schemaVersion: 8;
+  schemaVersion: 9;
   dayCount: number;
   gold: number;
   reputation: Record<string, number>;
@@ -154,6 +156,8 @@ export interface Roster {
   fort: { level: number; upgrades: string[] };
   /** M7.6: persistent fort log entries (latest at the end, trimmed to FORT_LOG_MAX). */
   fortLog: FortLogEntry[];
+  /** M9.2: consecutive days ended in debt (gold < 0). Resets to 0 on a non-debt day or after a desertion. */
+  consecutiveDebtDays: number;
 }
 
 /**
@@ -169,7 +173,7 @@ export function appendFortLog(roster: Roster, entry: FortLogEntry): void {
 
 export function newRoster(initialMercs: Merc[]): Roster {
   return {
-    schemaVersion: 8,
+    schemaVersion: 9,
     dayCount: 0,
     gold: 0,
     reputation: {},
@@ -182,6 +186,7 @@ export function newRoster(initialMercs: Merc[]): Roster {
     pendingErrands: [],
     fort: { level: 1, upgrades: [] },
     fortLog: [],
+    consecutiveDebtDays: 0,
   };
 }
 
@@ -235,7 +240,7 @@ export function loadRoster(
   }));
 
   return {
-    schemaVersion: 8,
+    schemaVersion: 9,
     dayCount: parsed.dayCount,
     gold: parsed.gold,
     reputation: parsed.reputation,
@@ -248,6 +253,7 @@ export function loadRoster(
     pendingErrands: parsed.pendingErrands,
     fort: parsed.fort,
     fortLog: parsed.fortLog,
+    consecutiveDebtDays: parsed.consecutiveDebtDays,
   };
 }
 
@@ -275,7 +281,7 @@ export function saveRoster(
     }
   }
   const file: RosterFile = {
-    schemaVersion: 8,
+    schemaVersion: 9,
     dayCount: roster.dayCount,
     gold: roster.gold,
     reputation: roster.reputation,
@@ -296,6 +302,7 @@ export function saveRoster(
     pendingErrands: roster.pendingErrands,
     fort: roster.fort,
     fortLog: roster.fortLog,
+    consecutiveDebtDays: roster.consecutiveDebtDays,
   };
   writeFileSync(path, JSON.stringify(file, null, 2) + '\n', 'utf8');
 }

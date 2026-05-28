@@ -106,6 +106,13 @@ export function renderDayTranscript(day: DayResolution): string {
       lines.push(`   ⛁ ${w.mercId}: −${w.wage}g`);
     }
   }
+  if (day.desertions.length > 0) {
+    lines.push('');
+    lines.push(` DESERTIONS:`);
+    for (const d of day.desertions) {
+      lines.push(`   ☠ ${d.mercId} walks out — ${d.reason}`);
+    }
+  }
   lines.push(DBAR);
   return lines.join('\n');
 }

@@ -23,6 +23,8 @@ import { reputationTier } from './reputation.js';
 
 /** M9.1: wages are paid every Nth day (CANONICAL §2.7 flat-wage rule). */
 export const WAGE_INTERVAL_DAYS = 7;
+/** M9.2: a merc deserts after this many consecutive days of fort debt (gold < 0). */
+export const DEBT_DESERTION_THRESHOLD_DAYS = 3;
 import { fortEffectsFor, chapelHealsWounds, fatigueRecoveryAmount } from './fortEffects.js';
 import { affordableUpgrades, loadFortCatalog, type FortUpgrade } from './fort.js';
 
@@ -102,6 +104,14 @@ export interface DayResolution {
    */
   wagesPaid: Array<{ mercId: string; wage: number }>;
   wagesTotalPaid: number;
+  /**
+   * M9.2: mercs who deserted at end-of-day because the fort has been in
+   * debt for at least `DEBT_DESERTION_THRESHOLD_DAYS` consecutive days.
+   * At most one merc deserts per day; the counter resets to 0 afterwards
+   * so the next desertion needs another full debt streak. Empty when the
+   * fort is solvent or has no mercs.
+   */
+  desertions: Array<{ mercId: string; reason: string }>;
   /**
    * M7.6: fort log entries appended during THIS day (currently only the
    * daily-event entry; upgrade purchases happen via the fort CLI, not the day
@@ -327,6 +337,43 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     }
   }
 
+  // M9.2: end-of-day debt tracking + desertion. Increment the streak when
+  // the fort closes the day with negative gold; reset to 0 on solvent days.
+  // When the streak reaches DEBT_DESERTION_THRESHOLD_DAYS, the lowest-tier
+  // / least-invested merc walks out and the counter resets.
+  const desertions: Array<{ mercId: string; reason: string }> = [];
+  if (roster) {
+    if (roster.gold < 0) {
+      roster.consecutiveDebtDays += 1;
+    } else {
+      roster.consecutiveDebtDays = 0;
+    }
+    if (roster.consecutiveDebtDays >= DEBT_DESERTION_THRESHOLD_DAYS && roster.mercs.length > 0) {
+      const tierRank: Record<string, number> = { rookie: 0, veteran: 1, grizzled: 2 };
+      const candidates = roster.mercs.map((m) => {
+        const st = roster.states.get(m.id);
+        return {
+          merc: m,
+          tier: tierRank[st?.tier ?? 'rookie'] ?? 0,
+          xp: st?.xp ?? 0,
+        };
+      });
+      candidates.sort((a, b) => {
+        if (a.tier !== b.tier) return a.tier - b.tier;
+        if (a.xp !== b.xp) return a.xp - b.xp;
+        return a.merc.id.localeCompare(b.merc.id);
+      });
+      const leaving = candidates[0]!.merc;
+      desertions.push({
+        mercId: leaving.id,
+        reason: `unpaid for ${roster.consecutiveDebtDays} days`,
+      });
+      roster.mercs = roster.mercs.filter((m) => m.id !== leaving.id);
+      roster.states.delete(leaving.id);
+      roster.consecutiveDebtDays = 0;
+    }
+  }
+
   // M7.5: compute affordable fort upgrades as of end-of-day so the
   // transcript can nudge the player with a FORT HINT block.
   let fortHints: Pick<FortUpgrade, 'id' | 'name' | 'cost' | 'description'>[] = [];
@@ -356,5 +403,6 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     woundHealing,
     wagesPaid,
     wagesTotalPaid,
+    desertions,
   };
 }

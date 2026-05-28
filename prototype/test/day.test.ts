@@ -219,3 +219,74 @@ describe('M9.1 weekly payday', () => {
     expect(r.gold).toBeLessThanOrEqual(0);
   });
 });
+
+describe('M9.2 debt-driven desertion', () => {
+  const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+  const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+  const dayPath = join(ROOT, 'fixtures', 'day-01.json');
+  const day = loadDay(dayPath);
+
+  async function runDebtDay(roster: any) {
+    return resolveDay({ day: { ...day, scenarios: [] as string[] } as any, dayPath, mercs, llm: new MockScenarioLLM(), roster });
+  }
+
+  it('exports DEBT_DESERTION_THRESHOLD_DAYS = 3', async () => {
+    const { DEBT_DESERTION_THRESHOLD_DAYS } = await import('../src/day.js');
+    expect(DEBT_DESERTION_THRESHOLD_DAYS).toBe(3);
+  });
+
+  it('increments consecutiveDebtDays when day ends in debt', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!]);
+    r.gold = -5;
+    r.dayCount = 0;
+    expect(r.consecutiveDebtDays).toBe(0);
+    const out = await runDebtDay(r);
+    expect(out.wagesTotalPaid).toBe(0);
+    expect(r.consecutiveDebtDays).toBe(1);
+    expect(out.desertions).toEqual([]);
+  });
+
+  it('resets consecutiveDebtDays when gold goes non-negative', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!]);
+    r.gold = 5;
+    r.consecutiveDebtDays = 2;
+    r.dayCount = 0;
+    await runDebtDay(r);
+    expect(r.consecutiveDebtDays).toBe(0);
+  });
+
+  it('triggers desertion after threshold debt days and resets counter', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!, mercs.get('veska')!]);
+    r.gold = -1;
+    r.consecutiveDebtDays = 2;
+    r.dayCount = 0;
+    const before = r.mercs.length;
+    const out = await runDebtDay(r);
+    expect(out.desertions.length).toBe(1);
+    expect(r.mercs.length).toBe(before - 1);
+    expect(r.consecutiveDebtDays).toBe(0);
+    const leaverId = out.desertions[0]!.mercId;
+    expect(r.mercs.find((m) => m.id === leaverId)).toBeUndefined();
+    expect(r.states.has(leaverId)).toBe(false);
+  });
+
+  it('picks the lowest-tier merc (rookies leave first)', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!, mercs.get('veska')!]);
+    r.states.get('marek')!.tier = 'veteran';
+    r.states.get('marek')!.xp = 10;
+    r.gold = -1;
+    r.consecutiveDebtDays = 2;
+    r.dayCount = 0;
+    const out = await runDebtDay(r);
+    expect(out.desertions[0]!.mercId).toBe('veska');
+  });
+
+  it('roster-less day loop produces no desertions', async () => {
+    const out = await resolveDay({ day, dayPath, mercs, llm: new MockScenarioLLM() });
+    expect(out.desertions).toEqual([]);
+  });
+});
