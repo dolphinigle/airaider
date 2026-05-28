@@ -141,6 +141,10 @@ export function renderDayTranscript(day: DayResolution): string {
       lines.push(`   ◇ ${q.questName} (${q.questId}) — ${q.enemyFactionId} reached enemy tier`);
     }
   }
+  if (day.captiveUpkeep.count > 0) {
+    lines.push('');
+    lines.push(` CAPTIVE UPKEEP: −${day.captiveUpkeep.goldSpent}g  (${day.captiveUpkeep.count} captive${day.captiveUpkeep.count === 1 ? '' : 's'})`);
+  }
   lines.push(DBAR);
   return lines.join('\n');
 }

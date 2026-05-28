@@ -131,5 +131,9 @@
   "tavernRefresh": [],
   "tavernExpired": [],
   "lowMorale": false,
-  "questsStirred": []
+  "questsStirred": [],
+  "captiveUpkeep": {
+    "count": 0,
+    "goldSpent": 0
+  }
 }

@@ -33,6 +33,8 @@ import {
 export const WAGE_INTERVAL_DAYS = 7;
 /** M9.2: a merc deserts after this many consecutive days of fort debt (gold < 0). */
 export const DEBT_DESERTION_THRESHOLD_DAYS = 3;
+/** M11.5: gold cost per captive per day for food + guards. */
+export const CAPTIVE_UPKEEP_PER_DAY = 1;
 import { fortEffectsFor, chapelHealsWounds, fatigueRecoveryAmount, granaryWageReduction } from './fortEffects.js';
 import { affordableUpgrades, loadFortCatalog, type FortUpgrade } from './fort.js';
 
@@ -156,6 +158,14 @@ export interface DayResolution {
    * that triggered it. Empty in roster-less mode.
    */
   questsStirred: Array<{ questId: string; questName: string; enemyFactionId: string }>;
+  /**
+   * M11.5: daily captive upkeep — each captive currently held costs
+   * CAPTIVE_UPKEEP_PER_DAY (=1g) per in-game day in food/guards. Applied
+   * unconditionally at end-of-day (after scenarios). Gold may go negative.
+   * `count` is the number of captives charged; `goldSpent = count * CAPTIVE_UPKEEP_PER_DAY`.
+   * Both 0 when no captives are held or in roster-less mode.
+   */
+  captiveUpkeep: { count: number; goldSpent: number };
 }
 
 /**
@@ -522,6 +532,28 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     }
   }
 
+  // M11.5: daily captive upkeep — each captive currently held costs
+  // CAPTIVE_UPKEEP_PER_DAY gold in food + guards. Applied at end-of-day
+  // AFTER scenarios but BEFORE the debt-desertion check above already
+  // ran — note: we deduct after desertions to avoid double-jeopardy on
+  // the same day (desertion already triggered on prior-day debt streak).
+  // Gold may go negative; the deduction shows up in the next day's
+  // debt-streak increment.
+  let captiveUpkeep: { count: number; goldSpent: number } = { count: 0, goldSpent: 0 };
+  if (roster && roster.captives.length > 0) {
+    const count = roster.captives.length;
+    const goldSpent = count * CAPTIVE_UPKEEP_PER_DAY;
+    roster.gold -= goldSpent;
+    captiveUpkeep = { count, goldSpent };
+    const entry: FortLogEntry = {
+      day: roster.dayCount + 1,
+      kind: 'note',
+      message: `Captive upkeep: ${goldSpent}g for ${count} captive${count === 1 ? '' : 's'} (gold ${roster.gold}g)`,
+    };
+    appendFortLog(roster, entry);
+    newFortLogEntries.push(entry);
+  }
+
   return {
     dayId: day.id,
     dayName: day.name,
@@ -545,5 +577,6 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     tavernExpired,
     lowMorale,
     questsStirred,
+    captiveUpkeep,
   };
 }

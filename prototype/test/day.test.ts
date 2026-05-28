@@ -588,3 +588,57 @@ describe('M13.1 enemy-faction quest auto-stir in day loop', () => {
     expect(out.questsStirred.length).toBe(0);
   });
 });
+
+describe('M11.5 daily captive upkeep', () => {
+  const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+  const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+  const dayPath = join(ROOT, 'fixtures', 'day-01.json');
+  const day = loadDay(dayPath);
+
+  function makeCaptive(id: string, notor = 2) {
+    return { id, name: id, archetype: 'thug', backstory: '', tags: [], notoriety: notor };
+  }
+
+  it('deducts 1g per captive per day (delta vs no-captive baseline)', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const baselineRoster = newRoster([mercs.get('marek')!]);
+    const baselineOut = await resolveDay({
+      day: { ...day, scenarios: [] as string[] } as any,
+      dayPath, mercs, llm: new MockScenarioLLM(), roster: baselineRoster,
+    });
+    expect(baselineOut.captiveUpkeep).toEqual({ count: 0, goldSpent: 0 });
+
+    const withCaptives = newRoster([mercs.get('marek')!]);
+    withCaptives.captives.push(makeCaptive('c1'), makeCaptive('c2'), makeCaptive('c3'));
+    const out = await resolveDay({
+      day: { ...day, scenarios: [] as string[] } as any,
+      dayPath, mercs, llm: new MockScenarioLLM(), roster: withCaptives,
+    });
+    expect(out.captiveUpkeep).toEqual({ count: 3, goldSpent: 3 });
+    expect(withCaptives.gold).toBe(baselineRoster.gold - 3);
+    expect(withCaptives.fortLog.some((e) => e.message.startsWith('Captive upkeep:'))).toBe(true);
+  });
+
+  it('reports zero when no captives are held and does not append upkeep log', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!]);
+    const out = await resolveDay({
+      day: { ...day, scenarios: [] as string[] } as any,
+      dayPath, mercs, llm: new MockScenarioLLM(), roster: r,
+    });
+    expect(out.captiveUpkeep).toEqual({ count: 0, goldSpent: 0 });
+    expect(r.fortLog.some((e) => e.message.startsWith('Captive upkeep:'))).toBe(false);
+  });
+
+  it('still deducts when it pushes gold negative', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!]);
+    r.captives.push(makeCaptive('c1'), makeCaptive('c2'), makeCaptive('c3'));
+    const out = await resolveDay({
+      day: { ...day, scenarios: [] as string[] } as any,
+      dayPath, mercs, llm: new MockScenarioLLM(), roster: r,
+    });
+    expect(out.captiveUpkeep.goldSpent).toBe(3);
+    expect(r.gold).toBeLessThanOrEqual(-1);
+  });
+});
