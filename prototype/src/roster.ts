@@ -50,11 +50,15 @@ const CaptiveSchema = z.object({
   tagIds: z.array(z.string()),
 });
 
-/** M10.1: persisted form of a tavern hire-pool entry. v10+. */
+/** M10.1: persisted form of a tavern hire-pool entry. v10+. M10.4: optional veteran starter (v11+). */
 const HirePoolEntrySchema = z.object({
   merc: GeneratedMercSchema,
   price: z.number().int().min(0),
   postedDay: z.number().int().min(0),
+  /** M10.4: optional starting tier for veteran/grizzled bench arrivals. */
+  startingTier: z.enum(['rookie', 'veteran', 'grizzled']).optional(),
+  /** M10.4: optional starting xp paired with startingTier. */
+  startingXp: z.number().int().min(0).optional(),
 });
 
 const DeceasedSchema = z.object({
@@ -107,7 +111,7 @@ const FortLogEntrySchema = z.object({
 export const FORT_LOG_MAX = 50;
 
 const RoasterSchema = z.object({
-  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6), z.literal(7), z.literal(8), z.literal(9), z.literal(10)]).default(10),
+  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6), z.literal(7), z.literal(8), z.literal(9), z.literal(10), z.literal(11)]).default(11),
   dayCount: z.number().int().min(0).default(0),
   gold: z.number().int().default(0),
   reputation: z.record(z.string(), z.number().int()).default({}),
@@ -144,7 +148,7 @@ export type FortLogEntry = z.infer<typeof FortLogEntrySchema>;
 export type RosterFile = z.infer<typeof RoasterSchema>;
 
 export interface Roster {
-  schemaVersion: 10;
+  schemaVersion: 11;
   dayCount: number;
   gold: number;
   reputation: Record<string, number>;
@@ -184,7 +188,7 @@ export function appendFortLog(roster: Roster, entry: FortLogEntry): void {
 
 export function newRoster(initialMercs: Merc[]): Roster {
   return {
-    schemaVersion: 10,
+    schemaVersion: 11,
     dayCount: 0,
     gold: 0,
     reputation: {},
@@ -252,7 +256,7 @@ export function loadRoster(
   }));
 
   return {
-    schemaVersion: 10,
+    schemaVersion: 11,
     dayCount: parsed.dayCount,
     gold: parsed.gold,
     reputation: parsed.reputation,
@@ -282,6 +286,8 @@ export function loadRoster(
       },
       price: e.price,
       postedDay: e.postedDay,
+      ...(e.startingTier ? { startingTier: e.startingTier } : {}),
+      ...(e.startingXp !== undefined ? { startingXp: e.startingXp } : {}),
     })),
   };
 }
@@ -310,7 +316,7 @@ export function saveRoster(
     }
   }
   const file: RosterFile = {
-    schemaVersion: 10,
+    schemaVersion: 11,
     dayCount: roster.dayCount,
     gold: roster.gold,
     reputation: roster.reputation,
@@ -344,6 +350,8 @@ export function saveRoster(
       },
       price: e.price,
       postedDay: e.postedDay,
+      ...(e.startingTier ? { startingTier: e.startingTier } : {}),
+      ...(e.startingXp !== undefined ? { startingXp: e.startingXp } : {}),
     })),
   };
   writeFileSync(path, JSON.stringify(file, null, 2) + '\n', 'utf8');

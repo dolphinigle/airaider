@@ -15,6 +15,10 @@ export interface HirePoolEntry {
   price: number;
   /** Day this entry was posted (roster.dayCount snapshot at refresh time). */
   postedDay: number;
+  /** M10.4: optional starting tier for veteran/grizzled wandering arrivals. */
+  startingTier?: 'rookie' | 'veteran' | 'grizzled';
+  /** M10.4: optional starting xp paired with startingTier. */
+  startingXp?: number;
 }
 
 /** Target bench size after every refresh. */
@@ -25,6 +29,12 @@ export const HIRE_REFRESH_INTERVAL_DAYS = 7;
 export const HIRE_BASE_PRICE = 5;
 /** M10.3: bench entries older than this drop off at the next refresh. */
 export const HIRE_LISTING_TTL_DAYS = 14;
+/** M10.4: probability per refreshed entry of being a wandering veteran. */
+export const WANDERING_VETERAN_CHANCE = 0.2;
+/** M10.4: price multiplier applied to a wandering-veteran bench entry. */
+export const WANDERING_VETERAN_PRICE_MULT = 2;
+/** M10.4: starting xp for a wandering veteran (above the veteran threshold 10). */
+export const WANDERING_VETERAN_START_XP = 12;
 
 /**
  * Top up the roster's hire pool to HIRE_POOL_TARGET_SIZE. Returns the new
@@ -56,8 +66,19 @@ export function refreshHirePool(
     }
     existing.add(merc.id);
     // Price = base + 0..2g jitter so the bench isn't a single-cost menu.
-    const price = HIRE_BASE_PRICE + Math.floor(rng() * 3);
-    const entry: HirePoolEntry = { merc, price, postedDay: currentDay };
+    let price = HIRE_BASE_PRICE + Math.floor(rng() * 3);
+    // M10.4: ~20% of bench refresh entries are wandering veterans —
+    // experienced mercs passing through town at a premium price.
+    const isVeteran = rng() < WANDERING_VETERAN_CHANCE;
+    const entry: HirePoolEntry = isVeteran
+      ? {
+          merc,
+          price: price * WANDERING_VETERAN_PRICE_MULT,
+          postedDay: currentDay,
+          startingTier: 'veteran',
+          startingXp: WANDERING_VETERAN_START_XP,
+        }
+      : { merc, price, postedDay: currentDay };
     roster.hirePool.push(entry);
     added.push(entry);
   }
@@ -112,8 +133,8 @@ export function hireFromPool(roster: Roster, index: number): Merc {
     fatigue: 0,
     hpDamage: 0,
     veterancyGain: 0,
-    xp: 0,
-    tier: 'rookie',
+    xp: entry.startingXp ?? 0,
+    tier: entry.startingTier ?? 'rookie',
     coDeployments: {},
   });
   roster.hirePool.splice(index, 1);

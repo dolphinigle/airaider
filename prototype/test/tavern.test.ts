@@ -101,7 +101,7 @@ describe('M10.1 tavern hire pool', () => {
     try {
       saveRoster(tmp, r, mercs);
       const onDisk = JSON.parse(readFileSync(tmp, 'utf8'));
-      expect(onDisk.schemaVersion).toBe(10);
+      expect(onDisk.schemaVersion).toBe(11);
       expect(onDisk.hirePool.length).toBe(HIRE_POOL_TARGET_SIZE);
       const reloaded = loadRoster(tmp, mercs, tags);
       expect(reloaded.hirePool.length).toBe(HIRE_POOL_TARGET_SIZE);
@@ -181,5 +181,77 @@ describe('M10.3 stale listing aging', () => {
       expect(e.postedDay).toBe(22);
       expect(oldIds).not.toContain(e.merc.id);
     }
+  });
+});
+
+describe('M10.4 wandering veteran bench entries', () => {
+  it('seeds at least one veteran across many refreshes (RNG-stress)', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    let vetSeen = false;
+    for (let seed = 1; seed <= 50 && !vetSeen; seed++) {
+      const r = newRoster([mercs.get('marek')!]);
+      const added = refreshHirePool(r, mulberry32(seed), tags, 7);
+      if (added.some((e) => e.startingTier === 'veteran')) vetSeen = true;
+    }
+    expect(vetSeen).toBe(true);
+  });
+
+  it('veteran entries carry startingXp and 2x price', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    for (let seed = 1; seed <= 50; seed++) {
+      const r = newRoster([mercs.get('marek')!]);
+      const added = refreshHirePool(r, mulberry32(seed), tags, 7);
+      const vet = added.find((e) => e.startingTier === 'veteran');
+      if (vet) {
+        expect(vet.startingXp).toBe(12);
+        // 2x of base+jitter (5..7) → 10..14
+        expect(vet.price).toBeGreaterThanOrEqual(10);
+        expect(vet.price).toBeLessThanOrEqual(14);
+        return;
+      }
+    }
+    throw new Error('no veteran across 50 seeds');
+  });
+
+  it('hireFromPool transfers startingTier + startingXp into roster state', async () => {
+    const { newRoster, saveRoster, loadRoster } = await import('../src/roster.js');
+    const { hireFromPool } = await import('../src/tavern.js');
+    const r = newRoster([mercs.get('marek')!]);
+    r.gold = 50;
+    // Construct veteran entry deterministically
+    refreshHirePool(r, mulberry32(1), tags, 7);
+    let vetIdx = -1;
+    for (let seed = 1; seed <= 200 && vetIdx < 0; seed++) {
+      const r2 = newRoster([mercs.get('marek')!]);
+      r2.gold = 50;
+      const added = refreshHirePool(r2, mulberry32(seed), tags, 7);
+      const i = added.findIndex((e) => e.startingTier === 'veteran');
+      if (i >= 0) {
+        const merc = hireFromPool(r2, i);
+        const st = r2.states.get(merc.id)!;
+        expect(st.tier).toBe('veteran');
+        expect(st.xp).toBe(12);
+        vetIdx = i;
+      }
+    }
+    expect(vetIdx).toBeGreaterThanOrEqual(0);
+  });
+
+  it('roster save/load preserves startingTier and startingXp', async () => {
+    const { newRoster, saveRoster, loadRoster } = await import('../src/roster.js');
+    const { writeFileSync } = await import('node:fs');
+    const r = newRoster([mercs.get('marek')!]);
+    r.hirePool.push({
+      merc: { id: 'tav-test-1', name: 'Test Vet', attrs: { physical: 3, agility: 3, intelligence: 3, charisma: 3, willpower: 3 }, tags: [], veterancy: 0, wage: 1, hp: 3 } as any,
+      price: 12,
+      postedDay: 7,
+      startingTier: 'veteran',
+      startingXp: 12,
+    });
+    const tmp = `/tmp/tavern-m10.4-${Date.now()}.json`;
+    saveRoster(tmp, r, mercs);
+    const loaded = loadRoster(tmp, mercs, tags);
+    expect(loaded.hirePool[0]!.startingTier).toBe('veteran');
+    expect(loaded.hirePool[0]!.startingXp).toBe(12);
   });
 });

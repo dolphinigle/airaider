@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 10,
+  "schemaVersion": 11,
   "dayCount": 32,
   "gold": 0,
   "reputation": {
@@ -138,49 +138,50 @@
     {
       "merc": {
         "id": "tavern-28-2",
-        "name": "Kelle",
+        "name": "Gretha",
         "attrs": {
-          "physical": 4,
-          "agility": 4,
-          "intelligence": 2,
-          "charisma": 2,
-          "willpower": 5
+          "physical": 5,
+          "agility": 2,
+          "intelligence": 3,
+          "charisma": 4,
+          "willpower": 4
         },
         "tagIds": [
           "gender:female",
-          "bg:smith",
-          "temp:brave",
-          "phys:frail"
+          "bg:soldier",
+          "temp:cautious",
+          "pers:greedy"
+        ],
+        "veterancy": 0,
+        "wage": 1,
+        "hp": 3
+      },
+      "price": 14,
+      "postedDay": 28,
+      "startingTier": "veteran",
+      "startingXp": 12
+    },
+    {
+      "merc": {
+        "id": "tavern-28-3",
+        "name": "Davrin",
+        "attrs": {
+          "physical": 2,
+          "agility": 3,
+          "intelligence": 3,
+          "charisma": 6,
+          "willpower": 5
+        },
+        "tagIds": [
+          "gender:male",
+          "bg:noble-bastard",
+          "temp:brave"
         ],
         "veterancy": 0,
         "wage": 1,
         "hp": 3
       },
       "price": 7,
-      "postedDay": 28
-    },
-    {
-      "merc": {
-        "id": "tavern-28-3",
-        "name": "Yorrick",
-        "attrs": {
-          "physical": 3,
-          "agility": 4,
-          "intelligence": 3,
-          "charisma": 5,
-          "willpower": 4
-        },
-        "tagIds": [
-          "gender:male",
-          "bg:hunter",
-          "temp:brave",
-          "pers:loyal"
-        ],
-        "veterancy": 0,
-        "wage": 1,
-        "hp": 3
-      },
-      "price": 6,
       "postedDay": 28
     }
   ]

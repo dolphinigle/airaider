@@ -236,13 +236,13 @@
     {
       "merc": {
         "id": "tavern-28-2",
-        "name": "Kelle",
+        "name": "Gretha",
         "attrs": {
-          "physical": 4,
-          "agility": 4,
-          "intelligence": 2,
-          "charisma": 2,
-          "willpower": 5
+          "physical": 5,
+          "agility": 2,
+          "intelligence": 3,
+          "charisma": 4,
+          "willpower": 4
         },
         "tags": [
           {
@@ -254,55 +254,54 @@
             "label": "Female"
           },
           {
-            "id": "bg:smith",
+            "id": "bg:soldier",
             "category": "background",
-            "rarity": "uncommon",
-            "tier": 3,
+            "rarity": "common",
+            "tier": 5,
             "mutexGroup": "background",
             "attrBias": {
               "physical": 1
             },
-            "label": "Smith"
+            "label": "Soldier"
           },
           {
-            "id": "temp:brave",
+            "id": "temp:cautious",
             "category": "personality:temperament",
             "rarity": "common",
             "tier": 4,
             "mutexGroup": "temperament",
             "attrBias": {
-              "willpower": 1
+              "intelligence": 1
             },
-            "label": "Brave"
+            "label": "Cautious"
           },
           {
-            "id": "phys:frail",
-            "category": "physicality",
+            "id": "pers:greedy",
+            "category": "personality",
             "rarity": "common",
-            "tier": 5,
-            "attrBias": {
-              "physical": -1
-            },
-            "label": "Frail"
+            "tier": 4,
+            "label": "Greedy"
           }
         ],
         "veterancy": 0,
         "wage": 1,
         "hp": 3
       },
-      "price": 7,
-      "postedDay": 28
+      "price": 14,
+      "postedDay": 28,
+      "startingTier": "veteran",
+      "startingXp": 12
     },
     {
       "merc": {
         "id": "tavern-28-3",
-        "name": "Yorrick",
+        "name": "Davrin",
         "attrs": {
-          "physical": 3,
-          "agility": 4,
+          "physical": 2,
+          "agility": 3,
           "intelligence": 3,
-          "charisma": 5,
-          "willpower": 4
+          "charisma": 6,
+          "willpower": 5
         },
         "tags": [
           {
@@ -314,15 +313,16 @@
             "label": "Male"
           },
           {
-            "id": "bg:hunter",
+            "id": "bg:noble-bastard",
             "category": "background",
-            "rarity": "common",
-            "tier": 4,
+            "rarity": "rare",
+            "tier": 2,
             "mutexGroup": "background",
             "attrBias": {
-              "agility": 1
+              "charisma": 1,
+              "intelligence": 1
             },
-            "label": "Hunter"
+            "label": "Noble Bastard"
           },
           {
             "id": "temp:brave",
@@ -334,23 +334,13 @@
               "willpower": 1
             },
             "label": "Brave"
-          },
-          {
-            "id": "pers:loyal",
-            "category": "personality",
-            "rarity": "uncommon",
-            "tier": 3,
-            "attrBias": {
-              "willpower": 1
-            },
-            "label": "Loyal"
           }
         ],
         "veterancy": 0,
         "wage": 1,
         "hp": 3
       },
-      "price": 6,
+      "price": 7,
       "postedDay": 28
     }
   ],
