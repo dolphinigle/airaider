@@ -1,10 +1,13 @@
 // CLI: view + manage a roster's tavern hire pool.
 // Usage:
 //   npm run tavern -- show --roster=<path>
+//   npm run tavern -- browse --roster=<path>
 //   npm run tavern -- refresh --roster=<path> [--seed=<n|string>] [--day=<n>]
 //   npm run tavern -- hire --roster=<path> --index=<n>
 //
-// `show` is read-only. `refresh` and `hire` mutate the roster file in place.
+// `show` is a quick read-only listing. `browse` is verbose (full attrs,
+// tag rarities, posted-age, bond-hint overlap with current roster).
+// `refresh` and `hire` mutate the roster file in place.
 // `refresh` does not gate on the weekly cadence — callers (or a future day
 // loop integration) decide when to call it; this CLI is the manual override.
 
@@ -15,7 +18,7 @@ import { refreshHirePool, hireFromPool, HIRE_BASE_PRICE } from './tavern.js';
 import { mulberry32, rngFromString } from './rng.js';
 
 interface Args {
-  cmd: 'show' | 'refresh' | 'hire';
+  cmd: 'show' | 'refresh' | 'hire' | 'browse';
   rosterPath?: string;
   seed: string;
   day?: number;
@@ -59,6 +62,44 @@ function renderPool(roster: ReturnType<typeof loadRoster>): string {
   return lines.join('\n');
 }
 
+function renderBrowse(roster: ReturnType<typeof loadRoster>): string {
+  const lines: string[] = [];
+  lines.push(`TAVERN BROWSE — ${roster.hirePool.length} on the bench  |  gold ${roster.gold}g  |  day ${roster.dayCount}`);
+  if (roster.hirePool.length === 0) {
+    lines.push('  (empty bench — refresh with: npm run tavern -- refresh)');
+    return lines.join('\n');
+  }
+  roster.hirePool.forEach((e, i) => {
+    const ageDays = Math.max(0, roster.dayCount - e.postedDay);
+    lines.push('');
+    lines.push(`  [${i}] ${e.merc.name} (${e.merc.id})  ${e.price}g  wage ${e.merc.wage}g/wk  posted day ${e.postedDay} (${ageDays}d ago)`);
+    const attrs = Object.entries(e.merc.attrs)
+      .map(([k, v]) => `${k}:${v}`)
+      .join('  ');
+    lines.push(`        attrs:   ${attrs}`);
+    const tagLines = e.merc.tags
+      .map((t) => `${t.label} [${t.id}] (${t.rarity} t${t.tier})`)
+      .join(', ');
+    lines.push(`        tags:    ${tagLines || '(none)'}`);
+    // Bond hints — overlapping tag ids with current roster mercs are a
+    // narrative cue that this candidate would slot into existing dynamics.
+    const candidateTagIds = new Set(e.merc.tags.map((t) => t.id));
+    const overlaps: string[] = [];
+    for (const m of roster.mercs) {
+      const shared = m.tags.filter((t) => candidateTagIds.has(t.id)).map((t) => t.id);
+      if (shared.length > 0) overlaps.push(`${m.name} (${shared.join(', ')})`);
+    }
+    if (overlaps.length > 0) {
+      lines.push(`        bonds?:  shared tags with ${overlaps.join('; ')}`);
+    } else if (roster.mercs.length > 0) {
+      lines.push(`        bonds?:  no shared tags with current roster`);
+    }
+  });
+  lines.push('');
+  lines.push(`  (hire with: npm run tavern -- hire --roster=<path> --index=<n>)`);
+  return lines.join('\n');
+}
+
 function main(): void {
   const args = parseArgs(process.argv.slice(2));
   if (!args.rosterPath) {
@@ -72,6 +113,10 @@ function main(): void {
   switch (args.cmd) {
     case 'show': {
       console.log(renderPool(roster));
+      return;
+    }
+    case 'browse': {
+      console.log(renderBrowse(roster));
       return;
     }
     case 'refresh': {
