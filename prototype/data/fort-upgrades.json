@@ -1,0 +1,40 @@
+{
+  "upgrades": [
+    {
+      "id": "reinforced-palisade",
+      "name": "Reinforced Palisade",
+      "description": "Heavy timbers and iron ties around the perimeter. Raids hit the gate, not the wall.",
+      "cost": 5,
+      "levelsUp": true
+    },
+    {
+      "id": "winter-larder",
+      "name": "Winter Larder",
+      "description": "Salted meat, pickled roots, and a locked door. Frost seasons sting less.",
+      "cost": 3
+    },
+    {
+      "id": "smithy",
+      "name": "Garrison Smithy",
+      "description": "A working forge for arms and armour. Mercs leave better kitted than they arrive.",
+      "cost": 6,
+      "requiresLevel": 2,
+      "levelsUp": true
+    },
+    {
+      "id": "chapel",
+      "name": "Wayside Chapel",
+      "description": "A small stone chapel for the dead. The living sleep a little easier.",
+      "cost": 4,
+      "requiresLevel": 2
+    },
+    {
+      "id": "watch-tower",
+      "name": "Stone Watch Tower",
+      "description": "A four-storey tower with crow's-nest sightlines. Few surprises reach the gate.",
+      "cost": 8,
+      "requiresLevel": 3,
+      "levelsUp": true
+    }
+  ]
+}

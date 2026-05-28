@@ -85,8 +85,13 @@ const PendingErrandSchema = z.object({
   seedSource: z.string().min(1),
 });
 
+const FortStateSchema = z.object({
+  level: z.number().int().min(1).default(1),
+  upgrades: z.array(z.string()).default([]),
+});
+
 const RoasterSchema = z.object({
-  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6)]).default(6),
+  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6), z.literal(7)]).default(7),
   dayCount: z.number().int().min(0).default(0),
   gold: z.number().int().default(0),
   reputation: z.record(z.string(), z.number().int()).default({}),
@@ -104,6 +109,8 @@ const RoasterSchema = z.object({
   completedQuests: z.array(CompletedQuestSchema).default([]),
   /** M5.4: errands dispatched but not yet returned. v4+. */
   pendingErrands: z.array(PendingErrandSchema).default([]),
+  /** M6.4: fort upgrade state (level + purchased upgrade ids). v7+. */
+  fort: FortStateSchema.default({ level: 1, upgrades: [] }),
 });
 
 export type RosterMercState = z.infer<typeof MercStateSchema>;
@@ -114,7 +121,7 @@ export type RosterPendingErrand = z.infer<typeof PendingErrandSchema>;
 export type RosterFile = z.infer<typeof RoasterSchema>;
 
 export interface Roster {
-  schemaVersion: 6;
+  schemaVersion: 7;
   dayCount: number;
   gold: number;
   reputation: Record<string, number>;
@@ -131,11 +138,13 @@ export interface Roster {
   completedQuests: RosterCompletedQuest[];
   /** M5.4: errands in flight. */
   pendingErrands: RosterPendingErrand[];
+  /** M6.4: fort upgrade state. */
+  fort: { level: number; upgrades: string[] };
 }
 
 export function newRoster(initialMercs: Merc[]): Roster {
   return {
-    schemaVersion: 6,
+    schemaVersion: 7,
     dayCount: 0,
     gold: 0,
     reputation: {},
@@ -146,6 +155,7 @@ export function newRoster(initialMercs: Merc[]): Roster {
     activeQuests: [],
     completedQuests: [],
     pendingErrands: [],
+    fort: { level: 1, upgrades: [] },
   };
 }
 
@@ -199,7 +209,7 @@ export function loadRoster(
   }));
 
   return {
-    schemaVersion: 6,
+    schemaVersion: 7,
     dayCount: parsed.dayCount,
     gold: parsed.gold,
     reputation: parsed.reputation,
@@ -210,6 +220,7 @@ export function loadRoster(
     activeQuests: parsed.activeQuests,
     completedQuests: parsed.completedQuests,
     pendingErrands: parsed.pendingErrands,
+    fort: parsed.fort,
   };
 }
 
@@ -237,7 +248,7 @@ export function saveRoster(
     }
   }
   const file: RosterFile = {
-    schemaVersion: 6,
+    schemaVersion: 7,
     dayCount: roster.dayCount,
     gold: roster.gold,
     reputation: roster.reputation,
@@ -256,6 +267,7 @@ export function saveRoster(
     activeQuests: roster.activeQuests,
     completedQuests: roster.completedQuests,
     pendingErrands: roster.pendingErrands,
+    fort: roster.fort,
   };
   writeFileSync(path, JSON.stringify(file, null, 2) + '\n', 'utf8');
 }
