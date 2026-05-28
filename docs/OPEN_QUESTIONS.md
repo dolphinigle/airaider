@@ -6,28 +6,7 @@ The questions below are explicitly unresolved. They are flagged so that future d
 
 ## P0 — Must resolve before any code
 
-### Q1. What is a raid, mechanically?
-
-The core unresolved question. See [RAID_DESIGN.md](RAID_DESIGN.md) for candidate styles (A–E). Until this is picked, everything downstream (hero abilities, room buffs, raid economy) is provisional.
-
-**Suggested decision criteria:** which candidate best satisfies *agency + heroes-feel-different + 15-min sessions + loot-feeds-fort + small-team-implementable*. Current top candidates: **B (turn-based tactics grid)** and **E (hybrid map + set pieces)**.
-
-### Q2. Does the agency layer fully solve the agency problem?
-
-The *thesis* of this remake is: "give the player the raid, and the hero collection / fort loop will start to feel meaningful." That is plausible but unproven. Before building, we should pressure-test:
-
-- Is "play the raid" enough? Or do heroes *also* need explicit relationship / personality systems (Darkest Dungeon's quirks, Crusader Kings' character interactions) for the hero loop to land?
-- Is the fort interesting enough as a *between-raids* activity, or does it need its own micro-decisions (events, intrigue, requests from followers) to feel alive?
-- Could agency leak away again if we let too much of the raid be automated (e.g. "auto-resolve a low-level raid you've played before")? Probably yes — and that feature must be carefully scoped or refused.
-
-**This is the question to bring back to the user before further design.**
-
-### Q3. Party size and raid length
-
-- Party size: 3 (lean, fast, FTL-ish) vs. 4 (Darkest Dungeon line) vs. 5 (XCOM-ish, probably too many).
-- Raid length: target 10 min, 15 min, or 25 min?
-
-These two interact. Smaller party + shorter raid = "one more raid" rhythm. Bigger party + longer raid = epic expedition rhythm. Pick one rhythm and commit.
+*(Q1, Q2, Q3, Q7 all resolved — see Resolved section.)*
 
 ## P1 — Resolve before vertical slice
 
@@ -45,9 +24,9 @@ When a new hero is recruited mid-game, do they start at level 1 (and need carefu
 
 Suggested middle ground: new heroes start at `max(1, current_player_avg − 3)`, so they need some raids to catch up but are not useless.
 
-### Q7. AI's role inside the raid
+### Q7. AI's role inside the raid — **RESOLVED**
 
-Is the AI active during the raid itself (writing flavor text for encounters in real time), or only at entry/exit (briefing and epilogue)? In-raid AI is richer but expensive (latency, cost) and could undermine readability. At-edges AI is cheap and clean.
+Narrated Pool (see `CORE_CONCEPTS.md` §5 and `RAID_DESIGN.md`). AI fires **per scenario** (one cheap call producing 4–5 narration lines, each citing the engine-picked tag), plus a closing line and a post-raid epilogue. Not real-time during decisions; not only at entry/exit. The "per scenario" cadence is the locked answer. (Moved to Resolved.)
 
 ### Q8. Fort-to-raid buffs scope
 
@@ -57,9 +36,9 @@ How many room→raid buffs exist? Are they always-active or opt-in (player choos
 
 Wounds and traumas heal across "raids completed" — but by *whom*? If they heal during *any* raid, the player will simply run filler raids to heal. If they heal only when the wounded hero is benched and another raid is run, the player has a real cost (running a raid without a hero). Probably the latter.
 
-### Q10. Raid lead expiration
+### Q10. Raid lead expiration — **RESOLVED**
 
-In AI Stronghold leads sat in the inventory indefinitely. Should leads expire (e.g. after N raids) to force commitment? Pro: forces choice. Con: punishes hoarders.
+Leads carry `expiry_days` and lapse from the board if not pursued. Pursued Quests then have a fast ~2-day window to assign + play before they lapse too. **No quest-tray cap; expiry alone is the rate-limiter.** See `RAID_DESIGN.md` § Leads. (Moved to Resolved.)
 
 ## P2 — Polish-tier questions
 
@@ -108,5 +87,20 @@ Decision: not now, not for vertical slice. If post-VS playtest shows Q16 is seve
 
 ## Resolved (move entries here as they get decided)
 
+### Q1. What is a raid, mechanically? — RESOLVED
+**Narrated Pool.** Each raid = 3–5 scenarios; player drags heroes into slots; engine computes (stat + engine-picked tag mod); AI generates one narration line per contribution citing the tag; outcome band fires; AI closes the scene. Climax scenario offers 2–3 approaches. See `CORE_CONCEPTS.md` §5 and `RAID_DESIGN.md`.
+
+### Q2. Does the agency layer fully solve the agency problem? — RESOLVED (in principle)
+**Yes — the Narrated Pool with tag-cited contribution lines is the locked answer.** Heroes become characters because the player chose which to send and the AI quoted that hero's specific tag. Day-1 sim and Day-47 sim both confirmed the felt experience. Real risk is camp-day repetition, not raid passivity; see Q16 + FR7 (theme system) + FR9 (captives).
+
+### Q3. Party size and raid length — RESOLVED
+**2–4 heroes per raid, 3–5 scenarios, target ~15 min per raid.** Roster cap 6–10 captains. Stamina = 3 charges per hero per raid forces rationing across the scenario count. Matches the Darkest-Dungeon-line rhythm.
+
 ### Q5. Pressure mechanic — RESOLVED
 Quest expiry + daily upkeep (hero wages, follower upkeep, room income). No Heat, no clock-timers, no closing-NPC. See `CORE_CONCEPTS.md` §14a.
+
+### Q7. AI's role inside the raid — RESOLVED
+One AI call per scenario (4–5 narration lines, each citing the engine-picked tag) + closing line + post-raid epilogue. See `CORE_CONCEPTS.md` §5.
+
+### Q10. Raid lead expiration — RESOLVED
+Leads carry `expiry_days`. Pursued Quests expire ~2 days later. No tray cap; expiry is the only rate-limiter. See `RAID_DESIGN.md` § Leads.

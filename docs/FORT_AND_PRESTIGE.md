@@ -134,7 +134,7 @@ Buffs are *small* — they do not replace play. They make the fort *matter* duri
 There is no global tick. The fort is a save-anywhere screen. Time advances per raid.
 
 Knock-on effects on previously week-based systems:
-- Wound and trauma healing are measured in **raids-completed** (a wound heals in "2 raids by anyone in the party that wasn't this hero", for example). This keeps the player from healing for free by sitting in the fort.
+- Wound and trauma healing are measured in **days at camp** (a wound heals in N days of rest at the fort, faster in a Chapel/Apothecary/Tavern depending on type). Days at camp accrue wages (see `CORE_CONCEPTS.md` §14a), so healing is never *free* — the upkeep clock is the cost.
 - Production rooms generate resources **on raid return**, scaled to raid difficulty. This ties the economy to play, not to idle time.
 
 ## Prestige stays room-only

@@ -70,7 +70,7 @@ Same pattern applies to: scenario thresholds, recruitment, loot generation, cons
 
 **Camp = day cycle.** Each day is a decision; no global "End Week" tick (that's an aistronghold artifact). The player allocates each hero to one action per day, then advances time deliberately. Idle heroes recover Fatigue passively.
 
-**Raid = 3–5 scenarios.** Setup scenarios (1–3, single-approach) build momentum; **climax scenario** offers branching approaches; exit screen distributes loot. Within a raid the player makes ~10–20 decisions (slot assignments, approach picks).
+**Raid = 3–5 scenarios.** Setup scenarios (1–3, single-approach) build momentum; **climax scenario** offers branching approaches; exit screen distributes loot. Within a raid the player makes ~5 decisions (slot assignments + climax approach pick). Per-scenario decision density is an open playtest concern (see `OPEN_QUESTIONS.md` Q16).
 
 **Rhythm:** slow (camp) / fast (raid) / cool-down (resolution). Same shape as Darkest Dungeon, FTL, Slay the Spire.
 

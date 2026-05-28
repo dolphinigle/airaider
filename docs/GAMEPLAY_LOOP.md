@@ -33,10 +33,10 @@ The hero level cap is intentionally soft (see `HEROES_AND_GROWTH.md`): a player 
 ┌──────────────────────────────────────────────────────────────────┐
 │                         RAID PHASE                               │
 │                                                                  │
-│   Player-controlled tactical play with the chosen party          │
-│   Decisions: positioning, ability use, push vs. retreat,         │
-│              sacrifice, loot-or-leave                            │
-│   Ends with: success / partial / failure / wipe                  │
+│   Player drags hero-cards into scenario slots (Narrated Pool).   │
+│   Engine resolves; AI narrates each contribution citing tag.     │
+│   Climax scenario offers 2–3 approaches.                         │
+│   Ends with: clean / partial / failure / wipe                    │
 │                                                                  │
 └──────────────────────────────┬───────────────────────────────────┘
                                │  Return home
@@ -103,8 +103,7 @@ The errand system guarantees there is never a "useless turn" for any hero — ev
 
 ### Plan the next raid
 
-- Browse available **Raid Leads** (analog of aistronghold's Quest Leads). Leads are hooks: "Pay-chest moving north in 9 days", "Christian funerary procession passes Caesina tomorrow", "Frontier governor's tax-equestrian sleeps at the Three-Pines mansio tonight." Each lead has an estimated take, a Heat cost, an optional deadline, and required minimum bench depth.
-- Pursuing a lead generates the full raid (AI flavors the scenarios, engine generates structure).
+- Browse available **Raid Leads** (`Lead [rarity] · {region} · L{dc} · ~{reward} · {expiry}d`). Each is a cheap stub — no prose, no hook. **Lead-scouting** (a cunning-hero errand) can pre-reveal hints. **Pursue Lead** is a free, instant action that fires AI quest-gen and turns the stub into a real Quest (visible scenarios, NPCs, named loot). Pursued Quests expire fast (~2 days). **Assign heroes** is a separate decision made on the now-fully-visible Quest. See `CORE_CONCEPTS.md` §11b and `RAID_DESIGN.md` § Leads.
 - Pick a party (typically 2–4 heroes from your roster).
 - Launch.
 
