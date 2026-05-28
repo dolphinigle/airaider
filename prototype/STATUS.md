@@ -1,8 +1,8 @@
 # Prototype STATUS
 
-> **Updated:** 2026-05-28 ~24:20 WIB
+> **Updated:** 2026-05-29 ~00:35 WIB
 > **Branch:** `prototype/m0`
-> **Last verified command:** `npm test` → 204 / 204 passing
+> **Last verified command:** `npm test` → 209 / 209 passing
 > **Last verified real-LLM command:** raid-13-guild-shipment with favorable seed — narrator awarded +1 to `lowmark-guild` and −1 to `black-hill-gang` and called out both factions by name in the outcome line (`fixtures/raid-13-guild-shipment.favorable.transcript-real.json`).
 
 ## ⚠️ Post-compaction discipline (READ FIRST)

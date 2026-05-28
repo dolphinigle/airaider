@@ -90,3 +90,11 @@ export function fatigueRecoveryAmount(
   if (winterLarder && season === 'frost') return 2;
   return 1;
 }
+
+/**
+ * M12.1: the granary discounts each merc's payday wage by 1g (floor 0)
+ * when present. Returns the per-merc reduction applied at payday.
+ */
+export function granaryWageReduction(effects: FortEffects | undefined): number {
+  return effects?.upgradeIds.has('granary') ? 1 : 0;
+}

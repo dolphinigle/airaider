@@ -35,6 +35,13 @@
       "cost": 8,
       "requiresLevel": 3,
       "levelsUp": true
+    },
+    {
+      "id": "granary",
+      "name": "Granary",
+      "description": "A stone granary and root cellar. The fort can feed itself; mercs ask 1g less per payday.",
+      "cost": 7,
+      "requiresLevel": 2
     }
   ]
 }

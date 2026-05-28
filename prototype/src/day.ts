@@ -27,7 +27,7 @@ import { reputationTier } from './reputation.js';
 export const WAGE_INTERVAL_DAYS = 7;
 /** M9.2: a merc deserts after this many consecutive days of fort debt (gold < 0). */
 export const DEBT_DESERTION_THRESHOLD_DAYS = 3;
-import { fortEffectsFor, chapelHealsWounds, fatigueRecoveryAmount } from './fortEffects.js';
+import { fortEffectsFor, chapelHealsWounds, fatigueRecoveryAmount, granaryWageReduction } from './fortEffects.js';
 import { affordableUpgrades, loadFortCatalog, type FortUpgrade } from './fort.js';
 
 const DaySchema = z.object({
@@ -368,15 +368,18 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   if (roster) {
     const currentDay = roster.dayCount + 1;
     if (currentDay % WAGE_INTERVAL_DAYS === 0 && roster.mercs.length > 0) {
+      const wageReduction = granaryWageReduction(fortEffectsFor(roster.fort.upgrades));
       for (const m of roster.mercs) {
-        wagesPaid.push({ mercId: m.id, wage: m.wage });
-        wagesTotalPaid += m.wage;
+        const paid = Math.max(0, m.wage - wageReduction);
+        wagesPaid.push({ mercId: m.id, wage: paid });
+        wagesTotalPaid += paid;
       }
       roster.gold -= wagesTotalPaid;
+      const granaryNote = wageReduction > 0 ? ` (granary −${wageReduction}g/merc)` : '';
       const payEntry: FortLogEntry = {
         day: currentDay,
         kind: 'note',
-        message: `Payday: ${wagesTotalPaid}g wages to ${wagesPaid.length} merc${wagesPaid.length === 1 ? '' : 's'} (gold ${roster.gold}g)`,
+        message: `Payday: ${wagesTotalPaid}g wages to ${wagesPaid.length} merc${wagesPaid.length === 1 ? '' : 's'}${granaryNote} (gold ${roster.gold}g)`,
       };
       appendFortLog(roster, payEntry);
       newFortLogEntries.push(payEntry);

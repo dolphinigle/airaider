@@ -475,3 +475,36 @@ describe('M9.5 fort log entries for payday and desertion', () => {
     expect(r.mercs.length).toBe(1); // one merc gone
   });
 });
+
+describe('M12.1 granary discounts payday wages', () => {
+  const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+  const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+  const dayPath = join(ROOT, 'fixtures', 'day-01.json');
+  const day = loadDay(dayPath);
+
+  it('payday with granary reduces each merc wage by 1g (floor 0)', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!, mercs.get('imogen')!]);
+    r.gold = 20;
+    r.dayCount = 6;
+    r.fort.upgrades.push('granary');
+    const out = await resolveDay({ day: { ...day, scenarios: [] as string[] } as any, dayPath, mercs, llm: new MockScenarioLLM(), roster: r });
+    // Each merc wage is 1g (standard), so granary drops to 0; total 0g
+    // (or 1g per merc if base is 2g; either way: reduced by 1)
+    const expectedTotal = [mercs.get('marek')!, mercs.get('imogen')!].reduce((a, m) => a + Math.max(0, m.wage - 1), 0);
+    expect(out.wagesTotalPaid).toBe(expectedTotal);
+    const payNote = r.fortLog.find((e) => e.message.startsWith('Payday'));
+    expect(payNote?.message).toContain('granary');
+  });
+
+  it('payday without granary pays full wage', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!]);
+    r.gold = 20;
+    r.dayCount = 6;
+    const out = await resolveDay({ day: { ...day, scenarios: [] as string[] } as any, dayPath, mercs, llm: new MockScenarioLLM(), roster: r });
+    expect(out.wagesTotalPaid).toBe(mercs.get('marek')!.wage);
+    const payNote = r.fortLog.find((e) => e.message.startsWith('Payday'));
+    expect(payNote?.message).not.toContain('granary');
+  });
+});

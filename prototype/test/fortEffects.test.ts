@@ -138,3 +138,20 @@ describe('M7.13 smithy casualty reduction + winter-larder frost recovery', () =>
     expect(fatigueRecoveryAmount(undefined, 'frost')).toBe(1);
   });
 });
+
+import { granaryWageReduction } from '../src/fortEffects.js';
+
+describe('M12.1 granary wage reduction', () => {
+  it('returns 0 without granary', () => {
+    expect(granaryWageReduction(fortEffectsFor([]))).toBe(0);
+    expect(granaryWageReduction(fortEffectsFor(['smithy', 'chapel']))).toBe(0);
+  });
+
+  it('returns 1 with granary', () => {
+    expect(granaryWageReduction(fortEffectsFor(['granary']))).toBe(1);
+  });
+
+  it('is a no-op for undefined effects', () => {
+    expect(granaryWageReduction(undefined)).toBe(0);
+  });
+});
