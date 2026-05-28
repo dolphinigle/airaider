@@ -1,0 +1,56 @@
+{
+  "events": [
+    {
+      "id": "frost-supplies-thin",
+      "label": "Supplies dwindling",
+      "narration": "Snow piled chest-high against the larder door. The cook returns with less than promised and a face like an undertaker's.",
+      "seasons": ["frost"],
+      "requiresMissingUpgrades": ["winter-larder"],
+      "effect": { "goldDelta": -1, "fatigueDelta": 1, "reputationDeltas": [] }
+    },
+    {
+      "id": "frost-larder-holds",
+      "label": "Larder holds",
+      "narration": "The reinforced larder rattles through another blizzard. Salt pork for everyone; for the first time this season, no one goes to bed hungry.",
+      "seasons": ["frost"],
+      "requiresUpgrades": ["winter-larder"],
+      "effect": { "goldDelta": 0, "fatigueDelta": -1, "reputationDeltas": [] }
+    },
+    {
+      "id": "thaw-market-day",
+      "label": "Lowmark market day",
+      "narration": "First market of the thaw. Wool, salt, and rumour change hands; the fort's name comes up only twice, and both times approvingly.",
+      "seasons": ["thaw"],
+      "effect": { "goldDelta": 2, "fatigueDelta": 0, "reputationDeltas": [{ "factionId": "lowmark-guild", "delta": 1 }] }
+    },
+    {
+      "id": "high-bandit-scouts",
+      "label": "Bandit scouts on the ridge",
+      "narration": "A rider out of the hills, then another. They mark the watchposts and ride on. Whatever they wanted, they found it.",
+      "seasons": ["high"],
+      "requiresMissingUpgrades": ["watch-tower"],
+      "effect": { "goldDelta": -1, "fatigueDelta": 1, "reputationDeltas": [] }
+    },
+    {
+      "id": "high-quiet-summer",
+      "label": "Quiet summer day",
+      "narration": "Bees in the thatch and nothing on the road. The mercs drill, then nap, then drill again. It will not last.",
+      "seasons": ["high"],
+      "effect": { "goldDelta": 0, "fatigueDelta": -1, "reputationDeltas": [] }
+    },
+    {
+      "id": "wane-harvest-tithes",
+      "label": "Harvest tithes",
+      "narration": "Hill villagers arrive with sacks of grain and a tally-stick. The fort takes its share and stamps the wood with the seal of the levy.",
+      "seasons": ["wane"],
+      "effect": { "goldDelta": 2, "fatigueDelta": 0, "reputationDeltas": [] }
+    },
+    {
+      "id": "smithy-extra-orders",
+      "label": "Smithy backlog cleared",
+      "narration": "The smith works two nights running and the kit comes off the rack sharper than it went on. Coin clinks into the fort chest.",
+      "requiresUpgrades": ["smithy"],
+      "effect": { "goldDelta": 1, "fatigueDelta": 0, "reputationDeltas": [] }
+    }
+  ]
+}

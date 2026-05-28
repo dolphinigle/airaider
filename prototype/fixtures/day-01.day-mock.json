@@ -202,5 +202,6 @@
   "errandsResolved": [],
   "promotions": [],
   "bondsFormed": [],
-  "seasonClock": null
+  "seasonClock": null,
+  "dailyEvent": null
 }

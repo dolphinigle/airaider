@@ -54,12 +54,9 @@ describe('M5.5 reputation surfacing', () => {
 
   it('day-loop applies reputationDeltas to the roster', async () => {
     const roster = newRoster([...mercs.values()]);
-    // Build a one-scenario day pointing at raid-13 with the favorable seed.
-    // Override seed by writing a temp day fixture pattern: just call resolveDay
-    // with a synthetic day and let scenario.seed (raid-13-guild-shipment) drive
-    // — that produces 'unfavorable'. Instead, call resolveScenario directly +
-    // mutate roster ourselves: that's the responsibility of resolveDay, so we
-    // test by feeding a favorable rng via rngFor.
+    // Park the roster in 'wane' so the M7.4 daily event roll cannot touch
+    // reputation (only wane-harvest-tithes is eligible there, gold-only).
+    roster.dayCount = 60;
     const dayFixture = {
       id: 'day-rep',
       name: 'Rep test',

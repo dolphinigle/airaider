@@ -17,6 +17,7 @@ import { dispatchErrand, resolveDueErrands } from './errands.js';
 import { applyVeterancyXp, type Promotion } from './veterancy.js';
 import { recordCoDeployment, bondedPairsOf, type BondFormation } from './bonds.js';
 import { seasonFor, type SeasonClock } from './season.js';
+import { loadEventCatalog, rollEventForDay, type DailyEvent } from './events.js';
 
 const DaySchema = z.object({
   id: z.string().min(1),
@@ -67,6 +68,8 @@ export interface DayResolution {
   bondsFormed: BondFormation[];
   /** M6.3: season clock at the time of this day (roster-mode only; null otherwise). */
   seasonClock: SeasonClock | null;
+  /** M7.4: daily event rolled at the start of the day (null if none / roster-less). */
+  dailyEvent: DailyEvent | null;
 }
 
 /**
@@ -89,6 +92,30 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   const seasonClock: SeasonClock | null = roster ? seasonFor(roster.dayCount) : null;
   const season = seasonClock?.season;
   const fortUpgrades = roster ? roster.fort.upgrades : undefined;
+
+  // M7.4: roll the day's event (if any) before scenarios begin, and apply
+  // its flat effects to the roster. Roster-less callers get no event.
+  let dailyEvent: DailyEvent | null = null;
+  if (roster) {
+    const catalog = loadEventCatalog(new URL('../data/events.json', import.meta.url).pathname);
+    dailyEvent = rollEventForDay(catalog, {
+      dayCount: roster.dayCount + 1,
+      season,
+      fortUpgrades: fortUpgrades ?? [],
+    });
+    if (dailyEvent) {
+      const eff = dailyEvent.effect;
+      roster.gold += eff.goldDelta;
+      if (eff.fatigueDelta !== 0) {
+        for (const m of roster.mercs) {
+          fatigue.set(m.id, Math.max(0, (fatigue.get(m.id) ?? 0) + eff.fatigueDelta));
+        }
+      }
+      for (const d of eff.reputationDeltas) {
+        roster.reputation[d.factionId] = (roster.reputation[d.factionId] ?? 0) + d.delta;
+      }
+    }
+  }
   const reputationOf = roster
     ? (factionId: string): number => roster.reputation[factionId] ?? 0
     : undefined;
@@ -182,5 +209,6 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     promotions,
     bondsFormed,
     seasonClock,
+    dailyEvent,
   };
 }

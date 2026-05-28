@@ -13,6 +13,17 @@ export function renderDayTranscript(day: DayResolution): string {
   }
   lines.push(DBAR);
   lines.push('');
+  if (day.dailyEvent) {
+    const e = day.dailyEvent;
+    const eff = e.effect;
+    const bits: string[] = [];
+    if (eff.goldDelta !== 0) bits.push(`${eff.goldDelta > 0 ? '+' : ''}${eff.goldDelta}g`);
+    if (eff.fatigueDelta !== 0) bits.push(`${eff.fatigueDelta > 0 ? '+' : ''}${eff.fatigueDelta} fatigue/merc`);
+    for (const d of eff.reputationDeltas) bits.push(`${d.factionId} ${d.delta > 0 ? '+' : ''}${d.delta}`);
+    lines.push(`>>> DAILY EVENT: ${e.label}${bits.length ? `  (${bits.join(', ')})` : ''}`);
+    lines.push(`     ${e.narration}`);
+    lines.push('');
+  }
   if (day.errandsResolved.length > 0) {
     lines.push(`>>> Errands that returned today:`);
     for (const r of day.errandsResolved) lines.push(`     • ${r.scenarioId} — ${r.title}`);
