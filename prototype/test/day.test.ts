@@ -508,3 +508,51 @@ describe('M12.1 granary discounts payday wages', () => {
     expect(payNote?.message).not.toContain('granary');
   });
 });
+
+describe('M13.1 enemy-faction quest auto-stir in day loop', () => {
+  const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+  const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+  const dayPath = join(ROOT, 'fixtures', 'day-01.json');
+  const day = loadDay(dayPath);
+
+  it('stirs lowmark-bounty when lowmark-guild is at enemy tier', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!]);
+    r.reputation['lowmark-guild'] = -10; // enemy tier threshold
+    const out = await resolveDay({
+      day: { ...day, scenarios: [] as string[] } as any,
+      dayPath, mercs, llm: new MockScenarioLLM(), roster: r,
+    });
+    expect(out.questsStirred.map((q) => q.questId)).toContain('lowmark-bounty');
+    expect(r.activeQuests.some((q) => q.questId === 'lowmark-bounty')).toBe(true);
+    const note = r.fortLog.find((e) => e.message.includes('lowmark-bounty') || e.message.includes('Lowmark Bounty'));
+    expect(note).toBeDefined();
+  });
+
+  it('does not stir again on subsequent days', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!]);
+    r.reputation['lowmark-guild'] = -10;
+    await resolveDay({
+      day: { ...day, scenarios: [] as string[] } as any,
+      dayPath, mercs, llm: new MockScenarioLLM(), roster: r,
+    });
+    r.dayCount += 1;
+    const out2 = await resolveDay({
+      day: { ...day, scenarios: [] as string[] } as any,
+      dayPath, mercs, llm: new MockScenarioLLM(), roster: r,
+    });
+    expect(out2.questsStirred.length).toBe(0);
+  });
+
+  it('does not stir when no faction is at enemy tier', async () => {
+    const { newRoster } = await import('../src/roster.js');
+    const r = newRoster([mercs.get('marek')!]);
+    r.reputation['lowmark-guild'] = -3; // hostile, not enemy
+    const out = await resolveDay({
+      day: { ...day, scenarios: [] as string[] } as any,
+      dayPath, mercs, llm: new MockScenarioLLM(), roster: r,
+    });
+    expect(out.questsStirred.length).toBe(0);
+  });
+});

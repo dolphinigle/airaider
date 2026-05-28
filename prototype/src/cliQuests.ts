@@ -100,9 +100,10 @@ async function main(): Promise<void> {
       console.error(`Unknown quest id: ${questId}`);
       process.exit(4);
     }
-    const carrier = carrierOf(roster, q.seededByTag);
-    if (!carrier) {
-      console.error(`No roster merc carries seeding tag "${q.seededByTag}"; stirring anyway with unknown carrier.`);
+    const seedingTag = q.seededByTag;
+    const carrier = seedingTag ? carrierOf(roster, seedingTag) : undefined;
+    if (seedingTag && !carrier) {
+      console.error(`No roster merc carries seeding tag "${seedingTag}"; stirring anyway with unknown carrier.`);
     }
     stirQuest(roster, q, carrier);
     saveRoster(rosterPath, roster, mercsPool);

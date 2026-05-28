@@ -134,6 +134,13 @@ export function renderDayTranscript(day: DayResolution): string {
       lines.push(`   ✗ ${e.merc.name} (${e.merc.id}) — tired of waiting`);
     }
   }
+  if (day.questsStirred.length > 0) {
+    lines.push('');
+    lines.push(' QUESTS STIRRED:');
+    for (const q of day.questsStirred) {
+      lines.push(`   ◇ ${q.questName} (${q.questId}) — ${q.enemyFactionId} reached enemy tier`);
+    }
+  }
   lines.push(DBAR);
   return lines.join('\n');
 }

@@ -232,5 +232,6 @@
   "fatigueRecoverySuspended": false,
   "tavernRefresh": [],
   "tavernExpired": [],
-  "lowMorale": false
+  "lowMorale": false,
+  "questsStirred": []
 }

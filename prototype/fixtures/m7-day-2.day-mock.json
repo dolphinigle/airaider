@@ -1,6 +1,6 @@
 {
   "dayId": "m7-day-2",
-  "dayName": "Cusp of High Summer — Watchtower Build",
+  "dayName": "Cusp of High Summer \u2014 Watchtower Build",
   "scenarios": [
     {
       "scenarioId": "raid-04",
@@ -55,7 +55,7 @@
       "heads": 2,
       "tails": 2,
       "band": "unfavorable",
-      "bandReason": "2/4 heads (split — pessimistic default)",
+      "bandReason": "2/4 heads (split \u2014 pessimistic default)",
       "contributions": [
         {
           "mercId": "veska",
@@ -136,5 +136,6 @@
   "desertions": [],
   "tavernRefresh": [],
   "tavernExpired": [],
-  "lowMorale": false
+  "lowMorale": false,
+  "questsStirred": []
 }

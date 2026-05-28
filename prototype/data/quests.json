@@ -25,5 +25,27 @@
       "goldDelta": 80,
       "reputationGain": "sevrenne-grateful"
     }
+  },
+  {
+    "id": "lowmark-bounty",
+    "name": "The Lowmark Bounty",
+    "seededByEnemyFaction": "lowmark-guild",
+    "summary": "The Lowmark Guild has put your fort's name on a slate in every counting-house. Hunt their bounty captain before his hires reach your gate.",
+    "stages": [
+      {
+        "id": "stage-0-tracker",
+        "scenarioId": "raid-12-bounty-tracker",
+        "summary": "Run down the Guild tracker scouting your approach roads."
+      },
+      {
+        "id": "stage-1-captain",
+        "scenarioId": "raid-13-bounty-captain",
+        "summary": "Corner the bounty captain in the burned hamlet and end the contract."
+      }
+    ],
+    "rewardOnComplete": {
+      "goldDelta": 40,
+      "reputationGain": "feared"
+    }
   }
 ]

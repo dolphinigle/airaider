@@ -22,6 +22,12 @@ import { loadEventCatalog, rollEventForDay, type DailyEvent } from './events.js'
 import { loadTags } from './tags.js';
 import { refreshHirePool, dropStaleListings, HIRE_REFRESH_INTERVAL_DAYS, type HirePoolEntry } from './tavern.js';
 import { reputationTier } from './reputation.js';
+import {
+  loadQuests,
+  findEnemyFactionStirrableQuests,
+  stirQuest,
+  type Quest,
+} from './quests.js';
 
 /** M9.1: wages are paid every Nth day (CANONICAL §2.7 flat-wage rule). */
 export const WAGE_INTERVAL_DAYS = 7;
@@ -144,6 +150,12 @@ export interface DayResolution {
    * loop). Empty in roster-less mode.
    */
   newFortLogEntries: FortLogEntry[];
+  /**
+   * M13.1: quests auto-stirred at the START of this day because a faction
+   * crossed into enemy tier. Each entry records the quest id + the faction
+   * that triggered it. Empty in roster-less mode.
+   */
+  questsStirred: Array<{ questId: string; questName: string; enemyFactionId: string }>;
 }
 
 /**
@@ -459,6 +471,38 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     }));
   }
 
+  // M13.1: auto-stir bounty-hunt quests whose `seededByEnemyFaction`
+  // matches any faction currently at enemy tier. Computed at end-of-day so
+  // reputation deltas from this day's scenarios are taken into account.
+  const questsStirred: Array<{ questId: string; questName: string; enemyFactionId: string }> = [];
+  if (roster) {
+    const endEnemies: string[] = [];
+    for (const [factionId, standing] of Object.entries(roster.reputation)) {
+      if (reputationTier(standing) === 'enemy') endEnemies.push(factionId);
+    }
+    if (endEnemies.length > 0) {
+      const questCatalog = loadQuests(
+        new URL('../data/quests.json', import.meta.url).pathname,
+      );
+      const triggers = findEnemyFactionStirrableQuests(roster, questCatalog, endEnemies);
+      for (const q of triggers) {
+        stirQuest(roster, q, undefined);
+        questsStirred.push({
+          questId: q.id,
+          questName: q.name,
+          enemyFactionId: q.seededByEnemyFaction!,
+        });
+        const entry: FortLogEntry = {
+          day: roster.dayCount + 1,
+          kind: 'note',
+          message: `Quest stirred: ${q.name} (${q.seededByEnemyFaction} now enemy)`,
+        };
+        appendFortLog(roster, entry);
+        newFortLogEntries.push(entry);
+      }
+    }
+  }
+
   return {
     dayId: day.id,
     dayName: day.name,
@@ -481,5 +525,6 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     tavernRefresh,
     tavernExpired,
     lowMorale,
+    questsStirred,
   };
 }

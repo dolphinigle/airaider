@@ -23,7 +23,10 @@ const QuestStageSchema = z.object({
 const QuestSchema = z.object({
   id: z.string(),
   name: z.string(),
-  seededByTag: z.string(),
+  seededByTag: z.string().optional(),
+  /** M13.1: alternative seeding mechanism — quest stirs automatically when
+   *  the roster has the named faction at enemy tier (reputation ≤ −5). */
+  seededByEnemyFaction: z.string().optional(),
   summary: z.string(),
   stages: z.array(QuestStageSchema).min(1),
   rewardOnComplete: z.object({
@@ -56,7 +59,29 @@ export function findStirrableQuests(
   const out: Quest[] = [];
   for (const q of catalog.values()) {
     if (active.has(q.id) || completed.has(q.id)) continue;
-    if (carriedTags.has(q.seededByTag)) out.push(q);
+    if (q.seededByTag && carriedTags.has(q.seededByTag)) out.push(q);
+  }
+  return out;
+}
+
+/**
+ * M13.1: find quests that should auto-stir because at least one faction the
+ * quest names via `seededByEnemyFaction` has reached enemy tier on this
+ * roster. Skips quests already active or completed.
+ */
+export function findEnemyFactionStirrableQuests(
+  roster: Roster,
+  catalog: Map<string, Quest>,
+  enemyFactions: Iterable<string>,
+): Quest[] {
+  const enemies = new Set<string>(enemyFactions);
+  if (enemies.size === 0) return [];
+  const active = new Set(roster.activeQuests.map((q) => q.questId));
+  const completed = new Set(roster.completedQuests.map((q) => q.questId));
+  const out: Quest[] = [];
+  for (const q of catalog.values()) {
+    if (active.has(q.id) || completed.has(q.id)) continue;
+    if (q.seededByEnemyFaction && enemies.has(q.seededByEnemyFaction)) out.push(q);
   }
   return out;
 }

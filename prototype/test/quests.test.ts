@@ -9,6 +9,7 @@ import {
   stirQuest,
   advanceQuestsForScenario,
   carrierOf,
+  findEnemyFactionStirrableQuests,
 } from '../src/quests.js';
 import type { Merc } from '../src/types.js';
 
@@ -44,8 +45,8 @@ describe('M5.2 quest arcs', () => {
   it('stirQuest activates at stage 0 and is idempotent', () => {
     const r = newRoster([mireMerc()]);
     const q = catalog.get('echoes-of-the-mire')!;
-    stirQuest(r, q, carrierOf(r, q.seededByTag));
-    stirQuest(r, q, carrierOf(r, q.seededByTag));
+    stirQuest(r, q, carrierOf(r, q.seededByTag!));
+    stirQuest(r, q, carrierOf(r, q.seededByTag!));
     expect(r.activeQuests.length).toBe(1);
     expect(r.activeQuests[0]!.stageIndex).toBe(0);
     expect(r.activeQuests[0]!.seededByMercId).toBe('roselle-mire');
@@ -86,5 +87,42 @@ describe('M5.2 quest arcs', () => {
     advanceQuestsForScenario(r, 'raid-09-mire-shrine', catalog);
     advanceQuestsForScenario(r, 'raid-10-mire-confrontation', catalog);
     expect(findStirrableQuests(r, catalog).length).toBe(0);
+  });
+});
+
+describe('M13.1 enemy-faction quest auto-stir', () => {
+  const tags = loadTags(TAGS_PATH);
+  const mercs = loadMercs(MERCS_PATH, tags);
+  const catalog = loadQuests(QUESTS_PATH);
+
+  it('loads lowmark-bounty quest with seededByEnemyFaction', () => {
+    const q = catalog.get('lowmark-bounty')!;
+    expect(q).toBeDefined();
+    expect(q.seededByEnemyFaction).toBe('lowmark-guild');
+  });
+
+  it('returns lowmark-bounty when lowmark-guild is in enemy list', () => {
+    const r = newRoster([mercs.get('marek')!]);
+    const stirrable = findEnemyFactionStirrableQuests(r, catalog, ['lowmark-guild']);
+    expect(stirrable.map((q) => q.id)).toContain('lowmark-bounty');
+  });
+
+  it('returns nothing when no enemy factions are passed', () => {
+    const r = newRoster([mercs.get('marek')!]);
+    expect(findEnemyFactionStirrableQuests(r, catalog, []).length).toBe(0);
+  });
+
+  it('skips quests already active or completed', () => {
+    const r = newRoster([mercs.get('marek')!]);
+    const q = catalog.get('lowmark-bounty')!;
+    stirQuest(r, q, undefined);
+    expect(findEnemyFactionStirrableQuests(r, catalog, ['lowmark-guild']).length).toBe(0);
+  });
+
+  it('ignores tag-only quests even if their tag isn\'t carried', () => {
+    const r = newRoster([mercs.get('marek')!]);
+    const stirrable = findEnemyFactionStirrableQuests(r, catalog, ['lowmark-guild']);
+    // echoes-of-the-mire has only seededByTag, not seededByEnemyFaction
+    expect(stirrable.map((q) => q.id)).not.toContain('echoes-of-the-mire');
   });
 });

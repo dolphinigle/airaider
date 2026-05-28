@@ -130,7 +130,7 @@ async function main(): Promise<void> {
     if (questCatalog.size > 0) {
       const stirrable = findStirrableQuests(roster, questCatalog);
       for (const q of stirrable) {
-        const carrier = carrierOf(roster, q.seededByTag);
+        const carrier = q.seededByTag ? carrierOf(roster, q.seededByTag) : undefined;
         stirQuest(roster, q, carrier);
         console.log(`\n  ✦ Quest stirred: "${q.name}" (carried by ${carrier ?? 'unknown'})`);
         console.log(`    ${q.summary}`);

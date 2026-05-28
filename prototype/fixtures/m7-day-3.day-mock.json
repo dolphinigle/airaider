@@ -1,6 +1,6 @@
 {
   "dayId": "m7-day-3",
-  "dayName": "Summer Reaches — Recruit at the Gate",
+  "dayName": "Summer Reaches \u2014 Recruit at the Gate",
   "scenarios": [
     {
       "scenarioId": "raid-02",
@@ -135,5 +135,6 @@
   "desertions": [],
   "tavernRefresh": [],
   "tavernExpired": [],
-  "lowMorale": false
+  "lowMorale": false,
+  "questsStirred": []
 }
