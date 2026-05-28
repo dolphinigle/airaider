@@ -87,3 +87,24 @@ describe('M12.2 watch-tower daily-event forecast', () => {
       .toEqual(watchTowerForecast(r2, EVENTS_PATH));
   });
 });
+
+describe('M11.8 captive escape-risk alert', () => {
+  const tags = loadTags(join('data', 'tags.json'));
+  const mercs = loadMercs(join('data', 'mercs.json'), tags);
+
+  it('flags captives with notoriety >= 3 with escape-risk percent', () => {
+    const r = newRoster([mercs.get('marek')!]);
+    r.captives.push({ id: 'a', name: 'Brand', archetype: 'thug', backstory: '', tags: [], notoriety: 3 });
+    r.captives.push({ id: 'b', name: 'Kael', archetype: 'thug', backstory: '', tags: [], notoriety: 5 });
+    const alerts = statusAlerts(r);
+    expect(alerts.some((a) => a.includes('Brand') && a.includes('30%'))).toBe(true);
+    expect(alerts.some((a) => a.includes('Kael') && a.includes('50%'))).toBe(true);
+  });
+
+  it('does not flag low-notoriety (≤2) captives', () => {
+    const r = newRoster([mercs.get('marek')!]);
+    r.captives.push({ id: 'a', name: 'Mild', archetype: 'thug', backstory: '', tags: [], notoriety: 2 });
+    const alerts = statusAlerts(r);
+    expect(alerts.some((a) => a.includes('escape risk'))).toBe(false);
+  });
+});

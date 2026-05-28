@@ -30,6 +30,14 @@ export function statusAlerts(r: Roster): string[] {
   if (daysToRefresh <= ALERT_HORIZON_DAYS && r.hirePool.length < HIRE_POOL_TARGET_SIZE) {
     out.push(`> Tavern refresh in ${daysToRefresh} day${daysToRefresh === 1 ? '' : 's'}`);
   }
+  // M11.8: warn when any held captive has a high escape risk
+  // (notoriety >= 3 ⇒ ≥30% chance per day in M11.7).
+  for (const c of r.captives) {
+    if (c.notoriety >= 3) {
+      const pct = Math.min(100, c.notoriety * 10);
+      out.push(`! Captive ${c.name} (notoriety ${c.notoriety}) escape risk ~${pct}%/day — process them soon`);
+    }
+  }
   return out;
 }
 
