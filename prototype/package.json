@@ -16,6 +16,7 @@
     "quests": "tsx src/cliQuests.ts",
     "fort": "tsx src/cliFort.ts",
     "tavern": "tsx src/cliTavern.ts",
+    "game": "tsx src/cliGame.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
