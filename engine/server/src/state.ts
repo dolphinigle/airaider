@@ -60,11 +60,13 @@ export function getRoster(): Roster {
   if (rosterExists(DEFAULT_SAVE_PATH)) {
     cachedRoster = loadRoster(DEFAULT_SAVE_PATH, mercPool, tagPool);
   } else {
-    // Fresh fort with no starter mercs — the GUI can recruit from tavern
-    // once the player builds one. Matches CLI cold-start behavior.
-    cachedRoster = newRoster([]);
-    // Give the player the cold-start gold.
-    cachedRoster.gold = 20;
+    // GUI cold-start: seed 2 starter mercs + 60g so the player can immediately
+    // build (scouting-post 6g + tavern 8g), pursue a lead, and recruit more
+    // from the bench. CLI starts leaner because it has interactive onboarding;
+    // the GUI loop benefits from a faster ramp.
+    const starterMercs: Merc[] = Array.from(mercPool.values()).slice(0, 2);
+    cachedRoster = newRoster(starterMercs);
+    cachedRoster.gold = 60;
     saveRoster();
   }
   return cachedRoster;

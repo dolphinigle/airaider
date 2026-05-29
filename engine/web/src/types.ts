@@ -122,4 +122,5 @@ export type Command =
   | { kind: 'place-captive'; captiveId: string; cellIdx: number | null }
   | { kind: 'captive-action'; captiveId: string; action: 'ransom' | 'sell' | 'display' | 'recruit' | 'execute' }
   | { kind: 'refresh-leads' }
-  | { kind: 'hire-merc'; mercId: string };
+  | { kind: 'hire-merc'; mercId: string }
+  | { kind: 'pursue-lead'; leadId: string; mercIds: string[] };

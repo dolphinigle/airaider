@@ -8,16 +8,20 @@ import { MercPanel } from './components/MercPanel';
 import { LogPanel } from './components/LogPanel';
 import { BuildModal } from './components/BuildModal';
 import { CaptiveActionModal } from './components/CaptiveActionModal';
+import { PursueModal } from './components/PursueModal';
 
 export function App() {
   const { data: state, isLoading, error } = useGameState();
   const dispatch = useDispatch();
   const [buildCell, setBuildCell] = useState<number | null>(null);
   const [captiveActionId, setCaptiveActionId] = useState<string | null>(null);
+  const [pursueLeadId, setPursueLeadId] = useState<string | null>(null);
 
   if (isLoading) return <div style={{ padding: 24 }}>loading…</div>;
   if (error) return <div style={{ padding: 24, color: 'var(--danger)' }}>error: {String(error)}</div>;
   if (!state) return null;
+
+  const pursuedLead = pursueLeadId ? state.leadBoard.find((l) => l.id === pursueLeadId) : null;
 
   return (
     <div style={{ display: 'grid', gridTemplateRows: 'auto 1fr', height: '100vh' }} data-testid="app-root">
@@ -33,7 +37,7 @@ export function App() {
           <LogPanel state={state} />
         </div>
         <div style={{ display: 'grid', gridTemplateRows: '1fr 1fr', gap: 12, overflow: 'hidden' }}>
-          <LeadBoard state={state} />
+          <LeadBoard state={state} onPursue={(leadId) => setPursueLeadId(leadId)} />
           <CaptivePanel state={state} onAction={(captiveId) => setCaptiveActionId(captiveId)} />
         </div>
         <MercPanel state={state} />
@@ -58,6 +62,17 @@ export function App() {
           onAction={(action) => {
             dispatch.mutate({ kind: 'captive-action', captiveId: captiveActionId, action });
             setCaptiveActionId(null);
+          }}
+        />
+      )}
+      {pursuedLead && (
+        <PursueModal
+          state={state}
+          lead={pursuedLead}
+          onClose={() => setPursueLeadId(null)}
+          onSend={(mercIds) => {
+            dispatch.mutate({ kind: 'pursue-lead', leadId: pursuedLead.id, mercIds });
+            setPursueLeadId(null);
           }}
         />
       )}

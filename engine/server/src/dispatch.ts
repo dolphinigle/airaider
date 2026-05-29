@@ -21,6 +21,7 @@ import { refreshLeadBoard, BASE_RARITY_WEIGHTS } from '../../../prototype/src/le
 import { computePrestige, prestigeTier, tiltRarityWeights } from '../../../prototype/src/prestige.js';
 import { refreshHirePool, hireFromPool } from '../../../prototype/src/tavern.js';
 import { rngFromString } from '../../../prototype/src/rng.js';
+import { appendFortLog } from '../../../prototype/src/roster.js';
 
 export const CommandSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('advance-day') }),
@@ -38,6 +39,11 @@ export const CommandSchema = z.discriminatedUnion('kind', [
   }),
   z.object({ kind: z.literal('refresh-leads') }),
   z.object({ kind: z.literal('hire-merc'), mercId: z.string() }),
+  z.object({
+    kind: z.literal('pursue-lead'),
+    leadId: z.string(),
+    mercIds: z.array(z.string()).min(1).max(4),
+  }),
 ]);
 export type Command = z.infer<typeof CommandSchema>;
 
@@ -168,6 +174,55 @@ export function dispatch(
       } catch (err: any) {
         return { ok: false, error: err?.message ?? String(err) };
       }
+    }
+    case 'pursue-lead': {
+      // Deterministic stub resolver (no LLM, no scenarios). Keeps the
+      // GUI playtest loop closed until full resolveDay hookup lands.
+      const leadIdx = roster.leadBoard.findIndex((l) => l.id === cmd.leadId);
+      if (leadIdx < 0) return { ok: false, error: `lead ${cmd.leadId} not on the board` };
+      const lead = roster.leadBoard[leadIdx]!;
+      if (roster.gold < lead.pursueCost) {
+        return { ok: false, error: `not enough gold (need ${lead.pursueCost}g, have ${roster.gold}g)` };
+      }
+      const party = cmd.mercIds.map((id) => roster.mercs.find((m) => m.id === id)).filter(Boolean) as typeof roster.mercs;
+      if (party.length !== cmd.mercIds.length) {
+        return { ok: false, error: 'one or more mercs not in roster' };
+      }
+      const rng = rngFromString(`gui-pursue-${lead.id}-day${roster.dayCount}`);
+      // Score = sum of best attr per merc + party size bonus.
+      let partyScore = 0;
+      for (const m of party) {
+        const best = Math.max(...Object.values(m.attrs));
+        partyScore += best;
+      }
+      partyScore += party.length; // small synergy
+      // Roll 2d6 + partyScore vs DC*2.
+      const roll = Math.floor(rng() * 6) + 1 + Math.floor(rng() * 6) + 1;
+      const total = roll + partyScore;
+      const target = lead.dc * 2;
+      const success = total >= target;
+      roster.gold -= lead.pursueCost;
+      // Fatigue tick on every participant.
+      for (const m of party) {
+        const st = roster.states.get(m.id);
+        if (st) st.fatigue += 1;
+      }
+      if (success) {
+        roster.gold += lead.rewardGold;
+        if (lead.rarity === 'legendary') roster.legendaryLeadsCompleted += 1;
+      }
+      // Remove the lead from the board regardless of outcome.
+      roster.leadBoard.splice(leadIdx, 1);
+      const outcome = success ? `SUCCESS (+${lead.rewardGold}g)` : `FAIL (lost ${lead.pursueCost}g)`;
+      appendFortLog(roster, {
+        day: roster.dayCount,
+        kind: 'note',
+        message: `pursued [${lead.rarity}] ${lead.archetype} with ${party.length} merc(s): ${outcome} (roll ${roll}+${partyScore}=${total} vs ${target})`,
+      });
+      return {
+        ok: true,
+        message: `${outcome} — roll ${roll}+${partyScore}=${total} vs DC*2=${target}`,
+      };
     }
   }
 }
