@@ -47,5 +47,27 @@
       "goldDelta": 40,
       "reputationGain": "feared"
     }
+  },
+  {
+    "id": "vengeance-for-the-fallen",
+    "name": "Vengeance for the Fallen",
+    "seededByBondGrief": true,
+    "summary": "A bonded comrade fell. The survivors are not going to let the road that killed them stay open. The fort owes its dead a reckoning.",
+    "stages": [
+      {
+        "id": "stage-0-trail",
+        "scenarioId": "raid-12-bounty-tracker",
+        "summary": "Pick up the killers' trail before the rain takes it."
+      },
+      {
+        "id": "stage-1-reckoning",
+        "scenarioId": "raid-13-bounty-captain",
+        "summary": "Settle the debt. Make sure the name spreads."
+      }
+    ],
+    "rewardOnComplete": {
+      "goldDelta": 30,
+      "reputationGain": "feared"
+    }
   }
 ]
