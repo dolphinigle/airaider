@@ -258,3 +258,63 @@ export function totalCapacity(
   }
   return n;
 }
+
+/**
+ * PROTO-GAME v14: list dungeon cells with remaining capacity for captives.
+ * Returns an array of cellIdx values, ordered by cell idx ascending, that
+ * have a dungeon-category room AND fewer captives than the room's capacity.
+ *
+ * `captives` is the list of currently-held captives (each with optional cellIdx).
+ */
+export function dungeonCellsWithSpace(
+  fort: FortState,
+  catalog: Map<string, RoomDef>,
+  captives: Array<{ cellIdx?: number }>,
+): number[] {
+  const out: number[] = [];
+  const heldByCell = new Map<number, number>();
+  for (const c of captives) {
+    if (c.cellIdx === undefined) continue;
+    heldByCell.set(c.cellIdx, (heldByCell.get(c.cellIdx) ?? 0) + 1);
+  }
+  for (const p of fort.placedRooms) {
+    const def = catalog.get(p.roomId);
+    if (!def || def.category !== 'dungeon' || def.capacity == null) continue;
+    const used = heldByCell.get(p.cellIdx) ?? 0;
+    if (used < def.capacity) out.push(p.cellIdx);
+  }
+  return out.sort((a, b) => a - b);
+}
+
+/**
+ * PROTO-GAME v14: classify a captive's holding situation by looking at the
+ * room in its cell and what's adjacent. Drives recruit bonuses, interrogate
+ * unlock, etc.
+ */
+export function captiveCellEffects(
+  fort: FortState,
+  catalog: Map<string, RoomDef>,
+  cellIdx: number | undefined,
+): { roomName: string | null; adjacentRoomIds: string[]; chapelAdjacent: boolean; smithyAdjacent: boolean } {
+  if (cellIdx === undefined) {
+    return { roomName: null, adjacentRoomIds: [], chapelAdjacent: false, smithyAdjacent: false };
+  }
+  const placedByCell = new Map<number, string>();
+  for (const p of fort.placedRooms) placedByCell.set(p.cellIdx, p.roomId);
+  const cells = fort.cells.map((c) => c.idx);
+  const totalSpan = (Math.max(...cells, 0)) + 1;
+  const roomId = placedByCell.get(cellIdx);
+  const def = roomId ? catalog.get(roomId) : undefined;
+  const roomName = def?.name ?? null;
+  const adjacentRoomIds: string[] = [];
+  for (const n of adjacentIndices(cellIdx, totalSpan)) {
+    const rid = placedByCell.get(n);
+    if (rid) adjacentRoomIds.push(rid);
+  }
+  return {
+    roomName,
+    adjacentRoomIds,
+    chapelAdjacent: adjacentRoomIds.includes('chapel'),
+    smithyAdjacent: adjacentRoomIds.includes('smithy'),
+  };
+}

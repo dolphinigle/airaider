@@ -12,6 +12,8 @@ import {
   adjacencyEffectIds,
   roomUpgradeIds,
   effectiveUpgradeIds,
+  dungeonCellsWithSpace,
+  captiveCellEffects,
 } from '../src/fortLayout.js';
 import type { FortState } from '../src/fort.js';
 
@@ -306,5 +308,55 @@ describe('roomUpgradeIds + effectiveUpgradeIds (PROTO-GAME v13.1)', () => {
     expect(merged.has('winter-larder')).toBe(true);
     expect(merged.has('smithy')).toBe(true);
     expect(merged.has('adj-smithy-workshop')).toBe(true);
+  });
+});
+
+describe('captive spatial helpers (PROTO-GAME v14)', () => {
+  it('dungeonCellsWithSpace returns dungeon cells with free capacity, sorted', () => {
+    const fort: FortState = {
+      level: 1,
+      upgrades: [],
+      cells: [
+        { idx: 0, openedOnDay: 0 },
+        { idx: 1, openedOnDay: 0 },
+        { idx: 2, openedOnDay: 0 },
+      ],
+      placedRooms: [
+        { roomId: 'bunkroom', cellIdx: 0, builtOnDay: 0 },
+        { roomId: 'storeroom', cellIdx: 1, builtOnDay: 0 },
+        { roomId: 'extra-storeroom', cellIdx: 2, builtOnDay: 0 },
+      ],
+    };
+    expect(dungeonCellsWithSpace(fort, catalog, [])).toEqual([1, 2]);
+    // Fill cell 1 (storeroom capacity 1).
+    const captives = [{ cellIdx: 1 }];
+    expect(dungeonCellsWithSpace(fort, catalog, captives)).toEqual([2]);
+  });
+
+  it('captiveCellEffects detects chapel/smithy adjacency', () => {
+    const fort: FortState = {
+      level: 1,
+      upgrades: [],
+      cells: [
+        { idx: 0, openedOnDay: 0 },
+        { idx: 1, openedOnDay: 0 },
+        { idx: 2, openedOnDay: 0 },
+      ],
+      placedRooms: [
+        { roomId: 'chapel', cellIdx: 0, builtOnDay: 1 },
+        { roomId: 'storeroom', cellIdx: 1, builtOnDay: 1 },
+        { roomId: 'smithy', cellIdx: 2, builtOnDay: 1 },
+      ],
+    };
+    const eff = captiveCellEffects(fort, catalog, 1);
+    expect(eff.roomName).toBe('Storeroom');
+    expect(eff.chapelAdjacent).toBe(true);
+    expect(eff.smithyAdjacent).toBe(true);
+  });
+
+  it('captiveCellEffects returns nothing when cell undefined', () => {
+    const eff = captiveCellEffects(starterFort(), catalog, undefined);
+    expect(eff.roomName).toBeNull();
+    expect(eff.chapelAdjacent).toBe(false);
   });
 });

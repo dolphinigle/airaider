@@ -54,6 +54,11 @@ const CaptiveSchema = z.object({
   backstory: z.string(),
   notoriety: z.number().int().min(1).max(5),
   tagIds: z.array(z.string()),
+  /** PROTO-GAME v14: spatial assignment to a specific dungeon cell. Optional —
+   *  fresh captures default to unassigned; the player assigns from the captives
+   *  menu. Adjacency effects (chapel→recruit, smithy→interrogate) only fire
+   *  when assigned. */
+  cellIdx: z.number().int().min(0).optional(),
 });
 
 /** M10.1: persisted form of a tavern hire-pool entry. v10+. M10.4: optional veteran starter (v11+). */
@@ -171,6 +176,12 @@ const RoasterSchema = z.object({
   })).default([]),
   /** PROTO-GAME v12: lead board — currently available opportunities. */
   leadBoard: z.array(LeadSchema).default([]),
+  /** PROTO-GAME v14: tally of captives executed via 'display' (heads on
+   *  pikes). Feeds the prestige score. Optional, backfills to 0 on load. */
+  displayedCount: z.number().int().min(0).default(0),
+  /** PROTO-GAME v14: tally of legendary leads resolved favorably. Feeds the
+   *  prestige score with the highest weight. Optional, backfills to 0. */
+  legendaryLeadsCompleted: z.number().int().min(0).default(0),
 });
 
 export type RosterMercState = z.infer<typeof MercStateSchema>;
@@ -216,6 +227,10 @@ export interface Roster {
   abandonedQuests: Array<{ questId: string; cooldownUntilDay: number }>;
   /** PROTO-GAME v12: lead board snapshot. */
   leadBoard: Lead[];
+  /** PROTO-GAME v14: tally of captives executed via 'display'. */
+  displayedCount: number;
+  /** PROTO-GAME v14: tally of legendary leads resolved favorably. */
+  legendaryLeadsCompleted: number;
 }
 
 /**
@@ -264,6 +279,8 @@ export function newRoster(initialMercs: Merc[]): Roster {
     hirePool: [],
     abandonedQuests: [],
     leadBoard: [],
+    displayedCount: 0,
+    legendaryLeadsCompleted: 0,
   };
 }
 
@@ -370,6 +387,8 @@ export function loadRoster(
     })),
     abandonedQuests: parsed.abandonedQuests,
     leadBoard: parsed.leadBoard,
+    displayedCount: parsed.displayedCount,
+    legendaryLeadsCompleted: parsed.legendaryLeadsCompleted,
   };
 }
 
@@ -436,6 +455,8 @@ export function saveRoster(
     })),
     abandonedQuests: roster.abandonedQuests,
     leadBoard: roster.leadBoard,
+    displayedCount: roster.displayedCount,
+    legendaryLeadsCompleted: roster.legendaryLeadsCompleted,
   };
   // M17.1: defensive backup. If a roster file already exists at this path,
   // copy it to `<path>.bak` before overwriting so a corrupted save (or an
@@ -459,6 +480,10 @@ export function applyCaptiveEffect(
 ): void {
   roster.gold += effect.goldDelta;
   roster.reputation[effect.reputationGain] = (roster.reputation[effect.reputationGain] ?? 0) + 1;
+  // PROTO-GAME v14: track displays for the prestige meter.
+  if (effect.action === 'display' && effect.captiveRemoved) {
+    roster.displayedCount += 1;
+  }
   if (effect.captiveRemoved) {
     roster.captives = roster.captives.filter((c) => c.id !== captive.id);
   }

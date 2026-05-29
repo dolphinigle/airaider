@@ -163,3 +163,40 @@ describe('M11.6 recruit carries bg:former-captive tag', () => {
     expect(ids).toContain('bg:former-captive');
   });
 });
+
+describe('captive adjacency context (PROTO-GAME v14)', () => {
+  const KAEL2: Captive = {
+    id: 'k', name: 'Kael', archetype: 'deserter', backstory: '', notoriety: 3, tags: [],
+  };
+
+  it('chapel-adjacent recruit posts at 0g bench price', () => {
+    const e = effectOf(KAEL2, 'recruit', {
+      fortLevel: 1,
+      chapelAdjacent: true,
+      formerCaptiveTag: { id: 'bg:former-captive', category: 'background', rarity: 'common', tier: 5, label: 'Former Captive' },
+    });
+    expect(e.blocked).toBeUndefined();
+    expect(e.benchPrice).toBe(0);
+  });
+
+  it('chapel-adjacent recruit bypasses fort-level gate', () => {
+    const e = effectOf(KAEL2, 'recruit', {
+      fortLevel: 1,
+      chapelAdjacent: true,
+      formerCaptiveTag: { id: 'bg:former-captive', category: 'background', rarity: 'common', tier: 5, label: 'Former Captive' },
+    });
+    expect(e.blocked).toBeUndefined();
+    expect(e.recruitedAs).toBeDefined();
+  });
+
+  it('non-chapel recruit at low fort level still blocks', () => {
+    const e = effectOf(KAEL2, 'recruit', { fortLevel: 1 });
+    expect(e.blocked).toBeDefined();
+  });
+
+  it('smithy-adjacent ransom gains +5g', () => {
+    const base = effectOf(KAEL2, 'ransom', {});
+    const adj = effectOf(KAEL2, 'ransom', { smithyAdjacent: true });
+    expect(adj.goldDelta).toBe(base.goldDelta + 5);
+  });
+});

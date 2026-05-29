@@ -598,13 +598,18 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     const escapeRng = rngFromString(`captive-escape-${roster.dayCount}`);
     const survivors: typeof roster.captives = [];
     for (const c of roster.captives) {
-      const chance = Math.min(1, Math.max(0, c.notoriety * 0.1));
+      // PROTO-GAME v14: spatial-fort modifier. Unassigned captives (held in
+      // an overflow corner) are easier to slip free; assigned captives sit
+      // in proper dungeon cells with bolts and bars.
+      const baseChance = Math.min(1, Math.max(0, c.notoriety * 0.1));
+      const chance = c.cellIdx === undefined ? Math.min(1, baseChance + 0.15) : baseChance;
       if (escapeRng() < chance) {
         captiveEscapes.push({ captiveId: c.id, captiveName: c.name, notoriety: c.notoriety });
+        const where = c.cellIdx === undefined ? ' from the overflow corner' : '';
         const entry: FortLogEntry = {
           day: roster.dayCount + 1,
           kind: 'note',
-          message: `Captive escaped: ${c.name} (notoriety ${c.notoriety}) slipped the guards`,
+          message: `Captive escaped: ${c.name} (notoriety ${c.notoriety}) slipped the guards${where}`,
         };
         appendFortLog(roster, entry);
         newFortLogEntries.push(entry);

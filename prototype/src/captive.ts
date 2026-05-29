@@ -24,6 +24,10 @@ export interface Captive {
   tags: Tag[];
   /** A simple 1..5 "how feared / valuable" indicator. */
   notoriety: number;
+  /** PROTO-GAME v14: which dungeon-category cell the captive is held in.
+   *  Optional — fresh captures arrive unassigned; player assigns from the
+   *  captives menu. Adjacency effects depend on this. */
+  cellIdx?: number;
 }
 
 /** Engine-side effects of a disposition — concrete, no narration. */
@@ -74,6 +78,15 @@ export interface EffectContext {
    *  the recruit's tag list so the captive's backstory carries into
    *  future scenarios as the `bg:former-captive` (or similar) tag. */
   formerCaptiveTag?: Tag;
+  /** PROTO-GAME v14: when true (captive cell is adjacent to a chapel), the
+   *  recruit disposition posts the captive at a free bench price (0g) and
+   *  bypasses the fort-level gate. Models a "converted by the chapel"
+   *  narrative. */
+  chapelAdjacent?: boolean;
+  /** PROTO-GAME v14: when true (captive cell is adjacent to a smithy), the
+   *  ransom disposition is enriched (+5g flat) — the smith forges chains
+   *  ornate enough to extract a higher ransom from the family. */
+  smithyAdjacent?: boolean;
 }
 
 export function effectOf(
@@ -86,7 +99,8 @@ export function effectOf(
     case 'ransom':
       return {
         action,
-        goldDelta: 10 + notor * 5,
+        // PROTO-GAME v14: smithy-adjacent captive ransoms for +5g (ornate chains).
+        goldDelta: 10 + notor * 5 + (ctx.smithyAdjacent ? 5 : 0),
         reputationGain: 'mercenary',
         captiveRemoved: true,
       };
@@ -105,14 +119,16 @@ export function effectOf(
         captiveRemoved: true,
       };
     case 'recruit':
-      if (ctx.fortLevel !== undefined && ctx.fortLevel < RECRUIT_MIN_FORT_LEVEL) {
+      // PROTO-GAME v14: chapel-adjacent captives are "converted" — they
+      // bypass the fort-level gate AND post to the bench for free.
+      if (!ctx.chapelAdjacent && ctx.fortLevel !== undefined && ctx.fortLevel < RECRUIT_MIN_FORT_LEVEL) {
         return {
           action,
           goldDelta: 0,
           reputationGain: 'mercenary',
           captiveRemoved: false,
           blocked: {
-            reason: `fort level ${ctx.fortLevel} below required ${RECRUIT_MIN_FORT_LEVEL} for recruit`,
+            reason: `fort level ${ctx.fortLevel} below required ${RECRUIT_MIN_FORT_LEVEL} for recruit (build a Chapel adjacent to bypass)`,
           },
         };
       }
@@ -122,7 +138,7 @@ export function effectOf(
         reputationGain: 'mercenary',
         captiveRemoved: false,
         recruitedAs: captiveToMerc(captive, ctx.formerCaptiveTag),
-        benchPrice: captiveBenchPrice(captive.notoriety),
+        benchPrice: ctx.chapelAdjacent ? 0 : captiveBenchPrice(captive.notoriety),
       };
     case 'execute':
       return {

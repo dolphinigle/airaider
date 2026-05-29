@@ -65,15 +65,20 @@ export const LeadSchema = z.object({
 });
 export type Lead = z.infer<typeof LeadSchema>;
 
-function rollRarity(rng: () => number): LeadRarity {
-  const r = rng() * 100;
+function rollRarity(rng: () => number, weights?: Record<LeadRarity, number>): LeadRarity {
+  const w = weights ?? RARITY_WEIGHTS;
+  const total = LEAD_RARITIES.reduce((s, k) => s + w[k], 0);
+  const r = rng() * total;
   let acc = 0;
   for (const rarity of LEAD_RARITIES) {
-    acc += RARITY_WEIGHTS[rarity];
+    acc += w[rarity];
     if (r < acc) return rarity;
   }
   return 'common';
 }
+
+/** Exported view of the base rarity weights — used by prestige tilting. */
+export const BASE_RARITY_WEIGHTS: Readonly<Record<LeadRarity, number>> = RARITY_WEIGHTS;
 
 const BLURBS: Record<LeadArchetype, string[]> = {
   raid: [
@@ -107,9 +112,11 @@ const BLURBS: Record<LeadArchetype, string[]> = {
 export function generateLead(opts: {
   seed: string;
   postedDay: number;
+  /** PROTO-GAME v14: optional rarity weight override (e.g. prestige tilt). */
+  rarityWeights?: Record<LeadRarity, number>;
 }): Lead {
   const rng = rngFromString(opts.seed);
-  const rarity = rollRarity(rng);
+  const rarity = rollRarity(rng, opts.rarityWeights);
   const archetype = pickFrom(rng, ARCHETYPES as readonly LeadArchetype[]);
   const region = pickFrom(rng, REGIONS);
   // DC scales with rarity: common 1-2, uncommon 2-3, rare 3-4, legendary 4-5.
@@ -136,6 +143,8 @@ export function refreshLeadBoard(opts: {
   board: Lead[];
   dayCount: number;
   target?: number;
+  /** PROTO-GAME v14: prestige-tilted rarity weights for new spawns. */
+  rarityWeights?: Record<LeadRarity, number>;
 }): { kept: Lead[]; added: Lead[]; expired: Lead[] } {
   const target = opts.target ?? TARGET_LEAD_COUNT;
   const kept: Lead[] = [];
@@ -150,6 +159,7 @@ export function refreshLeadBoard(opts: {
     added.push(generateLead({
       seed: `lead-board-d${opts.dayCount}-slot${kept.length + i}`,
       postedDay: opts.dayCount,
+      ...(opts.rarityWeights ? { rarityWeights: opts.rarityWeights } : {}),
     }));
     i += 1;
   }

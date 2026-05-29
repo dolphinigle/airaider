@@ -31,7 +31,7 @@ import { OpenAIScenarioLLM } from './llm/openai.js';
 import type { ScenarioLLM } from './llm/interface.js';
 import { loadFortCatalog, affordableUpgrades, purchaseUpgrade } from './fort.js';
 import { loadRoomCatalog, type RoomDef } from './rooms.js';
-import { renderFortLayout, buildRoom, excavateCell, activeGates, totalCapacity } from './fortLayout.js';
+import { renderFortLayout, buildRoom, excavateCell, activeGates, totalCapacity, dungeonCellsWithSpace, captiveCellEffects } from './fortLayout.js';
 import { loadQuests, abandonQuest, type Quest } from './quests.js';
 import { hireFromPool } from './tavern.js';
 import { effectOf, FORMER_CAPTIVE_TAG_ID, type CaptiveAction, CAPTIVE_ACTIONS } from './captive.js';
@@ -40,7 +40,8 @@ import { statusAlerts, watchTowerForecast } from './rosterAlerts.js';
 import { reputationTier } from './reputation.js';
 import { seasonFor } from './season.js';
 import { bondedPairsOf } from './bonds.js';
-import { refreshLeadBoard, pursueLead, PURSUE_COST_BY_RARITY, type Lead } from './leads.js';
+import { refreshLeadBoard, pursueLead, PURSUE_COST_BY_RARITY, BASE_RARITY_WEIGHTS, type Lead } from './leads.js';
+import { computePrestige, prestigeTier, prestigeTierLabel, tiltRarityWeights } from './prestige.js';
 import { templateFor } from './scenarioTemplates.js';
 import { formatTags, formatPreferredTags } from './tagFormat.js';
 import { rollCaptiveTags } from './captiveTags.js';
@@ -164,7 +165,7 @@ async function main(): Promise<void> {
         case 'f': case 'F': await cmdFort(rl, roster, fortCatalog, roomCatalog, mercPool, args.savePath); break;
         case 'q': case 'Q_'/*placeholder*/: await cmdQuests(rl, roster, questCatalog, mercPool, args.savePath); break;
         case 't': case 'T': await cmdTavern(rl, roster, roomCatalog, mercPool, args.savePath); break;
-        case 'c': case 'C': await cmdCaptives(rl, roster, tagPool, mercPool, args.savePath); break;
+        case 'c': case 'C': await cmdCaptives(rl, roster, tagPool, mercPool, roomCatalog, args.savePath); break;
         case 's': case 'S': saveRoster(args.savePath, roster, mercPool); console.log('Saved.'); break;
         case 'Q': running = false; break;
         default: console.log(`Unknown command "${cmd}" — type "h" for help.`);
@@ -187,10 +188,17 @@ function printStatus(r: Roster): void {
   const roomCount = r.fort.placedRooms.length;
   const cellCount = r.fort.cells.length;
   const upgrades = r.fort.upgrades.length > 0 ? r.fort.upgrades.join(',') : '—';
+  const prestige = computePrestige({
+    displayedCount: r.displayedCount,
+    legendaryLeadsCompleted: r.legendaryLeadsCompleted,
+    fortLevel: r.fort.level,
+  });
+  const tier = prestigeTier(prestige);
   console.log('');
   console.log('---------------------------------------------------------------');
   console.log(` Day ${r.dayCount}  |  season:${sc.season}(d${sc.dayOfSeason}/30)  |  gold:${r.gold}g`);
   console.log(` fort L${r.fort.level}  rooms:${roomCount}/${cellCount} cells  upgrades:[${upgrades}]   mercs:${r.mercs.length}  captives:${r.captives.length}  bench:${r.hirePool.length}`);
+  console.log(` prestige: ${prestige}  (${prestigeTierLabel(tier)})   heads-on-pikes:${r.displayedCount}   legendary-kills:${r.legendaryLeadsCompleted}`);
   if (repParts.length > 0) console.log(` reputation: ${repParts.join('  ')}`);
   const alerts = statusAlerts(r);
   for (const a of alerts) console.log(` ${a}`);
@@ -350,7 +358,15 @@ async function cmdAdvanceDay(
   }
 
   // PROTO-GAME: refresh the lead board first so today's options are visible.
-  const refresh = refreshLeadBoard({ board: r.leadBoard, dayCount: r.dayCount });
+  // PROTO-GAME v14: tilt rarity weights by current prestige tier — high-
+  // prestige forts attract richer leads.
+  const prestigeNow = computePrestige({
+    displayedCount: r.displayedCount,
+    legendaryLeadsCompleted: r.legendaryLeadsCompleted,
+    fortLevel: r.fort.level,
+  });
+  const tiltedWeights = tiltRarityWeights({ ...BASE_RARITY_WEIGHTS }, prestigeTier(prestigeNow));
+  const refresh = refreshLeadBoard({ board: r.leadBoard, dayCount: r.dayCount, rarityWeights: tiltedWeights });
   r.leadBoard = [...refresh.kept, ...refresh.added];
   if (refresh.expired.length > 0) {
     console.log(`\n${refresh.expired.length} lead(s) expired overnight: ${refresh.expired.map((l) => l.id).join(', ')}`);
@@ -438,6 +454,7 @@ async function cmdAdvanceDay(
   await runPlayerDay(rl, r, mercPool, llm, day, dayPath, savePath, [pursued.scenario], tagPool, roomCatalog, {
     rewardGold: lead.rewardGold,
     captiveFromLead: lead.archetype === 'captive' ? lead : undefined,
+    leadForOutcome: lead,
   });
 }
 
@@ -453,7 +470,7 @@ async function runPlayerDay(
   preloadedScenarios: any[] | null,
   tagPool: Map<string, any>,
   roomCatalog: Map<string, RoomDef>,
-  opts: { rewardGold?: number; captiveFromLead?: Lead } = {},
+  opts: { rewardGold?: number; captiveFromLead?: Lead; leadForOutcome?: Lead } = {},
 ): Promise<void> {
   const { loadScenario } = await import('./scenarios.js');
   const mercsForDay = new Map(r.mercs.map((m) => [m.id, m]));
@@ -537,6 +554,14 @@ async function runPlayerDay(
       console.log(`\nREWARD: 0g (band: ${band})  gold ${r.gold}g`);
     }
 
+    // PROTO-GAME v14: tally legendary kills for prestige. Only counts on
+    // favorable+ resolution of a legendary lead.
+    if (opts.leadForOutcome && opts.leadForOutcome.rarity === 'legendary'
+        && (band === 'favorable' || band === 'catastrophic-favorable')) {
+      r.legendaryLeadsCompleted += 1;
+      console.log(`  ✨ LEGENDARY DEED RECORDED. Fort prestige climbs. Total legendary kills: ${r.legendaryLeadsCompleted}.`);
+    }
+
     // PROTO-GAME: captive lead success grants a new captive to the roster
     // on favorable+ bands. The captive carries notoriety scaled with the
     // lead's DC so disposition choices (ransom/sell/recruit/...) matter.
@@ -551,6 +576,11 @@ async function runPlayerDay(
         const captiveId = `captive-${lead.id}`;
         const notoriety = Math.max(1, lead.dc);
         const rolledTags = rollCaptiveTags(tagPool, lead.rarity, lead.id);
+        // PROTO-GAME v14: auto-assign to first available dungeon cell so the
+        // spatial system has visible state from day one. Player can `move`
+        // from the captives menu.
+        const freeCells = dungeonCellsWithSpace(r.fort, roomCatalog, r.captives);
+        const assignedCell = freeCells[0];
         r.captives.push({
           id: captiveId,
           name: `Captive of ${lead.region}`,
@@ -558,9 +588,13 @@ async function runPlayerDay(
           backstory: lead.blurb,
           notoriety,
           tags: rolledTags,
+          cellIdx: assignedCell,
         });
-        console.log(`\nCAPTIVE TAKEN: "${captiveId}" added to your hold (notoriety ${notoriety}, ${r.captives.length}/${cap} cells).${formatTags(rolledTags)}`);
-        console.log(`  Use [c] to choose disposition.`);
+        const cellNote = assignedCell !== undefined
+          ? `held in cell ${assignedCell}`
+          : `held in overflow corner (+escape risk — assign to a cell with [c])`;
+        console.log(`\nCAPTIVE TAKEN: "${captiveId}" added to your hold (notoriety ${notoriety}, ${r.captives.length}/${cap} cells, ${cellNote}).${formatTags(rolledTags)}`);
+        console.log(`  Use [c] to choose disposition or move.`);
       }
     }
   }
@@ -831,25 +865,75 @@ async function cmdCaptives(
   r: Roster,
   tagPool: Map<string, any>,
   mercPool: Map<string, any>,
+  roomCatalog: Map<string, RoomDef>,
   savePath: string,
 ): Promise<void> {
   if (r.captives.length === 0) {
     console.log('\n(no captives held)');
     return;
   }
-  const cap = await pickFromList(rl, 'which captive?', r.captives, (c) => `${c.name}  ${c.archetype}  notoriety:${c.notoriety}${formatTags(c.tags)}`);
+  const cap = await pickFromList(rl, 'which captive?', r.captives, (c) => {
+    const eff = captiveCellEffects(r.fort, roomCatalog, c.cellIdx);
+    const cellLabel = c.cellIdx === undefined
+      ? 'OVERFLOW CORNER (+escape risk)'
+      : `cell ${c.cellIdx} (${eff.roomName ?? '?'})`;
+    const adjLabels: string[] = [];
+    if (eff.chapelAdjacent) adjLabels.push('chapel-adj → free recruit');
+    if (eff.smithyAdjacent) adjLabels.push('smithy-adj → +5g ransom');
+    const adj = adjLabels.length > 0 ? `  [${adjLabels.join(', ')}]` : '';
+    return `${c.name}  ${c.archetype}  notoriety:${c.notoriety}  ${cellLabel}${adj}${formatTags(c.tags)}`;
+  });
   if (!cap) return;
-  console.log(`\nCaptive ${cap.name} — choose disposition:`);
-  const action = await pickFromList(rl, 'action', CAPTIVE_ACTIONS as readonly CaptiveAction[] as CaptiveAction[], (a) => a);
-  if (!action) return;
+  const currentEff = captiveCellEffects(r.fort, roomCatalog, cap.cellIdx);
+  console.log(`\nCaptive ${cap.name} — held in ${cap.cellIdx === undefined ? 'OVERFLOW CORNER' : `cell ${cap.cellIdx} (${currentEff.roomName ?? '?'})`}`);
+  if (currentEff.chapelAdjacent) console.log('  ⛪ chapel adjacent — recruit will be free + bypasses fort level');
+  if (currentEff.smithyAdjacent) console.log('  ⚒  smithy adjacent — ransom gains +5g');
+
+  // PROTO-GAME v14: 'move' is a CLI-only meta-action alongside the
+  // engine dispositions. Don't add it to CAPTIVE_ACTIONS (which feeds
+  // schemas / saves); offer it as a separate menu option.
+  const MENU = ['move', ...CAPTIVE_ACTIONS] as const;
+  const choice = await pickFromList(rl, 'action', [...MENU], (a) => a);
+  if (!choice) return;
+
+  if (choice === 'move') {
+    const free = dungeonCellsWithSpace(r.fort, roomCatalog, r.captives.filter((c) => c.id !== cap.id));
+    if (free.length === 0) {
+      console.log('  No dungeon cells with capacity. Build another Storeroom first.');
+      return;
+    }
+    const target = await pickFromList(rl, 'move to which cell?', free, (idx) => {
+      const eff = captiveCellEffects(r.fort, roomCatalog, idx);
+      const adj: string[] = [];
+      if (eff.chapelAdjacent) adj.push('chapel-adj');
+      if (eff.smithyAdjacent) adj.push('smithy-adj');
+      return `cell ${idx} (${eff.roomName ?? '?'})${adj.length ? '  [' + adj.join(', ') + ']' : ''}`;
+    });
+    if (target === undefined) return;
+    cap.cellIdx = target;
+    console.log(`✓ moved ${cap.name} to cell ${target}`);
+    saveRoster(savePath, r, mercPool);
+    return;
+  }
+
+  const action = choice as CaptiveAction;
+  console.log(`\nCaptive ${cap.name} — disposition: ${action}`);
   const formerCaptiveTag = tagPool.get(FORMER_CAPTIVE_TAG_ID);
-  const eff = effectOf(cap, action, { fortLevel: r.fort.level, ...(formerCaptiveTag ? { formerCaptiveTag } : {}) });
+  const eff = effectOf(cap, action, {
+    fortLevel: r.fort.level,
+    chapelAdjacent: currentEff.chapelAdjacent,
+    smithyAdjacent: currentEff.smithyAdjacent,
+    ...(formerCaptiveTag ? { formerCaptiveTag } : {}),
+  });
   if (eff.blocked) {
     console.log(`✗ Blocked: ${eff.blocked.reason}`);
     return;
   }
   applyCaptiveEffect(r, cap, eff);
   console.log(`✓ ${action}: gold ${eff.goldDelta >= 0 ? '+' : ''}${eff.goldDelta}g, rep ${eff.reputationGain} +1`);
+  if (eff.benchPrice !== undefined) {
+    console.log(`  posted to tavern bench at ${eff.benchPrice}g${eff.benchPrice === 0 ? ' (chapel-converted — free)' : ''}`);
+  }
   saveRoster(savePath, r, mercPool);
 }
 
