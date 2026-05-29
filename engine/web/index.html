@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>airaider — fort</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0e0d0b;
+        --panel: #1a1815;
+        --panel-2: #232020;
+        --border: #3a342f;
+        --text: #d9d3c7;
+        --muted: #8c8479;
+        --accent: #c79b5c;
+        --legendary: #f5c463;
+        --rare: #b3d0ff;
+        --uncommon: #b6e3a3;
+        --common: #a9a39a;
+        --danger: #e07a5f;
+        --good: #7ec27e;
+      }
+      html, body, #root { height: 100%; margin: 0; }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+        font-size: 14px;
+        line-height: 1.4;
+      }
+      * { box-sizing: border-box; }
+      button {
+        background: var(--panel-2);
+        color: var(--text);
+        border: 1px solid var(--border);
+        padding: 6px 12px;
+        cursor: pointer;
+        border-radius: 3px;
+        font: inherit;
+      }
+      button:hover:not(:disabled) { background: var(--accent); color: #1a1815; }
+      button:disabled { opacity: 0.4; cursor: not-allowed; }
+      pre { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; margin: 0; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

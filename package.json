@@ -1,0 +1,20 @@
+{
+  "name": "airaider-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "workspaces": [
+    "prototype",
+    "engine/server",
+    "engine/web"
+  ],
+  "scripts": {
+    "gui": "concurrently -k -n server,web -c blue,magenta \"npm -w airaider-server run dev\" \"npm -w airaider-web run dev\"",
+    "gui:server": "npm -w airaider-server run dev",
+    "gui:web": "npm -w airaider-web run dev",
+    "test:engine": "npm -w airaider-server run test && npm -w airaider-web run test",
+    "test:prototype": "npm -w airaider-prototype test"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
