@@ -13,9 +13,9 @@
 // advance-day, fort purchase, tavern hire, captive disposition.
 
 import { createInterface } from 'node:readline/promises';
-import { existsSync, mkdirSync, readdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { join, resolve, dirname, basename } from 'node:path';
-import { homedir } from 'node:os';
+import { homedir, tmpdir } from 'node:os';
 import { config as loadDotenv } from 'dotenv';
 
 import { loadTags } from './tags.js';
@@ -38,6 +38,7 @@ import { statusAlerts, watchTowerForecast } from './rosterAlerts.js';
 import { reputationTier } from './reputation.js';
 import { seasonFor } from './season.js';
 import { bondedPairsOf } from './bonds.js';
+import { refreshLeadBoard, pursueLead, PURSUE_COST_BY_RARITY, type Lead } from './leads.js';
 
 // ---------- paths & args ----------
 
@@ -149,6 +150,7 @@ async function main(): Promise<void> {
       switch (cmd) {
         case 'h': case 'H': case '?': printHelp(); break;
         case 'r': case 'R': cmdRosterShow(roster); break;
+        case 'l': case 'L': cmdLeads(roster); break;
         case 'd': case 'D': await cmdAdvanceDay(rl, roster, mercPool, llm, dayFixtures, args.savePath, tagPool); break;
         case 'f': case 'F': await cmdFort(rl, roster, fortCatalog, mercPool, args.savePath); break;
         case 'q': case 'Q_'/*placeholder*/: await cmdQuests(rl, roster, questCatalog, mercPool, args.savePath); break;
@@ -185,16 +187,18 @@ function printStatus(r: Roster): void {
 }
 
 function printMenu(): void {
-  console.log(' [d] advance day   [f] fort     [q] quests    [t] tavern');
-  console.log(' [c] captives      [r] roster   [s] save      [Q] quit  [h] help');
+  console.log(' [d] advance day   [l] leads    [f] fort      [q] quests   [t] tavern');
+  console.log(' [c] captives      [r] roster   [s] save      [Q] quit     [h] help');
 }
 
 function printHelp(): void {
   console.log(`
 Commands:
-  d   advance one day — pick a day fixture, the engine resolves all
-      scenarios on it (assignments come from the scenario fixtures
-      themselves; deploy-picker is a future milestone). Auto-saves.
+  d   advance one day — refresh the lead board, then either pursue a
+      lead (pay gold → resolve that scenario today) or take a rest day
+      (no scenario, recover fatigue). Auto-saves.
+  l   lead board — list available opportunities (read-only; pursue
+      happens inside [d] advance-day).
   f   fort menu — buy upgrades you can afford.
   q   quests menu — list active quests, abandon one.
   t   tavern menu — list bench, hire a candidate.
@@ -265,6 +269,20 @@ function cmdRosterShow(r: Roster): void {
   }
 }
 
+function cmdLeads(r: Roster): void {
+  console.log('');
+  if (r.leadBoard.length === 0) {
+    console.log('Lead board is empty. Advance a day to refresh it.');
+    return;
+  }
+  console.log(`LEAD BOARD  (day ${r.dayCount}, ${r.leadBoard.length} active)`);
+  for (const lead of r.leadBoard) {
+    const daysLeft = Math.max(0, lead.expiryDay - r.dayCount);
+    console.log(`  • [${lead.rarity}] ${lead.archetype} — ${lead.region}  DC${lead.dc}  reward ${lead.rewardGold}g  cost ${lead.pursueCost}g  expires in ${daysLeft}d`);
+    console.log(`      "${lead.blurb}"`);
+  }
+}
+
 async function cmdAdvanceDay(
   rl: ReturnType<typeof createInterface>,
   r: Roster,
@@ -274,58 +292,125 @@ async function cmdAdvanceDay(
   savePath: string,
   tagPool: Map<string, any>,
 ): Promise<void> {
-  console.log('\nPick a day fixture to run:');
-  const pick = await pickFromList(rl, 'day', dayFixtures, (f) => f);
-  if (!pick) return;
-  const dayAbs = join(FIXTURES_DIR, pick);
-  const day = loadDay(dayAbs);
+  // PROTO-GAME: refresh the lead board first so today's options are visible.
+  const refresh = refreshLeadBoard({ board: r.leadBoard, dayCount: r.dayCount });
+  r.leadBoard = [...refresh.kept, ...refresh.added];
+  if (refresh.expired.length > 0) {
+    console.log(`\n${refresh.expired.length} lead(s) expired overnight: ${refresh.expired.map((l) => l.id).join(', ')}`);
+  }
+
+  console.log(`\nLEAD BOARD  (day ${r.dayCount})`);
+  for (let i = 0; i < r.leadBoard.length; i++) {
+    const lead = r.leadBoard[i]!;
+    const daysLeft = Math.max(0, lead.expiryDay - r.dayCount);
+    const afford = r.gold >= lead.pursueCost ? '' : '  ⚠ cannot afford';
+    console.log(`  ${i + 1}) [${lead.rarity}] ${lead.archetype} — ${lead.region}  DC${lead.dc}  reward ${lead.rewardGold}g  cost ${lead.pursueCost}g  ${daysLeft}d left${afford}`);
+    console.log(`     "${lead.blurb}"`);
+  }
+  console.log(`  R) rest day (no scenario, fatigue recovers)`);
+  console.log(`  F) play a hand-authored day fixture (${dayFixtures.length} available)`);
+  console.log(`  0) cancel`);
+  const ans = (await rl.question('choose > ')).trim();
+  if (ans === '' || ans === '0') return;
+  if (ans === 'R' || ans === 'r') {
+    await runRestDay(r, savePath, mercPool);
+    return;
+  }
+  if (ans === 'F' || ans === 'f') {
+    await runFixtureDay(rl, r, mercPool, llm, dayFixtures, savePath, tagPool);
+    return;
+  }
+  const idx = parseInt(ans, 10);
+  if (!Number.isFinite(idx) || idx < 1 || idx > r.leadBoard.length) {
+    console.log('cancelled.');
+    return;
+  }
+  const lead = r.leadBoard[idx - 1]!;
+  if (r.gold < lead.pursueCost) {
+    console.log(`Not enough gold (need ${lead.pursueCost}g, have ${r.gold}g).`);
+    return;
+  }
+  const pursued = pursueLead(lead, r.dayCount);
+  if (!pursued.ok) {
+    console.log(`Cannot pursue: ${pursued.error}`);
+    return;
+  }
+  // Pay & remove from board
+  r.gold -= pursued.goldSpent;
+  r.leadBoard = r.leadBoard.filter((l) => l.id !== lead.id);
+  console.log(`\n→ Pursuing [${lead.rarity}] ${lead.archetype} at ${lead.region} (paid ${pursued.goldSpent}g, ${r.gold}g remaining)`);
+
+  // Materialize the in-memory scenario as a temp file so resolveDay can load it.
+  const sessTmp = join(tmpdir(), `airaider-game-${process.pid}`);
+  mkdirSync(sessTmp, { recursive: true });
+  const scenarioPath = join(sessTmp, `${pursued.scenario.id}.json`);
+  writeFileSync(scenarioPath, JSON.stringify(pursued.scenario, null, 2));
+  const dayPath = join(sessTmp, `day-pursued-${lead.id}.json`);
+  const dayObj = {
+    id: `day-pursued-${lead.id}`,
+    name: `${lead.archetype} at ${lead.region}`,
+    scenarios: [scenarioPath],
+    seed: `day-${r.dayCount}-${lead.id}`,
+  };
+  writeFileSync(dayPath, JSON.stringify(dayObj, null, 2));
+
+  const day = loadDay(dayPath);
+  await runPlayerDay(rl, r, mercPool, llm, day, dayPath, savePath, [pursued.scenario], {
+    rewardGold: lead.rewardGold,
+  });
+}
+
+/** Common deploy-picker + resolve + end-of-day wrapping used by lead & fixture paths. */
+async function runPlayerDay(
+  rl: ReturnType<typeof createInterface>,
+  r: Roster,
+  mercPool: Map<string, any>,
+  llm: ScenarioLLM,
+  day: any,
+  dayPath: string,
+  savePath: string,
+  preloadedScenarios: any[] | null,
+  opts: { rewardGold?: number } = {},
+): Promise<void> {
+  const { loadScenario } = await import('./scenarios.js');
   const mercsForDay = new Map(r.mercs.map((m) => [m.id, m]));
   const initialFatigue = new Map([...r.states.values()].map((s) => [s.id, s.fatigue]));
-
-  // PROTO-GAME: pre-resolve assignments for each scenario by prompting the
-  // player. Loads scenarios up-front, asks for deployment per slot, and then
-  // hands the overrides to resolveDay. Errand scenarios (daysToResolve > 0)
-  // also get assigned this way — same picker, just dispatches instead.
-  const { loadScenario } = await import('./scenarios.js');
-  const deployedSoFar = new Set<string>(); // can't deploy same merc twice in one day
+  const deployedSoFar = new Set<string>();
   const overrides = new Map<number, Array<{ slotId: string; mercId: string }>>();
   console.log(`\n→ ${day.name} (${day.scenarios.length} scenario${day.scenarios.length === 1 ? '' : 's'})`);
   console.log('Pick deployments for each scenario (0 to skip — fall back to fixture default):\n');
 
   for (let i = 0; i < day.scenarios.length; i++) {
-    const scenAbs = day.scenarios[i]!.startsWith('/')
-      ? day.scenarios[i]!
-      : join(FIXTURES_DIR, day.scenarios[i]!);
-    const scen = loadScenario(scenAbs);
+    const scen = preloadedScenarios?.[i] ?? loadScenario(
+      (day.scenarios[i] as string).startsWith('/') ? (day.scenarios[i] as string) : join(dirname(dayPath), day.scenarios[i] as string),
+    );
     const isErrand = !!scen.daysToResolve && scen.daysToResolve > 0;
     console.log(`--- Scenario ${i + 1}/${day.scenarios.length}: ${scen.title} [${scen.archetype}]${isErrand ? `  (errand, ${scen.daysToResolve}d)` : ''}`);
     console.log(`    target: ${scen.target}`);
     const slotAssignments: Array<{ slotId: string; mercId: string }> = [];
     let skipped = false;
     for (const slot of scen.slots) {
-      const eligible = r.mercs.filter((m) => !deployedSoFar.has(m.id));
+      const eligible = r.mercs.filter((m: any) => !deployedSoFar.has(m.id));
       if (eligible.length === 0) {
-        console.log(`    (no mercs free to fill slot "${slot.id}" — falling back to fixture default for this scenario)`);
+        console.log(`    (no mercs free to fill slot "${slot.id}" — falling back to fixture default)`);
         skipped = true;
         break;
       }
-      // sort eligibles: preferred-attr value desc, then preferred-tag matches desc
       const pAttr = slot.preferredAttr;
-      const ranked = [...eligible].sort((a, b) => {
+      const ranked = [...eligible].sort((a: any, b: any) => {
         if (pAttr) {
-          const av = a.attrs[pAttr];
-          const bv = b.attrs[pAttr];
+          const av = a.attrs[pAttr]; const bv = b.attrs[pAttr];
           if (av !== bv) return bv - av;
         }
-        const aTagHit = a.tags.some((t) => slot.preferredTags?.includes(t.id)) ? 1 : 0;
-        const bTagHit = b.tags.some((t) => slot.preferredTags?.includes(t.id)) ? 1 : 0;
+        const aTagHit = a.tags.some((t: any) => slot.preferredTags?.includes(t.id)) ? 1 : 0;
+        const bTagHit = b.tags.some((t: any) => slot.preferredTags?.includes(t.id)) ? 1 : 0;
         return bTagHit - aTagHit;
       });
       console.log(`\n    slot "${slot.id}" — prefers ${pAttr ?? '(any)'}${slot.preferredTags?.length ? `, tags:[${slot.preferredTags.join(',')}]` : ''}`);
       console.log(`    "${slot.description}"`);
-      const picked = await pickFromList(rl, `    assign to ${slot.id}`, ranked, (m) => {
+      const picked = await pickFromList(rl, `    assign to ${slot.id}`, ranked, (m: any) => {
         const st = r.states.get(m.id);
-        const tagHit = m.tags.some((t) => slot.preferredTags?.includes(t.id)) ? '  ★preferred-tag' : '';
+        const tagHit = m.tags.some((t: any) => slot.preferredTags?.includes(t.id)) ? '  ★preferred-tag' : '';
         const attrStr = pAttr ? `  ${pAttr}=${m.attrs[pAttr]}` : '';
         const fat = st && st.fatigue > 0 ? `  fat:${st.fatigue}` : '';
         const tier = st && st.tier !== 'rookie' ? `  ${st.tier}` : '';
@@ -336,24 +421,39 @@ async function cmdAdvanceDay(
         skipped = true;
         break;
       }
-      slotAssignments.push({ slotId: slot.id, mercId: picked.id });
-      deployedSoFar.add(picked.id);
+      slotAssignments.push({ slotId: slot.id, mercId: (picked as any).id });
+      deployedSoFar.add((picked as any).id);
     }
     if (!skipped && slotAssignments.length === scen.slots.length) {
       overrides.set(i, slotAssignments);
     } else {
-      // undo any reservations from a partially-built assignment so they stay free
       for (const a of slotAssignments) deployedSoFar.delete(a.mercId);
     }
   }
 
   console.log(`\n→ Running ${day.name}…\n`);
   const res = await resolveDay({
-    day, dayPath: dayAbs, mercs: mercsForDay, llm, initialFatigue, roster: r,
+    day, dayPath, mercs: mercsForDay, llm, initialFatigue, roster: r,
     assignmentsOverride: (idx) => overrides.get(idx),
   });
   console.log(renderDayTranscript(res));
-  // mirror cliDay end-of-day: bump dayCount + apply fatigue/casualties/bonds.
+
+  // PROTO-GAME: pay out lead reward on FAVORABLE/CATASTROPHIC_FAVORABLE; half on UNFAVORABLE; nothing on CATASTROPHIC.
+  if (opts.rewardGold !== undefined && res.scenarios.length > 0) {
+    const band = res.scenarios[0]!.band;
+    let payout = 0;
+    if (band === 'catastrophic-favorable') payout = Math.floor(opts.rewardGold * 1.5);
+    else if (band === 'favorable') payout = opts.rewardGold;
+    else if (band === 'unfavorable') payout = Math.floor(opts.rewardGold * 0.4);
+    else payout = 0;
+    if (payout > 0) {
+      r.gold += payout;
+      console.log(`\nREWARD: +${payout}g (band: ${band})  gold now ${r.gold}g`);
+    } else {
+      console.log(`\nREWARD: 0g (band: ${band})  gold ${r.gold}g`);
+    }
+  }
+
   const { applyCasualties } = await import('./roster.js');
   const { bondedPairsOf: bp, applyBondGrief, pruneStaleGriefHints } = await import('./bonds.js');
   r.dayCount += 1;
@@ -374,6 +474,36 @@ async function cmdAdvanceDay(
   pruneStaleGriefHints(r, r.dayCount);
   saveRoster(savePath, r, mercPool);
   console.log(`\n(auto-saved → ${savePath})`);
+}
+
+async function runRestDay(r: Roster, savePath: string, mercPool: Map<string, any>): Promise<void> {
+  console.log('\n--- Rest day ---');
+  r.dayCount += 1;
+  // simple recovery: -1 fatigue for each merc (min 0)
+  let recovered = 0;
+  for (const s of r.states.values()) {
+    if (s.fatigue > 0) { s.fatigue = Math.max(0, s.fatigue - 1); recovered += 1; }
+  }
+  console.log(`Day advances. ${recovered} merc(s) recovered fatigue.`);
+  saveRoster(savePath, r, mercPool);
+  console.log(`(auto-saved → ${savePath})`);
+}
+
+async function runFixtureDay(
+  rl: ReturnType<typeof createInterface>,
+  r: Roster,
+  mercPool: Map<string, any>,
+  llm: ScenarioLLM,
+  dayFixtures: string[],
+  savePath: string,
+  _tagPool: Map<string, any>,
+): Promise<void> {
+  console.log('\nPick a hand-authored day fixture:');
+  const pick = await pickFromList(rl, 'day', dayFixtures, (f) => f);
+  if (!pick) return;
+  const dayAbs = join(FIXTURES_DIR, pick);
+  const day = loadDay(dayAbs);
+  await runPlayerDay(rl, r, mercPool, llm, day, dayAbs, savePath, null);
 }
 
 async function cmdFort(

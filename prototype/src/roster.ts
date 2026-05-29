@@ -9,6 +9,7 @@ import { readFileSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
 import { z } from 'zod';
 import type { Merc, Tag } from './types.js';
 import type { Captive, CaptiveEffect } from './captive.js';
+import { LeadSchema, type Lead } from './leads.js';
 
 const AttrBlockSchema = z.object({
   physical: z.number().int().min(1).max(7),
@@ -116,7 +117,7 @@ const FortLogEntrySchema = z.object({
 export const FORT_LOG_MAX = 50;
 
 const RoasterSchema = z.object({
-  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6), z.literal(7), z.literal(8), z.literal(9), z.literal(10), z.literal(11)]).default(11),
+  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6), z.literal(7), z.literal(8), z.literal(9), z.literal(10), z.literal(11), z.literal(12)]).default(12),
   dayCount: z.number().int().min(0).default(0),
   gold: z.number().int().default(0),
   reputation: z.record(z.string(), z.number().int()).default({}),
@@ -149,6 +150,8 @@ const RoasterSchema = z.object({
     questId: z.string(),
     cooldownUntilDay: z.number().int().min(0),
   })).default([]),
+  /** PROTO-GAME v12: lead board — currently available opportunities. */
+  leadBoard: z.array(LeadSchema).default([]),
 });
 
 export type RosterMercState = z.infer<typeof MercStateSchema>;
@@ -160,7 +163,7 @@ export type FortLogEntry = z.infer<typeof FortLogEntrySchema>;
 export type RosterFile = z.infer<typeof RoasterSchema>;
 
 export interface Roster {
-  schemaVersion: 11;
+  schemaVersion: 12;
   dayCount: number;
   gold: number;
   reputation: Record<string, number>;
@@ -187,6 +190,8 @@ export interface Roster {
   hirePool: import('./tavern.js').HirePoolEntry[];
   /** M13.4: quest abandonment cooldowns. */
   abandonedQuests: Array<{ questId: string; cooldownUntilDay: number }>;
+  /** PROTO-GAME v12: lead board snapshot. */
+  leadBoard: Lead[];
 }
 
 /**
@@ -202,7 +207,7 @@ export function appendFortLog(roster: Roster, entry: FortLogEntry): void {
 
 export function newRoster(initialMercs: Merc[]): Roster {
   return {
-    schemaVersion: 11,
+    schemaVersion: 12,
     dayCount: 0,
     gold: 0,
     reputation: {},
@@ -218,6 +223,7 @@ export function newRoster(initialMercs: Merc[]): Roster {
     consecutiveDebtDays: 0,
     hirePool: [],
     abandonedQuests: [],
+    leadBoard: [],
   };
 }
 
@@ -271,7 +277,7 @@ export function loadRoster(
   }));
 
   return {
-    schemaVersion: 11,
+    schemaVersion: 12,
     dayCount: parsed.dayCount,
     gold: parsed.gold,
     reputation: parsed.reputation,
@@ -305,6 +311,7 @@ export function loadRoster(
       ...(e.startingXp !== undefined ? { startingXp: e.startingXp } : {}),
     })),
     abandonedQuests: parsed.abandonedQuests,
+    leadBoard: parsed.leadBoard,
   };
 }
 
@@ -332,7 +339,7 @@ export function saveRoster(
     }
   }
   const file: RosterFile = {
-    schemaVersion: 11,
+    schemaVersion: 12,
     dayCount: roster.dayCount,
     gold: roster.gold,
     reputation: roster.reputation,
@@ -370,6 +377,7 @@ export function saveRoster(
       ...(e.startingXp !== undefined ? { startingXp: e.startingXp } : {}),
     })),
     abandonedQuests: roster.abandonedQuests,
+    leadBoard: roster.leadBoard,
   };
   // M17.1: defensive backup. If a roster file already exists at this path,
   // copy it to `<path>.bak` before overwriting so a corrupted save (or an

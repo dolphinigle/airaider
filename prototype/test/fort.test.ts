@@ -82,7 +82,7 @@ describe('M6.4 fort upgrades', () => {
     roster.fort = { level: 2, upgrades: ['reinforced-palisade', 'winter-larder'] };
     saveRoster(path, roster, mercPool);
     const reloaded = loadRoster(path, mercPool, tagPool);
-    expect(reloaded.schemaVersion).toBe(11);
+    expect(reloaded.schemaVersion).toBe(12);
     expect(reloaded.fort.level).toBe(2);
     expect(reloaded.fort.upgrades).toEqual(['reinforced-palisade', 'winter-larder']);
   });
@@ -162,7 +162,7 @@ describe('M7.6 persistent fort log', () => {
     }));
     const r = loadRoster(path, mercPool, tagPool);
     expect(r.fortLog).toEqual([]);
-    expect(r.schemaVersion).toBe(11);
+    expect(r.schemaVersion).toBe(12);
   });
 
   it('fortLog survives a save/load round-trip', () => {
