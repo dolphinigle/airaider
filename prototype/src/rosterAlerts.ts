@@ -38,6 +38,19 @@ export function statusAlerts(r: Roster): string[] {
       out.push(`! Captive ${c.name} (notoriety ${c.notoriety}) escape risk ~${pct}%/day — process them soon`);
     }
   }
+  // M9.10: surface in-window grief stamps so the player knows which mercs
+  // are still mourning a fallen bond-partner (the LLM gets the same hint
+  // via recentlyLostBondPartner). Stamp is pruned automatically after
+  // BOND_GRIEF_HINT_WINDOW_DAYS (=7) in cliDay's end-of-day step, so
+  // anything still present here is by definition fresh.
+  for (const m of r.mercs) {
+    const st = r.states.get(m.id);
+    if (!st || !st.recentGriefPartner || st.recentGriefDay === undefined) continue;
+    const daysLeft = (st.recentGriefDay + 7) - r.dayCount;
+    if (daysLeft > 0) {
+      out.push(`⤬ ${m.name} still grieving ${st.recentGriefPartner} (${daysLeft}d left in window)`);
+    }
+  }
   return out;
 }
 

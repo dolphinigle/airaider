@@ -108,3 +108,28 @@ describe('M11.8 captive escape-risk alert', () => {
     expect(alerts.some((a) => a.includes('escape risk'))).toBe(false);
   });
 });
+
+describe('M9.10 grief surfaced in roster alerts', () => {
+  const tags = loadTags(join('data', 'tags.json'));
+  const mercs = loadMercs(join('data', 'mercs.json'), tags);
+
+  it('reports each merc still in the 7-day grief window with days remaining', () => {
+    const r = newRoster([mercs.get('marek')!, mercs.get('veska')!]);
+    r.dayCount = 5;
+    const st = r.states.get('marek')!;
+    st.recentGriefPartner = 'Davrin';
+    st.recentGriefDay = 3; // window expires day 10; 5 days left at day 5
+    const alerts = statusAlerts(r);
+    expect(alerts.some((a) => a.includes('Marek') && a.includes('Davrin') && a.includes('5d'))).toBe(true);
+  });
+
+  it('does not report stamps whose window has already expired', () => {
+    const r = newRoster([mercs.get('marek')!]);
+    r.dayCount = 20;
+    const st = r.states.get('marek')!;
+    st.recentGriefPartner = 'Ghost';
+    st.recentGriefDay = 5; // expired by day 12
+    const alerts = statusAlerts(r);
+    expect(alerts.some((a) => a.includes('grieving'))).toBe(false);
+  });
+});

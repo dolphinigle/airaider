@@ -89,7 +89,10 @@ function printRoster(r: Roster, path: string): void {
     const dmg = st && st.hpDamage > 0 ? `  hp-${st.hpDamage}` : '';
     const vGain = st && st.veterancyGain > 0 ? `  v+${st.veterancyGain}` : '';
     const tier = st && st.tier !== 'rookie' ? `  ${st.tier}` : '';
-    console.log(`  • ${m.name} [${m.id}]${tier}${fatigue}${dmg}${vGain}`);
+    // M9.10: surface in-window grief stamp so the player sees who is mourning
+    // (the same hint the LLM gets via recentlyLostBondPartner).
+    const grief = st && st.recentGriefPartner ? `  grieving:${st.recentGriefPartner}` : '';
+    console.log(`  • ${m.name} [${m.id}]${tier}${fatigue}${dmg}${vGain}${grief}`);
   }
   // M16.1: surface currently-bonded pairs so the player can see emergent
   // comradeship. Bonded pairs are derived from co-deployment counters.
