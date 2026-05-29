@@ -98,7 +98,19 @@ describe('M6.4 fort upgrades', () => {
       deceased: [], activeQuests: [], completedQuests: [], pendingErrands: [],
     }));
     const r = loadRoster(path, mercPool, tagPool);
-    expect(r.fort).toEqual({ level: 1, upgrades: [], cells: [], placedRooms: [] });
+    expect(r.fort).toEqual({
+      level: 1,
+      upgrades: [],
+      cells: [
+        { idx: 0, openedOnDay: 0 },
+        { idx: 1, openedOnDay: 0 },
+        { idx: 2, openedOnDay: 0 },
+      ],
+      placedRooms: [
+        { roomId: 'bunkroom', cellIdx: 0, builtOnDay: 0 },
+        { roomId: 'storeroom', cellIdx: 1, builtOnDay: 0 },
+      ],
+    });
   });
 });
 

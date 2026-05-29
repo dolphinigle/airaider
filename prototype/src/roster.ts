@@ -328,7 +328,25 @@ export function loadRoster(
     activeQuests: parsed.activeQuests,
     completedQuests: parsed.completedQuests,
     pendingErrands: parsed.pendingErrands,
-    fort: parsed.fort,
+    // PROTO-GAME v13: if loading a pre-v13 save (or any save with an
+    // empty cells array), seed the Day-1 starter fort layout so the
+    // player isn't locked out of the build/lead loop. We only seed when
+    // BOTH cells and placedRooms are empty — saves that already have
+    // any structure are left untouched.
+    fort: (parsed.fort.cells.length === 0 && parsed.fort.placedRooms.length === 0)
+      ? {
+          ...parsed.fort,
+          cells: [
+            { idx: 0, openedOnDay: 0 },
+            { idx: 1, openedOnDay: 0 },
+            { idx: 2, openedOnDay: 0 },
+          ],
+          placedRooms: [
+            { roomId: 'bunkroom', cellIdx: 0, builtOnDay: 0 },
+            { roomId: 'storeroom', cellIdx: 1, builtOnDay: 0 },
+          ],
+        }
+      : parsed.fort,
     fortLog: parsed.fortLog,
     consecutiveDebtDays: parsed.consecutiveDebtDays,
     hirePool: parsed.hirePool.map((e) => ({
