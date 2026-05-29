@@ -69,6 +69,14 @@ export interface DayResolutionInput {
   initialFatigue?: Map<string, number>;
   /** M5.4: roster carries pending errands; if provided, errands are dispatched/resolved. */
   roster?: Roster;
+  /**
+   * PROTO-GAME: when set, replaces the scenario's hard-coded assignments[]
+   * for the scenario at the given index. Lets the interactive game prompt
+   * the player to pick deployments. Return undefined to fall back to the
+   * scenario's own assignments (deterministic-fixture behavior).
+   */
+  assignmentsOverride?: (scenarioIndex: number, scenario: FixtureScenario) =>
+    Array<{ slotId: string; mercId: string }> | undefined;
 }
 
 export interface DayResolution {
@@ -295,7 +303,10 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
       ? scenarioRelOrAbs
       : join(fixturesDir, scenarioRelOrAbs);
     const scenario = loadScenario(scenarioAbs);
-    if (!scenario.assignments || scenario.assignments.length === 0) {
+    // PROTO-GAME: allow caller to override hard-coded assignments per scenario.
+    const overrideAssignments = input.assignmentsOverride?.(i, scenario);
+    const effectiveAssignments = overrideAssignments ?? scenario.assignments;
+    if (!effectiveAssignments || effectiveAssignments.length === 0) {
       throw new Error(
         `Day ${day.id}: scenario ${scenario.id} has no assignments; the day loop requires them.`,
       );
@@ -303,7 +314,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
 
     // M5.4: if this is an errand and we have a roster, dispatch instead of resolve.
     if (roster && scenario.daysToResolve && scenario.daysToResolve > 0) {
-      const partyMercIds = scenario.assignments.map((a) => a.mercId);
+      const partyMercIds = effectiveAssignments.map((a) => a.mercId);
       const errand = dispatchErrand({
         roster, scenario, scenarioPath: scenarioRelOrAbs, partyMercIds,
       });
@@ -313,7 +324,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
       continue;
     }
 
-    const assignments: Assignment[] = scenario.assignments.map((a) => {
+    const assignments: Assignment[] = effectiveAssignments.map((a) => {
       const merc = mercs.get(a.mercId);
       if (!merc) {
         throw new Error(`Day ${day.id}: unknown merc ${a.mercId} in scenario ${scenario.id}`);

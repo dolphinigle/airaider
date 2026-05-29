@@ -281,11 +281,79 @@ async function cmdAdvanceDay(
   const day = loadDay(dayAbs);
   const mercsForDay = new Map(r.mercs.map((m) => [m.id, m]));
   const initialFatigue = new Map([...r.states.values()].map((s) => [s.id, s.fatigue]));
-  console.log(`\n→ Running ${day.name} (${day.scenarios.length} scenarios)…`);
-  const res = await resolveDay({ day, dayPath: dayAbs, mercs: mercsForDay, llm, initialFatigue, roster: r });
+
+  // PROTO-GAME: pre-resolve assignments for each scenario by prompting the
+  // player. Loads scenarios up-front, asks for deployment per slot, and then
+  // hands the overrides to resolveDay. Errand scenarios (daysToResolve > 0)
+  // also get assigned this way — same picker, just dispatches instead.
+  const { loadScenario } = await import('./scenarios.js');
+  const deployedSoFar = new Set<string>(); // can't deploy same merc twice in one day
+  const overrides = new Map<number, Array<{ slotId: string; mercId: string }>>();
+  console.log(`\n→ ${day.name} (${day.scenarios.length} scenario${day.scenarios.length === 1 ? '' : 's'})`);
+  console.log('Pick deployments for each scenario (0 to skip — fall back to fixture default):\n');
+
+  for (let i = 0; i < day.scenarios.length; i++) {
+    const scenAbs = day.scenarios[i]!.startsWith('/')
+      ? day.scenarios[i]!
+      : join(FIXTURES_DIR, day.scenarios[i]!);
+    const scen = loadScenario(scenAbs);
+    const isErrand = !!scen.daysToResolve && scen.daysToResolve > 0;
+    console.log(`--- Scenario ${i + 1}/${day.scenarios.length}: ${scen.title} [${scen.archetype}]${isErrand ? `  (errand, ${scen.daysToResolve}d)` : ''}`);
+    console.log(`    target: ${scen.target}`);
+    const slotAssignments: Array<{ slotId: string; mercId: string }> = [];
+    let skipped = false;
+    for (const slot of scen.slots) {
+      const eligible = r.mercs.filter((m) => !deployedSoFar.has(m.id));
+      if (eligible.length === 0) {
+        console.log(`    (no mercs free to fill slot "${slot.id}" — falling back to fixture default for this scenario)`);
+        skipped = true;
+        break;
+      }
+      // sort eligibles: preferred-attr value desc, then preferred-tag matches desc
+      const pAttr = slot.preferredAttr;
+      const ranked = [...eligible].sort((a, b) => {
+        if (pAttr) {
+          const av = a.attrs[pAttr];
+          const bv = b.attrs[pAttr];
+          if (av !== bv) return bv - av;
+        }
+        const aTagHit = a.tags.some((t) => slot.preferredTags?.includes(t.id)) ? 1 : 0;
+        const bTagHit = b.tags.some((t) => slot.preferredTags?.includes(t.id)) ? 1 : 0;
+        return bTagHit - aTagHit;
+      });
+      console.log(`\n    slot "${slot.id}" — prefers ${pAttr ?? '(any)'}${slot.preferredTags?.length ? `, tags:[${slot.preferredTags.join(',')}]` : ''}`);
+      console.log(`    "${slot.description}"`);
+      const picked = await pickFromList(rl, `    assign to ${slot.id}`, ranked, (m) => {
+        const st = r.states.get(m.id);
+        const tagHit = m.tags.some((t) => slot.preferredTags?.includes(t.id)) ? '  ★preferred-tag' : '';
+        const attrStr = pAttr ? `  ${pAttr}=${m.attrs[pAttr]}` : '';
+        const fat = st && st.fatigue > 0 ? `  fat:${st.fatigue}` : '';
+        const tier = st && st.tier !== 'rookie' ? `  ${st.tier}` : '';
+        return `${m.name} [${m.id}]${attrStr}${tagHit}${fat}${tier}`;
+      });
+      if (!picked) {
+        console.log(`    (skipped — falling back to fixture default for this scenario)`);
+        skipped = true;
+        break;
+      }
+      slotAssignments.push({ slotId: slot.id, mercId: picked.id });
+      deployedSoFar.add(picked.id);
+    }
+    if (!skipped && slotAssignments.length === scen.slots.length) {
+      overrides.set(i, slotAssignments);
+    } else {
+      // undo any reservations from a partially-built assignment so they stay free
+      for (const a of slotAssignments) deployedSoFar.delete(a.mercId);
+    }
+  }
+
+  console.log(`\n→ Running ${day.name}…\n`);
+  const res = await resolveDay({
+    day, dayPath: dayAbs, mercs: mercsForDay, llm, initialFatigue, roster: r,
+    assignmentsOverride: (idx) => overrides.get(idx),
+  });
   console.log(renderDayTranscript(res));
   // mirror cliDay end-of-day: bump dayCount + apply fatigue/casualties/bonds.
-  // (We keep this loop self-contained here to avoid importing the cliDay main.)
   const { applyCasualties } = await import('./roster.js');
   const { bondedPairsOf: bp, applyBondGrief, pruneStaleGriefHints } = await import('./bonds.js');
   r.dayCount += 1;
@@ -304,7 +372,6 @@ async function cmdAdvanceDay(
     }
   }
   pruneStaleGriefHints(r, r.dayCount);
-  // auto-save
   saveRoster(savePath, r, mercPool);
   console.log(`\n(auto-saved → ${savePath})`);
 }
