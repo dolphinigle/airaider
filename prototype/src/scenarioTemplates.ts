@@ -30,6 +30,10 @@ const SLOTS_BY_ARCHETYPE: Record<LeadArchetype, SlotTemplate[]> = {
     { id: 'lockwork', description: 'defeat the lock and the trap behind it', preferredAttr: 'agility', preferredTags: ['phys:quick'] },
     { id: 'lookout',  description: 'mark the rounds and signal when to move', preferredAttr: 'intelligence', preferredTags: ['pers:stoic'] },
   ],
+  captive: [
+    { id: 'subdue',   description: 'take the target alive without breaking him', preferredAttr: 'physical', preferredTags: ['phys:muscular', 'temp:brave'] },
+    { id: 'restrain', description: 'bind and walk him back without losing him on the road', preferredAttr: 'willpower', preferredTags: ['pers:stoic'] },
+  ],
 };
 
 const TITLE_BY_ARCHETYPE: Record<LeadArchetype, string> = {
@@ -37,6 +41,7 @@ const TITLE_BY_ARCHETYPE: Record<LeadArchetype, string> = {
   recovery: 'Recovery',
   contract: 'Contract',
   heist: 'Heist',
+  captive: 'Snatch',
 };
 
 const TARGET_BY_ARCHETYPE: Record<LeadArchetype, (region: string) => string> = {
@@ -44,6 +49,7 @@ const TARGET_BY_ARCHETYPE: Record<LeadArchetype, (region: string) => string> = {
   recovery: (region) => `bring back what was lost outside ${region}`,
   contract: (region) => `fulfil the patron's quiet request in ${region}`,
   heist: (region) => `lift the prize from the holding at ${region} without a trace`,
+  captive: (region) => `take the mark alive from the hold at ${region} and walk him back`,
 };
 
 /** Convert a Lead into a FixtureScenario the day-loop can run. */

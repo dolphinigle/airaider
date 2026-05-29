@@ -357,6 +357,7 @@ async function cmdAdvanceDay(
   const day = loadDay(dayPath);
   await runPlayerDay(rl, r, mercPool, llm, day, dayPath, savePath, [pursued.scenario], {
     rewardGold: lead.rewardGold,
+    captiveFromLead: lead.archetype === 'captive' ? lead : undefined,
   });
 }
 
@@ -370,7 +371,7 @@ async function runPlayerDay(
   dayPath: string,
   savePath: string,
   preloadedScenarios: any[] | null,
-  opts: { rewardGold?: number } = {},
+  opts: { rewardGold?: number; captiveFromLead?: Lead } = {},
 ): Promise<void> {
   const { loadScenario } = await import('./scenarios.js');
   const mercsForDay = new Map(r.mercs.map((m) => [m.id, m]));
@@ -451,6 +452,24 @@ async function runPlayerDay(
       console.log(`\nREWARD: +${payout}g (band: ${band})  gold now ${r.gold}g`);
     } else {
       console.log(`\nREWARD: 0g (band: ${band})  gold ${r.gold}g`);
+    }
+
+    // PROTO-GAME: captive lead success grants a new captive to the roster
+    // on favorable+ bands. The captive carries notoriety scaled with the
+    // lead's DC so disposition choices (ransom/sell/recruit/...) matter.
+    if (opts.captiveFromLead && (band === 'favorable' || band === 'catastrophic-favorable')) {
+      const lead = opts.captiveFromLead;
+      const captiveId = `captive-${lead.id}`;
+      const notoriety = Math.max(1, lead.dc);
+      r.captives.push({
+        id: captiveId,
+        name: `Captive of ${lead.region}`,
+        archetype: 'deserter',
+        backstory: lead.blurb,
+        notoriety,
+        tags: [],
+      });
+      console.log(`\nCAPTIVE TAKEN: "${captiveId}" added to your hold (notoriety ${notoriety}). Use [c] to choose disposition.`);
     }
   }
 

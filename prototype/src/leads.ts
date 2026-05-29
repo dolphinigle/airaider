@@ -43,7 +43,7 @@ const RARITY_WEIGHTS: Record<LeadRarity, number> = {
 };
 
 const REGIONS = ['Crow\'s Ford', 'Pinewood', 'Greythorn', 'Eastfen', 'Saltmire', 'Blackmoor', 'Ironvale'];
-const ARCHETYPES = ['raid', 'recovery', 'contract', 'heist'] as const;
+const ARCHETYPES = ['raid', 'recovery', 'contract', 'heist', 'captive'] as const;
 export type LeadArchetype = (typeof ARCHETYPES)[number];
 
 export const TARGET_LEAD_COUNT = 5;
@@ -95,6 +95,11 @@ const BLURBS: Record<LeadArchetype, string[]> = {
     'a tower vault was sealed in haste before the snow',
     'an upriver toll-house keeps coin in a single iron chest',
     'a chapel\'s silver was never quite consecrated',
+  ],
+  captive: [
+    'a deserter is hiding in the marsh fen — alive he is worth more than dead',
+    'a guildsman\'s favourite courier was taken with a price on his head',
+    'a witness is needed alive at the holdfast trial in three nights',
   ],
 };
 
