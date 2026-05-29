@@ -102,9 +102,28 @@ const PendingErrandSchema = z.object({
   seedSource: z.string().min(1),
 });
 
+/** PROTO-GAME v13: a single ground-tier fort cell. */
+const FortCellSchema = z.object({
+  /** Display index, 0-based left-to-right along the ground row. */
+  idx: z.number().int().min(0),
+  /** When excavated. dayCount value at the time of opening; starter cells = 0. */
+  openedOnDay: z.number().int().min(0).default(0),
+});
+
+/** PROTO-GAME v13: a room placed in a specific cell. */
+const PlacedRoomSchema = z.object({
+  roomId: z.string().min(1),
+  cellIdx: z.number().int().min(0),
+  builtOnDay: z.number().int().min(0).default(0),
+});
+
 const FortStateSchema = z.object({
   level: z.number().int().min(1).default(1),
   upgrades: z.array(z.string()).default([]),
+  /** PROTO-GAME v13: opened ground-tier cells. Day-1 default = 3 cells. */
+  cells: z.array(FortCellSchema).default([]),
+  /** PROTO-GAME v13: rooms occupying cells. */
+  placedRooms: z.array(PlacedRoomSchema).default([]),
 });
 
 const FortLogEntrySchema = z.object({
@@ -117,7 +136,7 @@ const FortLogEntrySchema = z.object({
 export const FORT_LOG_MAX = 50;
 
 const RoasterSchema = z.object({
-  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6), z.literal(7), z.literal(8), z.literal(9), z.literal(10), z.literal(11), z.literal(12)]).default(12),
+  schemaVersion: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6), z.literal(7), z.literal(8), z.literal(9), z.literal(10), z.literal(11), z.literal(12), z.literal(13)]).default(13),
   dayCount: z.number().int().min(0).default(0),
   gold: z.number().int().default(0),
   reputation: z.record(z.string(), z.number().int()).default({}),
@@ -136,7 +155,7 @@ const RoasterSchema = z.object({
   /** M5.4: errands dispatched but not yet returned. v4+. */
   pendingErrands: z.array(PendingErrandSchema).default([]),
   /** M6.4: fort upgrade state (level + purchased upgrade ids). v7+. */
-  fort: FortStateSchema.default({ level: 1, upgrades: [] }),
+  fort: FortStateSchema.default({ level: 1, upgrades: [], cells: [], placedRooms: [] }),
   /** M7.6: persistent fort log (upgrades + daily events). v8+. */
   fortLog: z.array(FortLogEntrySchema).default([]),
   /** M9.2: consecutive days the fort has ended with gold < 0. v9+. */
@@ -163,7 +182,7 @@ export type FortLogEntry = z.infer<typeof FortLogEntrySchema>;
 export type RosterFile = z.infer<typeof RoasterSchema>;
 
 export interface Roster {
-  schemaVersion: 12;
+  schemaVersion: 13;
   dayCount: number;
   gold: number;
   reputation: Record<string, number>;
@@ -180,8 +199,13 @@ export interface Roster {
   completedQuests: RosterCompletedQuest[];
   /** M5.4: errands in flight. */
   pendingErrands: RosterPendingErrand[];
-  /** M6.4: fort upgrade state. */
-  fort: { level: number; upgrades: string[] };
+  /** M6.4 + PROTO-GAME v13: fort state — upgrades (legacy shop) + cells/placedRooms (spatial). */
+  fort: {
+    level: number;
+    upgrades: string[];
+    cells: Array<{ idx: number; openedOnDay: number }>;
+    placedRooms: Array<{ roomId: string; cellIdx: number; builtOnDay: number }>;
+  };
   /** M7.6: persistent fort log entries (latest at the end, trimmed to FORT_LOG_MAX). */
   fortLog: FortLogEntry[];
   /** M9.2: consecutive days ended in debt (gold < 0). Resets to 0 on a non-debt day or after a desertion. */
@@ -207,7 +231,7 @@ export function appendFortLog(roster: Roster, entry: FortLogEntry): void {
 
 export function newRoster(initialMercs: Merc[]): Roster {
   return {
-    schemaVersion: 12,
+    schemaVersion: 13,
     dayCount: 0,
     gold: 0,
     reputation: {},
@@ -218,7 +242,21 @@ export function newRoster(initialMercs: Merc[]): Roster {
     activeQuests: [],
     completedQuests: [],
     pendingErrands: [],
-    fort: { level: 1, upgrades: [] },
+    fort: {
+      level: 1,
+      upgrades: [],
+      // Day-1 starter layout per SIM_BIBLE §2: 3 ground cells with bunkroom/bedroom/storeroom.
+      cells: [
+        { idx: 0, openedOnDay: 0 },
+        { idx: 1, openedOnDay: 0 },
+        { idx: 2, openedOnDay: 0 },
+      ],
+      placedRooms: [
+        { roomId: 'drust-bedroom', cellIdx: 0, builtOnDay: 0 },
+        { roomId: 'bunkroom', cellIdx: 1, builtOnDay: 0 },
+        { roomId: 'storeroom', cellIdx: 2, builtOnDay: 0 },
+      ],
+    },
     fortLog: [],
     consecutiveDebtDays: 0,
     hirePool: [],
@@ -277,7 +315,7 @@ export function loadRoster(
   }));
 
   return {
-    schemaVersion: 12,
+    schemaVersion: 13,
     dayCount: parsed.dayCount,
     gold: parsed.gold,
     reputation: parsed.reputation,
@@ -339,7 +377,7 @@ export function saveRoster(
     }
   }
   const file: RosterFile = {
-    schemaVersion: 12,
+    schemaVersion: 13,
     dayCount: roster.dayCount,
     gold: roster.gold,
     reputation: roster.reputation,

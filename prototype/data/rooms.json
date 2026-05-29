@@ -1,0 +1,104 @@
+{
+  "rooms": [
+    {
+      "id": "bunkroom",
+      "name": "Bunkroom",
+      "category": "quarters",
+      "cost": 0,
+      "description": "Hard pallets, a shared brazier, four bunks. Where the unattached sleep.",
+      "capacity": 4,
+      "gates": ["bunk-cap"],
+      "starter": true
+    },
+    {
+      "id": "drust-bedroom",
+      "name": "Hero Bedroom",
+      "category": "quarters",
+      "cost": 5,
+      "description": "A private cell with a real bed. Officers and named heroes get their own.",
+      "capacity": 1,
+      "gates": ["bedroom-slot"],
+      "adjacencyMates": ["bunkroom"]
+    },
+    {
+      "id": "storeroom",
+      "name": "Storeroom",
+      "category": "dungeon",
+      "cost": 0,
+      "description": "Damp stone, iron rings, a locked door. Holds one captive securely.",
+      "capacity": 1,
+      "gates": ["captive-cap"],
+      "starter": true
+    },
+    {
+      "id": "scouting-post",
+      "name": "Scouting Post",
+      "category": "utility",
+      "cost": 6,
+      "description": "A lean-to with maps, runners, a tally board. Word of work reaches here.",
+      "gates": ["lead-board"]
+    },
+    {
+      "id": "tavern",
+      "name": "Tavern",
+      "category": "income",
+      "cost": 8,
+      "description": "Cheap beer, hot stew, a fire. Drifters drift in. So do recruits.",
+      "incomePerDay": 1,
+      "gates": ["recruit-pool", "fatigue-recovery"]
+    },
+    {
+      "id": "smithy",
+      "name": "Garrison Smithy",
+      "category": "work",
+      "cost": 6,
+      "description": "A working forge for arms and armour. Mercs leave better kitted than they arrive.",
+      "incomePerDay": 1,
+      "gates": ["smithy-craft"],
+      "adjacencyMates": ["storeroom"]
+    },
+    {
+      "id": "chapel",
+      "name": "Wayside Chapel",
+      "category": "utility",
+      "cost": 4,
+      "description": "A small stone chapel for the dead. The living sleep a little easier.",
+      "gates": ["chapel-recover"]
+    },
+    {
+      "id": "watch-tower",
+      "name": "Stone Watch Tower",
+      "category": "utility",
+      "cost": 8,
+      "description": "A four-storey tower with crow's-nest sightlines. Few surprises reach the gate.",
+      "gates": ["watch-forecast"]
+    },
+    {
+      "id": "granary",
+      "name": "Granary",
+      "category": "income",
+      "cost": 7,
+      "description": "A stone granary and root cellar. The fort can feed itself; mercs ask 1g less per payday.",
+      "gates": ["wage-discount"]
+    },
+    {
+      "id": "workshop",
+      "name": "Workshop",
+      "category": "work",
+      "cost": 5,
+      "description": "Sawn benches, vices, a slow lathe. Where things get fixed and made.",
+      "incomePerDay": 1,
+      "adjacencyMates": ["smithy"]
+    },
+    {
+      "id": "extra-storeroom",
+      "name": "Deep Storeroom",
+      "category": "dungeon",
+      "cost": 7,
+      "description": "A second cell, deeper in the stone. Two more rings, two more captives.",
+      "capacity": 2,
+      "gates": ["captive-cap"],
+      "adjacencyMates": ["storeroom"]
+    }
+  ]
+}

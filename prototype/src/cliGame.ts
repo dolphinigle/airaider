@@ -30,6 +30,8 @@ import { MockScenarioLLM } from './llm/mock.js';
 import { OpenAIScenarioLLM } from './llm/openai.js';
 import type { ScenarioLLM } from './llm/interface.js';
 import { loadFortCatalog, affordableUpgrades, purchaseUpgrade } from './fort.js';
+import { loadRoomCatalog, type RoomDef } from './rooms.js';
+import { renderFortLayout, buildRoom, excavateCell, activeGates, totalCapacity } from './fortLayout.js';
 import { loadQuests, abandonQuest, type Quest } from './quests.js';
 import { hireFromPool } from './tavern.js';
 import { effectOf, FORMER_CAPTIVE_TAG_ID, type CaptiveAction, CAPTIVE_ACTIONS } from './captive.js';
@@ -112,6 +114,8 @@ async function main(): Promise<void> {
   const tagPool = loadTags(join(DATA_DIR, 'tags.json'));
   const mercPool = loadMercs(join(DATA_DIR, 'mercs.json'), tagPool);
   const fortCatalog = loadFortCatalog(join(DATA_DIR, 'fort-upgrades.json'));
+  const roomCatalogList = loadRoomCatalog(join(DATA_DIR, 'rooms.json'));
+  const roomCatalog = new Map<string, RoomDef>(roomCatalogList.map((r) => [r.id, r]));
   const questCatalog = (() => {
     try { return loadQuests(join(DATA_DIR, 'quests.json')); }
     catch { return new Map<string, Quest>(); }
@@ -154,10 +158,10 @@ async function main(): Promise<void> {
         case 'h': case 'H': case '?': printHelp(); break;
         case 'r': case 'R': cmdRosterShow(roster); break;
         case 'l': case 'L': cmdLeads(roster, tagPool); break;
-        case 'd': case 'D': await cmdAdvanceDay(rl, roster, mercPool, llm, dayFixtures, args.savePath, tagPool); break;
-        case 'f': case 'F': await cmdFort(rl, roster, fortCatalog, mercPool, args.savePath); break;
+        case 'd': case 'D': await cmdAdvanceDay(rl, roster, mercPool, llm, dayFixtures, args.savePath, tagPool, roomCatalog); break;
+        case 'f': case 'F': await cmdFort(rl, roster, fortCatalog, roomCatalog, mercPool, args.savePath); break;
         case 'q': case 'Q_'/*placeholder*/: await cmdQuests(rl, roster, questCatalog, mercPool, args.savePath); break;
-        case 't': case 'T': await cmdTavern(rl, roster, mercPool, args.savePath); break;
+        case 't': case 'T': await cmdTavern(rl, roster, roomCatalog, mercPool, args.savePath); break;
         case 'c': case 'C': await cmdCaptives(rl, roster, tagPool, mercPool, args.savePath); break;
         case 's': case 'S': saveRoster(args.savePath, roster, mercPool); console.log('Saved.'); break;
         case 'Q': running = false; break;
@@ -178,11 +182,13 @@ async function main(): Promise<void> {
 function printStatus(r: Roster): void {
   const sc = seasonFor(r.dayCount);
   const repParts = Object.entries(r.reputation).map(([k, v]) => `${k}:${v}(${reputationTier(v)})`);
+  const roomCount = r.fort.placedRooms.length;
+  const cellCount = r.fort.cells.length;
   const upgrades = r.fort.upgrades.length > 0 ? r.fort.upgrades.join(',') : '—';
   console.log('');
   console.log('---------------------------------------------------------------');
   console.log(` Day ${r.dayCount}  |  season:${sc.season}(d${sc.dayOfSeason}/30)  |  gold:${r.gold}g`);
-  console.log(` fort L${r.fort.level} [${upgrades}]   mercs:${r.mercs.length}  captives:${r.captives.length}  bench:${r.hirePool.length}`);
+  console.log(` fort L${r.fort.level}  rooms:${roomCount}/${cellCount} cells  upgrades:[${upgrades}]   mercs:${r.mercs.length}  captives:${r.captives.length}  bench:${r.hirePool.length}`);
   if (repParts.length > 0) console.log(` reputation: ${repParts.join('  ')}`);
   const alerts = statusAlerts(r);
   for (const a of alerts) console.log(` ${a}`);
@@ -202,7 +208,9 @@ Commands:
       (no scenario, recover fatigue). Auto-saves.
   l   lead board — list available opportunities (read-only; pursue
       happens inside [d] advance-day).
-  f   fort menu — buy upgrades you can afford.
+  f   fort menu — view 2D layout, build rooms in cells, excavate new
+      cells, or shop legacy upgrades. Rooms gate systems (Scouting Post
+      → leads, Tavern → recruits, Dungeon Storeroom → captive cap).
   q   quests menu — list active quests, abandon one.
   t   tavern menu — list bench, hire a candidate.
   c   captives menu — choose disposition (ransom/sell/display/recruit/execute).
@@ -299,7 +307,32 @@ async function cmdAdvanceDay(
   dayFixtures: string[],
   savePath: string,
   tagPool: Map<string, any>,
+  roomCatalog: Map<string, RoomDef>,
 ): Promise<void> {
+  // PROTO-GAME v13: room gates. Lead board needs a Scouting Post.
+  const gates = activeGates(r.fort, roomCatalog);
+  if (!gates.has('lead-board')) {
+    console.log('\nLEAD BOARD  (locked)');
+    console.log('  No Scouting Post built — without it, no runners reach the gate.');
+    console.log('  Build one via [f] fort → [b]uild → Scouting Post (6g).');
+    r.leadBoard = []; // ensure no stale leads linger
+    console.log(`  R) rest day (no scenario, fatigue recovers)`);
+    console.log(`  F) play a hand-authored day fixture (${dayFixtures.length} available)`);
+    console.log(`  0) cancel`);
+    const ansLocked = (await rl.question('choose > ')).trim();
+    if (ansLocked === '' || ansLocked === '0') return;
+    if (ansLocked.toLowerCase() === 'r') {
+      await runRestDay(r, savePath, mercPool);
+      return;
+    }
+    if (ansLocked.toLowerCase() === 'f') {
+      await runFixtureDay(rl, r, mercPool, llm, dayFixtures, savePath, tagPool, roomCatalog);
+      return;
+    }
+    console.log('cancelled.');
+    return;
+  }
+
   // PROTO-GAME: refresh the lead board first so today's options are visible.
   const refresh = refreshLeadBoard({ board: r.leadBoard, dayCount: r.dayCount });
   r.leadBoard = [...refresh.kept, ...refresh.added];
@@ -330,7 +363,7 @@ async function cmdAdvanceDay(
     return;
   }
   if (ans === 'F' || ans === 'f') {
-    await runFixtureDay(rl, r, mercPool, llm, dayFixtures, savePath, tagPool);
+    await runFixtureDay(rl, r, mercPool, llm, dayFixtures, savePath, tagPool, roomCatalog);
     return;
   }
   const idx = parseInt(ans, 10);
@@ -368,7 +401,7 @@ async function cmdAdvanceDay(
   writeFileSync(dayPath, JSON.stringify(dayObj, null, 2));
 
   const day = loadDay(dayPath);
-  await runPlayerDay(rl, r, mercPool, llm, day, dayPath, savePath, [pursued.scenario], tagPool, {
+  await runPlayerDay(rl, r, mercPool, llm, day, dayPath, savePath, [pursued.scenario], tagPool, roomCatalog, {
     rewardGold: lead.rewardGold,
     captiveFromLead: lead.archetype === 'captive' ? lead : undefined,
   });
@@ -385,6 +418,7 @@ async function runPlayerDay(
   savePath: string,
   preloadedScenarios: any[] | null,
   tagPool: Map<string, any>,
+  roomCatalog: Map<string, RoomDef>,
   opts: { rewardGold?: number; captiveFromLead?: Lead } = {},
 ): Promise<void> {
   const { loadScenario } = await import('./scenarios.js');
@@ -474,19 +508,26 @@ async function runPlayerDay(
     // lead's DC so disposition choices (ransom/sell/recruit/...) matter.
     if (opts.captiveFromLead && (band === 'favorable' || band === 'catastrophic-favorable')) {
       const lead = opts.captiveFromLead;
-      const captiveId = `captive-${lead.id}`;
-      const notoriety = Math.max(1, lead.dc);
-      const rolledTags = rollCaptiveTags(tagPool, lead.rarity, lead.id);
-      r.captives.push({
-        id: captiveId,
-        name: `Captive of ${lead.region}`,
-        archetype: 'deserter',
-        backstory: lead.blurb,
-        notoriety,
-        tags: rolledTags,
-      });
-      console.log(`\nCAPTIVE TAKEN: "${captiveId}" added to your hold (notoriety ${notoriety}).${formatTags(rolledTags)}`);
-      console.log(`  Use [c] to choose disposition.`);
+      const cap = totalCapacity(r.fort, roomCatalog, 'dungeon');
+      if (r.captives.length >= cap) {
+        console.log(`\nCAPTIVE TAKEN but NO CELL FREE: dungeon cap ${cap}, currently held ${r.captives.length}.`);
+        console.log(`  The prisoner was bound and dragged here — but with no Storeroom space, they slip free in the night.`);
+        console.log(`  Build a Deep Storeroom or dispose of an existing captive first.`);
+      } else {
+        const captiveId = `captive-${lead.id}`;
+        const notoriety = Math.max(1, lead.dc);
+        const rolledTags = rollCaptiveTags(tagPool, lead.rarity, lead.id);
+        r.captives.push({
+          id: captiveId,
+          name: `Captive of ${lead.region}`,
+          archetype: 'deserter',
+          backstory: lead.blurb,
+          notoriety,
+          tags: rolledTags,
+        });
+        console.log(`\nCAPTIVE TAKEN: "${captiveId}" added to your hold (notoriety ${notoriety}, ${r.captives.length}/${cap} cells).${formatTags(rolledTags)}`);
+        console.log(`  Use [c] to choose disposition.`);
+      }
     }
   }
 
@@ -533,16 +574,129 @@ async function runFixtureDay(
   dayFixtures: string[],
   savePath: string,
   tagPool: Map<string, any>,
+  roomCatalog: Map<string, RoomDef>,
 ): Promise<void> {
   console.log('\nPick a hand-authored day fixture:');
   const pick = await pickFromList(rl, 'day', dayFixtures, (f) => f);
   if (!pick) return;
   const dayAbs = join(FIXTURES_DIR, pick);
   const day = loadDay(dayAbs);
-  await runPlayerDay(rl, r, mercPool, llm, day, dayAbs, savePath, null, tagPool);
+  await runPlayerDay(rl, r, mercPool, llm, day, dayAbs, savePath, null, tagPool, roomCatalog);
 }
 
 async function cmdFort(
+  rl: ReturnType<typeof createInterface>,
+  r: Roster,
+  catalog: any,
+  roomCatalog: Map<string, RoomDef>,
+  mercPool: Map<string, any>,
+  savePath: string,
+): Promise<void> {
+  // Always render the layout first so the player sees what they have.
+  console.log('');
+  for (const line of renderFortLayout(r.fort, roomCatalog)) console.log(line);
+  const cellsOpen = r.fort.cells.length;
+  const placed = r.fort.placedRooms.length;
+  console.log(`\nFort L${r.fort.level}  cells:${cellsOpen} (${placed} occupied)  upgrades:[${r.fort.upgrades.join(',') || '—'}]  gold:${r.gold}g`);
+  const gates = activeGates(r.fort, roomCatalog);
+  if (gates.size > 0) {
+    console.log(`  active gates: ${[...gates].sort().join(', ')}`);
+  } else {
+    console.log('  active gates: (none — build rooms to unlock systems)');
+  }
+
+  const choice = (await rl.question('\n[b]uild room   [e]xcavate cell   [u]pgrade shop   [back] > ')).trim().toLowerCase();
+  if (choice === 'b') {
+    await cmdBuildRoom(rl, r, roomCatalog, mercPool, savePath);
+  } else if (choice === 'e') {
+    await cmdExcavate(rl, r, mercPool, savePath);
+  } else if (choice === 'u') {
+    await cmdBuyUpgrade(rl, r, catalog, mercPool, savePath);
+  }
+}
+
+async function cmdBuildRoom(
+  rl: ReturnType<typeof createInterface>,
+  r: Roster,
+  roomCatalog: Map<string, RoomDef>,
+  mercPool: Map<string, any>,
+  savePath: string,
+): Promise<void> {
+  // Find empty cells.
+  const occupiedCells = new Set(r.fort.placedRooms.map((p) => p.cellIdx));
+  const emptyCells = r.fort.cells.filter((c) => !occupiedCells.has(c.idx)).sort((a, b) => a.idx - b.idx);
+  if (emptyCells.length === 0) {
+    console.log('\n(no empty cells — excavate first)');
+    return;
+  }
+  // Catalog of buildable rooms (excludes already-placed unique rooms, sorted by cost asc).
+  const placedRoomIds = new Set(r.fort.placedRooms.map((p) => p.roomId));
+  const uniques = new Set(['scouting-post', 'tavern', 'chapel', 'watch-tower', 'granary']);
+  const buildable = [...roomCatalog.values()]
+    .filter((rd) => !(uniques.has(rd.id) && placedRoomIds.has(rd.id)))
+    .filter((rd) => !rd.starter || !placedRoomIds.has(rd.id))
+    .sort((a, b) => a.cost - b.cost);
+  if (buildable.length === 0) {
+    console.log('\n(every room already placed)');
+    return;
+  }
+  const room = await pickFromList(rl, '\nbuild which?', buildable, (rd) => {
+    const affordTag = rd.cost <= r.gold ? '' : ' (✗ insufficient gold)';
+    const gates = rd.gates.length > 0 ? `  gates:[${rd.gates.join(',')}]` : '';
+    const adj = rd.adjacencyMates.length > 0 ? `  pairs:[${rd.adjacencyMates.join(',')}]` : '';
+    return `${rd.name} [${rd.id}]  ${rd.cost}g  cat:${rd.category}${gates}${adj}${affordTag}\n      ${rd.description}`;
+  });
+  if (!room) return;
+  if (room.cost > r.gold) { console.log('✗ insufficient gold.'); return; }
+  const cell = await pickFromList(rl, 'place in which cell?', emptyCells, (c) => `cell ${c.idx}  (opened day ${c.openedOnDay})`);
+  if (!cell) return;
+  const out = buildRoom(r.fort, r.gold, room, cell.idx, r.dayCount);
+  if (!out.ok) {
+    const e = out.error;
+    const msg = e.kind === 'insufficient-gold' ? `need ${e.need}g, have ${e.have}g`
+      : e.kind === 'cell-occupied' ? `cell already holds ${e.existing}`
+      : e.kind === 'duplicate-room' ? `${e.roomId} already exists (unique room)`
+      : e.kind === 'unknown-cell' ? 'unknown cell'
+      : 'unknown room';
+    console.log(`✗ ${msg}`);
+    return;
+  }
+  r.fort = out.fort;
+  r.gold = out.gold;
+  appendFortLog(r, {
+    day: r.dayCount + 1,
+    kind: 'upgrade',
+    message: `Built ${room.name} in cell ${cell.idx} for ${room.cost}g.`,
+  });
+  console.log(`✓ Built ${room.name} in cell ${cell.idx}. ${r.gold}g left.`);
+  saveRoster(savePath, r, mercPool);
+}
+
+async function cmdExcavate(
+  rl: ReturnType<typeof createInterface>,
+  r: Roster,
+  mercPool: Map<string, any>,
+  savePath: string,
+): Promise<void> {
+  const out = excavateCell(r.fort, r.gold, r.dayCount);
+  if (!out.ok) {
+    console.log(`✗ excavation needs ${out.error.need}g, you have ${out.error.have}g.`);
+    return;
+  }
+  const confirm = (await rl.question(`Excavate a new cell for ${out.cost}g? (y/N) > `)).trim().toLowerCase();
+  if (confirm !== 'y') { console.log('cancelled.'); return; }
+  r.fort = out.fort;
+  r.gold = out.gold;
+  appendFortLog(r, {
+    day: r.dayCount + 1,
+    kind: 'upgrade',
+    message: `Excavated cell ${r.fort.cells[r.fort.cells.length - 1]!.idx} for ${out.cost}g.`,
+  });
+  console.log(`✓ Excavated cell ${r.fort.cells[r.fort.cells.length - 1]!.idx}. ${r.gold}g left.`);
+  saveRoster(savePath, r, mercPool);
+}
+
+async function cmdBuyUpgrade(
   rl: ReturnType<typeof createInterface>,
   r: Roster,
   catalog: any,
@@ -550,12 +704,11 @@ async function cmdFort(
   savePath: string,
 ): Promise<void> {
   const affordable = affordableUpgrades(catalog, r.fort, r.gold);
-  console.log(`\nFort L${r.fort.level}  owned:[${r.fort.upgrades.join(',') || '—'}]  gold:${r.gold}g`);
   if (affordable.length === 0) {
-    console.log('(no affordable / unowned upgrades right now)');
+    console.log('\n(no affordable / unowned upgrades right now)');
     return;
   }
-  const pick = await pickFromList(rl, 'upgrade', affordable, (u) => `${u.name} [${u.id}]  ${u.cost}g  — ${u.description}`);
+  const pick = await pickFromList(rl, '\nupgrade', affordable, (u) => `${u.name} [${u.id}]  ${u.cost}g  — ${u.description}`);
   if (!pick) return;
   const out = purchaseUpgrade({ fort: r.fort, gold: r.gold, upgrade: pick });
   if (out.ok) {
@@ -608,9 +761,17 @@ async function cmdQuests(
 async function cmdTavern(
   rl: ReturnType<typeof createInterface>,
   r: Roster,
+  roomCatalog: Map<string, RoomDef>,
   mercPool: Map<string, any>,
   savePath: string,
 ): Promise<void> {
+  const gates = activeGates(r.fort, roomCatalog);
+  if (!gates.has('recruit-pool')) {
+    console.log('\nTAVERN  (locked)');
+    console.log('  No Tavern built — drifters drift past without stopping.');
+    console.log('  Build one via [f] fort → [b]uild → Tavern (8g).');
+    return;
+  }
   if (r.hirePool.length === 0) {
     console.log('\n(bench is empty — wait for a refresh)');
     return;

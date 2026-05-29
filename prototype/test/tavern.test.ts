@@ -101,7 +101,7 @@ describe('M10.1 tavern hire pool', () => {
     try {
       saveRoster(tmp, r, mercs);
       const onDisk = JSON.parse(readFileSync(tmp, 'utf8'));
-      expect(onDisk.schemaVersion).toBe(12);
+      expect(onDisk.schemaVersion).toBe(13);
       expect(onDisk.hirePool.length).toBe(HIRE_POOL_TARGET_SIZE);
       const reloaded = loadRoster(tmp, mercs, tags);
       expect(reloaded.hirePool.length).toBe(HIRE_POOL_TARGET_SIZE);

@@ -26,13 +26,28 @@ const FortCatalogSchema = z.object({
   upgrades: z.array(FortUpgradeSchema),
 });
 
+export interface FortCell {
+  idx: number;
+  openedOnDay: number;
+}
+
+export interface PlacedRoom {
+  roomId: string;
+  cellIdx: number;
+  builtOnDay: number;
+}
+
 export interface FortState {
   level: number;
   upgrades: string[];
+  /** PROTO-GAME v13: opened ground-tier cells. */
+  cells: FortCell[];
+  /** PROTO-GAME v13: rooms placed in cells. */
+  placedRooms: PlacedRoom[];
 }
 
 export function newFortState(): FortState {
-  return { level: 1, upgrades: [] };
+  return { level: 1, upgrades: [], cells: [], placedRooms: [] };
 }
 
 export function loadFortCatalog(path: string): Map<string, FortUpgrade> {
@@ -80,6 +95,8 @@ export function purchaseUpgrade(input: PurchaseInput): { ok: true; result: Purch
   const nextFort: FortState = {
     level: leveledUp ? fort.level + 1 : fort.level,
     upgrades: nextUpgrades,
+    cells: fort.cells,
+    placedRooms: fort.placedRooms,
   };
   return {
     ok: true,

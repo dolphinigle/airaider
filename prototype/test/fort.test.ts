@@ -58,7 +58,7 @@ describe('M6.4 fort upgrades', () => {
 
   it('rejects duplicate purchase', () => {
     const u = catalog.get('winter-larder')!;
-    const res = purchaseUpgrade({ fort: { level: 1, upgrades: ['winter-larder'] }, gold: 99, upgrade: u });
+    const res = purchaseUpgrade({ fort: { level: 1, upgrades: ['winter-larder'], cells: [], placedRooms: [] }, gold: 99, upgrade: u });
     expect(res.ok).toBe(false);
     if (res.ok) return;
     expect(res.error.kind).toBe('already-owned');
@@ -79,10 +79,10 @@ describe('M6.4 fort upgrades', () => {
     const path = join(dir, 'r.json');
     const roster = newRoster([...mercPool.values()].slice(0, 2));
     roster.gold = 20;
-    roster.fort = { level: 2, upgrades: ['reinforced-palisade', 'winter-larder'] };
+    roster.fort = { level: 2, upgrades: ['reinforced-palisade', 'winter-larder'], cells: [], placedRooms: [] };
     saveRoster(path, roster, mercPool);
     const reloaded = loadRoster(path, mercPool, tagPool);
-    expect(reloaded.schemaVersion).toBe(12);
+    expect(reloaded.schemaVersion).toBe(13);
     expect(reloaded.fort.level).toBe(2);
     expect(reloaded.fort.upgrades).toEqual(['reinforced-palisade', 'winter-larder']);
   });
@@ -98,7 +98,7 @@ describe('M6.4 fort upgrades', () => {
       deceased: [], activeQuests: [], completedQuests: [], pendingErrands: [],
     }));
     const r = loadRoster(path, mercPool, tagPool);
-    expect(r.fort).toEqual({ level: 1, upgrades: [] });
+    expect(r.fort).toEqual({ level: 1, upgrades: [], cells: [], placedRooms: [] });
   });
 });
 
@@ -109,7 +109,7 @@ describe('M7.5 affordable upgrade hints', () => {
     const { affordableUpgrades } = await import('../src/fort.js');
     // L1 fort, 5g: reinforced-palisade (5g) and winter-larder (3g) qualify;
     // smithy/chapel need L2; watch-tower needs L3. Sorted by cost asc.
-    const hints = affordableUpgrades(catalog, { level: 1, upgrades: [] }, 5);
+    const hints = affordableUpgrades(catalog, { level: 1, upgrades: [], cells: [], placedRooms: [] }, 5);
     expect(hints.map((u) => u.id)).toEqual(['winter-larder', 'reinforced-palisade']);
   });
 
@@ -117,7 +117,7 @@ describe('M7.5 affordable upgrade hints', () => {
     const { affordableUpgrades } = await import('../src/fort.js');
     const hints = affordableUpgrades(
       catalog,
-      { level: 2, upgrades: ['reinforced-palisade'] },
+      { level: 2, upgrades: ['reinforced-palisade'], cells: [], placedRooms: [] },
       99,
     );
     const ids = hints.map((u) => u.id);
@@ -129,7 +129,7 @@ describe('M7.5 affordable upgrade hints', () => {
 
   it('returns [] when no upgrade is affordable', async () => {
     const { affordableUpgrades } = await import('../src/fort.js');
-    const hints = affordableUpgrades(catalog, { level: 1, upgrades: [] }, 0);
+    const hints = affordableUpgrades(catalog, { level: 1, upgrades: [], cells: [], placedRooms: [] }, 0);
     expect(hints).toEqual([]);
   });
 });
@@ -158,11 +158,11 @@ describe('M7.6 persistent fort log', () => {
       schemaVersion: 7, dayCount: 0, gold: 0, reputation: {},
       rosterMercIds: [], generatedMercs: [], mercStates: [], captives: [],
       deceased: [], activeQuests: [], completedQuests: [], pendingErrands: [],
-      fort: { level: 1, upgrades: [] },
+      fort: { level: 1, upgrades: [], cells: [], placedRooms: [] },
     }));
     const r = loadRoster(path, mercPool, tagPool);
     expect(r.fortLog).toEqual([]);
-    expect(r.schemaVersion).toBe(12);
+    expect(r.schemaVersion).toBe(13);
   });
 
   it('fortLog survives a save/load round-trip', () => {
