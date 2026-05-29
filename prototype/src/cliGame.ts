@@ -131,7 +131,9 @@ async function main(): Promise<void> {
     // start with the full default pool so all bundled day-fixture scenarios
     // have the mercs they reference; player can fire/lose them later.
     roster = newRoster([...mercPool.values()]);
-    roster.gold = 10;
+    // PROTO-GAME v13: enough gold to build the first room or two (Scouting
+    // Post 6g + Chapel 4g, with a few left over). Per SIM_BIBLE Day-1 treasury.
+    roster.gold = 20;
     // make sure save dir exists
     mkdirSync(dirname(args.savePath), { recursive: true });
     saveRoster(args.savePath, roster, mercPool);
@@ -193,6 +195,18 @@ function printStatus(r: Roster): void {
   const alerts = statusAlerts(r);
   for (const a of alerts) console.log(` ${a}`);
   console.log('---------------------------------------------------------------');
+  // PROTO-GAME v13: room-gate tutorial nudges. Surface what the player must
+  // build to unlock systems that are currently silent.
+  const placedRoomIds = new Set(r.fort.placedRooms.map((p) => p.roomId));
+  const tutorialHints: string[] = [];
+  if (!placedRoomIds.has('scouting-post')) {
+    tutorialHints.push('No Scouting Post → no leads. Build via [f]→[b]uild (6g).');
+  }
+  if (!placedRoomIds.has('tavern')) {
+    tutorialHints.push('No Tavern → no recruits drift in. Build via [f]→[b]uild (8g).');
+  }
+  for (const h of tutorialHints) console.log(` ▶ ${h}`);
+  if (tutorialHints.length > 0) console.log('---------------------------------------------------------------');
 }
 
 function printMenu(): void {

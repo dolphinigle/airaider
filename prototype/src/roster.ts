@@ -245,16 +245,18 @@ export function newRoster(initialMercs: Merc[]): Roster {
     fort: {
       level: 1,
       upgrades: [],
-      // Day-1 starter layout per SIM_BIBLE §2: 3 ground cells with bunkroom/bedroom/storeroom.
+      // Day-1 starter layout per SIM_BIBLE §2: 3 ground cells, but ONLY 2
+      // starter rooms placed — the third cell is empty so the player has
+      // an immediate build choice (Scouting Post? Tavern? Chapel?) on Day 1
+      // without needing to excavate first.
       cells: [
         { idx: 0, openedOnDay: 0 },
         { idx: 1, openedOnDay: 0 },
         { idx: 2, openedOnDay: 0 },
       ],
       placedRooms: [
-        { roomId: 'drust-bedroom', cellIdx: 0, builtOnDay: 0 },
-        { roomId: 'bunkroom', cellIdx: 1, builtOnDay: 0 },
-        { roomId: 'storeroom', cellIdx: 2, builtOnDay: 0 },
+        { roomId: 'bunkroom', cellIdx: 0, builtOnDay: 0 },
+        { roomId: 'storeroom', cellIdx: 1, builtOnDay: 0 },
       ],
     },
     fortLog: [],
