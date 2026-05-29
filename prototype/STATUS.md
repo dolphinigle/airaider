@@ -101,6 +101,30 @@ Day loop with fatigue accumulation.
 
 ## Milestone M7 — IN PROGRESS
 
+## PROTO-GAME (post-milestone fun-validation pass) — IN PROGRESS
+
+Layered work on top of the milestone-driven build to surface the
+SIM_BIBLE Day-100 locked dopamine spine. All on branch `prototype/m0`.
+
+- ✅ `9fe4f51` Deploy picker shows full merc tags + highlights matches
+- ✅ `85a8b49` Lead board telegraphs per-slot preferredTags
+- ✅ `e63513a` scripts/playtest100.ts (100-day greedy harness)
+- ✅ `80fa7a5` Captive leads add captives to roster on success
+- ✅ `7a84347` Tag visibility everywhere (roster/leads/deploy/tavern/captives)
+- ✅ `8fe4353` Captives roll rarity-scaled tags at capture
+- ✅ `6cb0855` Tag vocab expanded: general-trait rares + legendaries
+- ✅ `19f326b` Fort-rooms PILLAR: cells, placed rooms, adjacency, room gates
+- ✅ `3323b92` Cold-start UX: 2/3 starter cells, 20g, tutorial nudges
+
+Per SIM_BIBLE §2/§11 the fort is a spatial puzzle, not a flat shop.
+Current state: ground-tier 1D row, 11 rooms, adjacency bonuses
+visualized, room gates (scouting-post → leads, tavern → recruits,
+storeroom → captive cap) enforced in cliGame.
+
+Deferred for proper-impl: room levels, upper tiers, prestige scoring,
+narrated-pool construction roll, multi-cell rooms, income payouts,
+mechanical adjacency bonuses (currently flavor-only).
+
 - [x] M7.1 Fort upgrade mechanical effects (commit `0c0e85d`). `src/fortEffects.ts` exposes pure helpers: `flatCoinBonus` (smithy +1 if any merc deployed), `slotCoinBonus` (watch-tower +1 per `sentry`/`scout`/`watch` slot), `negativeSeasonClamped` (winter-larder zeros negative season modifiers), `palisadeBlocksCasualty` (catastrophic damage clauses dropped). Threaded into the resolver via `ResolutionInput.fortUpgrades`; day.ts + errands.ts pass `roster.fort.upgrades`. Chapel is narrative-only. 7 new tests (123 total).
 - [x] M7.4 Daily events table (commit `40485aa`). `src/events.ts` rolls one entry per day from `data/events.json`, filtered by current season + `requiresUpgrades[]` / `requiresMissingUpgrades[]`, weighted-sampled, deterministic via `rngFromString('event-<dayCount>')`. Effects: `goldDelta` added to `roster.gold`, `fatigueDelta` applied to every merc (clamped at 0), `reputationDeltas[]` merged. Surfaces as a `DAILY EVENT` block at the top of the day transcript. Seven seed events spanning all four seasons; `bandit-scouts` gated by missing watch-tower. 8 new tests (131 total).
 - [x] M7.2 Multi-day campaign demo (commit pending — fixtures + script). `scripts/m7-campaign.sh` runs a deterministic 5-day campaign on `fixtures/m7-campaign-roster.json` (dayCount 27 → 32) that exercises every M6 + M7 system: thaw → high season transition, daily-event swap (`thaw-market-day` × 3 → `high-bandit-scouts` × 2), mid-campaign upgrade purchases (palisade after day 1, smithy after day 3), marek/veska promotion to veteran, and marek↔veska bond formation. Committed mock transcripts at `fixtures/m7-day-{1..5}.day-mock.json` and final roster at `fixtures/m7-campaign-roster.final.json`.
