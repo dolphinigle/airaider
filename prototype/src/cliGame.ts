@@ -303,7 +303,9 @@ function cmdLeads(r: Roster, tagPool: Map<string, any>): void {
   console.log(`LEAD BOARD  (day ${r.dayCount}, ${r.leadBoard.length} active)`);
   for (const lead of r.leadBoard) {
     const daysLeft = Math.max(0, lead.expiryDay - r.dayCount);
-    console.log(`  • [${lead.rarity}] ${lead.archetype} — ${lead.region}  DC${lead.dc}  reward ${lead.rewardGold}g  cost ${lead.pursueCost}g  expires in ${daysLeft}d`);
+    const glyph = lead.rarity === 'legendary' ? '✨' : lead.rarity === 'rare' ? '★' : lead.rarity === 'uncommon' ? '✦' : '·';
+    const rarityLabel = lead.rarity === 'legendary' ? 'LEGENDARY' : lead.rarity;
+    console.log(`  • ${glyph} [${rarityLabel}] ${lead.archetype} — ${lead.region}  DC${lead.dc}  reward ${lead.rewardGold}g  cost ${lead.pursueCost}g  expires in ${daysLeft}d`);
     console.log(`      "${lead.blurb}"`);
     const scen = templateFor(lead);
     for (const slot of scen.slots) {
@@ -354,12 +356,30 @@ async function cmdAdvanceDay(
     console.log(`\n${refresh.expired.length} lead(s) expired overnight: ${refresh.expired.map((l) => l.id).join(', ')}`);
   }
 
+  // PROTO-GAME v13.1: rare/legendary fanfare — call out arrivals that should
+  // make the player lean forward.
+  const newLegendaries = refresh.added.filter((l) => l.rarity === 'legendary');
+  const newRares = refresh.added.filter((l) => l.rarity === 'rare');
+  for (const l of newLegendaries) {
+    console.log('');
+    console.log('  ✦✦✦  A LEGENDARY LEAD HAS REACHED THE GATE  ✦✦✦');
+    console.log(`        ${l.archetype} at ${l.region} — DC${l.dc}, reward ${l.rewardGold}g`);
+    console.log(`        "${l.blurb}"`);
+    console.log(`        only ${Math.max(0, l.expiryDay - r.dayCount)}d before the moment passes`);
+  }
+  if (newLegendaries.length === 0 && newRares.length > 0) {
+    console.log(`\n  ★ ${newRares.length} rare lead${newRares.length === 1 ? '' : 's'} on the board today.`);
+  }
+
   console.log(`\nLEAD BOARD  (day ${r.dayCount})`);
   for (let i = 0; i < r.leadBoard.length; i++) {
     const lead = r.leadBoard[i]!;
     const daysLeft = Math.max(0, lead.expiryDay - r.dayCount);
     const afford = r.gold >= lead.pursueCost ? '' : '  ⚠ cannot afford';
-    console.log(`  ${i + 1}) [${lead.rarity}] ${lead.archetype} — ${lead.region}  DC${lead.dc}  reward ${lead.rewardGold}g  cost ${lead.pursueCost}g  ${daysLeft}d left${afford}`);
+    // PROTO-GAME v13.1: rarity glyph prefix for instant visual sort.
+    const glyph = lead.rarity === 'legendary' ? '✨' : lead.rarity === 'rare' ? '★' : lead.rarity === 'uncommon' ? '✦' : '·';
+    const rarityLabel = lead.rarity === 'legendary' ? 'LEGENDARY' : lead.rarity;
+    console.log(`  ${i + 1}) ${glyph} [${rarityLabel}] ${lead.archetype} — ${lead.region}  DC${lead.dc}  reward ${lead.rewardGold}g  cost ${lead.pursueCost}g  ${daysLeft}d left${afford}`);
     console.log(`     "${lead.blurb}"`);
     const scen = templateFor(lead);
     for (const slot of scen.slots) {

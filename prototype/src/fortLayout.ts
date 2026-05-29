@@ -63,6 +63,12 @@ export function renderFortLayout(
     lines.push('');
     lines.push('  Adjacency bonuses active:');
     for (const b of bonuses) lines.push(`    ⤬ ${b}`);
+    // PROTO-GAME v13.1: surface the mechanical effect, not just the pair.
+    const effIds = adjacencyEffectIds(fort, catalog);
+    for (const id of effIds) {
+      if (id === 'adj-bed-bunk') lines.push('        → +1 fatigue recovery for idle mercs (any season)');
+      else if (id === 'adj-smithy-workshop') lines.push('        → +1 coin on every scenario the fort runs');
+    }
   } else if (fort.placedRooms.length >= 2) {
     lines.push('');
     lines.push('  (no adjacency bonuses — try pairing rooms with their adjacency-mates)');
@@ -97,6 +103,80 @@ export function adjacencyBonuses(
     }
   }
   return out;
+}
+
+/**
+ * PROTO-GAME v13.1: adjacency-driven pseudo-upgrade ids. Returns ids that
+ * downstream FortEffects code can treat the same as bought upgrades.
+ *
+ * Currently:
+ *   - bedroom ↔ bunkroom  → 'adj-bed-bunk'  (+1 fatigue recovery for idle mercs)
+ *   - smithy ↔ workshop   → 'adj-smithy-workshop' (+1 flat coin/scenario)
+ */
+export function adjacencyEffectIds(
+  fort: FortState,
+  catalog: Map<string, RoomDef>,
+): Set<string> {
+  const out = new Set<string>();
+  const placedByCell = new Map<number, string>();
+  for (const p of fort.placedRooms) placedByCell.set(p.cellIdx, p.roomId);
+  const cells = fort.cells.map((c) => c.idx);
+  const totalSpan = (Math.max(...cells, 0)) + 1;
+  const pairActive = (a: string, b: string): boolean => {
+    for (const p of fort.placedRooms) {
+      if (p.roomId !== a) continue;
+      for (const n of adjacentIndices(p.cellIdx, totalSpan)) {
+        if (placedByCell.get(n) === b) return true;
+      }
+    }
+    return false;
+  };
+  if (pairActive('drust-bedroom', 'bunkroom') || pairActive('bunkroom', 'drust-bedroom')) {
+    out.add('adj-bed-bunk');
+  }
+  if (pairActive('smithy', 'workshop') || pairActive('workshop', 'smithy')) {
+    out.add('adj-smithy-workshop');
+  }
+  // Ignore the catalog parameter for now; future expansion may read def.adjacencyEffectIds.
+  void catalog;
+  return out;
+}
+
+/**
+ * PROTO-GAME v13.1: pseudo-upgrade ids contributed by PLACED ROOMS that
+ * mirror their legacy fort-upgrade counterparts. A built smithy room should
+ * trigger the same +1 coin as the legacy `smithy` upgrade.
+ */
+export function roomUpgradeIds(
+  fort: FortState,
+): Set<string> {
+  const out = new Set<string>();
+  const ROOM_TO_UPGRADE: Record<string, string> = {
+    smithy: 'smithy',
+    chapel: 'chapel',
+    granary: 'granary',
+    'watch-tower': 'watch-tower',
+  };
+  for (const p of fort.placedRooms) {
+    const mapped = ROOM_TO_UPGRADE[p.roomId];
+    if (mapped) out.add(mapped);
+  }
+  return out;
+}
+
+/**
+ * PROTO-GAME v13.1: union of legacy upgrades + room-derived upgrades +
+ * adjacency-derived pseudo-upgrades. Pass this to fortEffectsFor.
+ */
+export function effectiveUpgradeIds(
+  fort: FortState,
+  catalog: Map<string, RoomDef>,
+  legacyUpgrades: string[] | undefined,
+): string[] {
+  const out = new Set<string>(legacyUpgrades ?? []);
+  for (const id of roomUpgradeIds(fort)) out.add(id);
+  for (const id of adjacencyEffectIds(fort, catalog)) out.add(id);
+  return [...out];
 }
 
 export type BuildError =

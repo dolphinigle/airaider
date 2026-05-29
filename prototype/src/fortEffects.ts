@@ -40,7 +40,11 @@ export function negativeSeasonClamped(effects: FortEffects | undefined, _season:
 /** Returns the fort's flat coin bonus regardless of slots (currently smithy). */
 export function flatCoinBonus(effects: FortEffects | undefined): number {
   if (!effects) return 0;
-  return effects.upgradeIds.has('smithy') ? 1 : 0;
+  let bonus = 0;
+  if (effects.upgradeIds.has('smithy')) bonus += 1;
+  // PROTO-GAME v13.1: smithy ↔ workshop adjacency adds another +1.
+  if (effects.upgradeIds.has('adj-smithy-workshop')) bonus += 1;
+  return bonus;
 }
 
 /** Returns the watch-tower per-slot bonus given a slot id list. */
@@ -87,8 +91,11 @@ export function fatigueRecoveryAmount(
   season: Season | undefined,
 ): number {
   const winterLarder = !!effects?.upgradeIds.has('winter-larder');
-  if (winterLarder && season === 'frost') return 2;
-  return 1;
+  let amt = 1;
+  if (winterLarder && season === 'frost') amt = 2;
+  // PROTO-GAME v13.1: bedroom ↔ bunkroom adjacency adds +1 recovery year-round.
+  if (effects?.upgradeIds.has('adj-bed-bunk')) amt += 1;
+  return amt;
 }
 
 /**

@@ -37,6 +37,19 @@ export const DEBT_DESERTION_THRESHOLD_DAYS = 3;
 export const CAPTIVE_UPKEEP_PER_DAY = 1;
 import { fortEffectsFor, chapelHealsWounds, fatigueRecoveryAmount, granaryWageReduction } from './fortEffects.js';
 import { affordableUpgrades, loadFortCatalog, type FortUpgrade } from './fort.js';
+import { loadRoomCatalog, type RoomDef } from './rooms.js';
+import { effectiveUpgradeIds } from './fortLayout.js';
+
+let _roomCatalogCache: Map<string, RoomDef> | null = null;
+function roomCatalogSingleton(): Map<string, RoomDef> {
+  if (_roomCatalogCache) return _roomCatalogCache;
+  const list = loadRoomCatalog(new URL('../data/rooms.json', import.meta.url).pathname);
+  _roomCatalogCache = new Map(list.map((r) => [r.id, r]));
+  return _roomCatalogCache;
+}
+function effUpgradesForRoster(roster: { fort: { upgrades: string[]; cells: any[]; placedRooms: any[] } }): string[] {
+  return effectiveUpgradeIds(roster.fort as any, roomCatalogSingleton(), roster.fort.upgrades);
+}
 
 const DaySchema = z.object({
   id: z.string().min(1),
@@ -211,7 +224,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   const bondedPairs = roster ? bondedPairsOf(roster) : undefined;
   const seasonClock: SeasonClock | null = roster ? seasonFor(roster.dayCount) : null;
   const season = seasonClock?.season;
-  const fortUpgrades = roster ? roster.fort.upgrades : undefined;
+  const fortUpgrades = roster ? effUpgradesForRoster(roster) : undefined;
 
   // M7.4: roll the day's event (if any) before scenarios begin, and apply
   // its flat effects to the roster. Roster-less callers get no event.
@@ -367,7 +380,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
     for (const e of roster.pendingErrands) for (const id of e.partyMercIds) onErrand.add(id);
     // M7.13: winter-larder doubles fatigue recovery during frost.
     const recoverAmount = fatigueRecoveryAmount(
-      fortEffectsFor(roster.fort.upgrades),
+      fortEffectsFor(effUpgradesForRoster(roster)),
       season,
     );
     for (const m of roster.mercs) {
@@ -389,7 +402,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   // of truth for hp damage; cliDay does NOT round-trip hpDamage the way it
   // does fatigue, because hp damage already lives on roster.states).
   const woundHealing: Array<{ mercId: string; before: number; after: number }> = [];
-  if (roster && chapelHealsWounds(fortEffectsFor(roster.fort.upgrades))) {
+  if (roster && chapelHealsWounds(fortEffectsFor(effUpgradesForRoster(roster)))) {
     const deployed = new Set<string>();
     for (const sr of scenarioResolutions) {
       for (const sc of sr.slotContributions) deployed.add(sc.mercId);
@@ -416,7 +429,7 @@ export async function resolveDay(input: DayResolutionInput): Promise<DayResoluti
   if (roster) {
     const currentDay = roster.dayCount + 1;
     if (currentDay % WAGE_INTERVAL_DAYS === 0 && roster.mercs.length > 0) {
-      const wageReduction = granaryWageReduction(fortEffectsFor(roster.fort.upgrades));
+      const wageReduction = granaryWageReduction(fortEffectsFor(effUpgradesForRoster(roster)));
       for (const m of roster.mercs) {
         const paid = Math.max(0, m.wage - wageReduction);
         wagesPaid.push({ mercId: m.id, wage: paid });

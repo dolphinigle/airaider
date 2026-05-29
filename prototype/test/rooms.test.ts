@@ -9,6 +9,9 @@ import {
   activeGates,
   totalCapacity,
   adjacencyBonuses,
+  adjacencyEffectIds,
+  roomUpgradeIds,
+  effectiveUpgradeIds,
 } from '../src/fortLayout.js';
 import type { FortState } from '../src/fort.js';
 
@@ -240,5 +243,68 @@ describe('adjacency bonuses', () => {
     };
     const bonuses = adjacencyBonuses(fort, catalog);
     expect(bonuses.length).toBe(0);
+  });
+});
+
+describe('adjacency effect ids (PROTO-GAME v13.1)', () => {
+  it('produces adj-bed-bunk for the starter fort', () => {
+    const ids = adjacencyEffectIds(starterFort(), catalog);
+    expect(ids.has('adj-bed-bunk')).toBe(true);
+  });
+
+  it('produces adj-smithy-workshop when adjacent', () => {
+    const fort: FortState = {
+      level: 1,
+      upgrades: [],
+      cells: [
+        { idx: 0, openedOnDay: 0 },
+        { idx: 1, openedOnDay: 0 },
+      ],
+      placedRooms: [
+        { roomId: 'smithy', cellIdx: 0, builtOnDay: 1 },
+        { roomId: 'workshop', cellIdx: 1, builtOnDay: 1 },
+      ],
+    };
+    const ids = adjacencyEffectIds(fort, catalog);
+    expect(ids.has('adj-smithy-workshop')).toBe(true);
+  });
+});
+
+describe('roomUpgradeIds + effectiveUpgradeIds (PROTO-GAME v13.1)', () => {
+  it('projects placed smithy/chapel rooms to upgrade ids', () => {
+    const fort: FortState = {
+      level: 1,
+      upgrades: [],
+      cells: [
+        { idx: 0, openedOnDay: 0 },
+        { idx: 1, openedOnDay: 0 },
+      ],
+      placedRooms: [
+        { roomId: 'smithy', cellIdx: 0, builtOnDay: 1 },
+        { roomId: 'chapel', cellIdx: 1, builtOnDay: 1 },
+      ],
+    };
+    const ids = roomUpgradeIds(fort);
+    expect(ids.has('smithy')).toBe(true);
+    expect(ids.has('chapel')).toBe(true);
+  });
+
+  it('unions legacy upgrades + room projections + adjacency ids', () => {
+    const fort: FortState = {
+      level: 1,
+      upgrades: ['winter-larder'],
+      cells: [
+        { idx: 0, openedOnDay: 0 },
+        { idx: 1, openedOnDay: 0 },
+      ],
+      placedRooms: [
+        { roomId: 'smithy', cellIdx: 0, builtOnDay: 1 },
+        { roomId: 'workshop', cellIdx: 1, builtOnDay: 1 },
+      ],
+    };
+    const merged = new Set(effectiveUpgradeIds(fort, catalog, fort.upgrades));
+    expect(merged.has('winter-larder')).toBe(true);
+    expect(merged.has('smithy')).toBe(true);
+    expect(merged.has('adj-smithy-workshop')).toBe(true);
   });
 });
