@@ -16,8 +16,8 @@ export function StatusBar({ state, onAdvanceDay, onExcavate, busy }: { state: Ga
       </span>
       <span style={{ flex: 1 }} />
       <button onClick={onExcavate} disabled={busy}>excavate</button>
-      <button onClick={onAdvanceDay} disabled={busy} data-testid="advance-day" style={{ background: 'var(--accent)', color: '#1a1815', borderColor: 'var(--accent)' }}>
-        advance day »
+      <button onClick={onAdvanceDay} disabled={busy} data-testid="end-day" style={{ background: 'var(--accent)', color: '#1a1815', borderColor: 'var(--accent)', fontWeight: 'bold' }}>
+        END DAY »
       </button>
     </header>
   );
