@@ -98,3 +98,45 @@ export async function resolveDueErrands(args: {
   roster.pendingErrands = remaining;
   return out;
 }
+
+/** M14.1: result of abandoning an in-flight errand. */
+export interface ErrandAbandonResult {
+  errandId: string;
+  scenarioPath: string;
+  partyMercIds: string[];
+  fatigueGain: number;
+  daysSkippedAhead: number;
+}
+
+/** M14.1: per-merc fatigue penalty applied when an errand is abandoned. */
+export const ERRAND_ABANDON_FATIGUE_PENALTY = 1;
+
+/**
+ * M14.1: drop an in-flight errand by id. The party stops the work and walks
+ * back empty-handed; each merc takes a small fatigue hit. Returns the
+ * abandon record or `undefined` if no pending errand with that id exists.
+ *
+ * Unlike `resolveDueErrands`, no scenario is rolled and no reward/penalty
+ * is computed — this is the player's pre-emptive recall.
+ */
+export function abandonErrand(
+  roster: Roster,
+  errandId: string,
+  fatiguePenalty: number = ERRAND_ABANDON_FATIGUE_PENALTY,
+): ErrandAbandonResult | undefined {
+  const idx = roster.pendingErrands.findIndex((e) => e.errandId === errandId);
+  if (idx < 0) return undefined;
+  const e = roster.pendingErrands[idx]!;
+  for (const id of e.partyMercIds) {
+    const st = roster.states.get(id);
+    if (st) st.fatigue = Math.max(0, st.fatigue + fatiguePenalty);
+  }
+  roster.pendingErrands.splice(idx, 1);
+  return {
+    errandId: e.errandId,
+    scenarioPath: e.scenarioPath,
+    partyMercIds: [...e.partyMercIds],
+    fatigueGain: fatiguePenalty,
+    daysSkippedAhead: Math.max(0, e.returnsOnDay - roster.dayCount),
+  };
+}

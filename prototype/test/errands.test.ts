@@ -6,7 +6,7 @@ import { loadTags } from '../src/tags.js';
 import { loadMercs } from '../src/mercs.js';
 import { loadScenario } from '../src/scenarios.js';
 import { newRoster } from '../src/roster.js';
-import { dispatchErrand, mercsInTransit, resolveDueErrands } from '../src/errands.js';
+import { dispatchErrand, mercsInTransit, resolveDueErrands, abandonErrand, ERRAND_ABANDON_FATIGUE_PENALTY } from '../src/errands.js';
 import { loadDay, resolveDay } from '../src/day.js';
 import { MockScenarioLLM } from '../src/llm/mock.js';
 
@@ -116,5 +116,54 @@ describe('M5.4 errands (long-clock)', () => {
     expect(r4.errandsResolved).toHaveLength(1);
     expect(r4.errandsResolved[0]!.scenarioId).toBe('raid-12-errand-courier');
     expect(roster.pendingErrands).toHaveLength(0);
+  });
+});
+
+describe('M14.1 errand abandonment', () => {
+  const tags = loadTags(join(ROOT, 'data', 'tags.json'));
+  const mercs = loadMercs(join(ROOT, 'data', 'mercs.json'), tags);
+
+  it('exports fatigue penalty = 1', () => {
+    expect(ERRAND_ABANDON_FATIGUE_PENALTY).toBe(1);
+  });
+
+  it('removes the errand and stamps fatigue on every party member', () => {
+    const roster = newRoster([...mercs.values()]);
+    roster.dayCount = 2;
+    const scen = loadScenario(join(ROOT, 'fixtures', 'raid-12-errand-courier.json'));
+    const e = dispatchErrand({
+      roster, scenario: scen, scenarioPath: 'raid-12-errand-courier.json',
+      partyMercIds: ['dren', 'imogen'],
+    });
+    const drenFatBefore = roster.states.get('dren')!.fatigue;
+    const imoFatBefore = roster.states.get('imogen')!.fatigue;
+    const res = abandonErrand(roster, e.errandId);
+    expect(res).toBeDefined();
+    expect(res!.errandId).toBe(e.errandId);
+    expect(res!.partyMercIds.sort()).toEqual(['dren', 'imogen']);
+    expect(res!.fatigueGain).toBe(ERRAND_ABANDON_FATIGUE_PENALTY);
+    expect(res!.daysSkippedAhead).toBe(4); // returnsOnDay 6 − dayCount 2
+    expect(roster.pendingErrands).toHaveLength(0);
+    expect(roster.states.get('dren')!.fatigue).toBe(drenFatBefore + 1);
+    expect(roster.states.get('imogen')!.fatigue).toBe(imoFatBefore + 1);
+  });
+
+  it('returns undefined when the errand id is unknown', () => {
+    const roster = newRoster([...mercs.values()]);
+    expect(abandonErrand(roster, 'nonexistent')).toBeUndefined();
+  });
+
+  it('honors a custom fatigue penalty', () => {
+    const roster = newRoster([...mercs.values()]);
+    roster.dayCount = 0;
+    const scen = loadScenario(join(ROOT, 'fixtures', 'raid-12-errand-courier.json'));
+    const e = dispatchErrand({
+      roster, scenario: scen, scenarioPath: 'raid-12-errand-courier.json',
+      partyMercIds: ['marek'],
+    });
+    const before = roster.states.get('marek')!.fatigue;
+    const res = abandonErrand(roster, e.errandId, 3);
+    expect(res!.fatigueGain).toBe(3);
+    expect(roster.states.get('marek')!.fatigue).toBe(before + 3);
   });
 });
