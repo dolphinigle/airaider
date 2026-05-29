@@ -1,6 +1,8 @@
 import type { GameState } from '../types';
+import { useDispatch } from '../api';
 
 export function MercPanel({ state }: { state: GameState }) {
+  const dispatch = useDispatch();
   return (
     <section data-testid="merc-panel" style={{ background: 'var(--panel)', padding: 12, borderRadius: 3, overflow: 'auto' }}>
       <h3 style={{ margin: '0 0 8px', fontSize: 13, color: 'var(--accent)' }}>ROSTER ({state.mercs.length})</h3>
@@ -26,8 +28,29 @@ export function MercPanel({ state }: { state: GameState }) {
         <>
           <h3 style={{ margin: '12px 0 8px', fontSize: 13, color: 'var(--accent)' }}>TAVERN BENCH ({state.hirePool.length})</h3>
           {state.hirePool.map((h) => (
-            <div key={h.merc.id} style={{ padding: 6, marginBottom: 6, background: 'var(--panel-2)', borderRadius: 3, fontSize: 12 }}>
-              {h.merc.name} ({h.merc.archetype}) — {h.price}g
+            <div key={h.merc.id} data-testid={`bench-${h.merc.id}`} style={{ padding: 6, marginBottom: 6, background: 'var(--panel-2)', borderRadius: 3, fontSize: 12 }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'baseline' }}>
+                <strong>{h.merc.name}</strong>
+                <span style={{ color: 'var(--muted)' }}>{h.merc.archetype}</span>
+                {h.startingTier && h.startingTier !== 'rookie' && (
+                  <span style={{ color: 'var(--rare)' }}>★{h.startingTier}</span>
+                )}
+                <span style={{ flex: 1 }} />
+                <span>{h.price}g</span>
+                <button
+                  data-testid={`hire-${h.merc.id}`}
+                  disabled={state.gold < h.price || dispatch.isPending}
+                  onClick={() => dispatch.mutate({ kind: 'hire-merc', mercId: h.merc.id })}
+                  style={{ fontSize: 11, padding: '2px 8px' }}
+                >
+                  hire
+                </button>
+              </div>
+              {h.merc.tags.length > 0 && (
+                <div style={{ marginTop: 2, fontSize: 11, color: 'var(--muted)' }}>
+                  {h.merc.tags.map((t) => t.label).join(', ')}
+                </div>
+              )}
             </div>
           ))}
         </>

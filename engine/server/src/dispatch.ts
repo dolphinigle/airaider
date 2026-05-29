@@ -19,6 +19,8 @@ import { applyCaptiveEffect as applyCaptiveEffectRoster } from '../../../prototy
 import { FORMER_CAPTIVE_TAG_ID } from '../../../prototype/src/captive.js';
 import { refreshLeadBoard, BASE_RARITY_WEIGHTS } from '../../../prototype/src/leads.js';
 import { computePrestige, prestigeTier, tiltRarityWeights } from '../../../prototype/src/prestige.js';
+import { refreshHirePool, hireFromPool } from '../../../prototype/src/tavern.js';
+import { rngFromString } from '../../../prototype/src/rng.js';
 
 export const CommandSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('advance-day') }),
@@ -35,6 +37,7 @@ export const CommandSchema = z.discriminatedUnion('kind', [
     action: z.enum(['ransom', 'sell', 'display', 'recruit', 'execute']),
   }),
   z.object({ kind: z.literal('refresh-leads') }),
+  z.object({ kind: z.literal('hire-merc'), mercId: z.string() }),
 ]);
 export type Command = z.infer<typeof CommandSchema>;
 
@@ -78,13 +81,27 @@ export function dispatch(
         fortLevel: roster.fort.level,
       });
       const weights = tiltRarityWeights({ ...BASE_RARITY_WEIGHTS }, prestigeTier(prestige));
-      const refresh = refreshLeadBoard({
-        board: roster.leadBoard,
-        dayCount: roster.dayCount,
-        rarityWeights: weights,
-      });
-      roster.leadBoard = [...refresh.kept, ...refresh.added];
-      return { ok: true, message: `advanced to day ${roster.dayCount}` };
+      const placedRoomIds = new Set(roster.fort.placedRooms.map((p) => p.roomId));
+      const hasScouting = placedRoomIds.has('scouting-post');
+      let leadAddedNote = '';
+      if (hasScouting) {
+        const refresh = refreshLeadBoard({
+          board: roster.leadBoard,
+          dayCount: roster.dayCount,
+          rarityWeights: weights,
+        });
+        roster.leadBoard = [...refresh.kept, ...refresh.added];
+        leadAddedNote = `, leads:${roster.leadBoard.length}`;
+      }
+      // Tavern bench refresh — gated on tavern being built so the bench
+      // doesn't fill up before the player builds one (mirrors CLI rules).
+      let hireNote = '';
+      if (placedRoomIds.has('tavern')) {
+        const rng = rngFromString(`gui-tavern-day${roster.dayCount}`);
+        const added = refreshHirePool(roster, rng, tagPool, roster.dayCount);
+        if (added.length > 0) hireNote = `, bench+${added.length}`;
+      }
+      return { ok: true, message: `advanced to day ${roster.dayCount}${leadAddedNote}${hireNote}` };
     }
     case 'build-room': {
       const def = roomCatalog.get(cmd.roomId);
@@ -137,6 +154,20 @@ export function dispatch(
       }
       applyCaptiveEffectRoster(roster, cap, captiveEffect);
       return { ok: true, message: `${cmd.action}: gold ${captiveEffect.goldDelta >= 0 ? '+' : ''}${captiveEffect.goldDelta}g` };
+    }
+    case 'hire-merc': {
+      const idx = roster.hirePool.findIndex((e) => e.merc.id === cmd.mercId);
+      if (idx < 0) return { ok: false, error: `merc ${cmd.mercId} not on tavern bench` };
+      const entry = roster.hirePool[idx]!;
+      if (roster.gold < entry.price) {
+        return { ok: false, error: `not enough gold (need ${entry.price}g, have ${roster.gold}g)` };
+      }
+      try {
+        const merc = hireFromPool(roster, idx);
+        return { ok: true, message: `hired ${merc.name} for ${entry.price}g` };
+      } catch (err: any) {
+        return { ok: false, error: err?.message ?? String(err) };
+      }
     }
   }
 }
