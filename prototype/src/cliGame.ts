@@ -39,6 +39,8 @@ import { reputationTier } from './reputation.js';
 import { seasonFor } from './season.js';
 import { bondedPairsOf } from './bonds.js';
 import { refreshLeadBoard, pursueLead, PURSUE_COST_BY_RARITY, type Lead } from './leads.js';
+import { templateFor } from './scenarioTemplates.js';
+import { formatTags, formatPreferredTags } from './tagFormat.js';
 
 // ---------- paths & args ----------
 
@@ -150,7 +152,7 @@ async function main(): Promise<void> {
       switch (cmd) {
         case 'h': case 'H': case '?': printHelp(); break;
         case 'r': case 'R': cmdRosterShow(roster); break;
-        case 'l': case 'L': cmdLeads(roster); break;
+        case 'l': case 'L': cmdLeads(roster, tagPool); break;
         case 'd': case 'D': await cmdAdvanceDay(rl, roster, mercPool, llm, dayFixtures, args.savePath, tagPool); break;
         case 'f': case 'F': await cmdFort(rl, roster, fortCatalog, mercPool, args.savePath); break;
         case 'q': case 'Q_'/*placeholder*/: await cmdQuests(rl, roster, questCatalog, mercPool, args.savePath); break;
@@ -269,7 +271,7 @@ function cmdRosterShow(r: Roster): void {
   }
 }
 
-function cmdLeads(r: Roster): void {
+function cmdLeads(r: Roster, tagPool: Map<string, any>): void {
   console.log('');
   if (r.leadBoard.length === 0) {
     console.log('Lead board is empty. Advance a day to refresh it.');
@@ -280,6 +282,11 @@ function cmdLeads(r: Roster): void {
     const daysLeft = Math.max(0, lead.expiryDay - r.dayCount);
     console.log(`  • [${lead.rarity}] ${lead.archetype} — ${lead.region}  DC${lead.dc}  reward ${lead.rewardGold}g  cost ${lead.pursueCost}g  expires in ${daysLeft}d`);
     console.log(`      "${lead.blurb}"`);
+    const scen = templateFor(lead);
+    for (const slot of scen.slots) {
+      const pAttr = slot.preferredAttr ? `  attr:${slot.preferredAttr}` : '';
+      console.log(`      ↳ slot "${slot.id}"${pAttr}${formatPreferredTags(slot.preferredTags, tagPool)}`);
+    }
   }
 }
 
@@ -306,6 +313,11 @@ async function cmdAdvanceDay(
     const afford = r.gold >= lead.pursueCost ? '' : '  ⚠ cannot afford';
     console.log(`  ${i + 1}) [${lead.rarity}] ${lead.archetype} — ${lead.region}  DC${lead.dc}  reward ${lead.rewardGold}g  cost ${lead.pursueCost}g  ${daysLeft}d left${afford}`);
     console.log(`     "${lead.blurb}"`);
+    const scen = templateFor(lead);
+    for (const slot of scen.slots) {
+      const pAttr = slot.preferredAttr ? `  attr:${slot.preferredAttr}` : '';
+      console.log(`     ↳ slot "${slot.id}"${pAttr}${formatPreferredTags(slot.preferredTags, tagPool)}`);
+    }
   }
   console.log(`  R) rest day (no scenario, fatigue recovers)`);
   console.log(`  F) play a hand-authored day fixture (${dayFixtures.length} available)`);
@@ -355,7 +367,7 @@ async function cmdAdvanceDay(
   writeFileSync(dayPath, JSON.stringify(dayObj, null, 2));
 
   const day = loadDay(dayPath);
-  await runPlayerDay(rl, r, mercPool, llm, day, dayPath, savePath, [pursued.scenario], {
+  await runPlayerDay(rl, r, mercPool, llm, day, dayPath, savePath, [pursued.scenario], tagPool, {
     rewardGold: lead.rewardGold,
     captiveFromLead: lead.archetype === 'captive' ? lead : undefined,
   });
@@ -371,6 +383,7 @@ async function runPlayerDay(
   dayPath: string,
   savePath: string,
   preloadedScenarios: any[] | null,
+  tagPool: Map<string, any>,
   opts: { rewardGold?: number; captiveFromLead?: Lead } = {},
 ): Promise<void> {
   const { loadScenario } = await import('./scenarios.js');
@@ -407,15 +420,16 @@ async function runPlayerDay(
         const bTagHit = b.tags.some((t: any) => slot.preferredTags?.includes(t.id)) ? 1 : 0;
         return bTagHit - aTagHit;
       });
-      console.log(`\n    slot "${slot.id}" — prefers ${pAttr ?? '(any)'}${slot.preferredTags?.length ? `, tags:[${slot.preferredTags.join(',')}]` : ''}`);
+      console.log(`\n    slot "${slot.id}" — prefers ${pAttr ?? '(any)'}${formatPreferredTags(slot.preferredTags, tagPool)}`);
       console.log(`    "${slot.description}"`);
       const picked = await pickFromList(rl, `    assign to ${slot.id}`, ranked, (m: any) => {
         const st = r.states.get(m.id);
-        const tagHit = m.tags.some((t: any) => slot.preferredTags?.includes(t.id)) ? '  ★preferred-tag' : '';
+        const matched = (m.tags as any[]).filter((t) => slot.preferredTags?.includes(t.id));
+        const star = matched.length > 0 ? `  ★(${matched.map((t) => t.label).join(',')})` : '';
         const attrStr = pAttr ? `  ${pAttr}=${m.attrs[pAttr]}` : '';
         const fat = st && st.fatigue > 0 ? `  fat:${st.fatigue}` : '';
         const tier = st && st.tier !== 'rookie' ? `  ${st.tier}` : '';
-        return `${m.name} [${m.id}]${attrStr}${tagHit}${fat}${tier}`;
+        return `${m.name} [${m.id}]${attrStr}${star}${fat}${tier}${formatTags(m.tags)}`;
       });
       if (!picked) {
         console.log(`    (skipped — falling back to fixture default for this scenario)`);
@@ -515,14 +529,14 @@ async function runFixtureDay(
   llm: ScenarioLLM,
   dayFixtures: string[],
   savePath: string,
-  _tagPool: Map<string, any>,
+  tagPool: Map<string, any>,
 ): Promise<void> {
   console.log('\nPick a hand-authored day fixture:');
   const pick = await pickFromList(rl, 'day', dayFixtures, (f) => f);
   if (!pick) return;
   const dayAbs = join(FIXTURES_DIR, pick);
   const day = loadDay(dayAbs);
-  await runPlayerDay(rl, r, mercPool, llm, day, dayAbs, savePath, null);
+  await runPlayerDay(rl, r, mercPool, llm, day, dayAbs, savePath, null, tagPool);
 }
 
 async function cmdFort(
@@ -598,7 +612,7 @@ async function cmdTavern(
     console.log('\n(bench is empty — wait for a refresh)');
     return;
   }
-  const pick = await pickFromList(rl, 'hire who?', r.hirePool, (e) => `${e.merc.name} [${e.merc.id}]  ${e.price}g  wage:${e.merc.wage}  posted day ${e.postedDay}`);
+  const pick = await pickFromList(rl, 'hire who?', r.hirePool, (e) => `${e.merc.name} [${e.merc.id}]  ${e.price}g  wage:${e.merc.wage}  posted day ${e.postedDay}${formatTags(e.merc.tags)}`);
   if (!pick) return;
   if (r.gold < pick.price) {
     console.log(`✗ Can't afford (have ${r.gold}g, need ${pick.price}g).`);
@@ -625,7 +639,7 @@ async function cmdCaptives(
     console.log('\n(no captives held)');
     return;
   }
-  const cap = await pickFromList(rl, 'which captive?', r.captives, (c) => `${c.name}  ${c.archetype}  notoriety:${c.notoriety}`);
+  const cap = await pickFromList(rl, 'which captive?', r.captives, (c) => `${c.name}  ${c.archetype}  notoriety:${c.notoriety}${formatTags(c.tags)}`);
   if (!cap) return;
   console.log(`\nCaptive ${cap.name} — choose disposition:`);
   const action = await pickFromList(rl, 'action', CAPTIVE_ACTIONS as readonly CaptiveAction[] as CaptiveAction[], (a) => a);

@@ -15,6 +15,7 @@ import { statusAlerts, watchTowerForecast } from './rosterAlerts.js';
 import { seasonFor, DAYS_PER_SEASON } from './season.js';
 import { loadQuests } from './quests.js';
 import { bondedPairsOf } from './bonds.js';
+import { formatTags } from './tagFormat.js';
 
 function main(): void {
   const [cmd, pathArg] = process.argv.slice(2);
@@ -92,7 +93,7 @@ function printRoster(r: Roster, path: string): void {
     // M9.10: surface in-window grief stamp so the player sees who is mourning
     // (the same hint the LLM gets via recentlyLostBondPartner).
     const grief = st && st.recentGriefPartner ? `  grieving:${st.recentGriefPartner}` : '';
-    console.log(`  • ${m.name} [${m.id}]${tier}${fatigue}${dmg}${vGain}${grief}`);
+    console.log(`  • ${m.name} [${m.id}]${tier}${fatigue}${dmg}${vGain}${grief}${formatTags(m.tags)}`);
   }
   // M16.1: surface currently-bonded pairs so the player can see emergent
   // comradeship. Bonded pairs are derived from co-deployment counters.
@@ -110,13 +111,13 @@ function printRoster(r: Roster, path: string): void {
     console.log(`\nTavern bench (${r.hirePool.length}):`);
     for (const e of r.hirePool) {
       const vet = e.startingTier && e.startingTier !== 'rookie' ? ` ${e.startingTier}` : '';
-      console.log(`  ⚑ ${e.merc.name} [${e.merc.id}]${vet}  ${e.price}g  (posted day ${e.postedDay})`);
+      console.log(`  ⚑ ${e.merc.name} [${e.merc.id}]${vet}  ${e.price}g  (posted day ${e.postedDay})${formatTags(e.merc.tags)}`);
     }
   }
   if (r.captives.length > 0) {
     console.log(`\nCaptives held (${r.captives.length}):`);
     for (const c of r.captives) {
-      console.log(`  • ${c.name} [${c.id}]  ${c.archetype}  notoriety:${c.notoriety}`);
+      console.log(`  • ${c.name} [${c.id}]  ${c.archetype}  notoriety:${c.notoriety}${formatTags(c.tags)}`);
     }
   }
   if (r.fortLog.length > 0) {
