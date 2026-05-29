@@ -41,6 +41,7 @@ import { bondedPairsOf } from './bonds.js';
 import { refreshLeadBoard, pursueLead, PURSUE_COST_BY_RARITY, type Lead } from './leads.js';
 import { templateFor } from './scenarioTemplates.js';
 import { formatTags, formatPreferredTags } from './tagFormat.js';
+import { rollCaptiveTags } from './captiveTags.js';
 
 // ---------- paths & args ----------
 
@@ -475,15 +476,17 @@ async function runPlayerDay(
       const lead = opts.captiveFromLead;
       const captiveId = `captive-${lead.id}`;
       const notoriety = Math.max(1, lead.dc);
+      const rolledTags = rollCaptiveTags(tagPool, lead.rarity, lead.id);
       r.captives.push({
         id: captiveId,
         name: `Captive of ${lead.region}`,
         archetype: 'deserter',
         backstory: lead.blurb,
         notoriety,
-        tags: [],
+        tags: rolledTags,
       });
-      console.log(`\nCAPTIVE TAKEN: "${captiveId}" added to your hold (notoriety ${notoriety}). Use [c] to choose disposition.`);
+      console.log(`\nCAPTIVE TAKEN: "${captiveId}" added to your hold (notoriety ${notoriety}).${formatTags(rolledTags)}`);
+      console.log(`  Use [c] to choose disposition.`);
     }
   }
 
