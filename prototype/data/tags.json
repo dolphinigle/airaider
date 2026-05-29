@@ -44,8 +44,8 @@
   {
     "id": "bg:priest",
     "category": "background",
-    "rarity": "rare",
-    "tier": 2,
+    "rarity": "uncommon",
+    "tier": 3,
     "mutexGroup": "background",
     "attrBias": { "charisma": 1, "willpower": 1 },
     "label": "Priest"
@@ -73,6 +73,7 @@
     "category": "physicality",
     "rarity": "common",
     "tier": 2,
+    "mutexGroup": "physique",
     "attrBias": { "physical": 1 },
     "label": "Brawny"
   },
@@ -121,8 +122,8 @@
   {
     "id": "bg:noble-bastard",
     "category": "background",
-    "rarity": "rare",
-    "tier": 2,
+    "rarity": "uncommon",
+    "tier": 3,
     "mutexGroup": "background",
     "attrBias": { "charisma": 1, "intelligence": 1 },
     "label": "Noble Bastard"
@@ -140,6 +141,7 @@
     "category": "physicality",
     "rarity": "common",
     "tier": 5,
+    "mutexGroup": "physique",
     "attrBias": { "physical": -1 },
     "label": "Frail"
   },
@@ -190,5 +192,69 @@
     "tier": 1,
     "attrBias": { "willpower": 2, "charisma": -1 },
     "label": "Touched by the Mire"
+  },
+  {
+    "id": "trait:oathsworn",
+    "category": "trait",
+    "rarity": "rare",
+    "tier": 2,
+    "attrBias": { "willpower": 1 },
+    "label": "Oathsworn"
+  },
+  {
+    "id": "trait:silver-tongue",
+    "category": "trait",
+    "rarity": "rare",
+    "tier": 2,
+    "attrBias": { "charisma": 1, "intelligence": 1 },
+    "label": "Silver-Tongued"
+  },
+  {
+    "id": "trait:night-eyed",
+    "category": "trait",
+    "rarity": "uncommon",
+    "tier": 3,
+    "attrBias": { "agility": 1 },
+    "label": "Night-Eyed"
+  },
+  {
+    "id": "trait:battle-tested",
+    "category": "trait",
+    "rarity": "uncommon",
+    "tier": 3,
+    "attrBias": { "physical": 1, "willpower": 1 },
+    "label": "Battle-Tested"
+  },
+  {
+    "id": "trait:prophet-touched",
+    "category": "trait",
+    "rarity": "rare",
+    "tier": 2,
+    "attrBias": { "intelligence": 1, "willpower": 1, "charisma": -1 },
+    "label": "Prophet-Touched"
+  },
+  {
+    "id": "trait:god-marked",
+    "category": "trait",
+    "rarity": "legendary",
+    "tier": 1,
+    "attrBias": { "charisma": 1, "willpower": 2 },
+    "label": "God-Marked"
+  },
+  {
+    "id": "trait:lost-heir",
+    "category": "trait",
+    "rarity": "legendary",
+    "tier": 1,
+    "attrBias": { "charisma": 1, "intelligence": 1, "willpower": 1 },
+    "label": "Lost Heir"
+  },
+  {
+    "id": "trait:dragon-slayer",
+    "category": "trait",
+    "rarity": "legendary",
+    "tier": 1,
+    "attrBias": { "physical": 1, "willpower": 2 },
+    "label": "Dragon-Slayer"
   }
 ]
