@@ -22,6 +22,7 @@ export function QuestChainPanel({ chains }: Props) {
   if (chains.length === 0) return null;
   const active = chains.filter((c) => c.status === 'active');
   const ended = chains.filter((c) => c.status !== 'active');
+  const titleById = new Map(chains.map((c) => [c.id, c.title]));
 
   return (
     <div style={{
@@ -36,14 +37,14 @@ export function QuestChainPanel({ chains }: Props) {
       {active.length === 0 && ended.length === 0 && (
         <div style={{ color: '#888', fontStyle: 'italic' }}>no sagas yet — pursue a rare lead to begin one</div>
       )}
-      {active.map((c) => <ChainCard key={c.id} chain={c} />)}
+      {active.map((c) => <ChainCard key={c.id} chain={c} priorTitle={c.priorChainId ? titleById.get(c.priorChainId) : undefined} />)}
       {ended.length > 0 && (
         <details style={{ marginTop: 8 }}>
           <summary style={{ cursor: 'pointer', color: '#888' }}>
             ended sagas ({ended.length})
           </summary>
           <div style={{ marginTop: 6 }}>
-            {ended.map((c) => <ChainCard key={c.id} chain={c} ended />)}
+            {ended.map((c) => <ChainCard key={c.id} chain={c} ended priorTitle={c.priorChainId ? titleById.get(c.priorChainId) : undefined} />)}
           </div>
         </details>
       )}
@@ -51,7 +52,7 @@ export function QuestChainPanel({ chains }: Props) {
   );
 }
 
-function ChainCard({ chain, ended }: { chain: QuestChainView; ended?: boolean }) {
+function ChainCard({ chain, ended, priorTitle }: { chain: QuestChainView; ended?: boolean; priorTitle?: string }) {
   const stepDots = Array.from({ length: chain.totalSteps }, (_, i) => {
     const s = chain.steps[i];
     if (!s) return '·';
@@ -61,6 +62,7 @@ function ChainCard({ chain, ended }: { chain: QuestChainView; ended?: boolean })
     if (s.status === 'active') return '○';
     return '·';
   }).join(' ');
+  const activeStep = chain.status === 'active' ? chain.steps[chain.currentStepIdx] : undefined;
   return (
     <div style={{
       marginBottom: 10,
@@ -76,6 +78,11 @@ function ChainCard({ chain, ended }: { chain: QuestChainView; ended?: boolean })
           {chain.status} · {chain.kind}{chain.unitName ? ` · ${chain.unitName}` : ''}
         </span>
       </div>
+      {priorTitle && (
+        <div style={{ fontSize: 11, color: '#8a7a55', marginTop: 2, fontStyle: 'italic' }}>
+          ↳ sequel to "{priorTitle}"
+        </div>
+      )}
       <div style={{ fontSize: 12, color: '#ccc', marginTop: 2, fontStyle: 'italic' }}>
         {chain.hook}
       </div>
@@ -83,6 +90,12 @@ function ChainCard({ chain, ended }: { chain: QuestChainView; ended?: boolean })
         {stepDots}  ({chain.currentStepIdx + (chain.status === 'active' ? 0 : 1)}/{chain.totalSteps})
         {' · '}{chain.region}
       </div>
+      {activeStep?.leadBlurb && (
+        <div style={{ fontSize: 12, color: '#c8b78a', marginTop: 6, paddingLeft: 8, borderLeft: '2px solid #4a3f2a' }}>
+          <span style={{ color: '#7a6f4a', fontWeight: 'bold', fontSize: 10, letterSpacing: 1 }}>NEXT BEAT</span>
+          <div style={{ marginTop: 2 }}>{activeStep.leadBlurb}</div>
+        </div>
+      )}
       {ended && chain.epilogue && (
         <div style={{ fontSize: 12, color: '#bda87a', marginTop: 6, paddingLeft: 8, borderLeft: '2px solid #5a4a2a' }}>
           {chain.epilogue}

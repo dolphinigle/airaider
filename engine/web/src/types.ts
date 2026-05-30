@@ -185,6 +185,7 @@ export interface QuestChainStepView {
   band?: string;
   summary?: string;
   partyMercNames?: string[];
+  leadBlurb?: string;
 }
 
 export interface QuestChainView {
@@ -196,6 +197,7 @@ export interface QuestChainView {
   region: string;
   title: string;
   hook: string;
+  priorChainId?: string;
   currentStepIdx: number;
   totalSteps: number;
   status: 'active' | 'completed' | 'failed' | 'abandoned';
