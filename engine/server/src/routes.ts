@@ -30,14 +30,10 @@ function snapshotState(roster: Roster, roomCatalog: Map<string, RoomDef>): unkno
   const adjEffects = [...adjacencyEffectIds(roster.fort, roomCatalog)];
   const dungeonFree = dungeonCellsWithSpace(roster.fort, roomCatalog, roster.captives);
   const dungeonCap = totalCapacity(roster.fort, roomCatalog, 'dungeon');
-  const captives = roster.captives.map((c) => {
-    const base = captiveCellEffects(roster.fort, roomCatalog, c.cellIdx);
-    const placed = c.cellIdx !== undefined
-      ? roster.fort.placedRooms.find((p) => p.cellIdx === c.cellIdx)
-      : undefined;
-    const dailyEffect = placed ? (roomCatalog.get(placed.roomId)?.captiveDailyEffect ?? null) : null;
-    return { ...c, cellEffects: { ...base, captiveDailyEffect: dailyEffect } };
-  });
+  const captives = roster.captives.map((c) => ({
+    ...c,
+    cellEffects: captiveCellEffects(roster.fort, roomCatalog, c.cellIdx),
+  }));
   const mercs = roster.mercs.map((m) => {
     const st = roster.states.get(m.id);
     return { ...m, fatigue: st?.fatigue ?? 0, hpDamage: st?.hpDamage ?? 0, tier: st?.tier ?? 'rookie' };

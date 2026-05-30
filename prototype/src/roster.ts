@@ -52,11 +52,7 @@ const CaptiveSchema = z.object({
   name: z.string(),
   archetype: z.string(),
   backstory: z.string(),
-  notoriety: z.number().int().min(1).max(10),
-  /** Notoriety at capture. Used as the anchor for room-effect caps. */
-  baseNotoriety: z.number().int().min(1).max(10).optional(),
-  /** Days spent in the current cell — reset to 0 on move. */
-  daysInRoom: z.number().int().min(0).optional(),
+  notoriety: z.number().int().min(1).max(5),
   tagIds: z.array(z.string()),
   /** PROTO-GAME v14: spatial assignment to a specific dungeon cell. Optional —
    *  fresh captures default to unassigned; the player assigns from the captives
@@ -330,9 +326,6 @@ export function loadRoster(
     archetype: c.archetype,
     backstory: c.backstory,
     notoriety: c.notoriety,
-    baseNotoriety: c.baseNotoriety ?? c.notoriety,
-    daysInRoom: c.daysInRoom ?? 0,
-    cellIdx: c.cellIdx,
     tags: c.tagIds.map((tid) => {
       const t = tagPool.get(tid);
       if (!t) throw new Error(`roster: unknown tag id ${tid} in captive ${c.id}`);
@@ -436,9 +429,6 @@ export function saveRoster(
       archetype: c.archetype,
       backstory: c.backstory,
       notoriety: c.notoriety,
-      baseNotoriety: c.baseNotoriety,
-      daysInRoom: c.daysInRoom,
-      cellIdx: c.cellIdx,
       tagIds: c.tags.map((t) => t.id),
     })),
     deceased: roster.deceased,
