@@ -91,6 +91,10 @@ export async function dispatch(
   const { roomCatalog, tagPool } = catalogs;
   switch (cmd.kind) {
     case 'refresh-leads': {
+      const placedRoomIds = new Set(roster.fort.placedRooms.map((p) => p.roomId));
+      if (!placedRoomIds.has('scouting-post')) {
+        return { ok: false, message: 'build a Scouting Post first — no leads without scouts.' };
+      }
       const prestige = computePrestige({
         displayedCount: roster.displayedCount,
         legendaryLeadsCompleted: roster.legendaryLeadsCompleted,
@@ -383,25 +387,10 @@ export async function dispatch(
       }
       store.lastResolutions = resolutions;
 
-      // Step 3: refresh lead board & tavern bench (gated as before).
-      const placedRoomIds = new Set(roster.fort.placedRooms.map((p) => p.roomId));
-      if (placedRoomIds.has('scouting-post')) {
-        const prestige = computePrestige({
-          displayedCount: roster.displayedCount,
-          legendaryLeadsCompleted: roster.legendaryLeadsCompleted,
-          fortLevel: roster.fort.level,
-          roomPrestige: totalRoomPrestige(roster.fort, roomCatalog),
-        captivePrestige: captiveRoomPrestige(roster.fort, roomCatalog, roster.captives),
-        });
-        const weights = tiltRarityWeights({ ...BASE_RARITY_WEIGHTS }, prestigeTier(prestige));
-        const refresh = refreshLeadBoard({
-          board: roster.leadBoard,
-          dayCount: roster.dayCount,
-          rarityWeights: weights,
-        });
-        await enrichLeadBlurbs(refresh.added);
-        roster.leadBoard = [...refresh.kept, ...refresh.added];
-      }
+      // Step 3: prune expired leads (no auto-top-up — that fires expensive AI
+      // calls every day). New leads only appear when player explicitly hits
+      // Refresh Leads, keeping AI cost player-initiated and predictable.
+      roster.leadBoard = roster.leadBoard.filter((l) => l.expiryDay >= roster.dayCount);
       // Tavern auto-refresh disabled: recruits now drop from successful
       // non-captive raid quests (see generateQuestRecruit above) instead of
       // weekly bench replenishment. The tavern room still gates other things

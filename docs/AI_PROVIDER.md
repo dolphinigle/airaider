@@ -89,6 +89,20 @@ For the production game, organize calls by purpose:
 
 **For prototype**: simplify to **GPT-4o-mini for everything**, A/B test Sonnet on narrative-heavy moments in week 2-3.
 
+### Narrative-vs-mechanical tier split (production wiring, deferred from prototype)
+
+The prototype runs one model (`AIRAIDER_LLM_MODEL`, default `gpt-4o-mini`) for every callsite. Production should split into two tiers — narrative (player reads it) gets a stronger model; mechanical (engine consumes IDs) gets the cheapest model that can follow JSON schema.
+
+| Env var | Default | Used by |
+|---|---|---|
+| `AIRAIDER_LLM_NARRATIVE_MODEL` | `gpt-4o-mini` (or `gpt-4.1-mini` once budget allows) | `narrate()`, `aiLeadGen` — anything the player reads as prose |
+| `AIRAIDER_LLM_MECHANICAL_MODEL` | `gpt-4.1-nano` | `flavorCaptive()`, `generateQuestRecruit()` — name + tagIds from outcome story; player only sees the resulting tags/labels, not the raw response |
+| `AIRAIDER_LLM_MODEL` | (unset) | Single-knob override; if set, wins over both above |
+
+**Rationale (per @dolphinigle, 2026-05-30 morning):** "we want the more expensive model for narration and the cheap model like mini/nano for the mechanical stuff like generating unit tags from story." Pricing per 1M tok: `gpt-4.1-nano` $0.10/$0.40 → `gpt-4o-mini` $0.15/$0.60 (1.5× nano) → `gpt-4.1-mini` $0.40/$1.60. Three viable test candidates: **nano / 4o-mini / 4.1-mini**, chosen per callsite based on whether prose quality matters.
+
+**Implementation note:** wire `pickModel(tier: 'narrative' | 'mechanical')` once in `engine/server/src/leanLlm.ts`; have callsites pass their tier. Falls back to `AIRAIDER_LLM_MODEL` then to the tier default.
+
 ---
 
 ## 5. Output format for airaider scenarios
