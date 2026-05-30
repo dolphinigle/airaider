@@ -36,6 +36,8 @@ import {
 } from './quests.js';
 import { getScenarioLLM } from './llm.js';
 import { flavorCaptive } from './leanLlm.js';
+import { enrichLeadBlurbs } from './aiLeadGen.js';
+import { flavorRecruits } from './aiRecruitGen.js';
 
 export const CommandSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('end-day') }),
@@ -102,6 +104,7 @@ export async function dispatch(
         dayCount: roster.dayCount,
         rarityWeights: weights,
       });
+      await enrichLeadBlurbs(refresh.added);
       roster.leadBoard = [...refresh.kept, ...refresh.added];
       return { ok: true, message: `kept ${refresh.kept.length}, added ${refresh.added.length}, expired ${refresh.expired.length}` };
     }
@@ -336,11 +339,13 @@ export async function dispatch(
           dayCount: roster.dayCount,
           rarityWeights: weights,
         });
+        await enrichLeadBlurbs(refresh.added);
         roster.leadBoard = [...refresh.kept, ...refresh.added];
       }
       if (placedRoomIds.has('tavern')) {
         const rng = rngFromString(`gui-tavern-day${roster.dayCount}`);
-        refreshHirePool(roster, rng, tagPool, roster.dayCount);
+        const added = refreshHirePool(roster, rng, tagPool, roster.dayCount);
+        await flavorRecruits(added.map((e) => e.merc));
       }
       // Idle fatigue recovery: each day, every merc not in a quest recovers 1 fatigue.
       const assignedMercIds = new Set<string>();
