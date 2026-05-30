@@ -42,8 +42,8 @@ const RARITY_WEIGHTS: Record<LeadRarity, number> = {
   common: 60, uncommon: 28, rare: 10, legendary: 2,
 };
 
-const REGIONS = ['Crow\'s Ford', 'Pinewood', 'Greythorn', 'Eastfen', 'Saltmire', 'Blackmoor', 'Ironvale'];
-const ARCHETYPES = ['raid', 'recovery', 'contract', 'heist', 'captive'] as const;
+export const REGIONS = ['Crow\'s Ford', 'Pinewood', 'Greythorn', 'Eastfen', 'Saltmire', 'Blackmoor', 'Ironvale'] as const;
+export const ARCHETYPES = ['raid', 'recovery', 'contract', 'heist', 'captive'] as const;
 export type LeadArchetype = (typeof ARCHETYPES)[number];
 
 export const TARGET_LEAD_COUNT = 5;
