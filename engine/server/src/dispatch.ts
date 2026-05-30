@@ -21,7 +21,7 @@ import { applyCaptiveEffect as applyCaptiveEffectRoster } from '../../../prototy
 import { FORMER_CAPTIVE_TAG_ID } from '../../../prototype/src/captive.js';
 import { refreshLeadBoard, BASE_RARITY_WEIGHTS, pursueLead as pursueLeadEngine } from '../../../prototype/src/leads.js';
 import { computePrestige, prestigeTier, tiltRarityWeights } from '../../../prototype/src/prestige.js';
-import { refreshHirePool, hireFromPool } from '../../../prototype/src/tavern.js';
+import { hireFromPool } from '../../../prototype/src/tavern.js';
 import { rngFromString } from '../../../prototype/src/rng.js';
 import { appendFortLog } from '../../../prototype/src/roster.js';
 import { resolveScenario, type Assignment } from '../../../prototype/src/resolver.js';
@@ -37,7 +37,7 @@ import {
 import { getScenarioLLM } from './llm.js';
 import { flavorCaptive } from './leanLlm.js';
 import { enrichLeadBlurbs } from './aiLeadGen.js';
-import { flavorRecruits } from './aiRecruitGen.js';
+import { generateQuestRecruit } from './aiQuestRecruit.js';
 
 export const CommandSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('end-day') }),
@@ -235,6 +235,52 @@ export async function dispatch(
             message: `[${quest.lead.rarity}] ${quest.scenario.title}: ${res.band} (+${goldAwarded}g)`,
           });
 
+          // Non-captive favorable resolutions drop a recruit who joins the
+          // roster — flavored by the OUTCOME STORY so it reads as a
+          // consequence of the raid ("a survivor from the camp asked for a
+          // place by your fire").
+          if (
+            quest.lead.archetype !== 'captive' &&
+            (res.band === 'favorable' || res.band === 'catastrophic-favorable')
+          ) {
+            try {
+              const recruit = await generateQuestRecruit(
+                {
+                  leadBlurb: quest.lead.blurb,
+                  leadArchetype: quest.lead.archetype,
+                  leadRegion: quest.lead.region,
+                  leadRarity: quest.lead.rarity,
+                  outcomeNarrative: res.outcomeNarrative,
+                  seed: quest.lead.id,
+                },
+                tagPool,
+              );
+              // Guard against id collision (e.g. same lead resolved twice).
+              if (!roster.mercs.some((m) => m.id === recruit.id)) {
+                roster.mercs.push(recruit);
+                roster.states.set(recruit.id, {
+                  id: recruit.id,
+                  fatigue: 0,
+                  hpDamage: 0,
+                  veterancyGain: 0,
+                  xp: 0,
+                  tier: 'rookie',
+                  coDeployments: {},
+                });
+                appendFortLog(roster, {
+                  day: roster.dayCount,
+                  kind: 'note',
+                  message: `RECRUIT JOINED: ${recruit.name} — drawn into your service after "${quest.scenario.title}"`,
+                });
+                console.log(
+                  `[quest-recruit] joined after "${quest.scenario.title}": ${recruit.name}, tags [${recruit.tags.map((t) => t.label).join(', ')}]`,
+                );
+              }
+            } catch (err: any) {
+              console.warn(`[quest-recruit] failed: ${err?.message ?? String(err)}`);
+            }
+          }
+
           // Captive-archetype leads, on favorable+ bands, drop a captive
           // into the dungeon (mirrors prototype/cliGame.ts behaviour).
           if (
@@ -348,11 +394,10 @@ export async function dispatch(
         await enrichLeadBlurbs(refresh.added);
         roster.leadBoard = [...refresh.kept, ...refresh.added];
       }
-      if (placedRoomIds.has('tavern')) {
-        const rng = rngFromString(`gui-tavern-day${roster.dayCount}`);
-        const added = refreshHirePool(roster, rng, tagPool, roster.dayCount);
-        await flavorRecruits(added.map((e) => e.merc));
-      }
+      // Tavern auto-refresh disabled: recruits now drop from successful
+      // non-captive raid quests (see generateQuestRecruit above) instead of
+      // weekly bench replenishment. The tavern room still gates other things
+      // but no longer spawns mercs on idle days.
       // Idle fatigue recovery: each day, every merc not in a quest recovers 1 fatigue.
       const assignedMercIds = new Set<string>();
       for (const q of store.pursued) {
