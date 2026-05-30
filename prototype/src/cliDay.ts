@@ -59,11 +59,11 @@ function parseArgs(argv: string[]): CliArgs {
 
 function printUsage(): void {
   console.error(
-    `Usage: npm run day -- <day.json> [--real] [--model gpt-4.1-nano] [--out path] [--no-write] [--roster=PATH] [--force]
+    `Usage: npm run day -- <day.json> [--real] [--model gpt-4o-mini] [--out path] [--no-write] [--roster=PATH] [--force]
 
   <day.json>       Path to day fixture (e.g. fixtures/day-01.json)
   --real           Use real OpenAI; needs OPENAI_API_KEY
-  --model NAME     Override OpenAI model (default gpt-4.1-nano)
+  --model NAME     Override OpenAI model (default gpt-4o-mini)
   --out PATH       Override transcript output path
   --no-write       Don't write a transcript JSON file (still prints to stdout)
   --roster=PATH    Load/save persistent roster state (creates if missing)
@@ -142,7 +142,7 @@ async function main(): Promise<void> {
   if (args.useReal) {
     llm = new OpenAIScenarioLLM({
       apiKey: process.env.OPENAI_API_KEY!,
-      model: args.model ?? 'gpt-4.1-nano',
+      model: args.model ?? 'gpt-4o-mini',
       // day loops can run more scenarios than the single-scenario CLI;
       // bump the call limit accordingly.
       callLimit: 25,

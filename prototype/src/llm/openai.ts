@@ -49,7 +49,7 @@ export class OpenAIScenarioLLM implements ScenarioLLM {
   constructor(cfg: OpenAIConfig) {
     if (!cfg.apiKey) throw new Error('OpenAIScenarioLLM requires apiKey');
     this.client = new OpenAI({ apiKey: cfg.apiKey });
-    this.model = cfg.model ?? 'gpt-4.1-nano';
+    this.model = cfg.model ?? 'gpt-4o-mini';
     this.maxTokens = cfg.maxTokens ?? 800;
     this.temperature = cfg.temperature ?? 0.7;
     this.callLimit = cfg.callLimit ?? 5;

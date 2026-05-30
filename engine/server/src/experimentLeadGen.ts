@@ -30,7 +30,7 @@ if (!apiKey) {
   process.exit(1);
 }
 
-const MODEL = process.env.AIRAIDER_EXPERIMENT_MODEL ?? 'gpt-4.1-nano';
+const MODEL = process.env.AIRAIDER_EXPERIMENT_MODEL ?? 'gpt-4o-mini';
 const COUNT = 5;
 const client = new OpenAI({ apiKey });
 

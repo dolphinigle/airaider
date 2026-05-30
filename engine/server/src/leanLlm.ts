@@ -34,31 +34,18 @@ const NarrationSchema = z.object({
 const SYSTEM_PROMPT = `You are the narration engine for a grimdark mercenary-fort game.
 The ENGINE owns numbers and outcome; you own FLAVOR.
 
-PLAYER PREFERENCES (apply to all prose):
-- tone: grimdark — pragmatic, mortal, mud-and-blood, no glory
-- writing style: terse — short sentences, concrete nouns, zero purple prose
-- NPC gender: balanced
-- cultural register: pan-european (Germanic + Celtic + Slavic feel)
+Voice: grimdark, terse, mortal, mud-and-blood. Low-medieval Europe (Germanic/Celtic/Slavic feel). No glory, no high-fantasy, no anachronisms (use bells, torches, watch-horns — not sirens, firearms, electricity).
 
-Rules:
-- The outcome band is GIVEN (catastrophic / unfavorable / favorable / catastrophic-favorable). You narrate WHY it happened in-fiction.
-- Do NOT invent stats, dice rolls, new mechanics, or new characters who weren't in the party or the lead's blurb.
-- Use each merc's NAME at least once. Lean on their TAGS (cautious, light-footed, etc.) and standout TRAITS (high INT, low STR) for colour — these are the only "stats" you may reference, and only by feel, never by number.
-- If a merc has a backstory, you may anchor ONE small concrete detail from it (an object, a place, a habit). Never summarise the backstory verbatim.
+What you have to work with:
+- The outcome BAND is given (catastrophic / unfavorable / favorable / catastrophic-favorable). You narrate WHY it happened in-fiction. Unfavorable/catastrophic must actually hurt — a wound that will fester, a name burned, a body left behind.
+- The LEAD HOOK tells you what the job actually is. Name the specific thing won, lost, or carried — never "the prize/the goods/the target".
+- Use each merc's NAME at least once. Use their tags + standout attributes for colour (never quote numbers). If they have a backstory, you may anchor ONE small detail from it.
+- Do NOT invent stats, dice rolls, new mechanics, or characters not in the party or blurb.
 
-CONCRETENESS (this is non-negotiable):
-- The LEAD HOOK below tells you WHAT the job actually is. Use it. Name the specific thing won, lost, or carried back.
-- BANNED PHRASES: "the prize", "the goods", "their reward", "the target", "the mark", "what they came for", "the spoils", "the relic", "the treasure" — these are placeholders. Replace them with the SPECIFIC thing from the lead hook (a name, an object, a corpse, a sum, a vow, an heirloom, a letter, a child, etc.). If the blurb says "the abbey's reliquary", you say "the bone-locked St. Hadric reliquary" or just "the reliquary", NOT "the prize".
-- Include at least ONE sensory detail per outcome: a smell, a sound, a weight, a temperature, an injury, a small object. No abstractions.
-- Include at least ONE proper noun beyond the merc names: a place, a person mentioned in the blurb, an object, a faction.
-
-PERIOD (low-medieval, grimdark):
-- NO anachronisms. NO sirens, alarms, electricity, firearms, modern phrasing ("sirens blared", "the system kicked in"). Use bells, hue-and-cry, watch-horns, torches, lanterns.
-- NO fantasy clichés ("destiny", "the chosen one", "ancient prophecy") unless the lead blurb explicitly invites it.
-- Outcomes for UNFAVORABLE or CATASTROPHIC bands should feel actually bad — a wound that will fester, a name burned, a guild now hostile, a body left behind. Don't soften an unfavorable result into "they escaped fine, mostly".
+Include at least one sensory detail (smell/sound/weight/temperature/injury) and one proper noun beyond merc names (a place, person, object, faction).
 
 LENGTH: 4-6 sentences, single paragraph. Show the moment, then the consequence.
-Output must be valid JSON: { "outcomeNarrative": "..." }`;
+Output: { "outcomeNarrative": "..." }`;
 
 function attrDescriptor(value: number): string | null {
   // Attribute scale is 0-5 (5 = peerless). Only surface the extremes —
@@ -120,7 +107,7 @@ export class LeanOpenAIScenarioLLM implements ScenarioLLM {
   constructor(cfg: LeanOpenAIConfig) {
     if (!cfg.apiKey) throw new Error('LeanOpenAIScenarioLLM requires apiKey');
     this.client = new OpenAI({ apiKey: cfg.apiKey });
-    this.model = cfg.model ?? 'gpt-4.1-nano';
+    this.model = cfg.model ?? 'gpt-4o-mini';
     this.maxTokens = cfg.maxTokens ?? 500;
     this.temperature = cfg.temperature ?? 0.8;
     this.callLimit = cfg.callLimit ?? 50;
@@ -217,19 +204,16 @@ Narrate the moment. 4-6 sentences. Name the specific stakes from the lead hook. 
 // ---------------------------------------------------------------------------
 
 const CAPTIVE_FLAVOR_SYSTEM = `You are the flavor engine for a grimdark mercenary-fort game.
-The ENGINE has just rolled a captive's notoriety and tags. You return a name + archetype + 1-2 sentence backstory that makes that captive feel like a believable consequence of the LEAD the player pursued.
+The ENGINE has rolled a captive's notoriety + tags. You return a name + archetype + 1-2 sentence backstory that reads as a believable consequence of the LEAD the player pursued.
 
-PLAYER PREFERENCES (apply to all flavor):
-- tone: grimdark
-- writing: terse
-- NPC gender: balanced
-- cultural register: pan-european
+Voice: grimdark, terse, pan-european low-medieval (Germanic/Celtic/Slavic). No grand destiny, no magic unless tags say so.
 
 Rules:
-- Archetype must follow the lead's blurb. "deserter in the marsh" → archetype 'deserter'. "guildsman's courier" → 'courier'. "witness needed alive" → 'witness'. NEVER invent a 'Lost Heir' if the blurb says 'deserter'.
-- Name: 1 first name, optional 1 epithet/clan ("Marek of the Fen"). Match cultural register.
-- Backstory: 1-2 sentences. Mention how the tags shaped them ("the bog still on him; flinches at lanterns"). No grand destiny. No magic unless tags say so.
-- Return STRICT JSON: { "name": "...", "archetype": "...", "backstory": "..." }.`;
+- Archetype follows the lead's blurb. "deserter in the marsh" → 'deserter'; "courier" → 'courier'. Don't invent a 'Lost Heir' if the blurb says 'deserter'.
+- Name: 1 first name + optional epithet/clan ("Marek of the Fen"). Match cultural register.
+- Backstory: 1-2 sentences. Let the tags shape the detail ("the bog still on him; flinches at lanterns").
+
+Output: { "name": "...", "archetype": "...", "backstory": "..." }`;
 
 const CaptiveFlavorSchema = z.object({
   name: z.string().min(1),

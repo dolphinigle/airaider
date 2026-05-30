@@ -103,7 +103,7 @@ export class OpenAICaptiveLLM implements CaptiveLLM {
   constructor(cfg: OpenAICaptiveConfig) {
     if (!cfg.apiKey) throw new Error('OpenAICaptiveLLM requires apiKey');
     this.client = new OpenAI({ apiKey: cfg.apiKey });
-    this.model = cfg.model ?? 'gpt-4.1-nano';
+    this.model = cfg.model ?? 'gpt-4o-mini';
     this.maxTokens = cfg.maxTokens ?? 500;
     this.temperature = cfg.temperature ?? 0.7;
     this.callLimit = cfg.callLimit ?? 10;

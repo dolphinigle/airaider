@@ -260,7 +260,7 @@ export async function dispatch(
               const apiKey = process.env.OPENAI_API_KEY;
               if (apiKey) {
                 try {
-                  const flavor = await flavorCaptive(apiKey, process.env.AIRAIDER_LLM_MODEL ?? 'gpt-4.1-nano', {
+                  const flavor = await flavorCaptive(apiKey, process.env.AIRAIDER_LLM_MODEL ?? 'gpt-4o-mini', {
                     leadBlurb: quest.lead.blurb,
                     leadArchetype: quest.lead.archetype,
                     leadRegion: quest.lead.region,

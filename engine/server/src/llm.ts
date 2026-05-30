@@ -51,13 +51,13 @@ export function getScenarioLLM(): ScenarioLLM {
     if (process.env.AIRAIDER_LLM_VARIANT === 'full') {
       inner = new OpenAIScenarioLLM({
         apiKey: key,
-        model: process.env.AIRAIDER_LLM_MODEL ?? 'gpt-4.1-nano',
+        model: process.env.AIRAIDER_LLM_MODEL ?? 'gpt-4o-mini',
         callLimit: Number(process.env.AIRAIDER_LLM_CALL_LIMIT ?? 50),
       });
     } else {
       inner = new LeanOpenAIScenarioLLM({
         apiKey: key,
-        model: process.env.AIRAIDER_LLM_MODEL ?? 'gpt-4.1-nano',
+        model: process.env.AIRAIDER_LLM_MODEL ?? 'gpt-4o-mini',
         callLimit: Number(process.env.AIRAIDER_LLM_CALL_LIMIT ?? 50),
       });
     }

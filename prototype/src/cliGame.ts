@@ -75,7 +75,7 @@ Usage: npm run game -- [--save=PATH] [--real]
 
 Options:
   --save=PATH   Save file path (default: ~/.airaider/save.json)
-  --real        Use OpenAI gpt-4.1-nano LLM (needs OPENAI_API_KEY).
+  --real        Use OpenAI gpt-4o-mini LLM (needs OPENAI_API_KEY).
                 Default is MockScenarioLLM (deterministic, no API call).
 
 Once running, type 'h' for a list of commands.
@@ -107,7 +107,7 @@ async function main(): Promise<void> {
   console.log('  airaider — grimdark mercenary fort  (prototype build)');
   console.log('===============================================================');
   console.log(`  save: ${args.savePath}`);
-  console.log(`  llm:  ${args.useReal ? 'openai:gpt-4.1-nano (real)' : 'mock (deterministic, no API call)'}`);
+  console.log(`  llm:  ${args.useReal ? 'openai:gpt-4o-mini (real)' : 'mock (deterministic, no API call)'}`);
   console.log('  type "h" for help, "Q" to quit.');
   console.log('');
 
@@ -142,7 +142,7 @@ async function main(): Promise<void> {
   }
 
   const llm: ScenarioLLM = args.useReal
-    ? new OpenAIScenarioLLM({ apiKey: process.env.OPENAI_API_KEY!, model: 'gpt-4.1-nano', callLimit: 50 })
+    ? new OpenAIScenarioLLM({ apiKey: process.env.OPENAI_API_KEY!, model: 'gpt-4o-mini', callLimit: 50 })
     : new MockScenarioLLM();
 
   // available day fixtures the player can roll

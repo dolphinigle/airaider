@@ -68,11 +68,11 @@ function parseArgs(argv: string[]): CliArgs {
 
 function printUsage(): void {
   console.error(
-    `Usage: npm run scenario -- <fixture.json> [--real] [--model gpt-4.1-nano] [--seed STR] [--out path] [--no-write] [--force]
+    `Usage: npm run scenario -- <fixture.json> [--real] [--model gpt-4o-mini] [--seed STR] [--out path] [--no-write] [--force]
 
   <fixture.json>   Path to scenario fixture (e.g. fixtures/raid-01.json)
   --real           Use real OpenAI; needs OPENAI_API_KEY (read from ~/.airaider/openai.env or env)
-  --model NAME     Override OpenAI model (default gpt-4.1-nano)
+  --model NAME     Override OpenAI model (default gpt-4o-mini)
   --seed STR       Override the deterministic RNG seed
   --approach ID    For multi-approach scenarios, pick approach by id (e.g. assault|parley|poison)
   --out PATH       Override transcript output path
@@ -122,7 +122,7 @@ async function main(): Promise<void> {
   if (args.useReal) {
     llm = new OpenAIScenarioLLM({
       apiKey: process.env.OPENAI_API_KEY!,
-      model: args.model ?? 'gpt-4.1-nano',
+      model: args.model ?? 'gpt-4o-mini',
     });
   } else {
     llm = new MockScenarioLLM();

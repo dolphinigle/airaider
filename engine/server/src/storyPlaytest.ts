@@ -22,7 +22,7 @@ if (!apiKey) {
   process.exit(1);
 }
 
-const llm = new LeanOpenAIScenarioLLM({ apiKey, model: 'gpt-4.1-nano' });
+const llm = new LeanOpenAIScenarioLLM({ apiKey, model: 'gpt-4o-mini' });
 
 const TAGS: Record<string, Tag> = {
   cautious: { id: 'temp:cautious', label: 'cautious', category: 'temperament', rarity: 'common', tier: 1 },
