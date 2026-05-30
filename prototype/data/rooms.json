@@ -47,7 +47,7 @@
       "description": "Cheap beer, hot stew, a fire. Drifters drift in. So do recruits.",
       "incomePerDay": 1,
       "gates": ["recruit-pool", "fatigue-recovery"],
-      "wantedTags": ["bg:peasant", "pers:charming", "pers:greedy", "trait:silver-tongue"]
+      "wantedTags": ["bg:peasant", "pers:charming", "pers:greedy", "pers:cynical"]
     },
     {
       "id": "smithy",
@@ -58,7 +58,7 @@
       "incomePerDay": 1,
       "gates": ["smithy-craft"],
       "adjacencyMates": ["storeroom"],
-      "wantedTags": ["bg:smith", "bg:soldier", "phys:muscular", "phys:scarred"]
+      "wantedTags": ["bg:smith", "bg:soldier", "phys:muscular", "phys:very-muscular"]
     },
     {
       "id": "chapel",
@@ -68,7 +68,7 @@
       "description": "A small stone chapel for the dead. The living sleep a little easier.",
       "gates": ["chapel-recover"],
       "prestigeBonus": 1,
-      "wantedTags": ["bg:priest", "pers:stoic", "temp:brave", "trait:prophet-touched", "trait:god-marked"]
+      "wantedTags": ["bg:priest", "pers:stoic", "pers:brave", "pers:zealous", "pers:touched-by-the-mire"]
     },
     {
       "id": "watch-tower",
@@ -78,7 +78,7 @@
       "description": "A four-storey tower with crow's-nest sightlines. Few surprises reach the gate.",
       "gates": ["watch-forecast"],
       "prestigeBonus": 1,
-      "wantedTags": ["bg:hunter", "phys:quick", "temp:cautious", "trait:night-eyed"]
+      "wantedTags": ["bg:hunter", "phys:quick", "pers:cautious", "phys:very-quick"]
     },
     {
       "id": "granary",
@@ -127,7 +127,7 @@
       "gates": ["fame"],
       "adjacencyMates": ["chapel", "watch-tower"],
       "prestigeBonus": 3,
-      "wantedTags": ["bg:noble-bastard", "trait:lost-heir", "trait:dragon-slayer", "trait:god-marked", "pers:charming"]
+      "wantedTags": ["bg:noble-bastard", "pers:proud", "pers:honorable", "pers:charming", "pers:touched-by-the-mire"]
     },
     {
       "id": "throne-room",
@@ -138,7 +138,7 @@
       "gates": ["court"],
       "adjacencyMates": ["trophy-hall"],
       "prestigeBonus": 5,
-      "wantedTags": ["bg:noble-bastard", "trait:lost-heir", "pers:charming", "pers:loyal", "trait:oathsworn"]
+      "wantedTags": ["bg:noble-bastard", "pers:honorable", "pers:charming", "pers:loyal", "pers:zealous"]
     }
   ]
 }
