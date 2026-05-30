@@ -66,8 +66,10 @@ export function getScenarioLLM(): ScenarioLLM {
     inner = new MockScenarioLLM();
     console.log('[llm] OPENAI_API_KEY not set — using MockScenarioLLM (deterministic, no AI)');
   }
-  // Wrap so every call dumps full JSON request + response. Opt out with
-  // AIRAIDER_LLM_VERBOSE=0 if the noise becomes a problem.
+  // Wrap for full request/response JSON dump. The lean impl additionally
+  // logs the actual prose prompt it sends to OpenAI (which is what you
+  // typically want to inspect). Opt out of the wrapper dump entirely with
+  // AIRAIDER_LLM_VERBOSE=0.
   cachedLLM = process.env.AIRAIDER_LLM_VERBOSE === '0' ? inner : new LoggingScenarioLLM(inner);
   return cachedLLM;
 }

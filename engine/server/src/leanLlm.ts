@@ -136,6 +136,11 @@ Outcome (ENGINE-DECIDED, you must narrate consistent with this):
 
 Narrate the moment. 4-6 sentences. Return JSON: { "outcomeNarrative": "..." }`;
 
+    if (process.env.AIRAIDER_LLM_VERBOSE !== '0') {
+      console.log(`[lean-llm:prompt] system:\n${SYSTEM_PROMPT}`);
+      console.log(`[lean-llm:prompt] user:\n${userPrompt}`);
+    }
+
     const resp = await this.client.chat.completions.create({
       model: this.model,
       max_tokens: this.maxTokens,
