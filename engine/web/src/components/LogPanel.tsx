@@ -26,7 +26,8 @@ function estimateCostUsd(e: LLMLogEntry): number | null {
 
 function fmtUsd(n: number | null): string {
   if (n === null) return '$?';
-  if (n < 0.001) return `$${(n * 1000).toFixed(2)}m`; // millicents → e.g. $0.50m for 0.5 millicents
+  if (n < 0.0001) return `$${n.toFixed(7)}`;
+  if (n < 0.01) return `$${n.toFixed(5)}`;
   return `$${n.toFixed(4)}`;
 }
 
