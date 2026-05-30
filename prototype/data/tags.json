@@ -256,5 +256,53 @@
     "tier": 1,
     "attrBias": { "physical": 1, "willpower": 2 },
     "label": "Dragon-Slayer"
-  }
+  },
+
+  { "id": "race:human",         "category": "race", "rarity": "common",    "tier": 5, "mutexGroup": "race", "label": "Human" },
+  { "id": "race:fenfolk",       "category": "race", "rarity": "uncommon",  "tier": 3, "mutexGroup": "race", "label": "Fenfolk" },
+  { "id": "race:dwarfborn",     "category": "race", "rarity": "uncommon",  "tier": 3, "mutexGroup": "race", "attrBias": { "physical": 1 }, "label": "Dwarfborn" },
+  { "id": "race:halfling",      "category": "race", "rarity": "uncommon",  "tier": 3, "mutexGroup": "race", "attrBias": { "agility": 1 }, "label": "Halfling" },
+  { "id": "race:wolfborn",      "category": "race", "rarity": "rare",      "tier": 2, "mutexGroup": "race", "attrBias": { "physical": 1 }, "label": "Wolfborn" },
+  { "id": "race:fey-touched",   "category": "race", "rarity": "rare",      "tier": 2, "mutexGroup": "race", "attrBias": { "charisma": 1 }, "label": "Fey-Touched" },
+  { "id": "race:wight-blooded", "category": "race", "rarity": "legendary", "tier": 1, "mutexGroup": "race", "label": "Wight-Blooded" },
+
+  { "id": "temp:patient",       "category": "personality:temperament", "rarity": "uncommon", "tier": 3, "mutexGroup": "temperament", "label": "Patient" },
+  { "id": "temp:hot-tempered",  "category": "personality:temperament", "rarity": "common",   "tier": 5, "mutexGroup": "temperament", "label": "Hot-Tempered" },
+  { "id": "temp:methodical",    "category": "personality:temperament", "rarity": "uncommon", "tier": 3, "mutexGroup": "temperament", "label": "Methodical" },
+  { "id": "temp:nervous",       "category": "personality:temperament", "rarity": "common",   "tier": 5, "mutexGroup": "temperament", "label": "Nervous" },
+
+  { "id": "pers:proud",         "category": "personality", "rarity": "common",   "tier": 5, "label": "Proud" },
+  { "id": "pers:melancholic",   "category": "personality", "rarity": "uncommon", "tier": 3, "label": "Melancholic" },
+  { "id": "pers:vengeful",      "category": "personality", "rarity": "uncommon", "tier": 3, "label": "Vengeful" },
+  { "id": "pers:kind",          "category": "personality", "rarity": "uncommon", "tier": 3, "label": "Kind" },
+  { "id": "pers:suspicious",    "category": "personality", "rarity": "common",   "tier": 5, "label": "Suspicious" },
+  { "id": "pers:zealous",       "category": "personality", "rarity": "uncommon", "tier": 3, "label": "Zealous" },
+  { "id": "pers:cowardly",      "category": "personality", "rarity": "common",   "tier": 5, "label": "Cowardly" },
+  { "id": "pers:honorable",     "category": "personality", "rarity": "uncommon", "tier": 3, "label": "Honorable" },
+  { "id": "pers:treacherous",   "category": "personality", "rarity": "uncommon", "tier": 3, "label": "Treacherous" },
+  { "id": "pers:taciturn",      "category": "personality", "rarity": "common",   "tier": 5, "label": "Taciturn" },
+  { "id": "pers:bawdy",         "category": "personality", "rarity": "common",   "tier": 5, "label": "Bawdy" },
+  { "id": "pers:superstitious", "category": "personality", "rarity": "common",   "tier": 5, "label": "Superstitious" },
+  { "id": "pers:ruthless",      "category": "personality", "rarity": "uncommon", "tier": 3, "label": "Ruthless" },
+
+  { "id": "bg:outlaw",          "category": "background", "rarity": "uncommon", "tier": 3, "mutexGroup": "background", "label": "Outlaw" },
+  { "id": "bg:deserter",        "category": "background", "rarity": "uncommon", "tier": 3, "mutexGroup": "background", "label": "Deserter" },
+  { "id": "bg:sellsword",       "category": "background", "rarity": "common",   "tier": 5, "mutexGroup": "background", "attrBias": { "physical": 1 }, "label": "Sellsword" },
+  { "id": "bg:beggar",          "category": "background", "rarity": "common",   "tier": 5, "mutexGroup": "background", "label": "Beggar" },
+  { "id": "bg:cutpurse",        "category": "background", "rarity": "uncommon", "tier": 3, "mutexGroup": "background", "attrBias": { "agility": 1 }, "label": "Cutpurse" },
+  { "id": "bg:wandering-monk",  "category": "background", "rarity": "uncommon", "tier": 3, "mutexGroup": "background", "attrBias": { "willpower": 1 }, "label": "Wandering Monk" },
+  { "id": "bg:sailor",          "category": "background", "rarity": "common",   "tier": 5, "mutexGroup": "background", "label": "Sailor" },
+  { "id": "bg:apothecary",      "category": "background", "rarity": "uncommon", "tier": 3, "mutexGroup": "background", "attrBias": { "intelligence": 1 }, "label": "Apothecary" },
+
+  { "id": "phys:tall",          "category": "physicality", "rarity": "common",   "tier": 5, "label": "Tall" },
+  { "id": "phys:limping",       "category": "physicality", "rarity": "common",   "tier": 5, "label": "Limping" },
+  { "id": "phys:one-eyed",      "category": "physicality", "rarity": "uncommon", "tier": 3, "label": "One-Eyed" },
+  { "id": "phys:burned",        "category": "physicality", "rarity": "uncommon", "tier": 3, "label": "Burned" },
+
+  { "id": "trait:fire-touched", "category": "trait", "rarity": "rare",      "tier": 2, "label": "Fire-Touched" },
+  { "id": "trait:mountain-born","category": "trait", "rarity": "uncommon",  "tier": 3, "label": "Mountain-Born" },
+  { "id": "trait:salt-blooded", "category": "trait", "rarity": "uncommon",  "tier": 3, "label": "Salt-Blooded" },
+  { "id": "trait:tongueless",   "category": "trait", "rarity": "uncommon",  "tier": 3, "label": "Tongueless" },
+  { "id": "trait:warlock-cursed","category": "trait", "rarity": "legendary","tier": 1, "label": "Warlock-Cursed" },
+  { "id": "trait:star-crowned", "category": "trait", "rarity": "legendary", "tier": 1, "label": "Star-Crowned" }
 ]
