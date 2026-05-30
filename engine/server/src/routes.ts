@@ -88,24 +88,37 @@ function snapshotState(roster: Roster, roomCatalog: Map<string, RoomDef>): unkno
       region: c.region,
       title: c.title,
       hook: c.hook,
+      skeleton: c.skeleton,
+      stepBeats: c.stepBeats,
+      anchors: c.anchors,
       currentStepIdx: c.currentStepIdx,
       totalSteps: c.steps.length,
+      plannedStepCount: c.steps.length,
       status: c.status,
       startedDay: c.startedDay,
       endedDay: c.endedDay,
       epilogue: c.epilogue,
-      steps: c.steps.map((s) => ({
-        stepIdx: s.stepIdx,
-        plannedRarity: s.plannedRarity,
-        status: s.status,
-        band: s.band,
-        summary: s.summary,
-        partyMercNames: (s.partyMercIds ?? []).map((mid) =>
-          roster.mercs.find((m) => m.id === mid)?.name
-          ?? roster.deceased.find((d) => d.id === mid)?.name
-          ?? mid,
-        ),
-      })),
+      steps: c.steps.map((s) => {
+        const lead = s.leadId
+          ? (roster.leadBoard.find((l) => l.id === s.leadId)
+            ?? getQuestStore().pursued.find((q) => q.lead.id === s.leadId)?.lead)
+          : undefined;
+        return {
+          stepIdx: s.stepIdx,
+          plannedRarity: s.plannedRarity,
+          status: s.status,
+          band: s.band,
+          summary: s.summary,
+          leadBlurb: lead?.blurb,
+          leadDc: lead?.dc,
+          leadArchetype: lead?.archetype,
+          partyMercNames: (s.partyMercIds ?? []).map((mid) =>
+            roster.mercs.find((m) => m.id === mid)?.name
+            ?? roster.deceased.find((d) => d.id === mid)?.name
+            ?? mid,
+          ),
+        };
+      }),
     })),
   };
 }
