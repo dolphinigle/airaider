@@ -31,7 +31,7 @@ import { OpenAIScenarioLLM } from './llm/openai.js';
 import type { ScenarioLLM } from './llm/interface.js';
 import { loadFortCatalog, affordableUpgrades, purchaseUpgrade } from './fort.js';
 import { loadRoomCatalog, type RoomDef } from './rooms.js';
-import { renderFortLayout, buildRoom, excavateCell, activeGates, totalCapacity, totalRoomPrestige, dungeonCellsWithSpace, captiveCellEffects } from './fortLayout.js';
+import { renderFortLayout, buildRoom, excavateCell, openFloor, activeGates, totalCapacity, totalRoomPrestige, dungeonCellsWithSpace, captiveCellEffects } from './fortLayout.js';
 import { loadQuests, abandonQuest, type Quest } from './quests.js';
 import { hireFromPool } from './tavern.js';
 import { effectOf, FORMER_CAPTIVE_TAG_ID, type CaptiveAction, CAPTIVE_ACTIONS } from './captive.js';
@@ -675,11 +675,13 @@ async function cmdFort(
     console.log('  active gates: (none — build rooms to unlock systems)');
   }
 
-  const choice = (await rl.question('\n[b]uild room   [e]xcavate cell   [u]pgrade shop   [back] > ')).trim().toLowerCase();
+  const choice = (await rl.question('\n[b]uild room   [e]xcavate cell   [o]pen new floor   [u]pgrade shop   [back] > ')).trim().toLowerCase();
   if (choice === 'b') {
     await cmdBuildRoom(rl, r, roomCatalog, mercPool, savePath);
   } else if (choice === 'e') {
     await cmdExcavate(rl, r, mercPool, savePath);
+  } else if (choice === 'o') {
+    await cmdOpenFloor(rl, r, mercPool, savePath);
   } else if (choice === 'u') {
     await cmdBuyUpgrade(rl, r, catalog, mercPool, savePath);
   }
@@ -748,7 +750,22 @@ async function cmdExcavate(
   mercPool: Map<string, any>,
   savePath: string,
 ): Promise<void> {
-  const out = excavateCell(r.fort, r.gold, r.dayCount);
+  // List available floors
+  const floors = [...new Set(r.fort.cells.map((c) => c.floor))].sort((a, b) => b - a);
+  console.log('\nFloors:');
+  for (const f of floors) {
+    const cellsOnFloor = r.fort.cells.filter((c) => c.floor === f).sort((a, b) => a.col - b.col);
+    const colRange = cellsOnFloor.length > 0
+      ? `cols ${cellsOnFloor[0]!.col}..${cellsOnFloor[cellsOnFloor.length - 1]!.col} (${cellsOnFloor.length} cells)`
+      : '(empty)';
+    console.log(`  floor ${f}: ${colRange}`);
+  }
+  const floorStr = (await rl.question(`Floor to excavate (default 0): `)).trim();
+  const floor = floorStr === '' ? 0 : parseInt(floorStr, 10);
+  if (!Number.isFinite(floor)) { console.log('cancelled.'); return; }
+  const sideStr = (await rl.question(`Side — [l]eft or [r]ight (default r): `)).trim().toLowerCase();
+  const side = sideStr === 'l' ? 'left' : 'right';
+  const out = excavateCell(r.fort, r.gold, r.dayCount, { floor, side });
   if (!out.ok) {
     if (out.error.kind === 'insufficient-gold') {
       console.log(`✗ excavation needs ${out.error.need}g, you have ${out.error.have}g.`);
@@ -757,16 +774,48 @@ async function cmdExcavate(
     }
     return;
   }
-  const confirm = (await rl.question(`Excavate a new cell for ${out.cost}g? (y/N) > `)).trim().toLowerCase();
+  const confirm = (await rl.question(`Excavate floor ${floor} (${side}) for ${out.cost}g? (y/N) > `)).trim().toLowerCase();
+  if (confirm !== 'y') { console.log('cancelled.'); return; }
+  r.fort = out.fort;
+  r.gold = out.gold;
+  const newCell = r.fort.cells[r.fort.cells.length - 1]!;
+  appendFortLog(r, {
+    day: r.dayCount + 1,
+    kind: 'upgrade',
+    message: `Excavated cell ${newCell.idx} on floor ${newCell.floor} (col ${newCell.col}) for ${out.cost}g.`,
+  });
+  console.log(`✓ Excavated cell ${newCell.idx} on floor ${newCell.floor} col ${newCell.col}. ${r.gold}g left.`);
+  saveRoster(savePath, r, mercPool);
+}
+
+async function cmdOpenFloor(
+  rl: ReturnType<typeof createInterface>,
+  r: Roster,
+  mercPool: Map<string, any>,
+  savePath: string,
+): Promise<void> {
+  const dirStr = (await rl.question(`Direction — [u]p or [d]own: `)).trim().toLowerCase();
+  if (dirStr !== 'u' && dirStr !== 'd') { console.log('cancelled.'); return; }
+  const direction = dirStr === 'u' ? 'up' : 'down';
+  const out = openFloor(r.fort, r.gold, r.dayCount, direction);
+  if (!out.ok) {
+    if (out.error.kind === 'insufficient-gold') {
+      console.log(`✗ new floor needs ${out.error.need}g, you have ${out.error.have}g.`);
+    } else {
+      console.log(`✗ cannot open floor: no existing cells.`);
+    }
+    return;
+  }
+  const confirm = (await rl.question(`Open new floor ${out.newFloor} (${direction}) — 3 fresh cells for ${out.cost}g? (y/N) > `)).trim().toLowerCase();
   if (confirm !== 'y') { console.log('cancelled.'); return; }
   r.fort = out.fort;
   r.gold = out.gold;
   appendFortLog(r, {
     day: r.dayCount + 1,
     kind: 'upgrade',
-    message: `Excavated cell ${r.fort.cells[r.fort.cells.length - 1]!.idx} for ${out.cost}g.`,
+    message: `Opened floor ${out.newFloor} (${direction}) for ${out.cost}g — 3 fresh cells at cols 0..2.`,
   });
-  console.log(`✓ Excavated cell ${r.fort.cells[r.fort.cells.length - 1]!.idx}. ${r.gold}g left.`);
+  console.log(`✓ Opened floor ${out.newFloor}. ${r.gold}g left.`);
   saveRoster(savePath, r, mercPool);
 }
 
