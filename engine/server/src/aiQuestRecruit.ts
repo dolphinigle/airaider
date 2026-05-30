@@ -65,6 +65,8 @@ export interface QuestRecruitInput {
   outcomeNarrative: string;
   /** Stable seed (e.g. lead id) for deterministic engine attr rolls. */
   seed: string;
+  /** Existing roster names so AI doesn't duplicate. */
+  existingNames: readonly string[];
 }
 
 interface AIFlavor {
@@ -82,12 +84,16 @@ async function callAI(input: QuestRecruitInput): Promise<AIFlavor | null> {
   const userPrompt = `Lead pursued: "${input.leadBlurb}"
 Lead archetype: ${input.leadArchetype}  region: ${input.leadRegion}  rarity: ${input.leadRarity}
 Engine tag budget: ${plan.join(' + ')}
+Existing roster names (DO NOT REUSE any of these — pick a DISTINCT first name): [${input.existingNames.join(', ')}]
 
 OUTCOME STORY (what just happened — drive your tagIds + archetype + backstory from this):
 ${input.outcomeNarrative}
 
 Return JSON: { "name": "...", "archetype": "...", "backstory": "...", "tagIds": ["...", "..."] }
-The tagIds you return must exist in VOCAB. Pick 6-10 that fit the OUTCOME STORY; engine will narrow to budget.`;
+The tagIds you return must exist in VOCAB. Pick 6-10 that fit the OUTCOME STORY; engine will narrow to budget.
+NAME RULE — TWO PARTS:
+1. If the OUTCOME STORY names the person who joins (e.g. "a young woman in a torn priest's robe named Elena asked to come with them"), use THAT EXACT name. The recruit on the roster should match the name the player just read.
+2. Only if the story does NOT name the recruit, invent one that is DIFFERENT from every Existing roster name above.`;
 
   const startedAt = Date.now();
   try {
@@ -187,9 +193,30 @@ export async function generateQuestRecruit(
     willpower: clampAttr(attrs.willpower) as AttributeBlock['willpower'],
   };
 
+  // Hard collision guard: if AI returned a name whose first word matches an
+  // existing roster member, fall back to a deterministic distinct name. AI
+  // sometimes ignores the existingNames rule when stories rhyme.
+  const existingFirsts = new Set(
+    input.existingNames.map((n) => n.split(/\s+/)[0]?.toLowerCase()).filter(Boolean),
+  );
+  let finalName = flavor?.name ?? `Wanderer of ${input.leadRegion}`;
+  const firstWord = finalName.split(/\s+/)[0]?.toLowerCase();
+  if (firstWord && existingFirsts.has(firstWord)) {
+    const fallbackPool = [
+      'Borrek', 'Aldric', 'Cyran', 'Doran', 'Edvin', 'Frelda', 'Gunnar',
+      'Hartwin', 'Ilse', 'Jorund', 'Kettil', 'Lothar', 'Mira', 'Nessa',
+      'Orin', 'Petra', 'Quill', 'Rangar', 'Sable', 'Toren', 'Una', 'Vesna',
+      'Wilf', 'Yara', 'Zane',
+    ];
+    const epithet = finalName.split(/\s+/).slice(1).join(' ');
+    const free = fallbackPool.filter((n) => !existingFirsts.has(n.toLowerCase()));
+    const picked = free[Math.floor(rng() * free.length)] ?? `${firstWord} of ${input.leadRegion}`;
+    finalName = epithet ? `${picked} ${epithet}` : picked;
+  }
+
   return {
     id: `recruit-${input.seed}`,
-    name: flavor?.name ?? `Wanderer of ${input.leadRegion}`,
+    name: finalName,
     attrs: clamped,
     tags,
     veterancy: 0,

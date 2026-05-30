@@ -252,6 +252,10 @@ export async function dispatch(
                   leadRarity: quest.lead.rarity,
                   outcomeNarrative: res.outcomeNarrative,
                   seed: quest.lead.id,
+                  existingNames: [
+                    ...roster.mercs.map((m) => m.name),
+                    ...roster.captives.map((c) => c.name),
+                  ],
                 },
                 tagPool,
               );
@@ -321,6 +325,10 @@ export async function dispatch(
                     notoriety,
                     outcomeNarrative: res.outcomeNarrative,
                     tagPlanLabel: planLabel,
+                    existingNames: [
+                      ...roster.mercs.map((m) => m.name),
+                      ...roster.captives.map((c) => c.name),
+                    ],
                   });
                   flavorName = flavor.name;
                   flavorArchetype = flavor.archetype;

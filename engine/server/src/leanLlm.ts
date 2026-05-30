@@ -43,6 +43,10 @@ What you have to work with:
 - Use each merc's NAME at least once. Use their tags + standout attributes for colour (never quote numbers). If they have a backstory, you may anchor ONE small detail from it.
 - Do NOT invent stats, dice rolls, new mechanics, or characters not in the party or blurb.
 
+NAMING RULES:
+- If the LEAD HOOK names a target (e.g. "Take alive Aldric the Vow-Broken"), use THAT EXACT name in the narration. The fort will record the captive under the name the player just read in the hook.
+- If the LEAD HOOK does NOT name the target, DO NOT invent a name. Refer to them by common noun + descriptor ("the smuggler's son", "the deserter", "the boy"). The fort will name them after the raid.
+
 Include at least one sensory detail (smell/sound/weight/temperature/injury) and one proper noun beyond merc names (a place, person, object, faction).
 
 LENGTH: 4-6 sentences, single paragraph. Show the moment, then the consequence.
@@ -247,6 +251,8 @@ export interface CaptiveFlavorInput {
   notoriety: number;
   outcomeNarrative: string;
   tagPlanLabel: string;
+  /** Existing roster + captive names so AI doesn't duplicate. */
+  existingNames: readonly string[];
 }
 
 export interface CaptiveFlavorOutput {
@@ -266,12 +272,16 @@ export async function flavorCaptive(
 Lead archetype: ${input.leadArchetype}  region: ${input.leadRegion}  rarity: ${input.leadRarity}
 Notoriety: ${input.notoriety}
 Engine tag budget: ${input.tagPlanLabel}
+Existing fort names (DO NOT REUSE — pick a DISTINCT first name for the captive): [${input.existingNames.join(', ')}]
 
 OUTCOME STORY (what just happened — drive your tagIds + archetype from this):
 ${input.outcomeNarrative}
 
 Return JSON: { "name": "...", "archetype": "...", "backstory": "...", "tagIds": ["...", "..."] }
-The tagIds you return must exist in VOCAB. Pick 5-8 that fit the OUTCOME STORY; engine will narrow to budget.`;
+The tagIds you return must exist in VOCAB. Pick 5-8 that fit the OUTCOME STORY; engine will narrow to budget.
+NAME RULE — TWO PARTS:
+1. If the OUTCOME STORY names the captured person (e.g. "they bound Aldric the Vow-Broken"), use THAT EXACT name. The captive in the fort should match the name the player just read.
+2. Only if the story does NOT name the captive, invent one that is DIFFERENT from every existing fort name above.`;
 
   if (process.env.AIRAIDER_LLM_VERBOSE !== '0') {
     console.log(`[lean-llm:captive-flavor] user:\n${userPrompt}`);
