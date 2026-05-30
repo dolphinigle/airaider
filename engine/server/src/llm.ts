@@ -9,6 +9,7 @@ import type {
 } from '../../../prototype/src/llm/interface.js';
 import { MockScenarioLLM } from '../../../prototype/src/llm/mock.js';
 import { OpenAIScenarioLLM } from '../../../prototype/src/llm/openai.js';
+import { LeanOpenAIScenarioLLM } from './leanLlm.js';
 
 /**
  * Wraps any ScenarioLLM and dumps the full JSON request/response pair to
@@ -44,12 +45,22 @@ export function getScenarioLLM(): ScenarioLLM {
   const key = process.env.OPENAI_API_KEY;
   let inner: ScenarioLLM;
   if (key) {
-    inner = new OpenAIScenarioLLM({
-      apiKey: key,
-      model: process.env.AIRAIDER_LLM_MODEL ?? 'gpt-4.1-nano',
-      // GUI playtest can fire many quests per End Day; cap is permissive.
-      callLimit: Number(process.env.AIRAIDER_LLM_CALL_LIMIT ?? 50),
-    });
+    // Lean prose-based prompt is the default for playtest (cheaper, richer
+    // outcome). Set AIRAIDER_LLM_VARIANT=full to use the prototype's
+    // JSON-blob prompt with per-merc contribution lines.
+    if (process.env.AIRAIDER_LLM_VARIANT === 'full') {
+      inner = new OpenAIScenarioLLM({
+        apiKey: key,
+        model: process.env.AIRAIDER_LLM_MODEL ?? 'gpt-4.1-nano',
+        callLimit: Number(process.env.AIRAIDER_LLM_CALL_LIMIT ?? 50),
+      });
+    } else {
+      inner = new LeanOpenAIScenarioLLM({
+        apiKey: key,
+        model: process.env.AIRAIDER_LLM_MODEL ?? 'gpt-4.1-nano',
+        callLimit: Number(process.env.AIRAIDER_LLM_CALL_LIMIT ?? 50),
+      });
+    }
     console.log(`[llm] using OpenAI (${inner.name})`);
   } else {
     inner = new MockScenarioLLM();
