@@ -182,7 +182,7 @@ A hook must:
 - Be ONE specific sentence. No generic placeholders (no "the prize/the target/the goods/the spoils").
 - Avoid the rarity-words themselves ("common/uncommon/rare/legendary/mythic/epic/heroic/glorious/destined").
 
-If prior step outcomes are supplied, REFERENCE them: an unfavorable past means the situation has worsened; a catastrophic past means the antagonist now knows the company's face; a favorable past gives the company momentum.
+IF prior step outcomes are supplied, REFERENCE the most recent one SPECIFICALLY: if it was unfavorable, name what was lost; if it was catastrophic, name the antagonist's new advantage (they have your faces, their reinforcements arrived, the witness was burned); if it was favorable, give the company momentum (the trail is fresh, the contact owes you). DO NOT write generic "the situation has worsened" — name a concrete person, place, or wound from the prior summary.
 
 ${VOCAB_BLOCK}`;
 
