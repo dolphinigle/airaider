@@ -206,13 +206,15 @@ export async function spawnPendingStepLeads(roster: Roster): Promise<void> {
     const step = chain.steps[chain.currentStepIdx];
     if (!step) continue;
     if (step.leadId) {
-      // Lead already exists on board or in pursued quest.
-      const stillExists =
-        roster.leadBoard.some((l) => l.id === step.leadId) ||
-        roster.leadBoard.length > 0 && false;
-      if (stillExists) continue;
-      // If lead expired without pursuit, the chain stalls; allow respawn.
-      step.leadId = undefined;
+      // Lead still on board (player hasn't pursued yet) OR moved into a
+      // pursued quest. Either way: don't double-spawn. If the lead expired
+      // off the board without pursuit, the chain stalls — player ignored
+      // the saga step. Acceptable prototype behavior.
+      const stillOnBoard = roster.leadBoard.some((l) => l.id === step.leadId);
+      if (stillOnBoard) continue;
+      // Lead is either in-flight (pursued) or expired. Don't respawn —
+      // pursuing or letting it expire is the player's choice.
+      continue;
     }
     // Unit chain: if anchor is dead, fail the chain immediately and skip spawning.
     if (chain.kind === 'unit' && chain.unitId) {
