@@ -196,6 +196,9 @@ Narrate the moment. 4-6 sentences. Name the specific stakes from the lead hook. 
       response: content,
       label: `${req.archetype}/${req.leadHook?.rarity ?? '?'}/${req.leadHook?.region ?? '?'} · ${req.band}`,
       elapsedMs: Date.now() - startedAt,
+      promptTokens: resp.usage?.prompt_tokens,
+      completionTokens: resp.usage?.completion_tokens,
+      cachedPromptTokens: resp.usage?.prompt_tokens_details?.cached_tokens ?? 0,
     });
     let parsed: unknown;
     try { parsed = JSON.parse(content); }
@@ -303,6 +306,9 @@ Return JSON: { "name": "...", "archetype": "...", "backstory": "..." }`;
     response: content,
     label: `${input.leadArchetype}/${input.leadRegion} (notoriety ${input.notoriety})`,
     elapsedMs: Date.now() - startedAt,
+    promptTokens: resp.usage?.prompt_tokens,
+    completionTokens: resp.usage?.completion_tokens,
+    cachedPromptTokens: resp.usage?.prompt_tokens_details?.cached_tokens ?? 0,
   });
   const parsed = CaptiveFlavorSchema.parse(JSON.parse(content));
   if (process.env.AIRAIDER_LLM_VERBOSE !== '0') {

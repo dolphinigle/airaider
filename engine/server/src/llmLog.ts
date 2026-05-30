@@ -21,6 +21,11 @@ export interface LLMLogEntry {
   label?: string;
   /** ms elapsed for the round-trip; 0 if the caller didn't time it. */
   elapsedMs?: number;
+  /** Token usage from OpenAI's resp.usage. */
+  promptTokens?: number;
+  completionTokens?: number;
+  /** Of promptTokens, how many were served from OpenAI prompt cache. */
+  cachedPromptTokens?: number;
 }
 
 const MAX = 50;

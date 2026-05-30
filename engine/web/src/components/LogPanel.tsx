@@ -1,6 +1,35 @@
 import { useState } from 'react';
 import type { GameState, LLMLogEntry } from '../types';
 
+/** OpenAI pricing per 1M tokens (USD), as of 2025-Q1. Update if rates change.
+ *  Cached input is roughly 0.25x of standard input for most models. */
+const MODEL_PRICES: Record<string, { in: number; out: number; cached: number }> = {
+  'gpt-4.1-nano':   { in: 0.10, out: 0.40, cached: 0.025 },
+  'gpt-4.1-mini':   { in: 0.40, out: 1.60, cached: 0.10  },
+  'gpt-4.1':        { in: 2.00, out: 8.00, cached: 0.50  },
+  'gpt-4o-mini':    { in: 0.15, out: 0.60, cached: 0.075 },
+  'gpt-4o':         { in: 2.50, out: 10.0, cached: 1.25  },
+};
+
+function estimateCostUsd(e: LLMLogEntry): number | null {
+  const price = MODEL_PRICES[e.model];
+  if (!price) return null;
+  if (e.promptTokens === undefined || e.completionTokens === undefined) return null;
+  const cached = e.cachedPromptTokens ?? 0;
+  const uncached = Math.max(0, e.promptTokens - cached);
+  const cost =
+    (uncached / 1_000_000) * price.in +
+    (cached / 1_000_000) * price.cached +
+    (e.completionTokens / 1_000_000) * price.out;
+  return cost;
+}
+
+function fmtUsd(n: number | null): string {
+  if (n === null) return '$?';
+  if (n < 0.001) return `$${(n * 1000).toFixed(2)}m`; // millicents → e.g. $0.50m for 0.5 millicents
+  return `$${n.toFixed(4)}`;
+}
+
 function LLMEntry({ e }: { e: LLMLogEntry }) {
   const [open, setOpen] = useState(false);
   const time = new Date(e.ts).toLocaleTimeString();
@@ -9,6 +38,8 @@ function LLMEntry({ e }: { e: LLMLogEntry }) {
     const j = JSON.parse(e.response);
     if (typeof j === 'object' && j !== null) parsedResponse = JSON.stringify(j, null, 2);
   } catch { /* leave raw */ }
+  const cost = estimateCostUsd(e);
+  const cachedHit = e.cachedPromptTokens && e.cachedPromptTokens > 0;
   return (
     <div style={{ marginBottom: 4, border: '1px solid var(--border)', borderRadius: 3, background: 'var(--panel-2)' }}>
       <div
@@ -20,11 +51,17 @@ function LLMEntry({ e }: { e: LLMLogEntry }) {
         <span style={{ color: 'var(--accent)' }}>{e.kind}</span>
         <span style={{ color: 'var(--muted)' }}>{time}</span>
         {e.elapsedMs !== undefined && <span style={{ color: 'var(--muted)' }}>{e.elapsedMs}ms</span>}
+        <span style={{ color: cachedHit ? 'var(--good)' : 'var(--accent)' }} title={cachedHit ? 'cached-prompt discount applied' : 'standard pricing'}>{fmtUsd(cost)}</span>
         <span style={{ flex: 1, color: 'var(--muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.label ?? ''}</span>
       </div>
       {open && (
         <div style={{ padding: 6, borderTop: '1px solid var(--border)', fontSize: 10 }}>
-          <div style={{ color: 'var(--muted)' }}>model: {e.model}</div>
+          <div style={{ color: 'var(--muted)' }}>
+            model: {e.model}
+            {e.promptTokens !== undefined && (
+              <> · in: {e.promptTokens}{cachedHit ? ` (${e.cachedPromptTokens} cached)` : ''} · out: {e.completionTokens} · est: {fmtUsd(cost)}</>
+            )}
+          </div>
           <details style={{ marginTop: 4 }}>
             <summary style={{ cursor: 'pointer', color: 'var(--muted)' }}>system prompt ({e.systemPrompt.length} chars)</summary>
             <pre style={{ whiteSpace: 'pre-wrap', background: 'var(--panel)', padding: 4, margin: '2px 0', maxHeight: 200, overflow: 'auto' }}>{e.systemPrompt}</pre>
@@ -46,6 +83,7 @@ function LLMEntry({ e }: { e: LLMLogEntry }) {
 export function LogPanel({ state }: { state: GameState }) {
   const [showAI, setShowAI] = useState(true);
   const llmLog = state.llmLog ?? [];
+  const totalCost = llmLog.reduce((acc, e) => acc + (estimateCostUsd(e) ?? 0), 0);
   return (
     <section data-testid="log-panel" style={{ background: 'var(--panel)', padding: 12, borderRadius: 3, overflow: 'auto' }}>
       <h3 style={{ margin: '0 0 8px', fontSize: 13, color: 'var(--accent)' }}>FORT LOG</h3>
@@ -60,7 +98,8 @@ export function LogPanel({ state }: { state: GameState }) {
         >
           <span>{showAI ? '▼' : '▶'}</span>
           <strong>AI CALLS ({llmLog.length})</strong>
-          <span style={{ color: 'var(--muted)', fontSize: 10 }}>most recent first · click to expand</span>
+          {llmLog.length > 0 && <span style={{ color: 'var(--good)' }} title="cumulative estimated cost across visible calls">{fmtUsd(totalCost)} total</span>}
+          <span style={{ color: 'var(--muted)', fontSize: 10 }}>· click to expand</span>
         </div>
         {showAI && (
           <div style={{ marginTop: 6 }}>

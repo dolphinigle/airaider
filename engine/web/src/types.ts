@@ -88,6 +88,9 @@ export interface LLMLogEntry {
   response: string;
   label?: string;
   elapsedMs?: number;
+  promptTokens?: number;
+  completionTokens?: number;
+  cachedPromptTokens?: number;
 }
 
 export interface PrestigeView {
