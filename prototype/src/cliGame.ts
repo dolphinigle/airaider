@@ -750,7 +750,11 @@ async function cmdExcavate(
 ): Promise<void> {
   const out = excavateCell(r.fort, r.gold, r.dayCount);
   if (!out.ok) {
-    console.log(`✗ excavation needs ${out.error.need}g, you have ${out.error.have}g.`);
+    if (out.error.kind === 'insufficient-gold') {
+      console.log(`✗ excavation needs ${out.error.need}g, you have ${out.error.have}g.`);
+    } else {
+      console.log(`✗ excavation: floor ${out.error.floor} not opened.`);
+    }
     return;
   }
   const confirm = (await rl.question(`Excavate a new cell for ${out.cost}g? (y/N) > `)).trim().toLowerCase();

@@ -109,8 +109,12 @@ const PendingErrandSchema = z.object({
 
 /** PROTO-GAME v13: a single ground-tier fort cell. */
 const FortCellSchema = z.object({
-  /** Display index, 0-based left-to-right along the ground row. */
+  /** Stable cell id. Unique across all floors. */
   idx: z.number().int().min(0),
+  /** Vertical floor (0 = ground starter, +/- for upper/lower). Default 0 for back-compat. */
+  floor: z.number().int().default(0),
+  /** Horizontal column within the floor. Can be negative. Default = idx for back-compat. */
+  col: z.number().int().optional(),
   /** When excavated. dayCount value at the time of opening; starter cells = 0. */
   openedOnDay: z.number().int().min(0).default(0),
 });
@@ -214,7 +218,7 @@ export interface Roster {
   fort: {
     level: number;
     upgrades: string[];
-    cells: Array<{ idx: number; openedOnDay: number }>;
+    cells: Array<{ idx: number; floor: number; col: number; openedOnDay: number }>;
     placedRooms: Array<{ roomId: string; cellIdx: number; builtOnDay: number }>;
   };
   /** M7.6: persistent fort log entries (latest at the end, trimmed to FORT_LOG_MAX). */
@@ -265,9 +269,9 @@ export function newRoster(initialMercs: Merc[]): Roster {
       // an immediate build choice (Scouting Post? Tavern? Chapel?) on Day 1
       // without needing to excavate first.
       cells: [
-        { idx: 0, openedOnDay: 0 },
-        { idx: 1, openedOnDay: 0 },
-        { idx: 2, openedOnDay: 0 },
+        { idx: 0, floor: 0, col: 0, openedOnDay: 0 },
+        { idx: 1, floor: 0, col: 1, openedOnDay: 0 },
+        { idx: 2, floor: 0, col: 2, openedOnDay: 0 },
       ],
       placedRooms: [
         { roomId: 'bunkroom', cellIdx: 0, builtOnDay: 0 },
@@ -354,16 +358,16 @@ export function loadRoster(
       ? {
           ...parsed.fort,
           cells: [
-            { idx: 0, openedOnDay: 0 },
-            { idx: 1, openedOnDay: 0 },
-            { idx: 2, openedOnDay: 0 },
+            { idx: 0, floor: 0, col: 0, openedOnDay: 0 },
+            { idx: 1, floor: 0, col: 1, openedOnDay: 0 },
+            { idx: 2, floor: 0, col: 2, openedOnDay: 0 },
           ],
           placedRooms: [
             { roomId: 'bunkroom', cellIdx: 0, builtOnDay: 0 },
             { roomId: 'storeroom', cellIdx: 1, builtOnDay: 0 },
           ],
         }
-      : parsed.fort,
+      : { ...parsed.fort, cells: parsed.fort.cells.map((c) => ({ ...c, col: c.col ?? c.idx })) },
     fortLog: parsed.fortLog,
     consecutiveDebtDays: parsed.consecutiveDebtDays,
     hirePool: parsed.hirePool.map((e) => ({

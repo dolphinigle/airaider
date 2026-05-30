@@ -68,6 +68,8 @@ export function App() {
             <FortGrid
               state={state}
               onCellClick={(cellIdx) => setBuildCell(cellIdx)}
+              onExcavate={(floor, side) => dispatch.mutate({ kind: 'excavate', floor, side })}
+              onOpenFloor={(direction) => dispatch.mutate({ kind: 'open-floor', direction })}
               onCaptiveDropToCell={() => {}}
               onCaptiveDropToOverflow={() => {}}
             />

@@ -8,6 +8,7 @@ import type { RoomDef } from '../../../prototype/src/rooms.js';
 import {
   buildRoom as buildRoomLayout,
   excavateCell as excavateCellLayout,
+  openFloor as openFloorLayout,
   dungeonCellsWithSpace,
   captiveCellEffects,
 } from '../../../prototype/src/fortLayout.js';
@@ -37,7 +38,8 @@ import { getScenarioLLM } from './llm.js';
 export const CommandSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('end-day') }),
   z.object({ kind: z.literal('build-room'), roomId: z.string(), cellIdx: z.number().int().min(0) }),
-  z.object({ kind: z.literal('excavate') }),
+  z.object({ kind: z.literal('excavate'), floor: z.number().int().default(0), side: z.enum(['left', 'right']).default('right') }),
+  z.object({ kind: z.literal('open-floor'), direction: z.enum(['up', 'down']) }),
   z.object({
     kind: z.literal('place-captive'),
     captiveId: z.string(),
@@ -332,12 +334,24 @@ export async function dispatch(
       return { ok: true, message: `built ${cmd.roomId} in cell ${cmd.cellIdx}` };
     }
     case 'excavate': {
-      const res = excavateCellLayout(roster.fort, roster.gold, roster.dayCount);
+      const res = excavateCellLayout(roster.fort, roster.gold, roster.dayCount, { floor: cmd.floor, side: cmd.side });
       if (!res.ok) return { ok: false, error: JSON.stringify(res.error) };
       const newIdx = res.fort.cells[res.fort.cells.length - 1]!.idx;
       roster.fort = res.fort;
       roster.gold = res.gold;
-      return { ok: true, message: `excavated cell ${newIdx} (cost ${res.cost}g)` };
+      return { ok: true, message: `excavated cell ${newIdx} on floor ${cmd.floor} (${cmd.side}, cost ${res.cost}g)` };
+    }
+    case 'open-floor': {
+      const res = openFloorLayout(roster.fort, roster.gold, roster.dayCount, cmd.direction);
+      if (!res.ok) return { ok: false, error: JSON.stringify(res.error) };
+      roster.fort = res.fort;
+      roster.gold = res.gold;
+      appendFortLog(roster, {
+        day: roster.dayCount,
+        kind: 'upgrade',
+        message: `opened floor ${res.newFloor} (${cmd.direction}, cost ${res.cost}g, 3 fresh cells)`,
+      });
+      return { ok: true, message: `opened floor ${res.newFloor} (${res.cost}g)` };
     }
     case 'place-captive': {
       const cap = roster.captives.find((c) => c.id === cmd.captiveId);

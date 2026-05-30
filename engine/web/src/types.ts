@@ -47,6 +47,8 @@ export interface PlacedRoom {
 
 export interface Cell {
   idx: number;
+  floor: number;
+  col: number;
   openedOnDay: number;
 }
 
@@ -175,7 +177,8 @@ export interface RoomDef {
 export type Command =
   | { kind: 'end-day' }
   | { kind: 'build-room'; roomId: string; cellIdx: number }
-  | { kind: 'excavate' }
+  | { kind: 'excavate'; floor?: number; side?: 'left' | 'right' }
+  | { kind: 'open-floor'; direction: 'up' | 'down' }
   | { kind: 'place-captive'; captiveId: string; cellIdx: number | null }
   | { kind: 'captive-action'; captiveId: string; action: 'ransom' | 'sell' | 'display' | 'recruit' | 'execute' }
   | { kind: 'refresh-leads' }

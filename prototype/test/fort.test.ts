@@ -102,9 +102,9 @@ describe('M6.4 fort upgrades', () => {
       level: 1,
       upgrades: [],
       cells: [
-        { idx: 0, openedOnDay: 0 },
-        { idx: 1, openedOnDay: 0 },
-        { idx: 2, openedOnDay: 0 },
+        { idx: 0, floor: 0, col: 0, openedOnDay: 0 },
+        { idx: 1, floor: 0, col: 1, openedOnDay: 0 },
+        { idx: 2, floor: 0, col: 2, openedOnDay: 0 },
       ],
       placedRooms: [
         { roomId: 'bunkroom', cellIdx: 0, builtOnDay: 0 },

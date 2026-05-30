@@ -55,13 +55,18 @@ export function loadRoomCatalog(path: string): RoomDef[] {
 /** Day-1 starter layout: 3 ground cells, starter rooms placed (per SIM_BIBLE §2). */
 export const STARTER_CELL_COUNT = 3;
 
-/** Excavation cost progression: 15g * (1 + 0.6 * cellsAlreadyOpened-3). */
-export function nextExcavationCost(currentCellCount: number): number {
-  const beyondStarter = Math.max(0, currentCellCount - STARTER_CELL_COUNT);
+/** Per-floor excavation cost: 15g, then exponential per cell already opened on that floor. */
+export function nextExcavationCost(cellsOnFloor: number): number {
+  const beyondStarter = Math.max(0, cellsOnFloor - STARTER_CELL_COUNT);
   return Math.round(15 * Math.pow(1.6, beyondStarter));
 }
 
-/** Cells adjacent to a given index (1D row: neighbors are i-1 and i+1). */
+/** Cost to open a brand-new floor (above or below). Starts at 50g, doubles per floor opened beyond ground. */
+export function nextFloorCost(floorsOpenedBeyondGround: number): number {
+  return Math.round(50 * Math.pow(2, floorsOpenedBeyondGround));
+}
+
+/** Linear-row neighbors: for a sequential single-floor row, idx i has neighbors i-1 and i+1. */
 export function adjacentIndices(cellIdx: number, totalCells: number): number[] {
   const out: number[] = [];
   if (cellIdx > 0) out.push(cellIdx - 1);

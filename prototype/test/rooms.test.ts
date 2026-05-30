@@ -26,9 +26,9 @@ function starterFort(): FortState {
     level: 1,
     upgrades: [],
     cells: [
-      { idx: 0, openedOnDay: 0 },
-      { idx: 1, openedOnDay: 0 },
-      { idx: 2, openedOnDay: 0 },
+      { idx: 0, floor: 0, col: 0, openedOnDay: 0 },
+      { idx: 1, floor: 0, col: 1, openedOnDay: 0 },
+      { idx: 2, floor: 0, col: 2, openedOnDay: 0 },
     ],
     placedRooms: [
       { roomId: 'drust-bedroom', cellIdx: 0, builtOnDay: 0 },
@@ -122,14 +122,14 @@ describe('buildRoom', () => {
   });
 
   it('rejects when gold insufficient', () => {
-    const fort: FortState = { ...starterFort(), cells: [...starterFort().cells, { idx: 3, openedOnDay: 1 }] };
+    const fort: FortState = { ...starterFort(), cells: [...starterFort().cells, { idx: 3, floor: 0, col: 3, openedOnDay: 1 }] };
     const out = buildRoom(fort, 2, catalog.get('tavern')!, 3, 1);
     expect(out.ok).toBe(false);
     if (!out.ok) expect(out.error.kind).toBe('insufficient-gold');
   });
 
   it('builds the tavern when affordable in an empty cell', () => {
-    const fort: FortState = { ...starterFort(), cells: [...starterFort().cells, { idx: 3, openedOnDay: 1 }] };
+    const fort: FortState = { ...starterFort(), cells: [...starterFort().cells, { idx: 3, floor: 0, col: 3, openedOnDay: 1 }] };
     const tavern = catalog.get('tavern')!;
     const out = buildRoom(fort, 20, tavern, 3, 5);
     expect(out.ok).toBe(true);
@@ -143,7 +143,7 @@ describe('buildRoom', () => {
   it('rejects duplicate of a unique room', () => {
     const fort: FortState = {
       ...starterFort(),
-      cells: [...starterFort().cells, { idx: 3, openedOnDay: 1 }, { idx: 4, openedOnDay: 1 }],
+      cells: [...starterFort().cells, { idx: 3, floor: 0, col: 3, openedOnDay: 1 }, { idx: 4, floor: 0, col: 4, openedOnDay: 1 }],
       placedRooms: [
         ...starterFort().placedRooms,
         { roomId: 'tavern', cellIdx: 3, builtOnDay: 1 },
@@ -192,7 +192,7 @@ describe('gates & capacity', () => {
   it('adding a Deep Storeroom raises dungeon capacity to 3', () => {
     const fort: FortState = {
       ...starterFort(),
-      cells: [...starterFort().cells, { idx: 3, openedOnDay: 1 }],
+      cells: [...starterFort().cells, { idx: 3, floor: 0, col: 3, openedOnDay: 1 }],
       placedRooms: [
         ...starterFort().placedRooms,
         { roomId: 'extra-storeroom', cellIdx: 3, builtOnDay: 1 },
@@ -215,8 +215,8 @@ describe('adjacency bonuses', () => {
       level: 1,
       upgrades: [],
       cells: [
-        { idx: 0, openedOnDay: 0 },
-        { idx: 1, openedOnDay: 0 },
+        { idx: 0, floor: 0, col: 0, openedOnDay: 0 },
+        { idx: 1, floor: 0, col: 1, openedOnDay: 0 },
       ],
       placedRooms: [
         { roomId: 'smithy', cellIdx: 0, builtOnDay: 1 },
@@ -234,9 +234,9 @@ describe('adjacency bonuses', () => {
       level: 1,
       upgrades: [],
       cells: [
-        { idx: 0, openedOnDay: 0 },
-        { idx: 1, openedOnDay: 0 },
-        { idx: 2, openedOnDay: 0 },
+        { idx: 0, floor: 0, col: 0, openedOnDay: 0 },
+        { idx: 1, floor: 0, col: 1, openedOnDay: 0 },
+        { idx: 2, floor: 0, col: 2, openedOnDay: 0 },
       ],
       placedRooms: [
         { roomId: 'smithy', cellIdx: 0, builtOnDay: 1 },
@@ -259,8 +259,8 @@ describe('adjacency effect ids (PROTO-GAME v13.1)', () => {
       level: 1,
       upgrades: [],
       cells: [
-        { idx: 0, openedOnDay: 0 },
-        { idx: 1, openedOnDay: 0 },
+        { idx: 0, floor: 0, col: 0, openedOnDay: 0 },
+        { idx: 1, floor: 0, col: 1, openedOnDay: 0 },
       ],
       placedRooms: [
         { roomId: 'smithy', cellIdx: 0, builtOnDay: 1 },
@@ -278,8 +278,8 @@ describe('roomUpgradeIds + effectiveUpgradeIds (PROTO-GAME v13.1)', () => {
       level: 1,
       upgrades: [],
       cells: [
-        { idx: 0, openedOnDay: 0 },
-        { idx: 1, openedOnDay: 0 },
+        { idx: 0, floor: 0, col: 0, openedOnDay: 0 },
+        { idx: 1, floor: 0, col: 1, openedOnDay: 0 },
       ],
       placedRooms: [
         { roomId: 'smithy', cellIdx: 0, builtOnDay: 1 },
@@ -296,8 +296,8 @@ describe('roomUpgradeIds + effectiveUpgradeIds (PROTO-GAME v13.1)', () => {
       level: 1,
       upgrades: ['winter-larder'],
       cells: [
-        { idx: 0, openedOnDay: 0 },
-        { idx: 1, openedOnDay: 0 },
+        { idx: 0, floor: 0, col: 0, openedOnDay: 0 },
+        { idx: 1, floor: 0, col: 1, openedOnDay: 0 },
       ],
       placedRooms: [
         { roomId: 'smithy', cellIdx: 0, builtOnDay: 1 },
@@ -317,9 +317,9 @@ describe('captive spatial helpers (PROTO-GAME v14)', () => {
       level: 1,
       upgrades: [],
       cells: [
-        { idx: 0, openedOnDay: 0 },
-        { idx: 1, openedOnDay: 0 },
-        { idx: 2, openedOnDay: 0 },
+        { idx: 0, floor: 0, col: 0, openedOnDay: 0 },
+        { idx: 1, floor: 0, col: 1, openedOnDay: 0 },
+        { idx: 2, floor: 0, col: 2, openedOnDay: 0 },
       ],
       placedRooms: [
         { roomId: 'bunkroom', cellIdx: 0, builtOnDay: 0 },
@@ -338,9 +338,9 @@ describe('captive spatial helpers (PROTO-GAME v14)', () => {
       level: 1,
       upgrades: [],
       cells: [
-        { idx: 0, openedOnDay: 0 },
-        { idx: 1, openedOnDay: 0 },
-        { idx: 2, openedOnDay: 0 },
+        { idx: 0, floor: 0, col: 0, openedOnDay: 0 },
+        { idx: 1, floor: 0, col: 1, openedOnDay: 0 },
+        { idx: 2, floor: 0, col: 2, openedOnDay: 0 },
       ],
       placedRooms: [
         { roomId: 'chapel', cellIdx: 0, builtOnDay: 1 },
@@ -358,5 +358,60 @@ describe('captive spatial helpers (PROTO-GAME v14)', () => {
     const eff = captiveCellEffects(starterFort(), catalog, undefined);
     expect(eff.roomName).toBeNull();
     expect(eff.chapelAdjacent).toBe(false);
+  });
+});
+
+describe('Stage D: vertical floors', () => {
+  it('openFloor adds 3 cells on a fresh floor above', async () => {
+    const { openFloor } = await import('../src/fortLayout.js');
+    const fort = {
+      level: 1, upgrades: [],
+      cells: [
+        { idx: 0, floor: 0, col: 0, openedOnDay: 0 },
+        { idx: 1, floor: 0, col: 1, openedOnDay: 0 },
+        { idx: 2, floor: 0, col: 2, openedOnDay: 0 },
+      ],
+      placedRooms: [],
+    };
+    const res = openFloor(fort, 100, 1, 'up');
+    expect(res.ok).toBe(true);
+    if (!res.ok) return;
+    expect(res.fort.cells.length).toBe(6);
+    const f1 = res.fort.cells.filter((c) => c.floor === 1);
+    expect(f1.length).toBe(3);
+    expect(f1.map((c) => c.col).sort()).toEqual([0, 1, 2]);
+    expect(res.gold).toBe(100 - res.cost);
+  });
+
+  it('cellNeighbors finds vertical neighbor across floors', async () => {
+    const { cellNeighbors } = await import('../src/fortLayout.js');
+    const fort = {
+      level: 1, upgrades: [],
+      cells: [
+        { idx: 0, floor: 0, col: 0, openedOnDay: 0 },
+        { idx: 1, floor: 0, col: 1, openedOnDay: 0 },
+        { idx: 2, floor: 1, col: 1, openedOnDay: 1 },
+      ],
+      placedRooms: [],
+    };
+    expect(cellNeighbors(fort, 1).sort()).toEqual([0, 2]); // col-neighbor + floor-neighbor
+    expect(cellNeighbors(fort, 2)).toEqual([1]);
+  });
+
+  it('excavate on the left adds a cell at min-col-1', async () => {
+    const fort = {
+      level: 1, upgrades: [],
+      cells: [
+        { idx: 0, floor: 0, col: 0, openedOnDay: 0 },
+        { idx: 1, floor: 0, col: 1, openedOnDay: 0 },
+        { idx: 2, floor: 0, col: 2, openedOnDay: 0 },
+      ],
+      placedRooms: [],
+    };
+    const res = excavateCell(fort, 100, 1, { floor: 0, side: 'left' });
+    expect(res.ok).toBe(true);
+    if (!res.ok) return;
+    const newCell = res.fort.cells.find((c) => c.idx === 3);
+    expect(newCell?.col).toBe(-1);
   });
 });

@@ -28,6 +28,11 @@ const FortCatalogSchema = z.object({
 
 export interface FortCell {
   idx: number;
+  /** Vertical floor — 0 = ground starter floor, positive = upper floors,
+   *  negative = sub-basements. Symmetric expansion both directions. */
+  floor: number;
+  /** Horizontal column within the floor. Can be negative (left expansion). */
+  col: number;
   openedOnDay: number;
 }
 

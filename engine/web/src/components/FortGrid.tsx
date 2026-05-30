@@ -92,22 +92,59 @@ function OverflowZone({ state }: { state: GameState }) {
 }
 
 export function FortGrid({
-  state, onCellClick,
+  state, onCellClick, onExcavate, onOpenFloor,
 }: {
   state: GameState;
   onCellClick: (idx: number) => void;
+  onExcavate?: (floor: number, side: 'left' | 'right') => void;
+  onOpenFloor?: (direction: 'up' | 'down') => void;
   /** Kept for API compat — drag handling moved to App's DndContext. */
   onCaptiveDropToCell?: (captiveId: string, cellIdx: number) => void;
   onCaptiveDropToOverflow?: (captiveId: string) => void;
 }) {
+  const cells = state.fort.cells;
+  const floors = [...new Set(cells.map((c) => c.floor))].sort((a, b) => b - a); // top floors first
+  const minCol = cells.length > 0 ? Math.min(...cells.map((c) => c.col)) : 0;
+  const maxCol = cells.length > 0 ? Math.max(...cells.map((c) => c.col)) : 0;
+  const totalCols = maxCol - minCol + 1;
+  // +2 cols for left/right excavate buttons per floor
+  const gridCols = totalCols + 2;
   return (
     <section data-testid="fort-grid" style={{ background: 'var(--panel)', padding: 12, borderRadius: 3, overflow: 'auto' }}>
       <h3 style={{ margin: '0 0 8px', fontSize: 13, color: 'var(--accent)' }}>FORT LAYOUT</h3>
-      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${state.fort.cells.length}, 1fr)`, gap: 6 }}>
-        {state.fort.cells.map((c) => (
-          <CellSlot key={c.idx} cellIdx={c.idx} state={state} onCellClick={onCellClick} />
-        ))}
-      </div>
+      {onOpenFloor && (
+        <div style={{ marginBottom: 6, display: 'flex', justifyContent: 'center' }}>
+          <button data-testid="open-floor-up" onClick={() => onOpenFloor('up')} style={{ fontSize: 11, padding: '2px 8px' }}>
+            ▲ open floor above
+          </button>
+        </div>
+      )}
+      {floors.map((floor) => (
+        <div key={floor} style={{ marginBottom: 6 }}>
+          <div style={{ fontSize: 10, color: 'var(--muted)', marginBottom: 2 }}>floor {floor}</div>
+          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${gridCols}, 1fr)`, gap: 6 }}>
+            {onExcavate ? (
+              <button data-testid={`excavate-left-${floor}`} onClick={() => onExcavate(floor, 'left')} style={{ fontSize: 11, padding: '2px 4px' }} title="dig left">◀</button>
+            ) : <div />}
+            {Array.from({ length: totalCols }, (_, i) => {
+              const col = minCol + i;
+              const cell = cells.find((c) => c.floor === floor && c.col === col);
+              if (!cell) return <div key={col} />;
+              return <CellSlot key={cell.idx} cellIdx={cell.idx} state={state} onCellClick={onCellClick} />;
+            })}
+            {onExcavate ? (
+              <button data-testid={`excavate-right-${floor}`} onClick={() => onExcavate(floor, 'right')} style={{ fontSize: 11, padding: '2px 4px' }} title="dig right">▶</button>
+            ) : <div />}
+          </div>
+        </div>
+      ))}
+      {onOpenFloor && (
+        <div style={{ marginTop: 6, display: 'flex', justifyContent: 'center' }}>
+          <button data-testid="open-floor-down" onClick={() => onOpenFloor('down')} style={{ fontSize: 11, padding: '2px 8px' }}>
+            ▼ open floor below
+          </button>
+        </div>
+      )}
       <OverflowZone state={state} />
       {state.adjacencyBonuses.length > 0 && (
         <div style={{ marginTop: 12, padding: 8, background: 'var(--panel-2)', borderRadius: 3 }}>

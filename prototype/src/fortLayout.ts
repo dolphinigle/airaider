@@ -1,7 +1,27 @@
 // PROTO-GAME: render + mutate fort layout (cells + placed rooms).
 
-import { adjacentIndices, nextExcavationCost, type RoomDef } from './rooms.js';
-import type { FortState } from './fort.js';
+import { nextExcavationCost, nextFloorCost, STARTER_CELL_COUNT, type RoomDef } from './rooms.js';
+import type { FortState, FortCell } from './fort.js';
+
+/** Look up a cell by (floor, col). O(n) — fine for prototype scale. */
+export function cellAt(fort: FortState, floor: number, col: number): FortCell | undefined {
+  return fort.cells.find((c) => c.floor === floor && c.col === col);
+}
+
+/** Grid-aware orthogonal neighbors of a cell idx — returns adjacent cell idxs.
+ *  Two cells are neighbors iff same floor with |Δcol|=1, OR same col with |Δfloor|=1. */
+export function cellNeighbors(fort: FortState, cellIdx: number): number[] {
+  const me = fort.cells.find((c) => c.idx === cellIdx);
+  if (!me) return [];
+  const out: number[] = [];
+  for (const c of fort.cells) {
+    if (c.idx === cellIdx) continue;
+    const dF = Math.abs(c.floor - me.floor);
+    const dC = Math.abs(c.col - me.col);
+    if ((dF === 0 && dC === 1) || (dC === 0 && dF === 1)) out.push(c.idx);
+  }
+  return out;
+}
 
 /** Truncate text to fit inside an N-wide cell, padded with spaces. */
 function fit(s: string, w: number): string {
@@ -29,8 +49,7 @@ export function renderFortLayout(
   catalog: Map<string, RoomDef>,
 ): string[] {
   const lines: string[] = [];
-  const cells = [...fort.cells].sort((a, b) => a.idx - b.idx);
-  if (cells.length === 0) {
+  if (fort.cells.length === 0) {
     lines.push('  (fort has no cells — should not happen on a starter save)');
     return lines;
   }
@@ -39,23 +58,36 @@ export function renderFortLayout(
     const def = catalog.get(p.roomId);
     if (def) placedByCell.set(p.cellIdx, def);
   }
+  const floors = [...new Set(fort.cells.map((c) => c.floor))].sort((a, b) => b - a); // top floors first
+  const minCol = Math.min(...fort.cells.map((c) => c.col));
+  const maxCol = Math.max(...fort.cells.map((c) => c.col));
   const horiz = '─'.repeat(CELL_W);
-  const top = '┌' + cells.map(() => horiz).join('┬') + '┐';
-  const bot = '└' + cells.map(() => horiz).join('┴') + '┘';
-  const nameRow = '│' + cells.map((c) => {
-    const r = placedByCell.get(c.idx);
-    return ' ' + fit(r ? r.name : '(empty)', CELL_W - 1);
-  }).join('│') + '│';
-  const catRow = '│' + cells.map((c) => {
-    const r = placedByCell.get(c.idx);
-    return ' ' + fit(r ? r.category : '—', CELL_W - 1);
-  }).join('│') + '│';
-  const idxRow = '  ' + cells.map((c) => fit(`cell ${c.idx}`, CELL_W + 1)).join('');
-  lines.push('  ' + top);
-  lines.push('  ' + nameRow);
-  lines.push('  ' + catRow);
-  lines.push('  ' + bot);
-  lines.push(idxRow);
+  for (const floor of floors) {
+    const row = fort.cells.filter((c) => c.floor === floor).sort((a, b) => a.col - b.col);
+    const cols: Array<FortCell | null> = [];
+    for (let col = minCol; col <= maxCol; col++) {
+      cols.push(row.find((c) => c.col === col) ?? null);
+    }
+    const topLine = '┌' + cols.map((c) => (c ? horiz : ' '.repeat(CELL_W))).join('┬') + '┐';
+    const botLine = '└' + cols.map((c) => (c ? horiz : ' '.repeat(CELL_W))).join('┴') + '┘';
+    const nameRow = '│' + cols.map((c) => {
+      if (!c) return ' '.repeat(CELL_W);
+      const r = placedByCell.get(c.idx);
+      return ' ' + fit(r ? r.name : '(empty)', CELL_W - 1);
+    }).join('│') + '│';
+    const catRow = '│' + cols.map((c) => {
+      if (!c) return ' '.repeat(CELL_W);
+      const r = placedByCell.get(c.idx);
+      return ' ' + fit(r ? r.category : '—', CELL_W - 1);
+    }).join('│') + '│';
+    lines.push(`  floor ${floor}:`);
+    lines.push('  ' + topLine);
+    lines.push('  ' + nameRow);
+    lines.push('  ' + catRow);
+    lines.push('  ' + botLine);
+    const idxRow = '  ' + cols.map((c) => fit(c ? `cell ${c.idx}` : '', CELL_W + 1)).join('');
+    lines.push(idxRow);
+  }
 
   // Adjacency bonuses
   const bonuses = adjacencyBonuses(fort, catalog);
@@ -63,7 +95,6 @@ export function renderFortLayout(
     lines.push('');
     lines.push('  Adjacency bonuses active:');
     for (const b of bonuses) lines.push(`    ⤬ ${b}`);
-    // PROTO-GAME v13.1: surface the mechanical effect, not just the pair.
     const effIds = adjacencyEffectIds(fort, catalog);
     for (const id of effIds) {
       if (id === 'adj-bed-bunk') lines.push('        → +1 fatigue recovery for idle mercs (any season)');
@@ -81,8 +112,6 @@ export function adjacencyBonuses(
   fort: FortState,
   catalog: Map<string, RoomDef>,
 ): string[] {
-  const cells = fort.cells.map((c) => c.idx);
-  const totalSpan = (Math.max(...cells, 0)) + 1;
   const placedByCell = new Map<number, string>();
   for (const p of fort.placedRooms) placedByCell.set(p.cellIdx, p.roomId);
   const seen = new Set<string>();
@@ -90,7 +119,7 @@ export function adjacencyBonuses(
   for (const p of fort.placedRooms) {
     const def = catalog.get(p.roomId);
     if (!def) continue;
-    for (const neighbor of adjacentIndices(p.cellIdx, totalSpan)) {
+    for (const neighbor of cellNeighbors(fort, p.cellIdx)) {
       const otherId = placedByCell.get(neighbor);
       if (!otherId) continue;
       const otherDef = catalog.get(otherId);
@@ -120,12 +149,10 @@ export function adjacencyEffectIds(
   const out = new Set<string>();
   const placedByCell = new Map<number, string>();
   for (const p of fort.placedRooms) placedByCell.set(p.cellIdx, p.roomId);
-  const cells = fort.cells.map((c) => c.idx);
-  const totalSpan = (Math.max(...cells, 0)) + 1;
   const pairActive = (a: string, b: string): boolean => {
     for (const p of fort.placedRooms) {
       if (p.roomId !== a) continue;
-      for (const n of adjacentIndices(p.cellIdx, totalSpan)) {
+      for (const n of cellNeighbors(fort, p.cellIdx)) {
         if (placedByCell.get(n) === b) return true;
       }
     }
@@ -222,15 +249,46 @@ export function excavateCell(
   fort: FortState,
   gold: number,
   dayCount: number,
-): { ok: true; fort: FortState; gold: number; cost: number } | { ok: false; error: { kind: 'insufficient-gold'; need: number; have: number } } {
-  const cost = nextExcavationCost(fort.cells.length);
+  opts: { floor: number; side: 'left' | 'right' } = { floor: 0, side: 'right' },
+): { ok: true; fort: FortState; gold: number; cost: number } | { ok: false; error: { kind: 'insufficient-gold'; need: number; have: number } | { kind: 'unknown-floor'; floor: number } } {
+  const cellsOnFloor = fort.cells.filter((c) => c.floor === opts.floor);
+  if (cellsOnFloor.length === 0) {
+    return { ok: false, error: { kind: 'unknown-floor', floor: opts.floor } };
+  }
+  const cost = nextExcavationCost(cellsOnFloor.length);
   if (gold < cost) return { ok: false, error: { kind: 'insufficient-gold', need: cost, have: gold } };
   const nextIdx = fort.cells.length === 0 ? 0 : Math.max(...fort.cells.map((c) => c.idx)) + 1;
+  const nextCol = opts.side === 'right'
+    ? Math.max(...cellsOnFloor.map((c) => c.col)) + 1
+    : Math.min(...cellsOnFloor.map((c) => c.col)) - 1;
   const next: FortState = {
     ...fort,
-    cells: [...fort.cells, { idx: nextIdx, openedOnDay: dayCount }],
+    cells: [...fort.cells, { idx: nextIdx, floor: opts.floor, col: nextCol, openedOnDay: dayCount }],
   };
   return { ok: true, fort: next, gold: gold - cost, cost };
+}
+
+/** Open a brand-new floor (above the highest, or below the lowest), seeded with
+ *  3 cells at cols 0..2. Cost: nextFloorCost(floorsBeyondGround). */
+export function openFloor(
+  fort: FortState,
+  gold: number,
+  dayCount: number,
+  direction: 'up' | 'down',
+): { ok: true; fort: FortState; gold: number; cost: number; newFloor: number } | { ok: false; error: { kind: 'insufficient-gold'; need: number; have: number } | { kind: 'no-cells' } } {
+  if (fort.cells.length === 0) return { ok: false, error: { kind: 'no-cells' } };
+  const floors = new Set(fort.cells.map((c) => c.floor));
+  const beyondGround = [...floors].filter((f) => f !== 0).length;
+  const cost = nextFloorCost(beyondGround);
+  if (gold < cost) return { ok: false, error: { kind: 'insufficient-gold', need: cost, have: gold } };
+  const newFloor = direction === 'up' ? Math.max(...floors) + 1 : Math.min(...floors) - 1;
+  let nextIdx = fort.cells.length === 0 ? 0 : Math.max(...fort.cells.map((c) => c.idx)) + 1;
+  const newCells: FortCell[] = [];
+  for (let col = 0; col < STARTER_CELL_COUNT; col++) {
+    newCells.push({ idx: nextIdx++, floor: newFloor, col, openedOnDay: dayCount });
+  }
+  const next: FortState = { ...fort, cells: [...fort.cells, ...newCells] };
+  return { ok: true, fort: next, gold: gold - cost, cost, newFloor };
 }
 
 /** Active gates as a set of strings, e.g. {'lead-board','recruit-pool','captive-cap',...}. */
@@ -314,13 +372,11 @@ export function captiveCellEffects(
   }
   const placedByCell = new Map<number, string>();
   for (const p of fort.placedRooms) placedByCell.set(p.cellIdx, p.roomId);
-  const cells = fort.cells.map((c) => c.idx);
-  const totalSpan = (Math.max(...cells, 0)) + 1;
   const roomId = placedByCell.get(cellIdx);
   const def = roomId ? catalog.get(roomId) : undefined;
   const roomName = def?.name ?? null;
   const adjacentRoomIds: string[] = [];
-  for (const n of adjacentIndices(cellIdx, totalSpan)) {
+  for (const n of cellNeighbors(fort, cellIdx)) {
     const rid = placedByCell.get(n);
     if (rid) adjacentRoomIds.push(rid);
   }
