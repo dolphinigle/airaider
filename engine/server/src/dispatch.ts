@@ -10,6 +10,7 @@ import {
   excavateCell as excavateCellLayout,
   openFloor as openFloorLayout,
   dungeonCellsWithSpace,
+  captiveHostableCells,
   captiveCellEffects,
 } from '../../../prototype/src/fortLayout.js';
 import {
@@ -394,13 +395,9 @@ export async function dispatch(
         cap.cellIdx = undefined;
         return { ok: true, message: `unassigned ${cap.id} (to overflow corner)` };
       }
-      const free = dungeonCellsWithSpace(
-        roster.fort,
-        roomCatalog,
-        roster.captives.filter((c) => c.id !== cmd.captiveId),
-      );
-      if (!free.includes(cmd.cellIdx)) {
-        return { ok: false, error: `cell ${cmd.cellIdx} is not a free dungeon cell` };
+      const hostable = captiveHostableCells(roster.fort, roomCatalog, roster.captives, cmd.captiveId);
+      if (!hostable.includes(cmd.cellIdx)) {
+        return { ok: false, error: `cell ${cmd.cellIdx} cannot host a captive (full, quarters, or empty)` };
       }
       cap.cellIdx = cmd.cellIdx;
       return { ok: true, message: `placed ${cap.id} in cell ${cmd.cellIdx}` };

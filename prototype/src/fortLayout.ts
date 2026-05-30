@@ -376,6 +376,38 @@ export function captiveRoomPrestigeBreakdown(
 }
 
 /**
+ * All cells able to hold an additional captive: dungeon cells with capacity
+ * remaining, plus any non-quarters cell with a placed room that has no captive
+ * yet (themed display slot, cap 1). Excludes the captive's own current cell.
+ *
+ * Returns cellIdx ascending. `excludeCaptiveId` lets the caller exclude the
+ * captive being moved so its old cell counts as free.
+ */
+export function captiveHostableCells(
+  fort: FortState,
+  catalog: Map<string, RoomDef>,
+  captives: readonly { id?: string; cellIdx?: number }[],
+  excludeCaptiveId?: string,
+): number[] {
+  const occupancy = new Map<number, number>();
+  for (const c of captives) {
+    if (c.cellIdx === undefined) continue;
+    if (excludeCaptiveId && c.id === excludeCaptiveId) continue;
+    occupancy.set(c.cellIdx, (occupancy.get(c.cellIdx) ?? 0) + 1);
+  }
+  const out: number[] = [];
+  for (const p of fort.placedRooms) {
+    const def = catalog.get(p.roomId);
+    if (!def) continue;
+    if (def.category === 'quarters') continue; // mercs sleep here, not captives
+    const cap = def.category === 'dungeon' ? (def.capacity ?? 0) : 1;
+    const used = occupancy.get(p.cellIdx) ?? 0;
+    if (used < cap) out.push(p.cellIdx);
+  }
+  return out.sort((a, b) => a - b);
+}
+
+/**
  * PROTO-GAME v14: list dungeon cells with remaining capacity for captives.
  * Returns an array of cellIdx values, ordered by cell idx ascending, that
  * have a dungeon-category room AND fewer captives than the room's capacity.

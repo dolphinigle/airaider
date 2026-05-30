@@ -31,7 +31,7 @@ import { OpenAIScenarioLLM } from './llm/openai.js';
 import type { ScenarioLLM } from './llm/interface.js';
 import { loadFortCatalog, affordableUpgrades, purchaseUpgrade } from './fort.js';
 import { loadRoomCatalog, type RoomDef } from './rooms.js';
-import { renderFortLayout, buildRoom, excavateCell, openFloor, activeGates, totalCapacity, totalRoomPrestige, captiveRoomPrestige, captiveRoomPrestigeBreakdown, dungeonCellsWithSpace, captiveCellEffects } from './fortLayout.js';
+import { renderFortLayout, buildRoom, excavateCell, openFloor, activeGates, totalCapacity, totalRoomPrestige, captiveRoomPrestige, captiveRoomPrestigeBreakdown, captiveHostableCells, dungeonCellsWithSpace, captiveCellEffects } from './fortLayout.js';
 import { loadQuests, abandonQuest, type Quest } from './quests.js';
 import { hireFromPool } from './tavern.js';
 import { effectOf, FORMER_CAPTIVE_TAG_ID, type CaptiveAction, CAPTIVE_ACTIONS } from './captive.js';
@@ -963,17 +963,24 @@ async function cmdCaptives(
   if (!choice) return;
 
   if (choice === 'move') {
-    const free = dungeonCellsWithSpace(r.fort, roomCatalog, r.captives.filter((c) => c.id !== cap.id));
-    if (free.length === 0) {
-      console.log('  No dungeon cells with capacity. Build another Storeroom first.');
+    const candidates = captiveHostableCells(r.fort, roomCatalog, r.captives, cap.id);
+    if (candidates.length === 0) {
+      console.log('  No room cells with capacity. Build another Storeroom or themed room first.');
       return;
     }
-    const target = await pickFromList(rl, 'move to which cell?', free, (idx) => {
+    const target = await pickFromList(rl, 'move to which cell?', candidates, (idx) => {
       const eff = captiveCellEffects(r.fort, roomCatalog, idx);
+      const placed = r.fort.placedRooms.find((p) => p.cellIdx === idx);
+      const def = placed ? roomCatalog.get(placed.roomId) : undefined;
+      const breakdown = captiveRoomPrestigeBreakdown(r.fort, roomCatalog, { ...cap, cellIdx: idx });
       const adj: string[] = [];
       if (eff.chapelAdjacent) adj.push('chapel-adj');
       if (eff.smithyAdjacent) adj.push('smithy-adj');
-      return `cell ${idx} (${eff.roomName ?? '?'})${adj.length ? '  [' + adj.join(', ') + ']' : ''}`;
+      const wants = def?.wantedTags?.length ? `  wants:[${def.wantedTags.join(',')}]` : '';
+      const preview = breakdown.total > 0
+        ? `  → +${breakdown.total}★/day${breakdown.matchedTagIds.length ? ` (${breakdown.matchedTagIds.join(',')})` : ''}`
+        : '';
+      return `cell ${idx} (${eff.roomName ?? '?'})${adj.length ? '  [' + adj.join(', ') + ']' : ''}${wants}${preview}`;
     });
     if (target === undefined) return;
     cap.cellIdx = target;
