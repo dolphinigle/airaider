@@ -53,8 +53,17 @@ function attrDescriptor(value: number): string | null {
 
 function mercLine(p: ScenarioLLMRequest['party'][number]): string {
   const { merc, tier, fatigueAtStart, recentlyLostBondPartner } = p;
-  const parts: string[] = [merc.name];
-  if (tier && tier !== 'rookie') parts.push(tier);
+  // Pull the gender tag (category 'gender') out of the regular tag list
+  // so it can frame the merc as "Male veteran" / "Female peasant" instead
+  // of being buried mid-list. Other tags stay in the tag list.
+  const genderTag = merc.tags.find((t) => t.category === 'gender');
+  const otherTags = merc.tags.filter((t) => t.category !== 'gender');
+  const framing: string[] = [];
+  if (genderTag) framing.push(genderTag.label);
+  if (tier && tier !== 'rookie') framing.push(tier);
+  const head = framing.length > 0 ? `${merc.name} (${framing.join(' ')})` : merc.name;
+
+  const parts: string[] = [head];
   const standoutAttrs = (Object.entries(merc.attrs) as Array<[string, number]>)
     .map(([k, v]) => {
       const d = attrDescriptor(v);
@@ -62,7 +71,7 @@ function mercLine(p: ScenarioLLMRequest['party'][number]): string {
     })
     .filter((s): s is string => !!s);
   if (standoutAttrs.length > 0) parts.push(standoutAttrs.join(', '));
-  if (merc.tags.length > 0) parts.push(merc.tags.map((t) => t.label).join(', '));
+  if (otherTags.length > 0) parts.push(otherTags.map((t) => t.label).join(', '));
   if (fatigueAtStart && fatigueAtStart >= 2) parts.push(`worn (fatigue)`);
   if (recentlyLostBondPartner) parts.push(`grieving ${recentlyLostBondPartner}`);
   let line = parts.join('. ');
