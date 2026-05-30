@@ -136,9 +136,16 @@ export function isStepSuccessful(status: StepStatus): boolean {
   return status === 'resolved-favorable' || status === 'resolved-catastrophic-favorable';
 }
 
-/** Whether a step status is a hard fail (catastrophic bands). */
+/** Whether a step status is a hard fail (catastrophic loss — chain may need
+ *  to be killed). Note: catastrophic-favorable is BOTH catastrophic damage
+ *  AND a success; use isStepHardFail() if you want only chain-killers. */
 export function isStepCatastrophic(status: StepStatus): boolean {
   return status === 'resolved-catastrophic' || status === 'resolved-catastrophic-favorable';
+}
+
+/** Whether a step status should END the chain regardless of remaining beats. */
+export function isStepHardFail(status: StepStatus): boolean {
+  return status === 'resolved-catastrophic';
 }
 
 /** Validate a step blurb mentions at least ONE anchor (case-insensitive

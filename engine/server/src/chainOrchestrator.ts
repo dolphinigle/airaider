@@ -379,8 +379,10 @@ export async function advanceChainAfterResolution(
     await finalizeChain(roster, chain, finalStatus, {});
     return;
   }
-  // Hard fail: catastrophic on second-to-last step OR catastrophic with no successes recorded.
-  if (isStepCatastrophic(newStatus) && stepIdx === chain.steps.length - 2) {
+  // Hard fail: catastrophic-FAILURE on second-to-last step (Pyrrhic wins
+  // a.k.a. catastrophic-favorable DO advance the chain — they're scarring
+  // successes, not collapses).
+  if (newStatus === 'resolved-catastrophic' && stepIdx === chain.steps.length - 2) {
     await finalizeChain(roster, chain, 'failed', {});
     return;
   }
