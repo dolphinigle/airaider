@@ -26,7 +26,7 @@ import { rngFromString } from '../../../prototype/src/rng.js';
 import { appendFortLog } from '../../../prototype/src/roster.js';
 import { resolveScenario, type Assignment } from '../../../prototype/src/resolver.js';
 import { templateFor } from '../../../prototype/src/scenarioTemplates.js';
-import { rollCaptiveTags } from '../../../prototype/src/captiveTags.js';
+import { rollCaptiveTags, resolveCaptiveTagsAI, PLAN_BY_LEAD_RARITY } from '../../../prototype/src/captiveTags.js';
 import { totalCapacity, totalRoomPrestige, captiveRoomPrestige } from '../../../prototype/src/fortLayout.js';
 import {
   getQuestStore,
@@ -252,14 +252,18 @@ export async function dispatch(
               const freeCells = dungeonCellsWithSpace(roster.fort, roomCatalog, roster.captives);
               const captiveId = `captive-${quest.lead.id}`;
               const notoriety = Math.max(1, quest.lead.dc);
-              const rolledTags = rollCaptiveTags(tagPool, quest.lead.rarity, quest.lead.id);
+              const plan = PLAN_BY_LEAD_RARITY[quest.lead.rarity] ?? PLAN_BY_LEAD_RARITY.common!;
+              const planLabel = plan.join(' + ');
 
-              // Stage E: ask AI to flavor the captive consistent with the lead.
-              // Best-effort — falls back to lead-archetype heuristics if no key
-              // or if the call fails.
+              // AI flavors the captive (name + archetype + backstory + tagIds)
+              // based on the OUTCOME STORY so tags read consistently with the
+              // narrative ("knight Aldric" → bg:soldier + temp:brave, not
+              // bg:peasant + pers:cowardly). Engine still owns the tag
+              // COUNT + RARITY MIX via the plan; AI picks WHICH IDs.
               let flavorName = `Captive of ${quest.lead.region}`;
               let flavorArchetype = quest.lead.archetype === 'captive' ? 'deserter' : quest.lead.archetype;
               let flavorBackstory = quest.lead.blurb;
+              let resolvedTags = rollCaptiveTags(tagPool, quest.lead.rarity, quest.lead.id);
               const apiKey = process.env.OPENAI_API_KEY;
               if (apiKey) {
                 try {
@@ -269,11 +273,13 @@ export async function dispatch(
                     leadRegion: quest.lead.region,
                     leadRarity: quest.lead.rarity,
                     notoriety,
-                    tagLabels: rolledTags.map((t) => t.label),
+                    outcomeNarrative: res.outcomeNarrative,
+                    tagPlanLabel: planLabel,
                   });
                   flavorName = flavor.name;
                   flavorArchetype = flavor.archetype;
                   flavorBackstory = flavor.backstory;
+                  resolvedTags = resolveCaptiveTagsAI(flavor.tagIds, tagPool, quest.lead.rarity, quest.lead.id);
                 } catch (err: any) {
                   console.warn(`[captive-flavor] fell back to heuristic: ${err?.message ?? String(err)}`);
                 }
@@ -284,7 +290,7 @@ export async function dispatch(
                 archetype: flavorArchetype,
                 backstory: flavorBackstory,
                 notoriety,
-                tags: rolledTags,
+                tags: resolvedTags,
                 cellIdx: freeCells[0],
               });
               appendFortLog(roster, {
@@ -293,7 +299,7 @@ export async function dispatch(
                 message: `CAPTIVE TAKEN: ${flavorName} (${flavorArchetype}, notoriety ${notoriety}, ${roster.captives.length}/${cap} cells)`,
               });
               console.log(
-                `[captive] taken from "${quest.scenario.title}": ${flavorName} (${flavorArchetype}), notoriety ${notoriety}, tags [${rolledTags.map((t) => t.label).join(', ')}]`,
+                `[captive] taken from "${quest.scenario.title}": ${flavorName} (${flavorArchetype}), notoriety ${notoriety}, tags [${resolvedTags.map((t) => t.label).join(', ')}]`,
               );
             }
           }

@@ -21,6 +21,7 @@
 import OpenAI from 'openai';
 import { z } from 'zod';
 import { pushLLMLog } from './llmLog.js';
+import { VOCAB_BLOCK } from './promptVocab.js';
 import type {
   ScenarioLLM,
   ScenarioLLMRequest,
@@ -204,21 +205,38 @@ Narrate the moment. 4-6 sentences. Name the specific stakes from the lead hook. 
 // ---------------------------------------------------------------------------
 
 const CAPTIVE_FLAVOR_SYSTEM = `You are the flavor engine for a grimdark mercenary-fort game.
-The ENGINE has rolled a captive's notoriety + tags. You return a name + archetype + 1-2 sentence backstory that reads as a believable consequence of the LEAD the player pursued.
+The ENGINE has already decided what RARITY of captive this is (count + tier of tags). You return:
+- name (1 first name + optional epithet/clan, pan-european low-medieval register)
+- archetype (one word fitting the lead + outcome story, e.g. 'deserter', 'courier', 'priest', 'knight', 'cutpurse')
+- backstory (1-2 sentences, grimdark, terse, references the outcome story)
+- tagIds (pick from VOCAB below; MUST be IDs that exist in VOCAB; pick ones that match the OUTCOME STORY and the captive's role)
 
 Voice: grimdark, terse, pan-european low-medieval (Germanic/Celtic/Slavic). No grand destiny, no magic unless tags say so.
 
-Rules:
-- Archetype follows the lead's blurb. "deserter in the marsh" → 'deserter'; "courier" → 'courier'. Don't invent a 'Lost Heir' if the blurb says 'deserter'.
-- Name: 1 first name + optional epithet/clan ("Marek of the Fen"). Match cultural register.
-- Backstory: 1-2 sentences. Let the tags shape the detail ("the bog still on him; flinches at lanterns").
+TAGID RULES — READ CAREFULLY:
+- Every tagId MUST start with the EXACT category prefix shown in VOCAB. Common confusions:
+  * "cynical/stoic/loyal/charming/greedy/proud/zealous/honorable/ruthless/melancholic/vengeful/kind/cowardly/superstitious/suspicious" → pers:* (NOT temp:*)
+  * "brave/cautious/reckless/hot-tempered/nervous/patient/methodical" → temp:* (NOT pers:*)
+- Never invent IDs not in VOCAB. Copy them character-for-character.
 
-Output: { "name": "...", "archetype": "...", "backstory": "..." }`;
+RARITY BUDGET — CRITICAL:
+- The engine tells you the rarity budget (e.g. "common + uncommon + rare"). You MUST include AT LEAST ONE tagId of EACH rarity tier listed in that budget that fits the story.
+- If budget says "common + rare + legendary" you MUST pick at least one common, one rare, AND one legendary tagId — all consistent with the outcome story.
+- Pick 6-10 total tagIds. Cover background + temperament + personality + physical + race + gender. Engine narrows to the budget.
+
+ARCHETYPE consistency:
+- Archetype + tags must fit the OUTCOME STORY: "knight" story → bg:noble-bastard or bg:soldier + temp:brave/pers:honorable; "deserter" → bg:deserter + pers:cowardly; "prophet" → bg:priest + pers:zealous.
+- Don't invent a knight from a peasant story or vice versa.
+
+${VOCAB_BLOCK}
+
+Output: { "name": "...", "archetype": "...", "backstory": "...", "tagIds": ["...", "..."] }`;
 
 const CaptiveFlavorSchema = z.object({
   name: z.string().min(1),
   archetype: z.string().min(1),
   backstory: z.string().min(1),
+  tagIds: z.array(z.string()).default([]),
 });
 
 export interface CaptiveFlavorInput {
@@ -227,13 +245,15 @@ export interface CaptiveFlavorInput {
   leadRegion: string;
   leadRarity: string;
   notoriety: number;
-  tagLabels: readonly string[];
+  outcomeNarrative: string;
+  tagPlanLabel: string;
 }
 
 export interface CaptiveFlavorOutput {
   name: string;
   archetype: string;
   backstory: string;
+  tagIds: string[];
 }
 
 export async function flavorCaptive(
@@ -244,9 +264,14 @@ export async function flavorCaptive(
   const client = new OpenAI({ apiKey });
   const userPrompt = `Lead pursued: "${input.leadBlurb}"
 Lead archetype: ${input.leadArchetype}  region: ${input.leadRegion}  rarity: ${input.leadRarity}
-Captive (engine-decided): notoriety ${input.notoriety}, tags [${input.tagLabels.join(', ')}]
+Notoriety: ${input.notoriety}
+Engine tag budget: ${input.tagPlanLabel}
 
-Return JSON: { "name": "...", "archetype": "...", "backstory": "..." }`;
+OUTCOME STORY (what just happened — drive your tagIds + archetype from this):
+${input.outcomeNarrative}
+
+Return JSON: { "name": "...", "archetype": "...", "backstory": "...", "tagIds": ["...", "..."] }
+The tagIds you return must exist in VOCAB. Pick 5-8 that fit the OUTCOME STORY; engine will narrow to budget.`;
 
   if (process.env.AIRAIDER_LLM_VERBOSE !== '0') {
     console.log(`[lean-llm:captive-flavor] user:\n${userPrompt}`);
@@ -269,8 +294,9 @@ Return JSON: { "name": "...", "archetype": "...", "backstory": "..." }`;
             name: { type: 'string' },
             archetype: { type: 'string' },
             backstory: { type: 'string' },
+            tagIds: { type: 'array', items: { type: 'string' } },
           },
-          required: ['name', 'archetype', 'backstory'],
+          required: ['name', 'archetype', 'backstory', 'tagIds'],
         },
       },
     },
