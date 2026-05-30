@@ -215,7 +215,31 @@ export async function generateChainGenesis(input: GenesisInput): Promise<Genesis
     }
   }
   const parsed = GenesisOutSchema.parse(raw);
+  warnIfClicheLeak(`genesis "${parsed.title}"`, [parsed.hook, parsed.skeleton, ...parsed.stepBeats]);
   return parsed;
+}
+
+const BANNED_PHRASES: readonly string[] = [
+  'nefarious schemes', 'pulls the strings', 'puppets of', 'tightening their grip',
+  'shadows of', 'fate hangs in the balance', 'hangs in the balance', 'darkness descends',
+  'ancient evil', 'twisted ambition', 'weight of the past', 'ghosts of the past',
+  'coin and blood', 'the spoils', 'promises coin',
+  'finds himself bloodied and outnumbered',
+];
+
+/** Surface banned-phrase leaks as warn-logs so playtest sessions can spot
+ *  prompt-discipline regressions without crashing. Does NOT retry. */
+function warnIfClicheLeak(label: string, texts: readonly string[]): void {
+  for (const t of texts) {
+    if (!t) continue;
+    const lower = t.toLowerCase();
+    for (const ban of BANNED_PHRASES) {
+      if (lower.includes(ban)) {
+        console.warn(`[chain-cliche] ${label} leaked "${ban}"`);
+        break;
+      }
+    }
+  }
 }
 
 // ---------- step blurb ----------
@@ -318,6 +342,7 @@ export async function generateChainStepBlurb(input: StepBlurbInput): Promise<str
     cachedPromptTokens: resp.usage?.prompt_tokens_details?.cached_tokens ?? 0,
   });
   const parsed = StepBlurbOutSchema.parse(JSON.parse(content));
+  warnIfClicheLeak(`step ${input.stepIdx} of "${input.chain.title}"`, [parsed.hook]);
   return parsed.hook.trim();
 }
 
