@@ -20,6 +20,7 @@
 
 import OpenAI from 'openai';
 import { z } from 'zod';
+import { pushLLMLog } from './llmLog.js';
 import type {
   ScenarioLLM,
   ScenarioLLMRequest,
@@ -160,6 +161,7 @@ Narrate the moment. 4-6 sentences. Name the specific stakes from the lead hook. 
       console.log(`[lean-llm:prompt] user:\n${userPrompt}`);
     }
 
+    const startedAt = Date.now();
     const resp = await this.client.chat.completions.create({
       model: this.model,
       max_tokens: this.maxTokens,
@@ -185,6 +187,16 @@ Narrate the moment. 4-6 sentences. Name the specific stakes from the lead hook. 
 
     const content = resp.choices[0]?.message?.content;
     if (!content) throw new Error('OpenAI returned no content');
+    pushLLMLog({
+      ts: Date.now(),
+      kind: 'narrate',
+      model: this.model,
+      systemPrompt: SYSTEM_PROMPT,
+      userPrompt,
+      response: content,
+      label: `${req.archetype}/${req.leadHook?.rarity ?? '?'}/${req.leadHook?.region ?? '?'} · ${req.band}`,
+      elapsedMs: Date.now() - startedAt,
+    });
     let parsed: unknown;
     try { parsed = JSON.parse(content); }
     catch (err) { throw new Error(`OpenAI returned non-JSON: ${(err as Error).message}\n${content}`); }
@@ -253,6 +265,7 @@ Return JSON: { "name": "...", "archetype": "...", "backstory": "..." }`;
     console.log(`[lean-llm:captive-flavor] user:\n${userPrompt}`);
   }
 
+  const startedAt = Date.now();
   const resp = await client.chat.completions.create({
     model,
     max_tokens: 300,
@@ -281,6 +294,16 @@ Return JSON: { "name": "...", "archetype": "...", "backstory": "..." }`;
   });
   const content = resp.choices[0]?.message?.content;
   if (!content) throw new Error('OpenAI returned no content for captive flavor');
+  pushLLMLog({
+    ts: Date.now(),
+    kind: 'captive-flavor',
+    model,
+    systemPrompt: CAPTIVE_FLAVOR_SYSTEM,
+    userPrompt,
+    response: content,
+    label: `${input.leadArchetype}/${input.leadRegion} (notoriety ${input.notoriety})`,
+    elapsedMs: Date.now() - startedAt,
+  });
   const parsed = CaptiveFlavorSchema.parse(JSON.parse(content));
   if (process.env.AIRAIDER_LLM_VERBOSE !== '0') {
     console.log(`[lean-llm:captive-flavor] ← ${parsed.name} (${parsed.archetype}): ${parsed.backstory}`);

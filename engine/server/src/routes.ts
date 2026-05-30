@@ -15,6 +15,7 @@ import {
   captiveRoomPrestige,
 } from '../../../prototype/src/fortLayout.js';
 import { computePrestige, prestigeTier, prestigeTierLabel } from '../../../prototype/src/prestige.js';
+import { recentLLMLog } from './llmLog.js';
 import type { Roster } from '../../../prototype/src/roster.js';
 import type { RoomDef } from '../../../prototype/src/rooms.js';
 
@@ -76,6 +77,7 @@ function snapshotState(roster: Roster, roomCatalog: Map<string, RoomDef>): unkno
     },
     pursuedQuests,
     lastResolutions: store.lastResolutions,
+    llmLog: recentLLMLog(20),
   };
 }
 

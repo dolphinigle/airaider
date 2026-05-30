@@ -79,6 +79,17 @@ export interface FortLogEntry {
   message: string;
 }
 
+export interface LLMLogEntry {
+  ts: number;
+  kind: string;
+  model: string;
+  systemPrompt: string;
+  userPrompt: string;
+  response: string;
+  label?: string;
+  elapsedMs?: number;
+}
+
 export interface PrestigeView {
   score: number;
   tier: 'unknown' | 'whispered' | 'feared' | 'storied' | 'legendary';
@@ -155,6 +166,7 @@ export interface GameState {
   hirePool: HirePoolEntry[];
   reputation: Record<string, number>;
   fortLog: FortLogEntry[];
+  llmLog?: LLMLogEntry[];
   prestige: PrestigeView;
   pursuedQuests: PursuedQuest[];
   lastResolutions: ResolutionRecord[];
