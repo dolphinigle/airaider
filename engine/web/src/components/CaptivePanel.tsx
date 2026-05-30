@@ -1,8 +1,10 @@
 import { useDraggable } from '@dnd-kit/core';
 import type { GameState } from '../types';
+import { useDispatch } from '../api';
 
 function DraggableCaptiveRow({ c, onAction }: { c: GameState['captives'][number]; onAction: (id: string) => void }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: `captive:${c.id}` });
+  const dispatch = useDispatch();
   const cellLabel = c.cellIdx === undefined ? 'OVERFLOW' : `cell ${c.cellIdx} (${c.cellEffects.roomName ?? '?'})`;
   return (
     <div
@@ -40,6 +42,14 @@ function DraggableCaptiveRow({ c, onAction }: { c: GameState['captives'][number]
         {c.cellEffects.chapelAdjacent && <span style={{ color: 'var(--good)' }}>⛪ chapel-adj → free recruit</span>}
         {c.cellEffects.smithyAdjacent && <span style={{ color: 'var(--accent)' }}>⚒ smithy-adj → +5g ransom</span>}
         <span style={{ flex: 1 }} />
+        {c.cellIdx !== undefined && (
+          <button
+            data-testid={`captive-unassign-${c.id}`}
+            onClick={() => dispatch.mutate({ kind: 'place-captive', captiveId: c.id, cellIdx: null })}
+            style={{ fontSize: 11, padding: '2px 8px' }}
+            title="move to overflow (no room slot)"
+          >unassign</button>
+        )}
         <button onClick={() => onAction(c.id)} style={{ fontSize: 11, padding: '2px 8px' }}>dispose</button>
       </div>
     </div>
