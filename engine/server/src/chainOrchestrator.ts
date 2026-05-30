@@ -39,7 +39,7 @@ import {
 } from './aiQuestChain.js';
 
 /** Cap on simultaneously active chains. */
-export const ACTIVE_CHAIN_CAP = process.env.AIRAIDER_CHAIN_PLAYTEST ? 10 : 3;
+export const ACTIVE_CHAIN_CAP = process.env.AIRAIDER_CHAIN_PLAYTEST ? 20 : 3;
 
 /** Default follow-up chance per chain rarity. */
 export const FOLLOWUP_CHANCE: Record<LeadRarity, number> = {
@@ -501,6 +501,11 @@ async function spawnFollowupChain(roster: Roster, prior: QuestChain): Promise<Qu
       chainRarity: nextRarity,
       themeTagLabels: themeTags,
       priorEpilogue: prior.epilogue ?? '',
+      inheritFromPrior: {
+        ...(prior.anchors.centralNpc ? { centralNpc: prior.anchors.centralNpc } : {}),
+        ...(prior.anchors.antagonistFaction ? { antagonistFaction: prior.anchors.antagonistFaction } : {}),
+        ...(prior.anchors.recurringPlaces?.length ? { places: prior.anchors.recurringPlaces } : {}),
+      },
       avoidNames: avoidNamesFromRoster(roster, prior.id),
       ...(anchor ? {
         anchorMerc: {

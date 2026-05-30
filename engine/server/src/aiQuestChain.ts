@@ -86,6 +86,10 @@ export interface GenesisInput {
   anchorMerc?: { name: string; backstory?: string; tagLabels: readonly string[] };
   /** For follow-up chains. */
   priorEpilogue?: string;
+  /** For follow-up chains: the centralNpc + antagonist + places that the
+   *  sequel SHOULD inherit verbatim. Prevents the AI from bolting prior
+   *  antagonist names onto the protagonist by accident. */
+  inheritFromPrior?: { centralNpc?: string; antagonistFaction?: string; places?: readonly string[] };
   /** Names already in use across other active chains — AI must NOT reuse them. */
   avoidNames?: { centralNpcs: readonly string[]; antagonists: readonly string[]; places: readonly string[] };
 }
@@ -127,6 +131,16 @@ export async function generateChainGenesis(input: GenesisInput): Promise<Genesis
   }
   if (input.priorEpilogue) {
     userParts.push(`This is a SEQUEL. The prior chain ended with: "${input.priorEpilogue}". Build on those consequences.`);
+  }
+  if (input.inheritFromPrior) {
+    const ip = input.inheritFromPrior;
+    const parts: string[] = [];
+    if (ip.centralNpc) parts.push(`centralNpc MUST be EXACTLY "${ip.centralNpc}" (do NOT bolt prior-antagonist names or any other word onto this name — use it verbatim as the single anchor of the new arc)`);
+    if (ip.antagonistFaction) parts.push(`antagonistFaction SHOULD inherit "${ip.antagonistFaction}" unless the prior chain definitively destroyed them — in that case coin a NEW faction that fills the vacuum`);
+    if (ip.places && ip.places.length) parts.push(`recurringPlaces MAY include up to 1-2 of the prior places (${ip.places.join(', ')}) for continuity, but add at least 1-2 fresh named places`);
+    if (parts.length) {
+      userParts.push(`SEQUEL INHERITANCE RULES:\n- ${parts.join('\n- ')}`);
+    }
   }
   if (input.avoidNames) {
     const av = input.avoidNames;
