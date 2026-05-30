@@ -24,6 +24,8 @@ import { rngFromString } from '../../../prototype/src/rng.js';
 import { appendFortLog } from '../../../prototype/src/roster.js';
 import { resolveScenario, type Assignment } from '../../../prototype/src/resolver.js';
 import { templateFor } from '../../../prototype/src/scenarioTemplates.js';
+import { rollCaptiveTags } from '../../../prototype/src/captiveTags.js';
+import { totalCapacity } from '../../../prototype/src/fortLayout.js';
 import {
   getQuestStore,
   QUEST_EXPIRY_DAYS,
@@ -217,6 +219,44 @@ export async function dispatch(
             kind: 'note',
             message: `[${quest.lead.rarity}] ${quest.scenario.title}: ${res.band} (+${goldAwarded}g)`,
           });
+
+          // Captive-archetype leads, on favorable+ bands, drop a captive
+          // into the dungeon (mirrors prototype/cliGame.ts behaviour).
+          if (
+            quest.lead.archetype === 'captive' &&
+            (res.band === 'favorable' || res.band === 'catastrophic-favorable')
+          ) {
+            const cap = totalCapacity(roster.fort, roomCatalog, 'dungeon');
+            if (roster.captives.length >= cap) {
+              appendFortLog(roster, {
+                day: roster.dayCount,
+                kind: 'note',
+                message: `captive from "${quest.scenario.title}" slipped free — no dungeon cell available (${roster.captives.length}/${cap})`,
+              });
+            } else {
+              const freeCells = dungeonCellsWithSpace(roster.fort, roomCatalog, roster.captives);
+              const captiveId = `captive-${quest.lead.id}`;
+              const notoriety = Math.max(1, quest.lead.dc);
+              const rolledTags = rollCaptiveTags(tagPool, quest.lead.rarity, quest.lead.id);
+              roster.captives.push({
+                id: captiveId,
+                name: `Captive of ${quest.lead.region}`,
+                archetype: 'deserter',
+                backstory: quest.lead.blurb,
+                notoriety,
+                tags: rolledTags,
+                cellIdx: freeCells[0],
+              });
+              appendFortLog(roster, {
+                day: roster.dayCount,
+                kind: 'note',
+                message: `CAPTIVE TAKEN: ${captiveId} (notoriety ${notoriety}, ${roster.captives.length}/${cap} cells)`,
+              });
+              console.log(
+                `[captive] taken from "${quest.scenario.title}": notoriety ${notoriety}, tags [${rolledTags.map((t) => t.label).join(', ')}]`,
+              );
+            }
+          }
         } catch (err: any) {
           // Resolution failure (e.g. LLM error) — keep quest, surface error.
           appendFortLog(roster, {
