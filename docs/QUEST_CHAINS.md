@@ -444,3 +444,62 @@ If 6 & 7 fail consistently, prompt engineering needs more iteration — the *des
 - 🟡 How to handle save-file migration when a chain's schema changes mid-prototype?
 
 None of these block the prototype. Make defaults: single cap of 3, no double-anchor, no lock, show count, on schema-change drop active chains with a fort-log warning.
+
+---
+
+## 17. Playtest-validated learnings (May 2026)
+
+The Phase A+B prototype was validated end-to-end on the live GUI server with real LLM calls. These are the failure modes observed and the fixes that worked. Future tuning should not regress them.
+
+### 17.1 Anti-cliché prompt discipline
+
+The base genesis prompt produced fantasy-novel cliché phrases on roughly 1 in 3 chains: "nefarious schemes", "pulls the strings", "puppets of", "tightening their grip", "shadows of", "fate hangs in the balance", "darkness descends", "ancient evil", "twisted ambition", "weight of the past", "ghosts of the past", "coin and blood", "the spoils".
+
+**Fix:** Maintain an explicit `BANNED PHRASES` list in `GENESIS_SYSTEM` and `STEP_BLURB_SYSTEM`. The AI obeys named bans more reliably than abstract "avoid clichés" instructions.
+
+### 17.2 Title-pattern lock-in
+
+Across multiple cold runs the AI repeatedly produced titles in the form `"The Weight of X"`, `"The Hollow's X"`, `"Whispers of X"`, `"Shadows over X"`. This made every chain feel similar even when the content was distinct.
+
+**Fix:** The genesis prompt now explicitly bans those title patterns and requires the title to contain a CONCRETE proper noun (a person's name, a place name, or a named object). Examples: "Marek's Crossroads", "Greythorn's Broken Shield", "The St. Hadric Reliquary".
+
+### 17.3 Hook abstraction failure mode
+
+Hooks like "A soldier's past haunts him in the shadows of Blackmoor" or "An old soldier seeks aid against a brutal clan" name nothing concrete and give the downstream step-blurb prompt nothing to anchor on. The chain feels generic from the first beat.
+
+**Fix:** The genesis prompt requires the hook to NAME the centralNpc AND the specific inciting thing in one sentence. The prompt includes three BAD examples and two GOOD examples ("Marek's old regiment was hanged at Greyford. The Grey Crawlers have begun asking who survived.").
+
+### 17.4 Mid-arc epithet abuse
+
+When the genesis output set `centralNpc = "Marek the Brawny"`, the step-blurb prompt used "Marek the Brawny" in every single blurb — across all 4 steps. Repetition broke voice.
+
+**Fix:** Anti-epithet discipline in `STEP_BLURB_SYSTEM`: introduce the NPC with their full name once, then use the first name only. The centralNpc value is split on whitespace for the prompt so the first token becomes the "preferred ongoing reference".
+
+### 17.5 Verbatim phrase reuse across steps
+
+Without intervention, the AI reused multi-word phrases verbatim from earlier blurbs ("the Grey Crawlers tightening their grip" appeared in steps 3 AND 4 of the same chain).
+
+**Fix:** `chainDigest(chain, priorHooks)` accepts an array of prior step blurbs. The orchestrator caches `step.blurb = lead.blurb` on spawn so prior blurbs survive after the lead is consumed. The step-blurb prompt explicitly instructs: *"DO NOT reuse any 3-word phrase from these — coin fresh language."* Observed: zero verbatim 3-word reuse after this change across 6+ subsequent chains.
+
+### 17.6 Pyrrhic-victory finalize bug (engine, not AI)
+
+The hard-fail gate at `advanceChainAfterResolution` used the helper `isStepCatastrophic(status)`, which returns true for BOTH `resolved-catastrophic` and `resolved-catastrophic-favorable`. A Pyrrhic win on step N-1 was therefore wrongly classified as a hard fail and the chain finalized one step early.
+
+**Fix:** Introduced `isStepHardFail()` helper that matches only the pure catastrophic case. The advance() routine uses a direct status comparison rather than the broader catastrophic predicate. `ChainStep` also gained an explicit `blurb` field so blurbs persist for the anti-repetition guard even after the lead is consumed.
+
+### 17.7 Cross-chain NPC and faction collision
+
+With 3+ chains active in parallel, the AI tended to reuse the same antagonist faction ("Grey Crawlers" appeared in three different chains in the same world) and occasionally the same centralNpc. Players reading multiple sagas can't tell them apart.
+
+**Fix:** The orchestrator now collects the centralNpc / antagonistFaction / heavily-reused places from all OTHER active chains and passes them as `avoidNames` to `generateChainGenesis`. The prompt instructs the AI to NOT reuse those names. Sequels are exempt for the prior chain itself (using `excludeChainId = prior.id`) since sequel inheritance is the whole point of a follow-up chain. Validation: with 9 pre-fix chains active (two with duplicate NPC "Alaric", two with duplicate antagonist "Grey Crawlers"), the first post-fix spawn produced a chain with a brand-new centralNpc and a brand-new antagonist faction.
+
+### 17.8 Follow-up sagas are the sleeper feature
+
+The follow-up chain path (one chain's epilogue threading into the next chain's genesis) is the strongest single feature of the chain system. End-to-end test: chain A "The Sorrow of Elowen" ended with Garrick dead, Roselle clutching Elowen's brooch, and Saltmire still under Grey Crawler control. The forced follow-up produced chain B "Roselle's Reckoning" whose hidden skeleton opens with *"In the aftermath of Garrick's death, Roselle struggles under the Grey Crawlers' oppressive rule in Saltmire, haunted by her dreams and the brooch that symbolizes her loss."* The brooch persisted as a memento. Varek persisted as antagonist. A new MacGuffin (Garrick's lost sword) and a new defected-Grey-Crawler NPC (Rurik) entered. Chain B then walked to completion in a single playtest pass; its epilogue folded in a NEW death (Gunther in catastrophic step 5) without ever losing the inherited continuity.
+
+**Implication:** The follow-up chance multiplier on completion is worth tilting upward. Saga depth (chain A → B → C) is where the system feels most authored. The orchestrator currently doubles the follow-up chance in PLAYTEST mode (capped at 95%); production might want the same lift.
+
+### 17.9 Active-chain cap interacts with debug spawn
+
+The default `ACTIVE_CHAIN_CAP = 3` is correct for production but hits hard during debug/playtest sessions where many chains are forced into existence. The orchestrator now reads `process.env.AIRAIDER_CHAIN_PLAYTEST` and uses cap=10 when set, cap=3 otherwise. The same env var also boosts the follow-up multiplier and lifts certain trigger probabilities.
+
