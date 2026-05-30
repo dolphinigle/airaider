@@ -6,7 +6,10 @@
 // see the heads-on-pikes pay off in lead-board quality.
 //
 // Formula (intentionally simple and legible):
-//   prestige = displayedCount + 2 * legendaryLeadsCompleted + (fortLevel - 1)
+//   prestige = displayedCount
+//            + 2 * legendaryLeadsCompleted
+//            + (fortLevel - 1)
+//            + sum(room.prestigeBonus for room in placedRooms)
 //
 // Tiers map to lead-rarity weight adjustments. Each tier shifts a few
 // percentage points away from common toward rare/legendary, so the player
@@ -18,10 +21,18 @@ export interface PrestigeInputs {
   displayedCount: number;
   legendaryLeadsCompleted: number;
   fortLevel: number;
+  /** Sum of prestigeBonus across all placed rooms. Default 0 for back-compat. */
+  roomPrestige?: number;
 }
 
 export function computePrestige(i: PrestigeInputs): number {
-  return Math.max(0, i.displayedCount + 2 * i.legendaryLeadsCompleted + Math.max(0, i.fortLevel - 1));
+  return Math.max(
+    0,
+    i.displayedCount
+      + 2 * i.legendaryLeadsCompleted
+      + Math.max(0, i.fortLevel - 1)
+      + (i.roomPrestige ?? 0),
+  );
 }
 
 export function prestigeTier(score: number): PrestigeTier {

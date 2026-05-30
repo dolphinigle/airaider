@@ -11,6 +11,7 @@ import {
   dungeonCellsWithSpace,
   captiveCellEffects,
   totalCapacity,
+  totalRoomPrestige,
 } from '../../../prototype/src/fortLayout.js';
 import { computePrestige, prestigeTier, prestigeTierLabel } from '../../../prototype/src/prestige.js';
 import type { Roster } from '../../../prototype/src/roster.js';
@@ -21,6 +22,7 @@ function snapshotState(roster: Roster, roomCatalog: Map<string, RoomDef>): unkno
     displayedCount: roster.displayedCount,
     legendaryLeadsCompleted: roster.legendaryLeadsCompleted,
     fortLevel: roster.fort.level,
+    roomPrestige: totalRoomPrestige(roster.fort, roomCatalog),
   });
   const tier = prestigeTier(prestige);
   const fortLayoutLines = renderFortLayout(roster.fort, roomCatalog);

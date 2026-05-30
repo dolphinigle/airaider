@@ -36,6 +36,13 @@ export function BuildModal({ state, cellIdx, onClose, onBuild }: { state: GameSt
                 </button>
               </div>
               <div style={{ fontSize: 11, color: 'var(--muted)' }}>{r.description}</div>
+              {(r.capacity || r.incomePerDay || r.prestigeBonus) && (
+                <div style={{ fontSize: 11, marginTop: 2, display: 'flex', gap: 10 }}>
+                  {r.capacity ? <span title="capacity">⛓ cap {r.capacity}</span> : null}
+                  {r.incomePerDay ? <span style={{ color: 'var(--accent)' }} title="gold per day">+{r.incomePerDay}g/d</span> : null}
+                  {r.prestigeBonus ? <span style={{ color: 'var(--legendary)' }} title="prestige">★+{r.prestigeBonus} prestige</span> : null}
+                </div>
+              )}
             </div>
           );
         })}

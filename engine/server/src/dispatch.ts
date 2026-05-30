@@ -25,7 +25,7 @@ import { appendFortLog } from '../../../prototype/src/roster.js';
 import { resolveScenario, type Assignment } from '../../../prototype/src/resolver.js';
 import { templateFor } from '../../../prototype/src/scenarioTemplates.js';
 import { rollCaptiveTags } from '../../../prototype/src/captiveTags.js';
-import { totalCapacity } from '../../../prototype/src/fortLayout.js';
+import { totalCapacity, totalRoomPrestige } from '../../../prototype/src/fortLayout.js';
 import {
   getQuestStore,
   QUEST_EXPIRY_DAYS,
@@ -89,6 +89,7 @@ export async function dispatch(
         displayedCount: roster.displayedCount,
         legendaryLeadsCompleted: roster.legendaryLeadsCompleted,
         fortLevel: roster.fort.level,
+        roomPrestige: totalRoomPrestige(roster.fort, roomCatalog),
       });
       const weights = tiltRarityWeights({ ...BASE_RARITY_WEIGHTS }, prestigeTier(prestige));
       const refresh = refreshLeadBoard({
@@ -290,6 +291,7 @@ export async function dispatch(
           displayedCount: roster.displayedCount,
           legendaryLeadsCompleted: roster.legendaryLeadsCompleted,
           fortLevel: roster.fort.level,
+          roomPrestige: totalRoomPrestige(roster.fort, roomCatalog),
         });
         const weights = tiltRarityWeights({ ...BASE_RARITY_WEIGHTS }, prestigeTier(prestige));
         const refresh = refreshLeadBoard({

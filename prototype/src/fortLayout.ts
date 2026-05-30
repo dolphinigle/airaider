@@ -259,6 +259,19 @@ export function totalCapacity(
   return n;
 }
 
+/** Sum of prestigeBonus across every placed room. */
+export function totalRoomPrestige(
+  fort: FortState,
+  catalog: Map<string, RoomDef>,
+): number {
+  let n = 0;
+  for (const p of fort.placedRooms) {
+    const def = catalog.get(p.roomId);
+    if (def?.prestigeBonus) n += def.prestigeBonus;
+  }
+  return n;
+}
+
 /**
  * PROTO-GAME v14: list dungeon cells with remaining capacity for captives.
  * Returns an array of cellIdx values, ordered by cell idx ascending, that

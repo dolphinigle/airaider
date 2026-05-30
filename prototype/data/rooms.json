@@ -18,7 +18,8 @@
       "description": "A private cell with a real bed. Officers and named heroes get their own.",
       "capacity": 1,
       "gates": ["bedroom-slot"],
-      "adjacencyMates": ["bunkroom"]
+      "adjacencyMates": ["bunkroom"],
+      "prestigeBonus": 1
     },
     {
       "id": "storeroom",
@@ -63,7 +64,8 @@
       "category": "utility",
       "cost": 4,
       "description": "A small stone chapel for the dead. The living sleep a little easier.",
-      "gates": ["chapel-recover"]
+      "gates": ["chapel-recover"],
+      "prestigeBonus": 1
     },
     {
       "id": "watch-tower",
@@ -71,7 +73,8 @@
       "category": "utility",
       "cost": 8,
       "description": "A four-storey tower with crow's-nest sightlines. Few surprises reach the gate.",
-      "gates": ["watch-forecast"]
+      "gates": ["watch-forecast"],
+      "prestigeBonus": 1
     },
     {
       "id": "granary",
@@ -99,6 +102,36 @@
       "capacity": 2,
       "gates": ["captive-cap"],
       "adjacencyMates": ["storeroom"]
+    },
+    {
+      "id": "oubliette",
+      "name": "Oubliette",
+      "category": "dungeon",
+      "cost": 14,
+      "description": "A pit you forget people in. Three more rings around three more throats.",
+      "capacity": 3,
+      "gates": ["captive-cap"],
+      "adjacencyMates": ["storeroom", "extra-storeroom"]
+    },
+    {
+      "id": "trophy-hall",
+      "name": "Trophy Hall",
+      "category": "utility",
+      "cost": 12,
+      "description": "Banners, broken blades, the helms of the named dead. Strangers slow down to look.",
+      "gates": ["fame"],
+      "adjacencyMates": ["chapel", "watch-tower"],
+      "prestigeBonus": 3
+    },
+    {
+      "id": "throne-room",
+      "name": "Throne Room",
+      "category": "utility",
+      "cost": 20,
+      "description": "A seat carved from one stone. The fort has a center of gravity now.",
+      "gates": ["court"],
+      "adjacencyMates": ["trophy-hall"],
+      "prestigeBonus": 5
     }
   ]
 }

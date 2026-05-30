@@ -35,6 +35,8 @@ export const RoomDefSchema = z.object({
   gates: z.array(z.string()).default([]),
   /** Room ids that, if placed in an adjacent cell, grant a small bonus. */
   adjacencyMates: z.array(z.string()).default([]),
+  /** Flat prestige contribution added once the room is placed. */
+  prestigeBonus: z.number().int().min(0).optional(),
   /** If true, the room is part of the Day-1 starter fort layout. */
   starter: z.boolean().default(false),
 });

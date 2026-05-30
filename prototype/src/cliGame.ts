@@ -31,7 +31,7 @@ import { OpenAIScenarioLLM } from './llm/openai.js';
 import type { ScenarioLLM } from './llm/interface.js';
 import { loadFortCatalog, affordableUpgrades, purchaseUpgrade } from './fort.js';
 import { loadRoomCatalog, type RoomDef } from './rooms.js';
-import { renderFortLayout, buildRoom, excavateCell, activeGates, totalCapacity, dungeonCellsWithSpace, captiveCellEffects } from './fortLayout.js';
+import { renderFortLayout, buildRoom, excavateCell, activeGates, totalCapacity, totalRoomPrestige, dungeonCellsWithSpace, captiveCellEffects } from './fortLayout.js';
 import { loadQuests, abandonQuest, type Quest } from './quests.js';
 import { hireFromPool } from './tavern.js';
 import { effectOf, FORMER_CAPTIVE_TAG_ID, type CaptiveAction, CAPTIVE_ACTIONS } from './captive.js';
@@ -152,7 +152,7 @@ async function main(): Promise<void> {
 
   let running = true;
   while (running) {
-    printStatus(roster);
+    printStatus(roster, roomCatalog);
     printMenu();
     const cmd = (await rl.question('> ')).trim();
     if (cmd === '' ) continue;
@@ -182,7 +182,7 @@ async function main(): Promise<void> {
 
 // ---------- status & menu ----------
 
-function printStatus(r: Roster): void {
+function printStatus(r: Roster, roomCatalog: Map<string, RoomDef>): void {
   const sc = seasonFor(r.dayCount);
   const repParts = Object.entries(r.reputation).map(([k, v]) => `${k}:${v}(${reputationTier(v)})`);
   const roomCount = r.fort.placedRooms.length;
@@ -192,6 +192,7 @@ function printStatus(r: Roster): void {
     displayedCount: r.displayedCount,
     legendaryLeadsCompleted: r.legendaryLeadsCompleted,
     fortLevel: r.fort.level,
+    roomPrestige: totalRoomPrestige(r.fort, roomCatalog),
   });
   const tier = prestigeTier(prestige);
   console.log('');
@@ -364,6 +365,7 @@ async function cmdAdvanceDay(
     displayedCount: r.displayedCount,
     legendaryLeadsCompleted: r.legendaryLeadsCompleted,
     fortLevel: r.fort.level,
+    roomPrestige: totalRoomPrestige(r.fort, roomCatalog),
   });
   const tiltedWeights = tiltRarityWeights({ ...BASE_RARITY_WEIGHTS }, prestigeTier(prestigeNow));
   const refresh = refreshLeadBoard({ board: r.leadBoard, dayCount: r.dayCount, rarityWeights: tiltedWeights });

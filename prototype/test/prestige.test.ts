@@ -17,6 +17,15 @@ describe('computePrestige', () => {
   it('counts fort level above 1', () => {
     expect(computePrestige({ displayedCount: 0, legendaryLeadsCompleted: 0, fortLevel: 3 })).toBe(2);
   });
+  it('adds roomPrestige contribution from placed rooms', () => {
+    // displayedCount=1 + 2*0 + (1-1) + roomPrestige=4 → 5
+    expect(computePrestige({
+      displayedCount: 1, legendaryLeadsCompleted: 0, fortLevel: 1, roomPrestige: 4,
+    })).toBe(5);
+  });
+  it('treats missing roomPrestige as 0 (back-compat)', () => {
+    expect(computePrestige({ displayedCount: 2, legendaryLeadsCompleted: 0, fortLevel: 1 })).toBe(2);
+  });
 });
 
 describe('prestigeTier', () => {

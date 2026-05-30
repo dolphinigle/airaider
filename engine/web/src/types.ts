@@ -166,6 +166,7 @@ export interface RoomDef {
   description: string;
   capacity?: number;
   incomePerDay?: number;
+  prestigeBonus?: number;
   gates: string[];
   adjacencyMates: string[];
   starter?: boolean;
