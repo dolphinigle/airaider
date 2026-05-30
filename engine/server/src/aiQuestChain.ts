@@ -32,12 +32,16 @@ BANNED PHRASES (fantasy-novel cliché — do not use):
 "twisted ambition", "weight of the past", "ghosts of the past".
 
 CONCRETE SPECIFICITY RULES:
-- The HOOK must name a CONCRETE inciting fact, not an abstraction.
+- The TITLE must contain a CONCRETE proper noun (a person's name, a place name, a named object). AVOID title patterns like "The Weight of X", "The Hollow's X", "Whispers of X", "Shadows over X" — these are cliché frames. Prefer specific: "Elara's Truce", "The St. Hadric Reliquary", "Black Talons at the Sunken Bridge".
+- The HOOK must NAME the centralNpc AND the specific inciting thing in ONE sentence. Generic abstractions are a failure.
   BAD: "A soldier's past haunts him in the shadows of Blackmoor."
+  BAD: "An old soldier seeks aid against a brutal clan."
+  BAD: "A weary soldier seeks redemption amidst the mire."
   GOOD: "Marek's old regiment was hanged at Greyford. The Grey Crawlers have begun asking who survived."
-- The centralNpc is a person, NOT an epithet. Pick ONE epithet (e.g. "the Hollow", "of the Ash Coven") ONLY if it's truly defining; in most cases just first + last name reads truer.
-- antagonistFaction must be a NAMED group, not a generic role. "the Iron Witnesses" or "Crow's Ford magistracy" — not "a local gang" or "the cult".
-- recurringPlaces: 2-4 SPECIFIC named places — a named tavern, a ruined chapel, a sunken bridge. Not "the forest" or "the city".
+  GOOD: "Elenora's brooch turned up on a Grim Wolves raider — Alaric wants to know who else from the homestead is still alive."
+- The centralNpc is a person — first name + last name OR first name + ONE epithet ONLY if truly defining. "Jorik" or "Mara Loth" beat "the Brawny Champion".
+- antagonistFaction must be a NAMED group, not a generic role. "the Iron Witnesses" or "the Crow's Ford magistracy" — not "a local gang" or "the cult".
+- recurringPlaces: 2-4 SPECIFIC named locations — a named tavern, a ruined chapel, a sunken bridge. Not "the forest" or "the city". AVOID self-referential filler like "Hollow's Hollow".
 
 STRUCTURE OF A SKELETON (3-4 paragraphs total):
   P1 — SETUP: a small, grounded hook in the region tied to a CONCRETE object/event/grudge.

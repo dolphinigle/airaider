@@ -39,7 +39,7 @@ import {
 } from './aiQuestChain.js';
 
 /** Cap on simultaneously active chains. */
-export const ACTIVE_CHAIN_CAP = 3;
+export const ACTIVE_CHAIN_CAP = process.env.AIRAIDER_CHAIN_PLAYTEST ? 10 : 3;
 
 /** Default follow-up chance per chain rarity. */
 export const FOLLOWUP_CHANCE: Record<LeadRarity, number> = {
