@@ -79,6 +79,7 @@ export function App() {
             <LeadBoard
               state={state}
               onPursue={(leadId) => dispatch.mutate({ kind: 'pursue-lead', leadId })}
+              onRefresh={() => dispatch.mutate({ kind: 'refresh-leads' })}
             />
             <CaptivePanel state={state} onAction={(captiveId) => setCaptiveActionId(captiveId)} />
           </div>

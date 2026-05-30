@@ -5,11 +5,23 @@ const RARITY_COLOR: Record<string, string> = {
   legendary: 'var(--legendary)', rare: 'var(--rare)', uncommon: 'var(--uncommon)', common: 'var(--common)',
 };
 
-export function LeadBoard({ state, onPursue }: { state: GameState; onPursue: (leadId: string) => void }) {
+export function LeadBoard({ state, onPursue, onRefresh }: { state: GameState; onPursue: (leadId: string) => void; onRefresh: () => void }) {
+  const hasScoutingPost = state.fort.placedRooms.some((p) => p.roomId === 'scouting-post');
   return (
     <section data-testid="lead-board" style={{ background: 'var(--panel)', padding: 12, borderRadius: 3, overflow: 'auto' }}>
-      <h3 style={{ margin: '0 0 8px', fontSize: 13, color: 'var(--accent)' }}>LEAD BOARD (day {state.dayCount})</h3>
-      {state.leadBoard.length === 0 && <div style={{ color: 'var(--muted)', fontSize: 12 }}>build a Scouting Post + advance a day to see leads</div>}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '0 0 8px' }}>
+        <h3 style={{ margin: 0, fontSize: 13, color: 'var(--accent)', flex: 1 }}>LEAD BOARD (day {state.dayCount})</h3>
+        <button
+          data-testid="refresh-leads"
+          disabled={!hasScoutingPost}
+          onClick={onRefresh}
+          title={hasScoutingPost ? 'refresh the lead board (1 AI call per new lead)' : 'build a Scouting Post first'}
+          style={{ fontSize: 11, padding: '2px 8px' }}
+        >
+          refresh leads
+        </button>
+      </div>
+      {state.leadBoard.length === 0 && <div style={{ color: 'var(--muted)', fontSize: 12 }}>build a Scouting Post and tap "refresh leads" to see fresh leads</div>}
       {state.leadBoard.map((lead) => {
         const days = Math.max(0, lead.expiryDay - state.dayCount);
         const canAfford = state.gold >= lead.pursueCost;
