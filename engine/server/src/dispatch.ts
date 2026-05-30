@@ -1,4 +1,4 @@
-// PROTO-GUI v0.1: command dispatch. Pure function over (state, command).
+// PROTO-GUI v0.5: command dispatch. Async — End Day fires LLM calls.
 // All gameplay state transitions flow through here so the AI can curl
 // any command and diff the resulting state.
 
@@ -17,14 +17,23 @@ import {
 } from '../../../prototype/src/captive.js';
 import { applyCaptiveEffect as applyCaptiveEffectRoster } from '../../../prototype/src/roster.js';
 import { FORMER_CAPTIVE_TAG_ID } from '../../../prototype/src/captive.js';
-import { refreshLeadBoard, BASE_RARITY_WEIGHTS } from '../../../prototype/src/leads.js';
+import { refreshLeadBoard, BASE_RARITY_WEIGHTS, pursueLead as pursueLeadEngine } from '../../../prototype/src/leads.js';
 import { computePrestige, prestigeTier, tiltRarityWeights } from '../../../prototype/src/prestige.js';
 import { refreshHirePool, hireFromPool } from '../../../prototype/src/tavern.js';
 import { rngFromString } from '../../../prototype/src/rng.js';
 import { appendFortLog } from '../../../prototype/src/roster.js';
+import { resolveScenario, type Assignment } from '../../../prototype/src/resolver.js';
+import { templateFor } from '../../../prototype/src/scenarioTemplates.js';
+import {
+  getQuestStore,
+  QUEST_EXPIRY_DAYS,
+  quoteLead,
+  type ResolutionRecord,
+} from './quests.js';
+import { getScenarioLLM } from './llm.js';
 
 export const CommandSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('advance-day') }),
+  z.object({ kind: z.literal('end-day') }),
   z.object({ kind: z.literal('build-room'), roomId: z.string(), cellIdx: z.number().int().min(0) }),
   z.object({ kind: z.literal('excavate') }),
   z.object({
@@ -39,11 +48,15 @@ export const CommandSchema = z.discriminatedUnion('kind', [
   }),
   z.object({ kind: z.literal('refresh-leads') }),
   z.object({ kind: z.literal('hire-merc'), mercId: z.string() }),
+  z.object({ kind: z.literal('pursue-lead'), leadId: z.string() }),
   z.object({
-    kind: z.literal('pursue-lead'),
-    leadId: z.string(),
-    mercIds: z.array(z.string()).min(1).max(4),
+    kind: z.literal('assign-slot'),
+    questId: z.string(),
+    slotId: z.string(),
+    mercId: z.string().nullable(),
   }),
+  z.object({ kind: z.literal('abandon-quest'), questId: z.string() }),
+  z.object({ kind: z.literal('clear-resolutions') }),
 ]);
 export type Command = z.infer<typeof CommandSchema>;
 
@@ -53,11 +66,20 @@ export interface DispatchResult {
   message?: string;
 }
 
-export function dispatch(
+function rarityRewardMult(rarity: string): number {
+  switch (rarity) {
+    case 'legendary': return 1.0;
+    case 'rare': return 0.85;
+    case 'uncommon': return 0.6;
+    default: return 0.35;
+  }
+}
+
+export async function dispatch(
   roster: Roster,
   cmd: Command,
   catalogs: { roomCatalog: Map<string, RoomDef>; tagPool: Map<string, any> },
-): DispatchResult {
+): Promise<DispatchResult> {
   const { roomCatalog, tagPool } = catalogs;
   switch (cmd.kind) {
     case 'refresh-leads': {
@@ -75,40 +97,168 @@ export function dispatch(
       roster.leadBoard = [...refresh.kept, ...refresh.added];
       return { ok: true, message: `kept ${refresh.kept.length}, added ${refresh.added.length}, expired ${refresh.expired.length}` };
     }
-    case 'advance-day': {
-      // For v0.1 the GUI day-advance is a stub: we just bump the day
-      // counter and refresh the lead board. Full resolveDay is a P2
-      // milestone — it has heavy LLM hookups and we want the GUI
-      // bring-up to verify the wiring first.
+
+    case 'end-day': {
+      // Step 1: resolve every fully-assigned pursued quest via the LLM.
+      const store = getQuestStore();
+      const resolutions: ResolutionRecord[] = [];
+      const llm = getScenarioLLM();
+      const remainingQuests: typeof store.pursued = [];
+      for (const quest of store.pursued) {
+        const slotIds = quest.scenario.slots.map((s) => s.id);
+        const fullyAssigned = slotIds.every((sid) => quest.assignments[sid]);
+        if (!fullyAssigned) {
+          remainingQuests.push(quest);
+          continue;
+        }
+        const assignments: Assignment[] = [];
+        let missingMerc = false;
+        for (const sid of slotIds) {
+          const mid = quest.assignments[sid]!;
+          const merc = roster.mercs.find((m) => m.id === mid);
+          if (!merc) { missingMerc = true; break; }
+          assignments.push({ slotId: sid, merc });
+        }
+        if (missingMerc) {
+          // Merc died/left — drop assignments, keep quest for re-assign.
+          quest.assignments = {};
+          remainingQuests.push(quest);
+          continue;
+        }
+        try {
+          const fatigueOf = (mercId: string) => roster.states.get(mercId)?.fatigue ?? 0;
+          const tierOf = (mercId: string) => roster.states.get(mercId)?.tier;
+          const rng = rngFromString(`gui-quest-${quest.questId}-day${roster.dayCount}`);
+          const res = await resolveScenario({
+            scenario: quest.scenario,
+            assignments,
+            llm,
+            rng,
+            fatigueOf,
+            tierOf,
+          });
+          // Compute gold reward by band.
+          let outcomeKind: ResolutionRecord['outcomeKind'] = 'failure';
+          let goldMult = 0;
+          switch (res.band) {
+            case 'catastrophic-favorable': outcomeKind = 'success'; goldMult = 1.25; break;
+            case 'favorable': outcomeKind = 'success'; goldMult = 1.0; break;
+            case 'unfavorable': outcomeKind = 'partial'; goldMult = 0.4; break;
+            case 'catastrophic': outcomeKind = 'failure'; goldMult = 0; break;
+          }
+          const goldAwarded = Math.round(quest.lead.rewardGold * goldMult);
+          roster.gold += goldAwarded;
+          if (quest.lead.rarity === 'legendary' && outcomeKind === 'success') {
+            roster.legendaryLeadsCompleted += 1;
+          }
+          // Fatigue +1 per participating merc.
+          for (const a of assignments) {
+            const st = roster.states.get(a.merc.id);
+            if (st) st.fatigue += 1;
+          }
+          // Casualty HP damage.
+          for (const c of res.casualties) {
+            const st = roster.states.get(c.mercId);
+            if (st) st.hpDamage += c.damage;
+          }
+          const contribLines = res.contributions.map((c) => ({
+            mercId: c.mercId,
+            mercName: roster.mercs.find((m) => m.id === c.mercId)?.name ?? c.mercId,
+            line: c.line,
+          }));
+          const casualtyDetail = res.casualties.map((c) => ({
+            mercId: c.mercId,
+            mercName: roster.mercs.find((m) => m.id === c.mercId)?.name ?? c.mercId,
+            damage: c.damage,
+            reason: c.reason,
+          }));
+          resolutions.push({
+            questId: quest.questId,
+            scenarioTitle: quest.scenario.title,
+            region: quest.lead.region,
+            archetype: quest.lead.archetype,
+            rarity: quest.lead.rarity,
+            rewardGold: quest.lead.rewardGold,
+            band: res.band,
+            bandReason: res.bandReason,
+            outcomeNarrative: res.outcomeNarrative,
+            contributions: contribLines,
+            rollFaces: res.rollFaces,
+            heads: res.heads,
+            tails: res.tails,
+            coinsActual: res.coinsActual,
+            goldAwarded,
+            casualties: casualtyDetail,
+            outcomeKind,
+          });
+          appendFortLog(roster, {
+            day: roster.dayCount,
+            kind: 'note',
+            message: `[${quest.lead.rarity}] ${quest.scenario.title}: ${res.band} (+${goldAwarded}g)`,
+          });
+        } catch (err: any) {
+          // Resolution failure (e.g. LLM error) — keep quest, surface error.
+          appendFortLog(roster, {
+            day: roster.dayCount,
+            kind: 'note',
+            message: `LLM error resolving ${quest.scenario.title}: ${err?.message ?? String(err)}`,
+          });
+          remainingQuests.push(quest);
+        }
+      }
+
+      // Step 2: advance the day counter & expire stale quests.
       roster.dayCount += 1;
-      const prestige = computePrestige({
-        displayedCount: roster.displayedCount,
-        legendaryLeadsCompleted: roster.legendaryLeadsCompleted,
-        fortLevel: roster.fort.level,
-      });
-      const weights = tiltRarityWeights({ ...BASE_RARITY_WEIGHTS }, prestigeTier(prestige));
+      store.pursued = remainingQuests.filter((q) => q.expiresOnDay >= roster.dayCount);
+      const expiredCount = remainingQuests.length - store.pursued.length;
+      for (const q of remainingQuests) {
+        if (q.expiresOnDay < roster.dayCount) {
+          appendFortLog(roster, {
+            day: roster.dayCount,
+            kind: 'note',
+            message: `quest "${q.scenario.title}" expired (moment passed)`,
+          });
+        }
+      }
+      store.lastResolutions = resolutions;
+
+      // Step 3: refresh lead board & tavern bench (gated as before).
       const placedRoomIds = new Set(roster.fort.placedRooms.map((p) => p.roomId));
-      const hasScouting = placedRoomIds.has('scouting-post');
-      let leadAddedNote = '';
-      if (hasScouting) {
+      if (placedRoomIds.has('scouting-post')) {
+        const prestige = computePrestige({
+          displayedCount: roster.displayedCount,
+          legendaryLeadsCompleted: roster.legendaryLeadsCompleted,
+          fortLevel: roster.fort.level,
+        });
+        const weights = tiltRarityWeights({ ...BASE_RARITY_WEIGHTS }, prestigeTier(prestige));
         const refresh = refreshLeadBoard({
           board: roster.leadBoard,
           dayCount: roster.dayCount,
           rarityWeights: weights,
         });
         roster.leadBoard = [...refresh.kept, ...refresh.added];
-        leadAddedNote = `, leads:${roster.leadBoard.length}`;
       }
-      // Tavern bench refresh — gated on tavern being built so the bench
-      // doesn't fill up before the player builds one (mirrors CLI rules).
-      let hireNote = '';
       if (placedRoomIds.has('tavern')) {
         const rng = rngFromString(`gui-tavern-day${roster.dayCount}`);
-        const added = refreshHirePool(roster, rng, tagPool, roster.dayCount);
-        if (added.length > 0) hireNote = `, bench+${added.length}`;
+        refreshHirePool(roster, rng, tagPool, roster.dayCount);
       }
-      return { ok: true, message: `advanced to day ${roster.dayCount}${leadAddedNote}${hireNote}` };
+      // Idle fatigue recovery: each day, every merc not in a quest recovers 1 fatigue.
+      const assignedMercIds = new Set<string>();
+      for (const q of store.pursued) {
+        for (const mid of Object.values(q.assignments)) if (mid) assignedMercIds.add(mid);
+      }
+      for (const m of roster.mercs) {
+        if (assignedMercIds.has(m.id)) continue;
+        const st = roster.states.get(m.id);
+        if (st && st.fatigue > 0) st.fatigue -= 1;
+      }
+
+      return {
+        ok: true,
+        message: `day ${roster.dayCount}: resolved ${resolutions.length}, expired ${expiredCount}, pending ${store.pursued.length}`,
+      };
     }
+
     case 'build-room': {
       const def = roomCatalog.get(cmd.roomId);
       if (!def) return { ok: false, error: `unknown room ${cmd.roomId}` };
@@ -175,54 +325,79 @@ export function dispatch(
         return { ok: false, error: err?.message ?? String(err) };
       }
     }
+
     case 'pursue-lead': {
-      // Deterministic stub resolver (no LLM, no scenarios). Keeps the
-      // GUI playtest loop closed until full resolveDay hookup lands.
       const leadIdx = roster.leadBoard.findIndex((l) => l.id === cmd.leadId);
       if (leadIdx < 0) return { ok: false, error: `lead ${cmd.leadId} not on the board` };
       const lead = roster.leadBoard[leadIdx]!;
       if (roster.gold < lead.pursueCost) {
         return { ok: false, error: `not enough gold (need ${lead.pursueCost}g, have ${roster.gold}g)` };
       }
-      const party = cmd.mercIds.map((id) => roster.mercs.find((m) => m.id === id)).filter(Boolean) as typeof roster.mercs;
-      if (party.length !== cmd.mercIds.length) {
-        return { ok: false, error: 'one or more mercs not in roster' };
-      }
-      const rng = rngFromString(`gui-pursue-${lead.id}-day${roster.dayCount}`);
-      // Score = sum of best attr per merc + party size bonus.
-      let partyScore = 0;
-      for (const m of party) {
-        const best = Math.max(...Object.values(m.attrs));
-        partyScore += best;
-      }
-      partyScore += party.length; // small synergy
-      // Roll 2d6 + partyScore vs DC*2.
-      const roll = Math.floor(rng() * 6) + 1 + Math.floor(rng() * 6) + 1;
-      const total = roll + partyScore;
-      const target = lead.dc * 2;
-      const success = total >= target;
+      const pursued = pursueLeadEngine(lead, roster.dayCount);
+      if (!pursued.ok) return { ok: false, error: pursued.error };
+      const scenario = templateFor(lead);
       roster.gold -= lead.pursueCost;
-      // Fatigue tick on every participant.
-      for (const m of party) {
-        const st = roster.states.get(m.id);
-        if (st) st.fatigue += 1;
-      }
-      if (success) {
-        roster.gold += lead.rewardGold;
-        if (lead.rarity === 'legendary') roster.legendaryLeadsCompleted += 1;
-      }
-      // Remove the lead from the board regardless of outcome.
       roster.leadBoard.splice(leadIdx, 1);
-      const outcome = success ? `SUCCESS (+${lead.rewardGold}g)` : `FAIL (lost ${lead.pursueCost}g)`;
+      const store = getQuestStore();
+      const questId = `quest-${lead.id}`;
+      store.pursued.push({
+        questId,
+        scenario,
+        lead: quoteLead(lead),
+        assignments: Object.fromEntries(scenario.slots.map((s) => [s.id, null])),
+        pursuedOnDay: roster.dayCount,
+        expiresOnDay: roster.dayCount + QUEST_EXPIRY_DAYS,
+      });
       appendFortLog(roster, {
         day: roster.dayCount,
         kind: 'note',
-        message: `pursued [${lead.rarity}] ${lead.archetype} with ${party.length} merc(s): ${outcome} (roll ${roll}+${partyScore}=${total} vs ${target})`,
+        message: `pursued [${lead.rarity}] ${scenario.title} (assign mercs before End Day)`,
       });
-      return {
-        ok: true,
-        message: `${outcome} — roll ${roll}+${partyScore}=${total} vs DC*2=${target}`,
-      };
+      return { ok: true, message: `pursuing ${scenario.title} — assign ${scenario.slots.length} slot(s)` };
+    }
+
+    case 'assign-slot': {
+      const store = getQuestStore();
+      const q = store.pursued.find((x) => x.questId === cmd.questId);
+      if (!q) return { ok: false, error: `quest ${cmd.questId} not pursued` };
+      if (!q.scenario.slots.find((s) => s.id === cmd.slotId)) {
+        return { ok: false, error: `slot ${cmd.slotId} not on quest ${cmd.questId}` };
+      }
+      if (cmd.mercId !== null) {
+        if (!roster.mercs.find((m) => m.id === cmd.mercId)) {
+          return { ok: false, error: `merc ${cmd.mercId} not in roster` };
+        }
+        // Unassign this merc from any OTHER slot (any quest).
+        for (const otherQ of store.pursued) {
+          for (const sid of Object.keys(otherQ.assignments)) {
+            if (otherQ.assignments[sid] === cmd.mercId) otherQ.assignments[sid] = null;
+          }
+        }
+      }
+      q.assignments[cmd.slotId] = cmd.mercId;
+      return { ok: true, message: cmd.mercId ? `assigned ${cmd.mercId} → ${q.questId}/${cmd.slotId}` : `cleared ${q.questId}/${cmd.slotId}` };
+    }
+
+    case 'abandon-quest': {
+      const store = getQuestStore();
+      const idx = store.pursued.findIndex((q) => q.questId === cmd.questId);
+      if (idx < 0) return { ok: false, error: `quest ${cmd.questId} not found` };
+      const [removed] = store.pursued.splice(idx, 1);
+      appendFortLog(roster, {
+        day: roster.dayCount,
+        kind: 'note',
+        message: `abandoned quest "${removed!.scenario.title}"`,
+      });
+      return { ok: true, message: `abandoned ${removed!.questId}` };
+    }
+
+    case 'clear-resolutions': {
+      const store = getQuestStore();
+      store.lastResolutions = [];
+      return { ok: true, message: 'cleared' };
     }
   }
 }
+// Silences "unused" warning on this helper kept for future use.
+void rarityRewardMult;
+

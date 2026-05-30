@@ -15,6 +15,12 @@ export interface Merc {
   hp: number;
   wage: number;
   tags: Tag[];
+  fatigue: number;
+  hpDamage: number;
+  tier: 'rookie' | 'veteran' | 'grizzled';
+  /** Optional flavor backstory, present on most generated mercs. */
+  backstory?: string;
+  gender?: string;
 }
 
 export interface Captive {
@@ -79,6 +85,54 @@ export interface PrestigeView {
   legendaryLeadsCompleted: number;
 }
 
+export interface QuestSlot {
+  id: string;
+  description: string;
+  preferredAttr?: string;
+  preferredTags?: string[];
+}
+
+export interface PursuedQuest {
+  questId: string;
+  title: string;
+  target: string;
+  lead: {
+    id: string;
+    rarity: Lead['rarity'];
+    archetype: string;
+    region: string;
+    blurb: string;
+    dc: number;
+    rewardGold: number;
+  };
+  slots: QuestSlot[];
+  /** slotId → mercId | null */
+  assignments: Record<string, string | null>;
+  pursuedOnDay: number;
+  expiresOnDay: number;
+  daysLeft: number;
+}
+
+export interface ResolutionRecord {
+  questId: string;
+  scenarioTitle: string;
+  region: string;
+  archetype: string;
+  rarity: Lead['rarity'];
+  rewardGold: number;
+  band: 'catastrophic' | 'unfavorable' | 'favorable' | 'catastrophic-favorable';
+  bandReason: string;
+  outcomeNarrative: string;
+  contributions: Array<{ mercId: string; mercName: string; line: string }>;
+  rollFaces: string[];
+  heads: number;
+  tails: number;
+  coinsActual: number;
+  goldAwarded: number;
+  casualties: Array<{ mercId: string; mercName: string; damage: number; reason: string }>;
+  outcomeKind: 'success' | 'partial' | 'failure';
+}
+
 export interface GameState {
   dayCount: number;
   gold: number;
@@ -100,6 +154,8 @@ export interface GameState {
   reputation: Record<string, number>;
   fortLog: FortLogEntry[];
   prestige: PrestigeView;
+  pursuedQuests: PursuedQuest[];
+  lastResolutions: ResolutionRecord[];
 }
 
 export interface RoomDef {
@@ -116,11 +172,14 @@ export interface RoomDef {
 }
 
 export type Command =
-  | { kind: 'advance-day' }
+  | { kind: 'end-day' }
   | { kind: 'build-room'; roomId: string; cellIdx: number }
   | { kind: 'excavate' }
   | { kind: 'place-captive'; captiveId: string; cellIdx: number | null }
   | { kind: 'captive-action'; captiveId: string; action: 'ransom' | 'sell' | 'display' | 'recruit' | 'execute' }
   | { kind: 'refresh-leads' }
   | { kind: 'hire-merc'; mercId: string }
-  | { kind: 'pursue-lead'; leadId: string; mercIds: string[] };
+  | { kind: 'pursue-lead'; leadId: string }
+  | { kind: 'assign-slot'; questId: string; slotId: string; mercId: string | null }
+  | { kind: 'abandon-quest'; questId: string }
+  | { kind: 'clear-resolutions' };

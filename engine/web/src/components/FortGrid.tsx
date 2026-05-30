@@ -1,4 +1,4 @@
-import { DndContext, useDraggable, useDroppable, type DragEndEvent } from '@dnd-kit/core';
+import { useDraggable, useDroppable } from '@dnd-kit/core';
 import type { GameState } from '../types';
 
 function CaptiveChip({ captive }: { captive: GameState['captives'][number] }) {
@@ -92,34 +92,23 @@ function OverflowZone({ state }: { state: GameState }) {
 }
 
 export function FortGrid({
-  state, onCellClick, onCaptiveDropToCell, onCaptiveDropToOverflow,
+  state, onCellClick,
 }: {
   state: GameState;
   onCellClick: (idx: number) => void;
-  onCaptiveDropToCell: (captiveId: string, cellIdx: number) => void;
-  onCaptiveDropToOverflow: (captiveId: string) => void;
+  /** Kept for API compat — drag handling moved to App's DndContext. */
+  onCaptiveDropToCell?: (captiveId: string, cellIdx: number) => void;
+  onCaptiveDropToOverflow?: (captiveId: string) => void;
 }) {
-  function handleDragEnd(e: DragEndEvent) {
-    if (!e.over) return;
-    const activeId = String(e.active.id);
-    const overId = String(e.over.id);
-    if (!activeId.startsWith('captive:')) return;
-    const captiveId = activeId.slice('captive:'.length);
-    if (overId === 'overflow') return onCaptiveDropToOverflow(captiveId);
-    if (overId.startsWith('cell:')) return onCaptiveDropToCell(captiveId, Number(overId.slice('cell:'.length)));
-  }
-
   return (
     <section data-testid="fort-grid" style={{ background: 'var(--panel)', padding: 12, borderRadius: 3, overflow: 'auto' }}>
       <h3 style={{ margin: '0 0 8px', fontSize: 13, color: 'var(--accent)' }}>FORT LAYOUT</h3>
-      <DndContext onDragEnd={handleDragEnd}>
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${state.fort.cells.length}, 1fr)`, gap: 6 }}>
-          {state.fort.cells.map((c) => (
-            <CellSlot key={c.idx} cellIdx={c.idx} state={state} onCellClick={onCellClick} />
-          ))}
-        </div>
-        <OverflowZone state={state} />
-      </DndContext>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${state.fort.cells.length}, 1fr)`, gap: 6 }}>
+        {state.fort.cells.map((c) => (
+          <CellSlot key={c.idx} cellIdx={c.idx} state={state} onCellClick={onCellClick} />
+        ))}
+      </div>
+      <OverflowZone state={state} />
       {state.adjacencyBonuses.length > 0 && (
         <div style={{ marginTop: 12, padding: 8, background: 'var(--panel-2)', borderRadius: 3 }}>
           <div style={{ fontSize: 11, color: 'var(--good)' }}>active adjacencies:</div>

@@ -29,8 +29,9 @@ export function LeadBoard({ state, onPursue }: { state: GameState; onPursue: (le
               <span style={{ color: days <= 1 ? 'var(--danger)' : 'var(--muted)' }}>{days}d</span>
               <button
                 data-testid={`pursue-${lead.id}`}
-                disabled={!canAfford || state.mercs.length === 0}
+                disabled={!canAfford}
                 onClick={() => onPursue(lead.id)}
+                title={!canAfford ? `need ${lead.pursueCost}g` : 'pursue — generates a quest for the Quest Board'}
                 style={{ fontSize: 11, padding: '2px 8px' }}
               >
                 pursue

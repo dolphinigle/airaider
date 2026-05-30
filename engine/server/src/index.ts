@@ -1,8 +1,9 @@
-// PROTO-GUI v0.1: Fastify HTTP API for airaider. Wraps the prototype's
+// PROTO-GUI v0.5: Fastify HTTP API for airaider. Wraps the prototype's
 // pure TS gameplay modules behind a single dispatch endpoint plus a few
 // read routes. AI testability is the headline requirement — every command
 // is one HTTP POST returning a full JSON state delta.
 
+import 'dotenv/config';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import { registerRoutes } from './routes.js';

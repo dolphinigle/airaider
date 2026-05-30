@@ -1,8 +1,9 @@
-// PROTO-GUI v0.1: HTTP routes. Single dispatch endpoint plus read paths.
+// PROTO-GUI v0.5: HTTP routes. Single dispatch endpoint plus read paths.
 
 import type { FastifyInstance } from 'fastify';
 import { CommandSchema, dispatch } from './dispatch.js';
 import { loadCatalogs, getRoster, saveRoster, resetCaches, DEFAULT_SAVE_PATH } from './state.js';
+import { getQuestStore, saveQuestStore } from './quests.js';
 import {
   renderFortLayout,
   adjacencyBonuses,
@@ -15,8 +16,6 @@ import { computePrestige, prestigeTier, prestigeTierLabel } from '../../../proto
 import type { Roster } from '../../../prototype/src/roster.js';
 import type { RoomDef } from '../../../prototype/src/rooms.js';
 
-/** Serialize the roster + computed view-models into a single JSON blob the
- *  GUI (or a curl-wielding AI) can render directly. */
 function snapshotState(roster: Roster, roomCatalog: Map<string, RoomDef>): unknown {
   const prestige = computePrestige({
     displayedCount: roster.displayedCount,
@@ -33,6 +32,22 @@ function snapshotState(roster: Roster, roomCatalog: Map<string, RoomDef>): unkno
     ...c,
     cellEffects: captiveCellEffects(roster.fort, roomCatalog, c.cellIdx),
   }));
+  const mercs = roster.mercs.map((m) => {
+    const st = roster.states.get(m.id);
+    return { ...m, fatigue: st?.fatigue ?? 0, hpDamage: st?.hpDamage ?? 0, tier: st?.tier ?? 'rookie' };
+  });
+  const store = getQuestStore();
+  const pursuedQuests = store.pursued.map((q) => ({
+    questId: q.questId,
+    title: q.scenario.title,
+    target: q.scenario.target,
+    lead: q.lead,
+    slots: q.scenario.slots,
+    assignments: q.assignments,
+    pursuedOnDay: q.pursuedOnDay,
+    expiresOnDay: q.expiresOnDay,
+    daysLeft: Math.max(0, q.expiresOnDay - roster.dayCount),
+  }));
   return {
     dayCount: roster.dayCount,
     gold: roster.gold,
@@ -44,7 +59,7 @@ function snapshotState(roster: Roster, roomCatalog: Map<string, RoomDef>): unkno
     dungeonFreeCells: dungeonFree,
     dungeonCapacity: dungeonCap,
     leadBoard: roster.leadBoard,
-    mercs: roster.mercs,
+    mercs,
     hirePool: roster.hirePool,
     reputation: roster.reputation,
     fortLog: roster.fortLog.slice(-20),
@@ -55,6 +70,8 @@ function snapshotState(roster: Roster, roomCatalog: Map<string, RoomDef>): unkno
       displayedCount: roster.displayedCount,
       legendaryLeadsCompleted: roster.legendaryLeadsCompleted,
     },
+    pursuedQuests,
+    lastResolutions: store.lastResolutions,
   };
 }
 
@@ -84,11 +101,12 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
     }
     const { roomCatalog, tagPool } = loadCatalogs();
     const roster = getRoster();
-    const result = dispatch(roster, parsed.data, { roomCatalog, tagPool });
+    const result = await dispatch(roster, parsed.data, { roomCatalog, tagPool });
     if (!result.ok) {
       return reply.code(409).send({ ok: false, error: result.error, state: snapshotState(roster, roomCatalog) });
     }
     saveRoster();
+    saveQuestStore();
     return { ok: true, message: result.message, state: snapshotState(roster, roomCatalog) };
   });
 }
