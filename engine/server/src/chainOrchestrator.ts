@@ -497,9 +497,11 @@ export interface PostResolveContext {
   chainStepRef?: { chainId: string; stepIdx: number };
 }
 
-/** % chance to spawn a world chain after a normal (non-chain) resolution. */
+/** % chance to spawn a world chain after a normal (non-chain) resolution.
+ *  Prototype defaults are AGGRESSIVE so playtesting actually exercises chains
+ *  — once balance tuning starts these will drop a tier (e.g. rare→25%). */
 const WORLD_CHAIN_TRIGGER: Record<LeadRarity, number> = {
-  common: 0, uncommon: 5, rare: 60, legendary: 90,
+  common: 0, uncommon: 10, rare: 80, legendary: 100,
 };
 
 export async function maybeTriggerWorldChainFromResolution(
@@ -535,7 +537,8 @@ export async function maybeTriggerUnitChainFromAcceptance(
     .map((t) => (t as Tag & { rarity?: string }).rarity ?? 'common')
     .reduce((best, cur) => rarityRank(cur) > rarityRank(best) ? cur : best, 'common');
   const chainRarity = (highest === 'legendary' ? 'legendary' : 'rare') as LeadRarity;
-  const chance = PLAYTEST_MODE ? 90 : 60;
+  // Prototype: rare+ tag → 80% unit chain (tune down once balance starts).
+  const chance = PLAYTEST_MODE ? 100 : 80;
   if (Math.random() * 100 > chance) return;
   // Default region: re-use roster region rotation by hashing merc id.
   const REGIONS_LOCAL = ['Crow\'s Ford', 'Pinewood', 'Greythorn', 'Eastfen', 'Saltmire', 'Blackmoor', 'Ironvale'];
