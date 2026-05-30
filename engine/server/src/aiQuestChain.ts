@@ -348,7 +348,27 @@ export async function generateChainStepBlurb(input: StepBlurbInput): Promise<str
 
 // ---------- epilogue ----------
 
-const EPILOGUE_SYSTEM = `You are the saga-keeper. The arc has ended. Write a 2-3 sentence EPILOGUE that bookends the skeleton and folds in how the actual play went. Voice: terse, mortal, mud-and-blood. Name the centralNpc and antagonist. Honour the band of the final step (favorable = the company won; catastrophic = the company broke; unfavorable = the cost was higher than the prize). If the anchor mercenary died, name them and the manner.`;
+const EPILOGUE_SYSTEM = `You are the saga-keeper. The arc has ended. Write a 2-4 sentence EPILOGUE that bookends the hidden skeleton AND folds in how the actual play went.
+
+Voice: terse, mortal, mud-and-blood. Low-medieval. No glory. No high-fantasy.
+
+REQUIREMENTS:
+- Name the centralNpc and the antagonistFaction (or their leader). No anonymous "the enemy".
+- Honour the final band: favorable = the company won at a real cost; catastrophic = the company broke; unfavorable = the prize cost more than it gave; catastrophic-favorable = a Pyrrhic victory, name what was traded for the win.
+- Pull at least ONE concrete event from the per-step outcomes you receive — a named place, a named ally, a wound, a betrayal, an object. Generic recap reads cheap.
+- If a mercenary died during the arc, name them and the manner.
+- Leave ONE small thread loose at the end — a missing person, a stolen item that wasn't recovered, a witness who escaped, a faction that survives in remnants. This seeds future chains naturally. Do NOT explicitly tease a "sequel"; just let the world keep breathing.
+
+BANNED PHRASES (fantasy-novel cliché — do not use):
+"nefarious schemes", "pulls the strings", "puppets of", "tightening their grip",
+"shadows of", "fate hangs in the balance", "hangs in the balance",
+"darkness descends", "ancient evil", "twisted ambition", "weight of the past",
+"ghosts of the past", "coin and blood", "the spoils", "promises coin",
+"a new dawn awaits", "the cycle continues", "for now".
+
+NAMING DISCIPLINE:
+- Use first names after first reference (e.g. "Roselle", not "Roselle the Light-Footed").
+- The antagonist's leader, if named in the skeleton, should appear by name.`;
 
 const EpilogueOutSchema = z.object({
   epilogue: z.string().min(20).max(800),
@@ -410,6 +430,7 @@ export async function generateChainEpilogue(input: EpilogueInput): Promise<strin
     cachedPromptTokens: resp.usage?.prompt_tokens_details?.cached_tokens ?? 0,
   });
   const parsed = EpilogueOutSchema.parse(JSON.parse(content));
+  warnIfClicheLeak(`epilogue "${input.chain.title}"`, [parsed.epilogue]);
   return parsed.epilogue.trim();
 }
 
