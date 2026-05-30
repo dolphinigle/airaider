@@ -34,6 +34,7 @@ import {
   type ResolutionRecord,
 } from './quests.js';
 import { getScenarioLLM } from './llm.js';
+import { flavorCaptive } from './leanLlm.js';
 
 export const CommandSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('end-day') }),
@@ -241,11 +242,36 @@ export async function dispatch(
               const captiveId = `captive-${quest.lead.id}`;
               const notoriety = Math.max(1, quest.lead.dc);
               const rolledTags = rollCaptiveTags(tagPool, quest.lead.rarity, quest.lead.id);
+
+              // Stage E: ask AI to flavor the captive consistent with the lead.
+              // Best-effort — falls back to lead-archetype heuristics if no key
+              // or if the call fails.
+              let flavorName = `Captive of ${quest.lead.region}`;
+              let flavorArchetype = quest.lead.archetype === 'captive' ? 'deserter' : quest.lead.archetype;
+              let flavorBackstory = quest.lead.blurb;
+              const apiKey = process.env.OPENAI_API_KEY;
+              if (apiKey) {
+                try {
+                  const flavor = await flavorCaptive(apiKey, process.env.AIRAIDER_LLM_MODEL ?? 'gpt-4.1-nano', {
+                    leadBlurb: quest.lead.blurb,
+                    leadArchetype: quest.lead.archetype,
+                    leadRegion: quest.lead.region,
+                    leadRarity: quest.lead.rarity,
+                    notoriety,
+                    tagLabels: rolledTags.map((t) => t.label),
+                  });
+                  flavorName = flavor.name;
+                  flavorArchetype = flavor.archetype;
+                  flavorBackstory = flavor.backstory;
+                } catch (err: any) {
+                  console.warn(`[captive-flavor] fell back to heuristic: ${err?.message ?? String(err)}`);
+                }
+              }
               roster.captives.push({
                 id: captiveId,
-                name: `Captive of ${quest.lead.region}`,
-                archetype: 'deserter',
-                backstory: quest.lead.blurb,
+                name: flavorName,
+                archetype: flavorArchetype,
+                backstory: flavorBackstory,
                 notoriety,
                 tags: rolledTags,
                 cellIdx: freeCells[0],
@@ -253,10 +279,10 @@ export async function dispatch(
               appendFortLog(roster, {
                 day: roster.dayCount,
                 kind: 'note',
-                message: `CAPTIVE TAKEN: ${captiveId} (notoriety ${notoriety}, ${roster.captives.length}/${cap} cells)`,
+                message: `CAPTIVE TAKEN: ${flavorName} (${flavorArchetype}, notoriety ${notoriety}, ${roster.captives.length}/${cap} cells)`,
               });
               console.log(
-                `[captive] taken from "${quest.scenario.title}": notoriety ${notoriety}, tags [${rolledTags.map((t) => t.label).join(', ')}]`,
+                `[captive] taken from "${quest.scenario.title}": ${flavorName} (${flavorArchetype}), notoriety ${notoriety}, tags [${rolledTags.map((t) => t.label).join(', ')}]`,
               );
             }
           }

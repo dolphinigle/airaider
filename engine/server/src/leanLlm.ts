@@ -173,3 +173,98 @@ Narrate the moment. 4-6 sentences. Return JSON: { "outcomeNarrative": "..." }`;
     return { contributions: [], outcomeNarrative };
   }
 }
+
+// ---------------------------------------------------------------------------
+// Stage E: AI-flavored captive spawn.
+//
+// Engine decides notoriety + tags. AI decides name + archetype + backstory,
+// keeping it consistent with the lead's blurb so a "deserter in the marsh"
+// produces a captive that reads as a deserter, not a Star-Crowned dragon-slayer.
+// ---------------------------------------------------------------------------
+
+const CAPTIVE_FLAVOR_SYSTEM = `You are the flavor engine for a grimdark mercenary-fort game.
+The ENGINE has just rolled a captive's notoriety and tags. You return a name + archetype + 1-2 sentence backstory that makes that captive feel like a believable consequence of the LEAD the player pursued.
+
+PLAYER PREFERENCES (apply to all flavor):
+- tone: grimdark
+- writing: terse
+- NPC gender: balanced
+- cultural register: pan-european
+
+Rules:
+- Archetype must follow the lead's blurb. "deserter in the marsh" → archetype 'deserter'. "guildsman's courier" → 'courier'. "witness needed alive" → 'witness'. NEVER invent a 'Lost Heir' if the blurb says 'deserter'.
+- Name: 1 first name, optional 1 epithet/clan ("Marek of the Fen"). Match cultural register.
+- Backstory: 1-2 sentences. Mention how the tags shaped them ("the bog still on him; flinches at lanterns"). No grand destiny. No magic unless tags say so.
+- Return STRICT JSON: { "name": "...", "archetype": "...", "backstory": "..." }.`;
+
+const CaptiveFlavorSchema = z.object({
+  name: z.string().min(1),
+  archetype: z.string().min(1),
+  backstory: z.string().min(1),
+});
+
+export interface CaptiveFlavorInput {
+  leadBlurb: string;
+  leadArchetype: string;
+  leadRegion: string;
+  leadRarity: string;
+  notoriety: number;
+  tagLabels: readonly string[];
+}
+
+export interface CaptiveFlavorOutput {
+  name: string;
+  archetype: string;
+  backstory: string;
+}
+
+export async function flavorCaptive(
+  apiKey: string,
+  model: string,
+  input: CaptiveFlavorInput,
+): Promise<CaptiveFlavorOutput> {
+  const client = new OpenAI({ apiKey });
+  const userPrompt = `Lead pursued: "${input.leadBlurb}"
+Lead archetype: ${input.leadArchetype}  region: ${input.leadRegion}  rarity: ${input.leadRarity}
+Captive (engine-decided): notoriety ${input.notoriety}, tags [${input.tagLabels.join(', ')}]
+
+Return JSON: { "name": "...", "archetype": "...", "backstory": "..." }`;
+
+  if (process.env.AIRAIDER_LLM_VERBOSE !== '0') {
+    console.log(`[lean-llm:captive-flavor] user:\n${userPrompt}`);
+  }
+
+  const resp = await client.chat.completions.create({
+    model,
+    max_tokens: 300,
+    temperature: 0.9,
+    response_format: {
+      type: 'json_schema',
+      json_schema: {
+        name: 'captive_flavor',
+        strict: true,
+        schema: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            name: { type: 'string' },
+            archetype: { type: 'string' },
+            backstory: { type: 'string' },
+          },
+          required: ['name', 'archetype', 'backstory'],
+        },
+      },
+    },
+    messages: [
+      { role: 'system', content: CAPTIVE_FLAVOR_SYSTEM },
+      { role: 'user', content: userPrompt },
+    ],
+  });
+  const content = resp.choices[0]?.message?.content;
+  if (!content) throw new Error('OpenAI returned no content for captive flavor');
+  const parsed = CaptiveFlavorSchema.parse(JSON.parse(content));
+  if (process.env.AIRAIDER_LLM_VERBOSE !== '0') {
+    console.log(`[lean-llm:captive-flavor] ← ${parsed.name} (${parsed.archetype}): ${parsed.backstory}`);
+  }
+  return parsed;
+}
