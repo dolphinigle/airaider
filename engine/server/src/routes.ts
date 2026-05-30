@@ -109,7 +109,7 @@ function snapshotState(roster: Roster, roomCatalog: Map<string, RoomDef>): unkno
           status: s.status,
           band: s.band,
           summary: s.summary,
-          leadBlurb: lead?.blurb,
+          leadBlurb: s.blurb ?? lead?.blurb,
           leadDc: lead?.dc,
           leadArchetype: lead?.archetype,
           partyMercNames: (s.partyMercIds ?? []).map((mid) =>

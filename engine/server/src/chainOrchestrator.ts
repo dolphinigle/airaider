@@ -257,7 +257,11 @@ async function spawnStepLead(roster: Roster, chain: QuestChain, step: ChainStep)
 
   // Get AI-authored hook (with anchor-mention validation).
   try {
-    const digest = chainDigest(chain);
+    const priorHooks = chain.steps
+      .slice(0, step.stepIdx)
+      .map((s) => s.blurb)
+      .filter((b): b is string => !!b);
+    const digest = chainDigest(chain, priorHooks);
     const hook = await generateChainStepBlurb({
       chain,
       digest,
@@ -282,6 +286,7 @@ async function spawnStepLead(roster: Roster, chain: QuestChain, step: ChainStep)
   }
 
   step.leadId = lead.id;
+  step.blurb = lead.blurb;
   step.status = 'active';
   roster.leadBoard.push(lead);
   appendFortLog(roster, {

@@ -51,6 +51,9 @@ export const ChainStepSchema = z.object({
   plannedRarity: ChainRaritySchema,
   originalPlannedRarity: ChainRaritySchema,
   leadId: z.string().optional(),
+  /** Cached blurb of the lead spawned for this step, retained after the
+   *  lead is consumed so later prompts can do anti-repetition checks. */
+  blurb: z.string().optional(),
   status: z.enum(STEP_STATUS).default('pending'),
   summary: z.string().optional(),
   resolvedDay: z.number().int().min(0).optional(),
@@ -169,8 +172,8 @@ export function blurbMentionsAnchor(
 
 /** Build a compact prompt-friendly digest of the chain so far. Used by
  *  step-blurb prompt to keep token cost bounded (skeleton goes in epilogue
- *  prompt only). */
-export function chainDigest(chain: QuestChain): string {
+ *  prompt only). Pass priorHooks to enable anti-repetition guard. */
+export function chainDigest(chain: QuestChain, priorHooks: readonly string[] = []): string {
   const beatsSoFar = chain.stepBeats
     .slice(0, chain.currentStepIdx + 1)
     .map((b, i) => `  step ${i} beat: ${b}`)
@@ -180,6 +183,9 @@ export function chainDigest(chain: QuestChain): string {
     .filter((s) => s.summary)
     .map((s) => `  step ${s.stepIdx} outcome (${s.band ?? '?'}): ${s.summary}`)
     .join('\n');
+  const priorHooksBlock = priorHooks.length > 0
+    ? `prior step hooks (DO NOT reuse any 3-word phrase from these — coin fresh language):\n${priorHooks.map((h, i) => `  step ${i}: ${h}`).join('\n')}`
+    : '';
   return [
     `title: ${chain.title}`,
     `central NPC: ${chain.anchors.centralNpc}`,
@@ -188,5 +194,6 @@ export function chainDigest(chain: QuestChain): string {
     `region: ${chain.region}`,
     `beats so far:\n${beatsSoFar}`,
     priorSummaries ? `prior step outcomes:\n${priorSummaries}` : 'no prior outcomes (this is step 0)',
-  ].join('\n');
+    priorHooksBlock,
+  ].filter(Boolean).join('\n');
 }
