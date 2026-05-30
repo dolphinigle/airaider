@@ -82,6 +82,7 @@ export const CommandSchema = z.discriminatedUnion('kind', [
     rarity: z.enum(['common', 'uncommon', 'rare', 'legendary']).optional(),
     mercId: z.string().optional(),
     region: z.string().optional(),
+    followupOfChainId: z.string().optional(),
   }),
 ]);
 export type Command = z.infer<typeof CommandSchema>;
@@ -615,6 +616,13 @@ export async function dispatch(
       // (or makes a synthetic one), and triggers world OR unit chain.
       if (!process.env.AIRAIDER_CHAIN_PLAYTEST && !process.env.AIRAIDER_DEBUG) {
         return { ok: false, error: 'debug-spawn-chain disabled (set AIRAIDER_CHAIN_PLAYTEST or AIRAIDER_DEBUG)' };
+      }
+      // Sub-mode: spawn a FOLLOW-UP chain off an existing prior chain.
+      if (cmd.followupOfChainId) {
+        const { forceSpawnFollowup } = await import('./chainOrchestrator.js');
+        const followup = await forceSpawnFollowup(roster, cmd.followupOfChainId);
+        if (!followup) return { ok: false, error: 'follow-up returned null (cap, anchor dead, or AI error)' };
+        return { ok: true, message: `follow-up spawned: ${followup.title}` };
       }
       const wantedRarity: LeadRarity = (cmd.rarity ?? 'rare') as LeadRarity;
       if (cmd.kind2 === 'unit') {

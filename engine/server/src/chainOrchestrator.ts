@@ -446,8 +446,19 @@ async function maybeSpawnFollowup(roster: Roster, prior: QuestChain): Promise<vo
   if (prior.status !== 'completed') return;
   const chance = PLAYTEST_MODE ? Math.min(95, FOLLOWUP_CHANCE[prior.chainRarity] * 2) : FOLLOWUP_CHANCE[prior.chainRarity];
   if (Math.random() * 100 > chance) return;
-  if (activeChains(roster).length >= ACTIVE_CHAIN_CAP) return;
-  if (!process.env.OPENAI_API_KEY) return;
+  await spawnFollowupChain(roster, prior);
+}
+
+/** Direct follow-up spawn — bypasses the chance roll. Used by debug command. */
+export async function forceSpawnFollowup(roster: Roster, priorId: string): Promise<QuestChain | null> {
+  const prior = roster.questChains.find((c) => c.id === priorId);
+  if (!prior) return null;
+  return spawnFollowupChain(roster, prior);
+}
+
+async function spawnFollowupChain(roster: Roster, prior: QuestChain): Promise<QuestChain | null> {
+  if (activeChains(roster).length >= ACTIVE_CHAIN_CAP) return null;
+  if (!process.env.OPENAI_API_KEY) return null;
   // Rarity bump (capped).
   const order: LeadRarity[] = ['common', 'uncommon', 'rare', 'legendary'];
   const i = order.indexOf(prior.chainRarity);
@@ -456,7 +467,7 @@ async function maybeSpawnFollowup(roster: Roster, prior: QuestChain): Promise<vo
   let anchor: Merc | undefined;
   if (prior.kind === 'unit' && prior.unitId) {
     anchor = roster.mercs.find((m) => m.id === prior.unitId);
-    if (!anchor) return; // no follow-up if anchor gone
+    if (!anchor) return null; // no follow-up if anchor gone
   }
   try {
     const themeTags: readonly string[] = anchor ? anchor.tags.map((t: Tag) => t.label) : prior.themeTagIds;
@@ -491,8 +502,10 @@ async function maybeSpawnFollowup(roster: Roster, prior: QuestChain): Promise<vo
       message: `SEQUEL SAGA: "${followup.title}" — ${followup.hook}`,
     });
     console.log(`[chain] follow-up ${followup.id} (${nextRarity}) from ${prior.id}`);
+    return followup;
   } catch (err: any) {
     console.warn(`[chain] follow-up genesis failed: ${err?.message ?? String(err)}`);
+    return null;
   }
 }
 

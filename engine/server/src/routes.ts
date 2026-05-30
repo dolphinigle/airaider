@@ -91,6 +91,7 @@ function snapshotState(roster: Roster, roomCatalog: Map<string, RoomDef>): unkno
       skeleton: c.skeleton,
       stepBeats: c.stepBeats,
       anchors: c.anchors,
+      priorChainId: c.priorChainId,
       currentStepIdx: c.currentStepIdx,
       totalSteps: c.steps.length,
       plannedStepCount: c.steps.length,
