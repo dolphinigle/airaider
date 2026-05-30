@@ -1,8 +1,14 @@
 import { useDraggable, useDroppable } from '@dnd-kit/core';
-import type { GameState } from '../types';
+import { useRoomCatalog } from '../api';
+import type { GameState, RoomDef } from '../types';
 
-function CaptiveChip({ captive }: { captive: GameState['captives'][number] }) {
+function CaptiveChip({ captive, room }: { captive: GameState['captives'][number]; room?: RoomDef }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: `captive:${captive.id}` });
+  const matches = room?.wantedTags?.length
+    ? captive.tags.filter((t) => room.wantedTags!.includes(t.id))
+    : [];
+  const themed = room?.wantedTags?.length ? 1 : 0;
+  const prestige = themed + matches.length;
   return (
     <div
       ref={setNodeRef}
@@ -13,17 +19,17 @@ function CaptiveChip({ captive }: { captive: GameState['captives'][number] }) {
         display: 'inline-block',
         padding: '2px 6px',
         margin: '2px',
-        background: 'var(--panel-2)',
-        border: '1px solid var(--border)',
+        background: prestige > 1 ? 'rgba(199, 155, 92, 0.25)' : 'var(--panel-2)',
+        border: prestige > 1 ? '1px solid var(--accent)' : '1px solid var(--border)',
         borderRadius: 3,
         fontSize: 11,
         cursor: 'grab',
         opacity: isDragging ? 0.5 : 1,
         userSelect: 'none',
       }}
-      title={`notoriety ${captive.notoriety}`}
+      title={`${captive.archetype} · not.${captive.notoriety}${captive.tags.length ? '\ntags: ' + captive.tags.map((t) => t.label).join(', ') : ''}${prestige ? `\n+${prestige} prestige/day${matches.length ? ` (matches: ${matches.map((m) => m.label).join(', ')})` : ''}` : ''}`}
     >
-      ⛓ {captive.name.slice(0, 12)}
+      ⛓ {captive.name.slice(0, 12)}{prestige > 0 && <span style={{ marginLeft: 4, color: 'var(--accent)' }}>+{prestige}★</span>}
     </div>
   );
 }
@@ -34,6 +40,9 @@ function CellSlot({ cellIdx, state, onCellClick }: { cellIdx: number; state: Gam
   const { isOver, setNodeRef } = useDroppable({ id: `cell:${cellIdx}`, disabled: !placed });
   const isDungeon = placed && (placed.roomId === 'storeroom' || placed.roomId === 'extra-storeroom');
   const bg = isOver && isDungeon ? 'rgba(199, 155, 92, 0.25)' : 'var(--panel-2)';
+  const { data: rooms } = useRoomCatalog();
+  const def = placed && rooms?.find((r) => r.id === placed.roomId);
+  const wantedTags = def?.wantedTags ?? [];
   return (
     <div
       ref={setNodeRef}
@@ -48,14 +57,19 @@ function CellSlot({ cellIdx, state, onCellClick }: { cellIdx: number; state: Gam
         display: 'flex',
         flexDirection: 'column',
       }}
-      title={placed ? `cell ${cellIdx}: ${placed.roomId}` : `cell ${cellIdx}: empty (click to build)`}
+      title={placed ? `cell ${cellIdx}: ${placed.roomId}${wantedTags.length ? `\nwants: ${wantedTags.join(', ')}` : ''}` : `cell ${cellIdx}: empty (click to build)`}
     >
       <div style={{ fontSize: 10, color: 'var(--muted)' }}>cell {cellIdx}</div>
       {placed ? (
         <>
           <strong style={{ fontSize: 13 }}>{placed.roomId}</strong>
+          {wantedTags.length > 0 && (
+            <div style={{ fontSize: 9, color: 'var(--accent)', marginTop: 2 }}>
+              ★ wants: {wantedTags.slice(0, 3).map((t) => t.replace(/^[^:]+:/, '')).join(', ')}{wantedTags.length > 3 ? '…' : ''}
+            </div>
+          )}
           <div style={{ flex: 1, marginTop: 4 }}>
-            {captivesHere.map((c) => <CaptiveChip key={c.id} captive={c} />)}
+            {captivesHere.map((c) => <CaptiveChip key={c.id} captive={c} room={def || undefined} />)}
           </div>
         </>
       ) : (

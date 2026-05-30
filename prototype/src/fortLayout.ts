@@ -331,6 +331,51 @@ export function totalRoomPrestige(
 }
 
 /**
+ * Prestige contribution from captives held in themed (wantedTags-bearing)
+ * rooms. Per captive in such a room: +1 base + 1 per overlapping tag id.
+ * A captive held in a cell with no room, or in a room with no wantedTags,
+ * contributes 0 — there is no automatic "captive held = prestige". Themed
+ * display is the dopamine moment (Lost Heir in the Throne Room).
+ *
+ * `captives` is a minimal shape: { cellIdx?, tags: {id} } so this fn is
+ * decoupled from the full Captive type and easy to call from server/CLI.
+ */
+export function captiveRoomPrestige(
+  fort: FortState,
+  catalog: Map<string, RoomDef>,
+  captives: readonly { cellIdx?: number; tags: readonly { id: string }[] }[],
+): number {
+  let n = 0;
+  for (const c of captives) {
+    if (c.cellIdx === undefined) continue;
+    const placed = fort.placedRooms.find((p) => p.cellIdx === c.cellIdx);
+    if (!placed) continue;
+    const def = catalog.get(placed.roomId);
+    if (!def?.wantedTags?.length) continue;
+    n += 1; // base for any themed display
+    const wanted = new Set(def.wantedTags);
+    for (const t of c.tags) if (wanted.has(t.id)) n += 1;
+  }
+  return n;
+}
+
+/** Per-captive breakdown of room prestige — used by GUI/CLI tooltips. */
+export function captiveRoomPrestigeBreakdown(
+  fort: FortState,
+  catalog: Map<string, RoomDef>,
+  captive: { cellIdx?: number; tags: readonly { id: string }[] },
+): { base: number; matchedTagIds: string[]; total: number; roomId: string | null } {
+  if (captive.cellIdx === undefined) return { base: 0, matchedTagIds: [], total: 0, roomId: null };
+  const placed = fort.placedRooms.find((p) => p.cellIdx === captive.cellIdx);
+  if (!placed) return { base: 0, matchedTagIds: [], total: 0, roomId: null };
+  const def = catalog.get(placed.roomId);
+  if (!def?.wantedTags?.length) return { base: 0, matchedTagIds: [], total: 0, roomId: placed.roomId };
+  const wanted = new Set(def.wantedTags);
+  const matched = captive.tags.filter((t) => wanted.has(t.id)).map((t) => t.id);
+  return { base: 1, matchedTagIds: matched, total: 1 + matched.length, roomId: placed.roomId };
+}
+
+/**
  * PROTO-GAME v14: list dungeon cells with remaining capacity for captives.
  * Returns an array of cellIdx values, ordered by cell idx ascending, that
  * have a dungeon-category room AND fewer captives than the room's capacity.

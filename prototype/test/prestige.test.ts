@@ -26,6 +26,57 @@ describe('computePrestige', () => {
   it('treats missing roomPrestige as 0 (back-compat)', () => {
     expect(computePrestige({ displayedCount: 2, legendaryLeadsCompleted: 0, fortLevel: 1 })).toBe(2);
   });
+  it('adds captivePrestige contribution from themed captives', () => {
+    expect(computePrestige({
+      displayedCount: 0, legendaryLeadsCompleted: 0, fortLevel: 1, captivePrestige: 3,
+    })).toBe(3);
+  });
+  it('treats missing captivePrestige as 0 (back-compat)', () => {
+    expect(computePrestige({ displayedCount: 1, legendaryLeadsCompleted: 0, fortLevel: 1 })).toBe(1);
+  });
+});
+
+describe('captiveRoomPrestige (themed room scoring)', () => {
+  const catalog = new Map([
+    ['throne-room', { id: 'throne-room', wantedTags: ['trait:lost-heir', 'pers:charming'] } as any],
+    ['storeroom', { id: 'storeroom', wantedTags: [] } as any],
+    ['tavern', { id: 'tavern', wantedTags: ['bg:peasant', 'pers:charming'] } as any],
+  ]);
+  const fort = {
+    placedRooms: [
+      { roomId: 'throne-room', cellIdx: 0, builtOnDay: 1 },
+      { roomId: 'storeroom', cellIdx: 1, builtOnDay: 1 },
+      { roomId: 'tavern', cellIdx: 2, builtOnDay: 1 },
+    ],
+  } as any;
+
+  it('returns 0 for unassigned captives', async () => {
+    const { captiveRoomPrestige } = await import('../src/fortLayout.js');
+    expect(captiveRoomPrestige(fort, catalog, [{ cellIdx: undefined, tags: [{ id: 'trait:lost-heir' }] }])).toBe(0);
+  });
+  it('returns 0 for captives in rooms without wantedTags (storeroom)', async () => {
+    const { captiveRoomPrestige } = await import('../src/fortLayout.js');
+    expect(captiveRoomPrestige(fort, catalog, [{ cellIdx: 1, tags: [{ id: 'trait:lost-heir' }] }])).toBe(0);
+  });
+  it('gives +1 base for any captive in a themed room with no tag match', async () => {
+    const { captiveRoomPrestige } = await import('../src/fortLayout.js');
+    expect(captiveRoomPrestige(fort, catalog, [{ cellIdx: 0, tags: [{ id: 'bg:soldier' }] }])).toBe(1);
+  });
+  it('gives +1 base + 1 per matching tag', async () => {
+    const { captiveRoomPrestige } = await import('../src/fortLayout.js');
+    // Lost Heir + Charming dropped in Throne Room → base 1 + 2 matches = 3
+    expect(captiveRoomPrestige(fort, catalog, [
+      { cellIdx: 0, tags: [{ id: 'trait:lost-heir' }, { id: 'pers:charming' }] },
+    ])).toBe(3);
+  });
+  it('sums across multiple captives', async () => {
+    const { captiveRoomPrestige } = await import('../src/fortLayout.js');
+    expect(captiveRoomPrestige(fort, catalog, [
+      { cellIdx: 0, tags: [{ id: 'trait:lost-heir' }] }, // 1+1=2
+      { cellIdx: 2, tags: [{ id: 'bg:peasant' }] },       // 1+1=2
+      { cellIdx: 1, tags: [{ id: 'trait:lost-heir' }] }, // 0
+    ])).toBe(4);
+  });
 });
 
 describe('prestigeTier', () => {

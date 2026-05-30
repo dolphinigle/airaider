@@ -23,6 +23,9 @@ export interface PrestigeInputs {
   fortLevel: number;
   /** Sum of prestigeBonus across all placed rooms. Default 0 for back-compat. */
   roomPrestige?: number;
+  /** Captives held in themed (wantedTags-bearing) rooms: +1 each, plus +1 per
+   *  matching tag. Default 0 for back-compat. */
+  captivePrestige?: number;
 }
 
 export function computePrestige(i: PrestigeInputs): number {
@@ -31,7 +34,8 @@ export function computePrestige(i: PrestigeInputs): number {
     i.displayedCount
       + 2 * i.legendaryLeadsCompleted
       + Math.max(0, i.fortLevel - 1)
-      + (i.roomPrestige ?? 0),
+      + (i.roomPrestige ?? 0)
+      + (i.captivePrestige ?? 0),
   );
 }
 

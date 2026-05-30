@@ -37,6 +37,10 @@ export const RoomDefSchema = z.object({
   adjacencyMates: z.array(z.string()).default([]),
   /** Flat prestige contribution added once the room is placed. */
   prestigeBonus: z.number().int().min(0).optional(),
+  /** Captive tag ids this room "wants". A captive assigned to a cell with this
+   *  room contributes prestige: +1 base + 1 per overlapping tag. Empty/absent =
+   *  no themed slot (room can still hold captives but they grant no prestige). */
+  wantedTags: z.array(z.string()).default([]),
   /** If true, the room is part of the Day-1 starter fort layout. */
   starter: z.boolean().default(false),
 });

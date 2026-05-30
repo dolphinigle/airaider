@@ -31,7 +31,7 @@ import { OpenAIScenarioLLM } from './llm/openai.js';
 import type { ScenarioLLM } from './llm/interface.js';
 import { loadFortCatalog, affordableUpgrades, purchaseUpgrade } from './fort.js';
 import { loadRoomCatalog, type RoomDef } from './rooms.js';
-import { renderFortLayout, buildRoom, excavateCell, openFloor, activeGates, totalCapacity, totalRoomPrestige, dungeonCellsWithSpace, captiveCellEffects } from './fortLayout.js';
+import { renderFortLayout, buildRoom, excavateCell, openFloor, activeGates, totalCapacity, totalRoomPrestige, captiveRoomPrestige, captiveRoomPrestigeBreakdown, dungeonCellsWithSpace, captiveCellEffects } from './fortLayout.js';
 import { loadQuests, abandonQuest, type Quest } from './quests.js';
 import { hireFromPool } from './tavern.js';
 import { effectOf, FORMER_CAPTIVE_TAG_ID, type CaptiveAction, CAPTIVE_ACTIONS } from './captive.js';
@@ -159,7 +159,7 @@ async function main(): Promise<void> {
     try {
       switch (cmd) {
         case 'h': case 'H': case '?': printHelp(); break;
-        case 'r': case 'R': cmdRosterShow(roster); break;
+        case 'r': case 'R': cmdRosterShow(roster, roomCatalog); break;
         case 'l': case 'L': cmdLeads(roster, tagPool); break;
         case 'd': case 'D': await cmdAdvanceDay(rl, roster, mercPool, llm, dayFixtures, args.savePath, tagPool, roomCatalog); break;
         case 'f': case 'F': await cmdFort(rl, roster, fortCatalog, roomCatalog, mercPool, args.savePath); break;
@@ -193,6 +193,7 @@ function printStatus(r: Roster, roomCatalog: Map<string, RoomDef>): void {
     legendaryLeadsCompleted: r.legendaryLeadsCompleted,
     fortLevel: r.fort.level,
     roomPrestige: totalRoomPrestige(r.fort, roomCatalog),
+    captivePrestige: captiveRoomPrestige(r.fort, roomCatalog, r.captives),
   });
   const tier = prestigeTier(prestige);
   console.log('');
@@ -270,7 +271,7 @@ async function pickFromList<T>(
 
 // ---------- commands ----------
 
-function cmdRosterShow(r: Roster): void {
+function cmdRosterShow(r: Roster, roomCatalog: Map<string, RoomDef>): void {
   console.log('');
   console.log(`Mercs (${r.mercs.length}):`);
   for (const m of r.mercs) {
@@ -291,7 +292,16 @@ function cmdRosterShow(r: Roster): void {
   }
   if (r.captives.length > 0) {
     console.log(`\nCaptives (${r.captives.length}):`);
-    for (const c of r.captives) console.log(`  • ${c.name}  ${c.archetype}  notoriety:${c.notoriety}`);
+    for (const c of r.captives) {
+      const breakdown = captiveRoomPrestigeBreakdown(r.fort, roomCatalog, c);
+      const where = c.cellIdx === undefined
+        ? 'OVERFLOW'
+        : `cell ${c.cellIdx}${breakdown.roomId ? ` (${breakdown.roomId})` : ''}`;
+      const prestigeTag = breakdown.total > 0
+        ? `  +${breakdown.total}★/day${breakdown.matchedTagIds.length ? ` (matches: ${breakdown.matchedTagIds.join(', ')})` : ''}`
+        : '';
+      console.log(`  • ${c.name}  ${c.archetype}  notoriety:${c.notoriety}  ${where}${prestigeTag}${formatTags(c.tags)}`);
+    }
   }
   if (r.activeQuests.length > 0) {
     console.log(`\nActive quests (${r.activeQuests.length}):`);
@@ -366,6 +376,7 @@ async function cmdAdvanceDay(
     legendaryLeadsCompleted: r.legendaryLeadsCompleted,
     fortLevel: r.fort.level,
     roomPrestige: totalRoomPrestige(r.fort, roomCatalog),
+    captivePrestige: captiveRoomPrestige(r.fort, roomCatalog, r.captives),
   });
   const tiltedWeights = tiltRarityWeights({ ...BASE_RARITY_WEIGHTS }, prestigeTier(prestigeNow));
   const refresh = refreshLeadBoard({ board: r.leadBoard, dayCount: r.dayCount, rarityWeights: tiltedWeights });

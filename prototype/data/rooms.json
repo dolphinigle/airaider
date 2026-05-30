@@ -46,7 +46,8 @@
       "cost": 8,
       "description": "Cheap beer, hot stew, a fire. Drifters drift in. So do recruits.",
       "incomePerDay": 1,
-      "gates": ["recruit-pool", "fatigue-recovery"]
+      "gates": ["recruit-pool", "fatigue-recovery"],
+      "wantedTags": ["bg:peasant", "pers:charming", "pers:greedy", "trait:silver-tongue"]
     },
     {
       "id": "smithy",
@@ -56,7 +57,8 @@
       "description": "A working forge for arms and armour. Mercs leave better kitted than they arrive.",
       "incomePerDay": 1,
       "gates": ["smithy-craft"],
-      "adjacencyMates": ["storeroom"]
+      "adjacencyMates": ["storeroom"],
+      "wantedTags": ["bg:smith", "bg:soldier", "phys:muscular", "phys:scarred"]
     },
     {
       "id": "chapel",
@@ -65,7 +67,8 @@
       "cost": 4,
       "description": "A small stone chapel for the dead. The living sleep a little easier.",
       "gates": ["chapel-recover"],
-      "prestigeBonus": 1
+      "prestigeBonus": 1,
+      "wantedTags": ["bg:priest", "pers:stoic", "temp:brave", "trait:prophet-touched", "trait:god-marked"]
     },
     {
       "id": "watch-tower",
@@ -74,7 +77,8 @@
       "cost": 8,
       "description": "A four-storey tower with crow's-nest sightlines. Few surprises reach the gate.",
       "gates": ["watch-forecast"],
-      "prestigeBonus": 1
+      "prestigeBonus": 1,
+      "wantedTags": ["bg:hunter", "phys:quick", "temp:cautious", "trait:night-eyed"]
     },
     {
       "id": "granary",
@@ -91,7 +95,8 @@
       "cost": 5,
       "description": "Sawn benches, vices, a slow lathe. Where things get fixed and made.",
       "incomePerDay": 1,
-      "adjacencyMates": ["smithy"]
+      "adjacencyMates": ["smithy"],
+      "wantedTags": ["bg:peasant", "bg:scholar", "phys:quick"]
     },
     {
       "id": "extra-storeroom",
@@ -121,7 +126,8 @@
       "description": "Banners, broken blades, the helms of the named dead. Strangers slow down to look.",
       "gates": ["fame"],
       "adjacencyMates": ["chapel", "watch-tower"],
-      "prestigeBonus": 3
+      "prestigeBonus": 3,
+      "wantedTags": ["bg:noble-bastard", "trait:lost-heir", "trait:dragon-slayer", "trait:god-marked", "pers:charming"]
     },
     {
       "id": "throne-room",
@@ -131,7 +137,8 @@
       "description": "A seat carved from one stone. The fort has a center of gravity now.",
       "gates": ["court"],
       "adjacencyMates": ["trophy-hall"],
-      "prestigeBonus": 5
+      "prestigeBonus": 5,
+      "wantedTags": ["bg:noble-bastard", "trait:lost-heir", "pers:charming", "pers:loyal", "trait:oathsworn"]
     }
   ]
 }
