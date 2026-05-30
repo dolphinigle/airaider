@@ -57,6 +57,28 @@ export function activeChains(roster: Roster): QuestChain[] {
   return roster.questChains.filter((c) => c.status === 'active');
 }
 
+function avoidNamesFromRoster(roster: Roster, excludeChainId?: string): {
+  centralNpcs: string[];
+  antagonists: string[];
+  places: string[];
+} {
+  const centralNpcs: string[] = [];
+  const antagonists: string[] = [];
+  const placeCounts = new Map<string, number>();
+  for (const c of roster.questChains) {
+    if (excludeChainId && c.id === excludeChainId) continue;
+    if (c.status !== 'active') continue;
+    const a = c.anchors;
+    if (a.centralNpc) centralNpcs.push(a.centralNpc);
+    if (a.antagonistFaction) antagonists.push(a.antagonistFaction);
+    for (const p of a.recurringPlaces ?? []) placeCounts.set(p, (placeCounts.get(p) ?? 0) + 1);
+  }
+  // Only flag places that have started repeating across chains.
+  const places: string[] = [];
+  for (const [p, n] of placeCounts) if (n >= 2) places.push(p);
+  return { centralNpcs, antagonists, places };
+}
+
 /** Spawn genesis after a player-pursued rare/legendary lead resolved
  *  favorably. Lazy: skeleton + step 0 lead are generated AFTER the genesis
  *  call returns. Returns the new chain or null if blocked (cap reached,
@@ -85,6 +107,7 @@ export async function trySpawnWorldChain(
       region: opts.seedLead.region,
       chainRarity: opts.chainRarity,
       themeTagLabels: opts.partyTagLabels,
+      avoidNames: avoidNamesFromRoster(roster),
     };
     const gen = await generateChainGenesis(input);
     const chain = freshChain({
@@ -136,6 +159,7 @@ export async function trySpawnUnitChain(
         ...(opts.anchor.backstory ? { backstory: opts.anchor.backstory } : {}),
         tagLabels: opts.anchor.tags.map((t) => t.label),
       },
+      avoidNames: avoidNamesFromRoster(roster),
     };
     const gen = await generateChainGenesis(input);
     const chain = freshChain({
@@ -477,6 +501,7 @@ async function spawnFollowupChain(roster: Roster, prior: QuestChain): Promise<Qu
       chainRarity: nextRarity,
       themeTagLabels: themeTags,
       priorEpilogue: prior.epilogue ?? '',
+      avoidNames: avoidNamesFromRoster(roster, prior.id),
       ...(anchor ? {
         anchorMerc: {
           name: anchor.name,

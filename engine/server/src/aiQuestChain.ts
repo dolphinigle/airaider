@@ -86,6 +86,8 @@ export interface GenesisInput {
   anchorMerc?: { name: string; backstory?: string; tagLabels: readonly string[] };
   /** For follow-up chains. */
   priorEpilogue?: string;
+  /** Names already in use across other active chains — AI must NOT reuse them. */
+  avoidNames?: { centralNpcs: readonly string[]; antagonists: readonly string[]; places: readonly string[] };
 }
 
 export interface GenesisOutput {
@@ -125,6 +127,20 @@ export async function generateChainGenesis(input: GenesisInput): Promise<Genesis
   }
   if (input.priorEpilogue) {
     userParts.push(`This is a SEQUEL. The prior chain ended with: "${input.priorEpilogue}". Build on those consequences.`);
+  }
+  if (input.avoidNames) {
+    const av = input.avoidNames;
+    const parts: string[] = [];
+    if (av.centralNpcs.length) parts.push(`central NPCs already in use: ${av.centralNpcs.join(', ')}`);
+    if (av.antagonists.length) parts.push(`antagonist factions already in use: ${av.antagonists.join(', ')}`);
+    if (av.places.length) parts.push(`places already heavily used: ${av.places.join(', ')}`);
+    if (parts.length) {
+      userParts.push(
+        `DIVERSITY: other active sagas in the world already use — ${parts.join('; ')}. ` +
+        `DO NOT reuse any of these names for centralNpc, antagonistFaction, or recurringPlaces. Coin fresh ones. ` +
+        `(A sequel that explicitly inherits prior names is allowed only if a priorEpilogue is given.)`,
+      );
+    }
   }
   userParts.push(
     '',
