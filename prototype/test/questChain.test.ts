@@ -6,6 +6,7 @@ import {
   bandToStepStatus,
   isStepSuccessful,
   isStepCatastrophic,
+  isStepHardFail,
   blurbMentionsAnchor,
   chainDigest,
   type QuestChain,
@@ -68,6 +69,18 @@ describe('bandToStepStatus', () => {
     expect(isStepCatastrophic('resolved-catastrophic')).toBe(true);
     expect(isStepCatastrophic('resolved-catastrophic-favorable')).toBe(true);
     expect(isStepCatastrophic('resolved-favorable')).toBe(false);
+  });
+  // Regression guard for the Pyrrhic-victory finalize bug (commit 139cb68).
+  // The hard-fail gate at advanceChainAfterResolution must reject ONLY pure
+  // catastrophic — a Pyrrhic win (catastrophic-favorable) is still a step
+  // success and must NOT short-circuit the chain at step N-1.
+  it('isStepHardFail matches ONLY pure catastrophic, not Pyrrhic wins', () => {
+    expect(isStepHardFail('resolved-catastrophic')).toBe(true);
+    expect(isStepHardFail('resolved-catastrophic-favorable')).toBe(false);
+    expect(isStepHardFail('resolved-favorable')).toBe(false);
+    expect(isStepHardFail('resolved-unfavorable')).toBe(false);
+    expect(isStepHardFail('active')).toBe(false);
+    expect(isStepHardFail('pending')).toBe(false);
   });
 });
 
