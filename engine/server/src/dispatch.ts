@@ -129,6 +129,11 @@ export async function dispatch(
           const fatigueOf = (mercId: string) => roster.states.get(mercId)?.fatigue ?? 0;
           const tierOf = (mercId: string) => roster.states.get(mercId)?.tier;
           const rng = rngFromString(`gui-quest-${quest.questId}-day${roster.dayCount}`);
+          const startedAt = Date.now();
+          console.log(
+            `[llm] → resolving "${quest.scenario.title}" (${quest.lead.archetype}, DC${quest.lead.dc}, ${quest.lead.rarity}) ` +
+            `with ${assignments.map((a) => a.merc.name).join(', ')}`,
+          );
           const res = await resolveScenario({
             scenario: quest.scenario,
             assignments,
@@ -137,6 +142,22 @@ export async function dispatch(
             fatigueOf,
             tierOf,
           });
+          const ms = Date.now() - startedAt;
+          console.log(
+            `[llm] ← "${quest.scenario.title}" → ${res.band} (${res.heads}/${res.coinsActual} heads, ` +
+            `band: ${res.bandReason ?? '—'}) in ${ms}ms`,
+          );
+          console.log(`[llm]   narrative: ${res.outcomeNarrative.slice(0, 200)}${res.outcomeNarrative.length > 200 ? '…' : ''}`);
+          for (const c of res.contributions) {
+            const mercName = roster.mercs.find((m) => m.id === c.mercId)?.name ?? c.mercId;
+            console.log(`[llm]   · ${mercName}: ${c.line.slice(0, 140)}${c.line.length > 140 ? '…' : ''}`);
+          }
+          if (res.casualties.length > 0) {
+            for (const c of res.casualties) {
+              const mercName = roster.mercs.find((m) => m.id === c.mercId)?.name ?? c.mercId;
+              console.log(`[llm]   ✗ ${mercName} took ${c.damage} HP — ${c.reason}`);
+            }
+          }
           // Compute gold reward by band.
           let outcomeKind: ResolutionRecord['outcomeKind'] = 'failure';
           let goldMult = 0;
