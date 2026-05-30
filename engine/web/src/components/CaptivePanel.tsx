@@ -17,7 +17,17 @@ export function CaptivePanel({ state, onAction }: { state: GameState; onAction: 
               <span style={{ fontSize: 11, color: c.cellIdx === undefined ? 'var(--danger)' : 'var(--good)' }}>{cellLabel}</span>
               <button onClick={() => onAction(c.id)} style={{ fontSize: 11, padding: '2px 8px' }}>dispose</button>
             </div>
-            <div style={{ marginTop: 2, display: 'flex', gap: 6, fontSize: 11 }}>
+            <div style={{ marginTop: 2, display: 'flex', gap: 6, fontSize: 11, flexWrap: 'wrap' }}>
+              {c.cellEffects.captiveDailyEffect === 'interrogate' && (
+                <span style={{ color: 'var(--danger)' }}>
+                  🩸 interrogating ({c.daysInRoom ?? 0}d, not. cap {(c.baseNotoriety ?? c.notoriety) * 2})
+                </span>
+              )}
+              {c.cellEffects.captiveDailyEffect === 'display' && (
+                <span style={{ color: 'var(--accent)' }}>
+                  💀 on pikes ({c.daysInRoom ?? 0}d / {Math.max(0, c.notoriety - (c.daysInRoom ?? 0))}d left)
+                </span>
+              )}
               {c.cellEffects.chapelAdjacent && <span style={{ color: 'var(--good)' }}>⛪ chapel-adj → free recruit</span>}
               {c.cellEffects.smithyAdjacent && <span style={{ color: 'var(--accent)' }}>⚒ smithy-adj → +5g ransom</span>}
             </div>

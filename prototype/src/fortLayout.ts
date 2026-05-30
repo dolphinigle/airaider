@@ -331,3 +331,17 @@ export function captiveCellEffects(
     smithyAdjacent: adjacentRoomIds.includes('smithy'),
   };
 }
+
+/** Look up the captive-daily-effect on the room in a captive's current cell.
+ *  Returns null if no cell, no room, or the room has no captive effect. */
+export function captiveRoomDailyEffect(
+  fort: FortState,
+  catalog: Map<string, RoomDef>,
+  cellIdx: number | undefined,
+): 'interrogate' | 'display' | null {
+  if (cellIdx === undefined) return null;
+  const placed = fort.placedRooms.find((p) => p.cellIdx === cellIdx);
+  if (!placed) return null;
+  const def = catalog.get(placed.roomId);
+  return def?.captiveDailyEffect ?? null;
+}

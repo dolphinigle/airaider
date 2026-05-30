@@ -29,6 +29,8 @@ export interface Captive {
   archetype: string;
   backstory: string;
   notoriety: number;
+  baseNotoriety?: number;
+  daysInRoom?: number;
   tags: Tag[];
   cellIdx?: number;
   cellEffects: {
@@ -36,6 +38,7 @@ export interface Captive {
     adjacentRoomIds: string[];
     chapelAdjacent: boolean;
     smithyAdjacent: boolean;
+    captiveDailyEffect?: 'interrogate' | 'display' | null;
   };
 }
 
@@ -167,6 +170,7 @@ export interface RoomDef {
   capacity?: number;
   incomePerDay?: number;
   prestigeBonus?: number;
+  captiveDailyEffect?: 'interrogate' | 'display';
   gates: string[];
   adjacencyMates: string[];
   starter?: boolean;

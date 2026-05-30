@@ -114,6 +114,28 @@
       "adjacencyMates": ["storeroom", "extra-storeroom"]
     },
     {
+      "id": "interrogation-chamber",
+      "name": "Interrogation Chamber",
+      "category": "dungeon",
+      "cost": 9,
+      "description": "Brazier, pliers, a long table. A held tongue softens here — and the ransom rises.",
+      "capacity": 1,
+      "gates": ["captive-cap"],
+      "adjacencyMates": ["smithy", "storeroom"],
+      "captiveDailyEffect": "interrogate"
+    },
+    {
+      "id": "pike-display",
+      "name": "Pike Display",
+      "category": "dungeon",
+      "cost": 6,
+      "description": "Iron pikes set into the courtyard wall. Display the captive while they last — fame for as many days as they can stand.",
+      "capacity": 2,
+      "gates": ["captive-cap"],
+      "adjacencyMates": ["chapel", "watch-tower"],
+      "captiveDailyEffect": "display"
+    },
+    {
       "id": "trophy-hall",
       "name": "Trophy Hall",
       "category": "utility",

@@ -24,6 +24,14 @@ export interface Captive {
   tags: Tag[];
   /** A simple 1..5 "how feared / valuable" indicator. */
   notoriety: number;
+  /** Notoriety at capture time. Used as an anchor for room-effect caps
+   *  (e.g. interrogation can only multiply by a fixed factor). Optional
+   *  for back-compat with pre-Stage-C saves. */
+  baseNotoriety?: number;
+  /** Days the captive has spent in their CURRENT cell. Resets to 0 when
+   *  moved. Drives per-day room effects (interrogation tenderise,
+   *  pike-display decay). */
+  daysInRoom?: number;
   /** PROTO-GAME v14: which dungeon-category cell the captive is held in.
    *  Optional — fresh captures arrive unassigned; player assigns from the
    *  captives menu. Adjacency effects depend on this. */

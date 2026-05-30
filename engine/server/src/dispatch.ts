@@ -25,7 +25,7 @@ import { appendFortLog } from '../../../prototype/src/roster.js';
 import { resolveScenario, type Assignment } from '../../../prototype/src/resolver.js';
 import { templateFor } from '../../../prototype/src/scenarioTemplates.js';
 import { rollCaptiveTags } from '../../../prototype/src/captiveTags.js';
-import { totalCapacity, totalRoomPrestige } from '../../../prototype/src/fortLayout.js';
+import { totalCapacity, totalRoomPrestige, captiveRoomDailyEffect } from '../../../prototype/src/fortLayout.js';
 import {
   getQuestStore,
   QUEST_EXPIRY_DAYS,
@@ -245,6 +245,8 @@ export async function dispatch(
                 archetype: 'deserter',
                 backstory: quest.lead.blurb,
                 notoriety,
+                baseNotoriety: notoriety,
+                daysInRoom: 0,
                 tags: rolledTags,
                 cellIdx: freeCells[0],
               });
@@ -267,6 +269,47 @@ export async function dispatch(
           });
           remainingQuests.push(quest);
         }
+      }
+
+      // Step 1.5: per-day captive room effects (interrogate ↑ notoriety,
+      // display ↑ displayedCount and ages the captive toward death).
+      const removedCaptiveIds: string[] = [];
+      for (const cap of roster.captives) {
+        const effect = captiveRoomDailyEffect(roster.fort, roomCatalog, cap.cellIdx);
+        if (!effect) continue;
+        if (cap.baseNotoriety === undefined) cap.baseNotoriety = cap.notoriety;
+        cap.daysInRoom = (cap.daysInRoom ?? 0) + 1;
+        if (effect === 'interrogate') {
+          const cap2x = (cap.baseNotoriety ?? cap.notoriety) * 2;
+          if (cap.notoriety < cap2x) {
+            cap.notoriety += 1;
+            appendFortLog(roster, {
+              day: roster.dayCount,
+              kind: 'note',
+              message: `interrogation: ${cap.name} cracks further (notoriety ${cap.notoriety}/${cap2x})`,
+            });
+          }
+        } else if (effect === 'display') {
+          roster.displayedCount += 1;
+          const daysLeft = cap.notoriety - cap.daysInRoom;
+          if (daysLeft < 0) {
+            removedCaptiveIds.push(cap.id);
+            appendFortLog(roster, {
+              day: roster.dayCount,
+              kind: 'note',
+              message: `${cap.name} expires on the pikes after ${cap.daysInRoom} days. Their name carries on.`,
+            });
+          } else {
+            appendFortLog(roster, {
+              day: roster.dayCount,
+              kind: 'note',
+              message: `${cap.name} on display (${cap.daysInRoom}d, ${daysLeft}d left)`,
+            });
+          }
+        }
+      }
+      if (removedCaptiveIds.length > 0) {
+        roster.captives = roster.captives.filter((c) => !removedCaptiveIds.includes(c.id));
       }
 
       // Step 2: advance the day counter & expire stale quests.
@@ -344,6 +387,7 @@ export async function dispatch(
       if (!cap) return { ok: false, error: `unknown captive ${cmd.captiveId}` };
       if (cmd.cellIdx === null) {
         cap.cellIdx = undefined;
+        cap.daysInRoom = 0;
         return { ok: true, message: `unassigned ${cap.id} (to overflow corner)` };
       }
       const free = dungeonCellsWithSpace(
@@ -355,6 +399,7 @@ export async function dispatch(
         return { ok: false, error: `cell ${cmd.cellIdx} is not a free dungeon cell` };
       }
       cap.cellIdx = cmd.cellIdx;
+      cap.daysInRoom = 0;
       return { ok: true, message: `placed ${cap.id} in cell ${cmd.cellIdx}` };
     }
     case 'captive-action': {

@@ -37,6 +37,8 @@ export const RoomDefSchema = z.object({
   adjacencyMates: z.array(z.string()).default([]),
   /** Flat prestige contribution added once the room is placed. */
   prestigeBonus: z.number().int().min(0).optional(),
+  /** Per-day effect applied to each captive held in this room. */
+  captiveDailyEffect: z.enum(['interrogate', 'display']).optional(),
   /** If true, the room is part of the Day-1 starter fort layout. */
   starter: z.boolean().default(false),
 });
