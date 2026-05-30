@@ -65,6 +65,8 @@ export const CommandSchema = z.discriminatedUnion('kind', [
   }),
   z.object({ kind: z.literal('abandon-quest'), questId: z.string() }),
   z.object({ kind: z.literal('clear-resolutions') }),
+  z.object({ kind: z.literal('accept-applicant'), applicantId: z.string() }),
+  z.object({ kind: z.literal('dismiss-applicant'), applicantId: z.string() }),
 ]);
 export type Command = z.infer<typeof CommandSchema>;
 
@@ -259,29 +261,24 @@ export async function dispatch(
                   existingNames: [
                     ...roster.mercs.map((m) => m.name),
                     ...roster.captives.map((c) => c.name),
+                    ...roster.applicants.map((a) => a.name),
                   ],
                 },
                 tagPool,
               );
               // Guard against id collision (e.g. same lead resolved twice).
-              if (!roster.mercs.some((m) => m.id === recruit.id)) {
-                roster.mercs.push(recruit);
-                roster.states.set(recruit.id, {
-                  id: recruit.id,
-                  fatigue: 0,
-                  hpDamage: 0,
-                  veterancyGain: 0,
-                  xp: 0,
-                  tier: 'rookie',
-                  coDeployments: {},
-                });
+              if (
+                !roster.mercs.some((m) => m.id === recruit.id)
+                && !roster.applicants.some((a) => a.id === recruit.id)
+              ) {
+                roster.applicants.push(recruit);
                 appendFortLog(roster, {
                   day: roster.dayCount,
                   kind: 'note',
-                  message: `RECRUIT JOINED: ${recruit.name} — drawn into your service after "${quest.scenario.title}"`,
+                  message: `APPLICANT AT THE GATE: ${recruit.name} — drawn here after "${quest.scenario.title}". Accept or dismiss.`,
                 });
                 console.log(
-                  `[quest-recruit] joined after "${quest.scenario.title}": ${recruit.name}, tags [${recruit.tags.map((t) => t.label).join(', ')}]`,
+                  `[applicant] arrived after "${quest.scenario.title}": ${recruit.name}, tags [${recruit.tags.map((t) => t.label).join(', ')}]`,
                 );
               }
             } catch (err: any) {
@@ -332,6 +329,7 @@ export async function dispatch(
                     existingNames: [
                       ...roster.mercs.map((m) => m.name),
                       ...roster.captives.map((c) => c.name),
+                      ...roster.applicants.map((a) => a.name),
                     ],
                   });
                   flavorName = flavor.name;
@@ -556,6 +554,40 @@ export async function dispatch(
       const store = getQuestStore();
       store.lastResolutions = [];
       return { ok: true, message: 'cleared' };
+    }
+
+    case 'accept-applicant': {
+      const idx = roster.applicants.findIndex((a) => a.id === cmd.applicantId);
+      if (idx < 0) return { ok: false, error: `applicant ${cmd.applicantId} not found` };
+      const [accepted] = roster.applicants.splice(idx, 1);
+      roster.mercs.push(accepted!);
+      roster.states.set(accepted!.id, {
+        id: accepted!.id,
+        fatigue: 0,
+        hpDamage: 0,
+        veterancyGain: 0,
+        xp: 0,
+        tier: 'rookie',
+        coDeployments: {},
+      });
+      appendFortLog(roster, {
+        day: roster.dayCount,
+        kind: 'note',
+        message: `RECRUITED: ${accepted!.name} joined the company.`,
+      });
+      return { ok: true, message: `recruited ${accepted!.name}` };
+    }
+
+    case 'dismiss-applicant': {
+      const idx = roster.applicants.findIndex((a) => a.id === cmd.applicantId);
+      if (idx < 0) return { ok: false, error: `applicant ${cmd.applicantId} not found` };
+      const [dismissed] = roster.applicants.splice(idx, 1);
+      appendFortLog(roster, {
+        day: roster.dayCount,
+        kind: 'note',
+        message: `turned away ${dismissed!.name} at the gate.`,
+      });
+      return { ok: true, message: `dismissed ${dismissed!.name}` };
     }
   }
 }

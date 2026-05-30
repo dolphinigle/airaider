@@ -166,6 +166,7 @@ export interface GameState {
   dungeonCapacity: number;
   leadBoard: Lead[];
   mercs: Merc[];
+  applicants: Merc[];
   hirePool: HirePoolEntry[];
   reputation: Record<string, number>;
   fortLog: FortLogEntry[];
@@ -202,4 +203,6 @@ export type Command =
   | { kind: 'pursue-lead'; leadId: string }
   | { kind: 'assign-slot'; questId: string; slotId: string; mercId: string | null }
   | { kind: 'abandon-quest'; questId: string }
-  | { kind: 'clear-resolutions' };
+  | { kind: 'clear-resolutions' }
+  | { kind: 'accept-applicant'; applicantId: string }
+  | { kind: 'dismiss-applicant'; applicantId: string };

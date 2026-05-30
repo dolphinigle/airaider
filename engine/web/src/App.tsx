@@ -6,6 +6,7 @@ import { FortGrid } from './components/FortGrid';
 import { LeadBoard } from './components/LeadBoard';
 import { CaptivePanel } from './components/CaptivePanel';
 import { MercPanel } from './components/MercPanel';
+import { ApplicantsPanel } from './components/ApplicantsPanel';
 import { LogPanel } from './components/LogPanel';
 import { BuildModal } from './components/BuildModal';
 import { CaptiveActionModal } from './components/CaptiveActionModal';
@@ -90,6 +91,23 @@ export function App() {
           />
           <MercPanel state={state} onSelectMerc={(mercId) => setMercDetailId(mercId)} />
         </div>
+
+        {state.applicants.length > 0 && (
+          <div
+            style={{
+              position: 'fixed',
+              right: 16,
+              bottom: 16,
+              width: 380,
+              maxHeight: '70vh',
+              overflow: 'auto',
+              boxShadow: '0 6px 20px rgba(0,0,0,0.5)',
+              zIndex: 20,
+            }}
+          >
+            <ApplicantsPanel state={state} />
+          </div>
+        )}
 
         {buildCell !== null && (
           <BuildModal

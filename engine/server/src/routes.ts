@@ -65,6 +65,7 @@ function snapshotState(roster: Roster, roomCatalog: Map<string, RoomDef>): unkno
     dungeonCapacity: dungeonCap,
     leadBoard: roster.leadBoard,
     mercs,
+    applicants: roster.applicants,
     hirePool: roster.hirePool,
     reputation: roster.reputation,
     fortLog: roster.fortLog.slice(-20),

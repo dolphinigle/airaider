@@ -45,6 +45,8 @@ const GeneratedMercSchema = z.object({
   veterancy: z.number().int().min(0).max(5).default(0),
   wage: z.number().int().min(0).default(1),
   hp: z.number().int().min(0).max(3).default(3),
+  /** PROTO-GAME v15: AI-flavored backstory (quest-recruit, applicant). Optional. */
+  backstory: z.string().optional(),
 });
 
 const CaptiveSchema = z.object({
@@ -186,6 +188,10 @@ const RoasterSchema = z.object({
   /** PROTO-GAME v14: tally of legendary leads resolved favorably. Feeds the
    *  prestige score with the highest weight. Optional, backfills to 0. */
   legendaryLeadsCompleted: z.number().int().min(0).default(0),
+  /** PROTO-GAME v15: applicants — quest-recruits waiting at the gate. Player
+   *  picks who to accept onto the roster; everyone else is dismissed. Each
+   *  applicant is a full Merc spec; same shape as generatedMercs. */
+  applicants: z.array(GeneratedMercSchema).default([]),
 });
 
 export type RosterMercState = z.infer<typeof MercStateSchema>;
@@ -235,6 +241,9 @@ export interface Roster {
   displayedCount: number;
   /** PROTO-GAME v14: tally of legendary leads resolved favorably. */
   legendaryLeadsCompleted: number;
+  /** PROTO-GAME v15: applicants — quest-recruits waiting at the gate, the
+   *  player accepts or dismisses each. Same shape as a regular Merc. */
+  applicants: Merc[];
 }
 
 /**
@@ -285,6 +294,7 @@ export function newRoster(initialMercs: Merc[]): Roster {
     leadBoard: [],
     displayedCount: 0,
     legendaryLeadsCompleted: 0,
+    applicants: [],
   };
 }
 
@@ -316,6 +326,7 @@ export function loadRoster(
       veterancy: g.veterancy,
       wage: g.wage,
       hp: g.hp,
+      ...(g.backstory ? { backstory: g.backstory } : {}),
     });
   }
   const states = new Map<string, RosterMercState>(
@@ -335,6 +346,23 @@ export function loadRoster(
       if (!t) throw new Error(`roster: unknown tag id ${tid} in captive ${c.id}`);
       return t;
     }),
+  }));
+
+  // PROTO-GAME v15: applicants are full Merc specs (same shape as
+  // generatedMercs) — quest-recruits waiting for player to accept.
+  const applicants: Merc[] = parsed.applicants.map((g) => ({
+    id: g.id,
+    name: g.name,
+    attrs: g.attrs as import('./types.js').AttributeBlock,
+    tags: g.tagIds.map((tid) => {
+      const t = tagPool.get(tid);
+      if (!t) throw new Error(`roster: unknown tag id ${tid} in applicant ${g.id}`);
+      return t;
+    }),
+    veterancy: g.veterancy,
+    wage: g.wage,
+    hp: g.hp,
+    ...(g.backstory ? { backstory: g.backstory } : {}),
   }));
 
   return {
@@ -393,6 +421,7 @@ export function loadRoster(
     leadBoard: parsed.leadBoard,
     displayedCount: parsed.displayedCount,
     legendaryLeadsCompleted: parsed.legendaryLeadsCompleted,
+    applicants,
   };
 }
 
@@ -416,6 +445,7 @@ export function saveRoster(
         veterancy: m.veterancy,
         wage: m.wage,
         hp: m.hp,
+        ...(m.backstory ? { backstory: m.backstory } : {}),
       });
     }
   }
@@ -461,6 +491,16 @@ export function saveRoster(
     leadBoard: roster.leadBoard,
     displayedCount: roster.displayedCount,
     legendaryLeadsCompleted: roster.legendaryLeadsCompleted,
+    applicants: roster.applicants.map((m) => ({
+      id: m.id,
+      name: m.name,
+      attrs: m.attrs,
+      tagIds: m.tags.map((t) => t.id),
+      veterancy: m.veterancy,
+      wage: m.wage,
+      hp: m.hp,
+      ...(m.backstory ? { backstory: m.backstory } : {}),
+    })),
   };
   // M17.1: defensive backup. If a roster file already exists at this path,
   // copy it to `<path>.bak` before overwriting so a corrupted save (or an
