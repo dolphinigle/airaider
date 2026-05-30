@@ -38,11 +38,12 @@ function CellSlot({ cellIdx, state, onCellClick }: { cellIdx: number; state: Gam
   const placed = state.fort.placedRooms.find((r) => r.cellIdx === cellIdx);
   const captivesHere = state.captives.filter((c) => c.cellIdx === cellIdx);
   const { isOver, setNodeRef } = useDroppable({ id: `cell:${cellIdx}`, disabled: !placed });
-  const isDungeon = placed && (placed.roomId === 'storeroom' || placed.roomId === 'extra-storeroom');
-  const bg = isOver && isDungeon ? 'rgba(199, 155, 92, 0.25)' : 'var(--panel-2)';
   const { data: rooms } = useRoomCatalog();
   const def = placed && rooms?.find((r) => r.id === placed.roomId);
   const wantedTags = def?.wantedTags ?? [];
+  const isCaptiveHost = !!def && def.category !== 'quarters'; // any non-quarters placed room
+  const bg = isOver && isCaptiveHost ? 'rgba(199, 155, 92, 0.35)' : 'var(--panel-2)';
+  const borderColor = isOver && isCaptiveHost ? 'var(--accent)' : 'var(--border)';
   return (
     <div
       ref={setNodeRef}
@@ -50,7 +51,7 @@ function CellSlot({ cellIdx, state, onCellClick }: { cellIdx: number; state: Gam
       onClick={() => onCellClick(cellIdx)}
       style={{
         background: bg,
-        border: '1px solid var(--border)',
+        border: `1px solid ${borderColor}`,
         padding: 8,
         minHeight: 100,
         cursor: 'pointer',

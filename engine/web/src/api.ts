@@ -42,5 +42,11 @@ export function useDispatch() {
     onSuccess: (data) => {
       if (data.state) qc.setQueryData(['state'], data.state);
     },
+    onError: (err: Error) => {
+      // Surface to devtools console so silent server rejections (e.g.
+      // place-captive into a full cell) are diagnosable. The mutation
+      // throws above so app-level error UI can also catch it.
+      console.error('[dispatch]', err.message);
+    },
   });
 }
