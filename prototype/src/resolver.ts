@@ -40,6 +40,14 @@ export interface ResolutionInput {
    * from `roster.states.get(id)?.recentGriefPartner`.
    */
   recentlyLostBondPartnerOf?: (mercId: string) => string | undefined;
+  /**
+   * Stage E (post-prototype refinement): the originating lead's narrative
+   * hook (blurb, archetype, region, rarity). Passed through to the LLM so
+   * narration can name CONCRETE prizes, victims, and objects from the
+   * blurb instead of generic "the prize". Optional — runs without a Lead
+   * still work (used by sim/fixture tests).
+   */
+  leadHook?: { blurb: string; archetype: string; region: string; rarity: string };
 }
 
 export interface SlotContribution {
@@ -384,6 +392,7 @@ export async function resolveScenario(input: ResolutionInput): Promise<ScenarioR
       };
     }),
     season: input.season,
+    leadHook: input.leadHook,
   };
   const narration = await llm.narrate(req);
 

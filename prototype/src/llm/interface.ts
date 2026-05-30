@@ -47,6 +47,10 @@ export interface ScenarioLLMRequest {
   }>;
   /** M6.3: in-game season ('thaw' | 'high' | 'wane' | 'frost'). */
   season?: 'thaw' | 'high' | 'wane' | 'frost';
+  /** Stage E: originating lead's narrative hook — the specific blurb the
+   *  player pursued. Lets narration name CONCRETE prizes/objects/people
+   *  from the blurb instead of generic "the prize". */
+  leadHook?: { blurb: string; archetype: string; region: string; rarity: string };
 }
 
 export interface ScenarioLLMNarration {

@@ -33,14 +33,31 @@ const NarrationSchema = z.object({
 const SYSTEM_PROMPT = `You are the narration engine for a grimdark mercenary-fort game.
 The ENGINE owns numbers and outcome; you own FLAVOR.
 
+PLAYER PREFERENCES (apply to all prose):
+- tone: grimdark — pragmatic, mortal, mud-and-blood, no glory
+- writing style: terse — short sentences, concrete nouns, zero purple prose
+- NPC gender: balanced
+- cultural register: pan-european (Germanic + Celtic + Slavic feel)
+
 Rules:
 - The outcome band is GIVEN (catastrophic / unfavorable / favorable / catastrophic-favorable). You narrate WHY it happened in-fiction.
-- Do NOT invent stats, dice rolls, new mechanics, or new characters.
-- Tone: pragmatic, mortal, slightly bleak. Mercs are people, not heroes. No purple prose. No "destiny."
+- Do NOT invent stats, dice rolls, new mechanics, or new characters who weren't in the party or the lead's blurb.
 - Use each merc's NAME at least once. Lean on their TAGS (cautious, light-footed, etc.) and standout TRAITS (high INT, low STR) for colour — these are the only "stats" you may reference, and only by feel, never by number.
 - If a merc has a backstory, you may anchor ONE small concrete detail from it (an object, a place, a habit). Never summarise the backstory verbatim.
-- Length: 4-6 sentences, single paragraph. Show the moment, then the consequence.
-- Output must be valid JSON: { "outcomeNarrative": "..." }`;
+
+CONCRETENESS (this is non-negotiable):
+- The LEAD HOOK below tells you WHAT the job actually is. Use it. Name the specific thing won, lost, or carried back.
+- BANNED PHRASES: "the prize", "the goods", "their reward", "the target", "the mark", "what they came for", "the spoils", "the relic", "the treasure" — these are placeholders. Replace them with the SPECIFIC thing from the lead hook (a name, an object, a corpse, a sum, a vow, an heirloom, a letter, a child, etc.). If the blurb says "the abbey's reliquary", you say "the bone-locked St. Hadric reliquary" or just "the reliquary", NOT "the prize".
+- Include at least ONE sensory detail per outcome: a smell, a sound, a weight, a temperature, an injury, a small object. No abstractions.
+- Include at least ONE proper noun beyond the merc names: a place, a person mentioned in the blurb, an object, a faction.
+
+PERIOD (low-medieval, grimdark):
+- NO anachronisms. NO sirens, alarms, electricity, firearms, modern phrasing ("sirens blared", "the system kicked in"). Use bells, hue-and-cry, watch-horns, torches, lanterns.
+- NO fantasy clichés ("destiny", "the chosen one", "ancient prophecy") unless the lead blurb explicitly invites it.
+- Outcomes for UNFAVORABLE or CATASTROPHIC bands should feel actually bad — a wound that will fester, a name burned, a guild now hostile, a body left behind. Don't soften an unfavorable result into "they escaped fine, mostly".
+
+LENGTH: 4-6 sentences, single paragraph. Show the moment, then the consequence.
+Output must be valid JSON: { "outcomeNarrative": "..." }`;
 
 function attrDescriptor(value: number): string | null {
   // Attribute scale is 0-5 (5 = peerless). Only surface the extremes —
@@ -124,17 +141,19 @@ export class LeanOpenAIScenarioLLM implements ScenarioLLM {
     const synergyLine = req.synergy && req.synergy.pairs.length > 0
       ? `Bonded pairs in party: ${req.synergy.pairs.map((p) => `${p.mercA}+${p.mercB}`).join(', ')}.\n`
       : '';
+    const leadHookLine = req.leadHook
+      ? `LEAD HOOK — the actual job, in the patron's words:\n  "${req.leadHook.blurb}" (${req.leadHook.archetype} job near ${req.leadHook.region}, ${req.leadHook.rarity})\nYou MUST name the specific thing/person/place from this blurb in the outcome. Don't say "the prize" — say what it actually is.\n\n`
+      : '';
 
     const userPrompt = `Job: "${req.scenarioTitle}" — ${req.scenarioTarget}.
-${seasonLine}${approachLine}${factionLine}${synergyLine}
-Party:
+${seasonLine}${approachLine}${factionLine}${synergyLine}${leadHookLine}Party:
 ${partyBlock}
 
 Outcome (ENGINE-DECIDED, you must narrate consistent with this):
 - band: ${req.band} (${bandFlavor(req.band)})
 - why: ${req.bandReason}
 
-Narrate the moment. 4-6 sentences. Return JSON: { "outcomeNarrative": "..." }`;
+Narrate the moment. 4-6 sentences. Name the specific stakes from the lead hook. Return JSON: { "outcomeNarrative": "..." }`;
 
     if (process.env.AIRAIDER_LLM_VERBOSE !== '0') {
       console.log(`[lean-llm:prompt] system:\n${SYSTEM_PROMPT}`);

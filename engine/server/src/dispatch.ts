@@ -147,6 +147,12 @@ export async function dispatch(
             rng,
             fatigueOf,
             tierOf,
+            leadHook: {
+              blurb: quest.lead.blurb,
+              archetype: quest.lead.archetype,
+              region: quest.lead.region,
+              rarity: quest.lead.rarity,
+            },
           });
           const ms = Date.now() - startedAt;
           console.log(
