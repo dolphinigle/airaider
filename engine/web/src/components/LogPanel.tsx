@@ -53,6 +53,11 @@ function LLMEntry({ e }: { e: LLMLogEntry }) {
         <span style={{ color: 'var(--muted)' }}>{time}</span>
         {e.elapsedMs !== undefined && <span style={{ color: 'var(--muted)' }}>{e.elapsedMs}ms</span>}
         <span style={{ color: cachedHit ? 'var(--good)' : 'var(--accent)' }} title={cachedHit ? 'cached-prompt discount applied' : 'standard pricing'}>{fmtUsd(cost)}</span>
+        {e.promptTokens !== undefined && (
+          <span style={{ color: 'var(--muted)' }} title="input (cached) / output tokens">
+            {e.promptTokens}{cachedHit ? `(${e.cachedPromptTokens}c)` : ''}/{e.completionTokens}t
+          </span>
+        )}
         <span style={{ flex: 1, color: 'var(--muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.label ?? ''}</span>
       </div>
       {open && (
