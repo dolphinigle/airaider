@@ -49,7 +49,14 @@ export function LeadBoard({ state, onPursue, onRefresh }: { state: GameState; on
                 pursue
               </button>
             </div>
-            <div style={{ fontSize: 11, color: 'var(--muted)', fontStyle: 'italic', marginTop: 2 }}>"{lead.blurb}"</div>
+            <div style={{ fontSize: 11, color: 'var(--muted)', fontStyle: 'italic', marginTop: 2 }}>
+              {lead.chainStepRef && (
+                <span style={{ color: '#d6a85a', fontStyle: 'normal', marginRight: 4 }}>
+                  ⛓ [{lead.chainStepRef.chainTitle}]
+                </span>
+              )}
+              "{lead.blurb}"
+            </div>
           </div>
         );
       })}

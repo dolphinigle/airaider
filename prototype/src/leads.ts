@@ -62,6 +62,14 @@ export const LeadSchema = z.object({
   expiryDay: z.number().int().min(0),
   /** One-line flavour shown to the player on the lead board. */
   blurb: z.string(),
+  /** PROTO-GAME v16: when present, this lead is a step in an active quest
+   *  chain. Resolution advances the chain. Chain leads bypass the board cap
+   *  + scouting-post gate; expiry is extended so the anchor merc has time. */
+  chainStepRef: z.object({
+    chainId: z.string(),
+    stepIdx: z.number().int().min(0),
+    chainTitle: z.string(),
+  }).optional(),
 });
 export type Lead = z.infer<typeof LeadSchema>;
 

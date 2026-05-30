@@ -38,6 +38,12 @@ import { getScenarioLLM } from './llm.js';
 import { flavorCaptive } from './leanLlm.js';
 import { enrichLeadBlurbs } from './aiLeadGen.js';
 import { generateQuestRecruit } from './aiQuestRecruit.js';
+import {
+  spawnPendingStepLeads,
+  advanceChainAfterResolution,
+  maybeTriggerWorldChainFromResolution,
+  maybeTriggerUnitChainFromAcceptance,
+} from './chainOrchestrator.js';
 
 export const CommandSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('end-day') }),
@@ -244,8 +250,10 @@ export async function dispatch(
           // Non-captive favorable resolutions drop a recruit who joins the
           // roster — flavored by the OUTCOME STORY so it reads as a
           // consequence of the raid ("a survivor from the camp asked for a
-          // place by your fire").
+          // place by your fire"). Chain steps SUPPRESS this — the chain
+          // narrative takes precedence.
           if (
+            !quest.chainStepRef &&
             quest.lead.archetype !== 'captive' &&
             (res.band === 'favorable' || res.band === 'catastrophic-favorable')
           ) {
@@ -288,7 +296,9 @@ export async function dispatch(
 
           // Captive-archetype leads, on favorable+ bands, drop a captive
           // into the dungeon (mirrors prototype/cliGame.ts behaviour).
+          // Chain steps SUPPRESS this — the chain narrative takes precedence.
           if (
+            !quest.chainStepRef &&
             quest.lead.archetype === 'captive' &&
             (res.band === 'favorable' || res.band === 'catastrophic-favorable')
           ) {
@@ -359,6 +369,32 @@ export async function dispatch(
               );
             }
           }
+
+          // PROTO-GAME v16: chain advancement / world-chain trigger.
+          const partyMercs = assignments.map((a) => a.merc);
+          if (quest.chainStepRef) {
+            await advanceChainAfterResolution(
+              roster,
+              quest.chainStepRef.chainId,
+              quest.chainStepRef.stepIdx,
+              res.band as any,
+              res.outcomeNarrative,
+              partyMercs.map((m) => m.id),
+            );
+          } else {
+            // Try to seed a new world chain from a rare/legendary win.
+            const seedLead: any = {
+              ...quest.lead,
+              postedDay: 0,
+              expiryDay: 0,
+              pursueCost: 0,
+            };
+            await maybeTriggerWorldChainFromResolution(roster, seedLead, {
+              rarity: quest.lead.rarity,
+              band: res.band as any,
+              partyMercs,
+            });
+          }
         } catch (err: any) {
           // Resolution failure (e.g. LLM error) — keep quest, surface error.
           appendFortLog(roster, {
@@ -388,7 +424,13 @@ export async function dispatch(
       // Step 3: prune expired leads (no auto-top-up — that fires expensive AI
       // calls every day). New leads only appear when player explicitly hits
       // Refresh Leads, keeping AI cost player-initiated and predictable.
+      // Chain step leads survive even after this since they have extended
+      // expiry; chain orchestrator may also push new step leads below.
       roster.leadBoard = roster.leadBoard.filter((l) => l.expiryDay >= roster.dayCount);
+
+      // PROTO-GAME v16: spawn the next-step lead for every active chain
+      // that just advanced (or whose current step has no lead on the board).
+      await spawnPendingStepLeads(roster);
       // Tavern auto-refresh disabled: recruits now drop from successful
       // non-captive raid quests (see generateQuestRecruit above) instead of
       // weekly bench replenishment. The tavern room still gates other things
@@ -503,6 +545,7 @@ export async function dispatch(
         questId,
         scenario,
         lead: quoteLead(lead),
+        ...(lead.chainStepRef ? { chainStepRef: lead.chainStepRef } : {}),
         assignments: Object.fromEntries(scenario.slots.map((s) => [s.id, null])),
         pursuedOnDay: roster.dayCount,
         expiresOnDay: roster.dayCount + QUEST_EXPIRY_DAYS,
@@ -575,6 +618,8 @@ export async function dispatch(
         kind: 'note',
         message: `RECRUITED: ${accepted!.name} joined the company.`,
       });
+      // PROTO-GAME v16: rare+ recruit may seed a personal saga.
+      await maybeTriggerUnitChainFromAcceptance(roster, accepted!);
       return { ok: true, message: `recruited ${accepted!.name}` };
     }
 

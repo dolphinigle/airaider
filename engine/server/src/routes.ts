@@ -79,6 +79,34 @@ function snapshotState(roster: Roster, roomCatalog: Map<string, RoomDef>): unkno
     pursuedQuests,
     lastResolutions: store.lastResolutions,
     llmLog: recentLLMLog(20),
+    questChains: roster.questChains.map((c) => ({
+      id: c.id,
+      kind: c.kind,
+      unitId: c.unitId,
+      unitName: c.unitId ? (roster.mercs.find((m) => m.id === c.unitId)?.name ?? roster.deceased.find((d) => d.id === c.unitId)?.name) : undefined,
+      chainRarity: c.chainRarity,
+      region: c.region,
+      title: c.title,
+      hook: c.hook,
+      currentStepIdx: c.currentStepIdx,
+      totalSteps: c.steps.length,
+      status: c.status,
+      startedDay: c.startedDay,
+      endedDay: c.endedDay,
+      epilogue: c.epilogue,
+      steps: c.steps.map((s) => ({
+        stepIdx: s.stepIdx,
+        plannedRarity: s.plannedRarity,
+        status: s.status,
+        band: s.band,
+        summary: s.summary,
+        partyMercNames: (s.partyMercIds ?? []).map((mid) =>
+          roster.mercs.find((m) => m.id === mid)?.name
+          ?? roster.deceased.find((d) => d.id === mid)?.name
+          ?? mid,
+        ),
+      })),
+    })),
   };
 }
 

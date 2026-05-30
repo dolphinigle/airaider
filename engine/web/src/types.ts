@@ -63,6 +63,7 @@ export interface Lead {
   postedDay: number;
   expiryDay: number;
   blurb: string;
+  chainStepRef?: { chainId: string; stepIdx: number; chainTitle: string };
 }
 
 export interface HirePoolEntry {
@@ -174,6 +175,34 @@ export interface GameState {
   prestige: PrestigeView;
   pursuedQuests: PursuedQuest[];
   lastResolutions: ResolutionRecord[];
+  questChains: QuestChainView[];
+}
+
+export interface QuestChainStepView {
+  stepIdx: number;
+  plannedRarity: 'common' | 'uncommon' | 'rare' | 'legendary';
+  status: string;
+  band?: string;
+  summary?: string;
+  partyMercNames?: string[];
+}
+
+export interface QuestChainView {
+  id: string;
+  kind: 'world' | 'unit';
+  unitId?: string;
+  unitName?: string;
+  chainRarity: 'common' | 'uncommon' | 'rare' | 'legendary';
+  region: string;
+  title: string;
+  hook: string;
+  currentStepIdx: number;
+  totalSteps: number;
+  status: 'active' | 'completed' | 'failed' | 'abandoned';
+  startedDay: number;
+  endedDay?: number;
+  epilogue?: string;
+  steps: QuestChainStepView[];
 }
 
 export interface RoomDef {

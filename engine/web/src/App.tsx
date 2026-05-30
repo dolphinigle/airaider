@@ -11,6 +11,7 @@ import { LogPanel } from './components/LogPanel';
 import { BuildModal } from './components/BuildModal';
 import { CaptiveActionModal } from './components/CaptiveActionModal';
 import { QuestPanel } from './components/QuestPanel';
+import { QuestChainPanel } from './components/QuestChainPanel';
 import { ResolutionModal } from './components/ResolutionModal';
 import { MercDetailDrawer } from './components/MercDetailDrawer';
 
@@ -89,6 +90,7 @@ export function App() {
             onAbandon={(questId) => dispatch.mutate({ kind: 'abandon-quest', questId })}
             onUnassign={(questId, slotId) => dispatch.mutate({ kind: 'assign-slot', questId, slotId, mercId: null })}
           />
+          <QuestChainPanel chains={state.questChains ?? []} />
           <MercPanel state={state} onSelectMerc={(mercId) => setMercDetailId(mercId)} />
         </div>
 

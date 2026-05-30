@@ -10,6 +10,7 @@ import { z } from 'zod';
 import type { Merc, Tag } from './types.js';
 import type { Captive, CaptiveEffect } from './captive.js';
 import { LeadSchema, type Lead } from './leads.js';
+import { QuestChainSchema, type QuestChain } from './questChain.js';
 
 const AttrBlockSchema = z.object({
   physical: z.number().int().min(1).max(7),
@@ -192,6 +193,9 @@ const RoasterSchema = z.object({
    *  picks who to accept onto the roster; everyone else is dismissed. Each
    *  applicant is a full Merc spec; same shape as generatedMercs. */
   applicants: z.array(GeneratedMercSchema).default([]),
+  /** PROTO-GAME v16: active + completed + failed + abandoned quest chains.
+   *  See /docs/QUEST_CHAINS.md. Default [] for back-compat. */
+  questChains: z.array(QuestChainSchema).default([]),
 });
 
 export type RosterMercState = z.infer<typeof MercStateSchema>;
@@ -244,6 +248,8 @@ export interface Roster {
   /** PROTO-GAME v15: applicants — quest-recruits waiting at the gate, the
    *  player accepts or dismisses each. Same shape as a regular Merc. */
   applicants: Merc[];
+  /** PROTO-GAME v16: quest chains (active + completed + failed + abandoned). */
+  questChains: QuestChain[];
 }
 
 /**
@@ -295,6 +301,7 @@ export function newRoster(initialMercs: Merc[]): Roster {
     displayedCount: 0,
     legendaryLeadsCompleted: 0,
     applicants: [],
+    questChains: [],
   };
 }
 
@@ -422,6 +429,13 @@ export function loadRoster(
     displayedCount: parsed.displayedCount,
     legendaryLeadsCompleted: parsed.legendaryLeadsCompleted,
     applicants,
+    questChains: parsed.questChains.map((qc) => ({
+      ...qc,
+      steps: qc.steps.map((s) => ({
+        ...s,
+        partyMercIds: s.partyMercIds ?? [],
+      })),
+    })),
   };
 }
 
@@ -501,6 +515,7 @@ export function saveRoster(
       hp: m.hp,
       ...(m.backstory ? { backstory: m.backstory } : {}),
     })),
+    questChains: roster.questChains,
   };
   // M17.1: defensive backup. If a roster file already exists at this path,
   // copy it to `<path>.bak` before overwriting so a corrupted save (or an

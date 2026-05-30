@@ -24,6 +24,9 @@ export interface PursuedQuest {
     dc: number;
     rewardGold: number;
   };
+  /** PROTO-GAME v16: when set, this pursued quest is a chain step; on
+   *  resolution dispatch advances chain[chainId].steps[stepIdx]. */
+  chainStepRef?: { chainId: string; stepIdx: number; chainTitle: string };
   /** slotId → mercId (null/absent = unassigned). */
   assignments: Record<string, string | null>;
   pursuedOnDay: number;
