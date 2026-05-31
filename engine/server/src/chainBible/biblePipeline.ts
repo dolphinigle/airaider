@@ -148,6 +148,45 @@ BANNED TOKENS (any inflection): weight, weighed, weighing, weighs, shadow, shado
 
 ANTI-FIXATION: if the engine lists "recently-used motifs/devices" (ledgers, sealed cloaks, hidden lists, smuggling, etc.), DO NOT make those the chain's central device. Pick a different concrete object/situation. Recurring locations are fine; recurring central devices are not.
 
+VOICE — TWO TIERS, DON'T MIX THEM:
+
+The bible has TWO kinds of fields:
+
+  PLAYER-FACING (allow narrative voice):
+    - leadBoardBlurb — the player reads this verbatim on the lead board.
+    - title — appears in UI.
+
+  WRITERS'-ROOM SCAFFOLD (CLINICAL, no literary voice):
+    - surfaceSituation, hiddenSituation, trajectory
+    - firstBeatOnramp
+    - setupPayoffs (plant/payoff pairs)
+    - cast.arcStateAfterChain
+    - dramaticIrony
+
+CLINICAL means: state the WHAT, not the FEELING. No metaphors-of-meaning. No mood painting. No "the X lands where the Y once did." No "tension hangs over the hall." Just the events, the character mechanics, the cause-and-effect. The downstream beat-writer adds the literary voice when expanding a beat into prose. You are writing the SCAFFOLD they work from.
+
+LITERARY (BAD — voice belongs in beats):
+  trajectory: "The fort's silence grows louder than its actions; what was once a quiet doubt becomes a clamour for justice that Marek can no longer ignore, and in the climax the seal he buried surfaces in a public hand."
+
+CLINICAL (GOOD — scaffold):
+  trajectory: "Beats 1-2 establish the body and the seal. Beat 3 reveals Jorun was paid to ignore it. Beat 4 (climax): the buried seal surfaces publicly when Roselle hands it to the magistrate; Jorun is arrested."
+
+LITERARY (BAD):
+  hiddenSituation: "Beneath the polite veneer of Greyford, a careful conspiracy moves like a slow river — Iselle's couriers slip Tevin coin past honest eyes."
+
+CLINICAL (GOOD):
+  hiddenSituation: "Iselle runs a Tevin courier route through Greyford. Jorun is paid to misfile manifests. Drust is one of her runners; the dead bargeman was about to confess."
+
+LITERARY (BAD):
+  setupPayoff.plant: "the rust-brown crow that perches on the chapel gate, watching like a witness"
+  payoff: "the crow is still there when the verdict is read"
+
+CLINICAL (GOOD):
+  plant: "rust-brown crow at chapel gate"
+  payoff: "still there when verdict is read"
+
+CharmHook-style character mechanics are fine in cast fields — those describe MECHANISM ("believes praise cheapens survival, withholds it"), not paint mood.
+
 CRITICAL FORMATTING: surfaceSituation, hiddenSituation, trajectory, dramaticIrony are STRINGS, not arrays. cast.arcStateAfterChain is a STRING.
 
 Output JSON only.`;
@@ -185,7 +224,7 @@ function buildUserPrompt(req: BibleRequest): { user: string; sample: PoolCharact
   if (required) {
     parts.push(``);
     const label = req.isUnitChain
-      ? 'REQUIRED IN CAST — this is a UNIT CHAIN: the anchor MUST be protagonist, and the controllingIdea/hiddenSituation/trajectory MUST be driven by their want/need/ghost/lie. The chain exists to advance THEIR arc.'
+      ? 'REQUIRED IN CAST — this is a UNIT CHAIN: the anchor MUST be protagonist, and the hiddenSituation/trajectory MUST be driven by their want/need/ghost/lie. The chain exists to advance THEIR arc.'
       : 'REQUIRED IN CAST — engine has anchored this character (you MUST include them)';
     parts.push(poolBlock([required], label));
   }
