@@ -626,3 +626,35 @@ Each chain's `arcStateAfterChain` for Drust naturally inherited the prior state 
 5. Reward fulfillment dispatch: map the engine reward spec to a cast member chosen by the AI
 6. Unit chain trigger: when a mercenary's chain count = 0 and they have a non-empty ghost/lie, spawn a unit chain anchored to them
 7. Follow-up chains: when a chain ends with loose threads, sample one of the involved cast members for a sequel and pass the prior bible as inheritance context
+
+### 18.10 Future: two-phase pool selection (DEFERRED to proper-impl, capture from user)
+
+At prototype scale we send 15 character blocks per call (~2500 tokens of pool data). At production scale the pool will be 100s of characters across multiple regions and the brute-force approach won't fit. User-proposed design:
+
+**Phase 1 — Casting call (cheap, cacheable).** The engine sends a LIST of brief character tidbits — id, name, role, region, 1-line surface, 1-line current-arcState — for every character that could plausibly appear. This block is byte-stable per region and gets prompt-cached. The AI is asked: "From this casting list, name the 2-5 characters you want to develop into the bible's cast, and one line of WHY each fits." Output: a list of character ids + role intent.
+
+**Phase 2 — Bible authoring (full detail).** The engine looks up the selected characters' full identity blocks (want, need, ghost, lie, secret) and sends ONLY those to the bible-author call. Now the AI has rich detail on the few characters that actually matter, instead of shallow detail on everyone.
+
+Benefits:
+- Casting call prompt is stable across all chains in a region → near-100% prompt-cache hit on the long list
+- Bible-author prompt is much shorter (3-5 full char blocks instead of 15 surface ones) → cheaper output reasoning
+- Engine can intercept the casting picks for sanity checks (e.g. "you picked a dead character — re-pick") before paying for the expensive bible call
+- Two-phase mirrors how a real showrunner works: scan the cast pool, pick the people the episode is about, THEN dive into their backstories
+
+Costs:
+- Two API calls per chain instead of one (~2x latency)
+- The casting-call prompt is a new prompt to engineer and tune
+
+Defer until production. Prototype validates that bibles work; two-phase is a scaling optimization.
+
+### 18.11 Future: stable-identity / volatile-state split for caching
+
+Validated in `poolPromptTest.ts iter5_cache_and_new`: when pool characters' `arcState` is mutated between chains in a session, the cached prefix breaks every call. Only the system prompt gets cached (~50% hit rate).
+
+**Fix:** Split the pool block into two sub-blocks for the AI:
+1. **STABLE IDENTITY** — id, name, tags, ghost, lie, secret. Never changes. Sent right after SYSTEM. Gets cached after first call.
+2. **VOLATILE STATE** — current role, current arcState. Changes per chain. Sent after identity block.
+
+Expected: cache hit rises from ~1800 tok to ~3000 tok (~50% → ~75%) once the identity block stabilizes. At 10x cheaper cached-token pricing, this is ~$0.005/chain saved.
+
+Also defer to proper-impl. Prototype works fine without it.

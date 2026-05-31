@@ -306,6 +306,8 @@ ARCSTATE DISCIPLINE:
 
 BANNED TOKENS (any inflection): weight, weighed, weighing, weighs, shadow, shadows, burden, burdened, ghosts, fate, destined, destiny, glorious, ancient evil, darkness descends, grip tightens, tightens its grip, stranglehold. When you want to convey heaviness, name a specific physical thing.
 
+ANTI-FIXATION: if the engine lists "recently-used motifs/devices" (ledgers, sealed cloaks, hidden lists, smuggling, etc.), DO NOT make those the chain's central device. Pick a different concrete object/situation as the inciting hook. Recurring locations are fine; recurring central devices are not.
+
 Output JSON only.`;
 
 function poolBlock(chars: PoolCharacter[], label: string): string {
@@ -333,6 +335,7 @@ interface RunChain {
   requiredAnchorId?: string;
   isUnitChain?: boolean;
   forbidReuse?: boolean;
+  recentMotifs?: readonly string[];
 }
 
 async function runChain(req: RunChain): Promise<{
@@ -378,6 +381,10 @@ async function runChain(req: RunChain): Promise<{
   if (req.themeKeywords.length) userParts.push(`Theme keywords: ${req.themeKeywords.join(', ')}`);
   if (req.seedLeadBlurb) userParts.push(`Inciting hint (must reflect in surfaceSituation): ${req.seedLeadBlurb}`);
   userParts.push(``);
+  if (req.recentMotifs && req.recentMotifs.length) {
+    userParts.push(``);
+    userParts.push(`RECENTLY-USED CENTRAL DEVICES (do NOT reuse as this chain's central device): ${req.recentMotifs.join(' | ')}`);
+  }
   if (req.forbidReuse) {
     userParts.push(``);
     userParts.push(`POOL OVERRIDE: This chain takes place far from the fort's usual operating area. NO pool character would plausibly be on stage here. You MUST coin every cast member as kind:"new". The pool block above is provided ONLY as a naming-style reference (so coined names don't clash with pool names) — do NOT cast anyone from the pool. Coin 2-4 fresh characters with full want/need/ghost/lie/secret.`);
@@ -491,15 +498,18 @@ const CHAINS: RunChain[] = [
     label: 'chain2',
     rarity: 'rare',
     rewardSpec: 'captive: an antagonist NPC ends the chain in the fort dungeon, available for ransom/recruit later',
-    themeKeywords: ['smuggler', 'tevin', 'debt'],
-    seedLeadBlurb: 'A barge slipped its mooring at the Greyford reach two nights ago; a child found a tarred ledger-corner washed up in the reeds.',
+    themeKeywords: ['marsh-rite', 'old-faith', 'silence'],
+    seedLeadBlurb: 'Three village children have gone missing from the marsh hamlet of Slowwater in successive new moons. The hamlet refuses outside help and has closed its causeway with felled birch.',
+    recentMotifs: ['ledgers / account books', 'sealed noble cloaks', 'sewn-list contraband evidence', 'smuggling networks'],
   },
   {
     label: 'chain3',
     rarity: 'rare',
     rewardSpec: 'unique trait on Roselle Vance: "Reckoned With" (already partially earned in her own past chain) — +1 to vow/debt rolls',
-    themeKeywords: ['scribe', 'oath', 'public-truth'],
+    themeKeywords: ['confession', 'public witness', 'inheritance'],
+    seedLeadBlurb: 'The abbey at Penholt — the same abbey Roselle fled — has sent a single bound book to Mireford addressed to her by name. The courier was found dead a day later in his rented bed, the book missing.',
     requiredAnchorId: 'char_roselle',
+    recentMotifs: ['Greyford smuggling', 'crown adjutant arrivals', 'marsh disappearances'],
   },
   {
     label: 'chain4_unit',
@@ -509,6 +519,7 @@ const CHAINS: RunChain[] = [
     seedLeadBlurb: 'A wagoneer wintering at Mireford claims he hired a crossbowman three years ago whose description matches a man Tibalt knew. The wagoneer is bound for Coldfen at first thaw.',
     requiredAnchorId: 'char_tibalt',
     isUnitChain: true,
+    recentMotifs: ['Greyford smuggling', 'abbey books', 'marsh disappearances'],
   },
   {
     label: 'chain5_legendary',
@@ -516,6 +527,7 @@ const CHAINS: RunChain[] = [
     rewardSpec: 'rare item: a named artifact tied to one of the involved factions, with a permanent regional effect (engine assigns +1 prestige in Mireford while owned)',
     themeKeywords: ['relic', 'crown', 'reckoning'],
     seedLeadBlurb: 'A crown adjutant arrives unannounced at Mireford gate carrying a sealed writ; he refuses to name his business until Marek meets him in private.',
+    recentMotifs: ['Greyford smuggling', 'abbey books', 'marsh disappearances', 'personal-debt closure'],
   },
   {
     label: 'chain6_newonly',
