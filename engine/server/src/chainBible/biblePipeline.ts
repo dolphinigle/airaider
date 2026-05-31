@@ -160,21 +160,34 @@ CRAFT REQUIREMENTS (compact, in JSON):
 - hiddenSituation: STRING. 3-5 sentences. The compressed summary of the truth — distillate of backstoryThreads + conflictingInterests, so a quest-writer can grok the situation without re-reading every thread.
 - trajectory: ARRAY OF 2-5 BROAD BEAT SKETCHES. NOT prescriptive. Each bullet is a one-line beat with an optional "IF SUCCEED:" clause naming what gets unlocked next. Do NOT spell out the entire arc — leave room for the story to go off rail. The quest-writer picks the actual beats based on prior-quest outcomes. Do NOT prescribe player decisions or merc observations here.
 
+  THE FUNDAMENTAL PRINCIPLE — READ THIS BEFORE WRITING TRAJECTORY:
+
+  A reader has no stake in a stranger. If your first beat throws the reader at "investigate the body" or "interview the suspects", they are watching a procedural about people they do not know. Stakes feel like math, not story.
+
+  Beat 1's actual job is to MAKE THE READER CARE about at least one person involved. The conflict matters in proportion to attachment. A deserter the mercs have hunted boar with and laughed at his bad jokes is not the same character as "a deserter on the lead board" — even though they are mechanically identical.
+
+  Therefore:
+  - In UNIT chains: Beat 1 should be a low-stakes shared activity (a hunt, a meal, a watch shift, a repair) that lets the anchor's want/need/lie SHOW through action, not exposition. Plot pressure arrives in Beat 2+ AFTER the reader has formed a fondness for them.
+  - In REGIONAL chains: Beat 1 should establish the TEXTURE of the place and the small humanity of the people who will later be in danger — a dockhand's joke, a child stealing apples, an old woman feeding cats — so when later beats put these people at risk, the reader feels it. Investigation can start in Beat 2.
+  - In COMMON chains (cheap stakes): the mundane beat can be one short sentence inside a bigger beat ("investigate Greyford — the dockhand who shows them the body is the same one who sold them salt last month"). Brief, but present.
+
+  Plot-only trajectories are SLOP. They pass schema and they bore.
+
   TIME / CADENCE: each beat MAY include a time-prefix like "(~5 days)" or "(a month later)" or "(over the next season)". For RARE+ chains, prefer LONGER spans — weeks or months between beats — so the world breathes and relationships build. For COMMON chains, beats can be days apart. The time-prefix is GUIDANCE for the quest-writer; they can adjust.
 
-  MUNDANE BEATS ARE WELCOME (especially for rare+ unit chains). Not every beat needs to advance plot. A beat like "Arc 1 — Beat 1: take the disguised traveler hunting; mercs get to know his quiet humour and the way he flinches at gunfire" builds ATTACHMENT, which is what makes the later conflict matter. If you only write plot beats, the reader has no reason to care when the officer arrives.
+  EXAMPLE (rare unit chain — Sevrenne pattern via the deserter):
+    - "Arc 1 — Beat 1 (~7 days): a quiet traveler asks for fort lodging; he helps with chores and joins a boar hunt; mercs warm to his dry humour and the way he flinches at gunfire. No plot — the reader is being introduced to a person." ← THIS IS WHY THE LATER BEATS WORK
+    - "Arc 1 — Beat 2 (~3 days): a small Greyford scuffle implicates him; his practiced calm doesn't match his story. IF SUCCEED: a merc confronts him privately and learns one fragment of his deserter past."
+    - "Arc 2 — Beat 1 (~1 month later): a Tevin officer arrives at the gate with a writ and demands him by his real name."
+    - "Arc 2 — Beat 2 (~2 days): the fort's commitment is forced into the open. IF SUCCEED: a merc who has bonded with him is willing to act."
+    - "Climax: the deserter is captured / hidden / surrendered. Engine reward (e.g., unique_trait_on_anchor 'Stood for a Stranger') fires when the fort's choice is sealed in act."
 
-  EXAMPLE (rare unit chain — Sevrenne pattern via the deserter you described):
-    - "Arc 1 — Beat 1: a quiet traveler asks for fort lodging; he helps with chores and a hunting party. The mercs warm to him; he's careful with his name. (~7 days)"
-    - "Arc 1 — Beat 2: a small Greyford scuffle implicates him; he handles it with practiced calm that doesn't match his story. IF SUCCEED: a merc confronts him privately and learns one fragment of his deserter past. (~3 days)"
-    - "Arc 2 — Beat 1: a Tevin officer arrives at the gate with a writ and demands him. (~1 month later)"
-    - "Arc 2 — Beat 2: choices about his exposure / hiding / extradition come to a head. IF SUCCEED: a merc who has bonded with him is willing to act. (~2 days)"
-    - "Climax: the deserter is either captured, hidden, or surrendered. Engine reward (e.g., unique_trait_on_anchor 'Stood for a Stranger') fires when the fort's commitment is sealed in act."
+  EXAMPLE (common regional chain — short cadence, mundane open compressed):
+    - "Beat 1 (~1 day): mercs arrive at Greyford; the dockhand who shows them the body is the same one who sold them salt last month — he is shaking. They examine the body and the cloak. IF SUCCEED: the chit is recovered."
+    - "Beat 2 (~next day): Halmar and Iselle pressure the fort from opposite sides; the dockhand is missing now."
+    - "Climax: whichever the fort exposes is brought back; the dockhand turns up alive or dead depending on path. Reward (captive_to_dungeon) fires there."
 
-  EXAMPLE (common regional chain — short cadence):
-    - "Beat 1: investigate the body and effects at Greyford. IF SUCCEED: the chit is recovered."
-    - "Beat 2: Halmar and Iselle pressure the fort from opposite sides. (~next day)"
-    - "Climax: whichever the fort exposes is brought back. Reward (captive_to_dungeon) fires there."
+  NOTICE: even the COMMON example seeds an attachment (the dockhand) in beat 1 and pays it off in beat 2/climax. The reader has been given someone to worry about.
 - setupPayoffs: 1-10 plant/payoff pairs (specific named objects/habits/places). Count matches shape.
 - vignettes: 1-6 TERSE bullets describing small character/world moments that DO NOT advance plot — they BUILD WORLD. Examples from Cinderella: "mice tailor a dress at night; Jaq sews crooked but earnest", "Lucifer stalks Gus across the kitchen", "King throws a tantrum about wanting grandchildren", "stepsisters squabble over what dress to wear, knocking down a vase". The downstream beat-writer can insert any vignette anywhere to texture a beat — they don't have to use them, but having them makes the world ALIVE. Each bullet ~5-15 words. NOT prose.
 - texture: 2-8 TERSE bullets naming specific physical objects/places/sensory anchors in this chain's world. Examples from Cinderella: "pumpkin in the kitchen garden", "midnight bell of the palace tower", "torn pink dress with mother's ribbon", "glass slipper", "royal invitation parchment with the king's seal". Each bullet ~3-10 words. These ground the beat-writer's imagery.
