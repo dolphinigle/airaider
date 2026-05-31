@@ -255,13 +255,14 @@ const CastEntrySchema = z.discriminatedUnion('kind', [CastExistingSchema, CastNe
 
 const PoolBibleOutSchema = z.object({
   title: z.string().min(2).max(80),
+  shape: z.enum(['tight', 'classic', 'ensemble', 'twist-heavy']),
   controllingIdea: z.string().min(10).max(220),
-  cast: z.array(CastEntrySchema).min(2).max(5),
+  cast: z.array(CastEntrySchema).min(2).max(6),
   surfaceSituation: z.string().min(20),
   hiddenSituation: z.string().min(20),
   trajectory: z.string().min(20),
-  setupPayoffs: z.array(z.object({ plant: z.string(), payoff: z.string() })).min(2).max(5),
-  dramaticIrony: z.string().min(10),
+  setupPayoffs: z.array(z.object({ plant: z.string(), payoff: z.string() })).min(1).max(6),
+  dramaticIrony: z.string().optional(),
 });
 
 // ---------------- prompt ----------------
@@ -272,16 +273,22 @@ This world keeps a CHARACTER POOL. Characters persist across chains: their want/
 
 CRAFT REQUIREMENTS (compact, in JSON):
 - title: a short evocative chain title (2-8 words). No "The Weight of X" / "The Shadow of Y" patterns. Name a specific concrete thing/person/place from the chain.
+- shape: PICK ONE based on what the situation needs. Don't always pick the same.
+    "tight"        — two cast members (protagonist + antagonist), single confrontation, 1-2 plants, may omit dramaticIrony. Best for personal feuds, ambushes, one-night problems. controllingIdea + surface + hidden + trajectory should be TERSE (1-2 sentences each).
+    "classic"      — 3 cast members, 2-3 plants, has dramaticIrony. Best for a balanced quest. Medium length everywhere.
+    "ensemble"     — 4-6 cast members, 3-5 plants, has dramaticIrony, hiddenSituation is fuller (4-6 sentences) because there are more parties. Best for political/multi-faction chains.
+    "twist-heavy"  — 2-3 cast, 4-6 plants/payoffs, dramaticIrony is the centerpiece (2-3 sentences naming WHEN each side learns the truth). hiddenSituation must clearly contradict surfaceSituation. Best for revelations, betrayals, identity-flip reveals.
+  Engine guidance: common rarity tends toward tight; legendary tends toward ensemble or twist-heavy. But the situation OVERRIDES rarity — a legendary personal duel should still be tight.
 - controllingIdea: one sentence stating what the chain ARGUES (a moral claim, not a plot).
-- cast: 2-5 characters with roleInChain (protagonist | antagonist | complication | ally). For each, EITHER:
+- cast: 2-6 characters with roleInChain (protagonist | antagonist | complication | ally). Cast SIZE matches your chosen shape — don't always pick 4. For each, EITHER:
     { "kind": "existing", "characterId": "<exact id from pool>", "roleInChain": "...", "arcStateAfterChain": "<one-line update describing where this character ends up>" }
     or:
     { "kind": "new", "character": { "name", "tags", "surface", "want", "need", "ghost", "lie", "secret" }, "roleInChain": "...", "arcStateAfterChain": "..." }
 - surfaceSituation: 2-3 sentences. What strangers/mercenaries are told.
 - hiddenSituation: 3-5 sentences. What's really going on.
 - trajectory: 3-5 sentences ending with how the climax delivers the reward.
-- setupPayoffs: 2-5 plant/payoff pairs (specific named objects/habits/places).
-- dramaticIrony: 1-2 sentences naming what player knows / characters don't, when each side learns.
+- setupPayoffs: 1-6 plant/payoff pairs (specific named objects/habits/places). Count matches your shape — tight: 1-2, classic: 2-3, ensemble: 3-5, twist-heavy: 4-6.
+- dramaticIrony: 1-2 sentences naming what player knows / characters don't, when each side learns. OMIT this field for "tight" shape if the chain has no real irony layer.
 
 REUSE DISCIPLINE (READ TWICE):
 - Pool characters are SHOWN with their full story (want/need/ghost/lie/secret/arcState). Read them. The point of a pool is that a character whose existing lie ALREADY MIRRORS the bible's needed antagonist role is a much richer choice than coining a stranger.
@@ -337,6 +344,9 @@ async function runChain(req: RunChain): Promise<{
   newCount: number;
   promptTokens: number;
   completionTokens: number;
+  systemPrompt: string;
+  userPrompt: string;
+  rawResponse: string;
 }> {
   const apiKey = process.env.OPENAI_API_KEY!;
   const client = new OpenAI({ apiKey });
@@ -412,6 +422,9 @@ async function runChain(req: RunChain): Promise<{
     newCount,
     promptTokens: resp.usage?.prompt_tokens ?? 0,
     completionTokens: resp.usage?.completion_tokens ?? 0,
+    systemPrompt: SYSTEM,
+    userPrompt: usr,
+    rawResponse: content,
   };
 }
 
@@ -483,6 +496,13 @@ const CHAINS: RunChain[] = [
     requiredAnchorId: 'char_tibalt',
     isUnitChain: true,
   },
+  {
+    label: 'chain5_legendary',
+    rarity: 'legendary',
+    rewardSpec: 'rare item: a named artifact tied to one of the involved factions, with a permanent regional effect (engine assigns +1 prestige in Mireford while owned)',
+    themeKeywords: ['relic', 'crown', 'reckoning'],
+    seedLeadBlurb: 'A crown adjutant arrives unannounced at Mireford gate carrying a sealed writ; he refuses to name his business until Marek meets him in private.',
+  },
 ];
 
 async function main(): Promise<void> {
@@ -516,7 +536,7 @@ async function main(): Promise<void> {
   for (const r of results) {
     lines.push(`==========================================================`);
     lines.push(`# ${r.request.label}: ${r.bible.title}`);
-    lines.push(`  rarity=${r.request.rarity}  reward="${r.request.rewardSpec}"`);
+    lines.push(`  rarity=${r.request.rarity}  shape=${r.bible.shape}  reward="${r.request.rewardSpec}"`);
     lines.push(`  controlling idea: ${r.bible.controllingIdea}`);
     lines.push(`  reuse=${r.reuseCount}  new=${r.newCount}  tokens=in:${r.promptTokens} out:${r.completionTokens}`);
     lines.push(``);
@@ -546,6 +566,16 @@ async function main(): Promise<void> {
       lines.push(`    PLANT  → ${sp.plant}`);
       lines.push(`    PAYOFF → ${sp.payoff}`);
     }
+    lines.push(``);
+    lines.push(`  --- FULL PROMPT SENT ---`);
+    lines.push(`  [SYSTEM]`);
+    lines.push(r.systemPrompt.split('\n').map(l => '  | ' + l).join('\n'));
+    lines.push(``);
+    lines.push(`  [USER]`);
+    lines.push(r.userPrompt.split('\n').map(l => '  | ' + l).join('\n'));
+    lines.push(``);
+    lines.push(`  --- RAW RESPONSE RECEIVED ---`);
+    lines.push(r.rawResponse.split('\n').map(l => '  | ' + l).join('\n'));
     lines.push(``);
   }
   const outPath = `${outDir}/pool-prompt-test-${label}.txt`;
