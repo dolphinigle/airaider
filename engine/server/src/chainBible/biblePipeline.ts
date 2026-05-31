@@ -46,11 +46,15 @@ export const BibleSchema = z.object({
   shape: z.enum(['tight', 'classic', 'ensemble', 'twist-heavy']),
   leadBoardBlurb: z.string().min(20),
   firstBeatOnramp: z.string().min(20),
-  cast: z.array(CastEntry).min(2).max(6),
+  cast: z.array(CastEntry).min(2).max(10),
   surfaceSituation: z.string().min(20),
   hiddenSituation: z.string().min(20),
   trajectory: z.string().min(20),
-  setupPayoffs: z.array(z.object({ plant: z.string(), payoff: z.string() })).min(1).max(6),
+  setupPayoffs: z.array(z.object({ plant: z.string(), payoff: z.string() })).min(1).max(10),
+  // Iter C: new bullet-list fields that BUILD WORLD without advancing plot.
+  vignettes: z.array(z.string()).min(1).max(6),   // small character/world moments; do NOT advance plot
+  texture: z.array(z.string()).min(2).max(8),     // specific physical objects/places that ground the chain
+  antagonistHumanity: z.string().min(15),         // one terse line: what makes the antagonist a person, not a plot device
   dramaticIrony: z.string().optional(),
 });
 export type Bible = z.infer<typeof BibleSchema>;
@@ -112,11 +116,12 @@ This world keeps a CHARACTER POOL. Characters persist across chains: their want/
 CRAFT REQUIREMENTS (compact, in JSON):
 - title: a short evocative chain title (2-8 words). No "The Weight of X" / "The Shadow of Y" patterns. Name a specific concrete thing/person/place from the chain.
 - shape: PICK ONE based on what the situation needs:
-    "tight"        — 2 cast (protag + antag), single confrontation, 1-2 plants, may omit dramaticIrony. Personal feuds, ambushes.
-    "classic"      — 3 cast, 2-3 plants, has dramaticIrony. Balanced quest.
-    "ensemble"     — 4-6 cast, 3-5 plants, has dramaticIrony, fuller hiddenSituation. Political/multi-faction.
-    "twist-heavy"  — 2-3 cast, 4-6 plants, dramaticIrony is centerpiece (2-3 sentences naming when each side learns). Revelations.
-  Engine guidance: common tends tight, legendary tends ensemble/twist. Situation overrides rarity.
+    "tight"        — 2-3 cast, 1-3 plants, 1-3 vignettes, may omit dramaticIrony. Personal feuds, ambushes.
+    "classic"      — 4-6 cast, 3-6 plants, 3-5 vignettes, has dramaticIrony. Balanced quest.
+    "ensemble"     — 7-10 cast, 6-10 plants, 4-6 vignettes, has dramaticIrony, fuller hiddenSituation. Political/multi-faction, ALIVE WORLD.
+    "twist-heavy"  — 3-5 cast, 6-10 plants, 2-4 vignettes, dramaticIrony is centerpiece (2-3 sentences naming when each side learns).
+  Engine guidance: common tends tight, rare tends classic, legendary tends ensemble/twist. Situation overrides rarity.
+  CAST DENSITY IS PLAYER ENGAGEMENT. Cinderella as a chain bible would be ENSEMBLE (Cinderella, stepmother, Anastasia, Drizella, fairy godmother, prince, king, Jaq, Gus, Lucifer = 10). Not 4 because "it's the simplest story possible". A world with only 4 characters feels empty. Bias UP, not down.
 - controllingIdea: DELETED FIELD. Do NOT output this. The bible focuses on characters + situation + trajectory; do not write a moralizing thesis statement.
 - leadBoardBlurb: 1-2 sentences shown to the player on the LEAD BOARD when this chain first appears, BEFORE they have ever met the cast. CRITICAL: the player at this point is sitting in their fort and knows NOTHING about the situation. Do NOT use cast member proper nouns the player has not encountered (check the FORT ROSTER + REGION SAMPLE: any character there is "known" only by reputation if their role is mercenary or landmark; npcs/captives are NOT known). Use concrete physical anchors: a body, a sealed letter, a runaway, a missing barge, a payment overdue, a banner outside the gate. The blurb tells the player WHY they would deploy.
 - firstBeatOnramp: 1-2 sentences of stage-direction for the writer of beat 1 — "this is how the party arrives at the situation from cold". Anchors the first beat in the leadBoardBlurb (don't drop the player mid-scene with named characters they've never met). Example: "the party rides out to Greyford Reach to look at the body the bargeman described; they meet Drust there, working a barge, and don't yet know his name."
@@ -127,7 +132,10 @@ CRAFT REQUIREMENTS (compact, in JSON):
 - surfaceSituation: STRING. 2-3 sentences. What strangers in the world are told (this is broader than the leadBoardBlurb — it's regional gossip, not the player's narrow lead).
 - hiddenSituation: STRING. 3-5 sentences. What's really going on. WRITERS'-ROOM ONLY: do NOT reveal in beat 1; reveal beat by beat.
 - trajectory: STRING. 3-5 sentences ending with how the climax delivers the reward. WRITERS'-ROOM ONLY: this maps the chain's arc; later beats earn each turn. Beat 1 is ONLY the leadBoardBlurb + firstBeatOnramp realised.
-- setupPayoffs: 1-6 plant/payoff pairs (specific named objects/habits/places). Count matches shape.
+- setupPayoffs: 1-10 plant/payoff pairs (specific named objects/habits/places). Count matches shape.
+- vignettes: 1-6 TERSE bullets describing small character/world moments that DO NOT advance plot — they BUILD WORLD. Examples from Cinderella: "mice tailor a dress at night; Jaq sews crooked but earnest", "Lucifer stalks Gus across the kitchen", "King throws a tantrum about wanting grandchildren", "stepsisters squabble over what dress to wear, knocking down a vase". The downstream beat-writer can insert any vignette anywhere to texture a beat — they don't have to use them, but having them makes the world ALIVE. Each bullet ~5-15 words. NOT prose.
+- texture: 2-8 TERSE bullets naming specific physical objects/places/sensory anchors in this chain's world. Examples from Cinderella: "pumpkin in the kitchen garden", "midnight bell of the palace tower", "torn pink dress with mother's ribbon", "glass slipper", "royal invitation parchment with the king's seal". Each bullet ~3-10 words. These ground the beat-writer's imagery.
+- antagonistHumanity: ONE TERSE sentence on what makes the chain's antagonist a PERSON, not a plot device. Mechanism, not adjective stacking. Cinderella stepmother: "Envious of Cinderella's late mother's grace and class — masks her own poverty-anxiety by performing propriety". Distinct from cast charmHook (which any character has); this one specifically humanizes the antagonist.
 - dramaticIrony: STRING (optional). 1-2 sentences naming what player knows / characters don't, when each side learns. OMIT for tight shape with no real irony.
 
 REUSE DISCIPLINE (READ TWICE):

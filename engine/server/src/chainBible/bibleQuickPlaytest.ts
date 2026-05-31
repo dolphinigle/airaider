@@ -97,6 +97,12 @@ function pretty(b: Bible): string {
   lines.push(`  ${b.trajectory}`);
   lines.push(``, `setupPayoffs (${b.setupPayoffs.length} — terse):`);
   for (const p of b.setupPayoffs) lines.push(`  plant: ${p.plant}`, `  payoff: ${p.payoff}`);
+  lines.push(``, `vignettes (${b.vignettes.length} — world-building, do NOT advance plot):`);
+  for (const v of b.vignettes) lines.push(`  - ${v}`);
+  lines.push(``, `texture (${b.texture.length} — physical objects/places):`);
+  for (const t of b.texture) lines.push(`  - ${t}`);
+  lines.push(``, `antagonistHumanity:`);
+  lines.push(`  ${b.antagonistHumanity}`);
   if (b.dramaticIrony) lines.push(``, `dramaticIrony (SCAFFOLD — clinical):`, `  ${b.dramaticIrony}`);
   return lines.join('\n');
 }
