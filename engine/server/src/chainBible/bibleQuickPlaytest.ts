@@ -93,7 +93,13 @@ function pretty(b: Bible): string {
   lines.push(`  ${b.surfaceSituation}`);
   lines.push(``, `hiddenSituation (SCAFFOLD — clinical):`);
   lines.push(`  ${b.hiddenSituation}`);
-  lines.push(``, `trajectory (SCAFFOLD — clinical):`);
+  lines.push(``, `openQuestion (the puzzle the PLAYER solves):`);
+  lines.push(`  ${b.openQuestion}`);
+  lines.push(``, `mercObservations (${b.mercObservations.length} — what mercs report back):`);
+  for (const o of b.mercObservations) lines.push(`  - ${o}`);
+  lines.push(``, `playerDecisions (${b.playerDecisions.length} — moments where the player chooses):`);
+  for (const d of b.playerDecisions) lines.push(`  - ${d}`);
+  lines.push(``, `trajectory (SCAFFOLD — branching, decision-driven):`);
   lines.push(`  ${b.trajectory}`);
   lines.push(``, `setupPayoffs (${b.setupPayoffs.length} — terse):`);
   for (const p of b.setupPayoffs) lines.push(`  plant: ${p.plant}`, `  payoff: ${p.payoff}`);
