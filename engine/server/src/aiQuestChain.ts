@@ -73,16 +73,53 @@ function getClient(apiKey: string): OpenAI {
   return cachedClient;
 }
 
+function isGpt5Family(model: string): boolean {
+  return model.startsWith('gpt-5') || model.startsWith('o1') || model.startsWith('o3') || model.startsWith('o4');
+}
+
+function chatParams(opts: {
+  model: string;
+  temperature: number;
+  maxTokens: number;
+  responseFormat?: { type: 'json_object' };
+  messages: Array<{ role: 'system' | 'user'; content: string }>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+}): any {
+  const base: Record<string, unknown> = {
+    model: opts.model,
+    messages: opts.messages,
+    stream: false,
+  };
+  if (opts.responseFormat) base.response_format = opts.responseFormat;
+  if (isGpt5Family(opts.model)) {
+    // gpt-5 reasoning models consume budget for hidden reasoning tokens too —
+    // give it a generous multiplier so the actual output isn't truncated to ''.
+    base.max_completion_tokens = opts.maxTokens * 10;
+  } else {
+    base.temperature = opts.temperature;
+    base.max_tokens = opts.maxTokens;
+  }
+  return base;
+}
+
 function model(envKey: string): string {
   return process.env[envKey] ?? process.env.AIRAIDER_LLM_MODEL ?? 'gpt-4o-mini';
 }
 
+/** Narrative-tier default (genesis + epilogue) — story-quality experiments
+ *  in EXPERIMENT_LOG.md showed gpt-4.1-mini is the sweet spot: ~7.5/10 craft
+ *  vs gpt-4o-mini's 5.8/10, at only ~2.7× the cost. Premium upgrade path
+ *  for legendary chains is AIRAIDER_LLM_NARRATIVE_MODEL=gpt-4.1 or gpt-5-mini. */
+function narrativeModelDefault(): string {
+  return process.env.AIRAIDER_LLM_NARRATIVE_MODEL ?? process.env.AIRAIDER_LLM_MODEL ?? 'gpt-4.1-mini';
+}
+
 function genesisModel(): string {
-  return process.env.AIRAIDER_LLM_GENESIS_MODEL ?? model('AIRAIDER_LLM_NARRATIVE_MODEL');
+  return process.env.AIRAIDER_LLM_GENESIS_MODEL ?? narrativeModelDefault();
 }
 
 function epilogueModel(): string {
-  return process.env.AIRAIDER_LLM_EPILOGUE_MODEL ?? model('AIRAIDER_LLM_NARRATIVE_MODEL');
+  return process.env.AIRAIDER_LLM_EPILOGUE_MODEL ?? narrativeModelDefault();
 }
 
 function stepBlurbModel(): string {
@@ -190,16 +227,18 @@ export async function generateChainGenesis(input: GenesisInput): Promise<Genesis
   const usr = userParts.join('\n');
   const m = genesisModel();
   const startedAt = Date.now();
-  const resp = await getClient(apiKey).chat.completions.create({
-    model: m,
-    temperature: 0.85,
-    max_tokens: 1200,
-    response_format: { type: 'json_object' },
-    messages: [
-      { role: 'system', content: sys },
-      { role: 'user', content: usr },
-    ],
-  });
+  const resp = await getClient(apiKey).chat.completions.create(
+    chatParams({
+      model: m,
+      temperature: 0.85,
+      maxTokens: 1200,
+      responseFormat: { type: 'json_object' },
+      messages: [
+        { role: 'system', content: sys },
+        { role: 'user', content: usr },
+      ],
+    }),
+  );
   const content = resp.choices[0]?.message?.content ?? '{}';
   pushLLMLog({
     ts: Date.now(),
@@ -340,16 +379,18 @@ export async function generateChainStepBlurb(input: StepBlurbInput): Promise<str
 
   const usr = userParts.join('\n');
   const startedAt = Date.now();
-  const resp = await getClient(apiKey).chat.completions.create({
-    model: m,
-    temperature: 0.85,
-    max_tokens: 350,
-    response_format: { type: 'json_object' },
-    messages: [
-      { role: 'system', content: STEP_BLURB_SYSTEM },
-      { role: 'user', content: usr },
-    ],
-  });
+  const resp = await getClient(apiKey).chat.completions.create(
+    chatParams({
+      model: m,
+      temperature: 0.85,
+      maxTokens: 350,
+      responseFormat: { type: 'json_object' },
+      messages: [
+        { role: 'system', content: STEP_BLURB_SYSTEM },
+        { role: 'user', content: usr },
+      ],
+    }),
+  );
   const content = resp.choices[0]?.message?.content ?? '{}';
   pushLLMLog({
     ts: Date.now(),
@@ -434,16 +475,18 @@ export async function generateChainEpilogue(input: EpilogueInput): Promise<strin
 
   const usr = userParts.join('\n');
   const startedAt = Date.now();
-  const resp = await getClient(apiKey).chat.completions.create({
-    model: m,
-    temperature: 0.8,
-    max_tokens: 350,
-    response_format: { type: 'json_object' },
-    messages: [
-      { role: 'system', content: EPILOGUE_SYSTEM },
-      { role: 'user', content: usr },
-    ],
-  });
+  const resp = await getClient(apiKey).chat.completions.create(
+    chatParams({
+      model: m,
+      temperature: 0.8,
+      maxTokens: 350,
+      responseFormat: { type: 'json_object' },
+      messages: [
+        { role: 'system', content: EPILOGUE_SYSTEM },
+        { role: 'user', content: usr },
+      ],
+    }),
+  );
   const content = resp.choices[0]?.message?.content ?? '{}';
   pushLLMLog({
     ts: Date.now(),
