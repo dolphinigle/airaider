@@ -16,16 +16,16 @@ const SAGA_EFFORT = (process.env.AIRAIDER_SAGA_EFFORT ?? 'low') as 'minimal' | '
 // ---------------- schema ----------------
 
 export const SagaPhaseHintSchema = z.object({
-  intent: z.string().min(40).max(220),
-  deliveryHint: z.string().min(40).max(280),
+  intent: z.string().min(40),
+  deliveryHint: z.string().min(40),
 });
 
 export const SagaSkeletonSchema = z.object({
   workingTitle: z.string().min(2).max(60),
-  controllingIdea: z.string().min(40).max(220),
-  antagonistPlan: z.string().min(40).max(700),
-  finalImageTarget: z.string().min(40).max(280),
-  body: z.array(z.string().min(120).max(900)).min(3).max(4),
+  controllingIdea: z.string().min(40),
+  antagonistPlan: z.string().min(40),
+  finalImageTarget: z.string().min(40),
+  body: z.array(z.string().min(120)).min(3).max(4),
   phases: z.array(SagaPhaseHintSchema).min(2).max(5),
   pinnedCastIds: z.array(z.string().min(2)).min(2).max(6).refine(
     (ids) => new Set(ids).size === ids.length,

@@ -22,7 +22,7 @@ const CastExisting = z.object({
   kind: z.literal('existing'),
   characterId: z.string().min(4),
   roleInChain: z.enum(['protagonist', 'antagonist', 'complication', 'ally']),
-  arcStateAfterChain: z.string().min(8).max(220),
+  arcStateAfterChain: z.string().min(8),
 });
 const CastNew = z.object({
   kind: z.literal('new'),
@@ -37,16 +37,16 @@ const CastNew = z.object({
     secret: z.string(),
   }),
   roleInChain: z.enum(['protagonist', 'antagonist', 'complication', 'ally']),
-  arcStateAfterChain: z.string().min(8).max(220),
+  arcStateAfterChain: z.string().min(8),
 });
 const CastEntry = z.discriminatedUnion('kind', [CastExisting, CastNew]);
 
 export const BibleSchema = z.object({
   title: z.string().min(2).max(80),
   shape: z.enum(['tight', 'classic', 'ensemble', 'twist-heavy']),
-  controllingIdea: z.string().min(10).max(220),
-  leadBoardBlurb: z.string().min(20).max(500),
-  firstBeatOnramp: z.string().min(20).max(500),
+  controllingIdea: z.string().min(10),
+  leadBoardBlurb: z.string().min(20),
+  firstBeatOnramp: z.string().min(20),
   cast: z.array(CastEntry).min(2).max(6),
   surfaceSituation: z.string().min(20),
   hiddenSituation: z.string().min(20),
