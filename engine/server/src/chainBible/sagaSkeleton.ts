@@ -13,24 +13,31 @@ import type { CharacterPool, PoolCharacter } from './characterPool.js';
 const SAGA_MODEL = process.env.AIRAIDER_SAGA_MODEL ?? 'gpt-5-mini';
 const SAGA_EFFORT = (process.env.AIRAIDER_SAGA_EFFORT ?? 'low') as 'minimal' | 'low' | 'medium' | 'high';
 
-// ---------------- schema ----------------
+// ---------------- schema (v2 — Cinderella shape) ----------------
+//
+// Design pivot 2026-05-30: dropped controllingIdea (moralizing), antagonistPlan,
+// finalImageTarget, body[] (too much prose detail at scaffold tier). The saga
+// skeleton is now a SCAFFOLD: hook + endearing cast + per-phase key plot points.
+// Prose lives in the per-chain Bible and per-beat writers.
 
-export const SagaPhaseHintSchema = z.object({
-  intent: z.string().min(40),
-  deliveryHint: z.string().min(40),
+export const PinnedCastEntrySchema = z.object({
+  characterId: z.string().min(2),
+  sagaRole: z.string().min(20),   // what they DO across the saga (1 sentence)
+  charmHook: z.string().min(20),  // what makes them endearing / alive / memorable (gacha-style)
+});
+
+export const SagaPhaseSchema = z.object({
+  plotPoints: z.array(z.string().min(15)).min(1).max(5),  // terse key events for THIS chain
 });
 
 export const SagaSkeletonSchema = z.object({
-  workingTitle: z.string().min(2).max(60),
-  controllingIdea: z.string().min(40),
-  antagonistPlan: z.string().min(40),
-  finalImageTarget: z.string().min(40),
-  body: z.array(z.string().min(120)).min(3).max(4),
-  phases: z.array(SagaPhaseHintSchema).min(2).max(5),
-  pinnedCastIds: z.array(z.string().min(2)).min(2).max(6).refine(
-    (ids) => new Set(ids).size === ids.length,
-    { message: 'pinnedCastIds must be unique' },
+  workingTitle: z.string().min(2).max(60).optional(),
+  hook: z.string().min(40),  // 1-2 sentence dramatic payoff promise (what makes the reader want this saga)
+  pinnedCast: z.array(PinnedCastEntrySchema).min(2).max(6).refine(
+    (cs) => new Set(cs.map((c) => c.characterId)).size === cs.length,
+    { message: 'pinnedCast characterIds must be unique' },
   ),
+  phases: z.array(SagaPhaseSchema).min(2).max(5),
 });
 export type SagaSkeleton = z.infer<typeof SagaSkeletonSchema>;
 
@@ -57,27 +64,45 @@ export interface SagaGenesisRequest {
 
 // ---------------- prompt ----------------
 
-const SAGA_SYSTEM = `You are the writer-room foreman for a grimdark mercenary-fort game. You author a SAGA SKELETON — the hidden master plot for a long arc that will be delivered to the player over 2-5 separate quest chains across many in-world days.
+const SAGA_SYSTEM = `You are a story-room foreman for a grimdark mercenary-fort game. You author a SAGA SKELETON — the hidden scaffold for a long arc that will be delivered to the player over 2-5 separate quest chains across many in-world days.
 
-The player NEVER sees your output. Your job is to give every chain's writers' room downstream a FIXED DESTINATION so plants in chain 1 can pay off in chain 3.
+The player NEVER sees your output. Your job is to give every chain's writers' room downstream:
+1. A clear DRAMATIC PAYOFF the saga is reaching for (the "hook")
+2. A handful of MEMORABLE, ENDEARING characters the player will see across multiple chains
+3. The KEY PLOT POINTS each chain must hit — terse, like an outline, NOT prose
 
-OUTPUT REQUIREMENTS:
-- "body" is 3-4 paragraphs. Each paragraph covers a 1-3 chain span and ENDS WITH A CONCRETE PHYSICAL IMAGE, not an abstract concept.
-- "antagonistPlan" must describe what the antagonist DOES if the heroes do nothing. State it as a verb-driven sequence, not a vibe.
-- "finalImageTarget" must be a single sentence describing the LAST SHOT the player should see in the final chain's climax beat. A specific image — a man bound at a jetty, a banner cut down, a coin pressed into a dead hand.
-- "phases" length MUST equal the engine's targetPhaseCount. Each phase has a one-sentence intent (what it delivers) and a one-sentence deliveryHint (how a chain should embody it).
-- "pinnedCastIds" REQUIRED: an array of AT LEAST 2 and AT MOST 6 DISTINCT character IDs copied VERBATIM from the pool block below (look for id="char_xxx"). NO DUPLICATES. These are characters who will appear in MULTIPLE chains of this saga. For a unit saga, the anchor merc's id MUST be one of them (but list it only ONCE — add other distinct pool characters as well). Do NOT leave this array empty. Do NOT invent IDs.
-- "controllingIdea" is the moral spine — what this saga is ABOUT in one sentence. No abstract concepts like "fate" or "destiny"; ground it in a concrete tension.
-- "workingTitle" is internal-only (the player sees chain titles, not the saga title). 2-8 words, concrete, no "Weight of X" pattern.
+THE FOCUS IS CHARACTERS, NOT THEMES.
+
+Characters must feel ALIVE. Like the cast of a beloved long-running show — or gacha-game characters players collect emotional attachment to. EVERY pinned cast member (yes, antagonists too) needs a charmHook: the specific thing that makes them feel like a person, not a role. Examples:
+- A stepmother who performs propriety in public, petty venom in private — comically self-defeating.
+- A fairy godmother who loves bending rules but enforces midnight strictly — chaotic-good auntie energy.
+- A captive smuggler who keeps trying to bargain with knock-knock jokes because deep down he's terrified.
+- A harbour-master who lies to the fort but tells his pet rat the truth.
 
 DO NOT:
-- Write any beats, chain bibles, or lead-board blurbs. The skeleton is upstream of all that.
-- Invent character IDs not in the pool. Use existing IDs only; chain genesis may introduce new characters as needed.
-- Use abstract destination words: "fate", "destiny", "darkness descends", "the weight of X", "shadows", "burden", "ancient evil".
+- Write a "controllingIdea" or any moralizing theme statement. The reader does not want a moral; they want CHARACTERS.
+- Write the saga as prose. Plot points are BULLET-LEVEL outline ("she leaves the shoe at midnight"), NOT scene-level detail ("she descends the marble stair as the bell tolls, leaving the glass slipper on the third step where moonlight catches it").
+- Write the antagonist's "plan" as a separate field. Their plan is implicit in the plot points; their humanity is in their charmHook.
+- Write phase intents or delivery hints. The plot points ARE the phase content.
 
-BANNED TOKENS: weight, weighed, shadow, burden, ghosts, fate, destined, destiny, ancient evil, darkness descends.
+The HOOK should name the dramatic payoff that will land at the saga's climax. Examples:
+- "An abused orphan, secretly destined for royalty — reader pays off when the family eats crow."
+- "A grizzled merc finally faces the brother he abandoned to die — pays off when he chooses the fort over his guilt."
+- "A respected harbour-master is quietly a child-trafficker — reader pays off when his web unspools in public."
 
-CRITICAL FORMATTING: body is an array of 3-4 strings. phases is an array. pinnedCastIds is an array of strings. Output JSON only.`;
+The PLOT POINTS per phase are 1-5 terse key events. Each plot point is ONE sentence. They drive the chain forward. Like a TV show's beat-sheet, not its shooting script.
+
+CAST RULES:
+- pinnedCast: 2-6 characters from the POOL who appear across MULTIPLE phases of this saga.
+- Each entry: characterId (verbatim from pool, look for id="char_xxx"), sagaRole (what they DO across the saga, one sentence), charmHook (what makes them endearing/alive, one sentence).
+- For a unit saga, the anchor merc MUST be in pinnedCast.
+- All characterIds MUST exist in the pool block. NO INVENTED IDs.
+
+PHASE COUNT MUST EQUAL the engine's targetPhaseCount. Each phase's plot points END WITH AN EVENT THAT JUSTIFIES THE ENGINE-FIXED REWARD for that phase (e.g., if the engine says "this phase ends with an antagonist in the dungeon", the last plot point must contain the capture).
+
+BANNED TOKENS (in any field): weight, weighed, shadow, burden, ghosts, fate, destined, destiny, ancient evil, darkness descends.
+
+CRITICAL FORMATTING: phases is an array. plotPoints is an array of strings. pinnedCast is an array of objects. Output JSON only.`;
 
 function poolBlock(chars: PoolCharacter[], label: string): string {
   if (chars.length === 0) return `${label}: (none)`;
@@ -225,37 +250,35 @@ export function validateSkeleton(skel: SagaSkeleton, req: SagaGenesisRequest, sa
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  // 1+2. zod already gates body length / phase count, but explicit phase-count match:
   if (skel.phases.length !== req.targetPhaseCount) {
     errors.push(`phase count: got ${skel.phases.length}, want ${req.targetPhaseCount}`);
   }
 
-  // 3. cast existence
   const knownIds = new Set<string>([...req.pool.cachedPrefix(req.region).map((c) => c.id), ...sample.map((c) => c.id)]);
   if (anchor) knownIds.add(anchor.id);
-  for (const id of skel.pinnedCastIds) {
+  const pinnedIds = skel.pinnedCast.map((c) => c.characterId);
+  for (const id of pinnedIds) {
     if (!knownIds.has(id)) errors.push(`pinned cast id "${id}" not in pool`);
   }
 
-  // 4. unit saga: anchor must be in pinned
-  if (req.kind === 'unit' && anchor && !skel.pinnedCastIds.includes(anchor.id)) {
-    errors.push(`unit saga: anchor "${anchor.id}" missing from pinnedCastIds`);
+  if (req.kind === 'unit' && anchor && !pinnedIds.includes(anchor.id)) {
+    errors.push(`unit saga: anchor "${anchor.id}" missing from pinnedCast`);
   }
 
-  // 5. banned tokens scan
   const banned = ['weight', 'weighed', 'shadow', 'burden', 'ghosts', 'fate', 'destined', 'destiny', 'ancient evil', 'darkness descends'];
-  const text = [skel.controllingIdea, skel.antagonistPlan, skel.finalImageTarget, ...skel.body, ...skel.phases.flatMap((p) => [p.intent, p.deliveryHint])].join(' ').toLowerCase();
+  const text = [
+    skel.hook,
+    ...skel.pinnedCast.flatMap((c) => [c.sagaRole, c.charmHook]),
+    ...skel.phases.flatMap((p) => p.plotPoints),
+  ].join(' ').toLowerCase();
   for (const tok of banned) {
     if (text.includes(tok)) warnings.push(`banned token "${tok}" appears`);
   }
 
-  // 6. body paragraph concrete-image heuristic: last 80 chars of each paragraph should
-  //    contain at least one noun-like physical word (not perfect, but flags drift).
-  const physicalCue = /(jetty|gate|table|coin|blade|knife|sword|letter|chest|barge|ledger|cup|wound|stone|iron|wood|rope|chain|bone|cloak|banner|seal|page|bell|fire|smoke|hand|throat|eye|window|door|wall|harbour|river|road|cell|dungeon|forge|cellar|loft|shrine|altar|grave|knot|nail|hook|bolt|patch|brick|paper|ink|wax|tide|mud|dust|tooth|finger|boot|map|key|lock|chain|tomb|page)/i;
-  skel.body.forEach((para, i) => {
-    const tail = para.slice(-100);
-    if (!physicalCue.test(tail)) warnings.push(`body paragraph ${i + 1} tail may lack a concrete physical image: "${tail.trim()}"`);
-  });
+  // Quality warnings (not blocking): charmHook should sound like a person, not a role label.
+  for (const c of skel.pinnedCast) {
+    if (c.charmHook.length < 40) warnings.push(`charmHook for ${c.characterId} feels thin (<40 chars): "${c.charmHook}"`);
+  }
 
   return { pass: errors.length === 0, errors, warnings };
 }

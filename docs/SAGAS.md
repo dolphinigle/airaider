@@ -76,11 +76,13 @@ type Saga = Readonly<{
   region: string;
 
   // The hidden master skeleton (NEVER shown to player verbatim).
-  // 3-4 short paragraphs, written at genesis, mutable via amendments only.
+  // Cinderella-shape: hook + endearing pinnedCast; per-phase plot points
+  // live inside `phases` below. Mutable via amendments only.
   skeleton: SagaSkeleton;
 
   // Cumulative amendments appended when chains within this saga fail.
-  // The engine never edits skeleton.body; it appends to amendments instead.
+  // The engine never edits the skeleton or earlier plot points; it appends
+  // to amendments instead.
   amendments: readonly SkeletonAmendment[];
 
   // Phase pointer. Saga is structured as 2-5 phases.
@@ -91,26 +93,25 @@ type Saga = Readonly<{
   // Chains spawned by this saga, in order of release.
   chainIds: readonly ChainId[];
 
-  // Stable cast pulled from the character pool at genesis.
-  // These characters' arcStates are expected to move across phases.
-  pinnedCastIds: readonly string[];
-
   createdAtDay: number;
   closedAtDay: number | null;
 }>;
 
 type SagaSkeleton = Readonly<{
-  workingTitle: string;                  // hidden; for log only
-  controllingIdea: string;               // moral spine + logline
-  antagonistPlan: string;                // what the world is doing if heroes do nothing
-  finalImageTarget: string;              // the climactic image phase N should land
-  body: readonly string[];               // 3-4 paragraphs of fleshed-out hidden plot
+  workingTitle?: string;                 // optional, internal log only
+  hook: string;                          // 1-2 sentence dramatic payoff promise (what makes the reader want this saga)
+  pinnedCast: readonly PinnedCastEntry[]; // see §2.3 — characters who appear across multiple chains
+}>;
+
+type PinnedCastEntry = Readonly<{
+  characterId: string;                   // verbatim from pool
+  sagaRole: string;                      // 1 sentence: what they DO across the saga
+  charmHook: string;                     // 1 sentence: what makes them endearing/alive (gacha-style)
 }>;
 
 type SagaPhase = Readonly<{
   idx: number;
-  intent: string;                        // 1-sentence: what THIS phase delivers
-  deliveryHint: string;                  // 1-sentence: how a chain should embody it
+  plotPoints: readonly string[];         // 1-5 terse key events (TV beat-sheet, not shooting script)
   rewardSpecHint: RewardKind;            // engine-balanced reward tier expected
   status: 'pending' | 'in_flight' | 'delivered' | 'failed';
   realizingChainId: ChainId | null;      // null until a chain is spawned for it
@@ -125,22 +126,52 @@ type SkeletonAmendment = Readonly<{
 }>;
 ```
 
-### 2.1 Why phases are pre-numbered
+### 2.1 The Cinderella shape (design rationale, validated 2026-05-30)
 
-The skeleton is generated with 2-5 phase intents at genesis. The engine knows *upfront* how many chains this saga aims for. This:
+The skeleton was originally going to have `controllingIdea` + `antagonistPlan` + `finalImageTarget` + 3-4 prose paragraphs (the "body"). Playtest revealed three problems:
+
+1. **`controllingIdea` moralizes.** AI writes thesis statements like *"Silence bought to protect reputations becomes its own crime"* — that's a thematic essay, not a story. The reader wants characters they care about, not morals they're taught.
+2. **Prose body did the chain-writer's job.** Body paragraphs ended with concrete physical images (a sealed Tevin chit nailed to a palm, etc) — but that level of detail belongs in the per-chain Bible / per-beat writer, not in the meta-skeleton. The skeleton is a SCAFFOLD, not a script.
+3. **Antagonists were "plans", not people.** A separate `antagonistPlan` field encouraged listing villain actions divorced from the villain's humanity.
+
+The Cinderella reframe: **the skeleton is a hook + a cast that feels alive + per-phase key plot points (bullet-level, NOT prose)**. Like a TV writers' room beat-sheet, not the shooting script.
+
+> **Hook**: "An abused orphan, secretly destined for royalty — reader pays off when the family eats crow."
+> **Cast (with charmHooks)**:
+> - Cinderella — *too kind to wish ill on her tormentors, which makes her victory sweeter*
+> - Stepmother — *performs propriety publicly, petty venom privately — comically self-defeating*
+> - Fairy godmother — *loves bending rules but enforces midnight strictly — chaotic-good auntie energy*
+> - Prince — *genuinely smitten by ONE dance, no pickup-artist suaveness*
+> **Phase plot points** (per chain): 2-4 bullets each. *"Party invitation arrives", "family forbids her", "she prays, fairy answers, blesses her with deadline"* — NOT *"the fairy descends from the chimney as moonlight catches her wand"*.
+
+### 2.2 Why phases are pre-numbered
+
+The skeleton is generated with 2-5 phases at genesis. The engine knows *upfront* how many chains this saga aims for. This:
 
 - Caps the saga's length (a saga is not infinite; it ends)
 - Lets the engine plan pacing (e.g., one chain every 3-5 in-world days)
 - Gives the AI a destination ("phase 3 of 4 — the cliff before the climax")
 
-### 2.2 Why amendments instead of editing the body
+### 2.3 The charmHook rule
 
-Editing `skeleton.body` after every failure means re-prompting the AI to rewrite paragraphs, which:
+Every entry in `pinnedCast` MUST have a `charmHook` — one sentence describing what makes that character feel like a PERSON, not a role. The standard the prompt enforces: it must be a behavioral specific you could imagine a fan-art of, not an adjective list.
+
+| Good | Bad |
+|---|---|
+| *Tells the truth to his pet crow and smooths over small crimes with a weary, practical laugh* | *Cynical and pragmatic harbour-master* |
+| *Polishes his crossbow mid-conversation like a nervous ritual and blushes at praise* | *Insecure young soldier with a mystery* |
+| *Folds tiny paper boats and leaves them in the pockets of acquaintances as a coded signature of favor* | *Quiet, mysterious operative* |
+
+Antagonists need charmHooks too — a villain who doesn't feel alive isn't a villain, it's a plot device.
+
+### 2.4 Why amendments instead of editing the plot points
+
+Editing earlier plot points after a chain fails means re-prompting the AI to rewrite, which:
 - Costs more
-- Breaks the prompt-cache prefix (the cached system prompt was matched against the original body)
-- Risks the AI rewriting parts that were already delivered
+- Breaks the prompt-cache prefix
+- Risks the AI rewriting parts that were already delivered to the player
 
-Appending an amendment is cheap, deterministic, and the prompt instructs the next chain's writer-room to *honour both the body AND every amendment*. This solves the user's question "*not sure if easy when quest failed*" — yes, it's easy, because we don't mutate, we accrete.
+Appending an amendment is cheap, deterministic, and the prompt instructs the next chain's writer-room to *honour the plot points AND every amendment*. This solves the user's question "*not sure if easy when quest failed*" — yes, it's easy, because we don't mutate, we accrete.
 
 ---
 
@@ -169,45 +200,49 @@ Total saga cost (4-phase saga, all clean wins): roughly **$0.04** over its in-wo
 - Target phase count (2-5, engine-picked based on rarity)
 - Per-phase reward spec hints (engine-balanced)
 
-**Output (zod-validated):**
+**Output (zod-validated, post-Cinderella pivot 2026-05-30):**
 
 ```ts
 const SagaSkeletonSchema = z.object({
-  workingTitle: z.string().min(2).max(60),
-  controllingIdea: z.string().min(40).max(220),
-  antagonistPlan: z.string().min(40).max(700),
-  finalImageTarget: z.string().min(40).max(280),
-  body: z.array(z.string().min(120).max(900)).min(3).max(4),
+  workingTitle: z.string().min(2).max(60).optional(),
+  hook: z.string().min(40),                       // dramatic payoff promise
+  pinnedCast: z.array(z.object({
+    characterId: z.string().min(2),               // verbatim from pool
+    sagaRole: z.string().min(20),                 // what they DO across the saga
+    charmHook: z.string().min(20),                // what makes them endearing/alive
+  })).min(2).max(6),                              // refined to enforce unique IDs
   phases: z.array(z.object({
-    intent: z.string().min(40).max(220),
-    deliveryHint: z.string().min(40).max(280),
+    plotPoints: z.array(z.string().min(15)).min(1).max(5),
   })).min(2).max(5),
-  pinnedCastIds: z.array(z.string()).min(2).max(6),
 });
 ```
 
-The schema enforces that the AI can't drift to >700 chars per paragraph (cost) or fewer than 3 paragraphs (no skeleton substance). It also enforces phases match the engine's target.
+**Locked design rules** (validated by playtest iter 2, see `files/saga_playtest_iter2_cinderella.md`):
+- Free-form prose fields have only `min` caps (let voice/cost decide; see repo memory "schema caps").
+- Phase count MUST equal engine's `targetPhaseCount` (validator enforces).
+- All `characterId` values MUST be in the pool (validator enforces).
+- Last plot point of each phase MUST justify that phase's engine-fixed reward (prompt rule; validator does not enforce).
 
-**Prompt sketch (don't write final yet — validate via playtest in §12):**
+**Prompt summary (full text in `engine/server/src/chainBible/sagaSkeleton.ts:SAGA_SYSTEM`):**
 
 ```
-SYSTEM: You are the writer-room foreman for a long-arc story (a "saga") that
-will be delivered to the player as 2-5 separate episodic Chains over many
-in-world days. You will write the HIDDEN master plot. The player will NEVER
-see your output. Your job is to give every chain-writer-room downstream a
-fixed destination so plants in chain 1 can pay off in chain 3.
+SYSTEM: You author a SAGA SKELETON for a long arc delivered as 2-5 chains.
+The player never sees this. You provide downstream chains with:
+  1. A clear DRAMATIC PAYOFF the saga is reaching for (the hook).
+  2. A handful of MEMORABLE, ENDEARING characters (charmHook required for each).
+  3. The KEY PLOT POINTS each chain must hit — terse, NOT prose.
 
-OUTPUT REQUIREMENTS:
-- Write a 3-4 paragraph body. Each paragraph covers a 1-3 chain span and
-  ends with a CONCRETE physical image, not an abstract concept.
-- The antagonist must have a PLAN that progresses even if the heroes do
-  nothing. State it explicitly.
-- The finalImageTarget must be a single sentence describing the LAST shot
-  the player should see in the last chain's last beat.
-- Reuse pool characters wherever the role fits; only introduce new ones if
-  the pool offers nothing usable.
-- Do NOT write any beats, leads, or chain bibles. Phase intents are
-  one-sentence promises only.
+THE FOCUS IS CHARACTERS, NOT THEMES.
+
+DO NOT write a controllingIdea, a moralizing theme, prose body paragraphs,
+or a separate antagonist plan. Antagonists are people; their plan is implicit
+in plot points; their humanity is in their charmHook.
+
+The HOOK names the dramatic payoff (e.g., "abused orphan, secretly destined
+for royalty — reader pays off when the family eats crow").
+
+PLOT POINTS are bullet-level outline ("she leaves the shoe at midnight"),
+NOT scene-level detail ("she descends the marble stair as the bell tolls").
 ```
 
 ### 3.2 Chain genesis from saga (modified existing call)
@@ -215,19 +250,20 @@ OUTPUT REQUIREMENTS:
 The chain-genesis call from `QUEST_CHAINS.md` §5.1 is **extended** when the chain is spawned from a saga:
 
 **Added prompt context:**
-- `saga.skeleton.body` (the 3-4 paragraphs verbatim)
+- `saga.hook` (verbatim)
+- `saga.pinnedCast` (every entry, with sagaRole + charmHook)
 - `saga.amendments` (all of them, in order)
-- `saga.phases[currentPhaseIdx].intent` and `.deliveryHint`
+- `saga.phases[currentPhaseIdx].plotPoints` (verbatim — the chain MUST land these events)
 - `saga.phases[0..currentPhaseIdx-1]`, each with `.summaryAfter` (what actually happened in earlier phases)
-- The saga's `pinnedCastIds` are marked as REQUIRED in this chain's cast (unless dead/captive — see §6)
 
 **Added prompt rules:**
 ```
 You are writing CHAIN N of a saga of M total chains.
-- This chain MUST deliver the phase intent. The reward kind is FIXED.
-- The bible's trajectory MUST end with the finalImageTarget LANDING if N==M,
-  else MUST end on a state that makes N+1 inevitable.
-- You MAY foreshadow later phases but you MUST NOT spend their payoffs.
+- This chain MUST hit every plot point listed for phase N.
+- The reward kind is engine-fixed; the LAST plot point determines how the
+  climax delivers that reward.
+- For pinned cast appearing in this chain, their charmHook is the voice
+  reference — they must feel like the same character readers met before.
 - If the skeleton contradicts a prior chain's actual epilogue, defer to the
   epilogue (the world wins, not the plan).
 ```
@@ -249,7 +285,7 @@ When a chain in a saga ends with `status='failed'` or has a `partial-loss` outco
 ```
 The plan called for X. Instead, the heroes failed at Y. In one or two
 sentences, describe how this changes the world for the next chain.
-Do NOT rewrite earlier paragraphs; just describe what BENT.
+Do NOT rewrite earlier plot points; just describe what BENT.
 ```
 
 The engine appends to `saga.amendments`. The next chain's genesis prompt includes the full amendment list.
@@ -275,10 +311,10 @@ Per `CANONICAL_DESIGN.md` §1: engine owns numbers, AI owns flavor.
 | Per-phase reward kind | Engine | Pre-allocated at saga genesis |
 | Per-phase reward magnitude | Engine | Numbers from existing economy |
 | In-world cadence (days between chains) | Engine | §7 |
-| Phase intent / delivery hint | AI | Inside genesis schema |
-| Skeleton paragraphs | AI | Hidden from player |
-| Working title | AI | Used only in dev logs |
-| Cast pinning | AI proposes, engine validates | Must exist in pool |
+| Phase plot points | AI | Inside genesis schema (bullet-level, not prose) |
+| Hook | AI | One sentence: dramatic payoff promise |
+| Working title | AI | Used only in dev logs (optional) |
+| Cast pinning + charmHook | AI proposes, engine validates IDs | Must exist in pool |
 | Chain bible / beats / epilogue | AI | Existing pipeline, with added saga context |
 | Amendment text | AI | One-shot, deterministic length cap |
 | Mark saga `failed` after 2 retries | Engine | Hard rule |
@@ -388,13 +424,15 @@ Per the user's standing rule (`QUEST_CHAINS.md` §10) — every AI response is p
 Saga-specific validations:
 
 1. **Skeleton schema** — strict zod (§3.1); reject and retry once if schema fails.
-2. **Cast existence** — every `pinnedCastIds` entry must exist in the pool at genesis time. If AI invented an ID, drop it from the list (don't crash) and log.
+2. **Cast existence** — every `pinnedCast[].characterId` must exist in the pool at genesis time. If AI invented an ID, drop that entry from the list (don't crash) and log.
 3. **Phase count match** — `phases.length` must equal the engine-requested target. Retry once on mismatch.
-4. **Body length** — paragraphs ≥ 3 and ≤ 4, each in [120, 700] chars. Enforced by zod.
-5. **No proper-noun leakage** — sanity-grep the player-visible chain title against the skeleton body; if the skeleton invents a name not in the pool, log it (don't block — but flag for review).
-6. **Final-image landing check** — after the last chain's last beat, run a fuzzy similarity (Jaccard on word stems) between `finalImageTarget` and the actual climax beat body. If similarity < 0.15, log as drift.
+4. **Unique cast IDs** — `pinnedCast` cannot list the same `characterId` twice. Enforced by zod `.refine()`.
+5. **CharmHook thinness** — observational: log when a charmHook reads as adjectives-only ("cynical and pragmatic") rather than a behavioral specific ("tells truth to his pet crow"). Heuristic: word count < 8 OR no verb, log warning. Don't block.
+6. **Reward landing per phase** — observational: after each chain's climax beat resolves, check that the *last* plot point of the phase matches the reward kind delivered. If reward was `unique_trait_on_anchor` but the last plot point was about money, log drift.
 
 Validations 1-4 are blocking (retry). Validations 5-6 are observational (log to `pushLLMLog`).
+
+(The previous `finalImageTarget` similarity check is gone — there is no `finalImageTarget` in v2. The "last plot point lands the reward" rule replaces it.)
 
 ---
 
@@ -413,7 +451,7 @@ Mirrors the existing prototype-phase structure in `QUEST_CHAINS.md` §12.
 - When supplied, prepend skeleton/amendments/prior-phase summaries to the prompt
 - Wire `sagaRunner.ts` to generate 2-3 chains from one skeleton, mock the beats, print the bibles
 - Acceptance: the second bible's cast/plants visibly reference the first bible's epilogue
-- Acceptance: a phase intent and the bible's controllingIdea are recognizably aligned
+- Acceptance: a phase's plot points and the bible's hook/leadBoardBlurb are recognizably aligned
 
 ### Phase S-C — amendments on failure [~1-2h]
 - `appendAmendment(saga, failedChain)` one-shot
@@ -427,7 +465,7 @@ Mirrors the existing prototype-phase structure in `QUEST_CHAINS.md` §12.
 
 ### Phase S-E — saga-tier follow-up [~1h]
 - After a completed saga, prompt the user "spawn follow-up?" → roll → if yes, generate a follow-up saga skeleton with prior epilogue as input
-- Acceptance: the follow-up saga's controllingIdea is recognizably evolved from the first
+- Acceptance: the follow-up saga's hook is recognizably evolved from the first (e.g., picks up a loose-thread character or unresolved consequence)
 
 ### Phase S-F — cross-check harness [~30min]
 - Implement validations 5-6 (§9) as logged warnings
@@ -463,16 +501,18 @@ The plan:
 
 1. Hand-write a `sagaSkeleton.ts` stub that does ONLY the genesis call and prints the raw AI response.
 2. Run it 3 times on the Mireford pool (2 regional, 1 unit-anchored on Tibalt Renn).
-3. For each output, manually grade:
-   - Does the body have 3-4 concrete paragraphs with physical images at the end?
-   - Does `finalImageTarget` actually describe a SHOT, not a concept?
-   - Are pinned cast IDs all in the pool?
-   - Is the antagonist plan something the antagonist would do without prompting?
-   - Could chain-genesis convincingly deliver phase 1 from this skeleton?
+3. For each output, manually grade as a **player**, not as a schema-validator:
+   - Does the hook promise a real dramatic payoff (e.g., "the abused orphan eats with royalty")?
+   - Does every `pinnedCast` entry have a charmHook that makes the character feel alive (behavioral specific, not adjectives)?
+   - Are all `characterId`s present in the pool?
+   - Could a chain-writer-room convincingly hit phase 1's plot points with one chain?
+   - Does the last plot point of each phase justify that phase's engine-fixed reward?
 4. If 2/3 pass, proceed to Phase S-B. If ≤1/3, iterate prompt and retry.
-5. Document grade results in `files/saga_playtest_iter1.md`.
+5. Document grade results in `files/saga_playtest_iterN.md`.
 
-This catches AI drift BEFORE we build the chain-from-saga plumbing on top of an unstable foundation.
+**Iter 1 result (2026-05-30):** v1 schema passed validators 3/3 but failed quality-grade on first read (`controllingIdea` moralized, `finalImageTarget` was indistinguishable from the body's last sentence, antagonist felt like a plot device). Pivoted to Cinderella shape (§2.1). Iter 2 (`files/saga_playtest_iter2_cinderella.md`) passed 3/3 with character-alive charmHooks.
+
+This protocol catches AI drift BEFORE we build the chain-from-saga plumbing on top of an unstable foundation — but only when the human grader reads as a player, not as a schema linter.
 
 ---
 

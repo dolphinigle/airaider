@@ -134,7 +134,6 @@ function printBible(bible: Bible): void {
   console.log(`\n[LEAD BOARD — what the player sees first]:\n  ${bible.leadBoardBlurb}`);
   console.log(`\n[BEAT 1 onramp (writer's note)]:\n  ${bible.firstBeatOnramp}`);
   console.log(`\n--- writers'-room internal (don't reveal in beat 1) ---`);
-  console.log(`controllingIdea: ${bible.controllingIdea}`);
   console.log(`surface (regional gossip): ${bible.surfaceSituation}`);
   console.log(`hidden: ${bible.hiddenSituation}`);
   console.log(`trajectory: ${bible.trajectory}`);

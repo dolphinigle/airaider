@@ -38,18 +38,18 @@ function setupPool(): CharacterPool {
 
 function pretty(skel: SagaSkeleton): string {
   const lines: string[] = [];
-  lines.push(`workingTitle: "${skel.workingTitle}"`);
-  lines.push(`controllingIdea: ${skel.controllingIdea}`);
-  lines.push(`antagonistPlan: ${skel.antagonistPlan}`);
-  lines.push(`finalImageTarget: ${skel.finalImageTarget}`);
-  lines.push(`pinnedCastIds: ${skel.pinnedCastIds.join(', ')}`);
-  lines.push(``, `body:`);
-  skel.body.forEach((p, i) => lines.push(`  ¶${i + 1}: ${p}`));
-  lines.push(``, `phases:`);
+  lines.push(`workingTitle: ${skel.workingTitle ? `"${skel.workingTitle}"` : '(none)'}`);
+  lines.push(`HOOK: ${skel.hook}`);
+  lines.push(``, `PINNED CAST:`);
+  skel.pinnedCast.forEach((c) => {
+    lines.push(`  ${c.characterId}`);
+    lines.push(`    sagaRole: ${c.sagaRole}`);
+    lines.push(`    charmHook: ${c.charmHook}`);
+  });
+  lines.push(``, `PHASES (each = one chain):`);
   skel.phases.forEach((p, i) => {
     lines.push(`  phase ${i + 1}:`);
-    lines.push(`    intent: ${p.intent}`);
-    lines.push(`    delivery: ${p.deliveryHint}`);
+    p.plotPoints.forEach((pt, j) => lines.push(`    ${j + 1}. ${pt}`));
   });
   return lines.join('\n');
 }

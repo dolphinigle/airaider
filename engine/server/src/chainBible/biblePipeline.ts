@@ -44,7 +44,6 @@ const CastEntry = z.discriminatedUnion('kind', [CastExisting, CastNew]);
 export const BibleSchema = z.object({
   title: z.string().min(2).max(80),
   shape: z.enum(['tight', 'classic', 'ensemble', 'twist-heavy']),
-  controllingIdea: z.string().min(10),
   leadBoardBlurb: z.string().min(20),
   firstBeatOnramp: z.string().min(20),
   cast: z.array(CastEntry).min(2).max(6),
@@ -118,7 +117,7 @@ CRAFT REQUIREMENTS (compact, in JSON):
     "ensemble"     — 4-6 cast, 3-5 plants, has dramaticIrony, fuller hiddenSituation. Political/multi-faction.
     "twist-heavy"  — 2-3 cast, 4-6 plants, dramaticIrony is centerpiece (2-3 sentences naming when each side learns). Revelations.
   Engine guidance: common tends tight, legendary tends ensemble/twist. Situation overrides rarity.
-- controllingIdea: one sentence stating what the chain ARGUES (a moral claim, not a plot).
+- controllingIdea: DELETED FIELD. Do NOT output this. The bible focuses on characters + situation + trajectory; do not write a moralizing thesis statement.
 - leadBoardBlurb: 1-2 sentences shown to the player on the LEAD BOARD when this chain first appears, BEFORE they have ever met the cast. CRITICAL: the player at this point is sitting in their fort and knows NOTHING about the situation. Do NOT use cast member proper nouns the player has not encountered (check the FORT ROSTER + REGION SAMPLE: any character there is "known" only by reputation if their role is mercenary or landmark; npcs/captives are NOT known). Use concrete physical anchors: a body, a sealed letter, a runaway, a missing barge, a payment overdue, a banner outside the gate. The blurb tells the player WHY they would deploy.
 - firstBeatOnramp: 1-2 sentences of stage-direction for the writer of beat 1 — "this is how the party arrives at the situation from cold". Anchors the first beat in the leadBoardBlurb (don't drop the player mid-scene with named characters they've never met). Example: "the party rides out to Greyford Reach to look at the body the bargeman described; they meet Drust there, working a barge, and don't yet know his name."
 - cast: 2-6 with roleInChain (protagonist | antagonist | complication | ally). Cast SIZE matches shape. For each, EITHER:

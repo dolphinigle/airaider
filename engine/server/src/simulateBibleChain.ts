@@ -146,7 +146,6 @@ async function runOne(seed: Seed): Promise<RunResult> {
     anchorMerc: seed.anchorMerc,
   });
   console.log(`  bible title: "${bible.title}"`);
-  console.log(`  controlling idea: ${bible.controllingIdea}`);
 
   // Beat bounds by rarity — keep tight; AI should climax earlier when story is ready.
   // The bounds are HARD safety rails, not targets. Beat prompt says so explicitly.
@@ -228,7 +227,6 @@ function renderEditorView(r: RunResult): string {
   lines.push(`Title: ${r.bible.title}`);
   lines.push(`Region: ${r.bible.region}    Rarity: ${r.bible.rarity}`);
   lines.push(`Reward spec: ${r.bible.rewardSpec}`);
-  lines.push(`Controlling idea: ${r.bible.controllingIdea}`);
   lines.push(``);
   lines.push(`Cast:`);
   for (const c of r.bible.cast) {
