@@ -270,7 +270,37 @@ You are writing CHAIN N of a saga of M total chains.
 
 That last rule matters: if chain 2 failed unexpectedly (say, the antagonist died early when the skeleton expected them in chain 4), the writer-room must adapt. The amendment system (§3.3) usually patches this, but the rule is a safety net.
 
-### 3.3 Skeleton mutation on chain failure
+### 3.3 Saga ↔ chain player-agency contract (added 2026-06-XX, post bible iter-D)
+
+The chain bible (post iter-D, commit `690b0a0`) now exposes:
+- `openQuestion` — the central uncertainty the player resolves via deployed mercs
+- `mercObservations` — what mercs report back over the chain's beats (the reveal mechanism)
+- `playerDecisions` — explicit branch moments with stated options
+- `trajectory` — branching outline that ends with the engine reward firing on the player's chosen path
+
+The saga skeleton speaks in **per-phase plotPoints**. The chain genesis call must TRANSLATE each phase's plotPoints into the chain's mercObservations + playerDecisions + trajectory, NOT just narrate them as inevitable events. The contract:
+
+| Saga side (writers' room) | Chain side (delivered to player) |
+|---|---|
+| `phases[N].plotPoints[K]` = "Marek's brother surfaces at Coldfen" | `mercObservations` includes "merc reports the bandit leader has Marek's scar" |
+| `phases[N].plotPoints[last]` = lands engine reward | `trajectory` ends with the reward fire AFTER the player's decision tree resolves |
+| `pinnedCast[i].charmHook` for cast appearing in this phase | bible.cast for that character carries the same voice |
+| `amendments[]` (from failed prior chains) | bible.hiddenSituation + trajectory must reflect them |
+
+**Prompt-rule added to chain genesis (saga mode):**
+```
+The saga's phase N plot points are the DESTINATION. The PLAYER's actions
+across mercObservations + playerDecisions are the PATH. Translate each plot
+point into either (a) a thing a merc could report back, or (b) a stated
+player decision that BRANCHES toward landing the plot point. Never write
+plot points as fait accompli — the player must drive each one.
+```
+
+**Validation (observational, logged):** post-chain, for each `phases[N].plotPoints[K]`, the engine checks that at least one `mercObservations` entry OR one `playerDecisions` branch outcome references it. Drift logged, not blocked.
+
+This is the missing link between "the saga has a plan" and "the player has agency". Without it, sagas slide back into watch-mode storytelling.
+
+### 3.4 Skeleton mutation on chain failure
 
 When a chain in a saga ends with `status='failed'` or has a `partial-loss` outcome at the climax beat, the engine spawns **one tiny AI call** to write an amendment:
 
@@ -292,7 +322,7 @@ The engine appends to `saga.amendments`. The next chain's genesis prompt include
 
 If the **same phase** fails twice, the engine MAY allow a third try OR mark the saga `failed`. Decision: prototype caps at 1 retry per phase. (Configurable later.)
 
-### 3.4 Saga epilogue (1 call, on saga close)
+### 3.5 Saga epilogue (1 call, on saga close)
 
 Same shape as chain epilogue (`QUEST_CHAINS.md` §5.4 / §18.4) but takes the whole saga as input. Returns a 4-6 sentence saga-level coda + a one-line "what the world remembers about this".
 
@@ -440,11 +470,11 @@ Validations 1-4 are blocking (retry). Validations 5-6 are observational (log to 
 
 Mirrors the existing prototype-phase structure in `QUEST_CHAINS.md` §12.
 
-### Phase S-A — saga skeleton MVP [~2-3h]
-- `engine/server/src/chainBible/sagaSkeleton.ts`: schema + genesis call + zod validation
-- `engine/server/src/chainBible/sagaTypes.ts`: Saga, SagaPhase, SagaSkeleton, SkeletonAmendment
-- New `sagaRunner.ts` CLI: pick pool → generate one skeleton → print → exit
-- Acceptance: 3 hand-runs on the Mireford pool produce valid, coherent skeletons
+### Phase S-A — saga skeleton MVP [~2-3h] **DONE** (commits `940609b`, `8ba97fd`)
+- `engine/server/src/chainBible/sagaSkeleton.ts`: Cinderella-shape schema (hook + pinnedCast w/ charmHooks + per-phase plotPoints), genesis call, zod validation, density rule, clinical voice rule
+- `engine/server/src/chainBible/sagaSkeletonRunner.ts`: 3-spec cross-check (regional rare, regional uncommon, unit rare on Tibalt)
+- Result: 3/3 pass at ~$0.005 per skeleton; each charmHook is a behavioral specific, each plot point is bullet-density not prose
+- Saga types still inline in sagaSkeleton.ts; promote to sagaTypes.ts when S-B wires the saga object
 
 ### Phase S-B — chain-from-saga genesis [~2-3h]
 - Extend `biblePipeline.ts` `generateBible(req)` to accept optional `sagaContext`
