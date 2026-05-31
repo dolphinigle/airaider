@@ -178,8 +178,10 @@ export function blurbMentionsAnchor(
 }
 
 /** Build a compact prompt-friendly digest of the chain so far. Used by
- *  step-blurb prompt to keep token cost bounded (skeleton goes in epilogue
- *  prompt only). Pass priorHooks to enable anti-repetition guard. */
+ *  step-blurb prompt. Now that the skeleton is the AUTHORED FULL STORY
+ *  (not a 4-paragraph outline), it goes into the digest too — that's the
+ *  whole point of the story-first design. Step-blurb tier is mini, so
+ *  the input-token cost increase is negligible (~\$0.001/chain). */
 export function chainDigest(chain: QuestChain, priorHooks: readonly string[] = []): string {
   const beatsSoFar = chain.stepBeats
     .slice(0, chain.currentStepIdx + 1)
@@ -199,6 +201,7 @@ export function chainDigest(chain: QuestChain, priorHooks: readonly string[] = [
     `antagonist: ${chain.anchors.antagonistFaction}`,
     `places: ${chain.anchors.recurringPlaces.join(', ')}`,
     `region: ${chain.region}`,
+    `\nFULL HIDDEN STORY (this is the authored short story this arc dramatises — your blurb must reflect a concrete moment FROM this story, not invent new events):\n${chain.skeleton}\n`,
     `beats so far:\n${beatsSoFar}`,
     priorSummaries ? `prior step outcomes:\n${priorSummaries}` : 'no prior outcomes (this is step 0)',
     priorHooksBlock,

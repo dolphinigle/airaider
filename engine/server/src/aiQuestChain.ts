@@ -21,43 +21,59 @@ import {
 } from '../../../prototype/src/questChain.js';
 import { REGIONS, type LeadRarity } from '../../../prototype/src/leads.js';
 
-const GENESIS_SYSTEM = `You are the saga-keeper for a grimdark mercenary-fort game. You author hidden 3-4 paragraph story SKELETONS that downstream prompts will draw on to keep multi-step arcs coherent.
+// Two-stage genesis (per-user direction 2026-05-31): the AI first writes
+// a fully-readable short story (real narrative prose with scenes and
+// dialogue), THEN a second cheap extraction call pulls out the engine
+// metadata (title, hook, anchors, step beats) from that story.
+// Why: prompting for a "P1 setup / P2 escalation" outline produces plot
+// summaries, not stories. Asking for a story produces a story; the engine
+// then derives quests from it. The story document is stored as the
+// chain's "skeleton" and seeds every downstream step + epilogue prompt.
 
-Voice: terse, mortal, mud-and-blood, low-medieval, no glory, no high-fantasy. Names feel pan-european (Germanic/Celtic/Slavic). Avoid the words "common/uncommon/rare/legendary/mythic/epic/heroic/glorious/destined".
+const GENESIS_STORY_SYSTEM = `You are a short-fiction writer for a grimdark mercenary-fort game. You write a complete, fully-readable short story (650–1100 words) about a single character whose ordeal will become a 3–5 quest arc that mercenaries can hire on to.
 
-BANNED PHRASES (fantasy-novel cliché — do not use):
-"nefarious schemes", "pulls the strings", "puppets of", "tightening their grip",
-"shadows of", "fate hangs in the balance", "darkness descends", "ancient evil",
-"the prize", "the target", "the spoils", "coin and blood", "promises coin",
-"twisted ambition", "weight of the past", "ghosts of the past".
+Your job is NOT to outline a plot. Your job is to WRITE A STORY a reader could enjoy on its own — scenes, sensory grounding, dialogue, real character interiority, a beginning that pulls them in, a middle that turns, an ending that lands. The reader should care about the protagonist by the time they finish. Treat this like a Dorothy Dunnett or Joe Abercrombie cold-open vignette: low-medieval, mortal, terse-but-not-stingy, mud-and-blood without melodrama.
 
-CONCRETE SPECIFICITY RULES:
-- The TITLE must contain a CONCRETE proper noun (a person's name, a place name, a named object). AVOID title patterns like "The Weight of X", "The Hollow's X", "Whispers of X", "Shadows over X" — these are cliché frames. Prefer specific: "Elara's Truce", "The St. Hadric Reliquary", "Black Talons at the Sunken Bridge".
-- The HOOK must NAME the centralNpc AND the specific inciting thing in ONE sentence. Generic abstractions are a failure.
-  BAD: "A soldier's past haunts him in the shadows of Blackmoor."
-  BAD: "An old soldier seeks aid against a brutal clan."
-  BAD: "A weary soldier seeks redemption amidst the mire."
-  GOOD: "Marek's old regiment was hanged at Greyford. The Grey Crawlers have begun asking who survived."
-  GOOD: "Elenora's brooch turned up on a Grim Wolves raider — Alaric wants to know who else from the homestead is still alive."
-- The centralNpc is a person — first name + last name OR first name + ONE epithet ONLY if truly defining. "Jorik" or "Mara Loth" beat "the Brawny Champion".
-- antagonistFaction must be a NAMED group, not a generic role. "the Iron Witnesses" or "the Crow's Ford magistracy" — not "a local gang" or "the cult".
-- recurringPlaces: 2-4 SPECIFIC named locations — a named tavern, a ruined chapel, a sunken bridge. Not "the forest" or "the city". AVOID self-referential filler like "Hollow's Hollow".
-- SETTING PALETTE: do NOT default to fog/mud/marsh/ruined-chapel/tavern every chain. The world also contains: cathedral cloisters, salt-flats, ironworks, mountain passes, grain barges, monastic gardens, river-fords, ducal salons, smugglers' coves, frozen lakes, burned orchards, abbey libraries, tannery yards, plague-pits, mason-camps, vineyards, copper mines. Pick a palette that FITS the region — Mireford ≠ Highholt ≠ Riverwynd ≠ Coldwater Coast. Re-using fog and mud across every chain is a failure.
+CRAFT REQUIREMENTS:
+- Dialogue. At least 3 short exchanges of real spoken English (in quotes), each by a NAMED speaker. Voices should be distinguishable (a steward speaks differently from a smuggler; a cleric differently from either).
+- Scenes, not summary. Show the protagonist DOING things in PLACES, with sensory anchors (a door that swells in the rain; the way the courier's hands shake before he runs). Avoid "Then she went and did X" stitching narration.
+- Time. Span 1 to 4 days, not weeks. Every scene should happen on a knowable day or hour.
+- A real moral fork in the second half — a choice the protagonist agonises over, where both options cost. Do not resolve it abstractly; let them choose, in scene, with specific costs.
+- An ending that lands a single concrete image or line that the reader will remember. Not a moral, not a recap.
+- Grounded fantasy. No magic systems, no prophecy, no mythic creatures unless the chain rarity is "legendary" (and even then: at most one numinous element, off-stage). The world is grim and ordinary; what makes it dramatic is the people.
+- Period voice. Names feel pan-european (Germanic/Celtic/Slavic). Vocabulary stays low-medieval. No "glorious", "destined", "ancient evil", "shadows of", "fate hangs in the balance", "weight of the past", "ghosts of the past", "tightening their grip".
+- Setting palette must FIT the supplied region and not default to fog/mud/marsh/ruined-chapel/tavern. The world also contains: cathedral cloisters, salt-flats, ironworks, mountain passes, grain barges, monastic gardens, river-fords, ducal salons, smugglers' coves, frozen lakes, burned orchards, abbey libraries, tannery yards, plague-pits, mason-camps, vineyards, copper mines.
 
-STRUCTURE OF A SKELETON (3-4 paragraphs total):
-  P1 — SETUP: a small, grounded hook in the region tied to a CONCRETE object/event/grudge.
-  P2 — ESCALATION: the thing turns out to matter; a second party / faction reveals itself.
-  P3 — PIVOT: the central choice, complication, or sacrifice. Force a real fork.
-  P4 — CLIMAX: a high-stakes resolution that allows both a crit-success ending and a tragic-failure ending to read as authored.
+CHARACTER REQUIREMENTS:
+- One protagonist with a first name + last name (or first name + a single defining epithet only if truly distinctive).
+- A named antagonist (an individual leader OR a named faction with a named leader).
+- 2–4 named places the story returns to.
+- The protagonist must have at least ONE specific habit, physical detail, or memory the reader can hold ("she counts door locks before she sleeps"; "his left thumb is missing the nail from a winter at Greyford"). This is NOT optional. Generic emotional shorthand ("burdened by the past") is a failure.
+- If the seed names a specific mercenary (anchorMerc) or an inciting incident (seedLeadBlurb), the story MUST integrate them: the protagonist either IS the anchor mercenary or is in their orbit; the inciting incident is on the page in scene, not paraphrased.
 
-You MUST also produce:
-  - centralNpc: the single name (with optional ONE epithet) who anchors the arc
-  - antagonistFaction: a named faction or notable individual antagonist
-  - recurringPlaces: 2-4 named, specific places the arc returns to
-  - stepBeats: one one-sentence beat per step, in order. Each beat must reference at least one CONCRETE noun (a place, a person, an object). The step count is supplied; obey it exactly.
-  - mustMentionByStep: per-step list of specific anchor names/objects this step MUST mention. Step 0 may be empty; later steps should reference at least one anchor that grounds the continuity.
+STORY SHAPE:
+- An opening scene that drops the reader into a moment of trouble or unease. Do NOT open with weather/light/atmosphere ("As the fog crept in across the marshes…"). Open with a person doing or saying something specific.
+- 3 to 6 numbered scenes is fine, but DO NOT label them "P1 / SETUP / Act I / Chapter 1" etc. Just write the story.
+- A turn at roughly the midpoint where the situation reveals it is worse or different than the protagonist thought.
+- A second-half choice the protagonist makes in scene with named, specific stakes for both branches.
+- A final scene that is concrete and short. Then stop.
+
+Write nothing else — no commentary, no headings, no "STORY:" prefix. Just the story text.
 
 ${VOCAB_BLOCK}`;
+
+const GENESIS_EXTRACT_SYSTEM = `You are an editor extracting structured metadata from a short story you have just been handed. The metadata will drive a video-game quest chain that mercenaries can hire on to. Your output is consumed by code; format MUST be exactly correct JSON.
+
+Read the story carefully, then return:
+- title: 4–10 words. Must contain a concrete proper noun from the story (a name, place, or object). Avoid cliché patterns like "The Weight of X", "Whispers of X", "Shadows over X".
+- hook: ONE sentence (max 240 chars) that names the protagonist AND the inciting thing in concrete terms. This is the public lead-board blurb — the thing a player decides to pursue. Do NOT spoil the second half.
+- centralNpc: the protagonist's name as it appears in the story (first name + last name preferred).
+- antagonistFaction: the named antagonist faction OR a named individual antagonist.
+- recurringPlaces: 2–4 named places that recur in the story (the most concrete ones — taverns, halls, bridges, gates, scriptoriums by name).
+- stepBeats: an array of EXACTLY \${stepCount} entries, each ONE sentence describing what happens in that step of a player playthrough that walks the player through the major events of the story. The first beat is the inciting incident; the last is the climax. Beats must be in the order of the story. Each beat names at least one specific thing from the story (a person, place, or object).
+- mustMentionByStep: an array of \${stepCount} arrays of strings — anchor names (NPCs, places, objects) the lead blurb for that step MUST mention to keep continuity. Step 0 may be empty; later steps should each list 1–2 anchors that ground the scene.
+
+Return JSON only.`;
 
 const GenesisOutSchema = z.object({
   title: z.string().min(1).max(80),
@@ -156,108 +172,142 @@ export interface GenesisOutput {
   stepBeats: string[];
 }
 
-/** Author a hidden skeleton + per-step beats. Throws on parse failure
- *  (caller falls back to a template chain so the game keeps running). */
+/** Author a hidden full short story + extracted per-step beats.
+ *  Two-stage: (1) write a real readable story, (2) extract structure
+ *  from it. The story text becomes the chain's "skeleton" and seeds
+ *  every downstream prompt (step blurbs + epilogue). Throws on parse
+ *  failure (caller falls back to a template chain so the game keeps
+ *  running). */
 export async function generateChainGenesis(input: GenesisInput): Promise<GenesisOutput> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error('no OPENAI_API_KEY — chain genesis requires AI');
   const stepCount = plannedStepCount(input.chainRarity);
 
-  const userParts: string[] = [
-    `Author a new quest-chain skeleton (HIDDEN from the player).`,
+  // ---- stage 1: write the short story ----
+  const storyUserParts: string[] = [
+    `Write a complete short story (650–1100 words) for a quest arc.`,
     `Region: ${input.region}.`,
-    `Chain rarity (climax tier): ${input.chainRarity}.`,
-    `Required step count: ${stepCount}. stepBeats array MUST have exactly ${stepCount} entries.`,
-    `Seed reason: ${input.seedReason}.`,
+    `Climax tier (rarity feel): ${input.chainRarity} — ${input.chainRarity === 'legendary' ? 'mythic stakes (a duchy, an oath that binds a year, a relic with a real history)' : input.chainRarity === 'rare' ? 'noble / abbey / cursed-relic stakes' : input.chainRarity === 'uncommon' ? 'town and trade stakes' : 'village stakes'}.`,
+    `The arc will be split into ${stepCount} quest beats by an editor; write the story so a 4-beat arc emerges naturally.`,
   ];
   if (input.themeTagLabels.length > 0) {
-    userParts.push(`Theme tags to honour: ${input.themeTagLabels.join(', ')}.`);
+    storyUserParts.push(`Theme keywords: ${input.themeTagLabels.join(', ')}.`);
   }
   if (input.anchorMerc) {
-    userParts.push(`UNIT CHAIN — this arc belongs to one mercenary:`);
-    userParts.push(`  Anchor: ${input.anchorMerc.name}`);
-    userParts.push(`  Tags: ${input.anchorMerc.tagLabels.join(', ')}`);
-    if (input.anchorMerc.backstory) userParts.push(`  Backstory: ${input.anchorMerc.backstory}`);
-    userParts.push(`The arc must turn on THIS mercenary's identity — their tags, past, name. They appear in every step.`);
+    storyUserParts.push(`PROTAGONIST IS A SPECIFIC MERCENARY:`);
+    storyUserParts.push(`  Name: ${input.anchorMerc.name}`);
+    storyUserParts.push(`  Tags: ${input.anchorMerc.tagLabels.join(', ')}`);
+    if (input.anchorMerc.backstory) storyUserParts.push(`  Backstory: ${input.anchorMerc.backstory}`);
+    storyUserParts.push(`Use this person — name, tags, backstory — as the protagonist. The story must turn on something specific to them.`);
   }
   if (input.seedLeadBlurb) {
-    userParts.push(`INCITING INCIDENT (the player already pursued and resolved this): "${input.seedLeadBlurb}". The skeleton picks up AFTER this — step 0 is the first NEW lead, not a repeat.`);
+    storyUserParts.push(`The story's opening situation is set up by this prior incident the player already pursued: "${input.seedLeadBlurb}". Have the consequences of that incident be the story's inciting moment, dramatised in scene.`);
   }
   if (input.priorEpilogue) {
-    userParts.push(`This is a SEQUEL. The prior chain ended with: "${input.priorEpilogue}". Build on those consequences.`);
+    storyUserParts.push(`This is a SEQUEL. The previous arc ended with: "${input.priorEpilogue}". The story should pick up from those consequences — name people/places/wounds inherited from that ending.`);
   }
   if (input.inheritFromPrior) {
     const ip = input.inheritFromPrior;
     const parts: string[] = [];
-    if (ip.centralNpc) parts.push(`centralNpc MUST be EXACTLY "${ip.centralNpc}" (do NOT bolt prior-antagonist names or any other word onto this name — use it verbatim as the single anchor of the new arc)`);
-    if (ip.antagonistFaction) parts.push(`antagonistFaction SHOULD inherit "${ip.antagonistFaction}" unless the prior chain definitively destroyed them — in that case coin a NEW faction that fills the vacuum`);
-    if (ip.places && ip.places.length) parts.push(`recurringPlaces MAY include up to 1-2 of the prior places (${ip.places.join(', ')}) for continuity, but add at least 1-2 fresh named places`);
-    if (parts.length) {
-      userParts.push(`SEQUEL INHERITANCE RULES:\n- ${parts.join('\n- ')}`);
-    }
+    if (ip.centralNpc) parts.push(`Protagonist MUST be EXACTLY "${ip.centralNpc}" — use this name verbatim.`);
+    if (ip.antagonistFaction) parts.push(`Antagonist faction SHOULD inherit "${ip.antagonistFaction}" unless the prior arc destroyed them — in that case the story coins a new faction filling the vacuum.`);
+    if (ip.places && ip.places.length) parts.push(`Places: 1-2 of these may recur — ${ip.places.join(', ')} — but the story should also use 1-2 fresh named locations.`);
+    if (parts.length) storyUserParts.push(`SEQUEL INHERITANCE:\n- ${parts.join('\n- ')}`);
   }
   if (input.avoidNames) {
     const av = input.avoidNames;
     const parts: string[] = [];
-    if (av.centralNpcs.length) parts.push(`central NPCs already in use: ${av.centralNpcs.join(', ')}`);
-    if (av.antagonists.length) parts.push(`antagonist factions already in use: ${av.antagonists.join(', ')}`);
-    if (av.places.length) parts.push(`places already heavily used: ${av.places.join(', ')}`);
+    if (av.centralNpcs.length) parts.push(`protagonists already in use: ${av.centralNpcs.join(', ')}`);
+    if (av.antagonists.length) parts.push(`antagonist factions in use: ${av.antagonists.join(', ')}`);
+    if (av.places.length) parts.push(`places heavily used: ${av.places.join(', ')}`);
     if (parts.length) {
-      userParts.push(
-        `DIVERSITY: other active sagas in the world already use — ${parts.join('; ')}. ` +
-        `DO NOT reuse any of these names for centralNpc, antagonistFaction, or recurringPlaces. Coin fresh ones. ` +
-        `(A sequel that explicitly inherits prior names is allowed only if a priorEpilogue is given.)`,
+      storyUserParts.push(
+        `DIVERSITY: other active stories in the world use — ${parts.join('; ')}. ` +
+        `Do NOT reuse any of these names for the protagonist, antagonist, or recurring places.`,
       );
     }
   }
-  userParts.push(
-    '',
-    'Return JSON ONLY of shape:',
-    '{',
-    '  "title": "2-5 word saga title",',
-    '  "hook": "1 sentence shown to player (no spoilers)",',
-    '  "skeleton": "3-4 paragraph hidden outline, ~300-500 words",',
-    '  "anchors": {',
-    '    "centralNpc": "Name Epithet",',
-    '    "antagonistFaction": "name",',
-    '    "recurringPlaces": ["place1","place2","place3"],',
-    `    "mustMentionByStep": ${JSON.stringify(Array.from({ length: stepCount }, () => []))}`,
-    '  },',
-    `  "stepBeats": [${Array.from({ length: stepCount }, (_, i) => `"step ${i} beat"`).join(',')}]`,
-    '}',
-  );
+  storyUserParts.push(``, `Write the story now. Output the story text only — no headings, no commentary.`);
 
-  const sys = GENESIS_SYSTEM;
-  const usr = userParts.join('\n');
+  const storyUsr = storyUserParts.join('\n');
   const m = genesisModel();
-  const startedAt = Date.now();
-  const resp = await getClient(apiKey).chat.completions.create(
+  const startedAtStory = Date.now();
+  const storyResp = await getClient(apiKey).chat.completions.create(
     chatParams({
       model: m,
-      temperature: 0.85,
-      maxTokens: 1200,
-      responseFormat: { type: 'json_object' },
+      temperature: 0.95,
+      maxTokens: 2000,
       messages: [
-        { role: 'system', content: sys },
-        { role: 'user', content: usr },
+        { role: 'system', content: GENESIS_STORY_SYSTEM },
+        { role: 'user', content: storyUsr },
       ],
     }),
   );
-  const content = resp.choices[0]?.message?.content ?? '{}';
+  const storyText = (storyResp.choices[0]?.message?.content ?? '').trim();
   pushLLMLog({
     ts: Date.now(),
-    kind: 'chain-genesis',
+    kind: 'chain-genesis-story',
     model: m,
-    systemPrompt: sys,
-    userPrompt: usr,
-    response: content,
-    label: `genesis ${input.chainRarity} ${input.region}`,
-    elapsedMs: Date.now() - startedAt,
-    promptTokens: resp.usage?.prompt_tokens,
-    completionTokens: resp.usage?.completion_tokens,
-    cachedPromptTokens: resp.usage?.prompt_tokens_details?.cached_tokens ?? 0,
+    systemPrompt: GENESIS_STORY_SYSTEM,
+    userPrompt: storyUsr,
+    response: storyText,
+    label: `genesis-story ${input.chainRarity} ${input.region}`,
+    elapsedMs: Date.now() - startedAtStory,
+    promptTokens: storyResp.usage?.prompt_tokens,
+    completionTokens: storyResp.usage?.completion_tokens,
+    cachedPromptTokens: storyResp.usage?.prompt_tokens_details?.cached_tokens ?? 0,
   });
-  const raw = JSON.parse(content);
+  if (storyText.length < 200) {
+    throw new Error(`genesis-story output too short (${storyText.length} chars) — likely truncation`);
+  }
+
+  // ---- stage 2: extract metadata from the story ----
+  const extractSys = GENESIS_EXTRACT_SYSTEM.replace(/\$\{stepCount\}/g, String(stepCount));
+  const extractUsr = [
+    `STORY:`,
+    storyText,
+    ``,
+    `Required step count: ${stepCount}. stepBeats and mustMentionByStep MUST each have exactly ${stepCount} entries.`,
+    `Region context: ${input.region}.`,
+    ``,
+    `Return JSON ONLY of shape:`,
+    `{`,
+    `  "title": "...",`,
+    `  "hook": "...",`,
+    `  "anchors": { "centralNpc":"...", "antagonistFaction":"...", "recurringPlaces":["..."], "mustMentionByStep": ${JSON.stringify(Array.from({ length: stepCount }, () => []))} },`,
+    `  "stepBeats": [${Array.from({ length: stepCount }, (_, i) => `"step ${i} beat"`).join(',')}]`,
+    `}`,
+  ].join('\n');
+
+  const startedAtExtract = Date.now();
+  const extractResp = await getClient(apiKey).chat.completions.create(
+    chatParams({
+      // Use the cheaper step-blurb model for extraction — it's mechanical.
+      model: stepBlurbModel(),
+      temperature: 0.3,
+      maxTokens: 800,
+      responseFormat: { type: 'json_object' },
+      messages: [
+        { role: 'system', content: extractSys },
+        { role: 'user', content: extractUsr },
+      ],
+    }),
+  );
+  const extractContent = extractResp.choices[0]?.message?.content ?? '{}';
+  pushLLMLog({
+    ts: Date.now(),
+    kind: 'chain-genesis-extract',
+    model: stepBlurbModel(),
+    systemPrompt: extractSys,
+    userPrompt: extractUsr,
+    response: extractContent,
+    label: `genesis-extract ${input.chainRarity} ${input.region}`,
+    elapsedMs: Date.now() - startedAtExtract,
+    promptTokens: extractResp.usage?.prompt_tokens,
+    completionTokens: extractResp.usage?.completion_tokens,
+    cachedPromptTokens: extractResp.usage?.prompt_tokens_details?.cached_tokens ?? 0,
+  });
+  const raw = JSON.parse(extractContent);
   // Be lenient about stepBeats length: clip or pad if AI miscounts.
   if (Array.isArray(raw.stepBeats)) {
     if (raw.stepBeats.length > stepCount) raw.stepBeats = raw.stepBeats.slice(0, stepCount);
@@ -270,8 +320,11 @@ export async function generateChainGenesis(input: GenesisInput): Promise<Genesis
       raw.anchors.mustMentionByStep = Array.from({ length: stepCount }, () => []);
     }
   }
+  // The "skeleton" field carries the full story now — this is what
+  // every downstream prompt uses for context.
+  raw.skeleton = storyText;
   const parsed = GenesisOutSchema.parse(raw);
-  warnIfClicheLeak(`genesis "${parsed.title}"`, [parsed.hook, parsed.skeleton, ...parsed.stepBeats]);
+  warnIfClicheLeak(`genesis "${parsed.title}"`, [parsed.hook, ...parsed.stepBeats]);
   return parsed;
 }
 
@@ -305,6 +358,7 @@ const STEP_BLURB_SYSTEM = `You are the lead-board writer for a grimdark mercenar
 A hook must:
 - Reference the chain's centralNpc, antagonistFaction, OR one of the recurringPlaces — by name. This is REQUIRED. Drift is a bug.
 - Hit the beat supplied for this step.
+- DRAW FROM THE FULL HIDDEN STORY supplied in the digest — pick ONE specific moment from that story for this step. Do NOT invent events that aren't in the story. The story is the source of truth; your job is to surface the right beat from it as a player-facing one-line hook.
 - Match the chain's region.
 - Match the engine-supplied rarity feel (common = village stakes; uncommon = town/trade; rare = noble/abbey/cursed; legendary = mythic).
 - Be ONE specific sentence (or one sentence + ONE short dialogue/overheard fragment). No generic placeholders (no "the prize/the target/the goods/the spoils").
@@ -416,7 +470,7 @@ export async function generateChainStepBlurb(input: StepBlurbInput): Promise<str
 
 // ---------- epilogue ----------
 
-const EPILOGUE_SYSTEM = `You are the saga-keeper. The arc has ended. Write a 2-4 sentence EPILOGUE that bookends the hidden skeleton AND folds in how the actual play went.
+const EPILOGUE_SYSTEM = `You are the saga-keeper. The arc has ended. You will be given the FULL AUTHORED SHORT STORY that this arc dramatises, plus the per-step outcomes from how it actually played. Write a 2-4 sentence EPILOGUE that bookends the story AND folds in how the play went.
 
 Voice: terse, mortal, mud-and-blood. Low-medieval. No glory. No high-fantasy.
 
@@ -483,7 +537,7 @@ export async function generateChainEpilogue(input: EpilogueInput): Promise<strin
     chatParams({
       model: m,
       temperature: 0.8,
-      maxTokens: 350,
+      maxTokens: 600,
       responseFormat: { type: 'json_object' },
       messages: [
         { role: 'system', content: EPILOGUE_SYSTEM },
