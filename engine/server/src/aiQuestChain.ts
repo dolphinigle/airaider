@@ -107,11 +107,15 @@ function model(envKey: string): string {
 }
 
 /** Narrative-tier default (genesis + epilogue) — story-quality experiments
- *  in EXPERIMENT_LOG.md showed gpt-4.1-mini is the sweet spot: ~7.5/10 craft
- *  vs gpt-4o-mini's 5.8/10, at only ~2.7× the cost. Premium upgrade path
- *  for legendary chains is AIRAIDER_LLM_NARRATIVE_MODEL=gpt-4.1 or gpt-5-mini. */
+ *  in EXPERIMENT_LOG.md showed gpt-5-mini's skeletons read as
+ *  shoot-from-this outlines (concrete moral forks, named NPCs, named
+ *  consequences) where 4.1-mini's read as fan-fiction-of-the-world.
+ *  At ~$0.017/chain it's the right default. Override via env if needed:
+ *    AIRAIDER_LLM_NARRATIVE_MODEL=gpt-4.1   (peak craft, ~$0.036/chain)
+ *    AIRAIDER_LLM_NARRATIVE_MODEL=gpt-4.1-mini (frugal, ~$0.007/chain)
+ *    AIRAIDER_LLM_NARRATIVE_MODEL=gpt-4o-mini  (cheapest, lower craft) */
 function narrativeModelDefault(): string {
-  return process.env.AIRAIDER_LLM_NARRATIVE_MODEL ?? process.env.AIRAIDER_LLM_MODEL ?? 'gpt-4.1-mini';
+  return process.env.AIRAIDER_LLM_NARRATIVE_MODEL ?? process.env.AIRAIDER_LLM_MODEL ?? 'gpt-5-mini';
 }
 
 function genesisModel(): string {
