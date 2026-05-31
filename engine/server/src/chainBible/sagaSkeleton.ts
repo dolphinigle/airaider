@@ -131,10 +131,29 @@ RULES:
 - All characterIds MUST exist in the pool block. NO INVENTED IDs.
 - Phase count MUST equal the engine's targetPhaseCount.
 
+VOICE — CLINICAL, NOT LITERARY:
+
+You are writing a writers'-room beat sheet, NOT prose. The chain-writers' room downstream is responsible for the LITERARY VOICE; you are responsible for the SCAFFOLD. State the WHAT, not the FEELING. No metaphors-of-meaning. No "the X lands where the Y once did". No "the chit is nailed to his palm like an accusation". Just the events and the character mechanics.
+
+LITERARY (BAD — voice belongs downstream):
+  "Marek finally locks the crooked harbour-master who let Tevin trade through his berth into the fort dungeon — and watches the fort's justice land where his failures once did."
+
+CLINICAL (GOOD — scaffold tier):
+  "Marek arrests harbour-master Jorun for letting Tevin couriers use his berth. PAYOFF: closes Marek's old failure to catch the previous ring."
+
+LITERARY (BAD):
+  "Dead barge captain on the Greyford jetty; Tevin chit nailed to his palm incites an inquest."
+
+CLINICAL (GOOD):
+  "Dead barge captain found at Greyford jetty. Sealed Tevin chit on body. Fort opens inquest."
+
+The charmHook is allowed slight wit because it describes a character mechanism ("believes praise cheapens survival, so withholds it"), but it must still state a MECHANISM, not paint a mood.
+
 DO NOT:
 - Write a "controllingIdea" or moralizing theme. The reader does not want a moral; they want CHARACTERS they're rooting for.
 - Write the saga as prose. Plot points are bullet outline.
 - Write antagonist plans as a separate field. Their plan IS the plot points; their humanity IS their charmHook.
+- Use literary voice in the hook or plot points. Save it for the chain-writers' room.
 
 BANNED TOKENS (in any field): weight, weighed, shadow, burden, ghosts, ancient evil, darkness descends.
 
