@@ -677,3 +677,17 @@ Benchmark in `engine/server/src/modelBenchmark.ts`: 5 models × 2 chains × gpt-
 **gpt-4.1 family is OBSOLETE.** Strictly worse than gpt-5 family on quality AND price for these tasks. Never use it. Same for gpt-4o-mini (which had schema failures in the benchmark).
 
 See `docs/AI_PROVIDER.md §4` for the full pricing table and the non-chain callsite mapping.
+
+### 18.13 Latency expectations (prototype playRunner)
+
+gpt-5-family models are reasoning models — every call has a hidden reasoning pass before the JSON output. Realistic wall-clock per call:
+
+| Stage | Model | Typical | Worst-case |
+|---|---|---|---|
+| Bible | gpt-5-mini | 20–60 s | up to 120 s for legendary/ensemble |
+| Beat | gpt-5-nano | 5–20 s | up to 40 s |
+| Epilogue | gpt-5-mini | 15–40 s | up to 80 s |
+
+**The runner is NOT hung when it sits at `[bible] generating...` for a minute.** `playRunner.ts` prints an elapsed-seconds spinner during each AI call so the user can tell the difference between "thinking" and "actually stuck". If the spinner's seconds counter is advancing, the call is in flight; if it's frozen >120s, the network probably did stall — Ctrl-C and retry.
+
+Consequence for production UX: bible generation should be backgrounded with a visible "Showrunner is drafting…" affordance. Players should never be staring at a frozen UI for >5 s without movement. Per-beat is fast enough to be inline; bible+epilogue are not.
