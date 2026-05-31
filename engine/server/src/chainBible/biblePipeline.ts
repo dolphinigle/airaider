@@ -160,11 +160,21 @@ CRAFT REQUIREMENTS (compact, in JSON):
 - hiddenSituation: STRING. 3-5 sentences. The compressed summary of the truth — distillate of backstoryThreads + conflictingInterests, so a quest-writer can grok the situation without re-reading every thread.
 - trajectory: ARRAY OF 2-5 BROAD BEAT SKETCHES. NOT prescriptive. Each bullet is a one-line beat with an optional "IF SUCCEED:" clause naming what gets unlocked next. Do NOT spell out the entire arc — leave room for the story to go off rail. The quest-writer picks the actual beats based on prior-quest outcomes. Do NOT prescribe player decisions or merc observations here.
 
-  EXAMPLE (drowned smuggler):
-    - "Beat 1: investigate the body and effects at Greyford. IF SUCCEED: the chit is recovered and the sister-in-Vael's-End connection surfaces."
-    - "Beat 2: conflict surfaces between Halmar and Iselle over what to do with the chit. (Don't resolve — quest-writer resolves based on prior beat's outcome.)"
-    - "Beat 3: Jorun is squeezed between his daughter's safety and his exposure in Veck's ledger. (Don't resolve.)"
-    - "Climax: whichever of Halmar / Jorun the fort exposes first is brought back to the dungeon. Engine reward (captive_to_dungeon) fires there."
+  TIME / CADENCE: each beat MAY include a time-prefix like "(~5 days)" or "(a month later)" or "(over the next season)". For RARE+ chains, prefer LONGER spans — weeks or months between beats — so the world breathes and relationships build. For COMMON chains, beats can be days apart. The time-prefix is GUIDANCE for the quest-writer; they can adjust.
+
+  MUNDANE BEATS ARE WELCOME (especially for rare+ unit chains). Not every beat needs to advance plot. A beat like "Arc 1 — Beat 1: take the disguised traveler hunting; mercs get to know his quiet humour and the way he flinches at gunfire" builds ATTACHMENT, which is what makes the later conflict matter. If you only write plot beats, the reader has no reason to care when the officer arrives.
+
+  EXAMPLE (rare unit chain — Sevrenne pattern via the deserter you described):
+    - "Arc 1 — Beat 1: a quiet traveler asks for fort lodging; he helps with chores and a hunting party. The mercs warm to him; he's careful with his name. (~7 days)"
+    - "Arc 1 — Beat 2: a small Greyford scuffle implicates him; he handles it with practiced calm that doesn't match his story. IF SUCCEED: a merc confronts him privately and learns one fragment of his deserter past. (~3 days)"
+    - "Arc 2 — Beat 1: a Tevin officer arrives at the gate with a writ and demands him. (~1 month later)"
+    - "Arc 2 — Beat 2: choices about his exposure / hiding / extradition come to a head. IF SUCCEED: a merc who has bonded with him is willing to act. (~2 days)"
+    - "Climax: the deserter is either captured, hidden, or surrendered. Engine reward (e.g., unique_trait_on_anchor 'Stood for a Stranger') fires when the fort's commitment is sealed in act."
+
+  EXAMPLE (common regional chain — short cadence):
+    - "Beat 1: investigate the body and effects at Greyford. IF SUCCEED: the chit is recovered."
+    - "Beat 2: Halmar and Iselle pressure the fort from opposite sides. (~next day)"
+    - "Climax: whichever the fort exposes is brought back. Reward (captive_to_dungeon) fires there."
 - setupPayoffs: 1-10 plant/payoff pairs (specific named objects/habits/places). Count matches shape.
 - vignettes: 1-6 TERSE bullets describing small character/world moments that DO NOT advance plot — they BUILD WORLD. Examples from Cinderella: "mice tailor a dress at night; Jaq sews crooked but earnest", "Lucifer stalks Gus across the kitchen", "King throws a tantrum about wanting grandchildren", "stepsisters squabble over what dress to wear, knocking down a vase". The downstream beat-writer can insert any vignette anywhere to texture a beat — they don't have to use them, but having them makes the world ALIVE. Each bullet ~5-15 words. NOT prose.
 - texture: 2-8 TERSE bullets naming specific physical objects/places/sensory anchors in this chain's world. Examples from Cinderella: "pumpkin in the kitchen garden", "midnight bell of the palace tower", "torn pink dress with mother's ribbon", "glass slipper", "royal invitation parchment with the king's seal". Each bullet ~3-10 words. These ground the beat-writer's imagery.
