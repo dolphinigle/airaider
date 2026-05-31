@@ -42,6 +42,7 @@ CONCRETE SPECIFICITY RULES:
 - The centralNpc is a person — first name + last name OR first name + ONE epithet ONLY if truly defining. "Jorik" or "Mara Loth" beat "the Brawny Champion".
 - antagonistFaction must be a NAMED group, not a generic role. "the Iron Witnesses" or "the Crow's Ford magistracy" — not "a local gang" or "the cult".
 - recurringPlaces: 2-4 SPECIFIC named locations — a named tavern, a ruined chapel, a sunken bridge. Not "the forest" or "the city". AVOID self-referential filler like "Hollow's Hollow".
+- SETTING PALETTE: do NOT default to fog/mud/marsh/ruined-chapel/tavern every chain. The world also contains: cathedral cloisters, salt-flats, ironworks, mountain passes, grain barges, monastic gardens, river-fords, ducal salons, smugglers' coves, frozen lakes, burned orchards, abbey libraries, tannery yards, plague-pits, mason-camps, vineyards, copper mines. Pick a palette that FITS the region — Mireford ≠ Highholt ≠ Riverwynd ≠ Coldwater Coast. Re-using fog and mud across every chain is a failure.
 
 STRUCTURE OF A SKELETON (3-4 paragraphs total):
   P1 — SETUP: a small, grounded hook in the region tied to a CONCRETE object/event/grudge.
@@ -74,6 +75,18 @@ function getClient(apiKey: string): OpenAI {
 
 function model(envKey: string): string {
   return process.env[envKey] ?? process.env.AIRAIDER_LLM_MODEL ?? 'gpt-4o-mini';
+}
+
+function genesisModel(): string {
+  return process.env.AIRAIDER_LLM_GENESIS_MODEL ?? model('AIRAIDER_LLM_NARRATIVE_MODEL');
+}
+
+function epilogueModel(): string {
+  return process.env.AIRAIDER_LLM_EPILOGUE_MODEL ?? model('AIRAIDER_LLM_NARRATIVE_MODEL');
+}
+
+function stepBlurbModel(): string {
+  return process.env.AIRAIDER_LLM_STEPBLURB_MODEL ?? model('AIRAIDER_LLM_MODEL');
 }
 
 export interface GenesisInput {
@@ -175,7 +188,7 @@ export async function generateChainGenesis(input: GenesisInput): Promise<Genesis
 
   const sys = GENESIS_SYSTEM;
   const usr = userParts.join('\n');
-  const m = model('AIRAIDER_LLM_NARRATIVE_MODEL');
+  const m = genesisModel();
   const startedAt = Date.now();
   const resp = await getClient(apiKey).chat.completions.create({
     model: m,
@@ -251,8 +264,18 @@ A hook must:
 - Hit the beat supplied for this step.
 - Match the chain's region.
 - Match the engine-supplied rarity feel (common = village stakes; uncommon = town/trade; rare = noble/abbey/cursed; legendary = mythic).
-- Be ONE specific sentence. No generic placeholders (no "the prize/the target/the goods/the spoils").
+- Be ONE specific sentence (or one sentence + ONE short dialogue/overheard fragment). No generic placeholders (no "the prize/the target/the goods/the spoils").
 - Avoid the rarity-words themselves ("common/uncommon/rare/legendary/mythic/epic/heroic/glorious/destined").
+
+CRAFT RULES (these are the difference between cheap and good):
+1. OPENING — Do NOT open with sense/atmosphere verbs ("In the dim light of", "As shadows deepen", "Beneath the pallid moon", "Under heavy rain", "Amidst the fog"). Open with an ACTION, a NAME, or a line of SPEECH.
+   BAD: "In the smoke of the burning shrine, Roselle discovers a sealed letter."
+   GOOD: "Roselle pries the seal off a courier's pouch in the burning shrine and finds her own name inside."
+   GOOD: "\"Don't open that here,\" the courier whispers — but Roselle already has the seal in her teeth."
+2. VERBS — Vary. The protagonist should ACT (pick, lie, hide, bribe, dig, burn, refuse, swear, cut, follow, name) — not merely sense (overhear, discover, learn, find, glimpse, sense). At most ONE sense-verb per arc.
+3. DIALOGUE — Where it fits, include ONE short line of speech or overheard fragment in quotes. Not every step needs it, but at least 2 of 4 steps should have a quoted line.
+4. RHYTHM — Vary sentence length across the arc. Some steps short and blunt (under 12 words). Some longer and articulated. Never four identical compound present-tense sentences in a row.
+5. SPECIFIC INTERIORITY — If you give the protagonist a thought, make it CONCRETE: "Roselle remembers Gunther's debt to the silversmith" beats "Roselle is burdened by guilt".
 
 NAMING DISCIPLINE:
 - Use the centralNpc's NAME, not their full epithet, in most steps. The epithet is for the saga header — repeated mid-arc it reads robotic.
@@ -276,7 +299,7 @@ IF prior step outcomes are supplied, REFERENCE the most recent one SPECIFICALLY:
 ${VOCAB_BLOCK}`;
 
 const StepBlurbOutSchema = z.object({
-  hook: z.string().min(8).max(280),
+  hook: z.string().min(8).max(420),
 });
 
 export interface StepBlurbInput {
@@ -296,7 +319,7 @@ export interface StepBlurbInput {
 export async function generateChainStepBlurb(input: StepBlurbInput): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error('no OPENAI_API_KEY');
-  const m = model('AIRAIDER_LLM_MODEL');
+  const m = stepBlurbModel();
 
   const downshifted = input.plannedRarity !== input.originalPlannedRarity;
   const userParts: string[] = [
@@ -320,7 +343,7 @@ export async function generateChainStepBlurb(input: StepBlurbInput): Promise<str
   const resp = await getClient(apiKey).chat.completions.create({
     model: m,
     temperature: 0.85,
-    max_tokens: 250,
+    max_tokens: 350,
     response_format: { type: 'json_object' },
     messages: [
       { role: 'system', content: STEP_BLURB_SYSTEM },
@@ -368,7 +391,13 @@ BANNED PHRASES (fantasy-novel cliché — do not use):
 
 NAMING DISCIPLINE:
 - Use first names after first reference (e.g. "Roselle", not "Roselle the Light-Footed").
-- The antagonist's leader, if named in the skeleton, should appear by name.`;
+- The antagonist's leader, if named in the skeleton, should appear by name.
+
+CRAFT (same rules as step blurbs):
+- DO NOT open with atmospheric weather/light frames. Open with a name, an action, or a line of speech.
+- Vary sentence length — at least one short blunt sentence among the 2-4.
+- Include ONE concrete line of dialogue or final-spoken thing if it fits the scene; e.g. a survivor's last words, the leader's parting curse, an order given.
+- Avoid generic interiority. Specific regrets (named debts, named graves) beat generic "burdened/haunted/heavy-hearted".`;
 
 const EpilogueOutSchema = z.object({
   epilogue: z.string().min(20).max(800),
@@ -385,7 +414,7 @@ export interface EpilogueInput {
 export async function generateChainEpilogue(input: EpilogueInput): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error('no OPENAI_API_KEY');
-  const m = model('AIRAIDER_LLM_NARRATIVE_MODEL');
+  const m = epilogueModel();
 
   const userParts: string[] = [
     `Hidden skeleton (you wrote this at genesis — bookend it):`,
