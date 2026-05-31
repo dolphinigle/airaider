@@ -141,8 +141,14 @@ Inciting hint: A crown adjutant arrives unannounced at Mireford gate carrying a 
 
 Author the bible now. Output JSON only.`;
 
-interface GenResult {
+interface ModelConfig {
   model: string;
+  effort?: 'minimal' | 'low' | 'medium' | 'high';
+  label: string;
+}
+
+interface GenResult {
+  config: ModelConfig;
   chain: 'A' | 'B';
   ok: boolean;
   bible?: z.infer<typeof Bible>;
@@ -151,15 +157,17 @@ interface GenResult {
   cachedTok: number;
   completionTok: number;
   costUsd: number;
+  latencyMs: number;
   errorMsg?: string;
 }
 
-async function generate(client: OpenAI, model: string, chain: 'A' | 'B'): Promise<GenResult> {
+async function generate(client: OpenAI, config: ModelConfig, chain: 'A' | 'B'): Promise<GenResult> {
   const user = chain === 'A' ? USER_CHAIN_A : USER_CHAIN_B;
+  const t0 = Date.now();
   let resp;
   try {
-    resp = await client.chat.completions.create({
-      model,
+    const params: Record<string, unknown> = {
+      model: config.model,
       messages: [
         { role: 'system', content: SYSTEM },
         { role: 'user', content: user },
@@ -167,40 +175,46 @@ async function generate(client: OpenAI, model: string, chain: 'A' | 'B'): Promis
       response_format: { type: 'json_object' },
       max_completion_tokens: 14000,
       stream: false,
-    });
+    };
+    if (config.effort) params.reasoning_effort = config.effort;
+    resp = await client.chat.completions.create(params as unknown as Parameters<typeof client.chat.completions.create>[0]);
   } catch (e) {
     return {
-      model, chain, ok: false, rawContent: '',
-      promptTok: 0, cachedTok: 0, completionTok: 0, costUsd: 0,
+      config, chain, ok: false, rawContent: '',
+      promptTok: 0, cachedTok: 0, completionTok: 0, costUsd: 0, latencyMs: Date.now() - t0,
       errorMsg: `api error: ${(e as Error).message}`,
     };
   }
-  const content = resp.choices[0]?.message?.content ?? '{}';
-  const promptTok = resp.usage?.prompt_tokens ?? 0;
-  const completionTok = resp.usage?.completion_tokens ?? 0;
-  const cachedTok = (resp.usage as unknown as { prompt_tokens_details?: { cached_tokens?: number } })
-    ?.prompt_tokens_details?.cached_tokens ?? 0;
-  const cost = costUsd(model, promptTok, cachedTok, completionTok);
+  const latencyMs = Date.now() - t0;
+  const r = resp as unknown as {
+    choices: Array<{ message?: { content?: string } }>;
+    usage?: { prompt_tokens?: number; completion_tokens?: number; prompt_tokens_details?: { cached_tokens?: number } };
+  };
+  const content = r.choices[0]?.message?.content ?? '{}';
+  const promptTok = r.usage?.prompt_tokens ?? 0;
+  const completionTok = r.usage?.completion_tokens ?? 0;
+  const cachedTok = r.usage?.prompt_tokens_details?.cached_tokens ?? 0;
+  const cost = costUsd(config.model, promptTok, cachedTok, completionTok);
   let raw: unknown;
   try { raw = JSON.parse(content); }
   catch (e) {
     return {
-      model, chain, ok: false, rawContent: content,
-      promptTok, cachedTok, completionTok, costUsd: cost,
+      config, chain, ok: false, rawContent: content,
+      promptTok, cachedTok, completionTok, costUsd: cost, latencyMs,
       errorMsg: `json parse: ${(e as Error).message}`,
     };
   }
   const parsed = Bible.safeParse(raw);
   if (!parsed.success) {
     return {
-      model, chain, ok: false, rawContent: content,
-      promptTok, cachedTok, completionTok, costUsd: cost,
+      config, chain, ok: false, rawContent: content,
+      promptTok, cachedTok, completionTok, costUsd: cost, latencyMs,
       errorMsg: `schema: ${JSON.stringify(parsed.error.errors.slice(0, 3))}`,
     };
   }
   return {
-    model, chain, ok: true, bible: parsed.data, rawContent: content,
-    promptTok, cachedTok, completionTok, costUsd: cost,
+    config, chain, ok: true, bible: parsed.data, rawContent: content,
+    promptTok, cachedTok, completionTok, costUsd: cost, latencyMs,
   };
 }
 
@@ -272,11 +286,19 @@ Score now. Output JSON only.`;
 }
 
 // ---------- main ----------
-const MODELS = ['gpt-5-mini', 'gpt-5-nano', 'gpt-4.1', 'gpt-4.1-mini', 'gpt-4o-mini'];
+const CONFIGS: ModelConfig[] = [
+  { model: 'gpt-5-mini', label: 'gpt-5-mini (default)' },
+  { model: 'gpt-5-mini', effort: 'minimal', label: 'gpt-5-mini-minimal' },
+  { model: 'gpt-5-mini', effort: 'low', label: 'gpt-5-mini-low' },
+  { model: 'gpt-5-mini', effort: 'medium', label: 'gpt-5-mini-medium' },
+  { model: 'gpt-5-nano', effort: 'minimal', label: 'gpt-5-nano-minimal' },
+  { model: 'gpt-5-nano', effort: 'low', label: 'gpt-5-nano-low' },
+  { model: 'gpt-5-nano', effort: 'medium', label: 'gpt-5-nano-medium' },
+];
 const CHAINS: Array<'A' | 'B'> = ['A', 'B'];
 
 interface Row {
-  model: string;
+  config: ModelConfig;
   chain: 'A' | 'B';
   gen: GenResult;
   judge?: JudgeResult;
@@ -287,35 +309,36 @@ async function main(): Promise<void> {
   const client = new OpenAI({ apiKey });
   console.log(`==== modelBenchmark ${label} ====`);
   const rows: Row[] = [];
-  for (const model of MODELS) {
+  for (const config of CONFIGS) {
     for (const chain of CHAINS) {
-      console.log(`\n--- ${model} / chain ${chain} ---`);
-      const gen = await generate(client, model, chain);
+      console.log(`\n--- ${config.label} / chain ${chain} ---`);
+      const gen = await generate(client, config, chain);
+      const sec = (gen.latencyMs / 1000).toFixed(1);
       if (gen.ok) {
-        console.log(`  ok title="${gen.bible!.title}" shape=${gen.bible!.shape}  tokens in=${gen.promptTok}(cached=${gen.cachedTok}) out=${gen.completionTok}  cost=$${gen.costUsd.toFixed(4)}`);
+        console.log(`  ok title="${gen.bible!.title}" shape=${gen.bible!.shape}  ${sec}s  in=${gen.promptTok}(cached=${gen.cachedTok}) out=${gen.completionTok}  cost=$${gen.costUsd.toFixed(4)}`);
         const jr = await judge(client, gen);
         if (jr) {
           console.log(`  scored overall=${jr.overall.toFixed(2)}  (spec=${jr.scores.specificity} cast=${jr.scores.castFit} ci=${jr.scores.controllingIdea} climax=${jr.scores.climaxLanding} p/p=${jr.scores.plantPayoff} prose=${jr.scores.prosecraft})`);
           console.log(`  summary: ${jr.scores.summary}`);
-          rows.push({ model, chain, gen, judge: jr });
+          rows.push({ config, chain, gen, judge: jr });
         } else {
-          rows.push({ model, chain, gen });
+          rows.push({ config, chain, gen });
         }
       } else {
-        console.log(`  FAILED: ${gen.errorMsg}  cost=$${gen.costUsd.toFixed(4)}`);
-        rows.push({ model, chain, gen });
+        console.log(`  FAILED in ${sec}s: ${gen.errorMsg}  cost=$${gen.costUsd.toFixed(4)}`);
+        rows.push({ config, chain, gen });
       }
     }
   }
 
   // Summary table
   console.log('\n\n==== SUMMARY ====');
-  console.log('model'.padEnd(15) + 'chain  overall  spec  cast  ci    climax p/p   prose  cost     status');
+  console.log('label'.padEnd(22) + 'chain  overall  spec  cast  ci    climax p/p   prose  latency  cost     status');
   for (const r of rows) {
     const status = r.gen.ok ? 'ok' : `FAIL(${r.gen.errorMsg?.slice(0, 30)})`;
     const s = r.judge?.scores;
     const row =
-      r.model.padEnd(15) +
+      r.config.label.padEnd(22) +
       r.chain + '      ' +
       (r.judge?.overall.toFixed(2) ?? '----').padEnd(7) +
       (s?.specificity.toFixed(1) ?? '--').padEnd(6) +
@@ -324,21 +347,27 @@ async function main(): Promise<void> {
       (s?.climaxLanding.toFixed(1) ?? '--').padEnd(7) +
       (s?.plantPayoff.toFixed(1) ?? '--').padEnd(6) +
       (s?.prosecraft.toFixed(1) ?? '--').padEnd(7) +
+      `${(r.gen.latencyMs / 1000).toFixed(1)}s`.padEnd(9) +
       ('$' + r.gen.costUsd.toFixed(4)).padEnd(9) +
       status;
     console.log(row);
   }
-  // Per-model averages
-  console.log('\n==== PER-MODEL AVERAGE ====');
-  for (const m of MODELS) {
-    const mRows = rows.filter(r => r.model === m && r.judge);
-    if (mRows.length === 0) {
-      console.log(`${m.padEnd(15)} -- (all failed or no judge)`);
+  // Per-config averages
+  console.log('\n==== PER-CONFIG AVERAGE ====');
+  console.log('label'.padEnd(22) + 'avg-quality  med-latency  total-cost  fails');
+  for (const cfg of CONFIGS) {
+    const cRows = rows.filter(r => r.config.label === cfg.label);
+    const judged = cRows.filter(r => r.judge);
+    const fails = cRows.filter(r => !r.gen.ok).length;
+    const latSorted = cRows.map(r => r.gen.latencyMs).sort((a, b) => a - b);
+    const medLat = latSorted[Math.floor(latSorted.length / 2)] ?? 0;
+    const totalCost = cRows.reduce((s, r) => s + r.gen.costUsd, 0);
+    if (judged.length === 0) {
+      console.log(cfg.label.padEnd(22) + 'all-failed'.padEnd(13) + `${(medLat / 1000).toFixed(1)}s`.padEnd(13) + ('$' + totalCost.toFixed(4)).padEnd(12) + `${fails}`);
       continue;
     }
-    const avg = mRows.reduce((s, r) => s + (r.judge?.overall ?? 0), 0) / mRows.length;
-    const totalCost = rows.filter(r => r.model === m).reduce((s, r) => s + r.gen.costUsd, 0);
-    console.log(`${m.padEnd(15)} avg=${avg.toFixed(2)}  totalGenCost=$${totalCost.toFixed(4)}`);
+    const avg = judged.reduce((s, r) => s + (r.judge?.overall ?? 0), 0) / judged.length;
+    console.log(cfg.label.padEnd(22) + avg.toFixed(2).padEnd(13) + `${(medLat / 1000).toFixed(1)}s`.padEnd(13) + ('$' + totalCost.toFixed(4)).padEnd(12) + `${fails}`);
   }
 
   // Dump full output
@@ -346,8 +375,8 @@ async function main(): Promise<void> {
   const lines: string[] = [`==== modelBenchmark ${label} ====`, ''];
   for (const r of rows) {
     lines.push('==========================================================');
-    lines.push(`# ${r.model} / chain ${r.chain}`);
-    lines.push(`  status: ${r.gen.ok ? 'ok' : 'FAIL'}`);
+    lines.push(`# ${r.config.label} / chain ${r.chain}`);
+    lines.push(`  status: ${r.gen.ok ? 'ok' : 'FAIL'}  latency: ${(r.gen.latencyMs / 1000).toFixed(1)}s`);
     if (r.gen.errorMsg) lines.push(`  error: ${r.gen.errorMsg}`);
     lines.push(`  tokens: in=${r.gen.promptTok} cached=${r.gen.cachedTok} out=${r.gen.completionTok}  cost=$${r.gen.costUsd.toFixed(4)}`);
     if (r.judge) {

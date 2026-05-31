@@ -659,35 +659,67 @@ Expected: cache hit rises from ~1800 tok to ~3000 tok (~50% → ~75%) once the i
 
 Also defer to proper-impl. Prototype works fine without it.
 
-### 18.12 Model selection (LOCKED 2026-05-30 per issue #6)
+### 18.12 Model selection (LOCKED 2026-05-30 per issue #6, REFINED 2026-05-30 per issue #7)
 
-Benchmark in `engine/server/src/modelBenchmark.ts`: 5 models × 2 chains × gpt-5 judge on 6 criteria. Decision matrix below applies to ALL chain-related calls.
+Benchmark in `engine/server/src/modelBenchmark.ts`: gpt-5 family with reasoning_effort axis × 2 chains × gpt-5 judge on 6 criteria. Decision matrix below applies to ALL chain-related calls.
 
-| Pipeline stage | Model | Per-call cost | Why |
-|---|---|---|---|
-| Bible genesis (cast + situation + trajectory) | `gpt-5-mini` | ~$0.008 | High-leverage; best quality/$. Beats gpt-4.1 in quality AND price. |
-| Beat generation (one beat at a time, 3-6 per chain) | `gpt-5-nano` | ~$0.001/beat | Cheap is fine for routine progression beats. Add tight schema prompt: "surface/hidden/trajectory/dramaticIrony are STRINGS, not arrays" — nano otherwise sometimes returns arrays. |
-| Epilogue (voice + cliche discipline) | `gpt-5-mini` | ~$0.003 | Voice matters; one call per chain. |
-| Cliche scrub (regex + retry) | `gpt-5-nano` | ~$0.0005 | Mechanical text rewrite; nano is fine. |
+| Pipeline stage | Model | reasoning_effort | Per-call cost | Median latency | Quality | Why |
+|---|---|---|---|---|---|---|
+| Bible genesis | `gpt-5-mini` | **`low`** | ~$0.0035 | **21s** | **8.25** | Beats default mini on every axis (+0.42 quality, -47% latency, -50% cost). Per issue #7. |
+| Beat generation | `gpt-5-nano` | **`minimal`** | ~$0.0004/beat | **7s** | 6.55 | Beats are short, mechanical; minimal effort reliable + 4× faster than nano-default. |
+| Epilogue | `gpt-5-mini` | **`low`** | ~$0.003 | ~20s | (assumed ~8.0) | Voice matters; mini-low is the winner. |
+| Cliché scrub (if added) | `gpt-5-nano` | `minimal` | ~$0.0002 | ~5s | n/a | Mechanical text rewrite. |
 
-**Per-chain total**: ~$0.012-0.018.
+**Per-chain total**: ~$0.005-0.010, ~80-150s wall-clock (parallelizable in production).
 
-**gpt-5 (full) is OFF-LIMITS** at any tier. Ceiling test on chain B: 8.62 overall (vs gpt-5-mini's 8.22), cost $0.05 (vs $0.008). +0.4 quality points for 6× cost is not worth it at scale. Sharper controlling ideas come from prompt iteration on mini, not from upgrading the model.
+**Configs ruled out:**
+- `gpt-5` (full) at any effort — issue #6 ceiling test: +0.4 quality for 6× cost.
+- `gpt-5-mini` `minimal` — 2/2 schema failures (tags-as-string). Reasoning is needed to enforce schema discipline.
+- `gpt-5-mini` `medium` and `default` — slower AND lower quality than `low`. Counterintuitive but consistent.
+- `gpt-5-nano` `low` and `medium` — `low` collapsed to 5.0 quality; `medium` burns 12k completion tokens in 70-80s with 1/2 truncation. nano is only safe at `minimal`.
+- `gpt-4.1` family — strictly worse than gpt-5 family on quality AND price.
+- `gpt-4o-mini` — 12× more expensive than gpt-5-nano AND schema failures.
 
-**gpt-4.1 family is OBSOLETE.** Strictly worse than gpt-5 family on quality AND price for these tasks. Never use it. Same for gpt-4o-mini (which had schema failures in the benchmark).
+**Env overrides** (in `biblePipeline.ts`):
+- `AIRAIDER_BIBLE_MODEL`, `AIRAIDER_BIBLE_EFFORT`
+- `AIRAIDER_BEAT_MODEL`, `AIRAIDER_BEAT_EFFORT`
+- `AIRAIDER_EPILOGUE_MODEL`, `AIRAIDER_EPILOGUE_EFFORT`
 
-See `docs/AI_PROVIDER.md §4` for the full pricing table and the non-chain callsite mapping.
+See `docs/AI_PROVIDER.md §4` for non-chain callsite mapping.
 
 ### 18.13 Latency expectations (prototype playRunner)
 
-gpt-5-family models are reasoning models — every call has a hidden reasoning pass before the JSON output. Realistic wall-clock per call:
+With the locked configs (issue #7), realistic wall-clock per call:
 
-| Stage | Model | Typical | Worst-case |
+| Stage | Model / effort | Typical | Worst-case |
 |---|---|---|---|
-| Bible | gpt-5-mini | 20–60 s | up to 120 s for legendary/ensemble |
-| Beat | gpt-5-nano | 5–20 s | up to 40 s |
-| Epilogue | gpt-5-mini | 15–40 s | up to 80 s |
+| Bible | gpt-5-mini / low | 15–25 s | 35 s for ensemble |
+| Beat | gpt-5-nano / minimal | 5–10 s | 15 s |
+| Epilogue | gpt-5-mini / low | 15–25 s | 35 s |
 
-**The runner is NOT hung when it sits at `[bible] generating...` for a minute.** `playRunner.ts` prints an elapsed-seconds spinner during each AI call so the user can tell the difference between "thinking" and "actually stuck". If the spinner's seconds counter is advancing, the call is in flight; if it's frozen >120s, the network probably did stall — Ctrl-C and retry.
+A full chain (bible + 3 beats + epilogue) ≈ 70–100 s wall-clock sequential. In production these can be parallelized (pre-gen next chain's bible during current chain's beats).
 
-Consequence for production UX: bible generation should be backgrounded with a visible "Showrunner is drafting…" affordance. Players should never be staring at a frozen UI for >5 s without movement. Per-beat is fast enough to be inline; bible+epilogue are not.
+**The runner is NOT hung when it sits at `[bible] elapsed Xs...`.** The spinner shows elapsed seconds; if the counter is advancing, the call is in flight. If it freezes >60s, Ctrl-C and retry (network stall).
+
+Consequence for production UX: bible generation should be backgrounded with a visible "Showrunner is drafting…" affordance. Players should never stare at a frozen UI for >5 s without movement. Per-beat is fast enough to be inline; bible+epilogue should be pre-generated or backgrounded.
+
+### 18.14 Player onboarding rule (do NOT leak trajectory into beat 1)
+
+**Playtest finding (2026-05-30, user feedback):** an early bible's first beat read like "Drust pretends to guide the party then betrays them..." — but the player at their fort has never met Drust. The trajectory is writers'-room information; the player at the lead board has effectively zero context.
+
+**Fix (applied to bible schema + beat prompt):**
+
+1. **Bible adds two player-onboarding fields:**
+   - `leadBoardBlurb` — 1-2 sentences SHOWN TO THE PLAYER on the lead board, before they meet any cast. No unknown proper nouns. Concrete physical hook (a body, a sealed letter, a missing barge).
+   - `firstBeatOnramp` — stage-direction for the beat writer: "this is how the party arrives at the situation cold". The first beat realises this, not the trajectory.
+
+2. **Beat prompt has hard rules:**
+   - Beat 1 HOOK = leadBoardBlurb (or tight rephrasing).
+   - Beat 1 BODY follows firstBeatOnramp. Earn each named character on-stage. Introduce ≤2 cast members in beat 1.
+   - Subsequent beats may name characters introduced in earlier beats. Hidden situation lands in the climax, not the hook.
+
+3. **Trajectory and hiddenSituation are explicitly marked "WRITERS'-ROOM ONLY"** in the bible prompt. They map the chain; beats reveal them piecewise.
+
+This is the single most important rule for chain UX: a chain is a *reveal*, not an *exposition dump*. The player is always at their fort discovering a lead.
+
+Validate per-playtest: read beat 1's hook out loud and ask "would this make sense to a player who has just heard of this lead, no context?" If no, the bible failed onboarding.

@@ -10,8 +10,11 @@ import { z } from 'zod';
 import type { CharacterPool, PoolCharacter } from './characterPool.js';
 
 const BIBLE_MODEL = process.env.AIRAIDER_BIBLE_MODEL ?? 'gpt-5-mini';
+const BIBLE_EFFORT = (process.env.AIRAIDER_BIBLE_EFFORT ?? 'low') as 'minimal' | 'low' | 'medium' | 'high';
 const BEAT_MODEL = process.env.AIRAIDER_BEAT_MODEL ?? 'gpt-5-nano';
+const BEAT_EFFORT = (process.env.AIRAIDER_BEAT_EFFORT ?? 'minimal') as 'minimal' | 'low' | 'medium' | 'high';
 const EPILOGUE_MODEL = process.env.AIRAIDER_EPILOGUE_MODEL ?? 'gpt-5-mini';
+const EPILOGUE_EFFORT = (process.env.AIRAIDER_EPILOGUE_EFFORT ?? 'low') as 'minimal' | 'low' | 'medium' | 'high';
 
 // ---------------- schemas ----------------
 
@@ -42,6 +45,8 @@ export const BibleSchema = z.object({
   title: z.string().min(2).max(80),
   shape: z.enum(['tight', 'classic', 'ensemble', 'twist-heavy']),
   controllingIdea: z.string().min(10).max(220),
+  leadBoardBlurb: z.string().min(20).max(280),
+  firstBeatOnramp: z.string().min(20).max(280),
   cast: z.array(CastEntry).min(2).max(6),
   surfaceSituation: z.string().min(20),
   hiddenSituation: z.string().min(20),
@@ -114,13 +119,15 @@ CRAFT REQUIREMENTS (compact, in JSON):
     "twist-heavy"  — 2-3 cast, 4-6 plants, dramaticIrony is centerpiece (2-3 sentences naming when each side learns). Revelations.
   Engine guidance: common tends tight, legendary tends ensemble/twist. Situation overrides rarity.
 - controllingIdea: one sentence stating what the chain ARGUES (a moral claim, not a plot).
+- leadBoardBlurb: 1-2 sentences shown to the player on the LEAD BOARD when this chain first appears, BEFORE they have ever met the cast. CRITICAL: the player at this point is sitting in their fort and knows NOTHING about the situation. Do NOT use cast member proper nouns the player has not encountered (check the FORT ROSTER + REGION SAMPLE: any character there is "known" only by reputation if their role is mercenary or landmark; npcs/captives are NOT known). Use concrete physical anchors: a body, a sealed letter, a runaway, a missing barge, a payment overdue, a banner outside the gate. The blurb tells the player WHY they would deploy.
+- firstBeatOnramp: 1-2 sentences of stage-direction for the writer of beat 1 — "this is how the party arrives at the situation from cold". Anchors the first beat in the leadBoardBlurb (don't drop the player mid-scene with named characters they've never met). Example: "the party rides out to Greyford Reach to look at the body the bargeman described; they meet Drust there, working a barge, and don't yet know his name."
 - cast: 2-6 with roleInChain (protagonist | antagonist | complication | ally). Cast SIZE matches shape. For each, EITHER:
     { "kind": "existing", "characterId": "<exact id from pool>", "roleInChain": "...", "arcStateAfterChain": "<one-line update>" }
     OR
     { "kind": "new", "character": { "name", "tags", "surface", "want", "need", "ghost", "lie", "secret" }, "roleInChain": "...", "arcStateAfterChain": "..." }
-- surfaceSituation: STRING. 2-3 sentences. What strangers are told.
-- hiddenSituation: STRING. 3-5 sentences. What's really going on.
-- trajectory: STRING. 3-5 sentences ending with how the climax delivers the reward.
+- surfaceSituation: STRING. 2-3 sentences. What strangers in the world are told (this is broader than the leadBoardBlurb — it's regional gossip, not the player's narrow lead).
+- hiddenSituation: STRING. 3-5 sentences. What's really going on. WRITERS'-ROOM ONLY: do NOT reveal in beat 1; reveal beat by beat.
+- trajectory: STRING. 3-5 sentences ending with how the climax delivers the reward. WRITERS'-ROOM ONLY: this maps the chain's arc; later beats earn each turn. Beat 1 is ONLY the leadBoardBlurb + firstBeatOnramp realised.
 - setupPayoffs: 1-6 plant/payoff pairs (specific named objects/habits/places). Count matches shape.
 - dramaticIrony: STRING (optional). 1-2 sentences naming what player knows / characters don't, when each side learns. OMIT for tight shape with no real irony.
 
@@ -218,8 +225,8 @@ function makeUsage(model: string, promptTok: number, cachedTok: number, completi
   return { model, promptTokens: promptTok, cachedTokens: cachedTok, completionTokens: completionTok, costUsd: cost };
 }
 
-async function callJson<T>(client: OpenAI, model: string, system: string, user: string, schema: z.ZodType<T>, maxOut: number): Promise<{ data: T; usage: CallUsage; raw: string }> {
-  const resp = await client.chat.completions.create({
+async function callJson<T>(client: OpenAI, model: string, system: string, user: string, schema: z.ZodType<T>, maxOut: number, effort?: 'minimal' | 'low' | 'medium' | 'high'): Promise<{ data: T; usage: CallUsage; raw: string }> {
+  const params: Record<string, unknown> = {
     model,
     messages: [
       { role: 'system', content: system },
@@ -228,12 +235,16 @@ async function callJson<T>(client: OpenAI, model: string, system: string, user: 
     response_format: { type: 'json_object' },
     max_completion_tokens: maxOut,
     stream: false,
-  });
+  };
+  if (effort) params.reasoning_effort = effort;
+  const resp = (await client.chat.completions.create(params as unknown as Parameters<typeof client.chat.completions.create>[0])) as unknown as {
+    choices: Array<{ message?: { content?: string } }>;
+    usage?: { prompt_tokens?: number; completion_tokens?: number; prompt_tokens_details?: { cached_tokens?: number } };
+  };
   const content = resp.choices[0]?.message?.content ?? '{}';
   const promptTok = resp.usage?.prompt_tokens ?? 0;
   const completionTok = resp.usage?.completion_tokens ?? 0;
-  const cachedTok = (resp.usage as unknown as { prompt_tokens_details?: { cached_tokens?: number } })
-    ?.prompt_tokens_details?.cached_tokens ?? 0;
+  const cachedTok = resp.usage?.prompt_tokens_details?.cached_tokens ?? 0;
   const usage = makeUsage(model, promptTok, cachedTok, completionTok);
   let raw: unknown;
   try { raw = JSON.parse(content); }
@@ -247,7 +258,7 @@ async function callJson<T>(client: OpenAI, model: string, system: string, user: 
 
 export async function generateBible(client: OpenAI, req: BibleRequest): Promise<{ bible: Bible; usage: CallUsage; sample: PoolCharacter[]; required?: PoolCharacter }> {
   const { user, sample, required } = buildUserPrompt(req);
-  const { data: bible, usage } = await callJson(client, BIBLE_MODEL, BIBLE_SYSTEM, user, BibleSchema, 14000);
+  const { data: bible, usage } = await callJson(client, BIBLE_MODEL, BIBLE_SYSTEM, user, BibleSchema, 14000, BIBLE_EFFORT);
   return { bible, usage, sample, required };
 }
 
@@ -255,7 +266,14 @@ export async function generateBible(client: OpenAI, req: BibleRequest): Promise<
 
 const BEAT_SYSTEM = `You are a writers'-room hand writing one quest beat at a time for a grimdark mercenary-fort game. You have the chain's BIBLE (cast, situation, trajectory) and the PRIOR BEATS with their outcomes. Write the NEXT beat.
 
-A beat is a single quest with a HOOK (1-2 sentences the player sees before deploying) and a BODY (3-6 sentences narrating the deployment's outcome conditional on a successful outcome — assume players succeed; the engine swaps in failure prose elsewhere). Beats progress the chain along its trajectory.
+A beat is a single quest with a HOOK (1-2 sentences the player sees on the deploy screen BEFORE they commit) and a BODY (3-6 sentences narrating the deployment's outcome conditional on a successful outcome — assume players succeed; the engine swaps in failure prose elsewhere). Beats progress the chain along its trajectory.
+
+CRITICAL — PLAYER ONBOARDING:
+- The player sits in their fort and discovers chains via the LEAD BOARD. They have NO prior knowledge of any cast character whose role is "npc" or "new" until that character is INTRODUCED in a beat the player has played.
+- Beat 1's HOOK must read EXACTLY like the bible.leadBoardBlurb (or be a tight rephrasing of it) — concrete physical lead, no proper nouns the player has never met.
+- Beat 1's BODY must follow the bible.firstBeatOnramp — the party arrives at the situation cold, and EARNS each named character by encountering them on-stage. Introduce one or two cast members in beat 1, no more.
+- Subsequent beats may name cast members the player met in earlier beats. Do not skip ahead in the trajectory.
+- The bible's hiddenSituation and trajectory are WRITERS'-ROOM information. Reveal them beat by beat. Beat 1 reveals only what the player would see arriving cold. The hidden situation lands in the climax, not the hook.
 
 If you judge the chain has reached its climax (the bible's trajectory ending lands in this beat), set isClimax=true. A climax is an EVENT (someone does something irreversible), not an announcement. Once isClimax=true, the engine writes the epilogue and ends the chain.
 
@@ -288,7 +306,7 @@ export async function generateBeat(client: OpenAI, bible: Bible, priorBeats: Pri
   if (forceClimax) userParts.push(`The engine has decided THIS beat must be the climax (chain has reached upper bound). Set isClimax=true and end the chain here.`);
   else if (beatNumber < bounds[0]) userParts.push(`Chain is below minimum (${bounds[0]}); isClimax MUST be false this beat.`);
   userParts.push(``, `Output JSON only.`);
-  return callJson(client, BEAT_MODEL, BEAT_SYSTEM, userParts.join('\n'), BeatSchema, 4000)
+  return callJson(client, BEAT_MODEL, BEAT_SYSTEM, userParts.join('\n'), BeatSchema, 4000, BEAT_EFFORT)
     .then(r => ({ beat: r.data, usage: r.usage }));
 }
 
@@ -319,7 +337,7 @@ export async function generateEpilogue(client: OpenAI, bible: Bible, beats: Prio
     userParts.push(`Beat ${i + 1} [${b.outcome}]: ${b.hook}\n  body: ${b.body}\n  outcome narration: ${b.narration}`);
   }
   userParts.push(``, `Write the epilogue now. Output JSON only.`);
-  return callJson(client, EPILOGUE_MODEL, EPILOGUE_SYSTEM, userParts.join('\n'), EpilogueSchema, 3000)
+  return callJson(client, EPILOGUE_MODEL, EPILOGUE_SYSTEM, userParts.join('\n'), EpilogueSchema, 3000, EPILOGUE_EFFORT)
     .then(r => ({ epilogue: r.data, usage: r.usage }));
 }
 

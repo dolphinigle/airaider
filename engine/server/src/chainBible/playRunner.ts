@@ -131,10 +131,13 @@ async function pickRewardRecipient(bible: Bible, reward: RewardSpec): Promise<st
 
 function printBible(bible: Bible): void {
   console.log(`\n=== "${bible.title}" (${bible.shape}) ===`);
+  console.log(`\n[LEAD BOARD — what the player sees first]:\n  ${bible.leadBoardBlurb}`);
+  console.log(`\n[BEAT 1 onramp (writer's note)]:\n  ${bible.firstBeatOnramp}`);
+  console.log(`\n--- writers'-room internal (don't reveal in beat 1) ---`);
   console.log(`controllingIdea: ${bible.controllingIdea}`);
-  console.log(`\nsurface: ${bible.surfaceSituation}`);
-  console.log(`\nhidden: ${bible.hiddenSituation}`);
-  console.log(`\ntrajectory: ${bible.trajectory}`);
+  console.log(`surface (regional gossip): ${bible.surfaceSituation}`);
+  console.log(`hidden: ${bible.hiddenSituation}`);
+  console.log(`trajectory: ${bible.trajectory}`);
   console.log(`\ncast (${bible.cast.length}):`);
   for (const c of bible.cast) {
     if (c.kind === 'existing') console.log(`  - [reuse] ${c.characterId} as ${c.roleInChain}`);
@@ -172,7 +175,7 @@ async function runChain(client: OpenAI, pool: CharacterPool, day: number, totalU
   const chainId = `c${day}_${Math.random().toString(36).slice(2, 8)}`;
   const recentMotifs: string[] = []; // (single-session, no tracking yet)
 
-  console.log('\n[bible] gpt-5-mini — typical 20-60s for reasoning + JSON output. Be patient.');
+  console.log('\n[bible] gpt-5-mini (reasoning_effort=low) — typical 15-25s.');
   const { bible, usage: bUsage } = await withSpinner('bible', () => generateBible(client, {
     pool, region: 'Mireford', rarity, rewardSpec: reward,
     seedLeadBlurb: seedHint || undefined, requiredAnchorId: anchorId, isUnitChain: isUnit, recentMotifs,
@@ -188,7 +191,7 @@ async function runChain(client: OpenAI, pool: CharacterPool, day: number, totalU
   while (true) {
     hr();
     const force = beats.length + 1 >= bounds[1];
-    console.log(`\n[beat ${beats.length + 1}/${bounds[1]}] gpt-5-nano — typical 5-20s${force ? ' (forced climax)' : ''}.`);
+    console.log(`\n[beat ${beats.length + 1}/${bounds[1]}] gpt-5-nano (reasoning_effort=minimal) — typical 5-10s${force ? ' (forced climax)' : ''}.`);
     const { beat, usage: beatUsage } = await withSpinner('beat', () => generateBeat(client, bible, beats, rarity, force));
     totalUsage.cost += beatUsage.costUsd;
     console.log(`\n--- Beat ${beats.length + 1}${beat.isClimax ? ' [CLIMAX]' : ''} ---`);
@@ -207,7 +210,7 @@ async function runChain(client: OpenAI, pool: CharacterPool, day: number, totalU
   }
 
   hr();
-  console.log('[epilogue] gpt-5-mini — typical 15-40s.');
+  console.log('[epilogue] gpt-5-mini (reasoning_effort=low) — typical 15-25s.');
   const { epilogue, usage: epUsage } = await withSpinner('epilogue', () => generateEpilogue(client, bible, beats));
   totalUsage.cost += epUsage.costUsd;
   console.log(`\n=== Epilogue: "${epilogue.title}" ===`);
