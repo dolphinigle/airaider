@@ -336,6 +336,8 @@ interface RunChain {
   isUnitChain?: boolean;
   forbidReuse?: boolean;
   recentMotifs?: readonly string[];
+  model?: 'gpt-5-mini' | 'gpt-5-nano' | 'gpt-5';
+  readerFlavor?: string;
 }
 
 async function runChain(req: RunChain): Promise<{
@@ -381,6 +383,11 @@ async function runChain(req: RunChain): Promise<{
   if (req.themeKeywords.length) userParts.push(`Theme keywords: ${req.themeKeywords.join(', ')}`);
   if (req.seedLeadBlurb) userParts.push(`Inciting hint (must reflect in surfaceSituation): ${req.seedLeadBlurb}`);
   userParts.push(``);
+  if (req.readerFlavor) {
+    userParts.push(``);
+    userParts.push(`READER PREFERENCE (the player has stated this preference; weave it into the bible while keeping the grimdark setting intact):`);
+    userParts.push(req.readerFlavor);
+  }
   if (req.recentMotifs && req.recentMotifs.length) {
     userParts.push(``);
     userParts.push(`RECENTLY-USED CENTRAL DEVICES (do NOT reuse as this chain's central device): ${req.recentMotifs.join(' | ')}`);
@@ -398,7 +405,7 @@ async function runChain(req: RunChain): Promise<{
   console.log(`  [${req.label}] approx input chars: ${approxInputChars} (~${Math.round(approxInputChars / 4)} tokens)`);
 
   const resp = await client.chat.completions.create({
-    model: 'gpt-5-mini',
+    model: req.model ?? 'gpt-5-mini',
     messages: [
       { role: 'system', content: SYSTEM },
       { role: 'user', content: usr },
@@ -486,56 +493,45 @@ function applyArcStateUpdates(bible: z.infer<typeof PoolBibleOutSchema>, label: 
 
 // ---------------- the 3-chain run ----------------
 
+const FURRY_FLAVOR = `The player enjoys character-driven anthropomorphic visual novels in the vein of "Nekojishi" and "Adastra" / "Astatos" — meaning: cast members are anthros (specify species in surface descriptions: fox, wolf, otter, bull, lynx, etc.); intimate emotional beats (vulnerability, tenderness, longing, mid-night confessions, romantic/queer subtext) are layered into the grimdark mercenary action; the controllingIdea may foreground intimacy/care/identity-as-species as much as politics. Do NOT abandon the grimdark setting — the mud and the marsh and the betrayals stay. Treat existing pool characters as anthros too: in the cast block's arcStateAfterChain you may include a species note for reused characters (e.g. "Marek Voss (mire-otter, greying)").`;
+
 const CHAINS: RunChain[] = [
   {
-    label: 'chain1',
+    label: 'nano_baseline',
     rarity: 'rare',
-    rewardSpec: 'rare recruit: an NPC from the cast joins the fort as a mid-career steward-soldier (administrative + martial tags)',
+    rewardSpec: 'rare recruit: an NPC from the cast joins the fort as a mid-career steward-soldier',
     themeKeywords: ['oath-bound', 'civic', 'lie'],
     seedLeadBlurb: 'A drowned smuggler washed up at Greyford with a noble house seal stitched into his cloak. Marek recognised the cipher.',
+    model: 'gpt-5-nano',
   },
   {
-    label: 'chain2',
+    label: 'mini_furry',
     rarity: 'rare',
-    rewardSpec: 'captive: an antagonist NPC ends the chain in the fort dungeon, available for ransom/recruit later',
+    rewardSpec: 'captive: an antagonist NPC ends the chain in the fort dungeon',
     themeKeywords: ['marsh-rite', 'old-faith', 'silence'],
-    seedLeadBlurb: 'Three village children have gone missing from the marsh hamlet of Slowwater in successive new moons. The hamlet refuses outside help and has closed its causeway with felled birch.',
-    recentMotifs: ['ledgers / account books', 'sealed noble cloaks', 'sewn-list contraband evidence', 'smuggling networks'],
+    seedLeadBlurb: 'Three village children have gone missing from the marsh hamlet of Slowwater in successive new moons. The hamlet refuses outside help.',
+    model: 'gpt-5-mini',
+    readerFlavor: FURRY_FLAVOR,
   },
   {
-    label: 'chain3',
+    label: 'nano_furry',
     rarity: 'rare',
-    rewardSpec: 'unique trait on Roselle Vance: "Reckoned With" (already partially earned in her own past chain) — +1 to vow/debt rolls',
-    themeKeywords: ['confession', 'public witness', 'inheritance'],
-    seedLeadBlurb: 'The abbey at Penholt — the same abbey Roselle fled — has sent a single bound book to Mireford addressed to her by name. The courier was found dead a day later in his rented bed, the book missing.',
-    requiredAnchorId: 'char_roselle',
-    recentMotifs: ['Greyford smuggling', 'crown adjutant arrivals', 'marsh disappearances'],
-  },
-  {
-    label: 'chain4_unit',
-    rarity: 'rare',
-    rewardSpec: 'unique trait on Tibalt Renn: he resolves (or entrenches) his fixation on his older brother — name a concrete narrative trait the climax earns',
+    rewardSpec: 'unique trait on Tibalt Renn: he resolves his fixation on his older brother — name a concrete narrative trait the climax earns',
     themeKeywords: ['brother', 'unfinished-contract', 'coming-of-age'],
-    seedLeadBlurb: 'A wagoneer wintering at Mireford claims he hired a crossbowman three years ago whose description matches a man Tibalt knew. The wagoneer is bound for Coldfen at first thaw.',
+    seedLeadBlurb: 'A wagoneer wintering at Mireford claims he hired a crossbowman three years ago whose description matches a man Tibalt knew.',
     requiredAnchorId: 'char_tibalt',
     isUnitChain: true,
-    recentMotifs: ['Greyford smuggling', 'abbey books', 'marsh disappearances'],
+    model: 'gpt-5-nano',
+    readerFlavor: FURRY_FLAVOR,
   },
   {
-    label: 'chain5_legendary',
+    label: 'mini_furry_legendary',
     rarity: 'legendary',
-    rewardSpec: 'rare item: a named artifact tied to one of the involved factions, with a permanent regional effect (engine assigns +1 prestige in Mireford while owned)',
+    rewardSpec: 'rare item: a named artifact, +1 prestige in Mireford while owned',
     themeKeywords: ['relic', 'crown', 'reckoning'],
     seedLeadBlurb: 'A crown adjutant arrives unannounced at Mireford gate carrying a sealed writ; he refuses to name his business until Marek meets him in private.',
-    recentMotifs: ['Greyford smuggling', 'abbey books', 'marsh disappearances', 'personal-debt closure'],
-  },
-  {
-    label: 'chain6_newonly',
-    rarity: 'rare',
-    rewardSpec: 'rare recruit: a new NPC joins the fort as a mercenary',
-    themeKeywords: ['far-trail', 'stranger-town', 'broken-oath'],
-    seedLeadBlurb: 'A trader returns from the Black Coast with word of a logging camp at Hollowfen where the foreman has been hanged and the loggers refuse to leave. The camp has no Mireford ties.',
-    forbidReuse: true,
+    model: 'gpt-5-mini',
+    readerFlavor: FURRY_FLAVOR,
   },
 ];
 
@@ -547,7 +543,7 @@ async function main(): Promise<void> {
     try {
       const r = await runChain(c);
       results.push(r);
-      console.log(`  bible: "${r.bible.title}"`);
+      console.log(`  model: ${c.model ?? 'gpt-5-mini'}  bible: "${r.bible.title}"`);
       console.log(`  controlling: ${r.bible.controllingIdea}`);
       console.log(`  cast: reuse=${r.reuseCount} new=${r.newCount}`);
       console.log(`  tokens: in=${r.promptTokens} (cached=${r.cachedTokens}) out=${r.completionTokens}`);
@@ -570,7 +566,7 @@ async function main(): Promise<void> {
   for (const r of results) {
     lines.push(`==========================================================`);
     lines.push(`# ${r.request.label}: ${r.bible.title}`);
-    lines.push(`  rarity=${r.request.rarity}  shape=${r.bible.shape}  reward="${r.request.rewardSpec}"`);
+    lines.push(`  model=${r.request.model ?? 'gpt-5-mini'}  rarity=${r.request.rarity}  shape=${r.bible.shape}  reward="${r.request.rewardSpec}"`);
     lines.push(`  controlling idea: ${r.bible.controllingIdea}`);
     lines.push(`  reuse=${r.reuseCount}  new=${r.newCount}  tokens=in:${r.promptTokens} cached:${r.cachedTokens} out:${r.completionTokens}`);
     lines.push(``);
