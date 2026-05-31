@@ -52,10 +52,9 @@ export const BibleSchema = z.object({
   // Fictional-truth tier — the bible is WHY the situation exists, not WHAT the player does.
   // Quest mechanics (player decisions, merc observations) emerge later when a separate AI
   // writes the next quest GIVEN the bible + prior-quest summaries.
-  backstoryThreads: z.array(z.string().min(20)).min(3).max(7),  // PICK ONE central WHY and go deep — answer the why-chain for the central situation/character (e.g., "why is the smuggler dead → he deserted Tevin → because his unit was ordered to kill the village he grew up in → he ran with the only thing he could trade, the chit"). Each bullet is ONE link in the chain.
-  conflictingInterests: z.array(z.string().min(20)).min(2).max(5), // who wants what from whom, why they clash. (e.g., "Jorun wants the chit destroyed to bury his daughter's passage debt; the Tevin paymaster wants the chit back as leverage; Drust wants Jorun gone so the ring promotes him."). Each bullet names the two parties + the object/stake of contention.
-  looseThreads: z.array(z.string().min(15)).min(1).max(4),    // open hooks that future chains/quests can pull on — things the bible plants but doesn't resolve. (e.g., "the daughter still doesn't know what her father paid for her passage", "the Tevin paymaster has not yet learned the courier is dead").
-  trajectory: z.string().min(20),                             // SCAFFOLD — 3-5 sentences sketching how the chain's beats might unfold given fictional truth, ENDS with how the climax delivers the engine reward. NOT prescriptive about player decisions — the quest-writer will choose.
+  backstoryThreads: z.array(z.string().min(20)).min(3),  // PICK ONE central WHY and go deep — answer the why-chain one link at a time until you reach something irreducible (a vow, a love, a loss, a debt). Each bullet is ONE link.
+  conflictingInterests: z.array(z.string().min(20)).min(2), // who wants what from whom, why they clash. Each bullet names the two parties + the object/stake + the why.
+  trajectory: z.array(z.string().min(20)).min(2).max(5),       // 2-5 BROAD beat sketches. NOT prescriptive. Each is a one-line beat with an optional "IF SUCCEED:" clause naming what gets unlocked next. Do NOT spell out the whole arc (the story can go off rail). The quest-writer downstream picks beats given prior-quest outcomes.
   setupPayoffs: z.array(z.object({ plant: z.string(), payoff: z.string() })).min(1).max(10),
   vignettes: z.array(z.string()).min(1).max(6),
   texture: z.array(z.string()).min(2).max(8),
@@ -151,23 +150,21 @@ CRAFT REQUIREMENTS (compact, in JSON):
     - "Veck's sister Mirel wants the chit destroyed (she's built a quiet life under a new name in Vael's End and Pellgrove's surfacing would expose her); Iselle wants Mirel found so Mirel can be turned into another asset"
     - "harbour-master Jorun wants Veck's body and effects quietly dumped (his name is in Veck's smuggling ledger); Drust wants the body examined publicly (he hated Veck and wants Iselle to demote him into Veck's vacated route)"
 
-- looseThreads: 1-4 TERSE bullets. Open hooks the bible plants but does NOT resolve this chain — material future chains/quests can pull on. Format: "<unresolved thing> — <why it matters later>".
-
-  EXAMPLE (drowned smuggler):
-    - "Mirel in Vael's End — alive, hidden, doesn't yet know her brother is dead"
-    - "the other two Pellgrove documents — held by a Tevin colonel who would also like them destroyed"
-    - "dockhand Pell who sold Veck out — paid 12 silver and a Tevin promise of pardon for his own desertion, which the officer has no intention of honouring"
+- NO LOOSE-THREADS FIELD. Do NOT output "looseThreads". If something is interesting enough to mention, EXPAND it: add another backstoryThread link, or add another conflictingInterest entry. The bible should be SELF-CONTAINED fictional truth where every interesting thing is grounded. Anything left dangling is sloppy — fold it in.
 
 - cast: 2-10 with roleInChain (protagonist | antagonist | complication | ally). Cast SIZE matches shape. For each, EITHER:
     { "kind": "existing", "characterId": "<exact id from pool>", "roleInChain": "...", "arcStateAfterChain": "<one-line update>" }
     OR
     { "kind": "new", "character": { "name", "tags", "surface", "want", "need", "ghost", "lie", "secret" }, "roleInChain": "...", "arcStateAfterChain": "..." }
 - surfaceSituation: STRING. 2-3 sentences. What strangers in the world are told (this is broader than the leadBoardBlurb — it's regional gossip, not the player's narrow lead).
-- hiddenSituation: STRING. 3-5 sentences. The compressed summary of the truth — distillate of backstoryThreads + conflictingInterests, so a quest-writer can grok the situation without re-reading every thread. WRITERS'-ROOM ONLY: do NOT reveal in beat 1.
-- trajectory: STRING. 3-5 sentences. SCAFFOLD only — a rough sketch of how the chain MIGHT unfold given the fictional truth, ending with how the engine reward fires. NOT prescriptive — the quest-writer will choose the actual beats given the bible + prior-quest summaries. DO NOT prescribe player decisions or merc observations here — those emerge in the quest layer.
+- hiddenSituation: STRING. 3-5 sentences. The compressed summary of the truth — distillate of backstoryThreads + conflictingInterests, so a quest-writer can grok the situation without re-reading every thread.
+- trajectory: ARRAY OF 2-5 BROAD BEAT SKETCHES. NOT prescriptive. Each bullet is a one-line beat with an optional "IF SUCCEED:" clause naming what gets unlocked next. Do NOT spell out the entire arc — leave room for the story to go off rail. The quest-writer picks the actual beats based on prior-quest outcomes. Do NOT prescribe player decisions or merc observations here.
 
-  EXAMPLE TRAJECTORY (drowned smuggler):
-    "Investigation surfaces Veck's deserter past and the chit's significance. Halmar's pursuit and Iselle's counter-pressure both bear on the fort. Climax delivers captive_to_dungeon when whichever of Halmar or Jorun the fort exposes is brought back alive; the chit either burns or surfaces depending on the path."
+  EXAMPLE (drowned smuggler):
+    - "Beat 1: investigate the body and effects at Greyford. IF SUCCEED: the chit is recovered and the sister-in-Vael's-End connection surfaces."
+    - "Beat 2: conflict surfaces between Halmar and Iselle over what to do with the chit. (Don't resolve — quest-writer resolves based on prior beat's outcome.)"
+    - "Beat 3: Jorun is squeezed between his daughter's safety and his exposure in Veck's ledger. (Don't resolve.)"
+    - "Climax: whichever of Halmar / Jorun the fort exposes first is brought back to the dungeon. Engine reward (captive_to_dungeon) fires there."
 - setupPayoffs: 1-10 plant/payoff pairs (specific named objects/habits/places). Count matches shape.
 - vignettes: 1-6 TERSE bullets describing small character/world moments that DO NOT advance plot — they BUILD WORLD. Examples from Cinderella: "mice tailor a dress at night; Jaq sews crooked but earnest", "Lucifer stalks Gus across the kitchen", "King throws a tantrum about wanting grandchildren", "stepsisters squabble over what dress to wear, knocking down a vase". The downstream beat-writer can insert any vignette anywhere to texture a beat — they don't have to use them, but having them makes the world ALIVE. Each bullet ~5-15 words. NOT prose.
 - texture: 2-8 TERSE bullets naming specific physical objects/places/sensory anchors in this chain's world. Examples from Cinderella: "pumpkin in the kitchen garden", "midnight bell of the palace tower", "torn pink dress with mother's ribbon", "glass slipper", "royal invitation parchment with the king's seal". Each bullet ~3-10 words. These ground the beat-writer's imagery.

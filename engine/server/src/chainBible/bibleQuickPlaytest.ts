@@ -97,10 +97,8 @@ function pretty(b: Bible): string {
   for (const t of b.backstoryThreads) lines.push(`  - ${t}`);
   lines.push(``, `conflictingInterests (${b.conflictingInterests.length} — who wants what from whom):`);
   for (const c of b.conflictingInterests) lines.push(`  - ${c}`);
-  lines.push(``, `looseThreads (${b.looseThreads.length} — unresolved hooks for future chains):`);
-  for (const l of b.looseThreads) lines.push(`  - ${l}`);
-  lines.push(``, `trajectory (SCAFFOLD — rough sketch, not prescriptive):`);
-  lines.push(`  ${b.trajectory}`);
+  lines.push(``, `trajectory (${b.trajectory.length} broad beat sketches — NOT prescriptive):`);
+  for (const t of b.trajectory) lines.push(`  - ${t}`);
   lines.push(``, `setupPayoffs (${b.setupPayoffs.length} — terse):`);
   for (const p of b.setupPayoffs) lines.push(`  plant: ${p.plant}`, `  payoff: ${p.payoff}`);
   lines.push(``, `vignettes (${b.vignettes.length} — world-building, do NOT advance plot):`);
