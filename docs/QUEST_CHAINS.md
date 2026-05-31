@@ -658,3 +658,22 @@ Validated in `poolPromptTest.ts iter5_cache_and_new`: when pool characters' `arc
 Expected: cache hit rises from ~1800 tok to ~3000 tok (~50% → ~75%) once the identity block stabilizes. At 10x cheaper cached-token pricing, this is ~$0.005/chain saved.
 
 Also defer to proper-impl. Prototype works fine without it.
+
+### 18.12 Model selection (LOCKED 2026-05-30 per issue #6)
+
+Benchmark in `engine/server/src/modelBenchmark.ts`: 5 models × 2 chains × gpt-5 judge on 6 criteria. Decision matrix below applies to ALL chain-related calls.
+
+| Pipeline stage | Model | Per-call cost | Why |
+|---|---|---|---|
+| Bible genesis (cast + situation + trajectory) | `gpt-5-mini` | ~$0.008 | High-leverage; best quality/$. Beats gpt-4.1 in quality AND price. |
+| Beat generation (one beat at a time, 3-6 per chain) | `gpt-5-nano` | ~$0.001/beat | Cheap is fine for routine progression beats. Add tight schema prompt: "surface/hidden/trajectory/dramaticIrony are STRINGS, not arrays" — nano otherwise sometimes returns arrays. |
+| Epilogue (voice + cliche discipline) | `gpt-5-mini` | ~$0.003 | Voice matters; one call per chain. |
+| Cliche scrub (regex + retry) | `gpt-5-nano` | ~$0.0005 | Mechanical text rewrite; nano is fine. |
+
+**Per-chain total**: ~$0.012-0.018.
+
+**gpt-5 (full) is OFF-LIMITS** at any tier. Ceiling test on chain B: 8.62 overall (vs gpt-5-mini's 8.22), cost $0.05 (vs $0.008). +0.4 quality points for 6× cost is not worth it at scale. Sharper controlling ideas come from prompt iteration on mini, not from upgrading the model.
+
+**gpt-4.1 family is OBSOLETE.** Strictly worse than gpt-5 family on quality AND price for these tasks. Never use it. Same for gpt-4o-mini (which had schema failures in the benchmark).
+
+See `docs/AI_PROVIDER.md §4` for the full pricing table and the non-chain callsite mapping.

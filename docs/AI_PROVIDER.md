@@ -76,30 +76,58 @@ Important: **this is community/benchmark consensus, NOT airaider-tested.** Real 
 
 ---
 
-## 4. The recommended hybrid (by purpose)
+## 4. The recommended hybrid (by purpose) — UPDATED 2026-05-30 per benchmark (issue #6)
 
-For the production game, organize calls by purpose:
+For the production game, organize OpenAI calls by purpose. The gpt-5 family (released after the earlier sections of this doc) is cheaper AND higher-quality than the gpt-4.1 / gpt-4o tiers it supersedes. Benchmark in `engine/server/src/modelBenchmark.ts` (5 models × 2 chains × gpt-5 judge) shows:
 
-| Purpose | Model | Why |
-|---|---|---|
-| **Structured scenario data** (Sultan-coin band, tag/attr usage, captive flow, wound severity) | **GPT-4o-mini** | Strict JSON Schema; cheap; reliable |
-| **Narrative flavor inside scenarios** | **GPT-4o-mini** (default) or **Claude Haiku 4.5** (if voice drift becomes a problem) | Test both; switch if drift observed |
-| **High-stakes one-offs** (legendary recruit arrival narration, quest arc beats, god-combo crit narration) | **Claude Sonnet 4.5** | Best voice consistency under pressure; cost-trivial at one-off scale |
-| **Bulk filler** (environmental descriptions, background NPC names) | **Gemini 2.0 Flash** | Cheapest; quality sufficient for non-critical text |
+- gpt-5-mini avg 7.92, $0.008/chain — winner
+- gpt-4.1 avg 7.26, $0.010/chain — worse AND more expensive
+- gpt-5-nano avg 6.25, $0.005/chain — fine for low-stakes; weak climax (4.2-5.4)
+- gpt-4.1-mini avg 5.73 — vague climaxes
+- gpt-4o-mini avg 5.05 — 1/2 chains schema-failed
 
-**For prototype**: simplify to **GPT-4o-mini for everything**, A/B test Sonnet on narrative-heavy moments in week 2-3.
+**gpt-4.1 family and gpt-4o family are obsoleted by the gpt-5 family for airaider's tasks.** Do not use them.
 
-### Narrative-vs-mechanical tier split (production wiring, deferred from prototype)
+| Purpose | Model | Cost/chain | Why |
+|---|---|---|---|
+| **Bible genesis** (story spine, controllingIdea, cast, trajectory) | **gpt-5-mini** | ~$0.008 | High-leverage call; best quality/$ ratio |
+| **Beat generation** (one beat at a time) | **gpt-5-nano** | ~$0.001/beat | 3-6 calls per chain; cheap is fine |
+| **Epilogue** (voice + cliche discipline) | **gpt-5-mini** | ~$0.003 | Voice matters; one call per chain |
+| **Cliche scrub** (regex + retry) | **gpt-5-nano** | ~$0.0005 | Mechanical text rewrite |
+| **Tag extraction** (parse AI prose → tagIds) | **gpt-5-nano** | ~$0.0005 | Player only sees the resulting tags |
+| **Numeric envelope** (AI asks "what stats", engine picks numbers — but the "what stats" call) | **gpt-5-nano** | ~$0.0003 | Structured output; voice irrelevant |
 
-The prototype runs one model (`AIRAIDER_LLM_MODEL`, default `gpt-4o-mini`) for every callsite. Production should split into two tiers — narrative (player reads it) gets a stronger model; mechanical (engine consumes IDs) gets the cheapest model that can follow JSON schema.
+**Per-chain total:** ~$0.012-0.018 including all beats.
+
+**gpt-5 (full) ruled out at any tier (issue #6):** ceiling test showed +0.53 quality points for 6.4× cost. Sharper controlling ideas can be obtained from gpt-5-mini with prompt iteration that hasn't been fully exploited.
+
+**Multi-provider (Claude / Gemini)** stays a future option. Lines 85-88 of an earlier draft suggested Claude Sonnet 4.5 for high-stakes / Gemini 2.0 Flash for bulk — those recommendations are NOT validated. For now, all calls go to OpenAI.
+
+### 4.1 Pricing reference (per 1M tokens, confirmed 2026-05-30)
+
+| Model | Input | Output | Cached input |
+|---|---|---|---|
+| gpt-5 | $1.25 | $10.00 | $0.125 |
+| gpt-5-mini | $0.25 | $2.00 | $0.025 |
+| gpt-5-nano | $0.05 | $0.40 | $0.005 |
+| gpt-4.1 | $2.00 | $8.00 | $0.50 |
+| gpt-4.1-mini | $0.40 | $1.60 | $0.10 |
+| gpt-4.1-nano | $0.10 | $0.40 | $0.025 |
+| gpt-4o-mini | $0.60 | $2.40 | $0.30 |
+
+`gpt-5-nano` is the cheapest reliable option. `gpt-4o-mini` (older default) is 12× more expensive than gpt-5-nano on input. Never use it.
+
+### Narrative-vs-mechanical tier split (production wiring)
+
+The prototype runs one model (`AIRAIDER_LLM_MODEL`, default `gpt-5-mini`) for every callsite. Production should split into two tiers — narrative (player reads it) gets a stronger model; mechanical (engine consumes IDs) gets the cheapest model that can follow JSON schema.
 
 | Env var | Default | Used by |
 |---|---|---|
-| `AIRAIDER_LLM_NARRATIVE_MODEL` | `gpt-4o-mini` (or `gpt-4.1-mini` once budget allows) | `narrate()`, `aiLeadGen` — anything the player reads as prose |
-| `AIRAIDER_LLM_MECHANICAL_MODEL` | `gpt-4.1-nano` | `flavorCaptive()`, `generateQuestRecruit()` — name + tagIds from outcome story; player only sees the resulting tags/labels, not the raw response |
+| `AIRAIDER_LLM_NARRATIVE_MODEL` | `gpt-5-mini` | `narrate()`, `aiLeadGen`, chain bibles & epilogues — anything the player reads as prose |
+| `AIRAIDER_LLM_MECHANICAL_MODEL` | `gpt-5-nano` | `flavorCaptive()`, `generateQuestRecruit()`, tag extraction, beat generation — player only sees the resulting tags/labels |
 | `AIRAIDER_LLM_MODEL` | (unset) | Single-knob override; if set, wins over both above |
 
-**Rationale (per @dolphinigle, 2026-05-30 morning):** "we want the more expensive model for narration and the cheap model like mini/nano for the mechanical stuff like generating unit tags from story." Pricing per 1M tok: `gpt-4.1-nano` $0.10/$0.40 → `gpt-4o-mini` $0.15/$0.60 (1.5× nano) → `gpt-4.1-mini` $0.40/$1.60. Three viable test candidates: **nano / 4o-mini / 4.1-mini**, chosen per callsite based on whether prose quality matters.
+**Rationale (per @dolphinigle, 2026-05-30):** "we want the more expensive model for narration and the cheap model like mini/nano for the mechanical stuff like generating unit tags from story." Benchmark (issue #6) confirmed gpt-5-mini is the winner for narrative work; gpt-5-nano is the cheapest reliable mechanical option.
 
 **Implementation note:** wire `pickModel(tier: 'narrative' | 'mechanical')` once in `engine/server/src/leanLlm.ts`; have callsites pass their tier. Falls back to `AIRAIDER_LLM_MODEL` then to the tier default.
 
