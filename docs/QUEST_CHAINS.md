@@ -503,3 +503,126 @@ The follow-up chain path (one chain's epilogue threading into the next chain's g
 
 The default `ACTIVE_CHAIN_CAP = 3` is correct for production but hits hard during debug/playtest sessions where many chains are forced into existence. The orchestrator now reads `process.env.AIRAIDER_CHAIN_PLAYTEST` and uses cap=10 when set, cap=3 otherwise. The same env var also boosts the follow-up multiplier and lifts certain trigger probabilities.
 
+
+---
+
+## 18. Character pool + bible architecture (validated 2026-05-30)
+
+This supersedes the story-first genesis described in §§3-16. The shipped pipeline (`aiQuestChain.ts`, commit `4888431`) produced fanfic prose stories — locally vivid but mechanically opaque. The new architecture replaces "AI writes a 1100-word short story" with "AI writes a compact STORY BIBLE from a persistent CHARACTER POOL." Validated via `engine/server/src/poolPromptTest.ts` (3 sequential bibles + 1 unit-chain, gpt-5-mini, all four reused 100% of cast).
+
+### 18.1 Why a pool
+
+Every chain casts 2-5 characters. Without a pool the AI coins new names every chain, so the world feels stranger-soup — never the same NPC twice, no memory of the prior chain's wins/losses. With a pool:
+- characters persist across chains, so the world feels lived-in
+- a character's `want/need/ghost/lie/secret` from one chain can drive the next chain's hidden situation
+- captives, slain antagonists, and recruited NPCs ALL live in the same pool with a `role` field
+- unit chains (§18.5) become trivial: anchor the chain to a pool character whose ghost is already specified
+
+### 18.2 Character shape
+
+```ts
+interface PoolCharacter {
+  id: string;              // char_marek, char_roselle, etc.
+  name: string;
+  region: string;          // Mireford, Greyford, Vael's End, ...
+  role: 'mercenary' | 'captive' | 'npc' | 'dead';
+  tags: string[];          // ['veteran', 'sergeant', 'mire-born']
+  surface: string;         // public-facing description (one sentence)
+  want: string;            // conscious goal
+  need: string;            // unconscious correction
+  ghost: string;           // the wound that made them
+  lie: string;             // the false belief they act on
+  secret: string;          // the concrete object/letter/list they hide
+  arcState: string;        // one line, where they are RIGHT NOW (updates per chain)
+}
+```
+
+Mercenaries ARE pool characters with `role: 'mercenary'`. No second hierarchy. Captives ARE pool characters with `role: 'captive'`. The dead persist (with `role: 'dead'`) so a future chain can reference them by name without re-introducing them.
+
+### 18.3 Pool selection for a chain
+
+The AI does NOT see the entire pool — that would blow tokens and confuse selection at scale. Per chain we send three buckets:
+
+1. **Cached prefix** (~5-8 chars, ~stable across chains): fort roster (mercenaries) + 3-5 regional landmarks. These rarely change between chains, so OpenAI prompt-caching applies on the second+ chain in a session. Cost: free after first.
+2. **Dynamic sample** (4 / 6 / 8 by rarity common/rare/legendary): regional NPCs not in the prefix, sorted by recency-of-mention. This is the "casting call" the AI picks supporting roles from.
+3. **Required anchor** (optional): for unit chains or follow-up chains, the engine pins one specific character that MUST appear.
+
+Token budget validated empirically: prefix 8 + sample 6 + anchor 1 = 15 character blocks ≈ 3300 input tokens (incl. system prompt). Well under the 5k target.
+
+### 18.4 Bible output shape
+
+```ts
+{
+  title: string,                    // 2-8 words, concrete proper noun, banned patterns (§17.2)
+  controllingIdea: string,          // one sentence; what the chain ARGUES (moral claim)
+  cast: CastEntry[2..5],            // discriminated union: existing | new
+  surfaceSituation: string,         // 2-3 sentences (what strangers are told)
+  hiddenSituation: string,          // 3-5 sentences (what's really going on)
+  trajectory: string,               // 3-5 sentences, ENDS with how climax delivers reward
+  setupPayoffs: { plant, payoff }[2..5],
+  dramaticIrony: string,
+}
+```
+
+`CastEntry` is a discriminated union:
+```ts
+{ kind: 'existing', characterId, roleInChain, arcStateAfterChain }
+{ kind: 'new', character: {name, tags, surface, want, need, ghost, lie, secret}, roleInChain, arcStateAfterChain }
+```
+
+`roleInChain` ∈ `protagonist | antagonist | complication | ally`. `arcStateAfterChain` is a one-line update (≤150 chars) describing where the character ends up. The engine applies this update to the pool after the chain epilogue resolves.
+
+### 18.5 Unit chains
+
+A unit chain is a normal chain with `isUnitChain: true` and a required anchor. The prompt tells the AI: *"the anchor MUST be protagonist, and the controllingIdea/hiddenSituation/trajectory MUST be driven by their want/need/ghost/lie. The chain exists to advance THEIR arc."*
+
+Validated example (Tibalt Renn — ghost: brother who never came back from a contract):
+- title: "Wagon to Coldfen"
+- controllingIdea: "Clinging to a vanished brother's story keeps a man from becoming his own person."
+- reward: named trait "Closed Account" — earned by Tibalt reading and burning his brother's unsent letter at the climax
+- cast reuse: 4/4 (Drust as complication, Marek as authority-figure, Roselle as evidence-witness)
+
+Mechanically a unit chain is the same as a region chain. The only differences:
+1. The reward spec must be a named trait, item, or arc-marker on the anchor (not a generic "rare recruit")
+2. The follow-up chance multiplier is higher than a region chain (the unit's arc has natural sequels: now they grapple with what they earned/lost)
+
+### 18.6 Reward fulfillment as engine spec
+
+The bible's `trajectory` describes how the climax delivers the reward narratively. But the actual reward is an **engine-declared spec** passed INTO the bible prompt:
+
+```ts
+type RewardSpec =
+  | { kind: 'promote_to_merc' }      // a cast NPC becomes a fort mercenary
+  | { kind: 'unique_trait_on_anchor', traitName, mechanicalEffect }
+  | { kind: 'unique_item', slotHint, mechanicalEffect }
+  | { kind: 'captive_to_dungeon', preferAntagonist: true }
+  | { kind: 'regional_prestige', amount }
+  | { kind: 'gold', amount };
+```
+
+The engine picks the reward kind (balancing economy) and the AI picks WHICH cast member receives it and how the climax delivers it. This obeys CANONICAL_DESIGN §1 (Engine owns numbers, AI owns flavor).
+
+### 18.7 ArcState evolution across chains
+
+Validated 3-chain sequence (Mireford pool, see `files/experiments/pool-prompt-test-iter2.txt`):
+- chain1 freed Drust from dungeon → "freed... hired as boat-handler"
+- chain2 used him as a witness → "named as a key witness... resentful of his usefulness"
+- chain3 had him testify publicly → "Testified at the public muster... granted a conditional pardon and a berth on a Greyford barge to leave Mireford"
+
+Each chain's `arcStateAfterChain` for Drust naturally inherited the prior state without us telling the AI to do so. The pool block in the next chain's prompt shows the updated arcState, and the AI reasoned forward from there.
+
+### 18.8 Known limitations
+
+- **Cliché leakage**: banned tokens (`weight`, `shadow`, `burden`) still leak ~1 per 3 chains even with explicit ban + few-shot replacement. Pragmatic fix: post-process regex scrubber with retry on the AI side; defer to a polish pass.
+- **Thematic fixation**: with a Drust-shaped pool (the captive holds a sewn list of names), three of three chains gravitated to ledger/account/list thematic devices. Risk mitigation: rotate seedLeadBlurbs so each chain has a clearly distinct inciting object, OR add an explicit "avoid these recent themes" line listing the last 2-3 chain titles.
+- **Token cost per call**: ~3300 in / ~3500 out × 4 chains = 13k in / 14k out. At gpt-5-mini pricing (~$0.40 in / $1.60 out per 1M) that's ~$0.03/chain. Acceptable.
+
+### 18.9 Implementation phases (deferred from prototype to proper-impl)
+
+1. Build `CharacterPoolService` with the schema above + region filter + recency sort
+2. Replace `aiQuestChain.ts` genesis with the bible pipeline from `chainBibleExperiment.ts`
+3. Wire pool selection: cached prefix from fort roster + landmarks; dynamic sample from region NPCs
+4. Persist `arcStateAfterChain` updates back to the pool after each chain's epilogue
+5. Reward fulfillment dispatch: map the engine reward spec to a cast member chosen by the AI
+6. Unit chain trigger: when a mercenary's chain count = 0 and they have a non-empty ghost/lie, spawn a unit chain anchored to them
+7. Follow-up chains: when a chain ends with loose threads, sample one of the involved cast members for a sequel and pass the prior bible as inheritance context
