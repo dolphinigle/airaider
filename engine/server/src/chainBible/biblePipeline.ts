@@ -49,11 +49,13 @@ export const BibleSchema = z.object({
   cast: z.array(CastEntry).min(2).max(10),
   surfaceSituation: z.string().min(20),
   hiddenSituation: z.string().min(20),
-  // Player-agency tier — the bible drives a PLAYER-AND-MERC LOOP, not a story that happens to characters.
-  openQuestion: z.string().min(15),                   // the central uncertainty the chain investigates
-  mercObservations: z.array(z.string()).min(3).max(7),// what mercs report back to the player, beat by beat
-  playerDecisions: z.array(z.string()).min(2).max(5), // moments where the player chooses; each bullet states the options
-  trajectory: z.string().min(20),                     // branching outline keyed to player choices
+  // Fictional-truth tier — the bible is WHY the situation exists, not WHAT the player does.
+  // Quest mechanics (player decisions, merc observations) emerge later when a separate AI
+  // writes the next quest GIVEN the bible + prior-quest summaries.
+  backstoryThreads: z.array(z.string().min(20)).min(3).max(7),  // PICK ONE central WHY and go deep — answer the why-chain for the central situation/character (e.g., "why is the smuggler dead → he deserted Tevin → because his unit was ordered to kill the village he grew up in → he ran with the only thing he could trade, the chit"). Each bullet is ONE link in the chain.
+  conflictingInterests: z.array(z.string().min(20)).min(2).max(5), // who wants what from whom, why they clash. (e.g., "Jorun wants the chit destroyed to bury his daughter's passage debt; the Tevin paymaster wants the chit back as leverage; Drust wants Jorun gone so the ring promotes him."). Each bullet names the two parties + the object/stake of contention.
+  looseThreads: z.array(z.string().min(15)).min(1).max(4),    // open hooks that future chains/quests can pull on — things the bible plants but doesn't resolve. (e.g., "the daughter still doesn't know what her father paid for her passage", "the Tevin paymaster has not yet learned the courier is dead").
+  trajectory: z.string().min(20),                             // SCAFFOLD — 3-5 sentences sketching how the chain's beats might unfold given fictional truth, ENDS with how the climax delivers the engine reward. NOT prescriptive about player decisions — the quest-writer will choose.
   setupPayoffs: z.array(z.object({ plant: z.string(), payoff: z.string() })).min(1).max(10),
   vignettes: z.array(z.string()).min(1).max(6),
   texture: z.array(z.string()).min(2).max(8),
@@ -126,21 +128,46 @@ CRAFT REQUIREMENTS (compact, in JSON):
   Engine guidance: common tends tight, rare tends classic, legendary tends ensemble/twist. Situation overrides rarity.
   CAST DENSITY IS PLAYER ENGAGEMENT. Cinderella as a chain bible would be ENSEMBLE (Cinderella, stepmother, Anastasia, Drizella, fairy godmother, prince, king, Jaq, Gus, Lucifer = 10). Not 4 because "it's the simplest story possible". A world with only 4 characters feels empty. Bias UP, not down.
 - controllingIdea: DELETED FIELD. Do NOT output this. The bible focuses on characters + situation + trajectory; do not write a moralizing thesis statement.
-- leadBoardBlurb: 1-2 sentences shown to the player on the LEAD BOARD when this chain first appears, BEFORE they have ever met the cast. CRITICAL: the player at this point is sitting in their fort and knows NOTHING about the situation. Do NOT use cast member proper nouns the player has not encountered. Use concrete physical anchors: a body, a sealed letter, a runaway, a missing barge, a payment overdue, a banner outside the gate. Also CRITICAL: the blurb sounds like a NORMAL CONTRACT — do NOT spoil the deeper story. The hook should look mundane ("vanquish a bandit camp threatening the road"); the real story (bandit leader resembles Marek; he's the missing brother) emerges through merc reports DURING the chain. Think: the player should deploy mercs not knowing what they'll find. The blurb tells them WHY they would deploy, not WHAT they will discover.
+- leadBoardBlurb: 1-2 sentences shown to the player on the LEAD BOARD when this chain first appears, BEFORE they have ever met the cast. CRITICAL: the player at this point is sitting in their fort and knows NOTHING about the situation. Do NOT use cast member proper nouns the player has not encountered. Use concrete physical anchors: a body, a sealed letter, a runaway, a missing barge, a payment overdue, a banner outside the gate. Also CRITICAL: the blurb sounds like a NORMAL CONTRACT — do NOT spoil the deeper story. The hook should look mundane ("vanquish a bandit camp threatening the road"); the deeper truth (bandit leader is Marek's brother, deserted Tevin years ago and built the camp on stolen coin) is in backstoryThreads, NOT in the blurb.
 - firstBeatOnramp: 1-2 sentences of stage-direction for the writer of beat 1 — "this is how the party arrives at the situation from cold". Anchors the first beat in the leadBoardBlurb (don't drop the player mid-scene with named characters they've never met). Example: "the party rides out to the bandit camp described in the contract; they don't yet know the leader is anyone they recognize."
-- openQuestion: ONE TERSE sentence naming the central uncertainty THE PLAYER will resolve via deployed mercs. Examples: "Who runs the Greyford courier ring, and is the harbour-master in on it?" / "Why does the bandit leader at Coldfen look like Marek?" / "Whose ledger entries actually match the magistrate's signature?" This is NOT just "what's the plot" — it's the puzzle the player is solving.
-- mercObservations: 3-7 TERSE bullets, each describing ONE THING a deployed merc would report back to the player. These are HOW the story unfolds — the player doesn't watch the story happen; the merc returns and tells them what they saw. Examples: "merc finds a sealed letter sewn into the drowned man's cloak, doesn't open it (asks player whether to)", "merc notes the bandit leader has Marek's bilge-dagger scar and the same flinch when fires snap", "merc returns with a forged Tevin chit that the harbour-master tried to swap mid-conversation". Each bullet 8-20 words. Be SPECIFIC about the observation, not vague ("merc finds clues").
-- playerDecisions: 2-5 TERSE bullets, each naming a MOMENT where the player makes a meaningful choice. State the options in the bullet. Example: "after the sealed letter is recovered: PLAYER CHOOSES (a) hand it to the magistrate publicly — fast prestige path / (b) confront Jorun privately with it — leverage path / (c) destroy it — protect-Greyford path". Each decision is a TRUE branch, not a cosmetic pick. The trajectory below explains how each branch resolves.
+
+- backstoryThreads: 3-7 TERSE bullets. THIS IS THE HEART OF THE BIBLE. Pick the ONE central WHY of this chain's situation/character and go DEEP — answer the why-chain ONE LINK AT A TIME until you reach something irreducible (a vow, a love, a loss, a debt). Each bullet is ONE link. Breadth-first ("everyone has a secret") is BAD; depth-first ("here is exactly why THIS situation exists") is GOOD. The bible exists so no asspulling happens — if a later quest reveals X about a character, X must already be in backstoryThreads or be a natural consequence of it.
+
+  EXAMPLE (drowned smuggler — go DEEP on the smuggler's WHY):
+    - "the drowned man, Veck Tarrin, was a Tevin deserter — he ran from his unit six years ago"
+    - "his unit had been ordered to burn the village of Pellgrove (his birthplace); he refused, killed his lieutenant, and fled with the company paymaster's signet chit"
+    - "Tevin never officially admitted Pellgrove happened; the chit is one of three documents that could prove the order existed"
+    - "Veck used the chit to buy passage and falsified papers; for years he ran small smuggling jobs for Iselle's Greyford ring to stay below visibility"
+    - "two months ago a Tevin officer recognized him at a Greyford dock and bought information from a dockhand named Pell"
+    - "the night he died, Veck was meeting a contact named 'Halmar' — actually the Tevin officer — under the pretext of selling the chit back"
+    - "Veck went to that meeting because his sister, who he hadn't seen since Pellgrove, had sent word she was alive and wanted the chit destroyed to bury the past"
+
+  NOTICE: each bullet is ONE link in the why-chain. By the end, the reader knows WHY the body is at Greyford, WHY the chit matters, WHY Veck went to a meeting he should have known was a trap. NO breadth ("the harbour-master is corrupt" — that's a separate thread; put it in conflictingInterests). NO mood-painting.
+
+- conflictingInterests: 2-5 TERSE bullets. Each bullet names TWO PARTIES + the OBJECT/STAKE they clash over + WHY. This is the conflict-engine of the chain — pre-loaded fuel for whoever writes the next quest. Format: "<party A> wants <stake>, <party B> wants <stake>, because <why>".
+
+  EXAMPLE (drowned smuggler):
+    - "Tevin officer 'Halmar' wants the chit destroyed quietly to bury Pellgrove; Iselle's ring wants it kept to threaten Tevin if Tevin ever pressures the Greyford route"
+    - "Veck's sister Mirel wants the chit destroyed (she's built a quiet life under a new name in Vael's End and Pellgrove's surfacing would expose her); Iselle wants Mirel found so Mirel can be turned into another asset"
+    - "harbour-master Jorun wants Veck's body and effects quietly dumped (his name is in Veck's smuggling ledger); Drust wants the body examined publicly (he hated Veck and wants Iselle to demote him into Veck's vacated route)"
+
+- looseThreads: 1-4 TERSE bullets. Open hooks the bible plants but does NOT resolve this chain — material future chains/quests can pull on. Format: "<unresolved thing> — <why it matters later>".
+
+  EXAMPLE (drowned smuggler):
+    - "Mirel in Vael's End — alive, hidden, doesn't yet know her brother is dead"
+    - "the other two Pellgrove documents — held by a Tevin colonel who would also like them destroyed"
+    - "dockhand Pell who sold Veck out — paid 12 silver and a Tevin promise of pardon for his own desertion, which the officer has no intention of honouring"
+
 - cast: 2-10 with roleInChain (protagonist | antagonist | complication | ally). Cast SIZE matches shape. For each, EITHER:
     { "kind": "existing", "characterId": "<exact id from pool>", "roleInChain": "...", "arcStateAfterChain": "<one-line update>" }
     OR
     { "kind": "new", "character": { "name", "tags", "surface", "want", "need", "ghost", "lie", "secret" }, "roleInChain": "...", "arcStateAfterChain": "..." }
 - surfaceSituation: STRING. 2-3 sentences. What strangers in the world are told (this is broader than the leadBoardBlurb — it's regional gossip, not the player's narrow lead).
-- hiddenSituation: STRING. 3-5 sentences. What's really going on. WRITERS'-ROOM ONLY: do NOT reveal in beat 1; reveal beat by beat.
-- trajectory: STRING. 4-7 sentences mapping the chain as a PLAYER-DECISION LOOP, NOT a story that unfolds on its own. Format: "Lead board offers HOOK. Player deploys mercs. After beat 1 mercs return with OBSERVATION_A and DECISION_1. If player picks (a): mercs investigate X, return with OBSERVATION_B and DECISION_2... Climax (player choices accumulate to outcome): the engine reward fires when [SPECIFIC EVENT enabled by the player's chosen path]." If two paths lead to the same reward but via different events, name BOTH. Engine-fixed reward MUST land in the climax sentence, but the SHAPE of how it lands depends on player choices.
+- hiddenSituation: STRING. 3-5 sentences. The compressed summary of the truth — distillate of backstoryThreads + conflictingInterests, so a quest-writer can grok the situation without re-reading every thread. WRITERS'-ROOM ONLY: do NOT reveal in beat 1.
+- trajectory: STRING. 3-5 sentences. SCAFFOLD only — a rough sketch of how the chain MIGHT unfold given the fictional truth, ending with how the engine reward fires. NOT prescriptive — the quest-writer will choose the actual beats given the bible + prior-quest summaries. DO NOT prescribe player decisions or merc observations here — those emerge in the quest layer.
 
-  EXAMPLE TRAJECTORY (the user's bandit-camp/Marek scenario):
-    "Lead board: 'a bandit camp threatens the Coldfen road, vanquish it.' Player deploys mercs to scout/raid. Beat 1 (merc returns): leader of the camp has Marek's bilge-dagger scar and his exact flinch at fire. DECISION 1: PLAYER (a) confronts Marek directly, (b) sends mercs back for more proof, (c) authorises the raid anyway. Beat 2-3 depend on path: (a) Marek confesses or denies — chain pivots to his exposure or breaking; (b) mercs return with the brother's tattooed forearm matching family records; (c) raid succeeds but Marek refuses to debrief the killed. Climax: the brother is captured alive (engine reward: captive_to_dungeon), regardless of path; the SHAPE depends on whether Marek admitted relation (path a) or learned only at the cell (paths b/c)."
+  EXAMPLE TRAJECTORY (drowned smuggler):
+    "Investigation surfaces Veck's deserter past and the chit's significance. Halmar's pursuit and Iselle's counter-pressure both bear on the fort. Climax delivers captive_to_dungeon when whichever of Halmar or Jorun the fort exposes is brought back alive; the chit either burns or surfaces depending on the path."
 - setupPayoffs: 1-10 plant/payoff pairs (specific named objects/habits/places). Count matches shape.
 - vignettes: 1-6 TERSE bullets describing small character/world moments that DO NOT advance plot — they BUILD WORLD. Examples from Cinderella: "mice tailor a dress at night; Jaq sews crooked but earnest", "Lucifer stalks Gus across the kitchen", "King throws a tantrum about wanting grandchildren", "stepsisters squabble over what dress to wear, knocking down a vase". The downstream beat-writer can insert any vignette anywhere to texture a beat — they don't have to use them, but having them makes the world ALIVE. Each bullet ~5-15 words. NOT prose.
 - texture: 2-8 TERSE bullets naming specific physical objects/places/sensory anchors in this chain's world. Examples from Cinderella: "pumpkin in the kitchen garden", "midnight bell of the palace tower", "torn pink dress with mother's ribbon", "glass slipper", "royal invitation parchment with the king's seal". Each bullet ~3-10 words. These ground the beat-writer's imagery.
@@ -175,6 +202,7 @@ The bible has TWO kinds of fields:
 
   WRITERS'-ROOM SCAFFOLD (CLINICAL, no literary voice):
     - surfaceSituation, hiddenSituation, trajectory
+    - backstoryThreads, conflictingInterests, looseThreads — bullet form, terse, FICTIONAL TRUTH not mood
     - firstBeatOnramp
     - setupPayoffs (plant/payoff pairs)
     - cast.arcStateAfterChain
