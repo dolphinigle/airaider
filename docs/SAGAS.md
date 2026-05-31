@@ -270,35 +270,26 @@ You are writing CHAIN N of a saga of M total chains.
 
 That last rule matters: if chain 2 failed unexpectedly (say, the antagonist died early when the skeleton expected them in chain 4), the writer-room must adapt. The amendment system (§3.3) usually patches this, but the rule is a safety net.
 
-### 3.3 Saga ↔ chain player-agency contract (added 2026-06-XX, post bible iter-D)
+### 3.3 Saga ↔ chain player-agency contract (added 2026-06-XX, updated after bible iter-E)
 
-The chain bible (post iter-D, commit `690b0a0`) now exposes:
-- `openQuestion` — the central uncertainty the player resolves via deployed mercs
-- `mercObservations` — what mercs report back over the chain's beats (the reveal mechanism)
-- `playerDecisions` — explicit branch moments with stated options
-- `trajectory` — branching outline that ends with the engine reward firing on the player's chosen path
+The chain bible (post iter-E, commit `fef259b`) is FICTIONAL TRUTH ONLY — it holds the WHY of the situation:
+- `backstoryThreads` — the why-chain, one link per bullet, depth-first on ONE central cause
+- `conflictingInterests` — who wants what from whom and WHY they clash
+- `looseThreads` — open hooks future chains can pull
+- `hiddenSituation` / `trajectory` — compressed summary + rough scaffold (not prescriptive)
 
-The saga skeleton speaks in **per-phase plotPoints**. The chain genesis call must TRANSLATE each phase's plotPoints into the chain's mercObservations + playerDecisions + trajectory, NOT just narrate them as inevitable events. The contract:
+Player agency does NOT live in the bible. It emerges LATER when a separate quest-writer AI consumes the bible + prior-quest summaries and authors the next quest. The contract:
 
-| Saga side (writers' room) | Chain side (delivered to player) |
-|---|---|
-| `phases[N].plotPoints[K]` = "Marek's brother surfaces at Coldfen" | `mercObservations` includes "merc reports the bandit leader has Marek's scar" |
-| `phases[N].plotPoints[last]` = lands engine reward | `trajectory` ends with the reward fire AFTER the player's decision tree resolves |
-| `pinnedCast[i].charmHook` for cast appearing in this phase | bible.cast for that character carries the same voice |
-| `amendments[]` (from failed prior chains) | bible.hiddenSituation + trajectory must reflect them |
+| Saga side (writers' room) | Bible side (fictional truth) | Quest layer (player-facing) |
+|---|---|---|
+| `phases[N].plotPoints` = destinations | `backstoryThreads` answers WHY those destinations exist | quest-writer chooses HOW the next quest surfaces a thread |
+| `phases[N].plotPoints[last]` = lands reward | bible.trajectory sketches reward fire path | quest-writer choreographs the beat-level decisions |
+| `pinnedCast[i].charmHook` | bible.cast carries the same voice | quest-writer keeps the voice in dialogue |
+| `amendments[]` (from failed chains) | bible bakes them into backstoryThreads / hiddenSituation | quest-writer respects them when generating next quest |
 
-**Prompt-rule added to chain genesis (saga mode):**
-```
-The saga's phase N plot points are the DESTINATION. The PLAYER's actions
-across mercObservations + playerDecisions are the PATH. Translate each plot
-point into either (a) a thing a merc could report back, or (b) a stated
-player decision that BRANCHES toward landing the plot point. Never write
-plot points as fait accompli — the player must drive each one.
-```
+**Why this separation matters:** the bible is the "no asspulling" guarantee. If a quest reveals X, X must already be in backstoryThreads or be a natural consequence of them. The quest-writer is FREE to pick HOW to surface threads (player deploys mercs, mercs report observations, player decides) — but the bible holds the truth they're surfacing.
 
-**Validation (observational, logged):** post-chain, for each `phases[N].plotPoints[K]`, the engine checks that at least one `mercObservations` entry OR one `playerDecisions` branch outcome references it. Drift logged, not blocked.
-
-This is the missing link between "the saga has a plan" and "the player has agency". Without it, sagas slide back into watch-mode storytelling.
+**Saga prompt rule (unchanged):** translate per-phase plotPoints into the chain's fictional ground (extend the why-chain into backstoryThreads; add adversaries' stakes to conflictingInterests). The quest layer downstream handles the player-facing surface.
 
 ### 3.4 Skeleton mutation on chain failure
 

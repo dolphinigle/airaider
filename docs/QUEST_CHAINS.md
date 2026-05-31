@@ -551,24 +551,25 @@ Token budget validated empirically: prefix 8 + sample 6 + anchor 1 = 15 characte
 
 ### 18.4 Bible output shape
 
-> **UPDATED 2026-06-XX (commits `603f4e0`, `690b0a0`):** the bible now includes world-density fields (vignettes, texture, antagonistHumanity) and player-agency fields (openQuestion, mercObservations, playerDecisions). The shape below reflects current `biblePipeline.ts` BibleSchema. The original `controllingIdea` field was removed when sagas took ownership of theme; the chain bible no longer moralizes.
+> **UPDATED 2026-06-XX (commits `603f4e0`, `fef259b`):** the bible is FICTIONAL TRUTH ONLY (the WHY of the situation). It includes world-density fields (vignettes, texture, antagonistHumanity) and depth-of-truth fields (backstoryThreads, conflictingInterests, looseThreads). Quest mechanics (player decisions, merc observations) live in the SEPARATE quest-writer layer that consumes the bible. The original `controllingIdea` field was removed when sagas took ownership of theme.
 
 ```ts
 {
-  title: string,                    // 2-8 words, concrete proper noun, banned patterns (§17.2)
+  title: string,                    // 2-8 words, concrete proper noun
+  shape: 'tight' | 'classic' | 'ensemble' | 'twist-heavy',
   leadBoardBlurb: string,           // 1-2 sentences shown on lead board BEFORE player meets cast; sounds like a mundane contract
   firstBeatOnramp: string,          // 1-2 sentences of stage-direction for beat 1 writer
 
-  // PLAYER-AGENCY (new, iter-D)
-  openQuestion: string,             // the central uncertainty the player resolves via deployed mercs
-  mercObservations: string[3..7],   // each = one thing a merc reports back to the player
-  playerDecisions: string[2..5],    // each = one branch moment with stated options
+  // FICTIONAL-TRUTH DEPTH (the WHY-chain — the "no asspulling" guarantee)
+  backstoryThreads: string[3..7],   // pick ONE central WHY, go DEEP, one link per bullet
+  conflictingInterests: string[2..5], // each: <party A> wants X, <party B> wants Y, because Z
+  looseThreads: string[1..4],       // unresolved hooks for future chains to pull
 
   // SCAFFOLD (clinical voice — writers' room only, never shown to player)
   surfaceSituation: string,         // 2-3 sentences (what strangers/region gossip says)
-  hiddenSituation: string,          // 3-5 sentences (what's really going on)
-  trajectory: string,               // 4-7 sentences mapping the chain as a PLAYER-DECISION LOOP, ending with engine reward firing on chosen path
-  setupPayoffs: { plant, payoff }[2..10],
+  hiddenSituation: string,          // 3-5 sentences — compressed summary of backstoryThreads + conflictingInterests
+  trajectory: string,               // 3-5 sentences, rough sketch ending with engine reward fire (NOT prescriptive; quest-writer chooses beats)
+  setupPayoffs: { plant, payoff }[1..10],
   dramaticIrony: string,
   antagonistHumanity: string,       // 1-2 sentences — what makes the antagonist a person, not a plot device
 
@@ -591,12 +592,12 @@ Token budget validated empirically: prefix 8 + sample 6 + anchor 1 = 15 characte
 
 ### 18.5 Unit chains
 
-A unit chain is a normal chain with `isUnitChain: true` and a required anchor. The prompt tells the AI: *"the anchor MUST be protagonist, and the openQuestion / mercObservations / playerDecisions / trajectory MUST be driven by their want/need/ghost/lie. The chain exists to advance THEIR arc — and the PLAYER's choices determine which way it advances."*
+A unit chain is a normal chain with `isUnitChain: true` and a required anchor. The prompt tells the AI: *"the anchor MUST be protagonist, and backstoryThreads / conflictingInterests / hiddenSituation MUST extend the anchor's want/need/ghost/lie/secret. The chain exists to advance THEIR fictional truth — the quest-writer downstream will choose how to expose it to the player."*
 
 Validated example (Tibalt Renn — ghost: brother who never came back from a contract):
 - title: "Wagon to Coldfen"
-- openQuestion: "Is the dead man at Coldfen actually Tibalt's brother — and if so, who killed him?"
-- reward: named trait "Closed Account" — earned by Tibalt reading and burning his brother's unsent letter at the climax (the player CHOOSES whether Tibalt reads it publicly or alone)
+- backstoryThreads should expand WHY: who the brother was, what contract he took, what he was carrying, who killed him, why the killer is still active, why the brother's letter went unsent
+- reward: named trait "Closed Account" — earned by Tibalt reading and burning his brother's unsent letter at the climax (the quest-writer decides whether Tibalt reads it publicly or alone)
 - cast reuse: 4/4 (Drust as complication, Marek as authority-figure, Roselle as evidence-witness)
 
 Mechanically a unit chain is the same as a region chain. The only differences:
