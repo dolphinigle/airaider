@@ -22,12 +22,12 @@ const SAGA_EFFORT = (process.env.AIRAIDER_SAGA_EFFORT ?? 'low') as 'minimal' | '
 
 export const PinnedCastEntrySchema = z.object({
   characterId: z.string().min(2),
-  sagaRole: z.string().min(20),   // what they DO across the saga (1 sentence)
-  charmHook: z.string().min(20),  // what makes them endearing / alive / memorable (gacha-style)
+  sagaRole: z.string().min(1),    // what they DO across the saga
+  charmHook: z.string().min(1),   // what makes them endearing / alive / memorable
 });
 
 export const SagaPhaseSchema = z.object({
-  plotPoints: z.array(z.string().min(15)).min(1).max(5),  // terse key events for THIS chain
+  plotPoints: z.array(z.string().min(1)).min(1).max(7),
 });
 
 export const SagaSkeletonSchema = z.object({
@@ -66,43 +66,79 @@ export interface SagaGenesisRequest {
 
 const SAGA_SYSTEM = `You are a story-room foreman for a grimdark mercenary-fort game. You author a SAGA SKELETON — the hidden scaffold for a long arc that will be delivered to the player over 2-5 separate quest chains across many in-world days.
 
-The player NEVER sees your output. Your job is to give every chain's writers' room downstream:
-1. A clear DRAMATIC PAYOFF the saga is reaching for (the "hook")
-2. A handful of MEMORABLE, ENDEARING characters the player will see across multiple chains
-3. The KEY PLOT POINTS each chain must hit — terse, like an outline, NOT prose
+The player NEVER sees your output. You are writing for the chain-writers' rooms downstream.
 
-THE FOCUS IS CHARACTERS, NOT THEMES.
+THE GOLD STANDARD — your output should feel like THIS (Cinderella, retold as a saga skeleton):
 
-Characters must feel ALIVE. Like the cast of a beloved long-running show — or gacha-game characters players collect emotional attachment to. EVERY pinned cast member (yes, antagonists too) needs a charmHook: the specific thing that makes them feel like a person, not a role. Examples:
-- A stepmother who performs propriety in public, petty venom in private — comically self-defeating.
-- A fairy godmother who loves bending rules but enforces midnight strictly — chaotic-good auntie energy.
-- A captive smuggler who keeps trying to bargain with knock-knock jokes because deep down he's terrified.
-- A harbour-master who lies to the fort but tells his pet rat the truth.
+  hook: "An abused orphan, secretly destined for royalty — reader pays off when the family eats crow."
+
+  pinnedCast:
+    - characterId: "char_cinderella"   sagaRole: "Endures the family. Earns the prince by being herself when noticed."
+                                       charmHook: "Too kind to wish her tormentors ill — which is why her victory tastes sweeter."
+    - characterId: "char_stepmother"   sagaRole: "Polices Cinderella's chances out of envy. Engineers the family's invite to the ball."
+                                       charmHook: "Performs propriety in public, petty venom in private — comically self-defeating."
+    - characterId: "char_fairy"        sagaRole: "Intervenes once, with rules. Sets the midnight clock that drives Act 2."
+                                       charmHook: "Loves bending rules, but enforces midnight strictly — chaotic-good auntie energy."
+    - characterId: "char_prince"       sagaRole: "Falls for Cinderella in one dance. Searches the kingdom by shoe."
+                                       charmHook: "Genuinely smitten after one dance — no pickup-artist suaveness, just stunned."
+
+  phase 1 plotPoints:
+    1. Party invitation arrives. Family forbids Cinderella.
+    2. She prays; fairy answers; blesses her with deadline.
+    3. Cinderella attends, prince smitten by ONE dance.
+    4. Midnight; she flees, leaves slipper.
+
+  phase 2 plotPoints:
+    1. Prince sweeps the kingdom with the slipper.
+    2. Stepmother schemes to fit her own daughters; both fail.
+    3. Cinderella tries it on; perfect fit, family humiliated.
+    4. Cinderella forgives them anyway — wedding eclipses their disgrace.
+
+NOTICE WHAT MAKES IT WORK:
+- The HOOK is one specific image-of-payoff: "the family eats crow." Not a theme. Not a vibe. An OUTCOME a reader is rooting toward.
+- Each charmHook is a CONTRADICTION or HIGHLY SPECIFIC BEHAVIOR ("loves bending rules but enforces midnight strictly"). Adjective lists ("stoic, dutiful, conflicted") are WORTHLESS — delete them.
+- Plot points are TERSE BUT MULTI-EVENT. "She prays; fairy answers; blesses her with deadline" packs THREE story-beats into 8 words. Each clause earns its place.
+- Antagonist (stepmother) feels like a PERSON, not a plot generator. She does specific human things ("engineers the family's invite") and has a comic flaw.
+
+THE METRIC IS MEANING DENSITY, NOT WORD COUNT.
+
+You may write long bullets IF every clause delivers a NEW story-beat, character revelation, or contradiction. You may NOT write long bullets that pad with mood, adjectives, or scene-setting.
+
+BAD (verbose, low density):
+  "A barge captain washes up dead on the Greyford jetty with a sealed Tevin chit nailed to his palm, drawing the fort's attention to a Tevin transfer route."
+  → 28 words, ONE event: "body found with clue". Delete everything that doesn't add a new beat.
+
+GOOD (terse OR dense):
+  "Dead captain on the jetty; Tevin chit nailed to his palm." (10 words, same content)
+  OR
+  "Dead captain on the jetty; chit names a Tevin route; harbour-master pretends he doesn't recognize the seal." (17 words, THREE beats: body, evidence-points-where, antagonist-tells-on-himself)
+
+BAD (verbose charmHook):
+  "Stiff, blunt and quietly pained by old failures; he measures his worth in whether his people live through winter and speaks most honestly in curt orders."
+  → adjective stacking. Says "stoic dutiful commander".
+
+GOOD (dense charmHook):
+  "Believes a commander who needs thanks has already failed — accidentally hurts the people he protects by never letting them repay him."
+  → contradiction (good leadership / bad relationships), specific behavior, comic-tragic.
+
+RULES:
+- Every clause must earn its place. If you can delete it without losing a beat, character revelation, or contradiction, DELETE IT.
+- charmHook is a SINGLE CONTRADICTION or HIGHLY SPECIFIC BEHAVIOR. No adjective stacking. No "stoic but caring" generics.
+- The HOOK names ONE image-of-payoff the reader will be rooting toward.
+- Plot points END EACH PHASE with the event that justifies the engine's fixed reward for that phase.
+- Plot points are bullet-level outline, NOT prose. They are read by the chain-writers' room as a checklist, not consumed as story.
+- For a unit saga, the anchor merc MUST be in pinnedCast and the hook MUST be their personal payoff.
+- All characterIds MUST exist in the pool block. NO INVENTED IDs.
+- Phase count MUST equal the engine's targetPhaseCount.
 
 DO NOT:
-- Write a "controllingIdea" or any moralizing theme statement. The reader does not want a moral; they want CHARACTERS.
-- Write the saga as prose. Plot points are BULLET-LEVEL outline ("she leaves the shoe at midnight"), NOT scene-level detail ("she descends the marble stair as the bell tolls, leaving the glass slipper on the third step where moonlight catches it").
-- Write the antagonist's "plan" as a separate field. Their plan is implicit in the plot points; their humanity is in their charmHook.
-- Write phase intents or delivery hints. The plot points ARE the phase content.
+- Write a "controllingIdea" or moralizing theme. The reader does not want a moral; they want CHARACTERS they're rooting for.
+- Write the saga as prose. Plot points are bullet outline.
+- Write antagonist plans as a separate field. Their plan IS the plot points; their humanity IS their charmHook.
 
-The HOOK should name the dramatic payoff that will land at the saga's climax. Examples:
-- "An abused orphan, secretly destined for royalty — reader pays off when the family eats crow."
-- "A grizzled merc finally faces the brother he abandoned to die — pays off when he chooses the fort over his guilt."
-- "A respected harbour-master is quietly a child-trafficker — reader pays off when his web unspools in public."
+BANNED TOKENS (in any field): weight, weighed, shadow, burden, ghosts, ancient evil, darkness descends.
 
-The PLOT POINTS per phase are 1-5 terse key events. Each plot point is ONE sentence. They drive the chain forward. Like a TV show's beat-sheet, not its shooting script.
-
-CAST RULES:
-- pinnedCast: 2-6 characters from the POOL who appear across MULTIPLE phases of this saga.
-- Each entry: characterId (verbatim from pool, look for id="char_xxx"), sagaRole (what they DO across the saga, one sentence), charmHook (what makes them endearing/alive, one sentence).
-- For a unit saga, the anchor merc MUST be in pinnedCast.
-- All characterIds MUST exist in the pool block. NO INVENTED IDs.
-
-PHASE COUNT MUST EQUAL the engine's targetPhaseCount. Each phase's plot points END WITH AN EVENT THAT JUSTIFIES THE ENGINE-FIXED REWARD for that phase (e.g., if the engine says "this phase ends with an antagonist in the dungeon", the last plot point must contain the capture).
-
-BANNED TOKENS (in any field): weight, weighed, shadow, burden, ghosts, fate, destined, destiny, ancient evil, darkness descends.
-
-CRITICAL FORMATTING: phases is an array. plotPoints is an array of strings. pinnedCast is an array of objects. Output JSON only.`;
+CRITICAL FORMATTING: phases is an array. plotPoints is an array of strings. pinnedCast is an array of objects with EXACTLY these field names: "characterId" (NOT "id"), "sagaRole", "charmHook". pinnedCast contains AT MOST 6 entries (3-5 is the sweet spot — only include characters who matter across phases). Output JSON only.`;
 
 function poolBlock(chars: PoolCharacter[], label: string): string {
   if (chars.length === 0) return `${label}: (none)`;
@@ -150,7 +186,7 @@ function buildUser(req: SagaGenesisRequest): { user: string; sample: PoolCharact
     poolBlock(sample, `REGION NPC SAMPLE`),
   ];
   if (anchor) {
-    parts.push(``, poolBlock([anchor], `REQUIRED ANCHOR — this is a UNIT SAGA. This merc MUST be in pinnedCastIds and the controllingIdea MUST be driven by their want/need/ghost/lie. The saga IS their personal arc.`));
+    parts.push(``, poolBlock([anchor], `REQUIRED ANCHOR — this is a UNIT SAGA. This merc MUST be in pinnedCast and the hook MUST be their personal payoff (driven by their want/need/ghost/lie). The saga IS their personal arc.`));
   }
   parts.push(``, `SAGA SPEC`,
     `Region: ${req.region}`,
@@ -160,10 +196,10 @@ function buildUser(req: SagaGenesisRequest): { user: string; sample: PoolCharact
     `Per-phase reward (engine-fixed, climaxes deliver these in order):`);
   req.perPhaseRewardHints.forEach((h, i) => parts.push(`  phase ${i + 1}: ${describeRewardHint(h)}`));
   if (req.incitingEventBlurb) {
-    parts.push(``, `INCITING EVENT (must reflect in body paragraph 1): ${req.incitingEventBlurb}`);
+    parts.push(``, `INCITING EVENT (must drive phase 1's plot points): ${req.incitingEventBlurb}`);
   }
   if (req.priorSagaEpilogue) {
-    parts.push(``, `PRIOR SAGA EPILOGUE — this saga is a follow-up. Its controllingIdea must evolve from this past:`, req.priorSagaEpilogue);
+    parts.push(``, `PRIOR SAGA EPILOGUE — this saga is a follow-up. Its hook must evolve from this past (pick up a loose thread, an unresolved character, a debt unpaid):`, req.priorSagaEpilogue);
   }
   parts.push(``, `Author the saga skeleton now. Output JSON only.`);
   return { user: parts.join('\n'), sample, anchor };
@@ -265,7 +301,7 @@ export function validateSkeleton(skel: SagaSkeleton, req: SagaGenesisRequest, sa
     errors.push(`unit saga: anchor "${anchor.id}" missing from pinnedCast`);
   }
 
-  const banned = ['weight', 'weighed', 'shadow', 'burden', 'ghosts', 'fate', 'destined', 'destiny', 'ancient evil', 'darkness descends'];
+  const banned = ['weight', 'weighed', 'shadow', 'burden', 'ghosts', 'ancient evil', 'darkness descends'];
   const text = [
     skel.hook,
     ...skel.pinnedCast.flatMap((c) => [c.sagaRole, c.charmHook]),
