@@ -10,6 +10,8 @@ This folder contains the working design for Airaider. The design was substantial
 4. [AI_PROVIDER.md](AI_PROVIDER.md) — AI model selection: hybrid recommendation (GPT-4o-mini default, A/B test Claude Sonnet for narrative), pricing landscape, structured-output strategy, output JSON schema pattern.
 5. [VISION.md](VISION.md) — One-page pitch, design pillars, non-goals.
 6. [PLAYER_PREFERENCES.md](PLAYER_PREFERENCES.md) — Player-supplied flavor knobs (tone, writing style, NPC gender bias, cultural register) that flow into every AI prompt without affecting engine math.
+7. [QUEST_CHAINS.md](QUEST_CHAINS.md) — Single chain (bible + 5 beats + epilogue) pipeline, character pool, unit chains, reward fulfillment.
+8. [SAGAS.md](SAGAS.md) — Saga tier: chain-of-chains with hidden master skeleton, unit sagas, saga-tier follow-ups. Builds on QUEST_CHAINS.md.
 
 ## Legacy detail docs (have SUPERSEDED banners)
 

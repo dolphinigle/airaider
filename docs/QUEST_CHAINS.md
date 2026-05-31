@@ -723,3 +723,17 @@ Consequence for production UX: bible generation should be backgrounded with a vi
 This is the single most important rule for chain UX: a chain is a *reveal*, not an *exposition dump*. The player is always at their fort discovering a lead.
 
 Validate per-playtest: read beat 1's hook out loud and ask "would this make sense to a player who has just heard of this lead, no context?" If no, the bible failed onboarding.
+
+---
+
+## 19. Saga tier (chain-of-chains)
+
+A **Saga** is the next tier up: a meta-arc spanning 2-5 chains held together by a hidden master skeleton (3-4 paragraphs written upfront, never shown to the player). The saga design lives in **[SAGAS.md](SAGAS.md)**.
+
+What sagas add on top of this doc:
+- Pre-written master plot so plants in chain 1 can land in chain 3 (fixes "AI has no vision for future")
+- Engine-paced cadence between chains in the same saga (not every chain is back-to-back)
+- Saga-tier follow-ups that compose long-form merc biographies
+- Failure handling at saga scope (anchor-merc death = saga failed; pinned-cast death = forced amendment)
+
+§9 of this doc (reactive single-chain follow-up) continues to exist for chains that are NOT part of a saga. When a chain belongs to a saga, the saga's pacing rules (`SAGAS.md` §7) supersede §9.
