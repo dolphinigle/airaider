@@ -332,6 +332,7 @@ interface RunChain {
   seedLeadBlurb?: string;
   requiredAnchorId?: string;
   isUnitChain?: boolean;
+  forbidReuse?: boolean;
 }
 
 async function runChain(req: RunChain): Promise<{
@@ -344,6 +345,7 @@ async function runChain(req: RunChain): Promise<{
   newCount: number;
   promptTokens: number;
   completionTokens: number;
+  cachedTokens: number;
   systemPrompt: string;
   userPrompt: string;
   rawResponse: string;
@@ -375,6 +377,11 @@ async function runChain(req: RunChain): Promise<{
   userParts.push(`Engine-declared reward (climax must deliver this naturally): ${req.rewardSpec}`);
   if (req.themeKeywords.length) userParts.push(`Theme keywords: ${req.themeKeywords.join(', ')}`);
   if (req.seedLeadBlurb) userParts.push(`Inciting hint (must reflect in surfaceSituation): ${req.seedLeadBlurb}`);
+  userParts.push(``);
+  if (req.forbidReuse) {
+    userParts.push(``);
+    userParts.push(`POOL OVERRIDE: This chain takes place far from the fort's usual operating area. NO pool character would plausibly be on stage here. You MUST coin every cast member as kind:"new". The pool block above is provided ONLY as a naming-style reference (so coined names don't clash with pool names) — do NOT cast anyone from the pool. Coin 2-4 fresh characters with full want/need/ghost/lie/secret.`);
+  }
   userParts.push(``);
   userParts.push(`Author the bible now. Output JSON only.`);
 
@@ -412,6 +419,12 @@ async function runChain(req: RunChain): Promise<{
   const parsed = parseResult.data;
   const reuseCount = parsed.cast.filter(c => c.kind === 'existing').length;
   const newCount = parsed.cast.filter(c => c.kind === 'new').length;
+  // Surface OpenAI's prompt-cache hit count if present.
+  // Cached tokens are billed at ~10% of normal input rate. Cache requires the
+  // prompt prefix to be byte-identical across calls (and >=1024 tokens).
+  const cachedTokens =
+    (resp.usage as unknown as { prompt_tokens_details?: { cached_tokens?: number } })
+      ?.prompt_tokens_details?.cached_tokens ?? 0;
   return {
     request: req,
     prefix,
@@ -422,6 +435,7 @@ async function runChain(req: RunChain): Promise<{
     newCount,
     promptTokens: resp.usage?.prompt_tokens ?? 0,
     completionTokens: resp.usage?.completion_tokens ?? 0,
+    cachedTokens,
     systemPrompt: SYSTEM,
     userPrompt: usr,
     rawResponse: content,
@@ -503,6 +517,14 @@ const CHAINS: RunChain[] = [
     themeKeywords: ['relic', 'crown', 'reckoning'],
     seedLeadBlurb: 'A crown adjutant arrives unannounced at Mireford gate carrying a sealed writ; he refuses to name his business until Marek meets him in private.',
   },
+  {
+    label: 'chain6_newonly',
+    rarity: 'rare',
+    rewardSpec: 'rare recruit: a new NPC joins the fort as a mercenary',
+    themeKeywords: ['far-trail', 'stranger-town', 'broken-oath'],
+    seedLeadBlurb: 'A trader returns from the Black Coast with word of a logging camp at Hollowfen where the foreman has been hanged and the loggers refuse to leave. The camp has no Mireford ties.',
+    forbidReuse: true,
+  },
 ];
 
 async function main(): Promise<void> {
@@ -516,7 +538,7 @@ async function main(): Promise<void> {
       console.log(`  bible: "${r.bible.title}"`);
       console.log(`  controlling: ${r.bible.controllingIdea}`);
       console.log(`  cast: reuse=${r.reuseCount} new=${r.newCount}`);
-      console.log(`  tokens: in=${r.promptTokens} out=${r.completionTokens}`);
+      console.log(`  tokens: in=${r.promptTokens} (cached=${r.cachedTokens}) out=${r.completionTokens}`);
       applyArcStateUpdates(r.bible, c.label);
     } catch (e) {
       console.error(`  *** chain ${c.label} failed: ${(e as Error).message}`);
@@ -538,7 +560,7 @@ async function main(): Promise<void> {
     lines.push(`# ${r.request.label}: ${r.bible.title}`);
     lines.push(`  rarity=${r.request.rarity}  shape=${r.bible.shape}  reward="${r.request.rewardSpec}"`);
     lines.push(`  controlling idea: ${r.bible.controllingIdea}`);
-    lines.push(`  reuse=${r.reuseCount}  new=${r.newCount}  tokens=in:${r.promptTokens} out:${r.completionTokens}`);
+    lines.push(`  reuse=${r.reuseCount}  new=${r.newCount}  tokens=in:${r.promptTokens} cached:${r.cachedTokens} out:${r.completionTokens}`);
     lines.push(``);
     lines.push(`  CAST:`);
     for (const c of r.bible.cast) {
