@@ -55,7 +55,7 @@ const BibleSchema = z.object({
     roleInStory: z.string().optional(),
   })).min(2).max(6),
   situation: z.string().min(30),              // the believable present truth, told straight
-  tensions: z.array(z.string().min(15)).min(1),
+  tensions: z.array(z.union([z.string().min(15), z.record(z.any())])).min(1),
   openDirections: z.array(z.string().min(10)).min(2).max(4),
 });
 type Bible = z.infer<typeof BibleSchema>;
@@ -133,6 +133,14 @@ async function callJson<T>(client: OpenAI, system: string, user: string, schema:
   return schema.parse(JSON.parse(content));
 }
 
+function tensionLine(t: string | Record<string, unknown>): string {
+  if (typeof t === 'string') return t;
+  const parties = t.parties ?? t.between ?? t.who ?? t.sides;
+  const over = t.over ?? t.about ?? t.reason ?? t.conflict ?? t.detail;
+  if (parties && over) return `${parties} — over ${over}`;
+  return Object.values(t).filter((v) => typeof v === 'string').join(' — ');
+}
+
 function render(seed: Seed, genesis: Genesis, bible: Bible): string {
   const L: string[] = [];
   L.push(`# BIBLE — "${bible.title}"`);
@@ -162,7 +170,7 @@ function render(seed: Seed, genesis: Genesis, bible: Bible): string {
     L.push(``);
   }
   L.push(`## TENSIONS`);
-  bible.tensions.forEach((t) => L.push(`- ${t}`));
+  bible.tensions.forEach((t) => L.push(`- ${tensionLine(t as string | Record<string, unknown>)}`));
   L.push(``);
   L.push(`## OPEN DIRECTIONS`);
   bible.openDirections.forEach((d) => L.push(`- ${d}`));
