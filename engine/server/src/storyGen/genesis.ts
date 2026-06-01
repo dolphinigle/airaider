@@ -19,7 +19,7 @@ import { writeFileSync, copyFileSync } from 'fs';
 import OpenAI from 'openai';
 import { z } from 'zod';
 import { CharacterPool, type PoolCharacter } from '../chainBible/characterPool.js';
-import { SEEDS, pickSeed, seedById, type Seed } from './seeds.js';
+import { SEEDS, pickSeed, seedById, type Seed, type Stakes } from './seeds.js';
 
 loadDotenv({ path: join(homedir(), '.airaider', 'openai.env'), override: true });
 
@@ -132,7 +132,7 @@ async function callJson<T>(client: OpenAI, system: string, user: string, schema:
     model: MODEL,
     messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
     response_format: { type: 'json_object' },
-    max_completion_tokens: 4000,
+    max_completion_tokens: 8000,
     reasoning_effort: EFFORT,
   } as never);
   const content = (res as { choices: { message: { content: string } }[] }).choices[0].message.content;
@@ -197,6 +197,35 @@ function render(seed: Seed, genesis: Genesis, bible: Bible): string {
   return L.join('\n');
 }
 
+function depthDirective(stakes: Stakes): string {
+  switch (stakes) {
+    case 'uncommon':
+      return [
+        `STAKES: UNCOMMON — a tight, human story. Keep it lean and sharp.`,
+        `- cast: 2-3 people. 1-2 of them deep (full why-ladder), the rest single-bullet edges.`,
+        `- why-ladder: ~4-6 links for the deep people, ending at bedrock.`,
+        `- situation: 2-3 sentences. tensions: 2-3. openDirections: 2-3.`,
+        `- One clear emotional core. Do not sprawl into subplots.`,
+      ].join('\n');
+    case 'rare':
+      return [
+        `STAKES: RARE — a fuller story with more people pulled in. Go deeper and wider.`,
+        `- cast: 3-5 people. 2-3 of them deep (full why-ladder), the rest meaningful but lighter.`,
+        `- why-ladder: ~6-8 links for the deep people, ending at bedrock.`,
+        `- situation: 3-5 sentences that lay out the interlocking truth. tensions: 3-4. openDirections: 3-4.`,
+        `- The collision should implicate more than two lives; let a second pressure (a creditor, an institution, kin) bear on it.`,
+      ].join('\n');
+    case 'legendary':
+      return [
+        `STAKES: LEGENDARY — a large, interlocking story that could reshape a town. Go the deepest and widest.`,
+        `- cast: 4-6 people. 3-4 of them deep (full why-ladder), each with a distinct stake.`,
+        `- why-ladder: ~7-9 links for the deep people, tracing to childhood/formative bedrock.`,
+        `- situation: 4-6 sentences. Make the truth layered: multiple parties, conflicting legitimate interests, real institutional weight. tensions: 4-5. openDirections: 4.`,
+        `- The story should feel like it has a past that predates the seed and consequences that outlast it.`,
+      ].join('\n');
+  }
+}
+
 async function main(): Promise<void> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error('OPENAI_API_KEY missing');
@@ -231,6 +260,8 @@ async function main(): Promise<void> {
     ``,
     `CORE PEOPLE (build their believable history by why-laddering):`,
     coreChars.map((c) => `- name="${c.name}" — known for: ${c.surface} [tags: ${c.tags.join(', ')}]`).join('\n'),
+    ``,
+    depthDirective(seed.stakes),
     ``,
     `Build the believable hidden truth. Output JSON only.`,
   ].filter(Boolean).join('\n');

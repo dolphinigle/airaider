@@ -6,7 +6,7 @@
 // PROTOTYPE SET (~14). Later: scale toward 1000, anchored on Polti's 36 Dramatic
 // Situations for breadth. Tags drive weighted, anti-repeat selection.
 
-export type Stakes = 'common' | 'rare' | 'legendary';
+export type Stakes = 'uncommon' | 'rare' | 'legendary';
 
 export interface Seed {
   id: string;
@@ -22,9 +22,9 @@ export const SEEDS: Seed[] = [
   { id: 'drag-back-savior', spark: 'What if a mercenary is hired to drag back a deserter, and it is the man who once carried her out of a burning hold?',
     situation: 'loyalty vs survival', emotionalCore: 'guilt of self-preservation', stakes: 'rare' },
   { id: 'creditor-at-grave', spark: 'What if a creditor arrives to collect at the graveside, before the body is even in the ground?',
-    situation: 'obstacle / obligation', emotionalCore: 'grief vs duty', stakes: 'common' },
+    situation: 'obstacle / obligation', emotionalCore: 'grief vs duty', stakes: 'uncommon' },
   { id: 'salt-and-candles', spark: 'What if one house on a starving lane is never short of salt and candles, and the neighbors have begun to wonder how?',
-    situation: 'unexplained fortune', emotionalCore: 'guilt under ease', stakes: 'common' },
+    situation: 'unexplained fortune', emotionalCore: 'guilt under ease', stakes: 'uncommon' },
   { id: 'mute-witness', spark: 'What if the only person who saw the killing is a mute stablehand everyone has already decided not to believe?',
     situation: 'enigma / suppressed testimony', emotionalCore: 'fear of not being heard', stakes: 'rare' },
   { id: 'kin-at-the-fort', spark: 'What if a grey-haired laborer takes work at the fort just to be near the young soldier who has no idea they share blood?',
@@ -36,7 +36,7 @@ export const SEEDS: Seed[] = [
   { id: 'feeding-the-orphans', spark: 'What if the raider you crossed three counties to kill turns out to be feeding the orphans of the village they supposedly burned?',
     situation: 'vengeance turning to pity', emotionalCore: 'hatred meeting empathy', stakes: 'rare' },
   { id: 'wrong-signet', spark: 'What if a man wears a signet ring that is not his, and the rightful heir walks into his tavern asking after it?',
-    situation: 'recovery of a lost thing', emotionalCore: 'greed and exposure', stakes: 'common' },
+    situation: 'recovery of a lost thing', emotionalCore: 'greed and exposure', stakes: 'uncommon' },
   { id: 'empty-prayers', spark: 'What if the priest leading the dawn prayers stopped believing years ago, and the whole village leans on those prayers to survive the winter?',
     situation: 'pretense to spare others', emotionalCore: 'private doubt', stakes: 'rare' },
   { id: 'old-name-at-the-gate', spark: 'What if a quiet newcomer freezes at a name no one here should know, called out by a stranger at the gate?',
@@ -44,7 +44,7 @@ export const SEEDS: Seed[] = [
   { id: 'same-grave', spark: 'What if two people meet at the same grave every winter, each certain the other got their shared love killed?',
     situation: 'rivalry in grief', emotionalCore: 'blame as a way to mourn', stakes: 'rare' },
   { id: 'place-at-the-table', spark: 'What if a soldier who swore to come home cannot, and learns the one who waited has set a place at the table every night for years?',
-    situation: 'obstacles of love', emotionalCore: 'guilt of the absent', stakes: 'common' },
+    situation: 'obstacles of love', emotionalCore: 'guilt of the absent', stakes: 'uncommon' },
 ];
 
 export function pickSeed(opts?: { stakes?: Stakes; excludeIds?: ReadonlySet<string> }): Seed {
