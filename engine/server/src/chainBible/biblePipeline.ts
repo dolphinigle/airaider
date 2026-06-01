@@ -113,7 +113,7 @@ function poolBlock(chars: PoolCharacter[], label: string): string {
   return lines.join('\n');
 }
 
-const BIBLE_SYSTEM = `You are the showrunner of a grimdark mercenary-fort game. You author chain bibles — compact reference documents a writers' room works from. A bible is NOT prose; it is the underlying CHARACTERS + SITUATION + TRAJECTORY a downstream writer will turn into quests one at a time.
+export const BIBLE_SYSTEM = `You are the showrunner of a grimdark mercenary-fort game. You author chain bibles — compact reference documents a writers' room works from. A bible is NOT prose; it is the underlying CHARACTERS + SITUATION + TRAJECTORY a downstream writer will turn into quests one at a time.
 
 This world keeps a CHARACTER POOL. Characters persist across chains: their want/need/ghost/lie/secret stay the same, their arcState updates with what happens. Your job is to BUILD A CAST primarily by reusing pool characters whose existing wounds and lies fit the role you need them to play. Coin a new character ONLY when no pool character can plausibly fill a role.
 
@@ -359,9 +359,9 @@ async function callJson<T>(client: OpenAI, model: string, system: string, user: 
   return { data: parsed.data, usage, raw: content };
 }
 
-export async function generateBible(client: OpenAI, req: BibleRequest): Promise<{ bible: Bible; usage: CallUsage; sample: PoolCharacter[]; required?: PoolCharacter }> {
+export async function generateBible(client: OpenAI, req: BibleRequest, systemOverride?: string): Promise<{ bible: Bible; usage: CallUsage; sample: PoolCharacter[]; required?: PoolCharacter }> {
   const { user, sample, required } = buildUserPrompt(req);
-  const { data: bible, usage } = await callJson(client, BIBLE_MODEL, BIBLE_SYSTEM, user, BibleSchema, 14000, BIBLE_EFFORT);
+  const { data: bible, usage } = await callJson(client, BIBLE_MODEL, systemOverride ?? BIBLE_SYSTEM, user, BibleSchema, 14000, BIBLE_EFFORT);
   return { bible, usage, sample, required };
 }
 
