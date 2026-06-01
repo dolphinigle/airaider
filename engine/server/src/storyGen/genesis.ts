@@ -11,17 +11,12 @@
 // Run: cd engine/server && AIRAIDER_BIBLE_MODEL=gpt-5-mini AIRAIDER_BIBLE_EFFORT=low \
 //        npx tsx src/storyGen/genesis.ts [seedId] [--anchor <charId>]
 
-import 'dotenv/config';
-import { config as loadDotenv } from 'dotenv';
-import { homedir } from 'os';
 import { join } from 'path';
 import { writeFileSync, copyFileSync } from 'fs';
-import OpenAI from 'openai';
 import { z } from 'zod';
 import { CharacterPool, type PoolCharacter } from '../chainBible/characterPool.js';
 import { SEEDS, pickSeed, seedById, type Seed, type Stakes } from './seeds.js';
-
-loadDotenv({ path: join(homedir(), '.airaider', 'openai.env'), override: true });
+import { makeClient, callJson } from './ai.js';
 
 const MODEL = process.env.AIRAIDER_BIBLE_MODEL ?? 'gpt-5-mini';
 const EFFORT = (process.env.AIRAIDER_BIBLE_EFFORT ?? 'low') as 'minimal' | 'low' | 'medium' | 'high';
@@ -137,18 +132,6 @@ function slateBlock(chars: PoolCharacter[]): string {
   return chars.map((c) => `- id="${c.id}" name="${c.name}" (${c.role}) — known for: ${c.surface} [tags: ${c.tags.join(', ')}]`).join('\n');
 }
 
-async function callJson<T>(client: OpenAI, system: string, user: string, schema: z.ZodType<T>): Promise<T> {
-  const res = await client.chat.completions.create({
-    model: MODEL,
-    messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
-    response_format: { type: 'json_object' },
-    max_completion_tokens: 8000,
-    reasoning_effort: EFFORT,
-  } as never);
-  const content = (res as { choices: { message: { content: string } }[] }).choices[0].message.content;
-  return schema.parse(JSON.parse(content));
-}
-
 function concealsLine(c: unknown): string | null {
   if (typeof c === 'string') return c.trim() || null;
   if (c && typeof c === 'object') {
@@ -241,9 +224,7 @@ function depthDirective(stakes: Stakes): string {
 }
 
 async function main(): Promise<void> {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) throw new Error('OPENAI_API_KEY missing');
-  const client = new OpenAI({ apiKey });
+  const client = makeClient();
 
   const seedArg = process.argv[2];
   const anchorIdx = process.argv.indexOf('--anchor');
@@ -263,7 +244,7 @@ async function main(): Promise<void> {
     ``,
     `Find the collision. Output JSON only.`,
   ].filter(Boolean).join('\n');
-  const genesis = await callJson(client, GENESIS_SYSTEM, genesisUser, GenesisSchema);
+  const genesis = await callJson(client, { system: GENESIS_SYSTEM, user: genesisUser, schema: GenesisSchema, model: MODEL, effort: EFFORT });
 
   const coreChars = genesis.coreCharacterIds.map((id) => pool.get(id)).filter(Boolean) as PoolCharacter[];
   const coreIds = new Set(coreChars.map((c) => c.id));
@@ -284,7 +265,7 @@ async function main(): Promise<void> {
     ``,
     `Build the believable hidden truth. Output JSON only.`,
   ].filter(Boolean).join('\n');
-  const bible = await callJson(client, BUILD_SYSTEM, buildUser, BibleSchema);
+  const bible = await callJson(client, { system: BUILD_SYSTEM, user: buildUser, schema: BibleSchema, model: MODEL, effort: EFFORT });
 
   const text = render(seed, genesis, bible);
   console.log(text);
