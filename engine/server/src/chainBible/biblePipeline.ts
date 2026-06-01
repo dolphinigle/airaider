@@ -222,7 +222,7 @@ The bible has TWO kinds of fields:
 
   WRITERS'-ROOM SCAFFOLD (CLINICAL, no literary voice):
     - surfaceSituation, hiddenSituation, trajectory
-    - backstoryThreads, conflictingInterests, looseThreads — bullet form, terse, FICTIONAL TRUTH not mood
+    - backstoryThreads, conflictingInterests — bullet form, terse, FICTIONAL TRUTH not mood
     - firstBeatOnramp
     - setupPayoffs (plant/payoff pairs)
     - cast.arcStateAfterChain
@@ -420,7 +420,7 @@ const EPILOGUE_SYSTEM = `You are the showrunner writing the epilogue for a compl
 - Names the outcome of each cast member (alive/dead/captured/recruited/ruined/restored).
 - Shows the reward arriving at the fort gate a week later (kit on back, banner under arm, ransom paid) — NOT delivered on-stage during the climax.
 - Cites specific events from the played-out beats (the bolt notch, the burnt page, the broken seal).
-- Echoes the bible's controllingIdea ONCE, in concrete language (do not state it directly as a moral).
+- Echoes the chain's central WHY (from backstoryThreads) ONCE, in concrete language (do not state it as a moral).
 - Leaves ONE loose thread that could seed a sequel (the unaccounted-for character, the missing object, the unanswered letter).
 
 BANNED TOKENS: weight, weighed, shadow, burden, ghosts, fate, destined, destiny, ancient evil, darkness descends, grip tightens, stranglehold. Name a specific physical thing instead.
