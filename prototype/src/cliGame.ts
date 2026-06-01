@@ -44,7 +44,13 @@ import { refreshLeadBoard, pursueLead, PURSUE_COST_BY_RARITY, BASE_RARITY_WEIGHT
 import { computePrestige, prestigeTier, prestigeTierLabel, tiltRarityWeights } from './prestige.js';
 import { templateFor } from './scenarioTemplates.js';
 import { formatTags, formatPreferredTags } from './tagFormat.js';
+import type { Merc } from './types.js';
 import { rollCaptiveTags } from './captiveTags.js';
+import { makeClient } from './storyGen/ai.js';
+import {
+  startChain, offerNextQuest, resolveOpen,
+  loadChains, saveChains, type ActiveChain,
+} from './storyGen/chainPlay.js';
 
 // ---------- paths & args ----------
 
@@ -145,6 +151,17 @@ async function main(): Promise<void> {
     ? new OpenAIScenarioLLM({ apiKey: process.env.OPENAI_API_KEY!, model: 'gpt-4o-mini', callLimit: 50 })
     : new MockScenarioLLM();
 
+  // Story-chain AI client (always real — chains have no mock). Disabled if no
+  // key is configured; the [x] chains menu reports how to enable it.
+  let chainClient: ReturnType<typeof makeClient> | null = null;
+  {
+    const envPath = join(homedir(), '.airaider', 'openai.env');
+    if (existsSync(envPath)) loadDotenv({ path: envPath, override: false });
+    try { chainClient = makeClient(); }
+    catch { chainClient = null; }
+  }
+  const chains: ActiveChain[] = loadChains(args.savePath);
+
   // available day fixtures the player can roll
   const dayFixtures = readdirSync(FIXTURES_DIR)
     .filter((f) => /^day-\d+\.json$/.test(f))
@@ -166,6 +183,7 @@ async function main(): Promise<void> {
         case 'q': case 'Q_'/*placeholder*/: await cmdQuests(rl, roster, questCatalog, mercPool, args.savePath); break;
         case 't': case 'T': await cmdTavern(rl, roster, roomCatalog, mercPool, args.savePath); break;
         case 'c': case 'C': await cmdCaptives(rl, roster, tagPool, mercPool, roomCatalog, args.savePath); break;
+        case 'x': case 'X': await cmdChains(rl, roster, chains, chainClient, mercPool, args.savePath); break;
         case 's': case 'S': saveRoster(args.savePath, roster, mercPool); console.log('Saved.'); break;
         case 'Q': running = false; break;
         default: console.log(`Unknown command "${cmd}" — type "h" for help.`);
@@ -221,7 +239,7 @@ function printStatus(r: Roster, roomCatalog: Map<string, RoomDef>): void {
 
 function printMenu(): void {
   console.log(' [d] advance day   [l] leads    [f] fort      [q] quests   [t] tavern');
-  console.log(' [c] captives      [r] roster   [s] save      [Q] quit     [h] help');
+  console.log(' [c] captives      [x] chains   [r] roster    [s] save     [Q] quit   [h] help');
 }
 
 function printHelp(): void {
@@ -238,6 +256,9 @@ Commands:
   q   quests menu — list active quests, abandon one.
   t   tavern menu — list bench, hire a candidate.
   c   captives menu — choose disposition (ransom/sell/display/recruit/execute).
+  x   chains — AI-authored story chains over your roster. Start a chain, read
+      the lead, offer the next quest, assign mercs, resolve. Needs an API key
+      in ~/.airaider/openai.env.
   r   verbose roster show.
   s   save now.
   Q   save and quit.
@@ -1008,6 +1029,203 @@ async function cmdCaptives(
     console.log(`  posted to tavern bench at ${eff.benchPrice}g${eff.benchPrice === 0 ? ' (chapel-converted — free)' : ''}`);
   }
   saveRoster(savePath, r, mercPool);
+}
+
+// ---------- chains (AI story chains over the roster) ----------
+
+const OUTCOME_GLYPH: Record<string, string> = {
+  clean_win: '✓✓ clean win', narrow_win: '✓ narrow win',
+  partial_loss: '~ partial loss', failure: '✗ failure',
+};
+
+function statusLabel(c: ActiveChain): string {
+  if (c.status === 'done') return 'CLOSED';
+  if (c.status === 'failed') return 'CLOSED (grim)';
+  if (c.status === 'awaiting-assign') return 'quest offered — assign mercs';
+  return 'ready — offer next quest';
+}
+
+async function pickMercs(
+  rl: ReturnType<typeof createInterface>,
+  r: Roster,
+): Promise<Merc[]> {
+  if (r.mercs.length === 0) { console.log('(no mercs to assign)'); return []; }
+  console.log('\n  Roster:');
+  r.mercs.forEach((m, i) => {
+    const tags = m.tags.map((t) => t.label).join(', ') || 'no tags';
+    console.log(`   ${i + 1}) ${m.name}  [${tags}]`);
+  });
+  const ans = (await rl.question('  assign which mercs? (e.g. "1 3", blank = none) > ')).trim();
+  if (ans === '') return [];
+  const picked: Merc[] = [];
+  for (const tok of ans.split(/[\s,]+/)) {
+    const idx = parseInt(tok, 10);
+    if (Number.isFinite(idx) && idx >= 1 && idx <= r.mercs.length) {
+      const m = r.mercs[idx - 1]!;
+      if (!picked.includes(m)) picked.push(m);
+    }
+  }
+  return picked;
+}
+
+function printChainDetail(c: ActiveChain): void {
+  console.log('');
+  console.log('═══════════════════════════════════════════════════════════════');
+  console.log(` "${c.title}"   [${c.stakes}]   quest ${c.step}/${c.target} (max ${c.max})`);
+  console.log(`  ${statusLabel(c)}`);
+  console.log('───────────────────────────────────────────────────────────────');
+  console.log(`  LEAD: ${c.leadBlurb}`);
+  if (c.state.knownToPlayer.length) {
+    console.log('  What you have learned:');
+    for (const k of c.state.knownToPlayer) console.log(`    • ${k}`);
+  }
+  if (c.openQuest) {
+    const q = c.openQuest;
+    console.log('───────────────────────────────────────────────────────────────');
+    console.log(`  QUEST: ${q.questTitle}`);
+    console.log(`  ${q.card}`);
+    const ask = q.assignmentAsk;
+    const stats = (ask.desiredStats ?? []).join(', ');
+    const traits = (ask.desiredTraits ?? []).join(', ');
+    if (stats || traits) console.log(`  Calls for: ${[stats, traits].filter(Boolean).join('  |  ')}`);
+    if (ask.fictionalReason) console.log(`  (${ask.fictionalReason})`);
+  }
+  console.log('═══════════════════════════════════════════════════════════════');
+}
+
+function printChainLog(c: ActiveChain): void {
+  if (c.log.length === 0) { console.log('  (no quests resolved yet)'); return; }
+  for (const e of c.log) {
+    console.log('');
+    console.log(`  ── quest ${e.step}: ${e.questTitle}  [${OUTCOME_GLYPH[e.outcome] ?? e.outcome}]  fit ${e.fit}/6  +${e.gold}g`);
+    console.log(`     party: ${e.party}`);
+    console.log(`     ${e.prose.replace(/\n/g, '\n     ')}`);
+  }
+}
+
+async function cmdChainDetail(
+  rl: ReturnType<typeof createInterface>,
+  r: Roster,
+  chain: ActiveChain,
+  client: ReturnType<typeof makeClient>,
+  mercPool: Map<string, any>,
+  savePath: string,
+  chains: ActiveChain[],
+): Promise<void> {
+  let viewing = true;
+  while (viewing) {
+    printChainDetail(chain);
+
+    if (chain.status === 'done' || chain.status === 'failed') {
+      console.log('  This chain is closed.  [v] view full log   [0] back');
+      const ans = (await rl.question('  > ')).trim().toLowerCase();
+      if (ans === 'v') printChainLog(chain);
+      else viewing = false;
+      continue;
+    }
+
+    if (chain.status === 'awaiting-offer') {
+      console.log('  [o] offer next quest   [v] view log   [0] back');
+      const ans = (await rl.question('  > ')).trim().toLowerCase();
+      if (ans === 'o') {
+        console.log('  …the next contract takes shape…');
+        await offerNextQuest(client, chain);
+        saveChains(savePath, chains);
+      } else if (ans === 'v') {
+        printChainLog(chain);
+      } else {
+        viewing = false;
+      }
+      continue;
+    }
+
+    // awaiting-assign
+    console.log('  [a] assign mercs & resolve   [v] view log   [0] back');
+    const ans = (await rl.question('  > ')).trim().toLowerCase();
+    if (ans === 'v') { printChainLog(chain); continue; }
+    if (ans !== 'a') { viewing = false; continue; }
+
+    const party = await pickMercs(rl, r);
+    const who = party.length ? party.map((m) => m.name).join(', ') : '(no one)';
+    const confirm = (await rl.question(`  Send ${who}? [y/N] > `)).trim().toLowerCase();
+    if (confirm !== 'y') { console.log('  …held back.'); continue; }
+
+    console.log('  …the company rides out…');
+    const result = await resolveOpen(client, chain, party);
+    r.gold += result.gold;
+    saveRoster(savePath, r, mercPool);
+    saveChains(savePath, chains);
+
+    console.log('');
+    console.log(`  OUTCOME: ${OUTCOME_GLYPH[result.outcome] ?? result.outcome}   (fit ${result.fit}/6 — ${result.fitNote})`);
+    console.log('  ───────────────────────────────────────────────────────────');
+    console.log(`  ${result.prose.replace(/\n/g, '\n  ')}`);
+    console.log('  ───────────────────────────────────────────────────────────');
+    console.log(`  Reward: +${result.gold}g   (treasury ${r.gold}g)`);
+    if (result.closed) {
+      console.log(result.outcome === 'failure'
+        ? '  ✗ The chain closes on a grim note.'
+        : '  ✓ The chain reaches its end.');
+    }
+  }
+}
+
+async function cmdChains(
+  rl: ReturnType<typeof createInterface>,
+  r: Roster,
+  chains: ActiveChain[],
+  client: ReturnType<typeof makeClient> | null,
+  mercPool: Map<string, any>,
+  savePath: string,
+): Promise<void> {
+  if (!client) {
+    console.log('\nChains need an OpenAI API key. Put it in ~/.airaider/openai.env');
+    console.log('(OPENAI_API_KEY=sk-...) and restart. Disabled for now.');
+    return;
+  }
+
+  let inMenu = true;
+  while (inMenu) {
+    console.log('');
+    console.log(`STORY CHAINS  (day ${r.dayCount})`);
+    if (chains.length === 0) {
+      console.log('  (none yet)');
+    } else {
+      chains.forEach((c, i) => {
+        console.log(`  ${i + 1}) "${c.title}"  [${c.stakes}]  ${c.step}/${c.target}  — ${statusLabel(c)}`);
+      });
+    }
+    console.log('  [n] start a new chain   [number] open a chain   [0] back');
+    const ans = (await rl.question('> ')).trim().toLowerCase();
+
+    if (ans === '' || ans === '0') { inMenu = false; continue; }
+
+    if (ans === 'n') {
+      if (r.mercs.length < 2) {
+        console.log('  Need at least 2 mercs in the roster to seed a story.');
+        continue;
+      }
+      console.log('  …a story stirs in Mireford (this calls the AI; a few seconds)…');
+      try {
+        const exclude = new Set(chains.map((c) => c.seedId));
+        const chain = await startChain(client, r.mercs, { dayCount: r.dayCount, excludeSeedIds: exclude });
+        chains.push(chain);
+        saveChains(savePath, chains);
+        console.log(`\n  ✦ New chain: "${chain.title}"  [${chain.stakes}]`);
+        console.log(`    LEAD: ${chain.leadBlurb}`);
+      } catch (e) {
+        console.log(`  !! Failed to start chain: ${(e as Error).message}`);
+      }
+      continue;
+    }
+
+    const idx = parseInt(ans, 10);
+    if (Number.isFinite(idx) && idx >= 1 && idx <= chains.length) {
+      await cmdChainDetail(rl, r, chains[idx - 1]!, client, mercPool, savePath, chains);
+    } else {
+      console.log('  (nothing there)');
+    }
+  }
 }
 
 main().catch((err) => {

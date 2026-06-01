@@ -13,9 +13,18 @@
 
 import OpenAI from 'openai';
 import { z } from 'zod';
-import { type PoolCharacter } from '../chainBible/characterPool.js';
 import { type Seed, type Stakes } from './seeds.js';
 import { callJson, type Effort } from './ai.js';
+
+// A character the bible may draw its cast from. In the game this is mapped from
+// the fort's mercenary roster (engine/server may map it from its own pool).
+export interface SlateCharacter {
+  id: string;
+  name: string;
+  role: 'mercenary' | 'captive' | 'npc' | 'landmark' | 'dead';
+  tags: string[];
+  surface: string;
+}
 
 // ---------------------------------------------------------------------------
 // Models (engine-side defaults; callers may override per call)
@@ -226,7 +235,7 @@ Output JSON only: { partyFit (0-6 integer), note (one short clause on why) }`;
 // ---------------------------------------------------------------------------
 // Prompt-building helpers
 // ---------------------------------------------------------------------------
-function slateBlock(chars: PoolCharacter[]): string {
+function slateBlock(chars: SlateCharacter[]): string {
   return chars.map((c) => `- id="${c.id}" name="${c.name}" (${c.role}) — known for: ${c.surface} [tags: ${c.tags.join(', ')}]`).join('\n');
 }
 
@@ -343,6 +352,7 @@ export function drivingHookOf(bible: Bible): string {
   const active = bible.openDirections.find((d) => typeof d === 'object' && d.kind === 'active');
   if (active && typeof active === 'object') return active.hook;
   const first = bible.openDirections[0];
+  if (first === undefined) return '';
   return typeof first === 'object' ? first.hook : first;
 }
 
@@ -361,7 +371,7 @@ export function mergeChainState(s: ChainState, r: Resolution): void {
 // ---------------------------------------------------------------------------
 export async function buildBible(
   client: OpenAI,
-  opts: { seed: Seed; slate: PoolCharacter[]; anchorId?: string; model?: string; effort?: Effort },
+  opts: { seed: Seed; slate: SlateCharacter[]; anchorId?: string; model?: string; effort?: Effort },
 ): Promise<{ genesis: Genesis; bible: Bible }> {
   const model = opts.model ?? BIBLE_MODEL;
   const effort = opts.effort ?? BIBLE_EFFORT;
@@ -378,7 +388,7 @@ export async function buildBible(
   ].filter(Boolean).join('\n');
   const genesis = await callJson(client, { system: GENESIS_SYSTEM, user: genesisUser, schema: GenesisSchema, model, effort });
 
-  const coreChars = genesis.coreCharacterIds.map((id) => slate.find((c) => c.id === id)).filter(Boolean) as PoolCharacter[];
+  const coreChars = genesis.coreCharacterIds.map((id) => slate.find((c) => c.id === id)).filter(Boolean) as SlateCharacter[];
   const coreIds = new Set(coreChars.map((c) => c.id));
   const secondary = slate.filter((c) => !coreIds.has(c.id));
 

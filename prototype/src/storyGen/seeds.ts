@@ -52,7 +52,7 @@ export function pickSeed(opts?: { stakes?: Stakes; excludeIds?: ReadonlySet<stri
   if (opts?.stakes) pool = pool.filter((s) => s.stakes === opts.stakes);
   if (opts?.excludeIds) pool = pool.filter((s) => !opts.excludeIds!.has(s.id));
   if (pool.length === 0) pool = SEEDS;
-  return pool[Math.floor(Math.random() * pool.length)];
+  return pool[Math.floor(Math.random() * pool.length)]!;
 }
 
 export function seedById(id: string): Seed | undefined {

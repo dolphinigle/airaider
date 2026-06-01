@@ -27,6 +27,6 @@ export async function callJson<T>(
     max_completion_tokens: opts.maxTokens ?? 8000,
     reasoning_effort: opts.effort,
   } as never);
-  const content = (res as { choices: { message: { content: string } }[] }).choices[0].message.content;
+  const content = (res as { choices: { message: { content: string } }[] }).choices[0]?.message.content ?? '';
   return opts.schema.parse(JSON.parse(content));
 }
