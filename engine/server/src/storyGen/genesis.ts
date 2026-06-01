@@ -47,16 +47,22 @@ const PersonSchema = z.object({
   conceals: z.union([z.string(), z.boolean(), z.null(), z.record(z.any())]).optional(), // string ONLY if a feeling makes hiding natural; model may send false/null for "nothing" or an object {what,why} at low effort
 });
 
+const DirectionSchema = z.object({
+  kind: z.enum(['ambient', 'active']).optional(), // ambient = happens with/without the company; active = a hook the company is invited into
+  hook: z.string().min(10),
+});
+
 const BibleSchema = z.object({
   title: z.string().min(2).max(80),
   leadBlurb: z.string().min(20),              // player-facing; mundane-contract tone; reveals NOTHING hidden
   cast: z.array(z.object({
     person: PersonSchema,
     roleInStory: z.string().optional(),
+    coined: z.boolean().optional(),           // true if this person is NEW (not drawn from the existing pool)
   })).min(2).max(6),
   situation: z.string().min(30),              // the believable present truth, told straight
   tensions: z.array(z.union([z.string().min(15), z.record(z.any())])).min(1),
-  openDirections: z.array(z.string().min(10)).min(2).max(4),
+  openDirections: z.array(z.union([DirectionSchema, z.string().min(10)])).min(2).max(6),
 });
 type Bible = z.infer<typeof BibleSchema>;
 
@@ -104,10 +110,14 @@ COMMIT TO THE TRUTH (critical):
 OUTPUT (clinical truth fields; only leadBlurb may carry light flavor):
 - title: short, concrete, names a real thing/person/place in the story. No "The Weight of X" patterns.
 - leadBlurb: 1-2 sentences the PLAYER sees on a job board before meeting anyone. It must sound like a MUNDANE CONTRACT and reveal NONE of the hidden truth. Use physical anchors (a body, an unpaid debt, a missing barge), not the cast's secret names.
-- cast: each { person { name, who, history[] (the why-ladder), wants, feels, conceals? }, roleInStory }. Reuse the core people; add the coined person only if the kernel named newRoleNeeded.
+- cast: each { person { name, who, history[] (the why-ladder), wants, feels, conceals? }, roleInStory, coined? }.
+  REUSE EXISTING PEOPLE FIRST. The slate you are given is the living population of this world. Draw the whole cast — core AND secondary — from the slate wherever a person could plausibly fill the role. When you use a slate person, the history you write is NEW canon being revealed about them; keep it consistent with what is already known of them (their known-for line and tags). Coin a brand-new person ONLY when a needed role has no plausible fit on the slate; set coined:true on those, and keep them few.
 - situation: 2-4 sentences — the believable present truth, told straight (this is the hidden ground truth, not the player blurb).
 - tensions: who clashes with whom, over what, and the plain reason. One bullet each.
-- openDirections: 2-4 loose ways this could go from here. NOT prescriptive beats — just plausible directions the story could take.
+- openDirections: 2-4 ways this could go, each { kind, hook }. Frame every hook toward the player's MERCENARY COMPANY / FORT — these are the seeds quests are written from. Provide AT LEAST ONE of each kind:
+  - kind:"ambient" — something that unfolds with or without the company; it can resolve in the background and shift the situation even if the company never acts (a character drifting into the fort's orbit, a death, a deal closing). Low player agency; living-world pressure.
+  - kind:"active" — a contract, plea, or opportunity the company is directly invited into and could take up (someone asks the company for help; a job the company can accept). This is a selectable quest seed.
+  A hook may involve several cast members. NOT prescriptive beats — just plausible openings.
 
 BANNED TOKENS: weight, shadow, burden, ghosts, fate, destiny. Name concrete things instead.
 
@@ -179,7 +189,7 @@ function render(seed: Seed, genesis: Genesis, bible: Bible): string {
   L.push(`## CAST`);
   for (const c of bible.cast) {
     const p = c.person;
-    L.push(`### ${p.name}${c.roleInStory ? ` — ${c.roleInStory}` : ''}`);
+    L.push(`### ${p.name}${c.roleInStory ? ` — ${c.roleInStory}` : ''}${c.coined ? ' [NEW]' : ''}`);
     L.push(`who: ${p.who}`);
     L.push(`history (why-ladder):`);
     p.history.forEach((h, i) => L.push(`  ${i + 1}. ${h}`));
@@ -193,7 +203,11 @@ function render(seed: Seed, genesis: Genesis, bible: Bible): string {
   bible.tensions.forEach((t) => L.push(`- ${tensionLine(t as string | Record<string, unknown>)}`));
   L.push(``);
   L.push(`## OPEN DIRECTIONS`);
-  bible.openDirections.forEach((d) => L.push(`- ${d}`));
+  bible.openDirections.forEach((d) => {
+    if (typeof d === 'string') { L.push(`- ${d}`); return; }
+    const tag = d.kind ? `[${d.kind}] ` : '';
+    L.push(`- ${tag}${d.hook}`);
+  });
   return L.join('\n');
 }
 
@@ -252,14 +266,19 @@ async function main(): Promise<void> {
   const genesis = await callJson(client, GENESIS_SYSTEM, genesisUser, GenesisSchema);
 
   const coreChars = genesis.coreCharacterIds.map((id) => pool.get(id)).filter(Boolean) as PoolCharacter[];
+  const coreIds = new Set(coreChars.map((c) => c.id));
+  const secondary = slate.filter((c) => !coreIds.has(c.id));
 
   // STEP B+C — WHY-LADDER + ASSEMBLE
   const buildUser = [
     `KERNEL (the collision to make believable):`, genesis.kernel,
     genesis.newRoleNeeded ? `\nThe kernel needs a coined person for this role: ${genesis.newRoleNeeded}` : ``,
     ``,
-    `CORE PEOPLE (build their believable history by why-laddering):`,
+    `CORE PEOPLE (the collision turns on these — build them deep by why-laddering):`,
     coreChars.map((c) => `- name="${c.name}" — known for: ${c.surface} [tags: ${c.tags.join(', ')}]`).join('\n'),
+    ``,
+    `OTHER EXISTING PEOPLE in this world — DRAW SECONDARY CAST FROM THESE before coining anyone new:`,
+    secondary.map((c) => `- name="${c.name}" (${c.role}) — known for: ${c.surface} [tags: ${c.tags.join(', ')}]`).join('\n'),
     ``,
     depthDirective(seed.stakes),
     ``,
