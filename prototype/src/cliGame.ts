@@ -46,6 +46,8 @@ import { templateFor } from './scenarioTemplates.js';
 import { formatTags, formatPreferredTags } from './tagFormat.js';
 import type { Merc } from './types.js';
 import { rollCaptiveTags } from './captiveTags.js';
+import { generateMerc } from './generator.js';
+import { rngFromString } from './rng.js';
 import { makeClient } from './storyGen/ai.js';
 import {
   startChain, offerNextQuest, resolveOpen,
@@ -183,7 +185,7 @@ async function main(): Promise<void> {
         case 'q': case 'Q_'/*placeholder*/: await cmdQuests(rl, roster, questCatalog, mercPool, args.savePath); break;
         case 't': case 'T': await cmdTavern(rl, roster, roomCatalog, mercPool, args.savePath); break;
         case 'c': case 'C': await cmdCaptives(rl, roster, tagPool, mercPool, roomCatalog, args.savePath); break;
-        case 'x': case 'X': await cmdChains(rl, roster, chains, chainClient, mercPool, args.savePath); break;
+        case 'x': case 'X': await cmdChains(rl, roster, chains, chainClient, mercPool, tagPool, args.savePath); break;
         case 's': case 'S': saveRoster(args.savePath, roster, mercPool); console.log('Saved.'); break;
         case 'Q': running = false; break;
         default: console.log(`Unknown command "${cmd}" — type "h" for help.`);
@@ -1109,6 +1111,7 @@ async function cmdChainDetail(
   chain: ActiveChain,
   client: ReturnType<typeof makeClient>,
   mercPool: Map<string, any>,
+  tagPool: Map<string, any>,
   savePath: string,
   chains: ActiveChain[],
 ): Promise<void> {
@@ -1167,7 +1170,35 @@ async function cmdChainDetail(
         ? '  ✗ The chain closes on a grim note.'
         : '  ✓ The chain reaches its end.');
     }
+
+    // A new face from the story may offer to join the company on a winning finale.
+    if (result.recruit) {
+      const rec = result.recruit;
+      console.log('');
+      console.log(`  ✦ ${rec.name} steps forward, asking to join your company.`);
+      console.log(`    ${rec.background}`);
+      const ans = (await rl.question(`  Recruit ${rec.name}? [y/N] > `)).trim().toLowerCase();
+      if (ans === 'y') {
+        const merc = makeRecruit(rec.name, rec.background, tagPool);
+        r.mercs.push(merc);
+        r.states.set(merc.id, { id: merc.id, fatigue: 0, hpDamage: 0, veterancyGain: 0, xp: 0, tier: 'rookie', coDeployments: {} });
+        saveRoster(savePath, r, mercPool);
+        const tags = merc.tags.map((t) => t.label).join(', ');
+        console.log(`  ✓ ${merc.name} joins the fort.  [${tags}]   (roster ${r.mercs.length})`);
+      } else {
+        console.log(`  …${rec.name} turns back to the road.`);
+      }
+    }
   }
+}
+
+/** Realize a story character as a roster merc: roll mechanical stats/tags, keep
+ *  the story's name + background. */
+function makeRecruit(name: string, background: string, tagPool: Map<string, any>): Merc {
+  const rng = rngFromString(`recruit:${name}:${Date.now()}`);
+  const idHint = `chain-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Math.floor(rng() * 0xffff).toString(16)}`;
+  const merc = generateMerc(rng, tagPool, {}, idHint);
+  return { ...merc, name, backstory: background };
 }
 
 async function cmdChains(
@@ -1176,6 +1207,7 @@ async function cmdChains(
   chains: ActiveChain[],
   client: ReturnType<typeof makeClient> | null,
   mercPool: Map<string, any>,
+  tagPool: Map<string, any>,
   savePath: string,
 ): Promise<void> {
   if (!client) {
@@ -1221,7 +1253,7 @@ async function cmdChains(
 
     const idx = parseInt(ans, 10);
     if (Number.isFinite(idx) && idx >= 1 && idx <= chains.length) {
-      await cmdChainDetail(rl, r, chains[idx - 1]!, client, mercPool, savePath, chains);
+      await cmdChainDetail(rl, r, chains[idx - 1]!, client, mercPool, tagPool, savePath, chains);
     } else {
       console.log('  (nothing there)');
     }

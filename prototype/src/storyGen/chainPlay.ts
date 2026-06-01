@@ -63,6 +63,8 @@ export interface ResolveResult {
   prose: string;
   gold: number;
   closed: boolean;
+  /** On a winning finale, a new face from the story who offers to join. */
+  recruit: { name: string; background: string } | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -92,6 +94,19 @@ export function partyOf(mercs: Merc[]): { name: string; tags: string[]; backgrou
 // ---------------------------------------------------------------------------
 // Engine-owned numbers
 // ---------------------------------------------------------------------------
+/** A new face the story coined (not a pre-existing roster merc) who could be
+ *  recruited when the chain ends on a win. Returns null if the story added no
+ *  new people. */
+export function recruitCandidate(bible: Bible): { name: string; background: string } | null {
+  const coined = bible.cast.find((c) => c.coined === true);
+  if (!coined) return null;
+  const p = coined.person;
+  const bedrock = p.history[p.history.length - 1];
+  const background = bedrock ? `${p.who} ${bedrock}` : p.who;
+  return { name: p.name, background };
+}
+
+const WIN_OUTCOMES = new Set<Outcome>(['clean_win', 'narrow_win']);
 const GOLD_BASE: Record<Stakes, number> = { uncommon: 8, rare: 16, legendary: 32 };
 const GOLD_MULT: Record<Outcome, number> = { clean_win: 1.5, narrow_win: 1.0, partial_loss: 0.4, failure: 0 };
 
@@ -207,6 +222,7 @@ export async function resolveOpen(
     prose: resolution.resolutionProse,
     gold,
     closed: isFinal,
+    recruit: isFinal && WIN_OUTCOMES.has(outcome) ? recruitCandidate(chain.bible) : null,
   };
 }
 
