@@ -11,7 +11,8 @@ This folder contains the working design for Airaider. The design was substantial
 5. [VISION.md](VISION.md) — One-page pitch, design pillars, non-goals.
 6. [PLAYER_PREFERENCES.md](PLAYER_PREFERENCES.md) — Player-supplied flavor knobs (tone, writing style, NPC gender bias, cultural register) that flow into every AI prompt without affecting engine math.
 7. [QUEST_CHAINS.md](QUEST_CHAINS.md) — Single chain (bible + 5 beats + epilogue) pipeline, character pool, unit chains, reward fulfillment.
-8. [SAGAS.md](SAGAS.md) — Saga tier: chain-of-chains with hidden master skeleton, unit sagas, saga-tier follow-ups. Builds on QUEST_CHAINS.md.
+8. [CHAIN_INTEGRATION_PLAN.md](CHAIN_INTEGRATION_PLAN.md) — Build plan for wiring the validated `storyGen/` bible→quest-card generator into the live game (server + GUI + CLI). Refines QUEST_CHAINS.md §18.9 with safer additive sequencing. **Read before implementing chain integration.**
+9. [SAGAS.md](SAGAS.md) — Saga tier: chain-of-chains with hidden master skeleton, unit sagas, saga-tier follow-ups. Builds on QUEST_CHAINS.md.
 
 ## Legacy detail docs (have SUPERSEDED banners)
 
