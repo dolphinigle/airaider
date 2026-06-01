@@ -17,6 +17,7 @@
 //   (run genesis.ts <seedId> first to produce the bible)
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { createInterface } from 'node:readline';
 import { z } from 'zod';
 import { CharacterPool, type PoolCharacter } from '../chainBible/characterPool.js';
 import { type Stakes } from './seeds.js';
@@ -25,6 +26,7 @@ import { makeClient, callJson, type Effort } from './ai.js';
 const MODEL = process.env.AIRAIDER_QUEST_MODEL ?? 'gpt-5-mini';
 const EFFORT = (process.env.AIRAIDER_QUEST_EFFORT ?? 'low') as Effort;
 const TMP_POOL = '/tmp/airaider-storygen-pool.json';
+const INTERACTIVE = process.argv.includes('--interactive') || process.env.AIRAIDER_QUEST_INTERACTIVE === '1';
 
 type Outcome = 'clean_win' | 'narrow_win' | 'partial_loss' | 'failure';
 const OUTCOMES: Outcome[] = ['clean_win', 'narrow_win', 'partial_loss', 'failure'];
@@ -87,6 +89,8 @@ You are given: the BIBLE (hidden truth), the CHAIN STATE (what is currently true
 
 HARD RULES:
 - The player sees ONLY the "card". It must be concrete and enticing — a job, a plea, a rumor, a body — and must reveal NO hidden CAUSE. Symptoms, not causes. (A corpse, never the murderer's name; a missing barge, never the smuggling ring.)
+- POV LOCK — the card is what arrives AT THE FORT. Write strictly from the company's vantage: ONLY what the client/messenger/rumor that comes to the gate actually says or shows, plus facts the company already established in earlier quests of this chain (see WHAT THE PLAYER ALREADY KNOWS). You have NO omniscient access. NEVER narrate the private thoughts, facial expressions, or unseen scenes of anyone the company has not yet met. If a person is off-scene, you may only report what the petitioner CLAIMS about them, explicitly attributed to the petitioner ("the steward says the tavernkeeper will not give it up") — never an all-seeing read of that person's face or heart.
+- STATE THE JOB PLAINLY — the card must make the contract unambiguous: WHO is hiring, WHAT they want achieved, and the CONCRETE ACTION the company is asked to perform (escort / recover / guard / stand witness / intimidate / investigate / hunt...). The player must finish reading and know exactly what taking this job commits the company to do. End the card on the explicit ask.
 - Reveal SLOWLY. One quest surfaces at most ONE new layer of the truth. Do not dump the conspiracy. Most of the bible stays buried for now.
 - CONTINUITY: the quest must follow believably from the CHAIN STATE — react to what the company just did and to what is now in motion. Do not reset. After the first quest, drive the next one from open threads and the actors' reactions, not from a fresh unrelated job.
 - The company's only agency is: take the job + assign units. Do NOT write mid-quest branching choices.
@@ -166,6 +170,11 @@ function sampleMercs(pool: CharacterPool, n: number): PoolCharacter[] {
   return shuffled.slice(0, n);
 }
 
+const rl = INTERACTIVE ? createInterface({ input: process.stdin, output: process.stdout }) : null;
+function ask(prompt: string): Promise<string> {
+  return new Promise((resolve) => rl!.question(prompt, (a) => resolve(a.trim())));
+}
+
 function printQuest(step: number, q: Quest): void {
   console.log(`\n${'='.repeat(70)}\n  QUEST ${step}: ${q.questTitle}\n${'='.repeat(70)}`);
   console.log(`\n[ JOB BOARD — what the player sees ]\n${q.card}`);
@@ -178,8 +187,8 @@ function printQuest(step: number, q: Quest): void {
   console.log(`\n[ hidden — purpose ] ${q.hiddenPurpose}`);
 }
 
-function printResolution(outcome: Outcome, assigned: PoolCharacter[], r: Resolution): void {
-  console.log(`\n--- RESOLUTION (${outcome}) — assigned: ${assigned.map((a) => a.name).join(', ')} ---`);
+function printResolution(outcome: Outcome, assignedLabel: string, r: Resolution): void {
+  console.log(`\n--- RESOLUTION (${outcome}) — assigned: ${assignedLabel} ---`);
   console.log(r.resolutionProse);
   if (r.newlyRevealed?.length) console.log(`\n  ↳ player now knows: ${r.newlyRevealed.join(' | ')}`);
   if (r.closingNote) console.log(`\n  ✦ ${r.closingNote}`);
@@ -247,13 +256,26 @@ async function main(): Promise<void> {
     const isFinal = mustEndNow || (truthy(quest.closesChain) && canEndNow);
     printQuest(step, quest);
 
-    // RESOLVE
-    const outcome = outcomes[step - 1] ?? 'narrow_win';
-    const assigned = sampleMercs(pool, 2);
+    // RESOLVE — assignment + outcome come from the player (interactive) or the script.
+    let outcome: Outcome;
+    let assignedDesc: string;   // fed to the resolver
+    let assignedLabel: string;  // for logging/history
+    if (INTERACTIVE) {
+      const unitLine = await ask(`\n  > assign units (freeform, e.g. "Felix the Wolfman, high CHA"): `);
+      assignedDesc = unitLine || '(an unnamed pair of company hands)';
+      assignedLabel = unitLine || '(unnamed)';
+      let tier = (await ask(`  > outcome [clean_win | narrow_win | partial_loss | failure]: `)).toLowerCase();
+      outcome = (OUTCOMES as string[]).includes(tier) ? (tier as Outcome) : 'narrow_win';
+    } else {
+      outcome = outcomes[step - 1] ?? 'narrow_win';
+      const assigned = sampleMercs(pool, 2);
+      assignedDesc = assigned.map((a) => `${a.name} [${a.tags.join(', ')}]`).join('; ');
+      assignedLabel = assigned.map((a) => a.name).join(', ');
+    }
     const outcomeBlock = [
       `## OUTCOME (engine-decided)`,
       `- tier: ${outcome}`,
-      `- assigned units: ${assigned.map((a) => `${a.name} [${a.tags.join(', ')}]`).join('; ')}`,
+      `- assigned units: ${assignedDesc}`,
       isFinal ? `- THIS IS THE FINAL QUEST OF THE CHAIN — close the arc.` : `- the chain continues after this.`,
     ].join('\n');
     const resolveUser = [
@@ -268,14 +290,15 @@ async function main(): Promise<void> {
       ``, `Resolve it. Output JSON only.`,
     ].join('\n');
     const resolution = await callJson(client, { system: RESOLVER_SYSTEM, user: resolveUser, schema: ResolutionSchema, model: MODEL, effort: EFFORT });
-    printResolution(outcome, assigned, resolution);
+    printResolution(outcome, assignedLabel, resolution);
 
     mergeState(state, resolution);
-    history.push({ step, quest, outcome, assigned: assigned.map((a) => a.name), resolution });
+    history.push({ step, quest, outcome, assigned: [assignedLabel], resolution });
 
     if (isFinal) { console.log(`\n########  CHAIN COMPLETE after ${step} quests  ########`); break; }
   }
 
+  rl?.close();
   const outPath = `/tmp/airaider-questchain-${seedId}.json`;
   writeFileSync(outPath, JSON.stringify({ seed, title: bible.title, drivingHook, history, finalState: state }, null, 2));
   console.log(`\nsaved: ${outPath}`);
