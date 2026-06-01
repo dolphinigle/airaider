@@ -5,13 +5,14 @@ This folder contains the working design for Airaider. The design was substantial
 ## Reading order
 
 1. **[AGENT_BOOTSTRAP.md](AGENT_BOOTSTRAP.md)** — Start here. 30-second orientation for a new agent or contributor. Pointers and terminology rules.
-2. **[CANONICAL_DESIGN.md](CANONICAL_DESIGN.md)** — The full canonical synthesis. Every load-bearing decision, post-200-day validation. Read this in full.
+2. **[PROTOTYPE_DOCTRINE.md](PROTOTYPE_DOCTRINE.md)** — **READ THIS SECOND.** The whole repo is a throwaway prototype; this doc is the anti-over-engineering doctrine + the lean "Chain Campaign" build plan (the current active work). Stops the drift into production-grade caution.
+3. **[CANONICAL_DESIGN.md](CANONICAL_DESIGN.md)** — The full canonical synthesis. Every load-bearing decision, post-200-day validation. Read this in full.
 3. [OPEN_QUESTIONS.md](OPEN_QUESTIONS.md) — Living list of unresolved questions. Being re-aligned with `CANONICAL_DESIGN.md` §7.
 4. [AI_PROVIDER.md](AI_PROVIDER.md) — AI model selection: hybrid recommendation (GPT-4o-mini default, A/B test Claude Sonnet for narrative), pricing landscape, structured-output strategy, output JSON schema pattern.
 5. [VISION.md](VISION.md) — One-page pitch, design pillars, non-goals.
 6. [PLAYER_PREFERENCES.md](PLAYER_PREFERENCES.md) — Player-supplied flavor knobs (tone, writing style, NPC gender bias, cultural register) that flow into every AI prompt without affecting engine math.
 7. [QUEST_CHAINS.md](QUEST_CHAINS.md) — Single chain (bible + 5 beats + epilogue) pipeline, character pool, unit chains, reward fulfillment.
-8. [CHAIN_INTEGRATION_PLAN.md](CHAIN_INTEGRATION_PLAN.md) — Build plan for wiring the validated `storyGen/` bible→quest-card generator into the live game (server + GUI + CLI). Refines QUEST_CHAINS.md §18.9 with safer additive sequencing. **Read before implementing chain integration.**
+8. [CHAIN_INTEGRATION_PLAN.md](CHAIN_INTEGRATION_PLAN.md) — **SUPERSEDED by PROTOTYPE_DOCTRINE.md** (was production-grade integration caution; over-engineered for a throwaway prototype). Kept for the generator-internals/current-state reference only.
 9. [SAGAS.md](SAGAS.md) — Saga tier: chain-of-chains with hidden master skeleton, unit sagas, saga-tier follow-ups. Builds on QUEST_CHAINS.md.
 
 ## Legacy detail docs (have SUPERSEDED banners)

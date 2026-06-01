@@ -1,10 +1,15 @@
 # Quest-Chain Integration Plan — wiring the validated storyGen pipeline into the live game
 
-> **Status:** PLAN (not yet implemented). Created 2026-06-01.
-> **Supersedes the build sequence in:** QUEST_CHAINS.md §18.9 (refines it with a
-> safer, additive sequencing after a rubber-duck review).
-> **Read first:** QUEST_CHAINS.md §18 (target architecture — character pool + bible),
-> §17 (playtest learnings), CANONICAL_DESIGN §1 (engine owns numbers, AI owns flavor).
+> **⚠️ SUPERSEDED by `PROTOTYPE_DOCTRINE.md`.** This plan was written as if the
+> game were production code — additive schema migrations, async job queues,
+> feature flags, pool-vs-roster authority. The whole repo is a THROWAWAY
+> prototype, so that caution is over-engineering. The actual build plan is the
+> lean "Chain Campaign" REPL in `PROTOTYPE_DOCTRINE.md`. Kept below only for the
+> generator-internals reference (current-state survey in §1).
+>
+> **Status:** SUPERSEDED. Created 2026-06-01.
+> **Read first:** `PROTOTYPE_DOCTRINE.md`, then QUEST_CHAINS.md §18 (target
+> architecture), CANONICAL_DESIGN §1 (engine owns numbers, AI owns flavor).
 
 ---
 
