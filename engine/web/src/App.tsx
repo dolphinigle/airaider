@@ -90,7 +90,12 @@ export function App() {
             onAbandon={(questId) => dispatch.mutate({ kind: 'abandon-quest', questId })}
             onUnassign={(questId, slotId) => dispatch.mutate({ kind: 'assign-slot', questId, slotId, mercId: null })}
           />
-          <QuestChainPanel chains={state.questChains ?? []} />
+          <QuestChainPanel
+            chains={state.chains ?? []}
+            mercs={state.mercs}
+            busy={dispatch.isPending}
+            onCommand={(cmd) => dispatch.mutate(cmd)}
+          />
           <MercPanel state={state} onSelectMerc={(mercId) => setMercDetailId(mercId)} />
         </div>
 

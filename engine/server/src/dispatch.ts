@@ -46,6 +46,13 @@ import {
   trySpawnWorldChain,
   trySpawnUnitChain,
 } from './chainOrchestrator.js';
+import {
+  startChain,
+  offerNextQuest,
+  resolveOpen,
+  recruitToRoster,
+} from '../../../prototype/src/storyGen/chainPlay.js';
+import { getChains, persistChains, getChainClient } from './state.js';
 import type { LeadRarity } from '../../../prototype/src/leads.js';
 
 export const CommandSchema = z.discriminatedUnion('kind', [
@@ -84,6 +91,10 @@ export const CommandSchema = z.discriminatedUnion('kind', [
     region: z.string().optional(),
     followupOfChainId: z.string().optional(),
   }),
+  z.object({ kind: z.literal('chain-new') }),
+  z.object({ kind: z.literal('chain-offer'), chainId: z.string() }),
+  z.object({ kind: z.literal('chain-resolve'), chainId: z.string(), mercIds: z.array(z.string()) }),
+  z.object({ kind: z.literal('chain-recruit'), chainId: z.string(), accept: z.boolean() }),
 ]);
 export type Command = z.infer<typeof CommandSchema>;
 
@@ -92,6 +103,12 @@ export interface DispatchResult {
   error?: string;
   message?: string;
 }
+
+// A chain action fires a slow AI call. This module-level flag prevents a
+// double-click / second tab from running two chain commands at once, which
+// could otherwise double-resolve a quest (and double its gold). The check and
+// set are synchronous (no await between them), so they are atomic.
+let chainBusy = false;
 
 function rarityRewardMult(rarity: string): number {
   switch (rarity) {
@@ -651,6 +668,82 @@ export async function dispatch(
       });
       if (!c) return { ok: false, error: 'world chain spawn returned null (cap or AI error)' };
       return { ok: true, message: `world chain spawned: ${c.title}` };
+    }
+
+    case 'chain-new': {
+      if (roster.mercs.length < 2) return { ok: false, error: 'need at least 2 mercs to seed a story' };
+      if (chainBusy) return { ok: false, error: 'a chain action is already in progress' };
+      chainBusy = true;
+      try {
+        const chains = getChains();
+        const exclude = new Set(chains.map((c) => c.seedId));
+        const chain = await startChain(getChainClient(), roster.mercs, {
+          dayCount: roster.dayCount,
+          excludeSeedIds: exclude,
+        });
+        chains.push(chain);
+        persistChains();
+        return { ok: true, message: `new chain: ${chain.title}` };
+      } finally {
+        chainBusy = false;
+      }
+    }
+
+    case 'chain-offer': {
+      const chain = getChains().find((c) => c.id === cmd.chainId);
+      if (!chain) return { ok: false, error: `chain ${cmd.chainId} not found` };
+      if (chain.status !== 'awaiting-offer') return { ok: false, error: `chain is ${chain.status}; cannot offer a quest` };
+      if (chainBusy) return { ok: false, error: 'a chain action is already in progress' };
+      chainBusy = true;
+      try {
+        await offerNextQuest(getChainClient(), chain);
+        persistChains();
+        return { ok: true, message: `quest offered for ${chain.title}` };
+      } finally {
+        chainBusy = false;
+      }
+    }
+
+    case 'chain-resolve': {
+      const chain = getChains().find((c) => c.id === cmd.chainId);
+      if (!chain) return { ok: false, error: `chain ${cmd.chainId} not found` };
+      if (chain.status !== 'awaiting-assign' || !chain.openQuest) {
+        return { ok: false, error: 'no open quest to resolve on this chain' };
+      }
+      if (chainBusy) return { ok: false, error: 'a chain action is already in progress' };
+      chainBusy = true;
+      try {
+        const party = cmd.mercIds
+          .map((id) => roster.mercs.find((m) => m.id === id))
+          .filter((m): m is NonNullable<typeof m> => !!m);
+        const result = await resolveOpen(getChainClient(), chain, party);
+        roster.gold += result.gold;
+        persistChains();
+        return { ok: true, message: `${chain.title}: ${result.outcome} (+${result.gold}g)` };
+      } finally {
+        chainBusy = false;
+      }
+    }
+
+    case 'chain-recruit': {
+      const chain = getChains().find((c) => c.id === cmd.chainId);
+      if (!chain) return { ok: false, error: `chain ${cmd.chainId} not found` };
+      const rec = chain.pendingRecruit;
+      if (!rec) return { ok: false, error: 'no pending recruit on this chain' };
+      if (cmd.accept) {
+        const merc = recruitToRoster(roster, rec, tagPool);
+        appendFortLog(roster, {
+          day: roster.dayCount,
+          kind: 'note',
+          message: `RECRUITED: ${merc.name} joined the company from a story chain.`,
+        });
+        chain.pendingRecruit = null;
+        persistChains();
+        return { ok: true, message: `recruited ${merc.name}` };
+      }
+      chain.pendingRecruit = null;
+      persistChains();
+      return { ok: true, message: `declined ${rec.name}` };
     }
 
     case 'accept-applicant': {

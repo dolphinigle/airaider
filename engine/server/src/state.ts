@@ -20,6 +20,8 @@ import {
   type Roster,
 } from '../../../prototype/src/roster.js';
 import type { Merc, Tag } from '../../../prototype/src/types.js';
+import { loadChains, saveChains, type ActiveChain } from '../../../prototype/src/storyGen/chainPlay.js';
+import { makeClient } from '../../../prototype/src/storyGen/ai.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 export const PROTO_ROOT = resolve(__dirname, '../../../prototype');
@@ -37,6 +39,8 @@ interface Caches {
 
 let caches: Caches | null = null;
 let cachedRoster: Roster | null = null;
+let cachedChains: ActiveChain[] | null = null;
+let chainClient: ReturnType<typeof makeClient> | null = null;
 
 export function loadCatalogs(): Caches {
   if (caches) return caches;
@@ -52,6 +56,7 @@ export function loadCatalogs(): Caches {
 export function resetCaches(): void {
   caches = null;
   cachedRoster = null;
+  cachedChains = null;
 }
 
 export function getRoster(): Roster {
@@ -82,4 +87,27 @@ export function saveRoster(): void {
 
 export function setRoster(r: Roster): void {
   cachedRoster = r;
+}
+
+// --- Story chains (the shared chainPlay engine, sidecar-persisted) --------
+// Both the text CLI and this GUI drive the SAME chain engine; the GUI keeps
+// its chains in a sidecar next to the roster save so the roster schema stays
+// untouched.
+
+export function getChains(): ActiveChain[] {
+  if (cachedChains) return cachedChains;
+  cachedChains = loadChains(DEFAULT_SAVE_PATH);
+  return cachedChains;
+}
+
+export function persistChains(): void {
+  if (!cachedChains) return;
+  const dir = dirname(DEFAULT_SAVE_PATH);
+  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+  saveChains(DEFAULT_SAVE_PATH, cachedChains);
+}
+
+export function getChainClient(): ReturnType<typeof makeClient> {
+  if (!chainClient) chainClient = makeClient();
+  return chainClient;
 }

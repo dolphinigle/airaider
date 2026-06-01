@@ -11,6 +11,10 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import OpenAI from 'openai';
 import type { Merc } from '../types.js';
+import type { Roster } from '../roster.js';
+import type { Tag } from '../types.js';
+import { generateMerc } from '../generator.js';
+import { rngFromString } from '../rng.js';
 import { pickSeed, seedById, type Seed, type Stakes } from './seeds.js';
 import {
   buildBible, writeQuest, resolveQuest, assessFit, mergeChainState,
@@ -57,6 +61,9 @@ export interface ActiveChain {
   /** Roster names at bible-build time — the engine's truth for who is NOT a new
    *  face. Used to decide recruitability of cast members. */
   slateNames: string[];
+  /** A new face offered by a winning finale, awaiting the player's accept/decline.
+   *  Durable so the offer survives a GUI state refresh; cleared once answered. */
+  pendingRecruit?: { name: string; background: string } | null;
 }
 
 export interface ResolveResult {
@@ -236,6 +243,11 @@ export async function resolveOpen(
   chain.openQuest = null;
   chain.status = isFinal ? (outcome === 'failure' ? 'failed' : 'done') : 'awaiting-offer';
 
+  const recruit = isFinal && WIN_OUTCOMES.has(outcome)
+    ? recruitCandidate(chain.bible, new Set(chain.slateNames ?? []))
+    : null;
+  chain.pendingRecruit = recruit;
+
   return {
     outcome,
     fit: fit.partyFit,
@@ -243,9 +255,7 @@ export async function resolveOpen(
     prose: resolution.resolutionProse,
     gold,
     closed: isFinal,
-    recruit: isFinal && WIN_OUTCOMES.has(outcome)
-      ? recruitCandidate(chain.bible, new Set(chain.slateNames ?? []))
-      : null,
+    recruit,
   };
 }
 
@@ -268,4 +278,28 @@ export function loadChains(savePath: string): ActiveChain[] {
 
 export function saveChains(savePath: string, chains: ActiveChain[]): void {
   writeFileSync(chainsPathFor(savePath), JSON.stringify(chains, null, 2));
+}
+
+/** Realize a story character as a roster merc: roll mechanical stats/tags, keep
+ *  the story's name + background, and enroll them in the roster (caller saves). */
+export function recruitToRoster(
+  roster: Roster,
+  rec: { name: string; background: string },
+  tagPool: Map<string, Tag>,
+): Merc {
+  const rng = rngFromString(`recruit:${rec.name}:${Date.now()}`);
+  const idHint = `chain-${rec.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Math.floor(rng() * 0xffff).toString(16)}`;
+  const base = generateMerc(rng, tagPool, {}, idHint);
+  const merc: Merc = { ...base, name: rec.name, backstory: rec.background };
+  roster.mercs.push(merc);
+  roster.states.set(merc.id, {
+    id: merc.id,
+    fatigue: 0,
+    hpDamage: 0,
+    veterancyGain: 0,
+    xp: 0,
+    tier: 'rookie',
+    coDeployments: {},
+  });
+  return merc;
 }

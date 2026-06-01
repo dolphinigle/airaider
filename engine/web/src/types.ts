@@ -176,6 +176,7 @@ export interface GameState {
   pursuedQuests: PursuedQuest[];
   lastResolutions: ResolutionRecord[];
   questChains: QuestChainView[];
+  chains: ChainView[];
 }
 
 export interface QuestChainStepView {
@@ -207,6 +208,43 @@ export interface QuestChainView {
   steps: QuestChainStepView[];
 }
 
+// The shared chainPlay engine (same engine the text CLI uses). These power the
+// interactive story-chain panel.
+export type ChainOutcome = 'clean_win' | 'narrow_win' | 'partial_loss' | 'failure';
+
+export interface ChainLogEntryView {
+  step: number;
+  questTitle: string;
+  party: string;
+  outcome: ChainOutcome;
+  fit: number;
+  prose: string;
+  gold: number;
+}
+
+export interface ChainOpenQuestView {
+  questTitle: string;
+  card: string;
+  desiredStats: string[];
+  desiredTraits: string[];
+  fictionalReason: string;
+}
+
+export interface ChainView {
+  id: string;
+  title: string;
+  stakes: 'uncommon' | 'rare' | 'legendary';
+  leadBlurb: string;
+  step: number;
+  target: number;
+  max: number;
+  status: 'awaiting-offer' | 'awaiting-assign' | 'done' | 'failed';
+  knownToPlayer: string[];
+  openQuest: ChainOpenQuestView | null;
+  log: ChainLogEntryView[];
+  pendingRecruit: { name: string; background: string } | null;
+}
+
 export interface RoomDef {
   id: string;
   name: string;
@@ -236,4 +274,8 @@ export type Command =
   | { kind: 'abandon-quest'; questId: string }
   | { kind: 'clear-resolutions' }
   | { kind: 'accept-applicant'; applicantId: string }
-  | { kind: 'dismiss-applicant'; applicantId: string };
+  | { kind: 'dismiss-applicant'; applicantId: string }
+  | { kind: 'chain-new' }
+  | { kind: 'chain-offer'; chainId: string }
+  | { kind: 'chain-resolve'; chainId: string; mercIds: string[] }
+  | { kind: 'chain-recruit'; chainId: string; accept: boolean };

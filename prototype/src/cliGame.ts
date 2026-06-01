@@ -46,11 +46,9 @@ import { templateFor } from './scenarioTemplates.js';
 import { formatTags, formatPreferredTags } from './tagFormat.js';
 import type { Merc } from './types.js';
 import { rollCaptiveTags } from './captiveTags.js';
-import { generateMerc } from './generator.js';
-import { rngFromString } from './rng.js';
 import { makeClient } from './storyGen/ai.js';
 import {
-  startChain, offerNextQuest, resolveOpen,
+  startChain, offerNextQuest, resolveOpen, recruitToRoster,
   loadChains, saveChains, type ActiveChain,
 } from './storyGen/chainPlay.js';
 
@@ -1179,9 +1177,7 @@ async function cmdChainDetail(
       console.log(`    ${rec.background}`);
       const ans = (await rl.question(`  Recruit ${rec.name}? [y/N] > `)).trim().toLowerCase();
       if (ans === 'y') {
-        const merc = makeRecruit(rec.name, rec.background, tagPool);
-        r.mercs.push(merc);
-        r.states.set(merc.id, { id: merc.id, fatigue: 0, hpDamage: 0, veterancyGain: 0, xp: 0, tier: 'rookie', coDeployments: {} });
+        const merc = recruitToRoster(r, rec, tagPool);
         saveRoster(savePath, r, mercPool);
         const tags = merc.tags.map((t) => t.label).join(', ');
         console.log(`  ✓ ${merc.name} joins the fort.  [${tags}]   (roster ${r.mercs.length})`);
@@ -1190,15 +1186,6 @@ async function cmdChainDetail(
       }
     }
   }
-}
-
-/** Realize a story character as a roster merc: roll mechanical stats/tags, keep
- *  the story's name + background. */
-function makeRecruit(name: string, background: string, tagPool: Map<string, any>): Merc {
-  const rng = rngFromString(`recruit:${name}:${Date.now()}`);
-  const idHint = `chain-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Math.floor(rng() * 0xffff).toString(16)}`;
-  const merc = generateMerc(rng, tagPool, {}, idHint);
-  return { ...merc, name, backstory: background };
 }
 
 async function cmdChains(

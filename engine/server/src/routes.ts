@@ -2,7 +2,7 @@
 
 import type { FastifyInstance } from 'fastify';
 import { CommandSchema, dispatch } from './dispatch.js';
-import { loadCatalogs, getRoster, saveRoster, resetCaches, DEFAULT_SAVE_PATH } from './state.js';
+import { loadCatalogs, getRoster, saveRoster, resetCaches, getChains, DEFAULT_SAVE_PATH } from './state.js';
 import { getQuestStore, saveQuestStore } from './quests.js';
 import {
   renderFortLayout,
@@ -79,6 +79,37 @@ function snapshotState(roster: Roster, roomCatalog: Map<string, RoomDef>): unkno
     pursuedQuests,
     lastResolutions: store.lastResolutions,
     llmLog: recentLLMLog(20),
+    // The shared chainPlay engine (same stories the text CLI produces).
+    chains: getChains().map((c) => ({
+      id: c.id,
+      title: c.title,
+      stakes: c.stakes,
+      leadBlurb: c.leadBlurb,
+      step: c.step,
+      target: c.target,
+      max: c.max,
+      status: c.status,
+      knownToPlayer: c.state.knownToPlayer,
+      openQuest: c.openQuest
+        ? {
+            questTitle: c.openQuest.questTitle,
+            card: c.openQuest.card,
+            desiredStats: c.openQuest.assignmentAsk.desiredStats ?? [],
+            desiredTraits: c.openQuest.assignmentAsk.desiredTraits ?? [],
+            fictionalReason: c.openQuest.assignmentAsk.fictionalReason ?? '',
+          }
+        : null,
+      log: c.log.map((e) => ({
+        step: e.step,
+        questTitle: e.questTitle,
+        party: e.party,
+        outcome: e.outcome,
+        fit: e.fit,
+        prose: e.prose,
+        gold: e.gold,
+      })),
+      pendingRecruit: c.pendingRecruit ?? null,
+    })),
     questChains: roster.questChains.map((c) => ({
       id: c.id,
       kind: c.kind,
