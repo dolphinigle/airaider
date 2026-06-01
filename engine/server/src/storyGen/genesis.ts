@@ -44,7 +44,7 @@ const PersonSchema = z.object({
   history: z.array(z.string().min(8)).min(1), // the why-ladder, one link per bullet, ending at bedrock
   wants: z.string().min(6),                   // plain present motive
   feels: z.string().min(6),                   // how they regard their own history (pride/shame/grief/fear)
-  conceals: z.union([z.string(), z.boolean(), z.null()]).optional(), // string ONLY if a feeling makes them naturally hide something; model may send false/null for "nothing"
+  conceals: z.union([z.string(), z.boolean(), z.null(), z.record(z.any())]).optional(), // string ONLY if a feeling makes hiding natural; model may send false/null for "nothing" or an object {what,why} at low effort
 });
 
 const BibleSchema = z.object({
@@ -95,6 +95,12 @@ BELIEVABILITY RUBRIC (your output must pass it):
 - Few secret-bearers: 1-2 people conceal anything; the rest are exactly what they seem.
 - Nobody behaves stupidly just to keep the situation alive.
 
+COMMIT TO THE TRUTH (critical):
+- This bible IS the settled, complete truth. It is what really happened, fully decided. NOTHING here is an open question.
+- If a thing happened — a killing, a theft, a betrayal, a disappearance — you MUST state plainly WHO did it and WHY, in the situation and the relevant person's history. Decide it now.
+- BANNED in the hidden layer: "unknown", "remains hidden", "it is unclear", "someone", "a mysterious figure", "the identity of X hangs on", "the truth of Y is never revealed". Those are the PLAYER's to discover later — but you, the author, already know, so write it down.
+- Mystery is manufactured downstream when quests are written from this bible. Your job is the opposite: leave no mystery in the truth itself. If you find yourself withholding a fact, stop and commit to it.
+
 OUTPUT (clinical truth fields; only leadBlurb may carry light flavor):
 - title: short, concrete, names a real thing/person/place in the story. No "The Weight of X" patterns.
 - leadBlurb: 1-2 sentences the PLAYER sees on a job board before meeting anyone. It must sound like a MUNDANE CONTRACT and reveal NONE of the hidden truth. Use physical anchors (a body, an unpaid debt, a missing barge), not the cast's secret names.
@@ -133,6 +139,19 @@ async function callJson<T>(client: OpenAI, system: string, user: string, schema:
   return schema.parse(JSON.parse(content));
 }
 
+function concealsLine(c: unknown): string | null {
+  if (typeof c === 'string') return c.trim() || null;
+  if (c && typeof c === 'object') {
+    const o = c as Record<string, unknown>;
+    const what = o.what ?? o.secret ?? o.it ?? o.thing;
+    const why = o.why ?? o.reason ?? o.because;
+    if (what && why) return `${what} — ${why}`;
+    const joined = Object.values(o).filter((v) => typeof v === 'string').join(' — ');
+    return joined || null;
+  }
+  return null;
+}
+
 function tensionLine(t: string | Record<string, unknown>): string {
   if (typeof t === 'string') return t;
   const parties = t.parties ?? t.between ?? t.who ?? t.sides;
@@ -166,7 +185,8 @@ function render(seed: Seed, genesis: Genesis, bible: Bible): string {
     p.history.forEach((h, i) => L.push(`  ${i + 1}. ${h}`));
     L.push(`wants: ${p.wants}`);
     L.push(`feels: ${p.feels}`);
-    if (p.conceals && typeof p.conceals === 'string' && p.conceals.trim()) L.push(`conceals: ${p.conceals}`);
+    const concealsStr = concealsLine(p.conceals);
+    if (concealsStr) L.push(`conceals: ${concealsStr}`);
     L.push(``);
   }
   L.push(`## TENSIONS`);
