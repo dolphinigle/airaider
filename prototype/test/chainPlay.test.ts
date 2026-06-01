@@ -48,24 +48,40 @@ const person = (name: string, who: string, history: string[]) => ({
   person: { name, who, history, wants: 'something', feels: 'something' },
 });
 
-describe('recruitCandidate (a coined story face can join)', () => {
-  it('returns the first coined cast member', () => {
+describe('recruitCandidate (a new story face can join on a win)', () => {
+  const slate = new Set(['Roselle', 'Marek']);
+  it('returns the first cast member who is not on the roster slate', () => {
     const bible = bibleWith([
       { ...person('Roselle', 'a roster merc', ['raised on the docks']) },
-      { ...person('Jorun', 'a travelling fence', ['lost his brother to a debt']), coined: true },
+      { ...person('Jorun', 'a travelling fence', ['lost his brother to a debt']) },
     ]);
-    const rec = recruitCandidate(bible);
+    const rec = recruitCandidate(bible, slate);
     expect(rec).not.toBeNull();
     expect(rec!.name).toBe('Jorun');
     expect(rec!.background).toContain('a travelling fence');
     expect(rec!.background).toContain('lost his brother to a debt'); // bedrock appended
   });
-  it('returns null when the story coined no new people', () => {
+  it('ignores the AI coined flag and trusts slate membership', () => {
+    const bible = bibleWith([
+      { ...person('Marek', 'a roster merc', ['ran from a name']), coined: true },
+      { ...person('Veska', 'a sharp clerk', ['keeps the crooked ledgers']) },
+    ]);
+    // Marek is coined-flagged but IS on the slate, so Veska (the real new face) wins.
+    expect(recruitCandidate(bible, slate)!.name).toBe('Veska');
+  });
+  it('never recruits a deceased cast member', () => {
+    const bible = bibleWith([
+      { ...person('Keld', 'the murdered merchant, found dead in the yard', ['was killed over a debt']) },
+      { ...person('Veska', 'a sharp clerk', ['keeps the crooked ledgers']) },
+    ]);
+    expect(recruitCandidate(bible, slate)!.name).toBe('Veska');
+  });
+  it('returns null when every cast face is on the slate', () => {
     const bible = bibleWith([
       { ...person('Roselle', 'a roster merc', ['raised on the docks']) },
       { ...person('Marek', 'another roster merc', ['ran from a name']) },
     ]);
-    expect(recruitCandidate(bible)).toBeNull();
+    expect(recruitCandidate(bible, slate)).toBeNull();
   });
 });
 

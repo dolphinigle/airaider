@@ -54,6 +54,9 @@ export interface ActiveChain {
   openQuest: Quest | null;
   log: ChainLogEntry[];
   startedOnDay: number;
+  /** Roster names at bible-build time — the engine's truth for who is NOT a new
+   *  face. Used to decide recruitability of cast members. */
+  slateNames: string[];
 }
 
 export interface ResolveResult {
@@ -94,13 +97,30 @@ export function partyOf(mercs: Merc[]): { name: string; tags: string[]; backgrou
 // ---------------------------------------------------------------------------
 // Engine-owned numbers
 // ---------------------------------------------------------------------------
-/** A new face the story coined (not a pre-existing roster merc) who could be
- *  recruited when the chain ends on a win. Returns null if the story added no
- *  new people. */
-export function recruitCandidate(bible: Bible): { name: string; background: string } | null {
-  const coined = bible.cast.find((c) => c.coined === true);
-  if (!coined) return null;
-  const p = coined.person;
+const DEAD = /\b(dead|killed|murdered|slain|deceased|corpse|the late|posthum)\b/i;
+
+/** A cast member is unrecruitable-by-death only when their identity line (`who`)
+ *  marks THEM as a corpse (e.g. "the murdered merchant"). We deliberately do NOT
+ *  scan `history` — the why-ladder routinely mentions OTHER people's deaths and
+ *  would wrongly filter out living characters. */
+function isDeceased(p: Bible['cast'][number]['person']): boolean {
+  return DEAD.test(p.who);
+}
+
+/** A new face the story surfaced (NOT a pre-existing roster merc, NOT dead) who
+ *  can join when the chain ends on a win. "New" is decided by slate membership —
+ *  the engine's truth — not the AI's unreliable `coined` flag. Returns null when
+ *  the story surfaced no recruitable new person. */
+export function recruitCandidate(
+  bible: Bible,
+  slateNames: ReadonlySet<string>,
+): { name: string; background: string } | null {
+  const norm = (s: string) => s.trim().toLowerCase();
+  const onSlate = new Set([...slateNames].map(norm));
+  const newFaces = bible.cast.filter((c) => !onSlate.has(norm(c.person.name)) && !isDeceased(c.person));
+  const pick = newFaces.find((c) => c.coined === true) ?? newFaces[0];
+  if (!pick) return null;
+  const p = pick.person;
   const bedrock = p.history[p.history.length - 1];
   const background = bedrock ? `${p.who} ${bedrock}` : p.who;
   return { name: p.name, background };
@@ -157,6 +177,7 @@ export async function startChain(
     openQuest: null,
     log: [],
     startedOnDay: opts.dayCount,
+    slateNames: mercs.map((m) => m.name),
   };
 }
 
@@ -222,7 +243,9 @@ export async function resolveOpen(
     prose: resolution.resolutionProse,
     gold,
     closed: isFinal,
-    recruit: isFinal && WIN_OUTCOMES.has(outcome) ? recruitCandidate(chain.bible) : null,
+    recruit: isFinal && WIN_OUTCOMES.has(outcome)
+      ? recruitCandidate(chain.bible, new Set(chain.slateNames ?? []))
+      : null,
   };
 }
 
