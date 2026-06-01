@@ -24,6 +24,8 @@ export const BIBLE_MODEL = process.env.AIRAIDER_BIBLE_MODEL ?? 'gpt-5-mini';
 export const BIBLE_EFFORT = (process.env.AIRAIDER_BIBLE_EFFORT ?? 'low') as Effort;
 export const QUEST_MODEL = process.env.AIRAIDER_QUEST_MODEL ?? 'gpt-5-mini';
 export const QUEST_EFFORT = (process.env.AIRAIDER_QUEST_EFFORT ?? 'low') as Effort;
+export const FIT_MODEL = process.env.AIRAIDER_FIT_MODEL ?? 'gpt-5-nano';
+export const FIT_EFFORT = (process.env.AIRAIDER_FIT_EFFORT ?? 'minimal') as Effort;
 
 // ---------------------------------------------------------------------------
 // Schemas + types
@@ -95,6 +97,12 @@ export type Resolution = z.infer<typeof ResolutionSchema>;
 
 export type Outcome = 'clean_win' | 'narrow_win' | 'partial_loss' | 'failure';
 export const OUTCOMES: Outcome[] = ['clean_win', 'narrow_win', 'partial_loss', 'failure'];
+
+const FitSchema = z.object({
+  partyFit: z.union([z.number(), z.string()]),   // 0..6; nano may stringify
+  note: z.string().optional(),
+});
+export interface FitJudgement { partyFit: number; note: string; }
 
 export interface ChainState {
   currentSituation: string;
@@ -202,6 +210,18 @@ HARD RULES:
 - Update state truthfully: newlyRevealed (facts the player now knows), threadsClosed, threadsOpened, actorUpdates (name → short new status), and a rewritten currentSituation (the hidden present reality AFTER this quest).
 - If this is the FINAL quest: bring the arc to a real close that pays off the bible's deeper truth — but still honor the outcome tier (a failed finale is a grim ending, not a triumph). Put the closing beat in closingNote.
 Output JSON only: { resolutionProse, newlyRevealed[], threadsOpened[], threadsClosed[], actorUpdates{}, currentSituation, closingNote }`;
+
+const FIT_JUDGE_SYSTEM = `You judge how well an assigned mercenary party suits a specific job. You are given the JOB (what the client asks, and the qualities the contract calls for) and the assigned PARTY (each merc's tags and short background).
+
+Rate partyFit as a single integer 0-6:
+- 0-1: actively wrong — nobody here suits this; sending them invites disaster.
+- 2-3: adequate — they can attempt it, but they are not specialists.
+- 4-5: well-suited — the party covers what the job asks; apt backgrounds.
+- 6: ideal — these are exactly the right people for this job.
+
+Weigh BOTH the explicitly desired stats/traits AND each merc's background/tags (a merc whose past directly fits the situation counts for a lot; a clear mismatch counts against). A larger apt party fits better than a single mismatched merc, but bodies alone are not fit.
+
+Output JSON only: { partyFit (0-6 integer), note (one short clause on why) }`;
 
 // ---------------------------------------------------------------------------
 // Prompt-building helpers
@@ -417,6 +437,29 @@ export async function resolveQuest(
     ``, `Resolve it. Output JSON only.`,
   ].join('\n');
   return callJson(client, { system: RESOLVER_SYSTEM, user: resolveUser, schema: ResolutionSchema, model: opts.model ?? QUEST_MODEL, effort: opts.effort ?? QUEST_EFFORT });
+}
+
+/** Qualitative party-fit judgement (AI owns the match; engine owns thresholds). */
+export async function assessFit(
+  client: OpenAI,
+  opts: { quest: Quest; party: { name: string; tags: string[]; background: string }[]; model?: string; effort?: Effort },
+): Promise<FitJudgement> {
+  const partyBlock = opts.party.length
+    ? opts.party.map((m) => `- ${m.name} [${m.tags.join(', ') || 'no tags'}] — ${m.background}`).join('\n')
+    : '- (no one was assigned)';
+  const user = [
+    `## JOB`,
+    `card: ${opts.quest.card}`,
+    `desired stats: ${(opts.quest.assignmentAsk.desiredStats ?? []).join(', ') || '—'}`,
+    `desired traits: ${(opts.quest.assignmentAsk.desiredTraits ?? []).join(', ') || '—'}`,
+    opts.quest.assignmentAsk.fictionalReason ? `because: ${opts.quest.assignmentAsk.fictionalReason}` : ``,
+    ``, `## ASSIGNED PARTY`, partyBlock,
+    ``, `Rate the party's fit. Output JSON only.`,
+  ].filter(Boolean).join('\n');
+  const raw = await callJson(client, { system: FIT_JUDGE_SYSTEM, user, schema: FitSchema, model: opts.model ?? FIT_MODEL, effort: opts.effort ?? FIT_EFFORT });
+  const n = typeof raw.partyFit === 'number' ? raw.partyFit : parseInt(String(raw.partyFit), 10);
+  const partyFit = Number.isFinite(n) ? Math.max(0, Math.min(6, Math.round(n))) : 0;
+  return { partyFit, note: raw.note ?? '' };
 }
 
 // ---------------------------------------------------------------------------
