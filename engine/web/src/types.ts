@@ -175,37 +175,7 @@ export interface GameState {
   prestige: PrestigeView;
   pursuedQuests: PursuedQuest[];
   lastResolutions: ResolutionRecord[];
-  questChains: QuestChainView[];
   chains: ChainView[];
-}
-
-export interface QuestChainStepView {
-  stepIdx: number;
-  plannedRarity: 'common' | 'uncommon' | 'rare' | 'legendary';
-  status: string;
-  band?: string;
-  summary?: string;
-  partyMercNames?: string[];
-  leadBlurb?: string;
-}
-
-export interface QuestChainView {
-  id: string;
-  kind: 'world' | 'unit';
-  unitId?: string;
-  unitName?: string;
-  chainRarity: 'common' | 'uncommon' | 'rare' | 'legendary';
-  region: string;
-  title: string;
-  hook: string;
-  priorChainId?: string;
-  currentStepIdx: number;
-  totalSteps: number;
-  status: 'active' | 'completed' | 'failed' | 'abandoned';
-  startedDay: number;
-  endedDay?: number;
-  epilogue?: string;
-  steps: QuestChainStepView[];
 }
 
 // The shared chainPlay engine (same engine the text CLI uses). These power the

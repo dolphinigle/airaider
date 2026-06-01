@@ -39,21 +39,12 @@ import { flavorCaptive } from './leanLlm.js';
 import { enrichLeadBlurbs } from './aiLeadGen.js';
 import { generateQuestRecruit } from './aiQuestRecruit.js';
 import {
-  spawnPendingStepLeads,
-  advanceChainAfterResolution,
-  maybeTriggerWorldChainFromResolution,
-  maybeTriggerUnitChainFromAcceptance,
-  trySpawnWorldChain,
-  trySpawnUnitChain,
-} from './chainOrchestrator.js';
-import {
   startChain,
   offerNextQuest,
   resolveOpen,
   recruitToRoster,
 } from '../../../prototype/src/storyGen/chainPlay.js';
 import { getChains, persistChains, getChainClient } from './state.js';
-import type { LeadRarity } from '../../../prototype/src/leads.js';
 
 export const CommandSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('end-day') }),
@@ -83,14 +74,6 @@ export const CommandSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('clear-resolutions') }),
   z.object({ kind: z.literal('accept-applicant'), applicantId: z.string() }),
   z.object({ kind: z.literal('dismiss-applicant'), applicantId: z.string() }),
-  z.object({
-    kind: z.literal('debug-spawn-chain'),
-    kind2: z.enum(['world', 'unit']).optional(),
-    rarity: z.enum(['common', 'uncommon', 'rare', 'legendary']).optional(),
-    mercId: z.string().optional(),
-    region: z.string().optional(),
-    followupOfChainId: z.string().optional(),
-  }),
   z.object({ kind: z.literal('chain-new') }),
   z.object({ kind: z.literal('chain-offer'), chainId: z.string() }),
   z.object({ kind: z.literal('chain-resolve'), chainId: z.string(), mercIds: z.array(z.string()) }),
@@ -397,32 +380,6 @@ export async function dispatch(
               );
             }
           }
-
-          // PROTO-GAME v16: chain advancement / world-chain trigger.
-          const partyMercs = assignments.map((a) => a.merc);
-          if (quest.chainStepRef) {
-            await advanceChainAfterResolution(
-              roster,
-              quest.chainStepRef.chainId,
-              quest.chainStepRef.stepIdx,
-              res.band as any,
-              res.outcomeNarrative,
-              partyMercs.map((m) => m.id),
-            );
-          } else {
-            // Try to seed a new world chain from a rare/legendary win.
-            const seedLead: any = {
-              ...quest.lead,
-              postedDay: 0,
-              expiryDay: 0,
-              pursueCost: 0,
-            };
-            await maybeTriggerWorldChainFromResolution(roster, seedLead, {
-              rarity: quest.lead.rarity,
-              band: res.band as any,
-              partyMercs,
-            });
-          }
         } catch (err: any) {
           // Resolution failure (e.g. LLM error) — keep quest, surface error.
           appendFortLog(roster, {
@@ -452,13 +409,8 @@ export async function dispatch(
       // Step 3: prune expired leads (no auto-top-up — that fires expensive AI
       // calls every day). New leads only appear when player explicitly hits
       // Refresh Leads, keeping AI cost player-initiated and predictable.
-      // Chain step leads survive even after this since they have extended
-      // expiry; chain orchestrator may also push new step leads below.
       roster.leadBoard = roster.leadBoard.filter((l) => l.expiryDay >= roster.dayCount);
 
-      // PROTO-GAME v16: spawn the next-step lead for every active chain
-      // that just advanced (or whose current step has no lead on the board).
-      await spawnPendingStepLeads(roster);
       // Tavern auto-refresh disabled: recruits now drop from successful
       // non-captive raid quests (see generateQuestRecruit above) instead of
       // weekly bench replenishment. The tavern room still gates other things
@@ -627,49 +579,6 @@ export async function dispatch(
       return { ok: true, message: 'cleared' };
     }
 
-    case 'debug-spawn-chain': {
-      // Playtest-only: force a chain genesis without waiting for a favorable
-      // rare resolution. Picks any rare/legendary lead on the board as seed
-      // (or makes a synthetic one), and triggers world OR unit chain.
-      if (!process.env.AIRAIDER_CHAIN_PLAYTEST && !process.env.AIRAIDER_DEBUG) {
-        return { ok: false, error: 'debug-spawn-chain disabled (set AIRAIDER_CHAIN_PLAYTEST or AIRAIDER_DEBUG)' };
-      }
-      // Sub-mode: spawn a FOLLOW-UP chain off an existing prior chain.
-      if (cmd.followupOfChainId) {
-        const { forceSpawnFollowup } = await import('./chainOrchestrator.js');
-        const followup = await forceSpawnFollowup(roster, cmd.followupOfChainId);
-        if (!followup) return { ok: false, error: 'follow-up returned null (cap, anchor dead, or AI error)' };
-        return { ok: true, message: `follow-up spawned: ${followup.title}` };
-      }
-      const wantedRarity: LeadRarity = (cmd.rarity ?? 'rare') as LeadRarity;
-      if (cmd.kind2 === 'unit') {
-        const anchor = roster.mercs.find((m) => m.id === cmd.mercId) ?? roster.mercs[0];
-        if (!anchor) return { ok: false, error: 'no merc to anchor unit chain' };
-        const c = await trySpawnUnitChain(roster, {
-          anchor,
-          chainRarity: wantedRarity,
-          region: cmd.region ?? 'Blackmoor',
-          reason: `debug-spawn ${wantedRarity} unit chain anchored on ${anchor.name}`,
-        });
-        if (!c) return { ok: false, error: 'unit chain spawn returned null (cap, dup, or AI error)' };
-        return { ok: true, message: `unit chain spawned: ${c.title}` };
-      }
-      // world
-      const seed = roster.leadBoard.find((l) => l.rarity === wantedRarity) ?? roster.leadBoard[0] ?? {
-        id: 'debug-seed', rarity: wantedRarity, archetype: 'recovery' as const,
-        region: cmd.region ?? 'Blackmoor', dc: 4, rewardGold: 36, pursueCost: 4,
-        postedDay: roster.dayCount, expiryDay: roster.dayCount + 3,
-        blurb: 'A debug-spawned seed rumour about a relic in Blackmoor.',
-      };
-      const c = await trySpawnWorldChain(roster, {
-        seedLead: seed,
-        chainRarity: wantedRarity,
-        partyTagLabels: roster.mercs.flatMap((m) => m.tags.map((t) => t.label)),
-      });
-      if (!c) return { ok: false, error: 'world chain spawn returned null (cap or AI error)' };
-      return { ok: true, message: `world chain spawned: ${c.title}` };
-    }
-
     case 'chain-new': {
       if (roster.mercs.length < 2) return { ok: false, error: 'need at least 2 mercs to seed a story' };
       if (chainBusy) return { ok: false, error: 'a chain action is already in progress' };
@@ -765,8 +674,6 @@ export async function dispatch(
         kind: 'note',
         message: `RECRUITED: ${accepted!.name} joined the company.`,
       });
-      // PROTO-GAME v16: rare+ recruit may seed a personal saga.
-      await maybeTriggerUnitChainFromAcceptance(roster, accepted!);
       return { ok: true, message: `recruited ${accepted!.name}` };
     }
 
