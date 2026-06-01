@@ -54,8 +54,8 @@ const QuestSchema = z.object({
   }),
   revealOnSuccess: strArr,                  // facts a win may surface
   revealOnFailure: strArr,                  // facts a loss may surface
-  wantsFinal: z.union([z.boolean(), z.string(), z.null()]).optional(),
-  finalReason: z.string().optional(),
+  closesChain: z.union([z.boolean(), z.string(), z.null()]).optional(), // writer wrote THIS as the climactic finale
+  closingReason: z.string().optional(),
 });
 type Quest = z.infer<typeof QuestSchema>;
 
@@ -91,10 +91,10 @@ HARD RULES:
 - CONTINUITY: the quest must follow believably from the CHAIN STATE — react to what the company just did and to what is now in motion. Do not reset. After the first quest, drive the next one from open threads and the actors' reactions, not from a fresh unrelated job.
 - The company's only agency is: take the job + assign units. Do NOT write mid-quest branching choices.
 - assignmentAsk: name the qualities the job calls for as QUALITATIVE tags only (stats, traits) plus a fiction reason. NEVER numbers, gold, or rewards — the engine owns all numbers.
-- PACING: set wantsFinal:true ONLY if canEndNow is true AND the story has reached a natural climax. If mustEndNow is true, write the climactic FINAL quest of the chain. Otherwise keep the arc moving and leave wantsFinal false.
+- PACING / ENDING IS ALLOWED, NEVER FORCED EARLY: while you are not yet permitted to end, keep the arc open (closesChain:false) and leave at least one thread driving forward. Once ending is PERMITTED, you may close — but ONLY if the arc has genuinely reached its climax: then write THIS quest as the climactic finale that pays off the buried truth, and set closesChain:true. If it has not peaked yet, keep driving and leave closesChain:false. At the hard limit you are out of room: write this quest as the climactic finale and set closesChain:true. NEVER slam an ending onto a quest that was not built as a climax — a finale must read as the arc's peak, not a sudden stop.
 
 VOICE: the card may be vivid and literary; the hidden fields are clinical.
-Output JSON only: { questTitle, card, missionFiction, hiddenPurpose, assignmentAsk { desiredStats[], desiredTraits[], fictionalReason }, revealOnSuccess[], revealOnFailure[], wantsFinal, finalReason }`;
+Output JSON only: { questTitle, card, missionFiction, hiddenPurpose, assignmentAsk { desiredStats[], desiredTraits[], fictionalReason }, revealOnSuccess[], revealOnFailure[], closesChain, closingReason }`;
 
 const RESOLVER_SYSTEM = `You resolve a mercenary quest after the company has acted. You are given the BIBLE (hidden truth), the CHAIN STATE, the QUEST just attempted, and the OUTCOME (a tier plus which units were assigned). Write what happened and update the world.
 
@@ -147,11 +147,15 @@ function chainStateBlock(s: ChainState): string {
 function pacingBlock(stepIndex: number, t: { target: number; max: number }): string {
   const canEndNow = stepIndex >= t.target;
   const mustEndNow = stepIndex >= t.max;
+  const ending = mustEndNow
+    ? `- HARD LIMIT REACHED — write this quest as the climactic finale and set closesChain:true.`
+    : canEndNow
+      ? `- ENDING NOW ALLOWED — you MAY close. Do so ONLY if the arc has reached its true climax (then set closesChain:true and write the finale); otherwise keep one thread driving and set closesChain:false.`
+      : `- ENDING NOT YET ALLOWED — keep the arc open, leave closesChain:false and at least one thread driving forward.`;
   return [
     `## PACING`,
-    `- this is quest #${stepIndex} of a chain that should run about ${t.target} (hard max ${t.max}).`,
-    `- canEndNow: ${canEndNow}`,
-    `- mustEndNow: ${mustEndNow}`,
+    `- this is quest #${stepIndex}; the chain should run about ${t.target} quests (hard limit ${t.max}).`,
+    ending,
   ].join('\n');
 }
 
@@ -240,7 +244,7 @@ async function main(): Promise<void> {
       ``, `Write quest #${step}. Output JSON only.`,
     ].join('\n');
     const quest = await callJson(client, { system: QUEST_WRITER_SYSTEM, user: questUser, schema: QuestSchema, model: MODEL, effort: EFFORT });
-    const isFinal = mustEndNow || (truthy(quest.wantsFinal) && canEndNow);
+    const isFinal = mustEndNow || (truthy(quest.closesChain) && canEndNow);
     printQuest(step, quest);
 
     // RESOLVE
