@@ -14,6 +14,7 @@ This folder contains the working design for Airaider. The design was substantial
 7. [QUEST_CHAINS.md](QUEST_CHAINS.md) — Single chain (bible + 5 beats + epilogue) pipeline, character pool, unit chains, reward fulfillment.
 8. [CHAIN_INTEGRATION_PLAN.md](CHAIN_INTEGRATION_PLAN.md) — **SUPERSEDED by PROTOTYPE_DOCTRINE.md** (was production-grade integration caution; over-engineered for a throwaway prototype). Kept for the generator-internals/current-state reference only.
 9. [SAGAS.md](SAGAS.md) — Saga tier: chain-of-chains with hidden master skeleton, unit sagas, saga-tier follow-ups. Builds on QUEST_CHAINS.md.
+10. **[STORY_GENERATION_FINDINGS.md](STORY_GENERATION_FINDINGS.md)** — **Handover findings.** What the `storyGen` prototype actually built and what was learned from real AI output: the generation engine works and the prose is good; the integration is the failure (chains are a side-panel disconnected from the core loop). Read this before rebuilding story generation.
 
 ## Legacy detail docs (have SUPERSEDED banners)
 
