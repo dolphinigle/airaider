@@ -20,7 +20,7 @@ import {
 import { generateReward, rewardEnvelope } from './reward.js';
 import { characterFromGen, liabilityCard, type MkId } from './cards.js';
 import { tagDef } from './tags.js';
-import { uid, addCard, logLine } from './state.js';
+import { uid, addCard, logLine, allMercs } from './state.js';
 import { slotCountFor } from './leads.js';
 import { captiveCapacity, levelCap } from './fort.js';
 
@@ -46,18 +46,26 @@ function clashingFor(favored: string[]): string[] {
   for (const id of favored) { const opp = tagDef(id)?.opposite; if (opp) out.push(opp); }
   return out;
 }
-function buildSlots(ask: AskShape, n: number): QuestSlot[] {
+function buildSlots(ask: AskShape, n: number, ownedTags: Set<string>): QuestSlot[] {
   const clashing = clashingFor(ask.favoredTags);
   const slots: QuestSlot[] = [];
   for (let i = 0; i < n; i++) {
     const req = ask.slots[i] ?? { kind: 'open' as const };
+    // downgrade a must-have to open if NO current merc can satisfy it (keeps quests pursuable —
+    // the AI sometimes over-requires; the fit bonus still rewards bringing the right merc)
+    const keep = req.kind === 'must-have' && ownedTags.has(req.tag);
     slots.push({
       index: i,
-      requirement: req.kind === 'must-have' ? { kind: 'must-have', tag: req.tag } : { kind: 'open' },
+      requirement: keep ? { kind: 'must-have', tag: (req as { tag: string }).tag } : { kind: 'open' },
       tested: { attribute: ask.attribute, favored: ask.favoredTags, clashing },
     });
   }
   return slots;
+}
+function ownedMercTags(state: GameState): Set<string> {
+  const s = new Set<string>();
+  for (const m of allMercs(state)) for (const t of m.tags) s.add(t.id);
+  return s;
 }
 
 // ---- pursue (dispatch) ------------------------------------------------------
@@ -78,7 +86,7 @@ async function pursueOneOff(state: GameState, ai: Narrator, r: Rng, lead: Lead):
   const quest: Quest = {
     id: uid(state, 'quest'), leadId: lead.id, rarity: lead.rarity, level: lead.level, location: lead.location,
     archetype: lead.archetype, title: card.job.slice(0, 48), situation: card.situation, job: card.job,
-    stakes: '', slots: buildSlots(card.ask, n), threshold: thresholdFor(n, lead.level),
+    stakes: '', slots: buildSlots(card.ask, n, ownedMercTags(state)), threshold: thresholdFor(n, lead.level),
     reward, risky: isRisky(lead),
   };
   state.quests[quest.id] = quest;
@@ -148,7 +156,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
     id: uid(state, 'quest'), leadId: lead.id, rarity: chain.rarity, level: chain.level, location: lead.location,
     archetype: 'investigate', chainId: chain.id, beat: chain.beatsResolved + 1, finale: isFinale,
     title: chain.title, situation: beat.situation, job: beat.job, stakes: beat.newLayerRevealed,
-    slots: buildSlots(beat.ask, n), threshold: thresholdFor(n, chain.level),
+    slots: buildSlots(beat.ask, n, ownedMercTags(state)), threshold: thresholdFor(n, chain.level),
     reward, risky: isFinale || chain.rarity === 'rare' || chain.rarity === 'legendary',
   };
   state.quests[quest.id] = quest;
@@ -274,7 +282,9 @@ function deliverReward(state: GameState, r: Rng, quest: Quest, outcome: Outcome,
   let positive = 0;
   for (const card of bundle.cards) {
     if (card.class === 'gold') { const g = Math.round(card.value * scale); state.gold += g; positive += g; out.push(`${g} gold`); }
-    else if (card.class === 'character') { deliverCharacter(state, card, outcome, aiCaptive, out); positive += card.value * scale; }
+    // a person can't be halved: on a partial you keep the WHOLE unit (full value) — the
+    // value is balanced back to V/2 by the saddling liability below.
+    else if (card.class === 'character') { deliverCharacter(state, card, outcome, aiCaptive, out); positive += card.value; }
     else if (card.class === 'liability') { card.location = 'roster'; addCard(state, card); out.push(card.name); }
   }
   // partial balancing: bring delivered net to ~V/2 with a liability (saddle) or skip if already near

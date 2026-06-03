@@ -9,7 +9,7 @@ import * as readline from 'node:readline';
 import { GameEngine } from '../core/game.js';
 import type { Quest, CharacterCard } from '../core/types.js';
 import { BALANCE } from '../core/economy.js';
-import { buildableRoomTypes } from '../core/fort.js';
+import { buildableRoomTypes, ROOM_TYPES } from '../core/fort.js';
 import { status, leadsList, questCard, resultBlock, fortView, C } from './format.js';
 
 function loadKey(): string | undefined {
@@ -46,9 +46,40 @@ function autoAssign(): void {
   }
 }
 
+// ---- auto fort development (so dogfooding exercises progression) ------------
+function autoFort(): void {
+  const empty = () => eng.state.cells.filter((c) => !c.roomId);
+  const has = (key: string) => Object.values(eng.state.rooms).some((r) => r.type === key);
+  const tryBuild = (key: string) => { const cell = empty()[0]; if (cell) eng.buildRoom(cell.idx, key); };
+  // priority: dungeon (capture) → tavern (recruit) → kitchen (prestige) → bedroom for top merc
+  if (!has('dungeon') && eng.gold >= 140) tryBuild('dungeon');
+  if (!has('tavern') && eng.gold >= 150) tryBuild('tavern');
+  if (eng.globalPrestige() >= 10 && !has('kitchen') && eng.gold >= 130) tryBuild('kitchen');
+  // bedroom for the highest-level merc, then own it
+  const top = [...eng.mercs()].sort((a, b) => b.level - a.level)[0];
+  if (top && eng.gold >= 120 && empty().length && !Object.values(eng.state.rooms).some((r) => r.ownerMercId === top.id)) {
+    const cell = empty()[0]; const before = Object.keys(eng.state.rooms).length;
+    eng.buildRoom(cell.idx, 'bedroom');
+    const room = Object.values(eng.state.rooms).find((r) => r.type === 'bedroom' && !r.ownerMercId);
+    if (room && Object.keys(eng.state.rooms).length > before) eng.setBedroomOwner(room.id, top.id);
+  }
+  // stock theme rooms + bedrooms with idle captives to generate prestige/comfort
+  for (const room of eng.rooms()) {
+    const cap = ROOM_TYPES[room.type];
+    if (cap.pool === 'none') continue;
+    for (const cardObj of [...eng.captives()]) {
+      if (room.displayCardIds.length >= cap.occupantSlots + cap.itemSlots) break;
+      if (cardObj.location.startsWith('room:')) continue;
+      eng.placeDisplay(room.id, cardObj.id);
+    }
+  }
+  if (empty().length === 0 && eng.gold >= 200) eng.excavate(0, 1);
+}
+
 // ---- auto-play (dogfood) ----------------------------------------------------
 async function autoPlay(cycles: number): Promise<void> {
   for (let c = 0; c < cycles; c++) {
+    autoFort();
     console.log('\n' + status(eng) + '\n');
     console.log(leadsList(eng) + '\n');
     // pursue: prefer chain continuations, then fillable fresh; bounded by free mercs

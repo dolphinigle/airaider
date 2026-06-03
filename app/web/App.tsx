@@ -1,6 +1,5 @@
 // The GUI. Presentation only — every action delegates to the shared GameEngine via
 // the store. Reads use the engine's view methods (questView, eligibleMercs, …).
-import React from 'react';
 import { useGame } from './store.js';
 import type { Quest, CharacterCard, Lead } from '../core/types.js';
 import { tagLabel, tagName } from '../core/tags.js';
@@ -142,7 +141,6 @@ function Roster() {
 function Fort() {
   const eng = useEng();
   const act = useGame((s) => s.act);
-  const [type, setType] = React.useState('');
   if (!eng) return null;
   const cells = [...eng.state.cells].sort((a, b) => b.floor - a.floor || a.col - b.col);
   const buildable = buildableRoomTypes(eng.state);
@@ -170,7 +168,6 @@ function Fort() {
         <button className="mini" onClick={() => act((e) => e.digFloor(-1))}>dig down</button>
       </div>
       <div className="hint">build theme rooms (kitchen/chapel/library) → prestige → unlocks more rooms</div>
-      {void type}{void setType}
     </div>
   );
 }

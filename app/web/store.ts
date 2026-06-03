@@ -51,7 +51,11 @@ export const useGame = create<Store>((set, get) => ({
   },
   dismissResults: () => set({ results: null }),
 
-  act: (fn) => { const eng = get().eng; if (eng) { fn(eng); set((s) => ({ tick: s.tick + 1 })); } },
+  act: (fn) => {
+    const eng = get().eng; if (!eng) return;
+    const res = fn(eng) as { error?: string } | undefined;
+    set((s) => ({ tick: s.tick + 1, error: res && typeof res === 'object' && 'error' in res ? res.error ?? null : null }));
+  },
 }));
 
 export type { Quest };

@@ -31,7 +31,7 @@ export function captives(state: GameState): CharacterCard[] {
 // ---- starter mercs (fixed identities so boot is offline + reproducible) ------
 interface StarterDef { name: string; who: string; tags: string[]; quirks: string[] }
 const STARTERS: StarterDef[] = [
-  { name: 'Marek of Saltreach', who: 'A scarred line-soldier who holds when others break', tags: ['gender:male', 'race:human', 'bg:soldier', 'pers:brave', 'phys:scarred', 'phys:muscular'], quirks: ['oils his blade before sleep'] },
+  { name: 'Marek of Saltreach', who: 'A scarred line-soldier who holds when others break', tags: ['gender:male', 'race:human', 'bg:soldier', 'skill:weapon', 'pers:brave', 'phys:scarred', 'phys:muscular'], quirks: ['oils his blade before sleep'] },
   { name: 'Ivo Wulfson', who: 'A fen-hunter who moves like weather', tags: ['gender:male', 'race:human', 'bg:hunter', 'skill:stealth', 'pers:aloof', 'pers:calm'], quirks: ['never sits with his back to a door'] },
   { name: 'Sigrun Edda', who: 'A quiet field-healer with steady hands', tags: ['gender:female', 'race:human', 'bg:healer', 'skill:heal', 'pers:kind', 'pers:calm'], quirks: ['hums while binding wounds'] },
 ];
