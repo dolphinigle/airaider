@@ -1,38 +1,30 @@
 # Airaider — Design Docs
 
-This folder contains the working design for Airaider. The design was substantially refreshed after a 200-day end-to-end validation simulation. The canonical state lives in **[CANONICAL_DESIGN.md](CANONICAL_DESIGN.md)**; the older detail docs remain as historical references with SUPERSEDED banners noting what's still in force vs. what has changed.
+Airaider is a persistent, single-player, **AI-driven character-collection fort game**: you collect characters you grow attached to, assign them to AI-generated quests, and live with what happens. These docs were rewritten from scratch for **prototype 2** (2026-06-02); the prior AI-Stronghold-remake design and the v1 story-chain prototype have been superseded (history is in git).
 
 ## Reading order
 
-1. **[AGENT_BOOTSTRAP.md](AGENT_BOOTSTRAP.md)** — Start here. 30-second orientation for a new agent or contributor. Pointers and terminology rules.
-2. **[PROTOTYPE_DOCTRINE.md](PROTOTYPE_DOCTRINE.md)** — **READ THIS SECOND.** The whole repo is a throwaway prototype; this doc is the anti-over-engineering doctrine + the lean "Chain Campaign" build plan (the current active work). Stops the drift into production-grade caution.
-3. **[CANONICAL_DESIGN.md](CANONICAL_DESIGN.md)** — The full canonical synthesis. Every load-bearing decision, post-200-day validation. Read this in full.
-3. [OPEN_QUESTIONS.md](OPEN_QUESTIONS.md) — Living list of unresolved questions. Being re-aligned with `CANONICAL_DESIGN.md` §7.
-4. [AI_PROVIDER.md](AI_PROVIDER.md) — AI model selection: hybrid recommendation (GPT-4o-mini default, A/B test Claude Sonnet for narrative), pricing landscape, structured-output strategy, output JSON schema pattern.
-5. [VISION.md](VISION.md) — One-page pitch, design pillars, non-goals.
-6. [PLAYER_PREFERENCES.md](PLAYER_PREFERENCES.md) — Player-supplied flavor knobs (tone, writing style, NPC gender bias, cultural register) that flow into every AI prompt without affecting engine math.
-7. [QUEST_CHAINS.md](QUEST_CHAINS.md) — Single chain (bible + 5 beats + epilogue) pipeline, character pool, unit chains, reward fulfillment.
-8. [CHAIN_INTEGRATION_PLAN.md](CHAIN_INTEGRATION_PLAN.md) — **SUPERSEDED by PROTOTYPE_DOCTRINE.md** (was production-grade integration caution; over-engineered for a throwaway prototype). Kept for the generator-internals/current-state reference only.
-9. [SAGAS.md](SAGAS.md) — Saga tier: chain-of-chains with hidden master skeleton, unit sagas, saga-tier follow-ups. Builds on QUEST_CHAINS.md.
-10. **[STORY_GENERATION_FINDINGS.md](STORY_GENERATION_FINDINGS.md)** — **Handover findings.** What the `storyGen` prototype actually built and what was learned from real AI output: the generation engine works and the prose is good; the integration is the failure (chains are a side-panel disconnected from the core loop). Read this before rebuilding story generation.
+1. **[VISION.md](VISION.md)** — the North Star. Three engines of fun, two loops, character attachment, what the game is and isn't. Read first.
+2. **[DESIGN.md](DESIGN.md)** — the core game. The Fort→Resolution cycle, the two boards, risk/loss, progression, recruitment. The authoritative *what* (with summaries that point into the docs below).
+3. **[CARDS.md](CARDS.md)** — the unit model: everything is a Card (`class` = character / item / gold / …). Characters (tags, attributes, the roll, value, generation) + items (ilvl). One global tag pool, one `overlap()` function.
+   - **[TAGS.md](TAGS.md)** — the fixed tag vocabulary (the list the AI references, never invents) + the prompt vocab block.
+4. **[GAME_STATE.md](GAME_STATE.md)** — what's persisted (one card collection + placements), the two prestige pools (comfort → merc cap; global → fort tier), the progression spiral, staging buildings.
+   - **[FORT.md](FORT.md)** — the fort: the 2D cross-section grid, expansion, the room set, and the prestige formula.
+5. **[ECONOMY.md](ECONOMY.md)** — value (gold-denominated, signed), the `V_base(level)` chart, reward generation (split + generateCard), the success/partial/failure outcome model, and the migrating-constraint economy.
+6. **[QUESTS.md](QUESTS.md)** — lead & quest generation: the pipeline from a cheap lead spec → AI quest → resolution → reward → chain. The crucial core.
+7. **[STORY_ENGINE.md](STORY_ENGINE.md)** — the AI craft behind the board: the hidden bible, casting tiers, quest-card structure/voice, individuated outcomes, the 5 prompt principles.
+   - **[PROMPTS.md](PROMPTS.md)** — production-close example prompts (card+ask, outcome, character-flesh, chain beat, genesis), validated against real models with the real tag vocabulary. The starting point for the prototype's AI layer.
 
-## Legacy detail docs (have SUPERSEDED banners)
+## Supporting
 
-These predate the 200-day sim. Each has a banner at the top explaining what's still valid and what has been replaced by `CANONICAL_DESIGN.md`. Read for historical perspective or for the parts still in force.
-
-6. [PROBLEM_AND_INHERITANCE.md](PROBLEM_AND_INHERITANCE.md) — Why Airaider exists as a remake; what is kept from AI Stronghold; what is replaced.
-7. [GAMEPLAY_LOOP.md](GAMEPLAY_LOOP.md) — Macro (camp day cycle) and micro (raid) loops.
-8. [CORE_CONCEPTS.md](CORE_CONCEPTS.md) — The old single-file synthesis. Predates the 200-day sim. Read `CANONICAL_DESIGN.md` instead.
-9. [RAID_DESIGN.md](RAID_DESIGN.md) — Narrated Pool (superseded by Sultan-coin), leads, arcs, equipment principles.
-10. [HEROES_AND_GROWTH.md](HEROES_AND_GROWTH.md) — "Heroes" (terminology superseded by "mercenaries"), early tag PoE-tier model, equipment.
-11. [FORT_AND_PRESTIGE.md](FORT_AND_PRESTIGE.md) — 2D side-view cross-section fort, RoomTypes, adjacency, prestige formula.
-12. [PROGRESSION_AND_PAYOFF.md](PROGRESSION_AND_PAYOFF.md) — Dopamine loop, reward economy, progression triangle.
+- **[AI_PROVIDER.md](AI_PROVIDER.md)** — model selection, structured-output strategy.
+- **[PLAYER_PREFERENCES.md](PLAYER_PREFERENCES.md)** — player-facing flavor knobs (tone, writing style) that flow into AI prompts without touching engine math.
 
 ## Status legend
 
-Each doc starts with a status line:
-- **Canonical** — current load-bearing decisions (post-200-day sim).
-- **Locked** — design decision is intentionally fixed; reopen only with strong reason.
-- **Draft** — current working answer; expected to evolve.
-- **Open** — explicitly unresolved; multiple candidates listed.
-- **SUPERSEDED** — predates the 200-day sim. See top-of-doc banner for what is still in force.
+- **Canonical** — current load-bearing design.
+- 🔒 **Locked** — don't reopen without strong reason · 🛠 **Locked-shape** — mechanism fixed, numbers deferred · 🟡 **Open**.
+
+## Doctrine
+
+Everything in this repo is a **throwaway prototype** — optimize for design-learning per hour, not robustness. Per current direction: **fun before balance.** The core question prototype 2 must answer: *is the marriage of the mechanical loop (min-max, fort, the roll) and the AI loop (individuated character stories) actually fun?* — the exact thing v1 failed to deliver because its two halves were disconnected.

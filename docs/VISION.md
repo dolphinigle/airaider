@@ -1,41 +1,49 @@
 # Vision
 
-**Status:** Draft
+**Status:** Canonical (prototype-2 rewrite, 2026-06-02). Supersedes the old AI-Stronghold-remake framing.
 
-## One-line pitch
+## One line
 
-A fortress-management game where you build a prestigious stronghold by sending heroes on raids that *you actually play*.
+A persistent fort-management game where you collect characters you fall in love with, assign them to AI-generated quests, and live with what happens.
 
-## Two-layer fantasy
+## The one question the game asks, over and over
 
-AI Raider is two games stitched together by a shared cast of characters:
+**Who do you send — and can you live with what happens?**
 
-- **The Lord layer (meta / fort phase):** You are the lord of a growing stronghold. You build themed rooms, staff them with followers, display rare artifacts, recruit heroes, and decide which raids to fund. Success here is measured in **Prestige**.
-- **The Raider layer (tactical / raid phase):** You take the heroes you raised and personally lead them into dangerous places. Success here is measured in **what you bring home** (and *who* you bring home).
+Everything else exists to make that question heavier: the characters you've grown attached to, the odds you can read but not control, the rival quest you had to skip, the reward you gambled a veteran's life for.
 
-The two layers feed each other:
-- Raids drop the followers, artifacts, story hooks and resources that fuel the fort.
-- The fort raises the heroes (and unlocks the gear, the followers-as-support, and the raid leads) that fuel raids.
+## Three engines of fun
 
-## Design pillars
+The game runs on three distinct pleasures. None is filler; pull one and the others starve.
 
-1. **Agency comes from the raid.** The player's most-felt choices happen during raids — positioning, ability use, when to push, when to retreat, who to sacrifice. Stats matter, but the player's decisions matter more.
-2. **Heroes are characters, not stat blocks.** Each hero accumulates meaning through *how the player used them*: tags earned from a raid they barely survived, a rival they made when the player chose one over the other, a signature ability the player leaned on. AI-generated personality + starting tags give a starting hook; play makes them yours.
-3. **The fort is where payoff lives.** The dopamine loop of "I found the perfect follower for the Candy Kitchen" is preserved verbatim from AI Stronghold. The fort is a trophy case as much as a workshop.
-4. **No infinite grind path.** You cannot bypass the fort by grinding raids (raids do not grant Prestige directly). You cannot bypass raids by optimizing the fort (better rooms unlock better raid leads, not better raid outcomes). Both layers are mandatory.
-5. **AI generates flavor, not mechanics.** AI writes the room's name, the hero's backstory, the raid's introductory hook, the post-raid epilogue. Mechanics — success, failure, damage, loot tables — are deterministic and inspectable.
+1. **Mechanical fun** — min-maxing your roster, growing your fort, and *rolling for it*. You read the odds (coins vs threshold), stack the tags that tilt them, and pull the lever. Optimization + number-go-up + the gamble.
+2. **AI fun** — infinite, never-repeating quests, and the thing Sultan's Game can't do: **each character acts as uniquely themselves in every outcome.** The AI knows who Roselle *is* and writes her, not a token. This is the differentiator.
+3. **Loot dopamine** — characters carry tags like Path-of-Exile affixes. You find them as recruits, captives, and quest rewards. The right tag at the right intensity for the right slot is rare, and finding it is the drop-thrill.
 
-## Non-goals
+## Two loops (roguelite structure, persistent base)
 
-- **Not a roguelike.** Heroes are persistent, named, and expensive to lose. Permadeath exists but is a heavy moment, not a routine one.
-- **Not an idle / auto-battler.** If the player isn't playing the raid, the game isn't happening.
-- **Not a narrative adventure.** Stories are flavor framing for mechanical events, not the primary content. Quality of writing is a bonus, not a load-bearing pillar.
-- **Not a multiplayer game.** Single-player, save-anywhere.
-- **Not a pixel-perfect tactics game.** Combat is tactical but should be readable, fast, and forgiving of UI mistakes. We are not making XCOM 2.
+Like a roguelite has "the run" and "the base" — but here the base **persists**, because attachment requires permanence.
 
-## What "winning" feels like
+- **Gameplay loop** — assign characters to quests → roll → AI narrates an individuated outcome → loot drops.
+- **Progression loop** — spend gold and captives to build rooms; rooms unlock new quests, convert tag-matched captives into prestige, and gate the next tier of rooms.
 
-- Coming home from a raid with a legendary artifact whose tags perfectly match an empty slot in your Throne Room.
-- Watching a hero you have leaned on for 20 raids finally hit a level where their signature ability changes how you play.
-- Losing a beloved hero on a raid you pushed too far, and naming the next recruit after them.
-- Looking at your fort screen and feeling that every room *means* something — every follower in it was found, not bought.
+They feed each other in a single circuit: quests drop tagged loot → loot builds the fort → the fort unlocks rarer, higher-stakes quests → which drop better loot. The marriage of these two loops **is** prototype 2's whole reason to exist (v1 built them in separate rooms; that was the failure).
+
+## What attachment is built from
+
+The emotional core. Characters become *yours* through:
+- **Investment** — the hours you spent leveling and equipping them.
+- **Individuation** — the AI writing *them* specifically, quest after quest, until they have a voice.
+- **Their own stories** — personal quest chains that grow out of who they are.
+- **Loss that's real** — they can die, leave bitter, or be promoted beyond your reach. Four flavors of goodbye, not one.
+
+## What it is / isn't
+
+- **Is:** a persistent, single-player, character-collection management game. Cozy-strategic pace, mortal stakes.
+- **Isn't:** a tactical combat game (you don't play battles — you assign and gamble). Not a roguelite with run-resets. Not an idle game. Not a visual-novel — prose decorates mechanical events; the events are the content.
+
+## Non-negotiables
+
+- **Engine owns numbers, AI owns flavor.** Every outcome's math is deterministic and inspectable; every word of it is AI-written.
+- **The two loops stay married.** Any feature that doesn't connect the gameplay loop to the progression loop (or vice versa) is suspect.
+- **Characters persist and accumulate meaning.** No mechanic may treat them as interchangeable.
