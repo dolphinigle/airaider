@@ -71,18 +71,28 @@ export function resultBlock(r: QuestResult): string {
   return lines.join('\n');
 }
 
+// A proper 2D vertical cross-section (docs/FORT.md §1): floors stacked (top first),
+// columns aligned by col index (negative = left), gaps shown as blanks.
 export function fortView(eng: GameEngine): string {
-  const lines = [cyan('Fort:')];
-  const cells = [...eng.state.cells].sort((a: any, b: any) => b.floor - a.floor || a.col - b.col);
-  let floor: number | null = null;
-  let row: string[] = [];
-  const flush = () => { if (row.length) lines.push('  ' + row.join(' ')); row = []; };
-  for (const c of cells) {
-    if (floor !== c.floor) { flush(); floor = c.floor; }
-    const room = c.roomId ? eng.state.rooms[c.roomId] : null;
-    const label = room ? ROOM_TYPES[room.type]?.name ?? room.type : 'empty';
-    row.push(`[${C.dim('#' + c.idx)} ${room ? label : C.dim(label)}]`);
+  const cells = eng.state.cells;
+  const floors = [...new Set(cells.map((c) => c.floor))].sort((a, b) => b - a);
+  const minCol = Math.min(...cells.map((c) => c.col));
+  const maxCol = Math.max(...cells.map((c) => c.col));
+  const W = 13; // cell width
+  const cell = (s: string) => s.padEnd(W).slice(0, W);
+  const lines = [cyan('Fort (cross-section):')];
+  for (const floor of floors) {
+    const tag = floor === 0 ? C.dim('  0 ') : floor > 0 ? C.dim(`+${floor} `) : C.dim(`${floor} `);
+    const cellsRow: string[] = [];
+    for (let col = minCol; col <= maxCol; col++) {
+      const c = cells.find((x) => x.floor === floor && x.col === col);
+      if (!c) { cellsRow.push(' '.repeat(W)); continue; }
+      const room = c.roomId ? eng.state.rooms[c.roomId] : null;
+      const label = room ? ROOM_TYPES[room.type]?.name ?? room.type : '·empty';
+      cellsRow.push(room ? cell(`[${label}]`) : C.dim(cell(`[#${c.idx} ${label}]`)));
+    }
+    lines.push('  ' + tag + cellsRow.join(''));
+    if (floor === 0) lines.push('  ' + C.dim('    ' + '‾'.repeat((maxCol - minCol + 1) * W)));
   }
-  flush();
   return lines.join('\n');
 }

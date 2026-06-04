@@ -9,7 +9,7 @@ import { ATTRIBUTES, type Attribute } from './types.js';
 import type {
   Narrator, NarratorOptions, CardAskInput, CardAskOut, OutcomeInput, OutcomeOut,
   FleshInput, FleshOut, GenesisInput, GenesisOut, ChainBeatInput, ChainBeatOut,
-  ConceptTagsInput, ConceptTagsOut, AskOut,
+  ConceptTagsInput, ConceptTagsOut, AskOut, AICallRecord,
 } from './ai.js';
 
 const VOCAB = promptVocabBlock();
@@ -57,14 +57,17 @@ export class OpenAINarrator implements Narrator {
   private client: OpenAI;
   private model: string;
   private log: (s: string) => void;
+  private onCall?: (rec: AICallRecord) => void;
+  private callCount = 0;
 
   constructor(opts: NarratorOptions) {
     this.client = new OpenAI({ apiKey: opts.apiKey ?? (typeof process !== 'undefined' ? process.env.OPENAI_API_KEY : undefined), dangerouslyAllowBrowser: opts.browser });
     this.model = opts.model ?? 'gpt-5-mini';
     this.log = opts.log ?? (() => {});
+    this.onCall = opts.onCall;
   }
 
-  private async json<T>(system: string, user: string, schema: z.ZodType<T>, effort: 'minimal' | 'low' = 'low', maxTokens = 2000): Promise<T> {
+  private async json<T>(kind: string, system: string, user: string, schema: z.ZodType<T>, effort: 'minimal' | 'low' = 'low', maxTokens = 2000): Promise<T> {
     const res = await this.client.chat.completions.create({
       model: this.model,
       messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
@@ -75,8 +78,12 @@ export class OpenAINarrator implements Narrator {
     } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
     const usage = res.usage;
     const cached = (usage as unknown as { prompt_tokens_details?: { cached_tokens?: number } })?.prompt_tokens_details?.cached_tokens ?? 0;
-    this.log(`  ai[${this.model}] in=${usage?.prompt_tokens} (cached ${cached}) out=${usage?.completion_tokens}`);
     const raw = res.choices[0]?.message?.content ?? '';
+    this.log(`  ai[${kind}] in=${usage?.prompt_tokens} (cached ${cached}) out=${usage?.completion_tokens}`);
+    this.onCall?.({
+      n: ++this.callCount, kind, model: this.model, system, user, response: raw,
+      promptTokens: usage?.prompt_tokens, completionTokens: usage?.completion_tokens, cachedTokens: cached,
+    });
     let parsed: unknown;
     try { parsed = JSON.parse(raw); } catch { throw new Error(`AI returned non-JSON: ${raw.slice(0, 200)}`); }
     return schema.parse(parsed);
@@ -94,7 +101,7 @@ export class OpenAINarrator implements Narrator {
       `${VOCAB_BLOCK}\n` +
       `RULES: terse, plain, concrete. State the job so the player knows exactly what taking it commits them to. NEVER write numbers. slots length must equal the SLOT COUNT given. Prefer "open" slots. JSON only.`;
     const user = `Archetype: ${i.archetype}\nLocation: ${i.location}\nSlot count: ${i.slotCount}\nThe job results in ${i.rewardSeed}.\nWrite the card + ask. JSON only.`;
-    const out = await this.json(system, user, zCardAsk, 'low', 1200);
+    const out = await this.json('cardAsk', system, user, zCardAsk, 'low', 1200);
     const ask = normAsk(out.ask);
     while (ask.slots.length < i.slotCount) ask.slots.push({ kind: 'open' });
     ask.slots.length = i.slotCount;
@@ -117,7 +124,7 @@ export class OpenAINarrator implements Narrator {
       `JOB CARD:\n situation: ${i.situation}\n job: ${i.job}\nPARTY SENT:\n${party}\n` +
       `DELIVERED CAPTIVE TAGS: ${i.captiveTags ? '[' + i.captiveTags.join(', ') + ']' : 'none'}\n` +
       `RISKY: ${i.risky ? 'yes' : 'no'}\nOUTCOME: ${i.outcome.toUpperCase()}\nNarrate, continuing from the card. JSON only.`;
-    const out = await this.json(system, user, zOutcome, 'low', 1600);
+    const out = await this.json('outcome', system, user, zOutcome, 'low', 1600);
     return { beforeRoll: out.beforeRoll, afterRoll: out.afterRoll, captive: out.captive ?? null, punishment: out.punishment ?? null };
   }
 
@@ -132,7 +139,7 @@ export class OpenAINarrator implements Narrator {
       `RULES: every word consistent with the given tags (a cowardly one is never 'fearless'; a priest is not a thief). High attributes read as natural giftedness, not loot. Terse, concrete, grimdark. NEVER write numbers. JSON only.`;
     const attrs = ATTRIBUTES.map((a) => `${a} ${i.attrs[a]}`).join(', ');
     const user = `TAGS: ${i.tags.join(', ')}\nATTRIBUTES: ${attrs}\nACQUIRED AS: ${i.context}.\nJSON only.`;
-    const out = await this.json(system, user, zFlesh, 'low', 1400);
+    const out = await this.json('flesh', system, user, zFlesh, 'low', 1400);
     return { ...out, quirks: (out.quirks ?? []).slice(0, 2) };
   }
 
@@ -148,7 +155,7 @@ export class OpenAINarrator implements Narrator {
       `RULES: the focal character's TAGS are the story seed — honor them. Mystery lives in the CAUSE, never the task. Terse, concrete. NEVER write numbers. JSON only.`;
     const focals = i.focalTags.map((t, n) => `Focal ${n + 1}: [${t.join(', ')}]`).join('\n');
     const user = `${focals}\nSPARK: ${i.spark}\nREGION: ${i.region}\nAuthor the bible. JSON only.`;
-    return this.json(system, user, zGenesis, 'low', 2200);
+    return this.json('genesis', system, user, zGenesis, 'low', 2200);
   }
 
   async chainBeat(i: ChainBeatInput): Promise<ChainBeatOut> {
@@ -165,7 +172,7 @@ export class OpenAINarrator implements Narrator {
       `KEY RULE: the ASK and proposedReward must fit the MUNDANE SURFACE the player perceives, NOT the hidden truth. Prefer "open" slots. Only newLayerRevealed may touch the buried truth.\n` +
       `RULES: state the JOB plainly; keep the WHY hidden. Terse, concrete. NEVER write numbers. JSON only.`;
     const user = `HIDDEN BIBLE: ${i.bible}\nCHAIN STATE: ${i.chainState}\nREGION: ${i.region}\nSLOT COUNT: ${i.slotCount}\n${i.beatConstraint}. JSON only.`;
-    const out = await this.json(system, user, zChainBeat, 'low', 1600);
+    const out = await this.json('chainBeat', system, user, zChainBeat, 'low', 1600);
     const ask = normAsk(out.ask);
     while (ask.slots.length < i.slotCount) ask.slots.push({ kind: 'open' });
     ask.slots.length = i.slotCount;
@@ -178,7 +185,7 @@ export class OpenAINarrator implements Narrator {
       `Output JSON only: { "name": "low-medieval name", "who": "one line", "tags": ["chosen bare words"] }\n` +
       `${VOCAB_BLOCK}\n` +
       `RULES: background is the character's PROFESSION/ORIGIN, not their current state (being captured is a role, not a tag). Always set a gender. Choose the few tags that DEFINE the concept (a brutal reaver = cruel/scarred, never kind); the engine adds the rest. JSON only.`;
-    const out = await this.json(system, `CONCEPT: ${i.concept}\nJSON only.`, zConcept, 'minimal', 900);
+    const out = await this.json('conceptTags', system, `CONCEPT: ${i.concept}\nJSON only.`, zConcept, 'minimal', 900);
     return { name: out.name, who: out.who, tags: canonicalTags(out.tags ?? []) };
   }
 }

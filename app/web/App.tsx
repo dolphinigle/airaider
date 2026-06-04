@@ -1,9 +1,11 @@
 // The GUI. Presentation only — every action delegates to the shared GameEngine via
 // the store. Reads use the engine's view methods (questView, eligibleMercs, …).
+import { useState } from 'react';
 import { useGame } from './store.js';
 import type { Quest, CharacterCard, Lead } from '../core/types.js';
+import type { AICallRecord } from '../core/ai.js';
 import { tagLabel, tagName } from '../core/tags.js';
-import { ROOM_TYPES, buildableRoomTypes } from '../core/fort.js';
+import { ROOM_TYPES, buildableRoomTypes, excavateCost, digFloorCost, roomPrestige, comfortFor } from '../core/fort.js';
 
 function useEng() { useGame((s) => s.tick); return useGame((s) => s.eng); }
 
@@ -20,9 +22,11 @@ function TagChips({ m, max = 5 }: { m: CharacterCard; max?: number }) {
   );
 }
 
-function TopBar() {
+function TopBar({ view, setView }: { view: string; setView: (v: string) => void }) {
   const eng = useEng();
   const endDay = useGame((s) => s.endDay);
+  const provider = useGame((s) => s.provider);
+  const aiCount = useGame((s) => s.aiLog.length);
   if (!eng) return null;
   const anyFilled = eng.activeQuests().some((q) => q.slots.some((s) => s.filledBy));
   return (
@@ -33,7 +37,12 @@ function TopBar() {
         <span>prestige {eng.globalPrestige()}</span>
         <span>scout T{eng.leadTier()}</span>
         <span>dungeon {eng.captiveCapacity()}</span>
+        <span className={`prov ${provider}`}>{provider === 'openai' ? '● live AI' : '○ offline mock'}</span>
       </div>
+      <nav className="tabs">
+        <button className={view === 'game' ? 'on' : ''} onClick={() => setView('game')}>Game</button>
+        <button className={view === 'log' ? 'on' : ''} onClick={() => setView('log')}>AI Log {aiCount > 0 && <b>{aiCount}</b>}</button>
+      </nav>
       <button className="endday" disabled={!anyFilled} onClick={() => void endDay()}>End the Day ▶</button>
     </header>
   );
@@ -113,12 +122,12 @@ function Roster() {
       <h3>Roster</h3>
       {eng.mercs().map((m) => (
         <div key={m.id} className={`merc ${eng.freeMercs().includes(m) ? '' : 'out'}`}>
-          <div className="merc-name">{m.name} <span className="lvl">L{m.level}</span>{m.injuries.length > 0 && <span className="hurt"> ✚</span>}</div>
+          <div className="merc-name">{m.name} <span className="lvl">L{m.level} · cap {eng.levelCap(m.id)}</span>{m.injuries.length > 0 && <span className="hurt"> ✚</span>}</div>
           <TagChips m={m} />
           {m.injuries.length > 0 && <button className="mini" onClick={() => act((e) => e.healInjury(m.id))}>heal</button>}
         </div>
       ))}
-      {eng.captives().length > 0 && <h3>Dungeon</h3>}
+      {eng.captives().length > 0 && <h3>Captives</h3>}
       {eng.captives().map((c) => (
         <div key={c.id} className="merc captive">
           <div className="merc-name">{c.name}</div>
@@ -138,36 +147,129 @@ function Roster() {
   );
 }
 
+// ---- Fort: the 2D vertical cross-section (docs/FORT.md §1) -------------------
+function FortCellBox({ idx }: { idx: number }) {
+  const eng = useEng();
+  const act = useGame((s) => s.act);
+  if (!eng) return null;
+  const cell = eng.state.cells.find((c) => c.idx === idx)!;
+  const room = cell.roomId ? eng.state.rooms[cell.roomId] : null;
+  if (!room) {
+    const buildable = buildableRoomTypes(eng.state);
+    return (
+      <div className="cell empty">
+        <span className="cidx">#{cell.idx}</span>
+        <select defaultValue="" onChange={(e) => e.target.value && act((eng2) => eng2.buildRoom(cell.idx, e.target.value))}>
+          <option value="">build…</option>
+          {buildable.map((t) => <option key={t.key} value={t.key}>{t.name} ({t.cost}g)</option>)}
+        </select>
+      </div>
+    );
+  }
+  const type = ROOM_TYPES[room.type];
+  const prest = type.pool === 'comfort' ? (room.ownerMercId ? comfortFor(eng.state, room.ownerMercId) : 0) : roomPrestige(eng.state, room);
+  const owner = room.ownerMercId ? eng.state.cards[room.ownerMercId] as CharacterCard : null;
+  const slots = type.occupantSlots + type.itemSlots;
+  return (
+    <div className={`cell built ${type.bucket}`}>
+      <div className="cell-name">{type.name}</div>
+      <div className="cell-meta">
+        {type.gate && <span className="gate">{type.gate.kind} {type.gate.value}</span>}
+        {type.pool !== 'none' && <span className="prest">{type.pool === 'comfort' ? 'comfort' : 'prestige'} {prest}</span>}
+      </div>
+      {type.pool === 'comfort' && (
+        <select defaultValue={room.ownerMercId ?? ''} onChange={(e) => act((en) => en.setBedroomOwner(room.id, e.target.value))}>
+          <option value="">— owner —</option>
+          {eng.mercs().map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
+        </select>
+      )}
+      {slots > 0 && (
+        <div className="displays">
+          {room.displayCardIds.map((id) => <span key={id} className="chip">{eng.state.cards[id]?.name ?? id}</span>)}
+          {room.displayCardIds.length < slots && (
+            <select defaultValue="" onChange={(e) => e.target.value && act((en) => en.placeDisplay(room.id, e.target.value))}>
+              <option value="">+ place {type.pool === 'comfort' ? 'item/captive' : 'occupant'}</option>
+              {[...eng.captives(), ...(owner ? [owner] : [])].map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Fort() {
   const eng = useEng();
   const act = useGame((s) => s.act);
   if (!eng) return null;
-  const cells = [...eng.state.cells].sort((a, b) => b.floor - a.floor || a.col - b.col);
-  const buildable = buildableRoomTypes(eng.state);
+  const cells = eng.state.cells;
+  const floors = [...new Set(cells.map((c) => c.floor))].sort((a, b) => b - a); // top floor first
+  const minCol = Math.min(...cells.map((c) => c.col));
+  const maxCol = Math.max(...cells.map((c) => c.col));
+  const cols = Array.from({ length: maxCol - minCol + 1 }, (_, i) => minCol + i);
+  const at = (floor: number, col: number) => cells.find((c) => c.floor === floor && c.col === col);
+
   return (
-    <div className="panel">
-      <h3>Fort</h3>
-      <div className="fort">
-        {cells.map((c) => {
-          const room = c.roomId ? eng.state.rooms[c.roomId] : null;
-          return (
-            <div key={c.idx} className={`cell ${room ? 'built' : 'empty'}`}>
-              <span className="cidx">#{c.idx}</span>
-              {room ? ROOM_TYPES[room.type]?.name : (
-                <select defaultValue="" onChange={(e) => e.target.value && act((eng2) => eng2.buildRoom(c.idx, e.target.value))}>
-                  <option value="">build…</option>
-                  {buildable.map((t) => <option key={t.key} value={t.key}>{t.name} ({t.cost}g)</option>)}
-                </select>
-              )}
+    <div className="panel fortpanel">
+      <h3>Fort <span className="dim">— cross-section · gold builds space</span></h3>
+      <div className="digrow"><button className="mini" onClick={() => act((e) => e.digFloor(1))}>↑ dig floor (−{digFloorCost(eng.state)}g)</button></div>
+      <div className="xsection">
+        {floors.map((floor) => (
+          <div key={floor} className={`floorrow ${floor === 0 ? 'ground' : ''}`}>
+            <button className="exc" title="excavate left" onClick={() => act((e) => e.excavate(floor, -1))}>＋</button>
+            <div className="cellsrow">
+              {cols.map((col) => {
+                const c = at(floor, col);
+                return c ? <FortCellBox key={col} idx={c.idx} /> : <div key={col} className="cell void" />;
+              })}
             </div>
-          );
-        })}
+            <button className="exc" title="excavate right" onClick={() => act((e) => e.excavate(floor, 1))}>＋</button>
+          </div>
+        ))}
       </div>
-      <div className="row">
-        <button className="mini" onClick={() => act((e) => e.excavate(0, 1))}>excavate →</button>
-        <button className="mini" onClick={() => act((e) => e.digFloor(-1))}>dig down</button>
+      <div className="digrow"><button className="mini" onClick={() => act((e) => e.digFloor(-1))}>↓ dig cellar (−{digFloorCost(eng.state)}g)</button></div>
+      <div className="hint">excavate (＋) ±{excavateCost(eng.state, 0)}g · theme rooms → prestige → unlock more room types · bedroom comfort → owner's level cap</div>
+    </div>
+  );
+}
+
+// ---- AI Log page ------------------------------------------------------------
+function LogEntry({ rec }: { rec: AICallRecord }) {
+  const [open, setOpen] = useState(false);
+  let pretty = rec.response;
+  try { pretty = JSON.stringify(JSON.parse(rec.response), null, 2); } catch { /* leave raw */ }
+  return (
+    <div className="logentry">
+      <button className="loghead" onClick={() => setOpen(!open)}>
+        <span className="logn">#{rec.n}</span>
+        <span className="logkind">{rec.kind}</span>
+        <span className="logtok">{rec.promptTokens}↑ {rec.completionTokens}↓{rec.cachedTokens ? ` · ${rec.cachedTokens} cached` : ''}</span>
+        <span className="logtoggle">{open ? '▾' : '▸'}</span>
+      </button>
+      {open && (
+        <div className="logbody">
+          <div className="logsec"><h4>system</h4><pre>{rec.system}</pre></div>
+          <div className="logsec"><h4>user</h4><pre>{rec.user}</pre></div>
+          <div className="logsec"><h4>response</h4><pre className="resp">{pretty}</pre></div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AILog() {
+  const log = useGame((s) => s.aiLog);
+  const provider = useGame((s) => s.provider);
+  const totals = log.reduce((a, r) => ({ in: a.in + (r.promptTokens ?? 0), out: a.out + (r.completionTokens ?? 0) }), { in: 0, out: 0 });
+  return (
+    <div className="logpage">
+      <div className="logsum">
+        {provider === 'mock'
+          ? <span className="dim">Offline mock narrator — no real prompts. Set OPENAI_API_KEY in ../.env and restart to see live calls.</span>
+          : <span>{log.length} calls · {totals.in} prompt tokens · {totals.out} completion tokens</span>}
       </div>
-      <div className="hint">build theme rooms (kitchen/chapel/library) → prestige → unlocks more rooms</div>
+      {[...log].reverse().map((rec) => <LogEntry key={rec.n} rec={rec} />)}
+      {log.length === 0 && provider === 'openai' && <p className="dim">No AI calls yet — pursue a lead or end the day.</p>}
     </div>
   );
 }
@@ -205,26 +307,29 @@ function Busy() {
 export function App() {
   const eng = useEng();
   const error = useGame((s) => s.error);
+  const [view, setView] = useState('game');
   if (!eng) return <div className="boot"><div className="spinner" /> mustering the company…</div>;
   return (
     <div className="app">
-      <TopBar />
+      <TopBar view={view} setView={setView} />
       {error && <div className="error">{error}</div>}
-      <div className="board">
-        <section className="col leads">
-          <h3>Lead Board</h3>
-          {eng.leads().map((l) => <LeadCard key={l.id} lead={l} />)}
-        </section>
-        <section className="col quests">
-          <h3>Quests <span className="dim">— assign your mercs, then End the Day</span></h3>
-          {eng.activeQuests().length === 0 && <p className="dim">Pursue a lead to open a quest.</p>}
-          {eng.activeQuests().map((q) => <QuestCard key={q.id} quest={q} />)}
-        </section>
-        <section className="col side">
-          <Roster />
-          <Fort />
-        </section>
-      </div>
+      {view === 'log' ? <AILog /> : (
+        <div className="board">
+          <section className="col leads">
+            <h3>Lead Board</h3>
+            {eng.leads().map((l) => <LeadCard key={l.id} lead={l} />)}
+          </section>
+          <section className="col quests">
+            <h3>Quests <span className="dim">— assign your mercs, then End the Day</span></h3>
+            {eng.activeQuests().length === 0 && <p className="dim">Pursue a lead to open a quest.</p>}
+            {eng.activeQuests().map((q) => <QuestCard key={q.id} quest={q} />)}
+          </section>
+          <section className="col side">
+            <Roster />
+            <Fort />
+          </section>
+        </div>
+      )}
       <ResultsModal />
       <Busy />
     </div>

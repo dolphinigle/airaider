@@ -5,9 +5,12 @@ import { create } from 'zustand';
 import { GameEngine } from '../core/game.js';
 import type { Quest } from '../core/types.js';
 import type { QuestResult } from '../core/quest.js';
+import type { AICallRecord } from '../core/ai.js';
 
 interface Store {
   eng: GameEngine | null;
+  provider: 'openai' | 'mock';
+  aiLog: AICallRecord[];
   tick: number;
   busy: string | null;          // label of in-flight async work, or null
   results: QuestResult[] | null; // last end-day reveal
@@ -24,12 +27,16 @@ interface Store {
 const key = (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_OPENAI_API_KEY;
 
 export const useGame = create<Store>((set, get) => ({
-  eng: null, tick: 0, busy: null, results: null, error: null,
+  eng: null, provider: key ? 'openai' : 'mock', aiLog: [], tick: 0, busy: null, results: null, error: null,
 
   init: async (seed?: string) => {
     set({ busy: 'mustering the company…' });
-    const eng = await GameEngine.create({ provider: key ? 'openai' : 'mock', apiKey: key, browser: true, seed });
-    set({ eng, tick: 1, busy: null });
+    const provider = key ? 'openai' : 'mock';
+    const eng = await GameEngine.create({
+      provider, apiKey: key, browser: true, seed,
+      onCall: (rec) => { const log = get().aiLog; log.push(rec); set({ aiLog: log, tick: get().tick + 1 }); },
+    });
+    set({ eng, provider, tick: 1, busy: null });
   },
 
   pursue: async (leadId: string) => {

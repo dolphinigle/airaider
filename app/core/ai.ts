@@ -52,6 +52,19 @@ export interface ChainBeatOut {
 export interface ConceptTagsInput { concept: string }
 export interface ConceptTagsOut { name: string; who: string; tags: string[] }
 
+// A record of one AI call (for the in-game prompt/response log).
+export interface AICallRecord {
+  n: number;
+  kind: string;                 // cardAsk / outcome / flesh / genesis / chainBeat / conceptTags
+  model: string;
+  system: string;
+  user: string;
+  response: string;
+  promptTokens?: number;
+  completionTokens?: number;
+  cachedTokens?: number;
+}
+
 export interface Narrator {
   readonly kind: 'openai' | 'mock';
   cardAsk(i: CardAskInput): Promise<CardAskOut>;
@@ -146,7 +159,11 @@ export function tagLabels(tags: Array<{ id: string; tier: number }>): string[] {
 }
 
 // ---- factory ----------------------------------------------------------------
-export interface NarratorOptions { provider?: 'openai' | 'mock'; apiKey?: string; model?: string; log?: (s: string) => void; browser?: boolean }
+export interface NarratorOptions {
+  provider?: 'openai' | 'mock'; apiKey?: string; model?: string;
+  log?: (s: string) => void; browser?: boolean;
+  onCall?: (rec: AICallRecord) => void;   // structured per-call hook for the AI log
+}
 export async function makeNarrator(opts: NarratorOptions = {}): Promise<Narrator> {
   const provider = opts.provider ?? (opts.apiKey ? 'openai' : 'mock');
   if (provider === 'openai') {

@@ -26,7 +26,12 @@ const apiKey = loadKey();
 const provider: 'openai' | 'mock' = useMock || !apiKey ? 'mock' : 'openai';
 
 const aiLog = (s: string) => { if (flag('verbose')) console.log(C.dim(s)); };
-const eng = await GameEngine.create({ provider, apiKey, seed, log: aiLog });
+const onCall = flag('verbose')
+  ? (r: { kind: string; system: string; user: string; response: string }) => {
+      console.log(C.dim(`\n┌ AI ${r.kind}\n│ system: ${r.system.slice(0, 400)}…\n│ user: ${r.user.replace(/\n/g, ' ')}\n│ response: ${r.response.replace(/\n/g, ' ')}\n└`));
+    }
+  : undefined;
+const eng = await GameEngine.create({ provider, apiKey, seed, log: aiLog, onCall });
 console.log(C.dim(`narrator: ${provider}${provider === 'mock' ? ' (offline)' : ''}  seed: ${seed}\n`));
 
 // ---- fit heuristic for auto-assign ------------------------------------------

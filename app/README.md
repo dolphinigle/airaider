@@ -12,8 +12,9 @@ npm install
 
 npm run cli                 # interactive text game (real AI if a key is present)
 npm run cli -- auto 6       # auto-play 6 cycles, printing every AI beat (dogfood)
-npm run cli -- auto 6 --mock   # offline, no tokens
-npm run web                 # the GUI at http://localhost:5173 (needs VITE_OPENAI_API_KEY)
+npm run cli -- auto 6 --mock      # offline, no tokens
+npm run cli -- auto 6 --verbose   # also dump every AI prompt/response
+npm run web                 # the GUI at http://localhost:5173 (auto-reads ../.env)
 
 npm test                    # pure-engine self-test (tags, generation, the roll curve)
 npm run looptest            # headless full-loop integration test (offline mock)
@@ -21,8 +22,9 @@ npm run aismoke             # one real call per AI path, against the live model
 npm run typecheck
 ```
 
-GUI key: Vite reads `VITE_OPENAI_API_KEY` (e.g. `VITE_OPENAI_API_KEY=sk-... npm run web`).
-Without a key, both front-ends fall back to the deterministic offline **mock narrator**.
+Both front-ends read `OPENAI_API_KEY` from `../.env` automatically (the GUI's Vite config
+injects it). Without a key they fall back to the deterministic offline **mock narrator**.
+The GUI's **AI Log** tab shows every prompt + response + token count (collapsible).
 
 ## Architecture — the shared core
 
