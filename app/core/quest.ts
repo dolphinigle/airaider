@@ -309,7 +309,21 @@ export async function resolveQuest(state: GameState, ai: Narrator, quest: Quest)
   });
   quest.outcome = outcome; quest.beforeText = narr.beforeRoll; quest.afterText = narr.afterRoll;
 
-  const delivered = deliverReward(state, r, quest, outcome, narr.captive ?? null, narr.punishment ?? null, party);
+  const deliveredChars: CharacterCard[] = [];
+  const delivered = deliverReward(state, r, quest, outcome, narr.captive ?? null, narr.punishment ?? null, party, deliveredChars);
+
+  // flowchart step 9: flesh delivered characters (backstory + quirks → the living dossier).
+  // Only the keepers (mercs/captives) and only once (skip if already fleshed) to bound cost.
+  for (const c of deliveredChars) {
+    if (c.backstory || c.role === 'dead') continue;
+    try {
+      const f = await ai.flesh({ tags: tagLabels(c.tags), attrs: c.attrs, context: `acquired via "${quest.job}"` });
+      if (f.name && (!c.name || c.name === 'Unknown')) c.name = f.name;
+      if (f.who) c.who = f.who;
+      c.backstory = f.backstory;
+      if (f.quirks?.length) c.quirks = f.quirks;
+    } catch { /* leave name/who from the outcome call */ }
+  }
 
   // free mercs + grant xp + level
   for (const m of party) {
@@ -339,7 +353,7 @@ function grantXp(state: GameState, m: CharacterCard, level: number, outcome: Out
 }
 
 // ---- delivery ---------------------------------------------------------------
-function deliverReward(state: GameState, r: Rng, quest: Quest, outcome: Outcome, aiCaptive: { name: string; who: string } | null, punishment: string | null, party: CharacterCard[]): string[] {
+function deliverReward(state: GameState, r: Rng, quest: Quest, outcome: Outcome, aiCaptive: { name: string; who: string } | null, punishment: string | null, party: CharacterCard[], delivered: CharacterCard[]): string[] {
   const out: string[] = [];
   const bundle = quest.reward;
   if (outcome === 'failure') {
@@ -349,11 +363,11 @@ function deliverReward(state: GameState, r: Rng, quest: Quest, outcome: Outcome,
       else { const d = liabilityCard(mk(state), 'debt', Math.round(BALANCE.vBase(quest.level) * 0.5), state.cycle); d.location = 'roster'; addCard(state, d); out.push(`a debt: ${punishment}`); }
     } else out.push('nothing gained');
     // on a finale failure the focal character is lost; intermediate beats keep it safe
-    if (quest.finale) handleFinaleFate(state, quest, 'failure', out, aiCaptive);
+    if (quest.finale) handleFinaleFate(state, quest, 'failure', out, aiCaptive, delivered);
     return out;
   }
 
-  if (quest.finale) { handleFinaleFate(state, quest, outcome, out, aiCaptive); return out; }
+  if (quest.finale) { handleFinaleFate(state, quest, outcome, out, aiCaptive, delivered); return out; }
 
   const scale = outcome === 'partial' ? 0.5 : 1;
   let positive = 0;
@@ -361,7 +375,7 @@ function deliverReward(state: GameState, r: Rng, quest: Quest, outcome: Outcome,
     if (card.class === 'gold') { const g = Math.round(card.value * scale); state.gold += g; positive += g; out.push(`${g} gold`); }
     // a person can't be halved: on a partial you keep the WHOLE unit (full value) — the
     // value is balanced back to V/2 by the saddling liability below.
-    else if (card.class === 'character') { deliverCharacter(state, card, outcome, aiCaptive, out); positive += card.value; }
+    else if (card.class === 'character') { deliverCharacter(state, card, outcome, aiCaptive, out); delivered.push(card); positive += card.value; }
     else if (card.class === 'liability') { card.location = 'roster'; addCard(state, card); out.push(card.name); }
   }
   // partial balancing: bring delivered net to ~V/2 with a liability (saddle) or skip if already near
@@ -386,7 +400,7 @@ function deliverCharacter(state: GameState, card: CharacterCard, outcome: Outcom
   out.push(`${card.role === 'captive' ? 'captive' : 'recruit'}: ${card.name}${outcome === 'partial' ? ' (wounded)' : ''}`);
 }
 
-function handleFinaleFate(state: GameState, quest: Quest, outcome: Outcome, out: string[], aiCaptive: { name: string; who: string } | null): void {
+function handleFinaleFate(state: GameState, quest: Quest, outcome: Outcome, out: string[], aiCaptive: { name: string; who: string } | null, delivered: CharacterCard[]): void {
   const chain = quest.chainId ? state.chains[quest.chainId] : undefined;
   const focal = chain && state.cards[chain.focalCardIds[0]] as CharacterCard | undefined;
   if (!focal) return;
@@ -406,9 +420,11 @@ function handleFinaleFate(state: GameState, quest: Quest, outcome: Outcome, out:
   if (kind === 'captive') {
     const held = captives(state).length;
     focal.role = 'captive'; focal.location = held < captiveCapacity(state) ? 'dungeon' : 'roster';
+    delivered.push(focal);
     out.push(`${focal.name} is taken captive${wounded ? ', wounded' : ''}`);
   } else { // recruit
     focal.role = 'merc'; focal.location = 'roster'; queueMainChain(state, focal.id);
+    delivered.push(focal);
     out.push(`${focal.name} joins the company${wounded ? ', but wounded' : ''}`);
   }
 }
