@@ -10,7 +10,7 @@ import type {
   GameState, Lead, Quest, QuestSlot, Chain, CharacterCard, Outcome, RewardBundle, ApproachGroup,
 } from './types.js';
 import type { Rng } from './rng.js';
-import { rngFrom, randInt } from './rng.js';
+import { rngFrom, randInt, pick } from './rng.js';
 import type { Narrator } from './ai.js';
 import { tagLabels } from './ai.js';
 import {
@@ -21,7 +21,7 @@ import { generateReward, rewardEnvelope } from './reward.js';
 import { characterFromGen, liabilityCard, type MkId } from './cards.js';
 import { tagDef } from './tags.js';
 import { uid, addCard, logLine, allMercs, captives } from './state.js';
-import { slotCountFor, queueMainChain } from './leads.js';
+import { slotCountFor, queueMainChain, LEAD_TTL } from './leads.js';
 import { captiveCapacity, levelCap } from './fort.js';
 
 const mk = (state: GameState): MkId => (p: string) => uid(state, p);
@@ -176,6 +176,8 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   } else {
     const side = Math.round(BALANCE.vBase(chain.level) * 0.6);
     reward = generateReward(r, mk(state), state.cycle, { V: side, archetype: 'contract', isChain: false, level: chain.level });
+    // engine owns the VALUE; the AI owns the THEME — name the beat's loot from its proposedReward
+    if (beat.proposedReward) { const g = reward.cards.find((c) => c.class === 'gold'); if (g) g.name = beat.proposedReward.slice(0, 60); }
   }
   // A non-personal finale offers MUTEX APPROACH-GROUPS (docs/QUESTS.md §9): the focal's
   // value/tags are fixed; the branch the player fills decides the KIND (welcome / cage / sell).
@@ -372,7 +374,7 @@ function deliverReward(state: GameState, r: Rng, quest: Quest, outcome: Outcome,
   const scale = outcome === 'partial' ? 0.5 : 1;
   let positive = 0;
   for (const card of bundle.cards) {
-    if (card.class === 'gold') { const g = Math.round(card.value * scale); state.gold += g; positive += g; out.push(`${g} gold`); }
+    if (card.class === 'gold') { const g = Math.round(card.value * scale); state.gold += g; positive += g; out.push(/gold$/.test(card.name) ? `${g} gold` : `${card.name} (${g}g)`); }
     // a person can't be halved: on a partial you keep the WHOLE unit (full value) — the
     // value is balanced back to V/2 by the saddling liability below.
     else if (card.class === 'character') { deliverCharacter(state, card, outcome, aiCaptive, out); delivered.push(card); positive += card.value; }
@@ -456,7 +458,23 @@ function recordBeat(state: GameState, quest: Quest, outcome: Outcome, partySize:
   chain.mercCyclesSpent += partySize;        // climax gate = effort, not value
   chain.beatsResolved += 1;
   chain.log.push(`Beat ${chain.beatsResolved} (${outcome}): ${quest.stakes || quest.job}`);
-  if (quest.finale) { chain.state = 'done'; return true; }
+  if (quest.finale) { chain.state = 'done'; if (outcome !== 'failure') maybeSpawnSequel(state, chain); return true; }
   if (chain.mercCyclesSpent >= chain.climaxTarget) chain.state = 'finale-ready';
   return false;
+}
+
+// flowchart step 17: a resolved saga MAY leave a loose thread → a sequel lead on the board.
+function maybeSpawnSequel(state: GameState, chain: Chain): void {
+  const r = rngFrom(`${state.seed}:sequel:${chain.id}`);
+  if (r() >= 0.6) return;
+  const order: Quest['rarity'][] = ['common', 'uncommon', 'rare', 'legendary'];
+  const rarity = order[Math.min(order.length - 1, order.indexOf(chain.rarity) + 1)]; // sequels raise the stakes
+  state.leads.push({
+    id: `lead_sequel_${chain.id}_${state.cycle}`,
+    rarity, level: chain.level + 1, location: pick(r, state.unlockedLocations),
+    archetype: 'investigate', chain: { kind: 'starts-new' },
+    title: `Echo of "${chain.title}"`, hook: `The end of ${chain.title} left a thread unpulled.`,
+    expiresCycle: state.cycle + LEAD_TTL + 2, sequelOf: chain.id,
+  });
+  logLine(state, `A loose thread remains from "${chain.title}" — a new lead surfaces.`);
 }

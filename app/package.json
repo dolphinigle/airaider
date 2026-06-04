@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "test": "tsx core/_selftest.ts",
     "aismoke": "tsx core/_aismoke.ts",
-    "looptest": "tsx core/_looptest.ts"
+    "looptest": "tsx core/_looptest.ts",
+    "conformance": "tsx core/_conformance.ts"
   },
   "dependencies": {
     "openai": "^4.68.0",

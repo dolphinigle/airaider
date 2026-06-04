@@ -85,6 +85,7 @@ export interface Lead {
   title?: string;        // cached chain title/hook (continuation leads only)
   hook?: string;
   expiresCycle: number;
+  sequelOf?: string;     // chain id this lead is a sequel to (finale aftermath)
 }
 
 export type Outcome = 'success' | 'partial' | 'failure';

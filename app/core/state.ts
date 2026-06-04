@@ -29,12 +29,12 @@ export function captives(state: GameState): CharacterCard[] {
 }
 
 // ---- starter mercs (fixed identities so boot is offline + reproducible) ------
-interface StarterDef { name: string; who: string; tags: string[]; quirks: string[] }
+interface StarterDef { name: string; who: string; backstory: string; tags: string[]; quirks: string[] }
 const STARTERS: StarterDef[] = [
-  { name: 'Marek of Saltreach', who: 'A scarred line-soldier who holds when others break', tags: ['gender:male', 'race:human', 'bg:soldier', 'skill:weapon', 'pers:brave', 'phys:scarred', 'phys:muscular'], quirks: ['oils his blade before sleep'] },
-  { name: 'Ivo Wulfson', who: 'A fen-hunter who moves like weather', tags: ['gender:male', 'race:human', 'bg:hunter', 'skill:stealth', 'pers:aloof', 'pers:calm'], quirks: ['never sits with his back to a door'] },
-  { name: 'Sigrun Edda', who: 'A quiet field-healer with steady hands', tags: ['gender:female', 'race:human', 'bg:healer', 'skill:heal', 'pers:kind', 'pers:gregarious'], quirks: ['hums while binding wounds'] },
-  { name: 'Aldric the Patient', who: 'A hedge-scholar who reads people and old script alike', tags: ['gender:male', 'race:elf', 'bg:scholar', 'skill:lore', 'phys:clever', 'pers:calm'], quirks: ['annotates the margins of any letter he is handed'] },
+  { name: 'Marek of Saltreach', who: 'A scarred line-soldier who holds when others break', backstory: 'Drafted from the salt-flats and bled in a dozen border musters; the long scar down his cheek is from the day his shield-wall broke and he did not.', tags: ['gender:male', 'race:human', 'bg:soldier', 'skill:weapon', 'pers:brave', 'phys:scarred', 'phys:muscular'], quirks: ['oils his blade before sleep'] },
+  { name: 'Ivo Wulfson', who: 'A fen-hunter who moves like weather', backstory: 'Raised trapping in the reed-mazes of Saltreach, he learned to vanish before he learned to read; he speaks little and notices everything.', tags: ['gender:male', 'race:human', 'bg:hunter', 'skill:stealth', 'pers:aloof', 'pers:calm'], quirks: ['never sits with his back to a door'] },
+  { name: 'Sigrun Edda', who: 'A quiet field-healer with steady hands', backstory: 'Apprenticed to a plague-camp matron who taught her that most wounds are won with patience; she has closed more throats with thread than any blade has opened.', tags: ['gender:female', 'race:human', 'bg:healer', 'skill:heal', 'pers:kind', 'pers:gregarious'], quirks: ['hums while binding wounds'] },
+  { name: 'Aldric the Patient', who: 'A hedge-scholar who reads people and old script alike', backstory: 'An elf turned out of a cloister library for asking the wrong questions; he reads a room the way he reads a ledger — slowly, and to the last line.', tags: ['gender:male', 'race:elf', 'bg:scholar', 'skill:lore', 'phys:clever', 'pers:calm'], quirks: ['annotates the margins of any letter he is handed'] },
 ];
 
 function makeStarterMerc(state: GameState, r: Rng, def: StarterDef): CharacterCard {
@@ -46,7 +46,7 @@ function makeStarterMerc(state: GameState, r: Rng, def: StarterDef): CharacterCa
     id: uid(state, 'char'), class: 'character', role: 'merc', name: def.name, tags,
     value: cardTagsValue(tags), location: 'roster', createdCycle: 0,
     attrs: attrsAtLevel(base, talents, level), base, talents, level, xp: 0,
-    who: def.who, backstory: undefined, quirks: def.quirks, chainIds: [], injuries: [],
+    who: def.who, backstory: def.backstory, quirks: def.quirks, chainIds: [], injuries: [],
   };
 }
 
