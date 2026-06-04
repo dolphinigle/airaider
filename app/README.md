@@ -26,6 +26,10 @@ Both front-ends read `OPENAI_API_KEY` from `../.env` automatically (the GUI's Vi
 injects it). Without a key they fall back to the deterministic offline **mock narrator**.
 The GUI's **AI Log** tab shows every prompt + response + token count (collapsible).
 
+The GUI **autosaves to localStorage after every action** — a refresh resumes your run; the
+**New** button starts fresh. First move: pursue a lead (a ★ one is a merc's personal saga),
+assign mercs to its slots, then **End the Day**.
+
 **Model tiers** (docs/AI_PROVIDER.md §4.1): narrative work (chain bibles, the resolution
 narration, character backstory) uses `gpt-5-mini` at `reasoning_effort:low`; mechanical work
 (quest/beat cards, tag picks) uses `gpt-5-nano` at `minimal`. Override via env:

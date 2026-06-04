@@ -25,6 +25,7 @@ function TagChips({ m, max = 5 }: { m: CharacterCard; max?: number }) {
 function TopBar({ view, setView }: { view: string; setView: (v: string) => void }) {
   const eng = useEng();
   const endDay = useGame((s) => s.endDay);
+  const newGame = useGame((s) => s.newGame);
   const provider = useGame((s) => s.provider);
   const aiCount = useGame((s) => s.aiLog.length);
   if (!eng) return null;
@@ -42,6 +43,7 @@ function TopBar({ view, setView }: { view: string; setView: (v: string) => void 
       <nav className="tabs">
         <button className={view === 'game' ? 'on' : ''} onClick={() => setView('game')}>Game</button>
         <button className={view === 'log' ? 'on' : ''} onClick={() => setView('log')}>AI Log {aiCount > 0 && <b>{aiCount}</b>}</button>
+        <button title="abandon this run and start fresh" onClick={() => { if (confirm('Abandon this run and start a new game?')) void newGame(); }}>New</button>
       </nav>
       <button className="endday" disabled={!anyFilled} onClick={() => void endDay()}>End the Day ▶</button>
     </header>
