@@ -2,7 +2,7 @@
 // the board: scout tier raises rarity ceiling + unlocks archetypes; level bands
 // around the roster. Continuation leads for live chains carry cached title/hook.
 
-import type { GameState, Lead, Rarity, Archetype, ChainInfo } from './types.js';
+import type { GameState, Lead, Rarity, Archetype, ChainInfo, CharacterCard } from './types.js';
 import { randInt, pick, weightedPick, type Rng } from './rng.js';
 import { allMercs } from './state.js';
 import { canCapture, leadTier, globalPrestige } from './fort.js';
@@ -57,10 +57,34 @@ export function rollFreshLead(state: GameState, r: Rng): Lead {
   };
 }
 
-/** Top the board to capacity: continuation leads (live chains) + fresh. */
+/** Queue a merc to receive a personal-chain lead (a saga about THEM) next restock. */
+export function queueMainChain(state: GameState, mercId: string): void {
+  if (!state.pendingMainChains.includes(mercId)) state.pendingMainChains.push(mercId);
+}
+
+/** Top the board to capacity: personal-chain leads + continuation leads + fresh. */
 export function stockLeadBoard(state: GameState, r: Rng): void {
   // drop expired
   state.leads = state.leads.filter((l) => l.expiresCycle >= state.cycle);
+
+  // personal-chain leads for queued joiners (a saga about a merc you've kept)
+  const stillQueued: string[] = [];
+  for (const mercId of state.pendingMainChains) {
+    const merc = state.cards[mercId] as CharacterCard | undefined;
+    if (!merc || merc.role !== 'merc') continue;                       // gone/dead → drop
+    if (Object.values(state.chains).some((c) => c.personal && c.focalCardIds.includes(mercId) && c.state !== 'done')) continue; // already running
+    const already = state.leads.some((l) => l.chain.kind === 'personal' && l.chain.mercId === mercId);
+    if (already) { stillQueued.push(mercId); continue; }
+    state.leads.push({
+      id: `lead_personal_${mercId}_${state.cycle}`,
+      rarity: 'uncommon', level: merc.level, location: pick(r, state.unlockedLocations),
+      archetype: 'investigate', chain: { kind: 'personal', mercId },
+      title: `${merc.name}'s past`, hook: `Something out of ${merc.name}'s history comes looking.`,
+      expiresCycle: state.cycle + LEAD_TTL + 3,
+    });
+    stillQueued.push(mercId); // keep until pursued (so it re-stocks if it expires)
+  }
+  state.pendingMainChains = stillQueued;
 
   // continuation leads — one per live chain that wants to continue
   for (const chain of Object.values(state.chains)) {

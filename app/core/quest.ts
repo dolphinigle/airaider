@@ -21,7 +21,7 @@ import { generateReward, rewardEnvelope } from './reward.js';
 import { characterFromGen, liabilityCard, type MkId } from './cards.js';
 import { tagDef } from './tags.js';
 import { uid, addCard, logLine, allMercs } from './state.js';
-import { slotCountFor } from './leads.js';
+import { slotCountFor, queueMainChain } from './leads.js';
 import { captiveCapacity, levelCap } from './fort.js';
 
 const mk = (state: GameState): MkId => (p: string) => uid(state, p);
@@ -74,6 +74,7 @@ export async function pursueLead(state: GameState, ai: Narrator, lead: Lead): Pr
   state.leads = state.leads.filter((l) => l.id !== lead.id);
   if (lead.chain.kind === 'starts-new') return genesisChainAndBeat(state, ai, r, lead);
   if (lead.chain.kind === 'continues') return continueChain(state, ai, r, lead, lead.chain.chainId);
+  if (lead.chain.kind === 'personal') return genesisPersonalChain(state, ai, r, lead, lead.chain.mercId);
   return pursueOneOff(state, ai, r, lead);
 }
 
@@ -121,6 +122,30 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
   return makeBeatQuest(state, ai, r, lead, chain, 'Write beat 1 (the deniable opener).');
 }
 
+// A newly-joined merc's MAIN chain — a saga ABOUT them (focal = the existing merc).
+// The finale develops THEM (renown / a scar / death), not a new acquisition.
+async function genesisPersonalChain(state: GameState, ai: Narrator, r: Rng, lead: Lead, mercId: string): Promise<Quest> {
+  state.pendingMainChains = state.pendingMainChains.filter((id) => id !== mercId);
+  const merc = state.cards[mercId] as CharacterCard | undefined;
+  if (!merc || merc.role !== 'merc') return pursueOneOff(state, ai, r, lead);
+  const B = randInt(r, 2, 3);
+  const spark = pick(r, [
+    `an old debt from ${merc.name}'s past comes due`, `a rival who never forgot ${merc.name}`,
+    `kin ${merc.name} believed dead resurfaces`, `a crime that still follows ${merc.name}`,
+    `an oath ${merc.name} once broke`,
+  ]);
+  const g = await ai.genesis({ focalTags: [tagLabels(merc.tags)], spark, region: lead.location });
+  const chain: Chain = {
+    id: uid(state, 'chain'), title: g.title, hook: g.hook, bible: g.bible, direction: g.direction,
+    focalCardIds: [merc.id], rarity: lead.rarity, level: merc.level, expectedBeats: B, beatsResolved: 0,
+    mercCyclesSpent: 0, climaxTarget: B * 1, state: 'live', log: [], personal: true,
+  };
+  merc.chainIds.push(chain.id);
+  state.chains[chain.id] = chain;
+  logLine(state, `${merc.name}'s own saga begins: "${chain.title}" — ${chain.hook}`);
+  return makeBeatQuest(state, ai, r, lead, chain, 'Write beat 1 of this merc\'s personal story (the deniable opener).', false, merc.id);
+}
+
 async function continueChain(state: GameState, ai: Narrator, r: Rng, lead: Lead, chainId: string): Promise<Quest> {
   const chain = state.chains[chainId];
   if (!chain) return pursueOneOff(state, ai, r, lead);
@@ -128,7 +153,8 @@ async function continueChain(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   const constraint = atClimax
     ? 'This is the FINALE — write the climactic confrontation that resolves the saga.'
     : `Write beat ${chain.beatsResolved + 1}, continuing from what the company already knows.`;
-  return makeBeatQuest(state, ai, r, lead, chain, constraint, atClimax);
+  const anchor = chain.personal ? chain.focalCardIds[0] : undefined;
+  return makeBeatQuest(state, ai, r, lead, chain, constraint, atClimax, anchor);
 }
 
 // chain beats are small encounters (1-2), not the genesis lead's archetype size; finales a touch bigger
@@ -137,26 +163,32 @@ function beatSlotCount(chain: Chain, r: Rng, isFinale: boolean): number {
   if (isFinale) return 2 + (rare ? 1 : 0);
   return 1 + (r() < 0.4 ? 1 : 0);
 }
-async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead, chain: Chain, constraint: string, isFinale = false): Promise<Quest> {
+async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead, chain: Chain, constraint: string, isFinale = false, anchorMercId?: string): Promise<Quest> {
   const n = beatSlotCount(chain, r, isFinale);
   const beat = await ai.chainBeat({
     bible: chain.bible, chainState: chain.log.length ? chain.log.join(' ') : 'The saga is just beginning.',
     region: lead.location, slotCount: n, beatConstraint: constraint,
   });
-  // intermediate beats pay a thin gold trickle; the finale pays the FOCAL character
+  // intermediate beats pay a thin gold trickle; a (non-personal) finale pays the FOCAL character.
+  // a PERSONAL finale develops the existing merc instead (handled at delivery) → no new unit.
   let reward: RewardBundle;
-  if (isFinale) {
+  if (isFinale && !chain.personal) {
     const focal = state.cards[chain.focalCardIds[0]] as CharacterCard | undefined;
     reward = { targetValue: focal?.value ?? questValue(chain.level, chain.rarity, 1), cards: focal ? [focal] : [], kindHint: 'recruit' };
+  } else if (isFinale) {
+    reward = { targetValue: 0, cards: [], kindHint: 'tag-stamp' };
   } else {
     const side = Math.round(BALANCE.vBase(chain.level) * 0.6);
     reward = generateReward(r, mk(state), state.cycle, { V: side, archetype: 'contract', isChain: false, level: chain.level });
   }
+  const slots = buildSlots(beat.ask, n, ownedMercTags(state));
+  // a personal-chain beat pins its anchor: slot 0 must be the merc the saga is about
+  if (anchorMercId && slots[0]) slots[0].requirement = { kind: 'must-be', cardId: anchorMercId };
   const quest: Quest = {
     id: uid(state, 'quest'), leadId: lead.id, rarity: chain.rarity, level: chain.level, location: lead.location,
     archetype: 'investigate', chainId: chain.id, beat: chain.beatsResolved + 1, finale: isFinale,
     title: chain.title, situation: beat.situation, job: beat.job, stakes: beat.newLayerRevealed,
-    slots: buildSlots(beat.ask, n, ownedMercTags(state)), threshold: thresholdFor(n, chain.level),
+    slots, threshold: thresholdFor(n, chain.level),
     reward, risky: isFinale || chain.rarity === 'rare' || chain.rarity === 'legendary',
   };
   state.quests[quest.id] = quest;
@@ -313,10 +345,29 @@ function handleFinaleFate(state: GameState, quest: Quest, outcome: Outcome, out:
   const chain = quest.chainId ? state.chains[quest.chainId] : undefined;
   const focal = chain && state.cards[chain.focalCardIds[0]] as CharacterCard | undefined;
   if (!focal) return;
+  if (chain?.personal) { handlePersonalFinale(focal, outcome, out); return; }
   if (aiCaptive) { focal.name = aiCaptive.name; focal.who = aiCaptive.who; }
-  if (outcome === 'success') { focal.role = 'merc'; focal.location = 'roster'; out.push(`the saga's heart joins you: ${focal.name}`); }
-  else if (outcome === 'partial') { focal.role = 'merc'; focal.location = 'roster'; focal.injuries.push({ id: 'injury:wound', tier: 3 }); out.push(`${focal.name} joins you, but wounded`); }
+  if (outcome === 'success') { focal.role = 'merc'; focal.location = 'roster'; queueMainChain(state, focal.id); out.push(`the saga's heart joins you: ${focal.name}`); }
+  else if (outcome === 'partial') { focal.role = 'merc'; focal.location = 'roster'; focal.injuries.push({ id: 'injury:wound', tier: 3 }); queueMainChain(state, focal.id); out.push(`${focal.name} joins you, but wounded`); }
   else { focal.role = 'dead'; focal.location = 'limbo'; out.push(`${focal.name} is lost — the saga ends in grief`); }
+}
+
+// A personal finale develops the EXISTING merc, gated by the roll (docs/QUESTS.md §6).
+function handlePersonalFinale(merc: CharacterCard, outcome: Outcome, out: string[]): void {
+  if (outcome === 'success') {
+    // renown — a stamped tag + a surge of veterancy
+    if (!merc.tags.some((t) => t.id.startsWith('noto:'))) merc.tags.push({ id: 'noto:famous', tier: 2 });
+    merc.xp += 30;
+    out.push(`${merc.name} settles their past and earns renown (famous)`);
+  } else if (outcome === 'partial') {
+    if (!merc.tags.some((t) => t.id === 'phys:scarred')) merc.tags.push({ id: 'phys:scarred', tier: 3 });
+    merc.xp += 10;
+    out.push(`${merc.name} closes the chapter, but it leaves a scar`);
+  } else {
+    // the gamble of a personal saga: it can claim them
+    merc.role = 'dead'; merc.location = 'limbo';
+    out.push(`${merc.name}'s past catches them at last — they are lost`);
+  }
 }
 
 const pickLiab = (r: Rng) => (['evidence', 'mess', 'debt'] as const)[randInt(r, 0, 2)];

@@ -70,7 +70,8 @@ export const isCharacter = (c: Card): c is CharacterCard => c.class === 'charact
 export type ChainInfo =
   | { kind: 'none' }
   | { kind: 'starts-new' }
-  | { kind: 'continues'; chainId: string };
+  | { kind: 'continues'; chainId: string }
+  | { kind: 'personal'; mercId: string };   // a newly-joined merc's main chain (about THEM)
 
 export type Archetype = 'raid' | 'capture' | 'rescue' | 'escort' | 'investigate' | 'hunt' | 'contract' | 'scout';
 
@@ -157,6 +158,7 @@ export interface Chain {
   climaxTarget: number;
   state: 'live' | 'finale-ready' | 'done';
   log: string[];             // beat summaries fed back to the AI
+  personal?: boolean;        // a main chain ABOUT an existing merc (focal = that merc)
 }
 
 // ---- fort (FORT.md) ---------------------------------------------------------
@@ -189,6 +191,7 @@ export interface GameState {
   chains: Record<string, Chain>;
   unlockedLocations: string[];
   globalPrestige: number;
+  pendingMainChains: string[];   // merc ids queued to get a personal-chain lead next restock
   nextId: number;
   log: string[];
 }

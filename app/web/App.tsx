@@ -51,7 +51,9 @@ function TopBar({ view, setView }: { view: string; setView: (v: string) => void 
 function LeadCard({ lead }: { lead: Lead }) {
   const pursue = useGame((s) => s.pursue);
   const eng = useEng();
-  const tag = lead.chain.kind === 'continues' ? `↪ ${lead.title}` : lead.chain.kind === 'starts-new' ? '✦ new saga' : '';
+  const tag = lead.chain.kind === 'continues' ? `↪ ${lead.title}`
+    : lead.chain.kind === 'starts-new' ? '✦ new saga'
+    : lead.chain.kind === 'personal' ? `★ ${lead.title}` : '';
   return (
     <div className={`lead ${lead.rarity}`}>
       <div className="lead-top">

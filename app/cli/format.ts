@@ -35,7 +35,7 @@ export function status(eng: GameEngine): string {
 export function leadsList(eng: GameEngine): string {
   const lines = [cyan('Leads:')];
   eng.leads().forEach((l: Lead, i) => {
-    const chain = l.chain.kind === 'continues' ? mag(` ↪ "${l.title}"`) : l.chain.kind === 'starts-new' ? mag(' ✦ new saga') : '';
+    const chain = l.chain.kind === 'continues' ? mag(` ↪ "${l.title}"`) : l.chain.kind === 'starts-new' ? mag(' ✦ new saga') : l.chain.kind === 'personal' ? mag(` ★ ${l.title}`) : '';
     lines.push(`  ${b(String(i))}. ${l.rarity} L${l.level} ${yel(l.archetype)} — ${l.location}${chain} ${dim('exp c' + l.expiresCycle)}`);
   });
   return lines.join('\n');

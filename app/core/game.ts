@@ -7,7 +7,7 @@ import type { GameState, Lead, Quest, CharacterCard, Room } from './types.js';
 import { rngFrom } from './rng.js';
 import { initGame, addCard, uid, allMercs, availableMercs, captives, logLine } from './state.js';
 import { makeNarrator, type Narrator, type NarratorOptions } from './ai.js';
-import { stockLeadBoard } from './leads.js';
+import { stockLeadBoard, queueMainChain } from './leads.js';
 import {
   pursueLead, assign as assignSlot, unassign as unassignSlot, resolveQuest,
   questOdds, questCoins, isFilled, partyOf, slotEligible, type QuestResult,
@@ -152,6 +152,7 @@ export class GameEngine {
     const c = this.state.cards[cardId] as CharacterCard | undefined;
     if (!c || c.role !== 'captive') return { error: 'not a captive' };
     c.role = 'merc'; c.location = 'roster';
+    queueMainChain(this.state, c.id);   // a recruited captive gets their own main chain
     logLine(this.state, `${c.name} takes the company's coin and joins.`);
     return { ok: true };
   }

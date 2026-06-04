@@ -56,7 +56,7 @@ export function initGame(seed = 'airaider'): GameState {
     cards: {}, cells: starterCells(), rooms: {},
     leads: [], quests: {}, chains: {},
     unlockedLocations: ['the Saltreach fens', 'the river marches of Kovar', 'the Ashmoor hills'],
-    globalPrestige: 0, nextId: 1, log: [],
+    globalPrestige: 0, pendingMainChains: [], nextId: 1, log: [],
   };
 
   // starter rooms: a bunkroom (cell 0) + a scout post (cell 1) so leads flow day 1
@@ -66,11 +66,15 @@ export function initGame(seed = 'airaider'): GameState {
   state.cells[0].roomId = bunk.id; state.cells[1].roomId = scout.id;
   void ROOM_TYPES; // catalog referenced for types
 
+  let first = '';
   for (const def of STARTERS) {
     const m = makeStarterMerc(state, r, def);
     addCard(state, m);
     bunk.displayCardIds.push(m.id);
+    if (!first) first = m.id;
   }
+  // seed one starter's personal chain so the "saga about a merc you keep" hook is visible early
+  if (first) state.pendingMainChains.push(first);
   logLine(state, 'The company musters at the fort gate. Three mercs, a scout post, and 250 gold.');
   return state;
 }
