@@ -96,6 +96,7 @@ export interface GenSpec {
   targetValue: number;
   level: number;            // source quest level → ceiling + character level
   required?: string[];      // canonical tag ids that must be included
+  exclude?: string[];       // canonical tag ids to AVOID (e.g. recent focals' theme skills → saga variety)
   role?: 'merc' | 'captive' | 'npc';
 }
 
@@ -135,7 +136,8 @@ export function generateCharacter(r: Rng, spec: GenSpec): GeneratedCharacter {
   ensureIdentity(r, tags, usedMutex);
 
   // 2. spend the rest — aim each tag near remaining/slotsLeft so the budget lands
-  const pool = allTags().filter((d) => d.group !== 'gender' && d.group !== 'race');
+  const avoid = new Set(spec.exclude ?? []);
+  const pool = allTags().filter((d) => d.group !== 'gender' && d.group !== 'race' && !avoid.has(d.id));
   let guard = 0;
   const cheapest = (d: TagDef) => (d.tiered ? tagValue(d, 5) : tagValue(d, 3));
   while (remaining > 1 && tags.length < cap && guard++ < 200) {

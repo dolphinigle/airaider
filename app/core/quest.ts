@@ -74,6 +74,17 @@ function ownedMercTags(state: GameState): Set<string> {
 function recentHooks(state: GameState): string[] {
   return Object.values(state.chains).slice(-4).map((c) => c.hook).filter(Boolean);
 }
+// skill tags of recent (non-personal) focals — excluded from the next focal so the THEME varies
+// (the avoid-hooks nudge can't beat tags that literally are food/beast; this fixes it at the root)
+function recentFocalSkills(state: GameState): string[] {
+  const out = new Set<string>();
+  for (const c of Object.values(state.chains).slice(-3)) {
+    if (c.personal) continue;
+    const focal = state.cards[c.focalCardIds[0]] as CharacterCard | undefined;
+    if (focal) for (const t of focal.tags) if (t.id.startsWith('skill:')) out.add(t.id);
+  }
+  return [...out];
+}
 
 // ---- pursue (dispatch) ------------------------------------------------------
 export async function pursueLead(state: GameState, ai: Narrator, lead: Lead): Promise<Quest> {
@@ -109,7 +120,8 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
   const V = questValue(lead.level, lead.rarity, B * n);
   // engine rolls the FOCAL character first (role-agnostic), at the saga payoff value.
   // role 'npc' (not merc) while pending: not on the roster, not sendable — the finale decides their fate.
-  const gen = generateCharacter(r, { targetValue: V, level: lead.level });
+  // exclude recent focals' SKILL tags so we don't get e.g. three "sinister cook" sagas in a row.
+  const gen = generateCharacter(r, { targetValue: V, level: lead.level, exclude: recentFocalSkills(state) });
   const focal = characterFromGen(mk(state), gen, 'npc', state.cycle);
   focal.location = 'limbo';
   addCard(state, focal);
@@ -463,7 +475,10 @@ function recordBeat(state: GameState, quest: Quest, outcome: Outcome, partySize:
   if (!chain) return false;
   chain.mercCyclesSpent += partySize;        // climax gate = effort, not value
   chain.beatsResolved += 1;
-  chain.log.push(`Beat ${chain.beatsResolved} (${outcome}): ${quest.stakes || quest.job}`);
+  // the truth only surfaces on success/partial (newLayerRevealed = "what the player learns on
+  // success"). A failed beat advances effort (climax gate) but reveals NOTHING — the mystery holds.
+  const learned = outcome === 'failure' ? `made no headway — the truth stays hidden` : (quest.stakes || quest.job);
+  chain.log.push(`Beat ${chain.beatsResolved} (${outcome}): ${learned}`);
   if (quest.finale) { chain.state = 'done'; if (outcome !== 'failure') maybeSpawnSequel(state, chain); return true; }
   if (chain.mercCyclesSpent >= chain.climaxTarget) chain.state = 'finale-ready';
   return false;
