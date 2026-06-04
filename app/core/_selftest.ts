@@ -31,20 +31,25 @@ ok(new Set(allTags().map((t) => t.word)).size === allTags().length, 'suffixes gl
 section('generateCharacter spends ~target value');
 {
   const r = rngFrom('gen1');
-  let within = 0; const n = 200;
+  let within = 0, grounded = 0; const n = 200;
   const mults = [1, 1.2, 1.6]; // common / uncommon / rare single-unit
   for (let i = 0; i < n; i++) {
     const level = 1 + (i % 10);
     const target = Math.round(BALANCE.vBase(level) * mults[i % 3]);
     const g = generateCharacter(r, { targetValue: target, level });
-    const lo = target * 0.78, hi = target * 1.15 + BALANCE.tagCeiling(level);
-    if (g.value >= lo && g.value <= hi) within++;
-    else if (within + (n - i) <= n * 0.85) console.log(`    miss L${level} target=${target} got=${g.value} tags=${g.tags.length}`);
-    ok(g.tags.length > 0, 'has tags');
+    // a character holds at most maxCharValue; value should approach min(target, cap), never overshoot wildly
+    const goal = Math.min(target, BALANCE.maxCharValue(level));
+    // grounded caps mean expensive value (skills/magic) is limited; the rest spills to gold by
+    // design, so a character holds ~60%+ of the holdable goal and never wildly overshoots target.
+    if (g.value >= goal * 0.6 && g.value <= target * 1.2 + BALANCE.tagCeiling(level)) within++;
+    const skills = g.tags.filter((t) => t.id.startsWith('skill:')).length;
+    const magic = g.tags.filter((t) => t.id.startsWith('skill:magic')).length;
+    if (skills <= 3 && magic <= 1) grounded++;
     ok(g.tags.some((t) => t.id.startsWith('gender:')) && g.tags.some((t) => t.id.startsWith('race:')), 'has identity');
   }
-  console.log(`  ${within}/${n} within value band (realistic single-unit targets)`);
-  ok(within > n * 0.85, 'most cards near target value');
+  console.log(`  ${within}/${n} near holdable value · ${grounded}/${n} grounded (≤3 skills, ≤1 magic)`);
+  ok(within > n * 0.85, 'most cards near holdable value');
+  ok(grounded === n, 'every character is grounded — no all-skill Mary Sues');
 }
 
 // ---- the success curve: level-L merc on level-L quest should be ~winnable ---

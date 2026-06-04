@@ -50,7 +50,8 @@ export function questCard(eng: GameEngine, q: Quest): string {
   lines.push('  ' + yel('Job: ') + q.job);
   if (q.stakes) lines.push('  ' + dim('whisper: ' + q.stakes));
   q.slots.forEach((s) => {
-    const req = s.requirement.kind === 'must-have' ? ` must:${tagName(s.requirement.tag)}` : s.requirement.kind === 'must-be' ? ' must-be' : '';
+    const req = s.requirement.kind === 'must-have' ? ` must:${tagName(s.requirement.tag)}`
+      : s.requirement.kind === 'must-be' ? ` must be ${eng.state.cards[s.requirement.cardId]?.name ?? 'them'}` : '';
     const fav = s.tested.favored.map((t) => tagName(t)).join('/');
     const who = s.filledBy ? grn(eng.state.cards[s.filledBy]?.name ?? s.filledBy) : dim('empty');
     lines.push(`    slot ${s.index} ${dim('tests ' + s.tested.attribute + (fav ? ' +[' + fav + ']' : '') + req)} → ${who}`);

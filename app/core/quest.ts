@@ -49,11 +49,14 @@ function clashingFor(favored: string[]): string[] {
 function buildSlots(ask: AskShape, n: number, ownedTags: Set<string>): QuestSlot[] {
   const clashing = clashingFor(ask.favoredTags);
   const slots: QuestSlot[] = [];
+  let mustHaves = 0;
   for (let i = 0; i < n; i++) {
     const req = ask.slots[i] ?? { kind: 'open' as const };
-    // downgrade a must-have to open if NO current merc can satisfy it (keeps quests pursuable —
-    // the AI sometimes over-requires; the fit bonus still rewards bringing the right merc)
-    const keep = req.kind === 'must-have' && ownedTags.has(req.tag);
+    // keep a must-have only if (a) some merc can satisfy it AND (b) we haven't already used one
+    // (≥2 hard requirements routinely make a quest unfillable — the AI over-requires). The fit
+    // bonus still rewards bringing the right merc to an "open" slot.
+    const keep = req.kind === 'must-have' && ownedTags.has(req.tag) && mustHaves < 1;
+    if (keep) mustHaves++;
     slots.push({
       index: i,
       requirement: keep ? { kind: 'must-have', tag: (req as { tag: string }).tag } : { kind: 'open' },
@@ -138,7 +141,9 @@ async function genesisPersonalChain(state: GameState, ai: Narrator, r: Rng, lead
   const chain: Chain = {
     id: uid(state, 'chain'), title: g.title, hook: g.hook, bible: g.bible, direction: g.direction,
     focalCardIds: [merc.id], rarity: lead.rarity, level: merc.level, expectedBeats: B, beatsResolved: 0,
-    mercCyclesSpent: 0, climaxTarget: B * 1, state: 'live', log: [], personal: true,
+    // personal beats run ~1 merc each (the anchor); gate on B*2 effort so the saga gets a few
+    // beats to breathe before the finale rather than beat-1 → finale in one step.
+    mercCyclesSpent: 0, climaxTarget: B * 2, state: 'live', log: [], personal: true,
   };
   merc.chainIds.push(chain.id);
   state.chains[chain.id] = chain;
@@ -182,8 +187,13 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
     reward = generateReward(r, mk(state), state.cycle, { V: side, archetype: 'contract', isChain: false, level: chain.level });
   }
   const slots = buildSlots(beat.ask, n, ownedMercTags(state));
-  // a personal-chain beat pins its anchor: slot 0 must be the merc the saga is about
-  if (anchorMercId && slots[0]) slots[0].requirement = { kind: 'must-be', cardId: anchorMercId };
+  // a personal-chain beat pins its anchor: slot 0 must be the merc the saga is about,
+  // and every OTHER slot is forced open (the anchor is the only hard requirement — else a
+  // second must:<tag> the anchor alone satisfies would make the beat unfillable).
+  if (anchorMercId && slots[0]) {
+    slots[0].requirement = { kind: 'must-be', cardId: anchorMercId };
+    for (let i = 1; i < slots.length; i++) slots[i].requirement = { kind: 'open' };
+  }
   const quest: Quest = {
     id: uid(state, 'quest'), leadId: lead.id, rarity: chain.rarity, level: chain.level, location: lead.location,
     archetype: 'investigate', chainId: chain.id, beat: chain.beatsResolved + 1, finale: isFinale,

@@ -81,6 +81,7 @@ function Slot({ quest, index }: { quest: Quest; index: number }) {
     <div className="slot">
       <div className="slot-test">tests <b>{slot.tested.attribute}</b>{fav && <> · favors <i>{fav}</i></>}
         {slot.requirement.kind === 'must-have' && <> · <span className="req">needs {tagName(slot.requirement.tag)}</span></>}
+        {slot.requirement.kind === 'must-be' && <> · <span className="req">must be {eng.state.cards[slot.requirement.cardId]?.name ?? 'them'}</span></>}
       </div>
       {filled
         ? <div className="slot-filled"><span>{filled.name}</span><button onClick={() => unassign(quest.id, index)}>✕</button></div>

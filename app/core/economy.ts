@@ -34,6 +34,11 @@ export const BALANCE = {
   maxTagsPerCard: 16,
   tagCapFor: (targetValue: number, ceiling: number) =>
     Math.min(16, Math.max(5, 2 + Math.ceil(targetValue / (ceiling * 0.45)))),
+  maxSkills: 3,   // a believable character has a few skills, not all of them
+  maxMagic: 1,    // …and at most one school of magic
+  // the most value a single believable character can hold in tags (empirically matched to what
+  // the grounded caps actually allow); value beyond this flows to the bundle as gold/treasure
+  maxCharValue: (level: number) => 45 + level * 11,
   jackpotChance: 0.08,
 };
 
@@ -105,10 +110,12 @@ export interface GeneratedCharacter {
 
 export function generateCharacter(r: Rng, spec: GenSpec): GeneratedCharacter {
   const ceiling = BALANCE.tagCeiling(spec.level);
-  const cap = BALANCE.tagCapFor(spec.targetValue, ceiling);
+  // a single character holds at most maxCharValue in tags; the caller tops up the rest as gold
+  const effTarget = Math.min(spec.targetValue, BALANCE.maxCharValue(spec.level));
+  const cap = BALANCE.tagCapFor(effTarget, ceiling);
   const tags: TagInstance[] = [];
   const usedMutex = new Set<string>();
-  let remaining = spec.targetValue;
+  let remaining = effTarget;
 
   const place = (def: TagDef, tier: number) => {
     if (def.mutex) { if (usedMutex.has(def.mutex)) return false; usedMutex.add(def.mutex); }
@@ -133,8 +140,12 @@ export function generateCharacter(r: Rng, spec: GenSpec): GeneratedCharacter {
   while (remaining > 1 && tags.length < cap && guard++ < 200) {
     const slotsLeft = cap - tags.length;
     const aim = Math.min(remaining / slotsLeft, ceiling);
+    const skillCount = tags.filter((t) => tagDef(t.id)?.group === 'skill').length;
+    const magicCount = tags.filter((t) => t.id.startsWith('skill:magic')).length;
     const candidates = pool.filter((d) => (!d.mutex || !usedMutex.has(d.mutex))
-      && !tags.some((t) => t.id === d.id) && cheapest(d) <= remaining);
+      && !tags.some((t) => t.id === d.id) && cheapest(d) <= remaining
+      && !(d.group === 'skill' && skillCount >= BALANCE.maxSkills)   // grounded: cap skills
+      && !(d.id.startsWith('skill:magic') && magicCount >= BALANCE.maxMagic));
     if (!candidates.length) break;
     // restrict to tags that can actually reach near the aim (avoids cheap-tag dilution),
     // then pick among them weighted by proximity to the aim
@@ -157,7 +168,10 @@ export function generateCharacter(r: Rng, spec: GenSpec): GeneratedCharacter {
   // 3. jackpot-with-catch lottery
   let jackpotNegative: GeneratedCharacter['jackpotNegative'];
   if (r() < BALANCE.jackpotChance) {
-    const bonus = pool.filter((d) => (!d.mutex || !usedMutex.has(d.mutex)) && !tags.some((t) => t.id === d.id) && d.tiered);
+    const sc = tags.filter((t) => tagDef(t.id)?.group === 'skill').length;
+    const mc = tags.filter((t) => t.id.startsWith('skill:magic')).length;
+    const bonus = pool.filter((d) => (!d.mutex || !usedMutex.has(d.mutex)) && !tags.some((t) => t.id === d.id) && d.tiered
+      && !(d.group === 'skill' && sc >= BALANCE.maxSkills) && !(d.id.startsWith('skill:magic') && mc >= BALANCE.maxMagic));
     if (bonus.length) {
       const def = weightedPick(r, bonus, (d) => BALANCE.rarityBase[d.rarity]); // bias RARE for the jackpot
       const tier = Math.max(1, affordableTier(def, ceiling, ceiling, r) - randInt(r, 0, 1));
