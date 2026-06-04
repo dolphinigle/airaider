@@ -38,12 +38,31 @@ export interface FleshOut { name: string; who: string; backstory: string; quirks
 export interface GenesisInput {
   focalTags: string[][];        // each focal character's display tags — THE story seed
   region: string;
+  rarity?: 'common' | 'uncommon' | 'rare' | 'legendary'; // depth scales with stakes
   personal?: boolean;           // true = this existing merc's own buried past
   name?: string;                // the focal's name (for personal chains)
-  avoid?: string[];             // hooks of recent sagas — make THIS premise distinct from them
+  who?: string;                 // the focal's known-for line (personal chains)
+  backstory?: string;           // the focal's existing backstory (personal chains)
+  avoid?: string[];             // titles/blurbs of recent sagas — make THIS distinct
+}
+// A bible person carries a WHY-LADDER (history: cause → cause → bedrock). docs/QUEST_BIBLE.md
+export interface BiblePerson {
+  name: string; who: string; history: string[]; wants: string; feels: string; conceals?: string; role?: string;
 }
 export interface GenesisOut {
-  title: string; hook: string; bible: string; direction: string; climax: string;
+  title: string;                // concrete, names a real thing/person/place
+  leadBlurb: string;            // the player-facing job-board teaser (mundane; no hidden truth)
+  cast: BiblePerson[];          // the cast web; cast[0] is the focal/core person
+  situation: string;            // the hidden ground truth, told straight
+  tensions: string[];           // "<A> wants X; <B> wants Y; because <reason>"
+  directions: Array<{ kind: 'ambient' | 'active'; hook: string }>; // quest seeds toward the fort
+}
+
+/** Render a structured bible into the clinical-truth text the beat-writer consumes. */
+export function renderBible(b: GenesisOut): string {
+  const cast = b.cast.map((p) => `- ${p.name} (${p.who}): ${p.history.join(' → ')}. wants: ${p.wants}. feels: ${p.feels}.${p.conceals ? ` conceals: ${p.conceals}.` : ''}`).join('\n');
+  const dirs = b.directions.map((d) => `- [${d.kind}] ${d.hook}`).join('\n');
+  return `TITLE: ${b.title}\nSITUATION (hidden truth): ${b.situation}\nCAST:\n${cast}\nTENSIONS:\n- ${b.tensions.join('\n- ')}\nOPEN DIRECTIONS:\n${dirs}`;
 }
 
 export interface ChainBeatInput {
@@ -136,13 +155,18 @@ export class MockNarrator implements Narrator {
   }
   async genesis(i: GenesisInput): Promise<GenesisOut> {
     const r = this.r(i);
-    const seed = i.focalTags[0]?.[2] ?? i.focalTags[0]?.[0] ?? 'a stranger';
+    const focalName = i.name ?? `${pick(r, NAMES)} ${pick(r, BYNAMES)}`;
+    const seed = i.focalTags[0]?.[2] ?? i.focalTags[0]?.[0] ?? 'a hard road';
     return {
-      title: `The ${pick(r, ['Debt', 'Wolf', 'Ledger', 'Vow', 'Oath'])} of ${i.region}`,
-      hook: `${i.personal ? (i.name ?? 'A merc') + "'s past" : 'A figure'} marked by ${seed} surfaces in ${i.region}.`,
-      bible: `Truth derived from the focal's tags (${i.focalTags[0]?.join(', ') ?? '—'}): their nature hides a buried cause. Each beat reveals one layer.`,
-      direction: i.personal ? 'Forces the merc to face who they are.' : 'Likely ends with a powerful recruit — or their grave.',
-      climax: 'A reckoning rooted in their own nature.',
+      title: `The Ledger of ${i.region}`,
+      leadBlurb: `A petitioner from ${i.region} brings a debt unpaid and a name they won't say.`,
+      cast: [
+        { name: focalName, who: i.who ?? `known for ${seed}`, history: [`shaped by ${seed}`, 'made a choice they cannot undo', 'now hides what it cost'], wants: 'to keep the past buried', feels: 'shame', conceals: 'the thing they did' },
+        { name: `${pick(r, NAMES)} of ${i.region}`, who: 'a witness', history: ['saw what happened'], wants: 'justice or silence-money', feels: 'fear', role: 'the one who remembers' },
+      ],
+      situation: `The focal (${i.focalTags[0]?.join(', ') ?? '—'}) did something in ${i.region} that a witness survived; both are bound to it.`,
+      tensions: [`${focalName} wants the past buried; the witness wants it answered; because only one of them can be safe.`],
+      directions: [{ kind: 'active', hook: `Someone hires the company to find the witness.` }, { kind: 'ambient', hook: `The witness drifts toward the fort's orbit.` }],
     };
   }
   async chainBeat(i: ChainBeatInput): Promise<ChainBeatOut> {

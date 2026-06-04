@@ -33,7 +33,23 @@ const zOutcome = z.object({
   punishment: z.string().nullable().optional(),
 });
 const zFlesh = z.object({ name: z.string(), who: z.string(), backstory: z.string(), quirks: z.array(z.string()).default([]) });
-const zGenesis = z.object({ title: z.string(), hook: z.string(), bible: z.string(), direction: z.string(), climax: z.string() });
+const zPerson = z.object({
+  name: z.string(), who: z.string().default(''),
+  history: z.array(z.string()).default([]),
+  wants: z.string().default(''), feels: z.string().default(''),
+  conceals: z.union([z.string(), z.boolean(), z.null()]).optional(),
+  roleInStory: z.string().optional(), role: z.string().optional(),
+});
+const zGenesis = z.object({
+  title: z.string(),
+  leadBlurb: z.string(),
+  // accept either flat persons or {person, roleInStory} nesting
+  cast: z.array(z.union([zPerson, z.object({ person: zPerson, roleInStory: z.string().optional() })])).default([]),
+  situation: z.string(),
+  tensions: z.array(z.string()).default([]),
+  directions: z.array(z.union([z.object({ kind: z.string().optional(), hook: z.string() }), z.string()])).default([]),
+  openDirections: z.array(z.union([z.object({ kind: z.string().optional(), hook: z.string() }), z.string()])).optional(),
+});
 const zChainBeat = z.object({ situation: z.string(), job: z.string(), ask: zAsk, proposedReward: z.string(), newLayerRevealed: z.string() });
 const zConcept = z.object({ name: z.string(), who: z.string(), tags: z.array(z.string()).default([]) });
 
@@ -168,43 +184,77 @@ export class OpenAINarrator implements Narrator {
   }
 
   async genesis(i: GenesisInput): Promise<GenesisOut> {
+    const depth: Record<string, string> = {
+      common: 'cast 2 people; the core person gets a ~3-4 link why-ladder; the other is a single-bullet edge.',
+      uncommon: 'cast 2-3 people; 1-2 deep (~4-6 link why-ladder), the rest single-bullet edges.',
+      rare: 'cast 3-5 people; 2-3 deep (~6-8 link why-ladders), each with a distinct stake.',
+      legendary: 'cast 4-6 people; 3-4 deep (~7-9 link why-ladders tracing to formative/childhood bedrock).',
+    };
     const system =
-      `You author the HIDDEN BIBLE (settled truth the player never sees) for a multi-quest story in a grimdark mercenary-fort game. The story is INVENTED FROM the focal character's tags — they are the only seed.\n` +
+      `You build the believable hidden TRUTH of a story — the reference a writers' room works from. NOT prose, NOT a mystery: what is ACTUALLY true, told straight. Mystery is added later by someone else who chooses what to reveal; your job is only to make the truth BELIEVABLE.\n` +
+      `You are given the CORE PERSON the story centers on (their tags / known life) and the region.\n\n` +
+      `BUILD EACH PERSON BY ASKING "WHY?" TO BEDROCK: start from a present fact and ask "why?" again and again to something irreducible — a love, loss, vow, debt, shame. Each answer is ONE history bullet, in order (e.g. "she avoids the harbour → a man drowned there → she untied the wrong line → she let them blame a boy"). \n` +
+      `SECRETS ARE NOT A FIELD: a person conceals something ONLY when a FEELING makes hiding natural (shame, guilt, fear). If history+feeling yields concealment, set "conceals"; else omit it. MOST people conceal NOTHING.\n` +
+      `Ladder DEEP only for the core person (and 1 other the story turns on); edge cast stay shallow.\n` +
+      `BELIEVABILITY: every present fact traces to a prior cause in history; ordinary human motives, not plot necessity; no coincidence-stacking; nobody acts dumb to keep the situation alive.\n` +
+      `COMMIT TO THE TRUTH: this bible IS the settled, complete truth. If a killing/theft/betrayal/disappearance happened, state plainly WHO did it and WHY. BANNED in the hidden layer: "unknown", "remains hidden", "it is unclear", "a mysterious figure", "the truth of X is never revealed" — you the author already know, so write it down.\n` +
+      `DERIVE EVERYTHING from the core person's tags: what would a person like THIS hide, want, be hunted for? Do NOT reach for a generic plot.\n\n` +
       `Output JSON only:\n` +
-      `{ "title": "<=6 words, evocative",\n` +
-      `  "hook": "<=20 words — the board-facing teaser (player-safe, no spoilers)",\n` +
-      `  "bible": "<=90 words — the settled truth: who the focal figure really is, the why-ladder, the buried cause. Clinical voice (state what IS). Invent supporting cast freely",\n` +
-      `  "direction": "<=18 words — the vague climax the arc builds toward",\n` +
-      `  "climax": "<=18 words — the intended final confrontation" }\n` +
-      `KEY RULE: DERIVE the whole story from the tags — ask "what would a person like THIS hide, want, or be hunted for?" A scarred soldier, a beautiful noble, a deceitful healer each imply a different buried truth. Do NOT reach for a generic plot; let these specific tags dictate it.\n` +
-      `RULES: mystery lives in the CAUSE, never the task. Terse, concrete. NEVER write numbers. JSON only.`;
-    const focals = i.focalTags.map((t, n) => `Focal ${n + 1}: [${t.join(', ')}]`).join('\n');
-    const framing = i.personal
-      ? `This is the existing mercenary ${i.name ?? ''}'s OWN buried past — the saga is about who they already are. Derive it from their tags.`
-      : `Invent a new figure and saga seeded entirely by these tags.`;
+      `{ "title": "short, concrete, names a real thing/person/place — NOT a poetic two-noun phrase like 'Oar and Scar', NOT 'The Weight of X'",\n` +
+      `  "leadBlurb": "1-2 sentences the PLAYER sees on the job board before meeting anyone — reads like a MUNDANE CONTRACT, reveals NONE of the hidden truth (a body, an unpaid debt, a missing barge — never the cast's secret names)",\n` +
+      `  "cast": [ { "name": "...", "who": "one line: what the world already knows of them", "history": ["the why-ladder, ordered cause→cause→bedrock"], "wants": "plain human want", "feels": "the feeling about their history", "conceals": "OPTIONAL: only if a feeling makes hiding natural", "role": "their role in the story" } ],\n` +
+      `  "situation": "2-4 sentences — the believable present truth, told straight (the hidden ground truth, NOT the blurb)",\n` +
+      `  "tensions": ["<Name A> wants <concrete X>; <Name B> wants <concrete Y>; because <plain reason they can't both have it>"],\n` +
+      `  "directions": [ { "kind": "active", "hook": "a contract/plea the company is invited into — a selectable quest seed framed toward the fort" }, { "kind": "ambient", "hook": "something that unfolds with or without the company" } ] }\n` +
+      `The FIRST cast entry MUST be the core person. ${depth[i.rarity ?? 'uncommon']} Include AT LEAST ONE 'active' and ONE 'ambient' direction.\n` +
+      `BANNED TOKENS: weight, shadow, burden, ghosts, fate, destiny. Clinical voice (state what IS). JSON only.`;
+    const core = i.personal
+      ? `CORE PERSON: the existing mercenary ${i.name ?? ''} — known as "${i.who ?? ''}"; ${i.backstory ?? ''}. Tags: [${i.focalTags[0]?.join(', ')}]. Build THEIR own buried past as NEW canon consistent with the above. Keep their name.`
+      : `CORE PERSON tags: [${i.focalTags[0]?.join(', ')}]. Invent and NAME them; the story centers on them.`;
     const avoid = i.avoid?.length
-      ? `\nDISTINCTNESS: recent sagas already in play — ${i.avoid.map((a) => `"${a}"`).join('; ')}. Make THIS premise clearly different from them (a different secret, crime, and fantasy — do NOT write another variation on the same theme, e.g. not another sinister-cook/hunger story if one is listed).`
+      ? `\nMake this DISTINCT from recent sagas: ${i.avoid.map((a) => `"${a}"`).join('; ')} — a different secret, crime, and fantasy.`
       : '';
-    const user = `${focals}\nREGION: ${i.region}\n${framing}${avoid}\nAuthor the bible. JSON only.`;
-    return this.json('genesis', system, user, zGenesis, this.narrativeModel, this.narrativeEffort, 2200);
+    const user = `${core}\nREGION: ${i.region}${avoid}\nBuild the bible. JSON only.`;
+    const out = await this.json('genesis', system, user, zGenesis, this.narrativeModel, this.narrativeEffort, 4000);
+    // flatten {person,roleInStory} → BiblePerson; coerce conceals
+    const cast = (out.cast ?? []).map((c) => {
+      const p = ('person' in c ? { ...c.person, role: c.roleInStory ?? c.person.role } : c) as Record<string, unknown>;
+      return {
+        name: String(p.name ?? 'Unknown'), who: String(p.who ?? ''),
+        history: Array.isArray(p.history) ? p.history.map(String) : [],
+        wants: String(p.wants ?? ''), feels: String(p.feels ?? ''),
+        conceals: typeof p.conceals === 'string' && p.conceals ? p.conceals : undefined,
+        role: p.role ? String(p.role) : undefined,
+      };
+    });
+    const dirsRaw = (out.directions?.length ? out.directions : out.openDirections) ?? [];
+    const directions = dirsRaw.map((d) => typeof d === 'string'
+      ? { kind: 'active' as const, hook: d }
+      : { kind: (d.kind === 'ambient' ? 'ambient' : 'active') as 'ambient' | 'active', hook: d.hook });
+    return { title: out.title, leadBlurb: out.leadBlurb, cast, situation: out.situation, tensions: out.tensions ?? [], directions };
   }
 
   async chainBeat(i: ChainBeatInput): Promise<ChainBeatOut> {
     const system =
-      `You write the NEXT quest card in a HIDDEN story for a grimdark mercenary-fort game.\n` +
-      `Given the hidden BIBLE (player NEVER sees it) and the CHAIN STATE (what the player already knows). This beat surfaces AT MOST ONE new layer of the truth.\n` +
+      `You are the quest-writer for a grimdark mercenary-fort game. A hidden BIBLE holds the complete settled truth of a story — its CAST are real people with wants that collide. The player NEVER sees the bible. Write the NEXT quest the company is offered, revealing the buried truth only a LITTLE at a time, through what the company can see and do.\n` +
+      `Given: the BIBLE (hidden truth + named cast), the CHAIN STATE (what's happened / what the player already knows), and the beat instruction.\n` +
       `Output JSON only:\n` +
-      `{ "situation": "<=45 words — what arrives at the gate; POV-LOCKED to what the company can see/hear; reference what they already learned",\n` +
-      `  "job": "one line — the concrete action this beat commits to",\n` +
+      `{ "situation": "<=55 words — what arrives AT THE FORT GATE: a named cast person, a body, a plea, a rumor. POV-LOCKED: only what the company can see/hear or already learned. Show, with concrete sensory detail.",\n` +
+      `  "job": "one plain line — exactly what taking this job commits the company to DO (escort / recover / guard / confront / investigate a specific thing)",\n` +
       `  "ask": { "attribute": "${ATTRS}", "favoredTags": ["0-3 bare tag words"], "slots": ["one per slot: open OR a tag word"] },\n` +
       `  "proposedReward": "<=12 words — the loot this beat plausibly yields; the GAME sets its value",\n` +
-      `  "newLayerRevealed": "<=15 words — the ONE new fact the player learns on success (writers-room note)" }\n` +
+      `  "newLayerRevealed": "<=18 words — the ONE CONCRETE fact the player learns on success: a NAME, a face, a specific deed (never 'a hidden actor' / 'a second figure' — name them or show the concrete symptom)" }\n` +
       `${VOCAB_BLOCK}\n` +
-      `ATTRIBUTE — pick the one this beat's CORE test needs and VARY it (physical=force, agility=speed/stealth, intelligence=lore/cunning, charisma=people, willpower=nerve). Most beats are NOT willpower; don't default to it.\n` +
-      `KEY RULE: the ASK and proposedReward must fit the MUNDANE SURFACE the player perceives, NOT the hidden truth. Prefer "open" slots. Only newLayerRevealed may touch the buried truth.\n` +
-      `RULES: state the JOB plainly; keep the WHY hidden. Terse, concrete. NEVER write numbers. JSON only.`;
-    const user = `HIDDEN BIBLE: ${i.bible}\nCHAIN STATE: ${i.chainState}\nREGION: ${i.region}\nSLOT COUNT: ${i.slotCount}\n${i.beatConstraint}. JSON only.`;
-    const out = await this.json('chainBeat', system, user, zChainBeat, this.mechanicalModel, 'minimal', 1600);
+      `CRAFT (this is character drama, not a logistics audit):\n` +
+      `- PUT THE CAST ON-STAGE. The chain is about the bible's PEOPLE. Bring a NAMED cast member into this beat in the flesh; never run the whole story through a faceless clerk/contract while the real characters stay off-screen.\n` +
+      `- BEAT 1 = ATTACHMENT. Open on a low-stakes HUMAN moment that makes the player care about one named cast person (their specific grief / want shown in small action) — NOT a cold procedural task. Even if a client hires you, bring a core character on-stage as a person.\n` +
+      `- VARY THE BEAT. Each beat does something DIFFERENT: meet/warm-to → investigate → confront → protect → a turn or betrayal → reveal. CHAIN STATE lists what already happened — do NOT reopen on the same scene, object, place, or cast-member entrance you used before (no "X staggers to the gate with the strongbox" twice). Change WHO is on stage, WHERE it happens, and the ACTION.\n` +
+      `- CONCRETE SYMPTOMS, NOT CAUSES. Show a corpse, never the murderer's name; a missing barge, never the smuggling ring. The hidden CAUSE stays buried; reveal one small concrete layer.\n` +
+      `- CONTINUITY. Follow believably from CHAIN STATE — react to what the company just did and what's now in motion. Don't reset to a fresh unrelated job.\n` +
+      `ATTRIBUTE — pick the one this beat's core test needs and VARY it (physical=force, agility=speed/stealth, intelligence=lore/cunning, charisma=people, willpower=nerve). Most beats are NOT willpower.\n` +
+      `The ASK fits the MUNDANE SURFACE, not the hidden truth. Prefer "open" slots. State the job plainly; keep the WHY hidden. Vivid but concrete; NEVER write numbers. JSON only.`;
+    const user = `HIDDEN BIBLE:\n${i.bible}\n\nCHAIN STATE: ${i.chainState}\nREGION: ${i.region}\nSLOT COUNT: ${i.slotCount}\n${i.beatConstraint} JSON only.`;
+    const out = await this.json('chainBeat', system, user, zChainBeat, this.narrativeModel, this.narrativeEffort, 1800);
     const ask = normAsk(out.ask);
     while (ask.slots.length < i.slotCount) ask.slots.push({ kind: 'open' });
     ask.slots.length = i.slotCount;

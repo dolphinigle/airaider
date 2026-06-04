@@ -1,7 +1,7 @@
 // Real-AI smoke test of the Narrator against the LOCKED vocab. Hits the network.
 // Run: npm run aismoke   (needs OPENAI_API_KEY in ../.env or env)
 import { readFileSync } from 'node:fs';
-import { makeNarrator } from './ai.js';
+import { makeNarrator, renderBible } from './ai.js';
 
 function loadKey(): string {
   if (process.env.OPENAI_API_KEY) return process.env.OPENAI_API_KEY;
@@ -42,7 +42,7 @@ const gen = await n.genesis({ focalTags: [['Female', 'Noble', 'Proud', 'Frail']]
 console.log(JSON.stringify(gen, null, 2), '\n');
 
 console.log('— chainBeat (beat 1)');
-const cb = await n.chainBeat({ bible: gen.bible, chainState: 'Beat 1: nothing known yet.', region: 'the river marches of Kovar', slotCount: 2, beatConstraint: 'Write beat 1 (the deniable opener)' });
+const cb = await n.chainBeat({ bible: renderBible(gen), chainState: 'Beat 1: nothing known yet.', region: 'the river marches of Kovar', slotCount: 2, beatConstraint: 'Write beat 1 (the deniable opener)' });
 console.log(JSON.stringify(cb, null, 2), '\n');
 
 console.log('✓ smoke complete');

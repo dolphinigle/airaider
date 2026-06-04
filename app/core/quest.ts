@@ -12,7 +12,7 @@ import type {
 import type { Rng } from './rng.js';
 import { rngFrom, randInt, pick } from './rng.js';
 import type { Narrator } from './ai.js';
-import { tagLabels } from './ai.js';
+import { tagLabels, renderBible } from './ai.js';
 import {
   BALANCE, thresholdFor, resolveRoll, estimateOdds, attrsAtLevel,
   generateCharacter, type RollTest,
@@ -70,9 +70,9 @@ function ownedMercTags(state: GameState): Set<string> {
   for (const m of allMercs(state)) for (const t of m.tags) s.add(t.id);
   return s;
 }
-// recent saga hooks fed to genesis so each new bible is steered AWAY from repeats
-function recentHooks(state: GameState): string[] {
-  return Object.values(state.chains).slice(-4).map((c) => c.hook).filter(Boolean);
+// recent saga titles fed to genesis so each new bible is steered AWAY from repeats
+function recentTitles(state: GameState): string[] {
+  return Object.values(state.chains).slice(-4).map((c) => c.title).filter(Boolean);
 }
 // skill tags of recent (non-personal) focals — excluded from the next focal so the THEME varies
 // (the avoid-hooks nudge can't beat tags that literally are food/beast; this fixes it at the root)
@@ -125,9 +125,12 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
   const focal = characterFromGen(mk(state), gen, 'npc', state.cycle);
   focal.location = 'limbo';
   addCard(state, focal);
-  const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], region: lead.location, avoid: recentHooks(state) });
+  const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], region: lead.location, rarity: lead.rarity, avoid: recentTitles(state) });
+  // the bible NAMES the core person (cast[0]) — that's the focal; adopt their name/face now
+  const core = g.cast[0];
+  if (core) { focal.name = core.name; focal.who = core.who; focal.backstory = core.history.join(' '); }
   const chain: Chain = {
-    id: uid(state, 'chain'), title: g.title, hook: g.hook, bible: g.bible, direction: g.direction,
+    id: uid(state, 'chain'), title: g.title, hook: g.leadBlurb, bible: renderBible(g), direction: g.directions[0]?.hook ?? '',
     focalCardIds: [focal.id], rarity: lead.rarity, level: lead.level, expectedBeats: B, beatsResolved: 0,
     mercCyclesSpent: 0, climaxTarget: B * n, state: 'live', log: [],
   };
@@ -144,9 +147,9 @@ async function genesisPersonalChain(state: GameState, ai: Narrator, r: Rng, lead
   const merc = state.cards[mercId] as CharacterCard | undefined;
   if (!merc || merc.role !== 'merc') return pursueOneOff(state, ai, r, lead);
   const B = randInt(r, 2, 3);
-  const g = await ai.genesis({ focalTags: [tagLabels(merc.tags)], region: lead.location, personal: true, name: merc.name, avoid: recentHooks(state) });
+  const g = await ai.genesis({ focalTags: [tagLabels(merc.tags)], region: lead.location, rarity: lead.rarity, personal: true, name: merc.name, who: merc.who, backstory: merc.backstory, avoid: recentTitles(state) });
   const chain: Chain = {
-    id: uid(state, 'chain'), title: g.title, hook: g.hook, bible: g.bible, direction: g.direction,
+    id: uid(state, 'chain'), title: g.title, hook: g.leadBlurb, bible: renderBible(g), direction: g.directions[0]?.hook ?? '',
     focalCardIds: [merc.id], rarity: lead.rarity, level: merc.level, expectedBeats: B, beatsResolved: 0,
     // personal beats run ~1 merc each (the anchor); gate on B*2 effort so the saga gets a few
     // beats to breathe before the finale rather than beat-1 → finale in one step.
@@ -333,14 +336,14 @@ export async function resolveQuest(state: GameState, ai: Narrator, quest: Quest)
   // flowchart step 9: flesh delivered characters (backstory + quirks → the living dossier).
   // Only the keepers (mercs/captives) and only once (skip if already fleshed) to bound cost.
   for (const c of deliveredChars) {
-    if (c.backstory || c.role === 'dead') continue;
+    if (c.role === 'dead' || (c.backstory && c.quirks.length)) continue; // already a complete card
     try {
       const f = await ai.flesh({ tags: tagLabels(c.tags), attrs: c.attrs, context: `acquired via "${quest.job}"` });
       if (f.name && (!c.name || c.name === 'Unknown')) c.name = f.name;
-      if (f.who) c.who = f.who;
-      c.backstory = f.backstory;
-      if (f.quirks?.length) c.quirks = f.quirks;
-    } catch { /* leave name/who from the outcome call */ }
+      if (f.who && !c.who) c.who = f.who;
+      if (!c.backstory) c.backstory = f.backstory;            // keep a chain focal's why-ladder backstory
+      if (!c.quirks.length && f.quirks?.length) c.quirks = f.quirks;
+    } catch { /* leave what we have */ }
   }
 
   // free mercs + grant xp + level
@@ -477,8 +480,9 @@ function recordBeat(state: GameState, quest: Quest, outcome: Outcome, partySize:
   chain.beatsResolved += 1;
   // the truth only surfaces on success/partial (newLayerRevealed = "what the player learns on
   // success"). A failed beat advances effort (climax gate) but reveals NOTHING — the mystery holds.
-  const learned = outcome === 'failure' ? `made no headway — the truth stays hidden` : (quest.stakes || quest.job);
-  chain.log.push(`Beat ${chain.beatsResolved} (${outcome}): ${learned}`);
+  // record the ACTION too (not just the reveal) so the next beat varies its staging and doesn't repeat
+  const learned = outcome === 'failure' ? `made no headway — the truth stays hidden` : (quest.stakes || 'a step forward');
+  chain.log.push(`Beat ${chain.beatsResolved} (${outcome}): the company set to "${quest.job}" — ${learned}`);
   if (quest.finale) { chain.state = 'done'; if (outcome !== 'failure') maybeSpawnSequel(state, chain); return true; }
   if (chain.mercCyclesSpent >= chain.climaxTarget) chain.state = 'finale-ready';
   return false;
