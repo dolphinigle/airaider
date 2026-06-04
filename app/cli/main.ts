@@ -43,6 +43,19 @@ function slotFit(m: CharacterCard, q: Quest, slotIndex: number): number {
 }
 function autoAssign(): void {
   for (const q of eng.activeQuests()) {
+    if (q.groups) {
+      // grouped finale: pick the single (branch-slot, merc) pairing with the best fit
+      let best: { slot: number; merc: string; fit: number } | null = null;
+      for (const g of q.groups) {
+        const i = g.slotIndices[0];
+        for (const m of eng.eligibleMercs(q, i)) {
+          const fit = slotFit(m, q, i);
+          if (!best || fit > best.fit) best = { slot: i, merc: m.id, fit };
+        }
+      }
+      if (best) eng.assign(q.id, best.slot, best.merc);
+      continue;
+    }
     for (let i = 0; i < q.slots.length; i++) {
       if (q.slots[i].filledBy) continue;
       const elig = eng.eligibleMercs(q, i).sort((a, b) => slotFit(b, q, i) - slotFit(a, q, i));

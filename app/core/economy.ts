@@ -63,7 +63,8 @@ const ATTR_BIAS: Record<string, Attribute> = {
   'skill:magic-fire': 'intelligence', 'skill:magic-earth': 'intelligence',
   'skill:magic-water': 'intelligence', 'skill:magic-air': 'intelligence', 'skill:magic-dark': 'intelligence',
   'phys:beautiful': 'charisma', 'bg:noble': 'charisma', 'skill:song': 'charisma', 'bg:merchant': 'charisma',
-  'phys:tough': 'willpower', 'bg:priest': 'willpower', 'pers:brave': 'willpower',
+  'pers:kind': 'charisma', 'pers:gregarious': 'charisma',
+  'phys:tough': 'willpower', 'bg:priest': 'willpower', 'pers:brave': 'willpower', 'skill:heal': 'intelligence',
 };
 
 // ---- talents & attributes ---------------------------------------------------

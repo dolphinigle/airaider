@@ -49,13 +49,22 @@ export function questCard(eng: GameEngine, q: Quest): string {
   lines.push('  ' + q.situation);
   lines.push('  ' + yel('Job: ') + q.job);
   if (q.stakes) lines.push('  ' + dim('whisper: ' + q.stakes));
-  q.slots.forEach((s) => {
-    const req = s.requirement.kind === 'must-have' ? ` must:${tagName(s.requirement.tag)}`
-      : s.requirement.kind === 'must-be' ? ` must be ${eng.state.cards[s.requirement.cardId]?.name ?? 'them'}` : '';
-    const fav = s.tested.favored.map((t) => tagName(t)).join('/');
-    const who = s.filledBy ? grn(eng.state.cards[s.filledBy]?.name ?? s.filledBy) : dim('empty');
-    lines.push(`    slot ${s.index} ${dim('tests ' + s.tested.attribute + (fav ? ' +[' + fav + ']' : '') + req)} → ${who}`);
-  });
+  if (q.groups) {
+    lines.push('  ' + mag('Choose ONE approach:'));
+    for (const g of q.groups) {
+      const s = q.slots[g.slotIndices[0]];
+      const who = s?.filledBy ? grn(eng.state.cards[s.filledBy]?.name ?? s.filledBy) : dim('empty');
+      lines.push(`    ${b('⟐ ' + g.label)} → ${yel(g.rewardKind)} ${dim('· tests ' + s.tested.attribute + ' (thr ' + g.threshold + ') slot ' + s.index)} → ${who}`);
+    }
+  } else {
+    q.slots.forEach((s) => {
+      const req = s.requirement.kind === 'must-have' ? ` must:${tagName(s.requirement.tag)}`
+        : s.requirement.kind === 'must-be' ? ` must be ${eng.state.cards[s.requirement.cardId]?.name ?? 'them'}` : '';
+      const fav = s.tested.favored.map((t) => tagName(t)).join('/');
+      const who = s.filledBy ? grn(eng.state.cards[s.filledBy]?.name ?? s.filledBy) : dim('empty');
+      lines.push(`    slot ${s.index} ${dim('tests ' + s.tested.attribute + (fav ? ' +[' + fav + ']' : '') + req)} → ${who}`);
+    });
+  }
   const o = v.odds;
   lines.push('  ' + dim(`coins ${v.coins} vs threshold ${q.threshold} → `) + grn(`S ${(o.success * 100) | 0}%`) + ' ' + yel(`P ${(o.partial * 100) | 0}%`) + ' ' + red(`F ${(o.failure * 100) | 0}%`));
   return lines.join('\n');

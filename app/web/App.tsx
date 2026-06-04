@@ -93,6 +93,29 @@ function Slot({ quest, index }: { quest: Quest; index: number }) {
   );
 }
 
+function Branch({ quest, group }: { quest: Quest; group: import('../core/types.js').ApproachGroup }) {
+  const eng = useEng();
+  const assign = useGame((s) => s.assign);
+  const unassign = useGame((s) => s.unassign);
+  if (!eng) return null;
+  const i = group.slotIndices[0];
+  const slot = quest.slots[i];
+  const filled = slot.filledBy ? eng.state.cards[slot.filledBy] as CharacterCard : null;
+  const eligible = eng.eligibleMercs(quest, i);
+  const kindWord = group.rewardKind === 'recruit' ? 'they join you' : group.rewardKind === 'captive' ? 'caged as a captive' : 'sold for gold';
+  return (
+    <div className={`branch ${filled ? 'chosen' : ''}`}>
+      <div className="branch-top"><b>{group.label}</b> <span className="kind">→ {kindWord}</span><span className="bthr">tests {slot.tested.attribute} · thr {group.threshold}</span></div>
+      {filled
+        ? <div className="slot-filled"><span>{filled.name}</span><button onClick={() => unassign(quest.id, i)}>✕</button></div>
+        : <select defaultValue="" onChange={(e) => e.target.value && assign(quest.id, i, e.target.value)}>
+            <option value="">— send merc (picks this approach) —</option>
+            {eligible.map((m) => <option key={m.id} value={m.id}>{m.name} (L{m.level})</option>)}
+          </select>}
+    </div>
+  );
+}
+
 function QuestCard({ quest }: { quest: Quest }) {
   const eng = useEng();
   if (!eng) return null;
@@ -107,7 +130,9 @@ function QuestCard({ quest }: { quest: Quest }) {
       </div>
       <p className="situation">{quest.situation}</p>
       <p className="job"><b>Job:</b> {quest.job}</p>
-      <div className="slots">{quest.slots.map((_, i) => <Slot key={i} quest={quest} index={i} />)}</div>
+      {quest.groups
+        ? <div className="branches"><div className="branchhdr">Choose ONE approach:</div>{quest.groups.map((g) => <Branch key={g.id} quest={quest} group={g} />)}</div>
+        : <div className="slots">{quest.slots.map((_, i) => <Slot key={i} quest={quest} index={i} />)}</div>}
       <div className="odds">
         <span className="bar"><i className="s" style={{ flex: o.success }} /><i className="p" style={{ flex: o.partial }} /><i className="f" style={{ flex: o.failure }} /></span>
         <span className="oddtext">{(o.success * 100) | 0}% / {(o.partial * 100) | 0}% / {(o.failure * 100) | 0}% · {v.coins} coins vs {quest.threshold}</span>

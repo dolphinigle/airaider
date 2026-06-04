@@ -7,7 +7,7 @@
 // because one-off, chain-beat, and finale share buildQuest/assign/resolve/deliver.
 
 import type {
-  GameState, Lead, Quest, QuestSlot, Chain, CharacterCard, Outcome, RewardBundle,
+  GameState, Lead, Quest, QuestSlot, Chain, CharacterCard, Outcome, RewardBundle, ApproachGroup,
 } from './types.js';
 import type { Rng } from './rng.js';
 import { rngFrom, randInt } from './rng.js';
@@ -20,7 +20,7 @@ import {
 import { generateReward, rewardEnvelope } from './reward.js';
 import { characterFromGen, liabilityCard, type MkId } from './cards.js';
 import { tagDef } from './tags.js';
-import { uid, addCard, logLine, allMercs } from './state.js';
+import { uid, addCard, logLine, allMercs, captives } from './state.js';
 import { slotCountFor, queueMainChain } from './leads.js';
 import { captiveCapacity, levelCap } from './fort.js';
 
@@ -177,19 +177,36 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
     const side = Math.round(BALANCE.vBase(chain.level) * 0.6);
     reward = generateReward(r, mk(state), state.cycle, { V: side, archetype: 'contract', isChain: false, level: chain.level });
   }
-  const slots = buildSlots(beat.ask, n, ownedMercTags(state));
-  // a personal-chain beat pins its anchor: slot 0 must be the merc the saga is about,
-  // and every OTHER slot is forced open (the anchor is the only hard requirement — else a
-  // second must:<tag> the anchor alone satisfies would make the beat unfillable).
-  if (anchorMercId && slots[0]) {
-    slots[0].requirement = { kind: 'must-be', cardId: anchorMercId };
-    for (let i = 1; i < slots.length; i++) slots[i].requirement = { kind: 'open' };
+  // A non-personal finale offers MUTEX APPROACH-GROUPS (docs/QUESTS.md §9): the focal's
+  // value/tags are fixed; the branch the player fills decides the KIND (welcome / cage / sell).
+  let slots: QuestSlot[];
+  let groups: ApproachGroup[] | undefined;
+  if (isFinale && !chain.personal) {
+    slots = []; groups = [];
+    const fav = beat.ask.favoredTags;
+    const clash = clashingFor(fav);
+    const addGroup = (id: string, label: string, kind: 'recruit' | 'captive' | 'gold', attribute: Quest['slots'][number]['tested']['attribute'], thrMult: number) => {
+      const index = slots.length;
+      slots.push({ index, requirement: { kind: 'open' }, tested: { attribute, favored: fav, clashing: clash }, groupId: id });
+      groups!.push({ id, label, rewardKind: kind, threshold: Math.max(2, Math.round(thresholdFor(1, chain.level) * thrMult)), slotIndices: [index] });
+    };
+    addGroup('winover', 'Win them over', 'recruit', 'charisma', 1.1);
+    addGroup('subdue', 'Subdue them', 'captive', 'physical', 1.1);
+    addGroup('ransom', 'Ransom / sell', 'gold', 'agility', 0.75);
+  } else {
+    slots = buildSlots(beat.ask, n, ownedMercTags(state));
+    // a personal-chain beat pins its anchor: slot 0 must be the merc the saga is about,
+    // and every OTHER slot is forced open (else a second must:<tag> only the anchor satisfies → unfillable).
+    if (anchorMercId && slots[0]) {
+      slots[0].requirement = { kind: 'must-be', cardId: anchorMercId };
+      for (let i = 1; i < slots.length; i++) slots[i].requirement = { kind: 'open' };
+    }
   }
   const quest: Quest = {
     id: uid(state, 'quest'), leadId: lead.id, rarity: chain.rarity, level: chain.level, location: lead.location,
     archetype: 'investigate', chainId: chain.id, beat: chain.beatsResolved + 1, finale: isFinale,
     title: chain.title, situation: beat.situation, job: beat.job, stakes: beat.newLayerRevealed,
-    slots, threshold: thresholdFor(n, chain.level),
+    slots, groups, threshold: thresholdFor(n, chain.level),
     reward, risky: isFinale || chain.rarity === 'rare' || chain.rarity === 'legendary',
   };
   state.quests[quest.id] = quest;
@@ -212,9 +229,23 @@ export function assign(state: GameState, quest: Quest, slotIndex: number, mercId
   if (!merc || !slotEligible(quest, slotIndex, merc)) return false;
   // clear any prior slot this merc held on this quest
   for (const s of quest.slots) if (s.filledBy === mercId) s.filledBy = undefined;
+  // mutex approach-groups: choosing a slot in one group frees every slot in the OTHER groups
+  if (quest.groups) {
+    const myGroup = quest.slots[slotIndex].groupId;
+    for (const s of quest.slots) if (s.groupId !== myGroup && s.filledBy) { if (state.cards[s.filledBy]) state.cards[s.filledBy].location = 'roster'; s.filledBy = undefined; }
+  }
   quest.slots[slotIndex].filledBy = mercId;
   merc.location = `quest:${quest.id}`;
   return true;
+}
+
+/** The approach-group the player has committed to (the one with a filled slot), if any. */
+export function chosenGroup(quest: Quest): ApproachGroup | undefined {
+  if (!quest.groups) return undefined;
+  return quest.groups.find((g) => g.slotIndices.some((i) => quest.slots[i]?.filledBy));
+}
+function effectiveThreshold(quest: Quest): number {
+  return chosenGroup(quest)?.threshold ?? quest.threshold;
 }
 export function unassign(state: GameState, quest: Quest, slotIndex: number): void {
   const id = quest.slots[slotIndex].filledBy;
@@ -237,9 +268,13 @@ function coinsForSlot(c: CharacterCard, slot: QuestSlot): number {
   return Math.max(0, Math.round(coins));
 }
 export function questOdds(state: GameState, quest: Quest) {
-  return estimateOdds(questCoins(state, quest), quest.threshold);
+  return estimateOdds(questCoins(state, quest), effectiveThreshold(quest));
 }
-export function isFilled(quest: Quest): boolean { return quest.slots.every((s) => s.filledBy); }
+export function isFilled(quest: Quest): boolean {
+  // a grouped finale is "filled" once one approach-group's slots are all filled
+  if (quest.groups) { const g = chosenGroup(quest); return !!g && g.slotIndices.every((i) => quest.slots[i]?.filledBy); }
+  return quest.slots.every((s) => s.filledBy);
+}
 
 // ---- resolution -------------------------------------------------------------
 export interface QuestResult {
@@ -251,7 +286,8 @@ export async function resolveQuest(state: GameState, ai: Narrator, quest: Quest)
   const r = rngFrom(`${state.seed}:resolve:${quest.id}:${state.cycle}`);
   const party = partyOf(state, quest);
   const coins = questCoins(state, quest);
-  const roll = resolveRoll(r, coins, quest.threshold);
+  const threshold = effectiveThreshold(quest);
+  const roll = resolveRoll(r, coins, threshold);
   const outcome = roll.outcome;
 
   // tags of the captive/recruit the bundle would deliver (for AI naming), if any & not failure
@@ -279,7 +315,7 @@ export async function resolveQuest(state: GameState, ai: Narrator, quest: Quest)
 
   delete state.quests[quest.id];
   logLine(state, `${outcome.toUpperCase()} — ${quest.job}`);
-  return { questId: quest.id, outcome, coins, heads: roll.heads, threshold: quest.threshold, beforeText: narr.beforeRoll, afterText: narr.afterRoll, delivered, chainDone };
+  return { questId: quest.id, outcome, coins, heads: roll.heads, threshold, beforeText: narr.beforeRoll, afterText: narr.afterRoll, delivered, chainDone };
 }
 
 function grantXp(state: GameState, m: CharacterCard, level: number, outcome: Outcome): void {
@@ -348,9 +384,25 @@ function handleFinaleFate(state: GameState, quest: Quest, outcome: Outcome, out:
   if (!focal) return;
   if (chain?.personal) { handlePersonalFinale(focal, outcome, out); return; }
   if (aiCaptive) { focal.name = aiCaptive.name; focal.who = aiCaptive.who; }
-  if (outcome === 'success') { focal.role = 'merc'; focal.location = 'roster'; queueMainChain(state, focal.id); out.push(`the saga's heart joins you: ${focal.name}`); }
-  else if (outcome === 'partial') { focal.role = 'merc'; focal.location = 'roster'; focal.injuries.push({ id: 'injury:wound', tier: 3 }); queueMainChain(state, focal.id); out.push(`${focal.name} joins you, but wounded`); }
-  else { focal.role = 'dead'; focal.location = 'limbo'; out.push(`${focal.name} is lost — the saga ends in grief`); }
+  // the chosen approach-group decides the KIND; the roll decides whether you get it clean
+  const kind = chosenGroup(quest)?.rewardKind ?? 'recruit';
+  if (kind === 'gold') {
+    const g = Math.round(focal.value * (outcome === 'success' ? 1 : outcome === 'partial' ? 0.5 : 0));
+    focal.role = 'dead'; focal.location = 'limbo'; // sold/handed off — leaves your story
+    if (g > 0) { state.gold += g; out.push(`${focal.name} sold off for ${g} gold`); } else out.push(`the deal collapses — ${focal.name} slips away with nothing gained`);
+    return;
+  }
+  if (outcome === 'failure') { focal.role = 'dead'; focal.location = 'limbo'; out.push(`${focal.name} is lost — the saga ends in grief`); return; }
+  const wounded = outcome === 'partial';
+  if (wounded) focal.injuries.push({ id: 'injury:wound', tier: 3 });
+  if (kind === 'captive') {
+    const held = captives(state).length;
+    focal.role = 'captive'; focal.location = held < captiveCapacity(state) ? 'dungeon' : 'roster';
+    out.push(`${focal.name} is taken captive${wounded ? ', wounded' : ''}`);
+  } else { // recruit
+    focal.role = 'merc'; focal.location = 'roster'; queueMainChain(state, focal.id);
+    out.push(`${focal.name} joins the company${wounded ? ', but wounded' : ''}`);
+  }
 }
 
 // A personal finale develops the EXISTING merc, gated by the roll (docs/QUESTS.md §6).

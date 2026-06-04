@@ -47,6 +47,12 @@ h3 { margin: 0 0 8px; font-size: 13px; letter-spacing: .08em; text-transform: up
 .slot-test { font-size: 12px; color: var(--dim); margin-bottom: 5px; } .slot-test b { color: var(--ink); text-transform: capitalize; } .slot-test .req { color: var(--gold); }
 .slot-filled { display: flex; justify-content: space-between; align-items: center; color: var(--s); }
 .slot-filled button { padding: 1px 7px; }
+.branches { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; }
+.branchhdr { color: var(--mag); font-size: 12px; letter-spacing: .05em; }
+.branch { background: var(--panel2); border: 1px solid var(--line); border-left: 3px solid var(--mag); border-radius: 4px; padding: 7px 9px; }
+.branch.chosen { border-color: var(--gold); background: #2c2318; }
+.branch-top { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 5px; }
+.branch-top .kind { color: var(--accent); font-size: 12px; } .branch-top .bthr { color: var(--dim); font-size: 11px; margin-left: auto; }
 .odds { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
 .bar { display: flex; flex: 0 0 180px; height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid var(--line); }
 .bar i { display: block; } .bar .s { background: var(--s); } .bar .p { background: var(--p); } .bar .f { background: var(--f); }
