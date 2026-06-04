@@ -161,11 +161,11 @@ export class GameEngine {
   /** End the day: roll + narrate every assigned quest, deliver, then advance the cycle. */
   async endDay(): Promise<QuestResult[]> {
     this.state.phase = 'resolution';
-    const results: QuestResult[] = [];
-    for (const quest of Object.values(this.state.quests)) {
-      if (!isFilled(quest)) continue; // unfilled quests simply don't resolve (mercs return)
-      results.push(await resolveQuest(this.state, this.ai, quest));
-    }
+    // resolve all filled quests CONCURRENTLY (each has its own seed + reward; the human
+    // shouldn't wait on N sequential AI calls). Order the reveal deterministically after.
+    const filled = Object.values(this.state.quests).filter(isFilled);
+    const settled = await Promise.all(filled.map((q) => resolveQuest(this.state, this.ai, q)));
+    const results = settled.sort((a, b) => a.questId.localeCompare(b.questId));
     // return any mercs on unfilled quests, drop those quests (lead consumed)
     for (const quest of Object.values(this.state.quests)) {
       for (const s of quest.slots) if (s.filledBy && this.state.cards[s.filledBy]) this.state.cards[s.filledBy].location = 'roster';

@@ -104,7 +104,8 @@ async function autoPlay(cycles: number): Promise<void> {
     const order = [...eng.leads()].sort((a, b) => (b.chain.kind !== 'none' ? 2 : 0) - (a.chain.kind !== 'none' ? 2 : 0));
     let pursued = 0;
     for (const lead of order) {
-      if (eng.freeMercs().length < 1 || pursued >= 3) break;
+      // pursue conservatively so we can actually FILL what we take (spreading thin = failures)
+      if (eng.freeMercs().length < 2 || pursued >= 2) break;
       const res = await eng.pursue(lead.id);
       if ('error' in res) continue;
       pursued++;
@@ -117,8 +118,24 @@ async function autoPlay(cycles: number): Promise<void> {
     if (!results.length) console.log(C.dim('  (nothing resolved)\n'));
   }
   console.log('\n' + status(eng));
-  console.log('\n' + C.mag('Sagas:'));
-  for (const ch of Object.values(eng.state.chains)) console.log(`  "${ch.title}" [${ch.state}] ${ch.beatsResolved} beats, ${ch.mercCyclesSpent}/${ch.climaxTarget} cycles — ${C.dim(ch.hook)}`);
+  // ---- DOSSIER DUMP: read character data + full saga arcs to judge writing/attachment ----
+  console.log('\n' + C.b('════ CHARACTER DOSSIERS ════'));
+  for (const m of [...eng.mercs(), ...eng.captives()]) {
+    console.log(`\n${C.b(m.name)} ${C.dim('[' + m.role + ' · L' + m.level + ']')}`);
+    console.log('  ' + C.dim('tags: ') + m.tags.map((t) => t.id).join(', '));
+    console.log('  ' + C.dim('who:  ') + (m.who ?? '—'));
+    console.log('  ' + C.dim('past: ') + (m.backstory ?? '—'));
+    console.log('  ' + C.dim('quirks: ') + JSON.stringify(m.quirks));
+    if (m.chainIds.length) console.log('  ' + C.dim('sagas: ') + m.chainIds.map((id) => eng.state.chains[id]?.title).filter(Boolean).join(' · '));
+  }
+  console.log('\n' + C.b('════ SAGA ARCS (read for coherence + quality) ════'));
+  for (const ch of Object.values(eng.state.chains)) {
+    console.log(`\n${C.mag('"' + ch.title + '"')} ${C.dim('[' + ch.state + '] ' + ch.beatsResolved + ' beats')}`);
+    console.log('  ' + C.dim('hook:   ') + ch.hook);
+    console.log('  ' + C.dim('bible:  ') + ch.bible);
+    console.log('  ' + C.dim('aim:    ') + ch.direction);
+    ch.log.forEach((l) => console.log('  ' + C.dim('· ') + l));
+  }
 }
 
 // ---- interactive REPL -------------------------------------------------------

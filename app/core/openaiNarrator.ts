@@ -58,6 +58,7 @@ export class OpenAINarrator implements Narrator {
   private model: string;
   private log: (s: string) => void;
   private onCall?: (rec: AICallRecord) => void;
+  private effortOverride?: 'minimal' | 'low' | 'medium';
   private callCount = 0;
 
   constructor(opts: NarratorOptions) {
@@ -65,16 +66,17 @@ export class OpenAINarrator implements Narrator {
     this.model = opts.model ?? 'gpt-5-mini';
     this.log = opts.log ?? (() => {});
     this.onCall = opts.onCall;
+    this.effortOverride = opts.effort ?? (typeof process !== 'undefined' ? process.env.AI_EFFORT as 'minimal' | 'low' | 'medium' | undefined : undefined);
   }
 
-  private async json<T>(kind: string, system: string, user: string, schema: z.ZodType<T>, effort: 'minimal' | 'low' = 'low', maxTokens = 2000): Promise<T> {
+  private async json<T>(kind: string, system: string, user: string, schema: z.ZodType<T>, effort: 'minimal' | 'low' | 'medium' = 'low', maxTokens = 2000): Promise<T> {
     const res = await this.client.chat.completions.create({
       model: this.model,
       messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
       response_format: { type: 'json_object' },
       max_completion_tokens: maxTokens,
       // reasoning_effort is a gpt-5 param the SDK types may not surface yet
-      ...( { reasoning_effort: effort } as Record<string, unknown> ),
+      ...( { reasoning_effort: this.effortOverride ?? effort } as Record<string, unknown> ),
     } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
     const usage = res.usage;
     const cached = (usage as unknown as { prompt_tokens_details?: { cached_tokens?: number } })?.prompt_tokens_details?.cached_tokens ?? 0;
@@ -101,7 +103,7 @@ export class OpenAINarrator implements Narrator {
       `${VOCAB_BLOCK}\n` +
       `RULES: terse, plain, concrete. State the job so the player knows exactly what taking it commits them to. NEVER write numbers. slots length must equal the SLOT COUNT given. Prefer "open" slots. JSON only.`;
     const user = `Archetype: ${i.archetype}\nLocation: ${i.location}\nSlot count: ${i.slotCount}\nThe job results in ${i.rewardSeed}.\nWrite the card + ask. JSON only.`;
-    const out = await this.json('cardAsk', system, user, zCardAsk, 'low', 1200);
+    const out = await this.json('cardAsk', system, user, zCardAsk, 'minimal', 1200);
     const ask = normAsk(out.ask);
     while (ask.slots.length < i.slotCount) ask.slots.push({ kind: 'open' });
     ask.slots.length = i.slotCount;
@@ -125,7 +127,7 @@ export class OpenAINarrator implements Narrator {
       `DELIVERED CAPTIVE TAGS: ${i.captiveTags ? '[' + i.captiveTags.join(', ') + ']' : 'none'}\n` +
       (i.approach ? `CHOSEN APPROACH: ${i.approach} — the afterRoll MUST read as this approach.\n` : '') +
       `RISKY: ${i.risky ? 'yes' : 'no'}\nOUTCOME: ${i.outcome.toUpperCase()}\nNarrate, continuing from the card. JSON only.`;
-    const out = await this.json('outcome', system, user, zOutcome, 'low', 1600);
+    const out = await this.json('outcome', system, user, zOutcome, 'minimal', 1600);
     return { beforeRoll: out.beforeRoll, afterRoll: out.afterRoll, captive: out.captive ?? null, punishment: out.punishment ?? null };
   }
 
@@ -140,7 +142,7 @@ export class OpenAINarrator implements Narrator {
       `RULES: every word consistent with the given tags (a cowardly one is never 'fearless'; a priest is not a thief). High attributes read as natural giftedness, not loot. Terse, concrete, grimdark. NEVER write numbers. JSON only.`;
     const attrs = ATTRIBUTES.map((a) => `${a} ${i.attrs[a]}`).join(', ');
     const user = `TAGS: ${i.tags.join(', ')}\nATTRIBUTES: ${attrs}\nACQUIRED AS: ${i.context}.\nJSON only.`;
-    const out = await this.json('flesh', system, user, zFlesh, 'low', 1400);
+    const out = await this.json('flesh', system, user, zFlesh, 'minimal', 1400);
     return { ...out, quirks: (out.quirks ?? []).slice(0, 2) };
   }
 
@@ -160,7 +162,7 @@ export class OpenAINarrator implements Narrator {
       ? `This is the existing mercenary ${i.name ?? ''}'s OWN buried past — the saga is about who they already are. Derive it from their tags.`
       : `Invent a new figure and saga seeded entirely by these tags.`;
     const user = `${focals}\nREGION: ${i.region}\n${framing}\nAuthor the bible. JSON only.`;
-    return this.json('genesis', system, user, zGenesis, 'low', 2200);
+    return this.json('genesis', system, user, zGenesis, 'minimal', 2200);
   }
 
   async chainBeat(i: ChainBeatInput): Promise<ChainBeatOut> {
@@ -177,7 +179,7 @@ export class OpenAINarrator implements Narrator {
       `KEY RULE: the ASK and proposedReward must fit the MUNDANE SURFACE the player perceives, NOT the hidden truth. Prefer "open" slots. Only newLayerRevealed may touch the buried truth.\n` +
       `RULES: state the JOB plainly; keep the WHY hidden. Terse, concrete. NEVER write numbers. JSON only.`;
     const user = `HIDDEN BIBLE: ${i.bible}\nCHAIN STATE: ${i.chainState}\nREGION: ${i.region}\nSLOT COUNT: ${i.slotCount}\n${i.beatConstraint}. JSON only.`;
-    const out = await this.json('chainBeat', system, user, zChainBeat, 'low', 1600);
+    const out = await this.json('chainBeat', system, user, zChainBeat, 'minimal', 1600);
     const ask = normAsk(out.ask);
     while (ask.slots.length < i.slotCount) ask.slots.push({ kind: 'open' });
     ask.slots.length = i.slotCount;

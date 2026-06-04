@@ -166,6 +166,7 @@ export function tagLabels(tags: Array<{ id: string; tier: number }>): string[] {
 export interface NarratorOptions {
   provider?: 'openai' | 'mock'; apiKey?: string; model?: string;
   log?: (s: string) => void; browser?: boolean;
+  effort?: 'minimal' | 'low' | 'medium';  // reasoning_effort override (latency knob)
   onCall?: (rec: AICallRecord) => void;   // structured per-call hook for the AI log
 }
 export async function makeNarrator(opts: NarratorOptions = {}): Promise<Narrator> {
