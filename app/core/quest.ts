@@ -10,7 +10,7 @@ import type {
   GameState, Lead, Quest, QuestSlot, Chain, CharacterCard, Outcome, RewardBundle,
 } from './types.js';
 import type { Rng } from './rng.js';
-import { rngFrom, pick, randInt } from './rng.js';
+import { rngFrom, randInt } from './rng.js';
 import type { Narrator } from './ai.js';
 import { tagLabels } from './ai.js';
 import {
@@ -109,11 +109,7 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
   const focal = characterFromGen(mk(state), gen, 'npc', state.cycle);
   focal.location = 'limbo';
   addCard(state, focal);
-  const spark = pick(r, [
-    'a sealed charter that disinherits a lord', 'a blood-debt owed to the company',
-    'a relic stolen from a burning chapel', 'a missing heir presumed dead', 'a betrayal that emptied a village',
-  ]);
-  const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], spark, region: lead.location });
+  const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], region: lead.location });
   const chain: Chain = {
     id: uid(state, 'chain'), title: g.title, hook: g.hook, bible: g.bible, direction: g.direction,
     focalCardIds: [focal.id], rarity: lead.rarity, level: lead.level, expectedBeats: B, beatsResolved: 0,
@@ -132,12 +128,7 @@ async function genesisPersonalChain(state: GameState, ai: Narrator, r: Rng, lead
   const merc = state.cards[mercId] as CharacterCard | undefined;
   if (!merc || merc.role !== 'merc') return pursueOneOff(state, ai, r, lead);
   const B = randInt(r, 2, 3);
-  const spark = pick(r, [
-    `an old debt from ${merc.name}'s past comes due`, `a rival who never forgot ${merc.name}`,
-    `kin ${merc.name} believed dead resurfaces`, `a crime that still follows ${merc.name}`,
-    `an oath ${merc.name} once broke`,
-  ]);
-  const g = await ai.genesis({ focalTags: [tagLabels(merc.tags)], spark, region: lead.location });
+  const g = await ai.genesis({ focalTags: [tagLabels(merc.tags)], region: lead.location, personal: true, name: merc.name });
   const chain: Chain = {
     id: uid(state, 'chain'), title: g.title, hook: g.hook, bible: g.bible, direction: g.direction,
     focalCardIds: [merc.id], rarity: lead.rarity, level: merc.level, expectedBeats: B, beatsResolved: 0,

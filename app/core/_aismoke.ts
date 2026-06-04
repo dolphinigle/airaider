@@ -38,7 +38,7 @@ const oc = await n.outcome({
 console.log(JSON.stringify(oc, null, 2), '\n');
 
 console.log('— genesis');
-const gen = await n.genesis({ focalTags: [['Female', 'Noble', 'Proud', 'Frail']], spark: 'a sealed charter that disinherits a count', region: 'the river marches of Kovar' });
+const gen = await n.genesis({ focalTags: [['Female', 'Noble', 'Proud', 'Frail']], region: 'the river marches of Kovar' });
 console.log(JSON.stringify(gen, null, 2), '\n');
 
 console.log('— chainBeat (beat 1)');

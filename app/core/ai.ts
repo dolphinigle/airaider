@@ -35,8 +35,10 @@ export interface FleshInput { tags: string[]; attrs: Attributes; context: string
 export interface FleshOut { name: string; who: string; backstory: string; quirks: string[] }
 
 export interface GenesisInput {
-  focalTags: string[][];        // each focal character's display tags
-  spark: string; region: string;
+  focalTags: string[][];        // each focal character's display tags — THE story seed
+  region: string;
+  personal?: boolean;           // true = this existing merc's own buried past
+  name?: string;                // the focal's name (for personal chains)
 }
 export interface GenesisOut {
   title: string; hook: string; bible: string; direction: string; climax: string;
@@ -130,12 +132,13 @@ export class MockNarrator implements Narrator {
   }
   async genesis(i: GenesisInput): Promise<GenesisOut> {
     const r = this.r(i);
+    const seed = i.focalTags[0]?.[2] ?? i.focalTags[0]?.[0] ?? 'a stranger';
     return {
-      title: `The ${pick(r, ['Debt', 'Charter', 'Wolf', 'Ledger', 'Vow'])} of ${i.region}`,
-      hook: `Someone from ${i.region} wants what you have — or what you could become.`,
-      bible: `Truth: the focal figure (${i.focalTags[0]?.join(', ') ?? '—'}) is bound to ${i.spark}. Each beat reveals one layer.`,
-      direction: 'Likely ends with a powerful recruit — or their grave.',
-      climax: 'A reckoning at the source of the spark.',
+      title: `The ${pick(r, ['Debt', 'Wolf', 'Ledger', 'Vow', 'Oath'])} of ${i.region}`,
+      hook: `${i.personal ? (i.name ?? 'A merc') + "'s past" : 'A figure'} marked by ${seed} surfaces in ${i.region}.`,
+      bible: `Truth derived from the focal's tags (${i.focalTags[0]?.join(', ') ?? '—'}): their nature hides a buried cause. Each beat reveals one layer.`,
+      direction: i.personal ? 'Forces the merc to face who they are.' : 'Likely ends with a powerful recruit — or their grave.',
+      climax: 'A reckoning rooted in their own nature.',
     };
   }
   async chainBeat(i: ChainBeatInput): Promise<ChainBeatOut> {

@@ -145,16 +145,20 @@ export class OpenAINarrator implements Narrator {
 
   async genesis(i: GenesisInput): Promise<GenesisOut> {
     const system =
-      `You author the HIDDEN BIBLE (settled truth the player never sees) for a multi-quest story in a grimdark mercenary-fort game, built AROUND the given focal character(s).\n` +
+      `You author the HIDDEN BIBLE (settled truth the player never sees) for a multi-quest story in a grimdark mercenary-fort game. The story is INVENTED FROM the focal character's tags — they are the only seed.\n` +
       `Output JSON only:\n` +
       `{ "title": "<=6 words, evocative",\n` +
       `  "hook": "<=20 words — the board-facing teaser (player-safe, no spoilers)",\n` +
       `  "bible": "<=90 words — the settled truth: who the focal figure really is, the why-ladder, the buried cause. Clinical voice (state what IS). Invent supporting cast freely",\n` +
       `  "direction": "<=18 words — the vague climax the arc builds toward",\n` +
       `  "climax": "<=18 words — the intended final confrontation" }\n` +
-      `RULES: the focal character's TAGS are the story seed — honor them. Mystery lives in the CAUSE, never the task. Terse, concrete. NEVER write numbers. JSON only.`;
+      `KEY RULE: DERIVE the whole story from the tags — ask "what would a person like THIS hide, want, or be hunted for?" A scarred soldier, a beautiful noble, a deceitful healer each imply a different buried truth. Do NOT reach for a generic plot; let these specific tags dictate it.\n` +
+      `RULES: mystery lives in the CAUSE, never the task. Terse, concrete. NEVER write numbers. JSON only.`;
     const focals = i.focalTags.map((t, n) => `Focal ${n + 1}: [${t.join(', ')}]`).join('\n');
-    const user = `${focals}\nSPARK: ${i.spark}\nREGION: ${i.region}\nAuthor the bible. JSON only.`;
+    const framing = i.personal
+      ? `This is the existing mercenary ${i.name ?? ''}'s OWN buried past — the saga is about who they already are. Derive it from their tags.`
+      : `Invent a new figure and saga seeded entirely by these tags.`;
+    const user = `${focals}\nREGION: ${i.region}\n${framing}\nAuthor the bible. JSON only.`;
     return this.json('genesis', system, user, zGenesis, 'low', 2200);
   }
 
