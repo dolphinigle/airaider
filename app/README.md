@@ -26,6 +26,13 @@ Both front-ends read `OPENAI_API_KEY` from `../.env` automatically (the GUI's Vi
 injects it). Without a key they fall back to the deterministic offline **mock narrator**.
 The GUI's **AI Log** tab shows every prompt + response + token count (collapsible).
 
+**Model tiers** (docs/AI_PROVIDER.md §4.1): narrative work (chain bibles, the resolution
+narration, character backstory) uses `gpt-5-mini` at `reasoning_effort:low`; mechanical work
+(quest/beat cards, tag picks) uses `gpt-5-nano` at `minimal`. Override via env:
+`AIRAIDER_LLM_NARRATIVE_MODEL`, `AIRAIDER_LLM_MECHANICAL_MODEL`, `AIRAIDER_LLM_MODEL`
+(single-knob), `AI_EFFORT`. Per-call latency ≈ 2s (nano) / 8–11s (mini); end-day resolves
+run concurrently. (Production would pre-generate asynchronously — latency isn't the constraint, quality is.)
+
 ## Architecture — the shared core
 
 ```
