@@ -439,9 +439,11 @@ function handlePersonalFinale(merc: CharacterCard, outcome: Outcome, out: string
     merc.xp += 30;
     out.push(`${merc.name} settles their past and earns renown (famous)`);
   } else if (outcome === 'partial') {
-    if (!merc.tags.some((t) => t.id === 'phys:scarred')) merc.tags.push({ id: 'phys:scarred', tier: 3 });
+    // a partial reckoning always leaves a mark: a scar, or — if already scarred — dark renown
+    if (!merc.tags.some((t) => t.id === 'phys:scarred')) { merc.tags.push({ id: 'phys:scarred', tier: 3 }); out.push(`${merc.name} closes the chapter, but it leaves a scar`); }
+    else if (!merc.tags.some((t) => t.id.startsWith('noto:'))) { merc.tags.push({ id: 'noto:infamous', tier: 3 }); out.push(`${merc.name} closes the chapter, but the truth follows them (infamous)`); }
+    else out.push(`${merc.name} closes the chapter at a cost`);
     merc.xp += 10;
-    out.push(`${merc.name} closes the chapter, but it leaves a scar`);
   } else {
     // the gamble of a personal saga: it can claim them
     merc.role = 'dead'; merc.location = 'limbo';
