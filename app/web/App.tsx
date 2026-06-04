@@ -127,11 +127,11 @@ function QuestCard({ quest }: { quest: Quest }) {
     <div className={`quest ${quest.chainId ? 'chain' : ''}`}>
       <div className="quest-head">
         {quest.chainId && <span className="beat">{quest.finale ? 'FINALE' : `beat ${quest.beat}`}</span>}
-        <b>{quest.title}</b>
-        <span className="qmeta">{quest.rarity} L{quest.level}</span>
+        {quest.chainId && <span className="saga">✦ {quest.title}</span>}
+        <span className="qmeta">{quest.rarity} · L{quest.level} · {quest.location}</span>
       </div>
       <p className="situation">{quest.situation}</p>
-      <p className="job"><b>Job:</b> {quest.job}</p>
+      <p className="job"><b>The job:</b> {quest.job}</p>
       {quest.groups
         ? <div className="branches"><div className="branchhdr">Choose ONE approach:</div>{quest.groups.map((g) => <Branch key={g.id} quest={quest} group={g} />)}</div>
         : <div className="slots">{quest.slots.map((_, i) => <Slot key={i} quest={quest} index={i} />)}</div>}

@@ -44,10 +44,10 @@ export function leadsList(eng: GameEngine): string {
 export function questCard(eng: GameEngine, q: Quest): string {
   const v = eng.questView(q);
   const lines: string[] = [];
-  const tag = q.chainId ? mag(q.finale ? '[FINALE] ' : `[beat ${q.beat}] `) : '';
-  lines.push(b(`${tag}${q.title}`) + dim(`  (${q.rarity} L${q.level}, ${q.archetype})  [${q.id}]`));
-  lines.push('  ' + q.situation);
-  lines.push('  ' + yel('Job: ') + q.job);
+  const tag = q.chainId ? mag(q.finale ? '[FINALE] ' : `[beat ${q.beat}] `) + mag(`✦ ${q.title}  `) : '';
+  lines.push(tag + dim(`(${q.rarity} · L${q.level} · ${q.location})  [${q.id}]`));
+  lines.push('  ' + b(q.situation));
+  lines.push('  ' + yel('The job: ') + q.job);
   if (q.stakes) lines.push('  ' + dim('whisper: ' + q.stakes));
   if (q.groups) {
     lines.push('  ' + mag('Choose ONE approach:'));
