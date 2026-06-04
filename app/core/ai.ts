@@ -24,6 +24,7 @@ export interface OutcomeInput {
   outcome: 'success' | 'partial' | 'failure';
   captiveTags?: string[];                            // display labels, if a captive delivered
   risky: boolean;
+  approach?: string;                                 // chosen finale branch intent (win-over / subdue / ransom)
 }
 export interface OutcomeOut {
   beforeRoll: string; afterRoll: string;

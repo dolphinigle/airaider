@@ -294,10 +294,18 @@ export async function resolveQuest(state: GameState, ai: Narrator, quest: Quest)
   const charCard = quest.reward.cards.find((c) => c.class === 'character') as CharacterCard | undefined;
   const captiveTags = charCard && outcome !== 'failure' ? tagLabels(charCard.tags) : undefined;
 
+  // tell the narrator which finale approach was chosen so the prose matches the delivered kind
+  const g = chosenGroup(quest);
+  const approach = g
+    ? g.rewardKind === 'recruit' ? 'win them over — persuade them to join the company'
+      : g.rewardKind === 'captive' ? 'subdue them — overpower and take them captive'
+      : 'ransom/sell — overpower them, then hand them off for coin'
+    : undefined;
+
   const narr = await ai.outcome({
     situation: quest.situation, job: quest.job,
     party: party.map((m) => ({ name: m.name, tags: tagLabels(m.tags).slice(0, 4) })),
-    outcome, captiveTags, risky: quest.risky,
+    outcome, captiveTags, risky: quest.risky, approach,
   });
   quest.outcome = outcome; quest.beforeText = narr.beforeRoll; quest.afterText = narr.afterRoll;
 
