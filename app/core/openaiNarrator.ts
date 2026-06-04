@@ -119,6 +119,7 @@ export class OpenAINarrator implements Narrator {
       `    "favoredTags": ["0-3 tag words from the vocabulary, bare (no prefix)"],\n` +
       `    "slots": ["one per party slot, each EITHER \\"open\\" OR a single tag word the job plainly needs"] } }\n` +
       `${VOCAB_BLOCK}\n` +
+      `ATTRIBUTE — pick the one the job's CORE test needs, and VARY across jobs: physical=force/brawn/melee, agility=speed/stealth/precision, intelligence=lore/investigation/cunning, charisma=persuasion/deceit/people, willpower=nerve/endurance under dread. Most jobs are NOT willpower — reserve it for holding-the-line-against-fear jobs. A raid→physical, a stealth/hunt→agility, an investigation→intelligence, a parley/escort-by-trust→charisma.\n` +
       `RULES: terse, plain, concrete. State the job so the player knows exactly what taking it commits them to. NEVER write numbers. slots length must equal the SLOT COUNT given. Prefer "open" slots. JSON only.`;
     const user = `Archetype: ${i.archetype}\nLocation: ${i.location}\nSlot count: ${i.slotCount}\nThe job results in ${i.rewardSeed}.\nWrite the card + ask. JSON only.`;
     const out = await this.json('cardAsk', system, user, zCardAsk, this.mechanicalModel, 'minimal', 1200);
@@ -138,7 +139,7 @@ export class OpenAINarrator implements Narrator {
       `  "captive": { "name": "string", "who": "one line, fits the captive tags" } or null,\n` +
       `  "punishment": "<=12 words: only if OUTCOME=FAILURE and the job was RISKY — the consequence that lands; else null" }\n` +
       `OUTCOME MEANINGS: SUCCESS = clean, captive taken. PARTIAL = taken but at a COST you must SHOW (a wound / complication / lesser haul). FAILURE = captive NOT taken (captive=null); a consequence lands.\n` +
-      `RULES: continue FROM the card (same people/place). Read each merc's tags and act them. Terse, concrete, low-medieval. NEVER write numbers. JSON only.`;
+      `RULES: continue FROM the card (same people/place). Read each merc's tags and act them. Do NOT describe capturing/binding a prisoner unless DELIVERED CAPTIVE TAGS are given (if 'none', no captive is taken). Terse, concrete, low-medieval. NEVER write numbers. JSON only.`;
     const party = i.party.map((p) => ` ${p.name} [${p.tags.join(', ')}]`).join('\n');
     const user =
       `JOB CARD:\n situation: ${i.situation}\n job: ${i.job}\nPARTY SENT:\n${party}\n` +
@@ -199,6 +200,7 @@ export class OpenAINarrator implements Narrator {
       `  "proposedReward": "<=12 words — the loot this beat plausibly yields; the GAME sets its value",\n` +
       `  "newLayerRevealed": "<=15 words — the ONE new fact the player learns on success (writers-room note)" }\n` +
       `${VOCAB_BLOCK}\n` +
+      `ATTRIBUTE — pick the one this beat's CORE test needs and VARY it (physical=force, agility=speed/stealth, intelligence=lore/cunning, charisma=people, willpower=nerve). Most beats are NOT willpower; don't default to it.\n` +
       `KEY RULE: the ASK and proposedReward must fit the MUNDANE SURFACE the player perceives, NOT the hidden truth. Prefer "open" slots. Only newLayerRevealed may touch the buried truth.\n` +
       `RULES: state the JOB plainly; keep the WHY hidden. Terse, concrete. NEVER write numbers. JSON only.`;
     const user = `HIDDEN BIBLE: ${i.bible}\nCHAIN STATE: ${i.chainState}\nREGION: ${i.region}\nSLOT COUNT: ${i.slotCount}\n${i.beatConstraint}. JSON only.`;

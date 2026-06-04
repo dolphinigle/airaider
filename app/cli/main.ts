@@ -226,8 +226,14 @@ if (autoIdx >= 0) {
 console.log(status(eng) + '\n' + C.dim('type h for help, or `play 3` to auto-run.\n'));
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout, prompt: C.cyan('› ') });
 rl.prompt();
+let handling = false;
 rl.on('line', async (line) => {
+  if (handling) return;            // ignore input while an async command (AI call) is in flight
+  handling = true;
+  rl.pause();
   try { if (!(await handle(line))) { rl.close(); return; } } catch (e) { console.log(C.red(String(e))); }
+  handling = false;
+  rl.resume();
   rl.prompt();
 });
 rl.on('close', () => { console.log(C.dim('\nfarewell.')); process.exit(0); });
