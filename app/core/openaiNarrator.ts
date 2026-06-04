@@ -62,6 +62,7 @@ export class OpenAINarrator implements Narrator {
   private log: (s: string) => void;
   private onCall?: (rec: AICallRecord) => void;
   private effortOverride?: 'minimal' | 'low' | 'medium';
+  readonly narrativeEffort: 'minimal' | 'low' | 'medium';
   private callCount = 0;
 
   constructor(opts: NarratorOptions) {
@@ -73,28 +74,39 @@ export class OpenAINarrator implements Narrator {
     this.log = opts.log ?? (() => {});
     this.onCall = opts.onCall;
     this.effortOverride = opts.effort ?? (env.AI_EFFORT as 'minimal' | 'low' | 'medium' | undefined);
+    this.narrativeEffort = opts.narrativeEffort ?? (env.AI_NARRATIVE_EFFORT as 'minimal' | 'low' | 'medium' | undefined) ?? 'low';
   }
 
   private async json<T>(kind: string, system: string, user: string, schema: z.ZodType<T>, model: string, effort: 'minimal' | 'low' | 'medium' = 'low', maxTokens = 2000): Promise<T> {
-    const res = await this.client.chat.completions.create({
-      model,
-      messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
-      response_format: { type: 'json_object' },
-      max_completion_tokens: maxTokens,
-      // reasoning_effort is a gpt-5 param the SDK types may not surface yet
-      ...( { reasoning_effort: this.effortOverride ?? effort } as Record<string, unknown> ),
-    } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
-    const usage = res.usage;
-    const cached = (usage as unknown as { prompt_tokens_details?: { cached_tokens?: number } })?.prompt_tokens_details?.cached_tokens ?? 0;
-    const raw = res.choices[0]?.message?.content ?? '';
-    this.log(`  ai[${kind}·${model}] in=${usage?.prompt_tokens} (cached ${cached}) out=${usage?.completion_tokens}`);
-    this.onCall?.({
-      n: ++this.callCount, kind, model, system, user, response: raw,
-      promptTokens: usage?.prompt_tokens, completionTokens: usage?.completion_tokens, cachedTokens: cached,
-    });
-    let parsed: unknown;
-    try { parsed = JSON.parse(raw); } catch { throw new Error(`AI returned non-JSON: ${raw.slice(0, 200)}`); }
-    return schema.parse(parsed);
+    // Try the requested effort; if the model truncates to empty (reasoning ate the budget) or
+    // returns invalid JSON, RETRY at minimal effort with a bigger budget (guaranteed output).
+    // A single flaky call must never crash the game.
+    const attempts: Array<{ eff: 'minimal' | 'low' | 'medium'; tok: number }> = [
+      { eff: this.effortOverride ?? effort, tok: maxTokens },
+      { eff: 'minimal', tok: Math.round(maxTokens * 1.6) },
+    ];
+    let lastErr = '';
+    for (let a = 0; a < attempts.length; a++) {
+      const { eff, tok } = attempts[a];
+      const t0 = Date.now();
+      const res = await this.client.chat.completions.create({
+        model, messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
+        response_format: { type: 'json_object' }, max_completion_tokens: tok,
+        ...( { reasoning_effort: eff } as Record<string, unknown> ),
+      } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
+      const ms = Date.now() - t0;
+      const usage = res.usage;
+      const raw = res.choices[0]?.message?.content ?? '';
+      this.log(`  ai[${kind}·${model}·${eff}${a ? ' RETRY' : ''}] ${(ms / 1000).toFixed(1)}s in=${usage?.prompt_tokens} out=${usage?.completion_tokens}`);
+      this.onCall?.({
+        n: ++this.callCount, kind, model, effort: eff, ms, system, user, response: raw,
+        promptTokens: usage?.prompt_tokens, completionTokens: usage?.completion_tokens,
+        cachedTokens: (usage as unknown as { prompt_tokens_details?: { cached_tokens?: number } })?.prompt_tokens_details?.cached_tokens ?? 0,
+      });
+      try { return schema.parse(JSON.parse(raw)); }
+      catch (e) { lastErr = raw ? String(e).slice(0, 120) : 'empty response'; }
+    }
+    throw new Error(`AI ${kind} failed after retry: ${lastErr}`);
   }
 
   async cardAsk(i: CardAskInput): Promise<CardAskOut> {
@@ -133,7 +145,7 @@ export class OpenAINarrator implements Narrator {
       `DELIVERED CAPTIVE TAGS: ${i.captiveTags ? '[' + i.captiveTags.join(', ') + ']' : 'none'}\n` +
       (i.approach ? `CHOSEN APPROACH: ${i.approach} — the afterRoll MUST read as this approach.\n` : '') +
       `RISKY: ${i.risky ? 'yes' : 'no'}\nOUTCOME: ${i.outcome.toUpperCase()}\nNarrate, continuing from the card. JSON only.`;
-    const out = await this.json('outcome', system, user, zOutcome, this.narrativeModel, 'low', 1600);
+    const out = await this.json('outcome', system, user, zOutcome, this.narrativeModel, this.narrativeEffort, 1600);
     return { beforeRoll: out.beforeRoll, afterRoll: out.afterRoll, captive: out.captive ?? null, punishment: out.punishment ?? null };
   }
 
@@ -150,7 +162,7 @@ export class OpenAINarrator implements Narrator {
     const user = `TAGS: ${i.tags.join(', ')}\nATTRIBUTES: ${attrs}\nACQUIRED AS: ${i.context}.\nJSON only.`;
     // flesh is NARRATIVE-tier (deviates from the guide's nano flavorCaptive): the backstory +
     // quirks are read in the dossier and are attachment-critical, so they get the stronger model.
-    const out = await this.json('flesh', system, user, zFlesh, this.narrativeModel, 'low', 1400);
+    const out = await this.json('flesh', system, user, zFlesh, this.narrativeModel, this.narrativeEffort, 1400);
     return { ...out, quirks: (out.quirks ?? []).slice(0, 2) };
   }
 
@@ -169,8 +181,11 @@ export class OpenAINarrator implements Narrator {
     const framing = i.personal
       ? `This is the existing mercenary ${i.name ?? ''}'s OWN buried past — the saga is about who they already are. Derive it from their tags.`
       : `Invent a new figure and saga seeded entirely by these tags.`;
-    const user = `${focals}\nREGION: ${i.region}\n${framing}\nAuthor the bible. JSON only.`;
-    return this.json('genesis', system, user, zGenesis, this.narrativeModel, 'low', 2200);
+    const avoid = i.avoid?.length
+      ? `\nDISTINCTNESS: recent sagas already in play — ${i.avoid.map((a) => `"${a}"`).join('; ')}. Make THIS premise clearly different from them (a different secret, crime, and fantasy — do NOT write another variation on the same theme, e.g. not another sinister-cook/hunger story if one is listed).`
+      : '';
+    const user = `${focals}\nREGION: ${i.region}\n${framing}${avoid}\nAuthor the bible. JSON only.`;
+    return this.json('genesis', system, user, zGenesis, this.narrativeModel, this.narrativeEffort, 2200);
   }
 
   async chainBeat(i: ChainBeatInput): Promise<ChainBeatOut> {

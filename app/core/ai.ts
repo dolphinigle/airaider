@@ -40,6 +40,7 @@ export interface GenesisInput {
   region: string;
   personal?: boolean;           // true = this existing merc's own buried past
   name?: string;                // the focal's name (for personal chains)
+  avoid?: string[];             // hooks of recent sagas — make THIS premise distinct from them
 }
 export interface GenesisOut {
   title: string; hook: string; bible: string; direction: string; climax: string;
@@ -60,6 +61,8 @@ export interface AICallRecord {
   n: number;
   kind: string;                 // cardAsk / outcome / flesh / genesis / chainBeat / conceptTags
   model: string;
+  effort?: string;
+  ms?: number;                  // wall-clock latency of the call
   system: string;
   user: string;
   response: string;
@@ -162,18 +165,37 @@ export function tagLabels(tags: Array<{ id: string; tier: number }>): string[] {
   return tags.map((t) => tagLabel(t.id, t.tier));
 }
 
+// ---- resilient wrapper: never let one bad AI call crash the game ------------
+// Tries the primary narrator; on any throw, logs and falls back to the mock so the
+// cycle always completes. (The primary already retries internally; this is the net.)
+export class ResilientNarrator implements Narrator {
+  readonly kind: 'openai' | 'mock';
+  constructor(private primary: Narrator, private fallback: Narrator, private log: (s: string) => void = () => {}) { this.kind = primary.kind; }
+  private async guard<T>(name: string, fn: (n: Narrator) => Promise<T>): Promise<T> {
+    try { return await fn(this.primary); }
+    catch (e) { this.log(`  ⚠ ${name} fell back to mock: ${String(e).slice(0, 100)}`); return fn(this.fallback); }
+  }
+  cardAsk(i: CardAskInput) { return this.guard('cardAsk', (n) => n.cardAsk(i)); }
+  outcome(i: OutcomeInput) { return this.guard('outcome', (n) => n.outcome(i)); }
+  flesh(i: FleshInput) { return this.guard('flesh', (n) => n.flesh(i)); }
+  genesis(i: GenesisInput) { return this.guard('genesis', (n) => n.genesis(i)); }
+  chainBeat(i: ChainBeatInput) { return this.guard('chainBeat', (n) => n.chainBeat(i)); }
+  conceptTags(i: ConceptTagsInput) { return this.guard('conceptTags', (n) => n.conceptTags(i)); }
+}
+
 // ---- factory ----------------------------------------------------------------
 export interface NarratorOptions {
   provider?: 'openai' | 'mock'; apiKey?: string; model?: string;
   log?: (s: string) => void; browser?: boolean;
-  effort?: 'minimal' | 'low' | 'medium';  // reasoning_effort override (latency knob)
+  effort?: 'minimal' | 'low' | 'medium';          // reasoning_effort override for ALL calls
+  narrativeEffort?: 'minimal' | 'low' | 'medium'; // reasoning_effort for the narrative tier only
   onCall?: (rec: AICallRecord) => void;   // structured per-call hook for the AI log
 }
 export async function makeNarrator(opts: NarratorOptions = {}): Promise<Narrator> {
   const provider = opts.provider ?? (opts.apiKey ? 'openai' : 'mock');
   if (provider === 'openai') {
     const { OpenAINarrator } = await import('./openaiNarrator.js');
-    return new OpenAINarrator(opts);
+    return new ResilientNarrator(new OpenAINarrator(opts), new MockNarrator(), opts.log);
   }
   return new MockNarrator();
 }
