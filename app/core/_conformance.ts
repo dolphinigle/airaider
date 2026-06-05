@@ -70,6 +70,8 @@ for (let c = 0; c < 30; c++) {
       let best: { slot: number; merc: string; fit: number } | null = null;
       for (const g of q.groups) { const i = g.slotIndices[0]; for (const m of eng.eligibleMercs(q, i)) { const fit = slotFit(m, q, i); if (!best || fit > best.fit) best = { slot: i, merc: m.id, fit }; } }
       if (best) eng.assign(q.id, best.slot, best.merc);
+      // force the finale to LAND (low threshold) so the success-only sequel path is exercised
+      q.threshold = 1; q.groups.forEach((g) => { g.threshold = 1; });
       continue;
     }
     for (let i = 0; i < q.slots.length; i++) {
@@ -82,6 +84,7 @@ for (let c = 0; c < 30; c++) {
   for (const l of eng.leads()) if (l.sequelOf) sequelLeadIds.add(l.id);
   const results = await eng.endDay();
   for (const r of results) if (r.chainDone) chainsConcluded++;
+  for (const l of eng.leads()) if (l.sequelOf) sequelLeadIds.add(l.id); // catch freshly-spawned sequels before next cycle pursues them
 
   // STATE INTEGRITY: every owned merc/captive is a COMPLETE character (CARDS.md)
   for (const ch of [...allMercs(state), ...captives(state)]) {

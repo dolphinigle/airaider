@@ -126,9 +126,11 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
   focal.location = 'limbo';
   addCard(state, focal);
   const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], region: lead.location, rarity: lead.rarity, avoid: recentTitles(state) });
-  // the bible NAMES the core person (cast[0]) — that's the focal; adopt their name/face now
+  // the bible NAMES the core person (cast[0]) — that's the focal; adopt their NAME so beats and the
+  // card match. who/backstory are written cleanly by flesh at delivery (the bible's why-ladder is the
+  // HIDDEN writers'-room reference, NOT a readable dossier bio).
   const core = g.cast[0];
-  if (core) { focal.name = core.name; focal.who = core.who; focal.backstory = core.history.join(' '); }
+  if (core) focal.name = core.name;
   const chain: Chain = {
     id: uid(state, 'chain'), title: g.title, hook: g.leadBlurb, bible: renderBible(g), direction: g.directions[0]?.hook ?? '',
     focalCardIds: [focal.id], rarity: lead.rarity, level: lead.level, expectedBeats: B, beatsResolved: 0,
@@ -455,7 +457,9 @@ function handleFinaleFate(state: GameState, quest: Quest, outcome: Outcome, out:
   const focal = chain && state.cards[chain.focalCardIds[0]] as CharacterCard | undefined;
   if (!focal) return;
   if (chain?.personal) { handlePersonalFinale(focal, outcome, out); return; }
-  if (aiCaptive) { focal.name = aiCaptive.name; focal.who = aiCaptive.who; }
+  // the focal kept their BIBLE name across every beat — don't let the outcome rename them.
+  // who/backstory are filled cleanly by flesh after delivery.
+  if (aiCaptive && (!focal.name || focal.name === 'Unknown')) { focal.name = aiCaptive.name; focal.who = aiCaptive.who; }
   // the chosen approach-group decides the KIND; the roll decides whether you get it clean
   const kind = chosenGroup(quest)?.rewardKind ?? 'recruit';
   if (kind === 'gold') {
