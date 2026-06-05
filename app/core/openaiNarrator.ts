@@ -50,7 +50,7 @@ const zGenesis = z.object({
   directions: z.array(z.union([z.object({ kind: z.string().optional(), hook: z.string() }), z.string()])).default([]),
   openDirections: z.array(z.union([z.object({ kind: z.string().optional(), hook: z.string() }), z.string()])).optional(),
 });
-const zChainBeat = z.object({ situation: z.string(), job: z.string(), ask: zAsk, proposedReward: z.string(), newLayerRevealed: z.string() });
+const zChainBeat = z.object({ situation: z.string(), job: z.string(), ask: zAsk, proposedReward: z.string(), newLayerRevealed: z.string(), closesChain: z.union([z.boolean(), z.string(), z.null()]).optional() });
 const zConcept = z.object({ name: z.string(), who: z.string(), tags: z.array(z.string()).default([]) });
 
 function normAttr(a: string): Attribute {
@@ -243,22 +243,23 @@ export class OpenAINarrator implements Narrator {
       `  "job": "one plain line — exactly what taking this job commits the company to DO (escort / recover / guard / confront / investigate a specific thing)",\n` +
       `  "ask": { "attribute": "${ATTRS}", "favoredTags": ["0-3 bare tag words"], "slots": ["one per slot: open OR a tag word"] },\n` +
       `  "proposedReward": "<=12 words — the loot this beat plausibly yields; the GAME sets its value",\n` +
-      `  "newLayerRevealed": "<=18 words — the ONE CONCRETE fact the player learns on success: a NAME, a face, a specific deed (never 'a hidden actor' / 'a second figure' — name them or show the concrete symptom)" }\n` +
+      `  "newLayerRevealed": "<=18 words — the ONE CONCRETE fact the player learns on success: a NAME, a face, a specific deed (never 'a hidden actor' / 'a second figure' — name them or show the concrete symptom)",\n` +
+      `  "closesChain": true/false — does THIS beat resolve the whole arc? Set true ONLY if the BEAT INSTRUCTION permits closing AND the story has genuinely reached its climax; otherwise false }\n` +
       `${VOCAB_BLOCK}\n` +
+      `FOLLOW THE BEAT INSTRUCTION below — it tells you this beat's job in the arc and whether you may close it.\n` +
       `CRAFT (this is character drama, not a logistics audit):\n` +
       `- PUT THE CAST ON-STAGE. The chain is about the bible's PEOPLE. Bring a NAMED cast member into this beat in the flesh; never run the whole story through a faceless clerk/contract while the real characters stay off-screen.\n` +
-      `- BEAT 1 = ATTACHMENT. Open on a low-stakes HUMAN moment that makes the player care about one named cast person (their specific grief / want shown in small action) — NOT a cold procedural task. Even if a client hires you, bring a core character on-stage as a person.\n` +
       `- VARY THE BEAT. Each beat does something DIFFERENT: meet/warm-to → investigate → confront → protect → a turn or betrayal → reveal. CHAIN STATE lists what already happened — do NOT reopen on the same scene, object, place, or cast-member entrance you used before (no "X staggers to the gate with the strongbox" twice). Change WHO is on stage, WHERE it happens, and the ACTION.\n` +
       `- CONCRETE SYMPTOMS, NOT CAUSES. Show a corpse, never the murderer's name; a missing barge, never the smuggling ring. The hidden CAUSE stays buried; reveal one small concrete layer.\n` +
       `- CONTINUITY. Follow believably from CHAIN STATE — react to what the company just did and what's now in motion. Don't reset to a fresh unrelated job.\n` +
       `ATTRIBUTE — pick the one this beat's core test needs and VARY it (physical=force, agility=speed/stealth, intelligence=lore/cunning, charisma=people, willpower=nerve). Most beats are NOT willpower.\n` +
       `The ASK fits the MUNDANE SURFACE, not the hidden truth. Prefer "open" slots. State the job plainly; keep the WHY hidden. Vivid but concrete; NEVER write numbers. JSON only.`;
-    const user = `HIDDEN BIBLE:\n${i.bible}\n\nCHAIN STATE: ${i.chainState}\nREGION: ${i.region}\nSLOT COUNT: ${i.slotCount}\n${i.beatConstraint} JSON only.`;
+    const user = `HIDDEN BIBLE:\n${i.bible}\n\nCHAIN STATE (what already happened — react to it, don't repeat it): ${i.chainState}\nREGION: ${i.region}\nSLOT COUNT: ${i.slotCount}\nBEAT INSTRUCTION: ${i.beatConstraint}\nJSON only.`;
     const out = await this.json('chainBeat', system, user, zChainBeat, this.narrativeModel, this.narrativeEffort, 1800);
     const ask = normAsk(out.ask);
     while (ask.slots.length < i.slotCount) ask.slots.push({ kind: 'open' });
     ask.slots.length = i.slotCount;
-    return { ...out, ask };
+    return { ...out, ask, closesChain: out.closesChain === true || out.closesChain === 'true' };
   }
 
   async conceptTags(i: ConceptTagsInput): Promise<ConceptTagsOut> {

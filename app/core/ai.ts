@@ -4,7 +4,7 @@
 // The engine owns all numbers; the Narrator only writes fiction + picks tags from the vocab.
 
 import { rngFrom, pick, type Rng } from './rng.js';
-import { tagLabel } from './tags.js';
+import { tagPlain } from './tags.js';
 import type { Attributes, Attribute } from './types.js';
 
 // ---- IO types (what each call gives and gets) -------------------------------
@@ -70,6 +70,7 @@ export interface ChainBeatInput {
 }
 export interface ChainBeatOut {
   situation: string; job: string; ask: AskOut; proposedReward: string; newLayerRevealed: string;
+  closesChain?: boolean;   // the AI's call: is THIS beat the arc's climax? (only honored when the engine permits)
 }
 
 export interface ConceptTagsInput { concept: string }
@@ -176,6 +177,7 @@ export class MockNarrator implements Narrator {
       ask: { attribute: 'intelligence', favoredTags: ['skill:lore', 'pers:brave'], slots: Array.from({ length: i.slotCount }, () => ({ kind: 'open' as const })) },
       proposedReward: 'a little coin and a clue',
       newLayerRevealed: 'one more layer of the truth surfaces',
+      closesChain: /finale|climax|out of room|close it now/i.test(i.beatConstraint),
     };
   }
   async conceptTags(i: ConceptTagsInput): Promise<ConceptTagsOut> {
@@ -184,9 +186,9 @@ export class MockNarrator implements Narrator {
   }
 }
 
-// tiny helper used by both narrators / callers to render a card's tags as labels
+// render a card's tags as CLEAR AI-facing descriptions (plain meaning, not flavor names)
 export function tagLabels(tags: Array<{ id: string; tier: number }>): string[] {
-  return tags.map((t) => tagLabel(t.id, t.tier));
+  return tags.map((t) => tagPlain(t.id, t.tier));
 }
 
 // ---- resilient wrapper: never let one bad AI call crash the game ------------

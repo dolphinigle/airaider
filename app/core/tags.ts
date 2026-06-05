@@ -128,6 +128,29 @@ export function tagName(id: string): string {
   return d ? cap(d.word) : id;
 }
 
+// intensity words for the AI-facing form of tiered PHYSICAL tags, by tier 1..5
+const PHYS_INTENSITY = ['very', 'notably', '', 'somewhat', 'slightly'];
+// plain concept word for each physical pair (the AI reads "very strong", not "Herculean")
+const PHYS_PLAIN: Record<string, string> = {
+  muscular: 'strong', frail: 'frail', beautiful: 'beautiful', ugly: 'ugly',
+  clever: 'clever', 'slow-witted': 'slow-witted', tough: 'tough', sickly: 'sickly',
+};
+
+/** AI-facing tag description — CLEAR meaning, not flavor. Physical tiers become
+ *  "very strong" instead of "Herculean" so the model isn't guessing. Player-facing
+ *  display still uses tagLabel() (the evocative names). */
+export function tagPlain(id: string, tier = 3): string {
+  const d = BY_ID.get(id);
+  if (!d) return id;
+  if (d.group === 'physical' && d.tiered) {
+    const t = Math.min(5, Math.max(1, tier));
+    const pre = PHYS_INTENSITY[t - 1];
+    const word = PHYS_PLAIN[d.word] ?? d.word.replace(/-/g, ' ');
+    return (pre ? pre + ' ' : '') + word;
+  }
+  return tagLabel(id, tier);
+}
+
 /** Display label for a tag at a tier (1..5; T1 strongest). Skills keep their noun
  *  ("Adept Stealth"); physical/notoriety tier-labels are self-descriptive adjectives. */
 export function tagLabel(id: string, tier = 3): string {

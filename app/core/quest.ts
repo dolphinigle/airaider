@@ -137,7 +137,7 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
   focal.chainIds.push(chain.id);
   state.chains[chain.id] = chain;
   logLine(state, `A new saga begins: "${chain.title}" — ${chain.hook}`);
-  return makeBeatQuest(state, ai, r, lead, chain, 'Write beat 1 (the deniable opener).');
+  return makeBeatQuest(state, ai, r, lead, chain);
 }
 
 // A newly-joined merc's MAIN chain — a saga ABOUT them (focal = the existing merc).
@@ -158,18 +158,14 @@ async function genesisPersonalChain(state: GameState, ai: Narrator, r: Rng, lead
   merc.chainIds.push(chain.id);
   state.chains[chain.id] = chain;
   logLine(state, `${merc.name}'s own saga begins: "${chain.title}" — ${chain.hook}`);
-  return makeBeatQuest(state, ai, r, lead, chain, 'Write beat 1 of this merc\'s personal story (the deniable opener).', false, merc.id);
+  return makeBeatQuest(state, ai, r, lead, chain, merc.id);
 }
 
 async function continueChain(state: GameState, ai: Narrator, r: Rng, lead: Lead, chainId: string): Promise<Quest> {
   const chain = state.chains[chainId];
   if (!chain) return pursueOneOff(state, ai, r, lead);
-  const atClimax = chain.mercCyclesSpent >= chain.climaxTarget;
-  const constraint = atClimax
-    ? 'This is the FINALE — write the climactic confrontation that resolves the saga.'
-    : `Write beat ${chain.beatsResolved + 1}, continuing from what the company already knows.`;
   const anchor = chain.personal ? chain.focalCardIds[0] : undefined;
-  return makeBeatQuest(state, ai, r, lead, chain, constraint, atClimax, anchor);
+  return makeBeatQuest(state, ai, r, lead, chain, anchor);
 }
 
 // chain beats are small encounters (1-2), not the genesis lead's archetype size; finales a touch bigger
@@ -178,12 +174,29 @@ function beatSlotCount(chain: Chain, r: Rng, isFinale: boolean): number {
   if (isFinale) return 2 + (rare ? 1 : 0);
   return 1 + (r() < 0.4 ? 1 : 0);
 }
-async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead, chain: Chain, constraint: string, isFinale = false, anchorMercId?: string): Promise<Quest> {
-  const n = beatSlotCount(chain, r, isFinale);
+async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead, chain: Chain, anchorMercId?: string): Promise<Quest> {
+  const beatNum = chain.beatsResolved + 1;
+  const isBeatOne = chain.beatsResolved === 0;
+  // ENGINE gates the finale WINDOW (merc-cycles spent) so you never get a 1-beat saga;
+  // within it the AI decides if THIS beat is the genuine climax. Hard cap forces a close.
+  const permitted = chain.mercCyclesSpent >= chain.climaxTarget;
+  const hardCap = Math.round(chain.climaxTarget * 1.6) + 1;
+  const forced = chain.mercCyclesSpent >= hardCap;
+  const n = beatSlotCount(chain, r, permitted || forced);
+
+  // the engine supplies the beat's job-in-the-arc instruction (beat-1 attachment is HERE, not a
+  // static prompt rule) and whether the AI may close the chain
+  let instr: string;
+  if (isBeatOne) instr = `This is BEAT 1 — the OPENER. Open on a low-stakes, HUMAN moment that makes the player CARE about a named cast member (their specific grief or want shown in a small action) — NOT a cold procedural task. Even if a client hires the company, bring a core character on-stage as a real person. Keep the arc open (closesChain:false).`;
+  else if (forced) instr = `This is the FINALE — the arc is out of room. Write the climactic confrontation that pays off the buried truth; it MUST read as the arc's peak, not a sudden stop. Set closesChain:true.`;
+  else if (permitted) instr = `This is BEAT ${beatNum}. Do something DIFFERENT from the prior beats. The arc MAY end now — but ONLY if it has genuinely reached its CLIMAX. If this beat IS the true peak, write it as the climactic finale and set closesChain:true; otherwise escalate one more turn and set closesChain:false.`;
+  else instr = `This is BEAT ${beatNum}. Escalate from what just happened; do something DIFFERENT from prior beats (don't re-stage a previous scene). The arc is NOT ready to end — keep it open and leave a thread driving forward. closesChain:false.`;
+
   const beat = await ai.chainBeat({
-    bible: chain.bible, chainState: chain.log.length ? chain.log.join(' ') : 'The saga is just beginning.',
-    region: lead.location, slotCount: n, beatConstraint: constraint,
+    bible: chain.bible, chainState: chain.log.length ? chain.log.join(' ') : 'The saga is just beginning; the player knows nothing yet.',
+    region: lead.location, slotCount: n, beatConstraint: instr,
   });
+  const isFinale = forced || (permitted && !!beat.closesChain);
   // intermediate beats pay a thin gold trickle; a (non-personal) finale pays the FOCAL character.
   // a PERSONAL finale develops the existing merc instead (handled at delivery) → no new unit.
   let reward: RewardBundle;
@@ -480,9 +493,12 @@ function recordBeat(state: GameState, quest: Quest, outcome: Outcome, partySize:
   chain.beatsResolved += 1;
   // the truth only surfaces on success/partial (newLayerRevealed = "what the player learns on
   // success"). A failed beat advances effort (climax gate) but reveals NOTHING — the mystery holds.
-  // record the ACTION too (not just the reveal) so the next beat varies its staging and doesn't repeat
-  const learned = outcome === 'failure' ? `made no headway — the truth stays hidden` : (quest.stakes || 'a step forward');
-  chain.log.push(`Beat ${chain.beatsResolved} (${outcome}): the company set to "${quest.job}" — ${learned}`);
+  // record the ACTION + RESULT so the next beat reacts and doesn't repeat staging.
+  // failure reveals NO truth but ADVANCES the world (those involved react) — it never just stalls.
+  const result = outcome === 'failure'
+    ? `but FAILED — the truth stays hidden; the people involved grow wary and the situation worsens (the next beat must reflect this setback, not ignore it)`
+    : `and ${outcome === 'partial' ? 'partly succeeded' : 'succeeded'} — the player now knows: ${quest.stakes || 'a step forward'}`;
+  chain.log.push(`Beat ${chain.beatsResolved}: the company set to "${quest.job}" ${result}.`);
   if (quest.finale) { chain.state = 'done'; if (outcome !== 'failure') maybeSpawnSequel(state, chain); return true; }
   if (chain.mercCyclesSpent >= chain.climaxTarget) chain.state = 'finale-ready';
   return false;
