@@ -81,6 +81,11 @@ function recentTitles(state: GameState): string[] {
     return premise ? `${c.title} — ${premise}` : c.title;
   }).filter(Boolean);
 }
+// the bible's cast names (from rendered "- Name (who): ..." lines) — used to track who the player has
+// already met so beats orient a name only on first appearance.
+function bibleCastNames(bible: string): string[] {
+  return [...bible.matchAll(/^- ([^(]+?)\s*\(/gm)].map((m) => m[1].trim()).filter((n) => n.length > 1);
+}
 // A hand-crafted concrete PREMISE (from seeds.ts) handed to genesis alongside the focal. Deriving the
 // story purely from the person's tags converges on one shape ("a character with a concealed truth,
 // under threat of exposure, resolved at a confrontation"). A seeded premise decorrelates the SHAPE
@@ -273,7 +278,14 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   const beat = await ai.chainBeat({
     bible: chain.bible, chainState: chain.log.length ? chain.log.join(' ') : 'The saga is just beginning; the player knows nothing yet.',
     region: lead.location, slotCount: n, beatConstraint: instr,
+    introduced: chain.introducedNames ?? [],
   });
+  // remember which cast members this beat puts on stage, so the NEXT beat orients a name only ONCE
+  // (re-tagging "Sigrun, the field-healer" every beat reads badly). Scan the player-facing text.
+  const shown = `${beat.situation} ${beat.job}`;
+  const seen = new Set(chain.introducedNames ?? []);
+  for (const name of bibleCastNames(chain.bible)) if (shown.includes(name.split(' ')[0])) seen.add(name);
+  chain.introducedNames = [...seen];
   const isFinale = forced || (permitted && !!beat.closesChain);
   // intermediate beats pay a thin gold trickle; a (non-personal) finale pays the FOCAL character.
   // a PERSONAL finale develops the existing merc instead (handled at delivery) → no new unit.

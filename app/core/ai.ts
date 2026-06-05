@@ -73,6 +73,7 @@ export function renderBible(b: GenesisOut): string {
 
 export interface ChainBeatInput {
   bible: string; chainState: string; region: string; slotCount: number; beatConstraint: string;
+  introduced?: string[];   // names the player has already met — orient ONLY names NOT in this list
 }
 export interface ChainBeatOut {
   situation: string; job: string; ask: AskOut; proposedReward: string; newLayerRevealed: string;
