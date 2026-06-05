@@ -25,6 +25,7 @@ export interface OutcomeInput {
   captiveTags?: string[];                            // display labels, if a captive delivered
   risky: boolean;
   approach?: string;                                 // chosen finale branch intent (win-over / subdue / ransom)
+  midSaga?: boolean;                                 // a NON-finale chain beat — named cast must survive & stay free
 }
 export interface OutcomeOut {
   beforeRoll: string; afterRoll: string;

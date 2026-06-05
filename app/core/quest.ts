@@ -70,18 +70,30 @@ function ownedMercTags(state: GameState): Set<string> {
   for (const m of allMercs(state)) for (const t of m.tags) s.add(t.id);
   return s;
 }
-// recent saga titles fed to genesis so each new bible is steered AWAY from repeats
+// recent sagas fed to genesis so each new bible is steered AWAY from repeats — title PLUS a short
+// premise snippet (titles alone don't stop the model re-using the same PLOT, e.g. wolf-woman-killed-
+// a-man, even under different titles). Pull the hidden SITUATION line out of the rendered bible.
 function recentTitles(state: GameState): string[] {
-  return Object.values(state.chains).slice(-4).map((c) => c.title).filter(Boolean);
+  return Object.values(state.chains).slice(-4).map((c) => {
+    const m = /SITUATION \(hidden truth\):\s*([^\n]+)/.exec(c.bible || '');
+    const premise = m ? m[1].trim().split(/(?<=[.!?])\s/).slice(0, 2).join(' ').slice(0, 200) : '';
+    return premise ? `${c.title} — ${premise}` : c.title;
+  }).filter(Boolean);
 }
-// skill tags of recent (non-personal) focals — excluded from the next focal so the THEME varies
-// (the avoid-hooks nudge can't beat tags that literally are food/beast; this fixes it at the root)
+// theme-defining tags of recent (non-personal) focals — excluded from the next focal so the
+// ARCHETYPE varies. Skills alone weren't enough: reading showed every focal coming out a
+// "beautiful, scarred, notorious wolf-witch" because those physical/notoriety tags (not just
+// skills) seed the same story. Exclude skill + physical + notoriety across the recent window so
+// consecutive sagas don't all center the same kind of person. (Race/gender are identity-floor,
+// added separately, so they're left alone.)
 function recentFocalSkills(state: GameState): string[] {
   const out = new Set<string>();
   for (const c of Object.values(state.chains).slice(-3)) {
     if (c.personal) continue;
     const focal = state.cards[c.focalCardIds[0]] as CharacterCard | undefined;
-    if (focal) for (const t of focal.tags) if (t.id.startsWith('skill:')) out.add(t.id);
+    if (focal) for (const t of focal.tags) {
+      if (t.id.startsWith('skill:') || t.id.startsWith('phys:') || t.id.startsWith('noto:')) out.add(t.id);
+    }
   }
   return [...out];
 }
@@ -191,43 +203,50 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
 
   // the engine ROTATES the opening mode + time so beats don't all read "X staggers to the gate at
   // dusk" (a strong model tic). Beat 1 is the human petitioner (attachment); later beats vary.
+  const focalName = (state.cards[chain.focalCardIds[0]] as CharacterCard | undefined)?.name ?? 'the person this saga is about';
+
+  // engine-rotated ARRIVAL + time so beats don't all read "X staggers to the gate at dusk" (a strong
+  // model tic). The "wrapped bundle / corpse left at the gate" cliché is deliberately ABSENT here and
+  // BANNED below — reading showed the model kept defaulting to it, even in finales.
   const MODES = [
-    'a petitioner arrives at the gate bringing this in person',
+    'a named cast member comes to the company in person',
     'the company is already out in the field on the last thread and comes upon this',
-    'a body, or a wrapped object, is found / left at the gate (no living petitioner)',
     'a rumor, a summons, or a sealed letter reaches the fort',
-    'an official or a creditor comes to demand / collect',
-    'a frightened bystander or a child brings word',
+    'an official, a rival, or a creditor comes to press the matter',
+    'a frightened bystander or a child brings urgent word',
   ];
   const TIMES = ['grey morning', 'high noon', 'a hot afternoon', 'dusk', 'after dark', 'in driving rain'];
-  // ACTION-TYPE follows a NATURAL DRAMATIC ARC — each beat a DIFFERENT KIND of thing (not
-  // "recover an object" every time, the padding the experiment found), with the reckoning at the
-  // END (the experiment showed a full shuffle puts premature hearings at beat 2). Mid beats walk
-  // investigate -> protect -> confront -> a-turn; the finale is the climactic reckoning.
-  const MID_ACTIONS = [
-    'INVESTIGATE — read a scene, follow a trail, or examine evidence to learn something',
-    'PROTECT / EXTRACT / SHELTER someone who is now in danger',
-    'CONFRONT / PRESS a cast member to force part of the truth out of them',
-    'a TURN — a betrayal, a double-cross, a switched allegiance, or a hard choice surfaces',
+  // VARIETY guidance ONLY: each beat should be a DIFFERENT KIND of scene than those before (so it
+  // can't pad with "recover an object" every beat — the experiment's failure mode). But the SUBSTANCE
+  // comes from THIS bible's own tensions/directions + central truth, NOT a fixed verb-arc that
+  // flattened every saga into the same crime procedural (the quality read's biggest finding).
+  const SCENE_KINDS = [
+    'get closer to a cast member and what they privately want',
+    'uncover one concrete piece of the buried truth',
+    'a danger forces the company to protect or extract someone',
+    "two cast members' wants collide out in the open",
+    'a betrayal, a double-cross, or a hard choice surfaces',
   ];
-  // rotate the opening MODE + the mid-action start per chain (seeded) so sagas don't all read
-  // identically — WITHOUT breaking the arc (beat 1 stays a human meet, the finale a reckoning)
-  const off = Math.floor(rngFrom(chain.id)() * MID_ACTIONS.length);
+  const off = Math.floor(rngFrom(chain.id)() * MODES.length);
   const mode = isBeatOne ? MODES[0] : MODES[1 + ((beatNum - 2 + off) % (MODES.length - 1))];
-  const action = isBeatOne ? 'WARM TO / MEET a cast member as a person — earn the player’s care before the plot bites'
-    : forced ? 'the CLIMACTIC confrontation or public reckoning that pays off the buried truth'
-    : MID_ACTIONS[(beatNum - 2) % MID_ACTIONS.length];
   const time = TIMES[(beatNum - 1) % TIMES.length];
-  const opening = ` OPEN this beat as: ${mode}; set it at ${time} (do NOT reuse the previous beat's opening or "dawn fog at the gate"). The beat's ACTION must be to ${action} — do NOT make this another "fetch/recover an object" job if a previous beat already was one.`;
 
-  // the engine supplies the beat's job-in-the-arc instruction (beat-1 attachment is HERE, not a
-  // static prompt rule) and whether the AI may close the chain
+  // the engine supplies the beat's job-in-the-arc instruction (beat-1 FOCAL attachment is HERE, not a
+  // static rule) and whether the AI may close the chain. Mid-beats are driven by the BIBLE itself.
   let instr: string;
-  if (isBeatOne) instr = `This is BEAT 1 — the OPENER. Open on a low-stakes, HUMAN moment that makes the player CARE about a named cast member (their specific grief or want shown in a small action) — NOT a cold procedural task. Even if a client hires the company, bring a core character on-stage as a real person. Keep the arc open (closesChain:false).`;
-  else if (forced) instr = `This is the FINALE — the arc is out of room. Write the climactic confrontation that pays off the buried truth; it MUST read as the arc's peak, not a sudden stop. Set closesChain:true.`;
-  else if (permitted) instr = `This is BEAT ${beatNum}. The arc has earned the right to end WHENEVER it genuinely PEAKS — let the STORY decide its length, neither cutting it short nor padding it. If THIS beat is the true climax that pays off the buried truth, write it as the finale (closesChain:true). If a real, driving thread still pulls the story forward, continue with a DIFFERENT, meaningful beat (closesChain:false) that ESCALATES — never a repeat of a previous beat's scene or action.`;
-  else instr = `This is BEAT ${beatNum}. Escalate from what just happened; do something DIFFERENT from prior beats (don't re-stage a previous scene). The arc is NOT ready to end — keep it open and leave a thread driving forward. closesChain:false.`;
-  instr += opening;   // engine-rotated opening mode + time, so beats don't all read the same way
+  if (isBeatOne) {
+    instr = `This is BEAT 1 — the OPENER. Center it on ${focalName}, the PERSON this saga is about, in a small, low-stakes HUMAN moment that makes the player CARE about them (a specific grief, want, or kindness shown in a small action) BEFORE the plot bites. The company may be hired, but the SCENE must put ${focalName} — or someone who plainly loves or fears for them — on stage as a real person; do NOT run beat 1 through a faceless steward/creditor/clerk handing over a contract, and do NOT capture, defeat, or resolve ${focalName} here. Keep the arc open (closesChain:false).`;
+  } else if (forced) {
+    instr = `This is the FINALE — the arc is out of room. Write the climactic confrontation that pays off the bible's CENTRAL TRUTH (the specific buried thing finally breaks into the open); it MUST read as the arc's peak, not a sudden stop. Set closesChain:true.`;
+  } else {
+    const close = permitted
+      ? `If THIS beat is the genuine climax that pays off the central truth, write it as the finale (closesChain:true); otherwise keep it open (closesChain:false).`
+      : `The arc is NOT ready to end — leave a real thread driving forward (closesChain:false).`;
+    const fn = SCENE_KINDS[(beatNum - 2 + off) % SCENE_KINDS.length];
+    instr = `This is BEAT ${beatNum}. ADVANCE THIS SAGA'S OWN STORY by escalating one of the bible's TENSIONS or OPEN DIRECTIONS, keeping its CENTRAL TRUTH — the bible's SPECIFIC hook (a curse, a feud, a vow, a heresy, whatever this story actually is) — LIVE and pressing on the cast. THIS BEAT'S JOB MUST BE A DIFFERENT KIND OF TASK than every prior beat: if a previous beat already escorted or guarded someone, do NOT escort/guard again; if one already recovered or secured an object, do NOT center this beat on fetching/securing an object again. Do NOT chase the same single object across beats. Vary BOTH the verb AND the focus. Aim this beat at the dramatic turn — "${fn}" — realized through the bible's PEOPLE, not a generic "investigate-a-ledger / question-a-clerk" errand, and never re-stage a scene, place, or action already used. ${close}`;
+  }
+  const opening = ` OPEN this beat as: ${mode}; set it at ${time}. NEVER open on (or end on) a wrapped bundle / sodden parcel / shrouded corpse left at the gate — that cliché is BANNED in every beat, finale included. Do NOT reuse the previous beat's opening.`;
+  instr += opening;
 
   const beat = await ai.chainBeat({
     bible: chain.bible, chainState: chain.log.length ? chain.log.join(' ') : 'The saga is just beginning; the player knows nothing yet.',
@@ -377,6 +396,7 @@ export async function resolveQuest(state: GameState, ai: Narrator, quest: Quest)
     situation: quest.situation, job: quest.job,
     party: party.map((m) => ({ name: m.name, tags: tagLabels(m.tags).slice(0, 4) })),
     outcome, captiveTags, risky: quest.risky, approach,
+    midSaga: !!quest.chainId && !quest.finale,
   });
   quest.outcome = outcome; quest.beforeText = narr.beforeRoll; quest.afterText = narr.afterRoll;
 
