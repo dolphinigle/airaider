@@ -184,6 +184,21 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   const forced = chain.mercCyclesSpent >= hardCap;
   const n = beatSlotCount(chain, r, permitted || forced);
 
+  // the engine ROTATES the opening mode + time so beats don't all read "X staggers to the gate at
+  // dusk" (a strong model tic). Beat 1 is the human petitioner (attachment); later beats vary.
+  const MODES = [
+    'a petitioner arrives at the gate bringing this in person',
+    'the company is already out in the field on the last thread and comes upon this',
+    'a body, or a wrapped object, is found / left at the gate (no living petitioner)',
+    'a rumor, a summons, or a sealed letter reaches the fort',
+    'an official or a creditor comes to demand / collect',
+    'a frightened bystander or a child brings word',
+  ];
+  const TIMES = ['grey morning', 'high noon', 'a hot afternoon', 'dusk', 'after dark', 'in driving rain'];
+  const mode = isBeatOne ? MODES[0] : MODES[1 + ((beatNum - 2) % (MODES.length - 1))];
+  const time = TIMES[(beatNum - 1) % TIMES.length];
+  const opening = ` OPEN this beat as: ${mode}; set it at ${time} (do NOT reuse the previous beat's opening or "dawn fog at the gate").`;
+
   // the engine supplies the beat's job-in-the-arc instruction (beat-1 attachment is HERE, not a
   // static prompt rule) and whether the AI may close the chain
   let instr: string;
@@ -191,6 +206,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   else if (forced) instr = `This is the FINALE — the arc is out of room. Write the climactic confrontation that pays off the buried truth; it MUST read as the arc's peak, not a sudden stop. Set closesChain:true.`;
   else if (permitted) instr = `This is BEAT ${beatNum}. Do something DIFFERENT from the prior beats. The arc MAY end now — but ONLY if it has genuinely reached its CLIMAX. If this beat IS the true peak, write it as the climactic finale and set closesChain:true; otherwise escalate one more turn and set closesChain:false.`;
   else instr = `This is BEAT ${beatNum}. Escalate from what just happened; do something DIFFERENT from prior beats (don't re-stage a previous scene). The arc is NOT ready to end — keep it open and leave a thread driving forward. closesChain:false.`;
+  instr += opening;   // engine-rotated opening mode + time, so beats don't all read the same way
 
   const beat = await ai.chainBeat({
     bible: chain.bible, chainState: chain.log.length ? chain.log.join(' ') : 'The saga is just beginning; the player knows nothing yet.',
