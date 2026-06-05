@@ -182,7 +182,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   // ENGINE gates the finale WINDOW (merc-cycles spent) so you never get a 1-beat saga;
   // within it the AI decides if THIS beat is the genuine climax. Hard cap forces a close.
   const permitted = chain.mercCyclesSpent >= chain.climaxTarget;
-  const hardCap = Math.round(chain.climaxTarget * 1.3) + 1;   // don't let a saga drag far past its peak
+  const hardCap = Math.round(chain.climaxTarget * 1.8) + 2;   // a GENEROUS safety net against runaway, NOT a length cap — the AI ends when the story peaks
   const forced = chain.mercCyclesSpent >= hardCap;
   const n = beatSlotCount(chain, r, permitted || forced);
 
@@ -206,7 +206,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   let instr: string;
   if (isBeatOne) instr = `This is BEAT 1 — the OPENER. Open on a low-stakes, HUMAN moment that makes the player CARE about a named cast member (their specific grief or want shown in a small action) — NOT a cold procedural task. Even if a client hires the company, bring a core character on-stage as a real person. Keep the arc open (closesChain:false).`;
   else if (forced) instr = `This is the FINALE — the arc is out of room. Write the climactic confrontation that pays off the buried truth; it MUST read as the arc's peak, not a sudden stop. Set closesChain:true.`;
-  else if (permitted) instr = `This is BEAT ${beatNum}. The arc has run long enough to end — a good saga peaks in a few beats. DEFAULT TO CLOSING: write THIS beat as the climactic confrontation that pays off the buried truth and set closesChain:true. Only set closesChain:false if a single major thread genuinely, urgently demands exactly one more beat (do not pad). Do something DIFFERENT from the prior beats.`;
+  else if (permitted) instr = `This is BEAT ${beatNum}. The arc has earned the right to end WHENEVER it genuinely PEAKS — let the STORY decide its length, neither cutting it short nor padding it. If THIS beat is the true climax that pays off the buried truth, write it as the finale (closesChain:true). If a real, driving thread still pulls the story forward, continue with a DIFFERENT, meaningful beat (closesChain:false) that ESCALATES — never a repeat of a previous beat's scene or action.`;
   else instr = `This is BEAT ${beatNum}. Escalate from what just happened; do something DIFFERENT from prior beats (don't re-stage a previous scene). The arc is NOT ready to end — keep it open and leave a thread driving forward. closesChain:false.`;
   instr += opening;   // engine-rotated opening mode + time, so beats don't all read the same way
 
