@@ -21,8 +21,10 @@
 Deriving the story *purely from the focal's tags converges* on ONE shape ("a person with a concealed
 truth, under threat of exposure, resolved at a confrontation"). So the engine injects independent seeds
 that decorrelate the story from the tags. (`GenesisInput`):
-- **`seed`** — a concrete **PREMISE** (from `core/seeds.ts` `PREMISES`, recent-excluded via
-  `chain.seedKernel`). Decorrelates the story SHAPE. *(Under active review — see Open Questions.)*
+- **`seed`** — a few random **THEME keywords** (`core/seeds.ts` `pickThemes`: one BOND + one TIE + one
+  FLAVOUR, e.g. "love, debt, a curse"). The engine hands raw sparks; genesis FUSES them into the
+  focal's life. Experiment-validated to beat a concrete premise: keywords keep the focal's tags central
+  and read far less "canned", with huge combinatorial variety. (Replaced the old `PREMISES` list.)
 - **`place`** — a concrete **SETTING** (`core/seeds.ts` `PLACES`). Stops every saga reading "a fen-hamlet".
 - **`poolCast`** — a sample of existing world characters (mercs/captives) the bible MAY weave in as
   SECONDARY people. Wires up the long-dormant `QUEST_BIBLE.md §4` "reuse the pool first" → recurrence =
@@ -77,23 +79,20 @@ that decorrelate the story from the tags. (`GenesisInput`):
 Twice this overturned a confident claim (free-length-is-fine; duplicate-beats-are-padding) and once it
 caught a self-inflicted regression (homogenization → verb-padding 56%→0%).
 
-## OPEN QUESTIONS / active experiment
+## RESOLVED (this session)
 
-- **Premise seeding: concrete premises vs random keywords.** Concrete full premises (current) may be
-  *too specific* — a player will eventually recognise a canned premise, and a ~75-entry list repeats.
-  Candidate the user proposed: hand the AI **3–4 random KEYWORDS** (e.g. `love`, `werewolf`, `revenge`)
-  and let it FUSE them with the focal. Rationale: **cheap AI can combine given concepts but can't "be
-  original" or "vary" on command** — so be smart with the ENGINE and give it concrete random seeds
-  instead of prose telling it to vary. Combinatorially far richer (100 keywords choose 3 ≫ 75 premises).
-  Risk: incoherent fusions / ignored keywords / convergence returns. **TO TEST: keyword vs premise — read
-  both, judge variety, coherence, "fun", non-repetitiveness.** Consider a structured draw (1 emotion +
-  1 situation + 1 flavour) for coherent fuel.
-- **Same principle for milieu**: replace the long "VARY THE MILIEU / don't use barge-ledger" prose with a
-  random setting/keyword seed (the `PLACES` list already does this for setting — the prose may now be
-  redundant and removable; test whether convergence returns without it).
-- **Holistic prompt rewrite**: the genesis system prompt has accreted patches (PREMISE VARIETY, NOT EVERY
-  SAGA NEEDS A DEATH, VARY THE MILIEU). Reread and REWRITE cleanly around engine-provided seeds rather
-  than piling on more "don't do X" prose.
+- **Premise → THEME keywords.** Tested keyword-seeding head-to-head vs concrete premises (`_exp_kw.ts`,
+  5 focals × 3 styles): keywords win — focal's tags stay central, far more varied, far less canned, still
+  coherent. Structured draw (bond+tie+flavour) is most reliable. Done in `core/seeds.ts` `pickThemes`.
+- **Removed the "please vary" prose.** Deleted PREMISE-VARIETY / NOT-EVERY-SAGA-NEEDS-A-DEATH /
+  VARY-THE-MILIEU paragraphs and rewrote the genesis prompt around engine-provided seeds. Validated:
+  convergence did NOT return (0 barge/ledger across the spread). **Principle: give the engine a concrete
+  random seed instead of prose telling cheap AI to "be diverse" — it can't, but it can fuse sparks.**
+- **Holistic rewrite done** — the genesis system prompt is now one clean "BUILD FROM PERSON + THEMES"
+  block instead of stacked "don't do X" patches.
+
+## OPEN QUESTIONS
+
 - **Recurrence is TEXT-LEVEL only** — bible/beats NAME existing mercs (reads great) but they aren't
   mechanically linked as units, and nothing stops assigning a merc to a quest they're a character in.
   Mechanical linking is the doc's deeper vision and the next real step.
