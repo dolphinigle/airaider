@@ -18,7 +18,7 @@ import {
   generateCharacter, type RollTest,
 } from './economy.js';
 import { generateReward, rewardEnvelope } from './reward.js';
-import { PREMISES, pickPlace } from './seeds.js';
+import { pickThemes, pickPlace } from './seeds.js';
 import { characterFromGen, liabilityCard, type MkId } from './cards.js';
 import { tagDef } from './tags.js';
 import { uid, addCard, logLine, allMercs, captives } from './state.js';
@@ -86,15 +86,11 @@ function recentTitles(state: GameState): string[] {
 function bibleCastNames(bible: string): string[] {
   return [...bible.matchAll(/^- ([^(]+?)\s*\(/gm)].map((m) => m[1].trim()).filter((n) => n.length > 1);
 }
-// A hand-crafted concrete PREMISE (from seeds.ts) handed to genesis alongside the focal. Deriving the
-// story purely from the person's tags converges on one shape ("a character with a concealed truth,
-// under threat of exposure, resolved at a confrontation"). A seeded premise decorrelates the SHAPE
-// from the tags. Pick one the recent sagas did NOT use so consecutive stories differ.
-function pickKernel(state: GameState, r: Rng): string {
-  const recent = new Set(Object.values(state.chains).slice(-8).map((c) => c.seedKernel).filter(Boolean));
-  const fresh = PREMISES.filter((s) => !recent.has(s));
-  const pool = fresh.length ? fresh : PREMISES;
-  return pool[Math.floor(r() * pool.length)];
+// THEME-KEYWORD spark handed to genesis alongside the focal (experiment-validated > a concrete premise:
+// keywords make the focal's own tags central and read far less "canned"). Deriving the story purely from
+// the person's tags converges on one shape; a few raw themes decorrelate it and the AI fuses them.
+function pickKernel(_state: GameState, r: Rng): string {
+  return pickThemes(r);
 }
 // a few existing world characters genesis MAY weave in as SECONDARY cast (recurrence = attachment,
 // QUEST_BIBLE.md §4 "reuse the pool first"). Never the focal; a small sample so the model can choose.

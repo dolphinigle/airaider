@@ -161,3 +161,20 @@ export const PLACES: string[] = [
 export function pickPlace(r: () => number): string {
   return PLACES[Math.floor(r() * PLACES.length)];
 }
+
+// THEME KEYWORDS — the better premise seed (experiment-validated, see STORY_GEN_STATE.md): instead of a
+// fixed concrete premise (which ignores the focal's tags and reads "canned"), hand genesis a few raw
+// theme words and let it FUSE them into THIS person's life. Cheap AI can't "vary" on command but it CAN
+// combine given sparks. Drawn one-per-register (a BOND + a TIE + a FLAVOUR) so the fuel is well-rounded:
+// an emotional axis, a plot axis, a concrete hook. Combinatorially huge (≫ a fixed premise list) and the
+// focal's craft/magic/trade ends up central. Append freely to grow.
+export const THEME_BOND = ['love', 'jealousy', 'grief', 'betrayal', 'loyalty', 'revenge', 'forgiveness', 'shame', 'devotion', 'obsession', 'estrangement', 'reunion', 'rivalry', 'guilt', 'mercy', 'longing', 'pride', 'spite', 'envy', 'duty', 'tenderness', 'resentment'];
+export const THEME_TIE  = ['debt', 'bondage', 'exile', 'heresy', 'an oath', 'blackmail', 'smuggling', 'desertion', 'impersonation', 'pilgrimage', 'sacrifice', 'inheritance', 'a feud', 'theft', 'ransom', 'escape', 'rebellion', 'a secret marriage', 'kidnapping', 'a succession', 'a debt of honour', 'a broken vow', 'sanctuary', 'a wager'];
+export const THEME_FLAV = ['werewolf', 'a curse', 'a ghost', 'a witch', 'a relic', 'a miracle', 'an omen', 'plague', 'famine', 'the drowned dead', 'a fae bargain', 'a prophecy', 'a haunting', 'a bog-body', "a saint's bones", 'a changeling', 'a twin', 'a bastard heir', 'a hidden letter', 'leprosy', 'madness', 'fire', 'a flood', 'a mask', 'a foundling', 'a deathbed promise'];
+
+const tpick = (a: string[], r: () => number) => a[Math.floor(r() * a.length)];
+
+/** A structured theme spark: one bond + one tie + one flavour, as a comma list (the genesis FUSES them). */
+export function pickThemes(r: () => number): string {
+  return [tpick(THEME_BOND, r), tpick(THEME_TIE, r), tpick(THEME_FLAV, r)].join(', ');
+}
