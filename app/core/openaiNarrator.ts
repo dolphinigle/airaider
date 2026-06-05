@@ -211,6 +211,8 @@ export class OpenAINarrator implements Narrator {
       `  "tensions": ["<Name A> wants <concrete X>; <Name B> wants <concrete Y>; because <plain reason they can't both have it>"],\n` +
       `  "directions": [ { "kind": "active", "hook": "a contract/plea the company is invited into — a selectable quest seed framed toward the fort" }, { "kind": "ambient", "hook": "something that unfolds with or without the company" } ] }\n` +
       `The FIRST cast entry MUST be the core person. ${depth[i.rarity ?? 'uncommon']} Include AT LEAST ONE 'active' and ONE 'ambient' direction.\n` +
+      `STORY SEED — if a SEED is given below, build the saga around THAT dramatic kernel: it is the ENGINE of the story, more than the person's tags. Grow it naturally from who the core person is so it feels inevitable for THEM, not stapled on. The central drama need NOT be a secret the focal is hiding — let the seed put the drama in a RELATIONSHIP, a CHOICE, an outside force, or another character. Do NOT default to "the focal has a guilty secret about to be exposed" unless the seed truly is that.\n` +
+      `RECURRING CAST — if EXISTING WORLD CHARACTERS are listed below, you MAY cast AT MOST ONE (rarely two) as a SECONDARY person (NEVER the core person), referencing them by their exact name + known surface; the history you write about them is new canon consistent with what's known. A returning face makes the world feel lived-in — but only where one genuinely fits the story; do NOT crowd the bible with familiar faces, and MANY sagas should use NONE and introduce fresh strangers. Coin fresh names for everyone else.\n` +
       `BANNED TOKENS: weight, shadow, burden, ghosts, fate, destiny. Clinical voice (state what IS). JSON only.`;
     const core = i.personal
       ? `CORE PERSON: the existing mercenary ${i.name ?? ''} — known as "${i.who ?? ''}"; ${i.backstory ?? ''}. Tags: [${i.focalTags[0]?.join(', ')}]. Build THEIR own buried past as NEW canon consistent with the above. Keep their name.`
@@ -218,7 +220,11 @@ export class OpenAINarrator implements Narrator {
     const avoid = i.avoid?.length
       ? `\nMake this DISTINCT from recent sagas: ${i.avoid.map((a) => `"${a}"`).join('; ')} — a different secret, crime, and fantasy.`
       : '';
-    const user = `${core}\nREGION: ${i.region}${avoid}\nBuild the bible. JSON only.`;
+    const seed = i.seed ? `\nSTORY SEED (the dramatic engine to build around): "${i.seed}"` : '';
+    const pool = i.poolCast?.length
+      ? `\nEXISTING WORLD CHARACTERS (you MAY cast one or two as SECONDARY people — never the core person):\n${i.poolCast.map((p) => `  - ${p.name} — ${p.who} [${p.tags.join(', ')}]`).join('\n')}`
+      : '';
+    const user = `${core}\nREGION: ${i.region}${seed}${pool}${avoid}\nBuild the bible. JSON only.`;
     const out = await this.json('genesis', system, user, zGenesis, this.narrativeModel, this.narrativeEffort, 4000);
     // flatten {person,roleInStory} → BiblePerson; coerce conceals
     const cast = (out.cast ?? []).map((c) => {

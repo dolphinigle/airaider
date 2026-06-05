@@ -45,6 +45,10 @@ export interface GenesisInput {
   who?: string;                 // the focal's known-for line (personal chains)
   backstory?: string;           // the focal's existing backstory (personal chains)
   avoid?: string[];             // titles/blurbs of recent sagas — make THIS distinct
+  seed?: string;                // a random DRAMATIC KERNEL to build around — decorrelates the story
+                                // SHAPE from the focal's tags (which converge on "hidden secret")
+  poolCast?: Array<{ name: string; who: string; tags: string[] }>; // existing world characters the
+                                // bible MAY cast as SECONDARY people (recurrence = attachment, QUEST_BIBLE.md §4)
 }
 // A bible person carries a WHY-LADDER (history: cause → cause → bedrock). docs/QUEST_BIBLE.md
 export interface BiblePerson {

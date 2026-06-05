@@ -80,6 +80,54 @@ function recentTitles(state: GameState): string[] {
     return premise ? `${c.title} — ${premise}` : c.title;
   }).filter(Boolean);
 }
+// A RANDOM DRAMATIC KERNEL handed to genesis alongside the focal. Deriving the story purely from
+// the person's tags converges on one shape ("a character with a concealed truth, under threat of
+// exposure, resolved at a confrontation") — every saga came out the same skeleton. An independent
+// seed decorrelates the SHAPE from the tags and (deliberately) lets the drama NOT be the focal's
+// guilty secret. Spread across engines: relationship / choice / external-force / reckoning, with
+// several that have no crime or concealment at all.
+const STORY_SEEDS = [
+  'a debt of honour between former comrades is finally called in',
+  'two people who love each other are kept apart by what they owe others',
+  'an estranged kin returns and forces a reckoning no one wanted',
+  'someone is shielding a person who may not deserve it — and knows it',
+  'a promise made to the dying is becoming impossible to keep',
+  'a rescue against the clock: someone must be pulled out before a door shuts for good',
+  'a long feud between two parties is about to turn lethal, and the focal is caught between them',
+  'an impersonation is unravelling, and the truth would ruin more than one life',
+  'a youth is about to make an irreversible choice, and the focal cannot stop them',
+  'an act of mercy is being punished as if it were malice',
+  'a sacrifice the focal chose freely looks, from outside, like a wrong to be put right',
+  'a blackmail tightens; paying it and refusing it both cost everything',
+  'a community is tearing itself apart over a scarce thing the focal controls',
+  'a false accusation has been made, and the real truth implicates the accuser',
+  'a vow or pilgrimage is driving the focal toward a dangerous end',
+  'two people the focal loves want incompatible things, and only one can win',
+  'a mentor has betrayed a trust, and the one betrayed does not yet know',
+  'a buried kinship — a secret parent, child, or sibling — is about to surface',
+  'a bargain struck long ago with someone dangerous is coming due',
+  "a protector's method carries a hidden cost that is becoming visible",
+  'loyalty to one person and loyalty to the whole community have become incompatible',
+  'grief has curdled into a plan that will harm someone innocent',
+  'a stranger arrives claiming a bond, a right, or a debt no one can verify',
+  'an old wrong the focal helped commit is resurfacing, and amends may not be possible',
+];
+// pick a kernel the recent sagas did NOT use (so consecutive stories differ in SHAPE, not just topic)
+function pickKernel(state: GameState, r: Rng): string {
+  const recent = new Set(Object.values(state.chains).slice(-5).map((c) => c.seedKernel).filter(Boolean));
+  const fresh = STORY_SEEDS.filter((s) => !recent.has(s));
+  const pool = fresh.length ? fresh : STORY_SEEDS;
+  return pool[Math.floor(r() * pool.length)];
+}
+// a few existing world characters genesis MAY weave in as SECONDARY cast (recurrence = attachment,
+// QUEST_BIBLE.md §4 "reuse the pool first"). Never the focal; a small sample so the model can choose.
+function gatherPoolCast(state: GameState, r: Rng, focalId: string): Array<{ name: string; who: string; tags: string[] }> {
+  const pool = [...allMercs(state), ...captives(state)]
+    .filter((c) => c.id !== focalId && c.name && c.name !== 'Unknown' && c.who);
+  // shuffle by seeded sort, take up to 3 (the prompt casts at most one or two, and only where they fit)
+  const shuffled = pool.map((c) => ({ c, k: r() })).sort((a, b) => a.k - b.k).map((x) => x.c).slice(0, 3);
+  return shuffled.map((c) => ({ name: c.name, who: c.who ?? '', tags: tagLabels(c.tags).slice(0, 5) }));
+}
 // theme-defining tags of recent (non-personal) focals — excluded from the next focal so the
 // ARCHETYPE varies. Skills alone weren't enough: reading showed every focal coming out a
 // "beautiful, scarred, notorious wolf-witch" because those physical/notoriety tags (not just
@@ -137,7 +185,8 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
   const focal = characterFromGen(mk(state), gen, 'npc', state.cycle);
   focal.location = 'limbo';
   addCard(state, focal);
-  const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], region: lead.location, rarity: lead.rarity, avoid: recentTitles(state) });
+  const kernel = pickKernel(state, r);
+  const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], region: lead.location, rarity: lead.rarity, avoid: recentTitles(state), seed: kernel, poolCast: gatherPoolCast(state, r, focal.id) });
   // the bible NAMES the core person (cast[0]) — that's the focal; adopt their NAME so beats and the
   // card match. who/backstory are written cleanly by flesh at delivery (the bible's why-ladder is the
   // HIDDEN writers'-room reference, NOT a readable dossier bio).
@@ -146,7 +195,7 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
   const chain: Chain = {
     id: uid(state, 'chain'), title: g.title, hook: g.leadBlurb, bible: renderBible(g), direction: g.directions[0]?.hook ?? '',
     focalCardIds: [focal.id], rarity: lead.rarity, level: lead.level, expectedBeats: B, beatsResolved: 0,
-    mercCyclesSpent: 0, climaxTarget: B * n, state: 'live', log: [],
+    mercCyclesSpent: 0, climaxTarget: B * n, state: 'live', log: [], seedKernel: kernel,
   };
   focal.chainIds.push(chain.id);
   state.chains[chain.id] = chain;
@@ -161,13 +210,14 @@ async function genesisPersonalChain(state: GameState, ai: Narrator, r: Rng, lead
   const merc = state.cards[mercId] as CharacterCard | undefined;
   if (!merc || merc.role !== 'merc') return pursueOneOff(state, ai, r, lead);
   const B = randInt(r, 2, 3);
-  const g = await ai.genesis({ focalTags: [tagLabels(merc.tags)], region: lead.location, rarity: lead.rarity, personal: true, name: merc.name, who: merc.who, backstory: merc.backstory, avoid: recentTitles(state) });
+  const kernel = pickKernel(state, r);
+  const g = await ai.genesis({ focalTags: [tagLabels(merc.tags)], region: lead.location, rarity: lead.rarity, personal: true, name: merc.name, who: merc.who, backstory: merc.backstory, avoid: recentTitles(state), seed: kernel, poolCast: gatherPoolCast(state, r, merc.id) });
   const chain: Chain = {
     id: uid(state, 'chain'), title: g.title, hook: g.leadBlurb, bible: renderBible(g), direction: g.directions[0]?.hook ?? '',
     focalCardIds: [merc.id], rarity: lead.rarity, level: merc.level, expectedBeats: B, beatsResolved: 0,
     // personal beats run ~1 merc each (the anchor); gate on B*2 effort so the saga gets a few
     // beats to breathe before the finale rather than beat-1 → finale in one step.
-    mercCyclesSpent: 0, climaxTarget: B * 2, state: 'live', log: [], personal: true,
+    mercCyclesSpent: 0, climaxTarget: B * 2, state: 'live', log: [], personal: true, seedKernel: kernel,
   };
   merc.chainIds.push(chain.id);
   state.chains[chain.id] = chain;

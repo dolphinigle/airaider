@@ -160,6 +160,7 @@ export interface Chain {
   state: 'live' | 'finale-ready' | 'done';
   log: string[];             // beat summaries fed back to the AI
   personal?: boolean;        // a main chain ABOUT an existing merc (focal = that merc)
+  seedKernel?: string;       // the random dramatic kernel this saga was built around (for variety + debug)
 }
 
 // ---- fort (FORT.md) ---------------------------------------------------------
