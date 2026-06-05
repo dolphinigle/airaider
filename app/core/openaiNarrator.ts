@@ -162,6 +162,7 @@ export class OpenAINarrator implements Narrator {
       `DELIVERED CAPTIVE TAGS: ${i.captiveTags ? '[' + i.captiveTags.join(', ') + ']' : 'none'}\n` +
       (i.approach ? `CHOSEN APPROACH: ${i.approach} — the afterRoll MUST read as this approach.\n` : '') +
       (i.midSaga ? `MID-SAGA BEAT: this is one beat of an ongoing story, NOT its end. Do NOT kill, capture, bind, defeat-for-good, or otherwise permanently remove ANY named person — the cast must survive and stay free for later beats. A FAILURE here is a SETBACK (they slip away, the trail goes cold, a wound, a worsening), never a death or capture. Take NO captive (captive=null).\n` : '') +
+      (i.reveal ? `REVEAL — the company LEARNS this on this beat; the afterRoll must SHOW them discovering it (not as a bare statement, but seen/heard/uncovered in the action), so the player comes away knowing it: "${i.reveal}"\n` : '') +
       `RISKY: ${i.risky ? 'yes' : 'no'}\nOUTCOME: ${i.outcome.toUpperCase()}\nNarrate, continuing from the card. JSON only.`;
     const out = await this.json('outcome', system, user, zOutcome, this.narrativeModel, this.narrativeEffort, 1600);
     return { beforeRoll: out.beforeRoll, afterRoll: out.afterRoll, captive: out.captive ?? null, punishment: out.punishment ?? null };
@@ -252,7 +253,7 @@ export class OpenAINarrator implements Narrator {
       `{ "situation": "<=55 words the PLAYER reads — what the company ENCOUNTERS on this beat (someone/something arriving, OR what they find in the field — per the BEAT INSTRUCTION's opening). POV-LOCKED: only what the company can see/hear or already learned. READABILITY MATTERS: write 2-4 CLEAN, plain sentences a player reads once and understands — NOT telegraphic fragment-stacking ('Grey morning. Mud. A man.') and NOT comma-splice run-ons. Weave the time of day into a real sentence, don't stack it as a fragment. ORIENT THE PLAYER, ONCE: the FIRST time a person appears, weave a 2-4 word who-they-are into the sentence as natural apposition ('his neighbour Lysa', 'a bailiff named Toft') — NOT in parentheses. But a name in the ALREADY-MET list below has been introduced in an earlier beat: use their BARE name with NO tag (re-explaining who they are every beat reads badly). Concrete sensory detail, but clarity first.",\n` +
       `  "job": "one plain line — exactly what taking this job commits the company to DO (escort / recover / guard / confront / investigate a specific thing)",\n` +
       `  "ask": { "attribute": "${ATTRS}", "favoredTags": ["0-3 bare tag words"], "slots": ["one per slot: open OR a tag word"] },\n` +
-      `  "proposedReward": "<=12 words — the loot this beat plausibly yields; the GAME sets its value",\n` +
+      `  "proposedReward": "<=12 words — the minor SIDE-LOOT this beat plausibly drops (a purse, a token, a clue, a salvaged tool); the GAME sets its value. NOT the saga's payoff — that is decided at the finale.",\n` +
       `  "newLayerRevealed": "<=18 words — the ONE CONCRETE fact the player learns on success: a NAME, a face, a specific deed (never 'a hidden actor' / 'a second figure' — name them or show the concrete symptom)",\n` +
       `  "closesChain": true/false — does THIS beat resolve the whole arc? Set true ONLY if the BEAT INSTRUCTION permits closing AND the story has genuinely reached its climax; otherwise false }\n` +
       `${VOCAB_BLOCK}\n` +

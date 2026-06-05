@@ -292,10 +292,12 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   } else if (isFinale) {
     reward = { targetValue: 0, cards: [], kindHint: 'tag-stamp' };
   } else {
+    // INTERMEDIATE beat → minor SIDE-LOOT only. (The real payoff is the FINALE's focal character above;
+    // proposedReward is side-loot flavour and never touches that — naming a captive is NOT its job.)
     const side = Math.round(BALANCE.vBase(chain.level) * 0.6);
     reward = generateReward(r, mk(state), state.cycle, { V: side, archetype: 'contract', isChain: false, level: chain.level });
-    // engine owns the VALUE; the AI owns the THEME — name the beat's loot from its proposedReward
-    if (beat.proposedReward) { const g = reward.cards.find((c) => c.class === 'gold'); if (g) g.name = beat.proposedReward.slice(0, 60); }
+    // engine owns the VALUE; the AI owns the THEME — name whatever loot card this beat drops (gold OR item).
+    if (beat.proposedReward) { const loot = reward.cards.find((c) => c.class !== 'character'); if (loot) loot.name = beat.proposedReward.slice(0, 60); }
   }
   // A non-personal finale offers MUTEX APPROACH-GROUPS (docs/QUESTS.md §9): the focal's
   // value/tags are fixed; the branch the player fills decides the KIND (welcome / cage / sell).
@@ -427,6 +429,8 @@ export async function resolveQuest(state: GameState, ai: Narrator, quest: Quest)
     party: party.map((m) => ({ name: m.name, tags: tagLabels(m.tags).slice(0, 4) })),
     outcome, captiveTags, risky: quest.risky, approach,
     midSaga: !!quest.chainId && !quest.finale,
+    // the buried truth surfaces to the PLAYER only on success/partial — gated by the coin flip here.
+    reveal: quest.chainId && outcome !== 'failure' && quest.stakes ? quest.stakes : undefined,
   });
   quest.outcome = outcome; quest.beforeText = narr.beforeRoll; quest.afterText = narr.afterRoll;
 

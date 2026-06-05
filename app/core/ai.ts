@@ -26,6 +26,8 @@ export interface OutcomeInput {
   risky: boolean;
   approach?: string;                                 // chosen finale branch intent (win-over / subdue / ransom)
   midSaga?: boolean;                                 // a NON-finale chain beat — named cast must survive & stay free
+  reveal?: string;                                   // the ONE concrete truth the player LEARNS on this beat
+                                                     // (set only on success/partial; the afterText must surface it)
 }
 export interface OutcomeOut {
   beforeRoll: string; afterRoll: string;
