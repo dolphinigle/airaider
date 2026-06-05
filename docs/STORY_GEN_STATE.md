@@ -56,13 +56,16 @@ that decorrelate the story from the tags. (`GenesisInput`):
 - **No reflexive death**: many sagas have no corpse; `midSaga` flag forbids killing/capturing named cast
   in a non-finale beat (a failure is a SETBACK).
 - **gate-bundle cliché banned** ("wrapped/sodden/shrouded corpse left at the gate"), incl. finales.
-- **Reveal gating** — each beat's `newLayerRevealed` (the one concrete truth) is surfaced to the PLAYER
-  only on success/partial: `resolveQuest` passes it to `ai.outcome` as `reveal` and the afterText shows
-  the company uncovering it; failure withholds it (mystery holds, world still worsens). The coin flip
-  decides what the player learns.
-- **Reward model** — a beat's reward is EITHER intermediate **side-loot** (gold/clue/item, themed by the
-  AI's `proposedReward`) OR the finale **payoff** = the focal CHARACTER (recruit/captive/ransom), themed
-  by the bible. `proposedReward` is side-loot ONLY; it never names the finale character.
+- **Beat proposes, RESOLUTION decides.** The beat's `newLayerRevealed` + `proposedReward` are only
+  PROPOSALS (carried on the quest as `stakes` / `proposedLoot`). The dice outcome is known at resolution,
+  so `ai.outcome` receives the proposals + the outcome and returns `learned` + `loot` scaled to it:
+  success = the full truth + clean loot; **partial = a hedged/partial truth + a lesser haul** (the old
+  pre-baked design couldn't express this); failure = nothing (a misleading scrap). The afterText shows
+  the company discovering `learned`; `recordBeat` logs the actual `learned`; the loot card is named from
+  `loot` at resolution. (Validated `_exp_scale.ts`: full → hedged → empty.)
+- **Reward model** — a beat's reward is EITHER intermediate **side-loot** (gold/clue/item; flavour decided
+  by resolution's `loot`, value by the engine) OR the finale **payoff** = the focal CHARACTER (recruit/
+  captive/ransom), themed by the bible. The side-loot path never names the finale character.
 - **Readability** (player-facing `situation`): 2–4 clean sentences, time woven into prose (no "Grey
   morning." fragments), **orient each name exactly once** in natural apposition (no parentheses), bare
   name thereafter. — *user verdict: "the beat text looks amazing now."*
