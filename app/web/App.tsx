@@ -273,7 +273,7 @@ function LogEntry({ rec }: { rec: AICallRecord }) {
       <button className="loghead" onClick={() => setOpen(!open)}>
         <span className="logn">#{rec.n}</span>
         <span className="logkind">{rec.kind}</span>
-        <span className="logtok">{rec.promptTokens}↑ {rec.completionTokens}↓{rec.cachedTokens ? ` · ${rec.cachedTokens} cached` : ''}</span>
+        <span className="logtok">{rec.ms != null ? `${(rec.ms / 1000).toFixed(1)}s · ` : ''}{rec.model ? `${rec.model.replace('gpt-5-', '')} · ` : ''}{rec.promptTokens}↑ {rec.completionTokens}↓{rec.cachedTokens ? ` · ${rec.cachedTokens} cached` : ''}</span>
         <span className="logtoggle">{open ? '▾' : '▸'}</span>
       </button>
       {open && (

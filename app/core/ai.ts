@@ -45,8 +45,9 @@ export interface GenesisInput {
   who?: string;                 // the focal's known-for line (personal chains)
   backstory?: string;           // the focal's existing backstory (personal chains)
   avoid?: string[];             // titles/blurbs of recent sagas — make THIS distinct
-  seed?: string;                // a random DRAMATIC KERNEL to build around — decorrelates the story
-                                // SHAPE from the focal's tags (which converge on "hidden secret")
+  seed?: string;                // a hand-crafted concrete PREMISE to build around — decorrelates the
+                                // story SHAPE from the focal's tags (which converge on "hidden secret")
+  place?: string;               // a concrete SETTING within the region (so sagas aren't all "a fen-hamlet")
   poolCast?: Array<{ name: string; who: string; tags: string[] }>; // existing world characters the
                                 // bible MAY cast as SECONDARY people (recurrence = attachment, QUEST_BIBLE.md §4)
 }

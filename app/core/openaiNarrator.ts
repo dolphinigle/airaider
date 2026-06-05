@@ -211,7 +211,7 @@ export class OpenAINarrator implements Narrator {
       `  "tensions": ["<Name A> wants <concrete X>; <Name B> wants <concrete Y>; because <plain reason they can't both have it>"],\n` +
       `  "directions": [ { "kind": "active", "hook": "a contract/plea the company is invited into — a selectable quest seed framed toward the fort" }, { "kind": "ambient", "hook": "something that unfolds with or without the company" } ] }\n` +
       `The FIRST cast entry MUST be the core person. ${depth[i.rarity ?? 'uncommon']} Include AT LEAST ONE 'active' and ONE 'ambient' direction.\n` +
-      `STORY SEED — if a SEED is given below, build the saga around THAT dramatic kernel: it is the ENGINE of the story, more than the person's tags. Grow it naturally from who the core person is so it feels inevitable for THEM, not stapled on. The central drama need NOT be a secret the focal is hiding — let the seed put the drama in a RELATIONSHIP, a CHOICE, an outside force, or another character. Do NOT default to "the focal has a guilty secret about to be exposed" unless the seed truly is that.\n` +
+      `STORY SEED — if a PREMISE is given below, build THIS saga around it: it is the ENGINE of the story, more than the person's tags. ADAPT its specifics to the rolled core person (their tags, profession, kind of life) so it feels inevitable for THEM, not stapled on — change roles, gender, trade, and surface so the premise and the person become one thing. The central drama need NOT be a secret the focal is hiding — let the premise put the drama where it belongs (a relationship, a choice, an outside force, another character). If a SETTING is given, stage the saga THERE.\n` +
       `RECURRING CAST — if EXISTING WORLD CHARACTERS are listed below, you MAY cast AT MOST ONE (rarely two) as a SECONDARY person (NEVER the core person), referencing them by their exact name + known surface; the history you write about them is new canon consistent with what's known. A returning face makes the world feel lived-in — but only where one genuinely fits the story; do NOT crowd the bible with familiar faces, and MANY sagas should use NONE and introduce fresh strangers. Coin fresh names for everyone else.\n` +
       `BANNED TOKENS: weight, shadow, burden, ghosts, fate, destiny. Clinical voice (state what IS). JSON only.`;
     const core = i.personal
@@ -220,11 +220,12 @@ export class OpenAINarrator implements Narrator {
     const avoid = i.avoid?.length
       ? `\nMake this DISTINCT from recent sagas: ${i.avoid.map((a) => `"${a}"`).join('; ')} — a different secret, crime, and fantasy.`
       : '';
-    const seed = i.seed ? `\nSTORY SEED (the dramatic engine to build around): "${i.seed}"` : '';
+    const seed = i.seed ? `\nPREMISE (build the saga around this; adapt its specifics to the core person): "${i.seed}"` : '';
+    const place = i.place ? `\nSETTING (stage the saga here): ${i.place}` : '';
     const pool = i.poolCast?.length
       ? `\nEXISTING WORLD CHARACTERS (you MAY cast one or two as SECONDARY people — never the core person):\n${i.poolCast.map((p) => `  - ${p.name} — ${p.who} [${p.tags.join(', ')}]`).join('\n')}`
       : '';
-    const user = `${core}\nREGION: ${i.region}${seed}${pool}${avoid}\nBuild the bible. JSON only.`;
+    const user = `${core}\nREGION: ${i.region}${place}${seed}${pool}${avoid}\nBuild the bible. JSON only.`;
     const out = await this.json('genesis', system, user, zGenesis, this.narrativeModel, this.narrativeEffort, 4000);
     // flatten {person,roleInStory} → BiblePerson; coerce conceals
     const cast = (out.cast ?? []).map((c) => {
@@ -249,7 +250,7 @@ export class OpenAINarrator implements Narrator {
       `You are the quest-writer for a grimdark mercenary-fort game. A hidden BIBLE holds the complete settled truth of a story — its CAST are real people with wants that collide. The player NEVER sees the bible. Write the NEXT quest the company is offered, revealing the buried truth only a LITTLE at a time, through what the company can see and do.\n` +
       `Given: the BIBLE (hidden truth + named cast), the CHAIN STATE (what's happened / what the player already knows), and the beat instruction.\n` +
       `Output JSON only:\n` +
-      `{ "situation": "<=55 words — what the company ENCOUNTERS on this beat (someone/something arriving at the gate, OR what they find once out in the field on this job — per the BEAT INSTRUCTION's opening). POV-LOCKED: only what the company can see/hear or already learned. Show, with concrete sensory detail.",\n` +
+      `{ "situation": "<=55 words the PLAYER reads — what the company ENCOUNTERS on this beat (someone/something arriving, OR what they find in the field — per the BEAT INSTRUCTION's opening). POV-LOCKED: only what the company can see/hear or already learned. READABILITY MATTERS: write 2-4 CLEAN, plain sentences a player reads once and understands — NOT telegraphic fragment-stacking ('Grey morning. Mud. A man.') and NOT comma-splice run-ons. Weave the time of day into a real sentence, don't stack it as a fragment. ORIENT THE PLAYER: the FIRST time you name anyone the player hasn't met, attach a 2-4 word tag of who they are to them ('his neighbour Lysa', 'a bailiff named Toft') — never a bare name the player cannot place. Concrete sensory detail, but clarity first.",\n` +
       `  "job": "one plain line — exactly what taking this job commits the company to DO (escort / recover / guard / confront / investigate a specific thing)",\n` +
       `  "ask": { "attribute": "${ATTRS}", "favoredTags": ["0-3 bare tag words"], "slots": ["one per slot: open OR a tag word"] },\n` +
       `  "proposedReward": "<=12 words — the loot this beat plausibly yields; the GAME sets its value",\n` +
