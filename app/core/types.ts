@@ -129,7 +129,8 @@ export interface Quest {
   title: string;
   situation: string;
   job: string;
-  stakes: string;
+  stakes: string;        // the beat's PROPOSED reveal (a suggestion; resolution decides what's actually learned)
+  proposedLoot?: string; // the beat's PROPOSED side-loot flavour (resolution decides the actual haul)
   // the ask
   slots: QuestSlot[];
   threshold: number;     // single-group quests; finale uses groups

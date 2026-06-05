@@ -292,12 +292,11 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   } else if (isFinale) {
     reward = { targetValue: 0, cards: [], kindHint: 'tag-stamp' };
   } else {
-    // INTERMEDIATE beat → minor SIDE-LOOT only. (The real payoff is the FINALE's focal character above;
-    // proposedReward is side-loot flavour and never touches that — naming a captive is NOT its job.)
+    // INTERMEDIATE beat → minor SIDE-LOOT only. (The real payoff is the FINALE's focal character above.)
+    // The engine fixes the VALUE here; the beat only PROPOSES the flavour — the RESOLUTION AI, which knows
+    // the dice outcome, decides the actual haul and names the card (in resolveQuest), scaled to that outcome.
     const side = Math.round(BALANCE.vBase(chain.level) * 0.6);
     reward = generateReward(r, mk(state), state.cycle, { V: side, archetype: 'contract', isChain: false, level: chain.level });
-    // engine owns the VALUE; the AI owns the THEME — name whatever loot card this beat drops (gold OR item).
-    if (beat.proposedReward) { const loot = reward.cards.find((c) => c.class !== 'character'); if (loot) loot.name = beat.proposedReward.slice(0, 60); }
   }
   // A non-personal finale offers MUTEX APPROACH-GROUPS (docs/QUESTS.md §9): the focal's
   // value/tags are fixed; the branch the player fills decides the KIND (welcome / cage / sell).
@@ -328,6 +327,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
     id: uid(state, 'quest'), leadId: lead.id, rarity: chain.rarity, level: chain.level, location: lead.location,
     archetype: 'investigate', chainId: chain.id, beat: chain.beatsResolved + 1, finale: isFinale,
     title: chain.title, situation: beat.situation, job: beat.job, stakes: beat.newLayerRevealed,
+    proposedLoot: beat.proposedReward,
     slots, groups, threshold: thresholdFor(n, chain.level),
     reward, risky: isFinale || chain.rarity === 'rare' || chain.rarity === 'legendary',
   };
@@ -429,10 +429,13 @@ export async function resolveQuest(state: GameState, ai: Narrator, quest: Quest)
     party: party.map((m) => ({ name: m.name, tags: tagLabels(m.tags).slice(0, 4) })),
     outcome, captiveTags, risky: quest.risky, approach,
     midSaga: !!quest.chainId && !quest.finale,
-    // the buried truth surfaces to the PLAYER only on success/partial — gated by the coin flip here.
-    reveal: quest.chainId && outcome !== 'failure' && quest.stakes ? quest.stakes : undefined,
+    // the beat only PROPOSES; the resolution AI decides (scaled to OUTCOME) what's actually learned/gained.
+    proposedReveal: quest.chainId ? quest.stakes || undefined : undefined,
+    proposedLoot: quest.chainId && !quest.finale ? quest.proposedLoot : undefined,
   });
   quest.outcome = outcome; quest.beforeText = narr.beforeRoll; quest.afterText = narr.afterRoll;
+  // the resolution AI named the actual side-loot (intermediate beats) — theme the loot card from it.
+  if (narr.loot && !quest.finale) { const loot = quest.reward.cards.find((c) => c.class !== 'character'); if (loot) loot.name = narr.loot.slice(0, 60); }
 
   const deliveredChars: CharacterCard[] = [];
   const delivered = deliverReward(state, r, quest, outcome, narr.captive ?? null, narr.punishment ?? null, party, deliveredChars);
@@ -458,7 +461,7 @@ export async function resolveQuest(state: GameState, ai: Narrator, quest: Quest)
 
   // chain bookkeeping
   let chainDone = false;
-  if (quest.chainId) chainDone = recordBeat(state, quest, outcome, party.length);
+  if (quest.chainId) chainDone = recordBeat(state, quest, outcome, party.length, narr.learned ?? null);
 
   delete state.quests[quest.id];
   logLine(state, `${outcome.toUpperCase()} — ${quest.job}`);
@@ -579,18 +582,18 @@ function handlePersonalFinale(merc: CharacterCard, outcome: Outcome, out: string
 const pickLiab = (r: Rng) => (['evidence', 'mess', 'debt'] as const)[randInt(r, 0, 2)];
 
 // ---- chain post-beat bookkeeping -------------------------------------------
-function recordBeat(state: GameState, quest: Quest, outcome: Outcome, partySize: number): boolean {
+function recordBeat(state: GameState, quest: Quest, outcome: Outcome, partySize: number, learned: string | null): boolean {
   const chain = quest.chainId ? state.chains[quest.chainId] : undefined;
   if (!chain) return false;
   chain.mercCyclesSpent += partySize;        // climax gate = effort, not value
   chain.beatsResolved += 1;
-  // the truth only surfaces on success/partial (newLayerRevealed = "what the player learns on
-  // success"). A failed beat advances effort (climax gate) but reveals NOTHING — the mystery holds.
-  // record the ACTION + RESULT so the next beat reacts and doesn't repeat staging.
-  // failure reveals NO truth but ADVANCES the world (those involved react) — it never just stalls.
-  const result = outcome === 'failure'
-    ? `but FAILED — the truth stays hidden; the people involved grow wary and the situation worsens (the next beat must reflect this setback, not ignore it)`
-    : `and ${outcome === 'partial' ? 'partly succeeded' : 'succeeded'} — the player now knows: ${quest.stakes || 'a step forward'}`;
+  // `learned` is what the RESOLUTION AI decided the company actually came away knowing (scaled to the
+  // outcome — full on success, partial/hedged on partial, empty on a clean failure). Record IT (not the
+  // beat's pre-baked suggestion) so the next beat reacts to the real state. A failure with nothing learned
+  // still ADVANCES the world (the people involved react) — it never just stalls.
+  const result = learned
+    ? `and the company now knows: ${learned}`
+    : `but FAILED — the truth stays hidden; the people involved grow wary and the situation worsens (the next beat must reflect this setback, not ignore it)`;
   chain.log.push(`Beat ${chain.beatsResolved}: the company set to "${quest.job}" ${result}.`);
   if (quest.finale) { chain.state = 'done'; if (outcome !== 'failure') maybeSpawnSequel(state, chain); return true; }
   if (chain.mercCyclesSpent >= chain.climaxTarget) chain.state = 'finale-ready';

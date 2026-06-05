@@ -31,6 +31,8 @@ const zOutcome = z.object({
   beforeRoll: z.string(), afterRoll: z.string(),
   captive: z.object({ name: z.string(), who: z.string() }).nullable().optional(),
   punishment: z.string().nullable().optional(),
+  learned: z.string().nullable().optional(),
+  loot: z.string().nullable().optional(),
 });
 const zFlesh = z.object({ name: z.string(), who: z.string(), backstory: z.string(), quirks: z.array(z.string()).default([]) });
 const zPerson = z.object({
@@ -153,8 +155,10 @@ export class OpenAINarrator implements Narrator {
       `{ "beforeRoll": "<=35 words: this party arrives at this job and sets to it; do NOT hint the result",\n` +
       `  "afterRoll": "<=60 words: what happened, per the OUTCOME. EACH named merc gets their own beat, true to their tags",\n` +
       `  "captive": { "name": "string", "who": "one line, fits the captive tags" } or null,\n` +
-      `  "punishment": "<=12 words: only if OUTCOME=FAILURE and the job was RISKY — the consequence that lands; else null" }\n` +
-      `OUTCOME MEANINGS: SUCCESS = clean, captive taken. PARTIAL = taken but at a COST you must SHOW (a wound / complication / lesser haul). FAILURE = captive NOT taken (captive=null); a consequence lands.\n` +
+      `  "punishment": "<=12 words: only if OUTCOME=FAILURE and the job was RISKY — the consequence that lands; else null",\n` +
+      `  "learned": "<=18 words: the ONE concrete truth the company comes away KNOWING this beat — a NAME, a face, a deed (never 'a hidden actor'). YOU decide it from the SUGGESTED truth + the OUTCOME: success = the suggested truth (or a sharper version); partial = only PART of it, hedged or learned at a cost; failure = \\"\\" (nothing concrete, or only a misleading scrap). Whatever you set here MUST also be shown being discovered in afterRoll.",\n` +
+      `  "loot": "<=10 words: the side-loot actually carried off this beat (flavour only — the game sets value). success = the suggested loot; partial = a lesser haul; failure = \\"\\"" }\n` +
+      `OUTCOME MEANINGS: SUCCESS = clean, captive taken (if any), the truth and loot won. PARTIAL = won but at a COST you must SHOW (a wound / complication / only PART of the truth / lesser haul). FAILURE = captive NOT taken (captive=null), little or nothing learned; a consequence lands. The DICE have already decided the outcome — your job is to narrate it AND decide, scaled to it, what was learned and gained.\n` +
       `RULES: continue FROM the card (same people/place). Read each merc's tags and act them. Do NOT describe capturing/binding a prisoner unless DELIVERED CAPTIVE TAGS are given (if 'none', no captive is taken). Terse, concrete, low-medieval. NEVER write numbers. JSON only.`;
     const party = i.party.map((p) => ` ${p.name} [${p.tags.join(', ')}]`).join('\n');
     const user =
@@ -162,10 +166,11 @@ export class OpenAINarrator implements Narrator {
       `DELIVERED CAPTIVE TAGS: ${i.captiveTags ? '[' + i.captiveTags.join(', ') + ']' : 'none'}\n` +
       (i.approach ? `CHOSEN APPROACH: ${i.approach} — the afterRoll MUST read as this approach.\n` : '') +
       (i.midSaga ? `MID-SAGA BEAT: this is one beat of an ongoing story, NOT its end. Do NOT kill, capture, bind, defeat-for-good, or otherwise permanently remove ANY named person — the cast must survive and stay free for later beats. A FAILURE here is a SETBACK (they slip away, the trail goes cold, a wound, a worsening), never a death or capture. Take NO captive (captive=null).\n` : '') +
-      (i.reveal ? `REVEAL — the company LEARNS this on this beat; the afterRoll must SHOW them discovering it (not as a bare statement, but seen/heard/uncovered in the action), so the player comes away knowing it: "${i.reveal}"\n` : '') +
-      `RISKY: ${i.risky ? 'yes' : 'no'}\nOUTCOME: ${i.outcome.toUpperCase()}\nNarrate, continuing from the card. JSON only.`;
+      (i.proposedReveal ? `SUGGESTED TRUTH (the beat set this up to surface — YOU decide how much actually lands given the OUTCOME): "${i.proposedReveal}"\n` : '') +
+      (i.proposedLoot ? `SUGGESTED LOOT (what the beat could drop — scale to the OUTCOME): "${i.proposedLoot}"\n` : '') +
+      `RISKY: ${i.risky ? 'yes' : 'no'}\nOUTCOME: ${i.outcome.toUpperCase()}\nNarrate, continuing from the card; decide what was learned and gained. JSON only.`;
     const out = await this.json('outcome', system, user, zOutcome, this.narrativeModel, this.narrativeEffort, 1600);
-    return { beforeRoll: out.beforeRoll, afterRoll: out.afterRoll, captive: out.captive ?? null, punishment: out.punishment ?? null };
+    return { beforeRoll: out.beforeRoll, afterRoll: out.afterRoll, captive: out.captive ?? null, punishment: out.punishment ?? null, learned: out.learned ?? null, loot: out.loot ?? null };
   }
 
   async flesh(i: FleshInput): Promise<FleshOut> {

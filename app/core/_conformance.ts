@@ -22,8 +22,9 @@ class CountingNarrator implements Narrator {
   inner = new MockNarrator();
   calls: Record<string, number> = { cardAsk: 0, outcome: 0, flesh: 0, genesis: 0, chainBeat: 0, conceptTags: 0 };
   lastProposed = '';
+  outcomeProposalsSeen = 0; outcomeLearnedReturned = 0;   // resolution consumes the beat's proposal → learned/loot
   cardAsk(i: Parameters<Narrator['cardAsk']>[0]) { this.calls.cardAsk++; return this.inner.cardAsk(i); }
-  outcome(i: Parameters<Narrator['outcome']>[0]) { this.calls.outcome++; return this.inner.outcome(i); }
+  async outcome(i: Parameters<Narrator['outcome']>[0]) { this.calls.outcome++; if (i.proposedReveal || i.proposedLoot) this.outcomeProposalsSeen++; const o = await this.inner.outcome(i); if (o.learned || o.loot) this.outcomeLearnedReturned++; return o; }
   flesh(i: Parameters<Narrator['flesh']>[0]) { this.calls.flesh++; return this.inner.flesh(i); }
   genesis(i: Parameters<Narrator['genesis']>[0]) { this.calls.genesis++; return this.inner.genesis(i); }
   async chainBeat(i: Parameters<Narrator['chainBeat']>[0]) { this.calls.chainBeat++; const o = await this.inner.chainBeat(i); this.lastProposed = o.proposedReward; return o; }
@@ -55,11 +56,10 @@ for (let c = 0; c < 30; c++) {
       // INVARIANT: N is engine-set and the reward bundle exists BEFORE assignment (reward-first)
       ok(q.slots.length >= 1, 'quest has engine-set slots before assignment');
       ok(!!q.reward, 'reward bundle fixed at quest birth');
-      // INVARIANT: a chain beat's AI proposedReward is consumed into the bundle (not ignored)
+      // INVARIANT: a chain beat carries the AI's PROPOSED reveal + loot (resolution decides the actuals)
       if (q.chainId && !q.finale) {
         beatRewardsChecked++;
-        const named = q.reward.cards.some((card) => card.name && /coin|clue|ledger|token|purse|relic|key|charm|map/i.test(card.name));
-        if (named) beatRewardsThemed++;
+        if (q.proposedLoot || q.stakes) beatRewardsThemed++;
       }
       if (q.finale) finalesSeen++;
     }
@@ -115,8 +115,10 @@ ok(ai.calls.chainBeat > 0, 'chainBeat fires (chain beats)');
 ok(ai.calls.flesh > 0, 'flesh fires (delivered characters get backstory+quirks) — DEAD CODE CHECK');
 
 console.log(`\n— flowchart invariants`);
-console.log(`  beat rewards: ${beatRewardsThemed}/${beatRewardsChecked} themed from AI proposedReward`);
-ok(beatRewardsChecked === 0 || beatRewardsThemed > 0, 'AI proposedReward is consumed into beat loot (not ignored)');
+console.log(`  beat proposals: ${beatRewardsThemed}/${beatRewardsChecked} beats carry a proposed reveal/loot`);
+ok(beatRewardsChecked === 0 || beatRewardsThemed > 0, 'chain beats carry the AI proposal (reveal/loot)');
+console.log(`  resolution consumed proposal → learned/loot: ${ai.outcomeLearnedReturned}/${ai.outcomeProposalsSeen}`);
+ok(ai.outcomeProposalsSeen === 0 || ai.outcomeLearnedReturned > 0, 'resolution decides learned/loot from the beat proposal');
 console.log(`  finales seen=${finalesSeen} · chains concluded=${chainsConcluded} · sequels seeded=${sequelsSeen}`);
 ok(chainsConcluded === 0 || sequelsSeen > 0, 'a concluded saga can seed a sequel lead (step 17)');
 console.log(`  new chains born=${Object.keys(state.chains).length - before.size}`);

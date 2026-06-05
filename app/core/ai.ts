@@ -26,13 +26,17 @@ export interface OutcomeInput {
   risky: boolean;
   approach?: string;                                 // chosen finale branch intent (win-over / subdue / ransom)
   midSaga?: boolean;                                 // a NON-finale chain beat — named cast must survive & stay free
-  reveal?: string;                                   // the ONE concrete truth the player LEARNS on this beat
-                                                     // (set only on success/partial; the afterText must surface it)
+  // the beat only PROPOSES; the resolution AI (which knows the OUTCOME) decides what is actually learned/gained.
+  proposedReveal?: string;                           // the truth the beat is SET UP to surface (a suggestion)
+  proposedLoot?: string;                             // the side-loot the beat is set up to drop (a suggestion)
 }
 export interface OutcomeOut {
   beforeRoll: string; afterRoll: string;
   captive?: { name: string; who: string } | null;
   punishment?: string | null;                       // short flavor for a failure consequence
+  learned?: string | null;                          // what the company ACTUALLY comes away knowing (scaled to
+                                                     // the outcome; '' / null on a clean failure). Decided here.
+  loot?: string | null;                             // the side-loot flavor actually gained ('' / null if none)
 }
 
 export interface FleshInput { tags: string[]; attrs: Attributes; context: string }
@@ -152,6 +156,9 @@ export class MockNarrator implements Narrator {
         ? { name: `${pick(r, NAMES)} ${pick(r, BYNAMES)}`, who: `A captive marked by ${i.captiveTags.slice(0, 2).join(' and ')}.` }
         : null,
       punishment: i.outcome === 'failure' && i.risky ? 'a wound taken in the retreat' : null,
+      // mock: resolution decides learned/loot from the proposals, scaled to the outcome.
+      learned: i.outcome === 'failure' ? null : (i.proposedReveal ?? null),
+      loot: i.outcome === 'failure' ? null : (i.proposedLoot ?? null),
     };
   }
   async flesh(i: FleshInput): Promise<FleshOut> {
