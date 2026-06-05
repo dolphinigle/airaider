@@ -200,26 +200,23 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
     'a frightened bystander or a child brings word',
   ];
   const TIMES = ['grey morning', 'high noon', 'a hot afternoon', 'dusk', 'after dark', 'in driving rain'];
-  // ACTION-TYPE rotation — beats must do a DIFFERENT KIND of thing, not "recover an object"
-  // every time (the padding the experiment found). Each verb-kind is genuinely distinct.
-  const ACTIONS = [
-    'WARM TO / MEET a cast member as a person (no plot task yet)',
+  // ACTION-TYPE follows a NATURAL DRAMATIC ARC — each beat a DIFFERENT KIND of thing (not
+  // "recover an object" every time, the padding the experiment found), with the reckoning at the
+  // END (the experiment showed a full shuffle puts premature hearings at beat 2). Mid beats walk
+  // investigate -> protect -> confront -> a-turn; the finale is the climactic reckoning.
+  const MID_ACTIONS = [
     'INVESTIGATE — read a scene, follow a trail, or examine evidence to learn something',
-    'PROTECT / EXTRACT / SHELTER someone who is in danger',
-    'CONFRONT / PRESS / face down a cast member to force the truth out of them',
+    'PROTECT / EXTRACT / SHELTER someone who is now in danger',
+    'CONFRONT / PRESS a cast member to force part of the truth out of them',
     'a TURN — a betrayal, a double-cross, a switched allegiance, or a hard choice surfaces',
-    'WITNESS / MEDIATE — a hearing, an accusation, a deal, or a public reckoning',
   ];
-  // shuffle the mode/action order PER CHAIN (seeded by chain id) so beats vary within a saga AND
-  // sagas don't all follow the same template; beat 1 is always a human meet, the finale a reckoning.
-  const rot = rngFrom(chain.id);
-  const shuf = <T,>(a: T[]): T[] => { const x = [...a]; for (let i = x.length - 1; i > 0; i--) { const j = Math.floor(rot() * (i + 1)); [x[i], x[j]] = [x[j], x[i]]; } return x; };
-  const midModes = shuf(MODES.slice(1));
-  const midActions = shuf(ACTIONS.slice(1));
-  const mode = isBeatOne ? MODES[0] : midModes[(beatNum - 2) % midModes.length];
-  const action = isBeatOne ? ACTIONS[0]
+  // rotate the opening MODE + the mid-action start per chain (seeded) so sagas don't all read
+  // identically — WITHOUT breaking the arc (beat 1 stays a human meet, the finale a reckoning)
+  const off = Math.floor(rngFrom(chain.id)() * MID_ACTIONS.length);
+  const mode = isBeatOne ? MODES[0] : MODES[1 + ((beatNum - 2 + off) % (MODES.length - 1))];
+  const action = isBeatOne ? 'WARM TO / MEET a cast member as a person — earn the player’s care before the plot bites'
     : forced ? 'the CLIMACTIC confrontation or public reckoning that pays off the buried truth'
-    : midActions[(beatNum - 2) % midActions.length];
+    : MID_ACTIONS[(beatNum - 2) % MID_ACTIONS.length];
   const time = TIMES[(beatNum - 1) % TIMES.length];
   const opening = ` OPEN this beat as: ${mode}; set it at ${time} (do NOT reuse the previous beat's opening or "dawn fog at the gate"). The beat's ACTION must be to ${action} — do NOT make this another "fetch/recover an object" job if a previous beat already was one.`;
 
