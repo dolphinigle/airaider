@@ -182,8 +182,11 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   // ENGINE gates the finale WINDOW (merc-cycles spent) so you never get a 1-beat saga;
   // within it the AI decides if THIS beat is the genuine climax. Hard cap forces a close.
   const permitted = chain.mercCyclesSpent >= chain.climaxTarget;
-  const hardCap = Math.round(chain.climaxTarget * 1.8) + 2;   // a GENEROUS safety net against runaway, NOT a length cap — the AI ends when the story peaks
-  const forced = chain.mercCyclesSpent >= hardCap;
+  // rarity-scaled MAX beats: a saga may run long IF the story earns it (legendary up to 7), but
+  // experiment data showed free length pads to 12-beat slogs — so cap it. The AI still decides
+  // WHEN to close within [permitted .. maxBeats]; this only stops a runaway.
+  const maxBeats: Record<string, number> = { common: 4, uncommon: 5, rare: 6, legendary: 7 };
+  const forced = beatNum >= (maxBeats[chain.rarity] ?? 5);
   const n = beatSlotCount(chain, r, permitted || forced);
 
   // the engine ROTATES the opening mode + time so beats don't all read "X staggers to the gate at
@@ -197,9 +200,20 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
     'a frightened bystander or a child brings word',
   ];
   const TIMES = ['grey morning', 'high noon', 'a hot afternoon', 'dusk', 'after dark', 'in driving rain'];
+  // ACTION-TYPE rotation — beats must do a DIFFERENT KIND of thing, not "recover an object"
+  // every time (the padding the experiment found). Each verb-kind is genuinely distinct.
+  const ACTIONS = [
+    'WARM TO / MEET a cast member as a person (no plot task yet)',
+    'INVESTIGATE — read a scene, follow a trail, or examine evidence to learn something',
+    'PROTECT / EXTRACT / SHELTER someone who is in danger',
+    'CONFRONT / PRESS / face down a cast member to force the truth out of them',
+    'a TURN — a betrayal, a double-cross, a switched allegiance, or a hard choice surfaces',
+    'WITNESS / MEDIATE — a hearing, an accusation, a deal, or a public reckoning',
+  ];
   const mode = isBeatOne ? MODES[0] : MODES[1 + ((beatNum - 2) % (MODES.length - 1))];
+  const action = isBeatOne ? ACTIONS[0] : ACTIONS[1 + ((beatNum - 2) % (ACTIONS.length - 1))];
   const time = TIMES[(beatNum - 1) % TIMES.length];
-  const opening = ` OPEN this beat as: ${mode}; set it at ${time} (do NOT reuse the previous beat's opening or "dawn fog at the gate").`;
+  const opening = ` OPEN this beat as: ${mode}; set it at ${time} (do NOT reuse the previous beat's opening or "dawn fog at the gate"). The beat's ACTION must be to ${action} — do NOT make this another "fetch/recover an object" job if a previous beat already was one.`;
 
   // the engine supplies the beat's job-in-the-arc instruction (beat-1 attachment is HERE, not a
   // static prompt rule) and whether the AI may close the chain
