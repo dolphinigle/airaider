@@ -55,7 +55,14 @@ that decorrelate the story from the tags. (`GenesisInput`):
 - **Beat 1 = focal attachment**, not the client.
 - **No reflexive death**: many sagas have no corpse; `midSaga` flag forbids killing/capturing named cast
   in a non-finale beat (a failure is a SETBACK).
-- **gate-bundle cliché banned** ("wrapped/sodden/shrouded corpse left at the gate"), incl. finales.
+- **gate-bundle cliché** — the explicit BAN was REMOVED (a brittle negative patch); the engine-rotated
+  opening MODE (a positive seed: a specific arrival each beat) keeps it at 0 occurrences on its own.
+  Same principle as premises/keywords: a positive seed beats a "don't do X" ban.
+- **The roll is the dramatic beat** (STORY_ENGINE §7a). Resolution = buildup until the challenge
+  materialises and the merc commits (END ON THE BRINK, held breath) → the roll shown (verdict) →
+  consequence with weight. `beforeRoll` 35-55w builds to the brink (no result hint); `afterRoll` 55-90w
+  is the consequence, each merc their own beat. GUI `ResultReveal` stages it (buildup → "dice fall…" →
+  verdict → consequence). Keep the resolution GENEROUS — it's the payoff moment.
 - **Beat proposes, RESOLUTION decides.** The beat's `newLayerRevealed` + `proposedReward` are only
   PROPOSALS (carried on the quest as `stakes` / `proposedLoot`). The dice outcome is known at resolution,
   so `ai.outcome` receives the proposals + the outcome and returns `learned` + `loot` scaled to it:
