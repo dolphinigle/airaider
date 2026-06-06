@@ -196,10 +196,10 @@ export class OpenAINarrator implements Narrator {
 
   async genesis(i: GenesisInput): Promise<GenesisOut> {
     const depth: Record<string, string> = {
-      common: 'cast 2 people; the core person gets a ~3-4 link why-ladder; the other is a single-bullet edge.',
-      uncommon: 'cast 2-3 people; 1-2 deep (~4-6 link why-ladder), the rest single-bullet edges.',
-      rare: 'cast 3-5 people; 2-3 deep (~6-8 link why-ladders), each with a distinct stake.',
-      legendary: 'cast 4-6 people; 3-4 deep (~7-9 link why-ladders tracing to formative/childhood bedrock).',
+      common: 'cast 2 people (the core person + one other who matters).',
+      uncommon: 'cast 2-3 people, each with a clear role in the quest.',
+      rare: 'cast 3-4 people, each with a distinct stake in the quest.',
+      legendary: 'cast 4-5 people, each with a distinct stake; richer web of allies and obstacles.',
     };
     const eb = i.expectedBeats ?? 4;
     const twistBlock = i.twist

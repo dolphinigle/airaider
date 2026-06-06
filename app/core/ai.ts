@@ -78,7 +78,15 @@ export interface GenesisOut {
 
 /** Render a structured bible into the clinical-truth text the beat-writer consumes. */
 export function renderBible(b: GenesisOut): string {
-  const cast = b.cast.map((p) => `- ${p.name} (${p.who}): ${p.history.join(' → ')}. wants: ${p.wants}. feels: ${p.feels}.${p.conceals ? ` conceals: ${p.conceals}.` : ''}`).join('\n');
+  // lean cast (role + want + one line) or, for kept characters, a deep why-ladder — render only the
+  // parts present, so a lean person doesn't show dangling ": ." / "feels: ." noise.
+  const cast = b.cast.map((p) => {
+    const role = p.role ? ` [${p.role}]` : '';
+    const hist = p.history?.length ? ` ${p.history.join(' → ')}.` : '';
+    const feels = p.feels ? ` feels: ${p.feels}.` : '';
+    const conceals = p.conceals ? ` conceals: ${p.conceals}.` : '';
+    return `- ${p.name} (${p.who})${role} — wants: ${p.wants}.${feels}${hist}${conceals}`;
+  }).join('\n');
   const dirs = b.directions.map((d) => `- [${d.kind}] ${d.hook}`).join('\n');
   const arc = (b.arc?.length) ? `\nROUGH ARC (a guide, not a script — step 1 opens, last step achieves the goal):\n${b.arc.map((s, i) => `  ${i + 1}. ${s}`).join('\n')}` : '';
   return `TITLE: ${b.title}\nQUEST GOAL (apparent): ${b.goal || '(the throughline)'}${b.twistReveal ? `\nTHE TWIST (hidden from the player; surfaces across beats): ${b.twistReveal}` : ''}${arc}\nSITUATION (the truth behind the job): ${b.situation}\nCAST:\n${cast}\nTENSIONS:\n- ${b.tensions.join('\n- ')}\nOPEN DIRECTIONS:\n${dirs}`;
