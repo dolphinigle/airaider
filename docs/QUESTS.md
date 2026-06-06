@@ -101,7 +101,7 @@ So you keep a hard-won focal character even on a *partial* — you only **lose**
 
 **One-off vs chain:**
 - **One-off** — the engine rolls the reward, the AI dresses it (§2). Reward-first.
-- **Chain** — the **focal character generated at genesis IS the payoff** (concentration is structural — no "bank" ledger or multiplier needed). Intermediate beats pay small reward-first side-loot (gold/minor captives, framed by the story); the **finale delivers the focal character**, with their **actual fate decided by the finale roll** (success = clean · partial = wounded/lesser · failure = lost). The likely fate was set at genesis; a failed finale diverts it (death / escape).
+- **Chain** — the **focal character generated at genesis IS the payoff**, and its value is **accrued over the beats as a merc-day bank** (ECONOMY §5a, [REWARD_BANK.md](REWARD_BANK.md)). Intermediate beats **bank** their merc-cycles (no immediate side-loot; a failed beat banks 0); the **finale crystallizes the bank** into the focal character **+ surplus gold**, the focal's **fate decided by the finale roll** (success = clean · partial = wounded/lesser · failure = lost *and* the bank forfeited). A bank short of the focal's value delivers them **with a debt**, or — if too thin — lets them **slip away** for salvage gold. A per-chain **failure budget** (harder = fewer) turns repeated stumbles into a forced **last-chance** finale rather than an endless retry.
 
 **Character rewards recurse** — a captive/recruit/promoted NPC runs character-generation, and if they become a merc fires the **main-chain** generation. A reward seeds the next story.
 
@@ -141,22 +141,57 @@ So you keep a hard-won focal character even on a *partial* — you only **lose**
 | 9 | AI | narrate (before→after); **flesh/name** the delivered card(s) |
 | 10 | Engine | apply |
 
-**Chain (linear beats + branched finale):**
+**Chain = genesis (build the bible) → linear beats (quest-writer) → branched finale.**
+
+### Phase A — Bible genesis (the writers'-room build; full spec in [QUEST_BIBLE.md](QUEST_BIBLE.md))
+
+```
+seed bank ──pick(stakes, region, anti-repeat)──┐
+fort roster + region pool sample ──────────────┤
+engine: focal character @ value V ─────────────┤   focal = the chain's REWARD (main chain → the joining merc)
+                                               ▼
+              GENESIS    collide seed × slate → one-line KERNEL; pick 1–3 CORE people (focal MUST be core)
+                                               ▼
+              BUILD      per core person: ask "why?" to bedrock → history;  feels → emergent conceals;
+                         COMMIT-TO-TRUTH (settle every fact);  reuse pool first, coin few;  edge cast stay shallow
+                                               ▼
+              ASSEMBLE   cast{who, history(why-ladder), wants, feels, conceals?} + situation
+                         + tensions(who clashes, plain reason) + openDirections{ambient | active}
+                                               ▼
+                    BIBLE = hidden settled truth   (cast size + ladder depth scale with stakes)
+```
+
 | # | Actor | Action |
 |---|---|---|
-| 1 | Engine | trigger; set rarity, expected beats B, N; `V = V_base×rarity×(B×N)` |
-| 2 | Engine | `generateCard` → **1–2 focal characters** at ~V (role-agnostic) |
-| 3 | AI | HANDOFF: flesh focal char(s) + **invent the rest of the cast** + bible + vague direction |
-| 4 | Engine | spawn beat-1 lead |
-| 5–10 | per beat | pursue → engine sets N + budget · AI writes card+ask + **proposes reward** → engine **translates** + threshold · assign → End Day · roll → deliver side-loot (**failure bends, focal SAFE**) · AI narrates · update state |
-| 11 | Engine | **CLIMAX GATE: merc-cycles *spent* < target → continuation lead, loop**; else finale |
-| 12 | Engine | hand AI the **finale recommendation** (focal char, value V) |
-| 13 | AI | finale card as **mutex approach-groups** (§9); may substitute reward if story diverged |
-| 14 | Player | **pick one approach** → fill its slots → End Day |
-| 15–16 | Engine | per-approach threshold; roll → s/p/f → **deliver focal char in the chosen KIND**, gated by roll |
+| 1 | Engine | trigger; rarity → **stakes** (sets cast size + why-ladder depth), beats `B`, slots `N`, `V = V_base×rarity×(B×N)` |
+| 2 | Engine | pre-generate the **focal character @ V** (role-agnostic tags) = the chain's **reward** *(main chain: focal = the joining merc)* |
+| 3 | Engine | pick a **seed** from the seed bank (Polti-anchored "what-if" spark, weighted by stakes/region, anti-repeat); build the **slate** = focal + region pool sample + fort roster |
+| 4 | AI · **GENESIS** | collide seed × slate → one-line **kernel**; choose **1–3 core** people the spark lands hardest on (**focal must be core**); flag `newRoleNeeded` only if no pool fit |
+| 5 | AI · **BUILD** | per core person: ladder *why?* → `history`; `feels` → emergent `conceals` (most conceal nothing); **commit-to-truth**; reuse pool first / coin few; edge cast shallow → `cast` + `situation` + `tensions` + `openDirections` |
+| 6 | Engine | persist bible (hidden); spawn **beat-1 lead** from an `active` openDirection (its hook = `drivingHook`) |
+
+### Phase B — per beat (quest-writer reveals one layer; resolver updates the world)
+
+| # | Actor | Action |
+|---|---|---|
+| 7 | Engine | per beat: set `N` + budget + threshold; hand the **quest-writer** the bible + **chain-state** (*story-so-far*: `currentSituation`, `knownToPlayer`, `openThreads`, `actorStates`) + `drivingHook` + pacing |
+| 8 | AI · **quest-writer** | write the **card** (POV-locked — only what arrives at the gate; **reveal ≤ 1 new layer**; state the job plainly) + **assignmentAsk** (qualities/tags, **no numbers**) + hiddenPurpose; propose reward fit. **Attachment: Beat 1 makes the player CARE (a low-stakes shared moment) before plot pressure; escalate from Beat 2.** Judge climax → `closesChain` |
+| 9 | Player | fill `N` slots → End Day |
+| 10 | Engine | roll → s/p/f → deliver side-loot (**failure bends the future; focal stays SAFE**) |
+| 11 | AI · **resolver** | narrate (individuate each merc by tags + dossier); update chain-state (`newlyRevealed`, threads, `actorUpdates`, `currentSituation`). **Bible PAST is immutable; outcomes bend the FUTURE only** |
+| 12 | Engine | **CLIMAX GATE: merc-cycles *spent* < target → continuation lead, loop (→ 7)**; else finale |
+
+### Phase C — branched finale
+
+| # | Actor | Action |
+|---|---|---|
+| 13 | Engine | hand AI the **finale recommendation** (focal char, value V) |
+| 14 | AI | finale card as **mutex approach-groups** (§9); may substitute reward if story diverged |
+| 15 | Player | **pick one approach** → fill its slots → End Day |
+| 16 | Engine | per-approach threshold; roll → s/p/f → **deliver focal char in the chosen KIND**, gated by roll |
 | 17 | AI | finale outcome + epilogue + maybe sequel lead |
 
-**Three solidity rules baked in:** (a) slot **count N is engine-set** (V needs it at birth, before the AI); (b) engine **computes delivery before the AI narrates** (so it names what's actually delivered); (c) the **climax gate is on merc-cycles spent** (effort), not value gained (else failures stall the chain).
+**Solidity rules baked in:** (a) slot **count N is engine-set** (V needs it at birth, before the AI); (b) engine **computes delivery before the AI narrates** (so it names what's actually delivered); (c) the **climax gate is on merc-cycles spent** (effort), not value gained (else failures stall the chain); (d) the **bible is plain settled truth** — mystery/reveal-cadence is the quest-writer's job at beat time, never baked into the bible.
 
 ## 9. Branches — mutex approach-groups 🔒-shape *(prototype: finale only)*
 

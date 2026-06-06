@@ -40,6 +40,12 @@ export const BALANCE = {
   // the grounded caps actually allow); value beyond this flows to the bundle as gold/treasure
   maxCharValue: (level: number) => 45 + level * 11,
   jackpotChance: 0.08,
+  // ---- chain reward bank (REWARD_BANK.md) ----
+  // allowed MIDDLE-beat failures before a saga is forced to a desperate finale (harder = fewer).
+  failBudget: { common: 2, uncommon: 2, rare: 1, legendary: 1 } as Record<Rarity, number>,
+  // at the finale, if the realized bank covers at least this fraction of the focal's value we still
+  // deliver the focal (saddled with a debt for the gap); below it the focal slips away → gold instead.
+  focalKeepFraction: 0.4,
 };
 
 // ---- tag pricing ------------------------------------------------------------

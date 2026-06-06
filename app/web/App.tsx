@@ -128,11 +128,15 @@ function QuestCard({ quest }: { quest: Quest }) {
   if (!eng) return null;
   const v = eng.questView(quest);
   const o = v.odds;
+  const chain = quest.chainId ? eng.state.chains[quest.chainId] : undefined;
+  const lastChance = quest.finale && chain && ((chain.failsSpent ?? 0) > (chain.failBudget ?? 99) || chain.lastChance);
   return (
     <div className={`quest ${quest.chainId ? 'chain' : ''}`}>
       <div className="quest-head">
         {quest.chainId && <span className="beat">{quest.finale ? 'FINALE' : `beat ${quest.beat}`}</span>}
+        {lastChance && <span className="beat" style={{ color: '#c0392b' }}>⚠ LAST CHANCE</span>}
         {quest.chainId && <span className="saga">✦ {quest.title}</span>}
+        {chain && (chain.bank ?? 0) > 0 && <span className="qmeta">spoils banked ~{chain.bank}g</span>}
         <span className="qmeta">{quest.rarity} · L{quest.level} · {quest.location}</span>
       </div>
       <p className="situation">{quest.situation}</p>

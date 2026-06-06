@@ -32,7 +32,8 @@ A **hardcoded table mapping level → value-per-merc-per-cycle** — the anchor 
 `splitValue(V, archetype, isChain)` allocates the value into kinds. **Archetype-driven, with a *randomized* division** (a ratio *range* rolled per quest, not a fixed number):
 
 ```
-isChain  → { focal character: ~V }   (concentrate; per-beat side-loot is a thin gold trickle)
+isChain  → { focal character: ~V }   (the focal IS the payoff — but V is ACCRUED over the beats as a
+                                      merc-day BANK, not a one-shot; see §5a + REWARD_BANK.md)
 one-off  → archetype sets a primary kind + a unit:gold ratio RANGE, e.g.
     capture  → captive 70–90% + gold
     rescue   → recruit 70–90% + gold
@@ -77,6 +78,25 @@ The roll is **three outcomes, no critical** (the upside lives in §4's generatio
 | **failure** | nothing; **and only on risky quests**, the AI proposes a **punishment** (injury/debt/liability) *within an engine-set envelope* |
 
 `EV per merc-cycle = P(succ)·V + P(partial)·(V/2) − P(fail)·cost`. Threshold sets the probabilities; tag-fit shifts them.
+
+---
+
+## 5a. Chains accrue value — the bank 🔒 *(REWARD_BANK.md)*
+
+`V_base` is **value per merc per cycle**, so a reward worth *more* than one merc-cycle can only be earned
+across several beats. A chain therefore **banks** its value: each beat accrues
+`party × V_base(level) × rarity-mult × outcomeScale` (success 1 · partial 0.5 · **failure 0**); the
+**finale crystallizes** the bank into the focal character **+ surplus gold** (the focal absorbs up to its
+own value; the rest is gold). Income-neutral vs the same merc-cycles spent on one-offs — it just defers the
+payout into a lump + a character, and adds variance (failed beats earn nothing).
+
+- **Shortfall** (bank < focal value, i.e. many beats failed): keep the focal **+ a debt** sized to the gap
+  (give-with-debt), or — below `focalKeepFraction` — the focal **slips away** and you salvage the bank as gold
+  (the §5 "keep the unit + a liability … else give gold" rule, now driven by the realized bank).
+- **Finale failure** → the whole quest failed → **0** (focal lost, bank forfeited) — §5's failure row.
+- **Off-rails / last chance**: a failed middle beat banks 0 and the story advances from the *fallout* (no
+  retry); the engine's per-chain **failure budget** (harder rarity = fewer) governs how many stumbles a saga
+  survives. Blow it → a forced **last-chance** finale: do-or-die for everything banked.
 
 ---
 

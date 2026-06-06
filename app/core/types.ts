@@ -164,8 +164,13 @@ export interface Chain {
   seedKernel?: string;       // the random dramatic kernel this saga was built around (for variety + debug)
   introducedNames?: string[];// cast names the PLAYER has already met — so beats orient a name only ONCE
   arc?: string[];            // the genesis's ROUGH arc guide — each beat realizes the matching step
-  arcProgress?: number;      // steps COMPLETED (advances only on success/partial; a failed step is retried)
-  lastFailed?: boolean;      // the previous beat failed → the next beat re-attempts the same step
+  arcProgress?: number;      // DEPRECATED (success-gating removed); kept for scratch-harness typecheck
+  lastFailed?: boolean;      // the previous beat failed → the next beat opens from the fallout (consequence)
+  // ---- reward bank (REWARD_BANK.md) ----
+  bank?: number;             // accrued merc-day value across beats; crystallized into the focal+gold at the finale
+  failBudget?: number;       // allowed MIDDLE-beat failures (rarity-scaled; harder = fewer)
+  failsSpent?: number;       // middle-beat failures so far
+  lastChance?: boolean;      // failBudget exceeded → the next beat is forced to a desperate finale
 }
 
 // ---- fort (FORT.md) ---------------------------------------------------------

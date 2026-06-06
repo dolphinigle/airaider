@@ -148,13 +148,12 @@ async function pursueOneOff(state: GameState, ai: Narrator, r: Rng, lead: Lead):
 
 // ---- chains -----------------------------------------------------------------
 async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead: Lead): Promise<Quest> {
-  const n = slotCountFor(lead, r);
-  const B = randInt(r, 2, 4);                       // expected beats
-  const V = questValue(lead.level, lead.rarity, B * n);
-  // engine rolls the FOCAL character first (role-agnostic), at the saga payoff value.
+  // engine rolls the FOCAL character first (role-agnostic), as a STRONG-for-level character.
   // role 'npc' (not merc) while pending: not on the roster, not sendable — the finale decides their fate.
   // exclude recent focals' SKILL tags so we don't get e.g. three "sinister cook" sagas in a row.
-  const gen = generateCharacter(r, { targetValue: V, level: lead.level, exclude: recentFocalSkills(state), maxSkills: 2 });
+  // The focal's value is the payout TARGET; the actual reward is the merc-day BANK accrued over the
+  // beats (REWARD_BANK.md) — bank ≥ value → focal + surplus gold; short → focal+debt or void-to-gold.
+  const gen = generateCharacter(r, { targetValue: BALANCE.maxCharValue(lead.level), level: lead.level, exclude: recentFocalSkills(state), maxSkills: 2 });
   const focal = characterFromGen(mk(state), gen, 'npc', state.cycle);
   focal.location = 'limbo';
   addCard(state, focal);
@@ -169,8 +168,9 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
   if (core) focal.name = core.name;
   const chain: Chain = {
     id: uid(state, 'chain'), title: g.title, hook: g.leadBlurb, bible: renderBible(g), direction: g.directions[0]?.hook ?? '',
-    focalCardIds: [focal.id], rarity: lead.rarity, level: lead.level, expectedBeats: B, beatsResolved: 0,
-    mercCyclesSpent: 0, climaxTarget: B * n, state: 'live', log: [], seedKernel: kernel, arc: g.arc,
+    focalCardIds: [focal.id], rarity: lead.rarity, level: lead.level, expectedBeats: arcBeats, beatsResolved: 0,
+    mercCyclesSpent: 0, climaxTarget: arcBeats, state: 'live', log: [], seedKernel: kernel, arc: g.arc,
+    bank: 0, failsSpent: 0, failBudget: BALANCE.failBudget[lead.rarity],
   };
   focal.chainIds.push(chain.id);
   state.chains[chain.id] = chain;
@@ -190,10 +190,10 @@ async function genesisPersonalChain(state: GameState, ai: Narrator, r: Rng, lead
   const g = await ai.genesis({ focalTags: [tagLabels(merc.tags)], region: lead.location, rarity: lead.rarity, personal: true, name: merc.name, who: merc.who, backstory: merc.backstory, avoid: recentTitles(state), seed: kernel, place: pickPlace(r), tone: pickTone(r), twist, expectedBeats: B * 2, poolCast: gatherPoolCast(state, r, merc.id) });
   const chain: Chain = {
     id: uid(state, 'chain'), title: g.title, hook: g.leadBlurb, bible: renderBible(g), direction: g.directions[0]?.hook ?? '',
-    focalCardIds: [merc.id], rarity: lead.rarity, level: merc.level, expectedBeats: B, beatsResolved: 0,
-    // personal beats run ~1 merc each (the anchor); gate on B*2 effort so the saga gets a few
-    // beats to breathe before the finale rather than beat-1 → finale in one step.
+    focalCardIds: [merc.id], rarity: lead.rarity, level: merc.level, expectedBeats: B * 2, beatsResolved: 0,
+    // personal beats run ~1 merc each (the anchor); a few beats to breathe before the finale.
     mercCyclesSpent: 0, climaxTarget: B * 2, state: 'live', log: [], personal: true, seedKernel: kernel, arc: g.arc,
+    bank: 0, failsSpent: 0, failBudget: BALANCE.failBudget[lead.rarity],
   };
   merc.chainIds.push(chain.id);
   state.chains[chain.id] = chain;
@@ -217,16 +217,15 @@ function beatSlotCount(chain: Chain, r: Rng, isFinale: boolean): number {
 async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead, chain: Chain, anchorMercId?: string): Promise<Quest> {
   const beatNum = chain.beatsResolved + 1;            // beat counter (length / display / rotation)
   const isBeatOne = chain.beatsResolved === 0;
-  // THE ARC IS THE PLAN, success-gated. The current step ADVANCES only when a beat succeeds (recordBeat);
-  // a FAILED step is RETRIED, not skipped — so the quest can't go off-rails by plowing past a step it
-  // failed (e.g. fail "recover the ledger" → you don't jump to "decide its fate", you try again, worse).
+  // THE ARC ADVANCES EVERY BEAT (no retry). A failed step is NOT re-attempted — the story moves on and
+  // the NEXT beat opens from the fallout (consequence), per the off-rails experiment. The engine's
+  // failure BUDGET, not retries, governs how many stumbles a saga survives (REWARD_BANK.md §4).
   const arc = chain.arc ?? [];
   const nSteps = arc.length || (chain.expectedBeats ?? 4);
-  const arcProgress = Math.min(chain.arcProgress ?? 0, Math.max(0, nSteps - 1)); // step index being attempted
-  const isRetry = !isBeatOne && !!chain.lastFailed;   // the previous beat FAILED → re-attempt the SAME step
-  const reachedLast = arcProgress >= nSteps - 1;      // on the last planned step → this is the finale
-  const stuck = chain.beatsResolved >= nSteps + 2;    // safety: endless failures still end (a desperate climax)
-  const isFinale = !isBeatOne && (reachedLast || stuck);
+  const stepIdx = Math.min(chain.beatsResolved, Math.max(0, nSteps - 1)); // arc step this beat realizes
+  const reachedLast = chain.beatsResolved >= nSteps - 1;   // done all but the last step → this IS the finale
+  const lastChance = (chain.failsSpent ?? 0) > (chain.failBudget ?? 99); // budget blown → forced desperate finale
+  const isFinale = !isBeatOne && (reachedLast || lastChance);
   const n = beatSlotCount(chain, r, isFinale);
 
   // the engine ROTATES the opening mode + time so beats don't all read "X staggers to the gate at
@@ -248,18 +247,19 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   const mode = isBeatOne ? MODES[0] : MODES[1 + ((beatNum - 2 + off) % (MODES.length - 1))];
   const time = TIMES[(beatNum - 1) % TIMES.length];
 
-  // each beat realizes the current ARC STEP (arcProgress, success-gated above). One numbering: "STEP k of n".
+  // each beat realizes the current ARC STEP (stepIdx = beatsResolved). One numbering: "STEP k of n".
   const step = (k: number) => arc.length ? `"${arc[Math.max(0, Math.min(k, arc.length - 1))]}"` : 'this step of the quest';
   const lastStep = arc.length ? `"${arc[arc.length - 1]}"` : 'the goal finally achieved';
-  const kNum = Math.min(arcProgress + 1, nSteps);
-  // a RETRY note when the previous beat failed (the same step, harder now) — so it's not a blind repeat.
-  const retryNote = isRetry ? ' RETRY: the previous attempt at THIS step FAILED — re-attempt it under worse conditions (people warier, time shorter, position weaker); do NOT pretend it succeeded.' : '';
+  const kNum = Math.min(stepIdx + 1, nSteps);
+  // a CONSEQUENCE note when the previous beat FAILED — this beat opens from the fallout (NOT a retry of
+  // the same step): the company is worse off, but the story moves forward toward the goal regardless.
+  const failNote = (!isBeatOne && chain.lastFailed) ? ' The previous step FAILED — OPEN from the fallout (a setback, loss, or worse position from that failure), then press on; do NOT re-attempt the same action and do NOT pretend it succeeded.' : '';
   // ENGINE gates mid-beat CHOICES (don't leave it to the AI, which offers one every beat): ~70% of chains
   // get exactly ONE choice step at a seeded middle position; the rest have none. Choices are a sometimes-thing.
   const croll = rngFrom(`${chain.id}:choicebeat`);
   const hasChoiceBeat = croll() < 0.7;
   const choiceStep = 1 + Math.floor(croll() * Math.max(1, nSteps - 2)); // a middle step index
-  const allowChoice = hasChoiceBeat && !isBeatOne && !isFinale && !anchorMercId && arcProgress === choiceStep;
+  const allowChoice = hasChoiceBeat && !isBeatOne && !isFinale && !anchorMercId && stepIdx === choiceStep;
   // CRITICAL discipline: the "job" line is THIS step's one concrete action — never a restatement of the
   // overall goal (the experiment showed early beats otherwise just echo the goal). Situation carries the goal.
   const jobRule = ' The "job" line is ONLY this step\'s ONE concrete action — NEVER a restatement of the overall goal (the player already knows the goal).';
@@ -267,10 +267,10 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   if (isBeatOne) {
     instr = `STEP 1 of ${nSteps} — the OPENER, where the company is OFFERED this job. Realize this step: ${step(0)}. Make the player CARE: a real person on stage in a small human moment (a grief, want, or kindness), centered on ${focalName} UNLESS they're the bible's hidden wrongdoer (then a victim / worried kin / bystander). The "situation" conveys the OVERALL job + why they'd take it; the "job" line is ONLY this opening action (meet / agree / scout / set out) — do NOT complete the goal, do NOT capture/resolve ${focalName}, no faceless steward/clerk handing over a contract. closesChain:false. Single approach — no "choices".`;
   } else if (isFinale) {
-    const desperate = !reachedLast ? ' The quest is OUT OF TIME — bring it to a head from where the company actually stands; the goal may slip if they are behind.' : '';
-    instr = `STEP ${nSteps} of ${nSteps} — the FINALE. Realize the final step: ${lastStep}. The goal is ACHIEVED or RESOLVED here, paying off whatever truth surfaced; it MUST read as the peak, not a sudden stop.${desperate}${jobRule}${retryNote} closesChain:true. No "choices" — the finale's choice is the engine's own (win over / subdue / ransom).`;
+    const desperate = (!reachedLast || lastChance) ? ' This is a LAST-CHANCE finale: the company is OUT OF TIME after repeated setbacks — force it to a head from where they actually stand; everything rides on this, and the goal may yet slip.' : '';
+    instr = `STEP ${nSteps} of ${nSteps} — the FINALE. Realize the final step: ${lastStep}. The goal is ACHIEVED or RESOLVED here, paying off whatever truth surfaced; it MUST read as the peak, not a sudden stop.${desperate}${jobRule}${failNote} closesChain:true. No "choices" — the finale's choice is the engine's own (win over / subdue / ransom).`;
   } else {
-    instr = `STEP ${kNum} of ${nSteps}. Realize this step: ${step(arcProgress)}. A MIDDLE step that ESCALATES toward the goal — a clearly DIFFERENT scene from every prior step (new place / people / action; don't re-stage or re-fetch the same thing). The company does NOT complete the goal yet.${jobRule}${retryNote} closesChain:false.${allowChoice ? ' THIS STEP AFFORDS A CHOICE: offer 2-3 "choices" (approaches testing DIFFERENT attributes — sneak/fight/talk).' : ' Single approach — no "choices".'}`;
+    instr = `STEP ${kNum} of ${nSteps}. Realize this step: ${step(stepIdx)}. A MIDDLE step that ESCALATES toward the goal — a clearly DIFFERENT scene from every prior step (new place / people / action; don't re-stage or re-fetch the same thing). The company does NOT complete the goal yet.${jobRule}${failNote} closesChain:false.${allowChoice ? ' THIS STEP AFFORDS A CHOICE: offer 2-3 "choices" (approaches testing DIFFERENT attributes — sneak/fight/talk).' : ' Single approach — no "choices".'}`;
   }
   const opening = ` OPEN it as: ${mode}; set it around ${time}, woven into a sentence (not a fragment opener). Do NOT reuse the previous beat's opening.`;
   instr += opening;
@@ -286,21 +286,16 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   const seen = new Set(chain.introducedNames ?? []);
   for (const name of bibleCastNames(chain.bible)) if (shown.includes(name.split(' ')[0])) seen.add(name);
   chain.introducedNames = [...seen];
-  // isFinale was decided by the engine (reaching the last arc step / stuck-cap), computed above.
-  // intermediate beats pay a thin gold trickle; a (non-personal) finale pays the FOCAL character.
-  // a PERSONAL finale develops the existing merc instead (handled at delivery) → no new unit.
+  // isFinale was decided by the engine (last arc step / last-chance), computed above.
+  // intermediate beats deliver NO card — their merc-day value is BANKED (REWARD_BANK.md) and crystallized
+  // at the finale into the FOCAL character + surplus gold. A PERSONAL finale develops the existing merc.
   let reward: RewardBundle;
   if (isFinale && !chain.personal) {
     const focal = state.cards[chain.focalCardIds[0]] as CharacterCard | undefined;
     reward = { targetValue: focal?.value ?? questValue(chain.level, chain.rarity, 1), cards: focal ? [focal] : [], kindHint: 'recruit' };
-  } else if (isFinale) {
-    reward = { targetValue: 0, cards: [], kindHint: 'tag-stamp' };
   } else {
-    // INTERMEDIATE beat → minor SIDE-LOOT only. (The real payoff is the FINALE's focal character above.)
-    // The engine fixes the VALUE here; the beat only PROPOSES the flavour — the RESOLUTION AI, which knows
-    // the dice outcome, decides the actual haul and names the card (in resolveQuest), scaled to that outcome.
-    const side = Math.round(BALANCE.vBase(chain.level) * 0.6);
-    reward = generateReward(r, mk(state), state.cycle, { V: side, archetype: 'contract', isChain: false, level: chain.level });
+    // intermediate beat OR personal finale: no immediate reward bundle — value banks (finale crystallizes it).
+    reward = { targetValue: 0, cards: [], kindHint: 'gold' };
   }
   // A non-personal finale offers MUTEX APPROACH-GROUPS (docs/QUESTS.md §9): the focal's
   // value/tags are fixed; the branch the player fills decides the KIND (welcome / cage / sell).
@@ -426,6 +421,16 @@ export async function resolveQuest(state: GameState, ai: Narrator, quest: Quest)
   const roll = resolveRoll(r, coins, threshold);
   const outcome = roll.outcome;
 
+  // ACCRUE THE BANK (REWARD_BANK.md §2) — each beat earns its merc-cycles, scaled to the outcome.
+  // Done BEFORE delivery so the finale crystallizes a bank that already includes its own earn.
+  if (quest.chainId) {
+    const chain = state.chains[quest.chainId];
+    if (chain) {
+      const scale = outcome === 'success' ? 1 : outcome === 'partial' ? 0.5 : 0;
+      chain.bank = (chain.bank ?? 0) + Math.round(party.length * BALANCE.vBase(chain.level) * BALANCE.rarityMult[chain.rarity] * scale);
+    }
+  }
+
   // tags of the captive/recruit the bundle would deliver (for AI naming), if any & not failure
   const charCard = quest.reward.cards.find((c) => c.class === 'character') as CharacterCard | undefined;
   const captiveTags = charCard && outcome !== 'failure' ? tagLabels(charCard.tags) : undefined;
@@ -512,6 +517,10 @@ function deliverReward(state: GameState, r: Rng, quest: Quest, outcome: Outcome,
 
   if (quest.finale) { handleFinaleFate(state, quest, outcome, out, aiCaptive, delivered); return out; }
 
+  // INTERMEDIATE chain beat (non-failure): no card — the merc-day value was BANKED (resolveQuest),
+  // crystallized into the focal + gold at the finale. Surface the running total so the gamble is visible.
+  if (quest.chainId) { const ch = state.chains[quest.chainId]; out.push(`spoils gathered toward the saga's end (~${ch?.bank ?? 0} banked)`); return out; }
+
   const scale = outcome === 'partial' ? 0.5 : 1;
   let positive = 0;
   for (const card of bundle.cards) {
@@ -543,23 +552,45 @@ function deliverCharacter(state: GameState, card: CharacterCard, outcome: Outcom
   out.push(`${card.role === 'captive' ? 'captive' : 'recruit'}: ${card.name}${outcome === 'partial' ? ' (wounded)' : ''}`);
 }
 
+// The finale crystallizes the accrued BANK into the reward (REWARD_BANK.md §3): the bank already
+// includes this finale beat's earn (accrued in resolveQuest). Failure forfeits everything; otherwise
+// the focal materializes, reconciled against the bank (surplus gold / give-with-debt / void-to-gold).
 function handleFinaleFate(state: GameState, quest: Quest, outcome: Outcome, out: string[], aiCaptive: { name: string; who: string } | null, delivered: CharacterCard[]): void {
   const chain = quest.chainId ? state.chains[quest.chainId] : undefined;
   const focal = chain && state.cards[chain.focalCardIds[0]] as CharacterCard | undefined;
-  if (!focal) return;
-  if (chain?.personal) { handlePersonalFinale(focal, outcome, out); return; }
-  // the focal kept their BIBLE name across every beat — don't let the outcome rename them.
-  // who/backstory are filled cleanly by flesh after delivery.
-  if (aiCaptive && (!focal.name || focal.name === 'Unknown')) { focal.name = aiCaptive.name; focal.who = aiCaptive.who; }
-  // the chosen approach-group decides the KIND; the roll decides whether you get it clean
-  const kind = chosenGroup(quest)?.rewardKind ?? 'recruit';
-  if (kind === 'gold') {
-    const g = Math.round(focal.value * (outcome === 'success' ? 1 : outcome === 'partial' ? 0.5 : 0));
-    focal.role = 'dead'; focal.location = 'limbo'; // sold/handed off — leaves your story
-    if (g > 0) { state.gold += g; out.push(`${focal.name} sold off for ${g} gold`); } else out.push(`the deal collapses — ${focal.name} slips away with nothing gained`);
+  if (!chain || !focal) return;
+  const bank = Math.round(chain.bank ?? 0);
+  // a PERSONAL finale develops the existing merc; non-failure still pays the saga's earned coin.
+  if (chain.personal) {
+    handlePersonalFinale(focal, outcome, out);
+    if (outcome !== 'failure' && bank > 0) { state.gold += bank; out.push(`the company earned ${bank} gold over the saga`); }
     return;
   }
-  if (outcome === 'failure') { focal.role = 'dead'; focal.location = 'limbo'; out.push(`${focal.name} is lost — the saga ends in grief`); return; }
+  // FINALE FAILURE → quest failed → 0 reward: the focal is lost, the bank forfeited (ECONOMY §5).
+  if (outcome === 'failure') {
+    focal.role = 'dead'; focal.location = 'limbo';
+    out.push(`${focal.name} is lost — the saga ends in grief, its spoils scattered`);
+    return;
+  }
+  // the focal kept their BIBLE name across every beat; who/backstory are fleshed after delivery.
+  if (aiCaptive && (!focal.name || focal.name === 'Unknown')) { focal.name = aiCaptive.name; focal.who = aiCaptive.who; }
+  const kind = chosenGroup(quest)?.rewardKind ?? 'recruit';
+  // RANSOM / SELL → take the whole bank as gold; the focal leaves your story.
+  if (kind === 'gold') {
+    focal.role = 'dead'; focal.location = 'limbo';
+    if (bank > 0) { state.gold += bank; out.push(`${focal.name} is handed off — ${bank} gold for the company`); }
+    else out.push(`the deal collapses — ${focal.name} slips away with nothing gained`);
+    return;
+  }
+  // WIN OVER / SUBDUE → deliver the focal, reconciled against the realized bank.
+  const target = Math.round(focal.value);
+  // VOID-TO-GOLD: too little was gathered to hold them — they slip away; salvage the bank as gold.
+  if (bank < target * BALANCE.focalKeepFraction) {
+    focal.role = 'dead'; focal.location = 'limbo';
+    if (bank > 0) state.gold += bank;
+    out.push(`too little was gathered — ${focal.name} slips away; ${bank} gold salvaged`);
+    return;
+  }
   const wounded = outcome === 'partial';
   if (wounded) focal.injuries.push({ id: 'injury:wound', tier: 3 });
   if (kind === 'captive') {
@@ -572,6 +603,9 @@ function handleFinaleFate(state: GameState, quest: Quest, outcome: Outcome, out:
     delivered.push(focal);
     out.push(`${focal.name} joins the company${wounded ? ', but wounded' : ''}`);
   }
+  // SURPLUS gold above the focal's value, or a DEBT for the shortfall (give-with-debt, ECONOMY §5).
+  if (bank > target) { const surplus = bank - target; state.gold += surplus; out.push(`+${surplus} gold gathered along the way`); }
+  else if (bank < target) { const gap = target - bank; const d = liabilityCard(mk(state), 'debt', gap, state.cycle); d.location = 'roster'; addCard(state, d); out.push(`but saddled with a ${gap}-gold debt (the saga cost more than it paid)`); }
 }
 
 // A personal finale develops the EXISTING merc, gated by the roll (docs/QUESTS.md §6).
@@ -602,16 +636,19 @@ function recordBeat(state: GameState, quest: Quest, outcome: Outcome, partySize:
   if (!chain) return false;
   chain.mercCyclesSpent += partySize;        // effort spent (display)
   chain.beatsResolved += 1;
-  // ARC ADVANCEMENT IS SUCCESS-GATED: a beat moves to the NEXT arc step only on success/partial; a FAILURE
-  // keeps the step (the next beat RETRIES it, harder) so the quest can't plow past a step it failed.
+  // THE ARC ADVANCES EVERY BEAT (no retry). A failed MIDDLE beat spends from the failure BUDGET; once
+  // the budget is blown the chain goes to a forced LAST-CHANCE finale (REWARD_BANK.md §4).
   chain.lastFailed = outcome === 'failure';
-  if (outcome !== 'failure') chain.arcProgress = (chain.arcProgress ?? 0) + 1;
+  if (outcome === 'failure' && !quest.finale) {
+    chain.failsSpent = (chain.failsSpent ?? 0) + 1;
+    if (chain.failsSpent > (chain.failBudget ?? 99)) chain.lastChance = true;
+  }
   // `learned` is what the RESOLUTION AI decided the company actually came away knowing (scaled to the
-  // outcome — full on success, partial/hedged on partial, empty on a clean failure). Record IT so the
-  // next beat reacts to the real state. A failure still advances the WORLD (people react) — never stalls.
+  // outcome — full on success, hedged on partial, empty on failure). A failure advances the WORLD (people
+  // react, the company is worse off) — the next beat opens from the fallout, never retries the step.
   const result = learned
     ? `and the company now knows: ${learned}`
-    : `but FAILED — the company did NOT complete this step; the people grow warier and the situation worsens (the next beat re-attempts THIS step under worse conditions)`;
+    : `but FAILED — the company did NOT complete this step; they are worse off and the situation darkens (the next beat opens from this fallout and presses on)`;
   chain.log.push(`Beat ${chain.beatsResolved}: the company set to "${quest.job}" ${result}.`);
   if (quest.finale) { chain.state = 'done'; if (outcome !== 'failure') maybeSpawnSequel(state, chain); return true; }
   return false;
