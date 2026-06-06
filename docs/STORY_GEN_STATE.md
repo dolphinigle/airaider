@@ -117,7 +117,35 @@ caught a self-inflicted regression (homogenization → verb-padding 56%→0%).
 - **Holistic rewrite done** — the genesis system prompt is now one clean "BUILD FROM PERSON + THEMES"
   block instead of stacked "don't do X" patches.
 
-## OPEN QUESTIONS
+## DECIDED — genesis direction (from the extensive 21-playthrough experiment, `_exp_long.ts`)
+
+Experiment: {A straight+ladders, D twist+lean, B twist+ladders} × {common/rare/legendary} × 3 reps, each
+played end-to-end to finale. Findings → decisions:
+- **Apparent goal + ENGINE-ROLLED twist (~30%).** The engine rolls twist-or-not and TELLS the genesis
+  (the AI never decides — left to itself it made a twist 9/9 times). When rolled, the genesis must give an
+  apparent goal + a real situation + the misdirection; the twist surfaces through the reveal-log and lands
+  at the finale. Validated: the twist lands at EVERY length, even 4-beat shorts (a "return the locket" job
+  becomes a dead man's dying wish; "recover the relic" becomes "it kills the person bonded to it"; an
+  escort becomes "the one you guard is the threat"). Rate ~30% (not 45%) so straights stay common and
+  twists stay surprising.
+- **Lean cast, not why-ladders, at genesis.** B (twist+ladders) and D (twist+lean) produced
+  indistinguishable QUEST quality — the ladders never show in the beats; their value is the delivered
+  character's dossier. So genesis goes lean (role + want + one vivid line); depth is paid only at
+  flesh-on-delivery for the character actually recruited. ~⅓ cheaper.
+- **Length control is solid** (common→4, rare→6, legendary→7 via the rarity cap).
+
+## OPEN QUESTIONS (next experiments)
+
+- **Does the bible PLAN the arc, or improvise reactively?** Currently REACTIVE: beats are generated
+  one-at-a-time (bible + state-so-far + an engine beat-instruction). The engine owns structure (beat-1
+  meet, mid = step-toward-goal w/ scene-kind rotation, finale = reckoning, rarity cap) but beat CONTENT is
+  improvised — which is why lean occasionally pads at MAX length (a legendary-lean run sagged to escort×4).
+  A genesis-planned arc (a loose beat outline / where the twist lands) would likely kill the padding and
+  place the twist deliberately, at the cost of rigidity vs the dice. Worth testing: planned vs reactive,
+  or a hybrid (plan the major turns, fill reactively). LEANING toward planning to stop unnecessary padding.
+- **The ~4-beat minimum is arbitrary** — it falls out of the climax gate `B×slots` (B=randInt 2-4), not a
+  design intent. Bible quests can't currently be 1-2 beats; true one-offs only come from the `cardAsk`
+  path. If short bible-quests are wanted, lower/flex the gate. Revisit.
 
 - **Recurrence is TEXT-LEVEL only** — bible/beats NAME existing mercs (reads great) but they aren't
   mechanically linked as units, and nothing stops assigning a merc to a quest they're a character in.
