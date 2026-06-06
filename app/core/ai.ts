@@ -54,6 +54,7 @@ export interface GenesisInput {
   seed?: string;                // a hand-crafted concrete PREMISE to build around — decorrelates the
                                 // story SHAPE from the focal's tags (which converge on "hidden secret")
   place?: string;               // a concrete SETTING within the region (so sagas aren't all "a fen-hamlet")
+  tone?: string;                // the engine-set register (slice-of-life … dark) so not every saga is grim
   poolCast?: Array<{ name: string; who: string; tags: string[] }>; // existing world characters the
                                 // bible MAY cast as SECONDARY people (recurrence = attachment, QUEST_BIBLE.md §4)
 }
@@ -63,9 +64,10 @@ export interface BiblePerson {
 }
 export interface GenesisOut {
   title: string;                // concrete, names a real thing/person/place
-  leadBlurb: string;            // the player-facing job-board teaser (mundane; no hidden truth)
+  leadBlurb: string;            // the player-facing job-board teaser — a clear job the company would take
+  goal: string;                 // the QUEST throughline: what the company is engaged to achieve
   cast: BiblePerson[];          // the cast web; cast[0] is the focal/core person
-  situation: string;            // the hidden ground truth, told straight
+  situation: string;            // the ground truth, told straight
   tensions: string[];           // "<A> wants X; <B> wants Y; because <reason>"
   directions: Array<{ kind: 'ambient' | 'active'; hook: string }>; // quest seeds toward the fort
 }
@@ -74,7 +76,7 @@ export interface GenesisOut {
 export function renderBible(b: GenesisOut): string {
   const cast = b.cast.map((p) => `- ${p.name} (${p.who}): ${p.history.join(' → ')}. wants: ${p.wants}. feels: ${p.feels}.${p.conceals ? ` conceals: ${p.conceals}.` : ''}`).join('\n');
   const dirs = b.directions.map((d) => `- [${d.kind}] ${d.hook}`).join('\n');
-  return `TITLE: ${b.title}\nSITUATION (hidden truth): ${b.situation}\nCAST:\n${cast}\nTENSIONS:\n- ${b.tensions.join('\n- ')}\nOPEN DIRECTIONS:\n${dirs}`;
+  return `TITLE: ${b.title}\nQUEST GOAL: ${b.goal || '(the throughline of this saga)'}\nSITUATION (the truth behind the job): ${b.situation}\nCAST:\n${cast}\nTENSIONS:\n- ${b.tensions.join('\n- ')}\nOPEN DIRECTIONS:\n${dirs}`;
 }
 
 export interface ChainBeatInput {
@@ -177,6 +179,7 @@ export class MockNarrator implements Narrator {
     return {
       title: `The Ledger of ${i.region}`,
       leadBlurb: `A petitioner from ${i.region} brings a debt unpaid and a name they won't say.`,
+      goal: `settle the matter the petitioner from ${i.region} brings to the company`,
       cast: [
         { name: focalName, who: i.who ?? `known for ${seed}`, history: [`shaped by ${seed}`, 'made a choice they cannot undo', 'now hides what it cost'], wants: 'to keep the past buried', feels: 'shame', conceals: 'the thing they did' },
         { name: `${pick(r, NAMES)} of ${i.region}`, who: 'a witness', history: ['saw what happened'], wants: 'justice or silence-money', feels: 'fear', role: 'the one who remembers' },

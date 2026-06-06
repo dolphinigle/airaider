@@ -34,7 +34,7 @@ export const BALANCE = {
   maxTagsPerCard: 16,
   tagCapFor: (targetValue: number, ceiling: number) =>
     Math.min(16, Math.max(5, 2 + Math.ceil(targetValue / (ceiling * 0.45)))),
-  maxSkills: 3,   // a believable character has a few skills, not all of them
+  maxSkills: 3,   // global cap for value-packing; FOCALS get a tighter cap (see GenSpec.maxSkills)
   maxMagic: 1,    // …and at most one school of magic
   // the most value a single believable character can hold in tags (empirically matched to what
   // the grounded caps actually allow); value beyond this flows to the bundle as gold/treasure
@@ -98,6 +98,7 @@ export interface GenSpec {
   required?: string[];      // canonical tag ids that must be included
   exclude?: string[];       // canonical tag ids to AVOID (e.g. recent focals' theme skills → saga variety)
   role?: 'merc' | 'captive' | 'npc';
+  maxSkills?: number;       // override the global skill cap (focals use 2 — fewer, more believable skills)
 }
 
 export interface GeneratedCharacter {
@@ -137,6 +138,7 @@ export function generateCharacter(r: Rng, spec: GenSpec): GeneratedCharacter {
 
   // 2. spend the rest — aim each tag near remaining/slotsLeft so the budget lands
   const avoid = new Set(spec.exclude ?? []);
+  const maxSk = spec.maxSkills ?? BALANCE.maxSkills;
   const pool = allTags().filter((d) => d.group !== 'gender' && d.group !== 'race' && !avoid.has(d.id));
   let guard = 0;
   const cheapest = (d: TagDef) => (d.tiered ? tagValue(d, 5) : tagValue(d, 3));
@@ -147,7 +149,7 @@ export function generateCharacter(r: Rng, spec: GenSpec): GeneratedCharacter {
     const magicCount = tags.filter((t) => t.id.startsWith('skill:magic')).length;
     const candidates = pool.filter((d) => (!d.mutex || !usedMutex.has(d.mutex))
       && !tags.some((t) => t.id === d.id) && cheapest(d) <= remaining
-      && !(d.group === 'skill' && skillCount >= BALANCE.maxSkills)   // grounded: cap skills
+      && !(d.group === 'skill' && skillCount >= maxSk)   // grounded: cap skills
       && !(d.id.startsWith('skill:magic') && magicCount >= BALANCE.maxMagic));
     if (!candidates.length) break;
     // restrict to tags that can actually reach near the aim (avoids cheap-tag dilution),
@@ -174,7 +176,7 @@ export function generateCharacter(r: Rng, spec: GenSpec): GeneratedCharacter {
     const sc = tags.filter((t) => tagDef(t.id)?.group === 'skill').length;
     const mc = tags.filter((t) => t.id.startsWith('skill:magic')).length;
     const bonus = pool.filter((d) => (!d.mutex || !usedMutex.has(d.mutex)) && !tags.some((t) => t.id === d.id) && d.tiered
-      && !(d.group === 'skill' && sc >= BALANCE.maxSkills) && !(d.id.startsWith('skill:magic') && mc >= BALANCE.maxMagic));
+      && !(d.group === 'skill' && sc >= maxSk) && !(d.id.startsWith('skill:magic') && mc >= BALANCE.maxMagic));
     if (bonus.length) {
       const def = weightedPick(r, bonus, (d) => BALANCE.rarityBase[d.rarity]); // bias RARE for the jackpot
       const tier = Math.max(1, affordableTier(def, ceiling, ceiling, r) - randInt(r, 0, 1));

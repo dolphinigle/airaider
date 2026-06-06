@@ -178,3 +178,21 @@ const tpick = (a: string[], r: () => number) => a[Math.floor(r() * a.length)];
 export function pickThemes(r: () => number): string {
   return [tpick(THEME_BOND, r), tpick(THEME_TIE, r), tpick(THEME_FLAV, r)].join(', ');
 }
+
+// STORY TONE — the engine sets the register so NOT every saga is grim/scary. Weighted toward the lighter
+// end (most jobs are ordinary); the heavy registers are rarer and land harder for being so.
+const TONES: Array<{ tone: string; w: number }> = [
+  { tone: 'a light SLICE-OF-LIFE — a small, low-stakes human problem; warm or wry, no one in real danger', w: 3 },
+  { tone: 'a WRY, roguish caper — trouble, banter, a scheme; fun more than fraught', w: 2 },
+  { tone: 'a tender, BITTERSWEET tale — quiet feeling, a small loss or kindness, melancholy not menace', w: 2 },
+  { tone: 'an ADVENTUROUS romp — a journey, a find, a risk worth taking for its own sake', w: 2 },
+  { tone: 'a TENSE situation — real stakes and pressure, but not yet horror', w: 2 },
+  { tone: 'a DARK, serious saga — danger, dread, hard choices; let it be heavy', w: 1 },
+];
+const TONE_TOTAL = TONES.reduce((s, t) => s + t.w, 0);
+/** Pick a tone (weighted) so the engine, not the AI, sets each saga's register. */
+export function pickTone(r: () => number): string {
+  let x = r() * TONE_TOTAL;
+  for (const t of TONES) { if ((x -= t.w) < 0) return t.tone; }
+  return TONES[0].tone;
+}

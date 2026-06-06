@@ -45,6 +45,7 @@ const zPerson = z.object({
 const zGenesis = z.object({
   title: z.string(),
   leadBlurb: z.string(),
+  goal: z.string().default(''),
   // accept either flat persons or {person, roleInStory} nesting
   cast: z.array(z.union([zPerson, z.object({ person: zPerson, roleInStory: z.string().optional() })])).default([]),
   situation: z.string(),
@@ -198,24 +199,27 @@ export class OpenAINarrator implements Narrator {
       legendary: 'cast 4-6 people; 3-4 deep (~7-9 link why-ladders tracing to formative/childhood bedrock).',
     };
     const system =
-      `You build the believable hidden TRUTH of a story — the reference a writers' room works from. NOT prose, NOT a mystery: what is ACTUALLY true, told straight. Mystery is added later by someone else who chooses what to reveal; your job is only to make the truth BELIEVABLE.\n` +
-      `You are given the CORE PERSON the story centers on (their tags / known life), a few THEME words, a SETTING, and the region.\n\n` +
+      `You design a QUEST for a MERCENARY COMPANY — and the believable truth behind it. The player RUNS the company: this lands on their job board, or someone brings it to their fort. Your job is to make a quest they have a clear REASON to take and a STAKE in — then build the believable people and truth that make it real. NOT prose; the settled facts a writers' room works from, told straight.\n` +
+      `You are given the CORE PERSON the quest centers on (their tags / known life), a few THEME words, a SETTING, a TONE, and the region.\n\n` +
+      `BUILD A QUEST THE COMPANY WOULD TAKE:\n` +
+      `- THE HOOK — how the company gets the job and WHY they'd take it. Someone hires them for coin, pleads for help, posts a bounty, OR the core person comes to the fort and asks them directly. The mercenary reason must be PLAIN: pay, a person to save/escort/find, a captive or recruit worth taking, a threat to remove. The player must read the hook and think "yes, that's a job for us."\n` +
+      `- THE GOAL — one clear thing the company is trying to ACHIEVE across the saga (save / escort / find / protect / hunt / recover / expose / deliver someone or something). Every beat is a step toward it; the player always knows what they're working toward.\n` +
+      `- GOAL-DRIVEN OR MYSTERY-DRIVEN, both are good. A quest can be a straight goal with NO hidden secret (escort this person to safety; hunt the thing in the fen; help them reach the thing they want) OR a truth to uncover. Do NOT force a hidden secret — if the themes/person suggest a simple adventure, write a simple adventure.\n` +
+      `- DRAMA SERVES THE QUEST. The cast's wants and secrets are OBSTACLES, allies, costs, and turns ALONG the goal — not a static web of strangers the player merely watches. The player is a PARTICIPANT working toward the goal, never a spectator to someone else's argument.\n\n` +
       `BUILD EACH PERSON BY ASKING "WHY?" TO BEDROCK: start from a present fact and ask "why?" again and again to something irreducible — a love, loss, vow, debt, shame. Each answer is ONE history bullet, in order (e.g. "she avoids the harbour → a man drowned there → she untied the wrong line → she let them blame a boy"). \n` +
       `SECRETS ARE NOT A FIELD: a person conceals something ONLY when a FEELING makes hiding natural (shame, guilt, fear). If history+feeling yields concealment, set "conceals"; else omit it. MOST people conceal NOTHING.\n` +
       `Ladder DEEP only for the core person (and 1 other the story turns on); edge cast stay shallow.\n` +
       `BELIEVABILITY: every present fact traces to a prior cause in history; ordinary human motives, not plot necessity; no coincidence-stacking; nobody acts dumb to keep the situation alive.\n` +
       `COMMIT TO THE TRUTH: this bible IS the settled, complete truth. If a killing/theft/betrayal/disappearance happened, state plainly WHO did it and WHY. BANNED in the hidden layer: "unknown", "remains hidden", "it is unclear", "a mysterious figure", "the truth of X is never revealed" — you the author already know, so write it down.\n` +
-      `BUILD THE SAGA FROM THE PERSON + THE THEMES:\n` +
-      `- The CORE PERSON is the heart. Their tags — craft, magic, profession, temperament — must be CENTRAL to what the story is ABOUT, not decoration. A water-singer's saga turns on water and song; a going-blind carver's on the carving; a feared dark-mage's on what they can do and what it costs. Ask what a person like THIS would want, fear, owe, or be caught up in.\n` +
-      `- The THEMES are a spark and a flavour to FUSE, not a checklist. Invent an ORIGINAL premise that braids them into this person's life and weave them in naturally (you need not name them). Let the themes set the SHAPE: the drama need NOT be a secret the focal is hiding — it can live in a relationship, a choice, an outside force, or another person. Let the SETTING be where it happens.\n` +
-      `- One human situation, specific and small enough to care about. Not every saga needs a death or a crime.\n\n` +
+      `THE CORE PERSON + THEMES make the quest specific. Their tags — craft, magic, profession, temperament — must be CENTRAL to what the quest is about (a water-singer's job turns on water and song; a going-blind carver's on the carving). The THEMES are a spark to FUSE, not a checklist (weave them in; you need not name them). Match the TONE you're given — not every saga is grim. Keep it ONE clear situation, small enough to care about.\n\n` +
       `Output JSON only:\n` +
       `{ "title": "short, concrete, names a real thing/person/place — NOT a poetic two-noun phrase like 'Oar and Scar', NOT 'The Weight of X'",\n` +
-      `  "leadBlurb": "1-2 sentences the PLAYER sees on the job board before meeting anyone — reads like a MUNDANE CONTRACT, reveals NONE of the hidden truth (a body, an unpaid debt, a missing barge — never the cast's secret names)",\n` +
-      `  "cast": [ { "name": "...", "who": "one line: what the world already knows of them", "history": ["the why-ladder, ordered cause→cause→bedrock"], "wants": "plain human want", "feels": "the feeling about their history", "conceals": "OPTIONAL: only if a feeling makes hiding natural", "role": "their role in the story" } ],\n` +
-      `  "situation": "2-4 sentences — the believable present truth, told straight (the hidden ground truth, NOT the blurb)",\n` +
-      `  "tensions": ["<Name A> wants <concrete X>; <Name B> wants <concrete Y>; because <plain reason they can't both have it>"],\n` +
-      `  "directions": [ { "kind": "active", "hook": "a contract/plea the company is invited into — a selectable quest seed framed toward the fort" }, { "kind": "ambient", "hook": "something that unfolds with or without the company" } ] }\n` +
+      `  "leadBlurb": "1-2 sentences the PLAYER reads on the job board — a CLEAR job they'd take: who/what it concerns, what the company is wanted FOR, and the draw (pay / a person / a prize). Plain and inviting, not cryptic. Hide the deep secret, but never hide what the JOB is.",\n` +
+      `  "goal": "one line: what taking this quest commits the company to ACHIEVE (e.g. 'escort Alen through the marsh to the abbey alive', 'find and bring back the miller's daughter', 'drive the thing out of the Sael fens'). The throughline every beat advances.",\n` +
+      `  "cast": [ { "name": "...", "who": "one line: what the world already knows of them", "history": ["the why-ladder, ordered cause→cause→bedrock"], "wants": "plain human want", "feels": "the feeling about their history", "conceals": "OPTIONAL: only if a feeling makes hiding natural", "role": "their role in the QUEST (client / companion / quarry / obstacle / ally / prize)" } ],\n` +
+      `  "situation": "2-4 sentences — the believable truth behind the job, told straight (may be no secret at all, just the honest situation)",\n` +
+      `  "tensions": ["what stands in the way and what's at stake: <A> wants <X>; <B> wants <Y>; because <reason> — obstacles ALONG the goal, not a standalone argument"],\n` +
+      `  "directions": [ { "kind": "active", "hook": "the next concrete step toward the goal the company can take" }, { "kind": "ambient", "hook": "something pressing on the goal that unfolds with or without them" } ] }\n` +
       `The FIRST cast entry MUST be the core person. ${depth[i.rarity ?? 'uncommon']} Include AT LEAST ONE 'active' and ONE 'ambient' direction.\n` +
       `RECURRING CAST — if EXISTING WORLD CHARACTERS are listed below, you MAY cast AT MOST ONE (rarely two) as a SECONDARY person (NEVER the core person), referencing them by their exact name + known surface; the history you write about them is new canon consistent with what's known. A returning face makes the world feel lived-in — but only where one genuinely fits the story; do NOT crowd the bible with familiar faces, and MANY sagas should use NONE and introduce fresh strangers. Coin fresh names for everyone else.\n` +
       `BANNED PURPLE WORDS: weight, shadow, burden, fate, destiny. Clinical voice (state what IS). JSON only.`;
@@ -227,10 +231,11 @@ export class OpenAINarrator implements Narrator {
       : '';
     const seed = i.seed ? `\nTHEMES (fuse these into the core person's life — a spark, not a checklist; you need not name them): ${i.seed}` : '';
     const place = i.place ? `\nSETTING (stage the saga here): ${i.place}` : '';
+    const tone = i.tone ? `\nTONE (the register for this quest): ${i.tone}` : '';
     const pool = i.poolCast?.length
       ? `\nEXISTING WORLD CHARACTERS (you MAY cast one or two as SECONDARY people — never the core person):\n${i.poolCast.map((p) => `  - ${p.name} — ${p.who} [${p.tags.join(', ')}]`).join('\n')}`
       : '';
-    const user = `${core}\nREGION: ${i.region}${place}${seed}${pool}${avoid}\nBuild the bible. JSON only.`;
+    const user = `${core}\nREGION: ${i.region}${place}${tone}${seed}${pool}${avoid}\nBuild the quest bible. JSON only.`;
     const out = await this.json('genesis', system, user, zGenesis, this.narrativeModel, this.narrativeEffort, 4000);
     // flatten {person,roleInStory} → BiblePerson; coerce conceals
     const cast = (out.cast ?? []).map((c) => {
@@ -247,12 +252,12 @@ export class OpenAINarrator implements Narrator {
     const directions = dirsRaw.map((d) => typeof d === 'string'
       ? { kind: 'active' as const, hook: d }
       : { kind: (d.kind === 'ambient' ? 'ambient' : 'active') as 'ambient' | 'active', hook: d.hook });
-    return { title: out.title, leadBlurb: out.leadBlurb, cast, situation: out.situation, tensions: out.tensions ?? [], directions };
+    return { title: out.title, leadBlurb: out.leadBlurb, goal: out.goal ?? '', cast, situation: out.situation, tensions: out.tensions ?? [], directions };
   }
 
   async chainBeat(i: ChainBeatInput): Promise<ChainBeatOut> {
     const system =
-      `You are the quest-writer for a grimdark mercenary-fort game. A hidden BIBLE holds the complete settled truth of a story — its CAST are real people with wants that collide. The player NEVER sees the bible. Write the NEXT quest the company is offered, revealing the buried truth only a LITTLE at a time, through what the company can see and do.\n` +
+      `You are the quest-writer for a grimdark mercenary-fort game. The player RUNS a mercenary company and is working a JOB. A hidden BIBLE holds the settled truth + the QUEST GOAL (what the company is trying to achieve). The player NEVER sees the bible. Write the NEXT step of this job — a concrete task the company is OFFERED that visibly moves them toward the goal — revealing the buried truth only a LITTLE at a time, through what the company can see and do. The player must always understand what they're doing and why it serves the job; never make them a spectator to a scene with no task in it for them.\n` +
       `Given: the BIBLE (hidden truth + named cast), the CHAIN STATE (what's happened / what the player already knows), and the beat instruction.\n` +
       `Output JSON only:\n` +
       `{ "situation": "<=55 words the PLAYER reads — what the company ENCOUNTERS on this beat (someone/something arriving, OR what they find in the field — per the BEAT INSTRUCTION's opening). POV-LOCKED: only what the company can see/hear or already learned. READABILITY MATTERS: write 2-4 CLEAN, plain sentences a player reads once and understands — NOT telegraphic fragment-stacking ('Grey morning. Mud. A man.') and NOT comma-splice run-ons. Weave the time of day into a real sentence, don't stack it as a fragment. ORIENT THE PLAYER, ONCE: the FIRST time a person appears, weave a 2-4 word who-they-are into the sentence as natural apposition ('his neighbour Lysa', 'a bailiff named Toft') — NOT in parentheses. But a name in the ALREADY-MET list below has been introduced in an earlier beat: use their BARE name with NO tag (re-explaining who they are every beat reads badly). Concrete sensory detail, but clarity first.",\n` +

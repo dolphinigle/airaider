@@ -18,7 +18,7 @@ import {
   generateCharacter, type RollTest,
 } from './economy.js';
 import { generateReward, rewardEnvelope } from './reward.js';
-import { pickThemes, pickPlace } from './seeds.js';
+import { pickThemes, pickPlace, pickTone } from './seeds.js';
 import { characterFromGen, liabilityCard, type MkId } from './cards.js';
 import { tagDef } from './tags.js';
 import { uid, addCard, logLine, allMercs, captives } from './state.js';
@@ -154,12 +154,12 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
   // engine rolls the FOCAL character first (role-agnostic), at the saga payoff value.
   // role 'npc' (not merc) while pending: not on the roster, not sendable — the finale decides their fate.
   // exclude recent focals' SKILL tags so we don't get e.g. three "sinister cook" sagas in a row.
-  const gen = generateCharacter(r, { targetValue: V, level: lead.level, exclude: recentFocalSkills(state) });
+  const gen = generateCharacter(r, { targetValue: V, level: lead.level, exclude: recentFocalSkills(state), maxSkills: 2 });
   const focal = characterFromGen(mk(state), gen, 'npc', state.cycle);
   focal.location = 'limbo';
   addCard(state, focal);
   const kernel = pickKernel(state, r);
-  const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], region: lead.location, rarity: lead.rarity, avoid: recentTitles(state), seed: kernel, place: pickPlace(r), poolCast: gatherPoolCast(state, r, focal.id) });
+  const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], region: lead.location, rarity: lead.rarity, avoid: recentTitles(state), seed: kernel, place: pickPlace(r), tone: pickTone(r), poolCast: gatherPoolCast(state, r, focal.id) });
   // the bible NAMES the core person (cast[0]) — that's the focal; adopt their NAME so beats and the
   // card match. who/backstory are written cleanly by flesh at delivery (the bible's why-ladder is the
   // HIDDEN writers'-room reference, NOT a readable dossier bio).
@@ -184,7 +184,7 @@ async function genesisPersonalChain(state: GameState, ai: Narrator, r: Rng, lead
   if (!merc || merc.role !== 'merc') return pursueOneOff(state, ai, r, lead);
   const B = randInt(r, 2, 3);
   const kernel = pickKernel(state, r);
-  const g = await ai.genesis({ focalTags: [tagLabels(merc.tags)], region: lead.location, rarity: lead.rarity, personal: true, name: merc.name, who: merc.who, backstory: merc.backstory, avoid: recentTitles(state), seed: kernel, place: pickPlace(r), poolCast: gatherPoolCast(state, r, merc.id) });
+  const g = await ai.genesis({ focalTags: [tagLabels(merc.tags)], region: lead.location, rarity: lead.rarity, personal: true, name: merc.name, who: merc.who, backstory: merc.backstory, avoid: recentTitles(state), seed: kernel, place: pickPlace(r), tone: pickTone(r), poolCast: gatherPoolCast(state, r, merc.id) });
   const chain: Chain = {
     id: uid(state, 'chain'), title: g.title, hook: g.leadBlurb, bible: renderBible(g), direction: g.directions[0]?.hook ?? '',
     focalCardIds: [merc.id], rarity: lead.rarity, level: merc.level, expectedBeats: B, beatsResolved: 0,
@@ -258,7 +258,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   // static rule) and whether the AI may close the chain. Mid-beats are driven by the BIBLE itself.
   let instr: string;
   if (isBeatOne) {
-    instr = `This is BEAT 1 — the OPENER. Make the player CARE about a real person in a small, low-stakes HUMAN moment (a specific grief, want, or kindness shown in a small action) BEFORE the plot bites. Center it on ${focalName}, the person this saga is about — UNLESS ${focalName} is the bible's hidden wrongdoer (showing them warmly would spoil the secret), in which case center it instead on another named cast member the player can care about: a victim, a worried kin, a bystander caught in it. Either way put a real person on stage; do NOT run beat 1 through a faceless steward/creditor/clerk handing over a contract, and do NOT capture, defeat, or resolve ${focalName} here. Keep the arc open (closesChain:false).`;
+    instr = `This is BEAT 1 — the OPENER, where the company is OFFERED this job. Two things at once: (a) make the player CARE — a real person on stage in a small human moment (a specific grief, want, or kindness), centered on ${focalName} UNLESS they're the bible's hidden wrongdoer (then center a victim / worried kin / bystander); and (b) make the JOB clear — by the end of this beat the player must understand what the company is being asked to DO and why they'd take it (the QUEST GOAL in the bible). Do NOT run it through a faceless steward/clerk handing over a contract; do NOT capture/resolve ${focalName} here. Keep the arc open (closesChain:false).`;
   } else if (forced) {
     instr = `This is the FINALE — the arc is out of room. Write the climactic confrontation that pays off the bible's CENTRAL TRUTH (the specific buried thing finally breaks into the open); it MUST read as the arc's peak, not a sudden stop. Set closesChain:true.`;
   } else {
@@ -266,7 +266,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
       ? `If THIS beat is the genuine climax that pays off the central truth, write it as the finale (closesChain:true); otherwise keep it open (closesChain:false).`
       : `The arc is NOT ready to end — leave a real thread driving forward (closesChain:false).`;
     const fn = SCENE_KINDS[(beatNum - 2 + off) % SCENE_KINDS.length];
-    instr = `This is BEAT ${beatNum}. ADVANCE THIS SAGA'S OWN STORY by escalating one of the bible's TENSIONS or OPEN DIRECTIONS, keeping its CENTRAL TRUTH — the bible's SPECIFIC hook (a curse, a feud, a vow, a heresy, whatever this story actually is) — LIVE and pressing on the cast. THIS BEAT'S JOB MUST BE A DIFFERENT KIND OF TASK than every prior beat: if a previous beat already escorted or guarded someone, do NOT escort/guard again; if one already recovered or secured an object, do NOT center this beat on fetching/securing an object again. Do NOT chase the same single object across beats. Vary BOTH the verb AND the focus. Aim this beat at the dramatic turn — "${fn}" — realized through the bible's PEOPLE, not a generic "investigate-a-ledger / question-a-clerk" errand, and never re-stage a scene, place, or action already used. ${close}`;
+    instr = `This is BEAT ${beatNum}. Take the company ONE concrete STEP toward the QUEST GOAL (in the bible) — this beat's job must visibly move them closer to achieving it, through the bible's obstacles/tensions; keep what's specific about this quest LIVE and pressing. THIS BEAT'S JOB MUST BE A DIFFERENT KIND OF TASK than every prior beat: if a previous beat already escorted or guarded someone, do NOT escort/guard again; if one already recovered or secured an object, do NOT center this beat on fetching/securing an object again. Do NOT chase the same single object across beats. Vary BOTH the verb AND the focus. Aim this beat at the dramatic turn — "${fn}" — realized through the bible's PEOPLE, not a generic "investigate-a-ledger / question-a-clerk" errand, and never re-stage a scene, place, or action already used. ${close}`;
   }
   const opening = ` OPEN this beat as: ${mode}; set it around ${time} (woven into a real sentence, not stacked as a fragment opener). Do NOT reuse the previous beat's opening.`;
   instr += opening;
