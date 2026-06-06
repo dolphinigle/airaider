@@ -215,17 +215,19 @@ function beatSlotCount(chain: Chain, r: Rng, isFinale: boolean): number {
   return 1 + (r() < 0.4 ? 1 : 0);
 }
 async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead, chain: Chain, anchorMercId?: string): Promise<Quest> {
-  const beatNum = chain.beatsResolved + 1;
+  const beatNum = chain.beatsResolved + 1;            // beat counter (length / display / rotation)
   const isBeatOne = chain.beatsResolved === 0;
-  // ENGINE gates the finale WINDOW (merc-cycles spent) so you never get a 1-beat saga;
-  // within it the AI decides if THIS beat is the genuine climax. Hard cap forces a close.
-  const permitted = chain.mercCyclesSpent >= chain.climaxTarget;
-  // rarity-scaled MAX beats: a saga may run long IF the story earns it (legendary up to 7), but
-  // experiment data showed free length pads to 12-beat slogs — so cap it. The AI still decides
-  // WHEN to close within [permitted .. maxBeats]; this only stops a runaway.
-  const maxBeats: Record<string, number> = { common: 4, uncommon: 5, rare: 6, legendary: 7 };
-  const forced = beatNum >= (maxBeats[chain.rarity] ?? 5);
-  const n = beatSlotCount(chain, r, permitted || forced);
+  // THE ARC IS THE PLAN, success-gated. The current step ADVANCES only when a beat succeeds (recordBeat);
+  // a FAILED step is RETRIED, not skipped — so the quest can't go off-rails by plowing past a step it
+  // failed (e.g. fail "recover the ledger" → you don't jump to "decide its fate", you try again, worse).
+  const arc = chain.arc ?? [];
+  const nSteps = arc.length || (chain.expectedBeats ?? 4);
+  const arcProgress = Math.min(chain.arcProgress ?? 0, Math.max(0, nSteps - 1)); // step index being attempted
+  const isRetry = !isBeatOne && !!chain.lastFailed;   // the previous beat FAILED → re-attempt the SAME step
+  const reachedLast = arcProgress >= nSteps - 1;      // on the last planned step → this is the finale
+  const stuck = chain.beatsResolved >= nSteps + 2;    // safety: endless failures still end (a desperate climax)
+  const isFinale = !isBeatOne && (reachedLast || stuck);
+  const n = beatSlotCount(chain, r, isFinale);
 
   // the engine ROTATES the opening mode + time so beats don't all read "X staggers to the gate at
   // dusk" (a strong model tic). Beat 1 is the human petitioner (attachment); later beats vary.
@@ -246,33 +248,29 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   const mode = isBeatOne ? MODES[0] : MODES[1 + ((beatNum - 2 + off) % (MODES.length - 1))];
   const time = TIMES[(beatNum - 1) % TIMES.length];
 
-  // ONE plan, ONE numbering (experiment finding): each beat realizes the matching ARC STEP — beat k ↔
-  // step k, 1:1. No "BEAT N" vs "arc step M" dual framing, no competing SCENE-turn that invented off-arc
-  // beats. The arc (sized to rarity at genesis) IS the beat plan; the finale is the LAST step.
-  const arc = chain.arc ?? [];
-  const nSteps = arc.length || (chain.expectedBeats ?? 4);
-  const kNum = Math.min(beatNum, nSteps);
+  // each beat realizes the current ARC STEP (arcProgress, success-gated above). One numbering: "STEP k of n".
   const step = (k: number) => arc.length ? `"${arc[Math.max(0, Math.min(k, arc.length - 1))]}"` : 'this step of the quest';
   const lastStep = arc.length ? `"${arc[arc.length - 1]}"` : 'the goal finally achieved';
+  const kNum = Math.min(arcProgress + 1, nSteps);
+  // a RETRY note when the previous beat failed (the same step, harder now) — so it's not a blind repeat.
+  const retryNote = isRetry ? ' RETRY: the previous attempt at THIS step FAILED — re-attempt it under worse conditions (people warier, time shorter, position weaker); do NOT pretend it succeeded.' : '';
   // ENGINE gates mid-beat CHOICES (don't leave it to the AI, which offers one every beat): ~70% of chains
   // get exactly ONE choice step at a seeded middle position; the rest have none. Choices are a sometimes-thing.
   const croll = rngFrom(`${chain.id}:choicebeat`);
   const hasChoiceBeat = croll() < 0.7;
-  const choiceBeatNum = 2 + Math.floor(croll() * Math.max(1, nSteps - 2));
-  const allowChoice = hasChoiceBeat && !isBeatOne && !forced && !anchorMercId && beatNum === choiceBeatNum;
+  const choiceStep = 1 + Math.floor(croll() * Math.max(1, nSteps - 2)); // a middle step index
+  const allowChoice = hasChoiceBeat && !isBeatOne && !isFinale && !anchorMercId && arcProgress === choiceStep;
   // CRITICAL discipline: the "job" line is THIS step's one concrete action — never a restatement of the
   // overall goal (the experiment showed early beats otherwise just echo the goal). Situation carries the goal.
   const jobRule = ' The "job" line is ONLY this step\'s ONE concrete action — NEVER a restatement of the overall goal (the player already knows the goal).';
   let instr: string;
   if (isBeatOne) {
     instr = `STEP 1 of ${nSteps} — the OPENER, where the company is OFFERED this job. Realize this step: ${step(0)}. Make the player CARE: a real person on stage in a small human moment (a grief, want, or kindness), centered on ${focalName} UNLESS they're the bible's hidden wrongdoer (then a victim / worried kin / bystander). The "situation" conveys the OVERALL job + why they'd take it; the "job" line is ONLY this opening action (meet / agree / scout / set out) — do NOT complete the goal, do NOT capture/resolve ${focalName}, no faceless steward/clerk handing over a contract. closesChain:false. Single approach — no "choices".`;
-  } else if (forced) {
-    instr = `STEP ${nSteps} of ${nSteps} — the FINALE. Realize the final step: ${lastStep}. The goal is finally ACHIEVED or RESOLVED here, paying off whatever truth surfaced; it MUST read as the peak, not a sudden stop.${jobRule} closesChain:true. No "choices" — the finale's choice is the engine's own (win over / subdue / ransom).`;
+  } else if (isFinale) {
+    const desperate = !reachedLast ? ' The quest is OUT OF TIME — bring it to a head from where the company actually stands; the goal may slip if they are behind.' : '';
+    instr = `STEP ${nSteps} of ${nSteps} — the FINALE. Realize the final step: ${lastStep}. The goal is ACHIEVED or RESOLVED here, paying off whatever truth surfaced; it MUST read as the peak, not a sudden stop.${desperate}${jobRule}${retryNote} closesChain:true. No "choices" — the finale's choice is the engine's own (win over / subdue / ransom).`;
   } else {
-    const close = permitted
-      ? `If the story has genuinely PEAKED, make THIS the finale — realize the final step ${lastStep} (the goal achieved) and closesChain:true. Otherwise closesChain:false.`
-      : `Not the finale yet — closesChain:false.`;
-    instr = `STEP ${kNum} of ${nSteps}. Realize this step: ${step(beatNum - 1)}. A MIDDLE step that ESCALATES toward the goal — a clearly DIFFERENT scene from every prior step (new place / people / action; don't re-stage or re-fetch the same thing). The company does NOT complete the goal yet.${jobRule} ${close}${allowChoice ? ' THIS STEP AFFORDS A CHOICE: offer 2-3 "choices" (approaches testing DIFFERENT attributes — sneak/fight/talk).' : ' Single approach — no "choices".'}`;
+    instr = `STEP ${kNum} of ${nSteps}. Realize this step: ${step(arcProgress)}. A MIDDLE step that ESCALATES toward the goal — a clearly DIFFERENT scene from every prior step (new place / people / action; don't re-stage or re-fetch the same thing). The company does NOT complete the goal yet.${jobRule}${retryNote} closesChain:false.${allowChoice ? ' THIS STEP AFFORDS A CHOICE: offer 2-3 "choices" (approaches testing DIFFERENT attributes — sneak/fight/talk).' : ' Single approach — no "choices".'}`;
   }
   const opening = ` OPEN it as: ${mode}; set it around ${time}, woven into a sentence (not a fragment opener). Do NOT reuse the previous beat's opening.`;
   instr += opening;
@@ -288,7 +286,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   const seen = new Set(chain.introducedNames ?? []);
   for (const name of bibleCastNames(chain.bible)) if (shown.includes(name.split(' ')[0])) seen.add(name);
   chain.introducedNames = [...seen];
-  const isFinale = forced || (permitted && !!beat.closesChain);
+  // isFinale was decided by the engine (reaching the last arc step / stuck-cap), computed above.
   // intermediate beats pay a thin gold trickle; a (non-personal) finale pays the FOCAL character.
   // a PERSONAL finale develops the existing merc instead (handled at delivery) → no new unit.
   let reward: RewardBundle;
@@ -602,18 +600,20 @@ const pickLiab = (r: Rng) => (['evidence', 'mess', 'debt'] as const)[randInt(r, 
 function recordBeat(state: GameState, quest: Quest, outcome: Outcome, partySize: number, learned: string | null): boolean {
   const chain = quest.chainId ? state.chains[quest.chainId] : undefined;
   if (!chain) return false;
-  chain.mercCyclesSpent += partySize;        // climax gate = effort, not value
+  chain.mercCyclesSpent += partySize;        // effort spent (display)
   chain.beatsResolved += 1;
+  // ARC ADVANCEMENT IS SUCCESS-GATED: a beat moves to the NEXT arc step only on success/partial; a FAILURE
+  // keeps the step (the next beat RETRIES it, harder) so the quest can't plow past a step it failed.
+  chain.lastFailed = outcome === 'failure';
+  if (outcome !== 'failure') chain.arcProgress = (chain.arcProgress ?? 0) + 1;
   // `learned` is what the RESOLUTION AI decided the company actually came away knowing (scaled to the
-  // outcome — full on success, partial/hedged on partial, empty on a clean failure). Record IT (not the
-  // beat's pre-baked suggestion) so the next beat reacts to the real state. A failure with nothing learned
-  // still ADVANCES the world (the people involved react) — it never just stalls.
+  // outcome — full on success, partial/hedged on partial, empty on a clean failure). Record IT so the
+  // next beat reacts to the real state. A failure still advances the WORLD (people react) — never stalls.
   const result = learned
     ? `and the company now knows: ${learned}`
-    : `but FAILED — the truth stays hidden; the people involved grow wary and the situation worsens (the next beat must reflect this setback, not ignore it)`;
+    : `but FAILED — the company did NOT complete this step; the people grow warier and the situation worsens (the next beat re-attempts THIS step under worse conditions)`;
   chain.log.push(`Beat ${chain.beatsResolved}: the company set to "${quest.job}" ${result}.`);
   if (quest.finale) { chain.state = 'done'; if (outcome !== 'failure') maybeSpawnSequel(state, chain); return true; }
-  if (chain.mercCyclesSpent >= chain.climaxTarget) chain.state = 'finale-ready';
   return false;
 }
 

@@ -164,6 +164,8 @@ export interface Chain {
   seedKernel?: string;       // the random dramatic kernel this saga was built around (for variety + debug)
   introducedNames?: string[];// cast names the PLAYER has already met — so beats orient a name only ONCE
   arc?: string[];            // the genesis's ROUGH arc guide — each beat realizes the matching step
+  arcProgress?: number;      // steps COMPLETED (advances only on success/partial; a failed step is retried)
+  lastFailed?: boolean;      // the previous beat failed → the next beat re-attempts the same step
 }
 
 // ---- fort (FORT.md) ---------------------------------------------------------
