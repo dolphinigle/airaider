@@ -159,7 +159,9 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
   focal.location = 'limbo';
   addCard(state, focal);
   const kernel = pickKernel(state, r);
-  const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], region: lead.location, rarity: lead.rarity, avoid: recentTitles(state), seed: kernel, place: pickPlace(r), tone: pickTone(r), poolCast: gatherPoolCast(state, r, focal.id) });
+  const arcBeats = ({ common: 4, uncommon: 5, rare: 6, legendary: 7 } as Record<string, number>)[lead.rarity] ?? 5;
+  const twist = r() < 0.3;   // engine rolls misdirection; the AI never decides
+  const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], region: lead.location, rarity: lead.rarity, avoid: recentTitles(state), seed: kernel, place: pickPlace(r), tone: pickTone(r), twist, expectedBeats: arcBeats, poolCast: gatherPoolCast(state, r, focal.id) });
   // the bible NAMES the core person (cast[0]) — that's the focal; adopt their NAME so beats and the
   // card match. who/backstory are written cleanly by flesh at delivery (the bible's why-ladder is the
   // HIDDEN writers'-room reference, NOT a readable dossier bio).
@@ -168,7 +170,7 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
   const chain: Chain = {
     id: uid(state, 'chain'), title: g.title, hook: g.leadBlurb, bible: renderBible(g), direction: g.directions[0]?.hook ?? '',
     focalCardIds: [focal.id], rarity: lead.rarity, level: lead.level, expectedBeats: B, beatsResolved: 0,
-    mercCyclesSpent: 0, climaxTarget: B * n, state: 'live', log: [], seedKernel: kernel,
+    mercCyclesSpent: 0, climaxTarget: B * n, state: 'live', log: [], seedKernel: kernel, arc: g.arc,
   };
   focal.chainIds.push(chain.id);
   state.chains[chain.id] = chain;
@@ -184,13 +186,14 @@ async function genesisPersonalChain(state: GameState, ai: Narrator, r: Rng, lead
   if (!merc || merc.role !== 'merc') return pursueOneOff(state, ai, r, lead);
   const B = randInt(r, 2, 3);
   const kernel = pickKernel(state, r);
-  const g = await ai.genesis({ focalTags: [tagLabels(merc.tags)], region: lead.location, rarity: lead.rarity, personal: true, name: merc.name, who: merc.who, backstory: merc.backstory, avoid: recentTitles(state), seed: kernel, place: pickPlace(r), tone: pickTone(r), poolCast: gatherPoolCast(state, r, merc.id) });
+  const twist = r() < 0.3;
+  const g = await ai.genesis({ focalTags: [tagLabels(merc.tags)], region: lead.location, rarity: lead.rarity, personal: true, name: merc.name, who: merc.who, backstory: merc.backstory, avoid: recentTitles(state), seed: kernel, place: pickPlace(r), tone: pickTone(r), twist, expectedBeats: B * 2, poolCast: gatherPoolCast(state, r, merc.id) });
   const chain: Chain = {
     id: uid(state, 'chain'), title: g.title, hook: g.leadBlurb, bible: renderBible(g), direction: g.directions[0]?.hook ?? '',
     focalCardIds: [merc.id], rarity: lead.rarity, level: merc.level, expectedBeats: B, beatsResolved: 0,
     // personal beats run ~1 merc each (the anchor); gate on B*2 effort so the saga gets a few
     // beats to breathe before the finale rather than beat-1 → finale in one step.
-    mercCyclesSpent: 0, climaxTarget: B * 2, state: 'live', log: [], personal: true, seedKernel: kernel,
+    mercCyclesSpent: 0, climaxTarget: B * 2, state: 'live', log: [], personal: true, seedKernel: kernel, arc: g.arc,
   };
   merc.chainIds.push(chain.id);
   state.chains[chain.id] = chain;
@@ -256,17 +259,24 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
 
   // the engine supplies the beat's job-in-the-arc instruction (beat-1 FOCAL attachment is HERE, not a
   // static rule) and whether the AI may close the chain. Mid-beats are driven by the BIBLE itself.
+  // the engine feeds each beat its ROUGH ARC STEP (chain.arc), so beat 1 only OPENS the job and the goal
+  // is completed at the FINALE — never in beat 1 (the bug the long experiment exposed).
+  const arc = chain.arc ?? [];
+  const arcN = arc.length;
+  const stepStr = (k: number) => arcN ? `"${arc[Math.max(0, Math.min(k, arcN - 1))]}"` : '';
+  const lastStep = arcN ? `"${arc[arcN - 1]}"` : 'the goal finally achieved';
   let instr: string;
   if (isBeatOne) {
-    instr = `This is BEAT 1 — the OPENER, where the company is OFFERED this job. Two things at once: (a) make the player CARE — a real person on stage in a small human moment (a specific grief, want, or kindness), centered on ${focalName} UNLESS they're the bible's hidden wrongdoer (then center a victim / worried kin / bystander); and (b) make the JOB clear — by the end of this beat the player must understand what the company is being asked to DO and why they'd take it (the QUEST GOAL in the bible). Do NOT run it through a faceless steward/clerk handing over a contract; do NOT capture/resolve ${focalName} here. Keep the arc open (closesChain:false).`;
+    instr = `This is BEAT 1 — the OPENER, where the company is OFFERED this job.${arcN ? ` Realize the arc's FIRST step: ${stepStr(0)}.` : ''} (a) make the player CARE — a real person on stage in a small human moment (a grief, want, or kindness), centered on ${focalName} UNLESS they're the bible's hidden wrongdoer (then a victim / worried kin / bystander); (b) the "situation" conveys the OVERALL job + why they'd take it, but the "job" LINE is ONLY THIS FIRST STEP (meet / agree / scout / set out) — do NOT phrase the job as the whole goal, and do NOT complete the goal here. No faceless steward/clerk handing over a contract; do NOT capture/resolve ${focalName}. closesChain:false.`;
   } else if (forced) {
-    instr = `This is the FINALE — the arc is out of room. Write the climactic confrontation that pays off the bible's CENTRAL TRUTH (the specific buried thing finally breaks into the open); it MUST read as the arc's peak, not a sudden stop. Set closesChain:true.`;
+    instr = `This is the FINALE — the arc's LAST step: ${lastStep}. The goal is finally ACHIEVED or RESOLVED here, paying off whatever truth surfaced; it MUST read as the arc's peak, not a sudden stop. closesChain:true.`;
   } else {
-    const close = permitted
-      ? `If THIS beat is the genuine climax that pays off the central truth, write it as the finale (closesChain:true); otherwise keep it open (closesChain:false).`
-      : `The arc is NOT ready to end — leave a real thread driving forward (closesChain:false).`;
+    const midK = Math.max(1, Math.min(beatNum - 1, arcN >= 3 ? arcN - 2 : arcN - 1));
     const fn = SCENE_KINDS[(beatNum - 2 + off) % SCENE_KINDS.length];
-    instr = `This is BEAT ${beatNum}. Take the company ONE concrete STEP toward the QUEST GOAL (in the bible) — this beat's job must visibly move them closer to achieving it, through the bible's obstacles/tensions; keep what's specific about this quest LIVE and pressing. THIS BEAT'S JOB MUST BE A DIFFERENT KIND OF TASK than every prior beat: if a previous beat already escorted or guarded someone, do NOT escort/guard again; if one already recovered or secured an object, do NOT center this beat on fetching/securing an object again. Do NOT chase the same single object across beats. Vary BOTH the verb AND the focus. Aim this beat at the dramatic turn — "${fn}" — realized through the bible's PEOPLE, not a generic "investigate-a-ledger / question-a-clerk" errand, and never re-stage a scene, place, or action already used. ${close}`;
+    const close = permitted
+      ? `If the story has genuinely PEAKED, make THIS the finale — realize the arc's LAST step ${lastStep} (the goal achieved) and closesChain:true. Otherwise keep it open (closesChain:false).`
+      : `The arc is NOT ready to end — keep it open (closesChain:false).`;
+    instr = `This is BEAT ${beatNum}.${arcN ? ` Realize roughly arc step ${midK + 1} of ${arcN}: ${stepStr(midK)}.` : ''} Take ONE concrete STEP forward — a DIFFERENT kind of task than every prior beat (don't re-escort, don't re-fetch the same object, don't chase one object across beats; vary the verb AND the focus). Aim at the dramatic turn "${fn}", realized through the bible's PEOPLE. The company must NOT complete the goal yet — that happens only at the finale. ${close}`;
   }
   const opening = ` OPEN this beat as: ${mode}; set it around ${time} (woven into a real sentence, not stacked as a fragment opener). Do NOT reuse the previous beat's opening.`;
   instr += opening;

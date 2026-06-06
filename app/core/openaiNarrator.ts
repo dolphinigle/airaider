@@ -38,7 +38,7 @@ const zFlesh = z.object({ name: z.string(), who: z.string(), backstory: z.string
 const zPerson = z.object({
   name: z.string(), who: z.string().default(''),
   history: z.array(z.string()).default([]),
-  wants: z.string().default(''), feels: z.string().default(''),
+  wants: z.string().default(''), want: z.string().optional(), feels: z.string().default(''),
   conceals: z.union([z.string(), z.boolean(), z.null()]).optional(),
   roleInStory: z.string().optional(), role: z.string().optional(),
 });
@@ -46,6 +46,8 @@ const zGenesis = z.object({
   title: z.string(),
   leadBlurb: z.string(),
   goal: z.string().default(''),
+  twistReveal: z.string().optional(),
+  arc: z.array(z.string()).default([]),
   // accept either flat persons or {person, roleInStory} nesting
   cast: z.array(z.union([zPerson, z.object({ person: zPerson, roleInStory: z.string().optional() })])).default([]),
   situation: z.string(),
@@ -198,26 +200,31 @@ export class OpenAINarrator implements Narrator {
       rare: 'cast 3-5 people; 2-3 deep (~6-8 link why-ladders), each with a distinct stake.',
       legendary: 'cast 4-6 people; 3-4 deep (~7-9 link why-ladders tracing to formative/childhood bedrock).',
     };
+    const eb = i.expectedBeats ?? 4;
+    const twistBlock = i.twist
+      ? `TWIST QUEST (engine-chosen): the job is a MISDIRECTION. "goal" = the APPARENT job the player commits to; "twistReveal" = how the truth subverts it (the client lies / the quarry is the victim / the prize is a trap / the one you rescue is the threat) — it must be FAIR (findable) and CHANGE what the right thing to do is. It lands in a MIDDLE arc step, NEVER beat 1. "situation" = the real truth.`
+      : `STRAIGHT QUEST (engine-chosen): NO misdirection — the job is honestly what it appears; the interest comes from the obstacles and the people. Set "twistReveal" to "".`;
     const system =
       `You design a QUEST for a MERCENARY COMPANY — and the believable truth behind it. The player RUNS the company: this lands on their job board, or someone brings it to their fort. Your job is to make a quest they have a clear REASON to take and a STAKE in — then build the believable people and truth that make it real. NOT prose; the settled facts a writers' room works from, told straight.\n` +
       `You are given the CORE PERSON the quest centers on (their tags / known life), a few THEME words, a SETTING, a TONE, and the region.\n\n` +
       `BUILD A QUEST THE COMPANY WOULD TAKE:\n` +
       `- THE HOOK — how the company gets the job and WHY they'd take it. Someone hires them for coin, pleads for help, posts a bounty, OR the core person comes to the fort and asks them directly. The mercenary reason must be PLAIN: pay, a person to save/escort/find, a captive or recruit worth taking, a threat to remove. The player must read the hook and think "yes, that's a job for us."\n` +
       `- THE GOAL — one clear thing the company is trying to ACHIEVE across the saga (save / escort / find / protect / hunt / recover / expose / deliver someone or something). Every beat is a step toward it; the player always knows what they're working toward.\n` +
-      `- GOAL-DRIVEN OR MYSTERY-DRIVEN, both are good. A quest can be a straight goal with NO hidden secret (escort this person to safety; hunt the thing in the fen; help them reach the thing they want) OR a truth to uncover. Do NOT force a hidden secret — if the themes/person suggest a simple adventure, write a simple adventure.\n` +
-      `- DRAMA SERVES THE QUEST. The cast's wants and secrets are OBSTACLES, allies, costs, and turns ALONG the goal — not a static web of strangers the player merely watches. The player is a PARTICIPANT working toward the goal, never a spectator to someone else's argument.\n\n` +
-      `BUILD EACH PERSON BY ASKING "WHY?" TO BEDROCK: start from a present fact and ask "why?" again and again to something irreducible — a love, loss, vow, debt, shame. Each answer is ONE history bullet, in order (e.g. "she avoids the harbour → a man drowned there → she untied the wrong line → she let them blame a boy"). \n` +
-      `SECRETS ARE NOT A FIELD: a person conceals something ONLY when a FEELING makes hiding natural (shame, guilt, fear). If history+feeling yields concealment, set "conceals"; else omit it. MOST people conceal NOTHING.\n` +
-      `Ladder DEEP only for the core person (and 1 other the story turns on); edge cast stay shallow.\n` +
+      `- DRAMA SERVES THE QUEST. The cast's wants are OBSTACLES, allies, costs, and turns ALONG the goal — not a static web of strangers the player merely watches. The player is a PARTICIPANT working toward the goal, never a spectator.\n\n` +
+      `${twistBlock}\n` +
+      `PLAN THE ARC — output "arc": a ROUGH ordered guide of ~${eb} beat-steps (a skeleton, NOT a rigid script). STEP 1 = the OPENER (the company TAKES the job / meets the person) — do NOT finish the goal here. MIDDLE steps = escalating obstacles and turns. LAST step = the FINALE where the goal is finally achieved/resolved. CRITICAL: the company must NOT complete the goal before the last step — a 'recover the locket' job does not recover it in step 1. Each step is a short phrase.\n` +
+      `PEOPLE — keep them LEAN: each is ONE vivid line (who they are + the one thing that matters here), a "want", and a "role" in the quest (client / companion / quarry / obstacle / ally / prize). NO backstory ladders — deep history is written later, only for whoever the company actually keeps.\n` +
       `BELIEVABILITY: every present fact traces to a prior cause in history; ordinary human motives, not plot necessity; no coincidence-stacking; nobody acts dumb to keep the situation alive.\n` +
       `COMMIT TO THE TRUTH: this bible IS the settled, complete truth. If a killing/theft/betrayal/disappearance happened, state plainly WHO did it and WHY. BANNED in the hidden layer: "unknown", "remains hidden", "it is unclear", "a mysterious figure", "the truth of X is never revealed" — you the author already know, so write it down.\n` +
       `THE CORE PERSON + THEMES make the quest specific. Their tags — craft, magic, profession, temperament — must be CENTRAL to what the quest is about (a water-singer's job turns on water and song; a going-blind carver's on the carving). The THEMES are a spark to FUSE, not a checklist (weave them in; you need not name them). Match the TONE you're given — not every saga is grim. Keep it ONE clear situation, small enough to care about.\n\n` +
       `Output JSON only:\n` +
       `{ "title": "short, concrete, names a real thing/person/place — NOT a poetic two-noun phrase like 'Oar and Scar', NOT 'The Weight of X'",\n` +
       `  "leadBlurb": "1-2 sentences the PLAYER reads on the job board — a CLEAR job they'd take: who/what it concerns, what the company is wanted FOR, and the draw (pay / a person / a prize). Plain and inviting, not cryptic. Hide the deep secret, but never hide what the JOB is.",\n` +
-      `  "goal": "one line: what taking this quest commits the company to ACHIEVE (e.g. 'escort Alen through the marsh to the abbey alive', 'find and bring back the miller's daughter', 'drive the thing out of the Sael fens'). The throughline every beat advances.",\n` +
-      `  "cast": [ { "name": "...", "who": "one line: what the world already knows of them", "history": ["the why-ladder, ordered cause→cause→bedrock"], "wants": "plain human want", "feels": "the feeling about their history", "conceals": "OPTIONAL: only if a feeling makes hiding natural", "role": "their role in the QUEST (client / companion / quarry / obstacle / ally / prize)" } ],\n` +
-      `  "situation": "2-4 sentences — the believable truth behind the job, told straight (may be no secret at all, just the honest situation)",\n` +
+      `  "goal": "one line: the APPARENT thing taking this quest commits the company to ACHIEVE (e.g. 'escort Alen to the abbey alive', 'find and bring back the miller's daughter'). The throughline.",\n` +
+      `  "twistReveal": "${i.twist ? 'how the truth SUBVERTS the apparent goal — the player must NOT see this; it surfaces across beats and lands at a middle step' : 'leave EMPTY \\"\\" — this is a straight quest'}",\n` +
+      `  "arc": ["~${eb} short step phrases — step 1 = take the job/meet (goal NOT done), last = goal achieved at the finale"],\n` +
+      `  "cast": [ { "name": "...", "who": "one vivid line — who they are + the one thing that matters here", "want": "plain want now", "role": "client / companion / quarry / obstacle / ally / prize" } ],\n` +
+      `  "situation": "2-4 sentences — the believable truth behind the job, told straight (for a twist quest this is the REAL situation the player will uncover)",\n` +
       `  "tensions": ["what stands in the way and what's at stake: <A> wants <X>; <B> wants <Y>; because <reason> — obstacles ALONG the goal, not a standalone argument"],\n` +
       `  "directions": [ { "kind": "active", "hook": "the next concrete step toward the goal the company can take" }, { "kind": "ambient", "hook": "something pressing on the goal that unfolds with or without them" } ] }\n` +
       `The FIRST cast entry MUST be the core person. ${depth[i.rarity ?? 'uncommon']} Include AT LEAST ONE 'active' and ONE 'ambient' direction.\n` +
@@ -243,7 +250,7 @@ export class OpenAINarrator implements Narrator {
       return {
         name: String(p.name ?? 'Unknown'), who: String(p.who ?? ''),
         history: Array.isArray(p.history) ? p.history.map(String) : [],
-        wants: String(p.wants ?? ''), feels: String(p.feels ?? ''),
+        wants: String(p.want ?? p.wants ?? ''), feels: String(p.feels ?? ''),
         conceals: typeof p.conceals === 'string' && p.conceals ? p.conceals : undefined,
         role: p.role ? String(p.role) : undefined,
       };
@@ -252,7 +259,8 @@ export class OpenAINarrator implements Narrator {
     const directions = dirsRaw.map((d) => typeof d === 'string'
       ? { kind: 'active' as const, hook: d }
       : { kind: (d.kind === 'ambient' ? 'ambient' : 'active') as 'ambient' | 'active', hook: d.hook });
-    return { title: out.title, leadBlurb: out.leadBlurb, goal: out.goal ?? '', cast, situation: out.situation, tensions: out.tensions ?? [], directions };
+    const twistReveal = i.twist && out.twistReveal && out.twistReveal.toLowerCase() !== 'none' ? out.twistReveal : undefined;
+    return { title: out.title, leadBlurb: out.leadBlurb, goal: out.goal ?? '', arc: out.arc ?? [], twistReveal, cast, situation: out.situation, tensions: out.tensions ?? [], directions };
   }
 
   async chainBeat(i: ChainBeatInput): Promise<ChainBeatOut> {
