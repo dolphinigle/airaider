@@ -242,49 +242,39 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
     'a frightened bystander or a child brings urgent word',
   ];
   const TIMES = ['grey morning', 'high noon', 'a hot afternoon', 'dusk', 'after dark', 'in driving rain'];
-  // VARIETY guidance ONLY: each beat should be a DIFFERENT KIND of scene than those before (so it
-  // can't pad with "recover an object" every beat — the experiment's failure mode). But the SUBSTANCE
-  // comes from THIS bible's own tensions/directions + central truth, NOT a fixed verb-arc that
-  // flattened every saga into the same crime procedural (the quality read's biggest finding).
-  const SCENE_KINDS = [
-    'get closer to a cast member and what they privately want',
-    'uncover one concrete piece of the buried truth',
-    'a danger forces the company to protect or extract someone',
-    "two cast members' wants collide out in the open",
-    'a betrayal, a double-cross, or a hard choice surfaces',
-  ];
   const off = Math.floor(rngFrom(chain.id)() * MODES.length);
   const mode = isBeatOne ? MODES[0] : MODES[1 + ((beatNum - 2 + off) % (MODES.length - 1))];
   const time = TIMES[(beatNum - 1) % TIMES.length];
 
-  // the engine supplies the beat's job-in-the-arc instruction (beat-1 FOCAL attachment is HERE, not a
-  // static rule) and whether the AI may close the chain. Mid-beats are driven by the BIBLE itself.
-  // the engine feeds each beat its ROUGH ARC STEP (chain.arc), so beat 1 only OPENS the job and the goal
-  // is completed at the FINALE — never in beat 1 (the bug the long experiment exposed).
+  // ONE plan, ONE numbering (experiment finding): each beat realizes the matching ARC STEP — beat k ↔
+  // step k, 1:1. No "BEAT N" vs "arc step M" dual framing, no competing SCENE-turn that invented off-arc
+  // beats. The arc (sized to rarity at genesis) IS the beat plan; the finale is the LAST step.
   const arc = chain.arc ?? [];
-  const arcN = arc.length;
-  const stepStr = (k: number) => arcN ? `"${arc[Math.max(0, Math.min(k, arcN - 1))]}"` : '';
-  const lastStep = arcN ? `"${arc[arcN - 1]}"` : 'the goal finally achieved';
+  const nSteps = arc.length || (chain.expectedBeats ?? 4);
+  const kNum = Math.min(beatNum, nSteps);
+  const step = (k: number) => arc.length ? `"${arc[Math.max(0, Math.min(k, arc.length - 1))]}"` : 'this step of the quest';
+  const lastStep = arc.length ? `"${arc[arc.length - 1]}"` : 'the goal finally achieved';
   // ENGINE gates mid-beat CHOICES (don't leave it to the AI, which offers one every beat): ~70% of chains
-  // get exactly ONE choice beat at a seeded middle position; the rest have none. Choices are a sometimes-thing.
+  // get exactly ONE choice step at a seeded middle position; the rest have none. Choices are a sometimes-thing.
   const croll = rngFrom(`${chain.id}:choicebeat`);
   const hasChoiceBeat = croll() < 0.7;
-  const choiceBeatNum = 2 + Math.floor(croll() * Math.max(1, arcN - 2));
+  const choiceBeatNum = 2 + Math.floor(croll() * Math.max(1, nSteps - 2));
   const allowChoice = hasChoiceBeat && !isBeatOne && !forced && !anchorMercId && beatNum === choiceBeatNum;
+  // CRITICAL discipline: the "job" line is THIS step's one concrete action — never a restatement of the
+  // overall goal (the experiment showed early beats otherwise just echo the goal). Situation carries the goal.
+  const jobRule = ' The "job" line is ONLY this step\'s ONE concrete action — NEVER a restatement of the overall goal (the player already knows the goal).';
   let instr: string;
   if (isBeatOne) {
-    instr = `This is BEAT 1 — the OPENER, where the company is OFFERED this job.${arcN ? ` Realize the arc's FIRST step: ${stepStr(0)}.` : ''} (a) make the player CARE — a real person on stage in a small human moment (a grief, want, or kindness), centered on ${focalName} UNLESS they're the bible's hidden wrongdoer (then a victim / worried kin / bystander); (b) the "situation" conveys the OVERALL job + why they'd take it, but the "job" LINE is ONLY THIS FIRST STEP (meet / agree / scout / set out) — do NOT phrase the job as the whole goal, and do NOT complete the goal here. No faceless steward/clerk handing over a contract; do NOT capture/resolve ${focalName}. closesChain:false. Single approach — do NOT output "choices".`;
+    instr = `STEP 1 of ${nSteps} — the OPENER, where the company is OFFERED this job. Realize this step: ${step(0)}. Make the player CARE: a real person on stage in a small human moment (a grief, want, or kindness), centered on ${focalName} UNLESS they're the bible's hidden wrongdoer (then a victim / worried kin / bystander). The "situation" conveys the OVERALL job + why they'd take it; the "job" line is ONLY this opening action (meet / agree / scout / set out) — do NOT complete the goal, do NOT capture/resolve ${focalName}, no faceless steward/clerk handing over a contract. closesChain:false. Single approach — no "choices".`;
   } else if (forced) {
-    instr = `This is the FINALE — the arc's LAST step: ${lastStep}. The goal is finally ACHIEVED or RESOLVED here, paying off whatever truth surfaced; it MUST read as the arc's peak, not a sudden stop. closesChain:true. Do NOT output "choices" — the finale's choice is the engine's own (win over / subdue / ransom).`;
+    instr = `STEP ${nSteps} of ${nSteps} — the FINALE. Realize the final step: ${lastStep}. The goal is finally ACHIEVED or RESOLVED here, paying off whatever truth surfaced; it MUST read as the peak, not a sudden stop.${jobRule} closesChain:true. No "choices" — the finale's choice is the engine's own (win over / subdue / ransom).`;
   } else {
-    const midK = Math.max(1, Math.min(beatNum - 1, arcN >= 3 ? arcN - 2 : arcN - 1));
-    const fn = SCENE_KINDS[(beatNum - 2 + off) % SCENE_KINDS.length];
     const close = permitted
-      ? `If the story has genuinely PEAKED, make THIS the finale — realize the arc's LAST step ${lastStep} (the goal achieved) and closesChain:true. Otherwise keep it open (closesChain:false).`
-      : `The arc is NOT ready to end — keep it open (closesChain:false).`;
-    instr = `This is BEAT ${beatNum}.${arcN ? ` Realize roughly arc step ${midK + 1} of ${arcN}: ${stepStr(midK)}.` : ''} Take ONE concrete STEP forward — a DIFFERENT kind of task than every prior beat (don't re-escort, don't re-fetch the same object, don't chase one object across beats; vary the verb AND the focus). Aim at the dramatic turn "${fn}", realized through the bible's PEOPLE. The company must NOT complete the goal yet — that happens only at the finale. ${close}${allowChoice ? ' THIS BEAT AFFORDS A CHOICE: offer 2-3 distinct "choices" (approaches testing DIFFERENT attributes — e.g. sneak/fight/talk) for how the company does it.' : ' Single approach — do NOT output "choices".'}`;
+      ? `If the story has genuinely PEAKED, make THIS the finale — realize the final step ${lastStep} (the goal achieved) and closesChain:true. Otherwise closesChain:false.`
+      : `Not the finale yet — closesChain:false.`;
+    instr = `STEP ${kNum} of ${nSteps}. Realize this step: ${step(beatNum - 1)}. A MIDDLE step that ESCALATES toward the goal — a clearly DIFFERENT scene from every prior step (new place / people / action; don't re-stage or re-fetch the same thing). The company does NOT complete the goal yet.${jobRule} ${close}${allowChoice ? ' THIS STEP AFFORDS A CHOICE: offer 2-3 "choices" (approaches testing DIFFERENT attributes — sneak/fight/talk).' : ' Single approach — no "choices".'}`;
   }
-  const opening = ` OPEN this beat as: ${mode}; set it around ${time} (woven into a real sentence, not stacked as a fragment opener). Do NOT reuse the previous beat's opening.`;
+  const opening = ` OPEN it as: ${mode}; set it around ${time}, woven into a sentence (not a fragment opener). Do NOT reuse the previous beat's opening.`;
   instr += opening;
 
   const beat = await ai.chainBeat({
