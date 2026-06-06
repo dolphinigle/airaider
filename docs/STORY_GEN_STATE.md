@@ -21,6 +21,15 @@
 Deriving the story *purely from the focal's tags converges* on ONE shape ("a person with a concealed
 truth, under threat of exposure, resolved at a confrontation"). So the engine injects independent seeds
 that decorrelate the story from the tags. (`GenesisInput`):
+- **The bible is a QUEST, not just drama** (playtest verdict: the conflict-web made great drama but
+  the player had no reason to take the job / no stake). Genesis now leads with THE HOOK (why a merc
+  company takes it) + THE GOAL (`goal` field — one clear thing to achieve), goal-driven OR mystery-driven
+  (don't force a secret; "escort X on an adventure" is valid). Drama serves the goal; the player is a
+  PARTICIPANT. Beats each STEP toward the goal; beat 1 makes the job + reason clear; chainBeat gets the
+  player-POV. Titles are now actions ("Escort Bren Tholl to the Old Sluice").
+- **`tone`** — engine-set register (`pickTone`, weighted toward lighter: slice-of-life / wry / bittersweet
+  / adventurous / tense / dark) so not every saga is grim.
+- **Focal skills capped at 2** (`GenSpec.maxSkills`; global stays 3 for value-packing).
 - **`seed`** — a few random **THEME keywords** (`core/seeds.ts` `pickThemes`: one BOND + one TIE + one
   FLAVOUR, e.g. "love, debt, a curse"). The engine hands raw sparks; genesis FUSES them into the
   focal's life. Experiment-validated to beat a concrete premise: keywords keep the focal's tags central
