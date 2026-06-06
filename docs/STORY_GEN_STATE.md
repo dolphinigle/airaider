@@ -136,13 +136,16 @@ played end-to-end to finale. Findings → decisions:
 
 ## OPEN QUESTIONS (next experiments)
 
-- **Does the bible PLAN the arc, or improvise reactively?** Currently REACTIVE: beats are generated
-  one-at-a-time (bible + state-so-far + an engine beat-instruction). The engine owns structure (beat-1
-  meet, mid = step-toward-goal w/ scene-kind rotation, finale = reckoning, rarity cap) but beat CONTENT is
-  improvised — which is why lean occasionally pads at MAX length (a legendary-lean run sagged to escort×4).
-  A genesis-planned arc (a loose beat outline / where the twist lands) would likely kill the padding and
-  place the twist deliberately, at the cost of rigidity vs the dice. Worth testing: planned vs reactive,
-  or a hybrid (plan the major turns, fill reactively). LEANING toward planning to stop unnecessary padding.
+- **Does the bible PLAN the arc, or improvise reactively? → IT MUST PLAN.** Currently REACTIVE and it
+  shows a SHARP bug on close read of the long-experiment transcripts: the engine hands BEAT 1 the whole
+  GOAL as its job, so the AI completes the goal in beat 1 ("retrieve the Moon-Root AND escort Seren to the
+  exchange" — done, beat 1), then the climax gate forces N more beats, which REWIND ("beat 2: reach the
+  tide-cave and Seren" — already done) or pad with logistics. Object-retrieval goals are worst (locket
+  returned in b1, re-retrieved at the finale). Twist quests partly mask it (the rug-pull motivates
+  continuation) but the geography/state still rewinds. FIX: the genesis must DECOMPOSE the goal into an
+  arc — beat 1 = the FIRST step/obstacle (not the whole goal), each beat advances, the finale is where the
+  goal completes. This is the next experiment: planned arc (a step outline + where the twist lands) vs the
+  current reactive beats. Likely a hybrid (plan major turns, fill reactively, the finale = goal achieved).
 - **The ~4-beat minimum is arbitrary** — it falls out of the climax gate `B×slots` (B=randInt 2-4), not a
   design intent. Bible quests can't currently be 1-2 beats; true one-offs only come from the `cardAsk`
   path. If short bible-quests are wanted, lower/flex the gate. Revisit.
