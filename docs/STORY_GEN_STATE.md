@@ -134,6 +134,18 @@ played end-to-end to finale. Findings → decisions:
   flesh-on-delivery for the character actually recruited. ~⅓ cheaper.
 - **Length control is solid** (common→4, rare→6, legendary→7 via the rarity cap).
 
+## DONE — quest-generator unified (beat = arc step)
+
+The quest generator (separate from the LOCKED bible — see BIBLE.md) was the weak half: the AI got FOUR
+competing framings per beat (`BEAT N`, `arc step M of N` clamped so they diverged, a `SCENE_KINDS`
+dramatic turn, and "do something different"). Confusing; beats drifted off-arc or just restated the goal.
+Experiment (`_exp_quest.ts`, current vs unified) → fix: **ONE numbering — each beat realizes the matching
+arc step 1:1 ("STEP k of n")**; dropped the competing SCENE turn (it invented off-arc beats); and a strong
+rule that **the job line is THIS step's concrete action, never a restatement of the goal** (the situation
+carries the goal). Validated: quests now read as clean, on-arc step sequences (meet→travel→confront→
+recover→resolve), beat-1 a real opener. The arc is the weak link to watch — if a genesis arc has redundant
+steps, the quest faithfully renders them; arc-clarity at genesis is the next lever if needed.
+
 ## DONE — arc planning + choices (implemented & playtested)
 
 - **Rough ARC, engine-rolled twist (30%), lean cast** — `GenesisOut.arc` is an ordered ~N-step guide;
