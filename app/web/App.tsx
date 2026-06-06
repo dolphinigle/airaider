@@ -105,10 +105,14 @@ function Branch({ quest, group }: { quest: Quest; group: import('../core/types.j
   const slot = quest.slots[i];
   const filled = slot.filledBy ? eng.state.cards[slot.filledBy] as CharacterCard : null;
   const eligible = eng.eligibleMercs(quest, i);
-  const kindWord = group.rewardKind === 'recruit' ? 'they join you' : group.rewardKind === 'captive' ? 'caged as a captive' : 'sold for gold';
+  // the recruit/captive/ransom outcome only applies to the FINALE (where the focal's fate is decided).
+  // a mid-beat choice is just HOW the company does this step — no kindWord.
+  const kindWord = quest.finale
+    ? (group.rewardKind === 'recruit' ? 'they join you' : group.rewardKind === 'captive' ? 'caged as a captive' : 'sold for gold')
+    : '';
   return (
     <div className={`branch ${filled ? 'chosen' : ''}`}>
-      <div className="branch-top"><b>{group.label}</b> <span className="kind">→ {kindWord}</span><span className="bthr">tests {slot.tested.attribute} · thr {group.threshold}</span></div>
+      <div className="branch-top"><b>{group.label}</b>{kindWord ? <span className="kind">→ {kindWord}</span> : null}<span className="bthr">tests {slot.tested.attribute} · thr {group.threshold}</span></div>
       {filled
         ? <div className="slot-filled"><span>{filled.name}</span><button onClick={() => unassign(quest.id, i)}>✕</button></div>
         : <select defaultValue="" onChange={(e) => e.target.value && assign(quest.id, i, e.target.value)}>
