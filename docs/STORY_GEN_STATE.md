@@ -134,6 +134,16 @@ played end-to-end to finale. Findings → decisions:
   flesh-on-delivery for the character actually recruited. ~⅓ cheaper.
 - **Length control is solid** (common→4, rare→6, legendary→7 via the rarity cap).
 
+## DONE — off-rails handling (a failed step is RETRIED, not skipped)
+
+The fixed arc assumed every step succeeds. Fixed: the arc is **success-gated** — `chain.arcProgress`
+advances only on success/partial; a FAILED step keeps it, so the next beat RE-ATTEMPTS the same step
+(with a "worse conditions" retry note), never plows past a step it failed (which would be incoherent for
+hard-gated steps like "recover the ledger" → "decide its fate"). The finale is engine-decided (reaching
+the last step, or a stuck-safety cap `beatsResolved ≥ nSteps+2` forces a desperate climax); a failed
+finale = the goal is lost. Replaced the old climaxTarget/maxBeats/closesChain gating. Validated
+(`_exp_fail.ts`): forced beat-2 failure → step 2 re-attempted → then 3,4,5 → finale.
+
 ## DONE — quest-generator unified (beat = arc step)
 
 The quest generator (separate from the LOCKED bible — see BIBLE.md) was the weak half: the AI got FOUR
