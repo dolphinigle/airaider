@@ -5,6 +5,20 @@
 > understanding survives a context reset. The design intent lives in `STORY_ENGINE.md` / `QUEST_BIBLE.md`;
 > this is the as-built + lessons.
 
+## PLANNED — not yet built
+
+- **Engine NAME-SEED (break the name convergence).** Data: left to "invent," the AI converges on a small
+  name pool — across dumped bibles, EXCLUDING the 4 starters (Sigrun/Marek/Ivo/Aldric — intended
+  recurrence), the invented names repeat hard: Tomas ×14, Lysa ×10, Mira ×9, Theren ×8, Mara/Maera ×10,
+  Coren ×5, Sera, Harrow… "Tomas"/"Lysa" recur across unrelated quests. Same failure mode as the
+  wolf-witch / fixed-premise convergence. FIX (same principle: engine seed > AI-vary): a curated name pool
+  in `seeds.ts` — varied low-medieval / fen given-names + bynames, ideally a few per race
+  (elf/lizardman/wolfman read differently). The engine draws a handful of CANDIDATE names (recent-excluded
+  like `avoid`/`recentFocalSkills`) and passes them to **genesis** ("name new cast from these / in this
+  register; don't reuse recent names") and to **flesh** (delivered characters). Partial is the sweet spot:
+  hand a name or register as a SPARK and let the AI adapt it to gender/race. Keep starter recurrence
+  untouched (the seed governs only NEW invented names). [User: deferred; do after off-rails.]
+
 ## The pipeline (one saga)
 
 1. **Lead pursued** → engine rolls a **focal character** first (tags = the seed of who the saga is about),
