@@ -134,9 +134,21 @@ played end-to-end to finale. Findings → decisions:
   flesh-on-delivery for the character actually recruited. ~⅓ cheaper.
 - **Length control is solid** (common→4, rare→6, legendary→7 via the rarity cap).
 
+## DONE — arc planning + choices (implemented & playtested)
+
+- **Rough ARC, engine-rolled twist (30%), lean cast** — `GenesisOut.arc` is an ordered ~N-step guide;
+  the engine feeds each beat its step (beat 1 = open, finale = goal achieved). Killed the
+  beat-1-completes-goal rewind (validated: bowl recovered ~beat 3, settled at finale). Twist surfaces
+  across beats and lands mid-arc (validated: "sacred bell" → it's a sluice-latch the client uses to flood
+  homesteads).
+- **Mid-beat CHOICES, engine-gated** — a beat may offer 2-3 approaches (sneak/fight/talk), each testing a
+  DIFFERENT attribute (reuses the finale approach-groups); the player picks by who they staff, and the
+  choice flavors the resolution. Engine-gated to ~1 choice-beat per chain (~70% of chains have one) so
+  it's a sometimes-thing, not every beat. The finale choice (recruit/subdue/ransom) already existed.
+
 ## OPEN QUESTIONS (next experiments)
 
-- **Does the bible PLAN the arc, or improvise reactively? → IT MUST PLAN.** Currently REACTIVE and it
+- **(superseded — arc planning is DONE above)** Historical note: the bible used to improvise reactively → Currently REACTIVE and it
   shows a SHARP bug on close read of the long-experiment transcripts: the engine hands BEAT 1 the whole
   GOAL as its job, so the AI completes the goal in beat 1 ("retrieve the Moon-Root AND escort Seren to the
   exchange" — done, beat 1), then the climax gate forces N more beats, which REWIND ("beat 2: reach the
