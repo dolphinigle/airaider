@@ -268,7 +268,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
     const fn = SCENE_KINDS[(beatNum - 2 + off) % SCENE_KINDS.length];
     instr = `This is BEAT ${beatNum}. ADVANCE THIS SAGA'S OWN STORY by escalating one of the bible's TENSIONS or OPEN DIRECTIONS, keeping its CENTRAL TRUTH — the bible's SPECIFIC hook (a curse, a feud, a vow, a heresy, whatever this story actually is) — LIVE and pressing on the cast. THIS BEAT'S JOB MUST BE A DIFFERENT KIND OF TASK than every prior beat: if a previous beat already escorted or guarded someone, do NOT escort/guard again; if one already recovered or secured an object, do NOT center this beat on fetching/securing an object again. Do NOT chase the same single object across beats. Vary BOTH the verb AND the focus. Aim this beat at the dramatic turn — "${fn}" — realized through the bible's PEOPLE, not a generic "investigate-a-ledger / question-a-clerk" errand, and never re-stage a scene, place, or action already used. ${close}`;
   }
-  const opening = ` OPEN this beat as: ${mode}; set it around ${time} (woven into a real sentence, not stacked as a fragment opener like "${time}."). NEVER open on (or end on) a wrapped bundle / sodden parcel / shrouded corpse left at the gate — that cliché is BANNED in every beat, finale included. Do NOT reuse the previous beat's opening.`;
+  const opening = ` OPEN this beat as: ${mode}; set it around ${time} (woven into a real sentence, not stacked as a fragment opener). Do NOT reuse the previous beat's opening.`;
   instr += opening;
 
   const beat = await ai.chainBeat({

@@ -92,6 +92,16 @@ v1 cards read unfriendly and "didn't feel like a quest" because the prompt licen
 
 The outcome is where "each character does something uniquely their own" must land. The resolver is told the outcome (**success / partial / failure**) and the assigned cast, and must **give each assigned character their own distinct beat, driven by their tags + quirks + dossier — never narrate the party as a blob.** Same terse, concrete, readable voice as the card. Reveals only what the outcome permits; the bible's past truth is immutable — outcomes bend only the future (who now knows what, who reacts, what is set in motion). On failure of a risky quest, the resolver also proposes a **punishment** (injury/debt/liability) within the engine's envelope.
 
+### 7a. The roll IS the dramatic beat 🔒 (the heartbeat)
+
+This game is a **gamble** (VISION §1: "read the odds… pull the lever"). The roll isn't a hidden calculation between two paragraphs — it is the emotional pivot of every assignment, and the resolution must be *staged around it*, not narrated past it. The rhythm, three movements:
+
+1. **Buildup → the brink.** The scene sets, the **challenge materialises** (the wolf rises from the reeds; the creditor's men block the lane; the lock resists), and the chosen merc *commits*. End on the **held breath** — the instant before fate decides, blade raised / question asked / weight thrown — and STOP. Do **not** hint the result. *("Marek steps into the clearing, sword low. The wolf rises, hackles up, and gathers itself to spring—")*
+2. **The roll — shown.** The dice/coins resolve *here*, visibly (odds were readable before commit; now the verdict lands: heads vs threshold → success / partial / failure). In the GUI this is a beat the player watches; in any surface, the roll is a **revealed moment**, never skipped.
+3. **Consequence → flows from the verdict.** Now narrate what the dice decided, with weight — each merc true to their tags; what is won/lost; **what is learned (scaled to the outcome — see §7, resolution decides)**. Success clean · partial at a shown cost · failure fails and a consequence lands.
+
+Why it matters: the buildup makes you *feel* the stakes you gambled on; the visible roll is the lever you pulled paying off or not; the consequence is the story the dice wrote. Skip the brink and the roll is just a coin-flip with flavour text — the thing that makes it FUN is that the prose holds its breath with you. **Keep the resolution generous** here (this is the payoff moment; terse elsewhere, but not here). Engine owns the odds + the verdict; the AI owns the buildup and the consequence around it.
+
 ---
 
 ## 8. Chains, recurrence, and sagas 🔒-shape

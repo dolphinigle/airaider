@@ -1,7 +1,8 @@
 // The GUI. Presentation only — every action delegates to the shared GameEngine via
 // the store. Reads use the engine's view methods (questView, eligibleMercs, …).
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useGame } from './store.js';
+import type { QuestResult } from '../core/quest.js';
 import type { Quest, CharacterCard, Lead } from '../core/types.js';
 import type { AICallRecord } from '../core/ai.js';
 import { tagLabel, tagName } from '../core/tags.js';
@@ -304,6 +305,32 @@ function AILog() {
   );
 }
 
+// the roll is the dramatic beat (STORY_ENGINE §7a): reveal the buildup, hold on the dice falling,
+// then drop the verdict, then the consequence. Staged so the gamble lands as a moment, not a label.
+function ResultReveal({ r, delay }: { r: QuestResult; delay: number }) {
+  const [phase, setPhase] = useState(0); // 0 buildup+rolling · 1 verdict · 2 consequence
+  useEffect(() => {
+    const t0 = setTimeout(() => setPhase(1), delay + 1100);
+    const t1 = setTimeout(() => setPhase(2), delay + 1750);
+    return () => { clearTimeout(t0); clearTimeout(t1); };
+  }, [delay]);
+  return (
+    <div className={`result ${r.outcome}`} style={{ opacity: 1, transition: 'opacity .4s' }}>
+      <p className="before">{r.beforeText}</p>
+      {phase === 0
+        ? <div className="verdict" style={{ animation: 'pulse 0.6s ease-in-out infinite' }}>the dice fall… <span className="dim">?/{r.threshold} heads</span></div>
+        : <div className="verdict" style={{ transition: 'opacity .3s' }}>{r.outcome.toUpperCase()} <span className="dim">({r.heads}/{r.threshold} heads)</span></div>}
+      {phase >= 2 && (
+        <div style={{ animation: 'fadein .45s ease-out' }}>
+          <p className="after">{r.afterText}</p>
+          {r.delivered.length > 0 && <p className="delivered">→ {r.delivered.join(', ')}</p>}
+          {r.chainDone && <p className="saga">✦ the saga concludes.</p>}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ResultsModal() {
   const results = useGame((s) => s.results);
   const dismiss = useGame((s) => s.dismissResults);
@@ -313,15 +340,7 @@ function ResultsModal() {
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <h2>The day's reckoning</h2>
         {results.length === 0 && <p className="dim">No company went out today.</p>}
-        {results.map((r) => (
-          <div key={r.questId} className={`result ${r.outcome}`}>
-            <p className="before">{r.beforeText}</p>
-            <div className="verdict">{r.outcome.toUpperCase()} <span className="dim">({r.heads}/{r.threshold} heads)</span></div>
-            <p className="after">{r.afterText}</p>
-            {r.delivered.length > 0 && <p className="delivered">→ {r.delivered.join(', ')}</p>}
-            {r.chainDone && <p className="saga">✦ the saga concludes.</p>}
-          </div>
-        ))}
+        {results.map((r, i) => <ResultReveal key={r.questId} r={r} delay={i * 500} />)}
         <button className="endday" onClick={dismiss}>Continue</button>
       </div>
     </div>
