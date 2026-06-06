@@ -265,6 +265,12 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   const arcN = arc.length;
   const stepStr = (k: number) => arcN ? `"${arc[Math.max(0, Math.min(k, arcN - 1))]}"` : '';
   const lastStep = arcN ? `"${arc[arcN - 1]}"` : 'the goal finally achieved';
+  // ENGINE gates mid-beat CHOICES (don't leave it to the AI, which offers one every beat): ~70% of chains
+  // get exactly ONE choice beat at a seeded middle position; the rest have none. Choices are a sometimes-thing.
+  const croll = rngFrom(`${chain.id}:choicebeat`);
+  const hasChoiceBeat = croll() < 0.7;
+  const choiceBeatNum = 2 + Math.floor(croll() * Math.max(1, arcN - 2));
+  const allowChoice = hasChoiceBeat && !isBeatOne && !forced && !anchorMercId && beatNum === choiceBeatNum;
   let instr: string;
   if (isBeatOne) {
     instr = `This is BEAT 1 — the OPENER, where the company is OFFERED this job.${arcN ? ` Realize the arc's FIRST step: ${stepStr(0)}.` : ''} (a) make the player CARE — a real person on stage in a small human moment (a grief, want, or kindness), centered on ${focalName} UNLESS they're the bible's hidden wrongdoer (then a victim / worried kin / bystander); (b) the "situation" conveys the OVERALL job + why they'd take it, but the "job" LINE is ONLY THIS FIRST STEP (meet / agree / scout / set out) — do NOT phrase the job as the whole goal, and do NOT complete the goal here. No faceless steward/clerk handing over a contract; do NOT capture/resolve ${focalName}. closesChain:false.`;
@@ -276,7 +282,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
     const close = permitted
       ? `If the story has genuinely PEAKED, make THIS the finale — realize the arc's LAST step ${lastStep} (the goal achieved) and closesChain:true. Otherwise keep it open (closesChain:false).`
       : `The arc is NOT ready to end — keep it open (closesChain:false).`;
-    instr = `This is BEAT ${beatNum}.${arcN ? ` Realize roughly arc step ${midK + 1} of ${arcN}: ${stepStr(midK)}.` : ''} Take ONE concrete STEP forward — a DIFFERENT kind of task than every prior beat (don't re-escort, don't re-fetch the same object, don't chase one object across beats; vary the verb AND the focus). Aim at the dramatic turn "${fn}", realized through the bible's PEOPLE. The company must NOT complete the goal yet — that happens only at the finale. ${close}`;
+    instr = `This is BEAT ${beatNum}.${arcN ? ` Realize roughly arc step ${midK + 1} of ${arcN}: ${stepStr(midK)}.` : ''} Take ONE concrete STEP forward — a DIFFERENT kind of task than every prior beat (don't re-escort, don't re-fetch the same object, don't chase one object across beats; vary the verb AND the focus). Aim at the dramatic turn "${fn}", realized through the bible's PEOPLE. The company must NOT complete the goal yet — that happens only at the finale. ${close}${allowChoice ? ' THIS BEAT AFFORDS A CHOICE: offer 2-3 distinct "choices" (approaches testing DIFFERENT attributes — e.g. sneak/fight/talk) for how the company does it.' : ' Single approach — do NOT output "choices".'}`;
   }
   const opening = ` OPEN this beat as: ${mode}; set it around ${time} (woven into a real sentence, not stacked as a fragment opener). Do NOT reuse the previous beat's opening.`;
   instr += opening;
@@ -324,6 +330,16 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
     addGroup('winover', 'Win them over', 'recruit', 'charisma', 1.1);
     addGroup('subdue', 'Subdue them', 'captive', 'physical', 1.1);
     addGroup('ransom', 'Ransom / sell', 'gold', 'agility', 0.75);
+  } else if (allowChoice && beat.choices && beat.choices.length >= 2) {
+    // MID-BEAT CHOICE: the AI offered distinct APPROACHES (sneak/fight/talk). Each is a mutex group with
+    // one open slot testing a DIFFERENT attribute; the player picks HOW by which they staff. Reward is the
+    // same side-loot whichever they pick — the choice changes the method/flavour + which mercs fit.
+    slots = []; groups = [];
+    for (const c of beat.choices) {
+      const index = slots.length; const id = `appr${index}`;
+      slots.push({ index, requirement: { kind: 'open' }, tested: { attribute: c.attribute as Quest['slots'][number]['tested']['attribute'], favored: c.favored, clashing: clashingFor(c.favored) }, groupId: id });
+      groups.push({ id, label: c.label, rewardKind: 'gold', threshold: thresholdFor(1, chain.level), slotIndices: [index] });
+    }
   } else {
     slots = buildSlots(beat.ask, n, ownedMercTags(state));
     // a personal-chain beat pins its anchor: slot 0 must be the merc the saga is about,
@@ -426,13 +442,14 @@ export async function resolveQuest(state: GameState, ai: Narrator, quest: Quest)
   const charCard = quest.reward.cards.find((c) => c.class === 'character') as CharacterCard | undefined;
   const captiveTags = charCard && outcome !== 'failure' ? tagLabels(charCard.tags) : undefined;
 
-  // tell the narrator which finale approach was chosen so the prose matches the delivered kind
+  // tell the narrator which approach the player chose so the prose matches it. Finale groups map to the
+  // delivered KIND (welcome/cage/sell); a MID-BEAT choice group carries the player's chosen METHOD label.
   const g = chosenGroup(quest);
-  const approach = g
-    ? g.rewardKind === 'recruit' ? 'win them over — persuade them to join the company'
+  const approach = !g ? undefined
+    : !quest.finale ? `the company chose to: ${g.label} — the afterRoll MUST read as this approach`
+    : g.rewardKind === 'recruit' ? 'win them over — persuade them to join the company'
       : g.rewardKind === 'captive' ? 'subdue them — overpower and take them captive'
-      : 'ransom/sell — overpower them, then hand them off for coin'
-    : undefined;
+      : 'ransom/sell — overpower them, then hand them off for coin';
 
   const narr = await ai.outcome({
     situation: quest.situation, job: quest.job,

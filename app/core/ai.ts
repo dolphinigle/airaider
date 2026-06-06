@@ -91,6 +91,8 @@ export interface ChainBeatInput {
 export interface ChainBeatOut {
   situation: string; job: string; ask: AskOut; proposedReward: string; newLayerRevealed: string;
   closesChain?: boolean;   // the AI's call: is THIS beat the arc's climax? (only honored when the engine permits)
+  // OPTIONAL: 2-3 distinct APPROACHES the player picks between (sneak vs fight vs talk) — a mid-beat choice
+  choices?: Array<{ label: string; attribute: string; favored: string[] }>;
 }
 
 export interface ConceptTagsInput { concept: string }

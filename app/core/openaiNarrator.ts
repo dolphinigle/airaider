@@ -55,7 +55,8 @@ const zGenesis = z.object({
   directions: z.array(z.union([z.object({ kind: z.string().optional(), hook: z.string() }), z.string()])).default([]),
   openDirections: z.array(z.union([z.object({ kind: z.string().optional(), hook: z.string() }), z.string()])).optional(),
 });
-const zChainBeat = z.object({ situation: z.string(), job: z.string(), ask: zAsk, proposedReward: z.string(), newLayerRevealed: z.string(), closesChain: z.union([z.boolean(), z.string(), z.null()]).optional() });
+const zChainBeat = z.object({ situation: z.string(), job: z.string(), ask: zAsk, proposedReward: z.string(), newLayerRevealed: z.string(), closesChain: z.union([z.boolean(), z.string(), z.null()]).optional(),
+  choices: z.array(z.object({ label: z.string(), attribute: z.string().default('physical'), favored: z.array(z.string()).default([]) })).optional() });
 const zConcept = z.object({ name: z.string(), who: z.string(), tags: z.array(z.string()).default([]) });
 
 function normAttr(a: string): Attribute {
@@ -273,7 +274,8 @@ export class OpenAINarrator implements Narrator {
       `  "ask": { "attribute": "${ATTRS}", "favoredTags": ["0-3 bare tag words"], "slots": ["one per slot: open OR a tag word"] },\n` +
       `  "proposedReward": "<=12 words — the minor SIDE-LOOT this beat plausibly drops (a purse, a token, a clue, a salvaged tool); the GAME sets its value. NOT the saga's payoff — that is decided at the finale.",\n` +
       `  "newLayerRevealed": "<=18 words — the ONE CONCRETE fact the player learns on success: a NAME, a face, a specific deed (never 'a hidden actor' / 'a second figure' — name them or show the concrete symptom)",\n` +
-      `  "closesChain": true/false — does THIS beat resolve the whole arc? Set true ONLY if the BEAT INSTRUCTION permits closing AND the story has genuinely reached its climax; otherwise false }\n` +
+      `  "closesChain": true/false — does THIS beat resolve the whole arc? Set true ONLY if the BEAT INSTRUCTION permits closing AND the story has genuinely reached its climax; otherwise false,\n` +
+      `  "choices": OPTIONAL 2-3 distinct APPROACHES the player picks between to do THIS beat — include ONLY when the beat genuinely affords different methods (slip past a guard vs fight through vs talk your way in; rescue by stealth vs by force). Each: { "label": "<=6 words, the approach", "attribute": one of [${ATTRS}] it tests, "favored": [0-2 bare tag words that help] }. The approaches must test DIFFERENT attributes. Omit entirely for a single-approach beat. }\n` +
       `${VOCAB_BLOCK}\n` +
       `FOLLOW THE BEAT INSTRUCTION below — it tells you this beat's job in the arc and whether you may close it.\n` +
       `CRAFT (this is character drama, not a logistics audit):\n` +
@@ -291,7 +293,13 @@ export class OpenAINarrator implements Narrator {
     const ask = normAsk(out.ask);
     while (ask.slots.length < i.slotCount) ask.slots.push({ kind: 'open' });
     ask.slots.length = i.slotCount;
-    return { ...out, ask, closesChain: out.closesChain === true || out.closesChain === 'true' };
+    const ATTR_OK = ['physical', 'agility', 'intelligence', 'charisma', 'willpower'];
+    const choices = (out.choices ?? []).filter((c) => c.label).map((c) => ({
+      label: String(c.label ?? '').slice(0, 40),
+      attribute: ATTR_OK.includes(String(c.attribute)) ? String(c.attribute) : 'physical',
+      favored: canonicalTags(c.favored ?? []),
+    })).slice(0, 3);
+    return { ...out, ask, closesChain: out.closesChain === true || out.closesChain === 'true', choices: choices.length >= 2 ? choices : undefined };
   }
 
   async conceptTags(i: ConceptTagsInput): Promise<ConceptTagsOut> {
