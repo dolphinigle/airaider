@@ -121,11 +121,12 @@ export class OpenAINarrator implements Narrator {
       const ms = Date.now() - t0;
       const usage = res.usage;
       const raw = res.choices[0]?.message?.content ?? '';
-      this.log(`  ai[${kind}·${model}·${eff}${a ? ' RETRY' : ''}] ${(ms / 1000).toFixed(1)}s in=${usage?.prompt_tokens} out=${usage?.completion_tokens}`);
+      const cached = (usage as unknown as { prompt_tokens_details?: { cached_tokens?: number } })?.prompt_tokens_details?.cached_tokens ?? 0;
+      this.log(`  ai[${kind}·${model}·${eff}${a ? ' RETRY' : ''}] ${(ms / 1000).toFixed(1)}s in=${usage?.prompt_tokens} (cached ${cached}) out=${usage?.completion_tokens}`);
       this.onCall?.({
         n: ++this.callCount, kind, model, effort: eff, ms, system, user, response: raw,
         promptTokens: usage?.prompt_tokens, completionTokens: usage?.completion_tokens,
-        cachedTokens: (usage as unknown as { prompt_tokens_details?: { cached_tokens?: number } })?.prompt_tokens_details?.cached_tokens ?? 0,
+        cachedTokens: cached,
       });
       try { return schema.parse(JSON.parse(raw)); }
       catch (e) { lastErr = raw ? String(e).slice(0, 120) : 'empty response'; }
@@ -165,9 +166,16 @@ export class OpenAINarrator implements Narrator {
       `  "learned": "<=18 words: the ONE concrete truth the company comes away KNOWING this beat — a NAME, a face, a deed (never 'a hidden actor'). YOU decide it from the SUGGESTED truth + the OUTCOME: success = the suggested truth (or a sharper version); partial = only PART of it, hedged or learned at a cost; failure = \\"\\" (nothing concrete, or only a misleading scrap). Whatever you set here MUST also be shown being discovered in afterRoll.",\n` +
       `  "loot": "<=10 words: the side-loot actually carried off this beat (flavour only — the game sets value). success = the suggested loot; partial = a lesser haul; failure = \\"\\"" }\n` +
       `OUTCOME MEANINGS: SUCCESS = clean, captive taken (if any), the truth and loot won. PARTIAL = won but at a COST you must SHOW (a wound / complication / only PART of the truth / lesser haul). FAILURE = captive NOT taken (captive=null), little or nothing learned; a consequence lands. The DICE have already decided the outcome — your job is to narrate it AND decide, scaled to it, what was learned and gained.\n` +
-      `RULES: continue FROM the card (same people/place). Read each merc's tags and act them. Do NOT describe capturing/binding a prisoner unless DELIVERED CAPTIVE TAGS are given (if 'none', no captive is taken). Terse, concrete, low-medieval. NEVER write numbers. JSON only.`;
+      `RULES: continue FROM the card (same people/place). Do NOT describe capturing/binding a prisoner unless DELIVERED CAPTIVE TAGS are given (if 'none', no captive is taken). NEVER write numbers.\n` +
+      `WRITING — this is fiction the player reads (grimdark, low-medieval; match the job's register):\n` +
+      `- SHOW, DON'T LABEL. NEVER filter through a faculty or adverb-label ("his scholar's eye found", "she said angrily", "with a soldier's instinct") — show the ACT, or give the LINE itself (if someone is furious, write the words: "How dare you.").\n` +
+      `- USE DIALOGUE. Where a named merc or character is present, let them SPEAK — a spoken line carries character and fact better than description. Weave dialogue through tight action; don't narrate a feeling, voice it.\n` +
+      `- BE CLEAR ABOUT THE RESULT. The reader must finish knowing EXACTLY what the company achieved or failed to achieve, and what they now hold or know — never vague or mood-only.\n` +
+      `- Each named merc acts true to their tags. Concrete and sensory but plain; no purple abstractions (weight / shadow / fate). JSON only.`;
     const party = i.party.map((p) => ` ${p.name} [${p.tags.join(', ')}]`).join('\n');
     const user =
+      (i.bible ? `HIDDEN BIBLE (context to GROUND the prose — the player never sees it; narrate ONLY who is actually present in this scene, do NOT bring in cast who aren't here):\n${i.bible}\n\n` : '') +
+      (i.storySoFar ? `STORY SO FAR (what already happened — for continuity): ${i.storySoFar}\n\n` : '') +
       `JOB CARD:\n situation: ${i.situation}\n job: ${i.job}\nPARTY SENT:\n${party}\n` +
       `DELIVERED CAPTIVE TAGS: ${i.captiveTags ? '[' + i.captiveTags.join(', ') + ']' : 'none'}\n` +
       (i.approach ? `CHOSEN APPROACH: ${i.approach} — the afterRoll MUST read as this approach.\n` : '') +

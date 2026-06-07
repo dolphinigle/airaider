@@ -27,6 +27,8 @@ export interface OutcomeInput {
   approach?: string;                                 // chosen finale branch intent (win-over / subdue / ransom)
   midSaga?: boolean;                                 // a NON-finale chain beat — named cast must survive & stay free
   finale?: boolean;                                  // the saga's CLIMAX — narrate with the weight of an ending
+  bible?: string;                                    // chain's hidden bible — grounds the prose (experiment-validated; mini only)
+  storySoFar?: string;                               // recent chain log — continuity context for the resolution
   beforeWords?: string;                              // engine-set word budget for beforeRoll (scales w/ stakes); default 35-55
   afterWords?: string;                               // engine-set word budget for afterRoll (scales w/ stakes); default 55-90
   // the beat only PROPOSES; the resolution AI (which knows the OUTCOME) decides what is actually learned/gained.

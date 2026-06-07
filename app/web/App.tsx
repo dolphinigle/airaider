@@ -142,9 +142,9 @@ function QuestCard({ quest }: { quest: Quest }) {
       </div>
       <p className="situation">{quest.situation}</p>
       <p className="job"><b>The job:</b> {quest.job}</p>
-      {!quest.finale && <p className="reward"><b>Reward:</b> {quest.chainId
-        ? (quest.immediate ? `${quest.proposedLoot || 'loot'} now, plus the saga’s payoff${(chain?.bank ?? 0) > 0 ? ` (~${chain!.bank}g banked)` : ''}` : `builds the saga’s payoff (banked)${(chain?.bank ?? 0) > 0 ? ` — ~${chain!.bank}g so far` : ''}`)
-        : rewardEnvelope(quest.reward)}</p>}
+      {/* show a reward line ONLY when it's a concrete thing the player gets — no mechanical "banked" meta */}
+      {!quest.finale && !quest.chainId && <p className="reward"><b>Reward:</b> {rewardEnvelope(quest.reward)}</p>}
+      {!quest.finale && quest.chainId && quest.immediate && quest.proposedLoot && <p className="reward"><b>Spoils here:</b> {quest.proposedLoot}</p>}
       {quest.groups
         ? <div className="branches"><div className="branchhdr">Choose ONE approach:</div>{quest.groups.map((g) => <Branch key={g.id} quest={quest} group={g} />)}</div>
         : <div className="slots">{quest.slots.map((_, i) => <Slot key={i} quest={quest} index={i} />)}</div>}
@@ -328,6 +328,7 @@ function ResultReveal({ r, delay }: { r: QuestResult; delay: number }) {
   }, [delay]);
   return (
     <div className={`result ${r.outcome}`} style={{ opacity: 1, transition: 'opacity .4s' }}>
+      <p className="reshead"><b>{r.title}</b> — <span className="dim">{r.job}</span></p>
       <p className="before">{r.beforeText}</p>
       {phase === 0
         ? <div className="verdict" style={{ animation: 'pulse 0.6s ease-in-out infinite' }}>the dice fall… <span className="dim">?/{r.threshold} heads</span></div>

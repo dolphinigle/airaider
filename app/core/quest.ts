@@ -458,6 +458,7 @@ export function isFilled(quest: Quest): boolean {
 // ---- resolution -------------------------------------------------------------
 export interface QuestResult {
   questId: string; outcome: Outcome; coins: number; heads: number; threshold: number;
+  title: string; job: string;   // so the reveal can remind the player WHAT this quest was
   beforeText: string; afterText: string; delivered: string[]; chainDone?: boolean;
 }
 
@@ -483,11 +484,15 @@ export async function resolveQuest(state: GameState, ai: Narrator, quest: Quest)
       : 'ransom/sell — overpower them, then hand them off for coin';
 
   const words = resolutionWords(quest);
+  // resolution gets the chain's BIBLE + recent log to GROUND the prose (experiment-validated; the
+  // narrative model handles it without dragging in off-stage cast — REWARD_BANK.md / PROMPT_RULES).
+  const rchain = quest.chainId ? state.chains[quest.chainId] : undefined;
   const narr = await ai.outcome({
     situation: quest.situation, job: quest.job,
     party: party.map((m) => ({ name: m.name, tags: tagLabels(m.tags).slice(0, 4) })),
     outcome, captiveTags, risky: quest.risky, approach,
     midSaga: !!quest.chainId && !quest.finale,
+    bible: rchain?.bible, storySoFar: rchain?.log.slice(-3).join(' ') || undefined,
     finale: !!quest.finale, beforeWords: words.before, afterWords: words.after,
     // the beat only PROPOSES; the resolution AI decides (scaled to OUTCOME) what's actually learned/gained.
     proposedReveal: quest.chainId ? quest.stakes || undefined : undefined,
@@ -525,7 +530,7 @@ export async function resolveQuest(state: GameState, ai: Narrator, quest: Quest)
 
   delete state.quests[quest.id];
   logLine(state, `${outcome.toUpperCase()} — ${quest.job}`);
-  return { questId: quest.id, outcome, coins, heads: roll.heads, threshold, beforeText: narr.beforeRoll, afterText: narr.afterRoll, delivered, chainDone };
+  return { questId: quest.id, outcome, coins, heads: roll.heads, threshold, title: quest.title, job: quest.job, beforeText: narr.beforeRoll, afterText: narr.afterRoll, delivered, chainDone };
 }
 
 function grantXp(state: GameState, m: CharacterCard, level: number, outcome: Outcome): void {

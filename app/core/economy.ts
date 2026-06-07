@@ -37,7 +37,7 @@ export const BALANCE = {
   // UNIT_GENERATION.md §1: each tag is rolled INDEPENDENTLY (no count caps — PoE's slot limit is wrong
   // for us). Rarity is emergent from the weights, not clipped.
   // appearance probability that a given tag shows up at all (low — most tags don't), by group:
-  tagAppear: (group: string): number => ({ personality: 0.17, physical: 0.13, skill: 0.09, background: 0.13, notoriety: 0.05 } as Record<string, number>)[group] ?? 0.07,
+  tagAppear: (group: string): number => ({ personality: 0.17, physical: 0.13, skill: 0.055, background: 0.13, notoriety: 0.05 } as Record<string, number>)[group] ?? 0.07,
   // tier spawn weights [unused, T1…T5] — low tiers common, top tiers ("very X") rare:
   tierWeight: [0, 2, 6, 16, 30, 46] as number[],
   // the most value a single believable character can hold in tags (empirically matched to what
