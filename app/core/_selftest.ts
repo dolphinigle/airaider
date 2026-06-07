@@ -27,29 +27,29 @@ ok(tagLabel('bg:noble') === 'Noble', 'flat label');
 console.log('  vocab block:\n' + promptVocabBlock().split('\n').map((l) => '    ' + l).join('\n'));
 ok(new Set(allTags().map((t) => t.word)).size === allTags().length, 'suffixes globally unique');
 
-// ---- generation -------------------------------------------------------------
-section('generateCharacter spends ~target value');
+// ---- generation (UNIT_GENERATION.md §1: roll each tag independently — most ordinary, few standouts) ----
+section('generateCharacter — roll-based, most ordinary + few standouts');
 {
-  const r = rngFrom('gen1');
-  let within = 0, grounded = 0; const n = 200;
-  const mults = [1, 1.2, 1.6]; // common / uncommon / rare single-unit
+  const r = rngFrom('gen1'); const n = 400;
+  let topTierSum = 0, multiTop = 0, manySkills = 0, tagSum = 0, blank = 0;
   for (let i = 0; i < n; i++) {
     const level = 1 + (i % 10);
-    const target = Math.round(BALANCE.vBase(level) * mults[i % 3]);
-    const g = generateCharacter(r, { targetValue: target, level });
-    // a character holds at most maxCharValue; value should approach min(target, cap), never overshoot wildly
-    const goal = Math.min(target, BALANCE.maxCharValue(level));
-    // grounded caps mean expensive value (skills/magic) is limited; the rest spills to gold by
-    // design, so a character holds ~60%+ of the holdable goal and never wildly overshoots target.
-    if (g.value >= goal * 0.6 && g.value <= target * 1.2 + BALANCE.tagCeiling(level)) within++;
+    const g = generateCharacter(r, { targetValue: BALANCE.vBase(level), level });
+    const top = g.tags.filter((t) => t.tier <= 2).length;          // "very X" standouts
     const skills = g.tags.filter((t) => t.id.startsWith('skill:')).length;
-    const magic = g.tags.filter((t) => t.id.startsWith('skill:magic')).length;
-    if (skills <= 3 && magic <= 1) grounded++;
-    ok(g.tags.some((t) => t.id.startsWith('gender:')) && g.tags.some((t) => t.id.startsWith('race:')), 'has identity');
+    const nonId = g.tags.filter((t) => !t.id.startsWith('gender:') && !t.id.startsWith('race:')).length;
+    topTierSum += top; tagSum += nonId;
+    if (top >= 3) multiTop++;            // a 3+ "very X" stack should be RARE (emergent, not capped)
+    if (skills >= 4) manySkills++;       // 4+ skills should be rare
+    if (nonId === 0) blank++;            // an unlucky near-blank unit is allowed but uncommon
+    ok(g.tags.some((t) => t.id.startsWith('gender:')) && g.tags.some((t) => t.id.startsWith('race:')), 'has identity (mandatory)');
+    ok(g.value >= 0, 'value is sane');
   }
-  console.log(`  ${within}/${n} near holdable value · ${grounded}/${n} grounded (≤3 skills, ≤1 magic)`);
-  ok(within > n * 0.85, 'most cards near holdable value');
-  ok(grounded === n, 'every character is grounded — no all-skill Mary Sues');
+  console.log(`  avg standout(T1-2)=${(topTierSum / n).toFixed(2)} · avg tags=${(tagSum / n).toFixed(1)} · 3+stack=${multiTop}/${n} · 4+skills=${manySkills}/${n} · blank=${blank}/${n}`);
+  ok(topTierSum / n < 1.0, 'standouts are rare on average (most traits ordinary)');
+  ok(multiTop < n * 0.06, '3+ "very X" stacks are rare (emergent rarity, no Mary-Sue stacks)');
+  ok(manySkills < n * 0.06, '4+ skills is rare');
+  ok(blank < n * 0.25, 'most units have at least one trait beyond identity');
 }
 
 // ---- the success curve: level-L merc on level-L quest should be ~winnable ---

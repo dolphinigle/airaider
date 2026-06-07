@@ -34,10 +34,12 @@ export const BALANCE = {
   maxTagsPerCard: 16,
   tagCapFor: (targetValue: number, ceiling: number) =>
     Math.min(16, Math.max(5, 2 + Math.ceil(targetValue / (ceiling * 0.45)))),
-  maxSkills: 3,   // global cap for value-packing; FOCALS get a tighter cap (see GenSpec.maxSkills)
-  maxMagic: 1,    // …and at most one school of magic
-  maxTopTier: 2,  // at most this many TIER-1/2 ("very X") tags per character — no Mary-Sue stat-stacks
-  maxPhys: 2,     // …and at most this many physical descriptors (avoids "tough + frail + beautiful + …")
+  // UNIT_GENERATION.md §1: each tag is rolled INDEPENDENTLY (no count caps — PoE's slot limit is wrong
+  // for us). Rarity is emergent from the weights, not clipped.
+  // appearance probability that a given tag shows up at all (low — most tags don't), by group:
+  tagAppear: (group: string): number => ({ personality: 0.17, physical: 0.13, skill: 0.09, background: 0.13, notoriety: 0.05 } as Record<string, number>)[group] ?? 0.07,
+  // tier spawn weights [unused, T1…T5] — low tiers common, top tiers ("very X") rare:
+  tierWeight: [0, 2, 6, 16, 30, 46] as number[],
   // the most value a single believable character can hold in tags (empirically matched to what
   // the grounded caps actually allow); value beyond this flows to the bundle as gold/treasure
   maxCharValue: (level: number) => 45 + level * 11,
@@ -136,112 +138,47 @@ export interface GeneratedCharacter {
 }
 
 export function generateCharacter(r: Rng, spec: GenSpec): GeneratedCharacter {
-  const ceiling = BALANCE.tagCeiling(spec.level);
-  // a single character holds at most maxCharValue in tags; the caller tops up the rest as gold
-  const effTarget = Math.min(spec.targetValue, BALANCE.maxCharValue(spec.level));
-  const cap = BALANCE.tagCapFor(effTarget, ceiling);
+  const ceiling = BALANCE.tagCeiling(spec.level);   // PoE ilvl: caps the per-tag value this source can roll
   const tags: TagInstance[] = [];
   const usedMutex = new Set<string>();
-  let remaining = effTarget;
-
   const place = (def: TagDef, tier: number) => {
     if (def.mutex) { if (usedMutex.has(def.mutex)) return false; usedMutex.add(def.mutex); }
     if (tags.some((t) => t.id === def.id)) return false;
     tags.push({ id: def.id, tier });
-    remaining -= tagValue(def, tier);
     return true;
   };
 
   // 1. AI-required tags first (mid tier)
-  for (const id of spec.required ?? []) {
-    const def = tagDef(id);
-    if (def) place(def, def.tiered ? affordableTier(def, remaining, ceiling, r) : 3);
-  }
-  // always give a gender + race if not present (identity floor, cheap)
+  for (const id of spec.required ?? []) { const def = tagDef(id); if (def) place(def, 3); }
+  // 2. identity floor (mandatory): a gender + a race
   ensureIdentity(r, tags, usedMutex);
-
-  // 2. spend the rest — aim each tag near remaining/slotsLeft so the budget lands
+  // 3. ROLL EACH eligible tag INDEPENDENTLY (UNIT_GENERATION.md §1): a low appearance prob → most tags
+  //    absent; a weighted-low tier → standouts ("very X") rare. NO count caps — rarity is emergent, not
+  //    clipped. Value is whatever it rolls; targeting a value is design-deferred (UNIT_GENERATION.md §2).
   const avoid = new Set(spec.exclude ?? []);
-  const maxSk = spec.maxSkills ?? BALANCE.maxSkills;
-  const pool = allTags().filter((d) => d.group !== 'gender' && d.group !== 'race' && !avoid.has(d.id));
-  let guard = 0;
-  const cheapest = (d: TagDef) => (d.tiered ? tagValue(d, 5) : tagValue(d, 3));
-  while (remaining > 1 && tags.length < cap && guard++ < 200) {
-    const slotsLeft = cap - tags.length;
-    const aim = Math.min(remaining / slotsLeft, ceiling);
-    const skillCount = tags.filter((t) => tagDef(t.id)?.group === 'skill').length;
-    const magicCount = tags.filter((t) => t.id.startsWith('skill:magic')).length;
-    const physCount = tags.filter((t) => tagDef(t.id)?.group === 'physical').length;
-    const topTierCount = tags.filter((t) => t.tier <= 2).length;
-    const candidates = pool.filter((d) => (!d.mutex || !usedMutex.has(d.mutex))
-      && !tags.some((t) => t.id === d.id) && cheapest(d) <= remaining
-      && !(d.group === 'skill' && skillCount >= maxSk)   // grounded: cap skills
-      && !(d.group === 'physical' && physCount >= BALANCE.maxPhys)   // …cap physical descriptors
-      && !(d.id.startsWith('skill:magic') && magicCount >= BALANCE.maxMagic));
-    if (!candidates.length) break;
-    // restrict to tags that can actually reach near the aim (avoids cheap-tag dilution),
-    // then pick among them weighted by proximity to the aim
-    const reach = candidates.filter((d) => bestValueNear(d, aim, ceiling, remaining) >= aim * 0.7);
-    const useable = reach.length ? reach : candidates;
-    const def = weightedPick(r, useable, (d) => {
-      const v = bestValueNear(d, aim, ceiling, remaining);
-      return 1 / (1 + Math.abs(v - aim));
-    });
-    let tier = def.tiered ? tierNear(def, aim, ceiling, remaining) : 3;
-    // cap "very X" stacking: once a character has enough TIER-1/2 tags, force the rest to tier 3+
-    if (def.tiered && tier <= 2 && topTierCount >= BALANCE.maxTopTier) tier = 3;
-    if (!place(def, tier)) continue;
+  const pool = allTags()
+    .filter((d) => d.group !== 'gender' && d.group !== 'race' && !avoid.has(d.id))
+    .map((d) => ({ d, k: r() })).sort((a, b) => a.k - b.k).map((x) => x.d);   // shuffle: placement order must not bias
+  for (const def of pool) {
+    if (def.mutex && usedMutex.has(def.mutex)) continue;
+    if (tags.some((t) => t.id === def.id)) continue;
+    if (r() >= BALANCE.tagAppear(def.group)) continue;
+    place(def, def.tiered ? weightedTier(r, def, ceiling) : 3);
   }
 
   const level = spec.level;
   const base = rollBaseAttrs(r, tags);
   const talents = rollTalents(r);
   const attrs = attrsAtLevel(base, talents, level);
-  let value = cardTagsValue(tags);
-
-  // 3. jackpot-with-catch lottery
-  let jackpotNegative: GeneratedCharacter['jackpotNegative'];
-  if (r() < BALANCE.jackpotChance) {
-    const sc = tags.filter((t) => tagDef(t.id)?.group === 'skill').length;
-    const mc = tags.filter((t) => t.id.startsWith('skill:magic')).length;
-    const bonus = pool.filter((d) => (!d.mutex || !usedMutex.has(d.mutex)) && !tags.some((t) => t.id === d.id) && d.tiered
-      && !(d.group === 'skill' && sc >= maxSk) && !(d.id.startsWith('skill:magic') && mc >= BALANCE.maxMagic));
-    if (bonus.length) {
-      const def = weightedPick(r, bonus, (d) => BALANCE.rarityBase[d.rarity]); // bias RARE for the jackpot
-      const tier = Math.max(1, affordableTier(def, ceiling, ceiling, r) - randInt(r, 0, 1));
-      place(def, tier);
-      const newValue = cardTagsValue(tags);
-      const overshoot = newValue - spec.targetValue;
-      if (overshoot > 0) jackpotNegative = { kind: pick3(r), value: -overshoot };
-      value = newValue;
-    }
-  }
-
-  return { tags, attrs, base, talents, level, value, jackpotNegative };
+  const value = cardTagsValue(tags);
+  return { tags, attrs, base, talents, level, value };
 }
 
-/** Strongest tier whose value is affordable under the ceiling (for the jackpot). */
-function affordableTier(def: TagDef, remaining: number, ceiling: number, _r: Rng): number {
-  let best = 5;
-  for (let tier = 5; tier >= 1; tier--) {
-    const v = tagValue(def, tier);
-    if (v <= remaining && v <= ceiling) best = tier; else break;
-  }
-  return best;
-}
-/** Tier whose value is closest to `aim`, not exceeding remaining or the ceiling. */
-function tierNear(def: TagDef, aim: number, ceiling: number, remaining: number): number {
-  let best = 5, bestDiff = Infinity;
-  for (let tier = 5; tier >= 1; tier--) {
-    const v = tagValue(def, tier);
-    if (v > remaining || v > ceiling) continue;
-    const diff = Math.abs(v - aim);
-    if (diff <= bestDiff) { bestDiff = diff; best = tier; }
-  }
-  return best;
-}
-function bestValueNear(def: TagDef, aim: number, ceiling: number, remaining: number): number {
-  return def.tiered ? tagValue(def, tierNear(def, aim, ceiling, remaining)) : tagValue(def, 3);
+/** Roll a tag's tier: low tiers ("ordinary") common, top tiers ("very X") rare; gated by the ceiling. */
+function weightedTier(r: Rng, def: TagDef, ceiling: number): number {
+  const allowed = [1, 2, 3, 4, 5].filter((t) => tagValue(def, t) <= ceiling);
+  if (!allowed.length) return 5;
+  return weightedPick(r, allowed, (t) => BALANCE.tierWeight[t] ?? 1);
 }
 function ensureIdentity(r: Rng, tags: TagInstance[], usedMutex: Set<string>) {
   for (const group of ['gender', 'race']) {
@@ -253,7 +190,6 @@ function ensureIdentity(r: Rng, tags: TagInstance[], usedMutex: Set<string>) {
     }
   }
 }
-const pick3 = (r: Rng) => (['evidence', 'mess', 'debt'] as const)[randInt(r, 0, 2)];
 
 // ---- splitValue: a target value → a bundle of kinds -------------------------
 export interface SplitPart { kind: RewardKind; value: number }

@@ -146,7 +146,7 @@ export class OpenAINarrator implements Narrator {
       `${VOCAB_BLOCK}\n` +
       `ATTRIBUTE — pick the one the job's CORE test needs, and VARY across jobs: physical=force/brawn/melee/toughness, agility=speed/stealth/precision, intelligence=lore/investigation/cunning, charisma=persuasion/deceit/people, perception=awareness/intuition (spotting an ambush, reading a lie, tracking, sensing danger). A raid→physical, a stealth job→agility, an investigation→intelligence, a parley→charisma, a scout/hunt/ambush-or-be-ambushed→perception.\n` +
       `RULES: terse, plain, concrete. State the job so the player knows exactly what taking it commits them to. NEVER write numbers. Give exactly one "slots" entry per mercenary the company can send (the count below). Prefer "open" slots. JSON only.`;
-    const user = `Archetype: ${i.archetype}\nLocation: ${i.location}\nMercenaries the company can send: ${i.slotCount}\nThe job results in ${i.rewardSeed} (this is the reward the player sees for taking it).\nWrite the job + ask. JSON only.`;
+    const user = `Archetype: ${i.archetype}\nLocation: ${i.location}\nMercenaries the company can send: ${i.slotCount}\nThe job results in ${i.rewardSeed} (this is the reward the player sees for taking it).\nJSON only.`;
     const out = await this.json('cardAsk', system, user, zCardAsk, this.mechanicalModel, 'minimal', 1200);
     const ask = normAsk(out.ask);
     while (ask.slots.length < i.slotCount) ask.slots.push({ kind: 'open' });
@@ -175,7 +175,7 @@ export class OpenAINarrator implements Narrator {
       (i.midSaga ? `MID-SAGA BEAT: this is one beat of an ongoing story, NOT its end. Do NOT kill, capture, bind, defeat-for-good, or otherwise permanently remove ANY named person — the cast must survive and stay free for later beats. A FAILURE here is a SETBACK (they slip away, the trail goes cold, a wound, a worsening), never a death or capture. Take NO captive (captive=null).\n` : '') +
       (i.proposedReveal ? `SUGGESTED TRUTH (the beat set this up to surface — YOU decide how much actually lands given the OUTCOME): "${i.proposedReveal}"\n` : '') +
       (i.proposedLoot ? `SUGGESTED LOOT (what the beat could drop — scale to the OUTCOME): "${i.proposedLoot}"\n` : '') +
-      `RISKY: ${i.risky ? 'yes' : 'no'}\nOUTCOME: ${i.outcome.toUpperCase()}\nNarrate, continuing from the card; decide what was learned and gained. JSON only.`;
+      `RISKY: ${i.risky ? 'yes' : 'no'}\nOUTCOME: ${i.outcome.toUpperCase()}\nJSON only.`;
     const out = await this.json('outcome', system, user, zOutcome, this.narrativeModel, this.narrativeEffort, 1600);
     return { beforeRoll: out.beforeRoll, afterRoll: out.afterRoll, captive: out.captive ?? null, punishment: out.punishment ?? null, learned: out.learned ?? null, loot: out.loot ?? null };
   }
@@ -213,13 +213,13 @@ export class OpenAINarrator implements Narrator {
       `You are given the CORE PERSON the chain centers on (their tags / known life), a few THEME words, a SETTING, a TONE, and the region.\n\n` +
       `BUILD A QUEST CHAIN THE COMPANY WOULD TAKE:\n` +
       `- THE HOOK — how the company gets drawn in and WHY they'd take the FIRST job. Someone hires them for coin, pleads for help, posts a bounty, OR the core person comes to the fort and asks directly. The mercenary reason must be PLAIN: pay, a person to save/escort/find, a captive or recruit worth taking, a threat to remove.\n` +
-      `- THE GOAL — one clear thing the company is working to ACHIEVE across the whole chain (save / escort / find / protect / hunt / recover / expose / deliver someone or something).\n` +
-      `- EACH JOB STANDS ALONE, the CHAIN coheres. Every individual job in the sequence must give the player a concrete reason to take THAT job (a clear task + payoff), AND each follows from the last so the chain reads as one escalating story toward the goal — not a single quest, not a vague mood piece, not unrelated errands.\n` +
+      `- THE DRIVE — what pulls the company in and gives the chain its throughline. It may be a CONCRETE objective (rescue Alen, recover the locket) OR an OPEN-ENDED pursuit (explore the drowned temple, find out what's killing the herds) where the end is DISCOVERED through play — the company need not know the final outcome up front. Don't force a fixed end-goal where the fun is the unknown.\n` +
+      `- EACH JOB HAS ITS OWN CLEAR GOAL; the CHAIN coheres. THIS is the hard requirement: every individual job in the sequence must give the player a concrete, plain task for THAT job (what to do, why, the payoff) — even when the overall end is open. Each follows from the last so the chain reads as one escalating story — not a single quest, not a vague mood piece, not unrelated errands.\n` +
       `- DRAMA SERVES THE QUEST. The cast's wants are OBSTACLES, allies, costs, and turns ALONG the goal — not a static web of strangers the player merely watches. The player is a PARTICIPANT, never a spectator.\n\n` +
       `${twistBlock}\n` +
-      `PLAN THE ARC — output "arc": a ROUGH ordered guide of ~${eb} beat-steps (a skeleton, NOT a rigid script). STEP 1 = the OPENER (the company TAKES the job / meets the person) — do NOT finish the goal here. MIDDLE steps = escalating obstacles and turns. LAST step = the FINALE where the goal is finally achieved/resolved. CRITICAL: the company must NOT complete the goal before the last step — a 'recover the locket' job does not recover it in step 1. Each step is a short phrase.\n` +
+      `PLAN THE ARC — output "arc": a ROUGH ordered guide of about ${eb} steps (a skeleton, NOT a rigid script; ~${eb} because this chain's length/stakes warrant it — fewer for a smaller chain). EACH STEP BECOMES ONE FULL JOB the player takes off the job board, so each must be a concrete, self-contained task (not a vague phase). STEP 1 = the OPENER (the company TAKES the first job / meets the person) — do NOT resolve the chain here. MIDDLE steps = escalating obstacles and turns. LAST step = the FINALE that brings it to a head (the resolution, confrontation, or the big discovery — a fixed prize need not exist for open-ended drives). CRITICAL: do NOT resolve the chain before the last step — a 'recover the locket' chain does not recover it in step 1. Each step is a short phrase.\n` +
       `PEOPLE — keep them LEAN: each is ONE vivid line (who they are + the one thing that matters here), a "want", and a "role" in the quest (client / companion / quarry / obstacle / ally / prize). NO backstory ladders — deep history is written later, only for whoever the company actually keeps.\n` +
-      `NAMES — draw your characters' names from the NAME SEEDS below (or riff on their SOUND for fresh ones); do NOT reuse any name in AVOID NAMES, and do NOT default to the same few names every saga.\n` +
+      `NAMES — draw your characters' names from the NAME SEEDS below (or riff on their SOUND for fresh ones); do NOT reuse any name in AVOID NAMES.\n` +
       `CHOICES (suggest from the STORY) — the engine allows AT MOST ${i.maxChoices ?? 1} of this arc's steps to BRANCH:\n` +
       `  • "choiceSteps": step numbers (1-based, from YOUR arc) where the company faces a real branching choice in HOW to do that job — sneak vs fight vs talk. You MAY include the LAST step (the finale). NEVER the first job. Suggest up to ${i.maxChoices ?? 1}; [] if none genuinely fits (a straight, linear chain is fine).\n` +
       `  • "finaleChoices": how the chain ENDS — 1 to 3 choices about the core person / prize, PHRASED IN THIS STORY'S TERMS and LOGICAL to it (e.g. for a captured deserter: "Take them into the company" / "March them to the magistrate" / "Cage them"). Give just 1 if the ending is a single fate (no real choice); give 2-3 ONLY if the finale genuinely branches (and then include the last step in choiceSteps). Vary the KIND where it makes sense. Each maps to: recruit (they join you) / captive (you hold them) / gold (hand off / sell / turn in for coin).\n` +
@@ -229,7 +229,7 @@ export class OpenAINarrator implements Narrator {
       `Output JSON only:\n` +
       `{ "title": "short, concrete, names a real thing/person/place — NOT a poetic two-noun phrase like 'Oar and Scar', NOT 'The Weight of X'",\n` +
       `  "leadBlurb": "1-2 sentences the PLAYER reads on the job board — a CLEAR job they'd take: who/what it concerns, what the company is wanted FOR, and the draw (pay / a person / a prize). Plain and inviting, not cryptic. Hide the deep secret, but never hide what the JOB is.",\n` +
-      `  "goal": "one line: the APPARENT thing taking this quest commits the company to ACHIEVE (e.g. 'escort Alen to the abbey alive', 'find and bring back the miller's daughter'). The throughline.",\n` +
+      `  "goal": "one line: the DRIVE / throughline — concrete OR open-ended (e.g. 'escort Alen to the abbey alive', 'find out what is drowning the herds', 'explore the sunken temple and bring back what is worth taking').",\n` +
       `  "twistReveal": "${i.twist ? 'how the truth SUBVERTS the apparent goal — the player must NOT see this; it surfaces across beats and lands at a middle step' : 'leave EMPTY \\"\\" — this is a straight quest'}",\n` +
       `  "arc": ["~${eb} short step phrases — step 1 = take the job/meet (goal NOT done), last = goal achieved at the finale"],\n` +
       `  "choiceSteps": [up to ${i.maxChoices ?? 1} step numbers from your arc that branch — MAY include the last (finale); never step 1; [] if none],\n` +
@@ -255,7 +255,7 @@ export class OpenAINarrator implements Narrator {
       : '';
     const names = i.nameSeeds?.length ? `\nNAME SEEDS (draw fresh names from these or riff on their sound): ${i.nameSeeds.join(', ')}` : '';
     const avoidNames = i.avoidNames?.length ? `\nAVOID NAMES (used in recent sagas — do NOT reuse): ${i.avoidNames.join(', ')}` : '';
-    const user = `${core}\nREGION: ${i.region}${place}${tone}${seed}${names}${avoidNames}${pool}${avoid}\nBuild the quest bible. JSON only.`;
+    const user = `${core}\nREGION: ${i.region}${place}${tone}${seed}${names}${avoidNames}${pool}${avoid}\nJSON only.`;
     const out = await this.json('genesis', system, user, zGenesis, this.narrativeModel, this.narrativeEffort, 4000);
     // flatten {person,roleInStory} → BiblePerson; coerce conceals
     const cast = (out.cast ?? []).map((c) => {
