@@ -140,8 +140,8 @@ function QuestCard({ quest }: { quest: Quest }) {
         {chain && (chain.bank ?? 0) > 0 && <span className="qmeta">spoils banked ~{chain.bank}g</span>}
         <span className="qmeta">{quest.rarity} · L{quest.level} · {quest.location}</span>
       </div>
+      {/* ONE text for the player: the intro (situation). The terse `job` is engine-internal, not shown. */}
       <p className="situation">{quest.situation}</p>
-      <p className="job"><b>The job:</b> {quest.job}</p>
       {/* show a reward line ONLY when it's a concrete thing the player gets — no mechanical "banked" meta */}
       {!quest.finale && !quest.chainId && <p className="reward"><b>Reward:</b> {rewardEnvelope(quest.reward)}</p>}
       {!quest.finale && quest.chainId && quest.immediate && quest.proposedLoot && <p className="reward"><b>Spoils here:</b> {quest.proposedLoot}</p>}

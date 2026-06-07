@@ -152,12 +152,21 @@ export async function pursueLead(state: GameState, ai: Narrator, lead: Lead): Pr
   return pursueOneOff(state, ai, r, lead);
 }
 
+// engine-rotated: HOW a one-off job reaches the boss's desk (so they don't all open "X slams a letter down").
+const ARRIVALS = [
+  'one of your own mercs strides in and drops a notice on your desk',
+  'a petitioner is shown into your office, twisting a cap in their hands',
+  'a sealed letter arrives by courier and is set before you',
+  'a frightened runner is brought to you, still catching their breath',
+  'a passing trader leans in at the gate to mention it',
+  'an official or a creditor arrives, expecting to be heard',
+];
 async function pursueOneOff(state: GameState, ai: Narrator, r: Rng, lead: Lead): Promise<Quest> {
   const n = slotCountFor(lead, r);
   const V = questValue(lead.level, lead.rarity, n);
   const reward = generateReward(r, mk(state), state.cycle, { V, archetype: lead.archetype, isChain: false, level: lead.level });
   const seed = rewardEnvelope(reward);
-  const card = await ai.cardAsk({ archetype: lead.archetype, location: lead.location, slotCount: n, rewardSeed: seed });
+  const card = await ai.cardAsk({ archetype: lead.archetype, location: lead.location, slotCount: n, rewardSeed: seed, arrival: pick(r, ARRIVALS) });
   const quest: Quest = {
     id: uid(state, 'quest'), leadId: lead.id, rarity: lead.rarity, level: lead.level, location: lead.location,
     archetype: lead.archetype, title: card.job.slice(0, 48), situation: card.situation, job: card.job,
@@ -264,12 +273,13 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   // engine-rotated ARRIVAL + time so beats don't all read "X staggers to the gate at dusk" (a strong
   // model tic). The "wrapped bundle / corpse left at the gate" cliché is deliberately ABSENT here and
   // BANNED below — reading showed the model kept defaulting to it, even in finales.
+  // ALL boss-POV: how the next step REACHES the fort this turn (the boss isn't in the field).
   const MODES = [
-    'a named cast member comes to the company in person',
-    'the company is already out in the field on the last thread and comes upon this',
+    'a named cast member comes to the fort in person',
+    'one of your own mercs brings word / drops a notice on your desk',
     'a rumor, a summons, or a sealed letter reaches the fort',
     'an official, a rival, or a creditor comes to press the matter',
-    'a frightened bystander or a child brings urgent word',
+    'a frightened bystander or a child brings urgent word to the gate',
   ];
   const TIMES = ['grey morning', 'high noon', 'a hot afternoon', 'dusk', 'after dark', 'in driving rain'];
   const off = Math.floor(rngFrom(chain.id)() * MODES.length);

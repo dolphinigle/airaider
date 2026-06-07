@@ -15,6 +15,7 @@ export interface AskOut {
 }
 export interface CardAskInput {
   archetype: string; location: string; slotCount: number; rewardSeed: string;
+  arrival?: string;   // engine-rotated: HOW this job reaches the boss (vary the opening across jobs)
 }
 export interface CardAskOut { situation: string; job: string; ask: AskOut }
 
