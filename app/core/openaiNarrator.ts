@@ -232,7 +232,7 @@ export class OpenAINarrator implements Narrator {
       `  "twistReveal": "${i.twist ? 'how the truth SUBVERTS the apparent goal — the player must NOT see this; it surfaces across beats and lands at a middle step' : 'leave EMPTY \\"\\" — this is a straight quest'}",\n` +
       `  "arc": ["~${eb} short step phrases — step 1 = take the job/meet (goal NOT done), last = goal achieved at the finale"],\n` +
       `  "choiceSteps": [0-2 step numbers from your arc where a real sneak/fight/talk choice fits — never step 1 or the last; [] if none],\n` +
-      `  "finaleChoices": [ { "label": "<=6 words, the ending choice in THIS story's terms", "kind": "recruit|captive|gold" } — 2-3 logical ways to resolve the chain ],\n` +
+      `  "finaleChoices": [ { "label": "<=8 words, fits a button — the ending choice in THIS story's terms (no trailing parenthetical)", "kind": "recruit|captive|gold" } — 2-3 logical ways to resolve the chain; vary the KIND where it makes sense (don't make all of them 'gold') ],\n` +
       `  "cast": [ { "name": "...", "who": "one vivid line — who they are + the one thing that matters here", "want": "plain want now", "role": "client / companion / quarry / obstacle / ally / prize" } ],\n` +
       `  "situation": "2-4 sentences — the believable truth behind the job, told straight (for a twist quest this is the REAL situation the player will uncover)",\n` +
       `  "tensions": ["what stands in the way and what's at stake: <A> wants <X>; <B> wants <Y>; because <reason> — obstacles ALONG the goal, not a standalone argument"],\n` +
@@ -273,7 +273,7 @@ export class OpenAINarrator implements Narrator {
     const choiceSteps = (out.choiceSteps ?? []).map((n) => Math.round(Number(n))).filter((n) => Number.isFinite(n) && n >= 1);
     const KIND_OK = ['recruit', 'captive', 'gold'];
     const finaleChoices = (out.finaleChoices ?? [])
-      .map((c) => ({ label: String(c.label ?? '').slice(0, 40), kind: KIND_OK.includes(String(c.kind)) ? String(c.kind) as 'recruit' | 'captive' | 'gold' : 'gold' }))
+      .map((c) => ({ label: String(c.label ?? '').slice(0, 64), kind: KIND_OK.includes(String(c.kind)) ? String(c.kind) as 'recruit' | 'captive' | 'gold' : 'gold' }))
       .filter((c) => c.label).slice(0, 3);
     return { title: out.title, leadBlurb: out.leadBlurb, goal: out.goal ?? '', arc: out.arc ?? [], twistReveal, choiceSteps, finaleChoices, cast, situation: out.situation, tensions: out.tensions ?? [], directions };
   }
