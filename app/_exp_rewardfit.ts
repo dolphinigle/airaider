@@ -4,6 +4,7 @@
 // each beat to success so the whole arc (incl. finale) is generated.
 import { readFileSync } from 'node:fs';
 import { GameEngine } from './core/game.js';
+import { tagLabel } from './core/tags.js';
 import type { Chain } from './core/types.js';
 const key = readFileSync(new URL('../.env', import.meta.url), 'utf8').match(/OPENAI_API_KEY=(.+)/)![1].trim();
 const strip = (s: string) => (s || '').replace(/\x1b\[[0-9;]*m/g, '');
@@ -28,8 +29,10 @@ for (let c = 0; c < 30 && done < TARGET_DONE; c++) {
       console.log(`\n\n========================================\n### "${strip(ch.title)}"  [${ch.rarity}, arc ${(ch.arc||[]).length} steps]`);
       console.log(`HOOK: ${strip(ch.hook)}`);
       console.log(`FOCAL (the finale payoff): ${focal.name} — value ${focal.value}, ${strip(focal.who||'')}`);
+      console.log(`   FOCAL TAGS: ${focal.tags.map((t:any)=>`${tagLabel(t.id,t.tier)}(T${t.tier})`).join(', ')}`);
+      console.log(`   CAST NAMES: ${(ch.bible.match(/^- ([^(]+?)\s*\(/gm)||[]).map((m:string)=>m.replace(/^- /,'').replace(/\s*\($/,'')).join(' · ')}`);
       (ch.arc||[]).forEach((s, i) => console.log(`   arc ${i + 1}: ${strip(s)}`));
-      console.log(`   BIBLE choiceSteps: [${(ch.choiceSteps||[]).join(', ')}]   finaleChoices: ${(ch.finaleChoices||[]).map((c:any)=>`${strip(c.label)}[${c.kind}]`).join(' · ') || '— (fallback trio)'}`);
+      console.log(`   choiceBudget(engine): ${ch.choiceBudget}   BIBLE choiceSteps: [${(ch.choiceSteps||[]).join(', ')}]   finaleChoices: ${(ch.finaleChoices||[]).map((c:any)=>`${strip(c.label)}[${c.kind}]`).join(' · ') || '—'}`);
     }
     const attr = q.groups ? q.groups.map((g:any)=>g.tested?.attribute||q.slots[g.slotIndices[0]]?.tested?.attribute).join('/') : q.slots[0]?.tested?.attribute;
     console.log(`\n  -- beat ${q.beat}${q.finale ? ' (FINALE)' : ''} of "${strip(ch.title)}"  [reward: ${q.finale ? 'FINALE→focal+bank' : q.immediate ? 'IMMEDIATE (loot now + bank floor)' : 'DEFERRED (banks)'}] [tests: ${attr}] --`);
