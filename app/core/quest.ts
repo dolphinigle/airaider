@@ -31,6 +31,13 @@ const mk = (state: GameState): MkId => (p: string) => uid(state, p);
 function questValue(level: number, rarity: Quest['rarity'], n: number): number {
   return Math.round(BALANCE.vBase(level) * BALANCE.rarityMult[rarity] * n);
 }
+// resolution word budget — scales with STAKES (position × rarity), so a legendary finale reads weighty
+// and a common one-off stays tight (BALANCE.resWords, calibrated by reading _exp_reslength.ts).
+function resolutionWords(quest: Quest): { before: string; after: string; finale: boolean } {
+  const pos: 'oneoff' | 'beat' | 'finale' = quest.finale ? 'finale' : quest.chainId ? 'beat' : 'oneoff';
+  const [b0, b1, a0, a1] = BALANCE.resWords[pos][quest.rarity] ?? BALANCE.resWords[pos].common;
+  return { before: `${b0}-${b1}`, after: `${a0}-${a1}`, finale: !!quest.finale };
+}
 function isRisky(lead: Lead): boolean {
   return lead.rarity === 'rare' || lead.rarity === 'legendary' || lead.archetype === 'raid' || lead.archetype === 'capture';
 }
@@ -434,11 +441,13 @@ export async function resolveQuest(state: GameState, ai: Narrator, quest: Quest)
       : g.rewardKind === 'captive' ? 'subdue them — overpower and take them captive'
       : 'ransom/sell — overpower them, then hand them off for coin';
 
+  const words = resolutionWords(quest);
   const narr = await ai.outcome({
     situation: quest.situation, job: quest.job,
     party: party.map((m) => ({ name: m.name, tags: tagLabels(m.tags).slice(0, 4) })),
     outcome, captiveTags, risky: quest.risky, approach,
     midSaga: !!quest.chainId && !quest.finale,
+    finale: !!quest.finale, beforeWords: words.before, afterWords: words.after,
     // the beat only PROPOSES; the resolution AI decides (scaled to OUTCOME) what's actually learned/gained.
     proposedReveal: quest.chainId ? quest.stakes || undefined : undefined,
     proposedLoot: quest.chainId && !quest.finale ? quest.proposedLoot : undefined,

@@ -49,6 +49,15 @@ export const BALANCE = {
   // even on an AI-flagged IMMEDIATE beat, the engine still BANKS this share toward the finale, so the
   // saga always builds a payoff (the focal stays affordable). The rest is paid out now. (REWARD_BANK.md)
   minDeferShare: 0.4,
+  // resolution word budget [beforeMin, beforeMax, afterMin, afterMax] — scales with STAKES on two axes:
+  // position (one-off < chain beat < FINALE) × rarity. A legendary finale earns ~3-4× a common one-off.
+  // Calibrated by reading real outputs (_exp_reslength.ts): one-off ~50w reads tight; finale common ~110w
+  // weighty; finale legendary ~160-180w sustains; beyond that it bloats.
+  resWords: {
+    oneoff: { common: [22, 34, 42, 62], uncommon: [24, 37, 46, 68], rare: [27, 40, 52, 76], legendary: [30, 44, 58, 84] },
+    beat:   { common: [30, 45, 55, 80], uncommon: [33, 48, 62, 90], rare: [36, 52, 70, 100], legendary: [40, 56, 78, 110] },
+    finale: { common: [45, 62, 90, 122], uncommon: [50, 68, 105, 138], rare: [55, 74, 120, 155], legendary: [62, 82, 140, 180] },
+  } as Record<'oneoff' | 'beat' | 'finale', Record<Rarity, [number, number, number, number]>>,
 };
 
 // ---- tag pricing ------------------------------------------------------------

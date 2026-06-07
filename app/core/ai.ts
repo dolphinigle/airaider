@@ -26,6 +26,9 @@ export interface OutcomeInput {
   risky: boolean;
   approach?: string;                                 // chosen finale branch intent (win-over / subdue / ransom)
   midSaga?: boolean;                                 // a NON-finale chain beat — named cast must survive & stay free
+  finale?: boolean;                                  // the saga's CLIMAX — narrate with the weight of an ending
+  beforeWords?: string;                              // engine-set word budget for beforeRoll (scales w/ stakes); default 35-55
+  afterWords?: string;                               // engine-set word budget for afterRoll (scales w/ stakes); default 55-90
   // the beat only PROPOSES; the resolution AI (which knows the OUTCOME) decides what is actually learned/gained.
   proposedReveal?: string;                           // the truth the beat is SET UP to surface (a suggestion)
   proposedLoot?: string;                             // the side-loot the beat is set up to drop (a suggestion)
