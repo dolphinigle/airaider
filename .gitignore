@@ -33,3 +33,6 @@ coverage/
 prototype/fixtures/*.transcript-real-auto.json
 
 logs/
+
+# transient Claude Code runtime locks
+.claude/scheduled_tasks.lock
