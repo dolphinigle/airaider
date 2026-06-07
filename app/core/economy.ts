@@ -46,6 +46,9 @@ export const BALANCE = {
   // at the finale, if the realized bank covers at least this fraction of the focal's value we still
   // deliver the focal (saddled with a debt for the gap); below it the focal slips away → gold instead.
   focalKeepFraction: 0.4,
+  // even on an AI-flagged IMMEDIATE beat, the engine still BANKS this share toward the finale, so the
+  // saga always builds a payoff (the focal stays affordable). The rest is paid out now. (REWARD_BANK.md)
+  minDeferShare: 0.4,
 };
 
 // ---- tag pricing ------------------------------------------------------------

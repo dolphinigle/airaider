@@ -56,6 +56,7 @@ const zGenesis = z.object({
   openDirections: z.array(z.union([z.object({ kind: z.string().optional(), hook: z.string() }), z.string()])).optional(),
 });
 const zChainBeat = z.object({ situation: z.string(), job: z.string(), ask: zAsk, proposedReward: z.string(), newLayerRevealed: z.string(), closesChain: z.union([z.boolean(), z.string(), z.null()]).optional(),
+  immediateReward: z.union([z.boolean(), z.string(), z.null()]).optional(),
   choices: z.array(z.object({ label: z.string(), attribute: z.string().default('physical'), favored: z.array(z.string()).default([]) })).optional() });
 const zConcept = z.object({ name: z.string(), who: z.string(), tags: z.array(z.string()).default([]) });
 
@@ -272,7 +273,8 @@ export class OpenAINarrator implements Narrator {
       `{ "situation": "<=55 words the PLAYER reads — what the company ENCOUNTERS on this beat (someone/something arriving, OR what they find in the field — per the BEAT INSTRUCTION's opening). POV-LOCKED: only what the company can see/hear or already learned. READABILITY MATTERS: write 2-4 CLEAN, plain sentences a player reads once and understands — NOT telegraphic fragment-stacking ('Grey morning. Mud. A man.') and NOT comma-splice run-ons. Weave the time of day into a real sentence, don't stack it as a fragment. ORIENT THE PLAYER, ONCE: the FIRST time a person appears, weave a 2-4 word who-they-are into the sentence as natural apposition ('his neighbour Lysa', 'a bailiff named Toft') — NOT in parentheses. But a name in the ALREADY-MET list below has been introduced in an earlier beat: use their BARE name with NO tag (re-explaining who they are every beat reads badly). Concrete sensory detail, but clarity first.",\n` +
       `  "job": "one plain line — exactly what taking this job commits the company to DO (escort / recover / guard / confront / investigate a specific thing)",\n` +
       `  "ask": { "attribute": "${ATTRS}", "favoredTags": ["0-3 bare tag words"], "slots": ["one per slot: open OR a tag word"] },\n` +
-      `  "proposedReward": "<=12 words — the minor SIDE-LOOT this beat plausibly drops (a purse, a token, a clue, a salvaged tool); the GAME sets its value. NOT the saga's payoff — that is decided at the finale.",\n` +
+      `  "proposedReward": "<=12 words — the tangible LOOT this beat plausibly drops (a purse, a strongbox's coin, a salvaged tool); the GAME sets its value. NOT the saga's payoff — that is decided at the finale.",\n` +
+      `  "immediateReward": true/false — TRUE only if THIS beat physically hands the company spoils RIGHT NOW (they raid/loot/seize/crack open something with coin or goods inside); FALSE for meet/scout/travel/talk/escort/negotiate beats that only make progress. Most beats are FALSE. (The engine still banks a share toward the finale regardless.)\n` +
       `  "newLayerRevealed": "<=18 words — the ONE CONCRETE fact the player learns on success: a NAME, a face, a specific deed (never 'a hidden actor' / 'a second figure' — name them or show the concrete symptom)",\n` +
       `  "closesChain": true/false — does THIS beat resolve the whole arc? Set true ONLY if the BEAT INSTRUCTION permits closing AND the story has genuinely reached its climax; otherwise false,\n` +
       `  "choices": OPTIONAL 2-3 distinct APPROACHES the player picks between to do THIS beat — include ONLY when the beat genuinely affords different methods (slip past a guard vs fight through vs talk your way in; rescue by stealth vs by force). Each: { "label": "<=6 words, the approach", "attribute": one of [${ATTRS}] it tests, "favored": [0-2 bare tag words that help] }. The approaches must test DIFFERENT attributes. Omit entirely for a single-approach beat. }\n` +
@@ -299,7 +301,7 @@ export class OpenAINarrator implements Narrator {
       attribute: ATTR_OK.includes(String(c.attribute)) ? String(c.attribute) : 'physical',
       favored: canonicalTags(c.favored ?? []),
     })).slice(0, 3);
-    return { ...out, ask, closesChain: out.closesChain === true || out.closesChain === 'true', choices: choices.length >= 2 ? choices : undefined };
+    return { ...out, ask, closesChain: out.closesChain === true || out.closesChain === 'true', immediateReward: out.immediateReward === true || out.immediateReward === 'true', choices: choices.length >= 2 ? choices : undefined };
   }
 
   async conceptTags(i: ConceptTagsInput): Promise<ConceptTagsOut> {

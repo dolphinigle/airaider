@@ -336,7 +336,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
     id: uid(state, 'quest'), leadId: lead.id, rarity: chain.rarity, level: chain.level, location: lead.location,
     archetype: 'investigate', chainId: chain.id, beat: chain.beatsResolved + 1, finale: isFinale,
     title: chain.title, situation: beat.situation, job: beat.job, stakes: beat.newLayerRevealed,
-    proposedLoot: beat.proposedReward,
+    proposedLoot: beat.proposedReward, immediate: !isFinale && !!beat.immediateReward,
     slots, groups, threshold: thresholdFor(n, chain.level),
     reward, risky: isFinale || chain.rarity === 'rare' || chain.rarity === 'legendary',
   };
@@ -421,16 +421,6 @@ export async function resolveQuest(state: GameState, ai: Narrator, quest: Quest)
   const roll = resolveRoll(r, coins, threshold);
   const outcome = roll.outcome;
 
-  // ACCRUE THE BANK (REWARD_BANK.md §2) — each beat earns its merc-cycles, scaled to the outcome.
-  // Done BEFORE delivery so the finale crystallizes a bank that already includes its own earn.
-  if (quest.chainId) {
-    const chain = state.chains[quest.chainId];
-    if (chain) {
-      const scale = outcome === 'success' ? 1 : outcome === 'partial' ? 0.5 : 0;
-      chain.bank = (chain.bank ?? 0) + Math.round(party.length * BALANCE.vBase(chain.level) * BALANCE.rarityMult[chain.rarity] * scale);
-    }
-  }
-
   // tags of the captive/recruit the bundle would deliver (for AI naming), if any & not failure
   const charCard = quest.reward.cards.find((c) => c.class === 'character') as CharacterCard | undefined;
   const captiveTags = charCard && outcome !== 'failure' ? tagLabels(charCard.tags) : undefined;
@@ -504,6 +494,25 @@ function grantXp(state: GameState, m: CharacterCard, level: number, outcome: Out
 function deliverReward(state: GameState, r: Rng, quest: Quest, outcome: Outcome, aiCaptive: { name: string; who: string } | null, punishment: string | null, party: CharacterCard[], delivered: CharacterCard[]): string[] {
   const out: string[] = [];
   const bundle = quest.reward;
+  // CHAIN BANK ACCRUAL (REWARD_BANK.md): each beat earns its merc-cycles, scaled to the outcome. A beat the
+  // AI flagged IMMEDIATE pays a share now and banks the floor; every other beat banks in full; the finale
+  // banks its own earn then crystallizes below. Done before the failure return (on failure earned = 0).
+  let immediateGold = 0;
+  if (quest.chainId) {
+    const ch = state.chains[quest.chainId];
+    if (ch) {
+      const scale = outcome === 'success' ? 1 : outcome === 'partial' ? 0.5 : 0;
+      const earned = Math.round(party.length * BALANCE.vBase(ch.level) * BALANCE.rarityMult[ch.rarity] * scale);
+      if (!quest.finale && quest.immediate) {
+        const banked = Math.round(earned * BALANCE.minDeferShare);
+        immediateGold = earned - banked;
+        ch.bank = (ch.bank ?? 0) + banked;
+        if (immediateGold > 0) state.gold += immediateGold;
+      } else {
+        ch.bank = (ch.bank ?? 0) + earned;
+      }
+    }
+  }
   if (outcome === 'failure') {
     if (quest.risky && punishment) {
       const victim = party[randInt(r, 0, Math.max(0, party.length - 1))];
@@ -517,9 +526,14 @@ function deliverReward(state: GameState, r: Rng, quest: Quest, outcome: Outcome,
 
   if (quest.finale) { handleFinaleFate(state, quest, outcome, out, aiCaptive, delivered); return out; }
 
-  // INTERMEDIATE chain beat (non-failure): no card — the merc-day value was BANKED (resolveQuest),
-  // crystallized into the focal + gold at the finale. Surface the running total so the gamble is visible.
-  if (quest.chainId) { const ch = state.chains[quest.chainId]; out.push(`spoils gathered toward the saga's end (~${ch?.bank ?? 0} banked)`); return out; }
+  // INTERMEDIATE chain beat (non-failure): the merc-day value was BANKED above (and a share paid now if the
+  // AI flagged immediate loot). Surface what happened so the gamble + the running bank are both visible.
+  if (quest.chainId) {
+    const ch = state.chains[quest.chainId];
+    if (immediateGold > 0) out.push(`looted ${immediateGold} gold${quest.proposedLoot ? ` (${quest.proposedLoot})` : ''} — the rest banks toward the saga (~${ch?.bank ?? 0})`);
+    else out.push(`spoils gathered toward the saga's end (~${ch?.bank ?? 0} banked)`);
+    return out;
+  }
 
   const scale = outcome === 'partial' ? 0.5 : 1;
   let positive = 0;

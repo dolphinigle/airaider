@@ -99,6 +99,9 @@ export interface ChainBeatInput {
 export interface ChainBeatOut {
   situation: string; job: string; ask: AskOut; proposedReward: string; newLayerRevealed: string;
   closesChain?: boolean;   // the AI's call: is THIS beat the arc's climax? (only honored when the engine permits)
+  // the AI's call: does THIS beat hand the company tangible loot RIGHT NOW (raid/loot/seize/crack-a-chest),
+  // vs only making progress? The engine sizes it AND still defers a share to the finale bank (REWARD_BANK.md).
+  immediateReward?: boolean;
   // OPTIONAL: 2-3 distinct APPROACHES the player picks between (sneak vs fight vs talk) — a mid-beat choice
   choices?: Array<{ label: string; attribute: string; favored: string[] }>;
 }
@@ -149,6 +152,7 @@ const BYNAMES = ['the Quiet', 'Greyborn', 'Wulfson', 'of Saltreach', 'One-Hand',
 
 export class MockNarrator implements Narrator {
   readonly kind = 'mock' as const;
+  private beatCount = 0;   // toggles immediateReward so both reward paths get exercised offline
   private r(seed: unknown): Rng { return rngFrom(JSON.stringify(seed)); }
 
   async cardAsk(i: CardAskInput): Promise<CardAskOut> {
@@ -213,6 +217,7 @@ export class MockNarrator implements Narrator {
       proposedReward: 'a little coin and a clue',
       newLayerRevealed: 'one more layer of the truth surfaces',
       closesChain: /finale|climax|out of room|close it now/i.test(i.beatConstraint),
+      immediateReward: (++this.beatCount % 2 === 0),   // alternate so both immediate + deferred paths run
     };
   }
   async conceptTags(i: ConceptTagsInput): Promise<ConceptTagsOut> {

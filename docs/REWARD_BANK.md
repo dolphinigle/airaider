@@ -26,9 +26,13 @@ focal character, worth many merc-cycles) **must accrue over the beats and pay at
   `outcomeScale = success 1 · partial 0.5 · failure 0`.
 - Accrual happens in `resolveQuest` **before** delivery, so the finale's own earn is in the bank when
   it crystallizes.
-- **Auto-bank** (no per-beat take-now choice, no immediate side-loot). The failure budget is the only
-  risk lever. Intermediate beats deliver no card — just a "spoils gathered (~X banked)" line; the
-  per-beat payoff is the *story* (`learned`).
+- **AI-proposed immediate vs deferred** (reward *type*, content-driven). `chainBeat` returns
+  `immediateReward` — true only when the beat physically hands over loot now (raid/loot/seize/crack a
+  chest), false for meet/scout/travel/talk/escort. The engine still **always banks a floor** of every
+  beat (`BALANCE.minDeferShare = 0.4`): an immediate beat pays `60%` as gold now and banks `40%`; a
+  deferred beat banks 100%. So the saga always builds a finale payoff (the focal stays affordable), and
+  immediate loot taken en route is **locked in** (only the deferred bank rides on the finale). No
+  premium — deferring's upside is the *character*, not a multiplier.
 - Income-neutral vs one-offs: a chain banks the same per-merc-cycle as N one-offs would pay; it only
   **defers** payment into a lump + a character, and adds **variance** (failed beats earn 0).
 
@@ -106,5 +110,6 @@ finale-fail) and print bank accrual + crystallization to confirm the math. Then 
 
 - Concentrate more value *into* the focal (lift `maxCharValue` for focals / higher-level focal) so the
   character holds more of the bank and surplus-gold shrinks — a balance lever, risky to tune unattended.
-- Per-beat take-now choice (gold now vs bank) — cut for the prototype; auto-bank only.
+- Per-beat *immediate vs deferred* is now in (AI-proposed, engine floors 40% banked). A *player*-facing
+  take-now choice (let the player, not the AI, decide each beat) is still cut — the AI decides the type.
 - Engine name-seed (separate, already documented in STORY_GEN_STATE.md).
