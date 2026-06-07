@@ -219,9 +219,10 @@ export class OpenAINarrator implements Narrator {
       `${twistBlock}\n` +
       `PLAN THE ARC — output "arc": a ROUGH ordered guide of ~${eb} beat-steps (a skeleton, NOT a rigid script). STEP 1 = the OPENER (the company TAKES the job / meets the person) — do NOT finish the goal here. MIDDLE steps = escalating obstacles and turns. LAST step = the FINALE where the goal is finally achieved/resolved. CRITICAL: the company must NOT complete the goal before the last step — a 'recover the locket' job does not recover it in step 1. Each step is a short phrase.\n` +
       `PEOPLE — keep them LEAN: each is ONE vivid line (who they are + the one thing that matters here), a "want", and a "role" in the quest (client / companion / quarry / obstacle / ally / prize). NO backstory ladders — deep history is written later, only for whoever the company actually keeps.\n` +
-      `CHOICES (suggest from the STORY) — two kinds, both OPTIONAL:\n` +
-      `  • "choiceSteps": which middle jobs (if any) naturally let the company pick HOW — sneak vs fight vs talk. Suggest the step numbers from YOUR arc where a branching choice genuinely fits (0-2; never the first job or the finale). [] if none.\n` +
-      `  • "finaleChoices": how the chain can END — 2-3 real choices the player makes about the core person / prize, PHRASED IN THIS STORY'S TERMS and LOGICAL to it (e.g. for a captured deserter: "Take them into the company" / "March them to the magistrate" / "Cage them"). Each maps to one engine outcome: kind = recruit (they join you), captive (you hold them), or gold (hand off / sell / turn in for coin). Offer the ones that make sense here — not all three if only two are believable.\n` +
+      `NAMES — draw your characters' names from the NAME SEEDS below (or riff on their SOUND for fresh ones); do NOT reuse any name in AVOID NAMES, and do NOT default to the same few names every saga.\n` +
+      `CHOICES (suggest from the STORY) — the engine allows AT MOST ${i.maxChoices ?? 1} of this arc's steps to BRANCH:\n` +
+      `  • "choiceSteps": step numbers (1-based, from YOUR arc) where the company faces a real branching choice in HOW to do that job — sneak vs fight vs talk. You MAY include the LAST step (the finale). NEVER the first job. Suggest up to ${i.maxChoices ?? 1}; [] if none genuinely fits (a straight, linear chain is fine).\n` +
+      `  • "finaleChoices": how the chain ENDS — 1 to 3 choices about the core person / prize, PHRASED IN THIS STORY'S TERMS and LOGICAL to it (e.g. for a captured deserter: "Take them into the company" / "March them to the magistrate" / "Cage them"). Give just 1 if the ending is a single fate (no real choice); give 2-3 ONLY if the finale genuinely branches (and then include the last step in choiceSteps). Vary the KIND where it makes sense. Each maps to: recruit (they join you) / captive (you hold them) / gold (hand off / sell / turn in for coin).\n` +
       `BELIEVABILITY: every present fact traces to a prior cause in history; ordinary human motives, not plot necessity; no coincidence-stacking; nobody acts dumb to keep the situation alive.\n` +
       `COMMIT TO THE TRUTH: this bible IS the settled, complete truth. If a killing/theft/betrayal/disappearance happened, state plainly WHO did it and WHY. BANNED in the hidden layer: "unknown", "remains hidden", "it is unclear", "a mysterious figure", "the truth of X is never revealed" — you the author already know, so write it down.\n` +
       `THE CORE PERSON + THEMES make the quest specific. Their tags — craft, magic, profession, temperament — must be CENTRAL to what the quest is about (a water-singer's job turns on water and song; a going-blind carver's on the carving). The THEMES are a spark to FUSE, not a checklist (weave them in; you need not name them). Match the TONE you're given — not every saga is grim. Keep it ONE clear situation, small enough to care about.\n\n` +
@@ -231,8 +232,8 @@ export class OpenAINarrator implements Narrator {
       `  "goal": "one line: the APPARENT thing taking this quest commits the company to ACHIEVE (e.g. 'escort Alen to the abbey alive', 'find and bring back the miller's daughter'). The throughline.",\n` +
       `  "twistReveal": "${i.twist ? 'how the truth SUBVERTS the apparent goal — the player must NOT see this; it surfaces across beats and lands at a middle step' : 'leave EMPTY \\"\\" — this is a straight quest'}",\n` +
       `  "arc": ["~${eb} short step phrases — step 1 = take the job/meet (goal NOT done), last = goal achieved at the finale"],\n` +
-      `  "choiceSteps": [0-2 step numbers from your arc where a real sneak/fight/talk choice fits — never step 1 or the last; [] if none],\n` +
-      `  "finaleChoices": [ { "label": "<=8 words, fits a button — the ending choice in THIS story's terms (no trailing parenthetical)", "kind": "recruit|captive|gold" } — 2-3 logical ways to resolve the chain; vary the KIND where it makes sense (don't make all of them 'gold') ],\n` +
+      `  "choiceSteps": [up to ${i.maxChoices ?? 1} step numbers from your arc that branch — MAY include the last (finale); never step 1; [] if none],\n` +
+      `  "finaleChoices": [ { "label": "<=8 words, fits a button — the ending choice in THIS story's terms (no trailing parenthetical)", "kind": "recruit|captive|gold" } — 1 = single fate, 2-3 = a real finale choice; vary the KIND ],\n` +
       `  "cast": [ { "name": "...", "who": "one vivid line — who they are + the one thing that matters here", "want": "plain want now", "role": "client / companion / quarry / obstacle / ally / prize" } ],\n` +
       `  "situation": "2-4 sentences — the believable truth behind the job, told straight (for a twist quest this is the REAL situation the player will uncover)",\n` +
       `  "tensions": ["what stands in the way and what's at stake: <A> wants <X>; <B> wants <Y>; because <reason> — obstacles ALONG the goal, not a standalone argument"],\n` +
@@ -252,7 +253,9 @@ export class OpenAINarrator implements Narrator {
     const pool = (i.poolCast?.length && (i.poolCastMax ?? 1) > 0)
       ? `\nEXISTING WORLD CHARACTERS (cast AT MOST ${i.poolCastMax ?? 1} as SECONDARY people — never the core person):\n${i.poolCast.map((p) => `  - ${p.name} — ${p.who} [${p.tags.join(', ')}]`).join('\n')}`
       : '';
-    const user = `${core}\nREGION: ${i.region}${place}${tone}${seed}${pool}${avoid}\nBuild the quest bible. JSON only.`;
+    const names = i.nameSeeds?.length ? `\nNAME SEEDS (draw fresh names from these or riff on their sound): ${i.nameSeeds.join(', ')}` : '';
+    const avoidNames = i.avoidNames?.length ? `\nAVOID NAMES (used in recent sagas — do NOT reuse): ${i.avoidNames.join(', ')}` : '';
+    const user = `${core}\nREGION: ${i.region}${place}${tone}${seed}${names}${avoidNames}${pool}${avoid}\nBuild the quest bible. JSON only.`;
     const out = await this.json('genesis', system, user, zGenesis, this.narrativeModel, this.narrativeEffort, 4000);
     // flatten {person,roleInStory} → BiblePerson; coerce conceals
     const cast = (out.cast ?? []).map((c) => {

@@ -63,6 +63,9 @@ export interface GenesisInput {
   poolCast?: Array<{ name: string; who: string; tags: string[] }>; // existing world characters the
                                 // bible MAY cast as SECONDARY people (recurrence = attachment, QUEST_BIBLE.md §4)
   poolCastMax?: number;         // engine-rolled cap on how many recurring faces this saga may reuse (0-2)
+  nameSeeds?: string[];         // engine-provided fresh name seeds to draw/riff from (break name convergence)
+  avoidNames?: string[];        // names used in recent sagas — do NOT reuse (break name convergence)
+  maxChoices?: number;          // engine-rolled cap: at most this many arc steps (incl. finale) may branch
 }
 // A bible person carries a WHY-LADDER (history: cause → cause → bedrock). docs/QUEST_BIBLE.md
 export interface BiblePerson {
@@ -206,7 +209,7 @@ export class MockNarrator implements Narrator {
       leadBlurb: `A petitioner from ${i.region} brings a debt unpaid and a name they won't say.`,
       goal: `settle the matter the petitioner from ${i.region} brings to the company`,
       arc: ['the petitioner brings the job to the gate', 'follow the trail and meet who it touches', 'the truth turns and the stakes rise', 'the reckoning that settles it'],
-      choiceSteps: [2],
+      choiceSteps: [2, 4],   // step 2 = a mid choice; step 4 = the finale branches (engine budget permitting)
       finaleChoices: [{ label: 'Take them into the company', kind: 'recruit' }, { label: 'Cage them', kind: 'captive' }, { label: 'Hand them over for coin', kind: 'gold' }],
       cast: [
         { name: focalName, who: i.who ?? `known for ${seed}`, history: [`shaped by ${seed}`, 'made a choice they cannot undo', 'now hides what it cost'], wants: 'to keep the past buried', feels: 'shame', conceals: 'the thing they did' },

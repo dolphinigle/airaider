@@ -36,6 +36,8 @@ export const BALANCE = {
     Math.min(16, Math.max(5, 2 + Math.ceil(targetValue / (ceiling * 0.45)))),
   maxSkills: 3,   // global cap for value-packing; FOCALS get a tighter cap (see GenSpec.maxSkills)
   maxMagic: 1,    // …and at most one school of magic
+  maxTopTier: 2,  // at most this many TIER-1/2 ("very X") tags per character — no Mary-Sue stat-stacks
+  maxPhys: 2,     // …and at most this many physical descriptors (avoids "tough + frail + beautiful + …")
   // the most value a single believable character can hold in tags (empirically matched to what
   // the grounded caps actually allow); value beyond this flows to the bundle as gold/treasure
   maxCharValue: (level: number) => 45 + level * 11,
@@ -169,9 +171,12 @@ export function generateCharacter(r: Rng, spec: GenSpec): GeneratedCharacter {
     const aim = Math.min(remaining / slotsLeft, ceiling);
     const skillCount = tags.filter((t) => tagDef(t.id)?.group === 'skill').length;
     const magicCount = tags.filter((t) => t.id.startsWith('skill:magic')).length;
+    const physCount = tags.filter((t) => tagDef(t.id)?.group === 'physical').length;
+    const topTierCount = tags.filter((t) => t.tier <= 2).length;
     const candidates = pool.filter((d) => (!d.mutex || !usedMutex.has(d.mutex))
       && !tags.some((t) => t.id === d.id) && cheapest(d) <= remaining
       && !(d.group === 'skill' && skillCount >= maxSk)   // grounded: cap skills
+      && !(d.group === 'physical' && physCount >= BALANCE.maxPhys)   // …cap physical descriptors
       && !(d.id.startsWith('skill:magic') && magicCount >= BALANCE.maxMagic));
     if (!candidates.length) break;
     // restrict to tags that can actually reach near the aim (avoids cheap-tag dilution),
@@ -182,7 +187,9 @@ export function generateCharacter(r: Rng, spec: GenSpec): GeneratedCharacter {
       const v = bestValueNear(d, aim, ceiling, remaining);
       return 1 / (1 + Math.abs(v - aim));
     });
-    const tier = def.tiered ? tierNear(def, aim, ceiling, remaining) : 3;
+    let tier = def.tiered ? tierNear(def, aim, ceiling, remaining) : 3;
+    // cap "very X" stacking: once a character has enough TIER-1/2 tags, force the rest to tier 3+
+    if (def.tiered && tier <= 2 && topTierCount >= BALANCE.maxTopTier) tier = 3;
     if (!place(def, tier)) continue;
   }
 

@@ -168,7 +168,8 @@ export interface Chain {
   arcProgress?: number;      // DEPRECATED (success-gating removed); kept for scratch-harness typecheck
   lastFailed?: boolean;      // the previous beat failed → the next beat opens from the fallout (consequence)
   // ---- reward bank (REWARD_BANK.md) ----
-  choiceSteps?: number[];    // bible-proposed arc steps (1-based) that afford a sneak/fight/talk choice
+  choiceSteps?: number[];    // bible-proposed arc steps (1-based, may incl. the finale) that branch
+  choiceBudget?: number;     // engine-rolled cap: at most this many of choiceSteps are honored
   finaleChoices?: Array<{ label: string; kind: 'recruit' | 'captive' | 'gold' }>; // bible-proposed endings
   bank?: number;             // accrued merc-day value across beats; crystallized into the focal+gold at the finale
   failBudget?: number;       // allowed MIDDLE-beat failures (rarity-scaled; harder = fewer)

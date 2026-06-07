@@ -179,6 +179,21 @@ export function pickThemes(r: () => number): string {
   return [tpick(THEME_BOND, r), tpick(THEME_TIE, r), tpick(THEME_FLAV, r)].join(', ');
 }
 
+// NAME SEEDS — a broad, sound-varied given-name pool the engine hands to genesis so the AI doesn't
+// converge on the same handful of names (Marek / Sigrun / Wren…). The AI may use these or riff on their
+// SOUND; the point is decorrelation, not a fixed cast. (Engine-seed-beats-AI-vary, PROMPT_RULES §2.)
+const NAME_SEEDS = [
+  'Talin', 'Yorsa', 'Bevan', 'Nilse', 'Orrin', 'Haldra', 'Cael', 'Vesna', 'Doran', 'Ysolde',
+  'Garrick', 'Maelis', 'Toller', 'Brannoch', 'Senna', 'Ourik', 'Lisbet', 'Hagen', 'Perrin', 'Aldith',
+  'Riska', 'Movar', 'Edrun', 'Sable', 'Korrin', 'Yelena', 'Drust', 'Mably', 'Fenwick', 'Corra',
+  'Ulric', 'Nesta', 'Bram', 'Oswin', 'Tamsin', 'Voss', 'Hethra', 'Calder', 'Wynn', 'Jessa',
+  'Roban', 'Imke', 'Sorrel', 'Davos', 'Kestrel', 'Anika', 'Merrow', 'Tibalt', 'Greer', 'Lune',
+];
+/** A few fresh name seeds for the genesis to draw from / riff on. */
+export function pickNameSeeds(r: () => number, n = 5): string[] {
+  return [...NAME_SEEDS].map((name) => ({ name, k: r() })).sort((a, b) => a.k - b.k).slice(0, n).map((x) => x.name);
+}
+
 // STORY TONE — the engine sets the register so NOT every saga is grim/scary. Weighted toward the lighter
 // end (most jobs are ordinary); the heavy registers are rarer and land harder for being so.
 const TONES: Array<{ tone: string; w: number }> = [
