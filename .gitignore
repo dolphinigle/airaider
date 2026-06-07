@@ -32,3 +32,4 @@ coverage/
 # Pattern below ignores by default; the curated samples are committed explicitly.
 prototype/fixtures/*.transcript-real-auto.json
 
+logs/

@@ -69,7 +69,7 @@ const BibleSchema = z.object({
     coined: z.boolean().optional(),
   })).min(2).max(6),
   situation: z.string().min(30),
-  tensions: z.array(z.union([z.string().min(15), z.record(z.any())])).min(1),
+  tensions: z.array(z.string().min(20)).min(1),
   openDirections: z.array(z.union([DirectionSchema, z.string().min(10)])).min(2).max(6),
 });
 export type Bible = z.infer<typeof BibleSchema>;
@@ -178,7 +178,7 @@ OUTPUT (clinical truth fields; only leadBlurb may carry light flavor):
 - cast: each { person { name, who, history[] (the why-ladder), wants, feels, conceals? }, roleInStory, coined? }.
   REUSE EXISTING PEOPLE FIRST. The slate you are given is the living population of this world. Draw the whole cast — core AND secondary — from the slate wherever a person could plausibly fill the role. When you use a slate person, the history you write is NEW canon being revealed about them; keep it consistent with what is already known of them (their known-for line and tags). Coin a brand-new person ONLY when a needed role has no plausible fit on the slate; set coined:true on those, and keep them few.
 - situation: 2-4 sentences — the believable present truth, told straight (this is the hidden ground truth, not the player blurb).
-- tensions: who clashes with whom, over what, and the plain reason. One bullet each.
+- tensions: 2-5 plain STRINGS (never objects). Each names two people and the concrete thing they clash over, in the form: "<Name A> wants <concrete X>; <Name B> wants <concrete Y>; because <the plain reason they can't both have it>". Name real people from the cast; no abstract theme-labels ("freedom vs survival").
 - openDirections: 2-4 ways this could go, each { kind, hook }. Frame every hook toward the player's MERCENARY COMPANY / FORT — these are the seeds quests are written from. Provide AT LEAST ONE of each kind:
   - kind:"ambient" — something that unfolds with or without the company; it can resolve in the background and shift the situation even if the company never acts (a character drifting into the fort's orbit, a death, a deal closing). Low player agency; living-world pressure.
   - kind:"active" — a contract, plea, or opportunity the company is directly invited into and could take up (someone asks the company for help; a job the company can accept). This is a selectable quest seed.
@@ -198,6 +198,8 @@ HARD RULES:
 - STATE THE JOB PLAINLY — the card must make the contract unambiguous: WHO is hiring, WHAT they want achieved, and the CONCRETE ACTION the company is asked to perform (escort / recover / guard / stand witness / intimidate / investigate / hunt...). The player must finish reading and know exactly what taking this job commits the company to do. End the card on the explicit ask.
 - Reveal SLOWLY. One quest surfaces at most ONE new layer of the truth. Do not dump the conspiracy. Most of the bible stays buried for now.
 - CONTINUITY: the quest must follow believably from the CHAIN STATE — react to what the company just did and to what is now in motion. Do not reset. After the first quest, drive the next one from open threads and the actors' reactions, not from a fresh unrelated job.
+- ATTACHMENT FIRST (Beat 1 especially): a reader has no stake in a stranger. Beat 1's real job is to make the player CARE about a person before plot pressure lands — open on a low-stakes, human moment that lets one cast member's want or feeling SHOW through small action (a shared meal / watch shift / repair / errand; a petitioner's specific grief), NOT a cold logistics task. Earn one or two NAMED cast people on-stage by meeting them. Real plot pressure escalates from Beat 2+. EVEN IF the driving hook is an investigation or a procedural job, Beat 1 must anchor on a CORE cast member encountered as a person — the victim, the accused, or the one with the most to lose — felt through a concrete human moment, NOT a faceless client/clerk handing over a writ. If a procedural client hires you, still bring a core character on-stage in the same beat.
+- VARY THE BEAT + USE THE EMOTIONAL CAST: each beat must do something DIFFERENT to the story — meet/warm-to → investigate → confront → protect → a turn or betrayal → reveal. NEVER repeat the same action twice (no "fetch another witness", then again). Put the bible's emotional cast — the people whose wants actually clash — ON-STAGE; do not run the whole chain through a single procedural contact while the real characters stay off-screen. The chain is about THEM.
 - The company's only agency is: take the job + assign units. Do NOT write mid-quest branching choices.
 - assignmentAsk: name the qualities the job calls for as QUALITATIVE tags only (stats, traits) plus a fiction reason. NEVER numbers, gold, or rewards — the engine owns all numbers.
 - PACING / ENDING IS ALLOWED, NEVER FORCED EARLY: while you are not yet permitted to end, keep the arc open (closesChain:false) and leave at least one thread driving forward. Once ending is PERMITTED, you may close — but ONLY if the arc has genuinely reached its climax: then write THIS quest as the climactic finale that pays off the buried truth, and set closesChain:true. If it has not peaked yet, keep driving and leave closesChain:false. At the hard limit you are out of room: write this quest as the climactic finale and set closesChain:true. NEVER slam an ending onto a quest that was not built as a climax — a finale must read as the arc's peak, not a sudden stop.
@@ -386,7 +388,7 @@ export async function buildBible(
     ``,
     `Find the collision. Output JSON only.`,
   ].filter(Boolean).join('\n');
-  const genesis = await callJson(client, { system: GENESIS_SYSTEM, user: genesisUser, schema: GenesisSchema, model, effort });
+  const genesis = await callJson(client, { system: GENESIS_SYSTEM, user: genesisUser, schema: GenesisSchema, model, effort, label: 'genesis' });
 
   const coreChars = genesis.coreCharacterIds.map((id) => slate.find((c) => c.id === id)).filter(Boolean) as SlateCharacter[];
   const coreIds = new Set(coreChars.map((c) => c.id));
@@ -406,7 +408,7 @@ export async function buildBible(
     ``,
     `Build the believable hidden truth. Output JSON only.`,
   ].filter(Boolean).join('\n');
-  const bible = await callJson(client, { system: BUILD_SYSTEM, user: buildUser, schema: BibleSchema, model, effort });
+  const bible = await callJson(client, { system: BUILD_SYSTEM, user: buildUser, schema: BibleSchema, model, effort, label: 'bible' });
 
   return { genesis, bible };
 }
@@ -422,7 +424,7 @@ export async function writeQuest(
     ``, pacingBlock(opts.step, opts.pacing),
     ``, `Write quest #${opts.step}. Output JSON only.`,
   ].join('\n');
-  return callJson(client, { system: QUEST_WRITER_SYSTEM, user: questUser, schema: QuestSchema, model: opts.model ?? QUEST_MODEL, effort: opts.effort ?? QUEST_EFFORT });
+  return callJson(client, { system: QUEST_WRITER_SYSTEM, user: questUser, schema: QuestSchema, model: opts.model ?? QUEST_MODEL, effort: opts.effort ?? QUEST_EFFORT, label: 'quest' });
 }
 
 export async function resolveQuest(
@@ -446,7 +448,7 @@ export async function resolveQuest(
     ``, outcomeBlock,
     ``, `Resolve it. Output JSON only.`,
   ].join('\n');
-  return callJson(client, { system: RESOLVER_SYSTEM, user: resolveUser, schema: ResolutionSchema, model: opts.model ?? QUEST_MODEL, effort: opts.effort ?? QUEST_EFFORT });
+  return callJson(client, { system: RESOLVER_SYSTEM, user: resolveUser, schema: ResolutionSchema, model: opts.model ?? QUEST_MODEL, effort: opts.effort ?? QUEST_EFFORT, label: 'resolve' });
 }
 
 /** Qualitative party-fit judgement (AI owns the match; engine owns thresholds). */
@@ -466,7 +468,7 @@ export async function assessFit(
     ``, `## ASSIGNED PARTY`, partyBlock,
     ``, `Rate the party's fit. Output JSON only.`,
   ].filter(Boolean).join('\n');
-  const raw = await callJson(client, { system: FIT_JUDGE_SYSTEM, user, schema: FitSchema, model: opts.model ?? FIT_MODEL, effort: opts.effort ?? FIT_EFFORT });
+  const raw = await callJson(client, { system: FIT_JUDGE_SYSTEM, user, schema: FitSchema, model: opts.model ?? FIT_MODEL, effort: opts.effort ?? FIT_EFFORT, label: 'fit' });
   const n = typeof raw.partyFit === 'number' ? raw.partyFit : parseInt(String(raw.partyFit), 10);
   const partyFit = Number.isFinite(n) ? Math.max(0, Math.min(6, Math.round(n))) : 0;
   return { partyFit, note: raw.note ?? '' };
