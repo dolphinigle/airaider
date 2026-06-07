@@ -32,7 +32,7 @@ for (let c = 0; c < 30 && done < TARGET_DONE; c++) {
       console.log(`   FOCAL TAGS: ${focal.tags.map((t:any)=>`${tagLabel(t.id,t.tier)}(T${t.tier})`).join(', ')}`);
       console.log(`   CAST NAMES: ${(ch.bible.match(/^- ([^(]+?)\s*\(/gm)||[]).map((m:string)=>m.replace(/^- /,'').replace(/\s*\($/,'')).join(' · ')}`);
       (ch.arc||[]).forEach((s, i) => console.log(`   arc ${i + 1}: ${strip(s)}`));
-      console.log(`   choiceBudget(engine): ${ch.choiceBudget}   BIBLE choiceSteps: [${(ch.choiceSteps||[]).join(', ')}]   finaleChoices: ${(ch.finaleChoices||[]).map((c:any)=>`${strip(c.label)}[${c.kind}]`).join(' · ') || '—'}`);
+      console.log(`   choiceBudget(engine): ${ch.choiceBudget}   BIBLE choiceSteps: [${(ch.choiceSteps||[]).join(', ')}]  (finale endings now written at finale time)`);
     }
     const attr = q.groups ? q.groups.map((g:any)=>g.tested?.attribute||q.slots[g.slotIndices[0]]?.tested?.attribute).join('/') : q.slots[0]?.tested?.attribute;
     console.log(`\n  -- beat ${q.beat}${q.finale ? ' (FINALE)' : ''} of "${strip(ch.title)}"  [reward: ${q.finale ? 'FINALE→focal+bank' : q.immediate ? 'IMMEDIATE (loot now + bank floor)' : 'DEFERRED (banks)'}] [tests: ${attr}] --`);
@@ -40,6 +40,7 @@ for (let c = 0; c < 30 && done < TARGET_DONE; c++) {
     console.log(`     JOB: ${strip(q.job)}`);
     console.log(`     proposedLoot: ${strip(q.proposedLoot || '—')}`);
     if (q.groups) console.log(`     approaches: ${q.groups.map((g: any) => `${strip(g.label)}[${g.rewardKind}·${q.slots[g.slotIndices[0]]?.tested?.attribute}]`).join(' · ')}`);
+    if (q.finale) console.log(`     FINALE endings (chainBeat@finale): ${(q.groups||[]).map((g:any)=>`${strip(g.label)}[${g.rewardKind}]`).join(' · ') || '—'}`);
   }
   // assign best-available and succeed everything (low threshold) so the arc completes
   for (const q of eng.activeQuests()) {

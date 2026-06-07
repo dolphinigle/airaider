@@ -77,8 +77,7 @@ export interface GenesisOut {
   goal: string;                 // the APPARENT throughline the company commits to (may be a misdirection)
   arc: string[];                // a ROUGH ordered guide: step 1 = take the job … last = goal achieved
   twistReveal?: string;         // if a twist quest: how the truth subverts the apparent goal
-  choiceSteps?: number[];       // bible-proposed arc steps (1-based) that afford a sneak/fight/talk choice
-  finaleChoices?: Array<{ label: string; kind: 'recruit' | 'captive' | 'gold' }>; // story-logical endings
+  choiceSteps?: number[];       // bible-proposed arc steps (1-based, may incl. the finale) that branch
   cast: BiblePerson[];          // the lean cast (role + want + one line); cast[0] is the focal
   situation: string;            // the ground truth, told straight
   tensions: string[];           // "<A> wants X; <B> wants Y; because <reason>"
@@ -103,6 +102,7 @@ export function renderBible(b: GenesisOut): string {
 
 export interface ChainBeatInput {
   bible: string; chainState: string; region: string; slotCount: number; beatConstraint: string;
+  choiceKind?: 'method' | 'ending';   // engine wants choices: 'method' = mid sneak/fight/talk; 'ending' = finale fates
   introduced?: string[];   // names the player has already met — orient ONLY names NOT in this list
 }
 export interface ChainBeatOut {
@@ -111,8 +111,9 @@ export interface ChainBeatOut {
   // the AI's call: does THIS beat hand the company tangible loot RIGHT NOW (raid/loot/seize/crack-a-chest),
   // vs only making progress? The engine sizes it AND still defers a share to the finale bank (REWARD_BANK.md).
   immediateReward?: boolean;
-  // OPTIONAL: 2-3 distinct APPROACHES the player picks between (sneak vs fight vs talk) — a mid-beat choice
-  choices?: Array<{ label: string; attribute: string; favored: string[] }>;
+  // OPTIONAL choices the player picks between. Mid-job: distinct APPROACHES (sneak/fight/talk).
+  // FINALE: story-logical ENDINGS, each carrying a `kind` (recruit/captive/gold) the engine pays out.
+  choices?: Array<{ label: string; attribute: string; favored: string[]; kind?: 'recruit' | 'captive' | 'gold' }>;
 }
 
 export interface ConceptTagsInput { concept: string }
@@ -210,7 +211,6 @@ export class MockNarrator implements Narrator {
       goal: `settle the matter the petitioner from ${i.region} brings to the company`,
       arc: ['the petitioner brings the job to the gate', 'follow the trail and meet who it touches', 'the truth turns and the stakes rise', 'the reckoning that settles it'],
       choiceSteps: [2, 4],   // step 2 = a mid choice; step 4 = the finale branches (engine budget permitting)
-      finaleChoices: [{ label: 'Take them into the company', kind: 'recruit' }, { label: 'Cage them', kind: 'captive' }, { label: 'Hand them over for coin', kind: 'gold' }],
       cast: [
         { name: focalName, who: i.who ?? `known for ${seed}`, history: [`shaped by ${seed}`, 'made a choice they cannot undo', 'now hides what it cost'], wants: 'to keep the past buried', feels: 'shame', conceals: 'the thing they did' },
         { name: `${pick(r, NAMES)} of ${i.region}`, who: 'a witness', history: ['saw what happened'], wants: 'justice or silence-money', feels: 'fear', role: 'the one who remembers' },
@@ -229,6 +229,11 @@ export class MockNarrator implements Narrator {
       newLayerRevealed: 'one more layer of the truth surfaces',
       closesChain: /finale|climax|out of room|close it now/i.test(i.beatConstraint),
       immediateReward: (++this.beatCount % 2 === 0),   // alternate so both immediate + deferred paths run
+      choices: i.choiceKind === 'ending'
+        ? [{ label: 'Take them into the company', attribute: 'charisma', favored: [], kind: 'recruit' as const }, { label: 'Cage them', attribute: 'physical', favored: [], kind: 'captive' as const }, { label: 'Hand them off for coin', attribute: 'perception', favored: [], kind: 'gold' as const }]
+        : i.choiceKind === 'method'
+          ? [{ label: 'Slip past', attribute: 'agility', favored: [] }, { label: 'Force it', attribute: 'physical', favored: [] }, { label: 'Talk it out', attribute: 'charisma', favored: [] }]
+          : undefined,
     };
   }
   async conceptTags(i: ConceptTagsInput): Promise<ConceptTagsOut> {

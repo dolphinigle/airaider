@@ -49,7 +49,6 @@ const zGenesis = z.object({
   twistReveal: z.string().optional(),
   arc: z.array(z.string()).default([]),
   choiceSteps: z.array(z.union([z.number(), z.string()])).default([]),
-  finaleChoices: z.array(z.object({ label: z.string(), kind: z.string().default('gold') })).default([]),
   // accept either flat persons or {person, roleInStory} nesting
   cast: z.array(z.union([zPerson, z.object({ person: zPerson, roleInStory: z.string().optional() })])).default([]),
   situation: z.string(),
@@ -59,7 +58,7 @@ const zGenesis = z.object({
 });
 const zChainBeat = z.object({ situation: z.string(), job: z.string(), ask: zAsk, proposedReward: z.string(), newLayerRevealed: z.string(), closesChain: z.union([z.boolean(), z.string(), z.null()]).optional(),
   immediateReward: z.union([z.boolean(), z.string(), z.null()]).optional(),
-  choices: z.array(z.object({ label: z.string(), attribute: z.string().default('physical'), favored: z.array(z.string()).default([]) })).optional() });
+  choices: z.array(z.object({ label: z.string(), attribute: z.string().default('physical'), favored: z.array(z.string()).default([]), kind: z.string().optional() })).optional() });
 const zConcept = z.object({ name: z.string(), who: z.string(), tags: z.array(z.string()).default([]) });
 
 function normAttr(a: string): Attribute {
@@ -220,9 +219,7 @@ export class OpenAINarrator implements Narrator {
       `PLAN THE ARC — output "arc": a ROUGH ordered guide of about ${eb} steps (a skeleton, NOT a rigid script; ~${eb} because this chain's length/stakes warrant it — fewer for a smaller chain). EACH STEP BECOMES ONE FULL JOB the player takes off the job board, so each must be a concrete, self-contained task (not a vague phase). STEP 1 = the OPENER (the company TAKES the first job / meets the person) — do NOT resolve the chain here. MIDDLE steps = escalating obstacles and turns. LAST step = the FINALE that brings it to a head (the resolution, confrontation, or the big discovery — a fixed prize need not exist for open-ended drives). CRITICAL: do NOT resolve the chain before the last step — a 'recover the locket' chain does not recover it in step 1. Each step is a short phrase.\n` +
       `PEOPLE — keep them LEAN: each is ONE vivid line (who they are + the one thing that matters here), a "want", and a "role" in the quest (client / companion / quarry / obstacle / ally / prize). NO backstory ladders — deep history is written later, only for whoever the company actually keeps.\n` +
       `NAMES — draw your characters' names from the NAME SEEDS below (or riff on their SOUND for fresh ones); do NOT reuse any name in AVOID NAMES.\n` +
-      `CHOICES (suggest from the STORY) — the engine allows AT MOST ${i.maxChoices ?? 1} of this arc's steps to BRANCH:\n` +
-      `  • "choiceSteps": step numbers (1-based, from YOUR arc) where the company faces a real branching choice in HOW to do that job — sneak vs fight vs talk. You MAY include the LAST step (the finale). NEVER the first job. Suggest up to ${i.maxChoices ?? 1}; [] if none genuinely fits (a straight, linear chain is fine).\n` +
-      `  • "finaleChoices": how the chain ENDS — 1 to 3 choices about the core person / prize, PHRASED IN THIS STORY'S TERMS and LOGICAL to it (e.g. for a captured deserter: "Take them into the company" / "March them to the magistrate" / "Cage them"). Give just 1 if the ending is a single fate (no real choice); give 2-3 ONLY if the finale genuinely branches (and then include the last step in choiceSteps). Vary the KIND where it makes sense. Each maps to: recruit (they join you) / captive (you hold them) / gold (hand off / sell / turn in for coin).\n` +
+      `CHOICES — "choiceSteps": which arc steps give the company a real branching choice. The engine allows AT MOST ${i.maxChoices ?? 1} to branch. Suggest step numbers (1-based, from YOUR arc); you MAY include the LAST step (the finale) if its ending should branch; NEVER the first job; [] if none genuinely fits (a straight, linear chain is fine). (The actual choice options — mid-job approaches, or the finale's endings — are written later by the quest-writer with full context, not here.)\n` +
       `BELIEVABILITY: every present fact traces to a prior cause in history; ordinary human motives, not plot necessity; no coincidence-stacking; nobody acts dumb to keep the situation alive.\n` +
       `COMMIT TO THE TRUTH: this bible IS the settled, complete truth. If a killing/theft/betrayal/disappearance happened, state plainly WHO did it and WHY. BANNED in the hidden layer: "unknown", "remains hidden", "it is unclear", "a mysterious figure", "the truth of X is never revealed" — you the author already know, so write it down.\n` +
       `THE CORE PERSON + THEMES make the quest specific. Their tags — craft, magic, profession, temperament — must be CENTRAL to what the quest is about (a water-singer's job turns on water and song; a going-blind carver's on the carving). The THEMES are a spark to FUSE, not a checklist (weave them in; you need not name them). Match the TONE you're given — not every saga is grim. Keep it ONE clear situation, small enough to care about.\n\n` +
@@ -233,7 +230,6 @@ export class OpenAINarrator implements Narrator {
       `  "twistReveal": "${i.twist ? 'how the truth SUBVERTS the apparent goal — the player must NOT see this; it surfaces across beats and lands at a middle step' : 'leave EMPTY \\"\\" — this is a straight quest'}",\n` +
       `  "arc": ["~${eb} short step phrases — step 1 = take the job/meet (goal NOT done), last = goal achieved at the finale"],\n` +
       `  "choiceSteps": [up to ${i.maxChoices ?? 1} step numbers from your arc that branch — MAY include the last (finale); never step 1; [] if none],\n` +
-      `  "finaleChoices": [ { "label": "<=8 words, fits a button — the ending choice in THIS story's terms (no trailing parenthetical)", "kind": "recruit|captive|gold" } — 1 = single fate, 2-3 = a real finale choice; vary the KIND ],\n` +
       `  "cast": [ { "name": "...", "who": "one vivid line — who they are + the one thing that matters here", "want": "plain want now", "role": "client / companion / quarry / obstacle / ally / prize" } ],\n` +
       `  "situation": "2-4 sentences — the believable truth behind the job, told straight (for a twist quest this is the REAL situation the player will uncover)",\n` +
       `  "tensions": ["what stands in the way and what's at stake: <A> wants <X>; <B> wants <Y>; because <reason> — obstacles ALONG the goal, not a standalone argument"],\n` +
@@ -274,11 +270,7 @@ export class OpenAINarrator implements Narrator {
       : { kind: (d.kind === 'ambient' ? 'ambient' : 'active') as 'ambient' | 'active', hook: d.hook });
     const twistReveal = i.twist && out.twistReveal && out.twistReveal.toLowerCase() !== 'none' ? out.twistReveal : undefined;
     const choiceSteps = (out.choiceSteps ?? []).map((n) => Math.round(Number(n))).filter((n) => Number.isFinite(n) && n >= 1);
-    const KIND_OK = ['recruit', 'captive', 'gold'];
-    const finaleChoices = (out.finaleChoices ?? [])
-      .map((c) => ({ label: String(c.label ?? '').slice(0, 64), kind: KIND_OK.includes(String(c.kind)) ? String(c.kind) as 'recruit' | 'captive' | 'gold' : 'gold' }))
-      .filter((c) => c.label).slice(0, 3);
-    return { title: out.title, leadBlurb: out.leadBlurb, goal: out.goal ?? '', arc: out.arc ?? [], twistReveal, choiceSteps, finaleChoices, cast, situation: out.situation, tensions: out.tensions ?? [], directions };
+    return { title: out.title, leadBlurb: out.leadBlurb, goal: out.goal ?? '', arc: out.arc ?? [], twistReveal, choiceSteps, cast, situation: out.situation, tensions: out.tensions ?? [], directions };
   }
 
   async chainBeat(i: ChainBeatInput): Promise<ChainBeatOut> {
@@ -293,7 +285,7 @@ export class OpenAINarrator implements Narrator {
       `  "immediateReward": true/false — TRUE only if THIS job physically hands the company spoils RIGHT NOW (they raid/loot/seize/crack open something with coin or goods inside); FALSE for meet/scout/travel/talk/escort/negotiate jobs that only make progress. Most jobs are FALSE. (The engine still banks a share toward the payoff regardless.)\n` +
       `  "newLayerRevealed": "<=18 words — the ONE CONCRETE fact the player learns on success: a NAME, a face, a specific deed (never 'a hidden actor' / 'a second figure' — name them or show the concrete symptom)",\n` +
       `  "closesChain": true/false — does THIS job END the whole story? Set true ONLY if the JOB INSTRUCTION permits ending AND the story has genuinely reached its climax; otherwise false,\n` +
-      `  "choices": OPTIONAL 2-3 distinct APPROACHES the player picks between to do THIS job — include ONLY when the JOB INSTRUCTION says this job affords a choice (slip past a guard vs fight through vs talk your way in). Each: { "label": "<=6 words, the approach", "attribute": one of [${ATTRS}] it tests, "favored": [0-2 bare tag words that help] }. The approaches must test DIFFERENT attributes. Omit entirely otherwise. }\n` +
+      `  "choices": OPTIONAL — include ONLY when the JOB INSTRUCTION asks for them. Two cases: (a) a MID-job choice = 2-3 distinct APPROACHES (slip past vs fight through vs talk your way in), each { "label": "<=6 words", "attribute": one of [${ATTRS}] it tests, "favored": [0-2 bare tag words] }, testing DIFFERENT attributes; (b) a FINALE ending choice = 2-3 story-logical ways to RESOLVE the core person/prize given how this finale actually unfolded, each ALSO with a "kind": recruit (they join you) / captive (you hold them) / gold (hand off / sell / turn in for coin). Omit entirely otherwise. }\n` +
       `${VOCAB_BLOCK}\n` +
       `FOLLOW THE JOB INSTRUCTION below — it tells you this job's place in the story and whether you may end it.\n` +
       `CRAFT (this is character drama, not a logistics audit):\n` +
@@ -311,10 +303,12 @@ export class OpenAINarrator implements Narrator {
     while (ask.slots.length < i.slotCount) ask.slots.push({ kind: 'open' });
     ask.slots.length = i.slotCount;
     const ATTR_OK = ['physical', 'agility', 'intelligence', 'charisma', 'perception'];
+    const KIND_OK = ['recruit', 'captive', 'gold'];
     const choices = (out.choices ?? []).filter((c) => c.label).map((c) => ({
-      label: String(c.label ?? '').slice(0, 40),
+      label: String(c.label ?? '').slice(0, 64),
       attribute: ATTR_OK.includes(String(c.attribute)) ? String(c.attribute) : 'physical',
       favored: canonicalTags(c.favored ?? []),
+      ...(c.kind && KIND_OK.includes(String(c.kind)) ? { kind: String(c.kind) as 'recruit' | 'captive' | 'gold' } : {}),
     })).slice(0, 3);
     return { ...out, ask, closesChain: out.closesChain === true || out.closesChain === 'true', immediateReward: out.immediateReward === true || out.immediateReward === 'true', choices: choices.length >= 2 ? choices : undefined };
   }
