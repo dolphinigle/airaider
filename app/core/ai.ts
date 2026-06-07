@@ -62,6 +62,7 @@ export interface GenesisInput {
   expectedBeats?: number;       // engine's rough beat budget → sizes the planned arc
   poolCast?: Array<{ name: string; who: string; tags: string[] }>; // existing world characters the
                                 // bible MAY cast as SECONDARY people (recurrence = attachment, QUEST_BIBLE.md §4)
+  poolCastMax?: number;         // engine-rolled cap on how many recurring faces this saga may reuse (0-2)
 }
 // A bible person carries a WHY-LADDER (history: cause → cause → bedrock). docs/QUEST_BIBLE.md
 export interface BiblePerson {
@@ -73,6 +74,8 @@ export interface GenesisOut {
   goal: string;                 // the APPARENT throughline the company commits to (may be a misdirection)
   arc: string[];                // a ROUGH ordered guide: step 1 = take the job … last = goal achieved
   twistReveal?: string;         // if a twist quest: how the truth subverts the apparent goal
+  choiceSteps?: number[];       // bible-proposed arc steps (1-based) that afford a sneak/fight/talk choice
+  finaleChoices?: Array<{ label: string; kind: 'recruit' | 'captive' | 'gold' }>; // story-logical endings
   cast: BiblePerson[];          // the lean cast (role + want + one line); cast[0] is the focal
   situation: string;            // the ground truth, told straight
   tensions: string[];           // "<A> wants X; <B> wants Y; because <reason>"
@@ -139,7 +142,7 @@ export interface Narrator {
 
 // ---- attribute & favored-tag heuristics shared by the mock ------------------
 const ARCH_ATTR: Record<string, Attribute> = {
-  capture: 'agility', raid: 'physical', rescue: 'charisma', escort: 'willpower',
+  capture: 'agility', raid: 'physical', rescue: 'charisma', escort: 'perception',
   investigate: 'intelligence', hunt: 'agility', contract: 'physical', scout: 'intelligence',
 };
 const ARCH_FAVORED: Record<string, string[]> = {
@@ -203,6 +206,8 @@ export class MockNarrator implements Narrator {
       leadBlurb: `A petitioner from ${i.region} brings a debt unpaid and a name they won't say.`,
       goal: `settle the matter the petitioner from ${i.region} brings to the company`,
       arc: ['the petitioner brings the job to the gate', 'follow the trail and meet who it touches', 'the truth turns and the stakes rise', 'the reckoning that settles it'],
+      choiceSteps: [2],
+      finaleChoices: [{ label: 'Take them into the company', kind: 'recruit' }, { label: 'Cage them', kind: 'captive' }, { label: 'Hand them over for coin', kind: 'gold' }],
       cast: [
         { name: focalName, who: i.who ?? `known for ${seed}`, history: [`shaped by ${seed}`, 'made a choice they cannot undo', 'now hides what it cost'], wants: 'to keep the past buried', feels: 'shame', conceals: 'the thing they did' },
         { name: `${pick(r, NAMES)} of ${i.region}`, who: 'a witness', history: ['saw what happened'], wants: 'justice or silence-money', feels: 'fear', role: 'the one who remembers' },

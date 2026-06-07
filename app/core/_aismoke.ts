@@ -26,7 +26,7 @@ const ct = await n.conceptTags({ concept: 'a captured knight, proud and scarred'
 console.log(JSON.stringify(ct, null, 2), '\n');
 
 console.log('— flesh');
-const fl = await n.flesh({ tags: ['Soldier', 'Brave', 'Scarred', 'Male', 'Human'], attrs: { physical: 7, agility: 4, intelligence: 3, charisma: 4, willpower: 5 }, context: 'taken captive in a fen raid' });
+const fl = await n.flesh({ tags: ['Soldier', 'Brave', 'Scarred', 'Male', 'Human'], attrs: { physical: 7, agility: 4, intelligence: 3, charisma: 4, perception: 5 }, context: 'taken captive in a fen raid' });
 console.log(JSON.stringify(fl, null, 2), '\n');
 
 console.log('— outcome (partial)');

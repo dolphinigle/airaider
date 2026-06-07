@@ -12,7 +12,7 @@ export interface TagInstance {
 }
 
 // ---- attributes / talents (characters only) ---------------------------------
-export const ATTRIBUTES = ['physical', 'agility', 'intelligence', 'charisma', 'willpower'] as const;
+export const ATTRIBUTES = ['physical', 'agility', 'intelligence', 'charisma', 'perception'] as const;
 export type Attribute = (typeof ATTRIBUTES)[number];
 export type Attributes = Record<Attribute, number>;
 export type Talents = Record<Attribute, number>; // growth rate per level (e.g. 0.5..2.0)
@@ -168,6 +168,8 @@ export interface Chain {
   arcProgress?: number;      // DEPRECATED (success-gating removed); kept for scratch-harness typecheck
   lastFailed?: boolean;      // the previous beat failed → the next beat opens from the fallout (consequence)
   // ---- reward bank (REWARD_BANK.md) ----
+  choiceSteps?: number[];    // bible-proposed arc steps (1-based) that afford a sneak/fight/talk choice
+  finaleChoices?: Array<{ label: string; kind: 'recruit' | 'captive' | 'gold' }>; // bible-proposed endings
   bank?: number;             // accrued merc-day value across beats; crystallized into the focal+gold at the finale
   failBudget?: number;       // allowed MIDDLE-beat failures (rarity-scaled; harder = fewer)
   failsSpent?: number;       // middle-beat failures so far

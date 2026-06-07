@@ -48,6 +48,8 @@ const zGenesis = z.object({
   goal: z.string().default(''),
   twistReveal: z.string().optional(),
   arc: z.array(z.string()).default([]),
+  choiceSteps: z.array(z.union([z.number(), z.string()])).default([]),
+  finaleChoices: z.array(z.object({ label: z.string(), kind: z.string().default('gold') })).default([]),
   // accept either flat persons or {person, roleInStory} nesting
   cast: z.array(z.union([zPerson, z.object({ person: zPerson, roleInStory: z.string().optional() })])).default([]),
   situation: z.string(),
@@ -134,17 +136,17 @@ export class OpenAINarrator implements Narrator {
 
   async cardAsk(i: CardAskInput): Promise<CardAskOut> {
     const system =
-      `You write ONE mercenary-fort job card for a grimdark, low-medieval world, plus its assignment ask.\n` +
+      `You write ONE standalone job for a grimdark, low-medieval world — a posting on a mercenary company's JOB BOARD (the player reads it at their fort and decides whether to take it and which mercenaries to send), plus its assignment ask.\n` +
       `Output JSON only:\n` +
       `{ "situation": "<=40 words: who brings the job to the company's gate and the concrete problem. POV: only what arrives at the gate",\n` +
       `  "job": "one line: the concrete action the company commits to",\n` +
       `  "ask": { "attribute": "one of ${ATTRS} (what this job mainly tests)",\n` +
       `    "favoredTags": ["0-3 tag words from the vocabulary, bare (no prefix)"],\n` +
-      `    "slots": ["one per party slot, each EITHER \\"open\\" OR a single tag word the job plainly needs"] } }\n` +
+      `    "slots": ["one entry per mercenary the company can send (the count is given below), each EITHER \\"open\\" OR a single tag word the job plainly needs"] } }\n` +
       `${VOCAB_BLOCK}\n` +
-      `ATTRIBUTE — pick the one the job's CORE test needs, and VARY across jobs: physical=force/brawn/melee, agility=speed/stealth/precision, intelligence=lore/investigation/cunning, charisma=persuasion/deceit/people, willpower=nerve/endurance under dread. Most jobs are NOT willpower — reserve it for holding-the-line-against-fear jobs. A raid→physical, a stealth/hunt→agility, an investigation→intelligence, a parley/escort-by-trust→charisma.\n` +
-      `RULES: terse, plain, concrete. State the job so the player knows exactly what taking it commits them to. NEVER write numbers. slots length must equal the SLOT COUNT given. Prefer "open" slots. JSON only.`;
-    const user = `Archetype: ${i.archetype}\nLocation: ${i.location}\nSlot count: ${i.slotCount}\nThe job results in ${i.rewardSeed}.\nWrite the card + ask. JSON only.`;
+      `ATTRIBUTE — pick the one the job's CORE test needs, and VARY across jobs: physical=force/brawn/melee/toughness, agility=speed/stealth/precision, intelligence=lore/investigation/cunning, charisma=persuasion/deceit/people, perception=awareness/intuition (spotting an ambush, reading a lie, tracking, sensing danger). A raid→physical, a stealth job→agility, an investigation→intelligence, a parley→charisma, a scout/hunt/ambush-or-be-ambushed→perception.\n` +
+      `RULES: terse, plain, concrete. State the job so the player knows exactly what taking it commits them to. NEVER write numbers. Give exactly one "slots" entry per mercenary the company can send (the count below). Prefer "open" slots. JSON only.`;
+    const user = `Archetype: ${i.archetype}\nLocation: ${i.location}\nMercenaries the company can send: ${i.slotCount}\nThe job results in ${i.rewardSeed} (this is the reward the player sees for taking it).\nWrite the job + ask. JSON only.`;
     const out = await this.json('cardAsk', system, user, zCardAsk, this.mechanicalModel, 'minimal', 1200);
     const ask = normAsk(out.ask);
     while (ask.slots.length < i.slotCount) ask.slots.push({ kind: 'open' });
@@ -207,15 +209,19 @@ export class OpenAINarrator implements Narrator {
       ? `TWIST QUEST (engine-chosen): the job is a MISDIRECTION. "goal" = the APPARENT job the player commits to; "twistReveal" = how the truth subverts it (the client lies / the quarry is the victim / the prize is a trap / the one you rescue is the threat) — it must be FAIR (findable) and CHANGE what the right thing to do is. It lands in a MIDDLE arc step, NEVER beat 1. "situation" = the real truth.`
       : `STRAIGHT QUEST (engine-chosen): NO misdirection — the job is honestly what it appears; the interest comes from the obstacles and the people. Set "twistReveal" to "".`;
     const system =
-      `You design a QUEST for a MERCENARY COMPANY — and the believable truth behind it. The player RUNS the company: this lands on their job board, or someone brings it to their fort. Your job is to make a quest they have a clear REASON to take and a STAKE in — then build the believable people and truth that make it real. NOT prose; the settled facts a writers' room works from, told straight.\n` +
-      `You are given the CORE PERSON the quest centers on (their tags / known life), a few THEME words, a SETTING, a TONE, and the region.\n\n` +
-      `BUILD A QUEST THE COMPANY WOULD TAKE:\n` +
-      `- THE HOOK — how the company gets the job and WHY they'd take it. Someone hires them for coin, pleads for help, posts a bounty, OR the core person comes to the fort and asks them directly. The mercenary reason must be PLAIN: pay, a person to save/escort/find, a captive or recruit worth taking, a threat to remove. The player must read the hook and think "yes, that's a job for us."\n` +
-      `- THE GOAL — one clear thing the company is trying to ACHIEVE across the saga (save / escort / find / protect / hunt / recover / expose / deliver someone or something). Every beat is a step toward it; the player always knows what they're working toward.\n` +
-      `- DRAMA SERVES THE QUEST. The cast's wants are OBSTACLES, allies, costs, and turns ALONG the goal — not a static web of strangers the player merely watches. The player is a PARTICIPANT working toward the goal, never a spectator.\n\n` +
+      `You design a QUEST CHAIN — a SEQUENCE of linked jobs a mercenary company takes one at a time — and the believable truth behind it. The player RUNS the company and picks jobs off a JOB BOARD at their fort; the jobs of THIS chain appear there one after another. Your bible is what makes that sequence COHERENT: one story told across several jobs. NOT prose; the settled facts a writers' room works from, told straight.\n` +
+      `You are given the CORE PERSON the chain centers on (their tags / known life), a few THEME words, a SETTING, a TONE, and the region.\n\n` +
+      `BUILD A QUEST CHAIN THE COMPANY WOULD TAKE:\n` +
+      `- THE HOOK — how the company gets drawn in and WHY they'd take the FIRST job. Someone hires them for coin, pleads for help, posts a bounty, OR the core person comes to the fort and asks directly. The mercenary reason must be PLAIN: pay, a person to save/escort/find, a captive or recruit worth taking, a threat to remove.\n` +
+      `- THE GOAL — one clear thing the company is working to ACHIEVE across the whole chain (save / escort / find / protect / hunt / recover / expose / deliver someone or something).\n` +
+      `- EACH JOB STANDS ALONE, the CHAIN coheres. Every individual job in the sequence must give the player a concrete reason to take THAT job (a clear task + payoff), AND each follows from the last so the chain reads as one escalating story toward the goal — not a single quest, not a vague mood piece, not unrelated errands.\n` +
+      `- DRAMA SERVES THE QUEST. The cast's wants are OBSTACLES, allies, costs, and turns ALONG the goal — not a static web of strangers the player merely watches. The player is a PARTICIPANT, never a spectator.\n\n` +
       `${twistBlock}\n` +
       `PLAN THE ARC — output "arc": a ROUGH ordered guide of ~${eb} beat-steps (a skeleton, NOT a rigid script). STEP 1 = the OPENER (the company TAKES the job / meets the person) — do NOT finish the goal here. MIDDLE steps = escalating obstacles and turns. LAST step = the FINALE where the goal is finally achieved/resolved. CRITICAL: the company must NOT complete the goal before the last step — a 'recover the locket' job does not recover it in step 1. Each step is a short phrase.\n` +
       `PEOPLE — keep them LEAN: each is ONE vivid line (who they are + the one thing that matters here), a "want", and a "role" in the quest (client / companion / quarry / obstacle / ally / prize). NO backstory ladders — deep history is written later, only for whoever the company actually keeps.\n` +
+      `CHOICES (suggest from the STORY) — two kinds, both OPTIONAL:\n` +
+      `  • "choiceSteps": which middle jobs (if any) naturally let the company pick HOW — sneak vs fight vs talk. Suggest the step numbers from YOUR arc where a branching choice genuinely fits (0-2; never the first job or the finale). [] if none.\n` +
+      `  • "finaleChoices": how the chain can END — 2-3 real choices the player makes about the core person / prize, PHRASED IN THIS STORY'S TERMS and LOGICAL to it (e.g. for a captured deserter: "Take them into the company" / "March them to the magistrate" / "Cage them"). Each maps to one engine outcome: kind = recruit (they join you), captive (you hold them), or gold (hand off / sell / turn in for coin). Offer the ones that make sense here — not all three if only two are believable.\n` +
       `BELIEVABILITY: every present fact traces to a prior cause in history; ordinary human motives, not plot necessity; no coincidence-stacking; nobody acts dumb to keep the situation alive.\n` +
       `COMMIT TO THE TRUTH: this bible IS the settled, complete truth. If a killing/theft/betrayal/disappearance happened, state plainly WHO did it and WHY. BANNED in the hidden layer: "unknown", "remains hidden", "it is unclear", "a mysterious figure", "the truth of X is never revealed" — you the author already know, so write it down.\n` +
       `THE CORE PERSON + THEMES make the quest specific. Their tags — craft, magic, profession, temperament — must be CENTRAL to what the quest is about (a water-singer's job turns on water and song; a going-blind carver's on the carving). The THEMES are a spark to FUSE, not a checklist (weave them in; you need not name them). Match the TONE you're given — not every saga is grim. Keep it ONE clear situation, small enough to care about.\n\n` +
@@ -225,12 +231,14 @@ export class OpenAINarrator implements Narrator {
       `  "goal": "one line: the APPARENT thing taking this quest commits the company to ACHIEVE (e.g. 'escort Alen to the abbey alive', 'find and bring back the miller's daughter'). The throughline.",\n` +
       `  "twistReveal": "${i.twist ? 'how the truth SUBVERTS the apparent goal — the player must NOT see this; it surfaces across beats and lands at a middle step' : 'leave EMPTY \\"\\" — this is a straight quest'}",\n` +
       `  "arc": ["~${eb} short step phrases — step 1 = take the job/meet (goal NOT done), last = goal achieved at the finale"],\n` +
+      `  "choiceSteps": [0-2 step numbers from your arc where a real sneak/fight/talk choice fits — never step 1 or the last; [] if none],\n` +
+      `  "finaleChoices": [ { "label": "<=6 words, the ending choice in THIS story's terms", "kind": "recruit|captive|gold" } — 2-3 logical ways to resolve the chain ],\n` +
       `  "cast": [ { "name": "...", "who": "one vivid line — who they are + the one thing that matters here", "want": "plain want now", "role": "client / companion / quarry / obstacle / ally / prize" } ],\n` +
       `  "situation": "2-4 sentences — the believable truth behind the job, told straight (for a twist quest this is the REAL situation the player will uncover)",\n` +
       `  "tensions": ["what stands in the way and what's at stake: <A> wants <X>; <B> wants <Y>; because <reason> — obstacles ALONG the goal, not a standalone argument"],\n` +
       `  "directions": [ { "kind": "active", "hook": "the next concrete step toward the goal the company can take" }, { "kind": "ambient", "hook": "something pressing on the goal that unfolds with or without them" } ] }\n` +
       `The FIRST cast entry MUST be the core person. ${depth[i.rarity ?? 'uncommon']} Include AT LEAST ONE 'active' and ONE 'ambient' direction.\n` +
-      `RECURRING CAST — if EXISTING WORLD CHARACTERS are listed below, you MAY cast AT MOST ONE (rarely two) as a SECONDARY person (NEVER the core person), referencing them by their exact name + known surface; the history you write about them is new canon consistent with what's known. A returning face makes the world feel lived-in — but only where one genuinely fits the story; do NOT crowd the bible with familiar faces, and MANY sagas should use NONE and introduce fresh strangers. Coin fresh names for everyone else.\n` +
+      `RECURRING CAST — the engine has decided how many returning faces this saga may use: ${i.poolCastMax === 0 ? 'USE NONE — introduce only fresh strangers this time.' : `cast AT MOST ${i.poolCastMax ?? 1} of the EXISTING WORLD CHARACTERS listed below`} as SECONDARY people (NEVER the core person), by their exact name + known surface; the history you write is new canon consistent with what's known. Only where one genuinely fits — never crowd the bible. Coin fresh names for everyone else.\n` +
       `BANNED PURPLE WORDS: weight, shadow, burden, fate, destiny. Clinical voice (state what IS). JSON only.`;
     const core = i.personal
       ? `CORE PERSON: the existing mercenary ${i.name ?? ''} — known as "${i.who ?? ''}"; ${i.backstory ?? ''}. Tags: [${i.focalTags[0]?.join(', ')}]. Build THEIR own buried past as NEW canon consistent with the above. Keep their name.`
@@ -241,8 +249,8 @@ export class OpenAINarrator implements Narrator {
     const seed = i.seed ? `\nTHEMES (fuse these into the core person's life — a spark, not a checklist; you need not name them): ${i.seed}` : '';
     const place = i.place ? `\nSETTING (stage the saga here): ${i.place}` : '';
     const tone = i.tone ? `\nTONE (the register for this quest): ${i.tone}` : '';
-    const pool = i.poolCast?.length
-      ? `\nEXISTING WORLD CHARACTERS (you MAY cast one or two as SECONDARY people — never the core person):\n${i.poolCast.map((p) => `  - ${p.name} — ${p.who} [${p.tags.join(', ')}]`).join('\n')}`
+    const pool = (i.poolCast?.length && (i.poolCastMax ?? 1) > 0)
+      ? `\nEXISTING WORLD CHARACTERS (cast AT MOST ${i.poolCastMax ?? 1} as SECONDARY people — never the core person):\n${i.poolCast.map((p) => `  - ${p.name} — ${p.who} [${p.tags.join(', ')}]`).join('\n')}`
       : '';
     const user = `${core}\nREGION: ${i.region}${place}${tone}${seed}${pool}${avoid}\nBuild the quest bible. JSON only.`;
     const out = await this.json('genesis', system, user, zGenesis, this.narrativeModel, this.narrativeEffort, 4000);
@@ -262,40 +270,44 @@ export class OpenAINarrator implements Narrator {
       ? { kind: 'active' as const, hook: d }
       : { kind: (d.kind === 'ambient' ? 'ambient' : 'active') as 'ambient' | 'active', hook: d.hook });
     const twistReveal = i.twist && out.twistReveal && out.twistReveal.toLowerCase() !== 'none' ? out.twistReveal : undefined;
-    return { title: out.title, leadBlurb: out.leadBlurb, goal: out.goal ?? '', arc: out.arc ?? [], twistReveal, cast, situation: out.situation, tensions: out.tensions ?? [], directions };
+    const choiceSteps = (out.choiceSteps ?? []).map((n) => Math.round(Number(n))).filter((n) => Number.isFinite(n) && n >= 1);
+    const KIND_OK = ['recruit', 'captive', 'gold'];
+    const finaleChoices = (out.finaleChoices ?? [])
+      .map((c) => ({ label: String(c.label ?? '').slice(0, 40), kind: KIND_OK.includes(String(c.kind)) ? String(c.kind) as 'recruit' | 'captive' | 'gold' : 'gold' }))
+      .filter((c) => c.label).slice(0, 3);
+    return { title: out.title, leadBlurb: out.leadBlurb, goal: out.goal ?? '', arc: out.arc ?? [], twistReveal, choiceSteps, finaleChoices, cast, situation: out.situation, tensions: out.tensions ?? [], directions };
   }
 
   async chainBeat(i: ChainBeatInput): Promise<ChainBeatOut> {
     const system =
-      `You are the quest-writer for a grimdark mercenary-fort game. The player RUNS a mercenary company and is working a JOB. A hidden BIBLE holds the settled truth + the QUEST GOAL (what the company is trying to achieve). The player NEVER sees the bible. Write the NEXT step of this job — a concrete task the company is OFFERED that visibly moves them toward the goal — revealing the buried truth only a LITTLE at a time, through what the company can see and do. The player must always understand what they're doing and why it serves the job; never make them a spectator to a scene with no task in it for them.\n` +
-      `Given: the BIBLE (hidden truth + named cast), the CHAIN STATE (what's happened / what the player already knows), and the beat instruction.\n` +
+      `You are the quest-writer for a grimdark mercenary-fort game. The player RUNS a mercenary company: they read available jobs on a JOB BOARD at their fort, take one, and send mercenaries to do it. A hidden BIBLE holds the settled truth + the GOAL the company is working toward across this run of linked jobs. The player NEVER sees the bible. Write the NEXT job in this run — a concrete task the company is OFFERED that visibly moves them toward the goal — revealing the buried truth only a LITTLE at a time, through what the company can see and do. The player must always understand what they're doing and why it serves the goal; never make them a spectator to a scene with no task in it.\n` +
+      `Given: the BIBLE (hidden truth + named cast), the STORY SO FAR (what's happened / what the player already knows), and the JOB INSTRUCTION (what this job is and whether you may end the story).\n` +
       `Output JSON only:\n` +
-      `{ "situation": "<=55 words the PLAYER reads — what the company ENCOUNTERS on this beat (someone/something arriving, OR what they find in the field — per the BEAT INSTRUCTION's opening). POV-LOCKED: only what the company can see/hear or already learned. READABILITY MATTERS: write 2-4 CLEAN, plain sentences a player reads once and understands — NOT telegraphic fragment-stacking ('Grey morning. Mud. A man.') and NOT comma-splice run-ons. Weave the time of day into a real sentence, don't stack it as a fragment. ORIENT THE PLAYER, ONCE: the FIRST time a person appears, weave a 2-4 word who-they-are into the sentence as natural apposition ('his neighbour Lysa', 'a bailiff named Toft') — NOT in parentheses. But a name in the ALREADY-MET list below has been introduced in an earlier beat: use their BARE name with NO tag (re-explaining who they are every beat reads badly). Concrete sensory detail, but clarity first.",\n` +
+      `{ "situation": "<=55 words the PLAYER reads — what the company ENCOUNTERS in this job (someone/something arriving, OR what they find in the field — per the JOB INSTRUCTION's opening). POV-LOCKED: only what the company can see/hear or already learned. READABILITY MATTERS: 2-4 CLEAN plain sentences a player reads once and understands — NOT telegraphic fragment-stacking ('Grey morning. Mud. A man.') and NOT comma-splice run-ons. Weave the time of day into a real sentence. ORIENT THE PLAYER, ONCE: the FIRST time a person appears, weave a 2-4 word who-they-are in as natural apposition ('his neighbour Lysa', 'a bailiff named Toft') — NOT in parentheses. A name in the ALREADY-MET list below was introduced earlier: use their BARE name (re-explaining who they are every time reads badly). Concrete sensory detail, but clarity first.",\n` +
       `  "job": "one plain line — exactly what taking this job commits the company to DO (escort / recover / guard / confront / investigate a specific thing)",\n` +
-      `  "ask": { "attribute": "${ATTRS}", "favoredTags": ["0-3 bare tag words"], "slots": ["one per slot: open OR a tag word"] },\n` +
-      `  "proposedReward": "<=12 words — the tangible LOOT this beat plausibly drops (a purse, a strongbox's coin, a salvaged tool); the GAME sets its value. NOT the saga's payoff — that is decided at the finale.",\n` +
-      `  "immediateReward": true/false — TRUE only if THIS beat physically hands the company spoils RIGHT NOW (they raid/loot/seize/crack open something with coin or goods inside); FALSE for meet/scout/travel/talk/escort/negotiate beats that only make progress. Most beats are FALSE. (The engine still banks a share toward the finale regardless.)\n` +
+      `  "ask": { "attribute": "${ATTRS}", "favoredTags": ["0-3 bare tag words"], "slots": ["one entry per mercenary the company can send (the count is given below): open OR a single tag word this job plainly needs"] },\n` +
+      `  "proposedReward": "<=12 words — the tangible LOOT this job plausibly drops (a purse, a strongbox's coin, a salvaged tool); the GAME sets its value. NOT the run's payoff — that is decided at the end.",\n` +
+      `  "immediateReward": true/false — TRUE only if THIS job physically hands the company spoils RIGHT NOW (they raid/loot/seize/crack open something with coin or goods inside); FALSE for meet/scout/travel/talk/escort/negotiate jobs that only make progress. Most jobs are FALSE. (The engine still banks a share toward the payoff regardless.)\n` +
       `  "newLayerRevealed": "<=18 words — the ONE CONCRETE fact the player learns on success: a NAME, a face, a specific deed (never 'a hidden actor' / 'a second figure' — name them or show the concrete symptom)",\n` +
-      `  "closesChain": true/false — does THIS beat resolve the whole arc? Set true ONLY if the BEAT INSTRUCTION permits closing AND the story has genuinely reached its climax; otherwise false,\n` +
-      `  "choices": OPTIONAL 2-3 distinct APPROACHES the player picks between to do THIS beat — include ONLY when the beat genuinely affords different methods (slip past a guard vs fight through vs talk your way in; rescue by stealth vs by force). Each: { "label": "<=6 words, the approach", "attribute": one of [${ATTRS}] it tests, "favored": [0-2 bare tag words that help] }. The approaches must test DIFFERENT attributes. Omit entirely for a single-approach beat. }\n` +
+      `  "closesChain": true/false — does THIS job END the whole story? Set true ONLY if the JOB INSTRUCTION permits ending AND the story has genuinely reached its climax; otherwise false,\n` +
+      `  "choices": OPTIONAL 2-3 distinct APPROACHES the player picks between to do THIS job — include ONLY when the JOB INSTRUCTION says this job affords a choice (slip past a guard vs fight through vs talk your way in). Each: { "label": "<=6 words, the approach", "attribute": one of [${ATTRS}] it tests, "favored": [0-2 bare tag words that help] }. The approaches must test DIFFERENT attributes. Omit entirely otherwise. }\n` +
       `${VOCAB_BLOCK}\n` +
-      `FOLLOW THE BEAT INSTRUCTION below — it tells you this beat's job in the arc and whether you may close it.\n` +
+      `FOLLOW THE JOB INSTRUCTION below — it tells you this job's place in the story and whether you may end it.\n` +
       `CRAFT (this is character drama, not a logistics audit):\n` +
-      `- PUT THE CAST ON-STAGE. The chain is about the bible's PEOPLE. Bring a NAMED cast member into this beat in the flesh; never run the whole story through a faceless clerk/contract while the real characters stay off-screen.\n` +
-      `- SERVE THIS BIBLE'S OWN STORY. The beats exist to bring THIS bible's specific hook (its curse / feud / vow / heresy / secret) to life — NOT to run a generic crime procedural (investigate-a-ledger → shelter-a-witness → force-a-confession → public-trial) that would fit any saga. Whatever makes THIS story unique must be live and pressing in the scene.\n` +
-      `- VARY THE BEAT. Each beat does something DIFFERENT: meet/warm-to → get closer → a danger → wants collide → a turn or betrayal → reveal. CHAIN STATE lists what already happened — do NOT reopen on the same scene, object, place, or cast-member entrance you used before. Change WHO is on stage (don't open two beats running on the same person unless this beat truly centers on them), WHERE it happens, and the ACTION. NEVER make two beats both about fetching/recovering/securing the SAME object — a saga is not five attempts to grab one item.\n` +
-      `- VARY THE ARRIVAL — this is critical. NOT every beat is "a person staggers to the gate at dusk". The thing that reaches the company can be: a rumor, summons, letter or writ delivered; a creditor, rival or official; a frightened child; a named cast member in person; OR the company already deployed on the prior thread encountering something in the field. Rotate the time of day. If a previous beat opened with someone arriving at the gate, open THIS one differently.\n` +
-      `- CONCRETE SYMPTOMS, NOT CAUSES. Show the symptom (a wound, a scorched door, a fled witness), never the hidden cause's name. The hidden CAUSE stays buried; reveal one small concrete layer.\n` +
-      `- CONTINUITY. Follow believably from CHAIN STATE — react to what the company just did and what's now in motion. Don't reset to a fresh unrelated job.\n` +
-      `ATTRIBUTE — pick the one this beat's core test needs and VARY it (physical=force, agility=speed/stealth, intelligence=lore/cunning, charisma=people, willpower=nerve). Most beats are NOT willpower.\n` +
+      `- PUT THE CAST ON-STAGE. The story is about the bible's PEOPLE. Bring a NAMED cast member into this job in the flesh; never run the whole story through a faceless clerk/contract while the real characters stay off-screen.\n` +
+      `- SERVE THIS BIBLE'S OWN STORY. The jobs exist to bring THIS bible's specific hook (its curse / feud / vow / heresy / secret) to life — NOT a generic crime procedural (investigate-a-ledger → shelter-a-witness → force-a-confession → public-trial) that would fit any saga. Whatever makes THIS story unique must be live and pressing in the scene.\n` +
+      `- A DIFFERENT SCENE EACH TIME. The STORY SO FAR lists what already happened — do NOT reopen on the same scene, object, place, or arrival you used before; change WHO is on stage, WHERE it happens, and the ACTION. The JOB INSTRUCTION gives you an opening to use (the engine varies it for you) — just don't reuse the previous one. NEVER make two jobs both about fetching the SAME object.\n` +
+      `- CONCRETE SYMPTOMS, NOT CAUSES. Show the symptom (a wound, a scorched door, a fled witness), never the hidden cause's name. Reveal one small concrete layer.\n` +
+      `- CONTINUITY. Follow believably from the STORY SO FAR — react to what the company just did. Don't reset to a fresh unrelated job.\n` +
+      `ATTRIBUTE — pick the one this job's core test needs and VARY it across the chain (physical=force/toughness, agility=speed/stealth, intelligence=lore/cunning, charisma=people, perception=awareness/intuition: spot an ambush, read a lie, track, sense danger).\n` +
       `The ASK fits the MUNDANE SURFACE, not the hidden truth. Prefer "open" slots. State the job plainly; keep the WHY hidden. Vivid but concrete; NEVER write numbers. JSON only.`;
     const met = i.introduced?.length ? `\nALREADY MET (use bare names, do NOT re-tag who they are): ${i.introduced.join(', ')}` : '';
-    const user = `HIDDEN BIBLE:\n${i.bible}\n\nCHAIN STATE (what already happened — react to it, don't repeat it): ${i.chainState}${met}\nREGION: ${i.region}\nSLOT COUNT: ${i.slotCount}\nBEAT INSTRUCTION: ${i.beatConstraint}\nJSON only.`;
+    const user = `HIDDEN BIBLE:\n${i.bible}\n\nSTORY SO FAR (what already happened — react to it, don't repeat it): ${i.chainState}${met}\nREGION: ${i.region}\nMERCENARIES THE COMPANY CAN SEND: ${i.slotCount}\nJOB INSTRUCTION: ${i.beatConstraint}\nJSON only.`;
     const out = await this.json('chainBeat', system, user, zChainBeat, this.narrativeModel, this.narrativeEffort, 1800);
     const ask = normAsk(out.ask);
     while (ask.slots.length < i.slotCount) ask.slots.push({ kind: 'open' });
     ask.slots.length = i.slotCount;
-    const ATTR_OK = ['physical', 'agility', 'intelligence', 'charisma', 'willpower'];
+    const ATTR_OK = ['physical', 'agility', 'intelligence', 'charisma', 'perception'];
     const choices = (out.choices ?? []).filter((c) => c.label).map((c) => ({
       label: String(c.label ?? '').slice(0, 40),
       attribute: ATTR_OK.includes(String(c.attribute)) ? String(c.attribute) : 'physical',

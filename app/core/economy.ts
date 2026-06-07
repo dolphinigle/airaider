@@ -75,14 +75,18 @@ export function cardTagsValue(tags: TagInstance[]): number {
 
 // ---- attribute bias from tags (flavor; keeps strong-looking mercs strong) ---
 const ATTR_BIAS: Record<string, Attribute> = {
+  // physical = force/brawn/toughness (toughness + battle-nerve folded in here now that willpower→perception)
   'phys:muscular': 'physical', 'skill:weapon': 'physical', 'bg:soldier': 'physical',
-  'skill:stealth': 'agility', 'bg:hunter': 'agility', 'bg:criminal': 'agility',
+  'phys:tough': 'physical', 'pers:brave': 'physical',
+  'skill:stealth': 'agility', 'bg:criminal': 'agility',
   'phys:clever': 'intelligence', 'skill:lore': 'intelligence', 'bg:scholar': 'intelligence',
   'skill:magic-fire': 'intelligence', 'skill:magic-earth': 'intelligence',
   'skill:magic-water': 'intelligence', 'skill:magic-air': 'intelligence', 'skill:magic-dark': 'intelligence',
   'phys:beautiful': 'charisma', 'bg:noble': 'charisma', 'skill:song': 'charisma', 'bg:merchant': 'charisma',
   'pers:kind': 'charisma', 'pers:gregarious': 'charisma',
-  'phys:tough': 'willpower', 'bg:priest': 'willpower', 'pers:brave': 'willpower', 'skill:heal': 'intelligence',
+  // perception = awareness/intuition: tracking, sensing danger, reading people
+  'bg:hunter': 'perception', 'bg:priest': 'perception', 'pers:calm': 'perception', 'pers:aloof': 'perception',
+  'skill:heal': 'intelligence',
 };
 
 // ---- talents & attributes ---------------------------------------------------

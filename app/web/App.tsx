@@ -7,6 +7,7 @@ import type { Quest, CharacterCard, Lead } from '../core/types.js';
 import type { AICallRecord } from '../core/ai.js';
 import { tagLabel, tagName } from '../core/tags.js';
 import { ROOM_TYPES, buildableRoomTypes, excavateCost, digFloorCost, roomPrestige, comfortFor } from '../core/fort.js';
+import { rewardEnvelope } from '../core/reward.js';
 
 function useEng() { useGame((s) => s.tick); return useGame((s) => s.eng); }
 
@@ -141,6 +142,9 @@ function QuestCard({ quest }: { quest: Quest }) {
       </div>
       <p className="situation">{quest.situation}</p>
       <p className="job"><b>The job:</b> {quest.job}</p>
+      {!quest.finale && <p className="reward"><b>Reward:</b> {quest.chainId
+        ? (quest.immediate ? `${quest.proposedLoot || 'loot'} now, plus the saga’s payoff${(chain?.bank ?? 0) > 0 ? ` (~${chain!.bank}g banked)` : ''}` : `builds the saga’s payoff (banked)${(chain?.bank ?? 0) > 0 ? ` — ~${chain!.bank}g so far` : ''}`)
+        : rewardEnvelope(quest.reward)}</p>}
       {quest.groups
         ? <div className="branches"><div className="branchhdr">Choose ONE approach:</div>{quest.groups.map((g) => <Branch key={g.id} quest={quest} group={g} />)}</div>
         : <div className="slots">{quest.slots.map((_, i) => <Slot key={i} quest={quest} index={i} />)}</div>}

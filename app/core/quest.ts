@@ -167,7 +167,8 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
   const kernel = pickKernel(state, r);
   const arcBeats = ({ common: 4, uncommon: 5, rare: 6, legendary: 7 } as Record<string, number>)[lead.rarity] ?? 5;
   const twist = r() < 0.3;   // engine rolls misdirection; the AI never decides
-  const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], region: lead.location, rarity: lead.rarity, avoid: recentTitles(state), seed: kernel, place: pickPlace(r), tone: pickTone(r), twist, expectedBeats: arcBeats, poolCast: gatherPoolCast(state, r, focal.id) });
+  const poolCastMax = r() < 0.45 ? randInt(r, 1, 2) : 0;   // engine rolls how many recurring faces may return
+  const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], region: lead.location, rarity: lead.rarity, avoid: recentTitles(state), seed: kernel, place: pickPlace(r), tone: pickTone(r), twist, expectedBeats: arcBeats, poolCast: gatherPoolCast(state, r, focal.id), poolCastMax });
   // the bible NAMES the core person (cast[0]) — that's the focal; adopt their NAME so beats and the
   // card match. who/backstory are written cleanly by flesh at delivery (the bible's why-ladder is the
   // HIDDEN writers'-room reference, NOT a readable dossier bio).
@@ -177,6 +178,7 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
     id: uid(state, 'chain'), title: g.title, hook: g.leadBlurb, bible: renderBible(g), direction: g.directions[0]?.hook ?? '',
     focalCardIds: [focal.id], rarity: lead.rarity, level: lead.level, expectedBeats: arcBeats, beatsResolved: 0,
     mercCyclesSpent: 0, climaxTarget: arcBeats, state: 'live', log: [], seedKernel: kernel, arc: g.arc,
+    choiceSteps: g.choiceSteps, finaleChoices: g.finaleChoices,
     bank: 0, failsSpent: 0, failBudget: BALANCE.failBudget[lead.rarity],
   };
   focal.chainIds.push(chain.id);
@@ -194,12 +196,14 @@ async function genesisPersonalChain(state: GameState, ai: Narrator, r: Rng, lead
   const B = randInt(r, 2, 3);
   const kernel = pickKernel(state, r);
   const twist = r() < 0.3;
-  const g = await ai.genesis({ focalTags: [tagLabels(merc.tags)], region: lead.location, rarity: lead.rarity, personal: true, name: merc.name, who: merc.who, backstory: merc.backstory, avoid: recentTitles(state), seed: kernel, place: pickPlace(r), tone: pickTone(r), twist, expectedBeats: B * 2, poolCast: gatherPoolCast(state, r, merc.id) });
+  const poolCastMax = r() < 0.45 ? randInt(r, 1, 2) : 0;
+  const g = await ai.genesis({ focalTags: [tagLabels(merc.tags)], region: lead.location, rarity: lead.rarity, personal: true, name: merc.name, who: merc.who, backstory: merc.backstory, avoid: recentTitles(state), seed: kernel, place: pickPlace(r), tone: pickTone(r), twist, expectedBeats: B * 2, poolCast: gatherPoolCast(state, r, merc.id), poolCastMax });
   const chain: Chain = {
     id: uid(state, 'chain'), title: g.title, hook: g.leadBlurb, bible: renderBible(g), direction: g.directions[0]?.hook ?? '',
     focalCardIds: [merc.id], rarity: lead.rarity, level: merc.level, expectedBeats: B * 2, beatsResolved: 0,
     // personal beats run ~1 merc each (the anchor); a few beats to breathe before the finale.
     mercCyclesSpent: 0, climaxTarget: B * 2, state: 'live', log: [], personal: true, seedKernel: kernel, arc: g.arc,
+    choiceSteps: g.choiceSteps, finaleChoices: g.finaleChoices,
     bank: 0, failsSpent: 0, failBudget: BALANCE.failBudget[lead.rarity],
   };
   merc.chainIds.push(chain.id);
@@ -261,12 +265,9 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   // a CONSEQUENCE note when the previous beat FAILED — this beat opens from the fallout (NOT a retry of
   // the same step): the company is worse off, but the story moves forward toward the goal regardless.
   const failNote = (!isBeatOne && chain.lastFailed) ? ' The previous step FAILED — OPEN from the fallout (a setback, loss, or worse position from that failure), then press on; do NOT re-attempt the same action and do NOT pretend it succeeded.' : '';
-  // ENGINE gates mid-beat CHOICES (don't leave it to the AI, which offers one every beat): ~70% of chains
-  // get exactly ONE choice step at a seeded middle position; the rest have none. Choices are a sometimes-thing.
-  const croll = rngFrom(`${chain.id}:choicebeat`);
-  const hasChoiceBeat = croll() < 0.7;
-  const choiceStep = 1 + Math.floor(croll() * Math.max(1, nSteps - 2)); // a middle step index
-  const allowChoice = hasChoiceBeat && !isBeatOne && !isFinale && !anchorMercId && stepIdx === choiceStep;
+  // mid-job CHOICES are BIBLE-proposed (genesis suggested which arc steps branch); the engine only gates
+  // them to valid middle steps. The AI emits the actual sneak/fight/talk approaches only when allowed here.
+  const allowChoice = !isBeatOne && !isFinale && !anchorMercId && (chain.choiceSteps ?? []).includes(stepIdx + 1);
   // CRITICAL discipline: the "job" line is THIS step's one concrete action — never a restatement of the
   // overall goal (the experiment showed early beats otherwise just echo the goal). Situation carries the goal.
   const jobRule = ' The "job" line is ONLY this step\'s ONE concrete action — NEVER a restatement of the overall goal (the player already knows the goal).';
@@ -275,7 +276,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
     instr = `STEP 1 of ${nSteps} — the OPENER, where the company is OFFERED this job. Realize this step: ${step(0)}. Make the player CARE: a real person on stage in a small human moment (a grief, want, or kindness), centered on ${focalName} UNLESS they're the bible's hidden wrongdoer (then a victim / worried kin / bystander). The "situation" conveys the OVERALL job + why they'd take it; the "job" line is ONLY this opening action (meet / agree / scout / set out) — do NOT complete the goal, do NOT capture/resolve ${focalName}, no faceless steward/clerk handing over a contract. closesChain:false. Single approach — no "choices".`;
   } else if (isFinale) {
     const desperate = (!reachedLast || lastChance) ? ' This is a LAST-CHANCE finale: the company is OUT OF TIME after repeated setbacks — force it to a head from where they actually stand; everything rides on this, and the goal may yet slip.' : '';
-    instr = `STEP ${nSteps} of ${nSteps} — the FINALE. Realize the final step: ${lastStep}. The goal is ACHIEVED or RESOLVED here, paying off whatever truth surfaced; it MUST read as the peak, not a sudden stop.${desperate}${jobRule}${failNote} closesChain:true. No "choices" — the finale's choice is the engine's own (win over / subdue / ransom).`;
+    instr = `STEP ${nSteps} of ${nSteps} — the FINALE. Realize the final step: ${lastStep}. The goal is ACHIEVED or RESOLVED here, paying off whatever truth surfaced; it MUST read as the peak, not a sudden stop.${desperate}${jobRule}${failNote} closesChain:true. Do NOT output "choices" — the engine presents the player's ending options (how to resolve the core person) separately.`;
   } else {
     instr = `STEP ${kNum} of ${nSteps}. Realize this step: ${step(stepIdx)}. A MIDDLE step that ESCALATES toward the goal — a clearly DIFFERENT scene from every prior step (new place / people / action; don't re-stage or re-fetch the same thing). The company does NOT complete the goal yet.${jobRule}${failNote} closesChain:false.${allowChoice ? ' THIS STEP AFFORDS A CHOICE: offer 2-3 "choices" (approaches testing DIFFERENT attributes — sneak/fight/talk).' : ' Single approach — no "choices".'}`;
   }
@@ -312,14 +313,24 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
     slots = []; groups = [];
     const fav = beat.ask.favoredTags;
     const clash = clashingFor(fav);
-    const addGroup = (id: string, label: string, kind: 'recruit' | 'captive' | 'gold', attribute: Quest['slots'][number]['tested']['attribute'], thrMult: number) => {
-      const index = slots.length;
-      slots.push({ index, requirement: { kind: 'open' }, tested: { attribute, favored: fav, clashing: clash }, groupId: id });
-      groups!.push({ id, label, rewardKind: kind, threshold: Math.max(2, Math.round(thresholdFor(1, chain.level) * thrMult)), slotIndices: [index] });
+    // engine maps each reward KIND to the attribute it tests + a threshold multiplier (the mechanics);
+    // the LABEL is the bible's story-logical phrasing when available, else a generic fallback.
+    const KIND_SPEC: Record<'recruit' | 'captive' | 'gold', { attr: Quest['slots'][number]['tested']['attribute']; thr: number; fallback: string }> = {
+      recruit: { attr: 'charisma', thr: 1.1, fallback: 'Win them over' },
+      captive: { attr: 'physical', thr: 1.1, fallback: 'Subdue them' },
+      gold: { attr: 'perception', thr: 0.75, fallback: 'Hand off for coin' },
     };
-    addGroup('winover', 'Win them over', 'recruit', 'charisma', 1.1);
-    addGroup('subdue', 'Subdue them', 'captive', 'physical', 1.1);
-    addGroup('ransom', 'Ransom / sell', 'gold', 'agility', 0.75);
+    const addGroup = (id: string, label: string, kind: 'recruit' | 'captive' | 'gold') => {
+      const spec = KIND_SPEC[kind]; const index = slots.length;
+      slots.push({ index, requirement: { kind: 'open' }, tested: { attribute: spec.attr, favored: fav, clashing: clash }, groupId: id });
+      groups!.push({ id, label: label || spec.fallback, rewardKind: kind, threshold: Math.max(2, Math.round(thresholdFor(1, chain.level) * spec.thr)), slotIndices: [index] });
+    };
+    // BIBLE-proposed endings (story-logical) when present + valid; else the generic recruit/subdue/ransom trio.
+    const bibleEndings = (chain.finaleChoices ?? []).filter((c) => c.label && KIND_SPEC[c.kind]);
+    const seenKinds = new Set<string>();
+    const endings = bibleEndings.filter((c) => !seenKinds.has(c.kind) && seenKinds.add(c.kind)); // one group per kind
+    if (endings.length >= 2) endings.forEach((c, i) => addGroup(`end${i}`, c.label, c.kind));
+    else { addGroup('winover', 'Win them over', 'recruit'); addGroup('subdue', 'Subdue them', 'captive'); addGroup('ransom', 'Ransom / sell', 'gold'); }
   } else if (allowChoice && beat.choices && beat.choices.length >= 2) {
     // MID-BEAT CHOICE: the AI offered distinct APPROACHES (sneak/fight/talk). Each is a mutex group with
     // one open slot testing a DIFFERENT attribute; the player picks HOW by which they staff. Reward is the
