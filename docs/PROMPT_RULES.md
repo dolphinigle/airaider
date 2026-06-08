@@ -35,6 +35,16 @@ mechanic, use **AI-proposes → engine-decides/caps**, never AI-sets-the-number:
 A pure-engine roll is fine when fiction shouldn't drive it (twist %, failure budget). Let the AI propose
 when the *story* knows best (is there loot here? does this step branch?).
 
+## 3a. The player is a MERCENARY BOSS who wants GAIN — every job must answer "what's in it for us?"
+
+The player runs a fort for profit; they are NOT a do-gooder. What they want: **coin**, **recruits**
+(skilled people worth bringing into the company), **captives** (to ransom or hold), **salvage/loot**,
+and **threats to their trade/fort removed**. So every job's intro MUST make the company's concrete
+**gain** plain — woven into the fiction (the petitioner *offers* coin / a favour that pays / a thing of
+value; the quarry is *worth taking*). An emotional plea alone ("save the orphans/puppies") is NOT a
+reason for a mercenary — attach the payoff. Never a job with no gain for the company. (Keep the gain
+*in-fiction*; don't surface mechanical "banked payoff" text — see the reward UX in REWARD_BANK.md.)
+
 ## 4. It's a QUEST CHAIN, not one quest
 Genesis designs a **chain**: a sequence of linked jobs the company takes one at a time. Each job must
 **stand on its own** (a clear, concrete reason to take it) AND the bible threads them into **one coherent
