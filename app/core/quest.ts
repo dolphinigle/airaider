@@ -170,6 +170,7 @@ async function pursueOneOff(state: GameState, ai: Narrator, r: Rng, lead: Lead):
   const quest: Quest = {
     id: uid(state, 'quest'), leadId: lead.id, rarity: lead.rarity, level: lead.level, location: lead.location,
     archetype: lead.archetype, title: card.job.slice(0, 48), situation: card.situation, job: card.job,
+    offeredReward: card.offeredReward,
     stakes: '', slots: buildSlots(card.ask, n, ownedMercTags(state)), threshold: thresholdFor(n, lead.level),
     reward, risky: isRisky(lead),
   };
@@ -394,7 +395,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
     id: uid(state, 'quest'), leadId: lead.id, rarity: chain.rarity, level: chain.level, location: lead.location,
     archetype: 'investigate', chainId: chain.id, beat: chain.beatsResolved + 1, finale: isFinale,
     title: chain.title, situation: beat.situation, job: beat.job, stakes: beat.newLayerRevealed,
-    proposedLoot: beat.proposedReward, immediate: !isFinale && !!beat.immediateReward,
+    proposedLoot: beat.proposedReward, offeredReward: beat.offeredReward, immediate: !isFinale && !!beat.immediateReward,
     slots, groups, threshold: thresholdFor(n, chain.level),
     reward, risky: isFinale || chain.rarity === 'rare' || chain.rarity === 'legendary',
   };

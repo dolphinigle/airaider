@@ -26,7 +26,7 @@ const zAsk = z.object({
   favoredTags: z.array(z.string()).default([]),
   slots: z.array(z.string()).default([]),
 });
-const zCardAsk = z.object({ situation: z.string(), job: z.string(), ask: zAsk });
+const zCardAsk = z.object({ situation: z.string(), job: z.string(), offeredReward: z.string().default(''), ask: zAsk });
 const zOutcome = z.object({
   beforeRoll: z.string(), afterRoll: z.string(),
   captive: z.object({ name: z.string(), who: z.string() }).nullable().optional(),
@@ -56,7 +56,7 @@ const zGenesis = z.object({
   directions: z.array(z.union([z.object({ kind: z.string().optional(), hook: z.string() }), z.string()])).default([]),
   openDirections: z.array(z.union([z.object({ kind: z.string().optional(), hook: z.string() }), z.string()])).optional(),
 });
-const zChainBeat = z.object({ situation: z.string(), job: z.string(), ask: zAsk, proposedReward: z.string(), newLayerRevealed: z.string(), closesChain: z.union([z.boolean(), z.string(), z.null()]).optional(),
+const zChainBeat = z.object({ situation: z.string(), job: z.string(), offeredReward: z.string().default(''), ask: zAsk, proposedReward: z.string(), newLayerRevealed: z.string(), closesChain: z.union([z.boolean(), z.string(), z.null()]).optional(),
   immediateReward: z.union([z.boolean(), z.string(), z.null()]).optional(),
   choices: z.array(z.object({ label: z.string(), attribute: z.string().default('physical'), favored: z.array(z.string()).default([]), kind: z.string().optional() })).optional() });
 const zConcept = z.object({ name: z.string(), who: z.string(), tags: z.array(z.string()).default([]) });
@@ -138,7 +138,8 @@ export class OpenAINarrator implements Narrator {
     const system =
       `You write ONE mercenary job as it ARRIVES at the player. The player is the BOSS of a mercenary company, at their fort; they read this and decide whether to take it and which mercs to send. They are NOT in the field — NEVER narrate the company already doing the job (that happens later, once they're sent).\n` +
       `Output JSON only:\n` +
-      `{ "situation": "the player's ONLY text for this job (2-3 plain sentences). Open from the 'how it reaches you' line below, WOVEN into real sentences — NEVER quote or echo that instruction. Whoever brings it MUST speak ONE line of DIALOGUE that states the WORK plainly AND — crucially — the COMPANY'S GAIN. The player is a profit-driven mercenary boss: make plain WHAT'S IN IT FOR THEM (coin, a captive to ransom, a recruit worth keeping, salvage, a threat to your trade gone). NEVER a number or amount: 'good coin' / 'a fat purse', not '40 gold'. A bare plea with no payoff (save the puppies) is WRONG — even a poor petitioner offers SOMETHING (coin scraped together, a favour that pays, a valuable, information worth selling). The job MUST match the JOB TYPE below and be SPECIFIC to this place/people; invent it FRESH.",\n` +
+      `{ "situation": "the PLAYER-FACING intro (2-3 plain sentences). Open from the 'how it reaches you' line below, WOVEN into real sentences — NEVER quote or echo that instruction. Whoever brings it speaks ONE line of DIALOGUE stating the WORK plainly. A line about the pay may surface naturally in their words, but the exact reward goes in 'offeredReward' below. NO numbers ('good coin', not '40 gold'). The job MUST match the JOB TYPE below and be SPECIFIC to this place/people; invent it FRESH.",\n` +
+      `  "offeredReward": "PLAYER-FACING, <=8 words: what the company is OFFERED for the job, plainly — the player reads this to decide. The player is a profit-driven mercenary boss, so be honest about the draw: e.g. 'a fat purse', 'good coin + salvage rights', 'a skilled recruit if they live', 'a captive to ransom', or — if it's a desperate plea — 'little but their gratitude' / 'nothing — they're begging'. Match the DRAW given below; NEVER a number.",\n` +
       `  "job": "one terse line for your own records (NOT shown to the player): the concrete task",\n` +
       `  "ask": { "attribute": "one of ${ATTRS} (what this job mainly tests)",\n` +
       `    "favoredTags": ["0-3 tag words from the vocabulary, bare (no prefix)"],\n` +
@@ -154,7 +155,7 @@ export class OpenAINarrator implements Narrator {
     const ask = normAsk(out.ask);
     while (ask.slots.length < i.slotCount) ask.slots.push({ kind: 'open' });
     ask.slots.length = i.slotCount;
-    return { situation: out.situation, job: out.job, ask };
+    return { situation: out.situation, job: out.job, offeredReward: out.offeredReward || drawKind, ask };
   }
 
   async outcome(i: OutcomeInput): Promise<OutcomeOut> {
@@ -291,6 +292,7 @@ export class OpenAINarrator implements Narrator {
       `Output JSON only:\n` +
       `{ "situation": "the player's ONLY text for this job (2-4 plain sentences). The player is the BOSS at their fort deciding whether to send mercs on this step — so write WHAT REACHES THEM THIS TURN: the petitioner/job arriving (the opener), OR one of your own mercs / a runner bringing word of the next step, OR a development pressing in. Use a line of DIALOGUE where someone speaks. What the company would DO must be PLAIN from the scene and the speaker's ask — but convey it NATURALLY; do NOT tack on a meta 'If you send men, they will…' clause. Keep the company's GAIN in view — these are mercenaries working for profit (coin, salvage, the recruit/captive this saga is chasing); the opener especially makes plain what's in it for them, never a payoff-free plea. Do NOT narrate the company already out in the field doing it (that happens AFTER you send them). READABILITY: clean plain sentences read once and understood — NOT fragment-stacks ('Grey morning. Mud. A man.'), NOT run-ons, NO flowery diction ('blisters the reedsea'), NO invented/obscure coinages — name things plainly. ORIENT a person ONCE on first appearance (natural apposition, not parens); a name in the ALREADY-MET list uses their BARE name.",\n` +
       `  "job": "one terse line for your own records (NOT shown to the player): the concrete task this step (escort / recover / confront / investigate a specific thing)",\n` +
+      `  "offeredReward": "PLAYER-FACING, <=8 words: what the company is OFFERED here, plainly — coin for the step and/or the saga's prize (the recruit/captive worth taking). Honest range, from 'a fat purse' to 'little but goodwill'. NEVER a number.",\n` +
       `  "ask": { "attribute": "${ATTRS}", "favoredTags": ["0-3 bare tag words"], "slots": ["one entry per mercenary the company can send (the count is given below): open OR a single tag word this job plainly needs"] },\n` +
       `  "proposedReward": "<=12 words — the tangible LOOT this job plausibly drops (a purse, a strongbox's coin, a salvaged tool); the GAME sets its value. NOT the run's payoff — that is decided at the end.",\n` +
       `  "immediateReward": true/false — TRUE only if THIS job physically hands the company spoils RIGHT NOW (they raid/loot/seize/crack open something with coin or goods inside); FALSE for meet/scout/travel/talk/escort/negotiate jobs that only make progress. Most jobs are FALSE. (The engine still banks a share toward the payoff regardless.)\n` +

@@ -16,6 +16,7 @@ for (const lead of [...eng.leads()]) {
   if (!q || 'error' in q) continue;
   console.log(`\n### ${kind}  (${q.archetype}, ${q.rarity}, ${q.location})`);
   console.log(`   SITUATION: ${strip(q.situation)}`);
+  console.log(`   OFFERED: ${strip(q.offeredReward||'—')}`);
   console.log(`   JOB: ${strip(q.job)}`);
 }
 console.log('\n(done)');

@@ -38,6 +38,7 @@ for (let c = 0; c < 30 && done < TARGET_DONE; c++) {
     console.log(`\n  -- beat ${q.beat}${q.finale ? ' (FINALE)' : ''} of "${strip(ch.title)}"  [reward: ${q.finale ? 'FINALE→focal+bank' : q.immediate ? 'IMMEDIATE (loot now + bank floor)' : 'DEFERRED (banks)'}] [tests: ${attr}] --`);
     console.log(`     SITUATION: ${wrap(q.situation)}`);
     console.log(`     JOB: ${strip(q.job)}`);
+    console.log(`     OFFERED: ${strip(q.offeredReward||'—')}`);
     console.log(`     proposedLoot: ${strip(q.proposedLoot || '—')}`);
     if (q.groups) console.log(`     approaches: ${q.groups.map((g: any) => `${strip(g.label)}[${g.rewardKind}·${q.slots[g.slotIndices[0]]?.tested?.attribute}]`).join(' · ')}`);
     if (q.finale) console.log(`     FINALE endings (chainBeat@finale): ${(q.groups||[]).map((g:any)=>`${strip(g.label)}[${g.rewardKind}]`).join(' · ') || '—'}`);

@@ -131,6 +131,7 @@ export interface Quest {
   job: string;
   stakes: string;        // the beat's PROPOSED reveal (a suggestion; resolution decides what's actually learned)
   proposedLoot?: string; // the beat's PROPOSED side-loot flavour (resolution decides the actual haul)
+  offeredReward?: string;// PLAYER-FACING: what's offered for this job (shown on the card; AI-written flavour)
   immediate?: boolean;   // chain beat: the AI flagged tangible loot NOW (engine pays a share now, banks the rest)
   // the ask
   slots: QuestSlot[];

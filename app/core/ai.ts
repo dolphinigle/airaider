@@ -17,7 +17,7 @@ export interface CardAskInput {
   archetype: string; location: string; slotCount: number; rewardSeed: string;
   arrival?: string;   // engine-rotated: HOW this job reaches the boss (vary the opening across jobs)
 }
-export interface CardAskOut { situation: string; job: string; ask: AskOut }
+export interface CardAskOut { situation: string; job: string; offeredReward: string; ask: AskOut }
 
 export interface OutcomeInput {
   situation: string; job: string;
@@ -109,7 +109,7 @@ export interface ChainBeatInput {
   introduced?: string[];   // names the player has already met — orient ONLY names NOT in this list
 }
 export interface ChainBeatOut {
-  situation: string; job: string; ask: AskOut; proposedReward: string; newLayerRevealed: string;
+  situation: string; job: string; offeredReward?: string; ask: AskOut; proposedReward: string; newLayerRevealed: string;
   closesChain?: boolean;   // the AI's call: is THIS beat the arc's climax? (only honored when the engine permits)
   // the AI's call: does THIS beat hand the company tangible loot RIGHT NOW (raid/loot/seize/crack-a-chest),
   // vs only making progress? The engine sizes it AND still defers a share to the finale bank (REWARD_BANK.md).
@@ -172,6 +172,7 @@ export class MockNarrator implements Narrator {
     return {
       situation: `A petitioner reaches the gate from ${i.location}: ${i.rewardSeed}.`,
       job: `Take the ${i.archetype} job and see it done.`,
+      offeredReward: i.rewardSeed || 'good coin',
       ask: { attribute: ARCH_ATTR[i.archetype] ?? 'physical', favoredTags: ARCH_FAVORED[i.archetype] ?? [], slots: Array.from({ length: i.slotCount }, () => ({ kind: 'open' as const })) },
     };
   }
@@ -227,6 +228,7 @@ export class MockNarrator implements Narrator {
     return {
       situation: `A new turn in the matter at ${i.region}: ${i.beatConstraint}.`,
       job: 'Follow the thread one step further.',
+      offeredReward: 'good coin, and the prize at the saga\'s end',
       ask: { attribute: 'intelligence', favoredTags: ['skill:lore', 'pers:brave'], slots: Array.from({ length: i.slotCount }, () => ({ kind: 'open' as const })) },
       proposedReward: 'a little coin and a clue',
       newLayerRevealed: 'one more layer of the truth surfaces',
