@@ -9,7 +9,7 @@ import { ATTRIBUTES, type Attribute } from './types.js';
 import type {
   Narrator, NarratorOptions, CardAskInput, CardAskOut, OutcomeInput, OutcomeOut,
   FleshInput, FleshOut, GenesisInput, GenesisOut, ChainBeatInput, ChainBeatOut,
-  ConceptTagsInput, ConceptTagsOut, AskOut, AICallRecord,
+  ConceptTagsInput, ConceptTagsOut, AskOut, AICallRecord, OfferKind, OfferedReward,
 } from './ai.js';
 
 const VOCAB = promptVocabBlock();
@@ -26,7 +26,8 @@ const zAsk = z.object({
   favoredTags: z.array(z.string()).default([]),
   slots: z.array(z.string()).default([]),
 });
-const zCardAsk = z.object({ situation: z.string(), job: z.string(), offeredReward: z.string().default(''), ask: zAsk });
+const zOffer = z.object({ kind: z.string().default('gold'), label: z.string().default('') });
+const zCardAsk = z.object({ situation: z.string(), job: z.string(), offeredReward: zOffer.default({ kind: 'gold', label: '' }), ask: zAsk });
 const zOutcome = z.object({
   beforeRoll: z.string(), afterRoll: z.string(),
   captive: z.object({ name: z.string(), who: z.string() }).nullable().optional(),
@@ -56,7 +57,7 @@ const zGenesis = z.object({
   directions: z.array(z.union([z.object({ kind: z.string().optional(), hook: z.string() }), z.string()])).default([]),
   openDirections: z.array(z.union([z.object({ kind: z.string().optional(), hook: z.string() }), z.string()])).optional(),
 });
-const zChainBeat = z.object({ situation: z.string(), job: z.string(), offeredReward: z.string().default(''), ask: zAsk, proposedReward: z.string(), newLayerRevealed: z.string(), closesChain: z.union([z.boolean(), z.string(), z.null()]).optional(),
+const zChainBeat = z.object({ situation: z.string(), job: z.string(), offeredReward: zOffer.optional(), ask: zAsk, proposedReward: z.string(), newLayerRevealed: z.string(), closesChain: z.union([z.boolean(), z.string(), z.null()]).optional(),
   immediateReward: z.union([z.boolean(), z.string(), z.null()]).optional(),
   choices: z.array(z.object({ label: z.string(), attribute: z.string().default('physical'), favored: z.array(z.string()).default([]), kind: z.string().optional() })).optional() });
 const zConcept = z.object({ name: z.string(), who: z.string(), tags: z.array(z.string()).default([]) });
@@ -64,6 +65,13 @@ const zConcept = z.object({ name: z.string(), who: z.string(), tags: z.array(z.s
 function normAttr(a: string): Attribute {
   const x = a.trim().toLowerCase() as Attribute;
   return (ATTRIBUTES as readonly string[]).includes(x) ? x : 'physical';
+}
+const OFFER_KINDS = ['gold', 'captive', 'recruit', 'item', 'none'];
+const OFFER_FALLBACK: Record<string, string> = { gold: 'good coin', captive: 'a captive to ransom', recruit: 'a recruit who joins you', item: 'salvage worth selling', none: "nothing — they're begging" };
+function normOffer(o: { kind?: string; label?: string } | undefined): OfferedReward {
+  const kind = (OFFER_KINDS.includes(String(o?.kind)) ? String(o?.kind) : 'gold') as OfferKind;
+  const label = (String(o?.label ?? '').trim().slice(0, 60)) || OFFER_FALLBACK[kind];
+  return { kind, label };
 }
 function normAsk(a: { attribute: string; favoredTags?: string[]; slots?: string[] }): AskOut {
   return {
@@ -139,7 +147,7 @@ export class OpenAINarrator implements Narrator {
       `You write ONE mercenary job as it ARRIVES at the player. The player is the BOSS of a mercenary company, at their fort; they read this and decide whether to take it and which mercs to send. They are NOT in the field — NEVER narrate the company already doing the job (that happens later, once they're sent).\n` +
       `Output JSON only:\n` +
       `{ "situation": "the PLAYER-FACING intro (2-3 plain sentences). Open from the 'how it reaches you' line below, WOVEN into real sentences — NEVER quote or echo that instruction. Whoever brings it speaks ONE line of DIALOGUE stating the WORK plainly. A line about the pay may surface naturally in their words, but the exact reward goes in 'offeredReward' below. NO numbers ('good coin', not '40 gold'). The job MUST match the JOB TYPE below and be SPECIFIC to this place/people; invent it FRESH.",\n` +
-      `  "offeredReward": "PLAYER-FACING, <=8 words: what the company is OFFERED for the job, plainly — the player reads this to decide. The player is a profit-driven mercenary boss, so be honest about the draw: e.g. 'a fat purse', 'good coin + salvage rights', 'a skilled recruit if they live', 'a captive to ransom', or — if it's a desperate plea — 'little but their gratitude' / 'nothing — they're begging'. Match the DRAW given below; NEVER a number.",\n` +
+      `  "offeredReward": { "kind": "what the company GETS — one of: gold | captive (a prisoner to ransom/hold) | recruit (a fighter who joins you) | item | none (a desperate plea, no pay). Pick what FITS the job + JOB TYPE (a raid pays gold; a hunt/capture yields a captive; a rescue can win a recruit).", "label": "PLAYER-FACING <=8 words naming it plainly: 'a fat purse' / 'the captured smuggler, to ransom' / 'a skilled fighter if they live' / 'nothing — they're begging'. NEVER a number." },\n` +
       `  "job": "one terse line for your own records (NOT shown to the player): the concrete task",\n` +
       `  "ask": { "attribute": "one of ${ATTRS} (what this job mainly tests)",\n` +
       `    "favoredTags": ["0-3 tag words from the vocabulary, bare (no prefix)"],\n` +
@@ -148,14 +156,13 @@ export class OpenAINarrator implements Narrator {
       `${VOCAB_BLOCK}\n` +
       `ATTRIBUTE — pick the one the job's CORE test needs, matched to the JOB TYPE: raid→physical, a stealth/scout/hunt→agility or perception, an investigation→intelligence, a parley/escort-by-trust→charisma, an ambush-or-be-ambushed→perception.\n` +
       `WRITING: plain, concrete, readable-once words; ONE line of dialogue brings it alive. NO flowery diction ("blisters the reedsea"), NO invented/obscure coinages — name things plainly. NEVER write numbers or coin amounts. Give exactly one "slots" entry per mercenary the company can send. Prefer "open" slots. JSON only.`;
-    const drawKind = (i.rewardSeed || 'coin').replace(/~?\d[\d,]*\s*gold/gi, 'coin').replace(/\s+/g, ' ').trim();
     const arrivalLine = i.arrival ? `how it reaches you (weave into the scene, do NOT quote this): ${i.arrival}\n` : '';
-    const user = `JOB TYPE: ${i.archetype}\nLocation: ${i.location}\n${arrivalLine}Mercenaries the company can send: ${i.slotCount}\nThe draw to dangle (describe its KIND, NEVER a number): ${drawKind}\nJSON only.`;
+    const user = `JOB TYPE: ${i.archetype}\nLocation: ${i.location}\n${arrivalLine}Mercenaries the company can send: ${i.slotCount}\nJSON only.`;
     const out = await this.json('cardAsk', system, user, zCardAsk, this.mechanicalModel, 'minimal', 1200);
     const ask = normAsk(out.ask);
     while (ask.slots.length < i.slotCount) ask.slots.push({ kind: 'open' });
     ask.slots.length = i.slotCount;
-    return { situation: out.situation, job: out.job, offeredReward: out.offeredReward || drawKind, ask };
+    return { situation: out.situation, job: out.job, offeredReward: normOffer(out.offeredReward), ask };
   }
 
   async outcome(i: OutcomeInput): Promise<OutcomeOut> {
@@ -292,7 +299,7 @@ export class OpenAINarrator implements Narrator {
       `Output JSON only:\n` +
       `{ "situation": "the player's ONLY text for this job (2-4 plain sentences). The player is the BOSS at their fort deciding whether to send mercs on this step — so write WHAT REACHES THEM THIS TURN: the petitioner/job arriving (the opener), OR one of your own mercs / a runner bringing word of the next step, OR a development pressing in. Use a line of DIALOGUE where someone speaks. What the company would DO must be PLAIN from the scene and the speaker's ask — but convey it NATURALLY; do NOT tack on a meta 'If you send men, they will…' clause. Keep the company's GAIN in view — these are mercenaries working for profit (coin, salvage, the recruit/captive this saga is chasing); the opener especially makes plain what's in it for them, never a payoff-free plea. Do NOT narrate the company already out in the field doing it (that happens AFTER you send them). READABILITY: clean plain sentences read once and understood — NOT fragment-stacks ('Grey morning. Mud. A man.'), NOT run-ons, NO flowery diction ('blisters the reedsea'), NO invented/obscure coinages — name things plainly. ORIENT a person ONCE on first appearance (natural apposition, not parens); a name in the ALREADY-MET list uses their BARE name.",\n` +
       `  "job": "one terse line for your own records (NOT shown to the player): the concrete task this step (escort / recover / confront / investigate a specific thing)",\n` +
-      `  "offeredReward": "PLAYER-FACING, <=8 words: what the company is OFFERED here, plainly — coin for the step and/or the saga's prize (the recruit/captive worth taking). Honest range, from 'a fat purse' to 'little but goodwill'. NEVER a number.",\n` +
+      `  "offeredReward": { "kind": "one of: gold | captive | recruit | item | none — what the company stands to GET (coin for the step, and/or the saga's prize)", "label": "PLAYER-FACING <=8 words, plain, NEVER a number — e.g. 'a fat purse' / 'the smith, to recruit' / 'little but goodwill'" },\n` +
       `  "ask": { "attribute": "${ATTRS}", "favoredTags": ["0-3 bare tag words"], "slots": ["one entry per mercenary the company can send (the count is given below): open OR a single tag word this job plainly needs"] },\n` +
       `  "proposedReward": "<=12 words — the tangible LOOT this job plausibly drops (a purse, a strongbox's coin, a salvaged tool); the GAME sets its value. NOT the run's payoff — that is decided at the end.",\n` +
       `  "immediateReward": true/false — TRUE only if THIS job physically hands the company spoils RIGHT NOW (they raid/loot/seize/crack open something with coin or goods inside); FALSE for meet/scout/travel/talk/escort/negotiate jobs that only make progress. Most jobs are FALSE. (The engine still banks a share toward the payoff regardless.)\n` +
@@ -323,7 +330,7 @@ export class OpenAINarrator implements Narrator {
       favored: canonicalTags(c.favored ?? []),
       ...(c.kind && KIND_OK.includes(String(c.kind)) ? { kind: String(c.kind) as 'recruit' | 'captive' | 'gold' } : {}),
     })).slice(0, 3);
-    return { ...out, ask, closesChain: out.closesChain === true || out.closesChain === 'true', immediateReward: out.immediateReward === true || out.immediateReward === 'true', choices: choices.length >= 2 ? choices : undefined };
+    return { ...out, ask, offeredReward: normOffer(out.offeredReward), closesChain: out.closesChain === true || out.closesChain === 'true', immediateReward: out.immediateReward === true || out.immediateReward === 'true', choices: choices.length >= 2 ? choices : undefined };
   }
 
   async conceptTags(i: ConceptTagsInput): Promise<ConceptTagsOut> {

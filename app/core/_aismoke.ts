@@ -18,7 +18,7 @@ const n = await makeNarrator({ provider: 'openai', apiKey: loadKey(), log });
 console.log('narrator:', n.kind, '\n');
 
 console.log('— cardAsk (capture/2)');
-const ca = await n.cardAsk({ archetype: 'capture', location: 'the Saltreach fens', slotCount: 2, rewardSeed: 'a sullen poacher taken alive' });
+const ca = await n.cardAsk({ archetype: 'capture', location: 'the Saltreach fens', slotCount: 2 });
 console.log(JSON.stringify(ca, null, 2), '\n');
 
 console.log('— conceptTags');

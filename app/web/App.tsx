@@ -143,7 +143,7 @@ function QuestCard({ quest }: { quest: Quest }) {
       {/* ONE text for the player: the intro (situation). The terse `job` is engine-internal, not shown. */}
       <p className="situation">{quest.situation}</p>
       {/* explicit, player-facing "what's offered" line (AI-written; ranges from a fat purse to nothing) */}
-      <p className="reward"><b>Offered:</b> {quest.offeredReward || rewardEnvelope(quest.reward)}</p>
+      <p className="reward"><b>Offered:</b> {quest.offeredReward ? quest.offeredReward.label : rewardEnvelope(quest.reward)}</p>
       {quest.groups
         ? <div className="branches"><div className="branchhdr">Choose ONE approach:</div>{quest.groups.map((g) => <Branch key={g.id} quest={quest} group={g} />)}</div>
         : <div className="slots">{quest.slots.map((_, i) => <Slot key={i} quest={quest} index={i} />)}</div>}

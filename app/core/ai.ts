@@ -14,10 +14,14 @@ export interface AskOut {
   slots: Array<{ kind: 'open' } | { kind: 'must-have'; tag: string }>;
 }
 export interface CardAskInput {
-  archetype: string; location: string; slotCount: number; rewardSeed: string;
+  archetype: string; location: string; slotCount: number;
   arrival?: string;   // engine-rotated: HOW this job reaches the boss (vary the opening across jobs)
 }
-export interface CardAskOut { situation: string; job: string; offeredReward: string; ask: AskOut }
+// the AI OFFERS a reward in an ENGINE-READABLE vocabulary (kind) + a player-facing label; the engine
+// then actually GRANTS that kind (so the offer and the payout are the same thing, not disconnected flavor).
+export type OfferKind = 'gold' | 'captive' | 'recruit' | 'item' | 'none';
+export interface OfferedReward { kind: OfferKind; label: string }
+export interface CardAskOut { situation: string; job: string; offeredReward: OfferedReward; ask: AskOut }
 
 export interface OutcomeInput {
   situation: string; job: string;
@@ -109,7 +113,7 @@ export interface ChainBeatInput {
   introduced?: string[];   // names the player has already met — orient ONLY names NOT in this list
 }
 export interface ChainBeatOut {
-  situation: string; job: string; offeredReward?: string; ask: AskOut; proposedReward: string; newLayerRevealed: string;
+  situation: string; job: string; offeredReward?: OfferedReward; ask: AskOut; proposedReward: string; newLayerRevealed: string;
   closesChain?: boolean;   // the AI's call: is THIS beat the arc's climax? (only honored when the engine permits)
   // the AI's call: does THIS beat hand the company tangible loot RIGHT NOW (raid/loot/seize/crack-a-chest),
   // vs only making progress? The engine sizes it AND still defers a share to the finale bank (REWARD_BANK.md).
@@ -170,9 +174,9 @@ export class MockNarrator implements Narrator {
 
   async cardAsk(i: CardAskInput): Promise<CardAskOut> {
     return {
-      situation: `A petitioner reaches the gate from ${i.location}: ${i.rewardSeed}.`,
+      situation: `A petitioner reaches the gate from ${i.location} with a ${i.archetype} job.`,
       job: `Take the ${i.archetype} job and see it done.`,
-      offeredReward: i.rewardSeed || 'good coin',
+      offeredReward: { kind: (({ capture: 'captive', hunt: 'captive', rescue: 'recruit' } as Record<string, 'gold' | 'captive' | 'recruit'>)[i.archetype] ?? 'gold'), label: 'good coin' },
       ask: { attribute: ARCH_ATTR[i.archetype] ?? 'physical', favoredTags: ARCH_FAVORED[i.archetype] ?? [], slots: Array.from({ length: i.slotCount }, () => ({ kind: 'open' as const })) },
     };
   }
@@ -228,7 +232,7 @@ export class MockNarrator implements Narrator {
     return {
       situation: `A new turn in the matter at ${i.region}: ${i.beatConstraint}.`,
       job: 'Follow the thread one step further.',
-      offeredReward: 'good coin, and the prize at the saga\'s end',
+      offeredReward: { kind: 'gold', label: 'coin, and the prize at the saga\'s end' },
       ask: { attribute: 'intelligence', favoredTags: ['skill:lore', 'pers:brave'], slots: Array.from({ length: i.slotCount }, () => ({ kind: 'open' as const })) },
       proposedReward: 'a little coin and a clue',
       newLayerRevealed: 'one more layer of the truth surfaces',

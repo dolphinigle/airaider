@@ -16,7 +16,9 @@ for (const lead of [...eng.leads()]) {
   if (!q || 'error' in q) continue;
   console.log(`\n### ${kind}  (${q.archetype}, ${q.rarity}, ${q.location})`);
   console.log(`   SITUATION: ${strip(q.situation)}`);
-  console.log(`   OFFERED: ${strip(q.offeredReward||'—')}`);
+  const off = q.offeredReward;
+  const granted = (q.reward?.cards||[]).map((c:any)=>c.class==='character'?`${c.role}`:c.class).join('+') || 'nothing';
+  console.log(`   OFFERED: [${off?.kind}] "${strip(off?.label||'—')}"   → GRANTED: ${granted}`);
   console.log(`   JOB: ${strip(q.job)}`);
 }
 console.log('\n(done)');
