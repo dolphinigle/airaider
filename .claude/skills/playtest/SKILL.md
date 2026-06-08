@@ -1,63 +1,62 @@
 ---
 name: playtest
-description: Dogfood-playtest the airaider game loop with the REAL AI — drive the engine through many cycles (one-offs AND quest chains), read every prompt + result for coherence, and assert engine/AI invariants to catch bugs (e.g. the AI hallucinating reward types, the engine mis-applying AI output). Use after any change to story-gen, quests, rewards, chains, or the narrator prompts.
+description: Dogfood-playtest airaider by READING the AI prompts and the prose they produce — judging writing QUALITY and whether the PROMPT itself is the problem (jargon a stateless model can't parse, stale/conflicting guidance, sticky examples it copies, instructions it echoes verbatim, smells/tics, vague outcomes). Invariant assertions are only a no-breakage backstop. Use after ANY change to a narrator prompt (openaiNarrator.ts) or to story-gen / quests / rewards / chains.
 ---
 
-# Playtest the airaider loop
+# Playtest airaider = read the prompts + read the prose
 
-Airaider's design question is *"is the AI-driven, character-driven quest chain fun?"* — so the only
-way to trust a change is to **play it and read the prose**, not to assert from the code. This skill is
-the dogfood loop. The **text CLI and the web GUI share `core/`**, so driving the engine headlessly
-exercises exactly what a player hits in either UI.
+Airaider's whole bet is *"is the AI-driven, character-driven quest fun to read?"* So playtesting is a
+**reading** activity, not an assertion activity. The job is to drive the REAL AI, **read the actual
+prompts and the text they produce**, and judge two things:
 
-## When to use
-After ANY change to: `core/quest.ts`, `core/economy.ts`, `core/openaiNarrator.ts` (prompts),
-`core/ai.ts`, chains/rewards/genesis, or the narrator. Big changes *introduce bugs* — assume they did.
+1. **Is the output good?** (coherent, readable-once, in-voice, dialogue where it helps, the outcome
+   unmistakable, the reward/offer clear, no smells.)
+2. **Is the PROMPT the reason it isn't?** Almost every problem this project has hit was a *prompt* fault,
+   not the model. So when the prose is off, open the prompt and find the cause.
 
-## Setup (one-time per run)
-- The OpenAI key is in `/home/irvan/airaider/.env` (`OPENAI_API_KEY=...`), gitignored, **read for
-  dogfooding only** — the user has authorized this. Never print or commit it.
-- Run harnesses from `app/` with `npx tsx <harness>.ts`. They use `provider: 'openai'` and
-  `GameEngine.create({ onCall })` to capture every prompt/response.
+Do NOT report "no invariant violations" as if that's a playtest. That only proves nothing crashed. The
+real findings come from reading.
 
-## The loop (per the user's instruction)
-Drive ~12–20 cycles. **On each iteration:**
-1. **Pursue BOTH one-offs and chains** — sort leads so chains fire (genesis → beats → finale), but
-   **always also pursue plain one-off leads** (`chain.kind === 'none'`). Non-chain quests must keep
-   working — they're easy to break when you touch chain code.
-2. **Read the prompt AND the result.** For each AI call (via `onCall`), check the *prose* is coherent
-   (situation reads cleanly, job is one concrete action, names oriented once) AND that the
-   **engine result matches the AI output** — the real bug class here is the seam between them.
-3. **Check the AI isn't hallucinating engine-controlled fields.** Parse each `chainBeat`/`outcome`
-   response and verify AI-proposed *types/flags* are sane and the engine handled them (e.g.
-   `immediateReward` is a clean bool; a FINALE is never treated as immediate; `closesChain` only
-   honored when the engine permits; `learned`/`loot` scaled to the outcome).
+## Setup
+- OpenAI key: `/home/irvan/airaider/.env` (`OPENAI_API_KEY=`), gitignored, read for dogfooding only (the
+  user authorized this). Never print/commit it. Run harnesses from `app/` with `npx tsx <harness>.ts`.
+- Capture EVERY prompt+response: `GameEngine.create({ provider: 'openai', onCall: r => calls.push(r) })`.
+  The record has `r.system`, `r.user`, `r.response`, `r.kind`, tokens. **Print and read them** — the
+  full system+user for the call type you changed, not just the parsed result.
 
-## Invariants to assert (flag, don't crash)
-- **One-offs**: a non-failure one-off delivers SOMETHING (gold or a unit). (Regression canary.)
-- **Chain finale**: crystallizes — focal delivered (recruit/captive) OR gold (ransom/void) OR, on
-  failure, lost. Never silently empty.
-- **Reward bank** (REWARD_BANK.md): `chain.bank` finite & ≥ 0; immediate beats bank the
-  `minDeferShare` floor; deferred beats bank in full; the finale includes its own earn.
-- **Off-rails**: a failed middle beat banks 0 and advances (no retry); `failsSpent ≤ budget+1`;
-  exceeding the budget forces a LAST-CHANCE finale.
-- **No throws**; **gold never negative**; every owned merc/captive is a complete card (name/who/
-  backstory/quirks).
+## The loop (read, don't assert)
+Drive ~8–15 real cycles over BOTH one-offs and chains (and let chains reach a finale). Each iteration:
+1. **Read the rendered prompt** for what you changed — as the stateless model sees it. Ask: is anything
+   jargon (it doesn't know "beat"/"slot"), stale, self-contradicting, a concrete example it will *copy*,
+   or an instruction label it will *echo verbatim*? Is the context it needs actually present?
+2. **Read the output as a player would.** Score the prose: does it read clean once? is the job/offer
+   clear? the outcome unmistakable? in the world's voice? Then hunt the **known smell classes** (all of
+   which we've hit and fixed — expect more):
+   - **templating / sticky example** — the same job/phrase every time because the prompt's example got copied.
+   - **verbatim echo** — the model pastes an instruction label ("ARRIVAL: …") into the output.
+   - **numbers / amounts** leaking ("40 gold") where they shouldn't.
+   - **formula** — every item ending the same way ("If you send men, they will…").
+   - **filter-words / telling** — "his scholar's eye found", "said angrily" (want: show the act / the line).
+   - **vague outcome** — you can't tell what was achieved or lost.
+   - **repetition** — same arrival/scene/opener across beats; over-orienting a name every time.
+   - **AI mis-using an engine field** — over/under-using a flag (immediateReward), hallucinating a kind,
+     a label that doesn't match its kind, an offer that doesn't match the grant.
+3. **Find the line in the prompt** that causes the smell, fix it, **re-run, re-read.** Iterate 2–4 rounds;
+   one read is never enough.
 
-## How
-Prefer the existing harness `app/_exp_playtest.ts` (real AI, captures prompts, asserts the above) as
-the starting point — run it, READ the dumped prompts/results, extend its assertions for whatever you
-just changed. For deterministic edge cases (forced failure patterns, last-chance, give-with-debt,
-void-to-gold) use `app/_exp_bank.ts` (mock, offline). Also run the offline gates every time:
-`npm run -s test` (selftest 226), `npm run -s looptest` (errors=0), `npm run -s conformance`.
+## Backstop (NOT the playtest)
+Run the offline gates to confirm you didn't break the engine — they use the Mock narrator so they can ONLY
+catch breakage, never judge prose: `npm run -s test` · `npm run -s looptest` · `npm run -s conformance`.
+A harness like `app/_exp_playtest2.ts` can assert structural invariants in passing, but treat that as the
+seatbelt, not the drive.
 
 ## Report back
-- Bugs found (engine/AI seam, hallucination, accounting) + the fix.
-- Prose quality: 1–2 lines on coherence, plus any smell (repetition, over-orientation, a flag the AI
-  over/under-uses). Note prompt-tuning opportunities separately from bugs.
-- Confirm one-offs still work and the offline suites are green.
+- The PROSE findings first: what read well, what smelled, with **example quotes** and the **prompt line**
+  responsible + the fix. Iterate until the re-read is clean.
+- Separate prompt-tuning nits from real bugs. Note token cost only if it changed.
+- Last and briefly: "offline gates green (no breakage)."
 
 ## Don't
-- Don't assert from the code that it "should" work — run it and read it.
-- Don't burn the whole budget: ~12 cycles is usually enough; one full chain + several one-offs is the
-  minimum useful sample. Read prompts in full for the part you changed; skim the rest.
+- Don't equate "invariants pass" with "playtested." Read the prose.
+- Don't read one sample and call it — variety hides in the 3rd/4th. Read across tones/archetypes.
+- Don't assert from the code that prose "should" be fine — generate it and read it.

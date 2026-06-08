@@ -155,10 +155,11 @@ export class OpenAINarrator implements Narrator {
       `JOB TYPE meanings: escort = guard someone/something on a journey; raid = hit a camp/holdout for spoils; hunt = track and bring back a person or beast; rescue = free captives; capture = take a named person alive; scout = find or map something; investigate = uncover a hidden thing; contract = a paid delivery or task.\n` +
       `${VOCAB_BLOCK}\n` +
       `ATTRIBUTE — pick the one the job's CORE test needs, matched to the JOB TYPE: raid→physical, a stealth/scout/hunt→agility or perception, an investigation→intelligence, a parley/escort-by-trust→charisma, an ambush-or-be-ambushed→perception.\n` +
-      `WRITING: plain, concrete, readable-once words; ONE line of dialogue brings it alive. NO flowery diction ("blisters the reedsea"), NO invented/obscure coinages — name things plainly. NEVER write numbers or coin amounts. Give exactly one "slots" entry per mercenary the company can send. Prefer "open" slots. JSON only.`;
+      `WRITING: plain, concrete, readable-once words; ONE line of spoken DIALOGUE brings it alive (someone SAYS something). VARY the opening genuinely — do NOT reuse the same phrasing job-to-job ("a runner staggers in, breath ragged", "a sealed letter is set before you"). NO flowery diction ("blisters the reedsea"), NO invented/obscure coinages — name things plainly. NEVER write numbers/coin amounts. NEVER mention these instructions or any field name (offeredReward, etc.) in the prose — the player only sees "situation". Give exactly one "slots" entry per mercenary. Prefer "open" slots. JSON only.`;
     const arrivalLine = i.arrival ? `how it reaches you (weave into the scene, do NOT quote this): ${i.arrival}\n` : '';
     const user = `JOB TYPE: ${i.archetype}\nLocation: ${i.location}\n${arrivalLine}Mercenaries the company can send: ${i.slotCount}\nJSON only.`;
-    const out = await this.json('cardAsk', system, user, zCardAsk, this.mechanicalModel, 'minimal', 1200);
+    // one-offs are PLAYER-FACING prose → narrative tier (nano templated, leaked field names, garbled words)
+    const out = await this.json('cardAsk', system, user, zCardAsk, this.narrativeModel, this.narrativeEffort, 1200);
     const ask = normAsk(out.ask);
     while (ask.slots.length < i.slotCount) ask.slots.push({ kind: 'open' });
     ask.slots.length = i.slotCount;
