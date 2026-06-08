@@ -31,7 +31,7 @@ const zCardAsk = z.object({ situation: z.string(), job: z.string(), offeredRewar
 const zOutcome = z.object({
   beforeRoll: z.string(), afterRoll: z.string(),
   captive: z.object({ name: z.string(), who: z.string() }).nullable().optional(),
-  punishment: z.string().nullable().optional(),
+  malus: z.object({ kind: z.string().default('none'), label: z.string().default('') }).optional(),
   learned: z.string().nullable().optional(),
   loot: z.string().nullable().optional(),
 });
@@ -173,7 +173,7 @@ export class OpenAINarrator implements Narrator {
       `{ "beforeRoll": "${i.beforeWords ?? '35-55'} words (HARD LIMIT — the upper number is a ceiling, never exceed it): the BUILDUP to the roll. Set the scene and let the CHALLENGE materialise (the threat rises to meet them, the obstacle resists), and the merc(s) COMMIT. END ON THE BRINK — the held breath the instant before fate decides (blade raised, question asked, weight thrown). Do NOT hint or state the result; stop right before it. This is the moment the player is gambling on.",\n` +
       `  "afterRoll": "${i.afterWords ?? '55-90'} words (HARD LIMIT — the upper number is a ceiling, NEVER exceed it; nearer the lower number is fine): the CONSEQUENCE that follows now the OUTCOME is set. OPEN INSIDE THE ACTION — do NOT begin with 'The dice…' or by announcing the verdict/roll/luck (no 'the dice fall', 'fate decides', 'fortune favors'); start on what a merc DOES or what HAPPENS. Pay it off with weight; EACH named merc gets their own distinct beat, true to their tags. Show what is won or lost. SUCCESS = clean; PARTIAL = it works but a cost lands (shown); FAILURE = the attempt fails and a consequence bites.${i.finale ? ' THIS IS THE CLIMAX of a long saga — give it the weight of an ENDING: the payoff of everything built, the fate of the focal sealed. Earn the length; do not pad.' : ''}",\n` +
       `  "captive": { "name": "string", "who": "one line, fits the captive tags" } or null,\n` +
-      `  "punishment": "<=12 words: only if OUTCOME=FAILURE and the job was RISKY — the consequence that lands; else null",\n` +
+      `  "malus": { "kind": "the lasting COST the company takes — one of: none (a clean run, or a clean failure with no extra sting) | debt (you now OWE someone coin) | injury (a merc is hurt) | liability (evidence/a mess that follows you). SUCCESS and PARTIAL are almost always 'none'. On FAILURE, mostly 'none' or — for a risky job gone wrong — 'debt'. (Use injury/liability sparingly.)", "label": "<=10 words player-facing, e.g. 'a debt to the smuggler Garr' / 'Marek's arm gashed'. NEVER a number. '' when none." },\n` +
       `  "learned": "<=18 words: the ONE concrete truth the company comes away KNOWING this beat — a NAME, a face, a deed (never 'a hidden actor'). YOU decide it from the SUGGESTED truth + the OUTCOME: success = the suggested truth (or a sharper version); partial = only PART of it, hedged or learned at a cost; failure = \\"\\" (nothing concrete, or only a misleading scrap). Whatever you set here MUST also be shown being discovered in afterRoll.",\n` +
       `  "loot": "<=10 words: the side-loot actually carried off this beat (flavour only — the game sets value). success = the suggested loot; partial = a lesser haul; failure = \\"\\"" }\n` +
       `OUTCOME MEANINGS: SUCCESS = clean, captive taken (if any), the truth and loot won. PARTIAL = won but at a COST you must SHOW (a wound / complication / only PART of the truth / lesser haul). FAILURE = captive NOT taken (captive=null), little or nothing learned; a consequence lands. The DICE have already decided the outcome — your job is to narrate it AND decide, scaled to it, what was learned and gained.\n` +
@@ -195,7 +195,8 @@ export class OpenAINarrator implements Narrator {
       (i.proposedLoot ? `SUGGESTED LOOT (what the beat could drop — scale to the OUTCOME): "${i.proposedLoot}"\n` : '') +
       `RISKY: ${i.risky ? 'yes' : 'no'}\nOUTCOME: ${i.outcome.toUpperCase()}\nJSON only.`;
     const out = await this.json('outcome', system, user, zOutcome, this.narrativeModel, this.narrativeEffort, 1600);
-    return { beforeRoll: out.beforeRoll, afterRoll: out.afterRoll, captive: out.captive ?? null, punishment: out.punishment ?? null, learned: out.learned ?? null, loot: out.loot ?? null };
+    const mk = ['none', 'debt', 'injury', 'liability'].includes(String(out.malus?.kind)) ? String(out.malus?.kind) as 'none' | 'debt' | 'injury' | 'liability' : 'none';
+    return { beforeRoll: out.beforeRoll, afterRoll: out.afterRoll, captive: out.captive ?? null, malus: { kind: mk, label: String(out.malus?.label ?? '').slice(0, 60) }, learned: out.learned ?? null, loot: out.loot ?? null };
   }
 
   async flesh(i: FleshInput): Promise<FleshOut> {

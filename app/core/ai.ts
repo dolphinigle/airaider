@@ -43,7 +43,9 @@ export interface OutcomeInput {
 export interface OutcomeOut {
   beforeRoll: string; afterRoll: string;
   captive?: { name: string; who: string } | null;
-  punishment?: string | null;                       // short flavor for a failure consequence
+  // the AI picks a MALUS in an engine-readable vocabulary (mirrors the reward). For now only 'debt' is
+  // wired (a negative-gold liability); 'injury'/'liability' are narrated + FLAGGED for later effects.
+  malus?: { kind: 'none' | 'debt' | 'injury' | 'liability'; label: string };
   learned?: string | null;                          // what the company ACTUALLY comes away knowing (scaled to
                                                      // the outcome; '' / null on a clean failure). Decided here.
   loot?: string | null;                             // the side-loot flavor actually gained ('' / null if none)
@@ -194,7 +196,7 @@ export class MockNarrator implements Narrator {
       captive: i.captiveTags && i.outcome !== 'failure'
         ? { name: `${pick(r, NAMES)} ${pick(r, BYNAMES)}`, who: `A captive marked by ${i.captiveTags.slice(0, 2).join(' and ')}.` }
         : null,
-      punishment: i.outcome === 'failure' && i.risky ? 'a wound taken in the retreat' : null,
+      malus: i.outcome === 'failure' && i.risky ? { kind: 'debt' as const, label: 'a debt from the botched job' } : { kind: 'none' as const, label: '' },
       // mock: resolution decides learned/loot from the proposals, scaled to the outcome.
       learned: i.outcome === 'failure' ? null : (i.proposedReveal ?? null),
       loot: i.outcome === 'failure' ? null : (i.proposedLoot ?? null),

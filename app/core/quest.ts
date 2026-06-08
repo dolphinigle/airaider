@@ -514,7 +514,7 @@ export async function resolveQuest(state: GameState, ai: Narrator, quest: Quest)
   if (narr.loot && !quest.finale) { const loot = quest.reward.cards.find((c) => c.class !== 'character'); if (loot) loot.name = narr.loot.slice(0, 60); }
 
   const deliveredChars: CharacterCard[] = [];
-  const delivered = deliverReward(state, r, quest, outcome, narr.captive ?? null, narr.punishment ?? null, party, deliveredChars);
+  const delivered = deliverReward(state, r, quest, outcome, narr.captive ?? null, narr.malus ?? { kind: 'none', label: '' }, party, deliveredChars);
 
   // flowchart step 9: flesh delivered characters (backstory + quirks → the living dossier).
   // Only the keepers (mercs/captives) and only once (skip if already fleshed) to bound cost.
@@ -557,7 +557,7 @@ function grantXp(state: GameState, m: CharacterCard, level: number, outcome: Out
 }
 
 // ---- delivery ---------------------------------------------------------------
-function deliverReward(state: GameState, r: Rng, quest: Quest, outcome: Outcome, aiCaptive: { name: string; who: string } | null, punishment: string | null, party: CharacterCard[], delivered: CharacterCard[]): string[] {
+function deliverReward(state: GameState, r: Rng, quest: Quest, outcome: Outcome, aiCaptive: { name: string; who: string } | null, malus: { kind: 'none' | 'debt' | 'injury' | 'liability'; label: string }, party: CharacterCard[], delivered: CharacterCard[]): string[] {
   const out: string[] = [];
   const bundle = quest.reward;
   // CHAIN BANK ACCRUAL (REWARD_BANK.md): each beat earns its merc-cycles, scaled to the outcome. A beat the
@@ -580,10 +580,13 @@ function deliverReward(state: GameState, r: Rng, quest: Quest, outcome: Outcome,
     }
   }
   if (outcome === 'failure') {
-    if (quest.risky && punishment) {
-      const victim = party[randInt(r, 0, Math.max(0, party.length - 1))];
-      if (victim && r() < 0.6) { victim.injuries.push({ id: 'injury:wound', tier: randInt(r, 2, 4) }); out.push(`${victim.name} is wounded (${punishment})`); }
-      else { const d = liabilityCard(mk(state), 'debt', Math.round(BALANCE.vBase(quest.level) * 0.5), state.cycle); d.location = 'roster'; addCard(state, d); out.push(`a debt: ${punishment}`); }
+    // AI-chosen MALUS (engine-readable). Only 'debt' is wired (a negative-gold liability); injury/liability
+    // are narrated + FLAGGED for later mechanical effects. 'none' = a clean failure.
+    if (malus.kind === 'debt') {
+      const d = liabilityCard(mk(state), 'debt', Math.round(BALANCE.vBase(quest.level) * 0.5), state.cycle); d.location = 'roster'; addCard(state, d);
+      out.push(`a debt — ${malus.label || 'you owe coin now'}`);
+    } else if (malus.kind !== 'none' && malus.label) {
+      out.push(malus.label);   // TODO: wire injury (wound a merc) / liability (evidence/mess card) effects
     } else out.push('nothing gained');
     // on a finale failure the focal character is lost; intermediate beats keep it safe
     if (quest.finale) handleFinaleFate(state, quest, 'failure', out, aiCaptive, delivered);
