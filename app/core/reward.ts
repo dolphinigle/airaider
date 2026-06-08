@@ -11,7 +11,7 @@ import { characterFromGen, goldCard, liabilityCard, type MkId } from './cards.js
 export interface RewardSpec {
   V: number; archetype: Archetype; isChain: boolean; level: number;
   requiredTags?: string[];   // AI-chosen concept tags for a focal/known character
-  forceKind?: 'gold' | 'captive' | 'recruit' | 'item' | 'none';  // the AI's OFFERED kind drives the actual grant
+  forceKind?: 'gold' | 'captive' | 'recruit' | 'item' | 'unknown' | 'none';  // the AI's OFFERED kind drives the actual grant
 }
 
 const KIND_ROLE: Partial<Record<RewardKind, 'merc' | 'captive'>> = { recruit: 'merc', captive: 'captive' };
@@ -20,11 +20,13 @@ export function generateReward(r: Rng, mkId: MkId, cycle: number, spec: RewardSp
   // the AI OFFERED a kind (engine-readable) → grant THAT kind, sized to V (a captive/recruit keeps a small
   // gold remainder for the value a single unit can't hold). 'none' = a charity job with no reward.
   if (spec.forceKind === 'none') return { targetValue: 0, cards: [], kindHint: 'gold' };
-  const parts = spec.forceKind
-    ? (spec.forceKind === 'captive' || spec.forceKind === 'recruit'
+  // 'unknown' = a mystery job (a sealed shrine): the player doesn't know the spoils — roll the natural
+  // archetype reward as a surprise. Other forced kinds grant that kind (a unit also keeps incidental gold).
+  const parts = (!spec.forceKind || spec.forceKind === 'unknown')
+    ? splitValue(r, spec.V, spec.archetype, spec.isChain)
+    : (spec.forceKind === 'captive' || spec.forceKind === 'recruit'
       ? [{ kind: spec.forceKind as RewardKind, value: spec.V }]
-      : [{ kind: 'gold' as RewardKind, value: spec.V }])   // gold / item → gold for the prototype
-    : splitValue(r, spec.V, spec.archetype, spec.isChain);
+      : [{ kind: 'gold' as RewardKind, value: spec.V }]);   // gold / item → gold for the prototype
   const cards: Card[] = [];
   let primaryKind: RewardKind = 'gold';
 

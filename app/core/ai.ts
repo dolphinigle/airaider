@@ -19,7 +19,7 @@ export interface CardAskInput {
 }
 // the AI OFFERS a reward in an ENGINE-READABLE vocabulary (kind) + a player-facing label; the engine
 // then actually GRANTS that kind (so the offer and the payout are the same thing, not disconnected flavor).
-export type OfferKind = 'gold' | 'captive' | 'recruit' | 'item' | 'none';
+export type OfferKind = 'gold' | 'captive' | 'recruit' | 'item' | 'unknown' | 'none';
 export interface OfferedReward { kind: OfferKind; label: string }
 export interface CardAskOut { situation: string; job: string; offeredReward: OfferedReward; ask: AskOut }
 
