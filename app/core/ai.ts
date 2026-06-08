@@ -15,7 +15,8 @@ export interface AskOut {
 }
 export interface CardAskInput {
   archetype: string; location: string; slotCount: number;
-  arrival?: string;   // engine-rotated: HOW this job reaches the boss (vary the opening across jobs)
+  rewardKind?: 'gold' | 'captive' | 'recruit';  // REWARD-FIRST: the engine already rolled this; the AI labels it
+  arrival?: string;   // engine-thrown keyword spark(s) for HOW the job reaches the boss (the AI weaves it)
 }
 // the AI OFFERS a reward in an ENGINE-READABLE vocabulary (kind) + a player-facing label; the engine
 // then actually GRANTS that kind (so the offer and the payout are the same thing, not disconnected flavor).

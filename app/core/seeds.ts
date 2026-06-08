@@ -189,6 +189,17 @@ const NAME_SEEDS = [
   'Ulric', 'Nesta', 'Bram', 'Oswin', 'Tamsin', 'Voss', 'Hethra', 'Calder', 'Wynn', 'Jessa',
   'Roban', 'Imke', 'Sorrel', 'Davos', 'Kestrel', 'Anika', 'Merrow', 'Tibalt', 'Greer', 'Lune',
 ];
+// ARRIVAL SPARKS — a bag of keyword seeds for HOW a job reaches the boss's desk. The engine throws a
+// random one or two; the AI weaves them into the scene (like themes). Decorrelates the opening WITHOUT
+// prescribing a full sentence (a full sentence got copied verbatim).
+const ARRIVAL_WHO = ['one of your own mercs', 'a petitioner', 'a frightened runner', 'a courier', 'a creditor', 'a passing trader', 'a child', 'a rival', 'an old contact', 'a town official', 'a wounded survivor', 'a hooded stranger'];
+const ARRIVAL_HOW = ['a sealed letter', 'a posted notice', 'urgent word', 'a plea', 'a summons', 'a warrant', 'a torn map', 'a whispered tip', 'a bounty', 'a debt called in'];
+/** One or two arrival keyword-sparks for the AI to weave into the opening. */
+export function pickArrival(r: () => number): string {
+  const who = ARRIVAL_WHO[Math.floor(r() * ARRIVAL_WHO.length)];
+  const how = ARRIVAL_HOW[Math.floor(r() * ARRIVAL_HOW.length)];
+  return r() < 0.6 ? `${who}, ${how}` : who;   // sometimes just the bringer, sometimes bringer + how
+}
 /** A few fresh name seeds for the genesis to draw from / riff on. */
 export function pickNameSeeds(r: () => number, n = 5): string[] {
   return [...NAME_SEEDS].map((name) => ({ name, k: r() })).sort((a, b) => a.k - b.k).slice(0, n).map((x) => x.name);

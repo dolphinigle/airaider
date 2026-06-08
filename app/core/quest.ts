@@ -18,7 +18,7 @@ import {
   generateCharacter, type RollTest,
 } from './economy.js';
 import { generateReward } from './reward.js';
-import { pickThemes, pickPlace, pickTone, pickNameSeeds } from './seeds.js';
+import { pickThemes, pickPlace, pickTone, pickNameSeeds, pickArrival } from './seeds.js';
 import { characterFromGen, liabilityCard, type MkId } from './cards.js';
 import { tagDef } from './tags.js';
 import { uid, addCard, logLine, allMercs, captives } from './state.js';
@@ -152,21 +152,17 @@ export async function pursueLead(state: GameState, ai: Narrator, lead: Lead): Pr
   return pursueOneOff(state, ai, r, lead);
 }
 
-// engine-rotated: HOW a one-off job reaches the boss's desk (so they don't all open "X slams a letter down").
-const ARRIVALS = [
-  'one of your own mercs strides in and drops a notice on your desk',
-  'a petitioner is shown into your office, twisting a cap in their hands',
-  'a sealed letter arrives by courier and is set before you',
-  'a frightened runner is brought to you, still catching their breath',
-  'a passing trader leans in at the gate to mention it',
-  'an official or a creditor arrives, expecting to be heard',
-];
+// the engine-readable reward KIND of a bundle (for telling the AI what the engine already rolled).
+function offerKindOf(reward: RewardBundle): 'gold' | 'captive' | 'recruit' {
+  return reward.kindHint === 'recruit' ? 'recruit' : reward.kindHint === 'captive' ? 'captive' : 'gold';
+}
 async function pursueOneOff(state: GameState, ai: Narrator, r: Rng, lead: Lead): Promise<Quest> {
   const n = slotCountFor(lead, r);
   const V = questValue(lead.level, lead.rarity, n);
-  // the AI writes the job AND offers a reward KIND (engine-readable); the engine then GRANTS that kind.
-  const card = await ai.cardAsk({ archetype: lead.archetype, location: lead.location, slotCount: n, arrival: pick(r, ARRIVALS) });
-  const reward = generateReward(r, mk(state), state.cycle, { V, archetype: lead.archetype, isChain: false, level: lead.level, forceKind: card.offeredReward.kind });
+  // REWARD-FIRST (ECONOMY/QUESTS): the engine rolls the reward, THEN the AI writes the job + a player-facing
+  // label around it — the AI dresses the reward, it doesn't pick it.
+  const reward = generateReward(r, mk(state), state.cycle, { V, archetype: lead.archetype, isChain: false, level: lead.level });
+  const card = await ai.cardAsk({ archetype: lead.archetype, location: lead.location, slotCount: n, rewardKind: offerKindOf(reward), arrival: pickArrival(r) });
   const quest: Quest = {
     id: uid(state, 'quest'), leadId: lead.id, rarity: lead.rarity, level: lead.level, location: lead.location,
     archetype: lead.archetype, title: card.job.slice(0, 48), situation: card.situation, job: card.job,
