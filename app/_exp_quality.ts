@@ -33,6 +33,9 @@ for (const r of calls.filter((c) => c.kind === 'outcome')) {
   console.log(`\n  AFTER: ${strip(j.afterRoll)}`);
   if (j.malus && j.malus.kind !== 'none') console.log(`    malus:[${j.malus.kind}] "${strip(j.malus.label)}"`);
 }
-console.log('\n\n===== ONE FULL chainBeat PROMPT (read the prompt itself) =====');
+console.log('\n\n===== ONE FULL cardAsk (one-off) PROMPT — read the prompt itself =====');
+const ca = calls.find((c) => c.kind === 'cardAsk');
+if (ca) { console.log('--- SYSTEM ---\n' + ca.system); console.log('\n--- USER ---\n' + ca.user); console.log('\n--- RESPONSE ---\n' + ca.response); }
+console.log('\n\n===== ONE FULL chainBeat PROMPT =====');
 const cb = calls.find((c) => c.kind === 'chainBeat');
-if (cb) { console.log('--- SYSTEM ---\n' + cb.system); console.log('\n--- USER ---\n' + cb.user); }
+if (cb) { console.log('--- USER (bible+instruction) ---\n' + cb.user); }
