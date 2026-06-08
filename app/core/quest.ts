@@ -162,7 +162,7 @@ async function pursueOneOff(state: GameState, ai: Narrator, r: Rng, lead: Lead):
   // REWARD-FIRST (ECONOMY/QUESTS): the engine rolls the reward, THEN the AI writes the job + a player-facing
   // label around it — the AI dresses the reward, it doesn't pick it.
   const reward = generateReward(r, mk(state), state.cycle, { V, archetype: lead.archetype, isChain: false, level: lead.level });
-  const card = await ai.cardAsk({ archetype: lead.archetype, location: lead.location, slotCount: n, rewardKind: offerKindOf(reward), arrival: pickArrival(r) });
+  const card = await ai.cardAsk({ archetype: lead.archetype, location: lead.location, slotCount: n, rewardKind: offerKindOf(reward), theme: pickThemes(r), arrival: pickArrival(r) });
   const quest: Quest = {
     id: uid(state, 'quest'), leadId: lead.id, rarity: lead.rarity, level: lead.level, location: lead.location,
     archetype: lead.archetype, title: card.job.slice(0, 48), situation: card.situation, job: card.job,

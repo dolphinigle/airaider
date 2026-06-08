@@ -16,6 +16,7 @@ export interface AskOut {
 export interface CardAskInput {
   archetype: string; location: string; slotCount: number;
   rewardKind?: 'gold' | 'captive' | 'recruit';  // REWARD-FIRST: the engine already rolled this; the AI labels it
+  theme?: string;     // engine-thrown THEME keyword sparks to fuse into the job (decorrelates one-offs, like genesis)
   arrival?: string;   // engine-thrown keyword spark(s) for HOW the job reaches the boss (the AI weaves it)
 }
 // the AI OFFERS a reward in an ENGINE-READABLE vocabulary (kind) + a player-facing label; the engine

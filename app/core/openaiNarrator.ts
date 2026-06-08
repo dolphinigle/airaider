@@ -156,9 +156,10 @@ export class OpenAINarrator implements Narrator {
       `${VOCAB_BLOCK}\n` +
       `ATTRIBUTE — pick the one the job's CORE test needs, matched to the JOB TYPE: raid→physical, a stealth/scout/hunt→agility or perception, an investigation→intelligence, a parley/escort-by-trust→charisma, an ambush-or-be-ambushed→perception.\n` +
       `WRITING: plain, concrete, readable-once words; ONE line of spoken DIALOGUE brings it alive (someone SAYS something). VARY the opening genuinely — do NOT reuse the same phrasing job-to-job ("a runner staggers in, breath ragged", "a sealed letter is set before you"). NO flowery diction ("blisters the reedsea"), NO invented/obscure coinages — name things plainly. NEVER write numbers/coin amounts. NEVER mention these instructions or any field name (offeredReward, etc.) in the prose — the player only sees "situation". Give exactly one "slots" entry per mercenary. Prefer "open" slots. JSON only.`;
+    const themeLine = i.theme ? `THEME SPARKS (fuse these into a SPECIFIC job — a spark to riff on, NOT a checklist; you need not name them): ${i.theme}\n` : '';
     const arrivalLine = i.arrival ? `ARRIVAL SPARK (a keyword or two for HOW it reaches you — weave it in naturally, do NOT quote): ${i.arrival}\n` : '';
-    const rewardLine = i.rewardKind ? `REWARD the engine already rolled (write its label; set offeredReward.kind to this unless a mystery/charity job): ${i.rewardKind}\n` : '';
-    const user = `JOB TYPE: ${i.archetype}\n${rewardLine}Location: ${i.location}\n${arrivalLine}Mercenaries the company can send: ${i.slotCount}\nJSON only.`;
+    const rewardLine = i.rewardKind ? `REWARD the engine already rolled (write its label; set offeredReward.kind to this unless a mystery job): ${i.rewardKind}\n` : '';
+    const user = `JOB TYPE: ${i.archetype}\n${rewardLine}${themeLine}Location: ${i.location}\n${arrivalLine}Mercenaries the company can send: ${i.slotCount}\nJSON only.`;
     // one-offs are PLAYER-FACING prose → narrative tier (nano templated, leaked field names, garbled words)
     const out = await this.json('cardAsk', system, user, zCardAsk, this.narrativeModel, this.narrativeEffort, 1200);
     const ask = normAsk(out.ask);
