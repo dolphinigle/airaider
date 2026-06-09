@@ -154,6 +154,8 @@ export interface Chain {
   bible: string;             // settled truth (AI)
   direction: string;         // vague climax direction
   focalCardIds: string[];    // 1-2 generated focal characters
+  coreKind?: 'recruit' | 'captive';  // engine-decided END-reward kind, chosen at genesis (frames the bible)
+  coreReward?: string;       // structured "{rarity} {kind}: [{tags}]" — the END reward, generated FIRST (like one-offs)
   rarity: Rarity;
   level: number;
   expectedBeats: number;

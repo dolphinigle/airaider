@@ -30,6 +30,7 @@ for (let c = 0; c < 30 && done < TARGET_DONE; c++) {
       console.log(`HOOK: ${strip(ch.hook)}`);
       console.log(`FOCAL (the finale payoff): ${focal.name} — value ${focal.value}, ${strip(focal.who||'')}`);
       console.log(`   FOCAL TAGS: ${focal.tags.map((t:any)=>`${tagLabel(t.id,t.tier)}(T${t.tier})`).join(', ')}`);
+      console.log(`   CORE REWARD (rolled FIRST): ${ch.coreReward}`);
       console.log(`   CAST NAMES: ${(ch.bible.match(/^- ([^(]+?)\s*\(/gm)||[]).map((m:string)=>m.replace(/^- /,'').replace(/\s*\($/,'')).join(' · ')}`);
       (ch.arc||[]).forEach((s, i) => console.log(`   arc ${i + 1}: ${strip(s)}`));
       console.log(`   choiceBudget(engine): ${ch.choiceBudget}   BIBLE choiceSteps: [${(ch.choiceSteps||[]).join(', ')}]  (finale endings now written at finale time)`);

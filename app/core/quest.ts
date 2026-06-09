@@ -189,9 +189,13 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
   const kernel = pickKernel(state, r);
   const arcBeats = ({ common: 4, uncommon: 5, rare: 6, legendary: 7 } as Record<string, number>)[lead.rarity] ?? 5;
   const twist = r() < 0.3;   // engine rolls misdirection; the AI never decides
+  // REWARD-FIRST (like one-offs): the END reward — the core person — is rolled BEFORE the bible. Decide its
+  // KIND here too (a quarry you take, or an ally you win), so the bible is framed to deliver it.
+  const coreKind: 'recruit' | 'captive' = (twist || r() < 0.4) ? 'captive' : 'recruit';
+  const coreReward = `${lead.rarity} ${coreKind}: [${tagLabels(focal.tags).join(', ')}]`;
   const poolCastMax = r() < 0.45 ? randInt(r, 1, 2) : 0;   // engine rolls how many recurring faces may return
   const maxChoices = rollChoiceBudget(r, lead.rarity);    // engine rolls how many arc steps may branch
-  const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], region: lead.location, rarity: lead.rarity, avoid: recentTitles(state), seed: kernel, place: pickPlace(r), tone: pickTone(r), twist, expectedBeats: arcBeats, poolCast: gatherPoolCast(state, r, focal.id), poolCastMax, maxChoices, nameSeeds: pickNameSeeds(r), avoidNames: recentNames(state) });
+  const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], region: lead.location, rarity: lead.rarity, coreKind, avoid: recentTitles(state), seed: kernel, place: pickPlace(r), tone: pickTone(r), twist, expectedBeats: arcBeats, poolCast: gatherPoolCast(state, r, focal.id), poolCastMax, maxChoices, nameSeeds: pickNameSeeds(r), avoidNames: recentNames(state) });
   // the bible NAMES the core person (cast[0]) — that's the focal; adopt their NAME so beats and the
   // card match. who/backstory are written cleanly by flesh at delivery (the bible's why-ladder is the
   // HIDDEN writers'-room reference, NOT a readable dossier bio).
@@ -199,7 +203,7 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
   if (core) focal.name = core.name;
   const chain: Chain = {
     id: uid(state, 'chain'), title: g.title, hook: g.leadBlurb, bible: renderBible(g), direction: g.directions[0]?.hook ?? '',
-    focalCardIds: [focal.id], rarity: lead.rarity, level: lead.level, expectedBeats: arcBeats, beatsResolved: 0,
+    focalCardIds: [focal.id], coreKind, coreReward, rarity: lead.rarity, level: lead.level, expectedBeats: arcBeats, beatsResolved: 0,
     mercCyclesSpent: 0, climaxTarget: arcBeats, state: 'live', log: [], seedKernel: kernel, arc: g.arc,
     choiceSteps: g.choiceSteps, choiceBudget: maxChoices,
     bank: 0, failsSpent: 0, failBudget: BALANCE.failBudget[lead.rarity],
@@ -281,7 +285,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   const TIMES = ['grey morning', 'high noon', 'a hot afternoon', 'dusk', 'after dark', 'in driving rain'];
   const off = Math.floor(rngFrom(chain.id)() * MODES.length);
   const mode = isBeatOne ? MODES[0] : MODES[1 + ((beatNum - 2 + off) % (MODES.length - 1))];
-  const time = TIMES[(beatNum - 1) % TIMES.length];
+  const time = pick(r, TIMES);   // random spark, NOT beatNum-deterministic (which made every beat 1 'grey morning')
 
   // each beat realizes the current ARC STEP (stepIdx = beatsResolved). One numbering: "STEP k of n".
   const step = (k: number) => arc.length ? `"${arc[Math.max(0, Math.min(k, arc.length - 1))]}"` : 'this step of the quest';
@@ -302,7 +306,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   const jobRule = ' The "job" line is ONLY this step\'s ONE concrete action — NEVER a restatement of the overall goal (the player already knows the goal).';
   let instr: string;
   if (isBeatOne) {
-    instr = `STEP 1 of ${nSteps} — the OPENER, where the company is OFFERED this job. Realize this step: ${step(0)}. Make the player CARE: a real person on stage in a small human moment (a grief, want, or kindness), centered on ${focalName} UNLESS they're the bible's hidden wrongdoer (then a victim / worried kin / bystander). The "situation" conveys the OVERALL job + why they'd take it; the "job" line is ONLY this opening action (meet / agree / scout / set out) — do NOT complete the goal, do NOT capture/resolve ${focalName}, no faceless steward/clerk handing over a contract. closesChain:false. Single approach — no "choices".`;
+    instr = `STEP 1 of ${nSteps} — the OPENER, where the company is OFFERED this job. Realize this step: ${step(0)}. Make the player CARE: a real person on stage in a small human moment (a grief, want, or kindness), centered on ${focalName} UNLESS they're the bible's hidden wrongdoer (then a victim / worried kin / bystander). The "situation" conveys the OVERALL job + why they'd take it; the "job" line is a COMPLETE, quest-worthy first mission (it can succeed or fail and comes away with a result) — not merely meeting or accepting, which the player has already done by choosing this job. Do NOT complete the goal, do NOT capture/resolve ${focalName}, no faceless steward/clerk handing over a contract. closesChain:false. Single approach — no "choices".`;
   } else if (isFinale) {
     const desperate = (!reachedLast || lastChance) ? ' This is a LAST-CHANCE finale: the company is OUT OF TIME after repeated setbacks — force it to a head from where they actually stand; everything rides on this, and the goal may yet slip.' : '';
     const endingAsk = chain.personal
@@ -314,7 +318,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   } else {
     instr = `STEP ${kNum} of ${nSteps}. Realize this step: ${step(stepIdx)}. A MIDDLE step that ESCALATES toward the goal — a clearly DIFFERENT scene from every prior step (new place / people / action; don't re-stage or re-fetch the same thing). The company does NOT complete the goal yet.${jobRule}${failNote} closesChain:false.${allowChoice ? ' THIS STEP AFFORDS A CHOICE: offer 2-3 "choices" (approaches testing DIFFERENT attributes — sneak/fight/talk).' : ' Single approach — no "choices".'}`;
   }
-  const opening = ` OPEN it as: ${mode}; set it around ${time}, woven into a sentence (not a fragment opener). Do NOT reuse the previous beat's opening.`;
+  const opening = ` OPENING SPARKS (weave naturally into the first sentence — they are prompts to riff on, NOT labels to copy or a fragment opener): it reaches the fort via ${mode}, around ${time}. Vary the opening from the previous beat.`;
   instr += opening;
 
   const beat = await ai.chainBeat({

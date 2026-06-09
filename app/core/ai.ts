@@ -60,6 +60,7 @@ export interface GenesisInput {
   focalTags: string[][];        // each focal character's display tags — THE story seed
   region: string;
   rarity?: 'common' | 'uncommon' | 'rare' | 'legendary'; // depth scales with stakes
+  coreKind?: 'recruit' | 'captive'; // the END reward kind the engine chose — frames the core person's role
   personal?: boolean;           // true = this existing merc's own buried past
   name?: string;                // the focal's name (for personal chains)
   who?: string;                 // the focal's known-for line (personal chains)
