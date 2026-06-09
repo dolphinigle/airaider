@@ -195,7 +195,10 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
   const coreReward = `${lead.rarity} ${coreKind}: [${tagLabels(focal.tags).join(', ')}]`;
   const poolCastMax = r() < 0.45 ? randInt(r, 1, 2) : 0;   // engine rolls how many recurring faces may return
   const maxChoices = rollChoiceBudget(r, lead.rarity);    // engine rolls how many arc steps may branch
-  const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], region: lead.location, rarity: lead.rarity, coreKind, avoid: recentTitles(state), seed: kernel, place: pickPlace(r), tone: pickTone(r), twist, expectedBeats: arcBeats, poolCast: gatherPoolCast(state, r, focal.id), poolCastMax, maxChoices, nameSeeds: pickNameSeeds(r), avoidNames: recentNames(state) });
+  // seed the focal with a NAME (the AI may tweak it) instead of inventing one cold; the rest seed the cast.
+  const nameSeeds = pickNameSeeds(r, 6);
+  focal.name = nameSeeds[0];
+  const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], region: lead.location, rarity: lead.rarity, coreKind, name: nameSeeds[0], avoid: recentTitles(state), seed: kernel, place: pickPlace(r), tone: pickTone(r), twist, expectedBeats: arcBeats, poolCast: gatherPoolCast(state, r, focal.id), poolCastMax, maxChoices, nameSeeds: nameSeeds.slice(1), avoidNames: recentNames(state) });
   // the bible NAMES the core person (cast[0]) — that's the focal; adopt their NAME so beats and the
   // card match. who/backstory are written cleanly by flesh at delivery (the bible's why-ladder is the
   // HIDDEN writers'-room reference, NOT a readable dossier bio).
@@ -267,14 +270,10 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   const isFinale = !isBeatOne && (reachedLast || lastChance);
   const n = beatSlotCount(chain, r, isFinale);
 
-  // the engine ROTATES the opening mode + time so beats don't all read "X staggers to the gate at
-  // dusk" (a strong model tic). Beat 1 is the human petitioner (attachment); later beats vary.
   const focalName = (state.cards[chain.focalCardIds[0]] as CharacterCard | undefined)?.name ?? 'the person this saga is about';
 
-  // engine-rotated ARRIVAL + time so beats don't all read "X staggers to the gate at dusk" (a strong
-  // model tic). The "wrapped bundle / corpse left at the gate" cliché is deliberately ABSENT here and
-  // BANNED below — reading showed the model kept defaulting to it, even in finales.
-  // ALL boss-POV: how the next step REACHES the fort this turn (the boss isn't in the field).
+  // engine-rotated ARRIVAL spark so beats don't all open the same way (a strong model tic). NO time of
+  // day — the fort runs in DAYS, not hours. Beat 1 is the human petitioner (attachment); later beats vary.
   const MODES = [
     'a named cast member comes to the fort in person',
     'one of your own mercs brings word / drops a notice on your desk',
@@ -282,10 +281,8 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
     'an official, a rival, or a creditor comes to press the matter',
     'a frightened bystander or a child brings urgent word to the gate',
   ];
-  const TIMES = ['grey morning', 'high noon', 'a hot afternoon', 'dusk', 'after dark', 'in driving rain'];
   const off = Math.floor(rngFrom(chain.id)() * MODES.length);
   const mode = isBeatOne ? MODES[0] : MODES[1 + ((beatNum - 2 + off) % (MODES.length - 1))];
-  const time = pick(r, TIMES);   // random spark, NOT beatNum-deterministic (which made every beat 1 'grey morning')
 
   // each beat realizes the current ARC STEP (stepIdx = beatsResolved). One numbering: "STEP k of n".
   const step = (k: number) => arc.length ? `"${arc[Math.max(0, Math.min(k, arc.length - 1))]}"` : 'this step of the quest';
@@ -306,7 +303,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   const jobRule = ' The "job" line is ONLY this step\'s ONE concrete action — NEVER a restatement of the overall goal (the player already knows the goal).';
   let instr: string;
   if (isBeatOne) {
-    instr = `STEP 1 of ${nSteps} — the OPENER, where the company is OFFERED this job. Realize this step: ${step(0)}. Make the player CARE: a real person on stage in a small human moment (a grief, want, or kindness), centered on ${focalName} UNLESS they're the bible's hidden wrongdoer (then a victim / worried kin / bystander). The "situation" conveys the OVERALL job + why they'd take it; the "job" line is a COMPLETE, quest-worthy first mission (it can succeed or fail and comes away with a result) — not merely meeting or accepting, which the player has already done by choosing this job. Do NOT complete the goal, do NOT capture/resolve ${focalName}, no faceless steward/clerk handing over a contract. closesChain:false. Single approach — no "choices".`;
+    instr = `STEP 1 of ${nSteps} — the OPENER, where the company is OFFERED this job. Realize this step: ${step(0)}. Make the player CARE: a real person on stage in a small human moment (a grief, want, or kindness), centered on ${focalName} UNLESS they're the bible's hidden wrongdoer (then a victim / worried kin / bystander). The "situation" carries the client's offer/briefing (how the job ARRIVES); the "job" line is the company's first real mission in the field — a task whose outcome is in doubt (go after the thing, search the place, confront someone). Meeting, accepting, or 'getting directions' is the SITUATION, NOT the job. Do NOT complete the goal, do NOT capture/resolve ${focalName}, no faceless steward/clerk handing over a contract. closesChain:false. Single approach — no "choices".`;
   } else if (isFinale) {
     const desperate = (!reachedLast || lastChance) ? ' This is a LAST-CHANCE finale: the company is OUT OF TIME after repeated setbacks — force it to a head from where they actually stand; everything rides on this, and the goal may yet slip.' : '';
     const endingAsk = chain.personal
@@ -318,7 +315,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   } else {
     instr = `STEP ${kNum} of ${nSteps}. Realize this step: ${step(stepIdx)}. A MIDDLE step that ESCALATES toward the goal — a clearly DIFFERENT scene from every prior step (new place / people / action; don't re-stage or re-fetch the same thing). The company does NOT complete the goal yet.${jobRule}${failNote} closesChain:false.${allowChoice ? ' THIS STEP AFFORDS A CHOICE: offer 2-3 "choices" (approaches testing DIFFERENT attributes — sneak/fight/talk).' : ' Single approach — no "choices".'}`;
   }
-  const opening = ` OPENING SPARKS (weave naturally into the first sentence — they are prompts to riff on, NOT labels to copy or a fragment opener): it reaches the fort via ${mode}, around ${time}. Vary the opening from the previous beat.`;
+  const opening = ` OPENING SPARK (a prompt to riff on for how this reaches the fort — weave it into the first sentence, do NOT copy it as a label or a fragment opener; NO time of day): ${mode}. Vary the opening from the previous beat.`;
   instr += opening;
 
   const beat = await ai.chainBeat({
