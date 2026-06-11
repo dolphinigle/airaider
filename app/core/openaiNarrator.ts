@@ -70,8 +70,10 @@ const OFFER_KINDS = ['gold', 'captive', 'recruit', 'item', 'unknown', 'none'];
 const OFFER_FALLBACK: Record<string, string> = { gold: 'good coin', captive: 'a captive to ransom', recruit: 'a recruit who joins you', item: 'salvage worth selling', unknown: 'unknown — who knows what waits', none: "nothing — they're begging" };
 function normOffer(o: { kind?: string; label?: string } | undefined): OfferedReward {
   const kind = (OFFER_KINDS.includes(String(o?.kind)) ? String(o?.kind) : 'gold') as OfferKind;
-  const label = (String(o?.label ?? '').trim().slice(0, 60)) || OFFER_FALLBACK[kind];
-  return { kind, label };
+  let label = String(o?.label ?? '').trim();
+  // cap length at a WORD boundary (a hard slice produced player-visible 'both partie')
+  if (label.length > 60) label = label.slice(0, 60).replace(/\s+\S*$/, '') + '…';
+  return { kind, label: label || OFFER_FALLBACK[kind] };
 }
 function normAsk(a: { attribute: string; favoredTags?: string[]; slots?: string[] }): AskOut {
   return {

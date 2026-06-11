@@ -178,6 +178,8 @@ async function handle(line: string): Promise<boolean> {
       process.stdout.write(C.dim('  …generating…\r'));
       const res = await eng.pursue(lead.id);
       if ('error' in res) console.log(C.red(res.error)); else console.log(questCard(eng, res));
+      // the board reindexes after a pursue — reprint it so `p <n>` never grabs the wrong lead
+      console.log('\n' + leadsList(eng));
       return true;
     }
     case 'a': {

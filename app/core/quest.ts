@@ -682,9 +682,10 @@ function handleFinaleFate(state: GameState, quest: Quest, outcome: Outcome, out:
     return;
   }
   // FINALE FAILURE → quest failed → 0 reward: the focal is lost, the bank forfeited (ECONOMY §5).
+  // Played sessions showed this moment was too quiet — a saga's death deserves a loud, explicit line.
   if (outcome === 'failure') {
     focal.role = 'dead'; focal.location = 'limbo';
-    out.push(`${focal.name} is lost — the saga ends in grief, its spoils scattered`);
+    out.push(`✝ ${focal.name} is LOST — the saga ends in failure${bank > 0 ? `, and the ${bank} gold banked over its course is forfeit` : ''}`);
     return;
   }
   // the focal kept their BIBLE name across every beat; who/backstory are fleshed after delivery.
@@ -737,9 +738,10 @@ function handlePersonalFinale(merc: CharacterCard, outcome: Outcome, out: string
     else out.push(`${merc.name} closes the chapter at a cost`);
     merc.xp += 10;
   } else {
-    // the gamble of a personal saga: it can claim them
+    // the gamble of a personal saga: it can claim them. Say WHAT happened (played sessions showed the
+    // prose often leaves them alive-but-broken while the roster line just shrank — name the departure).
     merc.role = 'dead'; merc.location = 'limbo';
-    out.push(`${merc.name}'s past catches them at last — they are lost`);
+    out.push(`✝ ${merc.name}'s past catches them at last — broken by it, they walk out of the fort and do not come back`);
   }
 }
 
