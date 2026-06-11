@@ -336,6 +336,8 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   }
   const opening = ` OPENING SPARK (a prompt to riff on for how this reaches the fort — weave it into the first sentence, do NOT copy it as a label or a fragment opener; NO time of day as scene dressing — a deadline inside the job's fiction is fine): ${mode}. Vary the opening from the previous beat.`;
   instr += opening;
+  // a PERSONAL saga is about an existing company merc — they can't be "recruited" as its reward
+  if (chain.personal) instr += ` ${focalName} ALREADY SERVES the company — the offeredReward is never recruiting or capturing them; the company's gain is coin, loot, or what the saga settles.`;
 
   const beat = await ai.chainBeat({
     bible: chain.bible, chainState: chain.log.length ? chain.log.join(' ') : 'The saga is just beginning; the player knows nothing yet.',
