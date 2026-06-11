@@ -88,7 +88,7 @@ and astronomically rare). Details belong to the TAG REVAMP (§8) — designed th
 | Quality not sprawl | per-group growth caps in generator | ✅ built |
 | Legibility (badge) | derived from substance | ❌ → §8 scope |
 
-## §8 TAG SYSTEM ✅ FINAL (designed 2026-06-12) — two-resolution tags, one geometric curve
+## §8 TAG SYSTEM 🔶 (curve/bands/depth agreed 2026-06-12; DRIFT, BADGE, DIES-list pending designer review)
 
 ARCHITECTURE — fine TIERS (engine) / coarse BANDS (AI):
 - A tag instance = (concept, tier). Tiers are ASCENDING integers (migration inverts today's
