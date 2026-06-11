@@ -97,6 +97,9 @@ claimed sainthood…) so the "useless noble hostage worth a fortune" can roll �
 (b) the LEGIBILITY BADGE derived from substance (goal 9); (c) note: personality is currently
 FLAT (no intensity) and coherence is mutex-only (cross-pair contradictions like tough+frail are
 legal) — decide both here.
+SCOPE EXPANDED (designer 2026-06-12): §8 ALSO covers the RELIC tag vocabulary design (the two
+species' ~disjoint vocabularies ride one domain-generic level/value/rarity system).
+NOTE: no implementation after §8 — more design stations may follow.
 
 ## §4 Secondary NPCs → real units (partial-unit handoff) ✅ (decided 2026-06-12)
 The handoff (pattern B — both sides seed each other), NO new AI calls (piggyback only):
