@@ -90,7 +90,10 @@ export function stockLeadBoard(state: GameState, r: Rng): void {
   for (const chain of Object.values(state.chains)) {
     if (chain.state === 'done') continue;
     const exists = state.leads.some((l) => l.chain.kind === 'continues' && l.chain.chainId === chain.id);
-    if (exists) continue;
+    // also skip while a beat of this chain is PURSUED but unresolved — otherwise the board re-offers
+    // the same beat and the chain can hold two live quests (seen in the 100-day marathon)
+    const beatActive = Object.values(state.quests).some((q) => q.chainId === chain.id);
+    if (exists || beatActive) continue;
     state.leads.push({
       id: `lead_chain_${chain.id}_${state.cycle}`,
       rarity: chain.rarity, level: chain.level, location: chain.title ? state.unlockedLocations[0] : pick(r, state.unlockedLocations),
