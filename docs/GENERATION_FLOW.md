@@ -64,14 +64,24 @@ should be too). No hard "capacity ceiling per level" clamping the economy.
   share × E[payoff] directly, NO min(·, unitCap) clamp; under/overshoot is the roll's variance
   and any shortfall pads as gold at crystallization (already the bank's behavior).
 
-## §4 Secondary NPCs → real units (partial-unit handoff) 🔶
-- 📌 Today: bible cast are prose-only; only the focal is a card; one-off captives are fully
-  engine-rolled, AI only names them.
-- Proposal (pattern B, "seed the AI again"):
+## §4 Secondary NPCs → real units (partial-unit handoff) ✅ (decided 2026-06-12)
+The handoff (pattern B — both sides seed each other), NO new AI calls (piggyback only):
   1. engine rolls a PARTIAL unit: identity + ~half the value budget;
-  2. AI may ADD up to K vocab tags fitting the story role;
-  3. engine canonicalizes, prices, rejects over-budget, completes remainder with shaped rolls.
-- OPEN: K (draft 2–3) · which flows use it (bible secondaries? beat captives? sequel focals?).
+  2. the AI call that already describes the person may ADD up to 3 vocab tags fitting the role;
+  3. engine canonicalizes + prices them; if over budget, drops RANDOMLY (not by heuristic) —
+     ⚠ revisit the budget semantics after §3b (unit-valuation revamp) lands;
+  4. engine completes the remainder with shaped rolls → unit MARKED at target (§2).
+Use sites: one-offs (cardAsk emits optional quarryTags → engine `required`); bible secondaries
+materialize LAZILY (only when actually acquired — finale choice / sequel — seeded by their bible
+line); chain MIDDLE beats stay unit-free. One-off composition reorder accepted (V/mark still
+computed first; only the unit's composition becomes a collaboration).
+
+## §4b NAMES — engine-rolled for ALL characters ✅ (designer 2026-06-12)
+The AI does not invent names (it's bad at it). The ENGINE rolls a name for every character that
+materializes — focal AND secondaries AND captives/recruits — from the seed pool now, from a
+dedicated NAME GENERATOR later (easy: syllable/part tables, fen register). AI calls receive the
+assigned name and use it as-is (genesis: cast names ASSIGNED, not inspired-by; flesh/outcome:
+name handed in, never chosen).
 
 ## §5 Keyword seeds — ONE field 🔶
 - 📌 Today: four labeled lines (THEMES / PROP / PRESSURE / CLIENT sparks) — labels prescribe
