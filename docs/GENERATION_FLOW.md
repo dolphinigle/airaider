@@ -121,8 +121,9 @@ BANDS (depth-20 default mapping): B1 1–4 · B2 5–8 · B3 9–12 · B4 13–1
   above (the in-band jackpot — "very strong" can come back t18). B5 words are display-only.
 - Depth-10 tags: 2 tiers per band; the AI always sees exactly 5 words either way.
 
-DICE STAY SANE: favoredBonus is defined per BAND (≈ +1…+5), not per tier — the value curve
-soars geometrically while the usefulness curve stays bounded (goal: value ≠ usefulness).
+DICE STAY SANE: favoredBonus per BAND = +1 / +1 / +2 / +2 / +3 (B1→B5; designer-tuned flat) —
+the value curve soars geometrically while the usefulness curve stays nearly flat (goal:
+value ≠ usefulness; a Mirror-tier tag barely out-rolls a solid one).
 Deep LOW-UTILITY lines (Kind, Lineage, Renown) are first-class: the living saint / noble
 hostage / Mona-Lisa relic all roll naturally.
 
