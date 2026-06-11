@@ -19,13 +19,14 @@ LEAD PURSUED (rarity · level · region)
  9. RESOLVE   per-beat bank accrual (unchanged) · finale crystallizes split              🔶 §2 interaction
 ```
 
-## §1 The calculation phase 🔶
-- 📌 Today: one-offs compute `V = slots × vBase(level) × rarityMult` ✓; chains compute NOTHING
-  up front — bank accrues at resolution; focal target is the unrelated `maxCharValue(level)`.
-- Proposal: at genesis, `E[payoff] = expectedBeats × E[slots/beat] × vBase(level) × rarityMult`
-  (≈ what the bank accrues on a clean run, so promise ≈ delivery).
-- OPEN: confirm formula + whether E[slots/beat] uses the actual beat-slot distribution (~1.4
-  middle / 2–3 finale) or a flat constant.
+## §1 The calculation phase ✅ (decided 2026-06-12)
+At genesis: `E[payoff] = expectedBeats × SLOTS_PER_BEAT × vBase(level) × rarityMult × 0.8`
+- `0.8` = outcome discount (partials half-bank, failures zero) so a DECENT run delivers the
+  prize + modest surplus; only bad runs hit debt/void.
+- `SLOTS_PER_BEAT` = flat constant (~1.5) — designer: distribution-exact is over-engineering.
+- This is BEST-EFFORT guidance (the realized bank varies with play) — it sizes the focal and
+  the split; the bank's crystallization machinery reconciles reality as it already does.
+- 📌 Replaces: focal target `maxCharValue(level)` (unrelated constant) and the absent chain calc.
 
 ## §2 The split — chain reward kinds 🔶
 - 📌 Today: core kind hardcoded `captive|recruit` (twist-linked coin-flip); gold exists only as
