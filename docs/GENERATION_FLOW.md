@@ -38,7 +38,20 @@ LEAD PURSUED (rarity · level · region)
 ## §3 Unit generation at a target value ✅ (built, commit 653f9b3)
 Tags roll INDEPENDENTLY (identity preserved); a wealth parameter (Monte-Carlo-bisected against
 the real roll) shapes the distribution so E[value] ≈ target; right tail from rare top tiers.
-Saturation note: targets above the level's reachable mean saturate; §1 makes targets realistic.
+
+## §3b UNIT VALUATION REVAMP 🔶 (designer-added 2026-06-12 — not yet designed)
+GOAL: a unit's value scale must extend FAR upward — a high-value generation target means a GOOD
+CHANCE the unit rolls genuinely RARE (PoE-style: some weapons are chase items; some people
+should be too). No hard "capacity ceiling per level" clamping the economy.
+- 📌 Today the scale is compressed: tag value = rarityBase(1/3/8/20) × tier(1–5×), per-tag value
+  capped by tagCeiling(level); realistic unit means ~20–80, absolute pool max ~854. There is no
+  chase-unit tail — a "500g person" cannot exist.
+- Needs a full design pass: value curve (likely super-linear in tier/rarity), how rarity tiers
+  of TAGS map to unit rarity, whether new tag rarities/pools are needed, how the shaped
+  distribution's tail produces them, jackpot interplay.
+- **Working assumption for §1/§2 (per designer): ASSUME THIS EXISTS** — i.e. focal target =
+  share × E[payoff] directly, NO min(·, unitCap) clamp; under/overshoot is the roll's variance
+  and any shortfall pads as gold at crystallization (already the bank's behavior).
 
 ## §4 Secondary NPCs → real units (partial-unit handoff) 🔶
 - 📌 Today: bible cast are prose-only; only the focal is a card; one-off captives are fully
