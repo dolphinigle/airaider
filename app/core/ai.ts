@@ -53,7 +53,11 @@ export interface OutcomeOut {
   loot?: string | null;                             // the side-loot flavor actually gained ('' / null if none)
 }
 
-export interface FleshInput { tags: string[]; attrs: Attributes; context: string }
+export interface FleshInput {
+  tags: string[]; attrs: Attributes; context: string;
+  nameSeeds?: string[];   // engine-thrown name sparks to draw/riff from (break name convergence)
+  avoidNames?: string[];  // names already in the world (roster/recent cast) — do NOT reuse
+}
 export interface FleshOut { name: string; who: string; backstory: string; quirks: string[] }
 
 export interface GenesisInput {

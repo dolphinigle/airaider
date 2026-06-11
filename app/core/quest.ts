@@ -518,7 +518,8 @@ export async function resolveQuest(state: GameState, ai: Narrator, quest: Quest)
   for (const c of deliveredChars) {
     if (c.role === 'dead' || (c.backstory && c.quirks.length)) continue; // already a complete card
     try {
-      const f = await ai.flesh({ tags: tagLabels(c.tags), attrs: c.attrs, context: `acquired via "${quest.job}"` });
+      const roster = Object.values(state.cards).filter((x): x is CharacterCard => x.class === 'character' && x.role === 'merc').map((m) => m.name.split(' ')[0]);
+      const f = await ai.flesh({ tags: tagLabels(c.tags), attrs: c.attrs, context: `acquired via "${quest.job}"`, nameSeeds: pickNameSeeds(r, 3), avoidNames: [...new Set([...roster, ...recentNames(state)])].slice(0, 16) });
       if (f.name && (!c.name || c.name === 'Unknown')) c.name = f.name;
       if (f.who && !c.who) c.who = f.who;
       if (!c.backstory) c.backstory = f.backstory;            // keep a chain focal's why-ladder backstory
