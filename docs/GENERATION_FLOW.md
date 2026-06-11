@@ -88,18 +88,61 @@ and astronomically rare). Details belong to the TAG REVAMP (§8) — designed th
 | Quality not sprawl | per-group growth caps in generator | ✅ built |
 | Legibility (badge) | derived from substance | ❌ → §8 scope |
 
-## §8 TAG REVAMP 🔶 (designer-added — come back after the walkthrough)
-One tag per concept with INTERNAL LEVELS (no separate "strong"/"very strong" entries); level
-depth extendable per tag; level drives BOTH rarity weight and value on a deep geometric curve;
-re-map display labels per level. This is where §3b's mechanism gets its numbers.
-SCOPE (added with §3b.1): also (a) HIGH-VALUE LOW-UTILITY tag lines (lineage, fame, beauty,
-claimed sainthood…) so the "useless noble hostage worth a fortune" can roll — serves goal 4;
-(b) the LEGIBILITY BADGE derived from substance (goal 9); (c) note: personality is currently
-FLAT (no intensity) and coherence is mutex-only (cross-pair contradictions like tough+frail are
-legal) — decide both here.
-SCOPE EXPANDED (designer 2026-06-12): §8 ALSO covers the RELIC tag vocabulary design (the two
-species' ~disjoint vocabularies ride one domain-generic level/value/rarity system).
-NOTE: no implementation after §8 — more design stations may follow.
+## §8 TAG SYSTEM ✅ FINAL (designed 2026-06-12) — two-resolution tags, one geometric curve
+
+ARCHITECTURE — fine TIERS (engine) / coarse BANDS (AI):
+- A tag instance = (concept, tier). Tiers are ASCENDING integers (migration inverts today's
+  descending 1-is-best data). The AI NEVER sees integers — it reads/writes 5 BAND WORDS per
+  concept; the engine rolls the exact tier within the band ("AI proposes quality, engine
+  decides magnitude" — PROMPT_RULES §3 applied to tags).
+
+THE CURVE (economy-anchored; vBase 30→448/day, sagas 144→15k, 100-day campaign ≈ 37k gross):
+  value(t) = 6 × 1.9^(t−1)        depth 20 → t20 ≈ 1.19M ("the Mirror")
+  t1–4    6·11·22·41        trait texture (commons land 25–80 — no economy shock)
+  t5–8    79·149·284·540    standout skills; uncommon-saga focals
+  t9–12   1.0k–7.0k         rare-saga prizes
+  t13–16  13k–92k           legendary territory and beyond
+  t17–20  174k–1.19M        mythic / trophy class
+- WHY 20 (not 12/15): ratio ×1.9/tier = a drift tick DOUBLES (usable growth grain);
+  maxTier = 2×contentLevel+2 (clean 2 tiers unlocked per content level, L1→4 … L9→20);
+  4 tiers of in-band leeway. Bands shield the AI, so depth costs nothing to author.
+
+DEPTH POLICY: default depth 10 (top ≈ 1.9k — "the best ordinary people"); designated DEEP
+LINES depth 20 (candidates: Strong, Craft, Renown, Kind, Lineage… — finalized in the
+vocabulary station). Depth is the per-tag balance knob. Identity tags (gender/race/type) =
+value 0; other flat concepts = depth 1 (worth ~6).
+
+RARITY & GATING: tier weight ∝ ~1.9⁻ᵗ…3⁻ᵗ baseline, TUNED BY HARNESS (the MC-calibrated
+generator self-recalibrates — repricing needs no generator change). Content gate:
+maxTier(contentLevel) = 2L+2; jackpot spillover may pierce it.
+
+BANDS (depth-20 default mapping): B1 1–4 · B2 5–8 · B3 9–12 · B4 13–16 · B5 17–20.
+- AI may REQUEST at most B4; a request rolls its window weighted-low with ~7%/step SPILLOVER
+  above (the in-band jackpot — "very strong" can come back t18). B5 words are display-only.
+- Depth-10 tags: 2 tiers per band; the AI always sees exactly 5 words either way.
+
+DICE STAY SANE: favoredBonus is defined per BAND (≈ +1…+5), not per tier — the value curve
+soars geometrically while the usefulness curve stays bounded (goal: value ≠ usefulness).
+Deep LOW-UTILITY lines (Kind, Lineage, Renown) are first-class: the living saint / noble
+hostage / Mona-Lisa relic all roll naturally.
+
+TIER DRIFT (characters ONLY — the species discriminator all the way down): saga stamps,
+training, hardship tick a tag ±1 tier (×÷1.9 value). Relics are frozen forever. Drift-event
+mechanisms designed with the growth system later; the principle is locked.
+
+BADGE (legibility, derived from highest tier): ≤8 common · 9–12 notable · 13–16 exceptional ·
+17+ singular.
+
+WHAT DIES: TagDef rarity-class (common/uncommon/rare/legendary), rarityBase, flatTagMult,
+tagCeiling-as-value, the old tierWeight table, descending tiers.
+
+NOTIONAL TOP END: above ~100k value is trophy-class — selling needs a SPECIAL-BUYER story
+event (later); prototype lets the mark sit on the card.
+
+DOMAIN-GENERIC: one curve, both species; vocabularies (~disjoint) are the NEXT PLANNING
+STATION — concept lists, deep-line designation, 5 band words per concept, cross-pair
+coherence (tough+frail), leveled-personality words, the relic vocabulary.
+NOTE: no implementation after §8 — more design stations may follow (designer).
 
 ## §4 Secondary NPCs → real units (partial-unit handoff) ✅ (decided 2026-06-12)
 The handoff (pattern B — both sides seed each other), NO new AI calls (piggyback only):
