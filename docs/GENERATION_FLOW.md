@@ -141,7 +141,43 @@ name handed in, never chosen).
 `SETTING` → `PLACE` · `ENGINE SETTINGS FOR THIS CHAIN` → `STORY SHAPE (engine-rolled)` ·
 `Focal unit:` → `CORE PERSON:` (user message now matches the system prompt).
 
-## §7 Artifacts / relics 🔶 (deferred — discuss at the end)
-A THING as a saga's prize (name TBD: artifact? relic?). Pays gold in the prototype; becomes a
-display item feeding prestige when the rooms/items build lands. Needs: kind weight, how it's
-generated (tagged item? unique?), display/prestige hookup. Discussion step after §5/§6.
+## §7 RELICS ✅ (designed 2026-06-12) — second card species, dopamine-first
+
+PURPOSE (hierarchy): 1) DOPAMINE — the drop-thrill (reward lottery, §8 jackpot tail) plus the
+FIT CLICK (a relic matching a slot that wants it). 2) Gameplay = SLOTTING INTO ROOMS, same verb
+as units. 3) Prestige / economy / story-trophy are consequences, not the point.
+
+THE UNIFIED SLOT GRAMMAR (the structural heart — one grammar for all cards):
+  "SLOTS WANT TAGS; units ROLL their fit (coins), relics ARE their fit (static)."
+  QUEST actor slot    wants tags → unit fits  → more coins   (dynamic gamble)
+  ROOM  occupant slot wants tags → unit fits  → works/rests
+  ROOM  item slot     wants tags → relic fits → comfort/prestige (placement)
+  A room TYPE declares its slot mix (unit slots, item slots, or both).
+
+BEDROOM PERSONALIZATION (closes the growth loop): a merc's bedroom item-slots are DERIVED FROM
+THE MERC'S TAGS (AI-determined — piggyback on the flesh call, no new calls): soldier → weapon
+rack (wants war-loot/blade); healer → herb niche; singer → instrument stand. Fitting relic →
+big comfort, any relic → small; comfort already gates level caps (3 + 0.9×comfort) →
+**relics don't grow — they fuel the growth of those who do.** Dopamine fused into attachment.
+
+GLOBAL ROOMS = the prestige path: hall/tavern/shrine item slots want renown-type tags;
+displayed storied relics → prestige → leadTier (plugs the 100-day dead faucet).
+SELL = cash-out at a discount off the mark (background dilemma, not the headline).
+
+STRUCTURE: Card contract = name + tags + value(mark) + location + chainIds (moves to BaseCard).
+GROWTH is THE species discriminator: characters grow (level/xp/talents/stamped tags); relics
+are IMMUTABLE post-creation. Condition/repair: parked (items don't grow).
+INVARIANTS: cards never hold cards (no equipping in prototype) · only characters roll coins ·
+one value system both species (§8 designed domain-generic; vocabularies ~disjoint, next PR).
+NAME: **relic** (the world's word; encodes relic-OF-a-story; class `relic`).
+
+### §7.1 CARD-TYPE-AS-TAG + STACKABLES (designer 2026-06-12)
+- A card's TYPE is itself a TAG (`type:character`, `type:relic`, `type:gold`, …; flat, value 0,
+  mutex one) — so slot filtering is PURE tag-matching: a quest slot "must-have type:character",
+  a display slot "must-have type:relic, wants storied". One grammar, no species special-cases.
+  (Code may keep the TS `class` discriminator for typing; the type tag mirrors it.)
+- Sultan's-Game rule: STACKABLES ARE CARDS TOO. Second axis, orthogonal to type:
+  SINGULAR (identity-bearing: characters, relics — name, story, chainIds) vs
+  FUNGIBLE (qty-stacked: gold, supplies/consumables — no identity, merge on pickup).
+- Payoff of type-as-tag: fungibles become slottable for free later (a "bribe" slot wants
+  type:gold; a "provisions" slot wants type:supply) — zero new mechanics.
