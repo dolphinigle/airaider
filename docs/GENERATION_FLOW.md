@@ -28,13 +28,23 @@ At genesis: `E[payoff] = expectedBeats × SLOTS_PER_BEAT × vBase(level) × rari
   the split; the bank's crystallization machinery reconciles reality as it already does.
 - 📌 Replaces: focal target `maxCharValue(level)` (unrelated constant) and the absent chain calc.
 
-## §2 The split — chain reward kinds 🔶
-- 📌 Today: core kind hardcoded `captive|recruit` (twist-linked coin-flip); gold exists only as
-  a finale CHOICE; `splitValue`'s chain branch is dead code.
-- Proposal: roll core kind from a weighted table incl. non-unit payoffs (treasure/relic sagas);
-  focal character ALWAYS exists (story seed 🔒) but need not be the acquisition.
-- OPEN: kind weights (draft: recruit 35 / captive 35 / gold-hoard 20 / relic 10) · unit share
-  (fixed ~70% vs rolled range like one-offs) · how a gold-hoard finale crystallizes.
+## §2 The split — chain reward kinds ✅ (decided 2026-06-12)
+- CORE KIND rolled from an EXTENDABLE weighted table — prototype set: `recruit / captive /
+  gold-hoard` (relic/artifact deferred → §7). Twist DECOUPLED from kind (independent rolls).
+- UNIT SHARE: ROLLED range (~55–85%) when the kind is a unit; focal target = share × E[payoff].
+- GOLD IS SUPPLEMENTARY (designer): the saga promises E[payoff]; the unit covers its MARKED
+  value; gold = E[payoff] − unit-marked. ("Quest worth 1000g, unit marked 800g → 200g gold.")
+- MARKED VALUE (designer, §2.5): a unit generated at target T is MARKED as worth T regardless
+  of what the tags actually rolled (the roll's variance is the gamble — a great roll is a
+  bargain, a dud is overpriced, like PoE crafting). ALL accounting (bank reconciliation,
+  ransom 0.6×, hire costs) uses the marked value. `card.value = target`, tags are the substance.
+- CHOICES vs KIND: the genesis kind is a GENERATION-TIME suggestion — it sizes the split and
+  frames the bible. The finale's kinded choices (recruit/captive/gold) pick the final
+  DISPOSITION freely; mid-quest choices remain method-only. Value is INVARIANT under
+  disposition (marked value doesn't change when a captive becomes a recruit) — choices change
+  what you DO with the prize, never what it's worth.
+- Focal character ALWAYS exists (story seed 🔒) even for gold-hoard sagas (they're the person
+  the saga is about, e.g. the hoard's guardian — finale choices may still take them instead).
 
 ## §3 Unit generation at a target value ✅ (built, commit 653f9b3)
 Tags roll INDEPENDENTLY (identity preserved); a wealth parameter (Monte-Carlo-bisected against
@@ -75,3 +85,8 @@ should be too). No hard "capacity ceiling per level" clamping the economy.
 ## §6 Prompt-field naming (after §1–5 land)
 Known confusions to fix: `SETTING` vs `ENGINE SETTINGS` (→ `PLACE` + `STORY SHAPE`);
 `REGION` vs `SETTING`; `Focal unit` (user msg) vs `CORE PERSON` (system prompt).
+
+## §7 Artifacts / relics 🔶 (deferred — discuss at the end)
+A THING as a saga's prize (name TBD: artifact? relic?). Pays gold in the prototype; becomes a
+display item feeding prestige when the rooms/items build lands. Needs: kind weight, how it's
+generated (tagged item? unique?), display/prestige hookup. Discussion step after §5/§6.
