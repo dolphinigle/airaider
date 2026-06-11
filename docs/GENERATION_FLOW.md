@@ -50,19 +50,34 @@ At genesis: `E[payoff] = expectedBeats × SLOTS_PER_BEAT × vBase(level) × rari
 Tags roll INDEPENDENTLY (identity preserved); a wealth parameter (Monte-Carlo-bisected against
 the real roll) shapes the distribution so E[value] ≈ target; right tail from rare top tiers.
 
-## §3b UNIT VALUATION REVAMP 🔶 (designer-added 2026-06-12 — not yet designed)
-GOAL: a unit's value scale must extend FAR upward — a high-value generation target means a GOOD
-CHANCE the unit rolls genuinely RARE (PoE-style: some weapons are chase items; some people
-should be too). No hard "capacity ceiling per level" clamping the economy.
-- 📌 Today the scale is compressed: tag value = rarityBase(1/3/8/20) × tier(1–5×), per-tag value
-  capped by tagCeiling(level); realistic unit means ~20–80, absolute pool max ~854. There is no
-  chase-unit tail — a "500g person" cannot exist.
-- Needs a full design pass: value curve (likely super-linear in tier/rarity), how rarity tiers
-  of TAGS map to unit rarity, whether new tag rarities/pools are needed, how the shaped
-  distribution's tail produces them, jackpot interplay.
-- **Working assumption for §1/§2 (per designer): ASSUME THIS EXISTS** — i.e. focal target =
-  share × E[payoff] directly, NO min(·, unitCap) clamp; under/overshoot is the roll's variance
-  and any shortfall pads as gold at crystallization (already the bank's behavior).
+## §3b UNIT VALUATION REVAMP — GOALS LOCKED ✅ (2026-06-12); mechanism → tag revamp (§8)
+GOALS (designer-confirmed):
+ 1. JACKPOT UNITS exist — the scale supports very high rolls; chase units are possible, rare, exciting.
+ 2. TARGET-EXPECTATION generation — "average ~500g" works for any target (§3 machinery, kept).
+ 3. UNIT POOLS with identity — hierarchical pool bias at generation ("city denizens" ⊃
+    "aristocrat humans"; "dragonkin tend strong"). NOTED IN PLAN; likely overkill for the
+    prototype — design exists as a goal, build later.
+ 4. VALUE ≠ USEFULNESS (designer correction): value is GOLD-WORTH, independent of combat
+    utility — a high-value captive can be a useless fighter (a noble hostage: ransom value).
+    The roll system and the value system are separate axes that merely share tags.
+ 5. Value through QUALITY (tier/intensity), not tag-count sprawl.
+ 6. Content-gated drops (PoE ilvl principle) — better content can drop better units.
+ 7. Tags stay STORY-SEEDS — pools/pricing must feed the writers, not just the spreadsheet.
+ 8. MARKED VALUE (§2): the card's price = generation target; the roll's substance varies;
+    jackpot = substance ≫ mark (that gap is the thrill).
+ 9. Legible at a glance (badge or similar — mechanism TBD).
+ 10. Extendable cheaply (append pools/tags without world rebalance).
+MECHANISM DIRECTION (designer): tag INTENSITY is the value/rarity axis — ONE tag ("Strong")
+with internal levels; deep geometric scale ("Strong T5" common ~pennies; "Strong T1" ~20,000g
+and astronomically rare). Details belong to the TAG REVAMP (§8) — designed there, not here.
+- 📌 Today: tag value = rarityBase(1/3/8/20) × linear tier(1–5×); ceiling 8+8L; means 20–80,
+  no chase tail. Both axes too flat — the revamp makes the tier axis geometric and deep.
+- Working assumption for §1/§2 stands: focal target = share × E[payoff], no capacity clamp.
+
+## §8 TAG REVAMP 🔶 (designer-added — come back after the walkthrough)
+One tag per concept with INTERNAL LEVELS (no separate "strong"/"very strong" entries); level
+depth extendable per tag; level drives BOTH rarity weight and value on a deep geometric curve;
+re-map display labels per level. This is where §3b's mechanism gets its numbers.
 
 ## §4 Secondary NPCs → real units (partial-unit handoff) ✅ (decided 2026-06-12)
 The handoff (pattern B — both sides seed each other), NO new AI calls (piggyback only):
