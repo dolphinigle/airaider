@@ -94,11 +94,18 @@ name handed in, never chosen).
   low-medieval-compatible · no proper nouns · no cross-pool duplicates.
 - ⚠ PLAYTEST FLAG (designer): when playtesting after this lands, specifically judge keyword-draw
   quality (vivid combos, no nonsense, fusion quality). Tracked as a standing task.
-- Old PROP/PRESSURE/CLIENT phrase pools + the dormant PREMISES list are superseded → delete.
+- Old PROP/PRESSURE/CLIENT phrase pools + the dormant PREMISES list are superseded → deleted.
+- **BUILT (commit 2bfcc34).** Actual v1 counts: BOND 399 · TIE 380 · THINGS 425 · OCCASIONS 173 ·
+  PEOPLE 211 · UNCANNY 183 · MOODS 88 = 1,859 unique (smaller pools still growing toward 500).
+- **EMPIRICAL NOTE (taste-tested):** with no ban, the model's LEDGER habit overrode even good
+  draws ('forgery, millstone' → "The Moot Ledger"); seeds occupy the slot but this one habit
+  needs belt-and-braces — ONE targeted ban-line kept in genesis. Unlabeled keywords are
+  generatively ambiguous and that's a feature ('church face' (mask sense) → a carved church
+  face as the plot object).
 
-## §6 Prompt-field naming (after §1–5 land)
-Known confusions to fix: `SETTING` vs `ENGINE SETTINGS` (→ `PLACE` + `STORY SHAPE`);
-`REGION` vs `SETTING`; `Focal unit` (user msg) vs `CORE PERSON` (system prompt).
+## §6 Prompt-field naming ✅ (built, commit 2bfcc34)
+`SETTING` → `PLACE` · `ENGINE SETTINGS FOR THIS CHAIN` → `STORY SHAPE (engine-rolled)` ·
+`Focal unit:` → `CORE PERSON:` (user message now matches the system prompt).
 
 ## §7 Artifacts / relics 🔶 (deferred — discuss at the end)
 A THING as a saga's prize (name TBD: artifact? relic?). Pays gold in the prototype; becomes a
