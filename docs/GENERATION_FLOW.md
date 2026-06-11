@@ -8,15 +8,17 @@ Each section below is marked ✅ agreed · 🔶 OPEN (decision pending) · 📌 
 
 ```
 LEAD PURSUED (rarity · level · region)
- 1. CALC      E[payoff] = expectedBeats × E[slots/beat] × vBase(level) × rarityMult     🔶 §1
- 2. SPLIT     core kind ∈ {recruit, captive, gold-hoard, relic…} + unit/gold shares      🔶 §2
- 3. ROLL      focal unit at unitShare × E[payoff]  (shaped distribution, E≈target)       ✅ §3
+ 1. CALC      E[payoff] = beats × SLOTS_PER_BEAT × vBase(level) × rarityMult × 0.8      ✅ §1 (impl pending)
+ 2. SPLIT     core kind ∈ {recruit, captive, gold-hoard} + rolled unit share             ✅ §2 (impl pending)
+ 3. ROLL      focal unit at share × E[payoff]  (shaped distribution, E≈target)           ✅ §3 (built)
  4. SHAPE     arc length · twist 30% · choice budget · recurring-cast cap                ✅ (as-is)
- 5. SEEDS     ONE keyword field (themes + 0–2 extras) · place · tone · names · pool      🔶 §5
- 6. AI #1     genesis → bible (title/blurb/goal/arc/cast/truth/tensions/branch steps)    (prompt rework after §1-5)
+ 5. SEEDS     ONE KEYWORDS field (1 bond + 1 tie + 1–2 wild) · place · tone · names      ✅ §5/§6 (built)
+ 6. AI #1     genesis → bible (title/blurb/goal/arc/cast/truth/tensions/branch steps)
  7. GUARDS    name-collision guard · persist Chain (incl. E[payoff], split, place)
  8. AI #2     chainBeat → beat-1 card
- 9. RESOLVE   per-beat bank accrual (unchanged) · finale crystallizes split              🔶 §2 interaction
+ 9. RESOLVE   per-beat bank accrual (unchanged) · finale crystallizes the §2 split       ✅ (impl pending)
+IMPLEMENTATION QUEUE: §1+§2+§4/4b (designed, not coded) → §8 tag revamp (design next) →
+§7 artifacts (design pending) → pools/name-generator (later).
 ```
 
 ## §1 The calculation phase ✅ (decided 2026-06-12)
@@ -74,10 +76,27 @@ and astronomically rare). Details belong to the TAG REVAMP (§8) — designed th
   no chase tail. Both axes too flat — the revamp makes the tier axis geometric and deep.
 - Working assumption for §1/§2 stands: focal target = share × E[payoff], no capacity clamp.
 
+### §3b.1 Goal → character-system mapping (designer-approved 2026-06-12)
+| Goal | Where it lives | Status |
+|---|---|---|
+| E[value]≈target | shaped-distribution generator (reads tagValue → reprice-proof) | ✅ built |
+| Jackpot units | tag tier depth + geometric tagValue | ❌ → §8 (only change needed) |
+| Value ≠ usefulness | structural: gold axis Σ tagValue vs dice axis attr+favoredBonus(≈flat) | ✅ exists |
+| Marked value | card.value semantics (today still substance-sum) | ❌ → §1/§2 impl batch |
+| Pools | sampling config over the generator | 📋 later (#31) |
+| Content gating | tagCeiling(level), rescale with §8 curve | ✅ exists |
+| Quality not sprawl | per-group growth caps in generator | ✅ built |
+| Legibility (badge) | derived from substance | ❌ → §8 scope |
+
 ## §8 TAG REVAMP 🔶 (designer-added — come back after the walkthrough)
 One tag per concept with INTERNAL LEVELS (no separate "strong"/"very strong" entries); level
 depth extendable per tag; level drives BOTH rarity weight and value on a deep geometric curve;
 re-map display labels per level. This is where §3b's mechanism gets its numbers.
+SCOPE (added with §3b.1): also (a) HIGH-VALUE LOW-UTILITY tag lines (lineage, fame, beauty,
+claimed sainthood…) so the "useless noble hostage worth a fortune" can roll — serves goal 4;
+(b) the LEGIBILITY BADGE derived from substance (goal 9); (c) note: personality is currently
+FLAT (no intensity) and coherence is mutex-only (cross-pair contradictions like tough+frail are
+legal) — decide both here.
 
 ## §4 Secondary NPCs → real units (partial-unit handoff) ✅ (decided 2026-06-12)
 The handoff (pattern B — both sides seed each other), NO new AI calls (piggyback only):
