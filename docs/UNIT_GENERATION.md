@@ -1,7 +1,11 @@
 # UNIT_GENERATION.md — how a character's tags are rolled
 
-**Status:** prototype = simple random rolls (this doc §1). The **value-targeting** half (§2) is
-**DESIGN-DEFERRED** — not built. We nail the STORY first; the unit/value economy is a later prototype.
+**Status:** value-targeting is now BUILT (2026-06-11) per ECONOMY §4 — generation **spends the value
+budget**: drop-weight-weighted tag picks; tier weighted LOW but bounded by the level ceiling AND what the
+remaining budget affords; a min-spend (~R/4) concentrates value into few standout tags; believability caps
+per group (personality 2, physical 2, skills ≤3, background/notoriety 1); jackpot-with-catch lottery
+(overshoot + a negative that nets back). §1 below documents the earlier roll-only prototype (superseded);
+§2's options were resolved as ~option (a) implemented through the budget loop.
 
 ## 1. Prototype: roll each tag independently (no value target)
 
