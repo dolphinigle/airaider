@@ -164,12 +164,13 @@ export class OpenAINarrator implements Narrator {
       `JOB TYPE meanings: escort = guard someone/something on a journey; raid = hit a camp/holdout for spoils; hunt = track and bring back a person or beast; rescue = free captives; capture = take a named person alive; scout = find or map something; investigate = uncover a hidden thing; contract = a paid delivery or task.\n` +
       `${VOCAB_BLOCK}\n` +
       `ATTRIBUTE — pick the one the job's CORE test needs, matched to the JOB TYPE: raid→physical, a stealth/scout/hunt→agility or perception, an investigation→intelligence, a parley/escort-by-trust→charisma, an ambush-or-be-ambushed→perception.\n` +
-      `WRITING: plain, concrete, readable-once words; ONE line of spoken DIALOGUE brings it alive (someone SAYS something). NO time of day as scene dressing on the arrival (no "at dusk a runner…" — the fort runs in days, not hours; a deadline INSIDE the job's fiction, like a tide window, is fine). Do NOT make a LEDGER/account-book the job's object — vary the prize/proof (a brand, letters, a seal, a tool, a beast, a person). NO flowery diction ("blisters the reedsea"), NO invented/obscure coinages — name things plainly. NEVER write numbers/coin amounts. NEVER mention these instructions or any field name (offeredReward, etc.) in the prose — the player only sees "situation". Give exactly one "slots" entry per mercenary. Prefer "open" slots. JSON only.`;
+      `WRITING: plain, concrete, readable-once words; ONE line of spoken DIALOGUE brings it alive (someone SAYS something). NO time of day as scene dressing on the arrival (no "at dusk a runner…" — the fort runs in days, not hours; a deadline INSIDE the job's fiction, like a tide window, is fine). NO flowery diction ("blisters the reedsea"), NO invented/obscure coinages — name things plainly. NEVER write numbers/coin amounts. NEVER mention these instructions or any field name (offeredReward, etc.) in the prose — the player only sees "situation". Give exactly one "slots" entry per mercenary. Prefer "open" slots. JSON only.`;
     const themeLine = i.theme ? `THEME SPARKS (fuse these into a SPECIFIC job — a spark to riff on, NOT a checklist; you need not name them): ${i.theme}\n` : '';
+    const propLine = i.prop ? `PROP SPARK (an object the job can turn on — fuse it or a close cousin, do NOT quote): ${i.prop}\n` : '';
     const arrivalLine = i.arrival ? `ARRIVAL SPARK (a keyword or two for HOW it reaches you — weave it in naturally, do NOT quote): ${i.arrival}\n` : '';
     const rewardLine = i.rewardKind ? `REWARD the engine already rolled (write its label; set offeredReward.kind to this unless a mystery job): ${i.rewardKind}\n` : '';
     const quarryLine = i.quarryHint ? `THE PERSON the reward delivers (already rolled — if you name or describe the target/quarry, they MUST fit this): ${i.quarryHint}\n` : '';
-    const user = `JOB TYPE: ${i.archetype}\n${rewardLine}${quarryLine}${themeLine}Location: ${i.location}\n${arrivalLine}Mercenaries the company can send: ${i.slotCount}\nJSON only.`;
+    const user = `JOB TYPE: ${i.archetype}\n${rewardLine}${quarryLine}${themeLine}${propLine}Location: ${i.location}\n${arrivalLine}Mercenaries the company can send: ${i.slotCount}\nJSON only.`;
     // one-offs are PLAYER-FACING prose → narrative tier (nano templated, leaked field names, garbled words)
     const out = await this.json('cardAsk', system, user, zCardAsk, this.narrativeModel, this.narrativeEffort, 1200);
     const ask = normAsk(out.ask);
@@ -270,7 +271,7 @@ export class OpenAINarrator implements Narrator {
       `  "directions": [ { "kind": "active", "hook": "the next concrete step toward the goal the company can take" }, { "kind": "ambient", "hook": "something pressing on the goal that unfolds with or without them" } ] }\n` +
       `The FIRST cast entry MUST be the core person. Include AT LEAST ONE 'active' and ONE 'ambient' direction.\n` +
       `RECURRING CAST — the user message says how many returning faces this saga may use (possibly none). Cast AT MOST that many of the EXISTING WORLD CHARACTERS listed there as SECONDARY people (NEVER the core person), by their exact name + known surface; the history you write is new canon consistent with what's known. One marked as a COMPANY MERCENARY works FOR the player — they may appear as a companion or witness, never as the client, the payer, or the quarry (the company does not pay itself). Only where one genuinely fits — never crowd the bible. Coin fresh names for everyone else.\n` +
-      `BANNED CRUTCHES: do not center the plot, its proof, or its prize on a LEDGER or account-book (played campaigns show every saga converging on one) — vary the load-bearing object: a brand, a ring, letters, a tally-stick, a seal, a carved token, a witness, a tool, a beast, a deed done in front of people. And the pressing deadline need not be a tide or surge — debts come due, a rival moves first, a season turns, a patron's patience runs out.\n` +
+      `SPARKS — the user message may hand you a PROP (a physical object the proof/prize can turn on), a PRESSURE (why this cannot wait), and a CLIENT (who pays and what they are to the matter). Like the themes, FUSE them — each is a spark to riff on or replace with a closer-fitting cousin, never a checklist; do not quote the spark text.\n` +
       `BANNED PURPLE WORDS: weight, shadow, burden, fate, destiny. Clinical voice (state what IS). JSON only.`;
     const rewardIdea = i.coreKind
       ? `\nReward (just an IDEA of where the saga LANDS, NOT its premise — build a real story; do NOT reduce the whole chain to 'capture/recruit them' or title it that bluntly): by the end this person becomes the company's ${i.rarity ?? 'uncommon'} ${i.coreKind} (${i.coreKind === 'captive' ? 'taken and held or ransomed' : 'won over to join the company'}).`
@@ -284,6 +285,9 @@ export class OpenAINarrator implements Narrator {
     const seed = i.seed ? `\nTHEMES (fuse these into the core person's life — a spark, not a checklist; you need not name them): ${i.seed}` : '';
     const place = i.place ? `\nSETTING (stage the saga here): ${i.place}` : '';
     const tone = i.tone ? `\nTONE (the register for this quest): ${i.tone}` : '';
+    const prop = i.prop ? `\nPROP SPARK (the object the proof/prize can turn on): ${i.prop}` : '';
+    const pressure = i.pressure ? `\nPRESSURE SPARK (why it cannot wait): ${i.pressure}` : '';
+    const client = i.client ? `\nCLIENT SPARK (who pays, and what they are to the matter): ${i.client}` : '';
     const pool = (i.poolCast?.length && (i.poolCastMax ?? 1) > 0)
       ? `\nEXISTING WORLD CHARACTERS (cast AT MOST ${i.poolCastMax ?? 1} as SECONDARY people — never the core person):\n${i.poolCast.map((p) => `  - ${p.name} — ${p.who} [${p.tags.join(', ')}]`).join('\n')}`
       : '';
@@ -291,7 +295,7 @@ export class OpenAINarrator implements Narrator {
     const avoidNames = i.avoidNames?.length ? `\nAVOID NAMES (used in recent sagas — do NOT reuse): ${i.avoidNames.join(', ')}` : '';
     const castSize: Record<string, string> = { common: '2', uncommon: '2-3', rare: '3-4', legendary: '4-5' };
     const settings = `\nENGINE SETTINGS FOR THIS CHAIN: arc steps ~${eb} · ${i.twist ? 'TWIST' : 'STRAIGHT'} · cast ${castSize[i.rarity ?? 'uncommon']} people · choice cap ${i.maxChoices ?? 1} · returning faces allowed: ${i.poolCastMax ?? 0}`;
-    const user = `${core}\nREGION: ${i.region}${place}${tone}${seed}${settings}${names}${avoidNames}${pool}${avoid}\nJSON only.`;
+    const user = `${core}\nREGION: ${i.region}${place}${tone}${seed}${prop}${pressure}${client}${settings}${names}${avoidNames}${pool}${avoid}\nJSON only.`;
     const out = await this.json('genesis', system, user, zGenesis, this.narrativeModel, this.narrativeEffort, 4000);
     // flatten {person,roleInStory} → BiblePerson; coerce conceals
     const cast = (out.cast ?? []).map((c) => {

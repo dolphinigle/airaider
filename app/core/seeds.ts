@@ -158,8 +158,11 @@ export const PLACES: string[] = [
   'a hunting-lodge stranded by the rising water',
 ];
 
-export function pickPlace(r: () => number): string {
-  return PLACES[Math.floor(r() * PLACES.length)];
+export function pickPlace(r: () => number, avoid: string[] = []): string {
+  // avoid-window like names: two same-session sagas drew the same landmark ("…of the High Walk" twice)
+  const pool = PLACES.filter((p) => !avoid.includes(p));
+  const from = pool.length ? pool : PLACES;
+  return from[Math.floor(r() * from.length)];
 }
 
 // THEME KEYWORDS — the better premise seed (experiment-validated, see STORY_GEN_STATE.md): instead of a
@@ -178,6 +181,43 @@ const tpick = (a: string[], r: () => number) => a[Math.floor(r() * a.length)];
 export function pickThemes(r: () => number): string {
   return [tpick(THEME_BOND, r), tpick(THEME_TIE, r), tpick(THEME_FLAV, r)].join(', ');
 }
+
+// PROP SEEDS — the LOAD-BEARING OBJECT a story's proof/prize turns on. Unseeded, the model converges on
+// "a ledger" in nearly every saga (measured: 8–72 mentions per campaign). Seeding the slot beats banning
+// the token (PROMPT_RULES §2). Append freely; keep them physical, low-medieval, story-flexible.
+export const PROPS: string[] = [
+  'a branded hide', 'a signet ring', 'a bundle of letters', 'a notched tally-stick', 'a wax seal-die',
+  'a carved token', 'a betrothal cup', 'a soldier’s medal', 'a reliquary', 'a key without its lock',
+  'a christening shawl', 'a deed witnessed by three', 'a prized beast', 'a funeral mask', 'a church bell',
+  'a smith’s punch-mark', 'a lock of braided hair', 'a map cut in halves', 'a poison vial', 'a wedding band',
+  'a saint’s finger-bone', 'a child’s toy', 'an old battle-standard', 'a cargo manifest nailed to a mast',
+  'a millstone’s maker-mark', 'a falcon’s jesses', 'a set of weighted dice', 'a pilgrim’s badge',
+  'a ransom note', 'a confession sealed for the grave',
+];
+export function pickProp(r: () => number): string { return tpick(PROPS, r); }
+
+// PRESSURE SEEDS — WHY the matter cannot wait. Unseeded, every saga defaulted to "the tide/surge comes".
+export const PRESSURES: string[] = [
+  'a rival means to move first', 'the debt falls due', 'a wedding is days away', 'a magistrate is on the road',
+  'the patron is losing patience', 'the season turns and the roads close', 'a ship sails at week’s end',
+  'the accused hangs at the next assize', 'a feast-day crowd is coming', 'the levy musters soon',
+  'a buyer leaves with the next caravan', 'the sickness is spreading', 'winter stores are running out',
+  'the old keeper is dying', 'a pilgrimage arrives within days', 'the garrison rotates out',
+  'the tide will bury it again', 'a witness is about to leave for good',
+];
+export function pickPressure(r: () => number): string { return tpick(PRESSURES, r); }
+
+// CLIENT SEEDS — WHO wants this done and what they are to the matter. Unseeded, every client was a
+// shrewd merchant posting coin.
+export const CLIENTS: string[] = [
+  'a guild that wants it handled quietly', 'a widow with the dead man’s savings', 'kin of the victim',
+  'a rival of the wrongdoer, paying out of spite', 'an official with a quota to meet', 'a village pooling its coin',
+  'the wrongdoer themselves, covering tracks', 'an old comrade calling in a favour', 'a landlord protecting rents',
+  'a churchman keeping scandal from the bishop', 'a moneylender protecting collateral', 'a parent who won’t say why',
+  'a betrothed protecting the match', 'an innkeeper whose trade is dying', 'a steward acting without their lord’s knowledge',
+  'a freed servant repaying an old kindness',
+];
+export function pickClient(r: () => number): string { return tpick(CLIENTS, r); }
 
 // NAME SEEDS — a broad, sound-varied given-name pool the engine hands to genesis so the AI doesn't
 // converge on the same handful of names (Marek / Sigrun / Wren…). The AI may use these or riff on their

@@ -17,6 +17,7 @@ export interface CardAskInput {
   archetype: string; location: string; slotCount: number;
   rewardKind?: 'gold' | 'captive' | 'recruit';  // REWARD-FIRST: the engine already rolled this; the AI labels it
   quarryHint?: string;// when the reward is a person: their rolled identity (gender/race) — a named target must FIT it
+  prop?: string;      // seed: a physical object the job can turn on (anti-ledger-convergence)
   theme?: string;     // engine-thrown THEME keyword sparks to fuse into the job (decorrelates one-offs, like genesis)
   arrival?: string;   // engine-thrown keyword spark(s) for HOW the job reaches the boss (the AI weaves it)
 }
@@ -75,6 +76,9 @@ export interface GenesisInput {
                                 // story SHAPE from the focal's tags (which converge on "hidden secret")
   place?: string;               // a concrete SETTING within the region (so sagas aren't all "a fen-hamlet")
   tone?: string;                // the engine-set register (slice-of-life … dark) so not every saga is grim
+  prop?: string;                // seed: the LOAD-BEARING OBJECT the proof/prize can turn on (anti-ledger-convergence)
+  pressure?: string;            // seed: WHY the matter cannot wait (anti-always-tides)
+  client?: string;              // seed: WHO pays and what they are to the matter (anti-merchant-client-default)
   twist?: boolean;              // engine-rolled: this quest's apparent goal is a misdirection
   expectedBeats?: number;       // engine's rough beat budget → sizes the planned arc
   poolCast?: Array<{ name: string; who: string; tags: string[] }>; // existing world characters the

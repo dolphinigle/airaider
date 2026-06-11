@@ -166,6 +166,7 @@ export interface Chain {
   log: string[];             // beat summaries fed back to the AI
   personal?: boolean;        // a main chain ABOUT an existing merc (focal = that merc)
   seedKernel?: string;       // the random dramatic kernel this saga was built around (for variety + debug)
+  place?: string;            // the seeded SETTING — tracked so same-session sagas don't share a landmark
   introducedNames?: string[];// cast names the PLAYER has already met — so beats orient a name only ONCE
   arc?: string[];            // the genesis's ROUGH arc guide — each beat realizes the matching step
   arcProgress?: number;      // DEPRECATED (success-gating removed); kept for scratch-harness typecheck
