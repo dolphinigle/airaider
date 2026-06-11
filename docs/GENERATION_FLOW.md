@@ -171,13 +171,21 @@ INVARIANTS: cards never hold cards (no equipping in prototype) · only character
 one value system both species (§8 designed domain-generic; vocabularies ~disjoint, next PR).
 NAME: **relic** (the world's word; encodes relic-OF-a-story; class `relic`).
 
-### §7.1 CARD-TYPE-AS-TAG + STACKABLES (designer 2026-06-12)
-- A card's TYPE is itself a TAG (`type:character`, `type:relic`, `type:gold`, …; flat, value 0,
-  mutex one) — so slot filtering is PURE tag-matching: a quest slot "must-have type:character",
-  a display slot "must-have type:relic, wants storied". One grammar, no species special-cases.
-  (Code may keep the TS `class` discriminator for typing; the type tag mirrors it.)
-- Sultan's-Game rule: STACKABLES ARE CARDS TOO. Second axis, orthogonal to type:
-  SINGULAR (identity-bearing: characters, relics — name, story, chainIds) vs
-  FUNGIBLE (qty-stacked: gold, supplies/consumables — no identity, merge on pickup).
-- Payoff of type-as-tag: fungibles become slottable for free later (a "bribe" slot wants
-  type:gold; a "provisions" slot wants type:supply) — zero new mechanics.
+### §7.1 THE CARD SYSTEM ✅ (designer-finalized 2026-06-12)
+THREE TYPES, type is a tag: `type:character` · `type:relic` · `type:stackable`.
+- UNIFORM RULE: every card = tags + value + location. The ONLY differences:
+  CHARACTERS grow (the sole growing type); STACKABLES are MINTED (fixed defining tags + qty)
+  instead of ROLLED (randomized tag-sets) — that is the main stackable difference, everything
+  else (slots, value, storage, matching) is the same system.
+- KIND IS A TAG: a stackable's kind is a tag (`gold`, `salt`, `debt`) → slot matching stays ONE
+  primitive: requires:[type:character] · requires:[type:relic] wants:[storied] ·
+  requires:[type:stackable, gold] (a bribe slot). Merge rule: stacks merge iff tag-sets match.
+- SINGULAR vs FUNGIBLE falls out of type: character/relic carry name+story+chainIds;
+  stackables carry qty, no identity. Value: singulars = mark; stackables = qty × unit value.
+- LIABILITIES = NEGATIVE STACKABLES (debt/evidence/mess as kind tags, negative value) that
+  TRIGGER BAD EVENTS IF UNRESOLVED — the trigger is the STORY ENGINE: an unresolved liability
+  eventually spawns a hostile lead/event (the collector arrives; the evidence surfaces).
+  Plugs the "debts never bite" dead mechanic found in the 100-day test. Prototype mechanism:
+  per cycle, each liability older than N cycles has p% to spawn its collection lead.
+- Migration order: type-tag injection → slot requires[]/wants[] generalization → gold stack
+  merge → relic class + room item slots → chainIds to BaseCard → liability event trigger.
