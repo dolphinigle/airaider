@@ -87,7 +87,9 @@ for (const level of [1, 3, 5, 8]) {
   const uCoins = coinsFor(unfit, { attribute: 'charisma', favored: ['skill:song'], clashing: [] });
   let us = 0; for (let i = 0; i < trials; i++) if (resolveRoll(r, uCoins, thr).outcome === 'success') us++;
   console.log(`  L${level}: fit coins=${coins} thr=${thr} → S ${(100 * s / trials).toFixed(0)}% P ${(100 * p / trials).toFixed(0)}% F ${(100 * f / trials).toFixed(0)}%  (est ${(100 * est.success).toFixed(0)}%) | unfit coins=${uCoins} S ${(100 * us / trials).toFixed(0)}%`);
-  ok(s / trials > 0.5 && s / trials < 0.98, `L${level} fit party wins often`);
+  // a PERFECT fit (two favored tags + biased attrs) may near-guarantee success — the gamble lives at
+  // decent fit (right attribute, no tag match ≈ 40-60%), tuned via thresholdPerMerc (2026-06-11).
+  ok(s / trials > 0.5 && s / trials < 0.995, `L${level} fit party wins often`);
   ok(us / trials < s / trials - 0.15, `L${level} unfit party clearly worse (fit is a lever)`);
 }
 

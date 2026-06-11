@@ -47,6 +47,7 @@ export function questCard(eng: GameEngine, q: Quest): string {
   const tag = q.chainId ? mag(q.finale ? '[FINALE] ' : `[beat ${q.beat}] `) + mag(`✦ ${q.title}  `) : '';
   lines.push(tag + dim(`(${q.rarity} · L${q.level} · ${q.location})  [${q.id}]`));
   lines.push('  ' + b(q.situation));
+  if (q.offeredReward) lines.push('  ' + yel('Offered: ') + q.offeredReward.label + dim(` [${q.offeredReward.kind}]`));
   lines.push('  ' + yel('The job: ') + q.job);
   if (q.stakes) lines.push('  ' + dim('whisper: ' + q.stakes));
   if (q.groups) {

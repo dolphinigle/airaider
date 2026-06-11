@@ -322,7 +322,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   } else {
     instr = `STEP ${kNum} of ${nSteps}. Realize this step: ${step(stepIdx)}. A MIDDLE step that ESCALATES toward the goal — a clearly DIFFERENT scene from every prior step (new place / people / action; don't re-stage or re-fetch the same thing). The company does NOT complete the goal yet.${jobRule}${failNote} closesChain:false.${allowChoice ? ' THIS STEP AFFORDS A CHOICE: offer 2-3 "choices" (approaches testing DIFFERENT attributes — sneak/fight/talk).' : ' Single approach — no "choices".'}`;
   }
-  const opening = ` OPENING SPARK (a prompt to riff on for how this reaches the fort — weave it into the first sentence, do NOT copy it as a label or a fragment opener; NO time of day): ${mode}. Vary the opening from the previous beat.`;
+  const opening = ` OPENING SPARK (a prompt to riff on for how this reaches the fort — weave it into the first sentence, do NOT copy it as a label or a fragment opener; NO time of day as scene dressing — a deadline inside the job's fiction is fine): ${mode}. Vary the opening from the previous beat.`;
   instr += opening;
 
   const beat = await ai.chainBeat({
@@ -587,6 +587,9 @@ function deliverReward(state: GameState, r: Rng, quest: Quest, outcome: Outcome,
   if (outcome === 'failure') {
     // AI-chosen MALUS (engine-readable). Only 'debt' is wired (a negative-gold liability); injury/liability
     // are narrated + FLAGGED for later mechanical effects. 'none' = a clean failure.
+    // ENGINE GATE (ECONOMY §5): a failure punishment lands ONLY on risky quests — the AI proposes,
+    // the engine decides. (A dropped gate here made every failure stack a debt — fail-spam.)
+    if (!quest.risky) malus = { kind: 'none', label: '' };
     if (malus.kind === 'debt') {
       const d = liabilityCard(mk(state), 'debt', Math.round(BALANCE.vBase(quest.level) * 0.5), state.cycle); d.location = 'roster'; addCard(state, d);
       out.push(`a debt — ${malus.label || 'you owe coin now'}`);

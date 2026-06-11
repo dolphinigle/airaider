@@ -28,7 +28,10 @@ export const BALANCE = {
   injuryPenalty: (tier: number) => 2 + (5 - tier),
   // heads needed per slot: tracks a level-matched merc's expected heads (~(6+L)/2),
   // set a touch below so modest fit clears and an unfit party still reaches partial.
-  thresholdPerMerc: (level: number) => 3 + level * 0.5,
+  // tuned 2026-06-11 from text-UI playtests: at 3+0.5L a matched decent-fit merc sat at S19%/F50%
+  // (1-slot) and S17% (2-slot) — fail-spam, debt piles, dead starter sagas. Target: decent fit ≈
+  // S50/P30/F20, good fit (favored match) safe, poor fit still punished.
+  thresholdPerMerc: (level: number) => 2.5 + level * 0.4,
   // generation: tag-count scales with budget (a legendary hero has more traits).
   // +2 for the identity (gender/race) slots that carry ~no value.
   maxTagsPerCard: 16,

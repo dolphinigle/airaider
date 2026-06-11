@@ -30,7 +30,10 @@ for (const r of calls.filter((c) => c.kind === 'cardAsk' || c.kind === 'chainBea
 console.log('\n\n===== RESOLUTIONS (afterRoll) — read for dialogue, show-dont-tell, clear outcome, malus =====');
 for (const r of calls.filter((c) => c.kind === 'outcome')) {
   const j = J(r.response);
-  console.log(`\n  AFTER: ${strip(j.afterRoll)}`);
+  const wc = (s: string) => (s || '').trim().split(/\s+/).length;
+  const bud = /afterRoll (\d+)-(\d+)/.exec(r.user);
+  const over = bud && wc(j.afterRoll) > Number(bud[2]) ? `  ⚠ OVER (${wc(j.afterRoll)}w > ${bud[2]})` : `  [${wc(j.afterRoll)}w / ${bud ? bud[2] : '?'}]`;
+  console.log(`\n  AFTER:${over} ${strip(j.afterRoll)}`);
   if (j.malus && j.malus.kind !== 'none') console.log(`    malus:[${j.malus.kind}] "${strip(j.malus.label)}"`);
 }
 console.log('\n\n===== ONE FULL cardAsk (one-off) PROMPT — read the prompt itself =====');
