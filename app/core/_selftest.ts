@@ -27,32 +27,36 @@ ok(tagLabel('bg:noble') === 'Noble', 'flat label');
 console.log('  vocab block:\n' + promptVocabBlock().split('\n').map((l) => '    ' + l).join('\n'));
 ok(new Set(allTags().map((t) => t.word)).size === allTags().length, 'suffixes globally unique');
 
-// ---- generation (ECONOMY §4: spend the value budget on tags — net tracks the target) ----
-section('generateCharacter — budget-spend: value tracks target, believable shape');
+// ---- generation (UNIT_GENERATION §1+§2a: independent rolls; distribution SHAPED so E[value]≈target) ----
+section('generateCharacter — independent rolls, expectation tracks achievable targets');
 {
-  const r = rngFrom('gen1'); const n = 400;
-  let ratioSum = 0, under = 0, manySkills = 0, manyPers = 0;
-  for (let i = 0; i < n; i++) {
-    const level = 1 + (i % 10);
-    const target = BALANCE.vBase(level);
-    const g = generateCharacter(r, { targetValue: target, level });
-    ratioSum += g.value / target;
-    if (g.value < target * 0.5) under++;                            // budget mostly spendable
-    if (g.tags.filter((t) => t.id.startsWith('skill:')).length > 3) manySkills++;     // skill cap holds
-    if (g.tags.filter((t) => t.id.startsWith('pers:')).length > 2) manyPers++;        // personality cap holds
-    ok(g.tags.some((t) => t.id.startsWith('gender:')) && g.tags.some((t) => t.id.startsWith('race:')), 'has identity (mandatory)');
-    ok(g.value >= 0, 'value is sane');
+  // achievable (small/mid) targets: the calibrated mean lands on target; the roll keeps real variance
+  for (const [tgt, lvl] of [[20, 1], [45, 2], [55, 3]] as Array<[number, number]>) {
+    const n = 250; const vals: number[] = [];
+    let manySkills = 0;
+    for (let i = 0; i < n; i++) {
+      const g = generateCharacter(rngFrom(`g${tgt}.${i}`), { targetValue: tgt, level: lvl });
+      vals.push(g.value);
+      if (g.tags.filter((t) => t.id.startsWith('skill:')).length > 3) manySkills++;
+      ok(g.tags.some((t) => t.id.startsWith('gender:')) && g.tags.some((t) => t.id.startsWith('race:')), 'has identity (mandatory)');
+      ok(g.value >= 0, 'value is sane');
+    }
+    const mean = vals.reduce((a, b) => a + b, 0) / n;
+    const max = Math.max(...vals);
+    console.log(`  target=${tgt} (L${lvl}): mean=${mean.toFixed(0)} (${(mean / tgt * 100).toFixed(0)}%) max=${max}`);
+    ok(mean > tgt * 0.82 && mean < tgt * 1.22, `E[value]≈target at ${tgt}`);
+    ok(max > mean * 1.3, `right-leaning tail exists at ${tgt} (a lucky roll is a standout)`);
+    ok(manySkills === 0, 'skill cap respected');
   }
-  console.log(`  avg value/target=${(ratioSum / n).toFixed(2)} · <50% of target=${under}/${n}`);
-  ok(ratioSum / n > 0.8 && ratioSum / n < 1.35, 'value tracks the target (ECONOMY §4 net ~V)');
-  ok(under === 0, 'no unit collapses below half its target');
-  ok(manySkills === 0, 'skill cap respected');
-  ok(manyPers === 0, 'personality cap respected (no trait soup)');
-  // the saga focal: a maxCharValue prize must actually be WORTH prize money at every level
+  // the saga focal targets maxCharValue — the LEVEL'S MAX, so the distribution saturates below it by
+  // design (as strong as the level allows; the bank pads the gap with gold). Assert it's still PRIZE
+  // money and the tail can exceed the nominal target.
   for (const lvl of [1, 3]) {
-    let s = 0; const m = 100;
-    for (let i = 0; i < m; i++) s += generateCharacter(rngFrom(`f${lvl}.${i}`), { targetValue: BALANCE.maxCharValue(lvl), level: lvl, maxSkills: 2 }).value;
-    ok(s / m > BALANCE.maxCharValue(lvl) * 0.75, `focal value tracks maxCharValue at lvl${lvl}`);
+    const m = 150; const vals: number[] = [];
+    for (let i = 0; i < m; i++) vals.push(generateCharacter(rngFrom(`f${lvl}.${i}`), { targetValue: BALANCE.maxCharValue(lvl), level: lvl, maxSkills: 2 }).value);
+    const mean = vals.reduce((a, b) => a + b, 0) / m;
+    ok(mean > BALANCE.maxCharValue(lvl) * 0.6, `focal mean is prize-worthy at lvl${lvl}`);
+    ok(Math.max(...vals) > BALANCE.maxCharValue(lvl), `a lucky focal can exceed the nominal max at lvl${lvl}`);
   }
 }
 

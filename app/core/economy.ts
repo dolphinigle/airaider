@@ -3,7 +3,11 @@
 // (fun before balance — tuned by simulation in _selftest.ts), structure is locked.
 
 import { allTags, tagDef, type Rarity, type TagDef } from './tags.js';
-import { randInt, weightedPick, flipCoins, type Rng } from './rng.js';
+import { randInt, weightedPick, flipCoins, rngFrom, type Rng } from './rng.js';
+
+// calibration cache: solved "wealth" parameter per (level, target, skillCap, excludes) — see
+// generateCharacter; sims are deterministic so the cache is pure memoization.
+const CAL_CACHE = new Map<string, number>();
 import {
   ATTRIBUTES, type Attribute, type Attributes, type Talents,
   type TagInstance, type CharacterCard, type Archetype, type RewardKind,
@@ -151,49 +155,81 @@ export function generateCharacter(r: Rng, spec: GenSpec): GeneratedCharacter {
     return true;
   };
 
-  // 1. AI-required tags first (mid tier) — they count against the budget
+  // 1. AI-required tags first (mid tier) — they count toward the target
   for (const id of spec.required ?? []) { const def = tagDef(id); if (def) place(def, 3); }
   // 2. identity floor (mandatory): a gender + a race
   ensureIdentity(r, tags, usedMutex);
-  // 3. SPEND THE VALUE BUDGET (ECONOMY §4): loop until the remaining budget R is ~spent — pick a tag
-  //    drop-weight-weighted, tier weighted LOW (standouts stay rare) but capped by the level ceiling AND
-  //    by what R affords. The unit's worth now TRACKS the target instead of being a flat emergent roll
-  //    (a rare saga's prize is genuinely worth more); any unspendable remainder pads as gold upstream.
+  // 3. INDEPENDENT RANDOM ROLLS with the distribution SHAPED to the target (UNIT_GENERATION §1 + §2a):
+  //    every tag is still rolled ON ITS OWN — emergent count, lucky/unlucky variance, no hand-picking.
+  //    A single "wealth" parameter u, solved so the EXPECTED roll value ≈ targetValue, (a) nudges
+  //    appearance odds up SUB-linearly (capped — most traits stay absent) and (b) tilts tier weights
+  //    toward the strong end (a richer target rolls BETTER tiers, not a sprawl of cheap tags). The
+  //    right-leaning tail comes for free: top tiers stay rare, so an over-target roll is a standout.
   const avoid = new Set(spec.exclude ?? []);
-  const skillCap = spec.maxSkills ?? 3;             // believability: even a rich budget caps skills
-  // believability caps per group (a person isn't five personalities); budget spends WITHIN these
-  const GROUP_CAP: Record<string, number> = { personality: 2, physical: 2, skill: skillCap, background: 1, notoriety: 1 };
-  const groupCount = (g: string) => tags.filter((t) => tagDef(t.id)?.group === g).length;
-  for (let guard = 0; guard < 40; guard++) {
-    const R = spec.targetValue - cardTagsValue(tags);
-    if (R <= 0) break;
-    const slack = R * 0.25 + 2;                     // mild overshoot allowed so small budgets still spend
-    // CONCENTRATE value: each pick should spend a real share of what's left (~R/4), so a rich budget buys
-    // few STANDOUT tags instead of a sprawl of cheap ones; as R shrinks, cheap tags become eligible again.
-    const minSpend = Math.min(Math.max(2, R / 4), ceiling * 0.8);
-    const pref: Array<{ def: TagDef; tiers: number[] }> = [];
-    const any: Array<{ def: TagDef; tiers: number[] }> = [];
-    for (const def of allTags()) {
-      if (def.group === 'gender' || def.group === 'race' || avoid.has(def.id)) continue;
-      if (def.mutex && usedMutex.has(def.mutex)) continue;
-      if (tags.some((t) => t.id === def.id)) continue;
-      if (groupCount(def.group) >= (GROUP_CAP[def.group] ?? 2)) continue;
-      const affordable = (def.tiered ? [1, 2, 3, 4, 5] : [3]).filter((t) => {
-        const v = tagValue(def, t); return v <= ceiling && v <= R + slack;
-      });
-      if (!affordable.length) continue;
-      const meaty = affordable.filter((t) => tagValue(def, t) >= minSpend);
-      if (meaty.length) pref.push({ def, tiers: meaty });
-      any.push({ def, tiers: affordable });
+  const skillCap = spec.maxSkills ?? 3;             // believability override (focals pass 2)
+  const pool = allTags().filter((d) => d.group !== 'gender' && d.group !== 'race' && !avoid.has(d.id) && !tags.some((t) => t.id === d.id));
+  // per-group growth ceilings: cheap personality/background tags barely scale (a rich roll should not
+  // be a soup of temperaments) — wealth expresses itself through better TIERS and skills/notoriety
+  const GROWTH: Record<string, number> = { personality: 1.35, background: 1.2, physical: 2.0, skill: 2.5, notoriety: 2.5 };
+  const appearAt = (d: TagDef, u: number) => {
+    const a = BALANCE.tagAppear(d.group);
+    return Math.min(a * Math.pow(u, 0.45), a * (GROWTH[d.group] ?? 2), 0.55);
+  };
+  const tiltAt = (u: number) => 1 + Math.max(0, u - 1) * 0.5;   // per-rank boost toward tier 1
+  const tiersAt = (d: TagDef, u: number): Array<{ t: number; w: number }> => {
+    const boost = tiltAt(u);
+    return (d.tiered ? [1, 2, 3, 4, 5] : [3])
+      .filter((t) => tagValue(d, t) <= ceiling)
+      .map((t) => ({ t, w: (BALANCE.tierWeight[t] ?? 1) * Math.pow(boost, 5 - t) }));
+  };
+  // one independent-roll pass at wealth u with a given rng — used both for the real roll and for
+  // calibration sims, so the solved u is true to the actual mechanics (mutex, caps, ceiling included)
+  const rollOnce = (rng: Rng, u: number, into?: TagInstance[]): number => {
+    const sim = !into;
+    const out = into ?? [];
+    const mutex = new Set(usedMutex);
+    const skillPSum = pool.filter((d) => d.group === 'skill').reduce((s, d) => s + appearAt(d, u), 0);
+    const skillScale = skillPSum > 0 ? Math.min(1, skillCap / skillPSum) : 1;
+    let skills = tags.filter((t) => t.id.startsWith('skill:')).length;
+    let value = 0;
+    const shuffled = pool.map((d) => ({ d, k: rng() })).sort((a, b) => a.k - b.k).map((x) => x.d);
+    for (const def of shuffled) {
+      if (def.mutex && mutex.has(def.mutex)) continue;
+      if (def.group === 'skill' && skills >= skillCap) continue;
+      const p = appearAt(def, u) * (def.group === 'skill' ? skillScale : 1);
+      if (rng() >= p) continue;
+      const ws = tiersAt(def, u);
+      if (!ws.length) continue;
+      const tier = def.tiered ? weightedPick(rng, ws.map((x) => x.t), (t) => ws.find((x) => x.t === t)!.w) : 3;
+      if (def.mutex) mutex.add(def.mutex);
+      if (def.group === 'skill') skills++;
+      value += tagValue(def, tier);
+      if (!sim) out.push({ id: def.id, tier });
     }
-    const cands = pref.length ? pref : any;
-    if (!cands.length) break;
-    const c = weightedPick(r, cands, (x) => BALANCE.tagAppear(x.def.group));
-    // among the eligible tiers, stay weighted LOW (the cheapest tier that still spends ≥ minSpend is the
-    // most common pick; a top tier stays the rare standout)
-    const tier = c.def.tiered ? weightedPick(r, c.tiers, (t) => BALANCE.tierWeight[t] ?? 1) : 3;
-    place(c.def, tier);
+    return value;
+  };
+  // solve u so the MEAN roll ≈ what the target leaves after identity/required tags — by simulating the
+  // real roll (deterministic internal rng), so mutex/cap effects are captured exactly. Cached per spec.
+  const want = Math.max(0, spec.targetValue - cardTagsValue(tags));
+  const calKey = `${spec.level}|${Math.round(want)}|${skillCap}|${[...avoid].join(',')}`;
+  let u = CAL_CACHE.get(calKey);
+  if (u === undefined) {
+    const meanAt = (uu: number) => {
+      const rng = rngFrom(`cal:${calKey}:${uu.toFixed(3)}`);
+      let s = 0; const K = 60;
+      for (let k = 0; k < K; k++) s += rollOnce(rng, uu);
+      return s / K;
+    };
+    let lo = 0.05, hi = 24;
+    for (let i = 0; i < 16; i++) { const mid = (lo + hi) / 2; if (meanAt(mid) < want) lo = mid; else hi = mid; }
+    u = (lo + hi) / 2;
+    CAL_CACHE.set(calKey, u);
   }
+  // the actual roll — the player's rng, every tag independent; under/over the target is a real roll
+  // (a low-level source may SATURATE below a rich target — the reward layer pads the gap with gold)
+  const rolled: TagInstance[] = [];
+  rollOnce(r, u, rolled);
+  for (const t of rolled) { const def = tagDef(t.id); if (def) place(def, t.tier); }
   // 4. jackpot-with-catch (ECONOMY §4 step 4, previously dead code): a small lottery OVERSHOOTS the
   //    budget with one extra standout tag and saddles a negative sized to the overshoot — net ~target.
   let jackpotNegative: GeneratedCharacter['jackpotNegative'];
