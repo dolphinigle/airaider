@@ -273,7 +273,7 @@ export class OpenAINarrator implements Narrator {
       ? `\nReward (just an IDEA of where the saga LANDS, NOT its premise — build a real story; do NOT reduce the whole chain to 'capture/recruit them' or title it that bluntly): by the end this person becomes the company's ${i.rarity ?? 'uncommon'} ${i.coreKind} (${i.coreKind === 'captive' ? 'taken and held or ransomed' : 'won over to join the company'}).`
       : '';
     const core = i.personal
-      ? `CORE PERSON: the existing mercenary ${i.name ?? ''} — known as "${i.who ?? ''}"; ${i.backstory ?? ''}. Tags: [${i.focalTags[0]?.join(', ')}]. Build THEIR own buried past as NEW canon consistent with the above. Keep their name.`
+      ? `CORE PERSON: the existing mercenary ${i.name ?? ''} — known as "${i.who ?? ''}"; ${i.backstory ?? ''}. Tags: [${i.focalTags[0]?.join(', ')}]. Build THEIR own buried past as NEW canon consistent with the above. Keep their name. They SERVE the company: they may bring the matter to the boss, but they are never the client or payer (the company does not pay itself) — the company's gain comes from the world (a bounty, salvage, an interested party's coin, a threat removed).`
       : `Focal unit: ${i.name ?? '(name them)'} (${i.focalTags[0]?.join(', ')}). The saga centers on this person — keep the given name, though you MAY tweak it slightly (add a surname or by-name).${rewardIdea}`;
     const avoid = i.avoid?.length
       ? `\nMake this DISTINCT from recent sagas: ${i.avoid.map((a) => `"${a}"`).join('; ')}.`
