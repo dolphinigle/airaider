@@ -108,12 +108,16 @@ function rollChoiceBudget(r: Rng, rarity: Quest['rarity']): number {
 // names used in recent sagas (focal + cast) — handed to genesis as AVOID so names don't converge.
 function recentNames(state: GameState): string[] {
   const out = new Set<string>();
+  // roster first: a NEW character must never echo a company merc's name (read showed a buyer
+  // "Aldric Voss" sharing scenes with roster merc "Aldric the Patient" — ambiguous prose)
+  for (const c of Object.values(state.cards))
+    if (c.class === 'character' && (c as CharacterCard).role === 'merc') out.add(c.name.split(' ')[0]);
   for (const c of Object.values(state.chains).slice(-3)) {
     const focal = state.cards[c.focalCardIds[0]] as CharacterCard | undefined;
     if (focal?.name && focal.name !== 'Unknown') out.add(focal.name.split(' ')[0]);
     for (const n of bibleCastNames(c.bible || '')) out.add(n.split(' ')[0]);
   }
-  return [...out].slice(0, 12);
+  return [...out].slice(0, 16);
 }
 // a few existing world characters genesis MAY weave in as SECONDARY cast (recurrence = attachment,
 // QUEST_BIBLE.md §4 "reuse the pool first"). Never the focal; a small sample so the model can choose.
@@ -163,7 +167,11 @@ async function pursueOneOff(state: GameState, ai: Narrator, r: Rng, lead: Lead):
   // REWARD-FIRST (ECONOMY/QUESTS): the engine rolls the reward, THEN the AI writes the job + a player-facing
   // label around it — the AI dresses the reward, it doesn't pick it.
   const reward = generateReward(r, mk(state), state.cycle, { V, archetype: lead.archetype, isChain: false, level: lead.level });
-  const card = await ai.cardAsk({ archetype: lead.archetype, location: lead.location, slotCount: n, rewardKind: offerKindOf(reward), theme: pickThemes(r), arrival: pickArrival(r) });
+  // if the reward is a PERSON, hand the writer their rolled identity — a named quarry must fit the
+  // actual unit (read showed a card promising "Eira" while the rolled captive was a male wolfman)
+  const unit = reward.cards.find((c): c is CharacterCard => c.class === 'character');
+  const quarryHint = unit ? tagLabels(unit.tags.filter((t) => t.id.startsWith('gender:') || t.id.startsWith('race:') || t.id.startsWith('bg:'))).join(', ') : undefined;
+  const card = await ai.cardAsk({ archetype: lead.archetype, location: lead.location, slotCount: n, rewardKind: offerKindOf(reward), quarryHint, theme: pickThemes(r), arrival: pickArrival(r) });
   const quest: Quest = {
     id: uid(state, 'quest'), leadId: lead.id, rarity: lead.rarity, level: lead.level, location: lead.location,
     archetype: lead.archetype, title: card.job.slice(0, 48), situation: card.situation, job: card.job,
@@ -297,7 +305,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   const kNum = Math.min(stepIdx + 1, nSteps);
   // a CONSEQUENCE note when the previous beat FAILED — this beat opens from the fallout (NOT a retry of
   // the same step): the company is worse off, but the story moves forward toward the goal regardless.
-  const failNote = (!isBeatOne && chain.lastFailed) ? ' The previous step FAILED — OPEN from the fallout (a setback, loss, or worse position from that failure), then press on; do NOT re-attempt the same action and do NOT pretend it succeeded.' : '';
+  const failNote = (!isBeatOne && chain.lastFailed) ? ' The previous step FAILED — OPEN from the fallout (a setback, loss, or worse position from that failure), then press on; do NOT re-attempt the same action and do NOT pretend it succeeded. If the arc step you are realizing ASSUMES something the company failed to get (an object not seized, a person not taken), ADAPT the step to where they actually stand — write the version of its INTENT that fits the fallout, never a job that handles a thing they do not have.' : '';
   // CHOICES: the bible proposed which arc steps branch (choiceSteps, may include the finale); the engine
   // honors at most choiceBudget of them (PROMPT_RULES §3). Mid-step branch = a sneak/fight/talk method choice.
   const branchPoints = (chain.choiceSteps ?? []).filter((s) => s >= 2 && s <= nSteps).slice(0, chain.choiceBudget ?? 0);
@@ -739,7 +747,7 @@ function recordBeat(state: GameState, quest: Quest, outcome: Outcome, partySize:
   // react, the company is worse off) — the next beat opens from the fallout, never retries the step.
   const result = learned
     ? `and the company now knows: ${learned}`
-    : `but FAILED — the company did NOT complete this step; they are worse off and the situation darkens (the next beat opens from this fallout and presses on)`;
+    : `but FAILED — worse off, nothing gained`;
   chain.log.push(`Beat ${chain.beatsResolved}: the company set to "${quest.job}" ${result}.`);
   if (quest.finale) { chain.state = 'done'; if (outcome !== 'failure') maybeSpawnSequel(state, chain); return true; }
   return false;
