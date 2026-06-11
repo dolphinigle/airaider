@@ -555,7 +555,7 @@ export async function resolveQuest(state: GameState, ai: Narrator, quest: Quest)
   for (const c of deliveredChars) {
     if (c.role === 'dead' || (c.backstory && c.quirks.length)) continue; // already a complete card
     try {
-      const roster = Object.values(state.cards).filter((x): x is CharacterCard => x.class === 'character' && x.role === 'merc').map((m) => m.name.split(' ')[0]);
+      const roster = Object.values(state.cards).filter((x): x is CharacterCard => x.class === 'character' && (x.role === 'merc' || x.role === 'captive') && x.id !== c.id && x.name !== 'Unknown').map((m) => m.name.split(' ')[0]);
       const f = await ai.flesh({ tags: tagLabels(c.tags), attrs: c.attrs, context: `acquired via "${quest.job}"`, nameSeeds: pickNameSeeds(r, 3), avoidNames: [...new Set([...roster, ...recentNames(state)])].slice(0, 16) });
       if (f.name && (!c.name || c.name === 'Unknown')) c.name = f.name;
       if (f.who && !c.who) c.who = f.who;
@@ -644,11 +644,12 @@ function deliverReward(state: GameState, r: Rng, quest: Quest, outcome: Outcome,
 
   const scale = outcome === 'partial' ? 0.5 : 1;
   let positive = 0;
+  let namedOne = false;   // the AI names ONE captive — a split two-unit haul must not clone the name
   for (const card of bundle.cards) {
     if (card.class === 'gold') { const g = Math.round(card.value * scale); state.gold += g; positive += g; out.push(/gold$/.test(card.name) ? `${g} gold` : `${card.name} (${g}g)`); }
     // a person can't be halved: on a partial you keep the WHOLE unit (full value) — the
     // value is balanced back to V/2 by the saddling liability below.
-    else if (card.class === 'character') { deliverCharacter(state, card, outcome, aiCaptive, out); delivered.push(card); positive += card.value; }
+    else if (card.class === 'character') { deliverCharacter(state, card, outcome, namedOne ? null : aiCaptive, out); namedOne = true; delivered.push(card); positive += card.value; }
     else if (card.class === 'liability') { card.location = 'roster'; addCard(state, card); out.push(card.name); }
   }
   // partial balancing: bring delivered net to ~V/2 with a liability (saddle) or skip if already near
