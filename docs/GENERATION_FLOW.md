@@ -88,7 +88,7 @@ and astronomically rare). Details belong to the TAG REVAMP (§8) — designed th
 | Quality not sprawl | per-group growth caps in generator | ✅ built |
 | Legibility (badge) | derived from substance | ❌ → §8 scope |
 
-## §8 TAG SYSTEM 🔶 (curve/bands/depth agreed 2026-06-12; DRIFT, BADGE, DIES-list pending designer review)
+## §8 TAG SYSTEM ✅ (designed 2026-06-12; deletion-list deferred to the next station)
 
 ARCHITECTURE — fine TIERS (engine) / coarse BANDS (AI):
 - A tag instance = (concept, tier). Tiers are ASCENDING integers (migration inverts today's
@@ -127,15 +127,17 @@ value ≠ usefulness; a Mirror-tier tag barely out-rolls a solid one).
 Deep LOW-UTILITY lines (Kind, Lineage, Renown) are first-class: the living saint / noble
 hostage / Mona-Lisa relic all roll naturally.
 
-TIER DRIFT (characters ONLY — the species discriminator all the way down): saga stamps,
-training, hardship tick a tag ±1 tier (×÷1.9 value). Relics are frozen forever. Drift-event
-mechanisms designed with the growth system later; the principle is locked.
+TIER DRIFT — designed, **NOT IN PROTOTYPE** (designer 2026-06-12): characters' tag tiers can
+tick ±1 from life events (training, saga stamps, hardship; ×÷1.9 value); relics never change.
+Recorded for the post-prototype growth system.
 
-BADGE (legibility, derived from highest tier): ≤8 common · 9–12 notable · 13–16 exceptional ·
-17+ singular.
+LEGIBILITY = PER-TAG RARITY BORDERS (designer; replaces the unit-level badge, which is OUT):
+each tag chip is displayed with a border/color indicating its tier band — rarity readable
+tag-by-tag, PoE-style, no derived unit label.
 
-WHAT DIES: TagDef rarity-class (common/uncommon/rare/legendary), rarityBase, flatTagMult,
-tagCeiling-as-value, the old tierWeight table, descending tiers.
+DELETION LIST: deferred to the next station (what the new system replaces — rarity-class,
+rarityBase, flatTagMult, tagCeiling-as-value, old tierWeight, descending tiers — to be
+confirmed item-by-item there, not locked here).
 
 NOTIONAL TOP END: above ~100k value is trophy-class — selling needs a SPECIAL-BUYER story
 event (later); prototype lets the mark sit on the card.
