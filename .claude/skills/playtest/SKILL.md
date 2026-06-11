@@ -50,6 +50,13 @@ catch breakage, never judge prose: `npm run -s test` · `npm run -s looptest` ·
 A harness like `app/_exp_playtest2.ts` can assert structural invariants in passing, but treat that as the
 seatbelt, not the drive.
 
+## Ready-made reading harnesses (start here, write new ones freely)
+- `app/_exp_quality.ts <seed>` — drives ~7 real cycles, dumps ALL intros+offers, ALL resolutions+maluses,
+  and one FULL prompt per kind. The main read.
+- `app/_exp_idea.ts <seed>` — two fresh chain geneses: title/arc/coreReward + beat-1, + the genesis user
+  prompt. For arc/bible reads.
+- `app/_exp_firstquest.ts <seed>` — first-board one-offs: situation/offer→grant/job. For one-off reads.
+
 ## Report back
 - The PROSE findings first: what read well, what smelled, with **example quotes** and the **prompt line**
   responsible + the fix. Iterate until the re-read is clean.

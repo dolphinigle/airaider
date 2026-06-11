@@ -66,6 +66,13 @@ ending" note. Calibrate by READING outputs (`_exp_reslength.ts`), not by asserti
 nor comma-splice run-ons. Orient a person ONCE on first appearance (natural apposition, not parens);
 pass the already-met list so the AI uses bare names thereafter.
 
+## 7a. System prompt is BYTE-STABLE; all variable data in the user message
+The system prompt (schema + instructions) is the prompt-cached prefix — it must not vary per call
+(STORY_ENGINE §10.2). Never interpolate per-call data (word budgets, step counts, twist flags, caps)
+into it; put those in the user message ("the cap given in the user message") and have the stable text
+reference them. Conditional rules (twist vs straight) live in the stable text as both branches, selected
+by a user-message flag. Implemented 2026-06-11 for outcome + genesis.
+
 ## 8. How to change a prompt
 Edit → **read real outputs** (run a `_exp_*` harness with the real AI, or `/playtest`) → judge the prose,
 not the diff → iterate. Offline gates (selftest/looptest/conformance) use the Mock narrator and only prove

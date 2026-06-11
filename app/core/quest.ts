@@ -122,7 +122,8 @@ function gatherPoolCast(state: GameState, r: Rng, focalId: string): Array<{ name
     .filter((c) => c.id !== focalId && c.name && c.name !== 'Unknown' && c.who);
   // shuffle by seeded sort, take up to 3 (the prompt casts at most one or two, and only where they fit)
   const shuffled = pool.map((c) => ({ c, k: r() })).sort((a, b) => a.k - b.k).map((x) => x.c).slice(0, 3);
-  return shuffled.map((c) => ({ name: c.name, who: c.who ?? '', tags: tagLabels(c.tags).slice(0, 5) }));
+  // mark company mercs so the bible can't cast them as client/payer/quarry (they work FOR the player)
+  return shuffled.map((c) => ({ name: c.name, who: `${c.role === 'merc' ? 'COMPANY MERCENARY — ' : ''}${c.who ?? ''}`, tags: tagLabels(c.tags).slice(0, 5) }));
 }
 // theme-defining tags of recent (non-personal) focals — excluded from the next focal so the
 // ARCHETYPE varies. Skills alone weren't enough: reading showed every focal coming out a
@@ -202,8 +203,14 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
   // the bible NAMES the core person (cast[0]) — that's the focal; adopt their NAME so beats and the
   // card match. who/backstory are written cleanly by flesh at delivery (the bible's why-ladder is the
   // HIDDEN writers'-room reference, NOT a readable dossier bio).
+  // ENGINE GUARD (don't trust the prompt): if the model cast an EXISTING world character as the core
+  // person (seen in play: it made roster-merc Marek the focal → the finale would deliver a second
+  // Marek), keep the seeded focal name instead of adopting the collision.
   const core = g.cast[0];
-  if (core) focal.name = core.name;
+  const worldNames = new Set(Object.values(state.cards)
+    .filter((c): c is CharacterCard => c.class === 'character' && c.id !== focal.id)
+    .map((c) => c.name.split(' ')[0]));
+  if (core && !worldNames.has(core.name.split(' ')[0])) focal.name = core.name;
   const chain: Chain = {
     id: uid(state, 'chain'), title: g.title, hook: g.leadBlurb, bible: renderBible(g), direction: g.directions[0]?.hook ?? '',
     focalCardIds: [focal.id], coreKind, coreReward, rarity: lead.rarity, level: lead.level, expectedBeats: arcBeats, beatsResolved: 0,
