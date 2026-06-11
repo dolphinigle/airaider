@@ -27,29 +27,33 @@ ok(tagLabel('bg:noble') === 'Noble', 'flat label');
 console.log('  vocab block:\n' + promptVocabBlock().split('\n').map((l) => '    ' + l).join('\n'));
 ok(new Set(allTags().map((t) => t.word)).size === allTags().length, 'suffixes globally unique');
 
-// ---- generation (UNIT_GENERATION.md §1: roll each tag independently — most ordinary, few standouts) ----
-section('generateCharacter — roll-based, most ordinary + few standouts');
+// ---- generation (ECONOMY §4: spend the value budget on tags — net tracks the target) ----
+section('generateCharacter — budget-spend: value tracks target, believable shape');
 {
   const r = rngFrom('gen1'); const n = 400;
-  let topTierSum = 0, multiTop = 0, manySkills = 0, tagSum = 0, blank = 0;
+  let ratioSum = 0, under = 0, manySkills = 0, manyPers = 0;
   for (let i = 0; i < n; i++) {
     const level = 1 + (i % 10);
-    const g = generateCharacter(r, { targetValue: BALANCE.vBase(level), level });
-    const top = g.tags.filter((t) => t.tier <= 2).length;          // "very X" standouts
-    const skills = g.tags.filter((t) => t.id.startsWith('skill:')).length;
-    const nonId = g.tags.filter((t) => !t.id.startsWith('gender:') && !t.id.startsWith('race:')).length;
-    topTierSum += top; tagSum += nonId;
-    if (top >= 3) multiTop++;            // a 3+ "very X" stack should be RARE (emergent, not capped)
-    if (skills >= 4) manySkills++;       // 4+ skills should be rare
-    if (nonId === 0) blank++;            // an unlucky near-blank unit is allowed but uncommon
+    const target = BALANCE.vBase(level);
+    const g = generateCharacter(r, { targetValue: target, level });
+    ratioSum += g.value / target;
+    if (g.value < target * 0.5) under++;                            // budget mostly spendable
+    if (g.tags.filter((t) => t.id.startsWith('skill:')).length > 3) manySkills++;     // skill cap holds
+    if (g.tags.filter((t) => t.id.startsWith('pers:')).length > 2) manyPers++;        // personality cap holds
     ok(g.tags.some((t) => t.id.startsWith('gender:')) && g.tags.some((t) => t.id.startsWith('race:')), 'has identity (mandatory)');
     ok(g.value >= 0, 'value is sane');
   }
-  console.log(`  avg standout(T1-2)=${(topTierSum / n).toFixed(2)} · avg tags=${(tagSum / n).toFixed(1)} · 3+stack=${multiTop}/${n} · 4+skills=${manySkills}/${n} · blank=${blank}/${n}`);
-  ok(topTierSum / n < 1.0, 'standouts are rare on average (most traits ordinary)');
-  ok(multiTop < n * 0.06, '3+ "very X" stacks are rare (emergent rarity, no Mary-Sue stacks)');
-  ok(manySkills < n * 0.06, '4+ skills is rare');
-  ok(blank < n * 0.25, 'most units have at least one trait beyond identity');
+  console.log(`  avg value/target=${(ratioSum / n).toFixed(2)} · <50% of target=${under}/${n}`);
+  ok(ratioSum / n > 0.8 && ratioSum / n < 1.35, 'value tracks the target (ECONOMY §4 net ~V)');
+  ok(under === 0, 'no unit collapses below half its target');
+  ok(manySkills === 0, 'skill cap respected');
+  ok(manyPers === 0, 'personality cap respected (no trait soup)');
+  // the saga focal: a maxCharValue prize must actually be WORTH prize money at every level
+  for (const lvl of [1, 3]) {
+    let s = 0; const m = 100;
+    for (let i = 0; i < m; i++) s += generateCharacter(rngFrom(`f${lvl}.${i}`), { targetValue: BALANCE.maxCharValue(lvl), level: lvl, maxSkills: 2 }).value;
+    ok(s / m > BALANCE.maxCharValue(lvl) * 0.75, `focal value tracks maxCharValue at lvl${lvl}`);
+  }
 }
 
 // ---- the success curve: level-L merc on level-L quest should be ~winnable ---

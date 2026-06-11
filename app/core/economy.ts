@@ -148,22 +148,67 @@ export function generateCharacter(r: Rng, spec: GenSpec): GeneratedCharacter {
     return true;
   };
 
-  // 1. AI-required tags first (mid tier)
+  // 1. AI-required tags first (mid tier) — they count against the budget
   for (const id of spec.required ?? []) { const def = tagDef(id); if (def) place(def, 3); }
   // 2. identity floor (mandatory): a gender + a race
   ensureIdentity(r, tags, usedMutex);
-  // 3. ROLL EACH eligible tag INDEPENDENTLY (UNIT_GENERATION.md §1): a low appearance prob → most tags
-  //    absent; a weighted-low tier → standouts ("very X") rare. NO count caps — rarity is emergent, not
-  //    clipped. Value is whatever it rolls; targeting a value is design-deferred (UNIT_GENERATION.md §2).
+  // 3. SPEND THE VALUE BUDGET (ECONOMY §4): loop until the remaining budget R is ~spent — pick a tag
+  //    drop-weight-weighted, tier weighted LOW (standouts stay rare) but capped by the level ceiling AND
+  //    by what R affords. The unit's worth now TRACKS the target instead of being a flat emergent roll
+  //    (a rare saga's prize is genuinely worth more); any unspendable remainder pads as gold upstream.
   const avoid = new Set(spec.exclude ?? []);
-  const pool = allTags()
-    .filter((d) => d.group !== 'gender' && d.group !== 'race' && !avoid.has(d.id))
-    .map((d) => ({ d, k: r() })).sort((a, b) => a.k - b.k).map((x) => x.d);   // shuffle: placement order must not bias
-  for (const def of pool) {
-    if (def.mutex && usedMutex.has(def.mutex)) continue;
-    if (tags.some((t) => t.id === def.id)) continue;
-    if (r() >= BALANCE.tagAppear(def.group)) continue;
-    place(def, def.tiered ? weightedTier(r, def, ceiling) : 3);
+  const skillCap = spec.maxSkills ?? 3;             // believability: even a rich budget caps skills
+  // believability caps per group (a person isn't five personalities); budget spends WITHIN these
+  const GROUP_CAP: Record<string, number> = { personality: 2, physical: 2, skill: skillCap, background: 1, notoriety: 1 };
+  const groupCount = (g: string) => tags.filter((t) => tagDef(t.id)?.group === g).length;
+  for (let guard = 0; guard < 40; guard++) {
+    const R = spec.targetValue - cardTagsValue(tags);
+    if (R <= 0) break;
+    const slack = R * 0.25 + 2;                     // mild overshoot allowed so small budgets still spend
+    // CONCENTRATE value: each pick should spend a real share of what's left (~R/4), so a rich budget buys
+    // few STANDOUT tags instead of a sprawl of cheap ones; as R shrinks, cheap tags become eligible again.
+    const minSpend = Math.min(Math.max(2, R / 4), ceiling * 0.8);
+    const pref: Array<{ def: TagDef; tiers: number[] }> = [];
+    const any: Array<{ def: TagDef; tiers: number[] }> = [];
+    for (const def of allTags()) {
+      if (def.group === 'gender' || def.group === 'race' || avoid.has(def.id)) continue;
+      if (def.mutex && usedMutex.has(def.mutex)) continue;
+      if (tags.some((t) => t.id === def.id)) continue;
+      if (groupCount(def.group) >= (GROUP_CAP[def.group] ?? 2)) continue;
+      const affordable = (def.tiered ? [1, 2, 3, 4, 5] : [3]).filter((t) => {
+        const v = tagValue(def, t); return v <= ceiling && v <= R + slack;
+      });
+      if (!affordable.length) continue;
+      const meaty = affordable.filter((t) => tagValue(def, t) >= minSpend);
+      if (meaty.length) pref.push({ def, tiers: meaty });
+      any.push({ def, tiers: affordable });
+    }
+    const cands = pref.length ? pref : any;
+    if (!cands.length) break;
+    const c = weightedPick(r, cands, (x) => BALANCE.tagAppear(x.def.group));
+    // among the eligible tiers, stay weighted LOW (the cheapest tier that still spends ≥ minSpend is the
+    // most common pick; a top tier stays the rare standout)
+    const tier = c.def.tiered ? weightedPick(r, c.tiers, (t) => BALANCE.tierWeight[t] ?? 1) : 3;
+    place(c.def, tier);
+  }
+  // 4. jackpot-with-catch (ECONOMY §4 step 4, previously dead code): a small lottery OVERSHOOTS the
+  //    budget with one extra standout tag and saddles a negative sized to the overshoot — net ~target.
+  let jackpotNegative: GeneratedCharacter['jackpotNegative'];
+  if (r() < BALANCE.jackpotChance) {
+    const lux = allTags().filter((d) => d.tiered && !avoid.has(d.id)
+      && !(d.mutex && usedMutex.has(d.mutex)) && !tags.some((t) => t.id === d.id)
+      && !(d.group === 'skill' && tags.filter((t) => t.id.startsWith('skill:')).length >= skillCap)
+      && [1, 2].some((t) => tagValue(d, t) <= ceiling));
+    if (lux.length) {
+      const def = lux[randInt(r, 0, lux.length - 1)];
+      const tier = tagValue(def, 1) <= ceiling ? 1 : 2;
+      place(def, tier);
+      const over = cardTagsValue(tags) - spec.targetValue;
+      if (over > 4) {
+        const kinds = ['evidence', 'mess', 'debt'] as const;
+        jackpotNegative = { kind: kinds[randInt(r, 0, 2)], value: Math.round(over) };
+      }
+    }
   }
 
   const level = spec.level;
@@ -171,15 +216,10 @@ export function generateCharacter(r: Rng, spec: GenSpec): GeneratedCharacter {
   const talents = rollTalents(r);
   const attrs = attrsAtLevel(base, talents, level);
   const value = cardTagsValue(tags);
-  return { tags, attrs, base, talents, level, value };
+  return { tags, attrs, base, talents, level, value, jackpotNegative };
 }
 
 /** Roll a tag's tier: low tiers ("ordinary") common, top tiers ("very X") rare; gated by the ceiling. */
-function weightedTier(r: Rng, def: TagDef, ceiling: number): number {
-  const allowed = [1, 2, 3, 4, 5].filter((t) => tagValue(def, t) <= ceiling);
-  if (!allowed.length) return 5;
-  return weightedPick(r, allowed, (t) => BALANCE.tierWeight[t] ?? 1);
-}
 function ensureIdentity(r: Rng, tags: TagInstance[], usedMutex: Set<string>) {
   for (const group of ['gender', 'race']) {
     if (![...usedMutex].some((m) => m.startsWith(group))) {
@@ -209,7 +249,9 @@ export function splitValue(r: Rng, V: number, archetype: Archetype, isChain: boo
   if (isChain) return [{ kind: 'recruit', value: V }]; // concentrate on focal character
   const cfg = ARCHETYPE_SPLIT[archetype];
   const [lo, hi] = cfg.unitShareRange;
-  const unitShare = lo + r() * (hi - lo);
+  // a gold-primary archetype is all gold (a non-gold unit share would just be discarded below,
+  // silently leaking value — the bundle must net ~V)
+  const unitShare = cfg.primary === 'gold' ? 0 : lo + r() * (hi - lo);
   const parts: SplitPart[] = [];
   const unitValue = Math.round(V * unitShare);
   const goldValue = V - unitValue;
