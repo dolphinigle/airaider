@@ -240,7 +240,9 @@ export class MockNarrator implements Narrator {
   }
   async chainBeat(i: ChainBeatInput): Promise<ChainBeatOut> {
     return {
-      situation: `A new turn in the matter at ${i.region}: ${i.beatConstraint}.`,
+      // plain fallback line — NEVER interpolate beatConstraint (it's a raw engine instruction; a real-AI
+      // failure falls back here and the player must not read internals)
+      situation: `Word reaches the fort: the matter at ${i.region} moves again, and the company can press on.`,
       job: 'Follow the thread one step further.',
       offeredReward: { kind: 'gold', label: 'coin, and the prize at the saga\'s end' },
       ask: { attribute: 'intelligence', favoredTags: ['skill:lore', 'pers:brave'], slots: Array.from({ length: i.slotCount }, () => ({ kind: 'open' as const })) },

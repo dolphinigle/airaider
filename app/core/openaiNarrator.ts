@@ -116,28 +116,35 @@ export class OpenAINarrator implements Narrator {
     const attempts: Array<{ eff: 'minimal' | 'low' | 'medium'; tok: number }> = [
       { eff: this.effortOverride ?? effort, tok: maxTokens },
       { eff: 'minimal', tok: Math.round(maxTokens * 1.6) },
+      { eff: 'minimal', tok: Math.round(maxTokens * 1.6) },
     ];
     let lastErr = '';
     for (let a = 0; a < attempts.length; a++) {
+      // backoff before retries: transient 429/5xx under load otherwise degrades the quest to a
+      // bland mock-fallback card (seen in parallel playtest campaigns)
+      if (a > 0) await new Promise((res) => setTimeout(res, 1500 * a));
       const { eff, tok } = attempts[a];
       const t0 = Date.now();
-      const res = await this.client.chat.completions.create({
-        model, messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
-        response_format: { type: 'json_object' }, max_completion_tokens: tok,
-        ...( { reasoning_effort: eff } as Record<string, unknown> ),
-      } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
-      const ms = Date.now() - t0;
-      const usage = res.usage;
-      const raw = res.choices[0]?.message?.content ?? '';
-      const cached = (usage as unknown as { prompt_tokens_details?: { cached_tokens?: number } })?.prompt_tokens_details?.cached_tokens ?? 0;
-      this.log(`  ai[${kind}·${model}·${eff}${a ? ' RETRY' : ''}] ${(ms / 1000).toFixed(1)}s in=${usage?.prompt_tokens} (cached ${cached}) out=${usage?.completion_tokens}`);
-      this.onCall?.({
-        n: ++this.callCount, kind, model, effort: eff, ms, system, user, response: raw,
-        promptTokens: usage?.prompt_tokens, completionTokens: usage?.completion_tokens,
-        cachedTokens: cached,
-      });
-      try { return schema.parse(JSON.parse(raw)); }
-      catch (e) { lastErr = raw ? String(e).slice(0, 120) : 'empty response'; }
+      try {
+        // the API call must be INSIDE the try: a transient 429/5xx used to throw straight past the
+        // retry loop to the mock fallback (seen as bland instruction-leak cards in parallel campaigns)
+        const res = await this.client.chat.completions.create({
+          model, messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
+          response_format: { type: 'json_object' }, max_completion_tokens: tok,
+          ...( { reasoning_effort: eff } as Record<string, unknown> ),
+        } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
+        const ms = Date.now() - t0;
+        const usage = res.usage;
+        const raw = res.choices[0]?.message?.content ?? '';
+        const cached = (usage as unknown as { prompt_tokens_details?: { cached_tokens?: number } })?.prompt_tokens_details?.cached_tokens ?? 0;
+        this.log(`  ai[${kind}·${model}·${eff}${a ? ' RETRY' : ''}] ${(ms / 1000).toFixed(1)}s in=${usage?.prompt_tokens} (cached ${cached}) out=${usage?.completion_tokens}`);
+        this.onCall?.({
+          n: ++this.callCount, kind, model, effort: eff, ms, system, user, response: raw,
+          promptTokens: usage?.prompt_tokens, completionTokens: usage?.completion_tokens,
+          cachedTokens: cached,
+        });
+        return schema.parse(JSON.parse(raw));
+      } catch (e) { lastErr = String(e).slice(0, 140); this.log(`  ai[${kind}] attempt ${a + 1} failed: ${lastErr}`); }
     }
     throw new Error(`AI ${kind} failed after retry: ${lastErr}`);
   }
