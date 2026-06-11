@@ -49,7 +49,7 @@ export function questCard(eng: GameEngine, q: Quest): string {
   lines.push('  ' + b(q.situation));
   if (q.offeredReward) lines.push('  ' + yel('Offered: ') + q.offeredReward.label + dim(` [${q.offeredReward.kind}]`));
   lines.push('  ' + yel('The job: ') + q.job);
-  if (q.stakes) lines.push('  ' + dim('whisper: ' + q.stakes));
+  // q.stakes (the beat's PROPOSED reveal) is internal — printing it spoils the beat's discovery
   if (q.groups) {
     lines.push('  ' + mag('Choose ONE approach:'));
     for (const g of q.groups) {

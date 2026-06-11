@@ -175,7 +175,11 @@ async function pursueOneOff(state: GameState, ai: Narrator, r: Rng, lead: Lead):
   const quest: Quest = {
     id: uid(state, 'quest'), leadId: lead.id, rarity: lead.rarity, level: lead.level, location: lead.location,
     archetype: lead.archetype, title: card.job.slice(0, 48), situation: card.situation, job: card.job,
-    offeredReward: card.offeredReward,
+    // PROMISE = GRANT: the offer's kind is the ROLLED kind (the AI only words the label); 'unknown'
+    // (a true mystery) and 'none' (a plea) are the only AI-allowed deviations.
+    offeredReward: ['unknown', 'none'].includes(card.offeredReward.kind)
+      ? card.offeredReward
+      : { kind: offerKindOf(reward), label: card.offeredReward.label },
     stakes: '', slots: buildSlots(card.ask, n, ownedMercTags(state)), threshold: thresholdFor(n, lead.level),
     reward, risky: isRisky(lead),
   };
@@ -322,7 +326,7 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
   const jobRule = ' The "job" line is ONLY this step\'s ONE concrete action — NEVER a restatement of the overall goal (the player already knows the goal).';
   let instr: string;
   if (isBeatOne) {
-    instr = `STEP 1 of ${nSteps} — the OPENER, where the company is OFFERED this job. Realize this step: ${step(0)}. Make the player CARE: a real person on stage in a small human moment (a grief, want, or kindness), centered on ${focalName} UNLESS they're the bible's hidden wrongdoer (then a victim / worried kin / bystander). The "situation" carries the client's offer/briefing (how the job ARRIVES); the "job" line is the company's first real mission in the field — a task whose outcome is in doubt (go after the thing, search the place, confront someone). Meeting, accepting, or 'getting directions' is the SITUATION, NOT the job. Do NOT complete the goal, do NOT capture/resolve ${focalName}, no faceless steward/clerk handing over a contract. closesChain:false. Single approach — no "choices".`;
+    instr = `STEP 1 of ${nSteps} — the OPENER, where the company is OFFERED this job. Realize this step: ${step(0)}. Make the player CARE: a real person on stage in a small human moment (a grief, want, or kindness), centered on ${focalName} UNLESS they're the bible's hidden wrongdoer (then a victim / worried kin / bystander). The "situation" carries the client's offer/briefing (how the job ARRIVES); the "job" line is the company's first real mission in the field — a task whose outcome is in doubt (go after the thing, search the place, confront someone). Meeting, accepting, or 'getting directions' is the SITUATION, NOT the job. Do NOT complete the goal, do NOT capture/resolve ${focalName}, no faceless steward/clerk handing over a contract. Single approach — no "choices".`;
   } else if (isFinale) {
     const desperate = (!reachedLast || lastChance) ? ' This is a LAST-CHANCE finale: the company is OUT OF TIME after repeated setbacks — force it to a head from where they actually stand; everything rides on this, and the goal may yet slip.' : '';
     const endingAsk = chain.personal
@@ -330,9 +334,9 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
       : finaleBranches
         ? ` OUTPUT "choices": 2-3 story-logical ENDINGS for ${focalName} given how this finale actually unfolded — each with a "kind". Each label must NAME who/what it resolves and READ as its kind: recruit = they join your company; captive = you take/hold/cage them; gold = you hand off / sell / turn them in for coin. Vary the kind where it makes sense.`
         : ` OUTPUT "choices": exactly ONE ending — the company's single way to resolve ${focalName} here — its label NAMES them and matches its "kind" (recruit / captive / gold).`;
-    instr = `STEP ${nSteps} of ${nSteps} — the FINALE. Realize the final step: ${lastStep}. The goal is ACHIEVED or RESOLVED here, paying off whatever truth surfaced; it MUST read as the peak, not a sudden stop. The offeredReward names the SAGA'S WHOLE PAYOFF in plain terms (the spoils gathered along the way and the person/prize at stake), not a small purse for the errand.${desperate}${jobRule}${failNote} closesChain:true.${endingAsk}`;
+    instr = `STEP ${nSteps} of ${nSteps} — the FINALE. Realize the final step: ${lastStep}. The goal is ACHIEVED or RESOLVED here, paying off whatever truth surfaced; it MUST read as the peak, not a sudden stop. The offeredReward names the SAGA'S WHOLE PAYOFF in plain terms (the spoils gathered along the way and the person/prize at stake), not a small purse for the errand.${desperate}${jobRule}${failNote}${endingAsk}`;
   } else {
-    instr = `STEP ${kNum} of ${nSteps}. Realize this step: ${step(stepIdx)}. A MIDDLE step that ESCALATES toward the goal — a clearly DIFFERENT scene from every prior step (new place / people / action; don't re-stage or re-fetch the same thing). The company does NOT complete the goal yet.${jobRule}${failNote} closesChain:false.${allowChoice ? ' THIS STEP AFFORDS A CHOICE: offer 2-3 "choices" (approaches testing DIFFERENT attributes — sneak/fight/talk).' : ' Single approach — no "choices".'}`;
+    instr = `STEP ${kNum} of ${nSteps}. Realize this step: ${step(stepIdx)}. A MIDDLE step that ESCALATES toward the goal — a clearly DIFFERENT scene from every prior step (new place / people / action; don't re-stage or re-fetch the same thing). The company does NOT complete the goal yet.${jobRule}${failNote}${allowChoice ? ' THIS STEP AFFORDS A CHOICE: offer 2-3 "choices" (approaches testing DIFFERENT attributes — sneak/fight/talk).' : ' Single approach — no "choices".'}`;
   }
   const opening = ` OPENING SPARK (a prompt to riff on for how this reaches the fort — weave it into the first sentence, do NOT copy it as a label or a fragment opener; NO time of day as scene dressing — a deadline inside the job's fiction is fine): ${mode}. Vary the opening from the previous beat.`;
   instr += opening;
@@ -413,7 +417,13 @@ async function makeBeatQuest(state: GameState, ai: Narrator, r: Rng, lead: Lead,
     id: uid(state, 'quest'), leadId: lead.id, rarity: chain.rarity, level: chain.level, location: lead.location,
     archetype: 'investigate', chainId: chain.id, beat: chain.beatsResolved + 1, finale: isFinale,
     title: chain.title, situation: beat.situation, job: beat.job, stakes: beat.newLayerRevealed,
-    proposedLoot: beat.proposedReward, offeredReward: beat.offeredReward, immediate: !isFinale && !!beat.immediateReward,
+    // a MIDDLE beat never delivers a unit (mid-saga: no captures) — a recruit/captive KIND there would
+    // be a false promise for THIS job; the label may still tease the saga's prize in words.
+    proposedLoot: beat.proposedReward,
+    offeredReward: beat.offeredReward && !isFinale && (beat.offeredReward.kind === 'recruit' || beat.offeredReward.kind === 'captive')
+      ? { kind: 'gold', label: beat.offeredReward.label }
+      : beat.offeredReward,
+    immediate: !isFinale && !!beat.immediateReward,
     slots, groups, threshold: thresholdFor(n, chain.level),
     reward, risky: isFinale || chain.rarity === 'rare' || chain.rarity === 'legendary',
   };
