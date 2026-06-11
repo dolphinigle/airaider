@@ -205,7 +205,11 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
   const poolCastMax = r() < 0.45 ? randInt(r, 1, 2) : 0;   // engine rolls how many recurring faces may return
   const maxChoices = rollChoiceBudget(r, lead.rarity);    // engine rolls how many arc steps may branch
   // seed the focal with a NAME (the AI may tweak it) instead of inventing one cold; the rest seed the cast.
-  const nameSeeds = pickNameSeeds(r, 6);
+  // filter seeds against names already in the world — two same-cycle geneses drew 'Anika' independently
+  // and produced accidental crossover sagas (both titled around the same person).
+  const taken = new Set(recentNames(state));
+  const nameSeeds = pickNameSeeds(r, 8).filter((n) => !taken.has(n));
+  if (!nameSeeds.length) nameSeeds.push(`Var${uid(state, 'nm').slice(-3)}`);
   focal.name = nameSeeds[0];
   const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], region: lead.location, rarity: lead.rarity, coreKind, name: nameSeeds[0], avoid: recentTitles(state), seed: kernel, place: pickPlace(r), tone: pickTone(r), twist, expectedBeats: arcBeats, poolCast: gatherPoolCast(state, r, focal.id), poolCastMax, maxChoices, nameSeeds: nameSeeds.slice(1), avoidNames: recentNames(state) });
   // the bible NAMES the core person (cast[0]) — that's the focal; adopt their NAME so beats and the

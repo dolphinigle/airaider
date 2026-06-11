@@ -55,7 +55,7 @@ export function questCard(eng: GameEngine, q: Quest): string {
     for (const g of q.groups) {
       const s = q.slots[g.slotIndices[0]];
       const who = s?.filledBy ? grn(eng.state.cards[s.filledBy]?.name ?? s.filledBy) : dim('empty');
-      lines.push(`    ${b('⟐ ' + g.label)} → ${yel(g.rewardKind)} ${dim('· tests ' + s.tested.attribute + ' (thr ' + g.threshold + ') slot ' + s.index)} → ${who}`);
+      lines.push(`    ${b('⟐ ' + g.label)}${q.finale ? ' → ' + yel(g.rewardKind) : ''} ${dim('· tests ' + s.tested.attribute + ' (thr ' + g.threshold + ') slot ' + s.index)} → ${who}`);
     }
   } else {
     q.slots.forEach((s) => {
