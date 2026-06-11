@@ -18,7 +18,7 @@ import {
   generateCharacter, type RollTest,
 } from './economy.js';
 import { generateReward } from './reward.js';
-import { pickThemes, pickPlace, pickTone, pickNameSeeds, pickArrival, pickProp, pickPressure, pickClient } from './seeds.js';
+import { pickKeywords, pickPlace, pickTone, pickNameSeeds, pickArrival } from './seeds.js';
 import { characterFromGen, liabilityCard, type MkId } from './cards.js';
 import { tagDef } from './tags.js';
 import { uid, addCard, logLine, allMercs, captives } from './state.js';
@@ -97,7 +97,7 @@ function bibleCastNames(bible: string): string[] {
 // keywords make the focal's own tags central and read far less "canned"). Deriving the story purely from
 // the person's tags converges on one shape; a few raw themes decorrelate it and the AI fuses them.
 function pickKernel(_state: GameState, r: Rng): string {
-  return pickThemes(r);
+  return pickKeywords(r);
 }
 // engine ROLLS how many arc steps (incl. the finale) may branch — scales with rarity, with variety
 // (some chains are fully linear). The bible proposes WHICH steps within this cap (PROMPT_RULES §3).
@@ -175,7 +175,7 @@ async function pursueOneOff(state: GameState, ai: Narrator, r: Rng, lead: Lead):
   // actual unit (read showed a card promising "Eira" while the rolled captive was a male wolfman)
   const unit = reward.cards.find((c): c is CharacterCard => c.class === 'character');
   const quarryHint = unit ? tagLabels(unit.tags.filter((t) => t.id.startsWith('gender:') || t.id.startsWith('race:') || t.id.startsWith('bg:'))).join(', ') : undefined;
-  const card = await ai.cardAsk({ archetype: lead.archetype, location: lead.location, slotCount: n, rewardKind: offerKindOf(reward), quarryHint, theme: pickThemes(r), prop: pickProp(r), arrival: pickArrival(r) });
+  const card = await ai.cardAsk({ archetype: lead.archetype, location: lead.location, slotCount: n, rewardKind: offerKindOf(reward), quarryHint, theme: pickKeywords(r), arrival: pickArrival(r) });
   const quest: Quest = {
     id: uid(state, 'quest'), leadId: lead.id, rarity: lead.rarity, level: lead.level, location: lead.location,
     archetype: lead.archetype, title: card.job.slice(0, 48), situation: card.situation, job: card.job,
@@ -220,7 +220,7 @@ async function genesisChainAndBeat(state: GameState, ai: Narrator, r: Rng, lead:
   if (!nameSeeds.length) nameSeeds.push(`Var${uid(state, 'nm').slice(-3)}`);
   focal.name = nameSeeds[0];
   const place = pickPlace(r, recentPlaces(state));
-  const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], region: lead.location, rarity: lead.rarity, coreKind, name: nameSeeds[0], avoid: recentTitles(state), seed: kernel, place, tone: pickTone(r), prop: pickProp(r), pressure: pickPressure(r), client: pickClient(r), twist, expectedBeats: arcBeats, poolCast: gatherPoolCast(state, r, focal.id), poolCastMax, maxChoices, nameSeeds: nameSeeds.slice(1), avoidNames: recentNames(state) });
+  const g = await ai.genesis({ focalTags: [tagLabels(focal.tags)], region: lead.location, rarity: lead.rarity, coreKind, name: nameSeeds[0], avoid: recentTitles(state), seed: kernel, place, tone: pickTone(r), twist, expectedBeats: arcBeats, poolCast: gatherPoolCast(state, r, focal.id), poolCastMax, maxChoices, nameSeeds: nameSeeds.slice(1), avoidNames: recentNames(state) });
   // the bible NAMES the core person (cast[0]) — that's the focal; adopt their NAME so beats and the
   // card match. who/backstory are written cleanly by flesh at delivery (the bible's why-ladder is the
   // HIDDEN writers'-room reference, NOT a readable dossier bio).
@@ -257,7 +257,7 @@ async function genesisPersonalChain(state: GameState, ai: Narrator, r: Rng, lead
   const poolCastMax = r() < 0.45 ? randInt(r, 1, 2) : 0;
   const maxChoices = rollChoiceBudget(r, lead.rarity);
   const place = pickPlace(r, recentPlaces(state));
-  const g = await ai.genesis({ focalTags: [tagLabels(merc.tags)], region: lead.location, rarity: lead.rarity, personal: true, name: merc.name, who: merc.who, backstory: merc.backstory, avoid: recentTitles(state), seed: kernel, place, tone: pickTone(r), prop: pickProp(r), pressure: pickPressure(r), client: pickClient(r), twist, expectedBeats: B * 2, poolCast: gatherPoolCast(state, r, merc.id), poolCastMax, maxChoices, nameSeeds: pickNameSeeds(r), avoidNames: recentNames(state) });
+  const g = await ai.genesis({ focalTags: [tagLabels(merc.tags)], region: lead.location, rarity: lead.rarity, personal: true, name: merc.name, who: merc.who, backstory: merc.backstory, avoid: recentTitles(state), seed: kernel, place, tone: pickTone(r), twist, expectedBeats: B * 2, poolCast: gatherPoolCast(state, r, merc.id), poolCastMax, maxChoices, nameSeeds: pickNameSeeds(r), avoidNames: recentNames(state) });
   const chain: Chain = {
     id: uid(state, 'chain'), title: g.title, hook: g.leadBlurb, bible: renderBible(g), direction: g.directions[0]?.hook ?? '',
     focalCardIds: [merc.id], rarity: lead.rarity, level: merc.level, expectedBeats: B * 2, beatsResolved: 0,

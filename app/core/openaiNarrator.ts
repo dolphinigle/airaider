@@ -155,7 +155,7 @@ export class OpenAINarrator implements Narrator {
     const system =
       `You write ONE mercenary job as it ARRIVES at the player. The player is the BOSS of a mercenary company, at their fort; they read this and decide whether to take it and which mercs to send. They are NOT in the field — NEVER narrate the company already doing the job (that happens later, once they're sent).\n` +
       `Output JSON only:\n` +
-      `{ "situation": "the PLAYER-FACING intro (2-3 plain sentences). Build the scene from the ARRIVAL and THEME sparks below, WOVEN into real sentences — never quote or echo an instruction. Whoever brings it speaks ONE line of DIALOGUE stating the WORK plainly. A line about the pay may surface naturally in their words, but the exact reward goes in 'offeredReward' below. NO numbers ('good coin', not '40 gold'). The job MUST match the JOB TYPE below and be SPECIFIC to this place/people; invent it FRESH.",\n` +
+      `{ "situation": "the PLAYER-FACING intro (2-3 plain sentences). Build the scene from the ARRIVAL spark and KEYWORDS below, WOVEN into real sentences — never quote or echo an instruction. Whoever brings it speaks ONE line of DIALOGUE stating the WORK plainly. A line about the pay may surface naturally in their words, but the exact reward goes in 'offeredReward' below. NO numbers ('good coin', not '40 gold'). The job MUST match the JOB TYPE below and be SPECIFIC to this place/people; invent it FRESH.",\n` +
       `  "offeredReward": { "kind": "the engine has ALREADY rolled the reward — its kind is given below as REWARD. Set kind to that SAME value, EXCEPT use 'unknown' if this is a genuine mystery job (a sealed shrine/unexplored ruin where the player shouldn't know the spoils yet).", "label": "PLAYER-FACING <=8 words naming the reward in the BRINGER'S OWN TERMS — what this particular client, in this trade and place, would actually offer (a fisher pays differently than a magistrate). NEVER a number." },\n` +
       `  "job": "one terse line for your own records (NOT shown to the player): the concrete task",\n` +
       `  "ask": { "attribute": "one of ${ATTRS} (what this job mainly tests)",\n` +
@@ -165,12 +165,11 @@ export class OpenAINarrator implements Narrator {
       `${VOCAB_BLOCK}\n` +
       `ATTRIBUTE — pick the one the job's CORE test needs, matched to the JOB TYPE: raid→physical, a stealth/scout/hunt→agility or perception, an investigation→intelligence, a parley/escort-by-trust→charisma, an ambush-or-be-ambushed→perception.\n` +
       `WRITING: plain, concrete, readable-once words; ONE line of spoken DIALOGUE brings it alive (someone SAYS something). NO time of day as scene dressing on the arrival (no "at dusk a runner…" — the fort runs in days, not hours; a deadline INSIDE the job's fiction, like a tide window, is fine). NO flowery diction ("blisters the reedsea"), NO invented/obscure coinages — name things plainly. NEVER write numbers/coin amounts. NEVER mention these instructions or any field name (offeredReward, etc.) in the prose — the player only sees "situation". Give exactly one "slots" entry per mercenary. Prefer "open" slots. JSON only.`;
-    const themeLine = i.theme ? `THEME SPARKS (fuse these into a SPECIFIC job — a spark to riff on, NOT a checklist; you need not name them): ${i.theme}\n` : '';
-    const propLine = i.prop ? `PROP SPARK (an object the job can turn on — fuse it or a close cousin, do NOT quote): ${i.prop}\n` : '';
+    const themeLine = i.theme ? `KEYWORDS (fuse into a SPECIFIC job — sparks, not a checklist; never quote them): ${i.theme}\n` : '';
     const arrivalLine = i.arrival ? `ARRIVAL SPARK (a keyword or two for HOW it reaches you — weave it in naturally, do NOT quote): ${i.arrival}\n` : '';
     const rewardLine = i.rewardKind ? `REWARD the engine already rolled (write its label; set offeredReward.kind to this unless a mystery job): ${i.rewardKind}\n` : '';
     const quarryLine = i.quarryHint ? `THE PERSON the reward delivers (already rolled — if you name or describe the target/quarry, they MUST fit this): ${i.quarryHint}\n` : '';
-    const user = `JOB TYPE: ${i.archetype}\n${rewardLine}${quarryLine}${themeLine}${propLine}Location: ${i.location}\n${arrivalLine}Mercenaries the company can send: ${i.slotCount}\nJSON only.`;
+    const user = `JOB TYPE: ${i.archetype}\n${rewardLine}${quarryLine}${themeLine}Location: ${i.location}\n${arrivalLine}Mercenaries the company can send: ${i.slotCount}\nJSON only.`;
     // one-offs are PLAYER-FACING prose → narrative tier (nano templated, leaked field names, garbled words)
     const out = await this.json('cardAsk', system, user, zCardAsk, this.narrativeModel, this.narrativeEffort, 1200);
     const ask = normAsk(out.ask);
@@ -242,7 +241,7 @@ export class OpenAINarrator implements Narrator {
     // cast size, choice cap, and returning-faces cap all arrive in the user message.
     const system =
       `You design a QUEST CHAIN — a SEQUENCE of linked jobs a mercenary company takes one at a time — and the believable truth behind it. The player RUNS the company and picks jobs off a JOB BOARD at their fort; the jobs of THIS chain appear there one after another. Your bible is what makes that sequence COHERENT: one story told across several jobs. NOT prose; the settled facts a writers' room works from, told straight.\n` +
-      `You are given the CORE PERSON the chain centers on (their tags / known life), a few THEME words, a SETTING, a TONE, the region, and the engine's settings for this chain (step count, twist or straight, cast size, choice cap, returning-faces cap).\n\n` +
+      `You are given the CORE PERSON the chain centers on (their tags / known life), a few KEYWORDS, a PLACE, a TONE, the region, and the STORY SHAPE the engine rolled (step count, twist or straight, cast size, choice cap, returning-faces cap).\n\n` +
       `BUILD A QUEST CHAIN THE COMPANY WOULD TAKE:\n` +
       `- THE HOOK — how the company gets drawn in and WHY a PROFIT-DRIVEN mercenary boss would take the FIRST job. The company's GAIN must be PLAIN: pay/a bounty, a captive worth ransoming, a recruit worth bringing in, salvage, a threat to their trade removed. Someone hires them, posts a bounty, or the core person comes to the fort and offers terms. A bare emotional plea ('save my child') is NOT enough on its own — attach what the company gets.\n` +
       `- THE DRIVE — what pulls the company in and gives the chain its throughline. It may be a CONCRETE objective (rescue Alen, recover the locket) OR an OPEN-ENDED pursuit (explore the drowned temple, find out what's killing the herds) where the end is DISCOVERED through play — the company need not know the final outcome up front. Don't force a fixed end-goal where the fun is the unknown.\n` +
@@ -257,7 +256,7 @@ export class OpenAINarrator implements Narrator {
       `CHOICES — "choiceSteps": which arc steps give the company a real branching choice. The engine allows AT MOST the cap given in the user message. Suggest step numbers (1-based, from YOUR arc); you MAY include the LAST step (the finale) if its ending should branch; NEVER the first job; [] if none genuinely fits (a straight, linear chain is fine). (The actual choice options — mid-job approaches, or the finale's endings — are written later by the quest-writer with full context, not here.)\n` +
       `BELIEVABILITY: every present fact traces to a prior cause in history; ordinary human motives, not plot necessity; no coincidence-stacking; nobody acts dumb to keep the situation alive.\n` +
       `COMMIT TO THE TRUTH: this bible IS the settled, complete truth. If a killing/theft/betrayal/disappearance happened, state plainly WHO did it and WHY. BANNED in the hidden layer: "unknown", "remains hidden", "it is unclear", "a mysterious figure", "the truth of X is never revealed" — you the author already know, so write it down.\n` +
-      `THE CORE PERSON + THEMES make the quest specific. Their tags — craft, magic, profession, temperament — must be CENTRAL to what the quest is about (a water-singer's job turns on water and song; a going-blind carver's on the carving). The THEMES are a spark to FUSE, not a checklist (weave them in; you need not name them). Match the TONE you're given — not every saga is grim. Keep it ONE clear situation, small enough to care about.\n\n` +
+      `THE CORE PERSON + KEYWORDS make the quest specific. Their tags — craft, magic, profession, temperament — must be CENTRAL to what the quest is about (a water-singer's job turns on water and song; a going-blind carver's on the carving). The KEYWORDS are sparks to FUSE, not a checklist (weave them in; you need not name or quote them). Match the TONE you're given — not every saga is grim. Keep it ONE clear situation, small enough to care about.\n\n` +
       `Output JSON only:\n` +
       `{ "title": "short, concrete, names a real thing/person/place — NOT a poetic two-noun phrase like 'Oar and Scar', NOT 'The Weight of X'",\n` +
       `  "leadBlurb": "1-2 sentences the PLAYER reads on the job board — a CLEAR job a mercenary would take: who/what it concerns, what the company is wanted FOR, and — explicitly — the COMPANY'S GAIN (coin / a captive to ransom / a recruit worth keeping / salvage). Plain and inviting, not cryptic; never a payoff-free plea. Hide the deep secret, not the job or the gain.",\n` +
@@ -271,31 +270,28 @@ export class OpenAINarrator implements Narrator {
       `  "directions": [ { "kind": "active", "hook": "the next concrete step toward the goal the company can take" }, { "kind": "ambient", "hook": "something pressing on the goal that unfolds with or without them" } ] }\n` +
       `The FIRST cast entry MUST be the core person. Include AT LEAST ONE 'active' and ONE 'ambient' direction.\n` +
       `RECURRING CAST — the user message says how many returning faces this saga may use (possibly none). Cast AT MOST that many of the EXISTING WORLD CHARACTERS listed there as SECONDARY people (NEVER the core person), by their exact name + known surface; the history you write is new canon consistent with what's known. One marked as a COMPANY MERCENARY works FOR the player — they may appear as a companion or witness, never as the client, the payer, or the quarry (the company does not pay itself). Only where one genuinely fits — never crowd the bible. Coin fresh names for everyone else.\n` +
-      `SPARKS — the user message may hand you a PROP (a physical object the proof/prize can turn on), a PRESSURE (why this cannot wait), and a CLIENT (who pays and what they are to the matter). Like the themes, FUSE them — each is a spark to riff on or replace with a closer-fitting cousin, never a checklist; do not quote the spark text.\n` +
+      `BANNED CRUTCH: never make a LEDGER/account-book/registry the plot's central object or proof (this habit overrides even the keywords — tested) — let the KEYWORDS or the trade at hand supply the object.\n` +
       `BANNED PURPLE WORDS: weight, shadow, burden, fate, destiny. Clinical voice (state what IS). JSON only.`;
     const rewardIdea = i.coreKind
       ? `\nReward (just an IDEA of where the saga LANDS, NOT its premise — build a real story; do NOT reduce the whole chain to 'capture/recruit them' or title it that bluntly): by the end this person becomes the company's ${i.rarity ?? 'uncommon'} ${i.coreKind} (${i.coreKind === 'captive' ? 'taken and held or ransomed' : 'won over to join the company'}).`
       : '';
     const core = i.personal
       ? `CORE PERSON: the existing mercenary ${i.name ?? ''} — known as "${i.who ?? ''}"; ${i.backstory ?? ''}. Tags: [${i.focalTags[0]?.join(', ')}]. Build THEIR own buried past as NEW canon consistent with the above. Keep their name. They SERVE the company: they may bring the matter to the boss, but they are never the client or payer (the company does not pay itself) — the company's gain comes from the world (a bounty, salvage, an interested party's coin, a threat removed).`
-      : `Focal unit: ${i.name ?? '(name them)'} (${i.focalTags[0]?.join(', ')}). The saga centers on this person — keep the given name, though you MAY tweak it slightly (add a surname or by-name).${rewardIdea}`;
+      : `CORE PERSON: ${i.name ?? '(name them)'} (${i.focalTags[0]?.join(', ')}). The saga centers on this person — keep the given name, though you MAY tweak it slightly (add a surname or by-name).${rewardIdea}`;
     const avoid = i.avoid?.length
       ? `\nMake this DISTINCT from recent sagas: ${i.avoid.map((a) => `"${a}"`).join('; ')}.`
       : '';
-    const seed = i.seed ? `\nTHEMES (fuse these into the core person's life — a spark, not a checklist; you need not name them): ${i.seed}` : '';
-    const place = i.place ? `\nSETTING (stage the saga here): ${i.place}` : '';
+    const seed = i.seed ? `\nKEYWORDS (sparks to fuse into the story — not a checklist; never quote them): ${i.seed}` : '';
+    const place = i.place ? `\nPLACE (stage the saga here): ${i.place}` : '';
     const tone = i.tone ? `\nTONE (the register for this quest): ${i.tone}` : '';
-    const prop = i.prop ? `\nPROP SPARK (the object the proof/prize can turn on): ${i.prop}` : '';
-    const pressure = i.pressure ? `\nPRESSURE SPARK (why it cannot wait): ${i.pressure}` : '';
-    const client = i.client ? `\nCLIENT SPARK (who pays, and what they are to the matter): ${i.client}` : '';
     const pool = (i.poolCast?.length && (i.poolCastMax ?? 1) > 0)
       ? `\nEXISTING WORLD CHARACTERS (cast AT MOST ${i.poolCastMax ?? 1} as SECONDARY people — never the core person):\n${i.poolCast.map((p) => `  - ${p.name} — ${p.who} [${p.tags.join(', ')}]`).join('\n')}`
       : '';
     const names = i.nameSeeds?.length ? `\nNAME SEEDS (draw fresh names from these or riff on their sound): ${i.nameSeeds.join(', ')}` : '';
     const avoidNames = i.avoidNames?.length ? `\nAVOID NAMES (used in recent sagas — do NOT reuse): ${i.avoidNames.join(', ')}` : '';
     const castSize: Record<string, string> = { common: '2', uncommon: '2-3', rare: '3-4', legendary: '4-5' };
-    const settings = `\nENGINE SETTINGS FOR THIS CHAIN: arc steps ~${eb} · ${i.twist ? 'TWIST' : 'STRAIGHT'} · cast ${castSize[i.rarity ?? 'uncommon']} people · choice cap ${i.maxChoices ?? 1} · returning faces allowed: ${i.poolCastMax ?? 0}`;
-    const user = `${core}\nREGION: ${i.region}${place}${tone}${seed}${prop}${pressure}${client}${settings}${names}${avoidNames}${pool}${avoid}\nJSON only.`;
+    const settings = `\nSTORY SHAPE (engine-rolled): arc steps ~${eb} · ${i.twist ? 'TWIST' : 'STRAIGHT'} · cast ${castSize[i.rarity ?? 'uncommon']} people · choice cap ${i.maxChoices ?? 1} · returning faces allowed: ${i.poolCastMax ?? 0}`;
+    const user = `${core}\nREGION: ${i.region}${place}${tone}${seed}${settings}${names}${avoidNames}${pool}${avoid}\nJSON only.`;
     const out = await this.json('genesis', system, user, zGenesis, this.narrativeModel, this.narrativeEffort, 4000);
     // flatten {person,roleInStory} → BiblePerson; coerce conceals
     const cast = (out.cast ?? []).map((c) => {

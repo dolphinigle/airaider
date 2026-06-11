@@ -83,14 +83,18 @@ dedicated NAME GENERATOR later (easy: syllable/part tables, fen register). AI ca
 assigned name and use it as-is (genesis: cast names ASSIGNED, not inspired-by; flesh/outcome:
 name handed in, never chosen).
 
-## §5 Keyword seeds — ONE field 🔶
-- 📌 Today: four labeled lines (THEMES / PROP / PRESSURE / CLIENT sparks) — labels prescribe
-  each word's story role; entries drifted to phrase-length micro-premises.
-- Agreed direction: ONE unlabeled `KEYWORDS:` line; balance lives in engine-side sampling
-  (bond + tie + flavour always, 0–2 extras from prop/pressure/client pools); entries are
-  noun-length (1–3 words); same single field for one-off cardAsk (ARRIVAL stays separate);
-  chainBeat gets no keywords (bible drives beats).
-- OPEN: final pool contents (keywordize my phrase-entries) · extras always-on vs 0–2.
+## §5 Keyword seeds — ONE field ✅ (decided 2026-06-12)
+- ONE unlabeled `KEYWORDS:` line; sampling = **1 BOND + 1 TIE + 2 WILDCARDS** (wildcards uniform
+  from the union of THINGS ∪ OCCASIONS ∪ PEOPLE ∪ UNCANNY ∪ MOODS; ~25% of draws use 1 wildcard
+  for texture). Same single field for one-off cardAsk (ARRIVAL stays separate); chainBeat none.
+- POOLS (~2,500 entries, append-to-grow; authored by category, sampled as designed above):
+  BOND 500 · TIE 500 · THINGS 500 · OCCASIONS 300 · PEOPLE 300 · UNCANNY 300 · MOODS 100.
+- STYLE BAR: bare words by default ("wedding", not "a wedding"); article only where the bare
+  word changes meaning ("a will"). 1–3 words · evocative-generic, never a micro-premise ·
+  low-medieval-compatible · no proper nouns · no cross-pool duplicates.
+- ⚠ PLAYTEST FLAG (designer): when playtesting after this lands, specifically judge keyword-draw
+  quality (vivid combos, no nonsense, fusion quality). Tracked as a standing task.
+- Old PROP/PRESSURE/CLIENT phrase pools + the dormant PREMISES list are superseded → delete.
 
 ## §6 Prompt-field naming (after §1–5 land)
 Known confusions to fix: `SETTING` vs `ENGINE SETTINGS` (→ `PLACE` + `STORY SHAPE`);
