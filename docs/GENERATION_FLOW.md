@@ -164,7 +164,24 @@ NOTE: no implementation after §8 — more design stations may follow (designer)
    One mechanism, tunable, preserves the anywhere-drop jackpot. Valuable rares are HIGH BANDS
    of tiered lines (princess = lineage 'royal blood') — hard-gated by maxTier for free.
 DEFAULTS: salience = identity → tiered desc → flats; band-word tables live on TagDef (5 per
-tiered concept; generic "slightly/very X" fallback when unauthored); mutex/opposites unchanged.
+tiered concept; generic "slightly/very X" fallback when unauthored).
+
+## §9a.2 TAG SCHEMA & SYSTEM RULES ✅ (decided interactively 2026-06-12)
+- TWO structures (group records chosen; impl details Claude's call — designer confirms
+  MECHANISMS/CONCEPTS only):
+  TagGroup   { id, domains: character|relic|both, pickPolicy: exactly-1|at-most-N|free,
+               appearOdds (level-rampable), menuLabel }
+  TagConcept { id, group, word, depth (1=flat), bandWords[5] if tiered, opposite?, weightOverride? }
+- WHY a group record: pick policy ("exactly one race") is a SET-level fact no per-tag field can
+  express; groups are ~7 rows of policy with one home (today's scattered tagAppear/BALANCE
+  functions were the failure mode).
+- SHARED GROUPS exist across species (renown, cursed/blessed) — domain lives on the group.
+- DELETED: `mutex` (subsumed: group pickPolicy + `opposite`); `opposite` survives doing BOTH
+  antonym exclusion AND the dice clash. `attrBias` CUT — tag/attr coherence is a POOL job (#31).
+- BUDGET = EXPECTATION (supersedes §4's "drop randomly" line, which was pre-curve): AI band
+  requests are folded into the generation CALIBRATION — the engine solves its completion rolls
+  (and may shift a requested band) so E[total] ≈ target, then EVERYTHING rolls. No caps, no
+  drops, no post-hoc trims; overshoot is jackpot, the mark stays the target.
 
 ## §4 Secondary NPCs → real units (partial-unit handoff) ✅ (decided 2026-06-12)
 The handoff (pattern B — both sides seed each other), NO new AI calls (piggyback only):
