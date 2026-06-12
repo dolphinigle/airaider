@@ -297,6 +297,27 @@ R2. `material` + `craft` — DROPPED (designer: "they are EMBODIED by the sword 
     RELIC VALUE = FULLY ADDITIVE: value(formTier) + Σ standing. NO multiplier survives —
     the scale-factor concept stays parked in the structure section, currently UNUSED; the
     golden-nail problem is solved by nail's own depth cap. Grail = {cup t3, famous t18}.
+    Relic roster built by ANALOGY to the 8 character groups (designer): BG≈form ·
+    race≈style · personality≈trait(renamed — "personality" is a misnomer for objects) ·
+    skill≈power · standing≈fame-only. Gender: no analogue.
+R3. `style` ✅ (designer 2026-06-13) — at-most-1 · FLAT (no tiers) · value ~0 ·
+    culture-marks mirroring races ("lizardkin-styled sword") · slot-fit + story
+    (lizard shrine favors lizardkin style).
+R4. `trait` ✅ (designer 2026-06-13; "personality" misnomer renamed) — free ·
+    opposite-pairs · PER-WORD DEPTH (beautiful/ugly tiered; sturdy/fragile flat-or-
+    shallow — per pair in pass 2; depth is per-CONCEPT so groups mix freely) · signed
+    value where it matters, ~0 for neutral descriptors (heavy/light, grim/cheerful).
+R5. `enchantment` ✅ (designer 2026-06-13; named "enchantment" per designer — was "power")
+    — free, tiny appearOdds · tiered DEEP earning lines (relics' rare jackpots) ·
+    all positive. ⭑ EXCEPTION to the bare-words rule (designer): enchantments render
+    WITH their label — "enchantment: fire (high)" — bare "fire (high)" is ambiguous
+    on an object.
+R6. relic `standing` ✅ (designer 2026-06-13: "standing only famous yea") — FAME ONLY:
+    the shared `famous` concept (domain both, tiered deep). No infamous/high-born for
+    objects; a curse, if ever wanted, = a negative enchantment line (pass-2/later).
+    Grail = {cup t3, famous t18} → "a cup (low); famous (legendary)".
+    Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
+    venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
     appliesTo field. The DEFAULT roll table holds concept×category weights (1 default,
     0 = nonsense: iron×tapestry); pools (#31, now covering relics too: forge-hoard,
