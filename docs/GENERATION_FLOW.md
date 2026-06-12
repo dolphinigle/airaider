@@ -231,6 +231,59 @@ AI proposes "master smith" → engine parses concept+band, rolls exact tier in-b
 IMPLEMENTATION: green-lit for the STRUCTURE (task #30); current word list migrates as
 PROVISIONAL content. The §9b CONTENT walk below decides the real vocabulary.
 
+### §9b CONTENT WALK — GROUPS (locked one by one; concept/word lists = a second pass)
+Pass 1 locks GROUPS ONLY (policy/value shape), pass 2 walks each group's concepts.
+1. `type` ✅ — character/relic/stackable · exactly-1 · value 0 · never rendered;
+   exists so slots can `requires: [character]` / `[stackable, gold]`.
+2. `gender` ✅ — male/female · exactly-1 · value 0.
+3. `race` ✅ — human/wolfman/elf/lizardman (flat concepts, one tier each) · exactly-1 ·
+   value 0 · odds skewed human-common; exotic-race VALUE comes via pools (#31), not the tag.
+4. `personality` ✅ — free · FLAT (one tier) · SIGNED value (designer 2026-06-12: good
+   words ~+6, bad words ~−6, neutral 0 — assignment per word in pass 2); opposite-pairs
+   (exclusion + dice clash); appearOdds = tunable balance baseline, NOT a design constant
+   (negatives fold into E[total]≈target calibration).
+5. `background` ✅ REVERSED-THEN-FINAL (designer 2026-06-13: "im positive now, BACKGROUND
+   should have tiers") — at-most-1 · TIERED · PER-WORD DEPTH = each vocation's ceiling
+   (peasant ~6 shallow, soldier/priest/merchant deep ~14-16): rank IS the tier of your
+   background, and per-word depth prices rank-5-soldier ≠ rank-5-peasant (a shared "rank"
+   line could not — that candidate is DEAD, subsumed). Custom band names per word are
+   REQUIRED (auto "very soldier" is nonsense) but ⚠ NAMES TBD — walkthrough examples
+   (levy/veteran/captain/general) are PLACEHOLDERS; real names must not assume one
+   army's/country's structure (designer). Birth stays in `standing` (princess = high-born,
+   not a background tier); battlefield-competence `command` skill = pass-2 call.
+   Probes that got here: criminal lord, princess-outvalues-crime-lord (per-concept depth),
+   high-post-but-incompetent general = {soldier,t13}+{dull}+no skill. CUT "noble" word.
+6. `trait` ✅ (replaces "physical" — name clashed with the physical ATTRIBUTE; designer:
+   attributes are the dice layer, tags stay the priced/story/slot face, decoupled) —
+   free · TIERED opposite-pairs (strong/weak, tough/sickly, beautiful/ugly, clever/dull,
+   scarred… pass 2) · deep positive / shallow negative · SIGNED value (negative sides go
+   more negative with tier, shallow depth keeps it mild). Group id is ENGINE-SIDE ONLY.
+   ⭑ PRESENTATION RULE (all groups, designer 2026-06-13): on units, tags render to the AI
+   as BARE band words — group labels are never part of the AI language; labels appear only
+   in the pick-menu (neutral headers, e.g. "qualities:") and player-UI grouping.
+   ⭑⭑ AI TAG FORMAT — LOCKED (designer 2026-06-13, supersedes fused band words): BOTH
+   directions = `word (rank)` with ONE generic 4-step rank vocabulary shared by ALL tiered
+   concepts: low / mid / high / legendary. Engine {criminal,t10} → "criminal (high)"; AI
+   "criminal (high)" → engine rolls a tier in the high band. Flats = bare word. Custom band
+   names (crime lord / grandmaster) are DEMOTED to optional player-display flavor only —
+   no longer part of the AI language, authorable anytime (resolves the armies-differ
+   naming worry). Tier integers never cross the AI boundary.
+8. `standing` ✅ (absorbs renown + lineage + any future pure value-line — designer: "the
+   one housing value-adding tags, same category") — free (NOT at-most-1: famous princess
+   = famous+high-born stack, rare via tiny odds) · tiered deep · all positive value ·
+   famous/infamous opposite pair · high-born minTier 4, deepest · domain BOTH (relic
+   renown: a famed blade) with CONCEPT-LEVEL DOMAIN OVERRIDE (high-born = character-only;
+   small schema addition). Same disclaimer as `trait`: NEVER "standing:famous" to the AI —
+   bare `famous (high)` only; group id is engine-side. (Group 9 "lineage" is DEAD — absorbed.)
+7. `skill` ✅ — free (believability cap ~2-3 kept) · tiered DEEP earning lines (flagships
+   depth 20) · custom band names (apprentice/journeyman/master/grandmaster) · all positive ·
+   exotics (magic) gated by tiny appearOdds only. Attribute interaction: DECOUPLED layers —
+   attribute = slot's base coins, skill tag = band bonus ONLY when the slot favors it
+   (attrBias stays cut; pools own coherence #31). Word list pass 2 (+`command` candidate).
+   ⚠ REVISIT (designer 2026-06-13): flat favored-dice +1/+1/+2/+3 (+4 t20) won't scale —
+   at high level (attr ~20) +2 is insignificant. Later: level-scaled band bonus, % of
+   coins, or slower attribute growth.
+
 ### Part 1 — the authored vocabulary (static content; two lists)
 
     TagGroup {
