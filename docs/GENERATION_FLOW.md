@@ -147,6 +147,25 @@ STATION — concept lists, deep-line designation, 5 band words per concept, cros
 coherence (tough+frail), leveled-personality words, the relic vocabulary.
 NOTE: no implementation after §8 — more design stations may follow (designer).
 
+## §9a TAG↔AI INTERFACE ✅ (decided interactively 2026-06-12)
+1. SCHEMA: every concept has `depth` (1 = flat, N = tiered). The system supports both; WHICH
+   concepts get what depth is §9b content (must support deep skill/fame/lineage/craft lines and
+   flat personality/identity tags).
+2. THE AI'S TAG LANGUAGE = BAND WORDS, BOTH DIRECTIONS. Read: tags render as their band word
+   ("somewhat strong", "masterly stealth"). Write: the AI uses the same band words; engine
+   parses by lookup (fallback: bare concept → engine picks band) and ROLLS the exact tier
+   within the band (weighted-low + spillover). Integers never cross the AI boundary.
+3. READ DETAIL: full substantive tag-set in all contexts MINUS system tags (`type:*` — never
+   rendered), salience-ordered. Trim only if real prompts bloat (not pre-emptively).
+4. MENUS: static per call-type/domain → prompt-cache safe (§10.2). Content gating is a SILENT
+   ENGINE CLAMP preserving relative intent (a "legendary" ask at L1 rolls the best allowed).
+5. RARE FLAT CONCEPTS: gated by RARITY WEIGHTS ONLY (no minContentLevel field) — and a weight
+   MAY be a FUNCTION of content level (constant for normal flats; a ramp ≈0→up for exotics).
+   One mechanism, tunable, preserves the anywhere-drop jackpot. Valuable rares are HIGH BANDS
+   of tiered lines (princess = lineage 'royal blood') — hard-gated by maxTier for free.
+DEFAULTS: salience = identity → tiered desc → flats; band-word tables live on TagDef (5 per
+tiered concept; generic "slightly/very X" fallback when unauthored); mutex/opposites unchanged.
+
 ## §4 Secondary NPCs → real units (partial-unit handoff) ✅ (decided 2026-06-12)
 The handoff (pattern B — both sides seed each other), NO new AI calls (piggyback only):
   1. engine rolls a PARTIAL unit: identity + ~half the value budget;
