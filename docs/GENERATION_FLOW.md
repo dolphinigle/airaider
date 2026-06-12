@@ -222,6 +222,21 @@ KEY PROPERTY (designer): the structure must support "slot requires tags". Hence:
   Examples: quest beat = requires [character], favors [stealth, brave] · bedroom shelf =
   requires [relic], favors [craft≥fine, renown(group)] · ransom = requires [stackable, gold] ×200.
 
+SCALE FACTOR (added 2026-06-13, designer: "multiplicative factor is a good concept"):
+a concept may carry a MULTIPLIER applied to a defined subset of co-resident tags' values —
+the one multiplicative element in an otherwise additive value model. First user: relic
+`form.scale` ("how much object is this": nail 0.05, sword 1.0, crown 1.5) multiplies
+SUBSTANCE tags (material, craft) only; STANDING tags never scale (the Saint's Nail keeps
+its famous-t14 value). RELIC VALUE FORMULA — AGREED (designer 2026-06-13):
+  relicValue = formFactor × materialFactor × (base + Σ substance tags) + Σ standing tags
+(material is a FACTOR, not added gold — the golden version of a thing ≈ ×8 that thing;
+small base so a tag-less relic isn't worth 0; standing stays OUTSIDE the product — the
+Grail is a plain wooden cup: story-value doesn't live in the matter.) Characters: NOT NEEDED
+YET (designer 2026-06-13); if one ever appears the holder should be BACKGROUND, not race —
+race-as-multiplier rejected (game-wise it pushes players to farm the high-value race).
+Standing lines (high-born/famous/background-rank) must stay ADDITIVE — multiplying needs
+substance and would kill the value-without-usefulness jackpots (the penniless saint).
+
 FEEDING A UNIT TO THE AI (designer-confirmed example): drop `type:*` → salience order
 (identity → tiered desc by value → flats) → tiered instances render as BAND WORDS,
 flats bare. `[{female},{human},{brave},{strong,t13},{stealth,t6}]` →
@@ -268,6 +283,24 @@ Pass 1 locks GROUPS ONLY (policy/value shape), pass 2 walks each group's concept
    names (crime lord / grandmaster) are DEMOTED to optional player-display flavor only —
    no longer part of the AI language, authorable anytime (resolves the armies-differ
    naming worry). Tier integers never cross the AI boundary.
+RELIC-SIDE GROUPS:
+R1. `form` ✅ FINAL (designer 2026-06-13; supersedes two earlier iterations — flat+formFactor,
+    then tier-derived multiplier × material × craft) — exactly-1 · TIERED LIKE BACKGROUND:
+    each form word ROLLS a tier with PER-WORD DEPTH CAPS (nail ~4, like peasant; sword/crown
+    deep). THE FORM TIER EMBODIES BOTH MATERIAL AND CRAFT (designer: "sword TIER is the
+    embodiment of both") — one number for how fine the thing is; WHY it's fine (starmetal,
+    masterwork forging) = AI FLAVOR TEXT, never engine data. AI format: "sword (high)".
+    Authored CATEGORY metadata stays (sword→weapon, ring→jewelry) — NOT a second rolled tag
+    (two rolled groups could contradict; designer caught it). TagQuery may match concept OR
+    group OR CATEGORY (armory rack `requires [relic, weapon]`; favors [form ≥ high]).
+R2. `material` + `craft` — DROPPED (designer: "they are EMBODIED by the sword quality").
+    RELIC VALUE = FULLY ADDITIVE: value(formTier) + Σ standing. NO multiplier survives —
+    the scale-factor concept stays parked in the structure section, currently UNUSED; the
+    golden-nail problem is solved by nail's own depth cap. Grail = {cup t3, famous t18}.
+R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
+    appliesTo field. The DEFAULT roll table holds concept×category weights (1 default,
+    0 = nonsense: iron×tapestry); pools (#31, now covering relics too: forge-hoard,
+    reliquary…) MULTIPLY base weights — 0×anything=0, bans authored once, bias per pool.
 8. `standing` ✅ (absorbs renown + lineage + any future pure value-line — designer: "the
    one housing value-adding tags, same category") — free (NOT at-most-1: famous princess
    = famous+high-born stack, rare via tiny odds) · tiered deep · all positive value ·
