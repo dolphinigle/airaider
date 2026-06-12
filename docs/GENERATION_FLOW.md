@@ -399,8 +399,17 @@ W4. `body` WORDS ✅ LOCKED (designer 2026-06-13 "sounds good. proceed") — gro
     trait→`body` (designer;
     engine-side id only, AI gets bare words as agreed; bonus: no more name-share with the
     relic `trait` group). 5 opposite-pairs + 1 unpaired:
-      strong/weak (muscle) · tough/sickly (constitution) · beautiful/ugly (looks) ·
-      clever/dull (wits) · tall/short (height — designer add) · endowed (unpaired)
+      muscular/scrawny (build) · tough/sickly (constitution) · beautiful/ugly (looks) ·
+      clever/dull (wits) · tall/short (height — designer add) · endowed/flat (sexual
+      body — designer paired it: "endowed should have a negative… like a flat woman")
+    AMENDED at the depths station (designer 2026-06-13, before table lock): strong/weak
+    → `muscular/scrawny` — strength-as-CAPABILITY is the physical ATTRIBUTE's job, the
+    tag is the visible BUILD (muscular + physical-4 = gym-body who folds — incompetent-
+    officer trick on a body; scrawny over "weak" (capability word) and "frail" (collides
+    w/ sickly); scrawny+tough wiry survivor, muscular+sickly coherent). `flat` as
+    endowed's negative (gloss "render per gender: bust/endowment"; AI sees vocab glosses
+    at prompt time; rejected: modest — bare-word misreads as personality, meager —
+    vague).
     `endowed` (designer 2026-06-13: "remove shapely, add endowment" — the sexual-body
     axis, explicit register; unisex via the COURTESAN PATTERN: the always-present gender
     tag tells the AI which kind — female·endowed = bust, male·endowed = endowment; gloss
@@ -411,7 +420,17 @@ W4. `body` WORDS ✅ LOCKED (designer 2026-06-13 "sounds good. proceed") — gro
     endowed=sexual body, strong=functional muscle. clever/dull (wits) living in a group
     named `body` = accepted (label never rendered); audit clean (short+strong stocky
     bruiser, dull+beautiful fine, ugly+endowed fine, etc.).
-    Still open for body: per-side signs + depths (next decision).
+W5. `body` SIGNS + DEPTHS ✅ LOCKED (designer 2026-06-13 "sounds good. record") —
+      muscular +20 / scrawny −4 · tough +20 / sickly −4 · beautiful +20 / ugly −4 ·
+      clever +16 / dull −4 · tall 0,d6 / short 0,d6 · endowed +16 / flat −4
+    Cap anchors: muscular t20 build-of-legend · tough t20 the unkillable · beautiful t20
+    face-that-launches-wars · clever t16 once-a-generation mind (NOT 20 — would shadow
+    scholar(legendary); intelligence attribute + background own genius-of-the-age) ·
+    endowed t16 (parallel narrower-than-beauty). RULES established: (1) NEGATIVES
+    SHALLOW (4) — deep negatives would let the generator FUND monster positives by
+    dumping a huge minus (degenerate jackpots); shallow = complications, not financing.
+    (2) VALUE-0-BUT-TIERED is legal (tall/short d6): tiers buy AI intensity
+    ("tall (legendary)" = a giant) without gold value.
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
