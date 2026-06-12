@@ -346,9 +346,18 @@ W1. `personality` ✅ LOCKED (designer 2026-06-13) — 7 opposite-pairs, all fla
     playful+stoic clash, stoic≈cool/serious overlap → replaced; designer picked `loner`.
     All-zero values also drop personality out of E[total] calibration entirely.
 
-W2. `background` WORDS ✅ LOCKED (designer 2026-06-13) — 15 vocations:
+W2. `background` WORDS ✅ LOCKED (designer 2026-06-13) — 16 vocations:
       soldier · hunter · peasant · sailor · criminal · merchant · mystic · artisan ·
-      adventurer · scholar · priest · slave · ruler · entertainer · servant
+      adventurer · scholar · priest · slave · ruler · entertainer · servant · courtesan
+    `courtesan` ADDED (designer probe "are brothel workers appropriate" → yes: fits the
+    fiction, passes the career-ladder test — streetwalker → courtesan → royal mistress,
+    high tiers are intrigue gold; dedicated word over folding into entertainer so the AI
+    doesn't have to infer it). UNISEX-BY-GLOSS: the word connotes female but the
+    always-present `gender` tag overrides connotation — "male · courtesan (high)" is
+    unambiguous; vocab gloss carries "unisex; pairs with the gender tag". Alternatives
+    rejected: companion (bare-word ambiguity — reads as friend/retainer), escort
+    (modern), consort (only coherent at top tier). NOT gated on `lustful` — a chaste
+    calculating courtesan is a valid roll.
     Changes from old vocab: `noble` CUT (pass 1 — birth = standing:high-born) · `beggar`
     CUT (designer: "beggar is just lowest tier peasant") · `wanderer` → `adventurer`
     (tier = how storied the career; "high-rank drifter" was fuzzy) · `healer` → `mystic`
