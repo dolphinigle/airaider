@@ -4,9 +4,9 @@
 Supersedes the scattered flow descriptions; QUESTS.md §"reward-first" 🔒 is the governing rule.
 Each section below is marked ✅ agreed · 🔶 OPEN (decision pending) · 📌 current-impl note.
 
-**RESUME POINT (for the next session): §9b PASS 2 — WORD LISTS PER GROUP, start with
-`personality`** (then background+depths, trait, skill, standing, relic form/style/trait/
-enchantment, stackable kinds). The §9b GROUP PASS is COMPLETE (see "§9b CONTENT WALK" +
+**RESUME POINT (for the next session): §9b PASS 2 — WORD LISTS PER GROUP. `personality`
+✅ DONE (see §9b PASS 2 / W1: 7 pairs, all value 0); NEXT = `background`+depths** (then
+trait, skill, standing, relic form/style/trait/enchantment, stackable kinds). The §9b GROUP PASS is COMPLETE (see "§9b CONTENT WALK" +
 "RELIC-SIDE GROUPS" sections): Character 8 = type/gender/race/personality/background(tiered,
 rank-is-the-tier)/trait/skill/standing · Relic 7 = type/form(tiered, embodies material+craft)/
 style/trait/enchantment(label-rendered)/standing(fame only) · Stackable = type/kind.
@@ -261,8 +261,8 @@ Pass 1 locks GROUPS ONLY (policy/value shape), pass 2 walks each group's concept
 2. `gender` ✅ — male/female · exactly-1 · value 0.
 3. `race` ✅ — human/wolfman/elf/lizardman (flat concepts, one tier each) · exactly-1 ·
    value 0 · odds skewed human-common; exotic-race VALUE comes via pools (#31), not the tag.
-4. `personality` ✅ — free · FLAT (one tier) · SIGNED value (designer 2026-06-12: good
-   words ~+6, bad words ~−6, neutral 0 — assignment per word in pass 2); opposite-pairs
+4. `personality` ✅ — free · FLAT (one tier) · ~~SIGNED value~~ SUPERSEDED by pass 2
+   (W1, designer 2026-06-13): ALL words value 0, pure flavor; opposite-pairs
    (exclusion + dice clash); appearOdds = tunable balance baseline, NOT a design constant
    (negatives fold into E[total]≈target calibration).
 5. `background` ✅ REVERSED-THEN-FINAL (designer 2026-06-13: "im positive now, BACKGROUND
@@ -330,6 +330,21 @@ S1. `kind` ✅ (designer 2026-06-13) — stackables' identity group: gold, debt,
 GROUP PASS COMPLETE (2026-06-13). Character 8: type/gender/race/personality/background/
 trait/skill/standing · Relic 7: type/form/style/trait/enchantment/standing · Stackable:
 type/kind. NEXT: PASS 2 — word lists per group, one group at a time.
+
+## §9b PASS 2 — WORD LISTS (one group at a time)
+
+W1. `personality` ✅ LOCKED (designer 2026-06-13) — 7 opposite-pairs, all flat, **ALL
+    VALUE 0** (designer reversed the pass-1 signed-value plan: "i dont think theres a
+    good/bad pairs… cowardly can be seen as careful, brave as reckless" — every word is
+    pure flavor + dice-hook; supersedes §9b group-4's good +6 / bad −6 note):
+      cool/hotheaded · serious/playful · greedy/generous · loner/gregarious ·
+      lustful/chaste · dominant/submissive · calculating/instinctive
+    Designer authored the list, replacing the old vocab (brave/cowardly, honest/deceitful,
+    kind/cruel CUT — kind/cruel overlapped greedy/generous). Cross-pair audit (all 21
+    pair×pair, 84 word-combos) done: clean EXCEPT designer's original `stoic` — wrong
+    axis (temper word in the company-preference pair): hotheaded+stoic contradiction,
+    playful+stoic clash, stoic≈cool/serious overlap → replaced; designer picked `loner`.
+    All-zero values also drop personality out of E[total] calibration entirely.
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
