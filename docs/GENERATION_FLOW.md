@@ -395,7 +395,8 @@ W3. `background` DEPTH CAPS ✅ LOCKED (designer 2026-06-13) — per-word cap ta
     servant 12→10; merchant/scholar/courtesan deliberately NOT 20.
     Background band names: PARKED past the walkthrough (display-only since the AI lock).
 
-W4. `body` WORDS ⚠ PROPOSED, NOT YET CONFIRMED — group RENAMED trait→`body` (designer;
+W4. `body` WORDS ✅ LOCKED (designer 2026-06-13 "sounds good. proceed") — group RENAMED
+    trait→`body` (designer;
     engine-side id only, AI gets bare words as agreed; bonus: no more name-share with the
     relic `trait` group). 5 opposite-pairs + 1 unpaired:
       strong/weak (muscle) · tough/sickly (constitution) · beautiful/ugly (looks) ·
@@ -410,7 +411,7 @@ W4. `body` WORDS ⚠ PROPOSED, NOT YET CONFIRMED — group RENAMED trait→`body
     endowed=sexual body, strong=functional muscle. clever/dull (wits) living in a group
     named `body` = accepted (label never rendered); audit clean (short+strong stocky
     bruiser, dull+beautiful fine, ugly+endowed fine, etc.).
-    Still open for body: express LOCK of this list · per-side signs + depths.
+    Still open for body: per-side signs + depths (next decision).
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
