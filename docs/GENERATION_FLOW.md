@@ -393,6 +393,26 @@ W3. `background` DEPTH CAPS ✅ LOCKED (designer 2026-06-13) — per-word cap ta
     vanishingly rare but a t16 slave (~91k) is legal jackpot material; maxTier=2×level+2
     still gates by content level. Designer deltas from proposal: sailor 14→16,
     servant 12→10; merchant/scholar/courtesan deliberately NOT 20.
+    Background band names: PARKED past the walkthrough (display-only since the AI lock).
+
+W4. `body` WORDS ✅ LOCKED (designer 2026-06-13) — group RENAMED trait→`body` (designer;
+    engine-side id only, AI gets bare words as agreed; bonus: no more name-share with the
+    relic `trait` group). 5 opposite-pairs + 1 unpaired:
+      strong/weak (muscle) · tough/sickly (constitution) · beautiful/ugly (looks) ·
+      clever/dull (wits) · tall/short (height — designer add) · shapely (unpaired)
+    `shapely` (designer asked for a physical figure/body-shape word, e.g. breast size —
+    unisex via the COURTESAN PATTERN: no unisex English word exists for desirable body
+    shape (the content is gendered — curves vs physique), so one neutral word + the
+    always-present gender tag tells the AI which kind: female·shapely(high) = voluptuous
+    curves, male·shapely(high) = sculpted build; gloss "physique/figure; render per
+    gender tag". Rejected: voluptuous/curvy/buxom (female-only), statuesque (collides
+    w/ tall), well-built (collides w/ strong), folding into beautiful (loses
+    plain-faced-stunning-body combos). Axis boundaries: beautiful=face, shapely=body,
+    strong=functional muscle.) `alluring` (carnal-magnetism axis) proposed then DROPPED —
+    designer meant literal physique. `scarred` DROPPED for now (designer). clever/dull
+    (wits) living in a group named `body` = accepted (label never rendered); clever/dull
+    + tall/short audit clean (short+strong stocky bruiser, dull+beautiful fine, etc.).
+    Still open for body: per-side signs + depths (next decision).
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
