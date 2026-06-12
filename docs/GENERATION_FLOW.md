@@ -203,6 +203,84 @@ default ("somewhat X / X / very X / extremely X"), custom names opt-in per conce
   (and may shift a requested band) so E[total] ≈ target, then EVERYTHING rolls. No caps, no
   drops, no post-hoc trims; overshoot is jackpot, the mark stays the target.
 
+## §9b STRUCTURE ✅ (designer-approved 2026-06-12: "for prototype that sounds ok. Implement.")
+
+The complete structure — SIX concepts, nothing else exists:
+  1 TagGroup (family + family rules) · 2 TagConcept (one word in the vocabulary) ·
+  3 TagInstance (word+tier ON a card — the only place tiers exist) · 4 Band (the coarse
+  4-step language everything outside the engine speaks) · 5 TagQuery (a pointer at tags) ·
+  6 Slot (requires/favors lists of TagQueries).
+
+KEY PROPERTY (designer): the structure must support "slot requires tags". Hence:
+- The vocabulary is COMPLETE — system tags live in it too, so slot queries have one
+  namespace: group `type` (character/relic/stackable, exactly-1, identity, never rendered)
+  and group `kind` (stackable kinds: gold, debt, … — §7.1 "kind is a tag").
+- TagQuery { match: concept-or-group, minBand?: band words not tiers }. A card matches ⇔
+  it carries an instance whose concept (or that concept's group) matches at ≥ the band floor.
+- Slot { requires: TagQuery[] (hard gate, ALL), favors: TagQuery[] (each held match adds
+  band dice +1/+1/+2/+3, +4 at t20; holding the OPPOSITE of a favored concept = clash) }.
+  Examples: quest beat = requires [character], favors [stealth, brave] · bedroom shelf =
+  requires [relic], favors [craft≥fine, renown(group)] · ransom = requires [stackable, gold] ×200.
+
+FEEDING A UNIT TO THE AI (designer-confirmed example): drop `type:*` → salience order
+(identity → tiered desc by value → flats) → tiered instances render as BAND WORDS,
+flats bare. `[{female},{human},{brave},{strong,t13},{stealth,t6}]` →
+"Ysolde — female human; very strong, journeyman stealth; brave". Same words parse back:
+AI proposes "master smith" → engine parses concept+band, rolls exact tier in-band.
+
+IMPLEMENTATION: green-lit for the STRUCTURE (task #30); current word list migrates as
+PROVISIONAL content. The §9b CONTENT walk below decides the real vocabulary.
+
+### Part 1 — the authored vocabulary (static content; two lists)
+
+    TagGroup {
+      id          // 'race', 'physical', 'skill', 'craft', ...   (~10 groups total)
+      domain      // 'character' | 'relic' | 'both' — which species can roll members
+      pickPolicy  // 'exactly-1' — every card gets one member (gender, race, relic form)
+                  // 'at-most-1' — optional, but never two members (background, renown)
+                  // 'free'      — any members may stack (personality, physical, skill)
+      identity?   // true → members worth 0 gold (gender/race/form/material — they say
+                  //        WHAT the card is, they aren't treasure)
+      appearOdds  // chance each member rolls (free/at-most-1); may grow with content level
+      menuLabel   // header word shown to AI/player ('background:', 'craft:')
+    }
+
+    TagConcept {
+      id, group, word   // ONE entry per word: 'strong' is one entry, 'weak' another
+      depth?            // highest tier this word reaches. absent/1 = flat (no tiers).
+                        //   strong: 20 (deep line) · weak: 4 (texture) · brave: flat
+      minTier?          // lowest rollable tier, default 1. royal-blood: 4 (no "faintly royal")
+      bandNames?        // 4 custom AI/player words; default auto "somewhat X / X / very X /
+                        //   extremely X". skill: apprentice/journeyman/master/grandmaster
+      opposite?         // partner that can NEVER coexist with this one + clashes in dice
+      appearOdds?       // per-word override (rare exotics get tiny odds)
+    }
+
+### Part 2 — what a generated card carries
+
+    card.tags = TagInstance[]        // TagInstance { concept, tier? }
+    // e.g.: [ {concept:'female'}, {concept:'human'},      // identity, worth 0
+    //         {concept:'brave'},                           // flat, ~6
+    //         {concept:'strong', tier:13},                 // value(13) ≈ 13k — the prize
+    //         {concept:'stealth', tier:6} ]                // "journeyman stealth", ~149
+
+Tiers exist ONLY here — rolled per card, never stored in the vocabulary.
+
+### Part 3 — who reads which field
+
+| consumer | uses |
+|---|---|
+| generation | exactly-1 groups roll first (identity floor) → others roll via appearOdds under E[total]≈target calibration (§9a.2); `opposite` removes the partner once one side lands; maxTier = 2×contentLevel+2 clamps |
+| value/mark | identity group → 0 · flat → ~6 · tiered → 6×1.9^(tier−1) |
+| AI read/write | band words only (`bandNames` or auto-words); engine rolls exact tier in band |
+| player display | word + band word + per-tag rarity border (keyed to band) |
+| dice | favored tag → +1/+1/+2/+3 by band, +4 at t20; `opposite` of a favored tag → clash |
+
+Exclusivity recap: whole-group exclusives (race, background, renown) = pickPolicy;
+pair exclusives inside free groups (brave/coward, strong/weak) = `opposite`; tiers are
+orthogonal to exclusion (they set magnitude, never coexistence). Sides of a pair set depth
+independently — deep positive, shallow negative is the norm (strong 20 / weak 4).
+
 ## §4 Secondary NPCs → real units (partial-unit handoff) ✅ (decided 2026-06-12)
 The handoff (pattern B — both sides seed each other), NO new AI calls (piggyback only):
   1. engine rolls a PARTIAL unit: identity + ~half the value budget;
