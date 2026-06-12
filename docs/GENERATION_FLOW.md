@@ -4,6 +4,13 @@
 Supersedes the scattered flow descriptions; QUESTS.md §"reward-first" 🔒 is the governing rule.
 Each section below is marked ✅ agreed · 🔶 OPEN (decision pending) · 📌 current-impl note.
 
+**RESUME POINT (for the next session): NEXT STATION = §9b CONTENT** — the actual group lists +
+concepts per species (skills, lineage line, relic forms/materials/craft/renown, opposite pairs,
+custom band names where flavor pays), walked ONE DECISION AT A TIME (designer confirms
+mechanisms/concepts, never impl). NO implementation until the designer ends the design
+walkthrough. Designed-not-built queue: §1+§2 calc/split · §4/4b handoff+names (budget rule
+superseded by §9a.2 expectation calibration) · §7 card system/relics · §8+§9a tag system.
+
 ## The corrected pipeline (target design)
 
 ```
