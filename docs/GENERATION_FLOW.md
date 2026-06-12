@@ -4,12 +4,20 @@
 Supersedes the scattered flow descriptions; QUESTS.md §"reward-first" 🔒 is the governing rule.
 Each section below is marked ✅ agreed · 🔶 OPEN (decision pending) · 📌 current-impl note.
 
-**RESUME POINT (for the next session): NEXT STATION = §9b CONTENT** — the actual group lists +
-concepts per species (skills, lineage line, relic forms/materials/craft/renown, opposite pairs,
-custom band names where flavor pays), walked ONE DECISION AT A TIME (designer confirms
-mechanisms/concepts, never impl). NO implementation until the designer ends the design
-walkthrough. Designed-not-built queue: §1+§2 calc/split · §4/4b handoff+names (budget rule
-superseded by §9a.2 expectation calibration) · §7 card system/relics · §8+§9a tag system.
+**RESUME POINT (for the next session): §9b PASS 2 — WORD LISTS PER GROUP, start with
+`personality`** (then background+depths, trait, skill, standing, relic form/style/trait/
+enchantment, stackable kinds). The §9b GROUP PASS is COMPLETE (see "§9b CONTENT WALK" +
+"RELIC-SIDE GROUPS" sections): Character 8 = type/gender/race/personality/background(tiered,
+rank-is-the-tier)/trait/skill/standing · Relic 7 = type/form(tiered, embodies material+craft)/
+style/trait/enchantment(label-rendered)/standing(fame only) · Stackable = type/kind.
+AI tag format LOCKED: `word (rank)`, ranks low/mid/high/legendary, both directions; bare
+words (no group labels) EXCEPT enchantment. Walk ONE DECISION AT A TIME; EXPRESS green
+light required before recording ANY lock (designer called out assumed locks twice); answer
+designer questions directly before proceeding. NO implementation until the designer ends
+the walkthrough — EXCEPT task #30 (tag-system STRUCTURE), which the designer green-lit
+("for prototype that sounds ok. Implement"; current words migrate as PROVISIONAL).
+Designed-not-built queue: §1+§2 calc/split · §4/4b handoff+names · §7 card system/relics ·
+§8+§9a+§9b-structure tag system (#30 in progress).
 
 ## The corrected pipeline (target design)
 
