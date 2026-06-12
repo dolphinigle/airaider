@@ -377,8 +377,22 @@ W2. `background` WORDS ✅ LOCKED (designer 2026-06-13) — 16 vocations:
     location is AI flavor, not a tag); fraud fortune-teller = mystic w/o magic skill
     (incompetent-officer trick generalizes). ⚠ FLAG for skill station: melee/ranged split
     of skill:weapon (the "where do archers live" question).
-    Still open for background: per-word DEPTH CAPS (next decision) · band names (now
-    DISPLAY-ONLY given the word(rank) AI lock — may defer past the walkthrough).
+    Still open for background: band names (now DISPLAY-ONLY given the word(rank) AI
+    lock — recommend deferring past the walkthrough).
+
+W3. `background` DEPTH CAPS ✅ LOCKED (designer 2026-06-13) — per-word cap table:
+      20: ruler · soldier · criminal · priest · mystic · artisan · adventurer ·
+          entertainer   (emperor · kingdom-breaking warlord · shadow-emperor · pontiff ·
+          prophet · grandmaster-of-national-treasures · hero-of-songs · voice-of-an-age)
+      16: merchant · scholar · courtesan · sailor · slave   (magnate · archsage ·
+          kingmaker mistress · admiral of legend · A DEPOSED KING IN CHAINS)
+      12: hunter   (mythic beast-slayer)
+      10: peasant · servant   (village patriarch · majordomo)
+    FLOOR: every word ≥10 (designer). PRINCIPLE (designer, via slave-16): DEPTH CAP =
+    what's POSSIBLE; the bottom-weighted tier-roll odds = what's FREQUENT — slave >4 is
+    vanishingly rare but a t16 slave (~91k) is legal jackpot material; maxTier=2×level+2
+    still gates by content level. Designer deltas from proposal: sailor 14→16,
+    servant 12→10; merchant/scholar/courtesan deliberately NOT 20.
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
