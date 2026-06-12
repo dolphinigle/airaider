@@ -345,6 +345,31 @@ W1. `personality` ✅ LOCKED (designer 2026-06-13) — 7 opposite-pairs, all fla
     axis (temper word in the company-preference pair): hotheaded+stoic contradiction,
     playful+stoic clash, stoic≈cool/serious overlap → replaced; designer picked `loner`.
     All-zero values also drop personality out of E[total] calibration entirely.
+
+W2. `background` WORDS ✅ LOCKED (designer 2026-06-13) — 15 vocations:
+      soldier · hunter · peasant · sailor · criminal · merchant · mystic · artisan ·
+      adventurer · scholar · priest · slave · ruler · entertainer · servant
+    Changes from old vocab: `noble` CUT (pass 1 — birth = standing:high-born) · `beggar`
+    CUT (designer: "beggar is just lowest tier peasant") · `wanderer` → `adventurer`
+    (tier = how storied the career; "high-rank drifter" was fuzzy) · `healer` → `mystic`
+    (designer asked rename after the forest-witch probe; "witch" gendered/dark-coded,
+    "magic practitioner" names a capability = background/skill collision; mystic =
+    consultable-about-the-beyond ladder: fortune-teller → seer → oracle → prophet; healing
+    competence was half-duplicating skill:heal — physician = scholar+heal, village healer
+    = mystic+heal) · ADDED ruler (the OFFICE ladder: headman → mayor → lord → emperor;
+    distinct from high-born BLOOD — usurper = ruler w/o high-born, princess = high-born
+    w/o ruler) · ADDED entertainer (street performer → court bard → living legend) ·
+    ADDED servant (maid/groom → steward of a great house; employed, vs slave = unfree).
+    Candidates passed over: gladiator, official (overlapped ruler/scholar).
+    RULE established (named-profession test): background word = a CAREER LADDER SOCIETY
+    RECOGNIZES, never a capability. Archer = soldier/hunter + skill:weapon (AI guise);
+    assassin = criminal(high) + stealth; witch/wizard = any bg + magic-* skill (court
+    wizard = scholar+magic-fire, forest witch = mystic+magic-dark+loner — lifestyle/
+    location is AI flavor, not a tag); fraud fortune-teller = mystic w/o magic skill
+    (incompetent-officer trick generalizes). ⚠ FLAG for skill station: melee/ranged split
+    of skill:weapon (the "where do archers live" question).
+    Still open for background: per-word DEPTH CAPS (next decision) · band names (now
+    DISPLAY-ONLY given the word(rank) AI lock — may defer past the walkthrough).
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
