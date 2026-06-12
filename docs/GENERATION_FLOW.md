@@ -116,14 +116,18 @@ RARITY & GATING: tier weight ∝ ~1.9⁻ᵗ…3⁻ᵗ baseline, TUNED BY HARNESS
 generator self-recalibrates — repricing needs no generator change). Content gate:
 maxTier(contentLevel) = 2L+2; jackpot spillover may pierce it.
 
-BANDS (depth-20 default mapping): B1 1–4 · B2 5–8 · B3 9–12 · B4 13–16 · B5 17–20.
-- AI may REQUEST at most B4; a request rolls its window weighted-low with ~7%/step SPILLOVER
-  above (the in-band jackpot — "very strong" can come back t18). B5 words are display-only.
-- Depth-10 tags: 2 tiers per band; the AI always sees exactly 5 words either way.
+BANDS — 4, generic by default (reviewed/final 2026-06-12): depth-20 mapping t1–5 / 6–10 /
+11–15 / 16–20. Band WORDS are AUTO-GENERATED from the concept word ("somewhat strong /
+strong / very strong / extremely strong") — zero authoring by default — with OPTIONAL custom
+names per concept where flavor pays (skills: apprentice/journeyman/master/grandmaster; craft:
+sound/fine/masterwork/wonder). All 4 bands are AI-requestable; a request rolls its window
+weighted-low with ~7%/step SPILLOVER above; the maxTier clamp still guards the top (no minting
+Mirrors by adjective). Non-20 depths map bands proportionally over the concept's tierRange.
 
-DICE STAY SANE: favoredBonus per BAND = +1 / +1 / +2 / +2 / +3 (B1→B5; designer-tuned flat) —
-the value curve soars geometrically while the usefulness curve stays nearly flat (goal:
-value ≠ usefulness; a Mirror-tier tag barely out-rolls a solid one).
+DICE (reviewed/final 2026-06-12): favoredBonus per band = +1 / +1 / +2 / +3, and a t20 tag
+gives +4 — the ONLY place dice acknowledge the Mirror tier (dopamine: a singular person is
+FELT in the roll, once per scale). Value soars geometrically; usefulness stays nearly flat
+(value ≠ usefulness).
 Deep LOW-UTILITY lines (Kind, Lineage, Renown) are first-class: the living saint / noble
 hostage / Mona-Lisa relic all roll naturally.
 
@@ -151,10 +155,11 @@ NOTE: no implementation after §8 — more design stations may follow (designer)
 1. SCHEMA: every concept has `depth` (1 = flat, N = tiered). The system supports both; WHICH
    concepts get what depth is §9b content (must support deep skill/fame/lineage/craft lines and
    flat personality/identity tags).
-2. THE AI'S TAG LANGUAGE = BAND WORDS, BOTH DIRECTIONS. Read: tags render as their band word
-   ("somewhat strong", "masterly stealth"). Write: the AI uses the same band words; engine
-   parses by lookup (fallback: bare concept → engine picks band) and ROLLS the exact tier
-   within the band (weighted-low + spillover). Integers never cross the AI boundary.
+2. THE AI'S TAG LANGUAGE = BAND WORDS, BOTH DIRECTIONS (4 bands — reviewed 2026-06-12).
+   Read: tags render as their band word ("very strong", "master smith"). Write: the AI uses
+   the same band words; engine parses by lookup (generic auto-words make parsing trivial;
+   fallback: bare concept → engine picks band) and ROLLS the exact tier within the band
+   (weighted-low + spillover). Integers never cross the AI boundary.
 3. READ DETAIL: full substantive tag-set in all contexts MINUS system tags (`type:*` — never
    rendered), salience-ordered. Trim only if real prompts bloat (not pre-emptively).
 4. MENUS: static per call-type/domain → prompt-cache safe (§10.2). Content gating is a SILENT
@@ -163,15 +168,23 @@ NOTE: no implementation after §8 — more design stations may follow (designer)
    MAY be a FUNCTION of content level (constant for normal flats; a ramp ≈0→up for exotics).
    One mechanism, tunable, preserves the anywhere-drop jackpot. Valuable rares are HIGH BANDS
    of tiered lines (princess = lineage 'royal blood') — hard-gated by maxTier for free.
-DEFAULTS: salience = identity → tiered desc → flats; band-word tables live on TagDef (5 per
-tiered concept; generic "slightly/very X" fallback when unauthored).
+DEFAULTS: salience = identity → tiered desc → flats; band words are GENERIC AUTO-WORDS by
+default ("somewhat X / X / very X / extremely X"), custom names opt-in per concept.
 
-## §9a.2 TAG SCHEMA & SYSTEM RULES ✅ (decided interactively 2026-06-12)
+## §9a.2 TAG SCHEMA & SYSTEM RULES ✅ (decided interactively; REVIEWED-FINAL 2026-06-12)
 - TWO structures (group records chosen; impl details Claude's call — designer confirms
   MECHANISMS/CONCEPTS only):
-  TagGroup   { id, domains: character|relic|both, pickPolicy: exactly-1|at-most-N|free,
-               appearOdds (level-rampable), menuLabel }
-  TagConcept { id, group, word, depth (1=flat), bandWords[5] if tiered, opposite?, weightOverride? }
+  TagGroup   { id, domains: character|relic|both, pickPolicy: exactly-1 | at-most-1 | free,
+               appearOdds default (level-rampable), menuLabel }
+  TagConcept { id, group, word, tierRange [minTier, depth] (1,1 = flat),
+               customBandNames?[4], opposite?, oddsOverride? }
+- pickPolicy meanings: exactly-1 = mandatory floor (gender, race; relic form/material);
+  at-most-1 = optional-but-exclusive (background, notoriety — the old group-mutex);
+  free = everything else, antonym PAIRS inside free groups handled by `opposite`.
+  Arbitrary at-most-N caps are CUT (appearance odds keep counts sane).
+- appearOdds: group default + per-concept override — effectively per tag.
+- tierRange: a concept may START above t1 (lineage t4–20: no "faintly royal") — a high minTier
+  makes the concept inherently rare and content-gated for free (maxTier must reach it).
 - WHY a group record: pick policy ("exactly one race") is a SET-level fact no per-tag field can
   express; groups are ~7 rows of policy with one home (today's scattered tagAppear/BALANCE
   functions were the failure mode).
