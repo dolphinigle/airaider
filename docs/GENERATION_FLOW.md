@@ -316,6 +316,12 @@ R6. relic `standing` ✅ (designer 2026-06-13: "standing only famous yea") — F
     the shared `famous` concept (domain both, tiered deep). No infamous/high-born for
     objects; a curse, if ever wanted, = a negative enchantment line (pass-2/later).
     Grail = {cup t3, famous t18} → "a cup (low); famous (legendary)".
+S1. `kind` ✅ (designer 2026-06-13) — stackables' identity group: gold, debt, grain… ·
+    exactly-1 · flat · exists so slots can `requires [stackable, gold]`; stackables have
+    no rolled tags (§7.1) — type + kind is their whole tag-set.
+GROUP PASS COMPLETE (2026-06-13). Character 8: type/gender/race/personality/background/
+trait/skill/standing · Relic 7: type/form/style/trait/enchantment/standing · Stackable:
+type/kind. NEXT: PASS 2 — word lists per group, one group at a time.
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
