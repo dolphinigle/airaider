@@ -513,8 +513,20 @@ W8. `standing` WORDS + minTier DROP ✅ LOCKED (designer 2026-06-13 "Just these 
     roll its low tier at low content levels (fine — minor noble is a good early card,
     appearOdds keeps it rare). AI disclaimer (as `body`): never "standing:famous" — bare
     `famous (high)` only; group id engine-side. (Group 9 "lineage" stays DEAD — absorbed.)
-    Still open for standing: per-word VALUE WEIGHTS / depths + the famous/infamous SIGN
-    question (next decision).
+W9. `standing` VALUES ✅ LOCKED (designer 2026-06-13 "famous/infamous should be apexes
+    too… a way to add extra value to units") — all 3 are APEX value lines:
+      high-born  + · depth 20 · t20 ≈ 1.19M · tiny appearOdds  (imperial blood — princess)
+      famous     + · depth 20 · t20 ≈ 1.19M · low appearOdds   (a name sung across lands)
+      infamous   + · depth 20 · t20 ≈ 1.19M · low appearOdds   (a name that empties taverns)
+    All POSITIVE-ADDITIVE (the value-without-usefulness group — princess/Grail jackpots
+    live here). `infamous` POSITIVE confirmed (NOT a liability): notoriety IS value
+    (recruits through fear, opens underworld doors); the "brings heat" downside is a STORY
+    consequence the AI writes, never a value penalty. Designer raised famous/infamous from
+    the proposed 626k to the full 1.19M apex — standing exists precisely to ADD extra value
+    to units, so the renown lines hit the top ceiling. Stacking is additive → a legendary
+    famous princess = famous(t20) + high-born(t20) ≈ 2.38M, the intended top jackpot.
+    high-born stays rarest (tiny appearOdds) so the princess remains the rare apex.
+    STANDING GROUP COMPLETE — character side (8 groups) DONE.
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
