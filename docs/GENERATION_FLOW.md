@@ -191,15 +191,19 @@ default ("somewhat X / X / very X / extremely X"), custom names opt-in per conce
   MECHANISMS/CONCEPTS only):
   TagGroup   { id, domains: character|relic|both, pickPolicy: exactly-1 | at-most-1 | free,
                appearOdds default (level-rampable), menuLabel }
-  TagConcept { id, group, word, tierRange [minTier, depth] (1,1 = flat),
+  TagConcept { id, group, word, depth (1 = flat), valueWeight?,
                customBandNames?[4], opposite?, oddsOverride? }
+               // minTier DROPPED (W8 2026-06-13): all concepts start at t1; "inherent
+               // grandness" = valueWeight + appearOdds, not a tier floor.
 - pickPolicy meanings: exactly-1 = mandatory floor (gender, race; relic form/material);
   at-most-1 = optional-but-exclusive (background, notoriety — the old group-mutex);
   free = everything else, antonym PAIRS inside free groups handled by `opposite`.
   Arbitrary at-most-N caps are CUT (appearance odds keep counts sane).
 - appearOdds: group default + per-concept override — effectively per tag.
-- tierRange: a concept may START above t1 (lineage t4–20: no "faintly royal") — a high minTier
-  makes the concept inherently rare and content-gated for free (maxTier must reach it).
+- ~~tierRange / minTier~~ DROPPED (W8 2026-06-13, designer: "minimum tier is flawed"): all
+  concepts start at t1. The "no faintly royal" goal is met instead by valueWeight (high-born's
+  t1 is already valuable) + tiny appearOdds (rare) — a GRADIENT (t1 minor noble → t20 imperial
+  blood), not a hard floor. Generalizes the W7 skill value-weight to all concepts.
 - WHY a group record: pick policy ("exactly one race") is a SET-level fact no per-tag field can
   express; groups are ~7 rows of policy with one home (today's scattered tagAppear/BALANCE
   functions were the failure mode).
@@ -488,6 +492,29 @@ W7. `skill` VALUE MODEL ✅ LOCKED (designer 2026-06-13 "sounds good. lock it") 
     is now LIVE for skills — per-concept growth rate / value weight is required in the
     value curve; characters are otherwise additive (Σ tag values), skills just price
     their own curve.
+
+W8. `standing` WORDS + minTier DROP ✅ LOCKED (designer 2026-06-13 "Just these three are
+    enough. continue" + "minimum tier is flawed… T1 just rarer and more value by
+    default") — 3 words:
+      famous (renown for deeds — admired; opposite of infamous; domain BOTH — a famed
+              blade) · infamous (renown for deeds — feared/hated; opposite of famous) ·
+      high-born (birth/blood — aristocracy; CHARACTER-ONLY domain override; distinct from
+              `ruler` background = the OFFICE)
+    Candidates SKIPPED (designer "three are enough"): wealthy (double-counts gold economy),
+    connected (= social skill + AI flavor), blessed/divine-favored.
+    minTier DROPPED globally (mechanism deleted — see §9a.2, §8 schema, §8 group-8 edits):
+    designer judged it flawed. Replacement = the W7 value-weight mechanism GENERALIZED to
+    ALL concepts — "inherent grandness" = high valueWeight + tiny appearOdds, never a tier
+    floor. high-born = high value-weight + tiny appearOdds → gradient t1 minor noble →
+    t20 imperial blood (the old "no faintly royal" goal met by a valuable+rare floor, not
+    a cut). CONFLICT CHECK (designer-requested): minTier was used in EXACTLY ONE place
+    (high-born); dropping it conflicts with nothing — flats are depth-1, background/skills
+    already start t1, bands still map t1-5/6-10/11-15/16-20; only change is high-born can
+    roll its low tier at low content levels (fine — minor noble is a good early card,
+    appearOdds keeps it rare). AI disclaimer (as `body`): never "standing:famous" — bare
+    `famous (high)` only; group id engine-side. (Group 9 "lineage" stays DEAD — absorbed.)
+    Still open for standing: per-word VALUE WEIGHTS / depths + the famous/infamous SIGN
+    question (next decision).
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
@@ -497,7 +524,8 @@ R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no 
 8. `standing` ✅ (absorbs renown + lineage + any future pure value-line — designer: "the
    one housing value-adding tags, same category") — free (NOT at-most-1: famous princess
    = famous+high-born stack, rare via tiny odds) · tiered deep · all positive value ·
-   famous/infamous opposite pair · high-born minTier 4, deepest · domain BOTH (relic
+   famous/infamous opposite pair · high-born high value-weight + tiny appearOdds (W8 —
+   minTier dropped; gradient t1 minor noble → t20 imperial blood), deepest · domain BOTH (relic
    renown: a famed blade) with CONCEPT-LEVEL DOMAIN OVERRIDE (high-born = character-only;
    small schema addition). Same disclaimer as `trait`: NEVER "standing:famous" to the AI —
    bare `famous (high)` only; group id is engine-side. (Group 9 "lineage" is DEAD — absorbed.)
@@ -528,7 +556,9 @@ R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no 
       id, group, word   // ONE entry per word: 'strong' is one entry, 'weak' another
       depth?            // highest tier this word reaches. absent/1 = flat (no tiers).
                         //   strong: 20 (deep line) · weak: 4 (texture) · brave: flat
-      minTier?          // lowest rollable tier, default 1. royal-blood: 4 (no "faintly royal")
+      valueWeight?      // per-concept growth/value scalar (W7/W8). high-value lines
+                        //   (magic, high-born) reach big value; "inherent grandness" lives
+                        //   HERE + appearOdds, NOT a tier floor. (minTier DROPPED — W8.)
       bandNames?        // 4 custom AI/player words; default auto "somewhat X / X / very X /
                         //   extremely X". skill: apprentice/journeyman/master/grandmaster
       opposite?         // partner that can NEVER coexist with this one + clashes in dice
