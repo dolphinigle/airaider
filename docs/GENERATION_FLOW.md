@@ -4,9 +4,12 @@
 Supersedes the scattered flow descriptions; QUESTS.md §"reward-first" 🔒 is the governing rule.
 Each section below is marked ✅ agreed · 🔶 OPEN (decision pending) · 📌 current-impl note.
 
-**RESUME POINT (for the next session): §9b PASS 2 — WORD LISTS PER GROUP. `personality`
-✅ DONE (see §9b PASS 2 / W1: 7 pairs, all value 0); NEXT = `background`+depths** (then
-trait, skill, standing, relic form/style/trait/enchantment, stackable kinds). The §9b GROUP PASS is COMPLETE (see "§9b CONTENT WALK" +
+**RESUME POINT (for the next session): §9b PASS 2 — VOCABULARY WALK COMPLETE ✅ (W1–W18,
+all groups, both card species + stackables). NEXT = task #30 IMPLEMENTATION** of the full
+tag system (structure + all pass-2 vocabulary), migrating the old `tags.ts`/`economy.ts`.
+See "§9b PASS 2" section for every locked word list, value model, and the minTier-drop /
+value-weight (W7/W8) and uniform-depth (W7/W11/W16) mechanisms. Open ⚠: favored-dice vs
+high-attrs scaling; band display names (parked, display-only). The §9b GROUP PASS is COMPLETE (see "§9b CONTENT WALK" +
 "RELIC-SIDE GROUPS" sections): Character 8 = type/gender/race/personality/background(tiered,
 rank-is-the-tier)/trait/skill/standing · Relic 7 = type/form(tiered, embodies material+craft)/
 style/trait/enchantment(label-rendered)/standing(fame only) · Stackable = type/kind.
@@ -640,6 +643,14 @@ W17. relic `standing` ✅ LOCKED (designer 2026-06-13 "yes") — confirms R6: re
     (W9: depth 20, t20 ≈ 1.19M, low appearOdds). NO infamous / high-born for objects
     (character-only via domain override). A relic CURSE = a negative enchantment line,
     FUTURE WORK (not a standing word). Grail = chalice/curio + famous(legendary).
+
+W18. stackable `kind` ✅ LOCKED (designer 2026-06-13 "just have Gold and Debt for now")
+    — 2 kinds: gold (currency, unit value 1) · debt (owed coin, negative stackable).
+    exactly-1 · flat · value-0 identity tag (the card's value = quantity × unit value;
+    kind just says which resource). grain CUT (designer; no upkeep mechanic yet). evidence/
+    mess stay LIABILITY cards (discrete complications), NOT stackable kinds. FUTURE: more
+    kinds when mechanics need them — consumable items (designer), building materials, etc.
+    §9b PASS 2 VOCABULARY WALK COMPLETE (W1–W18).
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
