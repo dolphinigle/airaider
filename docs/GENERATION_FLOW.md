@@ -633,6 +633,13 @@ W16. relic `enchantment` VALUE + ODDS ✅ LOCKED (designer 2026-06-13 "yes") —
     (maxed legendary artifact = multi-M jackpot, vanishingly rare via odds). MULTI-
     ENCHANT allowed-but-rare (free group; a flaming swift blade is legal, tiny odds make
     it rare not impossible — no hard cap). ENCHANTMENT COMPLETE.
+
+W17. relic `standing` ✅ LOCKED (designer 2026-06-13 "yes") — confirms R6: reuses the
+    SHARED `famous` concept (domain = both), nothing new. famous ONLY for objects (a
+    renowned relic — Grail, a named blade); same apex value line as character famous
+    (W9: depth 20, t20 ≈ 1.19M, low appearOdds). NO infamous / high-born for objects
+    (character-only via domain override). A relic CURSE = a negative enchantment line,
+    FUTURE WORK (not a standing word). Grail = chalice/curio + famous(legendary).
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
