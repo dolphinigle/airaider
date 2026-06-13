@@ -573,6 +573,26 @@ W12. relic `style` WORDS ✅ LOCKED (designer 2026-06-13 "should be exactly 1 th
     single style slot. CONSEQUENCE: an "ancient elven" relic picks ONE as the style tag,
     the other = AI flavor (acceptable for prototype). Slot-fit hook: lizard shrine favors
     lizardkin, ruin favors ancient, etc.
+
+W13. relic `trait` ✅ LOCKED (designer 2026-06-13 "skip and proceed… beautiful should go
+    up to T20") — ONE group, per-concept value (NO body/personality-style split — designer
+    agreed: relic traits don't cleave into two clean domains, only grim/cheerful was pure
+    vibe and it's cut). 4 opposite-pairs:
+      beautiful / ugly  — looks — SIGNED: beautiful depth 20 (t20 ≈ 1.19M, a top value
+                          line like form/character-beauty), ugly depth 4 (≈ −41g)
+      decorative / simple — ornamentation — value 0, tiered d6 (AI intensity)
+      sturdy / fragile    — durability — value 0 (fragile's drawback is utility/story,
+                          not gold; per W11 utility≠value), tiered d6
+      heavy / light       — weight — value 0, tiered d6 (slot-fit: heavy wants strong
+                          wielder)
+    REMOVED grim/cheerful (designer: vibe belongs to style/AI-flavor, not a physical
+    trait). REJECTED additional axes (designer "all look bad"): pristine/battle-worn
+    (condition/provenance), balanced/unwieldy (handling), large/small (size — proxied by
+    heavy/light). KEY PoE INSIGHT (designer pointer): PoE "traits" are FUNCTIONAL affixes
+    (+life/res/damage) — in our split those are the `enchantment` group's job, NOT traits;
+    so descriptive traits stay few, enchantment carries functional richness. OPEN for the
+    enchantment station: should a relic's power BOOST ITS WIELDER (PoE-style equip bonus —
+    combat dice / attribute bump on equip), tied to §7 equip/bedroom mechanic?
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
