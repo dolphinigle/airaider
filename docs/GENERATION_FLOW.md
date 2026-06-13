@@ -431,6 +431,39 @@ W5. `body` SIGNS + DEPTHS ✅ LOCKED (designer 2026-06-13 "sounds good. record")
     dumping a huge minus (degenerate jackpots); shallow = complications, not financing.
     (2) VALUE-0-BUT-TIERED is legal (tall/short d6): tiers buy AI intensity
     ("tall (legendary)" = a giant) without gold value.
+
+W6. `skill` WORDS ✅ LOCKED (designer 2026-06-13 "this list looks good. continue") — 16
+    skills (free · deep tiered lines · believability cap ~2–3 per character · DECOUPLED
+    from attributes: attribute = slot base coins, skill = favored-dice band bonus only):
+      roguery · lore · nature · craft · performance · food · heal · social ·
+      intimidation · leadership · melee · ranged · magic-fire · magic-earth ·
+      magic-water · magic-dark
+    Changes from old vocab: stealth→roguery (broader: locks/theft/sleight/forgery/
+    infiltration) · beast→nature (covers handling + wilderness/tracking/herb-gathering) ·
+    song→performance (music/dance/acting) · weapon→melee+ranged SPLIT (archers live in
+    ranged; duelist vs sharpshooter; slots favor one — "a rooftop shot") · ADDED social
+    (one-on-one influence — ABSORBS trade + seduce, designer) · ADDED intimidation
+    (influence by stick) · ADDED leadership (=the dropped `command`; group command/
+    generalship — completes the officer probe) · DROPPED magic-air (designer; 4 schools,
+    dark = the forbidden one). sail folds to background tier (seaman = sailor tier), not
+    a skill (designer).
+    SCOPE TABLE (makes the audit decidable): roguery=stealth/locks/theft/infiltration ·
+    lore=books/history/arcane THEORY/secrets-by-study · nature=wilderness/tracking/
+    animals/herb GATHERING · craft=making objects · performance=entertain an AUDIENCE ·
+    food=cook/brew/provision · heal=mundane medicine · social=ONE-ON-ONE influence
+    (persuade/charm/deceive/seduce/haggle) · intimidation=fear/coercion · leadership=
+    command a GROUP/tactics · melee=close combat · ranged=bow/thrown · magic-*=casting.
+    FULL PAIRWISE AUDIT (all 120 pairs) — NO true collisions; 9 overlap-risk pairs
+    adjudicated by domain boundary: social/intimidation = carrot/stick · social/leadership
+    = individual/group · social/performance = influence/entertain (seduce→social) ·
+    intimidation/leadership = frighten-individual/move-group · leadership/melee+ranged =
+    command/personally-fight (THE OFFICER PROBE: soldier(high)+leadership=real general,
+    +melee no leadership=duelist, +neither+dull=appointee) · lore/magic-* = know-about/
+    cast (scholar can have lore + zero schools) · nature/heal = gather/treat · nature/food
+    = find/prepare · magic-water/heal = elemental-casting/mundane-medicine (both heal in
+    FICTION, different source — vocab gloss to keep AI from conflating).
+    Still open for skill: per-word DEPTHS (next decision) — note the believability cap
+    and the ⚠ flat-favored-dice-vs-high-attrs revisit (pass-1 flag).
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
