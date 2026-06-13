@@ -4,12 +4,19 @@
 Supersedes the scattered flow descriptions; QUESTS.md §"reward-first" 🔒 is the governing rule.
 Each section below is marked ✅ agreed · 🔶 OPEN (decision pending) · 📌 current-impl note.
 
-**RESUME POINT (for the next session): §9b PASS 2 — VOCABULARY WALK COMPLETE ✅ (W1–W18,
-all groups, both card species + stackables). NEXT = task #30 IMPLEMENTATION** of the full
-tag system (structure + all pass-2 vocabulary), migrating the old `tags.ts`/`economy.ts`.
-See "§9b PASS 2" section for every locked word list, value model, and the minTier-drop /
-value-weight (W7/W8) and uniform-depth (W7/W11/W16) mechanisms. Open ⚠: favored-dice vs
-high-attrs scaling; band display names (parked, display-only). The §9b GROUP PASS is COMPLETE (see "§9b CONTENT WALK" +
+**RESUME POINT (for the next session): §9b PASS 2 vocabulary walk COMPLETE ✅ (W1–W18).
+NEXT = DICE / ATTRIBUTE / THRESHOLD REDESIGN — PLAN FIRST, then submit the plan to the
+designer before locking.** Designer directive (2026-06-13): redesign the WHOLE roll math
+as one coupled system — attribute model + favored/clash bonus + threshold (must be
+PER-TEST: "for quest A, what's the stealth threshold?") + coin resolution. NOT just the
+favored bonus. See the "⚠ DICE/ATTRIBUTE/THRESHOLD REDESIGN" note under skill group-7 for
+the problem statement, my (unlocked) favored-fraction candidate, and the per-test
+threshold direction. Current math: economy.ts (coinsFor/overlap/thresholdFor/resolveRoll/
+rollBaseAttrs/attrsAtLevel/rollTalents). BIG PICTURE ([[v3-docs-finalization]] in memory):
+we are finalizing design docs for ALL systems → implement prototype v3; the tag system is
+done, dice/attribute/threshold is the next system to finalize, then audit remaining docs.
+Parked: band display names (display-only). Tag-system IMPLEMENTATION (#30) waits until the
+docs are finalized. The §9b GROUP PASS is COMPLETE (see "§9b CONTENT WALK" +
 "RELIC-SIDE GROUPS" sections): Character 8 = type/gender/race/personality/background(tiered,
 rank-is-the-tier)/trait/skill/standing · Relic 7 = type/form(tiered, embodies material+craft)/
 style/trait/enchantment(label-rendered)/standing(fame only) · Stackable = type/kind.
@@ -670,9 +677,30 @@ R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no 
    exotics (magic) gated by tiny appearOdds only. Attribute interaction: DECOUPLED layers —
    attribute = slot's base coins, skill tag = band bonus ONLY when the slot favors it
    (attrBias stays cut; pools own coherence #31). Word list pass 2 (+`command` candidate).
-   ⚠ REVISIT (designer 2026-06-13): flat favored-dice +1/+1/+2/+3 (+4 t20) won't scale —
-   at high level (attr ~20) +2 is insignificant. Later: level-scaled band bonus, % of
-   coins, or slower attribute growth.
+   ⚠ DICE/ATTRIBUTE/THRESHOLD REDESIGN — OPEN, NOT LOCKED (designer 2026-06-13: "do this
+   together with Attribute… get dice properly done. plan first… specifically the
+   THRESHOLD mathing"). Scope = the WHOLE roll math as one system: attribute model
+   (rollBaseAttrs/attrsAtLevel/talents) + favored/clash bonus + threshold formula
+   (thresholdPerMerc=2.5+0.4L) + coin resolution (flipCoins, success/partial). NOT just
+   the favored bonus. PLAN-FIRST required before any lock.
+   PROBLEM: threshold & attribute both grow with level but favored bonus is FLAT
+   (favoredBonus(tier)=4−⌊(t−1)/2⌋), so per-merc coins-needed ≈ 2·threshold = 5+0.8L
+   (~5.8@L1 → ~21@L20); a flat +2 is swingy early, noise late — tag relevance INVERTS
+   with level and low/legendary bands compress.
+   CANDIDATE (mine, NOT locked — to fold into the full plan): favored/clash = a FRACTION
+   of the per-merc challenge (level-proportional, band-graded), bonus = bandFrac·(5+0.8L),
+   fracs low .12 / mid .22 / high .38 / legendary .55, clash = symmetric negative.
+   Preserves attr/tag decoupling (bonus depends on CHALLENGE not the merc's attr);
+   fractions harness-tunable. Rejected alt: %-of-attribute (re-couples skill to attr →
+   skills worthless on weak mercs). Current mechanic lives in economy.ts: coinsFor,
+   overlap, thresholdFor, resolveRoll, rollBaseAttrs, attrsAtLevel, rollTalents.
+   KEY DIRECTION (designer 2026-06-13): threshold should be PER-TEST — "for quest A,
+   what's the threshold for STEALTH it needs to pass?" — difficulty attaches to the
+   SPECIFIC check the quest demands (a sneaky job has a high stealth threshold), NOT a
+   generic per-merc flat number (today's thresholdFor is test-agnostic). Redesign must
+   define: per (attribute/skill) test, the threshold quest A sets, and how a merc's
+   attribute + favored tags meet it. ATTRIBUTE + FAVORED BONUS + THRESHOLD = ONE coupled
+   math, designed together. PLAN-FIRST must cover all of it.
 
 ### Part 1 — the authored vocabulary (static content; two lists)
 
