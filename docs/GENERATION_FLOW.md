@@ -548,7 +548,19 @@ W10. relic `form` WORDS ✅ LOCKED (designer 2026-06-13 "yes") — DESIGN CHANGE
     — beat `trinket` (connotes CHEAP — "legendary trinket" oxymoron), `treasure`/`gem`
     (narrower). vs `decoration` = a DISPLAY piece that furnishes a room (tapestry/statue/
     mirror/vase); split line = PORTABLE-sells-in-vault vs MOUNTED-for-room-prestige.
-    Next for relic form: the value model (uniform-20 confirm + per-category value weights?).
+W11. relic `form` VALUE MODEL ✅ LOCKED (designer 2026-06-13 "sounds good") — UNIFORM
+    DEPTH 20, the TIER IS the quality/value, standard global curve 6×1.9^(t−1) (legendary
+    relic ≈ 1.19M base). Every category spans t1 (rusty junk/rags) → t20 (legendary
+    artifact); tier embodies material+craft as locked. NO per-category value weight — all
+    categories EQUAL value: at t20 every category is "a legendary masterwork of its kind"
+    (throne/blade/robe/grimoire/gem comparably worth), and the tier already encodes
+    fineness, so weighting would double-count. What differs between categories is UTILITY
+    (weapons equip, decoration/furniture furnish prestige rooms, curio sells) — a fort
+    mechanic, NOT a tag-value one. WHICH form you get is CONTEXT-driven via POOLS (R1b
+    base-weight table, #31: armory→weapons, hoard→curio/treasure), not intrinsic per-form
+    odds. (Per-category weights slot in trivially later if playtest demands; not now.)
+    Relic value = value(formTier) + Σ trait + Σ enchantment + Σ standing (fully additive,
+    R2). RELIC FORM COMPLETE.
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
