@@ -312,9 +312,10 @@ R2. `material` + `craft` — DROPPED (designer: "they are EMBODIED by the sword 
     Relic roster built by ANALOGY to the 8 character groups (designer): BG≈form ·
     race≈style · personality≈trait(renamed — "personality" is a misnomer for objects) ·
     skill≈power · standing≈fame-only. Gender: no analogue.
-R3. `style` ✅ (designer 2026-06-13) — at-most-1 · FLAT (no tiers) · value ~0 ·
-    culture-marks mirroring races ("lizardkin-styled sword") · slot-fit + story
-    (lizard shrine favors lizardkin style).
+R3. `style` ✅ (designer 2026-06-13; AMENDED at W12 to exactly-1) — exactly-1 · FLAT
+    (no tiers) · value ~0 · culture-marks mirroring races ("lizardkin-styled sword") ·
+    slot-fit + story (lizard shrine favors lizardkin style). Now parallel to `race`:
+    every relic has a style, human the common default. See W12 for words.
 R4. `trait` ✅ (designer 2026-06-13; "personality" misnomer renamed) — free ·
     opposite-pairs · PER-WORD DEPTH (beautiful/ugly tiered; sturdy/fragile flat-or-
     shallow — per pair in pass 2; depth is per-CONCEPT so groups mix freely) · signed
@@ -561,6 +562,17 @@ W11. relic `form` VALUE MODEL ✅ LOCKED (designer 2026-06-13 "sounds good") —
     odds. (Per-category weights slot in trivially later if playtest demands; not now.)
     Relic value = value(formTier) + Σ trait + Σ enchantment + Σ standing (fully additive,
     R2). RELIC FORM COMPLETE.
+
+W12. relic `style` WORDS ✅ LOCKED (designer 2026-06-13 "should be exactly 1 then.
+    human wolfkin elven lizardkin ancient exotic") — pickPolicy AMENDED at-most-1 →
+    EXACTLY-1 (amends R3). 6 words: human · wolfkin · elven · lizardkin · ancient ·
+    exotic. FLAT · value ~0 · human-common odds (now fully parallel to `race`: every
+    relic has exactly one style, human the default). human KEPT (it's the mandatory
+    default value, like race's human — not absence). ancient (old-world/antique craft)
+    and exotic (foreign/unnamed-faraway) are non-cultural styles that still occupy the
+    single style slot. CONSEQUENCE: an "ancient elven" relic picks ONE as the style tag,
+    the other = AI flavor (acceptable for prototype). Slot-fit hook: lizard shrine favors
+    lizardkin, ruin favors ancient, etc.
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
