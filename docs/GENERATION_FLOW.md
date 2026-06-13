@@ -622,7 +622,17 @@ W15. relic `enchantment` AUGMENTING words ✅ LOCKED (designer 2026-06-13 "yes")
     insight. Distinctness: might (enchantment) vs muscular (body) vs physical (attribute);
     glamour (charm magic) vs beautiful (trait); insight (perception magic) vs lore (skill)
     — all clean (magical power vs descriptor vs stat). Every attribute now has a
-    relic-power path. Still open for enchantment: VALUE model + appearOdds (next).
+    relic-power path.
+
+W16. relic `enchantment` VALUE + ODDS ✅ LOCKED (designer 2026-06-13 "yes") — uniform
+    depth 20 (all 8 start t1) · uniform value weight → t20 ≈ 1.19M (APEX line — the
+    relic's rare jackpot power; no per-enchantment weight, like form categories: WHICH
+    one is utility/theme, not value) · TINY appearOdds (uniform, tunable — the rarity
+    lever; also naturally caps count per relic, usually 0-1) · all positive, fully
+    additive. RELIC VALUE = value(formTier) + Σ trait + Σ enchantment + Σ standing
+    (maxed legendary artifact = multi-M jackpot, vanishingly rare via odds). MULTI-
+    ENCHANT allowed-but-rare (free group; a flaming swift blade is legal, tiny odds make
+    it rare not impossible — no hard cap). ENCHANTMENT COMPLETE.
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
