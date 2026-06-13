@@ -613,6 +613,16 @@ W14. relic `enchantment` MECHANISM + ELEMENTAL words ✅ LOCKED (designer 2026-0
     mapping to physical · agility · charisma · perception (every attribute gets a
     relic-power path).
     Render: label-rendered "enchantment: fire (high)" (R5 exception). Value + odds: W15+.
+
+W15. relic `enchantment` AUGMENTING words ✅ LOCKED (designer 2026-06-13 "yes") — 4
+    augmenting enchantments, one per attribute (intelligence = the elemental set):
+      physical → might · agility → swiftness · charisma → glamour (magical allure/charm)
+      · perception → insight
+    FULL ENCHANTMENT SET = 8: fire · earth · water · dark · might · swiftness · glamour ·
+    insight. Distinctness: might (enchantment) vs muscular (body) vs physical (attribute);
+    glamour (charm magic) vs beautiful (trait); insight (perception magic) vs lore (skill)
+    — all clean (magical power vs descriptor vs stat). Every attribute now has a
+    relic-power path. Still open for enchantment: VALUE model + appearOdds (next).
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
