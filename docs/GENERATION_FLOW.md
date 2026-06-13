@@ -593,6 +593,26 @@ W13. relic `trait` ✅ LOCKED (designer 2026-06-13 "skip and proceed… beautifu
     so descriptive traits stay few, enchantment carries functional richness. OPEN for the
     enchantment station: should a relic's power BOOST ITS WIELDER (PoE-style equip bonus —
     combat dice / attribute bump on equip), tied to §7 equip/bedroom mechanic?
+    [RESOLVED W14 — relics equip on ROOMS not units; see W14.]
+
+W14. relic `enchantment` MECHANISM + ELEMENTAL words ✅ LOCKED (designer 2026-06-13 "yes")
+    — MECHANISM (corrects the W13 flag: relics equip on ROOMS, NOT units): enchantment =
+    deep VALUE + FLAVOR + ROOM PRESTIGE via the existing overlap/themeFavored mechanic
+    (a fire relic in a forge boosts that room's prestige when the enchantment matches the
+    room theme) — NO new system. QUEST RELIC-SLOTS = FUTURE WORK (deferred): structurally
+    trivial (the "slot requires/favors tags" property already lets a relic contribute its
+    tags like a unit), only the gameplay/UX integration is deferred. NOT a unit equip-buff.
+    ELEMENTAL enchantments = THE 4 MAGIC SCHOOLS: fire · earth · water · dark (designer:
+    "match elemental with magic elements from characters"). ONE element vocabulary shared
+    across magic skills / enchantments / room themes / pool roll-table (coherence). My
+    proposed shadow = dark; radiance DROPPED (no light school — air cut, dark kept);
+    frost/venom/storm become AI FLAVOR under the real elements (frost=water, venom=earth/
+    dark). "mystical" category rejected (designer).
+    AUGMENTING enchantments — PLAN LOCKED, words next (W15): ONE per ATTRIBUTE EXCEPT
+    intelligence (= magic, covered by the elemental set) → 4 augmenting enchantments
+    mapping to physical · agility · charisma · perception (every attribute gets a
+    relic-power path).
+    Render: label-rendered "enchantment: fire (high)" (R5 exception). Value + odds: W15+.
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
