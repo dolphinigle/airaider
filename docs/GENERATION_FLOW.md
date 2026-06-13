@@ -527,6 +527,28 @@ W9. `standing` VALUES ✅ LOCKED (designer 2026-06-13 "famous/infamous should be
     famous princess = famous(t20) + high-born(t20) ≈ 2.38M, the intended top jackpot.
     high-born stays rarest (tiny appearOdds) so the princess remains the rare apex.
     STANDING GROUP COMPLETE — character side (8 groups) DONE.
+
+W10. relic `form` WORDS ✅ LOCKED (designer 2026-06-13 "yes") — DESIGN CHANGED: form is
+    now a SMALL set of BROAD CATEGORIES; the exact type (sword, ring) is AI FLAVOR TEXT,
+    not a tag. 9 forms:
+      melee-weapon · ranged-weapon · armor · clothes · accessory · document ·
+      curio · decoration · furniture
+    Rationale (designer "the exact type should be flavor… dont want too many, fed to AI"):
+    fewer AI tokens + the narrator is better at the specific object anyway ("a jeweled
+    starmetal blade" from melee-weapon(legendary)+ornate+fire). CONSEQUENCES recorded:
+    (1) R1 "category metadata" (sword→weapon) is now REDUNDANT/DROPPED — FORM IS THE
+    QUERYABLE CATEGORY (slots match form directly: armory `requires [melee-weapon,
+    ranged-weapon]`). (2) The golden-nail problem DISSOLVES (nail was an exact type; nails
+    aren't relic cards now) → per-form DEPTH CAPS likely OUT; form probably goes
+    UNIFORM-DEPTH-20 like skills (W7), the TIER embodying material+craft/quality
+    (t1 rusty junk → t20 legendary artifact) — CONFIRM at the form-value decision (next).
+    Weapon split melee/ranged mirrors the skill split; "any weapon" slots list both.
+    Word calls: `curio` = portable object valued for rarity/craft/material (carvings,
+    masks, gems, oddments — designer: "weird things like wooden carvings… cover gems too")
+    — beat `trinket` (connotes CHEAP — "legendary trinket" oxymoron), `treasure`/`gem`
+    (narrower). vs `decoration` = a DISPLAY piece that furnishes a room (tapestry/statue/
+    mirror/vase); split line = PORTABLE-sells-in-vault vs MOUNTED-for-room-prestige.
+    Next for relic form: the value model (uniform-20 confirm + per-category value weights?).
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
