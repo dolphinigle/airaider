@@ -462,8 +462,32 @@ W6. `skill` WORDS ✅ LOCKED (designer 2026-06-13 "this list looks good. continu
     cast (scholar can have lore + zero schools) · nature/heal = gather/treat · nature/food
     = find/prepare · magic-water/heal = elemental-casting/mundane-medicine (both heal in
     FICTION, different source — vocab gloss to keep AI from conflating).
-    Still open for skill: per-word DEPTHS (next decision) — note the believability cap
-    and the ⚠ flat-favored-dice-vs-high-attrs revisit (pass-1 flag).
+W7. `skill` VALUE MODEL ✅ LOCKED (designer 2026-06-13 "sounds good. lock it") — NEW
+    MECHANISM, supersedes the per-word-depth-cap proposal for skills: ALL skills have
+    UNIFORM DEPTH 20 (every line runs 1→20, so low/mid/high/legendary band mapping is
+    identical across skills; reaching high tiers is "very rare" via the bottom-weighted
+    tier-roll, SAME for every skill) — and a PER-SKILL VALUE WEIGHT differentiates worth
+    (this is the recorded-but-unused SCALE FACTOR / multiplicative-factor concept, now
+    in use). Curve = PER-SKILL GROWTH RATE (not a flat multiplier): every skill t1 ≈ 6
+    (a novice is a novice), values diverge as they climb (a flat multiplier would make a
+    novice cook worth 0.06g — rejected for insane floors). t20 VALUE CEILINGS (= the old
+    depth-table caps, now all reachable):
+      ~1.19M: melee · ranged · leadership · magic-fire · magic-earth · magic-water ·
+              magic-dark   (g≈1.90)
+      ~626k:  social   (g≈1.84)
+      ~91k:   roguery · lore · heal · craft   (g≈1.66)
+      ~25k:   nature · performance · intimidation   (g≈1.55)
+      ~13k:   food   (g≈1.50)
+    So t20 magic-fire ≈ 90× t20 food, while both are equally rare to roll and both read
+    "legendary" to the AI. PRINCIPLE (designer, justifies leaving background W3 on
+    depth-caps): RANK IS BOUNDED, MASTERY IS NOT — no emperor-peasant exists (depth-cap
+    is a real ceiling), but anyone can master any skill (uniform depth, value differs).
+    Magic stays special via tiny appearOdds (rarity lever), NOT depth — combat shares the
+    1.19M ceiling. ⚠ flat-favored-dice-vs-high-attrs revisit still stands (pass-1 flag).
+    ⚠ IMPL NOTE for #30: the SCALE-FACTOR section earlier in this doc (recorded unused)
+    is now LIVE for skills — per-concept growth rate / value weight is required in the
+    value curve; characters are otherwise additive (Σ tag values), skills just price
+    their own curve.
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
     venom… — not fancy adjectives like "flaming".
 R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no separate
