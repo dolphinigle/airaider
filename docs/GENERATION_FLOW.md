@@ -15,8 +15,12 @@ biases body-tag odds, personality/skill-direct/standing/gender = none. VERIFIED 
 (supervisor agent loop; only change from L10 draft = base 4→3). clash=mirror; injury=#39 placeholder.
 INJURY ✅ LOCKED (#39, §11) — one generic injury in TIERS, AI-judged severity, flat coin penalty,
 tiers→death-cap(10)+building-extend, rest/infirmary/pay-gold-room healing, value=tiers×V_base.
-NEXT design area: FORT ROOM CATALOG (#36) — the LAST one; dice (bedrooms/focus/rest), injury
-(infirmary + pay-gold-heal room), relics (item slots), prestige all now hand it concrete requirements.
+CURRENT design area: FORT ROOM CATALOG (#36, §12) — GOAL recorded, IN PROGRESS. Goal = a BIG room
+set for SMOOTH progression + a build-ORDER TABLE tied to prestige. NEXT STEP = get the designer's
+capability-set STEER (which functional rooms exist + what each unlocks), then room list →
+build-order table → per-room cost/prestige. Rooms must cover the locked hooks: bedrooms (dice
+§10 rest/level/focus), infirmary + pay-gold-heal room (injury §11), item-slot rooms (relics §7),
+theme/prestige rooms (economy). FOLLOW-ON: PRESTIGE MATH = its own pass (#41), AFTER the catalog.
 After all design: the LEAN-DOC TRANSFORM (commit checkpoint → rewrite every doc to
 END-result-only / implementable, verify each claim vs chat history → archive superseded docs
 TAGS.md/UNIT_GENERATION.md/scratch). Also still-stale from the revamp: PROMPTS.md attribute
@@ -989,3 +993,28 @@ heal-skill occupant slot so healers have a job) and a higher *upgrade* that unlo
 
 Goals hit: I1 stakes · I2 roll-coupled · I4 gold-sink + medical rooms · I5 recoverable · I6
 escalation/death. (I3 "CON's job" — dropped, out of scope.)
+
+## §12 — FORT ROOM CATALOG (design IN PROGRESS, started 2026-06-14) — #36
+(Builds on FORT.md's spatial model: side-view cells, 1 room/cell, 2 prestige pools. Will consolidate
+into FORT.md in the lean transform.)
+
+GOAL — a **BIG room set so progression is SMOOTH**: there's always a meaningful next thing to build
+(fixes the 100-day "prestige wall / nothing left to build" gap). Deliverable = a **TABLE of the
+expected build order** (the rough sequence a player constructs over a campaign) — each row: room ·
+when (early/mid/late) · what it gates/unlocks · gold cost · prestige contribution. The order ties to
+the **PRESTIGE MATH** (rooms are what prestige is computed over).
+
+ROOMS MUST COVER the now-locked hooks:
+- **dice/build (§10):** BEDROOMS — a unit rests/levels/focus-trains there; bedroom comfort caps level.
+- **injury (§11):** INFIRMARY (faster recovery + raises death cap; maybe a heal-skill occupant slot)
+  + a higher MEDICAL upgrade unlocking pay-gold healing.
+- **relics (§7):** rooms with ITEM SLOTS that want tags (fit-click + prestige).
+- **economy:** construction = a gold sink; theme rooms → prestige → leadTier (content gate).
+
+OPEN (walk next session): (a) the **capability-set STEER** from designer — which functional rooms
+exist + what each unlocks (recruiting/tavern · holding cells · training · medical line · workshops ·
+theme/prestige rooms · housing); (b) the room LIST (functional / theme / housing); (c) the
+**build-order / progression TABLE**; (d) per-room gold cost + prestige contribution.
+
+⚠ FOLLOW-ON: **PRESTIGE MATH** needs its own planning pass (formula / curve / thresholds; FORT.md has
+it 🟡 open) — do it AFTER the room catalog (rooms define what prestige sums over). Tracked as #41.
