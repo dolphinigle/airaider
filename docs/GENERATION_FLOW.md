@@ -4,18 +4,16 @@
 Supersedes the scattered flow descriptions; QUESTS.md §"reward-first" 🔒 is the governing rule.
 Each section below is marked ✅ agreed · 🔶 OPEN (decision pending) · 📌 current-impl note.
 
-**RESUME POINT (for the next session): §9b vocabulary ✅ (W1–W18). DICE/ATTRIBUTE/THRESHOLD §10
-is being REVAMPED (2026-06-14, #27 reopened) — NOT fully locked. DONE so far: roll STRUCTURE
-(fixed-sum base+growth vectors + player FOCUS; per-test difficulty × parHeads; pooled
-resolution; 5 difficulty tiers incl. `extreme`). REVAMP IN FLIGHT: (A locked) body STAT tags
-now FEED attributes — reverses W4 decoupling; (B locked) attribute set = STRENGTH·DEXTERITY
-(=agi+perception merged)·INTELLIGENCE·CHARISMA·CONSTITUTION, one body stat tag each
-(muscular/nimble/clever/beautiful/tough); multi-stat quests POOL a unit's attributes, bar
-×(n+1)/2 (same chance as single-stat). NEXT in the walkthrough: step **C** — the tag-bonus MATH
-(stat-tag bands; skills = weaker favored-match; personality = small nudge, #40) — the §10
-Tag-bonus/pass-table/Numbers blocks are SUPERSEDED until C lands; step **D** — body depth
-(10-tier proposal) + whether `clever` cap lifts now that it feeds intelligence. THEN remaining
-design areas: FORT ROOM CATALOG (#36), INJURY SYSTEM (#39, fills §10's reserved injury term).
+**RESUME POINT (for the next session): §9b vocabulary ✅ (W1–W18). DICE/ATTRIBUTE/THRESHOLD ✅
+FULLY LOCKED 2026-06-14 (#27 done) — see §10 THE ROLL for the verified spec: attribute set
+STRENGTH·DEXTERITY(=agi+perception)·INTELLIGENCE·CHARISMA·CONSTITUTION; build = fixed-sum
+base(≈3/stat)+growth(g0=2) vectors + player FOCUS (single→great / dual→good); co-equal lever model
+E = ATTRIBUTE(great=1.0U) + MATCHING-TAG(0.5U favored skill) + ATTRIBUTE-TAG(0.5U body+background),
+U(L)=base+2·g0·(L−1); threshold = E·U/2 with difficulty E .25/.5/1/1.5/2; multi-stat ×(n+1)/2; body
+stat tags feed attributes (muscular/nimble/clever/beautiful/tough), background tiny rank-scaled, race
+biases body-tag odds, personality/skill-direct/standing/gender = none. VERIFIED 36/36 across L3–L20
+(supervisor agent loop; only change from L10 draft = base 4→3). clash=mirror; injury=#39 placeholder.
+NEXT design areas: FORT ROOM CATALOG (#36), INJURY SYSTEM (#39, fills §10's reserved injury term).
 After all design: the LEAN-DOC TRANSFORM (commit checkpoint → rewrite every doc to
 END-result-only / implementable, verify each claim vs chat history → archive superseded docs
 TAGS.md/UNIT_GENERATION.md/scratch). Also still-stale from the revamp: PROMPTS.md attribute
@@ -860,113 +858,94 @@ THREE TYPES, type is a tag: `type:character` · `type:relic` · `type:stackable`
   primitive: requires:[type:character] · requires:[type:relic] wants:[storied] ·
   requires:[type:stackable, gold] (a bribe slot). Merge rule: stacks merge iff tag-sets match.
 
-## §10 — THE ROLL: dice / attribute / threshold ✅ (LOCKED 2026-06-14)
+## §10 — THE ROLL: dice / attribute / threshold ✅ LOCKED 2026-06-14 (numbers verified 36/36 L3–L20)
 
-Serves G1 per-test difficulty · G2 pass-table holds · G3 no level-inversion · G4 dopamine
-(greatness rare/earned) · G5 attachment-via-differentiation · G6 engine owns numbers /
-pooled resolution unchanged · G7 specialist AND hybrid builds both viable.
+Serves G1 per-test difficulty · G2 pass-table holds (every level) · G3 no level-inversion · G4
+dopamine · G5 attachment-via-differentiation · G6 engine owns numbers / pooled resolution · G7
+specialist AND hybrid builds. Verified via a supervisor agent loop (2 independent Opus sims converged
+on the params + supervisor re-simulated → all 36 ladder cells in-band across L3/5/10/20).
 
-> ⚠ **ATTRIBUTE REVAMP IN PROGRESS (2026-06-14).** Two things changed and are being re-recorded:
-> (1) **Attribute set renamed/restructured** — now **STRENGTH · DEXTERITY · INTELLIGENCE ·
-> CHARISMA · CONSTITUTION** (physical→strength; agility+perception MERGED→dexterity; +constitution).
-> (2) **Body "stat" tags now FEED their attribute** (reverses the old W4 attr↔tag *decoupling*):
-> each attribute has one body stat tag — strength`muscular` · dexterity`nimble` · intelligence`clever`
-> · charisma`beautiful` · constitution`tough`. Skills become a *weaker* favored-match; personality a
-> *small* nudge (per-group weight, #40). Multi-stat quests **pool a unit's tested attributes**, bar
-> **×(n+1)/2** (same chance as single-stat). **The Tag-bonus / pass-table / Numbers blocks below are
-> the PRIOR single-lever model and are SUPERSEDED — magnitudes pending walkthrough step C.**
+### Attributes (5) — STRENGTH · DEXTERITY (= agility + perception, merged) · INTELLIGENCE · CHARISMA · CONSTITUTION
 
-### C — ROLL MODEL: co-equal levers ✅ PRINCIPLE LOCKED 2026-06-14 (designer "sounds good")
-Effective power **E = ATTRIBUTE + MATCHING-TAG + ATTRIBUTE-TAG** (additive), weighted in units of
-**U = a great build's coin contribution at that level**:
-- **ATTRIBUTE** (build: focus + natural talent; body/bg attribute-tags fold in) — great build = **1.0 U**.
-- **MATCHING TAG** (favored skill, per-slot) = **0.5 U** (flat per level).
-- **ATTRIBUTE TAG** (body + background, always-on) = **0.5 U** (flat per level; body the bulk, bg a sliver).
+### Build — how a unit's attribute grows
+`attr_A(L) = base_A + growth_A·(L−1)`
+- **base** = born as a **fixed-sum random vector** (total ≈15, ~3/stat avg): random *distribution* =
+  birth lean (dopamine); fixed *total* = balance (no birth-OP, only birth-SHAPE). Flat L1 floor — does
+  NOT scale (the growth term does).
+- **growth** = a **fixed-sum budget** (≈10/level; standard g0 = 2/stat) distributed by a random vector
+  (natural lean) **reshaped by the player's FOCUS**: single focus → one **GREAT** stat (share 2.0) ·
+  dual → two **GOOD** (1.5) · none → generalist (1.0). Two greats impossible (over budget). Re-assignable
+  but only FUTURE growth re-skews (past banked → history sticks → attachment).
+- **Build quality** (growth share in the tested attr): **weak 0.7 · decent 1.1 · good 1.5 · great 2.0**.
+- DROPPED: rollTalents, aptitude, old ATTR_BIAS. "Natural talent" = the random growth-lean (no separate
+  system). Differentiation GROWS with level (L1 ≈ all base; veterans diverge).
+
+### The co-equal lever model
+Effective power **E = ATTRIBUTE + MATCHING-TAG + ATTRIBUTE-TAG** (additive), in units of
+**U(L) = a great build's coins = base + 2·g0·(L−1)** (scales with level):
+- **ATTRIBUTE** (build; great = **1.0 U**) · **MATCHING-TAG** (a favored SKILL the slot wants, per-slot)
+  = **0.5 U** · **ATTRIBUTE-TAG** (body + background, always-on) = **0.5 U**.
 - Tags are **co-equal with the attribute** (matching + attr-tag = 1.0 = a full attribute); **max E = 2.0**.
+- Every term **scales with level** (× U(L)) but tags are **flat across builds** (a weak and a great unit
+  get the same 0.5U tag) → tags help any unit equally AND never invert with level (G3).
 
-**Coin-flip thresholds spaced by 0.5 — each tier demands one more 0.5-lever** (× U):
-**trivial 0.25 · standard 0.5 · hard 1.0 · brutal 1.5 · extreme 2.0.**
+### What feeds the attribute (tag → attribute map)
+- **BODY stat tags** (the bulk of ATTRIBUTE-TAG), one per attribute: STR `muscular/scrawny` · DEX
+  `nimble/clumsy` · INT `clever/dull` · CHA `beautiful/ugly` · CON `tough/sickly`. (Reverses the old W4
+  decoupling — a body tag now boosts its attribute.)
+- **BACKGROUND** (a sliver of ATTRIBUTE-TAG), very small, **rank-scaled** — the locked 6/6/6/6/6 map
+  (5 pure + 10 split, each attribute-pairing once, + servant = all-5).
+- **RACE** — *indirect*: biases the appearOdds of body stat tags (wolfkin→muscular/nimble …), not a
+  direct modifier.
+- **MATCHING-TAG** = favored **skills** (per-slot). **PERSONALITY / STANDING / GENDER = none.**
 
-**Ladder (the felt result):** ≤ standard = **attribute alone** · hard = a **full (great) attribute OR build+1 tag** ·
-brutal = **attribute + 1 tag** · extreme = **attribute + BOTH tags**. A sub-great generalist with no tag
-**caps at standard** — hard needs a great attribute or a tag. (Verified at L10; binomial pass-table matches.)
-Multi-stat: pool a unit's tested attributes, bar **× (n+1)/2** (unchanged). Concrete magnitudes (build shares,
-base, g0, exact per-level threshold formula that holds L1–L20) being finalized — #27.
+### Per-test threshold
+- A quest = SLOTS. Each slot: **AI picks** the tested attribute + favored/clashing skills; **ENGINE
+  rolls** a difficulty.
+- **threshold (heads) = E_difficulty × U(L) / 2.** Difficulty E (each tier = one more 0.5-lever):
+  **trivial 0.25 · standard 0.5 · hard 1.0 · brutal 1.5 · extreme 2.0.**
+- **Multi-stat quest** = ONE unit, its tested attributes **pooled across attributes** (NOT across units);
+  combined bar **× (n+1)/2** → same pass-chance as single-stat (a HYBRID is the natural fit; a lopsided
+  unit underperforms).
 
-### Attributes & growth (replaces talents/aptitude — DROPPED; attrBias now RE-ADDED as body stat tags)
-- 5 attributes: **strength · dexterity · intelligence · charisma · constitution**.
-- **Birth = two fixed-sum random vectors** (balance via fixed total, character via random shape —
-  no birth-OP, only birth-SHAPE):
-  - BASE vector, total ≈20 across the 5 stats → a unit is born with a lean (e.g. `[6,5,4,3,2]`).
-  - GROWTH budget ≈10/level distributed by a random vector → its natural growth lean.
-- `attr_X(L) = baseX + growthX·(L−1)`.
-- **FOCUS (player agency):** reallocates the growth budget toward chosen attribute(s) within a
-  fixed budget — **single focus → one GREAT stat** (growth share 2.0) · **dual focus → two GOOD
-  stats** (1.5 each) · **none → GENERALIST** (1.0 each). Two GREATs is impossible (over budget).
-  Re-assignable but only FUTURE growth re-skews (past stays banked → history sticks → attachment).
-- `standardAttr(L) = base + g0·(L−1)`, g0 = standard growth = 2.0/stat. `parHeads(L)=standardAttr/2`.
-- **QUALITY** (vs the QUEST's level-standard) = growth share in the tested attr:
-  **weak 0.7 · decent 1.0 · good 1.5 · great 2.0**. Differentiation GROWS with level (L1 ≈ all base;
-  veterans diverge). Find-dopamine = tags + lucky birth-lean; build-dopamine = focus investment.
+### Resolution (unchanged)
+`coins = attribute + matching-tag (0.5U if the slot's favored skill is owned) + attribute-tag (body+bg)
+− clash − injury` → flip, count heads. **Pooled**: heads vs the bar → success (≥bar) · partial
+(≥0.6×bar) · failure → value **full / half / zero**. `clash` mirrors a tag (negative, same scaling);
+`injury` = RESERVED placeholder (#39); coins floored at 0.
 
-### The roll (resolution LOCKED, unchanged)
-`coins(unit,slot) = attr_relevant + favoredBonus − clashPenalty − injury` → flip that many fair
-coins, count heads. **Pooled**: Σ heads vs quest bar → success (≥bar) · partial (≥0.6×bar) ·
-failure → value **full / half / zero**.
+### The ladder + verified pass-table
+≤ standard = **attribute alone** · hard = a **great attribute OR build + 1 tag** · brutal = **attribute
++ 1 tag** · extreme = **attribute + BOTH tags**. A sub-great generalist with no tag **caps at standard**.
+Binomial success probabilities (final params), all in their target band across L3–L20:
 
-### Per-test threshold (G1)
-- A quest = SLOTS. Each slot: **AI picks** tested attribute + `favored[]` + `clashing[]`;
-  **ENGINE rolls** a difficulty tier (weighted by quest rarity+level).
-- `slot bar = difficulty × parHeads(questLevel)` · `quest bar = Σ slot bars`.
-- **Difficulty tiers (× parHeads): trivial 0.4 · standard 1.0 · hard 1.5 · brutal 1.9 · extreme 2.4.**
-- Multi-attribute quest ("wants brawn AND brains") = ONE unit, its tested attributes **pooled
-  across attributes** (not across units); combined bar = single-stat bar **× (n+1)/2** → same
-  success chance as a single-stat quest (a HYBRID build is the natural fit; a lopsided specialist
-  underperforms). Pooling is across a unit's attributes, NOT across units.
-
-### Tag bonus — ⚠ SUPERSEDED (prior single-lever model; two-role stat+skill model pending C)
-- `favoredBonus = Σ over owned favored tags of (bandFrac × standardAttr(L))`, **capped at ≈1.05×std**
-  (one-legendary ceiling). `bandFrac` by the unit's tier-BAND in that tag:
-  **low .20 · mid .40 · high .60 · legendary 1.05** ("match" in the grid = high · "elite" = legendary).
-- FLAT (× standard, NOT × the unit's own attr) → helps ANY unit equally (tags genuinely dominate),
-  constant fractional edge at all levels (no inversion), and a match beats one even-spaced build rung.
-- `clashPenalty` = same, negative (capped); `injury` = injBand×std (RESERVED placeholder — see #39).
-  coins floored at 0.
-- **Tags-favored ladder:** a match beats one build rung — `good+tag > great-no-tag`,
-  `decent+tag > good-no-tag`. Build → hard · matching tag mandatory → brutal · maxed build AND
-  elite tag → extreme. Tags decide WHICH unit; build decides HOW FAR; the apex needs both.
-
-### Pass-table ① IDEAL — odds GIVEN the loadout (great build; stable L5–L20)
-| great build + … | trivial | standard | hard | brutal | extreme |
+| design check | target | L3 | L5 | L10 | L20 |
 |---|---|---|---|---|---|
-| weak, no-tag | sure | unlikely | – | – | – |
-| decent, no-tag | sure | coin | – | – | – |
-| good, no-tag | sure | sure | coin | – | – |
-| decent + tag | sure | sure | likely | unlikely | – |
-| great, no-tag | sure | sure | sure | coin | – |
-| good + tag | sure | sure | sure | likely | unlikely |
-| great + tag | sure | sure | sure | sure | coin |
-| great + elite | sure | sure | sure | sure | sure |
+| decent, no-tag @ standard | clears | .77 | .81 | .80 | .81 |
+| good, no-tag @ standard | sure | .91 | .94 | .98 | 1.0 |
+| **great, no-tag @ hard** | **coin** | .50 | .50 | .50 | .50 |
+| good, no-tag @ hard | fails | .25 | .15 | .05 | .01 |
+| decent + 1 tag @ hard | clears | .71 | .67 | .68 | .71 |
+| great, no-tag @ brutal | fails | .11 | .03 | .00 | .00 |
+| **great + 1 tag @ brutal** | **coin** | .60 | .57 | .55 | .54 |
+| great + 1 tag @ extreme | fails | .11 | .04 | .01 | .00 |
+| **great + 2 tags @ extreme** | **coin** | .58 | .56 | .55 | .53 |
 
-### Pass-table ② REALISTIC — folds in tag-findability (great build + best match a roster-of-8 supplies; P(specific tag)≈15%, OR-additive cap)
-| quest favors… | brutal | extreme |
-|---|---|---|
-| 1 tag | likely (72%) | unlikely (29%) |
-| 2 tags | sure (84%) | coin (46%) |
-| 3 tags | sure (90%) | coin (58%) |
-**Real difficulty = difficulty tier × favored-set breadth.** Engine guidance: brutal/extreme slots
-should favor **2–3 tags** so they're staffable, not a lottery; narrow favored = premium rare-staff.
-Extreme is correctly a roster-gated aspiration (need a found+built near-elite specialist).
-
-### Numbers (all tunable; STRUCTURE is the lock)
-base total ≈20 · growth budget ≈10/lvl (g0=2.0) · shares weak .7/decent 1/good 1.5/great 2 ·
-difficulty .4/1.0/1.5/1.9/2.4 · bandFrac .20/.40/.60/1.05 · favored/clash cap 1.05 · partial 0.6× ·
-value full/half/0. Accepted drift: L1 undifferentiated (growth=0); L20 veterans a notch easier on top tier.
+### Final numbers (LOCKED; tunable in playtest)
+base ≈3/stat (fixed-sum random, total ~15) · g0 = 2 (growth budget ~10/lvl) · build shares
+**weak .7 / decent 1.1 / good 1.5 / great 2.0** · tag = **0.5 · U(L)** each (matching & attribute) ·
+**U(L) = base + 2·g0·(L−1)** · difficulty E **.25 / .5 / 1.0 / 1.5 / 2.0** · threshold = **E · U(L) / 2** ·
+partial **0.6×** · value full/half/0 · multi-stat **× (n+1)/2**.
+**Accepted drift:** L1–L2 degenerate (growth·(L−1)≈0 → builds collapse to base; early game is
+luck/tag-driven). **The one fix from the working L10 draft was `base 4→3`** (+ decent share 1.0→1.1);
+g0, tag weights (1.0/0.5/0.5), and the 0.5-spaced thresholds were unchanged.
 
 ### Implementation (economy.ts)
-DROP rollTalents · ATTR_BIAS · flat favoredBonus(tier) · thresholdPerMerc. ADD fixed-sum base+growth
-vectors + focus allocation · parHeads · per-slot difficulty (5 tiers)→summed bar · OR-additive capped
-`bandFrac×std` bonus/clash · injury placeholder. KEEP flipCoins · pooled resolveRoll · success/partial/value.
+DROP rollTalents · ATTR_BIAS · flat favoredBonus(tier) · thresholdPerMerc. ADD: fixed-sum base+growth
+vectors + focus allocation · U(L) · per-slot difficulty E → threshold E·U/2 · matching-tag (0.5U, favored
+skills) · attribute-tag (body ≈ bulk of 0.5U + background tiny, rank-scaled) folded into the attribute ·
+multi-stat pool ×(n+1)/2 · clash (mirror, negative) · injury placeholder (#39). KEEP flipCoins · pooled
+resolveRoll · success/partial/value.
 - SINGULAR vs FUNGIBLE falls out of type: character/relic carry name+story+chainIds;
   stackables carry qty, no identity. Value: singulars = mark; stackables = qty × unit value.
 - LIABILITIES = NEGATIVE STACKABLES (debt/evidence/mess as kind tags, negative value) that
