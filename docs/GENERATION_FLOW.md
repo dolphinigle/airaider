@@ -422,6 +422,30 @@ W4/W5 ⚠ REVAMPED 2026-06-14 (SUPERSEDES the attr-decoupling parts below). Attr
     ONE stat tag per attribute (B locked): strength `muscular/scrawny` · dexterity `nimble/clumsy`
     (NEW pair) · intelligence `clever/dull` · charisma `beautiful/ugly` · constitution `tough/sickly`.
     LEFTOVER body tags `tall/short` + `endowed/flat` stay NON-stat (flavor + favored-eligible only).
+    WHICH GROUPS INFLUENCE ATTRIBUTES (designer 2026-06-14):
+    • body = FULL (the primary stat lever, above).
+    • RACE = INDIRECT — race does NOT modify attributes directly; it BIASES the APPEARODDS of the
+      body stat tags (e.g. wolfkin → more likely muscular/nimble · elven → clever/nimble · lizardkin
+      → tough). So race shapes a unit's likely build through the TAG layer, not a flat racial stat.
+      Per-race odds table TBD (ties to pools #31).
+    • personality = NONE (designer 2026-06-14: trade-off ±attr mappings were considered then
+      DROPPED — personalities stay pure story/flavor, value 0). STR especially didn't fit temperament.
+    • background = VERY SMALL +, RANK-SCALED ✅ LOCKED 2026-06-14 (designer "do this") —
+      5 PURE + 10 SPLIT (every attribute-pairing EXACTLY ONCE) + servant=all-5 → perfect 6/6/6/6/6:
+        PURE: soldier=STR · hunter=DEX · scholar=INT · ruler=CHA · slave=CON
+        SPLIT: sailor=STR+DEX · priest=STR+INT · adventurer=STR+CHA · peasant=STR+CON ·
+        artisan=DEX+INT · entertainer=DEX+CHA · criminal=DEX+CON · merchant=INT+CHA ·
+        mystic=INT+CON · courtesan=CHA+CON
+        ALL-5 (tiny each): servant
+      A SPLIT gives the small + to BOTH its attrs (vs split half/half — minor, → C).
+    • skill / standing / gender = NONE. (per-group weights = #40.)
+    • ✅ MODEL RESOLVED 2026-06-14: effective attr = BUILD + TAGS, ADDITIVE & BUILD-DOMINANT.
+      BUILD = focus (player reallocation, the big lever) + natural-lean (random growth-vector
+      component; "talent" = NO separate system). TAGS = small across the board — body is the
+      biggest tag contributor but still POLISH (not a build-rung rival, moderating the earlier
+      strong-lever idea); background tiny. Factors SUBSTITUTABLE: great-talent+decent-tags ≈
+      great-focus+decent-tags can both reach "Great STR" (focus still near-necessary; tags/talent
+      fine-tune). This SUPERSEDES the §10 single-lever pass-tables; magnitudes set in C.
     Pending walkthrough: stat-bonus magnitudes (C); depth (designer leans 10-tier max for body, vs
     the old 16–20 — D); whether `clever` cap lifts now that it feeds intelligence. Original W4/W5
     word/depth notes kept below for context; their attribute-decoupling claims are superseded.
