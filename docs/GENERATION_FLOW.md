@@ -955,3 +955,28 @@ resolveRoll · success/partial/value.
   per cycle, each liability older than N cycles has p% to spawn its collection lead.
 - Migration order: type-tag injection → slot requires[]/wants[] generalization → gold stack
   merge → relic class + room item slots → chainIds to BaseCard → liability event trigger.
+
+## §11 — INJURY (design IN PROGRESS, started 2026-06-14) — #39
+Designs the `injury` negative term reserved in §10 (`coins = … − injury`). v2 had injuries as
+temporary negative tags (clash in the roll, heal at gold/time); this pass makes it concrete.
+
+GOAL — design the injury so that:
+- (I1) STAKES — quest failure/partial (esp. RISKY quests) returns a unit DIMINISHED; a real felt cost.
+- (I2) ROLL-COUPLED — reduces coins via §10's injury term, in U-scaled units, severity-tiered.
+- (I3) CONSTITUTION'S JOB — CON + `tough` RESIST injury (lower acquire-chance/severity, faster heal) —
+       gives the new attribute a clear defensive role.
+- (I4) RECOVERY LOOP — heal via gold + time, accelerated by a HEALER (heal skill / infirmary room);
+       fixes "healer idles between injuries" + adds a gold sink (both 100-day-test gaps).
+- (I5) DOPAMINE-SAFE — a RECOVERABLE setback, not a death-spiral; clears cleanly; a healed veteran feels
+       earned (attachment via scars).
+- (I6) ESCALATION — untreated injuries linger/worsen → rare permanent scar or death (the risk&loss apex).
+
+OPEN DECISIONS (walk ONE at a time, confirm before locking):
+- **D1** what an injury IS + how it BITES — per-ATTRIBUTE negative tag (wounded leg → −DEX) vs flat
+  global penalty; magnitude (U-scaled, severity-tiered).
+- **D2** severity tiers + values.
+- **D3** acquisition — outcome→prob & severity; prose-wound→injury-tag mapping; the `risky` flag.
+- **D4** CON / `tough` resistance — exact effect.
+- **D5** healing — gold / time / healer; auto vs action; rate.
+- **D6** stacking — injured-while-injured; cap.
+- **D7** leave-it-be / escalation — linger, worsen, permanent scar, death.
