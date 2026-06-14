@@ -956,27 +956,33 @@ resolveRoll · success/partial/value.
 - Migration order: type-tag injection → slot requires[]/wants[] generalization → gold stack
   merge → relic class + room item slots → chainIds to BaseCard → liability event trigger.
 
-## §11 — INJURY (design IN PROGRESS, started 2026-06-14) — #39
-Designs the `injury` negative term reserved in §10 (`coins = … − injury`). v2 had injuries as
-temporary negative tags (clash in the roll, heal at gold/time); this pass makes it concrete.
+## §11 — INJURY ✅ LOCKED 2026-06-14 (#39)
+Implements the `injury` negative term in §10 (`coins = … − injury`).
 
-GOAL — design the injury so that:
-- (I1) STAKES — quest failure/partial (esp. RISKY quests) returns a unit DIMINISHED; a real felt cost.
-- (I2) ROLL-COUPLED — reduces coins via §10's injury term, in U-scaled units, severity-tiered.
-- (I3) CONSTITUTION'S JOB — CON + `tough` RESIST injury (lower acquire-chance/severity, faster heal) —
-       gives the new attribute a clear defensive role.
-- (I4) RECOVERY LOOP — heal via gold + time, accelerated by a HEALER (heal skill / infirmary room);
-       fixes "healer idles between injuries" + adds a gold sink (both 100-day-test gaps).
-- (I5) DOPAMINE-SAFE — a RECOVERABLE setback, not a death-spiral; clears cleanly; a healed veteran feels
-       earned (attachment via scars).
-- (I6) ESCALATION — untreated injuries linger/worsen → rare permanent scar or death (the risk&loss apex).
+**ONE generic injury** — NOT per-attribute (designer: multiple injury types = overkill). A single
+temporary negative tag on a unit, measured in **TIERS** (each tier ≈ one merc-day). U = a great
+build's coins at level L (§10); `V_base(level)` = the per-merc-per-cycle value (ECONOMY).
 
-OPEN DECISIONS (walk ONE at a time, confirm before locking):
-- **D1** what an injury IS + how it BITES — per-ATTRIBUTE negative tag (wounded leg → −DEX) vs flat
-  global penalty; magnitude (U-scaled, severity-tiered).
-- **D2** severity tiers + values.
-- **D3** acquisition — outcome→prob & severity; prose-wound→injury-tag mapping; the `risky` flag.
-- **D4** CON / `tough` resistance — exact effect.
-- **D5** healing — gold / time / healer; auto vs action; rate.
-- **D6** stacking — injured-while-injured; cap.
-- **D7** leave-it-be / escalation — linger, worsen, permanent scar, death.
+- **Acquisition — AI judges, engine counts.** On a quest **partial or failure**, the **AI resolution
+  decides the injury SEVERITY: `none / low / med / high`** (and narrates the wound in prose). The
+  **engine maps the band → TIERS** (rolls within): **low 1–2 · med 3–5 · high 6–9.** No separate
+  `risky` flag — the AI only wounds when the fiction warrants it (a failed raid, not a failed
+  negotiation). On success: no injury.
+- **The bite:** a **FLAT coin penalty on ALL of the unit's rolls** = **tiers × ~0.2·U(L)** (steep —
+  ~5 tiers ≈ a whole great-build's worth off every roll; coins floored at 0). A wounded unit still
+  deploys, just worse at everything.
+- **Stacking:** new injuries **add tiers** to one running total (no per-type bookkeeping).
+- **Death:** total tiers **> CAP (base 10) → death.** Deploying a wounded unit risks *more* tiers
+  (worsening toward the cap) → "pull them out or lose them." **Building upgrades raise the cap.**
+- **Healing:** default **rest in bed = 1 tier / 2 days** (idle, unavailable) · **infirmary room →
+  1 tier / day + raises the death cap** · a **further room upgrade unlocks PAY-GOLD healing**
+  (≈ tiers × daily value to clear tiers instead of idling).
+- **Monetary value:** injury = a **negative-value tag = tiers × V_base(level)** (the merc-days lost)
+  → a wounded roster is a real gold/productivity drag (the gold/time SINK we wanted).
+- **Out of scope:** CON does NOT resist injury (it stays a normal tested attribute).
+
+**Fort hooks (→ #36):** a medical room line — *infirmary* (faster recovery + cap raise; may carry a
+heal-skill occupant slot so healers have a job) and a higher *upgrade* that unlocks pay-gold healing.
+
+Goals hit: I1 stakes · I2 roll-coupled · I4 gold-sink + medical rooms · I5 recoverable · I6
+escalation/death. (I3 "CON's job" — dropped, out of scope.)
