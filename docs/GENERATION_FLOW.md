@@ -15,12 +15,14 @@ biases body-tag odds, personality/skill-direct/standing/gender = none. VERIFIED 
 (supervisor agent loop; only change from L10 draft = base 4→3). clash=mirror; injury=#39 placeholder.
 INJURY ✅ LOCKED (#39, §11) — one generic injury in TIERS, AI-judged severity, flat coin penalty,
 tiers→death-cap(10)+building-extend, rest/infirmary/pay-gold-room healing, value=tiers×V_base.
-CURRENT design area: FORT ROOM CATALOG (#36, §12) — GOAL recorded, IN PROGRESS. Goal = a BIG room
-set for SMOOTH progression + a build-ORDER TABLE tied to prestige. NEXT STEP = get the designer's
-capability-set STEER (which functional rooms exist + what each unlocks), then room list →
-build-order table → per-room cost/prestige. Rooms must cover the locked hooks: bedrooms (dice
-§10 rest/level/focus), infirmary + pay-gold-heal room (injury §11), item-slot rooms (relics §7),
-theme/prestige rooms (economy). FOLLOW-ON: PRESTIGE MATH = its own pass (#41), AFTER the catalog.
+CURRENT design area: FORT ROOM CATALOG (#36, §12) — capability-set STEER received; BRAINSTORM POOL
+recorded (§12.1, ⏳ not locked): rooms = 4 kinds (A feature/menu gates · B capacity · C repeatable-
+quest faucets [region-scoped] · D prestige gates). Torture chamber RESOLVED-keep (gpt-5-mini probed
+L1–L6, 0 refusals). NEXT STEP = the REGION pass (faucet rooms C multiply per region; quests carry
+location/unlockedLocations) — plan regions (count · unlock-by quest-or-room · identities), THEN
+return to finalize region-scoped faucets + the build-ORDER TABLE + per-room cost/prestige. Rooms
+cover the locked hooks: bedrooms (dice §10), infirmary + pay-gold room (injury §11), item-slot rooms
+(relics §7), theme/prestige rooms (economy). FOLLOW-ON: PRESTIGE MATH = its own pass (#41).
 After all design: the LEAN-DOC TRANSFORM (commit checkpoint → rewrite every doc to
 END-result-only / implementable, verify each claim vs chat history → archive superseded docs
 TAGS.md/UNIT_GENERATION.md/scratch). Also still-stale from the revamp: PROMPTS.md attribute
@@ -1018,3 +1020,58 @@ theme/prestige rooms · housing); (b) the room LIST (functional / theme / housin
 
 ⚠ FOLLOW-ON: **PRESTIGE MATH** needs its own planning pass (formula / curve / thresholds; FORT.md has
 it 🟡 open) — do it AFTER the room catalog (rooms define what prestige sums over). Tracked as #41.
+
+---
+
+### §12.1 — BRAINSTORM POOL (2026-06-14, ⏳ NOT LOCKED — pending region pass)
+
+KEY INSIGHT (the catalog spine): **most rooms are *feature/menu GATES*.** A room unlocks a game
+function — a menu, a capability, or a repeatable-quest faucet. Rooms fall into **4 kinds**:
+
+**A. Feature / menu unlockers** (build once → unlocks a menu or capability)
+- **Map room** — unlocks **quests**. The game's FIRST mandated build (onboarding spine).
+- **(Lead room)** — unlocks the **leads** menu.
+- **Tavern** — unlocks the **new-recruits** menu.
+- **Dungeon** — unlocks the **new-captives** menu.
+- **Holding cell** — unlocks **selecting candidate captives**.
+- **Ransom/slaver office** — unlocks **ransom / sell captive**.
+- **Mess hall** — unlocks the **merc list / details** menu.
+- **Storage** — unlocks the **relic / item list** menu.
+- **Market** — unlocks **buy/sell stackables**.
+- **Oracle / seer room** — unlocks **quest success %** display.
+- **Library** — unlocks **NPC roster / lore** menu.
+- (CUT: focus chamber — FOCUS assignment is a BASE game function, not a room.)
+
+**B. Capacity rooms** (build many → each +N to a cap)
+- **Merc bedrooms** (1/merc; comfort gates that merc's level-cap; holds their gear).
+- **Your bedroom** (player seat).
+- **Dungeon cell** (each +captive capacity).
+- **Infirmary** (heal speed + raises death-cap; slottable heal-skill occupant sets speed) →
+  **Hospital** upgrade (pay-gold instant heal, expensive — the §11 pay-gold room).
+
+**C. Repeatable-quest FAUCETS** (unlock a recurring quest type — ⚠ **region-scoped, multiple
+versions**; depends on the REGION pass)
+- **Training hall** → catch-up / level quests.
+- **Scouting room** → repeatable lead-gathering quests.
+- **(Recruiting post)** → repeatable get-new-recruit quests.
+- → each has a **per-region variant** (Scouting: Desert / Coast / Mountains…). ← blocked on regions.
+
+**D. Prestige gates** (big-cost rooms that unlock TIERS of other rooms + dump prestige)
+- **Grand hall / throne room**, etc. — gate the late catalog.
+- Plus pure **theme/display** rooms (trophy hall, garden, shrine, gallery, menagerie…) for prestige.
+  ← this is where the count balloons toward 50–100 (theme variants + tiered upgrades).
+
+**Torture chamber — RESOLVED (keep).** Concern was AI refusal. Probed gpt-5-mini (v3 narrative
+model) 2026-06-14 with escalating-darkness quest prompts L1→L6 (raid → capture → ransom → **torture
+to break captive** → enslaved labor → maiming): **all 6 COMPLIED, zero refusals.** So torture
+chamber is safe to ship. Mechanic: a captive must be **broken → `obedient`/`trained` tag** before it
+can be slotted to work. (Impl note for v3: gpt-5-mini spends reasoning tokens — set generous
+`max_completion_tokens` / low effort, else empty `finish=length` responses.)
+
+SCOPE: ~15–20 distinct *capability* rooms; 50–100 total reached via theme variants + tiered
+upgrades. **Prototype target = ~half.** Build-order spine falls out naturally: Map room (quests) →
+lead room → bedrooms/infirmary → capacity/faucets → prestige gates.
+
+NEXT STEP (designer's call): **REGION pass** — the faucet rooms (C) multiply per region and quests
+already carry `location`/`unlockedLocations`. Plan regions (how many · unlocked by quests or rooms ·
+their identities), THEN return here to finalize the region-scoped faucet rooms + the build-order table.
