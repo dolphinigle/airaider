@@ -13,7 +13,10 @@ U(L)=base+2·g0·(L−1); threshold = E·U/2 with difficulty E .25/.5/1/1.5/2; m
 stat tags feed attributes (muscular/nimble/clever/beautiful/tough), background tiny rank-scaled, race
 biases body-tag odds, personality/skill-direct/standing/gender = none. VERIFIED 36/36 across L3–L20
 (supervisor agent loop; only change from L10 draft = base 4→3). clash=mirror; injury=#39 placeholder.
-NEXT design areas: FORT ROOM CATALOG (#36), INJURY SYSTEM (#39, fills §10's reserved injury term).
+INJURY ✅ LOCKED (#39, §11) — one generic injury in TIERS, AI-judged severity, flat coin penalty,
+tiers→death-cap(10)+building-extend, rest/infirmary/pay-gold-room healing, value=tiers×V_base.
+NEXT design area: FORT ROOM CATALOG (#36) — the LAST one; dice (bedrooms/focus/rest), injury
+(infirmary + pay-gold-heal room), relics (item slots), prestige all now hand it concrete requirements.
 After all design: the LEAN-DOC TRANSFORM (commit checkpoint → rewrite every doc to
 END-result-only / implementable, verify each claim vs chat history → archive superseded docs
 TAGS.md/UNIT_GENERATION.md/scratch). Also still-stale from the revamp: PROMPTS.md attribute
