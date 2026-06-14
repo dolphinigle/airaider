@@ -633,26 +633,23 @@ W14. relic `enchantment` MECHANISM + ELEMENTAL words ✅ LOCKED (designer 2026-0
     proposed shadow = dark; radiance DROPPED (no light school — air cut, dark kept);
     frost/venom/storm become AI FLAVOR under the real elements (frost=water, venom=earth/
     dark). "mystical" category rejected (designer).
-    AUGMENTING enchantments — PLAN LOCKED, words next (W15): ONE per ATTRIBUTE EXCEPT
-    intelligence (= magic, covered by the elemental set) → 4 augmenting enchantments
-    mapping to physical · agility · charisma · perception (every attribute gets a
-    relic-power path).
+    AUGMENTING enchantments — ONE per ATTRIBUTE EXCEPT intelligence (= magic, the elemental
+    set) → 4 augmenting enchantments, REMAPPED 2026-06-14 to the new attribute set:
+    strength · dexterity · charisma · constitution (every attribute has a relic-power path).
     Render: label-rendered "enchantment: fire (high)" (R5 exception). Value + odds: W15+.
 
-W15. relic `enchantment` AUGMENTING words — ⚠ AFFECTED BY THE 2026-06-14 ATTRIBUTE REVAMP
-    (was 4 augmenting enchantments, one per OLD attribute: physical→might · agility→swiftness
-    · charisma→glamour · perception→insight). The attribute set is now STR/DEX/INT/CHA/CON, so the
-    1:1 mapping no longer holds (agility+perception merged→dexterity; constitution has no enchantment).
-    REVISIT when relic-side is reopened — NB enchantments don't mechanically boost the wielder anyway
-    (W14: relics sit on ROOMS), so these are thematic names + future quest-relic-slot favored-matches.
-    Original (pre-revamp) mapping kept below for context:
-      physical → might · agility → swiftness · charisma → glamour (magical allure/charm)
-      · perception → insight
-    FULL ENCHANTMENT SET = 8: fire · earth · water · dark · might · swiftness · glamour ·
-    insight. Distinctness: might (enchantment) vs muscular (body) vs physical (attribute);
-    glamour (charm magic) vs beautiful (trait); insight (perception magic) vs lore (skill)
-    — all clean (magical power vs descriptor vs stat). Every attribute now has a
-    relic-power path.
+W15. relic `enchantment` AUGMENTING words ✅ LOCKED (designer 2026-06-13 "yes"; REMAPPED
+    2026-06-14 to the new attribute set) — 4 augmenting enchantments, one per non-magic attribute:
+      strength → might · dexterity → swiftness · charisma → presence · constitution → vigor
+    (intelligence = the elemental set). Changes from the original: `glamour`→`presence` (designer:
+    glamour read badly; presence = commanding aura spanning social/leadership/seduction);
+    `insight` DROPPED (perception merged into dexterity→swiftness); `vigor` ADDED for constitution.
+    NB thematic only — relics don't boost the wielder (W14: relics on ROOMS); the per-attribute
+    mapping is for coherence + future quest-relic-slot favored-matches.
+    FULL ENCHANTMENT SET = 8: fire · earth · water · dark · might · swiftness · presence · vigor.
+    Distinctness: might vs muscular(body) vs strength(attr); presence vs beautiful(body) vs
+    charisma(attr); vigor vs tough(body) vs constitution(attr) — all clean (magic power vs
+    descriptor vs stat). Every attribute has a relic-power path.
 
 W16. relic `enchantment` VALUE + ODDS ✅ LOCKED (designer 2026-06-13 "yes") — uniform
     depth 20 (all 8 start t1) · uniform value weight → t20 ≈ 1.19M (APEX line — the
