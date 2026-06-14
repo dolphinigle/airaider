@@ -43,9 +43,9 @@ Card { class, tags[], location, ... }
 Mercenaries, captives, and NPCs are all `class:character`, distinguished by `role` (merc / captive / npc / dead). A character is:
 
 - **Tags** — identity + fit + the loot dopamine. **Personality IS tags.** Plus AI-generated **quirks** ("counts coins twice").
-- **Attributes** — five scalars (Physical, Agility, Intelligence, Charisma, Willpower) → the **coin count**. The only thing that generates dice.
-- **Talents** — per-attribute **growth rates** (Pokemon-style innate potential): how fast each attribute climbs with level. Rolled at acquisition, **separately from the value budget** (value = tags only). Two same-level mercs differ by their talents.
-- **Level** — grows attributes per the talents (the progression axis). Grown by quest-XP, capped by the merc's room comfort (see GAME_STATE.md).
+- **Attributes** — five scalars (**Strength, Dexterity, Intelligence, Charisma, Constitution**) → the **coin count**. The only thing that generates dice. *(Revamped 2026-06-14: physical→strength; agility+perception merged→dexterity; +constitution. Body "stat" tags now feed their attribute — see GENERATION_FLOW §10.)*
+- **Growth (replaces "talents")** — each unit has a fixed-sum **base vector** + a fixed-sum **growth vector** (random distribution = birth lean); the **player assigns a FOCUS** that reallocates growth (single→one GREAT stat, dual→two GOOD). No more rolled talents. *(See GENERATION_FLOW §10.)*
+- **Level** — grows attributes per the growth vector + focus (the progression axis). Grown by quest-XP, capped by the merc's room comfort (see GAME_STATE.md).
 - **`who` + backstory** — AI-written at acquisition, fitting the tags.
 - **Their chains** — the quests they pass through (cast in others') plus the one about them. *The chains are their living dossier* — no separate psychological model.
 

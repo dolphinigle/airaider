@@ -4,14 +4,23 @@
 Supersedes the scattered flow descriptions; QUESTS.md §"reward-first" 🔒 is the governing rule.
 Each section below is marked ✅ agreed · 🔶 OPEN (decision pending) · 📌 current-impl note.
 
-**RESUME POINT (for the next session): §9b vocabulary ✅ (W1–W18) and DICE/ATTRIBUTE/THRESHOLD
-✅ LOCKED 2026-06-14 (see §10 — THE ROLL at end of doc). NEXT design areas: FORT ROOM CATALOG
-(#36), then INJURY SYSTEM (#39, fills the reserved injury term in §10).** After those, the
-remaining step before v3 build is the LEAN-DOC TRANSFORM (commit checkpoint → rewrite every
-doc to END-result-only / implementable, verifying each claim against chat history → archive
-superseded docs TAGS.md/UNIT_GENERATION.md/scratch notes). BIG PICTURE ([[v3-docs-finalization]]
-in memory): finalize design docs for ALL systems → implement prototype v3; tag system + roll
-math are done, fort + injury next, then the lean transform, then build.
+**RESUME POINT (for the next session): §9b vocabulary ✅ (W1–W18). DICE/ATTRIBUTE/THRESHOLD §10
+is being REVAMPED (2026-06-14, #27 reopened) — NOT fully locked. DONE so far: roll STRUCTURE
+(fixed-sum base+growth vectors + player FOCUS; per-test difficulty × parHeads; pooled
+resolution; 5 difficulty tiers incl. `extreme`). REVAMP IN FLIGHT: (A locked) body STAT tags
+now FEED attributes — reverses W4 decoupling; (B locked) attribute set = STRENGTH·DEXTERITY
+(=agi+perception merged)·INTELLIGENCE·CHARISMA·CONSTITUTION, one body stat tag each
+(muscular/nimble/clever/beautiful/tough); multi-stat quests POOL a unit's attributes, bar
+×(n+1)/2 (same chance as single-stat). NEXT in the walkthrough: step **C** — the tag-bonus MATH
+(stat-tag bands; skills = weaker favored-match; personality = small nudge, #40) — the §10
+Tag-bonus/pass-table/Numbers blocks are SUPERSEDED until C lands; step **D** — body depth
+(10-tier proposal) + whether `clever` cap lifts now that it feeds intelligence. THEN remaining
+design areas: FORT ROOM CATALOG (#36), INJURY SYSTEM (#39, fills §10's reserved injury term).
+After all design: the LEAN-DOC TRANSFORM (commit checkpoint → rewrite every doc to
+END-result-only / implementable, verify each claim vs chat history → archive superseded docs
+TAGS.md/UNIT_GENERATION.md/scratch). Also still-stale from the revamp: PROMPTS.md attribute
+names (physical/agility/willpower) → fix in the transform. BIG PICTURE ([[v3-docs-finalization]]):
+finalize ALL system docs → build prototype v3.
 Parked: band display names (display-only). Tag-system IMPLEMENTATION (#30) waits until the
 docs are finalized. The §9b GROUP PASS is COMPLETE (see "§9b CONTENT WALK" +
 "RELIC-SIDE GROUPS" sections): Character 8 = type/gender/race/personality/background(tiered,
@@ -407,6 +416,15 @@ W3. `background` DEPTH CAPS ✅ LOCKED (designer 2026-06-13) — per-word cap ta
     servant 12→10; merchant/scholar/courtesan deliberately NOT 20.
     Background band names: PARKED past the walkthrough (display-only since the AI lock).
 
+W4/W5 ⚠ REVAMPED 2026-06-14 (SUPERSEDES the attr-decoupling parts below). Attributes restructured
+    to STRENGTH·DEXTERITY·INTELLIGENCE·CHARISMA·CONSTITUTION, and body "stat" tags now FEED their
+    attribute (the old "muscular ≠ strength / gym-body who folds" DECOUPLING is OVERTURNED — A locked).
+    ONE stat tag per attribute (B locked): strength `muscular/scrawny` · dexterity `nimble/clumsy`
+    (NEW pair) · intelligence `clever/dull` · charisma `beautiful/ugly` · constitution `tough/sickly`.
+    LEFTOVER body tags `tall/short` + `endowed/flat` stay NON-stat (flavor + favored-eligible only).
+    Pending walkthrough: stat-bonus magnitudes (C); depth (designer leans 10-tier max for body, vs
+    the old 16–20 — D); whether `clever` cap lifts now that it feeds intelligence. Original W4/W5
+    word/depth notes kept below for context; their attribute-decoupling claims are superseded.
 W4. `body` WORDS ✅ LOCKED (designer 2026-06-13 "sounds good. proceed") — group RENAMED
     trait→`body` (designer;
     engine-side id only, AI gets bare words as agreed; bonus: no more name-share with the
@@ -621,8 +639,13 @@ W14. relic `enchantment` MECHANISM + ELEMENTAL words ✅ LOCKED (designer 2026-0
     relic-power path).
     Render: label-rendered "enchantment: fire (high)" (R5 exception). Value + odds: W15+.
 
-W15. relic `enchantment` AUGMENTING words ✅ LOCKED (designer 2026-06-13 "yes") — 4
-    augmenting enchantments, one per attribute (intelligence = the elemental set):
+W15. relic `enchantment` AUGMENTING words — ⚠ AFFECTED BY THE 2026-06-14 ATTRIBUTE REVAMP
+    (was 4 augmenting enchantments, one per OLD attribute: physical→might · agility→swiftness
+    · charisma→glamour · perception→insight). The attribute set is now STR/DEX/INT/CHA/CON, so the
+    1:1 mapping no longer holds (agility+perception merged→dexterity; constitution has no enchantment).
+    REVISIT when relic-side is reopened — NB enchantments don't mechanically boost the wielder anyway
+    (W14: relics sit on ROOMS), so these are thematic names + future quest-relic-slot favored-matches.
+    Original (pre-revamp) mapping kept below for context:
       physical → might · agility → swiftness · charisma → glamour (magical allure/charm)
       · perception → insight
     FULL ENCHANTMENT SET = 8: fire · earth · water · dark · might · swiftness · glamour ·
@@ -819,11 +842,21 @@ THREE TYPES, type is a tag: `type:character` · `type:relic` · `type:stackable`
 ## §10 — THE ROLL: dice / attribute / threshold ✅ (LOCKED 2026-06-14)
 
 Serves G1 per-test difficulty · G2 pass-table holds · G3 no level-inversion · G4 dopamine
-(greatness rare/earned) · G5 attachment-via-differentiation · G6 engine owns numbers / attr↔tag
-decoupled / pooled resolution unchanged · G7 specialist AND hybrid builds both viable.
+(greatness rare/earned) · G5 attachment-via-differentiation · G6 engine owns numbers /
+pooled resolution unchanged · G7 specialist AND hybrid builds both viable.
 
-### Attributes & growth (replaces talents/aptitude/attrBias — all DROPPED)
-- 5 attributes: physical · agility · intelligence · charisma · perception.
+> ⚠ **ATTRIBUTE REVAMP IN PROGRESS (2026-06-14).** Two things changed and are being re-recorded:
+> (1) **Attribute set renamed/restructured** — now **STRENGTH · DEXTERITY · INTELLIGENCE ·
+> CHARISMA · CONSTITUTION** (physical→strength; agility+perception MERGED→dexterity; +constitution).
+> (2) **Body "stat" tags now FEED their attribute** (reverses the old W4 attr↔tag *decoupling*):
+> each attribute has one body stat tag — strength`muscular` · dexterity`nimble` · intelligence`clever`
+> · charisma`beautiful` · constitution`tough`. Skills become a *weaker* favored-match; personality a
+> *small* nudge (per-group weight, #40). Multi-stat quests **pool a unit's tested attributes**, bar
+> **×(n+1)/2** (same chance as single-stat). **The Tag-bonus / pass-table / Numbers blocks below are
+> the PRIOR single-lever model and are SUPERSEDED — magnitudes pending walkthrough step C.**
+
+### Attributes & growth (replaces talents/aptitude — DROPPED; attrBias now RE-ADDED as body stat tags)
+- 5 attributes: **strength · dexterity · intelligence · charisma · constitution**.
 - **Birth = two fixed-sum random vectors** (balance via fixed total, character via random shape —
   no birth-OP, only birth-SHAPE):
   - BASE vector, total ≈20 across the 5 stats → a unit is born with a lean (e.g. `[6,5,4,3,2]`).
@@ -848,9 +881,12 @@ failure → value **full / half / zero**.
   **ENGINE rolls** a difficulty tier (weighted by quest rarity+level).
 - `slot bar = difficulty × parHeads(questLevel)` · `quest bar = Σ slot bars`.
 - **Difficulty tiers (× parHeads): trivial 0.4 · standard 1.0 · hard 1.5 · brutal 1.9 · extreme 2.4.**
-- Multi-attribute quest ("wants brawn AND brains") = multiple slots, one attribute each, pooled.
+- Multi-attribute quest ("wants brawn AND brains") = ONE unit, its tested attributes **pooled
+  across attributes** (not across units); combined bar = single-stat bar **× (n+1)/2** → same
+  success chance as a single-stat quest (a HYBRID build is the natural fit; a lopsided specialist
+  underperforms). Pooling is across a unit's attributes, NOT across units.
 
-### Tag bonus — OR-additive, FLAT per level
+### Tag bonus — ⚠ SUPERSEDED (prior single-lever model; two-role stat+skill model pending C)
 - `favoredBonus = Σ over owned favored tags of (bandFrac × standardAttr(L))`, **capped at ≈1.05×std**
   (one-legendary ceiling). `bandFrac` by the unit's tier-BAND in that tag:
   **low .20 · mid .40 · high .60 · legendary 1.05** ("match" in the grid = high · "elite" = legendary).
