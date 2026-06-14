@@ -876,6 +876,23 @@ pooled resolution unchanged · G7 specialist AND hybrid builds both viable.
 > **×(n+1)/2** (same chance as single-stat). **The Tag-bonus / pass-table / Numbers blocks below are
 > the PRIOR single-lever model and are SUPERSEDED — magnitudes pending walkthrough step C.**
 
+### C — ROLL MODEL: co-equal levers ✅ PRINCIPLE LOCKED 2026-06-14 (designer "sounds good")
+Effective power **E = ATTRIBUTE + MATCHING-TAG + ATTRIBUTE-TAG** (additive), weighted in units of
+**U = a great build's coin contribution at that level**:
+- **ATTRIBUTE** (build: focus + natural talent; body/bg attribute-tags fold in) — great build = **1.0 U**.
+- **MATCHING TAG** (favored skill, per-slot) = **0.5 U** (flat per level).
+- **ATTRIBUTE TAG** (body + background, always-on) = **0.5 U** (flat per level; body the bulk, bg a sliver).
+- Tags are **co-equal with the attribute** (matching + attr-tag = 1.0 = a full attribute); **max E = 2.0**.
+
+**Coin-flip thresholds spaced by 0.5 — each tier demands one more 0.5-lever** (× U):
+**trivial 0.25 · standard 0.5 · hard 1.0 · brutal 1.5 · extreme 2.0.**
+
+**Ladder (the felt result):** ≤ standard = **attribute alone** · hard = a **full (great) attribute OR build+1 tag** ·
+brutal = **attribute + 1 tag** · extreme = **attribute + BOTH tags**. A sub-great generalist with no tag
+**caps at standard** — hard needs a great attribute or a tag. (Verified at L10; binomial pass-table matches.)
+Multi-stat: pool a unit's tested attributes, bar **× (n+1)/2** (unchanged). Concrete magnitudes (build shares,
+base, g0, exact per-level threshold formula that holds L1–L20) being finalized — #27.
+
 ### Attributes & growth (replaces talents/aptitude — DROPPED; attrBias now RE-ADDED as body stat tags)
 - 5 attributes: **strength · dexterity · intelligence · charisma · constitution**.
 - **Birth = two fixed-sum random vectors** (balance via fixed total, character via random shape —
