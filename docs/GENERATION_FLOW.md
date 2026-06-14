@@ -4,17 +4,14 @@
 Supersedes the scattered flow descriptions; QUESTS.md §"reward-first" 🔒 is the governing rule.
 Each section below is marked ✅ agreed · 🔶 OPEN (decision pending) · 📌 current-impl note.
 
-**RESUME POINT (for the next session): §9b PASS 2 vocabulary walk COMPLETE ✅ (W1–W18).
-NEXT = DICE / ATTRIBUTE / THRESHOLD REDESIGN — PLAN FIRST, then submit the plan to the
-designer before locking.** Designer directive (2026-06-13): redesign the WHOLE roll math
-as one coupled system — attribute model + favored/clash bonus + threshold (must be
-PER-TEST: "for quest A, what's the stealth threshold?") + coin resolution. NOT just the
-favored bonus. See the "⚠ DICE/ATTRIBUTE/THRESHOLD REDESIGN" note under skill group-7 for
-the problem statement, my (unlocked) favored-fraction candidate, and the per-test
-threshold direction. Current math: economy.ts (coinsFor/overlap/thresholdFor/resolveRoll/
-rollBaseAttrs/attrsAtLevel/rollTalents). BIG PICTURE ([[v3-docs-finalization]] in memory):
-we are finalizing design docs for ALL systems → implement prototype v3; the tag system is
-done, dice/attribute/threshold is the next system to finalize, then audit remaining docs.
+**RESUME POINT (for the next session): §9b vocabulary ✅ (W1–W18) and DICE/ATTRIBUTE/THRESHOLD
+✅ LOCKED 2026-06-14 (see §10 — THE ROLL at end of doc). NEXT design areas: FORT ROOM CATALOG
+(#36), then INJURY SYSTEM (#39, fills the reserved injury term in §10).** After those, the
+remaining step before v3 build is the LEAN-DOC TRANSFORM (commit checkpoint → rewrite every
+doc to END-result-only / implementable, verifying each claim against chat history → archive
+superseded docs TAGS.md/UNIT_GENERATION.md/scratch notes). BIG PICTURE ([[v3-docs-finalization]]
+in memory): finalize design docs for ALL systems → implement prototype v3; tag system + roll
+math are done, fort + injury next, then the lean transform, then build.
 Parked: band display names (display-only). Tag-system IMPLEMENTATION (#30) waits until the
 docs are finalized. The §9b GROUP PASS is COMPLETE (see "§9b CONTENT WALK" +
 "RELIC-SIDE GROUPS" sections): Character 8 = type/gender/race/personality/background(tiered,
@@ -677,30 +674,12 @@ R1b. ✅ (designer 2026-06-13) — COMPATIBILITY = POOLS WITH BASE-WEIGHT-0: no 
    exotics (magic) gated by tiny appearOdds only. Attribute interaction: DECOUPLED layers —
    attribute = slot's base coins, skill tag = band bonus ONLY when the slot favors it
    (attrBias stays cut; pools own coherence #31). Word list pass 2 (+`command` candidate).
-   ⚠ DICE/ATTRIBUTE/THRESHOLD REDESIGN — OPEN, NOT LOCKED (designer 2026-06-13: "do this
-   together with Attribute… get dice properly done. plan first… specifically the
-   THRESHOLD mathing"). Scope = the WHOLE roll math as one system: attribute model
-   (rollBaseAttrs/attrsAtLevel/talents) + favored/clash bonus + threshold formula
-   (thresholdPerMerc=2.5+0.4L) + coin resolution (flipCoins, success/partial). NOT just
-   the favored bonus. PLAN-FIRST required before any lock.
-   PROBLEM: threshold & attribute both grow with level but favored bonus is FLAT
-   (favoredBonus(tier)=4−⌊(t−1)/2⌋), so per-merc coins-needed ≈ 2·threshold = 5+0.8L
-   (~5.8@L1 → ~21@L20); a flat +2 is swingy early, noise late — tag relevance INVERTS
-   with level and low/legendary bands compress.
-   CANDIDATE (mine, NOT locked — to fold into the full plan): favored/clash = a FRACTION
-   of the per-merc challenge (level-proportional, band-graded), bonus = bandFrac·(5+0.8L),
-   fracs low .12 / mid .22 / high .38 / legendary .55, clash = symmetric negative.
-   Preserves attr/tag decoupling (bonus depends on CHALLENGE not the merc's attr);
-   fractions harness-tunable. Rejected alt: %-of-attribute (re-couples skill to attr →
-   skills worthless on weak mercs). Current mechanic lives in economy.ts: coinsFor,
-   overlap, thresholdFor, resolveRoll, rollBaseAttrs, attrsAtLevel, rollTalents.
-   KEY DIRECTION (designer 2026-06-13): threshold should be PER-TEST — "for quest A,
-   what's the threshold for STEALTH it needs to pass?" — difficulty attaches to the
-   SPECIFIC check the quest demands (a sneaky job has a high stealth threshold), NOT a
-   generic per-merc flat number (today's thresholdFor is test-agnostic). Redesign must
-   define: per (attribute/skill) test, the threshold quest A sets, and how a merc's
-   attribute + favored tags meet it. ATTRIBUTE + FAVORED BONUS + THRESHOLD = ONE coupled
-   math, designed together. PLAN-FIRST must cover all of it.
+   DICE/ATTRIBUTE/THRESHOLD ✅ LOCKED 2026-06-14 → see **§10 — THE ROLL** (end of doc) for the
+   full spec (fixed-sum base+growth vectors + player FOCUS; per-test difficulty × parHeads;
+   OR-additive capped `bandFrac×std` tag bonus; 5 difficulty tiers; ideal + realistic pass-tables).
+   Designed against goals G1–G7 (per-test difficulty · pass-table · no level-inversion · dopamine ·
+   attachment-via-differentiation · locked invariants · specialist+hybrid builds). Injury term is a
+   RESERVED placeholder pending its own design phase (#39).
 
 ### Part 1 — the authored vocabulary (static content; two lists)
 
@@ -836,6 +815,84 @@ THREE TYPES, type is a tag: `type:character` · `type:relic` · `type:stackable`
 - KIND IS A TAG: a stackable's kind is a tag (`gold`, `salt`, `debt`) → slot matching stays ONE
   primitive: requires:[type:character] · requires:[type:relic] wants:[storied] ·
   requires:[type:stackable, gold] (a bribe slot). Merge rule: stacks merge iff tag-sets match.
+
+## §10 — THE ROLL: dice / attribute / threshold ✅ (LOCKED 2026-06-14)
+
+Serves G1 per-test difficulty · G2 pass-table holds · G3 no level-inversion · G4 dopamine
+(greatness rare/earned) · G5 attachment-via-differentiation · G6 engine owns numbers / attr↔tag
+decoupled / pooled resolution unchanged · G7 specialist AND hybrid builds both viable.
+
+### Attributes & growth (replaces talents/aptitude/attrBias — all DROPPED)
+- 5 attributes: physical · agility · intelligence · charisma · perception.
+- **Birth = two fixed-sum random vectors** (balance via fixed total, character via random shape —
+  no birth-OP, only birth-SHAPE):
+  - BASE vector, total ≈20 across the 5 stats → a unit is born with a lean (e.g. `[6,5,4,3,2]`).
+  - GROWTH budget ≈10/level distributed by a random vector → its natural growth lean.
+- `attr_X(L) = baseX + growthX·(L−1)`.
+- **FOCUS (player agency):** reallocates the growth budget toward chosen attribute(s) within a
+  fixed budget — **single focus → one GREAT stat** (growth share 2.0) · **dual focus → two GOOD
+  stats** (1.5 each) · **none → GENERALIST** (1.0 each). Two GREATs is impossible (over budget).
+  Re-assignable but only FUTURE growth re-skews (past stays banked → history sticks → attachment).
+- `standardAttr(L) = base + g0·(L−1)`, g0 = standard growth = 2.0/stat. `parHeads(L)=standardAttr/2`.
+- **QUALITY** (vs the QUEST's level-standard) = growth share in the tested attr:
+  **weak 0.7 · decent 1.0 · good 1.5 · great 2.0**. Differentiation GROWS with level (L1 ≈ all base;
+  veterans diverge). Find-dopamine = tags + lucky birth-lean; build-dopamine = focus investment.
+
+### The roll (resolution LOCKED, unchanged)
+`coins(unit,slot) = attr_relevant + favoredBonus − clashPenalty − injury` → flip that many fair
+coins, count heads. **Pooled**: Σ heads vs quest bar → success (≥bar) · partial (≥0.6×bar) ·
+failure → value **full / half / zero**.
+
+### Per-test threshold (G1)
+- A quest = SLOTS. Each slot: **AI picks** tested attribute + `favored[]` + `clashing[]`;
+  **ENGINE rolls** a difficulty tier (weighted by quest rarity+level).
+- `slot bar = difficulty × parHeads(questLevel)` · `quest bar = Σ slot bars`.
+- **Difficulty tiers (× parHeads): trivial 0.4 · standard 1.0 · hard 1.5 · brutal 1.9 · extreme 2.4.**
+- Multi-attribute quest ("wants brawn AND brains") = multiple slots, one attribute each, pooled.
+
+### Tag bonus — OR-additive, FLAT per level
+- `favoredBonus = Σ over owned favored tags of (bandFrac × standardAttr(L))`, **capped at ≈1.05×std**
+  (one-legendary ceiling). `bandFrac` by the unit's tier-BAND in that tag:
+  **low .20 · mid .40 · high .60 · legendary 1.05** ("match" in the grid = high · "elite" = legendary).
+- FLAT (× standard, NOT × the unit's own attr) → helps ANY unit equally (tags genuinely dominate),
+  constant fractional edge at all levels (no inversion), and a match beats one even-spaced build rung.
+- `clashPenalty` = same, negative (capped); `injury` = injBand×std (RESERVED placeholder — see #39).
+  coins floored at 0.
+- **Tags-favored ladder:** a match beats one build rung — `good+tag > great-no-tag`,
+  `decent+tag > good-no-tag`. Build → hard · matching tag mandatory → brutal · maxed build AND
+  elite tag → extreme. Tags decide WHICH unit; build decides HOW FAR; the apex needs both.
+
+### Pass-table ① IDEAL — odds GIVEN the loadout (great build; stable L5–L20)
+| great build + … | trivial | standard | hard | brutal | extreme |
+|---|---|---|---|---|---|
+| weak, no-tag | sure | unlikely | – | – | – |
+| decent, no-tag | sure | coin | – | – | – |
+| good, no-tag | sure | sure | coin | – | – |
+| decent + tag | sure | sure | likely | unlikely | – |
+| great, no-tag | sure | sure | sure | coin | – |
+| good + tag | sure | sure | sure | likely | unlikely |
+| great + tag | sure | sure | sure | sure | coin |
+| great + elite | sure | sure | sure | sure | sure |
+
+### Pass-table ② REALISTIC — folds in tag-findability (great build + best match a roster-of-8 supplies; P(specific tag)≈15%, OR-additive cap)
+| quest favors… | brutal | extreme |
+|---|---|---|
+| 1 tag | likely (72%) | unlikely (29%) |
+| 2 tags | sure (84%) | coin (46%) |
+| 3 tags | sure (90%) | coin (58%) |
+**Real difficulty = difficulty tier × favored-set breadth.** Engine guidance: brutal/extreme slots
+should favor **2–3 tags** so they're staffable, not a lottery; narrow favored = premium rare-staff.
+Extreme is correctly a roster-gated aspiration (need a found+built near-elite specialist).
+
+### Numbers (all tunable; STRUCTURE is the lock)
+base total ≈20 · growth budget ≈10/lvl (g0=2.0) · shares weak .7/decent 1/good 1.5/great 2 ·
+difficulty .4/1.0/1.5/1.9/2.4 · bandFrac .20/.40/.60/1.05 · favored/clash cap 1.05 · partial 0.6× ·
+value full/half/0. Accepted drift: L1 undifferentiated (growth=0); L20 veterans a notch easier on top tier.
+
+### Implementation (economy.ts)
+DROP rollTalents · ATTR_BIAS · flat favoredBonus(tier) · thresholdPerMerc. ADD fixed-sum base+growth
+vectors + focus allocation · parHeads · per-slot difficulty (5 tiers)→summed bar · OR-additive capped
+`bandFrac×std` bonus/clash · injury placeholder. KEEP flipCoins · pooled resolveRoll · success/partial/value.
 - SINGULAR vs FUNGIBLE falls out of type: character/relic carry name+story+chainIds;
   stackables carry qty, no identity. Value: singulars = mark; stackables = qty × unit value.
 - LIABILITIES = NEGATIVE STACKABLES (debt/evidence/mess as kind tags, negative value) that
