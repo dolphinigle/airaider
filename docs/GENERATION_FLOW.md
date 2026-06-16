@@ -1176,3 +1176,75 @@ act* (gold sink, agency) — matches DESIGN.md "prestige unlocks new content" + 
 
 ### NEXT: LOREBOOK (#43) — the flavor layer for these regions (seed + emergent ledger), then back to
 rooms (slot assignment → prestige → kind-D) → build-order table → prestige math.
+
+---
+
+## §14 — LORE & CONTEXT-RETRIEVAL ("relevant-object" system) — #43 (design IN PROGRESS, 2026-06-16)
+
+The lorebook's CORE problem is **context selection**: at quest-genesis about a focal entity (e.g. a
+unit Alex), feed the LLM the RELEVANT entities/lore (Alex's brother Bob, his birthplace region, a
+life-changing past-quest memory + a few RANDOM seeds for spark) WITHOUT feeding the whole growing
+world. Designed via a 3-angle deep dive (primary architecture + alternatives red-team + codebase
+grounding), 2026-06-16.
+
+### Grounding facts (reshape the problem)
+- **No relation graph exists today** — "Alex's brother Bob" is only a substring in a chain's bible
+  prose; the only typed links are `chainIds`/`focalCardIds`. The typed-edge graph is THE new build.
+- **A crude version already ships**: `gatherPoolCast()` feeds a RANDOM sample of 3 roster chars into
+  genesis. The real ask = replace random with **relevance**.
+- **World is small (~10–40 entities) + determinism is sacred** (seeded replay). → This is
+  **relevance-ranking over a small set**, NOT an information-retrieval problem.
+
+### CONFIRMED decisions (2026-06-16)
+1. ✅ **Unified `LoreNode` base** — characters/relics/places/factions/sagas share one shape (extends
+   CARDS.md "everything is a Card"). **Lore is a LAYER over entities, not a separate store**: a
+   character is ONE object = gameplay Card + LoreNode (same id, two views). Some nodes are lore-only
+   (places, factions, dead NPCs).
+   ```
+   LoreNode { id, type(character|relic|place|faction|saga),
+              blurb,    // SHORT ≤~25 tok, byte-stable, prompt-cacheable
+              dossier,  // LONG — evolving living record
+              edges[],  // typed relations
+              ...gameplay data (gameplay entities only) }
+   ```
+2. ✅ **Memory = EDGE, not node** — `Alex —scarred-by→ Bob`, annotated with a one-liner + pointer to
+   `Chain.log[beat]` (dereference for full). Relation is first-class; no bible duplication.
+3. ✅ **Evolvable lore** = stable identity (blurb + birth tags + origin backstory; ~immutable,
+   cacheable) vs living dossier (grows via write-back@genesis + updates@resolution). **Short blurb is
+   DENORMALIZED from the long dossier** at resolution. Edges evolve: salience bumps on co-appearance,
+   lazy decay on read.
+4. ✅ **Retrieval pipeline** = deterministic ranked recall + thematic seed **+ dossier distillation**
+   now; **nano LLM-pick behind a flag**; **NO embeddings/tool-use yet**.
+
+### Edge model (the one genuinely new structure)
+`RelEdge { from, to, type, salience 0..1, lastCycle, blurb?, sourceChainId? }`, directed w/ inverse
+table; `GameState.edges[]` + a built-on-load adjacency index. Created by: engine-cheap (co-deploy →
+`served-with`, birth → `born-in`), genesis write-back (`bonded-by`/`scarred-by`/`rival-of`),
+resolution (betrayal → `rival-of`). `effectiveSalience = base · 0.97^(cycle−lastCycle)`.
+
+### Retrieval pipeline
+1. **Recall** (engine, deterministic, ranked) — replaces random `gatherPoolCast`: candidates = top
+   edge-neighbors by salience (1–2 hop) + recency + a few SEEDED thematic-similarity wildcards (tag/
+   keyword overlap, NOT embeddings). Zero tokens; cold-start = today's behavior.
+2. **Pick** (optional, size-gated) — if candidates > ~8, a cheap gpt-5-nano selector picks which to
+   expand to full; else feed all blurbs. Validate ids; deterministic top-K = reproducibility fallback.
+3. **Genesis** (gpt-5-mini) — full dossiers for picked + blurbs for rest → bible + write-back in ONE call.
+4. **Write-back** (no extra call) — declares used/new entities + edges → engine persists, guarded
+   (drop dangling/hallucinated); bible `cast` stays the correctness backstop.
+
+### Pushed back / DROPPED
+- "location" as a mechanical concept (region = sole mechanical unit; §13).
+- **Embeddings / vector store** — infra overkill at this scale; tag/keyword overlap covers the
+  "thematic spark" deterministically. Park for thousands-of-entities scale.
+- **Agentic tool-use mid-generation** — breaks the cached single-JSON-schema harness + latency +
+  non-determinism. Park for when the graph outgrows the prompt.
+
+### OPEN (being worked now, 2026-06-16) — WITH AI experiments:
+(1) HOW a lore node changes (update mechanism — who writes it, append+distill, length control).
+(2) candidates-list vs full-list CONTENTS (concrete examples).
+(3) relevance management / adjacency (how the engine surfaces Bob→Alice as a candidate).
+(4) new-lore GENERATION + the MEMORY question (do we want memories; are they part of generation).
+
+### Implementability
+Builds on `gatherPoolCast`, `GenesisInput`/`GenesisOut`, `Chain`/`CharacterCard`. New = the RelEdge
+store + the dossier-distillation step. Cold-start degrades to exactly today's shipped behavior.
