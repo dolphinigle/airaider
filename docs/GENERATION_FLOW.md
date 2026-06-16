@@ -18,11 +18,15 @@ tiers→death-cap(10)+building-extend, rest/infirmary/pay-gold-room healing, val
 CURRENT design area: FORT ROOM CATALOG (#36, §12). BRAINSTORM POOL recorded (§12.1, ⏳ not locked):
 rooms = 4 kinds (A feature/menu gates · B capacity · C region-scoped quest faucets · D prestige
 gates). Kinds A+B drafted; torture chamber RESOLVED-keep (gpt-5-mini probed L1–L6, 0 refusals).
-ORDER FROM HERE (designer-set): (1) REGION pass #42 — plan regions (count · unlock-by · identities);
-(2) back to rooms: ROOM SLOT ASSIGNMENT → PRESTIGE (what it sums/gates) → kind-D prestige+theme
-rooms; (3) finalize region faucets + build-ORDER TABLE + per-room cost/prestige; (4) PRESTIGE MATH
-#41. Rooms cover locked hooks: bedrooms (dice §10), infirmary+pay-gold room (injury §11), item-slot
-rooms (relics §7), theme/prestige (economy).
+REGIONS (§13, #42) — LIST ✅ locked 2026-06-15: 5 mapped (Western Forests=elf · The City=human ·
+Drowned Coast=lizardman · Highlands=wolfman · Underdeep=no-faction) + SHARED off-map endgame "The
+Outskirts" (L40→50, keyed by per-region endgame buildings). "location" concept DROPPED → region=sole
+mechanical unit, lorebook=flavor (#43, after). Dice re-verified L3–L50 (§10). Region OPEN: unlock
+structure (line vs graph) · #keys for Outskirts · poolWeights (#31) · costs/gates (#41).
+ORDER FROM HERE: (1) finish REGION open items; (2) back to rooms: ROOM SLOT ASSIGNMENT → PRESTIGE
+(what it sums/gates) → kind-D prestige+theme rooms; (3) LOREBOOK #43; (4) region faucets + build-ORDER
+TABLE + per-room cost/prestige; (5) PRESTIGE MATH #41. Rooms cover locked hooks: bedrooms (dice §10),
+infirmary+pay-gold room (injury §11), item-slot rooms (relics §7), theme/prestige (economy).
 After all design: the LEAN-DOC TRANSFORM (commit checkpoint → rewrite every doc to
 END-result-only / implementable, verify each claim vs chat history → archive superseded docs
 TAGS.md/UNIT_GENERATION.md/scratch). Also still-stale from the revamp: PROMPTS.md attribute
@@ -867,7 +871,7 @@ THREE TYPES, type is a tag: `type:character` · `type:relic` · `type:stackable`
   primitive: requires:[type:character] · requires:[type:relic] wants:[storied] ·
   requires:[type:stackable, gold] (a bribe slot). Merge rule: stacks merge iff tag-sets match.
 
-## §10 — THE ROLL: dice / attribute / threshold ✅ LOCKED 2026-06-14 (numbers verified 36/36 L3–L20)
+## §10 — THE ROLL: dice / attribute / threshold ✅ LOCKED 2026-06-14 (numbers verified L3–L50)
 
 Serves G1 per-test difficulty · G2 pass-table holds (every level) · G3 no level-inversion · G4
 dopamine · G5 attachment-via-differentiation · G6 engine owns numbers / pooled resolution · G7
@@ -926,19 +930,22 @@ Effective power **E = ATTRIBUTE + MATCHING-TAG + ATTRIBUTE-TAG** (additive), in 
 ### The ladder + verified pass-table
 ≤ standard = **attribute alone** · hard = a **great attribute OR build + 1 tag** · brutal = **attribute
 + 1 tag** · extreme = **attribute + BOTH tags**. A sub-great generalist with no tag **caps at standard**.
-Binomial success probabilities (final params), all in their target band across L3–L20:
+Binomial success probabilities (final params), all in their target band — **re-verified L3–L50
+(2026-06-14)** when the cap was raised to 40 (50 with a region's endgame building). Bands STABILIZE
+as level rises (scale-invariant: coins & threshold both ∝ U(L); "coin" checks pinned ~.50;
+"clears/fails" sharpen toward target then flatten) — nothing drifts out past L20:
 
-| design check | target | L3 | L5 | L10 | L20 |
-|---|---|---|---|---|---|
-| decent, no-tag @ standard | clears | .77 | .81 | .80 | .81 |
-| good, no-tag @ standard | sure | .91 | .94 | .98 | 1.0 |
-| **great, no-tag @ hard** | **coin** | .50 | .50 | .50 | .50 |
-| good, no-tag @ hard | fails | .25 | .15 | .05 | .01 |
-| decent + 1 tag @ hard | clears | .71 | .67 | .68 | .71 |
-| great, no-tag @ brutal | fails | .11 | .03 | .00 | .00 |
-| **great + 1 tag @ brutal** | **coin** | .60 | .57 | .55 | .54 |
-| great + 1 tag @ extreme | fails | .11 | .04 | .01 | .00 |
-| **great + 2 tags @ extreme** | **coin** | .58 | .56 | .55 | .53 |
+| design check | target | L3 | L10 | L20 | L30 | L40 | L50 |
+|---|---|---|---|---|---|---|---|
+| decent, no-tag @ standard | clears | .77 | .80 | .81 | .84 | .86 | .87 |
+| good, no-tag @ standard | sure | .91 | .98 | 1.0 | 1.0 | 1.0 | 1.0 |
+| **great, no-tag @ hard** | **coin** | .50 | .50 | .50 | .50 | .50 | .50 |
+| good, no-tag @ hard | fails | .25 | .05 | .01 | .00 | .00 | .00 |
+| decent + 1 tag @ hard | clears | .61 | .68 | .71 | .73 | .76 | .78 |
+| great, no-tag @ brutal | fails | .03 | .00 | .00 | .00 | .00 | .00 |
+| **great + 1 tag @ brutal** | **coin** | .40 | .45 | .46 | .47 | .47 | .48 |
+| great + 1 tag @ extreme | fails | .11 | .01 | .00 | .00 | .00 | .00 |
+| **great + 2 tags @ extreme** | **coin** | .58 | .55 | .53 | .53 | .52 | .52 |
 
 ### Final numbers (LOCKED; tunable in playtest)
 base ≈3/stat (fixed-sum random, total ~15) · g0 = 2 (growth budget ~10/lvl) · build shares
@@ -1092,3 +1099,67 @@ ORDER FROM HERE (designer-set 2026-06-14):
    then **kind-D prestige gates + theme rooms**.
 3. Finalize the region-scoped faucets + the **build-order TABLE** + per-room cost/prestige.
 4. **PRESTIGE MATH** (#41).
+
+---
+
+## §13 — REGIONS (design IN PROGRESS, started 2026-06-15) — #42
+
+Formalizes "location" into a real progression axis. **"location" as a separate mechanical concept is
+DROPPED** — there is ONE mechanical unit, the **REGION**; everything finer (a village, a ruin, a
+named NPC) is a **lorebook entry** = pure flavor/consistency, no mechanics (lorebook = its own pass,
+#43, AFTER this). The old `Lead.location` becomes just a name drawn from / appended to the region's
+lorebook. `GameState.unlockedLocations` → `unlockedRegions`.
+
+### Goals
+1. **Progression spine** — regions unlock over time (a sequence/graph) → steady "new place" dopamine
+   + structures the level/difficulty curve (unlock outward → higher-level content).
+2. **Variety / identity** — each region biases its **quest pool · recruit types · landmarks** so it
+   *feels* different and recruiting there yields different units (ties to hierarchical pools #31 +
+   race/background `appearOdds`).
+3. **Consistency** — content within a region stays coherent via the lightweight seed + emergent
+   ledger (the lorebook, #43).
+4. **Two clean layers** — MECHANICAL region (engine: gates, level band, pool weights) kept separate
+   from FLAVOR (AI lorebook/prose). Engine owns numbers, LLM owns prose.
+5. **Room hook** — regions scope the faucet rooms (§12.1 C); reaching/unlocking a region is a build act.
+
+### The mechanical region bundle (per region)
+| field | does |
+|---|---|
+| `levelBand [min,max]` | the level range of its leads → **the difficulty ladder** |
+| `poolWeights` | biases recruit/captive/cast generation (race appearOdds, background mix, tag leans) — the *variety* engine |
+| `unlockGate` | the prestige (or level) threshold that makes it **buildable** |
+| `seed` | 1–2 anchor lore facts (name, theme, a landmark) → handed to the lorebook (#43) |
+| faucet rooms | its scouting / training / recruiting variants (§12.1 C) |
+
+### Unlock flow (ties regions to the room loop)
+region **locked** → reach its **prestige gate** → becomes **buildable** → build its **scouting room**
+(gold) → its leads + faucet quests flow. Progression is *earned* (gate, can't rush) **and** a *build
+act* (gold sink, agency) — matches DESIGN.md "prestige unlocks new content" + the faucet-room model.
+
+### The region list (✅ LIST locked 2026-06-15; bands/order tunable)
+| # | Region | Faction | Base band |
+|---|---|---|---|
+| 1 | **Western Forests** (start) | elf | L1–8 |
+| 2 | **The City** | human | L6–16 |
+| 3 | **The Drowned Coast** | lizardman | L12–22 |
+| 4 | **The Highlands** | wolfman | L18–28 |
+| 5 | **The Underdeep** | NONE (a place, not a people — monster/hazard quests, no native recruits) | L24–34 |
+| 6 | **The Outskirts** (endgame, **off-map**) | mixed / monstrous | L40 → **L50** |
+
+- 4 of 5 mapped regions map 1:1 to the race roster (human/wolfman/elf/lizardman, TAGS.md). Underdeep
+  has no faction. Bands **overlap** (smooth — open a region, do its low end immediately, no wall).
+- **The Outskirts = SHARED** single off-map endgame region (NOT per-region). The **endgame buildings
+  are the KEYS to it** (§ cap model below). It's the L50 endgame everyone funnels into.
+
+### Cap model (reconciled with §10 + injury)
+- Normal merc cap = bedroom **comfort** (`cap = 3 + 0.9×comfort`), **soft ~40, no hard cap** (§10/FORT).
+- **Endgame building (one per region)** = a region capstone; building them are the **keys** that open
+  the shared **Outskirts** and lift the ceiling **40 → 50** (the sanctioned way past the soft cap, for
+  both content level and the mercs pushed there). Dice **verified to L50** (§10).
+
+### OPEN (next):
+- (a) unlock STRUCTURE — strict line vs shallow GRAPH (branch) — leaning graph, mostly-linear + 1
+  branch for the prototype; (b) how many endgame-building KEYS open the Outskirts (one? all 5?);
+  (c) exact `poolWeights` per region (needs hierarchical pools #31); (d) per-region scouting-room +
+  endgame-building COSTS / prestige gates (ties to PRESTIGE MATH #41). Then → back to rooms
+  (slot assignment → prestige → kind-D), then build-order table.
