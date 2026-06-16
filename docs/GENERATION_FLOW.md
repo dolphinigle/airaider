@@ -20,13 +20,14 @@ rooms = 4 kinds (A feature/menu gates · B capacity · C region-scoped quest fau
 gates). Kinds A+B drafted; torture chamber RESOLVED-keep (gpt-5-mini probed L1–L6, 0 refusals).
 REGIONS (§13, #42) — LIST ✅ locked 2026-06-15: 5 mapped (Western Forests=elf · The City=human ·
 Drowned Coast=lizardman · Highlands=wolfman · Underdeep=no-faction) + SHARED off-map endgame "The
-Outskirts" (L40→50, keyed by per-region endgame buildings). "location" concept DROPPED → region=sole
-mechanical unit, lorebook=flavor (#43, after). Dice re-verified L3–L50 (§10). Region OPEN: unlock
-structure (line vs graph) · #keys for Outskirts · poolWeights (#31) · costs/gates (#41).
-ORDER FROM HERE: (1) finish REGION open items; (2) back to rooms: ROOM SLOT ASSIGNMENT → PRESTIGE
-(what it sums/gates) → kind-D prestige+theme rooms; (3) LOREBOOK #43; (4) region faucets + build-ORDER
-TABLE + per-room cost/prestige; (5) PRESTIGE MATH #41. Rooms cover locked hooks: bedrooms (dice §10),
-infirmary+pay-gold room (injury §11), item-slot rooms (relics §7), theme/prestige (economy).
+Outskirts" (L40→50, keyed by ALL per-region endgame buildings). Unlock = shallow GRAPH (spine
+Forests→City→Coast→Highlands + Underdeep optional branch). "location" concept DROPPED → region=sole
+mechanical unit, lorebook=flavor (#43). Dice re-verified L3–L50 (§10). Region core ✅ DONE; deferred:
+poolWeights (#31) · costs/gates (#41).
+ORDER FROM HERE: (1) **LOREBOOK #43** ← NEXT (region seed + emergent ledger); (2) back to rooms: ROOM
+SLOT ASSIGNMENT → PRESTIGE (what it sums/gates) → kind-D prestige+theme rooms; (3) region faucets +
+build-ORDER TABLE + per-room cost/prestige; (4) PRESTIGE MATH #41. Rooms cover locked hooks: bedrooms
+(dice §10), infirmary+pay-gold room (injury §11), item-slot rooms (relics §7), theme/prestige (economy).
 After all design: the LEAN-DOC TRANSFORM (commit checkpoint → rewrite every doc to
 END-result-only / implementable, verify each claim vs chat history → archive superseded docs
 TAGS.md/UNIT_GENERATION.md/scratch). Also still-stale from the revamp: PROMPTS.md attribute
@@ -1157,9 +1158,21 @@ act* (gold sink, agency) — matches DESIGN.md "prestige unlocks new content" + 
   the shared **Outskirts** and lift the ceiling **40 → 50** (the sanctioned way past the soft cap, for
   both content level and the mercs pushed there). Dice **verified to L50** (§10).
 
-### OPEN (next):
-- (a) unlock STRUCTURE — strict line vs shallow GRAPH (branch) — leaning graph, mostly-linear + 1
-  branch for the prototype; (b) how many endgame-building KEYS open the Outskirts (one? all 5?);
-  (c) exact `poolWeights` per region (needs hierarchical pools #31); (d) per-region scouting-room +
-  endgame-building COSTS / prestige gates (ties to PRESTIGE MATH #41). Then → back to rooms
-  (slot assignment → prestige → kind-D), then build-order table.
+### Unlock structure ✅ locked 2026-06-15 — shallow GRAPH (not a strict line)
+- **Main spine:** Forests → City → Coast → Highlands (each gates the next).
+- **Underdeep = optional BRANCH** — a "place, no faction," hangs off the spine (unlockable mid-game
+  from the City or Coast), not a mandatory step. A side path.
+- **The Outskirts = convergence** (endgame), gated by the keys below.
+
+### Outskirts keys ✅ locked 2026-06-15 — ALL region endgame buildings
+- The Outskirts opens only when **every mapped region's endgame building is built** ("master the whole
+  map → go beyond it"). Each endgame building also lifts its own region to L50, so all-keys = whole map
+  at L50 + Outskirts open. One clean capstone goal; keeps every region relevant into endgame.
+- **Prototype:** ship fewer regions (first 3–4); the all-keys rule scales down to whatever ships.
+
+### STILL OPEN (deferred to their own passes):
+- (c) exact `poolWeights` per region — needs hierarchical pools (#31).
+- (d) per-region scouting-room + endgame-building COSTS / prestige gates — ties to PRESTIGE MATH (#41).
+
+### NEXT: LOREBOOK (#43) — the flavor layer for these regions (seed + emergent ledger), then back to
+rooms (slot assignment → prestige → kind-D) → build-order table → prestige math.
