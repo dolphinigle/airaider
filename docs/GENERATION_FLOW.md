@@ -1204,8 +1204,9 @@ grounding), 2026-06-16.
   prose; the only typed links are `chainIds`/`focalCardIds`. The typed-edge graph is THE new build.
 - **A crude version already ships**: `gatherPoolCast()` feeds a RANDOM sample of 3 roster chars into
   genesis. The real ask = replace random with **relevance**.
-- **World is small (~10–40 entities) + determinism is sacred** (seeded replay). → This is
-  **relevance-ranking over a small set**, NOT an information-retrieval problem.
+- **World is small (~10–40 entities)** + reproducibility matters → This is **relevance-ranking over a
+  small set**, NOT an information-retrieval problem. (Determinism model = §16: engine math seeded, AI
+  outputs persisted, nothing re-derived on reload.)
 
 ### CONFIRMED decisions (2026-06-16)
 1. ✅ **Unified `LoreNode` base** — characters/relics/places/factions/sagas share one shape (extends
@@ -1364,3 +1365,76 @@ enforcement** (rooms enforce neither today).
 fort.ts). Build = typed `RoomSlot[]` (replaces `displayCardIds`), upgrade levels (+slot each),
 theme-roll storage, occupant-function hook. Also fix the duplicate/buggy `coinsForSlot` (missing
 clashing) → call shared `coinsFor`.
+
+---
+
+## §16 — REVIEW RESOLUTIONS (independent review, 2026-06-21) ✅
+
+Two independent reviewers checked the design before the doc-redo. CARDS.md confirmed **faithful** (8/8
+locked facts). Cross-system holes resolved with the designer (F1–F6); F7–F8 still open (below).
+
+**F1 — endgame cap reachability.** Cap is purely comfort-driven; its CEILING is the **bedroom comfort
+band** (not hardcoded — the old "~34" was a band/coefficient artifact + the saturation asymptote).
+Calibrate (#41) so a maxed *normal* bedroom → cap ~40; **endgame buildings RAISE the comfort band →
+cap 50.** One mechanism, no out-of-formula bonus.
+
+**F2 — tier on the roll.** §10 wins: owning the slot's favored skill = **flat 0.5·U, tier-BLIND on
+the quest roll.** Tier instead pays off in **value** (§8 curve) + **room prestige** (overlap
+magnitude — and only realizable once you've **upgraded + themed** the room to slot the card). Retire
+§8's tier-scaled favored-*dice* bonus.
+
+**F3 — prestige progression / no gold-rush.** **Theme rooms unlock GRADUALLY behind prestige
+thresholds** (bounds how many rooms exist at a tier → no empty-room spam). **Prestige gates BOTH room
+*unlocks* AND *upgrades*** (gold = the cost, prestige = the permission). MASTER CLOCK: a
+**prestige → expected-level mapping** (#41) ties prestige to merc cap + the quest/region level you
+face. Principle: **no single dominant strategy** — deep-fill few / spread many / bedroom-vs-theme all
+viable; don't tune the math to force one route.
+
+**F4 — Underdeep / Outskirts.** The Outskirts is keyed by the **4 SPINE regions'** endgame buildings
+only (Forests→City→Coast→Highlands). **The Underdeep is OPTIONAL**, unlocking **between region 3
+(Coast) and region 4 (Highlands)**; you may still build its endgame building for its own L50 content,
+but it is NOT a key.
+
+**F5 — injury.** **Fully AI-judged at resolution, DECOUPLED from the outcome tier** (any outcome;
+typically failure, sometimes *none even on failure*; a costly partial may carry a minor one). AI picks
+the severity BAND (none/low/med/high); the engine maps band → tiers → flat coin penalty. Engine
+**value** (full/half/zero) and the partial's **liability** are independent channels.
+
+**F6 — determinism + the lore/quest FLOW.** See below. F6 is resolved by the 3-producer model.
+
+### The lore/quest FLOW (plain)
+**What the world stores:** every character/relic/place is a **node** with a **blurb** (one line) + a
+**dossier** (fuller). Between nodes are **memory-edges** ("Bob —betrayed→ Alex at Coldfen"), each with
+an **importance**; big ones are **pinned** (stay), trivial ones fade. A **dossier is just the top few
+memory-edges written up** — re-rendered, never a growing blob.
+
+**New questline (genesis):** (1) engine **gathers candidates** instantly — focal's closest
+connections by importance, 1–2 hops, + a couple of random wildcards. (2) AI **picks** the ~3–4 it
+needs full detail on (one cheap call, only if many candidates). (3) engine hands picked dossiers +
+the rest as blurbs to the **writer**. (4) writer **creates the bible** AND, in the same call, declares
+which entities it used + any new people/places/edges. (5) engine **saves** the bible + new edges.
+→ **≤ 2 AI calls** (picker + writer).
+
+**Quest resolves:** the engine computes the **result** (seeded roll → outcome → value/rewards/XP/
+prestige). **One AI call** wraps it — narration + dossier updates + new memory-edges + injury band.
+Engine saves everything.
+
+### Three producers of saved state (the determinism model)
+1. **Engine (seeded RNG + fixed mappings)** — quest **outcome**, reward **VALUE**, XP/prestige/gold,
+   band→tier conversions. Reproducible from the seed.
+2. **AI (creative + bounded CATEGORICAL picks)** — prose, bibles, dossiers, edges, theme tags, reward
+   **KIND**/label, injury **SEVERITY** band. **All saved as concrete fields** (a bible string, edge
+   rows `{from,to,type,blurb}`, dossier lines, `injuryTiers`, `Room.themeTags`).
+3. **AI picker** (selector "which candidates are relevant?") — **discarded**; its only effect is the
+   writer's output, which is already saved.
+
+**Principle: engine owns NUMBERS, AI owns FLAVOR + categorical picks** — the AI never emits a raw
+number (gold, DC, tier); it picks a category/band and the engine prices it. **Reload re-runs NO AI
+call** — every AI effect is baked into the save (bible, edges, dossier, injury tiers, theme tags).
+"Determinism" = engine math is seeded; AI outputs are persisted; nothing is re-derived.
+
+### STILL OPEN (next): F7 + F8
+- **F7** — core-memory pinning may OSSIFY a veteran's dossier (pinned cores accumulate; once they fill
+  the top-K, new memories can't enter → the dossier freezes for your most-used cast).
+- **F8** — STATUS edges go stale (`captive-of` → freed, `member-of` → defected): "never delete" would
+  feed contradicted facts into recall.
