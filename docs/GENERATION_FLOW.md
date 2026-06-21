@@ -1243,11 +1243,12 @@ w/ inverse table; `GameState.edges[]` + a built-on-load adjacency index.
   enum + convention → valid-ids 5/5, direction 4/5, type-in-enum 5/5 (vs 2/5 direction without).
 - **Salience / decay:** `effectiveSalience = base · 0.97^(cycle−lastCycle)`. **CORE memories
   (AI-flagged `core:true`, or importance ≥ ~0.8) are PINNED — never decay** (REQUIRED, E3b: under an
-  event-flood, decay-all retained **0/9** defining memories; pinning retained **8/9**). Non-core
-  decay + engine GC below a salience floor.
-- **Append + SUPERSEDE, never narrative-delete** (a betrayal stays true after a later rescue — the
-  relationship is both; E-test: the AI superseded `betrayed-by → sacrificed-for`, never removed).
-  Only deletion = engine GC of decayed non-core edges.
+  event-flood, decay-all retained **0/9** defining memories; pinning retained **8/9**). Non-core that
+  decay below the floor → flagged **inactive** (NOT deleted — see §16 F8 soft-delete).
+- **Append + SUPERSEDE, never delete** (a betrayal stays true after a later rescue — both true; the AI
+  superseded `betrayed-by → sacrificed-for`, never removed). **Soft-delete only** (§16 F8): superseded
+  status edges + below-floor memories go **inactive** (hidden from AI recall, still player-readable);
+  nothing is ever hard-deleted.
 - Created by: engine-cheap (co-deploy → `served-with`, birth → `born-in`), genesis write-back, and
   **resolution** (the outcome → memory-edges; validated E-test: clean `{from,to,type,blurb}`).
 
@@ -1433,8 +1434,12 @@ number (gold, DC, tier); it picks a category/band and the engine prices it. **Re
 call** — every AI effect is baked into the save (bible, edges, dossier, injury tiers, theme tags).
 "Determinism" = engine math is seeded; AI outputs are persisted; nothing is re-derived.
 
-### STILL OPEN (next): F7 + F8
-- **F7** — core-memory pinning may OSSIFY a veteran's dossier (pinned cores accumulate; once they fill
-  the top-K, new memories can't enter → the dossier freezes for your most-used cast).
-- **F8** — STATUS edges go stale (`captive-of` → freed, `member-of` → defected): "never delete" would
-  feed contradicted facts into recall.
+### F8 — SOFT-DELETE ONLY (resolved 2026-06-21)
+**Nothing in the lore graph is ever truly deleted.** Every memory + edge is append-only with an
+**`active` flag**. **Active** → fed to the AI (recall/context). **Inactive** → **hidden from the AI**
+(token saving + avoids contradicted facts) but **still saved, readable by the player** (the full
+history). Becomes inactive when: a memory **decays below the floor**, or a **status edge is
+SUPERSEDED** (`captive-of`→freed, `member-of`→defected). This **replaces** the earlier "engine GC
+deletes decayed edges" — it's mark-inactive, never delete. (Memories are what players browse; edges
+less so — same rule for both.)
+- (F7 dossier-ossification — DROPPED as premature detail; revisit only if playtest shows it.)
