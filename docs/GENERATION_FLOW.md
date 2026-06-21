@@ -30,10 +30,16 @@ REQUIRED, decay-all lost 0/9 defining mems); dossier=bounded render over edges; 
 ranked-recall + size-gated nano selector (F1 0.89); edges=enum+direction-convention, append+supersede;
 ≤2 round-trips (genesis 1 call w/ write-back folded; selector only if >8 cands; resolution=1 batched
 call) — IMPLEMENTER: join/batch queries. PURPOSE=continuity (canon-consistency 1.00 vs 0.55).
-ORDER FROM HERE: (1) back to rooms: ROOM SLOT ASSIGNMENT → PRESTIGE (what it sums/gates) → kind-D
-prestige+theme rooms; (2) region faucets + build-ORDER TABLE + per-room cost/prestige; (3) PRESTIGE
-MATH #41. Rooms cover locked hooks: bedrooms (dice §10), infirmary+pay-gold room (injury §11),
-item-slot rooms (relics §7), theme/prestige (economy).
+SLOTTABLES/FIT/PRESTIGE (§15, #36/#41) ✅ CONFIRMED 2026-06-21: one prestige formula (comfort=bedroom
+prestige, global=Σ theme rooms); shared Slot/Slottable (promote Room.displayCardIds→typed slots,
+reuse QuestSlot requirement union); shared overlap() primitive (keep RAW/tier-scaled, quest U-scales
+on top — don't fork); UPGRADES ADD SLOTS (U0=0 slots, +1/upgrade — reverses FORT "no upgrades", fix
+in transform); prestige=saturating band, designed via per-room [min,expected,max]; player THEME→AI
+rolls wanted-tags ONCE→engine scores. Slot kinds display/occupant/captive/owner. OPEN gaps: occupant
+-function hook · forced-negatives · cap-downgrade · capacity enforcement.
+ORDER FROM HERE: (1) **REDO DOCS for slottables** ← NEXT (collaborative — rewrite CARDS/FORT/GAME_STATE/
+QUESTS to the unified Slottable+prestige+theme model; still PLANNING phase); (2) resolve the 4 gap
+-decisions; (3) region faucets + build-ORDER TABLE + per-room cost/prestige; (4) PRESTIGE MATH #41.
 After all design: the LEAN-DOC TRANSFORM (commit checkpoint → rewrite every doc to
 END-result-only / implementable, verify each claim vs chat history → archive superseded docs
 TAGS.md/UNIT_GENERATION.md/scratch). Also still-stale from the revamp: PROMPTS.md attribute
@@ -1279,3 +1285,82 @@ store + the dossier-render step. Cold-start degrades to exactly today's shipped 
 (1)-(4) from the prior pass are all RESOLVED above (node change = render from salience-ranked edges;
 candidate vs full contents = edge-phrase blurb vs evolved dossier; relevance = engine edge-graph 1–2
 hop; new lore + memory = genesis write-back + resolution memory-edges, YES we want memories).
+
+---
+
+## §15 — SLOTTABLES, FIT & PRESTIGE (unified model) ✅ CONFIRMED 2026-06-21 — #36/#41
+
+Grounding: the shared primitive ALREADY exists in code — `overlap(have,favored,clashing)` (economy.ts)
+already feeds BOTH quest coins (`coinsFor`) AND room prestige (`roomPrestige` w/ saturating band).
+So this is reconciliation + gap-closing, not greenfield.
+
+### (1) ONE prestige computation — comfort is not special
+There is a single prestige formula. **Comfort** = the prestige of a merc's OWN bedroom (target = that
+merc's tags) → feeds THAT merc's cap. **Global** = the SUM of prestige over theme rooms → unlocks
+buildable room-types. Same formula, two aggregations. Comfort = `roomPrestige(bedroom)`.
+
+### (2) Shared SLOT / SLOTTABLE (structural fix — DO IT)
+Promote `Room.displayCardIds` → typed slots, symmetric with `QuestSlot`. Both Quest and Room are
+**Slottables**:
+```
+Slot { index; accepts: CardClass[]; requirement: open|must-be<id>|must-have<tag>; filledBy? }
+QuestSlot = Slot + { tested:{attribute,favored,clashing}, groupId? }   // quest-only
+RoomSlot  = Slot + { kind: display|occupant|captive|owner }            // room-only
+Slottable { id, slots: Slot[] }
+```
+ONE `place(card, slottable, idx)` (validates accepts+requirement), one fill-rule, one fit call. Reuse
+`QuestSlot`'s requirement union verbatim — no second grammar. Fixes the "rooms enforce nothing" gap.
+
+### (3) Shared FIT primitive (no duplication)
+`overlap(cardTags, wants, clashes)` → signed, tier-weighted (matching +favoredBonus(tier), clashing
+−clashPenalty(tier)). **QUEST:** `coins = attribute + overlap(…) − injury` → dice → success/partial/
+fail. **ROOM:** `raw = adjacency · Σ_slots slotBase[kind]·overlap(…)` → saturating band → prestige
+(DETERMINISTIC, no dice). `wants` = quest slot's favored skills OR a room's theme tags.
+⚠ **RULE (prevents the one real fork):** keep `overlap` RAW/tier-scaled; §10's flat "0.5·U(L) if
+favored skill owned" is a THRESHOLDING of overlap's sign done in the QUEST layer — never edit
+`overlap` itself (rooms need the raw tier value). Body/bg tags fold into the attribute before the
+attr term, never into `overlap`.
+
+### (4) Upgrades ADD slots (⚠ reverses FORT.md "no upgrades" — fix FORT in the transform)
+Every room starts at **U0 with ZERO slots**; each upgrade (gold) unlocks **+1 slot**. Upgrade-level
+and fill-quality are two independent prestige levers (gold sink + loot sink) → smooth, always-something
+-to-build.
+
+### (5) Prestige formula + table
+`raw = adjacency · Σ_slots slotBase[kind]·overlap(card,wants,clashes)` ;
+`prestige = min + (max−min)·(1 − e^(−max(0,raw)/k))` (k≈14, floor at min). Band `[min,expected,max]`
+per room-type; k tuned so typical stocking → `expected`. `max` reached only at full-upgrade+great-fill.
+| upgrade | slots | empty | avg-fill | great-fill |  (theme band [3,16,36]) |
+|---|---|---|---|---|---|
+| U0 | 0 | 3 | — | — | |
+| U1 | 1 | 3 | ~10 | ~16 | |
+| U2 | 2 | 3 | ~16 | ~24 | |
+| U3 | 3 | 3 | ~20 | ~29 | |
+| U4 | 4 | 3 | ~24 | ~32 | |
+Comfort: same formula, target=owner tags, band [3,18,40] → `cap = 3 + 0.9·comfort`. Global: Σ theme
+prestige → gates `unlockPrestige`. The whole catalog+curve is designed by choosing each room's band.
+
+### (6) Player THEME → AI-rolled tags (NOT static catalog)
+A room has a player-assigned **THEME** (renovate = gold). The AI rolls the wanted-tag set FROM the
+theme **ONCE** (at renovation — a discrete action, prompt-cache-safe) → stored on the room → engine
+scores deterministically against the stored set on every move. e.g. theme a kitchen "candy" → AI rolls
+`wants={skill:food, pers:kind, …}`+clashes. Player agency + AI flavor + engine determinism (the
+"AI generates once, engine uses forever" pattern, same as §14 lore). Replaces "AI-adjudicated" wording.
+
+### (7) Slot kinds
+**display** (item/furniture/captive → prestige) · **occupant** (working merc → prestige + FUNCTION
+boost, e.g. heal-skill → infirmary speed) · **captive** (capacity + prestige) · **owner** (bedroom;
+sets target=owner tags, not scored).
+
+### OPEN gap-decisions (next):
+(a) **occupant FUNCTION hook** — `occupantEffect(occupants)→functionValue`, separate from prestige
+(not built). (b) **forced negatives** — infestation/liability force-slotted must SUBTRACT prestige
+(today off-theme tags score 0, not negative). (c) **cap-downgrade rule** — unslot a bedroom item →
+comfort drops → merc now above cap: clamp/freeze/soft-overflow? (d) **capacity + acceptance
+enforcement** (rooms enforce neither today).
+
+### Implementability
+`overlap` + `roomPrestige` (saturating band) + `levelCap=3+0.9·comfort` ALREADY in code (economy.ts,
+fort.ts). Build = typed `RoomSlot[]` (replaces `displayCardIds`), upgrade levels (+slot each),
+theme-roll storage, occupant-function hook. Also fix the duplicate/buggy `coinsForSlot` (missing
+clashing) → call shared `coinsFor`.
