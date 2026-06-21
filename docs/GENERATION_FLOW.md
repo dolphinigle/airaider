@@ -24,10 +24,16 @@ Outskirts" (L40→50, keyed by ALL per-region endgame buildings). Unlock = shall
 Forests→City→Coast→Highlands + Underdeep optional branch). "location" concept DROPPED → region=sole
 mechanical unit, lorebook=flavor (#43). Dice re-verified L3–L50 (§10). Region core ✅ DONE; deferred:
 poolWeights (#31) · costs/gates (#41).
-ORDER FROM HERE: (1) **LOREBOOK #43** ← NEXT (region seed + emergent ledger); (2) back to rooms: ROOM
-SLOT ASSIGNMENT → PRESTIGE (what it sums/gates) → kind-D prestige+theme rooms; (3) region faucets +
-build-ORDER TABLE + per-room cost/prestige; (4) PRESTIGE MATH #41. Rooms cover locked hooks: bedrooms
-(dice §10), infirmary+pay-gold room (injury §11), item-slot rooms (relics §7), theme/prestige (economy).
+LORE & context-retrieval (§14, #43) ✅ DESIGNED + VALIDATED 2026-06-16 (5-exp campaign w/ controls):
+unified LoreNode (lore=layer over Cards); memory=salience-ranked EDGE (CORE pinned/never-decay —
+REQUIRED, decay-all lost 0/9 defining mems); dossier=bounded render over edges; retrieval=engine
+ranked-recall + size-gated nano selector (F1 0.89); edges=enum+direction-convention, append+supersede;
+≤2 round-trips (genesis 1 call w/ write-back folded; selector only if >8 cands; resolution=1 batched
+call) — IMPLEMENTER: join/batch queries. PURPOSE=continuity (canon-consistency 1.00 vs 0.55).
+ORDER FROM HERE: (1) back to rooms: ROOM SLOT ASSIGNMENT → PRESTIGE (what it sums/gates) → kind-D
+prestige+theme rooms; (2) region faucets + build-ORDER TABLE + per-room cost/prestige; (3) PRESTIGE
+MATH #41. Rooms cover locked hooks: bedrooms (dice §10), infirmary+pay-gold room (injury §11),
+item-slot rooms (relics §7), theme/prestige (economy).
 After all design: the LEAN-DOC TRANSFORM (commit checkpoint → rewrite every doc to
 END-result-only / implementable, verify each claim vs chat history → archive superseded docs
 TAGS.md/UNIT_GENERATION.md/scratch). Also still-stale from the revamp: PROMPTS.md attribute
@@ -1210,41 +1216,66 @@ grounding), 2026-06-16.
 2. ✅ **Memory = EDGE, not node** — `Alex —scarred-by→ Bob`, annotated with a one-liner + pointer to
    `Chain.log[beat]` (dereference for full). Relation is first-class; no bible duplication.
 3. ✅ **Evolvable lore** = stable identity (blurb + birth tags + origin backstory; ~immutable,
-   cacheable) vs living dossier (grows via write-back@genesis + updates@resolution). **Short blurb is
-   DENORMALIZED from the long dossier** at resolution. Edges evolve: salience bumps on co-appearance,
-   lazy decay on read.
-4. ✅ **Retrieval pipeline** = deterministic ranked recall + thematic seed **+ dossier distillation**
-   now; **nano LLM-pick behind a flag**; **NO embeddings/tool-use yet**.
+   cacheable) vs living dossier. **REFINED (validated 2026-06-16):** the dossier/blurb are NOT a
+   stored growing blob — they are a **bounded top-K RENDER over (stable identity + salience-ranked
+   memory-edges)**. Memory-edges are the source of truth; the dossier is a derived, cached projection.
+4. ✅ **Retrieval pipeline** = deterministic ranked recall + thematic seed **+ dossier render**;
+   size-gated **nano LLM selector** (validated, kept — F1 0.89); **NO embeddings/tool-use yet**.
+
+### PURPOSE (validated, E5b)
+The system exists for **CONTINUITY** — recurring entities stay consistent with established canon. Its
+value is NOT single-genesis polish: blind test showed feeding edge-context → canon-consistency **1.00
+vs 0.55** blurb-only (a blood-feud rival rendered at 0.2 without it). The North Star, demonstrated.
 
 ### Edge model (the one genuinely new structure)
-`RelEdge { from, to, type, salience 0..1, lastCycle, blurb?, sourceChainId? }`, directed w/ inverse
-table; `GameState.edges[]` + a built-on-load adjacency index. Created by: engine-cheap (co-deploy →
-`served-with`, birth → `born-in`), genesis write-back (`bonded-by`/`scarred-by`/`rival-of`),
-resolution (betrayal → `rival-of`). `effectiveSalience = base · 0.97^(cycle−lastCycle)`.
+`RelEdge { id, from, to, type, salience 0..1, core?, lastCycle, blurb?, sourceChainId? }`, directed
+w/ inverse table; `GameState.edges[]` + a built-on-load adjacency index.
+- **Type = a fixed `EdgeType` ENUM** (rival-of · scarred-by · bonded-by · owes · saved-by · kin-of ·
+  betrayed-by · served-with · born-in · member-of · …) handed to the AI. **+ explicit DIRECTION
+  convention** (`from` = the state-holder; symmetric types → alphabetical-first id). Validated E4b:
+  enum + convention → valid-ids 5/5, direction 4/5, type-in-enum 5/5 (vs 2/5 direction without).
+- **Salience / decay:** `effectiveSalience = base · 0.97^(cycle−lastCycle)`. **CORE memories
+  (AI-flagged `core:true`, or importance ≥ ~0.8) are PINNED — never decay** (REQUIRED, E3b: under an
+  event-flood, decay-all retained **0/9** defining memories; pinning retained **8/9**). Non-core
+  decay + engine GC below a salience floor.
+- **Append + SUPERSEDE, never narrative-delete** (a betrayal stays true after a later rescue — the
+  relationship is both; E-test: the AI superseded `betrayed-by → sacrificed-for`, never removed).
+  Only deletion = engine GC of decayed non-core edges.
+- Created by: engine-cheap (co-deploy → `served-with`, birth → `born-in`), genesis write-back, and
+  **resolution** (the outcome → memory-edges; validated E-test: clean `{from,to,type,blurb}`).
 
-### Retrieval pipeline
-1. **Recall** (engine, deterministic, ranked) — replaces random `gatherPoolCast`: candidates = top
-   edge-neighbors by salience (1–2 hop) + recency + a few SEEDED thematic-similarity wildcards (tag/
-   keyword overlap, NOT embeddings). Zero tokens; cold-start = today's behavior.
-2. **Pick** (optional, size-gated) — if candidates > ~8, a cheap gpt-5-nano selector picks which to
-   expand to full; else feed all blurbs. Validate ids; deterministic top-K = reproducibility fallback.
-3. **Genesis** (gpt-5-mini) — full dossiers for picked + blurbs for rest → bible + write-back in ONE call.
-4. **Write-back** (no extra call) — declares used/new entities + edges → engine persists, guarded
-   (drop dangling/hallucinated); bible `cast` stays the correctness backstop.
+### Retrieval pipeline — ≤ 2 LLM ROUND-TRIPS (implementer: JOIN queries wherever possible)
+1. **Recall** (engine, deterministic, ranked, ZERO tokens) — replaces random `gatherPoolCast`:
+   candidates = top edge-neighbors by effectiveSalience (**1–2 hop, NO recursive expansion**) +
+   recency + a few SEEDED thematic wildcards (tag/keyword overlap, not embeddings). Cold-start =
+   today's behavior. Candidate row carries the **edge-relation phrase** (why it's relevant) so the
+   selector can judge from blurbs alone.
+2. **Genesis round-trip** (gpt-5-mini, ONE call) — full dossiers for picked + blurbs for the rest →
+   **bible + write-back (relevantIds / newEntities / newEdges) in a SINGLE response.** Write-back is
+   folded in — never its own call.
+3. **Selector** (gpt-5-nano) — the ONLY extra round-trip, and only when candidates > ~8; else skip
+   and feed all blurbs into genesis. Validate ids (drop unknown / strip `id=` prefix); deterministic
+   top-K = the reproducibility fallback.
+→ So genesis path = **1 call (small world) or 2 calls (large world)**. **Resolution = ONE batched
+   call** updating ALL affected lores' dossiers + emitting all edges together (validated E-test: one
+   nano call handled 3 entities + 3 edges). **Implementer: batch/join every query you can.**
+
+### Validation summary (experiments, 2026-06-16)
+E1 retrieval selector F1 **0.89** (vs feed-all .67, random .52) · E2 salience std **0.054**, clean
+core/mid/trivia separation, 5/5 ordering · E3b **pinning required** (decay-all 0/9 → pin 8/9) ·
+E4b edges enum+convention valid 5/5 / dir 4/5 / enum 5/5 · E5b continuity **1.00 vs 0.55**.
+All mechanisms run on **gpt-5-nano** (cheap) except the genesis bible (gpt-5-mini).
 
 ### Pushed back / DROPPED
 - "location" as a mechanical concept (region = sole mechanical unit; §13).
 - **Embeddings / vector store** — infra overkill at this scale; tag/keyword overlap covers the
   "thematic spark" deterministically. Park for thousands-of-entities scale.
 - **Agentic tool-use mid-generation** — breaks the cached single-JSON-schema harness + latency +
-  non-determinism. Park for when the graph outgrows the prompt.
-
-### OPEN (being worked now, 2026-06-16) — WITH AI experiments:
-(1) HOW a lore node changes (update mechanism — who writes it, append+distill, length control).
-(2) candidates-list vs full-list CONTENTS (concrete examples).
-(3) relevance management / adjacency (how the engine surfaces Bob→Alice as a candidate).
-(4) new-lore GENERATION + the MEMORY question (do we want memories; are they part of generation).
+  non-determinism + ≫2 round-trips. Park for when the graph outgrows the prompt.
 
 ### Implementability
 Builds on `gatherPoolCast`, `GenesisInput`/`GenesisOut`, `Chain`/`CharacterCard`. New = the RelEdge
-store + the dossier-distillation step. Cold-start degrades to exactly today's shipped behavior.
+store + the dossier-render step. Cold-start degrades to exactly today's shipped behavior. OPEN items
+(1)-(4) from the prior pass are all RESOLVED above (node change = render from salience-ranked edges;
+candidate vs full contents = edge-phrase blurb vs evolved dossier; relevance = engine edge-graph 1–2
+hop; new lore + memory = genesis write-back + resolution memory-edges, YES we want memories).
