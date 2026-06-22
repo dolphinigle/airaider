@@ -1443,3 +1443,53 @@ SUPERSEDED** (`captive-of`→freed, `member-of`→defected). This **replaces** t
 deletes decayed edges" — it's mark-inactive, never delete. (Memories are what players browse; edges
 less so — same rule for both.)
 - (F7 dossier-ossification — DROPPED as premature detail; revisit only if playtest shows it.)
+
+---
+
+## §17 — DOC-REDO COVERAGE CHECKLIST (so no core decision is dropped) — #44
+
+Doc-redo is POSTPONED until the remaining DECISIONS land (catalog #36, prestige math #41, + the open
+gaps). When we resume the redo, every core decision below MUST be reflected in its target doc. Source
+of truth for each = its GENERATION_FLOW section (§8–§16). ✅ = doc already rewritten.
+
+**CARDS.md ✅ DONE** — Card+CardSlot concept · attrs STR/DEX/INT/CHA/CON · growth+focus (no talents) ·
+the roll (§10) · injury intrinsic (§11) · MARKED value · prestige-via-CardSlots hook · tags are 20-tier.
+
+**FORT.md ✅ DONE** — CardSlots + slot kinds · UPGRADES-ADD-SLOTS (reverses no-upgrades) · prestige by
+effect (bedroom→cap sole / non-bedroom→global) · global gates unlocks AND upgrades · theme rooms
+gradually unlock · player-theme→AI-rolls-once→engine-scores · saturating-band formula + upgrade×fill
+table · region faucet + endgame-building hooks (comfort-band lift, 4-spine Outskirts keys).
+
+**GAME_STATE.md ⏳** — prestige by EFFECT, NOT "two symmetric pools" (bedroom→cap sole effect /
+non-bedroom→summed global gating unlocks+upgrades) · CardSlot placement (location = slot-ref when
+slotted; else roster/inventory/limbo/staged) · live-recompute on slot change · the 3-PRODUCER save
+model (§16: engine seeded numbers / AI flavor+categorical persisted / picker discarded; reload re-runs
+no AI) · SOFT-DELETE lore graph (active flag; inactive hidden from AI, player-readable) · injury =
+intrinsic tiered state · `unlockedLocations`→`unlockedRegions`.
+
+**QUESTS.md ⏳** — QuestSlot = CardSlot + {tested,groupId} (one Slot concept) · the roll = §10 ·
+reward-FIRST (engine generates value bundle at quest birth; AI proposes KIND+label, engine grants) ·
+injury AI-judged at resolution, decoupled from tier (F5) · partial=half+liability / failure=0+AI-injury ·
+lore retrieval feeds genesis (recall→size-gated nano selector→genesis w/ write-back folded; ≤2
+round-trips) · leads region-scoped (location = a lorebook name, not a mechanical unit).
+
+**ECONOMY.md ⏳ (stale, F11)** — 20-tier GEOMETRIC value curve `6·1.9^(t−1)` (DROP old 5-tier
+common/uncommon/rare/legendary) · DROP rollTalents · MARKED value (card.value=target; tags=substance,
+may diverge) · injury value = tiers×V_base · reward-first bundle · debt = negative gold (vs liability).
+
+**LORE — new doc or §14/§16 promoted ⏳** — unified LoreNode · memory=EDGE (salience; CORE pinned
+never-decay; append+SUPERSEDE; enum type + direction convention; SOFT-DELETE active flag) · dossier =
+bounded top-K render over salience-ranked edges · retrieval pipeline (≤2 round-trips, batch/join) ·
+3-producer determinism · PURPOSE = continuity (1.00 vs 0.55).
+
+**TAGS.md / PROMPTS.md / UNIT_GENERATION.md ⏳ (stale)** — attribute names → STR/DEX/INT/CHA/CON
+(kill physical/agility/perception/willpower) · 20-tier · growth+focus not talents · archive superseded.
+
+**Cross-cutting principles to preserve everywhere** — engine owns NUMBERS, AI owns FLAVOR + bounded
+CATEGORICAL picks (never a raw number) · no single dominant strategy · prestige = master clock
+(prestige→expected-level mapping, #41) · F1 endgame raises comfort band→50 · F2 roll tier-blind
+(tier→value+prestige) · F3 gradual prestige-gated unlock · F4 Underdeep optional/4-spine keys ·
+F5 injury AI-judged decoupled · F6 3-producer determinism · F8 soft-delete.
+
+**Decision sections (source of truth):** §8 tags · §9b vocabulary · §10 roll · §11 injury · §12 rooms ·
+§13 regions · §14 lore · §15 slottables · §16 resolutions (F1–F8).
