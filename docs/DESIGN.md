@@ -19,7 +19,7 @@ Three distinct pleasures live across these loops. Pull any one and the others st
 2. **AI** — infinite quests, and each character acting as *uniquely themselves* in every outcome.
 3. **Loot** — tagged characters and items dropping; the rare perfect tag for an empty slot.
 
-The hinge that marries the loops: **tags are dual-use.** A character's tags set both their *odds on a quest* and their *prestige in a room* — and one character can't be in both places at once. Every assignment is an opportunity cost spanning the two loops.
+The hinge that marries the loops: **tags are dual-use, and loot allocation is the tension.** Mercs quest (tags → odds); captives and items staff rooms (tags → comfort). Every great card is an allocation choice — deepen a merc's bedroom (their cap) or a theme room (global prestige) — an opportunity cost spanning the two loops.
 
 ---
 
@@ -37,7 +37,7 @@ The player plans and commits, with **no results revealed**:
 ### Resolution Phase — everything rolls at once, then the AI narrates it all.
 - Every committed quest **rolls** (§5).
 - The AI **narrates each outcome**, giving every assigned character their own beat (§6, STORY_ENGINE.md).
-- **Loot lands**, captives are taken, characters are wounded or die, stories advance and spawn new leads.
+- **Loot lands**, captives are taken, characters are wounded (AI-judged), stories advance and spawn new leads.
 - The player reads the cascade — one **batched payoff** — then returns to Fort Phase.
 
 **Each character does one thing per cycle** (a quest, or staffing nothing — captives staff rooms, not mercs). The cycle is the unit of time; there is no separate "day" clock.
@@ -49,7 +49,7 @@ The player plans and commits, with **no results revealed**:
 The game is played across two boards at two speeds.
 
 ### Lead board — cheap, deterministic, the strategic surface
-A **lead is pure data**, no AI: `{ rarity, level, location, chain-info }` where `chain-info ∈ { continues an existing story · starts a new one · none }`. The player reads leads like loot filters and decides where to spend scarce effort. This is fun *before any story exists* — like a good map drop. The lead board is **dialed by the fort**: build a Scout post → leads appear in new locations; raise prestige → higher-rarity leads show up. It is the visible payoff of progression.
+A **lead is pure data**, no AI: `{ rarity, level, region, archetype, chain-info }` where `chain-info ∈ { continues an existing story · starts a new one · none }`. The player reads leads like loot filters and decides where to spend scarce effort. This is fun *before any story exists* — like a good map drop. The lead board is **dialed by the fort**: build a region's Scouting lodge → that region opens (+ its lead-hunting quests); raise prestige → higher-rarity leads show up. It is the visible payoff of progression.
 
 Leads **expire** (use-it-or-lose-it). What stocks the board each cycle: deterministic generation (gated by fort + prestige), plus "continue" leads from live stories, plus first-beat leads from new mercs' personal chains.
 
@@ -70,24 +70,23 @@ Characters are the atoms. Mercenaries (roster), captives (loot), and NPCs (world
 - **Their chains** — the quests they pass through (cast in others') plus the one chain about them (their main story). *The chains are their living memory and biography* — there is no separate psychological model. (See STORY_ENGINE.md for how this stays token-affordable.)
 - **State** — level/veterancy, wounds, fatigue, alive/dead/departed, current room (captives only).
 
-**The tag system:**
-- **One unified vocabulary** (~50–100 base tags) covering personality, physique, background, talent, faith. Small enough for the AI to treat as a known vocabulary. 🟡 full authoring is the big content job.
-- **Intensity tiers within an axis** — e.g. beauty `pretty → … → gorgeous` (higher = rarer drop).
+**The tag system** (🔒 LOCKED — authoritative: GENERATION_FLOW §8 + §9b):
+- **One unified vocabulary** (groups W1–W18, both species + stackables, locked) on a **20-tier scale in 4 bands** with a geometric value curve.
 - **Desirability is both rarity and context** — a higher tier is intrinsically better, but the real thrill is *fit*: a tag is "perfect" because it matches a quest's ask or a room's theme.
-- **Themed rooms, AI-adjudicated** — a themed room grants bonus prestige to tags that resonate with the theme; the AI decides the resonance dynamically.
-- **Mostly fixed** at acquisition (natural affinity, not grind-earned), with rare quest-stamped unique tags as growth.
-- **Mutex groups** prevent self-contradiction. 🛠 group list TBD.
+- **Themed rooms — player-styled, engine-scored** — a theme room is a concrete type + a player-applied style (renovation); the AI rolls type+style into a wanted-tag set **once**, the engine scores deterministically thereafter (`overlap`).
+- **Mostly fixed** at acquisition (natural affinity, not grind-earned); quest-stamped tags = deferred.
+- **Mutex/opposites** prevent self-contradiction (pickPolicy + `opposite`, locked in §8).
 
 ---
 
 ## 5. Resolution — the Sultan-coin roll 🔒-shape 🛠-numbers
 
-> **Authoritative detail: the roll math is in [CARDS.md](CARDS.md) §2; what's tested + the threshold + the resolution pipeline are in [QUESTS.md](QUESTS.md).** This section is the summary.
+> **Authoritative detail: the roll math is in [CARDS.md](CARDS.md) §3 + GENERATION_FLOW §10; what's tested + the threshold + the resolution pipeline are in [QUESTS.md](QUESTS.md).** This section is the summary.
 
 Engine owns the math; the AI narrates the result it's told.
 
 - The quest's **ask** + the assigned characters' relevant **tags/attributes** → a **coin count N** (better fit = more coins).
-- The quest carries a **threshold T**. Flip N coins → heads vs T → **success / partial / failure** (three outcomes, no critical — the jackpot lives at reward *generation*, not the roll). See [ECONOMY.md](ECONOMY.md) §5 for delivery (success = full · partial = half / keep+liability · failure = none + risk-gated punishment).
+- The quest carries a **threshold T**. Flip N coins → heads vs T → **success / partial / failure** (three outcomes, no critical — the jackpot lives at reward *generation*, not the roll). See [ECONOMY.md](ECONOMY.md) §5 for delivery (success = full · partial = half / keep+liability · failure = none; **injury is a separate AI-judged channel, decoupled from the outcome tier** — GENERATION_FLOW §11/F5).
 - **Odds are visible before commit** ("6 coins vs threshold 4 → ~78%"). This is what makes the min-max legible and what makes loss *owned* (§7) — you always knew the danger.
 - The engine tells the AI the outcome and the cast; the AI never invents numbers.
 - 🟡 exact thresholds and tag-vs-attribute weighting are open numbers (**fun before balance**).
@@ -100,36 +99,36 @@ The differentiator. In the Resolution Phase, each quest's outcome is written so 
 
 ---
 
-## 7. Risk & loss — TO DESIGN
+## 7. Risk & loss
 How a bad roll lands (wounds / death / departure) is not yet designed.
 
 ---
 
 ## 8. The progression loop 🔒-shape 🛠-numbers
 
-> **Authoritative detail: [GAME_STATE.md](GAME_STATE.md)** (two prestige pools, the progression spiral, staging buildings). This section is the summary; note the two-prestige model below supersedes any single-"prestige-gate" phrasing.
+> **Authoritative detail: [GAME_STATE.md](GAME_STATE.md)** (comfort→benefit, the progression spiral, staging) + [FORT.md](FORT.md). This section is the summary.
 
-The persistent base. It grows; it never resets. **Two prestige pools:** *comfort* (items in a merc's own room → that merc's level cap) and *global* (captives + items in theme rooms → **unlocks new rooms**, which then gate content). **Gold builds rooms**; prestige is the room-*availability* meter, not the build currency. **Functional rooms gate content (tiered); theme rooms generate prestige (flat).** Detail: [FORT.md](FORT.md).
+The persistent base. It grows; it never resets. Every comfort room computes **one number (comfort)** from its slotted cards → **one typed benefit**: a bedroom → its owner's level cap; **theme rooms → global PRESTIGE** (the master clock — it gates the **Great Hall tier ladder**, which unlocks rooms, upgrade depth, and regions); functional rooms → their unique bonus. **Gold is the cost, prestige the permission.** Rooms start with zero CardSlots; **upgrades add slots.** Detail: [FORT.md](FORT.md).
 
 ### 8.1 Captives — dual-use loot
 Quests produce **captives** carrying tags. Per captive you choose:
-- **Place in a tag-matched room** → prestige (the core progression act; a standing arrangement, not a per-cycle action).
-- **Recruit** → joins the roster (Game State, TBD).
-- **Ransom** (high gold, faction cost) / **Sell** (medium gold) / **Execute** (narrative weight).
+- **Break** (torture chamber → `obedient`) → **station in a room** → comfort/prestige (the captive-labor loop; a standing arrangement).
+- **Ransom / Sell** (gold).
+- *(Recruit only via a chain finale's reward kind; no other state-flow conversions in prototype — GAME_STATE §6.)*
 
 The choice is the fun: a `gorgeous`-tagged captive is a prestige drop *and* a future diplomacy asset *and* a ransom payday — pick one.
 
 ### 8.2 Rooms — the tech tree
 Rooms gate on **prestige** to build, and do three jobs:
-1. **Capability** — unlock new quest types/locations (Scout post → lead-hunt quests; Dungeon → hold captives + capture quests; Tavern → recruit pool).
-2. **Theme/prestige** — tag-matched captive/follower slots (Kitchen=cooking, Chapel=devout, Library=scholar…); AI adjudicates theme-fit bonus.
+1. **Capability** — unlock features/regions (Map room → quests; a region's Scouting lodge → that region + lead-hunt quests; Dungeon/cells → captives; Tavern → recruits).
+2. **Theme/prestige** — generic CardSlots for obedient captives + items (Kitchen, Gallery, Menagerie…; catalog in GENERATION_FLOW §19); themes player-styled, engine-scored.
 3. **Housing** — **Bedrooms cap the roster** ("the constraint is bedrooms").
 
 ### 8.3 Prestige — gate and score
 Prestige is earned from tag-matched captives/followers in rooms. It is both the **gate** (rooms have prestige requirements) and a **score** that raises recruit quality and unlocks higher-stakes content. Ladder: *prestige → unlock room → room unlocks quests + makes more prestige → higher prestige → better rooms & recruits.*
 
-### 8.4 Recruitment & captives — TO DESIGN
-How mercs enter the roster and how captives flow (recruit / room / ransom / sell) is part of the **Game State** design, not yet done.
+### 8.4 Recruitment & captives
+Designed — staging + dispositions in [GAME_STATE.md](GAME_STATE.md) §6 (Tavern hires; captive break/station/ransom/sell; no conversions).
 
 ---
 
@@ -141,7 +140,7 @@ There is **no separate story system the player touches** — only the board, kep
 
 ## 10. Deferred (intentionally) 🟡
 
-- **Artifacts** — tagged items (equipment boosts a character's quest odds; furniture boosts a room's prestige). Extra loot-dopamine that rides the *same* tag/fit/prestige rails. Slot reserved: keep those systems **item-agnostic** ("a tag-bearing thing that boosts a quest or a room") so artifacts drop in later with zero rework. Detail deferred — not where the fun-risk is.
+- **Artifacts/items** — tag-bearing cards slotted into rooms → **comfort** (never the roll — only characters touch dice, CARDS §1). The loot-dopamine rides the same tag/fit rails.
 - **All balance/economy numbers** — fun before balance (user directive).
 - **AI prompt/schema specifics** — implementation, in STORY_ENGINE.md and code.
 
