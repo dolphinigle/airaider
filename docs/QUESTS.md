@@ -53,8 +53,8 @@ Spend the expensive generation only where the story matters:
 
 | chain-info / rarity | Generated | Cost |
 |---|---|---|
-| `none` (common) | **no bible** — a light/templated card from {archetype + location}, generic loot | cheap |
-| `starts-new` (uncommon) | **genesis a bible** casting **new** characters from the location sub-pool → beat-1 card | full |
+| `none` (common) | **no bible** — a light/templated card from {archetype + region}, generic loot | cheap |
+| `starts-new` (uncommon) | **genesis a bible** casting **new** characters from the region sub-pool → beat-1 card | full |
 | `starts-new` (rare) | bible weaving in **known** characters (the apex) → beat-1 card | full |
 | `continues-X` | **load bible X + state** → beat-N card reacting to prior beats; check if at climax → finale | medium |
 

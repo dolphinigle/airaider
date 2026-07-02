@@ -26,7 +26,7 @@
 
 ## 4. Who writes what 🔒 *(the 3-producer model, GAME_STATE §2)*
 
-Engine: seeded math, edge bookkeeping, salience decay, GC-to-inactive. AI-creative (persisted): bibles, prose, dossiers/blurbs, memory-edges, importance/core flags, room theme-tags. AI-pickers (discarded): the selector. Reload re-runs nothing.
+Engine: seeded math, edge bookkeeping, salience decay, GC-to-inactive, **dossier/blurb rendering**. AI-creative (persisted): bibles, prose, memory-edges (+ per-edge blurbs), importance/core flags, room theme-tags. AI-pickers (discarded): the selector. Reload re-runs nothing.
 
 ## 5. Player-facing 🔒
 The **Chronicle room** (FORT §5) exposes the full graph — including inactive history — as the browsable world archive. The **Library** exposes the NPC/lore roster.

@@ -42,7 +42,7 @@ focal character, worth many merc-cycles) **must accrue over the beats and pay at
 
 `realizedBank` = `chain.bank` (incl. the finale beat). `focalTarget` = `focal.value`.
 
-- **Finale failure** → quest failed → **0 reward**: focal lost (grief), **bank forfeited**, + risky
+- **Finale failure** → quest failed → **0 reward**: focal lost (grief), **bank forfeited**, + any
   punishment. (ECONOMY §5 failure row; user "failure quest = 0".)
 - **Win them over / subdue (recruit/captive)**:
   - `bank ≥ focalTarget` → deliver focal (clean/wounded) + `round(bank − focalTarget)` gold (surplus).

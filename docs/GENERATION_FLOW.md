@@ -51,8 +51,7 @@ CURRENT: resume the DOC-REDO per §17 checklist (GAME_STATE/QUESTS/ECONOMY/LORE/
 retouch for §18–§20).
 After all design: the LEAN-DOC TRANSFORM (commit checkpoint → rewrite every doc to
 END-result-only / implementable, verify each claim vs chat history → archive superseded docs
-TAGS.md/UNIT_GENERATION.md/scratch). Also still-stale from the revamp: PROMPTS.md attribute
-names (physical/agility/willpower) → fix in the transform. BIG PICTURE ([[v3-docs-finalization]]):
+TAGS.md/UNIT_GENERATION.md/scratch). (PROMPTS.md attribute names — FIXED 2026-07-03 in the doc-redo.) BIG PICTURE ([[v3-docs-finalization]]):
 finalize ALL system docs → build prototype v3.
 Parked: band display names (display-only). Tag-system IMPLEMENTATION (#30) waits until the
 docs are finalized. The §9b GROUP PASS is COMPLETE (see "§9b CONTENT WALK" +
@@ -1025,7 +1024,7 @@ heal-skill occupant slot so healers have a job) and a higher *upgrade* that unlo
 Goals hit: I1 stakes · I2 roll-coupled · I4 gold-sink + medical rooms · I5 recoverable · I6
 escalation/death. (I3 "CON's job" — dropped, out of scope.)
 
-## §12 — FORT ROOM CATALOG (design IN PROGRESS, started 2026-06-14) — #36
+## §12 — FORT ROOM CATALOG (historical; superseded by §18–§19 — ⚠ mentions of "2 prestige pools"/"death cap" are pre-revision) — #36
 (Builds on FORT.md's spatial model: side-view cells, 1 room/cell, 2 prestige pools. Will consolidate
 into FORT.md in the lean transform.)
 

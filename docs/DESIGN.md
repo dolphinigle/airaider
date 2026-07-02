@@ -100,7 +100,7 @@ The differentiator. In the Resolution Phase, each quest's outcome is written so 
 ---
 
 ## 7. Risk & loss
-How a bad roll lands (wounds / death / departure) is not yet designed.
+**Wounds are designed:** a bad roll costs the reward (failure = nothing) and can leave **AI-judged injuries** (severity band → tiers → a flat coin penalty until healed; costs merc-time + gold — GENERATION_FLOW §11/F5, ECONOMY §5). **Death is deliberately ignored in the prototype** (a maxed-out unit is long-term out, never dead). 🟡 **Deeper loss (departure / bitter exits) is the open designer question** — review flagged that without it, stakes-on-people are thin; a cheap candidate: injury-cap breach → the merc quits bitter, persisting in the lore graph as a recurring NPC.
 
 ---
 

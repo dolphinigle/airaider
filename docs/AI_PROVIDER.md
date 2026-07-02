@@ -140,7 +140,7 @@ Strict JSON Schema with a `narrative` string field nested inside the structured 
 ```json
 {
   "narrative": "Marek mutters a prayer under his breath as he climbs the rope. His Strong Physical holds him steady; his superstitious tag whispers warnings he can't quite ignore...",
-  "attributes_used": ["physical", "willpower"],
+  "attributes_used": ["strength", "constitution"],
   "tags_invoked": ["muscular", "superstitious"],
   "sultan_coin_target": "reach the upper window without alerting the guards",
   "sultan_coin_band": "favorable",
