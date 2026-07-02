@@ -21,9 +21,11 @@
  5. set THRESHOLD                        │
         — Fort Phase: assign cards —     │
  6. END DAY → roll → success/partial/fail│
-                                         │ 7. write the outcome story
+                                         │ 7. ONE batched call: outcome story +
+                                         │    dossier updates + memory-edges +
+                                         │    injury severity band (LORE.md)
  8. deliver bundle (full / half+liability│
-    / none + risk-gated punishment)      │
+    / none); map injury band → tiers     │
  9. continue chain / spawn leads         │ (finale → epilogue + sequel lead)
 ```
 
@@ -35,10 +37,10 @@ Each cycle the board is topped to capacity with three kinds of lead:
 - **Personal-chain leads** — beat-1 of a newly-joined merc's main chain.
 - **Fresh leads** — fill the rest, rolled by the engine.
 
-A **lead** is pure data: `{ rarity, level, location, archetype, chain-info }`.
+A **lead** is pure data: `{ rarity, level, region, archetype, chain-info }`.
 
 The **fresh-lead roller** is the "fort dials the board" mechanism — four constrained rolls:
-- **location** — from *unlocked* locations (fort/Scout expands them); implies a local sub-pool of characters/landmarks to cast from.
+- **region** — from *unlocked regions* (GENERATION_FLOW §13; a region's Scouting lodge opens it + its repeatable lead-hunting quests). The region sets the level band + the casting sub-pool; any finer "location" is just a **lorebook name** on the quest (flavor, not a mechanical unit).
 - **rarity** — weighted; the **ceiling rises with prestige**. Mostly common; rare is scarce (and is where known-cast + big rewards live).
 - **level** — banded around the roster (always doable work) + occasional stretch.
 - **archetype** — the kind of job (raid / capture / rescue / escort / investigate / hunt / contract…), gated by fort capability (capture needs a Dungeon; lead-hunt needs a Scout). Does triple duty: info for the player's pursue decision, a seed for AI generation, and the bias for the reward kind.
@@ -64,18 +66,18 @@ The unifying rule: **the engine determines the reward first; a one-off dresses i
 
 This makes the payoff a person you've spent the whole arc with — you *know* them before you get them. The **vague direction** ("likely ends with a powerful recruit") gives the AI a climax to write toward *and* the player a visible long-horizon goal. But the **fate is play-determined**: the engine sets the *likely* outcome, the finale **roll** decides the *actual* one (success → they join clean; partial → they join wounded / owing a debt; failure → they die / escape / become a bitter captive). You can lose the character you spent a saga earning — the gamble stays real. Most chains are character-focal (for attachment); occasionally a chain is built around a non-character prize (a legendary artifact, a faction alliance) for variety.
 
-One-offs are **progression fuel** — the steady supply of tagged captives + gold that feeds the fort — not narrative. Their pipeline: (1) engine generates the **reward at quest-birth** (kind + value + tags, fixed then) + a templated card + ask (zero AI for common; richer for rare); player sees the reward **envelope**; (2) assign → roll → **success / partial / failure**; (3) the outcome **applies a consequence, never rescaling the unit** (success → reward clean; partial → reward + a **negative-gold liability card** — `evidence` / `a mess` / `a debt`; failure → lose the reward + a consequence, rarely a death); (4) **one cheap AI call** writes the outcome line (individuating the assigned merc) *and* names/describes any acquired captive. Anti-sameness = varied archetype→ask + the loot lottery, not bespoke prose. No bible, no chain.
+One-offs are **progression fuel** — the steady supply of tagged captives + gold that feeds the fort — not narrative. Their pipeline: (1) engine generates the **reward at quest-birth** (kind + value + tags, fixed then) + a templated card + ask (zero AI for common; richer for rare); player sees the reward **envelope**; (2) assign → roll → **success / partial / failure**; (3) the outcome **applies a consequence, never rescaling the unit** (success → reward clean; partial → reward + a **negative-gold liability card** — `evidence` / `a mess` / `a debt`; failure → lose the reward; injuries = the AI-judged channel above, any outcome); (4) **one cheap AI call** writes the outcome line (individuating the assigned merc) *and* names/describes any acquired captive. Anti-sameness = varied archetype→ask + the loot lottery, not bespoke prose. No bible, no chain.
 
 The structured card below and the story-first reward flow (§4–5) apply to **chain** quests.
 
 The card is the structured, friendly form (situation / job / stakes) from STORY_ENGINE.md — **plus the ask:**
 
 ### The ask — engine owns the slot *count* + threshold; AI authors the *requirements* + what's tested
-The **engine** sets the **slot count N** (derived from the lead's archetype — a duel is 1, a siege is many) **before** generating the reward, because `V` depends on `N` (a one-off can't wait on the AI for it). The **AI** then authors, per slot:
-- **what's tested** — which attribute(s) + which tags this job checks;
-- **slot requirements** — `open` / `must be <merc>` / `must have <tag>` (a quest about *Marek's* past has a *must-be-Marek* slot; a personal-chain beat pins its anchor this way — no separate engine rule).
+A quest's party slots are **CardSlots** (CARDS §2) + quest-only data `tested{attribute, favored, clashing}` and `groupId` — the same slot concept rooms use. The **engine** sets the **slot count N** (from the lead's archetype — a duel is 1, a siege is many) **before** generating the reward, because `V` depends on `N`. The **AI** then authors, per slot:
+- **what's tested** — the attribute + favored/clashing skills this job checks;
+- **slot requirements** — `open` / `must-be <merc>` / `must-have <tag>` (a quest about *Marek's* past pins a *must-be-Marek* slot).
 
-The **engine** then sets the **threshold** = f(N, level). Engine owns *how many* + *how hard*; AI owns *who fits* + *what's tested*. The player chooses **who fills the slots**, never how many.
+The **engine** then sets each slot's **threshold** per the locked roll (GENERATION_FLOW §10): it rolls a per-slot **difficulty E** (trivial .25 / standard .5 / hard 1.0 / brutal 1.5 / extreme 2.0) → `threshold = E × U(level)/2`; multi-attribute tests pool one unit's tested attributes with the bar ×(n+1)/2. Engine owns *how many* + *how hard*; AI owns *who fits* + *what's tested*. The player chooses **who fills the slots**, never how many.
 
 ## 3. Fort Phase — assign
 Player assigns mercs respecting party size + required units, sees the visible odds (coins vs threshold), commits. No results yet.
@@ -93,7 +95,9 @@ The engine rolls coins vs threshold → **success / partial / failure**, hands t
 **The reward is generated at quest birth** (value → split → `generateCard`; full detail in [ECONOMY.md](ECONOMY.md)). The roll only scales it **down**, never rescaling a unit:
 - **success** → the full bundle;
 - **partial** → **half**: keep the unit + a **liability card** (`evidence`/`mess`/`debt`) sized to net V/2 *(a focal character survives, just saddled with it)*, or give V/2 in gold if it's not worth keeping;
-- **failure** → nothing; and **only on a risky quest**, the AI proposes a **punishment** (injury/debt) within an engine-set envelope.
+- **failure** → nothing.
+
+**Injury is a separate, AI-judged channel, decoupled from the outcome tier** (GENERATION_FLOW §11, §16-F5): at resolution the AI judges from the fiction whether each party member is hurt and picks a **severity band** (none/low/med/high) — typically on failure, *sometimes none even on failure*, occasionally a minor one on a costly partial. The engine maps band → injury tiers → a flat coin penalty until healed. (There is no "risky" flag; the AI's judgment replaces it. Death is ignored in the prototype.)
 
 So you keep a hard-won focal character even on a *partial* — you only **lose** them on a *failure*. No value-rescaling anywhere; the outcome composes a down-scaled bundle.
 
@@ -137,9 +141,9 @@ So you keep a hard-won focal character even on a *partial* — you only **lose**
 | 5 | AI | HANDOFF: write card + author ask (requirements + what's-tested) + **flesh** framed char |
 | 6 | Engine | threshold = f(N, level) |
 | 7 | Player | fill N slots (respect requirements) → End Day |
-| 8 | Engine | roll → success/partial/failure → **compute delivery** (full / half+liability / none+punishment) |
-| 9 | AI | narrate (before→after); **flesh/name** the delivered card(s) |
-| 10 | Engine | apply |
+| 8 | Engine | roll → success/partial/failure → **compute delivery** (full / half+liability / none) |
+| 9 | AI | ONE call: narrate (before→after) + **flesh/name** delivered card(s) + injury **band** per merc + memory-edges/dossier updates ([LORE.md](LORE.md)) |
+| 10 | Engine | apply; map injury band → tiers |
 
 **Chain = genesis (build the bible) → linear beats (quest-writer) → branched finale.**
 
@@ -165,8 +169,8 @@ engine: focal character @ value V ─────────────┤   f
 |---|---|---|
 | 1 | Engine | trigger; rarity → **stakes** (sets cast size + why-ladder depth), beats `B`, slots `N`, `V = V_base×rarity×(B×N)` |
 | 2 | Engine | pre-generate the **focal character @ V** (role-agnostic tags) = the chain's **reward** *(main chain: focal = the joining merc)* |
-| 3 | Engine | pick a **seed** from the seed bank (Polti-anchored "what-if" spark, weighted by stakes/region, anti-repeat); build the **slate** = focal + region pool sample + fort roster |
-| 4 | AI · **GENESIS** | collide seed × slate → one-line **kernel**; choose **1–3 core** people the spark lands hardest on (**focal must be core**); flag `newRoleNeeded` only if no pool fit |
+| 3 | Engine | pick a **seed** from the seed bank (Polti-anchored "what-if" spark, weighted by stakes/region, anti-repeat); build the **slate** via LORE RETRIEVAL ([LORE.md](LORE.md)): ranked recall over the focal's memory-edges (1–2 hops + wildcards) → optional nano **selector** picks who gets full dossiers (≤2 LLM round-trips total incl. genesis) |
+| 4 | AI · **GENESIS** | collide seed × slate → one-line **kernel**; choose **1–3 core** people (**focal must be core**); **write-back folded into the same response**: relevant ids + new entities/places + new memory-edges (engine persists, guarded) |
 | 5 | AI · **BUILD** | per core person: ladder *why?* → `history`; `feels` → emergent `conceals` (most conceal nothing); **commit-to-truth**; reuse pool first / coin few; edge cast shallow → `cast` + `situation` + `tensions` + `openDirections` |
 | 6 | Engine | persist bible (hidden); spawn **beat-1 lead** from an `active` openDirection (its hook = `drivingHook`) |
 
