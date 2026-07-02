@@ -1552,3 +1552,67 @@ everywhere.
   The force-slot concept stays canon; its comfort bite gets designed when liabilities ship.
 - **Cap-downgrade** (unslot/re-theme drops a bedroom's comfort below the owner's level) — **keep
   level, can't grow**: levels never regress; the merc just can't level further until comfort recovers.
+
+---
+
+## §19 — ROOM CATALOG: classified (walkthrough 2026-06-22) ✅ — #36 step 1
+
+Every room is one of two SPECIES: **pure gate** (build once; no comfort/slots/upgrades) or **comfort
+room** (slots via upgrades; comfort → ONE typed benefit, §18). Class: PROTO / AFTER / NOT.
+
+**Core gates:** Map room (PROTO gate, FIRST build → quests) · Lead room (PROTO gate → leads menu;
+leads come from quests + lead-HUNTING quests, NOT restocks) · Mess hall (PROTO gate → merc list) ·
+Storage (PROTO gate → item menu; **NO capacity mechanics anywhere, ever** — inventory unlimited) ·
+Market (PROTO comfort → buy/sell prices) · Library (PROTO gate → lore/NPC menu) · Oracle (PROTO
+comfort → odds precision, U1 coarse → exact) · Chronicle room (PROTO gate → browse memory/lore
+archive) · Workshop (AFTER gate → craft) · Quartermaster (NOT).
+
+**GREAT HALL (PROTO)** — the TIER SPINE: upgradable T1→Tn, **NO slots**; each tier = gold + a
+global-prestige threshold; **each tier unlocks the next tier of buildings** (the tech tree made
+physical; the master clock embodied).
+
+**Housing:** **Bedroom — ONE type** (owner = you OR a merc; yours pre-built day 0; merc bedrooms
+grant +1 roster slot each, yours doesn't) PROTO comfort → owner's level cap · Bunkroom (PROTO
+starter; bedroom-less mercs at a low cap floor) · Tavern (PROTO gate → new-recruits menu) · Veteran
+hall (NOT — bedrooms grant roster) · Guest quarters (AFTER).
+
+**Captive line:** Dungeon (PROTO gate → captive list) · Holding cell (PROTO gate → new captives) ·
+Dungeon cell ×N (PROTO **capacity-only**: no comfort/upgrades, build more; MULTIPLE captives/cell) ·
+Ransom office (PROTO comfort → prices) · Torture chamber (PROTO comfort → break speed) ·
+Interrogation room (PROTO comfort → LEADS only) · Slave pens (NOT — stationed captives live in their
+work slot; cells hold raw + idle) · Auction stage (NOT).
+
+**Training rooms (tag-teaching family): NOT PLANNED entirely.**
+
+**Medical:** Infirmary (PROTO comfort → heal speed ONLY) · Hospital = its top tier (PROTO; building
+it gates PAY-GOLD instant heal; comfort → small +prestige) · **DEATH IS IGNORED IN PROTOTYPE** (trims
+§11: no death at max tiers — unit is just long-term out; no death-cap, no cap-extending buildings) ·
+Trauma sanctum / Apothecary (NOT).
+
+**Region rooms (× 4 spine + optional Underdeep):** Scouting lodge (PROTO **pure gate** — opens the
+region + its repeatable lead-hunting quests; quest QUALITY comes from slotting the right units into
+the quests, not room comfort) · Recruiting post (PROTO pure gate — region recruit quests) · Training
+hall (AFTER — catch-up XP quests) · Endgame building (PROTO **pure landmark**, no comfort/slots;
+prestige+gold gated; raises comfort band → cap 50; 4 spine = Outskirts keys).
+
+**PRESTIGE rooms (one family, benefit = +global prestige EXCLUSIVELY — no passive gold, no upkeep,
+no second channel).** Concrete TYPE + player-applied STYLE theme (renovation; AI rolls wants ONCE
+from type+style — revises §18's abstract "shells"). Tiered by canvas-breadth × loot-fit confidence:
+- **TIER 1 (bulletproof):** Dining hall · Kitchen · Smithy · Garden · Gallery · Trophy room · Hall of
+  arms · Shrine · Music hall · Menagerie · Treasure vault · Curiosity cabinet
+- **TIER 2 (solid, narrower):** Crypt · Gambling den · Bathhouse · Reading room · Brewery · Stables ·
+  Farm plot · Bakery · Theatre stage · Feast hall · Greenhouse/fountain court · Aviary/falconry/
+  kennel · Tapestry/portrait halls · Map chamber/observatory
+- **TIER 3 (niche/filler):** tea parlor · perfumery · silk lounge · opium den · steam room · apiary ·
+  herbarium · jewel room · clockwork room · bone chapel/idol vault/ritual circle/séance · duelling
+  ring · beast pit · banner/memorial/champions' halls · hall of mirrors · hedge maze · rooftop
+  terrace · gallows yard · head-spikes · plague memorial · taxidermy · antiquities · aquarium ·
+  laundry/scullery · smokehouse · granary/mill · sewing room · tannery · well
+- How many per stage ships = decided in the PRESTIGE pass (#41 step 2/3).
+
+**CUT:** faith/dark choice axis (chapel-vs-dark-altar — invents new mechanics; shrine/crypt cover the
+fantasy as prestige rooms) · structural walls/defense (no fort-attack system).
+
+NEXT: #41 step 2 — prestige MATH skeleton (master clock prestige→level map · comfort→cap curve +
+endgame band lift · Great-Hall-tier threshold curve · band archetypes · k · benefitCurves), then
+step 3 assignment (bands/costs per room → build-order TABLE → simulate the timeline).
