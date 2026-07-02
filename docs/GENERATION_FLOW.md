@@ -47,8 +47,16 @@ sim-verified §20.1 · (3) catalog-tied assignment §20.2 — TWO independent si
 (T15≈2,000–2,320c ≈100–115h; greedy P-rush SLOWER than humans; convergent rules: measured+monotonic
 thresholds · loot −30% · asymptote-aware early tiers (≥3 prestige rooms by T1) · re-theming agency
 REQUIRED · replacement staffing · bedroom depth drives cap; build-order TABLE recorded).
-CURRENT: resume the DOC-REDO per §17 checklist (GAME_STATE/QUESTS/ECONOMY/LORE/TAGS + CARDS/FORT
-retouch for §18–§20).
+DOC-REDO ✅ EXECUTED 2026-07-02/03 (overnight mandate): all §17 items — CARDS/FORT/GAME_STATE/
+QUESTS/ECONOMY/DESIGN rewritten-or-retouched, LORE.md NEW canonical, TAGS/UNIT_GENERATION/WIP
+archived, PROMPTS/AI_PROVIDER/REWARD_BANK/QUEST_BIBLE banners+fixes, README reordered. 3 independent
+reviews (consistency / design-fun / implementability ~70–75% buildable) + fix pass + round-2
+verification + must-fixes → SHIP. Review-resolved into canon: leads EARNED not restocked · AI
+proposes reward kind, engine grants (F6) · pooled aggregation Σcoins vs Σthresholds (partial 0.6×) ·
+odds baseline always-raw, Oracle adds computed % · genesis=1 call · engine renders dossiers from AI
+edges. OPEN DESIGNER DECISIONS: (1) LOSS/stakes design (reviews' top issue — departure/bitter-exit
+candidate) · (2) ambient lead-trickle floor y/n · (3) known-cast cadence target · (4) torture-chamber
+throughput spec+sim · then → BUILD PROTOTYPE V3.
 After all design: the LEAN-DOC TRANSFORM (commit checkpoint → rewrite every doc to
 END-result-only / implementable, verify each claim vs chat history → archive superseded docs
 TAGS.md/UNIT_GENERATION.md/scratch). (PROMPTS.md attribute names — FIXED 2026-07-03 in the doc-redo.) BIG PICTURE ([[v3-docs-finalization]]):
