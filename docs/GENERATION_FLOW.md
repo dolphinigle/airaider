@@ -1493,3 +1493,50 @@ F5 injury AI-judged decoupled · F6 3-producer determinism · F8 soft-delete.
 
 **Decision sections (source of truth):** §8 tags · §9b vocabulary · §10 roll · §11 injury · §12 rooms ·
 §13 regions · §14 lore · §15 slottables · §16 resolutions (F1–F8).
+
+---
+
+## §18 — ROOM MODEL UNIFIED: comfort → one benefit + CAPTIVE LABOR ✅ CONFIRMED 2026-06-22 — #36
+
+Refines §15/§16-F3. Supersedes the display/occupant slot-kind split and "all non-bedroom prestige sums
+to global."
+
+### One number, one benefit per room
+```
+comfort(room) = band-curve( Σ overlap(slotted cards' tags, room theme) )   ← the ONE number
+benefit(room) = benefitCurve( comfort )                                     ← ONE benefit, typed per room
+```
+- **RENAME:** the per-room fit-derived number = **"comfort"** (every room, not just bedrooms).
+  **"Prestige"** = the GLOBAL progression currency only.
+- **One benefit channel per room — NO double-dipping:**
+  - **Theme rooms** → benefit = **+global PRESTIGE** (that is ALL they do; the prestige generators).
+  - **Merc bedroom** → benefit = the owner's **level cap**.
+  - **Functional rooms** → benefit = their **unique bonus** (infirmary heal speed, scout lead quality,
+    market prices…) — and **NOT** global prestige.
+- Everything is `overlap` → comfort → per-RoomType benefitCurve ("prestige multiplier"). Engine-owned.
+  All curve numbers → #41.
+
+### Slots are GENERIC + the CAPTIVE-LABOR loop
+- **CardSlot is the one generic concept** (quests and rooms both have CardSlots). The old room slot
+  "kinds" collapse into the slot's **`accepts` list**; the only special slot = a bedroom's **owner**.
+- Each upgrade = **+1 generic slot**; a room slot accepts **items OR obedient captives** (both scored
+  by the same `overlap` vs the room theme). ~3–6 slots/room via upgrades (grand late rooms up to ~8).
+  No display-vs-occupant split, no authored slot-ladder.
+- **THE LOOP:** capture → hold (cells) → **break** (torture chamber → `obedient` tag) → **station in
+  rooms** → comfort ↑ → benefit ↑. **Captives are core loot** — every room is a collection puzzle
+  ("find a gorgeous singer for the music hall") → the FUN + game-length engine (keep hunting better
+  fits region after region, re-theme + upgrade all campaign).
+- **Mercs are NOT stationable** — mercs quest; their fort presence = their own bedroom (owner slot).
+  (Merc stationing later = one `accepts` flag if ever wanted.) Exceptions via `accepts`: **cells** =
+  captive-only (raw/unbroken ok — holding, not working) · **bedroom** = owner + item slots.
+- Staffing example: a kitchen wants `skill:food` — a captive cook or a copper cauldron both fit; the
+  cook's rarer tags fit better. A well-appointed infirmary (items + a broken healer) heals faster —
+  one rule, no exceptions.
+
+### ⚠ §17 checklist impact — CARDS.md + FORT.md need a RETOUCH in the doc-redo
+Both were rewritten before this refinement and now carry superseded bits: CARDS §2 room slot kinds
+(display/occupant/captive/owner → generic accepts + owner), CARDS §5 / FORT §3 "non-bedroom prestige
+sums to global" (→ only THEME rooms feed prestige; functional rooms' comfort → unique benefit),
+FORT §2 occupant→function hook (→ benefit = curve(comfort), captive labor not merc staffing), FORT §6
+open-gaps list (occupant-hook resolved by this section). Also propagate the comfort/prestige RENAME
+everywhere.
