@@ -34,12 +34,11 @@ A **CardSlot** is one spot that holds a Card. **Quests and rooms have CardSlots*
 ```
 CardSlot { accepts: CardClass[]; requirement: open | must-be <card> | must-have <tag>; filledBy? }
    + on a QUEST slot:  tested { attribute, favored, clashing }, groupId   (approach-branch)
-   + on a ROOM slot:   kind: display | occupant | captive | owner
 ```
 When slotted, a Card's `location` is a CardSlot reference (`quest:<id>#2` / `room:<id>#1`); otherwise it is a holding state (roster / inventory / limbo / staged). One placement model for both hosts.
 
 - **Quest slots** by accepted class: *party* (character; carries the `tested` attribute + favored/clashing skills) · *cost* (gold) · *requirement* (item/consumable, consumed).
-- **Room slot kinds**: *display* (item/furniture → prestige) · *occupant* (a working merc → prestige **+** a room FUNCTION, e.g. heal speed) · *captive* (a captive → capacity **+** prestige) · *owner* (one merc; binds a bedroom's theme target to its owner).
+- **Room slots are GENERIC** — differentiated only by `accepts`: a normal room slot accepts **items OR obedient captives** (both are just tagged cards to `overlap()`); a **cell** slot accepts captives only (holding, raw ok); a bedroom's **owner** slot holds exactly one merc (it *binds the room's target* to that merc's own tags — not scored itself). **Mercs are never stationable in room slots** — mercs quest; captives and items staff the fort (see §5, the captive-labor loop).
 - **Requirement** — `open` / `must-be <card>` / `must-have <tag>`.
 - **Fill rule** — a quest needs **all party slots filled** (no partial sends; the threshold assumes N). A room scores whatever is filled.
 - **Mutex (branches)** — quest approach-groups are mutually exclusive: filling one locks the others.
@@ -56,7 +55,7 @@ Mercenaries, captives, and NPCs are all `class:character`, distinguished by `rol
 - **Tags** — identity + fit + the loot dopamine. **Personality IS tags.** Plus AI-generated **quirks**.
 - **Attributes** — five scalars: **Strength · Dexterity · Intelligence · Charisma · Constitution** → the **coin count** (the only thing that generates dice).
 - **Growth (replaces "talents")** — a fixed-sum **base** vector (random distribution = birth lean; flat L1 floor) + a fixed-sum **growth** vector reshaped by the player-assigned **FOCUS** (single → one GREAT stat · dual → two GOOD · none → generalist). No rolled talents. (Detail: GENERATION_FLOW §10.)
-- **Level** — grown by quest-XP toward a cap = **`3 + 0.9 × comfort`** (the merc's own bedroom prestige; soft cap ~40, region endgame buildings lift it → 50). Items feed power *only* through comfort, never the roll.
+- **Level** — grown by quest-XP toward a cap = **`3 + 0.9 × comfort(their own bedroom)`** (the bedroom's comfort band tops out ~40 under normal play; region **endgame buildings raise the band → cap ~50**). Items feed power *only* through this channel, never the roll.
 - **who + backstory** — AI-written at acquisition, fitting the tags.
 - **Chains / dossier** — the sagas a character passes through are its **living dossier** (no separate psychological model; see GENERATION_FLOW §14).
 
@@ -79,13 +78,16 @@ Items are `class:equipment | furniture | consumable` — **ilvl + tags, no attri
 
 ---
 
-## 5. Prestige — the main progression (detail in FORT.md, GENERATION_FLOW §15) 🔒
+## 5. Comfort, prestige & the captive-labor loop — the main progression (detail in FORT.md) 🔒
 
-Cards slotted into a room's CardSlots generate **prestige**, the spine of progression: you raise prestige to advance. One formula per room (a saturating band over the slotted cards' `overlap` fit). Then, by room:
-- a **bedroom's** prestige (= "comfort") sets **its owner merc's level cap** — *its only effect*;
-- **every other room's** prestige is **summed into global prestige**, which unlocks new buildable room-types.
+Every room computes **ONE number — its "comfort"** — a saturating band over the slotted cards' `overlap` fit vs the room's theme. Comfort drives the room's **ONE typed benefit** (no double-dipping):
+- **Theme rooms** → **+global PRESTIGE** — the progression currency, exclusively theirs to generate;
+- a **bedroom** → its **owner merc's level cap** (and nothing else);
+- **functional rooms** → their **unique bonus** (infirmary heal speed, market prices, torture-chamber break speed, oracle odds-precision…) — *not* prestige.
 
-A room starts with **zero CardSlots** and gains them by **upgrading** (gold); its **theme** (the `wants` tags `overlap` scores against) is **player-assigned via renovation** (gold), and the AI rolls the theme into a tag set **once**, which the engine then scores deterministically.
+**Prestige is the master clock**: it gates room **unlocks AND upgrades** (gold is the cost, prestige is the permission), quantized by the **Great Hall's tiers** (each tier = an act that unlocks the next batch of buildings). A room starts with **zero CardSlots**; each upgrade adds one. A theme room is a **concrete type** (Dining hall, Gallery, Menagerie…) plus a **player-applied STYLE** (renovation, gold): the AI rolls type+style into a wanted-tag set **once**; the engine scores deterministically forever after.
+
+**The captive-labor loop** (who fills all those slots): capture → hold (cells) → **break** (torture chamber → `obedient`) → **station in rooms**. Captives and items are the fort's workforce and its collection game — every room is a puzzle of finding better-fitting cards, refreshed each region by higher-tier loot. Mercs never staff rooms; they quest.
 
 ---
 
