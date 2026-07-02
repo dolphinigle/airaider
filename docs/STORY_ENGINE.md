@@ -90,7 +90,7 @@ v1 cards read unfriendly and "didn't feel like a quest" because the prompt licen
 
 ## 7. Individuated resolution (the differentiator) 🔒
 
-The outcome is where "each character does something uniquely their own" must land. The resolver is told the outcome (**success / partial / failure**) and the assigned cast, and must **give each assigned character their own distinct beat, driven by their tags + quirks + dossier — never narrate the party as a blob.** Same terse, concrete, readable voice as the card. Reveals only what the outcome permits; the bible's past truth is immutable — outcomes bend only the future (who now knows what, who reacts, what is set in motion). On failure of a risky quest, the resolver also proposes a **punishment** (injury/debt/liability) within the engine's envelope.
+The outcome is where "each character does something uniquely their own" must land. The resolver is told the outcome (**success / partial / failure**) and the assigned cast, and must **give each assigned character their own distinct beat, driven by their tags + quirks + dossier — never narrate the party as a blob.** Same terse, concrete, readable voice as the card. Reveals only what the outcome permits; the bible's past truth is immutable — outcomes bend only the future (who now knows what, who reacts, what is set in motion). The resolver also judges each assigned character's **injury severity band** (none/low/med/high) from the fiction — any outcome, decoupled from the tier (GENERATION_FLOW §11/F5); the engine maps the band to tiers. Partials' liabilities are engine-composed.
 
 ### 7a. The roll IS the dramatic beat 🔒 (the heartbeat)
 

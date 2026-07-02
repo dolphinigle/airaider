@@ -1,3 +1,5 @@
+> **⚠ PARTIALLY SUPERSEDED (2026-07-03).** The BANK mechanism (accrual · crystallization · shortfall/debt · failure budget · last-chance) is canon — but details predating later locks are overridden: focal sizing = share×E[payoff] (GENERATION_FLOW §1–§2, replaces `maxCharValue`); no `risky` flag — injury is AI-judged & decoupled (F5); attribute names & the roll = §10. Treat QUESTS.md + ECONOMY.md as the entry points.
+
 # Reward bank, off-rails & last-chance — design + plan
 
 **Status:** spec (2026-06-06). Implements the chain reward as an *accrued merc-day bank*, replacing

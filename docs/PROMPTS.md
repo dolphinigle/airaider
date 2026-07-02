@@ -2,7 +2,7 @@
 
 **Status:** Working reference (prototype-2, 2026-06-04). These are the actual prompts to start the prototype's AI layer from — **validated against `gpt-5-mini` / `reasoning_effort:low`** with the real tag vocabulary. They obey the 5 principles in [STORY_ENGINE.md](STORY_ENGINE.md) §10 (JSON · cache · token-efficiency · engine-owns-numbers · right model). Tune them in play; the schemas + the disciplines below are the load-bearing part.
 
-> **⚠ PARTIALLY STALE:** attribute names updated to the locked set (STR/DEX/INT/CHA/CON, GENERATION_FLOW §10), but these examples predate the 20-tier tag system + lore retrieval — treat GENERATION_FLOW + LORE.md as authoritative; refresh prompts at implementation.
+> **⚠ PARTIALLY STALE:** attribute names updated to the locked set (STR/DEX/INT/CHA/CON, GENERATION_FLOW §10), but these examples predate the 20-tier tag system + lore retrieval — treat GENERATION_FLOW + LORE.md as authoritative; refresh prompts at implementation. **Schemas still to author at impl** (the current examples don't cover them): (1) genesis = bible + write-back (relevantIds/newEntities/newEdges) in ONE response; (2) the batched resolution (before/after prose + per-merc injury band + memory-edges w/ blurbs+importance + chain-state + flesh/name); (3) theme-roll (type+style → wants/clashes); (4) the lore selector (keep: id[]); (5) finale mutex approach-groups. Names: the ENGINE rolls all names; the AI never outputs a `name` field (§4b).
 
 > **Structure of every call:** a **byte-stable system prompt** (the schema + rules + tag vocab → prompt-cached) + a **short variable user message** (the specific data). Never interpolate variable data into the system prompt.
 

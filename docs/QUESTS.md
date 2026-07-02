@@ -80,7 +80,7 @@ The **engine** then sets each slot's **threshold** per the locked roll (GENERATI
 **Party aggregation (pooled — one outcome per quest):** each filled slot contributes `coins(occupant vs its own tested/favored/clashing)`; the quest rolls **Σ coins vs Σ slot thresholds** → success (≥ bar) / partial (≥ 0.6× bar) / failure. Engine owns *how many* + *how hard*; AI owns *who fits* + *what's tested*. The player chooses **who fills the slots**, never how many.
 
 ## 3. Fort Phase — assign
-Player assigns mercs respecting party size + required units, sees the visible odds (coins vs threshold), commits. No results yet.
+Player assigns mercs respecting party size + required units, sees the visible odds, commits. No results yet. **Odds baseline 🔒: raw `coins vs threshold` per slot + pooled is ALWAYS shown before commit** (the loss-is-owned contract); the **Oracle** room adds the *computed probability* display (success/partial % — coarse bands at low comfort, exact at high). No room ever hides the raw numbers.
 
 ## 4. Resolution Phase — one AI call, blind-then-sighted
 

@@ -994,7 +994,7 @@ resolveRoll · success/partial/value.
 - Migration order: type-tag injection → slot requires[]/wants[] generalization → gold stack
   merge → relic class + room item slots → chainIds to BaseCard → liability event trigger.
 
-## §11 — INJURY ✅ LOCKED 2026-06-14 (#39)
+## §11 — INJURY *(⚠ scope updates: §16-F5 — injury AI-judged on ANY outcome, decoupled from tier, no risky flag; §19 — DEATH ignored in prototype, no death-cap/extend-buildings)* ✅ LOCKED 2026-06-14 (#39)
 Implements the `injury` negative term in §10 (`coins = … − injury`).
 
 **ONE generic injury** — NOT per-attribute (designer: multiple injury types = overkill). A single
@@ -1299,7 +1299,7 @@ hop; new lore + memory = genesis write-back + resolution memory-edges, YES we wa
 
 ---
 
-## §15 — SLOTTABLES, FIT & PRESTIGE (unified model) ✅ CONFIRMED 2026-06-21 — #36/#41
+## §15 — SLOTTABLES, FIT & PRESTIGE (unified model) ✅ CONFIRMED 2026-06-21 — #36/#41 *(⚠ numbers + slot-kinds superseded: k/bands/archetypes → §20; slot kinds → §18 generic accepts; comfort rename → §18)*
 
 Grounding: the shared primitive ALREADY exists in code — `overlap(have,favored,clashing)` (economy.ts)
 already feeds BOTH quest coins (`coinsFor`) AND room prestige (`roomPrestige` w/ saturating band).
@@ -1542,7 +1542,7 @@ benefit(room) = benefitCurve( comfort )                                     ← 
   cook's rarer tags fit better. A well-appointed infirmary (items + a broken healer) heals faster —
   one rule, no exceptions.
 
-### ⚠ §17 checklist impact — CARDS.md + FORT.md need a RETOUCH in the doc-redo
+### ⚠ §17 checklist impact — CARDS.md + FORT.md need a RETOUCH in the doc-redo *(✅ DONE 2026-07-03 — retouches landed in the doc-redo)*
 Both were rewritten before this refinement and now carry superseded bits: CARDS §2 room slot kinds
 (display/occupant/captive/owner → generic accepts + owner), CARDS §5 / FORT §3 "non-bedroom prestige
 sums to global" (→ only THEME rooms feed prestige; functional rooms' comfort → unique benefit),
