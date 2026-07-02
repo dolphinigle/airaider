@@ -2,6 +2,8 @@
 
 **Status:** Working reference (prototype-2, 2026-06-04). These are the actual prompts to start the prototype's AI layer from — **validated against `gpt-5-mini` / `reasoning_effort:low`** with the real tag vocabulary. They obey the 5 principles in [STORY_ENGINE.md](STORY_ENGINE.md) §10 (JSON · cache · token-efficiency · engine-owns-numbers · right model). Tune them in play; the schemas + the disciplines below are the load-bearing part.
 
+> **⚠ PARTIALLY STALE:** attribute names updated to the locked set (STR/DEX/INT/CHA/CON, GENERATION_FLOW §10), but these examples predate the 20-tier tag system + lore retrieval — treat GENERATION_FLOW + LORE.md as authoritative; refresh prompts at implementation.
+
 > **Structure of every call:** a **byte-stable system prompt** (the schema + rules + tag vocab → prompt-cached) + a **short variable user message** (the specific data). Never interpolate variable data into the system prompt.
 
 ---
@@ -31,7 +33,7 @@ Output JSON only:
 { "situation": "<=40 words: who brings the job to the company's gate and the concrete problem. POV: only what arrives at the gate; no off-scene narration",
   "job": "one line: the concrete action the company commits to",
   "ask": {
-    "attribute": "one of physical|agility|intelligence|charisma|willpower (the attribute this job mainly tests)",
+    "attribute": "one of strength|dexterity|intelligence|charisma|constitution (the attribute this job mainly tests)",
     "favoredTags": ["0-3 tag ids, copied EXACTLY from the vocabulary including the prefix"],
     "slots": ["one per party slot, each EITHER the string \"open\" OR \"tag:\" + an exact vocab id"]
   } }
@@ -44,7 +46,7 @@ RULES: terse, plain, concrete. State the job so the player knows exactly what ta
 ```json
 { "situation": "A gaunt warrener hobbles to the gate, furious, reporting a local poacher is stealing from the lord's warrens at Saltreach and that the man is still in the fen hamlet.",
   "job": "Track down the poacher in Saltreach, seize him alive, and deliver him bound to the warrener.",
-  "ask": { "attribute": "agility", "favoredTags": ["bg:hunter","temp:cautious"], "slots": ["tag:bg:sellsword","tag:phys:quick"] } }
+  "ask": { "attribute": "dexterity", "favoredTags": ["bg:hunter","temp:cautious"], "slots": ["tag:bg:sellsword","tag:phys:quick"] } }
 ```
 *(parley/3 → `charisma`, favored `["bg:priest","pers:charming","temp:patient"]`, slots `["tag:bg:priest","tag:pers:charming","open"]`.)*
 
@@ -85,7 +87,7 @@ Output JSON only:
   "quirks": ["1-2 short concrete habits"] }
 RULES: every word must be consistent with the given tags (a pers:cowardly is never 'fearless'; a bg:priest is not a thief). High attributes read as natural giftedness, not loot. Terse, concrete, grimdark. NEVER write numbers. JSON only.
 ```
-**User** `TAGS: <ids>\nATTRIBUTES: physical X, agility X, …\nACQUIRED AS: <context>.\nJSON only.`
+**User** `TAGS: <ids>\nATTRIBUTES: strength X, dexterity X, …\nACQUIRED AS: <context>.\nJSON only.`
 
 **Validated** — `outlaw/cautious/quick/scarred` → *"Ivo Wulfson … crescent scar … fingers a hidden blade … favors hedges and shadowed ditches."* `noble-bastard/charming/proud` → *"Adeliza Greyborn … courtly graces and sharp lies … keeps a frayed lord's ribbon braided in her hair."* Every quirk traces to a tag.
 
@@ -100,7 +102,7 @@ Given the hidden BIBLE (settled truth — the player NEVER sees it) and the CHAI
 Output JSON only:
 { "situation": "<=45 words — what arrives at the gate (petitioner/body/rumor). POV-LOCKED: only what the company can see or hear; reference what they already learned",
   "job": "one line — the concrete action the company commits to this beat",
-  "ask": { "attribute": "physical|agility|intelligence|charisma|willpower", "favoredTags": ["0-3 exact vocab ids"], "slots": ["one per slot: open OR tag:<vocab id>"] },
+  "ask": { "attribute": "strength|dexterity|intelligence|charisma|constitution", "favoredTags": ["0-3 exact vocab ids"], "slots": ["one per slot: open OR tag:<vocab id>"] },
   "proposedReward": "<=12 words — the loot this beat plausibly yields; the GAME sets its value",
   "newLayerRevealed": "<=15 words — the ONE new fact the player learns on success (writers-room note)" }
 <TAG VOCABULARY block>

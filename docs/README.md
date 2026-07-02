@@ -6,14 +6,15 @@ Airaider is a persistent, single-player, **AI-driven character-collection fort g
 
 1. **[VISION.md](VISION.md)** — the North Star. Three engines of fun, two loops, character attachment, what the game is and isn't. Read first.
 2. **[DESIGN.md](DESIGN.md)** — the core game. The Fort→Resolution cycle, the two boards, risk/loss, progression, recruitment. The authoritative *what* (with summaries that point into the docs below).
-3. **[CARDS.md](CARDS.md)** — the unit model: everything is a Card (`class` = character / item / gold / …). Characters (tags, attributes, the roll, value, generation) + items (ilvl). One global tag pool, one `overlap()` function.
-   - **[TAGS.md](TAGS.md)** — the fixed tag vocabulary (the list the AI references, never invents) + the prompt vocab block.
-4. **[GAME_STATE.md](GAME_STATE.md)** — what's persisted (one card collection + placements), the two prestige pools (comfort → merc cap; global → fort tier), the progression spiral, staging buildings.
-   - **[FORT.md](FORT.md)** — the fort: the 2D cross-section grid, expansion, the room set, and the prestige formula.
-5. **[ECONOMY.md](ECONOMY.md)** — value (gold-denominated, signed), the `V_base(level)` chart, reward generation (split + generateCard), the success/partial/failure outcome model, and the migrating-constraint economy.
-6. **[QUESTS.md](QUESTS.md)** — lead & quest generation: the pipeline from a cheap lead spec → AI quest → resolution → reward → chain. The crucial core.
-7. **[STORY_ENGINE.md](STORY_ENGINE.md)** — the AI craft behind the board: the hidden bible, casting tiers, quest-card structure/voice, individuated outcomes, the 5 prompt principles.
-   - **[PROMPTS.md](PROMPTS.md)** — production-close example prompts (card+ask, outcome, character-flesh, chain beat, genesis), validated against real models with the real tag vocabulary. The starting point for the prototype's AI layer.
+3. **[CARDS.md](CARDS.md)** — the unit model: everything is a Card; **quests and rooms hold cards in CardSlots**; one `overlap()` fit primitive powers the roll *and* comfort/prestige. Characters (tags, the 5 attributes, growth+focus, the roll) + items (ilvl).
+4. **[GAME_STATE.md](GAME_STATE.md)** — the save (cards + placements + the lore graph), the 3-producer determinism model, comfort→benefit progression, staging.
+   - **[FORT.md](FORT.md)** — the fort: the grid, room species + generic slots, the captive-labor loop, comfort formula, the Great Hall master clock, the catalog, sim-verified pacing.
+5. **[ECONOMY.md](ECONOMY.md)** — value (signed, 20-tier geometric tag curve, marked value), `V_base(level)`, reward generation, outcomes + the decoupled injury channel, the bank, the migrating constraint.
+6. **[QUESTS.md](QUESTS.md)** — lead & quest generation: cheap lead spec → AI quest → resolution → reward → chain. The crucial core.
+7. **[LORE.md](LORE.md)** — the world graph (LoreNodes + memory-edges), soft-delete, salience/pinning, and the ≤2-round-trip context-retrieval pipeline (continuity engine).
+8. **[STORY_ENGINE.md](STORY_ENGINE.md)** — the AI craft behind the board: the hidden bible, casting tiers, quest-card structure/voice, individuated outcomes, the 5 prompt principles.
+   - **[PROMPTS.md](PROMPTS.md)** — example prompts (partially stale; GENERATION_FLOW + LORE.md are authoritative; refresh at implementation).
+9. **[GENERATION_FLOW.md](GENERATION_FLOW.md)** — the decision log (§8 tags · §10 the roll · §11 injury · §13 regions · §14 lore · §15 slottables · §16 resolutions · §18 room model · §19 catalog · §20 prestige math + sims). Where every 🔒 above traces to.
 
 ## Supporting
 

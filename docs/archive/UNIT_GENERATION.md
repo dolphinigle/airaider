@@ -1,3 +1,5 @@
+> **⚠ SUPERSEDED / ARCHIVED (2026-07-02).** Kept for history. The tag system (20-tier, 4 bands, groups W1–W18) lives in GENERATION_FLOW.md §8–§9b; unit generation in §10 + ECONOMY.md §4; the bible design in QUEST_BIBLE.md.
+
 # UNIT_GENERATION.md — how a character's tags are rolled
 
 **Status:** value-targeting is now BUILT (2026-06-11) per ECONOMY §4 — generation **spends the value
