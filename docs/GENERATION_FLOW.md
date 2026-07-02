@@ -1546,3 +1546,9 @@ sums to global" (→ only THEME rooms feed prestige; functional rooms' comfort �
 FORT §2 occupant→function hook (→ benefit = curve(comfort), captive labor not merc staffing), FORT §6
 open-gaps list (occupant-hook resolved by this section). Also propagate the comfort/prestige RENAME
 everywhere.
+
+### §18.1 — last two gaps closed (2026-06-22)
+- **Forced negatives** (infestation/liability in a room slot) — **DEFERRED, out of prototype scope.**
+  The force-slot concept stays canon; its comfort bite gets designed when liabilities ship.
+- **Cap-downgrade** (unslot/re-theme drops a bedroom's comfort below the owner's level) — **keep
+  level, can't grow**: levels never regress; the merc just can't level further until comfort recovers.
