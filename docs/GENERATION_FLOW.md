@@ -42,10 +42,11 @@ benefit (theme→+prestige · bedroom→owner cap · functional→unique bonus, 
 GENERIC (accepts-list, +1/upgrade, ~3–6); **CAPTIVE LABOR** (break→obedient→station; captives=core
 loot; mercs NOT stationable). CARDS+FORT need §18 retouch (flagged in §17). Remaining gaps:
 forced-negatives · cap-downgrade (capacity/acceptance now trivial via accepts+slot count).
-CURRENT STAGE (#36+#41, 3-step): (1) catalog STRUCTURE (gaps → room list w/ benefit+accepts+slots →
-build-order SEQUENCE) ← IN PROGRESS; (2) prestige MATH skeleton (master clock prestige→level map,
-comfort→cap curve+endgame lift, threshold curve, band archetypes); (3) ASSIGNMENT+verify (bands/costs
-per room → build-order TABLE → simulate timeline). THEN resume the doc-redo (§17 checklist).
+CURRENT STAGE (#36+#41, 3-step): (1) catalog STRUCTURE ✅ DONE (§19 — species, Great Hall tier spine,
+full classified roster, prestige rooms in 3 confidence tiers); (2) prestige MATH skeleton ← CURRENT
+(master clock prestige→level map, comfort→cap curve+endgame lift, Great-Hall threshold curve, band
+archetypes, benefitCurves); (3) ASSIGNMENT+verify (bands/costs per room → build-order TABLE →
+simulate timeline). THEN resume the doc-redo (§17 checklist, incl. CARDS/FORT §18-§19 retouch).
 After all design: the LEAN-DOC TRANSFORM (commit checkpoint → rewrite every doc to
 END-result-only / implementable, verify each claim vs chat history → archive superseded docs
 TAGS.md/UNIT_GENERATION.md/scratch). Also still-stale from the revamp: PROMPTS.md attribute
