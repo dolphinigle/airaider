@@ -1659,3 +1659,33 @@ thresholds don't require 100% re-fill sweeps.
 **STEP 3 SIM (next):** assign archetypes+costs to the §19 catalog → simulate 2,000 cycles under 2–3
 player policies → verify: ~130-cycle tier cadence · cap-vs-region-L lockstep · thresholds crossable
 by all policies (within ~20%) · no wall/stall · prototype T1-T6 pacing. Iterate numbers until green.
+
+### §20.1 — SIM-VERIFIED (step-3 pacing sim, 6 iterations, 2026-06-22) ✅ shape verified
+
+RESULT (v6): all 3 policies (breadth 60/25/15 · depth 25/25/50 · bedroom-lean 30/45/25 mixes of
+build/bed/upgrade) reach **T15 at ~2,220–2,250 cycles ≈ 110h** (target 100h+ ✓), spread <1.5% (G5 ✓),
+per-tier 46–320c around the ~130c budget with no stall >2.5× (G3 ✓), end cap ≈ 50 (G4 ✓), prototype
+T1–T6 ≈ ~750c ≈ 35h ✓. **KEEP 15 TIERS** (no need to drop to 12).
+
+DESIGN FINDINGS the iterations forced (all load-bearing, must survive into implementation):
+1. **Loot band must grow CONTINUOUSLY within a tier** (ilvl follows quest level) — a step-function
+   band deadlocks the clock at saturation (v1: 665c wall at T6→7 with P frozen).
+2. **Cap→loot coupling is load-bearing**: loot band + gold derive from merc LEVEL ≤ cap ≤ bedroom
+   comfort. Without it, skip-all-bedrooms is the dominant clock strategy (v3); with it, that
+   strategy stalls at T8 with band-1 loot. Bedrooms are part of the master clock, not a side track.
+3. **Gold income must scale ~1.09^level vs build costs ~1.32^tier** (i.e. income tracks
+   vBase-like growth) — flatter income starves the late game (v5: 400-730c tiers, gold the binder).
+4. **Loot rate grows with the roster**: ~0.4 → ~1.5 slottable drops/cycle across the campaign.
+5. **Threshold fracs: 0.70 (T2–8) / 0.60 (T9+)** of expected P, with a live-correction factor
+   (~0.77) — pure analytic thresholds overshoot because real fills lag the model.
+6. Residual spikiness (T7/T13/T15 ≈ 2× budget) = per-tier frac tuning at implementation, not a
+   shape problem.
+
+VERIFIED PARAMETER SET (v6, the step-3 assignment baseline): bandScore 1/2/4/8 · slots≤6 depth-gated
+(T1-2:1 · T3-5:2 · T6-8:3 · T9-11:4 · T12-13:5 · T14-15:6) · K=20 · adjacency 1.2 · archetypes
+minor(1,30)/std(2,60)/grand(4,120), grand phases in 5%/tier from T7 (max 30%) · ~4 new prestige
+rooms/tier · beds ≤ 2+tier (→15) · build cost 120·1.32^(T−1), upgrade 0.7×, GH 1.6× · income
+10·1.09^(L−1)/cycle · loot 0.4+0.08·T (cap 1.5) · cap = 3+0.9·comfort, endgame band-lift → ~50.
+
+NEXT: **step 3 ASSIGNMENT** — map the §19 catalog onto the archetypes (which room = minor/std/grand ·
+per-room costs/unlock tiers) → the BUILD-ORDER TABLE → re-run the sim against the real catalog.
