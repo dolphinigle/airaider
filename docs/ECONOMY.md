@@ -1,124 +1,83 @@
 # Economy — Value, Reward Generation & Gold
 
-**Status:** Canonical (prototype-2, 2026-06-03). The value economy and how the engine generates rewards. Numbers are placeholders (fun before balance); the *structure* is what's locked. Builds on [CARDS.md](CARDS.md) (cards/tags) and feeds [QUESTS.md](QUESTS.md) (the quest pipeline). Conventions: 🔒 · 🛠 · 🟡.
+**Status:** Canonical. The value economy and how the engine generates rewards. Numbers 🛠 (fun before balance); structure 🔒. Builds on [CARDS.md](CARDS.md), feeds [QUESTS.md](QUESTS.md); tag/curve decisions in GENERATION_FLOW §8, pacing couplings in §20.
 
 ---
 
 ## 1. Value is gold-denominated and signed 🔒
 
-**Everything's worth is one number — value — measured in gold-equivalent.** A reward of value 500 = "500 gold's worth of stuff." Gold is value 1:1; a unit "worth 400" is worth 400 gold-equivalent.
+**Everything's worth is one number — value — in gold-equivalent.** Gold is 1:1.
 
-**Value is signed.** Positives: tags (a card's value = Σ its tag values), gold, items. **Negatives:** `injury` (a temporary negative tag on a character), `debt` (negative gold), `liability` (`evidence`/`mess` — a negative card). A **reward is a bundle of cards (positive + negative) whose NET value = a target.** This one idea unifies clean rewards, jackpot-with-a-catch, partial outcomes, and punishments.
-
-- **tag value = custom per tag** (hand-authored), with a baseline of `rarity-base × tier-multiplier` (e.g. common 1 / uncommon 3 / rare 8 / legendary 20, × T5 1 … T1 5).
-- a **source-level ceiling** caps the per-tag value a quest can roll (PoE ilvl gate) — higher-level quests drop better loot.
-
----
-
-## 2. The master chart: `V_base(level)` 🔒 *(numbers 🛠)*
-
-A **hardcoded table mapping level → value-per-merc-per-cycle** — the anchor everything is priced against. **Rate rises with level.** Everything references it:
-
-- **quest reward** `V = V_base(quest_level) × rarity-mult × slots × random-split`
-- **hire cost** `= f(recruit value)`
-- **room / upgrade cost** `=` table value at that tier
-
-**Quest-level-matching is the optimum.** Reward and threshold scale with *quest* level; a merc's coins scale with *their* level. So a level-L merc on a level-L quest earns `V_base(L)` at good odds = **ideal**. Over-leveled → trivial odds but you *under-earn*; under-leveled → bad odds. "Send mercs to quests at their level" emerges for free.
+- **Tag value curve (20 tiers, geometric):** `value(t) = 6 × 1.9^(t−1)` — one curve over the unified 20-tier tag scale (4 bands of 5; GENERATION_FLOW §8). High tiers are rare and *feel* like jackpots by price alone.
+- **MARKED value** 🔒: a card's `value` = **the generation target spent on it** (the mark), not a live Σ of its tags — tags are the *substance* and may diverge from the mark (the jackpot gap: a lucky high-tier roll is worth more than its mark says).
+- **Signed:** negatives exist — `debt` (negative gold), `liability` (`evidence`/`mess` — a negative card), and **injury** (intrinsic tiers on a character; its cost = `tiers × V_base(level)`, §11). A **reward is a bundle of cards whose NET value = a target.**
+- A **source-level ceiling** (ilvl) gates the tag *tiers* a quest can roll — higher-level quests drop better loot; each region's band opens a new loot **stratum** (the re-fill chase, FORT §6).
 
 ---
 
-## 3. The split — value → a reward bundle (issue 1) 🔒
+## 2. The master chart: `V_base(level)` 🔒 🛠
 
-`splitValue(V, archetype, isChain)` allocates the value into kinds. **Archetype-driven, with a *randomized* division** (a ratio *range* rolled per quest, not a fixed number):
+**Level → value-per-merc-per-cycle** (reference `≈ 30 × 1.35^(L−1)`), the anchor everything is priced against: quest reward `V = V_base(quest level) × rarity × slots × split`, hire cost, room/upgrade costs, injury value, healing prices.
 
-```
-isChain  → { focal character: ~V }   (the focal IS the payoff — but V is ACCRUED over the beats as a
-                                      merc-day BANK, not a one-shot; see §5a + REWARD_BANK.md)
-one-off  → archetype sets a primary kind + a unit:gold ratio RANGE, e.g.
-    capture  → captive 70–90% + gold
-    rescue   → recruit 70–90% + gold
-    raid     → gold 70–90% + maybe a small captive
-    contract → gold
-    scout    → a lead + gold
- + value-scaled COUNT (a big raid's unit-share → two captives, not one)
- + small lottery chance of a bonus (a lead) or a jackpot-with-catch
-```
+**Quest-level-matching is the optimum** — a level-L merc on a level-L quest earns `V_base(L)` at good odds; over-leveled under-earns, under-leveled gets bad odds. "Send mercs at their level" emerges for free.
 
-🟡 **Need many archetypes** (content). The split's **gold portions are the player's income**; unit portions go to `generateCard` (§4).
+**Pacing couplings (sim-verified, §20):** player gold **income ≈ ×1.09 per level** while build/upgrade costs ≈ ×1.32 per Great-Hall tier (income must track V_base-like growth or the late game starves); **slottable loot ≈ 0.29 + 0.06×tier drops/cycle** — author the drop rate from the fort's slot+band growth budget, never from generosity (oversupply = dead-drop misery); roster width feeds drop volume.
 
 ---
 
-## 4. `generateCard(targetV, ceiling, required[])` — spend value on tags (issue 2) 🛠
+## 3. The split — value → a reward bundle 🔒
 
-Pure engine; the AI only names/stories *after* (the handoff, QUESTS.md).
+`splitValue(V, archetype, isChain)`: **chain → the focal character ≈ V** (accrued as a bank, §5a); **one-off → archetype sets a primary kind + a randomized unit:gold ratio range** (capture → captive 70–90% + gold · rescue → recruit · raid → gold · contract → gold · scout → a lead), value-scaled counts, small lottery of a bonus lead / jackpot-with-catch. Gold portions are the player's income; unit portions go to `generateCard`.
 
+---
+
+## 4. `generateCard(targetV, ceiling, required[])` 🔒 🛠
+
+Pure engine; the AI only names/stories after (the handoff).
 ```
-1. place AI-required tags (must-include); subtract their value → R
+1. place AI-required tags; subtract their value → R
 2. LOOP until R ~spent (or tag-count cap):
-     • pick a base tag — drop-weight-weighted, excluding mutex conflicts
-     • pick a tier — weighted toward LOW, capped ≤ ceiling AND ≤ what R affords
-     • place it; R −= tagValue(tag, tier)
-3. roll TALENTS separately   (attribute growth — NOT value-priced)
-4. [lottery] small chance of JACKPOT-WITH-CATCH: overshoot positive, add a negative
-   (debt/injury/liability) so the bundle nets back to targetV
+     pick a base tag (drop-weight, mutex-safe) · pick a tier (weighted LOW, ≤ ceiling, ≤ affordable) · place
+3. characters: roll the fixed-sum BASE + GROWTH vectors (GENERATION_FLOW §10 — no rolled talents; FOCUS is player-assigned later)
+4. [lottery] small JACKPOT-WITH-CATCH chance: overshoot positive + add a negative so the bundle nets targetV
 ```
-
-The **jackpot/dud lottery comes for free** from the tier-weighting: high tiers are rare, so most cards are moderate and a lucky high-tier draw is a standout. No separate distribution machinery.
+The jackpot/dud lottery comes free from tier-weighting; the card's `value` is **marked** = targetV (§1).
 
 ---
 
 ## 5. Outcomes — success / partial / failure 🔒
 
-The roll is **three outcomes, no critical** (the upside lives in §4's generation lottery, so a crit band would double-dip). The reward value is **fixed at quest birth**; the outcome only scales it **down**, never rescaling a unit:
+Three outcomes, no critical (upside lives in the generation lottery). Reward fixed at birth; the roll only scales **down**:
 
 | outcome | delivery |
 |---|---|
-| **success** | the full bundle |
-| **partial** | **half** — keep the unit + a **liability** card sized to net V/2 *(if worth keeping — a focal character survives, saddled with `evidence`)*, else give V/2 in gold |
-| **failure** | nothing; **and only on risky quests**, the AI proposes a **punishment** (injury/debt/liability) *within an engine-set envelope* |
+| **success** | full bundle |
+| **partial** | **half** — keep the unit + a liability sized to net V/2, else V/2 gold |
+| **failure** | nothing |
 
-`EV per merc-cycle = P(succ)·V + P(partial)·(V/2) − P(fail)·cost`. Threshold sets the probabilities; tag-fit shifts them.
+**Injury is a decoupled, AI-judged channel** (any outcome; typically failure, sometimes none even then): AI picks the severity band → engine maps to tiers → flat coin penalty; heal by rest (1 tier/2d) → infirmary (comfort → speed) → Hospital pay-gold instant. Injury's economic weight = `tiers × V_base(level)` of lost merc-time/gold. *(No "risky" flag; no death in prototype.)*
 
 ---
 
 ## 5a. Chains accrue value — the bank 🔒 *(REWARD_BANK.md)*
 
-`V_base` is **value per merc per cycle**, so a reward worth *more* than one merc-cycle can only be earned
-across several beats. A chain therefore **banks** its value: each beat accrues
-`party × V_base(level) × rarity-mult × outcomeScale` (success 1 · partial 0.5 · **failure 0**); the
-**finale crystallizes** the bank into the focal character **+ surplus gold** (the focal absorbs up to its
-own value; the rest is gold). Income-neutral vs the same merc-cycles spent on one-offs — it just defers the
-payout into a lump + a character, and adds variance (failed beats earn nothing).
-
-- **Shortfall** (bank < focal value, i.e. many beats failed): keep the focal **+ a debt** sized to the gap
-  (give-with-debt), or — below `focalKeepFraction` — the focal **slips away** and you salvage the bank as gold
-  (the §5 "keep the unit + a liability … else give gold" rule, now driven by the realized bank).
-- **Finale failure** → the whole quest failed → **0** (focal lost, bank forfeited) — §5's failure row.
-- **Off-rails / last chance**: a failed middle beat banks 0 and the story advances from the *fallout* (no
-  retry); the engine's per-chain **failure budget** (harder rarity = fewer) governs how many stumbles a saga
-  survives. Blow it → a forced **last-chance** finale: do-or-die for everything banked.
+Each beat banks `party × V_base(level) × rarity × outcomeScale` (success 1 · partial 0.5 · failure 0); the **finale crystallizes** the bank into the focal character + surplus gold. Shortfall → keep-with-debt or the focal slips away for salvage gold; finale failure → all forfeited. A per-chain **failure budget** forces a last-chance finale rather than endless retries. Income-neutral vs one-offs; adds variance + a lump payoff.
 
 ---
 
 ## 6. The economy shape — the constraint migrates 🔒
 
-Income and expenditure **both scale with progression** (room prices, hire costs climb with level; rewards climb with rarity/level), so the *feeling* stays constant while numbers grow. The campaign is **not** always-poor (fights the cozy tone, drowns the attachment soul) nor trivially-rich. The **binding constraint migrates:**
+Income and costs both scale with progression, so the *feel* stays constant. The binding constraint moves: **early → gold** (the teacher) · **mid → prestige + level** (the master clock; can I access better content?) · **late → merc-cycles + attachment** (who can I bear to risk?) — with gold returning as the *pacer* at T13–15 (Great Hall + endgame buildings are deliberately expensive; give a gold-reserve/wishlist affordance for hoard windows, §20.2).
 
-- **early → gold** (the cold-start vise; the teacher),
-- **mid → prestige + level** (can I access & survive better content?),
-- **late → merc-cycles + bedrooms + attachment** (who do I send, who can I bear to lose?).
-
-Gold is the early teacher, then **gets out of the way** so the late-game question is *"is this saga worth risking Marek?"* — not *"can I afford it?"* Keep light late sinks (luxury upkeep, top-tier rooms) so gold isn't meaningless, but never the binding constraint.
-
-**Income:** quest gold-portions + ransom/sell of captives. **Sinks:** hiring, building/upgrading, healing injuries, clearing liabilities. **Lever:** keep income a hair behind desired spending.
+**Income:** quest gold + ransom/sell (captives, dead drops). **Sinks:** hiring, builds/upgrades/renovations, Great Hall tiers, endgame buildings, healing. **Lever:** income a hair behind desired spending.
 
 ---
 
 ## 7. Leads are rewards 🔒
 
-A **lead is a deferred reward** — its worth is the **access** it grants (the rarity premium of content above your board's normal ceiling), not the full reward it leads to (you'd spend the merc-cycles anyway). So a rare lead-reward is valuable, a common one cheap. Priced by the same `rate(rarity)`. Awarding a lead = a value-priced stub on your board (a map, a rumor, a chain's sequel-seed).
+A lead is a **deferred reward** — priced by the access it grants (its rarity premium), not the reward behind it. Lead-hunting quests (region Scouting lodges) are the renewable faucet.
 
 ---
 
-## 8. The design knobs (all mine to tune in play)
-The `V_base` chart · per-tag values · the archetype split ranges · the `generateCard` tier-weights + jackpot chance · hire-cost fraction · room costs by tier · ransom/sell rates. Structure locked; numbers tuned in play.
+## 8. Design knobs 🛠
+`V_base` · per-tag values (the §8 curve × hand exceptions) · split ranges · tier-weights + jackpot chance · hire fraction · room/upgrade/Great-Hall cost tables · ransom/sell rates · drop rate · XP curve. Structure locked; numbers tuned at implementation against the §20 sim.
