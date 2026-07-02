@@ -1617,3 +1617,45 @@ fantasy as prestige rooms) · structural walls/defense (no fort-attack system).
 NEXT: #41 step 2 — prestige MATH skeleton (master clock prestige→level map · comfort→cap curve +
 endgame band lift · Great-Hall-tier threshold curve · band archetypes · k · benefitCurves), then
 step 3 assignment (bands/costs per room → build-order TABLE → simulate the timeline).
+
+---
+
+## §20 — PRESTIGE MATH SKELETON (⏳ concept BLESSED 2026-06-22; numbers pending step-3 sim) — #41
+
+GOALS: G1 master clock (P→L→region) · G2 GH tiers = acts · G3 cadence (always a next build) · G4
+comfort→cap tracks expected L · G5 multiple viable paths · G6 loot-driven (captives/artifacts; gold
+can't cross a gate) · G7 verifiable by simulation.
+
+**TIME BUDGET:** 100+ h ≈ **2,000 cycles** (~3 min/cycle). **15 GH tiers** ≈ ~130 cycles (~5–7h)
+each. Region arcs of ~3 tiers: Forests T1–3 · City T4–6 · Coast T7–9 · Highlands+Underdeep T10–12 ·
+endgame→Outskirts T13–15. Levels ≈ +3/tier (L1→50, dice-verified). Prototype = T1–T6 (~30h, cuttable
+to T1–T4). Tier count NOT locked — collapse to 12 if sim shows drag.
+**CONTENT ENGINE (multiplicative):** rooms × loot strata (each region opens a higher §8 tag BAND →
+every built room re-fillable better) × per-merc tracks (~15 bedrooms/caps/chains) × infinite AI quests.
+
+**THREE GROWTH AXES per room** (why 4–6 slots serve 15 tiers):
+1. **Slots** — max 6; allowed upgrade depth gated by GH tier: T1-2→U1 · T3-5→U2 · T6-8→U3 ·
+   T9-11→U4 · T12-13→U5 · T14-15→U6 (~one step per region arc).
+2. **Fill quality** — a matched card's fill score = its §8 tag BAND: band 1→1 · 2→2 · 3→4 · 4→8
+   (mild ×2/band; NOT the gold curve). Loot stratum at tier ≈ band 1 @T1-4 · 2 @T5-8 · 3 @T9-12 ·
+   4 @T13-15 (aligned with region arrivals — the structural argument FOR 15 tiers).
+3. **Count** — more rooms per tier (~2–3 new prestige rooms + 1–2 functional/upgrades per tier =
+   the ~130-cycle cadence budget; a build every ~30–40 cycles, fills between).
+
+**DERIVED per-room expectation** (no hand-authored per-tier tables):
+`raw(T) = slots(T) × bandScore(stratum(T)) × adjacency(~1.2)` → `comfort = min+(max−min)(1−e^(−raw/k))`.
+Standard room (band [2,—,60], k=20): T2≈5 · T5≈14 · T8≈19 · T10≈37 · T13≈54 · T15≈57 (asymptote 60).
+Room variety = **3 archetypes** scaling the band: **Minor ×0.5 · Standard ×1 · Grand ×2**.
+
+**GLOBAL:** P(T) = Σ over the growing roster (illustrative: T2≈15 · T5≈100 · T8≈250 · T10≈550 ·
+T13≈1,100 · T15≈1,500 — super-linear: count↑ × per-room↑). **GH threshold(T+1) ≈ ~70% of expected
+P(T)** — crossable by any strategy mix (breadth / depth+refill / great-fit) without perfection.
+Old-room band-1 drag is deliberate (re-filling old rooms = within-tier activity); sim must check
+thresholds don't require 100% re-fill sweeps.
+
+**BEDROOM/CAP:** same derived table → `cap = 3 + 0.9×comfort`: ~16 @T5 (City L6-16 ✓) · ~33 @T10
+(Highlands L18-28 ✓) · ~40 @T14 (normal band max ~45) · **endgame lift = band max +~10 → cap ~50**.
+
+**STEP 3 SIM (next):** assign archetypes+costs to the §19 catalog → simulate 2,000 cycles under 2–3
+player policies → verify: ~130-cycle tier cadence · cap-vs-region-L lockstep · thresholds crossable
+by all policies (within ~20%) · no wall/stall · prototype T1-T6 pacing. Iterate numbers until green.
