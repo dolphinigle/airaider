@@ -35,11 +35,17 @@ prestige, global=Σ theme rooms); shared Slot/Slottable (promote Room.displayCar
 reuse QuestSlot requirement union); shared overlap() primitive (keep RAW/tier-scaled, quest U-scales
 on top — don't fork); UPGRADES ADD SLOTS (U0=0 slots, +1/upgrade — reverses FORT "no upgrades", fix
 in transform); prestige=saturating band, designed via per-room [min,expected,max]; player THEME→AI
-rolls wanted-tags ONCE→engine scores. Slot kinds display/occupant/captive/owner. OPEN gaps: occupant
--function hook · forced-negatives · cap-downgrade · capacity enforcement.
-ORDER FROM HERE: (1) **REDO DOCS for slottables** ← NEXT (collaborative — rewrite CARDS/FORT/GAME_STATE/
-QUESTS to the unified Slottable+prestige+theme model; still PLANNING phase); (2) resolve the 4 gap
--decisions; (3) region faucets + build-ORDER TABLE + per-room cost/prestige; (4) PRESTIGE MATH #41.
+rolls wanted-tags ONCE→engine scores. §16 = review resolutions F1–F8 (incl. lore FLOW + 3-producer
+determinism + soft-delete). §17 = doc-redo coverage checklist. §18 (2026-06-22) UNIFIES the room
+model: **comfort** = the ONE per-room number (rename; "prestige"=global currency only) → ONE typed
+benefit (theme→+prestige · bedroom→owner cap · functional→unique bonus, NO double-dip); slots
+GENERIC (accepts-list, +1/upgrade, ~3–6); **CAPTIVE LABOR** (break→obedient→station; captives=core
+loot; mercs NOT stationable). CARDS+FORT need §18 retouch (flagged in §17). Remaining gaps:
+forced-negatives · cap-downgrade (capacity/acceptance now trivial via accepts+slot count).
+CURRENT STAGE (#36+#41, 3-step): (1) catalog STRUCTURE (gaps → room list w/ benefit+accepts+slots →
+build-order SEQUENCE) ← IN PROGRESS; (2) prestige MATH skeleton (master clock prestige→level map,
+comfort→cap curve+endgame lift, threshold curve, band archetypes); (3) ASSIGNMENT+verify (bands/costs
+per room → build-order TABLE → simulate timeline). THEN resume the doc-redo (§17 checklist).
 After all design: the LEAN-DOC TRANSFORM (commit checkpoint → rewrite every doc to
 END-result-only / implementable, verify each claim vs chat history → archive superseded docs
 TAGS.md/UNIT_GENERATION.md/scratch). Also still-stale from the revamp: PROMPTS.md attribute
