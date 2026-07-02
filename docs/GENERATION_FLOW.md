@@ -1689,3 +1689,55 @@ rooms/tier · beds ≤ 2+tier (→15) · build cost 120·1.32^(T−1), upgrade 0
 
 NEXT: **step 3 ASSIGNMENT** — map the §19 catalog onto the archetypes (which room = minor/std/grand ·
 per-room costs/unlock tiers) → the BUILD-ORDER TABLE → re-run the sim against the real catalog.
+
+### §20.2 — STEP-3 ASSIGNMENT: catalog-tied sim, TWO INDEPENDENT AGENTS ✅ ALL CHECKS PASS (2026-06-22)
+
+Two independent sim agents (A: 24 seeds, B: 32 seeds; 4 policies each incl. a greedy P-optimizer)
+built the campaign sim against the REAL §19 catalog with an EXPLICIT random-fit model (per-drop
+match/partial/dead rolls per room theme, best-of-portfolio placement, dead drops sold). Both PASS
+every check; spot-verified live. Headline: **T15 ≈ 2,000–2,320 cycles (~100–115h)** · human-policy
+spread 1.2–3.1% · prototype T1–T6 ≈ 790–840c (~40h) · caps clear every region floor · dead-drops
+~33% act-1 → ~8% act-3 · **the greedy P-rush is SLOWER than human play** (cap→loot coupling holds
+under attack — no degenerate strategy).
+
+**CONVERGENT DESIGN RULES (both agents independently — treat as LOCKED-shape):**
+1. **Thresholds = measured calibration × a hand-smoothed MONOTONIC ramp** (effective ~0.87–1.10 of
+   the measured curve — the §20.1 0.70/0.60 fracs pace ~20% too fast under real fit). Auto-tuners
+   oscillate/deadlock (threshold sits on a knee); calibrate-then-manual-ramp, in-engine at impl.
+2. **Loot rate ≈ 30% LOWER than §20.1** (both cut to ~0.70×: ~0.29+0.06·T, cap ~1.05/cycle) — author
+   drops/cycle from the slot+band growth budget; oversupply = dead-drop misery, not generosity.
+3. **Early-tier P ASYMPTOTES are hard walls**: a threshold above what a tier's unlocks can produce =
+   permanent deadlock (T1 asymptote ≈11 w/ 2 rooms; T2 ≈23). Rules: **≥3 prestige rooms by T1**
+   (Garden→T1 adopted; Infirmary→T1 as early leftover-sink), thresholds < ~85% of tier-reachable P.
+4. **Re-theming agency is REQUIRED**: the 2–3 newest prestige rooms tuned toward the loot stream
+   (p_match 0.20→~0.45–0.55; renovation-cost 0.25×). p_match tuning alone cannot fix act-1 dead rates.
+   Base fit p_match 0.20 / p_partial 0.30 kept by both.
+5. **Functional rooms = leftover-fill sinks w/ REPLACEMENT staffing** (better staff swaps in), else
+   they saturate after 1 fill and late dead rates blow the limit.
+6. **Bedroom DEPTH drives the cap clock** (deepen the best bedroom, not build many); **cap-binding
+   must be loudly player-visible** (sims needed a react-to-cap override or they stalled at T13+).
+
+**Adopted retunes:** Garden→T1 · Infirmary→T1 · early prestige spread ≥3 by T2 · **grand archetype
+costs 1.5–2× std** (else strictly dominant P-per-gold — B's find) · endgame buildings sequenced
+T13–T15, each lifts the bedroom band (→cap ~50), 2× GH cost.
+**Reference thresholds** (A/B agree ±15%; recalibrate in-engine): T2≈12 · T3≈23 · T4≈60 · T5≈88 ·
+T6≈118 · T7≈230 · T8≈310 · T9≈350 · T10≈510 · T11≈650 · T12≈785 · T13≈1,030 · T14≈1,275 · T15≈1,500.
+
+**THE BUILD-ORDER TABLE (median, bedroom-lean policy — the §12 goal deliverable):**
+c0 Bedroom(own) · c2 Map room · c14 Lead room · c25 Mess hall · c35 Storage · c45 Scouting lodge
+(Forests) · c55 Recruiting post (Forests) · c55-65 Infirmary · c65 Dining hall · c80 Kitchen ·
+c90-105 Bedrooms #2-3 · c110 Garden · **GH→T2 ~c120-145** · c130-170 Tavern · Dungeon · Holding cell ·
+c175 Bedroom #4 · c185 Trophy room · c200 Gallery · **GH→T3 ~c280** · c280-300 Library · Market ·
+Ransom office · c300 Smithy · c310 Bedroom #5 · c360 Shrine · **GH→T4 ~c400** · c410 Chronicle · …
+(each ~130-190c tier thereafter; T15 ≈ c2,100).
+
+**Implementation notes (spec gaps the sims exposed):** (a) roster width must feed loot rate (more
+mercs → parallel quests → drops; sims under-valued beds beyond the active squad — the real per-merc
+cap + party model provides this, keep the coupling explicit); (b) hoard-for-GH windows are 40–80c of
+nothing-to-buy → give a gold-reserve/wishlist affordance + always-available bed fills/renovations;
+(c) T13–15 gold competition (GH vs endgame buildings vs region gates) needs a purchase-priority hint;
+(d) cap model: sims used max/top-3 bedroom; real game = PER-MERC caps (richer, softens finding 6 but
+someone's bedroom must still be deep).
+
+**#36 + #41 = DONE.** The catalog+prestige stage is CLOSED. NEXT: resume the DOC-REDO per §17
+checklist (GAME_STATE/QUESTS/ECONOMY/LORE/TAGS + CARDS/FORT §18-§20 retouch) → lean transform → v3.
