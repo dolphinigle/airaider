@@ -34,7 +34,7 @@
 **Leads are EARNED, not restocked** (locked, GENERATION_FLOW §19): the board is fed by
 - **Continuation leads** — one per *live chain* that wants to go on; carries the chain's **cached title/hook** (zero new AI cost). How the mechanical board feels connected to the stories.
 - **Personal-chain leads** — beat-1 of a newly-joined merc's main chain.
-- **Fresh leads** — from **lead-hunting quests** (each region's Scouting lodge unlocks its repeatable hunt), **quest rewards** (scout archetype, interrogation, chain spawns) — rolled by the engine when granted. 🟡 optional small ambient trickle as an anti-starvation floor (designer call).
+- **Fresh leads** — from **lead-hunting quests** (each region's Scouting lodge unlocks its repeatable hunt), **quest rewards** (scout archetype, interrogation, chain spawns) — rolled by the engine when granted. **Strict — no ambient trickle 🔒** (§21): supply leeway comes from the math — a **lead grant is a priced component of quest-reward budgets** (ECONOMY §7), so lead income scales with play.
 
 A **lead** is pure data: `{ rarity, level, region, archetype, chain-info }`.
 
@@ -217,5 +217,5 @@ Double-axis decision: *which test fits my roster?* + *which reward form does my 
 
 - **Common `none` quests: templated (zero AI) or one cheap AI call?** *Lean: templated card + a tiny AI flavor line — cheap variety.* (This is the next thing to design.)
 - **Fresh lead: pure mechanical stub or a one-line teaser?** *Lean: pure stub — cheaper; story is the pursue payoff.*
-- **Rare/known-cast cadence** 🟡 — the rarity weights + prestige→ceiling mapping set how often the apex known-cast quests fire; pick a target ("a known face every ~N cycles per act"), derive weights, sim like §20.
+- **Rare/known-cast cadence 🛠** — target ≈ **2 known-cast geneses per GH tier** (~every 60 cycles; §21), gated on recurrable pool ≥ ~8; derive the rarity weights from this target + verify in playtest.
 - **Latency & reading load** — the batched Resolution fires many AI calls at once (needs pre-generation + parallel resolution), and prose volume × roster width × 3-min-cycle is a three-way tension: enforce word budgets by rarity (commons ≈ one line) and MEASURE real minutes/cycle in the first playtest before trusting §20 hour figures.

@@ -1750,3 +1750,23 @@ someone's bedroom must still be deep).
 
 **#36 + #41 = DONE.** The catalog+prestige stage is CLOSED. NEXT: resume the DOC-REDO per §17
 checklist (GAME_STATE/QUESTS/ECONOMY/LORE/TAGS + CARDS/FORT §18-§20 retouch) → lean transform → v3.
+
+
+---
+
+## §21 — POST-REVIEW DESIGNER RULINGS ✅ 2026-07-03
+
+1. **LOSS = mostly TIME 🔒.** The stakes philosophy: what you lose is **time** — injury downtime
+   (tiers × merc-days), forfeited chain banks, wasted merc-cycles on failures — plus the reward.
+   NO death, NO departure mechanics in the prototype; do not add them. (Closes the reviews' #1.)
+2. **Leads stay STRICT 🔒** — earned only, NO ambient trickle. If supply needs leeway, fix it in
+   the MATH: fold a **lead grant into the quest-reward budget as a priced component** (ECONOMY §7
+   prices leads; splitValue can allocate a lead share) so supply scales with play, not with a faucet.
+3. **Known-cast cadence 🛠 (derived, verify in playtest):** target ≈ **2 known-cast saga geneses per
+   GH tier** (~every 60 cycles ≈ 3h; ~0.5% of quests — apex-scarce), gated on a recurrable pool ≥ ~8;
+   continuation beats carry faces between. Rarity weights derived from this target at impl.
+4. **Torture-chamber throughput 🔒-shape 🛠-numbers (derived, capacity-checked):** breaking occupies
+   the chamber's OWN CardSlots — concurrency = slot count (upgrades add racks), duration = f(comfort)
+   ~5 → 2 cycles/break. Demand check: T4 0.25/c capacity vs ~0.2/c captive-fill demand (intended
+   early pinch: break vs ransom); T8+ comfortable headroom. Extend the pacing sim with this pipe at
+   impl calibration.

@@ -78,4 +78,4 @@ Implementation notes: loot ≈ 0.29+0.06/tier drops/cycle (author from the slot 
 ---
 
 ## 7. Open 🟡
-Starter fort + build/excavate flow detail · per-room gold-cost/unlock/archetype table + adjacency mate list (assignment exists in sim; finalize at impl calibration) · **functional-room benefitCurve table** (heal speed, prices, break speed, precision — esp. **torture-chamber THROUGHPUT**: concurrent breaks + cycles/break; spec + extend the sim, it's the one unmodeled pipe) · forced negatives (deferred) · room sizes/packing (later).
+Starter fort + build/excavate flow detail · per-room gold-cost/unlock/archetype table + adjacency mate list (assignment exists in sim; finalize at impl calibration) · **functional-room benefitCurve table** (heal speed, prices, break speed, precision — torture-chamber throughput now SPECCED §21: breaking occupies the chamber's own slots — concurrency = slot count, duration = f(comfort) ~5→2 cycles; extend the sim at impl) · forced negatives (deferred) · room sizes/packing (later).
