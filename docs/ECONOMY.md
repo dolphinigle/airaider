@@ -27,7 +27,7 @@
 
 ## 3. The split — value → a reward bundle 🔒
 
-`splitValue(V, archetype, isChain)`: **chain → the focal character ≈ V** (accrued as a bank, §5a); **one-off → archetype sets a primary kind + a randomized unit:gold ratio range** (capture → captive 70–90% + gold · rescue → recruit · raid → gold · contract → gold · scout → a lead), value-scaled counts, small lottery of a bonus lead / jackpot-with-catch. Gold portions are the player's income; unit portions go to `generateCard`.
+`splitValue(V, archetype, isChain)`: **chain → the focal character = a rolled unit SHARE (~55–85%) × E[payoff], remainder gold** (structure per GENERATION_FLOW §1–§2; accrued as a bank, §5a); **one-off → archetype sets a primary kind + a randomized unit:gold ratio range** (capture → captive 70–90% + gold · rescue → recruit · raid → gold · contract → gold · scout → a lead), value-scaled counts, small lottery of a bonus lead / jackpot-with-catch. Gold portions are the player's income; unit portions go to `generateCard`.
 
 ---
 
@@ -69,7 +69,7 @@ Each beat banks `party × V_base(level) × rarity × outcomeScale` (success 1 ·
 
 Income and costs both scale with progression, so the *feel* stays constant. The binding constraint moves: **early → gold** (the teacher) · **mid → prestige + level** (the master clock; can I access better content?) · **late → merc-cycles + attachment** (who can I bear to risk?) — with gold returning as the *pacer* at T13–15 (Great Hall + endgame buildings are deliberately expensive; give a gold-reserve/wishlist affordance for hoard windows, §20.2).
 
-**Income:** quest gold + ransom/sell (captives, dead drops). **Sinks:** hiring, builds/upgrades/renovations, Great Hall tiers, endgame buildings, healing. **Lever:** income a hair behind desired spending.
+**Income:** quest gold + ransom/sell (captives, dead drops). **Sinks:** hiring, builds/upgrades/renovations, Great Hall tiers, endgame buildings, healing. **Lever:** income a hair behind desired spending. 🟡 **Hire pricing lean:** recruits enter *below* the region band and cost ≥ the equivalent grow-investment — else buying veterans beats growing your people (would undermine the bedroom/attachment economy). *(Liabilities from partials ARE in prototype; only force-slotting negatives INTO rooms is deferred, §18.1.)*
 
 ---
 
@@ -80,4 +80,4 @@ A lead is a **deferred reward** — priced by the access it grants (its rarity p
 ---
 
 ## 8. Design knobs 🛠
-`V_base` · per-tag values (the §8 curve × hand exceptions) · split ranges · tier-weights + jackpot chance · hire fraction · room/upgrade/Great-Hall cost tables · ransom/sell rates · drop rate · XP curve. Structure locked; numbers tuned at implementation against the §20 sim.
+`V_base` · **rarityMult table** · per-slot difficulty-E roll weights · per-tag values (the §8 curve × hand exceptions) · split ranges · tier-weights + jackpot chance · hire fraction · room/upgrade/Great-Hall cost tables · ransom/sell rates · drop rate · XP curve. Structure locked; numbers tuned at implementation against the §20 sim.

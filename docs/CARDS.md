@@ -1,6 +1,6 @@
 # Cards — the unit model
 
-**Status:** Canonical. Everything you own is a **Card** (`class` distinguishes types). **Quests and rooms hold cards in CardSlots.** One function — `overlap(have, want)` — scores a card's tags against any CardSlot it sits in, powering both the dice roll and prestige. Conventions: 🔒 locked · 🟡 open. Roll/prestige numbers live in [GENERATION_FLOW.md](GENERATION_FLOW.md) §10/§15 and [FORT.md](FORT.md).
+**Status:** Canonical. Everything you own is a **Card** (`class` distinguishes types). **Quests and rooms hold cards in CardSlots.** One function — `overlap(have, want)` — scores a card's tags against any CardSlot it sits in, powering both the dice roll and prestige. Conventions: 🔒 locked · 🟡 open. Roll/comfort numbers live in [GENERATION_FLOW.md](GENERATION_FLOW.md) §10/§18–§20 and [FORT.md](FORT.md).
 
 ---
 
@@ -11,11 +11,11 @@ A **Card** is any owned, taggable thing.
 ```
 Card { id, class, name, tags[], value, location, ... }
   character  → + attributes, growth, level, role   (the ONLY dice-toucher)
-  equipment  → ilvl + tags     (display → prestige)
-  furniture  → ilvl + tags     (display → prestige)   ("equipment" vs "furniture" = which slot it fits)
+  equipment  → ilvl + tags     (slotted into rooms → comfort)
+  furniture  → ilvl + tags     (slotted into rooms → comfort)   ("equipment" vs "furniture" = flavor)
   consumable → ilvl + tags     (stackable; one-shot in a quest, then consumed)
   gold       → count           (currency, paid into cost slots)
-  liability  → negative value  (evidence / mess / debt — a problem with a face; see ECONOMY)
+  liability  → negative value  (evidence / mess — a problem with a face; debt = negative GOLD, not a liability; see ECONOMY)
   … more classes later — the model is built to extend
 ```
 
@@ -42,7 +42,7 @@ When slotted, a Card's `location` is a CardSlot reference (`quest:<id>#2` / `roo
 - **Requirement** — `open` / `must-be <card>` / `must-have <tag>`.
 - **Fill rule** — a quest needs **all party slots filled** (no partial sends; the threshold assumes N). A room scores whatever is filled.
 - **Mutex (branches)** — quest approach-groups are mutually exclusive: filling one locks the others.
-- **Fit** — `overlap(card.tags, wants, clashes)` scores a card against its slot's wants (quest = the slot's favored skills; room = its theme) — the **one shared primitive** powering both the dice roll and prestige. (Kept raw/tier-scaled; the quest layer scales it into coin units — see GENERATION_FLOW §15.)
+- **Fit** — `overlap(card.tags, wants, clashes)` scores a card against its slot's wants (quest = the slot's favored skills; room = its theme) — the **one shared primitive** powering both the dice roll and prestige. (Kept raw/tier-scaled; rooms use its magnitude, the quest layer thresholds its NET sign into the flat 0.5·U matching bonus — tier-blind on dice, F2. Clashing mirrors matching, negative; all matched tags score.)
 
 **Stacks.** Fungible cards (gold, identical consumables) store as `{card ×N}` — a count, not N objects. Unique cards (characters, rolled items) are singletons.
 
@@ -54,7 +54,7 @@ Mercenaries, captives, and NPCs are all `class:character`, distinguished by `rol
 
 - **Tags** — identity + fit + the loot dopamine. **Personality IS tags.** Plus AI-generated **quirks**.
 - **Attributes** — five scalars: **Strength · Dexterity · Intelligence · Charisma · Constitution** → the **coin count** (the only thing that generates dice).
-- **Growth (replaces "talents")** — a fixed-sum **base** vector (random distribution = birth lean; flat L1 floor) + a fixed-sum **growth** vector reshaped by the player-assigned **FOCUS** (single → one GREAT stat · dual → two GOOD · none → generalist). No rolled talents. (Detail: GENERATION_FLOW §10.)
+- **Growth (replaces "talents")** — a fixed-sum **base** vector (random distribution = birth lean; flat L1 floor) + a fixed-sum **growth** vector reshaped by the player-assigned **FOCUS** (single → one GREAT stat · dual → two GOOD · none → generalist). No rolled talents. Past growth is **banked** (re-focus only reshapes future levels → per-merc history persists). 🛠 reshape/renormalization algorithm at impl. (Detail: GENERATION_FLOW §10.)
 - **Level** — grown by quest-XP toward a cap = **`3 + 0.9 × comfort(their own bedroom)`** (the bedroom's comfort band tops out ~40 under normal play; region **endgame buildings raise the band → cap ~50**). Items feed power *only* through this channel, never the roll.
 - **who + backstory** — AI-written at acquisition, fitting the tags.
 - **Chains / dossier** — the sagas a character passes through are its **living dossier** (no separate psychological model; see GENERATION_FLOW §14).
@@ -73,7 +73,7 @@ Items are `class:equipment | furniture | consumable` — **ilvl + tags, no attri
 
 - **Item level (ilvl)** — fixed at the drop = the **source quest's level**; it never grows. It **gates which tag-tiers can roll**, so higher-level quests drop more desirable items (the loot chase). Item generation mirrors character-gen (value-budgeted, ilvl-gated tags).
 - **Display items** (equipment / furniture — differ by which themed slot they fit): slotted into a tag-matched room → **prestige** (§5). They **never touch the roll**.
-- **Consumables** — stackable; slotted into a quest's requirement slot for a **one-shot, bounded** effect, then consumed.
+- **Consumables** — stackable; slotted into a quest's requirement slot for a **one-shot, engine-bounded** effect, then consumed. 🟡 the effect model (what they do — they never touch the roll directly) = design at impl.
 - **Gold** — stackable currency; paid into quest cost slots and room build/upgrade/renovation costs.
 
 ---
@@ -83,7 +83,7 @@ Items are `class:equipment | furniture | consumable` — **ilvl + tags, no attri
 Every room computes **ONE number — its "comfort"** — a saturating band over the slotted cards' `overlap` fit vs the room's theme. Comfort drives the room's **ONE typed benefit** (no double-dipping):
 - **Theme rooms** → **+global PRESTIGE** — the progression currency, exclusively theirs to generate;
 - a **bedroom** → its **owner merc's level cap** (and nothing else);
-- **functional rooms** → their **unique bonus** (infirmary heal speed, market prices, torture-chamber break speed, oracle odds-precision…) — *not* prestige.
+- **functional rooms** → their **unique bonus** (infirmary heal speed, market prices, torture-chamber break speed, oracle odds-precision…) — *not* prestige (Hospital: small exception).
 
 **Prestige is the master clock**: it gates room **unlocks AND upgrades** (gold is the cost, prestige is the permission), quantized by the **Great Hall's tiers** (each tier = an act that unlocks the next batch of buildings). A room starts with **zero CardSlots**; each upgrade adds one. A theme room is a **concrete type** (Dining hall, Gallery, Menagerie…) plus a **player-applied STYLE** (renovation, gold): the AI rolls type+style into a wanted-tag set **once**; the engine scores deterministically forever after.
 

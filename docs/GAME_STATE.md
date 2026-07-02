@@ -8,7 +8,7 @@
 
 Everything you own — mercs, captives, items, gold — is a **Card**, stored uniformly. The save is:
 - the **card collection** — each card's `location` is a **CardSlot reference** when slotted (`room:<id>#1` / `quest:<id>#2`), else a holding state (roster / inventory / staged / limbo);
-- **gold**, the **fort** (cells + rooms + their CardSlots + upgrade levels + stored theme-tags), the **lead board**, **active chains**, the **Great Hall tier**, **unlocked regions**;
+- **gold** (a stackable card, shown as a counter), the **fort** (cells + rooms + their CardSlots + upgrade levels + stored theme-tags), the **lead board**, **active chains**, the **Great Hall tier**, **unlocked regions**, and the **RNG state** (persisted, not re-derived);
 - the **lore graph** ([LORE.md](LORE.md)): nodes' blurbs/dossiers + memory-edges — **append-only with an `active` flag; nothing is ever hard-deleted** (inactive = hidden from AI context, still player-readable in the Chronicle).
 
 **Comfort/prestige are computed live, never stored** — recomputed on any card move; free rearrange. **Cards are never attached to cards** — only rooms and quests have CardSlots. A character's gear lives in its owned bedroom; an **injury is intrinsic tiered state** on the character (GENERATION_FLOW §11), not a card or tag.
@@ -22,6 +22,8 @@ Everything you own — mercs, captives, items, gold — is a **Card**, stored un
 3. **AI: pickers** (e.g. the lore selector "which candidates need full text?") — **discarded**; their only effect is the creative call's output, which is saved.
 
 **Reload re-runs NO AI call** — every AI effect is baked into the save. "Determinism" = engine math is seeded; AI outputs are persisted; nothing is re-derived.
+
+**Cycle order 🔒-shape:** Fort phase (build/slot/assign) → commit → **Resolution** (quests resolve in quest-id order; lore write-backs apply *after* all of the cycle's resolutions — no same-cycle cross-feed, enabling parallel AI calls) → healing ticks, salience decay, staging timers → lead grants/expiry → next cycle.
 
 ---
 
@@ -71,4 +73,4 @@ No one joins or is held instantly — they **stage** with full stats and a timer
 ---
 
 ## 7. Open 🟡
-XP curve numbers · staging timers · starter fort composition (FORT §7).
+XP curve numbers · staging timers · starter fort composition (FORT §7) · **first-class repeat-assignment / party-memory / re-station affordances** (2,000 cycles of manual re-slotting is RSI, not min-maxing).

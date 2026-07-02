@@ -22,7 +22,7 @@
 1. **Recall** (engine, deterministic, zero tokens): candidates = the focal's edge-neighbors ranked by effectiveSalience (**1–2 hops, no recursive expansion**) + recency + a few seeded thematic wildcards. Each candidate row carries its **edge-relation phrase** ("sibling-of focal; deserted") — that's what lets the selector judge from blurbs.
 2. **Selector** (gpt-5-nano; only if candidates > ~8): picks the ~3–4 ids needing **full dossiers**; engine validates ids (strip `id=` echoes, drop unknowns). *(Validated F1 0.89 vs feed-all 0.67, random 0.52.)* Its output is **discarded after use** (GAME_STATE §2 producer 3).
 3. **Genesis / writer** (gpt-5-mini, ONE call): full dossiers for the picked + blurbs for the rest → the bible **+ write-back folded into the same response** (relevantIds, new entities, new edges — persisted, guarded: both endpoints must resolve).
-4. **Resolution** (ONE batched call): narration + **all affected entities'** dossier updates + new memory-edges + injury bands together.
+4. **Resolution** (ONE batched call, narrative model): narration + new **memory-edges with per-edge blurbs + importance** + injury bands together. **The AI never writes the dossier directly** — it emits edges; the **engine renders** dossier & blurb from (stable identity + top-K salience-ranked edges) per §2.
 
 ## 4. Who writes what 🔒 *(the 3-producer model, GAME_STATE §2)*
 

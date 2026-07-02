@@ -12,7 +12,7 @@
  MECHANICAL                              │ AI
  ───────────────────────────────────────┼──────────────────────────────────
  1. stock lead board                     │
- 2. lead = {rarity,level,location,       │
+ 2. lead = {rarity,level,region,         │
     archetype, chain-info}               │
         — player PURSUES —               │
  3. generate SUCCESS reward (value →     │

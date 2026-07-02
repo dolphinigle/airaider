@@ -8,7 +8,7 @@
 
 A side-view cross-section of a hill-fort, always visible.
 - **Cells** = `{ idx, floor, col }`; each floor starts with 3 cells; **expansion is pure gold** (excavate sideways, dig up/down; costs scale). **One room per cell**; rooms are not sized. 🟡 sizes/packing = a later depth layer.
-- **Adjacency** = orthogonal neighbors; hand-authored **mate-pairs** (Kitchen↔Dining…) multiply a room's raw score, capped ~×1.5.
+- **Adjacency** = orthogonal neighbors; hand-authored **mate-pairs** (Kitchen↔Dining…) multiply a room's raw score (typical ×1.2, capped ×1.5).
 - **Gold is the only construction resource.** Prestige is never spent — it's the *permission* (§3).
 
 ---
@@ -78,4 +78,4 @@ Implementation notes: loot ≈ 0.29+0.06/tier drops/cycle (author from the slot 
 ---
 
 ## 7. Open 🟡
-Starter fort + build/excavate flow detail · per-room gold-cost table (assignment exists in sim; finalize at impl calibration) · forced negatives (deferred) · room sizes/packing (later).
+Starter fort + build/excavate flow detail · per-room gold-cost/unlock/archetype table + adjacency mate list (assignment exists in sim; finalize at impl calibration) · **functional-room benefitCurve table** (heal speed, prices, break speed, precision — esp. **torture-chamber THROUGHPUT**: concurrent breaks + cycles/break; spec + extend the sim, it's the one unmodeled pipe) · forced negatives (deferred) · room sizes/packing (later).
