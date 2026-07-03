@@ -736,7 +736,7 @@ W18. stackable `kind` ✅ LOCKED (designer 2026-06-13 "just have Gold and Debt f
     — 2 kinds: gold (currency, unit value 1) · debt (owed coin, negative stackable).
     exactly-1 · flat · value-0 identity tag (the card's value = quantity × unit value;
     kind just says which resource). grain CUT (designer; no upkeep mechanic yet). evidence/
-    mess stay LIABILITY cards (discrete complications), NOT stackable kinds. FUTURE: more
+    mess stay LIABILITY cards (discrete complications), NOT stackable kinds (⚠ superseded by §7.1/§10 impl: LIABILITIES = NEGATIVE STACKABLES, kind tags). FUTURE: more
     kinds when mechanics need them — consumable items (designer), building materials, etc.
     §9b PASS 2 VOCABULARY WALK COMPLETE (W1–W18).
     Pass-2 note (designer): words will in practice be BASIC/elemental — fire, frost,
@@ -821,7 +821,7 @@ independently — deep positive, shallow negative is the norm (strong 20 / weak 
 The handoff (pattern B — both sides seed each other), NO new AI calls (piggyback only):
   1. engine rolls a PARTIAL unit: identity + ~half the value budget;
   2. the AI call that already describes the person may ADD up to 3 vocab tags fitting the role;
-  3. engine canonicalizes + prices them; if over budget, drops RANDOMLY (not by heuristic) —
+  3. engine canonicalizes + prices them; if over budget, drops RANDOMLY (⚠ superseded by §9a.2 BUDGET=EXPECTATION — no caps/drops) (not by heuristic) —
      ⚠ revisit the budget semantics after §3b (unit-valuation revamp) lands;
   4. engine completes the remainder with shaped rolls → unit MARKED at target (§2).
 Use sites: one-offs (cardAsk emits optional quarryTags → engine `required`); bible secondaries
@@ -873,7 +873,7 @@ THE UNIFIED SLOT GRAMMAR (the structural heart — one grammar for all cards):
   ROOM  item slot     wants tags → relic fits → comfort/prestige (placement)
   A room TYPE declares its slot mix (unit slots, item slots, or both).
 
-BEDROOM PERSONALIZATION (closes the growth loop): a merc's bedroom item-slots are DERIVED FROM
+BEDROOM PERSONALIZATION (closes the growth loop): a merc's bedroom item-slots are DERIVED FROM (⚠ superseded §15/§18: generic slots; owner slot binds target engine-side, no AI piggyback)
 THE MERC'S TAGS (AI-determined — piggyback on the flesh call, no new calls): soldier → weapon
 rack (wants war-loot/blade); healer → herb niche; singer → instrument stand. Fitting relic →
 big comfort, any relic → small; comfort already gates level caps (3 + 0.9×comfort) →
@@ -884,11 +884,11 @@ displayed storied relics → prestige → leadTier (plugs the 100-day dead fauce
 SELL = cash-out at a discount off the mark (background dilemma, not the headline).
 
 STRUCTURE: Card contract = name + tags + value(mark) + location + chainIds (moves to BaseCard).
-GROWTH is THE species discriminator: characters grow (level/xp/talents/stamped tags); relics
+GROWTH is THE species discriminator: characters grow (level/xp — ⚠ talents → growth+focus per §10; stamped tags → post-proto per §8); relics
 are IMMUTABLE post-creation. Condition/repair: parked (items don't grow).
 INVARIANTS: cards never hold cards (no equipping in prototype) · only characters roll coins ·
 one value system both species (§8 designed domain-generic; vocabularies ~disjoint, next PR).
-NAME: **relic** (the world's word; encodes relic-OF-a-story; class `relic`).
+NAME: **relic** (the world's word; encodes relic-OF-a-story; ⚠ 'class' → `type:relic` TAG per §7.1).
 
 ### §7.1 THE CARD SYSTEM ✅ (designer-finalized 2026-06-12)
 THREE TYPES, type is a tag: `type:character` · `type:relic` · `type:stackable`.

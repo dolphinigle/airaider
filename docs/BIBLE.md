@@ -17,7 +17,7 @@ engine injects independent seeds — this is the core architectural lesson:
   spark to FUSE, decorrelating the story's SHAPE from the tags. Beat keywords > a fixed premise list
   (cheap AI can't "be original" but it can fuse concrete sparks).
 - **PLACE** (`pickPlace`) — a concrete setting so sagas aren't all "a fen-hamlet".
-- **TONE** (`pickTone`, weighted toward lighter — the weighting is shifted by the PLAYER_PREFERENCES tone knob: slice-of-life / wry / bittersweet / adventurous / tense
+- **TONE** (`pickTone`, weighted toward lighter — shifted by the PLAYER_PREFERENCES tone knob: slice-of-life / wry / bittersweet / adventurous / tense
   / dark) so not every saga is grim.
 - **TWIST** — engine-rolled ~30% (the AI NEVER decides; left alone it twisted 9/9). When set, the
   apparent goal is a misdirection.
@@ -37,7 +37,7 @@ engine injects independent seeds — this is the core architectural lesson:
   beats, lands at a MIDDLE step.
 - **arc** — a ROUGH ordered ~N-step guide (a skeleton, not a script): step 1 = take the job / meet (goal
   NOT done here), middles = escalating turns, LAST = the goal achieved at the finale.
-- **cast** — LEAN: each person is one vivid line (who) + a want + a ROLE (client / companion / quarry /
+- **cast (names are ENGINE-assigned, §4b — the AI uses them as-is)** — LEAN: each person is one vivid line (who) + a want + a ROLE (client / companion / quarry /
   obstacle / ally / prize). NO why-ladders — deep history is written at DELIVERY (`flesh`), only for the
   one character the company keeps. (Validated equal-quality to ladders, ~⅓ cheaper.)
 - **situation** — the real truth behind the job, told straight.

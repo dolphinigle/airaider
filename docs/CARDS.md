@@ -1,6 +1,6 @@
 # Cards — the unit model
 
-**Status:** Canonical. Everything you own is a **Card** (`class` distinguishes types). **Quests and rooms hold cards in CardSlots.** One function — `overlap(have, want)` — scores a card's tags against any CardSlot it sits in, powering both the dice roll and prestige. Conventions: 🔒 locked · 🟡 open. Roll/comfort numbers live in [GENERATION_FLOW.md](GENERATION_FLOW.md) §10/§18–§20 and [FORT.md](FORT.md).
+**Status:** Canonical. Everything you own is a **Card** (the `type` TAG distinguishes three types — §7.1). **Quests and rooms hold cards in CardSlots.** One function — `overlap(have, want)` — scores a card's tags against any CardSlot it sits in, powering both the dice roll and prestige. Conventions: 🔒 locked · 🟡 open. Roll/comfort numbers live in [GENERATION_FLOW.md](GENERATION_FLOW.md) §10/§18–§20 and [FORT.md](FORT.md).
 
 ---
 
@@ -12,7 +12,7 @@ A **Card** is any owned, taggable thing.
 ```
 Card { id, name, tags[], value, location, ... }        // type:character | type:relic | type:stackable (a tag)
   type:character → + attributes, growth, level, role    (the ONLY dice-toucher; the sole GROWING type)
-  type:relic     → ilvl + tags; category = its `form` tag (furniture, decoration, melee-weapon, … §9b W10)
+  type:relic     → tags (generated under the source's tier ceiling — the 'ilvl' principle); category = its `form` tag (furniture, decoration, melee-weapon, … §9b W10)
   type:stackable → MINTED, not rolled: fixed defining tags + qty; `kind` is a tag —
                    gold · debt (negative gold) — W18: "just Gold and Debt for now"
                    LIABILITIES = NEGATIVE stackables (kind: evidence/mess/debt, negative value)
@@ -21,7 +21,7 @@ Card { id, name, tags[], value, location, ... }        // type:character | type:
 Singular vs fungible falls out of type: characters/relics carry name + story + chainIds; stackables carry qty, no identity (value: singulars = mark; stackables = qty × unit value). Consumables = a future stackable kind (not in the prototype vocabulary).
 
 **Two load-bearing rules:**
-1. Only the **character** type carries attributes/level, so **only characters touch the dice**. Every other class contributes **only tags** (read by `overlap()` wherever it sits) — so items can never unbalance the roll.
+1. Only the **character** type carries attributes/level, so **only characters touch the dice**. Every other type contributes **only tags** (read by `overlap()` wherever it sits) — so items can never unbalance the roll.
 2. **Cards never attach to cards.** Only **rooms and quests** have CardSlots. Slot `accepts` matches on **type/kind tags** (`requires:[type:relic]`, `requires:[kind:gold]`) — one matching primitive. A character's gear lives in its owned bedroom (a room); an **injury** is intrinsic state on the character (§11), not a card; a negative that hits a room (`infestation`) is *force-slotted into the room*. (See [GAME_STATE.md](GAME_STATE.md).)
 
 **Value** is gold-denominated and signed — every card has a value (negatives are negative). Full economy in [ECONOMY.md](ECONOMY.md).
@@ -38,7 +38,7 @@ CardSlot { accepts: type/kind tag query; requirement: open | must-be <card> | mu
 ```
 When slotted, a Card's `location` is a CardSlot reference (`quest:<id>#2` / `room:<id>#1`); otherwise it is a holding state (roster / inventory / limbo / staged). One placement model for both hosts.
 
-- **Quest slots** by accepted class: *party* (character; carries the `tested` attribute + favored/clashing skills) · *cost* (gold — reserved; pay-in antes cut from prototype) · *requirement* (item/consumable, consumed).
+- **Quest slots** by accepted type: *party* (character; carries the `tested` attribute + favored/clashing skills) · *cost* (gold — reserved; pay-in antes cut from prototype) · *requirement* (item/consumable, consumed).
 - **Room slots are GENERIC** — differentiated only by `accepts`: a normal room slot accepts **items OR obedient captives** (both are just tagged cards to `overlap()`); a **cell** slot accepts captives only (holding, raw ok); a bedroom's **owner** slot holds exactly one merc (it *binds the room's target* to that merc's own tags — not scored itself). **Mercs are never stationable in room slots** — mercs quest; captives and items staff the fort (see §5, the captive-labor loop).
 - **Requirement** — `open` / `must-be <card>` / `must-have <tag>`.
 - **Fill rule** — a quest needs **all party slots filled** (no partial sends; the threshold assumes N). A room scores whatever is filled.
@@ -49,7 +49,7 @@ When slotted, a Card's `location` is a CardSlot reference (`quest:<id>#2` / `roo
 
 ---
 
-## 3. The character class 🔒
+## 3. The character type 🔒
 
 Mercenaries, captives, and NPCs are all `type:character`, distinguished by `role` (merc / captive / npc; `dead` = lore-only, never a roster outcome). A character is:
 
@@ -72,7 +72,7 @@ Mercenaries, captives, and NPCs are all `type:character`, distinguished by `role
 
 Items are **`type:relic`** — **ilvl + tags, no attributes, no level-growth.** Category = the `form` tag (§9b W10: furniture, decoration, melee-weapon, …); vocabulary = form/style/trait/enchantment/standing (W10–W17).
 
-- **Item level (ilvl)** — fixed at the drop = the **source quest's level**; it never grows. It **gates which tag-tiers can roll**, so higher-level quests drop more desirable items (the loot chase). Item generation mirrors character-gen (value-budgeted, ilvl-gated tags).
+- **Tier ceiling ('ilvl' principle)** — a relic is generated under its **source quest's tier ceiling** (`maxTier = 2×contentLevel+2`, §8): higher-level quests roll higher tag tiers (the loot chase). No stored field — relics are immutable; the ceiling applies at generation. Generation mirrors character-gen (value-budgeted, tier-gated).
 - **Display**: a relic slotted into a tag-matched room → **comfort** (§5). Relics **never touch the roll**.
 - **Consumables** — a future **stackable kind** (post-prototype): one-shot in a quest requirement slot. 🟡 effect model at impl.
 - **Gold / debt** — the two prototype stackable kinds (W18). Gold pays build/upgrade/renovation costs (quest cost-slot antes cut); debt = negative gold; liability stackables (evidence/mess) arrive via partial outcomes and TRIGGER events if left unresolved.
