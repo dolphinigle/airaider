@@ -75,7 +75,7 @@ Items are `class:equipment | furniture | consumable` — **ilvl + tags, no attri
 - **Item level (ilvl)** — fixed at the drop = the **source quest's level**; it never grows. It **gates which tag-tiers can roll**, so higher-level quests drop more desirable items (the loot chase). Item generation mirrors character-gen (value-budgeted, ilvl-gated tags).
 - **Display items** (equipment / furniture — differ by which themed slot they fit): slotted into a tag-matched room → **prestige** (§5). They **never touch the roll**.
 - **Consumables** — stackable; slotted into a quest's requirement slot for a **one-shot, engine-bounded** effect, then consumed. 🟡 the effect model (what they do — they never touch the roll directly) = design at impl.
-- **Gold** — stackable currency; paid into quest cost slots and room build/upgrade/renovation costs.
+- **Gold** — stackable currency; paid into room build/upgrade/renovation costs (quest cost-slot antes are cut from prototype).
 
 ---
 

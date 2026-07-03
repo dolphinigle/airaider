@@ -1,4 +1,4 @@
-> **⚠ PARTIALLY SUPERSEDED (2026-07-03).** The BANK mechanism (accrual · crystallization · shortfall/debt · failure budget · last-chance) is canon — but details predating later locks are overridden: focal sizing = share×E[payoff] (GENERATION_FLOW §1–§2, replaces `maxCharValue`); no `risky` flag — injury is AI-judged & decoupled (F5); attribute names & the roll = §10. Treat QUESTS.md + ECONOMY.md as the entry points.
+> **⚠ PARTIALLY SUPERSEDED (2026-07-03).** The BANK mechanism (accrual · crystallization · shortfall/debt · failure budget · last-chance) is canon — but details predating later locks are overridden: focal sizing = share×E[payoff] (GENERATION_FLOW §1–§2, replaces `maxCharValue`); no `risky` flag — injury is AI-judged & decoupled (F5); attribute names & the roll = §10. Also overridden: the old immediate/deferred 60/40 side-loot mechanism → per-beat engine-set side-loot budget (QUESTS §6); the personal-finale payoff → QUESTS §5. Treat QUESTS.md + ECONOMY.md as the entry points.
 
 # Reward bank, off-rails & last-chance — design + plan
 
@@ -57,7 +57,7 @@ With the current value scale `bank` is usually **>** `focalTarget` (one good bea
 level-capped focal), so **surplus-gold is the norm**; debt/void are the catastrophe path (you failed
 most beats). That's intended.
 
-**Personal finale** — unchanged renown/scar/death, **plus** award `round(bank)` gold on non-failure.
+- **Personal finale** — payoff per QUESTS §5 (LOCKED): round(bank) gold/relics on non-failure + pinned CORE memory-edges on the merc; no stamps, no death.
 
 ## 4. Off-rails (replaces the retry) + last chance
 

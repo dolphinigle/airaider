@@ -147,7 +147,7 @@ So you keep a hard-won focal character even on a *partial* — you only **lose**
 
 **Chain = genesis (build the bible) → linear beats (quest-writer) → branched finale.** *(GENESIS+BUILD below = two logical stages of ONE AI call — the ≤2-round-trip rule (LORE §3) counts selector + genesis only.)*
 
-### Phase A — Bible genesis (the writers'-room build; full spec in [QUEST_BIBLE.md](QUEST_BIBLE.md))
+### Phase A — Bible genesis (the writers'-room build; authoritative spec: [BIBLE.md](BIBLE.md) (LOCKED); background craft in QUEST_BIBLE.md)
 
 ```
 seed bank ──pick(stakes, region, anti-repeat)──┐
