@@ -799,7 +799,7 @@ export class Game {
     // 2) ONE batched AI call for all resolutions
     const aiInputs: ResolveQuestInput[] = resolutions.map(r => ({
       questId: r.quest.id, title: r.quest.title, situation: r.quest.situation, job: r.quest.job,
-      outcome: r.outcome,
+      rarity: r.quest.rarity, outcome: r.outcome,
       party: r.party.map(p => ({ id: p.id, name: p.name, tags: renderTags(p.tags), dossier: this.dossier(p.id) })),
       deliveredSummary: this.describeDelivery(r),
       deliveredCharacters: r.delivery.cards.filter(c => c.character).map(c => ({ id: c.id, name: c.name, tags: renderTags(c.tags) })),

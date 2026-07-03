@@ -75,6 +75,7 @@ export interface GenesisOut {
 export interface ResolveQuestInput {
   questId: string;
   title: string; situation: string; job: string;
+  rarity: string;                // drives the word budget
   outcome: 'success' | 'partial' | 'failure';
   party: { id: string; name: string; tags: string; dossier: string }[];
   deliveredSummary: string;      // engine-computed delivery, named for the AI to narrate

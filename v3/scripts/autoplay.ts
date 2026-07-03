@@ -19,9 +19,13 @@ const BUILD_ORDER = [
   'map-room', 'lead-room', 'mess-hall', 'storage', 'scouting-forests', 'recruiting-forests',
   'infirmary', 'dining-hall', 'kitchen', 'garden', 'tavern', 'dungeon', 'holding-cell',
   'dungeon-cell', 'torture-chamber', 'trophy-room', 'gallery', 'library', 'market',
-  'ransom-office', 'smithy', 'shrine', 'dungeon-cell', 'oracle', 'interrogation', 'chronicle',
-  'music-hall', 'menagerie', 'scouting-city', 'recruiting-city', 'hospital', 'treasure-vault',
-  'curiosity-cabinet', 'crypt', 'gambling-den', 'bathhouse', 'brewery', 'stables', 'feast-hall',
+  'ransom-office', 'smithy', 'shrine',
+  'scouting-city', 'recruiting-city',     // region 2 the moment T4 opens it
+  'dungeon-cell', 'oracle', 'interrogation', 'chronicle',
+  'music-hall', 'menagerie', 'hospital', 'treasure-vault',
+  'curiosity-cabinet', 'crypt',
+  'scouting-coast', 'recruiting-coast',   // region 3 at T7
+  'gambling-den', 'bathhouse', 'brewery', 'stables', 'feast-hall',
 ];
 let bedroomsBuilt = 0;
 const INFRA = new Set(['map-room', 'lead-room', 'scouting-forests', 'recruiting-forests']);
