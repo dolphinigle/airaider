@@ -10,7 +10,7 @@
 
 - **Tag value curve (20 tiers, geometric):** `value(t) = 6 × 1.9^(t−1)` — one curve over the unified 20-tier tag scale (4 bands of 5; GENERATION_FLOW §8). High tiers are rare and *feel* like jackpots by price alone.
 - **MARKED value** 🔒: a card's `value` = **the generation target spent on it** (the mark), not a live Σ of its tags — tags are the *substance* and may diverge from the mark (the jackpot gap: a lucky high-tier roll is worth more than its mark says).
-- **Signed:** negatives exist — **negative stackables** (`kind: debt` = negative gold; `evidence`/`mess` liabilities — unresolved ones TRIGGER hostile events via the story engine, §7.1), and **injury** (intrinsic tiers on a character; its cost = `tiers × V_base(level)`, §11). A **reward is a bundle of cards whose NET value = a target.**
+- **Signed:** negatives exist — **negative stackables** (kinds `debt` = negative gold, `evidence`, `mess` — ALL are liabilities: left unresolved they TRIGGER hostile events via the story engine — the collector arrives, the evidence surfaces; §7.1/§10), and **injury** (intrinsic tiers on a character; its cost = `tiers × V_base(level)`, §11). A **reward is a bundle of cards whose NET value = a target.**
 - A **source-level ceiling** (ilvl) gates the tag *tiers* a quest can roll — higher-level quests drop better loot; each region's band opens a new loot **stratum** (the re-fill chase, FORT §6).
 
 ---
