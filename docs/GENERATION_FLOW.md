@@ -14,7 +14,7 @@ stat tags feed attributes (muscular/nimble/clever/beautiful/tough), background t
 biases body-tag odds, personality/skill-direct/standing/gender = none. VERIFIED 36/36 across L3–L20
 (supervisor agent loop; only change from L10 draft = base 4→3). clash=mirror; injury=#39 placeholder.
 INJURY ✅ LOCKED (#39, §11) — one generic injury in TIERS, AI-judged severity, flat coin penalty,
-tiers→death-cap(10)+building-extend, rest/infirmary/pay-gold-room healing, value=tiers×V_base.
+tiers→death-cap(10)+building-extend (⚠ death CUT §19), rest/infirmary/pay-gold-room healing, value=tiers×V_base.
 CURRENT design area: FORT ROOM CATALOG (#36, §12). BRAINSTORM POOL recorded (§12.1, ⏳ not locked):
 rooms = 4 kinds (A feature/menu gates · B capacity · C region-scoped quest faucets · D prestige
 gates). Kinds A+B drafted; torture chamber RESOLVED-keep (gpt-5-mini probed L1–L6, 0 refusals).
@@ -1535,7 +1535,7 @@ benefit(room) = benefitCurve( comfort )                                     ← 
 - **CardSlot is the one generic concept** (quests and rooms both have CardSlots). The old room slot
   "kinds" collapse into the slot's **`accepts` list**; the only special slot = a bedroom's **owner**.
 - Each upgrade = **+1 generic slot**; a room slot accepts **items OR obedient captives** (both scored
-  by the same `overlap` vs the room theme). ~3–6 slots/room via upgrades (grand late rooms up to ~8).
+  by the same `overlap` vs the room theme). ~3–6 slots/room via upgrades (grand late rooms up to ~8 (⚠ superseded §20: max 6)).
   No display-vs-occupant split, no authored slot-ladder.
 - **THE LOOP:** capture → hold (cells) → **break** (torture chamber → `obedient` tag) → **station in
   rooms** → comfort ↑ → benefit ↑. **Captives are core loot** — every room is a collection puzzle

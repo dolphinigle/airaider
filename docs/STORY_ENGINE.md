@@ -50,7 +50,7 @@ A character's depth comes from the chains they've lived through — but you can'
 
 **Token discipline at generation time:**
 - Always feed the **stable identity** for the relevant pool — small and prompt-cacheable.
-- Feed the **dossier** only for the 1–3 characters a quest actually develops.
+- Feed the **dossier** only for the ~3–4 characters the lore selector picks (LORE §3).
 - Feed only a **one-line surface** for the wider "casting pool" the AI picks supporting roles from.
 
 ### Characters are story-seeds
