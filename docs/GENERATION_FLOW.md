@@ -1769,3 +1769,14 @@ checklist (GAME_STATE/QUESTS/ECONOMY/LORE/TAGS + CARDS/FORT §18-§20 retouch) �
    ~5 → 2 cycles/break. Demand check: T4 0.25/c capacity vs ~0.2/c captive-fill demand (intended
    early pinch: break vs ransom); T8+ comfortable headroom. Extend the pacing sim with this pipe at
    impl calibration.
+
+### §17.1 — checklist EXTENSION (added 2026-07-03 after the blind-spot audit)
+The original §17 checklist started at §8 — the §1–§7 region was untracked, which let v2 text survive
+in canon (the card-class enum bug + fate-enum/keyword-sampler carryovers, all fixed 2026-07-03).
+Rows for the pre-§8 locks, now verified landed:
+**§1 calc/E[payoff]+0.8 → QUESTS §6/§8 + ECONOMY §3 ✅ · §2 split (unit share 55–85%, kind table
+recruit/captive/gold-hoard, focal ALWAYS exists) → QUESTS §2 + ECONOMY §3 ✅ · §4 handoff
+(BUDGET=EXPECTATION per §9a.2; middle beats unit-free) → ECONOMY §4 + QUESTS §6 ✅ · §4b names
+(engine rolls ALL) → QUESTS/PROMPTS/BIBLE ✅ · §5 keywords (1 BOND+1 TIE+2 WILDCARDS, one field) →
+BIBLE ✅ · §7 relics + §7.1 card system (type-as-TAG char/relic/stackable; form tags; gold+debt kinds;
+liabilities=negative stackables; tier-ceiling not stored ilvl) → CARDS ✅.**
