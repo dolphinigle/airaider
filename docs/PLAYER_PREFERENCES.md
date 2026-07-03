@@ -14,9 +14,9 @@ A **preference** is a structured, low-token hint added to every AI prompt's syst
 Conceptually:
 
 ```
-Engine: "captive notoriety = 3, archetype = deserter, tags = [scarred, mire-touched]"
+Engine: "captive standing: infamous (mid), archetype = deserter, tags = [tough, mire-touched]"
 Preferences: "tone = grimdark; writing = terse; npc gender bias = mostly-male"
-AI: "Marek of the Hollow — a scarred deserter with the bog still on him. 27, sullen, won't answer to his old name."
+AI: "Marek of the Hollow — a tough deserter with the bog still on him. 27, sullen, won't answer to his old name."
 ```
 
 ## Initial preference categories
@@ -48,7 +48,7 @@ Who are the captives, mercenaries, villains?
 - `mostly-female`
 - `all-male`
 - `all-female`
-- `non-binary-leaning`
+- `non-binary-leaning (post-prototype — no engine representation)`
 
 ### 4. Cultural register
 What naming/cultural feel should NPCs and places have?
@@ -102,4 +102,4 @@ This costs ~30 tokens and is paid once per AI call. Acceptable.
 
 ## Implementation note for the prototype
 
-Stage E (AI-determined rewards) introduces the first AI call that should respect preferences. **When implementing Stage E, plumb the preferences preamble through `LeanOpenAIScenarioLLM.narrate()` so it's available everywhere the AI writes prose.** Default values are fine for the prototype — no UI surface for preferences yet, just the engine plumbing.
+Prepend the preferences preamble to **every prose call** (v3: the narrator layer). Default values are fine for the prototype — no UI surface yet, just the plumbing. (Rewards are engine-generated, reward-FIRST; the AI proposes kind/label only — F6.)

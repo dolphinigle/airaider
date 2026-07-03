@@ -144,9 +144,9 @@ Strict JSON Schema with a `narrative` string field nested inside the structured 
   "tags_invoked": ["muscular", "superstitious"],
   "sultan_coin_target": "reach the upper window without alerting the guards",
   "sultan_coin_band": "favorable",
-  "merc_wound_severity": 0,
+  "merc_injury_band": "none|low|med|high",
   "captive_taken": null,
-  "narrative_consequences": ["+1 reputation with Brother Cedric", "Marek gains 1 V"],
+  "narrative_consequences": ["categorical/prose only — the AI never emits raw numbers (§16 3-producer)"],
   "follow_up_hooks": []
 }
 ```

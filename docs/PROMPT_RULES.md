@@ -30,7 +30,7 @@ The split is "engine owns the dice, AI owns the prose." Where the AI's fiction s
 mechanic, use **AI-proposes → engine-decides/caps**, never AI-sets-the-number:
 - the beat proposes a reveal/loot flavour → the **resolution** (knowing the dice) decides what actually
   lands, scaled to the outcome;
-- the beat proposes **immediateReward** (loot now vs banked) → the engine sizes it + always banks a floor;
+- the resolver proposes the **reward KIND/label** → the engine validates & grants from the budget (F6); side-loot = an engine-set per-beat budget deducted from the bank;
 - the genesis proposes **which arc steps afford a branching choice** → the engine caps how many.
 A pure-engine roll is fine when fiction shouldn't drive it (twist %, failure budget). Let the AI propose
 when the *story* knows best (is there loot here? does this step branch?).

@@ -22,10 +22,10 @@ engine injects independent seeds — this is the core architectural lesson:
 - **TWIST** — engine-rolled ~30% (the AI NEVER decides; left alone it twisted 9/9). When set, the
   apparent goal is a misdirection.
 - **expectedBeats** — sizes the arc to the rarity (uncommon 4 … legendary 7).
-- **recurring poolCast** — a sample of existing mercs/captives the bible MAY weave in as ≤1-2 SECONDARY
+- **recurring poolCast** — supplied via LORE.md retrieval (relevance-ranked recall + selector, §14 — replaces the old random sample); the bible MAY weave in ≤1-2 as SECONDARY
   people (recurrence = attachment); MANY sagas use none.
 - **avoid** — recent titles + premise snippets, to steer away from repeats.
-- **focal tag exclusion** — recent focals' skill+physical+notoriety tags excluded so the ARCHETYPE varies
+- **focal tag exclusion** — recent focals' skill+body+standing tags excluded so the ARCHETYPE varies
   (not every focal a "beautiful scarred notorious wolf-witch"). FOCAL skills capped at 2.
 
 ## Output (the bible)
