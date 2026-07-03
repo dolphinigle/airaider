@@ -1,6 +1,6 @@
 # Cards — the unit model
 
-**Status:** Canonical. Everything you own is a **Card** (the `type` TAG distinguishes three types — §7.1). **Quests and rooms hold cards in CardSlots.** One function — `overlap(have, want)` — scores a card's tags against any CardSlot it sits in, powering both the dice roll and prestige. Conventions: 🔒 locked · 🟡 open. Roll/comfort numbers live in [GENERATION_FLOW.md](GENERATION_FLOW.md) §10/§18–§20 and [FORT.md](FORT.md).
+**Status:** Canonical. Everything you own is a **Card** (the `type` TAG distinguishes three types — §7.1). **Quests and rooms hold cards in CardSlots.** One function — `overlap(have, want)` — scores a card's tags against any CardSlot it sits in, powering both the dice roll and room comfort. Conventions: 🔒 locked · 🟡 open. Roll/comfort numbers live in [GENERATION_FLOW.md](GENERATION_FLOW.md) §10/§18–§20 and [FORT.md](FORT.md).
 
 ---
 
@@ -38,14 +38,14 @@ CardSlot { accepts: type/kind tag query; requirement: open | must-be <card> | mu
 ```
 When slotted, a Card's `location` is a CardSlot reference (`quest:<id>#2` / `room:<id>#1`); otherwise it is a holding state (roster / inventory / limbo / staged). One placement model for both hosts.
 
-- **Quest slots** by accepted type: *party* (character; carries the `tested` attribute + favored/clashing skills) · *cost* (gold — reserved; pay-in antes cut from prototype) · *requirement* (item/consumable, consumed).
+- **Quest slots** by accepted type: *party* (character; carries the `tested` attribute + favored/clashing skills) · *cost* (gold — reserved; pay-in antes cut from prototype) · *requirement* (consumes a card — reserved; consumables are post-proto).
 - **Room slots are GENERIC** — differentiated only by `accepts`: a normal room slot accepts **items OR obedient captives** (both are just tagged cards to `overlap()`); a **cell** slot accepts captives only (holding, raw ok); a bedroom's **owner** slot holds exactly one merc (it *binds the room's target* to that merc's own tags — not scored itself). **Mercs are never stationable in room slots** — mercs quest; captives and items staff the fort (see §5, the captive-labor loop).
 - **Requirement** — `open` / `must-be <card>` / `must-have <tag>`.
 - **Fill rule** — a quest needs **all party slots filled** (no partial sends; the threshold assumes N). A room scores whatever is filled.
 - **Mutex (branches)** — quest approach-groups are mutually exclusive: filling one locks the others.
 - **Fit** — `overlap(card.tags, wants, clashes)` scores a card against its slot's wants (quest = the slot's favored skills; room = its theme) — the **one shared primitive** powering both the dice roll and prestige. (Kept raw/tier-scaled; rooms use its magnitude. On dice: **+0.5·U flat if the unit owns ≥1 favored skill** (no stacking, tier-blind — §16-F2, §10) and **−0.5·U mirror if it owns ≥1 clashing**; independent levers, not netted. In rooms all matched tags score by tier.)
 
-**Stacks.** Fungible cards (gold, identical consumables) store as `{card ×N}` — a count, not N objects. Unique cards (characters, rolled items) are singletons.
+**Stacks.** Stackables (gold/debt) store as `{card ×N}` — a count, not N objects. Characters and relics are singletons.
 
 ---
 
@@ -70,7 +70,7 @@ Mercenaries, captives, and NPCs are all `type:character`, distinguished by `role
 
 ## 4. Relics 🔒
 
-Items are **`type:relic`** — **ilvl + tags, no attributes, no level-growth.** Category = the `form` tag (§9b W10: furniture, decoration, melee-weapon, …); vocabulary = form/style/trait/enchantment/standing (W10–W17).
+Items are **`type:relic`** — **tags only: no attributes, no level-growth, no stored fields beyond the mark.** Category = the `form` tag (§9b W10: furniture, decoration, melee-weapon, …); vocabulary = form/style/trait/enchantment/standing (W10–W17).
 
 - **Tier ceiling ('ilvl' principle)** — a relic is generated under its **source quest's tier ceiling** (`maxTier = 2×contentLevel+2`, §8): higher-level quests roll higher tag tiers (the loot chase). No stored field — relics are immutable; the ceiling applies at generation. Generation mirrors character-gen (value-budgeted, tier-gated).
 - **Display**: a relic slotted into a tag-matched room → **comfort** (§5). Relics **never touch the roll**.
