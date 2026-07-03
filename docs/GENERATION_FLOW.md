@@ -55,8 +55,12 @@ verification + must-fixes → SHIP. Review-resolved into canon: leads EARNED not
 proposes reward kind, engine grants (F6) · pooled aggregation Σcoins vs Σthresholds (partial 0.6×) ·
 odds baseline always-raw, Oracle adds computed % · genesis=1 call · engine renders dossiers from AI
 edges. §21 RULINGS ✅ closed all four post-review items (loss=TIME · leads strict/priced grants ·
-known-cast ≈2/GH-tier · torture=chamber's own slots). Doc-redo DONE + triple-verified.
-NEXT = BUILD PROTOTYPE V3.
+known-cast ≈2/GH-tier · torture=chamber's own slots) + §21-4a (finale failure = TIME: bank forfeit,
+focal slips away FOR NOW → lore graph + sequel lead back; permanent loss out of prototype).
+VERIFIED TO CONVERGENCE on BOTH lens families: FACTS (numeric concordance · tables cell-by-cell ·
+supporting docs line-by-line) and PRINCIPLES (15 locked principles × 13 docs; §4b names, leads-earned,
+loss=TIME sweeps). Sole documented exemption to AI-never-emits-numbers = the §14 salience importance
+score (GAME_STATE §2). NEXT = BUILD PROTOTYPE V3 (README reading order; 🛠/🟡 flags = impl items).
 After all design: the LEAN-DOC TRANSFORM (commit checkpoint → rewrite every doc to
 END-result-only / implementable, verify each claim vs chat history → archive superseded docs
 TAGS.md/UNIT_GENERATION.md/scratch). (PROMPTS.md attribute names — FIXED 2026-07-03 in the doc-redo.) BIG PICTURE ([[v3-docs-finalization]]):
