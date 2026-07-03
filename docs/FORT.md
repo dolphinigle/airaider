@@ -35,7 +35,7 @@ Each comfort room's number drives its **single** benefit channel (no double-dipp
 | Room family | benefit = f(comfort) |
 |---|---|
 | **Theme rooms** (Dining hall, Gallery, Menagerie, Kitchen, Smithy, …) | **+global PRESTIGE** — exclusively; they are the only prestige generators (plus a small Hospital contribution) |
-| **Bedroom** (one type; owner = you or a merc) | the **owner's level cap** = `3 + 0.9 × comfort`; band tops ~40 normally, **endgame buildings raise the band → ~50** |
+| **Bedroom** (one type; owner = you or a merc) | the **owner's level cap** = `3 + 0.9 × comfort`; normal band max ≈ **45 → cap ~40**; **endgame buildings raise the band ≈ +10 → cap ~50** |
 | **Functional rooms** (Infirmary, Market, Ransom office, Torture chamber, Interrogation, Oracle, Hospital) | their **unique bonus** (heal speed, prices, break speed, leads, odds precision; Hospital also grants pay-gold instant heal on build) |
 
 **GLOBAL PRESTIGE = Σ theme-room comfort.** Its only job: **permission** — it gates the **Great Hall tier ladder**, and the Great Hall tier gates everything else:
@@ -64,6 +64,7 @@ comfort(room) = min + (max − min) · (1 − e^(−max(0, raw) / k))        // 
 - **Pure gates (proto):** Map room *(first build → quests)* · Lead room · Mess hall · Storage *(no capacity mechanics anywhere)* · Tavern *(recruits)* · Dungeon *(captive list)* · Holding cell *(new captives)* · Library · Chronicle *(browse the lore/memory archive)*. (After: Workshop.)
 - **Capacity:** Dungeon cells (×N, several captives each, no comfort). **Housing:** Bedroom (one type; merc bedrooms +1 roster slot; yours pre-built) · Bunkroom (starter housing; bedroom-less mercs sit at a low cap floor).
 - **Functional comfort (proto):** Infirmary *(heal speed — death is ignored in prototype)* · Hospital *(top tier; pay-gold heal + small prestige)* · Market · Ransom office · Torture chamber · Interrogation *(a priced per-captive action → yields a lead; comfort → yield quality)* · Oracle *(odds precision)*.
+- **Regions (§13):** Forests (elf, **L1–8**) → City (human, **L6–16**) → Coast (lizardman, **L12–22**) → Highlands (wolfkin, **L18–28**); Underdeep (no faction, **L24–34**, optional branch); the Outskirts (off-map, **L40→50**).
 - **Region rooms (× 4 spine + optional Underdeep):** Scouting lodge + Recruiting post = **pure gates** (open the region + its repeatable lead-hunt/recruit quests; quest *quality* comes from unit fit, not room comfort) · Training hall (after) · **Endgame building** = pure landmark (raises the bedroom comfort band; the 4 spine ones are the **Outskirts keys**). The **Underdeep branch unlocks between Coast and Highlands** (optional, not a key).
 - **Theme rooms (prestige family; ~50 types in 3 confidence tiers, §19):** proto tier-1 set ≈ Dining hall · Kitchen · Smithy · Garden · Gallery · Trophy room · Hall of arms · Shrine · Music hall · Menagerie · Treasure vault · Curiosity cabinet.
 - **Cut:** training-tag rooms, faith/dark axis, walls/defense, slave pens, passive-gold production.
@@ -72,8 +73,8 @@ comfort(room) = min + (max − min) · (1 − e^(−max(0, raw) / k))        // 
 
 ## 6. Pacing (sim-verified ×3 — §20.1, §20.2) 🛠
 
-15 Great-Hall tiers ≈ **2,000–2,300 cycles ≈ 100–115h**; ~130–190 cycles/tier; regions arrive ~every 3 tiers (Forests T1 → City ~T4 → Coast ~T7 → Highlands ~T10 → endgame T13–15); prototype = T1–T6 (~40h). Verified: 3 player policies within ~3%, greedy prestige-rush *slower* than human play (cap→loot coupling), caps clear every region gate, dead-drop rates 33%→8%. **The build-order table** (median opening: Map room → Lead room → Mess hall → Storage → Forests lodge/post → Infirmary → Dining hall → Kitchen → bedrooms → Garden → GH T2 ≈ c130 …) lives in §20.2.
-Implementation notes: loot ≈ 0.29+0.06/tier drops/cycle (author from the slot budget — oversupply = dead-drop misery) · income ~1.09^L vs costs ~1.32^T · roster width must feed loot rate · give a gold-reserve/wishlist affordance for hoard windows · **functional rooms take leftover fills with REPLACEMENT staffing** (better staff swaps in — required, §20.2 rule 5) · T13–15: surface a purchase-priority hint (GH vs endgame buildings vs region gates compete for gold).
+15 Great-Hall tiers ≈ **2,000–2,320 cycles ≈ 100–115h**; ~130–190 cycles/tier; regions arrive ~every 3 tiers (Forests T1 → City ~T4 → Coast ~T7 → Highlands ~T10 → endgame T13–15); prototype = T1–T6 (~40h). Verified: 3 player policies within ~3%, greedy prestige-rush *slower* than human play (cap→loot coupling), caps clear every region gate, dead-drop rates 33%→8%. **The build-order table** (median opening: Map room → Lead room → Mess hall → Storage → Forests lodge/post → Infirmary → Dining hall → Kitchen → bedrooms → Garden → GH T2 ≈ c130 …) lives in §20.2.
+Implementation notes: cost anchors (sim-verified): build ≈ 120·1.32^(T−1), upgrade 0.7×, Great-Hall tier-up 1.6×, endgame building 2×GH · loot ≈ 0.29+0.06/tier drops/cycle (cap ~1.05) (author from the slot budget — oversupply = dead-drop misery) · income ~1.09^L vs costs ~1.32^T · roster width must feed loot rate · give a gold-reserve/wishlist affordance for hoard windows · **functional rooms take leftover fills with REPLACEMENT staffing** (better staff swaps in — required, §20.2 rule 5) · T13–15: surface a purchase-priority hint (GH vs endgame buildings vs region gates compete for gold).
 
 ---
 

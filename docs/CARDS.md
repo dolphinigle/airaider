@@ -14,9 +14,9 @@ Card { id, name, tags[], value, location, ... }        // type:character | type:
   type:character → + attributes, growth, level, role    (the ONLY dice-toucher; the sole GROWING type)
   type:relic     → tags (generated under the source's tier ceiling — the 'ilvl' principle); category = its `form` tag (furniture, decoration, melee-weapon, … §9b W10)
   type:stackable → MINTED, not rolled: fixed defining tags + qty; `kind` is a tag —
-                   gold · debt (negative gold) — W18: "just Gold and Debt for now"
-                   LIABILITIES = NEGATIVE stackables (kind: evidence/mess/debt, negative value)
-                   that TRIGGER bad events if unresolved (the story engine collects)
+                   prototype kinds: gold · debt (negative gold) · evidence · mess —
+                   the latter three are LIABILITIES: negative stackables that TRIGGER
+                   bad events if unresolved (the story engine collects); more kinds later
 ```
 Singular vs fungible falls out of type: characters/relics carry name + story + chainIds; stackables carry qty, no identity (value: singulars = mark; stackables = qty × unit value). Consumables = a future stackable kind (not in the prototype vocabulary).
 
@@ -56,7 +56,7 @@ Mercenaries, captives, and NPCs are all `type:character`, distinguished by `role
 - **Tags** — identity + fit + the loot dopamine. **Personality IS tags.** Plus AI-generated **quirks**.
 - **Attributes** — five scalars: **Strength · Dexterity · Intelligence · Charisma · Constitution** → the **coin count** (the only thing that generates dice).
 - **Growth (replaces "talents")** — a fixed-sum **base** vector (random distribution = birth lean; flat L1 floor) + a fixed-sum **growth** vector reshaped by the player-assigned **FOCUS** (single → one GREAT stat · dual → two GOOD · none → generalist). No rolled talents. Past growth is **banked** (re-focus only reshapes future levels → per-merc history persists). 🛠 reshape/renormalization algorithm at impl. (Detail: GENERATION_FLOW §10.)
-- **Level** — grown by quest-XP toward a cap = **`3 + 0.9 × comfort(their own bedroom)`** (the bedroom's comfort band tops out ~40 under normal play; region **endgame buildings raise the band → cap ~50**). Items feed power *only* through this channel, never the roll.
+- **Level** — grown by quest-XP toward a cap = **`3 + 0.9 × comfort(their own bedroom)`** (normal bedroom band max ≈ 45 → **cap ~40**; region **endgame buildings raise the band ≈ +10 → cap ~50**). Items feed power *only* through this channel, never the roll.
 - **who + backstory** — AI-written at acquisition, fitting the tags.
 - **Chains / dossier** — the sagas a character passes through are its **living dossier** (no separate psychological model; see GENERATION_FLOW §14).
 
@@ -75,7 +75,7 @@ Items are **`type:relic`** — **tags only: no attributes, no level-growth, no s
 - **Tier ceiling ('ilvl' principle)** — a relic is generated under its **source quest's tier ceiling** (`maxTier = 2×contentLevel+2`, §8): higher-level quests roll higher tag tiers (the loot chase). No stored field — relics are immutable; the ceiling applies at generation. Generation mirrors character-gen (value-budgeted, tier-gated).
 - **Display**: a relic slotted into a tag-matched room → **comfort** (§5). Relics **never touch the roll**.
 - **Consumables** — a future **stackable kind** (post-prototype): one-shot in a quest requirement slot. 🟡 effect model at impl.
-- **Gold / debt** — the two prototype stackable kinds (W18). Gold pays build/upgrade/renovation costs (quest cost-slot antes cut); debt = negative gold; liability stackables (evidence/mess) arrive via partial outcomes and TRIGGER events if left unresolved.
+- **Stackables** — prototype kinds: **gold** (pays build/upgrade/renovation costs; quest cost-slot antes cut) · **debt** (negative gold) · **evidence / mess** (liabilities from partial outcomes — TRIGGER events if left unresolved).
 
 ---
 

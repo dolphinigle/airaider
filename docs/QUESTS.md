@@ -113,7 +113,7 @@ So you keep a hard-won focal character even on a *partial* — you only **lose**
 
 ## 6. Chain advance — organic length, no forced count
 
-- **Birth** — a `starts-new` lead pursued, a **merc joining** (main-chain built around the merc), or a **captive sometimes**. The engine generates **only the 1–2 focal (reward) characters** at `V = rolled unit SHARE (~55–85%) × E[payoff] ≈ V_base(level)×rarity×(B×N)×0.8` (structure per GENERATION_FLOW §1–§2; supersedes REWARD_BANK's maxCharValue; 🛠 numbers) (B = expected beats), **role-agnostic**; the **AI** then fleshes them and **invents the rest of the cast** freely (story NPCs, no value/gen) + writes the bible + a vague direction.
+- **Birth** — a `starts-new` lead pursued, a **merc joining** (main-chain built around the merc), or a **captive sometimes**. The engine generates **only the focal (reward) character** (ONE; secondaries materialize lazily, §4) at `V = rolled unit SHARE (~55–85%) × E[payoff]`, where `E[payoff] = B × S̄ × V_base(level) × rarity × 0.8` (S̄ = a FLAT slots-per-beat constant ≈1.5 — a genesis-time estimate, deliberately not distribution-exact; §1) (structure per GENERATION_FLOW §1–§2; supersedes REWARD_BANK's maxCharValue; 🛠 numbers) (B = expected beats), **role-agnostic**; the **AI** then fleshes them and **invents the rest of the cast** freely (story NPCs, no value/gen) + writes the bible + a vague direction.
 - **Per beat** — the engine sets the beat's slot count + a small side-loot budget; **the AI proposes the beat reward (thematic) → the engine translates it** to value/cards (middle-beat side-loot = gold/stackables/relics, never units — §4). AI owns theme; engine owns value.
 - **Climax gate** — the finale unlocks only once **merc-cycles *spent* ≥ target** (effort, not value-gained — so failures can't stall the chain). Below the gate, a resolved beat spawns a **continuation lead** (pursue or let lapse). Length = `min(player interest, the arc's climax)`.
 - **Finale** — the engine hands the AI a **reward recommendation** (the focal char); if the AI decides this beat is the finale, it writes it as **branched approach-groups** (§9) and may substitute the reward if the story diverged. The roll + the chosen branch decide the focal char's **kind + fate** → epilogue → maybe a **sequel lead**.
@@ -167,7 +167,7 @@ engine: focal character @ value V ─────────────┤   f
 
 | # | Actor | Action |
 |---|---|---|
-| 1 | Engine | trigger; rarity → **stakes** (cast size), beats `B`, slots `N`, **twist 30%**, `V = V_base×rarity×(B×N)×0.8 × unit-share` |
+| 1 | Engine | trigger; rarity → **stakes** (cast size), beats `B`, slots `N`, **twist 30%**, `V = unit-share × B × S̄(≈1.5) × V_base × rarity × 0.8` (§1) |
 | 2 | Engine | pre-generate the **focal character @ V** (role-agnostic tags) = the chain's **reward** *(main chain: focal = the joining merc)* |
 | 3 | Engine | pick a **seed** from the seed bank (Polti-anchored "what-if" spark, weighted by stakes/region, anti-repeat); build the **slate** via LORE RETRIEVAL ([LORE.md](LORE.md)): ranked recall over the focal's memory-edges (1–2 hops + wildcards) → optional nano **selector** picks who gets full dossiers (≤2 LLM round-trips total incl. genesis) |
 | 4 | AI · **GENESIS** | collide seed × slate → one-line **kernel**; choose **1–3 core** people (**focal must be core**); **write-back folded into the same response**: relevant ids + new entities/places + new memory-edges (engine persists, guarded) |

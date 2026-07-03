@@ -46,7 +46,7 @@ Every comfort room computes **one number (comfort)** from its slotted cards, dri
 ## 4. Merc power 🔒-shape 🛠-numbers
 
 - **Attributes → coins** (the roll, GENERATION_FLOW §10).
-- **Level → grows attributes** (per growth vector + player FOCUS). **Quest-XP** levels a merc toward the cap set by *their own bedroom's* comfort (band ~40; endgame buildings → ~50). 🟡 XP curve tuned at impl (~40 cycles/level mid-game per the pacing sim).
+- **Level → grows attributes** (per growth vector + player FOCUS). **Quest-XP** levels a merc toward the cap set by *their own bedroom's* comfort (normal band max ≈45 → cap ~40; endgame buildings → cap ~50). 🟡 XP curve tuned at impl (~40 cycles/level mid-game per the pacing sim).
 - **Cap-downgrade**: above a lowered cap → keep level, can't grow. **Cap-binding must be loudly visible** (UI).
 
 ---
