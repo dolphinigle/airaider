@@ -71,6 +71,7 @@ Mercenaries, captives, and NPCs are all `class:character`, distinguished by `rol
 
 Items are `class:equipment | furniture | consumable` — **ilvl + tags, no attributes, no level-growth.**
 
+- **Item TAGS** come from the relic vocabulary (GENERATION_FLOW §9b W10–W17: form/style/trait/enchantment/standing); `form` is the queryable category — the classes equipment/furniture ≈ which slot family the form fits.
 - **Item level (ilvl)** — fixed at the drop = the **source quest's level**; it never grows. It **gates which tag-tiers can roll**, so higher-level quests drop more desirable items (the loot chase). Item generation mirrors character-gen (value-budgeted, ilvl-gated tags).
 - **Display items** (equipment / furniture — differ by which themed slot they fit): slotted into a tag-matched room → **prestige** (§5). They **never touch the roll**.
 - **Consumables** — stackable; slotted into a quest's requirement slot for a **one-shot, engine-bounded** effect, then consumed. 🟡 the effect model (what they do — they never touch the roll directly) = design at impl.
