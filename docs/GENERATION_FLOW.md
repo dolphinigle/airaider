@@ -1526,7 +1526,7 @@ benefit(room) = benefitCurve( comfort )                                     ← 
 - **One benefit channel per room — NO double-dipping:**
   - **Theme rooms** → benefit = **+global PRESTIGE** (that is ALL they do; the prestige generators).
   - **Merc bedroom** → benefit = the owner's **level cap**.
-  - **Functional rooms** → benefit = their **unique bonus** (infirmary heal speed, scout lead quality,
+  - **Functional rooms** → benefit = their **unique bonus** (infirmary heal speed, break speed,
     market prices…) — and **NOT** global prestige.
 - Everything is `overlap` → comfort → per-RoomType benefitCurve ("prestige multiplier"). Engine-owned.
   All curve numbers → #41.

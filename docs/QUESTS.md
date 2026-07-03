@@ -125,7 +125,7 @@ So you keep a hard-won focal character even on a *partial* — you only **lose**
 | lead granting; rarity/level/region/archetype/chain-info rolls | the bible (settled truth) |
 | **threshold number**; reward budget | quest card + **the ask (what's tested, party size, required units)** |
 | roll coins → outcome (success/partial/failure) | resolution: **before-roll (blind) → after-roll (sighted)** |
-| reward VALUE + bundle composition (ECONOMY) | name/flesh the reward character(s) |
+| reward VALUE + bundle composition (ECONOMY) | flesh the reward character(s) (engine-assigned names) |
 | validate & grant reward KIND from the budget | propose reward KIND + label; cast selection |
 | chain continuation (spawn lead / expire) | finale epilogue + sequel seed |
 
@@ -142,7 +142,7 @@ So you keep a hard-won focal character even on a *partial* — you only **lose**
 | 6 | Engine | threshold = f(N, level) |
 | 7 | Player | fill N slots (respect requirements) → End Day |
 | 8 | Engine | roll → success/partial/failure → **compute delivery** (full / half+liability / none) |
-| 9 | AI | ONE call: narrate (before→after) + **flesh/name** delivered card(s) + injury **band** per merc + memory-edges/dossier updates ([LORE.md](LORE.md)) |
+| 9 | AI | ONE call: narrate (before→after) + **flesh** delivered card(s) (engine names) + injury **band** per merc + memory-edges/dossier updates ([LORE.md](LORE.md)) |
 | 10 | Engine | apply; map injury band → tiers |
 
 **Chain = genesis (build the bible) → linear beats (quest-writer) → branched finale.** *(GENESIS+BUILD below = two logical stages of ONE AI call — the ≤2-round-trip rule (LORE §3) counts selector + genesis only.)*

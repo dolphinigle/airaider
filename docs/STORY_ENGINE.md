@@ -114,7 +114,7 @@ Why it matters: the buildup makes you *feel* the stakes you gambled on; the visi
 
 ## 9. Model tiers & latency 🛠
 
-Validated split (keep, revisit model names as they update): a **stronger model** for the prose tiers (bible, card, resolution) and a **cheap fast model** for the mechanical tier (fit-judging). Generation is cost- and latency-bound, so:
+Validated split (keep, revisit model names as they update): a **stronger model** for the prose tiers (bible, card, resolution) and a **cheap fast model** for the mechanical tier (the lore selector, tag extraction — fit itself is engine `overlap()`, never AI). Generation is cost- and latency-bound, so:
 - Pre-generate where possible (e.g. draft the next likely card during the Resolution read).
 - Background long generations behind a visible "drafting…" affordance — never freeze the UI.
 - The batched Resolution Phase fires many resolutions at once; parallelize them.
