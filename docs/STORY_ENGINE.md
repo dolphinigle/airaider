@@ -10,7 +10,7 @@ Principle inherited from the whole project: **the engine owns numbers, the AI ow
 
 The story engine never presents a "story mode." It works behind the board:
 
-1. **Stocks** the board with quests fitting the fort's capabilities and prestige, cast at the right tier.
+1. **Feeds** the board through earned channels only (continuations, lead-hunts, priced reward grants — QUESTS §1), fitting the fort's capabilities and prestige, cast at the right tier.
 2. **Connects** quests — a finished quest can drop its next step back onto the board as a lead; the player chooses to pursue it or let it lapse, so **story length is organic** (driven by pursuit, never an engine beat-count).
 3. **Grows** characters — every quest a character touches becomes part of who they are; a strong-hook character becomes the *subject* of quests.
 

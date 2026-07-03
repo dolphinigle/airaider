@@ -135,7 +135,7 @@ Designed — staging + dispositions in [GAME_STATE.md](GAME_STATE.md) §6 (Taver
 
 ## 9. How the board stays alive (story integration) 🔒
 
-There is **no separate story system the player touches** — only the board, kept alive by the engine behind it (full detail in STORY_ENGINE.md). That engine does three invisible jobs: it **stocks** the board (fitting fort + prestige, cast from the right tier), **connects** quests (a finished quest can drop its next step back as a lead you choose to pursue or let lapse — so story length is organic, driven by pursuit, never an engine beat-count), and **grows** characters (every quest a character touches becomes part of them; a strong-hook character becomes the *subject* of quests). The fort dials what stories the board can tell; playing the quests produces the loot and characters that drive the fort.
+There is **no separate story system the player touches** — only the board, kept alive by the engine behind it (full detail in STORY_ENGINE.md). That engine does three invisible jobs: it **feeds** the board through earned channels (fitting fort + prestige, cast from the right tier), **connects** quests (a finished quest can drop its next step back as a lead you choose to pursue or let lapse — so story length is organic, driven by pursuit, never an engine beat-count), and **grows** characters (every quest a character touches becomes part of them; a strong-hook character becomes the *subject* of quests). The fort dials what stories the board can tell; playing the quests produces the loot and characters that drive the fort.
 
 ---
 
