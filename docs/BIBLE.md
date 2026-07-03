@@ -13,7 +13,7 @@ a STAKE in — not a drama they spectate.
 ## Inputs the engine hands genesis (alongside the focal's rolled tags)
 Deriving a story from the focal's tags alone CONVERGES (always "a person with a concealed truth"). So the
 engine injects independent seeds — this is the core architectural lesson:
-- **THEME keywords** (`pickThemes`: one BOND + one TIE + one FLAVOUR, e.g. "love, debt, a curse") — a
+- **KEYWORD seeds** (§5 lock: ONE unlabeled `KEYWORDS:` field — 1 BOND + 1 TIE + 2 WILDCARDS drawn from THINGS/OCCASIONS/PEOPLE/UNCANNY/MOODS, e.g. "love, debt, a curse, salt") — a
   spark to FUSE, decorrelating the story's SHAPE from the tags. Beat keywords > a fixed premise list
   (cheap AI can't "be original" but it can fuse concrete sparks).
 - **PLACE** (`pickPlace`) — a concrete setting so sagas aren't all "a fen-hamlet".
