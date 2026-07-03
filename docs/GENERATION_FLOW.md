@@ -1764,6 +1764,12 @@ checklist (GAME_STATE/QUESTS/ECONOMY/LORE/TAGS + CARDS/FORT §18-§20 retouch) �
 3. **Known-cast cadence 🛠 (derived, verify in playtest):** target ≈ **2 known-cast saga geneses per
    GH tier** (~every 60 cycles ≈ 3h; ~0.5% of quests — apex-scarce), gated on a recurrable pool ≥ ~8;
    continuation beats carry faces between. Rarity weights derived from this target at impl.
+4a. **Finale failure = TIME, never permanence (ruled 2026-07-03, extends §21.1):** a failed chain
+   finale forfeits the BANK (the time sting — a saga's worth of merc-days) and the focal **slips away
+   FOR NOW** — they exit to the lore graph (alive, remembered, findable) and a **sequel/redemption
+   lead** (rarity-priced) can bring them back into reach. The AI may instead deliver them in a WORST
+   form (bitter captive, debt-saddled) when the fiction supports it. **Permanent character loss is
+   REALLY RARE by design and OUT OF PROTOTYPE SCOPE entirely.**
 4. **Torture-chamber throughput 🔒-shape 🛠-numbers (derived, capacity-checked):** breaking occupies
    the chamber's OWN CardSlots — concurrency = slot count (upgrades add racks), duration = f(comfort)
    ~5 → 2 cycles/break. Demand check: T4 0.25/c capacity vs ~0.2/c captive-fill demand (intended

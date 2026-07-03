@@ -35,7 +35,7 @@ The emotional core. Characters become *yours* through:
 - **Investment** — the hours you spent leveling and equipping them.
 - **Individuation** — the AI writing *them* specifically, quest after quest, until they have a voice.
 - **Their own stories** — personal quest chains that grow out of who they are.
-- **Loss that's real** — they can die, leave bitter, or be promoted beyond your reach. *(Prototype scope: loss = TIME + losing chain-focal characters — death/departure mechanics are deliberately post-prototype; GENERATION_FLOW §21.)*
+- **Loss that's real** — they can die, leave bitter, or be promoted beyond your reach. *(Prototype scope: loss = TIME — injury downtime, forfeited banks, a saga's season wasted; even a failed finale only DELAYS the person (sequel road back). Death/departure/permanent loss are deliberately post-prototype and rare even then; GENERATION_FLOW §21.)*
 
 ## What it is / isn't
 

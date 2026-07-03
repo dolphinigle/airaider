@@ -61,7 +61,7 @@ Three outcomes, no critical (upside lives in the generation lottery). Reward fix
 
 ## 5a. Chains accrue value — the bank 🔒 *(REWARD_BANK.md)*
 
-Each beat banks `party × V_base(level) × rarity × outcomeScale` (success 1 · partial 0.5 · failure 0); the **finale crystallizes** the bank into the focal character + surplus gold. The per-beat side-loot budget is **deducted from the beat's banked earn** (not paid on top — preserves income-neutrality vs one-offs). Shortfall → keep-with-debt or the focal slips away for salvage gold; finale failure → all forfeited. A per-chain **failure budget** forces a last-chance finale rather than endless retries. Income-neutral vs one-offs; adds variance + a lump payoff.
+Each beat banks `party × V_base(level) × rarity × outcomeScale` (success 1 · partial 0.5 · failure 0); the **finale crystallizes** the bank into the focal character + surplus gold. The per-beat side-loot budget is **deducted from the beat's banked earn** (not paid on top — preserves income-neutrality vs one-offs). Shortfall → keep-with-debt or the focal slips away for salvage gold; finale failure → **the bank is forfeit (the time sting) and the focal slips away FOR NOW** — alive in the lore graph, a rarity-priced sequel lead the road back (§21-4a; permanent loss out of prototype). A per-chain **failure budget** forces a last-chance finale rather than endless retries. Income-neutral vs one-offs; adds variance + a lump payoff.
 
 ---
 
