@@ -64,7 +64,7 @@ finalize ALL system docs → build prototype v3.
 Parked: band display names (display-only). Tag-system IMPLEMENTATION (#30) waits until the
 docs are finalized. The §9b GROUP PASS is COMPLETE (see "§9b CONTENT WALK" +
 "RELIC-SIDE GROUPS" sections): Character 8 = type/gender/race/personality/background(tiered,
-rank-is-the-tier)/trait/skill/standing · Relic 7 = type/form(tiered, embodies material+craft)/
+rank-is-the-tier)/trait(→`body` W4)/skill/standing · Relic 6 (⚠ was '7') = type/form(tiered, embodies material+craft)/
 style/trait/enchantment(label-rendered)/standing(fame only) · Stackable = type/kind.
 AI tag format LOCKED: `word (rank)`, ranks low/mid/high/legendary, both directions; bare
 words (no group labels) EXCEPT enchantment. Walk ONE DECISION AT A TIME; EXPRESS green
@@ -389,7 +389,7 @@ S1. `kind` ✅ (designer 2026-06-13) — stackables' identity group: gold, debt,
     exactly-1 · flat · exists so slots can `requires [stackable, gold]`; stackables have
     no rolled tags (§7.1) — type + kind is their whole tag-set.
 GROUP PASS COMPLETE (2026-06-13). Character 8: type/gender/race/personality/background/
-trait/skill/standing · Relic 7: type/form/style/trait/enchantment/standing · Stackable:
+trait(→`body` W4)/skill/standing · Relic 6 (⚠ was '7'): type/form/style/trait/enchantment/standing · Stackable:
 type/kind. NEXT: PASS 2 — word lists per group, one group at a time.
 
 ## §9b PASS 2 — WORD LISTS (one group at a time)
