@@ -14,7 +14,7 @@ Card { id, class, name, tags[], value, location, ... }
   equipment  → ilvl + tags     (slotted into rooms → comfort)
   furniture  → ilvl + tags     (slotted into rooms → comfort)   ("equipment" vs "furniture" = flavor)
   consumable → ilvl + tags     (stackable; one-shot in a quest, then consumed)
-  gold       → count           (currency, paid into cost slots)
+  gold       → count           (currency, paid into build/upgrade/renovation costs)
   liability  → negative value  (evidence / mess — a problem with a face; debt = negative GOLD, not a liability; see ECONOMY)
   … more classes later — the model is built to extend
 ```
@@ -42,7 +42,7 @@ When slotted, a Card's `location` is a CardSlot reference (`quest:<id>#2` / `roo
 - **Requirement** — `open` / `must-be <card>` / `must-have <tag>`.
 - **Fill rule** — a quest needs **all party slots filled** (no partial sends; the threshold assumes N). A room scores whatever is filled.
 - **Mutex (branches)** — quest approach-groups are mutually exclusive: filling one locks the others.
-- **Fit** — `overlap(card.tags, wants, clashes)` scores a card against its slot's wants (quest = the slot's favored skills; room = its theme) — the **one shared primitive** powering both the dice roll and prestige. (Kept raw/tier-scaled; rooms use its magnitude. On dice: **+0.5·U flat if the unit owns ≥1 favored skill** (no stacking, tier-blind — F2/F10) and **−0.5·U mirror if it owns ≥1 clashing**; independent levers, not netted. In rooms all matched tags score by tier.)
+- **Fit** — `overlap(card.tags, wants, clashes)` scores a card against its slot's wants (quest = the slot's favored skills; room = its theme) — the **one shared primitive** powering both the dice roll and prestige. (Kept raw/tier-scaled; rooms use its magnitude. On dice: **+0.5·U flat if the unit owns ≥1 favored skill** (no stacking, tier-blind — §16-F2, §10) and **−0.5·U mirror if it owns ≥1 clashing**; independent levers, not netted. In rooms all matched tags score by tier.)
 
 **Stacks.** Fungible cards (gold, identical consumables) store as `{card ×N}` — a count, not N objects. Unique cards (characters, rolled items) are singletons.
 

@@ -21,7 +21,7 @@ engine injects independent seeds — this is the core architectural lesson:
   / dark) so not every saga is grim.
 - **TWIST** — engine-rolled ~30% (the AI NEVER decides; left alone it twisted 9/9). When set, the
   apparent goal is a misdirection.
-- **expectedBeats** — sizes the arc to the rarity (common 4 … legendary 7).
+- **expectedBeats** — sizes the arc to the rarity (uncommon 4 … legendary 7).
 - **recurring poolCast** — a sample of existing mercs/captives the bible MAY weave in as ≤1-2 SECONDARY
   people (recurrence = attachment); MANY sagas use none.
 - **avoid** — recent titles + premise snippets, to steer away from repeats.

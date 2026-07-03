@@ -8,7 +8,7 @@ This doc records the AI provider research and the **recommended strategy** for A
 
 ## TL;DR
 
-- **Use GPT-4o-mini for everything in the prototype** — covers structured JSON + creative output, ~$0.05 per 100-scenario playthrough, strict schema enforcement eliminates a class of parsing bugs.
+- **(v2 note — superseded: v3 uses the validated gpt-5-mini / gpt-5-nano split — §4.1, LORE §3.)** Use GPT-4o-mini for everything in the prototype — covers structured JSON + creative output, ~$0.05 per 100-scenario playthrough, strict schema enforcement eliminates a class of parsing bugs.
 - **A/B test Claude Sonnet 4.5** on narrative-heavy prompts (legendary recruits, quest beats, god combos) starting week 2-3 of prototype.
 - **Wrap the calls in a thin provider abstraction** so swapping is a 5-minute change, not a refactor. Don't pull in heavy frameworks (LiteLLM) yet.
 - **Output format**: strict JSON Schema with a `narrative` string field inside the structured object. Best of both worlds: free-form storytelling + engine-consumable data.

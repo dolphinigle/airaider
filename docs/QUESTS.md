@@ -101,7 +101,7 @@ The engine rolls coins vs threshold → **success / partial / failure**, hands t
 
 So you keep a hard-won focal character even on a *partial* — you only **lose** them on a *failure*. No value-rescaling anywhere; the outcome composes a down-scaled bundle.
 
-**Kind**: the **AI proposes the kind + player-facing label** (a bounded categorical pick — §16 3-producer model), with the archetype as its bias (capture→captive, raid→gold, rescue→recruit); the **engine validates & grants** it from the fixed value budget; multi-kind allowed. Value then **converts**: `value→gold`, `value→character` (the value *is* the character's target value → character-gen, CARDS.md §2). *(value→tag-stamp = post-prototype, per the §8 lock.)* **Personal (main-chain) finale payoff 🔒-shape:** the bank crystallizes as gold/relics + **pinned CORE memory-edges on the merc** (their dossier is the growth) — no stamps, no death.
+**Kind**: the **AI proposes the kind + player-facing label** (a bounded categorical pick — §16 3-producer model), with the archetype as its bias (capture→captive, raid→gold, rescue→recruit); the **engine validates & grants** it from the fixed value budget; multi-kind allowed. Value then **converts**: `value→gold`, `value→character` (the value *is* the character's target value → character-gen, ECONOMY §4 / CARDS §3). *(value→tag-stamp = post-prototype, per the §8 lock.)* **Personal (main-chain) finale payoff 🔒-shape:** the bank crystallizes as gold/relics + **pinned CORE memory-edges on the merc** (their dossier is the growth) — no stamps, no death.
 
 **One-off vs chain:**
 - **One-off** — the engine rolls the reward, the AI dresses it (§2). Reward-first.
