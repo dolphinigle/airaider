@@ -8,20 +8,21 @@
 
 A **Card** is any owned, taggable thing.
 
+**THREE TYPES — `type` is a tag** (🔒 §7.1, uniform rule: every card = tags + value + location):
 ```
-Card { id, class, name, tags[], value, location, ... }
-  character  → + attributes, growth, level, role   (the ONLY dice-toucher)
-  equipment  → ilvl + tags     (slotted into rooms → comfort)
-  furniture  → ilvl + tags     (slotted into rooms → comfort)   ("equipment" vs "furniture" = flavor)
-  consumable → ilvl + tags     (stackable; one-shot in a quest, then consumed)
-  gold       → count           (currency, paid into build/upgrade/renovation costs)
-  liability  → negative value  (evidence / mess — a problem with a face; debt = negative GOLD, not a liability; see ECONOMY)
-  … more classes later — the model is built to extend
+Card { id, name, tags[], value, location, ... }        // type:character | type:relic | type:stackable (a tag)
+  type:character → + attributes, growth, level, role    (the ONLY dice-toucher; the sole GROWING type)
+  type:relic     → ilvl + tags; category = its `form` tag (furniture, decoration, melee-weapon, … §9b W10)
+  type:stackable → MINTED, not rolled: fixed defining tags + qty; `kind` is a tag —
+                   gold · debt (negative gold) — W18: "just Gold and Debt for now"
+                   LIABILITIES = NEGATIVE stackables (kind: evidence/mess/debt, negative value)
+                   that TRIGGER bad events if unresolved (the story engine collects)
 ```
+Singular vs fungible falls out of type: characters/relics carry name + story + chainIds; stackables carry qty, no identity (value: singulars = mark; stackables = qty × unit value). Consumables = a future stackable kind (not in the prototype vocabulary).
 
 **Two load-bearing rules:**
-1. Only the **character** class carries attributes/level, so **only characters touch the dice**. Every other class contributes **only tags** (read by `overlap()` wherever it sits) — so items can never unbalance the roll.
-2. **Cards never attach to cards.** Only **rooms and quests** have CardSlots. A character's gear lives in its owned bedroom (a room); an **injury** is intrinsic state on the character (§11), not a card; a negative that hits a room (`infestation`) is *force-slotted into the room*. (See [GAME_STATE.md](GAME_STATE.md).)
+1. Only the **character** type carries attributes/level, so **only characters touch the dice**. Every other class contributes **only tags** (read by `overlap()` wherever it sits) — so items can never unbalance the roll.
+2. **Cards never attach to cards.** Only **rooms and quests** have CardSlots. Slot `accepts` matches on **type/kind tags** (`requires:[type:relic]`, `requires:[kind:gold]`) — one matching primitive. A character's gear lives in its owned bedroom (a room); an **injury** is intrinsic state on the character (§11), not a card; a negative that hits a room (`infestation`) is *force-slotted into the room*. (See [GAME_STATE.md](GAME_STATE.md).)
 
 **Value** is gold-denominated and signed — every card has a value (negatives are negative). Full economy in [ECONOMY.md](ECONOMY.md).
 
@@ -29,10 +30,10 @@ Card { id, class, name, tags[], value, location, ... }
 
 ## 2. CardSlots 🔒
 
-A **CardSlot** is one spot that holds a Card. **Quests and rooms have CardSlots** — a Card is placed *into* a CardSlot; cards never attach to cards. Placing a Card into a CardSlot is the one universal interaction; the engine validates the slot's `accepts` (card classes) + `requirement`.
+A **CardSlot** is one spot that holds a Card. **Quests and rooms have CardSlots** — a Card is placed *into* a CardSlot; cards never attach to cards. Placing a Card into a CardSlot is the one universal interaction; the engine validates the slot's `accepts` (a type/kind tag query, e.g. `[type:relic]`) + `requirement`.
 
 ```
-CardSlot { accepts: CardClass[]; requirement: open | must-be <card> | must-have <tag>; filledBy? }
+CardSlot { accepts: type/kind tag query; requirement: open | must-be <card> | must-have <tag>; filledBy? }
    + on a QUEST slot:  tested { attribute | attributes[] (multi-stat pools ×(n+1)/2), favored, clashing }, groupId
 ```
 When slotted, a Card's `location` is a CardSlot reference (`quest:<id>#2` / `room:<id>#1`); otherwise it is a holding state (roster / inventory / limbo / staged). One placement model for both hosts.
@@ -50,7 +51,7 @@ When slotted, a Card's `location` is a CardSlot reference (`quest:<id>#2` / `roo
 
 ## 3. The character class 🔒
 
-Mercenaries, captives, and NPCs are all `class:character`, distinguished by `role` (merc / captive / npc; `dead` = lore-only, never a roster outcome). A character is:
+Mercenaries, captives, and NPCs are all `type:character`, distinguished by `role` (merc / captive / npc; `dead` = lore-only, never a roster outcome). A character is:
 
 - **Tags** — identity + fit + the loot dopamine. **Personality IS tags.** Plus AI-generated **quirks**.
 - **Attributes** — five scalars: **Strength · Dexterity · Intelligence · Charisma · Constitution** → the **coin count** (the only thing that generates dice).
@@ -67,15 +68,14 @@ Mercenaries, captives, and NPCs are all `class:character`, distinguished by `rol
 
 ---
 
-## 4. Item classes 🔒
+## 4. Relics 🔒
 
-Items are `class:equipment | furniture | consumable` — **ilvl + tags, no attributes, no level-growth.**
+Items are **`type:relic`** — **ilvl + tags, no attributes, no level-growth.** Category = the `form` tag (§9b W10: furniture, decoration, melee-weapon, …); vocabulary = form/style/trait/enchantment/standing (W10–W17).
 
-- **Item TAGS** come from the relic vocabulary (GENERATION_FLOW §9b W10–W17: form/style/trait/enchantment/standing); `form` is the queryable category — the classes equipment/furniture ≈ which slot family the form fits.
 - **Item level (ilvl)** — fixed at the drop = the **source quest's level**; it never grows. It **gates which tag-tiers can roll**, so higher-level quests drop more desirable items (the loot chase). Item generation mirrors character-gen (value-budgeted, ilvl-gated tags).
-- **Display items** (equipment / furniture — differ by which themed slot they fit): slotted into a tag-matched room → **prestige** (§5). They **never touch the roll**.
-- **Consumables** — stackable; slotted into a quest's requirement slot for a **one-shot, engine-bounded** effect, then consumed. 🟡 the effect model (what they do — they never touch the roll directly) = design at impl.
-- **Gold** — stackable currency; paid into room build/upgrade/renovation costs (quest cost-slot antes are cut from prototype).
+- **Display**: a relic slotted into a tag-matched room → **comfort** (§5). Relics **never touch the roll**.
+- **Consumables** — a future **stackable kind** (post-prototype): one-shot in a quest requirement slot. 🟡 effect model at impl.
+- **Gold / debt** — the two prototype stackable kinds (W18). Gold pays build/upgrade/renovation costs (quest cost-slot antes cut); debt = negative gold; liability stackables (evidence/mess) arrive via partial outcomes and TRIGGER events if left unresolved.
 
 ---
 

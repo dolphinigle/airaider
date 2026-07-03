@@ -6,7 +6,7 @@ Airaider is a persistent, single-player, **AI-driven character-collection fort g
 
 1. **[VISION.md](VISION.md)** — the North Star. Three engines of fun, two loops, character attachment, what the game is and isn't. Read first.
 2. **[DESIGN.md](DESIGN.md)** — the core game. The Fort→Resolution cycle, the two boards, risk/loss, progression, recruitment. The authoritative *what* (with summaries that point into the docs below).
-3. **[CARDS.md](CARDS.md)** — the unit model: everything is a Card; **quests and rooms hold cards in CardSlots**; one `overlap()` fit primitive powers the roll *and* comfort/prestige. Characters (tags, the 5 attributes, growth+focus, the roll) + items (ilvl).
+3. **[CARDS.md](CARDS.md)** — the unit model: everything is a Card (`type` tag: character / relic / stackable); **quests and rooms hold cards in CardSlots**; one `overlap()` fit primitive powers the roll *and* comfort/prestige. Characters (tags, the 5 attributes, growth+focus, the roll) + items (ilvl).
 4. **[GAME_STATE.md](GAME_STATE.md)** — the save (cards + placements + the lore graph), the 3-producer determinism model, comfort→benefit progression, staging.
    - **[FORT.md](FORT.md)** — the fort: the grid, room species + generic slots, the captive-labor loop, comfort formula, the Great Hall master clock, the catalog, sim-verified pacing.
 5. **[ECONOMY.md](ECONOMY.md)** — value (signed, 20-tier geometric tag curve, marked value), `V_base(level)`, reward generation, outcomes + the decoupled injury channel, the bank, the migrating constraint.

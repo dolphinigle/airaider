@@ -6,7 +6,7 @@
 
 ## 1. The state = one card collection + placements + the lore graph 🔒
 
-Everything you own — mercs, captives, items, gold — is a **Card**, stored uniformly. The save is:
+Everything you own — mercs, captives, relics, stackables (gold/debt) — is a **Card** (`type` tag: character / relic / stackable; §7.1), stored uniformly. The save is:
 - the **card collection** — each card's `location` is a **CardSlot reference** when slotted (`room:<id>#1` / `quest:<id>#2`), else a holding state (roster / inventory / staged / limbo — limbo = generated but not yet owned, e.g. a chain focal pre-acquisition);
 - **gold** (a stackable card, shown as a counter), the **fort** (cells + rooms + their CardSlots + upgrade levels + stored theme-tags), the **lead board**, **active chains**, the **Great Hall tier**, **unlocked regions**, and the **RNG state** (persisted, not re-derived);
 - the **lore graph** ([LORE.md](LORE.md)): nodes' blurbs/dossiers + memory-edges — **append-only with an `active` flag; nothing is ever hard-deleted** (inactive = hidden from AI context, still player-readable in the Chronicle).
