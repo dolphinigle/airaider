@@ -64,7 +64,7 @@ Leads **expire** (use-it-or-lose-it). What feeds the board: EARNED leads — lea
 
 Characters are the atoms. Mercenaries (roster), captives (loot), and NPCs (world cast) are one kind of object distinguished by a `role` field — no parallel hierarchies. A character is:
 
-- **Tags** — the loot/identity layer *and* the personality. **Personality = tags** (a `cruel, greedy, ex-soldier` merc behaves cruelly, greedily, like a soldier). Tags are the behavioral fingerprint that individuates them.
+- **Tags** — the loot/identity layer *and* the personality. **Personality = tags** (a `greedy, hot-headed` merc with a `soldier` background behaves greedily, rashly, like a soldier). Tags are the behavioral fingerprint that individuates them.
 - **Quirks** — small AI-generated concrete habits ("counts coins twice").
 - **`who` + backstory** — a one-line known-for and a short AI-written origin, generated when they enter the pool, fitting their tags and how they were acquired.
 - **Their chains** — the quests they pass through (cast in others') plus the one chain about them (their main story). *The chains are their living memory and biography* — there is no separate psychological model. (See STORY_ENGINE.md for how this stays token-affordable.)
@@ -117,7 +117,7 @@ Quests produce **captives** carrying tags. Per captive you choose:
 - **Ransom / Sell** (gold).
 - *(Captive→merc CONVERSION only via a chain finale's reward kind; one-off rescue/recruit rewards still stage hireable people at the Tavern — GAME_STATE §6.)*
 
-The choice is the fun: a `gorgeous`-tagged captive is a prestige drop *and* a future diplomacy asset *and* a ransom payday — pick one.
+The choice is the fun: a `beautiful (legendary)`-tagged captive is a prestige drop *and* a future diplomacy asset *and* a ransom payday — pick one.
 
 ### 8.2 Rooms — the tech tree
 Rooms gate on **prestige** to build, and do three jobs:
@@ -126,7 +126,7 @@ Rooms gate on **prestige** to build, and do three jobs:
 3. **Housing** — **Bedrooms cap the roster** ("the constraint is bedrooms").
 
 ### 8.3 Prestige — gate and score
-Prestige is earned from tag-matched captives + items in rooms. It is both the **gate** (rooms have prestige requirements) and a **score** that raises recruit quality and unlocks higher-stakes content. Ladder: *prestige → unlock room → room unlocks quests + makes more prestige → higher prestige → better rooms & recruits.*
+Prestige is earned from tag-matched captives + items in theme rooms, and gates **only via the Great Hall tier ladder** (FORT §3) — plus it raises the lead **rarity ceiling** (QUESTS §1). Ladder: *prestige → GH tier → new rooms/upgrades/regions → more comfort → more prestige.*
 
 ### 8.4 Recruitment & captives
 Designed — staging + dispositions in [GAME_STATE.md](GAME_STATE.md) §6 (Tavern hires; captive break/station/ransom/sell; no conversions).

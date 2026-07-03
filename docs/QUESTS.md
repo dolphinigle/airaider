@@ -123,7 +123,7 @@ So you keep a hard-won focal character even on a *partial* — you only **lose**
 | Engine (numbers, constraints, cheap) | AI (fiction, specifics, expensive) |
 |---|---|
 | lead granting; rarity/level/region/archetype/chain-info rolls | the bible (settled truth) |
-| **threshold number**; reward budget | quest card + **the ask (what's tested, party size, required units)** |
+| **threshold number**; slot count N; reward budget | quest card + **the ask (what's tested per slot, slot requirements)** |
 | roll coins → outcome (success/partial/failure) | resolution: **before-roll (blind) → after-roll (sighted)** |
 | reward VALUE + bundle composition (ECONOMY) | flesh the reward character(s) (engine-assigned names) |
 | validate & grant reward KIND from the budget | propose reward KIND + label; cast selection |

@@ -146,8 +146,8 @@ Empirical fixes from v1; reach for these when real output misbehaves, don't bake
 
 | Owned by the engine (numbers) | Owned by the AI (flavor) |
 |---|---|
-| coin count, threshold, outcome, odds | the card, the prose, names, the outcome |
-| gold, reward **kind**, drop rates | **which** cast member gets the reward, and how the climax delivers it |
+| coin count, threshold, outcome, odds; roll ALL names (§4b) | the card, the prose, the outcome |
+| gold, drop rates; validate & grant the reward kind | **propose** the reward kind + label (F6); which cast member gets it, how the climax delivers it |
 | pacing trigger (which leads appear) | the bible, the cast's wants |
 | fit score → outcome tier | how each character's tags color what they did |
 
