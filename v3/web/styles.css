@@ -1,0 +1,54 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #14161a; color: #cfd3da; font: 14px/1.5 'Segoe UI', system-ui, sans-serif; }
+.app { max-width: 1080px; margin: 0 auto; padding: 12px; }
+
+header { display: flex; gap: 14px; align-items: center; padding: 8px 12px; background: #1d2127; border-radius: 8px; flex-wrap: wrap; }
+header b { color: #e8b34b; letter-spacing: 2px; }
+.gold { color: #e8b34b; } .prestige { color: #b48ef0; } .ai { color: #6a7280; font-size: 12px; margin-left: auto; }
+button.end { background: #7a2f2f; color: #fff; border: none; padding: 8px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+button.end:hover { background: #a03c3c; }
+
+.toast { margin: 8px 0; padding: 8px 12px; background: #24406b; border-radius: 6px; }
+nav { display: flex; gap: 4px; margin: 10px 0; flex-wrap: wrap; }
+nav button, .row button, .slotrow button, .cardrow button, td button, .quest button, details button {
+  background: #262b33; color: #cfd3da; border: 1px solid #3a4150; padding: 4px 10px; border-radius: 5px; cursor: pointer; font-size: 13px;
+}
+nav button.on, .quest button.on { background: #3b4d6b; border-color: #5f7cab; }
+nav button:hover { background: #303743; }
+button.danger { border-color: #7a2f2f; color: #d98; margin-left: 10px; }
+button.x { float: right; }
+
+main { min-height: 300px; }
+.fortgrid { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.floor { display: flex; gap: 6px; }
+.cell { width: 150px; min-height: 64px; background: #1d2127; border: 1px solid #2c313a; border-radius: 6px; padding: 6px 8px; cursor: pointer; display: flex; flex-direction: column; }
+.cell.empty { opacity: 0.35; cursor: default; }
+.cell.comfort { border-color: #4b5a3f; } .cell.landmark { border-color: #8a6d2f; } .cell.capacity { border-color: #5a3f3f; }
+.cell b { font-size: 12px; } .cell:hover { background: #262b33; }
+.comfort { color: #9ec46a; font-size: 12px; } .owner { color: #c9a86a; font-size: 11px; } .slots { letter-spacing: 2px; font-size: 12px; color: #8a93a3; }
+
+.row { display: flex; gap: 8px; margin: 8px 0; flex-wrap: wrap; }
+table { border-collapse: collapse; width: 100%; }
+td { padding: 5px 10px; border-bottom: 1px solid #262b33; }
+tr.dim { opacity: 0.45; }
+
+.quest, .cardrow { background: #1d2127; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; }
+.quest h3 small, .cardrow h3 small { color: #8a93a3; font-weight: normal; margin-left: 8px; }
+.tags { color: #7fa3c9; font-size: 13px; }
+.slotrow { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 5px 0; border-top: 1px dashed #2c313a; }
+.odds { margin-top: 6px; color: #c9b86a; }
+select { background: #262b33; color: #cfd3da; border: 1px solid #3a4150; padding: 4px; border-radius: 5px; max-width: 280px; }
+
+.report { background: #1a2230; border: 1px solid #2b3b55; border-radius: 8px; padding: 12px 16px; margin-top: 14px; }
+.report h3 { color: #7fa3c9; margin-bottom: 6px; }
+.report p { margin: 3px 0; }
+
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; }
+.panel { background: #1d2127; border: 1px solid #3a4150; border-radius: 10px; padding: 16px 20px; width: 640px; max-height: 80vh; overflow: auto; }
+
+pre { background: #14171c; padding: 8px 10px; border-radius: 6px; white-space: pre-wrap; font-size: 12px; }
+details { margin-top: 6px; } summary { cursor: pointer; color: #8a93a3; }
+.liability { border: 1px solid #7a2f2f; }
+.dim { opacity: 0.5; }
+.hint { color: #6a7280; font-style: italic; }
+h3 { font-size: 15px; }
