@@ -55,7 +55,8 @@ export const TWIST_CHANCE = 0.30;
 
 export function rollChainShape(rng: Rng, rarity: Rarity): { beats: number; failureBudget: number } {
   const beats = rarity === 'rare' ? rng.range(4, 6) : rarity === 'uncommon' ? rng.range(3, 4) : rng.range(2, 3);
-  return { beats, failureBudget: Math.max(1, Math.floor(beats / 2)) };
+  // a single stumble must never force the finale (fun-check); harder sagas still allow fewer
+  return { beats, failureBudget: Math.max(2, Math.ceil(beats / 2)) };
 }
 
 export function newChainEconomy(rng: Rng, level: number, rarity: Rarity): {

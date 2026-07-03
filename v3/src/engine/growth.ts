@@ -19,13 +19,13 @@ export function toVector(vals: number[]): AttrVector {
 }
 
 export function rollBase(rng: Rng): AttrVector {
-  // fixed-sum with a floor of 1 per stat so no stat is born at ~0
-  const spread = rng.fixedSumVector(5, BASE_TOTAL - 5).map(x => x + 1);
+  // fixed-sum, MILD lean (birth-SHAPE, not birth-OP — §10), floor 1 per stat
+  const spread = rng.fixedSumVector(5, BASE_TOTAL - 5, 3).map(x => x + 1);
   return toVector(spread);
 }
 
 export function rollGrowthLean(rng: Rng): AttrVector {
-  const lean = rng.fixedSumVector(5, GROWTH_BUDGET).map(x => Math.max(0.3, x));
+  const lean = rng.fixedSumVector(5, GROWTH_BUDGET, 2).map(x => Math.max(0.3, x));
   const sum = lean.reduce((a, b) => a + b, 0);
   return toVector(lean.map(x => (x / sum) * GROWTH_BUDGET));
 }

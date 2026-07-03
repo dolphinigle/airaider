@@ -174,17 +174,38 @@ export class Game {
   room(id: string): Room | undefined { return this.state.fort.rooms.find(r => r.id === id) }
   hasRoom(type: string): boolean { return this.state.fort.rooms.some(r => r.type === type) }
 
+  /** a room's EFFECTIVE wants — a bedroom's bind to its owner's tags (CARDS §2:
+   *  the owner slot binds the room's target; a fitting relic matches the OWNER) */
+  effectiveWants(room: Room): Room['wants'] {
+    const rt = ROOM_TYPE[room.type]!;
+    if (rt.benefit === 'cap' && room.ownerId) {
+      const wants: Room['wants'] = [{ match: 'furniture' }, { match: 'decoration' }];
+      const owner = room.ownerId === 'you' ? null : this.card(room.ownerId);
+      if (owner) {
+        for (const t of owner.tags) {
+          if (['type', 'gender', 'kind', 'status'].includes(CONCEPT[t.concept]?.group ?? '')) continue;
+          wants.push({ match: t.concept });
+        }
+      }
+      return wants;
+    }
+    return room.wants;
+  }
+
   comfort(room: Room): number {
-    const lift = ROOM_TYPE[room.type]!.benefit === 'cap' && this.endgameLiftActive() ? ENDGAME_BAND_LIFT : 0;
-    return roomComfort(this.state.fort, room, id => this.card(id), lift);
+    const rt = ROOM_TYPE[room.type]!;
+    const lift = rt.benefit === 'cap' && this.endgameLiftActive() ? ENDGAME_BAND_LIFT : 0;
+    const bound: Room = { ...room, wants: this.effectiveWants(room) };
+    return roomComfort(this.state.fort, bound, id => this.card(id), lift);
   }
   private endgameLiftActive(): boolean { return this.state.fort.endgameKeys.length > 0 }
 
-  /** a merc's level cap = their own bedroom's comfort (bedroom-less → bunk floor) */
+  /** a merc's level cap = their own bedroom's comfort, floored at the bunk floor
+   *  (an empty bedroom never caps BELOW bedroom-less housing) */
   capOf(mercId: string): number {
     const bed = this.state.fort.rooms.find(r => ROOM_TYPE[r.type]!.benefit === 'cap' && r.ownerId === mercId);
     if (!bed) return BUNK_CAP_FLOOR;
-    return capFromComfort(this.comfort(bed));
+    return Math.max(BUNK_CAP_FLOOR, capFromComfort(this.comfort(bed)));
   }
 
   roster(): Card[] {
@@ -510,6 +531,15 @@ export class Game {
   async pursue(leadId: string): Promise<{ ok: boolean; msg: string; questId?: string }> {
     const lead = this.visibleLeads().find(l => l.id === leadId);
     if (!lead) return { ok: false, msg: 'no such lead' };
+    if (lead.expiresAtCycle === null && this.state.quests.some(q => q.leadId === lead.id && q.state === 'open'))
+      return { ok: false, msg: 'that hunt is already underway' };
+    if (lead.expiresAtCycle === null) {
+      // standing hunts track the roster: re-level into the region band at pursue time
+      const band = REGION[lead.region]!.levelBand;
+      const levels = this.roster().map(m => m.character!.level);
+      const median = levels.length ? [...levels].sort((a, b) => a - b)[Math.floor(levels.length / 2)]! : band[0];
+      lead.level = Math.max(band[0], Math.min(band[1], median));
+    }
     let quest: Quest;
     if (lead.chainInfo.kind === 'continues') {
       const chain = this.state.chains.find(c => c.id === (lead.chainInfo as { chainId: string }).chainId);
@@ -787,7 +817,14 @@ export class Game {
     st.tavern = st.tavern.filter(s => s.expiresAtCycle > st.cycle || !report.push(`${this.card(s.cardId)?.name ?? 'someone'} left the tavern.`));
     st.holding = st.holding.filter(s => s.expiresAtCycle > st.cycle || !report.push(`a captive candidate slipped away from holding.`));
 
-    // 5) lead expiry + liability triggers
+    // 5) pursued-quest expiry (impl ruling on QUESTS §10 🟡: TTL 10; a lapsed chain
+    // beat respawns its continuation lead — the story waits, the quest doesn't)
+    for (const q of st.quests.filter(q => q.state === 'open' && st.cycle - q.createdCycle >= 10)) {
+      this.abandonQuest(q, report);
+    }
+    st.quests = st.quests.filter(q => q.state === 'open');
+
+    // 6) lead expiry + liability triggers
     st.leads = st.leads.filter(l => l.expiresAtCycle === null || l.expiresAtCycle > st.cycle);
     for (const c of st.cards.filter(isLiability)) {
       const age = st.cycle - (st.liabilityBirth[c.id] ?? st.cycle);
@@ -803,6 +840,35 @@ export class Game {
     this.state.rngState = this.rng.state();
     this.state.idCounter = idCounter();
     return report;
+  }
+
+  abandon(questId: string): { ok: boolean; msg: string } {
+    const q = this.state.quests.find(x => x.id === questId && x.state === 'open');
+    if (!q) return { ok: false, msg: 'no such open quest' };
+    this.abandonQuest(q, []);
+    this.state.quests = this.state.quests.filter(x => x !== q);
+    return { ok: true, msg: `${q.title} abandoned` };
+  }
+
+  private abandonQuest(q: Quest, report: string[]) {
+    for (const s of q.slots) this.doUnassign(q, s);
+    // forfeit the pre-generated reward cards (limbo cleanup)
+    const ids = new Set(q.rewardCards.map(c => c.id));
+    this.state.cards = this.state.cards.filter(c => !ids.has(c.id));
+    q.state = 'resolved';
+    if (q.chainId) {
+      const chain = this.state.chains.find(c => c.id === q.chainId);
+      if (chain && (chain.state === 'active' || chain.state === 'finale-pending')) {
+        this.state.leads.push({
+          id: freshId('lead-'), rarity: chain.rarity, level: chain.level, region: chain.region,
+          archetype: 'investigate', chainInfo: { kind: 'continues', chainId: chain.id, hook: chain.story.currentSituation },
+          expiresAtCycle: this.state.cycle + LEAD_TTL + 6, source: 'continuation',
+          title: `${chain.bible.title} — the thread dangles`,
+        });
+      }
+    }
+    report.push(`⏳ ${q.title} lapsed — the moment passed.`);
+    this.log('expire', `${q.title} lapsed unpursued`);
   }
 
   private isCommitted(q: Quest): boolean {
@@ -851,12 +917,21 @@ export class Game {
           st.holding.push({ cardId: c.id, expiresAtCycle: st.cycle + 4 });
           c.location = HELD('staged');
           report.push(`⛓ ${c.name} is in holding (accept within 4 cycles).`);
-        } else {
+          if (!st.cards.includes(c)) st.cards.push(c);
+        } else if (this.hasRoom('tavern')) {
           st.tavern.push({ cardId: c.id, expiresAtCycle: st.cycle + 5 });
           c.location = HELD('staged');
           report.push(`🍺 ${c.name} waits at the tavern (hire within 5 cycles).`);
+          if (!st.cards.includes(c)) st.cards.push(c);
+        } else {
+          // no Tavern yet — the grateful rescued pay what they can and move on (🛠 salvage)
+          const pay = Math.round(c.value * 0.4);
+          this.addGold(pay);
+          this.ensureLoreNode(c);
+          c.location = HELD('lore');
+          if (!st.cards.includes(c)) st.cards.push(c);
+          report.push(`🙏 ${c.name} thanks you and moves on: +${pay}g (build a Tavern to keep such people).`);
         }
-        if (!st.cards.includes(c)) st.cards.push(c);
       } else if (stackKind(c) === 'gold') {
         this.addGold(c.qty ?? 0);
       } else {

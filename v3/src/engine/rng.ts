@@ -72,9 +72,14 @@ export class Rng {
     for (let i = 0; i < n; i++) if (this.next() < 0.5) heads++;
     return heads;
   }
-  /** random fixed-sum non-negative vector: n cells summing to total (integer-ish granularity via dirichlet-lite) */
-  fixedSumVector(n: number, total: number): number[] {
-    const raw = Array.from({ length: n }, () => -Math.log(1 - this.next()));
+  /** random fixed-sum non-negative vector: n cells summing to total.
+   *  concentration k = how mild the lean is (1 = wild exponential, 3 = moderate) */
+  fixedSumVector(n: number, total: number, concentration = 1): number[] {
+    const raw = Array.from({ length: n }, () => {
+      let x = 0;
+      for (let i = 0; i < concentration; i++) x += -Math.log(1 - this.next());
+      return x;
+    });
     const sum = raw.reduce((a, b) => a + b, 0);
     return raw.map(x => (x / sum) * total);
   }

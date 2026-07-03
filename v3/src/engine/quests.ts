@@ -77,9 +77,15 @@ export function starterPacket(rng: Rng, cycle: number, idGen: () => string): Lea
     id: idGen(), rarity, level, region: 'forests', archetype,
     chainInfo: { kind: 'none' }, expiresAtCycle: cycle + LEAD_TTL * 2, source: 'starter',
   });
-  const leads = [mk('contract', 'common', 1), mk('raid', 'common', 1), mk('rescue', 'common', 2)];
+  const leads = [
+    mk('contract', 'common', 1), mk('raid', 'common', 1), mk('rescue', 'common', 2),
+    mk('hunt', 'common', 1), mk('raid', 'common', 2), mk('investigate', 'common', 2),
+  ];
   // one early story hook
   leads.push({ ...mk('investigate', 'uncommon', 2), chainInfo: { kind: 'starts-new' } });
+  // a generous learning window: the day-0 packet lingers (leads thereafter are strictly earned;
+  // packet size 🛠 — it must bridge to the first Scouting lodge)
+  for (const l of leads) l.expiresAtCycle = cycle + 40;
   return leads;
 }
 

@@ -221,8 +221,9 @@ export function splitOneOff(rng: Rng, V: number, archetype: Archetype): RewardSp
         out.push({ kind: 'relic', value: V * s }, { kind: 'gold', value: V * (1 - s) });
       } else out.push({ kind: 'gold', value: V });
   }
-  // small lottery: a bonus lead (priced — §21.2: lead grants are a budget component)
-  if (rng.chance(0.12)) {
+  // lottery: a bonus lead (priced — §21.2: lead grants are a budget component;
+  // 🛠 rate must carry the pre-lodge early game)
+  if (rng.chance(0.22)) {
     const leadCost = V * 0.15;
     const goldPart = out.find(r => r.kind === 'gold');
     if (goldPart && goldPart.value > leadCost) {
