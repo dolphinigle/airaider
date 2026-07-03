@@ -88,7 +88,7 @@ Engine owns the math; the AI narrates the result it's told.
 
 - The quest's **ask** + the assigned characters' relevant **tags/attributes** → a **coin count N** (better fit = more coins).
 - The quest carries a **threshold T**. Flip N coins → heads vs T → **success / partial / failure** (three outcomes, no critical — the jackpot lives at reward *generation*, not the roll). See [ECONOMY.md](ECONOMY.md) §5 for delivery (success = full · partial = half / keep+liability · failure = none; **injury is a separate AI-judged channel, decoupled from the outcome tier** — GENERATION_FLOW §11/F5).
-- **Odds are visible before commit** ("6 coins vs threshold 4 (raw, always visible; the Oracle room adds the computed ~78%)"). This is what makes the min-max legible and what makes loss *owned* (§7) — you always knew the danger.
+- **Odds are visible before commit** ("6 coins vs threshold 3 — raw, always visible; the Oracle room adds the computed ~66%"). This is what makes the min-max legible and what makes loss *owned* (§7) — you always knew the danger.
 - The engine tells the AI the outcome and the cast; the AI never invents numbers.
 - 🟡 exact thresholds and tag-vs-attribute weighting are open numbers (**fun before balance**).
 
@@ -115,7 +115,7 @@ The persistent base. It grows; it never resets. Every comfort room computes **on
 Quests produce **captives** carrying tags. Per captive you choose:
 - **Break** (torture chamber → `obedient`) → **station in a room** → comfort/prestige (the captive-labor loop; a standing arrangement).
 - **Ransom / Sell** (gold).
-- *(Recruit only via a chain finale's reward kind; no other state-flow conversions in prototype — GAME_STATE §6.)*
+- *(Captive→merc CONVERSION only via a chain finale's reward kind; one-off rescue/recruit rewards still stage hireable people at the Tavern — GAME_STATE §6.)*
 
 The choice is the fun: a `gorgeous`-tagged captive is a prestige drop *and* a future diplomacy asset *and* a ransom payday — pick one.
 

@@ -61,7 +61,7 @@ Spend the expensive generation only where the story matters:
 ### Everything is reward-first — a chain is built around a focal character 🔒
 The unifying rule: **the engine determines the reward first; a one-off dresses it with a line, a chain builds a whole story around it.** The axis is **one-off vs chain** (`chain-info = none` vs `starts-new/continues`), *independent of rarity*.
 - **One-off = reward, dressed.** The engine rolls the loot *first*; the AI writes a thin line to frame it. A one-off has no ongoing fiction to honor — the captive is *whatever tags rolled*, and the AI just frames them ("among the prisoners, a sullen militiaman").
-- **Chain = reward, storied.** At genesis the engine **generates the chain's FOCAL CHARACTER first** — the person the saga is about — at the saga's payoff value, plus a **likely fate** (recruit / captive / ally). The AI then authors the bible **around that character** (the "baseline guy"; the AI may flesh them out further; *their tags are the story seed* — a rolled `bg:princess` hands the AI "a crown in exile"). For a **main chain** (merc-join), the focal character is the **existing merc** — the chain develops *them* (a stamped tag, a meaningful event, a scar) rather than acquiring someone new. The focal character can be **new or known** (a rare chain's payoff might be re-engaging a long-lost veteran, or capturing a recurring antagonist — recurrence and attachment become one engine).
+- **Chain = reward, storied.** At genesis the engine **generates the chain's FOCAL CHARACTER first** — the person the saga is about — at the saga's payoff value, plus a **likely fate** (recruit / captive / ally). The AI then authors the bible **around that character** (the "baseline guy"; the AI may flesh them out further; *their tags are the story seed* — a rolled `bg:princess` hands the AI "a crown in exile"). For a **main chain** (merc-join), the focal character is the **existing merc** — the chain develops *them* (pinned CORE memories, a meaningful event — tag-stamping is post-prototype) rather than acquiring someone new. The focal character can be **new or known** (a rare chain's payoff might be re-engaging a long-lost veteran, or capturing a recurring antagonist — recurrence and attachment become one engine).
 
 This makes the payoff a person you've spent the whole arc with — you *know* them before you get them. The **vague direction** ("likely ends with a powerful recruit") gives the AI a climax to write toward *and* the player a visible long-horizon goal. But the **fate is play-determined**: the engine sets the *likely* outcome, the finale **roll** decides the *actual* one (success → they join clean; partial → they join lesser — saddled with a debt/liability; failure → they slip away / turn bitter captive — you lose them. Injury is the separate AI-judged channel; focal "loss" here is narrative, not roster death — death is ignored in prototype). You can lose the character you spent a saga earning — the gamble stays real. Most chains are character-focal (for attachment); occasionally a chain is built around a non-character prize (a legendary artifact, a faction alliance) for variety.
 
@@ -101,11 +101,11 @@ The engine rolls coins vs threshold → **success / partial / failure**, hands t
 
 So you keep a hard-won focal character even on a *partial* — you only **lose** them on a *failure*. No value-rescaling anywhere; the outcome composes a down-scaled bundle.
 
-**Kind**: the **AI proposes the kind + player-facing label** (a bounded categorical pick — §16 3-producer model), with the archetype as its bias (capture→captive, raid→gold, rescue→recruit); the **engine validates & grants** it from the fixed value budget; multi-kind allowed. Value then **converts**: `value→gold`, `value→character` (the value *is* the character's target value → character-gen, CARDS.md §2), `value→tag-stamp`.
+**Kind**: the **AI proposes the kind + player-facing label** (a bounded categorical pick — §16 3-producer model), with the archetype as its bias (capture→captive, raid→gold, rescue→recruit); the **engine validates & grants** it from the fixed value budget; multi-kind allowed. Value then **converts**: `value→gold`, `value→character` (the value *is* the character's target value → character-gen, CARDS.md §2). *(value→tag-stamp = post-prototype, per the §8 lock.)* **Personal (main-chain) finale payoff 🔒-shape:** the bank crystallizes as gold/relics + **pinned CORE memory-edges on the merc** (their dossier is the growth) — no stamps, no death.
 
 **One-off vs chain:**
 - **One-off** — the engine rolls the reward, the AI dresses it (§2). Reward-first.
-- **Chain** — the **focal character generated at genesis IS the payoff**, and its value is **accrued over the beats as a merc-day bank** (ECONOMY §5a, [REWARD_BANK.md](REWARD_BANK.md)). Intermediate beats **bank** their merc-cycles (no immediate side-loot; a failed beat banks 0); the **finale crystallizes the bank** into the focal character **+ surplus gold**, the focal's **fate decided by the finale roll** (success = clean · partial = wounded/lesser · failure = lost *and* the bank forfeited). A bank short of the focal's value delivers them **with a debt**, or — if too thin — lets them **slip away** for salvage gold. A per-chain **failure budget** (harder = fewer) turns repeated stumbles into a forced **last-chance** finale rather than an endless retry.
+- **Chain** — the **focal character generated at genesis IS the payoff**, and its value is **accrued over the beats as a merc-day bank** (ECONOMY §5a, [REWARD_BANK.md](REWARD_BANK.md)). Intermediate beats **bank** their merc-cycles toward the focal (each beat also carries a **small engine-set side-loot budget** — §6/§8; a failed beat banks 0 and drops no side-loot); the **finale crystallizes the bank** into the focal character **+ surplus gold**, the focal's **fate decided by the finale roll** (success = clean · partial = wounded/lesser · failure = lost *and* the bank forfeited). A bank short of the focal's value delivers them **with a debt**, or — if too thin — lets them **slip away** for salvage gold. A per-chain **failure budget** (harder = fewer) turns repeated stumbles into a forced **last-chance** finale rather than an endless retry.
 
 **Character rewards recurse** — a captive/recruit/promoted NPC runs character-generation, and if they become a merc fires the **main-chain** generation. A reward seeds the next story.
 
@@ -156,10 +156,10 @@ engine: focal character @ value V ─────────────┤   f
                                                ▼
               GENESIS    collide seed × slate → one-line KERNEL; pick 1–3 CORE people (focal MUST be core)
                                                ▼
-              BUILD      per core person: ask "why?" to bedrock → history;  feels → emergent conceals;
-                         COMMIT-TO-TRUTH (settle every fact);  reuse pool first, coin few;  edge cast stay shallow
+              BUILD      LEAN cast (one line + want + role — NO why-ladders; depth is written at
+                         delivery by flesh);  COMMIT-TO-TRUTH;  reuse pool first, coin few
                                                ▼
-              ASSEMBLE   cast{who, history(why-ladder), wants, feels, conceals?} + situation
+              ASSEMBLE   cast{who(1-line), want, role} + situation + GOAL + rough ARC skeleton
                          + tensions(who clashes, plain reason) + openDirections{ambient | active}
                                                ▼
                     BIBLE = hidden settled truth   (cast size + ladder depth scale with stakes)
@@ -167,11 +167,11 @@ engine: focal character @ value V ─────────────┤   f
 
 | # | Actor | Action |
 |---|---|---|
-| 1 | Engine | trigger; rarity → **stakes** (cast size + why-ladder depth), beats `B`, slots `N`, `V = V_base×rarity×(B×N)×0.8 × unit-share` |
+| 1 | Engine | trigger; rarity → **stakes** (cast size), beats `B`, slots `N`, **twist 30%**, `V = V_base×rarity×(B×N)×0.8 × unit-share` |
 | 2 | Engine | pre-generate the **focal character @ V** (role-agnostic tags) = the chain's **reward** *(main chain: focal = the joining merc)* |
 | 3 | Engine | pick a **seed** from the seed bank (Polti-anchored "what-if" spark, weighted by stakes/region, anti-repeat); build the **slate** via LORE RETRIEVAL ([LORE.md](LORE.md)): ranked recall over the focal's memory-edges (1–2 hops + wildcards) → optional nano **selector** picks who gets full dossiers (≤2 LLM round-trips total incl. genesis) |
 | 4 | AI · **GENESIS** | collide seed × slate → one-line **kernel**; choose **1–3 core** people (**focal must be core**); **write-back folded into the same response**: relevant ids + new entities/places + new memory-edges (engine persists, guarded) |
-| 5 | AI · **BUILD** | per core person: ladder *why?* → `history`; `feels` → emergent `conceals` (most conceal nothing); **commit-to-truth**; reuse pool first / coin few; edge cast shallow → `cast` + `situation` + `tensions` + `openDirections` |
+| 5 | AI · **BUILD** | LEAN cast (one line + want + role — depth written at delivery via flesh, per the LOCKED [BIBLE.md](BIBLE.md)); **commit-to-truth**; reuse pool first / coin few → `cast` + `situation` + `goal` + rough `arc` skeleton + `tensions` + `openDirections` |
 | 6 | Engine | persist bible (hidden); spawn **beat-1 lead** from an `active` openDirection (its hook = `drivingHook`) |
 
 ### Phase B — per beat (quest-writer reveals one layer; resolver updates the world)
@@ -195,7 +195,7 @@ engine: focal character @ value V ─────────────┤   f
 | 16 | Engine | per-approach threshold; roll → s/p/f → **deliver focal char in the chosen KIND**, gated by roll |
 | 17 | AI | finale outcome + epilogue + maybe sequel lead |
 
-**Solidity rules baked in:** (a) slot **count N is engine-set** (V needs it at birth, before the AI); (b) engine **computes delivery before the AI narrates** (so it names what's actually delivered); (c) the **climax gate is on merc-cycles spent** (effort), not value gained (else failures stall the chain); (d) the **bible is plain settled truth** — mystery/reveal-cadence is the quest-writer's job at beat time, never baked into the bible.
+**Solidity rules baked in:** (a) slot **count N is engine-set** (V needs it at birth, before the AI); (b) engine **computes delivery before the AI narrates** (so it names what's actually delivered); (c) the **climax gate is on merc-cycles spent** (effort), not value gained (else failures stall the chain); (d) the **bible is plain settled truth** — mystery/reveal-cadence is the quest-writer's job at beat time; the bible's `arc` is a ROUGH step guide the quest-writer realizes one step per beat, never prescriptive beat prose. **Bible schema authority = [BIBLE.md](BIBLE.md) (LOCKED): lean cast, goal, arc skeleton, engine-rolled twist.**
 
 ## 9. Branches — mutex approach-groups 🔒-shape *(prototype: finale only)*
 

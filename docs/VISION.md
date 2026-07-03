@@ -35,11 +35,11 @@ The emotional core. Characters become *yours* through:
 - **Investment** — the hours you spent leveling and equipping them.
 - **Individuation** — the AI writing *them* specifically, quest after quest, until they have a voice.
 - **Their own stories** — personal quest chains that grow out of who they are.
-- **Loss that's real** — they can die, leave bitter, or be promoted beyond your reach. Four flavors of goodbye, not one.
+- **Loss that's real** — they can die, leave bitter, or be promoted beyond your reach. *(Prototype scope: loss = TIME + losing chain-focal characters — death/departure mechanics are deliberately post-prototype; GENERATION_FLOW §21.)*
 
 ## What it is / isn't
 
-- **Is:** a persistent, single-player, character-collection management game. Cozy-strategic pace, mortal stakes.
+- **Is:** a persistent, single-player, character-collection management game. Cozy-strategic pace, real stakes (time, rewards, the people you almost had).
 - **Isn't:** a tactical combat game (you don't play battles — you assign and gamble). Not a roguelite with run-resets. Not an idle game. Not a visual-novel — prose decorates mechanical events; the events are the content.
 
 ## Non-negotiables

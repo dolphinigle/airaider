@@ -17,7 +17,7 @@ engine injects independent seeds — this is the core architectural lesson:
   spark to FUSE, decorrelating the story's SHAPE from the tags. Beat keywords > a fixed premise list
   (cheap AI can't "be original" but it can fuse concrete sparks).
 - **PLACE** (`pickPlace`) — a concrete setting so sagas aren't all "a fen-hamlet".
-- **TONE** (`pickTone`, weighted toward lighter: slice-of-life / wry / bittersweet / adventurous / tense
+- **TONE** (`pickTone`, weighted toward lighter — the weighting is shifted by the PLAYER_PREFERENCES tone knob: slice-of-life / wry / bittersweet / adventurous / tense
   / dark) so not every saga is grim.
 - **TWIST** — engine-rolled ~30% (the AI NEVER decides; left alone it twisted 9/9). When set, the
   apparent goal is a misdirection.

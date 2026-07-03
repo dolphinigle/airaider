@@ -21,7 +21,7 @@
 
 **Quest-level-matching is the optimum** — a level-L merc on a level-L quest earns `V_base(L)` at good odds; over-leveled under-earns, under-leveled gets bad odds. "Send mercs at their level" emerges for free.
 
-**Pacing couplings (sim-verified, §20):** player gold **income ≈ ×1.09 per level** while build/upgrade costs ≈ ×1.32 per Great-Hall tier (income must track V_base-like growth or the late game starves); **slottable loot ≈ 0.29 + 0.06×tier drops/cycle** — author the drop rate from the fort's slot+band growth budget, never from generosity (oversupply = dead-drop misery); roster width feeds drop volume.
+**Pacing couplings (sim-verified, §20):** player gold **income ≈ ×1.09 per level** (V_base grows ×1.35 — the gold *share* of rewards shrinks with level so income tracks 1.09; V_base-priced sinks stay affordable by design) while build/upgrade costs ≈ ×1.32 per Great-Hall tier (income must track V_base-like growth or the late game starves); **slottable loot ≈ 0.29 + 0.06×tier drops/cycle** — author the drop rate from the fort's slot+band growth budget, never from generosity (oversupply = dead-drop misery); roster width feeds drop volume.
 
 ---
 
