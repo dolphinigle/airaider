@@ -29,11 +29,24 @@ function loadKey(): string {
 
 // ---- schemas (permissive; engine guards after) --------------------------------------------
 
+/** array-of-strings — tolerate a bare string (the model sometimes collapses singletons) */
+const zStrArr = z.union([z.array(z.string()), z.string(), z.null()]).default([]).transform(v =>
+  v === null ? [] : typeof v === 'string' ? (v ? [v] : []) : v);
+
+/** importance 0..1 — tolerate numbers, numeric strings, and band words */
+const zImportance = z.union([z.number(), z.string()]).default(0.4).transform(v => {
+  if (typeof v === 'number') return Math.max(0, Math.min(1, v));
+  const n = parseFloat(v);
+  if (!Number.isNaN(n)) return Math.max(0, Math.min(1, n));
+  const words: Record<string, number> = { core: 0.85, defining: 0.9, high: 0.8, medium: 0.5, mid: 0.5, low: 0.3, trivial: 0.15 };
+  return words[v.toLowerCase().trim()] ?? 0.4;
+});
+
 const zAsk = z.object({
   attribute: z.string(),
   extraAttribute: z.string().nullish(),
-  favored: z.array(z.string()).default([]),
-  clashing: z.array(z.string()).default([]),
+  favored: zStrArr,
+  clashing: zStrArr,
 });
 const zQuestWrite = z.object({
   title: z.string(),
@@ -44,7 +57,7 @@ const zQuestWrite = z.object({
   closesChain: z.boolean().nullish(),
   approaches: z.array(z.object({
     label: z.string(), rewardKind: z.string().default('gold'),
-    attribute: z.string().default('cha'), favored: z.array(z.string()).default([]),
+    attribute: z.string().default('cha'), favored: zStrArr,
   })).nullish(),
 });
 const zGenesis = z.object({
@@ -56,15 +69,15 @@ const zGenesis = z.object({
   })).default([]),
   situation: z.string(),
   goal: z.string().default(''),
-  arc: z.array(z.string()).default([]),
+  arc: zStrArr,
   twistReveal: z.string().nullish(),
-  tensions: z.array(z.string()).default([]),
-  openDirections: z.array(z.string()).default([]),
-  relevantIds: z.array(z.string()).default([]),
+  tensions: zStrArr,
+  openDirections: zStrArr,
+  relevantIds: zStrArr,
   newPlaces: z.array(z.object({ name: z.string(), blurb: z.string().default('') })).default([]),
   newEdges: z.array(z.object({
     from: z.string(), to: z.string(), type: z.string(),
-    blurb: z.string().default(''), importance: z.number().min(0).max(1).default(0.4),
+    blurb: z.string().default(''), importance: zImportance,
   })).default([]),
 });
 const zResolveOne = z.object({
@@ -77,20 +90,20 @@ const zResolveOne = z.object({
   })).default([]),
   fleshed: z.array(z.object({
     characterId: z.string(), who: z.string().default(''),
-    backstory: z.string().default(''), quirks: z.array(z.string()).default([]),
+    backstory: z.string().default(''), quirks: zStrArr,
   })).default([]),
   edges: z.array(z.object({
     from: z.string(), to: z.string(), type: z.string(),
-    blurb: z.string().default(''), importance: z.number().min(0).max(1).default(0.4),
+    blurb: z.string().default(''), importance: zImportance,
   })).default([]),
   storyUpdate: z.object({
     currentSituation: z.string(),
-    newlyRevealed: z.array(z.string()).default([]),
-    openThreads: z.array(z.string()).default([]),
+    newlyRevealed: zStrArr,
+    openThreads: zStrArr,
   }).nullish(),
 });
-const zTheme = z.object({ wants: z.array(z.string()).default([]), flavorLine: z.string().default('') });
-const zSelect = z.object({ ids: z.array(z.string()).default([]) });
+const zTheme = z.object({ wants: zStrArr, flavorLine: z.string().default('') });
+const zSelect = z.object({ ids: zStrArr });
 
 // ---- shared rules blocks ---------------------------------------------------------------------
 
@@ -161,7 +174,7 @@ export function makeOpenAiProvider(): AiProvider {
         EDGE_TYPES_LINE,
         'If you coin NEW people, take names strictly from assignedNames (in order). New places may be freely named.',
         'Respond as JSON: {title, kernel, cast:[{name, who, want, role, loreId?}], situation, goal, arc:[3-5 rough steps], twistReveal (null unless twist=true), tensions:[], openDirections:[2],',
-        'relevantIds:[slate ids actually used], newPlaces:[{name,blurb}], newEdges:[{from,to,type,blurb,importance 0-1}] (ids only from the slate/focal)}.',
+        'relevantIds:[slate ids actually used], newPlaces:[{name,blurb}], newEdges:[{from,to,type,blurb,importance: a NUMBER 0-1}] (ids only from the slate/focal)}.',
       ].join('\n');
       const out = await call(WRITER_MODEL, system, JSON.stringify(input), zGenesis);
       return {
@@ -180,17 +193,24 @@ export function makeOpenAiProvider(): AiProvider {
         'Injuries: judge from the fiction per member (none/low/med/high) — typically on failure, sometimes none even then; never death.',
         'Flesh each delivered character: who (one line), backstory (2 sentences), quirks (1-2 concrete habits).',
         NUMBER_BAN, EDGE_TYPES_LINE,
-        'Memory edges: 0-2 per quest, only for moments that should be REMEMBERED (importance ≥0.8 = defining/core). Use character ids given.',
+        'Memory edges: 0-2 per quest, only for moments that should be REMEMBERED. importance is a NUMBER between 0 and 1 (0.8+ = defining/core). Use character ids given.',
         'Respond as JSON matching: {questId, before, after, injuries:[{characterId,band}], fleshed:[{characterId,who,backstory,quirks}], edges:[{from,to,type,blurb,importance}], storyUpdate?:{currentSituation,newlyRevealed,openThreads}}',
       ].join('\n');
       const outs = await Promise.all(inputs.map(q =>
-        call(WRITER_MODEL, system, JSON.stringify(q), zResolveOne).catch((e): ResolveQuestOut => ({
+        call(WRITER_MODEL, system, JSON.stringify(q), zResolveOne).catch((e): ResolveQuestOut => {
+          if (process.env.AI_DEBUG) console.error(`[ai] resolve fallback for ${q.questId}:`, (e as Error).message?.slice(0, 500));
+          return fallbackResolve(q);
+        })));
+      return outs.map(o => ({ ...o, storyUpdate: o.storyUpdate ?? undefined }));
+
+      function fallbackResolve(q: ResolveQuestInput): ResolveQuestOut {
+        return ({
           questId: q.questId,
           before: `${q.party.map(p => p.name).join(', ')} set out.`,
           after: q.outcome === 'success' ? `It goes their way: ${q.deliveredSummary}.` : q.outcome === 'partial' ? `A messy half-win: ${q.deliveredSummary}.` : 'It comes apart, and they walk home with nothing.',
           injuries: [], fleshed: [], edges: [],
-        }))));
-      return outs.map(o => ({ ...o, storyUpdate: o.storyUpdate ?? undefined }));
+        });
+      }
     },
 
     async themeRoll(input: ThemeRollInput): Promise<ThemeRollOut> {
