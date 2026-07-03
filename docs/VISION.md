@@ -10,7 +10,7 @@ A persistent fort-management game where you collect characters you fall in love 
 
 **Who do you send — and can you live with what happens?**
 
-Everything else exists to make that question heavier: the characters you've grown attached to, the odds you can read but not control, the rival quest you had to skip, the reward you gambled a veteran's life for.
+Everything else exists to make that question heavier: the characters you've grown attached to, the odds you can read but not control, the rival quest you had to skip, the reward you gambled a veteran's season for.
 
 ## Three engines of fun
 
@@ -32,7 +32,7 @@ They feed each other in a single circuit: quests drop tagged loot → loot build
 ## What attachment is built from
 
 The emotional core. Characters become *yours* through:
-- **Investment** — the hours you spent leveling and equipping them.
+- **Investment** — the hours you spent leveling them and furnishing their bedroom.
 - **Individuation** — the AI writing *them* specifically, quest after quest, until they have a voice.
 - **Their own stories** — personal quest chains that grow out of who they are.
 - **Loss that's real** — they can die, leave bitter, or be promoted beyond your reach. *(Prototype scope: loss = TIME — injury downtime, forfeited banks, a saga's season wasted; even a failed finale only DELAYS the person (sequel road back). Death/departure/permanent loss are deliberately post-prototype and rare even then; GENERATION_FLOW §21.)*

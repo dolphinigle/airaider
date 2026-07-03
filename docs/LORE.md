@@ -9,7 +9,7 @@
 - **LoreNode** — every character / relic / place / faction / saga is a node; **lore is a layer over the same objects** (a character = gameplay Card + LoreNode, one id). Some nodes are lore-only (places, factions, story NPCs, the dead). **Story NPCs stay lore-only until acquired** (captured/recruited/granted as a reward) — at that moment the engine rolls them a full Card (tags/attributes/value). Each node: a **blurb** (≤~25 tokens, stable, prompt-cacheable) + a **dossier** (the living record) + edges.
 - **Memory = a typed EDGE, not a node** — `Alex —betrayed-by→ Bob`, annotated with a one-liner + a pointer into the source chain's log. **RelEdge** `{ id, from, to, type, salience 0..1, core?, active, lastCycle, blurb?, sourceChainId? }`.
 - **EdgeType is a fixed ENUM** (rival-of · scarred-by · bonded-by · owes · saved-by · kin-of · betrayed-by · served-with · born-in · member-of · captive-of · …) with an explicit **direction convention**: `from` = the state-holder (the betrayed, the debtor, the rescued); symmetric types → alphabetically-first id. *(Validated: enum + convention → 5/5 valid ids, 4/5 direction vs 2/5 without.)*
-- **Region seeds**: each region (GENERATION_FLOW §13) ships a tiny fixed seed (name, theme, 1–2 anchors); everything finer — villages, taverns, NPCs — is **emergent lorebook content**: AI-invented, written back, reused. "Location" is a lorebook name, not a mechanical unit.
+- **Region seeds**: each region (GENERATION_FLOW §13) ships a tiny fixed seed (name, theme, 1–2 anchors); everything finer — villages, taverns, NPCs — is **emergent lorebook content**: AI-coined, written back, reused (character NAMES are engine-assigned, §4b; places/taverns free). "Location" is a lorebook name, not a mechanical unit.
 
 ## 2. How lore changes 🔒
 

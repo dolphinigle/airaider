@@ -18,7 +18,7 @@ Everything you own — mercs, captives, relics, stackables (gold/debt) — is a 
 ## 2. Determinism — the three producers of saved state 🔒
 
 1. **Engine (seeded RNG + fixed mappings)** — dice outcomes, reward *values* (generated at quest birth), XP/gold/prestige math, band→tier conversions. Reproducible from the seed.
-2. **AI: creative + bounded categorical picks** — bibles, narration, memory-edges (+ per-edge blurbs; the engine renders dossiers from them), room theme-tags, reward **kind**/label, injury **severity band**. **All saved as concrete fields.** The AI never emits a raw number — it picks a category; the engine prices it.
+2. **AI: creative + bounded categorical picks** — bibles, narration, memory-edges (+ per-edge blurbs; the engine renders dossiers from them), room theme-tags, reward **kind**/label, injury **severity band**. **All saved as concrete fields.** The AI never emits a raw number — it picks a category; the engine prices it. (Sole exemption: the validated per-edge importance score 0–1, §14 — it feeds salience only, never economy/dice.)
 3. **AI: pickers** (e.g. the lore selector "which candidates need full text?") — **discarded**; their only effect is the creative call's output, which is saved.
 
 **Reload re-runs NO AI call** — every AI effect is baked into the save. "Determinism" = engine math is seeded; AI outputs are persisted; nothing is re-derived.

@@ -29,7 +29,7 @@
  9. continue chain / spawn leads         │ (finale → epilogue + sequel lead)
 ```
 
-## 1. Lead board (mechanical, per-cycle, no AI)
+## 1. Lead board (mechanical, no AI)
 
 **Leads are EARNED, not restocked** (locked, GENERATION_FLOW §19): the board is fed by
 - **Continuation leads** — one per *live chain* that wants to go on; carries the chain's **cached title/hook** (zero new AI cost). How the mechanical board feels connected to the stories.
@@ -99,7 +99,7 @@ The engine rolls coins vs threshold → **success / partial / failure**, hands t
 
 **Injury is a separate, AI-judged channel, decoupled from the outcome tier** (GENERATION_FLOW §11, §16-F5): at resolution the AI judges from the fiction whether each party member is hurt and picks a **severity band** (none/low/med/high) — typically on failure, *sometimes none even on failure*, occasionally a minor one on a costly partial. The engine maps band → injury tiers → a flat coin penalty until healed. (There is no "risky" flag; the AI's judgment replaces it. Death is ignored in the prototype.)
 
-So you keep a hard-won focal character even on a *partial* — you only **lose** them on a *failure*. No value-rescaling anywhere; the outcome composes a down-scaled bundle.
+So you keep a hard-won focal character even on a *partial* — on a *failure* they slip away for now (§21-4a) — the season is what you lose. No value-rescaling anywhere; the outcome composes a down-scaled bundle.
 
 **Kind**: the **AI proposes the kind + player-facing label** (a bounded categorical pick — §16 3-producer model), with the archetype as its bias (capture→captive, raid→gold, rescue→recruit); the **engine validates & grants** it from the fixed value budget; multi-kind allowed. Value then **converts**: `value→gold`, `value→character` (the value *is* the character's target value → character-gen, ECONOMY §4 / CARDS §3). *(value→tag-stamp = post-prototype, per the §8 lock.)* **Personal (main-chain) finale payoff 🔒-shape:** the bank crystallizes as gold/relics + **pinned CORE memory-edges on the merc** (their dossier is the growth) — no stamps, no death.
 
@@ -113,7 +113,7 @@ So you keep a hard-won focal character even on a *partial* — you only **lose**
 
 ## 6. Chain advance — organic length, no forced count
 
-- **Birth** — a `starts-new` lead pursued, a **merc joining** (main-chain built around the merc), or a **captive sometimes**. The engine generates **only the focal (reward) character** (ONE; secondaries materialize lazily, §4) at `V = rolled unit SHARE (~55–85%) × E[payoff]`, where `E[payoff] = B × S̄ × V_base(level) × rarity × 0.8` (S̄ = a FLAT slots-per-beat constant ≈1.5 — a genesis-time estimate, deliberately not distribution-exact; §1) (structure per GENERATION_FLOW §1–§2; supersedes REWARD_BANK's maxCharValue; 🛠 numbers) (B = expected beats), **role-agnostic**; the **AI** then fleshes them and **invents the rest of the cast** freely (story NPCs, no value/gen) + writes the bible + a vague direction.
+- **Birth** — a `starts-new` lead pursued, a **merc joining** (main-chain built around the merc), or a **captive sometimes**. The engine generates **only the focal (reward) character** (ONE; secondaries materialize lazily, §4) at `V = rolled unit SHARE (~55–85%) × E[payoff]`, where `E[payoff] = B × S̄ × V_base(level) × rarity × 0.8` (S̄ = a FLAT slots-per-beat constant ≈1.5 — a genesis-time estimate, deliberately not distribution-exact; §1) (structure per GENERATION_FLOW §1–§2; supersedes REWARD_BANK's maxCharValue; 🛠 numbers) (B = expected beats), **role-agnostic**; the **AI** then fleshes them and **invents the rest of the cast** freely (story NPCs, no value/gen; names engine-assigned, §4b) + writes the bible + a vague direction.
 - **Per beat** — the engine sets the beat's slot count + a small side-loot budget; **the AI proposes the beat reward (thematic) → the engine translates it** to value/cards (middle-beat side-loot = gold/stackables/relics, never units — §4). AI owns theme; engine owns value.
 - **Climax gate** — the finale unlocks only once **merc-cycles *spent* ≥ target** (effort, not value-gained — so failures can't stall the chain). Below the gate, a resolved beat spawns a **continuation lead** (pursue or let lapse). Length = `min(player interest, the arc's climax)`.
 - **Finale** — the engine hands the AI a **reward recommendation** (the focal char); if the AI decides this beat is the finale, it writes it as **branched approach-groups** (§9) and may substitute the reward if the story diverged. The roll + the chosen branch decide the focal char's **kind + fate** → epilogue → maybe a **sequel lead**.

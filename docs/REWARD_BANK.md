@@ -68,7 +68,7 @@ most beats). That's intended.
   legendary 1 (harder = fewer; a fatter prize tolerates fewer wasted cycles). A middle failure →
   `failsSpent++`.
 - **Last chance** — when `failsSpent > failBudget`, set `lastChance`; the **next beat is forced to the
-  finale** (desperate / out-of-time framing). Fail it → lose everything; scrape it → focal + thin gold.
+  finale** (desperate / out-of-time framing). Fail it → bank forfeit; the focal slips away for now (sequel road back, §21-4a); scrape it → focal + thin gold.
 
 ## 5. Code changes
 
@@ -105,7 +105,7 @@ finale-fail) and print bank accrual + crystallization to confirm the math. Then 
 - 2-step arc → opener + finale (min length holds).
 - Budget blown early → forced desperate finale; bank thin; scrape-win = focal + little gold.
 - Conformance forces finale threshold=1 → success path crystallizes, focal pushed to `delivered` →
-  fleshed; void-to-gold focal is `dead` (not in allMercs/captives) → integrity check unaffected.
+  fleshed; void-to-gold focal → a lore-graph node (alive, `role:npc`, sequel-reachable — §21-4a), never `dead` → integrity check unaffected.
 - Ransom = bank gold; recruit = focal + (bank−focalTarget) gold → equal total, different form.
 
 ## 8. Deferred (noted, not built)

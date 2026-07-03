@@ -5,7 +5,7 @@
 
 ## Why this exists
 
-All flavor (names, prose, captive backstories, scenario narration, room descriptions, lead blurbs, captive titles) flows through the AI layer. Numbers (thresholds, gold, comfort, prestige) stay in the engine. To preserve player agency over the *experience* without giving them a number-tuning console, we expose a **player preferences** surface that the AI reads but the engine ignores.
+All flavor (prose, captive backstories, scenario narration, room descriptions, lead blurbs, captive titles) flows through the AI layer. Numbers (thresholds, gold, comfort, prestige) stay in the engine. To preserve player agency over the *experience* without giving them a number-tuning console, we expose a **player preferences** surface that the AI reads but the engine ignores.
 
 ## What a preference is
 
