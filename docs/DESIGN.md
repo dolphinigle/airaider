@@ -72,6 +72,7 @@ Characters are the atoms. Mercenaries (roster), captives (loot), and NPCs (world
 
 **The tag system** (🔒 LOCKED — authoritative: GENERATION_FLOW §8 + §9b):
 - **One unified vocabulary** (groups W1–W18, both species + stackables, locked) on a **20-tier scale in 4 bands** with a geometric value curve.
+- **Legibility** — each tag chip shows a band-keyed rarity border (the player reads rarity per-tag, no unit badge).
 - **Desirability is both rarity and context** — a higher tier is intrinsically better, but the real thrill is *fit*: a tag is "perfect" because it matches a quest's ask or a room's theme.
 - **Themed rooms — player-styled, engine-scored** — a theme room is a concrete type + a player-applied style (renovation); the AI rolls type+style into a wanted-tag set **once**, the engine scores deterministically thereafter (`overlap`).
 - **Mostly fixed** at acquisition (natural affinity, not grind-earned); quest-stamped tags = deferred.

@@ -31,5 +31,7 @@ Engine: seeded math, edge bookkeeping, salience decay, GC-to-inactive, **dossier
 ## 5. Player-facing 🔒
 The **Chronicle room** (FORT §5) exposes the full graph — including inactive history — as the browsable world archive. The **Library** exposes the NPC/lore roster.
 
-## 6. Open 🟡
+## 6. Out of scope 🔒 / Open 🟡
+**Parked deliberately:** NO embeddings/vector store, NO agentic tool-use mid-generation (deterministic graph recall + the one selector call cover it at this scale).
+
 Exact K/caps (dossier render size, candidate cap ~14, salience floor) — tune at implementation; edge-type enum finalization; region-seed authoring (content).

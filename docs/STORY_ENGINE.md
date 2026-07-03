@@ -128,7 +128,7 @@ Every prompt obeys five principles (and *only* these are principles — everythi
 1. **JSON / structured output** — schema-validated JSON, prose in string fields, validate→fallback. **Min *and* max length caps** on prose (max is a hard cost guardrail so output can't run away on price).
 2. **Cache** — a **byte-stable system prompt** (schema + instructions) so it's prompt-cached; **all variable data goes in the user message** (never interpolated into the system prompt); order stable→volatile to maximize the cached prefix.
 3. **Token efficiency** — max caps + **compact inputs** (tags as codes, one-line blocks) + maximize cache hits + **minimize calls** (combine related generation into one call when it shares context/model; split only when a *different model* genuinely pays for itself). *(Do not split into "one responsibility per call" — that multiplies cost.)*
-4. **Engine owns numbers** — no numeric fields the AI fills (no DCs, gold, thresholds, values); the AI authors *qualities*, never *magnitudes*.
+4. **Engine owns numbers** — no numeric fields the AI fills (no DCs, gold, thresholds, values); the AI authors *qualities*, never *magnitudes*. **Tags cross the AI boundary in the locked format** (GENERATION_FLOW §9b): `word (rank)`, ranks **low/mid/high/legendary** — bare words, no group labels, no integers; enchantments render via label.
 5. **Right model / effort** — prose tier vs mechanical tier, reasoning-effort per call (§9, AI_PROVIDER).
 
 ## 11. Tactical fixes (apply only when testing shows the problem — NOT principles)

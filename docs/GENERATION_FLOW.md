@@ -163,7 +163,7 @@ and astronomically rare). Details belong to the TAG REVAMP (§8) — designed th
 
 ARCHITECTURE — fine TIERS (engine) / coarse BANDS (AI):
 - A tag instance = (concept, tier). Tiers are ASCENDING integers (migration inverts today's
-  descending 1-is-best data). The AI NEVER sees integers — it reads/writes 5 BAND WORDS per
+  descending 1-is-best data). The AI NEVER sees integers — it reads/writes BAND WORDS per (⚠ superseded: 4 bands + the §9b `word (rank)` format lock)
   concept; the engine rolls the exact tier within the band ("AI proposes quality, engine
   decides magnitude" — PROMPT_RULES §3 applied to tags).
 
@@ -286,7 +286,7 @@ KEY PROPERTY (designer): the structure must support "slot requires tags". Hence:
 - TagQuery { match: concept-or-group, minBand?: band words not tiers }. A card matches ⇔
   it carries an instance whose concept (or that concept's group) matches at ≥ the band floor.
 - Slot { requires: TagQuery[] (hard gate, ALL), favors: TagQuery[] (each held match adds
-  band dice +1/+1/+2/+3, +4 at t20; holding the OPPOSITE of a favored concept = clash) }.
+  band dice +1/+1/+2/+3, +4 at t20 — ⚠ RETIRED by §16-F2, dice are tier-blind flat 0.5U; holding the OPPOSITE of a favored concept = clash) }.
   Examples: quest beat = requires [character], favors [stealth, brave] · bedroom shelf =
   requires [relic], favors [craft≥fine, renown(group)] · ransom = requires [stackable, gold] ×200.
 
@@ -810,7 +810,7 @@ Tiers exist ONLY here — rolled per card, never stored in the vocabulary.
 | value/mark | identity group → 0 · flat → ~6 · tiered → 6×1.9^(tier−1) |
 | AI read/write | band words only (`bandNames` or auto-words); engine rolls exact tier in band |
 | player display | word + band word + per-tag rarity border (keyed to band) |
-| dice | favored tag → +1/+1/+2/+3 by band, +4 at t20; `opposite` of a favored tag → clash |
+| dice | ⚠ RETIRED (§16-F2: flat tier-blind 0.5U) — was: favored → +1/+1/+2/+3 by band; `opposite` → clash |
 
 Exclusivity recap: whole-group exclusives (race, background, renown) = pickPolicy;
 pair exclusives inside free groups (brave/coward, strong/weak) = `opposite`; tiers are
