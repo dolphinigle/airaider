@@ -90,7 +90,7 @@ This costs ~30 tokens and is paid once per AI call. Acceptable.
 
 ## What preferences must NOT do
 
-- **Never affect engine numbers.** A `mostly-male` preference does not change captive notoriety. A `verbose` preference does not change resolution outcome. These are flavor-only.
+- **Never affect engine numbers.** A `mostly-male` preference does not change a captive's standing tier. A `verbose` preference does not change resolution outcome. These are flavor-only.
 - **Never gate content.** No "this preference unlocks legendary leads." Preferences are tone, not toggles.
 - **Never become a moral filter.** Players who want bleak grimdark can have it; players who want low-fantasy can have that too. Don't refuse legitimate combinations.
 

@@ -141,8 +141,8 @@ Strict JSON Schema with a `narrative` string field nested inside the structured 
 {
   "narrative": "Marek mutters a prayer under his breath as he climbs the rope. His Strength holds him steady; his superstitious tag whispers warnings he can't quite ignore...",
   "attributes_used": ["strength", "constitution"],
-  "tags_invoked": ["muscular", "superstitious"],
-  "sultan_coin_target": "reach the upper window without alerting the guards",
+  "tags_invoked": ["muscular", "devout (low)"],
+  "difficulty_note (engine-rolled, §10 — illustrative only)": "reach the upper window without alerting the guards",
   "sultan_coin_band": "favorable",
   "merc_injury_band": "none|low|med|high",
   "captive_taken": null,
@@ -154,7 +154,7 @@ Strict JSON Schema with a `narrative` string field nested inside the structured 
 **Why this pattern works:**
 - The `narrative` field is free-form storytelling — voice consistency lives here
 - All engine-consumed fields are typed and validated — no silent parsing failures
-- The AI can reference its narrative when writing the structured fields (e.g., choosing the right Sultan-coin band based on what it wrote)
+- The AI can reference its narrative when writing the structured fields (e.g., narrating around the engine's rolled difficulty based on what it wrote)
 - One round-trip per scenario, not two
 
 **Patterns to AVOID:**
