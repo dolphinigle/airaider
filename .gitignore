@@ -30,7 +30,7 @@ coverage/
 # Real-LLM transcripts: gitignored by default, but ONE per fixture may be force-added
 # (`git add -f`) so reviewers can SEE actual narrative output without rerunning.
 # Pattern below ignores by default; the curated samples are committed explicitly.
-prototype/fixtures/*.transcript-real-auto.json
+v3/saves/
 
 logs/
 
