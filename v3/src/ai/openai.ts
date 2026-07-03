@@ -54,7 +54,8 @@ const zQuestWrite = z.object({
   job: z.string(),
   ask: z.array(zAsk).default([]),
   proposedRewardKind: z.string().nullish(),
-  closesChain: z.boolean().nullish(),
+  closesChain: z.union([z.boolean(), z.string(), z.null()]).nullish()
+    .transform(v => typeof v === 'string' ? ['true', 'yes'].includes(v.toLowerCase()) : v ?? undefined),
   approaches: z.array(z.object({
     label: z.string(), rewardKind: z.string().default('gold'),
     attribute: z.string().default('cha'), favored: zStrArr,

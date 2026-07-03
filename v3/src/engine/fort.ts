@@ -93,9 +93,11 @@ export const ROOM_TYPE: Record<string, RoomType> = Object.fromEntries(ROOM_TYPES
 
 // ---- Great Hall thresholds & pacing constants (§20.2) ------------------------------------
 
-/** prestige needed to raise the GH TO tier t (reference thresholds; recalibrate in-engine) */
+/** prestige needed to raise the GH TO tier t. Reference thresholds recalibrated
+ *  in-engine per §20.2 rule 1/3 — T2-T4 eased below ~85% of measured tier-reachable P
+ *  (the T1-2 single-slot gate produces ~9-13 realistic; 12 was a knife-edge). */
 export const GH_THRESHOLDS: Record<number, number> = {
-  2: 12, 3: 23, 4: 60, 5: 88, 6: 118, 7: 230, 8: 310, 9: 350, 10: 510,
+  2: 9, 3: 16, 4: 48, 5: 80, 6: 118, 7: 230, 8: 310, 9: 350, 10: 510,
   11: 650, 12: 785, 13: 1030, 14: 1275, 15: 1500,
 };
 

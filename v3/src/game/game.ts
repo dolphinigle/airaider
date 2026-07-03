@@ -693,20 +693,29 @@ export class Game {
       rewardSpecs: specs, rewardCards: [], sideLootV,
       state: 'open', createdCycle: this.state.cycle,
     };
-    if (isFinale && out.approaches?.length) {
-      quest.approaches = out.approaches.map((a, i) => ({
+    if (isFinale) {
+      // mutex approach-groups (QUESTS §9). If the AI omitted them, synthesize the
+      // canonical trio — a finale must NEVER be an unbranched multi-slot wall.
+      const raw = out.approaches?.length ? out.approaches : [
+        { label: 'Win them over', rewardKind: 'recruit', attribute: 'cha', favored: ['social'] },
+        { label: 'Subdue them', rewardKind: 'captive', attribute: 'str', favored: ['melee', 'intimidation'] },
+        { label: 'Cash out', rewardKind: 'gold', attribute: 'int', favored: ['roguery'] },
+      ];
+      quest.approaches = raw.map((a, i) => ({
         id: `g${i}`, label: a.label,
         rewardKind: (['recruit', 'captive', 'gold'].includes(a.rewardKind) ? a.rewardKind : 'gold') as 'recruit' | 'captive' | 'gold',
       }));
-      quest.slots.forEach((s, i) => { s.groupId = quest.approaches![i % quest.approaches!.length]!.id });
-      // per-approach test flavor from the AI
-      out.approaches.forEach((a, i) => {
-        const slot = quest.slots.find(s => s.groupId === `g${i}`);
-        if (slot) {
-          const attr = a.attribute.toLowerCase();
-          if (['str', 'dex', 'int', 'cha', 'con'].includes(attr)) slot.test.attributes = [attr as Attribute];
-          slot.test.favored = a.favored.map(f => parseAiTag(f)?.concept).filter((c): c is string => !!c);
-        }
+      // exactly ONE slot per approach — each group is its own manning plan
+      const template = quest.slots[0]!;
+      quest.slots = raw.map((a, i) => {
+        const attr = a.attribute.toLowerCase();
+        const attributes = (['str', 'dex', 'int', 'cha', 'con'].includes(attr) ? [attr] : template.test.attributes) as Attribute[];
+        const favored = a.favored.map(f => parseAiTag(f)?.concept).filter((c): c is string => !!c);
+        return {
+          requirement: { kind: 'open' as const },
+          test: { ...template.test, attributes, favored },
+          groupId: `g${i}`, filledBy: null,
+        };
       });
       chain.state = 'finale-pending';
     }
@@ -1023,8 +1032,12 @@ export class Game {
       else { st.holding.push({ cardId: focal.id, expiresAtCycle: st.cycle + 6 }); focal.location = HELD('staged') }
       const surplus = crystallize(chain, focal.value);
       this.addGold(surplus);
-      if (fate.fate === 'saddled') this.addCard(mintStackable('debt', fate.debt));
-      report.push(`🎬 Finale: ${focal.name} is yours — ${kind}${fate.fate === 'saddled' ? `, saddled with a ${fate.debt}g debt` : ''}. Surplus: ${surplus}g.`);
+      // a bank SHORT of the focal's value delivers them WITH A DEBT (QUESTS §5);
+      // the AI-slips-for-salvage variant only when catastrophically thin
+      let shortDebt = Math.max(0, Math.round(focal.value - chain.bank));
+      if (fate.fate === 'saddled') shortDebt += fate.debt;
+      if (shortDebt > 0) this.addCard(mintStackable('debt', shortDebt));
+      report.push(`🎬 Finale: ${focal.name} is yours — ${kind}${shortDebt > 0 ? `, but the season ran short: a ${shortDebt}g debt comes with them` : ''}. Surplus: ${surplus}g.`);
     }
     guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `the saga ${chain.bible.title} ended ${fate.fate}`, importance: 0.85 }], st.cycle, () => freshId('e'));
   }

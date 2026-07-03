@@ -49,7 +49,7 @@ for (let c = 0; c < cycles; c++) {
     if (status.reason === 'already built') continue;
     if (status.reason?.startsWith('costs')) break;   // save up for the next thing in order
     if (status.reason) continue;
-    if (b === 'dungeon-cell' && g.captiveCapacity() >= Math.max(3, g.captives().length)) continue;
+    if (b === 'dungeon-cell' && (g.captiveCapacity() >= 24 || g.captiveCapacity() >= g.captives().length + 3)) continue;
     const r = g.build(b);
     if (r.ok) say(`c${g.state.cycle}: built ${b}`);
     break;
@@ -85,7 +85,7 @@ for (let c = 0; c < cycles; c++) {
     }
   }
   // renovate the newest theme room toward the loot stream once affordable (rule 4)
-  if (g.gold() > 500 && g.state.cycle % 25 === 0) {
+  if (g.gold() > 150 && g.state.cycle % 12 === 0) {
     const unstyled = g.state.fort.rooms.find(r => ROOM_TYPE[r.type]!.benefit === 'prestige' && !r.style);
     if (unstyled) {
       const styles = ['elven', 'ancient', 'human', 'exotic'];
@@ -110,6 +110,11 @@ for (let c = 0; c < cycles; c++) {
       if (r.ok) say(`c${g.state.cycle}: hired`);
     }
   }
+  // ransom surplus RAW captives only (keep the best 16 for breaking; obedient are the
+  // prestige workforce — never sold by policy)
+  const raw = g.captives().filter(x => !hasTag(x.tags, 'obedient') && x.location.kind === 'held')
+    .sort((a, b) => b.value - a.value);
+  for (const c of raw.slice(16)) g.ransom(c.id);
 
   // 6) quests — play like a human: read the odds (always visible), send winnable work,
   // abandon what can't be manned or won.

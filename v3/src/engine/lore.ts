@@ -157,6 +157,17 @@ export function guardEdges(g: LoreGraph, proposed: {
     if (!g.nodes[p.from] || !g.nodes[p.to]) continue;
     if (!EDGE_TYPES.includes(p.type as EdgeType)) continue;
     const importance = Math.max(0, Math.min(1, p.importance));
+    // DEDUP: an active edge with the same (from,to,type) is the SAME memory retold —
+    // refresh it (touch + best blurb) instead of stacking near-copies (LORE §2 append
+    // is for NEW facts; a repeated fact re-anchors salience)
+    const dup = g.edges.find(e => e.active && e.type === p.type &&
+      ((e.from === p.from && e.to === p.to) || (e.from === p.to && e.to === p.from)));
+    if (dup) {
+      touchEdge(dup, cycle, importance * 0.3);
+      if (p.blurb.length > dup.blurb.length) dup.blurb = p.blurb.slice(0, 160);
+      if (importance >= CORE_IMPORTANCE) dup.core = true;
+      continue;
+    }
     const e: RelEdge = {
       id: idGen(), from: p.from, to: p.to, type: p.type as EdgeType,
       salience: Math.max(0.3, importance), core: importance >= CORE_IMPORTANCE,
