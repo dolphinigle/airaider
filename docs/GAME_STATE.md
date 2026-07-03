@@ -7,7 +7,7 @@
 ## 1. The state = one card collection + placements + the lore graph 🔒
 
 Everything you own — mercs, captives, items, gold — is a **Card**, stored uniformly. The save is:
-- the **card collection** — each card's `location` is a **CardSlot reference** when slotted (`room:<id>#1` / `quest:<id>#2`), else a holding state (roster / inventory / staged / limbo);
+- the **card collection** — each card's `location` is a **CardSlot reference** when slotted (`room:<id>#1` / `quest:<id>#2`), else a holding state (roster / inventory / staged / limbo — limbo = generated but not yet owned, e.g. a chain focal pre-acquisition);
 - **gold** (a stackable card, shown as a counter), the **fort** (cells + rooms + their CardSlots + upgrade levels + stored theme-tags), the **lead board**, **active chains**, the **Great Hall tier**, **unlocked regions**, and the **RNG state** (persisted, not re-derived);
 - the **lore graph** ([LORE.md](LORE.md)): nodes' blurbs/dossiers + memory-edges — **append-only with an `active` flag; nothing is ever hard-deleted** (inactive = hidden from AI context, still player-readable in the Chronicle).
 
@@ -68,7 +68,7 @@ The marriage: the mechanical grind (prestige tiers) is what **unlocks the rare, 
 
 ## 6. Staging & capacity 🔒
 
-No one joins or is held instantly — they **stage** with full stats and a timer: **Tavern** stages hireable people (hire for gold; needs a free roster slot — merc bedrooms grant +1 each); **Holding cell** stages captive candidates; **Dungeon cells** hold captives (several per cell; build more for capacity). Disposition: display/station (if obedient) · ransom/sell · (torture chamber →) break. **No other state-flow conversions in prototype**; a focal character's play-determined fate decides which staging building they land in. **No inventory capacity anywhere.**
+No one joins or is held instantly — they **stage** with full stats and a timer: **Tavern** stages hireable people (hire for gold; needs a free roster slot — merc bedrooms grant +1 each; the Bunkroom provides the starting base slots (🛠 count)); **Holding cell** stages captive candidates; **Dungeon cells** hold captives (several per cell; build more for capacity). Disposition: display/station (if obedient) · ransom/sell · (torture chamber →) break. **No other state-flow conversions in prototype**; a focal character's play-determined fate decides which staging building they land in. **No inventory capacity anywhere.**
 
 ---
 

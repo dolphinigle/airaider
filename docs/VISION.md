@@ -25,7 +25,7 @@ The game runs on three distinct pleasures. None is filler; pull one and the othe
 Like a roguelite has "the run" and "the base" — but here the base **persists**, because attachment requires permanence.
 
 - **Gameplay loop** — assign characters to quests → roll → AI narrates an individuated outcome → loot drops.
-- **Progression loop** — spend gold and captives to build rooms; rooms unlock new quests, convert tag-matched captives into prestige, and gate the next tier of rooms.
+- **Progression loop** — spend gold to build rooms (captives staff them); rooms unlock new quests, convert tag-matched captives into prestige, and gate the next tier of rooms.
 
 They feed each other in a single circuit: quests drop tagged loot → loot builds the fort → the fort unlocks rarer, higher-stakes quests → which drop better loot. The marriage of these two loops **is** prototype 2's whole reason to exist (v1 built them in separate rooms; that was the failure).
 

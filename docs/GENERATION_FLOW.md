@@ -1,6 +1,6 @@
 # GENERATION_FLOW.md — how a saga/quest is generated (the canonical pipeline)
 
-**Status: WIP DRAFT (2026-06-12) — being finalized item-by-item with the designer.**
+**Status: decision log COMPLETE (2026-07-03; design finalized through §21) — being finalized item-by-item with the designer.**
 Supersedes the scattered flow descriptions; QUESTS.md §"reward-first" 🔒 is the governing rule.
 Each section below is marked ✅ agreed · 🔶 OPEN (decision pending) · 📌 current-impl note.
 
@@ -54,9 +54,9 @@ reviews (consistency / design-fun / implementability ~70–75% buildable) + fix 
 verification + must-fixes → SHIP. Review-resolved into canon: leads EARNED not restocked · AI
 proposes reward kind, engine grants (F6) · pooled aggregation Σcoins vs Σthresholds (partial 0.6×) ·
 odds baseline always-raw, Oracle adds computed % · genesis=1 call · engine renders dossiers from AI
-edges. OPEN DESIGNER DECISIONS: (1) LOSS/stakes design (reviews' top issue — departure/bitter-exit
-candidate) · (2) ambient lead-trickle floor y/n · (3) known-cast cadence target · (4) torture-chamber
-throughput spec+sim · then → BUILD PROTOTYPE V3.
+edges. §21 RULINGS ✅ closed all four post-review items (loss=TIME · leads strict/priced grants ·
+known-cast ≈2/GH-tier · torture=chamber's own slots). Doc-redo DONE + triple-verified.
+NEXT = BUILD PROTOTYPE V3.
 After all design: the LEAN-DOC TRANSFORM (commit checkpoint → rewrite every doc to
 END-result-only / implementable, verify each claim vs chat history → archive superseded docs
 TAGS.md/UNIT_GENERATION.md/scratch). (PROMPTS.md attribute names — FIXED 2026-07-03 in the doc-redo.) BIG PICTURE ([[v3-docs-finalization]]):
@@ -1131,7 +1131,7 @@ ORDER FROM HERE (designer-set 2026-06-14):
 
 ---
 
-## §13 — REGIONS (design IN PROGRESS, started 2026-06-15) — #42
+## §13 — REGIONS ✅ (locked; core done 2026-06-15) — #42
 
 Formalizes "location" into a real progression axis. **"location" as a separate mechanical concept is
 DROPPED** — there is ONE mechanical unit, the **REGION**; everything finer (a village, a ruin, a
@@ -1207,7 +1207,7 @@ rooms (slot assignment → prestige → kind-D) → build-order table → presti
 
 ---
 
-## §14 — LORE & CONTEXT-RETRIEVAL ("relevant-object" system) — #43 (design IN PROGRESS, 2026-06-16)
+## §14 — LORE & CONTEXT-RETRIEVAL ("relevant-object" system) — #43 ✅ (validated + promoted to LORE.md)
 
 The lorebook's CORE problem is **context selection**: at quest-genesis about a focal entity (e.g. a
 unit Alex), feed the LLM the RELEVANT entities/lore (Alex's brother Bob, his birthplace region, a
@@ -1464,8 +1464,7 @@ less so — same rule for both.)
 
 ## §17 — DOC-REDO COVERAGE CHECKLIST (so no core decision is dropped) — #44
 
-Doc-redo is POSTPONED until the remaining DECISIONS land (catalog #36, prestige math #41, + the open
-gaps). When we resume the redo, every core decision below MUST be reflected in its target doc. Source
+✅ ALL ITEMS EXECUTED 2026-07-02/03 (the overnight doc-redo). When we resume the redo, every core decision below MUST be reflected in its target doc. Source
 of truth for each = its GENERATION_FLOW section (§8–§16). ✅ = doc already rewritten.
 
 **CARDS.md ✅ DONE** — Card+CardSlot concept · attrs STR/DEX/INT/CHA/CON · growth+focus (no talents) ·
@@ -1476,29 +1475,29 @@ effect (bedroom→cap sole / non-bedroom→global) · global gates unlocks AND u
 gradually unlock · player-theme→AI-rolls-once→engine-scores · saturating-band formula + upgrade×fill
 table · region faucet + endgame-building hooks (comfort-band lift, 4-spine Outskirts keys).
 
-**GAME_STATE.md ⏳** — prestige by EFFECT, NOT "two symmetric pools" (bedroom→cap sole effect /
+**GAME_STATE.md ✅** — prestige by EFFECT, NOT "two symmetric pools" (bedroom→cap sole effect /
 non-bedroom→summed global gating unlocks+upgrades) · CardSlot placement (location = slot-ref when
 slotted; else roster/inventory/limbo/staged) · live-recompute on slot change · the 3-PRODUCER save
 model (§16: engine seeded numbers / AI flavor+categorical persisted / picker discarded; reload re-runs
 no AI) · SOFT-DELETE lore graph (active flag; inactive hidden from AI, player-readable) · injury =
 intrinsic tiered state · `unlockedLocations`→`unlockedRegions`.
 
-**QUESTS.md ⏳** — QuestSlot = CardSlot + {tested,groupId} (one Slot concept) · the roll = §10 ·
+**QUESTS.md ✅** — QuestSlot = CardSlot + {tested,groupId} (one Slot concept) · the roll = §10 ·
 reward-FIRST (engine generates value bundle at quest birth; AI proposes KIND+label, engine grants) ·
 injury AI-judged at resolution, decoupled from tier (F5) · partial=half+liability / failure=0+AI-injury ·
 lore retrieval feeds genesis (recall→size-gated nano selector→genesis w/ write-back folded; ≤2
 round-trips) · leads region-scoped (location = a lorebook name, not a mechanical unit).
 
-**ECONOMY.md ⏳ (stale, F11)** — 20-tier GEOMETRIC value curve `6·1.9^(t−1)` (DROP old 5-tier
+**ECONOMY.md ✅ (was F11-stale)** — 20-tier GEOMETRIC value curve `6·1.9^(t−1)` (DROP old 5-tier
 common/uncommon/rare/legendary) · DROP rollTalents · MARKED value (card.value=target; tags=substance,
 may diverge) · injury value = tiers×V_base · reward-first bundle · debt = negative gold (vs liability).
 
-**LORE — new doc or §14/§16 promoted ⏳** — unified LoreNode · memory=EDGE (salience; CORE pinned
+**LORE.md ✅ (new canonical)** — unified LoreNode · memory=EDGE (salience; CORE pinned
 never-decay; append+SUPERSEDE; enum type + direction convention; SOFT-DELETE active flag) · dossier =
 bounded top-K render over salience-ranked edges · retrieval pipeline (≤2 round-trips, batch/join) ·
 3-producer determinism · PURPOSE = continuity (1.00 vs 0.55).
 
-**TAGS.md / PROMPTS.md / UNIT_GENERATION.md ⏳ (stale)** — attribute names → STR/DEX/INT/CHA/CON
+**TAGS.md / PROMPTS.md / UNIT_GENERATION.md ✅ (archived / bannered / fixed)** — attribute names → STR/DEX/INT/CHA/CON
 (kill physical/agility/perception/willpower) · 20-tier · growth+focus not talents · archive superseded.
 
 **Cross-cutting principles to preserve everywhere** — engine owns NUMBERS, AI owns FLAVOR + bounded

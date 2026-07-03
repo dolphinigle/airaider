@@ -17,7 +17,7 @@
         — player PURSUES —               │
  3. generate SUCCESS reward (value →     │
     split → generateCard)  [ECONOMY]     │
-                                         │ 4. HANDOFF: name/flesh char + write CARD/BIBLE + author ASK
+                                         │ 4. HANDOFF: flesh char (engine-assigned name) + write CARD/BIBLE + author ASK
  5. set THRESHOLD                        │
         — Fort Phase: assign cards —     │
  6. END DAY → roll → success/partial/fail│
@@ -61,11 +61,11 @@ Spend the expensive generation only where the story matters:
 ### Everything is reward-first — a chain is built around a focal character 🔒
 The unifying rule: **the engine determines the reward first; a one-off dresses it with a line, a chain builds a whole story around it.** The axis is **one-off vs chain** (`chain-info = none` vs `starts-new/continues`), *independent of rarity*.
 - **One-off = reward, dressed.** The engine rolls the loot *first*; the AI writes a thin line to frame it. A one-off has no ongoing fiction to honor — the captive is *whatever tags rolled*, and the AI just frames them ("among the prisoners, a sullen militiaman").
-- **Chain = reward, storied.** At genesis the engine **generates the chain's FOCAL CHARACTER first** — the person the saga is about — at the saga's payoff value, plus a **likely fate** (recruit / captive / ally). The AI then authors the bible **around that character** (the "baseline guy"; the AI may flesh them out further; *their tags are the story seed* — a rolled `bg:princess` hands the AI "a crown in exile"). For a **main chain** (merc-join), the focal character is the **existing merc** — the chain develops *them* (a stamped tag, a meaningful event, possibly their death) rather than acquiring someone new. The focal character can be **new or known** (a rare chain's payoff might be re-recruiting a departed merc, or capturing a recurring antagonist — recurrence and attachment become one engine).
+- **Chain = reward, storied.** At genesis the engine **generates the chain's FOCAL CHARACTER first** — the person the saga is about — at the saga's payoff value, plus a **likely fate** (recruit / captive / ally). The AI then authors the bible **around that character** (the "baseline guy"; the AI may flesh them out further; *their tags are the story seed* — a rolled `bg:princess` hands the AI "a crown in exile"). For a **main chain** (merc-join), the focal character is the **existing merc** — the chain develops *them* (a stamped tag, a meaningful event, a scar) rather than acquiring someone new. The focal character can be **new or known** (a rare chain's payoff might be re-engaging a long-lost veteran, or capturing a recurring antagonist — recurrence and attachment become one engine).
 
 This makes the payoff a person you've spent the whole arc with — you *know* them before you get them. The **vague direction** ("likely ends with a powerful recruit") gives the AI a climax to write toward *and* the player a visible long-horizon goal. But the **fate is play-determined**: the engine sets the *likely* outcome, the finale **roll** decides the *actual* one (success → they join clean; partial → they join lesser — saddled with a debt/liability; failure → they slip away / turn bitter captive — you lose them. Injury is the separate AI-judged channel; focal "loss" here is narrative, not roster death — death is ignored in prototype). You can lose the character you spent a saga earning — the gamble stays real. Most chains are character-focal (for attachment); occasionally a chain is built around a non-character prize (a legendary artifact, a faction alliance) for variety.
 
-One-offs are **progression fuel** — the steady supply of tagged captives + gold that feeds the fort — not narrative. Their pipeline: (1) engine generates the **reward at quest-birth** (kind + value + tags, fixed then) + a templated card + ask (zero AI for common; richer for rare); player sees the reward **envelope**; (2) assign → roll → **success / partial / failure**; (3) the outcome **applies a consequence, never rescaling the unit** (success → reward clean; partial → reward + a **negative-gold liability card** — `evidence` / `a mess` / `a debt`; failure → lose the reward; injuries = the AI-judged channel above, any outcome); (4) **one cheap AI call** writes the outcome line (individuating the assigned merc) *and* names/describes any acquired captive. Anti-sameness = varied archetype→ask + the loot lottery, not bespoke prose. No bible, no chain.
+One-offs are **progression fuel** — the steady supply of tagged captives + gold that feeds the fort — not narrative. Their pipeline: (1) engine generates the **reward at quest-birth** (kind + value + tags, fixed then) + a templated card + ask (zero AI for common; richer for rare); player sees the reward **envelope**; (2) assign → roll → **success / partial / failure**; (3) the outcome **applies a consequence, never rescaling the unit** (success → reward clean; partial → reward + a **negative-gold liability card** — `evidence` / `a mess` (debt = negative gold); failure → lose the reward; injuries = the AI-judged channel above, any outcome); (4) **one cheap AI call** writes the outcome line (individuating the assigned merc) *and* names/describes any acquired captive. Anti-sameness = varied archetype→ask + the loot lottery, not bespoke prose. No bible, no chain.
 
 The structured card below and the story-first reward flow (§4–5) apply to **chain** quests.
 
@@ -94,7 +94,7 @@ The engine rolls coins vs threshold → **success / partial / failure**, hands t
 
 **The reward is generated at quest birth** (value → split → `generateCard`; full detail in [ECONOMY.md](ECONOMY.md)). The roll only scales it **down**, never rescaling a unit:
 - **success** → the full bundle;
-- **partial** → **half**: keep the unit + a **liability card** (`evidence`/`mess`/`debt`) sized to net V/2 *(a focal character survives, just saddled with it)*, or give V/2 in gold if it's not worth keeping;
+- **partial** → **half**: keep the unit + a **liability card** (`evidence`/`mess`; debt = negative gold) sized to net V/2 *(a focal character survives, just saddled with it)*, or give V/2 in gold if not worth keeping (engine threshold — same KEEP≈0.4 rule as the chain bank);
 - **failure** → nothing.
 
 **Injury is a separate, AI-judged channel, decoupled from the outcome tier** (GENERATION_FLOW §11, §16-F5): at resolution the AI judges from the fiction whether each party member is hurt and picks a **severity band** (none/low/med/high) — typically on failure, *sometimes none even on failure*, occasionally a minor one on a costly partial. The engine maps band → injury tiers → a flat coin penalty until healed. (There is no "risky" flag; the AI's judgment replaces it. Death is ignored in the prototype.)
@@ -167,7 +167,7 @@ engine: focal character @ value V ─────────────┤   f
 
 | # | Actor | Action |
 |---|---|---|
-| 1 | Engine | trigger; rarity → **stakes** (sets cast size + why-ladder depth), beats `B`, slots `N`, `V = V_base×rarity×(B×N)` |
+| 1 | Engine | trigger; rarity → **stakes** (cast size + why-ladder depth), beats `B`, slots `N`, `V = V_base×rarity×(B×N)×0.8 × unit-share` |
 | 2 | Engine | pre-generate the **focal character @ V** (role-agnostic tags) = the chain's **reward** *(main chain: focal = the joining merc)* |
 | 3 | Engine | pick a **seed** from the seed bank (Polti-anchored "what-if" spark, weighted by stakes/region, anti-repeat); build the **slate** via LORE RETRIEVAL ([LORE.md](LORE.md)): ranked recall over the focal's memory-edges (1–2 hops + wildcards) → optional nano **selector** picks who gets full dossiers (≤2 LLM round-trips total incl. genesis) |
 | 4 | AI · **GENESIS** | collide seed × slate → one-line **kernel**; choose **1–3 core** people (**focal must be core**); **write-back folded into the same response**: relevant ids + new entities/places + new memory-edges (engine persists, guarded) |
@@ -218,4 +218,5 @@ Double-axis decision: *which test fits my roster?* + *which reward form does my 
 - **Common `none` quests: templated (zero AI) or one cheap AI call?** *Lean: templated card + a tiny AI flavor line — cheap variety.* (This is the next thing to design.)
 - **Fresh lead: pure mechanical stub or a one-line teaser?** *Lean: pure stub — cheaper; story is the pursue payoff.*
 - **Rare/known-cast cadence 🛠** — target ≈ **2 known-cast geneses per GH tier** (~every 60 cycles; §21), gated on recurrable pool ≥ ~8; derive the rarity weights from this target + verify in playtest.
+- **Pursued-quest lifecycle** 🟡 — expiry/abandon rules for generated-but-unresolved quests (leads expire; do pursued quests?) — decide at impl.
 - **Latency & reading load** — the batched Resolution fires many AI calls at once (needs pre-generation + parallel resolution), and prose volume × roster width × 3-min-cycle is a three-way tension: enforce word budgets by rarity (commons ≈ one line) and MEASURE real minutes/cycle in the first playtest before trusting §20 hour figures.

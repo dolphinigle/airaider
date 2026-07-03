@@ -33,16 +33,16 @@ A **CardSlot** is one spot that holds a Card. **Quests and rooms have CardSlots*
 
 ```
 CardSlot { accepts: CardClass[]; requirement: open | must-be <card> | must-have <tag>; filledBy? }
-   + on a QUEST slot:  tested { attribute, favored, clashing }, groupId   (approach-branch)
+   + on a QUEST slot:  tested { attribute | attributes[] (multi-stat pools ×(n+1)/2), favored, clashing }, groupId
 ```
 When slotted, a Card's `location` is a CardSlot reference (`quest:<id>#2` / `room:<id>#1`); otherwise it is a holding state (roster / inventory / limbo / staged). One placement model for both hosts.
 
-- **Quest slots** by accepted class: *party* (character; carries the `tested` attribute + favored/clashing skills) · *cost* (gold) · *requirement* (item/consumable, consumed).
+- **Quest slots** by accepted class: *party* (character; carries the `tested` attribute + favored/clashing skills) · *cost* (gold — reserved; pay-in antes cut from prototype) · *requirement* (item/consumable, consumed).
 - **Room slots are GENERIC** — differentiated only by `accepts`: a normal room slot accepts **items OR obedient captives** (both are just tagged cards to `overlap()`); a **cell** slot accepts captives only (holding, raw ok); a bedroom's **owner** slot holds exactly one merc (it *binds the room's target* to that merc's own tags — not scored itself). **Mercs are never stationable in room slots** — mercs quest; captives and items staff the fort (see §5, the captive-labor loop).
 - **Requirement** — `open` / `must-be <card>` / `must-have <tag>`.
 - **Fill rule** — a quest needs **all party slots filled** (no partial sends; the threshold assumes N). A room scores whatever is filled.
 - **Mutex (branches)** — quest approach-groups are mutually exclusive: filling one locks the others.
-- **Fit** — `overlap(card.tags, wants, clashes)` scores a card against its slot's wants (quest = the slot's favored skills; room = its theme) — the **one shared primitive** powering both the dice roll and prestige. (Kept raw/tier-scaled; rooms use its magnitude, the quest layer thresholds its NET sign into the flat 0.5·U matching bonus — tier-blind on dice, F2. Clashing mirrors matching, negative; all matched tags score.)
+- **Fit** — `overlap(card.tags, wants, clashes)` scores a card against its slot's wants (quest = the slot's favored skills; room = its theme) — the **one shared primitive** powering both the dice roll and prestige. (Kept raw/tier-scaled; rooms use its magnitude. On dice: **+0.5·U flat if the unit owns ≥1 favored skill** (no stacking, tier-blind — F2/F10) and **−0.5·U mirror if it owns ≥1 clashing**; independent levers, not netted. In rooms all matched tags score by tier.)
 
 **Stacks.** Fungible cards (gold, identical consumables) store as `{card ×N}` — a count, not N objects. Unique cards (characters, rolled items) are singletons.
 
@@ -50,7 +50,7 @@ When slotted, a Card's `location` is a CardSlot reference (`quest:<id>#2` / `roo
 
 ## 3. The character class 🔒
 
-Mercenaries, captives, and NPCs are all `class:character`, distinguished by `role` (merc / captive / npc / dead). A character is:
+Mercenaries, captives, and NPCs are all `class:character`, distinguished by `role` (merc / captive / npc; `dead` = lore-only, never a roster outcome). A character is:
 
 - **Tags** — identity + fit + the loot dopamine. **Personality IS tags.** Plus AI-generated **quirks**.
 - **Attributes** — five scalars: **Strength · Dexterity · Intelligence · Charisma · Constitution** → the **coin count** (the only thing that generates dice).

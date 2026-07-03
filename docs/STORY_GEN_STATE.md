@@ -1,3 +1,5 @@
+> **⚠ v2 IMPLEMENTATION SNAPSHOT (non-canonical).** State of the v2 code + learnings; the v3 canon is the README reading order + GENERATION_FLOW.
+
 # Story-generation — current implementation state & learnings
 
 > Snapshot of how the v2 AI story engine works *right now* (`app/core/`), the design decisions and

@@ -11,7 +11,7 @@ Conventions: 🔒 locked · 🛠 locked-shape, numbers deferred · 🟡 open.
 One persistent fort. Two loops that share one currency — **tagged characters** — and feed each other so neither can become a side-panel:
 
 - **Gameplay loop** — assign characters to quests → roll → AI narrates an individuated outcome → loot drops.
-- **Progression loop** — spend gold and captives to build rooms; rooms unlock new quests, turn tag-matched captives into prestige, and gate the next tier of rooms.
+- **Progression loop** — spend gold to build rooms (captives staff them); rooms unlock new quests, turn tag-matched captives into prestige, and gate the next tier of rooms.
 
 Three distinct pleasures live across these loops. Pull any one and the others starve:
 
@@ -51,7 +51,7 @@ The game is played across two boards at two speeds.
 ### Lead board — cheap, deterministic, the strategic surface
 A **lead is pure data**, no AI: `{ rarity, level, region, archetype, chain-info }` where `chain-info ∈ { continues an existing story · starts a new one · none }`. The player reads leads like loot filters and decides where to spend scarce effort. This is fun *before any story exists* — like a good map drop. The lead board is **dialed by the fort**: build a region's Scouting lodge → that region opens (+ its lead-hunting quests); raise prestige → higher-rarity leads show up. It is the visible payoff of progression.
 
-Leads **expire** (use-it-or-lose-it). What stocks the board each cycle: deterministic generation (gated by fort + prestige), plus "continue" leads from live stories, plus first-beat leads from new mercs' personal chains.
+Leads **expire** (use-it-or-lose-it). What feeds the board: EARNED leads — lead-hunting quests + priced lead grants in quest rewards (no per-cycle restock; QUESTS §1, GENERATION_FLOW §21) — plus "continue" leads from live stories, plus first-beat leads from new mercs' personal chains.
 
 ### Quest board — the AI quests you committed to
 **Pursuing** a lead generates the full quest (its card) and moves it here, where you assign characters and, in the Resolution Phase, it resolves. AI cost fires only on pursuit, so the expensive generation is spent only on quests the player chose to care about.
@@ -68,7 +68,7 @@ Characters are the atoms. Mercenaries (roster), captives (loot), and NPCs (world
 - **Quirks** — small AI-generated concrete habits ("counts coins twice").
 - **`who` + backstory** — a one-line known-for and a short AI-written origin, generated when they enter the pool, fitting their tags and how they were acquired.
 - **Their chains** — the quests they pass through (cast in others') plus the one chain about them (their main story). *The chains are their living memory and biography* — there is no separate psychological model. (See STORY_ENGINE.md for how this stays token-affordable.)
-- **State** — level/veterancy, wounds, fatigue, alive/dead/departed, current room (captives only).
+- **State** — level/veterancy, injuries (tiers), current status, current room (captives only).
 
 **The tag system** (🔒 LOCKED — authoritative: GENERATION_FLOW §8 + §9b):
 - **One unified vocabulary** (groups W1–W18, both species + stackables, locked) on a **20-tier scale in 4 bands** with a geometric value curve.
@@ -87,7 +87,7 @@ Engine owns the math; the AI narrates the result it's told.
 
 - The quest's **ask** + the assigned characters' relevant **tags/attributes** → a **coin count N** (better fit = more coins).
 - The quest carries a **threshold T**. Flip N coins → heads vs T → **success / partial / failure** (three outcomes, no critical — the jackpot lives at reward *generation*, not the roll). See [ECONOMY.md](ECONOMY.md) §5 for delivery (success = full · partial = half / keep+liability · failure = none; **injury is a separate AI-judged channel, decoupled from the outcome tier** — GENERATION_FLOW §11/F5).
-- **Odds are visible before commit** ("6 coins vs threshold 4 → ~78%"). This is what makes the min-max legible and what makes loss *owned* (§7) — you always knew the danger.
+- **Odds are visible before commit** ("6 coins vs threshold 4 (raw, always visible; the Oracle room adds the computed ~78%)"). This is what makes the min-max legible and what makes loss *owned* (§7) — you always knew the danger.
 - The engine tells the AI the outcome and the cast; the AI never invents numbers.
 - 🟡 exact thresholds and tag-vs-attribute weighting are open numbers (**fun before balance**).
 
@@ -125,7 +125,7 @@ Rooms gate on **prestige** to build, and do three jobs:
 3. **Housing** — **Bedrooms cap the roster** ("the constraint is bedrooms").
 
 ### 8.3 Prestige — gate and score
-Prestige is earned from tag-matched captives/followers in rooms. It is both the **gate** (rooms have prestige requirements) and a **score** that raises recruit quality and unlocks higher-stakes content. Ladder: *prestige → unlock room → room unlocks quests + makes more prestige → higher prestige → better rooms & recruits.*
+Prestige is earned from tag-matched captives + items in rooms. It is both the **gate** (rooms have prestige requirements) and a **score** that raises recruit quality and unlocks higher-stakes content. Ladder: *prestige → unlock room → room unlocks quests + makes more prestige → higher prestige → better rooms & recruits.*
 
 ### 8.4 Recruitment & captives
 Designed — staging + dispositions in [GAME_STATE.md](GAME_STATE.md) §6 (Tavern hires; captive break/station/ransom/sell; no conversions).

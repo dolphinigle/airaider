@@ -14,10 +14,11 @@ Airaider is a persistent, single-player, **AI-driven character-collection fort g
 7. **[LORE.md](LORE.md)** — the world graph (LoreNodes + memory-edges), soft-delete, salience/pinning, and the ≤2-round-trip context-retrieval pipeline (continuity engine).
 8. **[STORY_ENGINE.md](STORY_ENGINE.md)** — the AI craft behind the board: the hidden bible, casting tiers, quest-card structure/voice, individuated outcomes, the 5 prompt principles.
    - **[PROMPTS.md](PROMPTS.md)** — example prompts (partially stale; GENERATION_FLOW + LORE.md are authoritative; refresh at implementation).
-9. **[GENERATION_FLOW.md](GENERATION_FLOW.md)** — the decision log (§8 tags · §10 the roll · §11 injury · §13 regions · §14 lore · §15 slottables · §16 resolutions · §18 room model · §19 catalog · §20 prestige math + sims). Where every 🔒 above traces to.
+9. **[GENERATION_FLOW.md](GENERATION_FLOW.md)** — the decision log (§8 tags · §10 the roll · §11 injury · §13 regions · §14 lore · §15 slottables · §16 resolutions · §18 room model · §19 catalog · §20 prestige math + sims · §21 post-review rulings). Where every 🔒 above traces to.
 
 ## Supporting
 
+- **[BIBLE.md](BIBLE.md)** — the LOCKED bible-authoring spec (wins over QUEST_BIBLE.md where they differ) · **[PROMPT_RULES.md](PROMPT_RULES.md)** — prompt-craft rules (v2 code paths; principles current).
 - **[AI_PROVIDER.md](AI_PROVIDER.md)** — model selection, structured-output strategy.
 - **[PLAYER_PREFERENCES.md](PLAYER_PREFERENCES.md)** — player-facing flavor knobs (tone, writing style) that flow into AI prompts without touching engine math.
 
