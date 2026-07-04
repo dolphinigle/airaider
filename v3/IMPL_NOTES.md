@@ -61,6 +61,11 @@ approaches deliver the focal. ~14 calls / ≈$0.09 per short campaign. Schemas h
 model quirks (string arrays, worded importance, string booleans); `AI_DEBUG=1` logs fallbacks.
 
 ## Open designer flags 🚩
+- **Early-roster poverty trap (found in bot play, can bite humans):** with 2 starting mercs, the
+  3rd hire is pivotal — a trajectory that can't afford it crawls at ~35g/cycle for hundreds of
+  cycles. Knobs: day-0 gold (300), hire lean (1.2×mark), recruit mark sizes. A human escapes by
+  selling junk relics + ransoming aggressively (the bot now does both), but the edge is sharp;
+  consider a cheaper "desperate hire" tier or a day-0 3rd merc.
 - Threshold retune (#10) is measured against the BOT; re-measure against human play in the GUI.
 - Idle-obedient hoarding: nothing pushes back on stockpiling broken captives (no upkeep by design) — fine for proto?
 - One-off common quests still fire one cheap AI call for the card (QUESTS §10 lean says "templated + tiny flavor line") — currently full writeQuest; cost is small, but templating can trim it later.

@@ -108,12 +108,24 @@ for (let c = 0; c < cycles; c++) {
       g.slot(rack.id, idx, captive.id);
     }
   }
+  // sell junk relics (unslottable fits) — a human monetizes the dead drops
+  const { fillScore: fs2 } = await import('../src/engine/overlap.js');
+  const idleRelics = g.relics().filter(r => r.location.kind === 'held');
+  for (const relic of idleRelics) {
+    const bestFit = Math.max(0, ...g.state.fort.rooms
+      .filter(r => ROOM_TYPE[r.type]!.species === 'comfort')
+      .map(r => fs2(relic.tags, g.effectiveWants(r))));
+    if (bestFit <= 0.5 && idleRelics.length > 3) g.sell(relic.id);
+  }
+  // hire: stretch for the roster — width IS the pursue budget (mercs are the constraint)
   for (const s of [...g.state.tavern]) {
     const cand = g.card(s.cardId);
     if (!cand) continue;
-    if (g.roster().length < g.rosterCapacity() && g.gold() > Math.round(cand.value * 1.2) + 120) {
+    const cost = Math.round(cand.value * 1.2);
+    const desperate = g.roster().length <= 3;   // the 3rd/4th merc is pivotal — stretch
+    if (g.roster().length < g.rosterCapacity() && g.gold() > cost + (desperate ? 0 : 100)) {
       const r = g.hire(s.cardId);
-      if (r.ok) say(`c${g.state.cycle}: hired ${cand.name}`);
+      if (r.ok) say(`c${g.state.cycle}: hired ${cand.name} (${cost}g)`);
     }
   }
   // set a training focus for any merc without one (their best natural attr)
