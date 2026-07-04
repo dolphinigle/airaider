@@ -233,3 +233,32 @@ describe('§21-4a sequel road-back', () => {
     expect(errs, errs.join(' | ')).toEqual([]);
   });
 });
+
+describe('endgame band lift', () => {
+  it('an endgame key lifts bedroom comfort band → cap can pass 40', () => {
+    const g = new Game(new MockProvider(41), 41);
+    g.state.cards.push(mintStackable('gold', 999999));
+    g.state.fort.ghTier = 13;
+    const merc = g.roster()[0]!;
+    g.build('bedroom', merc.id);
+    const bed = g.state.fort.rooms.find(r => r.ownerId === merc.id)!;
+    // saturate the bedroom with perfect fits
+    for (let i = 0; i < 6; i++) { bed.slots.push(null); }
+    for (let i = 0; i < 6; i++) {
+      const relic: Card = {
+        id: freshId('r'), name: `gift${i}`, value: 0, location: HELD('inventory'), chainIds: [],
+        tags: [{ concept: 'relic' }, T('furniture', 18), T('famous', 12)],
+      };
+      g.state.cards.push(relic);
+      expect(g.slot(bed.id, i, relic.id).ok).toBe(true);
+    }
+    const capBefore = g.capOf(merc.id);
+    expect(g.build('scouting-forests').ok).toBe(true);  // region must be open first
+    expect(g.build('endgame-forests').ok).toBe(true);
+    const capAfter = g.capOf(merc.id);
+    expect(capAfter).toBeGreaterThan(capBefore);
+    expect(g.state.fort.endgameKeys).toContain('forests');
+    const errs = auditGame(g);
+    expect(errs, errs.join(' | ')).toEqual([]);
+  });
+});
