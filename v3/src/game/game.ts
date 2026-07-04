@@ -77,6 +77,8 @@ export interface GameState {
   holding: Staged[];           // captive candidates
   breaking: Breaking[];
   liabilityBirth: Record<string, number>;
+  /** failure-debt echoes: a named person left in peril RESURFACES (the story bends, never dead-ends) */
+  pendingEchoes: { focalId: string; atCycle: number }[];
   log: LogEntry[];
 }
 
@@ -89,6 +91,7 @@ export class Game {
     this.ai = ai;
     if (loaded) {
       this.state = loaded;
+      this.state.pendingEchoes ??= [];   // saves from before the echo mechanic
       this.rng = new Rng(loaded.rngState);
       seedIdCounter(loaded.idCounter);
     } else {
@@ -97,7 +100,7 @@ export class Game {
         seed, rngState: this.rng.state(), idCounter: 1, cycle: 0,
         cards: [], fort: newFort(), leads: [], quests: [], chains: [],
         lore: newGraph(), unlockedRegions: [], tavern: [], holding: [],
-        breaking: [], liabilityBirth: {}, log: [],
+        breaking: [], liabilityBirth: {}, pendingEchoes: [], log: [],
       };
       this.bootstrap();
     }
@@ -658,8 +661,16 @@ export class Game {
     const n = slotCount(this.rng, lead.archetype, lead.rarity);
     const V = oneOffValue(this.rng, lead.level, lead.rarity, n);
     const specs = splitOneOff(this.rng, V, lead.archetype);
-    const rewardCards = specs.flatMap(s => s.kind !== 'gold' && s.kind !== 'lead'
-      ? materializeReward(this.rng, s, lead.level, lead.region) : []);
+    let rewardCards: Card[];
+    const returning = lead.focalId ? this.card(lead.focalId) : undefined;
+    if (returning?.character) {
+      // an echo rescue: the reward IS the person who was left behind (same card, same memories)
+      returning.location = HELD('limbo');
+      rewardCards = [returning];
+    } else {
+      rewardCards = specs.flatMap(s => s.kind !== 'gold' && s.kind !== 'lead'
+        ? materializeReward(this.rng, s, lead.level, lead.region) : []);
+    }
     const framed = rewardCards.find(c => c.character);
     const out = await this.ai.writeQuest({
       kind: 'one-off', archetype: lead.archetype, region: REGION[lead.region]!.name,
@@ -980,6 +991,21 @@ export class Game {
     }
     st.quests = st.quests.filter(q => q.state === 'open');
 
+    // 5b) peril echoes come due: the person left behind resurfaces as a rescue lead
+    for (const echo of [...st.pendingEchoes]) {
+      if (st.cycle < echo.atCycle) continue;
+      st.pendingEchoes = st.pendingEchoes.filter(e => e !== echo);
+      const person = this.card(echo.focalId);
+      if (!person?.character) continue;
+      const lead = rollFreshLead(this.rng, this.leadCtx(), () => freshId('lead-'), 'reward');
+      lead.archetype = 'rescue';
+      lead.chainInfo = { kind: 'none' };
+      lead.focalId = person.id;
+      lead.title = `Word of ${person.name} reaches the gate`;
+      st.leads.push(lead);
+      report.push(`🕮 Word of ${person.name} — left behind, still out there. A rescue is possible.`);
+    }
+
     // 6) lead expiry + liability triggers; standing hunts track the roster on the BOARD
     // too (a stale "L1" display misleads every consumer, human or bot)
     for (const l of st.leads) {
@@ -1025,9 +1051,16 @@ export class Game {
 
   private abandonQuest(q: Quest, report: string[]) {
     for (const s of q.slots) this.doUnassign(q, s);
-    // forfeit the pre-generated reward cards (limbo cleanup)
-    const ids = new Set(q.rewardCards.map(c => c.id));
-    this.state.cards = this.state.cards.filter(c => !ids.has(c.id));
+    // forfeit the pre-generated rewards: objects vanish, PEOPLE pass to the lore graph
+    // (loss = TIME — a person is never deleted; §21)
+    for (const c of q.rewardCards) {
+      if (c.character) {
+        this.ensureLoreNode(c);
+        c.location = HELD('lore');
+      }
+    }
+    const objectIds = new Set(q.rewardCards.filter(c => !c.character).map(c => c.id));
+    this.state.cards = this.state.cards.filter(c => !objectIds.has(c.id));
     q.state = 'resolved';
     if (q.chainId) {
       const chain = this.state.chains.find(c => c.id === q.chainId);
@@ -1131,6 +1164,19 @@ export class Game {
       }
     }
     if (r.delivery.liability) this.addCard(r.delivery.liability);
+    // forfeited people are not deleted and not forgotten: they pass to the lore graph,
+    // and a named one left in peril RESURFACES within a few cycles (failure bends the story)
+    for (const lost of r.delivery.forfeited) {
+      if (lost.character) {
+        this.ensureLoreNode(lost);
+        lost.location = HELD('lore');
+        if (!st.cards.includes(lost)) st.cards.push(lost);
+        st.pendingEchoes.push({ focalId: lost.id, atCycle: st.cycle + this.rng.range(4, 8) });
+        say(`🕮 ${lost.name} is left behind out there — word of them will come again.`);
+      } else {
+        st.cards = st.cards.filter(c => c.id !== lost.id);   // lost objects just vanish
+      }
+    }
     for (let i = 0; i < r.delivery.leadGrants; i++) {
       st.leads.push(rollFreshLead(this.rng, this.leadCtx(), () => freshId('lead-'), 'reward'));
     }
