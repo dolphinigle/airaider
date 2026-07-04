@@ -980,7 +980,16 @@ export class Game {
     }
     st.quests = st.quests.filter(q => q.state === 'open');
 
-    // 6) lead expiry + liability triggers
+    // 6) lead expiry + liability triggers; standing hunts track the roster on the BOARD
+    // too (a stale "L1" display misleads every consumer, human or bot)
+    for (const l of st.leads) {
+      if (l.expiresAtCycle === null && l.archetype === 'lead-hunt') {
+        const band = REGION[l.region]!.levelBand;
+        const levels = this.roster().map(m => m.character!.level);
+        const median = levels.length ? [...levels].sort((a, b) => a - b)[Math.floor(levels.length / 2)]! : band[0];
+        l.level = Math.max(band[0], Math.min(band[1], median));
+      }
+    }
     st.leads = st.leads.filter(l => l.expiresAtCycle === null || l.expiresAtCycle > st.cycle);
     for (const c of st.cards.filter(isLiability)) {
       const age = st.cycle - (st.liabilityBirth[c.id] ?? st.cycle);
@@ -1265,7 +1274,10 @@ export class Game {
   /** founding mercs get their personal main chain too (hires get one at hire) */
   private personalChainDrip(): void {
     const st = this.state;
-    if (!this.hasRoom('lead-room') || st.cycle < 6) return;
+    if (!this.hasRoom('lead-room') || st.cycle < 10) return;
+    // founders' sagas wait for a little slack (3rd merc or c25) — the opening belongs
+    // to the bootstrap; the stories land when someone can be spared to live them
+    if (this.roster().length < 3 && st.cycle < 25) return;
     const pendingPersonal = st.leads.some(l => l.source === 'personal');
     if (pendingPersonal) return;
     const unstoried = this.roster().find(m =>
