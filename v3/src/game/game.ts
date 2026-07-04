@@ -713,7 +713,8 @@ export class Game {
       region: REGION[chain.region]!.name, regionSeed: REGION[chain.region]!.seed,
       level: chain.level, rarity: chain.rarity, slotCount: n,
       rewardEnvelope: isFinale ? `the focal: ${chain.kind}` : 'side loot',
-      keywords: [], bible: chain.bible, storyState: chain.story,
+      keywords: [], placeNameSuggestions: [rollPlaceName(this.rng)],
+      bible: chain.bible, storyState: chain.story,
       beatIndex: chain.beatIndex + 1, expectedBeats: chain.expectedBeats,
       focalName: focal?.name,
     });
