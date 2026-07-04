@@ -89,7 +89,7 @@ for (let c = 0; c < cycles; c++) {
     }
   }
   // renovate the newest theme room toward the loot stream once affordable (rule 4)
-  if (g.gold() > 150 && g.state.cycle % 12 === 0) {
+  if (g.gold() > 400 && g.state.cycle % 20 === 0) {
     const unstyled = g.state.fort.rooms.find(r => ROOM_TYPE[r.type]!.benefit === 'prestige' && !r.style);
     if (unstyled) {
       const styles = ['elven', 'ancient', 'human', 'exotic'];
@@ -109,9 +109,11 @@ for (let c = 0; c < cycles; c++) {
     }
   }
   for (const s of [...g.state.tavern]) {
-    if (g.roster().length < g.rosterCapacity() && g.gold() > 300) {
+    const cand = g.card(s.cardId);
+    if (!cand) continue;
+    if (g.roster().length < g.rosterCapacity() && g.gold() > Math.round(cand.value * 1.2) + 120) {
       const r = g.hire(s.cardId);
-      if (r.ok) say(`c${g.state.cycle}: hired`);
+      if (r.ok) say(`c${g.state.cycle}: hired ${cand.name}`);
     }
   }
   // ransom surplus RAW captives only (keep the best 16 for breaking; obedient are the
@@ -184,6 +186,10 @@ for (let c = 0; c < cycles; c++) {
 
   const report = await g.endCycle();
   if (verbose) for (const line of report) console.log(`   ${line}`);
+
+  // tripwire: every cycle must leave a structurally consistent state
+  const { assertAudit } = await import('../src/game/audit.js');
+  assertAudit(g, `cycle ${g.state.cycle}`);
 }
 
 // ---- summary ------------------------------------------------------------------------------
@@ -199,4 +205,5 @@ console.log(`chains: ${st.chains.map(c => `${c.bible.title}[${c.state} b${c.beat
 console.log(`lore: ${Object.keys(st.lore.nodes).length} nodes, ${st.lore.edges.length} edges (${st.lore.edges.filter(e => e.active).length} active)`);
 console.log(`leads on board ${g.visibleLeads().length} · AI calls ${(g.ai as MockProvider).usage().calls}`);
 const resolved = st.log.filter(l => l.kind === 'resolve');
-console.log(`quests resolved ${resolved.length} (${resolved.filter(l => l.text.includes('success')).length} success / ${resolved.filter(l => l.text.includes('partial')).length} partial / ${resolved.filter(l => l.text.includes('failure')).length} failure)`);
+console.log(`quests resolved(last400log) ${resolved.length} (${resolved.filter(l => l.text.includes('success')).length} s / ${resolved.filter(l => l.text.includes('partial')).length} p / ${resolved.filter(l => l.text.includes('failure')).length} f)`);
+console.log(`sizes: cards ${st.cards.length} · quests[] ${st.quests.length} · leads[] ${st.leads.length} · loreN ${Object.keys(st.lore.nodes).length} · loreE ${st.lore.edges.length} (${st.lore.edges.filter(e => e.active).length} act) · save ${(g.save().length / 1024).toFixed(0)}kB`);

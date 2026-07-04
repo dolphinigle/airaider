@@ -217,8 +217,9 @@ export class Game {
     return BUNK_ROSTER_SLOTS + beds;
   }
   captives(): Card[] {
+    // OWNED captives only — staged holding candidates are not yours until accepted
     return this.state.cards.filter(c => c.character?.role === 'captive' &&
-      (c.location.kind === 'held' && c.location.state !== 'limbo' && c.location.state !== 'lore' || c.location.kind === 'room'));
+      ((c.location.kind === 'held' && c.location.state === 'roster') || c.location.kind === 'room'));
   }
   captiveCapacity(): number {
     return this.state.fort.rooms.filter(r => r.type === 'dungeon-cell').length * 3;
@@ -275,6 +276,13 @@ export class Game {
     if (!rt) return { ok: false, msg: 'no such room type' };
     const check = this.buildableTypes().find(b => b.type === typeId);
     if (check?.reason) return { ok: false, msg: check.reason };
+    if (rt.benefit === 'cap') {
+      const owner = ownerId ?? 'you';
+      if (this.state.fort.rooms.some(r => ROOM_TYPE[r.type]!.benefit === 'cap' && r.ownerId === owner))
+        return { ok: false, msg: 'they already have a bedroom — deepen it instead' };
+      if (owner !== 'you' && this.card(owner)?.character?.role !== 'merc')
+        return { ok: false, msg: 'bedrooms belong to mercs (or you)' };
+    }
     const cell = this.freeCells()[0];
     if (!cell) return { ok: false, msg: 'no free cells — excavate first' };
     if (!this.spendGold(buildCost(rt))) return { ok: false, msg: 'not enough gold' };
@@ -371,6 +379,8 @@ export class Game {
     if (slotIdx < 0 || slotIdx >= room.slots.length) return { ok: false, msg: 'no such slot' };
     if (room.slots[slotIdx]) return { ok: false, msg: 'slot occupied' };
     if (card.location.kind === 'quest') return { ok: false, msg: 'on a quest' };
+    if (card.location.kind === 'held' && card.location.state !== 'roster' && card.location.state !== 'inventory')
+      return { ok: false, msg: 'not yours yet (staged/limbo cards must be accepted first)' };
     const rt = ROOM_TYPE[room.type]!;
     if (rt.benefit === 'break') {
       // torture chamber racks take RAW captives (the breaking pipe, §21.4)
@@ -456,6 +466,7 @@ export class Game {
     this.unslotCard(card);
     card.location = HELD('lore');   // gone from play, alive in the world
     this.state.holding = this.state.holding.filter(s => s.cardId !== captiveId);
+    this.state.breaking = this.state.breaking.filter(b => b.cardId !== captiveId);
     this.addGold(pay);
     this.log('ransom', `${card.name} ransomed for ${pay}g.`);
     return { ok: true, msg: `+${pay}g` };
@@ -823,8 +834,17 @@ export class Game {
     this.healingPass();
     decayPass(st.lore, st.cycle);
     this.breakingPass(report);
-    st.tavern = st.tavern.filter(s => s.expiresAtCycle > st.cycle || !report.push(`${this.card(s.cardId)?.name ?? 'someone'} left the tavern.`));
-    st.holding = st.holding.filter(s => s.expiresAtCycle > st.cycle || !report.push(`a captive candidate slipped away from holding.`));
+    // staged people who time out LEAVE — to the lore graph, never orphaned in 'staged'
+    for (const s of st.tavern.filter(s => s.expiresAtCycle <= st.cycle)) {
+      const c = this.card(s.cardId);
+      if (c) { this.ensureLoreNode(c); c.location = HELD('lore'); report.push(`${c.name} drank up and left the tavern.`) }
+    }
+    st.tavern = st.tavern.filter(s => s.expiresAtCycle > st.cycle);
+    for (const s of st.holding.filter(s => s.expiresAtCycle <= st.cycle)) {
+      const c = this.card(s.cardId);
+      if (c) { this.ensureLoreNode(c); c.location = HELD('lore'); report.push(`${c?.name ?? 'a captive candidate'} slipped away from holding.`) }
+    }
+    st.holding = st.holding.filter(s => s.expiresAtCycle > st.cycle);
 
     // 5) pursued-quest expiry (impl ruling on QUESTS §10 🟡: TTL 10; a lapsed chain
     // beat respawns its continuation lead — the story waits, the quest doesn't)
@@ -845,6 +865,9 @@ export class Game {
         report.push(`⚠ Your unresolved ${c.name} draws attention — a hostile lead appears.`);
       }
     }
+
+    // keep the save lean: the log is a UI convenience, not the archive (lore is)
+    if (st.log.length > 600) st.log = st.log.slice(-400);
 
     this.state.rngState = this.rng.state();
     this.state.idCounter = idCounter();
