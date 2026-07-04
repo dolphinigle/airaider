@@ -125,8 +125,10 @@ export function recall(g: LoreGraph, focalId: string, cycle: number, wildcardIds
 
 // ---- dossier render (engine-derived, bounded — LORE §2) -----------------------------------
 
-/** dossier = stable identity + top-K salience-ranked ACTIVE memory-edges (never a growing blob) */
-export function renderDossier(g: LoreGraph, id: string, cycle: number): string {
+/** dossier = stable identity (+who/quirks when known) + top-K salience-ranked ACTIVE
+ *  memory-edges (never a growing blob). The extras are what let the narrator individuate. */
+export function renderDossier(g: LoreGraph, id: string, cycle: number,
+  extras?: { who?: string; quirks?: string[] }): string {
   const node = g.nodes[id];
   if (!node) return '';
   const memories = g.edges
@@ -138,7 +140,11 @@ export function renderDossier(g: LoreGraph, id: string, cycle: number): string {
       const dir = e.from === id ? e.type : `(${e.type} by)`;
       return `- ${dir} ${other}: ${e.blurb}${e.core ? ' [core]' : ''}`;
     });
-  return `${node.name} — ${node.identity}\n${memories.join('\n')}`;
+  const lines = [`${node.name} — ${node.identity}`];
+  if (extras?.who) lines.push(`known as: ${extras.who}`);
+  if (extras?.quirks?.length) lines.push(`habits: ${extras.quirks.join('; ')}`);
+  lines.push(...memories);
+  return lines.join('\n');
 }
 
 /** the Chronicle view: full history INCLUDING inactive (player-readable, never AI-fed) */

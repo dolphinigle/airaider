@@ -262,7 +262,11 @@ export class Game {
     this.state.lore.nodes[c.id] = node;
     return node;
   }
-  dossier(id: string): string { return renderDossier(this.state.lore, id, this.state.cycle) }
+  dossier(id: string): string {
+    const card = this.card(id);
+    return renderDossier(this.state.lore, id, this.state.cycle,
+      card?.character ? { who: card.character.who, quirks: card.character.quirks } : undefined);
+  }
   chronicle(id: string) { return chronicleOf(this.state.lore, id) }
 
   // ---- fort actions ---------------------------------------------------------------------------
@@ -906,6 +910,10 @@ export class Game {
     st.cycle += 1;
     const report: string[] = [];
 
+    // 0) FLESH pass — every merc and staged person deserves a who/backstory/quirks
+    // (attachment starts here; persisted per producer-2, so this runs at most once each)
+    await this.fleshPass();
+
     // 1) resolve committed quests in quest-id order (all party slots filled = committed).
     // DELIVERY IS COMPUTED HERE, BEFORE THE AI NARRATES — including the finale's fate
     // (QUESTS §8 solidity rule b; the narrator must name what is actually delivered).
@@ -949,6 +957,7 @@ export class Game {
     guardEdges(st.lore, pendingEdges, st.cycle, () => freshId('e'));
 
     // 4) housekeeping: healing, decay, staging timers, breaking
+    this.personalChainDrip();
     this.healingPass();
     decayPass(st.lore, st.cycle);
     this.breakingPass(report);
@@ -1218,6 +1227,54 @@ export class Game {
       report.push(`🎬 Finale: ${focal.name} is yours — ${kind}${shortDebt > 0 ? `, but the season ran short: a ${shortDebt}g debt comes with them` : ''}. Surplus: ${surplus}g.`);
     }
     guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `the saga ${chain.bible.title} ended ${fate.fate}`, importance: 0.85 }], st.cycle, () => freshId('e'));
+  }
+
+  /** give who/backstory/quirks to any owned/staged character that lacks them (ONE batched call) */
+  private async fleshPass(): Promise<void> {
+    const st = this.state;
+    const needs: Card[] = [];
+    for (const c of st.cards) {
+      if (!c.character || c.character.who) continue;
+      const staged = st.tavern.some(x => x.cardId === c.id) || st.holding.some(x => x.cardId === c.id);
+      const owned = this.isOwned(c) || c.location.kind === 'quest';
+      if (!owned && !staged) continue;
+      needs.push(c);
+      if (needs.length >= 5) break;   // batch cap per cycle
+    }
+    if (!needs.length) return;
+    try {
+      const outs = await this.ai.flesh(needs.map(c => ({
+        characterId: c.id, name: c.name, tags: renderTags(c.tags),
+        role: c.character!.role,
+        context: c.character!.role === 'merc'
+          ? (st.cycle <= 2 ? 'a founding member of the company' : 'a sword the company took on')
+          : c.character!.role === 'captive' ? 'a captive taken on a quest' : 'someone the road washed up at the gate',
+      })));
+      for (const o of outs) {
+        const card = this.card(o.characterId);
+        if (!card?.character) continue;
+        card.character.who = o.who || card.character.who;
+        card.character.backstory = o.backstory || card.character.backstory;
+        if (o.quirks.length) card.character.quirks = o.quirks.slice(0, 2);
+        const node = this.state.lore.nodes[card.id];
+        if (node && o.who) node.blurb = o.who.slice(0, 120);
+      }
+    } catch { /* flesh is flavor — never block the cycle on it */ }
+  }
+
+  /** founding mercs get their personal main chain too (hires get one at hire) */
+  private personalChainDrip(): void {
+    const st = this.state;
+    if (!this.hasRoom('lead-room') || st.cycle < 6) return;
+    const pendingPersonal = st.leads.some(l => l.source === 'personal');
+    if (pendingPersonal) return;
+    const unstoried = this.roster().find(m =>
+      !st.chains.some(c => c.isPersonal && c.focalId === m.id) &&
+      !st.leads.some(l => l.personalMercId === m.id));
+    if (!unstoried) return;
+    if (!this.rng.chance(0.25)) return;   // staggered, not a flood
+    this.spawnPersonalChainLead(unstoried);
+    this.log('leads', `${unstoried.name}'s past stirs — a personal thread appears.`);
   }
 
   private healingPass() {

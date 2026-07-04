@@ -96,6 +96,22 @@ export interface ResolveQuestOut {
   storyUpdate?: { currentSituation: string; newlyRevealed: string[]; openThreads: string[] };
 }
 
+// ---- ③b flesh (batched; who/backstory/quirks for characters that lack them) -------------------
+
+export interface FleshInput {
+  characterId: string;
+  name: string;              // engine-rolled — use as-is (§4b)
+  tags: string;              // rendered tag line
+  role: string;              // merc / captive / hireling
+  context: string;           // how they came to the fort ("founding member", "rescued from X")
+}
+export interface FleshOut {
+  characterId: string;
+  who: string;               // one line they'd be known by
+  backstory: string;         // 2 sentences
+  quirks: string[];          // 1-2 concrete physical habits
+}
+
 // ---- ④ theme roll (ONCE per renovation) ------------------------------------------------------
 
 export interface ThemeRollInput {
@@ -123,6 +139,7 @@ export interface AiProvider {
   writeQuest(input: QuestWriteInput): Promise<QuestWriteOut>;
   genesis(input: GenesisInput): Promise<GenesisOut>;
   resolve(inputs: ResolveQuestInput[]): Promise<ResolveQuestOut[]>;  // ONE batched call (parallel inside)
+  flesh(inputs: FleshInput[]): Promise<FleshOut[]>;                  // ONE batched call
   themeRoll(input: ThemeRollInput): Promise<ThemeRollOut>;
   select(input: SelectorInput): Promise<string[]>;
   usage(): AiUsage;

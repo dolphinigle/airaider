@@ -5,6 +5,7 @@ import { Rng } from '../engine/rng.js';
 import type {
   AiProvider, AiUsage, QuestWriteInput, QuestWriteOut, GenesisInput, GenesisOut,
   ResolveQuestInput, ResolveQuestOut, ThemeRollInput, ThemeRollOut, SelectorInput,
+  FleshInput, FleshOut,
 } from './provider.js';
 
 const JOBS: Record<string, string[]> = {
@@ -122,6 +123,16 @@ export class MockProvider implements AiProvider {
         } : undefined,
       };
     });
+  }
+
+  async flesh(inputs: FleshInput[]): Promise<FleshOut[]> {
+    this.tick();
+    return inputs.map(i => ({
+      characterId: i.characterId,
+      who: `known for ${this.rng.pick(['mending kit nobody asked about', 'a laugh that starts fights', 'never sleeping before the watch horn', 'feeding the gate dogs', 'losing at dice on purpose'])}`,
+      backstory: `${i.name} came to the company as ${i.context}. What they left behind, they do not say.`,
+      quirks: [this.rng.pick(['whets an already-sharp knife', 'braids and unbraids a leather cord', 'taps the doorframe twice on leaving', 'saves the crust of every loaf'])],
+    }));
   }
 
   async themeRoll(input: ThemeRollInput): Promise<ThemeRollOut> {

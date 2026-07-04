@@ -10,6 +10,7 @@ import * as os from 'node:os';
 import type {
   AiProvider, AiUsage, QuestWriteInput, QuestWriteOut, GenesisInput, GenesisOut,
   ResolveQuestInput, ResolveQuestOut, ThemeRollInput, ThemeRollOut, SelectorInput,
+  FleshInput, FleshOut,
 } from './provider.js';
 
 const WRITER_MODEL = 'gpt-5-mini';
@@ -103,6 +104,14 @@ const zResolveOne = z.object({
     openThreads: zStrArr,
   }).nullish(),
 });
+const zFleshBatch = z.object({
+  people: z.array(z.object({
+    characterId: z.string(),
+    who: z.string().default(''),
+    backstory: z.string().default(''),
+    quirks: zStrArr,
+  })).default([]),
+});
 const zTheme = z.object({ wants: zStrArr, flavorLine: z.string().default('') });
 const zSelect = z.object({ ids: zStrArr });
 
@@ -158,7 +167,7 @@ export function makeOpenAiProvider(): AiProvider {
         'Respond as JSON: {title, situation (2-3 sentences), job (1 sentence), ask: [{attribute (str|dex|int|cha|con), extraAttribute?, favored: [skill words], clashing: [words]}] — one per slot,',
         'proposedRewardKind? (gold|captive|recruit|relic), closesChain? (beats only), approaches? (finale only: [{label, rewardKind (recruit|captive|gold), attribute, favored}]) }.',
         'Favored/clashing must come from: melee, ranged, leadership, magic-fire, magic-earth, magic-water, magic-dark, social, roguery, lore, heal, craft, nature, performance, intimidation, food — or personality words (cool, hotheaded, serious, playful, greedy, generous, loner, gregarious, lustful, chaste, dominant, submissive, calculating, instinctive).',
-        input.kind === 'beat' ? 'This is ONE BEAT of an ongoing saga: reveal at most 1 new layer; beat 1 makes the player CARE (a low-stakes shared moment) before plot pressure. THE BEAT MUST ADVANCE: open on a situation lastBeatOutcome CREATED; you may NOT re-pose the previous beat\'s job — the objective must be materially different (new location, new claimant, new leverage, or raised stakes).' : '',
+        input.kind === 'beat' ? 'This is ONE BEAT of an ongoing saga: reveal at most 1 new layer. BEAT 1 IS THE CARE BEAT: before any plot pressure, give one small HUMAN moment with the focal person — something concrete to like, pity, or worry about (how they treat an animal, what they carry, what they refuse to say) — and keep the job itself low-stakes and shared. THE BEAT MUST ADVANCE: open on a situation lastBeatOutcome CREATED; you may NOT re-pose the previous beat\'s job — the objective must be materially different (new location, new claimant, new leverage, or raised stakes).' : '',
         input.kind === 'finale' ? 'This is the FINALE: write 2-3 mutually exclusive APPROACHES (win over / subdue / cash out — fit the fiction), each testing a different attribute.' : '',
       ].filter(Boolean).join('\n');
       const user = JSON.stringify({
@@ -186,6 +195,7 @@ export function makeOpenAiProvider(): AiProvider {
       const system = [
         'You are the writers\'-room for a saga in a dark-fantasy mercenary-fort game. Build a hidden BIBLE: settled truth, told plainly — mystery is the quest-writer\'s job later.',
         'Collide the SEED with the SLATE into a one-line KERNEL. Pick 1-3 core people; the FOCAL MUST be core. LEAN cast: one line + want + role each, no essays. Reuse slate people before coining new ones.',
+        'WANTS MUST BE HUMAN and specific — "to bury her brother where their mother lies", never "power" or "to come out ahead". The focal\'s want is the saga\'s heart: make it something a player could root for or against.',
         NUMBER_BAN,
         EDGE_TYPES_LINE,
         'If you coin NEW people, take names strictly from assignedNames (in order). New places may be freely named.',
@@ -208,6 +218,7 @@ export function makeOpenAiProvider(): AiProvider {
         'You narrate quest resolutions for a dark-fantasy mercenary game. Produce, in order:',
         '1) "before": ONE short clause of departure tension, written WITHOUT looking at the outcome — it must ADD something (weather, a doubt, a detail), never restate the card.',
         '2) "after": what happened, knowing the outcome. Give EVERY party member their own beat SHOWN through one concrete physical action — NEVER use their trait word or its adverb (no "playful", "instinctive", "calculating" in prose). WEAVE the delivered rewards into the action ("the brewer counted out eighty gold and pressed the broken blade into his hands") — never a trailing "Item, N gold" list, never the deliveredSummary string verbatim, never "(npc)" or any parenthetical role.',
+        'CONTINUITY IS THE PRODUCT: each dossier lists known-as, habits, and memories — when one is RELEVANT, let it surface (a quirk performed under stress, an old wound remembered at the wrong moment, two members who served together moving as a pair). Never info-dump a dossier; one touch per person at most.',
         'On failure: state in-fiction what the party came home without — NEVER the canned words "the reward is lost" or "nothing —".',
         'WORD BUDGET by rarity: common → before 1 short clause, after 2 sentences MAX. uncommon → 1/3. rare or finale → 2/5. Respect it strictly.',
         'Injuries: judge from the fiction per member (none/low/med/high) — typically on failure, sometimes none even then; never death.',
@@ -233,6 +244,22 @@ export function makeOpenAiProvider(): AiProvider {
           injuries: [], fleshed: [], edges: [],
         });
       }
+    },
+
+    async flesh(inputs: FleshInput[]): Promise<FleshOut[]> {
+      if (!inputs.length) return [];
+      const system = [
+        'You breathe life into characters of a dark-fantasy mercenary company. For EACH person given, write:',
+        '- who: ONE line they would be known by around the fort — specific and human, never generic ("keeps the night watch nobody else wants" beats "a brave fighter").',
+        '- backstory: 2 sentences of origin that FIT their tags and how they arrived. Give each one thing to love, pity, or worry about.',
+        '- quirks: 1-2 concrete PHYSICAL habits a watcher could notice (an action, never an adjective).',
+        'Make the people DISTINCT from each other. Low-medieval register.',
+        NUMBER_BAN,
+        'Respond as JSON: {people:[{characterId, who, backstory, quirks:[...]}]} — ids exactly as given.',
+      ].join('\n');
+      const out = await callR(WRITER_MODEL, system, JSON.stringify(inputs), zFleshBatch);
+      const legal = new Set(inputs.map(i => i.characterId));
+      return out.people.filter(p => legal.has(p.characterId));
     },
 
     async themeRoll(input: ThemeRollInput): Promise<ThemeRollOut> {
