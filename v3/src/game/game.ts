@@ -643,13 +643,17 @@ export class Game {
 
   private async generateGenesis(lead: Lead): Promise<Quest> {
     const personalMercId = (lead as Lead & { personalMercId?: string }).personalMercId;
-    const isPersonal = !!personalMercId && !!this.card(personalMercId);
+    const returning = lead.focalId ? this.card(lead.focalId) : undefined;
+    // a sequel whose focal has since become YOUR merc = a personal chain about them
+    // (never yank a roster merc into limbo)
+    const returningIsMerc = returning?.character?.role === 'merc';
+    const isPersonal = (!!personalMercId && !!this.card(personalMercId)) || returningIsMerc;
     const eco = newChainEconomy(this.rng, lead.level, lead.rarity);
     // the focal character FIRST (§2): personal → the merc; sequel → the SLIPPED focal
     // returns from the lore graph (§21-4a); else generated at the payoff value
     let focal: Card;
-    const returning = lead.focalId ? this.card(lead.focalId) : undefined;
-    if (isPersonal) focal = this.card(personalMercId!)!;
+    if (returningIsMerc) focal = returning!;
+    else if (isPersonal) focal = this.card(personalMercId!)!;
     else if (returning) {
       focal = returning;
       focal.location = HELD('limbo');   // back within reach, not yet owned
