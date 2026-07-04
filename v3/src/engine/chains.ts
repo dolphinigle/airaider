@@ -28,6 +28,7 @@ export interface ChainStoryState {
   knownToPlayer: string[];
   openThreads: string[];
   actorStates: Record<string, string>;
+  lastBeatOutcome?: string;   // "beat N ended in X: <what changed>" — feeds the next beat's writer
 }
 
 export interface Chain {

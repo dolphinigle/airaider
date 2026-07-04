@@ -663,6 +663,7 @@ export class Game {
       slotCount: n, rewardEnvelope: specs.map(s => s.kind).join(' + '),
       keywords: sampleKeywords(this.rng),
       placeNameSuggestions: [rollPlaceName(this.rng), rollPlaceName(this.rng)],
+      rosterNames: this.roster().map(m => m.name),
       framedCharacter: framed ? { name: framed.name, tags: renderTags(framed.tags) } : null,
     });
     return {
@@ -781,6 +782,8 @@ export class Game {
       level: chain.level, rarity: chain.rarity, slotCount: n,
       rewardEnvelope: isFinale ? `the focal: ${chain.kind}` : 'side loot',
       keywords: [], placeNameSuggestions: [rollPlaceName(this.rng)],
+      rosterNames: this.roster().map(m => m.name),
+      lastBeatOutcome: chain.story.lastBeatOutcome,
       bible: chain.bible, storyState: chain.story,
       beatIndex: chain.beatIndex + 1, expectedBeats: chain.expectedBeats,
       focalName: focal?.name,
@@ -1038,9 +1041,11 @@ export class Game {
       if (r.fate.fate === 'saddled') return `${focal?.name ?? 'the prize'} delivered as ${kind}, but lesser — the bargain came saddled`;
       return `${focal?.name ?? 'the prize'} delivered clean as ${kind}, with the season's surplus`;
     }
-    if (r.outcome === 'failure') return 'nothing — the reward is lost';
-    const bits = r.delivery.cards.map(c => c.character ? `${c.name} (${c.character.role})` : c.qty ? `${c.qty} gold` : c.name);
-    if (r.delivery.liability) bits.push(`and a ${r.delivery.liability.name} left behind`);
+    if (r.outcome === 'failure') return 'they return with empty hands (say what was lost, in-fiction)';
+    const bits = r.delivery.cards.map(c => c.character
+      ? `${c.name}${c.character.role === 'captive' ? ' taken captive' : ' (may be persuaded to stay)'}`
+      : c.qty ? `${c.qty} gold` : `the ${c.name}`);
+    if (r.delivery.liability) bits.push(`a ${r.delivery.liability.name} left behind`);
     return bits.join(', ') || 'a token result';
   }
 
@@ -1146,6 +1151,8 @@ export class Game {
       chain.story.knownToPlayer.push(...storyUpdate.newlyRevealed);
       chain.story.openThreads = storyUpdate.openThreads.slice(0, 5);
     }
+    chain.story.lastBeatOutcome =
+      `beat ${q.beatIndex ?? chain.beatIndex} ended in ${r.outcome.toUpperCase()}: ${storyUpdate?.currentSituation ?? chain.story.currentSituation}`;
     if (q.isFinale) return this.settleFinale(q, chain, r, report, fate);
     bankBeat(chain, r.party.length, r.outcome, q.sideLootV ?? 0);
     const focal = this.card(chain.focalId);

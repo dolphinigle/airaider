@@ -23,6 +23,8 @@ export interface QuestWriteInput {
   rewardEnvelope: string;        // "a captive and coin" — the engine's kind list, no numbers
   keywords: string[];            // §5 sampler: 1 BOND + 1 TIE + 2 WILDCARDS
   placeNameSuggestions?: string[]; // engine-rolled fresh place names (variety fuel)
+  rosterNames?: string[];        // the player's own soldiers — NEVER card NPCs
+  lastBeatOutcome?: string;      // beats: what the previous beat's resolution changed
   // chain context (beat/finale)
   bible?: unknown;               // the Bible object (hidden truth)
   storyState?: unknown;          // chain story-so-far

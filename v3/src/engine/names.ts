@@ -13,8 +13,10 @@ const PARTS: Record<string, { first: string[][]; epithets: string[] }> = {
   },
   elf: {
     first: [
-      ['Ae', 'Cael', 'Elo', 'Fae', 'Ith', 'Lia', 'Mael', 'Nim', 'Ori', 'Sylv', 'Thal', 'Vael', 'Yll', 'Ara', 'Eir'],
-      ['wen', 'rion', 'thil', 'anor', 'iel', 'las', 'dir', 'wyn', 'nith', 'rael', 'ion', 'a', 'is'],
+      ['Ae', 'Cael', 'Elo', 'Fae', 'Ith', 'Lia', 'Mael', 'Nim', 'Ori', 'Sylv', 'Thal', 'Vael', 'Yll', 'Ara', 'Eir',
+       'Bri', 'Cor', 'Dae', 'Gal', 'Hele', 'Ilm', 'Kess', 'Lor', 'Mira', 'Nae', 'Ola', 'Pell', 'Quil', 'Rhi', 'Sera', 'Tia', 'Une', 'Wist'],
+      ['wen', 'rion', 'thil', 'anor', 'iel', 'las', 'dir', 'wyn', 'nith', 'rael', 'ion', 'a', 'is',
+       'dai', 'eth', 'inne', 'lion', 'mar', 'neth', 'olas', 'ryn', 'sha', 'via'],
     ],
     epithets: ['Leafshade', 'of Thornhollow', 'Dawnsinger', 'Mosswalker', 'Palebough', 'Windrow'],
   },
