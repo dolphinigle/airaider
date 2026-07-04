@@ -142,6 +142,7 @@ export function makeOpenAiProvider(): AiProvider {
     async writeQuest(input: QuestWriteInput): Promise<QuestWriteOut> {
       const system = [
         'You write quest cards for a dark-fantasy mercenary-company game. POV-locked: only what arrives at the fort gate. State the job plainly.',
+        'BANNED CRUTCH: no ledgers/manifests/record-books as plot objects (grossly overused). VARY LOCATIONS: do not reuse the same landmark every quest — coin fresh hamlets, waysides, crossings (suggestions provided), the regionLore landmark only occasionally.',
         NUMBER_BAN,
         'Respond as JSON: {title, situation (2-3 sentences), job (1 sentence), ask: [{attribute (str|dex|int|cha|con), extraAttribute?, favored: [skill words], clashing: [words]}] — one per slot,',
         'proposedRewardKind? (gold|captive|recruit|relic), closesChain? (beats only), approaches? (finale only: [{label, rewardKind (recruit|captive|gold), attribute, favored}]) }.',
@@ -153,6 +154,7 @@ export function makeOpenAiProvider(): AiProvider {
         archetype: input.archetype, region: input.region, regionLore: input.regionSeed,
         rarity: input.rarity, slotCount: input.slotCount, rewardEnvelope: input.rewardEnvelope,
         KEYWORDS: input.keywords.join(', ') || undefined,
+        placeNameSuggestions: input.placeNameSuggestions,
         framedCharacter: input.framedCharacter,
         bible: input.bible, storyState: input.storyState,
         beat: input.beatIndex, expectedBeats: input.expectedBeats, focalName: input.focalName,
@@ -174,6 +176,7 @@ export function makeOpenAiProvider(): AiProvider {
         NUMBER_BAN,
         EDGE_TYPES_LINE,
         'If you coin NEW people, take names strictly from assignedNames (in order). New places may be freely named.',
+        'BANNED CRUTCH: do NOT center the saga on a ledger, manifest, record-book, or registry (grossly overused). Vary the plot object per the keywords.',
         'Respond as JSON: {title, kernel, cast:[{name, who, want, role, loreId?}], situation, goal, arc:[3-5 rough steps], twistReveal (null unless twist=true), tensions:[], openDirections:[2],',
         'relevantIds:[slate ids actually used], newPlaces:[{name,blurb}], newEdges:[{from,to,type,blurb,importance: a NUMBER 0-1}] (ids only from the slate/focal)}.',
       ].join('\n');

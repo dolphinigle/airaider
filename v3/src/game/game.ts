@@ -579,12 +579,16 @@ export class Game {
     return { ok: true, msg: `Quest generated: ${quest.title}`, questId: quest.id };
   }
 
-  private buildSlots(n: number, level: number, rarity: Rarity, archetype: Lead['archetype'], ask: AskSlotOut[]): QuestSlot[] {
+  private buildSlots(n: number, level: number, rarity: Rarity, archetype: Lead['archetype'], ask: AskSlotOut[],
+    maxDifficulty?: 'standard' | 'hard'): QuestSlot[] {
+    const CAP_ORDER = ['trivial', 'standard', 'hard', 'brutal', 'extreme'];
     const slots: QuestSlot[] = [];
     for (let i = 0; i < n; i++) {
       const a = ask[i];
       let test: SlotTest;
-      const difficulty = rollDifficulty(this.rng, rarity);
+      let difficulty = rollDifficulty(this.rng, rarity);
+      if (maxDifficulty && CAP_ORDER.indexOf(difficulty) > CAP_ORDER.indexOf(maxDifficulty))
+        difficulty = maxDifficulty;
       if (a) {
         const attrs = [a.attribute, a.extraAttribute].filter((x): x is string => !!x)
           .map(x => x.toLowerCase()).filter(x => ['str', 'dex', 'int', 'cha', 'con'].includes(x)) as Attribute[];
@@ -612,6 +616,7 @@ export class Game {
       regionSeed: REGION[lead.region]!.seed, level: lead.level, rarity: lead.rarity,
       slotCount: n, rewardEnvelope: specs.map(s => s.kind).join(' + '),
       keywords: sampleKeywords(this.rng),
+      placeNameSuggestions: [rollPlaceName(this.rng), rollPlaceName(this.rng)],
       framedCharacter: framed ? { name: framed.name, tags: renderTags(framed.tags) } : null,
     });
     return {
@@ -712,11 +717,15 @@ export class Game {
       focalName: focal?.name,
     });
     const specs = isFinale ? [] : [{ kind: 'gold' as const, value: sideLootV }];
+    // beat pacing (QUESTS §8-B): beat 1 is the low-stakes CARE moment — cap its
+    // difficulty at standard; beat 2 still escalating — cap at hard; then free
+    const beatNo = chain.beatIndex + 1;
+    const cap = isFinale ? undefined : beatNo <= 1 ? 'standard' as const : beatNo === 2 ? 'hard' as const : undefined;
     const quest: Quest = {
       id: freshId('q'), leadId: lead.id, title: out.title, situation: out.situation, job: out.job,
       level: chain.level, rarity: chain.rarity, region: chain.region, archetype: lead.archetype,
       chainId: chain.id, beatIndex: chain.beatIndex + 1, isFinale,
-      slots: this.buildSlots(n, chain.level, chain.rarity, 'investigate', out.ask),
+      slots: this.buildSlots(n, chain.level, chain.rarity, 'investigate', out.ask, cap),
       rewardSpecs: specs, rewardCards: [], sideLootV,
       state: 'open', createdCycle: this.state.cycle,
     };
@@ -959,14 +968,18 @@ export class Game {
       const xp = questXp(p.character!.level, q.level, r.outcome);
       grantXp(p.character!, xp, this.capOf(p.id));
     }
-    // injuries: AI-judged band → engine tiers (decoupled channel)
+    // injuries: AI-judged band → engine tiers (decoupled channel). ENGINE GUARD (§11/F5):
+    // success → none; partial → at most a minor one; failure → any band
     for (const inj of out?.injuries ?? []) {
-      if (inj.band === 'none') continue;
+      let band = inj.band;
+      if (r.outcome === 'success') band = 'none';
+      else if (r.outcome === 'partial' && (band === 'med' || band === 'high')) band = 'low';
+      if (band === 'none') continue;
       const merc = this.card(inj.characterId);
       if (!merc?.character || !r.party.includes(merc)) continue;
-      const tiers = rollInjuryTiers(this.rng, inj.band);
+      const tiers = rollInjuryTiers(this.rng, band);
       merc.character.injuryTiers += tiers;
-      report.push(`🩸 ${merc.name} is wounded (${inj.band}, ${tiers} tiers).`);
+      report.push(`🩸 ${merc.name} is wounded (${band}, ${tiers} tiers).`);
     }
     // delivery
     for (const c of r.delivery.cards) {
