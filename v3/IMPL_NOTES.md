@@ -93,6 +93,23 @@ ADEQUATE · **variety + chain-advancement WEAK** → all three recommendation tr
 | 44 | **Retry-once before fallback prose** (a single parse hiccup shipped "It goes their way:" raw) | qB degenerate resolution |
 | 45 | Reveal ordering: title → before → after → consequences; delivery summaries prose-friendly; elf syllable pool widened (Thal-cluster) | injury lines preceding their quest; name confusion |
 
+## Attachment round (2026-07-04, pre-playtest — story quality & character attachment)
+
+| # | Change | Why |
+|---|---|---|
+| 46 | **Flesh pass**: every merc + staged person gets who/backstory/quirks (ONE batched call at cycle end; founders included; persisted producer-2) | Attachment started at zero — founders had no prose identity at all |
+| 47 | **Founders get personal chains** (staggered drip once there's roster slack — 3rd merc or c25) | Only hires fired main chains; the two people you start with had no story |
+| 48 | AI-facing dossiers carry **known-as + habits**; resolver continuity mandate (relevant memory/quirk surfaces, one touch per person) | The narrator couldn't individuate with data it never saw |
+| 49 | **Beat-1 CARE spec**: a concrete human moment with the focal BEFORE plot pressure | Judge: care beats were interleaved with plot |
+| 50 | **Failure-debt ECHOES**: a named person forfeited on failure passes to the lore graph and RESURFACES as a rescue lead in 4–8 cycles — the SAME card, same memories (abandon path also preserves people) | Judge: failures stranded named people forever (design promises story-bending, not dead ends); also fixed a limbo-orphan leak |
+| 51 | Resolver: **one pair-interaction per resolution**, habit VARIATION (no verbatim quirk reuse), weather-tic ban | Judge: two vivid strangers, no relationship; signature lines became generator tics |
+| 52 | Standing-hunt board level tracks the roster (stale L1 starved post-chain openings) | Regression exposed by founder chains |
+| 53 | Seed-bank ledger purge + genesis title-variety rule; GUI surfaces quirks/backstory (roster, tavern, holding) | The engine's own seed fed the banned crutch; attachment must be VISIBLE |
+
+Attachment judge verdict on the verification campaign (35c real-AI): mercs-as-people STRONG ·
+continuity STRONG (six object/motif arcs cited) · distinctness STRONG ("no misattributable
+sentence") · chains ADEQUATE→addressed · failure feel ADEQUATE→echo mechanic added.
+
 ## Open designer flags 🚩
 - **Early-roster poverty trap (found in bot play, can bite humans):** with 2 starting mercs, the
   3rd hire is pivotal — a trajectory that can't afford it crawls at ~35g/cycle for hundreds of
