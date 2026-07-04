@@ -2,6 +2,7 @@
 // The dogfooding + pacing harness: verifies the whole loop holds up over a campaign.
 // Usage: npx tsx scripts/autoplay.ts [cycles] [seed] [--verbose]
 
+import * as fs from 'node:fs';
 import { Game } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
 import { ROOM_TYPE } from '../src/engine/fort.js';
@@ -227,6 +228,13 @@ console.log(`captives ${g.captives().length} (${g.captives().filter(c => hasTag(
 console.log(`chains: ${st.chains.map(c => `${c.bible.title}[${c.state} b${c.beatIndex}]`).join(' · ') || 'none'}`);
 console.log(`lore: ${Object.keys(st.lore.nodes).length} nodes, ${st.lore.edges.length} edges (${st.lore.edges.filter(e => e.active).length} active)`);
 console.log(`leads on board ${g.visibleLeads().length} · AI calls ${(g.ai as MockProvider).usage().calls}`);
+const saveArg = process.argv.find(a => a.startsWith('--save='));
+if (saveArg) {
+  const dest = saveArg.split('=')[1]!;
+  fs.mkdirSync('saves', { recursive: true });
+  fs.writeFileSync(dest, g.save());
+  console.log('saved →', dest);
+}
 const resolved = st.log.filter(l => l.kind === 'resolve');
 console.log(`quests resolved(last400log) ${resolved.length} (${resolved.filter(l => l.text.includes('success')).length} s / ${resolved.filter(l => l.text.includes('partial')).length} p / ${resolved.filter(l => l.text.includes('failure')).length} f)`);
 console.log(`sizes: cards ${st.cards.length} · quests[] ${st.quests.length} · leads[] ${st.leads.length} · loreN ${Object.keys(st.lore.nodes).length} · loreE ${st.lore.edges.length} (${st.lore.edges.filter(e => e.active).length} act) · save ${(g.save().length / 1024).toFixed(0)}kB`);

@@ -36,7 +36,7 @@ import {
 } from '../engine/lore.js';
 import { rollName, rollPlaceName } from '../engine/names.js';
 import { questXp, grantXp, rollBase, rollGrowthLean, growToLevel } from '../engine/growth.js';
-import { coins, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, type SlotTest, type Outcome } from '../engine/roll.js';
+import { coins, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, type SlotTest, type Outcome, type QuestRollResult } from '../engine/roll.js';
 import { sampleKeywords, sampleSeed } from '../ai/keywords.js';
 import type { AiProvider, ResolveQuestInput, AskSlotOut } from '../ai/provider.js';
 
@@ -59,6 +59,7 @@ interface Resolution {
   delivery: ReturnType<typeof computeDelivery>;
   party: Card[];
   fate?: FinaleFate;   // finales: decided BEFORE narration (P11)
+  rolled: QuestRollResult;   // the dice, shown in the reveal (loss must be OWNED — DESIGN §5)
 }
 export interface Breaking { cardId: string; roomId: string; doneAtCycle: number }
 
@@ -220,6 +221,14 @@ export class Game {
     return roomComfort(this.state.fort, bound, id => this.card(id), lift);
   }
   private endgameLiftActive(): boolean { return this.state.fort.endgameKeys.length > 0 }
+
+  /** cycles until a character heals fully at the CURRENT rate (rest or infirmary) */
+  healEta(c: Card): { cycles: number; rate: number; viaInfirmary: boolean } {
+    const infirmary = this.state.fort.rooms.find(r => r.type === 'infirmary');
+    const rate = infirmary ? infirmaryHealRate(this.comfort(infirmary)) : REST_HEAL_PER_CYCLE;
+    const tiers = c.character?.injuryTiers ?? 0;
+    return { cycles: Math.ceil(tiers / rate), rate, viaInfirmary: !!infirmary };
+  }
 
   /** a merc's level cap = their own bedroom's comfort, floored at the bunk floor
    *  (an empty bedroom never caps BELOW bedroom-less housing) */
@@ -941,7 +950,7 @@ export class Game {
         const chain = st.chains.find(c => c.id === q.chainId);
         if (chain) fate = finaleFate(this.rng, chain, rolled.outcome);
       }
-      resolutions.push({ quest: q, outcome: rolled.outcome, delivery, party, fate });
+      resolutions.push({ quest: q, outcome: rolled.outcome, delivery, party, fate, rolled });
     }
 
     // 2) ONE batched AI call for all resolutions
@@ -1197,8 +1206,8 @@ export class Game {
     }
     // lore edges from the AI (validated later in one pass)
     pendingEdges.push(...(out?.edges ?? []));
-    // narrate, then the consequences
-    report.push(`— ${q.title} [${r.outcome.toUpperCase()}]`);
+    // narrate, then the consequences — the DICE are always shown (owned loss, DESIGN §5)
+    report.push(`— ${q.title} (${q.id}) [${r.outcome.toUpperCase()}] · rolled ${r.rolled.heads} heads of ${r.rolled.totalCoins} coins vs bar ${r.rolled.totalBar.toFixed(1)}`);
     if (out) { report.push(out.before); report.push(out.after) }
     report.push(...after);
     this.log('resolve', `${q.title}: ${r.outcome}`, q.id);
@@ -1219,7 +1228,9 @@ export class Game {
     chain.story.lastBeatOutcome =
       `beat ${q.beatIndex ?? chain.beatIndex} ended in ${r.outcome.toUpperCase()}: ${storyUpdate?.currentSituation ?? chain.story.currentSituation}`;
     if (q.isFinale) return this.settleFinale(q, chain, r, report, fate);
+    const bankBefore = chain.bank;
     bankBeat(chain, r.party.length, r.outcome, q.sideLootV ?? 0);
+    const delta = Math.round(chain.bank - bankBefore);
     const focal = this.card(chain.focalId);
     // continuation lead (cached title, zero AI)
     st.leads.push({
@@ -1228,7 +1239,7 @@ export class Game {
       expiresAtCycle: st.cycle + LEAD_TTL + CONTINUATION_TTL_BONUS, source: 'continuation',
       title: `${chain.bible.title} — ${finaleReady(chain) ? 'the reckoning nears' : 'the story continues'}`,
     });
-    report.push(`📖 ${chain.bible.title}: bank ${chain.bank.toFixed(0)}g of a ~${chain.payoff.toFixed(0)}g season${finaleReady(chain) ? ' — FINALE next' : ''}. ${focal?.name ?? ''} remains at the center.`);
+    report.push(`📖 ${chain.bible.title}: bank ${chain.bank.toFixed(0)}g (${delta >= 0 ? '+' : ''}${delta} this beat) of a ~${chain.payoff.toFixed(0)}g season${finaleReady(chain) ? ' — FINALE next' : ''}. ${focal?.name ?? ''} remains at the center.`);
   }
 
   private settleFinale(q: Quest, chain: Chain, r: { outcome: Outcome; party: Card[] }, report: string[], precomputed?: FinaleFate) {
@@ -1322,9 +1333,9 @@ export class Game {
   private personalChainDrip(): void {
     const st = this.state;
     if (!this.hasRoom('lead-room') || st.cycle < 10) return;
-    // founders' sagas wait for a little slack (3rd merc or c25) — the opening belongs
-    // to the bootstrap; the stories land when someone can be spared to live them
-    if (this.roster().length < 3 && st.cycle < 25) return;
+    // founders' sagas STRICTLY wait for roster slack — with 2 mercs a personal chain
+    // monopolizes the whole company and starves the economy (dogfood-proven trap)
+    if (this.roster().length < 3) return;
     const pendingPersonal = st.leads.some(l => l.source === 'personal');
     if (pendingPersonal) return;
     const unstoried = this.roster().find(m =>

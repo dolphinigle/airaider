@@ -8,13 +8,15 @@ import * as path from 'node:path';
 import { Game } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
 import { makeOpenAiProvider } from '../src/ai/openai.js';
-import { ROOM_TYPE, buildCost, upgradeCost, renovateCost, ghUpgradeCost, GH_THRESHOLDS, maxSlotsAtTier } from '../src/engine/fort.js';
+import { ROOM_TYPE, buildCost, upgradeCost, renovateCost, ghUpgradeCost, GH_THRESHOLDS, maxSlotsAtTier, excavateCost } from '../src/engine/fort.js';
 import { REGION } from '../src/engine/regions.js';
 import { renderTags } from '../src/engine/tags.js';
 import { cardType, stackKind, isLiability, hasTag } from '../src/engine/cards.js';
 import { slotThreshold, coins, explainCoins } from '../src/engine/roll.js';
 import { QUEST_TTL } from '../src/game/game.js';
-import { hireCost } from '../src/engine/economy.js';
+import { hireCost, RANSOM_RATE, SELL_RATE } from '../src/engine/economy.js';
+import { ransomRate, marketSellRate } from '../src/engine/fort.js';
+import { xpNeeded } from '../src/engine/growth.js';
 import { fillScore } from '../src/engine/overlap.js';
 
 const SAVE = path.join(process.cwd(), 'saves', 'web.json');
@@ -94,13 +96,25 @@ function stateView() {
     },
     buildable: game.buildableTypes().map(b => ({ ...b, name: ROOM_TYPE[b.type]!.name })),
     freeCells: game.freeCells().length,
-    roster: game.roster().map(m => ({ ...cardView(m), cap: game.capOf(m.id), dossier: game.dossier(m.id) })),
-    captives: game.captives().map(c => ({
-      ...cardView(c),
-      breaking: st.breaking.find(b => b.cardId === c.id)?.doneAtCycle ?? null,
-      interrogated: hasTag(c.tags, 'interrogated'),
+    excavateCost: excavateCost(st.fort.cells.length),
+    roster: game.roster().map(m => ({
+      ...cardView(m), cap: game.capOf(m.id), dossier: game.dossier(m.id),
+      healEta: m.character!.injuryTiers > 0 ? game.healEta(m) : null,
+      xpNeeded: xpNeeded(m.character!.level),
     })),
-    relics: game.relics().map(c => cardView(c)),
+    captives: game.captives().map(c => {
+      const office = st.fort.rooms.find(r => r.type === 'ransom-office');
+      return {
+        ...cardView(c),
+        breaking: st.breaking.find(b => b.cardId === c.id)?.doneAtCycle ?? null,
+        interrogated: hasTag(c.tags, 'interrogated'),
+        ransomEst: Math.round(c.value * (office ? ransomRate(game.comfort(office)) : RANSOM_RATE)),
+      };
+    }),
+    relics: game.relics().map(c => {
+      const market = st.fort.rooms.find(r => r.type === 'market');
+      return { ...cardView(c), sellEst: Math.round(c.value * (market ? marketSellRate(game.comfort(market)) : SELL_RATE)) };
+    }),
     liabilities: st.cards.filter(isLiability).filter(c => (c.qty ?? 0) > 0).map(c => cardView(c)),
     tavern: st.tavern.map(s => ({ ...cardView(game.card(s.cardId)!), expires: s.expiresAtCycle, hireCost: hireCost(game.card(s.cardId)!.value) })),
     holding: st.holding.map(s => ({ ...cardView(game.card(s.cardId)!), expires: s.expiresAtCycle })),

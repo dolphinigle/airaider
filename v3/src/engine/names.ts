@@ -42,7 +42,8 @@ export function rollName(rng: Rng, race: string): string {
   return rng.chance(0.35) ? `${name} ${rng.pick(p.epithets)}` : name;
 }
 
-const RELIC_ADJ = ['Weathered', 'Gilded', 'Silent', 'Broken', 'Old', 'Salt-stained', 'Painted', 'Iron', 'Pale', 'Twin'];
+const RELIC_ADJ = ['Weathered', 'Gilded', 'Silent', 'Broken', 'Old', 'Salt-stained', 'Painted', 'Iron', 'Pale', 'Twin',
+  'Mossgrown', 'Ashen', 'Riverworn', 'Lacquered', 'Nicked', 'Hollow', 'Amber', 'Sooted', 'Threadbare', 'Kingless'];
 const RELIC_NOUN: Record<string, string[]> = {
   'melee-weapon': ['Blade', 'Axe', 'Maul', 'Spear', 'Dirk'],
   'ranged-weapon': ['Bow', 'Sling', 'Arbalest', 'Javelin'],

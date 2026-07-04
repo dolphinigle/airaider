@@ -2,12 +2,14 @@
 
 import type { Game } from '../src/game/game.js';
 import { renderTags } from '../src/engine/tags.js';
-import { ROOM_TYPE, GH_THRESHOLDS } from '../src/engine/fort.js';
+import { ROOM_TYPE, GH_THRESHOLDS, maxSlotsAtTier, upgradeCost, excavateCost, ransomRate, marketSellRate } from '../src/engine/fort.js';
+import { RANSOM_RATE, SELL_RATE } from '../src/engine/economy.js';
 import { REGION } from '../src/engine/regions.js';
 import { cardType, stackKind, isLiability } from '../src/engine/cards.js';
 import { slotThreshold, coins, explainCoins } from '../src/engine/roll.js';
 import { fillScore } from '../src/engine/overlap.js';
 import { QUEST_TTL } from '../src/game/game.js';
+import { xpNeeded } from '../src/engine/growth.js';
 
 const pct = (x: number | null) => x === null ? '—' : `${Math.round(x * 100)}%`;
 
@@ -62,14 +64,19 @@ export const render = {
   },
 
   rooms(g: Game): string {
-    return g.state.fort.rooms.map(r => {
+    const lines = g.state.fort.rooms.map(r => {
       const t = ROOM_TYPE[r.type]!;
-      const comfort = t.species === 'comfort' ? ` comfort ${g.comfort(r).toFixed(1)}` : '';
+      const c = t.species === 'comfort' ? g.comfort(r) : 0;
+      const ben = t.benefit === 'prestige' ? ` →P ${c.toFixed(1)}`
+        : t.benefit === 'cap' ? ` →cap ${Math.max(6, Math.floor(3 + 0.9 * c))}`
+        : t.species === 'comfort' ? ` [${t.benefit}] ${c.toFixed(1)}` : '';
       const slots = r.slots.length ? ` slots[${r.slots.map(s => s ? g.card(s)?.name?.split(' ')[0] ?? '?' : '·').join('|')}]` : '';
       const owner = r.ownerId ? ` owner=${r.ownerId === 'you' ? 'you' : g.card(r.ownerId)?.name ?? r.ownerId}` : '';
-      const wants = r.wants.length ? ` wants:${r.wants.map(w => w.match).join(',')}` : '';
-      return `${r.id.padEnd(10)} ${t.name.padEnd(24)}${comfort}${slots}${owner}${wants}`;
-    }).join('\n') || '(no rooms)';
+      return `${r.id.padEnd(10)} ${t.name.padEnd(24)}${ben}${slots}${owner}`;
+    });
+    const p = g.prestige();
+    lines.push(`— GLOBAL PRESTIGE ${p.toFixed(1)} = Σ theme-room comfort (rooms marked →P)`);
+    return lines.join('\n');
   },
 
   roomDetail(g: Game, id: string): string {
@@ -86,6 +93,9 @@ export const render = {
         lines.push(`  slot ${i}: ${c ? `${c.name}${fit} [${renderTags(c.tags)}]` : '(empty)'}`);
       });
       if (!r.slots.length) lines.push('  (no slots yet — upgrade to add)');
+      const max = maxSlotsAtTier(g.state.fort.ghTier);
+      if (r.slots.length < max) lines.push(`  upgrade: +1 slot for ${upgradeCost(t, r.slots.length)}g (max ${max} at GH T${g.state.fort.ghTier})`);
+      else lines.push(`  (slot depth ${r.slots.length}/${max} — gated by Great Hall tier)`);
     }
     return lines.join('\n');
   },
@@ -95,7 +105,7 @@ export const render = {
       const ch = m.character!;
       const a = ch.attrs;
       const busy = m.location.kind === 'quest' ? ` ⚔ on ${m.location.questId}` : '';
-      const injury = ch.injuryTiers > 0 ? ` 🩸${ch.injuryTiers}` : '';
+      const injury = ch.injuryTiers > 0 ? ` 🩸${ch.injuryTiers}(~${g.healEta(m).cycles}c)` : '';
       const cap = g.capOf(m.id);
       return `${m.id.padEnd(5)} ${m.name.padEnd(22)} L${ch.level}/${cap}${ch.level >= cap ? '⛔CAP' : ''} S${a.str.toFixed(0)} D${a.dex.toFixed(0)} I${a.int.toFixed(0)} C${a.cha.toFixed(0)} N${a.con.toFixed(0)}${injury}${busy}\n      ${renderTags(m.tags)}`;
     }).join('\n') || '(no mercs)';
@@ -106,10 +116,11 @@ export const render = {
     if (!m?.character) return 'no such merc';
     const ch = m.character;
     return [
-      `${m.name} — L${ch.level} (cap ${g.capOf(m.id)}) ${ch.role} · xp ${ch.xp} · injury ${ch.injuryTiers}`,
+      `${m.name} — L${ch.level} (cap ${g.capOf(m.id)}) ${ch.role} · xp ${ch.xp}/${xpNeeded(ch.level)} to L${ch.level + 1}` +
+      (ch.injuryTiers > 0 ? ` · 🩸${ch.injuryTiers} (~${g.healEta(m).cycles}c ${g.healEta(m).viaInfirmary ? 'infirmary' : 'rest — build an Infirmary'}${g.hasRoom('hospital') ? ', or pay-heal' : ''})` : ''),
       `tags: ${renderTags(m.tags)}`,
       `attrs: STR ${ch.attrs.str.toFixed(1)} DEX ${ch.attrs.dex.toFixed(1)} INT ${ch.attrs.int.toFixed(1)} CHA ${ch.attrs.cha.toFixed(1)} CON ${ch.attrs.con.toFixed(1)}`,
-      `focus: ${JSON.stringify(ch.focus)} · who: ${ch.who ?? '—'}`,
+      `focus: ${ch.focus.kind === 'none' ? 'none (generalist growth)' : ch.focus.kind === 'single' ? `${ch.focus.attr.toUpperCase()} (one GREAT stat)` : `${ch.focus.a.toUpperCase()}+${ch.focus.b.toUpperCase()} (two GOOD)`} · who: ${ch.who ?? '—'}`,
       ch.backstory ? `backstory: ${ch.backstory}` : '',
       ch.quirks?.length ? `quirks: ${ch.quirks.join('; ')}` : '',
       `dossier:\n${g.dossier(m.id) || '  (no memories yet)'}`,
@@ -144,7 +155,17 @@ export const render = {
       `REWARD envelope: ${q.rewardSpecs.map(r => r.kind).join(' + ') || (q.isFinale ? 'the focal character' : 'side loot')}`,
     ];
     if (q.approaches) {
-      lines.push(`APPROACHES (pick one): ${q.approaches.map(a => `[${a.id}] ${a.label} → ${a.rewardKind}`).join(' · ')}${q.chosenApproach ? ` — chosen: ${q.chosenApproach}` : ''}`);
+      lines.push(`APPROACHES (pick one)${q.chosenApproach ? ` — chosen: ${q.chosenApproach}` : ''}:`);
+      // §9: the player sees EVERY branch's envelope before committing
+      for (const a of q.approaches) {
+        const slot = q.slots.find(x => x.groupId === a.id);
+        if (!slot) continue;
+        const t = slot.test;
+        const best = g.roster().filter(m => m.location.kind === 'held')
+          .map(m => ({ m, n: coins(m, t) })).sort((x, y) => y.n - x.n)[0];
+        const mark = q.chosenApproach === a.id ? '▶' : ' ';
+        lines.push(`${mark} [${a.id}] ${a.label} → ${a.rewardKind} · tests ${t.attributes.join('+').toUpperCase()} (${t.difficulty}, bar ${slotThreshold(t).toFixed(1)})${t.favored.length ? ` favors ${t.favored.join(',')}` : ''}${best ? ` · best: ${best.m.name} ${best.n}c` : ''}`);
+      }
     }
     const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
     q.slots.forEach((s, i) => {
@@ -160,8 +181,12 @@ export const render = {
         if (cands.length) lines.push(`      candidates: ${cands.map(x => `${x.m.name} ${x.n}c`).join(' · ')}`);
       }
     });
-    const o = g.questOdds(q.id);
-    lines.push(`ODDS: ${o.coins} coins vs bar ${o.bar.toFixed(1)}${o.precision > 0 ? ` → success ${pct(o.success)} · partial+ ${pct(o.partial)}${o.precision === 1 ? ' (coarse)' : ''}` : ' (build an Oracle for %)'}`);
+    if (!q.approaches || q.chosenApproach) {
+      const o = g.questOdds(q.id);
+      lines.push(`ODDS: ${o.coins} coins vs bar ${o.bar.toFixed(1)}${o.precision > 0 ? ` → success ${pct(o.success)} · partial+ ${pct(o.partial)}${o.precision === 1 ? ' (coarse)' : ''}` : ' (build an Oracle for %)'}`);
+    } else {
+      lines.push('ODDS: choose an approach first (each branch rolls its own test)');
+    }
     return lines.join('\n');
   },
 
@@ -172,18 +197,22 @@ export const render = {
       const where = c.location.kind === 'room' ? `in ${c.location.roomId}` : 'cells';
       const ob = c.tags.some(t => t.concept === 'obedient') ? ' obedient' : ' raw';
       const brk = g.state.breaking.find(b => b.cardId === c.id);
-      return `${c.id.padEnd(5)} ${c.name.padEnd(22)} mark ${c.value}g${ob}${brk ? ` (breaking, done c${brk.doneAtCycle})` : ''} ${where}\n      ${renderTags(c.tags)}`;
+      const office = g.state.fort.rooms.find(r => r.type === 'ransom-office');
+      const rate = office ? ransomRate(g.comfort(office)) : RANSOM_RATE;
+      return `${c.id.padEnd(5)} ${c.name.padEnd(22)} mark ${c.value}g (ransom ~${Math.round(c.value * rate)}g)${ob}${brk ? ` (breaking, done c${brk.doneAtCycle})` : ''} ${where}\n      ${renderTags(c.tags)}`;
     }).join('\n');
   },
 
   items(g: Game): string {
     const rs = g.relics();
     const stacks = g.state.cards.filter(c => cardType(c) === 'stackable' && (c.qty ?? 0) > 0 && stackKind(c) !== 'gold');
+    const market = g.state.fort.rooms.find(x => x.type === 'market');
+    const sellRate = market ? marketSellRate(g.comfort(market)) : SELL_RATE;
     const lines = rs.map(r => {
       const where = r.location.kind === 'room' ? ` in ${r.location.roomId}` : '';
-      return `${r.id.padEnd(5)} ${r.name.padEnd(24)} mark ${r.value}g${where}  ${renderTags(r.tags)}`;
+      return `${r.id.padEnd(5)} ${r.name.padEnd(24)} mark ${r.value}g (sell ~${Math.round(r.value * sellRate)}g)${where}  ${renderTags(r.tags)}`;
     });
-    for (const s of stacks) lines.push(`${s.id.padEnd(5)} ${s.name} ×${s.qty}${isLiability(s) ? ' ⚠LIABILITY (settle it or it bites)' : ''}`);
+    for (const s of stacks) lines.push(`${s.id.padEnd(5)} ${s.name} ×${s.qty}${isLiability(s) ? ` ⚠LIABILITY — settle for ${Math.abs(s.value) * (s.qty ?? 1)}g or it bites (collector leads)` : ''}`);
     return lines.join('\n') || '(nothing)';
   },
 
@@ -223,14 +252,17 @@ export const render = {
   tavern(g: Game): string {
     return g.state.tavern.map(s => {
       const c = g.card(s.cardId)!;
-      return `${c.id.padEnd(5)} ${c.name.padEnd(22)} L${c.character!.level} mark ${c.value}g — hire ~${Math.round(c.value * 1.2)}g, leaves c${s.expiresAtCycle}\n      ${renderTags(c.tags)}`;
+      const who = c.character!.who ? `\n      "${c.character!.who}"` : '';
+      const story = c.character!.backstory ? `\n      ${c.character!.backstory}` : '';
+      return `${c.id.padEnd(5)} ${c.name.padEnd(22)} L${c.character!.level} mark ${c.value}g — hire ~${Math.round(c.value * 1.2)}g, leaves c${s.expiresAtCycle}${who}\n      ${renderTags(c.tags)}${story}`;
     }).join('\n') || '(nobody drinking today)';
   },
 
   holding(g: Game): string {
     return g.state.holding.map(s => {
       const c = g.card(s.cardId)!;
-      return `${c.id.padEnd(5)} ${c.name.padEnd(22)} mark ${c.value}g — accept before c${s.expiresAtCycle}\n      ${renderTags(c.tags)}`;
+      const who = c.character!.who ? `\n      "${c.character!.who}"` : '';
+      return `${c.id.padEnd(5)} ${c.name.padEnd(22)} mark ${c.value}g — accept before c${s.expiresAtCycle}${who}\n      ${renderTags(c.tags)}`;
     }).join('\n') || '(holding is empty)';
   },
 

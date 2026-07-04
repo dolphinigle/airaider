@@ -49,6 +49,13 @@ function rollTier(rng: Rng, conceptId: string, ceiling: number, budget: number):
   const c = CONCEPT[conceptId]!;
   const hi = Math.min(c.depth, ceiling);
   if (hi <= 1) return 1;
+  // zero-value tiered flavor (tall/short, sturdy/heavy…): tier = AI intensity only —
+  // roll it BOTTOM-WEIGHTED, never budget-driven ("legendary" must stay rare language)
+  if (c.zeroValue) {
+    const w: [number, number][] = [];
+    for (let t = 1; t <= hi; t++) w.push([t, Math.pow(0.45, t - 1)]);
+    return rng.weighted(w);
+  }
   const desired = Math.max(6, budget * rng.float(0.2, 0.85));
   let tier = 1;
   for (let t = 1; t <= hi; t++) {
@@ -155,6 +162,9 @@ export function generateCard(rng: Rng, opts: GenOptions): Card {
     });
     const id = rng.weighted(weights);
     const c = CONCEPT[id]!;
+    // TINY-odds lines (enchantments, standing) stay RARE per W9/W16 — an acceptance
+    // roll on top of the relative weighting (usually 0-1 per card, never five)
+    if ((c.appearOdds ?? 1) < 0.05 && !rng.chance((c.appearOdds ?? 1) * 10)) continue;
     place({ concept: id, tier: c.depth > 1 ? rollTier(rng, id, ceiling, Math.max(0, remaining)) : undefined });
     spent = Math.max(0, tagsValue(tags));
   }

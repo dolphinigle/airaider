@@ -105,7 +105,7 @@ function Fort({ s, doAct, setDetail }: { s: S; doAct: any; setDetail: (id: strin
         ))}
       </div>
       <div className="row">
-        <button onClick={() => doAct('excavate')}>Excavate (+1 cell)</button>
+        <button onClick={() => doAct('excavate')}>Excavate +1 cell ({s.excavateCost}g)</button>
         {s.ghNeed && <button onClick={() => doAct('gh')}>Raise Great Hall → T{s.ghTier + 1} (needs P{s.ghNeed}, {s.ghCost}g)</button>}
       </div>
     </div>
@@ -184,12 +184,21 @@ function Quests({ s, doAct }: any) {
           <p>{q.situation}</p>
           <p><b>JOB:</b> {q.job} · <b>REWARD:</b> {q.rewardEnvelope}</p>
           {q.approaches && (
-            <p>
-              <b>APPROACH:</b> {q.approaches.map((a: any) => (
-                <button key={a.id} className={q.chosenApproach === a.id ? 'on' : ''}
-                  onClick={() => doAct('approach', q.id, a.id)}>{a.label} → {a.rewardKind}</button>
-              ))}
-            </p>
+            <div className="approaches">
+              <b>APPROACH (each branch rolls its own test):</b>
+              {q.approaches.map((a: any) => {
+                const sl = q.slots.find((x: any) => x.groupId === a.id);
+                return (
+                  <div key={a.id} className="slotrow">
+                    <button className={q.chosenApproach === a.id ? 'on' : ''}
+                      onClick={() => doAct('approach', q.id, a.id)}>{a.label} → {a.rewardKind}</button>
+                    {sl && <span>tests <b>{sl.test.attributes.join('+').toUpperCase()}</b> ({sl.test.difficulty}, bar {sl.test.bar.toFixed(1)})
+                      {sl.test.favored.length > 0 && <> · favors <i>{sl.test.favored.join(', ')}</i></>}
+                      {sl.fits?.[0] && <> · best: {sl.fits[0].name} {sl.fits[0].coins}c</>}</span>}
+                  </div>
+                );
+              })}
+            </div>
           )}
           {q.slots.filter((sl: any) => !q.approaches || sl.groupId === q.chosenApproach).map((sl: any) => (
             <div key={sl.idx} className="slotrow">
@@ -223,7 +232,7 @@ function Roster({ s, doAct }: any) {
     <div>
       {s.roster.map((m: any) => (
         <div className="cardrow" key={m.id}>
-          <h3>{m.name} <small>L{m.character.level}/{m.cap}{m.character.level >= m.cap ? ' ⛔CAP' : ''} · {m.character.injury > 0 ? `🩸${m.character.injury}` : 'healthy'} · {m.location.kind === 'quest' ? '⚔ committed' : 'free'}</small></h3>
+          <h3>{m.name} <small>L{m.character.level}/{m.cap}{m.character.level >= m.cap ? ' ⛔CAP' : ''} · xp {m.character.xp}/{m.xpNeeded} · {m.character.injury > 0 ? `🩸${m.character.injury} (~${m.healEta?.cycles}c to heal)` : 'healthy'} · {m.location.kind === 'quest' ? '⚔ committed' : 'free'}</small></h3>
           <p className="tags">{m.tags}</p>
           <p>STR {m.character.attrs.str.toFixed(1)} · DEX {m.character.attrs.dex.toFixed(1)} · INT {m.character.attrs.int.toFixed(1)} · CHA {m.character.attrs.cha.toFixed(1)} · CON {m.character.attrs.con.toFixed(1)}</p>
           {m.character.who && <p><i>{m.character.who}</i></p>}
@@ -250,7 +259,7 @@ function Captives({ s, doAct }: any) {
     <div>
       {s.captives.map((c: any) => (
         <div className="cardrow" key={c.id}>
-          <h3>{c.name} <small>mark {c.value}g · {c.character.obedient ? 'obedient' : c.breaking ? `breaking (done c${c.breaking})` : 'raw'}{c.location.kind === 'room' ? ` · stationed` : ''}</small></h3>
+          <h3>{c.name} <small>mark {c.value}g · ransom ~{c.ransomEst}g · {c.character.obedient ? 'obedient' : c.breaking ? `breaking (done c${c.breaking})` : 'raw'}{c.location.kind === 'room' ? ` · stationed` : ''}</small></h3>
           <p className="tags">{c.tags}</p>
           <div className="row">
             <button onClick={() => doAct('ransom', c.id)}>ransom</button>
@@ -274,9 +283,9 @@ function Items({ s, doAct }: any) {
       ))}
       {s.relics.map((c: any) => (
         <div className="cardrow" key={c.id}>
-          <h3>{c.name} <small>mark {c.value}g{c.location.kind === 'room' ? ' · displayed' : ''}</small></h3>
+          <h3>{c.name} <small>mark {c.value}g · sell ~{c.sellEst}g{c.location.kind === 'room' ? ' · displayed' : ''}</small></h3>
           <p className="tags">{c.tags}</p>
-          {c.location.kind !== 'room' && <button onClick={() => doAct('sell', c.id)}>sell</button>}
+          {c.location.kind !== 'room' && <button onClick={() => doAct('sell', c.id)}>sell (~{c.sellEst}g)</button>}
         </div>
       ))}
       {!s.relics.length && !s.liabilities.length && <p>Nothing yet — loot comes from quests.</p>}

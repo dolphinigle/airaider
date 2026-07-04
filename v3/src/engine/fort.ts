@@ -127,8 +127,10 @@ export function ghUpgradeCost(toTier: number): number {
   return Math.round(120 * Math.pow(1.32, toTier - 1) * 1.6);
 }
 export function endgameCost(): number { return Math.round(ghUpgradeCost(14) * 2) }
+/** expansion is PURE GOLD and stays a minor sink (FORT §1) — the ~60-room fort the
+ *  §20 sim assumes must remain affordable (🛠 was 1.25^n: 50k at 40 cells — a wall) */
 export function excavateCost(nCells: number): number {
-  return Math.round(60 * Math.pow(1.25, Math.max(0, nCells - 9)));
+  return Math.round(45 * Math.pow(1.09, Math.max(0, nCells - 9)));
 }
 
 // ---- comfort (§20 formula) -----------------------------------------------------------------
