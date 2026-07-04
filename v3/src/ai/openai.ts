@@ -195,6 +195,7 @@ export function makeOpenAiProvider(): AiProvider {
       const system = [
         'You are the writers\'-room for a saga in a dark-fantasy mercenary-fort game. Build a hidden BIBLE: settled truth, told plainly — mystery is the quest-writer\'s job later.',
         'Collide the SEED with the SLATE into a one-line KERNEL. Pick 1-3 core people; the FOCAL MUST be core. LEAN cast: one line + want + role each, no essays. Reuse slate people before coining new ones.',
+        'TITLES: never default the saga title to the region landmark — name it for the person, the object, or the wound at its heart.',
         'WANTS MUST BE HUMAN and specific — "to bury her brother where their mother lies", never "power" or "to come out ahead". The focal\'s want is the saga\'s heart: make it something a player could root for or against.',
         NUMBER_BAN,
         EDGE_TYPES_LINE,

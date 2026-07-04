@@ -47,7 +47,7 @@ const SEEDS = [
   'a ransom paid to the wrong hands', 'an heir who does not want to be found',
   'a debt sold three times over', 'a relic that two shrines both claim',
   'a deserter who knows where the bodies are', 'a betrothal that would end a feud',
-  'a ledger that names the respectable', 'a beast that only hunts the guilty',
+  'a list of names the respectable would kill to burn', 'a beast that only hunts the guilty',
   'a will that frees the wrong people', 'a siege that ended too quietly',
   'a smuggler’s route that moves more than goods', 'a caged singer whose songs start riots',
 ];
