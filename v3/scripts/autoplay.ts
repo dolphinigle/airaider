@@ -136,7 +136,7 @@ for (let c = 0; c < cycles; c++) {
   }
   // interrogate a captive occasionally (the lead faucet nobody remembers)
   if (g.state.cycle % 15 === 0 && g.gold() > 500) {
-    const talker = g.captives().find(x => !x.chainIds.includes('interrogated'));
+    const talker = g.captives().find(x => !hasTag(x.tags, 'interrogated'));
     if (talker) g.interrogate(talker.id);
   }
   // ransom surplus RAW captives only (keep the best 16 for breaking; obedient are the

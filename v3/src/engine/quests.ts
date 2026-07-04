@@ -8,7 +8,7 @@ import {
 } from './economy.js';
 import { rollName, rollRelicName } from './names.js';
 import { mintStackable, HELD, type Card } from './cards.js';
-import { tierOf } from './tags.js';
+import { tierOf, CONCEPT } from './tags.js';
 import type { Attribute } from './tags.js';
 import { type SlotTest, type DifficultyName, type Outcome } from './roll.js';
 
@@ -28,6 +28,7 @@ export interface Lead {
   title?: string;                  // cached chain title for continuation leads (zero AI cost)
   focalId?: string;                // sequel leads (§21-4a): the SLIPPED focal — the road back is to THEM
   liabilityId?: string;            // collector leads: beating the quest settles THIS liability
+  personalMercId?: string;         // personal-chain leads: the merc whose main chain this starts
 }
 
 export const LEAD_TTL = 6; // cycles before an unpursued lead lapses 🛠
@@ -169,20 +170,20 @@ export function materializeReward(rng: Rng, spec: RewardSpec, contentLevel: numb
       return [g];
     }
     case 'captive': case 'recruit': {
-      const races = Object.entries(REGION[region]!.poolWeights) as [string, number][];
+      const races = Object.entries(REGION[region]!.poolWeights) as [string, number][];   // pool bias (region), not a hand list
       const card = generateCard(rng, {
         domain: 'character', targetV: spec.value, contentLevel,
         required: spec.required, race: rng.weighted(races),
         role: spec.kind === 'captive' ? 'captive' : 'npc',
         level: Math.max(1, contentLevel - (spec.kind === 'recruit' ? 1 : 0)),
       });
-      const race = card.tags.find(t => ['human', 'elf', 'wolfman', 'lizardman'].includes(t.concept))?.concept ?? 'human';
+      const race = card.tags.find(t => CONCEPT[t.concept]?.group === 'race')?.concept ?? 'human';
       card.name = rollName(rng, race);
       return [card];
     }
     case 'relic': {
       const card = generateCard(rng, { domain: 'relic', targetV: spec.value, contentLevel, required: spec.required });
-      const form = card.tags.find(t => ['melee-weapon', 'ranged-weapon', 'armor', 'clothes', 'accessory', 'document', 'curio', 'decoration', 'furniture'].includes(t.concept));
+      const form = card.tags.find(t => CONCEPT[t.concept]?.group === 'form');
       card.name = rollRelicName(rng, form?.concept ?? 'curio');
       return [card];
     }

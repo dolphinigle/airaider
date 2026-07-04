@@ -48,6 +48,24 @@ was not reopened. Dogfooding = the autoplay harness (`scripts/autoplay.ts`, mock
 Marathon state: 3 seeds × 2,200 cycles audit-clean (GH T5–T7); save at c2200 ≈ 2–5 MB (post-proto: compaction).
 Real-AI cost: ~0.5–1¢/cycle of play (~$0.15–0.25 per 25–35-cycle session).
 
+## Conformance audit round (2026-07-04, three independent reviewers: FACTS / PRINCIPLES / DRIFT)
+
+FACTS verdict: fully conformant (every §8/§10/§11/§13/§20 number, W1–W18 vocabulary, economy
+formulas verified in code) with ONE gap, now fixed. PRINCIPLES verdict: 13/15 held; 2 violations
+fixed. DRIFT: 2 high + 12 medium/low, all fixed:
+
+| # | Fix | Anchor |
+|---|---|---|
+| 30 | **Ownership boundary generalized** — `isOwned()` required by ransom/sell/interrogate/payHeal (a LIMBO chain focal was ransomable mid-chain for 0.6× its season-sized mark, then deliverable AGAIN at the finale) | GAME_STATE §6 |
+| 31 | **Collector loop truly closed**: duplicate-guard now checks open quests' own liabilityId (was dead code); collector leads forced one-off (a starts-new roll made the liability unsettleable forever) | §10 impl note |
+| 32 | **Finale fate decided BEFORE the AI narrates** (P11): fate + delivery summary precomputed, passed via chainContext.fate; settleFinale applies the precomputed fate | QUESTS §8 rule b |
+| 33 | **§4b genesis name guard**: known-cast entries keep canon lore names; new-cast names must come from engine-rolled assignedNames (now 4, rolled by REGION race weights) — AI-invented names can no longer persist in bibles | §4b |
+| 34 | **§13 Outskirts keys implemented**: all 4 SPINE endgame buildings (Underdeep is NOT a key) → Outskirts unlocks | §13/§16-F4 |
+| 35 | ONE debt rule at finales: shortfall(mark − bank) only — removed an unledgered flat 0.25×payoff surcharge | QUESTS §5 |
+| 36 | Dedrift: growth logic unified (growToLevel everywhere); interrogated = status TAG; RoomType.roomKind/multiBuild fields replace id-prefix matching; captiveCapacity from cellSlots; named staging/lead TTL constants (twin-path 4/6-cycle drift removed); wildcards rng-sampled; sell/heal fallbacks use named constants; pick-lists derived from vocabulary GROUPS; difficulty order exported once; personalMercId a typed field; dead code removed | — |
+| 37 | Interrogation comfort now DOES something (FORT §5 "leads only"): comfort → chance to upgrade the yielded lead's rarity; price ledgered (30 + 0.1×mark 🛠) | FORT §5 |
+| 38 | Finale writeQuest told the true shape (3 approaches, one slot each) | — |
+
 ## Balance state (mock autoplay, seeds 5/21, 800 cycles)
 T5 ≈ c500–660 · tier cadence ~100–220c (budget ~130–190 for a human; the bot is naive) ·
 outcome mix ≈ 55–65% success / 25–30% partial / 8–15% failure · chains complete b2–b6, slip ~20% ·

@@ -27,6 +27,8 @@ export interface RoomType {
   ghTier: number;               // Great Hall tier needed to build
   unlocks?: string;             // what capability a gate opens (menu key)
   region?: string;              // region rooms (scouting lodge / recruiting post / endgame)
+  roomKind?: 'scouting' | 'recruiting' | 'endgame';  // region-room role (no id-prefix matching)
+  multiBuild?: boolean;         // buildable more than once (bedrooms, cells)
   cellSlots?: number;           // capacity rooms: captives per cell room
   themeHints?: string[];        // default wanted-tag hints per concrete type (pre-style)
   mates?: string[];             // adjacency mate-pairs (×1.2)
@@ -48,9 +50,9 @@ export const ROOM_TYPES: RoomType[] = [
   RT('library', 'Library', { species: 'gate', benefit: 'none', ghTier: 3, unlocks: 'lore' }),
   RT('chronicle', 'Chronicle room', { species: 'gate', benefit: 'none', ghTier: 4, unlocks: 'chronicle' }),
   // capacity
-  RT('dungeon-cell', 'Dungeon cell', { species: 'capacity', benefit: 'none', ghTier: 2, cellSlots: 3 }),
+  RT('dungeon-cell', 'Dungeon cell', { species: 'capacity', benefit: 'none', ghTier: 2, cellSlots: 3, multiBuild: true }),
   // housing
-  RT('bedroom', 'Bedroom', { species: 'comfort', benefit: 'cap', archetype: 'std', ghTier: 1, themeHints: [] }),
+  RT('bedroom', 'Bedroom', { species: 'comfort', benefit: 'cap', archetype: 'std', ghTier: 1, themeHints: [], multiBuild: true }),
   RT('bunkroom', 'Bunkroom', { species: 'gate', benefit: 'none', ghTier: 1, unlocks: 'bunks' }),
   // functional comfort
   RT('infirmary', 'Infirmary', { species: 'comfort', benefit: 'heal', archetype: 'minor', ghTier: 1, themeHints: ['heal', 'furniture', 'clothes'] }),
@@ -64,9 +66,9 @@ export const ROOM_TYPES: RoomType[] = [
   RT('great-hall', 'Great Hall', { species: 'landmark', benefit: 'none', ghTier: 1 }),
   // region rooms (scouting lodge opens the region; recruiting post opens recruit quests)
   ...REGIONS.filter(r => r.id !== 'outskirts').flatMap(r => [
-    RT(`scouting-${r.id}`, `Scouting lodge (${r.name})`, { species: 'gate', benefit: 'none', ghTier: r.ghTier, region: r.id, unlocks: 'region' }),
-    RT(`recruiting-${r.id}`, `Recruiting post (${r.name})`, { species: 'gate', benefit: 'none', ghTier: r.ghTier, region: r.id, unlocks: 'recruit-quests' }),
-    RT(`endgame-${r.id}`, `Endgame: ${r.name} key`, { species: 'landmark', benefit: 'none', ghTier: 13, region: r.id }),
+    RT(`scouting-${r.id}`, `Scouting lodge (${r.name})`, { species: 'gate', benefit: 'none', ghTier: r.ghTier, region: r.id, unlocks: 'region', roomKind: 'scouting' }),
+    RT(`recruiting-${r.id}`, `Recruiting post (${r.name})`, { species: 'gate', benefit: 'none', ghTier: r.ghTier, region: r.id, unlocks: 'recruit-quests', roomKind: 'recruiting' }),
+    RT(`endgame-${r.id}`, `Endgame: ${r.name} key`, { species: 'landmark', benefit: 'none', ghTier: 13, region: r.id, roomKind: 'endgame' }),
   ]),
   // theme rooms (prestige family — §19 tier-1 set + a few tier-2 for later acts)
   RT('dining-hall', 'Dining hall', { species: 'comfort', benefit: 'prestige', archetype: 'std', ghTier: 1, themeHints: ['food', 'gregarious', 'furniture', 'decoration'], mates: ['kitchen'] }),

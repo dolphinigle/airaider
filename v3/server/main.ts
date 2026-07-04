@@ -83,7 +83,7 @@ function stateView() {
     captives: game.captives().map(c => ({
       ...cardView(c),
       breaking: st.breaking.find(b => b.cardId === c.id)?.doneAtCycle ?? null,
-      interrogated: c.chainIds.includes('interrogated'),
+      interrogated: hasTag(c.tags, 'interrogated'),
     })),
     relics: game.relics().map(c => cardView(c)),
     liabilities: st.cards.filter(isLiability).filter(c => (c.qty ?? 0) > 0).map(c => cardView(c)),

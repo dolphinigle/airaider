@@ -96,17 +96,13 @@ export function beatSideLoot(rng: Rng, chain: Chain): number {
 
 export type FinaleFate =
   | { fate: 'clean' }                                       // success: focal in the chosen kind
-  | { fate: 'saddled'; debt: number }                       // partial: lesser/saddled version
+  | { fate: 'saddled' }                                     // partial: lesser/saddled version (debt = the bank SHORTFALL, computed at delivery)
   | { fate: 'slipped'; sequelRarity: Rarity };              // failure: §21-4a — bank forfeit, road back exists
 
 /** finale resolution → the focal's fate (never death, never permanent — §21-4a) */
 export function finaleFate(rng: Rng, chain: Chain, outcome: Outcome): FinaleFate {
   if (outcome === 'success') return { fate: 'clean' };
-  if (outcome === 'partial') {
-    // bank short of the focal's value → keep with debt sized to the shortfall
-    const shortfall = Math.max(0, Math.round(chain.payoff * 0.25));
-    return { fate: 'saddled', debt: shortfall };
-  }
+  if (outcome === 'partial') return { fate: 'saddled' };
   return { fate: 'slipped', sequelRarity: chain.rarity === 'common' ? 'uncommon' : 'rare' };
 }
 

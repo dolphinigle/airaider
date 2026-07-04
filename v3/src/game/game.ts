@@ -8,7 +8,7 @@ import {
   type Card, type Location, HELD, cardType, stackKind, isLiability, freshId, seedIdCounter,
   idCounter, mintStackable, sameStack,
 } from '../engine/cards.js';
-import { T, renderTags, parseAiTag, CONCEPT, validateTags, type Attribute, hasTag } from '../engine/tags.js';
+import { T, renderTags, parseAiTag, CONCEPT, CONCEPTS, GROUPS, validateTags, type Attribute, hasTag } from '../engine/tags.js';
 import {
   newFort, ROOM_TYPE, ROOM_TYPES, buildCost, upgradeCost, renovateCost, ghUpgradeCost,
   excavateCost, maxSlotsAtTier, GH_THRESHOLDS, roomComfort, globalPrestige, capFromComfort,
@@ -16,10 +16,10 @@ import {
   BUNK_ROSTER_SLOTS, BUNK_CAP_FLOOR, ENDGAME_BAND_LIFT,
   type FortState, type Room,
 } from '../engine/fort.js';
-import { infirmaryHealRate, healTick, rollInjuryTiers, payHealCost, type InjuryBand } from '../engine/injury.js';
+import { infirmaryHealRate, healTick, rollInjuryTiers, payHealCost, REST_HEAL_PER_CYCLE, type InjuryBand } from '../engine/injury.js';
 import { REGION, REGIONS } from '../engine/regions.js';
 import {
-  vBase, RARITY_MULT, splitOneOff, hireCost, RANSOM_RATE, type Rarity,
+  vBase, RARITY_MULT, splitOneOff, hireCost, RANSOM_RATE, SELL_RATE, type Rarity,
 } from '../engine/economy.js';
 import {
   rollFreshLead, starterPacket, huntLead, slotCount, rollDifficulty, oneOffValue,
@@ -28,21 +28,37 @@ import {
 } from '../engine/quests.js';
 import {
   newChainEconomy, bankBeat, finaleReady, beatSideLoot, finaleFate, crystallize,
-  type Chain, type Bible,
+  type Chain, type Bible, type FinaleFate,
 } from '../engine/chains.js';
 import {
   newGraph, recall, renderDossier, decayPass, guardEdges, chronicleOf,
   type LoreGraph, type LoreNode,
 } from '../engine/lore.js';
 import { rollName, rollPlaceName } from '../engine/names.js';
-import { questXp, grantXp, rollBase, rollGrowthLean } from '../engine/growth.js';
-import { coins, slotThreshold, resolvePooled, odds, U, type SlotTest, type Outcome } from '../engine/roll.js';
+import { questXp, grantXp, rollBase, rollGrowthLean, growToLevel } from '../engine/growth.js';
+import { coins, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, type SlotTest, type Outcome } from '../engine/roll.js';
 import { sampleKeywords, sampleSeed } from '../ai/keywords.js';
 import type { AiProvider, ResolveQuestInput, AskSlotOut } from '../ai/provider.js';
 
 export interface LogEntry { cycle: number; kind: string; text: string; questId?: string }
 
+// staging & lead lifetimes (🛠 one named constant per mechanism — no twin-path drift)
+export const STAGE_TTL_HOLDING = 4;
+export const STAGE_TTL_TAVERN = 5;
+export const STAGE_TTL_FINALE = 6;
+export const CONTINUATION_TTL_BONUS = 6;   // continuation leads outlive fresh ones a bit
+export const INTERROGATE_BASE = 30;        // 🛠 priced per-captive action
+export const INTERROGATE_FRAC = 0.1;
+
 export interface Staged { cardId: string; expiresAtCycle: number }
+
+interface Resolution {
+  quest: Quest;
+  outcome: Outcome;
+  delivery: ReturnType<typeof computeDelivery>;
+  party: Card[];
+  fate?: FinaleFate;   // finales: decided BEFORE narration (P11)
+}
 export interface Breaking { cardId: string; roomId: string; doneAtCycle: number }
 
 export interface GameState {
@@ -125,15 +141,16 @@ export class Game {
         focus: { kind: 'none' }, injuryTiers: 0,
       },
     };
-    for (let l = 1; l < level; l++) {
-      const sh = card.character!.growthLean;
-      for (const a of ['str', 'dex', 'int', 'cha', 'con'] as const) card.character!.attrs[a] += sh[a] * 2;
-    }
-    // a couple of flavor/skill tags
-    const skills = ['melee', 'ranged', 'roguery', 'social', 'nature', 'craft', 'lore', 'heal'];
-    card.tags.push(T(this.rng.pick(skills), this.rng.range(1, 3)));
-    card.tags.push(T(this.rng.pick(['cool', 'hotheaded', 'serious', 'playful', 'greedy', 'generous'])));
-    card.tags.push(T(this.rng.pick(['male', 'female'])));
+    const body = growToLevel(this.rng, level);   // ONE growth implementation (no drift)
+    card.character!.attrs = body.attrs;
+    card.character!.growthLean = body.growthLean;
+    // flavor tags drawn from the vocabulary itself, not a parallel hand list
+    const skillWords = CONCEPTS.filter(c => c.group === 'skill' && !c.id.startsWith('magic-')).map(c => c.id);
+    const persWords = CONCEPTS.filter(c => c.group === 'personality').map(c => c.id);
+    const genders = CONCEPTS.filter(c => c.group === 'gender').map(c => c.id);
+    card.tags.push(T(this.rng.pick(skillWords), this.rng.range(1, 3)));
+    card.tags.push(T(this.rng.pick(persWords)));
+    card.tags.push(T(this.rng.pick(genders)));
     card.name = rollName(this.rng, race);
     return card;
   }
@@ -222,7 +239,10 @@ export class Game {
       ((c.location.kind === 'held' && c.location.state === 'roster') || c.location.kind === 'room'));
   }
   captiveCapacity(): number {
-    return this.state.fort.rooms.filter(r => r.type === 'dungeon-cell').length * 3;
+    return this.state.fort.rooms.reduce((s, r) => {
+      const rt = ROOM_TYPE[r.type]!;
+      return s + (rt.species === 'capacity' ? (rt.cellSlots ?? 0) : 0);
+    }, 0);
   }
   relics(): Card[] {
     return this.state.cards.filter(c => cardType(c) === 'relic' && c.location.kind !== 'quest');
@@ -253,14 +273,13 @@ export class Game {
       const cost = buildCost(rt);
       let reason: string | undefined;
       if (rt.ghTier > t) reason = `needs Great Hall T${rt.ghTier}`;
-      else if (rt.region && rt.id.startsWith('scouting-')) {
+      else if (rt.region && rt.roomKind === 'scouting') {
         const region = REGION[rt.region]!;
         if (region.prev && !this.state.unlockedRegions.includes(region.prev)) reason = `open ${region.prev} first`;
-      } else if (rt.region && !rt.id.startsWith('scouting-') && !this.state.unlockedRegions.includes(rt.region)) {
+      } else if (rt.region && rt.roomKind !== 'scouting' && !this.state.unlockedRegions.includes(rt.region)) {
         reason = `open ${rt.region} first`;
       }
-      if (!reason && rt.id === 'bedroom') { /* multiple allowed */ }
-      else if (!reason && this.hasRoom(rt.id) && rt.id !== 'dungeon-cell') reason = 'already built';
+      if (!reason && !rt.multiBuild && this.hasRoom(rt.id)) reason = 'already built';
       if (!reason && cost > this.gold()) reason = `costs ${cost}g`;
       return { type: rt.id, cost, reason };
     });
@@ -298,19 +317,26 @@ export class Game {
 
   private onBuilt(rt: (typeof ROOM_TYPES)[number], room: Room) {
     this.log('build', `Built: ${rt.name}`);
-    if (rt.id === 'map-room') {
+    if (rt.unlocks === 'quests') {
       // day-0 bootstrap: the Map room grants a visible starter lead packet
       this.state.leads.push(...starterPacket(this.rng, this.state.cycle, () => freshId('lead-')));
       this.log('leads', 'The map table fills: first leads are in.');
     }
-    if (rt.id.startsWith('scouting-') && rt.region) {
+    if (rt.roomKind === 'scouting' && rt.region) {
       if (!this.state.unlockedRegions.includes(rt.region)) this.state.unlockedRegions.push(rt.region);
       const band = REGION[rt.region]!.levelBand;
       this.state.leads.push(huntLead(rt.region, band[0], () => freshId('lead-')));
       this.log('region', `${REGION[rt.region]!.name} is open. Its lead-hunt is on the board.`);
     }
-    if (rt.id.startsWith('endgame-') && rt.region) {
+    if (rt.roomKind === 'endgame' && rt.region) {
       this.state.fort.endgameKeys.push(rt.region);
+      // §13 Outskirts keys: ALL 4 SPINE endgame buildings (Underdeep is NOT a key)
+      const spine = ['forests', 'city', 'coast', 'highlands'];
+      if (spine.every(k => this.state.fort.endgameKeys.includes(k)) &&
+        !this.state.unlockedRegions.includes('outskirts')) {
+        this.state.unlockedRegions.push('outskirts');
+        this.log('region', 'The border-stones fall behind you: THE OUTSKIRTS are open.');
+      }
     }
   }
 
@@ -337,7 +363,7 @@ export class Game {
     const cost = renovateCost(rt);
     if (!this.spendGold(cost)) return { ok: false, msg: `costs ${cost}g` };
     // AI rolls type+style → wants ONCE; engine scores deterministically forever (§18)
-    const vocab = Object.keys(CONCEPT).filter(k => !['character', 'relic', 'stackable', 'gold', 'debt', 'evidence', 'mess', 'obedient'].includes(k));
+    const vocab = CONCEPTS.filter(c => !['type', 'kind', 'status'].includes(c.group)).map(c => c.id);
     const out = await this.ai.themeRoll({
       roomType: room.type, roomName: rt.name, style,
       hintWords: rt.themeHints ?? [], vocabulary: vocab,
@@ -458,9 +484,19 @@ export class Game {
     return { ok: true, msg: `${card.name} moved to the cells` };
   }
 
+  /** ownership boundary — dispositions apply only to cards that are actually YOURS
+   *  (staged candidates must be accepted; limbo focals aren't yours until delivered) */
+  private isOwned(card: Card): boolean {
+    if (card.location.kind === 'room') return true;
+    if (card.location.kind === 'quest') return true;
+    return card.location.kind === 'held' &&
+      (card.location.state === 'roster' || card.location.state === 'inventory');
+  }
+
   ransom(captiveId: string): { ok: boolean; msg: string } {
     const card = this.card(captiveId);
     if (card?.character?.role !== 'captive') return { ok: false, msg: 'not a captive' };
+    if (!this.isOwned(card)) return { ok: false, msg: 'not yours to ransom (accept them first)' };
     const office = this.state.fort.rooms.find(r => r.type === 'ransom-office');
     const rate = office ? ransomRate(this.comfort(office)) : RANSOM_RATE;
     const pay = Math.round(card.value * rate);
@@ -476,8 +512,9 @@ export class Game {
   sell(relicId: string): { ok: boolean; msg: string } {
     const card = this.card(relicId);
     if (!card || cardType(card) !== 'relic') return { ok: false, msg: 'not a relic' };
+    if (!this.isOwned(card)) return { ok: false, msg: 'not yours to sell' };
     const market = this.state.fort.rooms.find(r => r.type === 'market');
-    const rate = market ? marketSellRate(this.comfort(market)) : 0.5;
+    const rate = market ? marketSellRate(this.comfort(market)) : SELL_RATE;
     const pay = Math.round(card.value * rate);
     this.unslotCard(card);
     this.state.cards = this.state.cards.filter(c => c.id !== relicId);
@@ -501,11 +538,19 @@ export class Game {
     if (!room) return { ok: false, msg: 'build an Interrogation room' };
     const card = this.card(captiveId);
     if (card?.character?.role !== 'captive') return { ok: false, msg: 'not a captive' };
-    if (card.chainIds.includes('interrogated')) return { ok: false, msg: 'already interrogated' };
-    const cost = Math.round(30 + card.value * 0.1);
+    if (!this.isOwned(card)) return { ok: false, msg: 'not yours to question (accept them first)' };
+    if (hasTag(card.tags, 'interrogated')) return { ok: false, msg: 'already interrogated' };
+    // priced per-captive action (🛠 INTERROGATE_COST — ledgered)
+    const cost = Math.round(INTERROGATE_BASE + card.value * INTERROGATE_FRAC);
     if (!this.spendGold(cost)) return { ok: false, msg: `costs ${cost}g` };
-    card.chainIds.push('interrogated');
+    card.tags.push({ concept: 'interrogated' });
     const lead = rollFreshLead(this.rng, this.leadCtx(), () => freshId('lead-'), 'interrogation');
+    // the room's comfort IS its benefit (FORT §5: leads only) — good comfort loosens tongues:
+    // a chance to upgrade the lead's rarity one step
+    if (this.rng.chance(Math.min(0.6, this.comfort(room) / 40))) {
+      if (lead.rarity === 'common') lead.rarity = 'uncommon';
+      else if (lead.rarity === 'uncommon') lead.rarity = 'rare';
+    }
     this.state.leads.push(lead);
     this.log('interrogate', `${card.name} talks: a ${lead.rarity} ${lead.archetype} lead in ${REGION[lead.region]!.name}.`);
     return { ok: true, msg: 'they talked' };
@@ -515,6 +560,7 @@ export class Game {
     if (!this.hasRoom('hospital')) return { ok: false, msg: 'build the Hospital' };
     const c = this.card(mercId);
     if (!c?.character || c.character.injuryTiers <= 0) return { ok: false, msg: 'not injured' };
+    if (!this.isOwned(c)) return { ok: false, msg: 'not one of yours' };
     const cost = payHealCost(c.character.injuryTiers, vBase(c.character.level));
     if (!this.spendGold(cost)) return { ok: false, msg: `costs ${cost}g` };
     c.character.injuryTiers = 0;
@@ -581,7 +627,7 @@ export class Game {
 
   private buildSlots(n: number, level: number, rarity: Rarity, archetype: Lead['archetype'], ask: AskSlotOut[],
     maxDifficulty?: 'standard' | 'hard'): QuestSlot[] {
-    const CAP_ORDER = ['trivial', 'standard', 'hard', 'brutal', 'extreme'];
+    const CAP_ORDER = DIFFICULTY_ORDER;
     const slots: QuestSlot[] = [];
     for (let i = 0; i < n; i++) {
       const a = ask[i];
@@ -637,12 +683,12 @@ export class Game {
       chainInfo: { kind: 'starts-new' }, expiresAtCycle: this.state.cycle + LEAD_TTL * 3,
       source: 'personal', title: `${merc.name}'s past stirs`,
     };
-    (lead as Lead & { personalMercId?: string }).personalMercId = merc.id;
+    lead.personalMercId = merc.id;
     this.state.leads.push(lead);
   }
 
   private async generateGenesis(lead: Lead): Promise<Quest> {
-    const personalMercId = (lead as Lead & { personalMercId?: string }).personalMercId;
+    const personalMercId = lead.personalMercId;
     const returning = lead.focalId ? this.card(lead.focalId) : undefined;
     // a sequel whose focal has since become YOUR merc = a personal chain about them
     // (never yank a roster merc into limbo)
@@ -665,7 +711,8 @@ export class Game {
     }
     this.ensureLoreNode(focal);
     // lore retrieval: recall around the focal + wildcards from the known cast
-    const wildcards = Object.keys(this.state.lore.nodes).filter(id => id !== focal.id).slice(0, 3);
+    const wildcardPool = Object.values(this.state.lore.nodes).filter(n => n.active && n.id !== focal.id).map(n => n.id);
+    const wildcards = this.rng.shuffle([...wildcardPool]).slice(0, 3);
     const candidates = recall(this.state.lore, focal.id, this.state.cycle, wildcards);
     const picked = candidates.length > 8
       ? await this.ai.select({ purpose: 'who needs full dossiers for this saga', candidates: candidates.map(c => ({ id: c.node.id, name: c.node.name, blurb: c.node.blurb, relationPhrase: c.relationPhrase })), max: 4 })
@@ -674,7 +721,8 @@ export class Game {
       id: c.node.id, name: c.node.name, blurb: c.node.blurb, relationPhrase: c.relationPhrase,
       dossier: picked.includes(c.node.id) ? this.dossier(c.node.id) : undefined,
     }));
-    const assignedNames = [rollName(this.rng, 'human'), rollName(this.rng, 'human')];
+    const races = Object.entries(REGION[lead.region]!.poolWeights) as [string, number][];
+    const assignedNames = Array.from({ length: 4 }, () => rollName(this.rng, this.rng.weighted(races)));
     const g = await this.ai.genesis({
       seed: sampleSeed(this.rng), keywords: sampleKeywords(this.rng),
       region: REGION[lead.region]!.name, regionSeed: REGION[lead.region]!.seed,
@@ -689,6 +737,20 @@ export class Game {
       this.state.lore.nodes[id] = { id, kind: 'place', name: p.name || rollPlaceName(this.rng), blurb: p.blurb.slice(0, 120), identity: p.blurb.slice(0, 120), active: true, createdCycle: this.state.cycle };
     }
     guardEdges(this.state.lore, g.newEdges, this.state.cycle, () => freshId('e'));
+    // §4b NAME GUARD: the AI never invents character names. Known-cast entries keep their
+    // lore-node names; NEW cast entries must use engine-rolled names (assignedNames, in order).
+    {
+      const legal = new Set<string>([focal.name, ...slate.map(x => x.name), ...assignedNames]);
+      let next = 0;
+      for (const member of g.cast) {
+        if (member.loreId && this.state.lore.nodes[member.loreId]) {
+          member.name = this.state.lore.nodes[member.loreId]!.name;   // canon wins
+        } else if (!legal.has(member.name)) {
+          const replacement = assignedNames[next++] ?? rollName(this.rng, this.rng.weighted(races));
+          member.name = replacement;
+        }
+      }
+    }
     const chain: Chain = {
       id: freshId('chain-'), kind: eco.kind, isPersonal, focalId: focal.id,
       level: lead.level, rarity: lead.rarity, region: lead.region,
@@ -709,7 +771,8 @@ export class Game {
 
   private async generateChainBeat(chain: Chain, lead: Lead): Promise<Quest> {
     const isFinale = finaleReady(chain);
-    const n = isFinale ? Math.min(3, 1 + Math.floor(chain.expectedBeats / 2)) : slotCount(this.rng, 'investigate', chain.rarity);
+    // finales are ALWAYS one slot per approach (3 mutex plans); the AI is told the true shape
+    const n = isFinale ? 3 : slotCount(this.rng, 'investigate', chain.rarity);
     const sideLootV = isFinale ? 0 : beatSideLoot(this.rng, chain);
     const focal = this.card(chain.focalId);
     const out = await this.ai.writeQuest({
@@ -840,15 +903,22 @@ export class Game {
     st.cycle += 1;
     const report: string[] = [];
 
-    // 1) resolve committed quests in quest-id order (all party slots filled = committed)
+    // 1) resolve committed quests in quest-id order (all party slots filled = committed).
+    // DELIVERY IS COMPUTED HERE, BEFORE THE AI NARRATES — including the finale's fate
+    // (QUESTS §8 solidity rule b; the narrator must name what is actually delivered).
     const ready = st.quests.filter(q => q.state === 'open' && this.isCommitted(q)).sort((a, b) => a.id.localeCompare(b.id));
-    const resolutions: { quest: Quest; outcome: Outcome; delivery: ReturnType<typeof computeDelivery>; party: Card[] }[] = [];
+    const resolutions: Resolution[] = [];
     for (const q of ready) {
       const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
       const party = active.map(s => this.card(s.filledBy!)!);
       const rolled = resolvePooled(this.rng, active.map(s => ({ unit: this.card(s.filledBy!)!, test: s.test })));
       const delivery = computeDelivery(this.rng, q, rolled.outcome);
-      resolutions.push({ quest: q, outcome: rolled.outcome, delivery, party });
+      let fate: FinaleFate | undefined;
+      if (q.isFinale && q.chainId) {
+        const chain = st.chains.find(c => c.id === q.chainId);
+        if (chain) fate = finaleFate(this.rng, chain, rolled.outcome);
+      }
+      resolutions.push({ quest: q, outcome: rolled.outcome, delivery, party, fate });
     }
 
     // 2) ONE batched AI call for all resolutions
@@ -862,6 +932,7 @@ export class Game {
         bible: this.state.chains.find(c => c.id === r.quest.chainId)?.bible,
         storyState: this.state.chains.find(c => c.id === r.quest.chainId)?.story,
         isFinale: !!r.quest.isFinale,
+        fate: r.fate?.fate,
       } : undefined,
     }));
     const aiOuts = aiInputs.length ? await this.ai.resolve(aiInputs) : [];
@@ -903,9 +974,10 @@ export class Game {
       const age = st.cycle - (st.liabilityBirth[c.id] ?? st.cycle);
       // one live collector per liability at a time
       if (st.leads.some(l => l.liabilityId === c.id) ||
-        st.quests.some(q => q.state === 'open' && (st.leads.find(l => l.id === q.leadId)?.liabilityId === c.id))) continue;
+        st.quests.some(q => q.state === 'open' && q.liabilityId === c.id)) continue;
       if (liabilityTriggers(this.rng, age)) {
         const lead = rollFreshLead(this.rng, this.leadCtx(), () => freshId('lead-'), 'collector');
+        lead.chainInfo = { kind: 'none' };   // a collection job is a one-off — it must be able to SETTLE
         lead.title = `The ${c.name} surfaces — deal with it`;
         lead.liabilityId = c.id;
         st.leads.push(lead);
@@ -942,7 +1014,7 @@ export class Game {
         this.state.leads.push({
           id: freshId('lead-'), rarity: chain.rarity, level: chain.level, region: chain.region,
           archetype: 'investigate', chainInfo: { kind: 'continues', chainId: chain.id, hook: chain.story.currentSituation },
-          expiresAtCycle: this.state.cycle + LEAD_TTL + 6, source: 'continuation',
+          expiresAtCycle: this.state.cycle + LEAD_TTL + CONTINUATION_TTL_BONUS, source: 'continuation',
           title: `${chain.bible.title} — the thread dangles`,
         });
       }
@@ -956,7 +1028,16 @@ export class Game {
     return active.length > 0 && active.every(s => s.filledBy);   // ALL party slots filled (no partial sends)
   }
 
-  private describeDelivery(r: { delivery: ReturnType<typeof computeDelivery>; outcome: Outcome }): string {
+  private describeDelivery(r: Resolution): string {
+    if (r.quest.isFinale && r.fate && r.quest.chainId) {
+      const chain = this.state.chains.find(c => c.id === r.quest.chainId);
+      const focal = chain ? this.card(chain.focalId) : undefined;
+      const approach = r.quest.approaches?.find(a => a.id === r.quest.chosenApproach);
+      const kind = approach?.rewardKind ?? 'gold';
+      if (r.fate.fate === 'slipped') return `${focal?.name ?? 'the prize'} slips away — the season's bank is forfeit (a road back will exist)`;
+      if (r.fate.fate === 'saddled') return `${focal?.name ?? 'the prize'} delivered as ${kind}, but lesser — the bargain came saddled`;
+      return `${focal?.name ?? 'the prize'} delivered clean as ${kind}, with the season's surplus`;
+    }
     if (r.outcome === 'failure') return 'nothing — the reward is lost';
     const bits = r.delivery.cards.map(c => c.character ? `${c.name} (${c.character.role})` : c.qty ? `${c.qty} gold` : c.name);
     if (r.delivery.liability) bits.push(`and a ${r.delivery.liability.name} left behind`);
@@ -964,7 +1045,7 @@ export class Game {
   }
 
   private applyResolution(
-    r: { quest: Quest; outcome: Outcome; delivery: ReturnType<typeof computeDelivery>; party: Card[] },
+    r: Resolution,
     out: { before: string; after: string; injuries: { characterId: string; band: InjuryBand }[]; fleshed: { characterId: string; who: string; backstory: string; quirks: string[] }[]; edges: { from: string; to: string; type: string; blurb: string; importance: number }[]; storyUpdate?: { currentSituation: string; newlyRevealed: string[]; openThreads: string[] } } | undefined,
     report: string[],
     pendingEdges: { from: string; to: string; type: string; blurb: string; importance: number }[],
@@ -998,14 +1079,14 @@ export class Game {
         if (fleshed) { c.character.who = fleshed.who; c.character.backstory = fleshed.backstory; c.character.quirks = fleshed.quirks }
         this.ensureLoreNode(c);
         if (c.character.role === 'captive') {
-          st.holding.push({ cardId: c.id, expiresAtCycle: st.cycle + 4 });
+          st.holding.push({ cardId: c.id, expiresAtCycle: st.cycle + STAGE_TTL_HOLDING });
           c.location = HELD('staged');
-          report.push(`⛓ ${c.name} is in holding (accept within 4 cycles).`);
+          report.push(`⛓ ${c.name} is in holding (accept within ${STAGE_TTL_HOLDING} cycles).`);
           if (!st.cards.includes(c)) st.cards.push(c);
         } else if (this.hasRoom('tavern')) {
-          st.tavern.push({ cardId: c.id, expiresAtCycle: st.cycle + 5 });
+          st.tavern.push({ cardId: c.id, expiresAtCycle: st.cycle + STAGE_TTL_TAVERN });
           c.location = HELD('staged');
-          report.push(`🍺 ${c.name} waits at the tavern (hire within 5 cycles).`);
+          report.push(`🍺 ${c.name} waits at the tavern (hire within ${STAGE_TTL_TAVERN} cycles).`);
           if (!st.cards.includes(c)) st.cards.push(c);
         } else {
           // no Tavern yet — the grateful rescued pay what they can and move on (🛠 salvage)
@@ -1048,12 +1129,11 @@ export class Game {
     if (out) { report.push(out.before); report.push(out.after) }
     this.log('resolve', `${q.title}: ${r.outcome}`, q.id);
     // chain advancement
-    if (q.chainId) this.advanceChain(q, r, out?.storyUpdate, report);
-    st.quests = st.quests.filter(x => x.state !== 'resolved' || x.id === q.id); // keep last for reading? drop all resolved
+    if (q.chainId) this.advanceChain(q, r, out?.storyUpdate, report, r.fate);
     st.quests = st.quests.filter(x => x.state !== 'resolved');
   }
 
-  private advanceChain(q: Quest, r: { outcome: Outcome; party: Card[] }, storyUpdate: { currentSituation: string; newlyRevealed: string[]; openThreads: string[] } | undefined, report: string[]) {
+  private advanceChain(q: Quest, r: { outcome: Outcome; party: Card[] }, storyUpdate: { currentSituation: string; newlyRevealed: string[]; openThreads: string[] } | undefined, report: string[], fate?: FinaleFate) {
     const st = this.state;
     const chain = st.chains.find(c => c.id === q.chainId);
     if (!chain) return;
@@ -1062,23 +1142,24 @@ export class Game {
       chain.story.knownToPlayer.push(...storyUpdate.newlyRevealed);
       chain.story.openThreads = storyUpdate.openThreads.slice(0, 5);
     }
-    if (q.isFinale) return this.settleFinale(q, chain, r, report);
+    if (q.isFinale) return this.settleFinale(q, chain, r, report, fate);
     bankBeat(chain, r.party.length, r.outcome, q.sideLootV ?? 0);
     const focal = this.card(chain.focalId);
     // continuation lead (cached title, zero AI)
     st.leads.push({
       id: freshId('lead-'), rarity: chain.rarity, level: chain.level, region: chain.region,
       archetype: 'investigate', chainInfo: { kind: 'continues', chainId: chain.id, hook: chain.story.currentSituation },
-      expiresAtCycle: st.cycle + LEAD_TTL + 4, source: 'continuation',
+      expiresAtCycle: st.cycle + LEAD_TTL + CONTINUATION_TTL_BONUS, source: 'continuation',
       title: `${chain.bible.title} — ${finaleReady(chain) ? 'the reckoning nears' : 'the story continues'}`,
     });
     report.push(`📖 ${chain.bible.title}: bank ${chain.bank.toFixed(0)}g of a ~${chain.payoff.toFixed(0)}g season${finaleReady(chain) ? ' — FINALE next' : ''}. ${focal?.name ?? ''} remains at the center.`);
   }
 
-  private settleFinale(q: Quest, chain: Chain, r: { outcome: Outcome; party: Card[] }, report: string[]) {
+  private settleFinale(q: Quest, chain: Chain, r: { outcome: Outcome; party: Card[] }, report: string[], precomputed?: FinaleFate) {
     const st = this.state;
     const focal = this.card(chain.focalId);
-    const fate = finaleFate(this.rng, chain, r.outcome);
+    // the fate was decided BEFORE the AI narrated (P11); recompute only as a fallback
+    const fate = precomputed ?? finaleFate(this.rng, chain, r.outcome);
     const approach = q.approaches?.find(a => a.id === q.chosenApproach);
     if (fate.fate === 'slipped') {
       // §21-4a: bank forfeit; focal slips away FOR NOW — alive in the lore graph, sequel lead back
@@ -1101,7 +1182,6 @@ export class Game {
       const surplus = Math.round(chain.bank);
       this.addGold(surplus);
       guardEdges(st.lore, [{ from: chain.focalId, to: chain.focalId, type: 'scarred-by', blurb: `came through ${chain.bible.title}`, importance: 0.9 }], st.cycle, () => freshId('e'));
-      if (focal) guardEdges(st.lore, [], st.cycle, () => freshId('e'));
       report.push(`🏅 ${focal?.name}'s story closes: +${surplus}g and a mark that stays.`);
       return;
     }
@@ -1115,14 +1195,14 @@ export class Game {
       report.push(`💰 The season crystallizes as coin: +${pay}g${fate.fate === 'saddled' ? ' (a hard bargain — the full price slipped away)' : ''}. ${focal.name} passes out of your hands.`);
     } else {
       focal.character!.role = kind === 'recruit' ? 'npc' : 'captive';
-      if (kind === 'recruit') { st.tavern.push({ cardId: focal.id, expiresAtCycle: st.cycle + 6 }); focal.location = HELD('staged') }
-      else { st.holding.push({ cardId: focal.id, expiresAtCycle: st.cycle + 6 }); focal.location = HELD('staged') }
+      if (kind === 'recruit') { st.tavern.push({ cardId: focal.id, expiresAtCycle: st.cycle + STAGE_TTL_FINALE }); focal.location = HELD('staged') }
+      else { st.holding.push({ cardId: focal.id, expiresAtCycle: st.cycle + STAGE_TTL_FINALE }); focal.location = HELD('staged') }
       const surplus = crystallize(chain, focal.value);
       this.addGold(surplus);
       // a bank SHORT of the focal's value delivers them WITH A DEBT (QUESTS §5);
       // the AI-slips-for-salvage variant only when catastrophically thin
-      let shortDebt = Math.max(0, Math.round(focal.value - chain.bank));
-      if (fate.fate === 'saddled') shortDebt += fate.debt;
+      // ONE debt rule: the shortfall between the bank and the focal's mark (QUESTS §5)
+      const shortDebt = Math.max(0, Math.round(focal.value - chain.bank));
       if (shortDebt > 0) this.addCard(mintStackable('debt', shortDebt));
       report.push(`🎬 Finale: ${focal.name} is yours — ${kind}${shortDebt > 0 ? `, but the season ran short: a ${shortDebt}g debt comes with them` : ''}. Surplus: ${surplus}g.`);
     }
@@ -1131,7 +1211,7 @@ export class Game {
 
   private healingPass() {
     const infirmary = this.state.fort.rooms.find(r => r.type === 'infirmary');
-    const rate = infirmary ? infirmaryHealRate(this.comfort(infirmary)) : 0.5;
+    const rate = infirmary ? infirmaryHealRate(this.comfort(infirmary)) : REST_HEAL_PER_CYCLE;
     for (const c of this.state.cards) {
       if (!c.character || c.character.injuryTiers <= 0) continue;
       if (c.location.kind === 'quest') continue;    // deployed units don't heal
@@ -1150,7 +1230,6 @@ export class Game {
       // off the rack, back to the cells — ready to be stationed
       this.unslotCard(card);
       card.location = HELD('roster');
-      guardEdges(st.lore, [], st.cycle, () => freshId('e'));
       report.push(`🔗 ${card.name} is broken — obedient, stationable.`);
     }
   }

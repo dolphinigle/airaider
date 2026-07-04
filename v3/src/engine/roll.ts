@@ -19,6 +19,7 @@ export const INJURY_FRAC = 0.2;      // §11: flat penalty = tiers × 0.2·U
 export const PARTIAL_FRAC = 0.6;
 
 export type DifficultyName = 'trivial' | 'standard' | 'hard' | 'brutal' | 'extreme';
+export const DIFFICULTY_ORDER: readonly DifficultyName[] = ['trivial', 'standard', 'hard', 'brutal', 'extreme'];
 export const DIFFICULTY_E: Record<DifficultyName, number> =
   { trivial: 0.25, standard: 0.5, hard: 1.0, brutal: 1.5, extreme: 2.0 };
 

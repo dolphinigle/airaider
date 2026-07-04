@@ -69,6 +69,7 @@ export const CONCEPTS: TagConcept[] = [
   // kinds — gold/debt (§9b W18) + evidence/mess (liability kinds per §7.1/§10 supersession)
   C('gold', 'kind', 1), C('debt', 'kind', 1), C('evidence', 'kind', 1), C('mess', 'kind', 1),
   C('obedient', 'status', 1),
+  C('interrogated', 'status', 1),
 
   // W1 personality — 7 opposite-pairs, all flat, all value 0
   ...pair(C('cool', 'personality', 1), C('hotheaded', 'personality', 1)),
