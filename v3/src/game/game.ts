@@ -1103,10 +1103,12 @@ export class Game {
     }
     if (!focal) return;
     if (kind === 'gold') {
-      const pay = Math.round(focal.value + crystallize(chain, focal.value));
+      // partial = the LESSER version of the kind (QUESTS §9) — a discounted cash-out
+      const full = Math.round(focal.value + crystallize(chain, focal.value));
+      const pay = fate.fate === 'saddled' ? Math.round(full * 0.7) : full;
       this.addGold(pay);
       focal.location = HELD('lore');
-      report.push(`💰 The season crystallizes as coin: +${pay}g. ${focal.name} passes out of your hands.`);
+      report.push(`💰 The season crystallizes as coin: +${pay}g${fate.fate === 'saddled' ? ' (a hard bargain — the full price slipped away)' : ''}. ${focal.name} passes out of your hands.`);
     } else {
       focal.character!.role = kind === 'recruit' ? 'npc' : 'captive';
       if (kind === 'recruit') { st.tavern.push({ cardId: focal.id, expiresAtCycle: st.cycle + 6 }); focal.location = HELD('staged') }

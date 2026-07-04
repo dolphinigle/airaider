@@ -196,6 +196,7 @@ export function makeOpenAiProvider(): AiProvider {
         '2) "after": what happened, knowing the outcome. Give EVERY party member their own beat driven by their tags/quirks/dossier — never the party as a blob. Name the delivered rewards exactly as given.',
         'WORD BUDGET by rarity: common → before 1 sentence, after 2 sentences MAX. uncommon → 2/3. rare or finale → 3/5. Respect it strictly.',
         'Injuries: judge from the fiction per member (none/low/med/high) — typically on failure, sometimes none even then; never death.',
+        'NEVER declare recruitments, joinings, departures, deaths, or ownership changes — the ENGINE decides all dispositions; you narrate only what was delivered as given.',
         'Flesh each delivered character: who (one line), backstory (2 sentences), quirks (1-2 concrete habits).',
         NUMBER_BAN, EDGE_TYPES_LINE,
         'Memory edges: 0-2 per quest, only for moments that should be REMEMBERED. importance is a NUMBER between 0 and 1 (0.8+ = defining/core). Use character ids given.',
