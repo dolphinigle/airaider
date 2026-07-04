@@ -26,6 +26,7 @@ export interface Lead {
   expiresAtCycle: number | null;   // null = standing (repeatable lead-hunts)
   source: 'starter' | 'hunt' | 'reward' | 'continuation' | 'personal' | 'interrogation' | 'collector' | 'sequel';
   title?: string;                  // cached chain title for continuation leads (zero AI cost)
+  focalId?: string;                // sequel leads (§21-4a): the SLIPPED focal — the road back is to THEM
 }
 
 export const LEAD_TTL = 6; // cycles before an unpursued lead lapses 🛠

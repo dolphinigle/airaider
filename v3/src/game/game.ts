@@ -333,6 +333,7 @@ export class Game {
     if (!room) return { ok: false, msg: 'no such room' };
     const rt = ROOM_TYPE[room.type]!;
     if (rt.species !== 'comfort') return { ok: false, msg: 'only comfort rooms take a style' };
+    if (rt.benefit === 'cap') return { ok: false, msg: 'a bedroom takes after its owner, not a style' };
     const cost = renovateCost(rt);
     if (!this.spendGold(cost)) return { ok: false, msg: `costs ${cost}g` };
     // AI rolls type+style → wants ONCE; engine scores deterministically forever (§18)
@@ -544,6 +545,15 @@ export class Game {
     if (!lead) return { ok: false, msg: 'no such lead' };
     if (lead.expiresAtCycle === null && this.state.quests.some(q => q.leadId === lead.id && q.state === 'open'))
       return { ok: false, msg: 'that hunt is already underway' };
+    if (lead.chainInfo.kind === 'continues') {
+      const chain = this.state.chains.find(c => c.id === (lead.chainInfo as { chainId: string }).chainId);
+      if (!chain || (chain.state !== 'active' && chain.state !== 'finale-pending')) {
+        this.state.leads = this.state.leads.filter(l => l.id !== leadId);
+        return { ok: false, msg: 'that story has already ended — the lead is stale' };
+      }
+      if (this.state.quests.some(q => q.chainId === chain.id && q.state === 'open'))
+        return { ok: false, msg: 'that story already has an open quest' };
+    }
     if (lead.expiresAtCycle === null) {
       // standing hunts track the roster: re-level into the region band at pursue time
       const band = REGION[lead.region]!.levelBand;
@@ -562,7 +572,8 @@ export class Game {
       quest = await this.generateOneOff(lead);
     }
     this.state.quests.push(quest);
-    if (lead.expiresAtCycle !== null) {
+    // consume the lead — only repeatable HUNTS stay standing after pursue
+    if (lead.expiresAtCycle !== null || lead.archetype !== 'lead-hunt') {
       this.state.leads = this.state.leads.filter(l => l.id !== leadId);
     }
     return { ok: true, msg: `Quest generated: ${quest.title}`, questId: quest.id };
@@ -628,10 +639,15 @@ export class Game {
     const personalMercId = (lead as Lead & { personalMercId?: string }).personalMercId;
     const isPersonal = !!personalMercId && !!this.card(personalMercId);
     const eco = newChainEconomy(this.rng, lead.level, lead.rarity);
-    // the focal character FIRST (§2): personal → the merc; else generated at the payoff value
+    // the focal character FIRST (§2): personal → the merc; sequel → the SLIPPED focal
+    // returns from the lore graph (§21-4a); else generated at the payoff value
     let focal: Card;
+    const returning = lead.focalId ? this.card(lead.focalId) : undefined;
     if (isPersonal) focal = this.card(personalMercId!)!;
-    else {
+    else if (returning) {
+      focal = returning;
+      focal.location = HELD('limbo');   // back within reach, not yet owned
+    } else {
       const spec = { kind: 'captive' as const, value: eco.focalTarget };
       focal = materializeReward(this.rng, spec, lead.level, lead.region)[0]!;
       focal.location = HELD('limbo');
@@ -791,7 +807,20 @@ export class Game {
 
   // ---- END CYCLE (the reckoning) -----------------------------------------------------------------------
 
+  private cycleInFlight = false;
+
   async endCycle(): Promise<string[]> {
+    // re-entrancy guard: a double END (GUI double-click) must never interleave
+    if (this.cycleInFlight) return ['(the cycle is already resolving)'];
+    this.cycleInFlight = true;
+    try {
+      return await this.doEndCycle();
+    } finally {
+      this.cycleInFlight = false;
+    }
+  }
+
+  private async doEndCycle(): Promise<string[]> {
     const st = this.state;
     st.cycle += 1;
     const report: string[] = [];
@@ -1027,6 +1056,7 @@ export class Game {
         id: freshId('lead-'), rarity: fate.sequelRarity, level: chain.level, region: chain.region,
         archetype: 'investigate', chainInfo: { kind: 'starts-new' }, expiresAtCycle: null,
         source: 'sequel', title: `${focal?.name ?? 'They'} resurface, someday`,
+        focalId: focal?.id,   // §21-4a: the road back leads to the SAME person
       };
       st.leads.push(sequel);
       report.push(`💨 ${focal?.name ?? 'The prize'} slips away — for now. The season's bank is forfeit. A road back exists (${fate.sequelRarity} sequel lead).`);

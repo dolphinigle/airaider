@@ -189,3 +189,47 @@ describe('hostile-order edge cases', () => {
     clean(g);
   });
 });
+
+describe('§21-4a sequel road-back', () => {
+  it('a slipped focal returns as the SAME card when the sequel lead is pursued', async () => {
+    const g = new Game(new MockProvider(31), 31);
+    g.state.cards.push(mintStackable('gold', 50000));
+    g.build('map-room');
+    g.build('lead-room');
+    const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new')!;
+    await g.pursue(story.id);
+    const chain = g.state.chains[0]!;
+    const focalId = chain.focalId;
+    // force a finale and fail it
+    chain.cyclesSpent = 999;
+    for (const q of [...g.state.quests]) g.abandon(q.id);
+    g.state.leads.push({
+      id: freshId('lead-'), rarity: chain.rarity, level: chain.level, region: chain.region,
+      archetype: 'investigate', chainInfo: { kind: 'continues', chainId: chain.id, hook: 'x' },
+      expiresAtCycle: g.state.cycle + 5, source: 'continuation',
+    });
+    await g.pursue(g.state.leads[g.state.leads.length - 1]!.id);
+    const finale = g.state.quests.find(q => q.isFinale)!;
+    g.chooseApproach(finale.id, finale.approaches![0]!.id);
+    const slotIdx = finale.slots.findIndex(s => s.groupId === finale.approaches![0]!.id);
+    const merc = g.roster()[0]!;
+    // sabotage: massive injury → 0 coins → guaranteed failure
+    merc.character!.injuryTiers = 99;
+    g.assign(finale.id, slotIdx, merc.id);
+    await g.endCycle();
+    expect(chain.state).toBe('slipped');
+    const focal = g.card(focalId)!;
+    expect(focal.location).toEqual(HELD('lore'));
+    const sequel = g.state.leads.find(l => l.source === 'sequel')!;
+    expect(sequel.focalId).toBe(focalId);
+    // pursue the sequel: the SAME card comes back within reach
+    await g.pursue(sequel.id);
+    expect(g.card(focalId)!.location).toEqual(HELD('limbo'));
+    const newChain = g.state.chains.find(c => c.id !== chain.id)!;
+    expect(newChain.focalId).toBe(focalId);
+    // and the sequel lead is consumed (no double-pursue into parallel sagas)
+    expect(g.state.leads.some(l => l.source === 'sequel')).toBe(false);
+    const errs = auditGame(g);
+    expect(errs, errs.join(' | ')).toEqual([]);
+  });
+});

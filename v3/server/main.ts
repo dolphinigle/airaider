@@ -153,8 +153,18 @@ const app = Fastify();
 
 app.get('/api/state', async () => stateView());
 
+// actions run strictly one-at-a-time — concurrent requests (double-clicks) must
+// never interleave inside an awaiting action
+let actionChain: Promise<unknown> = Promise.resolve();
+
 app.post<{ Body: { type: string; args: (string | number)[] } }>('/api/action', async (req) => {
-  const { type, args } = req.body;
+  const run = actionChain.then(() => handleAction(req.body));
+  actionChain = run.catch(() => undefined);
+  return run;
+});
+
+async function handleAction(body: { type: string; args: (string | number)[] }) {
+  const { type, args } = body;
   const a = args ?? [];
   const s = (x: unknown) => String(x);
   const n = (x: unknown) => Number(x);
@@ -195,7 +205,7 @@ app.post<{ Body: { type: string; args: (string | number)[] } }>('/api/action', a
   }
   autosave();
   return result;
-});
+}
 
 const port = Number(process.env.PORT ?? 3210);
 app.listen({ port, host: '127.0.0.1' }).then(() => {
