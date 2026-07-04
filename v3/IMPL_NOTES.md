@@ -23,6 +23,26 @@ was not reopened. Dogfooding = the autoplay harness (`scripts/autoplay.ts`, mock
 | 12 | **Bedroom wants bind dynamically to the owner's tags** (+furniture/decoration) via `effectiveWants` | CARDS §2 owner-binding | — |
 | 13 | Torture-chamber racks accept RAW captives (its slots = the breaking pipe; duration = f(comfort) 5→2c) | §21.4 | — |
 
+## Dogfood rounds 3–6 (2026-07-04, the long grind)
+
+| # | Ruling / fix | Anchor | Found by |
+|---|---|---|---|
+| 14 | **Invariant auditor** (`src/game/audit.ts`) — card↔slot bijection, staging integrity, numeric sanity — runs per-cycle in autoplay + in tests | — | (tooling) |
+| 15 | **Staging boundary sealed**: staged/limbo cards can't be slotted; `captives()` = owned only | GAME_STATE §6 | auditor: holding captive racked → corrupted |
+| 16 | Ransom mid-break cleans the rack queue · staged-expiry sends people to lore (no orphans) · one bedroom per owner | — | hostile-order tests |
+| 17 | **endCycle re-entrancy guard + server action serialization** (GUI double-click safety) | — | code review |
+| 18 | **Stale continuation leads pruned**; one open quest per chain | — | code review (ghost-finale repro) |
+| 19 | **§21-4a sequel leads carry the slipped focal** — the road back is to the SAME card (limbo on pursue, lead consumed) | §21-4a | code review + roundtrip test |
+| 20 | **Engine injury guard**: success → none, partial → at most low (AI was wounding on nearly every success) | §11 + §16-F5 wording | real-AI prose audit |
+| 21 | **Beat-1/2 difficulty caps** (standard/hard) — chains were dying at b2 before the player could care | QUESTS §8-B "beat 1 makes the player CARE" | real-AI campaign (2/3 chains slipped at b2) |
+| 22 | **Ledger-crutch ban** in genesis AND quest-writer + engine-rolled place-name suggestions (every quest was a Thornhollow ledger) | §5 empirical note | real-AI prose audit (3/3 chains "…Ledger") |
+| 23 | **Collector loop closed**: liability leads carry `liabilityId`; winning the collection quest settles it; one live collector per liability | §10 impl note | 400c verbose (fuse re-triggered forever) |
+| 24 | Resolver word budgets by rarity (common 1/2 sentences … finale 3/5) | QUESTS §10 latency | real-AI log length |
+| 25 | Determinism tests: same-seed identity · **load is byte-idempotent** · post-reload AI divergence is BY DESIGN (persisted-producer) | GAME_STATE §2 | — |
+| 26 | Chaos monkey: 4,000 random/garbage actions, audited — no throws, no corruption | — | (tooling) |
+
+Marathon state: 3 seeds × 2,200 cycles audit-clean (GH T5–T7); save at c2200 ≈ 2–5 MB (post-proto: compaction).
+
 ## Balance state (mock autoplay, seeds 5/21, 800 cycles)
 T5 ≈ c500–660 · tier cadence ~100–220c (budget ~130–190 for a human; the bot is naive) ·
 outcome mix ≈ 55–65% success / 25–30% partial / 8–15% failure · chains complete b2–b6, slip ~20% ·
