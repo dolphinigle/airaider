@@ -226,7 +226,9 @@ function Roster({ s, doAct }: any) {
           <p className="tags">{m.tags}</p>
           <p>STR {m.character.attrs.str.toFixed(1)} · DEX {m.character.attrs.dex.toFixed(1)} · INT {m.character.attrs.int.toFixed(1)} · CHA {m.character.attrs.cha.toFixed(1)} · CON {m.character.attrs.con.toFixed(1)}</p>
           {m.character.who && <p><i>{m.character.who}</i></p>}
-          <details><summary>dossier · focus</summary>
+          {m.character.quirks?.length > 0 && <p className="quirks">✦ {m.character.quirks.join(' · ')}</p>}
+          <details><summary>story · dossier · focus</summary>
+            {m.character.backstory && <p>{m.character.backstory}</p>}
             <pre>{m.dossier}</pre>
             <p>focus: {JSON.stringify(m.character.focus)}
               {['str', 'dex', 'int', 'cha', 'con'].map(a =>
@@ -309,7 +311,9 @@ function People({ s, doAct }: any) {
       {s.tavern.map((c: any) => (
         <div className="cardrow" key={c.id}>
           <h3>{c.name} <small>L{c.character.level} · leaves c{c.expires}</small></h3>
+          {c.character.who && <p><i>{c.character.who}</i></p>}
           <p className="tags">{c.tags}</p>
+          {c.character.backstory && <p>{c.character.backstory}</p>}
           <button onClick={() => doAct('hire', c.id)}>hire ({c.hireCost}g)</button>
         </div>
       ))}
@@ -318,6 +322,7 @@ function People({ s, doAct }: any) {
       {s.holding.map((c: any) => (
         <div className="cardrow" key={c.id}>
           <h3>{c.name} <small>mark {c.value}g · decide by c{c.expires}</small></h3>
+          {c.character.who && <p><i>{c.character.who}</i></p>}
           <p className="tags">{c.tags}</p>
           <div className="row">
             <button onClick={() => doAct('accept', c.id)}>to the cells</button>

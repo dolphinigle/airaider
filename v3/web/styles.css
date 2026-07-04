@@ -52,3 +52,5 @@ details { margin-top: 6px; } summary { cursor: pointer; color: #8a93a3; }
 .dim { opacity: 0.5; }
 .hint { color: #6a7280; font-style: italic; }
 h3 { font-size: 15px; }
+
+.quirks { color: #a8927a; font-size: 13px; font-style: italic; }
