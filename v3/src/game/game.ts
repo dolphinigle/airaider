@@ -47,6 +47,7 @@ export const STAGE_TTL_HOLDING = 4;
 export const STAGE_TTL_TAVERN = 5;
 export const STAGE_TTL_FINALE = 6;
 export const CONTINUATION_TTL_BONUS = 6;   // continuation leads outlive fresh ones a bit
+export const QUEST_TTL = 10;               // pursued quests lapse after this many cycles (IMPL #1)
 export const INTERROGATE_BASE = 30;        // 🛠 priced per-captive action
 export const INTERROGATE_FRAC = 0.1;
 
@@ -986,7 +987,7 @@ export class Game {
 
     // 5) pursued-quest expiry (impl ruling on QUESTS §10 🟡: TTL 10; a lapsed chain
     // beat respawns its continuation lead — the story waits, the quest doesn't)
-    for (const q of st.quests.filter(q => q.state === 'open' && st.cycle - q.createdCycle >= 10)) {
+    for (const q of st.quests.filter(q => q.state === 'open' && st.cycle - q.createdCycle >= QUEST_TTL)) {
       this.abandonQuest(q, report);
     }
     st.quests = st.quests.filter(q => q.state === 'open');

@@ -12,7 +12,8 @@ import { ROOM_TYPE, buildCost, upgradeCost, renovateCost, ghUpgradeCost, GH_THRE
 import { REGION } from '../src/engine/regions.js';
 import { renderTags } from '../src/engine/tags.js';
 import { cardType, stackKind, isLiability, hasTag } from '../src/engine/cards.js';
-import { slotThreshold, coins } from '../src/engine/roll.js';
+import { slotThreshold, coins, explainCoins } from '../src/engine/roll.js';
+import { QUEST_TTL } from '../src/game/game.js';
 import { hireCost } from '../src/engine/economy.js';
 import { fillScore } from '../src/engine/overlap.js';
 
@@ -83,7 +84,11 @@ function stateView() {
           owner: r.ownerId === 'you' ? 'you' : r.ownerId ? game.card(r.ownerId)?.name ?? r.ownerId : null,
           upgradeCost: rt.species === 'comfort' && r.slots.length < maxSlotsAtTier(st.fort.ghTier) ? upgradeCost(rt, r.slots.length) : null,
           renovateCost: rt.species === 'comfort' ? renovateCost(rt) : null,
-          slots: r.slots.map(s => s ? cardView(game.card(s)!) : null),
+          slots: r.slots.map(s => {
+            if (!s) return null;
+            const card = game.card(s)!;
+            return { ...cardView(card), fit: Math.round(fillScore(card.tags, game.effectiveWants(r)) * 100) / 100 };
+          }),
         };
       }),
     },
@@ -112,12 +117,14 @@ function stateView() {
         approaches: q.approaches ?? null, chosenApproach: q.chosenApproach ?? null,
         rewardEnvelope: q.rewardSpecs.map(r => r.kind).join(' + ') || (q.isFinale ? 'the focal character' : 'side loot'),
         odds: o,
+        lapsesAtCycle: q.createdCycle + QUEST_TTL,
         slots: q.slots.map((s, i) => ({
           idx: i, groupId: s.groupId ?? null,
           test: { ...s.test, bar: slotThreshold(s.test) },
           filledBy: s.filledBy ? game.card(s.filledBy)!.name : null, filledId: s.filledBy,
+          filledExplain: s.filledBy ? explainCoins(game.card(s.filledBy)!, s.test) : null,
           fits: game.roster().filter(m => m.location.kind === 'held')
-            .map(m => ({ id: m.id, name: m.name, coins: coins(m, s.test) }))
+            .map(m => ({ id: m.id, name: m.name, coins: coins(m, s.test), explain: explainCoins(m, s.test) }))
             .sort((a, b) => b.coins - a.coins),
         })),
         createdCycle: q.createdCycle,

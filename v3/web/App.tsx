@@ -123,7 +123,7 @@ function RoomDetail({ s, roomId, doAct, close }: any) {
         {room.comfort !== null && <p>comfort <b>{room.comfort.toFixed(1)}</b> · wants: {room.wants.join(', ') || '—'}</p>}
         {room.slots.map((slot: any, i: number) => (
           <div key={i} className="slotrow">
-            <span>slot {i}: {slot ? `${slot.name} [${slot.tags}]` : '(empty)'}</span>
+            <span>slot {i}: {slot ? `${slot.name} (fit ${slot.fit}) [${slot.tags}]` : '(empty)'}</span>
             {slot && <button onClick={() => doAct('unslot', room.id, i)}>free</button>}
             {!slot && fits.length > 0 && (
               <select defaultValue="" onChange={e => e.target.value && doAct('slot', room.id, i, e.target.value)}>
@@ -180,7 +180,7 @@ function Quests({ s, doAct }: any) {
     <div>
       {s.quests.map((q: any) => (
         <div className="quest" key={q.id}>
-          <h3>{q.title} <small>L{q.level} · <span style={{ color: RARITY_COLOR[q.rarity] }}>{q.rarity}</span> · {q.region}{q.isFinale ? ' · 🎬 FINALE' : q.chainId ? ` · beat ${q.beat}` : ''}</small></h3>
+          <h3>{q.title} <small>L{q.level} · <span style={{ color: RARITY_COLOR[q.rarity] }}>{q.rarity}</span> · {q.region} · lapses c{q.lapsesAtCycle}{q.isFinale ? ' · 🎬 FINALE' : q.chainId ? ` · beat ${q.beat}` : ''}</small></h3>
           <p>{q.situation}</p>
           <p><b>JOB:</b> {q.job} · <b>REWARD:</b> {q.rewardEnvelope}</p>
           {q.approaches && (
@@ -199,10 +199,10 @@ function Quests({ s, doAct }: any) {
                 {sl.test.clashing.length > 0 && <> · clashes <i>{sl.test.clashing.join(', ')}</i></>}
               </span>
               {sl.filledBy
-                ? <span><b>{sl.filledBy}</b> <button onClick={() => doAct('unassign', q.id, sl.idx)}>×</button></span>
+                ? <span title={sl.filledExplain ?? ''}><b>{sl.filledBy}</b> <small>({sl.filledExplain})</small> <button onClick={() => doAct('unassign', q.id, sl.idx)}>×</button></span>
                 : <select defaultValue="" onChange={e => e.target.value && doAct('assign', q.id, sl.idx, e.target.value)}>
                     <option value="">— assign (best coins first) —</option>
-                    {sl.fits.map((f: any) => <option key={f.id} value={f.id}>{f.name} ({f.coins} coins)</option>)}
+                    {sl.fits.map((f: any) => <option key={f.id} value={f.id} title={f.explain}>{f.name} ({f.coins}c · {f.explain})</option>)}
                   </select>}
             </div>
           ))}

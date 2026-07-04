@@ -5,7 +5,9 @@ import { renderTags } from '../src/engine/tags.js';
 import { ROOM_TYPE, GH_THRESHOLDS } from '../src/engine/fort.js';
 import { REGION } from '../src/engine/regions.js';
 import { cardType, stackKind, isLiability } from '../src/engine/cards.js';
-import { slotThreshold, coins } from '../src/engine/roll.js';
+import { slotThreshold, coins, explainCoins } from '../src/engine/roll.js';
+import { fillScore } from '../src/engine/overlap.js';
+import { QUEST_TTL } from '../src/game/game.js';
 
 const pct = (x: number | null) => x === null ? '—' : `${Math.round(x * 100)}%`;
 
@@ -76,10 +78,12 @@ export const render = {
     const t = ROOM_TYPE[r.type]!;
     const lines = [`${t.name} (${r.id}) — ${t.species}, benefit: ${t.benefit}${r.style ? `, style: ${r.style}` : ''}`];
     if (t.species === 'comfort') {
-      lines.push(`comfort ${g.comfort(r).toFixed(1)} · wants: ${r.wants.map(w => w.match).join(', ') || '(none — renovate to set a theme)'}`);
+      const wants = g.effectiveWants(r);
+      lines.push(`comfort ${g.comfort(r).toFixed(1)} · wants: ${wants.map(w => w.match).join(', ') || '(none — renovate to set a theme)'}`);
       r.slots.forEach((s, i) => {
         const c = s ? g.card(s) : null;
-        lines.push(`  slot ${i}: ${c ? `${c.name} [${renderTags(c.tags)}]` : '(empty)'}`);
+        const fit = c ? ` (fit ${fillScore(c.tags, wants).toFixed(2)})` : '';
+        lines.push(`  slot ${i}: ${c ? `${c.name}${fit} [${renderTags(c.tags)}]` : '(empty)'}`);
       });
       if (!r.slots.length) lines.push('  (no slots yet — upgrade to add)');
     }
@@ -127,7 +131,7 @@ export const render = {
     if (!qs.length) return '(no open quests — pursue a lead)';
     return qs.map(q => {
       const filled = q.slots.filter(s => s.filledBy).length;
-      return `${q.id.padEnd(5)} ${q.title.slice(0, 44).padEnd(44)} L${q.level} ${q.rarity} ${filled}/${q.slots.length} filled${q.isFinale ? ' 🎬FINALE' : q.chainId ? ` 📖beat${q.beatIndex}` : ''}`;
+      return `${q.id.padEnd(5)} ${q.title.slice(0, 40).padEnd(40)} L${q.level} ${q.rarity} ${filled}/${q.slots.length} filled · lapses c${q.createdCycle + QUEST_TTL}${q.isFinale ? ' 🎬FINALE' : q.chainId ? ` 📖beat${q.beatIndex}` : ''}`;
     }).join('\n');
   },
 
@@ -135,7 +139,7 @@ export const render = {
     const q = g.state.quests.find(x => x.id === id);
     if (!q) return 'no such quest';
     const lines = [
-      `═══ ${q.title} ═══  (${q.id}, L${q.level} ${q.rarity}, ${REGION[q.region]!.name})`,
+      `═══ ${q.title} ═══  (${q.id}, L${q.level} ${q.rarity}, ${REGION[q.region]!.name}, lapses c${q.createdCycle + QUEST_TTL})`,
       q.situation, `JOB: ${q.job}`,
       `REWARD envelope: ${q.rewardSpecs.map(r => r.kind).join(' + ') || (q.isFinale ? 'the focal character' : 'side loot')}`,
     ];
@@ -148,8 +152,13 @@ export const render = {
       const t = s.test;
       const bar = slotThreshold(t).toFixed(1);
       const merc = s.filledBy ? g.card(s.filledBy) : null;
-      const c = merc ? ` ← ${merc.name} (${coins(merc, t)} coins)` : '';
+      const c = merc ? ` ← ${merc.name} (${explainCoins(merc, t)})` : '';
       lines.push(`  slot ${i}: tests ${t.attributes.join('+').toUpperCase()} (${t.difficulty}, bar ${bar})${t.favored.length ? ` favors ${t.favored.join(',')}` : ''}${t.clashing.length ? ` clashes ${t.clashing.join(',')}` : ''}${c}`);
+      if (!merc) {
+        const cands = g.roster().filter(m => m.location.kind === 'held')
+          .map(m => ({ m, n: coins(m, t) })).sort((a, b) => b.n - a.n).slice(0, 4);
+        if (cands.length) lines.push(`      candidates: ${cands.map(x => `${x.m.name} ${x.n}c`).join(' · ')}`);
+      }
     });
     const o = g.questOdds(q.id);
     lines.push(`ODDS: ${o.coins} coins vs bar ${o.bar.toFixed(1)}${o.precision > 0 ? ` → success ${pct(o.success)} · partial+ ${pct(o.partial)}${o.precision === 1 ? ' (coarse)' : ''}` : ' (build an Oracle for %)'}`);

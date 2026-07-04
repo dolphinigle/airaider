@@ -67,6 +67,43 @@ export function coins(unit: Card, t: SlotTest): number {
   return Math.max(0, Math.round(c));
 }
 
+/** the WHY behind a coin count — every UI's answer to "why N coins?" */
+export interface CoinsBreakdown {
+  attr: number;        // Σ tested attribute values
+  match: number;       // +0.5U if ≥1 favored owned (tier-blind)
+  bodyBg: number;      // attribute-tags (body ± / background rank-scaled)
+  clash: number;       // −0.5U if ≥1 clashing (negative or 0)
+  injury: number;      // −0.2U × tiers (negative or 0)
+  total: number;       // floored at 0, rounded — the coin count
+}
+
+export function coinsBreakdown(unit: Card, t: SlotTest): CoinsBreakdown {
+  const ch = unit.character;
+  if (!ch) return { attr: 0, match: 0, bodyBg: 0, clash: 0, injury: 0, total: 0 };
+  const u = U(ch.level);
+  let attr = 0, bodyBg = 0;
+  for (const a of t.attributes) {
+    attr += attrOf(unit, a);
+    bodyBg += attrTagFrac(unit.tags, a) * u;
+  }
+  const match = hasFavored(unit.tags, t.favored) ? TAG_FRAC * u : 0;
+  const clash = hasClash(unit.tags, t.favored, t.clashing) ? -TAG_FRAC * u : 0;
+  const injury = -ch.injuryTiers * INJURY_FRAC * u;
+  const total = Math.max(0, Math.round(attr + bodyBg + match + clash + injury));
+  return { attr, match, bodyBg, clash, injury, total };
+}
+
+/** compact human string: "DEX 4 +match 3.5 −injury 1.4 = 8" */
+export function explainCoins(unit: Card, t: SlotTest): string {
+  const b = coinsBreakdown(unit, t);
+  const parts = [`${t.attributes.map(a => a.toUpperCase()).join('+')} ${b.attr.toFixed(1)}`];
+  if (b.match) parts.push(`+match ${b.match.toFixed(1)}`);
+  if (b.bodyBg) parts.push(`${b.bodyBg > 0 ? '+' : ''}body/bg ${b.bodyBg.toFixed(1)}`);
+  if (b.clash) parts.push(`clash ${b.clash.toFixed(1)}`);
+  if (b.injury) parts.push(`injury ${b.injury.toFixed(1)}`);
+  return `${parts.join(' ')} = ${b.total}`;
+}
+
 export type Outcome = 'success' | 'partial' | 'failure';
 
 export interface QuestRollResult {
