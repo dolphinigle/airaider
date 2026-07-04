@@ -624,6 +624,7 @@ export class Game {
       level: lead.level, rarity: lead.rarity, region: lead.region, archetype: lead.archetype,
       slots: this.buildSlots(n, lead.level, lead.rarity, lead.archetype, out.ask),
       rewardSpecs: specs, rewardCards, state: 'open', createdCycle: this.state.cycle,
+      liabilityId: lead.liabilityId,
     };
   }
 
@@ -895,12 +896,16 @@ export class Game {
     st.leads = st.leads.filter(l => l.expiresAtCycle === null || l.expiresAtCycle > st.cycle);
     for (const c of st.cards.filter(isLiability)) {
       const age = st.cycle - (st.liabilityBirth[c.id] ?? st.cycle);
+      // one live collector per liability at a time
+      if (st.leads.some(l => l.liabilityId === c.id) ||
+        st.quests.some(q => q.state === 'open' && (st.leads.find(l => l.id === q.leadId)?.liabilityId === c.id))) continue;
       if (liabilityTriggers(this.rng, age)) {
         const lead = rollFreshLead(this.rng, this.leadCtx(), () => freshId('lead-'), 'collector');
-        lead.title = `The ${c.name} surfaces`;
+        lead.title = `The ${c.name} surfaces — deal with it`;
+        lead.liabilityId = c.id;
         st.leads.push(lead);
         st.liabilityBirth[c.id] = st.cycle; // reset the fuse
-        report.push(`⚠ Your unresolved ${c.name} draws attention — a hostile lead appears.`);
+        report.push(`⚠ Your unresolved ${c.name} draws attention — a hostile lead appears (beat it to bury the matter).`);
       }
     }
 
@@ -1016,6 +1021,15 @@ export class Game {
     if (r.delivery.liability) this.addCard(r.delivery.liability);
     for (let i = 0; i < r.delivery.leadGrants; i++) {
       st.leads.push(rollFreshLead(this.rng, this.leadCtx(), () => freshId('lead-'), 'reward'));
+    }
+    // collector quest won → the liability is buried
+    if (q.liabilityId && r.outcome !== 'failure') {
+      const li = this.card(q.liabilityId);
+      if (li) {
+        st.cards = st.cards.filter(c => c.id !== q.liabilityId);
+        delete st.liabilityBirth[q.liabilityId];
+        report.push(`🕯 The matter of the ${li.name} is buried for good.`);
+      }
     }
     if (q.archetype === 'lead-hunt' && r.outcome !== 'failure') {
       const extra = r.outcome === 'success' ? 2 : 1;

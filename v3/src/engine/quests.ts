@@ -27,6 +27,7 @@ export interface Lead {
   source: 'starter' | 'hunt' | 'reward' | 'continuation' | 'personal' | 'interrogation' | 'collector' | 'sequel';
   title?: string;                  // cached chain title for continuation leads (zero AI cost)
   focalId?: string;                // sequel leads (§21-4a): the SLIPPED focal — the road back is to THEM
+  liabilityId?: string;            // collector leads: beating the quest settles THIS liability
 }
 
 export const LEAD_TTL = 6; // cycles before an unpursued lead lapses 🛠
@@ -128,6 +129,7 @@ export interface Quest {
   rewardSpecs: RewardSpec[];       // generated at BIRTH (one-offs; chains use the bank)
   rewardCards: Card[];             // pre-generated unit/relic cards (in limbo)
   sideLootV?: number;              // chain beats: small engine-set side-loot budget
+  liabilityId?: string;            // collector quests: winning settles this liability
   state: 'open' | 'resolved';
   createdCycle: number;
 }

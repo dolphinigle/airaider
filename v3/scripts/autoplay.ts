@@ -116,6 +116,17 @@ for (let c = 0; c < cycles; c++) {
       if (r.ok) say(`c${g.state.cycle}: hired ${cand.name}`);
     }
   }
+  // set a training focus for any merc without one (their best natural attr)
+  for (const m of g.roster()) {
+    if (m.character!.focus.kind !== 'none') continue;
+    const attrs = Object.entries(m.character!.attrs).sort((a, b) => b[1] - a[1]);
+    g.setFocus(m.id, { kind: 'single', attr: attrs[0]![0] as never } as never);
+  }
+  // interrogate a captive occasionally (the lead faucet nobody remembers)
+  if (g.state.cycle % 15 === 0 && g.gold() > 500) {
+    const talker = g.captives().find(x => !x.chainIds.includes('interrogated'));
+    if (talker) g.interrogate(talker.id);
+  }
   // ransom surplus RAW captives only (keep the best 16 for breaking; obedient are the
   // prestige workforce — never sold by policy)
   const raw = g.captives().filter(x => !hasTag(x.tags, 'obedient') && x.location.kind === 'held')
