@@ -41,7 +41,12 @@ was not reopened. Dogfooding = the autoplay harness (`scripts/autoplay.ts`, mock
 | 25 | Determinism tests: same-seed identity · **load is byte-idempotent** · post-reload AI divergence is BY DESIGN (persisted-producer) | GAME_STATE §2 | — |
 | 26 | Chaos monkey: 4,000 random/garbage actions, audited — no throws, no corruption | — | (tooling) |
 
+| 27 | Finale GOLD approach on a partial pays the LESSER price (0.7×) — was paying full crystallization | QUESTS §9 "lesser version of that kind" | real-AI finale review |
+| 28 | Selector path verified LIVE (dense graph → nano pick → bible casts the loaded relation) | LORE §3 | forced-scenario run |
+| 29 | Places: engine-rolled suggestions to one-offs AND beats; prose now rotates fresh hamlets (Ravenwick, Dunwick, Woldhollow) | §13 lorebook-names | prose audit |
+
 Marathon state: 3 seeds × 2,200 cycles audit-clean (GH T5–T7); save at c2200 ≈ 2–5 MB (post-proto: compaction).
+Real-AI cost: ~0.5–1¢/cycle of play (~$0.15–0.25 per 25–35-cycle session).
 
 ## Balance state (mock autoplay, seeds 5/21, 800 cycles)
 T5 ≈ c500–660 · tier cadence ~100–220c (budget ~130–190 for a human; the bot is naive) ·
