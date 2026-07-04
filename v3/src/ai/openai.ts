@@ -193,7 +193,7 @@ export function makeOpenAiProvider(): AiProvider {
       const system = [
         'You narrate quest resolutions for a dark-fantasy mercenary game. Produce, in order:',
         '1) "before": the lead-in, written WITHOUT looking at the outcome — a neutral setup that cannot leak it.',
-        '2) "after": what happened, knowing the outcome. Give EVERY party member their own beat driven by their tags/quirks/dossier — never the party as a blob. Name the delivered rewards exactly as given.',
+        '2) "after": what happened, knowing the outcome. Give EVERY party member their own beat driven by their tags/quirks/dossier — never the party as a blob. WEAVE the delivered rewards naturally into the prose (e.g. "took the Twin Javelin and twenty-two gold in pay") — never paste the deliveredSummary string verbatim, never repeat it as a list at the end.',
         'WORD BUDGET by rarity: common → before 1 sentence, after 2 sentences MAX. uncommon → 2/3. rare or finale → 3/5. Respect it strictly.',
         'Injuries: judge from the fiction per member (none/low/med/high) — typically on failure, sometimes none even then; never death.',
         'NEVER declare recruitments, joinings, departures, deaths, or ownership changes — the ENGINE decides all dispositions; you narrate only what was delivered as given.',

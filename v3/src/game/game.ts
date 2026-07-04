@@ -1053,6 +1053,9 @@ export class Game {
     const st = this.state;
     const q = r.quest;
     q.state = 'resolved';
+    // the reveal reads: title → before → after → consequences (injuries/staging/etc.)
+    const after: string[] = [];
+    const say = (line: string) => after.push(line);
     // free the party + XP
     for (const p of r.party) {
       p.location = HELD('roster');
@@ -1070,7 +1073,7 @@ export class Game {
       if (!merc?.character || !r.party.includes(merc)) continue;
       const tiers = rollInjuryTiers(this.rng, band);
       merc.character.injuryTiers += tiers;
-      report.push(`🩸 ${merc.name} is wounded (${band}, ${tiers} tiers).`);
+      say(`🩸 ${merc.name} is wounded (${band}, ${tiers} tiers).`);
     }
     // delivery
     for (const c of r.delivery.cards) {
@@ -1081,12 +1084,12 @@ export class Game {
         if (c.character.role === 'captive') {
           st.holding.push({ cardId: c.id, expiresAtCycle: st.cycle + STAGE_TTL_HOLDING });
           c.location = HELD('staged');
-          report.push(`⛓ ${c.name} is in holding (accept within ${STAGE_TTL_HOLDING} cycles).`);
+          say(`⛓ ${c.name} is in holding (accept within ${STAGE_TTL_HOLDING} cycles).`);
           if (!st.cards.includes(c)) st.cards.push(c);
         } else if (this.hasRoom('tavern')) {
           st.tavern.push({ cardId: c.id, expiresAtCycle: st.cycle + STAGE_TTL_TAVERN });
           c.location = HELD('staged');
-          report.push(`🍺 ${c.name} waits at the tavern (hire within ${STAGE_TTL_TAVERN} cycles).`);
+          say(`🍺 ${c.name} waits at the tavern (hire within ${STAGE_TTL_TAVERN} cycles).`);
           if (!st.cards.includes(c)) st.cards.push(c);
         } else {
           // no Tavern yet — the grateful rescued pay what they can and move on (🛠 salvage)
@@ -1095,7 +1098,7 @@ export class Game {
           this.ensureLoreNode(c);
           c.location = HELD('lore');
           if (!st.cards.includes(c)) st.cards.push(c);
-          report.push(`🙏 ${c.name} thanks you and moves on: +${pay}g (build a Tavern to keep such people).`);
+          say(`🙏 ${c.name} thanks you and moves on: +${pay}g (build a Tavern to keep such people).`);
         }
       } else if (stackKind(c) === 'gold') {
         this.addGold(c.qty ?? 0);
@@ -1114,19 +1117,20 @@ export class Game {
       if (li) {
         st.cards = st.cards.filter(c => c.id !== q.liabilityId);
         delete st.liabilityBirth[q.liabilityId];
-        report.push(`🕯 The matter of the ${li.name} is buried for good.`);
+        say(`🕯 The matter of the ${li.name} is buried for good.`);
       }
     }
     if (q.archetype === 'lead-hunt' && r.outcome !== 'failure') {
       const extra = r.outcome === 'success' ? 2 : 1;
       for (let i = 0; i < extra; i++) st.leads.push(rollFreshLead(this.rng, this.leadCtx(), () => freshId('lead-'), 'hunt'));
-      report.push(`🧭 The sweep pays: ${extra} new lead(s).`);
+      say(`🧭 The sweep pays: ${extra} new lead(s).`);
     }
     // lore edges from the AI (validated later in one pass)
     pendingEdges.push(...(out?.edges ?? []));
-    // narrate
+    // narrate, then the consequences
     report.push(`— ${q.title} [${r.outcome.toUpperCase()}]`);
     if (out) { report.push(out.before); report.push(out.after) }
+    report.push(...after);
     this.log('resolve', `${q.title}: ${r.outcome}`, q.id);
     // chain advancement
     if (q.chainId) this.advanceChain(q, r, out?.storyUpdate, report, r.fate);
