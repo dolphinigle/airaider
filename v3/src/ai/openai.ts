@@ -8,7 +8,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
 import type {
-  AiProvider, AiUsage, QuestWriteInput, QuestWriteOut, GenesisInput, GenesisOut,
+  AiProvider, AiUsage, AiCallRecord, QuestWriteInput, QuestWriteOut, GenesisInput, GenesisOut,
   ResolveQuestInput, ResolveQuestOut, ThemeRollInput, ThemeRollOut, SelectorInput,
   FleshInput, FleshOut,
 } from './provider.js';
@@ -128,20 +128,47 @@ const EDGE_TYPES_LINE =
 export function makeOpenAiProvider(): AiProvider {
   const client = new OpenAI({ apiKey: loadKey() });
   const usage: AiUsage = { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 };
+  const records: AiCallRecord[] = [];
+  let purposeCtx = '?';           // set by each public method before calling
 
   async function call<S extends z.ZodTypeAny>(model: string, system: string, user: string, schema: S): Promise<z.output<S>> {
-    const res = await client.chat.completions.create({
-      model,
-      messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
-      response_format: { type: 'json_object' },
-    });
-    usage.calls++;
-    usage.inputTokens += res.usage?.prompt_tokens ?? 0;
-    usage.outputTokens += res.usage?.completion_tokens ?? 0;
-    // rough gpt-5-mini pricing guess for the meter only
-    usage.costUsd += ((res.usage?.prompt_tokens ?? 0) * 0.25 + (res.usage?.completion_tokens ?? 0) * 2) / 1e6;
-    const raw = res.choices[0]?.message?.content ?? '{}';
-    return schema.parse(JSON.parse(raw));
+    const t0 = Date.now();
+    const rec: AiCallRecord = {
+      n: usage.calls + 1, purpose: purposeCtx, model, durationMs: 0,
+      inputTokens: 0, outputTokens: 0, cachedTokens: 0, costUsd: 0, ok: false,
+      systemPreview: system.slice(0, 600), userPrompt: user.slice(0, 6000),
+    };
+    records.push(rec);
+    if (records.length > 120) records.splice(0, records.length - 120);
+    try {
+      // reasoning_effort low = the docs-validated setting (PROMPTS.md); latency is gameplay
+      const res = await client.chat.completions.create({
+        model,
+        messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
+        response_format: { type: 'json_object' },
+        reasoning_effort: 'low',
+      } as never) as OpenAI.Chat.Completions.ChatCompletion;
+      usage.calls++;
+      const inTok = res.usage?.prompt_tokens ?? 0;
+      const outTok = res.usage?.completion_tokens ?? 0;
+      const cached = (res.usage as { prompt_tokens_details?: { cached_tokens?: number } } | undefined)
+        ?.prompt_tokens_details?.cached_tokens ?? 0;
+      usage.inputTokens += inTok;
+      usage.outputTokens += outTok;
+      // rough gpt-5-mini pricing for the meter (cached input at 10%)
+      const cost = ((inTok - cached) * 0.25 + cached * 0.025 + outTok * 2) / 1e6;
+      usage.costUsd += cost;
+      rec.durationMs = Date.now() - t0;
+      rec.inputTokens = inTok; rec.outputTokens = outTok; rec.cachedTokens = cached; rec.costUsd = cost;
+      const raw = res.choices[0]?.message?.content ?? '{}';
+      const out = schema.parse(JSON.parse(raw));
+      rec.ok = true;
+      return out;
+    } catch (e) {
+      rec.durationMs = Date.now() - t0;
+      rec.error = (e as Error).message?.slice(0, 300);
+      throw e;
+    }
   }
 
   /** one retry on parse/validation failure — a single hiccup must not ship fallback prose */
@@ -156,8 +183,10 @@ export function makeOpenAiProvider(): AiProvider {
   return {
     name: 'openai',
     usage: () => ({ ...usage }),
+    callLog: () => [...records],
 
     async writeQuest(input: QuestWriteInput): Promise<QuestWriteOut> {
+      purposeCtx = 'writeQuest';
       const system = [
         'You write quest cards for a dark-fantasy mercenary-company game. POV-locked: the player knows only what reaches the fort. State the job plainly.',
         'BANNED CRUTCH: no ledgers/manifests/record-books as plot objects (grossly overused).',
@@ -192,6 +221,7 @@ export function makeOpenAiProvider(): AiProvider {
     },
 
     async genesis(input: GenesisInput): Promise<GenesisOut> {
+      purposeCtx = 'genesis';
       const system = [
         'You are the writers\'-room for a saga in a dark-fantasy mercenary-fort game. Build a hidden BIBLE: settled truth, told plainly — mystery is the quest-writer\'s job later.',
         'Collide the SEED with the SLATE into a one-line KERNEL. Pick 1-3 core people; the FOCAL MUST be core. LEAN cast: one line + want + role each, no essays. Reuse slate people before coining new ones.',
@@ -214,6 +244,7 @@ export function makeOpenAiProvider(): AiProvider {
     },
 
     async resolve(inputs: ResolveQuestInput[]): Promise<ResolveQuestOut[]> {
+      purposeCtx = 'resolve';
       // one batched call per quest, fired in parallel (the cycle's single reckoning)
       const system = [
         'You narrate quest resolutions for a dark-fantasy mercenary game. Produce, in order:',
@@ -251,6 +282,7 @@ export function makeOpenAiProvider(): AiProvider {
     },
 
     async flesh(inputs: FleshInput[]): Promise<FleshOut[]> {
+      purposeCtx = 'flesh';
       if (!inputs.length) return [];
       const system = [
         'You breathe life into characters of a dark-fantasy mercenary company. For EACH person given, write:',
@@ -267,6 +299,7 @@ export function makeOpenAiProvider(): AiProvider {
     },
 
     async themeRoll(input: ThemeRollInput): Promise<ThemeRollOut> {
+      purposeCtx = 'themeRoll';
       const system = [
         'A player renovates a fort room in a style. Choose 3-5 wanted tag WORDS for the room theme — strictly from the provided vocabulary list. One flavor line.',
         NUMBER_BAN,
@@ -276,6 +309,7 @@ export function makeOpenAiProvider(): AiProvider {
     },
 
     async select(input: SelectorInput): Promise<string[]> {
+      purposeCtx = 'select';
       const system = 'Pick which candidates need FULL dossier context for the writing task. Respond as JSON: {ids:[...]} — at most the requested max. Ids exactly as given.';
       const out = await call(NANO_MODEL, system, JSON.stringify(input), zSelect);
       const legal = new Set(input.candidates.map(c => c.id));

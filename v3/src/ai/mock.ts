@@ -33,6 +33,7 @@ export class MockProvider implements AiProvider {
 
   constructor(seed = 1337) { this.rng = new Rng(seed) }
   usage(): AiUsage { return { ...this._usage } }
+  callLog() { return [] }
   private tick() { this._usage.calls++ }
 
   async writeQuest(input: QuestWriteInput): Promise<QuestWriteOut> {

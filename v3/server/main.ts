@@ -17,6 +17,16 @@ import { hireCost } from '../src/engine/economy.js';
 import { fillScore } from '../src/engine/overlap.js';
 
 const SAVE = path.join(process.cwd(), 'saves', 'web.json');
+const LOG_DIR = path.join(process.cwd(), 'logs');
+const SESSION_LOG = path.join(LOG_DIR, `session-web.jsonl`);
+
+/** append-only session trail — the post-hoc "what just happened and why" record */
+function slog(entry: Record<string, unknown>) {
+  try {
+    fs.mkdirSync(LOG_DIR, { recursive: true });
+    fs.appendFileSync(SESSION_LOG, JSON.stringify({ t: new Date().toISOString(), ...entry }) + '\n');
+  } catch { /* logging must never break play */ }
+}
 const useOpenAi = process.env.AIRAIDER_AI === 'openai';
 const ai = useOpenAi ? makeOpenAiProvider() : new MockProvider(Number(process.env.AIRAIDER_SEED ?? 42));
 
@@ -130,6 +140,7 @@ function stateView() {
     log: st.log.slice(-40),
     ai: game.ai.usage(),
     aiName: game.ai.name,
+    aiLog: game.ai.callLog().slice(-40).reverse(),
     // best free fills per comfort room (server-computed, fillScore-ranked)
     roomFits: Object.fromEntries(st.fort.rooms
       .filter(r => ROOM_TYPE[r.type]!.species === 'comfort' || ROOM_TYPE[r.type]!.species === 'capacity')
@@ -158,7 +169,11 @@ app.get('/api/state', async () => stateView());
 let actionChain: Promise<unknown> = Promise.resolve();
 
 app.post<{ Body: { type: string; args: (string | number)[] } }>('/api/action', async (req) => {
-  const run = actionChain.then(() => handleAction(req.body));
+  const run = actionChain.then(() => handleAction(req.body))
+    .catch((e: Error) => {
+      slog({ action: req.body?.type, error: e.message?.slice(0, 400) });
+      return { ok: false, msg: `engine error: ${e.message?.slice(0, 200)} (logged)` };
+    });
   actionChain = run.catch(() => undefined);
   return run;
 });
@@ -203,6 +218,8 @@ async function handleAction(body: { type: string; args: (string | number)[] }) {
     }
     default: result = { ok: false, msg: `unknown action ${type}` };
   }
+  slog({ cycle: game.state.cycle, action: type, args: a, ok: result.ok, msg: result.msg,
+    ...(type === 'end' ? { report: lastReport, ai: game.ai.usage() } : {}) });
   autosave();
   return result;
 }

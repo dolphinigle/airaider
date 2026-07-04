@@ -51,7 +51,7 @@ export function App() {
       </header>
       {toast && <div className="toast">{toast}</div>}
       <nav>
-        {['fort', 'build', 'leads', 'quests', 'roster', 'captives', 'items', 'chains', 'people', 'lore', 'log'].map(t =>
+        {['fort', 'build', 'leads', 'quests', 'roster', 'captives', 'items', 'chains', 'people', 'lore', 'log', 'ai'].map(t =>
           <button key={t} className={tab === t ? 'on' : ''} onClick={() => setTab(t)}>{t}</button>)}
       </nav>
       <main>
@@ -66,6 +66,7 @@ export function App() {
         {tab === 'people' && <People s={s} doAct={doAct} />}
         {tab === 'lore' && <Lore s={s} />}
         {tab === 'log' && <Log s={s} />}
+        {tab === 'ai' && <AiLog s={s} />}
       </main>
       {s.lastReport?.length > 0 && tab === 'fort' && (
         <section className="report">
@@ -359,4 +360,31 @@ function Lore({ s }: any) {
 
 function Log({ s }: any) {
   return <pre>{s.log.map((l: any) => `c${l.cycle} [${l.kind}] ${l.text}`).join('\n')}</pre>;
+}
+
+function AiLog({ s }: any) {
+  const u = s.ai;
+  if (!s.aiLog?.length) return <p>No AI calls yet{s.aiName === 'mock' ? ' (mock provider — no per-call log)' : ''}. Totals: {u.calls} calls · ~${u.costUsd.toFixed(3)}</p>;
+  return (
+    <div>
+      <p><b>totals:</b> {u.calls} calls · {u.inputTokens} in / {u.outputTokens} out tokens · ~${u.costUsd.toFixed(3)}</p>
+      <table><tbody>
+        <tr><td>#</td><td>purpose</td><td>model</td><td>ms</td><td>in</td><td>cached</td><td>out</td><td>$</td><td>ok</td></tr>
+        {s.aiLog.map((r: any) => (
+          <React.Fragment key={r.n}>
+            <tr className={r.ok ? '' : 'dim'}>
+              <td>{r.n}</td><td>{r.purpose}</td><td>{r.model}</td><td>{r.durationMs}</td>
+              <td>{r.inputTokens}</td><td>{r.cachedTokens}</td><td>{r.outputTokens}</td>
+              <td>{r.costUsd.toFixed(4)}</td><td>{r.ok ? '✓' : `✗ ${r.error ?? ''}`}</td>
+            </tr>
+            <tr><td colSpan={9}>
+              <details><summary>prompt</summary>
+                <pre>SYSTEM (start): {r.systemPreview}\n\nUSER: {r.userPrompt}</pre>
+              </details>
+            </td></tr>
+          </React.Fragment>
+        ))}
+      </tbody></table>
+    </div>
+  );
 }

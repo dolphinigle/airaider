@@ -19,6 +19,14 @@ const opt = (name: string): string | undefined => {
 };
 
 const SAVE_DIR = path.join(process.cwd(), 'saves');
+const LOG_DIR = path.join(process.cwd(), 'logs');
+const SESSION_LOG = path.join(LOG_DIR, 'session-cli.jsonl');
+function slog(entry: Record<string, unknown>) {
+  try {
+    fs.mkdirSync(LOG_DIR, { recursive: true });
+    fs.appendFileSync(SESSION_LOG, JSON.stringify({ t: new Date().toISOString(), ...entry }) + '\n');
+  } catch { /* never break play */ }
+}
 
 async function main() {
   const seed = Number(opt('seed') ?? 42);
@@ -73,7 +81,10 @@ async function exec(game: Game, line: string): Promise<boolean> {
   if (!line) return false;
   const [cmd, ...rest] = line.split(/\s+/);
   const arg = rest.join(' ');
-  const say = (r: { ok: boolean; msg: string }) => console.log(r.ok ? `✓ ${r.msg}` : `✗ ${r.msg}`);
+  const say = (r: { ok: boolean; msg: string }) => {
+    console.log(r.ok ? `✓ ${r.msg}` : `✗ ${r.msg}`);
+    slog({ cycle: game.state.cycle, action: cmd, args: rest, ok: r.ok, msg: r.msg });
+  };
 
   switch (cmd) {
     case 'help': console.log(render.help()); break;
@@ -130,6 +141,7 @@ async function exec(game: Game, line: string): Promise<boolean> {
     case 'end': {
       const report = await game.endCycle();
       console.log(render.cycleReport(game, report));
+      slog({ cycle: game.state.cycle, action: 'end', report, ai: game.ai.usage() });
       break;
     }
 

@@ -134,6 +134,22 @@ export interface SelectorInput {
 
 export interface AiUsage { calls: number; inputTokens: number; outputTokens: number; costUsd: number }
 
+/** one record per AI call — the GUI's ai-log tab and the debugging trail */
+export interface AiCallRecord {
+  n: number;                 // call ordinal
+  purpose: string;           // writeQuest / genesis / resolve / flesh / themeRoll / select
+  model: string;
+  durationMs: number;
+  inputTokens: number;
+  outputTokens: number;
+  cachedTokens: number;
+  costUsd: number;
+  ok: boolean;
+  error?: string;
+  systemPreview: string;     // first part of the system prompt
+  userPrompt: string;        // the full user message (the variable data)
+}
+
 export interface AiProvider {
   readonly name: string;
   writeQuest(input: QuestWriteInput): Promise<QuestWriteOut>;
@@ -143,4 +159,5 @@ export interface AiProvider {
   themeRoll(input: ThemeRollInput): Promise<ThemeRollOut>;
   select(input: SelectorInput): Promise<string[]>;
   usage(): AiUsage;
+  callLog(): AiCallRecord[];
 }
