@@ -78,6 +78,21 @@ the rusted key), resolutions individuate each merc by tags, injuries fiction-jud
 approaches deliver the focal. ~14 calls / ≈$0.09 per short campaign. Schemas hardened against
 model quirks (string arrays, worded importance, string booleans); `AI_DEBUG=1` logs fallbacks.
 
+## Quality round (2026-07-04, fresh-eyes judge on 2×30-cycle real-AI corpus)
+
+Judge scorecard (post-audit build): blind-before STRONG · fusion/individuation/budgets/register
+ADEQUATE · **variety + chain-advancement WEAK** → all three recommendation tracks applied:
+
+| # | Fix | Judge evidence |
+|---|---|---|
+| 39 | **Beat-advancement contract**: engine records `lastBeatOutcome`; writer must open on what it CREATED, may not re-pose the previous JOB (materially different objective) | Two Shrines beats 2–4 were the same card; finales replayed beat 1 |
+| 40 | **Roster-never-NPCs**: rosterNames passed to writer + genesis slate rule (own-people only) | roster merc cast as rival claimant / capering petitioner |
+| 41 | **Variety rules**: landmark ≤1-in-4 + no stock epithet; arrival-mode rotation (posting/patrol/prisoner/wreckage/summons/rumor — not always "at the gate"); seeds must be LOAD-BEARING or transformed | 24/24 gate openings; "moss-shrined ruin" ×10; checklist seeds |
+| 42 | **Narrator token bans**: traits shown through action (no trait-adverbs), rewards woven (no "Item, N gold" lists, no "(npc)"), failure stated in-fiction (no canned "the reward is lost") | "instinctive" ×10; "came to nothing — nothing — the reward is lost" |
+| 43 | **Blind-before cut to one short clause that ADDS something** (≈40% of resolver tokens were card restatement) | economic note |
+| 44 | **Retry-once before fallback prose** (a single parse hiccup shipped "It goes their way:" raw) | qB degenerate resolution |
+| 45 | Reveal ordering: title → before → after → consequences; delivery summaries prose-friendly; elf syllable pool widened (Thal-cluster) | injury lines preceding their quest; name confusion |
+
 ## Open designer flags 🚩
 - **Early-roster poverty trap (found in bot play, can bite humans):** with 2 starting mercs, the
   3rd hire is pivotal — a trajectory that can't afford it crawls at ~35g/cycle for hundreds of
