@@ -110,6 +110,25 @@ Attachment judge verdict on the verification campaign (35c real-AI): mercs-as-pe
 continuity STRONG (six object/motif arcs cited) · distinctness STRONG ("no misattributable
 sentence") · chains ADEQUATE→addressed · failure feel ADEQUATE→echo mechanic added.
 
+## Deep-dogfood round (2026-07-04, played every subsystem via the text UI until dry)
+
+Method: chained save/load CLI sessions played as a player; every "wait, why?" checked against
+both UIs; engine bugs fixed at the root. Findings #54–61:
+
+| # | Finding → fix | Class |
+|---|---|---|
+| 54 | **§9 violation**: finale approach labels shown but NO per-branch envelope before choosing (and a meaningless "bar 0.0") → every branch now shows test/difficulty/bar/favors/best-candidate pre-choice, both UIs | design conformance |
+| 55 | **Generator: enchantment spam** — junk relics rolled 4-5 enchantments (W16: tiny odds, usually 0-1) → acceptance roll on tiny-odds lines | engine bug |
+| 56 | **Generator: "legendary" flavor spam** — zero-value tiered tags (sturdy/heavy/tall…) always rolled MAX tier (0 ≤ any budget) → bottom-weighted intensity roll; rarity language restored | engine bug |
+| 57 | **The reveal shows the dice**: "rolled 4 heads of 18 coins vs bar 7.0" — an unlucky 1.5% draw looked exactly like an engine bug until the roll was visible; owned loss (DESIGN §5) needs the numbers | legibility |
+| 58 | **Excavation wall**: 60·1.25^n ≈ 50k gold at 40 cells, millions at the §20-assumed 60-room fort → 45·1.09^n (expansion stays a minor sink, FORT §1) | balance bug |
+| 59 | **Founders' saga drip strictly gated on roster ≥ 3** — the c25 fallback let two personal chains monopolize a 2-merc company (poverty trap, reproduced) | pacing bug |
+| 60 | Info surfaces added to BOTH UIs: per-slot candidate coins (CLI), coin breakdown/explain on filled slots + dropdowns, quest lapse cycle, heal ETA (+route hint), xp-to-next, per-room benefit (→P/→cap) + global prestige sum, per-fill fit scores + effective wants, ransom/sell/settle payout previews, upgrade/excavate cost previews, readable focus, bank delta per beat, who/backstory at hire/accept decisions, quest id in reveal lines | legibility |
+| 61 | Relic adjective pool widened ("Old ×5" runs) | flavor |
+
+Exit criterion met: a full fresh-seed replay of every screen raised no unanswerable question;
+chaos battery + 500c marathon clean after all changes.
+
 ## Open designer flags 🚩
 - **Early-roster poverty trap (found in bot play, can bite humans):** with 2 starting mercs, the
   3rd hire is pivotal — a trajectory that can't afford it crawls at ~35g/cycle for hundreds of
