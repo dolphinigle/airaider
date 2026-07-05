@@ -54,3 +54,7 @@ details { margin-top: 6px; } summary { cursor: pointer; color: #8a93a3; }
 h3 { font-size: 15px; }
 
 .quirks { color: #a8927a; font-size: 13px; font-style: italic; }
+
+/* menu gating (gate rooms open menus) */
+nav button.locked { opacity: .45; }
+.lockmsg { margin: 8px 0; padding: 10px 14px; background: #3a2f24; border-radius: 6px; }

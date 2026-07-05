@@ -85,6 +85,11 @@ async function exec(game: Game, line: string): Promise<boolean> {
     console.log(r.ok ? `✓ ${r.msg}` : `✗ ${r.msg}`);
     slog({ cycle: game.state.cycle, action: cmd, args: rest, ok: r.ok, msg: r.msg });
   };
+  // gate rooms open menus — view commands report the missing room instead of an empty list
+  const locked = (key: string): string | null => {
+    const g = game.menuGates().find(m => m.key === key);
+    return g && !g.open ? `🔒 locked — build a ${g.need} first` : null;
+  };
 
   switch (cmd) {
     case 'help': console.log(render.help()); break;
@@ -96,17 +101,17 @@ async function exec(game: Game, line: string): Promise<boolean> {
     case 'room': console.log(render.roomDetail(game, arg)); break;
     case 'roster': console.log(render.roster(game)); break;
     case 'merc': console.log(render.merc(game, arg)); break;
-    case 'leads': console.log(render.leads(game)); break;
-    case 'quests': console.log(render.quests(game)); break;
+    case 'leads': console.log(locked('leads') ?? render.leads(game)); break;
+    case 'quests': console.log(locked('quests') ?? render.quests(game)); break;
     case 'quest': console.log(render.questDetail(game, arg)); break;
-    case 'captives': console.log(render.captives(game)); break;
-    case 'items': console.log(render.items(game)); break;
+    case 'captives': console.log(locked('captives') ?? render.captives(game)); break;
+    case 'items': console.log(locked('items') ?? render.items(game)); break;
     case 'chains': console.log(render.chains(game)); break;
     case 'chain': console.log(render.chainDetail(game, arg)); break;
-    case 'lore': console.log(render.lore(game, arg)); break;
+    case 'lore': console.log(locked('lore') ?? render.lore(game, arg)); break;
     case 'log': console.log(render.log(game, Number(arg) || 15)); break;
-    case 'tavern': console.log(render.tavern(game)); break;
-    case 'holding': console.log(render.holding(game)); break;
+    case 'tavern': console.log(locked('recruits') ?? render.tavern(game)); break;
+    case 'holding': console.log(locked('staging') ?? render.holding(game)); break;
     case 'buildable': console.log(render.buildable(game)); break;
     case 'status': console.log(render.status(game)); break;
 

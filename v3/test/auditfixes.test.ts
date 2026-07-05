@@ -135,6 +135,37 @@ describe('audit-fix regressions', () => {
     }
   });
 
+  it('focal backstory is tied to the genesis saga and written the cycle they are staged', async () => {
+    const g = richGame(67);
+    g.build('map-room'); g.build('lead-room');
+    const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new')!;
+    await g.pursue(story.id);
+    const chain = g.state.chains[0]!;
+    chain.cyclesSpent = 999; chain.bank = 9999;   // finale ready, no debt noise
+    for (const q of [...g.state.quests]) g.abandon(q.id);
+    g.state.leads.push({
+      id: freshId('lead-'), rarity: chain.rarity, level: chain.level, region: chain.region,
+      archetype: 'investigate', chainInfo: { kind: 'continues', chainId: chain.id, hook: 'x' },
+      expiresAtCycle: g.state.cycle + 5, source: 'continuation',
+    });
+    await g.pursue(g.state.leads[g.state.leads.length - 1]!.id);
+    const finale = g.state.quests.find(q => q.isFinale)!;
+    const rec = finale.approaches!.find(a => a.rewardKind === 'recruit' || a.rewardKind === 'captive')
+      ?? finale.approaches![0]!;
+    g.chooseApproach(finale.id, rec.id);
+    const slotIdx = finale.slots.findIndex(s => s.groupId === rec.id);
+    const merc = g.roster()[0]!;
+    merc.character!.attrs = { str: 500, dex: 500, int: 500, cha: 500, con: 500 };
+    g.assign(finale.id, slotIdx, merc.id);
+    await g.endCycle();
+    if (chain.state === 'done' && rec.rewardKind !== 'gold') {
+      const focal = g.card(chain.focalId)!;
+      // staged THIS cycle and already fleshed — with a backstory grown from the saga
+      expect(focal.location).toEqual(HELD('staged'));
+      expect(focal.character!.backstory ?? '').toContain(chain.bible.title);
+    }
+  });
+
   it('#36 capacity from cellSlots; multiBuild fields honored', () => {
     const g = richGame(63);
     g.state.fort.ghTier = 6;

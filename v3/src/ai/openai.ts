@@ -34,6 +34,11 @@ function loadKey(): string {
 const zStrArr = z.union([z.array(z.string()), z.string(), z.null()]).default([]).transform(v =>
   v === null ? [] : typeof v === 'string' ? (v ? [v] : []) : v);
 
+/** prose with a hard max-length guardrail (STORY_ENGINE §10: soft-clamp, never reject-to-fallback) */
+const zProse = (max: number) => z.string().transform(s =>
+  s.length > max ? s.slice(0, max).replace(/\s+\S*$/, '') + '…' : s);
+const zProseD = (max: number) => zProse(max).catch('').default('');
+
 /** importance 0..1 — tolerate numbers, numeric strings, and band words */
 const zImportance = z.union([z.number(), z.string()]).default(0.4).transform(v => {
   if (typeof v === 'number') return Math.max(0, Math.min(1, v));
@@ -48,11 +53,14 @@ const zAsk = z.object({
   extraAttribute: z.string().nullish(),
   favored: zStrArr,
   clashing: zStrArr,
+  requiredTag: z.string().nullish(),
+  mustBeFocal: z.union([z.boolean(), z.string(), z.null()]).nullish()
+    .transform(v => typeof v === 'string' ? ['true', 'yes'].includes(v.toLowerCase()) : v ?? undefined),
 });
 const zQuestWrite = z.object({
-  title: z.string(),
-  situation: z.string(),
-  job: z.string(),
+  title: zProse(90),
+  situation: zProse(650),
+  job: zProse(240),
   ask: z.array(zAsk).default([]),
   proposedRewardKind: z.string().nullish(),
   closesChain: z.union([z.boolean(), z.string(), z.null()]).nullish()
@@ -63,14 +71,14 @@ const zQuestWrite = z.object({
   })).nullish(),
 });
 const zGenesis = z.object({
-  title: z.string(),
-  kernel: z.string(),
+  title: zProse(90),
+  kernel: zProse(320),
   cast: z.array(z.object({
-    name: z.string(), who: z.string(), want: z.string().default(''),
+    name: z.string(), who: zProse(240), want: zProseD(200),
     role: z.string().default(''), loreId: z.string().nullish(),
   })).default([]),
-  situation: z.string(),
-  goal: z.string().default(''),
+  situation: zProse(650),
+  goal: zProseD(400),
   arc: zStrArr,
   twistReveal: z.string().nullish(),
   tensions: zStrArr,
@@ -84,15 +92,15 @@ const zGenesis = z.object({
 });
 const zResolveOne = z.object({
   questId: z.string(),
-  before: z.string(),
-  after: z.string(),
+  before: zProse(800),
+  after: zProse(1400),
   injuries: z.array(z.object({
     characterId: z.string(),
     band: z.enum(['none', 'low', 'med', 'high']).default('none'),
   })).default([]),
   fleshed: z.array(z.object({
-    characterId: z.string(), who: z.string().default(''),
-    backstory: z.string().default(''), quirks: zStrArr,
+    characterId: z.string(), who: zProseD(240),
+    backstory: zProseD(700), quirks: zStrArr,
   })).default([]),
   edges: z.array(z.object({
     from: z.string(), to: z.string(), type: z.string(),
@@ -107,8 +115,8 @@ const zResolveOne = z.object({
 const zFleshBatch = z.object({
   people: z.array(z.object({
     characterId: z.string(),
-    who: z.string().default(''),
-    backstory: z.string().default(''),
+    who: zProseD(240),
+    backstory: zProseD(700),
     quirks: zStrArr,
   })).default([]),
 });
@@ -119,7 +127,8 @@ const zSelect = z.object({ ids: zStrArr });
 
 const NUMBER_BAN =
   'HARD RULES: never output numbers, prices, dice, or difficulty values — the engine owns all numbers. ' +
-  'Never invent character NAMES — use exactly the names given to you. Keep prose tight; low-medieval register, no modern idiom.';
+  'Never invent character NAMES — use exactly the names given to you. Keep prose tight; low-medieval register, no modern idiom. ' +
+  'BANNED purple words: "weight", "shadow", "burden", "fate", "destiny" — clinical voice, concrete nouns.';
 
 const EDGE_TYPES_LINE =
   'edge types (use ONLY these): rival-of, scarred-by, bonded-by, owes, saved-by, kin-of, betrayed-by, served-with, born-in, member-of, captive-of, loves, fears, defeated, freed-by, party-to. ' +
@@ -141,12 +150,13 @@ export function makeOpenAiProvider(): AiProvider {
     records.push(rec);
     if (records.length > 120) records.splice(0, records.length - 120);
     try {
-      // reasoning_effort low = the docs-validated setting (PROMPTS.md); latency is gameplay
+      // effort per tier (STORY_ENGINE §10.5): prose at low (PROMPTS.md — latency is gameplay),
+      // the mechanical nano tier at minimal
       const res = await client.chat.completions.create({
         model,
         messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
         response_format: { type: 'json_object' },
-        reasoning_effort: 'low',
+        reasoning_effort: model === NANO_MODEL ? 'minimal' : 'low',
       } as never) as OpenAI.Chat.Completions.ChatCompletion;
       usage.calls++;
       const inTok = res.usage?.prompt_tokens ?? 0;
@@ -190,10 +200,11 @@ export function makeOpenAiProvider(): AiProvider {
       const system = [
         'You write quest cards for a dark-fantasy mercenary-company game. POV-locked: the player knows only what reaches the fort. State the job plainly.',
         'BANNED CRUTCH: no ledgers/manifests/record-books as plot objects (grossly overused).',
-        'VARIETY RULES: (1) LANDMARK — use the regionLore landmark in at most 1 card in 4; when you do, NEVER repeat its stock epithet — describe it freshly or leave it unnamed. Prefer the fresh placeNameSuggestions or coin hamlets/waysides/crossings. (2) ARRIVAL — a petitioner at the gate is only ONE mode; rotate: a nailed posting or writ · a returning patrol\'s report · a prisoner or survivor brought in · wreckage or a body found on the road · a summons FROM the fort outward · rumor at market. (3) SEEDS — every KEYWORDS seed must be LOAD-BEARING in the job or its twist; if a seed cannot serve the premise, transform it — never display it at the gate and drop it.',
+        'VARIETY RULES: (1) LANDMARK — name the regionLore landmark ONLY if opening.landmarkAllowed is true; even then NEVER repeat its stock epithet — describe it freshly or leave it unnamed. Prefer the fresh placeNameSuggestions or coin hamlets/waysides/crossings. (2) ARRIVAL — open on the given opening.mode at opening.time (the engine rotates these; make the arrival concrete, don\'t swap it for a petitioner at dusk). (3) SEEDS — every KEYWORDS seed must be LOAD-BEARING in the job or its twist; if a seed cannot serve the premise, transform it — never display it at the gate and drop it.',
         'ROSTER RULE: rosterNames are the player\'s own soldiers — the ones who will be SENT. NEVER write them (or near-variants of their names) as petitioners, clients, claimants, victims, or opponents in the card fiction.',
         NUMBER_BAN,
-        'Respond as JSON: {title, situation (2-3 sentences), job (1 sentence), ask: [{attribute (str|dex|int|cha|con), extraAttribute?, favored: [skill words], clashing: [words]}] — one per slot,',
+        'Respond as JSON: {title, situation (2-3 sentences), job (1 sentence), ask: [{attribute (str|dex|int|cha|con), extraAttribute?, favored: [skill words], clashing: [words], requiredTag?, mustBeFocal?}] — one per slot,',
+        'REQUIREMENTS (rare, at most ONE slot per quest): requiredTag = one word from the favored vocabulary the job truly DEMANDS (a healer for plague work) — most quests have none. mustBeFocal:true ONLY when focalIsMerc is true and the beat is about the focal\'s own past — their story, their presence.',
         'proposedRewardKind? (gold|captive|recruit|relic), closesChain? (beats only), approaches? (finale only: [{label, rewardKind (recruit|captive|gold), attribute, favored}]) }.',
         'Favored/clashing must come from: melee, ranged, leadership, magic-fire, magic-earth, magic-water, magic-dark, social, roguery, lore, heal, craft, nature, performance, intimidation, food — or personality words (cool, hotheaded, serious, playful, greedy, generous, loner, gregarious, lustful, chaste, dominant, submissive, calculating, instinctive).',
         input.kind === 'beat' ? 'This is ONE BEAT of an ongoing saga: reveal at most 1 new layer. BEAT 1 IS THE CARE BEAT: before any plot pressure, give one small HUMAN moment with the focal person — something concrete to like, pity, or worry about (how they treat an animal, what they carry, what they refuse to say) — and keep the job itself low-stakes and shared. THE BEAT MUST ADVANCE: open on a situation lastBeatOutcome CREATED; you may NOT re-pose the previous beat\'s job — the objective must be materially different (new location, new claimant, new leverage, or raised stakes).' : '',
@@ -209,6 +220,8 @@ export function makeOpenAiProvider(): AiProvider {
         framedCharacter: input.framedCharacter,
         bible: input.bible, storyState: input.storyState,
         beat: input.beatIndex, expectedBeats: input.expectedBeats, focalName: input.focalName,
+        focalIsMerc: input.focalIsMerc,
+        opening: input.opening,
       });
       const out = await callR(WRITER_MODEL, system, user, zQuestWrite);
       return {
@@ -216,7 +229,10 @@ export function makeOpenAiProvider(): AiProvider {
         proposedRewardKind: out.proposedRewardKind ?? undefined,
         closesChain: out.closesChain ?? undefined,
         approaches: out.approaches ?? undefined,
-        ask: out.ask.map(a => ({ ...a, extraAttribute: a.extraAttribute ?? null, requirementTag: null })),
+        ask: out.ask.map(a => ({
+          ...a, extraAttribute: a.extraAttribute ?? null,
+          requirementTag: a.requiredTag ?? null, mustBeFocal: a.mustBeFocal ?? false,
+        })),
       };
     },
 
@@ -225,8 +241,12 @@ export function makeOpenAiProvider(): AiProvider {
       const system = [
         'You are the writers\'-room for a saga in a dark-fantasy mercenary-fort game. Build a hidden BIBLE: settled truth, told plainly — mystery is the quest-writer\'s job later.',
         'Collide the SEED with the SLATE into a one-line KERNEL. Pick 1-3 core people; the FOCAL MUST be core. LEAN cast: one line + want + role each, no essays. Reuse slate people before coining new ones.',
+        'cast.who is ONE human sentence a stranger could picture — NEVER a semicolon list or an echo of the tag words (the tags are already known; write the person, not the data).',
+        'PLACES: describe them in your own words — never lift the regionSeed\'s stock phrasing or epithet. The named landmark is ONE spot in a wide region: set most sagas elsewhere — coin hamlets, crossings, holds (newPlaces).',
+        'TONE: write the saga in the given TONE — honor it in kernel, wants, and tensions; not every saga is grim.',
+        'AVOID: the avoid list holds the player\'s recent sagas — do not reuse their premises, central objects, or title shapes.',
         'TITLES: never default the saga title to the region landmark — name it for the person, the object, or the wound at its heart.',
-        'WANTS MUST BE HUMAN and specific — "to bury her brother where their mother lies", never "power" or "to come out ahead". The focal\'s want is the saga\'s heart: make it something a player could root for or against.',
+        'WANTS MUST BE HUMAN and specific — a debt owed, a name cleared, a grave tended, a route reopened; never an abstraction like "power" or "to come out ahead". Invent each want fresh from THIS seed and cast — never reuse a want you were shown. The focal\'s want is the saga\'s heart: make it something a player could root for or against.',
         NUMBER_BAN,
         EDGE_TYPES_LINE,
         'If you coin NEW people, take names strictly from assignedNames (in order). New places may be freely named.',
@@ -248,17 +268,17 @@ export function makeOpenAiProvider(): AiProvider {
       // one batched call per quest, fired in parallel (the cycle's single reckoning)
       const system = [
         'You narrate quest resolutions for a dark-fantasy mercenary game. Produce, in order:',
-        '1) "before": ONE short clause of departure tension, written WITHOUT looking at the outcome — it must ADD something (weather, a doubt, a detail), never restate the card.',
+        '1) "before": the BUILDUP TO THE BRINK, written WITHOUT looking at the outcome: the scene sets, the challenge MATERIALISES, the party commits. END MID-MOTION on an em-dash, the instant before the decisive thing lands — the leap begun, the door giving way, the word half-spoken. Draw the cut-off image from THIS quest\'s own fiction; never reuse one. It must ADD something (terrain, a doubt, a detail), never restate the card, never hint at the result.',
         '2) "after": what happened, knowing the outcome. Give EVERY party member their own beat SHOWN through one concrete physical action — NEVER use their trait word or its adverb (no "playful", "instinctive", "calculating" in prose). WEAVE the delivered rewards into the action ("the brewer counted out eighty gold and pressed the broken blade into his hands") — never a trailing "Item, N gold" list, never the deliveredSummary string verbatim, never "(npc)" or any parenthetical role.',
         'CONTINUITY IS THE PRODUCT: each dossier lists known-as, habits, and memories — when one is RELEVANT, let it surface (a quirk performed under stress, an old wound remembered at the wrong moment). Never info-dump a dossier; one touch per person at most.',
         'HABITS VARY: never repeat a character\'s habit verbatim — recur it as a NEW action expressing the same trait (the songbook opened against rain, pressed over a wound, a page torn for a bandage — not the same smoothing gesture every time).',
         'THE PAIR: when two or more party members are present, include exactly ONE interaction BETWEEN them — a passed object, an answered glance, one spoken line. Their bond (or friction) is the long game; build it a brick at a time.',
         'Vary the lead-in clause — not every departure is mist, rain, or fog.',
         'On failure: state in-fiction what the party came home without — NEVER the canned words "the reward is lost" or "nothing —".',
-        'WORD BUDGET by rarity: common → before 1 short clause, after 2 sentences MAX. uncommon → 1/3. rare or finale → 2/5. Respect it strictly.',
+        'WORD BUDGET by rarity: common → before 2 short sentences, after 2 sentences MAX. uncommon → 3/3. rare or finale → 4/5 (the payoff moment — keep the brink and resolution generous). Respect it strictly.',
         'Injuries: judge from the fiction per member (none/low/med/high) — typically on failure, sometimes none even then; never death.',
         'NEVER declare recruitments, joinings, departures, deaths, or ownership changes — the ENGINE decides all dispositions; you narrate only what was delivered as given.',
-        'Flesh each delivered character: who (one line), backstory (2 sentences), quirks (1-2 concrete habits).',
+        'Flesh each delivered character: who (one line), backstory (2 sentences that grow out of THIS quest\'s fiction — how this person came to be in the mess the party found them in; a follower of the story must recognize them), quirks (1-2 concrete habits).',
         NUMBER_BAN, EDGE_TYPES_LINE,
         'Memory edges: 0-2 per quest, only for moments that should be REMEMBERED. importance is a NUMBER between 0 and 1 (0.8+ = defining/core). Use character ids given.',
         'storyUpdate.currentSituation must state CONCRETELY what changed (who holds what, who moved where) — never a vague "the trail continues".',
@@ -288,6 +308,7 @@ export function makeOpenAiProvider(): AiProvider {
         'You breathe life into characters of a dark-fantasy mercenary company. For EACH person given, write:',
         '- who: ONE line they would be known by around the fort — specific and human, never generic ("keeps the night watch nobody else wants" beats "a brave fighter").',
         '- backstory: 2 sentences of origin that FIT their tags and how they arrived. Give each one thing to love, pity, or worry about.',
+        '- if a `saga` is given, that person IS who that story was about: their backstory must grow out of it — its kernel, its places, what they wanted in it — so a player who followed the saga recognizes them. Never contradict the saga; never retell it, tell what came BEFORE it.',
         '- quirks: 1-2 concrete PHYSICAL habits a watcher could notice (an action, never an adjective).',
         'Make the people DISTINCT from each other. Low-medieval register.',
         NUMBER_BAN,
@@ -305,7 +326,8 @@ export function makeOpenAiProvider(): AiProvider {
         NUMBER_BAN,
         'Respond as JSON: {wants:[words], flavorLine}',
       ].join('\n');
-      return call(WRITER_MODEL, system, JSON.stringify(input), zTheme);
+      // mechanical tier: a vocab pick + one line — nano, not the prose model (STORY_ENGINE §10.5)
+      return call(NANO_MODEL, system, JSON.stringify(input), zTheme);
     },
 
     async select(input: SelectorInput): Promise<string[]> {

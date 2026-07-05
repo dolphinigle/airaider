@@ -13,6 +13,21 @@ async function act(type: string, ...args: (string | number)[]) {
 
 const RARITY_COLOR: Record<string, string> = { common: '#9aa', uncommon: '#6c6', rare: '#c8f' };
 
+// tab → menu-gate key (server `menus`, from game.menuGates()); unmapped tabs are always open
+const TAB_GATE: Record<string, string> = {
+  leads: 'leads', quests: 'quests', captives: 'captives', items: 'items', lore: 'lore',
+};
+function gateOf(s: S, key: string) { return (s.menus ?? []).find((m: any) => m.key === key); }
+/** room name needed to unlock this tab, or null if open */
+function tabLock(s: S, t: string): string | null {
+  if (t === 'people') { // people = tavern (recruits) + holding (staging); locked only if both are
+    const rec = gateOf(s, 'recruits'), stg = gateOf(s, 'staging');
+    return rec && stg && !rec.open && !stg.open ? rec.need : null;
+  }
+  const g = gateOf(s, TAB_GATE[t] ?? '');
+  return g && !g.open ? g.need : null;
+}
+
 export function App() {
   const [s, setS] = useState<S | null>(null);
   const [tab, setTab] = useState('fort');
@@ -51,22 +66,28 @@ export function App() {
       </header>
       {toast && <div className="toast">{toast}</div>}
       <nav>
-        {['fort', 'build', 'leads', 'quests', 'roster', 'captives', 'items', 'chains', 'people', 'lore', 'log', 'ai'].map(t =>
-          <button key={t} className={tab === t ? 'on' : ''} onClick={() => setTab(t)}>{t}</button>)}
+        {['fort', 'build', 'leads', 'quests', 'roster', 'captives', 'items', 'chains', 'people', 'lore', 'log', 'ai'].map(t => {
+          const need = tabLock(s, t);
+          return <button key={t} className={(tab === t ? 'on' : '') + (need ? ' locked' : '')}
+            title={need ? `build a ${need} first` : undefined}
+            onClick={() => setTab(t)}>{need ? `🔒 ${t}` : t}</button>;
+        })}
       </nav>
       <main>
-        {tab === 'fort' && <Fort s={s} doAct={doAct} setDetail={setDetail} />}
-        {tab === 'build' && <Build s={s} doAct={doAct} />}
-        {tab === 'leads' && <Leads s={s} doAct={doAct} />}
-        {tab === 'quests' && <Quests s={s} doAct={doAct} />}
-        {tab === 'roster' && <Roster s={s} doAct={doAct} />}
-        {tab === 'captives' && <Captives s={s} doAct={doAct} />}
-        {tab === 'items' && <Items s={s} doAct={doAct} />}
-        {tab === 'chains' && <Chains s={s} />}
-        {tab === 'people' && <People s={s} doAct={doAct} />}
-        {tab === 'lore' && <Lore s={s} />}
-        {tab === 'log' && <Log s={s} />}
-        {tab === 'ai' && <AiLog s={s} />}
+        {tabLock(s, tab) ? <p className="lockmsg">🔒 Locked — build a <b>{tabLock(s, tab)}</b> first.</p> : <>
+          {tab === 'fort' && <Fort s={s} doAct={doAct} setDetail={setDetail} />}
+          {tab === 'build' && <Build s={s} doAct={doAct} />}
+          {tab === 'leads' && <Leads s={s} doAct={doAct} />}
+          {tab === 'quests' && <Quests s={s} doAct={doAct} />}
+          {tab === 'roster' && <Roster s={s} doAct={doAct} />}
+          {tab === 'captives' && <Captives s={s} doAct={doAct} />}
+          {tab === 'items' && <Items s={s} doAct={doAct} />}
+          {tab === 'chains' && <Chains s={s} />}
+          {tab === 'people' && <People s={s} doAct={doAct} />}
+          {tab === 'lore' && <Lore s={s} />}
+          {tab === 'log' && <Log s={s} />}
+          {tab === 'ai' && <AiLog s={s} />}
+        </>}
       </main>
       {s.lastReport?.length > 0 && tab === 'fort' && (
         <section className="report">
@@ -259,10 +280,11 @@ function Captives({ s, doAct }: any) {
     <div>
       {s.captives.map((c: any) => (
         <div className="cardrow" key={c.id}>
-          <h3>{c.name} <small>mark {c.value}g · ransom ~{c.ransomEst}g · {c.character.obedient ? 'obedient' : c.breaking ? `breaking (done c${c.breaking})` : 'raw'}{c.location.kind === 'room' ? ` · stationed` : ''}</small></h3>
+          <h3>{c.name} <small>mark {c.value}g · ransom ~{c.ransomEst}g · sell ~{c.sellEst}g · {c.character.obedient ? 'obedient' : c.breaking ? `breaking (done c${c.breaking})` : 'raw'}{c.location.kind === 'room' ? ` · stationed` : ''}</small></h3>
           <p className="tags">{c.tags}</p>
           <div className="row">
             <button onClick={() => doAct('ransom', c.id)}>ransom</button>
+            <button onClick={() => doAct('sell', c.id)}>sell</button>
             {!c.interrogated && <button onClick={() => doAct('interrogate', c.id)}>interrogate (→ lead)</button>}
           </div>
         </div>
@@ -314,6 +336,14 @@ function Chains({ s }: any) {
 }
 
 function People({ s, doAct }: any) {
+  const rec = gateOf(s, 'recruits'), stg = gateOf(s, 'staging');
+  if (rec && !rec.open) return (
+    <div>
+      <h3>🍺 Tavern</h3>
+      <p className="lockmsg">🔒 Build a <b>{rec.need}</b> to meet recruits.</p>
+      {stg?.open && <PeopleHolding s={s} doAct={doAct} />}
+    </div>
+  );
   return (
     <div>
       <h3>🍺 Tavern</h3>
@@ -327,6 +357,16 @@ function People({ s, doAct }: any) {
           <button onClick={() => doAct('hire', c.id)}>hire ({c.hireCost}g)</button>
         </div>
       ))}
+      {stg && !stg.open
+        ? <><h3>⛓ Holding</h3><p className="lockmsg">🔒 Build a <b>{stg.need}</b> to take in new captives.</p></>
+        : <PeopleHolding s={s} doAct={doAct} />}
+    </div>
+  );
+}
+
+function PeopleHolding({ s, doAct }: any) {
+  return (
+    <>
       <h3>⛓ Holding</h3>
       {s.holding.length === 0 && <p>Holding is empty.</p>}
       {s.holding.map((c: any) => (
@@ -340,7 +380,7 @@ function People({ s, doAct }: any) {
           </div>
         </div>
       ))}
-    </div>
+    </>
   );
 }
 

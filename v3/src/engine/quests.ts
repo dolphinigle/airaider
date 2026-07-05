@@ -24,7 +24,7 @@ export interface Lead {
   archetype: Archetype;
   chainInfo: ChainInfo;
   expiresAtCycle: number | null;   // null = standing (repeatable lead-hunts)
-  source: 'starter' | 'hunt' | 'reward' | 'continuation' | 'personal' | 'interrogation' | 'collector' | 'sequel';
+  source: 'starter' | 'hunt' | 'reward' | 'continuation' | 'personal' | 'interrogation' | 'collector' | 'sequel' | 'recruiting';
   title?: string;                  // cached chain title for continuation leads (zero AI cost)
   focalId?: string;                // sequel leads (§21-4a): the SLIPPED focal — the road back is to THEM
   liabilityId?: string;            // collector leads: beating the quest settles THIS liability
@@ -100,6 +100,14 @@ export function huntLead(region: string, level: number, idGen: () => string): Le
   };
 }
 
+/** the Recruiting post's standing faucet (§19): a repeatable get-a-recruit quest for its region */
+export function recruitLead(region: string, level: number, idGen: () => string): Lead {
+  return {
+    id: idGen(), rarity: 'common', level, region, archetype: 'rescue',
+    chainInfo: { kind: 'none' }, expiresAtCycle: null, source: 'recruiting',
+  };
+}
+
 // ---- quests (QUESTS §2–§5) ------------------------------------------------------------
 
 export interface QuestSlot {
@@ -163,7 +171,8 @@ export function oneOffValue(rng: Rng, level: number, rarity: Rarity, n: number):
 }
 
 /** materialize a reward spec into actual cards (engine — names engine-rolled, §4b) */
-export function materializeReward(rng: Rng, spec: RewardSpec, contentLevel: number, region: string): Card[] {
+export function materializeReward(rng: Rng, spec: RewardSpec, contentLevel: number, region: string,
+  genExtras?: { excludeConcepts?: string[]; maxSkills?: number }): Card[] {
   switch (spec.kind) {
     case 'gold': {
       const g = mintStackable('gold', Math.max(1, Math.round(spec.value)));
@@ -176,6 +185,7 @@ export function materializeReward(rng: Rng, spec: RewardSpec, contentLevel: numb
         required: spec.required, race: rng.weighted(races),
         role: spec.kind === 'captive' ? 'captive' : 'npc',
         level: Math.max(1, contentLevel - (spec.kind === 'recruit' ? 1 : 0)),
+        ...genExtras,
       });
       const race = card.tags.find(t => CONCEPT[t.concept]?.group === 'race')?.concept ?? 'human';
       card.name = rollName(rng, race);

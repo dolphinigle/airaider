@@ -22,7 +22,7 @@ import {
   vBase, RARITY_MULT, splitOneOff, hireCost, RANSOM_RATE, SELL_RATE, type Rarity,
 } from '../engine/economy.js';
 import {
-  rollFreshLead, starterPacket, huntLead, slotCount, rollDifficulty, oneOffValue,
+  rollFreshLead, starterPacket, huntLead, recruitLead, slotCount, rollDifficulty, oneOffValue,
   materializeReward, computeDelivery, defaultAsk, liabilityTriggers, LEAD_TTL,
   type Lead, type Quest, type QuestSlot,
 } from '../engine/quests.js';
@@ -37,7 +37,7 @@ import {
 import { rollName, rollPlaceName } from '../engine/names.js';
 import { questXp, grantXp, rollBase, rollGrowthLean, growToLevel } from '../engine/growth.js';
 import { coins, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, type SlotTest, type Outcome, type QuestRollResult } from '../engine/roll.js';
-import { sampleKeywords, sampleSeed } from '../ai/keywords.js';
+import { sampleKeywords, sampleSeed, sampleOpening, pickTone } from '../ai/keywords.js';
 import type { AiProvider, ResolveQuestInput, AskSlotOut } from '../ai/provider.js';
 
 export interface LogEntry { cycle: number; kind: string; text: string; questId?: string }
@@ -196,6 +196,27 @@ export class Game {
   room(id: string): Room | undefined { return this.state.fort.rooms.find(r => r.id === id) }
   hasRoom(type: string): boolean { return this.state.fort.rooms.some(r => r.type === type) }
 
+  // Gate rooms open menus (GENERATION_FLOW §12.1 / DESIGN capability list). "open" also honors
+  // content the game already put in front of the player (starter leads, a staged finale focal)
+  // so a locked menu can never hide owned cards.
+  menuGates(): { key: string; open: boolean; need: string }[] {
+    const g = (key: string, roomId: string, orContent = false) =>
+      ({ key, open: this.hasRoom(roomId) || orContent, need: ROOM_TYPE[roomId]!.name });
+    return [
+      g('quests', 'map-room'),
+      // pre-Map-room the honest hint is the Map room (it brings the starter packet)
+      g('leads', this.hasRoom('map-room') ? 'lead-room' : 'map-room', this.visibleLeads().length > 0),
+      g('recruits', 'tavern', this.state.tavern.length > 0),
+      g('staging', 'holding-cell', this.state.holding.length > 0),
+      g('captives', 'dungeon', this.captives().length > 0),
+      g('items', 'storage'),
+      g('lore', 'library'),
+      // ⚠ doc-gap: §12.1 gives Mess hall → merc list, but FOCUS is a base function (§12.1 CUT
+      // note) and lives in the roster menu — always open pending a designer ruling.
+      g('roster', 'mess-hall', true),
+    ];
+  }
+
   /** a room's EFFECTIVE wants — a bedroom's bind to its owner's tags (CARDS §2:
    *  the owner slot binds the room's target; a fitting relic matches the OWNER) */
   effectiveWants(room: Room): Room['wants'] {
@@ -345,6 +366,13 @@ export class Game {
       this.state.leads.push(huntLead(rt.region, band[0], () => freshId('lead-')));
       this.log('region', `${REGION[rt.region]!.name} is open. Its lead-hunt is on the board.`);
     }
+    if (rt.roomKind === 'recruiting' && rt.region) {
+      // §19: the Recruiting post is a quest FAUCET, not just a gate — its standing
+      // recruit quest goes on the board (parallel to the scouting lodge's lead-hunt)
+      const band = REGION[rt.region]!.levelBand;
+      this.state.leads.push(recruitLead(rt.region, band[0], () => freshId('lead-')));
+      this.log('region', `${REGION[rt.region]!.name} recruiting post opens: word goes out for swords.`);
+    }
     if (rt.roomKind === 'endgame' && rt.region) {
       this.state.fort.endgameKeys.push(rt.region);
       // §13 Outskirts keys: ALL 4 SPINE endgame buildings (Underdeep is NOT a key)
@@ -385,7 +413,13 @@ export class Game {
       roomType: room.type, roomName: rt.name, style,
       hintWords: rt.themeHints ?? [], vocabulary: vocab,
     });
-    const wants = out.wants.map(w => parseAiTag(w)?.concept).filter((c): c is string => !!c && !!CONCEPT[c]);
+    const wants = out.wants.map(w => {
+      const c = parseAiTag(w)?.concept;
+      // r-twin guard: the model sometimes strips the relic prefix ('r-beautiful' → 'beautiful',
+      // which parses as the BODY trait); when this room's hints favor the relic twin, restore it
+      if (c && CONCEPT[`r-${c}`] && (rt.themeHints ?? []).includes(`r-${c}`)) return `r-${c}`;
+      return c;
+    }).filter((c): c is string => !!c && !!CONCEPT[c]);
     room.wants = (wants.length ? wants : rt.themeHints ?? []).map(w => ({ match: w }));
     room.style = style;
     this.log('renovate', out.flavorLine);
@@ -526,15 +560,29 @@ export class Game {
     return { ok: true, msg: `+${pay}g` };
   }
 
-  sell(relicId: string): { ok: boolean; msg: string } {
-    const card = this.card(relicId);
-    if (!card || cardType(card) !== 'relic') return { ok: false, msg: 'not a relic' };
+  sell(id: string): { ok: boolean; msg: string } {
+    const card = this.card(id);
+    if (!card) return { ok: false, msg: 'no such card' };
+    // captive disposition (DESIGN/GAME_STATE §6): sell = the slaver's price, below ransom's —
+    // no office needed, no questions asked; the person leaves play but lives on in lore
+    if (card.character?.role === 'captive') {
+      if (!this.isOwned(card)) return { ok: false, msg: 'not yours to sell (accept them first)' };
+      const pay = Math.round(card.value * SELL_RATE);
+      this.unslotCard(card);
+      card.location = HELD('lore');
+      this.state.holding = this.state.holding.filter(s => s.cardId !== id);
+      this.state.breaking = this.state.breaking.filter(b => b.cardId !== id);
+      this.addGold(pay);
+      this.log('sell', `${card.name} sold for ${pay}g.`);
+      return { ok: true, msg: `+${pay}g` };
+    }
+    if (cardType(card) !== 'relic') return { ok: false, msg: 'not a relic or captive' };
     if (!this.isOwned(card)) return { ok: false, msg: 'not yours to sell' };
     const market = this.state.fort.rooms.find(r => r.type === 'market');
     const rate = market ? marketSellRate(this.comfort(market)) : SELL_RATE;
     const pay = Math.round(card.value * rate);
     this.unslotCard(card);
-    this.state.cards = this.state.cards.filter(c => c.id !== relicId);
+    this.state.cards = this.state.cards.filter(c => c.id !== id);
     this.addGold(pay);
     return { ok: true, msg: `${card.name} sold: +${pay}g` };
   }
@@ -635,34 +683,44 @@ export class Game {
       quest = await this.generateOneOff(lead);
     }
     this.state.quests.push(quest);
-    // consume the lead — only repeatable HUNTS stay standing after pursue
-    if (lead.expiresAtCycle !== null || lead.archetype !== 'lead-hunt') {
+    // consume the lead — only repeatable faucets (lead-hunts, recruiting posts) stay standing
+    if (lead.expiresAtCycle !== null || (lead.archetype !== 'lead-hunt' && lead.source !== 'recruiting')) {
       this.state.leads = this.state.leads.filter(l => l.id !== leadId);
     }
     return { ok: true, msg: `Quest generated: ${quest.title}`, questId: quest.id };
   }
 
   private buildSlots(n: number, level: number, rarity: Rarity, archetype: Lead['archetype'], ask: AskSlotOut[],
-    maxDifficulty?: 'standard' | 'hard'): QuestSlot[] {
+    maxDifficulty?: 'standard' | 'hard', focalCardId?: string): QuestSlot[] {
     const CAP_ORDER = DIFFICULTY_ORDER;
     const slots: QuestSlot[] = [];
+    let reqPlaced = false;   // QUESTS §3: requirements are RARE — at most one pinned slot per quest
     for (let i = 0; i < n; i++) {
       const a = ask[i];
       let test: SlotTest;
       let difficulty = rollDifficulty(this.rng, rarity);
       if (maxDifficulty && CAP_ORDER.indexOf(difficulty) > CAP_ORDER.indexOf(maxDifficulty))
         difficulty = maxDifficulty;
+      let requirement: QuestSlot['requirement'] = { kind: 'open' };
       if (a) {
         const attrs = [a.attribute, a.extraAttribute].filter((x): x is string => !!x)
           .map(x => x.toLowerCase()).filter(x => ['str', 'dex', 'int', 'cha', 'con'].includes(x)) as Attribute[];
         const favored = a.favored.map(f => parseAiTag(f)?.concept).filter((c): c is string => !!c);
         const clashing = a.clashing.map(f => parseAiTag(f)?.concept).filter((c): c is string => !!c);
         test = { attributes: attrs.length ? attrs : ['str'], favored, clashing, difficulty, level };
+        // AI-authored slot requirement (QUESTS §3: open / must-be / must-have), engine-guarded
+        if (!reqPlaced && a.mustBeFocal && focalCardId) {
+          requirement = { kind: 'must-be', cardId: focalCardId };
+          reqPlaced = true;
+        } else if (!reqPlaced && a.requirementTag) {
+          const concept = parseAiTag(a.requirementTag)?.concept;
+          if (concept) { requirement = { kind: 'must-have', concept }; reqPlaced = true }
+        }
       } else {
         const d = defaultAsk(this.rng, archetype);
         test = { attributes: d.attrs, favored: d.favored, clashing: d.clashing, difficulty, level };
       }
-      slots.push({ requirement: { kind: 'open' }, test, filledBy: null });
+      slots.push({ requirement, test, filledBy: null });
     }
     return slots;
   }
@@ -687,6 +745,7 @@ export class Game {
       regionSeed: REGION[lead.region]!.seed, level: lead.level, rarity: lead.rarity,
       slotCount: n, rewardEnvelope: specs.map(s => s.kind).join(' + '),
       keywords: sampleKeywords(this.rng),
+      opening: sampleOpening(this.rng),
       placeNameSuggestions: [rollPlaceName(this.rng), rollPlaceName(this.rng)],
       rosterNames: this.roster().map(m => m.name),
       framedCharacter: framed ? { name: framed.name, tags: renderTags(framed.tags) } : null,
@@ -731,7 +790,15 @@ export class Game {
       focal.location = HELD('limbo');   // back within reach, not yet owned
     } else {
       const spec = { kind: 'captive' as const, value: eco.focalTarget };
-      focal = materializeReward(this.rng, spec, lead.level, lead.region)[0]!;
+      // focal variety (BIBLE lock): recent focals' skill/body/standing tags are excluded so
+      // the archetype varies, and focal skills cap at 2
+      const recentFocalTags = this.state.chains.slice(-4).flatMap(ch => {
+        const f = this.card(ch.focalId);
+        return f ? f.tags.filter(t => ['skill', 'body', 'standing'].includes(CONCEPT[t.concept]?.group ?? ''))
+          .map(t => t.concept) : [];
+      });
+      focal = materializeReward(this.rng, spec, lead.level, lead.region,
+        { excludeConcepts: recentFocalTags, maxSkills: 2 })[0]!;
       focal.location = HELD('limbo');
       this.addCard(focal);
     }
@@ -753,7 +820,9 @@ export class Game {
       seed: sampleSeed(this.rng), keywords: sampleKeywords(this.rng),
       region: REGION[lead.region]!.name, regionSeed: REGION[lead.region]!.seed,
       rarity: lead.rarity, stakes: lead.rarity === 'rare' ? 'high' : lead.rarity === 'uncommon' ? 'mid' : 'low',
-      focal: { name: focal.name, tags: renderTags(focal.tags), dossier: this.dossier(focal.id), isExistingMerc: isPersonal },
+      tone: pickTone(this.rng),
+      avoid: this.state.chains.slice(-5).map(c => `${c.bible.title} — ${c.bible.kernel}`),
+      focal: { id: focal.id, name: focal.name, tags: renderTags(focal.tags), dossier: this.dossier(focal.id), isExistingMerc: isPersonal },
       kind: isPersonal ? 'development' : eco.kind, twist: eco.twist,
       slate, assignedNames,
     });
@@ -806,12 +875,14 @@ export class Game {
       region: REGION[chain.region]!.name, regionSeed: REGION[chain.region]!.seed,
       level: chain.level, rarity: chain.rarity, slotCount: n,
       rewardEnvelope: isFinale ? `the focal: ${chain.kind}` : 'side loot',
-      keywords: [], placeNameSuggestions: [rollPlaceName(this.rng)],
+      keywords: [], opening: sampleOpening(this.rng),
+      placeNameSuggestions: [rollPlaceName(this.rng)],
       rosterNames: this.roster().map(m => m.name),
       lastBeatOutcome: chain.story.lastBeatOutcome,
       bible: chain.bible, storyState: chain.story,
       beatIndex: chain.beatIndex + 1, expectedBeats: chain.expectedBeats,
       focalName: focal?.name,
+      focalIsMerc: chain.isPersonal && focal?.character?.role === 'merc',
     });
     const specs = isFinale ? [] : [{ kind: 'gold' as const, value: sideLootV }];
     // beat pacing (QUESTS §8-B): beat 1 is the low-stakes CARE moment — cap its
@@ -822,7 +893,8 @@ export class Game {
       id: freshId('q'), leadId: lead.id, title: out.title, situation: out.situation, job: out.job,
       level: chain.level, rarity: chain.rarity, region: chain.region, archetype: lead.archetype,
       chainId: chain.id, beatIndex: chain.beatIndex + 1, isFinale,
-      slots: this.buildSlots(n, chain.level, chain.rarity, 'investigate', out.ask, cap),
+      slots: this.buildSlots(n, chain.level, chain.rarity, 'investigate', out.ask, cap,
+        chain.isPersonal && focal?.character?.role === 'merc' ? focal.id : undefined),
       rewardSpecs: specs, rewardCards: [], sideLootV,
       state: 'open', createdCycle: this.state.cycle,
     };
@@ -931,9 +1003,8 @@ export class Game {
     st.cycle += 1;
     const report: string[] = [];
 
-    // 0) FLESH pass — every merc and staged person deserves a who/backstory/quirks
-    // (attachment starts here; persisted per producer-2, so this runs at most once each)
-    await this.fleshPass();
+    // (the FLESH pass runs at step 7, AFTER resolution/staging — people minted THIS
+    // reckoning — finale focals, fresh tavern faces — must be fleshed before the player sees them)
 
     // 1) resolve committed quests in quest-id order (all party slots filled = committed).
     // DELIVERY IS COMPUTED HERE, BEFORE THE AI NARRATES — including the finale's fate
@@ -1019,7 +1090,7 @@ export class Game {
     // 6) lead expiry + liability triggers; standing hunts track the roster on the BOARD
     // too (a stale "L1" display misleads every consumer, human or bot)
     for (const l of st.leads) {
-      if (l.expiresAtCycle === null && l.archetype === 'lead-hunt') {
+      if (l.expiresAtCycle === null && (l.archetype === 'lead-hunt' || l.source === 'recruiting')) {
         const band = REGION[l.region]!.levelBand;
         const levels = this.roster().map(m => m.character!.level);
         const median = levels.length ? [...levels].sort((a, b) => a - b)[Math.floor(levels.length / 2)]! : band[0];
@@ -1042,6 +1113,10 @@ export class Game {
         report.push(`⚠ Your unresolved ${c.name} draws attention — a hostile lead appears (beat it to bury the matter).`);
       }
     }
+
+    // 7) FLESH pass — every merc and staged person deserves a who/backstory/quirks
+    // (attachment starts here; persisted per producer-2, so this runs at most once each)
+    await this.fleshPass();
 
     // keep the save lean: the log is a UI convenience, not the archive (lore is)
     if (st.log.length > 600) st.log = st.log.slice(-400);
@@ -1139,7 +1214,7 @@ export class Game {
       if (!merc?.character || !r.party.includes(merc)) continue;
       const tiers = rollInjuryTiers(this.rng, band);
       merc.character.injuryTiers += tiers;
-      say(`🩸 ${merc.name} is wounded (${band}, ${tiers} tiers).`);
+      say(`🩸 ${merc.name} is wounded (${band}, ${tiers} tier${tiers === 1 ? '' : 's'}).`);
     }
     // delivery
     for (const c of r.delivery.cards) {
@@ -1310,13 +1385,28 @@ export class Game {
     }
     if (!needs.length) return;
     try {
-      const outs = await this.ai.flesh(needs.map(c => ({
-        characterId: c.id, name: c.name, tags: renderTags(c.tags),
-        role: c.character!.role,
-        context: c.character!.role === 'merc'
-          ? (st.cycle <= 2 ? 'a founding member of the company' : 'a sword the company took on')
-          : c.character!.role === 'captive' ? 'a captive taken on a quest' : 'someone the road washed up at the gate',
-      })));
+      const outs = await this.ai.flesh(needs.map(c => {
+        // the locked rule (BIBLE/DESIGN): deep history is written at delivery and must FIT the
+        // genesis saga that produced this person — the focal IS who that story was about
+        const genesis = st.chains.find(ch => ch.focalId === c.id && !ch.isPersonal);
+        return {
+          characterId: c.id, name: c.name, tags: renderTags(c.tags),
+          role: c.character!.role,
+          context: genesis
+            ? (genesis.state === 'slipped'
+              ? `the person the saga "${genesis.bible.title}" is about — they slipped through the company's fingers once already`
+              : `the person the saga "${genesis.bible.title}" was about — the company spent a season on that story to reach them`)
+            : c.character!.role === 'merc'
+              ? (st.cycle <= 2 ? 'a founding member of the company' : 'a sword the company took on')
+              : c.character!.role === 'captive' ? 'a captive taken on a quest' : 'someone the road washed up at the gate',
+          saga: genesis ? {
+            title: genesis.bible.title,
+            kernel: genesis.bible.kernel,
+            situation: genesis.story.currentSituation,
+            want: genesis.bible.cast.find(e => e.name === c.name)?.want ?? null,
+          } : undefined,
+        };
+      }));
       for (const o of outs) {
         const card = this.card(o.characterId);
         if (!card?.character) continue;

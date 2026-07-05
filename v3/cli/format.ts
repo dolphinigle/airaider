@@ -174,7 +174,9 @@ export const render = {
       const bar = slotThreshold(t).toFixed(1);
       const merc = s.filledBy ? g.card(s.filledBy) : null;
       const c = merc ? ` ← ${merc.name} (${explainCoins(merc, t)})` : '';
-      lines.push(`  slot ${i}: tests ${t.attributes.join('+').toUpperCase()} (${t.difficulty}, bar ${bar})${t.favored.length ? ` favors ${t.favored.join(',')}` : ''}${t.clashing.length ? ` clashes ${t.clashing.join(',')}` : ''}${c}`);
+      const req = s.requirement.kind === 'must-be' ? ` ⚑ must be ${g.card(s.requirement.cardId)?.name ?? '?'}`
+        : s.requirement.kind === 'must-have' ? ` ⚑ needs ${s.requirement.concept}` : '';
+      lines.push(`  slot ${i}: tests ${t.attributes.join('+').toUpperCase()} (${t.difficulty}, bar ${bar})${t.favored.length ? ` favors ${t.favored.join(',')}` : ''}${t.clashing.length ? ` clashes ${t.clashing.join(',')}` : ''}${req}${c}`);
       if (!merc) {
         const cands = g.roster().filter(m => m.location.kind === 'held')
           .map(m => ({ m, n: coins(m, t) })).sort((a, b) => b.n - a.n).slice(0, 4);
@@ -199,7 +201,7 @@ export const render = {
       const brk = g.state.breaking.find(b => b.cardId === c.id);
       const office = g.state.fort.rooms.find(r => r.type === 'ransom-office');
       const rate = office ? ransomRate(g.comfort(office)) : RANSOM_RATE;
-      return `${c.id.padEnd(5)} ${c.name.padEnd(22)} mark ${c.value}g (ransom ~${Math.round(c.value * rate)}g)${ob}${brk ? ` (breaking, done c${brk.doneAtCycle})` : ''} ${where}\n      ${renderTags(c.tags)}`;
+      return `${c.id.padEnd(5)} ${c.name.padEnd(22)} mark ${c.value}g (ransom ~${Math.round(c.value * rate)}g · sell ~${Math.round(c.value * SELL_RATE)}g)${ob}${brk ? ` (breaking, done c${brk.doneAtCycle})` : ''} ${where}\n      ${renderTags(c.tags)}`;
     }).join('\n');
   },
 

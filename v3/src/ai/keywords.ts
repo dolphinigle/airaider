@@ -37,10 +37,29 @@ const MOODS = [
 
 const WILDCARD_UNION = [...THINGS, ...OCCASIONS, ...PEOPLE, ...UNCANNY, ...MOODS];
 
-/** 1 BOND + 1 TIE + 2 WILDCARDS (§5 locked sampler) */
+/** 1 BOND + 1 TIE + 1-2 WILDCARDS (§5 locked sampler; ~25% of draws go leaner, for texture) */
 export function sampleKeywords(rng: Rng): string[] {
-  return [rng.pick(BOND), rng.pick(TIE), rng.pick(WILDCARD_UNION), rng.pick(WILDCARD_UNION)];
+  const draw = [rng.pick(BOND), rng.pick(TIE), rng.pick(WILDCARD_UNION)];
+  if (!rng.chance(0.25)) draw.push(rng.pick(WILDCARD_UNION));
+  return draw;
 }
+
+/** engine-rolled opening seed (STORY_GEN: a positive seed each card beats telling the model "rotate") */
+const OPENING_MODES = [
+  'a petitioner at the gate', 'a nailed posting or writ', "a returning patrol's report",
+  'a prisoner or survivor brought in', 'wreckage or a body found on the road',
+  'a summons from the fort outward', 'rumor at market', 'a messenger who will not dismount',
+];
+const OPENING_TIMES = ['at first light', 'mid-morning', 'at noon', 'late afternoon', 'at dusk', 'after dark', 'in the small hours'];
+export function sampleOpening(rng: Rng): { mode: string; time: string; landmarkAllowed: boolean } {
+  return { mode: rng.pick(OPENING_MODES), time: rng.pick(OPENING_TIMES), landmarkAllowed: rng.chance(0.25) };
+}
+
+/** saga tone, weighted toward lighter (BIBLE.md tone knob; PLAYER_PREFERENCES shift is a later 🛠) */
+const TONES: [string, number][] = [
+  ['slice-of-life', 2], ['wry', 3], ['warm', 2], ['bittersweet', 2], ['grim', 2], ['dark', 1],
+];
+export function pickTone(rng: Rng): string { return rng.weighted(TONES) }
 
 /** seed sparks for chain genesis (Polti-anchored what-ifs, weighted by region later 🛠) */
 const SEEDS = [

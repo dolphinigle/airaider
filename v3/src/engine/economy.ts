@@ -38,6 +38,8 @@ export interface GenOptions {
   role?: CharRole;                // characters only
   level?: number;                 // characters only (defaults to contentLevel)
   jackpotChance?: number;         // small jackpot-with-catch lottery
+  excludeConcepts?: string[];     // focal variety (BIBLE): recent focals' tags — never re-roll
+  maxSkills?: number;             // focal cap (BIBLE): skills capped so archetypes vary
 }
 
 /**
@@ -147,11 +149,15 @@ export function generateCard(rng: Rng, opts: GenOptions): Card {
   for (let iter = 0; iter < 24 && tags.length < 12; iter++) {
     const remaining = opts.targetV - spent;
     if (remaining < 12) break;
+    const excluded = new Set(opts.excludeConcepts ?? []);
+    const skillCount = tags.filter(t => CONCEPT[t.concept]?.group === 'skill').length;
     const cand = pool.rollable.filter(r => {
       const c = CONCEPT[r.id]!;
       if (owned.has(r.id)) return false;
       if (c.opposite && owned.has(c.opposite)) return false;
       if (blockedGroups.has(c.group)) return false;
+      if (excluded.has(r.id)) return false;
+      if (opts.maxSkills !== undefined && c.group === 'skill' && skillCount >= opts.maxSkills) return false;
       return true;
     });
     if (cand.length === 0) break;

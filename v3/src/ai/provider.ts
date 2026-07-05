@@ -9,7 +9,8 @@ export interface AskSlotOut {
   extraAttribute?: string | null; // optional 2nd (multi-stat)
   favored: string[];             // favored skill/tag words (engine canonicalizes)
   clashing: string[];
-  requirementTag?: string | null; // must-have <tag> (rare)
+  requirementTag?: string | null; // must-have <tag> (rare; AI-authored, engine-guarded)
+  mustBeFocal?: boolean;          // personal sagas: this slot is THEIR story — pin the focal merc
 }
 
 // ---- ① one-off quest dress / chain-beat quest-writer -----------------------------------
@@ -21,7 +22,8 @@ export interface QuestWriteInput {
   level: number; rarity: string;
   slotCount: number;
   rewardEnvelope: string;        // "a captive and coin" — the engine's kind list, no numbers
-  keywords: string[];            // §5 sampler: 1 BOND + 1 TIE + 2 WILDCARDS
+  keywords: string[];            // §5 sampler: 1 BOND + 1 TIE + 1-2 WILDCARDS
+  opening: { mode: string; time: string; landmarkAllowed: boolean }; // engine-rolled arrival seed (a positive seed beats a "be diverse" ban)
   placeNameSuggestions?: string[]; // engine-rolled fresh place names (variety fuel)
   rosterNames?: string[];        // the player's own soldiers — NEVER card NPCs
   lastBeatOutcome?: string;      // beats: what the previous beat's resolution changed
@@ -30,6 +32,7 @@ export interface QuestWriteInput {
   storyState?: unknown;          // chain story-so-far
   beatIndex?: number; expectedBeats?: number;
   focalName?: string;
+  focalIsMerc?: boolean;         // personal saga: the focal is one of the player's own soldiers
   framedCharacter?: { name: string; tags: string } | null;  // one-offs: the rolled captive to frame
 }
 
@@ -50,7 +53,9 @@ export interface GenesisInput {
   keywords: string[];
   region: string; regionSeed: string;
   rarity: string; stakes: 'low' | 'mid' | 'high';
-  focal: { name: string; tags: string; dossier: string; isExistingMerc: boolean };
+  tone: string;                  // engine-picked, weighted toward lighter (BIBLE tone knob)
+  avoid: string[];               // recent saga titles+kernels — steer away from repeats
+  focal: { id: string; name: string; tags: string; dossier: string; isExistingMerc: boolean };
   kind: string;                  // likely fate (recruit/captive/gold-hoard)
   twist: boolean;                // engine-rolled 30%
   slate: { id: string; name: string; blurb: string; relationPhrase: string; dossier?: string }[];
@@ -103,7 +108,13 @@ export interface FleshInput {
   name: string;              // engine-rolled — use as-is (§4b)
   tags: string;              // rendered tag line
   role: string;              // merc / captive / hireling
-  context: string;           // how they came to the fort ("founding member", "rescued from X")
+  context: string;           // how they came to the fort ("founding member", "won at the finale of <saga>")
+  saga?: {                   // set when this person is a chain's focal: backstory must FIT this story
+    title: string;
+    kernel: string;          // the one-line collision the saga is built on
+    situation: string;       // where the story stands now
+    want: string | null;     // what the bible says they want
+  };
 }
 export interface FleshOut {
   characterId: string;

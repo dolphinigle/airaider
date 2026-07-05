@@ -72,6 +72,7 @@ function stateView() {
     ghCost: need ? ghUpgradeCost(st.fort.ghTier + 1) : null,
     maxSlots: maxSlotsAtTier(st.fort.ghTier),
     unlockedRegions: st.unlockedRegions,
+    menus: game.menuGates(),
     rosterCap: game.rosterCapacity(), captiveCap: game.captiveCapacity(),
     lastReport,
     fort: {
@@ -109,6 +110,7 @@ function stateView() {
         breaking: st.breaking.find(b => b.cardId === c.id)?.doneAtCycle ?? null,
         interrogated: hasTag(c.tags, 'interrogated'),
         ransomEst: Math.round(c.value * (office ? ransomRate(game.comfort(office)) : RANSOM_RATE)),
+        sellEst: Math.round(c.value * SELL_RATE),
       };
     }),
     relics: game.relics().map(c => {
@@ -134,6 +136,9 @@ function stateView() {
         lapsesAtCycle: q.createdCycle + QUEST_TTL,
         slots: q.slots.map((s, i) => ({
           idx: i, groupId: s.groupId ?? null,
+          requirement: s.requirement.kind === 'must-be'
+            ? `must be ${game.card(s.requirement.cardId)?.name ?? '?'}`
+            : s.requirement.kind === 'must-have' ? `needs ${s.requirement.concept}` : null,
           test: { ...s.test, bar: slotThreshold(s.test) },
           filledBy: s.filledBy ? game.card(s.filledBy)!.name : null, filledId: s.filledBy,
           filledExplain: s.filledBy ? explainCoins(game.card(s.filledBy)!, s.test) : null,

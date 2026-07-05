@@ -139,3 +139,35 @@ chaos battery + 500c marathon clean after all changes.
 - Idle-obedient hoarding: nothing pushes back on stockpiling broken captives (no upkeep by design) — fine for proto?
 - One-off common quests still fire one cheap AI call for the card (QUESTS §10 lean says "templated + tiny flavor line") — currently full writeQuest; cost is small, but templating can trim it later.
 - Word budgets by rarity not yet enforced on the resolver (QUESTS §10 latency note) — measure minutes/cycle in GUI play.
+
+## Doc-conformance audit round (2026-07-05, four parallel doc↔code audits + fixes)
+
+Method: user hit immediate discords (ungated menus, saga-less backstories); four systematic
+audits swept QUESTS+BIBLE, DESIGN+CARDS, STORY_ENGINE+PROMPTS, GENERATION_FLOW §1–§21 against
+the code. Every confirmed mismatch fixed at the root. Findings #62–75:
+
+| # | Finding → fix | Class |
+|---|---|---|
+| 62 | **Menus never gated** — gate rooms' `unlocks` metadata was dead; every tab visible at cycle 0 → engine `menuGates()` (open = room built OR content already present), server `menus`, web 🔒 tabs + lock panels, CLI locked-view messages. Roster stays open (FOCUS is a base function, §12.1 CUT note) — designer flag | design conformance |
+| 63 | **Backstory not tied to genesis saga** (BIBLE/DESIGN lock: flesh-on-delivery must fit the story) — fleshPass ran at step 0 with generic role strings; finale focals (rewardCards:[]) got swept a cycle late, saga-blind → fleshPass moved to step 7 (post-staging, same reckoning), looks up the focal's chain, passes saga {title,kernel,situation,want}; flesh+resolve prompts instruct the tie; mock echoes it; invariant test added | design conformance |
+| 64 | **Slot requirements never authored** (QUESTS §3: AI authors open/must-be/must-have) — zAsk had no field, buildSlots hardcoded open, assign guards dead → AI emits requiredTag/mustBeFocal (≤1 per quest, engine-guarded, parseAiTag-canonicalized); shown in CLI (⚑) + GUI | design conformance |
+| 65 | **Genesis missing tone/avoid/focal-id** (BIBLE: pickTone weighted-lighter; avoid = recent titles; focal edges) — tone+avoid+focal.id now passed; focal genesis edges no longer silently dropped by guardEdges | design conformance |
+| 66 | **Focal archetype convergence** (BIBLE: recent-tag exclusion + 2-skill cap) → generateCard excludeConcepts/maxSkills; genesis excludes last-4 focals' skill/body/standing tags | design conformance |
+| 67 | **"Rotate arrivals" told to a stateless model** (STORY_GEN: engine seeds beat prose bans) → engine-rolled opening {mode,time,landmarkAllowed(25%)} per card; prompt consumes it | prompt fix |
+| 68 | **Buildup-to-brink gutted** (STORY_ENGINE §7a) — "before" was 1 departure clause → brink spec (challenge materialises, party commits, held breath) + rarity budgets 2/3/4-5 sentences | prompt fix |
+| 69 | **Purple-word ban absent** (BIBLE lock) → in NUMBER_BAN; **no length caps** (STORY_ENGINE §10 cost guardrail) → zProse soft-clamps on all prose fields | prompt fix |
+| 70 | **`infamous` rolled onto relics** (§9b W17: fame only for objects) → domainOverride: character | engine bug |
+| 71 | **Recruiting post was a dead building** (§19: a quest faucet) → standing region recruit lead (rescue archetype) on build; survives pursue like lead-hunts | engine bug |
+| 72 | **Captive `sell` disposition missing** (DESIGN §6; CLI advertised it, errored "not a relic") → sell() handles captives at SELL_RATE, leaves them alive in lore; previews in both UIs | design conformance |
+| 73 | Keyword sampler always drew 2 wildcards (§5: ~25% draw 1) → leaner draw at 25% | engine bug |
+| 74 | themeRoll ran on the prose model; effort uniform 'low' → nano + 'minimal' for mechanical tier (STORY_ENGINE §10.5) | cost |
+| 75 | r-twin parse guard: AI stripping 'r-' ('beautiful') made gallery wants match bodies, not relics → hint-favored twin restored at renovate parse | latent bug |
+
+## Open designer flags 🚩 (this round)
+- **Mess hall → roster menu**: §12.1 (unlocked brainstorm) gates the merc list behind it, but FOCUS
+  assignment is a locked "base game function" living in that menu — roster left always-open; needs a ruling.
+- **Chronicle room** exists in the catalog (`unlocks: 'chronicle'`) but appears in NO doc; the chains
+  tab is left ungated. Rule or cut.
+- **leadBlurb** (BIBLE.md board line) still unimplemented — the board reuses `bible.title`.
+- **Finale approach slots** ignore mustBeFocal (left open) — is a personal finale allowed to pin?
+- **PLAYER_PREFERENCES tone knob** not implemented — tone is engine-weighted (lighter) only.

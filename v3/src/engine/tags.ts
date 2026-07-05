@@ -115,7 +115,8 @@ export const CONCEPTS: TagConcept[] = [
   // W8/W9 standing — 3 apex value lines (all depth 20, t20 ≈ 1.19M)
   ...pair(
     C('famous', 'standing', 20, { appearOdds: 0.02 }),
-    C('infamous', 'standing', 20, { appearOdds: 0.02 })),
+    // §9b W17: objects may be famous, never infamous — infamy is earned by deeds (characters only)
+    C('infamous', 'standing', 20, { appearOdds: 0.02, domainOverride: 'character' })),
   C('high-born', 'standing', 20, { appearOdds: 0.006, domainOverride: 'character' }),
 
   // W10/W11 relic form — 9 broad categories, uniform depth 20, tier embodies material+craft
