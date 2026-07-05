@@ -547,7 +547,9 @@ export class Game {
   ransom(captiveId: string): { ok: boolean; msg: string } {
     const card = this.card(captiveId);
     if (card?.character?.role !== 'captive') return { ok: false, msg: 'not a captive' };
-    if (!this.isOwned(card)) return { ok: false, msg: 'not yours to ransom (accept them first)' };
+    // owned captives AND holding candidates — "ransom now" is half the holding decision (§6)
+    if (!this.isOwned(card) && !this.state.holding.some(s => s.cardId === captiveId))
+      return { ok: false, msg: 'not yours to ransom (accept them first)' };
     const office = this.state.fort.rooms.find(r => r.type === 'ransom-office');
     const rate = office ? ransomRate(this.comfort(office)) : RANSOM_RATE;
     const pay = Math.round(card.value * rate);
@@ -566,7 +568,8 @@ export class Game {
     // captive disposition (DESIGN/GAME_STATE §6): sell = the slaver's price, below ransom's —
     // no office needed, no questions asked; the person leaves play but lives on in lore
     if (card.character?.role === 'captive') {
-      if (!this.isOwned(card)) return { ok: false, msg: 'not yours to sell (accept them first)' };
+      if (!this.isOwned(card) && !this.state.holding.some(s => s.cardId === id))
+        return { ok: false, msg: 'not yours to sell (accept them first)' };
       const pay = Math.round(card.value * SELL_RATE);
       this.unslotCard(card);
       card.location = HELD('lore');
@@ -646,8 +649,10 @@ export class Game {
 
   visibleLeads(): Lead[] {
     if (!this.hasRoom('map-room')) return [];
-    // the day-0 packet is visible pre-Lead-room; the full board needs the Lead room
-    if (!this.hasRoom('lead-room')) return this.state.leads.filter(l => l.source === 'starter');
+    // the day-0 packet is visible pre-Lead-room, as are STANDING faucets — those are posted
+    // at their own buildings (scouting lodge / recruiting post), not board gossip
+    if (!this.hasRoom('lead-room'))
+      return this.state.leads.filter(l => l.source === 'starter' || l.expiresAtCycle === null);
     return this.state.leads;
   }
 

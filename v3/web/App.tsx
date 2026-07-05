@@ -227,6 +227,7 @@ function Quests({ s, doAct }: any) {
                 tests <b>{sl.test.attributes.join('+').toUpperCase()}</b> ({sl.test.difficulty}, bar {sl.test.bar.toFixed(1)})
                 {sl.test.favored.length > 0 && <> · favors <i>{sl.test.favored.join(', ')}</i></>}
                 {sl.test.clashing.length > 0 && <> · clashes <i>{sl.test.clashing.join(', ')}</i></>}
+                {sl.requirement && <> · <b>⚑ {sl.requirement}</b></>}
               </span>
               {sl.filledBy
                 ? <span title={sl.filledExplain ?? ''}><b>{sl.filledBy}</b> <small>({sl.filledExplain})</small> <button onClick={() => doAct('unassign', q.id, sl.idx)}>×</button></span>

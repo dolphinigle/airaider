@@ -166,6 +166,35 @@ describe('audit-fix regressions', () => {
     }
   });
 
+  it('holding candidates can be cashed out: ransom and sell work pre-accept', () => {
+    const g = richGame(71);
+    const mk = () => {
+      const c = (g as never as { freshCharacter: (r: string, l: number, v: number, rg: string) => import('../src/engine/cards.js').Card })
+        .freshCharacter('captive', 2, 80, 'forests');
+      c.location = HELD('staged');
+      g.state.cards.push(c);
+      g.state.holding.push({ cardId: c.id, expiresAtCycle: 99 });
+      return c;
+    };
+    const a = mk(), b = mk();
+    expect(g.ransom(a.id).ok).toBe(true);
+    expect(g.sell(b.id).ok).toBe(true);
+    expect(g.state.holding.length).toBe(0);
+    expect(a.location).toEqual(HELD('lore'));
+    expect(b.location).toEqual(HELD('lore'));
+  });
+
+  it('standing faucet leads are visible and pursuable without a Lead room', async () => {
+    const g = richGame(73);
+    g.state.fort.ghTier = 6;
+    g.build('map-room'); g.build('scouting-forests'); g.build('recruiting-forests');
+    const faucets = g.visibleLeads().filter(l => l.expiresAtCycle === null);
+    expect(faucets.length).toBeGreaterThanOrEqual(2);   // hunt + recruit, no lead-room built
+    const rec = faucets.find(l => l.source === 'recruiting')!;
+    expect((await g.pursue(rec.id)).ok).toBe(true);
+    expect(g.state.leads.some(l => l.id === rec.id)).toBe(true);   // faucet survives pursue
+  });
+
   it('#36 capacity from cellSlots; multiBuild fields honored', () => {
     const g = richGame(63);
     g.state.fort.ghTier = 6;
