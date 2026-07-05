@@ -73,7 +73,16 @@ into it; put those in the user message ("the cap given in the user message") and
 reference them. Conditional rules (twist vs straight) live in the stable text as both branches, selected
 by a user-message flag. Implemented 2026-06-11 for outcome + genesis.
 
-## 8. How to change a prompt
+## 8. PRINCIPLES, not instance-patches (prompts AND code)
+When a bad output or bug surfaces, do NOT patch in the instance that failed ("never open on the boss
+finding a cart"). State the PRINCIPLE that makes the whole class impossible ("the boss is never in the
+field; write only what reaches the fort"). Instance-patches are brittle — the next failure is a sibling
+of the last one, not a repeat — and concrete examples in prompts are STICKY (the model copies them).
+The system fits together as: instructions = principles (this rule) · variety = engine seeds, not
+examples (§2) · bans = concrete tokens, the one place specificity wins (§5). Same discipline in code:
+fix the class, not the case. (Designer ruling, 2026-07-05.)
+
+## 9. How to change a prompt
 Edit → **read real outputs** (run a `_exp_*` harness with the real AI, or `/playtest`) → judge the prose,
 not the diff → iterate. Offline gates (selftest/looptest/conformance) use the Mock narrator and only prove
 no *breakage*; they can't judge prose. See the **playtest** skill.

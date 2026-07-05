@@ -4,6 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Working style
 - **Be terse. Save tokens.** Short answers, minimal preamble, no recap of what you just did.
+- **Principles, not instance-patches.** In prompts and code alike, fix the CLASS, never bolt on the specific example that failed — examples are sticky, instance-patches brittle. Full rule: `docs/PROMPT_RULES.md` §8.
 
 ## Project status
 - Airaider is in the **PROTOTYPE V3 IMPLEMENTATION phase.** The design is FINALIZED and verified — build against `docs/`, don't redesign.
