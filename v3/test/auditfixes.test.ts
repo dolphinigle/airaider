@@ -195,6 +195,22 @@ describe('audit-fix regressions', () => {
     expect(g.state.leads.some(l => l.id === rec.id)).toBe(true);   // faucet survives pursue
   });
 
+  it('must-have requirements are fillability-guarded: satisfiable pins, unsatisfiable favors', () => {
+    const g = richGame(79);
+    const merc = g.roster()[0]!;
+    merc.tags.push({ concept: 'heal', tier: 1 });
+    const build = (tag: string) => (g as never as {
+      buildSlots: (n: number, l: number, r: string, a: string, ask: unknown[]) => { requirement: { kind: string; concept?: string }; test: { favored: string[] } }[];
+    }).buildSlots(1, 2, 'common', 'investigate', [
+      { attribute: 'str', favored: [], clashing: [], requirementTag: tag },
+    ]);
+    const withHeal = build('heal');       // roster CAN satisfy → pins
+    expect(withHeal[0]!.requirement).toEqual({ kind: 'must-have', concept: 'heal' });
+    const noMagic = build('magic-fire');  // nobody has it → downgrade, no dead card
+    expect(noMagic[0]!.requirement.kind).toBe('open');
+    expect(noMagic[0]!.test.favored).toContain('magic-fire');
+  });
+
   it('#36 capacity from cellSlots; multiBuild fields honored', () => {
     const g = richGame(63);
     g.state.fort.ghTier = 6;

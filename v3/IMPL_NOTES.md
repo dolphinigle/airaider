@@ -184,6 +184,7 @@ renovate (nano). Findings #76–78 — two real bugs and one display gap:
 | 76 | **"Ransom now" from Holding ALWAYS failed** ("not yours to ransom — accept first"): staged candidates fail `isOwned`, yet the UI offers the button and without a Dungeon the person was a dead end that silently timed out → ransom+sell now accept holding candidates (the §6 "decide by cX" window is exactly accept-or-cash-out); regression test | engine bug (pre-existing) |
 | 77 | **Faucet leads invisible without a Lead room**: `visibleLeads` pre-Lead-room only showed `starter` — the new Recruiting-post lead (and the older scouting hunt lead) could never be pursued if built first → standing (expiry-null) leads are always visible: they're posted at their own buildings; regression test | engine bug (one mine, one latent) |
 | 78 | GUI quest slots never showed the new ⚑ requirement (CLI/server had it; a pinned slot looked open and refusals read as bugs) → shown in the slot row | legibility |
+| 79 | **Unfillable must-have = a dead card** (live real-AI run: 'needs heal' pinned with no healer on the roster — the quest blocked the board 6+ cycles until TTL) → fillability guard at authoring: a must-have nobody satisfies downgrades to a favored tag; regression test | engine guard |
 
 Verified clean this hour: cycle-0 menu gating over the live API (lock → build map-room → unlock,
 starter packet visible), tavern build correctly tier-blocked, hire cleanly refused, captive

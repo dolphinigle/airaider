@@ -719,7 +719,13 @@ export class Game {
           reqPlaced = true;
         } else if (!reqPlaced && a.requirementTag) {
           const concept = parseAiTag(a.requirementTag)?.concept;
-          if (concept) { requirement = { kind: 'must-have', concept }; reqPlaced = true }
+          if (concept) {
+            // fillability guard: a must-have NOBODY on the roster satisfies is a dead card
+            // that blocks the board until TTL — downgrade to favored (the tag still counts)
+            if (this.roster().some(m => hasTag(m.tags, concept))) {
+              requirement = { kind: 'must-have', concept }; reqPlaced = true;
+            } else if (!test.favored.includes(concept)) test.favored.push(concept);
+          }
         }
       } else {
         const d = defaultAsk(this.rng, archetype);
