@@ -129,7 +129,7 @@ export const TIE: string[] = [
   'succession', 'usurpation', 'regency', 'puppet rule', 'abdication', 'coup',
   'election rigging', 'vote buying', 'office selling', 'nepotism', 'purge', 'proscription',
   'guild war', 'trade war', 'turf war', 'family feud', 'clan feud', 'vendetta',
-  'power vacuum', 'contested command', 'divided loyalties', 'secret faction', 'shadow council', 'fifth column',
+  'power vacuum', 'contested command', 'divided loyalties', 'secret faction', 'shadow council', 'traitors within',
   'infiltration', 'defection', 'double agent', 'sleeper agent', 'dead drop', 'coded letters',
   // faith & heresy
   'heresy', 'apostasy', 'schism', 'excommunication', 'interdict', 'inquisition',

@@ -803,3 +803,23 @@ expect Y" semicolon weld (~25/30 cards) — resolved mechanically by #244 desemi
 sentences, the proven c6 register) | covered |. R34: 2/2 CLEAN (no collisions: challenge-first vs
 brink structure OK; no-fort-officials scopes to the company fort, client-side officials untouched).
 Campaign C (iteration-2 fixes) running; D follows with iteration-3.
+
+Judge C (848586, iteration-2 measure): desemi LANDED (0 semicolons in all narrative prose);
+matter-first openers 73%; but the model evades one-action via and/comma chains, desemi missed
+dossier/cast/story fields, and a "photograph" appeared. Judge D (919293, iteration-3 measure):
+**5/7 landed — before-texts +1.5 (0 departure templates), 0 invented officials, 0 tense slips,
+0 self-incrimination, concrete backstories.** Fixes #258-263:
+| 258 | and/comma action-chaining (2.7 actions/sentence) → never ACTIONS chained (compound objects
+fine); R35 caught the budget bind → after budget +1 sentence per extra party member | prompt |
+| 259 | desemi wired into zStrArr (quirks, knownToPlayer) + storyUpdate.currentSituation | engine |
+| 260 | "photograph"/"co-op"/"Fifth Column" anachronisms → NUMBER_BAN: no object or term from after
+the age of candles and horses; AND "fifth column" found as a KEYWORD SEED (seed/ban-collision class
+AGAIN — v2 pool) → replaced with "traitors within" | prompt+seed |
+| 261 | wound frame ("took a cut to her X" ×4, forearm ×3 near-verbatim) → wound rides INSIDE its
+action beat, never stapled on | prompt |
+| 262 | dangling "—and" brink glitch → desemi trims trailing conjunction after em-dash | engine |
+| 263 | WHO similes survive ("wore rules like a careful garment") → simile tell named | prompt |.
+Messenger-device saturation ~90% (beyond openers): partly inherent to boss-at-fort POV; added
+"no bringer needed when the matter is visible/known" 🟡. "0 heads of 0 coins" display + roster
+starvation deadlock (6 dead cycles, campaign ends at 2 wounded mercs) → the standing 🔴 economy
+queue, now with sharper evidence. Campaign E (010203) = final measure with iterations 4+5.
