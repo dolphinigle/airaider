@@ -116,7 +116,7 @@ for (const ch of g.state.chains) {
   say(`  GOAL: ${b.goal}`);
   say(`  ARC: ${b.arc.join(' → ')}`);
   if (b.twist) say(`  TWIST: ${b.twist}`);
-  say(`  CAST: ${b.cast.map(x => `${x.name} (${x.role}; wants ${x.want})`).join(' · ')}`);
+  say(`  CAST: ${b.cast.map(x => `${x.name} (${x.role} — wants ${x.want})`).join(' · ')}`);
   say(`  KNOWN TO PLAYER: ${ch.story.knownToPlayer.join(' | ') || '(none)'}`);
   say(`  INTRODUCED: ${(ch.story.introducedNames ?? []).join(', ') || '(none)'}`);
   say(`  NOW: ${ch.story.currentSituation}`);

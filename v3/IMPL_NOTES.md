@@ -823,3 +823,24 @@ Messenger-device saturation ~90% (beyond openers): partly inherent to boss-at-fo
 "no bringer needed when the matter is visible/known" 🟡. "0 heads of 0 coins" display + roster
 starvation deadlock (6 dead cycles, campaign ends at 2 wounded mercs) → the standing 🔴 economy
 queue, now with sharper evidence. Campaign E (010203) = final measure with iterations 4+5.
+
+Final judge E (010203, full stack): **"The targeted defect classes are cleared… the corpus now
+reads as functional RPG quest text, not purple novel prose. On the sentence-craft bar the designer
+set, this run passes on nearly every surface."** Counts: anachronisms 0 (seed fix holds), WHO
+similes 0, departure templates 0, dangling "—and" 0, semicolons 0 in ALL AI prose, and-chains
+2.7→1.48 actions/sentence, wound-folding integrated 5/5; after-texts 6→7. Closing fixes #264-267:
+| 264 | **finale resolution contradicted the CHOSEN approach** (plan named Magka; narration
+produced Rodton — "the only place the writing actively lies to the player") → the approach is a
+CONTRACT: named actions happen to named people; the outcome judges THAT plan, never a swap | prompt
+(correctness) | | 265 | brink truncation mid-phrase ("into the—") + R37 caught MY "word half-spoken"
+example licensing exactly that (§8 strikes again) → complete-image-halted examples only | prompt |
+| 266 | cross-item batch rules self-scoped ("when this message carries more than one quest") —
+R37 flagged them un-actionable on single-quest calls | prompt | | 267 | CAST render glue semicolon
+→ em-dash (harness) | harness |. R38: CLEAN — fixpoint.
+
+**EXTENDED PLAYTEST CLOSED. Trajectory: after-texts 6→7, before-texts 5→7, one-offs/beats hold 7,
+finales 8 (with the contract fix pending live confirm), dossiers 7, meta 7. Sentence-craft bar MET
+on all surfaces per the final judge. What remains is design-scope 🔴: single-region monotony,
+messenger-device as the core intake loop (92% of cards — partly inherent to boss-at-fort POV),
+roster-starvation failure spirals, "0 heads of 0 coins" display. Watch 🟡: residual ~1.5 and-chain,
+fixture pronoun/name-gender mismatches (Caelinne tagged male), q124-class grammar slips ~1/run.**
