@@ -38,21 +38,22 @@ export class MockProvider implements AiProvider {
 
   async writeQuest(input: QuestWriteInput): Promise<QuestWriteOut> {
     this.tick();
-    const kw = input.keywords.slice(0, 2).join(', ');
+    const kw = (input.keywords ?? []).slice(0, 2).join(', ');
+    const arch = input.archetype ?? 'investigate';
     const title = input.kind === 'finale'
       ? `The Reckoning: ${input.focalName ?? 'the end of it'}`
-      : `${cap(input.archetype)} — ${kw || input.region}`;
-    const situation = (this.rng.pick(SITS)).replace('{region}', input.region) +
+      : `${cap(arch)} — ${kw || input.location.split(' — ')[0]}`;
+    const situation = (this.rng.pick(SITS)).replace('{region}', input.location.split(' — ')[0]!) +
       (input.framedCharacter ? ` They speak of one ${input.framedCharacter.name} — ${input.framedCharacter.tags}.` : '') +
       (kw ? ` (${kw} figure in it.)` : '');
     const out: QuestWriteOut = {
       title,
       situation,
-      job: this.rng.pick(JOBS[input.archetype] ?? JOBS.contract!),
+      job: this.rng.pick(JOBS[arch] ?? JOBS.contract!),
       ask: [], // engine falls back to defaultAsk when empty (mock keeps engine authoritative)
-      proposedRewardKind: undefined,
     };
-    if (input.kind === 'beat') out.closesChain = false;
+    // §4 pattern-B: shape a partial quarry (type from the "AI", tier left to the engine)
+    if (input.framedCharacter?.partial) out.quarryTags = [this.rng.pick(['soldier', 'criminal (high)', 'hunter', 'beautiful (mid)'])];
     if (input.kind === 'finale') {
       out.approaches = [
         { label: 'Win them over', rewardKind: 'recruit', attribute: 'cha', favored: ['social'] },
@@ -76,7 +77,7 @@ export class MockProvider implements AiProvider {
         { name: extraName, who: 'a go-between with a stake of their own', want: 'to come out ahead', role: 'broker' },
         ...(known ? [{ name: known.name, who: known.blurb, want: 'old business settled', role: 'complication', loreId: known.id }] : []),
       ],
-      situation: `Out in ${input.region}, ${input.seed} — and ${f} stands at the middle of it.`,
+      situation: `Out in ${input.location.split(' — ')[0]}, ${input.seed} — and ${f} stands at the middle of it.`,
       goal: `Resolve what binds ${f} — likely ending as ${input.kind}.`,
       arc: ['a thread surfaces', 'the price becomes clear', 'sides must be chosen', 'the reckoning'],
       twistReveal: input.twist ? `${extraName} serves someone unseen.` : null,
@@ -101,7 +102,8 @@ export class MockProvider implements AiProvider {
         let band: 'none' | 'low' | 'med' | 'high' = 'none';
         if (q.outcome === 'failure' && this.rng.chance(0.5)) band = this.rng.chance(0.3) ? 'med' : 'low';
         else if (q.outcome === 'partial' && this.rng.chance(0.2)) band = 'low';
-        return { characterId: p.id, band };
+        // cause must cite the after text — the engine drops uncited wounds
+        return { characterId: p.id, band, cause: band === 'none' ? null : q.outcome === 'failure' ? 'the worst moment' : 'gets messy' };
       });
       const fleshed = q.deliveredCharacters.map(c => ({
         characterId: c.id,

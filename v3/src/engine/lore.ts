@@ -118,7 +118,7 @@ export function recall(g: LoreGraph, focalId: string, cycle: number, wildcardIds
   for (const n of hop1.slice(0, 8)) neighbors(n, 0.4);   // 2nd hop, damped, no recursion
   for (const w of wildcardIds) {
     const node = g.nodes[w];
-    if (node?.active && !seen.has(w)) seen.set(w, { node, relationPhrase: 'thematic wildcard', score: 0.1 });
+    if (node?.active && !seen.has(w)) seen.set(w, { node, relationPhrase: 'a name the world keeps mentioning', score: 0.1 });   // world-phrase, not selector jargon (it reaches prompts)
   }
   return [...seen.values()].sort((a, b) => b.score - a.score).slice(0, CANDIDATE_CAP);
 }
@@ -137,8 +137,9 @@ export function renderDossier(g: LoreGraph, id: string, cycle: number,
     .slice(0, DOSSIER_TOP_K)
     .map(e => {
       const other = g.nodes[e.from === id ? e.to : e.from]?.name ?? '?';
-      const dir = e.from === id ? e.type : `(${e.type} by)`;
-      return `- ${dir} ${other}: ${e.blurb}${e.core ? ' [core]' : ''}`;
+      // readable both ways: "they: betrayed-by Helelas" / "Helelas: betrayed-by them"
+      const dir = e.from === id ? `they: ${e.type} ${other}` : `${other}: ${e.type} them`;
+      return `- ${dir} — ${e.blurb}${e.core ? ' (defining memory)' : ''}`;
     });
   const lines = [`${node.name} — ${node.identity}`];
   if (extras?.who) lines.push(`known as: ${extras.who}`);

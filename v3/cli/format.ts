@@ -151,7 +151,7 @@ export const render = {
     if (!q) return 'no such quest';
     const lines = [
       `═══ ${q.title} ═══  (${q.id}, L${q.level} ${q.rarity}, ${REGION[q.region]!.name}, lapses c${q.createdCycle + QUEST_TTL})`,
-      q.situation, `JOB: ${q.job}`,
+      q.situation,
       `REWARD envelope: ${q.rewardSpecs.map(r => r.kind).join(' + ') || (q.isFinale ? 'the focal character' : 'side loot')}`,
     ];
     if (q.approaches) {

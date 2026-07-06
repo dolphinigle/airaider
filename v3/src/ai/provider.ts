@@ -17,23 +17,34 @@ export interface AskSlotOut {
 
 export interface QuestWriteInput {
   kind: 'one-off' | 'beat' | 'finale';
-  archetype: string;
-  region: string; regionSeed: string;
+  archetype?: string;            // one-offs only — beats serve the bible's story instead
+  location: string;              // "Western Forests — old-growth elven woods; Thornhollow at their heart"
   level: number; rarity: string;
   slotCount: number;
   rewardEnvelope: string;        // "a captive and coin" — the engine's kind list, no numbers
-  keywords: string[];            // §5 sampler: 1 BOND + 1 TIE + 1-2 WILDCARDS
-  opening: { mode: string; time: string; landmarkAllowed: boolean }; // engine-rolled arrival seed (a positive seed beats a "be diverse" ban)
+  keywords?: string[];           // one-offs: §5 sampler (1 BOND + 1 TIE + 1-2 WILDCARDS)
+  opening: { spark: string };    // arrival SPARK, time folded in ("a friar, a plea — at dusk"): a standalone time field taught cards to open "At dusk, ...".
+                                 // The landmark gate is enforced by OMISSION: a card that may not name the
+                                 // landmark simply never sees it in `location` (a shown token gets used).
+  gravity?: string;              // one-offs: engine-rolled weight of the matter ("a small, everyday job" … "a grave affair")
+  npcNameSuggestions?: string[]; // one-offs: engine-rolled names for any people the card must name (§4b)
+  rewardItems?: string[];        // one-offs: the pre-rolled prize objects — fiction naming the prize must use these
   placeNameSuggestions?: string[]; // engine-rolled fresh place names (variety fuel)
   rosterNames?: string[];        // the player's own soldiers — NEVER card NPCs
+  rosterPronouns?: Record<string, string>;  // name → she/he/they (separate map: inline "(she)" got copied into prose)
   lastBeatOutcome?: string;      // beats: what the previous beat's resolution changed
   // chain context (beat/finale)
   bible?: unknown;               // the Bible object (hidden truth)
   storyState?: unknown;          // chain story-so-far
+  // two-part lore prompting (LORE.md): the selector already picked who gets full dossiers;
+  // the writer receives the world's relevant memory around this saga
+  relevantLore?: { id: string; name: string; blurb: string; relationPhrase: string; companySoldier?: boolean; companyCaptive?: boolean; dossier?: string }[];
+  focalDossier?: string;         // what the world currently remembers of the focal (evolves each cycle)
   beatIndex?: number; expectedBeats?: number;
   focalName?: string;
   focalIsMerc?: boolean;         // personal saga: the focal is one of the player's own soldiers
-  framedCharacter?: { name: string; tags: string } | null;  // one-offs: the rolled captive to frame
+  framedCharacter?: { name: string; tags: string; pronoun?: string; dossier?: string; lastSeen?: string; partial?: boolean } | null;  // one-offs: the person to frame (pronoun explicit; lastSeen = a returning person's story so far; partial = identity only — the writer SHAPES them via quarryTags, §4 pattern-B)
+  avoid?: string[];              // one-offs: recent card titles+jobs — do not re-deal the same premise
 }
 
 export interface QuestWriteOut {
@@ -41,8 +52,7 @@ export interface QuestWriteOut {
   situation: string;             // POV-locked card prose
   job: string;                   // the job stated plainly
   ask: AskSlotOut[];             // one per slot (engine already fixed the count)
-  proposedRewardKind?: string;   // AI proposes, engine validates & grants (F6)
-  closesChain?: boolean;         // beat: AI judges climax (engine's gate still rules)
+  quarryTags?: string[];         // §4 pattern-B: ≤3 vocab words shaping a partial framedCharacter (AI = type; engine = tier)
   approaches?: { label: string; rewardKind: string; attribute: string; favored: string[] }[]; // finale mutex groups
 }
 
@@ -51,14 +61,15 @@ export interface QuestWriteOut {
 export interface GenesisInput {
   seed: string;                  // the Polti-anchored what-if spark
   keywords: string[];
-  region: string; regionSeed: string;
+  location: string;              // the land's name + anchor facts, one field
   rarity: string; stakes: 'low' | 'mid' | 'high';
   tone: string;                  // engine-picked, weighted toward lighter (BIBLE tone knob)
   avoid: string[];               // recent saga titles+kernels — steer away from repeats
   focal: { id: string; name: string; tags: string; dossier: string; isExistingMerc: boolean };
   kind: string;                  // likely fate (recruit/captive/gold-hoard)
   twist: boolean;                // engine-rolled 30%
-  slate: { id: string; name: string; blurb: string; relationPhrase: string; dossier?: string }[];
+  expectedBeats: number;         // the arc must have exactly this many steps (chain shape is engine-rolled)
+  slate: { id: string; name: string; blurb: string; relationPhrase: string; companySoldier?: boolean; companyCaptive?: boolean; dossier?: string }[];
   assignedNames: string[];       // pre-rolled names for any NEW cast the AI coins (§4b)
 }
 
@@ -88,17 +99,17 @@ export interface ResolveQuestInput {
   party: { id: string; name: string; tags: string; dossier: string }[];
   deliveredSummary: string;      // engine-computed delivery, named for the AI to narrate
   deliveredCharacters: { id: string; name: string; tags: string }[]; // to flesh (who/backstory)
-  chainContext?: { bible: unknown; storyState: unknown; isFinale: boolean; fate?: string };
+  chainContext?: { bible: unknown; storyState: unknown; isFinale: boolean; fate?: string; approach?: string };
 }
 
 export interface ResolveQuestOut {
   questId: string;
   before: string;                // blind lead-in (must not leak the outcome)
   after: string;                 // sighted consequence
-  injuries: { characterId: string; band: 'none' | 'low' | 'med' | 'high' }[];
+  injuries: { characterId: string; band: 'none' | 'low' | 'med' | 'high'; cause?: string | null }[];
   fleshed: { characterId: string; who: string; backstory: string; quirks: string[] }[];
   edges: { from: string; to: string; type: string; blurb: string; importance: number }[];
-  storyUpdate?: { currentSituation: string; newlyRevealed: string[]; openThreads: string[] };
+  storyUpdate?: { currentSituation: string; newlyRevealed: string[]; openThreads: string[]; sagaSettled?: boolean };
 }
 
 // ---- ③b flesh (batched; who/backstory/quirks for characters that lack them) -------------------
@@ -159,6 +170,7 @@ export interface AiCallRecord {
   error?: string;
   systemPreview: string;     // first part of the system prompt
   userPrompt: string;        // the full user message (the variable data)
+  output?: string;           // the raw model response (recorded even when schema validation fails)
 }
 
 export interface AiProvider {

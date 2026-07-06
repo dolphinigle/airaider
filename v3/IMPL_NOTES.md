@@ -193,3 +193,565 @@ build, nano themeRoll live (2s, parsed, wants stored), infamous×500 relics = 0,
 exclusions ×300 = 0 violations, keyword texture 24.1%, must-be/must-have build+enforce, 2×300c
 autoplay stable (74 chains done, saves ≤650kB). Note: the morning GUI session's ai log shows
 cost>0 — that session ran the OpenAI provider (AIRAIDER_AI was set), not mock.
+
+## POV round (2026-07-05, from a live GUI report: "You find a battered cart…")
+
+Player-reported POV break — a quest opening narrated the BOSS personally finding wreckage in the
+field. Root cause was doc-conformance drift, not the model: v3's writeQuest prompt had shrunk the
+frame to one jargon sentence ("POV-locked…") where PROMPT_RULES §1 + PROMPTS.md (and v2's narrator)
+mandate telling the stateless model WHO the player is (boss at the fort, reads the card, SENDS
+soldiers, never in the field) and putting the POV constraint inside the situation field spec
+("only what arrives at the gate; no off-scene narration"). There is NO quality gate on prose —
+zod checks shape only — so nothing caught it.
+
+| # | Finding → fix | Class |
+|---|---|---|
+| 80 | writeQuest frame restored to doc/v2 grade (boss at fort, sends soldiers, never in field; everything beyond the walls secondhand); situation field spec carries the POV rule; ARRIVAL rule labels opening.mode as HOW word reaches the fort; the one non-fort-anchored opening mode reworded ('found on the road' → 'hauled back to the gate') | prompt conformance |
+| 81 | AI call log never recorded the model's OUTPUT (`AiCallRecord` had prompts only; GUI ai-log tab useless for prose debugging) → `output` field, captured before schema.parse so failed validations keep the raw; GUI shows it (+ literal `\n` render bug fixed) | tooling |
+| 82 | Engine dealt a seed the prompt bans: 'tithe ledger' in the TIE pool vs BANNED CRUTCH (produced 2 ledger-centered cards in one 8-cycle read) → 'unpaid tithe' | seed/ban conflict |
+| 83 | writeQuest lacked PROMPT_RULES §3a (mercenary GAIN in the fiction; a payoff-free plea card observed) and v2's instruction-echo guard (2 cards performed the POV rule as prose) → both principle lines added; SEEDS rule: weave substance, never quote wording (a card quoted 'dream shared twice' verbatim) | prompt conformance |
+
+**New designer ruling written down** (was unwritten, violated by the first patch attempt this
+round): **PRINCIPLES, not instance-patches** — in prompts and code, fix the class, never bolt on
+the failing example; examples are sticky, instance-patches brittle → PROMPT_RULES.md §8 +
+CLAUDE.md working style.
+
+Verified by reading (playtest skill): 23 real-AI cards over 3 seeds/8-cycle runs post-fix — 23/23
+POV-clean (both draws of the reworded wreckage mode arrive at the gate), gain explicit, seeds
+woven not quoted, 0 ledgers. Watch items (single occurrences, left unpatched by the new rule):
+an occasional "reaches the fort" instruction-shadow; one muddy clause ("the captain's party waits
+beyond sight"). Reading harness kept at `scripts/povread.ts`. Gates green: typecheck + 82 tests.
+
+## Prompt-audit round (2026-07-05, designer challenge: "seed, don't ban — what else is missing?")
+
+Full v2-final `cardAsk` ↔ docs ↔ v3 `writeQuest` comparison. Designer thesis confirmed WHERE the
+docs already ruled it (§2 seeds > nags; validated precedents: v2's time-of-day BAN became v3's
+`opening.time` SEED; gate-bundle ban retired once the mode seed existed). Kept as distinct
+categories, not bans-to-seed: ARCHITECTURE guards (NUMBER_BAN = engine owns every number, any
+model-written number is wrong by construction; echo guard = JSON field names/meta out of prose)
+and §5 TOKEN bans (ban+steer; the steer half was the broken part — pool fix last round).
+
+| # | Finding → fix | Class |
+|---|---|---|
+| 84 | v2-validated pieces missing from v3 writeQuest → restored: ONE line of direct word per card (spoken at the gate or written on what arrives); READABILITY/orient-once (PROMPT_RULES §7 — was entirely absent); JOB TYPE glossary + attribute steer (§1 — archetype passed as bare jargon) | prompt conformance |
+| 85 | **`introducedNames` orient-once tracking absent from v3** (STORY_GEN_STATE.md:72, doc-mandated) → `ChainStoryState.introducedNames`, accumulated by scanning each beat's player-facing text (situation/job/before/after) for bible-cast given names; flows to the writer inside storyState; READABILITY line tells the model bare-name-only for listed names | engine conformance |
+| 86 | First dialogue wording ("stating the work plainly") was STICKY — 8 of 15 cards across 2 seeds tagged dialogue "…says/reads plainly"; one corpse forced to speak ("carry one line") → reworded without the manner adverb, speech anchored at the gate / written word on what arrives; confirm seed: 0/7 echoes, tags varied, written channel used naturally | prompt (own-goal, caught in-round) |
+
+Read 45 real-AI cards across 6 seeds today. Post-fix state: POV 100% clean, every card carries a
+direct line, gain explicit in most cards. Watch items: 1 ledger slip post-pool-fix (model violated
+the explicit ban once — ban alone isn't airtight; frequency way down vs 2/8 pre-fix); beat-1
+side-cast sometimes un-oriented (Nimdir; Uneinne/Eloeth — 2 occurrences); one triple-L name
+"Pelllion" (check names.ts generator vs model typo); povread harness doesn't print rosterNames so
+a suspected roster-name leak in one beat-1 couldn't be verified — worth adding to the harness.
+🚩 Designer ruling wanted: retire the ledger BAN now that the pool steers (gate-bundle precedent),
+or keep as backstop; §5 says keep while it earns its keep. Gates green: typecheck + 82 tests.
+
+## Full-surface round (2026-07-05, designer: "WAY too short — critical issues throughout; playtest properly")
+
+Correct call. The earlier reads covered ONE call type (quest openings); this round audited ALL six
+prompts against docs + v2-final and read full 30-cycle real-AI campaigns end-to-end (cards,
+resolutions, chains→finale, dossiers) via new `scripts/campaignread.ts` (prints roster names per
+card for leak checks; bible/story/dossier dumps at end). Lessons written to permanent memory:
+playtest-the-full-surface; drift is systemic — one drifted prompt ⇒ audit all.
+
+| # | Finding → fix | Class |
+|---|---|---|
+| 87 | **genesis prompt drifted from BIBLE.md**: title rule inverted (doc: concrete ACTION-title, never poetic two-noun — code invited "the wound at its heart" naming); ARC-shape constraint absent (the validated "beat-1-completes-goal rewind" killer: step 1 = take job/meet, middles escalate+move, LAST achieves); hook/stake ("a quest the company would TAKE", participant-never-spectator) absent; commit-to-truth (no "unknown/mysterious"; every fact traces to a cause) absent; twist semantics unexplained; focal-tags-central absent; tensions/directions unannotated → all restored | prompt conformance |
+| 88 | **resolve prompt missing outcome semantics**: no frame (whose result), no OUTCOME MEANINGS (partial = SHOW the cost), no BE-CLEAR-ABOUT-RESULT (the anti-vague-outcome rule), no outcome-scaled storyUpdate truth (success full / partial hedged / failure at most a misleading scrap — STORY_GEN_STATE don't-regress) → all added; flesh got never-contradict-a-tag | prompt conformance |
+| 89 | **CRITICAL: NPC/roster name collision** (campaign 12002): genesis `assignedNames` rolled with no uniqueness check → new bible cast "Fenlin" ≡ roster merc Fenlin; the §4b name guard then whitelisted it. Saga collapsed: the player's own soldier "hired the company", "collected the passing fee", stood at the gate while also being SENT. → uniqueness at BOTH boundaries: `addCard` rerolls any character name already borne by a living character; `assignedNames` filtered against all character names + in-batch dups | engine bug (critical) |
+| 90 | **Slate never marked the player's soldiers** — the genesis prompt referenced "people marked as the player's own soldiers" but no mark existed in the input (instruction pointing at data never provided) → `companySoldier: true` flag on slate entries; prompt names the field | engine/prompt contract |
+| 91 | **Seed/ban collision #2**: `rollPlaceName` can roll the region landmark itself ('Thorn'+'hollow' → "Thornhollow" offered as a "fresh" place while landmarkAllowed gates it); elf epithet 'of Thornhollow' hard-coupled every elf name to the landmark (9 of 18 cards mentioned Thornhollow) → `REGION.landmark` field + `freshPlaceName()` rerolls collisions; epithet swapped to 'Duskbough' | seed/ban conflict |
+| 92 | **Habit spam**: Osmund's cup-roll/trill and Fenlin's quill-tap appeared in nearly EVERY resolution (dossier touch treated as mandatory) → "MOST resolutions need none; never a signature stamped on every job" | prompt |
+| 93 | Name pile-ups at part joins ('Pell'+'lion' → "Pelllion", 'Yll'+'las' → "Ylllas") → collapse 3+ letter runs in rollName | engine (name gen) |
+| 94 | Degenerate `who` from resolve-flesh ("WHO: Betric" — just the name) → who spec: "one line they'd be known by — never merely their name"; JOB lines clamp-truncated mid-word ("…") → "ONE short sentence" | prompt |
+
+Also verified working in the 12002 read: echo-rescue leads (Miraneth left behind → word returns),
+beat-must-advance (beat 2 opened on beat 1's failure), finale approach envelopes, introducedNames
+accumulating, before-texts ending on the brink, failure aftertexts showing the cost in-fiction.
+Post-fix confirm campaigns running (13003, 14004). Gates green: typecheck + 82 tests.
+
+Campaign 11001 (same pre-fix code, richer chains) hardened the diagnosis and added four classes:
+
+| # | Finding → fix | Class |
+|---|---|---|
+| 95 | **Roster-cast is systemic, not a name fluke**: every chain's bible pulled the roster mercs in — "Unenith (client; he will hire mercenaries…)", "meets Unenith and Pelldai who know the lesser trails" — the slate offered them unmarked and "reuse slate people" invited it (12002's Fenlin: same path — founders get lore nodes). #90's companySoldier flag is the fix; prompt now also states the principle "the company does not hire, pay, or petition itself" | engine/prompt contract (critical) |
+| 96 | **Re-staged climax**: Coranor's token-casting happened in beat 2 — beats 3, 4 AND the finale resolutions each re-narrated the same token-drop as happening NOW (4 near-identical scenes; the resolver reached for the bible's climax instead of THIS beat's job) → resolve rule: storyState events are DONE, never re-staged; narrate this job only, moving forward | prompt (critical) |
+| 97 | **knownToPlayer duplicate spam**: the same fact restated 5× (newlyRevealed never excluded already-known facts) → only facts NOT already in storyState | prompt |
+| 98 | **Company captive walking free**: Aerael taken CAPTIVE at one finale, then next genesis cast her as the free client "waiting at the gate" (slate never said she sat in the cells) → companyCaptive flag + rule: captives cannot walk the world free | engine/prompt contract |
+| 99 | **Same-cycle saga clones**: two chains both Hollow-Cairn reckoning rites at Thornhollow Glen, same client — avoid list didn't cover places/devices → avoid extended to central PLACES and rites/devices + "visibly apart from every entry" | prompt |
+
+Gates green after all fixes: typecheck + 82 tests. Final all-fixes confirm campaign to follow.
+
+Post-round-1 confirm campaigns (13003, 14004) — round-1 fixes hold (no roster-as-client casts;
+habit spam down to occasional; who lines never bare names; no name pile-ups; PARTIAL shows cost;
+13003's Grain Contract chain reads genuinely well: escalating beats, no re-staging, a rescued NPC
+recurring as the saga's excavator). Two more criticals caught and fixed:
+
+| # | Finding → fix | Class |
+|---|---|---|
+| 100 | **SPOILER: `story.currentSituation` initialized to the bible's hidden situation** — and BOTH UIs display it (cli format.ts chains view, server stateView) — so from genesis until beat 1 resolves the chains tab showed the hidden truth, twist included (14004: Faedir's cover-up fully visible) → initialize from the APPARENT goal; openThreads start empty (openDirections stay on the bible for the writer) | engine bug (critical, spoiler) |
+| 101 | **fallbackResolve leaked engine numbers to the player** ("A messy half-win: 128 gold" — deliveredSummary verbatim after the resolve call failed schema twice; fired 2× in ~50 resolve calls) → fallback prose rewritten number-free (grant lines already show the take); campaignread now dumps failed AI calls (error + raw output) for diagnosis | engine bug + tooling |
+
+Watch items: resolve schema failure rate (~4%) worth a look at zResolveOne strictness once a
+failed-call dump is captured; "a cup she did not have" — habit-vary contortion (model referencing
+a quirk while varying it); Thornhollow still gravitational for one-region play (lore accretes
+around the single landmark — designer knob 🟡, not a prompt bug). Final confirm campaign: 15005.
+
+## Context-free verifier rounds (2026-07-05, designer: "review prompts like a human; the AI can't understand slotCount:3, KEYWORDS unexplained; seed, don't ban; severity missing; far from deliverable")
+
+New MANDATORY playtest gate (written into the playtest skill + permanent memory): render every
+prompt COMPLETELY (system + full user JSON — call-log now stores both untruncated) and hand it to a
+zero-context Opus subagent that must explain the task, every input field, every output field's
+downstream use, and flag anything guessed/blind/useless/conflicting. Three rounds run
+(`scripts/promptdump.ts` renders; 12 verifier agents total). Root cause of the earlier miss:
+I audited by docs-diff and output-reading — neither can see incomprehensibility.
+
+Round-1 verifier findings (all six prompts) → fixes #103-118, highlights:
+
+| # | Finding → fix | Class |
+|---|---|---|
+| 103 | **Naming pincer**: "never invent names" + roster names forbidden + no other names given ⇒ no legal way to name a client (every named petitioner had been a violation) → engine-rolled `npcNameSuggestions` seed (uniqueness-checked) + rule scoped to it | engine+prompt (high) |
+| 104 | **Name/gender contradiction** ("Branbert the Younger" tagged female): names rolled independent of gender tag → gendered human name pools; gender rolled FIRST at every site (incl. generateCard, which had NO gender tag at all) | engine (high) |
+| 105 | **Beat archetype fought the bible** (random 'investigate' vs a fetch saga) → beats no longer get an archetype; the bible drives the job. Beats' landmarkAllowed forced true (a saga AT the landmark was unwritable). Genesis arc length now = expectedBeats (was 5 steps for 3 beats) | engine (high) |
+| 106 | **Dead outputs**: proposedRewardKind + closesChain consumed NOWHERE → removed from schema/prompt/types | schema |
+| 107 | **NUMBER_BAN self-conflict** with `importance: NUMBER 0-1` → explicit schema-demands-a-number exemption; 'clinical voice' dropped from the shared ban (fought flesh's warmth) | prompt |
+| 108 | **deliveredSummary "26 gold" vs number ban** → prose translates THINGS not amounts; sticky "eighty gold" example removed | prompt |
+| 109 | **Unparseable tag notation** ("flat (legendary)", "dull (high)") → shared TAGS_NOTE (rank scale + looks-words scope) in all prompts handling tags | prompt |
+| 110 | **Unexplained load-bearing inputs** (slotCount, KEYWORDS, rewardEnvelope, rarity, kind, stakes, relationPhrase, framedCharacter, bible/storyState substructure, cast.role, loreId, blurb…) → every prompt rewritten input-explanation style ("YOUR INPUTS, field by field"); BANNED CRUTCH/VARIETY RULES label-blocks dissolved into field explanations | prompt (systemic) |
+| 111 | **Dossier renderer** emitted "(betrayed-by by) X" + unexplained [core] → readable both-ways rendering + "(defining memory)"; dossiers that are just name—tags no longer sent | engine |
+| 112 | **One-off severity missing** (v2 had a per-card register; every common job read like doom — the "Shrine Lease Ripped" murk) → engine-rolled `gravity` seed, rarity-weighted (common mostly small/light) | engine+prompt |
+| 113 | genesis situation/goal/twistReveal overlap + "apparent goal achieved at finale" contradiction → TRUTH vs SURFACE split; kind moved top-level and explained per value | prompt |
+| 114 | resolve chain-lines unconditional for one-offs; injuries "none" band unreachable; edges to id-less dossier people; storyUpdate for standalone jobs → all conditionally scoped; harmed-only injuries; ids from this message only | prompt |
+| 115 | slate relationPhrase 'thematic wildcard' contradicted companySoldier flag → engine overrides the phrase with the company relation | engine |
+| 116 | **Seed bug caught by verifier**: opening mode 'a summons from the fort outward' contradicts "how word reaches the fort" → 'a summons delivered to the gate, calling the company out'; beat-1 care beat now draws GENTLE arrival modes only (wreckage/prisoner openings fought the low-stakes mandate) | seed |
+| 117 | **Ledger-ban removal EXPERIMENT failed**: with the ban off, both sagas + a one-off centered on ledgers/promissory slates → §5 vindicated (ban+steer, not steer alone); ban restored covering renames ("by any name") | experiment |
+| 118 | **Finale three-way mismatch** (approach promised "keep her free", prose locked her up, engine crystallized gold) → approach labels may promise only what their rewardKind delivers; resolve must land the focal exactly on chainContext.fate | prompt |
+
+Also: my own round-1 fix planted a sticky example — "(a counted purse, never a figure)" stamped
+"counted purse" into ~8 straight resolutions → de-exampled (§8 strikes its own author). Round-3
+verifier verdicts: one-off/resolve/flesh parse CLEAN; beat/genesis clean after final polish
+(loreId covers focal; symmetric edge direction; bible substructure documented in the beat branch).
+Output reads: 21001 povread (named NPCs everywhere, tone finally varies, POV clean) + 22002
+campaign (failure-driven saga arc — a bolting thief in beat 1 shapes the whole chain; distinct
+creative finale approaches; ZERO resolve schema failures after the band annotation). Verifier notes
+that stay open: regionSeed's own "moss-shrined ruin" phrasing still gets copied despite the
+epithet rule (content fix 🛠 — reword the seed, don't add a ban); Thornhollow gravity for
+one-region play 🟡.
+
+Verifier-round confirmation campaign (23003, all fixes live): the fixes hold — varied hand-off
+phrasing (no "counted purse" tic), beat 1 opened gentle with the care-token (a prayer-pin bearing
+the focal's mark), finale approaches each promised exactly what their rewardKind grants and the
+prose landed the focal on her engine fate (recruit, shown joining), zero ledgers, zero schema
+failures, dossiers strong ("stitches laughter into the sickroom"). Last catches, fixed: | 119 |
+one resolution wrote "You leaned to the rail" — the resolve prompt never had the boss-stays-home
+frame → added (third person in the field, never "you") | prompt |. Watch items: saga cast can
+draw the same EPITHET as a roster merc (Ilmwyn Palebough vs roster Heleolas Palebough — reads as
+accidental kin; possibly charming, possibly confusing 🟡); a lapsed beat card re-offers the same
+step next cycle (mechanical TTL re-pursue, mild repetition when the roster is starved).
+Gates green: typecheck + 82 tests. ~$1.3 real-AI this verifier round (3 prompt dumps, 12 Opus
+verifier agents, 1 povread, 2 campaigns).
+
+## Verifier fixpoint (2026-07-05, designer: "iterate UNTIL the verifier returns fine on ALL prompts")
+
+Ran the context-free gate to convergence: rounds 4→7, ALL FIVE prompts re-dumped and re-judged by
+fresh zero-context Opus agents each time text changed, explicit CLEAN/DEFECTS verdicts. Tally:
+R4 flesh/genesis/resolve CLEAN, one-off+beat DEFECTS → fixes. R5 four CLEAN, resolve DEFECTS →
+fixes. R6 resolve re-judge → template clean but DATA defects → engine+prompt fixes (shared text
+changed). R7 (all five): **CLEAN × 5 — fixpoint.** Fixes landed during the loop:
+
+| # | Finding → fix | Class |
+|---|---|---|
+| 120 | Direct-word channels didn't cover rumor/report openings → "or quoted from the report or rumor" | prompt |
+| 121 | Ledger ban ("record-book by any name") caught wills/leases and its KEYWORDS escape hatch doesn't exist for beats → rescoped to the ACCOUNT-BOOK; wills/charters/leases/letters explicitly welcomed (both writers) | prompt |
+| 122 | Beat branch gaps: "side loot" undefined; cast role enum too rigid (genesis emits e.g. "rival"); bible.title/loreId/actorStates undocumented; place suggestions vs bible anchors → all defined ("side loot" = incidental valuables, true prize at finale; roles as e.g.-list; bookkeeping = ignore; bible places outrank suggestions); finale line: rewardEnvelope names the central prize | prompt |
+| 123 | resolve schema demanded storyUpdate.openThreads but never defined it → defined (live loose ends, replacing the old list); dossier memory-line format documented | prompt |
+| 124 | **Card promises a prize the engine didn't roll** ("a horn" written, "the Amber Bow" granted — the writer never saw the materialized item) → `rewardItems` input: pre-rolled prize object names; fiction naming a prize must use them. Also deliveredSummary defined as what ends in the COMPANY's hands (client's due separate) — killed the kept-vs-delivered ambiguity; TAGS_NOTE glosses opaque skill words ("food" = cookery) | engine+prompt |
+
+Verifier watch items (non-blocking, logged): edge DIRECTION sometimes stored inverted vs its own
+blurb (blurb self-corrects; renderer relies on it); genesis-authored cast blurbs can still hand
+props like "ledger-sack" to the beat writer (rated self-resolving — the ban covers plot objects).
+Gates green every round: typecheck + 82 tests. Loop cost: 4 dumps + 16 verifier agents ≈ $2.
+
+## Seeds round (2026-07-05 evening, designer: location confusing; openings too prescriptive; keywords fixed/tiny; favored missing in-game)
+
+| # | Finding → fix | Class |
+|---|---|---|
+| 125 | region + regionLore two-field split confusing → merged into ONE `location` line ("name — anchor facts"), writeQuest + genesis | contract |
+| 126 | **Openings regressed a documented v2 lesson** (v2 seeds.ts: "a full sentence got copied verbatim") — v3's 8 fixed sentence-modes → v2-style ARRIVAL SPARKS (who × how word-seeds, "a pedlar, a plea"); model builds the arrival itself. Beat-1 gentle filter kept | seed |
+| 127 | **Keyword pools were the ~94-entry stub** while v2-final held the real §5 bags → ported whole (~2,400 entries: BOND/TIE/THINGS/OCCASIONS/PEOPLE/UNCANNY/MOODS); KEYWORDS rule softened from LOAD-BEARING to v2's sparks-not-checklist | seed |
+| 128 | favored/clashing "not showing in game" → verified INTACT end-to-end in current code (engine populates, server sends, both UIs render); the report came from the pre-fix save — reset required | verified-ok |
+| 129 | **Landmark gate violated persistently** (Thornhollow named in 5/8 landmark-disallowed cards — a shown token gets used, a rule doesn't stop it) → gate now works by OMISSION: `seedPlain` on REGION; a card that may not name the landmark never sees it; `landmarkAllowed` no longer sent to the model. Output-verified: 0 leaks in 5 omitted cards | seed (structural) |
+
+Verifier gate re-run on changed prompts: R8 one-off/genesis/beat CLEAN; R9 (after landmark omission)
+one-off/beat CLEAN — fixpoint holds. Output reads: sparks weave creatively (a riderless mare from
+"an old contact, a riderless horse"), pool variety visible (betrothal cup, eel-runs, glandrot —
+no more blood-debt/temple/eclipse recycling), gravity lands ("Return a Donkey from Thornhollow" —
+a genuinely small job with a human hook). Watch: 1 ledger slip in 8 cards persists (model ignores
+the ban ~10% — engine post-filter is the structural fix if it stays annoying 🟡).
+
+## Day-1 playability round (2026-07-06, designer blocked at day 1; coordinator mode — delegated hunts)
+
+Three delegated hunts (live day-1 API driver · web↔server contract audit · lore-prompting docs audit)
++ re-delegated confirmation. Fixes:
+
+| # | Finding → fix | Class |
+|---|---|---|
+| 130 | **THE DAY-1 WALL: 3-slot quests vs the 2-merc starter roster** — can never march ("no partial sends"), no feedback, assigned merc stuck committed, odds shown confidently → fillability guard #79's class applied to SLOT COUNT: never more slots than the roster has soldiers (one-offs + beats); ⏸ report line when a partially-staffed quest doesn't march; `ready` flag + "will not march" in the quest card; "A quiet cycle" line when nothing marches | engine (critical) |
+| 131 | Bedroom renovate = 6 dead buttons on the fort's only day-1 interactive room (server offered renovateCost for cap-benefit rooms the engine rejects) → cost omitted for cap rooms | server |
+| 132 | **LORE two-part prompting missing from beats/finales** (designer's call; docs audit confirmed: recall→selector→dossiers ran ONLY at genesis; beats got zero lore, not even the focal's evolving dossier; QuestWriteInput had no field for it) → `buildLoreSlate()` shared helper (selector picks who gets FULL dossiers → writer gets RELEVANT LORE block); `relevantLore` + `focalDossier` inputs + beat-branch prompt gloss; echo-rescue framedCharacter now carries the returning person's dossier | engine+prompt (doc conformance) |
+| 133 | Branched-quest odds read "0 coins vs bar 0.0" pre-approach → "pick an approach first"; heal/interrogate buttons offered without their rooms → `can` flags, gated client-side; relic reward invisible behind locked Items tab → gate opens on held relics (orContent precedent) | UX |
+| 134 | Relic name generator dealt "Iron Ledger" as a fated prize vs the account-book ban (seed/ban collision #3, caught by a round-10 verifier) → 'Ledger' out of the relic noun pool | seed/ban |
+
+Verifier gate on changed prompts: R10 one-off DEFECTS (Iron Ledger collision → seed fix) + beat
+DEFECTS (relevantLore said "person" but carries places; dangling companyCaptive reference → both
+reworded); R11 one-off CLEAN, beat CLEAN — fixpoint restored across all five.
+
+## Reader round (2026-07-06, delegated harsh prose read of a 30c campaign post-lore-wiring)
+
+Reader verdicts: lore-in-beats MIXED (three-card object threads DO work — a rag pinned in one
+resolution carried through two later cards; but one chain self-completed at beat 1 then reset),
+cards GOOD on mechanics, resolutions MIXED. Fixes #135-146:
+
+| # | Finding → fix | Class |
+|---|---|---|
+| 135 | **Saga self-completed at beat 1, then the world reset** (beat-1 job = the bible's goal; its resolution narrated total victory; beats 2-4 re-posed the same job) → beat writer: the job may NEVER be/complete the goal pre-finale; resolver: unless isFinale, a success succeeds at THIS job only — the goal stays unachieved | prompt (critical) |
+| 136 | **Arc-over-state after failures** (beat 3 = escort of a person the company didn't hold) → when lastBeatOutcome/storyState contradict the arc step, the STATE wins; re-derive the objective | prompt (critical) |
+| 137 | Habit signature-stamp (scar-rub in 9/15 resolutions) → STRUCTURAL: dossier habits now reach the resolver only ~40% of calls (a habit not shown can't be stamped) | engine |
+| 138 | Injuries invented on harmless failures (med-4 from a gossip sweep) → wounds only when the fiction put them in harm's way | prompt |
+| 139 | Phantom + misgendered "own soldier" arrivals → rosterNames now carry pronouns ("Roktooth (she)"); a staged soldier must match name+pronoun exactly | engine+prompt |
+| 140 | Engine fate string "season's surplus" reified as a physical object in prose → fate strings reworded fiction-safe; resolver told never to quote the fate's wording | engine+prompt |
+| 141 | Account-book ban absent from resolve (a "guard's ledger" walked into a resolution) → ban added to resolve | prompt |
+| 142 | "moss-shrined ruin" epithet copied verbatim ≥5× → epithet REMOVED from the region seed (nothing to copy) | seed (structural) |
+| 143 | Genesis kernel echoed input fields into the permanent bible ("…Keywords: … Tone: grim. Stakes: low") → kernel = pure story, never restates inputs; roles strict enum; card titles never archetype-prefixed | prompt |
+| 144 | Disposition tease ("may yet be persuaded to remain") vs engine's leaving → never HINT at dispositions either | prompt |
+| 145 | Flesh echoed its instruction as a template ("One thing she loves: …") → detail shown never announced + echo guard added to flesh | prompt |
+| 146 | Twin-stem names (consecutive focals Pellthil/Pellnith; 3 unrelated Mosswalkers) → name guard extended to 4-letter given-name stems (addCard, npc names, assignedNames); elf epithet pool 6→14 | engine |
+
+Reader watch items (designer 🟡): zero-coin assignments may march (guaranteed failure — block or
+warn?); post-finale storyState can contradict later world state (recruit who then left the tavern);
+scrap/rag as the arriving prop in ~half the cards (texture tic); semicolon mega-sentences satisfy
+the sentence budget's letter, not its spirit. R12 full verifier pass: 5/5 CLEAN.
+
+## Reader round 2 (2026-07-06, confirmation read: fates+kernels DEAD; the WORST defect reproduced)
+
+Second harsh read (30c, seed 37373): fiction-safe fates and kernel purity confirmed dead; habit
+stamp halved (braid 25%) but not gone (rim-thumbing 45%); injuries mostly earned (2 soft
+relapses); "moss-shrined" gone; NAMED phantom soldiers gone — but **saga self-completion at
+beat 1 reproduced in full** (beat-1 job ≡ the bible's goal; resolution completed it; the chain
+sat active with 2 empty beats owed), a climax was re-staged 3× (band burned thrice), and the
+"(she)" pronoun annotation leaked verbatim into prose. Fixes #147-157:
+
+| # | Finding → fix | Class |
+|---|---|---|
+| 147 | **Engine tripwire for settled sagas** (the reader's key insight: prompt discipline can't survive one overshoot) → resolver reports storyUpdate.sagaSettled; engine sets chain.settled → finaleReady fires NEXT step (AI judges, engine gates — the closesChain idea reborn, this time consumed) | engine (critical) |
+| 148 | knownToPlayer near-duplicate facts (same fact ×3 invited the re-staging) → stem-dedupe on push | engine |
+| 149 | "(she)" leaked into prose → rosterNames bare again + separate rosterPronouns map (metadata isn't quoted); prompt says never print pronoun annotations | engine+prompt |
+| 150 | Genesis cast bloat (8 entries, 4 coined "companions" incl. phantom soldiers) → STRICTLY 1-3; soldiers are never cast unless the saga is about one | prompt |
+| 151 | Offscreen custody teleports between beats (a phantom patrol captured the focal) → the world moves ONLY as lastBeatOutcome says | prompt |
+| 152 | Solo jobs narrated as parties ("the others crossed the threshold") → party list is COMPLETE; one sent = alone | prompt |
+| 153 | Finale prose staged an UN-chosen approach → chainContext.approach (the chosen plan's label) passed; resolution must follow that plan and no other | engine+prompt |
+| 154 | Quirk monoculture (6/6 fleshed NPCs "fingers X + hums Y") → stock quirks token-banned (fingering/humming/whistling); reach wider | prompt |
+| 155 | Name near-twins beyond prefix (Ulfka/Ulfnak, Harmuzzle/Magmuzzle) → similarity guard extended with edit-distance ≤2 on given names | engine |
+| 156 | **Thornhollow monoculture at the ROOT**: genesis could always see the landmark (both sagas took it) and beats always saw it → genesis sees the landmark only 25% of rolls; beats see it only if THEIR bible uses it; one-off landmark odds 0.25→0.15 | seed (structural) |
+| 157 | Account-book leaked twice into resolutions despite the new ban (model violation) — left as prompt-ban; if it persists, engine post-filter 🟡 | watch |
+
+## Reader round 3 (2026-07-06, confirmation on seed 434445: 7 of 10 DEAD — settled-tripwire FIRED correctly)
+
+The settled-saga tripwire worked in the wild (beat 4 settled → beat 5 was the finale). Pronouns,
+lean casts, kernels, landmark spread (Thornhollow 17% of cards), solo-solo, chosen-approach
+fidelity, prop bans: all confirmed dead. Still alive → fixes #158-165:
+
+| # | Finding → fix | Class |
+|---|---|---|
+| 158 | **Unearned wounds persisted** (med-4 from fleeing a CLOSED DOOR) → injuries must CITE a phrase from the model's own after-text showing the harm; the ENGINE drops uncited wounds (verifiable guard, not another plea) | engine+prompt (critical) |
+| 159 | **Resolution overreach re-staged the climax** (job said FIND the glove; the narration TOOK it; the finale then re-took it) → success = the job AS WRITTEN: never take/deliver/finish what the job only asked to find, learn, or scout | prompt |
+| 160 | **"Messenger at the gate + prop + quote" macro owned ~40/42 cards** → ARRIVAL_SIGNS pool (matters with NO bringer: smoke on the ridge, the pedlar who never came, washing left on the lines — 20% of draws); never open the card's first words with the time of day | seed (structural) |
+| 161 | Purse-handoff choreography every resolution → routine payments may be skipped entirely | prompt |
+| 162 | NPC name near-twins (Betda/Betra/Beteth — card NPCs never become cards so the guard couldn't see them) → rolling recentNpcNames window (20) feeds the similarity guard | engine |
+| 163 | "elven X" race-labeling on every NPC → race named at most once per card, only where it matters | prompt |
+| 164 | Saga threat with no FACE (the "respectable buyers" never appeared; every beat repeated their absence) → genesis: opposing pressure gets a cast FACE who can actually appear | prompt |
+| 165 | knownToPlayer dedup missed re-worded duplicates — left as-is for now (stem check is cheap; full similarity is overkill) 🟡; R13/14 wording collisions from the cast-lean fix reconciled (naming whitelist covers rosterNames+relevantLore; soldiers = context not cast) | watch |
+
+Reader watch items (designer 🟡): 30 cycles of all-common cards = flat narrative gravity (rarity
+mix + single region is prototype scope); roster frozen at 2 all campaign (everyone "moves on —
+build a Tavern"; economy never affords one — the fun-check knob); saga GOAL field sometimes
+mis-scoped to the beat-1 MacGuffin.
+
+R15 verifier (all changed templates + injuries.cause mechanism): 4/4 CLEAN — "purpose and
+verification clear... a mechanically checkable substring constraint". Full template fixpoint.
+
+## Overnight loop (2026-07-06, designer asleep; standing goal: play must read WELL from day 1)
+
+Iteration 0 (closing read, 525354): injuries-cited-only DEAD in the wild (engine guard verified —
+3 wounds, all shown); tripwire numbering, race labels, saga-face all DEAD. Three drones needed
+structural teeth → #166-172. Iteration 1 (596061): payment endings mostly dead, investigate
+answers DEAD, goal scope DEAD — but later-beat completion reproduced (vial delivered in beat 1,
+re-staged beat 3, finale premised on it) and time-openers persisted (the ban had been lost in a
+rewrite; 16/38 cards).
+
+| # | Finding → fix | Class |
+|---|---|---|
+| 166 | Resolution performing LATER beats' objectives (dug the finale's tool at beat 1) → resolve: the arc's later steps belong to later cards — may not perform/recover/complete ANY of them | prompt |
+| 167 | Time-of-day openers (20/27 then 16/38) → time FOLDED into the spark string (standalone field taught "At dusk, …"); explicit first-words ban restored in WRITING; resolve lead-in stamp extended ("Dawn found them…") | seed+prompt |
+| 168 | Purse handoff closing ~24/25 resolutions → payment staging DEFAULT OFF (end on the deed, a face, the road; engine reports the take) | prompt |
+| 169 | Epithet reuse (Redhand ×2, Elmwhisper ×2 14 cycles apart) + same-cycle given twins → epithet equality added to the similarity guard; recentNpcNames window 20→60 | engine |
+| 170 | Investigate jobs resolving as fetches → when the job's verb is learn/uncover/question, the result IS the answer found | prompt |
+| 171 | Saga GOAL scoped to beat-1's errand → goal spans the WHOLE arc, never step 1's errand | prompt |
+| 172 | **Beat overrun re-runs** (beats 4/3 — no arc step left → same card re-posed; lapsed beats re-minted verbatim after quiet cycles) → finaleReady fires when beatIndex ≥ expectedBeats (arc exhausted = the head); a re-posed lapsed step gets an explicit reframe note (same step, fresh angle) | engine (structural) |
+
+Also: genesis landmark visibility 0.25→0.15 (chains still gravitating to Thornhollow), wound-variety
+clause (every wound was a gashed palm/forearm). Reader consensus on iteration 1: standalone commons
+are "genuinely good now"; sameness (one ruin, one wood, coin-roll closings) is the remaining drag.
+
+Iteration 2 (656667): Thornhollow DECENTERED (3/41 cards — fix confirmed); investigate-answers,
+habit frequency, kernel purity, cited injuries, mechanics-speak all DEAD. Three still alive →
+#173-177: | 173 | **finale off-by-one** (beats consumed ALL N arc steps, then a finale re-ran
+step N — the figurine opened before the moot twice) → beats consume steps 1..N-1; finaleReady at
+beatIndex ≥ expectedBeats-1; finale prompt = "covers the arc's LAST step" | engine (critical) |
+| 174 | time-openers persisted (~49%) despite fold + ban → time now seasons only 30% of sparks
+(no clock token to lead with) | seed (structural) | | 175 | payment-close persisted (27/32)
+because my own rules collided (WEAVE-the-gains vs staging-off) → GOLD IS NEVER STAGED; weave only
+items/people; end on the deed, a face, or the road | prompt (structural rewrite) | | 176 |
+"the elf" as name-substitute even for own mercs → banned alongside name-twice | prompt | | 177 |
+R17 caught prize-object written as client cargo (Pale Chair delivered away while deliveredSummary
+kept it) → rewardItems = end IN COMPANY HANDS, never cargo; resolve reconciliation rule (company's
+take wins) | prompt contract |. Name stem-clusters (Wil-/Ann-/-anor) noted 🟡 — 4-letter guard
+passes them; 3-letter too aggressive for the elf pool.
+
+Iteration 3 (686970): **finale off-by-one DEAD** (the saga's finale "the campaign's best moment" —
+coffer deliberately left shut, chosen approach honored); gold-staging DEAD (1 defensible instance);
+name-substitute DEAD; payment endings DEAD. Fixes #178-183: | 178 | scrap-with-ominous-line frame
+owned ~100% of cards (my "written on what arrives" channel taught it) → spoken forms outnumber
+written in ARRIVAL_HOW; prompt: the direct word is usually SPOKEN, scraps the exception | seed+prompt |
+| 179 | R16 (late): genesis situation clamp-truncated MID-SENTENCE ("renounce the…") → zProse clamps
+at a sentence boundary when one exists; lore blurbs word-safe | engine | | 180 | habit rate 0.4→0.25
+(map-tuck ×9) | engine | | 181 | wound body-part palm-default → variety clause + never narrate an
+unlisted wound | prompt | | 182 | beat-1 profit vs take-up tension → beat-1 pay may rest on the
+client's promise | prompt | | 183 | harness builds the Tavern early (roster starvation was starving
+the features under test) | harness |.
+
+Iteration 4 (717273): delivery-frame DEAD (1/33 written; 32 spoken), quirk spam DEAD (20%/0%),
+wound rut DEAD (8 wounds = 8 🩸, four body sites), finale-once + no re-runs PASS. Fixes #184-186:
+| 184 | **echo-rescue reinvented the person** (Claet: male under a kiln → female on a witch-ladder)
+→ framedCharacter carries explicit pronoun + lastSeen (the resolve line where the story left them);
+prompt: continue from there, never reinvent | engine+prompt | | 185 | near-duplicate one-off
+premises (two "Lantern in the Old Growth" stake-rescues) → one-offs get an avoid list (last 6 card
+titles+jobs, rolling window) | engine+prompt | | 186 | time-openers still ⅓ → noted; time now
+seasons only 30% of sparks (applied in it-3; verify in it-5) 🟡 |.
+
+Iteration 5 (747576): reader verdict **"qualified NO — but close"** to prototype-playtest bar;
+chains "genuinely good" (4 finale choices honored, clean banking); pronouns/kernels/gold/solo/
+approach all PASS. Bar items fixed → #187-190: | 187 | 🩸 with no wound in prose (cause "the shaft
+caved" passed the substring check) → cause must NAME the harmed person taking hurt; engine verifies
+name-in-cause + cause-in-after | engine+prompt | | 188 | echo-rescue reinvented peril (Sylvlion:
+mill-wheel → forest chase; Caeldir inherited correctly) → peril CAPTURED at left-behind time
+(pendingEchoes.lastSeen = title+situation snippet) and carried via lead.echoNote → framedCharacter
+.lastSeen | engine | | 189 | finale JOB said "send three soldiers" (slotCount=3 mutex plans misread
+as a party) → finale slots = mutually exclusive PLANS, never a party | prompt | | 190 | messenger-
+at-dusk migrated from openers into arrival clauses (18/40) → "not every arrival happens at dusk;
+most business reaches a fort in daylight" | prompt |. R18 full-template verify: 5/5 CLEAN.
+
+**DESIGNER DECISIONS NEEDED 🔴 (readers' consensus on remaining drags — all knobs, not bugs):**
+1. **Roster dead-lock** (top item, twice running): Tavern behind GH T2 is unreachable in 30 cycles;
+   every rescue "moves on" (nudge ×6-7/run); one wound stalls the 2-merc company for cycles.
+   Options: cheaper/earlier Tavern; understaffed march with penalty; starter roster 3.
+2. **Finale captives evaporate**: Eloion won WITH a 120g debt, then "slipped away from holding"
+   6 cycles later (no Dungeon buildable that early) — winning feels hollow. Convert to auto-ransom
+   when no Dungeon exists?
+3. **World monotony is scope, not prompt**: one region, elf-weighted victim pool, one landmark —
+   readers rank it the #1 experiential drag across every run. Second region / flattened victim
+   races / more landmarks per region are content+design work.
+4. Failure troughs (5 consecutive failures read as demoralizing) — dice/pacing knob.
+
+Iteration 6 (808182): reader verdict — **"Qualified YES: sentence-level prose is good enough for a
+prototype playtest; the remaining bar is VARIETY, not quality."** Wound forward-citation 4/4 DEAD;
+finale slot semantics DEAD; dusk 18→7 DEAD; approach fidelity 4/4; investigate answers "strong
+PASS"; the ransom wrong-girl twist and gleaner-share finale called "genuinely good." Fixes
+#191-195: | 191 | "at noon" replaced dusk (frame states arrival time in ~35/39 cards — word-bans
+are whack-a-mole) → VARY THE OPENING SHAPE clause (begin mid-word / on the thing brought / on the
+fort's reaction; most cards need no clock); SIGNS 20%→30% | prompt+seed | | 192 | genesis-coined
+cast names never entered the recent-names window → assignedNames pushed into it ("Ashveil" ×3) |
+engine | | 193 | signature-object over-staging (Marlin's sprig ×25 — it lives in her identity
+line, not quirks) → dossier identity is WHO they are, not a prop to stage | prompt | | 194 |
+premise re-deal 6 cycles apart escaped the 6-card avoid window → widened to 10 | engine | | 195 |
+reverse wound leak 2/37 (prose wound, no listed injury, on partial/failure) — instruction exists;
+low rate; watch 🟡 |.
+
+Iteration 7 (838485): **second consecutive "QUALIFIED YES — sentence-craft clearly above the
+prototype bar; the remaining bar is macro-variety, mostly design-scope."** Sprig spam 25→1;
+surname stamping DEAD; 10/37 non-arrival openers appeared; echo-continuity held on the one case
+(Sszzar's return coherently motivated); solo/approach/kernels/pronouns clean. Final micro fixes
+#196-199: | 196 | "Tiainne" reused for two unrelated people — likely leaked via the avoid list
+(titles carry names; the model recycled one) → avoid rule: NEVER reuse a name appearing in avoid
+entries; premise must land clear of them | prompt | | 197 | "road home" closer ×10 = MY OWN
+instruction phrase gone sticky (§8 strikes its author a third time) → de-exampled ("end where the
+story actually stops... never the same closing image twice in a row") | prompt | | 198 | NPC quirk
+recycling (wrist-rub ×3, cloth-fold ×3) → those tokens banned + each batch member fidgets
+differently | prompt | | 199 | Kelmund's cook-kit in ~60% of his beats (identity-driven, varied
+wording) — watch 🟡 |.
+
+**OVERNIGHT LOOP CLOSED (2026-07-06 morning): closing template verify 5/5 CLEAN (R19).
+Trajectory: "can't get past day 1" → live-replay "a new player clears days 1-3 without a wall" →
+two independent readers: "qualified YES, above the prototype-playtest bar." What remains is
+design-scope (the 🔴 queue above), not prompt quality.**
+
+## FINAL DOGFOODING (2026-07-06, designer directive)
+
+**Favored/clashing PROVEN end-to-end with live numbers** (scripts/surfacecheck.ts, kept): AI wrote
+non-empty favored/clashing on 6/6 slots; 27/27 stored words canonical; same merc on the same slot:
+neutral 4 coins → 93.8%, +favored 7 coins → 99.2%, +clashing 0 coins → 0.0% (±0.5·U exact, mirror
+rule live); server serialized all fields verbatim; web renders at App.tsx:228, CLI at format.ts:179.
+New-player walkthrough (scripts/playerwalk.ts, 6 real-AI cycles): menu gates "excellent", cards in-
+POV, assign-time info complete, ⏸/🙏 messaging "excellent". Fixes #200-208:
+
+| # | Finding → fix | Class |
+|---|---|---|
+| 200 | JOB promised a person the envelope couldn't grant ("bring her back alive" on relic+gold — the bound woman then evaporated, no ⛓/🙏 line) → a person may be a deliverable only when the envelope grants one | prompt (HIGH) |
+| 201 | Success loot SILENT in the reckoning (gold 119→247 with no line; relics slide into Items) → 💰/🗝 say-lines in applyResolution | engine |
+| 202 | Earned "+ lead" invisible pre-Lead-room (expired unseen) → reward-source leads always visible + 🧭 say-line | engine |
+| 203 | Beat JOB used unintroduced bible-cast name ("Edard's hire") → job names only people the situation introduced | prompt |
+| 204 | Level-ups silent → ⭐ say-line on grantXp gain | engine |
+| 205 | ~10% off-vocab favored words silently dropped ("healing","stealth") → stem fallback in parseAiTag (healing→heal class); true unknowns still dropped | engine |
+| 206 | First-board card at 0% for the WHOLE starter roster (clash + mirror zeroed both mercs) → #79-class guard: drop authored clash when it zeroes everyone; drop mirror-favored if still zeroed | engine |
+| 207 | "Marny" dealt beside quarry "Magny" in ONE card (reward people not yet in state.cards — guard blind) → reward characters registered in recentNpcNames before suggestions roll | engine |
+| 208 | Campaign-A reader: phantom "company men" garrison (roster IS the whole company — never invent watchmen); "as she always did" habit-tell banned; closing-image variety enforced across the resolve BATCH ("back toward the fort" ×10 was the reworded road-home) | prompt |
+
+Campaign-A reader (899091): qualified YES again; wound citation 11/11 forward; echo-continuity
+threads RESOLVE (Magny left behind → word returns → rescued; Elorael rescue → saga client).
+Correctness slips fixed above; Brutooth pronoun leak (she→he ×2 on a wolfborn merc) noted — model
+slip against provided rosterPronouns, watch 🟡.
+
+Campaign-B closing read (939495, all #200-208 live): **"ship for designer-playtest: QUALIFIED
+YES."** All four reward glyphs landed clean (💰×29 🗝×7 🧭×15 ⭐×8, sensible order, no number
+leaks); person-promise discipline "airtight" (9/9 person-quests delivered a body); JOB-name
+hygiene "perfect" (42/42); kernel purity, finale-once, gold-out-of-prose all hold. R20 verify:
+2/2 CLEAN. Final fixes #209-211: | 209 | reward-person names rolled engine-side with NO guard
+(rescuee "Olarion" twinned merc "Olaiel" in one card; Marny/Magny same class) → generateOneOff
+rerolls a twinned reward name (race+gender from tags) before the writer sees it, then registers
+all reward names in the window | engine | | 210 | merc pronoun leaks ("his hammer" on a she-merc,
+the reader's #2 bar item) → tags-are-pronoun check spelled out in resolve | prompt | | 211 |
+fabricated callback (twice-used invented memory of a scene no log contains) → callbacks may
+reference only dossier/storyState events | prompt |. R21 verify on resolve: pending.
+
+Remaining watch 🟡: untagged prose wounds ~1/run; "calf" as default wound site; return-and-latch
+closer creeping; beat-1 lapse-repose relabels the archetype (cosmetic incoherence); approach
+sub-clause under-delivery. NEW design ruling needed 🔴: fort-staff fiction (serjeant ×13, "the
+watch" ×12, paymaster, surgeon) — is caretaker staff licit, or is the roster the whole fort?
+**The reader's bar to an UNQUALIFIED yes: (1) world diversity (Thornhollow/Western-Forests
+monocropping — the 🔴 region-scope item), (2) merc pronoun stability (#210 applied).**
+
+**The single highest-impact item every reader agrees on: the
+2-merc roster dead-lock.** Tavern needs GH T2; 30-cycle campaigns never reach it; every rescue
+"moves on" (nudge printed 7×), one wound stalls the company (5 consecutive dead cycles in 717273).
+Options: cheaper/earlier Tavern; understaffed march with penalty; starter roster 3. Economy call —
+not made unilaterally. Iteration-5 campaign (747576) running.
+
+New designer watch items 🟡: retry/echo leads reinvent a lost person's captivity from scratch
+(prior-captivity fiction isn't carried; needs an engine memory hook); "messenger at the gate with
+prop + quote" is ~33/35 cards' macro-shape (the situation spec itself may need 2-3 alternate
+frames); left-behind/handed-over state doesn't constrain later genesis casting (kidnapped man
+hired the company while captive). R13 full verifier + fresh confirmation read running. The R11 beat
+verifier's read confirms the lore is landing: the focal's dossier handed it "perfect secondhand
+hooks" (owed coins, an old rescue) for the care beat. Watch: founders' who-lines can come out
+near-identical (both "keep the accounting in his head" this seed) — flesh distinctness under
+similar tags 🟡. **Confirmation replay (fresh agent, live server, real
+AI, days 1-3): all six fixes RESOLVED, zero new bugs, zero engine errors — "a new player can clear
+days 1-3 without a wall."** Notable design note from the replay: quest-reward leads stay hidden
+until a Lead room exists (visibleLeads design, not a bug). No spoiler (chain NOW = player-safe route status); no
+fallback text reached the player; KNOWN TO PLAYER duplicate-free; roster only as company people;
+captive-finale correct; chain "Seize the Second Key" reads well (twist lands, a failed escort's
+consequence — Kormuzzle seized — carries into later beats, finale recovers it). The failed-call
+dump found the resolve-schema failure root cause: | 102 | model wrote wound DESCRIPTIONS into
+injuries[].band ("bleeding gash at right forearm…") instead of the enum (3 of 4 failures), plus
+one newlyRevealed-as-object → JSON spec line now annotates band (STRICTLY none|low|med|high; the
+wound is shown in prose) and newlyRevealed/openThreads ([plain strings]) | prompt/schema |.
+Cosmetic watch: "Hejoined" model typo in one dossier. Gates green: typecheck + 82 tests.
+~$0.75 total real-AI spend this round across 6 campaign reads + 6 povread seeds.
+
+## Designer session round (2026-07-06 evening) — card voice, merged card, pattern-B built (#212-220)
+
+Designer rulings (recorded in QUESTS.md §card + GENERATION_FLOW §10 annotation): (1) situation IS
+the whole card, job = list-line only, never rendered on the card (both UIs updated); (2) card voice
+= BRIEFING to the boss — second person, present tense, plain declaratives, context→hook→task+hands+
+qualitative pay/risk, calibrated against Fort of Chains quest offers (research in session; agent
+pulled 13 verbatim samples from gitgud); (3) personality words legal in favored/clashing (±0.5U
+levers only, never attribute feeds) — GENERATION_FLOW "=none" clarified in place.
+
+Full-docs conformance sweep (4 Opus agents, every doc vs v3): ~180 decisions CONFORM. Silently
+MISSING found and BUILT this round:
+
+| # | Item | Build |
+|---|---|---|
+| 212 | §4 pattern-B partial-unit collaboration (the "AI shapes the quarry" channel; bandWindow never called anywhere) → one-off person rewards: engine pre-rolls IDENTITY (race/gender/name, similarity-guarded) → writer outputs quarryTags (≤3 vocab words, optional rank = BAND proposal) → engine fences families (skill/personality/body/background), rolls tier weighted-low in the band window, generateCard places required first, budget completion nets to mark. VERIFIED LIVE: card wrote "Edny the Younger, a human peasant" → delivered unit `female; human; peasant (low); …` | engine+prompt |
+| 213 | Coined bible cast never persisted → they now become lore-only character nodes at genesis (who-line as blurb, loreId written back into the cast entry) — the world populates itself with recurring faces beyond focals (LORE §1 / STORY_ENGINE §3) | engine |
+| 214 | §14 engine-cheap edges → co-deployed pairs linked served-with at zero tokens (existing link refreshes via touchEdge); born-in still impossible (regions aren't nodes) 🔴 | engine |
+| 215 | ECONOMY §4 jackpot-with-catch (dead jackpotChance field) → wired: flaw seeded first, budget loop overshoots positives to compensate, bundle nets mark; 0.08 on person+relic rewards 🛠 | engine |
+| 216 | favored/clashing family fence (audit: engine accepted ANY concept incl. group names + stat body tags = unpriced double-dip) → FAVOR_OK filter; vocab line gains tall/short/endowed/flat | engine+prompt |
+| 217 | situation clamp 650→1200 for the merged card | schema |
+| 218 | requiredTag band floor (minRank) still dropped at slot build — noted, not built 🟡 | watch |
+| 219 | MISSING items DEFERRED to designer queue 🔴: known-cast saga cadence (§21-3, ~2/GH-tier pool-gated); PLAYER_PREFERENCES plumbing; level-dependent gold-share (income 1.35 vs mandated ~1.09/level); finale-earn-in-bank (REWARD_BANK §2 vs supersession); born-in region nodes; STORY_ENGINE §10.1 min-length caps | queue |
+| 220 | Audit drift notes accepted as-is: MC-bisection→greedy budget-spend (value marked anyway); recall wildcards random-not-thematic; endgame lift binary/global (beyond prototype scope); blurb not edge-derived; zProse has no min cap | recorded |
+
+R22 verifier round on the rewritten writeQuest templates: pending. Live samples of the new voice
+(cardsample.ts 31007/32009): dispatcher briefings landed — "The work is plain, wet, and supervisory;
+expect hours on feet, council with wary peasants, and no glory." Gates green: typecheck + 82 tests.
+
+Verifier rounds R22-R25 on the rewritten templates (fixpoint discipline): R22 oneoff CLEAN /
+beat 3 defects → #221 mustBeFocal explicitly optional-and-omitted; #222 side-loot ∕ beat-1 promise
+∕ plain-profit reconciled in one clause; #223 storyState.currentSituation seeded as "just taken
+this up — the aim as the client puts it: <goal>" (a bare goal read as things-already-at-the-goal).
+R23 exposed the CLASS behind (c): genesis goals carried branch/twist tails + attribution prefixes
+→ #224 goal = PLAIN unattributed engagement (no "X states:", no "unless the company…", no unlearned
+facts — branches to openDirections, truths to situation); genesis account-book ban widened to
+ANYWHERE in the bible (a "ledger of meals" cast-want had seeded a downstream collision — the
+seed/ban-collision class again); cast.role "prize" = person-prize only (thing-prize → focal is
+quarry); recall wildcard relationPhrase de-jargoned ("thematic wildcard" reached prompts).
+**R25: 2/2 CLEAN — fixpoint.** Closing validation campaign (484950) running with the full stack:
+briefing voice + merged card + quarryTags + coined-cast lore nodes + served-with edges + jackpot.
+
+Closing validation read (484950) + response batch #225-231. Reader confirmed: task unmistakable
+41/41, structure clean, kernels pure, finale-once ×3, approach fidelity, no garrison, no gold
+staging, no payment endings, investigate answers "strong", jackpot-with-catch observed working
+("the ink run, so the proof felt planted"). Three of its findings were MY OWN artifacts: the JOB
+line it saw is campaignread's stale render (UIs are merged — harness fixed, #225); 5 "phantom
+wounds" were the name-in-cause guard dropping real 🩸 on SOLO marches while prose kept the wound →
+solo parties skip the name check (#226); "this morning" ×16 was my "most business reaches a fort
+in daylight" line gone sticky (§8 strikes its author AGAIN) → de-exampled to "name a time only
+when it matters" (#227). Real fixes: | 228 | voice mixed three addresses (you/the company/us) →
+ADDRESS THE BOSS AS "you" THROUGHOUT, never us/we, present/present-perfect — live samples now
+consistently second-person | prompt | | 229 | Sylvvia sex+station flip at flesh (bride → he/him
+kettle-page) → flesh: tags fix SEX and STATION; never demote a story's central figure | prompt |
+| 230 | "Grakjaw" worn by two opposite characters (saga warlord node + fresh rescue victim) →
+nameTooSimilar scans active lore character nodes | engine | | 231 | echo re-deals read as fresh
+news ×3 → lastSeen cards must read as another TRY at a known matter | prompt |. Escort-saga
+beat-1 overreach + finale re-deal seen again (known class, resolve rule in place — watch 🟡);
+"empty satchel + spat" failure formula + thigh ×8 noted 🟡. R26 pending. The reader's #1 drag is
+the 🔴 progression queue (roster starvation → back-half failure wall), not prose.
+
+## Writing simplification round (2026-07-06, designer: "RPG game writing, not novel") #232-236
+
+| # | Ruling/finding → change | Class |
+|---|---|---|
+| 232 | "no blaze of banners, no long stays at a watchpost" — zero-information sentences → governing positive rule: GAME WRITING — every sentence gives the player something usable (problem/place/client/task/hands/pay/risk); mood-only sentences cut | prompt (core) |
+| 233 | Named NPCs gravitate small jobs ("Briis" made routine work read important; one-offs have no room to introduce people — names read as already-familiar) → ANONYMITY BY OMISSION: small-gravity one-offs deal NO npcNameSuggestions (folk stay nameless by trade); serious+ get ONE; the quarry alone always carries a name | engine+prompt (structural) |
+| 234 | Preamble too long, accumulated do-nots → one-off template rewritten: input glosses one line each (~40% shorter), bans folded to one ALWAYS line + the two earned concrete bans (numbers, account-book); quarryTags spec moved from the npcNames bullet to the OUTPUT section beside ask (designer: vocab belongs with ask) | prompt |
+| 235 | Stray-tag audit answer: raw AI ~90% on-vocab; engine stores 100% canonical (stem fallback + family fence); both live quarryTags legal | measured |
+| 236 | R27 verify of compressed template: 2/2 CLEAN — no orphaned references, quarryTags trigger/vocab/rank clear; prize-focal added to the care-beat sympathetic bucket | verify |
+
+Live samples (34031): "He asks that you fetch her alive if possible; the friar fears wolves and a
+bad fall more than malice." — informational, brisk, anonymous-by-trade. Validation campaign
+(575859) running. Gates green.
+
+Writing-validation read (575859): **"RPG game writing bar MET — readability 7.5/10, up from ~5/10;
+reads like quest text, not a novel."** Anonymity STRONG PASS (0 named color NPCs on small cards);
+info density near-target (~4 mood sentences/10 cards, all in resolutions); voice PASS (0 us/we);
+wounds 7/7 both ways; garrison 0; care-beat tone matches focal role. Repetition is now the dominant
+defect → #237-240: | 237 | **finale ignored resolved chain state** (Krezzar captured at beat 1;
+finale re-posed "hides at the weir"; dossier held both facts) → finale opens from storyState AS IT
+STANDS; earlier successes stay done | prompt (HIGH) | | 238 | cast.want doubled its label ("wants
+he wants…") → want = the want itself, no subject prefix | prompt | | 239 | toponym stem families
+(Haw-×3, Mill-×3…) → freshPlaceName same-stem window guard (10) | engine | | 240 | lapse-repose
+reframe renamed the HOLD (Hawgate→Black Weir) → reframe keeps same places/people, varies only
+bringer+telling | prompt |. Remaining 🟡: resolution time-stamp openers (~16/30) + object-on-table
+closer ×5 (narrator habit); premise monotony (fetch-object 14/24) + single-region = the 🔴 world-
+variety queue. R28 verify pending.

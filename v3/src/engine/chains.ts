@@ -29,6 +29,7 @@ export interface ChainStoryState {
   openThreads: string[];
   actorStates: Record<string, string>;
   lastBeatOutcome?: string;   // "beat N ended in X: <what changed>" — feeds the next beat's writer
+  introducedNames?: string[]; // bible-cast names the player-facing text already introduced (orient ONCE)
 }
 
 export interface Chain {
@@ -48,6 +49,8 @@ export interface Chain {
   beatIndex: number;           // beats resolved so far
   bible: Bible;
   story: ChainStoryState;
+  settled?: boolean;           // resolver judged the matter settled mid-saga → next step is the finale
+  lastGeneratedBeat?: number;  // a re-posed (lapsed) step must arrive FRESH, not as the same card again
   state: 'active' | 'finale-pending' | 'done' | 'slipped';
   createdCycle: number;
 }
@@ -86,6 +89,13 @@ export function bankBeat(chain: Chain, partySize: number, outcome: Outcome, side
 
 /** the climax gate is on merc-cycles SPENT (§8 solidity rule c); failures force a last chance */
 export function finaleReady(chain: Chain): boolean {
+  // settled = the resolver judged the central matter essentially done mid-saga (an AI overshoot
+  // once completed a saga at beat 1 and the engine commissioned two beats of nothing) —
+  // AI judges, engine gates: the NEXT step becomes the finale instead of filler
+  if (chain.settled) return true;
+  // the LAST arc step IS the finale: beats consume steps 1..N-1 only. (Running beats to N and
+  // THEN firing a finale re-staged the climax — the figurine was opened before the moot twice.)
+  if (chain.beatIndex >= chain.expectedBeats - 1) return true;
   const target = chain.expectedBeats * 1.5; // S̄ per beat
   return chain.cyclesSpent >= target || chain.failures >= chain.failureBudget;
 }

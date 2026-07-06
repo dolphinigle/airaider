@@ -3,12 +3,19 @@
 
 import type { Rng } from './rng.js';
 
+// human first-name parts are GENDERED (a "Branbert" must not carry a female tag);
+// the other races' name-sounds are unisex by design
+const HUMAN_M: string[][] = [
+  ['Al', 'Bran', 'Cas', 'Dor', 'Ed', 'Fen', 'Gar', 'Hal', 'Jor', 'Kel', 'Lam', 'Mar', 'Ned', 'Os', 'Pell', 'Quin', 'Rod', 'Sam', 'Tom', 'Wil', 'Ys'],
+  ['ric', 'den', 'ton', 'win', 'mund', 'bert', 'fred', 'gard', 'helm', 'man', 'ard'],
+];
+const HUMAN_F: string[][] = [
+  ['Bet', 'Cla', 'El', 'Gwen', 'Isa', 'Mag', 'Ros', 'Sar', 'Tilda', 'Ann', 'Ed', 'Mar', 'Hild'],
+  ['a', 'eth', 'ine', 'wen', 'da', 'ra', 'lin', 'et', 'ny'],
+];
 const PARTS: Record<string, { first: string[][]; epithets: string[] }> = {
   human: {
-    first: [
-      ['Al', 'Bran', 'Cas', 'Dor', 'Ed', 'Fen', 'Gar', 'Hal', 'Jor', 'Kel', 'Lam', 'Mar', 'Ned', 'Os', 'Pell', 'Quin', 'Rod', 'Sam', 'Tom', 'Wil', 'Ys', 'Bet', 'Cla', 'El', 'Gwen', 'Isa', 'Mag', 'Ros', 'Sar', 'Tilda'],
-      ['ric', 'den', 'ton', 'win', 'mund', 'bert', 'fred', 'gard', 'helm', 'man', 'ny', 'ard', 'a', 'eth', 'ine', 'wen', 'da', 'ra', 'lin', 'et'],
-    ],
+    first: HUMAN_M, // default; rollName swaps by gender
     epithets: ['of the Ford', 'Longshanks', 'the Quiet', 'Redhand', 'of Millbrook', 'the Younger', 'Ashworth', 'Coalgate', 'Thatcher', 'Reed'],
   },
   elf: {
@@ -18,7 +25,8 @@ const PARTS: Record<string, { first: string[][]; epithets: string[] }> = {
       ['wen', 'rion', 'thil', 'anor', 'iel', 'las', 'dir', 'wyn', 'nith', 'rael', 'ion', 'a', 'is',
        'dai', 'eth', 'inne', 'lion', 'mar', 'neth', 'olas', 'ryn', 'sha', 'via'],
     ],
-    epithets: ['Leafshade', 'of Thornhollow', 'Dawnsinger', 'Mosswalker', 'Palebough', 'Windrow'],
+    epithets: ['Leafshade', 'Duskbough', 'Dawnsinger', 'Mosswalker', 'Palebough', 'Windrow',
+      'Fernbrook', 'Thistledown', 'Greenmantle', 'Sorrowsong', 'Brightwater', 'Ashveil', 'Rootward', 'Elmwhisper'],
   },
   wolfman: {
     first: [
@@ -36,9 +44,11 @@ const PARTS: Record<string, { first: string[][]; epithets: string[] }> = {
   },
 };
 
-export function rollName(rng: Rng, race: string): string {
+export function rollName(rng: Rng, race: string, gender?: string): string {
   const p = PARTS[race] ?? PARTS.human!;
-  const name = rng.pick(p.first[0]!) + rng.pick(p.first[1]!);
+  const first = (race === 'human' || !PARTS[race]) ? (gender === 'female' ? HUMAN_F : HUMAN_M) : p.first;
+  // collapse letter pile-ups at the part join ('Pell'+'lion' → 'Pellion', never 'Pelllion')
+  const name = (rng.pick(first[0]!) + rng.pick(first[1]!)).replace(/(.)\1\1+/g, '$1$1');
   return rng.chance(0.35) ? `${name} ${rng.pick(p.epithets)}` : name;
 }
 
@@ -50,7 +60,7 @@ const RELIC_NOUN: Record<string, string[]> = {
   armor: ['Hauberk', 'Helm', 'Shield', 'Cuirass'],
   clothes: ['Cloak', 'Robe', 'Veil', 'Mantle'],
   accessory: ['Ring', 'Chain', 'Brooch', 'Signet'],
-  document: ['Ledger', 'Charter', 'Map', 'Letters'],
+  document: ['Deed', 'Charter', 'Map', 'Letters'],   // never 'Ledger' — the writers ban account-books as props
   curio: ['Idol', 'Mask', 'Orb', 'Carving', 'Gem'],
   decoration: ['Tapestry', 'Statue', 'Mirror', 'Vase'],
   furniture: ['Chair', 'Chest', 'Table', 'Lectern'],

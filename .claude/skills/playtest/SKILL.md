@@ -24,6 +24,25 @@ real findings come from reading.
   The record has `r.system`, `r.user`, `r.response`, `r.kind`, tokens. **Print and read them** — the
   full system+user for the call type you changed, not just the parsed result.
 
+## MANDATORY FIRST GATE: the context-free verifier (designer directive 2026-07-05)
+Before reading any outputs, render the COMPLETE prompt (full system + the full user-message JSON,
+exactly as sent — never a preview) for every call type you touched, and hand each to a **fresh
+subagent with zero session context** (it simulates the stateless model — use an Opus general-purpose
+agent via the Agent tool, giving it ONLY the rendered prompt). Require it to answer:
+- What is being asked of you, in your own words?
+- For EVERY input field (`slotCount`, `KEYWORDS`, `rewardEnvelope`, …): what does it mean and what
+  would you DO with it?
+- For EVERY output field you must produce (`favored`, `clashing`, `mustBeFocal`, …): do you know what
+  it is FOR — what the game does with it — or would you be generating it blind? Flag every blind one.
+- Go line by line: which instructions are USELESS (you'd behave identically without them), redundant,
+  or confusing? Which conflict, or reference data you don't see?
+- Does the prompt as a whole MAKE SENSE for the task?
+Anything guessed, generated blind, flagged useless, or misread = a prompt defect. Fix, re-render, re-verify with a NEW fresh
+agent until a cold reader parses everything. Only then read outputs. A conformance diff against docs
+or v2 is NOT this check — docs-conformant prompts can still be incomprehensible; this gate exists
+because that exact failure shipped (bare `slotCount: 3`, unexplained KEYWORDS, `mustBeFocal` shown
+to one-off writers).
+
 ## The loop (read, don't assert)
 Drive ~8–15 real cycles over BOTH one-offs and chains (and let chains reach a finale). Each iteration:
 1. **Read the rendered prompt** for what you changed — as the stateless model sees it. Ask: is anything

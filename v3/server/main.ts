@@ -73,6 +73,7 @@ function stateView() {
     maxSlots: maxSlotsAtTier(st.fort.ghTier),
     unlockedRegions: st.unlockedRegions,
     menus: game.menuGates(),
+    can: { heal: game.hasRoom('hospital'), interrogate: game.hasRoom('interrogation') },
     rosterCap: game.rosterCapacity(), captiveCap: game.captiveCapacity(),
     lastReport,
     fort: {
@@ -86,7 +87,8 @@ function stateView() {
           wants: game.effectiveWants(r).map(w => w.match),
           owner: r.ownerId === 'you' ? 'you' : r.ownerId ? game.card(r.ownerId)?.name ?? r.ownerId : null,
           upgradeCost: rt.species === 'comfort' && r.slots.length < maxSlotsAtTier(st.fort.ghTier) ? upgradeCost(rt, r.slots.length) : null,
-          renovateCost: rt.species === 'comfort' ? renovateCost(rt) : null,
+          // cap-benefit rooms (bedrooms) can't be styled — the engine rejects it; don't offer dead buttons
+          renovateCost: rt.species === 'comfort' && rt.benefit !== 'cap' ? renovateCost(rt) : null,
           slots: r.slots.map(s => {
             if (!s) return null;
             const card = game.card(s)!;
@@ -130,6 +132,7 @@ function stateView() {
         id: q.id, title: q.title, situation: q.situation, job: q.job,
         level: q.level, rarity: q.rarity, region: REGION[q.region]!.name,
         chainId: q.chainId ?? null, beat: q.beatIndex ?? null, isFinale: !!q.isFinale,
+        ready: (q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots).every(s => s.filledBy),
         approaches: q.approaches ?? null, chosenApproach: q.chosenApproach ?? null,
         rewardEnvelope: q.rewardSpecs.map(r => r.kind).join(' + ') || (q.isFinale ? 'the focal character' : 'side loot'),
         odds: o,

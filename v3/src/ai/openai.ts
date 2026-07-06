@@ -35,8 +35,14 @@ const zStrArr = z.union([z.array(z.string()), z.string(), z.null()]).default([])
   v === null ? [] : typeof v === 'string' ? (v ? [v] : []) : v);
 
 /** prose with a hard max-length guardrail (STORY_ENGINE §10: soft-clamp, never reject-to-fallback) */
-const zProse = (max: number) => z.string().transform(s =>
-  s.length > max ? s.slice(0, max).replace(/\s+\S*$/, '') + '…' : s);
+// clamp at a SENTENCE boundary when one exists in the tail — a hidden truth ending
+// "…renounce the…" handed every beat writer a broken fact
+const zProse = (max: number) => z.string().transform(s => {
+  if (s.length <= max) return s;
+  const cut = s.slice(0, max);
+  const lastStop = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('! '), cut.lastIndexOf('? '));
+  return lastStop > max * 0.6 ? cut.slice(0, lastStop + 1) : cut.replace(/\s+\S*$/, '') + '…';
+});
 const zProseD = (max: number) => zProse(max).catch('').default('');
 
 /** importance 0..1 — tolerate numbers, numeric strings, and band words */
@@ -59,12 +65,10 @@ const zAsk = z.object({
 });
 const zQuestWrite = z.object({
   title: zProse(90),
-  situation: zProse(650),
+  situation: zProse(1200),   // the merged card: 1-3 short paragraphs (2026-07-06 ruling)
   job: zProse(240),
   ask: z.array(zAsk).default([]),
-  proposedRewardKind: z.string().nullish(),
-  closesChain: z.union([z.boolean(), z.string(), z.null()]).nullish()
-    .transform(v => typeof v === 'string' ? ['true', 'yes'].includes(v.toLowerCase()) : v ?? undefined),
+  quarryTags: z.array(z.string()).nullish().transform(v => v ?? undefined),
   approaches: z.array(z.object({
     label: z.string(), rewardKind: z.string().default('gold'),
     attribute: z.string().default('cha'), favored: zStrArr,
@@ -77,7 +81,7 @@ const zGenesis = z.object({
     name: z.string(), who: zProse(240), want: zProseD(200),
     role: z.string().default(''), loreId: z.string().nullish(),
   })).default([]),
-  situation: zProse(650),
+  situation: zProse(1100),
   goal: zProseD(400),
   arc: zStrArr,
   twistReveal: z.string().nullish(),
@@ -97,6 +101,7 @@ const zResolveOne = z.object({
   injuries: z.array(z.object({
     characterId: z.string(),
     band: z.enum(['none', 'low', 'med', 'high']).default('none'),
+    cause: z.string().nullish(),   // must quote the model's own after-text (engine verifies)
   })).default([]),
   fleshed: z.array(z.object({
     characterId: z.string(), who: zProseD(240),
@@ -110,6 +115,8 @@ const zResolveOne = z.object({
     currentSituation: z.string(),
     newlyRevealed: zStrArr,
     openThreads: zStrArr,
+    sagaSettled: z.union([z.boolean(), z.string(), z.null()]).nullish()
+      .transform(v => typeof v === 'string' ? ['true', 'yes'].includes(v.toLowerCase()) : v ?? undefined),
   }).nullish(),
 });
 const zFleshBatch = z.object({
@@ -126,13 +133,17 @@ const zSelect = z.object({ ids: zStrArr });
 // ---- shared rules blocks ---------------------------------------------------------------------
 
 const NUMBER_BAN =
-  'HARD RULES: never output numbers, prices, dice, or difficulty values — the engine owns all numbers. ' +
-  'Never invent character NAMES — use exactly the names given to you. Keep prose tight; low-medieval register, no modern idiom. ' +
-  'BANNED purple words: "weight", "shadow", "burden", "fate", "destiny" — clinical voice, concrete nouns.';
+  'HARD RULES: never write numbers, prices, or amounts in PROSE — the engine owns all numbers (sole exception: a JSON field whose schema itself demands a number). ' +
+  'Character names must come from the names this message gives you — never coin your own. Keep prose tight; low-medieval register, no modern idiom; concrete nouns. ' +
+  'BANNED purple words: "weight", "shadow", "burden", "fate", "destiny".';
+
+const TAGS_NOTE =
+  'TAGS NOTATION (wherever character tags appear in this message): tags read "word (rank)" — the rank marks how pronounced that trait is (low < mid < high < legendary; no rank = simply present). ' +
+  'The words name a race or sex, a trade, skills (e.g. "food" = cookery, "lore" = book-learning), temperament, or LOOKS — appearance words describe appearance only. Never contradict a tag; never echo tag words verbatim in prose.';
 
 const EDGE_TYPES_LINE =
   'edge types (use ONLY these): rival-of, scarred-by, bonded-by, owes, saved-by, kin-of, betrayed-by, served-with, born-in, member-of, captive-of, loves, fears, defeated, freed-by, party-to. ' +
-  'Direction: from = the state-holder (the betrayed, the debtor, the rescued).';
+  'Direction: from = the state-holder (the betrayed, the debtor, the rescued); for symmetric types (rival-of, kin-of, bonded-by, served-with, party-to) either direction serves.';
 
 export function makeOpenAiProvider(): AiProvider {
   const client = new OpenAI({ apiKey: loadKey() });
@@ -145,7 +156,7 @@ export function makeOpenAiProvider(): AiProvider {
     const rec: AiCallRecord = {
       n: usage.calls + 1, purpose: purposeCtx, model, durationMs: 0,
       inputTokens: 0, outputTokens: 0, cachedTokens: 0, costUsd: 0, ok: false,
-      systemPreview: system.slice(0, 600), userPrompt: user.slice(0, 6000),
+      systemPreview: system, userPrompt: user.slice(0, 20000),
     };
     records.push(rec);
     if (records.length > 120) records.splice(0, records.length - 120);
@@ -171,6 +182,7 @@ export function makeOpenAiProvider(): AiProvider {
       rec.durationMs = Date.now() - t0;
       rec.inputTokens = inTok; rec.outputTokens = outTok; rec.cachedTokens = cached; rec.costUsd = cost;
       const raw = res.choices[0]?.message?.content ?? '{}';
+      rec.output = raw.slice(0, 8000);
       const out = schema.parse(JSON.parse(raw));
       rec.ok = true;
       return out;
@@ -198,27 +210,47 @@ export function makeOpenAiProvider(): AiProvider {
     async writeQuest(input: QuestWriteInput): Promise<QuestWriteOut> {
       purposeCtx = 'writeQuest';
       const system = [
-        'You write quest cards for a dark-fantasy mercenary-company game. POV-locked: the player knows only what reaches the fort. State the job plainly.',
-        'BANNED CRUTCH: no ledgers/manifests/record-books as plot objects (grossly overused).',
-        'VARIETY RULES: (1) LANDMARK — name the regionLore landmark ONLY if opening.landmarkAllowed is true; even then NEVER repeat its stock epithet — describe it freshly or leave it unnamed. Prefer the fresh placeNameSuggestions or coin hamlets/waysides/crossings. (2) ARRIVAL — open on the given opening.mode at opening.time (the engine rotates these; make the arrival concrete, don\'t swap it for a petitioner at dusk). (3) SEEDS — every KEYWORDS seed must be LOAD-BEARING in the job or its twist; if a seed cannot serve the premise, transform it — never display it at the gate and drop it.',
-        'ROSTER RULE: rosterNames are the player\'s own soldiers — the ones who will be SENT. NEVER write them (or near-variants of their names) as petitioners, clients, claimants, victims, or opponents in the card fiction.',
+        'You write ONE job card for a dark-fantasy mercenary-fort GAME. The player is the company BOSS at the fort; the card is a short briefing TO them ("you"): what came in, what the job is, what it pays. They read it and pick which soldiers to SEND — the boss never goes, and the job has not started. Only what has reached the fort goes on the card; events elsewhere are report, not scene.',
+        'GAME WRITING, not literature. Every sentence must give the player something they can use: the problem, the place, the client, the task, the hands it needs, the pay, or the risk — a sentence that only adds mood or fine phrasing is cut. Simple words, short present-tense sentences, second person throughout (never "us/we"). People stay NAMELESS BY TRADE ("a drover", "the reeve") — a name appears only when this message hands you one, and only for someone the job centers on: an anonymous petitioner keeps a small job small.',
+        'YOUR INPUTS, field by field:',
+        '- location: the land and its anchor facts. A named landmark may be used (never with its stock epithet); other places from placeNameSuggestions or coined hamlets, waysides, crossings.',
+        '- opening.spark: seed for how word reaches the fort (a bringer, or a sign seen from the walls). Build it your own way; never quote its wording. Time of day only when it matters to the job — never the card\'s first words.',
+        '- KEYWORDS (when given): optional sparks — use what serves the premise, drop the rest, never quote their wording.',
+        '- gravity (when given): how heavy this reads. A small everyday job is SMALL — brisk, workmanlike, no dread, no portent; only a grave affair earns weight. rarity: how big the matter and prize are (common = local trouble). slotCount: how many soldiers the job takes.',
+        '- rewardEnvelope: the shape of the payout — the fiction must make that shape plausible and the pay plain (they work for pay; never a payoff-free plea). A person may be promised (rescued, captured, brought back) ONLY when the envelope grants a person; a goods-only envelope promises goods. rewardItems (when given): the prize objects — they end in the COMPANY\'s hands, never promised away to a client.',
+        '- archetype (when given): raid = hit a holdout for spoils; capture = take someone alive; rescue = free someone held; escort = guard on a journey; investigate = uncover a hidden thing; hunt = track down a person or beast; contract = a paid task; lead-hunt = sweep for rumors. The job matches it, specific to this place.',
+        '- rosterNames + rosterPronouns: the player\'s soldiers — the WHOLE company (never invent other company men or watchmen), sendable candidates only: never clients, victims, or foes.',
+        '- framedCharacter (when given): the person the job delivers — the one person who MUST carry their given name; the card must match them exactly (name, pronoun, tags). A dossier or lastSeen means the world already knows them: continue their story — another try at a known matter, never fresh news. npcNameSuggestions (when given): names for at most one or two others, only if the job truly needs them named.',
+        '- avoid (when given): the player\'s recent cards — different premise, different props, and never reuse a name from them.',
+        'YOUR OUTPUT — respond as JSON: {title, situation, job, ask: [{attribute, extraAttribute?, favored, clashing, requiredTag?}], quarryTags?}. Field by field:',
+        '- title: a short, concrete card name — never prefixed with the archetype label.',
+        '- situation: THE card the player reads. A common everyday job = ONE brisk paragraph; bigger matters up to three short ones. Shape: how word reached you → the matter and who wants it done → the task, the hands it wants, the pay and risk. The task must be unmistakable from this text alone. A client\'s exact words may be quoted when they carry weight — never as a ritual.',
+        '- job (ONE terse line): the task summarized for the boss\'s lists — the situation stands alone without it; never copy its sentences; no names the situation did not introduce.',
+        '- ask: EXACTLY slotCount entries — one per soldier the job needs. attribute (str|dex|int|cha|con): what the test truly demands — force→str, stealth or speed→dex, wits→int, parley→cha, endurance→con; extraAttribute only when the work is genuinely two-natured. favored (ARRAY of 1-3 words): traits that help — matched against the sent soldier\'s tags; clashing (ARRAY of 0-2): traits that hurt. VOCABULARY for favored/clashing/requiredTag — skills: melee, ranged, leadership, magic-fire, magic-earth, magic-water, magic-dark, social, roguery, lore, heal, craft, nature, performance, intimidation, food; personality: cool, hotheaded, serious, playful, greedy, generous, loner, gregarious, lustful, chaste, dominant, submissive, calculating, instinctive; looks: tall, short, endowed, flat.',
+        '- requiredTag (rare — at most ONE slot per card, most cards none): one vocabulary word the job truly DEMANDS; a soldier without it cannot take the slot.',
+        '- quarryTags (ONLY when framedCharacter is PARTIAL — its tags carry just race and sex; otherwise omit): up to 3 words that make the person your card describes, so the engine can build them to match. Draw from the ask vocabulary above, plus trades: ruler, soldier, criminal, priest, mystic, artisan, adventurer, entertainer, merchant, scholar, courtesan, sailor, slave, hunter, peasant, servant; and body words: muscular, scrawny, nimble, clumsy, clever, dull, beautiful, ugly, tough, sickly. Optional rank per word — "word (low|mid|high|legendary)" — for how pronounced.',
+        'ALWAYS: sentences read once and understood; orient a person ONCE, plainly; race named at most once and only when it matters; never echo these instructions or field names in prose. One prop is BANNED as a plot object (the trade\'s most overused): the account-book — ledger, manifest, registry, record-book by any name; wills, charters, leases, letters welcome instead.',
+        TAGS_NOTE,
         NUMBER_BAN,
-        'Respond as JSON: {title, situation (2-3 sentences), job (1 sentence), ask: [{attribute (str|dex|int|cha|con), extraAttribute?, favored: [skill words], clashing: [words], requiredTag?, mustBeFocal?}] — one per slot,',
-        'REQUIREMENTS (rare, at most ONE slot per quest): requiredTag = one word from the favored vocabulary the job truly DEMANDS (a healer for plague work) — most quests have none. mustBeFocal:true ONLY when focalIsMerc is true and the beat is about the focal\'s own past — their story, their presence.',
-        'proposedRewardKind? (gold|captive|recruit|relic), closesChain? (beats only), approaches? (finale only: [{label, rewardKind (recruit|captive|gold), attribute, favored}]) }.',
-        'Favored/clashing must come from: melee, ranged, leadership, magic-fire, magic-earth, magic-water, magic-dark, social, roguery, lore, heal, craft, nature, performance, intimidation, food — or personality words (cool, hotheaded, serious, playful, greedy, generous, loner, gregarious, lustful, chaste, dominant, submissive, calculating, instinctive).',
-        input.kind === 'beat' ? 'This is ONE BEAT of an ongoing saga: reveal at most 1 new layer. BEAT 1 IS THE CARE BEAT: before any plot pressure, give one small HUMAN moment with the focal person — something concrete to like, pity, or worry about (how they treat an animal, what they carry, what they refuse to say) — and keep the job itself low-stakes and shared. THE BEAT MUST ADVANCE: open on a situation lastBeatOutcome CREATED; you may NOT re-pose the previous beat\'s job — the objective must be materially different (new location, new claimant, new leverage, or raised stakes).' : '',
-        input.kind === 'finale' ? 'This is the FINALE: write 2-3 mutually exclusive APPROACHES (win over / subdue / cash out — fit the fiction), each testing a different attribute.' : '',
+        input.kind === 'beat' ? 'THIS CARD IS ONE STEP OF AN ONGOING SAGA — same briefing voice ("you"), but skip broad region context: open on the ongoing matter and what has just changed. Extra inputs: bible = the story\'s hidden settled truth (the player NEVER sees it; this card may surface at most ONE new layer of it). Its fields: kernel = the saga\'s one-line idea; situation = the full hidden truth; goal = what the company believes it is working toward — the job on THIS card may NEVER be, or complete, that goal before the finale: pose only this step\'s partial objective; arc = the rough step-by-step guide — this card covers arc step number beat and ONLY that step (beat 1 = the taking-up of the matter, never the whole errand). When lastBeatOutcome or storyState contradict the arc\'s step (a failure changed things), the STATE wins — re-derive this step\'s objective from where things actually stand, never from the plan; cast = its people, each with who / want / role (their function in the story — e.g. client, companion, quarry, obstacle, ally, prize); twist = a hidden fact that recontextualizes the goal mid-saga (may be null); tensions and openDirections = writers\'-room pressure notes; the bible\'s title and any loreId or actorStates entries are internal bookkeeping — ignore them. People in this card may be named ONLY from bible.cast, rosterNames (appearing solely as the company\'s own), or relevantLore entries — no other names. Places the bible names outrank placeNameSuggestions. rewardEnvelope on a mid-saga step reads "side loot": minor incidental valuables a step MAY shake loose — the saga\'s true prize lands only at its finale, and the plain-profit rule is satisfied by pay PROMISED for the saga (a card is not payoff-free when the client\'s pay stands behind it). relevantLore (when given) = what the world already remembers around this saga: each entry is a person or place, with its tie (relationPhrase), its tag-line (blurb), and sometimes a fuller dossier of memories — the card must stay CONSISTENT with these. An entry flagged companySoldier is one of the player\'s own soldiers (the rosterNames rules apply); one flagged companyCaptive sits in the company\'s cells and cannot walk the world free. focalDossier (when given) = what the world currently remembers of the focal, fresher than the bible — any focal moment must fit it. storyState = what the player has seen so far: currentSituation = where things stand for them; knownToPlayer = facts they hold; openThreads = loose ends; introducedNames = people already met (bare name only; orient everyone else once). beat / expectedBeats = which step this is of how many. focalName = who the saga is about. lastBeatOutcome (when given) = what the previous step changed: open on the situation it CREATED and never re-pose the previous job — the objective must be materially different (new location, new claimant, new leverage, or raised stakes). Between steps the world moves ONLY as lastBeatOutcome says — never invent an offscreen capture, delivery, or rescue to set this card up. BEAT 1 IS THE CARE BEAT: before any plot pressure, one small HUMAN moment with the focal, its aim set by their cast role — a focal to be helped, won, or claimed (companion, ally, prize) invites something to like or pity; a quarry or obstacle focal invites something to be wary of or darkly curious about (never make a villain lovable at beat 1); if the focal cannot be present at the fort, that moment arrives secondhand (a token of theirs, a witness\'s detail). Keep beat 1 low-stakes — its profit may rest on the client\'s PROMISE; nothing needs shaking loose yet. Each ask entry MAY gain one optional field, so its shape is {attribute, extraAttribute?, favored, clashing, requiredTag?, mustBeFocal?} — include mustBeFocal: true ONLY when focalIsMerc is true and this step is about that soldier\'s own past (it pins the slot to them); otherwise omit the field entirely.' : '',
+        input.kind === 'finale' ? 'THIS IS THE FINALE — it covers the bible arc\'s LAST step and must bring the matter to a head. It opens from storyState AS IT STANDS: what earlier steps already did (a quarry captured, a token delivered, a claim proven) STAYS done — the finale settles the matter from there and never re-stages an earlier success as still to do. slotCount here counts the mutually exclusive PLANS (one slot each): the company sends soldiers down ONE plan — never write a party of slotCount. rewardEnvelope here names the saga\'s central prize. Also output approaches: 2-3 mutually exclusive plans, each {label, rewardKind, attribute, favored} — rewardKind (recruit|captive|gold) is what that plan would NET the company (win them over → recruit, subdue → captive, cash out → gold — fit the fiction); each plan tests a different attribute. The player picks ONE. A plan\'s label may promise ONLY what its rewardKind delivers: recruit = they join the company, captive = the company holds them, gold = they pass out of the company\'s hands for value — never promise a fate (freedom, release, mercy) that no rewardKind grants.' : '',
       ].filter(Boolean).join('\n');
       const user = JSON.stringify({
-        archetype: input.archetype, region: input.region, regionLore: input.regionSeed,
+        archetype: input.archetype, location: input.location,
         rarity: input.rarity, slotCount: input.slotCount, rewardEnvelope: input.rewardEnvelope,
-        KEYWORDS: input.keywords.join(', ') || undefined,
+        KEYWORDS: input.keywords?.join(', ') || undefined,
+        gravity: input.gravity,
+        rewardItems: input.rewardItems?.length ? input.rewardItems : undefined,
         placeNameSuggestions: input.placeNameSuggestions,
+        npcNameSuggestions: input.npcNameSuggestions,
         rosterNames: input.rosterNames,
+        rosterPronouns: input.rosterPronouns,
         lastBeatOutcome: input.lastBeatOutcome,
         framedCharacter: input.framedCharacter,
+        avoid: input.avoid?.length ? input.avoid : undefined,
         bible: input.bible, storyState: input.storyState,
+        relevantLore: input.relevantLore?.length ? input.relevantLore : undefined,
+        focalDossier: input.focalDossier,
         beat: input.beatIndex, expectedBeats: input.expectedBeats, focalName: input.focalName,
         focalIsMerc: input.focalIsMerc,
         opening: input.opening,
@@ -226,8 +258,6 @@ export function makeOpenAiProvider(): AiProvider {
       const out = await callR(WRITER_MODEL, system, user, zQuestWrite);
       return {
         ...out,
-        proposedRewardKind: out.proposedRewardKind ?? undefined,
-        closesChain: out.closesChain ?? undefined,
         approaches: out.approaches ?? undefined,
         ask: out.ask.map(a => ({
           ...a, extraAttribute: a.extraAttribute ?? null,
@@ -239,21 +269,26 @@ export function makeOpenAiProvider(): AiProvider {
     async genesis(input: GenesisInput): Promise<GenesisOut> {
       purposeCtx = 'genesis';
       const system = [
-        'You are the writers\'-room for a saga in a dark-fantasy mercenary-fort game. Build a hidden BIBLE: settled truth, told plainly — mystery is the quest-writer\'s job later.',
-        'Collide the SEED with the SLATE into a one-line KERNEL. Pick 1-3 core people; the FOCAL MUST be core. LEAN cast: one line + want + role each, no essays. Reuse slate people before coining new ones.',
-        'cast.who is ONE human sentence a stranger could picture — NEVER a semicolon list or an echo of the tag words (the tags are already known; write the person, not the data).',
-        'PLACES: describe them in your own words — never lift the regionSeed\'s stock phrasing or epithet. The named landmark is ONE spot in a wide region: set most sagas elsewhere — coin hamlets, crossings, holds (newPlaces).',
-        'TONE: write the saga in the given TONE — honor it in kernel, wants, and tensions; not every saga is grim.',
-        'AVOID: the avoid list holds the player\'s recent sagas — do not reuse their premises, central objects, or title shapes.',
-        'TITLES: never default the saga title to the region landmark — name it for the person, the object, or the wound at its heart.',
+        'You are the writers\'-room for a saga in a dark-fantasy mercenary-fort game. The player runs a mercenary company for profit and takes this saga\'s jobs one at a time. Build a hidden BIBLE — the settled truth behind the whole saga, told plainly (mystery is the quest-writer\'s job later). COMMIT TO THE TRUTH: nothing "unknown" or "mysterious" in the bible; every fact traces to a cause.',
+        'It must be a QUEST the company would TAKE: a plain hook, a goal, and a stake for the company — and the player a PARTICIPANT in it, never a spectator.',
+        'YOUR INPUTS, field by field:',
+        '- seed: the what-if spark — collide it with the people given into a one-line KERNEL of pure story (never restate input fields — keywords, tone, stakes, rarity — inside it; if the seed resembles a recent saga in avoid, bend it somewhere new). keywords: motifs to weave where they serve the story (not a checklist). tone: write the whole saga in this register — not every saga is grim. stakes and rarity: how weighty the matter and its prize are; size the drama to them. location: the land\'s name and its anchor facts (never lift its phrasing). twist: when true, the saga hides a reveal (see TRUTH vs SURFACE); when false, twistReveal must be null.',
+        '- focal: the person this saga is ABOUT — they must be core cast, and their tags are central to what it is about. Their dossier (when fuller than the tags) is what the world remembers of them. isExistingMerc true = they already serve the player. kind (top-level) = how the saga likely ENDS: recruit = the focal may end up joining the company; captive = the focal may end up in its cells; gold-hoard = the prize is a treasure the focal is the key to; development = a saga about one of the company\'s own. Aim the arc at that ending.',
+        '- slate: people this world already knows, each with how they connect (relationPhrase; their blurb is their tag-line). Reuse slate people before coining new ones. EVERY cast entry for an existing person — slate or focal — carries that person\'s id as loreId (the link that ties them to the world); omit loreId only for newly coined people. companySoldier-flagged people are the player\'s own soldiers: they are CONTEXT, never cast entries (sole exception: a saga ABOUT one of them, whose role still comes from the enum). The situation may touch them only as the company\'s own — never as clients, claimants, victims, or antagonists (the company does not hire, pay, or petition itself). companyCaptive-flagged people sit in the company\'s cells and cannot walk the world free.',
+        '- avoid: the player\'s recent sagas — do not reuse their premises, central objects, central PLACES, rites/devices, or title shapes; set this saga visibly apart from every entry.',
+        '- assignedNames: the ONLY names for newly coined people, taken in order. New places may be freely named. expectedBeats: the arc must have EXACTLY this many steps.',
+        TAGS_NOTE,
+        'ARC SHAPE: step 1 = the company takes the job or meets the matter (the goal is NOT achieved here); middle steps = escalating turns that move across the world; the LAST step brings the matter to a head at the finale — never resolve the saga before it. EXACTLY expectedBeats steps, each a short phrase.',
+        'TRUTH vs SURFACE: situation = the full true state of things, twist included, told straight. When the saga has an opposing pressure, give it a FACE in the cast (an obstacle or quarry who can actually appear) — a threat no beat can stage drains every beat. goal = what the COMPANY believes it is working toward across the WHOLE saga — scope it to the full arc, never to step 1\'s errand (a goal step 1 can complete makes every later step a rerun). The goal is SHOWN to the player from beat 1: state the engagement PLAINLY and objectively, scoped to what the client asked — no attribution prefix ("X says/states…" — downstream surfaces add their own), never option branches ("unless the company chooses…"), never facts the company has not yet learned; alternatives and contingencies belong in openDirections, hidden truths in situation. twistReveal (null unless twist=true) = the one fact that recontextualizes the goal, built to surface at a MIDDLE step; the finale then settles the matter as re-understood.',
+        'cast.who is ONE human sentence a stranger could picture — NEVER a semicolon list or an echo of the tag words (the tags are already known; write the person, not the data). cast.want is the want itself, no subject prefix ("her family\'s claim restored", never "she wants her family\'s claim restored" — surfaces prepend the label). cast.role = EXACTLY ONE of: client, companion, quarry, obstacle, ally, prize — "prize" ONLY for a person who IS the prize; when the prize is a THING the focal holds or is the key to, the focal\'s role is quarry. LEAN cast: STRICTLY 1-3 people, one line + want + role each, no essays — never pad with coined "companions": the player\'s soldiers already fill that role and are never cast entries unless the saga is about one of them.',
+        'PLACES: describe them in your own words — never lift the location\'s stock phrasing or epithet. The named landmark is ONE spot in a wide land: set most sagas elsewhere — coin hamlets, crossings, holds (newPlaces).',
+        'TITLES: a concrete ACTION-title naming what the company is drawn into — never a poetic two-noun, never defaulted to the region landmark.',
         'WANTS MUST BE HUMAN and specific — a debt owed, a name cleared, a grave tended, a route reopened; never an abstraction like "power" or "to come out ahead". Invent each want fresh from THIS seed and cast — never reuse a want you were shown. The focal\'s want is the saga\'s heart: make it something a player could root for or against.',
+        'One prop is BANNED anywhere in the bible — center, cast wants, arc steps (the trade\'s most overused): the account-book — ledger, manifest, registry, record-book by any name. When a paper must matter, wills, charters, leases, and letters are welcome instead. (Everything in the bible SEEDS later cards; a banned prop planted here forces every writer downstream into a collision.)',
         NUMBER_BAN,
         EDGE_TYPES_LINE,
-        'If you coin NEW people, take names strictly from assignedNames (in order). New places may be freely named.',
-        'BANNED CRUTCH: do NOT center the saga on a ledger, manifest, record-book, or registry (grossly overused). Vary the plot object per the keywords.',
-        'Slate people marked as the player\'s own soldiers may be cast ONLY as the company\'s own people (comrades, escorts) — never as clients, claimants, victims, or antagonists.',
-        'Respond as JSON: {title, kernel, cast:[{name, who, want, role, loreId?}], situation, goal, arc:[3-5 rough steps], twistReveal (null unless twist=true), tensions:[], openDirections:[2],',
-        'relevantIds:[slate ids actually used], newPlaces:[{name,blurb}], newEdges:[{from,to,type,blurb,importance: a NUMBER 0-1}] (ids only from the slate/focal)}.',
+        'Respond as JSON: {title, kernel, cast:[{name, who, want, role, loreId?}], situation, goal, arc:[expectedBeats short step strings], twistReveal, tensions:[short strings: obstacles along the road to the goal], openDirections:[2 strings: one concrete next step toward the goal, one pressure that unfolds with or without the company],',
+        'relevantIds:[every slate/focal id you used anywhere — a simple checksum of reuse], newPlaces:[{name,blurb}], newEdges:[{from,to,type,blurb: one line saying what passed between them,importance: a NUMBER 0-1}]. newEdges records NEW history between EXISTING world people only (ids from slate/focal); the coined cast\'s ties live in the bible itself, not here — an empty array is often right}.',
       ].join('\n');
       const out = await callR(WRITER_MODEL, system, JSON.stringify(input), zGenesis);
       return {
@@ -267,22 +302,31 @@ export function makeOpenAiProvider(): AiProvider {
       purposeCtx = 'resolve';
       // one batched call per quest, fired in parallel (the cycle's single reckoning)
       const system = [
-        'You narrate quest resolutions for a dark-fantasy mercenary game. Produce, in order:',
-        '1) "before": the BUILDUP TO THE BRINK, written WITHOUT looking at the outcome: the scene sets, the challenge MATERIALISES, the party commits. END MID-MOTION on an em-dash, the instant before the decisive thing lands — the leap begun, the door giving way, the word half-spoken. Draw the cut-off image from THIS quest\'s own fiction; never reuse one. It must ADD something (terrain, a doubt, a detail), never restate the card, never hint at the result.',
-        '2) "after": what happened, knowing the outcome. Give EVERY party member their own beat SHOWN through one concrete physical action — NEVER use their trait word or its adverb (no "playful", "instinctive", "calculating" in prose). WEAVE the delivered rewards into the action ("the brewer counted out eighty gold and pressed the broken blade into his hands") — never a trailing "Item, N gold" list, never the deliveredSummary string verbatim, never "(npc)" or any parenthetical role.',
-        'CONTINUITY IS THE PRODUCT: each dossier lists known-as, habits, and memories — when one is RELEVANT, let it surface (a quirk performed under stress, an old wound remembered at the wrong moment). Never info-dump a dossier; one touch per person at most.',
-        'HABITS VARY: never repeat a character\'s habit verbatim — recur it as a NEW action expressing the same trait (the songbook opened against rain, pressed over a wound, a page torn for a bandage — not the same smoothing gesture every time).',
+        'You narrate the result of a job a mercenary company\'s soldiers were SENT on, in a dark-fantasy low-medieval world. The OUTCOME is already decided and given to you. The reader is the company\'s boss, who stayed at the fort: narrate the sent party in third person — never "you" in the field.',
+        'OUTCOME MEANINGS: success = the job done clean — and the JOB AS WRITTEN, no more: never take, deliver, or finish what the job only asked to find, learn, or scout. partial = done, but at a COST you must SHOW (a wound, a complication, a lesser haul). failure = the job NOT done; a consequence lands.',
+        'BE CLEAR ABOUT THE RESULT: the reader must finish knowing EXACTLY what the company achieved or failed to achieve, and what they now hold or know — never vague, never mood-only. When the job\'s verb is to learn, uncover, or question, the result IS the answer found (or not found) — show what was learned, not merely an object carried home.',
+        'When chainContext is given, this job is one step of a longer saga: chainContext.bible is the hidden truth behind it, chainContext.storyState is what the player has seen — and the storyState is the PAST: an event it records (a rite performed, a token cast, a prize taken) is DONE and may never be re-staged as if happening now; this job moves FORWARD from it. Unless chainContext.isFinale is true, this step may advance the saga but NEVER finish it: the bible\'s goal stays unachieved whatever the dice said — a success here succeeds at THIS job only, and the bible\'s arc lists steps that belong to LATER cards: this resolution may not perform, recover, or complete ANY of them (a beat that also does the finale\'s work makes every later card a rerun). Without chainContext the job stands alone.',
+        'Produce, in order:',
+        '1) "before": the BUILDUP TO THE BRINK, written WITHOUT looking at the outcome: the scene sets, the challenge MATERIALISES, the party commits. END MID-MOTION on an em-dash, the instant before the decisive thing lands — the leap begun, the door giving way, the word half-spoken. Draw the cut-off image from THIS job\'s own fiction. It must ADD something (terrain, a doubt, a detail), never restate the card (the given title/situation/job), never hint at the result.',
+        'The party list is COMPLETE: when one soldier was sent they are ALONE in the field — no "the others", no unnamed riders or party. After a person\'s first mention in a sentence, use their pronoun — never the same name twice in one sentence, and never "the elf/the man/the woman" as a name-substitute for someone already named. Each party member\'s pronoun comes from their tags — check before writing: a "female" tag is she/her in EVERY clause ("her hammer", "at her flank"); one slipped "his" on a named woman breaks the character.',
+        '2) "after": what happened, knowing the outcome. Give EVERY party member their own beat SHOWN through one concrete physical action — NEVER use their trait word or its adverb (no "playful", "instinctive", "calculating" in prose). WEAVE delivered ITEMS and PEOPLE from deliveredSummary into the action as things changing hands in-fiction. GOLD IS NEVER STAGED: no purses, pouches, coin-counting, or payment moments in prose — the engine reports pay separately; the one exception is a job whose story IS the payment. deliveredSummary is what ends in the COMPANY\'s hands once the job settles; anything the job promised to a client is separate — show it handled as the job said, and if the job\'s wording seems to promise away something deliveredSummary says the company KEEPS, the company\'s take wins (payment in kind, a declined delivery, a claim that failed). Never repeat deliveredSummary\'s amounts or its wording verbatim, nor "(npc)" or any parenthetical role. End the after-text where the story actually stops — on the deed done, on someone\'s reaction, on what it sets in motion. Across the resolutions in this batch, no two may end on the same closing image: walking back to the fort or gate is one image, not a default.',
+        'CONTINUITY IS THE PRODUCT: a party member\'s dossier holds what the world remembers of them — possibly who they are known as, habits, and memories (each memory line names the other person, the tie between them, and what happened). When one is RELEVANT, let it surface (a quirk performed under stress, an old wound remembered at the wrong moment). A person who appears only in a dossier memory may be REMEMBERED in prose but never staged as present. A callback may reference ONLY events written in the dossier or storyState — never invent shared history: an invented memory reads true once and false forever. Never info-dump a dossier; one touch per person at most, and MOST resolutions need none — a habit surfaces only when this scene genuinely calls it up, never as a signature stamped on every job — and never narrated AS habitual ("as she always did" is the stamp announcing itself). The dossier\'s identity line says WHO they are — it is not a prop to stage: a signature object from it may appear in at most the rare job where it matters.',
+        'HABITS VARY: when a habit does surface, never repeat it verbatim from the dossier — recur it as a NEW action expressing the same trait, never the same gesture every time.',
         'THE PAIR: when two or more party members are present, include exactly ONE interaction BETWEEN them — a passed object, an answered glance, one spoken line. Their bond (or friction) is the long game; build it a brick at a time.',
-        'Vary the lead-in clause — not every departure is mist, rain, or fog.',
+        'Vary the lead-in clause — not every departure is mist, rain, fog, or a time of day ("Dawn found them…" is a stamp). Vary hurt too: not every wound is a gashed palm or forearm — legs, ribs, scalp, an eye swollen shut; and never narrate a wound you did not list in injuries.',
         'On failure: state in-fiction what the party came home without — NEVER the canned words "the reward is lost" or "nothing —".',
-        'WORD BUDGET by rarity: common → before 2 short sentences, after 2 sentences MAX. uncommon → 3/3. rare or finale → 4/5 (the payoff moment — keep the brink and resolution generous). Respect it strictly.',
-        'Injuries: judge from the fiction per member (none/low/med/high) — typically on failure, sometimes none even then; never death.',
-        'NEVER declare recruitments, joinings, departures, deaths, or ownership changes — the ENGINE decides all dispositions; you narrate only what was delivered as given.',
-        'Flesh each delivered character: who (one line), backstory (2 sentences that grow out of THIS quest\'s fiction — how this person came to be in the mess the party found them in; a follower of the story must recognize them), quirks (1-2 concrete habits).',
+        'WORD BUDGET by rarity: common → before 2 short sentences, after 2 sentences MAX. uncommon → 3/3. rare, or a saga finale (chainContext.isFinale true) → 4/5 (the payoff moment — keep the brink and resolution generous). Respect it strictly.',
+        'Injuries: judge from the fiction per member — ONLY when the fiction itself put them in harm\'s way; a failure with no danger in it (closed doors, an empty site, cold trails) leaves NO wounds. Sometimes none even on violent failures; never death. List ONLY members who took harm; an empty array when nobody did. Each injury carries cause: the exact phrase FROM YOUR OWN "after" text that shows the harm happening, and it must NAME the harmed person taking their hurt ("Galdai took a cut…") — a scene event alone ("the shaft caved") is not a wound; if your after text shows no such moment, there is no injury.',
+        'One prop is BANNED in prose (the trade\'s most overused): the account-book — ledger, manifest, registry, record-book by any name.',
+        'NEVER declare, promise, or hint at recruitments, joinings, departures, deaths, or ownership changes — the ENGINE decides all dispositions; you narrate only what was delivered as given. On a saga finale, chainContext.fate states what ACTUALLY becomes of the central person and chainContext.approach names the plan the company CHOSE — the resolution must follow that plan and no other, ending the person exactly on the fate, told in the fiction\'s own words (never the fate\'s wording).',
+        'deliveredCharacters lists people the job handed over, each {id, name, tags}. Flesh each of them: who (one line they\'d be known by — never merely their name), backstory (2 sentences that grow out of THIS quest\'s fiction — how this person came to be in the mess the party found them in; a follower of the story must recognize them), quirks (1-2 concrete habits).',
         NUMBER_BAN, EDGE_TYPES_LINE,
-        'Memory edges: 0-2 per quest, only for moments that should be REMEMBERED. importance is a NUMBER between 0 and 1 (0.8+ = defining/core). Use character ids given.',
+        'Memory edges: 0-2 per job, only for moments that should be REMEMBERED. blurb = one line saying what passed between them. importance is a NUMBER between 0 and 1 (0.8+ = defining/core). Edge ids ONLY from the party/deliveredCharacters ids in this message — skip any edge whose person has no id here.',
         'storyUpdate.currentSituation must state CONCRETELY what changed (who holds what, who moved where) — never a vague "the trail continues".',
-        'Respond as JSON matching: {questId, before, after, injuries:[{characterId,band}], fleshed:[{characterId,who,backstory,quirks}], edges:[{from,to,type,blurb,importance}], storyUpdate?:{currentSituation,newlyRevealed,openThreads}}',
+        'storyUpdate: produce it ONLY when chainContext is given; omit it otherwise. Its truth SCALES with the outcome: success = the full new fact learned; partial = only part of it, hedged or bought dear; failure = nothing concrete (at most a misleading scrap).',
+        'storyUpdate.newlyRevealed holds only facts NOT already in the storyState — never restate what the player already knows.',
+        TAGS_NOTE,
+        'Respond as JSON matching: {questId, before, after, injuries:[{characterId, band: STRICTLY "low"|"med"|"high", cause: a phrase copied from your after text showing the harm — only the harmed appear here at all}], fleshed:[{characterId,who,backstory,quirks}], edges:[{from,to,type,blurb,importance}], storyUpdate?:{currentSituation, newlyRevealed: [plain strings], openThreads: [plain strings — the saga\'s live loose ends after this job, replacing the old list], sagaSettled: true ONLY if this outcome left the saga\'s central matter essentially settled with nothing real left to do — the game will then bring the saga to its head next step (false on an ordinary step)}}',
       ].join('\n');
       const outs = await Promise.all(inputs.map(q =>
         callR(WRITER_MODEL, system, JSON.stringify(q), zResolveOne).catch((e): ResolveQuestOut => {
@@ -292,10 +336,14 @@ export function makeOpenAiProvider(): AiProvider {
       return outs.map(o => ({ ...o, storyUpdate: o.storyUpdate ?? undefined }));
 
       function fallbackResolve(q: ResolveQuestInput): ResolveQuestOut {
+        // deliveredSummary carries engine numbers — it must NEVER surface raw (the engine's
+        // own grant lines already show the take); keep the fallback prose number-free
         return ({
           questId: q.questId,
           before: `${q.party.map(p => p.name).join(', ')} set out.`,
-          after: q.outcome === 'success' ? `It goes their way: ${q.deliveredSummary}.` : q.outcome === 'partial' ? `A messy half-win: ${q.deliveredSummary}.` : 'It comes apart, and they walk home with nothing.',
+          after: q.outcome === 'success' ? 'The job came home clean; what was promised was taken.'
+            : q.outcome === 'partial' ? 'A messy half-win — they brought back part of what they went for.'
+            : 'It comes apart, and they walk home with nothing.',
           injuries: [], fleshed: [], edges: [],
         });
       }
@@ -305,12 +353,13 @@ export function makeOpenAiProvider(): AiProvider {
       purposeCtx = 'flesh';
       if (!inputs.length) return [];
       const system = [
-        'You breathe life into characters of a dark-fantasy mercenary company. For EACH person given, write:',
-        '- who: ONE line they would be known by around the fort — specific and human, never generic ("keeps the night watch nobody else wants" beats "a brave fighter").',
-        '- backstory: 2 sentences of origin that FIT their tags and how they arrived. Give each one thing to love, pity, or worry about.',
-        '- if a `saga` is given, that person IS who that story was about: their backstory must grow out of it — its kernel, its places, what they wanted in it — so a player who followed the saga recognizes them. Never contradict the saga; never retell it, tell what came BEFORE it.',
-        '- quirks: 1-2 concrete PHYSICAL habits a watcher could notice (an action, never an adjective).',
-        'Make the people DISTINCT from each other. Low-medieval register.',
+        'You breathe life into characters of a dark-fantasy mercenary company. Each person comes with: name (use as-is), tags, role = what they are to the company (merc = one of its own soldiers, captive = held in its cells, hireling = staff), and context = how they came to the fort — let role and context shape the telling. The tags fix the person\'s SEX and STATION: a "female" tag is she/her in every clause, and who/backstory must keep the standing their tags and saga give them — never demote a story\'s central figure to background staff. For EACH person, write:',
+        '- who: ONE line they would be known by around the fort — specific and human, never generic and never merely their name ("keeps the night watch nobody else wants" beats "a brave fighter").',
+        '- backstory: 2 sentences of origin that FIT their tags and how they arrived, carrying one detail a reader could love, pity, or worry over — SHOWN inside the telling, never announced as a labeled fact. Every word must be consistent with every tag — never contradict one. Never echo these instructions or their wording in the prose.',
+        '- if a `saga` is given, that person IS who that story was about (saga.kernel = the one-line idea it was built on; saga.want = what they wanted in it): their backstory must grow out of it so a player who followed the saga recognizes them. Never contradict the saga; never retell it — tell what came BEFORE it.',
+        '- quirks: 1-2 concrete PHYSICAL habits a watcher could notice (an action, never an adjective). BANNED stock quirks: fingering/thumbing an object, humming or whistling, rubbing a wrist, folding a cloth corner — reach wider (gait, eating, grooming, speech rhythm, sleep, small rituals), and give each person in this batch a DIFFERENT kind of habit.',
+        'Make the people DISTINCT from each other.',
+        TAGS_NOTE,
         NUMBER_BAN,
         'Respond as JSON: {people:[{characterId, who, backstory, quirks:[...]}]} — ids exactly as given.',
       ].join('\n');

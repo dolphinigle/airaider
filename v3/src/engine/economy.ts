@@ -35,6 +35,7 @@ export interface GenOptions {
   contentLevel: number;           // tier ceiling = 2L+2 (ilvl)
   required?: TagInstance[];       // AI-required tags (placed first, §4 handoff)
   race?: string;                  // pool bias (region poolWeights)
+  gender?: string;                // preset identity (§4 pattern-B: identity rolled before the AI writes)
   role?: CharRole;                // characters only
   level?: number;                 // characters only (defaults to contentLevel)
   jackpotChance?: number;         // small jackpot-with-catch lottery
@@ -136,11 +137,26 @@ export function generateCard(rng: Rng, opts: GenOptions): Card {
     if (blockedGroups.has(group)) continue;
     let pick: string;
     if (group === 'race' && opts.race && members.includes(opts.race)) pick = opts.race;
+    else if (group === 'gender' && opts.gender && members.includes(opts.gender)) pick = opts.gender;
     else if (group === 'race') pick = rng.weighted(members.map(m => [m, m === 'human' ? 3 : 1] as const));
     else if (group === 'style') pick = rng.weighted(members.map(m => [m, m === 'human-style' ? 3 : 1] as const));
     else pick = rng.pick(members);
     const c = CONCEPT[pick]!;
     place({ concept: pick, tier: c.depth > 1 ? rollTier(rng, pick, ceiling, opts.targetV) : undefined });
+  }
+
+  // ECONOMY §4 step 4 — jackpot-with-catch: seed a FLAW first; the budget loop then overshoots
+  // the positives to compensate, so the bundle still nets targetV (stronger lines, one catch)
+  if (opts.jackpotChance && rng.chance(opts.jackpotChance)) {
+    const negs = pool.rollable.filter(r => {
+      const c2 = CONCEPT[r.id]!;
+      return c2.negative && !owned.has(r.id) && !(c2.opposite && owned.has(c2.opposite)) && !blockedGroups.has(c2.group);
+    });
+    if (negs.length) {
+      const id = rng.pick(negs.map(n => n.id));
+      const c2 = CONCEPT[id]!;
+      place({ concept: id, tier: c2.depth > 1 ? rng.range(1, Math.min(c2.depth, ceiling)) : undefined });
+    }
   }
 
   // spend the remainder (budget-driven; flavor flats ride along via their odds)

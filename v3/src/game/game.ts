@@ -8,7 +8,7 @@ import {
   type Card, type Location, HELD, cardType, stackKind, isLiability, freshId, seedIdCounter,
   idCounter, mintStackable, sameStack,
 } from '../engine/cards.js';
-import { T, renderTags, parseAiTag, CONCEPT, CONCEPTS, GROUPS, validateTags, type Attribute, hasTag } from '../engine/tags.js';
+import { T, renderTags, parseAiTag, CONCEPT, CONCEPTS, GROUPS, validateTags, type Attribute, hasTag, bandWindow, type TagInstance } from '../engine/tags.js';
 import {
   newFort, ROOM_TYPE, ROOM_TYPES, buildCost, upgradeCost, renovateCost, ghUpgradeCost,
   excavateCost, maxSlotsAtTier, GH_THRESHOLDS, roomComfort, globalPrestige, capFromComfort,
@@ -31,13 +31,14 @@ import {
   type Chain, type Bible, type FinaleFate,
 } from '../engine/chains.js';
 import {
-  newGraph, recall, renderDossier, decayPass, guardEdges, chronicleOf,
+  newGraph, recall, renderDossier, decayPass, guardEdges, chronicleOf, addEdge, touchEdge,
   type LoreGraph, type LoreNode,
 } from '../engine/lore.js';
 import { rollName, rollPlaceName } from '../engine/names.js';
+import { hasClash } from '../engine/overlap.js';
 import { questXp, grantXp, rollBase, rollGrowthLean, growToLevel } from '../engine/growth.js';
 import { coins, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, type SlotTest, type Outcome, type QuestRollResult } from '../engine/roll.js';
-import { sampleKeywords, sampleSeed, sampleOpening, pickTone } from '../ai/keywords.js';
+import { sampleKeywords, sampleSeed, sampleOpening, sampleGravity, pickTone } from '../ai/keywords.js';
 import type { AiProvider, ResolveQuestInput, AskSlotOut } from '../ai/provider.js';
 
 export interface LogEntry { cycle: number; kind: string; text: string; questId?: string }
@@ -80,7 +81,7 @@ export interface GameState {
   breaking: Breaking[];
   liabilityBirth: Record<string, number>;
   /** failure-debt echoes: a named person left in peril RESURFACES (the story bends, never dead-ends) */
-  pendingEchoes: { focalId: string; atCycle: number }[];
+  pendingEchoes: { focalId: string; atCycle: number; lastSeen?: string }[];
   log: LogEntry[];
 }
 
@@ -155,8 +156,9 @@ export class Game {
     const genders = CONCEPTS.filter(c => c.group === 'gender').map(c => c.id);
     card.tags.push(T(this.rng.pick(skillWords), this.rng.range(1, 3)));
     card.tags.push(T(this.rng.pick(persWords)));
-    card.tags.push(T(this.rng.pick(genders)));
-    card.name = rollName(this.rng, race);
+    const gender = this.rng.pick(genders);
+    card.tags.push(T(gender));
+    card.name = rollName(this.rng, race, gender);   // gender first — name never contradicts it
     return card;
   }
 
@@ -167,6 +169,13 @@ export class Game {
     if (cardType(c) === 'stackable') {
       const mate = this.state.cards.find(x => sameStack(x, c) && x.location.kind === 'held');
       if (mate) { mate.qty = (mate.qty ?? 0) + (c.qty ?? 0); return }
+    }
+    // §4b corollary: two characters must never share a name — NOR near-twin names
+    // (a colliding "Fenlin" merged NPC and soldier; twin focals "Pellthil"/"Pellnith" read as one saga twice)
+    if (c.character) {
+      const race = c.tags.find(t => ['human', 'elf', 'wolfman', 'lizardman'].includes(t.concept))?.concept ?? 'human';
+      for (let i = 0; i < 12 && this.nameTooSimilar(c.name); i++)
+        c.name = rollName(this.rng, race);
     }
     this.state.cards.push(c);
     if (isLiability(c)) this.state.liabilityBirth[c.id] = this.state.cycle;
@@ -209,7 +218,7 @@ export class Game {
       g('recruits', 'tavern', this.state.tavern.length > 0),
       g('staging', 'holding-cell', this.state.holding.length > 0),
       g('captives', 'dungeon', this.captives().length > 0),
-      g('items', 'storage'),
+      g('items', 'storage', this.state.cards.some(c => cardType(c) === 'relic' && c.location.kind === 'held')),
       g('lore', 'library'),
       // ⚠ doc-gap: §12.1 gives Mess hall → merc list, but FOCUS is a base function (§12.1 CUT
       // note) and lives in the roster menu — always open pending a designer ruling.
@@ -296,10 +305,10 @@ export class Game {
     this.state.lore.nodes[c.id] = node;
     return node;
   }
-  dossier(id: string): string {
+  dossier(id: string, opts?: { habits?: boolean }): string {
     const card = this.card(id);
     return renderDossier(this.state.lore, id, this.state.cycle,
-      card?.character ? { who: card.character.who, quirks: card.character.quirks } : undefined);
+      card?.character ? { who: card.character.who, quirks: opts?.habits === false ? undefined : card.character.quirks } : undefined);
   }
   chronicle(id: string) { return chronicleOf(this.state.lore, id) }
 
@@ -649,10 +658,11 @@ export class Game {
 
   visibleLeads(): Lead[] {
     if (!this.hasRoom('map-room')) return [];
-    // the day-0 packet is visible pre-Lead-room, as are STANDING faucets — those are posted
-    // at their own buildings (scouting lodge / recruiting post), not board gossip
+    // the day-0 packet is visible pre-Lead-room, as are STANDING faucets (posted at their own
+    // buildings) and EARNED reward leads — a "+ lead" the player was paid must never be
+    // invisible (a reader saw one expire unseen behind the Lead-room gate)
     if (!this.hasRoom('lead-room'))
-      return this.state.leads.filter(l => l.source === 'starter' || l.expiresAtCycle === null);
+      return this.state.leads.filter(l => l.source === 'starter' || l.source === 'reward' || l.expiresAtCycle === null);
     return this.state.leads;
   }
 
@@ -710,8 +720,22 @@ export class Game {
       if (a) {
         const attrs = [a.attribute, a.extraAttribute].filter((x): x is string => !!x)
           .map(x => x.toLowerCase()).filter(x => ['str', 'dex', 'int', 'cha', 'con'].includes(x)) as Attribute[];
-        const favored = a.favored.map(f => parseAiTag(f)?.concept).filter((c): c is string => !!c);
-        const clashing = a.clashing.map(f => parseAiTag(f)?.concept).filter((c): c is string => !!c);
+        // family fence (§10 + 2026-07-06 ruling): favored/clashing may name skills, personality,
+        // or the four flavor looks — never stat body tags (double-dips the attr feed), backgrounds,
+        // or group names (hasFavored would match a whole group)
+        const FAVOR_OK = (c: string) =>
+          CONCEPT[c]?.group === 'skill' || CONCEPT[c]?.group === 'personality' || ['tall', 'short', 'endowed', 'flat'].includes(c);
+        let favored = a.favored.map(f => parseAiTag(f)?.concept).filter((c): c is string => !!c && FAVOR_OK(c));
+        let clashing = a.clashing.map(f => parseAiTag(f)?.concept).filter((c): c is string => !!c && FAVOR_OK(c));
+        // fillability guard (#79 class): a slot whose clash hits EVERY roster merc (directly or
+        // via the opposite-of-favored mirror) zeroes the whole company — a first-board card sat
+        // at 0% for both starters. Soften: drop the authored clash; if the favored-opposite
+        // mirror alone still zeroes everyone, drop the favored words doing it.
+        if (this.roster().length && this.roster().every(m => hasClash(m.tags, favored, clashing))) {
+          clashing = [];
+          if (this.roster().every(m => hasClash(m.tags, favored, clashing)))
+            favored = favored.filter(f => !this.roster().every(m => hasClash(m.tags, [f], [])));
+        }
         test = { attributes: attrs.length ? attrs : ['str'], favored, clashing, difficulty, level };
         // AI-authored slot requirement (QUESTS §3: open / must-be / must-have), engine-guarded
         if (!reqPlaced && a.mustBeFocal && focalCardId) {
@@ -737,30 +761,101 @@ export class Game {
   }
 
   private async generateOneOff(lead: Lead): Promise<Quest> {
-    const n = slotCount(this.rng, lead.archetype, lead.rarity);
+    // fillability guard (same class as #79): never deal a card with more slots than the
+    // player HAS soldiers — a 3-slot quest against a 2-merc roster can never march
+    const n = Math.max(1, Math.min(slotCount(this.rng, lead.archetype, lead.rarity), this.roster().length));
     const V = oneOffValue(this.rng, lead.level, lead.rarity, n);
     const specs = splitOneOff(this.rng, V, lead.archetype);
     let rewardCards: Card[];
     const returning = lead.focalId ? this.card(lead.focalId) : undefined;
+    // §4 pattern-B (reorder accepted): a NEW person-reward is a COLLABORATION — the engine
+    // pre-rolls only IDENTITY (race/gender/name) here; the writer describes who they are via
+    // quarryTags (≤3 vocab words, rank = band proposal); the engine then builds the unit to
+    // match and completes the remainder of the budget. V/mark was computed above, untouched.
+    const personSpec = specs.find(s => s.kind === 'captive' || s.kind === 'recruit');
+    let pendingIdentity: { race: string; gender: 'male' | 'female'; name: string } | undefined;
     if (returning?.character) {
       // an echo rescue: the reward IS the person who was left behind (same card, same memories)
       returning.location = HELD('limbo');
       rewardCards = [returning];
     } else {
-      rewardCards = specs.flatMap(s => s.kind !== 'gold' && s.kind !== 'lead'
+      rewardCards = specs.flatMap(s => s.kind !== 'gold' && s.kind !== 'lead' && s !== personSpec
         ? materializeReward(this.rng, s, lead.level, lead.region) : []);
+      if (personSpec) {
+        const races = Object.entries(REGION[lead.region]!.poolWeights) as [string, number][];
+        const race = this.rng.weighted(races);
+        const gender = this.rng.pick(['male', 'female'] as const);
+        let name = rollName(this.rng, race, gender);
+        for (let i = 0; i < 12 && this.nameTooSimilar(name); i++) name = rollName(this.rng, race, gender);
+        pendingIdentity = { race, gender, name };
+      }
     }
-    const framed = rewardCards.find(c => c.character);
+    const framed = returning?.character ? returning : undefined;
+    // reward people aren't in state.cards yet, so the similarity guard can't see them —
+    // register every reward-person name against future rolls (Marny/Magny, Olaiel/Olarion)
+    for (const nm of [...rewardCards.filter(c => c.character).map(c => c.name), ...(pendingIdentity ? [pendingIdentity.name] : [])]) {
+      this.recentNpcNames.push(nm);
+      while (this.recentNpcNames.length > 60) this.recentNpcNames.shift();
+    }
+    const opening = sampleOpening(this.rng);
+    const gravity = sampleGravity(this.rng, lead.rarity);
     const out = await this.ai.writeQuest({
-      kind: 'one-off', archetype: lead.archetype, region: REGION[lead.region]!.name,
-      regionSeed: REGION[lead.region]!.seed, level: lead.level, rarity: lead.rarity,
+      kind: 'one-off', archetype: lead.archetype,
+      location: this.locationLine(lead.region, opening.landmarkAllowed),
+      level: lead.level, rarity: lead.rarity,
       slotCount: n, rewardEnvelope: specs.map(s => s.kind).join(' + '),
       keywords: sampleKeywords(this.rng),
-      opening: sampleOpening(this.rng),
-      placeNameSuggestions: [rollPlaceName(this.rng), rollPlaceName(this.rng)],
-      rosterNames: this.roster().map(m => m.name),
-      framedCharacter: framed ? { name: framed.name, tags: renderTags(framed.tags) } : null,
+      opening: { spark: opening.spark },
+      gravity,
+      placeNameSuggestions: [this.freshPlaceName(lead.region), this.freshPlaceName(lead.region)],
+      // ANONYMITY BY OMISSION (2026-07-06 ruling): a small job's folk stay nameless by trade —
+      // a dealt name gravitates the card ("Briis" made routine work read important). Only
+      // weightier matters get ONE color name; the quarry keeps theirs via framedCharacter.
+      npcNameSuggestions: gravity.includes('small') ? undefined : [this.rollNpcName(lead.region)],
+      rewardItems: rewardCards.filter(c => !c.character).map(c => c.name),
+      rosterNames: this.rosterForWriters().names,
+      rosterPronouns: this.rosterForWriters().pronouns,
+      framedCharacter: framed ? {
+        name: framed.name, tags: renderTags(framed.tags),
+        // pronoun EXPLICIT — an echo-rescued "Claet" once flipped sex and peril on return
+        pronoun: framed.tags.some(t => t.concept === 'female') ? 'she' : framed.tags.some(t => t.concept === 'male') ? 'he' : 'they',
+        // a RETURNING person brings their memories AND where the story left them
+        dossier: (d => d.includes('\n') ? d : undefined)(this.dossier(framed.id)),
+        lastSeen: lead.echoNote
+          ?? (lead.source === 'reward' && lead.focalId
+            ? [...this.state.log].reverse().find(l => l.text.includes(framed.name) && l.kind === 'resolve')?.text
+            : undefined),
+      } : pendingIdentity ? {
+        name: pendingIdentity.name,
+        tags: `${pendingIdentity.race}; ${pendingIdentity.gender}`,
+        pronoun: pendingIdentity.gender === 'female' ? 'she' : 'he',
+        partial: true,   // the writer SHAPES this person via quarryTags
+      } : null,
+      avoid: this.recentCardTitles.slice(-10),
     });
+    this.recentCardTitles.push(`${out.title} — ${out.job}`);
+    if (this.recentCardTitles.length > 12) this.recentCardTitles.shift();
+    // §4 pattern-B phase 2: canonicalize the writer's quarryTags (type from the AI, TIER from
+    // the engine — a rank is only a BAND proposal, rolled weighted-low inside its window),
+    // then build the person to match; the budget completion prices everything back to mark
+    if (personSpec && pendingIdentity) {
+      const required: TagInstance[] = [];
+      for (const w of (out.quarryTags ?? []).slice(0, 3)) {
+        const p = parseAiTag(w);
+        const c = p && CONCEPT[p.concept];
+        if (!p || !c || !['skill', 'personality', 'body', 'background'].includes(c.group)) continue;
+        let tier: number | undefined;
+        if (c.depth > 1 && p.rank) {
+          const [lo, hi] = bandWindow(p.concept, p.rank);
+          tier = Math.min(this.rng.range(lo, hi), this.rng.range(lo, hi));   // weighted-low in band
+        }
+        required.push({ concept: p.concept, tier });
+      }
+      personSpec.required = required.length ? required : undefined;
+      const [person] = materializeReward(this.rng, personSpec, lead.level, lead.region,
+        { gender: pendingIdentity.gender, presetName: pendingIdentity.name, race: pendingIdentity.race });
+      if (person) rewardCards.push(person);
+    }
     return {
       id: freshId('q'), leadId: lead.id, title: out.title, situation: out.situation, job: out.job,
       level: lead.level, rarity: lead.rarity, region: lead.region, archetype: lead.archetype,
@@ -814,33 +909,38 @@ export class Game {
       this.addCard(focal);
     }
     this.ensureLoreNode(focal);
-    // lore retrieval: recall around the focal + wildcards from the known cast
-    const wildcardPool = Object.values(this.state.lore.nodes).filter(n => n.active && n.id !== focal.id).map(n => n.id);
-    const wildcards = this.rng.shuffle([...wildcardPool]).slice(0, 3);
-    const candidates = recall(this.state.lore, focal.id, this.state.cycle, wildcards);
-    const picked = candidates.length > 8
-      ? await this.ai.select({ purpose: 'who needs full dossiers for this saga', candidates: candidates.map(c => ({ id: c.node.id, name: c.node.name, blurb: c.node.blurb, relationPhrase: c.relationPhrase })), max: 4 })
-      : candidates.map(c => c.node.id);
-    const slate = candidates.map(c => ({
-      id: c.node.id, name: c.node.name, blurb: c.node.blurb, relationPhrase: c.relationPhrase,
-      dossier: picked.includes(c.node.id) ? this.dossier(c.node.id) : undefined,
-    }));
+    const slate = await this.buildLoreSlate(focal.id, 'who needs full dossiers for this saga');
     const races = Object.entries(REGION[lead.region]!.poolWeights) as [string, number][];
-    const assignedNames = Array.from({ length: 4 }, () => rollName(this.rng, this.rng.weighted(races)));
+    // pre-rolled names for NEW cast — must not collide with any living character (§4b corollary)
+    const takenNames = new Set(this.state.cards.filter(x => x.character).map(x => x.name));
+    const assignedNames: string[] = [];
+    for (let i = 0; assignedNames.length < 4 && i < 60; i++) {
+      const n = rollName(this.rng, this.rng.weighted(races));
+      if (!takenNames.has(n) && !assignedNames.includes(n) && !this.nameTooSimilar(n)) assignedNames.push(n);
+    }
+    // coined cast never become cards — remember these names or their epithets get re-dealt
+    // ("Ashveil" once stamped three unrelated clients across chains)
+    this.recentNpcNames.push(...assignedNames);
+    while (this.recentNpcNames.length > 60) this.recentNpcNames.shift();
     const g = await this.ai.genesis({
       seed: sampleSeed(this.rng), keywords: sampleKeywords(this.rng),
-      region: REGION[lead.region]!.name, regionSeed: REGION[lead.region]!.seed,
+      // most sagas must live AWAY from the landmark — omission beats the ignored "set it elsewhere"
+      // nudge (both sagas of a read centered Thornhollow when genesis could always see it)
+      location: this.locationLine(lead.region, this.rng.chance(0.15)),
       rarity: lead.rarity, stakes: lead.rarity === 'rare' ? 'high' : lead.rarity === 'uncommon' ? 'mid' : 'low',
       tone: pickTone(this.rng),
       avoid: this.state.chains.slice(-5).map(c => `${c.bible.title} — ${c.bible.kernel}`),
       focal: { id: focal.id, name: focal.name, tags: renderTags(focal.tags), dossier: this.dossier(focal.id), isExistingMerc: isPersonal },
       kind: isPersonal ? 'development' : eco.kind, twist: eco.twist,
+      expectedBeats: eco.beats,
       slate, assignedNames,
     });
     // persist write-back (guarded); new places become lore nodes
     for (const p of g.newPlaces.slice(0, 3)) {
       const id = freshId('place-');
-      this.state.lore.nodes[id] = { id, kind: 'place', name: p.name || rollPlaceName(this.rng), blurb: p.blurb.slice(0, 120), identity: p.blurb.slice(0, 120), active: true, createdCycle: this.state.cycle };
+      // word-safe clamp — a blurb ending "hummed wit" fed broken prose to later prompts
+      const b = p.blurb.length > 120 ? p.blurb.slice(0, 120).replace(/\s+\S*$/, '') : p.blurb;
+      this.state.lore.nodes[id] = { id, kind: 'place', name: p.name || rollPlaceName(this.rng), blurb: b, identity: b, active: true, createdCycle: this.state.cycle };
     }
     guardEdges(this.state.lore, g.newEdges, this.state.cycle, () => freshId('e'));
     // §4b NAME GUARD: the AI never invents character names. Known-cast entries keep their
@@ -857,6 +957,29 @@ export class Game {
         }
       }
     }
+    // ENGINE BELTS on the bible (R28: prompt rules alone kept leaking):
+    // (a) the banned prop must not ride bible fields into every downstream card — scrub it;
+    // (b) a thing-prize saga's focal labeled "prize" reads as a person-deliverable under a
+    //     goods envelope AND flips the care-beat bucket — remap to quarry.
+    const scrub = (s: string) => s.replace(/\b(ledger|manifest|registry|record-book)s?\b/gi, 'charter');
+    g.kernel = scrub(g.kernel); g.situation = scrub(g.situation); g.goal = scrub(g.goal);
+    g.arc = g.arc.map(scrub); g.tensions = g.tensions.map(scrub); g.openDirections = g.openDirections.map(scrub);
+    for (const m of g.cast) { m.who = scrub(m.who); m.want = scrub(m.want) }
+    if (eco.kind === 'gold-hoard' || isPersonal) {
+      const f = g.cast.find(m => m.name === focal.name);
+      if (f?.role === 'prize') f.role = 'quarry';
+    }
+    // LORE §1 / STORY_ENGINE §3: coined cast PERSIST as lore-only people — the world populates
+    // itself with recurring faces (they surface in later recalls/slates and can be acquired);
+    // without this only focals ever entered the graph
+    for (const member of g.cast) {
+      if (member.loreId && this.state.lore.nodes[member.loreId]) continue;      // already known
+      if (member.name === focal.name) continue;                                  // focal has a card+node
+      const id = freshId('lore-');
+      const b = member.who.length > 120 ? member.who.slice(0, 120).replace(/\s+\S*$/, '') : member.who;
+      this.state.lore.nodes[id] = { id, kind: 'character', name: member.name, blurb: b, identity: b, active: true, createdCycle: this.state.cycle };
+      member.loreId = id;
+    }
     const chain: Chain = {
       id: freshId('chain-'), kind: eco.kind, isPersonal, focalId: focal.id,
       level: lead.level, rarity: lead.rarity, region: lead.region,
@@ -866,7 +989,11 @@ export class Game {
         title: g.title, kernel: g.kernel, cast: g.cast, situation: g.situation, goal: g.goal,
         arc: g.arc, twist: g.twistReveal, tensions: g.tensions, openDirections: g.openDirections,
       },
-      story: { currentSituation: g.situation, knownToPlayer: [], openThreads: [...g.openDirections], actorStates: {} },
+      // player-facing story state starts from the APPARENT goal — the bible's situation and
+      // directions are the hidden truth and must never seed a surface the UIs display. The
+      // taking-up framing keeps beat-1 writers from posing the whole errand (R22: a bare goal
+      // as currentSituation read as "things already stand at the goal")
+      story: { currentSituation: `The company has just taken this up — the aim as the client puts it: ${g.goal}`, knownToPlayer: [], openThreads: [], actorStates: {}, introducedNames: [] },
       state: 'active', createdCycle: this.state.cycle,
     };
     focal.chainIds.push(chain.id);
@@ -877,20 +1004,32 @@ export class Game {
 
   private async generateChainBeat(chain: Chain, lead: Lead): Promise<Quest> {
     const isFinale = finaleReady(chain);
-    // finales are ALWAYS one slot per approach (3 mutex plans); the AI is told the true shape
-    const n = isFinale ? 3 : slotCount(this.rng, 'investigate', chain.rarity);
+    // finales are ALWAYS one slot per approach (3 mutex plans); the AI is told the true shape.
+    // Beats obey the fillability guard: never more slots than the roster has soldiers.
+    const n = isFinale ? 3 : Math.max(1, Math.min(slotCount(this.rng, 'investigate', chain.rarity), this.roster().length));
     const sideLootV = isFinale ? 0 : beatSideLoot(this.rng, chain);
     const focal = this.card(chain.focalId);
+    // two-part lore prompting (LORE.md): selector picks who gets full dossiers, THEN the writer
+    // receives the relevant lore — beats carry world memory, not just the frozen bible
+    const relevantLore = await this.buildLoreSlate(chain.focalId, 'who needs full dossiers for this saga step');
     const out = await this.ai.writeQuest({
-      kind: isFinale ? 'finale' : 'beat', archetype: lead.archetype,
-      region: REGION[chain.region]!.name, regionSeed: REGION[chain.region]!.seed,
+      // beats serve the BIBLE's story, not a rolled job type (a random archetype fought the saga);
+      // the landmark gate is for one-off variety — a saga anchored at the landmark must name it
+      kind: isFinale ? 'finale' : 'beat',
+      // beats see the landmark ONLY when this saga's bible actually uses it (else it re-tempts drift)
+      location: this.locationLine(chain.region, !!REGION[chain.region]?.landmark && JSON.stringify(chain.bible).includes(REGION[chain.region]!.landmark!)),
       level: chain.level, rarity: chain.rarity, slotCount: n,
       rewardEnvelope: isFinale ? `the focal: ${chain.kind}` : 'side loot',
-      keywords: [], opening: sampleOpening(this.rng),
-      placeNameSuggestions: [rollPlaceName(this.rng)],
-      rosterNames: this.roster().map(m => m.name),
-      lastBeatOutcome: chain.story.lastBeatOutcome,
+      opening: { spark: sampleOpening(this.rng, { gentle: chain.beatIndex === 0 }).spark },
+      placeNameSuggestions: [this.freshPlaceName(chain.region)],
+      rosterNames: this.rosterForWriters().names,
+      rosterPronouns: this.rosterForWriters().pronouns,
+      lastBeatOutcome: chain.lastGeneratedBeat === chain.beatIndex + 1
+        ? `${chain.story.lastBeatOutcome ?? ''} This same step was posed before and went untaken — pose it AFRESH with a different bringer and telling, but the SAME places and people: the world did not move while the company sat.`.trim()
+        : chain.story.lastBeatOutcome,
       bible: chain.bible, storyState: chain.story,
+      relevantLore,
+      focalDossier: (d => d.includes('\n') ? d : undefined)(this.dossier(chain.focalId)),
       beatIndex: chain.beatIndex + 1, expectedBeats: chain.expectedBeats,
       focalName: focal?.name,
       focalIsMerc: chain.isPersonal && focal?.character?.role === 'merc',
@@ -900,6 +1039,7 @@ export class Game {
     // difficulty at standard; beat 2 still escalating — cap at hard; then free
     const beatNo = chain.beatIndex + 1;
     const cap = isFinale ? undefined : beatNo <= 1 ? 'standard' as const : beatNo === 2 ? 'hard' as const : undefined;
+    chain.lastGeneratedBeat = chain.beatIndex + 1;
     const quest: Quest = {
       id: freshId('q'), leadId: lead.id, title: out.title, situation: out.situation, job: out.job,
       level: chain.level, rarity: chain.rarity, region: chain.region, archetype: lead.archetype,
@@ -1021,6 +1161,13 @@ export class Game {
     // DELIVERY IS COMPUTED HERE, BEFORE THE AI NARRATES — including the finale's fate
     // (QUESTS §8 solidity rule b; the narrator must name what is actually delivered).
     const ready = st.quests.filter(q => q.state === 'open' && this.isCommitted(q)).sort((a, b) => a.id.localeCompare(b.id));
+    // a partially-staffed quest silently NOT marching was invisible — say it plainly
+    for (const q of st.quests.filter(x => x.state === 'open' && !this.isCommitted(x))) {
+      const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
+      const filled = active.filter(s => s.filledBy).length;
+      if (filled > 0) report.push(`⏸ ${q.title} did not march — every slot must be filled (${filled} of ${active.length}).`);
+    }
+    if (ready.length === 0) report.push('A quiet cycle — no one marched.');
     const resolutions: Resolution[] = [];
     for (const q of ready) {
       const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
@@ -1039,7 +1186,9 @@ export class Game {
     const aiInputs: ResolveQuestInput[] = resolutions.map(r => ({
       questId: r.quest.id, title: r.quest.title, situation: r.quest.situation, job: r.quest.job,
       rarity: r.quest.rarity, outcome: r.outcome,
-      party: r.party.map(p => ({ id: p.id, name: p.name, tags: renderTags(p.tags), dossier: this.dossier(p.id) })),
+      // habits reach the narrator only ~40% of the time — a habit not shown cannot become a
+      // signature stamp (the scar-tic appeared in 9 of 15 resolutions when always sent)
+      party: r.party.map(p => ({ id: p.id, name: p.name, tags: renderTags(p.tags), dossier: this.dossier(p.id, { habits: this.rng.chance(0.25) }) })),
       deliveredSummary: this.describeDelivery(r),
       deliveredCharacters: r.delivery.cards.filter(c => c.character).map(c => ({ id: c.id, name: c.name, tags: renderTags(c.tags) })),
       chainContext: r.quest.chainId ? {
@@ -1047,6 +1196,7 @@ export class Game {
         storyState: this.state.chains.find(c => c.id === r.quest.chainId)?.story,
         isFinale: !!r.quest.isFinale,
         fate: r.fate?.fate,
+        approach: r.quest.approaches?.find(a => a.id === r.quest.chosenApproach)?.label,
       } : undefined,
     }));
     const aiOuts = aiInputs.length ? await this.ai.resolve(aiInputs) : [];
@@ -1094,6 +1244,7 @@ export class Game {
       lead.chainInfo = { kind: 'none' };
       lead.focalId = person.id;
       lead.title = `Word of ${person.name} reaches the gate`;
+      lead.echoNote = echo.lastSeen;
       st.leads.push(lead);
       report.push(`🕮 Word of ${person.name} — left behind, still out there. A rescue is possible.`);
     }
@@ -1184,9 +1335,11 @@ export class Game {
       const focal = chain ? this.card(chain.focalId) : undefined;
       const approach = r.quest.approaches?.find(a => a.id === r.quest.chosenApproach);
       const kind = approach?.rewardKind ?? 'gold';
-      if (r.fate.fate === 'slipped') return `${focal?.name ?? 'the prize'} slips away — the season's bank is forfeit (a road back will exist)`;
-      if (r.fate.fate === 'saddled') return `${focal?.name ?? 'the prize'} delivered as ${kind}, but lesser — the bargain came saddled`;
-      return `${focal?.name ?? 'the prize'} delivered clean as ${kind}, with the season's surplus`;
+      // fate strings feed the narrator VERBATIM as the truth to land on — keep them fiction-safe
+      // (an earlier "season's surplus" wording got reified into prose as a physical object)
+      if (r.fate.fate === 'slipped') return `${focal?.name ?? 'the prize'} slips out of reach — the company comes away with nothing this time (though a road back will exist)`;
+      if (r.fate.fate === 'saddled') return `${focal?.name ?? 'the prize'} delivered as ${kind}, but at a worse bargain than hoped`;
+      return `${focal?.name ?? 'the prize'} delivered clean as ${kind}, and the company is paid well for the whole affair`;
     }
     if (r.outcome === 'failure') return 'they return with empty hands (say what was lost, in-fiction)';
     const bits = r.delivery.cards.map(c => c.character
@@ -1198,7 +1351,7 @@ export class Game {
 
   private applyResolution(
     r: Resolution,
-    out: { before: string; after: string; injuries: { characterId: string; band: InjuryBand }[]; fleshed: { characterId: string; who: string; backstory: string; quirks: string[] }[]; edges: { from: string; to: string; type: string; blurb: string; importance: number }[]; storyUpdate?: { currentSituation: string; newlyRevealed: string[]; openThreads: string[] } } | undefined,
+    out: { before: string; after: string; injuries: { characterId: string; band: InjuryBand; cause?: string | null }[]; fleshed: { characterId: string; who: string; backstory: string; quirks: string[] }[]; edges: { from: string; to: string; type: string; blurb: string; importance: number }[]; storyUpdate?: { currentSituation: string; newlyRevealed: string[]; openThreads: string[]; sagaSettled?: boolean } } | undefined,
     report: string[],
     pendingEdges: { from: string; to: string; type: string; blurb: string; importance: number }[],
   ) {
@@ -1212,15 +1365,41 @@ export class Game {
     for (const p of r.party) {
       p.location = HELD('roster');
       const xp = questXp(p.character!.level, q.level, r.outcome);
-      grantXp(p.character!, xp, this.capOf(p.id));
+      if (grantXp(p.character!, xp, this.capOf(p.id)) > 0)
+        say(`⭐ ${p.name} reaches level ${p.character!.level}.`);
+    }
+    // §14 engine-cheap edges: co-deployed pairs are linked served-with at ZERO tokens —
+    // an existing link refreshes instead (the graph must not depend on the AI remembering)
+    for (let i = 0; i < r.party.length; i++) for (let j = i + 1; j < r.party.length; j++) {
+      const [a, b] = [r.party[i]!, r.party[j]!];
+      this.ensureLoreNode(a); this.ensureLoreNode(b);
+      const existing = this.state.lore.edges.find(e => e.active && e.type === 'served-with'
+        && ((e.from === a.id && e.to === b.id) || (e.from === b.id && e.to === a.id)));
+      if (existing) touchEdge(existing, this.state.cycle);
+      else addEdge(this.state.lore, {
+        id: freshId('e'), from: a.id, to: b.id, type: 'served-with',
+        salience: 0.3, core: false, active: true, lastCycle: this.state.cycle,
+        blurb: `marched together — ${q.title}`,
+      });
     }
     // injuries: AI-judged band → engine tiers (decoupled channel). ENGINE GUARD (§11/F5):
-    // success → none; partial → at most a minor one; failure → any band
+    // success → none; partial → at most a minor one; failure → any band.
+    // A wound must CITE the moment in the model's own after-text that shows it — an uncited
+    // wound is invented (a med-4 "hedge wound" once came from fleeing a closed door)
     for (const inj of out?.injuries ?? []) {
       let band = inj.band;
       if (r.outcome === 'success') band = 'none';
       else if (r.outcome === 'partial' && (band === 'med' || band === 'high')) band = 'low';
       if (band === 'none') continue;
+      const merc0 = this.card(inj.characterId);
+      // the cause must appear in the after-text AND (in a multi-member party) name the harmed
+      // person — "the shaft caved" once passed the substring check while narrating no wound.
+      // SOLO parties skip the name check: the harmed one is unambiguous, and requiring the name
+      // was silently dropping real 🩸 while the prose kept the wound (5×/run mismatch)
+      const cited = !!inj.cause && !!merc0
+        && (out?.after ?? '').toLowerCase().includes(inj.cause.toLowerCase().slice(0, 25))
+        && (r.party.length === 1 || inj.cause.toLowerCase().includes(merc0.name.split(' ')[0]!.toLowerCase()));
+      if (!cited) continue;
       const merc = this.card(inj.characterId);
       if (!merc?.character || !r.party.includes(merc)) continue;
       const tiers = rollInjuryTiers(this.rng, band);
@@ -1254,9 +1433,11 @@ export class Game {
         }
       } else if (stackKind(c) === 'gold') {
         this.addGold(c.qty ?? 0);
+        say(`💰 ${q.title}: +${c.qty ?? 0}g.`);
       } else {
         c.location = HELD('inventory');
         if (!st.cards.includes(c)) st.cards.push(c);
+        say(`🗝 ${c.name} joins the company's holdings.`);
       }
     }
     if (r.delivery.liability) this.addCard(r.delivery.liability);
@@ -1267,14 +1448,21 @@ export class Game {
         this.ensureLoreNode(lost);
         lost.location = HELD('lore');
         if (!st.cards.includes(lost)) st.cards.push(lost);
-        st.pendingEchoes.push({ focalId: lost.id, atCycle: st.cycle + this.rng.range(4, 8) });
+        st.pendingEchoes.push({
+          focalId: lost.id, atCycle: st.cycle + this.rng.range(4, 8),
+          // capture the PERIL as the story left it — a returning Sylvlion once swapped
+          // "hobbled at the mill wheel" for a fresh forest chase
+          lastSeen: `${q.title}: ${q.situation.slice(0, 220)}`,
+        });
         say(`🕮 ${lost.name} is left behind out there — word of them will come again.`);
       } else {
         st.cards = st.cards.filter(c => c.id !== lost.id);   // lost objects just vanish
       }
     }
     for (let i = 0; i < r.delivery.leadGrants; i++) {
-      st.leads.push(rollFreshLead(this.rng, this.leadCtx(), () => freshId('lead-'), 'reward'));
+      const nl = rollFreshLead(this.rng, this.leadCtx(), () => freshId('lead-'), 'reward');
+      st.leads.push(nl);
+      say(`🧭 A lead earned: ${nl.title ?? 'word worth chasing'} — see the Leads tab.`);
     }
     // collector quest won → the liability is buried
     if (q.liabilityId && r.outcome !== 'failure') {
@@ -1298,18 +1486,146 @@ export class Game {
     report.push(...after);
     this.log('resolve', `${q.title}: ${r.outcome}`, q.id);
     // chain advancement
-    if (q.chainId) this.advanceChain(q, r, out?.storyUpdate, report, r.fate);
+    if (q.chainId) {
+      const chain = st.chains.find(c => c.id === q.chainId);
+      if (chain) this.noteIntroduced(chain, [q.situation, q.job, out?.before ?? '', out?.after ?? ''].join('\n'));
+      this.advanceChain(q, r, out?.storyUpdate, report, r.fate);
+    }
     st.quests = st.quests.filter(x => x.state !== 'resolved');
   }
 
-  private advanceChain(q: Quest, r: { outcome: Outcome; party: Card[] }, storyUpdate: { currentSituation: string; newlyRevealed: string[]; openThreads: string[] } | undefined, report: string[], fate?: FinaleFate) {
+  /** NPC names the writers were recently dealt — card NPCs never become cards, so without this
+   *  window the generator dealt Betda/Betra/Beteth within a few cycles */
+  private recentNpcNames: string[] = [];
+  /** recent card titles — one-offs need an avoid list too (two 'Lantern in the Old Growth'
+   *  stake-rescues shipped in one campaign) */
+  private recentCardTitles: string[] = [];
+
+  /** a fresh character name must not equal, share a 4-letter given-name stem with, or sit within
+   *  edit-distance 2 of a living one (Ulfka/Ulfnak and Harmuzzle/Magmuzzle read as twins) */
+  private nameTooSimilar(name: string): boolean {
+    const given = (n: string) => n.split(' ')[0]!.toLowerCase();
+    const g = given(name);
+    const close = (a: string, b: string): boolean => {
+      if (Math.abs(a.length - b.length) > 2) return false;
+      // tiny bounded edit-distance (≤2) — names are short
+      const dp = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+      for (let j = 0; j <= b.length; j++) dp[0]![j] = j;
+      for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
+        dp[i]![j] = Math.min(dp[i - 1]![j]! + 1, dp[i]![j - 1]! + 1, dp[i - 1]![j - 1]! + (a[i - 1] === b[j - 1] ? 0 : 1));
+      return dp[a.length]![b.length]! <= 2;
+    };
+    const epithet = (n: string) => n.split(' ').slice(1).join(' ').toLowerCase();
+    const e = epithet(name);
+    const hit = (other: string) => {
+      const xg = given(other);
+      // same given stem, near-identical given, or a REUSED distinctive epithet ("Redhand" ×2 NPCs)
+      return other === name || xg.slice(0, 4) === g.slice(0, 4) || close(xg, g)
+        || (!!e && epithet(other) === e);
+    };
+    // lore-only people count too — a coined saga warlord "Grakjaw" was re-rolled as a
+    // one-off rescue victim, one name wearing two opposite characters
+    return this.state.cards.some(x => x.character && hit(x.name))
+      || this.recentNpcNames.some(hit)
+      || Object.values(this.state.lore.nodes).some(nd => nd.active && nd.kind === 'character' && hit(nd.name));
+  }
+
+  /** fresh NPC-name material for one-off cards — the writer may not invent names, so the engine
+   *  must deal some (region-raced, similarity-checked like all character names) */
+  private rollNpcName(region: string): string {
+    const races = Object.entries(REGION[region]?.poolWeights ?? { human: 1 }) as [string, number][];
+    let name = rollName(this.rng, 'human');
+    for (let i = 0; i < 12; i++) {
+      const n = rollName(this.rng, this.rng.weighted(races), this.rng.pick(['male', 'female']));
+      if (!this.nameTooSimilar(n)) { name = n; break }
+    }
+    this.recentNpcNames.push(name);
+    if (this.recentNpcNames.length > 60) this.recentNpcNames.shift();   // 20 was too small: Elmwhisper reused 14 cycles apart
+    return name;
+  }
+
+  /** roster as the writers see it — names + a SEPARATE pronoun map ("Uneneth (she)" inline got
+   *  copied verbatim into prose; a map is metadata the model won't quote) */
+  private rosterForWriters(): { names: string[]; pronouns: Record<string, string> } {
+    const pronouns: Record<string, string> = {};
+    const names = this.roster().map(m => {
+      pronouns[m.name] = m.tags.find(t => t.concept === 'female') ? 'she' : m.tags.find(t => t.concept === 'male') ? 'he' : 'they';
+      return m.name;
+    });
+    return { names, pronouns };
+  }
+
+  /** LORE.md recall → selector → labeled slate: what the world remembers around a focal.
+   *  Shared by genesis AND every beat/finale (§4 tiering: dossiers for the picked few, blurbs for the rest). */
+  private async buildLoreSlate(focalId: string, purpose: string) {
+    const wildcardPool = Object.values(this.state.lore.nodes).filter(n => n.active && n.id !== focalId).map(n => n.id);
+    const wildcards = this.rng.shuffle([...wildcardPool]).slice(0, 3);
+    const candidates = recall(this.state.lore, focalId, this.state.cycle, wildcards);
+    const picked = candidates.length > 8
+      ? await this.ai.select({ purpose, candidates: candidates.map(c => ({ id: c.node.id, name: c.node.name, blurb: c.node.blurb, relationPhrase: c.relationPhrase })), max: 4 })
+      : candidates.map(c => c.node.id);
+    return candidates.map(c => {
+      const role = this.card(c.node.id)?.character?.role;
+      // a soldier/captive's company relation OVERRIDES a "thematic wildcard" phrase — the two contradicted
+      const relationPhrase = role === 'merc' ? "one of the company's own soldiers"
+        : role === 'captive' ? "held in the company's cells" : c.relationPhrase;
+      // a dossier that is just "name — tags" adds nothing over the blurb — send only fuller ones
+      const d = picked.includes(c.node.id) ? this.dossier(c.node.id) : '';
+      return {
+        id: c.node.id, name: c.node.name, blurb: c.node.blurb, relationPhrase,
+        companySoldier: role === 'merc' || undefined,
+        companyCaptive: role === 'captive' || undefined,
+        dossier: d.includes('\n') ? d : undefined,
+      };
+    });
+  }
+
+  /** the location line the writer sees — the landmark gate works by OMISSION (a shown token gets used) */
+  private locationLine(region: string, landmarkAllowed: boolean): string {
+    const r = REGION[region]!;
+    return `${r.name} — ${landmarkAllowed ? r.seed : (r.seedPlain ?? r.seed)}`;
+  }
+
+  /** a "fresh place" suggestion must never re-deal the region's own landmark (seed/ban-collision class) */
+  /** recent toponym stems — the combinatorial pool dealt Hawbrook/Hawhollow/Hawgate and three
+   *  Mill- villages in one run; same-stem places blur into one another for the reader */
+  private recentPlaceStems: string[] = [];
+
+  private freshPlaceName(region: string): string {
+    const banned = REGION[region]?.landmark;
+    const stem = (s: string) => s.slice(0, 4).toLowerCase();
+    let p = rollPlaceName(this.rng);
+    for (let i = 0; i < 12 && (p === banned || this.recentPlaceStems.includes(stem(p))); i++)
+      p = rollPlaceName(this.rng);
+    this.recentPlaceStems.push(stem(p));
+    while (this.recentPlaceStems.length > 10) this.recentPlaceStems.shift();
+    return p;
+  }
+
+  /** orient-once (STORY_GEN_STATE): a bible-cast name that has appeared in player-facing text is "met" —
+   *  the next beat's writer uses their bare name instead of re-orienting them */
+  private noteIntroduced(chain: Chain, text: string) {
+    const seen = (chain.story.introducedNames ??= []);
+    for (const c of chain.bible.cast) {
+      const given = c.name.split(' ')[0]!;
+      if (given.length > 2 && !seen.includes(c.name) && text.includes(given)) seen.push(c.name);
+    }
+  }
+
+  private advanceChain(q: Quest, r: { outcome: Outcome; party: Card[] }, storyUpdate: { currentSituation: string; newlyRevealed: string[]; openThreads: string[]; sagaSettled?: boolean } | undefined, report: string[], fate?: FinaleFate) {
     const st = this.state;
     const chain = st.chains.find(c => c.id === q.chainId);
     if (!chain) return;
     if (storyUpdate) {
       chain.story.currentSituation = storyUpdate.currentSituation;
-      chain.story.knownToPlayer.push(...storyUpdate.newlyRevealed);
+      // dedupe near-identical facts (the same fact stored 3× invited the AI to re-stage the event)
+      const stem = (s: string) => s.toLowerCase().replace(/[^a-z ]/g, '').split(' ').slice(0, 8).join(' ');
+      for (const f of storyUpdate.newlyRevealed) {
+        if (!chain.story.knownToPlayer.some(k => stem(k) === stem(f))) chain.story.knownToPlayer.push(f);
+      }
       chain.story.openThreads = storyUpdate.openThreads.slice(0, 5);
+      // AI judges the matter settled → engine gates: the NEXT step becomes the finale (no filler beats)
+      if (storyUpdate.sagaSettled && !q.isFinale) chain.settled = true;
     }
     chain.story.lastBeatOutcome =
       `beat ${q.beatIndex ?? chain.beatIndex} ended in ${r.outcome.toUpperCase()}: ${storyUpdate?.currentSituation ?? chain.story.currentSituation}`;

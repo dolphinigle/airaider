@@ -944,6 +944,9 @@ Effective power **E = ATTRIBUTE + MATCHING-TAG + ATTRIBUTE-TAG** (additive), in 
 - **RACE** — *indirect*: biases the appearOdds of body stat tags (wolfkin→muscular/nimble …), not a
   direct modifier.
 - **MATCHING-TAG** = favored **skills** (per-slot). **PERSONALITY / STANDING / GENDER = none.**
+  *(2026-07-06 ruling: the "= none" governs ATTRIBUTE feeds only — personality words ARE legal in a
+  slot's favored/clashing lists and pay the ±0.5U matching levers; standing/gender stay excluded.
+  Engine fences the families: skills + personality + tall/short/endowed/flat; never stat body tags.)*
 
 ### Per-test threshold
 - A quest = SLOTS. Each slot: **AI picks** the tested attribute + favored/clashing skills; **ENGINE

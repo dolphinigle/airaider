@@ -202,8 +202,8 @@ function Quests({ s, doAct }: any) {
       {s.quests.map((q: any) => (
         <div className="quest" key={q.id}>
           <h3>{q.title} <small>L{q.level} · <span style={{ color: RARITY_COLOR[q.rarity] }}>{q.rarity}</span> · {q.region} · lapses c{q.lapsesAtCycle}{q.isFinale ? ' · 🎬 FINALE' : q.chainId ? ` · beat ${q.beat}` : ''}</small></h3>
-          <p>{q.situation}</p>
-          <p><b>JOB:</b> {q.job} · <b>REWARD:</b> {q.rewardEnvelope}</p>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{q.situation}</p>
+          <p><b>REWARD:</b> {q.rewardEnvelope}</p>
           {q.approaches && (
             <div className="approaches">
               <b>APPROACH (each branch rolls its own test):</b>
@@ -238,7 +238,9 @@ function Quests({ s, doAct }: any) {
             </div>
           ))}
           <p className="odds">
-            ODDS: {q.odds.coins} coins vs bar {q.odds.bar.toFixed(1)}
+            {q.approaches && !q.chosenApproach ? <>ODDS: pick an approach first</>
+              : !q.ready ? <>⏸ will not march — every slot must be filled</>
+              : <>ODDS: {q.odds.coins} coins vs bar {q.odds.bar.toFixed(1)}</>}
             {q.odds.success !== null && <> → success <b>{Math.round(q.odds.success * 100)}%</b> · partial+ {Math.round(q.odds.partial * 100)}%{q.odds.precision === 1 ? ' (coarse)' : ''}</>}
             {q.odds.success === null && ' (build an Oracle for %)'}
             <button className="danger" onClick={() => doAct('abandon', q.id)}>abandon</button>
@@ -267,7 +269,9 @@ function Roster({ s, doAct }: any) {
                 <button key={a} onClick={() => doAct('focus', m.id, 'single', a)}>{a}</button>)}
               <button onClick={() => doAct('focus', m.id, 'none')}>none</button>
             </p>
-            {m.character.injury > 0 && <button onClick={() => doAct('heal', m.id)}>pay-heal (Hospital)</button>}
+            {m.character.injury > 0 && (s.can?.heal
+              ? <button onClick={() => doAct('heal', m.id)}>pay-heal</button>
+              : <span className="dim">heals over time — a Hospital would speed it</span>)}
           </details>
         </div>
       ))}
@@ -286,7 +290,7 @@ function Captives({ s, doAct }: any) {
           <div className="row">
             <button onClick={() => doAct('ransom', c.id)}>ransom</button>
             <button onClick={() => doAct('sell', c.id)}>sell</button>
-            {!c.interrogated && <button onClick={() => doAct('interrogate', c.id)}>interrogate (→ lead)</button>}
+            {!c.interrogated && s.can?.interrogate && <button onClick={() => doAct('interrogate', c.id)}>interrogate (→ lead)</button>}
           </div>
         </div>
       ))}
@@ -428,8 +432,8 @@ function AiLog({ s }: any) {
               <td>{r.costUsd.toFixed(4)}</td><td>{r.ok ? '✓' : `✗ ${r.error ?? ''}`}</td>
             </tr>
             <tr><td colSpan={9}>
-              <details><summary>prompt</summary>
-                <pre>SYSTEM (start): {r.systemPreview}\n\nUSER: {r.userPrompt}</pre>
+              <details><summary>prompt + output</summary>
+                <pre>SYSTEM (start): {r.systemPreview}{'\n\n'}USER: {r.userPrompt}{'\n\n'}OUTPUT: {r.output ?? '(not recorded)'}</pre>
               </details>
             </td></tr>
           </React.Fragment>

@@ -12,6 +12,8 @@ export interface Region {
   ghTier: number;
   prev: string | null;          // spine gating (build prev's lodge first)
   seed: string;                 // 1–2 anchor lore facts
+  seedPlain?: string;           // the seed WITHOUT its landmark — sent when the card may not name it
+  landmark?: string;            // the seed's named landmark — engine seeds must not re-deal it
 }
 
 export const REGIONS: Region[] = [
@@ -19,7 +21,10 @@ export const REGIONS: Region[] = [
     id: 'forests', name: 'Western Forests', faction: 'elf', levelBand: [1, 8],
     poolWeights: { elf: 4, human: 2, wolfman: 0.5, lizardman: 0.2 },
     ghTier: 1, prev: null,
-    seed: 'Old-growth elven forests west of the fort; the moss-shrined ruin of Thornhollow lies at their heart.',
+    // no ready-made epithet before the landmark's name — a shown phrase gets copied verbatim
+    seed: 'Old-growth elven forests west of the fort; the ruin of Thornhollow lies at their heart.',
+    seedPlain: 'Old-growth elven forests west of the fort.',
+    landmark: 'Thornhollow',
   },
   {
     id: 'city', name: 'The City', faction: 'human', levelBand: [6, 16],

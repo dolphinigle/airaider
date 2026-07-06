@@ -223,7 +223,15 @@ export function parseAiTag(s: string): { concept: string; rank: Rank | null } | 
   const m = s.trim().toLowerCase().match(/^(?:\w+:\s*)?([a-z-]+(?:\s[a-z-]+)*)\s*(?:\((low|mid|high|legendary)\))?$/);
   if (!m) return null;
   const word = m[1]!.replace(/\s+/g, '-');
-  const id = CONCEPT[word] ? word : CONCEPT[`r-${word}`] ? `r-${word}` : null;
+  let id = CONCEPT[word] ? word : CONCEPT[`r-${word}`] ? `r-${word}` : null;
+  if (!id) {
+    // stem fallback: ~10% of AI favored words are morphological variants of canon
+    // ("healing"→heal, "intimidating"→intimidation) — resolve instead of silently thinning
+    id = Object.keys(CONCEPT).find(c => {
+      const base = c.replace(/^r-/, '');
+      return base.length >= 4 && (word.startsWith(base) || base.startsWith(word)) && Math.abs(base.length - word.length) <= 5;
+    }) ?? null;
+  }
   if (!id) return null;
   return { concept: id, rank: (m[2] as Rank) ?? null };
 }

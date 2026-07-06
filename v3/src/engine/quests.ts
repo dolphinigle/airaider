@@ -8,7 +8,7 @@ import {
 } from './economy.js';
 import { rollName, rollRelicName } from './names.js';
 import { mintStackable, HELD, type Card } from './cards.js';
-import { tierOf, CONCEPT } from './tags.js';
+import { tierOf, CONCEPT, T } from './tags.js';
 import type { Attribute } from './tags.js';
 import { type SlotTest, type DifficultyName, type Outcome } from './roll.js';
 
@@ -29,6 +29,7 @@ export interface Lead {
   focalId?: string;                // sequel leads (§21-4a): the SLIPPED focal — the road back is to THEM
   liabilityId?: string;            // collector leads: beating the quest settles THIS liability
   personalMercId?: string;         // personal-chain leads: the merc whose main chain this starts
+  echoNote?: string;               // echo rescues: the peril exactly as the story left this person
 }
 
 export const LEAD_TTL = 6; // cycles before an unpursued lead lapses 🛠
@@ -172,7 +173,7 @@ export function oneOffValue(rng: Rng, level: number, rarity: Rarity, n: number):
 
 /** materialize a reward spec into actual cards (engine — names engine-rolled, §4b) */
 export function materializeReward(rng: Rng, spec: RewardSpec, contentLevel: number, region: string,
-  genExtras?: { excludeConcepts?: string[]; maxSkills?: number }): Card[] {
+  genExtras?: { excludeConcepts?: string[]; maxSkills?: number; gender?: string; presetName?: string; race?: string }): Card[] {
   switch (spec.kind) {
     case 'gold': {
       const g = mintStackable('gold', Math.max(1, Math.round(spec.value)));
@@ -182,17 +183,22 @@ export function materializeReward(rng: Rng, spec: RewardSpec, contentLevel: numb
       const races = Object.entries(REGION[region]!.poolWeights) as [string, number][];   // pool bias (region), not a hand list
       const card = generateCard(rng, {
         domain: 'character', targetV: spec.value, contentLevel,
-        required: spec.required, race: rng.weighted(races),
+        required: spec.required, race: genExtras?.race ?? rng.weighted(races),
+        gender: genExtras?.gender,
         role: spec.kind === 'captive' ? 'captive' : 'npc',
         level: Math.max(1, contentLevel - (spec.kind === 'recruit' ? 1 : 0)),
-        ...genExtras,
+        jackpotChance: 0.08,   // 🛠 ECONOMY §4 jackpot-with-catch lottery
+        excludeConcepts: genExtras?.excludeConcepts, maxSkills: genExtras?.maxSkills,
       });
       const race = card.tags.find(t => CONCEPT[t.concept]?.group === 'race')?.concept ?? 'human';
-      card.name = rollName(rng, race);
+      // gender is rolled BEFORE the name so the name can never contradict the tag
+      let gender = card.tags.find(t => CONCEPT[t.concept]?.group === 'gender')?.concept;
+      if (!gender) { gender = genExtras?.gender ?? rng.pick(['male', 'female']); card.tags.push(T(gender)) }
+      card.name = genExtras?.presetName ?? rollName(rng, race, gender);
       return [card];
     }
     case 'relic': {
-      const card = generateCard(rng, { domain: 'relic', targetV: spec.value, contentLevel, required: spec.required });
+      const card = generateCard(rng, { domain: 'relic', targetV: spec.value, contentLevel, required: spec.required, jackpotChance: 0.08 });   // 🛠 §4 jackpot-with-catch
       const form = card.tags.find(t => CONCEPT[t.concept]?.group === 'form');
       card.name = rollRelicName(rng, form?.concept ?? 'curio');
       return [card];
