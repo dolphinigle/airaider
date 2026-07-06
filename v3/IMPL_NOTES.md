@@ -755,3 +755,13 @@ reframe renamed the HOLD (Hawgate→Black Weir) → reframe keeps same places/pe
 bringer+telling | prompt |. Remaining 🟡: resolution time-stamp openers (~16/30) + object-on-table
 closer ×5 (narrator habit); premise monotony (fetch-object 14/24) + single-region = the 🔴 world-
 variety queue. R28 verify pending.
+
+## Readability push 7.5→target 8-9 (2026-07-06 late) #241-243
+
+| # | Change | Class |
+|---|---|---|
+| 241 | Designer: one-offs "still too literatey" → PLAIN ENGLISH rule: common everyday words ("the world is medieval; the language is not"), mostly one-clause sentences, NO semicolons (split instead), common cards hard-capped 3-5 short sentences. Live samples read 8.5-9 ("A wounded forester stumbled in at dusk. He points to an elm hollow near Millmere… expect close work and startled dogs.") | prompt |
+| 242 | R29 caught the stale register line ("low-medieval register" now read as the OPPOSITE of the new rule) → shared NUMBER_BAN reworded: plain low register — no archaic diction, no modern idiom; gravity=TONE vs rarity=SIZE made explicit (common+serious = short AND straight); "weight"/"carry weight" scrubbed from instruction text (banned-word echo risk) | prompt |
+| 243 | job-field audit (designer asked if wasted tokens): NOT wasted — resolver anchor ("the job as written" overreach guard, game.ts:1187) + avoid-list dedup string; ~20 tokens/card for a correctness anchor; player never sees it | measured |
+
+R30 verify: CLEAN (all three R29 defects confirmed resolved). Gates green.
