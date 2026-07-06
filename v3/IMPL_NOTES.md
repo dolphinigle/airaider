@@ -765,3 +765,41 @@ variety queue. R28 verify pending.
 | 243 | job-field audit (designer asked if wasted tokens): NOT wasted — resolver anchor ("the job as written" overreach guard, game.ts:1187) + avoid-list dedup string; ~20 tokens/card for a correctness anchor; player never sees it | measured |
 
 R30 verify: CLEAN (all three R29 defects confirmed resolved). Gates green.
+
+## Extended writing playtest (2026-07-07, designer: "same goal, other quest types, several hours") #244-252
+
+Register extended to ALL read surfaces: resolve gained the GAME WRITING field-report block (AFTER =
+did/cost/hold/know, ONE action per sentence <~20 words; BEFORE = stakes/challenge only; decoration
+cut) — R31 caught my global scoping colliding with the brink spec, R32 CLEAN after scoping. flesh
+who-line: a plain FACT, never a metaphor (R31 CLEAN). Campaign-B writing judge (757677) scored
+surfaces 6-8: finales 8, meta-surfaces 8, quirks 9 ("the best writing in the log"), after-texts 6
+(clause-stuffing). Fixes #244-252:
+| 244 | **semicolon ban ignored ~23×/run** → MECHANICAL: zProse desemi splits "; " into two
+sentences (prose semicolons splice independent clauses — safe) | engine (structural) |
+| 245 | "a messenger arrives" opener ~90% → shape inverted: THE MATTER FIRST (what is wrong and
+where); how word arrived = one clause at most, many cards skip it; never open on a messenger |
+prompt (structural) |
+| 246 | obscure nouns (cuir, rood, interdict, procuress) → "if a farmhand would not say the word,
+use the plain one" | prompt |
+| 247 | after-text run-ons (25-43 words) → one action per sentence, <~20 words | prompt |
+| 248 | **resolver framed a ROSTER MERC as the culprit** (c13: "pointed the reeve to Thatcher as
+the hand that staged the fall" — the company incriminated its own investigator) → party members
+are never the culprit/suspect/wrongdoer of their own job | prompt (correctness) |
+| 249 | echo re-offer copied prior card text near-verbatim → lastSeen retold in NEW words | prompt |
+| 250 | WHO metaphor-riddles ("beauty reads like a mask over old hunger") → plain FACT rule | prompt |
+| 251 | before-text purple clauses ("the house breathed") — covered by decoration-cut; watch 🟡 |
+| 252 | Sarny's calf/thigh wound ×5, Thornhollow ×8 again — known 🟡 classes | watch |
+
+Judge A (727374) converged with B: content clears the bar, FORM is templated. New classes fixed
+#253-257: | 253 | before-text opener template ("[Name] left the fort alone with [object] folded in
+[garment]" ~75%) → begin where the CHALLENGE is (place/obstacle/person waiting); never the
+departure | prompt | | 254 | wound-sentence stamp ("took a cut to her [part] from a [thing]" ×13)
+→ vary the how and the words, not just the body part | prompt | | 255 | novelistic backstories
+("traded secrets for song… a place she will not name") → plain concrete events; never withheld
+mysteries | prompt | | 256 | fort-receiver drift (quartermaster/sergeant/captain/clerk/foreman
+invented across resolutions) + handed-away-yet-retained wobble → goods return to the COMPANY's
+keeping; no invented fort officials; past tense start to finish | prompt | | 257 | "Pay is X;
+expect Y" semicolon weld (~25/30 cards) — resolved mechanically by #244 desemi (becomes two clean
+sentences, the proven c6 register) | covered |. R34: 2/2 CLEAN (no collisions: challenge-first vs
+brink structure OK; no-fort-officials scopes to the company fort, client-side officials untouched).
+Campaign C (iteration-2 fixes) running; D follows with iteration-3.
