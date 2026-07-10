@@ -1043,8 +1043,12 @@ export class Game {
     {
       const legal = new Set<string>([focal.name, ...slate.map(x => x.name), ...assignedNames]);
       let next = 0;
+      const ROLES = ['client', 'companion', 'quarry', 'obstacle', 'ally', 'prize'];
       for (const member of g.cast) {
         member.name = member.name.replace(/\s*\([^)]*\)\s*$/, '');   // strip echoed "(a man's name)" notes
+        // role fence: genesis once leaked its input KIND ("captive") into cast.role, and the
+        // beat writer branches the care beat on role — clamp out-of-enum values
+        if (!ROLES.includes(member.role)) member.role = member.name === focal.name ? 'quarry' : 'ally';
         if (member.loreId && this.state.lore.nodes[member.loreId]) {
           member.name = this.state.lore.nodes[member.loreId]!.name;   // canon wins
         } else if (!legal.has(member.name)) {
@@ -1113,7 +1117,7 @@ export class Game {
       // the landmark gate is for one-off variety — a saga anchored at the landmark must name it
       kind: isFinale ? 'finale' : 'beat',
       // beats see the landmark ONLY when this saga's bible actually uses it (else it re-tempts drift)
-      location: this.locationLine(chain.region, !!REGION[chain.region]?.landmark && JSON.stringify(chain.bible).includes(REGION[chain.region]!.landmark!)),
+      location: this.locationLine(chain.region, !!REGION[chain.region]?.landmark && JSON.stringify(chain.bible).includes(REGION[chain.region]!.landmark!), false),
       level: chain.level, rarity: chain.rarity, slotCount: n,
       rewardEnvelope: isFinale ? `the focal: ${chain.kind}` : 'side loot',
       // beats get NO opening spark (🛠 2026-07-10): a random spark fought the saga — the card
@@ -1738,10 +1742,11 @@ export class Game {
   /** known-cast sagas served so far (§21-3 cadence: ~2 per GH tier, pool-gated) */
   private knownCastSagas = 0;
 
-  private locationLine(region: string, landmarkAllowed: boolean): string {
+  private locationLine(region: string, landmarkAllowed: boolean, anchorOk = true): string {
     const r = REGION[region]!;
-    // a rotating named anchor gives the region proper nouns besides its one landmark
-    const anchor = r.anchors && this.rng.chance(0.5) ? ` Known ground: ${this.rng.pick(r.anchors)}.` : '';
+    // a rotating named anchor gives the region proper nouns besides its one landmark —
+    // NOT dealt to saga beats (their geography comes from the bible; a random anchor fought it)
+    const anchor = anchorOk && r.anchors && this.rng.chance(0.5) ? ` Known ground: ${this.rng.pick(r.anchors)}.` : '';
     return `${r.name} — ${landmarkAllowed ? r.seed : (r.seedPlain ?? r.seed)}${anchor}`;
   }
 

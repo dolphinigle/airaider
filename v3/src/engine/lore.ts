@@ -137,9 +137,10 @@ export function renderDossier(g: LoreGraph, id: string, cycle: number,
     .slice(0, DOSSIER_TOP_K)
     .map(e => {
       const other = g.nodes[e.from === id ? e.to : e.from]?.name ?? '?';
-      // readable both ways: "they: betrayed-by Helelas" / "Helelas: betrayed-by them"
-      const dir = e.from === id ? `they: ${e.type} ${other}` : `${other}: ${e.type} them`;
-      return `- ${dir} — ${e.blurb}${e.core ? ' (defining memory)' : ''}`;
+      // direction-NEUTRAL label: AI-emitted edges sometimes invert from/to, and a directional
+      // label then contradicts its own gloss ("they: saved-by Oridir — Rhieth hauled Oridir out");
+      // the blurb carries the truth, so the label only names the tie and the other party
+      return `- ${other} (${e.type}) — ${e.blurb}${e.core ? ' (defining memory)' : ''}`;
     });
   const lines = [`${node.name} — ${node.identity}`];
   if (extras?.who) lines.push(`known as: ${extras.who}`);

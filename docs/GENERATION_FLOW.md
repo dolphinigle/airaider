@@ -1742,6 +1742,10 @@ T6≈118 · T7≈230 · T8≈310 · T9≈350 · T10≈510 · T11≈650 · T12≈
 c0 Bedroom(own) · c2 Map room · c14 Lead room · c25 Mess hall · c35 Storage · c45 Scouting lodge
 (Forests) · c55 Recruiting post (Forests) · c55-65 Infirmary · c65 Dining hall · c80 Kitchen ·
 c90-105 Bedrooms #2-3 · c110 Garden · **GH→T2 ~c120-145** · c130-170 Tavern · Dungeon · Holding cell ·
+> 🛠 2026-07-10 (impl calibration, FORT §5 table space): **Tavern moved to GH T1** and **starter
+> roster 2→3** — on real 30-cycle campaigns the T2 gate made hiring unreachable (12/12 sim seeds:
+> roster flat at 2, dead-cycle stalls; measured: the gate, not gold, was 99% of the blockage).
+> This table's c130-170 placement assumed the 2,000-cycle pacing model. Designer review pending.
 c175 Bedroom #4 · c185 Trophy room · c200 Gallery · **GH→T3 ~c280** · c280-300 Library · Market ·
 Ransom office · c300 Smithy · c310 Bedroom #5 · c360 Shrine · **GH→T4 ~c400** · c410 Chronicle · …
 (each ~130-190c tier thereafter; T15 ≈ c2,100).

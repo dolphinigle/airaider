@@ -29,6 +29,11 @@
 
 `splitValue(V, archetype, isChain)`: **chain → the focal character = a rolled unit SHARE (~55–85%) × E[payoff], remainder gold** (structure per GENERATION_FLOW §1–§2; accrued as a bank, §5a); **one-off → archetype sets a primary kind + a randomized unit:gold ratio range** (capture → captive 70–90% + gold · rescue → recruit · raid → gold · contract → gold · scout → a lead), value-scaled counts, small lottery of a bonus lead / jackpot-with-catch. Gold portions are the player's income; unit portions go to `generateCard`.
 
+> 🛠 2026-07-10: hunt/investigate softened from always-relic to 65% relic / else gold or gold+lead —
+> with escort/raid relic chances on top, ~half of ALL one-offs read as fetch-the-object (readers'
+> premise-monotony consensus). Mid-saga beat side-loot may also roll a relic (35%), per QUESTS §6's
+> "gold/stackables/relics". Designer review pending.
+
 ---
 
 ## 4. `generateCard(targetV, ceiling, required[])` 🔒 🛠
@@ -61,7 +66,7 @@ Three outcomes, no critical (upside lives in the generation lottery). Reward fix
 
 ## 5a. Chains accrue value — the bank 🔒 *(REWARD_BANK.md)*
 
-Each beat banks `party × V_base(level) × rarity × outcomeScale` (success 1 · partial 0.5 · failure 0); the **finale crystallizes** the bank into the focal character + surplus gold. The per-beat side-loot budget is **deducted from the beat's banked earn** (not paid on top — preserves income-neutrality vs one-offs). Shortfall → keep-with-debt or the focal slips away for salvage gold; finale failure → **the bank is forfeit (the time sting) and the focal slips away FOR NOW** — alive in the lore graph, a rarity-priced sequel lead the road back (§21-4a; permanent loss out of prototype). A per-chain **failure budget** forces a last-chance finale rather than endless retries. Income-neutral vs one-offs; adds variance + a lump payoff.
+Each beat banks `party × V_base(level) × rarity × outcomeScale` (success 1 · partial 0.5 · failure 0); the **finale crystallizes** the bank into the focal character + surplus gold. The per-beat side-loot budget is **deducted from the beat's banked earn** (not paid on top — preserves income-neutrality vs one-offs; 🛠 2026-07-10: the deduction scales with what was DELIVERED — a partial pays half the loot, so it docks half). Shortfall → keep-with-debt or the focal slips away for salvage gold; finale failure → **the bank is forfeit (the time sting) and the focal slips away FOR NOW** — alive in the lore graph, a rarity-priced sequel lead the road back (§21-4a; permanent loss out of prototype). A per-chain **failure budget** forces a last-chance finale rather than endless retries. Income-neutral vs one-offs; adds variance + a lump payoff.
 
 ---
 

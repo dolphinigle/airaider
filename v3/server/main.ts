@@ -164,7 +164,11 @@ function stateView() {
     lore: Object.values(st.lore.nodes).map(n => ({
       id: n.id, name: n.name, kind: n.kind, blurb: n.blurb, active: n.active,
       dossier: game.dossier(n.id),
-      chronicle: game.chronicle(n.id).map(e => ({ type: e.type, blurb: e.blurb, active: e.active, core: e.core })),
+      // FORT §5 / LORE §5: the FULL history (inactive edges included) is the Chronicle room's
+      // exposure; without it the Library shows living memory only
+      chronicle: game.menuGates().find(m => m.key === 'chronicle')?.open
+        ? game.chronicle(n.id).map(e => ({ type: e.type, blurb: e.blurb, active: e.active, core: e.core }))
+        : game.chronicle(n.id).filter(e => e.active).map(e => ({ type: e.type, blurb: e.blurb, active: e.active, core: e.core })),
     })),
     log: st.log.slice(-40),
     ai: game.ai.usage(),

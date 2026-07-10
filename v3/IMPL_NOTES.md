@@ -844,3 +844,85 @@ on all surfaces per the final judge. What remains is design-scope 🔴: single-r
 messenger-device as the core intake loop (92% of cards — partly inherent to boss-at-fort POV),
 roster-starvation failure spirals, "0 heads of 0 coins" display. Watch 🟡: residual ~1.5 and-chain,
 fixture pronoun/name-gender mismatches (Caelinne tagged male), q124-class grammar slips ~1/run.**
+
+## FIX-EVERYTHING WEEKEND (2026-07-10, designer directive: "FIX EVERYTHING — fun, smooth, coherent, story GOOD and MAKES SENSE")
+
+Designer authorized acting on the whole 🔴 queue with own judgment, each change marked 🛠 for review.
+Method: docs re-audit (2 agents) + R39/R40 context-free verifier rounds + 3 baseline campaigns
+(313233/343536/373839, judges scored fun 3-4.5/10) → engine+prompt batch → confirm campaigns.
+
+**Docs-conformance misses BUILT (were silent — the pattern-B class again):**
+| # | Finding → fix | Class |
+| 268 | REWARD_BANK §3 void-to-gold ABSENT: a bank < KEEP(0.4)·mark delivered the focal + crushing debt ("6g debt with a recruit who then left") → thin finales now salvage round(bank) gold, focal to lore + sequel road back; regression test added | engine |
+| 269 | finale cash-out paid max(mark, bank) (equal-total invariant broken; cash strictly dominated thin banks) → gold fate pays round(bank) | engine |
+| 270 | recruit finale staged focal at tavern at 1.2×mark hire (mark paid TWICE; "Casden drank up and left" with no tavern built) → joins CLEAN when roster room, else stages PREPAID (hire cost 0) | engine |
+| 271 | lapsed continuation lead left chain 'active' forever, focal stranded invisible in limbo → chain slips, focal → lore + sequel lead, report line | engine |
+| 272 | holding expiry = zero-payoff evaporation → quick-price handoff (SELL_RATE gold; active ransom still pays better) + lore memory edge | engine |
+| 273 | §21-3 known-cast cadence + LORE §1 lazy promotion BUILT: ≤2/GH-tier, pool≥3-gated, 35% — a coined lore-only person becomes the new saga's focal; engine rolls their Card (race/sex sniffed from blurb), node+edges REMAPPED onto it so memories follow | engine |
+| 274 | STORY_ENGINE §5 trigger 2 BUILT: captive joining spawns a personal-chain lead 30% (🛠 rate) | engine |
+| 275 | #218 minRank band floor BUILT end-to-end (type, slot build w/ fillability soften, assign check, CLI+web display) + §8 ~7%/step spillover above quarry band windows | engine |
+| 276 | Chronicle room was a dead building → menu gate wired | engine |
+
+**Roster dead-lock (worktree agent, 12 seeds × 40 cycles, mock):** blockage measured 99% = GH T2
+prestige gate, NOT gold. 🛠 Tavern T2→T1 + 🛠 starter roster 3 (options A+B: Tavern ~c12, first hire
+~c18, roster 4@c20 → 6.5 end, dead cycles 2.5→0, all-wounded stalls 0, fail streaks ≤3). Snowball
+watch 🟡: c40 gold 5-7× baseline — damp via day-0 gold or hire lean if GUI play confirms a glut.
+Heal rate left at doc 0.5/cycle (not needed once roster ≥3). | 277 | mock injury causes now NAME
+the merc — all multi-party wounds were silently dropped in every sim (the §20 baselines were blind
+to the wound channel) | sim |
+
+**Monotony (3 campaign judges unanimous: variety, not prose, is the drag):**
+| 278 | intake CHANNEL: engine rolls how word reached the fort and deals it as a FACT (quarryTags
+pattern; lead.source was known and discarded) — bringer/sign/patrol/talk/notice weighted 4.5/2.5/
+1.2/1.2/0.6 + source-mapped facts for interrogation/hunt/reward/collector; beats get NO spark
+(a random spark fought the saga) | engine+prompt |
+| 279 | envelope kind words writer-UNSAFE: 'lead' read as METAL (12 lead-bar fetches in one run;
+"a parcel of lead" pay in another) → kinds translated ("a fresh trail to further work (knowledge,
+never an object)") | engine |
+| 280 | genesis kernel-novelty GUARD (mechanical): content-word overlap ≥3 vs avoid list → ONE
+retry with the collision named (two reliquary-in-a-cellar sagas shipped in one campaign) | engine |
+| 281 | archetype bag rotation (recent 3 skipped); hunt/investigate envelope decorrelated (65%
+relic / else gold or gold+lead 🛠, ECONOMY §3 annotated); beat side-loot may carry a relic (35%,
+QUESTS §6 "gold/stackables/relics" was gold-only); partial side-loot docks half (was full) | engine |
+| 282 | world texture: forests poolWeights elf 4→2.5 🛠 (§13 knob explicitly open; elves were 60%
+of every roll), rotating named ANCHORS in the location line, landmark cooldown 6 cycles after a
+deal, place-name pool 14×10→28×24 (Fal-family stamping), SEEDS 12→30, spark recency reroll
+("a poacher turned informer" ×3/run), TONES ∪ BIBLE.md list (adventurous/tense added 🛠) | engine |
+| 283 | names: elf suffix pools gendered (male "Caelinne"/"Ilmvia" class), given-name TAIL check
+(Pellmund/Nedmund read as kin), genesis assignedNames rolled WITH sex and dealt annotated ("(a
+woman's name)") — order freed | engine |
+| 284 | delivered-person FATE dealt to the resolver (no tavern → "they will thank the company and
+MOVE ON") — prose said "may be persuaded to stay" while the engine line said "moves on" | engine |
+| 285 | finale approaches roll per-branch difficulty (gold leans standard; one cloned roll made an
+easy cash-out impossible per QUESTS §9 sketch) | engine |
+
+**Prompt batch (R39: 5 zero-context judges + cross-template, ~50 defects; then R40):**
+| 286 | correctness fences: saga-block PRECEDENCE line; custody fence (companyCaptive only — the
+"Harjaw held in your cells after slipping away" class, genesis + beat); finale ground/frame
+stability (stands on SEEN ground; never reframes the focal against the saga's telling — "bring
+Rhivia to account" class); approach CONTRACT hardened (first sentence executes the chosen plan,
+unchosen-approach actions/props/verbs forbidden, failure fails THE CHOSEN plan); mid-saga
+goal-stays-open even on overreaching success (beat-1 overreach erased a finale); lastSeen facts
+settled (captor/place/cause drift); company stores hold only what the message lists (phantom
+tapestry); rewardItems never simultaneously the client's sought thing unexplained | prompt |
+| 287 | clarity: culprit-by-role answers legal; anonymous-client delivery default (waits at the
+fort); gold-only deliveredSummary = nothing to weave; injury bands calibrated (days/weeks/months);
+after-budget priority (result > promise > beats); intake/opening/quarryTags glosses render-
+conditional; keyword no-quote scoped to phrases; common-card size decoupled from gravity wording;
+requiredTag rank affordance documented | prompt |
+| 288 | §8 sweep: drover/reeve + night-watch + Galdai + want-list + wound-site list + token-of-
+theirs de-exampled; "Expect …" closer named as stamp (20-26/run); "the company's keeping" echo
+banned (MY OWN phrase ×9-12/run — §8 strikes its author AGAIN); before-openers vary beyond
+terrain-tableau ("crouched" ×7); departures rule un-contradicted; counting-house idiom ban
+("filing a complaint") | prompt |
+| 289 | cross-template: dossier contract UNIFIED (flesh rules → resolve.fleshed + genesis cast.who);
+flesh gains semicolon + account-book bans + both-sex pronoun map + homely-counts carve-out; echo-
+instructions ban → resolve + genesis; genesis newPlaces blurb spec (one sentence <15 words) +
+place-stem rule (Thornbar-beside-Thornhollow class) + no-client goal scope + tensions 2-4 + edge
+importance anchor; TAGS_NOTE trait-scope (race/sex words fine) + 'nature' gloss; EDGE direction
+for 'defeated' + people-only note | prompt |
+
+Also: "0 heads of 0 coins" → plain zero-dice line; campaignread harness prints BUILD/UPGRADE spends
+(judges called the gold drain invisible), abandons 0-coin marches (guard bug marched 3 guaranteed
+losses/run), CAST render em-dash. Baseline logs + judge verdicts: scratchpad campaign-3132/3435/
+3738; fixed-build confirm campaigns 616263/646566/676869 running at commit time.
