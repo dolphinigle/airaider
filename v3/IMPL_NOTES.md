@@ -1016,3 +1016,24 @@ de-quotabled; sceneFacet engine seed for before-text openings ('crouched' terrai
 the §2 fix the audit prescribed); 'Pay is coin.' mechanical rotation; flesh avoidQuirks (one tic
 landed on 4 people); finale memory edge records the approach ARRANGEMENT (informer deals were
 invisible to dossiers); stall set-aside prints one line, not two | engine+prompt+seed |
+| 322-323 | loop-8: chainContext.arcStep dealt to the RESOLVER + hard fence (resolutions
+overreached even when cards were scoped: 6/8 → 1(+1 borderline)/13 beats after); atTheFort slate
+flag; sceneFacet never-echo; saga cards drop the fake archetype label | engine+prompt |
+| 324 | CLOSING patches per the final judge (campaign 7 = 8/10, verdict "stop the loop"):
+outOfReach slate flag — the MIRROR of atTheFort ("Ulfgash sits in your cells" 19 cycles after
+slipping away; a lore-held person is free in the world unless won back on screen); forecast
+stamp-breaker REWRITTEN — word-substitution into arbitrary clauses was itself the grammar-breakage
+source ("Count on others may be…"): the only safe mechanical move is dropping every other
+forecast SENTENCE whole (hash-alternating), 'crouched' rotated | engine |
+
+**CONVERGENCE LOOP CLOSED (2026-07-11). Judged-campaign fun trajectory: 3-4.5 (baseline) →
+5.5-6 → 6.5 → 7 → 7 → 7.5 → 8/10. Final judge: finales 8.5 ("the strongest surface — all six
+honored the approach, two produced non-obvious, earned outcomes"), resolution overreach cleared,
+failed-beat-shapes-finale working as designed. Remaining watch 🟡: wound-stamp/prose desync ~1/run,
+dossier cross-contamination (events the person wasn't in), same-cycle shared-NPC card collisions,
+off-screen player-history invention (a "siege of the fort" retro-written as backstory), venue
+fatigue within the one region, late formatting artifacts. Remaining 🔴 designer-scope: ONE-REGION
+world (city at GH T4 still out of reach — THE structural ceiling), dice difficulty + payout spread
+(89% success, +9g vs +351g commons, saga beats pay less than commons), roster-cap-5 tavern
+treadmill (8/10 guests time out unhired), finale debt/Surplus-0 legibility, gold sink exhaustion
+after ~c22 (#219 gold-share item).**

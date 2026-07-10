@@ -1839,13 +1839,18 @@ export class Game {
       // faction leader — a tavern guest was once written leading a hamlet while she waited
       const atTheFort = !!card && card.location.kind === 'held' &&
         ['roster', 'staged', 'inventory'].includes((card.location as { state?: string }).state ?? '');
+      // the MIRROR fence: someone who passed out of play ("Ulfgash slipped past…") was re-cast
+      // "in your cells" 19 cycles later — flag them gone
+      const outOfReach = !!card && card.location.kind === 'held' &&
+        (card.location as { state?: string }).state === 'lore';
       // a dossier that is just "name — tags" adds nothing over the blurb — send only fuller ones
       const d = picked.includes(c.node.id) ? this.dossier(c.node.id) : '';
       return {
         id: c.node.id, name: c.node.name, blurb: c.node.blurb, relationPhrase,
         companySoldier: role === 'merc' || undefined,
-        companyCaptive: role === 'captive' || undefined,
+        companyCaptive: role === 'captive' && !outOfReach || undefined,
         atTheFort: atTheFort || undefined,
+        outOfReach: outOfReach || undefined,
         dossier: d.includes('\n') ? d : undefined,
       };
     });

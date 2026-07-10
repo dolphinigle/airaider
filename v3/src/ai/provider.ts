@@ -42,7 +42,7 @@ export interface QuestWriteInput {
   storyState?: unknown;          // chain story-so-far
   // two-part lore prompting (LORE.md): the selector already picked who gets full dossiers;
   // the writer receives the world's relevant memory around this saga
-  relevantLore?: { id: string; name: string; blurb: string; relationPhrase: string; companySoldier?: boolean; companyCaptive?: boolean; atTheFort?: boolean; dossier?: string }[];
+  relevantLore?: { id: string; name: string; blurb: string; relationPhrase: string; companySoldier?: boolean; companyCaptive?: boolean; atTheFort?: boolean; outOfReach?: boolean; dossier?: string }[];
   focalDossier?: string;         // what the world currently remembers of the focal (evolves each cycle)
   beatIndex?: number; expectedBeats?: number;
   arcStep?: string;              // the ONE arc step this card covers, dealt verbatim (models
@@ -76,7 +76,7 @@ export interface GenesisInput {
   kind: string;                  // likely fate (recruit/captive/gold-hoard)
   twist: boolean;                // engine-rolled 30%
   expectedBeats: number;         // the arc must have exactly this many steps (chain shape is engine-rolled)
-  slate: { id: string; name: string; blurb: string; relationPhrase: string; companySoldier?: boolean; companyCaptive?: boolean; atTheFort?: boolean; dossier?: string }[];
+  slate: { id: string; name: string; blurb: string; relationPhrase: string; companySoldier?: boolean; companyCaptive?: boolean; atTheFort?: boolean; outOfReach?: boolean; dossier?: string }[];
   assignedNames: string[];       // pre-rolled names for any NEW cast the AI coins (§4b)
 }
 
