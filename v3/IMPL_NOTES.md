@@ -973,3 +973,12 @@ Watch 🟡: sweep-speak variants may still stamp (measure next run); success 39-
 min-maxes); wound site "forearm" ×13 + all-low bands; lead-hunt template sameness (recruiting/
 scouting faucet cards); relic name collisions (Weathered Bow ×2); one-region world remains THE
 structural 🔴 (city at GH T4 still out of a 30-cycle campaign's reach).
+| 313 | R43/R44 finish line: non-bringer/sign channels deal NO spark (their pools were arrival-of-
+word images — the intake fact again, fighting the matter-first shape; the q14 card opened on "The
+last patrol brought…" from exactly this); lore blurbs clamp sentence-safe everywhere (clampBlurb —
+"speaks with a charter's" reached finale renders as a dangling fragment); genesis name-sex gloss
+bidirectional ("Tzazith (a woman's name)" landed on a woodsman); arc-named people must be cast or
+nameless-by-trade (arc-only names strand beats that cannot name them); SETTLED: prefix glossed in
+knownToPlayer | engine+prompt |
+**R44: ALL SEVEN render surfaces CLEAN at the breaks/degrades bar (one-off, beat, FINALE writeQuest;
+resolve, FINALE resolve; genesis; flesh) — first fixpoint that includes the finale surfaces.**

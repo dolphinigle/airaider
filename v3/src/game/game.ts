@@ -843,6 +843,9 @@ export class Game {
     this.recentSparks.push(sparkCore(opening.spark));
     while (this.recentSparks.length > 8) this.recentSparks.shift();
     const intake = special[lead.source] ?? opening.intake;
+    // non-bringer/sign channels get NO spark: their pools were all arrival-of-word images —
+    // the same fact as intake, and a seed that fought the matter-first opening shape
+    const dealSpark = opening.channel === 'bringer' || opening.channel === 'sign';
     // landmark cooldown: once dealt, the landmark rests several cycles (Thornhollow ×8/run)
     const lmOk = opening.landmarkAllowed && this.state.cycle - (this.lastLandmarkDeal[lead.region] ?? -99) > 6;
     if (lmOk) this.lastLandmarkDeal[lead.region] = this.state.cycle;
@@ -858,7 +861,7 @@ export class Game {
           recruit: 'a person who may join the company', captive: 'a person taken', gold: 'coin' } as Record<string, string>
       )[s.kind] ?? s.kind).join(' + '),
       keywords: sampleKeywords(this.rng),
-      opening: { spark: lead.source === 'interrogation' ? intake : opening.spark },
+      opening: dealSpark && lead.source !== 'interrogation' ? { spark: opening.spark } : undefined,
       intake,
       gravity,
       placeNameSuggestions: [this.freshPlaceName(lead.region), this.freshPlaceName(lead.region)],
@@ -1084,7 +1087,7 @@ export class Game {
       if (member.loreId && this.state.lore.nodes[member.loreId]) continue;      // already known
       if (member.name === focal.name) continue;                                  // focal has a card+node
       const id = freshId('lore-');
-      const b = member.who.length > 120 ? member.who.slice(0, 120).replace(/\s+\S*$/, '') : member.who;
+      const b = this.clampBlurb(member.who);
       this.state.lore.nodes[id] = { id, kind: 'character', name: member.name, blurb: b, identity: b, active: true, createdCycle: this.state.cycle };
       member.loreId = id;
     }
@@ -1803,6 +1806,15 @@ export class Game {
   }
 
   /** the location line the writer sees — the landmark gate works by OMISSION (a shown token gets used) */
+  /** sentence-safe clamp for lore blurbs — a blurb cut mid-phrase ("speaks with a charter's")
+   *  reaches later prompts as a dangling fragment the writer must stay consistent with */
+  private clampBlurb(t: string, max = 120): string {
+    if (t.length <= max) return t;
+    const cut = t.slice(0, max);
+    const d = cut.lastIndexOf('. ');
+    return d > max / 2 ? cut.slice(0, d + 1) : cut.replace(/\s+\S*$/, '');
+  }
+
   /** landmark rest window per region (🛠 2026-07-10) */
   private lastLandmarkDeal: Record<string, number> = {};
   /** recently dealt opening-spark cores (recency reroll) */
@@ -2021,7 +2033,7 @@ export class Game {
         card.character.backstory = o.backstory || card.character.backstory;
         if (o.quirks.length) card.character.quirks = o.quirks.slice(0, 2);
         const node = this.state.lore.nodes[card.id];
-        if (node && o.who) node.blurb = o.who.slice(0, 120);
+        if (node && o.who) node.blurb = this.clampBlurb(o.who);
       }
     } catch { /* flesh is flavor — never block the cycle on it */ }
   }
