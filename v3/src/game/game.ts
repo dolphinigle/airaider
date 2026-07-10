@@ -825,8 +825,8 @@ export class Game {
     // variants per source — one fixed string per channel became its own stamp
     const specialPools: Partial<Record<Lead['source'], string[]>> = {
       interrogation: ['a captive in the company\'s cells gave it up', 'it was traded out of the cells for small comforts'],
-      hunt: ['the company\'s own searching turned it up', 'the search parties came back with more than they went for'],
-      reward: ['word of it came home with the last job', 'the last job left this thread hanging'],
+      hunt: ['the company\'s own searching turned it up', 'it lay across the path of the last sweep', 'the hunt for other things led here'],
+      reward: ['word of it came home with the last job', 'the last job left this thread hanging', 'it grew out of business already done'],
       collector: ['a debt long owed to the company has come due', 'an old obligation has surfaced'],
     };
     const special: Partial<Record<Lead['source'], string>> = Object.fromEntries(
@@ -1034,8 +1034,17 @@ export class Game {
       // same client shipped in one run while title+kernel alone stayed just under the bar
       const kw = words(`${g.title} ${g.kernel} ${g.cast.map(c => `${c.name} ${c.role}`).join(' ')} ${g.newPlaces.map(p => p.name).join(' ')}`);
       const clash = avoid.find(a => { const aw = words(a); let hit = 0; kw.forEach(w => { if (aw.has(w)) hit++ }); return hit >= 3 });
-      if (clash) {
-        g = await this.ai.genesis({ ...genesisInput, avoid: [...avoid, `your rejected draft "${g.title} — ${g.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground`] });
+      // same-CLIENT guard (mechanical — the prompt rule alone left one lore client running
+      // three sagas at once): a live chain's client may not client the new saga too
+      const liveClients = new Set(this.state.chains
+        .filter(c => c.state === 'active' || c.state === 'finale-pending')
+        .flatMap(c => c.bible.cast.filter(x => x.role === 'client' && x.loreId).map(x => x.loreId!)));
+      const clientDup = g.cast.find(x => x.role === 'client' && x.loreId && liveClients.has(x.loreId));
+      if (clash || clientDup) {
+        const why = clash
+          ? `your rejected draft "${g.title} — ${g.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground`
+          : `your rejected draft used ${clientDup!.name} as client — they already client a running saga; this one needs a different client entirely`;
+        g = await this.ai.genesis({ ...genesisInput, avoid: [...avoid, why] });
       }
     }
     // persist write-back (guarded); new places become lore nodes
@@ -1288,12 +1297,22 @@ export class Game {
     // DELIVERY IS COMPUTED HERE, BEFORE THE AI NARRATES — including the finale's fate
     // (QUESTS §8 solidity rule b; the narrator must name what is actually delivered).
     const ready = st.quests.filter(q => q.state === 'open' && this.isCommitted(q)).sort((a, b) => a.id.localeCompare(b.id));
-    // a partially-staffed quest silently NOT marching was invisible — say it plainly
+    // a partially-staffed quest silently NOT marching was invisible — say it plainly, but a
+    // quest stalled 3 cycles running is SET ASIDE (the same ⏸ line printed ten cycles straight
+    // while a saga froze; a lapsed chain beat respawns its lead — the story waits)
     for (const q of st.quests.filter(x => x.state === 'open' && !this.isCommitted(x))) {
       const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
       const filled = active.filter(s => s.filledBy).length;
-      if (filled > 0) report.push(`⏸ ${q.title} did not march — every slot must be filled (${filled} of ${active.length}).`);
+      if (filled === 0) { q.stalls = 0; continue }
+      q.stalls = (q.stalls ?? 0) + 1;
+      if (q.stalls >= 3 && !q.isFinale) {
+        this.abandonQuest(q, report);
+        report.push(`⏸ ${q.title}: three cycles without a full party — the company sets it aside.`);
+      } else {
+        report.push(`⏸ ${q.title} did not march — every slot must be filled (${filled} of ${active.length}).`);
+      }
     }
+    st.quests = st.quests.filter(q => q.state === 'open');
     if (ready.length === 0) report.push('A quiet cycle — no one marched.');
     const resolutions: Resolution[] = [];
     for (const q of ready) {
@@ -1562,9 +1581,11 @@ export class Game {
     const bits = r.delivery.cards.map(c => {
       if (!c.character) return c.qty ? `${c.qty} gold` : `the ${c.name}`;
       if (c.character.role === 'captive') return `${c.name} taken captive`;
-      return this.hasRoom('tavern')
-        ? `${c.name} rescued — they will wait at the fort's tavern, open to joining if hired`
-        : `${c.name} rescued — they will thank the company and MOVE ON (the fort has no place to keep them); never show them staying`;
+      return !this.hasRoom('tavern')
+        ? `${c.name} rescued — they will thank the company and MOVE ON (the fort has no place to keep them); never show them staying`
+        : this.roster().length >= this.rosterCapacity()
+          ? `${c.name} rescued — they will wait at the fort's tavern, though the roster is FULL: no joining unless room opens; never promise them a place`
+          : `${c.name} rescued — they will wait at the fort's tavern, open to joining if hired`;
     });
     if (r.delivery.liability) bits.push(`a ${r.delivery.liability.name} left behind`);
     return bits.join(', ') || 'a token result';

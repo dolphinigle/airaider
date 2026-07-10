@@ -442,11 +442,11 @@ export type IntakeChannel = 'bringer' | 'sign' | 'patrol' | 'talk' | 'notice';
 // VARIANTS per channel — a single fact string became a stamp ("The company's own sweep" ×3/run),
 // and a negation in one ("no one brought it") leaked onto cards verbatim
 const INTAKE_FACT: Record<IntakeChannel, string[]> = {
-  bringer: ['someone came to the fort with it', 'it was carried to the gate in person'],
-  sign: ['it was seen from the fort\'s own walls', 'the fort noticed it before anyone spoke of it'],
-  patrol: ['the company\'s own people came back with it', 'it came home with the last patrol'],
-  talk: ['it was picked up from common talk in the country nearby', 'the countryside is talking of it'],
-  notice: ['it stands promised in public writing', 'it is posted for any taker'],
+  bringer: ['someone came to the fort with it', 'it was carried to the gate in person', 'it arrived with a caller at the gate'],
+  sign: ['it was seen from the fort\'s own walls', 'the fort noticed it before anyone spoke of it', 'the signs of it are plain from the walls'],
+  patrol: ['the company\'s own people came back with it', 'it came home with the last patrol', 'one of your own crossed it in the field', 'your riders passed through the middle of it'],
+  talk: ['it was picked up from common talk in the country nearby', 'the countryside is talking of it', 'it is the story every visitor tells this week'],
+  notice: ['it stands promised in public writing', 'it is posted for any taker', 'the offer has hung unclaimed a while'],
 };
 
 // a saga's CARE beat must not open on blood or menace

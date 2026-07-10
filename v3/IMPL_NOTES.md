@@ -982,3 +982,24 @@ nameless-by-trade (arc-only names strand beats that cannot name them); SETTLED: 
 knownToPlayer | engine+prompt |
 **R44: ALL SEVEN render surfaces CLEAN at the breaks/degrades bar (one-off, beat, FINALE writeQuest;
 resolve, FINALE resolve; genesis; flesh) — first fixpoint that includes the finale surfaces.**
+
+## CONVERGENCE LOOP (2026-07-10 evening, designer: "run until satisfied; no drifting, no overly specific fixes")
+| 314 | Loop-5 judge (787980, pass-III build): fun 6.5 (from 5.5-6), approach-contract 6/6, prior
+loop/stamp classes dead. New classes fixed: EXPECT_SUBS rotation reset per call → every card got
+"Count on" ×38 (start index now hashed from the text); settled-fact regression fences (a report
+performs ONLY its card's job; broken stays broken; finale USES knownToPlayer proofs); merc-focal
+finale plans never trade the soldier + fate-is-the-last-word return clause (Wilfred was narrated
+into a lodge and marched on); stall cap (3 part-staffed unmarched cycles → set aside; the ⏸ line
+had printed 10 cycles straight); same-CLIENT mechanical retry at genesis (Daeis clienting 3 sagas);
+intake pools widened again; describeDelivery tells the writer when the roster is FULL (rescues
+promised joins the cap couldn't take) | engine+prompt |
+| 315 | §8 DE-DRIFT SWEEP (designer directive; audit agent over the whole suite): the drift class
+was "positive menus of 2-3 ready-made phrasings appended after correct class rules" — 16 menus
+deleted or rewritten class-level ("spoken, posted, or sworn"; "payment in kind, …" ×2; "a passed
+object, an answered glance…"; "two winters" ×2; "a new hitch, a claim unpaid, a rite unfinished";
+"handed on, or waiting at the fort"; "hamlets, waysides, crossings" ×2; "closed doors, an empty
+site, cold trails"; "a quirk performed under stress…"; "her hammer/at her flank"; engine-decides
+rule inverted positive-first; genesis want example → schematic; custody instance-glosses → class;
+fidget-ban lists reconciled; care-beat meta-commentary trimmed). KEEP-BUT-WATCH guards untouched:
+messenger triple, before-opener menu (needs an engine seed), per-field quote bans, trait-adverb
+dup. Cleared as house-style: schematic examples ("X did A"), §5 token bans, definitional glosses | prompt |

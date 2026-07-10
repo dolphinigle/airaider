@@ -123,6 +123,7 @@ export interface QuestSlot {
   filledBy: string | null;
 }
 
+
 export interface ApproachGroup { id: string; label: string; rewardKind: 'recruit' | 'captive' | 'gold' }
 
 export interface Quest {
@@ -145,6 +146,7 @@ export interface Quest {
   rewardCards: Card[];             // pre-generated unit/relic cards (in limbo)
   sideLootV?: number;              // chain beats: small engine-set side-loot budget
   liabilityId?: string;            // collector quests: winning settles this liability
+  stalls?: number;                 // consecutive cycles part-staffed but unmarched (3 → set aside)
   state: 'open' | 'resolved';
   createdCycle: number;
 }
