@@ -40,7 +40,7 @@ import { hasClash, queryMatches } from '../engine/overlap.js';
 import { questXp, grantXp, rollBase, rollGrowthLean, growToLevel } from '../engine/growth.js';
 import { coins, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, type SlotTest, type Outcome, type QuestRollResult } from '../engine/roll.js';
 import { sampleKeywords, sampleSeed, sampleOpening, sampleGravity, pickTone } from '../ai/keywords.js';
-import type { AiProvider, ResolveQuestInput, AskSlotOut } from '../ai/provider.js';
+import type { AiProvider, ResolveQuestInput, AskSlotOut, QuestWriteOut } from '../ai/provider.js';
 
 export interface LogEntry { cycle: number; kind: string; text: string; questId?: string }
 
@@ -1032,7 +1032,7 @@ export class Game {
       const words = (s: string) => new Set((s.toLowerCase().match(/[a-z]+/g) ?? []).filter(w => w.length > 3 && !stop.has(w)));
       // cast + coined places join the fingerprint — five deliver-to-a-ceremony sagas with the
       // same client shipped in one run while title+kernel alone stayed just under the bar
-      const kw = words(`${g.title} ${g.kernel} ${g.cast.map(c => `${c.name} ${c.role}`).join(' ')} ${g.newPlaces.map(p => p.name).join(' ')}`);
+      const kw = words(`${g.title} ${g.kernel} ${g.arc.join(' ')} ${g.cast.map(c => `${c.name} ${c.role}`).join(' ')} ${g.newPlaces.map(p => p.name).join(' ')}`);
       const clash = avoid.find(a => { const aw = words(a); let hit = 0; kw.forEach(w => { if (aw.has(w)) hit++ }); return hit >= 3 });
       // same-CLIENT guard (mechanical — the prompt rule alone left one lore client running
       // three sagas at once): a live chain's client may not client the new saga too
@@ -1133,7 +1133,12 @@ export class Game {
     // two-part lore prompting (LORE.md): selector picks who gets full dossiers, THEN the writer
     // receives the relevant lore — beats carry world memory, not just the frozen bible
     const relevantLore = await this.buildLoreSlate(chain.focalId, 'who needs full dossiers for this saga step');
-    const out = await this.ai.writeQuest({
+    // 🛠 2026-07-10 (reverses the earlier arrive-FRESH ruling): a lapsed unmarched beat is
+    // re-offered VERBATIM from cache — a re-rendered "fresh telling" drifted settled facts
+    // (a mute girl became talkative between two renders of the same step)
+    const cached = this.cachedBeatOut.get(chain.id);
+    const isRepose = !isFinale && chain.lastGeneratedBeat === chain.beatIndex + 1;
+    const out = isRepose && cached && cached.beat === chain.beatIndex + 1 ? cached.out : await this.ai.writeQuest({
       // beats serve the BIBLE's story, not a rolled job type (a random archetype fought the saga);
       // the landmark gate is for one-off variety — a saga anchored at the landmark must name it
       kind: isFinale ? 'finale' : 'beat',
@@ -1157,6 +1162,7 @@ export class Game {
       // runtime truth, not genesis-time: a focal HIRED mid-saga is the company's own now
       focalIsMerc: focal?.character?.role === 'merc',
     });
+    if (!isFinale) this.cachedBeatOut.set(chain.id, { beat: chain.beatIndex + 1, out });
     // QUESTS §6: middle-beat side-loot = gold OR a relic among it (was always bare gold)
     const specs: RewardSpec[] = isFinale ? [] : [{ kind: 'gold' as const, value: sideLootV }];
     let beatRewardCards: Card[] = [];
@@ -1840,6 +1846,8 @@ export class Game {
   private lastLandmarkDeal: Record<string, number> = {};
   /** recently dealt opening-spark cores (recency reroll) */
   private recentSparks: string[] = [];
+  /** last generated beat card per chain — lapsed unmarched beats re-offer VERBATIM (🛠) */
+  private cachedBeatOut = new Map<string, { beat: number; out: QuestWriteOut }>();
   /** known-cast sagas served so far (§21-3 cadence: ~2 per GH tier, pool-gated) */
   private knownCastSagas = 0;
 
@@ -1990,12 +1998,12 @@ export class Game {
       if (this.roster().length < this.rosterCapacity()) {
         focal.location = HELD('roster');
         this.spawnPersonalChainLead(focal);
-        report.push(`🎬 Finale: ${focal.name} joins the company — clean${shortDebt > 0 ? `, though the season ran short: a ${shortDebt}g debt comes with them` : ''}. Surplus: ${surplus}g.`);
+        report.push(`🎬 Finale: ${focal.name} joins the company — clean${shortDebt > 0 ? `, though the season ran short: a ${shortDebt}g debt comes with them` : ''}. Surplus: ${surplus}g (the bank beyond their mark).`);
       } else {
         focal.character!.role = 'npc';
         st.tavern.push({ cardId: focal.id, expiresAtCycle: st.cycle + STAGE_TTL_FINALE, prepaid: true });
         focal.location = HELD('staged');
-        report.push(`🎬 Finale: ${focal.name} is yours — no roster room, so they wait at the tavern (already paid for)${shortDebt > 0 ? `; a ${shortDebt}g season-shortfall debt comes with them` : ''}. Surplus: ${surplus}g.`);
+        report.push(`🎬 Finale: ${focal.name} is yours — no roster room, so they wait at the tavern (already paid for)${shortDebt > 0 ? `; a ${shortDebt}g season-shortfall debt comes with them` : ''}. Surplus: ${surplus}g (the bank beyond their mark).`);
       }
     } else {
       focal.character!.role = 'captive';
@@ -2006,7 +2014,7 @@ export class Game {
       // ONE debt rule: the shortfall between the bank and the focal's mark (QUESTS §5)
       const shortDebt = Math.max(0, Math.round(focal.value - chain.bank));
       if (shortDebt > 0) this.addCard(mintStackable('debt', shortDebt));
-      report.push(`🎬 Finale: ${focal.name} is yours — captive${shortDebt > 0 ? `, but the season ran short: a ${shortDebt}g debt comes with them` : ''}. Surplus: ${surplus}g.`);
+      report.push(`🎬 Finale: ${focal.name} is yours — captive${shortDebt > 0 ? `, but the season ran short: a ${shortDebt}g debt comes with them` : ''}. Surplus: ${surplus}g (the bank beyond their mark).`);
     }
     guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `the saga ${chain.bible.title} ended ${fate.fate}`, importance: 0.85 }], st.cycle, () => freshId('e'));
   }
