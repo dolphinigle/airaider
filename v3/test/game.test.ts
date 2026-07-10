@@ -27,10 +27,10 @@ async function playCycles(g: Game, n: number): Promise<string[]> {
 }
 
 describe('game loop (mock AI)', () => {
-  it('bootstraps: gold, 2 mercs, day-0 fort', () => {
+  it('bootstraps: gold, 3 mercs, day-0 fort', () => {
     const g = newGame();
     expect(g.gold()).toBe(300);
-    expect(g.roster()).toHaveLength(2);
+    expect(g.roster()).toHaveLength(3);   // 🛠 2026-07-10: third starter kills the 2-merc stall
     expect(g.state.fort.rooms.map(r => r.type).sort()).toEqual(['bedroom', 'bunkroom', 'great-hall']);
     expect(g.visibleLeads()).toHaveLength(0); // no Map room yet
   });
@@ -117,7 +117,7 @@ describe('game loop (mock AI)', () => {
 
   it('economy guardrails: mercs never staff rooms; GH gates builds', () => {
     const g = newGame(19);
-    expect(g.build('tavern').ok).toBe(false);       // GH T2 gate
+    expect(g.build('dungeon').ok).toBe(false);      // GH T2 gate (tavern moved to T1, 🛠 2026-07-10)
     expect(g.build('hospital').ok).toBe(false);     // GH T5 gate
     const merc = g.roster()[0]!;
     g.build('garden');

@@ -424,17 +424,46 @@ const ARRIVAL_SIGNS = ['smoke on the ridge', 'bells from the valley, wrong hour'
   'animals fleeing the wood', 'a light where none should burn', 'the weekly pedlar simply never came',
   'a price suddenly doubled at market', 'a boat drifting empty past the ford', 'fresh graves where there was no sickness',
   'a road gone silent that is never silent', 'washing left three days on the lines', 'hoofprints circling the walls by night'];
+// ---- intake channels (🛠 2026-07-10): the ENGINE rolls how word reached the fort and deals it
+// as a settled FACT (the quarryTags pattern — engine owns the roll, AI flavors it). The POV-lock
+// otherwise leaves "a messenger arrives" as the model's only epistemic device (~92% of cards);
+// permission to skip the bringer never supplied a replacement, so this supplies one.
+const PATROL_SPARKS = ['a returning patrol saw it', 'one of your soldiers heard it on the road back',
+  'the wood-detail came back full of talk', 'your forager marked the spot and hurried home',
+  'the night watch counted lights where none should burn', 'a scout\'s report, two days stale'];
+const TALK_SPARKS = ['talk at the market', 'a quarrel overheard at the mill',
+  'the tavern keeps repeating one name', 'washerwomen trading the same story',
+  'a sermon that named no names but meant one', 'carters who all take the long way round now'];
+const NOTICE_SPARKS = ['a posted bounty', 'a notice nailed at the crossroads',
+  'a guild letter passed hand to hand', 'a standing reward, long unclaimed',
+  'a magistrate\'s writ, badly copied'];
+
+export type IntakeChannel = 'bringer' | 'sign' | 'patrol' | 'talk' | 'notice';
+const INTAKE_FACT: Record<IntakeChannel, string> = {
+  bringer: 'someone came to the fort with it',
+  sign: 'it was seen — or missed — from the fort itself; no one brought it',
+  patrol: 'the company\'s own people brought it back from outside',
+  talk: 'it was picked up from common talk in the country nearby',
+  notice: 'it stands promised in public writing — no one carried it to you in person',
+};
+
 // a saga's CARE beat must not open on blood or menace
 const GRIM = /wounded|creditor|warrant|bounty|debt|rival|confession|graves|blood/;
 const OPENING_TIMES = ['at first light', 'mid-morning', 'at noon', 'late afternoon', 'at dusk', 'after dark', 'in the small hours'];
-export function sampleOpening(rng: Rng, opts?: { gentle?: boolean }): { spark: string; landmarkAllowed: boolean } {
+export function sampleOpening(rng: Rng, opts?: { gentle?: boolean; channel?: IntakeChannel }):
+  { spark: string; landmarkAllowed: boolean; channel: IntakeChannel; intake: string } {
+  const channel = opts?.channel ?? rng.weighted<IntakeChannel>(
+    [['bringer', 4.5], ['sign', 2.5], ['patrol', 1.2], ['talk', 1.2], ['notice', 0.6]]);
   const pick = (a: string[]) => rng.pick(opts?.gentle ? a.filter(w => !GRIM.test(w)) : a);
-  const core = rng.chance(0.3) ? pick(ARRIVAL_SIGNS)
+  const core = channel === 'sign' ? pick(ARRIVAL_SIGNS)
+    : channel === 'patrol' ? pick(PATROL_SPARKS)
+    : channel === 'talk' ? pick(TALK_SPARKS)
+    : channel === 'notice' ? pick(NOTICE_SPARKS)
     : rng.chance(0.6) ? `${pick(ARRIVAL_WHO)}, ${pick(ARRIVAL_HOW)}` : pick(ARRIVAL_WHO);
   // time only SOMETIMES seasons the spark — any time token at all kept teaching cards to open
   // "At dusk, ..." (~50% even after folding + an explicit ban); most cards get no clock to lead with
-  const spark = rng.chance(0.3) ? `${core} — ${rng.pick(OPENING_TIMES)}` : core;
-  return { spark, landmarkAllowed: rng.chance(0.15) };
+  const spark = channel === 'bringer' && rng.chance(0.3) ? `${core} — ${rng.pick(OPENING_TIMES)}` : core;
+  return { spark, landmarkAllowed: rng.chance(0.15), channel, intake: INTAKE_FACT[channel] };
 }
 
 /** one-off gravity — not every job is dire (v2's per-card register knob, rarity-weighted).
@@ -448,9 +477,11 @@ export function sampleGravity(rng: Rng, rarity: string): string {
   return rng.weighted(GRAVITY[rarity] ?? GRAVITY.common!);
 }
 
-/** saga tone, weighted toward lighter (BIBLE.md tone knob; PLAYER_PREFERENCES shift is a later 🛠) */
+/** saga tone, weighted toward lighter (BIBLE.md tone knob; PLAYER_PREFERENCES shift is a later 🛠)
+ *  2026-07-10: BIBLE.md's adventurous/tense added to the pool (doc list ∪ impl list) */
 const TONES: [string, number][] = [
-  ['slice-of-life', 2], ['wry', 3], ['warm', 2], ['bittersweet', 2], ['grim', 2], ['dark', 1],
+  ['slice-of-life', 2], ['wry', 3], ['warm', 2], ['bittersweet', 2],
+  ['adventurous', 2], ['tense', 1.5], ['grim', 1.5], ['dark', 1],
 ];
 export function pickTone(rng: Rng): string { return rng.weighted(TONES) }
 
@@ -462,5 +493,15 @@ const SEEDS = [
   'a list of names the respectable would kill to burn', 'a beast that only hunts the guilty',
   'a will that frees the wrong people', 'a siege that ended too quietly',
   'a smuggler’s route that moves more than goods', 'a caged singer whose songs start riots',
+  // widened 2026-07-10 (pool of 12 re-dealt fast across a long campaign; append-to-grow)
+  'a hostage both sides would rather forget', 'an old victory that was really a massacre',
+  'a healer who chooses who is worth saving', 'two heirs, one seal, and no witnesses',
+  'a bridge toll that funds something worse', 'a saint’s bones that will not stay buried',
+  'a wager between lords paid in other people’s lives', 'a granary full the year everyone starved',
+  'a marriage sworn to end a war neither side stopped', 'a mine that pays in more than ore',
+  'a foundling raised under someone else’s name', 'an oath kept long after it should have broken',
+  'a village that pays two masters and can afford neither', 'a court singer who knows which songs are confessions',
+  'a road that was safe until someone made it safer', 'an exile come home richer than the lord who banished them',
+  'a cure that works only while its price is paid', 'a border stone moved by night, a little each year',
 ];
 export function sampleSeed(rng: Rng): string { return rng.pick(SEEDS) }

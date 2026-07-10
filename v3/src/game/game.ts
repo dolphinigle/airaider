@@ -19,7 +19,8 @@ import {
 import { infirmaryHealRate, healTick, rollInjuryTiers, payHealCost, REST_HEAL_PER_CYCLE, type InjuryBand } from '../engine/injury.js';
 import { REGION, REGIONS } from '../engine/regions.js';
 import {
-  vBase, RARITY_MULT, splitOneOff, hireCost, RANSOM_RATE, SELL_RATE, type Rarity,
+  vBase, RARITY_MULT, splitOneOff, hireCost, RANSOM_RATE, SELL_RATE, KEEP_THRESHOLD,
+  type Rarity, type Archetype, type RewardSpec,
 } from '../engine/economy.js';
 import {
   rollFreshLead, starterPacket, huntLead, recruitLead, slotCount, rollDifficulty, oneOffValue,
@@ -35,7 +36,7 @@ import {
   type LoreGraph, type LoreNode,
 } from '../engine/lore.js';
 import { rollName, rollPlaceName } from '../engine/names.js';
-import { hasClash } from '../engine/overlap.js';
+import { hasClash, queryMatches } from '../engine/overlap.js';
 import { questXp, grantXp, rollBase, rollGrowthLean, growToLevel } from '../engine/growth.js';
 import { coins, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, type SlotTest, type Outcome, type QuestRollResult } from '../engine/roll.js';
 import { sampleKeywords, sampleSeed, sampleOpening, sampleGravity, pickTone } from '../ai/keywords.js';
@@ -52,7 +53,7 @@ export const QUEST_TTL = 10;               // pursued quests lapse after this ma
 export const INTERROGATE_BASE = 30;        // 🛠 priced per-captive action
 export const INTERROGATE_FRAC = 0.1;
 
-export interface Staged { cardId: string; expiresAtCycle: number }
+export interface Staged { cardId: string; expiresAtCycle: number; prepaid?: boolean }
 
 interface Resolution {
   quest: Quest;
@@ -124,9 +125,10 @@ export class Game {
   // ---- bootstrap (day 0) ------------------------------------------------------------------
 
   private bootstrap() {
-    // starting gold + two starter mercs
+    // starting gold + starter mercs (🛠 2026-07-10: 2→3 — measured across 12 sim seeds, a third
+    // starter alone zeroes dead cycles and all-wounded stalls; no doc specifies the count)
     this.addCard(mintStackable('gold', 300));
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
       const merc = this.freshCharacter('merc', 2, 60, 'forests');
       merc.location = HELD('roster');
       this.addCard(merc);
@@ -220,6 +222,8 @@ export class Game {
       g('captives', 'dungeon', this.captives().length > 0),
       g('items', 'storage', this.state.cards.some(c => cardType(c) === 'relic' && c.location.kind === 'held')),
       g('lore', 'library'),
+      // FORT §5 / LORE §5: the Chronicle room exposes the archive (was a dead building)
+      g('chronicle', 'chronicle'),
       // ⚠ doc-gap: §12.1 gives Mess hall → merc list, but FOCUS is a base function (§12.1 CUT
       // note) and lives in the roster menu — always open pending a designer ruling.
       g('roster', 'mess-hall', true),
@@ -521,7 +525,7 @@ export class Game {
     const card = this.card(cardId);
     if (!staged || !card) return { ok: false, msg: 'not at the tavern' };
     if (this.roster().length >= this.rosterCapacity()) return { ok: false, msg: 'no roster room (bedrooms grant +1 each)' };
-    const cost = hireCost(card.value);
+    const cost = staged.prepaid ? 0 : hireCost(card.value);   // a won finale focal is already paid for
     if (!this.spendGold(cost)) return { ok: false, msg: `costs ${cost}g` };
     card.character!.role = 'merc';
     card.location = HELD('roster');
@@ -541,6 +545,9 @@ export class Game {
     card.location = HELD('roster');
     this.state.holding = this.state.holding.filter(s => s.cardId !== cardId);
     this.ensureLoreNode(card);
+    // STORY_ENGINE §5 trigger 2 (built 2026-07-10): a captive joining SOMETIMES stirs a story
+    // (🛠 rate) — their past does not stay outside the walls
+    if (this.rng.chance(0.3)) this.spawnPersonalChainLead(card);
     return { ok: true, msg: `${card.name} moved to the cells` };
   }
 
@@ -621,7 +628,7 @@ export class Game {
     const cost = Math.round(INTERROGATE_BASE + card.value * INTERROGATE_FRAC);
     if (!this.spendGold(cost)) return { ok: false, msg: `costs ${cost}g` };
     card.tags.push({ concept: 'interrogated' });
-    const lead = rollFreshLead(this.rng, this.leadCtx(), () => freshId('lead-'), 'interrogation');
+    const lead = this.freshLead('interrogation');
     // the room's comfort IS its benefit (FORT §5: leads only) — good comfort loosens tongues:
     // a chance to upgrade the lead's rarity one step
     if (this.rng.chance(Math.min(0.6, this.comfort(room) / 40))) {
@@ -653,7 +660,17 @@ export class Game {
       ghTier: this.state.fort.ghTier,
       rosterLevels: this.roster().map(m => m.character!.level),
       hasDungeon: this.hasRoom('dungeon'),
+      recentArchetypes: this.recentLeadArchetypes,
     };
+  }
+
+  /** 🛠 2026-07-10 premise-variety: recently dealt archetypes rotate out of the next roll */
+  private recentLeadArchetypes: Archetype[] = [];
+  private freshLead(source: Lead['source']): Lead {
+    const l = rollFreshLead(this.rng, this.leadCtx(), () => freshId('lead-'), source);
+    this.recentLeadArchetypes.push(l.archetype);
+    while (this.recentLeadArchetypes.length > 3) this.recentLeadArchetypes.shift();
+    return l;
   }
 
   visibleLeads(): Lead[] {
@@ -742,13 +759,17 @@ export class Game {
           requirement = { kind: 'must-be', cardId: focalCardId };
           reqPlaced = true;
         } else if (!reqPlaced && a.requirementTag) {
-          const concept = parseAiTag(a.requirementTag)?.concept;
-          if (concept) {
+          const p = parseAiTag(a.requirementTag);
+          if (p) {
+            // §9b band floor: an AI rank on the required word becomes minRank (#218 built)
+            const minRank = p.rank && (CONCEPT[p.concept]?.depth ?? 1) > 1 ? p.rank : undefined;
             // fillability guard: a must-have NOBODY on the roster satisfies is a dead card
-            // that blocks the board until TTL — downgrade to favored (the tag still counts)
-            if (this.roster().some(m => hasTag(m.tags, concept))) {
-              requirement = { kind: 'must-have', concept }; reqPlaced = true;
-            } else if (!test.favored.includes(concept)) test.favored.push(concept);
+            // that blocks the board until TTL — soften floor first, then downgrade to favored
+            if (minRank && this.roster().some(m => queryMatches(m.tags, { match: p.concept, minRank }))) {
+              requirement = { kind: 'must-have', concept: p.concept, minRank }; reqPlaced = true;
+            } else if (this.roster().some(m => hasTag(m.tags, p.concept))) {
+              requirement = { kind: 'must-have', concept: p.concept }; reqPlaced = true;
+            } else if (!test.favored.includes(p.concept)) test.favored.push(p.concept);
           }
         }
       } else {
@@ -797,15 +818,43 @@ export class Game {
       this.recentNpcNames.push(nm);
       while (this.recentNpcNames.length > 60) this.recentNpcNames.shift();
     }
-    const opening = sampleOpening(this.rng);
+    // 🛠 2026-07-10 intake channel: the lead's PROVENANCE (which the engine always knew and threw
+    // away) becomes a dealt fact — interrogations/hunts/rewards/debts stop reading as messengers
+    const special: Partial<Record<Lead['source'], string>> = {
+      interrogation: 'a captive in the company\'s keeping gave it up',
+      hunt: 'the company\'s own sweep turned it up',
+      reward: 'your people brought word of it back from the last job',
+      collector: 'a debt long owed to the company has come due',
+    };
+    const sparkOpts = {
+      channel: lead.source === 'hunt' || lead.source === 'reward' ? 'patrol' as const
+        : lead.source === 'collector' ? 'notice' as const : undefined,
+    };
+    let opening = sampleOpening(this.rng, sparkOpts);
+    // spark recency: one reroll if the same figure was dealt lately ("a poacher turned
+    // informer" carried three cards in one campaign)
+    const sparkCore = (s: string) => s.split(' — ')[0]!;
+    if (this.recentSparks.includes(sparkCore(opening.spark))) opening = sampleOpening(this.rng, sparkOpts);
+    this.recentSparks.push(sparkCore(opening.spark));
+    while (this.recentSparks.length > 8) this.recentSparks.shift();
+    const intake = special[lead.source] ?? opening.intake;
+    // landmark cooldown: once dealt, the landmark rests several cycles (Thornhollow ×8/run)
+    const lmOk = opening.landmarkAllowed && this.state.cycle - (this.lastLandmarkDeal[lead.region] ?? -99) > 6;
+    if (lmOk) this.lastLandmarkDeal[lead.region] = this.state.cycle;
     const gravity = sampleGravity(this.rng, lead.rarity);
     const out = await this.ai.writeQuest({
       kind: 'one-off', archetype: lead.archetype,
-      location: this.locationLine(lead.region, opening.landmarkAllowed),
+      location: this.locationLine(lead.region, lmOk),
       level: lead.level, rarity: lead.rarity,
-      slotCount: n, rewardEnvelope: specs.map(s => s.kind).join(' + '),
+      // engine kind names are NOT writer-safe: 'lead' read as the METAL (12 lead-bar fetches in
+      // one campaign, "a parcel of lead" pay in another) — translate kinds to plain words
+      slotCount: n, rewardEnvelope: specs.map(s => (
+        { lead: 'a fresh trail to further work (knowledge, never an object)', relic: 'a prize object',
+          recruit: 'a person who may join the company', captive: 'a person taken', gold: 'coin' } as Record<string, string>
+      )[s.kind] ?? s.kind).join(' + '),
       keywords: sampleKeywords(this.rng),
-      opening: { spark: opening.spark },
+      opening: { spark: lead.source === 'interrogation' ? intake : opening.spark },
+      intake,
       gravity,
       placeNameSuggestions: [this.freshPlaceName(lead.region), this.freshPlaceName(lead.region)],
       // ANONYMITY BY OMISSION (2026-07-06 ruling): a small job's folk stay nameless by trade —
@@ -848,6 +897,7 @@ export class Game {
         if (c.depth > 1 && p.rank) {
           const [lo, hi] = bandWindow(p.concept, p.rank);
           tier = Math.min(this.rng.range(lo, hi), this.rng.range(lo, hi));   // weighted-low in band
+          while (this.rng.chance(0.07) && tier < c.depth) tier++;   // §8: ~7%/step spillover above
         }
         required.push({ concept: p.concept, tier });
       }
@@ -903,43 +953,88 @@ export class Game {
         return f ? f.tags.filter(t => ['skill', 'body', 'standing'].includes(CONCEPT[t.concept]?.group ?? ''))
           .map(t => t.concept) : [];
       });
-      focal = materializeReward(this.rng, spec, lead.level, lead.region,
-        { excludeConcepts: recentFocalTags, maxSkills: 2 })[0]!;
+      // §21-3 known-cast cadence + LORE §1 lazy promotion (built 2026-07-10): some sagas return
+      // to a FACE THE WORLD ALREADY KNOWS — a lore-only coined person gets a full Card rolled
+      // here, and their lore node (memories, ties) is remapped onto it so their story follows
+      const loreCast = Object.values(this.state.lore.nodes).filter(nd =>
+        nd.active && nd.kind === 'character' && !this.card(nd.id) && !this.state.cards.some(c => c.name === nd.name));
+      if (loreCast.length >= 3 && this.knownCastSagas < this.state.fort.ghTier * 2 && this.rng.chance(0.35)) {
+        const nd = this.rng.pick(loreCast);
+        const text = `${nd.blurb} ${nd.identity}`;
+        const race = /\belv|elf\b/i.test(text) ? 'elf' : /wolfman/i.test(text) ? 'wolfman'
+          : /lizardman/i.test(text) ? 'lizardman' : /\bhuman\b/i.test(text) ? 'human' : undefined;
+        const gender = /\b(she|her|hers|woman|widow|daughter|sister|bride)\b/i.test(text) ? 'female'
+          : /\b(he|him|his|man|widower|son|brother)\b/i.test(text) ? 'male' : undefined;
+        focal = materializeReward(this.rng, spec, lead.level, lead.region,
+          { excludeConcepts: recentFocalTags, maxSkills: 2, presetName: nd.name, race, gender })[0]!;
+        // remap the node onto the card id — edges and memories follow the person
+        delete this.state.lore.nodes[nd.id];
+        this.state.lore.nodes[focal.id] = { ...nd, id: focal.id, identity: renderTags(focal.tags) };
+        for (const e of this.state.lore.edges) {
+          if (e.from === nd.id) e.from = focal.id;
+          if (e.to === nd.id) e.to = focal.id;
+        }
+        this.knownCastSagas++;
+      } else {
+        focal = materializeReward(this.rng, spec, lead.level, lead.region,
+          { excludeConcepts: recentFocalTags, maxSkills: 2 })[0]!;
+      }
       focal.location = HELD('limbo');
       this.addCard(focal);
     }
     this.ensureLoreNode(focal);
     const slate = await this.buildLoreSlate(focal.id, 'who needs full dossiers for this saga');
     const races = Object.entries(REGION[lead.region]!.poolWeights) as [string, number][];
-    // pre-rolled names for NEW cast — must not collide with any living character (§4b corollary)
+    // pre-rolled names for NEW cast — must not collide with any living character (§4b corollary).
+    // Rolled WITH a sex and dealt annotated (a gender-opaque list once forced "Ithion" onto the
+    // story's veiled lady because order was mandatory)
     const takenNames = new Set(this.state.cards.filter(x => x.character).map(x => x.name));
-    const assignedNames: string[] = [];
-    for (let i = 0; assignedNames.length < 4 && i < 60; i++) {
-      const n = rollName(this.rng, this.rng.weighted(races));
-      if (!takenNames.has(n) && !assignedNames.includes(n) && !this.nameTooSimilar(n)) assignedNames.push(n);
+    const assigned: { name: string; gender: string }[] = [];
+    for (let i = 0; assigned.length < 4 && i < 60; i++) {
+      const gender = this.rng.pick(['male', 'female']);
+      const n = rollName(this.rng, this.rng.weighted(races), gender);
+      if (!takenNames.has(n) && !assigned.some(a => a.name === n) && !this.nameTooSimilar(n)) assigned.push({ name: n, gender });
     }
+    const assignedNames = assigned.map(a => a.name);
     // coined cast never become cards — remember these names or their epithets get re-dealt
     // ("Ashveil" once stamped three unrelated clients across chains)
     this.recentNpcNames.push(...assignedNames);
     while (this.recentNpcNames.length > 60) this.recentNpcNames.shift();
-    const g = await this.ai.genesis({
+    const avoid = this.state.chains.slice(-5).map(c => `${c.bible.title} — ${c.bible.kernel}`);
+    const genesisInput = {
       seed: sampleSeed(this.rng), keywords: sampleKeywords(this.rng),
       // most sagas must live AWAY from the landmark — omission beats the ignored "set it elsewhere"
       // nudge (both sagas of a read centered Thornhollow when genesis could always see it)
       location: this.locationLine(lead.region, this.rng.chance(0.15)),
-      rarity: lead.rarity, stakes: lead.rarity === 'rare' ? 'high' : lead.rarity === 'uncommon' ? 'mid' : 'low',
+      rarity: lead.rarity,
+      stakes: (lead.rarity === 'rare' ? 'high' : lead.rarity === 'uncommon' ? 'mid' : 'low') as 'low' | 'mid' | 'high',
       tone: pickTone(this.rng),
-      avoid: this.state.chains.slice(-5).map(c => `${c.bible.title} — ${c.bible.kernel}`),
+      avoid,
       focal: { id: focal.id, name: focal.name, tags: renderTags(focal.tags), dossier: this.dossier(focal.id), isExistingMerc: isPersonal },
       kind: isPersonal ? 'development' : eco.kind, twist: eco.twist,
       expectedBeats: eco.beats,
-      slate, assignedNames,
-    });
+      slate, assignedNames: assigned.map(a => `${a.name} (${a.gender === 'female' ? 'a woman\'s name' : 'a man\'s name'})`),
+    };
+    let g = await this.ai.genesis(genesisInput);
+    // KERNEL-NOVELTY GUARD (mechanical — the `avoid` rule alone was ignored: two
+    // reliquary-in-a-cellar sagas shipped in one campaign): one retry, collision named
+    {
+      const stop = new Set('the,a,an,of,to,in,that,and,who,for,with,on,at,by,from,their,its,his,her,they,them,into,over,under'.split(','));
+      const words = (s: string) => new Set((s.toLowerCase().match(/[a-z]+/g) ?? []).filter(w => w.length > 3 && !stop.has(w)));
+      const kw = words(`${g.title} ${g.kernel}`);
+      const clash = avoid.find(a => { const aw = words(a); let hit = 0; kw.forEach(w => { if (aw.has(w)) hit++ }); return hit >= 3 });
+      if (clash) {
+        g = await this.ai.genesis({ ...genesisInput, avoid: [...avoid, `your rejected draft "${g.title} — ${g.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground`] });
+      }
+    }
     // persist write-back (guarded); new places become lore nodes
     for (const p of g.newPlaces.slice(0, 3)) {
       const id = freshId('place-');
-      // word-safe clamp — a blurb ending "hummed wit" fed broken prose to later prompts
-      const b = p.blurb.length > 120 ? p.blurb.slice(0, 120).replace(/\s+\S*$/, '') : p.blurb;
+      // sentence-safe clamp — a blurb ending mid-phrase ("hidden in a ring of") invites later
+      // writers to invent the completion; prefer a whole-sentence cut, else word-safe
+      const b = p.blurb.length > 120
+        ? (c => { const d = c.lastIndexOf('. '); return d > 60 ? c.slice(0, d + 1) : c.replace(/\s+\S*$/, '') })(p.blurb.slice(0, 120))
+        : p.blurb;
       this.state.lore.nodes[id] = { id, kind: 'place', name: p.name || rollPlaceName(this.rng), blurb: b, identity: b, active: true, createdCycle: this.state.cycle };
     }
     guardEdges(this.state.lore, g.newEdges, this.state.cycle, () => freshId('e'));
@@ -949,6 +1044,7 @@ export class Game {
       const legal = new Set<string>([focal.name, ...slate.map(x => x.name), ...assignedNames]);
       let next = 0;
       for (const member of g.cast) {
+        member.name = member.name.replace(/\s*\([^)]*\)\s*$/, '');   // strip echoed "(a man's name)" notes
         if (member.loreId && this.state.lore.nodes[member.loreId]) {
           member.name = this.state.lore.nodes[member.loreId]!.name;   // canon wins
         } else if (!legal.has(member.name)) {
@@ -1020,7 +1116,8 @@ export class Game {
       location: this.locationLine(chain.region, !!REGION[chain.region]?.landmark && JSON.stringify(chain.bible).includes(REGION[chain.region]!.landmark!)),
       level: chain.level, rarity: chain.rarity, slotCount: n,
       rewardEnvelope: isFinale ? `the focal: ${chain.kind}` : 'side loot',
-      opening: { spark: sampleOpening(this.rng, { gentle: chain.beatIndex === 0 }).spark },
+      // beats get NO opening spark (🛠 2026-07-10): a random spark fought the saga — the card
+      // opens from the story state, and beat 1 from how the bible says the matter arrived
       placeNameSuggestions: [this.freshPlaceName(chain.region)],
       rosterNames: this.rosterForWriters().names,
       rosterPronouns: this.rosterForWriters().pronouns,
@@ -1034,7 +1131,15 @@ export class Game {
       focalName: focal?.name,
       focalIsMerc: chain.isPersonal && focal?.character?.role === 'merc',
     });
-    const specs = isFinale ? [] : [{ kind: 'gold' as const, value: sideLootV }];
+    // QUESTS §6: middle-beat side-loot = gold OR a relic among it (was always bare gold)
+    const specs: RewardSpec[] = isFinale ? [] : [{ kind: 'gold' as const, value: sideLootV }];
+    let beatRewardCards: Card[] = [];
+    if (!isFinale && sideLootV > 40 && this.rng.chance(0.35)) {
+      specs[0] = { kind: 'gold', value: Math.round(sideLootV * 0.4) };
+      const relicSpec: RewardSpec = { kind: 'relic', value: Math.round(sideLootV * 0.6) };
+      specs.push(relicSpec);
+      beatRewardCards = materializeReward(this.rng, relicSpec, chain.level, chain.region);
+    }
     // beat pacing (QUESTS §8-B): beat 1 is the low-stakes CARE moment — cap its
     // difficulty at standard; beat 2 still escalating — cap at hard; then free
     const beatNo = chain.beatIndex + 1;
@@ -1046,7 +1151,7 @@ export class Game {
       chainId: chain.id, beatIndex: chain.beatIndex + 1, isFinale,
       slots: this.buildSlots(n, chain.level, chain.rarity, 'investigate', out.ask, cap,
         chain.isPersonal && focal?.character?.role === 'merc' ? focal.id : undefined),
-      rewardSpecs: specs, rewardCards: [], sideLootV,
+      rewardSpecs: specs, rewardCards: beatRewardCards, sideLootV,
       state: 'open', createdCycle: this.state.cycle,
     };
     if (isFinale) {
@@ -1067,9 +1172,13 @@ export class Game {
         const attr = a.attribute.toLowerCase();
         const attributes = (['str', 'dex', 'int', 'cha', 'con'].includes(attr) ? [attr] : template.test.attributes) as Attribute[];
         const favored = a.favored.map(f => parseAiTag(f)?.concept).filter((c): c is string => !!c);
+        // QUESTS §9: each PLAN carries its own difficulty — the cash-out road leans easy
+        // (one cloned roll made every branch identical; an easy gold exit could never occur)
+        const difficulty = quest.approaches![i]!.rewardKind === 'gold' && this.rng.chance(0.7)
+          ? 'standard' as const : rollDifficulty(this.rng, chain.rarity);
         return {
           requirement: { kind: 'open' as const },
-          test: { ...template.test, attributes, favored },
+          test: { ...template.test, attributes, favored, difficulty },
           groupId: `g${i}`, filledBy: null,
         };
       });
@@ -1100,7 +1209,8 @@ export class Game {
     if (slot.filledBy) return { ok: false, msg: 'slot filled' };
     if (merc.location.kind === 'quest') return { ok: false, msg: `${merc.name} is already committed` };
     if (slot.requirement.kind === 'must-be' && slot.requirement.cardId !== mercId) return { ok: false, msg: 'this slot names someone else' };
-    if (slot.requirement.kind === 'must-have' && !hasTag(merc.tags, slot.requirement.concept)) return { ok: false, msg: `needs ${slot.requirement.concept}` };
+    if (slot.requirement.kind === 'must-have' && !queryMatches(merc.tags, { match: slot.requirement.concept, minRank: slot.requirement.minRank }))
+      return { ok: false, msg: `needs ${slot.requirement.concept}${slot.requirement.minRank ? ` (${slot.requirement.minRank}+)` : ''}` };
     slot.filledBy = mercId;
     merc.location = { kind: 'quest', questId, slot: slotIdx };
     return { ok: true, msg: `${merc.name} → slot ${slotIdx}` };
@@ -1220,9 +1330,19 @@ export class Game {
       if (c) { this.ensureLoreNode(c); c.location = HELD('lore'); report.push(`${c.name} drank up and left the tavern.`) }
     }
     st.tavern = st.tavern.filter(s => s.expiresAtCycle > st.cycle);
+    // 🛠 2026-07-10: a timed-out captive is never a pure loss — the company hands them off at
+    // the slaver's quick price (an ACTIVE ransom before the clock still pays better; a Dungeon
+    // keeps them). Zero-payoff evaporation made won finales feel hollow.
     for (const s of st.holding.filter(s => s.expiresAtCycle <= st.cycle)) {
       const c = this.card(s.cardId);
-      if (c) { this.ensureLoreNode(c); c.location = HELD('lore'); report.push(`${c?.name ?? 'a captive candidate'} slipped away from holding.`) }
+      if (c) {
+        const pay = Math.round(c.value * SELL_RATE);
+        this.ensureLoreNode(c); c.location = HELD('lore');
+        this.addGold(pay);
+        guardEdges(st.lore, [{ from: c.id, to: c.id, type: 'party-to', blurb: 'handed off by the company when their holding lapsed — no longer at the fort', importance: 0.7 }], st.cycle, () => freshId('e'));
+        this.log('sell', `${c.name} handed off at the quick price (holding lapsed).`);
+        report.push(`⛓ Time ran out on ${c.name} — handed off at the quick price. 💰 +${pay}g (a ransom before the clock pays better).`);
+      }
     }
     st.holding = st.holding.filter(s => s.expiresAtCycle > st.cycle);
 
@@ -1239,7 +1359,7 @@ export class Game {
       st.pendingEchoes = st.pendingEchoes.filter(e => e !== echo);
       const person = this.card(echo.focalId);
       if (!person?.character) continue;
-      const lead = rollFreshLead(this.rng, this.leadCtx(), () => freshId('lead-'), 'reward');
+      const lead = this.freshLead('reward');
       lead.archetype = 'rescue';
       lead.chainInfo = { kind: 'none' };
       lead.focalId = person.id;
@@ -1259,6 +1379,26 @@ export class Game {
         l.level = Math.max(band[0], Math.min(band[1], median));
       }
     }
+    // a LAPSED continuation lead ends its story cleanly (built 2026-07-10 — chains used to zombify
+    // 'active' forever with the focal stranded invisibly in limbo): the player let it lapse
+    // (STORY_ENGINE §8), so the focal slips to the lore graph and a road back exists (§21-4a)
+    for (const l of st.leads.filter(l => l.expiresAtCycle !== null && l.expiresAtCycle <= st.cycle && l.chainInfo.kind === 'continues')) {
+      const chain = st.chains.find(c => c.id === (l.chainInfo as { chainId: string }).chainId);
+      if (!chain || (chain.state !== 'active' && chain.state !== 'finale-pending')) continue;
+      chain.state = 'slipped'; chain.bank = 0;
+      const focal = this.card(chain.focalId);
+      if (focal && !chain.isPersonal && focal.location.kind === 'held' && focal.location.state === 'limbo') {
+        focal.location = HELD('lore');
+        this.ensureLoreNode(focal);
+        st.leads.push({
+          id: freshId('lead-'), rarity: chain.rarity === 'common' ? 'uncommon' : 'rare',
+          level: chain.level, region: chain.region, archetype: 'investigate',
+          chainInfo: { kind: 'starts-new' }, expiresAtCycle: null,
+          source: 'sequel', title: `${focal.name} resurfaces, someday`, focalId: focal.id,
+        });
+      }
+      report.push(`🕮 The company let "${chain.bible.title}" lapse — ${focal?.name ?? 'its center'} passes out of reach, for now.`);
+    }
     st.leads = st.leads.filter(l => l.expiresAtCycle === null || l.expiresAtCycle > st.cycle);
     for (const c of st.cards.filter(isLiability)) {
       const age = st.cycle - (st.liabilityBirth[c.id] ?? st.cycle);
@@ -1266,7 +1406,7 @@ export class Game {
       if (st.leads.some(l => l.liabilityId === c.id) ||
         st.quests.some(q => q.state === 'open' && q.liabilityId === c.id)) continue;
       if (liabilityTriggers(this.rng, age)) {
-        const lead = rollFreshLead(this.rng, this.leadCtx(), () => freshId('lead-'), 'collector');
+        const lead = this.freshLead('collector');
         lead.chainInfo = { kind: 'none' };   // a collection job is a one-off — it must be able to SETTLE
         lead.title = `The ${c.name} surfaces — deal with it`;
         lead.liabilityId = c.id;
@@ -1342,9 +1482,15 @@ export class Game {
       return `${focal?.name ?? 'the prize'} delivered clean as ${kind}, and the company is paid well for the whole affair`;
     }
     if (r.outcome === 'failure') return 'they return with empty hands (say what was lost, in-fiction)';
-    const bits = r.delivery.cards.map(c => c.character
-      ? `${c.name}${c.character.role === 'captive' ? ' taken captive' : ' (may be persuaded to stay)'}`
-      : c.qty ? `${c.qty} gold` : `the ${c.name}`);
+    // the person's REAL fate is engine-decided — deal it, or prose promises "they may stay"
+    // while the engine line says "moves on" (both shipped on one card)
+    const bits = r.delivery.cards.map(c => {
+      if (!c.character) return c.qty ? `${c.qty} gold` : `the ${c.name}`;
+      if (c.character.role === 'captive') return `${c.name} taken captive`;
+      return this.hasRoom('tavern')
+        ? `${c.name} rescued — they will wait at the fort's tavern, open to joining if hired`
+        : `${c.name} rescued — they will thank the company and MOVE ON (the fort has no place to keep them); never show them staying`;
+    });
     if (r.delivery.liability) bits.push(`a ${r.delivery.liability.name} left behind`);
     return bits.join(', ') || 'a token result';
   }
@@ -1460,7 +1606,7 @@ export class Game {
       }
     }
     for (let i = 0; i < r.delivery.leadGrants; i++) {
-      const nl = rollFreshLead(this.rng, this.leadCtx(), () => freshId('lead-'), 'reward');
+      const nl = this.freshLead('reward');
       st.leads.push(nl);
       say(`🧭 A lead earned: ${nl.title ?? 'word worth chasing'} — see the Leads tab.`);
     }
@@ -1475,13 +1621,15 @@ export class Game {
     }
     if (q.archetype === 'lead-hunt' && r.outcome !== 'failure') {
       const extra = r.outcome === 'success' ? 2 : 1;
-      for (let i = 0; i < extra; i++) st.leads.push(rollFreshLead(this.rng, this.leadCtx(), () => freshId('lead-'), 'hunt'));
+      for (let i = 0; i < extra; i++) st.leads.push(this.freshLead('hunt'));
       say(`🧭 The sweep pays: ${extra} new lead(s).`);
     }
     // lore edges from the AI (validated later in one pass)
     pendingEdges.push(...(out?.edges ?? []));
     // narrate, then the consequences — the DICE are always shown (owned loss, DESIGN §5)
-    report.push(`— ${q.title} (${q.id}) [${r.outcome.toUpperCase()}] · rolled ${r.rolled.heads} heads of ${r.rolled.totalCoins} coins vs bar ${r.rolled.totalBar.toFixed(1)}`);
+    report.push(r.rolled.totalCoins === 0
+      ? `— ${q.title} (${q.id}) [${r.outcome.toUpperCase()}] · the party had no usable dice for this work (needed ${r.rolled.totalBar.toFixed(1)})`
+      : `— ${q.title} (${q.id}) [${r.outcome.toUpperCase()}] · rolled ${r.rolled.heads} heads of ${r.rolled.totalCoins} coins vs bar ${r.rolled.totalBar.toFixed(1)}`);
     if (out) { report.push(out.before); report.push(out.after) }
     report.push(...after);
     this.log('resolve', `${q.title}: ${r.outcome}`, q.id);
@@ -1501,8 +1649,9 @@ export class Game {
    *  stake-rescues shipped in one campaign) */
   private recentCardTitles: string[] = [];
 
-  /** a fresh character name must not equal, share a 4-letter given-name stem with, or sit within
-   *  edit-distance 2 of a living one (Ulfka/Ulfnak and Harmuzzle/Magmuzzle read as twins) */
+  /** a fresh character name must not equal, share a 4-letter given-name stem OR TAIL with, or sit
+   *  within edit-distance 2 of a living one (Ulfka/Ulfnak, Harmuzzle/Magmuzzle — and Pellmund/
+   *  Nedmund read as kin by their shared tail) */
   private nameTooSimilar(name: string): boolean {
     const given = (n: string) => n.split(' ')[0]!.toLowerCase();
     const g = given(name);
@@ -1519,8 +1668,9 @@ export class Game {
     const e = epithet(name);
     const hit = (other: string) => {
       const xg = given(other);
-      // same given stem, near-identical given, or a REUSED distinctive epithet ("Redhand" ×2 NPCs)
+      // same given stem OR tail, near-identical given, or a REUSED distinctive epithet
       return other === name || xg.slice(0, 4) === g.slice(0, 4) || close(xg, g)
+        || (g.length >= 6 && xg.length >= 6 && xg.slice(-4) === g.slice(-4))
         || (!!e && epithet(other) === e);
     };
     // lore-only people count too — a coined saga warlord "Grakjaw" was re-rolled as a
@@ -1581,9 +1731,18 @@ export class Game {
   }
 
   /** the location line the writer sees — the landmark gate works by OMISSION (a shown token gets used) */
+  /** landmark rest window per region (🛠 2026-07-10) */
+  private lastLandmarkDeal: Record<string, number> = {};
+  /** recently dealt opening-spark cores (recency reroll) */
+  private recentSparks: string[] = [];
+  /** known-cast sagas served so far (§21-3 cadence: ~2 per GH tier, pool-gated) */
+  private knownCastSagas = 0;
+
   private locationLine(region: string, landmarkAllowed: boolean): string {
     const r = REGION[region]!;
-    return `${r.name} — ${landmarkAllowed ? r.seed : (r.seedPlain ?? r.seed)}`;
+    // a rotating named anchor gives the region proper nouns besides its one landmark
+    const anchor = r.anchors && this.rng.chance(0.5) ? ` Known ground: ${this.rng.pick(r.anchors)}.` : '';
+    return `${r.name} — ${landmarkAllowed ? r.seed : (r.seedPlain ?? r.seed)}${anchor}`;
   }
 
   /** a "fresh place" suggestion must never re-deal the region's own landmark (seed/ban-collision class) */
@@ -1631,7 +1790,9 @@ export class Game {
       `beat ${q.beatIndex ?? chain.beatIndex} ended in ${r.outcome.toUpperCase()}: ${storyUpdate?.currentSituation ?? chain.story.currentSituation}`;
     if (q.isFinale) return this.settleFinale(q, chain, r, report, fate);
     const bankBefore = chain.bank;
-    bankBeat(chain, r.party.length, r.outcome, q.sideLootV ?? 0);
+    // side-loot deducts what was actually DELIVERED — a partial pays out half the loot,
+    // so the bank is docked half (it was docked the full budget for half the goods)
+    bankBeat(chain, r.party.length, r.outcome, (q.sideLootV ?? 0) * (r.outcome === 'partial' ? 0.5 : 1));
     const delta = Math.round(chain.bank - bankBefore);
     const focal = this.card(chain.focalId);
     // continuation lead (cached title, zero AI)
@@ -1661,6 +1822,9 @@ export class Game {
         focalId: focal?.id,   // §21-4a: the road back leads to the SAME person
       };
       st.leads.push(sequel);
+      // the WORLD must remember the slip — a later saga once staged a slipped focal "held in
+      // your cells" because her lore node never recorded that she got away
+      if (focal) guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `at large — slipped the company when "${chain.bible.title}" ended; in no one's custody`, importance: 0.8 }], st.cycle, () => freshId('e'));
       report.push(`💨 ${focal?.name ?? 'The prize'} slips away — for now. The season's bank is forfeit. A road back exists (${fate.sequelRarity} sequel lead).`);
       return;
     }
@@ -1675,25 +1839,60 @@ export class Game {
       return;
     }
     if (!focal) return;
+    // REWARD_BANK §3 void-to-gold (built 2026-07-10 — was a silent miss): a season banked below
+    // KEEP·mark can't hold its prize — the focal slips for salvage gold instead of arriving
+    // shackled to a crushing debt. A road back exists (§21-4a).
+    if (kind !== 'gold' && chain.bank < focal.value * KEEP_THRESHOLD) {
+      const pay = Math.round(chain.bank);
+      this.addGold(pay);
+      focal.location = HELD('lore');
+      st.leads.push({
+        id: freshId('lead-'), rarity: chain.rarity === 'common' ? 'uncommon' : 'rare',
+        level: chain.level, region: chain.region, archetype: 'investigate',
+        chainInfo: { kind: 'starts-new' }, expiresAtCycle: null,
+        source: 'sequel', title: `${focal.name} resurfaces, someday`, focalId: focal.id,
+      });
+      report.push(`💨 The season ran too thin to keep ${focal.name} — the affair yields 💰 +${pay}g and they pass out of reach, for now. A road back exists.`);
+      guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `the saga ${chain.bible.title} ended with ${focal.name} out of reach`, importance: 0.85 }], st.cycle, () => freshId('e'));
+      return;
+    }
     if (kind === 'gold') {
+      // REWARD_BANK §3: cash-out pays round(bank) — same TOTAL as recruiting (the old
+      // focal.value+surplus formula paid max(mark, bank) and dominated on thin banks).
       // partial = the LESSER version of the kind (QUESTS §9) — a discounted cash-out
-      const full = Math.round(focal.value + crystallize(chain, focal.value));
+      const full = Math.round(chain.bank);
       const pay = fate.fate === 'saddled' ? Math.round(full * 0.7) : full;
       this.addGold(pay);
       focal.location = HELD('lore');
       report.push(`💰 The season crystallizes as coin: +${pay}g${fate.fate === 'saddled' ? ' (a hard bargain — the full price slipped away)' : ''}. ${focal.name} passes out of your hands.`);
-    } else {
-      focal.character!.role = kind === 'recruit' ? 'npc' : 'captive';
-      if (kind === 'recruit') { st.tavern.push({ cardId: focal.id, expiresAtCycle: st.cycle + STAGE_TTL_FINALE }); focal.location = HELD('staged') }
-      else { st.holding.push({ cardId: focal.id, expiresAtCycle: st.cycle + STAGE_TTL_FINALE }); focal.location = HELD('staged') }
+    } else if (kind === 'recruit') {
+      // §2 value-invariance: the bank already paid the mark — a recruit finale JOINS CLEAN
+      // (staging them at the tavern re-charged 1.2×mark on top; that double-charge is gone)
       const surplus = crystallize(chain, focal.value);
       this.addGold(surplus);
-      // a bank SHORT of the focal's value delivers them WITH A DEBT (QUESTS §5);
-      // the AI-slips-for-salvage variant only when catastrophically thin
+      const shortDebt = Math.max(0, Math.round(focal.value - chain.bank));
+      if (shortDebt > 0) this.addCard(mintStackable('debt', shortDebt));
+      focal.character!.role = 'merc';
+      if (this.roster().length < this.rosterCapacity()) {
+        focal.location = HELD('roster');
+        this.spawnPersonalChainLead(focal);
+        report.push(`🎬 Finale: ${focal.name} joins the company — clean${shortDebt > 0 ? `, though the season ran short: a ${shortDebt}g debt comes with them` : ''}. Surplus: ${surplus}g.`);
+      } else {
+        focal.character!.role = 'npc';
+        st.tavern.push({ cardId: focal.id, expiresAtCycle: st.cycle + STAGE_TTL_FINALE, prepaid: true });
+        focal.location = HELD('staged');
+        report.push(`🎬 Finale: ${focal.name} is yours — no roster room, so they wait at the tavern (already paid for)${shortDebt > 0 ? `; a ${shortDebt}g season-shortfall debt comes with them` : ''}. Surplus: ${surplus}g.`);
+      }
+    } else {
+      focal.character!.role = 'captive';
+      st.holding.push({ cardId: focal.id, expiresAtCycle: st.cycle + STAGE_TTL_FINALE });
+      focal.location = HELD('staged');
+      const surplus = crystallize(chain, focal.value);
+      this.addGold(surplus);
       // ONE debt rule: the shortfall between the bank and the focal's mark (QUESTS §5)
       const shortDebt = Math.max(0, Math.round(focal.value - chain.bank));
       if (shortDebt > 0) this.addCard(mintStackable('debt', shortDebt));
-      report.push(`🎬 Finale: ${focal.name} is yours — ${kind}${shortDebt > 0 ? `, but the season ran short: a ${shortDebt}g debt comes with them` : ''}. Surplus: ${surplus}g.`);
+      report.push(`🎬 Finale: ${focal.name} is yours — captive${shortDebt > 0 ? `, but the season ran short: a ${shortDebt}g debt comes with them` : ''}. Surplus: ${surplus}g.`);
     }
     guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `the saga ${chain.bible.title} ended ${fate.fate}`, importance: 0.85 }], st.cycle, () => freshId('e'));
   }

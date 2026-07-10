@@ -109,7 +109,10 @@ describe('audit-fix regressions', () => {
     const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new')!;
     await g.pursue(story.id);
     const chain = g.state.chains[0]!;
-    chain.cyclesSpent = 999; chain.bank = 40;
+    // bank thin but ABOVE the KEEP floor — below it, REWARD_BANK §3 voids to salvage gold
+    // instead of delivering with a debt (built 2026-07-10)
+    chain.cyclesSpent = 999; chain.bank = Math.round(g.card(chain.focalId)!.value * 0.6);
+    const bankSet = chain.bank;
     for (const q of [...g.state.quests]) g.abandon(q.id);
     g.state.leads.push({
       id: freshId('lead-'), rarity: chain.rarity, level: chain.level, region: chain.region,
@@ -128,10 +131,40 @@ describe('audit-fix regressions', () => {
     await g.endCycle();
     if (chain.state === 'done' && rec.rewardKind !== 'gold') {
       const focal = g.card(chain.focalId)!;
-      const expected = Math.max(0, Math.round(focal.value - 40));
+      const expected = Math.max(0, Math.round(focal.value - bankSet));
       const debts = g.state.cards.filter(c => hasTag(c.tags, 'debt'));
       const totalDebt = debts.reduce((s, d) => s + (d.qty ?? 0), 0);
       expect(totalDebt).toBe(expected);
+    }
+  });
+
+  it('REWARD_BANK §3 void-to-gold: a bank under KEEP·mark salvages gold, never a debt-saddled prize', async () => {
+    const g = richGame(61);
+    g.build('map-room'); g.build('lead-room');
+    const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new')!;
+    await g.pursue(story.id);
+    const chain = g.state.chains[0]!;
+    const focal = g.card(chain.focalId)!;
+    chain.cyclesSpent = 999; chain.bank = Math.round(focal.value * 0.2);   // far below KEEP 0.4
+    for (const q of [...g.state.quests]) g.abandon(q.id);
+    g.state.leads.push({
+      id: freshId('lead-'), rarity: chain.rarity, level: chain.level, region: chain.region,
+      archetype: 'investigate', chainInfo: { kind: 'continues', chainId: chain.id, hook: 'x' },
+      expiresAtCycle: g.state.cycle + 5, source: 'continuation',
+    });
+    await g.pursue(g.state.leads[g.state.leads.length - 1]!.id);
+    const finale = g.state.quests.find(q => q.isFinale)!;
+    const rec = finale.approaches!.find(a => a.rewardKind === 'recruit') ?? finale.approaches![0]!;
+    g.chooseApproach(finale.id, rec.id);
+    const slotIdx = finale.slots.findIndex(s => s.groupId === rec.id);
+    const merc = g.roster()[0]!;
+    merc.character!.attrs = { str: 500, dex: 500, int: 500, cha: 500, con: 500 };
+    g.assign(finale.id, slotIdx, merc.id);
+    await g.endCycle();
+    if (chain.state === 'done' && rec.rewardKind !== 'gold') {
+      expect(g.state.cards.filter(c => hasTag(c.tags, 'debt'))).toHaveLength(0);
+      expect(focal.location).toEqual({ kind: 'held', state: 'lore' });            // slipped, not delivered
+      expect(g.state.leads.some(l => l.source === 'sequel' && l.focalId === focal.id)).toBe(true);
     }
   });
 

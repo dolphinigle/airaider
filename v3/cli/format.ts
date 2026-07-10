@@ -175,7 +175,7 @@ export const render = {
       const merc = s.filledBy ? g.card(s.filledBy) : null;
       const c = merc ? ` ← ${merc.name} (${explainCoins(merc, t)})` : '';
       const req = s.requirement.kind === 'must-be' ? ` ⚑ must be ${g.card(s.requirement.cardId)?.name ?? '?'}`
-        : s.requirement.kind === 'must-have' ? ` ⚑ needs ${s.requirement.concept}` : '';
+        : s.requirement.kind === 'must-have' ? ` ⚑ needs ${s.requirement.concept}${s.requirement.minRank ? ` (${s.requirement.minRank}+)` : ''}` : '';
       lines.push(`  slot ${i}: tests ${t.attributes.join('+').toUpperCase()} (${t.difficulty}, bar ${bar})${t.favored.length ? ` favors ${t.favored.join(',')}` : ''}${t.clashing.length ? ` clashes ${t.clashing.join(',')}` : ''}${req}${c}`);
       if (!merc) {
         const cands = g.roster().filter(m => m.location.kind === 'held')

@@ -102,8 +102,9 @@ export class MockProvider implements AiProvider {
         let band: 'none' | 'low' | 'med' | 'high' = 'none';
         if (q.outcome === 'failure' && this.rng.chance(0.5)) band = this.rng.chance(0.3) ? 'med' : 'low';
         else if (q.outcome === 'partial' && this.rng.chance(0.2)) band = 'low';
-        // cause must cite the after text — the engine drops uncited wounds
-        return { characterId: p.id, band, cause: band === 'none' ? null : q.outcome === 'failure' ? 'the worst moment' : 'gets messy' };
+        // cause must NAME the merc (multi-party guard drops nameless wounds — sims were blind
+        // to the whole wound channel until 2026-07-10)
+        return { characterId: p.id, band, cause: band === 'none' ? null : `${p.name} takes a knock ${q.outcome === 'failure' ? 'at the worst moment' : 'as it gets messy'}` };
       });
       const fleshed = q.deliveredCharacters.map(c => ({
         characterId: c.id,

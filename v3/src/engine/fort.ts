@@ -44,7 +44,10 @@ export const ROOM_TYPES: RoomType[] = [
   RT('lead-room', 'Lead room', { species: 'gate', benefit: 'none', ghTier: 1, unlocks: 'leads' }),
   RT('mess-hall', 'Mess hall', { species: 'gate', benefit: 'none', ghTier: 1, unlocks: 'roster' }),
   RT('storage', 'Storage', { species: 'gate', benefit: 'none', ghTier: 1, unlocks: 'items' }),
-  RT('tavern', 'Tavern', { species: 'gate', benefit: 'none', ghTier: 2, unlocks: 'recruits' }),
+  // 🛠 2026-07-10: Tavern T2→T1 — the T2 prestige gate was ~99% of why no 30-cycle campaign ever
+  // hired (12/12 sim seeds): the doc's Tavern-at-T2 sat on a 2000-cycle pacing model (FORT §
+  // unlock table is flagged impl-calibration). With T1: Tavern ~c12, roster 4 by c20, stalls 0.
+  RT('tavern', 'Tavern', { species: 'gate', benefit: 'none', ghTier: 1, unlocks: 'recruits' }),
   RT('dungeon', 'Dungeon', { species: 'gate', benefit: 'none', ghTier: 2, unlocks: 'captives' }),
   RT('holding-cell', 'Holding cell', { species: 'gate', benefit: 'none', ghTier: 2, unlocks: 'staging' }),
   RT('library', 'Library', { species: 'gate', benefit: 'none', ghTier: 3, unlocks: 'lore' }),

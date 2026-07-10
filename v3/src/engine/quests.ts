@@ -9,7 +9,7 @@ import {
 import { rollName, rollRelicName } from './names.js';
 import { mintStackable, HELD, type Card } from './cards.js';
 import { tierOf, CONCEPT, T } from './tags.js';
-import type { Attribute } from './tags.js';
+import type { Attribute, Rank } from './tags.js';
 import { type SlotTest, type DifficultyName, type Outcome } from './roll.js';
 
 // ---- leads (QUESTS §1) -----------------------------------------------------------------
@@ -42,6 +42,9 @@ export interface LeadRollCtx {
   ghTier: number;
   rosterLevels: number[];          // active mercs' levels (level banding)
   hasDungeon: boolean;             // capture needs somewhere to put them
+  /** 🛠 2026-07-10 premise-variety: archetypes dealt recently are skipped (bag-style rotation —
+   *  uniform picks dealt fetch-object 14/24; readers named premise monotony the #1 drag) */
+  recentArchetypes?: Archetype[];
 }
 
 /** rarity ceiling rises with the fort (GH tier as the prestige quantizer) */
@@ -65,8 +68,9 @@ export function rollFreshLead(rng: Rng, ctx: LeadRollCtx, idGen: () => string,
   source: Lead['source'] = 'reward'): Lead {
   const region = rng.pick(ctx.unlockedRegions);
   const rarity = rollRarity(rng, ctx.ghTier);
-  const archetypes = ONE_OFF_ARCHETYPES.filter(a => a !== 'capture' || ctx.hasDungeon);
-  const archetype = rng.pick(archetypes);
+  const pool = ONE_OFF_ARCHETYPES.filter(a => a !== 'capture' || ctx.hasDungeon);
+  const fresh = pool.filter(a => !ctx.recentArchetypes?.includes(a));
+  const archetype = rng.pick(fresh.length ? fresh : pool);
   const startChance = rarity === 'rare' ? 0.7 : rarity === 'uncommon' ? 0.3 : 0.08;
   return {
     id: idGen(), rarity, level: rollLevel(rng, ctx, region), region, archetype,
@@ -112,7 +116,8 @@ export function recruitLead(region: string, level: number, idGen: () => string):
 // ---- quests (QUESTS §2–§5) ------------------------------------------------------------
 
 export interface QuestSlot {
-  requirement: { kind: 'open' } | { kind: 'must-be'; cardId: string } | { kind: 'must-have'; concept: string };
+  requirement: { kind: 'open' } | { kind: 'must-be'; cardId: string }
+    | { kind: 'must-have'; concept: string; minRank?: Rank };   // §9b band floor (#218)
   test: SlotTest;
   groupId?: string;                // finale mutex approach-groups
   filledBy: string | null;

@@ -14,17 +14,24 @@ export interface Region {
   seed: string;                 // 1–2 anchor lore facts
   seedPlain?: string;           // the seed WITHOUT its landmark — sent when the card may not name it
   landmark?: string;            // the seed's named landmark — engine seeds must not re-deal it
+  /** 🛠 2026-07-10 world-variety: named sub-places rotated into the location line so the one
+   *  landmark stops being the region's only proper noun (readers: Thornhollow ×8/run) */
+  anchors?: string[];
 }
 
 export const REGIONS: Region[] = [
   {
     id: 'forests', name: 'Western Forests', faction: 'elf', levelBand: [1, 8],
-    poolWeights: { elf: 4, human: 2, wolfman: 0.5, lizardman: 0.2 },
+    // 🛠 2026-07-10: elf 4→2.5 etc — elves were 60% of every roll and readers called the victim
+    // pool monotone; faction still leads (§13 poolWeights explicitly STILL OPEN / tunable)
+    poolWeights: { elf: 2.5, human: 2, wolfman: 0.75, lizardman: 0.4 },
     ghTier: 1, prev: null,
     // no ready-made epithet before the landmark's name — a shown phrase gets copied verbatim
     seed: 'Old-growth elven forests west of the fort; the ruin of Thornhollow lies at their heart.',
     seedPlain: 'Old-growth elven forests west of the fort.',
     landmark: 'Thornhollow',
+    anchors: ['the charcoal-burners\' camps', 'the old elf road', 'the river ford and its shallows',
+      'the warden-stones on the ridgeline', 'the loggers\' winter huts', 'the beekeepers\' clearings'],
   },
   {
     id: 'city', name: 'The City', faction: 'human', levelBand: [6, 16],

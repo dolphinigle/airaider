@@ -141,7 +141,7 @@ function stateView() {
           idx: i, groupId: s.groupId ?? null,
           requirement: s.requirement.kind === 'must-be'
             ? `must be ${game.card(s.requirement.cardId)?.name ?? '?'}`
-            : s.requirement.kind === 'must-have' ? `needs ${s.requirement.concept}` : null,
+            : s.requirement.kind === 'must-have' ? `needs ${s.requirement.concept}${s.requirement.minRank ? ` (${s.requirement.minRank}+)` : ''}` : null,
           test: { ...s.test, bar: slotThreshold(s.test) },
           filledBy: s.filledBy ? game.card(s.filledBy)!.name : null, filledId: s.filledBy,
           filledExplain: s.filledBy ? explainCoins(game.card(s.filledBy)!, s.test) : null,

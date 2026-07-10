@@ -23,9 +23,13 @@ export interface QuestWriteInput {
   slotCount: number;
   rewardEnvelope: string;        // "a captive and coin" — the engine's kind list, no numbers
   keywords?: string[];           // one-offs: §5 sampler (1 BOND + 1 TIE + 1-2 WILDCARDS)
-  opening: { spark: string };    // arrival SPARK, time folded in ("a friar, a plea — at dusk"): a standalone time field taught cards to open "At dusk, ...".
+  opening?: { spark: string };   // one-offs only — arrival SPARK, time folded in ("a friar, a plea — at dusk"): a standalone time field taught cards to open "At dusk, ...".
+                                 // Beats get NO spark: a random spark fought the saga (a cart from nowhere).
                                  // The landmark gate is enforced by OMISSION: a card that may not name the
                                  // landmark simply never sees it in `location` (a shown token gets used).
+  intake?: string;               // one-offs: engine-rolled FACT of how word reached the company (quarryTags
+                                 // pattern — the POV-lock otherwise makes "a messenger arrives" the model's
+                                 // only epistemic device; ~92% of cards opened on one)
   gravity?: string;              // one-offs: engine-rolled weight of the matter ("a small, everyday job" … "a grave affair")
   npcNameSuggestions?: string[]; // one-offs: engine-rolled names for any people the card must name (§4b)
   rewardItems?: string[];        // one-offs: the pre-rolled prize objects — fiction naming the prize must use these

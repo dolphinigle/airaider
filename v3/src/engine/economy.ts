@@ -239,8 +239,15 @@ export function splitOneOff(rng: Rng, V: number, archetype: Archetype): RewardSp
       break;
     }
     case 'hunt': case 'investigate': {
-      const s = unitShare(0.3, 0.6);
-      out.push({ kind: 'relic', value: V * s }, { kind: 'gold', value: V * (1 - s) });
+      // 🛠 2026-07-10: was ALWAYS relic-primary — with escort/raid relic chances on top, ~half of
+      // all one-offs read as fetch-the-object (premise monotony). Sometimes the prize is coin,
+      // or coin and a trail worth following.
+      if (rng.chance(0.65)) {
+        const s = unitShare(0.3, 0.6);
+        out.push({ kind: 'relic', value: V * s }, { kind: 'gold', value: V * (1 - s) });
+      } else if (rng.chance(0.4)) {
+        out.push({ kind: 'lead', value: V * 0.3 }, { kind: 'gold', value: V * 0.7 });
+      } else out.push({ kind: 'gold', value: V });
       break;
     }
     case 'lead-hunt': {

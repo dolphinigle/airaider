@@ -34,12 +34,17 @@ for (let c = 0; c < cycles; c++) {
     if (!st || st.reason === 'already built') continue;
     if (st.reason?.startsWith('costs')) break;
     if (st.reason) continue;
+    const goldBefore = g.gold();
     g.build(b);
+    say(`c${g.state.cycle} BUILD ${b} (−${goldBefore - g.gold()}g)`);   // spends were invisible to readers
     break;
   }
   const up = g.state.fort.rooms.filter(r => ROOM_TYPE[r.type]!.species === 'comfort')
     .sort((a, b) => a.slots.length - b.slots.length)[0];
-  if (up && g.gold() > 300) g.upgrade(up.id);
+  if (up && g.gold() > 300) {
+    const goldBefore = g.gold();
+    if (g.upgrade(up.id).ok) say(`c${g.state.cycle} UPGRADE ${up.type} (−${goldBefore - g.gold()}g)`);
+  }
   for (const room of g.state.fort.rooms) {
     const rt = ROOM_TYPE[room.type]!;
     if (rt.species !== 'comfort' || rt.benefit === 'break') continue;
@@ -102,7 +107,8 @@ for (let c = 0; c < cycles; c++) {
       g.assign(q.id, i, best.id);
     }
     const o = g.questOdds(q.id);
-    if (o.coins > 0 && o.coins < o.bar * 0.7 && !q.isFinale) g.abandon(q.id);
+    // 0-coin parties are GUARANTEED losses — the old `coins > 0 &&` guard marched them (3×/run)
+    if (o.coins < o.bar * 0.7 && !q.isFinale) g.abandon(q.id);
   }
   const report = await g.endCycle();
   for (const line of report) say(`  ${line}`);
