@@ -79,7 +79,9 @@ for (let c = 0; c < cycles; c++) {
     const r = await g.pursue(lead.id);
     if (r.ok && r.questId) {
       const q = g.state.quests.find(x => x.id === r.questId)!;
-      say(`\nc${g.state.cycle} ▶ CARD [${q.rarity} ${q.archetype}${q.chainId ? ` · ${q.isFinale ? 'FINALE' : `beat ${q.beatIndex}`}` : ''}] ${q.title}`);
+      // saga cards carry no meaningful archetype (beats serve the bible) — the label lied
+      // ("[hunt · beat 1]" → "[investigate · FINALE]" read as a mid-saga family flip)
+      say(`\nc${g.state.cycle} ▶ CARD [${q.rarity}${q.chainId ? ` · ${q.isFinale ? 'FINALE' : `beat ${q.beatIndex}`}` : ` ${q.archetype}`}] ${q.title}`);
       say(`  (roster now: ${g.roster().map(m => m.name).join(', ')})`);
       say(`  ${q.situation}`);
       say(`  [list line: ${q.job}]`);   // NOT on the player's card (2026-07-06 merge) — lists only
