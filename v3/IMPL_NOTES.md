@@ -1003,3 +1003,16 @@ rule inverted positive-first; genesis want example → schematic; custody instan
 fidget-ban lists reconciled; care-beat meta-commentary trimmed). KEEP-BUT-WATCH guards untouched:
 messenger triple, before-opener menu (needs an engine seed), per-field quote bans, trait-adverb
 dup. Cleared as house-style: schematic examples ("X did A"), §5 token bans, definitional glosses | prompt |
+| 316-319 | loop-6 (campaign-4 judge, 7/10): approach-label kind-verbs; lapsed unmarched beats
+re-offer VERBATIM from cache 🛠 (fresh retellings drifted settled facts); kernel fingerprint +=
+arc steps; surplus line self-explains | engine+prompt |
+| 320 | loop-7 (campaign-5 judge, 7/10, "one focused loop then converged"): **arcStep dealt
+verbatim** — writers fumbled indexing arc[beat-1] and scoped beat 1 to the WHOLE goal (5/6 sagas
+retconned; the single dominant class) — the engine now hands each card its one step; finale
+premise may not contradict knownToPlayer | engine+prompt |
+| 321 | riders: client window includes last-3 closed chains (Hildine cliented 5/6 sequentially);
+'fresh trail' scrubbed from the lead envelope (leaked into titles ×32); intake hunt/reward strings
+de-quotabled; sceneFacet engine seed for before-text openings ('crouched' terrain owned 22/30 —
+the §2 fix the audit prescribed); 'Pay is coin.' mechanical rotation; flesh avoidQuirks (one tic
+landed on 4 people); finale memory edge records the approach ARRANGEMENT (informer deals were
+invisible to dossiers); stall set-aside prints one line, not two | engine+prompt+seed |

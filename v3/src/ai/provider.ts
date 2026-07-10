@@ -45,6 +45,9 @@ export interface QuestWriteInput {
   relevantLore?: { id: string; name: string; blurb: string; relationPhrase: string; companySoldier?: boolean; companyCaptive?: boolean; dossier?: string }[];
   focalDossier?: string;         // what the world currently remembers of the focal (evolves each cycle)
   beatIndex?: number; expectedBeats?: number;
+  arcStep?: string;              // the ONE arc step this card covers, dealt verbatim (models
+                                 // fumbled indexing arc[beat-1] themselves — beat 1 cards scoped
+                                 // to the whole GOAL and later beats had to retcon)
   focalName?: string;
   focalIsMerc?: boolean;         // personal saga: the focal is one of the player's own soldiers
   framedCharacter?: { name: string; tags: string; pronoun?: string; dossier?: string; lastSeen?: string; partial?: boolean } | null;  // one-offs: the person to frame (pronoun explicit; lastSeen = a returning person's story so far; partial = identity only — the writer SHAPES them via quarryTags, §4 pattern-B)
@@ -101,6 +104,8 @@ export interface ResolveQuestInput {
   rarity: string;                // drives the word budget
   outcome: 'success' | 'partial' | 'failure';
   party: { id: string; name: string; tags: string; dossier: string }[];
+  sceneFacet?: string;           // engine-rolled facet the before-text opens on (§2 seed —
+                                 // 'crouched' terrain openers owned 22 of ~30 reports)
   deliveredSummary: string;      // engine-computed delivery, named for the AI to narrate
   deliveredCharacters: { id: string; name: string; tags: string }[]; // to flesh (who/backstory)
   chainContext?: {
@@ -136,6 +141,8 @@ export interface FleshInput {
     situation: string;       // where the story stands now
     want: string | null;     // what the bible says they want
   };
+  avoidQuirks?: string[];    // habits living characters already own — same tic on 4 people reads
+                             // as a copy-paste world
 }
 export interface FleshOut {
   characterId: string;

@@ -825,8 +825,8 @@ export class Game {
     // variants per source — one fixed string per channel became its own stamp
     const specialPools: Partial<Record<Lead['source'], string[]>> = {
       interrogation: ['a captive in the company\'s cells gave it up', 'it was traded out of the cells for small comforts'],
-      hunt: ['the company\'s own searching turned it up', 'it lay across the path of the last sweep', 'the hunt for other things led here'],
-      reward: ['word of it came home with the last job', 'the last job left this thread hanging', 'it grew out of business already done'],
+      hunt: ['the company\'s own searching turned it up', 'it was found while looking for something else', 'it turned up on a routine pass'],
+      reward: ['word of it came home with the last job', 'it grew out of business already done'],
       collector: ['a debt long owed to the company has come due', 'an old obligation has surfaced'],
     };
     const special: Partial<Record<Lead['source'], string>> = Object.fromEntries(
@@ -856,8 +856,9 @@ export class Game {
       level: lead.level, rarity: lead.rarity,
       // engine kind names are NOT writer-safe: 'lead' read as the METAL (12 lead-bar fetches in
       // one campaign, "a parcel of lead" pay in another) — translate kinds to plain words
+      // no catchy nouns here — 'a fresh trail' leaked from this envelope into titles ×32/run
       slotCount: n, rewardEnvelope: specs.map(s => (
-        { lead: 'a fresh trail to further work (knowledge, never an object)', relic: 'a prize object',
+        { lead: 'knowledge of where further work waits (never an object)', relic: 'a prize object',
           recruit: 'a person who may join the company', captive: 'a person taken', gold: 'coin' } as Record<string, string>
       )[s.kind] ?? s.kind).join(' + '),
       keywords: sampleKeywords(this.rng),
@@ -1036,8 +1037,10 @@ export class Game {
       const clash = avoid.find(a => { const aw = words(a); let hit = 0; kw.forEach(w => { if (aw.has(w)) hit++ }); return hit >= 3 });
       // same-CLIENT guard (mechanical — the prompt rule alone left one lore client running
       // three sagas at once): a live chain's client may not client the new saga too
-      const liveClients = new Set(this.state.chains
-        .filter(c => c.state === 'active' || c.state === 'finale-pending')
+      // live chains AND the last few closed ones — one rescue NPC once cliented 5 of 6
+      // sequential sagas (the live-only window let her straight back in each time)
+      const liveClients = new Set([...this.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending'),
+        ...this.state.chains.slice(-3)]
         .flatMap(c => c.bible.cast.filter(x => x.role === 'client' && x.loreId).map(x => x.loreId!)));
       const clientDup = g.cast.find(x => x.role === 'client' && x.loreId && liveClients.has(x.loreId));
       if (clash || clientDup) {
@@ -1158,6 +1161,10 @@ export class Game {
       relevantLore,
       focalDossier: (d => d.includes('\n') ? d : undefined)(this.dossier(chain.focalId)),
       beatIndex: chain.beatIndex + 1, expectedBeats: chain.expectedBeats,
+      // the ONE step this card covers, dealt verbatim — writers fumbled indexing arc[beat-1]
+      // and scoped beat 1 to the whole goal
+      arcStep: isFinale ? chain.bible.arc[chain.bible.arc.length - 1]
+        : chain.bible.arc[Math.min(chain.beatIndex, chain.bible.arc.length - 1)],
       focalName: focal?.name,
       // runtime truth, not genesis-time: a focal HIRED mid-saga is the company's own now
       focalIsMerc: focal?.character?.role === 'merc',
@@ -1312,8 +1319,7 @@ export class Game {
       if (filled === 0) { q.stalls = 0; continue }
       q.stalls = (q.stalls ?? 0) + 1;
       if (q.stalls >= 3 && !q.isFinale) {
-        this.abandonQuest(q, report);
-        report.push(`⏸ ${q.title}: three cycles without a full party — the company sets it aside.`);
+        this.abandonQuest(q, report);   // its own lapse line suffices — a second read as spam
       } else {
         report.push(`⏸ ${q.title} did not march — every slot must be filled (${filled} of ${active.length}).`);
       }
@@ -1341,6 +1347,9 @@ export class Game {
       // habits reach the narrator only ~40% of the time — a habit not shown cannot become a
       // signature stamp (the scar-tic appeared in 9 of 15 resolutions when always sent)
       party: r.party.map(p => ({ id: p.id, name: p.name, tags: renderTags(p.tags), dossier: this.dossier(p.id, { habits: this.rng.chance(0.25) }) })),
+      // §2 engine seed: which facet the before-text opens on (terrain-tableau owned the slot)
+      sceneFacet: this.rng.pick(['the ground and what stands on it', 'the weather and the light',
+        'what can be heard', 'the people in view', 'the enemy\'s posture or handiwork', 'a thing out of place']),
       deliveredSummary: this.describeDelivery(r),
       // a finale's delivered PERSON is the focal — give them an id here so the narrator can
       // flesh them from the saga's own fiction and tie edges to them (they had no entry before)
@@ -2016,7 +2025,9 @@ export class Game {
       if (shortDebt > 0) this.addCard(mintStackable('debt', shortDebt));
       report.push(`🎬 Finale: ${focal.name} is yours — captive${shortDebt > 0 ? `, but the season ran short: a ${shortDebt}g debt comes with them` : ''}. Surplus: ${surplus}g (the bank beyond their mark).`);
     }
-    guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `the saga ${chain.bible.title} ended ${fate.fate}`, importance: 0.85 }], st.cycle, () => freshId('e'));
+    // the ARRANGEMENT joins the memory — dossiers once missed that a focal ended as a paid
+    // informer because only the outcome word was recorded
+    guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `the saga ${chain.bible.title} ended ${fate.fate}${approach ? ` — the company's way: ${approach.label}` : ''}`, importance: 0.85 }], st.cycle, () => freshId('e'));
   }
 
   /** give who/backstory/quirks to any owned/staged character that lacks them (ONE batched call) */
@@ -2053,6 +2064,8 @@ export class Game {
             situation: genesis.story.currentSituation,
             want: genesis.bible.cast.find(e => e.name === c.name)?.want ?? null,
           } : undefined,
+          // cross-batch quirk dedup — "tilts head when listening" landed on 4 people
+          avoidQuirks: st.cards.flatMap(x => x.character?.quirks ?? []).slice(-10),
         };
       }));
       for (const o of outs) {
