@@ -1364,6 +1364,10 @@ export class Game {
         bible: this.state.chains.find(c => c.id === r.quest.chainId)?.bible,
         storyState: this.state.chains.find(c => c.id === r.quest.chainId)?.story,
         isFinale: !!r.quest.isFinale,
+        // the ONE step this job covers — resolutions overreached even when the card was scoped
+        arcStep: (c => c && r.quest.beatIndex
+          ? c.bible.arc[Math.min(r.quest.beatIndex - 1, c.bible.arc.length - 1)] : undefined
+        )(this.state.chains.find(c => c.id === r.quest.chainId)),
         focalName: (c => c ? this.card(c.focalId)?.name : undefined)(this.state.chains.find(c => c.id === r.quest.chainId)),
         // the fate reaches the narrator as a plain SENTENCE (the raw token "clean" read as an
         // adjective and collided with 'success = done clean'; the climax must not be a guess)
@@ -1826,16 +1830,22 @@ export class Game {
       ? await this.ai.select({ purpose, candidates: candidates.map(c => ({ id: c.node.id, name: c.node.name, blurb: c.node.blurb, relationPhrase: c.relationPhrase })), max: 4 })
       : candidates.map(c => c.node.id);
     return candidates.map(c => {
-      const role = this.card(c.node.id)?.character?.role;
+      const card = this.card(c.node.id);
+      const role = card?.character?.role;
       // a soldier/captive's company relation OVERRIDES a "thematic wildcard" phrase — the two contradicted
       const relationPhrase = role === 'merc' ? "one of the company's own soldiers"
         : role === 'captive' ? "held in the company's cells" : c.relationPhrase;
+      // anyone physically AT the fort (tavern guest, staged) must not be cast as an off-site
+      // faction leader — a tavern guest was once written leading a hamlet while she waited
+      const atTheFort = !!card && card.location.kind === 'held' &&
+        ['roster', 'staged', 'inventory'].includes((card.location as { state?: string }).state ?? '');
       // a dossier that is just "name — tags" adds nothing over the blurb — send only fuller ones
       const d = picked.includes(c.node.id) ? this.dossier(c.node.id) : '';
       return {
         id: c.node.id, name: c.node.name, blurb: c.node.blurb, relationPhrase,
         companySoldier: role === 'merc' || undefined,
         companyCaptive: role === 'captive' || undefined,
+        atTheFort: atTheFort || undefined,
         dossier: d.includes('\n') ? d : undefined,
       };
     });
