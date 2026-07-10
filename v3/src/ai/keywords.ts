@@ -430,7 +430,7 @@ const ARRIVAL_SIGNS = ['smoke on the ridge', 'bells from the valley, wrong hour'
 // permission to skip the bringer never supplied a replacement, so this supplies one.
 const PATROL_SPARKS = ['a returning patrol saw it', 'one of your soldiers heard it on the road back',
   'the wood-detail came back full of talk', 'your forager marked the spot and hurried home',
-  'the night watch counted lights where none should burn', 'a scout\'s report, two days stale'];
+  'the night watch marked fires on the far ridge', 'a scout\'s report, two days stale'];
 const TALK_SPARKS = ['talk at the market', 'a quarrel overheard at the mill',
   'the tavern keeps repeating one name', 'washerwomen trading the same story',
   'a sermon that named no names but meant one', 'carters who all take the long way round now'];
@@ -439,12 +439,14 @@ const NOTICE_SPARKS = ['a posted bounty', 'a notice nailed at the crossroads',
   'a magistrate\'s writ, badly copied'];
 
 export type IntakeChannel = 'bringer' | 'sign' | 'patrol' | 'talk' | 'notice';
-const INTAKE_FACT: Record<IntakeChannel, string> = {
-  bringer: 'someone came to the fort with it',
-  sign: 'it was seen — or missed — from the fort itself; no one brought it',
-  patrol: 'the company\'s own people brought it back from outside',
-  talk: 'it was picked up from common talk in the country nearby',
-  notice: 'it stands promised in public writing — no one carried it to you in person',
+// VARIANTS per channel — a single fact string became a stamp ("The company's own sweep" ×3/run),
+// and a negation in one ("no one brought it") leaked onto cards verbatim
+const INTAKE_FACT: Record<IntakeChannel, string[]> = {
+  bringer: ['someone came to the fort with it', 'it was carried to the gate in person'],
+  sign: ['it was seen from the fort\'s own walls', 'the fort noticed it before anyone spoke of it'],
+  patrol: ['the company\'s own people came back with it', 'it came home with the last patrol'],
+  talk: ['it was picked up from common talk in the country nearby', 'the countryside is talking of it'],
+  notice: ['it stands promised in public writing', 'it is posted for any taker'],
 };
 
 // a saga's CARE beat must not open on blood or menace
@@ -463,7 +465,7 @@ export function sampleOpening(rng: Rng, opts?: { gentle?: boolean; channel?: Int
   // time only SOMETIMES seasons the spark — any time token at all kept teaching cards to open
   // "At dusk, ..." (~50% even after folding + an explicit ban); most cards get no clock to lead with
   const spark = channel === 'bringer' && rng.chance(0.3) ? `${core} — ${rng.pick(OPENING_TIMES)}` : core;
-  return { spark, landmarkAllowed: rng.chance(0.15), channel, intake: INTAKE_FACT[channel] };
+  return { spark, landmarkAllowed: rng.chance(0.15), channel, intake: rng.pick(INTAKE_FACT[channel]) };
 }
 
 /** one-off gravity — not every job is dire (v2's per-card register knob, rarity-weighted).

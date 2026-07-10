@@ -96,7 +96,10 @@ export function finaleReady(chain: Chain): boolean {
   // the LAST arc step IS the finale: beats consume steps 1..N-1 only. (Running beats to N and
   // THEN firing a finale re-staged the climax — the figurine was opened before the moot twice.)
   if (chain.beatIndex >= chain.expectedBeats - 1) return true;
-  const target = chain.expectedBeats * 1.5; // S̄ per beat
+  // 🛠 2026-07-10: 1.5 merc-cycles/beat fired the finale after ~2 beats once parties grew to 3 —
+  // arcs truncated mid-step and finales re-staged undone work. The cycle gate is a STALL guard
+  // only now; the beat count above is the normal trigger.
+  const target = chain.expectedBeats * 3;
   return chain.cyclesSpent >= target || chain.failures >= chain.failureBudget;
 }
 

@@ -289,4 +289,6 @@ export function newFort(): FortState {
   };
 }
 
-export const BUNK_ROSTER_SLOTS = 4;  // 🛠 starter roster base; merc bedrooms +1 each
+export const BUNK_ROSTER_SLOTS = 5;  // 🛠 starter roster base; merc bedrooms +1 each
+                                     // (4→5 2026-07-10: with 3 starters, cap 4 left ONE hire —
+                                     // 5 of 6 tavern guests walked in a confirm campaign)

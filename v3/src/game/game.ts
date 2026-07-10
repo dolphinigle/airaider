@@ -574,6 +574,7 @@ export class Game {
     this.state.holding = this.state.holding.filter(s => s.cardId !== captiveId);
     this.state.breaking = this.state.breaking.filter(b => b.cardId !== captiveId);
     this.addGold(pay);
+    this.noteCustodyChange(card.id, `${card.name} was ransomed away — no longer in the company's hands`);
     this.log('ransom', `${card.name} ransomed for ${pay}g.`);
     return { ok: true, msg: `+${pay}g` };
   }
@@ -592,6 +593,7 @@ export class Game {
       this.state.holding = this.state.holding.filter(s => s.cardId !== id);
       this.state.breaking = this.state.breaking.filter(b => b.cardId !== id);
       this.addGold(pay);
+      this.noteCustodyChange(card.id, `${card.name} was sold on — no longer in the company's hands`);
       this.log('sell', `${card.name} sold for ${pay}g.`);
       return { ok: true, msg: `+${pay}g` };
     }
@@ -820,12 +822,15 @@ export class Game {
     }
     // 🛠 2026-07-10 intake channel: the lead's PROVENANCE (which the engine always knew and threw
     // away) becomes a dealt fact — interrogations/hunts/rewards/debts stop reading as messengers
-    const special: Partial<Record<Lead['source'], string>> = {
-      interrogation: 'a captive in the company\'s keeping gave it up',
-      hunt: 'the company\'s own sweep turned it up',
-      reward: 'your people brought word of it back from the last job',
-      collector: 'a debt long owed to the company has come due',
+    // variants per source — one fixed string per channel became its own stamp
+    const specialPools: Partial<Record<Lead['source'], string[]>> = {
+      interrogation: ['a captive in the company\'s cells gave it up', 'it was traded out of the cells for small comforts'],
+      hunt: ['the company\'s own searching turned it up', 'the search parties came back with more than they went for'],
+      reward: ['word of it came home with the last job', 'the last job left this thread hanging'],
+      collector: ['a debt long owed to the company has come due', 'an old obligation has surfaced'],
     };
+    const special: Partial<Record<Lead['source'], string>> = Object.fromEntries(
+      Object.entries(specialPools).map(([k, v]) => [k, this.rng.pick(v!)]));
     const sparkOpts = {
       channel: lead.source === 'hunt' || lead.source === 'reward' ? 'patrol' as const
         : lead.source === 'collector' ? 'notice' as const : undefined,
@@ -1000,7 +1005,8 @@ export class Game {
     // ("Ashveil" once stamped three unrelated clients across chains)
     this.recentNpcNames.push(...assignedNames);
     while (this.recentNpcNames.length > 60) this.recentNpcNames.shift();
-    const avoid = this.state.chains.slice(-5).map(c => `${c.bible.title} — ${c.bible.kernel}`);
+    const avoid = this.state.chains.slice(-5).map(c =>
+      `${c.bible.title} — ${c.bible.kernel} (people: ${c.bible.cast.map(x => x.name).join(', ')})`);
     const genesisInput = {
       seed: sampleSeed(this.rng), keywords: sampleKeywords(this.rng),
       // most sagas must live AWAY from the landmark — omission beats the ignored "set it elsewhere"
@@ -1021,7 +1027,9 @@ export class Game {
     {
       const stop = new Set('the,a,an,of,to,in,that,and,who,for,with,on,at,by,from,their,its,his,her,they,them,into,over,under'.split(','));
       const words = (s: string) => new Set((s.toLowerCase().match(/[a-z]+/g) ?? []).filter(w => w.length > 3 && !stop.has(w)));
-      const kw = words(`${g.title} ${g.kernel}`);
+      // cast + coined places join the fingerprint — five deliver-to-a-ceremony sagas with the
+      // same client shipped in one run while title+kernel alone stayed just under the bar
+      const kw = words(`${g.title} ${g.kernel} ${g.cast.map(c => `${c.name} ${c.role}`).join(' ')} ${g.newPlaces.map(p => p.name).join(' ')}`);
       const clash = avoid.find(a => { const aw = words(a); let hit = 0; kw.forEach(w => { if (aw.has(w)) hit++ }); return hit >= 3 });
       if (clash) {
         g = await this.ai.genesis({ ...genesisInput, avoid: [...avoid, `your rejected draft "${g.title} — ${g.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground`] });
@@ -1093,7 +1101,8 @@ export class Game {
       // directions are the hidden truth and must never seed a surface the UIs display. The
       // taking-up framing keeps beat-1 writers from posing the whole errand (R22: a bare goal
       // as currentSituation read as "things already stand at the goal")
-      story: { currentSituation: `The company has just taken this up — the aim as the client puts it: ${g.goal}`, knownToPlayer: [], openThreads: [], actorStates: {}, introducedNames: [] },
+      // "has just taken this up" contradicted beat 1's own definition (the taking-up IS beat 1)
+      story: { currentSituation: `The matter is before the company — the aim as the client puts it: ${g.goal}`, knownToPlayer: [], openThreads: [], actorStates: {}, introducedNames: [] },
       state: 'active', createdCycle: this.state.cycle,
     };
     focal.chainIds.push(chain.id);
@@ -1126,14 +1135,15 @@ export class Game {
       rosterNames: this.rosterForWriters().names,
       rosterPronouns: this.rosterForWriters().pronouns,
       lastBeatOutcome: chain.lastGeneratedBeat === chain.beatIndex + 1
-        ? `${chain.story.lastBeatOutcome ?? ''} This same step was posed before and went untaken — pose it AFRESH with a different bringer and telling, but the SAME places and people: the world did not move while the company sat.`.trim()
+        ? `${chain.story.lastBeatOutcome ?? ''} This same step was posed before and went untaken — pose it AFRESH in a new telling, but the SAME places and people: the world did not move while the company sat.`.trim()
         : chain.story.lastBeatOutcome,
       bible: chain.bible, storyState: chain.story,
       relevantLore,
       focalDossier: (d => d.includes('\n') ? d : undefined)(this.dossier(chain.focalId)),
       beatIndex: chain.beatIndex + 1, expectedBeats: chain.expectedBeats,
       focalName: focal?.name,
-      focalIsMerc: chain.isPersonal && focal?.character?.role === 'merc',
+      // runtime truth, not genesis-time: a focal HIRED mid-saga is the company's own now
+      focalIsMerc: focal?.character?.role === 'merc',
     });
     // QUESTS §6: middle-beat side-loot = gold OR a relic among it (was always bare gold)
     const specs: RewardSpec[] = isFinale ? [] : [{ kind: 'gold' as const, value: sideLootV }];
@@ -1304,13 +1314,25 @@ export class Game {
       // signature stamp (the scar-tic appeared in 9 of 15 resolutions when always sent)
       party: r.party.map(p => ({ id: p.id, name: p.name, tags: renderTags(p.tags), dossier: this.dossier(p.id, { habits: this.rng.chance(0.25) }) })),
       deliveredSummary: this.describeDelivery(r),
-      deliveredCharacters: r.delivery.cards.filter(c => c.character).map(c => ({ id: c.id, name: c.name, tags: renderTags(c.tags) })),
+      // a finale's delivered PERSON is the focal — give them an id here so the narrator can
+      // flesh them from the saga's own fiction and tie edges to them (they had no entry before)
+      deliveredCharacters: [
+        ...r.delivery.cards.filter(c => c.character).map(c => ({ id: c.id, name: c.name, tags: renderTags(c.tags) })),
+        ...(r.quest.isFinale && r.fate && r.fate.fate !== 'slipped'
+          ? (f => f ? [{ id: f.id, name: f.name, tags: renderTags(f.tags) }] : [])(
+              this.card(this.state.chains.find(c => c.id === r.quest.chainId)?.focalId ?? ''))
+          : []),
+      ],
       chainContext: r.quest.chainId ? {
         bible: this.state.chains.find(c => c.id === r.quest.chainId)?.bible,
         storyState: this.state.chains.find(c => c.id === r.quest.chainId)?.story,
         isFinale: !!r.quest.isFinale,
-        fate: r.fate?.fate,
+        focalName: (c => c ? this.card(c.focalId)?.name : undefined)(this.state.chains.find(c => c.id === r.quest.chainId)),
+        // the fate reaches the narrator as a plain SENTENCE (the raw token "clean" read as an
+        // adjective and collided with 'success = done clean'; the climax must not be a guess)
+        fate: r.fate ? this.fateSentence(r) : undefined,
         approach: r.quest.approaches?.find(a => a.id === r.quest.chosenApproach)?.label,
+        rejectedApproaches: r.quest.approaches?.filter(a => a.id !== r.quest.chosenApproach).map(a => a.label),
       } : undefined,
     }));
     const aiOuts = aiInputs.length ? await this.ai.resolve(aiInputs) : [];
@@ -1328,12 +1350,14 @@ export class Game {
     this.healingPass();
     decayPass(st.lore, st.cycle);
     this.breakingPass(report);
-    // staged people who time out LEAVE — to the lore graph, never orphaned in 'staged'
-    for (const s of st.tavern.filter(s => s.expiresAtCycle <= st.cycle)) {
+    // staged people who time out LEAVE — to the lore graph, never orphaned in 'staged'.
+    // A PREPAID guest (a won finale prize waiting on roster room) never walks: the mark was
+    // paid — they wait ("Brugrim drank up and left" turned a won saga into a debt and nothing)
+    for (const s of st.tavern.filter(s => s.expiresAtCycle <= st.cycle && !s.prepaid)) {
       const c = this.card(s.cardId);
-      if (c) { this.ensureLoreNode(c); c.location = HELD('lore'); report.push(`${c.name} drank up and left the tavern.`) }
+      if (c) { this.ensureLoreNode(c); c.location = HELD('lore'); this.noteCustodyChange(c.id, `${c.name} moved on — no longer at the fort`); report.push(`${c.name} drank up and left the tavern.`) }
     }
-    st.tavern = st.tavern.filter(s => s.expiresAtCycle > st.cycle);
+    st.tavern = st.tavern.filter(s => s.expiresAtCycle > st.cycle || s.prepaid);
     // 🛠 2026-07-10: a timed-out captive is never a pure loss — the company hands them off at
     // the slaver's quick price (an ACTIVE ransom before the clock still pays better; a Dungeon
     // keeps them). Zero-payoff evaporation made won finales feel hollow.
@@ -1344,11 +1368,32 @@ export class Game {
         this.ensureLoreNode(c); c.location = HELD('lore');
         this.addGold(pay);
         guardEdges(st.lore, [{ from: c.id, to: c.id, type: 'party-to', blurb: 'handed off by the company when their holding lapsed — no longer at the fort', importance: 0.7 }], st.cycle, () => freshId('e'));
+        this.noteCustodyChange(c.id, `${c.name} was handed off — no longer in the company's hands`);
         this.log('sell', `${c.name} handed off at the quick price (holding lapsed).`);
         report.push(`⛓ Time ran out on ${c.name} — handed off at the quick price. 💰 +${pay}g (a ransom before the clock pays better).`);
       }
     }
     st.holding = st.holding.filter(s => s.expiresAtCycle > st.cycle);
+
+    // 4b) STAND-DOWN (built 2026-07-10): a quest that cannot POSSIBLY march — its empty slots
+    // outnumber every free fit soldier — releases its parked party. Three soldiers split 1+2
+    // across a 2-slot and a 3-slot quest once froze the fort for six straight cycles.
+    for (const q of st.quests.filter(q => q.state === 'open')) {
+      const active = q.slots.filter(s => !q.approaches || s.groupId === q.chosenApproach);
+      const empty = active.filter(s => !s.filledBy).length;
+      const parked = active.filter(s => s.filledBy).length;
+      if (!parked || !empty) continue;
+      const freeFit = this.roster().filter(m => m.location.kind === 'held' && m.character!.injuryTiers < 4).length;
+      if (freeFit < empty) {
+        for (const s of active) {
+          if (!s.filledBy) continue;
+          const m = this.card(s.filledBy);
+          if (m) m.location = HELD('roster');
+          s.filledBy = null;
+        }
+        report.push(`⏸ ${q.title}: the plan needs more hands than the company can field — the party stands down.`);
+      }
+    }
 
     // 5) pursued-quest expiry (impl ruling on QUESTS §10 🟡: TTL 10; a lapsed chain
     // beat respawns its continuation lead — the story waits, the quest doesn't)
@@ -1473,17 +1518,40 @@ export class Game {
     return active.length > 0 && active.every(s => s.filledBy);   // ALL party slots filled (no partial sends)
   }
 
+  /** custody changes must reach the STORY STATE of every saga the person anchors — a finale
+   *  card once staged "your captive Heleis" three cycles after she was ransomed away */
+  private noteCustodyChange(cardId: string, fact: string) {
+    for (const ch of this.state.chains.filter(c =>
+      (c.state === 'active' || c.state === 'finale-pending') && c.focalId === cardId)) {
+      ch.story.knownToPlayer.push(`SETTLED: ${fact}`);
+    }
+  }
+
+  /** the finale fate, told as a plain SENTENCE the narrator can land on — the raw token
+   *  ("clean") read as an adjective and collided with 'success = done clean' */
+  private fateSentence(r: Resolution): string {
+    const chain = this.state.chains.find(c => c.id === r.quest.chainId);
+    const focal = chain ? this.card(chain.focalId) : undefined;
+    const name = focal?.name ?? 'the central person';
+    // a focal ALREADY on the roster never "slips away" — that sentence once ran on the
+    // company's own scout while he stood in the yard
+    if (focal?.character?.role === 'merc') {
+      return r.fate!.fate === 'slipped'
+        ? `the matter around ${name} slips out of reach — nothing comes of it this time; ${name} stays with the company`
+        : `the matter closes around ${name}, who already stands with the company`;
+    }
+    const kind = r.quest.approaches?.find(a => a.id === r.quest.chosenApproach)?.rewardKind ?? 'gold';
+    if (r.fate!.fate === 'slipped') return `${name} gets away — the company comes away with nothing this time (a road back will exist)`;
+    const ending = kind === 'recruit' ? `${name} ends this saga siding with the company and will ride with it from here`
+      : kind === 'captive' ? `${name} ends this saga held, in the company's hands`
+      : `${name} passes out of the company's reach, and the company is paid for the whole affair`;
+    return r.fate!.fate === 'saddled' ? `${ending} — but at a visibly worse bargain than hoped` : ending;
+  }
+
   private describeDelivery(r: Resolution): string {
     if (r.quest.isFinale && r.fate && r.quest.chainId) {
-      const chain = this.state.chains.find(c => c.id === r.quest.chainId);
-      const focal = chain ? this.card(chain.focalId) : undefined;
-      const approach = r.quest.approaches?.find(a => a.id === r.quest.chosenApproach);
-      const kind = approach?.rewardKind ?? 'gold';
-      // fate strings feed the narrator VERBATIM as the truth to land on — keep them fiction-safe
-      // (an earlier "season's surplus" wording got reified into prose as a physical object)
-      if (r.fate.fate === 'slipped') return `${focal?.name ?? 'the prize'} slips out of reach — the company comes away with nothing this time (though a road back will exist)`;
-      if (r.fate.fate === 'saddled') return `${focal?.name ?? 'the prize'} delivered as ${kind}, but at a worse bargain than hoped`;
-      return `${focal?.name ?? 'the prize'} delivered clean as ${kind}, and the company is paid well for the whole affair`;
+      // ONE source of truth with chainContext.fate — two phrasings of the ending diverged
+      return this.fateSentence(r);
     }
     if (r.outcome === 'failure') return 'they return with empty hands (say what was lost, in-fiction)';
     // the person's REAL fate is engine-decided — deal it, or prose promises "they may stay"
@@ -1762,7 +1830,7 @@ export class Game {
     for (let i = 0; i < 12 && (p === banned || this.recentPlaceStems.includes(stem(p))); i++)
       p = rollPlaceName(this.rng);
     this.recentPlaceStems.push(stem(p));
-    while (this.recentPlaceStems.length > 10) this.recentPlaceStems.shift();
+    while (this.recentPlaceStems.length > 16) this.recentPlaceStems.shift();
     return p;
   }
 
@@ -1816,9 +1884,17 @@ export class Game {
     // the fate was decided BEFORE the AI narrated (P11); recompute only as a fallback
     const fate = precomputed ?? finaleFate(this.rng, chain, r.outcome);
     const approach = q.approaches?.find(a => a.id === q.chosenApproach);
+    // a focal who JOINED the company mid-saga (hired from the tavern, delivered earlier) makes
+    // this a personal-style close — never re-dispose of your own soldier ("Marric recruited
+    // twice"; "Zaxesh slips away" while on the roster)
+    const focalIsOwnMerc = focal?.character?.role === 'merc';
     if (fate.fate === 'slipped') {
       // §21-4a: bank forfeit; focal slips away FOR NOW — alive in the lore graph, sequel lead back
       chain.state = 'slipped'; chain.bank = 0;
+      if (focalIsOwnMerc) {
+        report.push(`💨 The matter around ${focal!.name} slips out of reach — for now. The season's bank is forfeit. ${focal!.name} stays with the company.`);
+        return;
+      }
       if (focal && !chain.isPersonal) focal.location = HELD('lore');
       const sequel: Lead = {
         id: freshId('lead-'), rarity: fate.sequelRarity, level: chain.level, region: chain.region,
@@ -1835,7 +1911,7 @@ export class Game {
     }
     chain.state = 'done';
     const kind = approach?.rewardKind ?? (chain.kind === 'gold-hoard' ? 'gold' : chain.kind === 'recruit' ? 'recruit' : 'captive');
-    if (chain.isPersonal) {
+    if (chain.isPersonal || focalIsOwnMerc) {
       // personal finale: bank crystallizes as gold + pinned CORE memory (no new character)
       const surplus = Math.round(chain.bank);
       this.addGold(surplus);

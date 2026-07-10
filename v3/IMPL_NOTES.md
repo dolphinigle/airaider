@@ -926,3 +926,50 @@ Also: "0 heads of 0 coins" → plain zero-dice line; campaignread harness prints
 (judges called the gold drain invisible), abandons 0-coin marches (guard bug marched 3 guaranteed
 losses/run), CAST render em-dash. Baseline logs + judge verdicts: scratchpad campaign-3132/3435/
 3738; fixed-build confirm campaigns 616263/646566/676869 running at commit time.
+
+**Confirm campaigns (fixed build, seeds 616263/646566/676869) — three judges: fun 3-4.5 → 5.5-6.**
+Approach-contract 5/5 and 6/6 and 7/7 HONORED (was the top lie); finales pay (1,111g crystallized
+in one run, zero evaporations); messenger intake 81-100% → 11-19%; fetch ~50% → 25-35%; lead-bar
+fetches DEAD; elf skew 60% → 0-37%; zero-to-few dead cycles. Unanimous remaining #1: SAGA STATE
+LOOPS (delivered things re-fetched; 4-5 of 7-8 chains) + the intake/closer stamps changed costume.
+Final wave #297-312:
+| 297 | finaleReady cycle-gate 1.5→3×beats 🛠 (merc-cycle gate fired finales after ~2 beats once
+parties grew — arcs truncated mid-step; beat-count is the trigger, cycles now a stall guard) | engine |
+| 298 | fate/disposition guards: a focal on the ROSTER never "slips away"/re-recruits — personal-
+style close + fateSentence branch + runtime focalIsMerc ("Zaxesh slips away" ran while he stood in
+the yard; Marric was recruited twice) | engine |
+| 299 | STAND-DOWN: a quest whose empty slots outnumber free fit soldiers releases its parked party
+(3 mercs split 1+2 froze a campaign 6 cycles); campaignread never splits the roster | engine+harness |
+| 300 | prepaid finale prizes never walk from the tavern (Brugrim: won saga → 24g debt + nothing);
+BUNK_ROSTER_SLOTS 4→5 🛠 (cap 4 left ONE hire; 5/6 guests walked) | engine |
+| 301 | noteCustodyChange: ransom/sell/handoff/move-on now write "SETTLED: no longer in the
+company's hands" into every saga the person anchors (finale staged "your captive Heleis" 3 cycles
+after her ransom) | engine |
+| 302 | MECHANICAL stamp-breakers in desemi: sentence-initial "Expect " → rotating substitutes
+(×23-27/run despite the named ban); "the company's keeping" → "the company('s hands)" (ban echoed
+AND grammar-mangled: "The company's keeping him."); both de-named from prompts (naming a stamp
+plants it — §8's final lesson) | engine |
+| 303 | DEAD-GROUND rule (saga block): anything an earlier step delivered/handed/settled may not
+be asked for again in any costume; genesis: no two arc steps target the same delivery/place/
+person-outcome; resolve keeps larger matter open on overreach (already in) | prompt |
+| 304 | intake fact VARIANTS per channel + fold-or-omit rule ("The company's own sweep" ×3-12/run;
+"no one brought it" negation leaked verbatim → de-negated) | engine+prompt |
+| 305 | coin-custody sentences cut (a custody sentence with nothing else is cut — engine pay lines
+say it; was ~25/run incl. "the promised coin now belongs to the roster") | prompt |
+| 306 | genesis slate: reused people keep their SIDE, never client of two sagas at once (Elodir 3
+chains, Lamfred 5); blurb/dossier lines are SETTLED history; cast must have arc parts; kernel-guard
+fingerprint + avoid entries now include cast names + coined places (5/5 deliver-to-ceremony run) | engine+prompt |
+| 307 | party never left behind/lodged/stationed (resolve); focal sex from tags, never flipped
+mid-saga (Brugrim she→him inside one saga) | prompt |
+| 308 | recentPlaceStems 10→16; PATROL spark de-templated ('lights where none should burn' ×5) | engine+seed |
+**Finale surface verified for the FIRST time (scripts/finaledump.ts): R42 found 3 BREAKS in
+resolve-finale (raw fate token; recruit-vs-claim contradiction; invisible unchosen approaches) and
+2 in writeQuest-finale (ask↔approaches contract undefined; blind bible/relevantLore on finale
+renders) — all rebuilt: saga gloss SHARED across beat+finale, fate as plain sentence via ONE
+fateSentence source, rejectedApproaches dealt, plans-settle-focalName contract, finale-on-young-
+saga scope, focal into deliveredCharacters. R42/R43 confirmations: prior breaks GONE.**
+Watch 🟡: sweep-speak variants may still stamp (measure next run); success 39-43/43 with fat bars
+— dice risk texture is a 🔴 DESIGNER knob (roster health made marches near-sure; the harness also
+min-maxes); wound site "forearm" ×13 + all-low bands; lead-hunt template sameness (recruiting/
+scouting faucet cards); relic name collisions (Weathered Bow ×2); one-region world remains THE
+structural 🔴 (city at GH T4 still out of a 30-cycle campaign's reach).

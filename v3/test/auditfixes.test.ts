@@ -193,8 +193,10 @@ describe('audit-fix regressions', () => {
     await g.endCycle();
     if (chain.state === 'done' && rec.rewardKind !== 'gold') {
       const focal = g.card(chain.focalId)!;
-      // staged THIS cycle and already fleshed — with a backstory grown from the saga
-      expect(focal.location).toEqual(HELD('staged'));
+      // a won recruit JOINS CLEAN when the roster has room (2026-07-10 — the mark was paid by
+      // the bank; staging re-charged it); captives and full-roster recruits still stage.
+      // Either way they are fleshed with a backstory grown from the saga.
+      expect([HELD('staged'), HELD('roster')]).toContainEqual(focal.location);
       expect(focal.character!.backstory ?? '').toContain(chain.bible.title);
     }
   });

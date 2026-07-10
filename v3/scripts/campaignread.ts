@@ -98,6 +98,10 @@ for (let c = 0; c < cycles; c++) {
       g.chooseApproach(q.id, bestG);
       say(`  CHOSE APPROACH: ${q.approaches.find(a => a.id === bestG)!.label}`);
     }
+    // never SPLIT the roster across quests it can't fully man — 1+2 parked across a 2-slot and
+    // a 3-slot quest froze a campaign for six cycles
+    const activeSlots = q.slots.filter(s => !q.approaches || s.groupId === q.chosenApproach);
+    if (activeSlots.filter(s => !s.filledBy).length > fit().length) continue;
     for (let i = 0; i < q.slots.length; i++) {
       const slot = q.slots[i]!;
       if (slot.filledBy || (q.approaches && slot.groupId !== q.chosenApproach)) continue;

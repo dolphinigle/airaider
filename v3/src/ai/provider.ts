@@ -103,7 +103,13 @@ export interface ResolveQuestInput {
   party: { id: string; name: string; tags: string; dossier: string }[];
   deliveredSummary: string;      // engine-computed delivery, named for the AI to narrate
   deliveredCharacters: { id: string; name: string; tags: string }[]; // to flesh (who/backstory)
-  chainContext?: { bible: unknown; storyState: unknown; isFinale: boolean; fate?: string; approach?: string };
+  chainContext?: {
+    bible: unknown; storyState: unknown; isFinale: boolean;
+    focalName?: string;              // the saga's central person, named explicitly
+    fate?: string;                   // finale: what becomes of them — a plain SENTENCE, never a token
+    approach?: string;               // finale: the plan the player CHOSE (a contract)
+    rejectedApproaches?: string[];   // finale: the plans NOT taken (their actions may not appear)
+  };
 }
 
 export interface ResolveQuestOut {
