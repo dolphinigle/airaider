@@ -1132,3 +1132,40 @@ Slot-depth gate loosened one band 🛠 (the reserved lever: P plateaued at 22 fo
 tier↔slots↔prestige loop; 1.25^slots upgrade cost stays the brake); harness does 2 upgrades/cycle
 when flush; GH_THRESHOLDS re-fitted to the MEASURED prestige curve (T2-T10 = 2/4/8/13/19/24/32/
 44/58, knee 150-650): sim medians T4 c40 · T7 c58-75 · T10 c96 | engine+harness |
+
+## ROUND-4 CHECKPOINT (2026-07-12) — judged 6.5-7/10 vs the 8/10-until-T10 bar
+Both 115-cycle judges: thirds ≈ 8/7.5 · 7 · 5-5.5. THE WRITING HOLDS ~8 THROUGHOUT ("the narrative
+machine is the healthiest component at cycle 110+"); the miss is SYSTEMS. Verified working: tier
+announcements, City refresh cashed in, 24-34 hires + ⭐ through c114, crystallization spikes legible,
+finale-approach fidelity mostly verbatim, failure→left-behind→rescue loops, re-offer caps.
+**REMAINING CLASSES (ranked, with the designer's efficiency split):**
+NUMBER-ONLY → verify in MOCK sim (no OpenAI):
+ 1. Risk collapse past c40 (bars ≈0.6× expected heads; 0 FAILs after ~c88; wounds never bench a
+    30-merc roster) — bar/difficulty curve + wound bench scaling. THE biggest fun lever.
+ 2. Tier cadence: T2-T6 sprint then 48-cycle T6 park / 29-cycle T4 drought — bedroom upkeep
+    monopolizes build throughput; region posts never built after unlock (T7/T8 dead-on-arrival).
+    Harness build priorities (region posts+key rooms > bedrooms), assert tier-gap ≤K and ≥M cycles
+    of runway after each region unlock.
+ 3. Economy legibility: +1g finale line items (fold), ~season estimates overshooting 30-60%
+    (recompute or hide), slip-forfeit shadow-gold shown, payout outliers clamped by rarity.
+ 4. Custody ENGINE routing: delivered-to-CLIENT captures still land in the player's ⛓ holding
+    (fiction hands over, engine keeps) — deterministic code split of capture-for-client vs
+    capture-for-company; departed-yet-held state leaks at edges.
+ 5. Name guard v3: exact dupes among HELD characters (Magny×2, Fenden×2 opposite genders),
+    Tild-/Lam- clusters, surname mills (four Thatchers/Reeds) — extend to all pools + surnames.
+ 6. Card volume late (12 offers + 9 resolutions/cycle; lead faucet self-feeds while hiring is
+    capacity-capped) — offer caps by tier, faucet coupled to capacity.
+ 7. Re-offer/lapse presentation: verbatim 130-word reprints, silent vs stamped chain deaths,
+    lapse messages using never-shown titles.
+REAL-AI (story/prompt) → needs live rounds:
+ 8. Chain-state fidelity INSIDE chains (name-strip burned ×4 then "must stay whole"; Garmund
+    delivered twice) — pipe beat-settled facts as dealt data + validation.
+ 9. Approach-constrained finales (chose sell → buyer is the victim's own kin; chose secret-cure →
+    "is yours — captive"): the chosen approach must constrain narration AND the disposition stamp.
+ 10. Capture-custody narration (never narrate final client handover on ⛓ results) + close-
+    disposition fidelity ("pledged to ride with the company" on a captive).
+ 11. Prose tic classes at 115-cycle horizon: object-out-of-place opener (30+), "thinned" weather,
+    tap-sleeve closers, item adjective mill, sleeve-quirks ~20% of cast — class bans per §8.
+ 12. Bio hygiene: stat-dump WHOs (add engine guard: who matching tag-dump pattern is dropped for
+    re-flesh), truncated bios, gender flips across chains (Korjaw her→his ×12), "phone docks"
+    anachronism, ⭐-printed-on-FAIL display, N−1/N beat display off-by-one.
