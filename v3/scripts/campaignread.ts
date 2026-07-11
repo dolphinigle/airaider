@@ -20,22 +20,34 @@ const g = new Game(makeOpenAiProvider(), seed);
 const out: string[] = [];
 const say = (s: string) => out.push(s);
 
-const ORDER = ['map-room', 'lead-room', 'scouting-forests', 'recruiting-forests', 'mess-hall',
-  'tavern', 'infirmary', 'dining-hall', 'kitchen', 'garden', 'dungeon', 'holding-cell'];
 // tavern early: without it every rescue "moves on", the roster freezes at 2, and a third of
-// cycles read as dead air — starving the very features under test
+// cycles read as dead air — starving the very features under test.
+// LONG-PLAY generalization (2026-07-11): the old fixed list had NO bedrooms (rosters froze at 5
+// forever) and only forest scouting (the City could never be entered) — now every gate/scouting/
+// recruiting/comfort building joins the queue as it unlocks, bedrooms whenever roster-bound.
+const ORDER = ['map-room', 'lead-room', 'scouting-forests', 'recruiting-forests', 'mess-hall',
+  'tavern', 'infirmary', 'dining-hall', 'kitchen', 'garden', 'dungeon', 'holding-cell',
+  'scouting-city', 'recruiting-city', 'library', 'market', 'ransom-office', 'smithy',
+  'trophy-room', 'gallery', 'shrine', 'chronicle', 'hospital',
+  'scouting-coast', 'recruiting-coast', 'scouting-underdeep', 'scouting-highlands', 'recruiting-highlands'];
 
 for (let c = 0; c < cycles; c++) {
   if (g.ai.usage().costUsd > maxUsd) { say(`[cost cap hit at cycle ${c}]`); break }
   g.ghUpgrade();
   if (g.freeCells().length === 0) g.excavate();
-  for (const b of ORDER) {
+  // a BEDROOM outranks everything when the roster is full and someone waits at the tavern;
+  // a DUNGEON-CELL likewise when holding candidates outrun captive capacity
+  const wantBedroom = g.roster().length >= g.rosterCapacity() && g.state.tavern.length > 0;
+  const wantCell = g.state.holding.length > 0 && g.captives().length >= g.captiveCapacity();
+  const MULTI = ['bedroom', 'dungeon-cell'];
+  const queue = [...(wantBedroom ? ['bedroom'] : []), ...(wantCell ? ['dungeon-cell'] : []), ...ORDER];
+  for (const b of queue) {
     const st = g.buildableTypes().find(x => x.type === b);
-    if (!st || st.reason === 'already built') continue;
+    if (!st || (st.reason === 'already built' && !MULTI.includes(b))) continue;
     if (st.reason?.startsWith('costs')) break;
     if (st.reason) continue;
     const goldBefore = g.gold();
-    g.build(b);
+    if (!g.build(b).ok) continue;
     say(`c${g.state.cycle} BUILD ${b} (−${goldBefore - g.gold()}g)`);   // spends were invisible to readers
     break;
   }
