@@ -418,6 +418,9 @@ function Log({ s }: any) {
 
 function AiLog({ s }: any) {
   const u = s.ai;
+  // raw single-line JSON was unreadable in the details view — pretty-print, fall back to raw
+  const pretty = (t?: string | null) =>
+    !t ? '(not recorded)' : (() => { try { return JSON.stringify(JSON.parse(t), null, 2) } catch { return t } })();
   if (!s.aiLog?.length) return <p>No AI calls yet{s.aiName === 'mock' ? ' (mock provider — no per-call log)' : ''}. Totals: {u.calls} calls · ~${u.costUsd.toFixed(3)}</p>;
   return (
     <div>
@@ -433,7 +436,7 @@ function AiLog({ s }: any) {
             </tr>
             <tr><td colSpan={9}>
               <details><summary>prompt + output</summary>
-                <pre>SYSTEM (start): {r.systemPreview}{'\n\n'}USER: {r.userPrompt}{'\n\n'}OUTPUT: {r.output ?? '(not recorded)'}</pre>
+                <pre style={{ whiteSpace: 'pre-wrap' }}>SYSTEM (start):{'\n'}{r.systemPreview}{'\n\n'}USER:{'\n'}{pretty(r.userPrompt)}{'\n\n'}OUTPUT:{'\n'}{pretty(r.output)}</pre>
               </details>
             </td></tr>
           </React.Fragment>
