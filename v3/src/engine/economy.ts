@@ -17,16 +17,16 @@ export function vBase(level: number): number {
 }
 
 /** ECONOMY §2 (built 2026-07-11, was deferred #219): CONTENT value grows 1.35/level (marks, tags,
- *  banks — the internal ruler), but player INCOME is mandated ~1.09/level. This deflator converts
+ *  banks — the internal ruler), but player INCOME grows ~1.20/level (🛠 2026-07-11: the doc's 1.09 assumed the 2,000-cycle ladder — under the compressed prototype ladder it STARVED a 115-cycle fort to 234g; 1.35 exploded it to 54k. 1.20 matches the re-paced cost curves). This deflator converts
  *  content-value to CASH wherever gold actually reaches the treasury. Without it, regions raised
  *  lead levels and a PARTIAL common paid +25,395g (L~30 vBase ≈ 180k). */
 export function incomeScale(level: number): number {
-  return Math.pow(1.09 / 1.35, Math.max(0, level - 1));
+  return Math.pow(1.20 / 1.35, Math.max(0, level - 1));
 }
 
 /** the same income curve expressed from a CONTENT value directly (cards don't carry levels):
  *  cash = 30·1.09^(L-1) where L is the level implied by value = 30·1.35^(L-1) */
-const CASH_K = Math.log(1.09) / Math.log(1.35);
+const CASH_K = Math.log(1.20) / Math.log(1.35);
 export function cashValue(contentValue: number): number {
   if (contentValue <= 0) return 0;
   return Math.round(Math.pow(30, 1 - CASH_K) * Math.pow(contentValue, CASH_K));
