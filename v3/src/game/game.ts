@@ -866,7 +866,9 @@ export class Game {
       // one campaign, "a parcel of lead" pay in another) — translate kinds to plain words
       // no catchy nouns here — 'a fresh trail' leaked from this envelope into titles ×32/run
       slotCount: n, rewardEnvelope: specs.map(s => (
-        { lead: 'knowledge of where further work waits (never an object)', relic: 'a prize object',
+        // 'further work' leaked from the old wording into ~every lead-hunt closer — keep the
+        // gloss phrase-free (any catchy noun in here WILL surface in prose)
+        { lead: 'knowledge that opens the company\'s next hire (never an object)', relic: 'a prize object',
           recruit: 'a person who may join the company', captive: 'a person taken', gold: 'coin' } as Record<string, string>
       )[s.kind] ?? s.kind).join(' + '),
       keywords: sampleKeywords(this.rng),
@@ -1904,7 +1906,7 @@ export class Game {
     for (let i = 0; i < 12 && (p === banned || this.recentPlaceStems.includes(stem(p))); i++)
       p = rollPlaceName(this.rng);
     this.recentPlaceStems.push(stem(p));
-    while (this.recentPlaceStems.length > 16) this.recentPlaceStems.shift();
+    while (this.recentPlaceStems.length > 24) this.recentPlaceStems.shift();
     return p;
   }
 

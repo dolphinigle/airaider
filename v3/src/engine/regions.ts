@@ -49,25 +49,38 @@ export const REGIONS: Region[] = [
     id: 'coast', name: 'The Drowned Coast', faction: 'lizardman', levelBand: [12, 22],
     poolWeights: { lizardman: 4, human: 2, elf: 0.5, wolfman: 0.3 },
     ghTier: 7, prev: 'city',
-    seed: 'Salt-marsh coastline of sunken temples; lizardman clans fish the drowned streets.',
+    // first live read (2026-07-11): identity landed, but lizardmen were scenery only — the
+    // clan-speakers clause gives the native race clients and voices
+    seed: 'Salt-marsh coastline of sunken temples; lizardman clans fish the drowned streets, and their clan-speakers trade and hire at the water\'s edge.',
+    anchors: ['the drowned causeway', 'the tide-flats', 'the salt-shrine steps', 'the eel-weirs', 'the breakwater ruins'],
   },
   {
     id: 'highlands', name: 'The Highlands', faction: 'wolfman', levelBand: [18, 28],
     poolWeights: { wolfman: 4, human: 1.5, elf: 0.5, lizardman: 0.3 },
     ghTier: 10, prev: 'coast',
+    // first live read: 6 of 8 cards leaned on the Howling Pass (the one-landmark trap)
     seed: 'Storm-bitten crags where wolfman packs keep the old ways; the Howling Pass divides them.',
+    seedPlain: 'Storm-bitten crags where wolfman packs keep the old ways.',
+    landmark: 'the Howling Pass',
+    anchors: ['the herding terraces', 'the cairn fields', 'the storm shelters', 'the goat bridges', 'the old beacon crags'],
   },
   {
     id: 'underdeep', name: 'The Underdeep', faction: null, levelBand: [24, 34],
     poolWeights: { human: 1, elf: 1, wolfman: 1, lizardman: 1 },
     ghTier: 8, prev: 'coast',   // optional branch off the spine (§13)
-    seed: 'A lightless labyrinth beneath the map; no people live there — things do.',
+    // first live read FAILED the design: 5 of 6 cards filled it with miners and toll-gangs —
+    // the seed now enforces its own rule
+    seed: 'A lightless labyrinth beneath the map. NO ONE lives down there: clients and witnesses wait at the entrances, and whatever is met below is never a resident person — things dwell in the deep.',
+    anchors: ['the rope-descents', 'the flooded galleries', 'the singing vents', 'the bone middens', 'a door older than any digging'],
   },
   {
     id: 'outskirts', name: 'The Outskirts', faction: 'mixed', levelBand: [40, 50],
     poolWeights: { human: 1, elf: 1, wolfman: 1, lizardman: 1 },
     ghTier: 15, prev: null,     // opens via ALL endgame keys, not the spine
-    seed: 'Off every map: the lands beyond the border-stones, where the roads themselves are lost.',
+    // first live read: generic hinterland with squatters' salvage at L40 — the seed now states
+    // the wrongness and the stakes register
+    seed: 'Off every map: beyond the border-stones roads lose their names, waymarks move by night, and nothing keeps the name a map gave it. Work out here is the company\'s gravest — what is sought beyond the stones is never petty.',
+    anchors: ['the last border-stone', 'the road that ends mid-stride', 'the leaning waymarks', 'the fields nobody claims'],
   },
 ];
 
