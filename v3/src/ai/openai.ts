@@ -57,6 +57,8 @@ const desemi = (s: string) => {
     .replace(/(^|[.!?]\s+)(?:The )?[Pp]ay is coin\.\s*/g, (_, p: string) =>
       p + ['Coin on completion. ', 'Paid in coin. ', 'The pay is honest coin. '][ei++ % 3]!)
     .replace(/\bcrouched\b/g, () => ['crouched', 'knelt', 'bent low', 'dropped low'][ei++ % 4]!)
+    // the forearm was the only anatomy in this world (11 of 14 second-half wounds)
+    .replace(/\bforearm\b/g, () => ['forearm', 'shoulder', 'shin', 'hip', 'upper arm'][ei++ % 5]!)
     .replace(/\bto the company's keeping\b/gi, 'to the company')
     .replace(/\bthe company's keeping\b/gi, "the company's hands");
 };

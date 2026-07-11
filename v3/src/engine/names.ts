@@ -62,7 +62,9 @@ export function rollName(rng: Rng, race: string, gender?: string): string {
 }
 
 const RELIC_ADJ = ['Weathered', 'Gilded', 'Silent', 'Broken', 'Old', 'Salt-stained', 'Painted', 'Iron', 'Pale', 'Twin',
-  'Mossgrown', 'Ashen', 'Riverworn', 'Lacquered', 'Nicked', 'Hollow', 'Amber', 'Sooted', 'Threadbare', 'Kingless'];
+  'Mossgrown', 'Ashen', 'Riverworn', 'Lacquered', 'Nicked', 'Hollow', 'Amber', 'Sooted', 'Threadbare', 'Kingless',
+  // widened 2026-07-11: a 64-cycle run minted Broken ×7 / Sooted ×5 / Nicked ×5 — mad-libs ledger
+  'Crooked', 'Waxed', 'Horn-hafted', 'Braided', 'Dun', 'Smoke-dark', 'Patched', 'Unlettered', 'Cold', 'Nine-ringed'];
 const RELIC_NOUN: Record<string, string[]> = {
   'melee-weapon': ['Blade', 'Axe', 'Maul', 'Spear', 'Dirk'],
   'ranged-weapon': ['Bow', 'Sling', 'Arbalest', 'Javelin'],

@@ -1065,3 +1065,27 @@ entrances (things below: fissures, sounds, an unaging figure); Highlands off the
 steady name beyond the border-stones"); Coast clan-speakers are clients with a NAMED speaker
 (Tzaess). 'further work' purged 0 hits. Wound LANGUAGE now matches band (a lodged spear read as
 low-tier) | confirm+prompt |
+
+## LONG-HORIZON READ (64-cycle campaign, the longest ever run — 2026-07-11)
+First half 7/10, second half 4/10, overall 5.5: **the content horizon is ~30-35 cycles** — the
+second half fails from PROGRESSION STARVATION, not prose decay (gold sink exhausted c28, zero
+builds/levels/hires/regions after c30, success 99%, 20 tavern guests walked at roster cap, 8/8
+captives timed out, season marks outgrow banks → debt finales). The approach contract held 15-16
+of 17 finales at 2x length; client-side cast reuse read as the run's best feature (rescued →
+client arcs). | 340 | mechanical: 'forearm' wound rotation (11 of 14 second-half wounds);
+RELIC_ADJ pool 20→30 (Broken ×7) | engine |
+**🔴 DESIGNER QUEUE (updated, ordered by the long read):**
+1. THE HORIZON DECISION: make region 2 reachable ~c30 (GH tier pacing — T2 lands ~c27; T4/City is
+   out of reach) OR end a campaign formally ~c35 with a finale. Everything else is downstream.
+2. Risk curve at veteran level (bars don't scale; failure extinct; wounds cosmetic — "dice are
+   decoration" three judges running).
+3. Roster cap 5 + tavern churn (20 broken "may join" promises in one run) + captive accept/ransom
+   loop (dungeon = dead purchase; 8/8 timeouts).
+4. Season-mark scaling vs bank pace late (3 of last 5 person finales end in shortfall/debt).
+5. Soft-pool budgets for 60+ cycle play (venues ~8 stock locations, intake framings, premise
+   families — sized for ~30 cycles by design; fine if the horizon decision caps campaigns).
+Watch 🟡 (fixes in but untested at length — most postdate the 64-cycle run's start): want-binding
+to wrong cast names (validation rule new), delivered-then-respawned third-party custody (Ithlas
+class; dead-ground covers company custody, third-party custody claims still drift), stat-dump WHO
+leaks (timeless-card register new), harness doesn't print GH tier-ups or dossier MEMORIES (judges
+couldn't see either — add to campaignread next session).
