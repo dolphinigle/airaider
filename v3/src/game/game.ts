@@ -1041,20 +1041,21 @@ export class Game {
       const words = (s: string) => new Set((s.toLowerCase().match(/[a-z]+/g) ?? []).filter(w => w.length > 3 && !stop.has(w)));
       // cast + coined places join the fingerprint — five deliver-to-a-ceremony sagas with the
       // same client shipped in one run while title+kernel alone stayed just under the bar
-      const kw = words(`${g.title} ${g.kernel} ${g.arc.join(' ')} ${g.cast.map(c => `${c.name} ${c.role}`).join(' ')} ${g.newPlaces.map(p => p.name).join(' ')}`);
+      const kw = words(`${g.title} ${g.kernel} ${g.arc.join(' ')} ${g.tensions.join(' ')} ${g.cast.map(c => `${c.name} ${c.role}`).join(' ')} ${g.newPlaces.map(p => p.name).join(' ')}`);
       const clash = avoid.find(a => { const aw = words(a); let hit = 0; kw.forEach(w => { if (aw.has(w)) hit++ }); return hit >= 3 });
       // same-CLIENT guard (mechanical — the prompt rule alone left one lore client running
       // three sagas at once): a live chain's client may not client the new saga too
       // live chains AND the last few closed ones — one rescue NPC once cliented 5 of 6
       // sequential sagas (the live-only window let her straight back in each time)
+      // obstacles too — three concurrent founder sagas once shared ONE coined villain
       const liveClients = new Set([...this.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending'),
         ...this.state.chains.slice(-3)]
-        .flatMap(c => c.bible.cast.filter(x => x.role === 'client' && x.loreId).map(x => x.loreId!)));
-      const clientDup = g.cast.find(x => x.role === 'client' && x.loreId && liveClients.has(x.loreId));
+        .flatMap(c => c.bible.cast.filter(x => (x.role === 'client' || x.role === 'obstacle') && x.loreId).map(x => `${x.role}:${x.loreId}`)));
+      const clientDup = g.cast.find(x => (x.role === 'client' || x.role === 'obstacle') && x.loreId && liveClients.has(`${x.role}:${x.loreId}`));
       if (clash || clientDup) {
         const why = clash
           ? `your rejected draft "${g.title} — ${g.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground`
-          : `your rejected draft used ${clientDup!.name} as client — they already client a running saga; this one needs a different client entirely`;
+          : `your rejected draft used ${clientDup!.name} as ${clientDup!.role} — they already hold that role in a running saga; this one needs a different ${clientDup!.role} entirely`;
         g = await this.ai.genesis({ ...genesisInput, avoid: [...avoid, why] });
       }
     }
