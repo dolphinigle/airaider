@@ -4,7 +4,7 @@
 
 import type { Rng } from './rng.js';
 import {
-  chainPayoff, chainFocalTarget, rollChainKind, vBase, RARITY_MULT,
+  chainPayoff, chainFocalTarget, rollChainKind, vBase, RARITY_MULT, incomeScale,
   type Rarity, type ChainKind,
 } from './economy.js';
 import type { Outcome } from './roll.js';
@@ -50,7 +50,8 @@ export interface Chain {
   bible: Bible;
   story: ChainStoryState;
   settled?: boolean;           // resolver judged the matter settled mid-saga → next step is the finale
-  lastGeneratedBeat?: number;  // a re-posed (lapsed) step must arrive FRESH, not as the same card again
+  lastGeneratedBeat?: number;  // a re-posed (lapsed) step re-offers VERBATIM from cache (🛠 2026-07-10)
+  reOffers?: number;           // lapse counter — 3 unmarched offers of a beat slips the chain (2026-07-11)
   state: 'active' | 'finale-pending' | 'done' | 'slipped';
   createdCycle: number;
 }
@@ -82,6 +83,7 @@ export function bankBeat(chain: Chain, partySize: number, outcome: Outcome, side
   const earned = partySize * vBase(chain.level) * RARITY_MULT[chain.rarity] * scale - (scale > 0 ? sideLootV : 0);
   chain.bank += Math.max(0, earned);
   chain.cyclesSpent += partySize;      // effort counts even on failure (the gate can't stall)
+  chain.reOffers = 0;                  // a marched beat resets the lapse counter
   chain.beatIndex += 1;
   if (outcome === 'failure') chain.failures += 1;
   return earned;
@@ -105,7 +107,9 @@ export function finaleReady(chain: Chain): boolean {
 
 /** small engine-set side-loot budget per middle beat (gold/stackables/relics, never units — §4) */
 export function beatSideLoot(rng: Rng, chain: Chain): number {
-  return Math.round(vBase(chain.level) * RARITY_MULT[chain.rarity] * rng.float(0.2, 0.5));
+  // side-loot is mostly CASH — income-scaled (§2 2026-07-11); the bank deduction uses the same
+  // number so the accounting stays consistent
+  return Math.round(vBase(chain.level) * RARITY_MULT[chain.rarity] * rng.float(0.2, 0.5) * incomeScale(chain.level));
 }
 
 export type FinaleFate =

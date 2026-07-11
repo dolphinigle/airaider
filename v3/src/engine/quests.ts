@@ -66,7 +66,10 @@ function rollLevel(rng: Rng, ctx: LeadRollCtx, region: string): number {
 
 export function rollFreshLead(rng: Rng, ctx: LeadRollCtx, idGen: () => string,
   source: Lead['source'] = 'reward'): Lead {
-  const region = rng.pick(ctx.unlockedRegions);
+  // the NEWEST region draws double weight (2026-07-11): with uniform picks the forests never
+  // receded below half of play even three regions in
+  const newest = ctx.unlockedRegions[ctx.unlockedRegions.length - 1];
+  const region = rng.weighted(ctx.unlockedRegions.map(r => [r, r === newest && ctx.unlockedRegions.length > 1 ? 2 : 1] as [string, number]));
   const rarity = rollRarity(rng, ctx.ghTier);
   const pool = ONE_OFF_ARCHETYPES.filter(a => a !== 'capture' || ctx.hasDungeon);
   const fresh = pool.filter(a => !ctx.recentArchetypes?.includes(a));

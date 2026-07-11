@@ -35,21 +35,36 @@ for (let c = 0; c < cycles; c++) {
   if (g.ai.usage().costUsd > maxUsd) { say(`[cost cap hit at cycle ${c}]`); break }
   g.ghUpgrade();
   if (g.freeCells().length === 0) g.excavate();
-  // a BEDROOM outranks everything when the roster is full and someone waits at the tavern;
-  // a DUNGEON-CELL likewise when holding candidates outrun captive capacity
-  const wantBedroom = g.roster().length >= g.rosterCapacity() && g.state.tavern.length > 0;
+  // MERC BEDROOMS drive BOTH roster capacity (+1 each) and level caps — and build('bedroom')
+  // without an ownerId targets the BOSS (who has one) and fails silently: every prior run froze
+  // at roster 5 / level 6 because of exactly this. One bedroom per merc, owner named.
+  const bedless = g.roster().find(m => !g.state.fort.rooms.some(r => r.ownerId === m.id));
+  if (bedless && g.gold() > 400) {
+    const goldBefore = g.gold();
+    if (g.build('bedroom', bedless.id).ok) say(`c${g.state.cycle} BUILD bedroom for ${bedless.name} (−${goldBefore - g.gold()}g)`);
+  }
   const wantCell = g.state.holding.length > 0 && g.captives().length >= g.captiveCapacity();
-  const MULTI = ['bedroom', 'dungeon-cell'];
-  const queue = [...(wantBedroom ? ['bedroom'] : []), ...(wantCell ? ['dungeon-cell'] : []), ...ORDER];
+  const queue = [...(wantCell ? ['dungeon-cell'] : []), ...ORDER];
+  let built = false;
   for (const b of queue) {
     const st = g.buildableTypes().find(x => x.type === b);
-    if (!st || (st.reason === 'already built' && !MULTI.includes(b))) continue;
+    if (!st || (st.reason === 'already built' && b !== 'dungeon-cell')) continue;
     if (st.reason?.startsWith('costs')) break;
     if (st.reason) continue;
     const goldBefore = g.gold();
     if (!g.build(b).ok) continue;
     say(`c${g.state.cycle} BUILD ${b} (−${goldBefore - g.gold()}g)`);   // spends were invisible to readers
+    built = true;
     break;
+  }
+  // ladder fuel: when the ORDER list is exhausted, ANY unlocked-unbuilt room feeds prestige
+  // (the tier ladder starved at T7-T8 with 34-54k gold idle)
+  if (!built && g.gold() > 800) {
+    const any = g.buildableTypes().find(x => !x.reason && x.type !== 'bedroom' && x.type !== 'great-hall');
+    if (any) {
+      const goldBefore = g.gold();
+      if (g.build(any.type).ok) say(`c${g.state.cycle} BUILD ${any.type} (−${goldBefore - g.gold()}g)`);
+    }
   }
   const up = g.state.fort.rooms.filter(r => ROOM_TYPE[r.type]!.species === 'comfort')
     .sort((a, b) => a.slots.length - b.slots.length)[0];

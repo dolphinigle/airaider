@@ -16,6 +16,22 @@ export function vBase(level: number): number {
   return 30 * Math.pow(1.35, level - 1);
 }
 
+/** ECONOMY §2 (built 2026-07-11, was deferred #219): CONTENT value grows 1.35/level (marks, tags,
+ *  banks — the internal ruler), but player INCOME is mandated ~1.09/level. This deflator converts
+ *  content-value to CASH wherever gold actually reaches the treasury. Without it, regions raised
+ *  lead levels and a PARTIAL common paid +25,395g (L~30 vBase ≈ 180k). */
+export function incomeScale(level: number): number {
+  return Math.pow(1.09 / 1.35, Math.max(0, level - 1));
+}
+
+/** the same income curve expressed from a CONTENT value directly (cards don't carry levels):
+ *  cash = 30·1.09^(L-1) where L is the level implied by value = 30·1.35^(L-1) */
+const CASH_K = Math.log(1.09) / Math.log(1.35);
+export function cashValue(contentValue: number): number {
+  if (contentValue <= 0) return 0;
+  return Math.round(Math.pow(30, 1 - CASH_K) * Math.pow(contentValue, CASH_K));
+}
+
 export type Rarity = 'common' | 'uncommon' | 'rare';
 export const RARITY_MULT: Record<Rarity, number> = { common: 1, uncommon: 1.8, rare: 3.5 }; // 🛠
 
@@ -223,8 +239,9 @@ export interface RewardSpec {
   required?: TagInstance[];
 }
 
-/** one-off split: archetype sets the primary kind + a randomized unit:gold ratio */
-export function splitOneOff(rng: Rng, V: number, archetype: Archetype): RewardSpec[] {
+/** one-off split: archetype sets the primary kind + a randomized unit:gold ratio.
+ *  `level` deflates the GOLD portions to the mandated income curve (units keep full value). */
+export function splitOneOff(rng: Rng, V: number, archetype: Archetype, level = 1): RewardSpec[] {
   const out: RewardSpec[] = [];
   const unitShare = (lo: number, hi: number) => rng.float(lo, hi);
   switch (archetype) {
@@ -270,7 +287,7 @@ export function splitOneOff(rng: Rng, V: number, archetype: Archetype): RewardSp
       out.push({ kind: 'lead', value: leadCost });
     }
   }
-  return out.map(r => ({ ...r, value: Math.round(r.value) }));
+  return out.map(r => ({ ...r, value: Math.round(r.kind === 'gold' ? r.value * incomeScale(level) : r.value) }));
 }
 
 /** chain split (§2): core kind from the extendable table; unit share 55–85% of E[payoff] */
@@ -291,7 +308,8 @@ export const KEEP_THRESHOLD = 0.4; // partial: keep the unit if its mark ≥ KEE
 export const RANSOM_RATE = 0.6;      // §2: ransom = 0.6 × mark
 export const SELL_RATE = 0.5;        // relics/dead drops
 /** hire cost ≥ the grow-investment (ECONOMY §6 lean) */
-export function hireCost(mark: number): number { return Math.round(mark * 1.2) }
+// hires are paid in CASH — priced on the income curve, or high-level recruits become unpayable
+export function hireCost(mark: number): number { return Math.round(cashValue(mark) * 1.2) }
 
 /** per-cycle passive trickle is ZERO — income is quest gold (ECONOMY §6). */
 

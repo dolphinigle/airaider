@@ -1103,3 +1103,16 @@ showed was missing, 14-36k banked unused). Rarity shift: rares from ~T3/c29 (was
 annotated (FORT.md Great Hall block, GENERATION_FLOW §20 time budget). Long-play harness: bedrooms
 + dungeon-cells on demand, full unlock queue (no prior run could build a 6th bed or enter the
 City by POLICY — rosters froze at 5 in every judged campaign) | engine+harness+docs |
+| 342 | T10-bar judges (two 115-cycle runs: early 8/10 ✓, mid 7, late 5-5.5 — bar missed): ladder
+starved at T7-T8 (harness build fuel + policy), levels/roster frozen (build('bedroom') defaulted
+owner to the BOSS who has one — failed silently every cycle of every campaign ever), the deferred
+#219 gold-curve divergence exploded at region levels (+25,395g PARTIAL common; ~752k season lines;
+34-54k idle treasuries). FIXES: **income curve BUILT** (ECONOMY §2 ~1.09/level — incomeScale on
+gold splits/side-loot, cashValue() at every cash mint: ransom/sell/handoff/tips/crystallize/gold-
+fate/void-salvage/personal close; hireCost cash-priced); harness builds a bedroom PER MERC with
+ownerId (unfreezes levels AND roster) + generic build fallback (ladder fuel); chain RE-OFFER CAP
+(3 lapses → slip with road back; one card had been re-offered ×28); newest region ×2 lead weight
+(forests never receded); focal names now pass the similarity guard (two Hessossks); CAST-SLOT
+integrity forced (focal owns quarry/prize; imposters demoted); fateSentence void-aware ("he will
+ride with the company" shipped beside "ran too thin to keep him"); release-verb labels coerce
+rewardKind gold ("Yield Ysard" ended captive) | engine+harness |

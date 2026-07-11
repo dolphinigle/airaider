@@ -19,7 +19,7 @@ import {
 import { infirmaryHealRate, healTick, rollInjuryTiers, payHealCost, REST_HEAL_PER_CYCLE, type InjuryBand } from '../engine/injury.js';
 import { REGION, REGIONS } from '../engine/regions.js';
 import {
-  vBase, RARITY_MULT, splitOneOff, hireCost, RANSOM_RATE, SELL_RATE, KEEP_THRESHOLD,
+  vBase, RARITY_MULT, splitOneOff, hireCost, RANSOM_RATE, SELL_RATE, KEEP_THRESHOLD, cashValue,
   type Rarity, type Archetype, type RewardSpec,
 } from '../engine/economy.js';
 import {
@@ -580,7 +580,7 @@ export class Game {
       return { ok: false, msg: 'not yours to ransom (accept them first)' };
     const office = this.state.fort.rooms.find(r => r.type === 'ransom-office');
     const rate = office ? ransomRate(this.comfort(office)) : RANSOM_RATE;
-    const pay = Math.round(card.value * rate);
+    const pay = Math.round(cashValue(card.value) * rate);
     this.unslotCard(card);
     card.location = HELD('lore');   // gone from play, alive in the world
     this.state.holding = this.state.holding.filter(s => s.cardId !== captiveId);
@@ -599,7 +599,7 @@ export class Game {
     if (card.character?.role === 'captive') {
       if (!this.isOwned(card) && !this.state.holding.some(s => s.cardId === id))
         return { ok: false, msg: 'not yours to sell (accept them first)' };
-      const pay = Math.round(card.value * SELL_RATE);
+      const pay = Math.round(cashValue(card.value) * SELL_RATE);
       this.unslotCard(card);
       card.location = HELD('lore');
       this.state.holding = this.state.holding.filter(s => s.cardId !== id);
@@ -613,7 +613,7 @@ export class Game {
     if (!this.isOwned(card)) return { ok: false, msg: 'not yours to sell' };
     const market = this.state.fort.rooms.find(r => r.type === 'market');
     const rate = market ? marketSellRate(this.comfort(market)) : SELL_RATE;
-    const pay = Math.round(card.value * rate);
+    const pay = Math.round(cashValue(card.value) * rate);
     this.unslotCard(card);
     this.state.cards = this.state.cards.filter(c => c.id !== id);
     this.addGold(pay);
@@ -800,7 +800,7 @@ export class Game {
     // player HAS soldiers — a 3-slot quest against a 2-merc roster can never march
     const n = Math.max(1, Math.min(slotCount(this.rng, lead.archetype, lead.rarity), this.roster().length));
     const V = oneOffValue(this.rng, lead.level, lead.rarity, n);
-    const specs = splitOneOff(this.rng, V, lead.archetype);
+    const specs = splitOneOff(this.rng, V, lead.archetype, lead.level);
     let rewardCards: Card[];
     const returning = lead.focalId ? this.card(lead.focalId) : undefined;
     // §4 pattern-B (reorder accepted): a NEW person-reward is a COLLABORATION — the engine
@@ -1007,6 +1007,12 @@ export class Game {
         focal = materializeReward(this.rng, spec, lead.level, lead.region,
           { excludeConcepts: recentFocalTags, maxSkills: 2 })[0]!;
       }
+      // focal names skipped the similarity guard — two unrelated "Hessossk Scale-of-Bronze"s
+      // anchored back-to-back sagas
+      for (let i = 0; i < 12 && this.nameTooSimilar(focal.name); i++) {
+        focal.name = rollName(this.rng, focal.tags.find(t => ['elf', 'human', 'wolfman', 'lizardman'].includes(t.concept))?.concept ?? 'human',
+          focal.tags.some(t => t.concept === 'female') ? 'female' : 'male');
+      }
       focal.location = HELD('limbo');
       this.addCard(focal);
     }
@@ -1111,6 +1117,17 @@ export class Game {
     if (eco.kind === 'gold-hoard' || isPersonal) {
       const f = g.cast.find(m => m.name === focal.name);
       if (f?.role === 'prize') f.role = 'quarry';
+    }
+    // CAST-SLOT INTEGRITY (2026-07-11 — judges found recycled slate names bound into the
+    // quarry/prize slot of sagas that starred someone else, in 4+ bibles per campaign):
+    // the FOCAL owns the central role; any other holder is demoted to a supporting one.
+    {
+      const centralRole = eco.kind === 'recruit' ? 'prize' : 'quarry';
+      const focalEntry = g.cast.find(m => m.name === focal.name);
+      if (focalEntry && !isPersonal && !['client'].includes(focalEntry.role)) focalEntry.role = centralRole;
+      for (const m of g.cast) {
+        if (m !== focalEntry && (m.role === 'quarry' || m.role === 'prize')) m.role = 'obstacle';
+      }
     }
     // LORE §1 / STORY_ENGINE §3: coined cast PERSIST as lore-only people — the world populates
     // itself with recurring faces (they surface in later recalls/slates and can be acquired);
@@ -1223,7 +1240,11 @@ export class Game {
       ];
       quest.approaches = raw.map((a, i) => ({
         id: `g${i}`, label: a.label,
-        rewardKind: (['recruit', 'captive', 'gold'].includes(a.rewardKind) ? a.rewardKind : 'gold') as 'recruit' | 'captive' | 'gold',
+        // a label promising RELEASE on a keep-kind plan lies to the player ("Yield Ysard" ended
+        // "Ysard is yours — captive") — the verb wins over the declared kind
+        rewardKind: (/\b(free|release|yield|hand (?:him|her|them) over|let .{0,12} go|slip .{0,16} free)\b/i.test(a.label)
+          ? 'gold'
+          : (['recruit', 'captive', 'gold'].includes(a.rewardKind) ? a.rewardKind : 'gold')) as 'recruit' | 'captive' | 'gold',
       }));
       // exactly ONE slot per approach — each group is its own manning plan
       const template = quest.slots[0]!;
@@ -1427,7 +1448,7 @@ export class Game {
     for (const s of st.holding.filter(s => s.expiresAtCycle <= st.cycle)) {
       const c = this.card(s.cardId);
       if (c) {
-        const pay = Math.round(c.value * SELL_RATE);
+        const pay = Math.round(cashValue(c.value) * SELL_RATE);
         this.ensureLoreNode(c); c.location = HELD('lore');
         this.addGold(pay);
         guardEdges(st.lore, [{ from: c.id, to: c.id, type: 'party-to', blurb: 'handed off by the company when their holding lapsed — no longer at the fort', importance: 0.7 }], st.cycle, () => freshId('e'));
@@ -1564,12 +1585,32 @@ export class Game {
     if (q.chainId) {
       const chain = this.state.chains.find(c => c.id === q.chainId);
       if (chain && (chain.state === 'active' || chain.state === 'finale-pending')) {
-        this.state.leads.push({
-          id: freshId('lead-'), rarity: chain.rarity, level: chain.level, region: chain.region,
-          archetype: 'investigate', chainInfo: { kind: 'continues', chainId: chain.id, hook: chain.story.currentSituation },
-          expiresAtCycle: this.state.cycle + LEAD_TTL + CONTINUATION_TTL_BONUS, source: 'continuation',
-          title: `${chain.bible.title} — the thread dangles`,
-        });
+        // RE-OFFER CAP (2026-07-11): one beat card was re-offered 28 TIMES over 90 cycles.
+        // Three lapses of the same beat = the company isn't taking this job — the story slips
+        // gracefully (a road back exists) instead of nagging forever.
+        chain.reOffers = (chain.reOffers ?? 0) + 1;
+        if (chain.reOffers >= 3) {
+          chain.state = 'slipped'; chain.bank = 0;
+          const focal = this.card(chain.focalId);
+          if (focal && !chain.isPersonal && focal.location.kind === 'held' && (focal.location as { state?: string }).state === 'limbo') {
+            focal.location = HELD('lore');
+            this.ensureLoreNode(focal);
+            this.state.leads.push({
+              id: freshId('lead-'), rarity: chain.rarity === 'common' ? 'uncommon' : 'rare',
+              level: chain.level, region: chain.region, archetype: 'investigate',
+              chainInfo: { kind: 'starts-new' }, expiresAtCycle: null,
+              source: 'sequel', title: `${focal.name} resurfaces, someday`, focalId: focal.id,
+            });
+          }
+          report.push(`🕮 "${chain.bible.title}" was left untaken three times — the matter passes out of reach, for now.`);
+        } else {
+          this.state.leads.push({
+            id: freshId('lead-'), rarity: chain.rarity, level: chain.level, region: chain.region,
+            archetype: 'investigate', chainInfo: { kind: 'continues', chainId: chain.id, hook: chain.story.currentSituation },
+            expiresAtCycle: this.state.cycle + LEAD_TTL + CONTINUATION_TTL_BONUS, source: 'continuation',
+            title: `${chain.bible.title} — the thread dangles`,
+          });
+        }
       }
     }
     report.push(`⏳ ${q.title} lapsed — the moment passed.`);
@@ -1605,6 +1646,11 @@ export class Game {
     }
     const kind = r.quest.approaches?.find(a => a.id === r.quest.chosenApproach)?.rewardKind ?? 'gold';
     if (r.fate!.fate === 'slipped') return `${name} gets away — the company comes away with nothing this time (a road back will exist)`;
+    // the VOID overlay must reach the narrator too — "He will ride with the company" shipped one
+    // line above "the season ran too thin to keep him"
+    if (chain && focal && kind !== 'gold' && chain.bank < focal.value * KEEP_THRESHOLD) {
+      return `the season ran too thin to keep ${name} — they pass out of the company's reach, for now, and the company takes what coin the affair yielded`;
+    }
     const ending = kind === 'recruit' ? `${name} ends this saga siding with the company and will ride with it from here`
       : kind === 'captive' ? `${name} ends this saga held, in the company's hands`
       : `${name} passes out of the company's reach, and the company is paid for the whole affair`;
@@ -1707,7 +1753,7 @@ export class Game {
           if (!st.cards.includes(c)) st.cards.push(c);
         } else {
           // no Tavern yet — the grateful rescued pay what they can and move on (🛠 salvage)
-          const pay = Math.round(c.value * 0.4);
+          const pay = Math.round(cashValue(c.value) * 0.4);
           this.addGold(pay);
           this.ensureLoreNode(c);
           c.location = HELD('lore');
@@ -2000,7 +2046,7 @@ export class Game {
     const kind = approach?.rewardKind ?? (chain.kind === 'gold-hoard' ? 'gold' : chain.kind === 'recruit' ? 'recruit' : 'captive');
     if (chain.isPersonal || focalIsOwnMerc) {
       // personal finale: bank crystallizes as gold + pinned CORE memory (no new character)
-      const surplus = Math.round(chain.bank);
+      const surplus = cashValue(chain.bank);
       this.addGold(surplus);
       guardEdges(st.lore, [{ from: chain.focalId, to: chain.focalId, type: 'scarred-by', blurb: `came through ${chain.bible.title}`, importance: 0.9 }], st.cycle, () => freshId('e'));
       report.push(`🏅 ${focal?.name}'s story closes: +${surplus}g and a mark that stays.`);
@@ -2011,7 +2057,7 @@ export class Game {
     // KEEP·mark can't hold its prize — the focal slips for salvage gold instead of arriving
     // shackled to a crushing debt. A road back exists (§21-4a).
     if (kind !== 'gold' && chain.bank < focal.value * KEEP_THRESHOLD) {
-      const pay = Math.round(chain.bank);
+      const pay = cashValue(chain.bank);
       this.addGold(pay);
       focal.location = HELD('lore');
       st.leads.push({
@@ -2036,7 +2082,7 @@ export class Game {
     } else if (kind === 'recruit') {
       // §2 value-invariance: the bank already paid the mark — a recruit finale JOINS CLEAN
       // (staging them at the tavern re-charged 1.2×mark on top; that double-charge is gone)
-      const surplus = crystallize(chain, focal.value);
+      const surplus = cashValue(crystallize(chain, focal.value));
       this.addGold(surplus);
       const shortDebt = Math.max(0, Math.round(focal.value - chain.bank));
       if (shortDebt > 0) this.addCard(mintStackable('debt', shortDebt));
@@ -2055,7 +2101,7 @@ export class Game {
       focal.character!.role = 'captive';
       st.holding.push({ cardId: focal.id, expiresAtCycle: st.cycle + STAGE_TTL_FINALE });
       focal.location = HELD('staged');
-      const surplus = crystallize(chain, focal.value);
+      const surplus = cashValue(crystallize(chain, focal.value));
       this.addGold(surplus);
       // ONE debt rule: the shortfall between the bank and the focal's mark (QUESTS §5)
       const shortDebt = Math.max(0, Math.round(focal.value - chain.bank));
