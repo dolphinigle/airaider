@@ -1059,3 +1059,9 @@ the instruction's own 'without'); focal-merc never handed into custody mid-saga 
 narrated into wardens' custody then marched next cycle); genesis may invent the WORLD's past,
 never the COMPANY's (sieges/vouches the player never played — third sighting). Late-game pay/bar
 scaling + lead-hunt faucet monoculture recorded 🔴 designer-scope | engine+prompt+seed |
+| 339 | Region-brief CONFIRM probe (74504): 4/4 LANDED — Underdeep 10/10 cards keep people at the
+entrances (things below: fissures, sounds, an unaging figure); Highlands off the Howling Pass
+(6/8 → 1/3, anchors live); Outskirts name-loss identity is load-bearing ("the ring is the only
+steady name beyond the border-stones"); Coast clan-speakers are clients with a NAMED speaker
+(Tzaess). 'further work' purged 0 hits. Wound LANGUAGE now matches band (a lodged spear read as
+low-tier) | confirm+prompt |
