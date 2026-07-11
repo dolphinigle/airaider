@@ -1116,3 +1116,13 @@ ownerId (unfreezes levels AND roster) + generic build fallback (ladder fuel); ch
 integrity forced (focal owns quarry/prize; imposters demoted); fateSentence void-aware ("he will
 ride with the company" shipped beside "ran too thin to keep him"); release-verb labels coerce
 rewardKind gold ("Yield Ysard" ended captive) | engine+harness |
+| 343 | round-2: income 1.09→1.20/level 🛠 (1.09 starved a 115-cycle fort to 234g; 1.35 exploded to
+54k — 1.20 matches the re-paced ladder costs). Campaign-13 judge (economy aside, 7.5/7/6.5):
+roster/levels MOVE (3→33 mercs, ⭐ through c110), re-offer cap 100% honored and slips CONVERT TO
+CONSEQUENCE (an unprotected quarry returned sold-onward with the old client as slaver-patron —
+the system generating story), City refresh lands. Fixes: custody-of-the-departed mechanical retry
+at genesis (a SOLD entertainer re-appeared "in your cells"); 3-char prefix crowding guard
+(Naemar/Naeryn/Naeiel/Naeeth); difficulty MIX stiffens with GH tier 🛠 (+3%/tier easy→hard;
+veterans strolled commons at 95%+); gold-fate leaves INTO the arrangement (paid-despite-escape);
+wrongness-signal variety (misplaced child's object ×14); pair-exchange de-whispered; avoidQuirks
+20; flesh batch cap 8 (tag-dump WHO backlog); recruiting faucet pauses at tavern≥3 | engine+prompt |

@@ -692,9 +692,12 @@ export class Game {
     // the day-0 packet is visible pre-Lead-room, as are STANDING faucets (posted at their own
     // buildings) and EARNED reward leads — a "+ lead" the player was paid must never be
     // invisible (a reader saw one expire unseen behind the Lead-room gate)
+    // the recruiting faucet PAUSES while the tavern queue is already deep (🛠 2026-07-11:
+    // ~50 rescuees walked out unhired in one long campaign — dead "may join" promises)
+    const paused = (l: Lead) => l.source === 'recruiting' && this.state.tavern.length >= 3;
     if (!this.hasRoom('lead-room'))
-      return this.state.leads.filter(l => l.source === 'starter' || l.source === 'reward' || l.expiresAtCycle === null);
-    return this.state.leads;
+      return this.state.leads.filter(l => !paused(l) && (l.source === 'starter' || l.source === 'reward' || l.expiresAtCycle === null));
+    return this.state.leads.filter(l => !paused(l));
   }
 
   async pursue(leadId: string): Promise<{ ok: boolean; msg: string; questId?: string }> {
@@ -744,7 +747,7 @@ export class Game {
     for (let i = 0; i < n; i++) {
       const a = ask[i];
       let test: SlotTest;
-      let difficulty = rollDifficulty(this.rng, rarity);
+      let difficulty = rollDifficulty(this.rng, rarity, this.state.fort.ghTier);
       if (maxDifficulty && CAP_ORDER.indexOf(difficulty) > CAP_ORDER.indexOf(maxDifficulty))
         difficulty = maxDifficulty;
       let requirement: QuestSlot['requirement'] = { kind: 'open' };
@@ -1060,6 +1063,10 @@ export class Game {
       // same client shipped in one run while title+kernel alone stayed just under the bar
       const kw = words(`${g.title} ${g.kernel} ${g.arc.join(' ')} ${g.tensions.join(' ')} ${g.cast.map(c => `${c.name} ${c.role}`).join(' ')} ${g.newPlaces.map(p => p.name).join(' ')}`);
       const clash = avoid.find(a => { const aw = words(a); let hit = 0; kw.forEach(w => { if (aw.has(w)) hit++ }); return hit >= 3 });
+      // custody-of-the-departed guard (mechanical — the outOfReach flag alone was ignored:
+      // a SOLD entertainer re-appeared "in your cells" three cycles later)
+      const goneNames = slate.filter(s => s.outOfReach).map(s => s.name);
+      const custodyGhost = goneNames.find(n => g.situation.includes(n) && /\b(cells?|custody|held at the fort|in your keeping)\b/i.test(g.situation));
       // same-CLIENT guard (mechanical — the prompt rule alone left one lore client running
       // three sagas at once): a live chain's client may not client the new saga too
       // live chains AND the last few closed ones — one rescue NPC once cliented 5 of 6
@@ -1069,10 +1076,12 @@ export class Game {
         ...this.state.chains.slice(-3)]
         .flatMap(c => c.bible.cast.filter(x => (x.role === 'client' || x.role === 'obstacle') && x.loreId).map(x => `${x.role}:${x.loreId}`)));
       const clientDup = g.cast.find(x => (x.role === 'client' || x.role === 'obstacle') && x.loreId && liveClients.has(`${x.role}:${x.loreId}`));
-      if (clash || clientDup) {
+      if (clash || clientDup || custodyGhost) {
         const why = clash
           ? `your rejected draft "${g.title} — ${g.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground`
-          : `your rejected draft used ${clientDup!.name} as ${clientDup!.role} — they already hold that role in a running saga; this one needs a different ${clientDup!.role} entirely`;
+          : custodyGhost
+            ? `your rejected draft placed ${custodyGhost} in the company's custody — they passed out of the company's reach and are FREE in the world; rebuild the saga around where they actually stand`
+            : `your rejected draft used ${clientDup!.name} as ${clientDup!.role} — they already hold that role in a running saga; this one needs a different ${clientDup!.role} entirely`;
         g = await this.ai.genesis({ ...genesisInput, avoid: [...avoid, why] });
       }
     }
@@ -1255,7 +1264,7 @@ export class Game {
         // QUESTS §9: each PLAN carries its own difficulty — the cash-out road leans easy
         // (one cloned roll made every branch identical; an easy gold exit could never occur)
         const difficulty = quest.approaches![i]!.rewardKind === 'gold' && this.rng.chance(0.7)
-          ? 'standard' as const : rollDifficulty(this.rng, chain.rarity);
+          ? 'standard' as const : rollDifficulty(this.rng, chain.rarity, this.state.fort.ghTier);
         return {
           requirement: { kind: 'open' as const },
           test: { ...template.test, attributes, favored, difficulty },
@@ -1856,6 +1865,11 @@ export class Game {
         || (g.length >= 6 && xg.length >= 6 && xg.slice(-4) === g.slice(-4))
         || (!!e && epithet(other) === e);
     };
+    // 3-char-prefix CROWDING: Naemar/Naeryn/Naeiel/Naeeth all active at once read as one blurred
+    // family — a third name on an already-doubled prefix is rejected
+    const pre3 = g.slice(0, 3);
+    const crowd = this.state.cards.filter(x => x.character && given(x.name).slice(0, 3) === pre3).length;
+    if (crowd >= 2) return true;
     // lore-only people count too — a coined saga warlord "Grakjaw" was re-rolled as a
     // one-off rescue victim, one name wearing two opposite characters
     return this.state.cards.some(x => x.character && hit(x.name))
@@ -2123,7 +2137,7 @@ export class Game {
       const owned = this.isOwned(c) || c.location.kind === 'quest';
       if (!owned && !staged) continue;
       needs.push(c);
-      if (needs.length >= 5) break;   // batch cap per cycle
+      if (needs.length >= 8) break;   // batch cap per cycle (5 backlogged 30-hire campaigns into tag-dump WHOs)
     }
     if (!needs.length) return;
     try {
@@ -2148,7 +2162,7 @@ export class Game {
             want: genesis.bible.cast.find(e => e.name === c.name)?.want ?? null,
           } : undefined,
           // cross-batch quirk dedup — "tilts head when listening" landed on 4 people
-          avoidQuirks: st.cards.flatMap(x => x.character?.quirks ?? []).slice(-10),
+          avoidQuirks: st.cards.flatMap(x => x.character?.quirks ?? []).slice(-20),
         };
       }));
       for (const o of outs) {

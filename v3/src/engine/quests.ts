@@ -167,12 +167,15 @@ export function slotCount(rng: Rng, archetype: Archetype, rarity: Rarity): numbe
 }
 
 /** difficulty roll 🛠 (E-roll weights — impl knob, sim-calibrated later) */
-export function rollDifficulty(rng: Rng, rarity: Rarity): DifficultyName {
+export function rollDifficulty(rng: Rng, rarity: Rarity, ghTier = 1): DifficultyName {
+  // 🛠 2026-07-11: a mature fort's veterans strolled commons at 95%+ success — the difficulty
+  // MIX now stiffens with the Great Hall (≈ +3%/tier drained from the easy end into the hard)
+  const shift = Math.min(0.30, Math.max(0, (ghTier - 2) * 0.03));
   const w: [DifficultyName, number][] = rarity === 'common'
-    ? [['trivial', 0.15], ['standard', 0.55], ['hard', 0.30]]
+    ? [['trivial', Math.max(0.03, 0.15 - shift)], ['standard', Math.max(0.20, 0.55 - shift)], ['hard', 0.30 + shift], ['brutal', shift]]
     : rarity === 'uncommon'
-      ? [['standard', 0.40], ['hard', 0.45], ['brutal', 0.15]]
-      : [['standard', 0.15], ['hard', 0.45], ['brutal', 0.30], ['extreme', 0.10]];
+      ? [['standard', Math.max(0.10, 0.40 - shift)], ['hard', 0.45], ['brutal', 0.15 + shift]]
+      : [['standard', Math.max(0.05, 0.15 - shift)], ['hard', 0.45 - shift / 2], ['brutal', 0.30 + shift], ['extreme', 0.10 + shift / 2]];
   return rng.weighted(w);
 }
 
