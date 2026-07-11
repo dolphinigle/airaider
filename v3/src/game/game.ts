@@ -828,15 +828,20 @@ export class Game {
     // variants per source — one fixed string per channel became its own stamp
     const specialPools: Partial<Record<Lead['source'], string[]>> = {
       interrogation: ['a captive in the company\'s cells gave it up', 'it was traded out of the cells for small comforts'],
-      hunt: ['the company\'s own searching turned it up', 'it was found while looking for something else', 'it turned up on a routine pass'],
+      hunt: ['the company\'s own searching turned it up', 'it was found while looking for something else', 'it surfaced along the way of other work'],
       reward: ['word of it came home with the last job', 'it grew out of business already done'],
       collector: ['a debt long owed to the company has come due', 'an old obligation has surfaced'],
     };
     const special: Partial<Record<Lead['source'], string>> = Object.fromEntries(
       Object.entries(specialPools).map(([k, v]) => [k, this.rng.pick(v!)]));
+    // the fort stands in the HOME region — "seen from the walls" is impossible for a far-region
+    // matter ("from the fort walls you watched a Brass Quarter lender's back room")
+    const homeRegion = this.state.unlockedRegions[0] ?? 'forests';
     const sparkOpts = {
       channel: lead.source === 'hunt' || lead.source === 'reward' ? 'patrol' as const
-        : lead.source === 'collector' ? 'notice' as const : undefined,
+        : lead.source === 'collector' ? 'notice' as const
+        : lead.region !== homeRegion ? this.rng.pick(['bringer', 'talk', 'notice', 'patrol'] as const)
+        : undefined,
     };
     let opening = sampleOpening(this.rng, sparkOpts);
     // spark recency: one reroll if the same figure was dealt lately ("a poacher turned

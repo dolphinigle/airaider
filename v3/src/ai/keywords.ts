@@ -444,7 +444,7 @@ export type IntakeChannel = 'bringer' | 'sign' | 'patrol' | 'talk' | 'notice';
 const INTAKE_FACT: Record<IntakeChannel, string[]> = {
   bringer: ['someone came to the fort with it', 'it was carried to the gate in person', 'it arrived with a caller at the gate'],
   sign: ['it was seen from the fort\'s own walls', 'the fort noticed it before anyone spoke of it', 'the signs of it are plain from the walls'],
-  patrol: ['the company\'s own people came back with it', 'it came home with the last patrol', 'one of your own crossed it in the field', 'your riders passed through the middle of it'],
+  patrol: ['the company\'s own people came back with it', 'it came home with the last patrol', 'one of your own crossed it in the field'],
   talk: ['it was picked up from common talk in the country nearby', 'the countryside is talking of it', 'it is the story every visitor tells this week'],
   notice: ['it stands promised in public writing', 'it is posted for any taker', 'the offer has hung unclaimed a while'],
 };

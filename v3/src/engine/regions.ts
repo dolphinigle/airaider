@@ -38,6 +38,12 @@ export const REGIONS: Region[] = [
     poolWeights: { human: 5, elf: 1, wolfman: 0.5, lizardman: 0.5 },
     ghTier: 4, prev: 'forests',
     seed: 'A walled river-city of guilds and grudges; the Brass Quarter never sleeps.',
+    // first live read (2026-07-11): 8 of 8 city cards sat in the Brass Quarter — same one-landmark
+    // trap as Thornhollow; anchors + the landmark cooldown fix the class
+    seedPlain: 'A walled river-city of guilds and grudges.',
+    landmark: 'the Brass Quarter',
+    anchors: ['the North Wharf', 'the tanners\' bank downriver', 'the grain bridges',
+      'the old wall gates', 'the boat-yards', 'the cloth-hall square'],
   },
   {
     id: 'coast', name: 'The Drowned Coast', faction: 'lizardman', levelBand: [12, 22],

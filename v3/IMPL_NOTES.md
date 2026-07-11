@@ -1047,3 +1047,15 @@ blade leave the racks" was the failure class); probe-verified ("A scribe who sig
 company formed. She will not bend to work that breaks her rules."); batch station-phrase dedup;
 **founders get personal chains** (STORY_ENGINE trigger 1 never fired for the day-0 three — their
 pasts could not stir; test selectors now skip personal leads when picking generic sagas) | engine+prompt+docs |
+| 329-331 | LATE-GAME first read (scripts/_lateprobe.ts — fast-forwarded GH T5 fort, City unlocked,
+real AI; the City had NEVER been generated live): verdict "the City's voice is ready — guilds,
+debts, quays land as a real different place; not ready as an experience". Fixes: City gains
+seedPlain + landmark('the Brass Quarter') + 6 anchors — 8/8 city cards had crammed into the Brass
+Quarter (the Thornhollow one-landmark trap, second region); far-region cards never roll the
+'seen from the walls' intake (a fort in the forests watched into a city back room); lead-hunt
+variety gloss ("further work" promise leaked from the envelope ×5; 'routine pass' intake string
+stamped ×8 — replaced); failure-cost line de-worded ('without X and without Y' frame ×3 grew from
+the instruction's own 'without'); focal-merc never handed into custody mid-saga (a founder was
+narrated into wardens' custody then marched next cycle); genesis may invent the WORLD's past,
+never the COMPANY's (sieges/vouches the player never played — third sighting). Late-game pay/bar
+scaling + lead-hunt faucet monoculture recorded 🔴 designer-scope | engine+prompt+seed |
