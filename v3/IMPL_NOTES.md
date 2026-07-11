@@ -1037,3 +1037,13 @@ world (city at GH T4 still out of reach — THE structural ceiling), dice diffic
 (89% success, +9g vs +351g commons, saga beats pay less than commons), roster-cap-5 tavern
 treadmill (8/10 guests time out unhired), finale debt/Surplus-0 legibility, gold sink exhaustion
 after ~c22 (#219 gold-share item).**
+| 325-328 | LIVE-PLAYTEST rounds (designer playing): quarryTags race/sex echo (2 of 3 slots wasted
+restating fixed identity — probe-verified fix: hunter/tough/clever, zero echo); actorless
+before-texts ("a cord led from a forked stake to a spring snare—" — scenery capped at one
+sentence, party must appear, brink = something in MOTION); web AI-log JSON pretty-printed;
+**WHO-LINE RULING (docs/DESIGN.md 🔒 2026-07-11)**: character-card register calibrated on Fire
+Emblem Heroes blurbs — station/origin + ONE hook; micro-habits belong to quirks ("she sees every
+blade leave the racks" was the failure class); probe-verified ("A scribe who signed on when the
+company formed. She will not bend to work that breaks her rules."); batch station-phrase dedup;
+**founders get personal chains** (STORY_ENGINE trigger 1 never fired for the day-0 three — their
+pasts could not stir; test selectors now skip personal leads when picking generic sagas) | engine+prompt+docs |

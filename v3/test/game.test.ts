@@ -75,7 +75,7 @@ describe('game loop (mock AI)', () => {
   it('chains: a starts-new lead builds a bible around a focal and banks beats', async () => {
     const g = newGame(13);
     g.build('map-room');
-    const chainLead = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new');
+    const chainLead = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new' && l.source !== 'personal');
     expect(chainLead).toBeDefined();
     await g.pursue(chainLead!.id);
     expect(g.state.chains).toHaveLength(1);

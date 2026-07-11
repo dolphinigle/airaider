@@ -117,7 +117,7 @@ describe('hostile-order edge cases', () => {
   it('approach switching unassigns the other group; committed = chosen group only', async () => {
     g.build('map-room');
     // force a finale-shaped quest through a chain
-    const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new')!;
+    const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new' && l.source !== 'personal')!;
     await g.pursue(story.id);
     const chain = g.state.chains[0]!;
     chain.cyclesSpent = 999; // force finaleReady
@@ -196,7 +196,7 @@ describe('§21-4a sequel road-back', () => {
     g.state.cards.push(mintStackable('gold', 50000));
     g.build('map-room');
     g.build('lead-room');
-    const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new')!;
+    const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new' && l.source !== 'personal')!;
     await g.pursue(story.id);
     const chain = g.state.chains[0]!;
     const focalId = chain.focalId;

@@ -19,7 +19,7 @@ describe('audit-fix regressions', () => {
     g.build('map-room'); g.build('lead-room'); g.build('dungeon');
     g.state.fort.ghTier = 6;
     g.build('interrogation');
-    const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new')!;
+    const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new' && l.source !== 'personal')!;
     await g.pursue(story.id);
     const chain = g.state.chains[0]!;
     const focal = g.card(chain.focalId)!;
@@ -76,7 +76,7 @@ describe('audit-fix regressions', () => {
       relevantIds: [], newPlaces: [], newEdges: [],
     });
     (g as { ai: typeof g.ai }).ai = naughty;
-    const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new')!;
+    const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new' && l.source !== 'personal')!;
     await g.pursue(story.id);
     const chain = g.state.chains[0]!;
     const names = chain.bible.cast.map(c => c.name);
@@ -106,7 +106,7 @@ describe('audit-fix regressions', () => {
   it('#35 one debt rule: finale debt equals the bank shortfall exactly', async () => {
     const g = richGame(61);
     g.build('map-room'); g.build('lead-room');
-    const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new')!;
+    const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new' && l.source !== 'personal')!;
     await g.pursue(story.id);
     const chain = g.state.chains[0]!;
     // bank thin but ABOVE the KEEP floor — below it, REWARD_BANK §3 voids to salvage gold
@@ -141,7 +141,7 @@ describe('audit-fix regressions', () => {
   it('REWARD_BANK §3 void-to-gold: a bank under KEEP·mark salvages gold, never a debt-saddled prize', async () => {
     const g = richGame(61);
     g.build('map-room'); g.build('lead-room');
-    const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new')!;
+    const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new' && l.source !== 'personal')!;
     await g.pursue(story.id);
     const chain = g.state.chains[0]!;
     const focal = g.card(chain.focalId)!;
@@ -171,7 +171,7 @@ describe('audit-fix regressions', () => {
   it('focal backstory is tied to the genesis saga and written the cycle they are staged', async () => {
     const g = richGame(67);
     g.build('map-room'); g.build('lead-room');
-    const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new')!;
+    const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new' && l.source !== 'personal')!;
     await g.pursue(story.id);
     const chain = g.state.chains[0]!;
     chain.cyclesSpent = 999; chain.bank = 9999;   // finale ready, no debt noise

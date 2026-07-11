@@ -67,6 +67,12 @@ Characters are the atoms. Mercenaries (roster), captives (loot), and NPCs (world
 - **Tags** — the loot/identity layer *and* the personality. **Personality = tags** (a `greedy, hot-headed` merc with a `soldier` background behaves greedily, rashly, like a soldier). Tags are the behavioral fingerprint that individuates them.
 - **Quirks** — small AI-generated concrete habits ("counts coins twice").
 - **`who` + backstory** — a one-line known-for and a short AI-written origin, generated when they enter the pool, fitting their tags and how they were acquired.
+  > 🔒 2026-07-11 ruling: the `who` line is a **CHARACTER-CARD line** — station/origin + ONE hook
+  > (a drive, a past, a temper), calibrated on Fire Emblem Heroes hero blurbs ("A pegasus knight in
+  > training. Traveling the world to hone her skills."). Identity-altitude only: micro-habits live
+  > in quirks, never in `who` ("she sees every blade leave the racks" was the failure). Applies to
+  > flesh, resolve-fleshed, and genesis cast.who alike. Also: STORY_ENGINE trigger 1 ("a merc
+  > joining → personal chain") applies to the day-0 FOUNDERS too.
 - **Their chains** — the quests they pass through (cast in others') plus the one chain about them (their main story). *The chains are their living memory and biography* — there is no separate psychological model. (See STORY_ENGINE.md for how this stays token-affordable.)
 - **State** — level/veterancy, injuries (tiers), current status, current room (captives only).
 

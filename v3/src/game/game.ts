@@ -133,6 +133,9 @@ export class Game {
       merc.location = HELD('roster');
       this.addCard(merc);
       this.ensureLoreNode(merc);
+      // STORY_ENGINE trigger 1 applies to FOUNDERS too — only hires got "past stirs" leads,
+      // so a starter's story could never begin (2026-07-11)
+      this.spawnPersonalChainLead(merc);
     }
     this.log('start', 'The fort stands: your bedroom, a bunkroom, and the Great Hall. Build a Map room to find work.');
   }
