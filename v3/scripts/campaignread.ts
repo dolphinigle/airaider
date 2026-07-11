@@ -66,11 +66,14 @@ for (let c = 0; c < cycles; c++) {
       if (g.build(any.type).ok) say(`c${g.state.cycle} BUILD ${any.type} (−${goldBefore - g.gold()}g)`);
     }
   }
-  const up = g.state.fort.rooms.filter(r => ROOM_TYPE[r.type]!.species === 'comfort')
-    .sort((a, b) => a.slots.length - b.slots.length)[0];
-  if (up && g.gold() > 300) {
+  // up to TWO upgrades a cycle when flush — the single-upgrade habit was a prestige binder
+  for (let u = 0; u < 2; u++) {
+    const up = g.state.fort.rooms.filter(r => ROOM_TYPE[r.type]!.species === 'comfort')
+      .sort((a, b) => a.slots.length - b.slots.length)[0];
+    if (!up || g.gold() < (u === 0 ? 300 : 700)) break;
     const goldBefore = g.gold();
     if (g.upgrade(up.id).ok) say(`c${g.state.cycle} UPGRADE ${up.type} (−${goldBefore - g.gold()}g)`);
+    else break;
   }
   for (const room of g.state.fort.rooms) {
     const rt = ROOM_TYPE[room.type]!;

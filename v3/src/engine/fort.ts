@@ -104,18 +104,24 @@ export const ROOM_TYPE: Record<string, RoomType> = Object.fromEntries(ROOM_TYPES
  *  phase 2 knee AT T10 — T11-T15 each take several times a phase-1 tier (endgame grind
  *  by design). Fitted to the measured mock-sim prestige curve (scripts/_tiersim.ts),
  *  each phase-1 step ≤ ~85% of the P the previous tier's slot depth can produce. */
+// 🛠 2026-07-11 SECOND refit: the income-curve fix (1.20/level) slowed prestige accrual ~40%
+// under real play — thresholds re-fitted to the MEASURED prestige-by-cycle medians so the
+// two-phase ruling holds (T4 ≈ c37, T7 ≈ c75, T10 ≈ c100; knee after T10).
 export const GH_THRESHOLDS: Record<number, number> = {
-  2: 2, 3: 7, 4: 16, 5: 30, 6: 42, 7: 54, 8: 68, 9: 82, 10: 96,
-  11: 200, 12: 320, 13: 460, 14: 620, 15: 800,
+  2: 2, 3: 4, 4: 8, 5: 13, 6: 19, 7: 24, 8: 32, 9: 44, 10: 58,
+  11: 150, 12: 240, 13: 350, 14: 480, 15: 650,
 };
 
-/** slot-depth gate: max slots (= max upgrades) per room by GH tier (§20.1) */
+/** slot-depth gate: max slots (= max upgrades) per room by GH tier (§20.1).
+ *  🛠 2026-07-11 loosened one band: the tier↔slots↔prestige loop PLATEAUED (P stuck ~22 for 30
+ *  cycles mid-game) — slots gate prestige which gates the tier which gates slots. The escalating
+ *  upgrade cost (1.25^slots) stays as the real brake. */
 export function maxSlotsAtTier(ghTier: number): number {
-  if (ghTier <= 2) return 1;
-  if (ghTier <= 5) return 2;
-  if (ghTier <= 8) return 3;
-  if (ghTier <= 11) return 4;
-  if (ghTier <= 13) return 5;
+  if (ghTier <= 1) return 1;
+  if (ghTier <= 3) return 2;
+  if (ghTier <= 6) return 3;
+  if (ghTier <= 9) return 4;
+  if (ghTier <= 12) return 5;
   return 6;
 }
 

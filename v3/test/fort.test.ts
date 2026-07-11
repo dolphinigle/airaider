@@ -63,9 +63,9 @@ describe('cap ladder (§20: ~16 @T5-ish comfort, endgame lift)', () => {
 });
 
 describe('the Great Hall clock', () => {
-  it('slot depth gates by tier', () => {
+  it('slot depth gates by tier (🛠 2026-07-11 loosened one band)', () => {
     expect(maxSlotsAtTier(1)).toBe(1);
-    expect(maxSlotsAtTier(4)).toBe(2);
+    expect(maxSlotsAtTier(3)).toBe(2);
     expect(maxSlotsAtTier(6)).toBe(3);
     expect(maxSlotsAtTier(15)).toBe(6);
   });

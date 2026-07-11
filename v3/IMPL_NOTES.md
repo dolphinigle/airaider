@@ -1126,3 +1126,9 @@ at genesis (a SOLD entertainer re-appeared "in your cells"); 3-char prefix crowd
 veterans strolled commons at 95%+); gold-fate leaves INTO the arrangement (paid-despite-escape);
 wrongness-signal variety (misplaced child's object ×14); pair-exchange de-whispered; avoidQuirks
 20; flesh batch cap 8 (tag-dump WHO backlog); recruiting faucet pauses at tavern≥3 | engine+prompt |
+| 344 | round-3: economy CONFIRMED healthy (1-3.3k gold, 30 hires, ~32 ⭐, 14-16 real failures per
+115 cycles) but the ladder slowed to T5-T6 — the income fix cut prestige-side spending ~40%.
+Slot-depth gate loosened one band 🛠 (the reserved lever: P plateaued at 22 for 30 cycles — the
+tier↔slots↔prestige loop; 1.25^slots upgrade cost stays the brake); harness does 2 upgrades/cycle
+when flush; GH_THRESHOLDS re-fitted to the MEASURED prestige curve (T2-T10 = 2/4/8/13/19/24/32/
+44/58, knee 150-650): sim medians T4 c40 · T7 c58-75 · T10 c96 | engine+harness |
