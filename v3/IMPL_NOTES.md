@@ -1089,3 +1089,17 @@ to wrong cast names (validation rule new), delivered-then-respawned third-party 
 class; dead-ground covers company custody, third-party custody claims still drift), stat-dump WHO
 leaks (timeless-card register new), harness doesn't print GH tier-ups or dossier MEMORIES (judges
 couldn't see either — add to campaignread next session).
+
+## TWO-PHASE TIER RE-PACE (2026-07-11 designer ruling: "8/10 fun until T10, then endgame slows")
+| 341 | GH_THRESHOLDS recalibrated (worktree sim, 10 seeds × 130cy, binder-instrumented): T2-T10 =
+2/7/16/30/42/54/68/82/96 (was 9/16/48/80/118/230/310/350/510), knee, T11-15 = 200/320/460/620/800.
+Post-change: T4/City c37 median 10/10 seeds · T7 c71 · T10 ~c100 8/10 · T10→11 transit 21-49cy ✓.
+Baseline had T5+ NEVER reached (prestige plateau P77-79 vs old T5=80). Latent bug fixed: a zero
+threshold read as "final tier" (game.ts need===undefined). Tier-ups now ANNOUNCED in the cycle
+report with newly-unlocked building names (judges read 3 campaigns without seeing a tier event).
+ghUpgradeCost re-paced two-phase to match (1.18^T through T10 — the old 1.32 tail stalled half
+the seeds 10-27cy on gold with prestige ready; ×2.2/tier after T10 = the endgame money sink sims
+showed was missing, 14-36k banked unused). Rarity shift: rares from ~T3/c29 (was ~c40). Docs
+annotated (FORT.md Great Hall block, GENERATION_FLOW §20 time budget). Long-play harness: bedrooms
++ dungeon-cells on demand, full unlock queue (no prior run could build a 6th bed or enter the
+City by POLICY — rosters froze at 5 in every judged campaign) | engine+harness+docs |

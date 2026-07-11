@@ -83,6 +83,9 @@ export interface GameState {
   liabilityBirth: Record<string, number>;
   /** failure-debt echoes: a named person left in peril RESURFACES (the story bends, never dead-ends) */
   pendingEchoes: { focalId: string; atCycle: number; lastSeen?: string }[];
+  /** tier-up lines minted by ghUpgrade, surfaced in the NEXT endCycle report (judges read
+   *  campaign reports and never saw a tier event — the log line alone was invisible) */
+  pendingTierLines?: string[];
   log: LogEntry[];
 }
 
@@ -456,14 +459,20 @@ export class Game {
   ghUpgrade(): { ok: boolean; msg: string } {
     const to = this.state.fort.ghTier + 1;
     const need = GH_THRESHOLDS[to];
-    if (!need) return { ok: false, msg: 'the Great Hall is at its final tier' };
+    if (need === undefined) return { ok: false, msg: 'the Great Hall is at its final tier' };  // (!need read a 0 threshold as "final")
     const p = this.prestige();
     if (p < need) return { ok: false, msg: `needs prestige ${need} (have ${p.toFixed(0)})` };
     const cost = ghUpgradeCost(to);
     if (!this.spendGold(cost)) return { ok: false, msg: `costs ${cost}g` };
     this.state.fort.ghTier = to;
-    this.log('gh', `The Great Hall rises to Tier ${to}. New works are unlocked.`);
-    return { ok: true, msg: `Great Hall → T${to}` };
+    // visible tier-up announcement: name what THIS tier just put within reach — the raw
+    // log line never reached the endCycle report, so campaigns read as if tiers never moved
+    const unlocked = ROOM_TYPES.filter(rt => rt.ghTier === to && rt.id !== 'great-hall').map(rt => rt.name);
+    const line = `🏛 The Great Hall rises to Tier ${to}` +
+      (unlocked.length ? ` — newly within reach: ${unlocked.join(', ')}.` : '.');
+    (this.state.pendingTierLines ??= []).push(line);
+    this.log('gh', line);
+    return { ok: true, msg: `Great Hall → T${to}${unlocked.length ? ` — newly within reach: ${unlocked.join(', ')}` : ''}` };
   }
 
   slot(roomId: string, slotIdx: number, cardId: string): { ok: boolean; msg: string } {
@@ -1313,6 +1322,8 @@ export class Game {
     const st = this.state;
     st.cycle += 1;
     const report: string[] = [];
+    // tier-ups from this cycle's fort phase lead the report (the moment must be SEEN)
+    if (st.pendingTierLines?.length) { report.push(...st.pendingTierLines); st.pendingTierLines = [] }
 
     // (the FLESH pass runs at step 7, AFTER resolution/staging — people minted THIS
     // reckoning — finale focals, fresh tavern faces — must be fleshed before the player sees them)

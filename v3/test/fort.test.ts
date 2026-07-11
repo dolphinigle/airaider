@@ -72,9 +72,10 @@ describe('the Great Hall clock', () => {
   it('thresholds are monotonic', () => {
     for (let t = 3; t <= 15; t++) expect(GH_THRESHOLDS[t]!).toBeGreaterThan(GH_THRESHOLDS[t - 1]!);
   });
-  it('costs scale ~1.32^T', () => {
+  it('costs scale two-phase (🛠 2026-07-11: gentle through T10, steep endgame sink after)', () => {
     expect(buildCost({ id: 'x', name: 'x', species: 'comfort', benefit: 'prestige', archetype: 'std', ghTier: 1 })).toBe(120);
-    expect(ghUpgradeCost(2) / ghUpgradeCost(1)).toBeCloseTo(1.32, 1);
+    expect(ghUpgradeCost(2) / ghUpgradeCost(1)).toBeCloseTo(1.18, 1);
+    expect(ghUpgradeCost(11) / ghUpgradeCost(10)).toBeGreaterThan(2);   // the knee
   });
 });
 

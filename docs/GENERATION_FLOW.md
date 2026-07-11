@@ -1641,6 +1641,9 @@ GOALS: G1 master clock (P→L→region) · G2 GH tiers = acts · G3 cadence (alw
 comfort→cap tracks expected L · G5 multiple viable paths · G6 loot-driven (captives/artifacts; gold
 can't cross a gate) · G7 verifiable by simulation.
 
+> 🔒 2026-07-11: superseded for the v3 prototype by the TWO-PHASE re-pace ruling (FORT.md Great
+> Hall block): T2→T10 at ~10-12 cycles/tier, knee at T10, endgame tiers several-fold slower.
+
 **TIME BUDGET:** 100+ h ≈ **2,000 cycles** (~3 min/cycle). **15 GH tiers** ≈ ~130 cycles (~5–7h)
 each. Region arcs of ~3 tiers: Forests T1–3 · City T4–6 · Coast T7–9 · Highlands+Underdeep T10–12 ·
 endgame→Outskirts T13–15. Levels ≈ +3/tier (L1→50, dice-verified). Prototype = T1–T6 (~30h, cuttable

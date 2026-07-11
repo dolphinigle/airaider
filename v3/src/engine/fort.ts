@@ -98,12 +98,15 @@ export const ROOM_TYPE: Record<string, RoomType> = Object.fromEntries(ROOM_TYPES
 
 // ---- Great Hall thresholds & pacing constants (§20.2) ------------------------------------
 
-/** prestige needed to raise the GH TO tier t. Reference thresholds recalibrated
- *  in-engine per §20.2 rule 1/3 — T2-T4 eased below ~85% of measured tier-reachable P
- *  (the T1-2 single-slot gate produces ~9-13 realistic; 12 was a knife-edge). */
+/** prestige needed to raise the GH TO tier t. 🛠 recalibrated 2026-07-11 (designer ruling:
+ *  §20.2's ~130-190 cycles/tier was "way too grindy" for the prototype) — TWO-PHASE curve:
+ *  phase 1 (T2-T10) ≈ one tier per 10-12 cycles (T4/City ≈ c34-40, T10 ≈ c95-110);
+ *  phase 2 knee AT T10 — T11-T15 each take several times a phase-1 tier (endgame grind
+ *  by design). Fitted to the measured mock-sim prestige curve (scripts/_tiersim.ts),
+ *  each phase-1 step ≤ ~85% of the P the previous tier's slot depth can produce. */
 export const GH_THRESHOLDS: Record<number, number> = {
-  2: 9, 3: 16, 4: 48, 5: 80, 6: 118, 7: 230, 8: 310, 9: 350, 10: 510,
-  11: 650, 12: 785, 13: 1030, 14: 1275, 15: 1500,
+  2: 2, 3: 7, 4: 16, 5: 30, 6: 42, 7: 54, 8: 68, 9: 82, 10: 96,
+  11: 200, 12: 320, 13: 460, 14: 620, 15: 800,
 };
 
 /** slot-depth gate: max slots (= max upgrades) per room by GH tier (§20.1) */
@@ -127,7 +130,13 @@ export function upgradeCost(type: RoomType, currentSlots: number): number {
 }
 export function renovateCost(type: RoomType): number { return Math.round(buildCost(type) * 0.25) }
 export function ghUpgradeCost(toTier: number): number {
-  return Math.round(120 * Math.pow(1.32, toTier - 1) * 1.6);
+  // 🛠 2026-07-11 two-phase (matches the threshold knee): phase-1 tiers stay affordable — the
+  // old 1.32 tail (T8-10 = 1.3-2.3k) stalled half the calibration seeds 10-27 cycles on GOLD
+  // while prestige stood ready; phase-2 tiers are the endgame's long-haul money sink (sims
+  // banked 14-36k unused — gold finally has somewhere to go).
+  if (toTier <= 10) return Math.round(120 * Math.pow(1.18, toTier - 1) * 1.6);
+  const t10 = 120 * Math.pow(1.18, 9) * 1.6;
+  return Math.round(t10 * Math.pow(2.2, toTier - 10));
 }
 export function endgameCost(): number { return Math.round(ghUpgradeCost(14) * 2) }
 /** expansion is PURE GOLD and stays a minor sink (FORT §1) — the ~60-room fort the

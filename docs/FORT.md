@@ -41,6 +41,13 @@ Each comfort room's number drives its **single** benefit channel (no double-dipp
 **GLOBAL PRESTIGE = Σ theme-room comfort.** Its only job: **permission** — it gates the **Great Hall tier ladder**, and the Great Hall tier gates everything else:
 
 > **The GREAT HALL** 🔒 — a no-slot landmark upgraded T1→T15 (gold + a prestige threshold per tier). **Each tier unlocks the next batch of buildings + the next slot-depth** — the tech tree made physical, the campaign's act structure (regions arrive ~every 3 tiers; see §6). Thresholds 🛠: measured-calibration × hand-smoothed **monotonic** ramp (reference: T2≈12 · T5≈88 · T8≈310 · T11≈650 · T15≈1,500; recalibrate in-engine — §20.2).
+> 🔒 2026-07-11 PROTOTYPE RE-PACE (designer ruling, supersedes the reference numbers above for v3):
+> the 2,000-cycle cadence was "way too grindy" for prototyping. TWO-PHASE ladder — **T2→T10 at
+> ~10-12 cycles/tier** (fun flows: City ~c37 · Coast ~c70 · Highlands ~c100), then a **knee at T10
+> where "endgame part 1" begins and tiers slow several-fold by design** (T15 = long-haul goal).
+> Thresholds AND Great-Hall upgrade costs recalibrated in-engine (measured, 10-seed sim,
+> IMPL_NOTES #341); tier-ups are now announced in the cycle report with their newly unlocked
+> buildings.
 
 Principles 🔒: **prestige is loot-driven** (slotted captives/artifacts; gold alone can't cross a gate — theme rooms *unlock gradually*, so empty-room spam can't ladder) · **no single dominant strategy** (deep-fill / spread-wide / bedroom-lean all verified viable within ~3%) · **bedroom depth drives the cap clock** (deepen your best bedrooms; cap-binding must be loudly visible in UI).
 
