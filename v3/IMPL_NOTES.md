@@ -1325,3 +1325,22 @@ words; the model composes; variety = combinations, not entry count.
   focal (company's own) landing quarry/prize/obstacle is forced to companion. Remaining watch
   (task #2 batch): obstacle wants that ALIGN with the goal (Nithonda), fate-wording echo in a
   slipped-saga after-text, band-language on 'deep gash' at low.
+- **#361 before-shape + prompt COMPACTION (designer: "the PROMPT TEXT is way too long… gpt-5-mini
+  can't handle it")**: (a) before-text now ENDS on the challenge itself — arrive → obstacle-as-
+  last-sentence → dice (Sultan's-Game shape, designer's "A and B went to C. But a big door
+  appears!"); verified 10/10 befores on seed 28009. (b) Measured drift: resolve system 4,303
+  tok / genesis 2,932 / writeQuest ~2,500-4,100 by kind, all at LOW reasoning effort. Compacted
+  per PROMPT_RULES §2/§8 — duplicates merged, rationale riders dropped, engine-guarded rules
+  cut, exception-chains → principles: resolve → 3,288 tok (−24%), saga/beat/finale blocks
+  ~−40%, genesis focal/slate bullets −45%. Verification campaign (seed 29010, $0.08): register
+  held (arrive→obstacle→dice→events on every card), sagas coherent, failures respected, tag
+  compliance 86/88. (c) The run's calls dump exposed two ENGINE bugs, both fixed: the genesis
+  issues() early clash-return MASKED a live-chain dup from the mechanical recast (Nurisea
+  obstacled two live sagas — dup now rides along every issue return), and a bible shipped
+  with its FOCAL absent from cast (now a validated-retry defect). (d) Context-free verifier on
+  the compacted renders: resolve CLEAN; two compression artifacts fixed (orphaned
+  framedCharacter ref; twistReveal→twist field-name mismatch — the middle-step twist-surfacing
+  rule referenced a field that doesn't exist in the writer's input, likely why twists
+  under-surfaced) + genesis 'development' kind got its missing ending/role (companion, matching
+  the engine forcing). Watch: 'technician' anachronism (one card), duplicate-sentence in a
+  before, "the next step is to…" plan-speak tail in one after.

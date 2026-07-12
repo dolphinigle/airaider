@@ -1101,8 +1101,14 @@ export class Game {
         // three sagas at once); obstacles too — concurrent sagas once shared ONE coined villain
         const clientDup = d.cast.find(x => x.name !== focal.name &&
           (liveAny.has(personKey(x)) || ((x.role === 'client' || x.role === 'obstacle') && recentRole.has(`${x.role}:${personKey(x)}`))));
-        if (clash) return { why: `your rejected draft "${d.title} — ${d.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground` };
-        if (custodyGhost) return { why: `your rejected draft placed ${custodyGhost} in the company's custody — they passed out of the company's reach and are FREE in the world; rebuild the saga around where they actually stand` };
+        // the saga is ABOUT the focal — a bible without them strands the care beat, the role
+        // forcing, and the finale steering (29010: a vault saga shipped with its focal absent)
+        const focalMissing = !d.cast.some(x => x.loreId === focal.id || x.name === focal.name);
+        // dup RIDES ALONG whatever why is reported: an early clash-return once masked a live-chain
+        // dup from the post-retry mechanical recast (29010: Nurisea obstacled two live sagas)
+        if (focalMissing) return { why: `your rejected draft's cast is missing ${focal.name} — the saga is ABOUT them; they must be a cast entry`, dup: clientDup };
+        if (clash) return { why: `your rejected draft "${d.title} — ${d.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground`, dup: clientDup };
+        if (custodyGhost) return { why: `your rejected draft placed ${custodyGhost} in the company's custody — they passed out of the company's reach and are FREE in the world; rebuild the saga around where they actually stand`, dup: clientDup };
         if (clientDup) return { why: `your rejected draft used ${clientDup.name} as ${clientDup.role} — they are already bound up in a running saga; this one needs a different person in that part entirely`, dup: clientDup };
         return null;
       };
