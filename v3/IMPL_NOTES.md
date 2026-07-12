@@ -1255,3 +1255,18 @@ words; the model composes; variety = combinations, not entry count.
   as to-infinitive/noun phrase ('wants prevent…' glue ×6 was a rendering of bare-verb stubs);
   metaphors must stay physically sensible ('anvils of boots'). Remaining watch: beat-state
   recap staleness (#345-8), quirk-out-of-scene echoes, after-text flatness (do not overcorrect).
+- **#356 fixpoint judge (24005) + round-4**: cringe 7/10, story 7/10 (old arms sit at 3-4/10).
+  The LIST-driven cringe classes are confirmed dead — the old arm printed the designer's own
+  exemplar ("a light where none should burn") as a card opener plus a card TITLED "Light Where
+  None Burns"; the new arm's worst offense is one throwaway coined name ('Farmolbrian'). What
+  remains is writer-behavior, and round-4 fixes the judge's top classes: (a) after-text may
+  never open by restating the job/list line (the restate+round-robin skeleton was the #1
+  remaining defect); (b) THE CARD KNOWS ONLY WHAT ITS SOURCES COULD KNOW (omniscient
+  scrap-under-a-floorboard card); (c) finale plans may not presuppose an unsurfaced twist
+  ("expose the forgery" offered before any forgery hint); (d) an obstacle's want must OPPOSE
+  the goal (Engail's want restated it); (e) LIVE chains fence their cast in EVERY role — one
+  gaoler anchored all three concurrent sagas by rotating roles (closed chains keep the
+  same-role-only fence, so faces recur over time, never in parallel). Score trajectory
+  6 → 6 → 7 → 7 with composition shifting from list-cringe to model-tail; remaining ledgered
+  classes: resolution-skeleton variety (watch after (a)), re-offer verbatim presentation
+  (#345-7), beat-state recap staleness (#345-8), register-slip tail, place-name 'hollow' mania.

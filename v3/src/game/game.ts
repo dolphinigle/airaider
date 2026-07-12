@@ -1078,9 +1078,13 @@ export class Game {
       // OWN bible, so an id-only check let one heir client two sagas born a cycle apart)
       const personKey = (x: { name: string; loreId?: string }) => x.loreId ?? loreByName.get(x.name) ?? x.name;
       // live chains AND the last few closed ones — one rescue NPC once cliented 5 of 6
-      // sequential sagas (the live-only window let her straight back in each time)
-      const liveClients = new Set([...this.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending'),
-        ...this.state.chains.slice(-3)]
+      // sequential sagas (the live-only window let her straight back in each time).
+      // 2026-07-12: a LIVE chain's cast is fenced in EVERY role (one gaoler anchored all three
+      // concurrent sagas by rotating roles); recent-closed chains fence same-role client/obstacle
+      // only, so recurring faces stay possible over TIME, never in parallel.
+      const liveAny = new Set(this.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending')
+        .flatMap(c => c.bible.cast.map(personKey)));
+      const recentRole = new Set(this.state.chains.slice(-3)
         .flatMap(c => c.bible.cast.filter(x => x.role === 'client' || x.role === 'obstacle').map(x => `${x.role}:${personKey(x)}`)));
       const issues = (d: typeof g): { why: string; dup?: (typeof g.cast)[number] } | null => {
         for (const m of d.cast) if (!m.loreId && loreByName.has(m.name)) m.loreId = loreByName.get(m.name);
@@ -1094,10 +1098,11 @@ export class Game {
         const custodyGhost = goneNames.find(n => d.situation.includes(n) && /\b(cells?|custody|held at the fort|in your keeping)\b/i.test(d.situation));
         // same-CLIENT guard (mechanical — the prompt rule alone left one lore client running
         // three sagas at once); obstacles too — concurrent sagas once shared ONE coined villain
-        const clientDup = d.cast.find(x => (x.role === 'client' || x.role === 'obstacle') && liveClients.has(`${x.role}:${personKey(x)}`));
+        const clientDup = d.cast.find(x => x.name !== focal.name &&
+          (liveAny.has(personKey(x)) || ((x.role === 'client' || x.role === 'obstacle') && recentRole.has(`${x.role}:${personKey(x)}`))));
         if (clash) return { why: `your rejected draft "${d.title} — ${d.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground` };
         if (custodyGhost) return { why: `your rejected draft placed ${custodyGhost} in the company's custody — they passed out of the company's reach and are FREE in the world; rebuild the saga around where they actually stand` };
-        if (clientDup) return { why: `your rejected draft used ${clientDup.name} as ${clientDup.role} — they already hold that role in a running saga; this one needs a different ${clientDup.role} entirely`, dup: clientDup };
+        if (clientDup) return { why: `your rejected draft used ${clientDup.name} as ${clientDup.role} — they are already bound up in a running saga; this one needs a different person in that part entirely`, dup: clientDup };
         return null;
       };
       let issue = issues(g);
