@@ -61,6 +61,8 @@ function build(file: string, n: number, opts: { maxLen?: number; hyphen?: boolea
     (opts.genderEnd !== 'f' || /([aeiy]|wen|yn|nn|id|eth|il)$/.test(x)) &&
     (opts.genderEnd !== 'm' || !/(a|ette|elle|ine|enne)$/.test(x)) &&
     !/cock/i.test(x) &&
+    // consonant clusters alien to an English eye read as typos in HUMAN names ('Martxot')
+    (opts.genderEnd === undefined || !/tx|tz|zk|xh|q(?!u)/i.test(x)) &&
     !seen.has(x) && !seenAll.has(x) &&          // unique within pool AND across races
     (seen.add(x), true));
   const picked = stride(ok, n);

@@ -1201,3 +1201,25 @@ words; the model composes; variety = combinations, not entry count.
   recast with a fresh engine-rolled name). Also: my new sign-intake variant re-introduced a
   NEGATION ('no one reported it…' → "You were not told this by a petitioner." on a card) —
   replaced with positive phrasing; the negation lesson holds.
+- **#351 blind-judge round 1 (2 judges, old-arm logs vs new-arm campaigns 20001/21002)**: NEW ARM
+  WINS both — cringe 6/10 vs 3/10 (10=clean) and 6 vs 3; story 6 vs 5 and 7 vs 5. The atomization
+  classes are confirmed dead in the new arm: zero transcribed-seed cards (old: fairy-mound card,
+  walking-corpse+grudge+love-potion stack), zero anachronisms (old: 'for ID', 'co-op', 'fifth
+  column', 'sleep paralysis', 'rewilded'), zero misgendered names (old: ~1 in 3 elf names),
+  opening variety real. Convergent REMAINING classes → fixed in round 2 (#352):
+- **#352 round-2 class fixes** (prompts + data, verifier-gated):
+  (a) beat writer: client-DELIVERY is always later work (beat-1 'Bones' completed the whole goal
+      → later beats re-did then contradicted it — bones exhumed twice, then 'undisturbed');
+      twistReveal nudge (a middle beat surfaces it — 21002's spirits-twist never reached a card);
+  (b) saga gloss: bible coinages are notes never names ('the hung thing' ×9, 'alloy rib' ×8) +
+      beat-1 must parse for a cold reader;
+  (c) finale: labels never promise away a prize the envelope keeps ('Witness a public handover'
+      chosen → 'company kept custody' narrated); labels in period words ('technical unbinding');
+  (d) resolve: system words (approach/plan/roster/lead/envelope/outcome) named as
+      machinery-never-in-prose ('carried out the chosen plan', 'sketched for the roster');
+      uncanny promises pay off in one concrete moment (levitating bundle fetched as a parcel);
+      own soldier never worded into 'custody/care'; PAIR exchange must carry information
+      (hip-bump/shin-grip filler); before-opening GRAMMAR varies ('X showed Y' ×5);
+  (e) genesis: dispute-SHAPE joins the avoid axes (three custody-dispute-by-witnessed-proof
+      sagas in one run); period law words (no 'temporary custodial control');
+  (f) names importer: alien consonant clusters rejected for humans ('Martxot').
