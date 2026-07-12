@@ -1344,3 +1344,40 @@ words; the model composes; variety = combinations, not entry count.
   under-surfaced) + genesis 'development' kind got its missing ending/role (companion, matching
   the engine forcing). Watch: 'technician' anachronism (one card), duplicate-sentence in a
   before, "the next step is to…" plan-speak tail in one after.
+- **#362 saga-card INFO DIET (designer: beat-1 card "unreadable… i have no idea whats going on")**:
+  the quest-writer relayed the whole BIBLE onto single cards — the reported beat 1 carried 5
+  proper nouns, beat-2's conflict (Derella's surety terms) and beat-2's place; across three
+  campaign logs beat-1 cards averaged 5-11 names, one naming the beat-3 gatekeeper and his
+  refusal terms up front. Root cause: QUESTS §8's "reveal ≤ 1 new layer" was stated but never
+  OPERATIONALIZED — nothing bounded names-per-card or scoped the situation prose (only the job)
+  to the dealt step. Fix ladder, each rung verified by a fresh real-AI campaign (~$0.10 each):
+  (a) PROMPT diet (31011): card stages ONLY the dealt arcStep's ground; later-step cast/places/
+  terms/dangers stay off entirely; ≤2 new named people + 1 new named place (goal/arcStep names
+  pre-dealt); goal restated in ONE plain sentence (was "restating is free" — licensed the dump);
+  task = outcome wanted, never an itinerary; no "Pay:/Risk:" labeled clauses. Result: lean-cast
+  sagas complied, 4-person casts still dumped (8-9 names). (b) ENGINE offstage flag (32012):
+  cast members neither met, step-named, focal, nor client are flagged offstage — writer told
+  never to name them. Result: names down but 2 of 4 offstage names still leaked (the bible's
+  own situation text named them). (c) ENGINE name scrub (33013): the staged bible carries NO
+  trace of an offstage name — entry passed without its name field, name replaced by "another
+  party" in every bible string. Result: leaks impossible by construction, cards 3-6 names,
+  1/7 echoed the stand-in phrase (prompt told to re-render in own words). Reads across 32012/
+  33013/34014: each saga now unspools one step per card in the docs' serial shape.
+- **#363 genesis fences hardened by the #362 campaign reads**: (a) a company SOLDIER shipped as
+  another saga's cast claimant (32012: Koralla) — soldiers-are-context is now a validated-retry
+  defect with recast fallback; (b) the dup-recast was INCOMPLETE: it renamed the cast entry but
+  left the old name in the bible's free text, so the beat writer resurrected the recast client
+  (33013: Reinhold lived on in situation/arc while cast said Gotwinus), and the rolled fresh
+  name could collide with a same-bible cast name (33013: TWO cast entries named Rels). Recast
+  now renames across title/kernel/situation/goal/arc/tensions/openDirections/cast who+want and
+  rolls past taken names. Verified end-to-end on 34014: a sticky live-client dup (Raflod, kept
+  through all 3 retries) was recast to Cosmas and every string + downstream card followed.
+  (c) initial storyState.currentSituation no longer embeds the goal verbatim (the doubled
+  sentence was a paste-magnet). Context-free Fable verifier on the offstage render: offstage
+  data model CLEAN; fixed its findings — place-budget vs goal-exception guess resolved
+  (goal/arcStep names never count), DIET now binds tensions too, offstage pressure scoped to
+  "the dealt step itself runs into it", mustBeFocal added to the output-spec line (zod already
+  accepted it) + condition sharpened ("stages that soldier's own matter in person; when in
+  doubt, omit"), beat field path + actorStates glossary location corrected. Watch: "Expect…"
+  forecast-tail recurs (~3/12 cards); place-name pile-up when a beat-1 focal's want references
+  a later-step place.
