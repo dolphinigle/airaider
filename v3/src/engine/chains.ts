@@ -30,6 +30,8 @@ export interface ChainStoryState {
   actorStates: Record<string, string>;
   lastBeatOutcome?: string;   // "beat N ended in X: <what changed>" — feeds the next beat's writer
   introducedNames?: string[]; // bible-cast names the player-facing text already introduced (orient ONCE)
+  history?: string[];         // every beat's player-visible after-text — the SETTLED record the next
+                              // writer must not contradict (abstract ledgers alone were ignored)
 }
 
 export interface Chain {

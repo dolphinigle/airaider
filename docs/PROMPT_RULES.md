@@ -5,6 +5,24 @@ Check this before editing any prompt in `core/openaiNarrator.ts`. The engine own
 the AI owns fiction. These rules are about getting good, coherent fiction out of a model that knows
 **nothing** about our game.
 
+## 0. Written for CHEAP models — the prompt budget is the first constraint *(designer ruling 2026-07-12)*
+We run budget models (gpt-5-mini at low/medium effort). A rule that exists but sits in a wall of text
+does NOT exist for these models — every rule added dilutes every other rule.
+- **Adding a rule requires paying for it**: merge it into an existing rule or cut something first.
+  Prompt growth is a regression even when every line is individually right.
+- **Structure over volume**: fenced, headed sections (the TAG VOCABULARY pattern) hold; buried
+  mid-paragraph clauses don't. The load-bearing constraint takes the section-header position.
+- **When a rule is ignored twice at the model's effort tier, stop rewording it** — enforce it
+  mechanically (engine seed, input shaping, schema transform) per §2, or accept the cost.
+- Judge every prompt against the CHEAPEST model that will run it, never against what a frontier
+  model could follow.
+- **"The AI didn't follow the instruction" is a prompt-design bug report, not a model complaint.**
+  The question is always "how do I make this instruction one the model WILL follow" — and the answer,
+  in order of measured effectiveness: (1) engine enforcement — don't ask; (2) input shaping — deal
+  concrete data (a literal ban-list, a withheld field) instead of an abstract rule; (3) structure —
+  fenced, headed section; (4) wording — the weakest lever; (5) more model/effort — measured ZERO
+  judge-score return at 2.3× cost on this project (seeds 39019 vs 40020, 2026-07-12).
+
 ## 1. The AI is STATELESS and has NO game context
 It sees only what THIS prompt hands it. It does not know prior calls, our code, or our jargon.
 - **Never use internal/game-dev terms.** Words like **"beat"**, **"slot"**, **"arc step"**, "chain",

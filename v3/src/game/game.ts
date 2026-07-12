@@ -1045,8 +1045,11 @@ export class Game {
     // ("Ashveil" once stamped three unrelated clients across chains)
     this.recentNpcNames.push(...assignedNames);
     while (this.recentNpcNames.length > 60) this.recentNpcNames.shift();
+    // fingerprint includes arc+tensions (40020: hounds/tarred scraps/moots recurred as DEVICES
+    // across chains while title+kernel stayed under the bar) and the settled outcome (a closed
+    // moot came back as an upcoming event two cycles later)
     const avoid = this.state.chains.slice(-5).map(c =>
-      `${c.bible.title} — ${c.bible.kernel} (people: ${c.bible.cast.map(x => x.name).join(', ')})`);
+      `${c.bible.title} — ${c.bible.kernel} (people: ${c.bible.cast.map(x => x.name).join(', ')}; the road: ${c.bible.arc.join('; ')} ${c.bible.tensions.join('; ')})${c.state === 'done' || c.state === 'slipped' ? ` [SETTLED: ${c.story.currentSituation}]` : ''}`);
     const genesisInput = {
       seed: sampleSeed(this.rng), keywords: sampleKeywords(this.rng),
       // most sagas must live AWAY from the landmark — omission beats the ignored "set it elsewhere"
@@ -1062,6 +1065,25 @@ export class Game {
       slate, assignedNames: assigned.map(a => `${a.name} (${a.gender === 'female' ? 'a woman\'s name' : 'a man\'s name'})`),
     };
     let g = await this.ai.genesis(genesisInput);
+    // names dealt by the dup-recast below — the NAME GUARD must honor them (34014/35015: the
+    // guard clobbered a recast client with assignedNames[0], a name the model had already
+    // spent on another cast member → one bible carried "Serrin" as client AND obstacle while
+    // the bible TEXT kept the recast name; three sagas shipped with cast/text name splits)
+    const recastNames: string[] = [];
+    const recastMember = (d: { name: string; loreId?: string }, extraTaken: Iterable<string> = []) => {
+      const taken = new Set([focal.name, ...slate.map(x => x.name), ...assignedNames, ...g.cast.map(x => x.name), ...extraTaken]);
+      let fresh = rollName(this.rng, this.rng.weighted(races));
+      for (let i = 0; i < 8 && taken.has(fresh); i++) fresh = rollName(this.rng, this.rng.weighted(races));
+      const escRe2 = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const forms = [...new Set([d.name, d.name.split(/\s+/)[0]!])];
+      const ren = (s: string) => forms.reduce((t, f) => t.replace(new RegExp(`\\b${escRe2(f)}\\b`, 'g'), fresh), s);
+      d.name = fresh;
+      recastNames.push(fresh);
+      delete d.loreId;
+      g.title = ren(g.title); g.kernel = ren(g.kernel); g.situation = ren(g.situation); g.goal = ren(g.goal);
+      g.arc = g.arc.map(ren); g.tensions = g.tensions.map(ren); g.openDirections = g.openDirections.map(ren);
+      for (const m of g.cast) { m.who = ren(m.who); m.want = ren(m.want); }
+    };
     // KERNEL-NOVELTY GUARD (mechanical — the `avoid` rule alone was ignored: two
     // reliquary-in-a-cellar sagas shipped in one campaign). 2026-07-12: the single unchecked
     // retry let a rejected premise ship anyway (twin custody-clause-at-a-ford sagas), and the
@@ -1093,7 +1115,13 @@ export class Game {
         // cast + coined places join the fingerprint — five deliver-to-a-ceremony sagas with the
         // same client shipped in one run while title+kernel alone stayed just under the bar
         const kw = words(`${d.title} ${d.kernel} ${d.arc.join(' ')} ${d.tensions.join(' ')} ${d.cast.map(c => `${c.name} ${c.role}`).join(' ')} ${d.newPlaces.map(p => p.name).join(' ')}`);
-        const clash = avoid.find(a => { const aw = words(a); let hit = 0; kw.forEach(w => { if (aw.has(w)) hit++ }); return hit >= 3 });
+        const hits = (a: string) => { const aw = words(a); let hit = 0; kw.forEach(w => { if (aw.has(w)) hit++ }); return hit };
+        // a LIVE chain's premise clashes at a LOWER bar — the player holds both stories at
+        // once (37017: two concurrent foundling-escorted-to-a-rite sagas passed the ≥3 gate);
+        // the LAST TWO chains regardless of state too (39019: back-to-back dies-forgery sagas)
+        const liveFp = [...this.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending'), ...this.state.chains.slice(-2)]
+          .map(c => `${c.bible.title} — ${c.bible.kernel} ${c.bible.arc.join(' ')} ${c.bible.tensions.join(' ')}`);
+        const clash = avoid.find(a => hits(a) >= 3) ?? liveFp.find(a => hits(a) >= 2);
         // custody-of-the-departed guard (mechanical — the outOfReach flag alone was ignored:
         // a SOLD entertainer re-appeared "in your cells" three cycles later)
         const goneNames = slate.filter(s => s.outOfReach).map(s => s.name);
@@ -1109,10 +1137,28 @@ export class Game {
         // let a merc ship as another saga's salvage claimant (32012: Koralla)
         const soldierCast = d.cast.find(x => x.loreId !== focal.id && x.name !== focal.name &&
           ((x.loreId && soldierKeys.has(x.loreId)) || soldierKeys.has(x.name)));
+        // parked arc: a place token staged in 3+ steps means the beats replay one scene
+        // (34014: three defend-the-hearing-at-the-oak beats; the ARC SHAPE rule alone failed).
+        // first word of each step is skipped (imperative verbs are capitalized there)
+        const castTok = new Set(d.cast.flatMap(x => x.name.split(/\s+/)));
+        const tokSteps = new Map<string, number>();
+        for (const step of d.arc) for (const tok of new Set(step.replace(/^\S+\s*/, '').match(/\b[A-Z][a-z]{2,}\b/g) ?? []))
+          if (!castTok.has(tok)) tokSteps.set(tok, (tokSteps.get(tok) ?? 0) + 1);
+        const parked = [...tokSteps.entries()].find(([, n]) => n >= 3)?.[0];
+        // BIBLE.md: step 1 = take the job, goal NOT done here — "arc kills the beat-1-completes-
+        // goal rewind" is a VALIDATED property that regressed (37017 predator, 38018 granary,
+        // 41021 singer all delivered/settled at beat 1 and un-happened later)
+        const step1Delivers = /\b(deliver|hand (over|him|her|it|the)|bring .{0,40} (back )?to\b|present .{0,30} to\b|return .{0,30} to\b)/i.test(d.arc[0] ?? '');
+        // a step that merely confirms what is already known is a null job (41021: "establish
+        // that the singer's binding feather is missing" — told to the player two cards earlier)
+        const nullStep = d.arc.find(s => /\b(confirm|verify|establish that|learn whether)\b/i.test(s));
         // dup RIDES ALONG whatever why is reported: an early clash-return once masked a live-chain
         // dup from the post-retry mechanical recast (29010: Nurisea obstacled two live sagas)
         if (focalMissing) return { why: `your rejected draft's cast is missing ${focal.name} — the saga is ABOUT them; they must be a cast entry`, dup: clientDup };
         if (soldierCast) return { why: `your rejected draft cast ${soldierCast.name} — one of the company's own soldiers — as ${soldierCast.role}; soldiers are context, never cast members: a DIFFERENT person (or no one) takes that part`, dup: soldierCast };
+        if (parked) return { why: `your rejected draft's arc parks at ${parked} — three or more steps stage the same ground; each step must move to NEW ground or a new claimant, and only the last may return to bring the matter to a head`, dup: clientDup };
+        if (step1Delivers) return { why: `your rejected draft's FIRST arc step already performs a delivery or handover — the goal is NOT done at step 1: step 1 is taking the job plus a first leg of field work, and every delivery belongs to a later step`, dup: clientDup };
+        if (nullStep) return { why: `your rejected draft's arc contains a step that merely confirms or verifies something ("${nullStep}") — a null job; every step must CHANGE the situation: gain ground, gain leverage, or raise the stakes`, dup: clientDup };
         if (clash) return { why: `your rejected draft "${d.title} — ${d.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground`, dup: clientDup };
         if (custodyGhost) return { why: `your rejected draft placed ${custodyGhost} in the company's custody — they passed out of the company's reach and are FREE in the world; rebuild the saga around where they actually stand`, dup: clientDup };
         if (clientDup) return { why: `your rejected draft used ${clientDup.name} as ${clientDup.role} — they are already bound up in a running saga; this one needs a different person in that part entirely`, dup: clientDup };
@@ -1128,20 +1174,13 @@ export class Game {
       // COMPLETE: reach the bible's free text (33013: a recast client lived on in situation/arc
       // and the beat writer resurrected him) and never collide with a name already in play
       // (33013: the rolled name duplicated the same bible's client — two cast both "Rels")
-      if (issue?.dup) {
-        const d = issue.dup;
-        const taken = new Set([focal.name, ...slate.map(x => x.name), ...assignedNames, ...g.cast.map(x => x.name)]);
-        let fresh = rollName(this.rng, this.rng.weighted(races));
-        for (let i = 0; i < 8 && taken.has(fresh); i++) fresh = rollName(this.rng, this.rng.weighted(races));
-        const escRe2 = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const forms = [...new Set([d.name, d.name.split(/\s+/)[0]!])];
-        const ren = (s: string) => forms.reduce((t, f) => t.replace(new RegExp(`\\b${escRe2(f)}\\b`, 'g'), fresh), s);
-        d.name = fresh;
-        delete d.loreId;
-        g.title = ren(g.title); g.kernel = ren(g.kernel); g.situation = ren(g.situation); g.goal = ren(g.goal);
-        g.arc = g.arc.map(ren); g.tensions = g.tensions.map(ren); g.openDirections = g.openDirections.map(ren);
-        for (const m of g.cast) { m.who = ren(m.who); m.want = ren(m.want); }
+      // a stubborn non-cast defect (premise clash, parked arc, delivery-first arc) survives the
+      // retries because the SEED itself keeps pulling the model back — burn the seed, go once more
+      if (issue && !issue.why.includes('already bound up') && !issue.why.includes("company's own soldiers")) {
+        g = await this.ai.genesis({ ...genesisInput, seed: sampleSeed(this.rng), avoid: [...avoid, issue.why] });
+        issue = issues(g);
       }
+      if (issue?.dup) recastMember(issue.dup);
     }
     // persist write-back (guarded); new places become lore nodes
     for (const p of g.newPlaces.slice(0, 3)) {
@@ -1157,7 +1196,7 @@ export class Game {
     // §4b NAME GUARD: the AI never invents character names. Known-cast entries keep their
     // lore-node names; NEW cast entries must use engine-rolled names (assignedNames, in order).
     {
-      const legal = new Set<string>([focal.name, ...slate.map(x => x.name), ...assignedNames]);
+      const legal = new Set<string>([focal.name, ...slate.map(x => x.name), ...assignedNames, ...recastNames]);
       let next = 0;
       const ROLES = ['client', 'companion', 'quarry', 'obstacle', 'ally', 'prize'];
       for (const member of g.cast) {
@@ -1173,8 +1212,37 @@ export class Game {
         } else if (member.loreId && this.state.lore.nodes[member.loreId]) {
           member.name = this.state.lore.nodes[member.loreId]!.name;   // canon wins
         } else if (!legal.has(member.name)) {
-          const replacement = assignedNames[next++] ?? rollName(this.rng, this.rng.weighted(races));
-          member.name = replacement;
+          // never deal a name another cast member already bears (the Serrin² collision)
+          const used = (n: string | undefined) => !!n && g.cast.some(m2 => m2 !== member && m2.name === n);
+          let replacement = assignedNames[next++];
+          while (used(replacement)) replacement = assignedNames[next++];
+          for (let i = 0; (!replacement || used(replacement)) && i < 8; i++) replacement = rollName(this.rng, this.rng.weighted(races));
+          member.name = replacement ?? member.name;
+        }
+      }
+    }
+    // FINAL SWEEP (38018: Nurov obstacled TWO live sagas despite the liveAny fence — whatever
+    // path admits them, no cast member may share a live chain's cast in ANY role, ever)
+    {
+      const liveChains = this.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending');
+      const liveKeys = new Set(liveChains.flatMap(c => c.bible.cast.flatMap(m => [m.loreId ?? '', m.name].filter(Boolean))));
+      for (const m of g.cast) {
+        if (m.name === focal.name || m.loreId === focal.id) continue;
+        if (liveKeys.has(m.name) || (m.loreId && liveKeys.has(m.loreId))) recastMember(m, liveKeys);
+      }
+      // a live chain's cast may not haunt this bible's TEXT either (40020: one bible's TWIST
+      // read "Algar's hound" — a ferryman from a concurrent saga who wasn't even in this cast)
+      const escRe3 = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const ownNames = new Set(g.cast.flatMap(m => m.name.split(/\s+/)));
+      for (const c of liveChains) for (const other of c.bible.cast) {
+        for (const n of new Set([other.name.trim(), other.name.trim().split(/\s+/)[0]!])) {
+          if (n.length < 3 || ownNames.has(n)) continue;
+          const rx = new RegExp(`\\b${escRe3(n)}('s)?\\b`, 'g');
+          const rep = (_: string, p?: string) => p ? "another party's" : 'another party';
+          g.situation = g.situation.replace(rx, rep); g.goal = g.goal.replace(rx, rep);
+          g.arc = g.arc.map(s => s.replace(rx, rep)); g.tensions = g.tensions.map(s => s.replace(rx, rep));
+          g.openDirections = g.openDirections.map(s => s.replace(rx, rep));
+          if (typeof g.twistReveal === 'string') g.twistReveal = g.twistReveal.replace(rx, rep);
         }
       }
     }
@@ -1249,7 +1317,13 @@ export class Game {
     const focal = this.card(chain.focalId);
     // two-part lore prompting (LORE.md): selector picks who gets full dossiers, THEN the writer
     // receives the relevant lore — beats carry world memory, not just the frozen bible
-    const relevantLore = await this.buildLoreSlate(chain.focalId, 'who needs full dossiers for this saga step');
+    // another LIVE chain's cast is invisible to this chain's writer — Nurov entered a second
+    // saga through the lore feed and led war bands there while under the first saga's escort
+    const otherLiveCast = new Set(this.state.chains
+      .filter(c2 => c2.id !== chain.id && (c2.state === 'active' || c2.state === 'finale-pending'))
+      .flatMap(c2 => c2.bible.cast.flatMap(m => [m.loreId ?? '', m.name].filter(Boolean))));
+    const relevantLore = (await this.buildLoreSlate(chain.focalId, 'who needs full dossiers for this saga step'))
+      .filter(e => !otherLiveCast.has(e.id) && !otherLiveCast.has(e.name));
     // 🛠 2026-07-10 (reverses the earlier arrive-FRESH ruling): a lapsed unmarched beat is
     // re-offered VERBATIM from cache — a re-rendered "fresh telling" drifted settled facts
     // (a mute girl became talkative between two renders of the same step)
@@ -1260,31 +1334,7 @@ export class Game {
     // offstage — the writer may not name them, so later beats introduce them on their own turn
     const dealtStep = isFinale ? chain.bible.arc[chain.bible.arc.length - 1]!
       : chain.bible.arc[Math.min(chain.beatIndex, chain.bible.arc.length - 1)]!;
-    const met = (name: string) => {
-      const words = name.toLowerCase().split(/[^a-z]+/).filter(w => w.length > 2);
-      const seen = [dealtStep, ...(chain.story.introducedNames ?? []), chain.bible.cast.find(m => m.loreId === chain.focalId)?.name ?? '', this.state.lore.nodes[chain.focalId]?.name ?? ''].join(' ').toLowerCase();
-      return words.some(w => seen.includes(w));
-    };
-    // the flag alone leaked (2 of 4 offstage names shipped when the bible's own situation text
-    // named them) — so the staged copy carries NO trace of an offstage name anywhere
-    const offstageCast = chain.bible.cast.filter(m => !(m.role === 'client' || met(m.name)));
-    const escRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const scrub = (s: string) => offstageCast.reduce((t, m) => {
-      for (const n of new Set([m.name.trim(), m.name.trim().split(/\s+/)[0]!]))
-        t = t.replace(new RegExp(`\\b${escRe(n)}('s)?\\b`, 'g'), (_, p) => p ? "another party's" : 'another party');
-      return t;
-    }, s);
-    const stagedBible = offstageCast.length === 0 ? chain.bible : {
-      ...chain.bible,
-      kernel: scrub(chain.bible.kernel),
-      situation: scrub(chain.bible.situation),
-      goal: scrub(chain.bible.goal),
-      arc: chain.bible.arc.map(scrub),
-      tensions: chain.bible.tensions.map(scrub),
-      openDirections: chain.bible.openDirections.map(scrub),
-      twist: typeof chain.bible.twist === 'string' ? scrub(chain.bible.twist) : chain.bible.twist,
-      cast: chain.bible.cast.map((m): unknown => offstageCast.includes(m) ? { who: m.who, want: m.want, role: m.role, offstage: true } : m),
-    };
+    const stagedBible = this.stageBible(chain, dealtStep, chain.beatIndex === 0 && !isFinale);
     const out = isRepose && cached && cached.beat === chain.beatIndex + 1 ? cached.out : await this.ai.writeQuest({
       // beats serve the BIBLE's story, not a rolled job type (a random archetype fought the saga);
       // the landmark gate is for one-off variety — a saga anchored at the landmark must name it
@@ -1292,7 +1342,10 @@ export class Game {
       // beats see the landmark ONLY when this saga's bible actually uses it (else it re-tempts drift)
       location: this.locationLine(chain.region, !!REGION[chain.region]?.landmark && JSON.stringify(chain.bible).includes(REGION[chain.region]!.landmark!), false),
       level: chain.level, rarity: chain.rarity, slotCount: n,
-      rewardEnvelope: isFinale ? `the focal: ${chain.kind}` : 'side loot',
+      // the person's NAME, never engine words — "custody of the focal" once printed on a card
+      rewardEnvelope: isFinale
+        ? `${this.card(chain.focalId)?.name ?? 'the central person'} — likely ${chain.isPersonal ? 'the matter settled, the soldier stays' : chain.kind === 'gold-hoard' ? 'their treasure' : chain.kind}`
+        : 'side loot',
       // beats get NO opening spark (🛠 2026-07-10): a random spark fought the saga — the card
       // opens from the story state, and beat 1 from how the bible says the matter arrived
       placeNameSuggestions: [this.freshPlaceName(chain.region)],
@@ -1512,12 +1565,19 @@ export class Game {
           : []),
       ],
       chainContext: r.quest.chainId ? {
-        bible: this.state.chains.find(c => c.id === r.quest.chainId)?.bible,
+        // the resolver gets the STAGED bible too — unmet cast cannot debut in a report
+        bible: (c => c ? this.stageBible(c, `${r.quest.situation} ${r.quest.job}`, r.quest.beatIndex === 1 && !r.quest.isFinale) : undefined)(this.state.chains.find(c => c.id === r.quest.chainId)),
         storyState: this.state.chains.find(c => c.id === r.quest.chainId)?.story,
         isFinale: !!r.quest.isFinale,
         // the ONE step this job covers — resolutions overreached even when the card was scoped
         arcStep: (c => c && r.quest.beatIndex
           ? c.bible.arc[Math.min(r.quest.beatIndex - 1, c.bible.arc.length - 1)] : undefined
+        )(this.state.chains.find(c => c.id === r.quest.chainId)),
+        // later steps dealt as a CONCRETE ban list — the abstract "no later step's work"
+        // rule kept failing (37017: beat 1 killed the saga's predator; 38018: beat 2 spoke
+        // the finale's pledge and opened the granary)
+        stepsNotYet: (c => c && r.quest.beatIndex && !r.quest.isFinale
+          ? c.bible.arc.slice(r.quest.beatIndex) : undefined
         )(this.state.chains.find(c => c.id === r.quest.chainId)),
         focalName: (c => c ? this.card(c.focalId)?.name : undefined)(this.state.chains.find(c => c.id === r.quest.chainId)),
         // the fate reaches the narrator as a plain SENTENCE (the raw token "clean" read as an
@@ -1931,7 +1991,7 @@ export class Game {
     if (q.chainId) {
       const chain = st.chains.find(c => c.id === q.chainId);
       if (chain) this.noteIntroduced(chain, [q.situation, q.job, out?.before ?? '', out?.after ?? ''].join('\n'));
-      this.advanceChain(q, r, out?.storyUpdate, report, r.fate);
+      this.advanceChain(q, r, out?.storyUpdate, report, r.fate, out?.after);
     }
     st.quests = st.quests.filter(x => x.state !== 'resolved');
   }
@@ -2072,6 +2132,38 @@ export class Game {
    *  Mill- villages in one run; same-stem places blur into one another for the reader */
   private recentPlaceStems: string[] = [];
 
+  /** reveal-cadence staging (shared by the beat writer AND the resolver — 37017: "Watkyn"
+   *  debuted in a resolution): cast the player hasn't met is passed WITHOUT their name, and
+   *  the name is scrubbed from every bible string, so an unmet person CANNOT be named. */
+  private stageBible(chain: Chain, stepText: string, withholdTwist = false) {
+    const met = (name: string) => {
+      const words = name.toLowerCase().split(/[^a-z]+/).filter(w => w.length > 2);
+      const seen = [stepText, ...(chain.story.introducedNames ?? []), chain.bible.cast.find(m => m.loreId === chain.focalId)?.name ?? '', this.state.lore.nodes[chain.focalId]?.name ?? ''].join(' ').toLowerCase();
+      return words.some(w => seen.includes(w));
+    };
+    const offstageCast = chain.bible.cast.filter(m => !(m.role === 'client' || met(m.name)));
+    // beat 1 never sees the twist (40020: a beat-1 card printed the chain's twist verbatim,
+    // pre-spoiling the finale — withholding beats instructing)
+    if (offstageCast.length === 0) return withholdTwist ? { ...chain.bible, twist: null } : chain.bible;
+    const escRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const scrub = (s: string) => offstageCast.reduce((t, m) => {
+      for (const n of new Set([m.name.trim(), m.name.trim().split(/\s+/)[0]!]))
+        t = t.replace(new RegExp(`\\b${escRe(n)}('s)?\\b`, 'g'), (_, p) => p ? "another party's" : 'another party');
+      return t;
+    }, s);
+    return {
+      ...chain.bible,
+      kernel: scrub(chain.bible.kernel),
+      situation: scrub(chain.bible.situation),
+      goal: scrub(chain.bible.goal),
+      arc: chain.bible.arc.map(scrub),
+      tensions: chain.bible.tensions.map(scrub),
+      openDirections: chain.bible.openDirections.map(scrub),
+      twist: withholdTwist ? null : typeof chain.bible.twist === 'string' ? scrub(chain.bible.twist) : chain.bible.twist,
+      cast: chain.bible.cast.map((m): unknown => offstageCast.includes(m) ? { who: m.who, want: m.want, role: m.role, offstage: true } : m),
+    };
+  }
+
   private freshPlaceName(region: string): string {
     const banned = REGION[region]?.landmark;
     const stem = (s: string) => s.slice(0, 4).toLowerCase();
@@ -2093,10 +2185,17 @@ export class Game {
     }
   }
 
-  private advanceChain(q: Quest, r: { outcome: Outcome; party: Card[] }, storyUpdate: { currentSituation: string; newlyRevealed: string[]; openThreads: string[]; sagaSettled?: boolean } | undefined, report: string[], fate?: FinaleFate) {
+  private advanceChain(q: Quest, r: { outcome: Outcome; party: Card[] }, storyUpdate: { currentSituation: string; newlyRevealed: string[]; openThreads: string[]; sagaSettled?: boolean } | undefined, report: string[], fate?: FinaleFate, afterText?: string) {
     const st = this.state;
     const chain = st.chains.find(c => c.id === q.chainId);
     if (!chain) return;
+    // the settled record: what the player actually read — judges caught the beat writer
+    // un-settling objects (a recovered polehead re-buried two beats later) when it only saw
+    // abstract ledgers; concrete prior text is what the model actually honors
+    if (afterText) {
+      (chain.story.history ??= []).push(`beat ${q.beatIndex ?? chain.beatIndex} (${r.outcome}): ${afterText}`);
+      while (chain.story.history!.length > 8) chain.story.history!.shift();
+    }
     if (storyUpdate) {
       chain.story.currentSituation = storyUpdate.currentSituation;
       // dedupe near-identical facts (the same fact stored 3× invited the AI to re-stage the event)
@@ -2124,7 +2223,9 @@ export class Game {
       expiresAtCycle: st.cycle + LEAD_TTL + CONTINUATION_TTL_BONUS, source: 'continuation',
       title: `${chain.bible.title} — ${finaleReady(chain) ? 'the reckoning nears' : 'the story continues'}`,
     });
-    report.push(`📖 ${chain.bible.title}: bank ${chain.bank.toFixed(0)}g (${delta >= 0 ? '+' : ''}${delta} this beat) of a ~${chain.payoff.toFixed(0)}g season${finaleReady(chain) ? ' — FINALE next' : ''}. ${focal?.name ?? ''} remains at the center.`);
+    // company-ledger diction — "bank/beat/season/remains at the center" read as engine
+    // jargon at the story's emotional beats (41021 judge, class 5)
+    report.push(`📖 ${chain.bible.title}: ${chain.bank.toFixed(0)}g earned toward this matter's ~${chain.payoff.toFixed(0)}g worth (${delta >= 0 ? '+' : ''}${delta}g today)${finaleReady(chain) ? ' — it now comes to a head' : ''}.${focal ? ` ${focal.name} stays at the heart of it.` : ''}`);
   }
 
   private settleFinale(q: Quest, chain: Chain, r: { outcome: Outcome; party: Card[] }, report: string[], precomputed?: FinaleFate) {

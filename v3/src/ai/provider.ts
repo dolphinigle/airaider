@@ -113,6 +113,9 @@ export interface ResolveQuestInput {
     arcStep?: string;                // the ONE arc step this job covers — the report may not
                                      // complete later steps (resolutions overreached even when
                                      // the card was scoped)
+    stepsNotYet?: string[];          // the plan's LATER steps, dealt as a concrete ban list —
+                                     // their work/prizes/targets may not land in this report
+                                     // (the abstract rule alone kept failing at low effort)
     focalName?: string;              // the saga's central person, named explicitly
     fate?: string;                   // finale: what becomes of them — a plain SENTENCE, never a token
     approach?: string;               // finale: the plan the player CHOSE (a contract)

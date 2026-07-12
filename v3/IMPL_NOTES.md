@@ -1381,3 +1381,40 @@ words; the model composes; variety = combinations, not entry count.
   doubt, omit"), beat field path + actorStates glossary location corrected. Watch: "Expect…"
   forecast-tail recurs (~3/12 cards); place-name pile-up when a beat-1 focal's want references
   a later-step place.
+- **#364 judge loop on chain stories (designer: "quality of story for quest chains… fix until
+  8/10; readability… was 2/10")**: two independent Fable judges per campaign, harsh rubric
+  (readability ~half; any forced re-read caps a chain at 6). Baselines 34014=5, 35015=4.5.
+  Six rounds of class fixes, each verified by a fresh real-AI campaign (~$0.20-0.45):
+  R1 grounding/history: first-use grounding, per-beat after-texts stored as story.history and
+  dealt to writers (abstract ledgers were ignored; concrete prior text is what models honor),
+  name-guard honors recast names + no double-dealt names, arc-parked genesis lint, one-fact-
+  per-sentence, pay/loot own sentence. R2 (37017 4/4): resolver gets the STAGED bible too
+  (Watkyn debuted in a resolution), finale rewardEnvelope carries the person's NAME (a card
+  printed "custody of the focal"), stepsNotYet dealt to the resolver as a concrete ban list,
+  soldiers-return-to-fort + party-only-on-screen, finale accounts for every open captive/prize,
+  prophetic-briefing ban, live-chain clash bar ≥2. R3 (38018 4.5/4): unconditional final sweep —
+  no cast member may share a LIVE chain's cast (Nurov obstacled two sagas past the liveAny
+  fence); live-cast names scrubbed from other bibles' free text (a TWIST read "Algar's hound");
+  relevantLore hides other live chains' cast from writers; recent-2 clash bar ≥2.
+- **#365 effort A/B (39019 low vs 40020 medium, same-ish prompts)**: judges 5/4 vs 4/5 — ZERO
+  score gain at 2.3x cost ($0.20→$0.45) and 3x latency (20s→58s per saga call). Cards/resolve
+  reverted to LOW; genesis kept at MEDIUM (1-2 calls/saga, no gameplay latency, seeds all
+  downstream cards). Designer ruling recorded as PROMPT_RULES §0: prompts are written for
+  CHEAP models — buried rules don't exist; hierarchy = engine enforcement > input shaping >
+  structure > wording > more model. desemi bug found: per-occurrence 'forearm' rotation MADE
+  wounds migrate inside one report (fixed: one pick per text); "The matter closed" stamp now
+  mechanically dropped.
+- **#366 prompt compaction round 2 (§0)**: saga writeQuest 4,200→~3,100 tok, saga block
+  1,600→873 as fenced headed sections (RECORD / STEP / DIET / BIBLE / NAMES & PLACES); beat
+  block 640→380; finale −17%; resolve saga-step/finale blocks −40% each. 41021 (compacted, low):
+  judges 4/3.5 — no score jump yet but classes narrowed to state-machine defects; Windcall
+  chain hit 7/6 ("the pipeline can produce a one-read cause-and-effect saga").
+- **#367 doc-drift fixes from 41021**: BIBLE.md says situation "hides the deep secret" — the
+  genesis prompt said "full truth, twist included" (that's how 3 of 4 twist chains spoiled
+  their reveal on card 1 THROUGH the situation text, around the mechanical beat-1 twist
+  withholding). Prompt now doc-true: twistReveal ALONE carries the twist. BIBLE.md's validated
+  "arc kills the beat-1-completes-goal rewind" had regressed (37017 predator, 38018 granary,
+  41021 singer): genesis lints added — arc[0] delivery-verb → retry; confirm/verify null-step →
+  retry; stubborn non-cast defects burn the SEED and re-roll once. 📖/🎬 lines re-voiced
+  (bank/beat/season/"remains at the center" were engine jargon judges kept scoring). Twist
+  mechanically withheld from ALL beat-1 writer+resolver inputs via stageBible.
