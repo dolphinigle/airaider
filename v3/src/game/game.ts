@@ -1045,11 +1045,13 @@ export class Game {
     // ("Ashveil" once stamped three unrelated clients across chains)
     this.recentNpcNames.push(...assignedNames);
     while (this.recentNpcNames.length > 60) this.recentNpcNames.shift();
-    // fingerprint includes arc+tensions (40020: hounds/tarred scraps/moots recurred as DEVICES
-    // across chains while title+kernel stayed under the bar) and the settled outcome (a closed
-    // moot came back as an upcoming event two cycles later)
+    // the MODEL sees a LEAN fingerprint — showing full arc+tensions in avoid (round 5) made
+    // avoid an ATTRACTOR per §8 (42022: seven token-to-oak-judgment sagas in one campaign);
+    // the rich text feeds only the engine-side clash lint below
     const avoid = this.state.chains.slice(-5).map(c =>
-      `${c.bible.title} — ${c.bible.kernel} (people: ${c.bible.cast.map(x => x.name).join(', ')}; the road: ${c.bible.arc.join('; ')} ${c.bible.tensions.join('; ')})${c.state === 'done' || c.state === 'slipped' ? ` [SETTLED: ${c.story.currentSituation}]` : ''}`);
+      `${c.bible.title} — ${c.bible.kernel} (people: ${c.bible.cast.map(x => x.name).join(', ')})${c.state === 'done' || c.state === 'slipped' ? ` [SETTLED: ${c.story.currentSituation}]` : ''}`);
+    const avoidRich = this.state.chains.slice(-5).map(c =>
+      `${c.bible.title} — ${c.bible.kernel} (people: ${c.bible.cast.map(x => x.name).join(', ')}) ${c.bible.arc.join(' ')} ${c.bible.tensions.join(' ')}`);
     const genesisInput = {
       seed: sampleSeed(this.rng), keywords: sampleKeywords(this.rng),
       // most sagas must live AWAY from the landmark — omission beats the ignored "set it elsewhere"
@@ -1121,7 +1123,13 @@ export class Game {
         // the LAST TWO chains regardless of state too (39019: back-to-back dies-forgery sagas)
         const liveFp = [...this.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending'), ...this.state.chains.slice(-2)]
           .map(c => `${c.bible.title} — ${c.bible.kernel} ${c.bible.arc.join(' ')} ${c.bible.tensions.join(' ')}`);
-        const clash = avoid.find(a => hits(a) >= 3) ?? liveFp.find(a => hits(a) >= 2);
+        const clash = avoidRich.find(a => hits(a) >= 3) ?? liveFp.find(a => hits(a) >= 2);
+        // dispute-shape monoculture: campaigns converge on ONE settling device (42022: seven
+        // oath/judgment-at-a-tree sagas). When the draft AND 2+ recent chains settle by
+        // ceremony, the draft must settle its matter another way
+        const CEREMONY = /\b(oath|judgment|judgement|pledge|rite|moot|ceremon|vow|sworn|swear)\w*/i;
+        const draftCeremony = CEREMONY.test(`${d.kernel} ${d.arc.join(' ')} ${d.goal}`);
+        const ceremonyMono = draftCeremony && avoidRich.filter(a => CEREMONY.test(a)).length >= 2;
         // custody-of-the-departed guard (mechanical — the outOfReach flag alone was ignored:
         // a SOLD entertainer re-appeared "in your cells" three cycles later)
         const goneNames = slate.filter(s => s.outOfReach).map(s => s.name);
@@ -1159,6 +1167,7 @@ export class Game {
         if (parked) return { why: `your rejected draft's arc parks at ${parked} — three or more steps stage the same ground; each step must move to NEW ground or a new claimant, and only the last may return to bring the matter to a head`, dup: clientDup };
         if (step1Delivers) return { why: `your rejected draft's FIRST arc step already performs a delivery or handover — the goal is NOT done at step 1: step 1 is taking the job plus a first leg of field work, and every delivery belongs to a later step`, dup: clientDup };
         if (nullStep) return { why: `your rejected draft's arc contains a step that merely confirms or verifies something ("${nullStep}") — a null job; every step must CHANGE the situation: gain ground, gain leverage, or raise the stakes`, dup: clientDup };
+        if (ceremonyMono) return { why: `your rejected draft settles its matter with an oath, judgment, or ceremony — as the player's recent sagas already did; settle THIS matter by an entirely different means (a chase, a trade, a siege, an escape, a betrayal exposed, a debt collected — anything but a gathering that swears or judges)`, dup: clientDup };
         if (clash) return { why: `your rejected draft "${d.title} — ${d.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground`, dup: clientDup };
         if (custodyGhost) return { why: `your rejected draft placed ${custodyGhost} in the company's custody — they passed out of the company's reach and are FREE in the world; rebuild the saga around where they actually stand`, dup: clientDup };
         if (clientDup) return { why: `your rejected draft used ${clientDup.name} as ${clientDup.role} — they are already bound up in a running saga; this one needs a different person in that part entirely`, dup: clientDup };
@@ -2185,7 +2194,7 @@ export class Game {
     }
   }
 
-  private advanceChain(q: Quest, r: { outcome: Outcome; party: Card[] }, storyUpdate: { currentSituation: string; newlyRevealed: string[]; openThreads: string[]; sagaSettled?: boolean } | undefined, report: string[], fate?: FinaleFate, afterText?: string) {
+  private advanceChain(q: Quest, r: { outcome: Outcome; party: Card[] }, storyUpdate: { currentSituation: string; newlyRevealed: string[]; openThreads: string[]; actorUpdates?: Record<string, string> | null; sagaSettled?: boolean } | undefined, report: string[], fate?: FinaleFate, afterText?: string) {
     const st = this.state;
     const chain = st.chains.find(c => c.id === q.chainId);
     if (!chain) return;
@@ -2204,6 +2213,14 @@ export class Game {
         if (!chain.story.knownToPlayer.some(k => stem(k) === stem(f))) chain.story.knownToPlayer.push(f);
       }
       chain.story.openThreads = storyUpdate.openThreads.slice(0, 5);
+      // QUESTS §11 WHEREABOUTS ledger — single-location truth per person/object; the next
+      // writer and resolver treat it as authoritative (42022: a recovered mould was re-found
+      // in the antagonist's dagger because prose history alone didn't pin locations)
+      for (const [k, v] of Object.entries(storyUpdate.actorUpdates ?? {})) {
+        if (typeof v === 'string' && v.trim()) chain.story.actorStates[k] = v.trim().slice(0, 160);
+      }
+      const keys = Object.keys(chain.story.actorStates);
+      for (const k of keys.slice(0, Math.max(0, keys.length - 14))) delete chain.story.actorStates[k];
       // AI judges the matter settled → engine gates: the NEXT step becomes the finale (no filler beats)
       if (storyUpdate.sagaSettled && !q.isFinale) chain.settled = true;
     }

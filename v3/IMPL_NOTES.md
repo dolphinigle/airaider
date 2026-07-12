@@ -1418,3 +1418,23 @@ words; the model composes; variety = combinations, not entry count.
   retry; stubborn non-cast defects burn the SEED and re-roll once. 📖/🎬 lines re-voiced
   (bank/beat/season/"remains at the center" were engine jargon judges kept scoring). Twist
   mechanically withheld from ALL beat-1 writer+resolver inputs via stageBible.
+- **#368 judge loop round 7 (43023, judges 4/3.5 — PLATEAU)**: WHEREABOUTS ledger wired per
+  QUESTS §11 (resolver emits actorUpdates {name→where it rests}; engine persists to
+  story.actorStates, capped 14; writer+resolver told it is the single authoritative truth) —
+  14 resolves emitted, 9 cards consumed. Monoculture root-caused as §8 backfire: round-5's
+  arc+tensions-in-avoid handed the model example text to copy (each campaign converged on ONE
+  motif: hounds→custody→oak-oaths→rite-bound-objects); avoid split — model sees LEAN
+  fingerprints, the rich text feeds only the engine-side clash lint; plus a ceremony-
+  monoculture lint (draft + 2 recent chains settling by oath/judgment → retry with
+  settle-another-way why). New fences from the read: development focal LIVES AT THE FORT
+  (43023 staged a roster merc as an ailing mound-dwelling NPC, bilocating him every cycle and
+  offering him as recruitment payment over his own roster line); soldier never promised as
+  prize; a second attempt at a task goes DIFFERENTLY (a finale replayed a prior beat's failure
+  near-verbatim). Scores across 7 rounds: 4.5/5 → 4/4 → 4.5/4 → 5/4 → 4/5 → 4/3.5 → 4/3.5.
+  Fixed-and-staying-fixed: dice fidelity, register, bilocation of soldiers ON missions,
+  offstage leaks, twist spoilers, tag compliance, engine jargon. Still bleeding: sentence-level
+  parse failures + ungrounded coinages (~1-2 per chain, any one of which caps a chain at 6).
+  Next lever (recommended): per-card COLD-READER GATE — a cheap zero-context validator call on
+  each saga card/report (parse? grounded? contradicts the ledger?) with one guided retry;
+  matches the context-free-verifier insight that zero-context readers catch exactly what
+  judges catch.
