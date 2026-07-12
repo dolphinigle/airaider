@@ -1223,3 +1223,14 @@ words; the model composes; variety = combinations, not entry count.
   (e) genesis: dispute-SHAPE joins the avoid axes (three custody-dispute-by-witnessed-proof
       sagas in one run); period law words (no 'temporary custodial control');
   (f) names importer: alien consonant clusters rejected for humans ('Martxot').
+- **#353 verifier pass (context-free, 4 rendered prompts) + fixes**: resolve = clean; the ONE
+  BLOCKING find is the ROOT of the beat-1 overreach class — genesis wrote arc step 1 as a
+  fort-side handshake ("Meet X and accept the hire"), leaving the beat writer squeezed between
+  "cover arcStep ONLY" and "a real job to send soldiers on" → it steals later steps' work.
+  Fixed both ends: ARC SHAPE requires step 1 to CONTAIN a sendable field leg (accepting = a
+  clause, not the step); beat-1 gains the no-fieldwork escape (smallest leg TOWARD the next
+  ground). Minor fixes: `level` was explained to the card writer but never SENT in the user
+  JSON (weight-class calibration silently dead — now sent); framedCharacter null→omitted;
+  quarryTags omit-line self-contained; worn-through idiom → plain; law-register list → register
+  description (enumerated words would stamp); genesis schema de-interleaved + soldier-tie rule
+  resolved against the company-history ban; 'clocks' idiom out of the resolve style rule.
