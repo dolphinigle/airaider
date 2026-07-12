@@ -402,7 +402,7 @@ const INTAKE_FACT: Record<IntakeChannel, string[]> = {
   sign: ['it was seen from the fort\'s own walls', 'the fort noticed it before anyone spoke of it',
     'the signs of it are plain from the walls', 'it showed itself before any word of it came',
     'the walls have a view of it', 'the company saw it before hearing of it',
-    'no one reported it — it was simply there to see'],
+    'it sits in plain sight of the watch'],
   patrol: ['the company\'s own people came back with it', 'it came home with the last patrol',
     'one of your own crossed it in the field', 'your own people walked into it',
     'it was picked up in the course of the company\'s rounds', 'the company found it while out on other business',

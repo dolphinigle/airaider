@@ -1062,34 +1062,51 @@ export class Game {
     };
     let g = await this.ai.genesis(genesisInput);
     // KERNEL-NOVELTY GUARD (mechanical — the `avoid` rule alone was ignored: two
-    // reliquary-in-a-cellar sagas shipped in one campaign): one retry, collision named
+    // reliquary-in-a-cellar sagas shipped in one campaign). 2026-07-12: the single unchecked
+    // retry let a rejected premise ship anyway (twin custody-clause-at-a-ford sagas), and the
+    // same-role guard trusted MODEL-reported loreId — a slate name copied without its id slipped
+    // the fence (one coined foreman obstacled THREE concurrent sagas). Now: engine resolves
+    // loreIds by name first, every draft is re-validated, and a stubborn duplicate cast member
+    // is mechanically recast with a fresh name.
     {
       const stop = new Set('the,a,an,of,to,in,that,and,who,for,with,on,at,by,from,their,its,his,her,they,them,into,over,under'.split(','));
       const words = (s: string) => new Set((s.toLowerCase().match(/[a-z]+/g) ?? []).filter(w => w.length > 3 && !stop.has(w)));
-      // cast + coined places join the fingerprint — five deliver-to-a-ceremony sagas with the
-      // same client shipped in one run while title+kernel alone stayed just under the bar
-      const kw = words(`${g.title} ${g.kernel} ${g.arc.join(' ')} ${g.tensions.join(' ')} ${g.cast.map(c => `${c.name} ${c.role}`).join(' ')} ${g.newPlaces.map(p => p.name).join(' ')}`);
-      const clash = avoid.find(a => { const aw = words(a); let hit = 0; kw.forEach(w => { if (aw.has(w)) hit++ }); return hit >= 3 });
-      // custody-of-the-departed guard (mechanical — the outOfReach flag alone was ignored:
-      // a SOLD entertainer re-appeared "in your cells" three cycles later)
-      const goneNames = slate.filter(s => s.outOfReach).map(s => s.name);
-      const custodyGhost = goneNames.find(n => g.situation.includes(n) && /\b(cells?|custody|held at the fort|in your keeping)\b/i.test(g.situation));
-      // same-CLIENT guard (mechanical — the prompt rule alone left one lore client running
-      // three sagas at once): a live chain's client may not client the new saga too
+      const loreByName = new Map(Object.values(this.state.lore.nodes)
+        .filter(n => n.kind === 'character' && n.active).map(n => [n.name, n.id]));
       // live chains AND the last few closed ones — one rescue NPC once cliented 5 of 6
       // sequential sagas (the live-only window let her straight back in each time)
-      // obstacles too — three concurrent founder sagas once shared ONE coined villain
       const liveClients = new Set([...this.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending'),
         ...this.state.chains.slice(-3)]
         .flatMap(c => c.bible.cast.filter(x => (x.role === 'client' || x.role === 'obstacle') && x.loreId).map(x => `${x.role}:${x.loreId}`)));
-      const clientDup = g.cast.find(x => (x.role === 'client' || x.role === 'obstacle') && x.loreId && liveClients.has(`${x.role}:${x.loreId}`));
-      if (clash || clientDup || custodyGhost) {
-        const why = clash
-          ? `your rejected draft "${g.title} — ${g.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground`
-          : custodyGhost
-            ? `your rejected draft placed ${custodyGhost} in the company's custody — they passed out of the company's reach and are FREE in the world; rebuild the saga around where they actually stand`
-            : `your rejected draft used ${clientDup!.name} as ${clientDup!.role} — they already hold that role in a running saga; this one needs a different ${clientDup!.role} entirely`;
-        g = await this.ai.genesis({ ...genesisInput, avoid: [...avoid, why] });
+      const issues = (d: typeof g): { why: string; dup?: (typeof g.cast)[number] } | null => {
+        for (const m of d.cast) if (!m.loreId && loreByName.has(m.name)) m.loreId = loreByName.get(m.name);
+        // cast + coined places join the fingerprint — five deliver-to-a-ceremony sagas with the
+        // same client shipped in one run while title+kernel alone stayed just under the bar
+        const kw = words(`${d.title} ${d.kernel} ${d.arc.join(' ')} ${d.tensions.join(' ')} ${d.cast.map(c => `${c.name} ${c.role}`).join(' ')} ${d.newPlaces.map(p => p.name).join(' ')}`);
+        const clash = avoid.find(a => { const aw = words(a); let hit = 0; kw.forEach(w => { if (aw.has(w)) hit++ }); return hit >= 3 });
+        // custody-of-the-departed guard (mechanical — the outOfReach flag alone was ignored:
+        // a SOLD entertainer re-appeared "in your cells" three cycles later)
+        const goneNames = slate.filter(s => s.outOfReach).map(s => s.name);
+        const custodyGhost = goneNames.find(n => d.situation.includes(n) && /\b(cells?|custody|held at the fort|in your keeping)\b/i.test(d.situation));
+        // same-CLIENT guard (mechanical — the prompt rule alone left one lore client running
+        // three sagas at once); obstacles too — concurrent sagas once shared ONE coined villain
+        const clientDup = d.cast.find(x => (x.role === 'client' || x.role === 'obstacle') && x.loreId && liveClients.has(`${x.role}:${x.loreId}`));
+        if (clash) return { why: `your rejected draft "${d.title} — ${d.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground` };
+        if (custodyGhost) return { why: `your rejected draft placed ${custodyGhost} in the company's custody — they passed out of the company's reach and are FREE in the world; rebuild the saga around where they actually stand` };
+        if (clientDup) return { why: `your rejected draft used ${clientDup.name} as ${clientDup.role} — they already hold that role in a running saga; this one needs a different ${clientDup.role} entirely`, dup: clientDup };
+        return null;
+      };
+      let issue = issues(g);
+      for (let retry = 0; issue && retry < 2; retry++) {
+        g = await this.ai.genesis({ ...genesisInput, avoid: [...avoid, issue.why] });
+        issue = issues(g);
+      }
+      // last resort: recast a stubborn duplicate client/obstacle as a FRESH person — a new
+      // villain beats the same face fronting a fourth concurrent saga
+      if (issue?.dup) {
+        const d = issue.dup;
+        d.name = rollName(this.rng, this.rng.weighted(races));
+        delete d.loreId;
       }
     }
     // persist write-back (guarded); new places become lore nodes

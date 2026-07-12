@@ -839,6 +839,12 @@ materializes — focal AND secondaries AND captives/recruits — from the seed p
 dedicated NAME GENERATOR later (easy: syllable/part tables, fen register). AI calls receive the
 assigned name and use it as-is (genesis: cast names ASSIGNED, not inspired-by; flesh/outcome:
 name handed in, never chosen).
+- 🛠 **2026-07-12 (designer ruling, Fort-of-Chains calibrated): NO syllable/part tables.**
+  Syllable joins minted mad-libs texture ('Branbert', 'Pelllion'). Names now draw WHOLE from
+  large curated per-race+gender pools (~3,750 names filtered from public name corpora via
+  `scripts/_importnames.ts` → `names_data.ts`); every name was vetted by a human eye before
+  entering the pool. Filters carry the perceived-gender lesson (a name's ENDING reads gendered
+  in English regardless of the corpus's intent) + modern/mythic-famous blocklists.
 
 ## §5 Keyword seeds — ONE field ✅ (decided 2026-06-12)
 - ONE unlabeled `KEYWORDS:` line; sampling = **1 BOND + 1 TIE + 2 WILDCARDS** (wildcards uniform
@@ -859,6 +865,16 @@ name handed in, never chosen).
   needs belt-and-braces — ONE targeted ban-line kept in genesis. Unlabeled keywords are
   generatively ambiguous and that's a feature ('church face' (mask sense) → a carved church
   face as the plot object).
+- 🛠 **2026-07-12 ATOMIZATION (designer ruling — supersedes the style bar above): entries are
+  SINGLE common words** (two only for a lexical unit with no one-word form). The 2-3-word
+  strata pre-authored premises ('banned festival', 'fairy mound') the model could only
+  transcribe → cringe; atoms combine instead ('festival' + 'banned' as separate draws) and
+  variety comes from COMBINATIONS, not entry count. Added a QUALITIES modifier pool (~200:
+  stolen/banned/false/hidden…) to the wildcard union; a rolled 2nd wildcard leans QUALITIES 35%.
+  Obscure medievalia (a curious twelve-year-old must know the word), anachronisms, and posed
+  cleverness purged. v2 pools: BOND 308 · TIE 261 · QUALITIES 208 · THINGS 465 · OCCASIONS 137 ·
+  PEOPLE 255 · UNCANNY 118 · MOODS 33 = 1,785 unique. The ARRIVAL/opening-spark pools were
+  atomized under the same ruling (seed atoms joined ' · ', writer combines them).
 
 ## §6 Prompt-field naming ✅ (built, commit 2bfcc34)
 `SETTING` → `PLACE` · `ENGINE SETTINGS FOR THIS CHAIN` → `STORY SHAPE (engine-rolled)` ·
