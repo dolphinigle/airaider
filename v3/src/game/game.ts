@@ -1358,7 +1358,7 @@ export class Game {
     // the CARD writer never sees a step's "→ yields:" answer — handing it the yield made
     // cards name the find before the party looked (lab batch C, 4/6); the RESOLVER keeps
     // the full step because it must deliver that yield
-    const stripYields = (s: string) => s.replace(/\s*→ yields:.*$/i, '');
+    const stripYields = (s?: string) => (s ?? '').replace(/\s*→ yields:.*$/i, '');
     const stagedRaw = this.stageBible(chain, dealtStep, chain.beatIndex === 0 && !isFinale);
     // mid-saga CARD writers lose bible.situation entirely (lab batch E: every leak class —
     // twists, yields, later beats — drew from that well; the omission pattern is the proven
