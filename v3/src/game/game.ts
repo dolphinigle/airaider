@@ -1141,7 +1141,12 @@ export class Game {
         // role fence: genesis once leaked its input KIND ("captive") into cast.role, and the
         // beat writer branches the care beat on role — clamp out-of-enum values
         if (!ROLES.includes(member.role)) member.role = member.name === focal.name ? 'quarry' : 'ally';
-        if (member.loreId && this.state.lore.nodes[member.loreId]) {
+        if (member.loreId === focal.id) {
+          // the focal's id pins the focal's NAME (a bible once dressed the focal's entry in a
+          // slate neighbor's name over the focal's own id — the wrong name was "legal", so it
+          // slipped the fence and broke role forcing + introducedNames downstream)
+          member.name = focal.name;
+        } else if (member.loreId && this.state.lore.nodes[member.loreId]) {
           member.name = this.state.lore.nodes[member.loreId]!.name;   // canon wins
         } else if (!legal.has(member.name)) {
           const replacement = assignedNames[next++] ?? rollName(this.rng, this.rng.weighted(races));
@@ -1168,6 +1173,9 @@ export class Game {
       const centralRole = eco.kind === 'recruit' ? 'prize' : 'quarry';
       const focalEntry = g.cast.find(m => m.name === focal.name);
       if (focalEntry && !isPersonal && !['client'].includes(focalEntry.role)) focalEntry.role = centralRole;
+      // development sagas are about the company's OWN (#357/#360 evidence: a focal merc labeled
+      // 'quarry' steers the finale to close around the wrong person, as if hunting one's own)
+      if (focalEntry && isPersonal && ['quarry', 'prize', 'obstacle'].includes(focalEntry.role)) focalEntry.role = 'companion';
       for (const m of g.cast) {
         if (m !== focalEntry && (m.role === 'quarry' || m.role === 'prize')) m.role = 'obstacle';
       }
@@ -1854,11 +1862,14 @@ export class Game {
     }
     // lore edges from the AI (validated later in one pass)
     pendingEdges.push(...(out?.edges ?? []));
-    // narrate, then the consequences — the DICE are always shown (owned loss, DESIGN §5)
+    // narrate in the fiction's own order — setup, THEN the dice, THEN the outcome
+    // (QUESTS §7: before-roll blind → after-roll sighted; the DICE are always shown, DESIGN §5)
+    report.push(`— ${q.title} (${q.id})`);
+    if (out) report.push(out.before);
     report.push(r.rolled.totalCoins === 0
-      ? `— ${q.title} (${q.id}) [${r.outcome.toUpperCase()}] · the party had no usable dice for this work (needed ${r.rolled.totalBar.toFixed(1)})`
-      : `— ${q.title} (${q.id}) [${r.outcome.toUpperCase()}] · rolled ${r.rolled.heads} heads of ${r.rolled.totalCoins} coins vs bar ${r.rolled.totalBar.toFixed(1)}`);
-    if (out) { report.push(out.before); report.push(out.after) }
+      ? `⚄ [${r.outcome.toUpperCase()}] · the party had no usable dice for this work (needed ${r.rolled.totalBar.toFixed(1)})`
+      : `⚄ [${r.outcome.toUpperCase()}] · rolled ${r.rolled.heads} heads of ${r.rolled.totalCoins} coins vs bar ${r.rolled.totalBar.toFixed(1)}`);
+    if (out) report.push(out.after);
     report.push(...after);
     this.log('resolve', `${q.title}: ${r.outcome}`, q.id);
     // chain advancement

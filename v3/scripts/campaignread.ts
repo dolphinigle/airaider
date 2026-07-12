@@ -184,4 +184,6 @@ if (failed.length) {
 const u = g.ai.usage();
 say(`\n════ cycle ${g.state.cycle} · gold ${g.gold()} · AI ${u.calls} calls ~$${u.costUsd.toFixed(2)} ════`);
 fs.writeFileSync(LOG, out.join('\n'));
+// raw calls ride along for lint passes (out-of-vocab ask tags, rendered-prompt verifier reads)
+fs.writeFileSync(`${LOG}.calls.json`, JSON.stringify(g.ai.callLog(), null, 1));
 console.log(`done → ${LOG} (${out.length} lines)`);

@@ -1294,3 +1294,34 @@ words; the model composes; variety = combinations, not entry count.
   no noun to bite on → sampler now draws slot 3 from concrete-noun pools only, QUALITIES enters
   only as the optional 2nd wildcard (25% of draws carry a quality, all noun-paired); 'only'
   itself removed (pure function word).
+- **#359 live-playtest round 3 (designer findings)**: (1) hallucinated ask tags still common
+  (nonexistent requiredTag words in raw responses) — the vocab was BURIED mid-paragraph inside
+  the ask bullet; now a visually fenced ═══ TAG VOCABULARY ═══ section of its own (designer's
+  suggested experiment), all emitting fields (favored/clashing/requiredTag/quarryTags/
+  approaches.favored) reference it, with the discard consequence stated and a copy-EXACTLY
+  rule ("roguery", never "stealth"). (2) resolutions unreadable — literary mush ("RPG writing,
+  NOT LITERATURE"); root cause was the prompt's OWN theater machinery: mandated em-dash brink
+  ending, one-beat-per-party-member, mandated pair exchange, sentence-count budgets gamed by
+  clause-packing. All four cut as classes; register returned to the docs' bar (PROMPTS.md
+  ≤35/≤60 shape): hard WORD caps by rarity (25/45 · 35/65 · 50/95 finale), before ends on a
+  full stop (dice print next), members named only where they turned the job, every sentence
+  must change the picture (moving/handling/carrying gear reports nothing); zProse caps
+  500/850. (3) report order now matches QUESTS §7's before-roll(blind)→after-roll(sighted):
+  title → before → ⚄ dice line → after (dice previously printed before both halves).
+  campaignread.ts now dumps raw calls (`.calls.json`) for lint passes.
+- **#360 verification round for #359** (12-cycle real-AI, seed 27008, $0.14 + fresh verifier):
+  resolutions read as plain event reports (befores end on full stops, no choreography, budgets
+  held); tag lint on raw responses 178/181 exact-vocab (98.3%) — one miss was 'stealth', which
+  I PLANTED myself by writing `never "stealth"` in the new vocab section (§8 again: the
+  counter-example is a stamp) → de-named to the class rule. Context-free verifier: resolve
+  MINOR (two pre-existing tensions now fixed: rejected-plan verb ban scoped to what makes a
+  plan DIFFERENT — it collided with the job's own night-guard verbs; finale output-spec line
+  now lists `approaches`), writeQuest BLOCKING on the #357 scramble class with smoking gun:
+  the singer-saga focal's cast entry wore a slate neighbor's NAME (Pimaxi-Loh) over the
+  focal's own loreId (Taldyn) — the wrong name was "legal", so the name guard passed it, and
+  every downstream fence that finds the focal BY NAME (role forcing, introducedNames, name
+  fence) silently no-opped. Engine fix: a cast entry whose loreId === focal.id is renamed to
+  focal.name before anything else runs; plus the #357 ruling implemented — a development-saga
+  focal (company's own) landing quarry/prize/obstacle is forced to companion. Remaining watch
+  (task #2 batch): obstacle wants that ALIGN with the goal (Nithonda), fate-wording echo in a
+  slipped-saga after-text, band-language on 'deep gash' at low.
