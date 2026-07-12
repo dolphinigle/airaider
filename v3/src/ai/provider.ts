@@ -44,6 +44,7 @@ export interface QuestWriteInput {
   // the writer receives the world's relevant memory around this saga
   relevantLore?: { id: string; name: string; blurb: string; relationPhrase: string; companySoldier?: boolean; companyCaptive?: boolean; atTheFort?: boolean; outOfReach?: boolean; dossier?: string }[];
   focalDossier?: string;         // what the world currently remembers of the focal (evolves each cycle)
+  fixNotes?: string[];           // cold-reader gate: defects found in the rejected previous draft
   beatIndex?: number; expectedBeats?: number;
   arcStep?: string;              // the ONE arc step this card covers, dealt verbatim (models
                                  // fumbled indexing arc[beat-1] themselves — beat 1 cards scoped
@@ -121,6 +122,7 @@ export interface ResolveQuestInput {
     approach?: string;               // finale: the plan the player CHOSE (a contract)
     rejectedApproaches?: string[];   // finale: the plans NOT taken (their actions may not appear)
   };
+  fixNotes?: string[];               // cold-reader gate: defects found in the rejected previous report
 }
 
 export interface ResolveQuestOut {
@@ -204,6 +206,17 @@ export interface AiProvider {
   flesh(inputs: FleshInput[]): Promise<FleshOut[]>;                  // ONE batched call
   themeRoll(input: ThemeRollInput): Promise<ThemeRollOut>;
   select(input: SelectorInput): Promise<string[]>;
+  /** cold-reader gate: a zero-context read of one player-facing text — the defects it returns
+   *  feed ONE guided rewrite (the judge-loop plateau traced to ~1-2 unparseable/ungrounded
+   *  sentences per chain, each capping a chain's readability) */
+  review(input: ReviewInput): Promise<ReviewOut>;
   usage(): AiUsage;
   callLog(): AiCallRecord[];
 }
+
+export interface ReviewInput {
+  text: string;                          // the player-facing text to cold-read
+  whereabouts?: Record<string, string>;  // authoritative object/person locations (contradiction check)
+  known?: string[];                      // names/facts the player has already met
+}
+export interface ReviewOut { ok: boolean; defects: string[] }

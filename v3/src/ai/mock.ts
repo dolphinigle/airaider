@@ -156,6 +156,11 @@ export class MockProvider implements AiProvider {
     this.tick();
     return input.candidates.slice(0, input.max).map(c => c.id);
   }
+
+  async review(): Promise<{ ok: boolean; defects: string[] }> {
+    this.tick();
+    return { ok: true, defects: [] };   // mock text is deterministic — nothing to gate
+  }
 }
 
 function cap(s: string): string { return s.charAt(0).toUpperCase() + s.slice(1) }

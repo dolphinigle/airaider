@@ -1438,3 +1438,17 @@ words; the model composes; variety = combinations, not entry count.
   each saga card/report (parse? grounded? contradicts the ledger?) with one guided retry;
   matches the context-free-verifier insight that zero-context readers catch exactly what
   judges catch.
+- **#369 COLD-READER GATE (judge-loop rounds 8-9)**: new AiProvider.review — a zero-context
+  gpt-5-mini pass on each saga card AND saga report, checking exactly three defect kinds
+  (unparseable sentence / ungrounded term whose KIND can't be told / real WHEREABOUTS
+  contradiction); a flagged draft gets ONE guided rewrite via fixNotes. First cut over-flagged
+  13/15 (no player frame: "the fort" flagged unknown; reworded-same-holder flagged as ledger
+  break) — reviewer given the player frame + kind-level grounding + contradiction-not-rewording;
+  tuned rate 8/13 with genuine judge-class catches (ambiguous "present him", garden-path
+  destination). Cost ~+$0.02/campaign, one low call latency per saga artifact. 45025 judges:
+  4/4 overall but per-chain ceiling up (6, 6, 5.5 in one campaign). Report gate added after
+  the card-only round left the top class (resolutions negating their own setup: bones carried
+  out of a lodge whose door "stayed barred") untouched. Also: freshPlaceName anti-repeat now
+  covers the LAST word (four "X Hollow"s templated one campaign); unrevealed twists must
+  come out at the finale (a wager-treachery twist silently died); beat objectives must be
+  WINNABLE (a "stand before her so she may choose" job read SUCCESS-then-refusal as a bug).

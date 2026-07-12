@@ -1344,10 +1344,10 @@ export class Game {
     const dealtStep = isFinale ? chain.bible.arc[chain.bible.arc.length - 1]!
       : chain.bible.arc[Math.min(chain.beatIndex, chain.bible.arc.length - 1)]!;
     const stagedBible = this.stageBible(chain, dealtStep, chain.beatIndex === 0 && !isFinale);
-    const out = isRepose && cached && cached.beat === chain.beatIndex + 1 ? cached.out : await this.ai.writeQuest({
+    const wqInput = ({
       // beats serve the BIBLE's story, not a rolled job type (a random archetype fought the saga);
       // the landmark gate is for one-off variety — a saga anchored at the landmark must name it
-      kind: isFinale ? 'finale' : 'beat',
+      kind: (isFinale ? 'finale' : 'beat') as 'finale' | 'beat',
       // beats see the landmark ONLY when this saga's bible actually uses it (else it re-tempts drift)
       location: this.locationLine(chain.region, !!REGION[chain.region]?.landmark && JSON.stringify(chain.bible).includes(REGION[chain.region]!.landmark!), false),
       level: chain.level, rarity: chain.rarity, slotCount: n,
@@ -1374,6 +1374,21 @@ export class Game {
       // runtime truth, not genesis-time: a focal HIRED mid-saga is the company's own now
       focalIsMerc: focal?.character?.role === 'merc',
     });
+    let out = isRepose && cached && cached.beat === chain.beatIndex + 1 ? cached.out : await this.ai.writeQuest(wqInput);
+    // COLD-READER GATE (judge-loop plateau, IMPL #368): ~1-2 unparseable/ungrounded sentences
+    // per chain capped every chain's readability — a zero-context read of the drafted card
+    // feeds ONE guided rewrite; a reader that errors passes the draft through
+    if (!(isRepose && cached && cached.beat === chain.beatIndex + 1)) {
+      const rev = await this.ai.review({
+        text: `${out.title}\n${out.situation}`,
+        whereabouts: chain.story.actorStates,
+        known: [...(chain.story.introducedNames ?? []), chain.bible.goal, ...chain.story.knownToPlayer],
+      }).catch(() => ({ ok: true, defects: [] }));
+      if (!rev.ok && rev.defects.length) {
+        this.log('chain', `saga card re-written: cold reader flagged ${rev.defects.length} defect(s)`);
+        out = await this.ai.writeQuest({ ...wqInput, fixNotes: rev.defects });
+      }
+    }
     if (!isFinale) this.cachedBeatOut.set(chain.id, { beat: chain.beatIndex + 1, out });
     // QUESTS §6: middle-beat side-loot = gold OR a relic among it (was always bare gold)
     const specs: RewardSpec[] = isFinale ? [] : [{ kind: 'gold' as const, value: sideLootV }];
@@ -1597,6 +1612,24 @@ export class Game {
       } : undefined,
     }));
     const aiOuts = aiInputs.length ? await this.ai.resolve(aiInputs) : [];
+    // COLD-READER GATE on saga reports (45025 judge: the card gate alone left the top class
+    // untouched — resolutions negating their own setup or the record); one guided redo each
+    for (let i = 0; i < aiOuts.length; i++) {
+      const o = aiOuts[i]!;
+      const inp = aiInputs.find(x => x.questId === o.questId);
+      if (!inp?.chainContext) continue;
+      const chain = st.chains.find(c => c.id === resolutions.find(r2 => r2.quest.id === o.questId)?.quest.chainId);
+      const rev = await this.ai.review({
+        text: `${o.before}\n[the dice fall]\n${o.after}`,
+        whereabouts: chain?.story.actorStates,
+        known: [...(chain?.story.introducedNames ?? []), ...(chain?.story.knownToPlayer ?? [])],
+      }).catch(() => ({ ok: true, defects: [] as string[] }));
+      if (!rev.ok && rev.defects.length) {
+        this.log('chain', `saga report re-written: cold reader flagged ${rev.defects.length} defect(s)`);
+        const redo = await this.ai.resolve([{ ...inp, fixNotes: rev.defects }]).catch(() => null);
+        if (redo?.[0]) aiOuts[i] = redo[0];
+      }
+    }
 
     // 3) apply engine effects + AI outputs; lore write-backs AFTER all (collected first)
     const pendingEdges: { from: string; to: string; type: string; blurb: string; importance: number }[] = [];
@@ -2176,11 +2209,14 @@ export class Game {
   private freshPlaceName(region: string): string {
     const banned = REGION[region]?.landmark;
     const stem = (s: string) => s.slice(0, 4).toLowerCase();
+    // anti-repeat covers the LAST word too — prefix stems alone let "Mossway Hollow /
+    // Coalward Hollow / Linden Hollow / Marepen Hollow" template a whole campaign (45025)
+    const tail = (s: string) => s.split(/\s+/).pop()!.toLowerCase();
     let p = rollPlaceName(this.rng);
-    for (let i = 0; i < 12 && (p === banned || this.recentPlaceStems.includes(stem(p))); i++)
+    for (let i = 0; i < 12 && (p === banned || this.recentPlaceStems.includes(stem(p)) || this.recentPlaceStems.filter(t => t === `tail:${tail(p)}`).length >= 2); i++)
       p = rollPlaceName(this.rng);
-    this.recentPlaceStems.push(stem(p));
-    while (this.recentPlaceStems.length > 24) this.recentPlaceStems.shift();
+    this.recentPlaceStems.push(stem(p), `tail:${tail(p)}`);
+    while (this.recentPlaceStems.length > 48) this.recentPlaceStems.shift();
     return p;
   }
 
