@@ -839,10 +839,18 @@ export class Game {
     // away) becomes a dealt fact — interrogations/hunts/rewards/debts stop reading as messengers
     // variants per source — one fixed string per channel became its own stamp
     const specialPools: Partial<Record<Lead['source'], string[]>> = {
-      interrogation: ['a captive in the company\'s cells gave it up', 'it was traded out of the cells for small comforts'],
-      hunt: ['the company\'s own searching turned it up', 'it was found while looking for something else', 'it surfaced along the way of other work'],
-      reward: ['word of it came home with the last job', 'it grew out of business already done'],
-      collector: ['a debt long owed to the company has come due', 'an old obligation has surfaced'],
+      interrogation: ['a captive in the company\'s cells gave it up', 'it was traded out of the cells for small comforts',
+        'it came out of the cells, a little at a time', 'someone below decided talking beat waiting',
+        'the cells yielded it after long silence'],
+      hunt: ['the company\'s own searching turned it up', 'it was found while looking for something else',
+        'it surfaced along the way of other work', 'the company dug until this came loose',
+        'it was lying under a question no one had asked yet'],
+      reward: ['word of it came home with the last job', 'it grew out of business already done',
+        'the last job left this behind', 'finishing one matter uncovered this one',
+        'it was owed to the company before anyone named it'],
+      collector: ['a debt long owed to the company has come due', 'an old obligation has surfaced',
+        'someone remembered what they owe the company', 'a favor given long ago wants collecting',
+        'old business has found its way back to the gate'],
     };
     const special: Partial<Record<Lead['source'], string>> = Object.fromEntries(
       Object.entries(specialPools).map(([k, v]) => [k, this.rng.pick(v!)]));
@@ -858,9 +866,8 @@ export class Game {
     let opening = sampleOpening(this.rng, sparkOpts);
     // spark recency: one reroll if the same figure was dealt lately ("a poacher turned
     // informer" carried three cards in one campaign)
-    const sparkCore = (s: string) => s.split(' — ')[0]!;
-    if (this.recentSparks.includes(sparkCore(opening.spark))) opening = sampleOpening(this.rng, sparkOpts);
-    this.recentSparks.push(sparkCore(opening.spark));
+    if (this.recentSparks.includes(opening.sparkCore)) opening = sampleOpening(this.rng, sparkOpts);
+    this.recentSparks.push(opening.sparkCore);
     while (this.recentSparks.length > 8) this.recentSparks.shift();
     const intake = special[lead.source] ?? opening.intake;
     // non-bringer/sign channels get NO spark: their pools were all arrival-of-word images —

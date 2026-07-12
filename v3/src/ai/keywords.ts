@@ -1,433 +1,385 @@
 // Keyword seeds — §5: ONE unlabeled KEYWORDS line; sampling = 1 BOND + 1 TIE + 1-2 WILDCARDS
-// (wildcards uniform over THINGS ∪ OCCASIONS ∪ PEOPLE ∪ UNCANNY ∪ MOODS).
-// Pools ported whole from v2-final app/core/keywords.ts (~2,400 entries; append-to-grow).
-// STYLE BAR: bare words; 1-3 words; evocative-generic, never a micro-premise; low-medieval;
-// no proper nouns; no cross-pool dupes.
+// (wildcards uniform over THINGS ∪ OCCASIONS ∪ PEOPLE ∪ UNCANNY ∪ MOODS ∪ QUALITIES).
+// 🛠 2026-07-12 ATOMIZATION (designer ruling): entries are SINGLE common words. The old pools'
+// 2-3-word entries pre-authored a premise ('banned festival', 'fairy mound') and the AI could
+// only transcribe them — atoms combine instead ('festival' + 'banned' arrive as separate draws
+// and the model invents the story). Variety now comes from COMBINATIONS, not from entry count.
+// STYLE BAR: one word (two only for a common lexical unit with no one-word form); a curious
+// twelve-year-old knows it; plain English first, low-medieval compatible; no proper nouns;
+// no anachronisms; no dictionary-obscure medievalia; never a pose or a joke; no cross-pool dupes.
 
 import type { Rng } from '../engine/rng.js';
 
-// ---- BOND (~500): emotions, stances, relations — the draw's emotional axis -------------------
+// ---- BOND (~350): feelings, stances, drives, relations — the draw's emotional axis ------------
 export const BOND: string[] = [
-  // raw feeling
+  // feelings
   'grief', 'longing', 'spite', 'envy', 'dread', 'shame', 'pride', 'guilt', 'rage', 'pity',
   'tenderness', 'contempt', 'awe', 'loneliness', 'homesickness', 'jealousy', 'devotion', 'resentment',
   'gratitude', 'mercy', 'malice', 'remorse', 'yearning', 'bitterness', 'adoration', 'loathing',
-  'wonder', 'despair', 'hope', 'relief', 'humiliation', 'vindication', 'heartbreak', 'infatuation',
+  'despair', 'hope', 'relief', 'humiliation', 'vindication', 'heartbreak', 'infatuation',
   'disgust', 'terror', 'melancholy', 'glee', 'scorn', 'reverence', 'suspicion', 'trust',
-  'mistrust', 'forgiveness', 'unforgiveness', 'regret', 'nostalgia', 'restlessness', 'serenity', 'fury',
-  // stances & habits of heart
+  'mistrust', 'forgiveness', 'regret', 'nostalgia', 'restlessness', 'serenity', 'fury',
+  'sorrow', 'joy', 'delight', 'misery', 'anguish', 'torment', 'unease', 'worry', 'panic',
+  'fright', 'horror', 'revulsion', 'fondness', 'affection', 'warmth', 'indifference',
+  'boredom', 'weariness', 'desire', 'satisfaction', 'contentment', 'calm', 'doubt',
+  'certainty', 'conviction', 'confusion', 'bewilderment', 'astonishment', 'surprise', 'shock',
+  'dismay', 'disappointment', 'frustration', 'exasperation', 'irritation', 'annoyance',
+  'anger', 'wrath', 'hatred', 'hostility', 'grudge', 'embarrassment', 'shyness',
+  'nervousness', 'anxiety', 'apprehension', 'foreboding', 'anticipation', 'eagerness',
+  'excitement', 'thrill', 'elation', 'triumph', 'gloating', 'smugness', 'wonder',
+  'gloom', 'cheer', 'mirth', 'sulking', 'brooding', 'pining', 'aching', 'numbness',
+  // stances & habits
   'stubbornness', 'cowardice', 'bravado', 'humility', 'vanity', 'greed', 'generosity', 'patience',
-  'impatience', 'cruelty', 'kindness', 'caution', 'recklessness', 'cunning', 'innocence', 'worldliness',
-  'zeal', 'apathy', 'curiosity', 'denial', 'obstinacy', 'meekness', 'arrogance', 'modesty',
-  'pettiness', 'magnanimity', 'severity', 'leniency', 'rigour', 'sloth', 'industry', 'thrift',
-  'extravagance', 'prudence', 'folly', 'wisdom', 'naivety', 'cynicism', 'idealism', 'fatalism',
-  'defiance', 'obedience', 'servility', 'rebelliousness', 'loyalty', 'disloyalty', 'fickleness', 'constancy',
-  // bonds between people
-  'rivalry', 'kinship', 'brotherhood', 'sisterhood', 'fellowship', 'enmity', 'courtship', 'estrangement',
-  'reunion', 'betrayal', 'reconciliation', 'mentorship', 'apprentice loyalty', 'first love', 'old love', 'lost love',
-  'forbidden love', 'unrequited love', 'married silence', 'widowed love', 'mother love', 'father hunger',
-  'orphan longing', 'sibling rivalry', 'twin bond', 'blood feud', 'sworn friendship', 'broken friendship',
-  'soldier fellowship', 'shield-brotherhood', 'oath kinship', 'milk kinship', 'foster bond', 'ward bond',
-  'master and servant', 'debtor and lender', 'hunter and quarry', 'jailer and prisoner', 'healer and patient',
-  'priest and doubter', 'teacher and pupil', 'rival heirs', 'rival suitors', 'rival craftsmen', 'rival houses',
-  'old comrades', 'old enemies', 'new neighbours', 'estranged kin', 'distant cousins', 'in-laws',
-  // shaded, specific feelings (2-3 words)
-  'cold charity', 'borrowed courage', 'quiet hatred', 'public devotion', 'private doubt', 'old guilt',
-  'fresh grief', 'inherited grudge', 'misplaced trust', 'earned distrust', 'reluctant respect', 'grudging love',
-  'feigned indifference', 'hidden admiration', 'jealous guardianship', 'smothering care', 'wounded pride', 'borrowed shame',
-  'survivor guilt', 'deathbed tenderness', 'gallows humour', 'famine temper', 'harvest joy', 'winter patience',
-  'pilgrim hope', 'convert zeal', 'apostate doubt', 'exile longing', 'homecoming fear', 'stranger kindness',
-  'neighbourly spite', 'village pity', 'crowd cruelty', 'mob courage', 'lonely vigilance', 'shared silence',
-  'sworn silence', 'guilty silence', 'protective lies', 'loving deceit', 'honest cruelty', 'kind cowardice',
-  'brave despair', 'cheerful menace', 'gentle ruthlessness', 'patient vengeance', 'hasty mercy', 'weary duty',
-  'glad obedience', 'sullen service', 'eager servitude', 'proud poverty', 'ashamed wealth', 'guilty comfort',
-  'envious admiration', 'admiring envy', 'fearful love', 'loving fear', 'holy terror', 'profane joy',
-  'sour gratitude', 'sweet revenge', 'stale anger', 'banked fury', 'kindled hope', 'doused hope',
-  'second thoughts', 'cold feet', 'iron resolve', 'failing nerve', 'borrowed time', 'stolen happiness',
-  'unearned fame', 'earned infamy', 'quiet heroism', 'loud piety', 'secret pride', 'open scorn',
-  'old tenderness', 'new suspicion', 'mutual need', 'one-sided love', 'mutual hatred', 'wary truce',
-  'forced politeness', 'false cheer', 'true grief', 'practised grief', 'borrowed grief', 'rented loyalty',
-  'bought silence', 'sold honour', 'pawned dignity', 'redeemed honour', 'squandered trust', 'hoarded love',
+  'impatience', 'cruelty', 'kindness', 'caution', 'recklessness', 'cunning', 'innocence',
+  'zeal', 'apathy', 'curiosity', 'denial', 'arrogance', 'modesty', 'pettiness',
+  'severity', 'leniency', 'sloth', 'industry', 'thrift', 'extravagance', 'prudence',
+  'folly', 'wisdom', 'naivety', 'cynicism', 'idealism', 'fatalism', 'defiance',
+  'obedience', 'servility', 'loyalty', 'disloyalty', 'fickleness', 'constancy',
+  'honesty', 'dishonesty', 'tact', 'bluntness', 'discretion', 'indiscretion',
+  'secrecy', 'openness', 'hypocrisy', 'piety', 'faith', 'superstition',
+  'courage', 'valor', 'daring', 'boldness', 'timidity', 'meekness', 'gentleness',
+  'harshness', 'mildness', 'temperance', 'gluttony', 'sobriety', 'drunkenness',
+  'lust', 'chastity', 'fidelity', 'infidelity', 'diligence', 'laziness',
+  'complacency', 'vigilance', 'negligence', 'carelessness', 'fussiness', 'squeamishness',
+  'stinginess', 'charity', 'hospitality', 'rudeness', 'courtesy', 'insolence',
+  'deference', 'condescension', 'spitefulness', 'vindictiveness',
+  'gullibility', 'wariness', 'optimism', 'pessimism', 'stoicism', 'self-pity',
+  'self-denial', 'self-importance', 'self-sacrifice', 'penance', 'martyrdom',
   // appetites & drives
-  'ambition', 'lust', 'gluttony', 'wanderlust', 'bloodlust', 'gold hunger', 'land hunger', 'name hunger',
-  'glory hunger', 'belonging', 'escape', 'oblivion', 'recognition', 'legacy', 'atonement', 'absolution',
-  'redemption', 'salvation', 'damnation', 'temptation', 'obsession', 'compulsion', 'addiction', 'craving',
-  'self-denial', 'self-punishment', 'self-deception', 'self-importance', 'self-pity', 'self-sacrifice',
-  'martyrdom', 'penance', 'confession hunger', 'secret keeping', 'truth hunger', 'gossip hunger',
-  // duties & weights of place
-  'duty', 'obligation', 'responsibility', 'stewardship', 'guardianship', 'wardship', 'fealty', 'allegiance',
-  'patriot love', 'clan pride', 'family honour', 'house shame', 'name shame', 'trade pride', 'craft pride',
-  'guild loyalty', 'parish duty', 'neighbour duty', 'host duty', 'guest right', 'salt bond', 'bread debt',
-  'roof debt', 'life debt', 'blood debt', 'honour debt', 'gambling debt', 'gratitude debt',
-  // fears
-  'fear of water', 'fear of fire', 'fear of dark', 'fear of crowds', 'fear of priests', 'fear of dogs',
-  'fear of debt', 'fear of shame', 'fear of dying poor', 'fear of dying alone', 'fear of being known', 'fear of being forgotten',
-  'fear of the fen', 'fear of the sea', 'fear of winter', 'fear of childbirth', 'fear of madness', 'fear of heights',
-  // griefs & losses
-  'mourning', 'unfinished mourning', 'denied mourning', 'public mourning', 'mourning cut short', 'mourning overlong',
-  'child loss', 'spouse loss', 'parent loss', 'friend loss', 'home loss', 'limb loss',
-  'sight loss', 'voice loss', 'memory loss', 'faith loss', 'face loss', 'fortune loss',
-  // odd, vivid stances
-  'borrowed plumage', 'small tyranny', 'petty kingdom', 'kitchen pride', 'doorstep honour', 'market face',
-  'church face', 'tavern truth', 'morning regret', 'night courage', 'fair-weather faith', 'foxhole prayer',
-  'one good deed', 'one bad day', 'last straw', 'first offence', 'old habit', 'new leaf',
-  'second chance', 'third strike', 'final warning', 'last kindness', 'parting gift', 'cold shoulder',
-  'long memory', 'short fuse', 'thick skin', 'thin patience', 'hard bargain', 'soft heart',
-  'sharp tongue', 'still water', 'slow burn', 'quick temper', 'high horse', 'low cunning',
-  'dumb luck', 'sore loser', 'gracious winner', 'bitter winner', 'happy loser', 'bad blood',
-  'good riddance', 'fond farewell', 'unwelcome return', 'prodigal welcome', 'overdue apology', 'refused apology',
-  'unsaid thanks', 'unpaid respects', 'empty condolence', 'true condolence', 'crocodile tears', 'honest tears',
+  'ambition', 'wanderlust', 'bloodlust', 'belonging', 'oblivion', 'recognition', 'legacy',
+  'atonement', 'absolution', 'redemption', 'salvation', 'damnation', 'temptation',
+  'obsession', 'compulsion', 'craving', 'vengeance', 'retribution', 'justice',
+  'honor', 'dishonor', 'glory', 'fame', 'infamy', 'reputation', 'respect',
+  'dignity', 'indignity', 'freedom', 'captivity', 'escape',
+  'hunger', 'thirst', 'want', 'plenty', 'poverty', 'wealth', 'comfort', 'hardship',
+  'survival', 'safety', 'danger', 'risk', 'ruin', 'fortune', 'advancement', 'station',
+  // relations
+  'rivalry', 'kinship', 'brotherhood', 'sisterhood', 'fellowship', 'enmity', 'courtship',
+  'estrangement', 'betrayal', 'reconciliation', 'mentorship', 'friendship',
+  'partnership', 'marriage', 'widowhood', 'motherhood', 'fatherhood', 'childhood',
+  'familiarity', 'intimacy', 'distance',
+  'attachment', 'dependence', 'independence', 'protection', 'neglect', 'abandonment',
+  'favoritism', 'exclusion', 'welcome', 'rejection', 'acceptance', 'tolerance',
+  // duties & weights
+  'duty', 'obligation', 'responsibility', 'stewardship', 'guardianship', 'fealty',
+  'allegiance', 'service', 'servitude', 'birthright', 'debt',
+  'mourning', 'loss', 'bereavement', 'absence', 'emptiness',
 ];
 
-// ---- MOODS (~100): genre / mode words — what KIND of story this wants to be -------------------
-export const MOODS: string[] = [
-  'adventure', 'mystery', 'tragedy', 'comedy', 'farce', 'romance', 'caper', 'heist',
-  'intrigue', 'scandal', 'conspiracy', 'whodunit', 'chase', 'siege', 'standoff',   'rescue', 'downfall', 'comeuppance', 'windfall', 'reversal',
-  'homecoming', 'farewell', 'initiation', 'awakening', 'reckoning', 'corruption',
-  'seduction', 'conversion', 'odyssey', 'vigil', 'haunting',   'masquerade', 'mistaken identity', 'double life', 'long con', 'slow poison', 'cold case',
-  'last stand', 'fool\'s errand', 'wild goose chase', 'treasure hunt', 'race against time', 'game of nerves',
-  'battle of wits', 'war of whispers', 'trial', 'ordeal', 'duel',
-  'courtship dance', 'cat and mouse', 'tug of war', 'house of cards', 'powder keg', 'slow thaw',
-  'gathering storm', 'calm before storm', 'aftermath', 'cleanup', 'unravelling',
-  'domino fall', 'snowball', 'spiral', 'descent', 'ascent', 'tightrope',
-  'crossroads', 'point of no return', 'eleventh hour', 'dawn raid', 'long night',   'bad bargain', 'devil\'s bargain', 'pyrrhic victory', 'hollow victory', 'narrow escape', 'near miss',
-  'comedy of errors', 'tangled web', 'bedlam', 'quiet dread', 'creeping rot', 'small mercy',
-  'minor miracle', 'everyday heroism', 'banal evil', 'petty apocalypse', 'storm in a teacup', 'tempest',
-];
-
-// ---- TIE (~500): plot situations & mechanics — the draw's story axis --------------------------
+// ---- TIE (~330): situations — the draw's story axis (what HAPPENED or is happening) ------------
 export const TIE: string[] = [
-  // pacts, promises, words given
-  'wager', 'oath', 'broken vow', 'deathbed promise', 'secret betrothal', 'forced betrothal',
-  'broken betrothal', 'elopement', 'secret marriage', 'sham marriage', 'marriage of convenience', 'annulment',
-  'blood oath', 'peace pact', 'broken truce', 'surrender terms', 'parley',
-  'hostage exchange', 'prisoner swap', 'ransom', 'tribute', 'protection pact', 'sworn service',
-  'indenture', 'bonded labour', 'manumission', 'sworn testimony', 'retracted testimony', 'false oath',
-  // money, property, inheritance
-  'debt', 'usury', 'foreclosure', 'bankruptcy', 'embezzlement', 'skimming',
-  'counterfeiting', 'coin clipping', 'forged will', 'contested will', 'disinheritance', 'inheritance',
-  'dowry dispute', 'bride price', 'unpaid wages', 'rent strike', 'evictions', 'land grab',
-  'boundary dispute', 'water rights', 'grazing rights', 'fishing rights', 'salvage rights', 'mineral rights',
-  'toll farming', 'tax farming', 'tithe dispute', 'crooked audit', 'cooked books', 'double mortgage',
-  'pawned heirloom', 'unredeemed pledge', 'hidden treasure', 'buried savings', 'split spoils', 'cheated partner',
-  'silent partner', 'failed venture', 'cornered market', 'price fixing', 'hoarding', 'smuggled goods',
+  // words given
+  'wager', 'oath', 'vow', 'promise', 'pledge', 'pact', 'bargain', 'contract', 'agreement',
+  'treaty', 'truce', 'surrender', 'parley', 'ransom', 'tribute', 'indenture', 'apprenticeship',
+  'testimony', 'perjury', 'betrothal', 'elopement', 'annulment', 'dowry', 'exchange',
+  'negotiation', 'ultimatum', 'compromise', 'concession', 'forfeit',
+  // money & property
+  'usury', 'inheritance', 'dispute', 'quarrel', 'rent', 'wages', 'tax', 'tithe', 'toll',
+  'fine', 'bribe', 'monopoly', 'hoarding', 'smuggling', 'salvage', 'plunder', 'spoils',
+  'eviction', 'repossession', 'confiscation', 'compensation', 'restitution', 'arrears',
+  'partition', 'trespass', 'encroachment', 'squatting', 'poaching', 'rustling',
+  'embezzlement', 'swindle', 'shortchange', 'overcharge',
+  'barter', 'credit', 'collateral', 'windfall',
   // crimes & wrongs
-  'theft', 'burglary', 'highway robbery', 'cattle rustling', 'poaching', 'arson',
-  'murder', 'manslaughter', 'poisoning', 'kidnapping', 'abduction', 'extortion',
-  'blackmail', 'bribery', 'fraud', 'impersonation', 'identity theft', 'forgery',
-  'perjury', 'jury tampering', 'witness bribing', 'evidence planting', 'frame job', 'cover-up',
-  'smuggling', 'fencing stolen goods', 'grave robbing', 'body snatching', 'relic theft', 'horse theft',
-  'piracy', 'wrecking', 'mutiny', 'desertion', 'treason', 'sedition',
-  'espionage', 'sabotage', 'vandalism', 'trespass', 'squatting', 'rustled brand',
-  // justice & its machinery
-  'trial by ordeal', 'trial by combat', 'sanctuary claim', 'outlawry', 'banishment', 'exile',
-  'pardon', 'amnesty', 'bounty', 'manhunt', 'wrongful conviction', 'miscarried justice',
-  'vigilante justice', 'mob justice', 'show trial', 'secret tribunal', 'appeal', 'royal pardon',
-  'confession', 'false confession', 'coerced confession', 'deathbed confession', 'sealed verdict', 'unsolved crime',
-  'cold trail', 'reopened case', 'eyewitness', 'sole witness', 'missing witness', 'silenced witness',
-  // power, office, faction
-  'succession', 'usurpation', 'regency', 'puppet rule', 'abdication', 'coup',
-  'election rigging', 'vote buying', 'office selling', 'nepotism', 'purge', 'proscription',
-  'guild war', 'trade war', 'turf war', 'family feud', 'clan feud', 'vendetta',
-  'power vacuum', 'contested command', 'divided loyalties', 'secret faction', 'shadow council', 'traitors within',
-  'infiltration', 'defection', 'double agent', 'sleeper agent', 'dead drop', 'coded letters',
-  // faith & heresy
-  'heresy', 'apostasy', 'schism', 'excommunication', 'interdict', 'inquisition',
-  'false prophecy', 'failed prophecy', 'self-fulfilling prophecy', 'miracle claim', 'fraudulent relic', 'pilgrimage',
-  'indulgence selling', 'simony', 'desecration', 'iconoclasm', 'forbidden rite',
-  'secret congregation', 'hedge preaching', 'unlicensed burial', 'unbaptised dead', 'broken sanctuary', 'sacrilege',
-  'monastic intrigue', 'stolen tithe', 'cursed offering', 'unanswered prayer', 'answered prayer', 'rash vow',
+  'theft', 'robbery', 'burglary', 'arson', 'murder', 'poisoning', 'kidnapping', 'extortion',
+  'blackmail', 'bribery', 'fraud', 'forgery', 'impersonation', 'piracy', 'mutiny',
+  'treason', 'sedition', 'sabotage', 'slander', 'accusation',
+  'assault', 'ambush', 'raid', 'abduction', 'menace', 'harassment', 'intimidation',
+  'vandalism', 'desecration', 'looting',
+  // justice
+  'trial', 'verdict', 'sentence', 'pardon', 'amnesty', 'bounty', 'manhunt', 'banishment',
+  'exile', 'arrest', 'imprisonment', 'execution', 'hanging', 'confession', 'appeal',
+  'acquittal', 'injustice', 'reprieve', 'clemency', 'outlawing',
+  'inquiry', 'investigation', 'inquest', 'summons', 'indictment', 'denunciation',
+  // power & faction
+  'succession', 'usurpation', 'abdication', 'coronation', 'election', 'rebellion', 'revolt',
+  'uprising', 'riot', 'purge', 'plot', 'scheme', 'faction', 'coup', 'regicide',
+  'nepotism', 'corruption', 'graft', 'patronage', 'appointment',
+  'demotion', 'dismissal', 'resignation', 'promotion', 'reinstatement',
+  'infiltration', 'defection', 'eavesdropping',
+  // faith
+  'heresy', 'blasphemy', 'sacrilege', 'excommunication', 'sin', 'sermon', 'sanctuary',
+  'idolatry', 'conversion', 'fasting', 'penitence', 'indulgence',
+  'ordination', 'defrocking', 'tithing',
   // family & blood
-  'illegitimacy', 'bastardy', 'secret parentage', 'switched infants', 'lost heir', 'returned heir',
-  'false heir', 'changeling claim', 'adoption', 'fosterage', 'abandonment', 'foundling',
-  'runaway child', 'prodigal return', 'family secret', 'sealed adoption', 'twin confusion', 'hidden sibling',
-  'forbidden union', 'cousin marriage', 'misalliance', 'morganatic match', 'widow remarriage', 'levirate claim',
-  'custody fight', 'stolen child', 'sold child', 'pawned child', 'apprenticed child', 'conscripted son',
-  // work, craft, trade
-  'apprenticeship', 'masterpiece trial', 'guild examination', 'trade secret', 'stolen formula', 'poached craftsman',
-  'sabotaged work', 'shoddy work', 'cursed commission', 'unpaid commission', 'rival workshop', 'broken monopoly',
-  'patent quarrel', 'signature forgery', 'workshop fire', 'ruined harvest', 'failed crop', 'blighted field',
-  'dead livestock', 'dry well', 'broken mill', 'silted channel', 'collapsed mine', 'flooded quarry',
-  'lost cargo', 'spoiled cargo', 'mislabeled cargo', 'short weight', 'crooked scales', 'watered wine',
-  'adulterated flour', 'poisoned batch', 'tainted well', 'bad medicine', 'quack cure', 'botched surgery',
-  // war & soldiering
-  'levy', 'conscription', 'draft dodging', 'billeting', 'requisition', 'war debt',
-  'lost standard', 'abandoned post', 'friendly fire', 'massacre', 'war crime', 'old battlefield',
-  'unburied dead', 'missing in action', 'presumed dead', 'returned veteran', 'deserter colony', 'mercenary contract',
-  'unpaid soldiers', 'mutinous garrison', 'disbanded company', 'occupied village', 'reprisal', 'scorched earth',
-  'siege debt', 'surrendered keep', 'razed watchtower', 'border raid', 'cattle raid', 'slave raid',
-  // escape, flight, hiding
-  'prison break', 'asylum seeking', 'witness protection', 'safe house', 'underground road',
-  'hidden fugitive', 'harboured outlaw', 'sheltered heretic', 'smuggled person', 'bought passage', 'stowaway',
-  'false papers', 'assumed name', 'faked death', 'staged accident', 'vanished traveller', 'missing person',
-  'amnesia', 'hidden past', 'buried scandal', 'erased record', 'burned letters', 'destroyed evidence',
-  // love & its plots
-  'love triangle', 'matchmaking', 'arranged match', 'broken engagement', 'jilted bride',
-  'jilted groom', 'runaway bride', 'abandoned spouse', 'bigamy', 'adultery', 'cuckoldry',
-  'love letters', 'intercepted letters', 'go-between', 'love potion claim', 'courtship contest', 'bride kidnapping',
-  'morning gift dispute', 'separated lovers', 'reunited lovers', 'deathbed wedding', 'ghost marriage', 'mourning courtship',
-  // odd situations
-  'wandering madman', 'holy fool', 'silent stranger', 'unclaimed corpse', 'unidentified body', 'mystery bequest',
-  'anonymous gift', 'anonymous accusation', 'poison pen letters', 'graffiti campaign', 'effigy burning', 'charivari',
-  'bell ringing dispute', 'banned festival', 'broken taboo', 'violated custom', 'forgotten law', 'absurd law',
-  'wager gone wrong', 'prank gone wrong', 'rumour spiral', 'moral panic', 'witch scare', 'plague scare',
-  'quarantine', 'lifted quarantine', 'premature burial', 'mistaken burial', 'double funeral', 'empty grave',
-  'second body', 'wrong body', 'unquiet estate', 'locked room', 'sealed cellar', 'walled-up door',
+  'adoption', 'disowning', 'parentage', 'ancestry', 'lineage', 'bloodline',
+  'custody', 'legitimacy', 'illegitimacy', 'remarriage', 'bigamy', 'adultery', 'divorce',
+  'incest', 'orphaning', 'widowing',
+  // war
+  'invasion', 'skirmish', 'retreat', 'occupation', 'conscription', 'blockade', 'massacre',
+  'reprisal', 'desertion', 'discharge', 'requisition', 'fortification',
+  // flight & hiding
+  'hiding', 'flight', 'pursuit', 'disappearance', 'deception', 'lie', 'alias',
+  'amnesia', 'concealment', 'evasion', 'misdirection', 'diversion', 'decoy',
+  'refuge', 'asylum', 'harboring', 'sheltering',
+  // love
+  'affair', 'jilting', 'matchmaking', 'proposal', 'seduction',
+  'cuckoldry', 'philandering',
+  // work & land
+  'blight', 'famine', 'plague', 'quarantine', 'shortage', 'surplus', 'commission',
+  'masterpiece', 'guild', 'strike', 'lockout', 'apprenticing', 'journeying',
+  'irrigation', 'drainage', 'clearing', 'enclosure', 'grazing', 'foraging',
+  // odd
+  'prank', 'dare', 'riddle', 'taboo', 'custom', 'tradition', 'law', 'decree',
+  'proclamation', 'petition', 'boundary', 'border', 'feud', 'vendetta',
+  'misunderstanding', 'mistake', 'accident', 'blunder', 'coincidence', 'omission',
+  'discovery', 'revelation', 'exposure', 'unmasking', 'reappearance',
 ];
 
-// ---- THINGS (~500): objects, beasts, substances — concrete anchors ----------------------------
+// ---- QUALITIES (~190): plain modifiers — combine with any noun the draw supplies ---------------
+export const QUALITIES: string[] = [
+  'stolen', 'banned', 'forbidden', 'forged', 'counterfeit', 'false', 'true', 'hidden',
+  'secret', 'broken', 'mended', 'last', 'first', 'final', 'only', 'lost', 'found',
+  'borrowed', 'cursed', 'blessed', 'unpaid', 'owed', 'sworn', 'abandoned', 'forsaken',
+  'poisoned', 'tainted', 'spoiled', 'sealed', 'unsealed', 'locked', 'unlocked', 'empty',
+  'full', 'missing', 'returned', 'ruined', 'restored', 'rightful', 'wrongful', 'disputed',
+  'unclaimed', 'claimed', 'overdue', 'sudden', 'slow', 'silent', 'loud', 'midnight',
+  'unfinished', 'twin', 'third', 'seventh', 'foreign', 'ancient', 'new',
+  'old', 'young', 'sacred', 'profane', 'holy', 'unholy', 'cheap', 'priceless',
+  'worthless', 'precious', 'unwanted', 'coveted', 'inherited', 'promised', 'refused',
+  'denied', 'delayed', 'marked', 'unmarked', 'nameless', 'named', 'masked', 'veiled',
+  'drowned', 'burned', 'buried', 'unburied', 'frozen', 'thawed', 'rotten', 'fresh',
+  'stale', 'crooked', 'straight', 'bent', 'sharp', 'blunt', 'heavy', 'light',
+  'hollow', 'solid', 'cracked', 'patched', 'stained', 'clean', 'filthy', 'gilded',
+  'plain', 'ornate', 'rare', 'common', 'smuggled', 'looted', 'ransomed', 'orphaned',
+  'widowed', 'exiled', 'banished', 'outlawed', 'pardoned', 'condemned', 'accused',
+  'innocent', 'guilty', 'wanted', 'hunted', 'watched', 'followed', 'betrayed',
+  'avenged', 'sold', 'bought', 'traded', 'gifted', 'misplaced', 'unread', 'unsent',
+  'unopened', 'unanswered', 'unspoken', 'whispered', 'shouted', 'sung', 'written',
+  'erased', 'faded', 'forgotten', 'remembered', 'dreamed', 'feared', 'beloved',
+  'hated', 'envied', 'mourned', 'unmourned', 'bewitched', 'blighted', 'barren',
+  'fertile', 'flooded', 'parched', 'overgrown', 'trampled', 'fallow', 'ripe',
+  'unripe', 'harvested', 'unharvested', 'branded', 'shorn', 'saddled', 'lame',
+  'blind', 'deaf', 'mute', 'scarred', 'maimed', 'healed', 'feverish', 'sleepless',
+  'starving', 'gorged', 'sober', 'drunk', 'mad', 'sane', 'wise', 'foolish',
+  'brave', 'afraid', 'loyal', 'faithless', 'honest', 'lying', 'generous', 'greedy',
+  'proud', 'humble', 'patient', 'restless', 'kind', 'cruel', 'gentle', 'savage',
+  'wild', 'tame', 'stray', 'caged', 'freed', 'escaped', 'captured', 'surrendered',
+];
+
+// ---- THINGS (~400): concrete nouns — objects, beasts, substances, structures -------------------
 export const THINGS: string[] = [
-  // tokens & keepsakes
-  'signet ring', 'wedding band', 'betrothal cup', 'locket', 'lock of hair', 'christening shawl',
-  'baby shoe', 'child\'s toy', 'wooden doll', 'carved whistle', 'keepsake ribbon', 'mourning brooch',
-  'funeral mask', 'death mask', 'memorial stone', 'name-day gift', 'soldier\'s medal', 'campaign badge',
-  'pilgrim badge', 'saint medallion', 'prayer beads', 'worry stone', 'lucky coin', 'cursed coin',
+  // tokens & valuables
+  'ring', 'locket', 'brooch', 'medallion', 'beads', 'coin', 'purse', 'hoard', 'gem',
+  'pearl', 'amber', 'ivory', 'silver', 'copper', 'iron', 'steel', 'bronze', 'crown',
+  'circlet', 'chalice', 'goblet', 'icon', 'idol', 'candlestick', 'heirloom', 'keepsake', 'trinket',
+  'ribbon', 'kerchief', 'glove', 'comb', 'hairpin', 'bracelet', 'anklet', 'earring',
   // documents & marks
-  'a will', 'deed', 'charter', 'manifest', 'muster roll', 'parish register',
-  'ransom note', 'sealed confession', 'coded letter', 'burnt letter', 'unsent letter',
-  'map half', 'treasure map', 'star chart', 'tide table', 'recipe book', 'herbal',
-  'bestiary', 'psalter', 'forbidden book', 'banned pamphlet', 'wanted poster', 'eviction notice',
-  'wax seal', 'seal die', 'tally-stick', 'notched stick', 'brand iron', 'maker\'s mark',
-  'guild mark', 'smith\'s punch', 'mason\'s mark', 'cattle brand', 'ear notch', 'signature',
-  // keys, locks, containers
-  'key without a lock', 'lock without a key', 'skeleton key', 'strongbox', 'iron chest', 'puzzle box',
-  'sealed jar', 'reliquary', 'lead casket', 'coffer', 'hidden drawer', 'false bottom',
-  'locked diary', 'sea chest', 'dowry chest', 'grain bin', 'salt cellar', 'tithe barn key',
-  // weapons & soldier gear
-  'notched sword', 'broken blade', 'named blade', 'rusted dagger', 'poisoned knife', 'hidden knife',
-  'heirloom axe', 'boar spear', 'hunting bow', 'crossbow bolt', 'spent quiver', 'split shield',
-  'dented helm', 'torn banner', 'battle standard', 'war horn', 'signal horn', 'drum',
-  'mail shirt', 'gambeson', 'old wound', 'arrowhead', 'caltrops', 'siege ladder',
-  // tools of trades
-  'fishing net', 'eel trap', 'wicker creel', 'gutting knife', 'flensing blade', 'harpoon',
-  'plough', 'scythe', 'sickle', 'flail', 'millstone', 'quern',
-  'anvil', 'bellows', 'tongs', 'crucible', 'mould', 'ingot',
-  'loom', 'spindle', 'distaff', 'shuttle', 'dye vat', 'tenterhooks',
-  'awl', 'last', 'tanning knife', 'lime pit', 'potter\'s wheel', 'kiln',
-  'chisel', 'adze', 'auger', 'plumb line', 'level', 'scaffold rope',
-  'mortar and pestle', 'scales', 'weights', 'false weights', 'measuring rod', 'counting board',
-  'lancet', 'leech jar', 'splint', 'crutch', 'tooth key', 'trepan',
-  'rope coil', 'block and tackle', 'grappling hook', 'boat hook', 'caulking iron', 'oakum',
-  // boats & travel
-  'leaky skiff', 'sunken barge', 'ferry punt', 'coracle', 'oar', 'broken rudder',
-  'anchor', 'mooring ring', 'lodestone', 'compass needle', 'waymarker', 'milestone',
-  'cart wheel', 'broken axle', 'wagon', 'sledge', 'pack saddle', 'saddlebag',
-  'horseshoe', 'spur', 'bridle', 'wagon grease', 'lantern pole', 'walking staff',
-  // animals
-  'falcon', 'hooded hawk', 'hunting hound', 'lame horse', 'stolen horse', 'prize bull',
-  'brood mare', 'black ram', 'white hart', 'old sow', 'fighting cock', 'messenger pigeon',
-  'raven', 'magpie', 'heron', 'eel', 'pike', 'carp',
-  'otter', 'beaver', 'badger', 'fox', 'wolf pelt', 'bear skin',
-  'beehive', 'swarm', 'silkworm', 'leeches', 'toad', 'white snake',
-  'cat', 'church grim', 'goat', 'donkey', 'ox team', 'goose flock',
-  // food, drink, substances
-  'salt', 'salt loaf', 'spice packet', 'saffron', 'pepper', 'honeycomb',
-  'mead cask', 'wine tun', 'ale barrel', 'brandy keg', 'sour beer', 'poisoned cup',
-  'wedding cake', 'funeral bread', 'first loaf', 'last sheaf', 'seed corn', 'blighted grain',
-  'smoked eel', 'salted pork', 'wheel of cheese', 'butter churn', 'milk pail', 'tainted milk',
-  'quicklime', 'pitch', 'tar', 'tallow', 'lamp oil', 'whale oil',
-  'lye', 'soap', 'dye', 'woad', 'madder', 'ink',
-  'gall', 'vitriol', 'arsenic', 'hemlock', 'nightshade', 'poppy milk',
-  'healing salve', 'plague water', 'holy water', 'grave dirt', 'bone ash', 'iron filings',
+  'letter', 'map', 'chart', 'deed', 'charter', 'will', 'scroll', 'seal', 'signature',
+  'book', 'diary', 'song', 'ballad', 'poem', 'list', 'notice', 'poster', 'sign',
+  'brand', 'tattoo', 'crest', 'emblem', 'insignia', 'tally', 'receipt',
+  'parchment', 'ink', 'quill', 'wax',
+  // keys & containers
+  'key', 'lock', 'chain', 'strongbox', 'chest', 'coffer', 'casket', 'coffin', 'urn',
+  'jar', 'jug', 'flask', 'bottle', 'cask', 'barrel', 'crate', 'sack', 'pouch',
+  'satchel', 'basket', 'bucket', 'trunk', 'drawer', 'cupboard', 'cabinet', 'shelf',
+  // weapons & war gear
+  'sword', 'dagger', 'knife', 'spear', 'lance', 'bow', 'arrow', 'quiver', 'crossbow',
+  'shield', 'helmet', 'armor', 'gauntlet', 'banner', 'horn', 'drum', 'trumpet',
+  'club', 'cudgel', 'sling', 'whetstone', 'scabbard', 'hilt', 'pommel',
+  // tools
+  'net', 'hook', 'anchor', 'oar', 'sail', 'mast', 'rudder', 'rope', 'pulley', 'winch',
+  'cart', 'wagon', 'wheel', 'axle', 'saddle', 'bridle', 'stirrup', 'horseshoe', 'spur',
+  'whip', 'harness', 'plough', 'scythe', 'sickle', 'hoe', 'spade', 'rake', 'axe',
+  'saw', 'hammer', 'anvil', 'bellows', 'tongs', 'kiln', 'loom', 'spindle', 'needle',
+  'thread', 'thimble', 'button', 'nail', 'hinge', 'latch', 'ladder', 'lantern',
+  'lamp', 'torch', 'candle', 'beacon', 'flint', 'tinder', 'mirror', 'lens', 'hourglass',
+  'scales', 'weights', 'measure', 'compass', 'trap', 'snare', 'bait', 'cage',
+  'shackles', 'noose', 'gallows', 'stocks', 'scaffold', 'millstone', 'grindstone',
   // clothes & cloth
-  'wedding dress', 'mourning veil', 'christening gown', 'monk\'s habit', 'borrowed cloak', 'turned coat',
-  'patched cloak', 'fine gloves', 'single glove', 'embroidered kerchief', 'silk ribbon', 'velvet purse',
-  'leather apron', 'smith\'s apron', 'bloody apron', 'bolt of cloth', 'tapestry', 'banner cloth',
-  'shroud', 'winding sheet', 'swaddling cloth', 'beggar\'s rags', 'stolen livery', 'mask',
-  // valuables
-  'pearl', 'amber bead', 'jet brooch', 'silver spoon', 'gold tooth', 'coin hoard',
-  'foreign coin', 'ancient coin', 'gem rough', 'cut stone', 'paste jewel', 'crown',
-  'circlet', 'chalice', 'paten', 'censer', 'icon', 'gilded plate',
-  'candlesticks', 'altar cloth', 'bell metal', 'church bell', 'hand bell', 'sanctus bell',
+  'cloak', 'robe', 'veil', 'mantle', 'gown', 'dress', 'shirt', 'boot', 'shoe',
+  'hat', 'hood', 'mask', 'belt', 'buckle', 'apron', 'shawl', 'shroud', 'blanket',
+  'quilt', 'rug', 'tapestry', 'curtain', 'cloth', 'wool', 'linen', 'silk', 'velvet',
+  'fur', 'hide', 'leather', 'pelt', 'fleece', 'rags', 'livery',
+  // food & substances
+  'bread', 'loaf', 'flour', 'grain', 'wheat', 'barley', 'oats', 'hay', 'straw', 'seed',
+  'apple', 'pear', 'plum', 'cherry', 'berry', 'grape', 'wine', 'ale', 'mead', 'cider',
+  'brandy', 'milk', 'butter', 'cheese', 'egg', 'meat', 'bacon', 'ham', 'sausage',
+  'venison', 'fish', 'stew', 'broth', 'porridge', 'pie', 'cake', 'honey', 'honeycomb',
+  'salt', 'pepper', 'saffron', 'spice', 'garlic', 'onion', 'cabbage', 'turnip',
+  'bean', 'mushroom', 'acorn', 'chestnut', 'herb', 'vinegar', 'oil', 'tallow',
+  'soap', 'dye', 'pitch', 'tar', 'charcoal', 'peat', 'coal', 'ore', 'poison',
+  'antidote', 'potion', 'salve', 'bandage', 'splint', 'crutch', 'cane', 'staff',
+  // animals
+  'falcon', 'hawk', 'hound', 'wolf', 'fox', 'badger', 'otter', 'deer', 'stag', 'doe',
+  'boar', 'bear', 'horse', 'mare', 'stallion', 'colt', 'mule', 'donkey', 'ox', 'bull',
+  'cow', 'calf', 'goat', 'sheep', 'ram', 'ewe', 'lamb', 'pig', 'sow', 'hen',
+  'rooster', 'goose', 'duck', 'swan', 'dove', 'pigeon', 'raven', 'crow', 'magpie',
+  'owl', 'wren', 'sparrow', 'eagle', 'heron', 'gull', 'eel', 'carp', 'trout',
+  'salmon', 'herring', 'crab', 'oyster', 'snail', 'toad', 'frog', 'snake', 'adder',
+  'lizard', 'rat', 'mouse', 'mole', 'bat', 'moth', 'bee', 'wasp', 'hornet', 'ant',
+  'spider', 'worm', 'leech', 'cricket', 'beetle', 'butterfly', 'cat', 'swarm', 'hive',
+  // plants & ground
+  'moss', 'fern', 'ivy', 'thorn', 'nettle', 'reed', 'willow', 'oak', 'elm', 'birch',
+  'pine', 'yew', 'holly', 'mistletoe', 'rose', 'lily', 'violet', 'daisy', 'poppy',
+  'lavender', 'heather', 'clover', 'root', 'bark', 'sap', 'resin', 'timber', 'log',
+  'plank', 'stump', 'firewood', 'stone', 'boulder', 'gravel', 'sand', 'clay', 'mud',
+  'dust', 'ash', 'ember', 'smoke', 'feather', 'antler', 'tusk', 'claw', 'fang',
+  'bone', 'skull', 'skeleton', 'relic', 'moon', 'star',
   // structures & fixtures
-  'gibbet', 'stocks', 'pillory', 'whipping post', 'boundary stone', 'standing stone',
-  'sundial', 'weathervane', 'dovecote', 'well winch', 'sluice gate', 'weir',
-  'tide mill', 'windmill sail', 'drawbridge chain', 'portcullis', 'gate bar', 'door knocker',
-  'hearthstone', 'chimney', 'thatch', 'ridgepole', 'lintel', 'threshold',
-  'cellar door', 'trapdoor', 'priest hole', 'secret stair', 'walled door', 'bricked window',
-  // remains & relics
-  'saint\'s finger-bone', 'knuckle bone', 'skull', 'jawbone', 'rib', 'spine',
-  'bog body', 'mummified cat', 'horse skull', 'whale rib', 'antler crown', 'tooth necklace',
-  'old grave', 'fresh grave', 'unmarked grave', 'opened grave', 'ossuary', 'charnel box',
-  'ashes', 'urn', 'coffin nail', 'hearse cloth', 'grave goods', 'barrow treasure',
-  // light & fire
-  'lantern', 'storm lamp', 'rushlight', 'beeswax candle', 'black candle', 'votive candle',
-  'beacon', 'signal fire', 'watch fire', 'forge fire', 'ember', 'cold hearth',
-  'tinderbox', 'flint and steel', 'fire bell', 'cresset', 'torch stub', 'burnt match',
-  // misc vivid
-  'hourglass', 'broken clock', 'astrolabe', 'spyglass', 'magnifying lens', 'mirror shard',
-  'silvered mirror', 'scrying bowl', 'dice', 'weighted dice', 'card deck', 'marked cards',
-  'game board', 'chess piece', 'puppet', 'marionette', 'music box', 'hurdy-gurdy',
-  'fiddle', 'reed pipe', 'drum skin', 'harp string', 'songbook', 'sheet ballad',
-  'rocking chair', 'cradle', 'spinning top', 'kite', 'fishhook', 'thimble',
-  'needle case', 'pincushion', 'button', 'odd buttons', 'bootlace', 'left boot',
-  'wig', 'false teeth', 'glass eye', 'ear trumpet', 'eye patch', 'wooden leg',
+  'shrine', 'chapel', 'altar', 'well', 'fountain', 'bridge', 'ford', 'mill', 'dam',
+  'ditch', 'hedge', 'fence', 'gate', 'wall', 'tower', 'cellar', 'attic', 'stable',
+  'barn', 'granary', 'orchard', 'vineyard', 'garden', 'field', 'meadow', 'pasture',
+  'crossroads', 'milestone', 'signpost', 'grave', 'tomb', 'hearth', 'chimney',
+  'threshold', 'doorstep', 'window', 'roof', 'rafter', 'beam', 'door', 'stair',
+  'trapdoor', 'tunnel', 'passage', 'archway', 'courtyard', 'alley', 'lane', 'path',
 ];
 
-// ---- OCCASIONS (~300): events, moments, deadlines ---------------------------------------------
+// ---- OCCASIONS (~160): events, moments, deadlines ----------------------------------------------
 export const OCCASIONS: string[] = [
   // rites of passage
-  'wedding', 'betrothal feast', 'christening', 'name-day', 'coming of age', 'first hunt',
-  'first voyage', 'apprenticeship oath', 'mastership trial', 'knighting', 'tonsuring', 'taking the veil',
-  'funeral', 'wake', 'month\'s mind', 'year\'s mind', 'will reading', 'estate auction',
-  'widow\'s remarriage', 'mourning\'s end', 'birth', 'difficult birth', 'twin birth', 'churching',
+  'wedding', 'christening', 'birth', 'name-day', 'funeral', 'wake', 'burial', 'anniversary',
+  'knighting', 'initiation', 'retirement', 'farewell', 'departure', 'arrival',
+  'homecoming', 'return', 'send-off', 'oath-taking',
   // calendar & season
-  'midsummer', 'midwinter', 'first frost', 'last frost', 'thaw', 'spring flood',
-  'harvest', 'failed harvest', 'gleaning', 'threshing', 'slaughter month', 'salting season',
-  'eel run', 'herring run', 'lambing', 'calving', 'shearing', 'haymaking',
-  'planting', 'first plough', 'fallow year', 'drought', 'long rain', 'hard winter',
-  'spring tide', 'neap tide', 'king tide', 'storm surge', 'fog week', 'ice road',
+  'midsummer', 'midwinter', 'solstice', 'spring', 'summer', 'autumn', 'winter', 'thaw',
+  'frost', 'snow', 'rain', 'hail', 'storm', 'gale', 'flood', 'drought', 'wildfire',
+  'earthquake', 'landslide', 'avalanche', 'eclipse', 'comet', 'dawn', 'dusk', 'noon',
+  'nightfall', 'tide', 'harvest', 'planting', 'shearing', 'lambing', 'slaughter',
+  'brewing', 'baking', 'gleaning', 'haymaking', 'threshing', 'salting', 'smoking',
   // feasts & gatherings
-  'market day', 'fair day', 'horse fair', 'goose fair', 'hiring fair', 'saint\'s day',
-  'feast day', 'fast day', 'vigil night', 'procession', 'pilgrimage season', 'relic showing',
-  'church ale', 'harvest supper', 'wassail', 'mumming', 'bonfire night', 'beating the bounds',
-  'moot', 'folkmoot', 'guild feast', 'lodge meeting', 'veterans\' reunion', 'family gathering',
+  'market', 'fair', 'festival', 'feast', 'banquet', 'fast', 'procession', 'pilgrimage',
+  'prayer', 'dance', 'play', 'pageant', 'contest', 'tournament', 'joust', 'race',
+  'game', 'gathering', 'meeting', 'council', 'assembly', 'reunion', 'celebration',
+  'toast', 'bonfire', 'carnival', 'holiday', 'vigil', 'ceremony',
   // justice & rule
-  'assize', 'court day', 'hanging day', 'pillory day', 'tax day', 'rent day',
-  'quarter day', 'tithe collection', 'census', 'muster', 'levy call', 'beacon lighting',
-  'royal progress', 'lord\'s visit', 'bishop\'s visitation', 'inspection', 'audit', 'inventory',
-  'election', 'lot drawing', 'oath taking', 'homage ceremony', 'border perambulation', 'charter renewal',
+  'census', 'muster', 'audit', 'inspection', 'visitation',
+  'lottery', 'auction', 'hearing', 'tribunal', 'reckoning',
+  'collection', 'levy', 'draft',
   // commerce & work moments
-  'auction', 'debt due', 'loan call', 'foreclosure day', 'ship sailing', 'caravan departure',
-  'fleet return', 'cargo landing', 'warehouse clearing', 'stocktaking', 'launch day', 'keel laying',
-  'mill opening', 'forge lighting', 'kiln firing', 'brew day', 'baking day', 'washing day',
-  'pay day', 'settling day', 'contract signing', 'partnership dissolution', 'shop opening', 'shop closing',
+  'sailing', 'voyage', 'journey', 'landing', 'launch', 'delivery', 'shipment',
+  'opening', 'closing', 'signing', 'settlement', 'payment', 'deadline',
+  'stocktaking', 'weighing', 'measuring', 'branding', 'shoeing', 'foaling',
   // disruptions
-  'fire', 'flood', 'dyke breach', 'bridge collapse', 'roof fall', 'landslip',
-  'shipwreck', 'grounding', 'plague outbreak', 'murrain', 'blight',
-  'riot', 'bread riot', 'strike', 'lockout', 'desertion wave', 'press gang sweep',
-  'raid', 'border alarm', 'wolf winter', 'beggar influx', 'refugee column', 'eviction day',
-  // small sharp moments
-  'midnight knock', 'dawn departure', 'last ferry', 'curfew bell', 'angelus', 'lights out',
-  'changing of watch', 'shift change', 'low tide window', 'moonless night', 'first snow', 'candle auction',
-  'final notice', 'last banns reading', 'third summons', 'grace period\'s end', 'ultimatum', 'amnesty\'s end',
-  'anniversary', 'deathday', 'old promise due', 'prophecy date', 'comet', 'eclipse',
+  'fire', 'collapse', 'shipwreck', 'sinking', 'outbreak', 'fever', 'alarm', 'battle',
+  'war', 'peace', 'victory', 'defeat', 'exodus', 'stampede',
+  'curfew', 'search', 'sweep', 'moonrise', 'moonset',
 ];
 
-// ---- PEOPLE (~300): roles & figures ------------------------------------------------------------
+// ---- PEOPLE (~230): roles & figures --------------------------------------------------------------
 export const PEOPLE: string[] = [
   // kin & household
-  'widow', 'widower', 'orphan', 'twins', 'bastard',
-  'heir', 'disowned heir', 'younger son', 'spinster aunt', 'grandmother', 'stepmother',
-  'foster child', 'ward', 'godparent', 'wet nurse', 'midwife', 'housekeeper',
-  'estranged brother', 'prodigal son', 'runaway daughter', 'child bride', 'old retainer',
+  'widow', 'widower', 'orphan', 'twins', 'bastard', 'heir', 'heiress', 'firstborn',
+  'stepmother', 'godmother', 'grandmother', 'aunt', 'uncle', 'cousin', 'nephew', 'niece',
+  'foundling', 'ward', 'midwife', 'nurse', 'servant', 'maid', 'housekeeper', 'steward',
+  'daughter', 'son', 'mother', 'father', 'sister', 'brother', 'husband', 'wife',
   // authority
-  'reeve', 'bailiff', 'steward', 'magistrate', 'sheriff', 'constable',
-  'tax collector', 'toll keeper', 'customs man', 'gaoler', 'hangman', 'herald',
-  'notary', 'scrivener', 'clerk of court', 'coroner', 'plague warden', 'harbourmaster',
-  'alderman', 'burgomaster', 'guildmaster', 'castellan', 'marshal', 'chamberlain',
+  'lord', 'lady', 'baron', 'duke', 'prince', 'princess', 'king', 'queen', 'mayor',
+  'magistrate', 'sheriff', 'constable', 'bailiff', 'warden', 'jailer', 'hangman',
+  'herald', 'crier', 'messenger', 'envoy', 'clerk', 'scribe', 'taxman', 'gatekeeper',
+  'watchman', 'sentry', 'guard', 'official', 'inspector', 'examiner',
   // church
-  'parish priest', 'hedge-priest', 'curate', 'friar', 'pardoner', 'summoner',
-  'anchorite', 'hermit', 'abbess', 'prioress', 'novice', 'lay brother',
-  'sexton', 'bell ringer', 'verger', 'relic keeper', 'pilgrim', 'flagellant',
-  'heretic preacher', 'defrocked priest', 'church builder', 'icon painter', 'choirboy', 'beguine',
+  'priest', 'monk', 'nun', 'friar', 'abbot', 'abbess', 'bishop', 'chaplain', 'hermit',
+  'pilgrim', 'preacher', 'zealot', 'heretic', 'martyr', 'saint', 'sinner', 'penitent',
+  'convert', 'novice', 'acolyte', 'gravedigger',
   // trades
-  'smith', 'farrier', 'wheelwright', 'cooper', 'chandler', 'tanner',
-  'weaver', 'dyer', 'fuller', 'seamstress', 'glover', 'cobbler',
-  'miller', 'baker', 'brewer', 'alewife', 'butcher', 'fishmonger',
-  'salter', 'eel fisher', 'fowler', 'reed cutter', 'peat cutter', 'charcoal burner',
-  'mason', 'thatcher', 'carpenter', 'shipwright', 'ropemaker', 'sailmaker',
-  'potter', 'glassblower', 'tinker', 'knife grinder', 'rat catcher', 'chimney sweep',
-  'apothecary', 'barber-surgeon', 'bone setter', 'herbalist', 'leech', 'tooth puller',
-  // road & water
-  'ferryman', 'bargeman', 'pilot', 'lighterman', 'drover', 'carter',
-  'pedlar', 'tinker family', 'travelling player', 'minstrel', 'ballad seller', 'bear ward',
-  'puppeteer', 'fortune teller', 'quack doctor', 'relic seller', 'letter carrier', 'king\'s messenger',
-  'pilgrim band', 'merchant venturer', 'spice trader', 'horse trader', 'wool stapler', 'moneychanger',
-  // margins
-  'beggar', 'leper', 'lazar-house keeper', 'gravedigger', 'night-soil man', 'mudlark',
-  'scavenger', 'wrecker', 'smuggler', 'poacher', 'outlaw', 'highwayman',
-  'cutpurse', 'housebreaker', 'fence', 'forger', 'coiner', 'cardsharp',
-  'procuress', 'tavern girl', 'pot boy', 'link boy', 'urchin', 'street gang',
-  'madman', 'village idiot', 'wise woman', 'cunning man', 'witch-finder',
-  // soldiers & violence
-  'veteran', 'maimed soldier', 'deserter', 'mercenary', 'sellsword', 'bodyguard',
-  'watchman', 'gatekeeper', 'archer', 'pikeman', 'siege engineer', 'sapper',
-  'press-gang', 'recruiting sergeant', 'duellist', 'prizefighter', 'wrestler', 'bear baiter',
-  'bandit chief', 'pirate captain', 'raider', 'feud champion', 'hired bully', 'kneecapper',
+  'smith', 'tanner', 'weaver', 'dyer', 'spinner', 'seamstress', 'tailor', 'cobbler',
+  'miller', 'baker', 'brewer', 'butcher', 'fishmonger', 'fisherman', 'sailor', 'boatman',
+  'ferryman', 'shepherd', 'goatherd', 'swineherd', 'drover', 'plowman', 'farmer',
+  'farmhand', 'milkmaid', 'beekeeper', 'forester', 'woodcutter', 'trapper', 'hunter',
+  'falconer', 'gamekeeper', 'stableboy', 'carter', 'porter', 'laborer',
+  'mason', 'carpenter', 'thatcher', 'painter', 'carver', 'potter', 'glassblower',
+  'jeweler', 'goldsmith', 'locksmith', 'mapmaker', 'cook', 'innkeeper', 'shopkeeper',
+  // learning & arts
+  'scholar', 'student', 'teacher', 'tutor', 'librarian', 'poet', 'bard', 'minstrel',
+  'singer', 'dancer', 'actor', 'acrobat', 'juggler', 'puppeteer', 'storyteller',
+  'sculptor', 'apprentice', 'journeyman', 'master', 'prodigy',
+  // healing & lore
+  'healer', 'surgeon', 'barber', 'apothecary', 'herbalist', 'alchemist', 'astrologer',
+  'seer', 'prophet', 'witch', 'sorcerer', 'embalmer',
+  // road & margins
+  'trader', 'merchant', 'peddler', 'moneylender', 'pawnbroker', 'courtesan', 'mistress',
+  'matchmaker', 'suitor', 'admirer', 'sweetheart', 'lover', 'bride', 'groom',
+  'spinster', 'bachelor', 'beggar', 'vagrant', 'leper', 'madman', 'fool', 'jester',
+  'drunkard', 'gambler', 'urchin', 'runaway',
+  // violence & shadow
+  'bandit', 'outlaw', 'highwayman', 'thief', 'cutpurse', 'poacher', 'smuggler',
+  'pirate', 'forger', 'swindler', 'soldier', 'archer', 'sergeant', 'veteran',
+  'deserter', 'mercenary', 'bodyguard', 'champion', 'thug', 'bully', 'henchman',
+  'accomplice', 'ringleader', 'traitor', 'spy', 'informer', 'assassin', 'duelist',
   // strangers & arrivals
-  'stranger', 'foreigner', 'refugee', 'returned traveller', 'shipwreck survivor',
-  'amnesiac', 'mute stranger', 'veiled lady', 'disguised noble', 'royal bastard', 'pretender',
-  'long-lost sibling', 'doppelganger', 'imposter', 'witness', 'sole survivor',
-  'informer', 'spy', 'agent provocateur', 'debt collector', 'bounty hunter', 'man hunter',
+  'stranger', 'foreigner', 'refugee', 'survivor', 'castaway', 'wanderer', 'nomad',
+  'traveler', 'guide', 'hostage', 'prisoner', 'imposter', 'witness', 'namesake', 'scapegoat',
+  'gossip', 'busybody', 'neighbor', 'landlord', 'tenant', 'lodger', 'guest', 'host',
+  'patron', 'benefactor', 'overseer', 'go-between', 'peacemaker', 'troublemaker',
+  'agitator', 'courtier', 'advisor', 'confidant', 'flatterer', 'rival', 'double',
 ];
 
-// ---- UNCANNY (~300): folk-horror & wonder ------------------------------------------------------
+// ---- UNCANNY (~140): folk-horror & wonder --------------------------------------------------------
 export const UNCANNY: string[] = [
-  // creatures & presences
-  'ghost', 'restless dead', 'drowned dead', 'churchyard walker', 'phantom funeral', 'death coach',
-  'banshee wail', 'black dog', 'barghest', 'will-o-wisp', 'corpse candle',
-  'bog spirit', 'fen wraith', 'water horse', 'river hag', 'mermaid', 'selkie',
-  'changeling', 'fairy mound', 'fae bargain', 'fae debt', 'fairy ring',
-  'household spirit', 'hearth ghost', 'knocker', 'brownie', 'poltergeist', 'familiar',
-  'werewolf', 'wolf charm', 'hare witch', 'cat omen', 'raven omen', 'magpie count',
-  'revenant', 'hungry grave', 'walking corpse', 'plague ghost', 'gibbet ghost', 'headless rider',
-  // witchcraft & cunning craft
-  'witch mark', 'evil eye', 'overlooking', 'hex', 'curse', 'inherited curse',
-  'curse tablet', 'poppet', 'pin doll', 'witch bottle', 'witch ladder', 'knotted cord',
-  'love charm', 'fertility charm', 'protection charm', 'iron horseshoe', 'rowan cross', 'salt line',
-  'hag stone', 'hag riding', 'night terror', 'sleep paralysis', 'sent dream', 'stolen voice',
-  'blighted touch', 'milk theft', 'butter that won\'t come', 'bees told', 'untold bees', 'swarm omen',
-  'familiar toad', 'black cockerel', 'midnight sabbat', 'devil\'s mark', 'pact', 'soul wager',
-  // holy & unholy
-  'miracle', 'false miracle', 'weeping icon', 'bleeding host', 'incorrupt body', 'saint\'s breath',
-  'healing spring', 'cursed well', 'holy fool\'s word', 'prophecy', 'speaking in tongues', 'stigmata',
-  'visitation', 'angel sighting', 'demon whisper', 'possession', 'exorcism', 'unquiet relic',
-  'desecrated altar', 'inverted cross', 'black mass rumour', 'unhallowed ground', 'suicide corner', 'crossroads burial',
-  // omens & signs
-  'omen', 'ill omen', 'death omen', 'birth caul', 'seventh son', 'two moons',
-  'red sky', 'blood rain', 'fish fall', 'frog rain', 'eclipse dread',
-  'howling night', 'silent birds', 'fleeing rats', 'beached whale', 'white stag', 'three knocks',
-  'stopped clock', 'cracked mirror', 'spilled salt', 'crossed knives', 'dropped ring', 'guttered candle',
-  // places that are wrong
-  'haunted mill', 'cursed field', 'sour ground', 'hungry marsh', 'singing reeds', 'whispering wood',
-  'hollow hill', 'barrow light', 'sunken bell', 'drowned village', 'phantom island', 'moving bog',
-  'door that opens', 'room kept locked', 'cold spot', 'shadow corner', 'watching window', 'path that shifts',
-  'circle of mushrooms', 'lightning oak', 'gallows tree', 'wishing thorn', 'boundary ghost', 'spite hedge',
-  // things that are wrong
-  'unrotting corpse', 'too-heavy coffin', 'empty coffin', 'extra grave', 'name worn off', 'portrait that watches',
-  'bell that tolls itself', 'untraceable smell', 'bleeding stone', 'sweating idol', 'warm grave', 'frost in summer',
-  'milk turned', 'bread won\'t rise', 'fire won\'t catch', 'iron gone cold', 'salt gone wet', 'well gone bitter',
-  'beast born wrong', 'two-headed calf', 'crowing hen', 'swarm in the wall', 'rats in formation', 'eel knot',
-  // time & memory wrongness
-  'lost hour', 'repeated day', 'remembered future', 'borrowed years', 'aged overnight', 'unaging stranger',
-  'forgotten name', 'unrememberable face', 'shared dream', 'inherited dream', 'memory in the blood', 'walked path remembering',
+  // presences
+  'ghost', 'specter', 'phantom', 'wraith', 'spirit', 'shade', 'apparition', 'haunting',
+  'changeling', 'fairy', 'goblin', 'imp', 'sprite', 'giant', 'ogre', 'troll', 'dragon',
+  'serpent', 'unicorn', 'griffin', 'phoenix', 'mermaid', 'siren', 'vampire', 'ghoul',
+  'demon', 'devil', 'fiend', 'angel', 'familiar', 'revenant', 'doppelganger',
+  'shapeshifter', 'hag', 'monster', 'beast', 'creature', 'thing', 'presence',
+  // signs & fates
+  'omen', 'premonition', 'prophecy', 'vision', 'dream', 'nightmare', 'trance',
+  'curse', 'spell', 'charm', 'enchantment', 'illusion', 'possession', 'exorcism',
+  'madness', 'frenzy', 'miracle', 'marvel', 'blessing', 'amulet', 'effigy', 'rune',
+  'doom', 'fate', 'destiny', 'luck', 'misfortune', 'jinx', 'wish', 'bane',
+  // practices
+  'witchcraft', 'sorcery', 'necromancy', 'alchemy', 'magic', 'ritual', 'sacrifice',
+  'offering', 'coven', 'summoning', 'banishing', 'warding', 'divination',
+  'invocation', 'consecration', 'anointing', 'purification',
+  // places & thresholds
+  'underworld', 'afterlife', 'heaven', 'hell', 'graveyard', 'catacomb', 'labyrinth',
+  'maze', 'wilderness', 'wasteland', 'ruins', 'shadow',
+  'darkness', 'twilight', 'mist', 'fog', 'silence', 'echo', 'howl', 'knocking',
+  // wrongness
+  'transformation', 'resurrection', 'immortality', 'invisibility', 'petrification',
+  'levitation', 'portent', 'hex', 'talisman', 'wail', 'second-sight', 'evil-eye',
 ];
 
-// ---- the sampler (§5 locked: 1 BOND + 1 TIE + 1-2 wildcards) -----------------------------------
-const WILDCARD_UNION = [...THINGS, ...OCCASIONS, ...PEOPLE, ...UNCANNY, ...MOODS];
+// ---- MOODS (~50): genre / mode words — what KIND of story this wants to be -----------------------
+export const MOODS: string[] = [
+  'adventure', 'mystery', 'tragedy', 'comedy', 'farce', 'romance', 'caper', 'heist',
+  'intrigue', 'scandal', 'conspiracy', 'chase', 'siege', 'standoff', 'rescue',
+  'downfall', 'reversal', 'awakening', 'ordeal',
+  'masquerade', 'duel', 'aftermath', 'unraveling', 'descent',
+  'misadventure', 'disaster', 'escapade', 'gambit',
+  'fable', 'legend', 'myth', 'saga', 'spectacle',
+];
+
+// ---- the sampler (§5 locked shape: 1 BOND + 1 TIE + 1-2 wildcards) -------------------------------
+// 🛠 2026-07-12: QUALITIES joins the wildcard union; when a 2nd wildcard rolls, it leans QUALITIES
+// (35%) so modifier+noun pairings ('banned' + 'festival') emerge often without being forced.
+const WILDCARD_UNION = [...THINGS, ...OCCASIONS, ...PEOPLE, ...UNCANNY, ...MOODS, ...QUALITIES];
 export function sampleKeywords(rng: Rng): string[] {
   const draw = [rng.pick(BOND), rng.pick(TIE), rng.pick(WILDCARD_UNION)];
-  if (!rng.chance(0.25)) draw.push(rng.pick(WILDCARD_UNION));
+  if (!rng.chance(0.25)) draw.push(rng.chance(0.35) ? rng.pick(QUALITIES) : rng.pick(WILDCARD_UNION));
   return draw;
 }
 
-// ---- arrival sparks (v2 lesson, kept: a keyword spark decorrelates the opening WITHOUT
-// prescribing a sentence — full sentences got copied verbatim) -----------------------------------
-const ARRIVAL_WHO = ['one of your own soldiers', 'a petitioner', 'a frightened runner', 'a courier',
-  'a creditor', 'a passing trader', 'a child', 'a rival', 'an old contact', 'a town official',
-  'a wounded survivor', 'a hooded stranger', 'a straggler', 'a widow', 'a returning patrol',
-  'a pedlar', 'a shepherd', 'a ferryman', 'a friar', 'an innkeeper', 'a poacher turned informer',
-  'a drunk who swears it is true', 'a neighbour farmer', 'an old friend of the company'];
-const ARRIVAL_HOW = ['a sealed letter', 'a posted notice', 'urgent word', 'a plea', 'a summons',
-  'a warrant', 'a whispered tip', 'a bounty', 'a debt called in', 'a rumor',
-  'a token pressed into a hand', 'a bell rung at odd hours',
-  'a riderless horse', 'a basket left at the gate', 'word from the market',
-  // SPOKEN forms outnumber written ones — "written on what arrives" taught a scrap-with-ominous-line
-  // frame onto ~100% of cards
-  'a tale told at the gate', 'a name gasped out', 'a demand called from horseback',
-  'a warning sung as a rhyme', 'an offer made too smoothly', 'a grievance shouted over the wall',
-  'a bargain proposed in whispers', 'a story that changes with each telling'];
-// SIGNS: matters that reach the fort with NO bringer at all — seen, heard, or missed from the
-// walls (breaks the "supplicant hands over a prop" macro that owned ~40 of 42 cards)
-const ARRIVAL_SIGNS = ['smoke on the ridge', 'bells from the valley, wrong hour', 'a cart abandoned on the road',
-  'animals fleeing the wood', 'a light where none should burn', 'the weekly pedlar simply never came',
-  'a price suddenly doubled at market', 'a boat drifting empty past the ford', 'fresh graves where there was no sickness',
-  'a road gone silent that is never silent', 'washing left three days on the lines', 'hoofprints circling the walls by night'];
-// ---- intake channels (🛠 2026-07-10): the ENGINE rolls how word reached the fort and deals it
-// as a settled FACT (the quarryTags pattern — engine owns the roll, AI flavors it). The POV-lock
-// otherwise leaves "a messenger arrives" as the model's only epistemic device (~92% of cards);
-// permission to skip the bringer never supplied a replacement, so this supplies one.
+// ---- arrival sparks (🛠 2026-07-12 ATOMIZED like keywords: the old pools were authored images
+// ('a light where none should burn') the writer could only transcribe — now the spark is 2-3
+// plain seed atoms the writer combines its own way) ------------------------------------------------
+const SPARK_WHO = ['a courier', 'a shepherd', 'a widow', 'a child', 'a friar', 'a peddler',
+  'a creditor', 'a neighbor', 'a poacher', 'an innkeeper', 'a ferryman', 'a drover',
+  'a beggar', 'a clerk', 'a town official', 'a wounded survivor', 'a straggler',
+  'an old friend of the company', 'a rival', 'a passing trader', 'a hooded stranger',
+  'a tenant farmer', 'a miller', 'a fisherman', 'a gravedigger', 'a tinker', 'a midwife',
+  'a stableboy', 'a nun', 'a woodcutter', 'a horse trader', 'a hired guard',
+  'a runaway servant', 'a village elder', 'a hunter', 'a washerwoman', 'a swineherd',
+  'one of your own soldiers', 'a petitioner', 'a drunk', 'an apprentice', 'a shipmaster'];
+const SPARK_WHAT = ['a letter', 'a plea', 'a summons', 'a warrant', 'a rumor', 'a bounty',
+  'a token', 'a name', 'a warning', 'an offer', 'a grievance', 'a tale', 'a demand',
+  'a debt', 'a map', 'a confession', 'a gift', 'a threat', 'a question', 'an invitation',
+  'an apology', 'a boast', 'a price', 'a list', 'an accusation'];
+// sign atoms: OBSERVABLE facts, no inference, no poetry
+const SPARK_SEEN = ['smoke over the trees', 'fires on the ridge at night', 'an abandoned cart',
+  'animals fleeing the wood', 'fresh graves', 'an empty road at midday', 'a boat adrift',
+  'circling crows', 'a missed market day', 'prices doubled overnight', 'strange hoofprints',
+  'a shuttered farmhouse', 'travelers turning back', 'a felled bridge', 'a dry stream',
+  'washing left out for days', 'a riderless horse', 'bells at the wrong hour',
+  'a cold chimney at a lived-in house', 'livestock loose on the road', 'a burned hayrick',
+  'doors barred in daylight', 'a beacon lit in peacetime', 'more strangers on the road than usual',
+  'carts leaving full and returning empty', 'the weekly peddler never came', 'fresh-cut stumps past the boundary',
+  'lamplight in a house that stands empty', 'tracks that end mid-field', 'a gate left open that is always locked'];
+const SPARK_WHERE = ['on the ridge', 'at the ford', 'on the mill road', 'by the far bank',
+  'at the tree line', 'at the crossroads', 'in the south pasture', 'by the old bridge',
+  'on the quarry track', 'near the churchyard', 'at the gate', 'below the walls',
+  'on the cart road', 'in the lower fields', 'by the charcoal camps', 'at the boundary stone'];
 const PATROL_SPARKS = ['a returning patrol saw it', 'one of your soldiers heard it on the road back',
   'the wood-detail came back full of talk', 'your forager marked the spot and hurried home',
   'the night watch marked fires on the far ridge', 'a scout\'s report, two days stale'];
@@ -440,32 +392,57 @@ const NOTICE_SPARKS = ['a posted bounty', 'a notice nailed at the crossroads',
 
 export type IntakeChannel = 'bringer' | 'sign' | 'patrol' | 'talk' | 'notice';
 // VARIANTS per channel — a single fact string became a stamp ("The company's own sweep" ×3/run),
-// and a negation in one ("no one brought it") leaked onto cards verbatim
+// and a negation in one ("no one brought it") leaked onto cards verbatim.
+// Widened 3→7 per channel 2026-07-12 (3 variants stamp over a long campaign).
 const INTAKE_FACT: Record<IntakeChannel, string[]> = {
-  bringer: ['someone came to the fort with it', 'it was carried to the gate in person', 'it arrived with a caller at the gate'],
-  sign: ['it was seen from the fort\'s own walls', 'the fort noticed it before anyone spoke of it', 'the signs of it are plain from the walls'],
-  patrol: ['the company\'s own people came back with it', 'it came home with the last patrol', 'one of your own crossed it in the field'],
-  talk: ['it was picked up from common talk in the country nearby', 'the countryside is talking of it', 'it is the story every visitor tells this week'],
-  notice: ['it stands promised in public writing', 'it is posted for any taker', 'the offer has hung unclaimed a while'],
+  bringer: ['someone came to the fort with it', 'it was carried to the gate in person',
+    'it arrived with a caller at the gate', 'it was brought to the company directly',
+    'a visitor put it before the company', 'it came through the gate with the morning\'s callers',
+    'whoever carried it did not linger'],
+  sign: ['it was seen from the fort\'s own walls', 'the fort noticed it before anyone spoke of it',
+    'the signs of it are plain from the walls', 'it showed itself before any word of it came',
+    'the walls have a view of it', 'the company saw it before hearing of it',
+    'no one reported it — it was simply there to see'],
+  patrol: ['the company\'s own people came back with it', 'it came home with the last patrol',
+    'one of your own crossed it in the field', 'your own people walked into it',
+    'it was picked up in the course of the company\'s rounds', 'the company found it while out on other business',
+    'it followed your soldiers home'],
+  talk: ['it was picked up from common talk in the country nearby', 'the countryside is talking of it',
+    'it is the story every visitor tells this week', 'it drifted in with ordinary gossip',
+    'half the district has a version of it', 'it came secondhand, thirdhand, and then again',
+    'everyone tells it a little differently'],
+  notice: ['it stands promised in public writing', 'it is posted for any taker',
+    'the offer has hung unclaimed a while', 'it is written where anyone can read it',
+    'the promise of payment is public', 'it waits on a board for whoever will have it',
+    'the notice has weathered a season already'],
 };
 
 // a saga's CARE beat must not open on blood or menace
-const GRIM = /wounded|creditor|warrant|bounty|debt|rival|confession|graves|blood/;
-const OPENING_TIMES = ['at first light', 'mid-morning', 'at noon', 'late afternoon', 'at dusk', 'after dark', 'in the small hours'];
+const GRIM = /wounded|creditor|warrant|bounty|debt|rival|confession|graves|burned|barred|beacon|threat|accusation/;
+const OPENING_TIMES = ['at first light', 'mid-morning', 'at noon', 'late afternoon', 'at dusk',
+  'after dark', 'in the small hours', 'in the rain', 'in fog', 'on market day'];
 export function sampleOpening(rng: Rng, opts?: { gentle?: boolean; channel?: IntakeChannel }):
-  { spark: string; landmarkAllowed: boolean; channel: IntakeChannel; intake: string } {
+  { spark: string; sparkCore: string; landmarkAllowed: boolean; channel: IntakeChannel; intake: string } {
   const channel = opts?.channel ?? rng.weighted<IntakeChannel>(
     [['bringer', 4.5], ['sign', 2.5], ['patrol', 1.2], ['talk', 1.2], ['notice', 0.6]]);
   const pick = (a: string[]) => rng.pick(opts?.gentle ? a.filter(w => !GRIM.test(w)) : a);
-  const core = channel === 'sign' ? pick(ARRIVAL_SIGNS)
-    : channel === 'patrol' ? pick(PATROL_SPARKS)
-    : channel === 'talk' ? pick(TALK_SPARKS)
-    : channel === 'notice' ? pick(NOTICE_SPARKS)
-    : rng.chance(0.6) ? `${pick(ARRIVAL_WHO)}, ${pick(ARRIVAL_HOW)}` : pick(ARRIVAL_WHO);
-  // time only SOMETIMES seasons the spark — any time token at all kept teaching cards to open
-  // "At dusk, ..." (~50% even after folding + an explicit ban); most cards get no clock to lead with
-  const spark = channel === 'bringer' && rng.chance(0.3) ? `${core} — ${rng.pick(OPENING_TIMES)}` : core;
-  return { spark, landmarkAllowed: rng.chance(0.15), channel, intake: rng.pick(INTAKE_FACT[channel]) };
+  let atoms: string[]; let core: string;
+  if (channel === 'sign') {
+    core = pick(SPARK_SEEN);
+    atoms = [core];
+    if (rng.chance(0.6)) atoms.push(rng.pick(SPARK_WHERE));
+    if (rng.chance(0.2)) atoms.push(rng.pick(OPENING_TIMES));
+  } else if (channel === 'patrol') { core = pick(PATROL_SPARKS); atoms = [core]; }
+  else if (channel === 'talk') { core = pick(TALK_SPARKS); atoms = [core]; }
+  else if (channel === 'notice') { core = pick(NOTICE_SPARKS); atoms = [core]; }
+  else {
+    core = pick(SPARK_WHO);
+    atoms = [core, pick(SPARK_WHAT)];
+    // time only SOMETIMES seasons the spark — any time token at all kept teaching cards to open
+    // "At dusk, ..." (~50% even after folding + an explicit ban); most cards get no clock to lead with
+    if (rng.chance(0.25)) atoms.push(rng.pick(OPENING_TIMES));
+  }
+  return { spark: atoms.join(' · '), sparkCore: core, landmarkAllowed: rng.chance(0.15), channel, intake: rng.pick(INTAKE_FACT[channel]) };
 }
 
 /** one-off gravity — not every job is dire (v2's per-card register knob, rarity-weighted).
@@ -487,7 +464,8 @@ const TONES: [string, number][] = [
 ];
 export function pickTone(rng: Rng): string { return rng.weighted(TONES) }
 
-/** seed sparks for chain genesis (Polti-anchored what-ifs, weighted by region later 🛠) */
+/** seed sparks for chain genesis (Polti-anchored what-ifs, weighted by region later 🛠)
+ *  These are the ONE list that is SUPPOSED to be premise-shaped — a genesis needs a what-if. */
 const SEEDS = [
   'a ransom paid to the wrong hands', 'an heir who does not want to be found',
   'a debt sold three times over', 'a relic that two shrines both claim',

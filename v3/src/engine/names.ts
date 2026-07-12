@@ -1,64 +1,38 @@
 // Names — §4b: the ENGINE rolls a name for EVERY character that materializes.
 // The AI receives assigned names and uses them as-is, never inventing its own.
+// 🛠 2026-07-12 (designer ruling, Fort-of-Chains calibrated): whole CURATED names, one draw,
+// no syllable mad-libs — joins minted 'Branbert/Pelllion' texture; every whole name was
+// vetted by a human eye at import (scripts/_importnames.ts → names_data.ts).
 
 import type { Rng } from './rng.js';
+import {
+  HUMAN_M, HUMAN_F, ELF_M, ELF_F, WOLF_M, WOLF_F, LIZARD_M, LIZARD_F,
+} from './names_data.js';
 
-// human first-name parts are GENDERED (a "Branbert" must not carry a female tag);
-// the other races' name-sounds are unisex by design
-const HUMAN_M: string[][] = [
-  ['Al', 'Bran', 'Cas', 'Dor', 'Ed', 'Fen', 'Gar', 'Hal', 'Jor', 'Kel', 'Lam', 'Mar', 'Ned', 'Os', 'Pell', 'Quin', 'Rod', 'Sam', 'Tom', 'Wil', 'Ys'],
-  ['ric', 'den', 'ton', 'win', 'mund', 'bert', 'fred', 'gard', 'helm', 'man', 'ard'],
-];
-const HUMAN_F: string[][] = [
-  ['Bet', 'Cla', 'El', 'Gwen', 'Isa', 'Mag', 'Ros', 'Sar', 'Tilda', 'Ann', 'Ed', 'Mar', 'Hild'],
-  ['a', 'eth', 'ine', 'wen', 'da', 'ra', 'lin', 'et', 'ny'],
-];
-const PARTS: Record<string, { first: string[][]; epithets: string[] }> = {
-  human: {
-    first: HUMAN_M, // default; rollName swaps by gender
-    epithets: ['of the Ford', 'Longshanks', 'the Quiet', 'Redhand', 'of Millbrook', 'the Younger', 'Ashworth', 'Coalgate', 'Thatcher', 'Reed'],
-  },
-  elf: {
-    // prefixes are shared; SUFFIXES carry perceived gender for English readers
-    // (a male 'Caelinne' reads as a mistake even if the sounds are 'unisex by design')
-    first: [
-      ['Ae', 'Cael', 'Elo', 'Fae', 'Ith', 'Lia', 'Mael', 'Nim', 'Ori', 'Sylv', 'Thal', 'Vael', 'Yll', 'Ara', 'Eir',
-       'Bri', 'Cor', 'Dae', 'Gal', 'Hele', 'Ilm', 'Kess', 'Lor', 'Mira', 'Nae', 'Ola', 'Pell', 'Quil', 'Rhi', 'Sera', 'Tia', 'Une', 'Wist'],
-      ['rion', 'thil', 'anor', 'las', 'dir', 'ion', 'dai', 'lion', 'mar', 'neth', 'olas', 'ryn',
-       'wen', 'iel', 'wyn', 'nith', 'rael', 'a', 'is', 'eth', 'inne', 'sha', 'via'],
-    ],
-    epithets: ['Leafshade', 'Duskbough', 'Dawnsinger', 'Mosswalker', 'Palebough', 'Windrow',
-      'Fernbrook', 'Thistledown', 'Greenmantle', 'Sorrowsong', 'Brightwater', 'Ashveil', 'Rootward', 'Elmwhisper'],
-  },
-  wolfman: {
-    first: [
-      ['Grak', 'Har', 'Kor', 'Mag', 'Rok', 'Skar', 'Thur', 'Ulf', 'Var', 'Zur', 'Bru', 'Fang'],
-      ['nar', 'gash', 'tooth', 'jaw', 'gar', 'muzzle', 'howl', 'ka', 'grim', 'nak'],
-    ],
-    epithets: ['of the Pass', 'Greypelt', 'Nightrunner', 'Bonechewer', 'Stormhide'],
-  },
-  lizardman: {
-    first: [
-      ['Ss', 'Za', 'Xi', 'Kre', 'Ith', 'Vex', 'Ska', 'Nash', 'Tza', 'Hess'],
-      ['sska', 'zith', 'xesh', 'kaal', 'issh', 'zzar', 'thek', 'ossk', 'ess'],
-    ],
-    epithets: ['of the Shallows', 'Salt-born', 'Tidecaller', 'Scale-of-Bronze', 'Marshwalker'],
-  },
+const FIRST: Record<string, { male: string[]; female: string[] }> = {
+  human: { male: HUMAN_M, female: HUMAN_F },
+  elf: { male: ELF_M, female: ELF_F },
+  wolfman: { male: WOLF_M, female: WOLF_F },
+  lizardman: { male: LIZARD_M, female: LIZARD_F },
 };
 
-// elf suffix split by perceived gender (first 12 male-leaning, rest female-leaning)
-const ELF_SUF_M = 12;
+const EPITHETS: Record<string, string[]> = {
+  human: ['of the Ford', 'Longshanks', 'the Quiet', 'Redhand', 'of Millbrook', 'the Younger',
+    'Ashworth', 'Coalgate', 'Thatcher', 'Reed', 'Greyfell', 'of the Marches', 'the Elder',
+    'Blackbrook', 'Hollis', 'Fairweather', 'Stonebridge', 'the Lame', 'Wexcombe', 'Harrow'],
+  elf: ['Leafshade', 'Duskbough', 'Dawnsinger', 'Mosswalker', 'Palebough', 'Windrow',
+    'Fernbrook', 'Thistledown', 'Greenmantle', 'Sorrowsong', 'Brightwater', 'Ashveil',
+    'Rootward', 'Elmwhisper'],
+  wolfman: ['of the Pass', 'Greypelt', 'Nightrunner', 'Bonechewer', 'Stormhide',
+    'Snowtracker', 'Ironjaw', 'of the High Fells', 'Winterborn'],
+  lizardman: ['of the Shallows', 'Salt-born', 'Tidecaller', 'Scale-of-Bronze', 'Marshwalker',
+    'of the Deep Fens', 'Reedspear'],
+};
 
 export function rollName(rng: Rng, race: string, gender?: string): string {
-  const p = PARTS[race] ?? PARTS.human!;
-  const first = (race === 'human' || !PARTS[race]) ? (gender === 'female' ? HUMAN_F : HUMAN_M) : p.first;
-  let sufs = first[1]!;
-  if (race === 'elf' && gender) {
-    sufs = gender === 'female' ? sufs.slice(ELF_SUF_M) : sufs.slice(0, ELF_SUF_M);
-  }
-  // collapse letter pile-ups at the part join ('Pell'+'lion' → 'Pellion', never 'Pelllion')
-  const name = (rng.pick(first[0]!) + rng.pick(sufs)).replace(/(.)\1\1+/g, '$1$1');
-  return rng.chance(0.35) ? `${name} ${rng.pick(p.epithets)}` : name;
+  const pools = FIRST[race] ?? FIRST.human!;
+  const name = rng.pick(gender === 'female' ? pools.female : pools.male);
+  return rng.chance(0.35) ? `${name} ${rng.pick(EPITHETS[race] ?? EPITHETS.human!)}` : name;
 }
 
 const RELIC_ADJ = ['Weathered', 'Gilded', 'Silent', 'Broken', 'Old', 'Salt-stained', 'Painted', 'Iron', 'Pale', 'Twin',
