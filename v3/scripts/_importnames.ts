@@ -50,7 +50,10 @@ astrid cicero serana isran maven brynjolf mercer karliah madanach elisif torygg 
 vivec almalexia dagoth caius fargoth sheogorath jyggalag haskill martin uriel mankar lucien
 nazeem ysgramor olaf tiber talos akatosh dibella kynareth stendarr arkay julianos zenithar
 azura boethiah hircine malacath mehrunes meridia molag namira nocturnal peryite sanguine
-vaermina hermaeus`.split(/\s+/));
+vaermina hermaeus
+sulla marius crassus pompey cato scipio hannibal leonidas pericles themistocles alcibiades
+lysander xerxes darius cyrus euryleon achates aeneas romulus remus spartacus plato socrates
+aristotle homer virgil ovid seneca plutarch herodotus`.split(/\s+/));
 
 const seenAll = new Set<string>();
 function build(file: string, n: number, opts: { maxLen?: number; hyphen?: boolean; genderEnd?: 'm' | 'f' } = {}): string[] {
@@ -60,6 +63,7 @@ function build(file: string, n: number, opts: { maxLen?: number; hyphen?: boolea
   const ok = load(file).filter(x =>
     re.test(x) && x.length >= 4 && x.length <= maxLen &&
     !/(.)\1\1/.test(x) &&                       // no letter pile-ups
+    !/^[^aeiouAEIOUy]{3}/.test(x) &&            // 3+ leading consonants is unpronounceable ('Wlveva')
     !MODERN.has(x.toLowerCase()) &&
     // human lists mix in Latin family names and surnames — the ENDING carries perceived gender
     // for an English eye regardless of the corpus's intent (the elf-suffix lesson, applied at

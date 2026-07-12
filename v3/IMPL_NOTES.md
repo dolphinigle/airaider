@@ -1270,3 +1270,16 @@ words; the model composes; variety = combinations, not entry count.
   6 → 6 → 7 → 7 with composition shifting from list-cringe to model-tail; remaining ledgered
   classes: resolution-skeleton variety (watch after (a)), re-offer verbatim presentation
   (#345-7), beat-state recap staleness (#345-8), register-slip tail, place-name 'hollow' mania.
+- **#357 final judge (25006: cringe 6/10, story 7/10 — "texture-level, almost no whole-card
+  cringe"; old arms 3/10 premise-level) + closing micro-round**: the judge caught the
+  "[odd object] where no X should be" frame REBORN as a resolution opener (7/19) — root was
+  ENGINE-side: the sceneFacet value 'a thing out of place' planted the exact frame (swapped for
+  'what the party carries or readies'); fate line now orders composition (the JOB's objective
+  resolves on screen FIRST, the fate lands after, never instead — the Muramil finale closed
+  around the focal merc and never showed the quarry taken); importer adds famous-antiquity
+  blocklist (Sulla the peasant woman, Euryleon) + 3-leading-consonant filter ('Wlveva').
+  LEDGERED for the story batch with fresh evidence: bible cast-role scrambling on development
+  sagas (focal merc as 'quarry' steering finales to close around the wrong person; ghost cast
+  entries carrying another's motive), clue-formula watch, register-slip tail ('a pissed band').
+  Day's verdict across 5 blind judges: cringe 3-4/10 → 6-7/10, story 5/10 → 7/10; the LIST
+  classes (transcribed seeds, anachronisms, misgendered mash names, samey openings) are dead.

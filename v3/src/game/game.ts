@@ -1433,8 +1433,10 @@ export class Game {
       // signature stamp (the scar-tic appeared in 9 of 15 resolutions when always sent)
       party: r.party.map(p => ({ id: p.id, name: p.name, tags: renderTags(p.tags), dossier: this.dossier(p.id, { habits: this.rng.chance(0.25) }) })),
       // §2 engine seed: which facet the before-text opens on (terrain-tableau owned the slot)
+      // 'a thing out of place' taught the exact "[odd object] where no X should be" frame the
+      // whole overhaul existed to kill (7 of 19 resolutions in one campaign) — facet swapped
       sceneFacet: this.rng.pick(['the ground and what stands on it', 'the weather and the light',
-        'what can be heard', 'the people in view', 'the enemy\'s posture or handiwork', 'a thing out of place']),
+        'what can be heard', 'the people in view', 'the enemy\'s posture or handiwork', 'what the party carries or readies']),
       deliveredSummary: this.describeDelivery(r),
       // a finale's delivered PERSON is the focal — give them an id here so the narrator can
       // flesh them from the saga's own fiction and tie edges to them (they had no entry before)
