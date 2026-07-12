@@ -1244,3 +1244,14 @@ words; the model composes; variety = combinations, not entry count.
   applied to BOTH sides of the check. Remaining watchlist from my read: twist blurted on a
   beat-1 card (should be a middle-step reveal), 'legal claim' register on cards, beat cards
   recapping a traveler as still at the gate mid-journey, one simile slip in report prose.
+- **#355 round-3 (judge-3 scored 22003 at cringe 7/10, story 7/10 — one point from the bar)**:
+  the monoculture ROOT found in the last untouched hand list — SEEDS skewed legal-ritual (wills/
+  claims/rites/witnesses), so a campaign grew FIVE witnessed-rite sagas from a clean writer.
+  SEEDS rebuilt to 41 balanced across conflict TYPES (rescue/hunt/heist/betrayal/love/revenge/
+  survival/identity/crime/uncanny/power-capped); dropped the second singer seed. Names: TES-
+  famous blocklist ('Balgruuf Snowtracker' walked in from the Skyrim corpus) + embedded-English-
+  word filter ('Celelruin' reads ruin) → pools regenerated. Prompts: development-saga focal never
+  staged as the client hiring the company (Chelni was roster AND 'hired the company'); cast.want
+  as to-infinitive/noun phrase ('wants prevent…' glue ×6 was a rendering of bare-verb stubs);
+  metaphors must stay physically sensible ('anvils of boots'). Remaining watch: beat-state
+  recap staleness (#345-8), quirk-out-of-scene echoes, after-text flatness (do not overcorrect).

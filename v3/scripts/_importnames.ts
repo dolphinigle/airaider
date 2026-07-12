@@ -44,7 +44,13 @@ rochelle melodie melody chloe zoe mia ava lily ella nora hazel violet stella luc
 ivy fiona vera vittoria allen alcock
 agamemnon achilles hector priam odysseus ajax cassandra helen menelaus orestes electra oedipus
 perseus theseus heracles hercules apollo zeus hera athena aphrodite artemis hermes poseidon hades
-lancelot gawain merlin guinevere roland caesar brutus cicero nero augustus cleopatra`.split(/\s+/));
+lancelot gawain merlin guinevere roland caesar brutus cicero nero augustus cleopatra
+balgruuf ulfric tullius delphine esbern alduin ralof hadvar lydia aela farkas vilkas kodlak
+astrid cicero serana isran maven brynjolf mercer karliah madanach elisif torygg rikke galmar
+vivec almalexia dagoth caius fargoth sheogorath jyggalag haskill martin uriel mankar lucien
+nazeem ysgramor olaf tiber talos akatosh dibella kynareth stendarr arkay julianos zenithar
+azura boethiah hircine malacath mehrunes meridia molag namira nocturnal peryite sanguine
+vaermina hermaeus`.split(/\s+/));
 
 const seenAll = new Set<string>();
 function build(file: string, n: number, opts: { maxLen?: number; hyphen?: boolean; genderEnd?: 'm' | 'f' } = {}): string[] {
@@ -63,6 +69,8 @@ function build(file: string, n: number, opts: { maxLen?: number; hyphen?: boolea
     !/cock/i.test(x) &&
     // consonant clusters alien to an English eye read as typos in HUMAN names ('Martxot')
     (opts.genderEnd === undefined || !/tx|tz|zk|xh|q(?!u)/i.test(x)) &&
+    // embedded English words derail the eye ('Celelruin' reads as ruin; worse exists)
+    !/ruin|rape|anus|arse|shit|piss|fart|dick|slut|butt|crap/i.test(x) &&
     !seen.has(x) && !seenAll.has(x) &&          // unique within pool AND across races
     (seen.add(x), true));
   const picked = stride(ok, n);

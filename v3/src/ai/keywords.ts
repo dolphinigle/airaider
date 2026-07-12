@@ -465,23 +465,51 @@ const TONES: [string, number][] = [
 export function pickTone(rng: Rng): string { return rng.weighted(TONES) }
 
 /** seed sparks for chain genesis (Polti-anchored what-ifs, weighted by region later 🛠)
- *  These are the ONE list that is SUPPOSED to be premise-shaped — a genesis needs a what-if. */
+ *  These are the ONE list that is SUPPOSED to be premise-shaped — a genesis needs a what-if.
+ *  🛠 2026-07-12 re-balanced by CONFLICT TYPE: the old pool skewed legal-ritual (wills, claims,
+ *  rites, witnesses) and a judged campaign grew FIVE witnessed-rite sagas from it — the seed
+ *  mix, not the writer, was the monoculture. Now spread over rescue/hunt/heist/betrayal/love/
+ *  revenge/survival/identity/crime/uncanny/power; append-to-grow keeps the balance. */
 const SEEDS = [
-  'a ransom paid to the wrong hands', 'an heir who does not want to be found',
-  'a debt sold three times over', 'a relic that two shrines both claim',
-  'a deserter who knows where the bodies are', 'a betrothal that would end a feud',
-  'a list of names the respectable would kill to burn', 'a beast that only hunts the guilty',
-  'a will that frees the wrong people', 'a siege that ended too quietly',
-  'a smuggler’s route that moves more than goods', 'a caged singer whose songs start riots',
-  // widened 2026-07-10 (pool of 12 re-dealt fast across a long campaign; append-to-grow)
-  'a hostage both sides would rather forget', 'an old victory that was really a massacre',
-  'a healer who chooses who is worth saving', 'two heirs, one seal, and no witnesses',
-  'a bridge toll that funds something worse', 'a saint’s bones that will not stay buried',
-  'a wager between lords paid in other people’s lives', 'a granary full the year everyone starved',
-  'a marriage sworn to end a war neither side stopped', 'a mine that pays in more than ore',
-  'a foundling raised under someone else’s name', 'an oath kept long after it should have broken',
-  'a village that pays two masters and can afford neither', 'a court singer who knows which songs are confessions',
-  'a road that was safe until someone made it safer', 'an exile come home richer than the lord who banished them',
-  'a cure that works only while its price is paid', 'a border stone moved by night, a little each year',
+  // rescue & captivity
+  'a ransom paid to the wrong hands', 'a hostage both sides would rather forget',
+  'a kidnapping staged to look like a running-away', 'an heir who does not want to be found',
+  // hunt & beast
+  'a beast that only hunts the guilty', 'a predator that has learned to follow funerals',
+  'something in the millpond that takes lambs and dogs but never fish',
+  // heist & theft
+  'a vault key split among three enemies who now need each other',
+  'a theft the victim refuses to admit happened',
+  // betrayal & war
+  'an old victory that was really a massacre', 'a garrison sold to raiders by its own paymaster',
+  'a truce that holds only while one old man lives', 'a siege that ended too quietly',
+  'a deserter who knows where the bodies are',
+  // love & kinship
+  'a betrothal that would end a feud', 'a marriage sworn to end a war neither side stopped',
+  'a love letter delivered twenty years late', 'a foundling raised under someone else’s name',
+  // revenge
+  'a widow buying, one by one, the men who burned her farm',
+  'an exile come home richer than the lord who banished them',
+  // survival & land
+  'a village that must move before the water rises and cannot agree where',
+  'a winter road kept open by feeding something at the pass',
+  'a granary full the year everyone starved', 'a village that pays two masters and can afford neither',
+  // identity & secrets
+  'a dead man seen buying horses at three fairs', 'a list of names the respectable would kill to burn',
+  'an oath kept long after it should have broken',
+  // crime & coin
+  'a debt sold three times over', 'a smuggler’s route that moves more than goods',
+  'a counterfeiter whose fakes are better than the mint’s coin', 'a bridge toll that funds something worse',
+  // uncanny
+  'a saint’s bones that will not stay buried', 'a cure that works only while its price is paid',
+  'a road that was safe until someone made it safer', 'a relic that two shrines both claim',
+  // power & law (capped — this shape once owned the pool)
+  'a will that frees the wrong people', 'two heirs, one seal, and no witnesses',
+  'a border stone moved by night, a little each year',
+  // performance & voice
+  'a caged singer whose songs start riots',
+  // wagers
+  'a wager between lords paid in other people’s lives',
+  'a healer who chooses who is worth saving',
 ];
 export function sampleSeed(rng: Rng): string { return rng.pick(SEEDS) }
