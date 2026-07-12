@@ -1160,6 +1160,17 @@ export class Game {
         // a step that merely confirms what is already known is a null job (41021: "establish
         // that the singer's binding feather is missing" — told to the player two cards earlier)
         const nullStep = d.arc.find(s => /\b(confirm|verify|establish that|learn whether)\b/i.test(s));
+        // arc CONSERVATION (lab batch I: 6/8 arcs conjured places/tools mid-chain): a step's
+        // ERRAND half may only touch what the goal, the cast, or an EARLIER step introduced —
+        // the yield half is where new things legitimately enter (they are the discoveries)
+        let conjured: string | undefined;
+        for (let i = 1; i < d.arc.length && !conjured; i++) {
+          const errand = d.arc[i]!.split('→')[0]!;
+          const prior = `${d.goal} ${d.arc.slice(0, i).join(' ')}`;
+          for (const tok of new Set(errand.replace(/^\S+\s*/, '').match(/\b[A-Z][a-z]{2,}\b/g) ?? [])) {
+            if (!castTok.has(tok) && !prior.includes(tok)) { conjured = `"${tok}" (step ${i + 1})`; break; }
+          }
+        }
         // dup RIDES ALONG whatever why is reported: an early clash-return once masked a live-chain
         // dup from the post-retry mechanical recast (29010: Nurisea obstacled two live sagas)
         if (focalMissing) return { why: `your rejected draft's cast is missing ${focal.name} — the saga is ABOUT them; they must be a cast entry`, dup: clientDup };
@@ -1168,6 +1179,7 @@ export class Game {
         if (step1Delivers) return { why: `your rejected draft's FIRST arc step already performs a delivery or handover — the goal is NOT done at step 1: step 1 is taking the job plus a first leg of field work, and every delivery belongs to a later step`, dup: clientDup };
         if (nullStep) return { why: `your rejected draft's arc contains a step that merely confirms or verifies something ("${nullStep}") — a null job; every step must CHANGE the situation: gain ground, gain leverage, or raise the stakes`, dup: clientDup };
         if (ceremonyMono) return { why: `your rejected draft settles its matter with an oath, judgment, or ceremony — as the player's recent sagas already did; settle THIS matter by an entirely different means (a chase, a trade, a siege, an escape, a betrayal exposed, a debt collected — anything but a gathering that swears or judges)`, dup: clientDup };
+        if (conjured) return { why: `your rejected draft's arc touches ${conjured} that no earlier step yielded and neither the goal nor the cast introduced — every place, person, and tool a step USES must come from the hire, the goal, or an earlier step's yield (new things enter only as a step's own "→ yields:")`, dup: clientDup };
         if (clash) return { why: `your rejected draft "${d.title} — ${d.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground`, dup: clientDup };
         if (custodyGhost) return { why: `your rejected draft placed ${custodyGhost} in the company's custody — they passed out of the company's reach and are FREE in the world; rebuild the saga around where they actually stand`, dup: clientDup };
         if (clientDup) return { why: `your rejected draft used ${clientDup.name} as ${clientDup.role} — they are already bound up in a running saga; this one needs a different person in that part entirely`, dup: clientDup };
@@ -1343,7 +1355,31 @@ export class Game {
     // offstage — the writer may not name them, so later beats introduce them on their own turn
     const dealtStep = isFinale ? chain.bible.arc[chain.bible.arc.length - 1]!
       : chain.bible.arc[Math.min(chain.beatIndex, chain.bible.arc.length - 1)]!;
-    const stagedBible = this.stageBible(chain, dealtStep, chain.beatIndex === 0 && !isFinale);
+    // the CARD writer never sees a step's "→ yields:" answer — handing it the yield made
+    // cards name the find before the party looked (lab batch C, 4/6); the RESOLVER keeps
+    // the full step because it must deliver that yield
+    const stripYields = (s: string) => s.replace(/\s*→ yields:.*$/i, '');
+    const stagedRaw = this.stageBible(chain, dealtStep, chain.beatIndex === 0 && !isFinale);
+    // mid-saga CARD writers lose bible.situation entirely (lab batch E: every leak class —
+    // twists, yields, later beats — drew from that well; the omission pattern is the proven
+    // fix). The kernel keeps the premise; goal/cast/record carry everything a briefing knows.
+    // Finale writers and resolvers keep the full truth.
+    // beat writers get a MINIMAL, card-safe feed (lab batches E-G: every leak drew from a
+    // bible field that holds whole-story knowledge — situation, kernel, later arc steps,
+    // tensions, openDirections; each was closed by OMISSION, the session's one reliably
+    // winning move). The client's open telling is composed from card-safe fields only:
+    // the goal (already player-known by design) and the client's own want.
+    const clientEntry = (stagedRaw.cast as { role?: string; name?: string; want?: string }[]).find(m => m.role === 'client');
+    const stagedBible = {
+      ...stagedRaw,
+      arc: isFinale ? (stagedRaw.arc as string[]).map(stripYields) : [stripYields(dealtStep)],
+      ...(isFinale ? {} : {
+        kernel: '',
+        tensions: [],
+        openDirections: [],
+        situation: `THE CLIENT'S OPEN TELLING (this IS card material — the hook carries its why): ${stagedRaw.goal}${clientEntry?.name && clientEntry?.want ? ` ${clientEntry.name} wants ${clientEntry.want}.` : ''} The truth beyond this stays hidden until the party finds it; write from this telling, the dealt step, the cast, and the record.`,
+      }),
+    };
     const wqInput = ({
       // beats serve the BIBLE's story, not a rolled job type (a random archetype fought the saga);
       // the landmark gate is for one-off variety — a saga anchored at the landmark must name it
@@ -1369,8 +1405,10 @@ export class Game {
       beatIndex: chain.beatIndex + 1, expectedBeats: chain.expectedBeats,
       // the ONE step this card covers, dealt verbatim — writers fumbled indexing arc[beat-1]
       // and scoped beat 1 to the whole goal
-      arcStep: dealtStep,
-      focalName: focal?.name,
+      arcStep: stripYields(dealtStep),
+      // focalName only when the staged bible still carries the name — an unmet focal whose
+      // identity is the saga's discovery must not re-enter through this side door
+      focalName: focal && JSON.stringify(stagedBible).includes(focal.name.split(' ')[0]!) ? focal.name : undefined,
       // runtime truth, not genesis-time: a focal HIRED mid-saga is the company's own now
       focalIsMerc: focal?.character?.role === 'merc',
     });
@@ -1590,7 +1628,9 @@ export class Game {
       ],
       chainContext: r.quest.chainId ? {
         // the resolver gets the STAGED bible too — unmet cast cannot debut in a report
-        bible: (c => c ? this.stageBible(c, `${r.quest.situation} ${r.quest.job}`, r.quest.beatIndex === 1 && !r.quest.isFinale) : undefined)(this.state.chains.find(c => c.id === r.quest.chainId)),
+        // the resolver's met-text includes the FULL dealt step (yields intact) so it may
+        // NAME what this step's yield reveals — the card posed the question, the report answers
+        bible: (c => c ? this.stageBible(c, `${r.quest.situation} ${r.quest.job} ${(r.quest.beatIndex ? c.bible.arc[Math.min(r.quest.beatIndex - 1, c.bible.arc.length - 1)] : '') ?? ''}`, r.quest.beatIndex === 1 && !r.quest.isFinale) : undefined)(this.state.chains.find(c => c.id === r.quest.chainId)),
         storyState: this.state.chains.find(c => c.id === r.quest.chainId)?.story,
         isFinale: !!r.quest.isFinale,
         // the ONE step this job covers — resolutions overreached even when the card was scoped
@@ -2180,7 +2220,10 @@ export class Game {
   private stageBible(chain: Chain, stepText: string, withholdTwist = false) {
     const met = (name: string) => {
       const words = name.toLowerCase().split(/[^a-z]+/).filter(w => w.length > 2);
-      const seen = [stepText, ...(chain.story.introducedNames ?? []), chain.bible.cast.find(m => m.loreId === chain.focalId)?.name ?? '', this.state.lore.nodes[chain.focalId]?.name ?? ''].join(' ').toLowerCase();
+      // the focal is NOT unconditionally met (lab batch H: when discovering the focal's
+      // identity IS the mystery, the old exemption pre-named them on beat 1) — they count
+      // as met only where the goal, the step text, or the record names them
+      const seen = [stepText, chain.bible.goal, ...(chain.story.introducedNames ?? [])].join(' ').toLowerCase();
       return words.some(w => seen.includes(w));
     };
     const offstageCast = chain.bible.cast.filter(m => !(m.role === 'client' || met(m.name)));

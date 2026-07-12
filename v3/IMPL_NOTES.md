@@ -1464,3 +1464,32 @@ words; the model composes; variety = combinations, not entry count.
   child is). Round-9b fixes: ticker names the focal only after introducedNames holds them;
   find/learn steps pose the QUESTION only (answer withheld by DIET); each beat's obstacle is a
   NEW CLASS (never the last one re-armed or renamed).
+- **#371 PROMPT LAB (rapid-fire A/B, designer-directed): scripts/promptlab.ts generates
+  genesis+beat-1 pairs directly (no cycles/resolves, ~$0.13/8-pair batch, ~2 min) and a Fable
+  judge scores batches comparatively — replaces $0.40/15-min campaigns for prompt iteration.
+  Nine batches (A→J), controlled seeds. VERIFIED WINS, in order:
+  (1) RECENCY ANCHORS (designer's ordering hypothesis): a short "ABOVE ALL (write now)" block —
+  4 critical rules + schema reminder — appended to the END of genesis + writeQuest lifted
+  CARD 4.8→7.0 and ARC 5.3→6.8 in one step, the single largest jump of the whole effort.
+  Recorded in PROMPT_RULES §0 implicitly (structure over volume); cheap models weight the end.
+  (2) Causal-chain arcs (designer's example): each step written "<errand using previous yield>
+  → yields: <what the next step uses>"; genesis lints added: step-1-delivers, null-confirm
+  steps, ceremony monoculture, arc conservation (capitalized token in an errand half that no
+  earlier step/goal/cast introduced → retry).
+  (3) Hire-settlement anchor: the LAST step settles the CLIENT's hire; the focal ending rides
+  along (was: recruit endings eclipsed the hire in 3/6 arcs).
+  (4) MIN-FEED for beat-card writers — the decisive structural change, all by OMISSION: the
+  writer receives ONLY the client's open telling (goal + client want; NOT the kernel — it
+  compresses the whole story, twist included, and leaked verbatim), the dealt step with its
+  "→ yields:" tail STRIPPED, the staged cast, and the record. No situation, no later arc
+  steps, no tensions/openDirections. Each removed field had been quoted leaking by judges.
+  (5) Focal gating: the focal counts as met only where the GOAL or record names them (a saga
+  whose mystery IS the focal's identity pre-named them via the old exemption + the focalName
+  input side door, both closed); the resolver's met-text includes the full dealt step so the
+  REPORT reveals the name at the yield beat.
+  Trajectory (means): CARD 4.8 → 7.0 (anchors) → ~6 stable with every catastrophic class dead
+  (whole-saga reveals, twist leaks, yield-handing, kernel-speak, pre-named discoveries);
+  ARC ~6-7. Judge on the latest: "card prose register and grounding are near-shippable."
+  REMAINING (stable, well-characterized): late-arc unearned entries the lint can't see
+  (lowercase common nouns like "the cure"; persistent drafts ship after retries), the last
+  step drifting off the hire, beat-1 job lines folding in the goal's final delivery.
