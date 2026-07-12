@@ -129,7 +129,7 @@ export const TIE: string[] = [
 // ---- QUALITIES (~190): plain modifiers — combine with any noun the draw supplies ---------------
 export const QUALITIES: string[] = [
   'stolen', 'banned', 'forbidden', 'forged', 'counterfeit', 'false', 'true', 'hidden',
-  'secret', 'broken', 'mended', 'last', 'first', 'final', 'only', 'lost', 'found',
+  'secret', 'broken', 'mended', 'last', 'first', 'final', 'lost', 'found',
   'borrowed', 'cursed', 'blessed', 'unpaid', 'owed', 'sworn', 'abandoned', 'forsaken',
   'poisoned', 'tainted', 'spoiled', 'sealed', 'unsealed', 'locked', 'unlocked', 'empty',
   'full', 'missing', 'returned', 'ruined', 'restored', 'rightful', 'wrongful', 'disputed',
@@ -342,12 +342,13 @@ export const MOODS: string[] = [
 ];
 
 // ---- the sampler (§5 locked shape: 1 BOND + 1 TIE + 1-2 wildcards) -------------------------------
-// 🛠 2026-07-12: QUALITIES joins the wildcard union; when a 2nd wildcard rolls, it leans QUALITIES
-// (35%) so modifier+noun pairings ('banned' + 'festival') emerge often without being forced.
-const WILDCARD_UNION = [...THINGS, ...OCCASIONS, ...PEOPLE, ...UNCANNY, ...MOODS, ...QUALITIES];
+// 🛠 2026-07-12: QUALITIES enters ONLY as the 2nd wildcard (35% lean) — the guaranteed wildcard
+// is always a concrete noun, so a modifier never lands alone ("grief, theft, only" read as
+// nonsense; a quality needs a noun in the draw to bite on: 'banned' + 'festival').
+const WILDCARD_NOUNS = [...THINGS, ...OCCASIONS, ...PEOPLE, ...UNCANNY, ...MOODS];
 export function sampleKeywords(rng: Rng): string[] {
-  const draw = [rng.pick(BOND), rng.pick(TIE), rng.pick(WILDCARD_UNION)];
-  if (!rng.chance(0.25)) draw.push(rng.chance(0.35) ? rng.pick(QUALITIES) : rng.pick(WILDCARD_UNION));
+  const draw = [rng.pick(BOND), rng.pick(TIE), rng.pick(WILDCARD_NOUNS)];
+  if (!rng.chance(0.25)) draw.push(rng.chance(0.35) ? rng.pick(QUALITIES) : rng.pick(WILDCARD_NOUNS));
   return draw;
 }
 

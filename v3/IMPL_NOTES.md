@@ -1283,3 +1283,14 @@ words; the model composes; variety = combinations, not entry count.
   entries carrying another's motive), clue-formula watch, register-slip tail ('a pissed band').
   Day's verdict across 5 blind judges: cringe 3-4/10 → 6-7/10, story 5/10 → 7/10; the LIST
   classes (transcribed seeds, anachronisms, misgendered mash names, samey openings) are dead.
+- **#358 live-playtest round 2 (designer findings)**: (1) "A shy straggler" — a BOND feeling
+  word (shyness) adjectivized onto a person; KEYWORDS line now splits by kind: THINGS may be
+  named, feeling/stance words color what happens, NEVER an adjective stapled onto a person
+  (tag-side was already covered by TAGS_NOTE's trait-echo ban). (2) "the writer will tell a
+  name that opens your next hire" ~40% of cards — the lead envelope gloss; every gloss ever
+  tried became a stamp, and gold ALWAYS rides alongside a lead spec → lead components are now
+  OMITTED from the writer's envelope entirely (engine grant line announces the lead when it
+  lands). (3) keyword "only" dealt bare — QUALITIES could land as the lone slot-3 wildcard with
+  no noun to bite on → sampler now draws slot 3 from concrete-noun pools only, QUALITIES enters
+  only as the optional 2nd wildcard (25% of draws carry a quality, all noun-paired); 'only'
+  itself removed (pure function word).

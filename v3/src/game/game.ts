@@ -882,12 +882,13 @@ export class Game {
       location: this.locationLine(lead.region, lmOk),
       level: lead.level, rarity: lead.rarity,
       // engine kind names are NOT writer-safe: 'lead' read as the METAL (12 lead-bar fetches in
-      // one campaign, "a parcel of lead" pay in another) — translate kinds to plain words
-      // no catchy nouns here — 'a fresh trail' leaked from this envelope into titles ×32/run
-      slotCount: n, rewardEnvelope: specs.map(s => (
-        // 'further work' leaked from the old wording into ~every lead-hunt closer — keep the
-        // gloss phrase-free (any catchy noun in here WILL surface in prose)
-        { lead: 'knowledge that opens the company\'s next hire (never an object)', relic: 'a prize object',
+      // one campaign, "a parcel of lead" pay in another) — translate kinds to plain words.
+      // 2026-07-12: lead components are OMITTED from the envelope outright — every gloss ever
+      // tried ('further work', 'opens the next hire') became a card stamp ("the writer will tell
+      // a name that opens your next hire" ~40% of cards); gold always rides alongside a lead,
+      // and the engine's own grant line announces the lead when it lands
+      slotCount: n, rewardEnvelope: specs.filter(s => s.kind !== 'lead').map(s => (
+        { relic: 'a prize object',
           recruit: 'a person who may join the company', captive: 'a person taken', gold: 'coin' } as Record<string, string>
       )[s.kind] ?? s.kind).join(' + '),
       keywords: sampleKeywords(this.rng),
