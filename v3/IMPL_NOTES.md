@@ -1234,3 +1234,13 @@ words; the model composes; variety = combinations, not entry count.
   quarryTags omit-line self-contained; worn-through idiom → plain; law-register list → register
   description (enumerated words would stamp); genesis schema de-interleaved + soldier-tie rule
   resolved against the company-history ban; 'clocks' idiom out of the resolve style rule.
+- **#354 round-2 campaign read (22003) + guard hole #2**: the round-2 classes visibly fixed in
+  the wild — five DISTINCT saga premises (custody-clause skeleton gone), chosen approaches
+  enacted as labeled, "remained a soldier of the company" (no custody wording on own mercs),
+  client delivery held to the finale, twist surfaced via the singer's song mid-saga. BUT the
+  cast-reuse guard leaked once more: a COINED cast member has no loreId in her own bible, so the
+  id-keyed liveClients set couldn't see her when the next saga reused her (one heir cliented two
+  sagas born a cycle apart) → canonical personKey (loreId ∨ name-resolved node ∨ bare name)
+  applied to BOTH sides of the check. Remaining watchlist from my read: twist blurted on a
+  beat-1 card (should be a middle-step reveal), 'legal claim' register on cards, beat cards
+  recapping a traveler as still at the gate mid-journey, one simile slip in report prose.

@@ -1073,11 +1073,15 @@ export class Game {
       const words = (s: string) => new Set((s.toLowerCase().match(/[a-z]+/g) ?? []).filter(w => w.length > 3 && !stop.has(w)));
       const loreByName = new Map(Object.values(this.state.lore.nodes)
         .filter(n => n.kind === 'character' && n.active).map(n => [n.name, n.id]));
+      // canonical person key: lore id when the world knows them, else the bare name — BOTH the
+      // live casts and the draft resolve the same way (a coined cast member has no loreId in her
+      // OWN bible, so an id-only check let one heir client two sagas born a cycle apart)
+      const personKey = (x: { name: string; loreId?: string }) => x.loreId ?? loreByName.get(x.name) ?? x.name;
       // live chains AND the last few closed ones — one rescue NPC once cliented 5 of 6
       // sequential sagas (the live-only window let her straight back in each time)
       const liveClients = new Set([...this.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending'),
         ...this.state.chains.slice(-3)]
-        .flatMap(c => c.bible.cast.filter(x => (x.role === 'client' || x.role === 'obstacle') && x.loreId).map(x => `${x.role}:${x.loreId}`)));
+        .flatMap(c => c.bible.cast.filter(x => x.role === 'client' || x.role === 'obstacle').map(x => `${x.role}:${personKey(x)}`)));
       const issues = (d: typeof g): { why: string; dup?: (typeof g.cast)[number] } | null => {
         for (const m of d.cast) if (!m.loreId && loreByName.has(m.name)) m.loreId = loreByName.get(m.name);
         // cast + coined places join the fingerprint — five deliver-to-a-ceremony sagas with the
@@ -1090,7 +1094,7 @@ export class Game {
         const custodyGhost = goneNames.find(n => d.situation.includes(n) && /\b(cells?|custody|held at the fort|in your keeping)\b/i.test(d.situation));
         // same-CLIENT guard (mechanical — the prompt rule alone left one lore client running
         // three sagas at once); obstacles too — concurrent sagas once shared ONE coined villain
-        const clientDup = d.cast.find(x => (x.role === 'client' || x.role === 'obstacle') && x.loreId && liveClients.has(`${x.role}:${x.loreId}`));
+        const clientDup = d.cast.find(x => (x.role === 'client' || x.role === 'obstacle') && liveClients.has(`${x.role}:${personKey(x)}`));
         if (clash) return { why: `your rejected draft "${d.title} — ${d.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground` };
         if (custodyGhost) return { why: `your rejected draft placed ${custodyGhost} in the company's custody — they passed out of the company's reach and are FREE in the world; rebuild the saga around where they actually stand` };
         if (clientDup) return { why: `your rejected draft used ${clientDup.name} as ${clientDup.role} — they already hold that role in a running saga; this one needs a different ${clientDup.role} entirely`, dup: clientDup };
