@@ -1452,3 +1452,15 @@ words; the model composes; variety = combinations, not entry count.
   covers the LAST word (four "X Hollow"s templated one campaign); unrevealed twists must
   come out at the finale (a wager-treachery twist silently died); beat objectives must be
   WINNABLE (a "stand before her so she may choose" job read SUCCESS-then-refusal as a bug).
+- **#370 judge-loop round 9 (46026, gated cards+reports): 4.5/4.5 — first round both judges
+  above 4, and the verdict shifted: "the chains fail on story-state machinery, not sentence
+  craft" (register, dice fidelity, quirk-theater, anachronisms all clean). Both gates ran live
+  (28 reviews, 14 rewrites, campaign $0.41). Converged remaining classes: (1) truth-state
+  reversals across cards (obstacle re-armed after being opened on-screen; failed beat's stake
+  handed over by fiat); (2) obstacle-device monoculture (posted-board bridge toll ×5 across
+  three sagas); (3) bible twists never staged (a true-heir twist died unspoken while the finale
+  asked the player to "decide which claim to honor"); (4) cold names incl. the 📖 ticker naming
+  a never-introduced quarry; (5) pre-solved briefings (a find-the-child card stating where the
+  child is). Round-9b fixes: ticker names the focal only after introducedNames holds them;
+  find/learn steps pose the QUESTION only (answer withheld by DIET); each beat's obstacle is a
+  NEW CLASS (never the last one re-armed or renamed).

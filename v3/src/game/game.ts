@@ -2278,7 +2278,10 @@ export class Game {
     });
     // company-ledger diction — "bank/beat/season/remains at the center" read as engine
     // jargon at the story's emotional beats (41021 judge, class 5)
-    report.push(`📖 ${chain.bible.title}: ${chain.bank.toFixed(0)}g earned toward this matter's ~${chain.payoff.toFixed(0)}g worth (${delta >= 0 ? '+' : ''}${delta}g today)${finaleReady(chain) ? ' — it now comes to a head' : ''}.${focal ? ` ${focal.name} stays at the heart of it.` : ''}`);
+    // the focal is named ONLY once the cards have introduced them (46026: "Ungrien stays at
+    // the heart of it" told the player a total stranger anchored their chain)
+    const focalMet = !!focal && (chain.story.introducedNames ?? []).includes(focal.name);
+    report.push(`📖 ${chain.bible.title}: ${chain.bank.toFixed(0)}g earned toward this matter's ~${chain.payoff.toFixed(0)}g worth (${delta >= 0 ? '+' : ''}${delta}g today)${finaleReady(chain) ? ' — it now comes to a head' : ''}.${focalMet ? ` ${focal!.name} stays at the heart of it.` : ''}`);
   }
 
   private settleFinale(q: Quest, chain: Chain, r: { outcome: Outcome; party: Card[] }, report: string[], precomputed?: FinaleFate) {
