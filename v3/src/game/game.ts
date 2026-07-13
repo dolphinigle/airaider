@@ -887,8 +887,9 @@ export class Game {
       // tried ('further work', 'opens the next hire') became a card stamp ("the writer will tell
       // a name that opens your next hire" ~40% of cards); gold always rides alongside a lead,
       // and the engine's own grant line announces the lead when it lands
+      // world words only — 'a prize object' was echoed verbatim onto cards (data echoes)
       slotCount: n, rewardEnvelope: specs.filter(s => s.kind !== 'lead').map(s => (
-        { relic: 'a prize object',
+        { relic: 'a thing of worth the job turns up',
           recruit: 'a person who may join the company', captive: 'a person taken', gold: 'coin' } as Record<string, string>
       )[s.kind] ?? s.kind).join(' + '),
       keywords: sampleKeywords(this.rng),
