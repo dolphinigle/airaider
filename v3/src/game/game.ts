@@ -1192,6 +1192,12 @@ export class Game {
           ? (lastStep.replace(/^\S+\s*/, '').match(/\b[A-Z][a-z]{2,}\b/g) ?? [])
               .find(t => !castTok.has(t) && !priorToLast.includes(t))
           : undefined;
+        // a declared OBSTACLE that never appears in any arc step is dead cast — the chain has no
+        // antagonist and reads as a pure fetch (batch R: Rolon, Celarion; batch Q: Oxel — all
+        // absent). Checks NAME presence, not behaviour (a helpful "obstacle" is too fuzzy to lint).
+        const obstacleEntry = d.cast.find(x => x.role === 'obstacle');
+        const obstacleAbsent = obstacleEntry && !d.arc.some(s =>
+          new RegExp(`\\b${obstacleEntry.name.split(/\s+/)[0]!.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(s));
         // dup RIDES ALONG whatever why is reported: an early clash-return once masked a live-chain
         // dup from the post-retry mechanical recast (29010: Nurisea obstacled two live sagas)
         if (focalMissing) return { why: `your rejected draft's cast is missing ${focal.name} — the saga is ABOUT them; they must be a cast entry`, dup: clientDup };
@@ -1201,6 +1207,7 @@ export class Game {
         if (nullStep) return { why: `your rejected draft's arc contains a step that merely confirms or verifies something ("${nullStep}") — a null job; every step must CHANGE the situation: gain ground, gain leverage, or raise the stakes`, dup: clientDup };
         if (ceremonyMono) return { why: `your rejected draft settles its matter with an oath, judgment, or ceremony — as the player's recent sagas already did; settle THIS matter by an entirely different means (a chase, a trade, a siege, an escape, a betrayal exposed, a debt collected — anything but a gathering that swears or judges)`, dup: clientDup };
         if (offContractPlace) return { why: `your rejected draft's LAST step delivers the hired thing to "${offContractPlace}" — but the hire brings it HOME (to the fort or to the client in hand); the closing step settles AT THE FORT the company already holds, never at a fresh meeting-place invented for the ending`, dup: clientDup };
+        if (obstacleAbsent) return { why: `your rejected draft names ${obstacleEntry!.name} as the obstacle, yet they appear in NO arc step — the one who stands in the company's way must actively BLOCK a step (guard the prize, refuse, fight, or flee) in the step where the company meets them; write them into that step or give the part to no one`, dup: clientDup };
         if (conjured) return { why: `your rejected draft's arc touches ${conjured} that no earlier step yielded and neither the goal nor the cast introduced — every place, person, and tool a step USES must come from the hire, the goal, or an earlier step's yield (new things enter only as a step's own "→ yields:")`, dup: clientDup };
         if (clash) return { why: `your rejected draft "${d.title} — ${d.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground`, dup: clientDup };
         if (custodyGhost) return { why: `your rejected draft placed ${custodyGhost} in the company's custody — they passed out of the company's reach and are FREE in the world; rebuild the saga around where they actually stand`, dup: clientDup };
@@ -2297,7 +2304,10 @@ export class Game {
       tensions: chain.bible.tensions.map(scrub),
       openDirections: chain.bible.openDirections.map(scrub),
       twist: withholdTwist ? null : typeof chain.bible.twist === 'string' ? scrub(chain.bible.twist) : chain.bible.twist,
-      cast: chain.bible.cast.map((m): unknown => offstageCast.includes(m) ? { who: m.who, want: m.want, role: m.role, offstage: true } : m),
+      // offstage cast pass ROLE ONLY — who/want carry the future person's identity and desire,
+      // which the writer voices through an invented witness to spoil them (batch R: Telare
+      // "remembers a wandering lizardman smith", the step-2 prize). Omission is the fix.
+      cast: chain.bible.cast.map((m): unknown => offstageCast.includes(m) ? { role: m.role, offstage: true } : m),
     };
   }
 
