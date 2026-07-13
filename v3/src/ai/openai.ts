@@ -304,11 +304,13 @@ export function makeOpenAiProvider(): AiProvider {
     try {
       // effort per tier (STORY_ENGINE §10.5): prose at low (PROMPTS.md — latency is gameplay),
       // the mechanical nano tier at minimal
+      // reasoning_effort exists only on the gpt-5 (reasoning) family; 4.x models reject it
+      const isReasoning = /^gpt-5/.test(model);
       const res = await client.chat.completions.create({
         model,
         messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
         response_format: { type: 'json_object' },
-        reasoning_effort: effort ?? (model === NANO_MODEL ? 'minimal' : 'low'),
+        ...(isReasoning ? { reasoning_effort: effort ?? (model === NANO_MODEL ? 'minimal' : 'low') } : {}),
       } as never) as OpenAI.Chat.Completions.ChatCompletion;
       usage.calls++;
       const inTok = res.usage?.prompt_tokens ?? 0;
@@ -409,7 +411,7 @@ export function makeOpenAiProvider(): AiProvider {
         'Respond as JSON: {title, kernel, cast:[{name, who, want, role, loreId?}], situation, goal, arc:[expectedBeats short step strings], twistReveal, tensions:[2-4 short strings: obstacles along the road to the goal], openDirections:[2 strings: one concrete next step toward the goal, one pressure that unfolds with or without the company], relevantIds:[every slate/focal id you used anywhere — a simple checksum of reuse], newPlaces:[{name,blurb}], newEdges:[{from,to,type,blurb,importance}]}.',
         'newEdges = NEW history between EXISTING people only (ids from slate/focal): blurb one line, importance a NUMBER 0-1 (0.8+ = defining). Coined-cast ties live in the bible itself — an empty array is often right. A tie touching a company soldier grows only from hooks their dossier already holds.',
         // recency anchor (§0)
-        '═══ ABOVE ALL (write now) ═══\n1. The arc is a SIMPLE causal chain: each step uses the previous step\'s yield and ends "→ yields: …" (except the last); the thing to be found appears only AFTER "→ yields:", never in the errand half.\n2. NOTHING ENTERS FROM NOWHERE: every person, place, and object a step touches comes from the hire, that step\'s own named ground, or an earlier step\'s yield — a rescuer, key, or destination that first appears in the step that needs it is a broken story.\n3. The LAST step settles the CLIENT\'s hire AS CONTRACTED: the client receives what they hired for, or visibly loses it — an arc step never refuses or defies the client (when the truth turns against the hire, the last step PRESENTS that reckoning; it does not decide it). The focal\'s ending (kind) rides WITH the settlement, never instead of it.\n4. situation HIDES the twist; twistReveal alone carries it. Cast strictly 1-3, each with a real part; differ from every avoid entry.\nRespond as the JSON object specified above — nothing else.',
+        '═══ ABOVE ALL (write now) ═══\n1. The arc is a SIMPLE causal chain: each step uses the previous step\'s yield and ends "→ yields: …" (except the last); the thing to be found appears only AFTER "→ yields:", never in the errand half.\n2. NOTHING ENTERS FROM NOWHERE: every person, place, and object a step touches comes from the hire, that step\'s own named ground, or an earlier step\'s yield — a rescuer, key, or destination that first appears in the step that needs it is a broken story.\n3. The LAST step settles the CLIENT\'s hire AS CONTRACTED, at the ground the hire named — carried to the client, or home to the fort/your keeping; when the hire delivers home it ends AT THE FORT, never at a fresh meeting-place invented for the ending, and the prize reaches the client, no one else. The client receives what they hired for or visibly loses it — an arc step never refuses the client (when the truth turns against the hire, the last step PRESENTS that reckoning; it does not decide it). The focal\'s ending (kind) rides WITH the settlement, never instead of it.\n4. situation HIDES the twist; twistReveal alone carries it. Cast strictly 1-3, each with a real part; differ from every avoid entry.\nRespond as the JSON object specified above — nothing else.',
       ].join('\n');
       // 🛠 genesis stays at MEDIUM: 1-2 calls per saga, no gameplay latency, and the bible seeds
       // every downstream card (cards/resolve reverted to low after the 39019/40020 A/B)

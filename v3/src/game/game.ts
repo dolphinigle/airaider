@@ -1175,6 +1175,23 @@ export class Game {
             if (!castTok.has(tok) && !prior.includes(tok)) { conjured = `"${tok}" (step ${i + 1})`; break; }
           }
         }
+        // settle-as-contracted (saga batch N: 3/8 arcs end off-contract — the hired thing lands
+        // at a fresh meeting-place, not where the hire pointed). Where the hire delivers HOME —
+        // to the fort/your keeping or to the client themselves — the last step must NOT invent an
+        // external delivery-place: the fort is ground the company already holds (37017 quay for
+        // "the fort's cells"). Detected only for home-delivery goals; external-destination hires
+        // (a named tent/crossing the client sends the party to) are legitimate and left alone.
+        const lastStep = d.arc[d.arc.length - 1] ?? '';
+        const goalHome = /\b(fort|the cells|our (keeping|hall|cells))\b/i.test(d.goal)
+          || /\b(to|into) (me|my (keeping|custody)|the client|us)\b/i.test(d.goal);
+        // a FRESH place (not the goal, cast, or any earlier step — same conservation test as
+        // conjured) that the last step delivers to, when the hire is a home-delivery: the model
+        // invents a meeting-scene instead of coming back to the fort it already holds
+        const priorToLast = `${d.goal} ${d.arc.slice(0, -1).join(' ')}`;
+        const offContractPlace = goalHome && !/\bthe fort\b/i.test(lastStep)
+          ? (lastStep.replace(/^\S+\s*/, '').match(/\b[A-Z][a-z]{2,}\b/g) ?? [])
+              .find(t => !castTok.has(t) && !priorToLast.includes(t))
+          : undefined;
         // dup RIDES ALONG whatever why is reported: an early clash-return once masked a live-chain
         // dup from the post-retry mechanical recast (29010: Nurisea obstacled two live sagas)
         if (focalMissing) return { why: `your rejected draft's cast is missing ${focal.name} — the saga is ABOUT them; they must be a cast entry`, dup: clientDup };
@@ -1183,6 +1200,7 @@ export class Game {
         if (step1Delivers) return { why: `your rejected draft's FIRST arc step already performs a delivery or handover — the goal is NOT done at step 1: step 1 is taking the job plus a first leg of field work, and every delivery belongs to a later step`, dup: clientDup };
         if (nullStep) return { why: `your rejected draft's arc contains a step that merely confirms or verifies something ("${nullStep}") — a null job; every step must CHANGE the situation: gain ground, gain leverage, or raise the stakes`, dup: clientDup };
         if (ceremonyMono) return { why: `your rejected draft settles its matter with an oath, judgment, or ceremony — as the player's recent sagas already did; settle THIS matter by an entirely different means (a chase, a trade, a siege, an escape, a betrayal exposed, a debt collected — anything but a gathering that swears or judges)`, dup: clientDup };
+        if (offContractPlace) return { why: `your rejected draft's LAST step delivers the hired thing to "${offContractPlace}" — but the hire brings it HOME (to the fort or to the client in hand); the closing step settles AT THE FORT the company already holds, never at a fresh meeting-place invented for the ending`, dup: clientDup };
         if (conjured) return { why: `your rejected draft's arc touches ${conjured} that no earlier step yielded and neither the goal nor the cast introduced — every place, person, and tool a step USES must come from the hire, the goal, or an earlier step's yield (new things enter only as a step's own "→ yields:")`, dup: clientDup };
         if (clash) return { why: `your rejected draft "${d.title} — ${d.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground`, dup: clientDup };
         if (custodyGhost) return { why: `your rejected draft placed ${custodyGhost} in the company's custody — they passed out of the company's reach and are FREE in the world; rebuild the saga around where they actually stand`, dup: clientDup };
@@ -1399,11 +1417,14 @@ export class Game {
       // 'side loot' ×4, then its replacement ×5; rotation breaks the stamp)
       rewardEnvelope: isFinale
         ? `${this.card(chain.focalId)?.name ?? 'the central person'} — likely ${chain.isPersonal ? 'the matter settled, the soldier stays' : chain.kind === 'gold-hoard' ? 'their treasure' : chain.kind}`
+        // FULL in-voice sentences, not gists: the writer is told to reword these, but cheap
+        // models paste the DATA verbatim (batch O: "pay as agreed…" ended a card lowercase) — so
+        // a paste must itself read as a clean card sentence (§8 input-shaping over nagging)
         : this.rng.pick([
-            'coin as the client promised, and what the road happens to offer',
-            'the agreed fee; small findings ride home too',
-            'the client\'s coin for the step done',
-            'pay as agreed, plus anything worth carrying that turns up',
+            'The client pays the agreed coin, and the company keeps whatever the road turns up.',
+            'Honest coin for the work, and any small spoils ride home besides.',
+            'She pays as agreed, and what the company hauls back is its own to keep.',
+            'Coin as promised, and the pick of whatever the job turns up.',
           ]),
       // beats get NO opening spark (🛠 2026-07-10): a random spark fought the saga — the card
       // opens from the story state, and beat 1 from how the bible says the matter arrived
@@ -1413,7 +1434,11 @@ export class Game {
       lastBeatOutcome: chain.lastGeneratedBeat === chain.beatIndex + 1
         ? `${chain.story.lastBeatOutcome ?? ''} This same step was posed before and went untaken — pose it AFRESH in a new telling, but the SAME places and people: the world did not move while the company sat.`.trim()
         : chain.story.lastBeatOutcome,
-      bible: stagedBible, storyState: chain.story,
+      // beat 1: the canned "matter just came before the company, nothing done" status is echo-bait
+      // (batch O pasted it verbatim into 3/6 cards) and adds nothing the BEAT 1 branch doesn't say —
+      // blank it so the writer opens from the client's telling, not a stock scaffolding line
+      bible: stagedBible,
+      storyState: chain.beatIndex === 0 && !isFinale ? { ...chain.story, currentSituation: '' } : chain.story,
       relevantLore,
       focalDossier: (d => d.includes('\n') ? d : undefined)(this.dossier(chain.focalId)),
       beatIndex: chain.beatIndex + 1, expectedBeats: chain.expectedBeats,
