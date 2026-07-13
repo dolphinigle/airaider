@@ -1381,6 +1381,19 @@ export class Game {
     // cards name the find before the party looked (lab batch C, 4/6); the RESOLVER keeps
     // the full step because it must deliver that yield
     const stripYields = (s?: string) => (s ?? '').replace(/\s*→ yields:.*$/i, '');
+    // BEAT 1's step opens "Take the job / Accept the hire and <errand>" — that lead clause is
+    // engine framing (the card is the board POSTING, read BEFORE the company accepts). Handed to
+    // the writer it gets narrated as done ("You accepted the hire and rode out", batch P 4/6);
+    // strip it so only the field errand remains and the writer renders a job TO DO, not one begun.
+    const isBeat1 = chain.beatIndex === 0 && !isFinale;
+    const stripTakeJob = (s: string) => s
+      .replace(/^\s*(?:at [^.,]+,\s*)?(?:take|accept)\b[^.]*?\b(?:hire|job)\b[^.]*?(?:\.\s+|,\s+|\s+and\s+)/i, '')
+      .replace(/^(\w)/, (_m, c: string) => c.toUpperCase());
+    // genesis writes beat-1 steps with "<the place/person> the hire named / the client named /
+    // she named" — engine framing to withhold the name at hiring. The writer echoes it as a seam
+    // ("The hire sent you to…", batch Q) — strip the qualifier so only the plain noun remains.
+    const stripHireFraming = (s: string) => s.replace(/,?\s+(?:the (?:hire|client)|s?he|they)\s+named\b/gi, '');
+    const cardStep = isBeat1 ? stripHireFraming(stripTakeJob(stripYields(dealtStep))) : stripYields(dealtStep);
     // BEAT 1's card knows only what the HIRE knows: its met-gate uses the goal alone —
     // genesis packs discovery names into step 1's errand text, and trusting stepText there
     // dumped the cast roster onto beat-1 cards (lab batch M: 6/8 leaked via this door)
@@ -1397,7 +1410,7 @@ export class Game {
     const clientEntry = (stagedRaw.cast as { role?: string; name?: string; want?: string }[]).find(m => m.role === 'client');
     const stagedBible = {
       ...stagedRaw,
-      arc: isFinale ? (stagedRaw.arc as string[]).map(stripYields) : [stripYields(dealtStep)],
+      arc: isFinale ? (stagedRaw.arc as string[]).map(stripYields) : [cardStep],
       ...(isFinale ? {} : {
         kernel: '',
         tensions: [],
@@ -1444,7 +1457,7 @@ export class Game {
       beatIndex: chain.beatIndex + 1, expectedBeats: chain.expectedBeats,
       // the ONE step this card covers, dealt verbatim — writers fumbled indexing arc[beat-1]
       // and scoped beat 1 to the whole goal
-      arcStep: stripYields(dealtStep),
+      arcStep: cardStep,
       // focalName only when the staged bible still carries the name — an unmet focal whose
       // identity is the saga's discovery must not re-enter through this side door
       focalName: focal && JSON.stringify(stagedBible).includes(focal.name.split(' ')[0]!) ? focal.name : undefined,
