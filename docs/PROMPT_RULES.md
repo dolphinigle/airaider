@@ -22,6 +22,13 @@ does NOT exist for these models — every rule added dilutes every other rule.
   concrete data (a literal ban-list, a withheld field) instead of an abstract rule; (3) structure —
   fenced, headed section; (4) wording — the weakest lever; (5) more model/effort — measured ZERO
   judge-score return at 2.3× cost on this project (seeds 39019 vs 40020, 2026-07-12).
+- **Position, once, no contradictions** *(2026-07-13, external research + measured here)*:
+  (a) small models weight the END of the prompt — the critical rules and the output schema go LAST
+  (measured here: +2.2/10 on cards from this alone); (b) every rule stated EXACTLY ONCE — OpenAI
+  measured deleting repeated rules at +10-15% score and −66% tokens; move a rule to its best
+  position, never duplicate it; (c) NEVER ship a contradiction for the model to arbitrate — a
+  "where X and Y disagree, X wins" clause means the prompt should be TWO prompts; small models
+  fail contradiction-resolution almost universally.
 
 ## 1. The AI is STATELESS and has NO game context
 It sees only what THIS prompt hands it. It does not know prior calls, our code, or our jargon.
