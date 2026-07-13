@@ -900,7 +900,10 @@ export class Game {
       // a dealt name gravitates the card ("Briis" made routine work read important). Only
       // weightier matters get ONE color name; the quarry keeps theirs via framedCharacter.
       npcNameSuggestions: gravity.includes('small') ? undefined : [this.rollNpcName(lead.region)],
-      rewardItems: rewardCards.filter(c => !c.character).map(c => c.name),
+      // rewardItems deliberately NOT dealt to the card writer (lab batches C-I: every framing
+      // of "the company keeps X" on a card bred a possession contradiction — payer paying FOR
+      // the kept thing, deliver-and-keep, prophetic loot. Omission is the class kill: cards
+      // never name prizes; the RESOLVER names them at discovery via deliveredSummary.)
       rosterNames: this.rosterForWriters().names,
       rosterPronouns: this.rosterForWriters().pronouns,
       framedCharacter: framed ? {
@@ -1359,7 +1362,10 @@ export class Game {
     // cards name the find before the party looked (lab batch C, 4/6); the RESOLVER keeps
     // the full step because it must deliver that yield
     const stripYields = (s?: string) => (s ?? '').replace(/\s*→ yields:.*$/i, '');
-    const stagedRaw = this.stageBible(chain, dealtStep, chain.beatIndex === 0 && !isFinale);
+    // BEAT 1's card knows only what the HIRE knows: its met-gate uses the goal alone —
+    // genesis packs discovery names into step 1's errand text, and trusting stepText there
+    // dumped the cast roster onto beat-1 cards (lab batch M: 6/8 leaked via this door)
+    const stagedRaw = this.stageBible(chain, chain.beatIndex === 0 && !isFinale ? '' : dealtStep, chain.beatIndex === 0 && !isFinale);
     // mid-saga CARD writers lose bible.situation entirely (lab batch E: every leak class —
     // twists, yields, later beats — drew from that well; the omission pattern is the proven
     // fix). The kernel keeps the premise; goal/cast/record carry everything a briefing knows.
@@ -1388,9 +1394,16 @@ export class Game {
       location: this.locationLine(chain.region, !!REGION[chain.region]?.landmark && JSON.stringify(chain.bible).includes(REGION[chain.region]!.landmark!), false),
       level: chain.level, rarity: chain.rarity, slotCount: n,
       // the person's NAME, never engine words — "custody of the focal" once printed on a card
+      // world-worded AND rotated — any fixed string stamps (models echo DATA fields:
+      // 'side loot' ×4, then its replacement ×5; rotation breaks the stamp)
       rewardEnvelope: isFinale
         ? `${this.card(chain.focalId)?.name ?? 'the central person'} — likely ${chain.isPersonal ? 'the matter settled, the soldier stays' : chain.kind === 'gold-hoard' ? 'their treasure' : chain.kind}`
-        : 'side loot',
+        : this.rng.pick([
+            'coin as the client promised, and what the road happens to offer',
+            'the agreed fee; small findings ride home too',
+            'the client\'s coin for the step done',
+            'pay as agreed, plus anything worth carrying that turns up',
+          ]),
       // beats get NO opening spark (🛠 2026-07-10): a random spark fought the saga — the card
       // opens from the story state, and beat 1 from how the bible says the matter arrived
       placeNameSuggestions: [this.freshPlaceName(chain.region)],
