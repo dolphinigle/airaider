@@ -1399,7 +1399,11 @@ export class Game {
     // genesis writes beat-1 steps with "<the place/person> the hire named / the client named /
     // she named" — engine framing to withhold the name at hiring. The writer echoes it as a seam
     // ("The hire sent you to…", batch Q) — strip the qualifier so only the plain noun remains.
-    const stripHireFraming = (s: string) => s.replace(/,?\s+(?:the (?:hire|client)|s?he|they)\s+named\b/gi, '');
+    const stripHireFraming = (s: string) => s
+      .replace(/,?\s+(?:the (?:hire|client)|s?he|they)\s+named\b/gi, '')
+      // "using only what X knows" is genesis literalising the internal "hire-knowledge only"
+      // rule; the writer echoed it as prose ("asks you to use only what he knows", batch S)
+      .replace(/,?\s+using only (?:what [^,.]+? knows|[^,.]+?'s (?:information|knowledge|word|lead))/gi, '');
     const cardStep = isBeat1 ? stripHireFraming(stripTakeJob(stripYields(dealtStep))) : stripYields(dealtStep);
     // BEAT 1's card knows only what the HIRE knows: its met-gate uses the goal alone —
     // genesis packs discovery names into step 1's errand text, and trusting stepText there
