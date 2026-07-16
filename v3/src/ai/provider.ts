@@ -31,7 +31,6 @@ export interface QuestWriteInput {
                                  // pattern — the POV-lock otherwise makes "a messenger arrives" the model's
                                  // only epistemic device; ~92% of cards opened on one)
   gravity?: string;              // one-offs: engine-rolled weight of the matter ("a small, everyday job" … "a grave affair")
-  npcNameSuggestions?: string[]; // one-offs: engine-rolled names for any people the card must name (§4b)
   rewardItems?: string[];        // one-offs: the pre-rolled prize objects — fiction naming the prize must use these
   placeNameSuggestions?: string[]; // engine-rolled fresh place names (variety fuel)
   rosterNames?: string[];        // the player's own soldiers — NEVER card NPCs

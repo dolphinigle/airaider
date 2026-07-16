@@ -889,7 +889,8 @@ export class Game {
       // and the engine's own grant line announces the lead when it lands
       // world words only — 'a prize object' was echoed verbatim onto cards (data echoes)
       slotCount: n, rewardEnvelope: specs.filter(s => s.kind !== 'lead').map(s => (
-        { relic: 'a thing of worth the job turns up',
+        // pre-shaped to read whole if pasted: 'a thing of worth…' echoed as "any thing of worth"
+        { relic: 'the pick of what the job turns up',
           recruit: 'a person who may join the company', captive: 'a person taken', gold: 'coin' } as Record<string, string>
       )[s.kind] ?? s.kind).join(' + '),
       keywords: sampleKeywords(this.rng),
@@ -897,16 +898,16 @@ export class Game {
       intake,
       gravity,
       placeNameSuggestions: [this.freshPlaceName(lead.region), this.freshPlaceName(lead.region)],
-      // ANONYMITY BY OMISSION (2026-07-06 ruling): a small job's folk stay nameless by trade —
-      // a dealt name gravitates the card ("Briis" made routine work read important). Only
-      // weightier matters get ONE color name; the quarry keeps theirs via framedCharacter.
-      npcNameSuggestions: gravity.includes('small') ? undefined : [this.rollNpcName(lead.region)],
+      // ANONYMITY BY OMISSION (2026-07-06; widened 2026-07-16 designer ruling): one-off folk
+      // stay nameless by trade with NO gravity exception — any dealt name gravitates the card
+      // ("Briis" made routine work read important). The quarry keeps theirs via
+      // framedCharacter; anyone who materializes is engine-named at flesh time (§4b).
       // rewardItems deliberately NOT dealt to the card writer (lab batches C-I: every framing
       // of "the company keeps X" on a card bred a possession contradiction — payer paying FOR
       // the kept thing, deliver-and-keep, prophetic loot. Omission is the class kill: cards
       // never name prizes; the RESOLVER names them at discovery via deliveredSummary.)
-      rosterNames: this.rosterForWriters().names,
-      rosterPronouns: this.rosterForWriters().pronouns,
+      // roster deliberately NOT dealt to one-offs (2026-07-16): its only rule was "never use
+      // these" — pure copy-bait for a cheap model. Saga cards still get it (focalIsMerc).
       framedCharacter: framed ? {
         name: framed.name, tags: renderTags(framed.tags),
         // pronoun EXPLICIT — an echo-rescued "Claet" once flipped sex and peril on return
@@ -1450,8 +1451,14 @@ export class Game {
         : this.rng.pick([
             'The client pays the agreed coin, and the company keeps whatever the road turns up.',
             'Honest coin for the work, and any small spoils ride home besides.',
-            'She pays as agreed, and what the company hauls back is its own to keep.',
+            // every string sex-neutral: a hardcoded 'She pays…' was pasted under male clients
+            'Pay stands as agreed, and what the company hauls back is its own to keep.',
             'Coin as promised, and the pick of whatever the job turns up.',
+            // pool of 4 stamped visibly (same string verbatim on 3 cards per campaign) — widened
+            'Coin on the work done, and what the party carries home besides is the company\'s.',
+            'The fee is agreed, and any spoils along the way stay with the company.',
+            'Plain coin for plain work, and what the road yields is the company\'s to keep.',
+            'The pay is fixed, and what else the job shakes loose the company keeps.',
           ]),
       // beats get NO opening spark (🛠 2026-07-10): a random spark fought the saga — the card
       // opens from the story state, and beat 1 from how the bible says the matter arrived
@@ -1488,9 +1495,14 @@ export class Game {
         whereabouts: chain.story.actorStates,
         known: [...(chain.story.introducedNames ?? []), chain.bible.goal, ...chain.story.knownToPlayer],
       }).catch(() => ({ ok: true, defects: [] }));
-      if (!rev.ok && rev.defects.length) {
-        this.log('chain', `saga card re-written: cold reader flagged ${rev.defects.length} defect(s)`);
-        out = await this.ai.writeQuest({ ...wqInput, fixNotes: rev.defects });
+      // §0 lever-1 lint: mechanical defects a regex catches never spend the cold reader's budget
+      // (batch W: body restated the job line on 5/8 cards, scaffold voice on 3/8). Re-lint after
+      // each rewrite — batch X showed a single unchecked pass REINTRODUCES the flagged defect.
+      for (let pass = 0; pass < 2; pass++) {
+        const flaws = [...this.lintCard(out), ...(pass === 0 && !rev.ok ? rev.defects : [])];
+        if (!flaws.length) break;
+        this.log('chain', `saga card re-written (pass ${pass + 1}): ${flaws.length} defect(s) flagged`);
+        out = await this.ai.writeQuest({ ...wqInput, fixNotes: flaws });
       }
     }
     if (!isFinale) this.cachedBeatOut.set(chain.id, { beat: chain.beatIndex + 1, out });
@@ -2187,22 +2199,24 @@ export class Game {
       || Object.values(this.state.lore.nodes).some(nd => nd.active && nd.kind === 'character' && hit(nd.name));
   }
 
-  /** fresh NPC-name material for one-off cards — the writer may not invent names, so the engine
-   *  must deal some (region-raced, similarity-checked like all character names) */
-  private rollNpcName(region: string): string {
-    const races = Object.entries(REGION[region]?.poolWeights ?? { human: 1 }) as [string, number][];
-    let name = rollName(this.rng, 'human');
-    for (let i = 0; i < 12; i++) {
-      const n = rollName(this.rng, this.rng.weighted(races), this.rng.pick(['male', 'female']));
-      if (!this.nameTooSimilar(n)) { name = n; break }
-    }
-    this.recentNpcNames.push(name);
-    if (this.recentNpcNames.length > 60) this.recentNpcNames.shift();   // 20 was too small: Elmwhisper reused 14 cycles apart
-    return name;
-  }
 
   /** roster as the writers see it — names + a SEPARATE pronoun map ("Uneneth (she)" inline got
    *  copied verbatim into prose; a map is metadata the model won't quote) */
+  /** deterministic saga-card lint (§0 lever 1) — each hit becomes a fixNote for the one rewrite pass */
+  private lintCard(out: { situation: string; job: string }): string[] {
+    const d: string[] = [];
+    const words = (s: string) => s.toLowerCase().replace(/[^a-z' ]/g, ' ').split(/\s+/).filter(w => w.length > 3);
+    const jw = new Set(words(out.job));
+    const dup = out.situation.split(/(?<=[.!?])\s+/).some(sent => {
+      const overlap = words(sent).filter(w => jw.has(w));
+      return jw.size >= 4 && overlap.length >= jw.size * 0.7;
+    });
+    if (dup) d.push('a situation sentence restates the job line nearly word-for-word — the body tells the MATTER; the job line alone carries the errand');
+    if (/\b(your task is|this step is|the hire)\b/i.test(`${out.situation} ${out.job}`))
+      d.push('scaffold voice on the card ("your task is", "this step is", "the hire") — say the errand as the outcome wanted, in world words');
+    return d;
+  }
+
   private rosterForWriters(): { names: string[]; pronouns: Record<string, string> } {
     const pronouns: Record<string, string> = {};
     const names = this.roster().map(m => {
