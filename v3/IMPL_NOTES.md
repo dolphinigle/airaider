@@ -1493,3 +1493,31 @@ words; the model composes; variety = combinations, not entry count.
   REMAINING (stable, well-characterized): late-arc unearned entries the lint can't see
   (lowercase common nouns like "the cure"; persistent drafts ship after retries), the last
   step drifting off the hire, beat-1 job lines folding in the goal's final delivery.
+
+## Prompt sweep rounds 1–3 — executed-arc to target (2026-07-16/17, #372)
+
+Fix→judge loop (promptlab/oneofflab/campaignread → fresh Fable judges), commit only verified.
+**Executed-ARC 5.0/5.7 (two old-prompt campaign seeds) → 8.0 → 8.1**; one-off cards 6.0 → 6.5
+with 0 name leaks in 36; commits 4f33ed1 · 6f7502f · 803a579 (+ 38427ed GUI pending feedback).
+
+1. **Arc scope (genesis)**: step 1 locates/gains access only; the goal's prize moves ONLY at the
+   last step; finale opposed by the CAST's own unbeaten entry (wording "must be opposed" alone
+   made the model conjure uncast opponents — pin the requirement to its ground); ≥1 cast entry
+   resists the goal. Fake-success + beat-1 over-scope: dominant → 0.
+2. **WHEREABOUTS**: resolver pins each step's key object + every moved person (was "only what
+   changed" → unpopulated ledger → teleports 6 hard/seed → 1).
+3. **One-off anonymity (designer ruling 2026-07-16, widens 2026-07-06)**: one-offs get NO npc
+   name deals (any dealt name gravitates the card) and NO roster feed (never-use data =
+   copy-bait). framedCharacter still carries engine names (§4b intact).
+4. **Own-data echoes were three separate "AI bugs"**: hardcoded 'She pays…' in the pay rotation
+   (pool now sex-neutral, widened 4→8 vs verbatim stamping), first-person goal strings flipping
+   referents when pasted (goal now third-person), instruction-label-in-data on the beat
+   situation field. Any string another prompt will paste must read clean pasted.
+5. **Card lint (engine, lever 1)**: job-line restatement + scaffold voice ("your task is",
+   "the hire") reject the draft into the fixNotes rewrite, RE-LINTED ≤2 passes (an unchecked
+   pass reintroduced the flagged defect); dup windows cover adjacent sentence PAIRS with
+   suffix normalization (batch Y's evasion: restatement split across two sentences).
+REMAINING (characterized, next round): chain-possession breaks (finale asserts holding a person
+no step acquired, 2/6), place-distinctness collapse (whole arc in one location), one-off payer
+blur (two anonymous payer roles on one card), vacuous keep-clauses, coin staged in ~2/11
+resolutions, "the hire" persisting in arc-plan text (cards clean).
