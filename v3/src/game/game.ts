@@ -2202,16 +2202,22 @@ export class Game {
 
   /** roster as the writers see it — names + a SEPARATE pronoun map ("Uneneth (she)" inline got
    *  copied verbatim into prose; a map is metadata the model won't quote) */
-  /** deterministic saga-card lint (§0 lever 1) — each hit becomes a fixNote for the one rewrite pass */
+  /** deterministic saga-card lint (§0 lever 1) — each hit becomes a fixNote for the rewrite pass */
   private lintCard(out: { situation: string; job: string }): string[] {
     const d: string[] = [];
-    const words = (s: string) => s.toLowerCase().replace(/[^a-z' ]/g, ' ').split(/\s+/).filter(w => w.length > 3);
+    // suffix-normalized so "grove's"/"knows" match "grove"/"know"
+    const words = (s: string) => s.toLowerCase().replace(/[^a-z ]/g, ' ').split(/\s+/)
+      .filter(w => w.length > 3).map(w => w.replace(/s$/, ''));
     const jw = new Set(words(out.job));
-    const dup = out.situation.split(/(?<=[.!?])\s+/).some(sent => {
-      const overlap = words(sent).filter(w => jw.has(w));
-      return jw.size >= 4 && overlap.length >= jw.size * 0.7;
+    const sents = out.situation.split(/(?<=[.!?])\s+/);
+    // single sentences AND adjacent pairs: batch Y evaded the per-sentence check by splitting
+    // the restatement across two neighboring sentences
+    const windows = [...sents, ...sents.slice(1).map((s, i) => `${sents[i]} ${s}`)];
+    const dup = jw.size >= 4 && windows.some(win => {
+      const overlap = new Set(words(win).filter(w => jw.has(w)));
+      return overlap.size >= jw.size * 0.7;
     });
-    if (dup) d.push('a situation sentence restates the job line nearly word-for-word — the body tells the MATTER; the job line alone carries the errand');
+    if (dup) d.push('the situation restates the job line nearly word-for-word — the body tells the MATTER; the job line alone carries the errand');
     if (/\b(your task is|this step is|the hire)\b/i.test(`${out.situation} ${out.job}`))
       d.push('scaffold voice on the card ("your task is", "this step is", "the hire") — say the errand as the outcome wanted, in world words');
     return d;
