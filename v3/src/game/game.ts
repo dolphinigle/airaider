@@ -1418,7 +1418,6 @@ export class Game {
     // tensions, openDirections; each was closed by OMISSION, the session's one reliably
     // winning move). The client's open telling is composed from card-safe fields only:
     // the goal (already player-known by design) and the client's own want.
-    const clientEntry = (stagedRaw.cast as { role?: string; name?: string; want?: string }[]).find(m => m.role === 'client');
     const stagedBible = {
       ...stagedRaw,
       arc: isFinale ? (stagedRaw.arc as string[]).map(stripYields) : [cardStep],
@@ -1426,7 +1425,11 @@ export class Game {
         kernel: '',
         tensions: [],
         openDirections: [],
-        situation: `THE CLIENT'S OPEN TELLING (this IS card material — the hook carries its why): ${stagedRaw.goal}${clientEntry?.name && clientEntry?.want ? ` ${clientEntry.name} wants ${clientEntry.want}.` : ''} The truth beyond this stays hidden until the party finds it; write from this telling, the dealt step, the cast, and the record.`,
+        // §0 input-shaping: this field is DATA, not instructions — the "client's open telling /
+        // truth stays hidden" framing lives in the SYSTEM prompt (sagaSystem THE STEP). Embedding
+        // a bracketed label here made cheap models paste it onto the card, and appending the
+        // client's want (≈ the goal for a client) produced a doubled run-on. Hand the telling clean.
+        situation: stagedRaw.goal,
       }),
     };
     const wqInput = ({
