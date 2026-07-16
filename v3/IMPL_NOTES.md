@@ -1521,3 +1521,26 @@ REMAINING (characterized, next round): chain-possession breaks (finale asserts h
 no step acquired, 2/6), place-distinctness collapse (whole arc in one location), one-off payer
 blur (two anonymous payer roles on one card), vacuous keep-clauses, coin staged in ~2/11
 resolutions, "the hire" persisting in arc-plan text (cards clean).
+
+## Seeds, genesis latency, and the guard verdict (2026-07-17, #372)
+1. **Fresh games roll fresh seeds** (server + CLI; was a fixed 42): every restart replayed the
+   identical RNG draw sequence — the "keywords feel too few / same words every run" report was
+   seed replay, not pool size. `AIRAIDER_SEED` / `--seed` pins a run for repro.
+2. **Genesis latency budget (designer ruling)**: ONE re-roll max per pursue (was up to 4
+   sequential MEDIUM calls ≈ 3–4 min per click).
+3. **Guard verdict (scripts/guardlab.ts: 2×12 real pursues + blind judge on 7 rejected-vs-
+   shipped pairs)**: re-rolling on story-SHAPE defects is net NEGATIVE — fire rate 58–67%,
+   +50s mean latency, re-rolled bibles LOST to their rejected originals 5/7 (mean 5.3 vs 6.0);
+   the avoid-note nag degrades the second draft. Shape lints (parked/conjured/step1-delivers/
+   null-step/ceremony-mono/off-contract/absent-obstacle) are LOG-ONLY telemetry now. Re-roll
+   survives only for engine-breaking defects: focal missing, custody ghost, premise clash
+   (seed burn IS the fix). Dup cast stays free mechanical recast. Also fixed the proper-noun
+   heuristic: capitalization counts only MID-sentence ("Beat"/"Force"/"Defeat" at sentence
+   starts fired 3/12 false rejects, each burning ~74s + the seed).
+4. **Keyword pools 1784 → 2490** under the style bar (+BOND bar: strong enough to hire over —
+   "shyness" class culled). Card-BANNED prose words purged from pools as copy-bait ('fate',
+   'destiny', 'shadow' pre-existing, 'burden' incoming). Small pools (MOODS 48, OCCASIONS 154,
+   UNCANNY 144) cap far below the 1000 target — the vocabulary runs out before the bar does;
+   THINGS/TIE/QUALITIES/PEOPLE can still grow in a future top-up round.
+5. **GUI**: in-flight AI-log records say "still running" (was "(not recorded)"); genesis
+   re-rolls log visibly (were phantom duplicate geneses).
