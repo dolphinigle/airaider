@@ -1217,6 +1217,8 @@ export class Game {
       };
       let issue = issues(g);
       for (let retry = 0; issue && retry < 2; retry++) {
+        // visible in the log tab — without this, guard re-rolls read as phantom duplicate geneses
+        this.log('chain', `saga draft rejected (re-rolling): ${issue.why.slice(0, 120)}…`);
         g = await this.ai.genesis({ ...genesisInput, avoid: [...avoid, issue.why] });
         issue = issues(g);
       }
@@ -1228,6 +1230,7 @@ export class Game {
       // a stubborn non-cast defect (premise clash, parked arc, delivery-first arc) survives the
       // retries because the SEED itself keeps pulling the model back — burn the seed, go once more
       if (issue && !issue.why.includes('already bound up') && !issue.why.includes("company's own soldiers")) {
+        this.log('chain', `saga draft rejected again — burning the seed and re-rolling once more`);
         g = await this.ai.genesis({ ...genesisInput, seed: sampleSeed(this.rng), avoid: [...avoid, issue.why] });
         issue = issues(g);
       }

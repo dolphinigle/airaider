@@ -455,7 +455,7 @@ function AiLog({ s }: any) {
             </tr>
             <tr><td colSpan={9}>
               <details><summary>prompt + output</summary>
-                <pre style={{ whiteSpace: 'pre-wrap' }}>SYSTEM (start):{'\n'}{r.systemPreview}{'\n\n'}USER:{'\n'}{pretty(r.userPrompt)}{'\n\n'}OUTPUT:{'\n'}{pretty(r.output)}</pre>
+                <pre style={{ whiteSpace: 'pre-wrap' }}>SYSTEM (start):{'\n'}{r.systemPreview}{'\n\n'}USER:{'\n'}{pretty(r.userPrompt)}{'\n\n'}OUTPUT:{'\n'}{inflight ? '(still running — no output yet)' : pretty(r.output)}</pre>
               </details>
             </td></tr>
           </React.Fragment>

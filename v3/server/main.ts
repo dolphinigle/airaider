@@ -31,15 +31,18 @@ function slog(entry: Record<string, unknown>) {
   } catch { /* logging must never break play */ }
 }
 const useOpenAi = process.env.AIRAIDER_AI === 'openai';
-const ai = useOpenAi ? makeOpenAiProvider() : new MockProvider(Number(process.env.AIRAIDER_SEED ?? 42));
+// a fresh game rolls a fresh seed — a fixed default (42) replayed the exact same keyword/name
+// draw sequence every restart ("shyness" on every playthrough). Pin AIRAIDER_SEED for repro.
+const seed = Number(process.env.AIRAIDER_SEED ?? Date.now() % 2 ** 31);
+const ai = useOpenAi ? makeOpenAiProvider() : new MockProvider(seed);
 
 let game: Game;
 if (fs.existsSync(SAVE) && !process.env.AIRAIDER_FRESH) {
   game = Game.load(ai, fs.readFileSync(SAVE, 'utf8'));
   console.log(`[server] loaded ${SAVE} (cycle ${game.state.cycle})`);
 } else {
-  game = new Game(ai, Number(process.env.AIRAIDER_SEED ?? 42));
-  console.log('[server] fresh game');
+  game = new Game(ai, seed);
+  console.log(`[server] fresh game (seed ${seed} — set AIRAIDER_SEED to replay it)`);
 }
 let lastReport: string[] = [];
 

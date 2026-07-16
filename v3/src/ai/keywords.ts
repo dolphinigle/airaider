@@ -7,6 +7,8 @@
 // STYLE BAR: one word (two only for a common lexical unit with no one-word form); a curious
 // twelve-year-old knows it; plain English first, low-medieval compatible; no proper nouns;
 // no anachronisms; no dictionary-obscure medievalia; never a pose or a joke; no cross-pool dupes.
+// BOND bar (2026-07-17 designer flag: "shyness"): a BOND word must be strong enough to make
+// someone HIRE mercenaries or start a quarrel — inward micro-discomforts don't qualify.
 
 import type { Rng } from '../engine/rng.js';
 
@@ -24,8 +26,8 @@ export const BOND: string[] = [
   'boredom', 'weariness', 'desire', 'satisfaction', 'contentment', 'calm', 'doubt',
   'certainty', 'conviction', 'confusion', 'bewilderment', 'astonishment', 'surprise', 'shock',
   'dismay', 'disappointment', 'frustration', 'exasperation', 'irritation', 'annoyance',
-  'anger', 'wrath', 'hatred', 'hostility', 'grudge', 'embarrassment', 'shyness',
-  'nervousness', 'anxiety', 'apprehension', 'foreboding', 'anticipation', 'eagerness',
+  'anger', 'wrath', 'hatred', 'hostility', 'grudge',
+  'anxiety', 'apprehension', 'foreboding', 'anticipation', 'eagerness',
   'excitement', 'thrill', 'elation', 'triumph', 'gloating', 'smugness', 'wonder',
   'gloom', 'cheer', 'mirth', 'sulking', 'brooding', 'pining', 'aching', 'numbness',
   // stances & habits

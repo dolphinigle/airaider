@@ -29,7 +29,8 @@ function slog(entry: Record<string, unknown>) {
 }
 
 async function main() {
-  const seed = Number(opt('seed') ?? 42);
+  // fresh seed per run — a fixed default replayed the same draws every game (--seed pins one)
+  const seed = Number(opt('seed') ?? Date.now() % 2 ** 31);
   let ai: AiProvider;
   if (flag('ai')) {
     ai = makeOpenAiProvider();
