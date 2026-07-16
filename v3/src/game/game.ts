@@ -1117,7 +1117,7 @@ export class Game {
       const recentRole = new Set(this.state.chains.slice(-3)
         .flatMap(c => c.bible.cast.filter(x => x.role === 'client' || x.role === 'obstacle').map(x => `${x.role}:${personKey(x)}`)));
       const soldierKeys = new Set(slate.filter(s => s.companySoldier).flatMap(s => [s.id, s.name]));
-      const issues = (d: typeof g): { why: string; dup?: (typeof g.cast)[number] } | null => {
+      const issues = (d: typeof g): { why: string; hard?: boolean; dup?: (typeof g.cast)[number] } | null => {
         for (const m of d.cast) if (!m.loreId && loreByName.has(m.name)) m.loreId = loreByName.get(m.name);
         // cast + coined places join the fingerprint — five deliver-to-a-ceremony sagas with the
         // same client shipped in one run while title+kernel alone stayed just under the bar
@@ -1150,12 +1150,17 @@ export class Game {
         // let a merc ship as another saga's salvage claimant (32012: Koralla)
         const soldierCast = d.cast.find(x => x.loreId !== focal.id && x.name !== focal.name &&
           ((x.loreId && soldierKeys.has(x.loreId)) || soldierKeys.has(x.name)));
+        // capitalization marks a proper noun only MID-sentence — a capitalized word opening a
+        // step OR any later sentence is just English (guardlab 81001: sentence-start imperatives
+        // "Beat", "Force", "Defeat" fired the conjured lint on 3/12 clean arcs — every false
+        // fire burned ~74s and the seed)
+        const properTokens = (s: string) => new Set(
+          s.split(/(?<=[.!?])\s+/).flatMap(f => f.replace(/^\S+\s*/, '').match(/\b[A-Z][a-z]{2,}\b/g) ?? []));
         // parked arc: a place token staged in 3+ steps means the beats replay one scene
         // (34014: three defend-the-hearing-at-the-oak beats; the ARC SHAPE rule alone failed).
-        // first word of each step is skipped (imperative verbs are capitalized there)
         const castTok = new Set(d.cast.flatMap(x => x.name.split(/\s+/)));
         const tokSteps = new Map<string, number>();
-        for (const step of d.arc) for (const tok of new Set(step.replace(/^\S+\s*/, '').match(/\b[A-Z][a-z]{2,}\b/g) ?? []))
+        for (const step of d.arc) for (const tok of properTokens(step))
           if (!castTok.has(tok)) tokSteps.set(tok, (tokSteps.get(tok) ?? 0) + 1);
         const parked = [...tokSteps.entries()].find(([, n]) => n >= 3)?.[0];
         // BIBLE.md: step 1 = take the job, goal NOT done here — "arc kills the beat-1-completes-
@@ -1172,7 +1177,7 @@ export class Game {
         for (let i = 1; i < d.arc.length && !conjured; i++) {
           const errand = d.arc[i]!.split('→')[0]!;
           const prior = `${d.goal} ${d.arc.slice(0, i).join(' ')}`;
-          for (const tok of new Set(errand.replace(/^\S+\s*/, '').match(/\b[A-Z][a-z]{2,}\b/g) ?? [])) {
+          for (const tok of properTokens(errand)) {
             if (!castTok.has(tok) && !prior.includes(tok)) { conjured = `"${tok}" (step ${i + 1})`; break; }
           }
         }
@@ -1190,8 +1195,7 @@ export class Game {
         // invents a meeting-scene instead of coming back to the fort it already holds
         const priorToLast = `${d.goal} ${d.arc.slice(0, -1).join(' ')}`;
         const offContractPlace = goalHome && !/\bthe fort\b/i.test(lastStep)
-          ? (lastStep.replace(/^\S+\s*/, '').match(/\b[A-Z][a-z]{2,}\b/g) ?? [])
-              .find(t => !castTok.has(t) && !priorToLast.includes(t))
+          ? [...properTokens(lastStep)].find(t => !castTok.has(t) && !priorToLast.includes(t))
           : undefined;
         // a declared OBSTACLE that never appears in any arc step is dead cast — the chain has no
         // antagonist and reads as a pure fetch (batch R: Rolon, Celarion; batch Q: Oxel — all
@@ -1200,8 +1204,13 @@ export class Game {
         const obstacleAbsent = obstacleEntry && !d.arc.some(s =>
           new RegExp(`\\b${obstacleEntry.name.split(/\s+/)[0]!.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(s));
         // dup RIDES ALONG whatever why is reported: an early clash-return once masked a live-chain
-        // dup from the post-retry mechanical recast (29010: Nurisea obstacled two live sagas)
-        if (focalMissing) return { why: `your rejected draft's cast is missing ${focal.name} — the saga is ABOUT them; they must be a cast entry`, dup: clientDup };
+        // dup from the post-retry mechanical recast (29010: Nurisea obstacled two live sagas).
+        // HARD defects (checked first so a soft return can't mask them) are the ones the engine
+        // cannot ship: a bible without its focal, a custody contradiction, a premise the player
+        // is already playing. Everything else is soft — log-only, see the verdict below.
+        if (focalMissing) return { hard: true, why: `your rejected draft's cast is missing ${focal.name} — the saga is ABOUT them; they must be a cast entry`, dup: clientDup };
+        if (custodyGhost) return { hard: true, why: `your rejected draft placed ${custodyGhost} in the company's custody — they passed out of the company's reach and are FREE in the world; rebuild the saga around where they actually stand`, dup: clientDup };
+        if (clash) return { hard: true, why: `your rejected draft "${d.title} — ${d.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground`, dup: clientDup };
         if (soldierCast) return { why: `your rejected draft cast ${soldierCast.name} — one of the company's own soldiers — as ${soldierCast.role}; soldiers are context, never cast members: a DIFFERENT person (or no one) takes that part`, dup: soldierCast };
         if (parked) return { why: `your rejected draft's arc parks at ${parked} — three or more steps stage the same ground; each step must move to NEW ground or a new claimant, and only the last may return to bring the matter to a head`, dup: clientDup };
         if (step1Delivers) return { why: `your rejected draft's FIRST arc step already performs a delivery or handover — the goal is NOT done at step 1: step 1 is taking the job plus a first leg of field work, and every delivery belongs to a later step`, dup: clientDup };
@@ -1210,30 +1219,24 @@ export class Game {
         if (offContractPlace) return { why: `your rejected draft's LAST step delivers the hired thing to "${offContractPlace}" — but the hire brings it HOME (to the fort or to the client in hand); the closing step settles AT THE FORT the company already holds, never at a fresh meeting-place invented for the ending`, dup: clientDup };
         if (obstacleAbsent) return { why: `your rejected draft names ${obstacleEntry!.name} as the obstacle, yet they appear in NO arc step — the one who stands in the company's way must actively BLOCK a step (guard the prize, refuse, fight, or flee) in the step where the company meets them; write them into that step or give the part to no one`, dup: clientDup };
         if (conjured) return { why: `your rejected draft's arc touches ${conjured} that no earlier step yielded and neither the goal nor the cast introduced — every place, person, and tool a step USES must come from the hire, the goal, or an earlier step's yield (new things enter only as a step's own "→ yields:")`, dup: clientDup };
-        if (clash) return { why: `your rejected draft "${d.title} — ${d.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground`, dup: clientDup };
-        if (custodyGhost) return { why: `your rejected draft placed ${custodyGhost} in the company's custody — they passed out of the company's reach and are FREE in the world; rebuild the saga around where they actually stand`, dup: clientDup };
         if (clientDup) return { why: `your rejected draft used ${clientDup.name} as ${clientDup.role} — they are already bound up in a running saga; this one needs a different person in that part entirely`, dup: clientDup };
         return null;
       };
-      // LATENCY BUDGET (2026-07-17 designer ruling): at most ONE re-roll per pursue — genesis
-      // is ~1 min a call, and the old retry chain (up to 4 calls) turned one click into 3-4
-      // minutes. The one re-roll burns the seed when the defect is seed-pulled (premise clash,
-      // parked arc, delivery-first arc — the seed keeps dragging the model back); cast defects
-      // keep the seed and lean on the avoid note. A defect that survives the re-roll ships:
-      // the mechanical recast below still fixes duplicate cast, and the rest is a worse-story
-      // cost the designer accepts over a third minute of waiting.
+      // GUARD VERDICT (guardlab 81001/82001 + blind judge, 2026-07-17): re-rolling on
+      // story-SHAPE defects is a net NEGATIVE — fire rate 58-67%, +50s mean latency, and
+      // blind-judged re-rolled bibles LOST to the drafts they replaced 5/7 (mean 5.3 vs 6.0):
+      // the avoid-note nag degrades the second draft ("never nag a cheap model"). Shape lints
+      // are LOG-ONLY telemetry now. One re-roll survives for HARD defects the engine cannot
+      // ship (focal missing breaks the care beat and finale steering; custody ghost contradicts
+      // world state; premise clash duplicates a saga the player is playing — and burning the
+      // seed IS the mechanical fix for a clash). Duplicate cast stays free: mechanical recast.
       let issue = issues(g);
-      if (issue) {
+      if (issue?.hard) {
         this.log('chain', `saga draft rejected (one re-roll): ${issue.why.slice(0, 120)}…`);
-        const seedPulled = !issue.why.includes('already bound up') && !issue.why.includes("company's own soldiers");
-        g = await this.ai.genesis({
-          ...genesisInput,
-          ...(seedPulled ? { seed: sampleSeed(this.rng) } : {}),
-          avoid: [...avoid, issue.why],
-        });
+        g = await this.ai.genesis({ ...genesisInput, seed: sampleSeed(this.rng), avoid: [...avoid, issue.why] });
         issue = issues(g);
-        if (issue) this.log('chain', `saga draft still flawed — shipping anyway (latency budget): ${issue.why.slice(0, 120)}…`);
       }
+      if (issue) this.log('chain', `saga draft lint (${issue.hard ? 'HARD, shipping anyway' : 'log-only'}): ${issue.why.slice(0, 120)}…`);
       // recast a stubborn duplicate client/obstacle as a FRESH person — a new villain beats
       // the same face fronting a fourth concurrent saga. The rename must be COMPLETE: reach
       // the bible's free text (33013: a recast client lived on in situation/arc and the beat
