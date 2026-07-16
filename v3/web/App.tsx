@@ -33,6 +33,7 @@ export function App() {
   const [tab, setTab] = useState('fort');
   const [toast, setToast] = useState('');
   const [busy, setBusy] = useState(false);
+  const [pending, setPending] = useState<string | null>(null);
   const [detail, setDetail] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
@@ -40,13 +41,26 @@ export function App() {
   }, []);
   useEffect(() => { refresh() }, [refresh]);
 
+  // Every action gets immediate feedback: a pending banner the moment it's clicked, cleared
+  // on resolve. Actions that hit the AI (pursue/story genesis, renovate, end cycle) can take
+  // 60s+; while one is in-flight we live-poll /api/state (a plain GET, NOT serialized behind
+  // the action) so the in-progress AI-log row and running totals surface instead of a dead click.
   const doAct = async (type: string, ...args: (string | number)[]) => {
     setBusy(true);
-    const r = await act(type, ...args);
-    setToast(r.msg);
-    await refresh();
-    setBusy(false);
-    setTimeout(() => setToast(''), 4000);
+    setPending(type);
+    const poll = setInterval(() => { refresh().catch(() => {}); }, 1200);
+    try {
+      const r = await act(type, ...args);
+      setToast(r.msg);
+    } catch (e) {
+      setToast(`request failed: ${(e as Error).message ?? e}`);
+    } finally {
+      clearInterval(poll);
+      setPending(null);
+      setBusy(false);
+      await refresh().catch(() => {});
+      setTimeout(() => setToast(''), 4000);
+    }
   };
 
   if (!s) return <div className="app">loading…</div>;
@@ -64,6 +78,7 @@ export function App() {
         <span className="ai">AI: {s.aiName} ({s.ai.calls} calls{s.aiName === 'openai' ? `, ~$${s.ai.costUsd.toFixed(2)}` : ''})</span>
         <button className="end" disabled={busy} onClick={() => doAct('end')}>{busy ? '…' : 'END CYCLE ▶'}</button>
       </header>
+      {pending && <div className="pending"><span className="spin" /> working: <b>{pending}</b>… <i>story generation can take a minute — watch the AI tab</i></div>}
       {toast && <div className="toast">{toast}</div>}
       <nav>
         {['fort', 'build', 'leads', 'quests', 'roster', 'captives', 'items', 'chains', 'people', 'lore', 'log', 'ai'].map(t => {
@@ -427,12 +442,16 @@ function AiLog({ s }: any) {
       <p><b>totals:</b> {u.calls} calls · {u.inputTokens} in / {u.outputTokens} out tokens · ~${u.costUsd.toFixed(3)}</p>
       <table><tbody>
         <tr><td>#</td><td>purpose</td><td>model</td><td>ms</td><td>in</td><td>cached</td><td>out</td><td>$</td><td>ok</td></tr>
-        {s.aiLog.map((r: any) => (
+        {s.aiLog.map((r: any) => {
+          // a record is pushed at call-start (ok:false, durationMs:0, no error) and rewritten on
+          // finish — so an unfinished call is uniquely "in flight", not a failure.
+          const inflight = !r.ok && !r.error && r.durationMs === 0;
+          return (
           <React.Fragment key={r.n}>
-            <tr className={r.ok ? '' : 'dim'}>
-              <td>{r.n}</td><td>{r.purpose}</td><td>{r.model}</td><td>{r.durationMs}</td>
+            <tr className={r.ok ? '' : inflight ? 'inflight' : 'dim'}>
+              <td>{r.n}</td><td>{r.purpose}</td><td>{r.model}</td><td>{inflight ? <span className="spin" /> : r.durationMs}</td>
               <td>{r.inputTokens}</td><td>{r.cachedTokens}</td><td>{r.outputTokens}</td>
-              <td>{r.costUsd.toFixed(4)}</td><td>{r.ok ? '✓' : `✗ ${r.error ?? ''}`}</td>
+              <td>{r.costUsd.toFixed(4)}</td><td>{r.ok ? '✓' : inflight ? '⏳ running…' : `✗ ${r.error ?? ''}`}</td>
             </tr>
             <tr><td colSpan={9}>
               <details><summary>prompt + output</summary>
@@ -440,7 +459,7 @@ function AiLog({ s }: any) {
               </details>
             </td></tr>
           </React.Fragment>
-        ))}
+        );})}
       </tbody></table>
     </div>
   );

@@ -9,6 +9,11 @@ button.end { background: #7a2f2f; color: #fff; border: none; padding: 8px 18px; 
 button.end:hover { background: #a03c3c; }
 
 .toast { margin: 8px 0; padding: 8px 12px; background: #24406b; border-radius: 6px; }
+.pending { margin: 8px 0; padding: 8px 12px; background: #4a3a1a; border: 1px solid #7a5f22; border-radius: 6px; display: flex; align-items: center; gap: 8px; }
+.pending i { color: #b8a06a; font-size: 12px; }
+tr.inflight { color: #e8b34b; }
+.spin { display: inline-block; width: 12px; height: 12px; border: 2px solid #7a5f22; border-top-color: #e8b34b; border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 nav { display: flex; gap: 4px; margin: 10px 0; flex-wrap: wrap; }
 nav button, .row button, .slotrow button, .cardrow button, td button, .quest button, details button {
   background: #262b33; color: #cfd3da; border: 1px solid #3a4150; padding: 4px 10px; border-radius: 5px; cursor: pointer; font-size: 13px;
