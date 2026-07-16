@@ -1215,25 +1215,30 @@ export class Game {
         if (clientDup) return { why: `your rejected draft used ${clientDup.name} as ${clientDup.role} — they are already bound up in a running saga; this one needs a different person in that part entirely`, dup: clientDup };
         return null;
       };
+      // LATENCY BUDGET (2026-07-17 designer ruling): at most ONE re-roll per pursue — genesis
+      // is ~1 min a call, and the old retry chain (up to 4 calls) turned one click into 3-4
+      // minutes. The one re-roll burns the seed when the defect is seed-pulled (premise clash,
+      // parked arc, delivery-first arc — the seed keeps dragging the model back); cast defects
+      // keep the seed and lean on the avoid note. A defect that survives the re-roll ships:
+      // the mechanical recast below still fixes duplicate cast, and the rest is a worse-story
+      // cost the designer accepts over a third minute of waiting.
       let issue = issues(g);
-      for (let retry = 0; issue && retry < 2; retry++) {
-        // visible in the log tab — without this, guard re-rolls read as phantom duplicate geneses
-        this.log('chain', `saga draft rejected (re-rolling): ${issue.why.slice(0, 120)}…`);
-        g = await this.ai.genesis({ ...genesisInput, avoid: [...avoid, issue.why] });
+      if (issue) {
+        this.log('chain', `saga draft rejected (one re-roll): ${issue.why.slice(0, 120)}…`);
+        const seedPulled = !issue.why.includes('already bound up') && !issue.why.includes("company's own soldiers");
+        g = await this.ai.genesis({
+          ...genesisInput,
+          ...(seedPulled ? { seed: sampleSeed(this.rng) } : {}),
+          avoid: [...avoid, issue.why],
+        });
         issue = issues(g);
+        if (issue) this.log('chain', `saga draft still flawed — shipping anyway (latency budget): ${issue.why.slice(0, 120)}…`);
       }
-      // last resort: recast a stubborn duplicate client/obstacle as a FRESH person — a new
-      // villain beats the same face fronting a fourth concurrent saga. The rename must be
-      // COMPLETE: reach the bible's free text (33013: a recast client lived on in situation/arc
-      // and the beat writer resurrected him) and never collide with a name already in play
+      // recast a stubborn duplicate client/obstacle as a FRESH person — a new villain beats
+      // the same face fronting a fourth concurrent saga. The rename must be COMPLETE: reach
+      // the bible's free text (33013: a recast client lived on in situation/arc and the beat
+      // writer resurrected him) and never collide with a name already in play
       // (33013: the rolled name duplicated the same bible's client — two cast both "Rels")
-      // a stubborn non-cast defect (premise clash, parked arc, delivery-first arc) survives the
-      // retries because the SEED itself keeps pulling the model back — burn the seed, go once more
-      if (issue && !issue.why.includes('already bound up') && !issue.why.includes("company's own soldiers")) {
-        this.log('chain', `saga draft rejected again — burning the seed and re-rolling once more`);
-        g = await this.ai.genesis({ ...genesisInput, seed: sampleSeed(this.rng), avoid: [...avoid, issue.why] });
-        issue = issues(g);
-      }
       if (issue?.dup) recastMember(issue.dup);
     }
     // persist write-back (guarded); new places become lore nodes
