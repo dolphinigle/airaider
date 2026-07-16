@@ -66,6 +66,19 @@ export const BOND: string[] = [
   'duty', 'obligation', 'responsibility', 'stewardship', 'guardianship', 'fealty',
   'allegiance', 'service', 'servitude', 'birthright', 'debt',
   'mourning', 'loss', 'bereavement', 'absence', 'emptiness',
+  // ---- 2026-07-17 expansion (designer: pools toward ~1000; agent-generated, bar-linted) ----
+  'fear', 'love', 'passion', 'lovesickness', 'compassion', 'outrage', 'indignation', 'offense',
+  'insult', 'mockery', 'flattery', 'boasting', 'mischief', 'meddling', 'temper', 'distress',
+  'desperation', 'helplessness', 'suffering', 'grievance', 'discontent', 'unrest', 'blame', 'disgrace',
+  'disrespect', 'ingratitude', 'intolerance', 'shunning', 'persecution', 'oppression', 'tyranny', 'lawlessness',
+  'slavery', 'treachery', 'brutality', 'ruthlessness', 'wickedness', 'selfishness', 'shamelessness', 'possessiveness',
+  'virtue', 'vice', 'righteousness', 'purity', 'grace', 'worship', 'godlessness', 'chivalry',
+  'conscience', 'ignorance', 'knowledge', 'truth', 'memory', 'power', 'conquest', 'mastery',
+  'profit', 'ownership', 'claim', 'favor', 'alliance', 'resemblance', 'beauty', 'youth',
+  'pleasure', 'solitude', 'childlessness', 'weakness', 'sickness', 'injury', 'death', 'failure',
+  // 'burden'/'shadow'/'fate'/'destiny' are BANNED prose words on cards (writeQuest hard
+  // rules) — a draw containing one forces the writer to echo a banned word or waste the slot
+  'calling', 'safekeeping', 'self-loathing',
 ];
 
 // ---- TIE (~330): situations — the draw's story axis (what HAPPENED or is happening) ------------
@@ -126,6 +139,15 @@ export const TIE: string[] = [
   'proclamation', 'petition', 'boundary', 'border', 'feud', 'vendetta',
   'misunderstanding', 'mistake', 'accident', 'blunder', 'coincidence', 'omission',
   'discovery', 'revelation', 'exposure', 'unmasking', 'reappearance',
+  // ---- 2026-07-17 expansion (designer: pools toward ~1000; agent-generated, bar-linted) ----
+  'loan', 'pawn', 'hire', 'sale', 'purchase', 'haggling', 'bidding', 'swap',
+  'grave-robbing', 'banditry', 'flogging', 'whipping', 'beating', 'strangling', 'stabbing', 'brawl',
+  'scuffle', 'oathbreaking', 'misrule', 'regency', 'overthrow', 'fostering', 'disinheritance', 'bride-price',
+  'tryst', 'wooing', 'flirtation', 'infestation', 'hoax', 'disguise', 'cave-in', 'rockfall',
+  'snub', 'taunt', 'challenge', 'boast', 'sighting', 'encounter', 'intrusion', 'spying',
+  'stalking', 'shadowing', 'lawsuit', 'expulsion', 'migration', 'baptism', 'gambling', 'apology',
+  'assassination', 'cheating', 'trickery', 'homage', 'edict', 'beheading', 'torture', 'enslavement',
+  'mining', 'drowning', 'stalemate', 'ransacking',
 ];
 
 // ---- QUALITIES (~190): plain modifiers — combine with any noun the draw supplies ---------------
@@ -157,6 +179,29 @@ export const QUALITIES: string[] = [
   'brave', 'afraid', 'loyal', 'faithless', 'honest', 'lying', 'generous', 'greedy',
   'proud', 'humble', 'patient', 'restless', 'kind', 'cruel', 'gentle', 'savage',
   'wild', 'tame', 'stray', 'caged', 'freed', 'escaped', 'captured', 'surrendered',
+  // ---- 2026-07-17 expansion (designer: pools toward ~1000; agent-generated, bar-linted) ----
+  'pawned', 'hired', 'swapped', 'switched', 'divided', 'shared', 'hoarded', 'wagered',
+  'pledged', 'seized', 'forfeited', 'reclaimed', 'salvaged', 'rescued', 'recovered', 'replaced',
+  'copied', 'faked', 'mislaid', 'dented', 'chipped', 'shattered', 'splintered', 'warped',
+  'rusted', 'tarnished', 'moldy', 'worm-eaten', 'moth-eaten', 'singed', 'scorched', 'charred',
+  'sodden', 'soaked', 'waterlogged', 'leaky', 'sunken', 'wrecked', 'stranded', 'beached',
+  'snapped', 'frayed', 'threadbare', 'darned', 'betrothed', 'jilted', 'disowned', 'adopted',
+  'fostered', 'annulled', 'unwed', 'remarried', 'cheated', 'robbed', 'ransacked', 'homeless',
+  'landless', 'penniless', 'beggared', 'indebted', 'secondhand', 'spare', 'sole', 'belated',
+  'untimely', 'premature', 'fleeting', 'unseen', 'unheard', 'unnoticed', 'overlooked', 'misheard',
+  'misread', 'garbled', 'coded', 'rumored', 'alleged', 'confessed', 'proven', 'unproven',
+  'doubted', 'believed', 'disbelieved', 'foretold', 'expected', 'unexpected', 'uninvited', 'unwelcome',
+  'summoned', 'conjured', 'doomed', 'damned', 'saved', 'spared', 'punished', 'rewarded',
+  'tested', 'tempted', 'corrupted', 'redeemed', 'shamed', 'disgraced', 'honored', 'celebrated',
+  'pitied', 'scorned', 'mocked', 'deceived', 'tricked', 'fooled', 'threatened', 'warned',
+  'forewarned', 'besieged', 'cornered', 'trapped', 'ensnared', 'tangled', 'limping', 'toothless',
+  'bald', 'bearded', 'pregnant', 'newborn', 'dying', 'dead', 'undead', 'lifeless',
+  'headless', 'barefoot', 'unwashed', 'unshaven', 'ragged', 'tattered', 'naked', 'cloaked',
+  'hooded', 'armored', 'armed', 'unarmed', 'mounted', 'unhorsed', 'marooned', 'adrift',
+  'distant', 'neighboring', 'contested', 'garrisoned', 'deserted', 'uninhabited', 'haunted', 'possessed',
+  'enchanted', 'spellbound', 'moonlit', 'candlelit', 'unlucky', 'lucky', 'dreaded', 'awaited',
+  'long-lost', 'ill-gotten', 'hard-won', 'short-lived', 'newfound', 'handmade', 'half-built', 'mismatched',
+  'miscounted', 'misdelivered', 'underpaid', 'one-eyed', 'left-handed', 'two-headed', 'thirteenth',
 ];
 
 // ---- THINGS (~400): concrete nouns — objects, beasts, substances, structures -------------------
@@ -225,6 +270,40 @@ export const THINGS: string[] = [
   'crossroads', 'milestone', 'signpost', 'grave', 'tomb', 'hearth', 'chimney',
   'threshold', 'doorstep', 'window', 'roof', 'rafter', 'beam', 'door', 'stair',
   'trapdoor', 'tunnel', 'passage', 'archway', 'courtyard', 'alley', 'lane', 'path',
+  // ---- 2026-07-17 expansion (designer: pools toward ~1000; agent-generated, bar-linted) ----
+  'fiddle', 'lute', 'harp', 'flute', 'bell', 'whistle', 'ship', 'boat',
+  'raft', 'barge', 'skiff', 'hull', 'keel', 'figurehead', 'dock', 'pier',
+  'harbor', 'lighthouse', 'reliquary', 'gravestone', 'epitaph', 'pulpit', 'spire', 'steeple',
+  'cloister', 'crypt', 'pew', 'font', 'kettle', 'cauldron', 'pot', 'pan',
+  'ladle', 'spoon', 'platter', 'bowl', 'cup', 'mug', 'tankard', 'spit',
+  'oven', 'churn', 'mortar', 'pestle', 'sieve', 'funnel', 'keg', 'vat',
+  'trough', 'dice', 'doll', 'puppet', 'hoop', 'marbles', 'ball', 'tooth',
+  'braid', 'blood', 'heart', 'lightning', 'thunder', 'rainbow', 'icicle', 'snowdrift',
+  'dew', 'puddle', 'wave', 'whirlpool', 'cliff', 'cave', 'cavern', 'gorge',
+  'ravine', 'valley', 'hill', 'mountain', 'marsh', 'bog', 'swamp', 'moor',
+  'glade', 'grove', 'thicket', 'ridge', 'peak', 'island', 'shore', 'cove',
+  'bay', 'waterfall', 'rapids', 'hut', 'hovel', 'cottage', 'cabin', 'manor',
+  'hall', 'keep', 'castle', 'palace', 'dungeon', 'moat', 'drawbridge', 'portcullis',
+  'rampart', 'battlement', 'turret', 'watchtower', 'windmill', 'forge', 'smithy', 'tavern',
+  'inn', 'bathhouse', 'bakery', 'brewery', 'tannery', 'warehouse', 'shed', 'coop',
+  'kennel', 'sty', 'treasure', 'scepter', 'orb', 'throne', 'statue', 'sundial',
+  'weathervane', 'chisel', 'mallet', 'wheelbarrow', 'handcart', 'sled', 'sleigh', 'stilts',
+  'mace', 'flail', 'pike', 'javelin', 'dart', 'bolt', 'catapult', 'bonnet',
+  'mitten', 'scarf', 'stocking', 'garter', 'breeches', 'tunic', 'pastry', 'tart',
+  'pudding', 'dumpling', 'pancake', 'pickle', 'brine', 'lard', 'mustard', 'radish',
+  'carrot', 'parsnip', 'leek', 'pea', 'lentil', 'fig', 'raisin', 'almond',
+  'walnut', 'hazelnut', 'nutmeg', 'cinnamon', 'ginger', 'clove', 'sugar', 'weasel',
+  'ferret', 'hedgehog', 'squirrel', 'hare', 'rabbit', 'lynx', 'wildcat', 'elk',
+  'reindeer', 'walrus', 'whale', 'dolphin', 'shark', 'minnow', 'tadpole', 'newt',
+  'salamander', 'viper', 'centipede', 'flea', 'louse', 'tick', 'maggot', 'grub',
+  'caterpillar', 'slug', 'nightingale', 'lark', 'thrush', 'robin', 'swallow', 'cuckoo',
+  'woodpecker', 'kingfisher', 'crane', 'stork', 'peacock', 'pheasant', 'partridge', 'quail',
+  'buzzard', 'vulture', 'cedar', 'maple', 'beech', 'aspen', 'juniper', 'hawthorn',
+  'bramble', 'briar', 'thistle', 'dandelion', 'buttercup', 'foxglove', 'nightshade', 'hemlock',
+  'wormwood', 'mandrake', 'sage', 'thyme', 'rosemary', 'mint', 'parsley', 'fennel',
+  'hops', 'flax', 'hemp', 'rye', 'marble', 'granite', 'slate', 'chalk',
+  'quartz', 'crystal', 'glass', 'brick', 'tile', 'shingle', 'plaster', 'gold',
+  'tin', 'lead', 'brass', 'pewter', 'caravan',
 ];
 
 // ---- OCCASIONS (~160): events, moments, deadlines ----------------------------------------------
@@ -256,6 +335,10 @@ export const OCCASIONS: string[] = [
   'fire', 'collapse', 'shipwreck', 'sinking', 'outbreak', 'fever', 'alarm', 'battle',
   'war', 'peace', 'victory', 'defeat', 'exodus', 'stampede',
   'curfew', 'search', 'sweep', 'moonrise', 'moonset',
+  // ---- 2026-07-17 expansion (designer: pools toward ~1000; agent-generated, bar-linted) ----
+  'sowing', 'mowing', 'reaping', 'pruning', 'milking', 'blizzard', 'downpour', 'mudslide',
+  'revel', 'crossing', 'unveiling', 'dedication', 'calving', 'hatching', 'sunset', 'sunrise',
+  'sabbath',
 ];
 
 // ---- PEOPLE (~230): roles & figures --------------------------------------------------------------
@@ -305,6 +388,17 @@ export const PEOPLE: string[] = [
   'gossip', 'busybody', 'neighbor', 'landlord', 'tenant', 'lodger', 'guest', 'host',
   'patron', 'benefactor', 'overseer', 'go-between', 'peacemaker', 'troublemaker',
   'agitator', 'courtier', 'advisor', 'confidant', 'flatterer', 'rival', 'double',
+  // ---- 2026-07-17 expansion (designer: pools toward ~1000; agent-generated, bar-linted) ----
+  'knight', 'squire', 'page', 'count', 'countess', 'duchess', 'earl', 'emperor',
+  'empress', 'regent', 'chancellor', 'treasurer', 'ambassador', 'courier', 'scout', 'general',
+  'captain', 'commander', 'admiral', 'drummer', 'piper', 'deacon', 'prior', 'choirboy',
+  'shipwright', 'cooper', 'glover', 'saddler', 'ropemaker', 'sailmaker', 'candlemaker', 'miner',
+  'ratcatcher', 'chimneysweep', 'tinker', 'cheesemaker', 'harpist', 'fiddler', 'outcast', 'grandfather',
+  'stepfather', 'granddaughter', 'grandson', 'elder', 'ancestor', 'descendant', 'lookout', 'burglar',
+  'brigand', 'graverobber', 'poisoner', 'kidnapper', 'blackmailer', 'counterfeiter', 'harbormaster', 'coroner',
+  'judge', 'juror', 'lawyer', 'executioner', 'physician', 'philosopher', 'historian', 'astronomer',
+  'architect', 'surveyor', 'translator', 'interpreter', 'godfather', 'godchild', 'washerwoman', 'chambermaid',
+  'reaper', 'sower', 'mower', 'thresher', 'oarsman', 'deckhand', 'navigator', 'mutineer',
 ];
 
 // ---- UNCANNY (~140): folk-horror & wonder --------------------------------------------------------
@@ -319,18 +413,23 @@ export const UNCANNY: string[] = [
   'omen', 'premonition', 'prophecy', 'vision', 'dream', 'nightmare', 'trance',
   'curse', 'spell', 'charm', 'enchantment', 'illusion', 'possession', 'exorcism',
   'madness', 'frenzy', 'miracle', 'marvel', 'blessing', 'amulet', 'effigy', 'rune',
-  'doom', 'fate', 'destiny', 'luck', 'misfortune', 'jinx', 'wish', 'bane',
+  'doom', 'luck', 'misfortune', 'jinx', 'wish', 'bane',
   // practices
   'witchcraft', 'sorcery', 'necromancy', 'alchemy', 'magic', 'ritual', 'sacrifice',
   'offering', 'coven', 'summoning', 'banishing', 'warding', 'divination',
   'invocation', 'consecration', 'anointing', 'purification',
   // places & thresholds
   'underworld', 'afterlife', 'heaven', 'hell', 'graveyard', 'catacomb', 'labyrinth',
-  'maze', 'wilderness', 'wasteland', 'ruins', 'shadow',
+  'maze', 'wilderness', 'wasteland', 'ruins',
   'darkness', 'twilight', 'mist', 'fog', 'silence', 'echo', 'howl', 'knocking',
   // wrongness
   'transformation', 'resurrection', 'immortality', 'invisibility', 'petrification',
   'levitation', 'portent', 'hex', 'talisman', 'wail', 'second-sight', 'evil-eye',
+  // ---- 2026-07-17 expansion (designer: pools toward ~1000; agent-generated, bar-linted) ----
+  'banshee', 'werewolf', 'bogeyman', 'pixie', 'gnome', 'hobgoblin', 'golem', 'gargoyle',
+  'basilisk', 'kraken', 'leviathan', 'knell', 'stargazing', 'broomstick', 'wand', 'spellbook',
+  'elixir', 'sleepwalking', 'delirium', 'barrow', 'withering', 'vanishing', 'birthmark', 'warlock',
+  'wizard', 'enchantress', 'necromancer', 'oracle', 'druid',
 ];
 
 // ---- MOODS (~50): genre / mode words — what KIND of story this wants to be -----------------------
@@ -341,6 +440,9 @@ export const MOODS: string[] = [
   'masquerade', 'duel', 'aftermath', 'unraveling', 'descent',
   'misadventure', 'disaster', 'escapade', 'gambit',
   'fable', 'legend', 'myth', 'saga', 'spectacle',
+  // ---- 2026-07-17 expansion (designer: pools toward ~1000; agent-generated, bar-linted) ----
+  'quest', 'hunt', 'escort', 'expedition', 'crusade', 'witch-hunt', 'last stand', 'dilemma',
+  'ruse', 'rebirth', 'restoration', 'epic', 'chronicle', 'parable', 'satire',
 ];
 
 // ---- the sampler (§5 locked shape: 1 BOND + 1 TIE + 1-2 wildcards) -------------------------------
