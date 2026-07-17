@@ -1476,7 +1476,9 @@ export class Game {
             'Pay stands as agreed, and what the company hauls back is its own to keep.',
             'Coin as promised, and the pick of whatever the job turns up.',
             // pool of 4 stamped visibly (same string verbatim on 3 cards per campaign) — widened
-            'Coin on the work done, and what the party carries home besides is the company\'s.',
+            // "…carries home besides is the company's" parsed two ways — our own cold reader
+            // flagged the canned string twice (reviewlab 84001); paste-clean strings only
+            'Coin when the work is done. Anything else the party carries home is the company\'s.',
             'The fee is agreed, and any spoils along the way stay with the company.',
             'Plain coin for plain work, and what the road yields is the company\'s to keep.',
             'The pay is fixed, and what else the job shakes loose the company keeps.',
@@ -1506,26 +1508,13 @@ export class Game {
       // runtime truth, not genesis-time: a focal HIRED mid-saga is the company's own now
       focalIsMerc: focal?.character?.role === 'merc',
     });
-    let out = isRepose && cached && cached.beat === chain.beatIndex + 1 ? cached.out : await this.ai.writeQuest(wqInput);
-    // COLD-READER GATE (judge-loop plateau, IMPL #368): ~1-2 unparseable/ungrounded sentences
-    // per chain capped every chain's readability — a zero-context read of the drafted card
-    // feeds ONE guided rewrite; a reader that errors passes the draft through
-    if (!(isRepose && cached && cached.beat === chain.beatIndex + 1)) {
-      const rev = await this.ai.review({
-        text: `${out.title}\n${out.situation}`,
-        whereabouts: chain.story.actorStates,
-        known: [...(chain.story.introducedNames ?? []), chain.bible.goal, ...chain.story.knownToPlayer],
-      }).catch(() => ({ ok: true, defects: [] }));
-      // §0 lever-1 lint: mechanical defects a regex catches never spend the cold reader's budget
-      // (batch W: body restated the job line on 5/8 cards, scaffold voice on 3/8). Re-lint after
-      // each rewrite — batch X showed a single unchecked pass REINTRODUCES the flagged defect.
-      for (let pass = 0; pass < 2; pass++) {
-        const flaws = [...this.lintCard(out), ...(pass === 0 && !rev.ok ? rev.defects : [])];
-        if (!flaws.length) break;
-        this.log('chain', `saga card re-written (pass ${pass + 1}): ${flaws.length} defect(s) flagged`);
-        out = await this.ai.writeQuest({ ...wqInput, fixNotes: flaws });
-      }
-    }
+    const out = isRepose && cached && cached.beat === chain.beatIndex + 1 ? cached.out : await this.ai.writeQuest(wqInput);
+    // COLD-READER GATE REMOVED (reviewlab 83001/84001 + blind judge, 2026-07-17): the review
+    // roundtrip cost ~5.5s per card and its fixNotes rewrites made cards WORSE (pre-rewrite won
+    // 6/9, mean 7.44 vs 7.11) — same nag-degradation as the genesis guard. The dup-restatement
+    // lint also over-fired (situation and job line naturally share words: 10/12 cards). Lint is
+    // LOG-ONLY telemetry now; fix defect classes at the prompt, never by re-generation.
+    for (const flaw of this.lintCard(out)) this.log('chain', `saga card lint (log-only): ${flaw}`);
     if (!isFinale) this.cachedBeatOut.set(chain.id, { beat: chain.beatIndex + 1, out });
     // QUESTS §6: middle-beat side-loot = gold OR a relic among it (was always bare gold)
     const specs: RewardSpec[] = isFinale ? [] : [{ kind: 'gold' as const, value: sideLootV }];
@@ -1751,24 +1740,11 @@ export class Game {
       } : undefined,
     }));
     const aiOuts = aiInputs.length ? await this.ai.resolve(aiInputs) : [];
-    // COLD-READER GATE on saga reports (45025 judge: the card gate alone left the top class
-    // untouched — resolutions negating their own setup or the record); one guided redo each
-    for (let i = 0; i < aiOuts.length; i++) {
-      const o = aiOuts[i]!;
-      const inp = aiInputs.find(x => x.questId === o.questId);
-      if (!inp?.chainContext) continue;
-      const chain = st.chains.find(c => c.id === resolutions.find(r2 => r2.quest.id === o.questId)?.quest.chainId);
-      const rev = await this.ai.review({
-        text: `${o.before}\n[the dice fall]\n${o.after}`,
-        whereabouts: chain?.story.actorStates,
-        known: [...(chain?.story.introducedNames ?? []), ...(chain?.story.knownToPlayer ?? [])],
-      }).catch(() => ({ ok: true, defects: [] as string[] }));
-      if (!rev.ok && rev.defects.length) {
-        this.log('chain', `saga report re-written: cold reader flagged ${rev.defects.length} defect(s)`);
-        const redo = await this.ai.resolve([{ ...inp, fixNotes: rev.defects }]).catch(() => null);
-        if (redo?.[0]) aiOuts[i] = redo[0];
-      }
-    }
+    // COLD-READER GATE on saga reports REMOVED (reviewlab 84001 + blind judge, 2026-07-17):
+    // the redo made reports WORSE in 6/7 fired cases (pre-redo mean 7.29 vs shipped 6.14) at
+    // ~5.5s review + ~15s redo on 58-67% of saga resolutions — the strongest nag-degradation
+    // measurement of the three gates. Report-defect classes (ledger breaks, ambiguous
+    // antecedents) get fixed at the resolve prompt instead.
 
     // 3) apply engine effects + AI outputs; lore write-backs AFTER all (collected first)
     const pendingEdges: { from: string; to: string; type: string; blurb: string; importance: number }[] = [];

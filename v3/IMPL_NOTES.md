@@ -1544,3 +1544,21 @@ resolutions, "the hire" persisting in arc-plan text (cards clean).
    THINGS/TIE/QUALITIES/PEOPLE can still grow in a future top-up round.
 5. **GUI**: in-flight AI-log records say "still running" (was "(not recorded)"); genesis
    re-rolls log visibly (were phantom duplicate geneses).
+
+## Cold-reader gate verdict + slate diet (2026-07-17, #372)
+1. **Soldiers filtered from genesis + beat lore slates** (never-use data; a 10+ roster flooded
+   the 14-entry slate ~500-800 tokens/call; soldierCast guard keys off the roster now).
+2. **Cold-reader (review) gates REMOVED from cards and reports** (scripts/reviewlab.ts, 2×12
+   full runs + blind judges): the review roundtrip cost ~5.5s/call ×2 per beat cycle, and its
+   fixNotes regeneration made text WORSE — cards: pre-rewrite won 6/9 (7.44 vs 7.11); reports:
+   pre-redo won 6/7 (7.29 vs 6.14). Third consistent measurement of nag-degradation (genesis
+   guard was 5/7, −0.7). Card lint is log-only telemetry; the dup-restatement lint also
+   over-fired (10/12 — situation and job line naturally share words).
+3. **Own-string defects the reviewer caught before it went**: the "[the dice fall]" scaffold
+   separator was sent to the reviewer as text (flagged UNPARSEABLE — own-scaffold-as-input);
+   the canned pay string "…what the party carries home besides is the company's" parsed two
+   ways (flagged twice) — reworded. Paste-clean engine strings remain a live checklist item.
+4. **provider.review + reviewlab kept** for future re-measurement; no game path calls review.
+RULE OF THE DAY (three independent measurements): fixNotes/avoid-note REGENERATION degrades
+gpt-5-mini output — validate any reject-and-retry gate with a blind pre/post judge before
+shipping it; prefer prompt fixes and log-only lints.

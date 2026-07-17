@@ -24,12 +24,14 @@ async function one(i: number) {
     ...ai,
     writeQuest: async (inp: QuestWriteInput) => {
       const o = await ai.writeQuest(inp);
-      wq.push({ fixNotes: inp.fixNotes, out: o });
+      wq.push({ fixNotes: inp.fixNotes, out: structuredClone(o) });
       return o;
     },
     resolve: async (inps: ResolveQuestInput[]) => {
       const o = await ai.resolve(inps);
-      resolves.push({ fixNotes: inps[0]?.fixNotes, outs: o });
+      // DEEP COPY — the game mutates the returned array in place (aiOuts[i] = redo), which
+      // aliased the captured batch output to the redone one (first lab run: 8 identical pairs)
+      resolves.push({ fixNotes: inps[0]?.fixNotes, outs: structuredClone(o) });
       return o;
     },
     review: async (inp: ReviewInput) => {
