@@ -118,6 +118,11 @@ Validated split (keep, revisit model names as they update): a **stronger model**
 - Pre-generate where possible (e.g. draft the next likely card during the Resolution read).
 - Background long generations behind a visible "drafting…" affordance — never freeze the UI.
 - The batched Resolution Phase fires many resolutions at once; parallelize them.
+- **Scope (designer ruling 2026-07-17): parallelizing/backgrounding AI calls is REQUIRED for
+  the non-prototype build** — a blocking ~1-minute genesis on a click is not shippable; hide it
+  behind pre-generation, background jobs, and parallel fan-out. **The prototype is exempt**:
+  serial blocking calls with pending-state feedback are fine (design-learning per hour beats
+  robustness there).
 
 ---
 
