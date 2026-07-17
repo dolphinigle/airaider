@@ -1033,7 +1033,11 @@ export class Game {
       this.addCard(focal);
     }
     this.ensureLoreNode(focal);
-    const slate = await this.buildLoreSlate(focal.id, 'who needs full dossiers for this saga');
+    // soldiers are NEVER-USE data at genesis (their only rule is "context, never cast" — the
+    // 32012 Koralla class shipped a merc as another saga's claimant anyway): don't deal them.
+    // A 10+ roster otherwise floods the 14-entry slate. The focal stays (personal sagas).
+    const slate = (await this.buildLoreSlate(focal.id, 'who needs full dossiers for this saga'))
+      .filter(e => !e.companySoldier || e.id === focal.id);
     const races = Object.entries(REGION[lead.region]!.poolWeights) as [string, number][];
     // pre-rolled names for NEW cast — must not collide with any living character (§4b corollary).
     // Rolled WITH a sex and dealt annotated (a gender-opaque list once forced "Ithion" onto the
@@ -1116,7 +1120,9 @@ export class Game {
         .flatMap(c => c.bible.cast.map(personKey)));
       const recentRole = new Set(this.state.chains.slice(-3)
         .flatMap(c => c.bible.cast.filter(x => x.role === 'client' || x.role === 'obstacle').map(x => `${x.role}:${personKey(x)}`)));
-      const soldierKeys = new Set(slate.filter(s => s.companySoldier).flatMap(s => [s.id, s.name]));
+      // keyed off the ROSTER, not the slate — soldiers are filtered out of the slate now, but
+      // the model can still coin a matching name; the guard must keep seeing them
+      const soldierKeys = new Set(this.roster().flatMap(m => [m.id, m.name]));
       const issues = (d: typeof g): { why: string; hard?: boolean; dup?: (typeof g.cast)[number] } | null => {
         for (const m of d.cast) if (!m.loreId && loreByName.has(m.name)) m.loreId = loreByName.get(m.name);
         // cast + coined places join the fingerprint — five deliver-to-a-ceremony sagas with the
@@ -1385,7 +1391,11 @@ export class Game {
       .filter(c2 => c2.id !== chain.id && (c2.state === 'active' || c2.state === 'finale-pending'))
       .flatMap(c2 => c2.bible.cast.flatMap(m => [m.loreId ?? '', m.name].filter(Boolean))));
     const relevantLore = (await this.buildLoreSlate(chain.focalId, 'who needs full dossiers for this saga step'))
-      .filter(e => !otherLiveCast.has(e.id) && !otherLiveCast.has(e.name));
+      .filter(e => !otherLiveCast.has(e.id) && !otherLiveCast.has(e.name))
+      // same never-use fence as genesis: soldiers reach a beat card only when the BIBLE binds
+      // them (focal / cast entry); the rest of the roster is copy-bait, not context
+      .filter(e => !e.companySoldier || e.id === chain.focalId
+        || chain.bible.cast.some(m => m.loreId === e.id || m.name === e.name));
     // 🛠 2026-07-10 (reverses the earlier arrive-FRESH ruling): a lapsed unmarched beat is
     // re-offered VERBATIM from cache — a re-rendered "fresh telling" drifted settled facts
     // (a mute girl became talkative between two renders of the same step)
