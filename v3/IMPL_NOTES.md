@@ -1659,3 +1659,11 @@ Cost: zero AI calls, zero latency; prompt size O(1) via CANDIDATE_CAP.
   got the style pass; resolve rules ship for both). Steering laws promoted to docs law:
   PROMPT_RULES §10 (rule budget ~4, positive register line, the shipped four, rotation stamps,
   bench-before-ship, card-register craft to apply).
+- 2026-07-18 (latest): LENGTH shipped — resolution caps raised to the reference band (FoC
+  outcomes 60-250w measured from source; ours sat at the 70w minimum): common 35/75, unc 45/95,
+  rare/finale 60/125 + "length is room, not a target". Blind A/B batch H: long 5.8 vs short 5.2,
+  best-of-batch needed the room. Watch: investigate-scene evidence-inventory waffle. RES_SHORT=1
+  = legacy. PROMPT_RULES §6 updated. Carrot research: designer REJECTED curiosity-axis proposals
+  (backbone stays); real gap = "why send people?" → sell-the-stake proposals R1-R3 in memory
+  await ruling (beat-1 sells the engagement from engine envelope; bank-at-risk surfaced; leads
+  show worth-band).

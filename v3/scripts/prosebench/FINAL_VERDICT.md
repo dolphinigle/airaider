@@ -45,6 +45,15 @@ worst class to among the best.
   chain/arc-skeleton content, the #1 item on the story-interest agenda.
 - One-quote-per-report cadence — visible but cheap; revisit with input-shaped speech.
 
+## Addendum 2026-07-18 (late): LENGTH A/B — long budgets SHIPPED
+Designer felt one-off resolutions thin; reference measured: FoC outcomes 60-250w (source),
+Sultan's ~2 short paragraphs; our caps sat at the 70w minimum. Raised ≈+55% (common 35/75,
+uncommon 45/95, rare/finale 60/125) + "length is room, not a target" clause. Same-batch blind
+A/B (batch H, seed 90501): LONG mean 5.8 / median 6.5 vs SHORT 5.2 / 5.5; holdout 10 ×3; the
+batch's best sample (8 — the wind-bell scene) needed the room. Watch class: investigate scenes
+fill spare room with evidence-inventory waffle (one 4); one cast-slip unrelated to length.
+`RES_SHORT=1` restores legacy caps. PROMPT_RULES §6 updated with the measured numbers.
+
 Records: RUBRIC.md · ANCHORS.md (frozen) · JUDGE_PROMPT.md · ROUND1-3_RESULTS.md · round1-key.md.
 Campaign logs lived in the session scratchpad (ephemeral); every judged sample is quoted in the
 round files and key.

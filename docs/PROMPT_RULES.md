@@ -81,10 +81,14 @@ story**. Don't let the bible read as a single quest or a vague mood piece.
 Require concrete proper nouns. Keep the ban list — it earns its keep.
 
 ## 6. Length scales with stakes; give a HARD ceiling
-Resolution length is engine-set by position × rarity (BALANCE.resWords): a common one-off ~50w, a
-legendary finale ~165w. The model treats a word range as loose and **overshoots ~25%** — so state the
-upper number as a **HARD CEILING, never exceed**. A finale also gets a "this is the climax, weight of an
-ending" note. Calibrate by READING outputs (`_exp_reslength.ts`), not by asserting numbers.
+Resolution caps by rarity, **set from the reference band, not guessed** *(2026-07-18: Fort of Chains
+outcomes measured 60–250w from source, Sultan's "a couple short paragraphs"; our old caps sat at the
+70w minimum and the designer felt the thinness)*: common → before ≤35 / after ≤75, uncommon ≤45/≤95,
+rare-or-finale ≤60/≤125 — blind-benched vs the old caps (5.8 vs 5.2; the batch's best scene needed the
+room). The model treats a range as loose and **overshoots ~25%** — state the upper number as a **HARD
+CEILING**, and pair any raise with "length is room, not a target — fewer words is BETTER". Watch class
+when raising: investigate scenes fill spare room with evidence-inventory waffle. Calibrate by READING
+outputs on the prosebench, never by asserting numbers.
 
 ## 7. Readability + orient-once
 2–4 clean sentences a player reads once — not telegraphic fragment-stacks ("Grey morning. Mud. A man.")
