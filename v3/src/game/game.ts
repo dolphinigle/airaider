@@ -23,7 +23,7 @@ import {
   type Rarity, type Archetype, type RewardSpec,
 } from '../engine/economy.js';
 import {
-  rollFreshLead, starterPacket, huntLead, recruitLead, slotCount, rollDifficulty, oneOffValue,
+  rollFreshLead, starterPacket, starterDripLead, STARTER_DRIP_COUNT, huntLead, recruitLead, slotCount, rollDifficulty, oneOffValue,
   materializeReward, computeDelivery, defaultAsk, liabilityTriggers, LEAD_TTL,
   type Lead, type Quest, type QuestSlot,
 } from '../engine/quests.js';
@@ -86,6 +86,9 @@ export interface GameState {
   /** tier-up lines minted by ghUpgrade, surfaced in the NEXT endCycle report (judges read
    *  campaign reports and never saw a tier event — the log line alone was invisible) */
   pendingTierLines?: string[];
+  /** early-game smoothing 2026-07-18: how many starterDripLead grants have fired (old saves
+   *  default to done — no retro-drip mid-campaign) */
+  starterDripped?: number;
   log: LogEntry[];
 }
 
@@ -136,9 +139,9 @@ export class Game {
       merc.location = HELD('roster');
       this.addCard(merc);
       this.ensureLoreNode(merc);
-      // STORY_ENGINE trigger 1 applies to FOUNDERS too — only hires got "past stirs" leads,
-      // so a starter's story could never begin (2026-07-11)
-      this.spawnPersonalChainLead(merc);
+      // founders' "past stirs" leads now arrive via personalChainDrip, STAGGERED (early-game
+      // smoothing 2026-07-18: all three at day 0 fed the 10-lead paralysis board) — the
+      // 2026-07-11 guarantee that every founder's story eventually begins lives in the drip
     }
     this.log('start', 'The fort stands: your bedroom, a bunkroom, and the Great Hall. Build a Map room to find work.');
   }
@@ -1802,6 +1805,7 @@ export class Game {
 
     // 4) housekeeping: healing, decay, staging timers, breaking
     this.personalChainDrip();
+    this.starterDripPass();
     this.healingPass();
     decayPass(st.lore, st.cycle);
     this.breakingPass(report);
@@ -2718,9 +2722,22 @@ export class Game {
   }
 
   /** founding mercs get their personal main chain too (hires get one at hire) */
+  /** early-game smoothing: the rest of the old day-0 packet arrives one lead per cycle */
+  private starterDripPass(): void {
+    const st = this.state;
+    if (!this.hasRoom('map-room')) return;
+    st.starterDripped ??= (st.cycle > 1 ? STARTER_DRIP_COUNT : 0);   // old saves: no retro-drip
+    if (st.starterDripped >= STARTER_DRIP_COUNT) return;
+    st.leads.push(starterDripLead(st.starterDripped, st.cycle, () => freshId('lead-')));
+    st.starterDripped += 1;
+    this.log('leads', 'New word reaches the map table.');
+  }
+
   private personalChainDrip(): void {
     const st = this.state;
-    if (!this.hasRoom('lead-room') || st.cycle < 10) return;
+    // cycle gate 10→3 (2026-07-18): founders now START here — first personal saga lands
+    // ~cycle 5 in expectation (0.25/cycle), the rest staggered behind the one-pending gate
+    if (!this.hasRoom('lead-room') || st.cycle < 3) return;
     // founders' sagas STRICTLY wait for roster slack — with 2 mercs a personal chain
     // monopolizes the whole company and starves the economy (dogfood-proven trap)
     if (this.roster().length < 3) return;

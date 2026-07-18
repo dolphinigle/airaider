@@ -1686,3 +1686,17 @@ Cost: zero AI calls, zero latency; prompt size O(1) via CANDIDATE_CAP.
   Batch K residual classes (the current worklist): draft-merge garble AT the pivotal beat
   (injury/lift), discovery told 3× (action→description→caption), specifics gestured-at
   ("its title clear") not paid out, "with the bank between them" formula ×2.
+- 2026-07-18 EARLY-GAME SMOOTHING shipped (designer: "smooth out the early game so its
+  playable"; earlier finding = day-0 decision paralysis, 10 near-identical stubs at once).
+  Day-0 board 10 → 3: starterPacket trimmed 7→3 (contract c1 L1 + rescue c2 L2 + the uncommon
+  story hook; variety kept), remaining 4 commons drip 1/cycle via starterDripLead/
+  STARTER_DRIP_COUNT (raid/hunt/investigate/raid, expiry +40 — still bridges to Scouting);
+  founders' 3 "past stirs" leads no longer spawn in bootstrap — they ride personalChainDrip
+  (cycle gate 10→3, one-pending stagger; first ~c3-5, every founder still guaranteed theirs).
+  GameState.starterDripped tracks progress; old saves default to done (no retro-dump). 🛠 knobs:
+  drip seq/count, personal gate cycle. Mock probe (seeds 11, 90501): c0=3 leads, +1/cycle,
+  personal lead c3. Real-AI 6-cycle read (seed 77301): opening 3 read varied+actionable (pack
+  contract / rescue / saga hook that became The Harrowed Name), drip lands as world-noise not a
+  queue, no dead cycles, builds every cycle, finale c4, roster 4 by c5. Typecheck + 86 tests
+  green. Playtest note → story lane: finale card named Herve before the player ever met him
+  (card-logic-hole class, already on the watch list).

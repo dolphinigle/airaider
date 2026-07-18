@@ -88,17 +88,32 @@ export function starterPacket(rng: Rng, cycle: number, idGen: () => string): Lea
     id: idGen(), rarity, level, region: 'forests', archetype,
     chainInfo: { kind: 'none' }, expiresAtCycle: cycle + LEAD_TTL * 2, source: 'starter',
   });
+  // 🛠 2026-07-18 early-game smoothing (designer: day-0 board of 10 leads = decision paralysis):
+  // the packet opens at THREE (two plain jobs + the story hook); the rest of the old packet
+  // arrives via starterDripLead, one per cycle — same total, staged choices, still bridges to
+  // the first Scouting lodge
   const leads = [
-    mk('contract', 'common', 1), mk('raid', 'common', 1), mk('rescue', 'common', 2),
-    mk('hunt', 'common', 1), mk('raid', 'common', 2), mk('investigate', 'common', 2),
+    mk('contract', 'common', 1), mk('rescue', 'common', 2),
   ];
   // one early story hook
   leads.push({ ...mk('investigate', 'uncommon', 2), chainInfo: { kind: 'starts-new' } });
-  // a generous learning window: the day-0 packet lingers (leads thereafter are strictly earned;
-  // packet size 🛠 — it must bridge to the first Scouting lodge)
+  // a generous learning window: the day-0 packet lingers (leads thereafter are strictly earned)
   for (const l of leads) l.expiresAtCycle = cycle + 40;
   return leads;
 }
+
+/** the rest of the old day-0 packet, dripped one per cycle after the Map room stands */
+export function starterDripLead(i: number, cycle: number, idGen: () => string): Lead {
+  const seq: [Archetype, Rarity, number][] = [
+    ['raid', 'common', 1], ['hunt', 'common', 1], ['investigate', 'common', 2], ['raid', 'common', 2],
+  ];
+  const [archetype, rarity, level] = seq[i % seq.length]!;
+  return {
+    id: idGen(), rarity, level, region: 'forests', archetype,
+    chainInfo: { kind: 'none' }, expiresAtCycle: cycle + 40, source: 'starter',
+  };
+}
+export const STARTER_DRIP_COUNT = 4;
 
 /** a region's standing lead-hunt (renewable faucet — the Scouting lodge's repeatable) */
 export function huntLead(region: string, level: number, idGen: () => string): Lead {
