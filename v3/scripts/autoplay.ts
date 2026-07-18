@@ -235,6 +235,11 @@ if (saveArg) {
   fs.writeFileSync(dest, g.save());
   console.log('saved →', dest);
 }
+// early-game pacing: cycles 0..19 with zero quest resolutions (the "dead cycle" metric)
+const earlyRes = st.log.filter(l => l.kind === 'resolve' && l.cycle < 20);
+const deadEarly = Array.from({ length: Math.min(20, st.cycle) }, (_, i) => i)
+  .filter(c => !earlyRes.some(l => l.cycle === c));
+console.log(`early: dead-cycles(0-19) ${deadEarly.length}${deadEarly.length ? ` [${deadEarly.join(',')}]` : ''} · resolved-by-c20 ${earlyRes.length}`);
 const resolved = st.log.filter(l => l.kind === 'resolve');
 console.log(`quests resolved(last400log) ${resolved.length} (${resolved.filter(l => l.text.includes('success')).length} s / ${resolved.filter(l => l.text.includes('partial')).length} p / ${resolved.filter(l => l.text.includes('failure')).length} f)`);
 console.log(`sizes: cards ${st.cards.length} · quests[] ${st.quests.length} · leads[] ${st.leads.length} · loreN ${Object.keys(st.lore.nodes).length} · loreE ${st.lore.edges.length} (${st.lore.edges.filter(e => e.active).length} act) · save ${(g.save().length / 1024).toFixed(0)}kB`);

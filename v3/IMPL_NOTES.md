@@ -1700,3 +1700,12 @@ Cost: zero AI calls, zero latency; prompt size O(1) via CANDIDATE_CAP.
   queue, no dead cycles, builds every cycle, finale c4, roster 4 by c5. Typecheck + 86 tests
   green. Playtest note → story lane: finale card named Herve before the player ever met him
   (card-logic-hole class, already on the watch list).
+- 2026-07-19 FOUNDERS 3→2 (designer-ruled "one or two"). Re-measured under the drip board
+  (autoplay, 12 seeds ×20 cycles — new permanent early-stats line in the summary: dead-cycles
+  0-19 + resolved-by-c20): 1 founder STALLS (dead cycles in 9/12 seeds, roster stuck at 1 by
+  c20 in 10/12 — the all-wounded stall the third founder once fixed comes back); 2 is
+  near-clean (one extra dead cycle in 2/12; ~26 resolved vs 37 at three — throughput, not
+  stalls); → 2. Real-AI 6-cycle read (seed 40417): founder med-wounded on a c0 failed rescue,
+  remaining founder soloed on with zero dead cycles; wound window playable; leave-behind
+  re-offer loop surfaced nicely. game.test.ts roster assertion 3→2. 86 green. Playtest nit
+  → prose lane: flesh WHO-line sometimes echoes the bare name ("WHO: Syalleth Dawnsinger").

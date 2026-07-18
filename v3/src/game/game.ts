@@ -131,10 +131,12 @@ export class Game {
   // ---- bootstrap (day 0) ------------------------------------------------------------------
 
   private bootstrap() {
-    // starting gold + starter mercs (🛠 2026-07-10: 2→3 — measured across 12 sim seeds, a third
-    // starter alone zeroes dead cycles and all-wounded stalls; no doc specifies the count)
+    // starting gold + starter mercs (🛠 2026-07-19: 3→2, designer-ruled with the drip board.
+    // Re-measured 12 sim seeds ×20 cycles: 1 founder stalls (dead cycles in 9/12, roster stuck
+    // at 1 by c20 in 10/12); 2 is near-clean (one extra dead cycle in 2/12); 3 was zero-dead
+    // but the designer wants the leaner start. No doc specifies the count)
     this.addCard(mintStackable('gold', 300));
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 2; i++) {
       const merc = this.freshCharacter('merc', 2, 60, 'forests');
       merc.location = HELD('roster');
       this.addCard(merc);

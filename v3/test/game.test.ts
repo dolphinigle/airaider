@@ -30,7 +30,7 @@ describe('game loop (mock AI)', () => {
   it('bootstraps: gold, 3 mercs, day-0 fort', () => {
     const g = newGame();
     expect(g.gold()).toBe(300);
-    expect(g.roster()).toHaveLength(3);   // 🛠 2026-07-10: third starter kills the 2-merc stall
+    expect(g.roster()).toHaveLength(2);   // 🛠 2026-07-19: 3→2 designer-ruled (1 stalls, measured)
     expect(g.state.fort.rooms.map(r => r.type).sort()).toEqual(['bedroom', 'bunkroom', 'great-hall']);
     expect(g.visibleLeads()).toHaveLength(0); // no Map room yet
   });
