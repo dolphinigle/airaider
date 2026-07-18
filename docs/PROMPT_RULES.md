@@ -111,3 +111,35 @@ fix the class, not the case. (Designer ruling, 2026-07-05.)
 Edit → **read real outputs** (run a `_exp_*` harness with the real AI, or `/playtest`) → judge the prose,
 not the diff → iterate. Offline gates (selftest/looptest/conformance) use the Mock narrator and only prove
 no *breakage*; they can't judge prose. See the **playtest** skill.
+
+## 10. Prose STYLE steering — the measured laws *(prosebench, 2026-07-18; designer-verified on sagas)*
+How the reports went from "clear but dead" (4.5) to good (6.5–7, peaks 8) — all A/B'd blind on the
+anchored bench in `v3/scripts/prosebench/` (rubric + frozen anchors + judge protocol). These are LAWS
+for style edits; every one below was measured, most the expensive way.
+
+- **~4 style rules is the cheap model's whole budget.** Beyond that, EVERY added directive was
+  net-negative per-sample even when it fixed its target class (three independent rounds). To add a
+  style rule, CUT one. Corollary of §0, now with numbers.
+- **All-negative constraint piles produce telegraphese.** The old block (one fact per sentence, one
+  clause, no similes, mood cut) was the CAUSE of the dead prose: a model under pure constraint emits
+  the safest generic sentence. Give ONE positive register line ("plain words, real events, no
+  ornament — every sentence earns its place by what happens in it") and few positive rules.
+- **The shipped four** (resolve prompts, `openai.ts`): vary rhythm — the SHORTEST sentence for the
+  moment that matters · ONE quoted line where it changes something (the single cheapest lever: judges'
+  best moments are always the spoken line) · anything uncanny acts by its strange nature or stays off
+  stage (a wonder two hired guards could replace is furniture) · LAST sentence is an act, image, or
+  spoken line — never a tally, never what it meant. The last-sentence rule sits in END position (§0);
+  in short-form the final line dominates the read.
+- **Exemplars underperform rules here** (+0.5 alone, nothing on top of rules) — contra the general
+  literature; our register line + rules already carry the voice.
+- **Prompt-side shape rotation STAMPS**: 3 rotating molds = 3 visible stamps (half the reports ended
+  on palms). Variety is an INPUT-shaping problem (engine seeds per §2 — e.g. archetype-weighted speech
+  demand), never more prompt directives.
+- **Bench before ship**: any style change is judged on the SAME frozen anchors, blind, ≥3 judges with
+  the calibration holdout; batch effects run ±1, so ties are settled by SAME-batch head-to-head.
+- **Known residuals are STRUCTURAL** (resistant to wording, don't re-try rules on them): finale
+  fate-formula echo, deliveredSummary loot pastes, parley pivots summarized when the speech demand is
+  scene-blind, same-ground chain monotony (arc-skeleton). 🟡 **One-off CARD briefings never got this
+  pass** (designer 2026-07-18: sagas good, one-offs lag) — the reference craft is Sultan's Game /
+  Fort of Chains: every setup's LAST sentence is a vector at the player's decision; each card
+  WITHHOLDS exactly one named thing; failure plays deadpan; restraint at the extremes.

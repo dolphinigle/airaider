@@ -1654,3 +1654,8 @@ Cost: zero AI calls, zero latency; prompt size O(1) via CANDIDATE_CAP.
 - Residual classes (structural, → story-interest phase): finale fate-formula echo, uncaused
   deliveredSummary loot pastes, orbit-summary on parley pivots (wants archetype-weighted speech),
   chain-ground monotony (arc-skeleton).
+- 2026-07-18 addendum: designer verdict post-ship — "quest now looks really good, finally
+  understandable"; one-offs still lag → next prose target = one-off CARD register (cards never
+  got the style pass; resolve rules ship for both). Steering laws promoted to docs law:
+  PROMPT_RULES §10 (rule budget ~4, positive register line, the shipped four, rotation stamps,
+  bench-before-ship, card-register craft to apply).
