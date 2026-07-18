@@ -1415,8 +1415,10 @@ export class Game {
       .filter(e => !e.companySoldier || e.id === chain.focalId
         || chain.bible.cast.some(m => m.loreId === e.id || m.name === e.name))
       // a cast member's lore entry that adds NO flag is a byte-duplicate of bible.cast
-      // (context-free audit: same person described twice in one payload) — drop it
-      .filter(e => e.companySoldier || e.companyCaptive || e.atTheFort || e.outOfReach
+      // (context-free audit: same person described twice in one payload) — drop it. The FOCAL
+      // is exempt: their lore identity carries the tags/sex the writer has no other source
+      // for (bible cast entries hold who/want only — dropping it left a named focal sexless)
+      .filter(e => e.id === chain.focalId || e.companySoldier || e.companyCaptive || e.atTheFort || e.outOfReach
         || !chain.bible.cast.some(m => m.loreId === e.id || m.name === e.name));
     // 🛠 2026-07-10 (reverses the earlier arrive-FRESH ruling): a lapsed unmarched beat is
     // re-offered VERBATIM from cache — a re-rendered "fresh telling" drifted settled facts
