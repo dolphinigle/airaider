@@ -1882,6 +1882,7 @@ export class Game {
       const chain = st.chains.find(c => c.id === (l.chainInfo as { chainId: string }).chainId);
       if (!chain || (chain.state !== 'active' && chain.state !== 'finale-pending')) continue;
       chain.state = 'slipped'; chain.bank = 0;
+      this.persistMetCast(chain);
       const focal = this.card(chain.focalId);
       if (focal && !chain.isPersonal && focal.location.kind === 'held' && focal.location.state === 'limbo') {
         focal.location = HELD('lore');
@@ -1954,6 +1955,7 @@ export class Game {
         chain.reOffers = (chain.reOffers ?? 0) + 1;
         if (chain.reOffers >= 3) {
           chain.state = 'slipped'; chain.bank = 0;
+          this.persistMetCast(chain);
           const focal = this.card(chain.focalId);
           if (focal && !chain.isPersonal && focal.location.kind === 'held' && (focal.location as { state?: string }).state === 'limbo') {
             focal.location = HELD('lore');
@@ -2481,7 +2483,46 @@ export class Game {
     report.push(`📖 ${chain.bible.title}: ${chain.bank.toFixed(0)}g earned toward this matter's ~${chain.payoff.toFixed(0)}g worth (${delta >= 0 ? '+' : ''}${delta}g today)${finaleReady(chain) ? ' — it now comes to a head' : ''}.${focalMet ? ` ${focal!.name} stays at the heart of it.` : ''}`);
   }
 
+  /** LORE §1 story-NPC write-back (built 2026-07-18): when a saga closes, coined cast the
+   *  player actually MET persist as lore-only nodes — the world remembers faces. Cap 2/saga
+   *  (client > obstacle > ally) guards the slate. The memory edge anchors them to the FOCAL —
+   *  recall is edge-driven, an unanchored node is unreachable — at salience 0.5, never core,
+   *  so standard decay forgets them in ~45 cycles unless a later saga re-touches them.
+   *  Persisted at CLOSE, not genesis-time (§3.3 literal): live-chain cast are slate-excluded
+   *  anyway, and close-time avoids offstage spoilers + abandoned-saga clutter. Recurrence
+   *  rides existing channels: slate reuse + §21-3 known-cast promotion (starved until now). */
+  private persistMetCast(chain: Chain) {
+    const met = new Set(chain.story.introducedNames ?? []);
+    const focalName = this.card(chain.focalId)?.name;
+    const prio: Record<string, number> = { client: 0, obstacle: 1, ally: 2 };
+    // cap BEFORE the collision filter: the top-2 slots are fixed by role, never back-filled
+    // on a re-entry (a collided name means the world already holds that memory)
+    const picked = chain.bible.cast
+      .filter(m => !m.loreId && m.name && met.has(m.name) && m.name !== focalName)
+      .sort((a, b) => (prio[a.role] ?? 3) - (prio[b.role] ?? 3))
+      .slice(0, 2)
+      .filter(m => !this.state.cards.some(c => c.name === m.name)
+        // name checked against ALL nodes incl. inactive — a remembered name is never re-dealt
+        && !Object.values(this.state.lore.nodes).some(nd => nd.name === m.name));
+    for (const m of picked) {
+      const id = freshId('lore-');
+      // sentence-safe clamp (newPlaces pattern): a blurb cut mid-phrase invites invented completions
+      const b = m.who.length > 120
+        ? (c => { const d = c.lastIndexOf('. '); return d > 60 ? c.slice(0, d + 1) : c.replace(/\s+\S*$/, '') })(m.who.slice(0, 120))
+        : m.who;
+      this.state.lore.nodes[id] = { id, kind: 'character', name: m.name, blurb: b, identity: b, active: true, createdCycle: this.state.cycle };
+      guardEdges(this.state.lore, [{
+        from: id, to: chain.focalId,
+        type: m.role === 'obstacle' ? 'rival-of' : 'party-to',
+        blurb: `${m.role === 'obstacle' ? 'stood against the company' : m.role === 'client' ? 'hired the company' : 'stood with the company'} in the matter of "${chain.bible.title}"`,
+        importance: 0.5,
+      }], this.state.cycle, () => freshId('e'), chain.id);
+    }
+    if (picked.length) this.log('chain', `The world remembers ${picked.map(m => m.name).join(' and ')}.`);
+  }
+
   private settleFinale(q: Quest, chain: Chain, r: { outcome: Outcome; party: Card[] }, report: string[], precomputed?: FinaleFate) {
+    this.persistMetCast(chain);
     const st = this.state;
     const focal = this.card(chain.focalId);
     // the fate was decided BEFORE the AI narrated (P11); recompute only as a fallback

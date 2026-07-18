@@ -1615,3 +1615,16 @@ shipping it; prefer prompt fixes and log-only lints.
    ending when the record is too thin. RULING PENDING.
 4. Failure-narration defect classes to watch: unrecorded wounds narrated (no 🩸 emitted, then
    carried/mutated by later cards), redundant loss restatement ×2-3 per report.
+
+## Story-NPC write-back — the empty-lorebook fix (2026-07-18, #372, designer-approved plan)
+Designer playtest caught it: after whole campaigns the lore graph held only payroll + focals —
+LORE §1's "story NPCs" layer had no producer (§3.3 write-back was built for places+edges only,
+and coined bible cast deliberately never became cards… or nodes). Built `persistMetCast` at all
+three chain-close sites (done + both slip paths): met coined cast → lore-only nodes, cap 2,
+edge-anchored to the focal (recall is edge-driven; a self-edge-only node is UNREACHABLE — the
+recall walks the focal's neighbors). GC needed none new: edges at salience 0.5 non-core decay
+to the 0.12 floor in ~45 cycles via the existing per-cycle decayPass (LORE §2 soft-delete);
+nodes stay as the Chronicle archive by design and keep the name guard airtight forever.
+Unlocks the starved §21-3 known-cast promotion (needs ≥3 lore-only characters; was always 0).
+Cap-before-collision-filter ordering matters (idempotency — a vitest caught back-fill).
+Cost: zero AI calls, zero latency; prompt size O(1) via CANDIDATE_CAP.
