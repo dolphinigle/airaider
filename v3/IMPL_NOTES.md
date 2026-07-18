@@ -1628,3 +1628,12 @@ nodes stay as the Chronicle archive by design and keep the name guard airtight f
 Unlocks the starved §21-3 known-cast promotion (needs ≥3 lore-only characters; was always 0).
 Cap-before-collision-filter ordering matters (idempotency — a vitest caught back-fill).
 Cost: zero AI calls, zero latency; prompt size O(1) via CANDIDATE_CAP.
+- **VERIFIED (campaign 99001 + continuity judge, same day)**: full loop fired in one 24-cycle
+  run — Dolly Greyfell (obstacle, saga 1) persisted, re-dealt via slate, recast as a LATER
+  saga's obstacle with loreId, judged CONSISTENT (same hunt-mark, temperament, side, prop
+  callbacks); Georgy's reuse exemplary (prize→companion, twist built on his established
+  craft). Judge: "reads as a richer world, not name-collision." Watch-list classes it
+  surfaced (edges, not the feature): chain twists borrowing a campaign location against its
+  logged event ("the retreat at Oakwell Hawthorn" vs a logged win there); prose inventing
+  unlogged history (a burn-mark no report recorded); a lapsed one-off re-offer mutating its
+  captors' trade; INTRODUCED lists not marking reuse; one intra-finale handoff muddle.
