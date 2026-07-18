@@ -272,7 +272,88 @@ function sagaSystem(input: QuestWriteInput): string {
 
 // ── resolve system prompts (§0: self-contained per shape, rules once, critical at end) ──────
 
-const RESOLVE_CORE_HEAD = 'You narrate the result of a job a mercenary company\'s soldiers were SENT on, in a dark-fantasy low-medieval world. The OUTCOME is already decided and given to you. The reader is the company\'s boss, who stayed at the fort: narrate the sent party in third person — never "you" in the field.\nGAME WRITING, not literature: entries in a game session log, read once between dice rolls. Past tense. Plain everyday English; short sentences; no semicolons; no similes. Every sentence changes the picture of the job — progress, a setback, a cost, a gain, a fact learned; a sentence of soldiers merely moving or handling gear is cut, and so is a mood-only sentence.';
+// ── prose-style lab (prosebench 2026-07-18): PROSE_VARIANT = '' | exemplar | stack | diet ──
+// Bench baseline 4-6 ("clear but dead"); judges' unanimous defects: nobody speaks, monotone
+// chains, receipt endings; designer's 4th class: uncanny staged as furniture (the druid ring).
+// Research (arxiv 2509.14543 a.o.): in-voice exemplar > rules; rule budget ~3-6; ban
+// constructions as positives. Variants isolate: exemplar alone / exemplar+rules / rules alone.
+// SHIPPED DEFAULT = 'diet' (the V3 config): prosebench head-to-head winner 6.3 vs 5.3 (r4),
+// vs 4.5 old prompts. Set PROSE_VARIANT=v0 for the legacy style block; other variants = lab lineage.
+const PROSE_VARIANT = process.env.PROSE_VARIANT ?? 'diet';
+// Voice exemplars are MUNDANE on purpose (bleed-safe: no quests, no wonders, no props the game
+// deals); each shows varied rhythm, one spoken fragment, one seen detail, a hard ending.
+const VOICE_EXEMPLARS = [
+  '«Marsh crossed at first light. Two horses were gone from the string, and the ferryman would not meet his eye. "Count them again," Marsh said. He stayed on the ramp, arms folded, until the man had. The count came up two short, and the ferryman\'s boy was gone too.»',
+  '«The pens had held all winter, and then one night they didn\'t. Hedda found the fence post lifted out whole and set aside, the way a man sets aside a chair. Nothing torn, nothing bled. "Wolves pull," was all she said. "They don\'t lift." She nailed a lantern to the gate and sat up with the dog.»',
+  '«Rain caught the column at the ford and the wagon went in to the axle. They carried the grain over by hand, sack by sack, while the carter stood on the bank telling them what each sack was worth. The last man over threw his sack down at the carter\'s feet. "Carry the next one yourself."»',
+];
+let exemplarTick = 0;
+
+const RESOLVE_HEAD_FRAME = 'You narrate the result of a job a mercenary company\'s soldiers were SENT on, in a dark-fantasy low-medieval world. The OUTCOME is already decided and given to you. The reader is the company\'s boss, who stayed at the fort: narrate the sent party in third person — never "you" in the field.\n';
+const RESOLVE_STYLE_DIET = 'Entries in a game session log, read once between dice rolls. Past tense. Plain words, real events, no ornament — every sentence earns its place by what happens in it.';
+
+// round-2 (ROUND1_RESULTS): the opener stamped 8/8 (arrival formula) and the closer stamped as
+// a demonstrative quote — a per-call prompt cannot see the last report's shape, so the ENGINE
+// rotates the demanded shape (rotation precedent: pay-gloss pools). Pairs rotate together.
+const SHAPE_ROTATION: [string, string][] = [
+  ['Open "before" on the ground itself — what the place shows before any soldier is named.',
+   'The LAST sentence of "after" is someone doing one last concrete thing — never a tally of goods, never what it all meant.'],
+  ['Open "before" on the person or thing that will resist — the party arrives to find it already there.',
+   'The LAST sentence of "after" is an IMAGE — a thing seen, still or in motion; never a tally of goods, never what it all meant.'],
+  ['Open "before" on the party in motion, already at the place.',
+   'The LAST sentence of "after" is a short EXCHANGE — someone speaks and someone answers or acts on it; never a tally of goods, never what it all meant.'],
+];
+
+// r3 (ROUND2 stamp verdict: 3 molds = 3 stamps): rotation goes COMBINATORIAL — independent
+// co-prime axes (openers 4 × closers 5 × speech 3, cycle 60) so adjacent reports never share
+// a shape and the one-quote-per-report cadence breaks. Style atomization: axes combine.
+const R3_OPENERS = [
+  'Open "before" on the ground itself — what the place shows before any soldier is named.',
+  'Open "before" on the person or thing that will resist — the party arrives to find it already there.',
+  'Open "before" on the party in motion, already at the place.',
+  'Open "before" on the first thing HEARD or the first thing that MOVES.',
+];
+const R3_CLOSERS = [
+  'The LAST sentence of "after" is someone doing one last concrete thing — never a tally of goods, never what it all meant.',
+  'The LAST sentence of "after" is an IMAGE — a thing seen, still or in motion; never a tally of goods, never what it all meant.',
+  'The LAST sentence of "after" is a short EXCHANGE — someone speaks and someone answers or acts on it; never a tally of goods, never what it all meant.',
+  'The LAST sentence of "after" belongs to the OTHER side — what those left behind do or say as the party goes.',
+  'The LAST sentence of "after" is the road — the party already moving, the place at their backs.',
+];
+const R3_SPEECH = [
+  'No one speaks in this report — the telling is all act and image.',
+  'One line of speech, quoted, that does something narration cannot — an answer, a refusal, a demand. Speech can be a fragment.',
+  'One short exchange — two voices, a line each; people answer sideways.',
+];
+let r3tick = 0;
+
+function resolveCoreHead(): string {
+  if (PROSE_VARIANT === 'exemplar' || PROSE_VARIANT === 'stack') {
+    return RESOLVE_HEAD_FRAME + RESOLVE_STYLE_DIET + '\nWrite in the VOICE of this sample — copy the voice, never its people, events, or words:\n'
+      + VOICE_EXEMPLARS[exemplarTick++ % VOICE_EXEMPLARS.length];
+  }
+  if (PROSE_VARIANT === 'diet' || PROSE_VARIANT === 'r2') return RESOLVE_HEAD_FRAME + RESOLVE_STYLE_DIET;
+  return RESOLVE_HEAD_FRAME + 'GAME WRITING, not literature: entries in a game session log, read once between dice rolls. Past tense. Plain everyday English; short sentences; no semicolons; no similes. Every sentence changes the picture of the job — progress, a setback, a cost, a gain, a fact learned; a sentence of soldiers merely moving or handling gear is cut, and so is a mood-only sentence.';
+}
+
+// the rule stack: rhythm, one spoken line, load-bearing strangeness (+r2: on-screen
+// transactions — "the spear made the exchange" class), with r2's rotating opener shape
+function proseStack(shape: string[] | null): string {
+  if (PROSE_VARIANT !== 'stack' && PROSE_VARIANT !== 'diet' && PROSE_VARIANT !== 'r2' && PROSE_VARIANT !== 'r3' && PROSE_VARIANT !== 'r4') return '';
+  // r3: the speech directive rotates (none / one line / exchange) — the always-one-quote
+  // cadence was itself a stamp; the line-quality bar (anti-receipt) rides the rolled directive
+  const speech = PROSE_VARIANT === 'r3' && shape?.[2]
+    ? shape[2]
+    : PROSE_VARIANT === 'r4'
+      ? 'One line of speech, quoted, that does something narration cannot — an answer, a refusal, a demand. Speech can be a fragment; people answer sideways.'
+      : 'One line of speech, quoted, where it changes something. Speech can be a fragment; people answer sideways.';
+  return '═══ THE TELLING ═══\nVary sentence length — let one sentence run long where cause links to effect, and keep the shortest for the moment that matters; never three sentences of the same length in a row.\n' + speech
+    + '\nAnything uncanny on stage acts by its strange nature or stays off the stage — a wonder that two hired guards could replace is furniture.'
+    + (PROSE_VARIANT === 'r2' ? '\nEvery give, take, or yield happens as hands, words, or blows ON SCREEN — never told as an abstract exchange or a price paid.' : '')
+    // r3 (ROUND2): the garble class = the model juggling 4+ named props; cap the manifest
+    + (PROSE_VARIANT === 'r3' || PROSE_VARIANT === 'r4' ? '\nThe "after" names at most TWO objects; everything else stays unnamed — "it", "the rest", or absent.' : '')
+    + (shape && (PROSE_VARIANT === 'r2' || PROSE_VARIANT === 'r3') ? '\n' + shape[0] : '');
+}
 
 // inputs section per-call: rules about fields this call doesn't carry are pure parse-load
 // for a cold model (context-free audit 2026-07-17)
@@ -289,34 +370,54 @@ const resolveInputs = (q: ResolveQuestInput) => [
 const RESOLVE_OUTPUT = (finale: boolean) => [
   '═══ YOUR OUTPUT ═══',
   '1) "before" — the SETUP, written WITHOUT looking at the outcome, in two moves: the party arrives, then the CHALLENGE SHOWS ITSELF — the LAST sentence states, in the indicative, the concrete thing that now stands in the way — a live obstacle, never the prize itself, never a statement that something cannot be reached, never an order or task restated — on a full stop (never an em-dash, ellipsis, or scenery). Everything the outcome will need — foes, tools, helpers — is on stage HERE. It ADDS something the card did not say, never hints at the result, never reveals what the job has yet to find. Vary the opening sentence\'s grammar AND the final obstacle sentence\'s shape report to report — the same verb of blocking twice running is a stamp; skip the departure from the fort (mist, rain, and time-of-day openers are stamps).',
-  '2) "after" — what happened, knowing the outcome. The first sentence is the decisive moment or its result, never a restatement of the job. Events in the order they mattered: how the attempt met the challenge, what it cost, what the company now holds or knows. The reader must finish knowing EXACTLY what was achieved or lost; a learn-or-uncover job states the answer IN FULL (a fact "learned" but not said is nothing reported). Name a party member only where they personally turned the job; a member with no such moment gets no invented one, and never their trait word. Wounds ride inside their action beats — never a default body part, never the same wound sentence twice, never a wound not listed in injuries. On failure, show in-fiction what was lost — fresh words each time. An unnamed person enters by trade, never a coined name; an absent client is not staged. End where the story stops — a concrete event or holding, never a summing-up. ONE SCENE, ONE TRUTH: the after acts ONLY through people and things the before staged, exactly as it left them — same place, same state (a thing on a stall is taken from the stall; a person staged alive dies only by an on-screen event); the party stays on the staged ground to the last act (no cutting away and back); no new foes, tools, or helpers appear mid-outcome; a staged threat acts or is dealt with, never reported absent.',
+  '2) "after" — what happened, knowing the outcome. The first sentence is the decisive moment or its result, never a restatement of the job. Events in the order they mattered: how the attempt met the challenge, what it cost, what the company now holds or knows. The reader must finish knowing EXACTLY what was achieved or lost; a learn-or-uncover job states the answer IN FULL (a fact "learned" but not said is nothing reported). Name a party member only where they personally turned the job; a member with no such moment gets no invented one, and never their trait word. ' + (PROSE_VARIANT === 'r3' || PROSE_VARIANT === 'r4' ? 'A wound lands in ONE plain sentence of its own — who was hurt, what struck, where it bit — set where it happened; never a default body part, never the same wound sentence twice, never a wound not listed in injuries.' : 'Wounds ride inside their action beats — never a default body part, never the same wound sentence twice, never a wound not listed in injuries.') + ' On failure, show in-fiction what was lost — fresh words each time. An unnamed person enters by trade, never a coined name; an absent client is not staged. End where the story stops — a concrete event or holding, never a summing-up. ONE SCENE, ONE TRUTH: the after acts ONLY through people and things the before staged, exactly as it left them — same place, same state (a thing on a stall is taken from the stall; a person staged alive dies only by an on-screen event); the party stays on the staged ground to the last act (no cutting away and back); no new foes, tools, or helpers appear mid-outcome; a staged threat acts or is dealt with, never reported absent.',
   '- injuries: ONLY when the fiction put a member in harm\'s way — a clean success lists none, never death, empty array when nobody was hurt. cause = an exact phrase FROM YOUR OWN after text showing that person taking the hurt. Bands: low = days; med = weeks and a scar; high = months — and the wound\'s LANGUAGE matches its band (a low wound reads as a nick, never a lodged spear).',
   `- WORD BUDGET (hard caps, count): common → before ≤25, after ≤45. uncommon → ≤35 / ≤65. rare${finale ? ' or finale' : ''} → ≤50 / ≤95. When it cannot all fit keep, in order: the RESULT, the cost, the client\'s promise handled, any character touch.`,
   '- edges: 0-2, only moments that should be REMEMBERED; blurb one line; importance a NUMBER 0-1 (0.8+ = defining); ids only from party/deliveredCharacters in this message.',
 ].join('\n');
 
-const RESOLVE_ANCHOR = '═══ ABOVE ALL (write now) ═══\n1. Every sentence parses ONE way on one skim — subject and verb early; a carry-list holds only what hands can carry.\n2. The result is unmistakable: what was won or lost, what the company now holds or knows — and a FAILED job wins NOTHING: what it sought stays unfound and unlearned, never handed out by the failure\'s own telling.\n3. The report ENDS at the job\'s last act in the field: the coin payment and the walk home always stay OUTSIDE your text — but when the job\'s own objective is to deliver or hand something over AND the receiver stands on the staged ground, THAT handover IS the last act and is shown (a receiver elsewhere is never staged — the report ends with the goods secured for the road); only the coin that would follow it is not.\n4. Period diction; never echo an instruction or field name ("approach", "plan", "outcome", "step", "dice", "roll", "obstacle", "payer" are system words that never appear in prose); the account-book (ledger, registry, record-book) is BANNED in prose.\nRespond as the JSON object specified below — nothing else.';
+const resolveAnchor = (shape: string[] | null) => '═══ ABOVE ALL (write now) ═══\n1. Every sentence parses ONE way on one skim — subject and verb early; a carry-list holds only what hands can carry.\n2. The result is unmistakable' + (PROSE_VARIANT === 'r3' || PROSE_VARIANT === 'r4' ? ', shown ONCE — never restated in a second or third sentence' : '') + ': what was won or lost, what the company now holds or knows — and a FAILED job wins NOTHING: what it sought stays unfound and unlearned, never handed out by the failure\'s own telling.\n3. The report ENDS at the job\'s last act in the field: the coin payment and the walk home always stay OUTSIDE your text — but when the job\'s own objective is to deliver or hand something over AND the receiver stands on the staged ground, THAT handover IS the last act and is shown (a receiver elsewhere is never staged — the report ends with the goods secured for the road); only the coin that would follow it is not.\n4. Period diction; never echo an instruction or field name ("approach", "plan", "outcome", "step", "dice", "roll", "obstacle", "payer" are system words that never appear in prose); the account-book (ledger, registry, record-book) is BANNED in prose.\n'
+  + (shape ? '5. ' + shape[1] + '\n'
+    : (PROSE_VARIANT === 'stack' || PROSE_VARIANT === 'diet' || PROSE_VARIANT === 'r4') ? '5. The LAST sentence of after is a concrete act, an image, or a spoken line — never a tally of goods, never what it all meant.\n' : '')
+  + 'Respond as the JSON object specified below — nothing else.';
 
-const oneOffResolveSystem = (q: ResolveQuestInput) => [
-  RESOLVE_CORE_HEAD,
+// returns [openerDirective, closerDirective, speechDirective?] — r2 pairs, r3 triple
+function rollShape(): string[] | null {
+  if (PROSE_VARIANT === 'r2') return SHAPE_ROTATION[exemplarTick++ % SHAPE_ROTATION.length] ?? null;
+  if (PROSE_VARIANT === 'r3') {
+    const t = r3tick++;
+    let closer = R3_CLOSERS[t % 5]!;
+    const speech = R3_SPEECH[t % 3]!;
+    // a no-speech report cannot demand an exchange closer
+    if (t % 3 === 0 && t % 5 === 2) closer = R3_CLOSERS[1]!;
+    return [R3_OPENERS[t % 4]!, closer, speech];
+  }
+  return null;
+}
+
+const oneOffResolveSystem = (q: ResolveQuestInput, shape = rollShape()) => [
+  resolveCoreHead(),
   resolveInputs(q),
   TAGS_NOTE, NUMBER_BAN, EDGE_TYPES_LINE,
   RESOLVE_OUTPUT(false),
-  RESOLVE_ANCHOR,
+  proseStack(shape),
+  resolveAnchor(shape),
   'Respond as JSON matching: {questId, before, after, injuries:[{characterId, band: STRICTLY "low"|"med"|"high", cause}], fleshed:' + (q.deliveredCharacters?.length ? '[{characterId,who,backstory,quirks}]' : ' [] (no one was handed over)') + ', edges:[{from,to,type,blurb,importance}]}',
-].join('\n');
+].filter(Boolean).join('\n');
 
 function sagaResolveSystem(q: ResolveQuestInput): string {
   const finale = !!q.chainContext?.isFinale;
+  const shape = rollShape();
   return [
-    RESOLVE_CORE_HEAD,
+    resolveCoreHead(),
     resolveInputs(q),
-    '═══ THE SAGA STEP ═══\nThis job is ONE STEP of a longer saga. The report performs chainContext.arcStep and nothing else. When arcStep ends in "→ yields: …", that is what a SUCCESS delivers, shown concretely (a partial delivers it dearly or in part; a failure withholds it). stepsNotYet = later steps — their work, prizes, and targets may not land or resolve here, however big the roll (a big roll is THIS step done exceptionally well). ' + (finale ? '' : 'The saga\'s goal stays unachieved whatever the dice said; when a success as written would settle it, complete the JOB while the larger matter visibly stays open. ') + 'What a resolution settles STAYS settled; storyState is the PAST — never re-staged, and this report never repeats a prior report\'s event sequence (a second attempt goes DIFFERENTLY). storyState.actorStates = WHEREABOUTS, the single truth of where each person and object rests: the report starts them there; only on-screen action moves them. A focal who is a company soldier is never handed into custody. ONLY this party\'s soldiers appear; between jobs every soldier returns to the fort — no report leaves one posted or holding something in the field. bible = the hidden truth (the STATE outranks its plan).',
-    finale ? '═══ THE FINALE ═══\nThe ENGINE decides every disposition — who joins, leaves, dies, owns: narrate what was delivered as given. chainContext.fate = what becomes of the central person; it COMPOSES with the outcome: the job\'s own objective resolves on screen FIRST, the fate lands after, never instead. End the person exactly on the fate in the fiction\'s own words: kept WITH the company = the report ends with them back with the company; sent OUT = they leave into the arrangement, never escaping or kept after all. chainContext.approach = the plan the company CHOSE, a CONTRACT: the first after-sentence shows it executed by its own terms, every action its label names happens or fails on screen, and a failure fails THE CHOSEN plan; each rejectedApproaches plan\'s distinctive route, trick, or prop may not appear. The report ACCOUNTS for every named captive, prize, and open obligation still live in storyState — kept, returned, lost, or written off, each in a clause.' : '',
+    '═══ THE SAGA STEP ═══\nThis job is ONE STEP of a longer saga. The report performs chainContext.arcStep and nothing else. When arcStep ends in "→ yields: …", that is what a SUCCESS delivers, shown concretely (a partial delivers it dearly or in part; a failure withholds it). stepsNotYet = later steps — their work, prizes, and targets may not land or resolve here, however big the roll (a big roll is THIS step done exceptionally well). ' + (finale ? '' : 'The saga\'s goal stays unachieved whatever the dice said; when a success as written would settle it, complete the JOB while the larger matter visibly stays open. ') + 'What a resolution settles STAYS settled; storyState is the PAST — never re-staged, and this report never repeats a prior report\'s event sequence (a second attempt goes DIFFERENTLY). storyState.actorStates = WHEREABOUTS, the single truth of where each person and object rests: the report starts them there; only on-screen action moves them' + (PROSE_VARIANT === 'r2' || PROSE_VARIANT === 'r3' || PROSE_VARIANT === 'r4' ? ' — retold in your OWN words: a whereabouts phrase pasted into prose reads as nonsense' : '') + '. A focal who is a company soldier is never handed into custody. ONLY this party\'s soldiers appear; between jobs every soldier returns to the fort — no report leaves one posted or holding something in the field. bible = the hidden truth (the STATE outranks its plan).',
+    finale ? '═══ THE FINALE ═══\nThe ENGINE decides every disposition — who joins, leaves, dies, owns: narrate what was delivered as given. chainContext.fate = what becomes of the central person; it COMPOSES with the outcome: the job\'s own objective resolves on screen FIRST, the fate lands after, never instead. End the person exactly on the fate in the fiction\'s own words' + (PROSE_VARIANT === 'r2' || PROSE_VARIANT === 'r3' || PROSE_VARIANT === 'r4' ? ' — the fate lands as an EVENT someone could watch, never a status line' : '') + (PROSE_VARIANT === 'r3' || PROSE_VARIANT === 'r4' ? ', and the central person gets one line or visible reaction of their OWN before the end' : '') + ': kept WITH the company = the report ends with them back with the company; sent OUT = they leave into the arrangement, never escaping or kept after all. chainContext.approach = the plan the company CHOSE, a CONTRACT: the first after-sentence shows it executed by its own terms, every action its label names happens or fails on screen, and a failure fails THE CHOSEN plan; each rejectedApproaches plan\'s distinctive route, trick, or prop may not appear. The report ACCOUNTS for every named captive, prize, and open obligation still live in storyState — kept, returned, lost, or written off, each in a clause.' : '',
     TAGS_NOTE, NUMBER_BAN, EDGE_TYPES_LINE,
     RESOLVE_OUTPUT(finale),
     '- storyUpdate: its truth SCALES with the outcome (success = the full new fact; partial = part, bought dear; failure = nothing concrete). currentSituation states concretely what changed — who holds what, who moved where — names spelled exactly as earlier text spelled them. actorUpdates = the WHEREABOUTS ledger: {"name": "where they now are / who holds it"} — record this step\'s own key object and every person it moved, found, secured, or placed, each name spelled exactly; the NEXT step is pinned to what you write here, so anything you leave out can drift to a wrong place. newlyRevealed = only facts NOT already in storyState. openThreads = the saga\'s live loose ends, replacing the old list. sagaSettled = true ONLY if the central matter is essentially settled with nothing real left to do' + (finale ? '' : ' (the game then brings the saga to its head next step)') + '.',
-    RESOLVE_ANCHOR,
+    proseStack(shape),
+    resolveAnchor(shape),
     'Respond as JSON matching: {questId, before, after, injuries:[{characterId, band: STRICTLY "low"|"med"|"high", cause}], fleshed:' + (q.deliveredCharacters?.length ? '[{characterId,who,backstory,quirks}]' : ' [] (no one was handed over)') + ', edges:[{from,to,type,blurb,importance}], storyUpdate:{currentSituation, newlyRevealed:[strings], openThreads:[strings], actorUpdates:{name: "one line"}, sagaSettled: boolean}}',
   ].filter(Boolean).join('\n');
 }

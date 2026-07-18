@@ -1637,3 +1637,20 @@ Cost: zero AI calls, zero latency; prompt size O(1) via CANDIDATE_CAP.
   logged event ("the retreat at Oakwell Hawthorn" vs a logged win there); prose inventing
   unlogged history (a burn-mark no report recorded); a lapsed one-off re-offer mutating its
   captors' trade; INTRODUCED lists not marking reuse; one intra-finale handoff muddle.
+
+## 2026-07-18 (late) — prose quality: the bench + the shipped style (designer: "get the score to 7-8")
+- Built `scripts/prosebench/` — an ANCHORED blind-judging framework (rubric, frozen anchors incl.
+  a matched-content rewrite of the designer's own Highford playthrough + Sultan's Game / Fort of
+  Chains / Njála excerpts, calibration holdout, hidden cross-round repeats). 21 judge-runs,
+  calibration perfect throughout. Designer's playthrough baseline: 4-6 (median 5), "clear but dead".
+- SHIPPED (default): the diet+stack resolve style — positive register line + 3 TELLING rules
+  (rhythm / one quoted line / load-bearing strangeness) + end-position last-sentence rule.
+  Measured 6.5-7 vs 4.5 old; head-to-head 6.3 vs 5.3 over the fixes-heavy r4. `PROSE_VARIANT=v0`
+  = legacy; exemplar/stack/r2/r3/r4 kept as lab lineage in openai.ts.
+- MEASURED LAWS: (1) style-rule budget ~4 for gpt-5-mini/low — every rule past that was
+  net-negative across three rounds; (2) exemplar ≈ +0.5 alone, nothing over rules; (3) 3-mold
+  rotation = 3 stamps; combinatorial axes buy variety (3→4-5) but cost quality — variety is an
+  INPUT-shaping problem. Full curve + residual structural classes: prosebench/FINAL_VERDICT.md.
+- Residual classes (structural, → story-interest phase): finale fate-formula echo, uncaused
+  deliveredSummary loot pastes, orbit-summary on parley pivots (wants archetype-weighted speech),
+  chain-ground monotony (arc-skeleton).
