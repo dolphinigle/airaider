@@ -22,6 +22,7 @@ export interface QuestWriteInput {
   level: number; rarity: string;
   slotCount: number;
   rewardEnvelope: string;        // "a captive and coin" — the engine's kind list, no numbers
+  stake?: string;                // beat 1 only (R1 sell-the-stake): what the WHOLE matter is rumored to be worth to the company — paste-clean, rumor-toned, no numbers
   keywords?: string[];           // one-offs: §5 sampler (1 BOND + 1 TIE + 1-2 WILDCARDS)
   opening?: { spark: string };   // one-offs only — arrival SPARK, time folded in ("a friar, a plea — at dusk"): a standalone time field taught cards to open "At dusk, ...".
                                  // Beats get NO spark: a random spark fought the saga (a cart from nowhere).

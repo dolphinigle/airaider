@@ -1667,3 +1667,12 @@ Cost: zero AI calls, zero latency; prompt size O(1) via CANDIDATE_CAP.
   (backbone stays); real gap = "why send people?" → sell-the-stake proposals R1-R3 in memory
   await ruling (beat-1 sells the engagement from engine envelope; bank-at-risk surfaced; leads
   show worth-band).
+- 2026-07-18 R1 SHIPPED (designer-ruled experiment): beat-1 saga cards sell the stake — engine
+  deals a paste-clean rumor gloss (kind × payoff band; personal sagas name the focal) and the
+  card must CLOSE on it (conditional ABOVE-ALL rule 5; mid-paragraph placement fired ~50%,
+  end position 6/6 — position law again). Blind A/B batch I (briefing register, FoC holdout
+  8/8/8): stake 5.5 vs control 4.25; boss_pull: stake 5 yes / 0 no, control 0 yes / 10 no.
+  Debug trail: field was whitelisted OUT of the user message (context-free-verifier class);
+  personal chains initially excluded; anonymous personal gloss judged boilerplate → named.
+  STAKE=0 restores. New watch classes from judges (→ story phase): card logic holes (a
+  gatekeeper who could search her own gate), referent bridges ("caged traveler"→"the singer").

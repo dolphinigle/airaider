@@ -1511,6 +1511,14 @@ export class Game {
             'Plain coin for plain work, and what the road yields is the company\'s to keep.',
             'The pay is fixed, and what else the job shakes loose the company keeps.',
           ]),
+      // R1 sell-the-stake (designer ruling 2026-07-18, STAKE=1 lab flag): beat 1 tells the boss
+      // what the WHOLE matter is rumored to be worth — engine-known kind + payoff band, dealt as
+      // a paste-clean rumor sentence (sticky-string law); rumor-toned so a later slip breaks no promise
+      // SHIPPED default (batch I blind A/B: stake 5.5 vs control 4.25; boss_pull yes 5-0):
+      // STAKE=0 restores stake-less beat-1 cards
+      ...(process.env.STAKE !== '0' && chain.beatIndex === 0 && !isFinale
+        ? { stake: this.stakeGloss(chain, focal?.character?.role === 'merc' ? focal.name : undefined) }
+        : {}),
       // beats get NO opening spark (🛠 2026-07-10): a random spark fought the saga — the card
       // opens from the story state, and beat 1 from how the bible says the matter arrived
       placeNameSuggestions: [this.freshPlaceName(chain.region)],
@@ -2491,6 +2499,35 @@ export class Game {
    *  Persisted at CLOSE, not genesis-time (§3.3 literal): live-chain cast are slate-excluded
    *  anyway, and close-time avoids offstage spoilers + abandoned-saga clutter. Recurrence
    *  rides existing channels: slate reuse + §21-3 known-cast promotion (starved until now). */
+  /** R1 sell-the-stake: the whole matter's worth as ONE rumor sentence — kind × payoff band,
+   *  sex-neutral, paste-clean (the writer may paste it verbatim and the card still reads) */
+  private stakeGloss(chain: Chain, focalMercName?: string): string {
+    const rich = chain.payoff >= 300;
+    // personal sagas: the stake is the company's own soldier — NAMED (batch I: the anonymous
+    // "one of the company's own…them" gloss judged as pasted boilerplate, weak pull; a dangling
+    // referent reads as missing, not withheld). Name in BOTH clauses = truncation-proof.
+    if (chain.isPersonal) return focalMercName
+      ? (rich
+        ? `This matter is ${focalMercName}'s own — settled, it would sit well on ${focalMercName} for good.`
+        : `This matter is ${focalMercName}'s own — seen through, it would leave ${focalMercName} steadier for good.`)
+      : 'Seeing this matter through would leave one of the company\'s own steadier for good.';
+    const table: Record<string, [string, string]> = {
+      recruit: [
+        'Word runs that the one at the heart of this would be worth a place on any roster.',
+        'Word runs that the one at the heart of this is worth more than a season of common hires.',
+      ],
+      captive: [
+        'They say the one at the heart of this would fetch a proper ransom in the right hands.',
+        'They say the one at the heart of this would fetch a ransom worth a season of contracts.',
+      ],
+      'gold-hoard': [
+        'The matter smells of a payout worth a string of small jobs.',
+        'The matter smells of a payout worth a season of small jobs.',
+      ],
+    };
+    return (table[chain.kind] ?? table['gold-hoard']!)[rich ? 1 : 0]!;
+  }
+
   private persistMetCast(chain: Chain) {
     const met = new Set(chain.story.introducedNames ?? []);
     const focalName = this.card(chain.focalId)?.name;

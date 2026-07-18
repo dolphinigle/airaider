@@ -61,6 +61,11 @@ A pure-engine roll is fine when fiction shouldn't drive it (twist %, failure bud
 when the *story* knows best (is there loot here? does this step branch?).
 
 ## 3a. The player is a MERCENARY BOSS who wants GAIN — every job must answer "what's in it for us?"
+*(2026-07-18 R1 "sell the stake", blind-benched +1.25 and boss-pull 5-0: beat-1 SAGA cards close on an
+engine-dealt `stake` rumor line — the WHOLE matter's worth in world words from the chain envelope
+(recruit/ransom/hoard by payoff band; personal sagas NAME the soldier — an anonymous "one of our own…
+them" judged as pasted boilerplate). Rumor-toned so a slip breaks no promise; the demand lives as
+conditional rule 5 in END position — buried mid-paragraph it fired ~50%, end-position 6/6.)*
 
 The player runs a fort for profit; they are NOT a do-gooder. What they want: **coin**, **recruits**
 (skilled people worth bringing into the company), **captives** (to ransom or hold), **salvage/loot**,

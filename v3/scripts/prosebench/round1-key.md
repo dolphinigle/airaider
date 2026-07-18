@@ -25,6 +25,11 @@ F6=q46(FAIL) F7=q51 F8=REPEAT-V3-q75 F9=q52(partial) F10=q56(FAILED FINALE) F11=
 G1=r4-q18 G2=V3-q16(FAIL) G3=r4-q44(partial) G4=V3-q34 G5=HOLDOUT G6=r4-q16(FAIL) G7=V3-q51
 G8=r4-q53 G9=REPEAT-V0-q34 G10=V3-q55 G11=r4-q54(partial FINALE) G12=V3-q18 G13=r4-q34 G14=V3-q78(finale)
 
+# Stake A/B (batch I, briefing register): R1 sell-the-stake beat-1 cards (STAKE4 run, rule-5 end
+# position, 6/6 compliance) vs control beat-1 cards (LONG-90501 run). STAKE = I1(recruit gloss),
+# I3(personal rich), I6(personal), I8(personal TRUNCATED-gloss wart); CONTROL = I2,I4,I7,I9;
+# I5 = HOLDOUT (FoC out_of_retirement setup verbatim, ~7-8 grade, discard judge if ≤5).
+
 # Length A/B (batch H): LONG budgets (RES_LONG=1, common 35/75 unc 45/95 rare 60/125) vs SHORT
 # (shipped), both seed 90501, same style rules. LONG = H1,H3,H6,H8,H10,H12 (q16,q37,q31,q42,q51,q18);
 # SHORT = H2,H4,H7,H11,H13,H14 (V3-diet q16F,q28,q18,q42,q75,q34); H5=HOLDOUT H9=REPEAT-V0-q34
