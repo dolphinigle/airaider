@@ -889,8 +889,9 @@ export class Game {
       // and the engine's own grant line announces the lead when it lands
       // world words only — 'a prize object' was echoed verbatim onto cards (data echoes)
       slotCount: n, rewardEnvelope: specs.filter(s => s.kind !== 'lead').map(s => (
-        // pre-shaped to read whole if pasted: 'a thing of worth…' echoed as "any thing of worth"
-        { relic: 'the pick of what the job turns up',
+        // pre-shaped to read whole if pasted — and ROTATED: a single gloss string went sticky
+        // ("the pick of what the job turns up" verbatim on 4/18 cards, lab 87001)
+        { relic: this.rng.pick(['the pick of what the job turns up', 'first claim on what the road yields', 'whatever worth the work shakes loose']),
           recruit: 'a person who may join the company', captive: 'a person taken', gold: 'coin' } as Record<string, string>
       )[s.kind] ?? s.kind).join(' + '),
       keywords: sampleKeywords(this.rng),
