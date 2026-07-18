@@ -86,8 +86,13 @@ export function bankBeat(chain: Chain, partySize: number, outcome: Outcome, side
   chain.bank += Math.max(0, earned);
   chain.cyclesSpent += partySize;      // effort counts even on failure (the gate can't stall)
   chain.reOffers = 0;                  // a marched beat resets the lapse counter
-  chain.beatIndex += 1;
-  if (outcome === 'failure') chain.failures += 1;
+  // a FAILED beat does NOT consume its arc step — QUESTS §"failure budget... rather than an
+  // endless retry" assumes the stumble is RETRIED; advancing past it dealt the NEXT step whose
+  // errand assumes the failed yield, structurally forcing the card writer to conjure
+  // (failgate labs 95001/96001: every post-failure card either broke or strained the record).
+  // The failure budget + cyclesSpent stall guard still force the finale — no endless retry.
+  if (outcome !== 'failure') chain.beatIndex += 1;
+  else chain.failures += 1;
   return earned;
 }
 

@@ -2453,6 +2453,10 @@ export class Game {
     }
     chain.story.lastBeatOutcome =
       `beat ${q.beatIndex ?? chain.beatIndex} ended in ${r.outcome.toUpperCase()}: ${storyUpdate?.currentSituation ?? chain.story.currentSituation}`;
+    // a failed beat re-poses the SAME step (see bankBeat) — the cached card and the repose
+    // marker describe a world before the failure; both must go so the next card is written
+    // FRESH from the failure's aftermath
+    if (r.outcome === 'failure') { this.cachedBeatOut.delete(chain.id); chain.lastGeneratedBeat = 0; }
     if (q.isFinale) return this.settleFinale(q, chain, r, report, fate);
     const bankBefore = chain.bank;
     // side-loot deducts what was actually DELIVERED — a partial pays out half the loot,

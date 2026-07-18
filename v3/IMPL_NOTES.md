@@ -1591,3 +1591,27 @@ shipping it; prefer prompt fixes and log-only lints.
    scaffold openers ("Your task is to…" → imperative), "ownerless"/"company's pick" rule
    vocab, "barred" rotation, near-verbatim job-echo sentence drop (bidirectional ≥0.85 only —
    0.7 one-way over-fired).
+
+## Failure-gate arc — structural fix beats wording (2026-07-18, #372)
+1. **scripts/failgate.ts** (worst-merc saga beats) exercises what natural campaigns never
+   rolled (0 failed saga steps in 44 across 91001/92001). Ladder of measurements:
+   pre-gate 5/5 next-cards BROKE (asserted the failed step's planned yield) → prompt gate v1
+   (conditional LAST-STEP-FAILED section, engine deals lastStepFailed) 2 HELD/1 PARTIAL/1
+   BROKE → HARDENED wording ("introduces no new person, place, or fact") 0/0/3 — the
+   negation-dense addition REGRESSED it. Fourth independent measurement of nag-degradation;
+   reverted to v1 wording.
+2. **Root cause was STRUCTURAL, not prompt**: bankBeat advanced beatIndex on EVERY outcome,
+   so after a failure the writer was dealt the NEXT arc step whose errand assumes the failed
+   yield — an impossible brief; conjuring was forced. QUESTS ("failure budget… rather than an
+   endless retry") already implies retry-on-failure; code now conforms: a failed beat re-poses
+   the SAME step (cache + repose marker cleared → fresh telling). Verified: retries read as
+   genuine fresh second attempts, never verbatim do-overs. 1/2/1 on n=4 with residual leaks
+   all UPSTREAM: the failure narration itself handed out the sought yield — resolve anchor
+   now states a FAILED job wins nothing (was mid-paragraph, dropped).
+3. **Open designer corner (T4)**: a failure-budget-forced last-chance finale with a thin
+   record must stand "on ground and people the player has SEEN" — after repeated failures
+   almost nothing was seen, so the writer conjures a settlement figure. Options: let forced
+   finales surface the bible's own unseen CAST (reveal, not conjure), or accept a slip-away
+   ending when the record is too thin. RULING PENDING.
+4. Failure-narration defect classes to watch: unrecorded wounds narrated (no 🩸 emitted, then
+   carried/mutated by later cards), redundant loss restatement ×2-3 per report.
