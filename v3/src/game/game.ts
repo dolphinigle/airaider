@@ -1069,11 +1069,16 @@ export class Game {
       rarity: lead.rarity,
       stakes: (lead.rarity === 'rare' ? 'high' : lead.rarity === 'uncommon' ? 'mid' : 'low') as 'low' | 'mid' | 'high',
       tone: pickTone(this.rng),
-      avoid,
-      focal: { id: focal.id, name: focal.name, tags: renderTags(focal.tags), dossier: this.dossier(focal.id), isExistingMerc: isPersonal },
+      // empty avoid/slate omitted outright — a "[]" field with no rule referencing it is
+      // parse-load for a cold model (context-free audit 2026-07-17)
+      avoid: avoid.length ? avoid : undefined,
+      // dossier only when it adds lines beyond the blurb — a byte-identical duplicate of tags
+      // taught the writer nothing and broke "dossier outranks blurb" (context-free audit)
+      focal: { id: focal.id, name: focal.name, tags: renderTags(focal.tags), dossier: (d => d.includes('\n') ? d : undefined)(this.dossier(focal.id)), isExistingMerc: isPersonal },
       kind: isPersonal ? 'development' : eco.kind, twist: eco.twist,
       expectedBeats: eco.beats,
-      slate, assignedNames: assigned.map(a => `${a.name} (${a.gender === 'female' ? 'a woman\'s name' : 'a man\'s name'})`),
+      slate: slate.length ? slate : undefined,
+      assignedNames: assigned.map(a => `${a.name} (${a.gender === 'female' ? 'a woman\'s name' : 'a man\'s name'})`),
     };
     let g = await this.ai.genesis(genesisInput);
     // names dealt by the dup-recast below — the NAME GUARD must honor them (34014/35015: the
@@ -1395,7 +1400,11 @@ export class Game {
       // same never-use fence as genesis: soldiers reach a beat card only when the BIBLE binds
       // them (focal / cast entry); the rest of the roster is copy-bait, not context
       .filter(e => !e.companySoldier || e.id === chain.focalId
-        || chain.bible.cast.some(m => m.loreId === e.id || m.name === e.name));
+        || chain.bible.cast.some(m => m.loreId === e.id || m.name === e.name))
+      // a cast member's lore entry that adds NO flag is a byte-duplicate of bible.cast
+      // (context-free audit: same person described twice in one payload) — drop it
+      .filter(e => e.companySoldier || e.companyCaptive || e.atTheFort || e.outOfReach
+        || !chain.bible.cast.some(m => m.loreId === e.id || m.name === e.name));
     // 🛠 2026-07-10 (reverses the earlier arrive-FRESH ruling): a lapsed unmarched beat is
     // re-offered VERBATIM from cache — a re-rendered "fresh telling" drifted settled facts
     // (a mute girl became talkative between two renders of the same step)
@@ -1442,17 +1451,21 @@ export class Game {
     // the goal (already player-known by design) and the client's own want.
     const stagedBible = {
       ...stagedRaw,
-      arc: isFinale ? (stagedRaw.arc as string[]).map(stripYields) : [cardStep],
-      ...(isFinale ? {} : {
-        kernel: '',
-        tensions: [],
-        openDirections: [],
-        // §0 input-shaping: this field is DATA, not instructions — the "client's open telling /
-        // truth stays hidden" framing lives in the SYSTEM prompt (sagaSystem THE STEP). Embedding
-        // a bracketed label here made cheap models paste it onto the card, and appending the
-        // client's want (≈ the goal for a client) produced a doubled run-on. Hand the telling clean.
-        situation: stagedRaw.goal,
-      }),
+      ...(isFinale
+        ? { arc: (stagedRaw.arc as string[]).map(stripYields) }
+        : {
+          // beats carry the LEAN bible only (context-free audit 2026-07-17: one payload held
+          // the same sentence ×4). kernel/tensions/openDirections: dead fields. arc: arcStep
+          // deals the step. situation: duplicated goal byte-for-byte since the round-1
+          // hand-the-telling-clean fix — the goal alone IS the client's telling for a beat.
+          // twist: whole-story knowledge, never a beat's to see.
+          kernel: undefined,
+          tensions: undefined,
+          openDirections: undefined,
+          arc: undefined,
+          situation: undefined,
+          twist: undefined,
+        }),
     };
     const wqInput = ({
       // beats serve the BIBLE's story, not a rolled job type (a random archetype fought the saga);
@@ -1486,8 +1499,11 @@ export class Game {
       // beats get NO opening spark (🛠 2026-07-10): a random spark fought the saga — the card
       // opens from the story state, and beat 1 from how the bible says the matter arrived
       placeNameSuggestions: [this.freshPlaceName(chain.region)],
-      rosterNames: this.rosterForWriters().names,
-      rosterPronouns: this.rosterForWriters().pronouns,
+      // roster dealt ONLY when the focal is the company's own (the one case a saga card may
+      // name a soldier) — otherwise it's never-use data, pure copy-bait (context-free audit)
+      ...(focal?.character?.role === 'merc'
+        ? { rosterNames: this.rosterForWriters().names, rosterPronouns: this.rosterForWriters().pronouns }
+        : {}),
       lastBeatOutcome: chain.lastGeneratedBeat === chain.beatIndex + 1
         ? `${chain.story.lastBeatOutcome ?? ''} This same step was posed before and went untaken — pose it AFRESH in a new telling, but the SAME places and people: the world did not move while the company sat.`.trim()
         : chain.story.lastBeatOutcome,
@@ -1495,16 +1511,19 @@ export class Game {
       // (batch O pasted it verbatim into 3/6 cards) and adds nothing the BEAT 1 branch doesn't say —
       // blank it so the writer opens from the client's telling, not a stock scaffolding line
       bible: stagedBible,
-      storyState: chain.beatIndex === 0 && !isFinale ? { ...chain.story, currentSituation: '' } : chain.story,
+      // beat 1 has no record yet — an all-empty storyState scaffold is pure parse-load
+      storyState: chain.beatIndex === 0 && !isFinale ? undefined : chain.story,
       relevantLore,
       focalDossier: (d => d.includes('\n') ? d : undefined)(this.dossier(chain.focalId)),
-      beatIndex: chain.beatIndex + 1, expectedBeats: chain.expectedBeats,
+      // expectedBeats deliberately NOT sent to the card writer: the system never explains it,
+      // and the total arc length is whole-story knowledge a beat card must not lean on
+      beatIndex: chain.beatIndex + 1,
       // the ONE step this card covers, dealt verbatim — writers fumbled indexing arc[beat-1]
       // and scoped beat 1 to the whole goal
       arcStep: cardStep,
       // focalName only when the staged bible still carries the name — an unmet focal whose
       // identity is the saga's discovery must not re-enter through this side door
-      focalName: focal && JSON.stringify(stagedBible).includes(focal.name.split(' ')[0]!) ? focal.name : undefined,
+      focalName: focal && `${JSON.stringify(stagedBible)} ${cardStep}`.includes(focal.name.split(' ')[0]!) ? focal.name : undefined,
       // runtime truth, not genesis-time: a focal HIRED mid-saga is the company's own now
       focalIsMerc: focal?.character?.role === 'merc',
     });
@@ -1698,7 +1717,7 @@ export class Game {
       rarity: r.quest.rarity, outcome: r.outcome,
       // habits reach the narrator only ~40% of the time — a habit not shown cannot become a
       // signature stamp (the scar-tic appeared in 9 of 15 resolutions when always sent)
-      party: r.party.map(p => ({ id: p.id, name: p.name, tags: renderTags(p.tags), dossier: this.dossier(p.id, { habits: this.rng.chance(0.25) }) })),
+      party: r.party.map(p => ({ id: p.id, name: p.name, tags: renderTags(p.tags), dossier: (d => d.includes('\n') ? d : undefined)(this.dossier(p.id, { habits: this.rng.chance(0.25) })) })),
       // §2 engine seed: which facet the before-text opens on (terrain-tableau owned the slot)
       // 'a thing out of place' taught the exact "[odd object] where no X should be" frame the
       // whole overhaul existed to kill (7 of 19 resolutions in one campaign) — facet swapped
@@ -2331,7 +2350,11 @@ export class Game {
       // offstage cast pass ROLE ONLY — who/want carry the future person's identity and desire,
       // which the writer voices through an invented witness to spoil them (batch R: Telare
       // "remembers a wandering lizardman smith", the step-2 prize). Omission is the fix.
-      cast: chain.bible.cast.map((m): unknown => offstageCast.includes(m) ? { role: m.role, offstage: true } : m),
+      // Retained entries get SCRUBBED who/want too — an offstage focal's name once leaked
+      // through the client's want ("to receive Udara…") while her own entry was nameless.
+      cast: chain.bible.cast.map((m): unknown => offstageCast.includes(m)
+        ? { role: m.role, offstage: true }
+        : { ...m, who: scrub(m.who), want: scrub(m.want) }),
     };
   }
 

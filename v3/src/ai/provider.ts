@@ -71,12 +71,12 @@ export interface GenesisInput {
   location: string;              // the land's name + anchor facts, one field
   rarity: string; stakes: 'low' | 'mid' | 'high';
   tone: string;                  // engine-picked, weighted toward lighter (BIBLE tone knob)
-  avoid: string[];               // recent saga titles+kernels — steer away from repeats
-  focal: { id: string; name: string; tags: string; dossier: string; isExistingMerc: boolean };
+  avoid?: string[];              // recent saga titles+kernels — steer away from repeats; omitted when none
+  focal: { id: string; name: string; tags: string; dossier?: string; isExistingMerc: boolean };  // dossier only when it adds lines beyond the blurb
   kind: string;                  // likely fate (recruit/captive/gold-hoard)
   twist: boolean;                // engine-rolled 30%
   expectedBeats: number;         // the arc must have exactly this many steps (chain shape is engine-rolled)
-  slate: { id: string; name: string; blurb: string; relationPhrase: string; companySoldier?: boolean; companyCaptive?: boolean; atTheFort?: boolean; outOfReach?: boolean; dossier?: string }[];
+  slate?: { id: string; name: string; blurb: string; relationPhrase: string; companySoldier?: boolean; companyCaptive?: boolean; atTheFort?: boolean; outOfReach?: boolean; dossier?: string }[];  // omitted when empty
   assignedNames: string[];       // pre-rolled names for any NEW cast the AI coins (§4b)
 }
 
@@ -103,7 +103,7 @@ export interface ResolveQuestInput {
   title: string; situation: string; job: string;
   rarity: string;                // drives the word budget
   outcome: 'success' | 'partial' | 'failure';
-  party: { id: string; name: string; tags: string; dossier: string }[];
+  party: { id: string; name: string; tags: string; dossier?: string }[];  // dossier only when it adds lines beyond the blurb
   sceneFacet?: string;           // engine-rolled facet the before-text opens on (§2 seed —
                                  // 'crouched' terrain openers owned 22 of ~30 reports)
   deliveredSummary: string;      // engine-computed delivery, named for the AI to narrate

@@ -68,7 +68,8 @@ export class MockProvider implements AiProvider {
     this.tick();
     const f = input.focal.name;
     const extraName = input.assignedNames[0] ?? 'a stranger';
-    const known = input.slate[0];
+    const slate = input.slate ?? [];
+    const known = slate[0];
     return {
       title: `The ${cap(this.rng.pick(['debt', 'oath', 'road', 'price', 'shadow']))} of ${f}`,
       kernel: `${f} is the key to ${input.seed}`,
@@ -83,9 +84,9 @@ export class MockProvider implements AiProvider {
       twistReveal: input.twist ? `${extraName} serves someone unseen.` : null,
       tensions: [`${f} vs what they owe`, `${extraName} plays both sides`],
       openDirections: [`follow the thread of ${f}`, 'let it lie and see who comes knocking'],
-      relevantIds: input.slate.slice(0, 2).map(s => s.id),
+      relevantIds: slate.slice(0, 2).map(s => s.id),
       newPlaces: [],
-      newEdges: known ? [{ from: input.slate[0]!.id, to: input.slate[0]!.id, type: 'party-to', blurb: 'drawn into the affair', importance: 0.4 }] : [],
+      newEdges: known ? [{ from: known.id, to: known.id, type: 'party-to', blurb: 'drawn into the affair', importance: 0.4 }] : [],
     };
   }
 
