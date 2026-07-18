@@ -36,6 +36,7 @@ export interface QuestWriteInput {
   rosterNames?: string[];        // the player's own soldiers — NEVER card NPCs
   rosterPronouns?: Record<string, string>;  // name → she/he/they (separate map: inline "(she)" got copied into prose)
   lastBeatOutcome?: string;      // beats: what the previous beat's resolution changed
+  lastStepFailed?: boolean;      // beats: previous step FAILED — its planned yield was never won
   // chain context (beat/finale)
   bible?: unknown;               // the Bible object (hidden truth)
   storyState?: unknown;          // chain story-so-far

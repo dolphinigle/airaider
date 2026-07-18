@@ -877,7 +877,7 @@ export class Game {
     const lmOk = opening.landmarkAllowed && this.state.cycle - (this.lastLandmarkDeal[lead.region] ?? -99) > 6;
     if (lmOk) this.lastLandmarkDeal[lead.region] = this.state.cycle;
     const gravity = sampleGravity(this.rng, lead.rarity);
-    const out = await this.ai.writeQuest({
+    const out = this.stripJobEcho(await this.ai.writeQuest({
       kind: 'one-off', archetype: lead.archetype,
       location: this.locationLine(lead.region, lmOk),
       level: lead.level, rarity: lead.rarity,
@@ -926,7 +926,7 @@ export class Game {
         partial: true,   // the writer SHAPES this person via quarryTags
       } : null,
       avoid: this.recentCardTitles.slice(-10),
-    });
+    }));
     this.recentCardTitles.push(`${out.title} — ${out.job}`);
     if (this.recentCardTitles.length > 12) this.recentCardTitles.shift();
     // §4 pattern-B phase 2: canonicalize the writer's quarryTags (type from the AI, TIER from
@@ -1508,6 +1508,10 @@ export class Game {
       lastBeatOutcome: chain.lastGeneratedBeat === chain.beatIndex + 1
         ? `${chain.story.lastBeatOutcome ?? ''} This same step was posed before and went untaken — pose it AFRESH in a new telling, but the SAME places and people: the world did not move while the company sat.`.trim()
         : chain.story.lastBeatOutcome,
+      // paired A/B 88001: on failure-heavy seeds BOTH arms bridged failed beats by asserting
+      // the failed step's planned yield (badge/summons-stone/remains materialized). The engine
+      // KNOWS the outcome — deal the flag so the system can raise a prominent conditional gate
+      lastStepFailed: /ended in FAILURE/.test(chain.story.lastBeatOutcome ?? ''),
       // beat 1: the canned "matter just came before the company, nothing done" status is echo-bait
       // (batch O pasted it verbatim into 3/6 cards) and adds nothing the BEAT 1 branch doesn't say —
       // blank it so the writer opens from the client's telling, not a stock scaffolding line
@@ -1528,7 +1532,7 @@ export class Game {
       // runtime truth, not genesis-time: a focal HIRED mid-saga is the company's own now
       focalIsMerc: focal?.character?.role === 'merc',
     });
-    const out = isRepose && cached && cached.beat === chain.beatIndex + 1 ? cached.out : await this.ai.writeQuest(wqInput);
+    const out = this.stripJobEcho(isRepose && cached && cached.beat === chain.beatIndex + 1 ? cached.out : await this.ai.writeQuest(wqInput));
     // COLD-READER GATE REMOVED (reviewlab 83001/84001 + blind judge, 2026-07-17): the review
     // roundtrip cost ~5.5s per card and its fixNotes rewrites made cards WORSE (pre-rewrite won
     // 6/9, mean 7.44 vs 7.11) — same nag-degradation as the genesis guard. The dup-restatement
@@ -2220,6 +2224,28 @@ export class Game {
   /** roster as the writers see it — names + a SEPARATE pronoun map ("Uneneth (she)" inline got
    *  copied verbatim into prose; a map is metadata the model won't quote) */
   /** deterministic saga-card lint (§0 lever 1) — each hit becomes a fixNote for the rewrite pass */
+  /** NEAR-VERBATIM job-echo strip (§0 lever 1, no extra AI call): drop a situation sentence
+   *  that essentially IS the job line. Bidirectional ≥0.85 only — the 0.7 one-way lint
+   *  over-fired (situation and job naturally share words); dropping a whole sentence is the
+   *  proven safe mechanical move. Never touches a card with fewer than 2 sentences. */
+  private stripJobEcho<T extends { situation: string; job: string }>(out: T): T {
+    const words = (s: string) => s.toLowerCase().replace(/[^a-z ]/g, ' ').split(/\s+/)
+      .filter(w => w.length > 3).map(w => w.replace(/s$/, ''));
+    const jw = new Set(words(out.job));
+    if (jw.size < 4) return out;
+    const sents = out.situation.split(/(?<=[.!?])\s+/);
+    if (sents.length < 2) return out;
+    const kept = sents.filter(sent => {
+      const sw = words(sent);
+      if (sw.length < 4) return true;
+      const hit = new Set(sw.filter(w => jw.has(w))).size;
+      return !(hit >= jw.size * 0.85 && hit >= new Set(sw).size * 0.85);
+    });
+    if (kept.length === sents.length || kept.length === 0) return out;
+    this.log('chain', 'card body echoed the job line near-verbatim — sentence dropped');
+    return { ...out, situation: kept.join(' ') };
+  }
+
   private lintCard(out: { situation: string; job: string }): string[] {
     const d: string[] = [];
     // suffix-normalized so "grove's"/"knows" match "grove"/"know"
