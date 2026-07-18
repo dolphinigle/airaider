@@ -2503,14 +2503,20 @@ export class Game {
    *  sex-neutral, paste-clean (the writer may paste it verbatim and the card still reads) */
   private stakeGloss(chain: Chain, focalMercName?: string): string {
     const rich = chain.payoff >= 300;
-    // personal sagas: the stake is the company's own soldier — NAMED (batch I: the anonymous
-    // "one of the company's own…them" gloss judged as pasted boilerplate, weak pull; a dangling
-    // referent reads as missing, not withheld). Name in BOTH clauses = truncation-proof.
-    if (chain.isPersonal) return focalMercName
-      ? (rich
-        ? `This matter is ${focalMercName}'s own — settled, it would sit well on ${focalMercName} for good.`
-        : `This matter is ${focalMercName}'s own — seen through, it would leave ${focalMercName} steadier for good.`)
-      : 'Seeing this matter through would leave one of the company\'s own steadier for good.';
+    // personal sagas: the stake is the company's own soldier — NAMED (batch I: anonymous gloss =
+    // pasted boilerplate) and POOLED (batch J: a single string stamped by its 3rd appearance;
+    // name said twice read clunky → name ONCE). Chain-id-keyed pick: rotation without touching
+    // the seeded RNG stream.
+    if (chain.isPersonal) {
+      if (!focalMercName) return 'Seeing this matter through would leave one of the company\'s own steadier for good.';
+      const pool = [
+        `This matter is ${focalMercName}'s own; settling it would steady the soldier for good.`,
+        `${focalMercName} has more than wages riding on this one.`,
+        `Old business of ${focalMercName}'s lives in this matter — ending it would end more than a contract.`,
+        `The company would get more than coin out of this: it would get ${focalMercName} back whole.`,
+      ];
+      return pool[(parseInt(chain.id.replace(/\D/g, '') || '0', 10)) % pool.length]!;
+    }
     const table: Record<string, [string, string]> = {
       recruit: [
         'Word runs that the one at the heart of this would be worth a place on any roster.',

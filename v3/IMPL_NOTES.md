@@ -1676,3 +1676,13 @@ Cost: zero AI calls, zero latency; prompt size O(1) via CANDIDATE_CAP.
   personal chains initially excluded; anonymous personal gloss judged boilerplate → named.
   STAKE=0 restores. New watch classes from judges (→ story phase): card logic holes (a
   gatekeeper who could search her own gate), referent bridges ("caged traveler"→"the singer").
+- 2026-07-18 round-5 (story/prose lane per designer; R2/R3 parked "meh"): SHIPPED card-rule
+  merges (why-it-takes-hired-steel + one-designation-per-person into rule 3; "the goal"+"the
+  change" ban tokens; stake fused with pay as one close) — batch J: 5.4 vs 5.25 stake-arm
+  control, goal-echo class gone, no regression. SHIPPED investigate told-once merge (partial
+  effect — reveal still told 3× sometimes; watch). REVERTED parley two-voice branch (batch K:
+  lone parley sample garbled its blocking — demand-overload law, 3× prior). Personal stake gloss
+  POOLED ×4, name once, chain-id-keyed (batch J: single string stamped by 3rd appearance).
+  Batch K residual classes (the current worklist): draft-merge garble AT the pivotal beat
+  (injury/lift), discovery told 3× (action→description→caption), specifics gestured-at
+  ("its title clear") not paid out, "with the bank between them" formula ×2.
