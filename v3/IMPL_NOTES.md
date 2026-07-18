@@ -1562,3 +1562,32 @@ resolutions, "the hire" persisting in arc-plan text (cards clean).
 RULE OF THE DAY (three independent measurements): fixNotes/avoid-note REGENERATION degrades
 gpt-5-mini output — validate any reject-and-retry gate with a blind pre/post judge before
 shipping it; prefer prompt fixes and log-only lints.
+
+## Prompt compression + failure-gate (2026-07-18, #372)
+1. **Round-4 compression (context-free audit, 4 zero-context cold readers ×2 rounds)**: the
+   dominant prompt-defect class was INERT text — rules about data the call doesn't carry.
+   Rules now render conditionally (slate/avoid/newEdges, RECORD at beat 1, lore-flags,
+   person-payout, quarryTags vocab, deliveredCharacters/fixNotes/fleshed); dead payload cut
+   (beat bible situation/arc/twist/kernel/tensions dupes — one payload shipped the same
+   sentence ×4; empty storyState; dossier==tags; roster w/o merc focal; expectedBeats).
+   Rendered prompts 47.5k → 39.6k chars (−17% vs pre-sweep; beat −26%, one-off −21%).
+2. **Paired A/B (same seed 88001, situation restored vs dedup)**: dedup KEPT — restored arm
+   4.75 vs 5.50, "completing" arcs by materializing unearned objects. The seed's real lesson:
+   failure-heavy seeds bridge FAILED beats by asserting the failed step's planned yield
+   (both arms, 5×). Engine now deals lastStepFailed → prominent conditional gate
+   (THE LAST STEP FAILED); arcStep facts the record never established are posed as
+   question/rumor (+ echoed in the ABOVE-ALL anchor). Gate still UNVERIFIED by campaign
+   (91001/92001 rolled 0 failed saga steps in 44); scripts/failgate.ts forces failures.
+3. **Executed-arc scoreboard** (harsher rubrics each round — trend, not absolute):
+   baselines 5.0/5.7 → rounds 1-3: 8.0/8.1/7.1 → post-compression: 6.7/6.3 → round-4.2:
+   6.75/6.6. Residual top classes: mid-arc cards asserting bible-only artifacts (~5/campaign;
+   yield-in-errand genesis lint added, log-only), saga skeleton monotony (6-7 of 8 arcs =
+   search→token→press→handover; DESIGNER RULING PENDING: engine-rolled arc-shape hint?),
+   pay-line pool cycling visibly (8 strings).
+4. **Sticky-string law (twice-measured)**: any engine-dealt gloss string WILL be pasted
+   verbatim — it must read whole as a card sentence, stay sex-neutral, and ROTATE (a pool of
+   4 stamps ×3-4/campaign; "She pays as agreed" stamped under male clients; "the pick of what
+   the job turns up" went sticky in one lab round). Mechanical desemi strips now cover
+   scaffold openers ("Your task is to…" → imperative), "ownerless"/"company's pick" rule
+   vocab, "barred" rotation, near-verbatim job-echo sentence drop (bidirectional ≥0.85 only —
+   0.7 one-way over-fired).

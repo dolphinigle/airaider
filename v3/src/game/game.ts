@@ -1227,6 +1227,18 @@ export class Game {
         if (parked) return { why: `your rejected draft's arc parks at ${parked} — three or more steps stage the same ground; each step must move to NEW ground or a new claimant, and only the last may return to bring the matter to a head`, dup: clientDup };
         if (step1Delivers) return { why: `your rejected draft's FIRST arc step already performs a delivery or handover — the goal is NOT done at step 1: step 1 is taking the job plus a first leg of field work, and every delivery belongs to a later step`, dup: clientDup };
         if (nullStep) return { why: `your rejected draft's arc contains a step that merely confirms or verifies something ("${nullStep}") — a null job; every step must CHANGE the situation: gain ground, gain leverage, or raise the stakes`, dup: clientDup };
+        // 91001 read: 5 mid-arc cards asserted artifacts no record established — every one
+        // traceable to a step naming its OWN yield-object inside the errand half ("force a
+        // bone map" before any map is known). stripYields can't fix an errand-half leak.
+        const yieldInErrand = d.arc.map(s => {
+          const halves = s.split(/→ yields:/i);
+          if (halves.length < 2) return null;
+          const toks = (t: string) => t.toLowerCase().replace(/[^a-z' ]/g, ' ').split(/\s+/).filter(w => w.length > 4);
+          const err = new Set(toks(halves[0]!));
+          const hits = [...new Set(toks(halves[1]!))].filter(w => err.has(w));
+          return hits.length >= 2 ? hits.slice(0, 3).join(', ') : null;
+        }).find(Boolean);
+        if (yieldInErrand) return { why: `your rejected draft's arc names a step's own yield ("${yieldInErrand}") inside its errand half — the errand says only what the party DOES and where; the thing found lives after "→ yields:" alone`, dup: clientDup };
         if (ceremonyMono) return { why: `your rejected draft settles its matter with an oath, judgment, or ceremony — as the player's recent sagas already did; settle THIS matter by an entirely different means (a chase, a trade, a siege, an escape, a betrayal exposed, a debt collected — anything but a gathering that swears or judges)`, dup: clientDup };
         if (offContractPlace) return { why: `your rejected draft's LAST step delivers the hired thing to "${offContractPlace}" — but the hire brings it HOME (to the fort or to the client in hand); the closing step settles AT THE FORT the company already holds, never at a fresh meeting-place invented for the ending`, dup: clientDup };
         if (obstacleAbsent) return { why: `your rejected draft names ${obstacleEntry!.name} as the obstacle, yet they appear in NO arc step — the one who stands in the company's way must actively BLOCK a step (guard the prize, refuse, fight, or flee) in the step where the company meets them; write them into that step or give the part to no one`, dup: clientDup };
