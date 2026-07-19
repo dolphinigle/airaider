@@ -205,7 +205,7 @@ const ASK_SPEC = '- ask: EXACTLY slotCount entries — one per soldier the job n
 
 function oneOffSystem(input: QuestWriteInput): string {
   return [
-    '═══ THE JOB ═══\nYou write ONE job card for a dark-fantasy mercenary-fort GAME. The player is the company BOSS at the fort; the card is a short briefing TO them ("you"): what came in, what the job is, what it pays. They read it once and pick which soldiers to SEND — the boss never goes, and the job has not started. Only what has reached the fort goes on the card. GAME WRITING, not literature: every sentence gives the player something to use — the problem, the place, the client, the task, the hands, the pay, or the risk; a mood-only sentence is cut. Plain everyday words a farmhand would say; short sentences, mostly one clause, no semicolons. People stay NAMELESS BY TRADE — a name appears only when this message hands you one, and only for someone the job centers on.',
+    '═══ THE JOB ═══\nYou write ONE job card for a dark-fantasy mercenary-fort GAME. The player is the company BOSS at the fort; ' + (CARD_VARIANT === 'dlg' ? 'the card is the matter arriving in a VOICE — the words of whoever or whatever brought it to the fort, set down for the boss: what is wrong, what they want done, what it pays.' : 'the card is a short briefing TO them ("you"): what came in, what the job is, what it pays.') + ' They read it once and pick which soldiers to SEND — the boss never goes, and the job has not started. Only what has reached the fort goes on the card. GAME WRITING, not literature: every sentence gives the player something to use — the problem, the place, the client, the task, the hands, the pay, or the risk; a mood-only sentence is cut. Plain everyday words a farmhand would say; short sentences, mostly one clause, no semicolons. People stay NAMELESS BY TRADE — a name appears only when this message hands you one, and only for someone the job centers on.',
     '═══ YOUR INPUTS ═══',
     '- location: the land and its anchor facts. A named landmark may be used bare (never with an epithet); other places come from placeNameSuggestions or coined small places of the land.',
     input.intake ? '- intake: HOW this matter reached the company — a settled FACT: the opening must agree with it, but most cards need NO sentence for it; never quote its wording.' : '',
@@ -223,7 +223,9 @@ function oneOffSystem(input: QuestWriteInput): string {
     tagVocab(!!input.framedCharacter?.partial),
     `═══ YOUR OUTPUT — respond as JSON: {title, situation, job, ask: [{attribute, extraAttribute?, favored, clashing, requiredTag?}]${input.framedCharacter?.partial ? ', quarryTags' : ''}} ═══`,
     '- title: short and concrete — never prefixed with the archetype label.',
-    '- situation: THE card. Common = 3-5 short sentences; uncommon and rare may take up to three short paragraphs. Shape: the MATTER first (what is wrong and where) → who wants it done (one clause at most; none when the matter is visible from the walls) → the task as the outcome wanted (one errand, never an itinerary) → pay and loot rights in their OWN short sentence. ONE FACT PER SENTENCE. Never open on a messenger arriving. Vary what signals the wrongness (an absence, a sound, animal behavior, damage, a person\'s state — an abandoned object is overused). The card knows only what its sources could know: a hidden thing is suspected or rumored, never stated as fact — finding out is the job. Most cards need no risk line; when one appears, flowing prose, never a labeled clause. State intent and rumor, never a named person\'s scripted future action.',
+    CARD_VARIANT === 'dlg'
+      ? '- situation: THE card — the matter arrives in a VOICE. First line: the bearer alone in square brackets, named by station never by a name this message did not hand you — "[a drover off the south road]", "[a letter under a cracked seal]", "[the wall sentry]". Then the bearer\'s OWN words (a letter = its written text): first person, in the diction of their station — a drover does not talk like a lord, though all in plain period words. Common = 3-5 short sentences; uncommon and rare may run longer. Their telling: the MATTER first (what is wrong and where) → the ask as the outcome wanted (one errand, never an itinerary) → the pay in its OWN short sentence, promised in kind, never a sum. ONE FACT PER SENTENCE. The bearer says only what they could know: a hidden thing is suspected aloud, never stated as fact — finding out is the job. Vary what the bearer noticed first (an absence, a sound, animal behavior, damage, a person\'s state). State intent and rumor, never a named person\'s scripted future action. A matter visible from the fort\'s own walls comes as the sentry\'s report.'
+      : '- situation: THE card. Common = 3-5 short sentences; uncommon and rare may take up to three short paragraphs. Shape: the MATTER first (what is wrong and where) → who wants it done (one clause at most; none when the matter is visible from the walls) → the task as the outcome wanted (one errand, never an itinerary) → pay and loot rights in their OWN short sentence. ONE FACT PER SENTENCE. Never open on a messenger arriving. Vary what signals the wrongness (an absence, a sound, animal behavior, damage, a person\'s state — an abandoned object is overused). The card knows only what its sources could know: a hidden thing is suspected or rumored, never stated as fact — finding out is the job. Most cards need no risk line; when one appears, flowing prose, never a labeled clause. State intent and rumor, never a named person\'s scripted future action.',
     '- job (ONE terse line): the task for the boss\'s lists — never copies the situation\'s sentences, no names the situation did not introduce; a find-or-learn task poses the QUESTION, never the answer.',
     ASK_SPEC,
     input.framedCharacter?.partial ? '- quarryTags (framedCharacter is PARTIAL — its tags carry just race and sex): up to 3 TAG VOCABULARY words (the quarryTags-only lists allowed) that make the person your card describes; race and sex are already set — spend every word on a NEW trait; optional rank "word (low|mid|high|legendary)".' : '',
@@ -233,7 +235,7 @@ function oneOffSystem(input: QuestWriteInput): string {
 
 function sagaSystem(input: QuestWriteInput): string {
   return [
-    '═══ THE JOB ═══\nYou write the NEXT card of an ongoing SAGA in a dark-fantasy mercenary-fort GAME. The player is the company BOSS at the fort; the card is a short briefing TO them ("you"): what has just changed in a matter they are already working, and what this step\'s errand is. They read it once and pick which soldiers to SEND — the boss never goes. GAME WRITING, not literature: every sentence gives the player something to use; a mood-only sentence is cut. Plain everyday words; short sentences, mostly one clause, no semicolons. Open on the ongoing matter and what has just changed — never on a description of the land.',
+    '═══ THE JOB ═══\nYou write the NEXT card of an ongoing SAGA in a dark-fantasy mercenary-fort GAME. The player is the company BOSS at the fort; ' + (CARD_VARIANT === 'dlg' ? 'the card is this step\'s news arriving in a VOICE — the words of whoever brings it, set down for the boss: what has just changed in a matter they are already working, and what this step\'s errand is.' : 'the card is a short briefing TO them ("you"): what has just changed in a matter they are already working, and what this step\'s errand is.') + ' They read it once and pick which soldiers to SEND — the boss never goes. GAME WRITING, not literature: every sentence gives the player something to use; a mood-only sentence is cut. Plain everyday words; short sentences, mostly one clause, no semicolons. Open on the ongoing matter and what has just changed — never on a description of the land.',
     // the RECORD paragraph renders only once a record EXISTS — at beat 1 it described fields
     // the payload doesn't carry (context-free audit 2026-07-17: rules about absent data)
     (input.beatIndex && input.beatIndex > 1) || input.kind === 'finale' || input.lastBeatOutcome
@@ -261,7 +263,9 @@ function sagaSystem(input: QuestWriteInput): string {
     tagVocab(false),
     `═══ YOUR OUTPUT — respond as JSON: {title, situation, job, ask: [{attribute, extraAttribute?, favored, clashing, requiredTag?${input.kind === 'beat' ? ', mustBeFocal?' : ''}}]${input.kind === 'finale' ? ', approaches: [{label, rewardKind, attribute, favored}]' : ''}} ═══`,
     '- title: short and concrete, about THIS step.',
-    '- situation: THE card. 3-5 short sentences (uncommon and rare may run longer). Shape: what has just changed → this step\'s task as the outcome wanted → pay in its OWN short sentence, named in the world\'s words (the client\'s coin, goods off the dead), never echoing an instruction or field name. ONE FACT PER SENTENCE. State intent and rumor, never a named person\'s scripted future action; risk lines are flowing prose, never a labeled clause.',
+    CARD_VARIANT === 'dlg'
+      ? '- situation: THE card — this step\'s news arrives in a VOICE. First line: the teller alone in square brackets — whoever the record makes its natural bearer: the client by name once met, their messenger, or word sent back from that ground; on the saga\'s first card, the client themselves. Then the teller\'s OWN words, first person, in their station\'s diction (plain period words): what has just changed → this step\'s task as the outcome wanted → the pay in its OWN short sentence, named in the world\'s words (the client\'s coin, goods off the dead), never echoing an instruction or field name. ONE FACT PER SENTENCE. The teller says only what the record lets them know. State intent and rumor, never a named person\'s scripted future action.'
+      : '- situation: THE card. 3-5 short sentences (uncommon and rare may run longer). Shape: what has just changed → this step\'s task as the outcome wanted → pay in its OWN short sentence, named in the world\'s words (the client\'s coin, goods off the dead), never echoing an instruction or field name. ONE FACT PER SENTENCE. State intent and rumor, never a named person\'s scripted future action; risk lines are flowing prose, never a labeled clause.',
     '- job (ONE terse line): THIS step\'s errand for the boss\'s lists — never the saga\'s final delivery, never a name the situation did not introduce; a find-or-learn task poses the QUESTION, never the answer.',
     ASK_SPEC,
     '═══ ABOVE ALL (write now) ═══\n1. Every sentence parses ONE way and is understood on one skim — subject and verb early.\n2. Stage ONLY the dealt step: the cast, places, terms, and dangers of LATER steps stay off the card entirely' + (input.storyState ? '; the RECORD and WHEREABOUTS are law, and what the record has NOT established the card poses as a question or rumor, never as fact' : '') + '.\n3. First use of any person, place, or thing — the client included — is introduced by a FULL sentence with a verb of its own that grounds who or what they are in this matter, and a person keeps ONE designation throughout, never re-entering under a new label; a card whose reader cannot say who hires them, what the matter is, why it matters, and why it takes hired steel has failed.\n4. Every word in favored, clashing, or requiredTag is copied EXACTLY from TAG VOCABULARY; period diction; never echo an instruction or field name ("step", "plan", "focal", "beat", "arc", "the hire", "the goal", "the change" never appear on a card); the account-book is BANNED as a plot object.\n' + (input.stake ? '5. The card CLOSES on stake (given in the user message) — as given or reworded, word reaching the fort of what the whole matter is worth to the company; never a number, never a certainty, and it stands WITH the pay sentence as one close, never a pile of separate closers.\n' : '') + 'Respond as the JSON object specified above — nothing else.',
@@ -280,6 +284,10 @@ function sagaSystem(input: QuestWriteInput): string {
 // SHIPPED DEFAULT = 'diet' (the V3 config): prosebench head-to-head winner 6.3 vs 5.3 (r4),
 // vs 4.5 old prompts. Set PROSE_VARIANT=v0 for the legacy style block; other variants = lab lineage.
 const PROSE_VARIANT = process.env.PROSE_VARIANT ?? 'diet';
+// ── dialogue-framing lab (2026-07-19): CARD_VARIANT=dlg frames the card as the bearer's own
+// first-person words; PROSE_VARIANT=dlg turns resolutions into script-format scenes. Both are
+// bench variants — unset = shipped behavior.
+const CARD_VARIANT = process.env.CARD_VARIANT ?? '';
 // Voice exemplars are MUNDANE on purpose (bleed-safe: no quests, no wonders, no props the game
 // deals); each shows varied rhythm, one spoken fragment, one seen detail, a hard ending.
 const VOICE_EXEMPLARS = [
@@ -291,6 +299,7 @@ let exemplarTick = 0;
 
 const RESOLVE_HEAD_FRAME = 'You narrate the result of a job a mercenary company\'s soldiers were SENT on, in a dark-fantasy low-medieval world. The OUTCOME is already decided and given to you. The reader is the company\'s boss, who stayed at the fort: narrate the sent party in third person — never "you" in the field.\n';
 const RESOLVE_STYLE_DIET = 'Entries in a game session log, read once between dice rolls. Past tense. Plain words, real events, no ornament — every sentence earns its place by what happens in it.';
+const RESOLVE_STYLE_DLG = 'Entries in a game session log, read once between dice rolls. Past tense for the telling. The report is a PLAYED SCENE, set down line by line: every line opens with its teller in square brackets — [Narrator] for act and ground, a person\'s NAME for words they speak aloud (the spoken words alone, never "he said"). Narrator lines: plain words, real events, no ornament. Speech lines: a breath each, in the speaker\'s own diction, doing what narration cannot. Every rule below that speaks of sentences binds the [Narrator] lines; "before" ends on a [Narrator] line; the bracketed tags stand outside every word count.';
 
 // round-2 (ROUND1_RESULTS): the opener stamped 8/8 (arrival formula) and the closer stamped as
 // a demonstrative quote — a per-call prompt cannot see the last report's shape, so the ENGINE
@@ -328,6 +337,7 @@ const R3_SPEECH = [
 let r3tick = 0;
 
 function resolveCoreHead(): string {
+  if (PROSE_VARIANT === 'dlg') return RESOLVE_HEAD_FRAME + RESOLVE_STYLE_DLG;
   if (PROSE_VARIANT === 'exemplar' || PROSE_VARIANT === 'stack') {
     return RESOLVE_HEAD_FRAME + RESOLVE_STYLE_DIET + '\nWrite in the VOICE of this sample — copy the voice, never its people, events, or words:\n'
       + VOICE_EXEMPLARS[exemplarTick++ % VOICE_EXEMPLARS.length];
@@ -339,10 +349,15 @@ function resolveCoreHead(): string {
 // the rule stack: rhythm, one spoken line, load-bearing strangeness (+r2: on-screen
 // transactions — "the spear made the exchange" class), with r2's rotating opener shape
 function proseStack(shape: string[] | null): string {
-  if (PROSE_VARIANT !== 'stack' && PROSE_VARIANT !== 'diet' && PROSE_VARIANT !== 'r2' && PROSE_VARIANT !== 'r3' && PROSE_VARIANT !== 'r4') return '';
+  if (PROSE_VARIANT !== 'stack' && PROSE_VARIANT !== 'diet' && PROSE_VARIANT !== 'r2' && PROSE_VARIANT !== 'r3' && PROSE_VARIANT !== 'r4' && PROSE_VARIANT !== 'dlg') return '';
   // r3: the speech directive rotates (none / one line / exchange) — the always-one-quote
   // cadence was itself a stamp; the line-quality bar (anti-receipt) rides the rolled directive
-  const speech = PROSE_VARIANT === 'r3' && shape?.[2]
+  const rhythm = PROSE_VARIANT === 'dlg'
+    ? 'Vary the [Narrator] lines\' length — let one run long where cause links to effect, and keep the shortest for the moment that matters.'
+    : 'Vary sentence length — let one sentence run long where cause links to effect, and keep the shortest for the moment that matters; never three sentences of the same length in a row.';
+  const speech = PROSE_VARIANT === 'dlg'
+    ? 'Break narrator runs with a voice where anyone on stage can speak — never three [Narrator] lines running then; a lone soldier gets no invented listener, and a silent scene may run all [Narrator]. The ground moves between exchanges.'
+    : PROSE_VARIANT === 'r3' && shape?.[2]
     ? shape[2]
     : PROSE_VARIANT === 'r4'
       ? 'One line of speech, quoted, that does something narration cannot — an answer, a refusal, a demand. Speech can be a fragment; people answer sideways.'
@@ -350,7 +365,7 @@ function proseStack(shape: string[] | null): string {
       // mug/cup smear, informant's fact in the questioner's mouth — consistent with the
       // demand-overload law; n=1 but the prior is 3× measured)
       : 'One line of speech, quoted, where it changes something. Speech can be a fragment; people answer sideways.';
-  return '═══ THE TELLING ═══\nVary sentence length — let one sentence run long where cause links to effect, and keep the shortest for the moment that matters; never three sentences of the same length in a row.\n' + speech
+  return '═══ THE TELLING ═══\n' + rhythm + '\n' + speech
     + '\nAnything uncanny on stage acts by its strange nature or stays off the stage — a wonder that two hired guards could replace is furniture.'
     + (PROSE_VARIANT === 'r2' ? '\nEvery give, take, or yield happens as hands, words, or blows ON SCREEN — never told as an abstract exchange or a price paid.' : '')
     // r3 (ROUND2): the garble class = the model juggling 4+ named props; cap the manifest
@@ -386,6 +401,7 @@ const RESOLVE_OUTPUT = (finale: boolean) => [
 
 const resolveAnchor = (shape: string[] | null) => '═══ ABOVE ALL (write now) ═══\n1. Every sentence parses ONE way on one skim — subject and verb early; a carry-list holds only what hands can carry.\n2. The result is unmistakable' + (PROSE_VARIANT === 'r3' || PROSE_VARIANT === 'r4' ? ', shown ONCE — never restated in a second or third sentence' : '') + ': what was won or lost, what the company now holds or knows — and a FAILED job wins NOTHING: what it sought stays unfound and unlearned, never handed out by the failure\'s own telling.\n3. The report ENDS at the job\'s last act in the field: the coin payment and the walk home always stay OUTSIDE your text — but when the job\'s own objective is to deliver or hand something over AND the receiver stands on the staged ground, THAT handover IS the last act and is shown (a receiver elsewhere is never staged — the report ends with the goods secured for the road); only the coin that would follow it is not.\n4. Period diction; never echo an instruction or field name ("approach", "plan", "outcome", "step", "dice", "roll", "obstacle", "payer" are system words that never appear in prose); the account-book (ledger, registry, record-book) is BANNED in prose.\n'
   + (shape ? '5. ' + shape[1] + '\n'
+    : PROSE_VARIANT === 'dlg' ? '5. The LAST line of after is a spoken line or a [Narrator] image — never a tally of goods, never what it all meant.\n'
     : (PROSE_VARIANT === 'stack' || PROSE_VARIANT === 'diet' || PROSE_VARIANT === 'r4') ? '5. The LAST sentence of after is a concrete act, an image, or a spoken line — never a tally of goods, never what it all meant.\n' : '')
   + 'Respond as the JSON object specified below — nothing else.';
 

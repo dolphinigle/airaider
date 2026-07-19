@@ -1709,3 +1709,18 @@ Cost: zero AI calls, zero latency; prompt size O(1) via CANDIDATE_CAP.
   remaining founder soloed on with zero dead cycles; wound window playable; leave-behind
   re-offer loop surfaced nicely. game.test.ts roster assertion 3→2. 86 green. Playtest nit
   → prose lane: flesh WHO-line sometimes echoes the bare name ("WHO: Syalleth Dawnsinger").
+- 2026-07-19 DIALOGUE-FRAMING A/B (designer: "is it easier to read framed as dialogues?").
+  Lab variants in openai.ts, default untouched: CARD_VARIANT=dlg (card = bracketed bearer +
+  first-person pitch) · PROSE_VARIANT=dlg (resolution = [Narrator]/[Name] script). Both passed
+  the context-free gate (2 audits + re-audit; fixes: station-diction within plain register,
+  pay in kind never a sum, beat-1 teller = client, sentence-rules bind [Narrator] lines, lone
+  soldier gets no invented listener). Bench (scripts/prosebench/DIALOGUE_AB.md, frozen protocol,
+  5 blind judges/batch + 3-judge preference pass, holdouts 10/10 ×5 and 10/10/10/9/9): CLEAN
+  SPLIT — cards dlg WINS (6.5 vs 5.5 median, preference 15:9, unanimous per-pair) · resolutions
+  dlg LOSES (6 vs 7, preference 6:18; new stamp: speech-as-stage-direction; format chop;
+  demand-overload garbles at the finale). Failure classes on dlg cards: saga-card voice break
+  (client narrates himself/recites the record — M7=5), place-name scatter, self-narrated
+  gestures. AWAITING RULING: ship voiced cards for one-offs? (saga cards need the voice-break
+  class fixed + re-benched; recurring tellers would need a bible cast voice line — phase 2.)
+  Resolutions stay prose. Division-of-labor rule added to CLAUDE.md (Fable plans, Opus codes).
+  Pre-existing prompt defects the audits surfaced are listed at the bottom of DIALOGUE_AB.md.
