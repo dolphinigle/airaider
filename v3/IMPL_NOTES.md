@@ -1724,3 +1724,10 @@ Cost: zero AI calls, zero latency; prompt size O(1) via CANDIDATE_CAP.
   class fixed + re-benched; recurring tellers would need a bible cast voice line — phase 2.)
   Resolutions stay prose. Division-of-labor rule added to CLAUDE.md (Fable plans, Opus codes).
   Pre-existing prompt defects the audits surfaced are listed at the bottom of DIALOGUE_AB.md.
+- 2026-07-24: class-fix A/B (batch J) NEGATIVE — memory-touch→plain-sentence + name-bridge rule
+  swaps measured fix 4.8 vs control 5.5 (designer bar was ≥ +1.0) → REVERTED. The plain-sentence
+  memory form produced bolted-on callbacks stalling action (its own new defect); the name flag
+  proved a broken instrument at single-sample judging (card/cross-beat names indistinguishable
+  from coinages). Wording on these two classes is EXHAUSTED per PROMPT_RULES §0 — future attempts
+  go through input shaping (deal dossier memories only when scene-relevant) or acceptance.
+  Also shipped same day: dice-line WHY (explainCoins per merc under every roll — engine text).

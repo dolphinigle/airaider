@@ -30,6 +30,12 @@ G8=r4-q53 G9=REPEAT-V0-q34 G10=V3-q55 G11=r4-q54(partial FINALE) G12=V3-q18 G13=
 # I3(personal rich), I6(personal), I8(personal TRUNCATED-gloss wart); CONTROL = I2,I4,I7,I9;
 # I5 = HOLDOUT (FoC out_of_retirement setup verbatim, ~7-8 grade, discard judge if ≤5).
 
+# Class-fix A/B (batch J, seed 93301 both arms): memory-touch→plain-sentence + name-bridge rule
+# swaps. Ship bar (designer): Δmean ≥ +1.0; ~0.5 = fluctuation; also count class incidence.
+# FIX = J1(q8) J3(q31) J6(q40 partial) J8(q32 memory-touches) J10(q44 finale) J12(q10)
+# CONTROL = J2(q8) J4(q41 Sanga/Felippe) J7(q31 the original Sanga garble) J9(q10) J11(q43) J13(q32)
+# J5 = HOLDOUT
+
 # Length A/B (batch H): LONG budgets (RES_LONG=1, common 35/75 unc 45/95 rare 60/125) vs SHORT
 # (shipped), both seed 90501, same style rules. LONG = H1,H3,H6,H8,H10,H12 (q16,q37,q31,q42,q51,q18);
 # SHORT = H2,H4,H7,H11,H13,H14 (V3-diet q16F,q28,q18,q42,q75,q34); H5=HOLDOUT H9=REPEAT-V0-q34
