@@ -38,7 +38,7 @@ import {
 import { rollName, rollPlaceName } from '../engine/names.js';
 import { hasClash, queryMatches } from '../engine/overlap.js';
 import { questXp, grantXp, rollBase, rollGrowthLean, growToLevel } from '../engine/growth.js';
-import { coins, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, type SlotTest, type Outcome, type QuestRollResult } from '../engine/roll.js';
+import { coins, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, explainCoins, type SlotTest, type Outcome, type QuestRollResult } from '../engine/roll.js';
 import { sampleKeywords, sampleSeed, sampleOpening, sampleGravity, pickTone } from '../ai/keywords.js';
 import type { AiProvider, ResolveQuestInput, AskSlotOut, QuestWriteOut } from '../ai/provider.js';
 
@@ -801,6 +801,17 @@ export class Game {
       slots.push({ requirement, test, filledBy: null });
     }
     return slots;
+  }
+
+  /** beat variant: deterministically (no RNG) classify how a job turns — from the tested
+   *  attributes/favored of the chosen approach's slots (or all ask slots when unbranched) */
+  private sceneModeFor(q: Quest): 'physical' | 'wits' | 'social' {
+    const slots = q.chosenApproach ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
+    const words = new Set<string>();
+    for (const s of slots) { for (const a of s.test.attributes) words.add(a); for (const f of s.test.favored) words.add(f); }
+    if (words.has('social') || words.has('performance') || words.has('leadership')) return 'social';
+    if (q.archetype === 'investigate' || words.has('lore')) return 'wits';
+    return 'physical';
   }
 
   private async generateOneOff(lead: Lead): Promise<Quest> {
@@ -1756,6 +1767,8 @@ export class Game {
       sceneFacet: this.rng.pick(['the ground and what stands on it', 'the weather and the light',
         'what can be heard', 'the people in view', 'the enemy\'s posture or handiwork', 'what the party carries or readies']),
       deliveredSummary: this.describeDelivery(r),
+      // beat variant (engine-dealt, no RNG): how this job turns — physical / wits / social
+      sceneMode: this.sceneModeFor(r.quest),
       // a finale's delivered PERSON is the focal — give them an id here so the narrator can
       // flesh them from the saga's own fiction and tie edges to them (they had no entry before)
       deliveredCharacters: [
@@ -2059,7 +2072,7 @@ export class Game {
 
   private applyResolution(
     r: Resolution,
-    out: { before: string; after: string; injuries: { characterId: string; band: InjuryBand; cause?: string | null }[]; fleshed: { characterId: string; who: string; backstory: string; quirks: string[] }[]; edges: { from: string; to: string; type: string; blurb: string; importance: number }[]; storyUpdate?: { currentSituation: string; newlyRevealed: string[]; openThreads: string[]; sagaSettled?: boolean } } | undefined,
+    out: { before: string; turn?: string; turnActor?: string; speech?: { who: string; says: string }[]; after: string; injuries: { characterId: string; band: InjuryBand; cause?: string | null }[]; fleshed: { characterId: string; who: string; backstory: string; quirks: string[] }[]; edges: { from: string; to: string; type: string; blurb: string; importance: number }[]; storyUpdate?: { currentSituation: string; newlyRevealed: string[]; openThreads: string[]; sagaSettled?: boolean } } | undefined,
     report: string[],
     pendingEdges: { from: string; to: string; type: string; blurb: string; importance: number }[],
   ) {
@@ -2195,13 +2208,26 @@ export class Game {
     report.push(r.rolled.totalCoins === 0
       ? `⚄ [${r.outcome.toUpperCase()}] · the party had no usable dice for this work (needed ${r.rolled.totalBar.toFixed(1)})`
       : `⚄ [${r.outcome.toUpperCase()}] · rolled ${r.rolled.heads} heads of ${r.rolled.totalCoins} coins vs bar ${r.rolled.totalBar.toFixed(1)}`);
+    // the WHY under the dice (designer 2026-07-24): each sent merc's coins traced to the card's
+    // ask — attribute value, favored/clash, injury — via the engine's own explainCoins
+    if (r.rolled.totalCoins > 0) {
+      const activeSlots = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
+      const terms = activeSlots.filter(s => s.filledBy).map(s => {
+        const u = this.card(s.filledBy!);
+        return u ? `${u.name} — ${explainCoins(u, s.test)}` : '';
+      }).filter(Boolean);
+      if (terms.length) report.push(`   ${terms.join('  ·  ')}`);
+    }
+    // beat variant: the engine assembles the strip's turn caption + speech around its dice line
+    if (out?.turn) report.push(`▸ ${out.turnActor ?? '—'} — ${out.turn}`);
+    for (const s of out?.speech ?? []) report.push(`  ${s.who}: "${s.says}"`);
     if (out) report.push(out.after);
     report.push(...after);
     this.log('resolve', `${q.title}: ${r.outcome}`, q.id);
     // chain advancement
     if (q.chainId) {
       const chain = st.chains.find(c => c.id === q.chainId);
-      if (chain) this.noteIntroduced(chain, [q.situation, q.job, out?.before ?? '', out?.after ?? ''].join('\n'));
+      if (chain) this.noteIntroduced(chain, [q.situation, q.job, out?.before ?? '', out?.turn ?? '', (out?.speech ?? []).map(s => s.says).join(' '), out?.after ?? ''].join('\n'));
       this.advanceChain(q, r, out?.storyUpdate, report, r.fate, out?.after);
     }
     st.quests = st.quests.filter(x => x.state !== 'resolved');

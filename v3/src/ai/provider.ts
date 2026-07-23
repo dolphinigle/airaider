@@ -124,11 +124,15 @@ export interface ResolveQuestInput {
     rejectedApproaches?: string[];   // finale: the plans NOT taken (their actions may not appear)
   };
   fixNotes?: string[];               // cold-reader gate: defects found in the rejected previous report
+  sceneMode?: 'physical' | 'wits' | 'social';   // beat variant: how this job turns (engine-dealt)
 }
 
 export interface ResolveQuestOut {
   questId: string;
   before: string;                // blind lead-in (must not leak the outcome)
+  turn?: string;                 // beat variant: ONE present-tense clause, the decisive act
+  turnActor?: string;            // beat variant: given name of the party member who does it
+  speech?: { who: string; says: string }[];  // beat variant: 0-2 spoken lines
   after: string;                 // sighted consequence
   injuries: { characterId: string; band: 'none' | 'low' | 'med' | 'high'; cause?: string | null }[];
   fleshed: { characterId: string; who: string; backstory: string; quirks: string[] }[];
