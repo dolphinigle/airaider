@@ -1731,3 +1731,8 @@ Cost: zero AI calls, zero latency; prompt size O(1) via CANDIDATE_CAP.
   from coinages). Wording on these two classes is EXHAUSTED per PROMPT_RULES §0 — future attempts
   go through input shaping (deal dossier memories only when scene-relevant) or acceptance.
   Also shipped same day: dice-line WHY (explainCoins per merc under every roll — engine text).
+- 2026-07-24: RPG chip-format round 2 (SPEECH_ANCHORS: prose + verbatim quote extraction +
+  display splitter) — extraction fidelity 100% (cheap model NOT the blocker) but same-text
+  format preference 17:1 for paragraphs; orphan-fragment + name-stutter classes; chips need
+  content generated for the shape, which is round-1's losing script format. Resolutions stay
+  prose (measured twice). Voiced one-off cards (+1, round 1) still await designer ruling.

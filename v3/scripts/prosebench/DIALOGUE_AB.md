@@ -77,3 +77,22 @@ omits chainContext/storyState/bible; saga edge-id line references deliveredChara
 carries; beat-1 "open on the CLIENT" vs head-frame "open on what has just changed" tension; the
 "ONE LEDGER" instruction word vs the account-book ban; dead "JSON field whose schema demands a
 number" exception (no numeric field in card schema).
+
+## Round 2 (2026-07-24) — post-hoc chip-splitting (SPEECH_ANCHORS), the designer's RPG-alternation ask
+Design: prose UNCHANGED (the measured winner); the model additionally LISTS its own quotes
+verbatim with speakers (extraction, not composition); the engine splits display at anchored
+quotes into narration blocks + [Speaker] "line" chips, safe fallback on any mismatch.
+- CHEAP-MODEL FIDELITY (the designer's worry): 100% — every listed quote anchored verbatim
+  (5/5, seed 94401); a multi-sentence quote missed the splitter once (graceful inline fallback).
+- Same-text pairs (6, order-alternated), 3 blind judges: **paragraph 17 : chips 1.**
+- WHY (unanimous): our reports carry 0-2 short quotes with attribution baked into the sentence;
+  extracting the quote strands subjectless em-dash orphans ("— walked toward the path…"), the
+  chip repeats a name the adjacent narration just gave, and one chip per report chops a
+  read-once log without the RPG payoff. "Chips earn their keep in exchanges; these logs have none."
+- The ONE chip win (P6): the quote stood ALONE between complete sentences. Convergent judge law:
+  **chips need text GENERATED for that shape — standalone speaker-led quote sentences and 2+
+  exchanges — never converted after the fact.** But generating for that shape = the script
+  format that lost round 1. VERDICT: resolutions stay prose (measured twice, two designs).
+  The bench-backed dialogue lever remains the round-1 VOICED CARDS win (+1, ruling pending).
+Code kept as env-off lab lineage: SPEECH_ANCHORS=1 (openai.ts speech extraction line,
+game.ts renderWithBubbles).

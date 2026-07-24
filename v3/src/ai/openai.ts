@@ -417,8 +417,14 @@ const RESOLVE_OUTPUT = (finale: boolean) => [
   process.env.RES_SHORT !== '1'
     ? `- WORD BUDGET (hard caps, count): common → before ≤35, after ≤75. uncommon → ≤45 / ≤95. rare${finale ? ' or finale' : ''} → ≤60 / ≤125. Length is room, not a target — a report that says everything in fewer words is BETTER; spend the room on the confrontation and the cost, never on packing, travel, or restating. When it cannot all fit keep, in order: the RESULT, the cost, the client\'s promise handled, any character touch.`
     : `- WORD BUDGET (hard caps, count): common → before ≤25, after ≤45. uncommon → ≤35 / ≤65. rare${finale ? ' or finale' : ''} → ≤50 / ≤95. When it cannot all fit keep, in order: the RESULT, the cost, the client\'s promise handled, any character touch.`,
+  // SPEECH_ANCHORS lab (2026-07-24, designer: RPG-style narration/dialogue alternation): prose
+  // stays prose (script-format resolutions measured-worse, DIALOGUE_AB.md); the model merely
+  // LISTS its own quotes with speakers so the renderer can split display at anchored quotes
+  process.env.SPEECH_ANCHORS === '1'
+    ? '- speech: every quoted line your before/after contain, in order, as {who, says} — says = the quote EXACTLY as it stands in your text, word for word; who = the speaker as your text names them (a given name, or a trade like "the barkeep"). No quotes in the text = empty array.'
+    : '',
   '- edges: 0-2, only moments that should be REMEMBERED; blurb one line; importance a NUMBER 0-1 (0.8+ = defining); ids only from party/deliveredCharacters in this message.',
-].join('\n');
+].filter(Boolean).join('\n');
 
 const resolveAnchor = (shape: string[] | null) => '═══ ABOVE ALL (write now) ═══\n1. Every sentence parses ONE way on one skim — subject and verb early; a carry-list holds only what hands can carry.\n2. The result is unmistakable' + (PROSE_VARIANT === 'r3' || PROSE_VARIANT === 'r4' ? ', shown ONCE — never restated in a second or third sentence' : '') + ': what was won or lost, what the company now holds or knows — and a FAILED job wins NOTHING: what it sought stays unfound and unlearned, never handed out by the failure\'s own telling.\n3. The report ENDS at the job\'s last act in the field: the coin payment and the walk home always stay OUTSIDE your text — but when the job\'s own objective is to deliver or hand something over AND the receiver stands on the staged ground, THAT handover IS the last act and is shown (a receiver elsewhere is never staged — the report ends with the goods secured for the road); only the coin that would follow it is not.\n4. Period diction; never echo an instruction or field name ("approach", "plan", "outcome", "step", "dice", "roll", "obstacle", "payer" are system words that never appear in prose); the account-book (ledger, registry, record-book) is BANNED in prose.\n'
   + (shape ? '5. ' + shape[1] + '\n'

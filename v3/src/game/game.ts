@@ -2204,7 +2204,8 @@ export class Game {
     // narrate in the fiction's own order — setup, THEN the dice, THEN the outcome
     // (QUESTS §7: before-roll blind → after-roll sighted; the DICE are always shown, DESIGN §5)
     report.push(`— ${q.title} (${q.id})`);
-    if (out) report.push(out.before);
+    const bubbles = process.env.SPEECH_ANCHORS === '1' && out?.speech?.length ? out.speech : null;
+    if (out) report.push(...(bubbles ? this.renderWithBubbles(out.before, bubbles) : [out.before]));
     report.push(r.rolled.totalCoins === 0
       ? `⚄ [${r.outcome.toUpperCase()}] · the party had no usable dice for this work (needed ${r.rolled.totalBar.toFixed(1)})`
       : `⚄ [${r.outcome.toUpperCase()}] · rolled ${r.rolled.heads} heads of ${r.rolled.totalCoins} coins vs bar ${r.rolled.totalBar.toFixed(1)}`);
@@ -2220,8 +2221,8 @@ export class Game {
     }
     // beat variant: the engine assembles the strip's turn caption + speech around its dice line
     if (out?.turn) report.push(`▸ ${out.turnActor ?? '—'} — ${out.turn}`);
-    for (const s of out?.speech ?? []) report.push(`  ${s.who}: "${s.says}"`);
-    if (out) report.push(out.after);
+    if (!bubbles) for (const s of out?.speech ?? []) report.push(`  ${s.who}: "${s.says}"`);
+    if (out) report.push(...(bubbles ? this.renderWithBubbles(out.after, bubbles) : [out.after]));
     report.push(...after);
     this.log('resolve', `${q.title}: ${r.outcome}`, q.id);
     // chain advancement
@@ -2531,6 +2532,39 @@ export class Game {
    *  Persisted at CLOSE, not genesis-time (§3.3 literal): live-chain cast are slate-excluded
    *  anyway, and close-time avoids offstage spoilers + abandoned-saga clutter. Recurrence
    *  rides existing channels: slate reuse + §21-3 known-cast promotion (starved until now). */
+  /** SPEECH_ANCHORS display split: prose paragraph → alternating narration blocks and
+   *  [Speaker] "line" bubbles, cut at the sentences carrying the model's own listed quotes.
+   *  Deterministic; any quote that doesn't anchor verbatim leaves its sentence untouched. */
+  private renderWithBubbles(text: string, speech: { who: string; says: string }[]): string[] {
+    if (!speech.length) return [text];
+    const sentences = text.split(/(?<=[.!?]["”]?)\s+(?=["“A-Z])/u);
+    const out: string[] = [];
+    let narr: string[] = [];
+    const flush = () => { if (narr.length) { out.push(narr.join(' ')); narr = []; } };
+    const pending = [...speech];
+    for (const s of sentences) {
+      const hit = pending.findIndex(sp => s.includes(sp.says.replace(/[.!?,]+$/, '')));
+      if (hit === -1) { narr.push(s); continue; }
+      const sp = pending.splice(hit, 1)[0]!;
+      const core = sp.says.replace(/[.!?,]+$/, '');
+      const at = s.indexOf(core);
+      // pre-quote part of the carrier sentence stays narration (minus a dangling open-quote)
+      const pre = s.slice(0, at).replace(/["“'\s]+$/, '').trim();
+      if (pre) narr.push(pre.endsWith(',') || /[.!?]$/.test(pre) ? pre : pre + ' —');
+      flush();
+      const said = sp.says.replace(/^["“]|["”]$/g, '').replace(/,$/, '.');
+      out.push(`      [${sp.who}]  “${said}”`);
+      // post-quote residue: drop pure attribution tails ("he said."), keep working clauses —
+      // rendered as a continuation dash, never re-capitalized into a fake sentence
+      const tail = s.slice(at + core.length).replace(/^["”'\s,]*/, '')
+        .replace(/^(?:(?:he|she|they|[A-Z][\p{L}-]+(?: [A-Z][\p{L}-]+)?) )?(?:said|answered|snapped|barked|spat|whispered|called|asked)[,.]?\s*/u, '')
+        .replace(/^and\s+/, '').trim();
+      if (tail.replace(/[.!?]/g, '').split(/\s+/).filter(Boolean).length > 2) narr.push(`— ${tail}`);
+    }
+    flush();
+    return out;
+  }
+
   /** R1 sell-the-stake: the whole matter's worth as ONE rumor sentence — kind × payoff band,
    *  sex-neutral, paste-clean (the writer may paste it verbatim and the card still reads) */
   private stakeGloss(chain: Chain, focalMercName?: string): string {
