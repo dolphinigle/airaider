@@ -144,6 +144,12 @@ for style edits; every one below was measured, most the expensive way.
 - **Prompt-side shape rotation STAMPS**: 3 rotating molds = 3 visible stamps (half the reports ended
   on palms). Variety is an INPUT-shaping problem (engine seeds per §2 — e.g. archetype-weighted speech
   demand), never more prompt directives.
+- **A cheap model treats permission as prohibition** *(batch N, 2026-07-24)*: "dialogue is not
+  required, only where needed" → ZERO dialogue in 14 reports. Optional behaviors happen only when
+  PUSHED — and a flat always-push metronomes (one quote in 16/16 reports, plus summarize-then-staple
+  quotes). SHIPPED: condition the push on ENGINE DATA (sceneMode: social scenes invite a 2-voice
+  exchange, others get the neutral rule) — "sometimes" must come from input shaping, never from
+  trusting the model's judgment or a bare option. Full samples: prosebench/SAMPLES_SPARSE_AB.md.
 - **Bench before ship**: any style change is judged on the SAME frozen anchors, blind, ≥3 judges with
   the calibration holdout; batch effects run ±1, so ties are settled by SAME-batch head-to-head.
 - **Known residuals are STRUCTURAL** (resistant to wording, don't re-try rules on them): finale

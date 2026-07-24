@@ -1736,3 +1736,10 @@ Cost: zero AI calls, zero latency; prompt size O(1) via CANDIDATE_CAP.
   format preference 17:1 for paragraphs; orphan-fragment + name-stutter classes; chips need
   content generated for the shape, which is round-1's losing script format. Resolutions stay
   prose (measured twice). Voiced one-off cards (+1, round 1) still await designer ruling.
+- 2026-07-24 (cont.): dialogue-density experiment (batch N, arms A quota / B neutral / C
+  scene-conditioned, same seed): C SHIPPED as default (C 6.5 · A 6.25 · B 5.5; C took the
+  batch's only 8s and kills the 16/16 quote metronome). MEASURED LAWS → PROMPT_RULES §10:
+  permission reads as prohibition (B: 0 quotes/14); a line lifts only when it IS the turn;
+  quota's staple-mode (summary then quote) is a real defect class. SPEECH_MODE=quota restores.
+  D (rotating axis) parked — C delivers "sometimes" from engine data. Full samples for the
+  designer: prosebench/SAMPLES_SPARSE_AB.md.

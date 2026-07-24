@@ -354,7 +354,7 @@ function resolveCoreHead(): string {
 
 // the rule stack: rhythm, one spoken line, load-bearing strangeness (+r2: on-screen
 // transactions — "the spear made the exchange" class), with r2's rotating opener shape
-function proseStack(shape: string[] | null): string {
+function proseStack(shape: string[] | null, sceneMode?: 'physical' | 'wits' | 'social'): string {
   if (PROSE_VARIANT !== 'stack' && PROSE_VARIANT !== 'diet' && PROSE_VARIANT !== 'r2' && PROSE_VARIANT !== 'r3' && PROSE_VARIANT !== 'r4' && PROSE_VARIANT !== 'dlg') return '';
   // r3: the speech directive rotates (none / one line / exchange) — the always-one-quote
   // cadence was itself a stamp; the line-quality bar (anti-receipt) rides the rolled directive
@@ -370,7 +370,20 @@ function proseStack(shape: string[] | null): string {
       // round-5 parley branch REVERTED (batch K: the lone parley sample garbled its blocking —
       // mug/cup smear, informant's fact in the questioner's mouth — consistent with the
       // demand-overload law; n=1 but the prior is 3× measured)
-      : 'One line of speech, quoted, where it changes something. Speech can be a fragment; people answer sideways.';
+      // SPARSE_SPEECH lab (2026-07-24, designer: "dialogue ONLY when needed"): drops the soft
+      // one-line quota — narration leads, speech is the exception
+      : process.env.SPARSE_SPEECH === '1'
+        ? 'Dialogue is not required — quote a line only where it does what narration cannot: a demand, a refusal, an answer that turns the moment. Never quote for flavor.'
+        // SHIPPED DEFAULT 2026-07-24 (batch N, SAMPLES_SPARSE_AB.md): scene-conditioned speech —
+        // the engine's sceneMode decides where dialogue is INVITED (social) vs merely permitted.
+        // Measured: permission-only reads as prohibition (0 quotes/14); the always-one quota
+        // metronomes (16/16) and staples quotes on after their summary; scene-conditioning took
+        // the batch's peaks (two 8s) at C 6.5 · A 6.25 · B 5.5. SPEECH_MODE=quota restores the quota.
+        : process.env.SPEECH_MODE !== 'quota'
+          ? (sceneMode === 'social'
+            ? 'Words decide this job — let a short exchange carry the turn: two voices, a line each, people answer sideways.'
+            : 'Dialogue is not required — quote a line only where it does what narration cannot: a demand, a refusal, an answer that turns the moment. Never quote for flavor.')
+          : 'One line of speech, quoted, where it changes something. Speech can be a fragment; people answer sideways.';
   return '═══ THE TELLING ═══\n' + rhythm + '\n' + speech
     + '\nAnything uncanny on stage acts by its strange nature or stays off the stage — a wonder that two hired guards could replace is furniture.'
     + (PROSE_VARIANT === 'r2' ? '\nEvery give, take, or yield happens as hands, words, or blows ON SCREEN — never told as an abstract exchange or a price paid.' : '')
@@ -453,7 +466,7 @@ const oneOffResolveSystem = (q: ResolveQuestInput, shape = rollShape()) => {
     resolveInputs(q),
     TAGS_NOTE, NUMBER_BAN, EDGE_TYPES_LINE,
     beat ? BEAT_OUTPUT(false) : RESOLVE_OUTPUT(false),
-    proseStack(shape),
+    proseStack(shape, q.sceneMode),
     beat ? BEAT_ANCHOR : resolveAnchor(shape),
     'Respond as JSON matching: {questId, before, ' + (beat ? 'turn, turnActor, speech:[{who,says}], ' : '') + 'after, injuries:[{characterId, band: STRICTLY "low"|"med"|"high", cause}], fleshed:' + (q.deliveredCharacters?.length ? '[{characterId,who,backstory,quirks}]' : ' [] (no one was handed over)') + ', edges:[{from,to,type,blurb,importance}]}',
   ].filter(Boolean).join('\n');
@@ -471,7 +484,7 @@ function sagaResolveSystem(q: ResolveQuestInput): string {
     TAGS_NOTE, NUMBER_BAN, EDGE_TYPES_LINE,
     beat ? BEAT_OUTPUT(finale) : RESOLVE_OUTPUT(finale),
     '- storyUpdate: its truth SCALES with the outcome (success = the full new fact; partial = part, bought dear; failure = nothing concrete). currentSituation states concretely what changed — who holds what, who moved where — names spelled exactly as earlier text spelled them. actorUpdates = the WHEREABOUTS ledger: {"name": "where they now are / who holds it"} — record this step\'s own key object and every person it moved, found, secured, or placed, each name spelled exactly; the NEXT step is pinned to what you write here, so anything you leave out can drift to a wrong place. newlyRevealed = only facts NOT already in storyState. openThreads = the saga\'s live loose ends, replacing the old list. sagaSettled = true ONLY if the central matter is essentially settled with nothing real left to do' + (finale ? '' : ' (the game then brings the saga to its head next step)') + '.',
-    proseStack(shape),
+    proseStack(shape, q.sceneMode),
     beat ? BEAT_ANCHOR : resolveAnchor(shape),
     'Respond as JSON matching: {questId, before, ' + (beat ? 'turn, turnActor, speech:[{who,says}], ' : '') + 'after, injuries:[{characterId, band: STRICTLY "low"|"med"|"high", cause}], fleshed:' + (q.deliveredCharacters?.length ? '[{characterId,who,backstory,quirks}]' : ' [] (no one was handed over)') + ', edges:[{from,to,type,blurb,importance}], storyUpdate:{currentSituation, newlyRevealed:[strings], openThreads:[strings], actorUpdates:{name: "one line"}, sagaSettled: boolean}}',
   ].filter(Boolean).join('\n');
