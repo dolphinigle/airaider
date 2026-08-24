@@ -1137,4 +1137,166 @@ Respond as JSON: {title, situation, job}
 - title: the particular thing this job turns on.
 - job: one line for the boss's list, in different words from the situation. ONE errand — if you need an "and" to say it, that is two, and you keep the one being paid for. It never names the unexplained act.`;
 
-export const VARIANTS: Record<string, string> = { P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22, P23, P24, P25, P26, P30, P31 };
+// ── P32: P31 + the three defects only READING caught (the reviewer now catches the first):
+//        an ambiguous pronoun closer when two trades share a card, incoherent premises from two
+//        KEYWORDS forced together ("swore the wildcat took his debt"), and job lines naming the
+//        unexplained act and so selling it twice.
+const P32 = `You write the card for ONE job in a dark-fantasy mercenary game.
+
+The player runs a mercenary company. They read this card, then choose which of their soldiers to send. The boss stays at the fort. Nothing here has happened yet.
+
+Write about the people out there in the third person. The company is never "we" or "us"; the reader is "you", and even that is rarely needed.
+
+WHAT YOU ARE GIVEN
+- location: the country this sits in. Name AT MOST ONE place, and only if the job turns on it.
+- archetype: the kind of work the job is.
+- gravity: how heavy it reads. Small matters read brisk.
+- rewardEnvelope: shorthand for the kind of pay. Say it in your own plain words or leave it to the ledger the boss already sees.
+- KEYWORDS: sparks for the world. Take ONE, or none. Two of them forced together make a card nobody can follow.
+- intake: how word reached the fort. Never state it — the boss knows a card came from somewhere.
+- oddActor: whose strange act closes the card — "A" the one who is gone, "B" the one left with the trouble, "C" someone else who works that ground.
+
+THE CARD IS TWO SENTENCES.
+
+**First: someone DID something, or something is being done to people.** A person acts in the first six words — *a* miller, *the* drover, never a bare job title standing alone. Not a place, not an object sitting still, not the weather.
+
+**Second: what that means for the reader.** A doubt, a demand, a question, a price, a thing that will get worse. This sentence is why the player sends anyone, and it is the last thing they read.
+
+Then close on ONE act nobody has explained — something a person did with a thing, or about it. Say WHO by their trade, not "he" or "she", whenever more than one person stands on the card. Ordinary in itself, wrong only where it is. Set it down and stop. That act may live inside the second sentence or take a short third; three sentences is the ceiling.
+
+HOW IT READS
+- About twenty-five words. Forty is long. Sentences average a dozen words.
+- Everyone is called by a plain trade a farmhand would use — miller, drover, shepherd, warden, smith. Never invent a compound job.
+- Only what the message names has a name.
+- Plain period words. No numbers, no amounts. No ledger, tally or written record anywhere.
+- Say each thing once.
+
+Respond as JSON: {title, situation, job}
+- title: the particular thing this job turns on.
+- job: one line for the boss's list, in different words from the situation. ONE errand — if you need an "and" to say it, that is two, and you keep the one being paid for. It names only what the client wants done — never the unexplained act, which is the player\u2019s to find.`;
+
+// ── P33: P32 + the coherence classes my READING caught that the reviewer could not (two of the
+//        three are now linted): cold referents ("the patron" with no introduction), premises made
+//        incoherent by forcing archetype and keywords together, and job lines promising a different
+//        errand than the card's second sentence.
+const P33 = `You write the card for ONE job in a dark-fantasy mercenary game.
+
+The player runs a mercenary company. They read this card, then choose which of their soldiers to send. The boss stays at the fort. Nothing here has happened yet.
+
+Write about the people out there in the third person. The company is never "we" or "us"; the reader is "you", and even that is rarely needed.
+
+WHAT YOU ARE GIVEN
+- location: the country this sits in. Name AT MOST ONE place, and only if the job turns on it.
+- archetype: the kind of work the job is.
+- gravity: how heavy it reads. Small matters read brisk.
+- rewardEnvelope: shorthand for the kind of pay. Say it in your own plain words or leave it to the ledger the boss already sees.
+- KEYWORDS: sparks for the world. Take ONE, or none. Two of them forced together make a card nobody can follow.
+- intake: how word reached the fort. Never state it — the boss knows a card came from somewhere.
+- oddActor: whose strange act closes the card — "A" the one who is gone, "B" the one left with the trouble, "C" someone else who works that ground.
+
+THE CARD IS TWO SENTENCES.
+
+It must describe ONE plain situation a tired reader follows first time. If the pieces you were given will not fit into one, use fewer of them. A card nobody can follow is worse than a plain card.
+
+**First: someone DID something, or something is being done to people.** A person acts in the first six words — *a* miller, *the* drover, never a bare job title standing alone. Not a place, not an object sitting still, not the weather.
+
+**Second: what that means for the reader.** A doubt, a demand, a question, a price, a thing that will get worse. This sentence is why the player sends anyone, and it is the last thing they read.
+
+Then close on ONE act nobody has explained — something a person did with a thing, or about it. Say WHO by their trade, not "he" or "she", whenever more than one person stands on the card. Ordinary in itself, wrong only where it is. Set it down and stop. That act may live inside the second sentence or take a short third; three sentences is the ceiling.
+
+HOW IT READS
+- About twenty-five words. Forty is long. Sentences average a dozen words.
+- Everyone is called by a plain trade a farmhand would use — miller, drover, shepherd, warden, smith. Never invent a compound job.
+- Only what the message names has a name.
+- Everyone gets introduced the moment they appear: *a* drover, *a* woman who keeps the ford. Never "the patron", "the client", "the carrier" — the reader has not met them.
+- Plain period words. No numbers, no amounts. No ledger, tally or written record anywhere.
+- Say each thing once.
+
+Respond as JSON: {title, situation, job}
+- title: the particular thing this job turns on.
+- job: one line for the boss's list, in different words from the situation. ONE errand — if you need an "and" to say it, that is two, and you keep the one being paid for. It names only what the client wants done — never the unexplained act, which is the player\u2019s to find.`;
+
+// ── P34: P33 + a bug I introduced myself — my italic examples ("*a* miller, *the* drover") taught
+//        the model to START CARDS LOWERCASE, 4 of 28. L1 applies to FORMATTING, not just wording.
+//        Also: give the model plain job words to reach for instead of banning coinage, and keep pay
+//        out of the job line. Trimmed to offset the additions.
+const P34 = `You write the card for ONE job in a dark-fantasy mercenary game.
+
+The player runs a mercenary company. They read this card, then choose which of their soldiers to send. The boss stays at the fort. Nothing here has happened yet.
+
+Write about the people out there in the third person. The company is never "we" or "us"; the reader is "you", and even that is rarely needed.
+
+WHAT YOU ARE GIVEN
+- location: the country this sits in. Name AT MOST ONE place, and only if the job turns on it.
+- archetype: the kind of work the job is.
+- rewardEnvelope: shorthand for the kind of pay. Say it in your own plain words or leave it to the ledger the boss already sees.
+- KEYWORDS: sparks for the world. Take ONE, or none. Two of them forced together make a card nobody can follow.
+- intake: how word reached the fort. Never state it — the boss knows a card came from somewhere.
+- oddActor: whose strange act closes the card — "A" the one who is gone, "B" the one left with the trouble, "C" someone else who works that ground.
+
+THE CARD IS TWO SENTENCES.
+
+It describes ONE plain situation a tired reader follows first time. If the pieces you were given will not fit into one, use fewer of them.
+
+**First: someone DID something, or something is being done to people.** A person acts in the first six words. Give them an article, never a bare job title standing alone. Not a place, not an object sitting still, not the weather. Begin the card with a capital letter.
+
+**Second: what that means for the reader.** A doubt, a demand, a question, a price, a thing that will get worse. This sentence is why the player sends anyone, and it is the last thing they read.
+
+Then close on ONE act nobody has explained — something a person did with a thing, or about it. Say WHO by their trade, not "he" or "she", whenever more than one person stands on the card. Ordinary in itself, wrong only where it is. Set it down and stop. That act may live inside the second sentence or take a short third; three sentences is the ceiling.
+
+HOW IT READS
+- About twenty-five words. Forty is long. Sentences average a dozen words.
+- Everyone is called by a plain trade a farmhand would use. When the message gives you no word for someone, take the plainest one that already exists — keeper, guide, hand, watchman, carter, cook — and never join two words to make a new job.
+- Only what the message names has a name.
+- Everyone gets introduced the moment they appear: *a* drover, *a* woman who keeps the ford. Never "the patron", "the client", "the carrier" — the reader has not met them.
+- Plain period words. No numbers, no amounts. No ledger, tally or written record anywhere.
+- Say each thing once.
+
+Respond as JSON: {title, situation, job}
+- title: the particular thing this job turns on.
+- job: one line for the boss's list, in different words from the situation. No pay in it. ONE errand — if you need an "and" to say it, that is two, and you keep the one being paid for. It names only what the client wants done — never the unexplained act, which is the player\u2019s to find.`;
+
+// ── P35: MEASURED against the 1,495 official rite intros — the prompt was manufacturing devices
+//        the gold standard barely uses. "before X happens" urgency: official 1%, ours 57%.
+//        Imperatives at the reader ("Find him", "Send men"): official 1%, ours 36%. "demands":
+//        1% vs 25%. Questions, which official text uses 14% of the time, we never wrote at all.
+//        The card DESCRIBES; the job line commands.
+const P35 = `You write the card for ONE job in a dark-fantasy mercenary game.
+
+The player runs a mercenary company. They read this card, then choose which of their soldiers to send. The boss stays at the fort. Nothing here has happened yet.
+
+Write about the people out there in the third person. The company is never "we" or "us"; the reader is "you", and even that is rarely needed.
+
+WHAT YOU ARE GIVEN
+- location: the country this sits in. Name AT MOST ONE place, and only if the job turns on it.
+- archetype: the kind of work the job is.
+- rewardEnvelope: shorthand for the kind of pay. Say it in your own plain words or leave it to the ledger the boss already sees.
+- KEYWORDS: sparks for the world. Take ONE, or none. Two of them forced together make a card nobody can follow.
+- intake: how word reached the fort. Never state it — the boss knows a card came from somewhere.
+- oddActor: whose strange act closes the card — "A" the one who is gone, "B" the one left with the trouble, "C" someone else who works that ground.
+
+THE CARD IS TWO SENTENCES.
+
+It describes ONE plain situation a tired reader follows first time. If the pieces you were given will not fit into one, use fewer of them.
+
+**First: someone DID something, or something is being done to people.** A person acts in the first six words. Give them an article, never a bare job title standing alone. Not a place, not an object sitting still, not the weather. Begin the card with a capital letter.
+
+**Second: what it means for the people it happened to.** What they want, what they fear, or what nobody can explain — often just a question the situation raises. This is why the player sends anyone, and it is the last thing they read.
+
+The card TELLS the boss what has happened. It never orders them about: no "find him", no "send men", no "recover it before". Those belong on the job line. The trouble is only as urgent as the facts make it — never invent a deadline the message did not give you.
+
+One act nobody has explained closes the card — something a person did with a thing, or about it. Say WHO by their trade, not "he" or "she", whenever more than one person stands on the card. Ordinary in itself, wrong only where it is. Set it down and stop. That act may live inside the second sentence or take a short third; three sentences is the ceiling.
+
+HOW IT READS
+- About twenty-five words. Forty is long. Sentences average a dozen words.
+- Everyone is called by a plain trade a farmhand would use. When the message gives you no word for someone, take the plainest one that already exists — keeper, guide, hand, watchman, carter, cook — and never join two words to make a new job.
+- Only what the message names has a name.
+- Everyone gets introduced the moment they appear: *a* drover, *a* woman who keeps the ford. Never "the patron", "the client", "the carrier" — the reader has not met them.
+- Plain period words. No numbers, no amounts. No ledger, tally or written record anywhere.
+- Say each thing once.
+
+Respond as JSON: {title, situation, job}
+- title: the particular thing this job turns on.
+- job: one line for the boss's list, in different words from the situation. No pay in it. ONE errand — if you need an "and" to say it, that is two, and you keep the one being paid for. It names only what the client wants done — never the unexplained act, which is the player\u2019s to find.`;
+
+export const VARIANTS: Record<string, string> = { P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22, P23, P24, P25, P26, P30, P31, P32, P33, P34, P35 };

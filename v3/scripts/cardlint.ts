@@ -81,11 +81,20 @@ export function lintCard(situation: string, input: QuestWriteInput, form: CardFo
     .map(hit => hit.join('/'));
   if (named.length >= CAP.places) f.push({ code: 'two-places', detail: named.join(' + ') });
 
+  // Anything the ENGINE dealt is not a coinage: locationLine says "the charcoal-burners' camps"
+  // and "the warden-stones on the ridgeline", so those compounds are vocabulary, not invention.
+  // Without this the lint punishes the model for using dealt words correctly.
+  const dealtWords = JSON.stringify([input.location, input.placeNameSuggestions, input.keywords, input.archetype])
+    .toLowerCase().replace(/[^a-z-]+/g, ' ');
+  // the WHOLE compound must have been dealt — "stone-warden" is a coinage even though the engine
+  // dealt "warden-stones", so matching part-by-part would let real inventions through.
+  const isDealt = (w: string) => dealtWords.includes(w) || dealtWords.includes(w.replace(/-/g, ' '));
   // ── NEAR-DUPLICATE COINAGE — "stone-warden" beside "warden-stones" in one card: the reader
   // meets the same invented stem twice in two different senses. Worst of the jargon class.
   // narrowed: only fires when a HYPHENATED coinage shares a stem with another word in the card
   // ("stone-warden" beside "warden-stones"). Any-word-overlap fired on 7.3% of official text.
   const hyph = (s.toLowerCase().match(/\b[a-z]{4,}-[a-z]{4,}\b/g) ?? [])
+    .filter(h => !isDealt(h))
     .filter(h => /-(warden|keeper|master|hand|wright|monger|herd|cutter|burner|maker|stone|gate)s?$/.test(h) || /^(stone|ruin|copse|ridge|peat|bog|moor)-/.test(h));
   const coll: string[] = [];
   for (const h of hyph) for (const part of h.split('-'))
@@ -94,7 +103,7 @@ export function lintCard(situation: string, input: QuestWriteInput, form: CardFo
 
   // ── COINED COMPOUND TRADES — "stone-warden", "ruin-keeper". ZERO occurrences in 1,426 official
   // intros, so this is genuinely alien to the register, not a stylistic preference of mine.
-  const compounds = [...new Set((s.match(/\b[a-z]{3,}-[a-z]{3,}\b/g) ?? []))]
+  const compounds = [...new Set((s.match(/\b[a-z]{3,}-[a-z]{3,}\b/g) ?? []))].filter(c => !isDealt(c))
     .filter(c => !PLAIN_TRADES.has(c.split('-')[1]!) || !PLAIN_TRADES.has(c.split('-')[0]!));
   const coinedTrade = compounds.filter(c => /-(warden|keeper|master|hand|man|wright|smith|monger|herd|cutter|burner|maker)$/.test(c));
   if (coinedTrade.length) f.push({ code: 'coined-trade', detail: coinedTrade.join(', ') });
@@ -102,6 +111,30 @@ export function lintCard(situation: string, input: QuestWriteInput, form: CardFo
   // ── INVENTED DURATION — the payload has no duration field, so any of these is fabricated
   const dm = s.match(DURATION);
   if (dm) f.push({ code: 'invented-duration', detail: dm[0] });
+
+  // ── UNINTRODUCED REFERENT — "the patron", "the client", "the bride" arriving with a definite
+  // article though the card never put them on the page. This is the readability defect the designer
+  // described as jargon: the reader is addressed as if they already know who this is.
+  const firstMention = new Map<string, boolean>();
+  for (const m of s.matchAll(/\b(a|an|the)\s+([a-z][a-z-]{2,})\b/gi)) {
+    const noun = m[2]!.toLowerCase();
+    if (!firstMention.has(noun)) firstMention.set(noun, m[1]!.toLowerCase() !== 'the');
+  }
+  // NARROW on purpose. English licenses "the lady of the house" from a mansion already mentioned,
+  // and official text does this constantly — an earlier, wider list failed 6 gold texts. Only nouns
+  // that carry NO context anchor of their own stay here.
+  const PERSONISH = /^(patron|client|claimant|bearer|carrier|rival|employer)$/;
+  const cold = [...firstMention].filter(([n, introduced]) => !introduced && PERSONISH.test(n)
+    && !dealtWords.includes(n)).map(([n]) => `the ${n}`);
+  if (cold.length) f.push({ code: 'cold-referent', detail: cold.join(', ') });
+
+  // ── AMBIGUOUS CLOSER — the last sentence opens on a bare pronoun while two or more different
+  // trades are on the card, so the reader cannot tell who performed the closing act.
+  const TRADE = /\b(foreman|shepherd|ferryman|beekeeper|miller|smith|carter|drover|warden|guide|archer|sage|warrior|scout|hunter|trapper|oarsman|tinker|farmer|tenant|steward|reeve|herdsman|miner|logger|cutter|fisher|cook|maid|sergeant|captain|merchant|physician|scribe|priest|monk|widow|apprentice|courier|wanderer|stranger|burner|officer|vicar|shipmaster|landholder|advisor|tracker|woodcutter|boatman|woodsman)\b/gi;
+  const trades = new Set((s.match(TRADE) ?? []).map(x => x.toLowerCase()));
+  const last = sents[sents.length - 1] ?? '';
+  if (trades.size >= 2 && /^(he|she|they)\b/i.test(last.trim()))
+    f.push({ code: 'ambiguous-closer', detail: `${[...trades].join('/')} — closer opens "${last.trim().split(/\s+/)[0]}"` });
 
   // ── MY OWN RULE WORDING COMING BACK
   for (const p of RULE_ECHO) if (s.toLowerCase().includes(p)) { f.push({ code: 'rule-echo', detail: p }); break }

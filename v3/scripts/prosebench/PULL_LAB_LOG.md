@@ -283,6 +283,36 @@ with the unexplained act closing.
 cannot yet catch referent ambiguity ("He set an anvil" — warden or wanderer?), an incoherent premise
 ("swore the wildcat took his debt"), or a job line that names the unexplained act.
 
+### P32 → P35: the iteration that mattered was MEASURING MY OWN PROMPT AGAINST THE CORPUS
+Four rounds of patching lint classes (P32-P34) moved the reviewer from 23→25/28 but the READ score
+did not improve (P32 20/28, P34 ~18/28). The prompt grew 414→573 words for nothing.
+
+Then I measured what devices our cards used against the 1,495 official rite intros:
+
+| device | official | ours (P34) | ours (P35) |
+|---|---|---|---|
+| "before X happens" urgency | **1%** | **57%** | **0%** |
+| imperative at the reader ("Find him", "Send men") | **1%** | 36% | **0%** |
+| "demands" | 1% | 25% | 21% |
+| a question | **14%** | **0%** | 4% |
+
+**My prompt was manufacturing three devices the gold standard barely uses, and suppressing one it
+uses constantly.** The urgency clause was mine; the imperatives were mine. They were what garbled
+sentence 2 ("That has a neighbor calling for retribution and wants someone to break the hands").
+**The card DESCRIBES what happened; the job line commands.** Removing all three:
+
+**P35 = 24/28 (86%) by reading** — the best result of the lab, against P32's 20/28.
+Sample: *"A beekeeper bolted herself inside her hut in the western forests. Neighbors fear the
+guardian hives and the old homage shrine are sealed with her."* [25w] ·
+*"A guide led a merchant party past the warden-stones and returned alone, a candle still burning in
+his hand."* [39w] · *"A drover opened his pens beside the old elf road and walked off. The livestock
+wander toward the churchyard, and the villagers ask whether they were abandoned or taken by
+something."* [31w]
+
+**METHOD LESSON, third time this session:** measure the artefact against the gold standard rather
+than reasoning about it. My rubric was wrong (fixed), my reviewer was wrong (calibrated), and my
+prompt's own devices were wrong — each time the corpus said so in one query.
+
 ## NEXT
 Present the champion samples to the designer against CARD_PULL.md's complaint list. Nothing ships
 until it wins a blind bench under the frozen prosebench protocol against the current prompt.
