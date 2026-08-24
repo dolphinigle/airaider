@@ -4,8 +4,10 @@
 against at least two independent corpora. Where corpora disagreed, the disagreement is stated and
 settled explicitly rather than averaged away.
 
-**Ground truth.** The designer supplied four Sultan's Game quests and called them the goal
-(`REFERENCE_SULTANS_RESULTS.md`). **Where anything below conflicts with those four, they win.**
+**Ground truth.** `GOLD_STANDARD.md` — tier 1 is the four Sultan's Game quests the designer supplied
+plus the seven event intros they read and called "very good and interesting"; tier 2 is 35 further
+event intros of the same form, not yet ruled on. **Where anything below conflicts with tier 1, tier 1
+wins.**
 Everything else is corroboration or correction.
 
 **Fidelity status (audited and repaired 2026-08-24; `research/AUDIT_*.md`, repair log at the top of
@@ -83,9 +85,14 @@ it 18/18: *"A barred door hangs on Thornhollow's outer hall and has stood so sin
   daughter of the chief."*
 Our restitution frame (a tradesman cannot work while a thing sits in a place) appears in no corpus.
 
-**A3. 15–60 words, 1–3 sentences — and the size is BIMODAL, not a target to hit.**
-The designer's four cards are 15, 22, 54, 59 words. There is nothing between 22 and 54. A card is
-either **one strong sentence of ~15–25 words**, or **two-to-three sentences totalling ~50–60**.
+**A3. 15–70 words, 1–4 sentences — the size is a RANGE with a centre near 45, not a target.**
+*(Revised 2026-08-24 after the gold standard was widened from 4 texts to 46 — see `GOLD_STANDARD.md`.
+Written from the four quests alone this rule said "20–40 words, 1–3 sentences"; the 42 endorsed and
+corpus event intros measure median 46 words, p25 35, p75 64, with sentences median 3 and p75 4. The
+narrower rule would have excluded most of the goal texts.)*
+The designer's four cards are 15, 22, 54, 59 words — nothing between 22 and 54 — and the seven
+endorsed event intros run 24–45 (median 42). So a card is either **one or two sentences of ~15–25
+words** or **two-to-four sentences totalling ~40–65**; the tail runs to ~137 for a singular quest.
 Corpus centres: official Sultan median 38 (p25 23, p75 72; post-repair); Fallen London roots median 22 with a
 published ≤30 rule; KoDP median 51. Our cards run 50–75 in four mandated sentences — the wrong
 sentence count at every size, and always at the long end.
@@ -95,9 +102,9 @@ result · 22 → 19 · 54 → 53 · 59 → 51. A small quest gets a small card A
 singular quest earns both. Size is a property of the QUEST, so it must be dealt by the engine
 (rarity/gravity), never chosen by the writer.
 
-**A4. Sentences centre on 15 words; the working range is 10–30.**
-Corpus centres: official Sultan English median **15.2** (p25 12.0, p75 20.5); KoDP 15.0; Battle
-Brothers 16.0; Fallen London 8.5–10.5. The designer's own eight pieces span **10.6 → 29.5**, so a
+**A4. Sentences centre on 15–17 words; the working range is 10–30.**
+Corpus centres: official Sultan English median **15.2** (p25 12.0, p75 20.5); the 42 event intros
+**17.1**; KoDP 15.0; Battle Brothers 16.0; Fallen London 8.5–10.5. The designer's own eight pieces span **10.6 → 29.5**, so a
 12–20 band would exclude half of the goal texts. **15 is the centre, not a cap.** Longer sentences
 belong to the singular quests (the 29.5 is sample 3, a saga beat); routine cards sit at 12–18.
 Readability governs the choice: when in doubt take the low end.
@@ -251,7 +258,7 @@ twice the length because a lasting cost needs stating. Our engine already grades
 # THE NUMBERS, in one table
 | piece | words | sentences | w/sentence |
 |---|---|---|---|
-| card | **15–60**, bimodal (~15–25 or ~50–60) | **1–3** | **10–30**, centre 15 |
+| card | **15–70**, centre ~45 (short form ~15–25, full form ~40–65) | **1–4** | **10–30**, centre 15–17 |
 | slot line | **5–20** | 1 | — |
 | result (success) | **19–55**, scaling with the card | 1–5 | 10–30, centre 15 |
 | result (failure) | shorter than its success | 2–4 | 10–30, centre 15 |
@@ -271,8 +278,15 @@ twice the length because a lasting cost needs stating. Our engine already grades
    its withholding inside a noun phrase and spends its last sentence on a vector at the player.
 
 # SELF-AUDIT — does this guideline actually contain the goal texts?
-Run against the designer's four quests (eight measured pieces) after the bands were fixed:
-**8/8 contained.** The first draft of this document scored **3/8** — its bands came from corpus
+Run against tier 1 of `GOLD_STANDARD.md` — the four designer quests plus the seven endorsed event
+intros — after the bands were widened: **11/11 contained.**
+History of this audit, because it keeps catching the same failure mode: the first draft scored
+**3/8** against the four quests alone; corrected to 8/8; then the gold standard was widened from 4
+texts to 46 and the corrected bands were found to be too NARROW again (median 46 words vs the 20–40
+the rule allowed, and four-sentence cards occur). Widened again to 15–70 words / 1–4 sentences:
+11/11. **Every time the evidence base grew, my bands were too tight — because they were drawn from
+the sample I happened to have.** Re-run this audit after any numeric edit, and after any addition to
+the gold standard. The earlier draft scored **3/8** and — its bands came from corpus
 medians (dominated by the larger KoDP and Fallen London corpora) and excluded five of the designer's
 own samples, including both one-sentence cards. That drift is exactly what the designer warned
 against, and the bands were widened to the ground truth rather than the ground truth being ignored.
