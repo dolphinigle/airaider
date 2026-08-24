@@ -1057,4 +1057,84 @@ Respond as JSON: {title, situation, job}
 - title: the particular thing this job turns on, never a summary of the first sentence.
 - job: ONE line for the boss's list — a whole instruction a captain could act on, in different words from the situation. One errand only: if you need an "and" to say it, that is two errands, and you keep the one the client is actually paying for. No pay, no plan, no count of soldiers. It never mentions the thing that does not fit; that is the player's to find, and naming it here sells it twice. A find-out job is posed as the QUESTION and never names a cause the situation has not established.`;
 
-export const VARIANTS: Record<string, string> = { P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22, P23, P24, P25, P26 };
+
+// ── P30: REBUILT SMALL from the official-English rite target (median 24w, 2 sentences, 12 w/sent).
+//   P26 was ~900 words aiming at 50-75w cards; the goal is ~24w, so the prompt was three times too
+//   big and pointed at the wrong size. Deletions do most of the work here:
+//   · the duration demand is GONE — the payload has no duration field, so it forced invention
+//     ("since the last market") on nearly every card
+//   · "use its named places" is GONE — it dragged the landmark AND the Known-ground token into one
+//     short card ("Thornhollow" + "the ridgeline warden-stones")
+//   · the cost sentence is GONE — official rite intros do not account for what the trouble costs
+//   · rule 2's liftable wording is GONE ("is left carrying it" came back as a template)
+//   Shape taken from the shipped intros: TWO sentences — what happened, then what it means for you.
+const P30 = `You write the card for ONE job in a dark-fantasy mercenary game.
+
+The player runs a mercenary company. They read this card, then choose which of their soldiers to send. The boss stays at the fort. Nothing here has happened yet.
+
+WHAT YOU ARE GIVEN
+- location: the country this sits in. Name AT MOST ONE place, and only if the job turns on it.
+- archetype: the kind of work — contract, investigate, hunt, rescue, raid, capture, escort, or a sweep for word of what to do next.
+- gravity: how heavy it reads. Small matters read brisk.
+- rewardEnvelope: shorthand for the kind of pay. Say it in your own plain words or leave it to the ledger the boss already sees.
+- KEYWORDS: sparks for the world. Take at most one and rebuild it in your own words.
+- intake: how word reached the fort. Never state it — the boss knows a card came from somewhere.
+- oddActor: whose strange act closes the card — "A" the one who is gone, "B" the one left with the trouble, "C" someone else who works that ground.
+
+THE CARD IS TWO SENTENCES.
+
+**First: someone DID something, or something is being done to people.** A person acts in the first six words. Not a place, not an object sitting still, not the weather.
+
+**Second: what that means for the reader.** A doubt, a demand, a question, a price, a thing that will get worse. This sentence is why the player sends anyone, and it is the last thing they read.
+
+Then close on ONE act nobody has explained — something a person did with a thing, or about it. Ordinary in itself, wrong only where it is. Set it down and stop. That act may live inside the second sentence or take a short third; three sentences is the ceiling.
+
+HOW IT READS
+- About twenty-five words. Forty is long. Sentences average a dozen words.
+- Everyone is called by a plain trade a farmhand would use — miller, drover, shepherd, warden, smith. Never invent a compound job.
+- Only what the message names has a name.
+- Plain period words. No numbers, no amounts. Nothing written down as a prop.
+- Say each thing once.
+
+Respond as JSON: {title, situation, job}
+- title: the particular thing this job turns on.
+- job: one line for the boss's list, one errand, in different words from the situation. It never names the unexplained act.`;
+
+// ── P31: P30 + four fixes, no net growth. The 25-word budget made the model drop articles
+//        ("Woodsman drove", "Drover cut"); "we/us" crept in for the company; job lines stacked
+//        errands; and compressing the written-record ban let a ledger back.
+const P31 = `You write the card for ONE job in a dark-fantasy mercenary game.
+
+The player runs a mercenary company. They read this card, then choose which of their soldiers to send. The boss stays at the fort. Nothing here has happened yet.
+
+Write about the people out there in the third person. The company is never "we" or "us"; the reader is "you", and even that is rarely needed.
+
+WHAT YOU ARE GIVEN
+- location: the country this sits in. Name AT MOST ONE place, and only if the job turns on it.
+- archetype: the kind of work the job is.
+- gravity: how heavy it reads. Small matters read brisk.
+- rewardEnvelope: shorthand for the kind of pay. Say it in your own plain words or leave it to the ledger the boss already sees.
+- KEYWORDS: sparks for the world. Take at most one and rebuild it in your own words.
+- intake: how word reached the fort. Never state it — the boss knows a card came from somewhere.
+- oddActor: whose strange act closes the card — "A" the one who is gone, "B" the one left with the trouble, "C" someone else who works that ground.
+
+THE CARD IS TWO SENTENCES.
+
+**First: someone DID something, or something is being done to people.** A person acts in the first six words — *a* miller, *the* drover, never a bare job title standing alone. Not a place, not an object sitting still, not the weather.
+
+**Second: what that means for the reader.** A doubt, a demand, a question, a price, a thing that will get worse. This sentence is why the player sends anyone, and it is the last thing they read.
+
+Then close on ONE act nobody has explained — something a person did with a thing, or about it. Ordinary in itself, wrong only where it is. Set it down and stop. That act may live inside the second sentence or take a short third; three sentences is the ceiling.
+
+HOW IT READS
+- About twenty-five words. Forty is long. Sentences average a dozen words.
+- Everyone is called by a plain trade a farmhand would use — miller, drover, shepherd, warden, smith. Never invent a compound job.
+- Only what the message names has a name.
+- Plain period words. No numbers, no amounts. No ledger, tally or written record anywhere.
+- Say each thing once.
+
+Respond as JSON: {title, situation, job}
+- title: the particular thing this job turns on.
+- job: one line for the boss's list, in different words from the situation. ONE errand — if you need an "and" to say it, that is two, and you keep the one being paid for. It never names the unexplained act.`;
+
+export const VARIANTS: Record<string, string> = { P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22, P23, P24, P25, P26, P30, P31 };

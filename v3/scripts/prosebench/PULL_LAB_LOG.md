@@ -261,6 +261,28 @@ First version flagged the OFFICIAL Sultan texts — it was measuring my assumpti
 **Method note worth keeping: a quality gate must be calibrated against the gold standard, or it
 optimises toward whatever its author already believed.**
 
+### THE SMALL REBUILD — P30/P31 (2026-08-24)
+Rebuilt from the official-English rite target (median 24w, 2 sentences, 12 w/sent) instead of
+patching P26, whose mandates the research had falsified. **Deletions did most of the work:**
+- the DURATION demand ("how long it has stood so") — the payload has no duration field, so it forced
+  invention on nearly every card. Removing it killed the "since the last market" class outright.
+- "use its named places" — it dragged the landmark AND the Known-ground token into one short card.
+- the cost sentence — official rite intros do not account for what the trouble costs anyone.
+- rule 2's liftable wording.
+Shape taken from the shipped intros: TWO sentences — what happened, then what it means for you —
+with the unexplained act closing.
+
+| prompt | size | reviewer clean | notes |
+|---|---|---|---|
+| P26 (old champion) | 1148 w | **2/18** | 8 invented durations, 8 coined trades, 5 rule-echoes |
+| P30 | 414 w | 9/14 | dropped articles ("Woodsman drove"), "we/us", stacked job lines |
+| **P31** | **459 w** | **14/14** | articles restored, third person pinned, one errand, record-ban restored |
+
+**P31 is one third the size of P26 and beats it 14/14 against 2/18** on a reviewer calibrated so that
+100% of the designer's endorsed gold standard passes. By READING, P31 is ~10-11/14 — the reviewer
+cannot yet catch referent ambiguity ("He set an anvil" — warden or wanderer?), an incoherent premise
+("swore the wildcat took his debt"), or a job line that names the unexplained act.
+
 ## NEXT
 Present the champion samples to the designer against CARD_PULL.md's complaint list. Nothing ships
 until it wins a blind bench under the frozen prosebench protocol against the current prompt.

@@ -7,6 +7,7 @@ import OpenAI from 'openai';
 import * as fs from 'node:fs';
 import { VARIANTS } from './pullprompts.js';
 import type { QuestWriteInput } from '../src/ai/provider.js';
+import { lintCard } from './cardlint.js';
 
 function loadKey(): string {
   if (process.env.OPENAI_API_KEY) return process.env.OPENAI_API_KEY;
@@ -86,26 +87,11 @@ const userOf = (i: QuestWriteInput) => JSON.stringify({
   ...(process.env.ODD_ACTOR === '1' ? { oddActor: ACTORS[actorN++ % ACTORS.length] } : {}),
 });
 
-/** log-only lint — objective smells, counted; the PASS is still a human read */
-function lint(s: string, i: QuestWriteInput): string[] {
-  const f: string[] = [];
-  const w = s.split(/\s+/).filter(Boolean).length;
-  if (w > 95) f.push(`long:${w}w`);
-  const sents = s.split(/(?<=[.!?])\s+/).filter(Boolean);
-  if (sents.length > 6) f.push(`sents:${sents.length}`);
-  if (/\b(I|my|we|our)\b/.test(s)) f.push('first-person');
-  if (!/\b(he|she|they|him|her|them|his|their)\b/i.test(s)) f.push('no-pronouns');
-  if (/\b(no one|nobody|none) (can|could|will|would) (say|tell|account|explain)/i.test(s)) f.push('cannot-say-tag');
-  for (const piece of i.rewardEnvelope.split(' + ')) {
-    if (piece.length > 6 && s.toLowerCase().includes(piece.toLowerCase())) f.push('envelope-echo');
-  }
-  if (i.intake && s.toLowerCase().includes(i.intake.toLowerCase().slice(0, 18))) f.push('intake-echo');
-  if (/^(word|news|a messenger|a rider|a runner|at (dawn|dusk|first light|nightfall))/i.test(s.trim())) f.push('weak-open');
-  if (/\b(is|are|was|were) (suspected|thought|believed|rumou?red) to\b/i.test(s)) f.push('hedge');
-  if (/\b(wants?|needs?) it (fixed|put right|set right|ended|dealt with)\b/i.test(s)) f.push('wants-it-fixed');
-  if (/\bledger|registry|record-book\b/i.test(s)) f.push('account-book');
-  return f;
-}
+/** the calibrated quality reviewer (scripts/cardlint.ts) — log-only telemetry, but it is validated
+ *  so that 100% of the designer's endorsed gold standard passes and 84% of the 1,426 official rite
+ *  intros pass, while catching the jargon classes the designer flagged. */
+const lint = (situation: string, i: QuestWriteInput) =>
+  lintCard(situation, i).map(f => f.code + (f.detail ? `:${f.detail}` : ''));
 
 const client = new OpenAI({ apiKey: loadKey() });
 const md: string[] = [`# batch ${variantId} — n=${picks.length}, real engine payloads\n`];

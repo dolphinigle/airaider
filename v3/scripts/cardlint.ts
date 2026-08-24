@@ -19,7 +19,18 @@ import type { QuestWriteInput } from '../src/ai/provider.js';
  *  goal. Distribution: words p50 24 / p75 37 / p90 58 / p95 73 · sentences p50 2 / p90 4 / p95 5 ·
  *  w/sent p50 12.4 / p90 21.5 / p95 26 · proper nouns per intro p50 1 / p75 3 / p90 4 / max 9. */
 export const TARGET = { words: 24, wordsP75: 37, sentences: 2, wordsPerSentence: 12 };
-const CAP = { words: 58, sentences: 4, wordsPerSentence: 26, properNouns: 5, places: 2 };
+
+/** TWO FORMS, TWO DISTRIBUTIONS — judging both with one threshold failed the designer's own
+ *  endorsed texts (65% pass). RITES are the assign-characters quests (our analogue): median 24w.
+ *  EVENTS are the end-of-day choice cards the designer endorsed: median 46w, tail to 137w.
+ *  Our generated cards are rites; the gold standard contains both. */
+const CAPS = {
+  // rite caps sit slightly above corpus p90 so the designer's own endorsed quests pass:
+  // "Project Investment" is 59w at 29.5 w/sent. Official p95 is 73w / 26 w-per-sentence.
+  rite:  { words: 62,  sentences: 4, wordsPerSentence: 30, properNouns: 5, places: 2 },
+  event: { words: 140, sentences: 8, wordsPerSentence: 36, properNouns: 7, places: 3 },
+};
+export type CardForm = keyof typeof CAPS;
 
 const DURATION = /\b(since|for|after)\s+(the\s+)?(last\s+)?(market|moon|dawn|dusk|nightfall|thaw|season|harvest|sabbath|(two|three|four|five|several|many)\s+(days?|nights?|dawns?|mornings?|weeks?|moons?|seasons?))\b/i;
 const RULE_ECHO = [
@@ -32,7 +43,8 @@ const PLAIN_TRADES = new Set(['foreman','shepherd','ferryman','beekeeper','mille
 
 export interface Flag { code: string; detail: string }
 
-export function lintCard(situation: string, input: QuestWriteInput): Flag[] {
+export function lintCard(situation: string, input: QuestWriteInput, form: CardForm = 'rite'): Flag[] {
+  const CAP = CAPS[form];
   const f: Flag[] = [];
   const s = situation.trim();
   const words = s.split(/\s+/).filter(Boolean);
@@ -55,19 +67,26 @@ export function lintCard(situation: string, input: QuestWriteInput): Flag[] {
   // THE ACTUAL ENGINE-INPUT DEFECT: locationLine hands the writer a landmark AND a separate
   // "Known ground:" token, and both get stuffed into one short card, so the reader is asked to hold
   // two unrelated places at once. Count how many DEALT places the card names.
-  const placeTokens = [
-    ...(String(input.location ?? '').match(/(?:ruin of|Known ground:)\s*([^.;]+)/g) ?? []),
-    ...(input.placeNameSuggestions ?? []),
-  ].flatMap(x => String(x).replace(/^(the ruin of|Known ground:)\s*/i, '').split(/\s+/))
-   .filter(w => /^[A-Za-z-]{4,}$/.test(w) && !/^(the|and|on|of|at|in)$/i.test(w));
-  const named = [...new Set(placeTokens.filter(t => new RegExp(`\\b${t}\\b`, 'i').test(s)))];
+  // Group tokens by the PHRASE the engine dealt them in: locationLine says "the ruin of
+  // Thornhollow", so a card naming both "the ruin" and "Thornhollow" has named ONE place, not two.
+  // Only distinct dealt PHRASES count.
+  const phrases: string[][] = [
+    ...(String(input.location ?? '').match(/(?:ruin of|Known ground:)\s*([^.;]+)/g) ?? [])
+      .map(x => x.replace(/^(the ruin of|Known ground:)\s*/i, '')),
+    ...(input.placeNameSuggestions ?? []).map(String),
+  ].map(ph => ph.split(/\s+/).filter(w => /^[A-Za-z-]{4,}$/.test(w) && !/^(the|and|on|of|at|in|their|its)$/i.test(w)));
+  const named = phrases
+    .map(toks => toks.filter(t => new RegExp(`\\b${t}\\b`, 'i').test(s)))
+    .filter(hit => hit.length > 0)
+    .map(hit => hit.join('/'));
   if (named.length >= CAP.places) f.push({ code: 'two-places', detail: named.join(' + ') });
 
   // ── NEAR-DUPLICATE COINAGE — "stone-warden" beside "warden-stones" in one card: the reader
   // meets the same invented stem twice in two different senses. Worst of the jargon class.
   // narrowed: only fires when a HYPHENATED coinage shares a stem with another word in the card
   // ("stone-warden" beside "warden-stones"). Any-word-overlap fired on 7.3% of official text.
-  const hyph = (s.toLowerCase().match(/\b[a-z]{4,}-[a-z]{4,}\b/g) ?? []);
+  const hyph = (s.toLowerCase().match(/\b[a-z]{4,}-[a-z]{4,}\b/g) ?? [])
+    .filter(h => /-(warden|keeper|master|hand|wright|monger|herd|cutter|burner|maker|stone|gate)s?$/.test(h) || /^(stone|ruin|copse|ridge|peat|bog|moor)-/.test(h));
   const coll: string[] = [];
   for (const h of hyph) for (const part of h.split('-'))
     if (part.length >= 5 && new RegExp(`\\b${part}s?\\b`, 'i').test(s.replace(h, ''))) coll.push(`${h} ~ ${part}`);
@@ -88,7 +107,10 @@ export function lintCard(situation: string, input: QuestWriteInput): Flag[] {
   for (const p of RULE_ECHO) if (s.toLowerCase().includes(p)) { f.push({ code: 'rule-echo', detail: p }); break }
 
   // ── carried over from the old lint, still real
-  if (/\b(I|my|we|our)\b/.test(s)) f.push({ code: 'first-person', detail: '' });
+  // speech inside quotes is a CHARACTER talking, not the narrator — strip it before the check
+  const unquoted = s.replace(/["\u201C\u201D][^"\u201C\u201D]{0,400}["\u201C\u201D]/g, ' ')
+                    .replace(/\u2018[^\u2019]{0,400}\u2019/g, ' ');
+  if (/\b(I|my|we|our)\b/.test(unquoted)) f.push({ code: 'first-person', detail: '' });
   // 'no-pronouns' REMOVED: 51% of official intros have none. It was measuring my assumption.
   if (/\b(is|are|was|were) (suspected|thought|believed|rumou?red) to\b/i.test(s)) f.push({ code: 'hedge', detail: '' });
   if (/\b(ledger|tally|registry|record-book)\b/i.test(s)) f.push({ code: 'account-book', detail: '' });
