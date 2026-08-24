@@ -1,7 +1,8 @@
 # GOLD STANDARD — the texts the prompt is trying to reproduce
 
-Two tiers. **Tier 1 is endorsed by the designer**; tier 2 is corpus material of the same form that
-the designer has NOT yet ruled on. Only tier 1 is authoritative. Do not quietly promote tier 2.
+Two tiers, **both endorsed**. Tier 1 the designer supplied or explicitly praised; tier 2 the designer
+reviewed and ruled on with *"all look good though"* (2026-08-24), so it is authoritative too. The tier
+split is kept only to record HOW each text was endorsed, not to rank them.
 
 Provenance: tier-1 quests from `research/samples_sultans.md` PART 3 / the designer's own transcription
 (`REFERENCE_SULTANS_RESULTS.md`); event intros from PART 4 (Steam guide 3464000283, cross-matching
@@ -49,7 +50,7 @@ structure reference, not a style target.
 
 ---
 
-# TIER 2 — SAME FORM, NOT YET RULED ON BY THE DESIGNER
+# TIER 2 — ENDORSED BY THE DESIGNER AS A SET ("all look good though", 2026-08-24)
 
 Sorted short to long.
 
@@ -131,4 +132,7 @@ Sorted short to long.
 - The numbers above are the target distribution, not a single target value. Card size is BIMODAL and
   scales with the quest (see `GUIDELINE.md` A3/A3b) — a routine job gets a short card.
 - Re-run the containment audit (`GUIDELINE.md`, self-audit section) after ANY edit to the numbers.
-- Tier 2 becomes tier 1 only by designer ruling.
+- Both tiers are authoritative. The 42 event intros have **no prose outcomes available** — the Steam
+  guide records their outcomes as stat deltas — so the RESULT-side gold standard is smaller: the four
+  designer quests plus the graded English outcome sets in `research/samples_sultans.md` PART 1
+  ("Catching a Thief", "Charges and Defence", "Absurd Joy").

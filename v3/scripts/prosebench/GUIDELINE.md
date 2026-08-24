@@ -66,6 +66,49 @@ citations float on `/HEAD/` against actively-pushed repos, so pin SHAs if they a
 
 ---
 
+
+---
+
+# ⚠ SUPERSEDING MEASUREMENT — the official English corpus (2026-08-24)
+
+The game's own English localisation was located and verified: **43,619 keys, all 1,495 rites**,
+including **8,283 settlement/branch texts** and **3,627 slot lines**
+(`research/sultans_en/config_merged.json.gz`; provenance and the two source files in
+`research/english_source_hunt.md`). Verified by me against the wiki: `rite_5000703` "Canyon of Gales"
+name and flavour text match verbatim. **This replaces every figure previously derived from
+translations, wiki fragments, or small samples.**
+
+| piece | n | median | p25–p75 | sentences | w/sentence |
+|---|---|---|---|---|---|
+| **rite intro (= our card)** | 1463 | **23** | 14–37 (p90 57) | **2** (p75 3) | **12.0** |
+| **slot line** | 3627 | **7** | 5–10 | 1 | 7.0 |
+| settlement, unconditional | 3586 | **50** | 21–99 (p90 150) | 3 | 13.2 |
+| settlement branch (dice-gated) | 4697 | **48** | 27–81 (p90 129) | 3 | 14.0 |
+| card/character blurb | 1229 | 17 | 12–25 | 2 | 11.0 |
+
+Branches per rite: median **2**, p75 6, max 166. Intros opening on an animate subject within eight
+words: **68%**.
+
+## ‼ THE DISTINCTION THAT CHANGES THE TARGET
+The texts the designer endorsed are **random events** — end-of-day cards you answer with a choice,
+median 46 words. **Rites** are the quests where you ASSIGN CHARACTERS to slots and dice resolve them
+— median **23 words**. *Rites are our mechanical analogue, not random events.* Our one-off card is a
+rite; our slots are its slots; our resolution is its settlement.
+
+So the card target is **shorter than anything I have proposed so far**: ~23 words, 2 sentences,
+12 words per sentence — against P26's 50–75 words in four sentences, i.e. **we are running roughly
+three times too long**. A3/A4 below are the endorsed-random-event bands and remain valid for that
+form; for CARDS use the rite figures in this table.
+
+## The slot line, in the game's own English (confirms Part B outright)
+> Mountain guide, requiring at least 5 Survival
+> Pack bearer, requiring at least 5 Physique
+> Scout, requiring at least 5 Wisdom
+> You must go yourself, requiring at least 5 Magic
+Role plus an explicit numeric threshold, seven words on average. Slots may also be plain statements
+of what the step needs ("Mahir hopes you can sponsor 5 Gold Coins").
+
+---
 # PART A — THE CARD (what the player reads before committing)
 
 **A1. Open on an animate subject doing something, inside the first seven words.**

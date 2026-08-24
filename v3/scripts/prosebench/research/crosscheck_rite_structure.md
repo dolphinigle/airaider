@@ -75,3 +75,35 @@ published anywhere (only Chinese source and Spanish/Vietnamese translations are 
 is sitting in the Steam install folder of anyone who owns the game.** If the designer owns Sultan's
 Game, copying that one file makes every translated sample in this study obsolete and gives us the
 full official corpus to measure.
+
+---
+
+# THE SCHEMA, read directly from the shipped configs (2026-08-24)
+Verified by me against `rite/5000131`, `5000506`, `5000703`, `5000704` on the `master` branch.
+
+A rite carries TWO kinds of result text, and this maps almost exactly onto our engine:
+
+| field | what it is | evidence |
+|---|---|---|
+| `settlement[]` | **unconditional** result paragraphs — shown whatever the dice do | 5000506 has 7 of these and ZERO dice conditions (a rite that cannot fail); 5000704 has 5 |
+| `settlement_extre[]` | **conditional** branches, each with a `condition` and its own `result_text` | 5000703 has 8, gated by 12 dice conditions |
+
+**This settles the "is the pre-roll beat real?" question.** A research agent, reading a review site's
+account of the UI, suggested the moment between card and dice is stat-surfacing rather than authored
+prose — i.e. that our pre-roll text has no ground truth. **That is wrong.** The unconditional
+`settlement` array IS the authored always-shown beat, and the designer's transcription
+(*"RESULT: (repeat the before, then) … ROLL … SUCCESS:"*) maps onto it exactly:
+`settlement` = the paragraph you always read · `settlement_extre` = the branch the dice select.
+
+**The dice condition names the SLOTS, not the party.** Verbatim from 5000703:
+`"r2:s1.体魄+s1.战斗+s3.体魄+s3.战斗+s6.体魄+s6.战斗<":[1,5]` — "roll 2: Physique+Combat of the
+characters in slots 1, 3 and 6; fewer than 1 success out of 5 dice." The developers even annotate
+each branch in-line: `//射杀狮鹫失败` ("failed to shoot the griffin").
+So the check is composed from **who the player put in which slot** — the same shape as our
+`test.attributes` over assigned mercs — and the prose branch is written against that specific
+failure, which is why the outcome can name what went wrong so precisely.
+
+**Consequence for our resolver:** a Sultan quest is not one card plus one outcome. It is
+[unconditional beat] + [a SEQUENCE of checks, each with its own written failure and success], and the
+branch prose is authored against the specific check that failed. Our engine already rolls per slot;
+we currently collapse everything into one resolution paragraph.
