@@ -1,24 +1,35 @@
 # PULL LAB — standing anchor (2026-08-24). READ THIS FIRST after any context loss.
 
-## ⛳ THE BIG PLAN — re-read this at the END OF EVERY STEP before deciding what to do next
-Designer's master plan for the one-off card. Do not skip ahead, do not silently widen a step.
+## ⛳ THE BIG PLAN — re-read at the END OF EVERY STEP before deciding what to do next
 
-- **Step 1 — CAN the cheap model do it at all?** ✅ DONE 2026-08-24. One fixed situation (q9
-  Peatmoss), prose only. Verdict below: yes, decisively. It was a PROMPTING failure, not a model
-  ceiling — same model, same effort, same inputs, same cost; only the prompt changed.
-- **Step 2 — HIT RATE. ← CURRENT.** Designer's stated goal, verbatim: *"get a prompt where MOST of
-  the stories tried on it came out nice."* Step 1 was allowed to celebrate a best-of-6. Step 2 is
-  not: the unit of success is the SHARE of samples that pass, across MANY DIFFERENT situations
-  (archetypes, regions, rarities, gravities), not the best card in a batch. Every claim from here
-  reports a hit rate with its denominator.
-- **Step 3 — blind bench** against the shipped prompt under the frozen prosebench protocol
-  (untouched anchors/rubric, fresh blind judges). Nothing ships without winning it.
-- **Step 4 — ship** into `src/ai/openai.ts`, then re-playtest the full surface (one drifted prompt
-  ⇒ audit all prompts; drift is systemic).
+**THE JOB IS DESIGNING A PROMPT.** Everything else — the corpus, the measurements, the guideline —
+is scaffolding for that one deliverable: a system prompt that makes gpt-5-mini write quest cards and
+resolutions at the quality of the designer's Sultan's Game samples, MOST of the time, on real engine
+payloads, at shipped cost. If an activity is not moving that prompt forward, it is off-task.
 
-**End-of-step ritual (do not skip):** state which step just finished · report the number, with its
-denominator · re-read this plan · name the next step and its bar · update the ROUND LOG below.
-Rulings stay with the designer: propose, do not decide.
+- **Step 1 — CAN the cheap model do it?** ✅ DONE. Yes; it was a prompting failure, not a model
+  ceiling. Same model, same effort, same cost — only the prompt changed.
+- **Step 2 — HIT RATE.** ✅ reached 83% on the OLD rubric (P26) — then the designer judged the output
+  "still not great" and supplied the real target, which invalidated that rubric. See step 2b.
+- **Step 3 — REFERENCE RESEARCH.** ✅ DONE and audited (3 adversarial audits, no fabrication).
+  Output: `GUIDELINE.md`, self-audited 8/8 against the designer's samples. Corpus in `research/`.
+- **Step 2b — REDESIGN THE PROMPT AGAINST THE GUIDELINE. ← CURRENT, and this is the whole job.**
+  Rewrite from the guideline, not by patching P26 — P26's core mandates (four sentences, 15-word
+  cap, restitution frame, scenery opening) are the things the research falsified. Measure the hit
+  rate on real payloads from `pullfixtures.ts` across many situations; report passes/total, never a
+  peak.
+- **Step 4 — BLIND BENCH** against the shipped prompt under the frozen prosebench protocol.
+  Nothing ships without winning it.
+- **Step 5 — SHIP** into `src/ai/openai.ts`, then re-playtest the full surface.
+
+**Tools already built — use them, do not rebuild:** `scripts/pullfixtures.ts` (captures real
+`writeQuest` payloads from the engine via MockProvider, zero API cost) · `scripts/pullbatch.ts`
+(stratified batch over those payloads + log-only lint telemetry + the PAY_ARRAY / ODD_ACTOR input
+switches) · `scripts/pullprompts.ts` (the P1–P26 lineage, each variant carrying a comment recording
+what it broke) · engine seeding for variety · `prosebench/` frozen anchors and judge protocol.
+
+**End-of-step ritual:** state which step finished · report the number with its denominator · re-read
+this plan · name the next step and its bar · update the ROUND LOG. Rulings stay with the designer.
 
 ## THE GOAL (do not drift from this)
 Master plan step 1: **gauge whether gpt-5-mini can write a GOOD, MOTIVATING card at all.**
