@@ -225,6 +225,42 @@ When oddActor = "B" (the client), the card occasionally has the client both hiri
 walked off — the strongest pull in the batch when phrased as presence, a contradiction when phrased
 as departure (2 of the 3 failures). The third was a garbled outcome clause.
 
+## THE JARGON ROUND (designer 2026-08-24: "mark these weird things, they make texts unreadable —
+## it's like reading a textbook with jargon but the jargon isn't explained")
+
+The designer read our card and named the symptom precisely. Traced to FOUR distinct causes, only one
+of which is a writing problem:
+1. **Two places in one short card** — `locationLine` deals a landmark AND a separate `Known ground:`
+   token, and my INPUTS line says "use its named places", so both get stuffed in
+   ("Thornhollow" + "the ridgeline warden-stones"). ENGINE INPUT.
+2. **Invented durations** — my rule 1 demanded "how long it has stood so" and the payload carries NO
+   duration field, so the model fabricates one every card ("since the last market", "since the last
+   moon"). A RULE DEMANDING DATA THE INPUT LACKS. This is what I earlier misdiagnosed as mere
+   stickiness.
+3. **Coined compound trades** ("stone-warden", "ruin-keeper") — no names are dealt and "everyone goes
+   by their trade" is the only vocabulary instruction, so the model manufactures compounds. VOCABULARY
+   VACUUM.
+4. **"is left carrying it"** — rule 2's own wording returning as a template. L1 again.
+
+### The reviewer was rebuilt and CALIBRATED against the gold standard (`scripts/cardlint.ts`)
+First version flagged the OFFICIAL Sultan texts — it was measuring my assumptions. Calibrated on the
+1,426 shipped official-English rite intros:
+- distribution: words p50 **24** / p75 37 / p90 58 / p95 73 · sentences p50 **2** / p90 4 ·
+  w/sent p50 **12.4** / p90 21.5 / p95 26 · proper nouns p50 **1** / p90 4 / max 9.
+- thresholds set at p90/p95 so gold-standard text PASSES. My first pass used p75 and flagged the
+  official "Boundless Sands" as too long — which would have driven our prompt SHORTER AND FLATTER
+  than the goal.
+- **`no-pronouns` deleted**: 51% of official intros have none. It was pure assumption.
+- **`jargon-density` is not a raw proper-noun count**: official intros carry a median of 1 and up to
+  9. Density alone is not the defect.
+- Checks validated as genuinely alien to the register: `coined-trade` fires on **0.0%** of official
+  text, `invented-duration` on **0.2%**. Those two are real.
+- Result: **80.2% of official intros pass clean** (the ~10% tripping `long` is by design at a p90
+  threshold), while the designer's flagged card trips five precise defects.
+
+**Method note worth keeping: a quality gate must be calibrated against the gold standard, or it
+optimises toward whatever its author already believed.**
+
 ## NEXT
 Present the champion samples to the designer against CARD_PULL.md's complaint list. Nothing ships
 until it wins a blind bench under the frozen prosebench protocol against the current prompt.
