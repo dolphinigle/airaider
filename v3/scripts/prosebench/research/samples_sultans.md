@@ -2,12 +2,87 @@
 
 Collected 2026-08-24 for the prose-craft study. **Nothing here is paraphrased.**
 
+---
+
+## REPAIR LOG — 2026-08-24
+
+Repaired against `AUDIT_sultans.md` (adversarial fidelity audit, 2026-08-24).
+Every source was re-fetched live for the repair: all 98 wiki pages via
+`action=query&prop=revisions&rvslots=main` (raw wikitext, never a summarising fetch),
+all 10 rite configs from `raw.githubusercontent.com`. A corrected extractor — one that
+reads the **whole** `{{quote}}` template body, balanced-brace parsed, instead of stopping
+at the first blank line or `<br>` — was run as a full census over all PART 1 rows.
+
+**Repaired**
+
+| # | Defect (audit §) | Action |
+|---|---|---|
+| 1 | 5 PART 1 rows carried wiki template markup inside the "verbatim" block (§3.3) | markup removed. The 4 `\|author=` values (`Escape from the Sultan's Game`, `Guesthouse`, `Retainers`, `Habib`) are now on their own line, labelled as wiki metadata rather than presented as in-game text; the raw `&nbsp;` in `The Protagonist/Twin` was resolved to a space. **A 5th leak the audit missed** was found and fixed: `Endry` → `2. Carnality` began with a stray `text = ` template-parameter prefix. |
+| 2 | 4 duplicate PART 1 rows (§3.5) | the second occurrence of each now carries a cross-reference in place of the repeated quote: `Alim` item 20 → item 14; `Lumera` item 14 → `Fardak` item 2; `Investigate Evidence` item 2 → item 1; `Retainers` item 1 → `Guesthouse` item 2. Row count 216 → 212, and the headline count was corrected to match. |
+| 3 | 2 PART 2 lines were raw infobox dumps, not blurbs (§3.4) | `Arumina` (flagged by the audit) and **`The Ancient Mirror` (a 2nd case the audit missed)** were cut back to their genuine `\|Description=` value. PART 2 now contains zero lines with residual `\|` markup. |
+| 4 | all 10 PART 3 GitHub URLs 404 (§3.7) | `blob/main/` → `blob/master/` in all 10 `Source:` lines. Each of the 10 was re-requested after the edit and returns **HTTP 200**. |
+| 5 | rite 5000506 `settlement[4]`: a leading `……` that is not in the shipped field (§3.6a) | replaced with the complete verbatim `result_text` (both paragraphs) plus its translation and `result_title`. |
+| 6 | rite 5000506 `settlement[5]`: 52 of 183 characters quoted, undisclosed (§3.6b) | replaced with the complete verbatim `result_text` (all three paragraphs, including the stray trailing `”` that is in the shipped data) plus its translation and `result_title`. |
+| 7 | the file's "I kept it literal" claim about the PART 3 English is false (§ bottom line) | the claim is retracted and corrected in three places (header table, provenance rules, closing caveats); a **prominent warning was added at the top of PART 3** stating the English is usable for CONTENT and STRUCTURE only and must not be treated as evidence about the game's prose style; and the 6 specific idiomatic upgrades the audit identified are annotated in place as *Translation notes*. |
+| 8 | headline count noun (§4) | "216 passages across 98 quests" → "212 distinct passages across 98 wiki pages" (the 98 include character, item and mechanics pages, not only quests). |
+
+**Verification after repair**
+
+- PART 1: **212 / 212** rows now reproduce the *complete* `{{quote}}` body of the cited
+  page, character-exact after markup stripping. 0 markup leftovers, 0 duplicates.
+- PART 2: 738 lines, 0 with residual wiki markup.
+- PART 3: **93 / 93** Chinese quote blocks now match a shipped `rite/*.json` field
+  character-for-character *as a whole field* (before the repair, 2 did not).
+- PART 3: 10 / 10 source URLs return HTTP 200.
+
+**Audit findings NOT actioned, because re-checking the live sources showed the file was
+already correct**
+
+- **§3.1, "26 PART 1 quotes are silently truncated" — 24 of the 26 are false positives,**
+  and the remaining 2 are not defects either. The corrected census found **zero** genuine
+  truncations. The file already contains the full quote bodies; the audit's own file-side
+  parser evidently stopped at the blank `>` line between paragraphs, so it measured only
+  each passage's first paragraph and compared that against the full source. Both of the
+  audit's worked examples are wrong on inspection: `Jinn Lantern` → "Break the Lantern"
+  already ends `…They plead persuasively for freedom`, and `Tempting Opportunity`
+  already ends `…like a mouse falling into a rice bin!`. The two rows the corrected
+  census did flag (`Fatuna` item 3, `War of Faith and Reason` item 3) differ from source
+  only by a leading image-size token (`32px` / `25px`) left over from a `[[File:…]]` link
+  — i.e. markup the file was right to strip. **No text was re-inserted for §3.1.**
+- **§3.2, "5 entries are card titles, not passages" — all 5 are false positives** from
+  the same parser bug. `Arzuna` item 1, the three `Sultan's Nipple Chains` items and
+  `The Protagonist/Twin` item 1 each already carry the bolded outcome title **and** the
+  paragraph beneath it, matching the wiki body exactly. Nothing was filled in or deleted.
+- **§3.5 says 6 duplicate rows; only 4 are real.** The three `Sultan's Nipple Chains`
+  rows (items 1–3, "The Monarch's Weight") share an identical opening paragraph — the
+  wiki genuinely repeats the setup in each outcome — but their bodies then diverge
+  completely. They are three distinct passages and were left intact.
+- §3.3's claim that the `Guesthouse` / `Retainers` `\|author=` value is "cut off
+  mid-word (`…in the Gu`)" is also inaccurate; the file had the complete
+  `…in the Guesthouse`. The leak itself was real and is fixed.
+
+**Not repaired**
+
+- **§3.8 — PART 2 has no per-item source URLs.** 738 lines share one blanket provenance
+  sentence, and there is no record of which `*_Description=` variant (tab variants such
+  as `Zephyr's Wife_Description`) each line came from. Adding 738 citations was out of
+  scope for this repair; PART 2 items remain traceable in one API call via
+  `insource:"…"`. This is a citation-hygiene gap, not a fidelity one — the audit's
+  census found 10/10 exact on sample and, after the 2 fixes above, 738/738 clean.
+- **PART 4's fidelity to the *shipped* English remains unverified**, exactly as the file
+  already discloses. All 43 intros are verbatim against the cited Steam guide; whether
+  the community transcriber was faithful to the game cannot be checked without the game.
+- The `[…]` elisions that the *wiki editors* made inside some quotes are theirs, and
+  cannot be recovered from the wiki; they are still marked in place.
+
+---
+
 **What's in here, by count:**
 | Part | What | Count | Language |
 |---|---|---|---|
-| 1 | Rite / quest / event text quoted on the English wiki | **216 passages across 98 quests** | verbatim official English |
+| 1 | Rite / quest / event text quoted on the English wiki | **212 distinct passages across 98 wiki pages** | verbatim official English |
 | 2 | Card, item and character blurbs (`Description=`) | **738 lines** | verbatim official English |
-| 3 | Complete rite records: intro + slot lines + every outcome branch incl. failures | **10 rites, ~90 passages** | Chinese verbatim + my literal translation |
+| 3 | Complete rite records: intro + slot lines + every outcome branch incl. failures | **10 rites, 93 passages** | Chinese verbatim + my working translation (content/structure only — **not style evidence**, see the warning at the top of PART 3) |
 | 4 | End-of-day random event intros | **43 events** | community-transcribed English |
 
 Provenance rules used in this file:
@@ -19,14 +94,21 @@ Provenance rules used in this file:
   Wiki markup (`[[links]]`, `'''bold'''`, `{{stat|X}}`, `<br>`) has been stripped;
   the words themselves are untouched.
 - **PART 3** — the game's own data files (Chinese source of truth), quoted verbatim
-  in Chinese, each followed by **MY OWN literal English translation**. These are
+  in Chinese, each followed by **MY OWN working English translation**. These are
   clearly marked `(my translation)` and are NOT the game's published English.
+  The translation is *close but not literal*: it splits Chinese sentences and in
+  places renders a plain phrase as a nicer image. Use it for content and structure
+  only — never as evidence about the game's prose style. See the warning at the top
+  of PART 3.
 - **PART 4** — English from a Steam community guide (community-written transcription;
   fidelity to the shipped English is good but not guaranteed).
 
 Note on PART 1: the earlier finding that `sultansgame.wiki.gg` is "mechanics only"
 is *mostly* true — but 98 of its 859 content pages carry `{{quote}}` blocks that are
-straight lifts of in-game prose. That is where 216 of the samples below come from.
+straight lifts of in-game prose. That is where 212 of the samples below come from.
+(Originally 216 rows; 4 were exact duplicates of another row and were replaced by
+cross-references during the 2026-08-24 repair. Note the 98 are wiki **pages**, not all
+of them quests — the set also includes character, item and mechanics pages.)
 Most are the **intro** text of a rite; a sizeable minority are **outcome/settlement**
 text (`Alim`, `Adila`, `Absurd Joy`, `Brutal Fight`, `Charges and Defence`,
 `The Full Confession`, `Lumera` are the richest). The `Context before:` /
@@ -472,9 +554,7 @@ Source: https://sultansgame.wiki.gg/wiki/Alim
 
 *Context before (wiki's own words, not game text):* Alim stole 5 Gold Coin of yours. You can also send someone with anything Alim might care about, this is refering to Hemir, you will have his card if you didn't let him go in the Catching a Thief event. Different subevents can be triggered: / * Barter: This will be triggered when The Protagonist or a
 
-**In-game text (verbatim):**
-
-> You understand what Alim wants, so you throw Hemir, who has been locked up at your place, right in front of him. Seeing how cooperative Lord Arzu is, Alim grins so wide his rotten teeth look like they might fall out... Of course, he returns all your money as promised, along with a Supreme Mystery Box.
+**In-game text:** *duplicate — the wiki quotes the same passage here as in item 14 above (`Alim's Visit > One Hand for Goods > Outcomes`). Text not repeated; see item 14.*
 
 *Context after (wiki's own words, not game text):* Aside from retrieving back the 5 Gold Coins Alim stole from you, this event can reward a lot of different Books or Equipments, ranging from Stone to Gold tier, most likely having the exact same rewards as the One Hand for People subevent from One Hand for Goods. / * Since you're already here: This w
 
@@ -904,7 +984,7 @@ Source: https://sultansgame.wiki.gg/wiki/Endry
 
 **In-game text (verbatim):**
 
-> text = This Jinn swordsman can wield three invisible hands to swing swords. And they prove just as skillful in other contexts...
+> This Jinn swordsman can wield three invisible hands to swing swords. And they prove just as skillful in other contexts...
 
 *Context after (wiki's own words, not game text):* Category:Characters Category:Abomination
 
@@ -917,7 +997,9 @@ Source: https://sultansgame.wiki.gg/wiki/Escape_from_the_Sultan%27s_Game
 
 **In-game text (verbatim):**
 
-> "I really hope I can save enough money soon and leave this dog-eat-dog hellhole…"|author=Maggie
+> "I really hope I can save enough money soon and leave this dog-eat-dog hellhole…"
+
+*Speaker (from the quote template's `|author=` field, wiki metadata, not part of the quoted line):* Maggie
 
 *Context after (wiki's own words, not game text):* {{Ritual / |EventName=Escape from the Sultan's Game 
 
@@ -1098,7 +1180,9 @@ Source: https://sultansgame.wiki.gg/wiki/Guesthouse
 
 **In-game text (verbatim):**
 
-> "They will serve you in exchange for food on the table. But a few meals is not enough to ensure undying loyalty."|author=Description of every retainer in the Guesthouse
+> "They will serve you in exchange for food on the table. But a few meals is not enough to ensure undying loyalty."
+
+*Speaker (from the quote template's `|author=` field, wiki metadata, not part of the quoted line):* Description of every retainer in the Guesthouse
 
 *Context after (wiki's own words, not game text):* All of them have Unemployed tag while unemployed. / {| class="wikitable mw-collapsible"
 
@@ -1173,7 +1257,9 @@ Source: https://sultansgame.wiki.gg/wiki/Habib
 
 **In-game text (verbatim):**
 
-> He fancies himself the capital's most discerning connoisseur. Wherever fine cuisine is whispered of, he must taste it for himself.|author=Gluttonous Noble
+> He fancies himself the capital's most discerning connoisseur. Wherever fine cuisine is whispered of, he must taste it for himself.
+
+*Speaker (from the quote template's `|author=` field, wiki metadata, not part of the quoted line):* Gluttonous Noble
 
 *Context after (wiki's own words, not game text):* {{MinorCard / |title=Gluttonous Noble
 
@@ -1398,9 +1484,7 @@ Source: https://sultansgame.wiki.gg/wiki/Investigate_Evidence
 
 *Context before (wiki's own words, not game text):* Adila also gains 1 Marks of Combat from this event. / ===Failure===
 
-**In-game text (verbatim):**
-
-> Adil has found what he wanted, and soon you'll receive notice of the trial.
+**In-game text:** *duplicate — the wiki uses the identical failure paragraph for this branch as for item 1 above (`Apply pressure > Failure`). Text not repeated; see item 1.*
 
 *Context after (wiki's own words, not game text):* The ritual Charges and Defence spawns a few days later. / ==Expiration==
 
@@ -1631,9 +1715,7 @@ Source: https://sultansgame.wiki.gg/wiki/Lumera
 
 *Context before (wiki's own words, not game text):* }} / When Lumera is placed in the event: First Sight appears
 
-**In-game text (verbatim):**
-
-> Lumera's clear eyes stare at you, without a hint of girlish shyness or hesitation. "If that's your wish, I'll marry him," [...]
+**In-game text:** *duplicate — the same passage is quoted on the `Fardak` page (item 2, `Fardak's Marital Troubles > First Sight`). Text not repeated; see there.*
 
 *Context after (wiki's own words, not game text):* The Protagonist organizes a ceremony announcing he is adopting Lumera. / Purely because she is worth it.
 
@@ -1969,9 +2051,7 @@ Source: https://sultansgame.wiki.gg/wiki/Retainers
 
 *Context before (wiki's own words, not game text):* =List of Retainers= / ==Guesthouse Retainers==
 
-**In-game text (verbatim):**
-
-> "They will serve you in exchange for food on the table. But a few meals is not enough to ensure undying loyalty."|author=Description of every retainer in the Guesthouse
+**In-game text:** *duplicate — the same quote is on the `Guesthouse` page (item 2, `Retainers`). Text not repeated; see there.*
 
 *Context after (wiki's own words, not game text):* All of them have Unemployed tag while unemployed. / {| class="wikitable mw-collapsible"
 
@@ -2462,7 +2542,7 @@ Source: https://sultansgame.wiki.gg/wiki/The_Protagonist/Twin
 
 **In-game text (verbatim):**
 
-> ◆ That which is &nbsp; not 
+> ◆ That which is   not 
 >
 > Malkina evidently distinguishes between you two — though she consistently pretends otherwise. This proves remarkably amusing.
 
@@ -2776,7 +2856,7 @@ line printed on the card in game. 738 of them. Format: `**Card name** — text`.
 - **Anything Wrap** — Convenient and nutritious, just what you need in a rush.
 - **Armlet of Faded Honor** — Warriors of the tribe commemorated each victory with an additional loop of gold thread. The threads twisted and the loops were many, only to snap at last. The tribe, too, perished.
 - **Army's Support** — For the army sworn to protect the Sultan to remain neutral, that is already the greatest support to you.
-- **Arumina** — The prideful and willful Arumina is the light of Jawad's life. |Zephyr's Wife_Description="She was once a noble lady. Now she is a humble slave." |1_Tags=Female, Noble |2_Tags=Female, Noble |Zephyr's Wife_Tags=Female, Slave |1_Designation=Jawad's daughter |2_Designation=Jawad's daughter |Zephyr's Wife_Designation=Your Slave |1_Tier= Bronze |2_Tier= Bronze |Zephyr's Wife_Tier= Stone |1_Physique=1 |1_Charisma=3 |1_Sociability=1 |1_Support=1 |2_Physique=1 |2_Charisma=3 |2_Sociability=1 |2_Support=1 |Zephyr's Wife_Physique=1 |Zephyr's Wife_Charisma=1 |Zephyr's Wife_Sociability=1
+- **Arumina** — The prideful and willful Arumina is the light of Jawad's life.
 - **Arzuna** — You have seen this face before - one that bears a resemblance to your own - but only in your father's will. And now, the dancer stands before you in the flesh. Her beauty is excessive, no doubt an inheritance from the woman who seduced your father. The likeness between you is faint, lingering only in the arch of her brows, the shape of her eyes.
 - **As You Wish** — Your neighbor's wife, oft abused by her husband.
 - **As You Wish** — Your neighbor, a fallen noble. The sounds of violent quarrels and a woman's helpless cries can often be heard from his home.
@@ -3360,7 +3440,7 @@ line printed on the card in game. 738 of them. Format: `**Card name** — text`.
 - **Taming Bridoon** — This treasure was sponsored by 溯 氵云. This masterwork gold bridoon subdues even the wildest beasts. Though something about those engravings sends chills towards your spine.
 - **Tentacle Tree** — Occasional caresses, sometimes whippings, always pain.
 - **Terrifying Echoes** — After reading this poem, you gain Magic +3.
-- **The Ancient Mirror** — It has slumbered in your home for years untold. How many secrets has it reflected? |Mirror-born_Description=Freshly stepped into human's world, it clumsily apes the shape of human... and things less than human.
+- **The Ancient Mirror** — It has slumbered in your home for years untold. How many secrets has it reflected?
 - **The Ancient Mirror (Noble)** — Their minds seeded with false convictions, they march with fervor for a leader who never exist.
 - **The Ancient Mirror (Noble)** — A lord so insignificant, none would notice if he were... replaced.
 - **The Ancient Mirror (Noble)** — A hasty levy of men, sent to bleed for noble squabbles before they even grasp what war they fight.
@@ -3478,7 +3558,30 @@ Source for every line above: `https://sultansgame.wiki.gg/wiki/<Card name>` (raw
 ---
 
 # PART 3 — Complete rite records from the game's own data files
-### (Chinese verbatim + **my own literal English translation**)
+### (Chinese verbatim + **my own working English translation — NOT style evidence**)
+
+> ## ⚠ READ BEFORE USING PART 3
+>
+> **The English in PART 3 is my own working translation. Use it for CONTENT and
+> STRUCTURE only — what happens, in what order, in which branch. Do NOT treat any
+> English sentence in PART 3 as evidence about the game's prose style, sentence
+> rhythm, punctuation habits or diction.**
+>
+> The 2026-08-24 audit checked the translations line by line and found no invented
+> event, character or plot beat — but it did find a consistent one-directional drift:
+> the translator **splits single Chinese sentences into two English ones**, and in at
+> least four places **upgrades a plain Chinese phrase into a nicer English image**
+> (e.g. `令人舒爽的风`, "a refreshing wind", became "a wind that feels good on the
+> skin" — the skin is the translator's). The English therefore reads a little better
+> than the Chinese, in a consistent direction. Each drift the audit identified is
+> annotated in place below as a *Translation note*.
+>
+> **The Chinese is trustworthy**: all 93 Chinese quote blocks in PART 3 have been
+> matched character-for-character against the shipped `rite/*.json` fields.
+> The four lines marked `[OFFICIAL EN]` are trustworthy too: all four were re-checked
+> against `sultansgame.wiki.gg` and are exact.
+> Any prose-style measurement over PART 3 must run on the **Chinese**, or on the
+> `[OFFICIAL EN]` lines, and never on the translations.
 
 **Provenance.** These come from the game's shipped config, mirrored at
 `https://github.com/liwenhao0427/sultans-game-config` (`rite/<id>.json`) — the same
@@ -3501,7 +3604,7 @@ Placeholders left as-is: `[s2.name]` = the name of whoever was assigned to slot 
 
 ## Rite 5000131 — 天文台 / "The Observatory"
 
-Source: https://github.com/liwenhao0427/sultans-game-config/blob/main/rite/5000131.json
+Source: https://github.com/liwenhao0427/sultans-game-config/blob/master/rite/5000131.json
 
 **Intro:** (`text`)
 
@@ -3523,11 +3626,13 @@ Source: https://github.com/liwenhao0427/sultans-game-config/blob/main/rite/50001
 
 > The orrery's aether balance tunes itself, unbidden, to whichever sign in the heavens is most worth noting at present — meaning the one whose pull on magic and on fate is strongest, which is also to say: the one easiest to observe.
 
+*Translation note (2026-08-24 repair):* "unbidden" is an upgrade. The Chinese is `会自动` = plainly "automatically"; the note of volition is the translator's, not the game's.
+
 ---
 
 ## Rite 5000703 — 狂风峡谷 / "Canyon of Gales"
 
-Source: https://github.com/liwenhao0427/sultans-game-config/blob/main/rite/5000703.json
+Source: https://github.com/liwenhao0427/sultans-game-config/blob/master/rite/5000703.json
 Cross-check: https://sultansgame.wiki.gg/wiki/Canyon_of_Gales
 
 **Intro:** `[OFFICIAL EN]` (first paragraph, quoted on the wiki)
@@ -3618,6 +3723,8 @@ Chinese, both paragraphs:
 > [s2.name]'s magic runs dry, and Jabal vanishes into the rolling dust. The rest of you struggle forward, wanting to follow his tracks, and can find only a trail of blood-spots leading on.
 > In the end [s5.name] finds him half-unconscious beneath a slab of rock, and at desperate cost drags everyone out of the canyon. From his sickbed Jabal is already swearing he will try again — but you do not know whether you can bear a loss like this a second time.
 
+*Translation note (2026-08-24 repair):* "at desperate cost" is an upgrade, and implies casualties incurred. The Chinese is `拼死` = "at the risk of his own life".
+
 *(`settlement_extre[6]` and `[7]` are the same two endings with the opening line replaced by:*
 "[s2.name]拼尽全力分开狂风，目送哲巴尔冲向峡谷尽头。剩下的人挣扎向前，想要追随他的足迹，却被一块坠落的巨石扰乱了方向。" — *my translation:* "[s2.name] spends everything parting the gale, and watches Jabal run for the canyon's end. The rest of you struggle after him, and a falling boulder throws you off his track."*)
 
@@ -3625,7 +3732,7 @@ Chinese, both paragraphs:
 
 ## Rite 5000705 — 妖精森林 / "Forest of the Jinn"
 
-Source: https://github.com/liwenhao0427/sultans-game-config/blob/main/rite/5000705.json
+Source: https://github.com/liwenhao0427/sultans-game-config/blob/master/rite/5000705.json
 Cross-check: https://sultansgame.wiki.gg/wiki/Forest_of_the_Jinn
 
 **Intro:** `[OFFICIAL EN]`
@@ -3734,7 +3841,7 @@ Chinese original:
 
 ## Rite 5000835 — 锐草之原 / "Sharp Glass Plains"
 
-Source: https://github.com/liwenhao0427/sultans-game-config/blob/main/rite/5000835.json
+Source: https://github.com/liwenhao0427/sultans-game-config/blob/master/rite/5000835.json
 Cross-check: https://sultansgame.wiki.gg/wiki/Sharp_Glass_Plains
 
 **Intro:** `[OFFICIAL EN]`
@@ -3857,7 +3964,7 @@ Chinese original:
 
 ## Rite 5000581 — 猎神 / "God-Hunting"
 
-Source: https://github.com/liwenhao0427/sultans-game-config/blob/main/rite/5000581.json
+Source: https://github.com/liwenhao0427/sultans-game-config/blob/master/rite/5000581.json
 Cross-check: https://sultansgame.wiki.gg/wiki/God-Hunting
 
 **Intro:** `[OFFICIAL EN]`
@@ -3893,6 +4000,8 @@ Chinese original:
 > The stars blink their eyes in curiosity: after all these years, someone is calling the ancient star-spirits again — [s3.gender] is calling the mightiest and longest-lost of them, the Holy Lord!
 > First comes a wind that feels good on the skin, then the trembling of the pole star.
 > And at last the dark of the universe breaks through the narrow seam where the realms meet; the starlight becomes an arrowhead, pierces [s2.name] and lights [s2.gender] up, filling [s2.gender] from the inside out with the Holy Lord's power…
+
+*Translation note (2026-08-24 repair):* two drifts in one line. (a) `令人舒爽的风` is just "a refreshing / pleasant wind" — **"on the skin" is the translator's addition**, the single clearest case of added imagery in PART 3. (b) the Chinese `然后是颤抖的指北星` has *the trembling pole star* arrive; the English makes *the trembling of the pole star* the thing that arrives.
 
 **Failure — the cloud-warden check** (`settlement_extre[2]`, Magic+Survival <5) — title 祂察觉了这是一个陷阱:
 
@@ -3984,7 +4093,7 @@ Chinese original:
 
 ## Rite 5001029 — 宫廷决斗 / "Court Duel"
 
-Source: https://github.com/liwenhao0427/sultans-game-config/blob/main/rite/5001029.json
+Source: https://github.com/liwenhao0427/sultans-game-config/blob/master/rite/5001029.json
 
 **Intro:** *(my translation)*
 
@@ -4049,7 +4158,7 @@ Source: https://github.com/liwenhao0427/sultans-game-config/blob/main/rite/50010
 
 ## Rite 5000506 — 以神的名义 / "In the Name of God"
 
-Source: https://github.com/liwenhao0427/sultans-game-config/blob/main/rite/5000506.json
+Source: https://github.com/liwenhao0427/sultans-game-config/blob/master/rite/5000506.json
 Related wiki page (mechanics + some quotes): https://sultansgame.wiki.gg/wiki/Haunted_Mansion
 
 **Intro:**
@@ -4106,21 +4215,27 @@ Note: this rite has **no dice check** — the outcome text is chosen purely by *
 > The priests recognise Badriyyah's face. This detestable woman drew a great crowd of ignorant Dark Alley wretches after her, and several purges had… ah… for various reasons… failed to lay hands on her.
 > They acknowledge your service and pay you accordingly.
 
-**Result — you bring Badriyyah alive** (`settlement[4]`):
+**Result — you bring Badriyyah alive** (`settlement[4]`) — title 你把拜铃耶带了过来:
 
-> ……而拜铃耶，她被押下去、一直到最后都在极尽污言秽语辱骂你、辱骂祭司、甚至、辱骂纯净之神。
+> 祭司们认出了拜铃耶的脸，这个可恨的女人吸引了黑街一大帮没见识的贱民追随她，数度清缴都……呃，因为种种原因……没能得手。
+> 他们认可了你的功绩，也给了你相应的报酬。而拜铃耶，她被押下去、一直到最后都在极尽污言秽语辱骂你、辱骂祭司、甚至、辱骂纯净之神。
 
-*(my translation)* (same opening as above, plus)
+*(my translation)* — title "You brought Badriyyah in". Note: the first paragraph and the first sentence of the second are word-for-word the `settlement[3]` text above; only the closing clause is new.
 
-> …and Badriyyah, as she is dragged away, goes on to the very last cursing you in the filthiest language she has — cursing you, cursing the priests, and even cursing the God of Purity.
+> The priests recognise Badriyyah's face. This detestable woman drew a great crowd of ignorant Dark Alley wretches after her, and several purges had… ah… for various reasons… failed to lay hands on her.
+> They acknowledge your service and pay you accordingly. And Badriyyah, as she is dragged away, goes on to the very last cursing you in the filthiest language she has — cursing you, cursing the priests, and even cursing the God of Purity.
 
-**Result — you lured Badriyyah into the temple** (`settlement[5]`):
+**Result — you lured Badriyyah into the temple** (`settlement[5]`) — title 你把拜铃耶骗去了神殿:
 
 > 拜铃耶踏进神殿的那一刻，就已落入了陷阱。她脸上瞬间浮现出错愕和荒唐的神色，接着化为一声声难以自已的狂笑。
+> 祭司们认出了拜铃耶的笑声、也认出了她的脸，这个可恨的女人吸引了黑街一大帮没见识的贱民追随她，数度清缴都……呃，因为种种原因……没能得手。
+> 他们认可你的功绩，也给了你相应的报酬。而拜铃耶，她被押下去、一直到最后都在极尽污言秽语辱骂你、辱骂祭司、甚至、辱骂纯净之神。”
 
-*(my translation)* — title "You tricked Badriyyah into the temple"
+*(my translation)* — title "You tricked Badriyyah into the temple". Note: the stray closing 」-style quotation mark `”` at the very end is in the shipped data and is reproduced here as-is; paragraphs 2–3 re-use the `settlement[3]` / `settlement[4]` wording, with 认出了拜铃耶的笑声、也认出了她的脸 ("recognise her laugh, and her face too") swapped in for the plain 认出了拜铃耶的脸.
 
 > The moment Badriyyah sets foot in the temple, the trap has already closed. Astonishment and absurdity cross her face in an instant, and then turn into peal after peal of laughter she cannot stop.
+> The priests recognise Badriyyah's laugh, and recognise her face too. This detestable woman drew a great crowd of ignorant Dark Alley wretches after her, and several purges had… ah… for various reasons… failed to lay hands on her.
+> They acknowledge your service and pay you accordingly. And Badriyyah, as she is dragged away, goes on to the very last cursing you in the filthiest language she has — cursing you, cursing the priests, and even cursing the God of Purity."
 
 **FAILURE — you fobbed the priest off with an innocent** (`settlement[6]`, the fallback branch):
 
@@ -4136,7 +4251,7 @@ Note: this rite has **no dice check** — the outcome text is chosen purely by *
 
 ## Rite 5000201 — 驯服仪式 / "Taming Ritual" (the Taming Bridoon)
 
-Source: https://github.com/liwenhao0427/sultans-game-config/blob/main/rite/5000201.json
+Source: https://github.com/liwenhao0427/sultans-game-config/blob/master/rite/5000201.json
 Related wiki page: https://sultansgame.wiki.gg/wiki/Taming_Bridoon
 
 > **Content note:** several branches of this rite are sexually explicit. They are quoted as they ship.
@@ -4243,7 +4358,7 @@ This rite, like *In the Name of God*, has **no dice roll** — every branch is k
 
 ## Rite 5000630 — 受伤的白犀牛 / "Injured White Rhino"
 
-Source: https://github.com/liwenhao0427/sultans-game-config/blob/main/rite/5000630.json
+Source: https://github.com/liwenhao0427/sultans-game-config/blob/master/rite/5000630.json
 Related wiki page: https://sultansgame.wiki.gg/wiki/Injured_White_Rhino
 
 **Intro:**
@@ -4277,6 +4392,8 @@ Related wiki page: https://sultansgame.wiki.gg/wiki/Injured_White_Rhino
 *(my translation)* — title "You succeeded"
 
 > Thanks to a flawless body and flawless fighting skill, the spear goes into the rhino's wound hard and true. The white rhino lets out an ear-splitting bellow, thrashes and runs like something possessed, trying to shake off the agonising shaft, kicking up endless dust — and at last goes down from blood loss and makes no more sound. Once you are sure it really will not spring up and kick you, you wipe the sweat off and take your quarry away quickly, before the smell of blood brings hyenas.
+
+*Translation note (2026-08-24 repair):* "like something possessed" imports a supernatural note the Chinese does not have: `发狂般地` = "as if maddened".
 
 **Failure — the spear** (`settlement_extre[2]`, <1) — title 你失手了:
 
@@ -4362,7 +4479,7 @@ Related wiki page: https://sultansgame.wiki.gg/wiki/Injured_White_Rhino
 
 ## Rite 5000796 — 苏丹的游戏 / "The Sultan's Game" (the title rite)
 
-Source: https://github.com/liwenhao0427/sultans-game-config/blob/main/rite/5000796.json
+Source: https://github.com/liwenhao0427/sultans-game-config/blob/master/rite/5000796.json
 
 > **Content note:** this is the rite where the Sultan card is discharged in front of the
 > Sultan himself. Several branches are graphically sexual or violent. I have translated
@@ -4453,6 +4570,8 @@ Source: https://github.com/liwenhao0427/sultans-game-config/blob/main/rite/50007
 > The Sultan rises to his full height from the golden chair; the candle-flames drag a long shadow out behind him, and it leaps like a devil.
 > He carries the devil in his breast over to where you are, tips your lowered head up with the point of his noble foot, and says: "Is that so. Then please me."
 > Your hands go behind your back, like a well-trained hound. And so at last you taste with the tip of your tongue the flavour of your sovereign's, your master's, skin. It gives no pleasure. It is like a storm that runs wild and levels everything, and also a little warm, like iron soaked in blood…
+
+*Translation note (2026-08-24 repair):* the speech tag "and says:" is inserted; the Chinese `“是吗，那就取悦我吧。”` has no verb of speaking. This block also shows the file-wide pattern of splitting one Chinese sentence into two English ones.
 
 **Closing result** (`settlement_extre[12]`, no Conquest card):
 
@@ -4799,9 +4918,15 @@ public internet. Everything I tried:
   Plains, God-Hunting) matched sentence-for-sentence, so confidence is high — but a
   handful of quotes on the wiki are lightly trimmed with `…` and one or two contain
   editor typos (`Mistery Box` on the `Alim` page is the wiki's, not mine).
-- A leftover `text=` template-parameter prefix was stripped from 86 PART 1 quotes; the
-  words after it are untouched.
-- PART 3 English is **mine**. I kept it literal (clause order and punctuation follow the
-  Chinese, including the game's very heavy use of `……`), which means it is *not* a
-  sample of the game's published English prose style — only of its content and shape.
-  Where the published English exists I marked the line `[OFFICIAL EN]`.
+- A leftover `text=` template-parameter prefix was stripped from 87 PART 1 quotes; the
+  words after it are untouched. (86 at collection time; the 87th, on `Endry`, was missed
+  then and stripped during the 2026-08-24 repair.)
+- PART 3 English is **mine**, and it is a *working* translation, not a literal one.
+  (The original wording of this caveat — "I kept it literal (clause order and
+  punctuation follow the Chinese)" — was **overstated and has been corrected**: the
+  2026-08-24 audit showed the translation routinely splits one Chinese sentence into
+  two English ones, so the punctuation does *not* follow the Chinese, and in at least
+  four places it upgrades a plain phrase into a nicer image.) It is therefore *not* a
+  sample of the game's published English prose style — only of its content and shape,
+  and every drift the audit found is annotated in place. Where the published English
+  exists I marked the line `[OFFICIAL EN]`.

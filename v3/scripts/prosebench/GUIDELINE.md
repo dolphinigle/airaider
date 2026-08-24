@@ -8,16 +8,48 @@ settled explicitly rather than averaged away.
 (`REFERENCE_SULTANS_RESULTS.md`). **Where anything below conflicts with those four, they win.**
 Everything else is corroboration or correction.
 
+**Fidelity status (audited and repaired 2026-08-24; `research/AUDIT_*.md`, repair log at the top of
+`research/samples_sultans.md`).**
+
+Three independent adversarial audits found **no fabrication in any corpus**. Every quote traces to a
+live source containing it verbatim. The second audit re-fetched **100%** of the KoDP/Six Ages and
+mercenary-game corpora — 125/125 and 145/145 blockquotes verbatim, no altered engine slots, no
+stitched text, no mislabelled outcomes, no dead sources.
+
+**One audit finding was itself wrong, and I checked rather than believed it.** The Sultan audit's
+headline defect — "26 of 216 passages silently truncated, dropping their closing sentences" — is a
+FALSE POSITIVE. Its file-side parser stopped at the blank `>` line between paragraphs, so it compared
+each passage's first paragraph against the full source. Verified directly against the pre-repair
+commit: both of its worked examples were already complete in the file (`Jinn Lantern` already ended
+"…They plead persuasively for freedom"; `Tempting Opportunity` already ended "…like a mouse falling
+into a rice bin!"). Its §3.2 (5 "title-only" rows) and §3.5 (duplicate count) were also overstated.
+**No re-extraction was needed and none was done; PART 1 is complete.** Length and ending claims drawn
+from it are therefore safe, and the corpus median (38 words post-repair, 37 before) stands.
+
+Real defects found and repaired: 5 markup leaks, 2 infobox dumps, 4 duplicate rows (216 → **212**
+passages across 98 wiki pages), 10 dead PART 3 URLs (`main` → `master`, all now HTTP 200), and two
+genuine defects in rite 5000506 (a fabricated ellipsis and a 52-of-183-character truncation), both
+replaced with the complete verbatim field. Post-repair: 212/212 PART 1 rows character-exact against
+the live `{{quote}}` bodies; 93/93 PART 3 Chinese blocks character-exact against the shipped configs.
+
+The one relabel that DOES bind: the PART 3 English is **not literal**. It splits Chinese sentences
+and in six places upgrades plain phrasing into a nicer image (`令人舒爽的风` → "a wind that feels good
+on the skin"; the skin is the translator's). All six are now annotated in place. **Use PART 3 for
+content and structure only — never as evidence about Sultan's prose style.** Part B and C2/C3 below
+draw only on its structure, which is what it is safe for. Also carry forward: the Fort of Chains text
+is verbatim-from-the-fork, not certified against a 403-walled vanilla upstream; and all 41 GitHub
+citations float on `/HEAD/` against actively-pushed repos, so pin SHAs if they are relied on later.
+
 **Evidence base** (all verbatim, all in `research/`):
 | corpus | size | what it gave |
 |---|---|---|
 | Sultan's Game — designer's samples | 4 quests | the target |
-| Sultan's Game — official English | 345 passages / 98 quests | validation at scale |
+| Sultan's Game — official English | 212 passages / 98 wiki pages | validation at scale |
 | Sultan's Game — shipped rite configs | 10 full rites, all branches | the STRUCTURE |
 | Sultan's Game — full corpus (translated) | 1485 intros, 3639 settlements | length distributions |
 | King of Dragon Pass + Six Ages | 125 blocks / 85 events | the incursion frame; opening subjects |
 | Fallen London + Sunless (shipped) | 36 storylets, 61 branches | failure prose; short-form limits |
-| Battle Brothers + Fort of Chains | 49 samples / 152 pieces | 33 failures + 6 disasters; graded outcomes |
+| Battle Brothers + Fort of Chains | 48 samples / 145 pieces | 33 failures + 6 disasters; graded outcomes |
 | Craft literature | 29 sources | Failbetter's full canon, inkle, Choice of Games, Emily Short |
 
 ---
@@ -44,7 +76,7 @@ Our restitution frame (a tradesman cannot work while a thing sits in a place) ap
 **A3. 15–60 words, 1–3 sentences — and the size is BIMODAL, not a target to hit.**
 The designer's four cards are 15, 22, 54, 59 words. There is nothing between 22 and 54. A card is
 either **one strong sentence of ~15–25 words**, or **two-to-three sentences totalling ~50–60**.
-Corpus centres: official Sultan median 37 (p25 23, p75 70); Fallen London roots median 22 with a
+Corpus centres: official Sultan median 38 (p25 23, p75 72; post-repair); Fallen London roots median 22 with a
 published ≤30 rule; KoDP median 51. Our cards run 50–75 in four mandated sentences — the wrong
 sentence count at every size, and always at the long end.
 

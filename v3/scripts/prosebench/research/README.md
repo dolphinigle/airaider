@@ -17,9 +17,9 @@ guideline, re-derive from these files.
 
 | file | size | contents | provenance |
 |---|---|---|---|
-| `samples_sultans.md` | 362 KB | PART 1: 216 official-English in-game passages across 98 quests. PART 2: 738 official-English card/item/character blurbs. PART 3: 10 complete rite records (intro + every slot line + every settlement branch, success and failure, with the dice condition selecting each) — **Chinese verbatim with an agent's own literal English translation, marked as such**. PART 4: 43 random-event intros. | PARTS 1–2 `sultansgame.wiki.gg` via `api.php` (`{{quote}}` templates and infobox `Description=` fields). PART 3 `github.com/liwenhao0427/sultans-game-config` (`rite/<id>.json`). PART 4 Steam guide `3464000283`. |
+| `samples_sultans.md` | 362 KB | PART 1: 212 official-English in-game passages across 98 wiki pages (216 before deduplication). PART 2: 738 official-English card/item/character blurbs. PART 3: 10 complete rite records (intro + every slot line + every settlement branch, success and failure, with the dice condition selecting each) — **Chinese verbatim with an agent's own English translation, marked as such — NOT literal, see caveats below**. PART 4: 43 random-event intros. | PARTS 1–2 `sultansgame.wiki.gg` via `api.php` (`{{quote}}` templates and infobox `Description=` fields). PART 3 `github.com/liwenhao0427/sultans-game-config` (`rite/<id>.json`). PART 4 Steam guide `3464000283`. |
 | `samples_kodp_sixages.md` | 80 KB | 85 events (42 King of Dragon Pass, 43 Six Ages), 125 verbatim blockquote passages, 24 with outcome prose. Engine slots (`<X>`, `<treasure>`, `<Ring Member>`) preserved. | `kingofdragonpass.fandom.com` (489 `Category:Events` pages swept) and `sixages.fandom.com` (914 swept), via MediaWiki API; `{{Quote}}` bodies extracted programmatically, markup stripped without rewording. |
-| `samples_mercenary_games.md` | 112 KB | 49 samples / 152 quoted pieces. Battle Brothers contract hooks, negotiation and `Success*`/`Failure*` screens, ambient camp events. Fort of Chains quests as full Twee passages with the four-grade `Crit`/`Success`/`Failure`/`Disaster` structure. Wildermyth `.properties` files. A separately-labelled CK3 section. **33 failure and 6 disaster texts.** | Battle Brothers: `github.com/kovasap/battle-bros-decompiled` (decompiled vanilla `.nut`). Fort of Chains: `github.com/Official-Husko/fork-of-chains`. Wildermyth: shipped English `.properties` vendored in `github.com/adenzu/Wildermyth-Turkish`. CK3: the **VIET Events mod**, not vanilla. |
+| `samples_mercenary_games.md` | 112 KB | 48 samples / 145 quoted pieces (audit-corrected; the original 49/152 counted a content-free divider and 7 appendix subheads). Battle Brothers contract hooks, negotiation and `Success*`/`Failure*` screens, ambient camp events. Fort of Chains quests as full Twee passages with the four-grade `Crit`/`Success`/`Failure`/`Disaster` structure. Wildermyth `.properties` files. A separately-labelled CK3 section. **33 failure and 6 disaster texts.** | Battle Brothers: `github.com/kovasap/battle-bros-decompiled` (decompiled vanilla `.nut`). Fort of Chains: `github.com/Official-Husko/fork-of-chains`. Wildermyth: shipped English `.properties` vendored in `github.com/adenzu/Wildermyth-Turkish`. CK3: the **VIET Events mod**, not vanilla. |
 | `reference_failbetter.md` | 99 KB | PART A: the three official Fallen London Writer Guidelines posts plus the rest of Failbetter's published craft canon. PART B: 36 storylet sections / 61 branches as Root / Branch / Success / Failure, each word-counted; only samples with zero elision markers were kept. | `failbettergames.com/news/*`; `fallenlondon.wiki` API; Sunless Sea / Sunless Skies Fandom wikis. |
 | `craft_literature.md` | 68 KB | ~29 sources of published craft guidance, rules quoted with URLs, plus a section listing advice stated independently by two or more practitioners. | Failbetter, inkle (Jon Ingold), Emily Short, Choice of Games, Mawhorter/Short, CCG flavour-text guidance, IF craft writing. |
 
@@ -34,6 +34,49 @@ guideline, re-derive from these files.
 | `crosscheck_failure.md` | Failure-prose measurements and register across Fallen London, Battle Brothers, Fort of Chains, KoDP; the graded failure/disaster structure. |
 | `crosscheck_rite_structure.md` | How a Sultan's rite is assembled from its shipped config: slot lines, per-check success/failure pairs, named assigned characters as actors. |
 | `GUIDELINE_DRAFT_v0.md` | The first draft, written from the four designer samples ALONE before the corpora arrived. Kept so its claims can be compared against what the corpora later confirmed or falsified. Superseded by `../GUIDELINE.md`. |
+
+### Audit + repair findings (2026-08-24)
+
+**Three adversarial fidelity audits; no fabrication found in any corpus.** Every quote traces to a
+live source containing it verbatim.
+
+`AUDIT_games.md` — **100% coverage, every source re-fetched.** 125/125 KoDP/Six Ages and 145/145
+mercenary-game blockquotes verbatim; zero rewordings, zero altered or dropped engine slots, zero
+stitched text, zero mislabelled outcomes (69/69 Battle Brothers screen IDs, 31/31 Fort of Chains
+grades), zero dead sources. Counts corrected: **48 samples / 145 pieces**, not 49/152 (nothing
+missing — the denominators had been counted from headings).
+
+`AUDIT_sultans.md` — **read this one with its correction.** Its headline finding ("26 of 216
+passages silently truncated, dropping their closing sentences") is a **FALSE POSITIVE**: the audit's
+own file-side parser stopped at the blank `>` line between paragraphs, so it compared each passage's
+first paragraph against the full source. Independently verified against the pre-repair commit — both
+worked examples were already complete in the file. Its "5 title-only rows" and its duplicate count
+were likewise overstated. **No re-extraction was needed; PART 1 is complete and safe for length,
+paragraph and ending analysis.**
+
+**Repairs actually applied** (see the REPAIR LOG at the top of `samples_sultans.md`): 5 markup leaks
+cleaned, 2 infobox dumps removed, 4 duplicate rows deduplicated (**216 → 212 passages**), 10 dead
+PART 3 GitHub URLs fixed (`blob/main` → `blob/master`, all now HTTP 200), and two genuine defects in
+rite 5000506 corrected against the raw config. Post-repair verification: 212/212 PART 1 rows
+character-exact against live `{{quote}}` bodies; 93/93 PART 3 Chinese blocks character-exact against
+the shipped `rite/*.json`; PART 2 738 lines with zero residual markup.
+
+**Caveats that bind on use:**
+- **PART 3 English translations are NOT literal.** They split Chinese sentences and in six places
+  upgrade plain phrasing into a nicer image (`令人舒爽的风` → "a wind that feels good on the skin").
+  All six are annotated in place. Use PART 3 for **content and structure only**; it is not evidence
+  about the game's prose style.
+- **PART 2** has no per-item source URLs (738 citations, out of scope for the repair).
+- **PART 4** fidelity to the shipped English is unverifiable without owning the game.
+- Some wiki editors' own `[…]` elisions inside quotes are unrecoverable from the wiki.
+- **Fort of Chains** text is verbatim *from the fork* cited, not certified against vanilla upstream
+  (`gitgud.io` is 403 behind Cloudflare; the fork self-describes as "Galvanized", pushed 2025-11-16).
+- All 41 GitHub citations float on `/HEAD/` against actively-pushed repos — verified 2026-08-24, not
+  reproducible later. **Pin SHAs if these samples matter.**
+
+**Method lesson worth carrying:** an adversarial audit needs its own verification. The most serious
+finding in this study was an artefact of the auditor's parser, and would have triggered a pointless
+re-extraction of a corpus that was already correct.
 
 ### Audits
 `AUDIT_sultans.md`, `AUDIT_games.md`, `AUDIT_craft.md` — adversarial fidelity audits commissioned
@@ -96,7 +139,7 @@ curl -sL "https://api.github.com/repos/OWNER/REPO/git/trees/HEAD?recursive=1"
 | corpus | card/intro median | result median | words per sentence |
 |---|---|---|---|
 | Sultan's — 4 designer samples | 15 / 22 / 54 / 59 | 19 / 21 / 51 / 53 | 10.6–29.5 |
-| Sultan's — official English (n=345) | 37 (p25 23, p75 70) | — | 15.2 |
+| Sultan's — official English (n=342, post-repair) | 38 (p25 23, p75 72) | — | 15.2 |
 | Sultan's — full corpus, Spanish (n=1485 / 3639) | 24 | 51 | — |
 | Fallen London — shipped (n=36 / 59 / 58) | 22 | 33 success, 31 failure | 8.5–10.5 |
 | Fallen London — Failbetter's published rule | ≤30 | ≤100 | — |
