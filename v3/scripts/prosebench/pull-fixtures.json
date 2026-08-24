@@ -1,0 +1,4771 @@
+[
+ {
+  "kind": "one-off",
+  "archetype": "contract",
+  "location": "Western Forests — Old-growth elven forests west of the fort; the ruin of Thornhollow lies at their heart. Known ground: the warden-stones on the ridgeline.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "first claim on what the road yields + coin",
+  "keywords": [
+   "fealty",
+   "seduction",
+   "pulley",
+   "tongs"
+  ],
+  "opening": {
+   "spark": "doors barred in daylight"
+  },
+  "intake": "the signs of it are plain from the walls",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Netherbarrow",
+   "Millwell"
+  ],
+  "framedCharacter": null,
+  "avoid": []
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "guilt",
+   "tribute",
+   "thug"
+  ],
+  "intake": "the company's own people came back with it",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Greymarch",
+   "Rushworth"
+  ],
+  "framedCharacter": {
+   "name": "Firthaedal",
+   "tags": "elf; male",
+   "pronoun": "he",
+   "partial": true
+  },
+  "avoid": [
+   "Contract — fealty, seduction — A quiet favor for a loud purse."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "rudeness",
+   "bounty",
+   "spindle",
+   "oarsman"
+  ],
+  "intake": "it was owed to the company before anyone named it",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Tarncroft",
+   "Hawfen"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — fealty, seduction — A quiet favor for a loud purse.",
+   "Rescue — guilt, tribute — Someone wants them back. Go be the someone who delivers."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "grievance",
+   "blasphemy",
+   "violet",
+   "tempted"
+  ],
+  "opening": {
+   "spark": "a town official · a threat"
+  },
+  "intake": "it came through the gate with the morning's callers",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Fernmoss",
+   "Oakstead"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — fealty, seduction — A quiet favor for a loud purse.",
+   "Rescue — guilt, tribute — Someone wants them back. Go be the someone who delivers.",
+   "Hunt — rudeness, bounty — The trail is fresh; the bounty is fresher."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the river ford and its shallows.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "the pick of what the job turns up + coin",
+  "keywords": [
+   "astonishment",
+   "perjury",
+   "sling",
+   "wildcat"
+  ],
+  "opening": {
+   "spark": "a shipmaster · a debt"
+  },
+  "intake": "a visitor put it before the company",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Hawcroft",
+   "Cragshaw"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — fealty, seduction — A quiet favor for a loud purse.",
+   "Rescue — guilt, tribute — Someone wants them back. Go be the someone who delivers.",
+   "Hunt — rudeness, bounty — The trail is fresh; the bounty is fresher.",
+   "Raid — grievance, blasphemy — Hit the camp before first light and take what they owe."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "investigate",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the old elf road.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "abandonment",
+   "proposal",
+   "beast"
+  ],
+  "opening": {
+   "spark": "livestock loose on the road · near the churchyard"
+  },
+  "intake": "the walls have a view of it",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Ashcot",
+   "Yarlea"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — fealty, seduction — A quiet favor for a loud purse.",
+   "Rescue — guilt, tribute — Someone wants them back. Go be the someone who delivers.",
+   "Hunt — rudeness, bounty — The trail is fresh; the bounty is fresher.",
+   "Raid — grievance, blasphemy — Hit the camp before first light and take what they owe.",
+   "Hunt — astonishment, perjury — The trail is fresh; the bounty is fresher."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "first claim on what the road yields + coin",
+  "keywords": [
+   "thirst",
+   "poaching",
+   "advisor"
+  ],
+  "opening": {
+   "spark": "a tenant farmer · a confession"
+  },
+  "intake": "it came through the gate with the morning's callers",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Coldworth",
+   "Yarbourne"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — fealty, seduction — A quiet favor for a loud purse.",
+   "Rescue — guilt, tribute — Someone wants them back. Go be the someone who delivers.",
+   "Hunt — rudeness, bounty — The trail is fresh; the bounty is fresher.",
+   "Raid — grievance, blasphemy — Hit the camp before first light and take what they owe.",
+   "Hunt — astonishment, perjury — The trail is fresh; the bounty is fresher.",
+   "Investigate — abandonment, proposal — Ask the questions no one else dares ask."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the beekeepers' clearings.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "joy",
+   "coincidence",
+   "antidote",
+   "ladle"
+  ],
+  "intake": "it surfaced along the way of other work",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Ravenbourne",
+   "Peatmere"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — fealty, seduction — A quiet favor for a loud purse.",
+   "Rescue — guilt, tribute — Someone wants them back. Go be the someone who delivers.",
+   "Hunt — rudeness, bounty — The trail is fresh; the bounty is fresher.",
+   "Raid — grievance, blasphemy — Hit the camp before first light and take what they owe.",
+   "Hunt — astonishment, perjury — The trail is fresh; the bounty is fresher.",
+   "Investigate — abandonment, proposal — Ask the questions no one else dares ask.",
+   "Raid — thirst, poaching — Storm the stockade; leave the rest to burn."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "escort",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the beekeepers' clearings.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "whatever worth the work shakes loose + coin",
+  "keywords": [
+   "regret",
+   "homage",
+   "hut",
+   "glade"
+  ],
+  "intake": "it was owed to the company before anyone named it",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Sedgefen",
+   "Falbrook"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — fealty, seduction — A quiet favor for a loud purse.",
+   "Rescue — guilt, tribute — Someone wants them back. Go be the someone who delivers.",
+   "Hunt — rudeness, bounty — The trail is fresh; the bounty is fresher.",
+   "Raid — grievance, blasphemy — Hit the camp before first light and take what they owe.",
+   "Hunt — astonishment, perjury — The trail is fresh; the bounty is fresher.",
+   "Investigate — abandonment, proposal — Ask the questions no one else dares ask.",
+   "Raid — thirst, poaching — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — joy, coincidence — Sweep the region for rumors worth chasing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "contract",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the river ford and its shallows.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "the pick of what the job turns up + coin",
+  "keywords": [
+   "elation",
+   "fostering",
+   "niece",
+   "trinket"
+  ],
+  "intake": "it was owed to the company before anyone named it",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Hawwell",
+   "Birthorpe"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — fealty, seduction — A quiet favor for a loud purse.",
+   "Rescue — guilt, tribute — Someone wants them back. Go be the someone who delivers.",
+   "Hunt — rudeness, bounty — The trail is fresh; the bounty is fresher.",
+   "Raid — grievance, blasphemy — Hit the camp before first light and take what they owe.",
+   "Hunt — astonishment, perjury — The trail is fresh; the bounty is fresher.",
+   "Investigate — abandonment, proposal — Ask the questions no one else dares ask.",
+   "Raid — thirst, poaching — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — joy, coincidence — Sweep the region for rumors worth chasing.",
+   "Escort — regret, homage — Walk them to the gate and dare anyone to object."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "intolerance",
+   "idolatry",
+   "grindstone"
+  ],
+  "opening": {
+   "spark": "one of your own soldiers · a gift"
+  },
+  "intake": "it was brought to the company directly",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Linggate",
+   "Stonegate"
+  ],
+  "framedCharacter": {
+   "name": "Nele",
+   "tags": "human; male",
+   "pronoun": "he",
+   "partial": true
+  },
+  "avoid": [
+   "Contract — fealty, seduction — A quiet favor for a loud purse.",
+   "Rescue — guilt, tribute — Someone wants them back. Go be the someone who delivers.",
+   "Hunt — rudeness, bounty — The trail is fresh; the bounty is fresher.",
+   "Raid — grievance, blasphemy — Hit the camp before first light and take what they owe.",
+   "Hunt — astonishment, perjury — The trail is fresh; the bounty is fresher.",
+   "Investigate — abandonment, proposal — Ask the questions no one else dares ask.",
+   "Raid — thirst, poaching — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — joy, coincidence — Sweep the region for rumors worth chasing.",
+   "Escort — regret, homage — Walk them to the gate and dare anyone to object.",
+   "Contract — elation, fostering — A quiet favor for a loud purse."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "betrayal",
+   "appeal",
+   "sergeant",
+   "chart"
+  ],
+  "intake": "it surfaced along the way of other work",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Brammere",
+   "Elmholt"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Rescue — guilt, tribute — Someone wants them back. Go be the someone who delivers.",
+   "Hunt — rudeness, bounty — The trail is fresh; the bounty is fresher.",
+   "Raid — grievance, blasphemy — Hit the camp before first light and take what they owe.",
+   "Hunt — astonishment, perjury — The trail is fresh; the bounty is fresher.",
+   "Investigate — abandonment, proposal — Ask the questions no one else dares ask.",
+   "Raid — thirst, poaching — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — joy, coincidence — Sweep the region for rumors worth chasing.",
+   "Escort — regret, homage — Walk them to the gate and dare anyone to object.",
+   "Contract — elation, fostering — A quiet favor for a loud purse.",
+   "Rescue — intolerance, idolatry — Someone wants them back. Go be the someone who delivers."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the charcoal-burners' camps.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "fussiness",
+   "confiscation",
+   "chestnut"
+  ],
+  "intake": "it grew out of business already done",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Hawlea",
+   "Falford"
+  ],
+  "framedCharacter": {
+   "name": "Eguerdi Greyfell",
+   "tags": "human; male",
+   "pronoun": "he",
+   "partial": true
+  },
+  "avoid": [
+   "Hunt — rudeness, bounty — The trail is fresh; the bounty is fresher.",
+   "Raid — grievance, blasphemy — Hit the camp before first light and take what they owe.",
+   "Hunt — astonishment, perjury — The trail is fresh; the bounty is fresher.",
+   "Investigate — abandonment, proposal — Ask the questions no one else dares ask.",
+   "Raid — thirst, poaching — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — joy, coincidence — Sweep the region for rumors worth chasing.",
+   "Escort — regret, homage — Walk them to the gate and dare anyone to object.",
+   "Contract — elation, fostering — A quiet favor for a loud purse.",
+   "Rescue — intolerance, idolatry — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — betrayal, appeal — Buy drinks, open ears, bring back threads."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "investigate",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the warden-stones on the ridgeline.",
+  "level": 5,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "heartbreak",
+   "concealment",
+   "deserter",
+   "scribe"
+  ],
+  "intake": "the company's own searching turned it up",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Yarhollow",
+   "Birmarch"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Raid — grievance, blasphemy — Hit the camp before first light and take what they owe.",
+   "Hunt — astonishment, perjury — The trail is fresh; the bounty is fresher.",
+   "Investigate — abandonment, proposal — Ask the questions no one else dares ask.",
+   "Raid — thirst, poaching — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — joy, coincidence — Sweep the region for rumors worth chasing.",
+   "Escort — regret, homage — Walk them to the gate and dare anyone to object.",
+   "Contract — elation, fostering — A quiet favor for a loud purse.",
+   "Rescue — intolerance, idolatry — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — betrayal, appeal — Buy drinks, open ears, bring back threads.",
+   "Rescue — fussiness, confiscation — Someone wants them back. Go be the someone who delivers."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the river ford and its shallows.",
+  "level": 6,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "the pick of what the job turns up + coin",
+  "keywords": [
+   "tolerance",
+   "baptism",
+   "neighbor"
+  ],
+  "intake": "it was lying under a question no one had asked yet",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Nethergill",
+   "Whinshaw"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Hunt — astonishment, perjury — The trail is fresh; the bounty is fresher.",
+   "Investigate — abandonment, proposal — Ask the questions no one else dares ask.",
+   "Raid — thirst, poaching — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — joy, coincidence — Sweep the region for rumors worth chasing.",
+   "Escort — regret, homage — Walk them to the gate and dare anyone to object.",
+   "Contract — elation, fostering — A quiet favor for a loud purse.",
+   "Rescue — intolerance, idolatry — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — betrayal, appeal — Buy drinks, open ears, bring back threads.",
+   "Rescue — fussiness, confiscation — Someone wants them back. Go be the someone who delivers.",
+   "Investigate — heartbreak, concealment — Ask the questions no one else dares ask."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the old elf road.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "terror",
+   "tithe",
+   "juror",
+   "colt"
+  ],
+  "intake": "everyone tells it a little differently",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Duncombe",
+   "Greycroft"
+  ],
+  "framedCharacter": {
+   "name": "Idhdean Wexcombe",
+   "tags": "human; male",
+   "pronoun": "he",
+   "partial": true
+  },
+  "avoid": [
+   "Investigate — abandonment, proposal — Ask the questions no one else dares ask.",
+   "Raid — thirst, poaching — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — joy, coincidence — Sweep the region for rumors worth chasing.",
+   "Escort — regret, homage — Walk them to the gate and dare anyone to object.",
+   "Contract — elation, fostering — A quiet favor for a loud purse.",
+   "Rescue — intolerance, idolatry — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — betrayal, appeal — Buy drinks, open ears, bring back threads.",
+   "Rescue — fussiness, confiscation — Someone wants them back. Go be the someone who delivers.",
+   "Investigate — heartbreak, concealment — Ask the questions no one else dares ask.",
+   "Raid — tolerance, baptism — Storm the stockade; leave the rest to burn."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "contract",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the charcoal-burners' camps.",
+  "level": 5,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "the pick of what the job turns up + coin",
+  "keywords": [
+   "complacency",
+   "nepotism",
+   "millstone",
+   "jinx"
+  ],
+  "intake": "it grew out of business already done",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Cragbourne",
+   "Elmgill"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Raid — thirst, poaching — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — joy, coincidence — Sweep the region for rumors worth chasing.",
+   "Escort — regret, homage — Walk them to the gate and dare anyone to object.",
+   "Contract — elation, fostering — A quiet favor for a loud purse.",
+   "Rescue — intolerance, idolatry — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — betrayal, appeal — Buy drinks, open ears, bring back threads.",
+   "Rescue — fussiness, confiscation — Someone wants them back. Go be the someone who delivers.",
+   "Investigate — heartbreak, concealment — Ask the questions no one else dares ask.",
+   "Raid — tolerance, baptism — Storm the stockade; leave the rest to burn.",
+   "Rescue — terror, tithe — Get them out before the trail goes cold."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the charcoal-burners' camps.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "faith",
+   "encounter",
+   "purification",
+   "smuggler"
+  ],
+  "intake": "it surfaced along the way of other work",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Oakmere",
+   "Faldale"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Lead-hunt — joy, coincidence — Sweep the region for rumors worth chasing.",
+   "Escort — regret, homage — Walk them to the gate and dare anyone to object.",
+   "Contract — elation, fostering — A quiet favor for a loud purse.",
+   "Rescue — intolerance, idolatry — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — betrayal, appeal — Buy drinks, open ears, bring back threads.",
+   "Rescue — fussiness, confiscation — Someone wants them back. Go be the someone who delivers.",
+   "Investigate — heartbreak, concealment — Ask the questions no one else dares ask.",
+   "Raid — tolerance, baptism — Storm the stockade; leave the rest to burn.",
+   "Rescue — terror, tithe — Get them out before the trail goes cold.",
+   "Contract — complacency, nepotism — A quiet favor for a loud purse."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "doubt",
+   "fine",
+   "comet",
+   "spire"
+  ],
+  "intake": "the last job left this behind",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Marlfen",
+   "Birshaw"
+  ],
+  "framedCharacter": {
+   "name": "Aladess",
+   "tags": "elf; female",
+   "pronoun": "she",
+   "partial": true
+  },
+  "avoid": [
+   "Escort — regret, homage — Walk them to the gate and dare anyone to object.",
+   "Contract — elation, fostering — A quiet favor for a loud purse.",
+   "Rescue — intolerance, idolatry — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — betrayal, appeal — Buy drinks, open ears, bring back threads.",
+   "Rescue — fussiness, confiscation — Someone wants them back. Go be the someone who delivers.",
+   "Investigate — heartbreak, concealment — Ask the questions no one else dares ask.",
+   "Raid — tolerance, baptism — Storm the stockade; leave the rest to burn.",
+   "Rescue — terror, tithe — Get them out before the trail goes cold.",
+   "Contract — complacency, nepotism — A quiet favor for a loud purse.",
+   "Lead-hunt — faith, encounter — Buy drinks, open ears, bring back threads."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "the pick of what the job turns up + coin",
+  "keywords": [
+   "brutality",
+   "banishment",
+   "ferret",
+   "pommel"
+  ],
+  "intake": "the company's own searching turned it up",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Ravengate",
+   "Woldgill"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — elation, fostering — A quiet favor for a loud purse.",
+   "Rescue — intolerance, idolatry — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — betrayal, appeal — Buy drinks, open ears, bring back threads.",
+   "Rescue — fussiness, confiscation — Someone wants them back. Go be the someone who delivers.",
+   "Investigate — heartbreak, concealment — Ask the questions no one else dares ask.",
+   "Raid — tolerance, baptism — Storm the stockade; leave the rest to burn.",
+   "Rescue — terror, tithe — Get them out before the trail goes cold.",
+   "Contract — complacency, nepotism — A quiet favor for a loud purse.",
+   "Lead-hunt — faith, encounter — Buy drinks, open ears, bring back threads.",
+   "Rescue — doubt, fine — Someone wants them back. Go be the someone who delivers."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "escort",
+  "location": "Western Forests — Old-growth elven forests west of the fort; the ruin of Thornhollow lies at their heart. Known ground: the loggers' winter huts.",
+  "level": 5,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "first claim on what the road yields + coin",
+  "keywords": [
+   "panic",
+   "hoax",
+   "wanderer",
+   "anvil"
+  ],
+  "intake": "it was lying under a question no one had asked yet",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Hawbarrow",
+   "Hawholt"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Rescue — intolerance, idolatry — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — betrayal, appeal — Buy drinks, open ears, bring back threads.",
+   "Rescue — fussiness, confiscation — Someone wants them back. Go be the someone who delivers.",
+   "Investigate — heartbreak, concealment — Ask the questions no one else dares ask.",
+   "Raid — tolerance, baptism — Storm the stockade; leave the rest to burn.",
+   "Rescue — terror, tithe — Get them out before the trail goes cold.",
+   "Contract — complacency, nepotism — A quiet favor for a loud purse.",
+   "Lead-hunt — faith, encounter — Buy drinks, open ears, bring back threads.",
+   "Rescue — doubt, fine — Someone wants them back. Go be the someone who delivers.",
+   "Hunt — brutality, banishment — Track it. Corner it. End it."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "investigate",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the charcoal-burners' camps.",
+  "level": 6,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "first claim on what the road yields + coin",
+  "keywords": [
+   "damnation",
+   "spying",
+   "carp",
+   "godchild"
+  ],
+  "intake": "it was owed to the company before anyone named it",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Harrowhollow",
+   "Bircombe"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Lead-hunt — betrayal, appeal — Buy drinks, open ears, bring back threads.",
+   "Rescue — fussiness, confiscation — Someone wants them back. Go be the someone who delivers.",
+   "Investigate — heartbreak, concealment — Ask the questions no one else dares ask.",
+   "Raid — tolerance, baptism — Storm the stockade; leave the rest to burn.",
+   "Rescue — terror, tithe — Get them out before the trail goes cold.",
+   "Contract — complacency, nepotism — A quiet favor for a loud purse.",
+   "Lead-hunt — faith, encounter — Buy drinks, open ears, bring back threads.",
+   "Rescue — doubt, fine — Someone wants them back. Go be the someone who delivers.",
+   "Hunt — brutality, banishment — Track it. Corner it. End it.",
+   "Escort — panic, hoax — Walk them to the gate and dare anyone to object."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "contract",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "familiarity",
+   "harassment",
+   "angel",
+   "hated"
+  ],
+  "opening": {
+   "spark": "a ferryman · a rumor"
+  },
+  "intake": "it was carried to the gate in person",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Bramworth",
+   "Coldmoss"
+  ],
+  "framedCharacter": null,
+  "avoid": []
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the warden-stones on the ridgeline.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "compulsion",
+   "treaty",
+   "coven",
+   "tinder"
+  ],
+  "opening": {
+   "spark": "a tinker · an invitation"
+  },
+  "intake": "it was carried to the gate in person",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Millworth",
+   "Greyfen"
+  ],
+  "framedCharacter": {
+   "name": "Odotheus Longshanks",
+   "tags": "human; male",
+   "pronoun": "he",
+   "partial": true
+  },
+  "avoid": [
+   "Contract — familiarity, harassment — Do the job, take the coin, ask nothing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the warden-stones on the ridgeline.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "ambition",
+   "plunder",
+   "drought",
+   "elder"
+  ],
+  "opening": {
+   "spark": "an old friend of the company · a list"
+  },
+  "intake": "it was brought to the company directly",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Fernlea",
+   "Yarwick"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — familiarity, harassment — Do the job, take the coin, ask nothing.",
+   "Rescue — compulsion, treaty — Someone wants them back. Go be the someone who delivers."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the beekeepers' clearings.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "impatience",
+   "revelation",
+   "staff",
+   "darned"
+  ],
+  "opening": {
+   "spark": "a missed market day · below the walls"
+  },
+  "intake": "it showed itself before any word of it came",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Dewcroft",
+   "Whinford"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — familiarity, harassment — Do the job, take the coin, ask nothing.",
+   "Rescue — compulsion, treaty — Someone wants them back. Go be the someone who delivers.",
+   "Raid — ambition, plunder — Storm the stockade; leave the rest to burn."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "investigate",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the old elf road.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "irritation",
+   "verdict",
+   "namesake"
+  ],
+  "opening": {
+   "spark": "a shipmaster · a boast"
+  },
+  "intake": "it came through the gate with the morning's callers",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Ashhollow",
+   "Lingcroft"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — familiarity, harassment — Do the job, take the coin, ask nothing.",
+   "Rescue — compulsion, treaty — Someone wants them back. Go be the someone who delivers.",
+   "Raid — ambition, plunder — Storm the stockade; leave the rest to burn.",
+   "Hunt — impatience, revelation — The trail is fresh; the bounty is fresher."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "whatever worth the work shakes loose + coin",
+  "keywords": [
+   "partnership",
+   "reprieve",
+   "leather",
+   "straight"
+  ],
+  "intake": "one of your own crossed it in the field",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Dewmere",
+   "Woldthorpe"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — familiarity, harassment — Do the job, take the coin, ask nothing.",
+   "Rescue — compulsion, treaty — Someone wants them back. Go be the someone who delivers.",
+   "Raid — ambition, plunder — Storm the stockade; leave the rest to burn.",
+   "Hunt — impatience, revelation — The trail is fresh; the bounty is fresher.",
+   "Investigate — irritation, verdict — Find out what actually happened — and to whom."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "investigate",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "hardship",
+   "skirmish",
+   "lamp",
+   "vinegar"
+  ],
+  "intake": "it was owed to the company before anyone named it",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Craglea",
+   "Marlcot"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — familiarity, harassment — Do the job, take the coin, ask nothing.",
+   "Rescue — compulsion, treaty — Someone wants them back. Go be the someone who delivers.",
+   "Raid — ambition, plunder — Storm the stockade; leave the rest to burn.",
+   "Hunt — impatience, revelation — The trail is fresh; the bounty is fresher.",
+   "Investigate — irritation, verdict — Find out what actually happened — and to whom.",
+   "Raid — partnership, reprieve — Storm the stockade; leave the rest to burn."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the loggers' winter huts.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "grudge",
+   "theft",
+   "brewing",
+   "helmet"
+  ],
+  "intake": "finishing one matter uncovered this one",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Dewshaw",
+   "Sedgefen"
+  ],
+  "framedCharacter": {
+   "name": "Odotheus Longshanks",
+   "tags": "male; human; roguery (low); intimidation (low); nimble (low); ugly (mid); soldier (low)",
+   "pronoun": "he",
+   "lastSeen": "Rescue — compulsion, treaty: A mud-spattered rider arrives at the gate with the offer. They speak of one Odotheus Longshanks — human; male. (compulsion, treaty figure in it.)"
+  },
+  "avoid": [
+   "Contract — familiarity, harassment — Do the job, take the coin, ask nothing.",
+   "Rescue — compulsion, treaty — Someone wants them back. Go be the someone who delivers.",
+   "Raid — ambition, plunder — Storm the stockade; leave the rest to burn.",
+   "Hunt — impatience, revelation — The trail is fresh; the bounty is fresher.",
+   "Investigate — irritation, verdict — Find out what actually happened — and to whom.",
+   "Raid — partnership, reprieve — Storm the stockade; leave the rest to burn.",
+   "Investigate — hardship, skirmish — Ask the questions no one else dares ask."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the old elf road.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "rivalry",
+   "scuffle",
+   "gravestone",
+   "bear"
+  ],
+  "intake": "it was lying under a question no one had asked yet",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Hawstead",
+   "Yargill"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — familiarity, harassment — Do the job, take the coin, ask nothing.",
+   "Rescue — compulsion, treaty — Someone wants them back. Go be the someone who delivers.",
+   "Raid — ambition, plunder — Storm the stockade; leave the rest to burn.",
+   "Hunt — impatience, revelation — The trail is fresh; the bounty is fresher.",
+   "Investigate — irritation, verdict — Find out what actually happened — and to whom.",
+   "Raid — partnership, reprieve — Storm the stockade; leave the rest to burn.",
+   "Investigate — hardship, skirmish — Ask the questions no one else dares ask.",
+   "Rescue — grudge, theft — Get them out before the trail goes cold."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "harshness",
+   "inheritance",
+   "defeat"
+  ],
+  "intake": "it was found while looking for something else",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Dundale",
+   "Hawcot"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — familiarity, harassment — Do the job, take the coin, ask nothing.",
+   "Rescue — compulsion, treaty — Someone wants them back. Go be the someone who delivers.",
+   "Raid — ambition, plunder — Storm the stockade; leave the rest to burn.",
+   "Hunt — impatience, revelation — The trail is fresh; the bounty is fresher.",
+   "Investigate — irritation, verdict — Find out what actually happened — and to whom.",
+   "Raid — partnership, reprieve — Storm the stockade; leave the rest to burn.",
+   "Investigate — hardship, skirmish — Ask the questions no one else dares ask.",
+   "Rescue — grudge, theft — Get them out before the trail goes cold.",
+   "Lead-hunt — rivalry, scuffle — Sweep the region for rumors worth chasing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "loyalty",
+   "wooing",
+   "stump",
+   "spur"
+  ],
+  "intake": "it was lying under a question no one had asked yet",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Stonefen",
+   "Ashworth"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — familiarity, harassment — Do the job, take the coin, ask nothing.",
+   "Rescue — compulsion, treaty — Someone wants them back. Go be the someone who delivers.",
+   "Raid — ambition, plunder — Storm the stockade; leave the rest to burn.",
+   "Hunt — impatience, revelation — The trail is fresh; the bounty is fresher.",
+   "Investigate — irritation, verdict — Find out what actually happened — and to whom.",
+   "Raid — partnership, reprieve — Storm the stockade; leave the rest to burn.",
+   "Investigate — hardship, skirmish — Ask the questions no one else dares ask.",
+   "Rescue — grudge, theft — Get them out before the trail goes cold.",
+   "Lead-hunt — rivalry, scuffle — Sweep the region for rumors worth chasing.",
+   "Lead-hunt — harshness, inheritance — Buy drinks, open ears, bring back threads."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "escort",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the warden-stones on the ridgeline.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "carelessness",
+   "challenge",
+   "receipt"
+  ],
+  "intake": "it surfaced along the way of other work",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Peatbourne",
+   "Yarstead"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Rescue — compulsion, treaty — Someone wants them back. Go be the someone who delivers.",
+   "Raid — ambition, plunder — Storm the stockade; leave the rest to burn.",
+   "Hunt — impatience, revelation — The trail is fresh; the bounty is fresher.",
+   "Investigate — irritation, verdict — Find out what actually happened — and to whom.",
+   "Raid — partnership, reprieve — Storm the stockade; leave the rest to burn.",
+   "Investigate — hardship, skirmish — Ask the questions no one else dares ask.",
+   "Rescue — grudge, theft — Get them out before the trail goes cold.",
+   "Lead-hunt — rivalry, scuffle — Sweep the region for rumors worth chasing.",
+   "Lead-hunt — harshness, inheritance — Buy drinks, open ears, bring back threads.",
+   "Lead-hunt — loyalty, wooing — Sweep the region for rumors worth chasing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "investigate",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the beekeepers' clearings.",
+  "level": 5,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "mastery",
+   "pledge",
+   "jailer",
+   "hell"
+  ],
+  "intake": "the company's own searching turned it up",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Harrowcot",
+   "Bramfen"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Raid — ambition, plunder — Storm the stockade; leave the rest to burn.",
+   "Hunt — impatience, revelation — The trail is fresh; the bounty is fresher.",
+   "Investigate — irritation, verdict — Find out what actually happened — and to whom.",
+   "Raid — partnership, reprieve — Storm the stockade; leave the rest to burn.",
+   "Investigate — hardship, skirmish — Ask the questions no one else dares ask.",
+   "Rescue — grudge, theft — Get them out before the trail goes cold.",
+   "Lead-hunt — rivalry, scuffle — Sweep the region for rumors worth chasing.",
+   "Lead-hunt — harshness, inheritance — Buy drinks, open ears, bring back threads.",
+   "Lead-hunt — loyalty, wooing — Sweep the region for rumors worth chasing.",
+   "Escort — carelessness, challenge — Walk them to the gate and dare anyone to object."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort; the ruin of Thornhollow lies at their heart. Known ground: the river ford and its shallows.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "harshness",
+   "taboo",
+   "matchmaker",
+   "pledged"
+  ],
+  "intake": "the company dug until this came loose",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Tarnholt",
+   "Elmshaw"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Hunt — impatience, revelation — The trail is fresh; the bounty is fresher.",
+   "Investigate — irritation, verdict — Find out what actually happened — and to whom.",
+   "Raid — partnership, reprieve — Storm the stockade; leave the rest to burn.",
+   "Investigate — hardship, skirmish — Ask the questions no one else dares ask.",
+   "Rescue — grudge, theft — Get them out before the trail goes cold.",
+   "Lead-hunt — rivalry, scuffle — Sweep the region for rumors worth chasing.",
+   "Lead-hunt — harshness, inheritance — Buy drinks, open ears, bring back threads.",
+   "Lead-hunt — loyalty, wooing — Sweep the region for rumors worth chasing.",
+   "Escort — carelessness, challenge — Walk them to the gate and dare anyone to object.",
+   "Investigate — mastery, pledge — Ask the questions no one else dares ask."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "contract",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the warden-stones on the ridgeline.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "the pick of what the job turns up + coin",
+  "keywords": [
+   "reconciliation",
+   "hoax",
+   "wave",
+   "funeral"
+  ],
+  "intake": "finishing one matter uncovered this one",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Coldgill",
+   "Falmoss"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Investigate — irritation, verdict — Find out what actually happened — and to whom.",
+   "Raid — partnership, reprieve — Storm the stockade; leave the rest to burn.",
+   "Investigate — hardship, skirmish — Ask the questions no one else dares ask.",
+   "Rescue — grudge, theft — Get them out before the trail goes cold.",
+   "Lead-hunt — rivalry, scuffle — Sweep the region for rumors worth chasing.",
+   "Lead-hunt — harshness, inheritance — Buy drinks, open ears, bring back threads.",
+   "Lead-hunt — loyalty, wooing — Sweep the region for rumors worth chasing.",
+   "Escort — carelessness, challenge — Walk them to the gate and dare anyone to object.",
+   "Investigate — mastery, pledge — Ask the questions no one else dares ask.",
+   "Lead-hunt — harshness, taboo — Buy drinks, open ears, bring back threads."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 8,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "craving",
+   "purchase",
+   "iron",
+   "bark"
+  ],
+  "intake": "it surfaced along the way of other work",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Elmholt",
+   "Nethermere"
+  ],
+  "framedCharacter": {
+   "name": "Curwe",
+   "tags": "elf; female",
+   "pronoun": "she",
+   "partial": true
+  },
+  "avoid": [
+   "Raid — partnership, reprieve — Storm the stockade; leave the rest to burn.",
+   "Investigate — hardship, skirmish — Ask the questions no one else dares ask.",
+   "Rescue — grudge, theft — Get them out before the trail goes cold.",
+   "Lead-hunt — rivalry, scuffle — Sweep the region for rumors worth chasing.",
+   "Lead-hunt — harshness, inheritance — Buy drinks, open ears, bring back threads.",
+   "Lead-hunt — loyalty, wooing — Sweep the region for rumors worth chasing.",
+   "Escort — carelessness, challenge — Walk them to the gate and dare anyone to object.",
+   "Investigate — mastery, pledge — Ask the questions no one else dares ask.",
+   "Lead-hunt — harshness, taboo — Buy drinks, open ears, bring back threads.",
+   "Contract — reconciliation, hoax — Do the job, take the coin, ask nothing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "contract",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the loggers' winter huts.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "hunger",
+   "encroachment",
+   "goblin",
+   "hail"
+  ],
+  "opening": {
+   "spark": "a widow · a warning"
+  },
+  "intake": "a visitor put it before the company",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Coldmarch",
+   "Greymarch"
+  ],
+  "framedCharacter": null,
+  "avoid": []
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "compulsion",
+   "apprenticing",
+   "raven",
+   "lambing"
+  ],
+  "opening": {
+   "spark": "a shuttered farmhouse · on the quarry track"
+  },
+  "intake": "it was seen from the fort's own walls",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Stonemarch",
+   "Whinwell"
+  ],
+  "framedCharacter": {
+   "name": "Ainhoa Thatcher",
+   "tags": "human; female",
+   "pronoun": "she",
+   "partial": true
+  },
+  "avoid": [
+   "Contract — hunger, encroachment — A quiet favor for a loud purse."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the loggers' winter huts.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "anxiety",
+   "flogging",
+   "translator",
+   "cloister"
+  ],
+  "opening": {
+   "spark": "bells at the wrong hour · at the ford · at first light"
+  },
+  "intake": "it was seen from the fort's own walls",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Sedgewell",
+   "Ferndale"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — hunger, encroachment — A quiet favor for a loud purse.",
+   "Rescue — compulsion, apprenticing — Someone wants them back. Go be the someone who delivers."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "whatever worth the work shakes loose + coin",
+  "keywords": [
+   "freedom",
+   "blackmail",
+   "birth",
+   "student"
+  ],
+  "intake": "your own people walked into it",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Peatgill",
+   "Nethershaw"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — hunger, encroachment — A quiet favor for a loud purse.",
+   "Rescue — compulsion, apprenticing — Someone wants them back. Go be the someone who delivers.",
+   "Raid — anxiety, flogging — Storm the stockade; leave the rest to burn."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "motherhood",
+   "partition",
+   "barrel",
+   "hilt"
+  ],
+  "intake": "the company dug until this came loose",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Oakworth",
+   "Birshaw"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — hunger, encroachment — A quiet favor for a loud purse.",
+   "Rescue — compulsion, apprenticing — Someone wants them back. Go be the someone who delivers.",
+   "Raid — anxiety, flogging — Storm the stockade; leave the rest to burn.",
+   "Hunt — freedom, blackmail — The trail is fresh; the bounty is fresher."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "investigate",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "first claim on what the road yields + coin",
+  "keywords": [
+   "sorrow",
+   "ambush",
+   "sled",
+   "stray"
+  ],
+  "opening": {
+   "spark": "an empty road at midday"
+  },
+  "intake": "the walls have a view of it",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Woldmere",
+   "Elmwell"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — hunger, encroachment — A quiet favor for a loud purse.",
+   "Rescue — compulsion, apprenticing — Someone wants them back. Go be the someone who delivers.",
+   "Raid — anxiety, flogging — Storm the stockade; leave the rest to burn.",
+   "Hunt — freedom, blackmail — The trail is fresh; the bounty is fresher.",
+   "Lead-hunt — motherhood, partition — Sweep the region for rumors worth chasing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "obligation",
+   "arrears",
+   "brewery"
+  ],
+  "opening": {
+   "spark": "a passing trader · a question"
+  },
+  "intake": "it was carried to the gate in person",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Falmarch",
+   "Marlworth"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — hunger, encroachment — A quiet favor for a loud purse.",
+   "Rescue — compulsion, apprenticing — Someone wants them back. Go be the someone who delivers.",
+   "Raid — anxiety, flogging — Storm the stockade; leave the rest to burn.",
+   "Hunt — freedom, blackmail — The trail is fresh; the bounty is fresher.",
+   "Lead-hunt — motherhood, partition — Sweep the region for rumors worth chasing.",
+   "Investigate — sorrow, ambush — Find out what actually happened — and to whom."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "indifference",
+   "eviction",
+   "toast"
+  ],
+  "intake": "the company's own searching turned it up",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Dewcot",
+   "Dungill"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — hunger, encroachment — A quiet favor for a loud purse.",
+   "Rescue — compulsion, apprenticing — Someone wants them back. Go be the someone who delivers.",
+   "Raid — anxiety, flogging — Storm the stockade; leave the rest to burn.",
+   "Hunt — freedom, blackmail — The trail is fresh; the bounty is fresher.",
+   "Lead-hunt — motherhood, partition — Sweep the region for rumors worth chasing.",
+   "Investigate — sorrow, ambush — Find out what actually happened — and to whom.",
+   "Raid — obligation, arrears — Hit the camp before first light and take what they owe."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the old elf road.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "truth",
+   "border",
+   "midwinter"
+  ],
+  "intake": "everyone tells it a little differently",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Dewfen",
+   "Birbrook"
+  ],
+  "framedCharacter": {
+   "name": "Fainorume",
+   "tags": "elf; male",
+   "pronoun": "he",
+   "partial": true
+  },
+  "avoid": [
+   "Contract — hunger, encroachment — A quiet favor for a loud purse.",
+   "Rescue — compulsion, apprenticing — Someone wants them back. Go be the someone who delivers.",
+   "Raid — anxiety, flogging — Storm the stockade; leave the rest to burn.",
+   "Hunt — freedom, blackmail — The trail is fresh; the bounty is fresher.",
+   "Lead-hunt — motherhood, partition — Sweep the region for rumors worth chasing.",
+   "Investigate — sorrow, ambush — Find out what actually happened — and to whom.",
+   "Raid — obligation, arrears — Hit the camp before first light and take what they owe.",
+   "Lead-hunt — indifference, eviction — Buy drinks, open ears, bring back threads."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "conscience",
+   "torture",
+   "spear",
+   "ransomed"
+  ],
+  "intake": "it was found while looking for something else",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Brambarrow",
+   "Elmthorpe"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — hunger, encroachment — A quiet favor for a loud purse.",
+   "Rescue — compulsion, apprenticing — Someone wants them back. Go be the someone who delivers.",
+   "Raid — anxiety, flogging — Storm the stockade; leave the rest to burn.",
+   "Hunt — freedom, blackmail — The trail is fresh; the bounty is fresher.",
+   "Lead-hunt — motherhood, partition — Sweep the region for rumors worth chasing.",
+   "Investigate — sorrow, ambush — Find out what actually happened — and to whom.",
+   "Raid — obligation, arrears — Hit the camp before first light and take what they owe.",
+   "Lead-hunt — indifference, eviction — Buy drinks, open ears, bring back threads.",
+   "Rescue — truth, border — Someone wants them back. Go be the someone who delivers."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "contract",
+  "location": "Western Forests — Old-growth elven forests west of the fort; the ruin of Thornhollow lies at their heart.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "whatever worth the work shakes loose + coin",
+  "keywords": [
+   "mischief",
+   "eviction",
+   "tannery",
+   "threadbare"
+  ],
+  "intake": "it was owed to the company before anyone named it",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Millshaw",
+   "Ashwick"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — hunger, encroachment — A quiet favor for a loud purse.",
+   "Rescue — compulsion, apprenticing — Someone wants them back. Go be the someone who delivers.",
+   "Raid — anxiety, flogging — Storm the stockade; leave the rest to burn.",
+   "Hunt — freedom, blackmail — The trail is fresh; the bounty is fresher.",
+   "Lead-hunt — motherhood, partition — Sweep the region for rumors worth chasing.",
+   "Investigate — sorrow, ambush — Find out what actually happened — and to whom.",
+   "Raid — obligation, arrears — Hit the camp before first light and take what they owe.",
+   "Lead-hunt — indifference, eviction — Buy drinks, open ears, bring back threads.",
+   "Rescue — truth, border — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — conscience, torture — Sweep the region for rumors worth chasing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the river ford and its shallows.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "whatever worth the work shakes loose + coin",
+  "keywords": [
+   "suffering",
+   "fostering",
+   "chestnut",
+   "cliff"
+  ],
+  "intake": "it surfaced along the way of other work",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Yarholt",
+   "Elmbrook"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Rescue — compulsion, apprenticing — Someone wants them back. Go be the someone who delivers.",
+   "Raid — anxiety, flogging — Storm the stockade; leave the rest to burn.",
+   "Hunt — freedom, blackmail — The trail is fresh; the bounty is fresher.",
+   "Lead-hunt — motherhood, partition — Sweep the region for rumors worth chasing.",
+   "Investigate — sorrow, ambush — Find out what actually happened — and to whom.",
+   "Raid — obligation, arrears — Hit the camp before first light and take what they owe.",
+   "Lead-hunt — indifference, eviction — Buy drinks, open ears, bring back threads.",
+   "Rescue — truth, border — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — conscience, torture — Sweep the region for rumors worth chasing.",
+   "Contract — mischief, eviction — A quiet favor for a loud purse."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "dismay",
+   "loan",
+   "collapse",
+   "mutineer"
+  ],
+  "intake": "it was found while looking for something else",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Stonegarth",
+   "Greyshaw"
+  ],
+  "framedCharacter": {
+   "name": "Hildeth of the Ford",
+   "tags": "human; female",
+   "pronoun": "she",
+   "partial": true
+  },
+  "avoid": [
+   "Raid — anxiety, flogging — Storm the stockade; leave the rest to burn.",
+   "Hunt — freedom, blackmail — The trail is fresh; the bounty is fresher.",
+   "Lead-hunt — motherhood, partition — Sweep the region for rumors worth chasing.",
+   "Investigate — sorrow, ambush — Find out what actually happened — and to whom.",
+   "Raid — obligation, arrears — Hit the camp before first light and take what they owe.",
+   "Lead-hunt — indifference, eviction — Buy drinks, open ears, bring back threads.",
+   "Rescue — truth, border — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — conscience, torture — Sweep the region for rumors worth chasing.",
+   "Contract — mischief, eviction — A quiet favor for a loud purse.",
+   "Raid — suffering, fostering — Hit the camp before first light and take what they owe."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the loggers' winter huts.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "damnation",
+   "raid",
+   "stargazing",
+   "believed"
+  ],
+  "opening": {
+   "spark": "a village elder · a gift · late afternoon"
+  },
+  "intake": "a visitor put it before the company",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Sedgedale",
+   "Fernwell"
+  ],
+  "framedCharacter": {
+   "name": "Karalgar",
+   "tags": "wolfman; female",
+   "pronoun": "she",
+   "partial": true
+  },
+  "avoid": [
+   "Hunt — freedom, blackmail — The trail is fresh; the bounty is fresher.",
+   "Lead-hunt — motherhood, partition — Sweep the region for rumors worth chasing.",
+   "Investigate — sorrow, ambush — Find out what actually happened — and to whom.",
+   "Raid — obligation, arrears — Hit the camp before first light and take what they owe.",
+   "Lead-hunt — indifference, eviction — Buy drinks, open ears, bring back threads.",
+   "Rescue — truth, border — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — conscience, torture — Sweep the region for rumors worth chasing.",
+   "Contract — mischief, eviction — A quiet favor for a loud purse.",
+   "Raid — suffering, fostering — Hit the camp before first light and take what they owe.",
+   "Rescue — dismay, loan — Get them out before the trail goes cold."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "triumph",
+   "oath",
+   "highwayman",
+   "phoenix"
+  ],
+  "intake": "the company's own searching turned it up",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Linghollow",
+   "Whinmere"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Lead-hunt — motherhood, partition — Sweep the region for rumors worth chasing.",
+   "Investigate — sorrow, ambush — Find out what actually happened — and to whom.",
+   "Raid — obligation, arrears — Hit the camp before first light and take what they owe.",
+   "Lead-hunt — indifference, eviction — Buy drinks, open ears, bring back threads.",
+   "Rescue — truth, border — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — conscience, torture — Sweep the region for rumors worth chasing.",
+   "Contract — mischief, eviction — A quiet favor for a loud purse.",
+   "Raid — suffering, fostering — Hit the camp before first light and take what they owe.",
+   "Rescue — dismay, loan — Get them out before the trail goes cold.",
+   "Rescue — damnation, raid — Someone wants them back. Go be the someone who delivers."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "investigate",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the charcoal-burners' camps.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "negligence",
+   "investigation",
+   "archer",
+   "premature"
+  ],
+  "intake": "the company dug until this came loose",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Nethergate",
+   "Coldhollow"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Investigate — sorrow, ambush — Find out what actually happened — and to whom.",
+   "Raid — obligation, arrears — Hit the camp before first light and take what they owe.",
+   "Lead-hunt — indifference, eviction — Buy drinks, open ears, bring back threads.",
+   "Rescue — truth, border — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — conscience, torture — Sweep the region for rumors worth chasing.",
+   "Contract — mischief, eviction — A quiet favor for a loud purse.",
+   "Raid — suffering, fostering — Hit the camp before first light and take what they owe.",
+   "Rescue — dismay, loan — Get them out before the trail goes cold.",
+   "Rescue — damnation, raid — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — triumph, oath — Buy drinks, open ears, bring back threads."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "contract",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the warden-stones on the ridgeline.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "whatever worth the work shakes loose + coin",
+  "keywords": [
+   "brotherhood",
+   "custom",
+   "gauntlet"
+  ],
+  "opening": {
+   "spark": "a tenant farmer · a token"
+  },
+  "intake": "whoever carried it did not linger",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Yarwick",
+   "Fallea"
+  ],
+  "framedCharacter": null,
+  "avoid": []
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "calm",
+   "robbery",
+   "bull",
+   "limping"
+  ],
+  "intake": "it is written where anyone can read it",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Raventhorpe",
+   "Oakford"
+  ],
+  "framedCharacter": {
+   "name": "Finnorieth Duskbough",
+   "tags": "elf; female",
+   "pronoun": "she",
+   "partial": true
+  },
+  "avoid": [
+   "Contract — brotherhood, custom — Do the job, take the coin, ask nothing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the beekeepers' clearings.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "harshness",
+   "deception",
+   "bread",
+   "trampled"
+  ],
+  "opening": {
+   "spark": "prices doubled overnight · by the old bridge"
+  },
+  "intake": "it showed itself before any word of it came",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Stonefen",
+   "Tarnlea"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — brotherhood, custom — Do the job, take the coin, ask nothing.",
+   "Rescue — calm, robbery — Get them out before the trail goes cold."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the river ford and its shallows.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "alliance",
+   "tradition",
+   "heaven",
+   "last"
+  ],
+  "opening": {
+   "spark": "a midwife · a price · in fog"
+  },
+  "intake": "it was brought to the company directly",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Ashstead",
+   "Duncroft"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — brotherhood, custom — Do the job, take the coin, ask nothing.",
+   "Rescue — calm, robbery — Get them out before the trail goes cold.",
+   "Raid — harshness, deception — Hit the camp before first light and take what they owe."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "modesty",
+   "illegitimacy",
+   "tallow",
+   "tarnished"
+  ],
+  "intake": "it was lying under a question no one had asked yet",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Woldgate",
+   "Sedgegarth"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — brotherhood, custom — Do the job, take the coin, ask nothing.",
+   "Rescue — calm, robbery — Get them out before the trail goes cold.",
+   "Raid — harshness, deception — Hit the camp before first light and take what they owe.",
+   "Hunt — alliance, tradition — Track it. Corner it. End it."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "investigate",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the charcoal-burners' camps.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "the pick of what the job turns up + coin",
+  "keywords": [
+   "patience",
+   "border",
+   "chancellor"
+  ],
+  "intake": "it came home with the last patrol",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Rushwell",
+   "Greygate"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — brotherhood, custom — Do the job, take the coin, ask nothing.",
+   "Rescue — calm, robbery — Get them out before the trail goes cold.",
+   "Raid — harshness, deception — Hit the camp before first light and take what they owe.",
+   "Hunt — alliance, tradition — Track it. Corner it. End it.",
+   "Lead-hunt — modesty, illegitimacy — Buy drinks, open ears, bring back threads."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "mildness",
+   "sanctuary",
+   "saffron",
+   "marble"
+  ],
+  "intake": "it grew out of business already done",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Lingwell",
+   "Marlholt"
+  ],
+  "framedCharacter": {
+   "name": "Raetus of the Ford",
+   "tags": "human; male",
+   "pronoun": "he",
+   "partial": true
+  },
+  "avoid": [
+   "Contract — brotherhood, custom — Do the job, take the coin, ask nothing.",
+   "Rescue — calm, robbery — Get them out before the trail goes cold.",
+   "Raid — harshness, deception — Hit the camp before first light and take what they owe.",
+   "Hunt — alliance, tradition — Track it. Corner it. End it.",
+   "Lead-hunt — modesty, illegitimacy — Buy drinks, open ears, bring back threads.",
+   "Investigate — patience, border — Ask the questions no one else dares ask."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the river ford and its shallows.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "denial",
+   "pawn",
+   "enchantress",
+   "cloaked"
+  ],
+  "opening": {
+   "spark": "a widow · a threat"
+  },
+  "intake": "it was brought to the company directly",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Dewgate",
+   "Thornwell"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — brotherhood, custom — Do the job, take the coin, ask nothing.",
+   "Rescue — calm, robbery — Get them out before the trail goes cold.",
+   "Raid — harshness, deception — Hit the camp before first light and take what they owe.",
+   "Hunt — alliance, tradition — Track it. Corner it. End it.",
+   "Lead-hunt — modesty, illegitimacy — Buy drinks, open ears, bring back threads.",
+   "Investigate — patience, border — Ask the questions no one else dares ask.",
+   "Rescue — mildness, sanctuary — Get them out before the trail goes cold."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the old elf road.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "ruthlessness",
+   "occupation",
+   "beggar",
+   "figurehead"
+  ],
+  "intake": "it surfaced along the way of other work",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Hawgill",
+   "Birworth"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — brotherhood, custom — Do the job, take the coin, ask nothing.",
+   "Rescue — calm, robbery — Get them out before the trail goes cold.",
+   "Raid — harshness, deception — Hit the camp before first light and take what they owe.",
+   "Hunt — alliance, tradition — Track it. Corner it. End it.",
+   "Lead-hunt — modesty, illegitimacy — Buy drinks, open ears, bring back threads.",
+   "Investigate — patience, border — Ask the questions no one else dares ask.",
+   "Rescue — mildness, sanctuary — Get them out before the trail goes cold.",
+   "Raid — denial, pawn — Storm the stockade; leave the rest to burn."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the charcoal-burners' camps.",
+  "level": 6,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "bereavement",
+   "riddle",
+   "tutor",
+   "trampled"
+  ],
+  "intake": "word of it came home with the last job",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Elmwick",
+   "Elmmarch"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — brotherhood, custom — Do the job, take the coin, ask nothing.",
+   "Rescue — calm, robbery — Get them out before the trail goes cold.",
+   "Raid — harshness, deception — Hit the camp before first light and take what they owe.",
+   "Hunt — alliance, tradition — Track it. Corner it. End it.",
+   "Lead-hunt — modesty, illegitimacy — Buy drinks, open ears, bring back threads.",
+   "Investigate — patience, border — Ask the questions no one else dares ask.",
+   "Rescue — mildness, sanctuary — Get them out before the trail goes cold.",
+   "Raid — denial, pawn — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — ruthlessness, occupation — Buy drinks, open ears, bring back threads."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the river ford and its shallows.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "wariness",
+   "adultery",
+   "name-day",
+   "advisor"
+  ],
+  "intake": "everyone tells it a little differently",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Ferngarth",
+   "Elmcot"
+  ],
+  "framedCharacter": {
+   "name": "Veeka-La Scale-of-Bronze",
+   "tags": "lizardman; female",
+   "pronoun": "she",
+   "partial": true
+  },
+  "avoid": [
+   "Contract — brotherhood, custom — Do the job, take the coin, ask nothing.",
+   "Rescue — calm, robbery — Get them out before the trail goes cold.",
+   "Raid — harshness, deception — Hit the camp before first light and take what they owe.",
+   "Hunt — alliance, tradition — Track it. Corner it. End it.",
+   "Lead-hunt — modesty, illegitimacy — Buy drinks, open ears, bring back threads.",
+   "Investigate — patience, border — Ask the questions no one else dares ask.",
+   "Rescue — mildness, sanctuary — Get them out before the trail goes cold.",
+   "Raid — denial, pawn — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — ruthlessness, occupation — Buy drinks, open ears, bring back threads.",
+   "Hunt — bereavement, riddle — Track it. Corner it. End it."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "temperance",
+   "indictment",
+   "louse",
+   "embalmer"
+  ],
+  "intake": "it was found while looking for something else",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Dewcroft",
+   "Brambrook"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Rescue — calm, robbery — Get them out before the trail goes cold.",
+   "Raid — harshness, deception — Hit the camp before first light and take what they owe.",
+   "Hunt — alliance, tradition — Track it. Corner it. End it.",
+   "Lead-hunt — modesty, illegitimacy — Buy drinks, open ears, bring back threads.",
+   "Investigate — patience, border — Ask the questions no one else dares ask.",
+   "Rescue — mildness, sanctuary — Get them out before the trail goes cold.",
+   "Raid — denial, pawn — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — ruthlessness, occupation — Buy drinks, open ears, bring back threads.",
+   "Hunt — bereavement, riddle — Track it. Corner it. End it.",
+   "Rescue — wariness, adultery — Someone wants them back. Go be the someone who delivers."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 5,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "restlessness",
+   "banishment",
+   "hoe"
+  ],
+  "intake": "it was owed to the company before anyone named it",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Ashgate",
+   "Dewworth"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Raid — harshness, deception — Hit the camp before first light and take what they owe.",
+   "Hunt — alliance, tradition — Track it. Corner it. End it.",
+   "Lead-hunt — modesty, illegitimacy — Buy drinks, open ears, bring back threads.",
+   "Investigate — patience, border — Ask the questions no one else dares ask.",
+   "Rescue — mildness, sanctuary — Get them out before the trail goes cold.",
+   "Raid — denial, pawn — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — ruthlessness, occupation — Buy drinks, open ears, bring back threads.",
+   "Hunt — bereavement, riddle — Track it. Corner it. End it.",
+   "Rescue — wariness, adultery — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — temperance, indictment — Buy drinks, open ears, bring back threads."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "escort",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the warden-stones on the ridgeline.",
+  "level": 5,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "whatever worth the work shakes loose + coin",
+  "keywords": [
+   "horror",
+   "proposal",
+   "rainbow",
+   "candlelit"
+  ],
+  "intake": "it grew out of business already done",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Dungate",
+   "Dewbrook"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Hunt — alliance, tradition — Track it. Corner it. End it.",
+   "Lead-hunt — modesty, illegitimacy — Buy drinks, open ears, bring back threads.",
+   "Investigate — patience, border — Ask the questions no one else dares ask.",
+   "Rescue — mildness, sanctuary — Get them out before the trail goes cold.",
+   "Raid — denial, pawn — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — ruthlessness, occupation — Buy drinks, open ears, bring back threads.",
+   "Hunt — bereavement, riddle — Track it. Corner it. End it.",
+   "Rescue — wariness, adultery — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — temperance, indictment — Buy drinks, open ears, bring back threads.",
+   "Raid — restlessness, banishment — Storm the stockade; leave the rest to burn."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "investigate",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the beekeepers' clearings.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "the pick of what the job turns up + coin",
+  "keywords": [
+   "thrill",
+   "wager",
+   "falconer",
+   "mist"
+  ],
+  "intake": "it was lying under a question no one had asked yet",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Hawwick",
+   "Netherbrook"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Lead-hunt — modesty, illegitimacy — Buy drinks, open ears, bring back threads.",
+   "Investigate — patience, border — Ask the questions no one else dares ask.",
+   "Rescue — mildness, sanctuary — Get them out before the trail goes cold.",
+   "Raid — denial, pawn — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — ruthlessness, occupation — Buy drinks, open ears, bring back threads.",
+   "Hunt — bereavement, riddle — Track it. Corner it. End it.",
+   "Rescue — wariness, adultery — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — temperance, indictment — Buy drinks, open ears, bring back threads.",
+   "Raid — restlessness, banishment — Storm the stockade; leave the rest to burn.",
+   "Escort — horror, proposal — Walk them to the gate and dare anyone to object."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 6,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "first claim on what the road yields + coin",
+  "keywords": [
+   "mistrust",
+   "abdication",
+   "reindeer",
+   "heart"
+  ],
+  "intake": "it was found while looking for something else",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Stonegarth",
+   "Ravencroft"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Investigate — patience, border — Ask the questions no one else dares ask.",
+   "Rescue — mildness, sanctuary — Get them out before the trail goes cold.",
+   "Raid — denial, pawn — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — ruthlessness, occupation — Buy drinks, open ears, bring back threads.",
+   "Hunt — bereavement, riddle — Track it. Corner it. End it.",
+   "Rescue — wariness, adultery — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — temperance, indictment — Buy drinks, open ears, bring back threads.",
+   "Raid — restlessness, banishment — Storm the stockade; leave the rest to burn.",
+   "Escort — horror, proposal — Walk them to the gate and dare anyone to object.",
+   "Investigate — thrill, wager — Find out what actually happened — and to whom."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the warden-stones on the ridgeline.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "indignity",
+   "dare",
+   "astronomer",
+   "butter"
+  ],
+  "opening": {
+   "spark": "circling crows · at the crossroads"
+  },
+  "intake": "it was seen from the fort's own walls",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Ashstead",
+   "Peatstead"
+  ],
+  "framedCharacter": {
+   "name": "Umbuudalin",
+   "tags": "elf; female",
+   "pronoun": "she",
+   "partial": true
+  },
+  "avoid": [
+   "Rescue — mildness, sanctuary — Get them out before the trail goes cold.",
+   "Raid — denial, pawn — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — ruthlessness, occupation — Buy drinks, open ears, bring back threads.",
+   "Hunt — bereavement, riddle — Track it. Corner it. End it.",
+   "Rescue — wariness, adultery — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — temperance, indictment — Buy drinks, open ears, bring back threads.",
+   "Raid — restlessness, banishment — Storm the stockade; leave the rest to burn.",
+   "Escort — horror, proposal — Walk them to the gate and dare anyone to object.",
+   "Investigate — thrill, wager — Find out what actually happened — and to whom.",
+   "Hunt — mistrust, abdication — Track it. Corner it. End it."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 5,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "retribution",
+   "revolt",
+   "race",
+   "dungeon"
+  ],
+  "intake": "finishing one matter uncovered this one",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Birgate",
+   "Greyhollow"
+  ],
+  "framedCharacter": {
+   "name": "Gwinir Greenmantle",
+   "tags": "elf; male",
+   "pronoun": "he",
+   "partial": true
+  },
+  "avoid": [
+   "Raid — denial, pawn — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — ruthlessness, occupation — Buy drinks, open ears, bring back threads.",
+   "Hunt — bereavement, riddle — Track it. Corner it. End it.",
+   "Rescue — wariness, adultery — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — temperance, indictment — Buy drinks, open ears, bring back threads.",
+   "Raid — restlessness, banishment — Storm the stockade; leave the rest to burn.",
+   "Escort — horror, proposal — Walk them to the gate and dare anyone to object.",
+   "Investigate — thrill, wager — Find out what actually happened — and to whom.",
+   "Hunt — mistrust, abdication — Track it. Corner it. End it.",
+   "Rescue — indignity, dare — Get them out before the trail goes cold."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort; the ruin of Thornhollow lies at their heart. Known ground: the warden-stones on the ridgeline.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "curiosity",
+   "amnesty",
+   "horse",
+   "weasel"
+  ],
+  "intake": "the company's own searching turned it up",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Linggate",
+   "Ashcroft"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Lead-hunt — ruthlessness, occupation — Buy drinks, open ears, bring back threads.",
+   "Hunt — bereavement, riddle — Track it. Corner it. End it.",
+   "Rescue — wariness, adultery — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — temperance, indictment — Buy drinks, open ears, bring back threads.",
+   "Raid — restlessness, banishment — Storm the stockade; leave the rest to burn.",
+   "Escort — horror, proposal — Walk them to the gate and dare anyone to object.",
+   "Investigate — thrill, wager — Find out what actually happened — and to whom.",
+   "Hunt — mistrust, abdication — Track it. Corner it. End it.",
+   "Rescue — indignity, dare — Get them out before the trail goes cold.",
+   "Rescue — retribution, revolt — Get them out before the trail goes cold."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "contract",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "obsession",
+   "promise",
+   "stableboy",
+   "fairy"
+  ],
+  "opening": {
+   "spark": "a washerwoman · a grievance · at first light"
+  },
+  "intake": "it was carried to the gate in person",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Dewcroft",
+   "Dewmoss"
+  ],
+  "framedCharacter": null,
+  "avoid": []
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "courtship",
+   "cuckoldry",
+   "viper",
+   "hoarded"
+  ],
+  "opening": {
+   "spark": "a ferryman · a bounty"
+  },
+  "intake": "whoever carried it did not linger",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Coldgate",
+   "Nethermoss"
+  ],
+  "framedCharacter": {
+   "name": "Faylva",
+   "tags": "wolfman; female",
+   "pronoun": "she",
+   "partial": true
+  },
+  "avoid": [
+   "Contract — obsession, promise — A quiet favor for a loud purse."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort; the ruin of Thornhollow lies at their heart.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "whatever worth the work shakes loose + coin",
+  "keywords": [
+   "survival",
+   "confession",
+   "sickle"
+  ],
+  "intake": "word of it came home with the last job",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Stonemoss",
+   "Ashwell"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — obsession, promise — A quiet favor for a loud purse.",
+   "Rescue — courtship, cuckoldry — Someone wants them back. Go be the someone who delivers."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "selfishness",
+   "harboring",
+   "knocking"
+  ],
+  "opening": {
+   "spark": "a shipmaster · an apology"
+  },
+  "intake": "it came through the gate with the morning's callers",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Milldale",
+   "Lingbarrow"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — obsession, promise — A quiet favor for a loud purse.",
+   "Rescue — courtship, cuckoldry — Someone wants them back. Go be the someone who delivers.",
+   "Raid — survival, confession — Hit the camp before first light and take what they owe."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the river ford and its shallows.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "joy",
+   "unmasking",
+   "twilight",
+   "effigy"
+  ],
+  "opening": {
+   "spark": "a missed market day"
+  },
+  "intake": "the company saw it before hearing of it",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Tarnbrook",
+   "Yarbrook"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — obsession, promise — A quiet favor for a loud purse.",
+   "Rescue — courtship, cuckoldry — Someone wants them back. Go be the someone who delivers.",
+   "Raid — survival, confession — Hit the camp before first light and take what they owe.",
+   "Raid — selfishness, harboring — Storm the stockade; leave the rest to burn."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "self-importance",
+   "cave-in",
+   "hoop",
+   "icon"
+  ],
+  "intake": "the company dug until this came loose",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Rushmoss",
+   "Dunmoss"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — obsession, promise — A quiet favor for a loud purse.",
+   "Rescue — courtship, cuckoldry — Someone wants them back. Go be the someone who delivers.",
+   "Raid — survival, confession — Hit the camp before first light and take what they owe.",
+   "Raid — selfishness, harboring — Storm the stockade; leave the rest to burn.",
+   "Hunt — joy, unmasking — Track it. Corner it. End it."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "investigate",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the river ford and its shallows.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "poverty",
+   "looting",
+   "surgeon",
+   "forfeited"
+  ],
+  "opening": {
+   "spark": "a dry stream"
+  },
+  "intake": "the signs of it are plain from the walls",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Birbourne",
+   "Harrowlea"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — obsession, promise — A quiet favor for a loud purse.",
+   "Rescue — courtship, cuckoldry — Someone wants them back. Go be the someone who delivers.",
+   "Raid — survival, confession — Hit the camp before first light and take what they owe.",
+   "Raid — selfishness, harboring — Storm the stockade; leave the rest to burn.",
+   "Hunt — joy, unmasking — Track it. Corner it. End it.",
+   "Lead-hunt — self-importance, cave-in — Sweep the region for rumors worth chasing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the warden-stones on the ridgeline.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "whatever worth the work shakes loose + coin",
+  "keywords": [
+   "godlessness",
+   "dismissal",
+   "labyrinth",
+   "two-headed"
+  ],
+  "opening": {
+   "spark": "an abandoned cart"
+  },
+  "intake": "the walls have a view of it",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Greylea",
+   "Elmwick"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — obsession, promise — A quiet favor for a loud purse.",
+   "Rescue — courtship, cuckoldry — Someone wants them back. Go be the someone who delivers.",
+   "Raid — survival, confession — Hit the camp before first light and take what they owe.",
+   "Raid — selfishness, harboring — Storm the stockade; leave the rest to burn.",
+   "Hunt — joy, unmasking — Track it. Corner it. End it.",
+   "Lead-hunt — self-importance, cave-in — Sweep the region for rumors worth chasing.",
+   "Investigate — poverty, looting — Ask the questions no one else dares ask."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "reconciliation",
+   "assassination",
+   "nightfall",
+   "dusk"
+  ],
+  "intake": "the company's own searching turned it up",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Hawgate",
+   "Ravenmarch"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — obsession, promise — A quiet favor for a loud purse.",
+   "Rescue — courtship, cuckoldry — Someone wants them back. Go be the someone who delivers.",
+   "Raid — survival, confession — Hit the camp before first light and take what they owe.",
+   "Raid — selfishness, harboring — Storm the stockade; leave the rest to burn.",
+   "Hunt — joy, unmasking — Track it. Corner it. End it.",
+   "Lead-hunt — self-importance, cave-in — Sweep the region for rumors worth chasing.",
+   "Investigate — poverty, looting — Ask the questions no one else dares ask.",
+   "Raid — godlessness, dismissal — Storm the stockade; leave the rest to burn."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "whatever worth the work shakes loose + coin",
+  "keywords": [
+   "mastery",
+   "bribe",
+   "stilts"
+  ],
+  "intake": "it grew out of business already done",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Elmfen",
+   "Woldmere"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — obsession, promise — A quiet favor for a loud purse.",
+   "Rescue — courtship, cuckoldry — Someone wants them back. Go be the someone who delivers.",
+   "Raid — survival, confession — Hit the camp before first light and take what they owe.",
+   "Raid — selfishness, harboring — Storm the stockade; leave the rest to burn.",
+   "Hunt — joy, unmasking — Track it. Corner it. End it.",
+   "Lead-hunt — self-importance, cave-in — Sweep the region for rumors worth chasing.",
+   "Investigate — poverty, looting — Ask the questions no one else dares ask.",
+   "Raid — godlessness, dismissal — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — reconciliation, assassination — Sweep the region for rumors worth chasing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "contract",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the charcoal-burners' camps.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "the pick of what the job turns up + coin",
+  "keywords": [
+   "eagerness",
+   "vendetta",
+   "guide",
+   "battlement"
+  ],
+  "intake": "it was found while looking for something else",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Ashford",
+   "Hawbrook"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — obsession, promise — A quiet favor for a loud purse.",
+   "Rescue — courtship, cuckoldry — Someone wants them back. Go be the someone who delivers.",
+   "Raid — survival, confession — Hit the camp before first light and take what they owe.",
+   "Raid — selfishness, harboring — Storm the stockade; leave the rest to burn.",
+   "Hunt — joy, unmasking — Track it. Corner it. End it.",
+   "Lead-hunt — self-importance, cave-in — Sweep the region for rumors worth chasing.",
+   "Investigate — poverty, looting — Ask the questions no one else dares ask.",
+   "Raid — godlessness, dismissal — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — reconciliation, assassination — Sweep the region for rumors worth chasing.",
+   "Hunt — mastery, bribe — The trail is fresh; the bounty is fresher."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "escort",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the beekeepers' clearings.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "whatever worth the work shakes loose + coin",
+  "keywords": [
+   "purity",
+   "betrothal",
+   "ant",
+   "noose"
+  ],
+  "intake": "the company dug until this came loose",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Peatford",
+   "Elmbourne"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Rescue — courtship, cuckoldry — Someone wants them back. Go be the someone who delivers.",
+   "Raid — survival, confession — Hit the camp before first light and take what they owe.",
+   "Raid — selfishness, harboring — Storm the stockade; leave the rest to burn.",
+   "Hunt — joy, unmasking — Track it. Corner it. End it.",
+   "Lead-hunt — self-importance, cave-in — Sweep the region for rumors worth chasing.",
+   "Investigate — poverty, looting — Ask the questions no one else dares ask.",
+   "Raid — godlessness, dismissal — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — reconciliation, assassination — Sweep the region for rumors worth chasing.",
+   "Hunt — mastery, bribe — The trail is fresh; the bounty is fresher.",
+   "Contract — eagerness, vendetta — A quiet favor for a loud purse."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort; the ruin of Thornhollow lies at their heart. Known ground: the charcoal-burners' camps.",
+  "level": 6,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "brutality",
+   "refuge",
+   "traveler",
+   "dove"
+  ],
+  "intake": "it was owed to the company before anyone named it",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Thornford",
+   "Dundale"
+  ],
+  "framedCharacter": {
+   "name": "Firthaedal",
+   "tags": "elf; male",
+   "pronoun": "he",
+   "partial": true
+  },
+  "avoid": [
+   "Raid — survival, confession — Hit the camp before first light and take what they owe.",
+   "Raid — selfishness, harboring — Storm the stockade; leave the rest to burn.",
+   "Hunt — joy, unmasking — Track it. Corner it. End it.",
+   "Lead-hunt — self-importance, cave-in — Sweep the region for rumors worth chasing.",
+   "Investigate — poverty, looting — Ask the questions no one else dares ask.",
+   "Raid — godlessness, dismissal — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — reconciliation, assassination — Sweep the region for rumors worth chasing.",
+   "Hunt — mastery, bribe — The trail is fresh; the bounty is fresher.",
+   "Contract — eagerness, vendetta — A quiet favor for a loud purse.",
+   "Escort — purity, betrothal — Walk them to the gate and dare anyone to object."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "investigate",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the charcoal-burners' camps.",
+  "level": 7,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "the pick of what the job turns up + coin",
+  "keywords": [
+   "partnership",
+   "discovery",
+   "shirt",
+   "venison"
+  ],
+  "intake": "finishing one matter uncovered this one",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Whinmarch",
+   "Cragholt"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Raid — selfishness, harboring — Storm the stockade; leave the rest to burn.",
+   "Hunt — joy, unmasking — Track it. Corner it. End it.",
+   "Lead-hunt — self-importance, cave-in — Sweep the region for rumors worth chasing.",
+   "Investigate — poverty, looting — Ask the questions no one else dares ask.",
+   "Raid — godlessness, dismissal — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — reconciliation, assassination — Sweep the region for rumors worth chasing.",
+   "Hunt — mastery, bribe — The trail is fresh; the bounty is fresher.",
+   "Contract — eagerness, vendetta — A quiet favor for a loud purse.",
+   "Escort — purity, betrothal — Walk them to the gate and dare anyone to object.",
+   "Rescue — brutality, refuge — Someone wants them back. Go be the someone who delivers."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "courage",
+   "lockout",
+   "valley",
+   "horn"
+  ],
+  "intake": "the company dug until this came loose",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Coldbrook",
+   "Marlfen"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Hunt — joy, unmasking — Track it. Corner it. End it.",
+   "Lead-hunt — self-importance, cave-in — Sweep the region for rumors worth chasing.",
+   "Investigate — poverty, looting — Ask the questions no one else dares ask.",
+   "Raid — godlessness, dismissal — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — reconciliation, assassination — Sweep the region for rumors worth chasing.",
+   "Hunt — mastery, bribe — The trail is fresh; the bounty is fresher.",
+   "Contract — eagerness, vendetta — A quiet favor for a loud purse.",
+   "Escort — purity, betrothal — Walk them to the gate and dare anyone to object.",
+   "Rescue — brutality, refuge — Someone wants them back. Go be the someone who delivers.",
+   "Investigate — partnership, discovery — Find out what actually happened — and to whom."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the old elf road.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "whatever worth the work shakes loose + coin",
+  "keywords": [
+   "failure",
+   "stalemate",
+   "firstborn",
+   "moneylender"
+  ],
+  "intake": "it was owed to the company before anyone named it",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Birhollow",
+   "Dewgarth"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Lead-hunt — self-importance, cave-in — Sweep the region for rumors worth chasing.",
+   "Investigate — poverty, looting — Ask the questions no one else dares ask.",
+   "Raid — godlessness, dismissal — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — reconciliation, assassination — Sweep the region for rumors worth chasing.",
+   "Hunt — mastery, bribe — The trail is fresh; the bounty is fresher.",
+   "Contract — eagerness, vendetta — A quiet favor for a loud purse.",
+   "Escort — purity, betrothal — Walk them to the gate and dare anyone to object.",
+   "Rescue — brutality, refuge — Someone wants them back. Go be the someone who delivers.",
+   "Investigate — partnership, discovery — Find out what actually happened — and to whom.",
+   "Lead-hunt — courage, lockout — Buy drinks, open ears, bring back threads."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "escort",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the charcoal-burners' camps.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "knowledge",
+   "overcharge",
+   "oracle",
+   "trance"
+  ],
+  "intake": "the company dug until this came loose",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Fernwell",
+   "Oakfen"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Investigate — poverty, looting — Ask the questions no one else dares ask.",
+   "Raid — godlessness, dismissal — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — reconciliation, assassination — Sweep the region for rumors worth chasing.",
+   "Hunt — mastery, bribe — The trail is fresh; the bounty is fresher.",
+   "Contract — eagerness, vendetta — A quiet favor for a loud purse.",
+   "Escort — purity, betrothal — Walk them to the gate and dare anyone to object.",
+   "Rescue — brutality, refuge — Someone wants them back. Go be the someone who delivers.",
+   "Investigate — partnership, discovery — Find out what actually happened — and to whom.",
+   "Lead-hunt — courage, lockout — Buy drinks, open ears, bring back threads.",
+   "Hunt — failure, stalemate — Track it. Corner it. End it."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "contract",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the old elf road.",
+  "level": 7,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "industry",
+   "brawl",
+   "mercenary",
+   "basilisk"
+  ],
+  "intake": "the company's own searching turned it up",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Yarstead",
+   "Hawford"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Raid — godlessness, dismissal — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — reconciliation, assassination — Sweep the region for rumors worth chasing.",
+   "Hunt — mastery, bribe — The trail is fresh; the bounty is fresher.",
+   "Contract — eagerness, vendetta — A quiet favor for a loud purse.",
+   "Escort — purity, betrothal — Walk them to the gate and dare anyone to object.",
+   "Rescue — brutality, refuge — Someone wants them back. Go be the someone who delivers.",
+   "Investigate — partnership, discovery — Find out what actually happened — and to whom.",
+   "Lead-hunt — courage, lockout — Buy drinks, open ears, bring back threads.",
+   "Hunt — failure, stalemate — Track it. Corner it. End it.",
+   "Escort — knowledge, overcharge — See the cargo through the pass. Whole."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "absolution",
+   "fraud",
+   "brewery",
+   "potter"
+  ],
+  "opening": {
+   "spark": "a shipmaster · an offer · after dark"
+  },
+  "intake": "whoever carried it did not linger",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Milllea",
+   "Greyfen"
+  ],
+  "framedCharacter": {
+   "name": "Anakletos of Millbrook",
+   "tags": "human; male",
+   "pronoun": "he",
+   "partial": true
+  },
+  "avoid": [
+   "Lead-hunt — reconciliation, assassination — Sweep the region for rumors worth chasing.",
+   "Hunt — mastery, bribe — The trail is fresh; the bounty is fresher.",
+   "Contract — eagerness, vendetta — A quiet favor for a loud purse.",
+   "Escort — purity, betrothal — Walk them to the gate and dare anyone to object.",
+   "Rescue — brutality, refuge — Someone wants them back. Go be the someone who delivers.",
+   "Investigate — partnership, discovery — Find out what actually happened — and to whom.",
+   "Lead-hunt — courage, lockout — Buy drinks, open ears, bring back threads.",
+   "Hunt — failure, stalemate — Track it. Corner it. End it.",
+   "Escort — knowledge, overcharge — See the cargo through the pass. Whole.",
+   "Contract — industry, brawl — A quiet favor for a loud purse."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "contract",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the beekeepers' clearings.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "industry",
+   "indenture",
+   "census",
+   "envied"
+  ],
+  "intake": "it was picked up from common talk in the country nearby",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Oakfen",
+   "Harrowbourne"
+  ],
+  "framedCharacter": null,
+  "avoid": []
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "folly",
+   "dare",
+   "coffin",
+   "shipwreck"
+  ],
+  "opening": {
+   "spark": "a creditor · an invitation"
+  },
+  "intake": "whoever carried it did not linger",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Sedgecroft",
+   "Hawfen"
+  ],
+  "framedCharacter": {
+   "name": "Nurov Sorrowsong",
+   "tags": "elf; male",
+   "pronoun": "he",
+   "partial": true
+  },
+  "avoid": [
+   "Contract — industry, indenture — A quiet favor for a loud purse."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the river ford and its shallows.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "sorrow",
+   "fasting",
+   "brass",
+   "meeting"
+  ],
+  "opening": {
+   "spark": "a hunter · a name"
+  },
+  "intake": "it was carried to the gate in person",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Falmere",
+   "Dunworth"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — industry, indenture — A quiet favor for a loud purse.",
+   "Rescue — folly, dare — Someone wants them back. Go be the someone who delivers."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "first claim on what the road yields + coin",
+  "keywords": [
+   "helplessness",
+   "surplus",
+   "stocking",
+   "savage"
+  ],
+  "opening": {
+   "spark": "a straggler · a list"
+  },
+  "intake": "whoever carried it did not linger",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Falbrook",
+   "Woldbourne"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — industry, indenture — A quiet favor for a loud purse.",
+   "Rescue — folly, dare — Someone wants them back. Go be the someone who delivers.",
+   "Raid — sorrow, fasting — Hit the camp before first light and take what they owe."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the old elf road.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "self-loathing",
+   "trickery",
+   "fire",
+   "faded"
+  ],
+  "intake": "it surfaced along the way of other work",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Peatgate",
+   "Bircombe"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — industry, indenture — A quiet favor for a loud purse.",
+   "Rescue — folly, dare — Someone wants them back. Go be the someone who delivers.",
+   "Raid — sorrow, fasting — Hit the camp before first light and take what they owe.",
+   "Hunt — helplessness, surplus — The trail is fresh; the bounty is fresher."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "investigate",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the loggers' winter huts.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "whatever worth the work shakes loose + coin",
+  "keywords": [
+   "astonishment",
+   "lie",
+   "pancake",
+   "unfinished"
+  ],
+  "opening": {
+   "spark": "a shepherd · a demand"
+  },
+  "intake": "someone came to the fort with it",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Thornholt",
+   "Ravenstead"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — industry, indenture — A quiet favor for a loud purse.",
+   "Rescue — folly, dare — Someone wants them back. Go be the someone who delivers.",
+   "Raid — sorrow, fasting — Hit the camp before first light and take what they owe.",
+   "Hunt — helplessness, surplus — The trail is fresh; the bounty is fresher.",
+   "Lead-hunt — self-loathing, trickery — Sweep the region for rumors worth chasing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the river ford and its shallows.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "abandonment",
+   "drowning",
+   "creature"
+  ],
+  "opening": {
+   "spark": "a drunk · an accusation"
+  },
+  "intake": "it came through the gate with the morning's callers",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Elmmoss",
+   "Dewshaw"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — industry, indenture — A quiet favor for a loud purse.",
+   "Rescue — folly, dare — Someone wants them back. Go be the someone who delivers.",
+   "Raid — sorrow, fasting — Hit the camp before first light and take what they owe.",
+   "Hunt — helplessness, surplus — The trail is fresh; the bounty is fresher.",
+   "Lead-hunt — self-loathing, trickery — Sweep the region for rumors worth chasing.",
+   "Investigate — astonishment, lie — Find out what actually happened — and to whom."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the charcoal-burners' camps.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "meekness",
+   "boast",
+   "mitten",
+   "anklet"
+  ],
+  "intake": "the company dug until this came loose",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Hawcroft",
+   "Lingwell"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — industry, indenture — A quiet favor for a loud purse.",
+   "Rescue — folly, dare — Someone wants them back. Go be the someone who delivers.",
+   "Raid — sorrow, fasting — Hit the camp before first light and take what they owe.",
+   "Hunt — helplessness, surplus — The trail is fresh; the bounty is fresher.",
+   "Lead-hunt — self-loathing, trickery — Sweep the region for rumors worth chasing.",
+   "Investigate — astonishment, lie — Find out what actually happened — and to whom.",
+   "Raid — abandonment, drowning — Storm the stockade; leave the rest to burn."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "knowledge",
+   "faction",
+   "winter",
+   "beam"
+  ],
+  "intake": "it grew out of business already done",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Oakhollow",
+   "Bramstead"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — industry, indenture — A quiet favor for a loud purse.",
+   "Rescue — folly, dare — Someone wants them back. Go be the someone who delivers.",
+   "Raid — sorrow, fasting — Hit the camp before first light and take what they owe.",
+   "Hunt — helplessness, surplus — The trail is fresh; the bounty is fresher.",
+   "Lead-hunt — self-loathing, trickery — Sweep the region for rumors worth chasing.",
+   "Investigate — astonishment, lie — Find out what actually happened — and to whom.",
+   "Raid — abandonment, drowning — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — meekness, boast — Sweep the region for rumors worth chasing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort; the ruin of Thornhollow lies at their heart.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "certainty",
+   "eavesdropping",
+   "nightshade",
+   "caged"
+  ],
+  "intake": "it was lying under a question no one had asked yet",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Millholt",
+   "Falhollow"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — industry, indenture — A quiet favor for a loud purse.",
+   "Rescue — folly, dare — Someone wants them back. Go be the someone who delivers.",
+   "Raid — sorrow, fasting — Hit the camp before first light and take what they owe.",
+   "Hunt — helplessness, surplus — The trail is fresh; the bounty is fresher.",
+   "Lead-hunt — self-loathing, trickery — Sweep the region for rumors worth chasing.",
+   "Investigate — astonishment, lie — Find out what actually happened — and to whom.",
+   "Raid — abandonment, drowning — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — meekness, boast — Sweep the region for rumors worth chasing.",
+   "Raid — knowledge, faction — Hit the camp before first light and take what they owe."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "investigate",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the warden-stones on the ridgeline.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "whatever worth the work shakes loose + coin",
+  "keywords": [
+   "distress",
+   "repossession",
+   "shipment",
+   "one-eyed"
+  ],
+  "intake": "it was owed to the company before anyone named it",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Nethergate",
+   "Fernholt"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — industry, indenture — A quiet favor for a loud purse.",
+   "Rescue — folly, dare — Someone wants them back. Go be the someone who delivers.",
+   "Raid — sorrow, fasting — Hit the camp before first light and take what they owe.",
+   "Hunt — helplessness, surplus — The trail is fresh; the bounty is fresher.",
+   "Lead-hunt — self-loathing, trickery — Sweep the region for rumors worth chasing.",
+   "Investigate — astonishment, lie — Find out what actually happened — and to whom.",
+   "Raid — abandonment, drowning — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — meekness, boast — Sweep the region for rumors worth chasing.",
+   "Raid — knowledge, faction — Hit the camp before first light and take what they owe.",
+   "Lead-hunt — certainty, eavesdropping — Sweep the region for rumors worth chasing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "first claim on what the road yields + coin",
+  "keywords": [
+   "bloodlust",
+   "cheating",
+   "fast",
+   "regent"
+  ],
+  "intake": "the company dug until this came loose",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Dewhollow",
+   "Dewwell"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Rescue — folly, dare — Someone wants them back. Go be the someone who delivers.",
+   "Raid — sorrow, fasting — Hit the camp before first light and take what they owe.",
+   "Hunt — helplessness, surplus — The trail is fresh; the bounty is fresher.",
+   "Lead-hunt — self-loathing, trickery — Sweep the region for rumors worth chasing.",
+   "Investigate — astonishment, lie — Find out what actually happened — and to whom.",
+   "Raid — abandonment, drowning — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — meekness, boast — Sweep the region for rumors worth chasing.",
+   "Raid — knowledge, faction — Hit the camp before first light and take what they owe.",
+   "Lead-hunt — certainty, eavesdropping — Sweep the region for rumors worth chasing.",
+   "Investigate — distress, repossession — Find out what actually happened — and to whom."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "contract",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the old elf road.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "friendship",
+   "fraud",
+   "inspector"
+  ],
+  "intake": "the company dug until this came loose",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Coldford",
+   "Hawwick"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Raid — sorrow, fasting — Hit the camp before first light and take what they owe.",
+   "Hunt — helplessness, surplus — The trail is fresh; the bounty is fresher.",
+   "Lead-hunt — self-loathing, trickery — Sweep the region for rumors worth chasing.",
+   "Investigate — astonishment, lie — Find out what actually happened — and to whom.",
+   "Raid — abandonment, drowning — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — meekness, boast — Sweep the region for rumors worth chasing.",
+   "Raid — knowledge, faction — Hit the camp before first light and take what they owe.",
+   "Lead-hunt — certainty, eavesdropping — Sweep the region for rumors worth chasing.",
+   "Investigate — distress, repossession — Find out what actually happened — and to whom.",
+   "Hunt — bloodlust, cheating — Track it. Corner it. End it."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "relief",
+   "coup",
+   "badger",
+   "secret"
+  ],
+  "intake": "your own people walked into it",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Dewdale",
+   "Sedgestead"
+  ],
+  "framedCharacter": {
+   "name": "Nistel",
+   "tags": "elf; female",
+   "pronoun": "she",
+   "partial": true
+  },
+  "avoid": [
+   "Hunt — helplessness, surplus — The trail is fresh; the bounty is fresher.",
+   "Lead-hunt — self-loathing, trickery — Sweep the region for rumors worth chasing.",
+   "Investigate — astonishment, lie — Find out what actually happened — and to whom.",
+   "Raid — abandonment, drowning — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — meekness, boast — Sweep the region for rumors worth chasing.",
+   "Raid — knowledge, faction — Hit the camp before first light and take what they owe.",
+   "Lead-hunt — certainty, eavesdropping — Sweep the region for rumors worth chasing.",
+   "Investigate — distress, repossession — Find out what actually happened — and to whom.",
+   "Hunt — bloodlust, cheating — Track it. Corner it. End it.",
+   "Contract — friendship, fraud — Do the job, take the coin, ask nothing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the old elf road.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "envy",
+   "snub",
+   "vulture",
+   "king"
+  ],
+  "intake": "it was lying under a question no one had asked yet",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Dunmere",
+   "Ashcroft"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Lead-hunt — self-loathing, trickery — Sweep the region for rumors worth chasing.",
+   "Investigate — astonishment, lie — Find out what actually happened — and to whom.",
+   "Raid — abandonment, drowning — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — meekness, boast — Sweep the region for rumors worth chasing.",
+   "Raid — knowledge, faction — Hit the camp before first light and take what they owe.",
+   "Lead-hunt — certainty, eavesdropping — Sweep the region for rumors worth chasing.",
+   "Investigate — distress, repossession — Find out what actually happened — and to whom.",
+   "Hunt — bloodlust, cheating — Track it. Corner it. End it.",
+   "Contract — friendship, fraud — Do the job, take the coin, ask nothing.",
+   "Rescue — relief, coup — Someone wants them back. Go be the someone who delivers."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 5,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "slavery",
+   "discovery",
+   "acolyte",
+   "turret"
+  ],
+  "intake": "word of it came home with the last job",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Craghollow",
+   "Tarnthorpe"
+  ],
+  "framedCharacter": {
+   "name": "Meleril Thistledown",
+   "tags": "elf; female",
+   "pronoun": "she",
+   "partial": true
+  },
+  "avoid": [
+   "Investigate — astonishment, lie — Find out what actually happened — and to whom.",
+   "Raid — abandonment, drowning — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — meekness, boast — Sweep the region for rumors worth chasing.",
+   "Raid — knowledge, faction — Hit the camp before first light and take what they owe.",
+   "Lead-hunt — certainty, eavesdropping — Sweep the region for rumors worth chasing.",
+   "Investigate — distress, repossession — Find out what actually happened — and to whom.",
+   "Hunt — bloodlust, cheating — Track it. Corner it. End it.",
+   "Contract — friendship, fraud — Do the job, take the coin, ask nothing.",
+   "Rescue — relief, coup — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — envy, snub — Sweep the region for rumors worth chasing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 7,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "first claim on what the road yields + coin",
+  "keywords": [
+   "poverty",
+   "intimidation",
+   "vineyard",
+   "giant"
+  ],
+  "intake": "it was lying under a question no one had asked yet",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Elmholt",
+   "Harrowthorpe"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Raid — abandonment, drowning — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — meekness, boast — Sweep the region for rumors worth chasing.",
+   "Raid — knowledge, faction — Hit the camp before first light and take what they owe.",
+   "Lead-hunt — certainty, eavesdropping — Sweep the region for rumors worth chasing.",
+   "Investigate — distress, repossession — Find out what actually happened — and to whom.",
+   "Hunt — bloodlust, cheating — Track it. Corner it. End it.",
+   "Contract — friendship, fraud — Do the job, take the coin, ask nothing.",
+   "Rescue — relief, coup — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — envy, snub — Sweep the region for rumors worth chasing.",
+   "Rescue — slavery, discovery — Get them out before the trail goes cold."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "investigate",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the beekeepers' clearings.",
+  "level": 5,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "first claim on what the road yields + coin",
+  "keywords": [
+   "infamy",
+   "clemency",
+   "landlord",
+   "flood"
+  ],
+  "intake": "the company's own searching turned it up",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Whinstead",
+   "Ashbrook"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Lead-hunt — meekness, boast — Sweep the region for rumors worth chasing.",
+   "Raid — knowledge, faction — Hit the camp before first light and take what they owe.",
+   "Lead-hunt — certainty, eavesdropping — Sweep the region for rumors worth chasing.",
+   "Investigate — distress, repossession — Find out what actually happened — and to whom.",
+   "Hunt — bloodlust, cheating — Track it. Corner it. End it.",
+   "Contract — friendship, fraud — Do the job, take the coin, ask nothing.",
+   "Rescue — relief, coup — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — envy, snub — Sweep the region for rumors worth chasing.",
+   "Rescue — slavery, discovery — Get them out before the trail goes cold.",
+   "Raid — poverty, intimidation — Hit the camp before first light and take what they owe."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "tenderness",
+   "beheading",
+   "ink",
+   "coded"
+  ],
+  "opening": {
+   "spark": "doors barred in daylight · by the old bridge"
+  },
+  "intake": "the company saw it before hearing of it",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Falwell",
+   "Ravenbrook"
+  ],
+  "framedCharacter": {
+   "name": "Beenalz",
+   "tags": "lizardman; male",
+   "pronoun": "he",
+   "partial": true
+  },
+  "avoid": [
+   "Raid — knowledge, faction — Hit the camp before first light and take what they owe.",
+   "Lead-hunt — certainty, eavesdropping — Sweep the region for rumors worth chasing.",
+   "Investigate — distress, repossession — Find out what actually happened — and to whom.",
+   "Hunt — bloodlust, cheating — Track it. Corner it. End it.",
+   "Contract — friendship, fraud — Do the job, take the coin, ask nothing.",
+   "Rescue — relief, coup — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — envy, snub — Sweep the region for rumors worth chasing.",
+   "Rescue — slavery, discovery — Get them out before the trail goes cold.",
+   "Raid — poverty, intimidation — Hit the camp before first light and take what they owe.",
+   "Investigate — infamy, clemency — Ask the questions no one else dares ask."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the old elf road.",
+  "level": 5,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "distress",
+   "shortage",
+   "informer"
+  ],
+  "intake": "it was lying under a question no one had asked yet",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Woldgarth",
+   "Hawmere"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Lead-hunt — certainty, eavesdropping — Sweep the region for rumors worth chasing.",
+   "Investigate — distress, repossession — Find out what actually happened — and to whom.",
+   "Hunt — bloodlust, cheating — Track it. Corner it. End it.",
+   "Contract — friendship, fraud — Do the job, take the coin, ask nothing.",
+   "Rescue — relief, coup — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — envy, snub — Sweep the region for rumors worth chasing.",
+   "Rescue — slavery, discovery — Get them out before the trail goes cold.",
+   "Raid — poverty, intimidation — Hit the camp before first light and take what they owe.",
+   "Investigate — infamy, clemency — Ask the questions no one else dares ask.",
+   "Rescue — tenderness, beheading — Get them out before the trail goes cold."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the warden-stones on the ridgeline.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "dependence",
+   "cuckoldry",
+   "claw"
+  ],
+  "intake": "it was found while looking for something else",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Lingmarch",
+   "Rushfen"
+  ],
+  "framedCharacter": {
+   "name": "Olquamir",
+   "tags": "elf; male",
+   "pronoun": "he",
+   "partial": true
+  },
+  "avoid": [
+   "Investigate — distress, repossession — Find out what actually happened — and to whom.",
+   "Hunt — bloodlust, cheating — Track it. Corner it. End it.",
+   "Contract — friendship, fraud — Do the job, take the coin, ask nothing.",
+   "Rescue — relief, coup — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — envy, snub — Sweep the region for rumors worth chasing.",
+   "Rescue — slavery, discovery — Get them out before the trail goes cold.",
+   "Raid — poverty, intimidation — Hit the camp before first light and take what they owe.",
+   "Investigate — infamy, clemency — Ask the questions no one else dares ask.",
+   "Rescue — tenderness, beheading — Get them out before the trail goes cold.",
+   "Lead-hunt — distress, shortage — Sweep the region for rumors worth chasing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 6,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "first claim on what the road yields + coin",
+  "keywords": [
+   "extravagance",
+   "cuckoldry",
+   "orchard",
+   "yew"
+  ],
+  "intake": "it surfaced along the way of other work",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Marlbarrow",
+   "Birgarth"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Hunt — bloodlust, cheating — Track it. Corner it. End it.",
+   "Contract — friendship, fraud — Do the job, take the coin, ask nothing.",
+   "Rescue — relief, coup — Someone wants them back. Go be the someone who delivers.",
+   "Lead-hunt — envy, snub — Sweep the region for rumors worth chasing.",
+   "Rescue — slavery, discovery — Get them out before the trail goes cold.",
+   "Raid — poverty, intimidation — Hit the camp before first light and take what they owe.",
+   "Investigate — infamy, clemency — Ask the questions no one else dares ask.",
+   "Rescue — tenderness, beheading — Get them out before the trail goes cold.",
+   "Lead-hunt — distress, shortage — Sweep the region for rumors worth chasing.",
+   "Rescue — dependence, cuckoldry — Get them out before the trail goes cold."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "contract",
+  "location": "Western Forests — Old-growth elven forests west of the fort; the ruin of Thornhollow lies at their heart.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "lust",
+   "clearing",
+   "gossip",
+   "haymaking"
+  ],
+  "opening": {
+   "spark": "carts leaving full and returning empty"
+  },
+  "intake": "it sits in plain sight of the watch",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Hawcot",
+   "Linggill"
+  ],
+  "framedCharacter": null,
+  "avoid": []
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "industry",
+   "collateral",
+   "heirloom",
+   "beekeeper"
+  ],
+  "opening": {
+   "spark": "a hired guard · a tale · in fog"
+  },
+  "intake": "it was brought to the company directly",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Sedgegarth",
+   "Dunford"
+  ],
+  "framedCharacter": {
+   "name": "Eucarpia",
+   "tags": "human; female",
+   "pronoun": "she",
+   "partial": true
+  },
+  "avoid": [
+   "Contract — lust, clearing — Do the job, take the coin, ask nothing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "intolerance",
+   "blight",
+   "madman",
+   "ball"
+  ],
+  "opening": {
+   "spark": "a riderless horse · on the cart road"
+  },
+  "intake": "it was seen from the fort's own walls",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Marlgill",
+   "Greythorpe"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — lust, clearing — Do the job, take the coin, ask nothing.",
+   "Rescue — industry, collateral — Someone wants them back. Go be the someone who delivers."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the old elf road.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "the pick of what the job turns up + coin",
+  "keywords": [
+   "wrath",
+   "dispute",
+   "crown",
+   "stocking"
+  ],
+  "intake": "it is the story every visitor tells this week",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Oakmere",
+   "Harrowhollow"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — lust, clearing — Do the job, take the coin, ask nothing.",
+   "Rescue — industry, collateral — Someone wants them back. Go be the someone who delivers.",
+   "Raid — intolerance, blight — Hit the camp before first light and take what they owe."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "mistrust",
+   "blunder",
+   "wall",
+   "singed"
+  ],
+  "intake": "it was found while looking for something else",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Raventhorpe",
+   "Fernbrook"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — lust, clearing — Do the job, take the coin, ask nothing.",
+   "Rescue — industry, collateral — Someone wants them back. Go be the someone who delivers.",
+   "Raid — intolerance, blight — Hit the camp before first light and take what they owe.",
+   "Hunt — wrath, dispute — Track it. Corner it. End it."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "mockery",
+   "misdirection",
+   "horse",
+   "gold"
+  ],
+  "intake": "it grew out of business already done",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Cragfen",
+   "Yarshaw"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — lust, clearing — Do the job, take the coin, ask nothing.",
+   "Rescue — industry, collateral — Someone wants them back. Go be the someone who delivers.",
+   "Raid — intolerance, blight — Hit the camp before first light and take what they owe.",
+   "Hunt — wrath, dispute — Track it. Corner it. End it.",
+   "Lead-hunt — mistrust, blunder — Sweep the region for rumors worth chasing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "investigate",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "serenity",
+   "unmasking",
+   "saga",
+   "witness"
+  ],
+  "opening": {
+   "spark": "travelers turning back · below the walls"
+  },
+  "intake": "it was seen from the fort's own walls",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Yarthorpe",
+   "Dunmoss"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — lust, clearing — Do the job, take the coin, ask nothing.",
+   "Rescue — industry, collateral — Someone wants them back. Go be the someone who delivers.",
+   "Raid — intolerance, blight — Hit the camp before first light and take what they owe.",
+   "Hunt — wrath, dispute — Track it. Corner it. End it.",
+   "Lead-hunt — mistrust, blunder — Sweep the region for rumors worth chasing.",
+   "Raid — mockery, misdirection — Hit the camp before first light and take what they owe."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "the pick of what the job turns up + coin",
+  "keywords": [
+   "zeal",
+   "wages",
+   "double",
+   "godchild"
+  ],
+  "opening": {
+   "spark": "a boat adrift · on the mill road"
+  },
+  "intake": "the fort noticed it before anyone spoke of it",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Falcombe",
+   "Rushhollow"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — lust, clearing — Do the job, take the coin, ask nothing.",
+   "Rescue — industry, collateral — Someone wants them back. Go be the someone who delivers.",
+   "Raid — intolerance, blight — Hit the camp before first light and take what they owe.",
+   "Hunt — wrath, dispute — Track it. Corner it. End it.",
+   "Lead-hunt — mistrust, blunder — Sweep the region for rumors worth chasing.",
+   "Raid — mockery, misdirection — Hit the camp before first light and take what they owe.",
+   "Investigate — serenity, unmasking — Find out what actually happened — and to whom."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the warden-stones on the ridgeline.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "first claim on what the road yields + coin",
+  "keywords": [
+   "slavery",
+   "strike",
+   "horseshoe",
+   "siren"
+  ],
+  "intake": "it grew out of business already done",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Hawmoss",
+   "Whinmarch"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — lust, clearing — Do the job, take the coin, ask nothing.",
+   "Rescue — industry, collateral — Someone wants them back. Go be the someone who delivers.",
+   "Raid — intolerance, blight — Hit the camp before first light and take what they owe.",
+   "Hunt — wrath, dispute — Track it. Corner it. End it.",
+   "Lead-hunt — mistrust, blunder — Sweep the region for rumors worth chasing.",
+   "Raid — mockery, misdirection — Hit the camp before first light and take what they owe.",
+   "Investigate — serenity, unmasking — Find out what actually happened — and to whom.",
+   "Raid — zeal, wages — Storm the stockade; leave the rest to burn."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the loggers' winter huts.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "restlessness",
+   "exchange",
+   "antidote",
+   "swallow"
+  ],
+  "intake": "it was lying under a question no one had asked yet",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Dewbourne",
+   "Woldworth"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — lust, clearing — Do the job, take the coin, ask nothing.",
+   "Rescue — industry, collateral — Someone wants them back. Go be the someone who delivers.",
+   "Raid — intolerance, blight — Hit the camp before first light and take what they owe.",
+   "Hunt — wrath, dispute — Track it. Corner it. End it.",
+   "Lead-hunt — mistrust, blunder — Sweep the region for rumors worth chasing.",
+   "Raid — mockery, misdirection — Hit the camp before first light and take what they owe.",
+   "Investigate — serenity, unmasking — Find out what actually happened — and to whom.",
+   "Raid — zeal, wages — Storm the stockade; leave the rest to burn.",
+   "Hunt — slavery, strike — Track it. Corner it. End it."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "courtship",
+   "sentence",
+   "peak",
+   "velvet"
+  ],
+  "opening": {
+   "spark": "a clerk · a confession"
+  },
+  "intake": "it came through the gate with the morning's callers",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Birworth",
+   "Brambourne"
+  ],
+  "framedCharacter": {
+   "name": "Mege of the Ford",
+   "tags": "human; female",
+   "pronoun": "she",
+   "partial": true
+  },
+  "avoid": [
+   "Contract — lust, clearing — Do the job, take the coin, ask nothing.",
+   "Rescue — industry, collateral — Someone wants them back. Go be the someone who delivers.",
+   "Raid — intolerance, blight — Hit the camp before first light and take what they owe.",
+   "Hunt — wrath, dispute — Track it. Corner it. End it.",
+   "Lead-hunt — mistrust, blunder — Sweep the region for rumors worth chasing.",
+   "Raid — mockery, misdirection — Hit the camp before first light and take what they owe.",
+   "Investigate — serenity, unmasking — Find out what actually happened — and to whom.",
+   "Raid — zeal, wages — Storm the stockade; leave the rest to burn.",
+   "Hunt — slavery, strike — Track it. Corner it. End it.",
+   "Lead-hunt — restlessness, exchange — Sweep the region for rumors worth chasing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the warden-stones on the ridgeline.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "obsession",
+   "clearing",
+   "rescue",
+   "full"
+  ],
+  "intake": "it surfaced along the way of other work",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Yarwell",
+   "Oakholt"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Rescue — industry, collateral — Someone wants them back. Go be the someone who delivers.",
+   "Raid — intolerance, blight — Hit the camp before first light and take what they owe.",
+   "Hunt — wrath, dispute — Track it. Corner it. End it.",
+   "Lead-hunt — mistrust, blunder — Sweep the region for rumors worth chasing.",
+   "Raid — mockery, misdirection — Hit the camp before first light and take what they owe.",
+   "Investigate — serenity, unmasking — Find out what actually happened — and to whom.",
+   "Raid — zeal, wages — Storm the stockade; leave the rest to burn.",
+   "Hunt — slavery, strike — Track it. Corner it. End it.",
+   "Lead-hunt — restlessness, exchange — Sweep the region for rumors worth chasing.",
+   "Rescue — courtship, sentence — Get them out before the trail goes cold."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "escort",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the beekeepers' clearings.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "whatever worth the work shakes loose + coin",
+  "keywords": [
+   "honesty",
+   "overcharge",
+   "deacon",
+   "translator"
+  ],
+  "intake": "it grew out of business already done",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Dewlea",
+   "Coldcroft"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Raid — intolerance, blight — Hit the camp before first light and take what they owe.",
+   "Hunt — wrath, dispute — Track it. Corner it. End it.",
+   "Lead-hunt — mistrust, blunder — Sweep the region for rumors worth chasing.",
+   "Raid — mockery, misdirection — Hit the camp before first light and take what they owe.",
+   "Investigate — serenity, unmasking — Find out what actually happened — and to whom.",
+   "Raid — zeal, wages — Storm the stockade; leave the rest to burn.",
+   "Hunt — slavery, strike — Track it. Corner it. End it.",
+   "Lead-hunt — restlessness, exchange — Sweep the region for rumors worth chasing.",
+   "Rescue — courtship, sentence — Get them out before the trail goes cold.",
+   "Lead-hunt — obsession, clearing — Sweep the region for rumors worth chasing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "investigate",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the warden-stones on the ridgeline.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "the pick of what the job turns up + coin",
+  "keywords": [
+   "infatuation",
+   "patronage",
+   "ladder"
+  ],
+  "intake": "it was found while looking for something else",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Peatgarth",
+   "Ashmoss"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Hunt — wrath, dispute — Track it. Corner it. End it.",
+   "Lead-hunt — mistrust, blunder — Sweep the region for rumors worth chasing.",
+   "Raid — mockery, misdirection — Hit the camp before first light and take what they owe.",
+   "Investigate — serenity, unmasking — Find out what actually happened — and to whom.",
+   "Raid — zeal, wages — Storm the stockade; leave the rest to burn.",
+   "Hunt — slavery, strike — Track it. Corner it. End it.",
+   "Lead-hunt — restlessness, exchange — Sweep the region for rumors worth chasing.",
+   "Rescue — courtship, sentence — Get them out before the trail goes cold.",
+   "Lead-hunt — obsession, clearing — Sweep the region for rumors worth chasing.",
+   "Escort — honesty, overcharge — Walk them to the gate and dare anyone to object."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the loggers' winter huts.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "disgust",
+   "alias",
+   "rescue",
+   "feverish"
+  ],
+  "intake": "the company dug until this came loose",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Nethermere",
+   "Oakwick"
+  ],
+  "framedCharacter": {
+   "name": "Teroni Ashveil",
+   "tags": "elf; female",
+   "pronoun": "she",
+   "partial": true
+  },
+  "avoid": [
+   "Lead-hunt — mistrust, blunder — Sweep the region for rumors worth chasing.",
+   "Raid — mockery, misdirection — Hit the camp before first light and take what they owe.",
+   "Investigate — serenity, unmasking — Find out what actually happened — and to whom.",
+   "Raid — zeal, wages — Storm the stockade; leave the rest to burn.",
+   "Hunt — slavery, strike — Track it. Corner it. End it.",
+   "Lead-hunt — restlessness, exchange — Sweep the region for rumors worth chasing.",
+   "Rescue — courtship, sentence — Get them out before the trail goes cold.",
+   "Lead-hunt — obsession, clearing — Sweep the region for rumors worth chasing.",
+   "Escort — honesty, overcharge — Walk them to the gate and dare anyone to object.",
+   "Investigate — infatuation, patronage — Find out what actually happened — and to whom."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the river ford and its shallows.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "obsession",
+   "fraud",
+   "stork"
+  ],
+  "intake": "it stands promised in public writing",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Sedgeford",
+   "Stonebarrow"
+  ],
+  "framedCharacter": {
+   "name": "Uresa",
+   "tags": "elf; female",
+   "pronoun": "she",
+   "partial": true
+  },
+  "avoid": [
+   "Raid — mockery, misdirection — Hit the camp before first light and take what they owe.",
+   "Investigate — serenity, unmasking — Find out what actually happened — and to whom.",
+   "Raid — zeal, wages — Storm the stockade; leave the rest to burn.",
+   "Hunt — slavery, strike — Track it. Corner it. End it.",
+   "Lead-hunt — restlessness, exchange — Sweep the region for rumors worth chasing.",
+   "Rescue — courtship, sentence — Get them out before the trail goes cold.",
+   "Lead-hunt — obsession, clearing — Sweep the region for rumors worth chasing.",
+   "Escort — honesty, overcharge — Walk them to the gate and dare anyone to object.",
+   "Investigate — infatuation, patronage — Find out what actually happened — and to whom.",
+   "Rescue — disgust, alias — Someone wants them back. Go be the someone who delivers."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the loggers' winter huts.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "reputation",
+   "rockfall",
+   "sled",
+   "wax"
+  ],
+  "intake": "the company's own searching turned it up",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Oakgate",
+   "Dunbourne"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Investigate — serenity, unmasking — Find out what actually happened — and to whom.",
+   "Raid — zeal, wages — Storm the stockade; leave the rest to burn.",
+   "Hunt — slavery, strike — Track it. Corner it. End it.",
+   "Lead-hunt — restlessness, exchange — Sweep the region for rumors worth chasing.",
+   "Rescue — courtship, sentence — Get them out before the trail goes cold.",
+   "Lead-hunt — obsession, clearing — Sweep the region for rumors worth chasing.",
+   "Escort — honesty, overcharge — Walk them to the gate and dare anyone to object.",
+   "Investigate — infatuation, patronage — Find out what actually happened — and to whom.",
+   "Rescue — disgust, alias — Someone wants them back. Go be the someone who delivers.",
+   "Rescue — obsession, fraud — Get them out before the trail goes cold."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "contract",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the old elf road.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "dependence",
+   "wooing",
+   "ford"
+  ],
+  "intake": "it was lying under a question no one had asked yet",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Elmthorpe",
+   "Ravencroft"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Raid — zeal, wages — Storm the stockade; leave the rest to burn.",
+   "Hunt — slavery, strike — Track it. Corner it. End it.",
+   "Lead-hunt — restlessness, exchange — Sweep the region for rumors worth chasing.",
+   "Rescue — courtship, sentence — Get them out before the trail goes cold.",
+   "Lead-hunt — obsession, clearing — Sweep the region for rumors worth chasing.",
+   "Escort — honesty, overcharge — Walk them to the gate and dare anyone to object.",
+   "Investigate — infatuation, patronage — Find out what actually happened — and to whom.",
+   "Rescue — disgust, alias — Someone wants them back. Go be the someone who delivers.",
+   "Rescue — obsession, fraud — Get them out before the trail goes cold.",
+   "Lead-hunt — reputation, rockfall — Buy drinks, open ears, bring back threads."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "contract",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "risk",
+   "flight",
+   "doppelganger"
+  ],
+  "intake": "everyone tells it a little differently",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Birfen",
+   "Peatmoss"
+  ],
+  "framedCharacter": null,
+  "avoid": []
+ },
+ {
+  "kind": "one-off",
+  "archetype": "rescue",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "a person who may join the company + coin",
+  "keywords": [
+   "debt",
+   "ultimatum",
+   "book",
+   "toad"
+  ],
+  "opening": {
+   "spark": "fresh-cut stumps past the boundary · in the south pasture"
+  },
+  "intake": "the fort noticed it before anyone spoke of it",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Harrowmarch",
+   "Linghollow"
+  ],
+  "framedCharacter": {
+   "name": "Turi Harrow",
+   "tags": "human; female",
+   "pronoun": "she",
+   "partial": true
+  },
+  "avoid": [
+   "Contract — risk, flight — Do the job, take the coin, ask nothing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the loggers' winter huts.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "tact",
+   "cave-in",
+   "nutmeg",
+   "jar"
+  ],
+  "intake": "it stands promised in public writing",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Marlshaw",
+   "Whincroft"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — risk, flight — Do the job, take the coin, ask nothing.",
+   "Rescue — debt, ultimatum — Someone wants them back. Go be the someone who delivers."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort; the ruin of Thornhollow lies at their heart. Known ground: the old elf road.",
+  "level": 1,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "first claim on what the road yields + coin",
+  "keywords": [
+   "outrage",
+   "occupation",
+   "cloak",
+   "sentry"
+  ],
+  "opening": {
+   "spark": "an old friend of the company · a boast"
+  },
+  "intake": "it arrived with a caller at the gate",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Stonemarch",
+   "Oakholt"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — risk, flight — Do the job, take the coin, ask nothing.",
+   "Rescue — debt, ultimatum — Someone wants them back. Go be the someone who delivers.",
+   "Raid — tact, cave-in — Hit the camp before first light and take what they owe."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "investigate",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "the pick of what the job turns up + coin",
+  "keywords": [
+   "power",
+   "assassination",
+   "whirlpool"
+  ],
+  "opening": {
+   "spark": "one of your own soldiers · a tale"
+  },
+  "intake": "it was brought to the company directly",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Falbarrow",
+   "Dewwell"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — risk, flight — Do the job, take the coin, ask nothing.",
+   "Rescue — debt, ultimatum — Someone wants them back. Go be the someone who delivers.",
+   "Raid — tact, cave-in — Hit the camp before first light and take what they owe.",
+   "Hunt — outrage, occupation — Track it. Corner it. End it."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "the pick of what the job turns up + coin",
+  "keywords": [
+   "fury",
+   "misdirection",
+   "informer",
+   "measure"
+  ],
+  "intake": "finishing one matter uncovered this one",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Ashbarrow",
+   "Ashford"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — risk, flight — Do the job, take the coin, ask nothing.",
+   "Rescue — debt, ultimatum — Someone wants them back. Go be the someone who delivers.",
+   "Raid — tact, cave-in — Hit the camp before first light and take what they owe.",
+   "Hunt — outrage, occupation — Track it. Corner it. End it.",
+   "Investigate — power, assassination — Find out what actually happened — and to whom."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "raid",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 2,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "fussiness",
+   "plague",
+   "herald",
+   "sacred"
+  ],
+  "intake": "it was picked up from common talk in the country nearby",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Sedgefen",
+   "Dewfen"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — risk, flight — Do the job, take the coin, ask nothing.",
+   "Rescue — debt, ultimatum — Someone wants them back. Go be the someone who delivers.",
+   "Raid — tact, cave-in — Hit the camp before first light and take what they owe.",
+   "Hunt — outrage, occupation — Track it. Corner it. End it.",
+   "Investigate — power, assassination — Find out what actually happened — and to whom.",
+   "Raid — fury, misdirection — Storm the stockade; leave the rest to burn."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the beekeepers' clearings.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "contentment",
+   "fine",
+   "ford"
+  ],
+  "intake": "the company's own searching turned it up",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Greygill",
+   "Hawlea"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — risk, flight — Do the job, take the coin, ask nothing.",
+   "Rescue — debt, ultimatum — Someone wants them back. Go be the someone who delivers.",
+   "Raid — tact, cave-in — Hit the camp before first light and take what they owe.",
+   "Hunt — outrage, occupation — Track it. Corner it. End it.",
+   "Investigate — power, assassination — Find out what actually happened — and to whom.",
+   "Raid — fury, misdirection — Storm the stockade; leave the rest to burn.",
+   "Raid — fussiness, plague — Storm the stockade; leave the rest to burn."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the beekeepers' clearings.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "jealousy",
+   "theft",
+   "breeches",
+   "hard-won"
+  ],
+  "intake": "it was found while looking for something else",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Ravenford",
+   "Colddale"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — risk, flight — Do the job, take the coin, ask nothing.",
+   "Rescue — debt, ultimatum — Someone wants them back. Go be the someone who delivers.",
+   "Raid — tact, cave-in — Hit the camp before first light and take what they owe.",
+   "Hunt — outrage, occupation — Track it. Corner it. End it.",
+   "Investigate — power, assassination — Find out what actually happened — and to whom.",
+   "Raid — fury, misdirection — Storm the stockade; leave the rest to burn.",
+   "Raid — fussiness, plague — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — contentment, fine — Buy drinks, open ears, bring back threads."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort. Known ground: the warden-stones on the ridgeline.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "pity",
+   "encounter",
+   "falconer"
+  ],
+  "intake": "it was found while looking for something else",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Nethershaw",
+   "Rushlea"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — risk, flight — Do the job, take the coin, ask nothing.",
+   "Rescue — debt, ultimatum — Someone wants them back. Go be the someone who delivers.",
+   "Raid — tact, cave-in — Hit the camp before first light and take what they owe.",
+   "Hunt — outrage, occupation — Track it. Corner it. End it.",
+   "Investigate — power, assassination — Find out what actually happened — and to whom.",
+   "Raid — fury, misdirection — Storm the stockade; leave the rest to burn.",
+   "Raid — fussiness, plague — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — contentment, fine — Buy drinks, open ears, bring back threads.",
+   "Lead-hunt — jealousy, theft — Buy drinks, open ears, bring back threads."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "lead-hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 4,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "fussiness",
+   "lawsuit",
+   "choirboy",
+   "wife"
+  ],
+  "intake": "it was found while looking for something else",
+  "gravity": "a grave affair",
+  "placeNameSuggestions": [
+   "Dunmoss",
+   "Yargarth"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Contract — risk, flight — Do the job, take the coin, ask nothing.",
+   "Rescue — debt, ultimatum — Someone wants them back. Go be the someone who delivers.",
+   "Raid — tact, cave-in — Hit the camp before first light and take what they owe.",
+   "Hunt — outrage, occupation — Track it. Corner it. End it.",
+   "Investigate — power, assassination — Find out what actually happened — and to whom.",
+   "Raid — fury, misdirection — Storm the stockade; leave the rest to burn.",
+   "Raid — fussiness, plague — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — contentment, fine — Buy drinks, open ears, bring back threads.",
+   "Lead-hunt — jealousy, theft — Buy drinks, open ears, bring back threads.",
+   "Lead-hunt — pity, encounter — Sweep the region for rumors worth chasing."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "escort",
+  "location": "Western Forests — Old-growth elven forests west of the fort; the ruin of Thornhollow lies at their heart. Known ground: the river ford and its shallows.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "annoyance",
+   "negotiation",
+   "crossbow",
+   "written"
+  ],
+  "intake": "it was owed to the company before anyone named it",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Yarfen",
+   "Fernfen"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Rescue — debt, ultimatum — Someone wants them back. Go be the someone who delivers.",
+   "Raid — tact, cave-in — Hit the camp before first light and take what they owe.",
+   "Hunt — outrage, occupation — Track it. Corner it. End it.",
+   "Investigate — power, assassination — Find out what actually happened — and to whom.",
+   "Raid — fury, misdirection — Storm the stockade; leave the rest to burn.",
+   "Raid — fussiness, plague — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — contentment, fine — Buy drinks, open ears, bring back threads.",
+   "Lead-hunt — jealousy, theft — Buy drinks, open ears, bring back threads.",
+   "Lead-hunt — pity, encounter — Sweep the region for rumors worth chasing.",
+   "Lead-hunt — fussiness, lawsuit — Buy drinks, open ears, bring back threads."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "contract",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 5,
+  "rarity": "common",
+  "slotCount": 1,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "welcome",
+   "monopoly",
+   "steel",
+   "locked"
+  ],
+  "intake": "it was found while looking for something else",
+  "gravity": "a small, everyday job",
+  "placeNameSuggestions": [
+   "Faldale",
+   "Elmfen"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Raid — tact, cave-in — Hit the camp before first light and take what they owe.",
+   "Hunt — outrage, occupation — Track it. Corner it. End it.",
+   "Investigate — power, assassination — Find out what actually happened — and to whom.",
+   "Raid — fury, misdirection — Storm the stockade; leave the rest to burn.",
+   "Raid — fussiness, plague — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — contentment, fine — Buy drinks, open ears, bring back threads.",
+   "Lead-hunt — jealousy, theft — Buy drinks, open ears, bring back threads.",
+   "Lead-hunt — pity, encounter — Sweep the region for rumors worth chasing.",
+   "Lead-hunt — fussiness, lawsuit — Buy drinks, open ears, bring back threads.",
+   "Escort — annoyance, negotiation — Walk them to the gate and dare anyone to object."
+  ]
+ },
+ {
+  "kind": "one-off",
+  "archetype": "hunt",
+  "location": "Western Forests — Old-growth elven forests west of the fort.",
+  "level": 3,
+  "rarity": "common",
+  "slotCount": 2,
+  "rewardEnvelope": "coin",
+  "keywords": [
+   "revulsion",
+   "apprenticing",
+   "elder",
+   "inherited"
+  ],
+  "intake": "it was lying under a question no one had asked yet",
+  "gravity": "a serious matter",
+  "placeNameSuggestions": [
+   "Yarwell",
+   "Dunhollow"
+  ],
+  "framedCharacter": null,
+  "avoid": [
+   "Hunt — outrage, occupation — Track it. Corner it. End it.",
+   "Investigate — power, assassination — Find out what actually happened — and to whom.",
+   "Raid — fury, misdirection — Storm the stockade; leave the rest to burn.",
+   "Raid — fussiness, plague — Storm the stockade; leave the rest to burn.",
+   "Lead-hunt — contentment, fine — Buy drinks, open ears, bring back threads.",
+   "Lead-hunt — jealousy, theft — Buy drinks, open ears, bring back threads.",
+   "Lead-hunt — pity, encounter — Sweep the region for rumors worth chasing.",
+   "Lead-hunt — fussiness, lawsuit — Buy drinks, open ears, bring back threads.",
+   "Escort — annoyance, negotiation — Walk them to the gate and dare anyone to object.",
+   "Contract — welcome, monopoly — A quiet favor for a loud purse."
+  ]
+ }
+]

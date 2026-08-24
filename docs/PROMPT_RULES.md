@@ -158,3 +158,30 @@ for style edits; every one below was measured, most the expensive way.
   pass** (designer 2026-07-18: sagas good, one-offs lag) — the reference craft is Sultan's Game /
   Fort of Chains: every setup's LAST sentence is a vector at the player's decision; each card
   WITHHOLDS exactly one named thing; failure plays deadpan; restraint at the extremes.
+
+## 11. The RESULT continues the CARD — it never re-tells it 🔒 *(designer ruling 2026-08-24)*
+Measured from the reference craft (Sultan's Game, 4 designer-supplied quests, 4/4; full samples and
+laws in `v3/scripts/prosebench/REFERENCE_SULTANS_RESULTS.md`):
+
+**Every result text opens by repeating its card's intro VERBATIM, then writes on past it.** The card
+is not consumed and discarded — it is the first line of the scene the result plays out. Designer:
+*"the one about having the quest intro be part of resolution is excellent."*
+
+We do the opposite today: `writeQuest` and the resolver generate independently, so the resolver
+re-imagines from engine facts a scene the player has already read, and the card's own images,
+client, and hook are thrown away at the moment they would pay off.
+
+What this implies for our prompts (targets — not yet implemented):
+- The resolver RECEIVES the card's situation text and continues it. It does not restate the
+  situation in new words (today's `deliveredSummary`-driven re-telling is the defect this fixes).
+- **The card's hook returns as SPEECH at the pivotal moment.** Reference: a card ending "many hunters
+  tried to tame it, but all returned empty-handed" pays off mid-result as the guide's whisper —
+  *"Many have tried to capture it. All have failed."* Setup on the card, payoff in the report.
+- **The pre-roll text ends on a LEAN, never a resolution** — an aphorism trailing off, a craving, or
+  the sent soldier rising to commit by name. Then the dice.
+- **The person the card kept anonymous is NAMED in the result.** This confirms anonymity-by-omission
+  (§4b) and tells us where the name belongs: the resolver names them at the moment they matter.
+- **The last line delivers a FEELING or points FORWARD, never a fact** — a win undercut by a worry, a
+  moment of wonder, or a promise of more. Tonal, not formulaic.
+- Numbers and amounts stay out of the prose; the grant line carries them (already our design, and
+  the reference confirms it).
