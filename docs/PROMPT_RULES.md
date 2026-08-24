@@ -159,29 +159,39 @@ for style edits; every one below was measured, most the expensive way.
   Fort of Chains: every setup's LAST sentence is a vector at the player's decision; each card
   WITHHOLDS exactly one named thing; failure plays deadpan; restraint at the extremes.
 
-## 11. The RESULT continues the CARD — it never re-tells it 🔒 *(designer ruling 2026-08-24)*
-Measured from the reference craft (Sultan's Game, 4 designer-supplied quests, 4/4; full samples and
-laws in `v3/scripts/prosebench/REFERENCE_SULTANS_RESULTS.md`):
+## 11. The RESULT continues the CARD — it never re-tells it 🔒 *(designer ruling 2026-08-24; CORRECTED 2026-08-24 after checking the shipped data)*
 
-**Every result text opens by repeating its card's intro VERBATIM, then writes on past it.** The card
-is not consumed and discarded — it is the first line of the scene the result plays out. Designer:
-*"the one about having the quest intro be part of resolution is excellent."*
+**The correction first, because the original wording of this section was wrong.** It said every
+result text "opens by repeating its card's intro VERBATIM". That was inferred from the designer's
+transcription, which reads *"RESULT: (repeat the before, then)"*. Checked against four shipped
+Sultan's Game rite configs (`rite/5000131`, `5000506`, `5000703`, `5000704`): **0 of 21 `result_text`
+fields contain their rite's intro.** The repetition is the game UI stacking the card above the
+result on screen — a DISPLAY behaviour, not authored duplication.
 
-We do the opposite today: `writeQuest` and the resolver generate independently, so the resolver
-re-imagines from engine facts a scene the player has already read, and the card's own images,
-client, and hook are thrown away at the moment they would pay off.
+**The law that survives, and it is the useful one:** the player reads card and result as ONE
+CONTINUOUS PASSAGE, so the result must be written as a CONTINUATION of the card — it neither repeats
+the card nor re-tells the situation in new words. Our resolver does the second thing today: it
+re-imagines from engine facts a scene the player has already read, discarding the card's own images,
+client and hook at the moment they would pay off.
 
 What this implies for our prompts (targets — not yet implemented):
-- The resolver RECEIVES the card's situation text and continues it. It does not restate the
-  situation in new words (today's `deliveredSummary`-driven re-telling is the defect this fixes).
-- **The card's hook returns as SPEECH at the pivotal moment.** Reference: a card ending "many hunters
-  tried to tame it, but all returned empty-handed" pays off mid-result as the guide's whisper —
-  *"Many have tried to capture it. All have failed."* Setup on the card, payoff in the report.
+- The resolver RECEIVES the card's situation text and writes what happens NEXT. It does not restate
+  the situation, and it does not repeat it either.
+- Consider showing the card text above the resolution in both UIs, as the reference does — that is
+  what makes the continuation read correctly.
+- **The card's hook may return as SPEECH at the pivotal moment.** Reference: a card ending "many
+  hunters tried to tame it, but all returned empty-handed" pays off mid-result as the guide's
+  whisper — *"Many have tried to capture it. All have failed."*
+- **Success and failure of the same check may open on the same sentence and diverge at the assigned
+  character's verb.** A device, not a rule: present in 5 of 21 shipped pairs, and in 4 of 4 within
+  one rite. Verbatim (translated): *"[s3.name] draws and looses, and is still a step slower than the
+  griffin's talons"* versus *"[s3.name]'s eye and hand are quick: the arrow blinds its left eye."*
 - **The pre-roll text ends on a LEAN, never a resolution** — an aphorism trailing off, a craving, or
   the sent soldier rising to commit by name. Then the dice.
 - **The person the card kept anonymous is NAMED in the result.** This confirms anonymity-by-omission
   (§4b) and tells us where the name belongs: the resolver names them at the moment they matter.
 - **The last line delivers a FEELING or points FORWARD, never a fact** — a win undercut by a worry, a
-  moment of wonder, or a promise of more. Tonal, not formulaic.
+  moment of wonder, or a promise of more. Tonal, not formulaic. In the reference, even the failure
+  branch plants a hook (*"maybe he will come back again"*).
 - Numbers and amounts stay out of the prose; the grant line carries them (already our design, and
   the reference confirms it).

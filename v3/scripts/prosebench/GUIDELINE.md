@@ -185,10 +185,18 @@ banned, because the fiction cannot know the player's stats.
 
 # PART C — THE RESULT
 
-**C1. Repeat the card's text verbatim, then write on past it.** 4/4 in the designer's samples;
-already ruled and recorded as `docs/PROMPT_RULES.md` §11.
+**C1. The result CONTINUES the card — it neither repeats it nor re-tells it.**
+*(Corrected 2026-08-24. This rule previously said "repeat the card's text verbatim, then write on
+past it", inferred from the designer's "(repeat the before, then)" transcription. Checked against
+four shipped rite configs: **0 of 21 `result_text` fields contain their intro.** The repetition is
+the game UI stacking card above result, not authored duplication.)*
+The player reads the two as one continuous passage, so the result must be written to follow on. Our
+resolver currently re-imagines the scene from engine facts — the defect this fixes. See
+`docs/PROMPT_RULES.md` §11.
 
-**C2. Success and failure are THE SAME SCENE, diverging at the assigned character's verb.**
+**C2. Success and failure MAY open on the same sentence and diverge at the assigned character's
+verb.** A device, not a universal rule — present in 5 of 21 shipped pairs, and 4 of 4 within a single
+rite.
 From the shipped configs, the two branches of one check open with an identical sentence and split at
 the moment of the act: *"[s3.name] draws and looses, and is still a step slower than the griffin's
 talons"* versus *"[s3.name]'s eye and hand are quick: the arrow blinds its left eye."*
