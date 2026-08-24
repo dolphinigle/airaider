@@ -12,9 +12,11 @@ official English was cross-matching ~98 wiki.gg `{{quote}}` pages against the Ch
 **That file is public, and a prior session already downloaded it into this very directory.**
 See `english_source_hunt.md`: `sultans_en/config.json`, 7,762,449 bytes, 38,797 keys, from
 `github.com/we1how/Sultan-s-Game_Data` (`StreamingAssets/i18n/en/config.json`). 23,375 of its keys
-are `rite_*`. The same repo also carries the **version-matched** Chinese structural config
-(`StreamingAssets/config/rite/*.json`, 1,382 rites), which supplies the piece the localisation file
-lacks: each settlement branch's dice/state **condition**.
+are `rite_*`. (A parallel session has since gzipped it and merged a second build in as
+`sultans_en/config_merged.json.gz`, 43,619 keys, zero value conflicts; `rite_record.py` prefers the
+merged file and falls back to the plain one.) The same repo also carries the **version-matched**
+Chinese structural config (`StreamingAssets/config/rite/*.json`, 1,382 rites), which supplies the
+piece the localisation file lacks: each settlement branch's dice/state **condition**.
 
 Joining those two gives a complete, verbatim, official-English record for essentially every rite in
 the game — intro, slot lines, dice line, and every outcome branch with its exact condition. The wiki
@@ -35,6 +37,11 @@ the localisation file is the shipped English (see Provenance below).
 | No English intro | 7 | intro is empty in the **Chinese** too (estate-expansion rites: `5000057`, `5000060`, `5000061`, `5000062`, `5006024`, `5006025`, `5008165`) |
 | No outcome branches at all | 9 | all named `Abandoned` / `Discard` — dead rite slots (`5000311`, `5000338`, `5000351`, `5000715`–`5000719`, `5008086`) |
 
+A further **113 rite ids** carry full English in the merged config but have **no public structural
+config** at that build (`5004834`–`5010214`), so their branch conditions cannot be reconstructed.
+Their English prose is still readable straight out of `config_merged.json.gz`; they are simply not
+representable as a conditioned record here.
+
 **Nothing in the rite corpus is CN-only.** Every field that has Chinese text has English text.
 There is no `[CN ONLY]` marking anywhere in the records below, because there is nothing to mark.
 
@@ -46,21 +53,21 @@ The wiki sweep was completed as specified before the pivot. Numbers, self-verifi
 - **98** pages contain `{{quote` — the brief's figure is exactly right.
 - **216** `{{quote}}` templates in those 98 pages; a further **978** italic / `mw-collapsible`
   prose blocks across **229** pages carry game text the `{{quote}}`-only sweep misses.
-- **238** distinct official English `rite_*` strings across **140 rites** are corroborated by
+- **249** distinct official English `rite_*` strings across **143 rites** are corroborated by
   that wiki prose. 163 of the matching blocks agree *verbatim* after whitespace/quote-mark
   normalisation; the rest agree on 5-gram word overlap, differing only because the wiki preserves
   an **earlier build's** official translation (e.g. rite `5008177`: wiki "While you anxiously
   ponder what the Cultists might do with your Conquest Card…" vs current build "While fretting
   over what the cultists might do with your Conquest Card…").
 
-Assembling *only* from the wiki, those 140 rites would have come out as:
+Assembling *only* from the wiki, those 143 rites would have come out as:
 
 | wiki-only outcome | rites |
 |---|---:|
 | Full record (intro + all outcomes) | **10** |
-| English intro + ≥1 English outcome | 18 |
-| English intro only | 89 |
-| Outcome fragments only, no intro | 23 |
+| English intro + ≥1 English outcome | 21 |
+| English intro only | 88 |
+| Outcome fragments only, no intro | 24 |
 
 So: **10 complete records from the wiki route, 1,366 from the localisation file** — and 8 of the 10
 are short rites with 1–3 branches. The wiki's prose also drifts: it is variously an older build's
@@ -87,6 +94,23 @@ file). Where the two disagree, the localisation file wins.
 3. **Untranslated runtime tokens survive.** Strings retain the engine's substitution tokens
    (`[player.name]`, `[s4.name]`, `[s4.gender(his, her)]`) — present in the shipped build, absent
    from any human retelling. Where the wiki says "Lord Arzu", the file says `Lord [player.name]`.
+
+---
+
+## What is NOT in these records (but is in the same file)
+
+A rite record covers the rite card only. Sultan's Game also puts prose in three other places, all
+present in `sultans_en/config.json` under different key prefixes:
+
+- `OPTION_*` / `PROMPT_*` — the choice pop-ups a rite fires *between* rites. This is where the
+  branch the wiki calls **"Adila's Confrontation"** actually lives (`OPTION_5320541_option_02_TEXT`:
+  *"She lowered her head, and after a while, she looked at you with determined eyes. 'I have found
+  that I love Maggie, sir.'"*). There is no rite id for it — which is why a wiki-driven pass hunting
+  it in `rite/` cannot find it. 1,728 `PROMPT_*` + 956 `OPTION_*` keys.
+- `card_*_plot_*` — per-card story beats (6,552 `card_*` keys total).
+- `after_*` — the after-story epilogues (2,758 keys). `over_*` (506) holds the endings.
+
+`rite_record.py` deliberately does not touch these; grep `config.json` directly for them.
 
 ---
 
@@ -136,8 +160,8 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 ---
 
 ## Zazie's Nightmare — rite `5000576` (莎姬的噩梦)
-**Confidence:** High — official `i18n/en` string for every field; 9 of them also appear verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
-**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5000576_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Zazie#A_More_Terrible_God, https://sultansgame.wiki.gg/wiki/Zazie#Bookstore_Encounter, https://sultansgame.wiki.gg/wiki/Zazie#God-Hunting, https://sultansgame.wiki.gg/wiki/Zazie#Lord_s_Ambition, https://sultansgame.wiki.gg/wiki/Zazie#Star-Burning
+**Confidence:** High — official `i18n/en` string for every field; 10 of them also appear verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5000576_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Zazie#A_More_Terrible_God, https://sultansgame.wiki.gg/wiki/Zazie#Bookstore_Encounter, https://sultansgame.wiki.gg/wiki/Zazie#God-Hunting, https://sultansgame.wiki.gg/wiki/Zazie#Lord_s_Ambition, https://sultansgame.wiki.gg/wiki/Zazie#Star-Burning, https://sultansgame.wiki.gg/wiki/Zazie#Zazie_s_Nightmare
 
 **Intro (EN):**
 > The Highlord torments Zazie nightly, each dream more terrifying than the last. You have methods to temporarily soothe the god's demands, easing her suffering. Other approaches might eliminate the problem entirely.
@@ -265,7 +289,7 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 
 ## Tailor Shop — rite `5000101` (裁缝店)
 **Confidence:** High — official `i18n/en` string for every field; 7 of them also appear verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
-**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5000101_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Arzuna#Tailor_Shop, https://sultansgame.wiki.gg/wiki/Jenna#Tailor_Shop, https://sultansgame.wiki.gg/wiki/Lady_Becky#Tailor_Shop, https://sultansgame.wiki.gg/wiki/The_Protagonist#Tailor_Shop, https://sultansgame.wiki.gg/wiki/The_Protagonist/Twin#Tailor_Shop, https://sultansgame.wiki.gg/wiki/Zaki#Entangled_in_Scandal, https://sultansgame.wiki.gg/wiki/Zephyr
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5000101_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Arzuna#Tailor_Shop, https://sultansgame.wiki.gg/wiki/Jenna#Tailor_Shop, https://sultansgame.wiki.gg/wiki/Lady_Becky#Tailor_Shop, https://sultansgame.wiki.gg/wiki/The_Protagonist#Tailor_Shop, https://sultansgame.wiki.gg/wiki/The_Protagonist/Twin#Tailor_Shop, https://sultansgame.wiki.gg/wiki/Zaki#Entangled_in_Scandal, https://sultansgame.wiki.gg/wiki/Zephyr, https://sultansgame.wiki.gg/wiki/Zephyr#Tailor_Shop
 
 **Intro (EN):**
 > Malkina offers her talents to style you or your followers.
@@ -402,7 +426,7 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 
 ## Charges and Defense — rite `5001026` (论罪与辩护)
 **Confidence:** High — official `i18n/en` string for every field; 7 of them also appear verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
-**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5001026_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Charges_and_Defence#Failure, https://sultansgame.wiki.gg/wiki/Charges_and_Defence#Partial_success, https://sultansgame.wiki.gg/wiki/Charges_and_Defence#Success
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5001026_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Charges_and_Defence, https://sultansgame.wiki.gg/wiki/Charges_and_Defence#Failure, https://sultansgame.wiki.gg/wiki/Charges_and_Defence#Partial_success, https://sultansgame.wiki.gg/wiki/Charges_and_Defence#Success
 
 **Intro (EN):**
 > The judges under the Sultan's command are known for their perfect parallel thinking. On the one hand, they turn a blind eye to the atrocities committed by the supreme ruler... On the other hand, they enforce the law on others with the strictest and most mechanical standards. This way, they can still claim to uphold the dignity of the law.
@@ -577,7 +601,7 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 > You wish to use the Carnality Card on my woman; only one of exactly matching tier will suffice.
 
 <!-- settlement_extre[10] -->
-**Outcome — branch, condition `{"杀戮": 1, "type": "sudan", "f:s6.rare-s4.rare=": 0, "s5.主角": 1, "!s7.is": 2000137, "s4.is": 2000349, "counter.7000059<": 1}`:**
+**Outcome — branch, condition `{"杀戮": 1, "type": "sudan", "f:s6.rare-s4.rare=": 0, "s5.主角": 1, "!s7.is": 2000137, "s4.is": 2000349, "counter.7000059<": 1}`:** *The Sultan rejects your request.*
 > When you reveal the card of Bloodshed in the Sultan's court, everyone holds their breath.
 >
 > After a moment of peace, you choose the one who just spoke on stage, Vizier Abdul. Facing the trembling Abdul, the Sultan permits him to call for help – it's more entertaining that way.
@@ -636,7 +660,7 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 > Your work is done.
 
 <!-- settlement_extre[16] -->
-**Outcome — branch, condition `{"s7.is": 2000174, "!s3.is": 2000009, "s5.主角": 1, "any": {"!s6.type": "sudan", "!s6.杀戮": 1, "!s6.rare<=": 3}}`:**
+**Outcome — branch, condition `{"s7.is": 2000174, "!s3.is": 2000009, "s5.主角": 1, "any": {"!s6.type": "sudan", "!s6.杀戮": 1, "!s6.rare<=": 3}}`:** *You report Sadani's Secret to the Sultan.*
 > You reported Sadani's secret to the Sultan, but the Sultan reacted indifferently, 'Is that so? I see.' He tapped the armrest of the throne lightly, saying no more. A few days later, you heard that a woman’s corpse, with its abdomen hollowed out, was found outside the city, possibly chewed by wild dogs.
 
 <!-- settlement_extre[17] -->
@@ -943,6 +967,143 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 > Hemir slips his hand into your wallet with silent precision... but as he rummages deeper and deeper, practically diving in with his whole body, he can't find even a single coin. Left with no choice, he exchanges an awkward forced smile with Alim...
 
 
+## Headless Dragons — rite `5001004` (群龙无首)
+**Confidence:** High — official `i18n/en` string for every field; 4 of them also appear verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5001004_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Rebellion, https://sultansgame.wiki.gg/wiki/The_Court#Headless_Dragons
+
+**Intro (EN):**
+> The Sultan is like the sun, projecting vast, distorted shadows named power when away from the court.
+
+**Slot lines (EN):**
+> s1: Conviction
+> s2: Insert 3 Intelligences of the same name and tier to synthesize
+> s3: Insert 3 Conviction of the same name to synthesize
+> s4: The True Taboo
+> s5: Other Matters Best Left Untold
+
+<!-- settlement[0] -->
+**Outcome — branch, condition `{"any": {"rite": 5000795}}`:**
+> The Sultan is still not seen today.
+
+<!-- settlement[1] -->
+**Outcome — branch, condition `{"s1.休息>=": 3}`:**
+> The Sultan has returned to his loyal court.
+
+<!-- settlement[2] -->
+**Outcome — branch, condition `{"s1.休息<": 3}`:**
+> The Sultan is still not seen today.
+
+<!-- settlement_extre[0] -->
+**Outcome — branch, condition `{"s2.is": 2000032}`:** *Reading Between the Lines*
+> One secret pulls out another secret, and in the exploration process, you're not sure if you're closer to or further from the truth.
+
+<!-- settlement_extre[1] -->
+**Outcome — branch, condition `{"s2.is": 2000038}`:** *Reading Between the Lines*
+> One secret pulls out another secret, and in the exploration process, you're not sure if you're closer to or further from the truth.
+
+<!-- settlement_extre[2] -->
+**Outcome — branch, condition `{"s2.is": 2000044}`:** *Reading Between the Lines*
+> One secret pulls out another secret, and in the exploration process, you're not sure if you're closer to or further from the truth.
+
+<!-- settlement_extre[3] -->
+**Outcome — branch, condition `{"s2.is": 2000033}`:** *Art of Relevance*
+> The inner philosophy of things is mostly universal; you've peered through to deeper mysteries.
+
+<!-- settlement_extre[4] -->
+**Outcome — branch, condition `{"s2.is": 2000039}`:** *Art of Relevance*
+> The inner philosophy of things is mostly universal; you've peered through to deeper mysteries.
+
+<!-- settlement_extre[5] -->
+**Outcome — branch, condition `{"s2.is": 2000045}`:** *Art of Relevance*
+> The inner philosophy of things is mostly universal; you've peered through to deeper mysteries.
+
+<!-- settlement_extre[6] -->
+**Outcome — branch, condition `{"s2.is": 2000034}`:** *Prepare yourself.*
+> No one can win always, but you now have confidence in catching more leaves when the wind blows.
+
+<!-- settlement_extre[7] -->
+**Outcome — branch, condition `{"s2.is": 2000040}`:** *Prepare yourself.*
+> No one can win always, but you now have confidence in catching more leaves when the wind blows.
+
+<!-- settlement_extre[8] -->
+**Outcome — branch, condition `{"s2.is": 2000046}`:** *Prepare yourself.*
+> No one can win always, but you now have confidence in catching more leaves when the wind blows.
+
+<!-- settlement_extre[9] -->
+**Outcome — branch, condition `{"s2.is": 2000035}`:** *I see.*
+> Suddenly, you realize what's behind those secretive glances and smiles.
+
+<!-- settlement_extre[10] -->
+**Outcome — branch, condition `{"s2.is": 2000041}`:** *I see.*
+> Suddenly, you realize what's behind those secretive glances and smiles.
+
+<!-- settlement_extre[11] -->
+**Outcome — branch, condition `{"s2.is": 2000047}`:** *I see.*
+> Suddenly, you realize what's behind those secretive glances and smiles.
+
+<!-- settlement_extre[12] -->
+**Outcome — branch, condition `{"s2.is": 2000036}`:** *Pieces of the Puzzle*
+> The murmured exchanges among colleagues dissolve into holy silence, and flashes of the future flicker before your eyes, but upon deep thought, they remain a blur.
+
+<!-- settlement_extre[13] -->
+**Outcome — branch, condition `{"s2.is": 2000042}`:** *Pieces of the Puzzle*
+> The murmured exchanges among colleagues dissolve into holy silence, and flashes of the future flicker before your eyes, but upon deep thought, they remain a blur.
+
+<!-- settlement_extre[14] -->
+**Outcome — branch, condition `{"s2.is": 2000048}`:** *Pieces of the Puzzle*
+> The murmured exchanges among colleagues dissolve into holy silence, and flashes of the future flicker before your eyes, but upon deep thought, they remain a blur.
+
+<!-- settlement_extre[15] -->
+**Outcome — branch, condition `{"s2.is": 2000037}`:** *Planning Ahead*
+> Your past battle experience and knowledge slowly integrate through conversations with colleagues.
+
+<!-- settlement_extre[16] -->
+**Outcome — branch, condition `{"s2.is": 2000043}`:** *Planning Ahead*
+> Your past battle experience and knowledge slowly integrate through conversations with colleagues.
+
+<!-- settlement_extre[17] -->
+**Outcome — branch, condition `{"s2.is": 2000049}`:** *Planning Ahead*
+> Your past battle experience and knowledge slowly integrate through conversations with colleagues.
+
+<!-- settlement_extre[18] -->
+**Outcome — branch, condition `{"s2.is": 2000419}`:** *Fanning the Flames*
+> The splendid stories are inevitably wrapped in lies and fabrications, adding an air of mystery.
+
+<!-- settlement_extre[19] -->
+**Outcome — branch, condition `{"s2.is": 2000420}`:** *Fanning the Flames*
+> The splendid stories are inevitably wrapped in lies and fabrications, adding an air of mystery.
+
+<!-- settlement_extre[20] -->
+**Outcome — branch, condition `{"s2.is": 2000421}`:** *Fanning the Flames*
+> The splendid stories are inevitably wrapped in lies and fabrications, adding an air of mystery.
+
+<!-- settlement_extre[21] -->
+**Outcome — branch, condition `{"s3.is": 2000100}`:** *Eye Contact*
+> All fear will find an exit – those oppressed can't help but ask, "how can we gain freedom?"
+
+<!-- settlement_extre[22] -->
+**Outcome — branch, condition `{"s3.is": 2000541}`:** *Unspoken Understanding*
+> All questions will have their answers, like how a stream naturally becomes a river as it flows.
+
+<!-- settlement_extre[23] -->
+**Outcome — branch, condition `{"s3.is": 2000171, "s1.is": 2000169}`:** *Known to All*
+> More and more people gather around you, uneasy and restless, daggers in hand thirst for the unjust ruler's blood.
+
+<!-- settlement_extre[24] -->
+**Outcome — branch, condition `{"s3.is": 2000724}`:** *You Casually Reveal a Dark Secret*
+> A few strands of Impure Thoughts tempt people, drawing them to you, leading you all into mysterious and dangerous darkness.
+
+<!-- settlement_extre[25] -->
+**Outcome — branch, condition `{"s3.is": 2000410}`:** *Once Forgotten, Now Remembered*
+> Certain corners of the court are perpetually sunless, where ancient God's words are quietly etched.
+
+<!-- settlement_extre[26] -->
+**Outcome — branch, condition `{"s3.is": 2000411}`:** *What If It's True?*
+> The gullible are skeptical while nobles bide their time, waiting for better terms – only you've heard it, that alluring yet hoarse whisper in your mind of the New World's promise.
+
+*(+4 further outcome branches, all present in official English — regenerate uncapped with `rite_record.py 5001004`.)*
+
+
 ## The Monarch's Weight — rite `5000160` (君王的胸襟)
 **Confidence:** High — official `i18n/en` string for every field; 4 of them also appear verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
 **Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5000160_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Sultan%27s_Nipple_Chains#The_Monarch_s_Weight
@@ -1092,7 +1253,7 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 
 ## Ripples in the Bathhouse — rite `5006514` (浴池里的波澜)
 **Confidence:** High — official `i18n/en` string for every field; 4 of them also appear verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
-**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5006514_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Zaki#Admiration_of_the_Young_Noble
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5006514_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Zaki#Admiration_of_the_Young_Noble, https://sultansgame.wiki.gg/wiki/Zaki#Ripples_in_the_Bathhouse
 
 **Intro (EN):**
 > You invited Zaki, and he did not refuse. What will happen in the ripples of the bathhouse? Zaki might know, or he might not. But you are fully aware of what you are doing, aren't you? You will hold his hand, using his curiosity, trust, and admiration to lure him onto a path full of temptation and danger...
@@ -1122,7 +1283,7 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 
 ## Investigate Evidence — rite `5001024` (调查罪证)
 **Confidence:** High — official `i18n/en` string for every field; 3 of them also appear verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
-**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5001024_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Investigate_Evidence#Expiration, https://sultansgame.wiki.gg/wiki/Investigate_Evidence#Failure
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5001024_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Investigate_Evidence, https://sultansgame.wiki.gg/wiki/Investigate_Evidence#Expiration, https://sultansgame.wiki.gg/wiki/Investigate_Evidence#Failure
 
 **Intro (EN):**
 > High Constable Adil is searching for your evidence... You need to do something, or he might really put you on trial – when obviously when it’s all clearly the Sultan’s fault!
@@ -1236,6 +1397,108 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 > You took great pains to escape the siege of the guards, but they still left a lot of wounds on you... You must find a trustworthy doctor to heal you as soon as possible, otherwise your life will be in danger.
 
 
+## Nest of Decay — rite `5008072` (腐烂之巢)
+**Confidence:** High — official `i18n/en` string for every field; 3 of them also appear verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5008072_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Alim#Nest_of_Decay, https://sultansgame.wiki.gg/wiki/Alim#Outcomes
+
+**Intro (EN):**
+> You come to the depths of Dark Alley, with its towering walls and iron gates sturdy enough to withstand armed soldiers – but it still stinks like a garbage dump. Alim clenches his fists. 
+> "It's them... They've been eyeing my boys..." 
+> You ask him who they are. 
+> "The beggars of Dark Alley... They all listen to an old man called White-Belly, who always tries to turn my kids into beggars... This time they're even stealing!" 
+> You remember the child beggars in Dark Alley, often physically disabled, using their deformed bodies to forcibly evoke passersby's sympathy... And you think of lively, healthy Hemir. You need to act quickly.
+
+**Slot lines (EN):**
+> s1: This beggar leader won't let you in
+> s2: Sturdy Gate
+> s3: Alim's Impotent Rage
+> s4: You can do this job yourself, or send any of your followers to do it.
+> s5: Send a person to assist with this matter
+> s6: Consumable to improve abilities.
+
+**Dice line (EN):**
+> Open the Gate
+> The number of dice is affected by the challenger's Combat and Physique.
+> You need at least 9 Success.
+
+<!-- settlement_prior[0] -->
+**Outcome — failure, condition `{"counter.7100002<": 10, "counter.7100004<": 10, "r1:战斗+体魄-e(体魄+战斗)<": [9, 5]}`:** *You wasted too much time*
+> The gate is reinforced specifically to withstand group attacks. By the time you find tools to break through, nothing remains but the stench of garbage... All the beggars and that child-trafficking kingpin White-Belly have vanished. Alim races frantically into the night... After that night, you never hear from him again.
+
+<!-- settlement[0] -->
+**Outcome — branch, condition `{"all": {"counter.7100004>=": 10, "counter.7100002<": 10}}`:** *Your words can split steel*
+> Almost everyone in the Dark Alley knows you; they gather around the beggar's hideout, shouting your command: "Open the gate!"
+>
+> Under this pressure, the gate opens, and an old man with disgusting white sores covering his belly emerges. "What's all this about?" he squints at the crowd, then notices Alim. "Oh, it's the old mutt searching for his lost pup? He ran off, who knows where. Nothing to do with me." The angry crowd seizes him. Meanwhile, Alim rushes straight into the squalid den with you.
+
+<!-- settlement[1] -->
+**Outcome — branch, condition `{"counter.7100002>=": 10}`:** *There's always a bigger fish*
+> Seeing the sturdy wooden door, Alim's heart races with panic. He blurts out, "Do you know Lord [player.name]? The Sultan's most terrifying minion! He eats children, kills women, rapes men, and brushes his teeth with their ashes! He is right here! And I swear, if you don't open this door, he will rape you, then kill you! Even if you fled to the ends of the earth, the Sultan's magician will still find you, gnawing off your rotten dick at midnight!" 
+>
+> Before you say anything to clarify yourself, White-Belly – trembling with fear – flings the door wide open.
+
+<!-- settlement[2] -->
+**Outcome — success, condition `{"counter.7100002<": 10, "counter.7100004<": 10, "r1:战斗+体魄-e(战斗+体魄)>=": [9, 5]}`:** *Master Key*
+> There is a kind of key that can open any door: large enough, thick enough, heavy enough, a <size=+10><font="Title SDF"><b>log</b></font></size> wrapped in iron... lucky you, you can actually use this key. 
+> White-Belly, still listening inside, is knocked off his feet, revealing ugly white sores on his belly...
+
+<!-- settlement_extre[0] -->
+**Outcome — success, condition `{"r2:生存+隐匿>=": [6, 5]}`:** *Unexpected Discovery*
+> This is a trash heap, home to a swarm of young beggars – most of them crippled, while a few have yet to be maimed.
+> You search through them one by one, but there's no sign of Hemir…
+> Suddenly, Alim grabs something from around a young beggar's neck. It's a crude wooden whistle.
+> "This belongs to Hemir. He carved it himself. That old bastard must have dragged my boy here – forcing him, beating him, trying to make him a beggar. Then Hemir refused, so he beat him even harder, probably even killed him. That's why the other kid has his whistle." He clenches the whistle tightly in his hand… Maybe you could interrogate White-Belly again – or at least kill him to let Alim vent his anger.
+
+<!-- settlement_extre[1] -->
+**Outcome — failure, condition `{"r2:生存+隐匿<": [6, 5]}`:** *Nothing Gained*
+> This is a trash heap, home to a swarm of young beggars – most of them crippled, while a few have yet to be maimed.
+>
+> You search through them one by one, but there's no sign of Hemir…
+>
+> Alim kicks White-Belly to the ground… then pulls out his blade, the one he uses for cutting purses.
+>
+> Maybe you could interrogate White-Belly again – or at least kill him to let Alim vent his anger.
+
+
+## Under the Sultan's Gaze — rite `5006027` (御前试合)
+**Confidence:** High — official `i18n/en` string for every field; 3 of them also appear verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5006027_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Under_the_Sultan%27s_Gaze
+
+**Intro (EN):**
+> The Rod of Life's fame grows... more and more of its rumors keep the Sultan vigilant, even restless at night.
+>
+> Finally, he asks you to demonstrate the fake phallus's power before him – Alas, the benevolent Sultan proposes that this glorious demonstration in the lapis lazuli hall is worth breaking a Gold Carnality Card, only if you draw it.
+
+**Slot lines (EN):**
+> s1: Yourself
+> s2: An ally with Passion, or an ally equipped with the Rod of Life, or... the Rod itself
+> s3: Golden Carnality Card of the highest tier
+
+<!-- settlement_prior[0] -->
+**Outcome — branch, condition `{"s2.is": 2000556}`:** *Infinite Loyalty*
+> You dismantle this thing and personally deliver it to the throne — this invincible weapon can only belong to the Sultan. And infinite loyalty surpassing even one's own desire of self to the Sultan, who can surpass this? You rarely see the Sultan laughs so happily, he praises you tirelessly and rewarded you with a large sum of money.
+
+<!-- settlement[0] -->
+**Outcome — branch, condition `{"s2.妻子": 1}`:** *Grand Harmony*
+> The Sultan’s intent was perhaps half curiosity, half humiliation. But with the help of the Rod of Life, you and your wife overcame all shame, presenting a fluid and harmonious passion – an ability to make one's partner feel blissful that moved the entire palace – nearly everyone displayed envious expressions... The Sultan seemed influenced by this atmosphere as well; he made a few praises of you and your wife and then dismissed you.
+
+<!-- settlement[1] -->
+**Outcome — branch, condition `{"s1.生命权杖": 1, "!s2.妻子": 1}`:** *Barbarity and Bliss*
+> This prolonged, powerful, and debauched feast shocked the palace. The ministers quietly watched as you exhibited invincible techniques with the Rod of Life, as if overwhelmed by your indomitable aura. Finally, when you stood proudly in front of the Sultan, you suddenly realized you had overstepped your bounds...
+>  You immediately knelt to apologize to the Sultan, but alas, his cruelty and bestial desire had been provoked to the extreme by the previous obscene performance – he declared that subjects were unworthy of using such a monarch's tool, and as punishment, your flesh-bound prosthetic would be cut off at once... It is a self-evident law in this country that there cannot be a phallus better than the Sultan's!
+>  You bled to death in the palace like a clown.
+
+<!-- settlement[2] -->
+**Outcome — branch, condition `{"s2.生命权杖": 1, "!s2.妻子": 1}`:** *Disgrace at Court*
+> The Sultan wanted to humiliate you, and you satisfied his wildest imagination. But truly, you never expected the Rod of Life to feel this pleasurable...
+> [s2.name] was evidently a bit scared of the Sultan, but the power of the Rod of Life surpassed earthly dominion. You were entirely conquered in the center of the palace hall, emitting various strange cries and terrifying sounds, finally collapsing from exhaustion under the gaze of the ministers and the Sultan.
+>  Regardless, such humiliation and pleasure must never be repeated in this lifetime.
+
+<!-- settlement_extre[0] -->
+**Outcome — branch, condition `{"any": {"all": {"s2.生命权杖": 1, "s3": 1}}}`:**
+> Such legendary tales can break any Carnality Card.
+
+
 ## Entangled in Scandal — rite `5006515` (丑闻缠身)
 **Confidence:** High — official `i18n/en` string for every field; 3 of them also appear verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
 **Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5006515_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Zaki#Entangled_in_Scandal
@@ -1301,7 +1564,7 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 
 ## Become a Lamb? — rite `5008083` (做羔羊？)
 **Confidence:** High — official `i18n/en` string for every field; 3 of them also appear verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
-**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5008083_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Orphans#Become_a_Lamb_
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5008083_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Orphans#Become_a_Lamb.3F, https://sultansgame.wiki.gg/wiki/Orphans#Become_a_Lamb_
 
 **Intro (EN):**
 > There is not just one god in this world... Some gods shepherd their people, while others grind their teeth, suck blood, and favor fresh lambs...
@@ -1494,6 +1757,92 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 > Come back next time
 
 
+## Wine and Flesh — rite `5006029` (酒与肉)
+**Confidence:** High — official `i18n/en` string for every field; 2 of them also appear verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5006029_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Adila#Wine_and_Flesh
+
+**Intro (EN):**
+> Adila wants to have a drink with Maggie, do you want to join in?
+
+**Slot lines (EN):**
+> s1: Adila wants to visit Maggie
+> s2: Maggie should attend
+> s3: You can join this small talk.
+
+**Dice line (EN):**
+> You grab a small knife and start dueling with her...
+> The numbers of dices provided by your Combat are affected by Adila.
+> You need at least 1 Success to achieve victory.
+
+<!-- settlement[0] -->
+**Outcome — branch, condition `{"s2": 1, "!s3": 1}`:** *You decide not to join the women's discussion.*
+> You arrange for Maggie to meet her alone – after all, she’s here specifically to see Maggie.
+>
+> Maggie is pleasantly surprised by her visit and quickly asks the maid to prepare nuts, dried fruits, and plenty of honey and cheese. The two of them spend a full two hours together, with bursts of laughter echoing from time to time.
+>
+> When Adila leaves, Maggie comes to find you. Her wine-flushed cheeks makes her look particularly charming. She tells you that Adila has shared a story about how her family is cursed by a dragon, preventing them from ever having male heirs. Adila seems to truly believe in the existence of the dragon and is determined to slay it to end the curse.
+>
+> As Maggie speaks, a complicated expression crosses her face. She pauses, as if wanting to say something, but in the end, she simply shakes her head and stays silent. Perhaps even she hasn’t figured out what to say.
+
+<!-- settlement[1] -->
+**Outcome — branch, condition `{"s2": 1, "s3": 1}`:** *You choose to entertain Adila with your wife.*
+> Maggie greatly appreciates your respect for her. According to the noble tradition, the lady of the house must be present when entertaining unmarried female guests in the inner chambers.
+>
+> But Adila doesn't consider herself a guest at all. She eats freely, tearing into meat chunks, and drinks heavily. Eventually, she starts talking about her family.
+>
+> “My ancestors killed a dragon. A real dragon – a massive, winged lizard.”
+>
+> You nod and tell her that you’ve heard stories about dragons too. The story came from Jabal – the general who was always obsessed with venturing into the unknown. He once told you that, long ago, the Sultan’s armies spent years scouring the land in search of dragons. Yet even with the strength of an entire nation, they never found even a single dragon scale.
+>
+> Still, Jabal believes that dragons existed – and so do you.
+>
+> Adila’s eyes widen, clearly not expecting your agreement. Then, with renewed excitement, she dives into the history of her family. She explains that the Adila family had been warriors for generations. They were once extremely prominent, and among every Sultan's grand generals, there was always one from her lineage.
+>
+> But about two centuries ago, one of her ancestors encountered a dragon. He tracked it relentlessly, following its trail deep into its lair, and ultimately slew it.
+>
+> “At the time, my old ancestor thought dragons were nothing more than oversized lizards,” she says with a bitter laugh. “Dead is dead, right? Well, it turns out that dragons are far more formidable than that.”
+>
+> With its dying breath, the dragon cursed the Adila family, ensuring they would never kill another dragon again. The curse manifested in a cruel way: from that day forward, no male heirs were ever born into the family. And a woman's hands were for spinning thread and cooking - not for wielding swords. A family with only women could never slay a dragon.
+>
+> As Adila recounts this twisted tale of curses and dragons, she toys with the carving knife stuck in her lamb shank. As Adila recounts this twisted tale, she toys with the carving knife in her lamb shank. Her tone is mocking, but her eyes betray a melancholy she can't hide.
+>
+> “So you see,” she continues, “even though my family has done well for itself, run entirely by women, the moment I said I wanted to take up the sword, my grandmother, mother, aunts, cousins – all of them – jumped in to stop me. They said the dragon’s curse forbids us from touching weapons, and if I dared to try, it would only anger that dead dragon even more! They're... ah, forget it. Just treat it as drunk talk, nothing more."
+>
+> Her voice trails off, and she downs the last of her wine in a single, fluid motion. From the way she handles the cup, you suspect she isn’t drunk at all. She just needed the courage of the drink to tell you this story.
+
+<!-- settlement_extre[0] -->
+**Outcome — branch, condition `{"!s2": 1, "s3": 1}`:** *You choose to entertain Adila alone.*
+> According to the noble tradition, the lady of the house must be present when entertaining unmarried female guests in the inner chambers. But Adila doesn't consider herself a guest at all... Perhaps Maggie won't be angry about this... hopefully.
+> Adila eats freely, tearing into meat chunks, and drinks heavily. The conversation turns to her family only after she is half-drunk.
+> “My ancestors killed a dragon. A real dragon – a massive, winged lizard.” She puts down her glass and stares straight at you as if she is judging whether you believe her or not...
+> It occurs to you that the Sultan once sent the adventurous general Jabal to lead his army around for years in search of dragons.Yet even with the strength of an entire nation, they never found even a single dragon scale. And yet...
+> You hesitate, unsure how to respond, but Adila doesn’t miss a beat. She slams her glass down with a thud, waving a leftover goat bone in one hand, and demands that you to fight her. She can't take anyone suspecting her of being a swindler.
+
+<!-- settlement_extre[1] -->
+**Outcome — failure, condition `{"!s2": 1, "s3": 1, "r1:战斗-e(战斗)<": [1, 5]}`:**
+> The goat bone catches you right in the head before you can react. Adila freezes, the shock sobering her up a bit. She backs off – as wild as she might be, she's still a guest and wouldn't dare to seriously harm her host. After making sure you're not hurt, she apologizes, straightens up in her seat, and starts telling you about her family.
+
+<!-- settlement_extre[2] -->
+**Outcome — success, condition `{"!s2": 1, "s3": 1, "r1:战斗-e(战斗)>=": [1, 5]}`:**
+> No matter which angle Adila swings the goat bone from, you smoothly deflect each blow. You're so in control that you even manage to grab the bone and use it to pin her down. She bursts into laughter as she admits defeat, praising your skills over and over again. When things finally settle down, she clears her throat, straightens up in her seat, and with a suddenly serious face, starts telling you about her family.
+
+<!-- settlement_extre[3] -->
+**Outcome — branch, condition `{"!s2": 1, "s3": 1}`:**
+> She explains that the Adila family had been warriors for generations. They were once extremely prominent, and among every Sultan's grand generals, there was always one from her lineage.
+>
+> But about two centuries ago, one of her ancestors stumbled upon a dragon. He tracked it relentlessly, following its trail all the way to its lair, and finally slayed it.
+>
+> “At the time, my old ancestor thought dragons were nothing more than oversized lizards,” she says with a bitter laugh. “Dead is dead, right? Well, it turns out that dragons are far more formidable than that.”
+>
+> With its dying breath, the dragon cursed the Adila family, ensuring they would never kill another dragon again. The curse manifested in a cruel way: from that day forward, no male heirs were ever born into the family. And a woman's hands were for spinning thread and cooking - not for wielding swords. A family with only women could never slay a dragon.
+>
+> As Adila recounts this twisted tale of curses and dragons, she toys with the carving knife stuck in her lamb shank. As Adila recounts this twisted tale, she toys with the carving knife in her lamb shank. Her tone is mocking, but her eyes betray a melancholy she can't hide.
+>
+> “So you see,” she continues, “even though my family has done well for itself, run entirely by women, the moment I said I wanted to take up the sword, my grandmother, mother, aunts, cousins – all of them – jumped in to stop me. They said the dragon’s curse forbids us from touching weapons, and if I dared to try, it would only anger that dead dragon even more! They're... ah, forget it. Just treat it as drunk talk, nothing more."
+>
+> Her voice trails off, and she downs the last of her wine in a single, fluid motion. From the way she handles the cup, you suspect she isn’t drunk at all. She just needed the courage of the drink to tell you this story.
+
+
 ## Guesthouse — rite `5006561` (舍馆)
 **Confidence:** High — official `i18n/en` string for every field; 2 of them also appear verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
 **Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5006561_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Guesthouse, https://sultansgame.wiki.gg/wiki/Guesthouse#Upgrades
@@ -1576,72 +1925,9 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 > Come back next time
 
 
-## Nest of Decay — rite `5008072` (腐烂之巢)
-**Confidence:** High — official `i18n/en` string for every field; 2 of them also appear verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
-**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5008072_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Alim#Outcomes
-
-**Intro (EN):**
-> You come to the depths of Dark Alley, with its towering walls and iron gates sturdy enough to withstand armed soldiers – but it still stinks like a garbage dump. Alim clenches his fists. 
-> "It's them... They've been eyeing my boys..." 
-> You ask him who they are. 
-> "The beggars of Dark Alley... They all listen to an old man called White-Belly, who always tries to turn my kids into beggars... This time they're even stealing!" 
-> You remember the child beggars in Dark Alley, often physically disabled, using their deformed bodies to forcibly evoke passersby's sympathy... And you think of lively, healthy Hemir. You need to act quickly.
-
-**Slot lines (EN):**
-> s1: This beggar leader won't let you in
-> s2: Sturdy Gate
-> s3: Alim's Impotent Rage
-> s4: You can do this job yourself, or send any of your followers to do it.
-> s5: Send a person to assist with this matter
-> s6: Consumable to improve abilities.
-
-**Dice line (EN):**
-> Open the Gate
-> The number of dice is affected by the challenger's Combat and Physique.
-> You need at least 9 Success.
-
-<!-- settlement_prior[0] -->
-**Outcome — failure, condition `{"counter.7100002<": 10, "counter.7100004<": 10, "r1:战斗+体魄-e(体魄+战斗)<": [9, 5]}`:** *You wasted too much time*
-> The gate is reinforced specifically to withstand group attacks. By the time you find tools to break through, nothing remains but the stench of garbage... All the beggars and that child-trafficking kingpin White-Belly have vanished. Alim races frantically into the night... After that night, you never hear from him again.
-
-<!-- settlement[0] -->
-**Outcome — branch, condition `{"all": {"counter.7100004>=": 10, "counter.7100002<": 10}}`:** *Your words can split steel*
-> Almost everyone in the Dark Alley knows you; they gather around the beggar's hideout, shouting your command: "Open the gate!"
->
-> Under this pressure, the gate opens, and an old man with disgusting white sores covering his belly emerges. "What's all this about?" he squints at the crowd, then notices Alim. "Oh, it's the old mutt searching for his lost pup? He ran off, who knows where. Nothing to do with me." The angry crowd seizes him. Meanwhile, Alim rushes straight into the squalid den with you.
-
-<!-- settlement[1] -->
-**Outcome — branch, condition `{"counter.7100002>=": 10}`:** *There's always a bigger fish*
-> Seeing the sturdy wooden door, Alim's heart races with panic. He blurts out, "Do you know Lord [player.name]? The Sultan's most terrifying minion! He eats children, kills women, rapes men, and brushes his teeth with their ashes! He is right here! And I swear, if you don't open this door, he will rape you, then kill you! Even if you fled to the ends of the earth, the Sultan's magician will still find you, gnawing off your rotten dick at midnight!" 
->
-> Before you say anything to clarify yourself, White-Belly – trembling with fear – flings the door wide open.
-
-<!-- settlement[2] -->
-**Outcome — success, condition `{"counter.7100002<": 10, "counter.7100004<": 10, "r1:战斗+体魄-e(战斗+体魄)>=": [9, 5]}`:** *Master Key*
-> There is a kind of key that can open any door: large enough, thick enough, heavy enough, a <size=+10><font="Title SDF"><b>log</b></font></size> wrapped in iron... lucky you, you can actually use this key. 
-> White-Belly, still listening inside, is knocked off his feet, revealing ugly white sores on his belly...
-
-<!-- settlement_extre[0] -->
-**Outcome — success, condition `{"r2:生存+隐匿>=": [6, 5]}`:** *Unexpected Discovery*
-> This is a trash heap, home to a swarm of young beggars – most of them crippled, while a few have yet to be maimed.
-> You search through them one by one, but there's no sign of Hemir…
-> Suddenly, Alim grabs something from around a young beggar's neck. It's a crude wooden whistle.
-> "This belongs to Hemir. He carved it himself. That old bastard must have dragged my boy here – forcing him, beating him, trying to make him a beggar. Then Hemir refused, so he beat him even harder, probably even killed him. That's why the other kid has his whistle." He clenches the whistle tightly in his hand… Maybe you could interrogate White-Belly again – or at least kill him to let Alim vent his anger.
-
-<!-- settlement_extre[1] -->
-**Outcome — failure, condition `{"r2:生存+隐匿<": [6, 5]}`:** *Nothing Gained*
-> This is a trash heap, home to a swarm of young beggars – most of them crippled, while a few have yet to be maimed.
->
-> You search through them one by one, but there's no sign of Hemir…
->
-> Alim kicks White-Belly to the ground… then pulls out his blade, the one he uses for cutting purses.
->
-> Maybe you could interrogate White-Belly again – or at least kill him to let Alim vent his anger.
-
-
 ## Deal with Adila — rite `5000633` (处置阿迪莱)
 **Confidence:** High — official `i18n/en` string for every field; 2 of them also appear verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
-**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5000633_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Adila#Deal_with_Adila
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5000633_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Adila#Adila_Seeks_Combat, https://sultansgame.wiki.gg/wiki/Adila#Deal_with_Adila
 
 **Intro (EN):**
 > The victor has the right to do as they please with the loser. Such is the warriors' code of honor.
@@ -2282,143 +2568,6 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 *(+43 further outcome branches, all present in official English — regenerate uncapped with `rite_record.py 5000800`.)*
 
 
-## Headless Dragons — rite `5001004` (群龙无首)
-**Confidence:** High — official `i18n/en` string for every field; 1 of them also appears verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
-**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5001004_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/The_Court#Headless_Dragons
-
-**Intro (EN):**
-> The Sultan is like the sun, projecting vast, distorted shadows named power when away from the court.
-
-**Slot lines (EN):**
-> s1: Conviction
-> s2: Insert 3 Intelligences of the same name and tier to synthesize
-> s3: Insert 3 Conviction of the same name to synthesize
-> s4: The True Taboo
-> s5: Other Matters Best Left Untold
-
-<!-- settlement[0] -->
-**Outcome — branch, condition `{"any": {"rite": 5000795}}`:**
-> The Sultan is still not seen today.
-
-<!-- settlement[1] -->
-**Outcome — branch, condition `{"s1.休息>=": 3}`:**
-> The Sultan has returned to his loyal court.
-
-<!-- settlement[2] -->
-**Outcome — branch, condition `{"s1.休息<": 3}`:**
-> The Sultan is still not seen today.
-
-<!-- settlement_extre[0] -->
-**Outcome — branch, condition `{"s2.is": 2000032}`:** *Reading Between the Lines*
-> One secret pulls out another secret, and in the exploration process, you're not sure if you're closer to or further from the truth.
-
-<!-- settlement_extre[1] -->
-**Outcome — branch, condition `{"s2.is": 2000038}`:** *Reading Between the Lines*
-> One secret pulls out another secret, and in the exploration process, you're not sure if you're closer to or further from the truth.
-
-<!-- settlement_extre[2] -->
-**Outcome — branch, condition `{"s2.is": 2000044}`:** *Reading Between the Lines*
-> One secret pulls out another secret, and in the exploration process, you're not sure if you're closer to or further from the truth.
-
-<!-- settlement_extre[3] -->
-**Outcome — branch, condition `{"s2.is": 2000033}`:** *Art of Relevance*
-> The inner philosophy of things is mostly universal; you've peered through to deeper mysteries.
-
-<!-- settlement_extre[4] -->
-**Outcome — branch, condition `{"s2.is": 2000039}`:** *Art of Relevance*
-> The inner philosophy of things is mostly universal; you've peered through to deeper mysteries.
-
-<!-- settlement_extre[5] -->
-**Outcome — branch, condition `{"s2.is": 2000045}`:** *Art of Relevance*
-> The inner philosophy of things is mostly universal; you've peered through to deeper mysteries.
-
-<!-- settlement_extre[6] -->
-**Outcome — branch, condition `{"s2.is": 2000034}`:** *Prepare yourself.*
-> No one can win always, but you now have confidence in catching more leaves when the wind blows.
-
-<!-- settlement_extre[7] -->
-**Outcome — branch, condition `{"s2.is": 2000040}`:** *Prepare yourself.*
-> No one can win always, but you now have confidence in catching more leaves when the wind blows.
-
-<!-- settlement_extre[8] -->
-**Outcome — branch, condition `{"s2.is": 2000046}`:** *Prepare yourself.*
-> No one can win always, but you now have confidence in catching more leaves when the wind blows.
-
-<!-- settlement_extre[9] -->
-**Outcome — branch, condition `{"s2.is": 2000035}`:** *I see.*
-> Suddenly, you realize what's behind those secretive glances and smiles.
-
-<!-- settlement_extre[10] -->
-**Outcome — branch, condition `{"s2.is": 2000041}`:** *I see.*
-> Suddenly, you realize what's behind those secretive glances and smiles.
-
-<!-- settlement_extre[11] -->
-**Outcome — branch, condition `{"s2.is": 2000047}`:** *I see.*
-> Suddenly, you realize what's behind those secretive glances and smiles.
-
-<!-- settlement_extre[12] -->
-**Outcome — branch, condition `{"s2.is": 2000036}`:** *Pieces of the Puzzle*
-> The murmured exchanges among colleagues dissolve into holy silence, and flashes of the future flicker before your eyes, but upon deep thought, they remain a blur.
-
-<!-- settlement_extre[13] -->
-**Outcome — branch, condition `{"s2.is": 2000042}`:** *Pieces of the Puzzle*
-> The murmured exchanges among colleagues dissolve into holy silence, and flashes of the future flicker before your eyes, but upon deep thought, they remain a blur.
-
-<!-- settlement_extre[14] -->
-**Outcome — branch, condition `{"s2.is": 2000048}`:** *Pieces of the Puzzle*
-> The murmured exchanges among colleagues dissolve into holy silence, and flashes of the future flicker before your eyes, but upon deep thought, they remain a blur.
-
-<!-- settlement_extre[15] -->
-**Outcome — branch, condition `{"s2.is": 2000037}`:** *Planning Ahead*
-> Your past battle experience and knowledge slowly integrate through conversations with colleagues.
-
-<!-- settlement_extre[16] -->
-**Outcome — branch, condition `{"s2.is": 2000043}`:** *Planning Ahead*
-> Your past battle experience and knowledge slowly integrate through conversations with colleagues.
-
-<!-- settlement_extre[17] -->
-**Outcome — branch, condition `{"s2.is": 2000049}`:** *Planning Ahead*
-> Your past battle experience and knowledge slowly integrate through conversations with colleagues.
-
-<!-- settlement_extre[18] -->
-**Outcome — branch, condition `{"s2.is": 2000419}`:** *Fanning the Flames*
-> The splendid stories are inevitably wrapped in lies and fabrications, adding an air of mystery.
-
-<!-- settlement_extre[19] -->
-**Outcome — branch, condition `{"s2.is": 2000420}`:** *Fanning the Flames*
-> The splendid stories are inevitably wrapped in lies and fabrications, adding an air of mystery.
-
-<!-- settlement_extre[20] -->
-**Outcome — branch, condition `{"s2.is": 2000421}`:** *Fanning the Flames*
-> The splendid stories are inevitably wrapped in lies and fabrications, adding an air of mystery.
-
-<!-- settlement_extre[21] -->
-**Outcome — branch, condition `{"s3.is": 2000100}`:** *Eye Contact*
-> All fear will find an exit – those oppressed can't help but ask, "how can we gain freedom?"
-
-<!-- settlement_extre[22] -->
-**Outcome — branch, condition `{"s3.is": 2000541}`:** *Unspoken Understanding*
-> All questions will have their answers, like how a stream naturally becomes a river as it flows.
-
-<!-- settlement_extre[23] -->
-**Outcome — branch, condition `{"s3.is": 2000171, "s1.is": 2000169}`:** *Known to All*
-> More and more people gather around you, uneasy and restless, daggers in hand thirst for the unjust ruler's blood.
-
-<!-- settlement_extre[24] -->
-**Outcome — branch, condition `{"s3.is": 2000724}`:** *You Casually Reveal a Dark Secret*
-> A few strands of Impure Thoughts tempt people, drawing them to you, leading you all into mysterious and dangerous darkness.
-
-<!-- settlement_extre[25] -->
-**Outcome — branch, condition `{"s3.is": 2000410}`:** *Once Forgotten, Now Remembered*
-> Certain corners of the court are perpetually sunless, where ancient God's words are quietly etched.
-
-<!-- settlement_extre[26] -->
-**Outcome — branch, condition `{"s3.is": 2000411}`:** *What If It's True?*
-> The gullible are skeptical while nobles bide their time, waiting for better terms – only you've heard it, that alluring yet hoarse whisper in your mind of the New World's promise.
-
-*(+4 further outcome branches, all present in official English — regenerate uncapped with `rite_record.py 5001004`.)*
-
-
 ## Noble Hospitality — rite `5008118` (如何款待尊贵的客人)
 **Confidence:** High — official `i18n/en` string for every field; 1 of them also appears verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
 **Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5008118_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Noble_Hospitality
@@ -2695,7 +2844,7 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 
 ## The Frenzied Highlord — rite `5000578` (狂乱的圣主)
 **Confidence:** High — official `i18n/en` string for every field; 1 of them also appears verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
-**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5000578_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Highlord_of_the_Highlands
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5000578_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Highlord_of_the_Highlands, https://sultansgame.wiki.gg/wiki/Highlord_of_the_Highlands#The_Frenzied_Highlord, https://sultansgame.wiki.gg/wiki/The_Star-Souled#Highland_Highlord_
 
 **Intro (EN):**
 > The mightiest of Star-Souleds has returned to earth, consumed by excitement, joy, and insatiable hunger, devouring mortal dreams without restraint.
@@ -3000,6 +3149,102 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 <!-- settlement_extre[1] -->
 **Outcome — branch, condition `{"s2.is": 2000184, "s5": 1}`:** *Resolve Sultan Card*
 > Having heard of your use of the Double-Headed Dragon, the Sultan laughs and permits you breaking the flimsy card.
+
+
+## Uprising Troops — rite `5000825` (乱军)
+**Confidence:** High — official `i18n/en` string for every field; 1 of them also appears verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5000825_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Uprising_Troops
+
+**Intro (EN):**
+> The dispossessed have gathered - refugees, barbarians, and nomads who have lost their families, friends, and kin to senseless violence. They've amassed outside the capital walls with clubs and swords, seeking vengeance against the nobility they could never hope to join. 
+> Abdul, his face drained of color, repeatedly denies responsibility, instead shifting blame to you for this crisis. Now the Sultan commands you to quell this uprising - and you know well the price of failure.
+
+**Slot lines (EN):**
+> s1: Nomad Uprising
+> s2: Freemen Uprising
+> s3: Barbarian Uprising
+> s4: Blade Winds
+> s5: Paper Shredders
+> s6: Soul Hunters
+> s7: Anti-Nomad troops or followers
+> s8: Anti-Freeman troops or followers
+> s9: Anti-Barbarian troops or followers
+> s10: Consumables useful
+> s11: You can take this to break any Conquest Card if you emerge victorious
+
+**Dice line (EN):**
+> Nomad Confrontation
+> The dice count provided by your Combat and Physique is affected by the Nomad Uprising
+> You need at least 3 Success to overcome the Nomad Uprising
+
+<!-- settlement_extre[0] -->
+**Outcome — branch, condition `{}`:** *First Wave*
+> The mounted nomads arrive first, seeking revenge for past raids by slave hunters. They harass the city with guerrilla tactics, relying on their superior horsemanship. These tall warriors have sown unrest throughout the city.
+
+<!-- settlement_extre[1] -->
+**Outcome — branch, condition `{"s4": 1}`:** *Unexpected Alliance*
+> The nomad slaves you and Riel rescued secretly left the city, using special methods to contact the band and find their kin. The nomads realized that you - who seemed reluctant to deploy forces against them despite their raids - are their ally. 
+> They swiftly dispersed on horseback, appearing to withdraw but perhaps seeking their true enemies. As thanks, they sent you an exquisitely crafted silver saddle.
+
+<!-- settlement_extre[2] -->
+**Outcome — success, condition `{"!s4": 1, "r1:s7.战斗+s7.体魄+s10.战斗+s10.体魄-s1.战斗-s1.体魄>=": [3, 5]}`:** *Bitter Victory*
+> You know these nomads have done no wrong; they've simply lost too much... but royal commands cannot be ignored. 
+> You prevailed, though victory has never tasted so bitter.
+
+<!-- settlement_extre[3] -->
+**Outcome — failure, condition `{"!s4": 1, "r1:s7.战斗+s7.体魄+s10.战斗+s10.体魄-s1.战斗-s1.体魄<": [3, 5]}`:** *Nomad's Revenge*
+> Your forces chase shadows, exhausting themselves without ever catching sight of the enemy... Your defeat is humiliating.
+
+<!-- settlement_extre[4] -->
+**Outcome — branch, condition `{}`:** *Justice Demanded*
+> Anxious vagrants flood toward the capital, fearing enslavement and loss of their freeman status. They demand the king punish those responsible for their suffering.
+
+<!-- settlement_extre[5] -->
+**Outcome — branch, condition `{"s5": 1}`:** *Sanctuary Found*
+> You send those sheltered by Riel - who obtained identity papers with your help - to negotiate, promising to banish this darkness plaguing them. 
+> The troubled vagrants gradually disperse; war was never their intention. In this harsh land, survival is their only desire. 
+> Later, someone secretly informs you these previously enslaved freemen discovered a remote oasis where they've built their own paradise - a place that will always welcome you.
+
+<!-- settlement_extre[6] -->
+**Outcome — success, condition `{"!s5": 1, "r2:s8.战斗+s8.体魄+s10.战斗+s10.体魄-s2.战斗-s2.体魄>=": [3, 5]}`:** *Bitter Victory*
+> You know these vagrants have done no wrong; they simply fear losing more... but royal commands cannot be ignored. 
+> You prevailed, though victory has never tasted so bitter.
+
+<!-- settlement_extre[7] -->
+**Outcome — failure, condition `{"!s5": 1, "r2:s8.战斗+s8.体魄+s10.战斗+s10.体魄-s2.战斗-s2.体魄<": [3, 5]}`:** *Vagrant's Revenge*
+> Inspired by these vagrants, many oppressed freemen within the city join their cause. You cannot bring yourself to eliminate them entirely and find yourself hindered, while they show no mercy - "Why pretend?" they challenge, "Aren't you just another self-righteous noble?"
+
+<!-- settlement_extre[8] -->
+**Outcome — branch, condition `{}`:** *Savage Horde*
+> The barbarian forces aren't the most numerous but they are the fiercest. Each warrior fights with the strength of ten and resists until death - traits evident in Riel's temperament. These formidable enemies now gather ominously, advancing toward the city...
+
+<!-- settlement_extre[9] -->
+**Outcome — branch, condition `{"s6": 1}`:** *Misunderstanding Cleared*
+> Even as barbarian warriors drape a fur around your neck, you remain confused. 
+> Beside you, Riel smiles with delight: "When I returned with our rescued kin, they thought I was a hero. But I told them I am merely the hero's hand. The true hero is a city-dweller they dismiss, named [player.name]."
+
+<!-- settlement_extre[10] -->
+**Outcome — success, condition `{"!s6": 1, "r3:s9.战斗+s9.体魄+s10.战斗+s10.体魄-s3.战斗-s3.体魄>=": [3, 5]}`:** *Bitter Victory*
+> These barbarians pillage and murder along their path. Each conquered village becomes a site for bonfires, ritual dances, and feasts of bloody organs... 
+> For the safety of the surrounding populace, you must eliminate and drive them away. Regarding this matter, Riel maintains an uncharacteristic silence.
+
+<!-- settlement_extre[11] -->
+**Outcome — failure, condition `{"!s6": 1, "r3:s9.战斗+s9.体魄+s10.战斗+s10.体魄-s3.战斗-s3.体魄<": [3, 5]}`:** *Barbarian's Revenge*
+> These barbarians pillage and murder along their path. Each conquered village becomes a site for bonfires, ritual dances, and feasts of bloody organs - from villagers and slain soldiers alike. The horror drains all fighting spirit from your troops; they scatter in retreat, and you are powerless to stop them.
+
+<!-- settlement_extre[12] -->
+**Outcome — branch, condition `{"any": {"all": {"any": {"all": {"!s6": 1, "r3:s9.战斗+s9.体魄+s10.战斗+s10.体魄-s3.战斗-s3.体魄<": [3, 5]}}}}, "s11": 1}`:**
+> Crushing a rebellion certainly merits a Conquest Card.
+
+<!-- settlement_extre[13] -->
+**Outcome — branch, condition `{"any": {"all": {"any": {"all": {"!s6": 1, "r3:s9.战斗+s9.体魄+s10.战斗+s10.体魄-s3.战斗-s3.体魄<": [3, 5]}}}}}`:**
+> You successfully suppressed the uprising and returned triumphant. Now it's time to settle accounts with the true villain - Vizier Abdul.
+
+<!-- settlement_extre[14] -->
+**Outcome — branch, condition `{"any": {"all": {"any": {"all": {"!s6": 1, "r3:s9.战斗+s9.体魄+s10.战斗+s10.体魄-s3.战斗-s3.体魄<": [3, 5]}}}}}`:** *Sultan's Wrath*
+> You failed! How could you allow a rabble of insurgents to defeat you, damaging his people, buildings, wealth, and lands?! 
+> The Sultan burns with fury. He kicks you aside, dons his armor, and personally leads his guards across the battlefield, killing indiscriminately! The land becomes a scene of devastation, flowing with blood... All perish - yes, all - those who betrayed him deserve death, as do those who failed him! 
+> Your only consolation is that Vizier Abdul bears primary responsibility for this rebellion... If you keep your head down for a while, the Sultan might spare your life... perhaps...
 
 
 ## Sharp Grass Plain — rite `5000835` (锐草之原)
@@ -3376,7 +3621,7 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 
 ## Matchmaker — rite `5008060` (证婚人)
 **Confidence:** High — official `i18n/en` string for every field; 1 of them also appears verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
-**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5008060_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Fardak#First_Sight, https://sultansgame.wiki.gg/wiki/Lumera#Marriage
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5008060_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Fardak#First_Sight, https://sultansgame.wiki.gg/wiki/Fardak#Matchmaker, https://sultansgame.wiki.gg/wiki/Lumera#Marriage
 
 **Intro (EN):**
 > Marriage can also bring happiness. With this in mind, you volunteered to help Fardak find a suitable wife and bring them together...
@@ -4464,7 +4709,7 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 
 ## Do Whatever You Want — rite `5010016` (为所欲为)
 **Confidence:** High — official `i18n/en` string for every field; 1 of them also appears verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
-**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5010016_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Guide:Rod_of_Life#Convert_Faris
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5010016_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Change_of_Dynasty#Do_Whatever_You_Want_, https://sultansgame.wiki.gg/wiki/Guide:Rod_of_Life#Change_of_Dynasty, https://sultansgame.wiki.gg/wiki/Guide:Rod_of_Life#Convert_Faris
 
 **Intro (EN):**
 > No matter how powerful he once was, his brutal deeds that turned everyone against him have led him to this pitiable corner – pinned to the throne by blades, barely breathing... now, your command shall become his destiny.
@@ -4683,90 +4928,60 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 > While analyzing the statue's magical circuits, [s2.name] makes several errors. The statue begins dancing wildly, destroying its supports... In the dust and rubble, you gain nothing.
 
 
-## Wine and Flesh — rite `5006029` (酒与肉)
+## How Dare You? — rite `5006636` (下次还敢吗？)
 **Confidence:** High — official `i18n/en` string for every field; 1 of them also appears verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
-**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5006029_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Adila#Wine_and_Flesh
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5006636_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Inal#How_Dare_You_
 
 **Intro (EN):**
-> Adila wants to have a drink with Maggie, do you want to join in?
+> You knock on the presumptuous noble's door with the Sultan Card, demanding to know if he really wants to harass YOUR follower – even a slave girl.
 
 **Slot lines (EN):**
-> s1: Adila wants to visit Maggie
-> s2: Maggie should attend
-> s3: You can join this small talk.
+> s1: Overestimated Noble.
+> s2: You must show up yourself
+> s3: You can intimidate him with a Silver Bloodshed, Carnality, or Conquest Card.
+> s4: To use a Conquest Card, you must have an army, otherwise any helpful consumable can be placed here.
 
 **Dice line (EN):**
-> You grab a small knife and start dueling with her...
-> The numbers of dices provided by your Combat are affected by Adila.
-> You need at least 1 Success to achieve victory.
-
-<!-- settlement[0] -->
-**Outcome — branch, condition `{"s2": 1, "!s3": 1}`:** *You decide not to join the women's discussion.*
-> You arrange for Maggie to meet her alone – after all, she’s here specifically to see Maggie.
->
-> Maggie is pleasantly surprised by her visit and quickly asks the maid to prepare nuts, dried fruits, and plenty of honey and cheese. The two of them spend a full two hours together, with bursts of laughter echoing from time to time.
->
-> When Adila leaves, Maggie comes to find you. Her wine-flushed cheeks makes her look particularly charming. She tells you that Adila has shared a story about how her family is cursed by a dragon, preventing them from ever having male heirs. Adila seems to truly believe in the existence of the dragon and is determined to slay it to end the curse.
->
-> As Maggie speaks, a complicated expression crosses her face. She pauses, as if wanting to say something, but in the end, she simply shakes her head and stays silent. Perhaps even she hasn’t figured out what to say.
-
-<!-- settlement[1] -->
-**Outcome — branch, condition `{"s2": 1, "s3": 1}`:** *You choose to entertain Adila with your wife.*
-> Maggie greatly appreciates your respect for her. According to the noble tradition, the lady of the house must be present when entertaining unmarried female guests in the inner chambers.
->
-> But Adila doesn't consider herself a guest at all. She eats freely, tearing into meat chunks, and drinks heavily. Eventually, she starts talking about her family.
->
-> “My ancestors killed a dragon. A real dragon – a massive, winged lizard.”
->
-> You nod and tell her that you’ve heard stories about dragons too. The story came from Jabal – the general who was always obsessed with venturing into the unknown. He once told you that, long ago, the Sultan’s armies spent years scouring the land in search of dragons. Yet even with the strength of an entire nation, they never found even a single dragon scale.
->
-> Still, Jabal believes that dragons existed – and so do you.
->
-> Adila’s eyes widen, clearly not expecting your agreement. Then, with renewed excitement, she dives into the history of her family. She explains that the Adila family had been warriors for generations. They were once extremely prominent, and among every Sultan's grand generals, there was always one from her lineage.
->
-> But about two centuries ago, one of her ancestors encountered a dragon. He tracked it relentlessly, following its trail deep into its lair, and ultimately slew it.
->
-> “At the time, my old ancestor thought dragons were nothing more than oversized lizards,” she says with a bitter laugh. “Dead is dead, right? Well, it turns out that dragons are far more formidable than that.”
->
-> With its dying breath, the dragon cursed the Adila family, ensuring they would never kill another dragon again. The curse manifested in a cruel way: from that day forward, no male heirs were ever born into the family. And a woman's hands were for spinning thread and cooking - not for wielding swords. A family with only women could never slay a dragon.
->
-> As Adila recounts this twisted tale of curses and dragons, she toys with the carving knife stuck in her lamb shank. As Adila recounts this twisted tale, she toys with the carving knife in her lamb shank. Her tone is mocking, but her eyes betray a melancholy she can't hide.
->
-> “So you see,” she continues, “even though my family has done well for itself, run entirely by women, the moment I said I wanted to take up the sword, my grandmother, mother, aunts, cousins – all of them – jumped in to stop me. They said the dragon’s curse forbids us from touching weapons, and if I dared to try, it would only anger that dead dragon even more! They're... ah, forget it. Just treat it as drunk talk, nothing more."
->
-> Her voice trails off, and she downs the last of her wine in a single, fluid motion. From the way she handles the cup, you suspect she isn’t drunk at all. She just needed the courage of the drink to tell you this story.
+> Helplessly, you drew your sword. He wouldn't sit still waiting for death either.
+> Your Physique and Combat determine your full dice count.
+> You need at least 3 Successes.
 
 <!-- settlement_extre[0] -->
-**Outcome — branch, condition `{"!s2": 1, "s3": 1}`:** *You choose to entertain Adila alone.*
-> According to the noble tradition, the lady of the house must be present when entertaining unmarried female guests in the inner chambers. But Adila doesn't consider herself a guest at all... Perhaps Maggie won't be angry about this... hopefully.
-> Adila eats freely, tearing into meat chunks, and drinks heavily. The conversation turns to her family only after she is half-drunk.
-> “My ancestors killed a dragon. A real dragon – a massive, winged lizard.” She puts down her glass and stares straight at you as if she is judging whether you believe her or not...
-> It occurs to you that the Sultan once sent the adventurous general Jabal to lead his army around for years in search of dragons.Yet even with the strength of an entire nation, they never found even a single dragon scale. And yet...
-> You hesitate, unsure how to respond, but Adila doesn’t miss a beat. She slams her glass down with a thud, waving a leftover goat bone in one hand, and demands that you to fight her. She can't take anyone suspecting her of being a swindler.
+**Outcome — branch, condition `{}`:**
+> You slaped the Sultan Card across his face, asking if he'd like to taste it. Briefly grimacing, he clenched his fists, but then bowed to you.
+> "Please forgive me," he apologized submissively, though deep down still unwilling, "But you can't blame me, it was your slave girl who seduced me. She's so beautiful, she looked at me among so many people, if not showing her willing..." 
+> Under your cold gaze, he swallowed the rest of his words.
+> Matters seemed to conclude in this way.
 
 <!-- settlement_extre[1] -->
-**Outcome — failure, condition `{"!s2": 1, "s3": 1, "r1:战斗-e(战斗)<": [1, 5]}`:**
-> The goat bone catches you right in the head before you can react. Adila freezes, the shock sobering her up a bit. She backs off – as wild as she might be, she's still a guest and wouldn't dare to seriously harm her host. After making sure you're not hurt, she apologizes, straightens up in her seat, and starts telling you about her family.
+**Outcome — branch, condition `{}`:** *However, the Sultan finds out about it.*
+> The Sultan curiously inquires what Sultan Card you brandished, then commands you to execute it.
+> He wants you to know he permits you to play this game, grants you these powers, but ultimately, he is the true master, and you're merely his entertainment.
 
 <!-- settlement_extre[2] -->
-**Outcome — success, condition `{"!s2": 1, "s3": 1, "r1:战斗-e(战斗)>=": [1, 5]}`:**
-> No matter which angle Adila swings the goat bone from, you smoothly deflect each blow. You're so in control that you even manage to grab the bone and use it to pin her down. She bursts into laughter as she admits defeat, praising your skills over and over again. When things finally settle down, she clears her throat, straightens up in her seat, and with a suddenly serious face, starts telling you about her family.
+**Outcome — success, condition `{"s3.杀戮": 1, "r1:战斗+体魄>=": [3, 5]}`:**
+> He fell under your blade, ending his vile, pitiful life like a rat. Amidst the Sultan's laughter, you admitted you felt little pity for him – a man undeserving of sympathy.
+> You settled the matter with Inal honorably, and on returning, Maggie embraces you. She never finds you such dependable.
 
 <!-- settlement_extre[3] -->
-**Outcome — branch, condition `{"!s2": 1, "s3": 1}`:**
-> She explains that the Adila family had been warriors for generations. They were once extremely prominent, and among every Sultan's grand generals, there was always one from her lineage.
+**Outcome — failure, condition `{"s3.杀戮": 1, "r1:战斗+体魄<": [3, 5]}`:**
+> You died. Everyone laughs at you, dying for a lowly slave. Only your wife and followers loyal to you weep for you.
+
+<!-- settlement_extre[4] -->
+**Outcome — branch, condition `{"s3.纵欲": 1}`:**
+> Though you were unwilling, you ultimately had no choice. The man jumped up terrified, dodging and fleeing across the court, captured only by the combined efforts of the guards, still desperately struggling and begging for mercy, his tears making that already unattractive face even more repulsive, and with that smelly, suspicious liquid dripping down between his legs.
 >
-> But about two centuries ago, one of her ancestors stumbled upon a dragon. He tracked it relentlessly, following its trail all the way to its lair, and finally slayed it.
+> Alas, was it worth it? Unlike you, he had not accustomed himself to accepting these things... Though, perhaps he should find it fortunate, at least, that he won't die. Such a man's flavor was hardly appealing... After a perfunctory ordeal, your grim face at last elicited a subtle smile from the Sultan. 
 >
-> “At the time, my old ancestor thought dragons were nothing more than oversized lizards,” she says with a bitter laugh. “Dead is dead, right? Well, it turns out that dragons are far more formidable than that.”
+> Even Maggie, upon hearing, couldn't criticize you harshly. What could be said... at least you resolved the affair with Inal. Rumor had it that the noble, having lost his face, left the capital overnight. 
 >
-> With its dying breath, the dragon cursed the Adila family, ensuring they would never kill another dragon again. The curse manifested in a cruel way: from that day forward, no male heirs were ever born into the family. And a woman's hands were for spinning thread and cooking - not for wielding swords. A family with only women could never slay a dragon.
+> You just wished whatever wind carried him away carry you with too.
+
+<!-- settlement_extre[5] -->
+**Outcome — branch, condition `{"s3.征服": 1}`:** *Your army mobilizes accordingly*
+> His family, his lands, his dignity, all that he could boast of were ruthlessly crushed. The Sultan smiled, enjoying what he saw, moreover delighted by your army. Oh, what army! He watched as if a child rejuvinated in a toy he had long grown bored of. The Sultan's gaze pierced your back until you left the Court. He'll crush it all for amusement when you are most absorbed in it, just wait... ha ha. 
 >
-> As Adila recounts this twisted tale of curses and dragons, she toys with the carving knife stuck in her lamb shank. As Adila recounts this twisted tale, she toys with the carving knife in her lamb shank. Her tone is mocking, but her eyes betray a melancholy she can't hide.
->
-> “So you see,” she continues, “even though my family has done well for itself, run entirely by women, the moment I said I wanted to take up the sword, my grandmother, mother, aunts, cousins – all of them – jumped in to stop me. They said the dragon’s curse forbids us from touching weapons, and if I dared to try, it would only anger that dead dragon even more! They're... ah, forget it. Just treat it as drunk talk, nothing more."
->
-> Her voice trails off, and she downs the last of her wine in a single, fluid motion. From the way she handles the cup, you suspect she isn’t drunk at all. She just needed the courage of the drink to tell you this story.
+> Though it brought much bloodshed, you sided with Inal to resolve the issue. Maggie doesn't blame you much... if anyone's to blame, blame the Sultan.
 
 
 ## Malicious Joke — rite `5006670` (恶意的玩笑)
@@ -5036,45 +5251,6 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 > As her final skeleton collapses and dissolves in the pool, the formerly sapphire-clear water has become pitch-black, churning with foul bubbles... You'd better flee quickly, before the god realizes someone has spat in its refreshing treat.
 
 
-## Under the Sultan's Gaze — rite `5006027` (御前试合)
-**Confidence:** High — official `i18n/en` string for every field; 1 of them also appears verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
-**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5006027_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Under_the_Sultan%27s_Gaze
-
-**Intro (EN):**
-> The Rod of Life's fame grows... more and more of its rumors keep the Sultan vigilant, even restless at night.
->
-> Finally, he asks you to demonstrate the fake phallus's power before him – Alas, the benevolent Sultan proposes that this glorious demonstration in the lapis lazuli hall is worth breaking a Gold Carnality Card, only if you draw it.
-
-**Slot lines (EN):**
-> s1: Yourself
-> s2: An ally with Passion, or an ally equipped with the Rod of Life, or... the Rod itself
-> s3: Golden Carnality Card of the highest tier
-
-<!-- settlement_prior[0] -->
-**Outcome — branch, condition `{"s2.is": 2000556}`:** *Infinite Loyalty*
-> You dismantle this thing and personally deliver it to the throne — this invincible weapon can only belong to the Sultan. And infinite loyalty surpassing even one's own desire of self to the Sultan, who can surpass this? You rarely see the Sultan laughs so happily, he praises you tirelessly and rewarded you with a large sum of money.
-
-<!-- settlement[0] -->
-**Outcome — branch, condition `{"s2.妻子": 1}`:** *Grand Harmony*
-> The Sultan’s intent was perhaps half curiosity, half humiliation. But with the help of the Rod of Life, you and your wife overcame all shame, presenting a fluid and harmonious passion – an ability to make one's partner feel blissful that moved the entire palace – nearly everyone displayed envious expressions... The Sultan seemed influenced by this atmosphere as well; he made a few praises of you and your wife and then dismissed you.
-
-<!-- settlement[1] -->
-**Outcome — branch, condition `{"s1.生命权杖": 1, "!s2.妻子": 1}`:** *Barbarity and Bliss*
-> This prolonged, powerful, and debauched feast shocked the palace. The ministers quietly watched as you exhibited invincible techniques with the Rod of Life, as if overwhelmed by your indomitable aura. Finally, when you stood proudly in front of the Sultan, you suddenly realized you had overstepped your bounds...
->  You immediately knelt to apologize to the Sultan, but alas, his cruelty and bestial desire had been provoked to the extreme by the previous obscene performance – he declared that subjects were unworthy of using such a monarch's tool, and as punishment, your flesh-bound prosthetic would be cut off at once... It is a self-evident law in this country that there cannot be a phallus better than the Sultan's!
->  You bled to death in the palace like a clown.
-
-<!-- settlement[2] -->
-**Outcome — branch, condition `{"s2.生命权杖": 1, "!s2.妻子": 1}`:** *Disgrace at Court*
-> The Sultan wanted to humiliate you, and you satisfied his wildest imagination. But truly, you never expected the Rod of Life to feel this pleasurable...
-> [s2.name] was evidently a bit scared of the Sultan, but the power of the Rod of Life surpassed earthly dominion. You were entirely conquered in the center of the palace hall, emitting various strange cries and terrifying sounds, finally collapsing from exhaustion under the gaze of the ministers and the Sultan.
->  Regardless, such humiliation and pleasure must never be repeated in this lifetime.
-
-<!-- settlement_extre[0] -->
-**Outcome — branch, condition `{"any": {"all": {"s2.生命权杖": 1, "s3": 1}}}`:**
-> Such legendary tales can break any Carnality Card.
-
-
 ## Thirst for Blood — rite `5006071` (血的渴求)
 **Confidence:** High — official `i18n/en` string for every field; 1 of them also appears verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
 **Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5006071_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Thirst_For_Blood
@@ -5118,6 +5294,65 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 <!-- settlement[4] -->
 **Outcome — failure, condition `{"r1:魔力<": [2, 5]}`:**
 > The god remains silent to your prayers, while the demon of dreams stirs in vengeful awakening.
+
+
+## The Same Storm — rite `5008057` (同一场风暴)
+**Confidence:** High — official `i18n/en` string for every field; 1 of them also appears verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5008057_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Fardak#Embrace_him
+
+**Intro (EN):**
+> The shadow of the same storm looms over you, drawing you inexplicably closer to each other, seeking solace...
+
+**Slot lines (EN):**
+> s1: Fardak
+> s2: You must personally...
+> s3: You can take this opportunity to break a Carnality Card
+
+<!-- settlement[0] -->
+**Outcome — branch, condition `{"counter.7000069>=": 1, "!s3": 1}`:** *A hug is not enough*
+> Fardak's pale fingers clasp your garment tightly, trembling slightly.
+>
+> He has always turned to you for solace without even realizing it... When did this become his refuge? Is it a habit? Since when?
+>
+> Is it because he once laid his vulnerabilities bare before you, freeing him to confront his deepest heart and desires now? Or is it because you are a player of the Sultan Card, or simply... because you are special to him?
+>
+> He lowers his eyes, asking for a kiss, and then, for more.
+>
+> What happened that night is never mentioned again. But you both know, in the storm, you are not alone.
+
+<!-- settlement[1] -->
+**Outcome — branch, condition `{"counter.7000069>=": 1, "s3": 1}`:** *Only joy can resist pain and despair*
+> If cruel fate is inevitable, why not find joy amid misery?
+>
+> You persuade Fardak, pushing him down onto the rough carpet.
+>
+> The memory of that public humiliation resurfaces in his mind, and he struggles, sensing how different this moment is from the last time: there is no Sultan's gaze, no Sultan's intimidation... but, is it really different?
+>
+> A tear forms on his trembling eyelashes; Fardak closes his despairing eyes, not looking at you, not resisting, simply clutching your garment tightly as he yields to your passionate advance.
+>
+> You are sure of this truth. A moment of joy can help one temporarily forget the lingering despair. To accept it, to surrender to it, is all he can do.
+
+<!-- settlement[2] -->
+**Outcome — branch, condition `{"counter.7000069<": 1, "!s3": 1}`:** *Let's forget about tomorrow*
+> You take him to your secret cellar. You have spent countless sleepless nights here; in that mesmerizing intoxication, where you can finally stop thinking about tomorrow. As if time exists only in this moment, as if the world contains no one but the two of you.
+>
+> You clink your glasses, creating a loud sound. Like two wounded beasts who have wandered the dangerous wilderness separately, only to find each other by chance, you begin to tend to one another's pain. Together, you set aside thoughts of the Sultan, the Sultan Card, that cruel game, and that cold destiny. You pat the jug gently while he sings the songs of his homeland. You laugh heartily until tears stream from your eyes. Eventually, you both fall asleep drunk in this sheltered place. In this tiny respite from reality, you steal what little courage you can to face the uncertain tomorrow that awaits beyond these walls – even if it might ultimately lead to death.
+
+<!-- settlement[3] -->
+**Outcome — branch, condition `{"counter.7000069<": 1, "s3": 1}`:** *You show him a Carnality Card*
+> He examines the card, feeling the cold seep from his fingertips into the depths of his soul.
+>
+> "So this is what's been trapping you all this time?" A faint smile appears on his pale face. And then, he leans in to kiss you, gently guiding you back into the soft pillows and draping curtains.
+>
+> In this luxurious yet impossibly cold mansion, in this world, the warmth of an embrace feels so fragile, so ephemeral. But what else can you ask from each other?
+>
+> When morning light spills into the room, he sightly breaks the card for you: "I'm trapped now, [player.name], but you – are you one step closer to your freedom?"
+
+<!-- settlement_extre[0] -->
+**Outcome — branch, condition `{"counter.7000069>=": 1, "s3": 1}`:** *You take the opportunity to break a carnality card*
+> Fardak stands again in the center of the Lapis Lazuli Palace, head bowed, lips pressed tight, knees and elbows raw and red. Seeing this, the Sultan laughs heartily, allowing you to break this card.
+>
+> This is exactly what he expected to see.
 
 
 ## No Loose Ends — rite `5000565` (不留后患)
@@ -5354,7 +5589,7 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 
 ## The Uncanny Mirror — rite `5000301` (诡异的镜子)
 **Confidence:** High — official `i18n/en` string for every field; 1 of them also appears verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
-**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5000301_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/The_Ancient_Mirror#The_Uncanny_Mirror
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5000301_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/The_Ancient_Mirror#Recruiting, https://sultansgame.wiki.gg/wiki/The_Ancient_Mirror#The_Uncanny_Mirror
 
 **Intro (EN):**
 > That old warehouse—untouched for a decade—now hums with whispers and flickers with eerie blue light. Something stirs where nothing should.
@@ -5671,7 +5906,7 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 
 ## Sacred Branding — rite `5010034` (神圣的烙印)
 **Confidence:** High — official `i18n/en` string for every field; 1 of them also appears verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
-**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5010034_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Bonum_in_se%3F#Sacred_Branding_Conclusion
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5010034_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Bonum_in_se%3F#Sacred_Branding, https://sultansgame.wiki.gg/wiki/Bonum_in_se%3F#Sacred_Branding_Conclusion
 
 **Intro (EN):**
 > A mark of loyalty... branded over your heart.
@@ -6188,7 +6423,7 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 
 ## Fragment of the Star-Souled Glyphs — rite `5006519` (星灵咒文残卷)
 **Confidence:** High — official `i18n/en` string for every field; 1 of them also appears verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
-**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5006519_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Lumera#The_Pain_of_Editing
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5006519_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Lumera#The_Genius_Girl, https://sultansgame.wiki.gg/wiki/Lumera#The_Pain_of_Editing
 
 **Intro (EN):**
 > You and Lumera try to decipher these obscure spells.
@@ -6271,7 +6506,7 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 
 ## Last Wish — rite `5006678` (最后的愿望)
 **Confidence:** High — official `i18n/en` string for every field; 1 of them also appears verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
-**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5006678_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Nursery#Happiness
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5006678_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Nursery#Events, https://sultansgame.wiki.gg/wiki/Nursery#Happiness
 
 **Intro (EN):**
 > In the orphanage, there is a well-loved child named Safaa. Little Safaa is a die-hard fan of the King of Flames and the most beloved happy spirit among the children. Sadly, she is afflicted with an illness that even the most excellent doctors cannot cure... Yesterday, you heard that Little Safaa wishes to become a "burning ghost" under the King of Flames when she dies. (You have no idea what this means – it wasn't part of your original writings. It seems to be a fan creation by subsequent bards).
@@ -6650,7 +6885,7 @@ A handful of hub rites here are capped at 30 outcome branches (`Game of Power` h
 
 ## Fate of the Pickpocket — rite `5008070` (小贼的命运)
 **Confidence:** High — official `i18n/en` string for every field; 1 of them also appears verbatim on sultansgame.wiki.gg, transcribed by editors from the running game (see Source).
-**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5008070_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Hemir
+**Source:** official English `StreamingAssets/i18n/en/config.json`, keys `rite_5008070_*`; wiki corroboration: https://sultansgame.wiki.gg/wiki/Hemir, https://sultansgame.wiki.gg/wiki/Hemir#Fate_of_the_Pickpocket
 
 **Intro (EN):**
 > The time has come. You decide to use the card you drew to deal with the little pickpocket bold enough to steal your property.

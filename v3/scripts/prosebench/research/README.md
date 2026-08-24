@@ -23,6 +23,21 @@ guideline, re-derive from these files.
 | `reference_failbetter.md` | 99 KB | PART A: the three official Fallen London Writer Guidelines posts plus the rest of Failbetter's published craft canon. PART B: 36 storylet sections / 61 branches as Root / Branch / Success / Failure, each word-counted; only samples with zero elision markers were kept. | `failbettergames.com/news/*`; `fallenlondon.wiki` API; Sunless Sea / Sunless Skies Fandom wikis. |
 | `craft_literature.md` | 68 KB | ~29 sources of published craft guidance, rules quoted with URLs, plus a section listing advice stated independently by two or more practitioners. | Failbetter, inkle (Jon Ingold), Emily Short, Choice of Games, Mawhorter/Short, CCG flavour-text guidance, IF craft writing. |
 
+### ⭐ THE PRIMARY SOURCE — official English game data
+| file | contents |
+|---|---|
+| `sultans_en/config_merged.json.gz` | **The game's shipped English localisation.** 43,619 keys: all 1,495 rites, 8,283 settlement/branch texts, 3,627 slot lines, 1,229 card blurbs. Verified against the wiki (`rite_5000703` name + flavour text verbatim). Key schema: `rite_N_text` (card), `rite_N_cards_slot_sN_text` (slot line), `rite_N_settlement_N_text` (unconditional result), `rite_N_settlement_extre_N_text` (dice-gated branch). |
+| `sultans_en/config.json.gz` | The clean official file alone (38,797 keys, Dec-2025 build). Use when provenance must be single-source. |
+| `sultans_en/merge_provenance.json` | Which keys came from the second source (a Thai pack's untranslated English residue) rather than the clean file. |
+| `sultans_en/rite_conditions.json` | rite id → name, slots, branch dice conditions. |
+| `english_rite_records.md` | **1,366 COMPLETE English rite records** — intro + slot lines + dice line + every outcome branch with its dice condition. 143 assembled with wiki corroboration; the rest generatable. |
+| `rite_record.py` | Emits any or all remaining records (`--all`, `--index`, `--max`). |
+| `english_source_hunt.md` | How the file was found, and every avenue that failed. GitHub code search does not index files >384 KB, which is why earlier hunts missed it. |
+| `english_speech_lines.md` | 99 official-English spoken lines swept from wiki prose outside `{{quote}}` templates. |
+| `english_outcomes_hunt.md` | The off-wiki hunt that came back empty, with a source map of what is blocked. |
+
+**Nothing in the rite corpus is CN-only.** Every rite field exists in official English.
+
 ### Derived analysis (measurements and cross-checks made from the corpora above)
 
 | file | contents |

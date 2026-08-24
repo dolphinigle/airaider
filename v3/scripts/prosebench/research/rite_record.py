@@ -2,7 +2,8 @@
 """Emit COMPLETE Sultan's Game rite records in the game's official shipped English.
 
 Joins two local files:
-  sultans_en/config.json          - official StreamingAssets/i18n/en/config.json (all English strings)
+  sultans_en/config_merged.json[.gz] (preferred) or config.json[.gz]
+                                  - official StreamingAssets/i18n/en/config.json (all English strings)
   sultans_en/rite_conditions.json - version-matched structural index derived from the shipped
                                     Chinese StreamingAssets/config/rite/*.json (slot ids, branch
                                     order, and each branch's dice/state condition)
@@ -13,10 +14,24 @@ Usage:
   python3 rite_record.py --all --max 30       # cap outcome branches per rite
   python3 rite_record.py --index              # id / English name / branch count / completeness
 """
-import json, os, re, sys, argparse
+import json, os, re, sys, gzip, argparse
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-EN = json.load(open(os.path.join(HERE, 'sultans_en/config.json'), encoding='utf-8'))
+
+
+def _load_en():
+    """Prefer the merged (multi-build) English config; fall back to the plain one.
+    Accepts .json or .json.gz — a parallel session gzips these in place."""
+    for cand in ('sultans_en/config_merged.json', 'sultans_en/config_merged.json.gz',
+                 'sultans_en/config.json', 'sultans_en/config.json.gz'):
+        p = os.path.join(HERE, cand)
+        if os.path.exists(p):
+            op = gzip.open if p.endswith('.gz') else open
+            return json.load(op(p, 'rt', encoding='utf-8')), cand
+    raise SystemExit('no English config found under sultans_en/')
+
+
+EN, EN_SRC = _load_en()
 CN = json.load(open(os.path.join(HERE, 'sultans_en/rite_conditions.json'), encoding='utf-8'))
 
 
