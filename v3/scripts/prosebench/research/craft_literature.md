@@ -1,3 +1,39 @@
+> # ⚠ CORRECTIONS — read before citing anything in this file
+> An adversarial fidelity audit (`AUDIT_craft.md`, 2026-08-24: ~316 phrase-level substring tests over
+> ~190 quotations, every source re-fetched) found **no fabricated quote and no invented source**, and
+> **no dead links**. All ~110 Failbetter quotes, all Emily Short, all Jon Ingold, and all
+> Rosewater/Wonders/Kennedy/GDC-MMO material verified verbatim. Failbetter's root 30 / branch 20 /
+> result 100 is exact. But the following defects are confirmed and **are not yet fixed in the text
+> below**:
+>
+> 1. **The Loewenstein quotation in §9 is wrong three ways and misattributed.** It reads *"a cognitive
+>    induced deprivation that arises from the perception of a gap in knowledge and understanding"*,
+>    cited to a PBS NOVA page. It is not on that page at all, and the paper's actual wording is
+>    *"a form of **cognitively** induced deprivation… gap in knowledge **or** understanding"*. This is
+>    the garbled version that circulates on secondary blogs — i.e. copied third-hand. The cited CMU
+>    PDF is a scanned image with no text layer, so nothing in it could have been verified by search.
+>    **Do not quote this. Cite Loewenstein only from the paper itself.**
+> 2. **Five Choice of Games quotes are filed under the wrong post** — "condense your game down [to] a
+>    single sentence" and "gripping premise" are in Part 1, not the cited Part 3.
+> 3. **The two Vonnegut citations are exactly swapped** — "The dictum of fiction is…" is in Part 3,
+>    spoken by Mary Duffy, not in her "How to Edit Yourself".
+> 4. **Two author surnames are invented** relative to their sources: "Yasmeen **Khan**" and "Nigel
+>    **Evans**" appear nowhere on those pages (bylined "Failbetter Games"; only first names appear
+>    internally). `reference_failbetter.md` gets this right and contradicts this file.
+> 5. **The CCG "100 characters" figure is real but misframed** as a hard budget; the source's very
+>    next sentence — dropped without ellipsis — says there is "usually some flexibility… 110
+>    characters".
+> 6. **Four minor silent misquotes**: Short's "directs"→"direct" plus a dropped example that orphans
+>    "to kiss"; Mistretta truncated mid-clause with a full stop; two Die Hard sentence openings
+>    clipped without ellipsis.
+> 7. **Several unmarked inferences are dressed as source content** — most clearly the invented
+>    rationale for Failbetter's weather/time rules, and the ink bracket-syntax claim, which
+>    **inverts** the source's stated design intent ("core similarity"). The file declares a
+>    `[paraphrase]` convention and then never uses it.
+>
+> None of these defects propagated into `../GUIDELINE.md` — verified by inspection; the guideline
+> cites only Failbetter, Short and Ingold material that the audit confirmed verbatim.
+
 # Craft literature: short interactive prose attached to a mechanic
 
 Research compiled 2026-08-24. Scope: published, citable craft guidance on **short prose that a

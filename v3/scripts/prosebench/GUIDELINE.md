@@ -32,6 +32,16 @@ genuine defects in rite 5000506 (a fabricated ellipsis and a 52-of-183-character
 replaced with the complete verbatim field. Post-repair: 212/212 PART 1 rows character-exact against
 the live `{{quote}}` bodies; 93/93 PART 3 Chinese blocks character-exact against the shipped configs.
 
+The craft-sources audit (~316 phrase tests over ~190 quotations, every source re-fetched) found
+**no fabricated quote, no invented source and no dead links**. All ~110 Failbetter quotes, all Emily
+Short and all Jon Ingold material verified verbatim, and Failbetter's root 30 / branch 20 / result
+100 is exact — so every craft citation THIS document relies on is confirmed. It did find seven
+defects in `research/craft_literature.md` (a third-hand garbled Loewenstein quote attributed to a
+page that does not contain it, five Choice of Games quotes filed under the wrong post, two swapped
+Vonnegut citations, two invented author surnames, a misframed CCG character limit, four minor
+misquotes, unmarked inferences). **None propagated here** — verified by inspection; that file now
+carries a corrections banner.
+
 The one relabel that DOES bind: the PART 3 English is **not literal**. It splits Chinese sentences
 and in six places upgrades plain phrasing into a nicer image (`令人舒爽的风` → "a wind that feels good
 on the skin"; the skin is the translator's). All six are now annotated in place. **Use PART 3 for

@@ -61,6 +61,19 @@ rite 5000506 corrected against the raw config. Post-repair verification: 212/212
 character-exact against live `{{quote}}` bodies; 93/93 PART 3 Chinese blocks character-exact against
 the shipped `rite/*.json`; PART 2 738 lines with zero residual markup.
 
+`AUDIT_craft.md` — ~316 phrase-level tests over ~190 quotations; every source re-fetched.
+**No fabricated quote, no invented source, no dead links.** All ~110 Failbetter quotes, all Emily
+Short, all Jon Ingold, all Rosewater/Wonders/Kennedy/GDC-MMO verified verbatim; Failbetter's root 30
+/ branch 20 / result 100 exact. `reference_failbetter.md` is essentially clean — 104/104 Part A
+blocks verified, 215/215 word counts correct, 213/215 texts exact substrings of live wiki source,
+and its zero-elision claim holds. **`craft_literature.md` carries seven confirmed defects** — a
+third-hand garbled Loewenstein quote attributed to a page that does not contain it, five Choice of
+Games quotes filed under the wrong post, two swapped Vonnegut citations, two invented author
+surnames, a misframed CCG character limit, four minor silent misquotes, and several unmarked
+inferences dressed as source content. **A corrections banner is prepended to that file; read it
+before citing anything from it.** None of these defects propagated into `../GUIDELINE.md`, which
+cites only audit-verified Failbetter/Short/Ingold material.
+
 **Caveats that bind on use:**
 - **PART 3 English translations are NOT literal.** They split Chinese sentences and in six places
   upgrade plain phrasing into a nicer image (`令人舒爽的风` → "a wind that feels good on the skin").
