@@ -668,3 +668,48 @@ use*. Result: `dealt-paste` **6 → 2** and **8 → 1**; clean **63% → 71%** a
 ⚠️ **Not yet blind-judged as a unit.** The +0.57 / 28%-vs-8% result was measured on V3 with the
 149-pair pool. The ban is w2-measured and lint-verified and the pool is diversity-verified, but the
 combination needs a blind batch before the champion claim carries over in full.
+
+---
+# ❌ RETRACTION — the V3 champion claim was built on a statistical error of mine
+**Batch 5 (116 cards, 3 seats, 48 UNIQUE cards per arm across TWO seeds, both arms on the same 409
+pool) — the first genuinely independent test:**
+| arm | n | mean | 95% CI | ≥7 |
+|---|---|---|---|---|
+| GOLD_endorsed | 20 | 5.98 | [5.24, 6.72] | 7/20 (35%) |
+| **P54_old** | 48 | **5.74** | [5.41, 6.06] | 11/48 (22%) |
+| **CHAMPION_V3** | 48 | **5.44** | [5.02, 5.87] | 12/48 (25%) |
+
+**V3 − P54 = −0.29 ± 0.54, not significant. Hit rate 12/48 vs 11/48 — indistinguishable.**
+
+## The error
+I claimed "+0.57, direction consistent across three independent batches, Fisher p=0.0295, n=46/arm."
+**Batches 2, 3 and 4 all drew V3's cards from the SAME single generation run** — `ATT_V3_both.md`,
+seed 101, 24 cards (verified: 10/10, 12/12, 24/24 of them came from that one file). The same is true
+of the P54 control.
+
+So:
+- **"n=46 per arm" double-counted the same cards.** There were only ever 24 unique cards per arm.
+- **"Direction consistent across three batches" was three re-judgements of ONE draw**, not three
+  replications. It measured judge agreement, not prompt quality.
+- **The Fisher test (13/46 vs 4/46, p=0.0295) was computed on duplicated rows and is void.**
+
+On unique cards, no test ever showed a significant V3 advantage: batch 4 alone gave +0.64 ± 0.65
+(not significant — I recorded that caveat at the time and then over-rode it by pooling). Batch 5
+gives −0.29 ± 0.54.
+
+**⇒ V3's closer rule is UNPROVEN. It is not a champion. Renamed `ATT_V3_UNPROVEN.txt`.**
+It may still be worth something — its point estimate led on one draw — but a single 24-card draw
+cannot establish it, and the honest state is "no measured effect."
+
+## What survives, and what the champion now is
+`CHAMPION.txt` = **P54 + the `ask` adjacent ban, and nothing else.** The ban is validated
+independently of any of this: it is a lint-measurable paste defect, fixed three separate times
+(w4 5/24→0/24, mine 21/24→2/24, this one 6-8/24→1-2/24). Verified on the 409 pool: **83% and 88%
+lint-clean** on two seeds, up from 63%/54% without it.
+
+## The methodological lesson — the expensive one of the session
+**Re-judging the same generated cards is not replication.** Every arm must be REGENERATED on a fresh
+seed for each independent test, or the batches only measure how much the judges agree with each
+other. I built two rounds of conclusions on this and it cost the champion claim.
+Combined with the earlier lesson (an 8–12 card arm cannot rank prompts), the standing protocol is:
+**≥24 unique cards per arm, ≥2 seeds, regenerated per test, judged blind by ≥3 fresh seats.**
