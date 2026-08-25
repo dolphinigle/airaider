@@ -10,6 +10,7 @@ import type { QuestWriteInput } from '../src/ai/provider.js';
 import { lintCard } from './cardlint.js';
 import { MOTIVES } from './motives.js';
 import { MOTIVES2 } from './motives2.js';
+import { SHAPES, CONCRETE } from './shapes.js';
 
 function loadKey(): string {
   if (process.env.OPENAI_API_KEY) return process.env.OPENAI_API_KEY;
@@ -94,6 +95,12 @@ let motiveN = 0;
 // followed at the real frequency rather than as stated.
 const VOICE = ['question','aside','dash','speech','','','','','','','','','','','',''] as const;
 let voiceN = 0;
+// MOTIVE=4 — the designer's design: a GENERIC story shape plus two CONCRETE atoms that combine,
+// rather than my 149 pre-written scenarios. 'a person with an unexpected background' + 'wolf' +
+// 'morning' can become a werewolf who changes at dawn; the same shape with 'a bell' + 'a funeral'
+// becomes something else entirely. Space is ~40 x 726 x 335, not 149.
+let shapeN = 0;
+const pickA = <T,>(a: readonly T[], i: number) => a[(i * 7 + 3) % a.length]!;
 let actorN = 0;
 
 const userOf = (i: QuestWriteInput) => JSON.stringify({
@@ -104,6 +111,25 @@ const userOf = (i: QuestWriteInput) => JSON.stringify({
   ...(process.env.ODD_ACTOR === '1' && process.env.MOTIVE !== '3' ? { oddActor: ACTORS[actorN++ % ACTORS.length] } : {}),
   ...(process.env.MOTIVE === '1' ? { clientMotive: MOTIVES[(motiveN++ * 37) % MOTIVES.length] } : {}),
   ...(process.env.VOICE === '1' && VOICE[voiceN++ % VOICE.length] ? { voice: VOICE[(voiceN-1) % VOICE.length] } : {}),
+  ...(process.env.MOTIVE === '4' ? (() => { const i = shapeN++; const pools = Object.values(CONCRETE);
+        const p1 = pools[i % pools.length]!, p2 = pools[(i + 2) % pools.length]!;
+        return { shape: SHAPES[(i * 13) % SHAPES.length], atoms: [pickA(p1, i), pickA(p2, i * 3)] }; })() : {}),
+  // MOTIVE=6 — the synthesis. Blind judging showed variety comes from varying the VERB (what the
+  // job asks) and NOT the noun (props merely get decorated). The two halves of the pool are
+  // therefore DECOUPLED and combined independently: 149 actions x 149 tells = 22,201 pairings,
+  // where the fixed pairs gave 149. Generic and combinatorial, per the designer's design, but
+  // combinatorial on the axis that actually produces range.
+  // MOTIVE=7 — pairing PRESERVED (decoupling ask from tell destroyed coherence: 'watch the roof
+  // at night; their beds have been moved to the outbuilding already'), plus a SHAPE as a third,
+  // ORTHOGONAL dimension. A shape modulates the turn of any pair without needing to be paired to
+  // it, so it multiplies the space 149 -> 149 x 40 without breaking the ask/tell relationship.
+  ...(process.env.MOTIVE === '7' ? (() => { const i = motiveN++; const m = MOTIVES2[(i * 17) % MOTIVES2.length]!;
+        return { ask: m.want, seen: m.tell, shape: SHAPES[(i * 13) % SHAPES.length] }; })() : {}),
+  ...(process.env.MOTIVE === '6' ? (() => { const i = motiveN++;
+        return { ask: MOTIVES2[(i * 17) % MOTIVES2.length]!.want,
+                 seen: MOTIVES2[(i * 71 + 43) % MOTIVES2.length]!.tell }; })() : {}),
+  ...(process.env.MOTIVE === '5' ? (() => { const i = shapeN++; const pools = Object.values(CONCRETE);
+        return { shape: SHAPES[(i * 13) % SHAPES.length], atom: pickA(pools[i % pools.length]!, i) }; })() : {}),
   ...((process.env.MOTIVE === '2' || process.env.MOTIVE === '3') ? { ask: MOTIVES2[(motiveN++ * 17) % MOTIVES2.length].want, seen: MOTIVES2[((motiveN-1) * 17) % MOTIVES2.length].tell } : {}),
 });
 
