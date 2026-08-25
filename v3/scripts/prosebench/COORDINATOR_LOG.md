@@ -349,3 +349,12 @@ worst cards are *"You have transcended the world woven from ink…"* (an ending 
 *"Meticulously ensuring its flight capability…"* (a sentence fragment), which all three seats
 correctly scored 1–2. Its best scored 7.33. **Rebuild the reference arm from the ENDORSED gold, not
 a filter, before quoting any reference number again.**
+
+### Footnote — why the `openWith` claim survived as long as it did
+I justified "variety at NO quality cost" with *lint-clean unchanged at 92%*. That number came from a
+lint which **could not see dealt-value pastes** — precisely the defect `openWith` was introducing.
+The instrument was blind to the failure mode of the thing it was being used to validate.
+Re-measured with the fixed lint, the control's own clean rate is 75%, not 92%, so **no clean-rate
+figure recorded before commit `00d55b0` is comparable to one after it.**
+The blind judges caught it anyway. **When lint and blind judgement disagree, the judges are ground
+truth** — lint is telemetry that can only ever check what someone thought to encode.
