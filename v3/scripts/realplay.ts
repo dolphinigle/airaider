@@ -14,7 +14,7 @@ import { assertAudit } from '../src/game/audit.js';
 const cycles = Number(process.argv[2] ?? 35);
 const seed = Number(process.argv[3] ?? 7777);
 const maxUsd = Number(process.argv[4] ?? 2);
-const LOG = '/tmp/claude-1000/-home-irvan-airaider/aae74806-c696-46d6-b099-8565108c8a84/scratchpad/realplay.log';
+const LOG = process.argv[5] ?? '/home/irvan/.claude/jobs/0731b68a/tmp/realplay.log';
 
 const g = new Game(makeOpenAiProvider(), seed);
 const out: string[] = [];
