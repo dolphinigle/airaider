@@ -87,7 +87,18 @@ simile are what make it heavy.
 
 ---
 
-# THE STRUCTURAL LAW (2 samples for 2 — this is the shape, and it is implementable)
+# ⚠ CORRECTION (2026-08-24) — READ BEFORE THE SECTION BELOW
+The claim below that "the result opens by repeating its card's intro VERBATIM" is **WRONG**, and it
+misled a later research agent that read this file. It was inferred from the designer's transcription
+shorthand *"RESULT: (repeat the before, then)"*. Checked against four shipped rite configs
+(`5000131`, `5000506`, `5000703`, `5000704`): **0 of 21 `result_text` fields contain their rite's
+intro.** The repetition is the game UI stacking the card above the result on screen — a DISPLAY
+behaviour, not authored duplication.
+**What survives:** the player reads card and result as ONE CONTINUOUS PASSAGE, so the result is
+written as a CONTINUATION — it neither repeats the card nor re-tells the situation in new words.
+Corrected law: `docs/PROMPT_RULES.md` §11.
+
+# THE STRUCTURAL LAW (2 samples for 2 — SEE THE CORRECTION ABOVE)
 
 **RESULT = [the intro text, repeated VERBATIM] → [approach, time compressed] → [a SPOKEN line that
 echoes the intro's hook] → [the SENT CHARACTER, by name, commits] → ROLL → [outcome beats, ending on
@@ -149,7 +160,8 @@ Other transferable notes from sample 2:
 # CONSOLIDATED LAWS — 3 samples for 3
 
 ## A. The result CONTINUES the card; it does not restate the situation in new words
-**3/3.** Every result opens with the intro repeated VERBATIM and then writes on past it. Our engine
+**CORRECTED — see the box above.** The result does NOT repeat the intro (0 of 21 shipped
+`result_text` fields do). It continues from it, and the UI stacks them. Our engine
 generates the two independently, so our resolver re-imagines a scene the player has already read.
 → Give the resolver the card text and have it CONTINUE.
 
