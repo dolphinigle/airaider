@@ -8,10 +8,14 @@ import * as fs from 'node:fs';
 import { lintCard } from './cardlint.js';
 import { MOTIVES2 } from './motives2.js';
 import { SHAPES } from './shapes.js';
+import { STRUCTURES } from './structures.js';
 import type { QuestWriteInput } from '../src/ai/provider.js';
 
 const arg = (n: string, d?: string) => { const i = process.argv.indexOf('--' + n); return i >= 0 ? process.argv[i + 1]! : d; };
 const promptPath = arg('prompt')!, n = Number(arg('n', '24')), out = arg('out', '/tmp/out.md')!, seed = Number(arg('seed', '1'));
+// --structure deals a CARD-STRUCTURE token per call (structures.ts). OPT-IN: without the flag the
+// payload is byte-identical to before, so earlier runs stay comparable.
+const useStructure = process.argv.includes('--structure');
 if (!promptPath) { console.error('need --prompt <file>'); process.exit(1) }
 const system = fs.readFileSync(promptPath, 'utf8');
 
@@ -44,6 +48,7 @@ const userOf = (i: QuestWriteInput, k: number) => {
     opening: i.opening, intake: i.intake, slotCount: i.slotCount,
     shape: SHAPES[((k + seed) * 13) % SHAPES.length],
     ask: m.want, seen: m.tell,
+    ...(useStructure ? { structure: STRUCTURES[((k + seed) * 11) % STRUCTURES.length] } : {}),
   });
 };
 
@@ -55,7 +60,7 @@ const res = await Promise.all(picks.map(async (i, k) => {
   try { return { i, k, o: JSON.parse(r.choices[0]!.message.content ?? '{}') } } catch { return { i, k, o: null } }
 }));
 
-const md: string[] = [`# ${promptPath} — n=${picks.length}\n`]; const tal: Record<string, number> = {}; let clean = 0;
+const md: string[] = [`# ${promptPath} — n=${picks.length}${useStructure ? ' — STRUCTURE dealt' : ''}\n`]; const tal: Record<string, number> = {}; let clean = 0;
 for (const { i, k, o } of res.sort((a, b) => a.k - b.k)) {
   if (!o) { md.push('## PARSE FAIL\n'); continue }
   const s = String(o.situation ?? '');
@@ -63,6 +68,7 @@ for (const { i, k, o } of res.sort((a, b) => a.k - b.k)) {
   if (!f.length) clean++;
   for (const x of new Set(f.map(y => y.code))) tal[x] = (tal[x] ?? 0) + 1;
   md.push(`## ${k + 1} · ${i.archetype} · ${i.gravity} · ${s.split(/\s+/).length}w`);
+  if (useStructure) md.push(`\`structure:\` ${STRUCTURES[((k + seed) * 11) % STRUCTURES.length]}`);
   md.push(`**${o.title}**\n\n${s}\n\n\`JOB:\` ${o.job}\n`);
   md.push(f.length ? `\`lint:\` ${f.map(x => x.code + (x.detail ? ':' + x.detail : '')).join(' · ')}\n` : '`lint:` clean\n');
 }

@@ -125,3 +125,57 @@ construction per demo, shape bound to gravity, length bound to gravity, stake fo
 but the CARD's shape (where the concrete fact sits, whether anyone speaks, what the last clause
 does). This is the same lever that already fixed variety for `ask`/`seen`/`shape`, applied to form
 instead of content.
+
+---
+# ⛔ THE MONOTONY IS DOWNSTREAM OF A DESIGN RULING, NOT OF THE PROMPT
+*(coordinator's own experiment, 2026-08-25, while w1/w2 were still out — 5 arms × 24 cards, seed 101)*
+
+I built the dealt STRUCTURE token that w3 and w4 both asked for (`scripts/structures.ts`,
+`runprompt.ts --structure`, opt-in so their in-flight runs stay comparable). **It does not work, and
+the reason matters more than the lever.**
+
+### First: the monotony, finally quantified
+| arm | opens `A/An …` | distinct 1st words | sentence counts | lint-clean |
+|---|---|---|---|---|
+| A control P54 | **24/24** | **1** | 2 sentences ×24 | 92% |
+| C + dealt structure token | 23/24 | 2 | 2×22, 1×2 | 83% |
+| D + instance-carrying opening rule removed | 23/24 | 2 | 2×20, 1×4 | 71% |
+| E + sentence count freed too | 23/24 | 2 | 2×20, 1×4 | 75% |
+| **REFERENCE (713 job-like rites)** | **5%** | **221** | **1:195 2:247 3:145 4:67 5:30 6+:29** | — |
+
+**Every card we generate opens the same way and is the same length.** 96% vs the reference's 5%;
+one distinct first word vs 221. This is a bigger measured gap than the names gap (0% vs 64%) and it
+is almost certainly what the designer felt as "not motivating".
+
+**Four independent levers all failed to move it**: the dealt token; deleting the rule that carries
+concrete instances (`*a* drover, *a* woman who keeps the ford`); freeing sentence count; and
+second-person vantage. Loosening rules cost clean rate (92%→71%) and bought **nothing**.
+
+### The cause: the reference opens on people the player HAS met
+Reference first words: `The` 104, `You` 109, `A` 37. I checked what follows `The`, expecting our
+cold-referent ban to be the culprit. It is not — those openings are **named or titled recurring
+cast**: *The foreign merchant Bharat*, *The cartographer Manar*, *The Royal Guard Captain*, *The
+vineyard owner*, *The maid*. Sultan's Game has a **persistent cast**, so a definite article is
+honest there.
+
+**Our `anonymity-by-omission` ruling (designer, 2026-07-16) makes every person a stranger. A stranger
+can only be introduced indefinitely. "A <trade> <verbs>" is the ONLY grammatical frame left.** The
+prompt is not failing; it is correctly executing a constraint that has exactly one output shape.
+**No prompt can fix this. It is ruling #1's bill, now itemised.**
+
+### ⚠️ AND: we have been overshooting voice badly
+**The reference is 4% voiced (31/713).** w4's champion produces 21/24 = 87%; our arms ran 8-29%.
+Every recent push toward dialogue has been moving us AWAY from the gold standard, not toward it.
+This collides with the prose-bench A/B where voiced cards scored **+1 with blind judges**. Judge
+preference and reference fidelity point opposite ways here — a designer call, not mine.
+
+### One ruling-free lever remains untested
+`You …` opens **15%** of reference cards, needs no name, and breaks the `A` frame. We already write
+second person mid-card (15/24) but never open on it. Worth a targeted arm next round.
+
+### Correction to my own work
+The first draft of `structures.ts` violated the law written in its own header: six tokens said "the
+fort"/"the asker", which deal a *scene*, not a structure. They pushed "gate" from 42% of inputs to
+79% of outputs (control amplified nothing: 42% in, 45% out). Purifying them fixed the leak but
+halved their effect — **concrete tokens get used and leak; abstract tokens are clean and ignored.**
+That tension is w4's copy law seen from the other side, and it caps what any dealt token can do.
