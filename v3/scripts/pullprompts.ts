@@ -1513,4 +1513,229 @@ Respond as JSON: {title, situation, job}
 - title: the particular thing this job turns on.
 - job: one line for the boss's list, in different words from the situation. No pay in it. ONE errand — if you need an "and" to say it, that is two, and you keep the one being paid for. It names only what the client wants done — never the unexplained act, which is the player\u2019s to find.`;
 
-export const VARIANTS: Record<string, string> = { P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22, P23, P24, P25, P26, P30, P31, P32, P33, P34, P35, P36, P37, P38, P39, P40 };
+// ── P41: two self-inflicted fixes. (a) The vocabulary list I offered in P34 ('keeper, guide,
+//        hand...') was being WELDED onto nouns — barrow-keeper, well-keeper, ford-keeper, hut-keeper.
+//        L1 operating at the word level: offer a word and the model builds with it. (b) 7 of 149
+//        MOTIVE POOL entries contained constructions we ban in output ('he will not say who it is
+//        for', 'tally', 'he wants...'), so the input was poisoning its own result. Pool cleaned and
+//        a pool lint added.
+const P41 = `You write the card for ONE job in a dark-fantasy mercenary game.
+
+The player runs a mercenary company. They read this card, then choose which of their soldiers to send. The boss stays at the fort. Nothing here has happened yet.
+
+Write about the people out there in the third person. The company is never "we" or "us"; the reader is "you", and even that is rarely needed.
+
+WHAT YOU ARE GIVEN
+- location: the country this sits in. Name AT MOST ONE place, and only if the job turns on it.
+- archetype: the kind of work the job is.
+- rewardEnvelope: shorthand for the kind of pay. Say it in your own plain words or leave it to the ledger the boss already sees.
+- KEYWORDS: sparks for the world. Take ONE, or none. Two of them forced together make a card nobody can follow.
+- intake: how word reached the fort. Never state it — the boss knows a card came from somewhere.
+- ask: what the person bringing this job wants done. Say it in your own words; never call them "the client".
+- seen: one thing about them or the place that can be SEEN. It goes INTO a sentence that is already doing work — joined by because, and, or a comma — not tacked on at the end after a semicolon. Do not explain what it means; the reader works that out. Never write that someone "will not say" or that "no one can say".
+
+THE CARD IS TWO SENTENCES.
+
+It describes ONE plain situation a tired reader follows first time. If the pieces you were given will not fit into one, use fewer of them.
+
+**First: someone DID something, or something is being done to people.** A person acts in the first six words. Give them an article, never a bare job title standing alone. Not a place, not an object sitting still, not the weather. Begin the card with a capital letter.
+
+**Second: what it means for the people it happened to.** What they want, what they fear, or what nobody can explain — often just a question the situation raises. This is why the player sends anyone, and it is the last thing they read.
+
+The card TELLS the boss what has happened. It never orders them about: no "find him", no "send men", no "recover it before". Those belong on the job line. The trouble is only as urgent as the facts make it — never invent a deadline the message did not give you.
+
+The thing that can be SEEN closes the card. Set it down and stop.
+
+HOW IT READS
+- About twenty-five words. Forty is long. Sentences average a dozen words.
+- Everyone is called by a plain trade a farmhand would use. When the message gives you no word for someone, use a job that already exists on its own: a warden, a carter, a cook, a smith, a drover, a watchman. Never weld a place or a thing onto a job to make a new one.
+- Only what the message names has a name.
+- Everyone gets introduced the moment they appear: *a* drover, *a* woman who keeps the ford. Never "the patron", "the client", "the carrier" — the reader has not met them.
+- Plain period words. No numbers, no amounts. No ledger, tally or written record anywhere.
+- Say each thing once.
+
+Respond as JSON: {title, situation, job}
+- title: the particular thing this job turns on.
+- job: one line for the boss's list, in different words from the situation. No pay in it. ONE errand — if you need an "and" to say it, that is two, and you keep the one being paid for. It names only what the client wants done — never the unexplained act, which is the player\u2019s to find.`;
+
+// ── P42: restore GRAVITY as a live input. It is dealt by the engine but P34 cut its line to save
+//        space, leaving a dead field AND no way for length to vary — our cards compressed to
+//        median 33 / p25 29, where the reference runs median 25 / p25 18. The reference's short
+//        cards (12-20w) are a form we never produced.
+const P42 = `You write the card for ONE job in a dark-fantasy mercenary game.
+
+The player runs a mercenary company. They read this card, then choose which of their soldiers to send. The boss stays at the fort. Nothing here has happened yet.
+
+Write about the people out there in the third person. The company is never "we" or "us"; the reader is "you", and even that is rarely needed.
+
+WHAT YOU ARE GIVEN
+- location: the country this sits in. Name AT MOST ONE place, and only if the job turns on it.
+- archetype: the kind of work the job is.
+- rewardEnvelope: shorthand for the kind of pay. Say it in your own plain words or leave it to the ledger the boss already sees.
+- KEYWORDS: sparks for the world. Take ONE, or none. Two of them forced together make a card nobody can follow.
+- intake: how word reached the fort. Never state it — the boss knows a card came from somewhere.
+- gravity: how much room this job gets. A small everyday job is FIFTEEN to TWENTY-FIVE words and often one sentence — the reference is unembarrassed about a card that short. A serious matter runs to about thirty. Only a grave affair earns forty or more.
+- ask: what the person bringing this job wants done. Say it in your own words; never call them "the client".
+- seen: one thing about them or the place that can be SEEN. It goes INTO a sentence that is already doing work — joined by because, and, or a comma — not tacked on at the end after a semicolon. Do not explain what it means; the reader works that out. Never write that someone "will not say" or that "no one can say".
+
+THE CARD IS TWO SENTENCES.
+
+It describes ONE plain situation a tired reader follows first time. If the pieces you were given will not fit into one, use fewer of them.
+
+**First: someone DID something, or something is being done to people.** A person acts in the first six words. Give them an article, never a bare job title standing alone. Not a place, not an object sitting still, not the weather. Begin the card with a capital letter.
+
+**Second: what it means for the people it happened to.** What they want, what they fear, or what nobody can explain — often just a question the situation raises. This is why the player sends anyone, and it is the last thing they read.
+
+The card TELLS the boss what has happened. It never orders them about: no "find him", no "send men", no "recover it before". Those belong on the job line. The trouble is only as urgent as the facts make it — never invent a deadline the message did not give you.
+
+The thing that can be SEEN closes the card. Set it down and stop.
+
+HOW IT READS
+- Length follows gravity, above. Never pad to reach a length. Forty is long. Sentences average a dozen words.
+- Everyone is called by a plain trade a farmhand would use. When the message gives you no word for someone, use a job that already exists on its own: a warden, a carter, a cook, a smith, a drover, a watchman. Never weld a place or a thing onto a job to make a new one.
+- Only what the message names has a name.
+- Everyone gets introduced the moment they appear: *a* drover, *a* woman who keeps the ford. Never "the patron", "the client", "the carrier" — the reader has not met them.
+- Plain period words. No numbers, no amounts. No ledger, tally or written record anywhere.
+- Say each thing once.
+
+Respond as JSON: {title, situation, job}
+- title: the particular thing this job turns on.
+- job: one line for the boss's list, in different words from the situation. No pay in it. ONE errand — if you need an "and" to say it, that is two, and you keep the one being paid for. It names only what the client wants done — never the unexplained act, which is the player\u2019s to find.`;
+
+// ── P43: P42's gravity bands stated as HARD CEILINGS. Given a RANGE the model took the top of it
+//        and everything got longer (median 33 -> 36). This is the project's own PROMPT_RULES 6 law —
+//        'the model treats a range as loose and overshoots ~25%; state the upper number as a HARD
+//        CEILING' — which I had ignored.
+const P43 = `You write the card for ONE job in a dark-fantasy mercenary game.
+
+The player runs a mercenary company. They read this card, then choose which of their soldiers to send. The boss stays at the fort. Nothing here has happened yet.
+
+Write about the people out there in the third person. The company is never "we" or "us"; the reader is "you", and even that is rarely needed.
+
+WHAT YOU ARE GIVEN
+- location: the country this sits in. Name AT MOST ONE place, and only if the job turns on it.
+- archetype: the kind of work the job is.
+- rewardEnvelope: shorthand for the kind of pay. Say it in your own plain words or leave it to the ledger the boss already sees.
+- KEYWORDS: sparks for the world. Take ONE, or none. Two of them forced together make a card nobody can follow.
+- intake: how word reached the fort. Never state it — the boss knows a card came from somewhere.
+- gravity: the CEILING on this card's length, and it is a hard ceiling, not a target. A small everyday job: NO MORE THAN 25 WORDS, and one sentence is a perfectly good card. A serious matter: no more than 35. A grave affair: no more than 45. Coming in under is always better than reaching it.
+- ask: what the person bringing this job wants done. Say it in your own words; never call them "the client".
+- seen: one thing about them or the place that can be SEEN. It goes INTO a sentence that is already doing work — joined by because, and, or a comma — not tacked on at the end after a semicolon. Do not explain what it means; the reader works that out. Never write that someone "will not say" or that "no one can say".
+
+THE CARD IS TWO SENTENCES.
+
+It describes ONE plain situation a tired reader follows first time. If the pieces you were given will not fit into one, use fewer of them.
+
+**First: someone DID something, or something is being done to people.** A person acts in the first six words. Give them an article, never a bare job title standing alone. Not a place, not an object sitting still, not the weather. Begin the card with a capital letter.
+
+**Second: what it means for the people it happened to.** What they want, what they fear, or what nobody can explain — often just a question the situation raises. This is why the player sends anyone, and it is the last thing they read.
+
+The card TELLS the boss what has happened. It never orders them about: no "find him", no "send men", no "recover it before". Those belong on the job line. The trouble is only as urgent as the facts make it — never invent a deadline the message did not give you.
+
+The thing that can be SEEN closes the card. Set it down and stop.
+
+HOW IT READS
+- Length follows gravity, above. Never pad to reach a length. Forty is long. Sentences average a dozen words.
+- Everyone is called by a plain trade a farmhand would use. When the message gives you no word for someone, use a job that already exists on its own: a warden, a carter, a cook, a smith, a drover, a watchman. Never weld a place or a thing onto a job to make a new one.
+- Only what the message names has a name.
+- Everyone gets introduced the moment they appear: *a* drover, *a* woman who keeps the ford. Never "the patron", "the client", "the carrier" — the reader has not met them.
+- Plain period words. No numbers, no amounts. No ledger, tally or written record anywhere.
+- Say each thing once.
+
+Respond as JSON: {title, situation, job}
+- title: the particular thing this job turns on.
+- job: one line for the boss's list, in different words from the situation. No pay in it. ONE errand — if you need an "and" to say it, that is two, and you keep the one being paid for. It names only what the client wants done — never the unexplained act, which is the player\u2019s to find.`;
+
+// ── P44: the two defects two blind judges independently named, plus the address gap.
+//   (a) FALSE CONNECTIVE — my own P40 'weave it with because' instruction produced facts welded on
+//       with causals that do not hold ('she wants it recovered BECAUSE the chest is still in her
+//       room'). Judge B: 'deleting the connective and letting the fact stand would fix most of them
+//       outright.' Over-correction from the semicolon fix.
+//   (b) 0 of 54 cards addressed the player; the reference does in 74%. That was MY rule, not the
+//       engine's, and both judges named it as the biggest gap from the target.
+//   (c) JOB lines contradicted the card body in 8 of 54.
+const P44 = `You write the card for ONE job in a dark-fantasy mercenary game.
+
+The player runs a mercenary company. They read this card, then choose which of their soldiers to send. The boss stays at the fort. Nothing here has happened yet.
+
+Write about the people out there in the third person. The company is never "we" or "us". Speak to the boss as "you" where it is natural — what he can see from his own walls, what was brought to his gate, what he already knows about these people. The reference does this in most of its cards.
+
+WHAT YOU ARE GIVEN
+- location: the country this sits in. Name AT MOST ONE place, and only if the job turns on it.
+- archetype: the kind of work the job is.
+- rewardEnvelope: shorthand for the kind of pay. Say it in your own plain words or leave it to the ledger the boss already sees.
+- KEYWORDS: sparks for the world. Take ONE, or none. Two of them forced together make a card nobody can follow.
+- intake: how word reached the fort. Never state it — the boss knows a card came from somewhere.
+- gravity: the CEILING on this card's length, and it is a hard ceiling, not a target. A small everyday job: NO MORE THAN 25 WORDS, and one sentence is a perfectly good card. A serious matter: no more than 35. A grave affair: no more than 45. Coming in under is always better than reaching it.
+- ask: what the person bringing this job wants done. Say it in your own words; never call them "the client".
+- seen: one thing about them or the place that can be SEEN. Set it down as a plain fact in its own right. Join it to what came before ONLY if the join is really true — a fact that merely happens to be interesting is not a reason, and welding it on with a because that does not hold breaks the sentence. Standing alone as a short sentence is usually better. Do not explain what it means; the reader works that out. Never write that someone "will not say" or that "no one can say".
+
+THE CARD IS TWO SENTENCES.
+
+It describes ONE plain situation a tired reader follows first time. If the pieces you were given will not fit into one, use fewer of them.
+
+**First: someone DID something, or something is being done to people.** A person acts in the first six words. Give them an article, never a bare job title standing alone. Not a place, not an object sitting still, not the weather. Begin the card with a capital letter.
+
+**Second: what it means for the people it happened to.** What they want, what they fear, or what nobody can explain — often just a question the situation raises. This is why the player sends anyone, and it is the last thing they read.
+
+The card TELLS the boss what has happened. It never orders them about: no "find him", no "send men", no "recover it before". Those belong on the job line. The trouble is only as urgent as the facts make it — never invent a deadline the message did not give you.
+
+The thing that can be SEEN closes the card. Set it down and stop.
+
+HOW IT READS
+- Length follows gravity, above. Never pad to reach a length. Forty is long. Sentences average a dozen words.
+- Everyone is called by a plain trade a farmhand would use. When the message gives you no word for someone, use a job that already exists on its own: a warden, a carter, a cook, a smith, a drover, a watchman. Never weld a place or a thing onto a job to make a new one.
+- Only what the message names has a name.
+- Everyone gets introduced the moment they appear: *a* drover, *a* woman who keeps the ford. Never "the patron", "the client", "the carrier" — the reader has not met them.
+- Plain period words. No numbers, no amounts. No ledger, tally or written record anywhere.
+- Say each thing once.
+
+Respond as JSON: {title, situation, job}
+- title: the particular thing this job turns on.
+- job: one line for the boss's list, in different words from the situation. No pay in it. It must be the SAME errand the card describes — not a different task, a different place, or something the card says is already done. ONE errand — if you need an "and" to say it, that is two, and you keep the one being paid for. It names only what the client wants done — never the unexplained act, which is the player\u2019s to find.`;
+
+// ── P45: P44 reached only 23% player-address against the reference's 74%, because my instruction
+//        was soft AND collided with the 'never state the intake' rule. Reconciled: intake must not
+//        be NARRATED as word arriving, but it is precisely where the boss belongs in the card —
+//        his walls, his gate, his patrols.
+const P45 = `You write the card for ONE job in a dark-fantasy mercenary game.
+
+The player runs a mercenary company. They read this card, then choose which of their soldiers to send. The boss stays at the fort. Nothing here has happened yet.
+
+Write about the people out there in the third person. The company is never "we" or "us". Speak to the boss as "you" — what he can see from his own walls, who is standing at his gate, what his own people found, what he already knows about these folk. Roughly three cards in four should have him in them somewhere.
+
+WHAT YOU ARE GIVEN
+- location: the country this sits in. Name AT MOST ONE place, and only if the job turns on it.
+- archetype: the kind of work the job is.
+- rewardEnvelope: shorthand for the kind of pay. Say it in your own plain words or leave it to the ledger the boss already sees.
+- KEYWORDS: sparks for the world. Take ONE, or none. Two of them forced together make a card nobody can follow.
+- intake: how word reached the fort. Never state it — the boss knows a card came from somewhere.
+- gravity: the CEILING on this card's length, and it is a hard ceiling, not a target. A small everyday job: NO MORE THAN 25 WORDS, and one sentence is a perfectly good card. A serious matter: no more than 35. A grave affair: no more than 45. Coming in under is always better than reaching it.
+- ask: what the person bringing this job wants done. Say it in your own words; never call them "the client".
+- seen: one thing about them or the place that can be SEEN. Set it down as a plain fact in its own right. Join it to what came before ONLY if the join is really true — a fact that merely happens to be interesting is not a reason, and welding it on with a because that does not hold breaks the sentence. Standing alone as a short sentence is usually better. Do not explain what it means; the reader works that out. Never write that someone "will not say" or that "no one can say".
+
+THE CARD IS TWO SENTENCES.
+
+It describes ONE plain situation a tired reader follows first time. If the pieces you were given will not fit into one, use fewer of them.
+
+**First: someone DID something, or something is being done to people.** A person acts in the first six words. Give them an article, never a bare job title standing alone. Not a place, not an object sitting still, not the weather. Begin the card with a capital letter.
+
+**Second: what it means for the people it happened to.** What they want, what they fear, or what nobody can explain — often just a question the situation raises. This is why the player sends anyone, and it is the last thing they read.
+
+The card TELLS the boss what has happened. It never orders them about: no "find him", no "send men", no "recover it before". Those belong on the job line. The trouble is only as urgent as the facts make it — never invent a deadline the message did not give you.
+
+The thing that can be SEEN closes the card. Set it down and stop.
+
+HOW IT READS
+- Length follows gravity, above. Never pad to reach a length. Forty is long. Sentences average a dozen words.
+- Everyone is called by a plain trade a farmhand would use. When the message gives you no word for someone, use a job that already exists on its own: a warden, a carter, a cook, a smith, a drover, a watchman. Never weld a place or a thing onto a job to make a new one.
+- Only what the message names has a name.
+- Everyone gets introduced the moment they appear: *a* drover, *a* woman who keeps the ford. Never "the patron", "the client", "the carrier" — the reader has not met them.
+- Plain period words. No numbers, no amounts. No ledger, tally or written record anywhere.
+- Say each thing once.
+
+Respond as JSON: {title, situation, job}
+- title: the particular thing this job turns on.
+- job: one line for the boss's list, in different words from the situation. No pay in it. It must be the SAME errand the card describes — not a different task, a different place, or something the card says is already done. ONE errand — if you need an "and" to say it, that is two, and you keep the one being paid for. It names only what the client wants done — never the unexplained act, which is the player\u2019s to find.`;
+
+export const VARIANTS: Record<string, string> = { P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22, P23, P24, P25, P26, P30, P31, P32, P33, P34, P35, P36, P37, P38, P39, P40, P41, P42, P43, P44, P45 };
