@@ -293,3 +293,59 @@ printing it in the very next clause.
 
 🐛 **Lint blind spot found**: the noun-phrase batch scored **24/24 lint-clean** while 7 of those
 cards literally began "a physical object …". Lint does not detect dealt-value pastes. Needs a check.
+
+---
+# 🏁 UNIFIED BLIND JUDGEMENT — one instrument, 3 fresh seats, 64 cards, sources hidden
+Per-seat means **4.86 / 5.00 / 4.77** — a stable instrument at last (the four agents' own instruments
+had scored the same reference corpus 5.0 and 7.44). All three seats independently named the SAME
+strongest card, the SAME weakest card, and the SAME dominant failure.
+
+### Hit rate (cards averaging ≥7 across the three seats) — the measure that matters
+| arm | ≥7 | median | mean |
+|---|---|---|---|
+| **P54_incumbent** | **3/8** | 5.50 | 5.25 |
+| w1_plain | 1/8 | 6.00 | 6.04 |
+| w2_v20 · w3_BEST · w4_R7 | 1/8 each | 3.00–5.00 | — |
+| REFERENCE_sultans | 1/8 | 5.50 | 4.79 |
+| **w1_openWith** | **0/8** | 5.00 | 4.88 |
+| **P54_openWith** | **0/8** | 4.00 | 4.17 |
+
+## ⛔ RESULT 1 — THE INCUMBENT WON. The round produced no better prompt.
+Four independent writers, ~8 hours, 100+ prompt versions between them, none seeing our existing
+work — **and P54 still has the best hit rate.** That is the round's headline and it is a negative
+result. The writers' value was the LAWS they measured (L12–L15), not their prompts.
+
+## ⛔ RESULT 2 — `openWith` IS REFUTED. My own lever, killed by the measurement.
+**0/8 cards ≥7 on BOTH bases**, and it cost ~1–1.5 points on each (w1 6.00→5.00, P54 5.50→4.00).
+It did exactly what I claimed — variety 1→10 distinct openings, lint-clean unchanged — and the cards
+got *worse*. The judges say why, unanimously: forcing an opening frame that fights the dealt content
+produces exactly the batch's #1 defect. This is the SECOND independent measurement of it (w1's v5
+archetype-keyed openings collapsed coherence the same way).
+**Variety is not the bottleneck. Do not spend the next round on it.**
+
+## ✅ RESULT 3 — the three seats handed us the actual mechanism, unprompted and identically
+**The failure (named #1 by all three): the dangling referent — a punchy final "hook" clause bolted on
+without being grammatically attached to the scene.** Judge 2: *"many cards close on a punchy fact
+that was clearly meant as the hook, but it is appended without being attached to the scene, so
+instead of complicating the job it stalls the read."* Examples they cite: "the saddlebags are gone
+from it", "it grew out of business already done", "Bell on a goose shows market is three days the
+other way".
+
+**The success, from the top four cards (36, 6, 14, 61 — one from each of four different arms):**
+> *one clean, load-bearing wrongness — a final detail that RETROACTIVELY CHANGES what the earlier
+> sentences meant, rather than decorating them.*
+A cut axle ("cut, not worn through"). A ransom smaller than what was already paid. A sergeant who
+will not enter the barn he locked. A grieving father who asks when the watch changes.
+
+**This is the brief for the next round, and it is prompt-fixable**: our cards already CARRY a hook
+(that is what `seen` is for); the hook is simply not ATTACHED. Same information, different join.
+Judges' secondary failure — "perfectly clear but asks nothing and risks nothing" — is the designer's
+original complaint (*"for a routine job i still want to be motivated"*) reappearing in blind data.
+
+## 🔧 Correction to my own measurement
+The reference arm's low mean (4.79) is partly MY sampling error, not a fair reading of the gold
+standard. My "job-like" filter (≥2 slot lines + a dice check) let non-job texts through: its two
+worst cards are *"You have transcended the world woven from ink…"* (an ending text) and
+*"Meticulously ensuring its flight capability…"* (a sentence fragment), which all three seats
+correctly scored 1–2. Its best scored 7.33. **Rebuild the reference arm from the ENDORSED gold, not
+a filter, before quoting any reference number again.**

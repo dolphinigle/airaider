@@ -43,7 +43,79 @@ const PLAIN_TRADES = new Set(['foreman','shepherd','ferryman','beekeeper','mille
 
 export interface Flag { code: string; detail: string }
 
-export function lintCard(situation: string, input: QuestWriteInput, form: CardForm = 'rite'): Flag[] {
+/** THE DEALT PAYLOAD, as the harness hands it to the writer (runprompt.ts `userOf`). Optional so the
+ *  3-arg signature keeps working. Any string field is checked; the keys below are just the ones the
+ *  harness deals today — the check is over VALUES, not over a whitelist of names. */
+export type DealtFields = Record<string, string | undefined>;
+
+/** ── DEALT-PASTE: "the card printed something it was dealt" ──────────────────────────────────────
+ *  The blind spot that let 24/24 score clean while 7 cards opened with the literal words of an input
+ *  field. This is the project's oldest prose-shaped-input law (six recurrences), so it is checked as
+ *  a CLASS: no dealt string is ever named here.
+ *
+ *  CALIBRATED against the 1,485 shipped official-English rite intros, paired EXHAUSTIVELY against
+ *  every value of every dealt pool (SHAPES 40 · MOTIVES2 want/tell 149x2 · OPENINGS 8 · STRUCTURES
+ *  17) = 537,570 text-vs-value pairings. Measured false positives:
+ *    whole-value containment, value >= 2 words ....... 0 / 530,145  (0.0000%)
+ *    shared run >= 5 consecutive words ............... 0 / 537,570  (0.0000%)  [run>=4: 4, run>=3: 106]
+ *    card opens on the value's first >= 4 words ...... 0 / 448,470  (0.0000%)  [prefix-3: 3, prefix-2: 58]
+ *    dealt LABEL token present ....................... 0 / 1,485 intros (one intro has an all-caps
+ *                                                      word at all, and it is not a dealt value)
+ *  RUN=5 is the tightest length with zero measured collisions AND a margin: the longest accidental
+ *  overlap anywhere in the corpus is 4 ("he asks you to"), so 5 sits one word clear of the observed
+ *  maximum rather than on top of it.
+ *
+ *  `seen` is EXEMPT BY CONSTRUCTION, not by special-casing: the prompt tells the writer to restate
+ *  that fact in its own words, and a paraphrase shares no 5-word run and is not a containment, so it
+ *  cannot trip any rule above. Only a verbatim lift does — which is the defect. */
+const normWords = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean);
+const RUN = 5;          // consecutive shared words (corpus max accidental overlap: 4)
+const OPEN_PREFIX = 4;  // words of the value the card may not open on (corpus max accidental: 3)
+
+function longestSharedRun(a: string[], b: string[]): { n: number; at: number } {
+  let best = 0, at = 0; const prev = new Array(b.length + 1).fill(0);
+  for (let i = 1; i <= a.length; i++) { let diag = 0;
+    for (let j = 1; j <= b.length; j++) { const t = prev[j];
+      prev[j] = a[i - 1] === b[j - 1] ? diag + 1 : 0;
+      if (prev[j] > best) { best = prev[j]; at = i - best } diag = t; } }
+  return { n: best, at };
+}
+
+/** A token no period prose can contain: all-caps, optionally hyphen-joined (SECOND-PERSON, OBJECT).
+ *  Shape-based, so it covers any future label pool without naming one. */
+const isLabel = (v: string) => /^[A-Z][A-Z0-9]*(-[A-Z0-9]+)*$/.test(v.trim()) && v.trim().length >= 3;
+
+export function dealtPasteFlags(situation: string, dealt: DealtFields): Flag[] {
+  const s = situation.trim();
+  const cardW = normWords(s);
+  const card = cardW.join(' ');
+  const hits: string[] = [];
+  for (const [key, raw] of Object.entries(dealt)) {
+    const v = typeof raw === 'string' ? raw.trim() : '';
+    if (!v) continue;
+    // 1. LABEL TOKEN — a dealt category label printed as if it were a word of the card.
+    if (isLabel(v)) {
+      if (new RegExp(`(^|[^A-Za-z0-9-])${v}([^A-Za-z0-9-]|$)`).test(s)) hits.push(`${key}=label "${v}"`);
+      continue;
+    }
+    const vw = normWords(v);
+    if (vw.length < 2) continue;
+    const val = vw.join(' ');
+    // 2. WHOLE VALUE, verbatim, anywhere in the card.
+    if (` ${card} `.includes(` ${val} `)) { hits.push(`${key}=verbatim "${v}"`); continue }
+    // 3. THE CARD OPENS ON IT — a head paste, even if the writer trailed off after a few words.
+    if (vw.length >= OPEN_PREFIX && `${card} `.startsWith(vw.slice(0, OPEN_PREFIX).join(' ') + ' ')) {
+      hits.push(`${key}=opens-on "${vw.slice(0, OPEN_PREFIX).join(' ')}..."`); continue;
+    }
+    // 4. A LONG VERBATIM RUN — a partial lift with a word swapped or an ending trimmed.
+    const { n, at } = longestSharedRun(cardW, vw);
+    if (n >= RUN) hits.push(`${key}=run${n} "${cardW.slice(at, at + n).join(' ')}"`);
+  }
+  return hits.length ? [{ code: 'dealt-paste', detail: hits.join(' / ') }] : [];
+}
+
+
+export function lintCard(situation: string, input: QuestWriteInput, form: CardForm = 'rite', dealt?: DealtFields): Flag[] {
   const CAP = CAPS[form];
   const f: Flag[] = [];
   const s = situation.trim();
@@ -158,6 +230,10 @@ export function lintCard(situation: string, input: QuestWriteInput, form: CardFo
   for (const piece of String(input.rewardEnvelope ?? '').split(' + '))
     if (piece.length > 6 && s.toLowerCase().includes(piece.toLowerCase())) { f.push({ code: 'envelope-echo', detail: piece }); break }
   if (input.intake && s.toLowerCase().includes(input.intake.toLowerCase().slice(0, 18))) f.push({ code: 'intake-echo', detail: '' });
+
+  // ── THE CARD PRINTED WHAT IT WAS DEALT (see dealtPasteFlags). Only runs when the caller hands the
+  // dealt payload through; the 3-arg callers are unaffected.
+  if (dealt) f.push(...dealtPasteFlags(s, dealt));
 
   return f;
 }

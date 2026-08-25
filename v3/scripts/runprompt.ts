@@ -40,18 +40,25 @@ const TOKEN: Record<string, string> = { 'coin': 'coin', 'a person who may join t
   'the pick of what the job turns up': 'salvage-rights', 'first claim on what the road yields': 'salvage-rights',
   'whatever worth the work shakes loose': 'salvage-rights', 'a person taken': 'a captive' };
 
+/** The fields DEALT to the writer for call k — the ones a card must never print verbatim.
+ *  Built once so the payload and the lint see exactly the same values. */
+const dealtOf = (k: number) => {
+  const m = MOTIVES2[((k + seed) * 17) % MOTIVES2.length]!;
+  return {
+    shape: SHAPES[((k + seed) * 13) % SHAPES.length]!, ask: m.want, seen: m.tell,
+    ...(useOpening ? { openWith: OPENINGS[((k + seed) * 7) % OPENINGS.length]! } : {}),
+    ...(useStructure ? { structure: STRUCTURES[((k + seed) * 11) % STRUCTURES.length]! } : {}),
+  };
+};
+
 /** The engine payload as the writer receives it, plus the seeded fields. */
 const userOf = (i: QuestWriteInput, k: number) => {
-  const m = MOTIVES2[((k + seed) * 17) % MOTIVES2.length]!;
   return JSON.stringify({
     archetype: i.archetype, location: i.location, gravity: i.gravity,
     rewardEnvelope: String(i.rewardEnvelope ?? '').split(' + ').map(p => TOKEN[p] ?? p),
     KEYWORDS: i.keywords?.join(', '), placeNameSuggestions: i.placeNameSuggestions,
     opening: i.opening, intake: i.intake, slotCount: i.slotCount,
-    shape: SHAPES[((k + seed) * 13) % SHAPES.length],
-    ask: m.want, seen: m.tell,
-    ...(useOpening ? { openWith: OPENINGS[((k + seed) * 7) % OPENINGS.length] } : {}),
-    ...(useStructure ? { structure: STRUCTURES[((k + seed) * 11) % STRUCTURES.length] } : {}),
+    ...dealtOf(k),
   });
 };
 
@@ -67,7 +74,7 @@ const md: string[] = [`# ${promptPath} — n=${picks.length}${useStructure ? ' �
 for (const { i, k, o } of res.sort((a, b) => a.k - b.k)) {
   if (!o) { md.push('## PARSE FAIL\n'); continue }
   const s = String(o.situation ?? '');
-  const f = lintCard(s, i);
+  const f = lintCard(s, i, 'rite', dealtOf(k));
   if (!f.length) clean++;
   for (const x of new Set(f.map(y => y.code))) tal[x] = (tal[x] ?? 0) + 1;
   md.push(`## ${k + 1} · ${i.archetype} · ${i.gravity} · ${s.split(/\s+/).length}w`);
