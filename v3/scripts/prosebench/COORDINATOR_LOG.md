@@ -358,3 +358,63 @@ Re-measured with the fixed lint, the control's own clean rate is 75%, not 92%, s
 figure recorded before commit `00d55b0` is comparable to one after it.**
 The blind judges caught it anyway. **When lint and blind judgement disagree, the judges are ground
 truth** — lint is telemetry that can only ever check what someone thought to encode.
+
+---
+# 🎯 ROUND 2 — I CHASED THE WRONG VARIABLE, AND THE MEASUREMENT SAYS SO
+Batch 2: 50 cards, 3 fresh seats, one instrument, sources hidden. Per-seat means 5.16/5.18/5.12.
+**Calibration is FIXED**: rebuilt from the ENDORSED gold instead of my faulty "job-like" filter, the
+reference now scores **median 7.00, 10/30 cards ≥8 — clearly the top arm**, as the designer requires.
+My round-1 reference number was my sampling error, now confirmed twice.
+
+| arm | median | mean | ≥8 | dangling closer | mean, ATTACHED cards only |
+|---|---|---|---|---|---|
+| **GOLD_endorsed** | **7.00** | 6.40 | **10/30** | 2/10 | **7.12** |
+| **V3_both** | 5.50 | 5.23 | 1/30 | 2/10 | **5.62** |
+| P54_control | 5.00 | 5.03 | 0/30 | **0/10** | 5.03 |
+| V1_referent | 5.00 | 4.77 | 1/30 | 1/10 | 5.07 |
+| V2_contradict | 4.00 | 4.33 | 0/30 | 3/10 | 4.57 |
+
+## The correction
+I read "all three judges named the dangling referent as the #1 failure" as "dangling is our gap." It
+is not, and two facts kill it:
+1. **The control dangles 0/10.** I built three variants against a defect the incumbent did not have.
+2. **The gold standard dangles 2/10 — the SAME as my best variant and MORE than the control** — and
+   still outscores us by ~2 points with dangling cards removed from both sides.
+
+Dangling is real and expensive **when it occurs** (dangling cards mean 3.46 vs attached 5.48), which
+is why every judge noticed it. But it is distributed across the bad cards of EVERY arm including
+gold. **"The most common failure in a batch" is not "what separates the best from the rest."** Those
+are different questions and I answered the wrong one.
+
+Worse, two of my three interventions *caused* the thing they targeted: demanding a contradiction
+(V2) took dangling from 0/10 to 3/10 and cost 0.5 points. The mechanism is judge A's sharpest
+observation — **the UNEARNED DEFINITE**: *"a noun phrase presented as known information when the card
+has never introduced it… the reader does not choose the wrong referent, they wait for one that never
+arrives."* Ordering a twist makes the model invent a contradicting entity and then point at it with a
+definite article. Requiring the closer to be about an ALREADY-NAMED referent (V3) cancels that harm —
+which is why only the combination beat the control.
+
+**KEEP V3** (+0.6 on attached cards, the round's only real gain). It is small; do not oversell it.
+
+## ✅ WHAT THE GAP ACTUALLY IS — and it is the designer's original complaint, unchanged
+Gold's 8s and 9s, in the judges' own words: *"tonight, this man kills you"* · *"they are already
+armed and waiting for you"* · *"this could cost me my head"* · *"your regicide plot"* · *"a monster
+ravaging your own territory."*
+
+**Gold puts the PLAYER at risk. Our cards put a stranger's problem in front of the player.** Every
+one of our cards is someone arriving at the gate to request a service; the stakes belong to the
+petitioner, never to the fort. That is exactly what the designer said at the very start —
+*"for a routine job i still want to be motivated to do this"* — arriving now as blind measurement on
+the rubric's MOTIVATION dimension.
+
+And **P54 actively suppresses it in prompt text**:
+> *"The trouble is only as urgent as the facts make it — never invent a deadline the message did not
+> give you."* … *"The card TELLS the boss what has happened. It never orders them about."*
+Both rules exist for good reasons (invented urgency and imperative nagging were measured defects),
+but together they forbid the card from ever putting anything on the fort.
+
+🔒 **DESIGNER QUESTION, and the highest-value one open**: may a one-off job card state what it costs
+the FORT — a consequence, not a reward — if the job is refused or botched? If yes, is that a payload
+field (the engine owns the number/severity) or prompt-side? The engine currently deals no such fact,
+so the model would have to invent it, and inventing urgency is a measured defect. **This looks like a
+seeding change, not a prompt change** — the same conclusion w1 reached from a different direction.
