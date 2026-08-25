@@ -195,3 +195,48 @@ What this implies for our prompts (targets — not yet implemented):
   branch plants a hook (*"maybe he will come back again"*).
 - Numbers and amounts stay out of the prose; the grant line carries them (already our design, and
   the reference confirms it).
+
+## §12 — INTRODUCE A THING BY WHAT IT IS BEFORE WHAT IT IS LIKE
+*(designer ruling, 2026-08-25, from a side-by-side against Sultan's Game)*
+
+The designer's verdict on a shipped one-off card: **"yours is very very unclear… weird things tacked
+on it."** The card read:
+
+> *At first light a visitor brought a confession and a plea. A runaway servant took a reed-woven
+> token that a kin claims as inheritance. The servant left on the old elf road through the Western
+> Forests and is the one who holds the token now. A kin at Oakstead will pay coin on delivery. The
+> company keeps the coin and any goods turned up while on the road.*
+
+The designer's model of what it should have been:
+
+> *You woke up early morning to a messenger bringing a plea: to recover a stolen heirloom
+> inheritance. A servant of them, who had worked for over 20 years, suddenly disappeared one morning
+> with the token. The client promises gold if you are able to track him down.*
+
+### The class (fix this, never the example)
+1. **FUNCTION BEFORE TEXTURE.** "a reed-woven token" hands the reader an exotic material for a thing
+   they cannot yet place. "a stolen heirloom inheritance" names what it IS and what is wrong with it;
+   the weave can come later or never. **A modifier the reader cannot use yet is noise.**
+2. **A PERSON IS INTRODUCED BY THEIR RELATION TO THE MATTER, not by a bare category.** "a runaway
+   servant" and "a kin" are labels. "A servant of theirs, who had worked for over twenty years"
+   carries the betrayal — which is the entire reason the job is worth taking. The relationship IS the
+   story; omitting it leaves only bookkeeping.
+3. **THE CARD MUST NOT NARRATE ITS OWN LEDGER.** "and is the one who holds the token now" is ABOVE
+   ALL rule 2 (*who holds the wanted thing NOW*) surfacing as prose. The ledger is a consistency
+   constraint for the WRITER; it is not a fact for the reader. This is §8/L1 again — rule wording
+   comes back as output.
+4. **PAY IS ONE CLAUSE, CONDITIONAL, HUMAN.** "The client promises gold if you are able to track him
+   down" — one clause, and the *if* restates the job. The shipped prompt instead MANDATES a whole
+   sentence for pay plus another for loot rights, so 2 of 5 sentences were contract terms.
+   For comparison: Sultan's Game job cards carry **no payment language in the card prose at all** —
+   it lives in the slot lines and UI.
+5. **THE OPENING NAMES WHAT IS WANTED, not the manner of arrival.** "a visitor brought a confession
+   and a plea" is two abstractions and zero facts.
+
+### ⚠️ Tension this ruling exposes — flagged, NOT silently resolved
+The designer's model card contains **"worked for over 20 years"** — a duration and a number, both
+forbidden by `NUMBER_BAN`. That ban exists for a measured reason (the payload carries no such fact,
+so the model invents one, and `invented-duration` was a real defect in q9). **But the ban is also
+what strips out the concrete grounding the designer is asking for.** The honest options are (a) deal
+a tenure/duration fact from the engine so it need not be invented, or (b) relax the ban for
+relationship-tenure only. **This is a designer call and is left open.**
