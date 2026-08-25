@@ -83,6 +83,17 @@ const ACTORS = ['A', 'B', 'C'];
 // deterministic here so a run is reproducible; the engine would use its own RNG. The reference
 // individuates a job by the client's motive rather than by the craft — see prosebench/TRANSFER.md.
 let motiveN = 0;
+// VOICE=1 — deal a voice marker on a minority of cards, at the reference's measured rates on the
+// 376 job-like rites: rhetorical question 13%, em-dash aside 21%, explicit narrator aside 6%.
+// Per PROMPT_RULES §10 a cheap model reads a bare permission as a prohibition, so 'sometimes' must
+// be dealt by the engine rather than left to the writer's judgement.
+// (Ellipsis is 37% in the reference but the full-corpus read established it as a Chinese
+// translation artefact, not craft — deliberately NOT dealt.)
+// 'speech' added at the reference's measured rate for job-like rites: quoted speech 5%.
+// NOTE both blind judges asked for speech on EVERY card; the corpus says 5%, so their advice is
+// followed at the real frequency rather than as stated.
+const VOICE = ['question','aside','dash','speech','','','','','','','','','','','',''] as const;
+let voiceN = 0;
 let actorN = 0;
 
 const userOf = (i: QuestWriteInput) => JSON.stringify({
@@ -92,6 +103,7 @@ const userOf = (i: QuestWriteInput) => JSON.stringify({
   placeNameSuggestions: i.placeNameSuggestions, opening: i.opening, intake: i.intake,
   ...(process.env.ODD_ACTOR === '1' && process.env.MOTIVE !== '3' ? { oddActor: ACTORS[actorN++ % ACTORS.length] } : {}),
   ...(process.env.MOTIVE === '1' ? { clientMotive: MOTIVES[(motiveN++ * 37) % MOTIVES.length] } : {}),
+  ...(process.env.VOICE === '1' && VOICE[voiceN++ % VOICE.length] ? { voice: VOICE[(voiceN-1) % VOICE.length] } : {}),
   ...((process.env.MOTIVE === '2' || process.env.MOTIVE === '3') ? { ask: MOTIVES2[(motiveN++ * 17) % MOTIVES2.length].want, seen: MOTIVES2[((motiveN-1) * 17) % MOTIVES2.length].tell } : {}),
 });
 
