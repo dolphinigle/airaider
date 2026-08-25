@@ -228,3 +228,68 @@ pool toward frames that survive any content.
   designer call.
 - Ruling #1 is still open, but it is now **cheap to price**: names need a MANDATE (H: 16/24), never
   permission (G: 6/24). The ruling is not blocking variety; it only costs the 64% name rate.
+
+---
+## w1 — FREE HAND — returned. Self-score 6.5; blind 7.0 median vs its reference sample at 5.0
+`agents/w1_CHAMPION_v41.txt`, 1,189 words. My verify on unseen seed 101: **88% clean, median 29w**
+(it claimed 96% on its own seed 200 — within normal seed spread).
+- 43 versions. Its governing law, reached independently: ***any rule demanding invented content
+  collapses to one mold; rules pointing at payload fields vary.*** Found via "name one small exact
+  thing their body is doing" → **THUMB in 10/24 cards**.
+- Negative results it paid for: archetype-keyed openings (coherence collapse — a boar invented for a
+  calf job), aphorism closers, short-quote caps (blind 4.25, "My dues are everything"), a rhythm rule
+  ("no two sentences built the same way", −0.45), and **deleting a clause a zero-context verifier
+  called dead weight → regressed** (confirms L5, the floor on rule mass).
+- **Its unsolved defect: the three-beat skeleton** — scene / `X says "…"` / flat contradicting fact,
+  visible across a batch. All four of its judges named it as the cap: *"9-grade content sitting
+  inside a 7-grade shape."*
+
+## w2 — CORPUS-FIRST — returned. Self-score 5.5; its judges put the reference at 7.44, itself at 4.87
+`agents/w2_v20.txt`, 1,036 words. 93% clean over three seeds, **zero repeated 3-grams**, 20–22/24
+distinct openings. It rebuilt the reference set itself (347 deduped job-like rites, ~145 read in full).
+- Gaps it measured against the corpus, each 3–10×: `"asks you to"` **0.3% ref vs 54% ours**;
+  placement verbs (sits/stands/lies/hangs) **7% ref vs 88% ours**; first sentence names a person
+  **74% ref vs 29% ours**; `because` **1.4% ref**.
+- Its law, reached independently and now the FOURTH vote: ***the one technique that reliably beat
+  templating was keying the rule to a field that varies.*** Binding the closer's shape to `gravity`
+  reproduced the reference closer mix (62/21/12 vs 57/13/10) and took repeated 3-grams to zero, where
+  every fixed wording of the same instruction templated ×5–×7.
+- **Negative result worth the whole round: implementing its own judges' top recommendation lost 1.2
+  points.** Judges asked for a standing "whenever/if" conditional; it built one, hit the corpus rate
+  (0%→29%), and scored 5.25→4.08. *A mechanism copied without its anchoring is worse than absent.*
+- **And: matching a corpus statistic can hurt.** The reference's 64% name / 35% ellipsis / 33% aside
+  rates are subsidised by things we cannot copy — 255/555 cards name a RECURRING NPC, and the
+  ellipses are a Chinese-translation artefact. Pushed to the measured 33%, the aside over-fired to
+  87% and scored below leaving it alone.
+- Its unsolved defect: `⟨Name⟩ the ⟨trade⟩` in ~30/36 cards — a judge called it *"a database dump."*
+  Two attacks failed; removing names collapses opening variety 20/24 → 3/24.
+
+## ⚠️ THE JUDGING INSTRUMENT IS NOT STABLE ACROSS AGENTS
+w1's judges scored the reference **5.0**; w2's scored the same corpus **7.44**. Same texts, opposite
+verdicts, because each agent built its own rubric and sampled the corpus differently (w1's judges
+penalised translation artefacts and boilerplate that w2's judges read as voice).
+**Consequence: no cross-agent score in this round is comparable, including the "beats the reference"
+claims. Every champion must be re-judged on ONE instrument before any of it means anything.**
+
+---
+## THE ROUND'S ACTIONABLE RESULT — `openWith`, and the adjacent ban that makes it safe
+Four writers, four independent routes, one law: **variety comes only from a rule keyed to a field
+that varies.** I built it (`scripts/openings.ts`, `--opening`) and it took three forms to get right:
+
+| dealt form | paste rate (w1) | distinct openings |
+|---|---|---|
+| whole command — `Begin with the place.` | **10/24** ("Begin…") | 8 |
+| bare noun phrase — `a physical object` | **7/24** — *and lint called that batch 100% CLEAN* | 4 |
+| **category label + adjacent no-print ban** | **2/24** | **10** |
+
+The ban is the active ingredient, isolated by accident: my patch silently failed to add it to w1
+while P54 got it. **Same labels, same rotation: 21/24 paste without the ban, 2/24 with it**, variety
+unchanged (3 → 10 distinct openings). This reproduces w4's adjacent-ban result (5/24 → 0/24) on a
+different mechanism, so adjacent bans are now confirmed twice on independent evidence.
+
+**Anything that reads as writable English gets printed** when the prompt says the card must begin
+with it — imperatives and noun phrases alike. Deal a label that cannot sit in period prose, and ban
+printing it in the very next clause.
+
+🐛 **Lint blind spot found**: the noun-phrase batch scored **24/24 lint-clean** while 7 of those
+cards literally began "a physical object …". Lint does not detect dealt-value pastes. Needs a check.
