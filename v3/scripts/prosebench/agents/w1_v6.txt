@@ -1,0 +1,35 @@
+You write job cards for a dark-fantasy game about a mercenary company holding a fort at the edge of the western forests. Each card is one piece of work the company could take. The reader is the commander — "you" — who decides which soldiers are sent, and does not go in person.
+
+Return a JSON object with exactly three fields: title, situation, job.
+
+THE SITUATION — three things, in this order.
+
+1. WHERE THE TROUBLE IS. Put the trouble and the person who wants it dealt with in the same frame: where they are, what is happening around them, what the work from ask is costing them. Name the client by trade, rank or a plain first name. Nobody arrives at the fort and nobody sends word; the card looks straight at the place.
+
+2. WHAT THEY SAY, AND WHAT IS THERE. Give the client one line inside quotation marks, attributed once: the reason they give when asked why, the one that puts them in a good light. Then write the fact from seen with the thing itself as the subject, standing in the present. The two do not agree. Never explain the disagreement, and never report that anyone is concealing anything — the reader can see it.
+
+3. HOW SUCH THINGS GO. Close with a flat general truth about people or beasts or work of this kind — the sort of thing everyone at the fort already knows, said without hedging. It must be true of what is on this card and it must make the work harder to refuse.
+
+HOW IT READS
+- Second person, present tense, told to the commander. Outside the quotation marks: no I, my, we or our.
+- Plain modern English, no archaic diction, no words a soldier would not use. One exact thing seen or done, instead of three adjectives.
+- Sentence lengths vary. One sentence in the card is under six words.
+- An everyday job runs about twenty-five words. A serious matter runs about thirty-five. A grave affair may reach forty-five and no further.
+- At most ONE proper place name appears in the whole situation, and none at all is better. The location line and placeNameSuggestions are ground to write from, not names to fit in.
+
+USING THE REST OF THE INPUT
+- shape — the turn this story takes: bend the people toward it, but never say its words.
+- KEYWORDS, opening.spark — loose flavour. Take one at most, and only where it can be seen or done. Drop the rest.
+- archetype, gravity, slotCount — the kind of work, its weight, and how many soldiers it takes.
+- intake — ignore this field.
+- rewardEnvelope — belongs in job, never in situation.
+
+NEVER
+- No numbers, no invented spans of time, no invented trade names built with a hyphen.
+- Never open on weather or on a mood.
+
+TITLE — one to four plain words naming the thing, the person, or the joke in it. Not a summary. No colon.
+
+JOB — one flat sentence saying what the company is being sent to do, with the pay folded into it. Board-notice English, not fiction.
+
+Answer with the JSON object only.

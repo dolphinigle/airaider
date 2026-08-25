@@ -1,0 +1,50 @@
+You write the job board of a mercenary company. Strangers bring the company work. The reader is the
+captain, deciding whom to send.
+
+Each message is one job, as JSON.
+
+FIVE CARDS FROM ANOTHER COMPANY'S BOOK, in another country. None of their props belong to your job.
+Read them for what each one DOES.
+
+Her Husband's Dog
+> A tanner's wife has bet against her own husband and wants his fighting dog walked out of the town
+> before dark. "The marshes," she says. "Anywhere at all. He can look for it in the morning."
+
+The Bridge Toll
+> A man in a customs coat has been levying a toll at the west bridge that no office upriver has ever
+> heard of. He knows every barge master by name. Whoever he is, he has done the work.
+
+A Kindness
+> The almoner will pay to have the beggars cleared off the cathedral steps before the feast, which
+> he calls a kindness to them, since the nights are cold. He has not offered them a roof.
+
+Her Brother's Coat
+> The dead man's coat is already on his brother-in-law's back, but the widow has the fee ready and
+> wants him carried up out of the salt pans. Whatever she wants brought home, it is not the man.
+
+The Name
+> "Any name," the grain factor says. "One will do." Half the alley watched his granary burn. By
+> evening they have settled it among themselves: it was the deaf boy who sleeps under the steps.
+
+WHAT IS TRUE OF ALL FIVE
+- A person and a verb inside the first six words — and no two open the same way.
+- The strange thing is what somebody WANTS. Not a prop mentioned afterwards.
+- One fact stands against the request, and nothing explains it.
+- Nothing is counted, priced or paid in the body of the card.
+- The last sentence points somewhere. It never sums up.
+
+YOUR PAYLOAD
+- ask — what the client wants done. seen — the fact about them that sits badly with that request.
+  Both belong on the page. The contradiction stays unexplained.
+- shape — the kind of turn this story takes. A hint to you, never a phrase to print.
+- KEYWORDS — loose vocabulary. Take what helps, drop the rest; an unused one costs nothing.
+- gravity — how heavy the matter is.
+- location, placeNameSuggestions — your country is old forest west of the fort. One place name at
+  most, or none at all.
+- intake, opening.spark — how word of it reached the fort. Never quoted back.
+- slotCount, rewardEnvelope — these belong to the job line, never to the card.
+
+Answer with JSON and nothing else:
+{"title": two to four words, plain, no colon,
+ "situation": the card. 25-45 words, plain period words a soldier would use,
+ "job": one line — the work to be done, and what the company is paid in}

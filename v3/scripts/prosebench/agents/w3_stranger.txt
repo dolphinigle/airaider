@@ -1,0 +1,796 @@
+STRANGER-ish job cards: 273
+
+«The Queen's Blessing» [47w]
+  When the Queen decides to make a dream come true, the world shifts. From a fresh new look to incredible strength, anything is possible.
+However, it also scatters her power across the realm. No one knows why she picks whom she picks, or what the catch is.
+   · The Queen's Cage
+   · The one who receives the blessing
+
+«Sanitarium» [12w]
+  You can spend Gold Coins here to treat injured or sick people.
+   · Injured or sick people
+   · The consultation fee is 1 Gold Coin.
+
+«Thief Apprentice» [31w]
+  "This young pup came back to me, still set on being a thief... but that's wrong. So, my Lord, help me set him straight until he goes back to the mill."
+   · Alim
+   · Hemir
+   · You can do this job yourself, or send any of your followers to do it.
+   · Consumable to improve abilities.
+   · Your gold coins
+
+«Dagger's Path» [62w]
+  Having slain their servants, you enter the god's domain - this realm descends, merging with your world, revealing jagged claws. Stone transforms into blades, light forges mechanisms and stairs: this is the path to divine audience, recorded in sacred texts. The heavier one's sins, the faster the blade-wheels spin, the easier one's dismemberment... And your sins? Those wheels nearly spark from friction.
+   · Aether of the True Faith strengthens god power while weakening yours
+   · Mechanism Observer
+   · Blade Resistor
+   · Mechanism Disruptor
+   · Blade Breaker
+   · Consumable
+
+«Adila's Challenge» [13w]
+  A woman dressed as a warrior blocks your doorway, aggressively demanding an explanation.
+   · A warrioress is causing you trouble.
+   · You can meet her in person or send a follower to receive her.
+
+«Offered Wooden Sculpture» [26w]
+  This dirty, ugly statue is a suitable trophy to display, showcasing your military achievements... Whenever you approach it, it attempts to instill such thoughts in you.
+   · Tribal Treasure
+   · It only requires 7 Gold Coins.
+   · Perhaps this counts as an act of extravagance, enough to break a Sultan Card.
+
+«World's Eye» [43w]
+  They are both Purifier and Disciplinarian. Now, They have come. All living beings involuntarily look to the sky - from now on, the eye of God begins calculating everyone's transgressions for the impending judgment day... Without intervention, most will despair under celestial scrutiny.
+   · Aether of the True Faith strengthens god power while weakening yours
+   · Friend in the Sky
+   · Humans stand condemned - which leader will guide their rebellion against the god?
+   · Summon clouds to block judgment's light
+   · Find a path to climb back to the divine throne
+   · Rally spirits, counter god manipulation
+
+«Guesthouse» [16w]
+  These people will risk everything for you after enjoying your meal... at least until it's digested.
+   · Retainer
+   · Retainer
+   · Retainer
+   · Send someone to recruit the 1st Retainer.
+   · Send someone to recruit the 2nd Retainer.
+   · Send someone to recruit the 3rd Retainer.
+
+«Plead with the Queen» [22w]
+  The great Queen of Jinn is coming into this world. Offer her gifts, kneel and kiss her toes, or... set a trap.
+   · The Flame Bearer severs the Queen's magic.
+   · The Wind Wielder shields everyone from the Queen's enchantment.
+   · The Filth Caster breaks the jinn's magic.
+   · The Lamp Keeper completes the seal.
+   · Veesa trembles
+   · Endry is eager to try
+
+«I Want It All» [39w]
+  A swindler – or maybe not a swindler – approaches you with a heap of trinkets, claiming they are ancient relics belonging to your family. With a grand gesture, you generously declare that you will take them all in.
+   · You can handle this yourself, or send a follower to do it.
+   · 10 Gold Coins, not a single cent less.
+   · You can take this opportunity to break an Extravagance Card of Bronze tier or lower.
+
+«The Collapsed Tower» [45w]
+  This marks humanity's closest encounter with the divine... The battle unfolds not in reality, but in the realm of legends. The ensuing events remain shrouded from history, preserved solely in your memory, serving as the building blocks for you to craft your own unique saga.
+   · The insect king who ascends the tower's peak, disdaining the gods
+   · Insect warriors
+   · Insect warriors
+   · Insect warriors
+   · Insect warriors
+   · Your emissary
+
+«Sky Fire» [39w]
+  You finally reach the Destroyer's burning throne. They await behind raging flames, watching you, anticipating when their holy fire will ignite the world's sky. You sense their contempt: this immaculate domain has no weaknesses, no vulnerabilities mortals can exploit.
+   · Aether of the True Faith strengthens god power while weakening yours
+   · Pathfinder
+   · Pathfinder
+   · Pathfinder
+   · Pathfinder
+   · Consumable
+
+«Smoked Lion Feast» [12w]
+  The feast is finished - time to invite friends to enjoy it.
+   · Today's menu
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+
+«Justice's Challenge» [12w]
+  For justice, revenge, or glory? Someone blocked your door, demanding a duel.
+   · The dueling opponent who challenged you
+   · You can personally challenge, or assign a follower to fight on your behalf
+   · Some things can make you win more easily
+   · You can take this to break a Bloodshed Card that matches the Challenger's tier, or spare him to prove your noble character
+
+«Roast Pigeon» [12w]
+  The feast is ready - time to invite friends to enjoy it.
+   · Today's menu
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+
+«A Sense of Distance» [26w]
+  The first feeling is remoteness, so far now from the world of men. As a god, you are no longer permitted to remain upon the board.
+   · You will become a god.
+   · And your avatar shall become your finest tool.
+
+«Velvet Chamber» [23w]
+  You transform the attic into a discreet chamber for political intrigue. Heavy curtains create an atmosphere where anything might be discussed or accomplished.
+   · Noble Conspiracy
+   · Noble Conspiracy
+
+«Time Reversal» [19w]
+  You've finally uncovered the Shadow Compass's secret - it can reverse numerous powerful enchantments, potentially including the Magician's cards.
+   · Shadow Compass
+   · Sultan Card
+
+«The Grand Hunt Feast» [23w]
+  Every hunt brings different ingredients, and that's what makes shawarma fun. And of course, the freshly baked, piping-hot flatbread is just as crucial.
+   · Today's menu
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+
+«Stinking Attic» [16w]
+  Today, your friend shows an unusual embarrassment when facing you, seemingly having something difficult to admit.
+   · This person looks troubled
+   · This person looks embarrassed
+
+«Night's Shelter» [63w]
+  Amid swirling mist, you tread through Dark Alley's smoke and dust, finding this old clay-brick house. The colored tiles above the windows have long since faded and fallen away, wind and sand having rendered the heavy curtains dirty and dim. Still, you discern blurred dark shapes matching your memory. This is the place. Before knocking, you consider once more: why have you come?
+   · You're certain the evil Occultist is hiding here
+   · Option 1: You are prepared to send followers, or go apprehend this cultist yourself
+   · Option 2: You are quite interested in the cultist's dark arts. You are prepared to send followers, or go and talk to her in person
+   · You can bring consumables to help you arrest the cultist. If you have a White Honey Amber Orb, it will all be very simple
+
+«Forceful Expulsion» [25w]
+  Clearly, the locals have failed to eliminate the bandits due to gross incompetence. If you are to lead the assault personally, things will be different!
+   · Participants in this extermination operation need at least 6 points in Combat.
+   · Participants in this extermination operation need at least 6 points in Combat.
+
+«Cold Amusement» [22w]
+  Recently, your wife has been quite unhappy with you. You can sense her growing resentment, and you didn't please her in time.
+   · Wife's Resentment
+   · Cold Maggie
+
+«Conception» [26w]
+  Place the phantom dark seed from your heart into a mortal body. Through flesh and blood, nurture the egg necessary for divine birth in this world...
+   · Only fervent hope for birthing a new world... can herald the Creator's advent
+   · The vessel of birth, the divine passage, the glorious defiler
+   · Host with Black Art and at least 6 Magic
+   · Devoted supplicant, offering defilement
+   · Devoted supplicant, offering defilement
+   · Devoted supplicant, offering defilement
+
+«Interrogation» [18w]
+  This foreign merchant... your tenant... seems suspicious. A touch of skill may be required to loosen his tongue.
+   · Suspicious Bharat
+   · Who Will Interrogate?
+   · Who Will Interrogate?
+   · Consumable
+
+«Unwavering Loyalty» [14w]
+  Many folk tales of chastity and fidelity, half-true and half-false, all carry indescribable eeriness.
+   · Currently Reading
+   · The reader.
+
+«While Breath Remains» [36w]
+  You saw that new world. What a tiny seed it was... In eons, perhaps, it would grow into a magnificent cosmos. But for now, it could hold only your soul...
+And that was more than enough.
+   · A world meant only for you is flickering your way.
+   · Protagonist
+   · Is there still someone willing to hold your hand?
+   · Have you gathered enough Rationality and skill?
+
+«The Final Polishing» [34w]
+  The Dragon's Eye is drawn from the furnace, slowly stabilizing... Now, whoever polishes away its last sharp edges and forges a bond between its light and their own soul shall become its eternal master.
+   · It holds the power of a new world, the power of infinity.
+   · You... or Mahir...
+   · A portion of Aether, for polishing and lubrication.
+   · 1 large diamond, or 3 small diamonds, or 60 gold coins to purchase polishing materials.
+   · Perhaps, if the gods gain a new world, they will spare yours.
+   · Perhaps, if the gods gain a new world, they will spare yours.
+
+«Carving of the Dragon's Eye» [38w]
+  Mahir has sent you to find the most unyielding weapons. Working the Dragon's Eye with ordinary tools would be like fighting with a spoon. You can't even be bothered to ask if these weapons will survive the process...
+   · Dragon's Eye
+   · Mahir will carve the Dragon's Eye herself.
+   · Use Aether to keep the Dragon's Eye viable.
+   · Gold-tier weapons used as disassembly and cutting tools.
+   · Assistant with at least 10 Wisdom.
+   · Assistant with at least 10 Wisdom.
+
+«Holy Bread» [12w]
+  The meal is ready - time to invite friends to enjoy it.
+   · Today's menu
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+
+«Absurd Pleasure» [26w]
+  The cultists have chosen - no, the Cult God has selected this absurd carnality target for you... When resistance proves impossible, try finding pleasure in surrender.
+   · What's done is done
+   · Try to enjoy it
+   · The Sultan Card you gave the cultists
+
+«Sweet Whip» [31w]
+  Legend tells that blessed, beautiful women can tame even the fiercest beasts. Only the largest and most ferocious creatures are worthy of Lady Jalila's training. Do you count yourself among them?
+   · Excited Jalila
+   · Only 4 Gold Coins
+   · This kind of thing can’t be entrusted to someone else, right?
+   · You can break a Carnality Card of Bronze tier or lower
+   · You can try putting some items on it, maybe it will be useful.
+
+«Clay Gate» [33w]
+  <color=#3F2A29>You have reached the end, and the key fits perfectly. Yet, the gate does not budge; your strength alone is not enough! This is the final secret—no one can create a world alone.</color>
+   · Is It the Final Step?
+   · Will they share it with you... or become part of a new world itself?
+   · Do you truly wish to share the power of world-creation with it?
+   · Can you bear to coexist with it for eons to come?
+   · The Dawn of a New World
+   · The Dawn of a New World
+
+«Minting» [26w]
+  Royal authority shows itself as divine blessing in the heavens, as palaces and monuments on earth, and among men as the sovereign right to strike coin.
+   · Artisan
+   · Helper
+   · At Least Some Real Gold... 10 Gold Coins
+   · Handler
+   · Consumable
+
+«One Hand for Goods» [15w]
+  The pickpocket ringleader sells stolen goods at your doorstep – not just for business, clearly.
+   · Alim
+   · Alim's Mysterious Box of Stolen Goods
+   · 5 Gold Coins or anything that Alim might care about.
+   · You can do this job yourself, or send any of your followers to do it.
+
+«Nawfal's Poisoned Arrows» [17w]
+  On the eve of war, what would someone who couldn't even kill a chicken say to you?
+   · Nawfal
+   · You
+
+«Devourer's Hunger» [28w]
+  The cultists publicly announce the Cultic God will bestow blessings, providing wine to Dark Alley's poorest... You dare not imagine their confidence... or where their wine money originates.
+   · Raw Material
+   · Raw Material
+   · The Sultan Card you gave the cultists
+
+«Generous Donation» [48w]
+  Someone beats drums and gongs at your doorstep, singing hymns loudly. As you open the door, a group of children shower you with white flowers and shout 'Hooray' and 'Thank you.' Before you figure out what's going on, they pull out a donation banner 'for the pure children'...
+   · You can do this job yourself, or send any of your followers to do it.
+   · You are certain you want to donate 10 Gold Coins.
+   · You can take this opportunity to break an Extravagance Card of Bronze tier or lower.
+
+«Feast» [44w]
+  Miss Arumina hosts a banquet for young nobles. You are her family's benefactor and a famous figure in court – young people are eager to see you, learn your manners, demeanor, and even lifestyle... It is best to prepare carefully and bring appropriate companions.
+   · Arumina
+   · You must go there yourself
+   · Choose a female companion... Actually, a male would do too!
+   · Bring along a servant
+   · Choose a passionate partner or wife, you can break a Carnality Card of Silver tier or lower
+
+«You Are the Last One» [15w]
+  This straightforward revenge makes no pretense - he simply blocks your path with his sword.
+   · The vengeful blade now rests against your neck.
+   · You are in crisis
+   · Certain items might help you survive.
+   · You can take this to break any tier Bloodshed Card
+
+«Let Me Open Your Chest» [26w]
+  The mysterious man takes out a sharp knife, a pointed awl, and a handsaw. The cold light reflects off his rigid face. "All set. And you?"
+   · You decide to accept his help
+   · Do you remember where you got the sleeping draught or liquor?
+   · Consumables that aid your checks when necessary
+
+«Unclean Material» [37w]
+  Obtaining a corpse... sounds simple, because the deceased themselves won't oppose you, but in reality, it is a grave crime. You don't want to ask Mahir how she got the corpse before you. If you need more...
+   · 10 Gold Coins, or a person to serve as material.
+   · A Bloodshed Card, the tier cannot be higher than the character used as material
+   · Mahir is eager to try
+
+«Fate of the Pickpocket» [24w]
+  The time has come. You decide to use the card you drew to deal with the little pickpocket bold enough to steal your property.
+   · Hemir
+   · In this situation, you should step in personally.
+   · You can use this to break a Stone tier Bloodshed Card
+
+«Wilderness Stew» [12w]
+  The feast is ready - time to invite friends to enjoy it.
+   · Today's menu
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+
+«Vengeance in Justice» [43w]
+  There is a brutal and strong warrior whose hobby is hunting humans – especially young slave girls. In nearby forests and wilderness, corpses of people cut in two after being humiliated by him are often seen... It’s time for the role to change.
+   · King of Flames
+   · Consumables to assist with checks
+
+«A Quiet Place» [16w]
+  It is a gentle hill by a clear river. A fitting place for a resting ground.
+   · Construction Cost: 8 Gold Coins
+   · To break the Extravagance Card, another 8 Gold Coins are required.
+   · Can only break Extravagance Cards up to Silver tier.
+
+«Deal with Adila» [20w]
+  The victor has the right to do as they please with the loser. Such is the warriors' code of honor.
+   · Adila is at your mercy.
+   · You can use her to break a Bloodshed Card or Carnality Card, or... as a gesture of good faith, gift her the White Rhino Skin?
+
+«Steps» [29w]
+  You have arrived here. Depose some, so they respect your majesty; promote some, so they know your power. At least at this moment, no one can defy your decisions.
+   · Promotion
+   · Promotion
+   · Promotion
+   · Promotion
+   · Promotion
+   · Execution
+
+«Battle of the Mind X» [61w]
+  True battles unfold within... 
+Having passed through that door, what did you expect to find? 
+Since that day, you've fruitlessly searched for more visions, more power, more supernatural guidance, all without success. 
+That door must have significance, but where can you find it again? 
+Today, you resolve to focus your entire consciousness on exploring the spiritual realm, to try once more...
+   · Evil?
+   · Good?
+   · Your Own Thoughts
+   · Your rationality can help, if you possess it
+   · Your faith may help, if strong enough
+   · Bloodshed Card
+
+«Make a wish upon a star» [12w]
+  As the Highlord adjusts to Their new form, They await your wish.
+   · The Highlord-Possessed
+   · Your fears, your ambitions
+
+«Mountain Depths» [25w]
+  According to "Blood of the Longhorn Beetle" records, in endless mountains where ice, snow, and clouds converge, life's ultimate secret lies hidden, tempting you constantly.
+   · Mountain guide, requiring at least 5 Survival
+   · Pack bearer, requiring at least 5 Physique
+   · Scout, requiring at least 5 Wisdom
+   · You must go yourself, requiring at least 5 Magic
+   · You must spend 6 Gold Coins to fund the expedition.
+   · These will yet prove its uses within your adventures.
+
+«Innocent Victim» [22w]
+  While fretting over what the cultists might do with your Conquest Card, you hear reports of a terrifying monster ravaging your territory...
+   · Predator
+   · Captive Followers
+   · The Sultan Card you gave the cultists
+   · You must face this monster yourself
+   · You can seek assistance
+   · You can seek assistance
+
+«Biting Bread» [14w]
+  Careful, hold on tight. Don't let the bread chase you around the room instead.
+   · Today's menu
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+
+«Sharp Grass Plain» [29w]
+  An unnatural place where grass grows sharp as razors and nights become bitterly cold. Legends tell of fallen Homeland royal ghosts wandering here. Perhaps treasures or secrets lie hidden.
+   · Pathfinder needs 4 Survival
+   · Exorcist needs 5 Magic
+   · Explorer needs 5 Wisdom
+   · The 10 Gold Coins cost of this adventure
+   · Fire-setting requires special items or someone with sufficient magic
+   · Conquest Sultan Card Silver of Silver or lower
+
+«Winds of Creation» [34w]
+  <color=#3F2A29>You are nearing the end. The wind toward a new world grows ever fiercer... No longer can you rely on arms or wings alone—you must hoist your sails and ride the force of creation.</color>
+   · You are now on the path of ascension.
+   · What divine hands and eyes could forge this?
+   · Could one glimpse the sparks of its forging on the mortal horizon?
+   · Will your work smile when seeing itself?
+   · Proof of Power
+   · Proof of Power
+
+«Salt-Roasted Ox Heart» [18w]
+  A real warrior tears an ox's heart apart with bare hands—yes, that's why I don't give you forks.
+   · Today's menu
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+
+«Little Guardian» [24w]
+  Following the directions, you reach a cluster of shacks in the Dark Alley said to house the exiled court physicians of the fallen kingdom.
+   · You can handle this in person or send any follower in your stead.
+   · 5 Gold Coins improve their living conditions. 10 Gold Coins allow you to break an Extravagance Card.
+   · You can take this opportunity to break an Extravagance Card of Bronze tier or lower.
+
+«Gathering Darkness» [41w]
+  The god is born. With Their cries, darkness ascends from the horizon... They shall splash stains across the world, just as They attempted tens of thousands of years ago - you must rally final resistance before darkness completely devours the world.
+   · In this apocalypse, maintain humanity's fragile hope and order (Sociability + Charisma)
+   · Light a beacon for all distant people (Magic + Charisma)
+   · Use protective magic against dark corruption (Magic + Survival)
+   · Carve a path through darkness and chaos toward god (Survival + Physique + Magic)
+   · Consumable
+
+«Even Stranger Rumors» [24w]
+  Stranger rumors are sure to spread through the Dark Alley. You've unknowingly done some terrifying deeds... It's best to send someone to investigate discreetly.
+   · You can send someone to investigate.
+   · Consumables to assist the investigation
+
+«Final Absolution» [16w]
+  Time remains to obliterate this dark egg at its most vulnerable moment through the holiest flames...
+   · Iman
+   · Yourself
+   · While They remain unfed and utterly defenseless
+
+«Dispose of the Captured Cultist» [16w]
+  Instead of delivering the cultist to the temple priests, you choose to deal with him yourself...
+   · Captured Cultist
+   · In this situation, you should step in personally.
+   · You can use this opportunity to break a Carnality Card or Bloodshed Card of the corresponding tier
+
+«Negotiation» [33w]
+  Zaki accidentally killed a prostitute, and it's well known that a prostitute’s life is of little value. You can step in to negotiate with the people from the brothel, spend some money, or...
+   · Zaki is very frightened
+   · You have to handle this yourself
+   · You may place a Bloodshed or an Extravagance card not exceeding Bronze tier
+   · You need at least 5 Gold Coins to buy the life of the prostitute.
+
+«The Mound» [50w]
+  As your ant swarm draws closer, the details of the mound come into view: ugly stone walls, countless boxes of wood and mud, swarming with insects trembling under your divine presence. You never asked for any of this. But now... you just long to see them tear each other apart.
+   · Soldier ants in the Mound
+   · Your cherished insects
+   · Your ant swarm
+   · Soldier ants in the Mound
+   · Your cherished insects
+   · Your ant swarm
+
+«Rob The Rich, Give to The Poor» [52w]
+  This wealthy merchant, relying on relatives in the court and hired thugs, monopolizing the milling and oil-pressing business of thirty villages... His warehouse grows fuller, while the poor are driven to such desperation that they can't even eat the wheat they grow... It's time for the King of Flames to enact justice.
+   · King of Flames
+   · Consumables to assist with checks
+
+«Battle of the Mind IV» [57w]
+  True battles unfold within... 
+You notice those seeking help, appearing virtuous, cannot face life's challenges. Those who harm them - the "wicked" - often wield power. 
+Is weakness virtue's essence? 
+Does virtue exist to attract assistance? 
+Must you embrace wickedness to gain power to help the virtuous? 
+Does virtue summon vice? 
+These thoughts occasionally surface, demanding consideration...
+   · Evil?
+   · Good?
+   · Your Own Thoughts
+   · Your rationality can help, if you possess it
+   · Your faith may help, if strong enough
+   · Consider the people and events around you for inspiration
+
+«Guesthouse» [16w]
+  These people will risk everything for you after enjoying your meal... at least until it's digested.
+   · Retainer
+   · Retainer
+   · Retainer
+   · Retainer
+   · Retainer
+   · Send someone to recruit the 1st Retainer.
+
+«Enjoy the wine» [14w]
+  A bottle of fine liquor, perfect for inviting a few friends for a drink.
+   · Yourself
+   · You can invite any friend
+   · You can invite any friend
+   · You can invite any friend
+   · Unnamed Cellar Reserve
+
+«Trial in the Dream» [55w]
+  You plunge deeper into the darkness and secrets of the nightmare, but suddenly, a black shadow manifests before you, wielding a massive weapon, forcing you back. And then... a golden crown appears upon your head, and you suddenly realize that countless people are willing to sacrifice themselves for you, as it is their highest honor.
+   · In an ancient, chaotic dream...
+   · The would-be dragonslayer walks a solitary path of power
+   · Is anyone willing to die for you?
+
+«Wild Goose Herbal Broth» [12w]
+  The feast is ready - time to invite friends to enjoy it.
+   · Today's menu
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+
+«Palace Duel» [23w]
+  Yesterday, you presented a Bloodshed Card in court. Today is the day you and your opponent must settle this fight to the death.
+   · The opponent you chose yesterday
+   · You can fight the battle yourself, or choose a noble follower to fight on your behalf.
+   · Certain items can be useful in combats.
+
+«Choose the Enlightened» [42w]
+  You arrive at the Order, where many aspiring believers have waited long. Following priests' guidance, they cut their palms, using pain to awaken their divine gifts. You see chaotic divine lights and varying expectations in their eyes as they look to you
+   · Merchant's son, completely without divine light
+   · You choose to acknowledge this merchant's son's light
+   · Noble's son, possessing stronger light than all others
+   · You choose to acknowledge this noble's son's light
+   · Humble servant, with weak light, barely present
+   · You choose to acknowledge this humble servant's light
+
+«Encouragement» [38w]
+  Recently, your renown in the capital has been increasing, requiring you to handle more matters and meet more people, naturally with more help from Faraj. Sometimes, after reporting on the day's affairs, he looks at you with anticipation...
+   · Faraj awaits your praise
+   · Praise his valor
+   · Praise his alertness
+   · Praise his grace
+
+«Reborn True God» [44w]
+  They wait atop their divine throne, silently expecting you... All light and majesty retract into that moonstone body - a form resembling humanity. To concentrate their strength against you, to adapt to this world's laws, this mighty god chooses the form most resembling humans.
+   · Aether of the True Faith empowers their god
+   · The Destroyer
+   · Only enlightened sages can face the gods
+   · Only mortal kings can face the gods
+   · Only Their former enemies can face the gods
+   · Consumable
+
+«Pack of Vicious Dogs» [62w]
+  A pack of wild dogs rampages through the slums, attacking lone passers-by. Some drunks were even devoured in their sleep, losing their lives. They severely impact the safety of the city. The security team has tried multiple times to catch them but failed each time. To catch these beasts, who have grown wisdom in order to survive, special measures might be necessary...
+   · Pack of Vicious Dogs
+   · You can put a dog lure here, or money to lure people.
+   · You can either go yourself or dispatch a strong enough follower to hunt.
+   · An extra companion, a better chance of ensurance.
+   · You can take this to break a Conquest Card of Bronze tier or lower, or a Extravagance Card
+   · Some things might come in handy in the battle.
+
+«The Bookshop of Fate» [37w]
+  You behold countless volumes, each one containing the destiny of a mortal life... Yet you can reach only the nearest few, for they have just been rewritten by the compiler and placed where your fate touches them.
+   · It has to be you.
+   · Characters bound to your fate.
+   · Consumable
+
+«Magic Furnace» [41w]
+  According to Mahir, the Dragon's Eye has "solidified," lost its malleability without the dragon's own magic. We need a powerful magical fire to make it pliable again. Well? What are you waiting for? Go find fuel! Anything with magic in it!
+   · Dragon's Eye
+   · Mahir must tend the flames personally.
+   · Using Aether as a catalyst.
+   · Magic-infused firewood.
+   · Magic-infused firewood.
+   · Magic-infused firewood.
+
+«Glorious Return» [19w]
+  You've obtained the hereditary title of the Qais family, now it's time to return it to its rightful owner.
+   · You invited Qais out
+   · Things to give to Qais
+
+«Check for vulnerabilities» [41w]
+  The issue of cultists taking advantage of conversion to commit tax evasion is a deep-rooted and complicated one. Something must be done, but you cannot do it alone. You summon advisors from different walks of life to chart a path forward.
+   · The host of the meeting needs at least 8 in Wisdom to work through the intricacies.
+   · You can assign a persuasive assistant to the host.
+   · Certain items can grant you a distinct advantage in negotiations.
+
+«Warrior's Feast» [18w]
+  Someone hopes you'll host a feast for warriors, as he and his friends deeply admire the adventurous life.
+   · Banquet Chef
+   · You can invite a friend to help
+   · You can invite a friend to help
+   · You can invite a friend to help
+
+«Receive Divine Grace» [21w]
+  Priests from the Purist Order can dispel evil and bestow blessings through special incantations... making recipients increasingly devoted to the Immaculate.
+   · Attending Priest
+   · One Seeking Blessing or Curse Removal
+   · You Must Demonstrate "Sincerity" to the Priests
+   · Try a Sultan Card here? You must personally deliver it
+
+«Guesthouse» [16w]
+  These people will risk everything for you after enjoying your meal... at least until it's digested.
+   · Retainer
+   · Retainer
+   · Retainer
+   · Retainer
+   · Retainer
+   · Retainer
+
+«Cactus Cake» [12w]
+  The dessert is ready - time to invite friends to enjoy it.
+   · Today's menu
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+
+«Disgrace of Being Abandoned» [12w]
+  Choose a Follower and let him or her pretend to abandon yourself.
+   · Choose a noble follower
+   · The Sultan's Suspicion
+
+«Star-Burning» [27w]
+  The Purist Order seeks your help locating the heretical god's celestial source - requiring extensive calculations and time, but witnessing the Immaculate Purity's miracle justifies all effort.
+   · Zazie's Token
+   · Astronomer with Wisdom 5 or use Astronomy
+   · Astronomer with Wisdom 5 or use Astronomy
+   · Astronomer with Wisdom 5 or use Astronomy
+   · 20 Gold Coins
+   · Any True Faith Ideology
+
+«Do Whatever You Want» [38w]
+  No matter how powerful he once was, his brutal deeds that turned everyone against him have led him to this pitiable corner – pinned to the throne by blades, barely breathing... now, your command shall become his destiny.
+   · Sultan
+   · Humiliate him
+   · Kill him
+   · Imprison him
+   · Exile him
+
+«The Look of the Chivalry» [61w]
+  Malkina has long admired the daring figures of the Dark Alley, or rather, the bandits and rogues who haunt it. She wanted to know more about their lives. Perhaps she can distill a way to make someone appear stronger, fiercer, more untamed. You happened to know quite a bit about these people. Which one will you bring for her to observe?
+   · Malkina
+   · Who is the true hero?
+
+«Worthless Papers» [36w]
+  "A beggar died leaving these items. They say he was once chief eunuch to the Homeland. He starved rather than sell these tattered books. I can't read them, but perhaps they'd interest a lord like yourself?"
+   · Tattered Book
+   · Tattered Book
+   · Tattered Book
+   · 3 Cold Coins, Buy
+   · 3 Cold Coins, Buy
+   · 3 Cold Coins, Buy
+
+«The Whole Story» [30w]
+  Asal comes to offer his apology. From the courtyard gate he drops to his knees and shuffles forward. It's the highest etiquette of apology—or rather, the posture of the guilty.
+   · Asal Comes to Apologize
+   · You can take this opportunity to break a Bloodshed Card of Asal's tier or lower.
+
+«Become Dogs» [29w]
+  These children are gentle and obedient. Perhaps you could recommend them to the Court... The nobles prefer flawed slaves – they tend to be more dependent on their masters.
+   · Children
+   · It costs 10 Gold Coins for a bribe
+
+«Great Hunt» [20w]
+  The Destroyer rages, their warriors appearing overhead - angels skilled in torture prepare to preemptively slaughter all who still defy.
+   · Aether of the True Faith strengthens god power while weakening yours
+   · Angels
+   · Only their most hateful enemy would help you now
+   · Warrior
+   · Troop
+   · Warrior
+
+«Killing the Fierce Lion» [54w]
+  A lion, banished by its pride, approaches a human city during the dry season, desperate for food. Initially, it preyed on livestock, but later, it attacked shepherds, killing them swiftly. Once a beast has tasted the sweet and fragile human flesh, it becomes unstoppable. Stop it now! Or someday, you will become its prey.
+   · The fierce lion with countless victims under its fangs.
+   · You can either go yourself or dispatch a strong enough follower to hunt.
+   · An extra companion, a better chance of success.
+   · Some things might come in handy during the hunt.
+   · You can take this to break a Conquest Card of Bronze tier or lower, or a Extravagance Card
+
+«Zaki's Request» [21w]
+  After the last guidance, he completely regards you as his mentor for life. This time, he has come to you again.
+   · Zaki
+   · Find someone to take him in.
+
+«Flawed Creation» [56w]
+  The Corrupter's nightmare shatters as you pierce the darkness... Yet you don't return to reality - or perhaps reality and divine dreams now blur together... In the dream's depths, you witness countless errors They made while defacing the world, the source of Their corruption... the regret and madness that torment Their divine mind day and night.
+   · They see through all time, thus despise Their creations' folly
+   · The self-righteous are easiest to deceive (Stealth)
+   · They are omnipotent, thus scorn all emotion and law
+   · Larger machines break easier... if you know where to draw lines (Wisdom)
+   · They follow doctrine executing every Creator command... why were They still abandoned!
+   · Stricter doctrine crumbles at slight misinterpretation (Sociability)
+
+«Eyeball Flatbread» [15w]
+  Send one person to distract the eyeballs. The rest sneak in and grab a bite!
+   · Today's menu
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+   · You can go youselft, or invite followers to taste it
+
+«Ink Offender» [24w]
+  Asal is arrested by you, and all the way to the scaffold, he stares at you in shock, utterly unaware of what has happened.
+   · Asal
+   · Still thinking of defiance?
+   · Still thinking of defiance?
+   · Still thinking of defiance?
+   · Still thinking of defiance?
+   · Still thinking of defiance?
+
+«Purchase Title» [31w]
+  The hereditary noble title of the Qais family has once again been lost due to the death of the noble who bought it, now anyone has the opportunity to get it.
+   · You must provide 10 Gold Coins
+   · You can personally go, or send any follower to buy it
+
+«The Frenzied Highlord» [20w]
+  The mightiest of Star-Souleds has returned to earth, consumed by excitement, joy, and insatiable hunger, devouring mortal dreams without restraint.
+   · The Highlord
+   · Your follower caught by the Star
+   · A noble of the city caught by the Star
+   · The Star-Souled
+   · Leading the god-slayers
+   · Following the god-slayers
+
+«Battle of the Mind III» [48w]
+  True battles unfold within... 
+Is a person born virtuous as others are born wicked? 
+Does a tiger's nature to hunt sheep make sheep inherently good? 
+You face twin trials of virtue and vice, feeling torn between opposing forces... 
+But was this predetermined? Were you originally virtuous or wicked?
+   · Evil?
+   · Good?
+   · Your Own Thoughts
+   · Your rationality can help, if you possess it
+   · Your faith may help, if strong enough
+   · Consider the people and events around you for inspiration
+
+«Divine Assistance» [19w]
+  The unusual evil atmosphere in the Haunted Mansion is disturbing. Perhaps you can seek help from the Purist Order.
+   · Ritual Insight
+   · If you want Iman's help, you must hand him the <i>Traces of Black Magic</i>.
+   · You must send a follower, or go to the temple yourself. People who are diplomatic and charming always get better results.
+   · You can try putting some items on it, maybe it will be useful.
+
+«Final Preparations» [41w]
+  According to the Book of Dragonslaying, that damned giant lizard breathes scorching heat, and most standard armor in the market offers little protection against flames... you'll need fire-resistant equipment for this adventure if you don't want to be handicapped in battle.
+   · You have to handle this yourself
+   · An experienced craftsman can help you
+   · You estimate this will cost at least 40 Gold Coins
+   · You can use this opportunity to break an Extravagance Card of any tier for this
+
+«The Law of Iron and Lash» [47w]
+  For these wretched peasants that dare to flee, you draft a decree – harsh, precise, unavoidable. You summon scholars of the law, pore over the scrolls, and unleash the storm. The fugitives will be hunted, their punishment a warning to those who might follow in their footsteps.
+   · The drafter of the laws needs at least 5 in Wisdom
+   · The enforcer of the laws needs at least 5 in Physique
+
+«Gold Bird House» [13w]
+  Meticulously ensuring its flight capability, and then constructing a huge cage for it.
+   · Gold Bird
+   · It only requires 5 Gold Coins.
+
+«Snake Valley» [43w]
+  Someone told you about a sandy valley outside the city, where many snakes roam. The black market is buying their venom glands at a high price. But it's not easy to obtain them... First, you need to survive the onslaught of snake fangs.
+   · You can go yourself, or you can send an experienced follower to explore
+   · An extra companion, a better chance of success.
+   · Some things might come in handy during the search.
+
+«The Dawn Rally» [56w]
+  This is a hilltop overlooking the capital, surrounded by your troops... They wear no uniform, their appearances diverse and disheveled, with nearly half wielding nothing more than farm tools or crude improvised weapons... Yet they stand in silence, watching as the sun slowly rises over the hill where you stand – waiting for you to speak.
+   · Protagonist
+   · The Legitimacy You Choose
+   · Troop
+   · Troop
+   · Troop
+   · Troop
+
+«Release» [28w]
+  Nothing is more important than eradicating evil. You throw the cards in your hand before the dragon, it takes a deep breath and then exhales its scorching breath...
+   · Dying Dragon
+   · Producing any Sultan Card will end this game
+   · The fate-bearers
+
+«Learning Sociability» [17w]
+  The youth should make the most of their physical advantages and steal everyone's eyes in the bathhouse.
+   · Zaki
+   · You can mentor him yourself, or send any follower to guide him
+   · Consumables to assist in training
+
+«Thorn and Tower» [17w]
+  From afar, you can see this green, broken tower... But is that a mirage or real landmark?
+   · A guide, with at least 4 in Survival or Wisdom.
+   · An adventurer with at least 4 in Stealth or Physique.
+   · A puzzle-solver with at least 4 in Wisdom or Magic.
+   · A negotiator with at least 4 in Charisma or Sociability.
+   · You must spend 5 Gold Coins to fund the expedition.
+   · These will yet prove its uses within your adventures.
+
+«A Strange Story» [20w]
+  The things that happened in the fog, the conflicting memories, that lamb... you can't help but want to tell someone.
+   · Thoughts
+   · Some people have a way of stirring your very mind...
+
+«The Kindred Bird» [40w]
+  In the library, you encounter your twin. In theory, the two of you shouldn't appear in the same place at the same time... yet here he is, and you find yourself speaking openly of the troubles that weigh on you.
+   · Twin
+   · Madness, suspicion, wounds, and curses, all can be eased.
+
+«The Look of Evil» [57w]
+  Malkina wished to study scoundrels firsthand, hoping to distill from them a way to look wicked. She's convinced she could devise a whole style of dress and makeup that makes one appear far more sinister. You've agreed to help her—though, truth be told, not everyone would be flattered by the words: "Because you're such an evil person..."
+   · Malkina
+   · Who is evil?

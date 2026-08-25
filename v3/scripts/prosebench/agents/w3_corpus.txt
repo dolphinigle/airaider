@@ -1,0 +1,1745 @@
+TOTAL rites 1485 job-like(>=2slots + dice) 685
+
+=== «Spring-Water Beef» [15w] id=5006174
+CARD: The meat seems to glow, letting you see your own face reflected in the plate.
+  SLOT: Today's menu
+  SLOT: You can go youselft, or invite followers to taste it
+  SLOT: You can go youselft, or invite followers to taste it
+  SLOT: You can go youselft, or invite followers to taste it
+  SLOT: You can go youselft, or invite followers to taste it
+  OUT: There's something in this. A mysterious power Veesa knows. Ah. No. Impossible!
+  OUT: Hassan gazes at the light playing across the meat and recites: "One day,
+we will see a stranger
+in our own dish.
+One day,
+we will taste
+what must be tasted."
+
+=== «Shama's Game» [5w] id=5000808
+CARD: This game belongs to Shama
+  SLOT: Shama
+  SLOT: Nabhani
+  SLOT: Shama's guest
+  SLOT: Shama's guest
+  SLOT: Yourself
+  SLOT: Your companion
+  SLOT: You can take this opportunity to break a Sultan Card of Silver tier or lower.
+  SLOT: Consumable
+  OUT: Conquest failed, did not conquer everyone.
+  OUT: Description of breaking the Conquest Card. Successful!
+  OUT: Description of breaking the Carnality Card. A passage is needed about the Sultan refusing the Gold Carnality Card.
+
+=== «How Dare You?» [27w] id=5006636
+CARD: You knock on the presumptuous noble's door with the Sultan Card, demanding to know if he really wants to harass YOUR follower – even a slave girl.
+  SLOT: Overestimated Noble.
+  SLOT: You must show up yourself
+  SLOT: You can intimidate him with a Silver Bloodshed, Carnality, or Conquest Card.
+  SLOT: To use a Conquest Card, you must have an army, otherwise any helpful consumable can be placed here.
+  OUT: You slaped the Sultan Card across his face, asking if he'd like to taste it. Briefly grimacing, he clenched his fists, but then bowed to you.
+"Please forgive me," he apologized submissively, though deep down still unwilling, "But you can't blame me, it was your slave girl who seduced me. She's so beautiful, she looked at me among so many people, if not showing her willing..." 
+Under your cold gaze
+  OUT: The Sultan curiously inquires what Sultan Card you brandished, then commands you to execute it.
+He wants you to know he permits you to play this game, grants you these powers, but ultimately, he is the true master, and you're merely his entertainment.
+  OUT: He fell under your blade, ending his vile, pitiful life like a rat. Amidst the Sultan's laughter, you admitted you felt little pity for him – a man undeserving of sympathy.
+You settled the matter with Inal honorably, and on returning, Maggie embraces you. She never finds you such dependable.
+
+=== «» [20w] id=5010073
+CARD: Gather those bugs that follow you. Tell them how great you have become, and prepare them to fight for you.
+  SLOT: Your Emissary
+  SLOT: How a God Rules the World
+  SLOT: New Followers
+  SLOT: New Followers
+  SLOT: New Followers
+  SLOT: New Followers
+  SLOT: New Followers
+  SLOT: New Followers
+  OUT: [s1.name] gathers every follower you once trusted, valued, relied upon, and presents you anew. Brings them your revelation.
+You tell the story of [player.name], the one who endlessly returns, who cycles through the world without end. It was through this very spiral that you ascended to godhood. Now, your age approaches. And to your chosen, you shall grant this power.
+On the stage of this new age, 
+  OUT: Receiving your revelation, the nameless swordsman is drawn to the heavens above. Through him, your divine power meets the stars, and bends the reality they remember.
+Ancient contracts, long forgotten, rumble back to life... but shaped now as you decree.
+  OUT: When [s1.name] gathers them, all see the light you cast from the firmament. The Immaculate Purity is reborn, in a new form. King of Kings. Guardian of monarchs. Only those blessed by them may rule in their name.
+[s1.name]'s words echo, through mountains, rivers, palaces, wilds. Every sacred flame in the Sultan's court dies. Every false god, not carved in [player.name]'s likeness, cracks and falls.
+
+=== «What’s Your Next Life» [19w] id=5000341
+CARD: If there is a next life, [xiaochou.name] wishes to know, what kind of person would you choose to be?
+  SLOT: The Mirror
+  SLOT: If there is a next life, what kind of person would you choose to be?
+  OUT: At supper that evening, a servant fumbled and shattered a great silver platter. He dropped to his knees in haste, gathering the shards—only to slice his finger open.
+Yet how could a silver plate break so easily? And how could its edges cut so deep?
+You sent the clumsy servant away to tend his wound, then lifted a fragment to study it. There, upon the polished silver, your own face stared back...
+Y
+
+=== «The Star's Contract» [34w] id=5000579
+CARD: With seed to attract the Highlord... you could conduct your own ritual to summon Him. Whether dealing with abyssal demons or Star-Souled, such rituals share a core principle - trap the target, then negotiate.
+  SLOT: Zazie's Token
+  SLOT: The Highlord's perpetual desire, a summoning medium
+  SLOT: Sacrifice to entice divine incarnation - perhaps also part of the bargain (Physique+Charisma)
+  SLOT: The host illuminates the sacrifice, guiding the god's path (Magic+Charisma)
+  SLOT: Use Magic to maintain the barrier, trapping the summoned entity
+  SLOT: Use Magic to maintain the barrier, trapping the summoned entity
+  SLOT: Use Magic to maintain the barrier, trapping the summoned entity
+  SLOT: Consumable
+  OUT: As [s3.name] chants the ancient invocation, arcane energy surges into the vial of seeds, bathing it in ethereal radiance. 
+The stars above twinkle with curiosity - after countless years, someone once again calls to the ancient star spirits. [s3.gender] summons the most powerful yet long-forgotten Highlord! 
+First arrives the caressing wind, followed by the trembling North Star. 
+Finally, cosmic da
+  OUT: That seed, under starlight's glow, gradually coalesces into a tiny humanoid form. Along the starlight path, They will enter the prepared vessel through its left eye... In this moment, the spellcasters simultaneously utter true words, completing the binding of this god - They has accepted the sacrifice, and now, the time of covenant has come.
+  OUT: A god has entered your soul... They sees all that you are and has fallen into your web - that cruel game constructed of the Magician's cards and countless victims' souls... More delightful still, you yourself cannot escape either, so regardless of what great god They once were, They cannot leave now. 
+After much arguing, complaining, cursing, persuading, deceiving... They finally accept Their fate
+
+=== «The Vitality Platter» [12w] id=5008139
+CARD: The feast is ready - time to invite friends to enjoy it.
+  SLOT: Today's menu
+  SLOT: You can go youselft, or invite followers to taste it
+  SLOT: You can go youselft, or invite followers to taste it
+  SLOT: You can go youselft, or invite followers to taste it
+  SLOT: You can go youselft, or invite followers to taste it
+  OUT: "The key to enjoying a meal is to close your eyes,
+Just as the key to enjoying love
+Is to leave your mind behind."
+Hassan's verse stired something within Zephyr...
+  OUT: "The key to enjoying a meal is to close your eyes,
+Just as the key to enjoying love
+Is to leave your mind behind."
+
+=== «A Makeup in Blood» [31w] id=5000651
+CARD: Nayla has thought of a new game – she invites you to use a Bloodshed Card to execute her most defiant slave. This will be immensely fun for both of you.
+  SLOT: The Lady.
+  SLOT: The Sharp-eyed Slave.
+  SLOT: You have to attend in person.
+  SLOT: A Bloodshed Card... but which tier should it be?
+  OUT: When you come to your senses, you are both panting, lying exhausted amidst guts and blood...
+
+She gently licks away the blood clots in your ear and whispers: "I think I'm a little in love with you."
+  OUT: Surprisingly, after a long time, no more sound came from the room...
+Just when you were getting impatient, the slave opened the door, threw the blood-stained scimitar on the ground, and told you that he needed a handy bow and arrow to better serve you.
+
+=== «Death of a Tax Farmer» [25w] id=5006578
+CARD: A Sultan's tax farmer was assassinated for overly aggressive tax policies, involving local and royal conflict, possibly inciting large-scale rebellion... Be careful in handling it.
+  SLOT: Vizier Abdul's Seat
+  SLOT: Amend unreasonable clause. (Requires Abdul to be persuaded)
+  SLOT: Raise taxes on these unruly citizens, or send in the army. Agree with Abdul's approach
+  SLOT: Consumable
+  SLOT: Only a Gold-tier Bloodshed Card can eliminate the Vizier.
+  OUT: In the astonished gaze of the Vizier, you see relief, is this the truth behind inviting you to work together? He knows that one day, you will draw a golden Bloodshed Card, and you will use it on the most detestable elder... 
+Now, he lies peacefully in a pool of blood, leaving all the remnants of this empire, mainly pressure and excrement, to you.
+The Sultan, upon hearing the news, chucks lightly –
+
+=== «Twisted Branch» [23w] id=5008222
+CARD: A romantic night with Arzuna lets you break a Carnality Card. And sure enough, Maggie would catch wind of it in no time.
+  SLOT: Maggie is outraged by what you've done.
+  SLOT: You must soothe her yourself.
+  SLOT: You might want to promise Maggie that you will keep your distance from someone.
+  OUT: "Haha, what harm could she do? A dancer, an illiterate little commoner, an illegitimate child of the third woman—she ought to be grateful if I don't drain her dry!" Of course, you wouldn't do that... She could still be useful, and after all, she was family.
+You tried to paint Arzuna in a scornful tone to ease Maggie's mind, but Maggie only fixed you with a quiet gaze.
+At least, she didn't press yo
+  OUT: You nodded.
+In all those years, you had never heard a word about that mother and daughter. Clearly, your father went out of his way to keep this secret. Arzuna's hatred of him was only natural. And such hatred could easily fall on his son, especially one who had inherited all of his titles, estate, wealth, and influence. In hindsight, Arzuna's arrival seemed almost too deliberate.
+You promised to 
+
+=== «Ansuya's Request I» [49w] id=5000522
+CARD: Ansuya agrees to help you steal the Sultan's ring, but she must first gain the Sultan's trust and favor, before she will even have an opportunity to enter his bed chamber. This is no easy task... Right now, she needs money to take care of matters in the palace.
+  SLOT: Ansuya needs your support
+  SLOT: Mute Bells
+  SLOT: Requires 10 Gold Coins.
+  SLOT: You can do this job yourself, or send any of your followers to do it.
+  SLOT: You can either pay 10 Gold Coins to bribe the guard, or utilize the prepared Harem Secret Passage.
+  SLOT: Some things can help in infiltration
+  OUT: Bribing the guards is a job that only you can do.
+
+=== «Become Human» [67w] id=5008085
+CARD: Alim proposed a bold idea: to establish a school that would shelter the beggars from Dark Alley. Think about it – he is already skilled at caring for his puppies, but they need a gentleman to teach them proper manners rather than the tricks of thievery. So, if you're willing to help, Alim could fund half of the project – which means quite a fortune for him!
+  SLOT: Alim
+  SLOT: Half each, 10 Gold Coins
+  SLOT: If you're willing to pay 20 Gold Coins, you can take the opportunity to break an Extravagance Card no higher than the Bronze tier
+  SLOT: Children
+  OUT: Alim noticed you had built this shelter much larger than these beggars actually needed. You told him that this place would not only house one group of beggars but become a base for educating all homeless children: We are nurturing the future.
+
+Although Alim did not fully grasp what you said, he smiled, knowing it's always right to follow you.
+
+=== «Call of Abnormal Affection» [74w] id=5002023
+CARD: You thought you had left her behind, but something else has taken root within you. A craving tightens around your neck, urging you to abandon everything to see the woman who both desires and resents you.
+ As if cursed, when she grips your throat, all colors fade... If you are lucky to survive, it will be a life of the walking dead, because only on the brink of hell can you find true pleasure.
+  SLOT: Junah, her passion is a bit terrifying.
+  SLOT: You cannot control yourself.
+  SLOT: You can try putting some items on it, maybe it will be useful.
+  OUT: Everyone can see the dirty bruises on your neck, they won't mock you, only Maggie and her flawless, jade-like neck.
+
+=== «See the Honor» [26w] id=5000326
+CARD: [xiaochou.name] sought to behold the glory human has claimed through conquest. Perhaps it would help [xiaochou.name] better grasp the ways of human, and better serve you.
+  SLOT: Can the mirror-born ever understand human?
+  SLOT: A common example of human
+  OUT: You couldn’t shake the feeling that people now looked at you differently—perhaps with more awe, more fear, or even more reverence. Whatever it was, your words carried more weight than before. You broached the subject with a servant or two, but they could only stammer, "It’s as if we suddenly remembered some great deeds of yours… yet when we try to recall them, nothing comes to mind." This, you sup
+
+=== «Injured White Rhino» [16w] id=5000630
+CARD: Someone has spotted a white rhino near a lush watering hole in the wild, seemingly injured.
+  SLOT: Injured White Rhino
+  SLOT: You can either go yourself or dispatch a follower to hunt this White Rhino
+  SLOT: You can either go yourself or dispatch a follower to hunt this White Rhino
+  SLOT: Certain consumables can come in handy in combat.
+  SLOT: You can take this opportunity to break a Conquest Card or Carnality Card up to the Rhino's tier
+  OUT: You successfully sneak as close as you can to the White Rhino without alerting it.
+It is drinking at the riverside, with a long, bleeding wound on its side. The wound seems deep, likely made by a sharp blade. You ponder. A well-aimed harpoon through the wound could slay it while causing the least damage to the beautiful hide...
+  OUT: Thanks to your perfect physique and combat prowess, you thrust the harpoon right into the white rhino's wound. The rhino's roars are deafening as it struggles madly, dashing across the fields, trying to shake off the painful blade, raising clouds of dust in its trail. At last, it falls prone from blood loss, lifeless. After ensuring its death, you wipe the sweat from your brows and quickly take yo
+  OUT: The harpoon plunges into the water, startling the wary beast. The large white rhino raises its head and looks towards your position. It seems a tough battle awaits.
+
+=== «Baa, Baa! Enough of That!» [89w] id=5006699
+CARD: Clouds surge in from all sides, pressing toward the center. You stretch out your arms with all your strength, barely keeping them at bay... From the wool-like mist, threads shoot out, weaving themselves into forms. "I told you, didn't I? Baa? Baa baa! Stop prying, won't you? Fine, have it your way... Baa—ah!"
+The clouds churn and twist, dark masses rolling forward as lightning arcs across the sky. The world around you shatters violently... The creatures formed from the mist return, fiercer than ever, their shapes bristling with menace.
+  SLOT: Hassan
+  SLOT: Protagonist
+  SLOT: Consumable
+  SLOT: It hoards human thoughts like pinecones.
+  SLOT: They are the embodiment of rumors and scrambled information.
+  SLOT: It embodies the swelling of malicious intent.
+  SLOT: Construct a labyrinth of reason to trap the thieves of the mind.
+  SLOT: Use golden Astronomy to intimidate these mischievous spirits.
+  OUT: The thief darts through it, trying to steal your thoughts, but you let your consciousness unfold... In this maze, the intruder keeps running, weaving itself into your mind until it becomes part of your own thought patterns, like a nimble, instinctive memory.
+  OUT: Though the little creatures are quick, you swat them repeatedly until they dissolve into drifting mist—then, gradually, you gather them into your grasp, absorbing them. The thoughts still flit about inside you, like a nimble, instinctive memory.
+  OUT: A squirrel plunges into your mind... and from the back of your skull comes the sickening scrape of wood being gouged. Dizziness hits you like a wave, and you tumble into the soft, billowing fog. You fall and fall, until you finally land face-down on the floor. What happened?
+You look around. Hassan is watching you with a patient smile.
+You remember nothing of what just happened. Only that somethin
+
+=== «Prisoner and Kidnapper» [31w] id=5006672
+CARD: Abdul has already received the message from the assassins. He is in his courtyard outskirts, excitedly awaiting his detested enemy to be brought here, to bow his noble head before him.
+  SLOT: Vizier Abdul is eagerly anticipating the outcome
+  SLOT: Nawfal has become a "prisoner"
+  SLOT: You must handle this personally or send any follower
+  SLOT: One definitive scandal of sexual relationship about the vizier
+  SLOT: You can take this opportunity to break a Gold Bloodshed Card
+  OUT: Cloaked heavily with your face concealed, you lead Nawfal bound with ropes, wearing a humiliated expression. Upon your entrance, the Vizier laughs loudly, circling Nawfal while clicking his tongue: "Ah, look at you, the righteous Nawfal, reduced to such a state!"
+"Unbelievable, truly unbelievable! A life dedicated to the nation, only to end like this – " Abdul strikes his chest in exaggerated dism
+  OUT: You tell Nawfal, you need the Vizier‘s head to break this Bloodshed Card, to explain why you are here, to escape the guilt of killing a country's vizier.
+
+And indeed, when you break this Gold Bloodshed Card in court, no one questions why you appeared at the kidnapping scene. After all, nothing one does for this game is surprising...
+  OUT: "This is a good deal." Nawfal takes a deep breath, "I plan to fully disclose the Vizier's plot against me to the Sultan, and the evidence is ample; killing him in self-defense is quite reasonable. Next, I guess the Sultan will ask us to choose another vizier."
+You nod, considering it. "Well, let's call it a day, hm..." He stops, nods reservedly at you, "Thank you."
+
+=== «Sultan's Private Life» [54w] id=5000574
+CARD: The Sultan's appetite for pleasure is legendary - a voracious hunter claiming numerous conquests. Surely his cleansing eunuchs can't extend to every encounter... If his seed is truly so precious to him, he must employ alternative methods when bedding concubines, noblewomen, or common harlots away from the palace. Such a matter requires careful exploration.
+  SLOT: Gather information from Zazie: Send Jenna or a follower with at least 5 Stealth to exchange messages
+  SLOT: Bribe Courtiers: 8 Gold Coins necessary
+  SLOT: Investigate folk rumors: A non-noble follower with at least 5 Sociability
+  SLOT: Trade intelligence: Requires gold-tier Inside Information
+  OUT: A painting arrives from Zazie's messenger—her handiwork! This sketch offers a one-to-one ratio depiction of a crystal bottle, with color and texture notes. According to Zazie's letter, during outdoor proceedings, the Sultan retrieves a scented, oily sheath from one of such bottles—to capture his precious seed. As for its nature and further fate, these are secrets even a concubine can't inquire.
+  OUT: Your discreet inquiries quickly bear fruit. The device is made from processed sheep intestines - more commonplace than you'd expect among the nobility. Many high-ranking nobles employ similar methods... You manage to obtain basic instructions for creating a passable imitation.
+  OUT: Whispers among courtesans tell a chilling story: a beautiful woman once captured the affection of a powerful figure who would visit the House of Delights in disguise, seeking forbidden pleasures. 
+Consumed by ambition, she plotted to bear his child and secure her position. 
+One night, she stole a golden box where her patron had stored his essence (now you understand he likely used one of these int
+
+=== «Confession» [17w] id=5004503
+CARD: In this place of accumulated sin, confess your transgressions to the priests, cleansing your soul and faith.
+  SLOT: Choose Confessor or Object for Purification
+  SLOT: Faith in the Immaculate Purity
+  SLOT: Donation: 3 Gold
+  OUT: Look at this! Alim produces your previously confiscated lewd item... the Lust Serpent's Veil remains intact - you assumed the priests burned it!
+Though closer inspection reveals more strange phantoms within the fabric...
+  OUT: When the coin fell into the donation box, there was a faint, discordant sound. The presiding priest seemed to notice, looked toward you, yet said nothing.
+  OUT: Penitents disperse in the sunset, watched by the Order's immaculate stone pillars observing these elongated, filthy shadows without comment.
+
+=== «A Warrioress' Challenge» [70w] id=5000638
+CARD: A woman dressed as a warrior blocks your door, aggressively demanding an explanation. She claims that the white rhino was her prey. After all it took to trap and wound it, you came out of nowhere and scared it off! Adila's anger flares higher and higher as she speaks, until she throws her sword on the ground and challenges you to a duel, her finger an inch from your nose.
+  SLOT: The Enraged Warrioress
+  SLOT: You can fight personally, or send a follower.
+  SLOT: Certain consumables can come in handy in combat.
+  OUT: You realize the moment your blades cross – this warrior is no mere showpiece. Her swordplay is razor-sharp, her footwork fluid and fast. Fury and battle-lust blaze in her eyes, but you are no lesser fighter. More than that, you are colder, sharper, more calculating. You let her rage guide her, bait her with a few careless words, and she becomes reckless, exposed... Too young, too naive. You whistl
+  OUT: You realize the moment your blades cross – she is no mere showpiece. Her swordplay is razor-sharp, her footwork fluid and fast. Fury and battle-lust blaze in her eyes, and soon burn through your defense. 
+
+You shout as you try to protect yourself from her attacks: her sword is too powerful; it is unfair. She laughs at your words and slashes your neck – you fall to your knees with a scream, holding
+
+=== «Classic Terrace Buffet» [13w] id=5008158
+CARD: Desserts and fresh fruits await - time to invite friends to enjoy it.
+  SLOT: Today's menu
+  SLOT: You can go youselft, or invite followers to taste it
+  SLOT: You can go youselft, or invite followers to taste it
+  SLOT: You can go youselft, or invite followers to taste it
+  SLOT: You can go youselft, or invite followers to taste it
+  OUT: "Red stands for first sight,
+Purple for passionate love,
+Blue for a broken vow,
+And white
+For the ashes of desire—
+Only it remains before me."
+Hassan's verse stired something within Jabal...
+  OUT: "Red stands for first sight,
+Purple for passionate love,
+Blue for a broken vow,
+And white
+For the ashes of desire—
+Only it remains before me."
+
+=== «The Sultan's Suspicion» [20w] id=5006683
+CARD: You must account for all this to the Sultan—though perhaps offering a generous "tribute" will suffice to prove your loyalty.
+  SLOT: You must face the Sultan in person.
+  SLOT: Present a fine as penance.
+  SLOT: Present the counterfeit coins you have seized.
+  SLOT: Present tokens sufficient to divert the Sultan's gaze.
+  OUT: Though you failed to catch the forger, you offer something far more tangible—real gold coins! The Sultan says nothing, yet at least your head remains firmly upon your shoulders.
+  OUT: You tell the Sultan that, by every means at your disposal, you have seized all these counterfeit coins... which now, of course, are the Sultan's trophies.
+The Sultan examines the coins with utmost seriousness... and commands his eunuchs to gather them. You suspect he may well spend them as if they were genuine.
+  OUT: You trust the Sultan will perceive the secret bound within this ring... you hint that it is one of his companions' women, not you, who has been unfaithful and pilfered his wealth.
+
+=== «Ansuya's Request» [64w] id=5000523
+CARD: Ansuya agrees to help you steal the Sultan's ring, but she must first gain the Sultan's trust and favor, before she will even have an opportunity to enter his bed chamber. This is no easy task... Right now, she needs information that she cannot inquire about in the harem, so that she can be one step ahead of those that may wish her ill.
+  SLOT: Ansuya needs your support
+  SLOT: Mute Bells
+  SLOT: 3 pieces of Intelligence of the same type, Bronze tier or above.
+  SLOT: You can do this job yourself, or send any of your followers to do it.
+  SLOT: You can either pay 10 Gold Coins to bribe the guard, or utilize the prepared Harem Secret Passage.
+  SLOT: Some things can help in infiltration
+  OUT: Bribing the guards is a job that only you can do.
+
+=== «God, Please Descent!» [74w] id=5008181
+CARD: Badriyyah leads you to a shadowy chamber, smiling with fevered eyes as she tells you she has found a way to summon her master's arrival. Behind her, cold and putrid stenches seep from the doorway like her familiar black herb juice... but ten, a hundred times more concentrated.
+She generously offers you a chance to "share this joy," though you clearly understand that if you wish to stop her, now is your only opportunity.
+  SLOT: Badriyyah
+  SLOT: You must attend the appointment in person.
+  SLOT: What You've Seen
+  SLOT: What You Believe
+  OUT: Before you can speak, Badriyyah draws close and takes your hand, stroking the ink blot in your palm.
+It has grown larger, now resembling a quill dipped in ink and flung across your skin.
+"How beautiful it is..." Badriyyah gazes at the mark with fascination, "Like the sun, like mud, like an eye. This is my master's personal mark upon you. They carved one into me as well, but none so beautiful as yo
+  OUT: Before you can speak, Badriyyah draws close and takes your hand, stroking the ink blot in your palm.
+It has grown larger, now resembling a quill dipped in ink and flung across your skin.
+"How beautiful it is..." Badriyyah gazes at the mark with fascination, "Like the sun, like mud, like an eye. This is my master's personal mark upon you. They carved one into me as well, but none so beautiful as yo
+  OUT: Your mind holds no divine image - to you, They are merely a place for "exchange," where you offer blood and receive wondrous powers in return, nothing more. Hearing this, Badriyyah erupts in laughter, and when it subsides she says: "I admit you speak truly, but our master can do so much more than that."
+
+=== «Behind the Yellow Sands» [10w] id=5000750
+CARD: Reading can improve yourself, so develop a habit of reading.
+  SLOT: Currently Reading
+  SLOT: The reader.
+  OUT: Learned Wisdom.
+  OUT: You discovered the secret of the endless yellow sands.
+
+=== «Book Hunt» [79w] id=5002038
+CARD: The Dark Alley is flooded with countless unknown things – some are stolen goods, others are even worse... My task is to reach into that murky stream, seize the moment, catch a wave – or a book. Once it's out of that river, it becomes as perfect and intriguing as the rest of my collection, the bookstore owner says, as he invites you – or someone as skilled in combat as you – to join him in "catching waves."
+  SLOT: Bookstore Owner
+  SLOT: Send a follower to accompany
+  SLOT: You have to pay for the book hunt.
+  SLOT: Certain items may be useful during the communications
+  OUT: The bookstore owner, much like a hound, can always sniff out his target in the bustling Dark Alley... Just make sure he doesn't get hit with a blackjack.
+  OUT: Today's a good day – a fine book acquired, knowledge gained without bloodshed.
+  OUT: Today's a good day – a fine book acquired, knowledge gained without bloodshed.
+
+=== «Great Hunt» [20w] id=5010046
+CARD: The Destroyer rages, their warriors appearing overhead - angels skilled in torture prepare to preemptively slaughter all who still defy.
+  SLOT: Aether of the True Faith strengthens god power while weakening yours
+  SLOT: Angels
+  SLOT: Only their most hateful enemy would help you now
+  SLOT: Warrior
+  SLOT: Troop
+  SLOT: Warrior
+  SLOT: Troop
+  SLOT: Warrior
+  OUT: Mortal warriors clash with heavenly armies, your struggling shadows projected onto clouds, displaying legendary forms... If human free will survives, this sight would become legendary for generations... Unfortunately... there may be no future generations.
+  OUT: These angels match mythological descriptions of afterlife tormentors - you don't know whether the Immaculate Purity's purification purgatory actually exists, or if human imagination temporarily manifested these monsters.
+Regardless, their pincers, branding irons, whips, wheels, burning coals... certainly appear threatening, though they're designed to punish adulterers, liars, cattle-thieves and co
+  OUT: [s4.name] charged alone at the vanguard... Now [s4.name] leans against rocks bandaging wounds, praying for you - though there aren't many other gods to pray to.
+
+=== «Deicide (Abandoned)» [5w] id=5010043
+CARD: This will not be easy
+  SLOT: Ritual Leader, you or Iman
+  SLOT: Attendee
+  SLOT: Attendee
+  SLOT: Attendee
+  SLOT: Attendee
+  SLOT: Attendee
+  SLOT: Attendee
+  SLOT: Attendee
+  OUT: [s1.name] officially begins leading the god Descent ritual.
+  OUT: [s2.name], as a follower of the foreign god, is vaporized by a beam of light.
+  OUT: [s2.name] gains god blessing.
+
+=== «The God's Scales» [8w] id=5010083
+CARD: Bestow blessings upon some and curses upon others
+  SLOT: Blessing
+  SLOT: Blessing
+  SLOT: Blessing
+  SLOT: Blessing
+  SLOT: Blessing
+  SLOT: Divinity
+  OUT: You granted Junah noble status, along with twelve servants, an estate, and tax privileges in textiles, encouraging courtly women to practice the act of saluting a former commoner in secret.
+  OUT: Lady Becky is a clever little cat. He knows who is good and who is bad to him. When you wanted to order him caught and spanked, he had long disappeared to someplace unknown. Perhaps it's somewhere nobody knows him as Lady Becky. People might call him Little White, Pearl, or Rice, but it doesn't matter to him.
+  OUT: You handed a large box of documents to Zephyr, ordering him to deliver them to every station in the empire. He won't be back for three to five years.
+
+=== «Regicide Plot (Abandoned)» [13w] id=5000529
+CARD: According to the regicide plot, gather all the prerequisites for slaying the Sultan!
+  SLOT: Opened Gate (Optional)
+  SLOT: The Sultan's Magic Ring
+  SLOT: Protagonist
+  SLOT: Follower
+  SLOT: Follower
+  SLOT: Your own troops
+  SLOT: The Regicide Plot or the Bloodshed Card
+  OUT: Everything is ready. Once the Sultan leaves the palace, let's start the regicide plot!
+
+=== «Sparkling Presence» [47w] id=5008207
+CARD: Princess Raedina quickly became the Capital's star! While many might still have reservations about the Lord [player.name], she was welcomed wherever she went—if handled with care, the benefits were practically endless. And of course, don't forget to quietly secure some advantages for the vagrants along the way.
+  SLOT: The Princess must attend the ball in person.
+  SLOT: Guests Attending the Ball
+  SLOT: Guests Attending the Ball
+  SLOT: Those Who Came in Support
+  SLOT: You can send someone to attent the ball.
+  OUT: Moonlight, pearls, eagle feathers, the prairie wind, an agate hilt, silver scimitars... after hearing these extravagant metaphors and seeing Raedina casually picking at her toes or burping, it's all rather amusing.
+Yet each gilded word only elevated the princess further.
+  OUT: You eye the beautifully wrapped boxes brought by admirers, eager for the banquet to end so you can inspect them one by one. Hopefully, this time they bring something useful for Lord [player.name] rather than gaudy powders and rouge!
+  OUT: Whatever she wears, women buy. Whatever she dons as jewelry, those who don't follow are ridiculed. Merchants now pay Princess Raedina to accept their gifts... and, naturally, you take your cut.
+
+=== «Dance of the Finale» [25w] id=5008228
+CARD: At the end of the banquet, to everyone's surprise—even yours—Arzuna steps onto the stage with a smile, promising one last dance for all of you.
+  SLOT: Arzuna's resolve.
+  SLOT: You are the host of this banquet.
+  SLOT: Consumables useful
+  OUT: Too late! The dagger plunged into your throat—then your palms, chin, eye sockets, chest... Her full, scorching hatred struck like a sudden storm, and in the last flicker of life, you saw only her icy eyes. Scarlet splashes across her face made her look twisted, mad, terrifying—but she was smiling softly.
+"You're no different from your father, my dear brother." She leveled the dagger at your eye. "
+  OUT: Too bold, wasn't it? She was a dancer, not a fighter; a woman, not a man. She couldn't beat you—not yesterday, not today. You smiled as you snapped her dagger and pinned her to the wrecked table, the crowd roaring for another conquest. But then, without warning, she slit her own throat on a shard of broken porcelain. The blood gushed, then cooled; the hatred in her bright eyes froze, crystallizing
+
+=== «Tribulation» [12w] id=5006639
+CARD: You wish to offer the Sultan something else in place of Inal.
+  SLOT: You have to handle this yourself.
+  SLOT: Consumables to help convince the Sultan.
+  SLOT: You choose to offer the Sultan 20 Gold Coins
+  SLOT: You choose to offer the Sultan a gold tier equipment.
+  SLOT: You choose to offer the Sultan another woman...
+  OUT: Kneeling, you complained to the Sultan. Explaining your wife has a picky palate, only ever eating food made by Inal. If you give her to the Sultan – though everything in the world belongs to him – your wife might refuse to eat, wail, and take it all out on you... you're just someone afraid of his wife, hoping the Sultan would understand your uselessness...
+The Sultan burst out laughing with his mi
+  OUT: Nothing you can say will stop the Sultan when he wants something; he waves his hand, ordering guards to take Inal from your home.
+By the way, the money you offered earlier won't be returned.
+  OUT: The Sultan nods, accepts your gift. While he doesn't raise the issue again, you know he is displeased with your evasive attitude. It’s uncertain what might happen if someone fans the flames of it in secret...
+
+=== «Cycle of Death» [20w] id=5000342
+CARD: [xiaochou.name], in its final mercy, lets you choose—who do you want to kill you? And who... most desires your death?
+  SLOT: The Mirror wants to make one last attempt
+  SLOT: Who will you choose to kill you?
+  OUT: The blade in your hand still bore the stains of blood. You pressed it to your heart. The cold steel gleamed, reflecting your eyes... It watched you, searching—what drove this choice? Weariness? Guilt? Regret? Or something else?
+You only smiled. The tip pierced skin, muscle, vein—no resistance. You were no different from the dead, and human no different from beasts. Darkness swallowed you. The worl
+  OUT: You saw strangers beckoning, then passing through you to embrace their lovers; you saw the weak pleading for help, friends reuniting, sages laboring in thought, warriors roaring in battle. You witnessed betrayal, loyalty, pity, hatred, lament, compassion... Each called to you, for you shared their name—
+You jolted awake, drenched in cold sweat. Servants crowded around you, gasping with relief: "Ma
+  OUT: It was the sound of water, the sound of wind, the sound of the earth shifting in silence, the sound of light falling upon leaves. They passed through you, embraced you with boundless joy, then vanished without a trace. In every moment, you met them and bid them farewell, again and again. And suddenly, you understood the riddle’s truth: eternity is but the reflection of nothingness, just as death a
+
+=== «Book Hunt» [37w] id=5002036
+CARD: The bookstore owner is heading to the vagrants outside the city to gather worthwhile books. He believes you should send someone to accompany him – after all, it's your relentless book-buying that has left his shelves empty.
+  SLOT: Bookstore Owner
+  SLOT: Send a follower to accompany
+  SLOT: You have to pay for the book hunt.
+  SLOT: Certain items may be useful during the communications
+  OUT: You wander through the vagrant camp, surrounded by hungry children, gaunt women, and filthy men with vacant stares. How could there be books for sale in such a place?
+
+"When fate takes a bad turn, some sell their books first, while others cling to them until the very end," he explains, weaving through the crowd with eyes fixed on people's hands. "Under our most exalted Sultan's rule, such rises an
+  OUT: You find some valuable books... You try to speak with the bookstore owner, but she covers her face and hurries away, as though she's done something more shameful than the women of the night across the road.
+  OUT: You find some valuable books... You try to speak with the bookstore owner, but she covers her face and hurries away, as though she's done something more shameful than the women of the night across the road.
+
+=== «Instinct of Life» [36w] id=5000339
+CARD: To [xiaochou.name], death was the most natural thing in the world. So why did people resist it so fiercely? [xiaochou.name] wanted to meet the most ordinary of souls, to see how they faced life and death.
+  SLOT: The creature that listened to your tale
+  SLOT: Your example
+  OUT: That night, you dreamed a strange dream.
+You and many copies of you swam through the sea alongside countless versions of yourself—a school of tiny fish, each insignificant, yet together, vast.
+A great golden shark surged after you, jaws gaping to swallow you whole. But in an instant, you shifted, reformed, became a towering black figure wielding a trident, dwarfing the shark. Every fish among you 
+
+=== «Absurd Pleasure» [26w] id=5008171
+CARD: The cultists have chosen - no, the Cult God has selected this absurd carnality target for you... When resistance proves impossible, try finding pleasure in surrender.
+  SLOT: What's done is done
+  SLOT: Try to enjoy it
+  SLOT: The Sultan Card you gave the cultists
+  OUT: You suddenly feel yourself lifted skyward - more precisely, carried by an enormous hand. You struggle to turn but find your entire body wrapped in soft, warm, billowing pink skin. This gigantic hand raises you higher and higher...
+A pair of immense, moist almond eyes observe you from the void, each eyelash like a tree, their inner corners white as whale bellies. Warm breath washes over you as the 
+  OUT: You scrub vigorously at the mysterious ink stain without success. Through feverish haze, you still hear her gentle humming. You sense that stroking this mark might summon her enormous face to your window again.
+  OUT: Beyond that permanent stain and your psychological trauma, she leaves nothing more.
+
+=== «Unfulfilled Desires» [32w] id=5000779
+CARD: Salwiyah requests you to prepare a separate courtyard for her so that she can become the real mistress there, and do everything she wants. She is done with living with your wife.
+  SLOT: Salwiyah wants more... more...
+  SLOT: Salwiyah wants you to offer her a separated courtyard
+  SLOT: You can take this opportunity to break a Extravagance Card up to the tier of Vacant House
+  OUT: Giving a precious courtyard to a slave girl – well, a bought-back slave, is such an absurd thing! Many people inquired about the address of it from you, wanting to know just how beautiful this woman is to deserve such a generous reward. Since you broke a Sultan Card for this, it's only natural that this matter reached Maggie's ears...
+
+=== «The Warrior's Union» [10w] id=5006057
+CARD: Adila and Jabal visited you, seemingly having something to say.
+  SLOT: Adila visits
+  SLOT: Jabal visits
+  OUT: Despite being married, Adila and Jabal still live in their own houses, exchanging polite greetings whenever their paths cross.
+
+Speaking of the wedding, the young female warrior's voice turns emotional: "Turns out every woman in my family is like me... striving to become a warrior capable of slaying a dragon." She sighs, sprawling on the thick carpet with her legs stretched out. "My grandmother, m
+  OUT: "Hmm... Mother said she didn't want me to actually slay a dragon because it meant death, but she felt it would be a tremendous honor if her daughter could kill one – that's why she was always so conflicted about it. The dragon must have known mothers would always protect their children. That's why the curse works like this, right?"
+
+"But the dragon never expected someone like you." Jabal nods at A
+  OUT: "So, is there anything I can help with?" you ask them.
+
+Adila lists out what they need to slay the dragon: besides her family's ancestral quenched mithril longsword, they need fireproof gear and special harpoons to keep the dragon from escaping. But before all that, she says, the most important thing is finding the dragon's lair. The location is written in her ancestors' journals, but the crucial 
+
+=== «Futile Charity» [50w] id=5006674
+CARD: You see a large crowd gathering in the market, and as you approach, you realize it's Nawfal's family distributing porridge to the poor. Everyone gets a ladle, and children or women with children receive an extra ladle. The line is long, and Nawfal stands behind the cauldron, his brow furrowed.
+  SLOT: You can use 3 Gold Coins to spite him
+  SLOT: You can take this opportunity to break a Stone Extravagance Card
+  OUT: You spend some money and set up a new stall across from Nawfal's porridge stand, offering freshly baked bread and fresh camel milk, quickly gathering a large number of refugees who couldn't stand in line there.
+  OUT: The next day, many courtiers nudged each other and inquired about the matter, and you openly said you just wanted to undermine Nawfal, to make him look bad. They laughed loudly and mocked Nawfal's shabbiness. Nawfal walked past them, seemingly indifferent to it all.
+  OUT: You sigh at the long line in front of Nawfal's porridge stand while boasting about your generosity and kindness, the only thing you didn't do is slapping an Extravagance Card along with spittle onto Nawfal's face.
+
+Nawfal's face turns livid, unable to retaliate. The Sultan rarely see him looking so frustrated and laughed, allowing you to break the card.
+
+=== «Your Game» [21w] id=5000800
+CARD: This is your game; you control the guest list, indulge in pleasures, savor every moment – provided the Sultan isn't present.
+  SLOT: You once promised the great Sultan you would invite him to attend
+  SLOT: The Invited Lady of Delights
+  SLOT: You can invite one male noble follower
+  SLOT: You can invite one male commoner follower
+  SLOT: You can invite one female noble follower
+  SLOT: Buthayna
+  SLOT: You can invite any follower
+  SLOT: As the host of the banquet, you must be present in person
+  OUT: Slippers embroidered with gold thread step on your shoulder as the Sultan descended down from the carriage, entering the garden of earthly delights you prepared. He inspects the arrangements and the guests you've gathered with great interest, a slight smile on his lips. Now, he is the master here, and everyone revolves around his pleasure.
+  OUT: [s2.name] kneels naked at his feet, her beautiful and smooth back supporting the golden tray and wine on the table, trembling slightly, but not daring to spill a drop of the wine
+  OUT: [s3.name] lies on the carpet before the Sultan, holding a scroll with both hands, struggling to restrain herself, frowning and reading out the nonsense written on it, yet unable to suppress the rolling breath in her throat
+
+=== «Honey Omelette» [12w] id=5008144
+CARD: The feast is ready - time to invite friends to enjoy it.
+  SLOT: Today's menu
+  SLOT: You can go youselft, or invite followers to taste it
+  SLOT: You can go youselft, or invite followers to taste it
+  SLOT: You can go youselft, or invite followers to taste it
+  SLOT: You can go youselft, or invite followers to taste it
+  OUT: "As I savor this omelet,
+The devil pokes me from behind,
+Offering a city for this bite;
+I tell him,
+Swearing on my sheep:
+No way, not a chance!"
+Looking at the funny expression of Hassan, Lumera laughed, with honey still at the corner of her lips.
+  OUT: "As I savor this omelet,
+The devil pokes me from behind,
+Offering a city for this bite;
+I tell him,
+Swearing on my sheep:
+No way, not a chance!"
+
+=== «Spare him» [45w] id=5000727
+CARD: You decide to spare Murtaz. He is nothing more than a man driven mad by the Sultan's cruelties. You will try to dissuade him from speaking so openly of his schemes – it is not wise, and you will have something to satisfy the Vizier.
+  SLOT: Murtaz is praying to the devil
+  SLOT: You can meet with him yourself, or send a follower.
+  SLOT: Perhaps there is something that can help you.
+  OUT: The Vizier listened to your report impassively, appearing unsatisfied. Things had gotten to this point, and he couldn't find a pretense to target that poor man any further – but wait, why? Murtaz posed no real threat to him... You left the Vizier’s mansion lost in thought, unable to understand what it all meant.
+
+=== «Viper Temple» [22w] id=5008192
+CARD: As you approach, fierce winds arise, revealing giant serpent sculptures concealed beneath yellow sand. They await new inheritors - or blood offerings.
+  SLOT: Requires someone with at least 7 Physique to solve the python's riddle
+  SLOT: Requires someone with at least 7 Wisdom to solve the cobra's riddle
+  SLOT: Requires someone with at least 7 Charisma to breach the rattlesnake's passage
+  SLOT: Requires someone with at least 7 Magic to disarm the coral snake's trap
+  SLOT: You must spend 5 Gold Coins to fund the expedition.
+  SLOT: These will yet prove its uses within your adventures.
+  SLOT: The Beginning of Adventure
+  OUT: The serpent spirits dwelling within stone sculptures were intimidated by this feline before them. Those stone-carved segments rolled, stirring underground quicksand... From deep stone steps came the sound of mechanisms activating - you opened the temple's seal... at least partially.
+  OUT: The first mechanism requires matching several special carved stone plates... The patterns upon that rock python sculpture seem mysteriously corresponding.
+As [s1.name] drew nearer to examine it, the massive sculpture springs to life, ensnaring [s1.name] in its coils and eliciting a pained moan from [s1.name].
+Quicksand flows through ancient gears as carved stone scales scrape against flesh, etchin
+  OUT: A sequence of carved tablets holds the key to the first mechanism, their symbols somehow linked to the great python's stone hide. But when you venture close enough to study the markings, the sculpture awakens with terrible purpose, crushing [s1.name] in its embrace. As the stone drinks [s1.gender(his,her)] life, crimson spreads across every carved scale - yet the riddle remains unsolved. This adve
+
+=== «Pain Cannot Be Ignored» [20w] id=5006127
+CARD: Samir hopes you will inquire whether folk remedies for easing pain exist. Such knowledge may help him refine his imitation.
+  SLOT: Ways to Gain Inspiration
+  SLOT: Ways to Gain Inspiration
+  SLOT: Ways to Gain Inspiration
+  OUT: You know little of medicine, but peasants, herders, fishermen, and soldiers all keep their own cures and secrets.
+So you send your servants to the marketplace, offering dates and lamb to any who can present a proven remedy.
+By the next evening, you have gathered dozens of methods.
+  OUT: Raed ponders long before she speaks: "When I was a child, my mother's garden held a small grey plant, hardly worth notice, with little white blossoms. Its sap numbs the skin. In those days it was used as an anesthetic. Whether the Sultan's physicians still remember it, I cannot say—but it would be laughable indeed if they did not. The answer lies at hand, yet still the search goes on everywhere el
+  OUT: Jabal's body is covered in scars, proof of his knowledge.
+"For pain? Soldiers use a kind of liquor from the frontier. It dulls the nerves, but drink too much and it weakens the will. I never touch that thing."
+He explains its making, but makes you swear never to indulge in excess. Only after your promise does he let you go.
+You record both the recipe and its danger.
+
+=== «Devourer's Hunger» [28w] id=5008174
+CARD: The cultists publicly announce the Cultic God will bestow blessings, providing wine to Dark Alley's poorest... You dare not imagine their confidence... or where their wine money originates.
+  SLOT: Raw Material
+  SLOT: Raw Material
+  SLOT: The Sultan Card you gave the cultists
+  OUT: Hearing how you broke this Extravagance Card, the Sultan's expression darkens: "You're exhausting my favor, [player.name]." He toys with his ring, watching you coldly. "Surely you don't believe you've gained authority to assign others to this game?"
+Cold sweat pours as you repeatedly deny this; another such incident would certainly cost you your head.
+  OUT: Badriyyah wants more! She giggles, seeking a second, third card... For your own survival, you absolutely cannot oblige. She seems disappointed, though her smile never fades. "Well then, let's reframe - not you providing cards, but me helping you. That works, right?"
+She settles this unilaterally.
+  OUT: The cultists' ritual grants you disturbing insights into forbidden realms.
+
+=== «Anonymous assailant» [10w] id=5001011
+CARD: You are attacked by a lurking Assassin... prepare for battle!
+  SLOT: Unidentifiable assassin
+  SLOT: You were involved in an assassination attempt.
+  SLOT: Carrying Consumables might come in handy.
+  OUT: A blade grazes your waist, reflecting the ghostly blue moonlight – this is a Poison Coated dagger. Having missed the first strike, the Assassin turns to flee, and you do not pursue...
+  OUT: He's simply a tool, but who wants you dead? What secret have you uncovered lately?
+  OUT: The wound is not deep, but you quickly lose strength... your vision dims, and you hear the Assassin's final whisper: Mr. Jawad bids you farewell.
+
+=== «The Law of Iron and Lash» [47w] id=5000672
+CARD: For these wretched peasants that dare to flee, you draft a decree – harsh, precise, unavoidable. You summon scholars of the law, pore over the scrolls, and unleash the storm. The fugitives will be hunted, their punishment a warning to those who might follow in their footsteps.
+  SLOT: The drafter of the laws needs at least 5 in Wisdom
+  SLOT: The enforcer of the laws needs at least 5 in Physique
+  OUT: Under your guidance, jurists gather in great halls, their voices rising and falling in heated debate. The verdict comes swiftly.
+A new system of identification is tested upon the land. A sweep of the nameless and the rootless is unleashed. The runaway peasant, once caught, is flogged, branded, fined, and returned to their original place. Those who shelter them are punished. Those who report them a
+
+=== «Who Is She?» [21w] id=5008216
+CARD: Polished speech, perfect makeup. Even a swindler would struggle to mimic nobility so convincingly... but what is her connection to Raed?
+  SLOT: There must be an interesting story behind her.
+  SLOT: Send a noble to probe the court archives. Requires Influence 15 or higher.
+  SLOT: Send a commoner to the Dark Alley for clues. Requires Notoriety 8 or higher.
+  SLOT: Send someone to the courtesans' quarter to gather information, or spend 5 Gold Coins to buy intelligence.
+  OUT: A young lady of good birth who hides herself, alters her looks, and shuns the nobility—why? Prompted by a hint, you searched the files on noble inheritance disputes... and eventually turned your attention to the Sultan.
+In a dust-caked tower of parchments, the conquests of the current Supreme Sultan's father were recorded in detail... You skimmed, wondering how it might connect to Raed, until a pa
+  OUT: You sounded out a few familiar street toughs about the vagrants and Raed; they had plenty of tales to tell. The vagrants did not act violently on their own; they "helped" wherever nedded in exchange for payment. Some hardly looked like vagrants at all—literate, well-mannered, able to play instruments, with soft, uncalloused skin. Raed gathered them from the streets and sent them across the city. T
+  OUT: To inquire after a beauty, the best source is Nabhani. Of course he knew—a mysterious lady who had stood up for vagrants... He had even helped them thrash a bribery-demanding guard because of her! What? That woman might be Raed in disguise? Nabhani peered at Raed's face from the shadows...
+"I see it! She smeared clay on the cheekbones to look sturdier, dirtier, and tousled her hair on purpose. And
+
+=== «Revelation Ritual» [18w] id=5010042
+CARD: Whatever God intends after arrival, you and the Sultan will witness it together, first bathing in divine light...
+  SLOT: Ritual Leader, you or Iman
+  SLOT: Attendee
+  SLOT: Attendee
+  SLOT: Attendee
+  SLOT: Attendee
+  SLOT: Attendee
+  SLOT: Attendee
+  SLOT: Attendee
+  OUT: Heaven and earth tremble as light engulfs you, obscuring everything below... Proud as the sun, burning with desire, merciless and pitiless, the god tears their path between the golden arches, determined to rule all creation...
+  OUT: As expected, [s2.name]'s cultist nature cannot withstand God of Purification's cleansing. With terrible screams, they dissolve into white dust... Why this small provocation? The god already knows all your sins.
+  OUT: [s2.name] knees, eyes brimming with tears. All [s2.name]'s lifetime regrets and transgressions rise to the surface... Now comes judgment... then purification.
+
+=== «Fight with the Prisoner» [19w] id=5001020
+CARD: This is the Prisoner's only chance. Why was he sentenced to death? Honestly, you and he aren't that different.
+  SLOT: This is the Prisoner’s only chance to stay alive after committing a capital crime.
+  SLOT: The fighter has already been chosen by you.
+  SLOT: You can still provide items for this battle to slightly increase your chances of victory.
+  OUT: The Prisoner's desperate thrust was too flawed. [s2.name] easily seized the opportunity and delivered a fatal blow. Afterwards, another battle ensued in the court, in which the ministers had to put in a lot of effort to persuade The Sultan not to use this method for executing all prisoners.
+  OUT: [s2.name] was more skilled and cut the Prisoner's shoulder first. However, the Prisoner clinched him desperately, and in the ensuing struggle, choked him with chains... They rolled in the mud, struggled, and tore each other in the pigsty mud for a long time. In the end, neither of them stood alive to claim victory.
+
+=== «Book Burning» [44w] id=5006592
+CARD: You're going to burn all the books here, as well as the people who won't leave – which may not be your intention, but now, the Sultan's Game has choked you full of enough madness to orchestrate this disaster with your own two hands.
+  SLOT: He looked at you with eyes filled with despair and hatred
+  SLOT: She decided to perish with the books
+  SLOT: A Sultan Card of Silver tier or lower
+  SLOT: Once Precious
+  OUT: This card wasn't broken for those foolish enough to throw themselves into flames, you explain to the Sultan: the books contain immortal souls, and here you will burn them.
+
+Seeing the flames raging, the Sultan gives a satisfied smile.
+  OUT: You tell the Sultan, the books of the ten nations he once annihilated are all preserved here, they remember their languages, their cultures, their stories, their ideals... Now, for your Lord, you will cleanse them from this earth.
+
+This is the real conquest. The Sultan nods, an exclaimation mark towards the agreement that, henceforth, this shall become routine after any city broken.
+  OUT: Why is this book-burning fire so wondrous, fragrant beyond burning costly spices, more splendid than the fire offered by an alchemist? The Sultan asks, and you reply: "It is a fire ignited using the future as fuel, thus it's extremely extravagance." – the Sultan feels this elegant act indeed deserves an Extravagance Card.
+
+=== «Her Husband» [43w] id=5000654
+CARD: Nayla's wealth and status come from her husband's family – though he himself has been chronically ill and almost forgotten by the palace... Now, she begs you to ensure that he is forgotten for good, so she can share her everything with you.
+  SLOT: Nayla is waiting for you at home...
+  SLOT: This poor man, wreaked by sickness...
+  SLOT: You have to handle this yourself.
+  SLOT: Place a Bloodshed Card here, and you can kill Nayla.
+  SLOT: Place a Bloodshed Card here, and you can kill her husband.
+  SLOT: What a dreadful choice, but you can do it.
+  OUT: He thanks you for your mercy and wisdom. Although he is too frail to be of service to you, he will lend you support in the court...
+  OUT: Finally, as you two gaze upon Nayla's corpse, you can't help but loosen your tongue – what a beautiful and enchanting woman she was. Her beauty gave her the privilege to commit evils, didn't it? Weren't it not us who were too weak to bear such beauty...?
+As these memories come back, your skin twitches as if reliving her touch... Not just you, but even her husband's sickly, withered body is stirred
+  OUT: “From now on, I belong to you,” Nayla whispers in your ear. The corpse of her previous husband watch as you embrace her, his eyes unclosing...
+
+=== «Unexpected Visitor» [27w] id=5008154
+CARD: The Sultan's slave Fadia arrives at your mansion. After presenting herself, she silently removes what little clothing she wears, then kneels before you, seemingly awaiting your pleasure.
+  SLOT: Fadia is at your disposal
+  SLOT: You choose to use her body
+  SLOT: You choose to go yourself, or ask Maggie to host her
+  SLOT: You choose to kill her with a designated executor
+  SLOT: If determined to kill her, you must provide a matching tier Bloodshed Card for immunity
+  OUT: Fadia seems to be experiencing a "guest" role at a banquet for the first time. She sits stiffly, anxiously scanning for hidden traps.
+ She respectfully consumes everything you serve, leaving nothing, as if completing a duty. Only when you say "you may go" does realization dawn: could this truly be... such a peaceful, gentle evening?
+She appears somewhat dazed, eyes unable to hide surprise, but ins
+  OUT: Fadia is surprised by your decision, then terrified - perhaps thinking you want Maggie to join for some cruel entertainment. Instead, Maggie brings desserts, tea, soft cushions, and several kind maids.
+Once seated, Maggie compliments Fadia's beautiful hair, with maids enthusiastically agreeing... Soon, Fadia shyly but proudly shares her hair care secrets, her eyes noticeably brightening.
+You quiet
+  OUT: Since you've already broken a Carnality Card, there's no reason not to enjoy its pleasure.
+Fadia proves extremely compliant - no matter how you position her body, bend her limbs, or create shameful poses, those large brown eyes reveal no dissatisfaction.
+As you indulge, you consider that perhaps this compliance is her greatest weapon: she survives at court not through beauty, status, or favor, but
+
+=== «Search for Tyrian Relic» [32w] id=5000531
+CARD: The name Tyria is unfamiliar to you, but perhaps not to Bharat, the merchant under your roof, who is always selling exotic goods. If you ask him, you might learn something useful.
+  SLOT: Bharat sells all kinds of exotic goods here.
+  SLOT: You must bring 10 Gold Coins to for your purchase.
+  SLOT: You can do this job yourself, or send any of your followers to do it.
+  SLOT: If you and Bharat share the same goal, he will help you.
+  OUT: You find Bharat, explaining your purpose and predicaments. Of course... Well, there is no need for that. The absurd stories about you and those Sultan Cards always spread like wild fire from the court to every corner of the city.
+Bharat, who always greets people with a smile, stares at you with an uncharacteristically cold expression. He holds on to the door frame tightly, as if he has used up all
+  OUT: A heavy shadow looms over you. The fear of the Sultan, the fear of death, coldly climbs up your spine and neck. You tremble, enduring the seething, impotent rage: "Yes, I will die. Everyone dies, so what? From his consort to the ants on the ground, who can guarantee that they will live to see another day?"
+"And that's why you defiled Consort Ansuya? You despicable coward!" Bharat sneers.
+"Naturall
+  OUT: You find his attitude peculiar. "You... as well?"
+Bharat does not answer directly, but inquires into your plan. Seeing you eyeing him without a word, he finally takes a step back as a gesture of faith.
+He tells you that the Tyrian tribe had long been destroyed by war... When Tyria were surrounded by enemy forces, the chief reached out to the Sultan for help, and gave his only daughter to the Sulta
+
+=== «Cleanse the Cultists» [58w] id=5008179
+CARD: Purist followers hunt cultists throughout the city again - their sacred privilege. Whenever they identify violators of the Purist's faith, they may arrest and punish them according to their laws. Badriyyah and her cultists have scurried like rats through countless close escapes. This time, they've tired of hiding and prepare a ritual to teach the priests a lesson...
+  SLOT: Cultist Hunters
+  SLOT: Fanatic Warriors
+  SLOT: You choose to assist in cleansing the Clut
+  SLOT: If you won't openly confront the Purist Order, try to dissuade them
+  SLOT: Cult Leader
+  SLOT: Cultic God Followers
+  SLOT: You choose to help the cultists repel these priests
+  SLOT: If you won't openly confront the Cult, try to dissuade them
+  OUT: Badriyyah and sixty-some cultists burn at the stake. Amidst flames and smoke, she laughs maniacally, filled with ecstatic joy as she watches you break the thin card - as though witnessing world's end.
+As the card snaps, a painless, bloodless scar appears on your chest, transmitting ecstatic joy - in this game, the sin of world-rending stands absolved, even when potentially committed by a god.
+  OUT: Badriyyah and sixty-some cultists burn at the stake. Amidst flames and smoke, she laughs maniacally, filled with ecstatic joy as she watches you break the thin card - as though witnessing world's end.
+  OUT: After their deaths, a storm of putrid black rain sweeps the city, claiming many Purist faithful. And you... you suffer the same recurring nightmare.
+You're caged, surrounded by numerous doors. Behind each stands, sits, or lies a monster. They glare hatefully at you for blocking their entrance to this world - their playground.
+In some dreams, the Great Mother Goddess devours you; in others, pomegra
+
+=== «Ansuya's Request» [78w] id=5000524
+CARD: Ansuya agrees to help you steal the Sultan's ring, but she must first gain the Sultan's trust and favor, before she will even have an opportunity to enter his bed chamber. For someone working alone from within the harem, she needs support – your support. You need to have enough Influence over the court to lend her aid when needed. In addition, she would like to speak with you or your messenger to discuss plans for the future.
+  SLOT: Ansuya has something to tell you
+  SLOT: Mute Bells
+  SLOT: You can do this job yourself, or send any of your followers to do it.
+  SLOT: You can either pay 10 Gold Coins to bribe the guard, or utilize the prepared Harem Secret Passage.
+  SLOT: Some things can help in infiltration
+  OUT: Bribing the guards is a job that only you can do.
+
+=== «Attire Merchant» [6w] id=5002012
+CARD: This is where Attire is sold
+  SLOT: Stone Attire
+  SLOT: Bronze Attire
+  SLOT: Bronze Attire
+  SLOT: Silver Attire
+  SLOT: Gold Attire
+  SLOT: 2 Gold Coins
+  SLOT: 5 Gold Coins
+  SLOT: 5 Gold Coins
+  OUT: Purchase Successful
+  OUT: Purchase Successful
+  OUT: Purchase Successful
+
+=== «Fate of the Pickpocket» [24w] id=5008070
+CARD: The time has come. You decide to use the card you drew to deal with the little pickpocket bold enough to steal your property.
+  SLOT: Hemir
+  SLOT: In this situation, you should step in personally.
+  SLOT: You can use this to break a Stone tier Bloodshed Card
+  OUT: You stole my money, so I take your life – fair trade.
+
+=== «Pudding of Life» [12w] id=5008135
+CARD: The dessert is ready - time to invite friends to enjoy it.
+  SLOT: Today's menu
+  SLOT: You can go youselft, or invite followers to taste it
+  SLOT: You can go youselft, or invite followers to taste it
+  SLOT: You can go youselft, or invite followers to taste it
+  SLOT: You can go youselft, or invite followers to taste it
+  OUT: "Soft as her breasts,
+Sweet as her vow,
+Smooth as her skin,
+And gone again—
+Just like her."
+Hassan's verse stired something within Nabhani...
+  OUT: "Soft as her breasts,
+Sweet as her vow,
+Smooth as her skin,
+And gone again—
+Just like her."
+
+=== «A Delicacy» [13w] id=5006686
+CARD: The Sultan has prepared a courtly banquet... Share this weighty favor alongside Hassan.
+  SLOT: A Poet's Tribute
+  SLOT: The Wretched Hassan
+  SLOT: The Wretched Witness
+  SLOT: Consumable
+  OUT: The servants bow as they guide you and Hassan through the halls.
+Beside you, the old poet staggers under the weight of it all, nearly collapsing from fright. You urge him forward, keeping a firm grip as you guide him along.
+At last, you arrive at the place where the Sultan will dine today: a charming little garden, exotic and meticulously trimmed. A gentle stream winds through the center, over whi
+  OUT: He weaves the garden's splendor into verses on a consort who, reflected in the flowing waters, longs for her valiant sovereign... This fitting display of talent earns the Sultan's smile—a promising beginning.
+  OUT: He weaves the garden's splendor into verses on the fleeting seasons, praising only the ruler's virtue as everlasting... This fitting display of talent earns the Sultan's smile—a promising beginning.
+
+=== «A Bloody Diamond Pit» [80w] id=5006139
+CARD: This is a secret diamond mine unknown to the Sultan. The miners are gaunt, hollow-eyed, their strength sapped. Overseers crack whips without mercy, trampling those who collapse until they no longer cry out. It is plain to see: these people are expendable. To keep the mine's location secret, the workforce is meant to be consumed and then silenced. Buying slaves would be cheaper than these losses. Most of these wretches were seized from the Dark Alley by the mine's owners.
+  SLOT: Diamond Mine's Owner
+  SLOT: Pit Guard
+  SLOT: Pit Guard
+  SLOT: You can lead the assault on the diamond pit in person or send your followers in your stead.
+  SLOT: You can lead an entire troop to seize the mine.
+  SLOT: Consumables useful
+  SLOT: If you wish to keep this operation hidden from the Sultan, you must assign someone responsible for covering your tracks.
+  SLOT: You can take this opportunity to break a Conquest card of Silver tier or lower, demonstrating your loyalty.
+  OUT: Your forces have barely assembled before guards on the other side notice the activity. On this open plain, no movement goes unseen.
+  OUT: Although the diamond merchant hates the idea of bloodshed, he hates the thought of being beheaded by the Sultan for hoarding mines even more...
+[s4.name]'s blood makes the diamonds redder.
+  OUT: You overpower the guards and force them to lead you to the mine-owner's crude tent.
+Seeing you—and the blood on your blade—he crumples in terror. Worthless creature. You do not hesitate. You kill him, then sweep your gaze over the tent piled high with newly unearthed crystals... Possessing this vein would yield diamonds without limit. The profit is tempting, but ownership brings terrible risk.
+
+=== «» [24w] id=5006805
+CARD: In Gullis's tribal tongue, harpies are women who dine on the flesh of cowards. Yet it is clear—there is no prey for them here.
+  SLOT: A warrior.
+  SLOT: A warrior.
+  SLOT: Consumable
+  OUT: At the edge of the hunting grounds, you waited anxiously...
+Finally, Adila and Gullis returned!
+But behind them, there was no magnificent, bloodied prey. Instead, they dragged a long line of captives with bound hands... and a strange sculpture placed in a crevice.
+It turned out that they had indeed ventured into the valley rumored to be haunted by monsters, only to find a slave hunter camp instead
+  OUT: At the edge of the hunting grounds, you waited anxiously...
+Finally, Adila and Gullis returned!
+But behind them, there was no magnificent, bloodied prey, and their faces carried expressions of frustration...
+It turned out that they had indeed ventured into the valley rumored to be haunted by monsters, only to find a slave hunter camp instead. The terrifying stories had been deliberately spread to 
+
+=== «Final Reckoning» [9w] id=5010058
+CARD: To preserve the world, nearly all your adversaries unite...
+  SLOT: Betrayer
+  SLOT: Betrayer
+  SLOT: Betrayer
+  SLOT: The True Faith
+  SLOT: The True Faith
+  SLOT: The True Faith
+  SLOT: Your enemy
+  SLOT: Your enemy
+  OUT: This game belonging to the old world likely bears no significance after the true god's arrival...
+
+=== «Support the Official Release» [23w] id=5006727
+CARD: Meanwhile, in the alley-workshops, ink runs black and fast. Pirated pages of Lumera's work fly from hidden presses, stitched and bound in haste.
+  SLOT: You can handle this matter in person or send any follower in your stead.
+  SLOT: Consumables useful
+  SLOT: You can take this opportunity to break an Bloodshed Card of Bronze tier or lower.
+  OUT: You kicked open the door, stepping boldly into the center of every eye. Your voice thundered: Who dares meddle with a trade under my protection? Are you blind to the fate of those who cross me? Have you not heard of Lord [player.name]?
+The crowd froze, uncertain, exchanging wary glances... Can you bend them to your will?
+  OUT: No one's really afraid of you. Knives flashed, wooden planks were raised, stones flew.
+Ah... some lessons must be carved in pain. You were driven back, humiliated for the moment.
+  OUT: Everyone's heard of your infamous name for killing. In an instant, a tide of people dropped to their knees before you, trembling, begging that your wrath be spared. They sweared to smash every carved block to earn your mercy.
+You accepted their apology, and the crisis seemed at an end.
+
+=== «Evil Emblem» [96w] id=5006574
+CARD: This is a report about you: you and the Sultan's Game, and those cards, have now become legends among the people. Many soldiers, especially the younger ones, have started carving designs they've heard about from the Sultan Cards onto their shields or armor. 
+
+Most of these are Carnality Cards, often featuring your face alongside other indecent symbols or organs. On a small scale, this might seem like a harmless prank; but on a larger scale, it raises a significant issue, as only the portraits of successive Sultans are deemed worthy of being engraved on officers' weapons.
+  SLOT: Vizier Abdul's Seat
+  SLOT: Encourage it. (Requires Abdul to be persuaded)
+  SLOT: Prohibit this behavior
+  SLOT: Consumable
+  SLOT: Only a Gold-tier Bloodshed Card can eliminate the Vizier.
+  OUT: In the astonished gaze of the Vizier, you see relief, is this the truth behind inviting you to work together? He knows that one day, you will draw a golden Bloodshed Card, and you will use it on the most detestable elder... 
+Now, he lies peacefully in a pool of blood, leaving all the remnants of this empire, mainly pressure and excrement, to you.
+The Sultan, upon hearing the news, chucks lightly –
+
+=== «Testing the Edge of the Blade» [47w] id=5006081
+CARD: With indomitable dragon-forged spirit, you stand unwavering before the Sultan. This clash transcends good and evil, ruler and subject, all known and unknown fates – it is just two warriors testing each other's blades, even if you might cast your life in vain upon the lapis lazuli.
+  SLOT: Sultan
+  SLOT: Dragonslayer
+  SLOT: The dragon's lifeless eyes seem to still watch this battle...
+  SLOT: Certain items might be useful in the decisive battle
+  OUT: His strike sends tremors through your blade to your grip. If not for the dragon blood tempering your bone, flesh, and soul, this single blow would have torn the weapon from your hands.
+
+Before the pain can register, an unspeakable joy and thrill surge through you. A chuckle escapes your lips – and you hear the same from the Sultan.
+
+Blades clash like relentless thunder and rain. Blood sprays wild 
+  OUT: His strike sends tremors through your blade to your grip. If not for the dragon blood tempering your bone, flesh, and soul, this single blow would have torn the weapon from your hands.
+
+Before the pain can register, an unspeakable joy and thrill surge through you. A chuckle escapes your lips – and you hear the same from the Sultan.
+
+Blades clash like relentless thunder and rain. Blood sprays wild 
+
+=== «Servant of God» [29w] id=5004523
+CARD: High Priest Iman of the Purist Order has died. That night, all believers heard God's voice in dreams, saw one name - [player.name] - who would guide them forward.
+  SLOT: Your path forward is irrevocable
+  SLOT: Your faith in the Purist
+  OUT: Amid pervasive fragrant mist, you keenly sense a certain observation... but you don't look up. Instead, you kneel more reverently, praying, promising: everything shall... be as You wish.
+That presence is satisfied. It gently caresses your head in the damp, cold air. Its touch is stone-cold.
+  OUT: Amid pervasive fragrant mist, you inexplicably feel a sudden shiver. Cold, sharp pain rapidly climbs from your wounds, causing dizziness. A Pure Word involuntarily escapes through your trembling teeth, healing all believers' wounds, erasing all doubts... leaving only pure, terrifying fervor...
+You faint amid the believers' cheers.
+  OUT: After this ritual, your faith ascends. Now you remember only one thing - one most important, only important thing: you must build a tower for the Purist, a tower welcoming God's descent to the world.
+
+=== «Depths of the Black Prison (Abandoned)» [5w] id=5001009
+CARD: Depths of the Black Prison
+  SLOT: Cell No. 1
+  SLOT: Cell No. 2
+  SLOT: Cell No. 3
+  SLOT: Cell No. 4
+  SLOT: Cell No. 5
+  SLOT: Deal with Cell No. 1
+  SLOT: Deal with Cell No. 2
+  SLOT: Deal with Cell No. 2
+  OUT: You have redeemed Prisoner No. 1
+  OUT: The Sultan smiled.
+  OUT: The Sultan smiled.
+
+=== «Divine Purpose» [16w] id=5004514
+CARD: Why would Iman's lifelong devotion receive divine response through your sinful card? What could it mean?
+  SLOT: Iman
+  SLOT: You must attend the appointment in person.
+  SLOT: What You've Seen
+  SLOT: What You Believe
+  OUT: Iman leads you to a secluded garden planted with elegant foliage surrounding a massive central white stone pillar. Looking upward, you can't determine its height, only seeing neat inscriptions disappearing beyond sight. 
+Iman remains silent, contemplative, waiting until you lower your gaze before speaking.
+  OUT: You hand him your broken Extravagance Card. Iman traces its sharp edge, feeling unmistakable pain from its concentrated sinfulness, furrowing his brow. 
+"Is something wrong?" you ask. 
+He brushes aside his hair, again revealing his extensively scarred back - layered, accumulated, heart-wrenching. 
+"Having received blessing, you understand that only in pain, only when experiencing nothing but pure 
+  OUT: You laugh softly, placing the card in his gold-dusted palm. Iman feels its cold surface, sensing evil and sin; any spiritually sensitive person would reach identical conclusions. 
+"Is something wrong?" you ask. 
+He brushes aside his hair, again revealing his extensively scarred back - layered, accumulated, heart-wrenching. 
+"Having received blessing, you understand that only in pain, only when exp
+
+=== «The Winery Owner Visits Again» [47w] id=5000607
+CARD: The vineyard owner comes to visit you as if nothing had happened, wearing a veneer of friendliness. He informs you that everything has gone to plan and he has inherited all the disputed property. As for Fatuna? Well... he does not say what fate has befallen her.
+  SLOT: The vineyard owner comes to visit
+  SLOT: You can meet him in person, or send a follower.
+  SLOT: You can use a Bloodshed Card if you want to kill him.
+  OUT: He does not make it out of your house.
+
+Why take half when you can take it all? And besides – you already knew. He is behind that assassin. This is only balance, only justice, only the game played in reverse. A man like this is a perfect sacrifice for the Sultan's Game.
+  OUT: "Just like that? You know, the other day..." You look at him with a hint of amusement, fiddling with a card in your hand. It is not a Bloodshed Card, but it is enough to chill this man.
+It does not take a genius to make the connection. This man was behind the assassination. But you are prepared to give him a chance to repent...
+Cold sweat breaks out on the man's forehead. After a long time, he gri
+
+=== «The False Princess» [44w] id=5008205
+CARD: If it weren't for the coarse curses she muttered upon entering, and the dagger you glimpsed beneath her delicate, flowing veil, you might never believe that this beauty was really Raed. But to have the Capital truly accept a noblewoman, appearances alone weren't enough.
+  SLOT: Raed must step forward.
+  SLOT: Send an envoy with at least 5 in both Stealth and Sociability to forge the princess's title.
+  SLOT: Who should you invite to build support for the princess?
+  SLOT: Who should you invite to build support for the princess?
+  OUT: As the champion of the Purists, her reputation among the nobility was impeccable. Iman listened quietly to your request, then asked a few pointed questions: Does this princess follow the Purists? Of course—she is devoutly faithful! Will she be helpful to your cause? Absolutely—but, well... you'd rather this "help" remain discreet. "Understood," Iman replied. "I will tell the nobles who come seekin
+  OUT: Jabal, of course, was willing to help, but he was puzzled over how. "Look, all that tea and gossip with noblewomen... I obviously won't attend. They never invite me anyway, right? So how am I supposed to spread word about this... Ra—Raedina Princess?" You explained that Princess Raedina—he must memorize her name carefully—comes from a fiercely warlike tribe. She wields a dagger with skill, and the
+  OUT: Nabhani could barely contain his excitement—this was a princess, after all! A never-before-seen beauty! He bombarded you with questions about her appearance, hobbies, attire, tastes, figure, choice of mate, birthday, hair color, eye color, favorite gemstones—until you were thoroughly exasperated. "Alright, alright, I get it! We simply must tell everyone interested in the Empire's beauties that the
+
+=== «Elegy of the Defeated» [34w] id=5006082
+CARD: The Sultan's blade cleaves through the air straight for your face. Yet in that moment before death descends, you catch something in the cruel monarch's eyes – an undertow of regret, perhaps even... compassion...
+  SLOT: Sultan
+  SLOT: Death looms over you
+  SLOT: The dragon's lifeless eyes seem to still watch this battle...
+  SLOT: Consumable
+  SLOT: Homeland's Avenger
+  SLOT: Wrath of the People
+  OUT: Without mercy, the blade severs your final tether to this mortal world with brutal precision – as if even the slightest hesitation would be an insult to this battle.
+
+The Sultan wipes his blade clean with his sleeve as the warrior's phantom fades into nothing... His sigh speaks of boredom. Soon, servants will scrub the blood from the floor. Soon, the dragon's head will be just another forgotten pi
+  OUT: However, such compassion is nothing but your illusion. The Sultan's blade arcs towards you with crushing force, merciless and determined – as if the slightest hesitation would be an insult to this battle. In that very moment, a golden sword hurls through the air, knocking the scimitar off course before dissolving into dust.
+What was that? There's no time to think. Death's whisper brushes past your
+  OUT: You have no idea how long this battle has lasted – all you know is that every bone and drop of blood in your body burns like fire. 
+Though you and [s5.name] have rarely fought side by side, an unspoken understanding connects you both – the potential heir to the throne and the prince of the Homeland. A single glance is all it takes to read each other's intentions. You advance and retreat in perfect
+
+=== «Royal Interest» [54w] id=5008117
+CARD: A courtier approaches you ashen-faced. He admits accidentally mentioning your Velvet Chamber in Dark Alley to the Sultan, who now expresses interest in visiting. 
+What now? If the Sultan comes, he'll discover your power base, your profit-making ventures, and things you'd rather keep hidden... He'll see many things he dislikes. What can be done?
+  SLOT: Panicking Courtier
+  SLOT: You refuse to help the noble - let him handle his own troubles.
+  SLOT: You accept the challenge - your guesthouse stands ready to receive the Sultan.
+  SLOT: You send your own fellower to persuade the Sultan.
+  OUT: "Clean up your own mess," you say, patting his cheek. "Perhaps learn to control your tongue." 
+He wipes sweat from his brow, wanting to beg but not daring to speak further... The courtier must apologize to the Sultan himself and is predictably executed for "loose talk about his master." 
+His family blames you entirely.
+  OUT: You plead understanding - your humble establishment couldn't possibly entertain the esteemed Sultan. If something displeases him, punishing you would be one thing, but what if his anger extends to those who recommended you? 
+Though displeased by your refusal, the noble leaves. He later apologizes to the Sultan at great cost to save his life. He blames all these losses on you - all because of your 
+  OUT: "Clean up your own mess," you say, patting his cheek. "Perhaps learn to control your tongue." 
+He wipes sweat from his brow, wanting to beg but not daring to speak further... The courtier must apologize to the Sultan himself and is predictably executed for "loose talk about his master." 
+His family blames you entirely, spreading word of your arrogance until it reaches the Sultan's ears - now he's 
+
+=== «One Hand for Goods» [15w] id=5008068
+CARD: The pickpocket ringleader sells stolen goods at your doorstep – not just for business, clearly.
+  SLOT: Alim
+  SLOT: Alim's Mysterious Box of Stolen Goods
+  SLOT: 5 Gold Coins or anything that Alim might care about.
+  SLOT: You can do this job yourself, or send any of your followers to do it.
+  OUT: [s4.name] returns home in a bad mood...[s4.gender] found [s4.gender(his, her)] equipment in Alim's mysterious box – no one even saw when he made his move.
+  OUT: There was a note in the mysterious box advising you to carry more equipment to deal with the terrible Sultan's Game.
+
+=== «Ancient Language Lessons» [16w] id=5006517
+CARD: You're ready to hire a noble with considerable expertise in ancient languages to be Lumera's tutor.
+  SLOT: Lumera wants to learn ancient languages.
+  SLOT: Your knowledge can provide some help.
+  SLOT: An expense of 5 Gold Coins or 10 Gold Coins.
+  SLOT: If you are willing to pay double the price, you can use this to break an Extravagance Card.
+  SLOT: Something that clears the mind might come in handy.
+  OUT: Seeing that the student is just a Slave Girl, the noble felt rather repulsed, but begrudgingly agreed due to your power. He soon discovers that this lowly Slave Girl possesses an unusually sharp mind and quick insights. Holding some concealed jealousy and indignation, he makes Lumera’s lessons increasingly difficult and profound day by day.
+  OUT: You expertly converse with Lumera in the ancient language, recalling all the long-forgotten knowledge instantly, as if by instinct. Lumera looks at you with admiration, her eyes sparkling like stars.
+  OUT: You stumble through those obscure ancient words, as if returning to the age when teachers would hit your knuckles. After barely making it through another day of classes, Lumera leaves, and you curse the noble who taught her ancient language a hundred times in your mind.
+
+=== «The Calling Card» [34w] id=5006719
+CARD: Asal asks you to accompany him to visit Nawfal, already presenting a precious ancient tome as a calling card. And you? As one of the city's most notable dignitaries, you can hardly arrive empty-handed.
+  SLOT: Asal
+  SLOT: Asal's Collection
+  SLOT: Visit in person to show sincerity.
+  SLOT: A Reading Material that's no less than Silver tier
+  SLOT: Consumable
+  OUT: A servant greets you coldly, leads you to the parlor, and serves a few cups of bland wine.
+After some time, Nawfal emerges, clutching a scroll. He frowns, scrutinizing you and Asal as he paces.
+"I have little interest in meeting you outside the court, Lord [player.name]."
+You're tempted to tell him you feel the same, but then you think of his legendary library and glance at Asal's wide, sparkling 
+  OUT: Nawfal is trying very hard to keep his composure, but really, did he think he could fool you, his old rival? Asal's book is indeed a rare treasure, even you feel a twinge of envy. Still, the one you've brought is no less remarkable. Look at Nawfal's shining eyes and trembling hands—he's dying to dive into the study right now, yet still trying to keep that calm facade. Tsk.
+You hear him clear his t
+  OUT: You present the old wooden box and gesture for Nawfal to open it. He looks a little wary, a little puzzled. He turns a few pages, frowning deeper with each one.
+"This isn't cheap," he mutters, setting the book down to look you squarely in the eye. "Why are you so eager to see my library?"
+Ah, this man, always assuming you're up to no good, when in truth you're simply acting out of... pure altruism
+
+=== «Blessing Ritual» [30w] id=5006052
+CARD: Maggie seems very anxious lately... She's worried about Adila, so she decides to perform a blessing ritual, praying for Adila's safe return. You promise to help her with the ritual.
+  SLOT: You need to take out at least 10 Gold Coins to complete this Ritual.
+  SLOT: If you take out 20 Gold Coins, you can break an Extravagance Card of Silver tier or lower.
+  SLOT: Pray with sincere devotion
+  OUT: Donations to the church are considered "extravagance" – though the church protests this view, arguing that such charitable acts are righteous and worthy. After all, no price is too high for divine favor.
+
+However, the Sultan considers it a waste of money. He rarely wastes money in this way, but he seems to admire your extravagant spending style.
+
+=== «Bathed in Dragon's Blood» [24w] id=5010088
+CARD: Warriors gather in reverence, bowing before you, honoring your valor in slaying the dragon and eagerly anticipating the strength you will bestow upon them.
+  SLOT: The flowing blood still retains remarkable magical power...
+  SLOT: Anoint their heads with dragon's blood
+  SLOT: Anoint their heads with dragon's blood
+  SLOT: Anoint their heads with dragon's blood
+  SLOT: Anoint their heads with dragon's blood
+  SLOT: Anoint their heads with dragon's blood
+  OUT: You ride amidst these warriors and soldiers, the dragon's head trailing behind you. Your hands, stained with the dragon's blood, gently touch each of their faces... Then, you call forth the brave souls who volunteer to lead the charge, presenting each with a pure silver knife to carve a strip of dragon flesh to consume... Feast, warriors! Feast as if this were your final banquet! Fear not, for whe
+
+=== «Nightmare's Edge» [55w] id=5010062
+CARD: Each step toward the Corrupter distorts the world further. Yes, reality was originally written using Their body as source material... Now, They can twist it... Your forward path becomes a maze between reality and illusion, revealing bizarre fangs and tendrils... Hatred, weakness, ignorance, anguish, confusion - all negative emotions in your hearts form this prison.
+  SLOT: Call upon love to sever hatred's thorns
+  SLOT: Only the truly strong can move this stone
+  SLOT: Use the Wisdom key to unlock this door
+  SLOT: Any unhappiness will trap you in misery's bog
+  SLOT: Let faith illuminate the path through darkness
+  SLOT: Consumable
+  OUT: First, hatred's thorns that hunger for flesh; behind them looms a sealed door painted with countless fools' entanglements... blocked by a massive boulder - a cowardly giant clutching its head. Beyond, darkness churns like fog, awaiting your arrival...
+  OUT: Maggie produces golden shears from nowhere - no matter how fierce the thorns, all are severed cleanly and wither away... As effortless as tending her garden at home, you pass this first trial.
+  OUT: Faris studies briefly, testing with his staff, quickly grasping these living thorns' nature.
+He shows you how to free entangled bodies by moving with the thorns' growth pattern, or offering them soft leather strips to play with... "Simple as handling dogs," he explains: "Never snatch from a dog's mouth - feed it gently and they'll release willingly."
+
+=== «Free Feast» [36w] id=5008096
+CARD: Habib has made an incredibly delicious Marvelous Mush from kitchen scraps - er, I mean, from leftover ingredients! It's now more popular than the main courses! Um... would you like to send someone to taste it?
+  SLOT: Marvelous Mush
+  SLOT: Crowds of the Dark Alley
+  SLOT: Who will you send to taste this mush?
+  SLOT: Who will you send to taste this mush?
+  OUT: The guests begin stirring their soup, checking for strange objects, while [s3.name] and [s4.name] exchange glances before stepping forward to defend your reputation - such a thing could not - must not happen in your guesthouse. [s3.gender] promise a thorough investigation, then half-threaten, half-persuade the man who found the rat into an empty room next door. Looking at his troubled expression m
+  OUT: [s3.name] and [s4.name] exchange glances before stepping forward to defend your reputation - such a thing could not - must not happen in your guesthouse. However, everyone is stirring their soup, whispering about what might be in it... Your inn's reputation hangs in the balance, and the man who found the rat wears a smug, satisfied expression... He's definitely suspicious! 
+There's no time to wast
+  OUT: Amidst the commotion, Habib emerges. With his towering height, he stands beside the troublemaker like a robust tower. "May I see this rat?" 
+The man falters, nervously waving the rat before dropping it into Habib's hand. 
+"Indeed, it is a rat. However, a rat's neck is fragile and would break apart if cooked for long. Given this rat's condition, it must have been placed in the soup just moments ago
+
+=== «Ant Swarm» [26w] id=5010075
+CARD: You suddenly remember: as a child, you used to play this very game. Tossing out bait, watching the bugs swarm, seeing them tear each other apart.
+  SLOT: It will gather followers in your name.
+  SLOT: Your power now blazes across the sky.
+  SLOT: Feed the mightiest insect, your divine warrior.
+  SLOT: Forge your own monsters, your own legends.
+  SLOT: Forge your own monsters, your own legends.
+  SLOT: The swarming masses
+  SLOT: The swarming masses
+  SLOT: The swarming masses
+  OUT: As once you fed them, you cast divine refuse among the swarm. The quickest and the hungriest earn your favor, your blessing.
+[s4.name]'s body swells, muscles twisting and contorting as extra eyes and teeth sprout. Amid the soldiers' cheers, [s4.name] slowly rises, as if a vast living tower.
+  OUT: You watch them tear at each other. Watch [s5.name] writhe for your scraps. Watch smaller bugs crushed beneath your gigantic pet. This pleasure, known to a child or a god, has never once changed. It stirs something primal in you.
+  OUT: You scatter sweet nectar, anointing [s3.name]'s head with celestial balm.
+[s3.name] drinks in the blessing, twisting, growing into something greater, fiercer. Go, my warrior!
+
+=== «One Against Hundred» [23w] id=5000853
+CARD: The moment the Sultan appears, you regret your decision - he's accompanied by a well-equipped Royal Guard, clearly not just for his protection...
+  SLOT: Sultan
+  SLOT: Sultan's Legion
+  SLOT: Yourself
+  SLOT: You can take this to break a Conquest Card of Silver tier or lower.
+  SLOT: Consumable
+  SLOT: The Sultan's Suspicion
+  OUT: Rejoice! Few endure the Sultan's displeasure and live. Learn gratitude!
+
+=== «Perhaps We Shouldn't Have Done This» [50w] id=5006516
+CARD: Zaki didn't tell you explicitly what would happen next, so your boundless imagination took the lead and brought you into a realm of ultimate romance. You play with the perfectly warm ripples in the bath, smiling as you await the arrival of the young man and the unmentioned 'someone else'.
+  SLOT: Zaki looks forward to meeting with you privately.
+  SLOT: You must attend the appointment in person.
+  SLOT: Who could be the 'someone else' Zaki mentioned? Feel free to speculate.
+  SLOT: You can take the opportunity to break a Carnality Card not higher than Gold tier.
+  OUT: People were astonished by your audacity, yet envious of your fortune... Regardless, because of your power in the palace and your unbridled reputation among the populace, no one dared to openly say anything against you or the mother and son. It seemed as if the matter was forgotten. However, don't worry; the moment you fall from grace or even show a hint of instability, they'll immediately remember
+
+=== «Salwiyah's Game» [5w] id=5000809
+CARD: This game belongs to Salwiyah.
+  SLOT: Salwiyah
+  SLOT: Nabhani
+  SLOT: Salwiyah's Guest
+  SLOT: Salwiyah's Guest
+  SLOT: Yourself
+  SLOT: Your companion
+  SLOT: You can take this opportunity to break a Sultan Card of Silver tier or lower.
+  SLOT: Consumable
+  OUT: Conquest failed, did not conquer everyone.
+  OUT: Description of breaking the Conquest Card. Successful!
+  OUT: Description of breaking the Carnality Card. A passage is needed about the Sultan refusing the Gold Carnality Card.
+
+=== «Again?» [132w] id=5008046
+CARD: Miss Arumina comes to find you.
+
+She must have had a huge argument with her father, her face still carries anger. "I don't need my father to tell me which man I can or can't associate with!" she shouts at you, "I understand everything myself! Please don't get involved again; every time my father mentions something annoying, it's you!"
+
+After dropping this heap of meaningless threats, she glares at you fiercely, as if waiting for a reply.
+You carefully examine this pampered young lady, suddenly realizing that for her, her father's protection is her entire world, so a man like you whom even her father fears and avoids intrigues her... That's why she will take such a blatant risk to come, experiencing real storms in life, to her, danger just seems fun!
+  SLOT: Arumina
+  SLOT: Ask your wife to talk to her
+  SLOT: You don't have time to lecture her, so you dismiss her.
+  SLOT: Teach her how dangerous men truly are.
+  OUT: Jawad, evidently, has a different interpretation of your casual arrangements: He believes you are demonstrating to him as her Father, "Look, I can play with your daughter any time; for now, I'll generously return her to you!"
+
+After he painstakingly persuades Arumina to leave, he humbly tries to befriend you for a long time, even leaving some Gold Coins as a friendly gesture.
+  OUT: You lead her to the outer courtyard, then lock the wooden door of the inner chamber.
+She threw a fit, calling you a coward, completely unaware of the fate she narrowly avoids.
+
+You sighed and ignored her noise until she sheepishly left.
+  OUT: Maggie whisked her away like a ragdoll, their voices disappearing down the corridor—especially Miss Arumina's screams.
+Whatever Maggie did, the girl left well-fed, her hair adorned with flowers, her pockets full of books and trinkets Maggie had given her, subdued like a real doll.
+The next day, her Father sent some recompense—with the only thing he knows, shiny Gold Coins.
+
+=== «Nursery» [22w] id=5006676
+CARD: Children gather in your garden, flourishing under your care and guidance. What future will these tender seedlings bloom into? No one knows.
+  SLOT: Nawfal came to the nursery you built together
+  SLOT: You teach them what love is
+  SLOT: You tell them what true wisdom is
+  SLOT: You guided them on what faith means
+  SLOT: You lead them to know what strength to rely on
+  SLOT: You lead them to seek what kind of happiness
+  SLOT: Sheltered Orphans
+  SLOT: Sheltered Orphans
+  OUT: Nawfal is unaware of what you're thinking. After class ends, he finds you. H He seems absorbed in some new idea, silent and contemplative until the last child leaves. In the empty mansion, only faint moonlight remains, gently swaying among the tree shadows.
+
+Nawfal looks up, fixes his gaze upon you, and slowly says, "Do you know? Standing on the podium today, seeing so many innocent faces, I sudde
+
+=== «See a Survivor» [37w] id=5000330
+CARD: Conquest is war, and war is ever shadowed by death. [xiaochou.name] wished to hear the tales of those who lived through it... Perhaps it would help [xiaochou.name] better grasp the ways of human, and better serve you.
+  SLOT: Can the mirror-born ever understand human?
+  SLOT: A common example of human
+  OUT: After the talk of conquest’s cost, [xiaochou.name] fell silent, and you, too, found yourself lingering on the words exchanged with it. Almost without thought, your manner toward servants and slaves softened; in councils with the high nobles, your considerations grew weightier. A subtle yet unmistakable change took hold... You felt yourself grow stronger.
+
+=== «Riots Outside the City» [20w] id=5000600
+CARD: You come across a rumor that there are riots outside the city and a noble lady is caught by vagrants.
+  SLOT: The Widow.
+  SLOT: You have to handle this yourself.
+  SLOT: You can bring any followers you want, as long as they can help.
+  SLOT: Some things come in handy in combat.
+  SLOT: You can use a Conquest Card of Bronze tier or lower.
+  OUT: She studies you for a moment, then recognition flickers in her gaze. The one who plays the Sultan’s Game. Her speech is measured, thoughtful. She knows where the villains have fled – they have taken over a noble estate. If you remove this thorn from her side, she will pay you handsomely. Besides, is this not a fine opportunity to rid yourself of a Sultan’s Card?
+
+You nod in agreement. Clearly, hel
+
+=== «Devourer's Hunger» [28w] id=5008172
+CARD: The cultists publicly announce the Cultic God will bestow blessings, providing meat to Dark Alley's poorest... You dare not imagine their confidence... or where their meat money originates.
+  SLOT: Raw Material
+  SLOT: Raw Material
+  SLOT: Raw Material
+  SLOT: Raw Material
+  SLOT: The Sultan Card you gave the cultists
+  OUT: Hearing how you broke this Extravagance Card, the Sultan's expression darkens: "You're exhausting my favor, [player.name]." He toys with his ring, watching you coldly. "Surely you don't believe you've gained authority to assign others to this game?"
+Cold sweat pours as you repeatedly deny this; another such incident would certainly cost you your head.
+  OUT: Badriyyah wants more! She giggles, seeking a second, third card... For your own survival, you absolutely cannot oblige. She seems disappointed, though her smile never fades. "Well then, let's reframe - not you providing cards, but me helping you. That works, right?"
+She settles this unilaterally.
+  OUT: The cultists' ritual grants you disturbing insights into forbidden realms.
+
+=== «The Vagrants' Demand» [47w] id=5008196
+CARD: Raed brought a large group of vagrants to your doorstep. From now on, you can only enter the court through the back gate in your carriage. She claims that the vagrants are merely hungry and in need of assistance... If your game can help them, prove it!
+  SLOT: Raed awaits your help or pressures you.
+  SLOT: The vagrants have gathered.
+  SLOT: 8 Gold Coins or 1 Feast
+  SLOT: You just happen to hold a Sultan Card.
+  OUT: Now, Raed has come to believe you completely—this game can truly be used to do some good! This large sum of money is enough to see countless homeless souls through the winter... For now, they regard you as a living deity. Well... at least for the time being.
+  OUT: Now, Raed has come to believe you completely—this game can truly be used to do some good! Many of these people haven't tasted a clean, warm, properly seasoned meal in ages... You have, at least for a time, restored them from mere survival into something approaching humanity.
+
+=== «Face the Sultan» [49w] id=5010014
+CARD: The Sultan sits on the Gold throne, with his loyal honor guard standing by. As always, the deep shadows and brilliant light in the Lapis Lazuli Hall weave an inscrutable expression upon him. But when you truly push open the door, his throat pulsates, revealing an undeniable beast-like joy.
+  SLOT: Sultan
+  SLOT: Even the sunlight and shadows belong to the Sultan
+  SLOT: The Monarch-Shattering Blade
+  SLOT: He doesn't need protection, but the majesty
+  SLOT: The Weak-Crushing Blade
+  SLOT: Honor Guard
+  SLOT: Ikar and Husam
+  SLOT: Honor Guard
+  OUT: You draw your weapon, loudly challenging the Sultan as you step into his hall. If you didn't, no one would dare to enter the Lapis Lazuli Hall as a rebel... The combat stretches from dawn till dusk, the setting sun casting blood-red light between you. With each step closer to the Sultan, you feel the shadows dance, flames flicker, and even the columns around you seem to spin wildly in the tension.
+  OUT: The Sultan stands as if matching the speed of your approach step by step. He reaches for his battle sword, beckons a guard to help him don his armor, then pauses briefly between weapons before choosing another blade – a light, serpentine scimitar. 
+
+During these preparations, your team remains still and silent, neither speaking nor charging, as if bound by some unspoken pact, simply maintaining th
+  OUT: "I accept your challenge, rebel," says the Sultan, leaving his long-held throne and descending the stairs toward you, step by step... With each step, his reflected light becomes more radiant. His form seems to grow even larger.
+Behind you, someone loses control—you hear stumbling retreats and weapons clattering to the ground, but there's no time to scold or inspire your companions now. You need to
+
+=== «Negotiation» [33w] id=5006512
+CARD: Zaki accidentally killed a prostitute, and it's well known that a prostitute’s life is of little value. You can step in to negotiate with the people from the brothel, spend some money, or...
+  SLOT: Zaki is very frightened
+  SLOT: You have to handle this yourself
+  SLOT: You may place a Bloodshed or an Extravagance card not exceeding Bronze tier
+  SLOT: You need at least 5 Gold Coins to buy the life of the prostitute.
+  OUT: The Sultan heard of this matter and announced that henceforth, killing prostitutes would be a legal activity at double the cost.
+
+=== «Challenges Are Ever-Present» [9w] id=5006536
+CARD: Some so-called champions of justice decided to challenge you.
+  SLOT: Challenger
+  SLOT: Who is calling for help?
+  SLOT: Some things can make you more combative.
+  SLOT: You can break a Bloodshed Card of no higher than the challenger's tier
+  OUT: The Challenger's head was cut off. You broke the Bloodshed Card in your hand, and for a while, no one dared challenge you anymore.
+  OUT: You mercifully spared this challenger, and the opponent was deeply grateful.
+
+=== «Dance of Light» [32w] id=5010017
+CARD: The Sultan's Signet Ring – a symbol of royal power, an invincible talisman, a deadly artifact wielded with a mere gesture. You must have prepared well to stand before him, haven't you?
+  SLOT: Sultan
+  SLOT: Shouldn't you have dealt with this ring earlier?
+  SLOT: Divine Intervention of Power
+  SLOT: Fight Fire with Fire
+  SLOT: Fight Fire with Fire
+  SLOT: Fight Fire with Fire
+  SLOT: Consumable
+  OUT: The Sultan has high expectations of you, but that doesn't mean he will compromise his standards: the rebellious traitor must face the piercing light of death from the Signet Ring. As its magical power surges, the sunset light and shadows in the hall twist and writhe, morphing into crimson beasts poised to devour you whole.
+
+Bathed in this power, you realize it is the power of time – the end that m
+  OUT: Lumera faces the death tide of the Sultan's Signet Ring; her Magic becomes lines of silver-shining text, describing shelter, safety, and hope...
+  OUT: The sheaf of drafts in Hassan's hand bursts forth, like a thousand birds drawn to the light of the Sultan's Signet Ring...
+
+=== «The Look of Kindness» [29w] id=5006743
+CARD: You invited a truly kind soul to let Malkina observe. Perhaps she can distill a connection between kindness and outward appearance, sharpening her craft. But who shall it be?
+  SLOT: Malkina
+  SLOT: Who is kind?
+  OUT: Through your efforts, Malkina gathered a trove of insights linking kindness and beauty. She filled pages upon pages of her notebook with observations.
+"The key is modesty in exposure, balance in tone," she insisted, fussing over your appearance with practiced hands. "The outline mustn't pinch too narrow... ah, there! See? You look much kinder already."
+
+=== «The Cleansing Eunuch» [38w] id=5000573
+CARD: Zazie spoke of a eunuch whose sole duty is to "cleanse" the concubines after the Sultan's visits... Perhaps this servant could be persuaded to preserve some of what our precious Zazie needs? Such a matter requires careful exploration.
+  SLOT: Gather information from Zazie: Send Jenna or a follower with at least 5 Stealth to exchange messages
+  SLOT: Bribe Courtiers: 8 Gold Coins necessary
+  SLOT: Investigate folk rumors: A non-noble follower with at least 5 Sociability
+  SLOT: Trade intelligence: Requires gold-tier Inside Information
+  OUT: Zazie's messenger brings a hastily written letter. You barely register surprise at her literacy before the contents shock you.
+Zazie reveals her orchestration of an old eunuch's execution - the very man who ritually cleansed her with icy water after the Sultan's visits, washing away the royal "essence." The aged eunuch performed this duty with sadistic pleasure, inflicting needless pain on the wom
+  OUT: Your network of informants quickly yields results. A younger eunuch named Savasar has assumed old Baru's duties. This pale-skinned man seems a stark contrast to his predecessor - thoughtful and composed where Baru was venomous and cruel. The challenge lies not in finding him but in convincing such a measured individual to commit treason against the Sultan himself. After greasing a few more palms, 
+  OUT: Court legends speak of the Sultan's unique disposal method for executed servants - no burial honors for them, but rather a one-way journey into the palace drainage channels. There, they say, lurks an ancient crocodile of monstrous proportions, grown fat on a steady diet of royal discards.
+
+=== «Private Meeting» [34w] id=5000641
+CARD: This mansion, isolated from the bustle of the city, stands in a silence that feels like no man's land. Beneath the eaves and tree shadows, Nawfal sits alone reading, no servants by his sight.
+  SLOT: You must attend the appointment in person.
+  SLOT: A Note in a Book.
+  SLOT: Nawfal seems to be waiting for you.
+  SLOT: You may place a Bloodshed Card or Carnality Card of Nawfal’s tier or lower.
+  OUT: Your arrival didn't surprise him. He simply nodded at you.
+
+You casually talked with him, when he stood up and led you to the house, you easily slipped a dagger into his unguarded heart – yet he only but looked into your eyes, neither surprised nor resisting.
+
+"Am I the first to die from this deck of cards? That I know not, but I know I won't be the last," he sighed and closed his eyes forever.
+
+A
+  OUT: Under the shadow of trees, it seems suitable to do such carnal things.
+"Has this deck of cards granted you the sovereignty and audacity to humiliate me?" He asks, as you pin his hands above his head. Anger flashes in his eyes, then fades within the blink of an eye. "... I pity you." He closes his eyes wearily, refusing to confront your desire.
+Yet in that moment, you vaguely caught something – the
+  OUT: Your arrival does not surprise him. He simply nods at you.He leads you in, then proceeds to speak: "This is a disaster..." Pouring you a mint-infused tea, his voice is low and certain, "Everyone will be dragged into a whirlpool of fear and distrust, a life worse than death. Especially you... [s1.name], to survive this game, you will betray your own morals – killing friends, squandering fortune, tr
+
+=== «Dark Gathering» [22w] id=5004910
+CARD: Depending on needs, it may be lecture, celebration, or sacrifice... The Cultic Gods encompass infinite variety, missing only one catalyst: human desire.
+  SLOT: Cultist
+  SLOT: Cultist
+  SLOT: Host with Black Art
+  SLOT: Consumable with Magic
+  SLOT: Sacrifice
+  OUT: The former priest retains his power to create miracles through suffering... the Cultic Gods lovingly gift different ecstasies to each of his wounds.
+He guides your followers through this blood-soaked domain of sensation... At the moment of supreme pleasure, mortal blood recedes, and miraculous nectar flows from his wounds.
+  OUT: Darkness mercifully conceals Jawad's greasy, avaricious face... Incense lends his worldly voice a saint's cadence.
+He expertly convinces people to purchase "darkness-blessed" trinkets... most being worthless junk randomly acquired from market stalls throughout the city.
+  OUT: When darkness reaches its zenith, Junah disrobes, parting her legs to reveal her magic to curious participants...
+This gift bestowed by darkness consists of layer upon layer of fangs and tongues embedded deep within her flesh.
+Inevitably, some succumb to temptation, surrendering themselves to experience the ultimate - and final - pleasure... Afterward, their essence is consumed by Junah, along wit
+
+=== «Desperate Gamble» [32w] id=5007016
+CARD: Late at night, the torches surrounded your mansion. Aziz brought all his forces – albeit just a bunch of slaves and bandits, but where they lacked in number, they repaid in ferocity.
+  SLOT: He is no longer a slave, but a leader.
+  SLOT: Their tribe has been destroyed by the Sultan, but their beliefs have not.
+  SLOT: They blindly follow the strongest leader.
+  SLOT: Aziz had submitted to fate, but for her, he could change everything again.
+  SLOT: Aziz has been waiting for a chance for revenge...
+  SLOT: You must do it yourself
+  SLOT: Your troops are necessary.
+  SLOT: Follower
+  OUT: Nobles must have the ability to discipline slaves, but few like you can do it personally.
+  OUT: Your fame spreads.
+
+=== «No Loose Ends» [9w] id=5000565
+CARD: The Royal Guard Captain steps obliviously into your snare.
+  SLOT: Seliman was unprepared
+  SLOT: You can do this yourself or send any of your followers to do it.
+  SLOT: You can place a Bloodshed Card of a tier no higher than the Royal Guard Captain's.
+  OUT: The Sultan doesn’t seem to care about Seliman's death.
+  OUT: Your actions inevitably left traces.
+
+=== «Regicide (Abandoned)» [1w] id=5000528
+CARD: Regicide
+  SLOT: The Sultan himself.
+  SLOT: Sultan's Guard
+  SLOT: Sultan's Guard
+  SLOT: Sultan's Guard
+  SLOT: An already breached city gate, or a declaration of Providence.
+  SLOT: Protagonist
+  SLOT: The Regicide Plot or the Bloodshed Card
+  SLOT: Follower
+  OUT: The gates are open. You pass through without suffering any loss.
+  OUT: As you have the element of surprise, you defeat them with ease.
+  OUT: The enemy's resistance was fierce. You suffer some losses.
+
+=== «A Midnight Call» [18w] id=5006129
+CARD: Deep in the night, your door shakes beneath urgent pounding. "Physician—Lord Samir—he... Lord [player.name], you must help him!"
+  SLOT: Samir
+  SLOT: You can enter the palace to handle this in person.
+  SLOT: Any Consumable
+  OUT: You hurry to Samir's chambers in the palace. Normally, the royal guards at his door interrogate every man who passes, but today they look stricken with fear. Without a word, they step aside and open the way. Samir drags you inside. His back presses against the door, eyes darting nervously toward you. Only now do you notice the sweat soaking his face.
+"They... they were just here. They spoke—if you
+  OUT: You steady your mind, wrapping every word and syllable in the power of your Insight. Yet the harder you try, the more the voices shatter your focus. The door groans. A crack splinters across the wood. Darkness floods the room. It swallows you and Samir whole. Your consciousness slips away—yet even the monsters who kill you seem bewildered, as if they had meant to bargain for something else.
+  OUT: You steady your mind, wrapping every word and syllable in the power of your Insight... You try to communicate with beings far beyond Samir's comprehension, from a height he could never reach.
+"Ten bottles... at the entrance... we... need... will... give you... reward..."
+You wipe the cold sweat streaming down your forehead and shout out loud, promising that you understand—you will make sure Samir 
+
+=== «Mortal's Research» [23w] id=5006715
+CARD: Asal has promised to help you survive the "Midnight Banquet" and prepare weapons against the otherworldly intruders, but he will need your assistance.
+  SLOT: Cursed Asal
+  SLOT: Asal needs an assistant who possesses both Wisdom and Magic.
+  OUT: Asal arrives at your door early, bringing exciting news: with [s2.name]'s help, he has found the most effective way to fight these creatures.
+"The real weapon is their true name," he says. "Every time they devour a human, they take that person's true name into themselves. Speak those names aloud, and you can awaken the victims—and weaken the monsters."
+You ask, "Where do I find the names?"
+His fac
+
+=== «A meeting related to the dragon» [15w] id=5006031
+CARD: Jabal asked you to arrange a meeting with Adila. It's no big deal for you.
+  SLOT: Jabal wishes to meet the descendant of the dragon-slaying family
+  SLOT: Adila must attend the meeting in person
+  OUT: You invite Adila and Jabal to your residence. Jabal begins introducing his story of searching for dragons under the Sultan's order, but Adila seems uninterested.
+
+"Enough, General." The girl interrupts Jabal's lengthy description by raising her hand, "I have no intention of handing the dragon-killing technique of my family to the Sultan. I intend to kill that creature myself, only then can I lift 
+  OUT: So, you're left to try and persuade Adila. Even if she is a very strong warrior, finding and killing a dragon on her own is almost an impossible task. Currently, Jabal is the best partner she can find. He has been tracking dragon clues for many years, and his martial prowess is unquestionable.
+But Adila still shook her head vigorously: "You simply don't understand." With something like an unspoken
+  OUT: Seeing Adila so resistant, you and Jabal exchange a glance and can only shake your heads.
+
+"Perhaps it's for the better," you console Jabal, "If the sultan finds out there's a new way to find the dragon, he'll surely order you – or me – to bring him the dragon's head, or deliver our own heads to him."
+
+Jabal opens his mouth and is ultimately forced to agree with you. He lets out a long sigh, the d
+
+=== «The Sands of Time» [17w] id=5006625
+CARD: You harbor doubts about Aziz's origin, so you plan to call him over to make things clear.
+  SLOT: These matters are only known to Aziz himself.
+  SLOT: Perhaps he will accept some of your Convictions, perhaps not.
+  OUT: “Before becoming a slave, Aziz, what kind of person were you?” you ask.
+
+Slowly, word by word, Aziz tells you his origins. He was raided by the Sultan's army from the western desert region when he was only ten, too young to understand; his height saved him from being chosen for the palace by the Sultan’s eunuchs, thus barely retaining his male dignity.
+“I remember my father had five hundred camels
+  OUT: Silently, you suddenly ask him if he ever thought about redeeming his freedom.
+
+Aziz still has no expression, appearing numb, calm, or perhaps hiding something. Slowly, he answers, saying if you permit, master, he would prefer to serve you.
+
+=== «Buy her books» [54w] id=5006527
+CARD: The brothel owner gave you some hush money, and you left the oppressive street after the feast. Lumera looked downcast, likely upset with her performance at the meeting. But it's already done; overthinking won't help. You looked up and noticed the bookstore's lights still on. Perhaps buying her some books will cheer her up.
+  SLOT: Lumera is downcast
+  SLOT: Spend 5 Gold Coins or 10 Gold Coins
+  SLOT: Extravagance Card no higher than Bronze
+  OUT: Many people heard about your extravagant purchases for the home library, and an old family favoring reading is always admired.
+
+=== «What to See...?» [38w] id=5000308
+CARD: The things you refuse to speak, the feelings words fail to capture—[xiaochou.name] has ways of knowing. All you need do is provide a vessel. Come now, you wouldn’t be so stingy as to deny even that, would you?
+  SLOT: The Mirror
+  SLOT: You recall things not meant for others' ears...
+  OUT: The next day—you cast a casual glance at the ancient silver mirror hanging in your hallway, its surface worn by time, once capable of reflecting only faint, ghostly shapes. But now, the figure in the mirror stares back at you with unsettling clarity. A shiver runs down your spine as you realize it must be [s1.name]. It offers you an inscrutable smile, then, in the blink of an eye, the mirror rever
+
+=== «Slave and Master» [18w] id=5006801
+CARD: If you still mean to use him as a warrior, you cannot flee from a challenge like this.
+  SLOT: The Challenged Master
+  SLOT: The Defiant Slave
+  SLOT: Consumable
+  OUT: When your blades sink deep into the tiger's flesh, you can no longer tell whose blood soaks you. The beast collapses, pinning you beneath its weight. Your vision blurs... The last thing you see: Gullis, pulling his blade from the tiger's back.
+  OUT: You dodge Gullis's strike, but he reverses the blade and slams the hilt into your jaw. The world spins. You're on the ground, looking up at the slave.
+Then, in that charged stillness, you see it. A tiger, creeping up behind Gullis. Quick! Get down!
+  OUT: When your blades sink deep into the tiger's flesh, you can no longer tell whose blood soaks you. The beast collapses, pinning you beneath its weight. Your vision blurs... Something warm on your neck. Is that your artery, torn open? You can't make out what Gullis is shouting anymore... So cold.
+
+=== «Guesthouse» [6w] id=5006564
+CARD: You can recruit temporary followers here.
+  SLOT: Retainer
+  SLOT: Retainer
+  SLOT: Retainer
+  SLOT: Retainer
+  SLOT: Send someone to recruit the 1st Retainer.
+  SLOT: Send someone to recruit the 2nd Retainer.
+  SLOT: Send someone to recruit the 3rd Retainer.
+  SLOT: Send someone to recruit the 4th Retainer.
+  OUT: Recruitment Successful
+  OUT: Recruitment Successful
+  OUT: Recruitment Successful
+
+=== «Nighttime Service» [19w] id=5000859
+CARD: Jalila enthusiastically advertises while Nabhani keeps accounts beside her, counting money - can't shortchange my good friend's hard-earned coin!
+  SLOT: Mysterious Guest
+  SLOT: Protagonist
+  SLOT: Jalila
+  SLOT: Nabhani
+  OUT: The slaves position your body for display, showing off your muscles, buttocks, face, thighs, and even opening your mouth to showcase your teeth to the audience below. 
+So this is how it feels to be treated as merchandise, the daily experience these women endure... 
+Before you can reflect further, Jalila announces loudly - 
+"And this noble gentleman's client shall be..."
+  OUT: When Junah approaches the stage, surprised murmurs ripple through the crowd. No one expected this lowest-ranking Lady of Delights to gather three gold coins for this game... 
+After passing those gleaming pieces to Jalila, Junah examines you with an expressionless gaze. 
+"This won't do," she remarks, patting your cheek. "You're too rigid - hardly ready for business. A proper servant needs to look t
+  OUT: You've lost count of what Junah has inserted - you only hear shocked gasps from the audience. 
+Without warning, she delivers a sharp punch to your stomach - the objects inside collide with your organs, sending waves of agony throughout your body. You can't suppress a whimper. 
+She gently removes each item one by one, caressing your genitals and abdomen throughout. This tender attention following p
+
+=== «End the Pain» [17w] id=5000725
+CARD: You decide to kill this pathetic person and end the despair and pain he dares not end.
+  SLOT: Murtaz is praying to the devil
+  SLOT: Anyone can kill him, anyone at all.
+  SLOT: Murtaz’s life can be used to break a Bronze or Stone Bloodshed Card.
+  OUT: The Vizier is very pleased with the outcome. He examined the pale head, sneering at the pitiful hatred that it would never act upon. How could anyone dare to attract the Sultan’s attention with such means? How shameless...
+You listened to Abdul’s muttering, and the hidden emotion in his slightly squinting eyes sent a chill down your spine.
+
+=== «Young People's Wedding» [15w] id=5008063
+CARD: You agreed to Fardak and Lumera's marriage, and naturally, the wedding should be arranged intensively.
+  SLOT: Groom
+  SLOT: Bride
+  SLOT: You or Maggie must attend this wedding as elders
+  SLOT: This would be a good opportunity to leave, should you remind them? Only you and Maggie can do this.
+  SLOT: You can take the opportunity to break an Extravagance Card no higher than Silver tier.
+  SLOT: Organizing a wedding requires at least 5 Gold Coins, and if you want to break an Extravagance card, you must take out 15 Gold Coins
+  OUT: The wedding draws to a close like this, and you sincerely hope this happiness won't be just a fleeting illusion...
+  OUT: As the ceremony nears its end, Maggie pulls Lumera aside, as though preparing to share a few private words. After speaking to her alone for a moment, she also calls Fardak over. Lowering her voice, she tells them this is the perfect time to use "returning home for the wedding" as an excuse to escape this city.
+
+"You can take her back with you," Maggie says, gripping both of their hands tightly. "A
+  OUT: As the ceremony nears its end, you take on a fatherly demeanor and pull Fardak and Lumera aside. After giving them some advice, you lower your voice and tell them this is the perfect time to use "returning home for the wedding" as an excuse to escape this city.
+
+"You can take her back with you," You say, "and don't come back anymore. This isn't a place where happiness can take root."
+
+Lumera remai
+
+=== «The Final Polishing» [34w] id=5010068
+CARD: The Dragon's Eye is drawn from the furnace, slowly stabilizing... Now, whoever polishes away its last sharp edges and forges a bond between its light and their own soul shall become its eternal master.
+  SLOT: It holds the power of a new world, the power of infinity.
+  SLOT: You... or Mahir...
+  SLOT: A portion of Aether, for polishing and lubrication.
+  SLOT: 1 large diamond, or 3 small diamonds, or 60 gold coins to purchase polishing materials.
+  SLOT: Perhaps, if the gods gain a new world, they will spare yours.
+  SLOT: Perhaps, if the gods gain a new world, they will spare yours.
+  OUT: The great God of Darkness arrived first. They are always one step ahead of the Purist. When you showed them the light within the Dragon's Eye, a tremor of excitement passed through your mind. They praised your devotion, promising infinite rewards in their new world. How strange! Your god was suddenly speaking to you with such kindness.
+And of course, the Purist came too.
+They took turns seducing y
+  OUT: You didn't tell Mahir: besides her, you had arranged for a god to witness this treasure, this symbol of a new world.
+The light blazed forth, and the gaze of the gods turned toward you. Was this caution? Trust? Or something carefully planned? No one could know your mind, not even the gods, whose were attention wholly consumed by the Dragon's Eye. Then, in an instant, something vast slipped free of 
+  OUT: When you saw Mahir again, she was a wreck: hollow-eyed, gaunt, aged a decade overnight. The entire laboratory was carpeted in sheets scrawled with symbols and numbers, records of her experiments projecting light into the Dragon's Eye and observing what came back. "I have to tell you this. Anyone else would think I'd lost my mind, and honestly, I think I actually might be losing it. What this Drago
+
+=== «Righteous Cause» [90w] id=5002031
+CARD: When you request to send a campaign to the Sultan, the court burst into uproars. All courtiers oppose you stirring up civil conflict so grandly just to favor a prostitute.
+But you know the Sultan will agree. He dislikes that lord who grows increasingly arrogant with age. Besides, it's quite fun to kill her father for a woman.
+Sure enough, you see an eager smile on the Sultan's face: "He used to be my strongest asides, [player.name]. If you can present a Conquest Card, I'll allow you to send troops."
+  SLOT: Shama's father has received your battle notice
+  SLOT: An elite unit, sworn to serve their master for generations.
+  SLOT: You must dispatch a troop of your own to join the battle
+  SLOT: You can personally, or send any follower who lead the army
+  SLOT: You can personally, or send any follower to join the army
+  SLOT: To win such a tremendous war, you should be well-prepared.
+  SLOT: You must present a Conquest Card to persuade the Sultan to allow you to start this war
+  OUT: Besides that head, you also loot the city thoroughly. Everything that once belonged to him – money, horses, jewels, weapons – now all belongs to you.
+
+=== «Armed Beauty» [31w] id=5008242
+CARD: Beauty alone won't secure a place in the harem. The Sultan has never been short of pretty women. Before Arzuna enters the palace, you still have a chance to help her.
+  SLOT: Use 10 Gold Coins either for palace affairs or to buy attire.
+  SLOT: You can gift her another piece of jewelry with Charisma of 4 and above.
+  SLOT: You can assign a noblewoman to guide her.
+  SLOT: You can now break an Extravagance Card of Bronze and below, but it requires 10 more Gold Coins.
+  SLOT: To break an Extravagance Card, you must spend 10 more Gold Coins.
+  OUT: When the time came, you led Arzuna to the passage near the palace gate, where the most senior eunuchs were inspecting the "goods" brought by the slavers.
+"Too old... too ugly... too... Oh, Lord [player.name]? And... the lady at your side—is she for the palace?" An old eunuch practically yelled, eyes lighting up as he appraised Arzuna. "What a beauty! Surely she's meant for the court—otherwise, we'
+  OUT: Before Arzuna's departure, you asked [s4.name] to walk her through the palace's rules, correcting gestures too casual for court. Then they whispered for what felt like hours. You didn't know what was said—only that Arzuna's eyes grew brighter with every word, and finally, she nodded, firm and resolute.
+  OUT: Beauty might shield a woman in the harem, while jewels were what struck. You slipped [s3.name] into Arzuna's hand. As her smile slowly bloomed, you knew she would wield this weapon to its sharpest edge.
+
+=== «Public Brawl» [32w] id=5000762
+CARD: If you still remember your promise with Jabal, you should find him in the underground fighting arena, despite the suffocating smoke, the raw violence, and the crude clamor that fills the place.
+  SLOT: Jabal should be here, right?
+  SLOT: You must do it yourself.
+  SLOT: Some intelligence could help in combats.
+  OUT: When you push through the crowd, he is on the stage, beating his opponent into a bloody pulp and tossing him to the ground like a rag.Spotting you instantly, he suddenly shouts in your direction,
+"Hey, you over there! Want to fight me? If you win, I'll double the prize and give it all to you!"
+Ha... This guy must have been itching to fight you for a while.
+  OUT: You knock Jabal to the ground and throw a punch, as if you are about to end his life – he closes his eyes, resigned to his fate – only for you to pull him up, laughing as you pat his shoulder.
+
+Jabal's bloody face freezes for a moment, then he bursts into laughter as well.
+
+The two of you slap each other and tell crude jokes, while the audience applauds.
+
+From this moment on, you have truly become
+  OUT: He slams you to the ground and vents his frustration by landing several punches squarely on your face. Only when the referee pulls him off does he finally let you go, satisfied.
+"Looks like I'm still the better fighter!" he boasts, twisting his wrist with a smug grin.
+Holding your nose, you nod in defeat and slink back home. Your servants barely recognize you. Just when you think Jabal has complet
+
+=== «Sacred Contest» [45w] id=5004521
+CARD: You are a cultist severed from the Purist Order, an unbeliever banished by priests. Yet how laughable! Your mission comes directly from God; you are His earthly voice. Now is time to prove - who is the heretic? Who should wield that pure, pristine authority?
+  SLOT: Cultist High Priest
+  SLOT: Cultist's Troop
+  SLOT: You must personally lead the troop against cultists
+  SLOT: You may assign a follower to assist in battle
+  SLOT: Holy crusaders responding to your call
+  SLOT: Holy crusaders responding to your call
+  SLOT: Consumables useful in battle
+  SLOT: You can take this to break any Conquest Card
+  OUT: As those Pure Words pierce your chest like swords, you find it laughable - should you ask why god granted you righteousness only to mock you thus?
+Your ears hear only deceptive silence - in extreme dying agony, you receive not another word from Them.
+  OUT: They open their mouths but produce no sound. The Purist has abandoned them. They use your throat to speak a single sentence - the only one worthy of utterance in heaven and earth...
+<size=+10><font="Title SDF"><b>I SHALL DESCEND</b></font></size>
+  OUT: The High Priest and priests of the Purist Order suppressed this ridiculous rebellion, purging all heretical combatants.
+Presumptuous fool, as you fell, were you still begging, still hoping for divine mercy?
+
+=== «Confrontation at Court» [33w] id=5006641
+CARD: You persuade the Sultan. He orders the guards to summon in the troublesome noble who disturbed your home. Allegedly, he is at home holding a large banquet; probably celebrating how he outwitted you.
+  SLOT: Troublemaking Noble.
+  SLOT: You have to handle this yourself.
+  SLOT: Some items might help you win this verbal war.
+  OUT: You harshly scold the scoundrel for flirting with anyone, especially favoring women of higher-ranking courtiers, displaying a despicable, distorted mindset – He won't even spare a slave girl! 
+Though you could forgive him for flirting with your slave, using lies to cover his nature, exaggerating a mere common slave to mislead the radiantly divine Sultan – it's treason! As the Sultan’s most loyal s
+  OUT: When Inal was mentioned, the scoundrel’s enthusiasm flared. He praised Inal to be incredibly enchanting, as beautiful as a fairy. No matter how you argued, the Sultan was unmoved. He waved his hand, commanding the guards to retrieve the intriguing slave from your home.
+
+=== «Running Wildly All Night» [19w] id=5006631
+CARD: Your concubine Inal has eloped with a slave! If this disgraceful matter spreads, it would truly tarnish your reputation!
+  SLOT: Escaped Inal
+  SLOT: Escaped Aziz
+  SLOT: You can do this yourself or send any follower to pursue them.
+  SLOT: You can do this yourself or send any follower to assist.
+  SLOT: Consumable
+  OUT: Following that direction, soon, you see a well-built figure in the distance, beside a petite one!
+  OUT: All is in vain. Aziz and Inal have disappeared! What can you do but curse them? You can only wish for them to be mercilessly destroyed by time. But don't forget, time marches on for everyone.
+  OUT: At last, in a deserted alley, you corner the elopers. Upon seeing you, Inal bursts into tears, while Aziz, expressionless, blocks Inal and slowly raises the sharp knife towards you.
+
+=== «Divine Genesis» [25w] id=5010059
+CARD: When believers prostrate before Them, they hear the earth quake with Their heartbeat. Prepare Their inaugural meal after birth... before They devour the entire world.
+  SLOT: God's Egg
+  SLOT: God's Nursery
+  SLOT: Final sacrifice, first to meet god
+  SLOT: Angels who serve Them
+  SLOT: Relics in memory of Them
+  SLOT: Mortals who worship the true god
+  SLOT: Authority to rule the land
+  SLOT: Do you know who They are?
+  OUT: A black hand punctures the crimson membrane. Blood oceans surge as the humanoid form staggers and fights to stand upright... After unknowable eons, the Creator witnesses sunlight and earth again - the world They personally authored... And They behold Themselves anew.
+How repulsive, how warped... The god begins sobbing.
+  OUT: A black hand punctures the crimson membrane. Blood oceans surge as the humanoid form staggers and fights to stand upright... After unknowable eons, the Creator witnesses sunlight and earth again - the world They personally authored... And They behold Themselves anew.
+How repulsive, how warped... The god begins sobbing.
+  OUT: Dark tendrils embrace Their designated sacrifice - yet Inal harbors no fear, only compassion.
+She has eternally served as the Creator's priestess. Since the master god's exile, this bloodline has wandered lost through countless ages... yet still comprehends all the god's anguish.
+My god, my god, You have endured excessive suffering! Misunderstood, forsaken, cursed, imprisoned... until You surrende
+
+=== «Fratricide» [40w] id=5000605
+CARD: You wait for the perfect opportunity. And you find it. You find him – the brother of Lady Fatuna's late husband, lost in the exciting fantasy of all the wealth is about to inherit, defenseless in the House of Delights.
+  SLOT: Vineyard Owner
+  SLOT: You can kill this greedy man yourself, or send any of your followers to do so.
+  SLOT: Certain consumables can come in handy in combat.
+  SLOT: Use a Bloodshed Card to escape scrutiny.
+  SLOT: Fatuna is waiting to hear back from you.
+  OUT: You bring news of the vineyard owner's death to Fatuna. The shadow that has loomed over her for so long finally dissipates. She exhales, slow and deep, and a relieved smile flickers across her lips. She thanks you and pays you handsomely.
+  OUT: Fatuna steps closer. Her fingers brush against your armor, wiping away a smear of blood. She asks you softly if you are hurt. You lower your gaze and tell her the blood is not yours, that you are well. Yet she does not release your wrist. Something unspoken coils between you... You wonder if you should allow it to grow.
+  OUT: Words of the commotion at the House of Delights quickly spreads among the nobles. You pull out a Bloodshed Card before they could utter more words of condemnation. They immediately shut up. Thank the poor unfortunate guy! He died so others may live.
+
+=== «Nighttime Service» [19w] id=5000857
+CARD: Jalila enthusiastically advertises while Nabhani keeps accounts beside her, counting money - can't shortchange my good friend's hard-earned coin!
+  SLOT: Mysterious Guest
+  SLOT: Tonight's Labor
+  SLOT: Jalila's Delight
+  SLOT: Nabhani's Glee
+  OUT: The slaves position your body for display, showing off your muscles, buttocks, face, thighs, and even opening your mouth to showcase your teeth to the audience below. 
+So this is how it feels to be treated as merchandise, the daily experience these women endure... 
+Before you can reflect further, Jalila announces loudly - 
+"And this noble gentleman's client shall be..."
+  OUT: When Maggie approaches, you're genuinely startled. 
+She somewhat shyly asks Jalila for a private room, explaining she's unaccustomed to such activities in front of an audience... Indeed, this is her first time (and likely last) setting foot in such an establishment. 
+Jalila graciously agrees as three shining gold coins pass from Maggie's fingers into her palm. 
+You're nervously ushered into a room
+  OUT: In serving noble ladies, male companions are forbidden from touching with hands - tongues are their primary tool. 
+You follow this custom, tracing every curve of Maggie's skin with careful licks from earlobe to collarbone to breast. Her soft gasps tell you everything - as her husband, you recognize her pleasure. 
+You journey downward, playfully nipping at her breasts and earning a gentle tap of re
+
+=== «Struggle Among Slave Girls» [52w] id=5008244
+CARD: The Sultan does sometimes take an interest in his slave girls, and once, passing by Arzuna, his gaze lingers on her slender waist. Everyone notices—eunuchs, slave girls, scribes, and nobles. It's a flicker of hope... and a tightening noose. For the other slave girls, watching a peer rise is agony beyond killing.
+  SLOT: You may do it yourself, or have a palace-eligible noble to take care of it.
+  SLOT: Bribe the eunuch for just 5 Gold Coins.
+  OUT: That day, you sent a servant to the harem passage, bearing a golden bracelet and exquisite sweets in your name for the fattest, most arrogant eunuch.
+No words were needed... Everything slid into place silently.
+From then on, the young eunuchs patrolling the harem at night scolded any slave girls who messed with Arzuna's bedding and made sure no tampering reached her food. When an old eunuch caught
+
+=== «Changes Brought» [27w] id=5006649
+CARD: Once again, you arrive at that secluded manor. You know Nawfal is waiting for you; regarding changes in the territory, he probably has something to tell you.
+  SLOT: Nawfal is waiting for you
+  SLOT: You must attend the appointment in person.
+  OUT: In private, Nawfal couldn't hide his excitement.
+"As you can see, I've done as you said in my own territory. Now, the women have livestock to look after, milk and eggs to eat, and a future to contemplate – they stay, so their men and children stay, too."
+
+This way, there are fewer wandering vagrants coming to his porridge stall for charity.
+
+"I always knew!... I always knew you could do it." He gr
+
+=== «Corpse Power Workshop» [69w] id=5006015
+CARD: A whole new energy! It can drive heavy gears, process grain, hammer weapons, smelt metals, stir the alchemy cauldron, and even do laundry!
+
+The crucial part is that this force does not rely on the Sultan's river, so it is tax-free.
+
+For the first time, you genuinely deem this a great idea. Of course, this core secret must stay hidden; you have Mahir keep the power source diligently covered.
+  SLOT: Reanimated Zombie
+  SLOT: Mahir
+  SLOT: Loopholes in tax laws
+  OUT: The joy of evading taxes has attracted the Sultan's Tax Collector
+
+=== «Dark Alley Warrior Campaign» [48w] id=5000791
+CARD: Your residence is surrounded by a bustling crowd, shouting for you to come out and fight like a man. Apparently, Nabhani declared on his usual street that you were the most powerful man he had ever seen, in many respects... This aroused the competitive spirit of the hooligans.
+  SLOT: Dark Alley Warrior, he wants to prove he's the best—in every aspect.
+  SLOT: You must do it yourself.
+  SLOT: Certain consumables can be helpful
+  OUT: This little trick is completely transparent to you; you easily dodge the handful of sand and take advantage of the chaos to kick him.
+  OUT: Your eyes are in severe pain, and you can't see anything for a moment. While you're crying with blurred vision and covering your face, the opponent kicks you several times mercilessly.
+  OUT: Just like that, effortlessly, you deal with this defiant little thug until he's begging for mercy. The onlookers dare not approach you, fearing they might witness how "others" can be fierce.
+
+=== «The Poet's Renown» [23w] id=5006695
+CARD: While Hassan hosts your guests, crowds gather, drawn by his latest works... Perhaps this is the perfect opportunity to host a grand banquet.
+  SLOT: Great Poet
+  SLOT: Present one of Hassan's poems to the guests.
+  SLOT: Invite a noble to join Hassan in hosting the company.
+  SLOT: Consumable
+  OUT: The young nobles recite Hassan's latest love poems aloud, each one convinced that their beloved will hear the verses at the banquet and fully grasp the depth of their feelings.
+However, those who hear these words are often thinking of someone else entirely... Yet these emotions travel with the poetry, circling around the poet, shaping the image of him in the minds of those who live in this world..
+  OUT: Hassan names twelve ancient wise kings, and mocks nine infamous tyrants. Any scholar familiar with history would know that these tales are hardly reliable, but no amount of diligent research can shape history quite like a single witty poem. The fool vents their dissatisfaction with the present through the past, while the wise savor the delicate dance between truth and fiction... Again, these senti
+  OUT: Hassan's latest work lampoons the petty and stingy ways of certain nobles... Even the servants carrying trays cannot help laughing.
+All the guests laugh wildly, careful not to appear as if they take offense personally. These bursts of joy, envy, arrogance, and insecurity swirl with the poetry, circling the poet, carving his image in the minds of those who witness it...
+
+=== «The Gradually Perfected Creation» [92w] id=5006016
+CARD: Mahir has built a dedicated workshop for her greatest invention. Although it feels more like a slaughterhouse to you  –  dozens of limbs from various body parts are categorized and hung on the walls, some from the living and some intricately assembled from wood and metal.
+ Metal wires and rivets have been removed, the corpse's body has turned into a pile of chaotic connections of water pipes and lead canisters, only the spine is soaked in sparkling ether solution, indicating its origins from a once-living human.
+ Mahir couldn't wait to start working.
+  SLOT: Place the corpse in the workshop to await modifications.
+  SLOT: Use a live human to optimize the parts...
+  SLOT: Use to exonerate the Sultan Card
+  SLOT: Directly weld a piece of human equipment onto its body.
+  SLOT: Have a magical ally to charge the etheric solution, or engrave magical runes on the silver lining of the chest cavity.
+  SLOT: 5 Gold Coins budget
+  SLOT: Besides Mahir, you can hardly imagine anyone else tinkering with this monster.
+  OUT: Due to the struggle of the materials and various other accidents, you have made a mess of the workshop, but not a single part was taken off intact and usable.
+  OUT: The collected flesh and tendons will live forever within Mahir's creation...
+  OUT: The collected flesh and tendons will live forever within Mahir's creation...
+
+=== «Clean troop» [38w] id=5006666
+CARD: You suspect a spy at Nawfal's banquet, but you're unsure who it might be. You rack your brain trying to recall everything that happened at the banquet, uncertain whether to cast doubt and mention it privately to Nawfal...
+  SLOT: Nawfal seems unaware of this
+  SLOT: You are unsure if he is a spy
+  SLOT: You are unsure if he is a spy
+  SLOT: You are unsure if he is a spy
+  SLOT: Place yourself here to identify the Young Noble
+  SLOT: Place yourself here to identify the fat Noble
+  SLOT: Place yourself here to identify the Elderly Noble
+  OUT: Indeed, you have a subtle feeling he is not a naive hothead. Despite his many sharp questions, there's more of an observation and scrutiny in his eyes... 
+After hearing your words, Nawfal's expression becomes peculiar, "Do you think they are my force?"
+He pauses, then slowly says, "I am not their leader, nor are they my allies. This is just a place to talk – talk truthfully. If there's any price t
+  OUT: After confirming the spy's identity, Nawfal acts decisively. 
+Later, Nawfal quietly finds you, looking somewhat weary. He tells you that the Young Noble was working for the Vizier, with whom he had long-standing discord. 
+"Our young people shouldn't be like this. They were meant to be the clearest in judgment, the most ambitious, never extinguished hope," Nawfal shakes his head, sighs, and gifts y
+  OUT: Yes, you find the fat noble extremely suspicious. This bastard completely exposed his seedy nature after getting drunk... you can hardly imagine Nawfal would sit at the same table with someone like him. 
+After hearing your words, Nawfal's expression becomes peculiar, "Do you think they are my force?"
+ He pauses, then slowly says, "I am not their leader, nor are they my allies. This is just a place
+
+=== «Guesthouse» [16w] id=5006568
+CARD: These people will risk everything for you after enjoying your meal... at least until it's digested.
+  SLOT: Retainer
+  SLOT: Retainer
+  SLOT: Retainer
+  SLOT: Retainer
+  SLOT: Retainer
+  SLOT: Retainer
+  SLOT: Send someone to recruit the 1st Retainer.
+  SLOT: Send someone to recruit the 2nd Retainer.
+  OUT: Recruitment Successful
+  OUT: Recruitment Successful
+  OUT: Recruitment Successful
+
+=== «The Empire's warrior» [40w] id=5006612
+CARD: Nayla approaches with satisfaction. She hands you a book, her envisioned True Warriors of the Empire, Ranked… To thank you for your contributions, she leaves a note on the book's first page, showing gratitude. Naturally, you eagerly check your ranking…
+  SLOT: Nayla brings the results from this run.
+  SLOT: You must receive her yourself
+  SLOT: Consumables to assist with checks
+  OUT: As expected! You see your name in the last chapter. 
+Nayla lavishly praised you by using an overly passionate style, saying your physique is reminiscent of those ancient exotic deities, enchanting others. She said your honeyed mouth easily spouting sweet words makes women's hearts flutter...
+But what’s most crucial, she emphasized your indomitable Rod of Life that merits all praises in the world, 
+  OUT: As expected! You see your name in the last chapter. 
+Nayla praised you in a passionate style, describing your efficiently muscular physique, your sweet words, and most important, your enduring stamina during the long-lasting "war"... 
+Her detailed, vivid writing suggests that these evaluations will serve as bases for noblewomen critiquing their husbands for a long time… 
+It’s unfathomable what jea
+  OUT: You find your chapter via the index; Nayla reviewed your performance in bed from various perspectives: from whether your body is muscular, your stamina capacity is sufficient, your skills is diverse... Considering your looks if appealing, your words if affectionate, your patience in pleasing women if enough to make them forget all other shortcomings under the comfort of the blankets... 
+The more y
+
+=== «The Mountain Lion's Final Demand» [15w] id=5002517
+CARD: Should you trust the evil dream or dispose of the monster still craving human flesh?
+  SLOT: The fierce lion with countless victims under its fangs.
+  SLOT: You can either go yourself or dispatch a strong enough follower to hunt.
+  SLOT: An extra companion, a better chance of success.
+  SLOT: Some things might come in handy during the hunt.
+  SLOT: You can take this to break a Conquest Card of Bronze tier or lower
+  SLOT: Sacrifice for the Mountain Lion.
+  OUT: The Sultan listens intently to your detailed lion hunt story. He accepts the lion's head you offer and permits you to break a Conquest Card. 
+A few days later, the blood-soaked lion's head hangs on the wall of the audience hall, symbolizing the Sultan's power, glory, and bravery.
+
+=== «Winds of Creation» [34w] id=5010206
+CARD: <color=#3F2A29>You are nearing the end. The wind toward a new world grows ever fiercer... No longer can you rely on arms or wings alone—you must hoist your sails and ride the force of creation.</color>
+  SLOT: You are now on the path of ascension.
+  SLOT: What divine hands and eyes could forge this?
+  SLOT: Could one glimpse the sparks of its forging on the mortal horizon?
+  SLOT: Will your work smile when seeing itself?
+  SLOT: Proof of Power
+  SLOT: Proof of Power
+  SLOT: Proof of Power
+  OUT: You yanked at Faris's soul, bringing a tangled wake of dogs, horses, and riders into the light. You shook off their mortal shells, clutching only the raw bonds they shared. Under your near-Creator power, a law of creation took form. It was the shared instinct of the pack, the rhythmic pulse of the flock, and the collective ecstasy of the mob. Through this law, you could command the many with one a
+  OUT: This thing could not support you, and it would not. In the winds of creation, it faded from your heart and returned to the mortal realm...
+Quick! Dig through your pockets, memories, and heart! You had already wasted too much time...
+  OUT: You called out to Raed, and to all who trusted you two and would give everything. She still stood before them, confronting your divine power with her final challenge. From her voice and gaze, you drew that will and forged it into a law fit for world creation. It was the force of rallying and defiance, the last cry of the weak, and the light that endured even in adversity. With your spirit inspired
+
+=== «The Boy's Request» [15w] id=5000610
+CARD: Zaki, Fatuna's only son, comes, bearing thanks for saving his mother and a personal request.
+  SLOT: The Young Noble.
+  SLOT: Find someone to take him in.
+  OUT: He comes to you, in the hope that he can fight like you did, and protect his mother like you did. He asks for your tutelage.
+
+You are amused. You agree.
+
+=== «Palace Duel» [23w] id=5001005
+CARD: Yesterday, you presented a Bloodshed Card in court. Today is the day you and your opponent must settle this fight to the death.
+  SLOT: The opponent you chose yesterday
+  SLOT: You can fight the battle yourself, or choose a noble follower to fight on your behalf.
+  SLOT: Certain items can be useful in combats.
+  OUT: With surprising speed and skill, although [s1.name] barely dodged the blow, they were still injured.
+  OUT: Your attack was ineffective, and the opponent dodged gracefully.
+  OUT: You easily dodged the kick.
+
+=== «King's Roast» [12w] id=5008142
+CARD: The feast is served - time to invite friends to enjoy it.
+  SLOT: Today's menu
+  SLOT: You can go youselft, or invite followers to taste it
+  SLOT: You can go youselft, or invite followers to taste it
+  SLOT: You can go youselft, or invite followers to taste it
+  SLOT: You can go youselft, or invite followers to taste it
+  OUT: "Raise your cup, my friend!
+We are mere fleeting mortals,
+But this moment,
+We live like kings!"
+Hassan's verse stired something within Alim...
+  OUT: "Raise your cup, my friend!
+We are mere fleeting mortals,
+But this moment,
+We live like kings!"
+
+=== «Shifting Winds» [8w] id=5003011
+CARD: Your crimes have changed how people view you.
+  SLOT: Your crimes have changed the nobles' views about you.
+  SLOT: Your crimes have changed the nobles' views about you.
+  SLOT: Your crimes have changed the nobles' views about you.
+  SLOT: Your crimes have changed the nobles' views about you.
+  OUT: [s1.name] no longer supports you.
+  OUT: [s1.name] no longer trusts you as before.
+  OUT: You are no longer attractive to [s1.name].
+
+=== «Justice's Challenge» [12w] id=5003013
+CARD: For justice, revenge, or glory? Someone blocked your door, demanding a duel.
+  SLOT: The dueling opponent who challenged you
+  SLOT: You can personally challenge, or assign a follower to fight on your behalf
+  SLOT: Some things can make you win more easily
+  SLOT: You can take this to break a Bloodshed Card that matches the Challenger's tier, or spare him to prove your noble character
+  OUT: Your bravery and noble mercy make the crowd applaud, wishing they could reward you with a few coins. See, fools do not care for bloodshed and the shadow of death; they just seek entertainment.
+  OUT: Your incredible bravery and noble mercy are widely praised throughout the city. This victory has intimidated many who wanted to trouble you. For the time being, you should be able to live peacefully.
+  OUT: Your bravery and noble mercy amaze everyone. People talk about this victory with great enthusiasm, either out of respect or fear, they no longer dare to openly express their repulsion.
+
+=== «Scholar's Haven» [38w] id=5000161
+CARD: Unlike the solemn, silent Royal Library, this place hums with human voices - academy members and knowledge-seeking citizens discussing, exploring, questioning, explaining between copying and page-turning, occasionally debating yet creating unexpected harmony - an ordinary yet hopeful symphony.
+  SLOT: Scholar Texts
+  SLOT: Scholar Texts
+  SLOT: Scholar Texts
+  SLOT: 3 Gold Coins
+  SLOT: 3 Gold Coins
+  SLOT: 3 Gold Coins
+  SLOT: You must display your Scholar's Insignia
+  OUT: Please take this.
+  OUT: Please take this.
+  OUT: Please take this.

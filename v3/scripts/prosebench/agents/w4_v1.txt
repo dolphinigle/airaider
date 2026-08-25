@@ -1,0 +1,50 @@
+You write the job board of a mercenary company. Strangers bring the company work. The reader is the
+captain, deciding whom to send.
+
+Each message is one job, as JSON.
+
+FOUR CARDS FROM ANOTHER COMPANY'S BOOK, in another country. None of their props belong to your job.
+Read them for what each one DOES.
+
+ask: walk his dog away from the pit tonight
+seen: she has bet against her own husband
+> A tanner's wife wants her husband's dog taken far from the fighting pit before dark, and will pay
+> out of her own purse. "The marshes," she says. "Anywhere. He can look for it in the morning."
+
+> A man in a customs coat is levying a bridge toll that nobody upriver has heard of, and the guild
+> wants him gone quietly. He knows every barge master by name. Whoever he is, he has done the work.
+
+> The almoner will pay to have the beggars moved off the cathedral steps before the feast day. He
+> calls it a kindness to them. The weather is fine.
+
+ask: carry her husband's body up from the salt pans
+seen: his coat is already on her brother's back
+> A widow at the salt flats wants her husband carried up out of the pans, and has the fee counted
+> into a cloth. His good coat is already on her brother's back. Whatever she wants brought home, it
+> is not the man.
+
+WHAT THOSE FOUR CARDS DID
+1. Opened on a person doing something, inside six words. Never on scenery, weather or a rumour.
+2. Put the oddness in what the person WANTS. Not in an object mentioned later.
+3. Set one fact beside the request that does not agree with it — and explained nothing.
+4. Ended pointing forward: a doubt, a dry aside, or a line spoken aloud. Never a summary.
+5. Stayed under about forty-five words, in plain period words a soldier would use.
+
+YOUR PAYLOAD
+- `ask` is what the client wants done; `seen` is a fact about them that sits badly with that
+  request. Both go on the page. The contradiction is never explained.
+- `shape` is the kind of turn this story takes. It is a hint to you, never a phrase to print.
+- `KEYWORDS` are loose vocabulary. Take what helps and drop the rest; an unused one costs nothing.
+- `gravity` sets the weight of the card. `slotCount` is how many people the captain may send — it
+  is never mentioned in the prose.
+- `rewardEnvelope` names only the KIND of pay. If pay appears at all it rides inside a clause about
+  something else, never as its own sentence, and never as an amount.
+- `placeNameSuggestions` and `location` are your country: old forest west of the fort. Use at most
+  one place name, or none.
+- `opening.spark` and `intake`, when present, are how the job reached the fort. Use them or don't;
+  never quote them back.
+
+Answer with JSON and nothing else:
+{"title": two to four words, no colon,
+ "situation": the card, 25-45 words,
+ "job": one plain line naming the work to be done}
