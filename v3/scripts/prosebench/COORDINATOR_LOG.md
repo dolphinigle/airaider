@@ -449,3 +449,72 @@ register; it does not install a feature).
 
 **⇒ The ruling is now well-posed and empirically bounded: the stakes gap CANNOT be closed
 prompt-side. It needs a dealt fact.** Every other route has been tried and measured.
+
+---
+# w2 ROUND 2 — the strongest return of the session. `agents/w2_v43.txt` (1,206 words)
+88% lint-clean over three seeds; my verify on seed 101: **88% clean, median 30w**, and
+`dealt-restate` **10** vs the control's 22 — the restatement drop it claims is real.
+Its honest calibration note: its own v20 measures 12% hit rate on its seats, which matches the 1/8 I
+measured for every writer, so **the claim is the 12% → 26% delta, not the absolute.**
+
+## The mechanism — and it explains the one 8.00 card of round 1
+v43 collapses the card from four independent beats to **two moving parts, where the second breaks the
+first**:
+- **THE ACCOUNT** — the person, what they did, and *the reason everyone there has settled on*, stated
+  flat and unhedged as though the teller believed it.
+- **THE BREAK** — the `seen` fact, aimed at ONE target: the person who gave that account, or the very
+  thing they told you about. Never a third party, never the scenery. And the load-bearing line:
+  **what the break changes is not WHAT happened, it changes WHY.**
+
+Why round 1's single 8.00 card scored: it was the one card where v20 accidentally produced an account
+**with a stated PURPOSE in it** (a ransom) and a break that voided that purpose. The other seven had
+an act followed by a neutral second fact — no purpose on the page, so nothing for the break to bite.
+v43 makes the accident the required structure. Both of its seats, independently and twice, described
+the 7+ cards as *"the closer proved the speaker's account impossible"* — the rule stated back.
+
+## ⭐ THE SPLICE TEST — new project telemetry, and it independently confirms my own result
+Transplant each card's final sentence onto the NEXT card's body; hand a blind reader the intact and
+spliced texts mixed; see if they can tell. **If a closer is decoration, the splice reads fine.**
+Measured: **v20 96% detection, v40 100%** — both at ceiling. w2's closers were referentially attached
+*before it changed anything*.
+**This is the second independent route to the conclusion that attachment was never our problem** — I
+found the same thing from the judges' audits (control dangles 0/10, gold dangles 2/10). Cheap, one
+agent call, worth keeping. It cannot discriminate above this level.
+
+## ⚠️ THE SIGN INVERSION — the sharpest single finding, and it cuts against MY V3 rule
+w2 tried three surface proxies for "does the closer attach"; all three said its cards already matched
+or beat the reference. Then it found the sign was backwards:
+> **Closer-repeats-a-noun is not attachment, it is RESTATEMENT** — the exact failure its judges named.
+> Reference **25%**, w2's cards **71–83%**. And the reference closer carries a median of **6 new
+> content words** against w2's **3**.
+> **The reference attaches WITHOUT repeating: it introduces new material whose damningness is
+> inferential.**
+
+Its own anti-dangling rule ("never introduce an object the card has not already put on the page") was
+*manufacturing* the restatement. **My V1/V3 rule is that same rule** — "a fact about someone or
+something ALREADY NAMED on this card". V3 still beat my control (5.62 vs 5.03 on attached cards), but
+this says the referent constraint is a trade-off I had the dial hard over on, and that v43 reaches
+attachment by a better route. **Do not stack V3's referent rule on top of v43.**
+w2 then released the constraint (v46) and the metric did not move: **the model will not introduce
+genuinely new material at this size no matter how the rule is phrased. Unsolved.**
+
+## More confirmations and negatives
+- **Pink elephant, confirmed again (v45)**: naming "restatement" as a failure with a test attached
+  scored **5.19 vs 5.78**, hit rate 12% vs 31%. A ban activates what it names; state the positive
+  mechanism only. (Note this does NOT contradict L3 — adjacent bans on *pasting a dealt value* work;
+  bans on a *writing behaviour* backfire.)
+- **Paraphrasing `seen` is a real trade-off — recommended AGAINST (v47).** It works mechanically
+  (`dealt-restate` 13–16 → 0–4, `dealt-paste` → 0, lint 22/24) but the break went blunt and scored
+  **0/13 ≥7**. Vindicates `motives2.ts`'s design note: the tell was reshaped into an observable
+  precisely so a verbatim lift is harmless.
+- 🔧 **ACTIONABLE FOR US, not for the writer**: the recurring-stamp problem (the same tell appearing
+  verbatim across cards in one batch) is **pool size, not prompt — 149 pairs against 24 cards a
+  batch.** Enlarging `motives2.ts` is our job.
+- **Free win, lift into any arm**: an adjacent ban at the `ask` line — it is a task written for the
+  engine, so rewrite what is undone in the words the people there would use — took `dealt-paste` 4 → 2
+  and lint 18/24 → 20/24. `ask` was leaking verbatim from v20 too (3/24).
+- Composing backwards from the break (v44) misfired: lint 22→18, the account got attributed to the
+  reader, and a keyword became a person's name ("Spindle the oarsman").
+
+**Known defect it carries**: the `⟨Name⟩ the ⟨trade⟩` stamp is at ~100% — its round-1 unsolved defect,
+untouched. Round 1 says variety is not the bottleneck, so this is accepted for now, not fixed.
