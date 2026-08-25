@@ -147,3 +147,36 @@ of its cards name a RECURRING NPC, and its ellipsis rate is a Chinese-translatio
 **Measure the corpus to find your gaps; do not target its numbers as goals.**
 Related, from w2: **implementing its own judges' top recommendation cost 1.2 points** — a mechanism
 copied without the anchoring that made it work in the original is worse than its absence.
+
+# L16 — WHICH BANS WORK: ban a PASTE, never a BEHAVIOUR
+Two results looked contradictory and are not:
+- **Adjacent bans WORK** on copying a dealt value. Measured three times: 5/24 → 0/24 (w4, demo props),
+  21/24 → 2/24 (mine, dealt labels), 4 → 2 `dealt-paste` (w2, the `ask` line).
+- **Adjacent bans BACKFIRE** on a writing behaviour. w2 banned "restatement" with a test attached and
+  scored **5.19 vs 5.78**, hit rate 12% vs 31% — textbook pink elephant.
+
+**The rule: a ban works when it forbids REPRODUCING SOMETHING PRESENT IN THE PROMPT, and backfires
+when it forbids a way of writing.** The first is a mechanical check the model can apply by comparison
+("is this string in my input?"). The second requires holding a negative property in mind while
+generating, which at low effort just raises the property's salience.
+For a writing behaviour, **state the positive mechanism only** and let the wrong behaviour fall out.
+
+# L17 — ATTACHMENT ≠ REPETITION (the sign was backwards)
+We spent a round believing closers failed because they did not connect to the scene. Two independent
+routes proved they already did — a splice test (transplant each closer onto the next card's body and
+see if a blind reader notices: **96–100% detection**, i.e. ceiling) and the judges' own audits (our
+control dangled **0/10**; the GOLD STANDARD dangled **2/10**).
+The real measurement, inverted:
+> **A closer that repeats a noun from the scene is not ATTACHED, it is RESTATING.**
+> Reference **25%** noun-repeat; ours **71–83%**. Reference closers carry a median **6 new content
+> words**; ours **3**.
+> **The reference attaches WITHOUT repeating — it introduces new material whose damningness is
+> inferential.**
+The rule "never introduce an object the card has not already put on the page" *manufactures* the
+restatement it was written to prevent. Releasing it did not help either: **the model will not
+introduce genuinely new material at this size no matter how the rule is phrased.** Unsolved.
+
+**Methodological warning, paid for twice this session:** "the most common failure in a batch" is NOT
+"what separates the best from the rest." Dangling referents were the #1 failure by unanimous judge
+agreement AND were absent from the control AND present in the gold. Always check whether the defect
+you are chasing discriminates between the arms before spending a round on it.
