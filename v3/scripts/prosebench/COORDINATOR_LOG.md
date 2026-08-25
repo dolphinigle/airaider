@@ -713,3 +713,12 @@ seed for each independent test, or the batches only measure how much the judges 
 other. I built two rounds of conclusions on this and it cost the champion claim.
 Combined with the earlier lesson (an 8–12 card arm cannot rank prompts), the standing protocol is:
 **≥24 unique cards per arm, ≥2 seeds, regenerated per test, judged blind by ≥3 fresh seats.**
+
+---
+## HEAD-TO-HEAD under the corrected protocol: w2_v43 vs CHAMPION (P54+ban)
+v43 was ALSO only ever judged on a single draw, so its 26% claim carries the same flaw as my
+retracted one. Re-running it properly: 48 unique cards per arm across seeds 101 and 303, both arms
+on the 409 pool, regenerated, 3 fresh seats, endorsed gold as the calibration arm.
+
+Lint on the new pool: **v43 96% / 92%** vs **CHAMPION 83% / 88%** — v43 leads on lint, which is
+telemetry only; the blind judgement decides.
