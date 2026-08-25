@@ -639,3 +639,32 @@ w2's v43 reaches the same goal by a better-argued route — an ACCOUNT carrying 
 BREAK that changes WHY rather than WHAT — and it scored 5.37 without V3's restatement cost. Merging
 V3's contradiction requirement with v43's account/purpose structure is the clear next experiment.
 Per L17, do NOT stack V3's already-named rule on top of v43.
+
+---
+## Pool enlarged 149 → 409, and it exposed the paste law for the SEVENTH time
+`motives2.ts` now holds 409 pairs (the original 149 untouched). Verified: **272 distinct head nouns,
+132 distinct main verbs, 0 duplicate tells or wants**, all 520 new strings lint clean. 409 is prime
+and coprime with the rotation step 17, so a 24-card batch draws 24 distinct entries for every seed
+(0 repeats over 500 seeds) and the rotation now wraps after 17 batches instead of ~6.
+*(It also corrected my brief: the existing pool lints **1**, not 0 — a pre-existing
+`invented-duration` at entry #58.)*
+
+**But the enlarged pool REGRESSED the champion**: 79% → 63% clean (seed 101) and 54% (seed 202), with
+`dealt-paste` jumping 1 → 6–8. Every flag was the **`ask`** field, lifted verbatim:
+> `ask=verbatim "watch the churchyard"` · `"sweep the chimney"` · `"shear the flock early"` ·
+> `"keep a name off a list"`
+
+**Cause: my own brief.** I required `want` to be a clean verb phrase ("watch the roof at night") to
+kill an old passive-nominalisation bug. A clean verb phrase is exactly card-ready English, so it gets
+pasted. **Better input English ⇒ more pasteable input.** That is the prose-shaped-paste law for the
+seventh time in this project, and this time I caused it.
+
+**Fixed with w2's already-measured adjacent ban at the `ask` line** — *it is a task written for the
+engine, not speech: do not reuse its wording; say what is undone in the words the people there would
+use*. Result: `dealt-paste` **6 → 2** and **8 → 1**; clean **63% → 71%** and **54% → 83%**.
+**Third independent confirmation of L16** (w4 5/24→0/24, mine 21/24→2/24, now this).
+
+`CHAMPION_V3.txt` now = V3 + the `ask` adjacent ban, running against the 409-pair pool.
+⚠️ **Not yet blind-judged as a unit.** The +0.57 / 28%-vs-8% result was measured on V3 with the
+149-pair pool. The ban is w2-measured and lint-verified and the pool is diversity-verified, but the
+combination needs a blind batch before the champion claim carries over in full.
