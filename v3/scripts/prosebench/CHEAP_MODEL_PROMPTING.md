@@ -94,3 +94,56 @@ Register/frame → what the inputs are → the four things the card must do IN O
 ground → how it reads (cohesion + length) → a short NEVER list → output spec last. Requirements as
 DOs, no examples anywhere, no questions, no speech permission, and the load-bearing constraints at
 the end.
+
+---
+# L12 — PERMISSION ⊂ MANDATE ⊂ DEALT MANDATE
+*(measured 2026-08-25, 5 arms × 24 cards, one seed; corroborated by four independent prompt-writers
+who each reached the same law from a different direction)*
+
+The single most useful thing learned in the independent-writer round. Three grammatical moods, three
+completely different outcomes:
+
+| you write | you get |
+|---|---|
+| **permission** — "you may use names" | **nothing.** 24/24 cards keep the default frame. (This is L10 restated: a cheap model reads permission as prohibition.) |
+| **mandate in prompt text** — "give the person a name" | **ONE new shape.** The feature installs (names 3/24 → 16/24) but every card gets the *same* one, because prompt text can only hold one value. |
+| **mandate + the value DEALT per call** | **N shapes at no quality cost.** Distinct openings 1 → 10, lint-clean unchanged at 92%. |
+
+**A feature is installed by a MANDATE. VARIETY is installed by a mandate that is DEALT.**
+
+Corollaries, each paid for:
+- **Variety can never come from prompt text.** Not from asking for it, not from listing alternatives,
+  not from a rhythm rule (w1 measured −0.45), not from telling the model to vary. Prompt text holds
+  one value; that is a property of the medium, not of the wording.
+- **Descriptive dealt values are advisory and lose to the model's default frame.** Dealing
+  *"open on a physical object; let who and why arrive after it"* changed almost nothing. The dealt
+  value must be a COMMAND or a LABEL, not a description.
+- **But anything that reads as writable English gets PRINTED.** Dealing whole commands put "Begin"
+  at the head of 10/24 cards; dealing bare noun phrases put "a physical object" at the head of 7/24.
+  Deal a token that cannot sit in period prose (a bare category label), and…
+- **…ban printing it in the very next clause.** Isolated by accident when a patch failed to apply to
+  one prompt but not another: **same labels, same rotation, 21/24 paste without the adjacent ban,
+  2/24 with it**, with the variety gain fully retained. This is the second independent confirmation
+  of L3 (adjacent bans work, no pink-elephant rebound); w4 separately measured 5/24 → 0/24.
+
+# L13 — THE COPY LAW IS ABOUT CONCRETENESS, NOT ABOUT EXAMPLES
+We had been recording this as "examples get copied". Wrong emphasis. w4 measured a *rule* carrying
+five concrete fragments leaking at **24/24** — worse than any demonstration block it wrote (5/24).
+Stripping every instance dropped it to 0/24.
+**Any concrete instance ANYWHERE in the prompt is copied, and the rate scales with how neatly it fits
+the slot the model must invent into.** Rules beat examples only because abstract instructions are the
+only kind that *cannot* be pasted — not because rules are privileged.
+
+# L14 — DEMONSTRATION SHOWS A REGISTER; IT DOES NOT INSTALL A FEATURE
+Blind three-arm, same job and fixtures: rules-only **8.0** median, rules+demo 7.0, demo-only **4.5**.
+The demo-only arm had FOUR of eight demonstration cards containing spoken dialogue and produced
+**0/24 voiced outputs**; one sentence of rule produced 21/24. A demonstration cannot suppress a
+default and cannot install a feature — it only tints the register.
+
+# L15 — MATCHING A CORPUS STATISTIC CAN HURT
+w2 pushed its aside rate to the reference's measured 33% and scored *below* leaving it alone (it
+over-fired to 87%). The reference's headline rates are subsidised by things we cannot copy: 255/555
+of its cards name a RECURRING NPC, and its ellipsis rate is a Chinese-translation artefact.
+**Measure the corpus to find your gaps; do not target its numbers as goals.**
+Related, from w2: **implementing its own judges' top recommendation cost 1.2 points** — a mechanism
+copied without the anchoring that made it work in the original is worse than its absence.

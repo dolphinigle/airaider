@@ -316,3 +316,18 @@ prompt's own devices were wrong — each time the corpus said so in one query.
 ## NEXT
 Present the champion samples to the designer against CARD_PULL.md's complaint list. Nothing ships
 until it wins a blind bench under the frozen prosebench protocol against the current prompt.
+
+---
+## ROUND: four independent prompt-writers (2026-08-25) — STATUS
+THE JOB IS STILL DESIGNING A PROMPT. Four agents wrote prompts from scratch without seeing ours.
+All four returned; all four independently found the SAME law, now recorded as **L12** in
+`CHEAP_MODEL_PROMPTING.md`: **variety comes only from a mandate whose value is DEALT per call.**
+
+Built and measured: `scripts/openings.ts` + `runprompt.ts --opening` (a dealt `openWith` label,
+plus an adjacent no-print ban). Result: distinct card openings **1 → 10** with lint-clean unchanged.
+Before this, **every card we generated opened "A ⟨trade⟩ ⟨verbs⟩" — 24/24, one distinct first word**,
+against the reference corpus's 221 distinct first words over 713 cards. That was the monotony.
+
+⚠️ Do not trust any cross-agent score from this round: the four agents built four different judging
+instruments, and two of them scored the SAME reference corpus at 5.0 and 7.44. One unified blind
+judgement over all champions is the only comparable number.
