@@ -265,7 +265,7 @@ export const THINGS: string[] = [
   'bone', 'skull', 'skeleton', 'relic', 'moon', 'star',
   // structures & fixtures
   'shrine', 'chapel', 'altar', 'well', 'fountain', 'bridge', 'ford', 'mill', 'dam',
-  'ditch', 'hedge', 'fence', 'gate', 'wall', 'tower', 'cellar', 'attic', 'stable',
+  'ditch', 'hedge', 'fence', 'stile', 'wall', 'tower', 'cellar', 'attic', 'stable',
   'barn', 'granary', 'orchard', 'vineyard', 'garden', 'field', 'meadow', 'pasture',
   'crossroads', 'milestone', 'signpost', 'grave', 'tomb', 'hearth', 'chimney',
   'threshold', 'doorstep', 'window', 'roof', 'rafter', 'beam', 'door', 'stair',
@@ -483,10 +483,10 @@ const SPARK_SEEN = ['smoke over the trees', 'fires on the ridge at night', 'an a
   'a cold chimney at a lived-in house', 'livestock loose on the road', 'a burned hayrick',
   'doors barred in daylight', 'a beacon lit in peacetime', 'more strangers on the road than usual',
   'carts leaving full and returning empty', 'the weekly peddler never came', 'fresh-cut stumps past the boundary',
-  'lamplight in a house that stands empty', 'tracks that end mid-field', 'a gate left open that is always locked'];
+  'lamplight in a house that stands empty', 'tracks that end mid-field', 'a door left open that is always barred'];
 const SPARK_WHERE = ['on the ridge', 'at the ford', 'on the mill road', 'by the far bank',
   'at the tree line', 'at the crossroads', 'in the south pasture', 'by the old bridge',
-  'on the quarry track', 'near the churchyard', 'at the gate', 'below the walls',
+  'on the quarry track', 'near the churchyard', 'at the mill race', 'below the walls',
   'on the cart road', 'in the lower fields', 'by the charcoal camps', 'at the boundary stone'];
 const PATROL_SPARKS = ['a returning patrol saw it', 'one of your soldiers heard it on the road back',
   'the wood-detail came back full of talk', 'your forager marked the spot and hurried home',
@@ -503,9 +503,12 @@ export type IntakeChannel = 'bringer' | 'sign' | 'patrol' | 'talk' | 'notice';
 // and a negation in one ("no one brought it") leaked onto cards verbatim.
 // Widened 3→7 per channel 2026-07-12 (3 variants stamp over a long campaign).
 const INTAKE_FACT: Record<IntakeChannel, string[]> = {
-  bringer: ['someone came to the fort with it', 'it was carried to the gate in person',
-    'it arrived with a caller at the gate', 'it was brought to the company directly',
-    'a visitor put it before the company', 'it came through the gate with the morning\'s callers',
+  // Kept gate-free on purpose: 3 of these 7 used to name the gate and 'gate' turned up in 31% of
+  // 1,030 generated cards. The channel says only that the matter came WITH SOMEONE; where they
+  // stood is the writer's to invent (designer ruling: an over-used trope is the seeds' fault).
+  bringer: ['someone came to the fort with it', 'it was carried in by hand',
+    'it arrived with a caller', 'it was brought to the company directly',
+    'a visitor put it before the company', 'it came in with the morning\'s callers',
     'whoever carried it did not linger'],
   sign: ['it was seen from the fort\'s own walls', 'the fort noticed it before anyone spoke of it',
     'the signs of it are plain from the walls', 'it showed itself before any word of it came',
