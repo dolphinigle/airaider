@@ -59,3 +59,69 @@ self-contradictory — spark "livestock loose on the road" combined with ask "op
 key". 2-4 cards per 24 are unsalvageable by any prompt, capping the achievable score.
 **Not fixed mid-round**: w1, w2 and w4 are still running against this harness and changing it now
 would make their results incomparable. Fix before the next round, then re-baseline.
+
+---
+## w4 — DEMONSTRATION — RETURNED WITH A CLEAN NEGATIVE RESULT
+**`agents/w4_R7.txt`, 611 words — and it is a RULES prompt with ZERO examples anywhere.**
+w4's own blind protocol: 3 fresh zero-context judge seats per batch, frozen rubric/anchors,
+calibration holdout scoring 10/10/10 every time. Pooled median **7.0**, mean **6.50** over 48 cards.
+- **Verified by me on a seed w4 never used: 63% clean, median 37w** — below its claimed 79-92%.
+  ⚠️ 5 of the flags are `account-book` (the word "ledger"), which is a project-wide banned prop w4
+  was never told about because the ban lives in a file it was barred from. **My briefing gap, and it
+  penalises w4 unfairly.** Fix the brief before the next round.
+- Its cards run long (median 37w vs the reference's 24-28) and capitalise trades mid-sentence
+  ("A Beekeeper", "A Herder"). One card leaked unquoted first person.
+
+### The three-arm blind result: demonstration LOSES
+Same job, same fixtures, same seed, judged blind together:
+| arm | median | mean |
+|---|---|---|
+| **rules-only** | **8.0** | 7.25 |
+| rules + demonstration | 7.0 | 7.25 |
+| **demonstration-only** | **4.5** | 5.00 |
+
+**The mechanism, measured, and it is the valuable part:** the demo-only arm had FOUR of eight
+demonstration cards containing spoken dialogue and produced **0/24 voiced outputs**. One sentence of
+RULE produced **21/24**. *Demonstration shows a register; it does not install a feature, and it
+cannot suppress a default.*
+
+### THE COPY LAW IS ABOUT CONCRETENESS, NOT ABOUT EXAMPLES
+w4's leak counts:
+| prompt | what leaked | rate |
+|---|---|---|
+| a demo's field labels printed as literal text | — | 5/24 |
+| demo props | — | 5/24 |
+| a demo's *semantic category* (all reasons became family obligation) | — | ~24/24 |
+| **five closer fragments given as examples INSIDE A RULE** | — | **24/24** |
+| **one example sentence inside a rule** | — | **16/24** |
+A *rule* carrying concrete instances leaked at **66-100%, worse than any demonstration**. Stripping
+every instance dropped it to 0/24.
+**Restated law: ANY concrete instance anywhere in the prompt is copied, and the rate scales with how
+neatly it fits the slot the model must invent into.** Rules win not because rules are magic but
+because ABSTRACT instructions are the only kind that cannot be pasted — and demonstration is
+concrete by definition.
+
+### Two techniques from the losing angle that DID pay
+1. A **no-reuse line placed immediately after** the demo block cut prop leakage 5/24 → 0/24 with no
+   pink-elephant rebound. **Adjacent bans work** — consistent with our own L3.
+2. **Never repeat a construction across examples**: giving each a distinct main verb frame cut
+   construction-copying 54% → 21%.
+
+---
+## ⭐ CONVERGENCE — w3 AND w4 INDEPENDENTLY REACHED THE SAME ROOT CAUSE AND THE SAME FIX
+Neither saw the other's work, and they attacked from opposite directions (minimal rules vs
+demonstration). Both ended at the same wall and named the same remedy:
+- **w3**: *"any beat I ground in my own prose becomes a verbatim grammatical template within one
+  generation. The only beats that resisted are those grounded in a VARYING INPUT FIELD."*
+- **w4**: *"at reasoning_effort low this model holds exactly one card-shape at a time; whatever you
+  demonstrate or state becomes that shape, and any instruction to vary either produces a NEW single
+  mold or breaks clarity. Breaking this needs an engine-side lever — a dealt card-shape token
+  varying per call, the way shape/ask/seen already are — not more prompt text."*
+w4 tried five separate ways to break the template (four differently-built demos, distinct
+construction per demo, shape bound to gravity, length bound to gravity, stake folded into the line).
+**All five scored worse than the plain version.**
+
+**ACTIONABLE, with two independent votes: deal a STRUCTURE token per call** — not the story's shape
+but the CARD's shape (where the concrete fact sits, whether anyone speaks, what the last clause
+does). This is the same lever that already fixed variety for `ask`/`seen`/`shape`, applied to form
+instead of content.
