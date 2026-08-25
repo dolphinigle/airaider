@@ -166,3 +166,37 @@ the next. Re-census the whole distribution after every fix, never just the prop 
 **"whose kin" came back as the bare noun** the designer complained about (*"A Lingthorpe kin will
 pay coin"*). L13 — instances inside a rule leak. Check the rule's own example words before blaming
 a pool.
+
+### 🔎 THE CENSUS MUST BE OPEN-ENDED — and what it found underneath the props
+Counting a prop list you choose only finds tropes you already suspect. My first census used a fixed
+list and ranked `charcoal` third while missing `steward` entirely; both surfaced immediately once the
+census counted EVERY content word instead.
+
+And underneath the props it found the real repetition, which is not a prop at all. Live census, n=52:
+
+| word | rate |
+|---|---|
+| bring | 36% |
+| **seized** | **34%** |
+| **taken** | **30%** |
+| return | 25% |
+| join | 25% |
+| fetch | 19% |
+
+**A third of all cards are an abduction, and the job is nearly always retrieval.** The trope is the
+PREMISE, not the props.
+
+**Cause, and it is not fixable by wording.** `ONE_OFF_ARCHETYPES` = raid · capture · rescue · escort
+· investigate · hunt · contract. **Two of those seven are seizure premises** (capture = take someone
+alive, rescue = free someone held) and `hunt` is usually a person as well. 2/7 ≈ 29% predicts the
+measured 30-34%. The roll itself is fine — uniform, with a 3-deep no-repeat rotation.
+
+🔒 **DESIGNER QUESTION:** the premise mix is the composition of the job-type pool — what kinds of
+work the game offers. Widening it (a siege, a delivery under weather, a negotiation, a build, a
+vigil) is a DESIGN change, not a prose or seed-wording one. **Do not attempt to fix this in the
+prompt**: the writer is correctly executing the archetype it is dealt.
+
+### Stopping condition reached (2026-08-26)
+Prop-level tropes are fixed and measured (gate 18→4%, steward 19→5%, charcoal 19→15%). What remains
+above the noise floor is premise-level and belongs to the ruling above. Further small-sample
+iterations were chasing ±10% swings at n=20 — see the batch-size rule in Part 2.
