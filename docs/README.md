@@ -18,7 +18,7 @@ Airaider is a persistent, single-player, **AI-driven character-collection fort g
 
 ## Supporting
 
-- **[BIBLE.md](BIBLE.md)** — the LOCKED bible-authoring spec (wins over QUEST_BIBLE.md where they differ) · **[PROMPT_RULES.md](PROMPT_RULES.md)** — prompt-craft rules (v2 code paths; principles current). · **[PROSE_METHOD.md](PROSE_METHOD.md)** — ⭐ card-writing guiding principles + the blind-measurement protocol and its five traps. Read before touching any writing prompt.
+- **[BIBLE.md](BIBLE.md)** — the LOCKED bible-authoring spec (wins over QUEST_BIBLE.md where they differ) · **[PROMPT_RULES.md](PROMPT_RULES.md)** — prompt-craft rules (v2 code paths; principles current). · **[WRITING_CHECKPOINT.md](WRITING_CHECKPOINT.md)** — ⛳ the designer-approved writing baseline (2026-08-25) + what remains to implement. · **[PROSE_METHOD.md](PROSE_METHOD.md)** — ⭐ card-writing guiding principles + the blind-measurement protocol and its five traps. Read before touching any writing prompt.
 - **[AI_PROVIDER.md](AI_PROVIDER.md)** — model selection, structured-output strategy.
 - **[PLAYER_PREFERENCES.md](PLAYER_PREFERENCES.md)** — player-facing flavor knobs (tone, writing style) that flow into AI prompts without touching engine math.
 
