@@ -83,4 +83,4 @@ for (const m of g.roster()) say(g.dossier(m.id) + '\n');
 if (focal) say(g.dossier(focal.id));
 const u = g.ai.usage();
 say(`\nAI usage: ${u.calls} calls · ${u.inputTokens} in / ${u.outputTokens} out · ~$${u.costUsd.toFixed(3)}`);
-fs.writeFileSync('/tmp/claude-1000/-home-irvan-airaider/aae74806-c696-46d6-b099-8565108c8a84/scratchpad/aicampaign.log', out.join('\n'));
+fs.writeFileSync((process.argv[3] ?? '/home/irvan/.claude/jobs/0731b68a/tmp/aicampaign.log'), out.join('\n'));
