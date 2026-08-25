@@ -555,3 +555,42 @@ instead of the 20 endorsed intros. Arms: P54_control · V3_both · w2_v43 · GOL
 
 **Standing lesson: an 8–12 card arm cannot rank prompts.** Every per-arm number recorded in this log
 before batch 4 carries a ±0.5–0.9 standard error and the rankings between adjacent arms are noise.
+
+---
+# 🔍 WHY THE GOLD ARM KEEPS MOVING — most of the reference corpus is NOT standalone-readable
+Three gold arms, three different scores, all on the same instrument:
+| gold arm | how built | mean |
+|---|---|---|
+| 10 endorsed intros (batch 2) | hand-curated | **6.40** |
+| 12 endorsed intros (batch 3) | hand-curated | 5.11 |
+| 24 from a 425-text auto-filter (batch 4) | filtered: complete sentence, addresses the player, 14–70w, no placeholders | **5.06** |
+
+I read the 24 that batch 4 actually judged. The filter is not the problem — **the corpus is.** Most
+of those texts are mid-campaign beats that depend on a persistent cast and prior story:
+> *"Soon, Buthayna discovers the four girls are missing…"* · *"Arzuna wants to see you, as soon as
+> possible."* · *"A Bloodshed Card placed you and Nabhani at opposite ends of life and death."* ·
+> *"According to Mahir, the Dragon's Eye has 'solidified'…"*
+plus aphorisms (*"Life is a circle"*), combat barks (*"Get over here and bite!"* — the worst card in
+the batch by unanimous judgement), and rhetorical framings. **No automated filter can separate these
+from job cards, because the difference is narrative context, not surface form.**
+
+## 🔑 THE REFRAME — and it changes what "match Sultan's Game" can even mean
+**Sultan's Game cards are gold IN CONTEXT.** They are read by a player who knows Arzuna, who has met
+Nabhani, who drew the Bloodshed Card three turns ago. Read cold by a stranger — which is exactly what
+our blind instrument does — the corpus at large scores **~5.1**, i.e. no better than our own cards.
+The 20 endorsed intros score higher precisely because they were hand-picked for standalone
+readability.
+
+**Our one-off cards are being asked to do something the reference corpus mostly does NOT do: work
+with zero context.** That is a harder problem, not the same problem. It also explains, at last, the
+0% vs 64% name gap and the 5% vs 96% opening gap: those are both symptoms of the same thing — a
+persistent cast the reader already knows.
+
+**Consequences for the benchmark:**
+1. **The only valid gold arm is the hand-curated endorsed set**, and there are 20 of it. Any larger
+   gold arm drawn by filter is contaminated and will read as ~5.
+2. **Comparisons among OUR arms remain fully valid** — same task, same context conditions, and in
+   batch 4 every card of every arm is judged, so there is no sampling variance on our side.
+3. Chasing corpus-wide statistics (names, openings, voice rates) is chasing numbers produced by a
+   game structure we do not have. This is L15 with a much sharper edge: **the reference's numbers are
+   not targets, and for the context-dependent ones they are not even meaningful for us.**
