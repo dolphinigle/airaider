@@ -722,3 +722,31 @@ on the 409 pool, regenerated, 3 fresh seats, endorsed gold as the calibration ar
 
 Lint on the new pool: **v43 96% / 92%** vs **CHAMPION 83% / 88%** — v43 leads on lint, which is
 telemetry only; the blind judgement decides.
+
+### RESULT — the champion holds, and v43 has a CEILING
+| arm | n cards | mean | ≥7 | individual judgements ≥8 | max |
+|---|---|---|---|---|---|
+| GOLD_endorsed | 20 | **6.47** | 10/20 (50%) | **20/60** (5 at 9) | 9 |
+| **CHAMPION (P54+ban)** | 48 | 5.39 | 11/48 (23%) | **13/144** | 8 |
+| w2_v43 | 48 | 5.05 | 5/48 (10%) | **0/144** | **7** |
+
+v43 − CHAMPION = −0.34 ± 0.57 on the mean — **not significant**, so I do not claim v43 is worse on
+average. But the ceiling is not a noisy comparison, it is a descriptive fact over 144 judgements:
+**v43 never once scored 8. Not a single card, from any of the three seats.** Its sd is also the
+lowest (1.31 vs 1.54).
+
+**And v43 had the BEST lint of anything tested — 96% / 92% clean vs the champion's 83% / 88%.**
+So the arm with the cleanest telemetry has the lowest ceiling. Its rigid two-part ACCOUNT/BREAK
+structure buys a high floor by capping the peak: every card comes out competent and none comes out
+excellent. That is the **fourth** time this session lint and blind quality have pointed opposite ways.
+
+🔑 **A structure tight enough to guarantee the floor forbids the peak.** If the goal is "8+ as much
+as you can", a prompt that reliably produces 6s is the wrong trade — the designer asked for peaks.
+
+## Where the gold gap really sits, measured properly
+The endorsed gold is the ENTIRE curated population (n=20), not a sample, so re-judging it estimates
+its own mean legitimately — only judge variance, no sampling variance. Two independent judgings:
+**5.98 and 6.47**, ≥7 rate 35% and 50%.
+Our champion: **5.39**, ≥7 rate 23%, and 9% of judgements reach 8 against gold's 33%.
+**The gap is ~0.8–1.0 points and a 2× hit rate — real and replicated, but not the 2 points I claimed
+before, and not the parity the mid-session pooling suggested either.**
