@@ -418,3 +418,34 @@ the FORT — a consequence, not a reward — if the job is refused or botched? I
 field (the engine owns the number/severity) or prompt-side? The engine currently deals no such fact,
 so the model would have to invent it, and inventing urgency is a measured defect. **This looks like a
 seeding change, not a prompt change** — the same conclusion w1 reached from a different direction.
+
+## And the prompt-side fix for it does NOT work — tested, so the ruling is now well-posed
+Before escalating, I tested whether stakes can be installed prompt-side without any new dealt fact.
+The lever looked promising: **the engine already deals `gravity`, and P54 spends it entirely on word
+count** ("the CEILING on this card's length"). Severity is dealt and we were spending it on length.
+So: V4 keeps the ceiling and adds "gravity is also HOW MUCH IS EXPOSED"; V5 makes the exposure
+specifically the FORT's. Both refuse a clock, since inventing urgency is a measured defect.
+
+| | `asks you to` | `because` | fort-mention | median |
+|---|---|---|---|---|
+| P54_control | 3/24 | 2/24 | 6/24 | 26w |
+| **V3_both** | **2/24** | **1/24** | 4/24 | 33w |
+| V4_exposure | 6/24 | 2/24 | 14/24 | 32w |
+| **V5_fort** | **9/24** | 2/24 | 16/24 | 35w |
+*(reference rates, w2's measurement over 347 rites: `asks you to` **0.3%**, `because` **1.4%**)*
+
+**It produced the VOCABULARY of stakes, not stakes.** Fort-mentions went 4 → 16, but they are
+cosmetic — "from your walls", "your gate" — while the actual exposure stays the petitioner's. And it
+regressed the card into the supplicant frame w2 measured as our single largest deviation from the
+corpus: `asks you to` 2/24 → 9/24 against a reference rate of 0.3%. Cards also re-acquired false
+`because` joins ("She asks you to have it stabled BECAUSE the saddlebags are gone from it").
+*(Directional: judged on regression markers and reading, NOT blind-judged — I stopped rather than
+spend three more seats on an arm that reads worse than V3 on every marker.)*
+
+**This is L12 again, from the other side.** A mandate installs a feature only when the model has
+something to install it FROM. "Name what is exposed" has no dealt fact behind it, so the model
+produces the register and not the substance — the same shape as w4's L14 (demonstration shows a
+register; it does not install a feature).
+
+**⇒ The ruling is now well-posed and empirically bounded: the stakes gap CANNOT be closed
+prompt-side. It needs a dealt fact.** Every other route has been tried and measured.
