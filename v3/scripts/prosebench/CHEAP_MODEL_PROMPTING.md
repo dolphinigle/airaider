@@ -180,3 +180,32 @@ introduce genuinely new material at this size no matter how the rule is phrased.
 "what separates the best from the rest." Dangling referents were the #1 failure by unanimous judge
 agreement AND were absent from the control AND present in the gold. Always check whether the defect
 you are chasing discriminates between the arms before spending a round on it.
+
+# L18 — THE §0 HIERARCHY, DEMONSTRATED END TO END (2026-08-25)
+The cleanest single case this project has of *why* input shaping outranks wording.
+
+**The defect:** a card read *"A cask of **election milk** was stolen from Oakthorpe."* Two keyword
+atoms from different pools — `election` (a happening) and `milk` (a thing) — welded into one
+unreadable noun phrase.
+
+**Three WORDING fixes, all failed:**
+1. Turned the rule from permission into a mandate ("Take ONE, or none"). Still welded — **and the
+   rule contradicted the engine**, which deals 3–4 atoms on purpose because pool MIX drives variety.
+   Reverted.
+2. Banned welding explicitly ("NEVER weld two of them into a single name or thing"). Still welded.
+3. Added a concrete example to the ban — **rejected by the compiler**, which incidentally prevented
+   an L13 violation: the example would have been a concrete instance free to leak.
+
+**One INPUT-SHAPING fix, worked immediately:** label each atom by its axis in the engine —
+`bond: … · happening: … · thing: … · quality: …`. The writer can no longer read two atoms as one
+compound noun, because they are visibly different kinds. `milk` became a milk cask; `election` became
+a rival candidate.
+
+**Wording is lever #4 and lost three times. Shaping is lever #2 and won once.**
+When a prompt rule has to be repeated or strengthened, stop writing rules and ask what shape the
+INPUT would have to be for the defect to be impossible.
+
+**Corollary, hit twice in one session:** before adding a rule, check whether the engine already does
+something deliberate in that area. Two of my prompt edits (a saga pay rule, this keyword mandate)
+contradicted deliberate engine design and had to be reverted. A contradiction inside a cheap-model
+prompt is worse than either instruction alone.

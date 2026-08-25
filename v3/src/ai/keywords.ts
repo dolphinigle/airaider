@@ -451,8 +451,11 @@ export const MOODS: string[] = [
 // nonsense; a quality needs a noun in the draw to bite on: 'banned' + 'festival').
 const WILDCARD_NOUNS = [...THINGS, ...OCCASIONS, ...PEOPLE, ...UNCANNY, ...MOODS];
 export function sampleKeywords(rng: Rng): string[] {
-  const draw = [rng.pick(BOND), rng.pick(TIE), rng.pick(WILDCARD_NOUNS)];
-  if (!rng.chance(0.25)) draw.push(rng.chance(0.35) ? rng.pick(QUALITIES) : rng.pick(WILDCARD_NOUNS));
+  // LABELLED by axis on purpose. The atoms come from different pools and seed different parts of a
+  // card; dealt as a bare list the writer welds two into one noun phrase (a cask of "election milk").
+  // Three prompt-side rewrites failed to stop it — §0: wording is the weakest lever, shaping wins.
+  const draw = [`bond: ${rng.pick(BOND)}`, `happening: ${rng.pick(TIE)}`, `thing: ${rng.pick(WILDCARD_NOUNS)}`];
+  if (!rng.chance(0.25)) draw.push(rng.chance(0.35) ? `quality: ${rng.pick(QUALITIES)}` : `thing: ${rng.pick(WILDCARD_NOUNS)}`);
   return draw;
 }
 

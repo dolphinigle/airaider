@@ -230,7 +230,7 @@ function oneOffSystem(input: QuestWriteInput): string {
     '- location: the land and its anchor facts. A named landmark may be used bare (never with an epithet); other places come from placeNameSuggestions or coined small places of the land.',
     input.intake ? '- intake: HOW this matter reached the company — a settled FACT: the opening must agree with it, but most cards need NO sentence for it; never quote its wording.' : '',
     input.opening ? '- opening.spark: seed atoms for how the matter arrives, separated by " · " — combine into an opening of your own; use what serves; never quote their wording. Time of day only when it matters, never the first words.' : '',
-    input.keywords?.length ? '- KEYWORDS: optional sparks — use what serves, drop the rest; rebuild phrasing in your own words; a modern word is rendered as its period idea. A feeling word colors what happens — never an adjective stapled onto a person.' : '',
+    input.keywords?.length ? '- KEYWORDS: sparks for the world, each LABELLED by what kind of seed it is (bond / happening / thing / quality) — use what serves and drop the rest. A label tells you where its word belongs; two of them never become one name or thing. Rebuild phrasing in your own words; a modern word is rendered as its period idea. A feeling word colors what happens — never an adjective stapled onto a person.' : '',
     '- rarity: sets size — common = local trouble told short; uncommon and rare may run bigger. level: the weight-class of the work — high level means matters worthy of veterans. slotCount: how many soldiers.',
     input.gravity ? '- gravity: sets TONE only — small jobs read brisk, serious matters straight, only a grave affair reads heavy; when a keyword pulls against it, gravity wins.' : '',
     '- rewardEnvelope: the payout\'s shape — the fiction makes it plausible and the pay plain (they work for PAY, never a payoff-free plea). Goods beyond the pay stay UNNAMED on the card (what the job turns up is the report\'s to tell); no talk of stores or inventories.'
@@ -584,7 +584,7 @@ export function makeOpenAiProvider(): AiProvider {
         // level dealt to one-offs only — the saga system never explains it (context-free audit)
         rarity: input.rarity, level: input.kind === 'one-off' ? input.level : undefined, slotCount: input.slotCount, rewardEnvelope: input.rewardEnvelope,
         stake: input.stake,
-        KEYWORDS: input.keywords?.join(', ') || undefined,
+        KEYWORDS: input.keywords?.join(' · ') || undefined,
         gravity: input.gravity,
         rewardItems: input.rewardItems?.length ? input.rewardItems : undefined,
         placeNameSuggestions: input.placeNameSuggestions,
