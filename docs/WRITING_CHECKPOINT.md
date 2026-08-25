@@ -55,6 +55,30 @@ hand. This surprised me once; do not be surprised again.
    L12 says variety cannot come from prompt text, L13 says its instances leak.
 
 ---
+## 3b. DOGFOOD RESULTS — 2026-08-25, after the saga port
+Three full AI campaigns to finale (`aicampaign.ts`) plus a full CLI loop with real AI
+(`npm run cli -- --ai --script <file>` — the CLI has a batch mode built for exactly this).
+**Every player-facing call type read clean: one-off cards, saga cards, lead-ins, resolutions,
+finale.** No drift found, so no all-prompt audit was triggered.
+
+Saga cards, before and after the port:
+> *"Haeruana **is** a woman of the fort who brings a private grievance…"* (definition dump)
+> → *"Haeruana came to the longhouse and pressed her palm to your table. She speaks low and keeps
+> her hands tight on the hem of her cloak. The northern lean-to shows a sleeping bundle gone and
+> fresh boot prints into the woods. **The lean-to's hearth was stirred but not cold.**"*
+
+A resolution at the current bar:
+> *"Ragna worked the peg free with the butt of her axe while Gaufrid eased the rug's edge. The nail
+> tore a hand-sized gap in the weave and the rug came up. Beneath the rug they found a silvered
+> goblet, its rim scored in a running elven pattern and stained dark along one side."*
+
+**Investigated and dismissed:** a crude scan suggested 11/12 resolutions used a definite noun phrase
+absent from their lead-in. Hand-checking showed these are false positives — props staged by the CARD
+(which the resolve prompt permits), a soldier's own weapon, or nouns introduced in the same sentence.
+One genuine instance was found (a spear appearing unstaged). **Not systemic; deliberately NOT patched**
+— an instance-patch is forbidden by §8, and this session has already paid twice for chasing a defect
+before checking that it was real and that it discriminated.
+
 ## 4. ⏭ REMAINING WORK — the checkpoint is NOT the finish line
 - [ ] **Port §12 to `sagaSystem()`** — saga cards are the campaign spine and have none of it.
 - [ ] **Apply the resolution findings** — measured gap: *we narrate procedure, the reference narrates
