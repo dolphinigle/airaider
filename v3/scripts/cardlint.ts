@@ -108,6 +108,13 @@ export function lintCard(situation: string, input: QuestWriteInput, form: CardFo
   const coinedTrade = compounds.filter(c => /-(warden|keeper|master|hand|man|wright|smith|monger|herd|cutter|burner|maker)$/.test(c));
   if (coinedTrade.length) f.push({ code: 'coined-trade', detail: coinedTrade.join(', ') });
 
+  // ── WITHHOLDING-AS-EVASION. "he will not say why", "no one can say" — ZERO occurrences in the
+  // 1,495 official rite intros, versus 32% of ours once a client motive was dealt. The reference
+  // delivers a concealment by STATING the contradicting fact, usually on a but/yet/though pivot
+  // (17.9% of cards), never by reporting that somebody is withholding.
+  if (/\b(will not say|won'?t say|no one (will|can) say|nobody (will|can) say|refuses to say|would not say|will not tell|cannot say why)\b/i.test(s))
+    f.push({ code: 'evasion-tell', detail: (s.match(/\b(will not say|won'?t say|no one (will|can) say|nobody (will|can) say|refuses to say|would not say|will not tell|cannot say why)\b/i) ?? [''])[0] });
+
   // ── INVENTED DURATION — the payload has no duration field, so any of these is fabricated
   const dm = s.match(DURATION);
   if (dm) f.push({ code: 'invented-duration', detail: dm[0] });

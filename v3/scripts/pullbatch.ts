@@ -8,6 +8,8 @@ import * as fs from 'node:fs';
 import { VARIANTS } from './pullprompts.js';
 import type { QuestWriteInput } from '../src/ai/provider.js';
 import { lintCard } from './cardlint.js';
+import { MOTIVES } from './motives.js';
+import { MOTIVES2 } from './motives2.js';
 
 function loadKey(): string {
   if (process.env.OPENAI_API_KEY) return process.env.OPENAI_API_KEY;
@@ -77,6 +79,10 @@ const payOf = (i: QuestWriteInput) => {
 // envelope: ANY prose-shaped field gets pasted. The prompt maps these tokens to people itself.
 // LETTERS — 'client' leaked into prose as a literal word. A bare letter cannot be pasted as English.
 const ACTORS = ['A', 'B', 'C'];
+// MOTIVE=1 — deal one CLIENT MOTIVE per card from a 120-entry pool (scripts/motives.ts). Seeded and
+// deterministic here so a run is reproducible; the engine would use its own RNG. The reference
+// individuates a job by the client's motive rather than by the craft — see prosebench/TRANSFER.md.
+let motiveN = 0;
 let actorN = 0;
 
 const userOf = (i: QuestWriteInput) => JSON.stringify({
@@ -84,7 +90,9 @@ const userOf = (i: QuestWriteInput) => JSON.stringify({
   slotCount: i.slotCount, ...(process.env.PAY_ARRAY === '3' ? {} : { rewardEnvelope: payOf(i) }),
   KEYWORDS: i.keywords?.join(', ') || undefined, gravity: i.gravity,
   placeNameSuggestions: i.placeNameSuggestions, opening: i.opening, intake: i.intake,
-  ...(process.env.ODD_ACTOR === '1' ? { oddActor: ACTORS[actorN++ % ACTORS.length] } : {}),
+  ...(process.env.ODD_ACTOR === '1' && process.env.MOTIVE !== '3' ? { oddActor: ACTORS[actorN++ % ACTORS.length] } : {}),
+  ...(process.env.MOTIVE === '1' ? { clientMotive: MOTIVES[(motiveN++ * 37) % MOTIVES.length] } : {}),
+  ...((process.env.MOTIVE === '2' || process.env.MOTIVE === '3') ? { ask: MOTIVES2[(motiveN++ * 17) % MOTIVES2.length].want, seen: MOTIVES2[((motiveN-1) * 17) % MOTIVES2.length].tell } : {}),
 });
 
 /** the calibrated quality reviewer (scripts/cardlint.ts) — log-only telemetry, but it is validated
