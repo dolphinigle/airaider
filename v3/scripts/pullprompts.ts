@@ -1470,4 +1470,47 @@ Respond as JSON: {title, situation, job}
 - title: the particular thing this job turns on.
 - job: one line for the boss's list, in different words from the situation. No pay in it. ONE errand — if you need an "and" to say it, that is two, and you keep the one being paid for. It names only what the client wants done — never the unexplained act, which is the player\u2019s to find.`;
 
-export const VARIANTS: Record<string, string> = { P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22, P23, P24, P25, P26, P30, P31, P32, P33, P34, P35, P36, P37, P38, P39 };
+// ── P40: P39 + the JOIN. The dealt tell was being bolted on after a semicolon rather than woven
+//        into a working sentence ('...; the seal on it is fresh but the paper is old'). The good
+//        ones subordinate it ('the burners want the wolf found BECAUSE the sheep were killed but
+//        not eaten').
+const P40 = `You write the card for ONE job in a dark-fantasy mercenary game.
+
+The player runs a mercenary company. They read this card, then choose which of their soldiers to send. The boss stays at the fort. Nothing here has happened yet.
+
+Write about the people out there in the third person. The company is never "we" or "us"; the reader is "you", and even that is rarely needed.
+
+WHAT YOU ARE GIVEN
+- location: the country this sits in. Name AT MOST ONE place, and only if the job turns on it.
+- archetype: the kind of work the job is.
+- rewardEnvelope: shorthand for the kind of pay. Say it in your own plain words or leave it to the ledger the boss already sees.
+- KEYWORDS: sparks for the world. Take ONE, or none. Two of them forced together make a card nobody can follow.
+- intake: how word reached the fort. Never state it — the boss knows a card came from somewhere.
+- ask: what the person bringing this job wants done. Say it in your own words; never call them "the client".
+- seen: one thing about them or the place that can be SEEN. It goes INTO a sentence that is already doing work — joined by because, and, or a comma — not tacked on at the end after a semicolon. Do not explain what it means; the reader works that out. Never write that someone "will not say" or that "no one can say".
+
+THE CARD IS TWO SENTENCES.
+
+It describes ONE plain situation a tired reader follows first time. If the pieces you were given will not fit into one, use fewer of them.
+
+**First: someone DID something, or something is being done to people.** A person acts in the first six words. Give them an article, never a bare job title standing alone. Not a place, not an object sitting still, not the weather. Begin the card with a capital letter.
+
+**Second: what it means for the people it happened to.** What they want, what they fear, or what nobody can explain — often just a question the situation raises. This is why the player sends anyone, and it is the last thing they read.
+
+The card TELLS the boss what has happened. It never orders them about: no "find him", no "send men", no "recover it before". Those belong on the job line. The trouble is only as urgent as the facts make it — never invent a deadline the message did not give you.
+
+The thing that can be SEEN closes the card. Set it down and stop.
+
+HOW IT READS
+- About twenty-five words. Forty is long. Sentences average a dozen words.
+- Everyone is called by a plain trade a farmhand would use. When the message gives you no word for someone, take the plainest one that already exists — keeper, guide, hand, watchman, carter, cook — and never join two words to make a new job.
+- Only what the message names has a name.
+- Everyone gets introduced the moment they appear: *a* drover, *a* woman who keeps the ford. Never "the patron", "the client", "the carrier" — the reader has not met them.
+- Plain period words. No numbers, no amounts. No ledger, tally or written record anywhere.
+- Say each thing once.
+
+Respond as JSON: {title, situation, job}
+- title: the particular thing this job turns on.
+- job: one line for the boss's list, in different words from the situation. No pay in it. ONE errand — if you need an "and" to say it, that is two, and you keep the one being paid for. It names only what the client wants done — never the unexplained act, which is the player\u2019s to find.`;
+
+export const VARIANTS: Record<string, string> = { P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, P22, P23, P24, P25, P26, P30, P31, P32, P33, P34, P35, P36, P37, P38, P39, P40 };
