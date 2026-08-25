@@ -487,7 +487,7 @@ const SPARK_SEEN = ['smoke over the trees', 'fires on the ridge at night', 'an a
 const SPARK_WHERE = ['on the ridge', 'at the ford', 'on the mill road', 'by the far bank',
   'at the tree line', 'at the crossroads', 'in the south pasture', 'by the old bridge',
   'on the quarry track', 'near the churchyard', 'at the mill race', 'below the walls',
-  'on the cart road', 'in the lower fields', 'by the charcoal camps', 'at the boundary stone'];
+  'on the cart road', 'in the lower fields', 'by the kilns', 'at the boundary stone'];
 const PATROL_SPARKS = ['a returning patrol saw it', 'one of your soldiers heard it on the road back',
   'the wood-detail came back full of talk', 'your forager marked the spot and hurried home',
   'the night watch marked fires on the far ridge', 'a scout\'s report, two days stale'];

@@ -129,3 +129,40 @@ Full statements in `CHEAP_MODEL_PROMPTING.md`. The four that bite most often:
    dialogue (+1 on the prose bench); the gold standard does not use it. These point opposite ways.
 4. **Names** (§ anonymity-by-omission): reference 64%, ours 0%. Names need a MANDATE — permission
    yields 6/24, a mandate 16/24. The ruling costs the name rate; it does NOT cost variety.
+
+---
+# PART 5 — THE TROPE CENSUS (added 2026-08-25)
+🔒 **Designer ruling:** *"routine quests redundant is fine — overused tropes is not, and if it
+happens too much, it's the SEEDS' fault."*
+
+A repeated PROP or TRADE across many cards is a **seed-pool defect**, not a prompt defect. No prompt
+rule can suppress a trope the engine is dealing. The loop:
+
+1. **Census live-generated cards** for prop/trade frequency.
+2. Find the over-represented one.
+3. **Trace it to the pool(s) that deal it** — usually more than one.
+4. Fix the pool. Re-census.
+
+### ⚠️ CENSUS ONLY LIVE-GENERATED CARDS
+`runprompt.ts` lab batches reuse the same ~146 FROZEN payloads (`pull-fixtures.json`) across every
+prompt experiment, so their tropes are counted dozens of times and will dominate any pooled count —
+and they do not even come from the live pools. **I got this wrong once:** a pooled census of 1,030
+cards reported `gate` at 31%; separating the populations showed 936 were lab fixtures, and the true
+live rate was **18%**, with `charcoal` (19%) actually the top trope. Filter: `oneofflab.ts` /
+campaign output = live; anything whose first line matches `# <path> — n=` = lab, exclude it.
+
+### Fixed so far (live rates, before → after)
+| trope | before | after | dealt by |
+|---|---|---|---|
+| gate | 18% | **4%** | `INTAKE_FACT.bringer` (3 of 7 entries!) · an authored spark · `WILDCARD_NOUNS` · `SPARK_WHERE` |
+| charcoal | 19% | measuring | a goods atom **and** `SPARK_WHERE`'s "by the charcoal camps"; the writer then coins "charcoal-burner" as a trade |
+
+### Watch for DISPLACEMENT
+When `gate` fell 18→4, `ford` rose 10→20 on a small sample. Pruning one prop may just concentrate
+the next. Re-census the whole distribution after every fix, never just the prop you removed.
+
+### A trope can also come from a RULE
+`gate` had a prompt-side helper: §12 read *"whose servant, whose kin, who they answer to"*, and
+**"whose kin" came back as the bare noun** the designer complained about (*"A Lingthorpe kin will
+pay coin"*). L13 — instances inside a rule leak. Check the rule's own example words before blaming
+a pool.
