@@ -5,7 +5,7 @@
 // Prints a lint summary and writes the cards to --out.
 import OpenAI from 'openai';
 import * as fs from 'node:fs';
-import { lintCard } from './cardlint.js';
+import { lintCard, INFO_CODES } from './cardlint.js';
 import { MOTIVES2 } from './motives2.js';
 import { SHAPES } from './shapes.js';
 import { STRUCTURES } from './structures.js';
@@ -39,6 +39,12 @@ for (let r = 0; picks.length < n; r++) { let added = false;
 const TOKEN: Record<string, string> = { 'coin': 'coin', 'a person who may join the company': 'a recruit',
   'the pick of what the job turns up': 'salvage-rights', 'first claim on what the road yields': 'salvage-rights',
   'whatever worth the work shakes loose': 'salvage-rights', 'a person taken': 'a captive' };
+
+/** Dealt fields the PROMPT ORDERS the card to carry as a fact. motives2.ts reshaped `tell` into an
+ *  observable precisely so that copying it is harmless ("it IS the card's concrete particular"), so a
+ *  verbatim lift of it is telemetry, not a defect: it is reported as `dealt-restate`, never as
+ *  `dealt-paste`. Every other dealt field is a FRAME the card must never print. */
+const RESTATE = ['seen'];
 
 /** The fields DEALT to the writer for call k — the ones a card must never print verbatim.
  *  Built once so the payload and the lint see exactly the same values. */
@@ -74,8 +80,8 @@ const md: string[] = [`# ${promptPath} — n=${picks.length}${useStructure ? ' �
 for (const { i, k, o } of res.sort((a, b) => a.k - b.k)) {
   if (!o) { md.push('## PARSE FAIL\n'); continue }
   const s = String(o.situation ?? '');
-  const f = lintCard(s, i, 'rite', dealtOf(k));
-  if (!f.length) clean++;
+  const f = lintCard(s, i, 'rite', dealtOf(k), RESTATE);
+  if (!f.some(x => !INFO_CODES.has(x.code))) clean++;   // informational codes do not spend the clean rate
   for (const x of new Set(f.map(y => y.code))) tal[x] = (tal[x] ?? 0) + 1;
   md.push(`## ${k + 1} · ${i.archetype} · ${i.gravity} · ${s.split(/\s+/).length}w`);
   if (useStructure) md.push(`\`structure:\` ${STRUCTURES[((k + seed) * 11) % STRUCTURES.length]}`);

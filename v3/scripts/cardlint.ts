@@ -43,6 +43,10 @@ const PLAIN_TRADES = new Set(['foreman','shepherd','ferryman','beekeeper','mille
 
 export interface Flag { code: string; detail: string }
 
+/** TELEMETRY, NOT DEFECTS — codes a caller should report but not count against a card's clean rate.
+ *  Keeping them out of the headline number is what keeps run-to-run clean rates comparable. */
+export const INFO_CODES = new Set(['dealt-restate']);
+
 /** THE DEALT PAYLOAD, as the harness hands it to the writer (runprompt.ts `userOf`). Optional so the
  *  3-arg signature keeps working. Any string field is checked; the keys below are just the ones the
  *  harness deals today — the check is over VALUES, not over a whitelist of names. */
@@ -65,9 +69,13 @@ export type DealtFields = Record<string, string | undefined>;
  *  overlap anywhere in the corpus is 4 ("he asks you to"), so 5 sits one word clear of the observed
  *  maximum rather than on top of it.
  *
- *  `seen` is EXEMPT BY CONSTRUCTION, not by special-casing: the prompt tells the writer to restate
- *  that fact in its own words, and a paraphrase shares no 5-word run and is not a containment, so it
- *  cannot trip any rule above. Only a verbatim lift does — which is the defect. */
+ *  A PARAPHRASE NEVER TRIPS ANY RULE — it shares no 5-word run and is not a containment. Only a
+ *  verbatim lift does. That matters because some dealt fields are facts the prompt ORDERS the card
+ *  to restate; those are declared by the caller in `restate` and reported under the separate,
+ *  informational code `dealt-restate`, so that a licensed lift never contaminates the clean rate of
+ *  `dealt-paste`. MEASURED on the three fixtures: with licensed fields folded in, the check fires
+ *  24/24 · 24/24 · 19/24 on bad/bad/good — no discriminative power. Split out, `dealt-paste` fires
+ *  12/24 · 22/24 · 1/24. The split is what makes the check worth having. */
 const normWords = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean);
 const RUN = 5;          // consecutive shared words (corpus max accidental overlap: 4)
 const OPEN_PREFIX = 4;  // words of the value the card may not open on (corpus max accidental: 3)
@@ -85,37 +93,41 @@ function longestSharedRun(a: string[], b: string[]): { n: number; at: number } {
  *  Shape-based, so it covers any future label pool without naming one. */
 const isLabel = (v: string) => /^[A-Z][A-Z0-9]*(-[A-Z0-9]+)*$/.test(v.trim()) && v.trim().length >= 3;
 
-export function dealtPasteFlags(situation: string, dealt: DealtFields): Flag[] {
+export function dealtPasteFlags(situation: string, dealt: DealtFields, restate: string[] = []): Flag[] {
   const s = situation.trim();
   const cardW = normWords(s);
   const card = cardW.join(' ');
-  const hits: string[] = [];
+  const hits: string[] = [], licensed: string[] = [];
+  const bin = (k: string) => (restate.includes(k) ? licensed : hits);
   for (const [key, raw] of Object.entries(dealt)) {
     const v = typeof raw === 'string' ? raw.trim() : '';
     if (!v) continue;
     // 1. LABEL TOKEN — a dealt category label printed as if it were a word of the card.
     if (isLabel(v)) {
-      if (new RegExp(`(^|[^A-Za-z0-9-])${v}([^A-Za-z0-9-]|$)`).test(s)) hits.push(`${key}=label "${v}"`);
+      if (new RegExp(`(^|[^A-Za-z0-9-])${v}([^A-Za-z0-9-]|$)`).test(s)) bin(key).push(`${key}=label "${v}"`);
       continue;
     }
     const vw = normWords(v);
     if (vw.length < 2) continue;
     const val = vw.join(' ');
     // 2. WHOLE VALUE, verbatim, anywhere in the card.
-    if (` ${card} `.includes(` ${val} `)) { hits.push(`${key}=verbatim "${v}"`); continue }
+    if (` ${card} `.includes(` ${val} `)) { bin(key).push(`${key}=verbatim "${v}"`); continue }
     // 3. THE CARD OPENS ON IT — a head paste, even if the writer trailed off after a few words.
     if (vw.length >= OPEN_PREFIX && `${card} `.startsWith(vw.slice(0, OPEN_PREFIX).join(' ') + ' ')) {
-      hits.push(`${key}=opens-on "${vw.slice(0, OPEN_PREFIX).join(' ')}..."`); continue;
+      bin(key).push(`${key}=opens-on "${vw.slice(0, OPEN_PREFIX).join(' ')}..."`); continue;
     }
     // 4. A LONG VERBATIM RUN — a partial lift with a word swapped or an ending trimmed.
     const { n, at } = longestSharedRun(cardW, vw);
-    if (n >= RUN) hits.push(`${key}=run${n} "${cardW.slice(at, at + n).join(' ')}"`);
+    if (n >= RUN) bin(key).push(`${key}=run${n} "${cardW.slice(at, at + n).join(' ')}"`);
   }
-  return hits.length ? [{ code: 'dealt-paste', detail: hits.join(' / ') }] : [];
+  return [
+    ...(hits.length ? [{ code: 'dealt-paste', detail: hits.join(' / ') }] : []),
+    ...(licensed.length ? [{ code: 'dealt-restate', detail: licensed.join(' / ') }] : []),
+  ];
 }
 
 
-export function lintCard(situation: string, input: QuestWriteInput, form: CardForm = 'rite', dealt?: DealtFields): Flag[] {
+export function lintCard(situation: string, input: QuestWriteInput, form: CardForm = 'rite', dealt?: DealtFields, restate: string[] = []): Flag[] {
   const CAP = CAPS[form];
   const f: Flag[] = [];
   const s = situation.trim();
@@ -233,7 +245,7 @@ export function lintCard(situation: string, input: QuestWriteInput, form: CardFo
 
   // ── THE CARD PRINTED WHAT IT WAS DEALT (see dealtPasteFlags). Only runs when the caller hands the
   // dealt payload through; the 3-arg callers are unaffected.
-  if (dealt) f.push(...dealtPasteFlags(s, dealt));
+  if (dealt) f.push(...dealtPasteFlags(s, dealt, restate));
 
   return f;
 }
