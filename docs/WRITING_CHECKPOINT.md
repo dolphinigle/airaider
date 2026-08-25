@@ -1,8 +1,20 @@
-# ✅ WRITING-QUALITY CHECKPOINT — 2026-08-25
+# 🔒 WRITING-QUALITY CHECKPOINT — LOCKED 2026-08-25
 > **DESIGNER SIGN-OFF: "i think the quality of writing is good now! That's VERY important."**
 > This file marks the state the writing was in when the designer approved it. **Do not regress past
 > this line.** If card prose ever reads worse than the samples below, something in this checkpoint
 > was undone — diff against it before debugging anything else.
+
+**STATUS: LOCKED.** The prose bar below is settled. Later work may OPTIMIZE the prompts (cut dead
+weight, tighten for cheap models) but must not lower this bar — re-run the §6 check after any edit.
+
+### The finding that closes this phase
+**Craft is no longer the bottleneck; PREMISE is.** Our prose now beats the reference
+sentence-for-sentence (a gold rite resolves in *"Didn't win, run fast"*; our lead-ins carry *"the rug
+had been pegged to the floor with a long iron nail driven through its weave, stopping hands from
+lifting it quietly"*). But «The Poet's Lamb» is *about* something — a man has a lamb, and every time
+you try to think about the lamb something pushes your mind away, and its FAILURE text is the horror.
+Ours is a fetch-quest with good lighting: their card has a **question**, ours has an **errand**.
+That gap is what §5's open rulings are for. Do not try to close it with more prose rules.
 
 Read with: `docs/PROMPT_RULES.md` §12 (the rules) · `docs/PROSE_METHOD.md` (principles + protocol).
 
