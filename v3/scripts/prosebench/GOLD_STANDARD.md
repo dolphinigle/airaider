@@ -1,138 +1,366 @@
-# GOLD STANDARD — the texts the prompt is trying to reproduce
+# GOLD STANDARD — rebuilt 2026-08-24 from the WHOLE official corpus
 
-Two tiers, **both endorsed**. Tier 1 the designer supplied or explicitly praised; tier 2 the designer
-reviewed and ruled on with *"all look good though"* (2026-08-24), so it is authoritative too. The tier
-split is kept only to record HOW each text was endorsed, not to rank them.
+**Why rebuilt.** The previous version was 46 texts: the designer's four transcribed quests plus
+endorsed random-EVENT intros. Two problems. (1) Random events are end-of-day choice cards, not the
+assign-characters quests our game actually generates. (2) A later sample of the corpus skewed heavily
+toward cards about people the player already knows, and the designer flagged it: *"more variety pls
+instead of everyone about 'ppl you already know'"*.
 
-Provenance: tier-1 quests from `research/samples_sultans.md` PART 3 / the designer's own transcription
-(`REFERENCE_SULTANS_RESULTS.md`); event intros from PART 4 (Steam guide 3464000283, cross-matching
-the wiki's Random_Events page). PART 4 fidelity to the shipped English is unverified — see
-`research/README.md`. All are Sultan's Game.
+**Method.** All 1,446 official-English rite intros were classified. The subset that matches OUR
+mechanic — **≥2 character slots AND a dice check** — is **389 rites**. That is the true analogue: a
+job you staff from your roster and resolve with dice. Representatives below were chosen to span both
+LENGTH and SUBJECT, deliberately weighted away from the personal-relationship cards.
 
-## MEASUREMENTS
-| set | figures |
+## Measured, on the 389 job-like rites
+| metric | value |
 |---|---|
-| Tier 1 — 4 designer quests (intros) | n=4 · words 15/22/54/59 · sentences 1/3/2/1 · w/sent 15.0–29.5 |
-| Tier 1 — 7 endorsed event intros | n=7 · words med 42 (p25 32, p75 43, range 24-45) · sentences med 2 (p75 2) · w/sent med 17.5 |
-| Tier 2 — 35 further event intros | n=35 · words med 50 (p25 37, p75 66, range 17-137) · sentences med 3 (p75 5) · w/sent med 17.0 |
-| All 42 event intros | n=42 · words med 46 (p25 35, p75 64, range 17-137) · sentences med 3 (p75 4) · w/sent med 17.1 |
+| words | median **28** · p25 19 · p75 45 · p90 66 |
+| addresses the player (you/your) | **74%** |
+| contains a name | **64%** |
 
-**What this changes versus the guideline written from the four quests alone:** the card band is
-wider and the centre is HIGHER — median 46 words, not ~25 — and **four sentences occur** (p75 = 4),
-so "1–3 sentences" was too tight. Words per sentence (17.0) sits inside the existing 10–30 band,
-above the 15 centre. `GUIDELINE.md` A3/A4 updated accordingly.
+For context, across all 1,446 rites: 86% have ≥2 slots, 27% carry a dice check, 69% address the
+player. Our generated cards score 0% on both address and names.
 
 ---
+# THE JOB-LIKE GOLD STANDARD (n=389; representatives below)
 
-# TIER 1 — ENDORSED BY THE DESIGNER
+### «Hunters' Remnants»  [26w · 7 slots · 0 branches] · addresses you, named person
 
-## The four quests (full intro + result; see `REFERENCE_SULTANS_RESULTS.md` for the complete records)
-Managing the Estate · Divine Stallion · Project Investment · Major Construction.
-Designer's caveat on Divine Stallion, preserved: *"a rather hard to read one compared to the rest"* —
-structure reference, not a style target.
+> Your search leads to a nomad-hunting outpost disguised as an ordinary farmstead. Behind its heavy gates, armed hunters prepare for your arrival. 
+Steel yourself for blood.
 
-## The seven event intros the designer read and called "very good and interesting"
+**slot lines:**
 
-> A bored noble in the city sent his two slaves into the desert, betting on which slave would live longer. Would it be the strong man who had lost an arm, or the weak woman?
+> · Nomad Slave Hunters
 
-> A colleague from the court came to your home for a feast. Probably having drunk too much, he drunkenly vented his grievances to you and began to recklessly complain about the Sultan...
+> · Nomad Slave Hunters
 
-> A lavishly dressed man suddenly appeared at your door, gesturing to indicate he was an exiled foreign prince and hoping for your support to return home, promising a reward afterward. Whether or not there would be a reward, you knew there was definitely a trick...
+> · Riel's blade thirsts for blood
 
-> A noble presents the Sultan with a strange beast: it has the head of a deer, the body of a leopard, and the tail of a pheasant. The Sultan is very intrigued by the creature and asks you how to interpret it.
+> · Riel's Subordinates
 
-> A peculiar man claiming to be an inventor seeks an The Grand Game, presenting a mechanical bird made of metal. The bird can tell time, fly, and preen its feathers. He hopes the Sultan will buy it with its weight in gold.
+> · You can go yourself, or dispatch any follower to fight alongside her
 
-> A person suddenly approaches you, showing you a bundle of old items, claiming they are treasures passed down from your ancestors and asking you to buy them back. You inspect them; some are good, some are clearly fake, but some seem worth appreciating.
 
-> At midnight, you hear a knock on your door. A young, beautiful woman dressed seductively appears shyly asking to spend the night with you...
+### «Wealthy Troll»  [30w · 5 slots · 0 branches] · addresses you
+
+> You've heard of a gold mine ruled by trolls... but can trolls even mine? It's the first time you've ever heard of such a thing – though it's not important.
+
+**slot lines:**
+
+> · Do trolls like gold too?
+
+> · You must insert a Conquest Card to command the army and avoid punishment
+
+> · You can go yourself, or dispatch any follower to lead the attack
+
+> · You must have an army at your command to wage war.
+
+> · Certain items can be useful in combats.
+
+
+### «General Night Hunt»  [33w · 4 slots · 0 branches] · named person
+
+> A general, eager for adventure and challenge, has found the perfect hunting ground. Now, hand over the Conquest card and wait for him to bring back the beast’s head after his killing spree.
+
+**slot lines:**
+
+> · The General's blade thirsts for the blood of adventure.
+
+> · Fierce Beast
+
+> · You can also join this hunt.
+
+> · You must present a Conquest Card of Bronze or lower tier, as promised to Jabal.
+
+
+### «Battle at the Wolves’ Den»  [18w · 4 slots · 1 branches] · addresses you
+
+> Ultimately, human wisdom prevailed. You successfully located the wolves' lair, forcing the wolf king to confront you directly.
+
+**slot lines:**
+
+> · You can either go yourself or dispatch a strong enough follower to hunt.
+
+> · An extra companion, a better chance of success.
+
+> · Some things might come in handy during the hunt.
+
+> · You can take this to break a Conquest Card of Bronze tier or lower
+
+
+### «Divine Stallion»  [54w · 3 slots · 0 branches]
+
+> Someone swore that they had seen a pure black horse in the wilds east of the city. It was elegant and slender, with satin-like hair that shone as it ran, seeming to fly with the wind despite lacking wings. Many hunters tried to track it down and tame it, but they all returned empty-handed.
+
+**slot lines:**
+
+> · You can go yourself or send an experienced hunter.
+
+> · More companions, more help.
+
+> · Some things might come in handy during the taming.
+
+
+### «Forest of the Jinn»  [50w · 6 slots · 8 branches] · addresses you, named person
+
+> Legends say the jinn are as beautiful as they are cruel, yet many claim to have won the Jinn Queen's treasures through wit and deceit... Jabal’s notes speak of a wager: triumph, and the jinn will be trapped to serve you... You wonder what the cost of failure would be.
+
+**slot lines:**
+
+> · Will the adventurous general come here this time?
+
+> · A guide, with at least 4 in Survival.
+
+> · A bulwark, with at least 4 in Combat.
+
+> · To deal with the jinn's trickery, you need someone clever, with at least 4 in Wisdom.
+
+> · To engage the Jinn Queen, you need a messenger with at least 4 in Charisma.
+
+
+### «Raider's Hideout»  [44w · 6 slots · 4 branches] · addresses you, named person
+
+> Following Fatuna's directions, you come to a noble winery... a winery that looks very peaceful. Is this the attacker's lair? Perhaps. You look at Fatuna... This is clearly a property dispute between nobles, but in the Sultan's Game, you can do whatever you want.
+
+**slot lines:**
+
+> · Fatuna wants you to help her.
+
+> · You have to handle this yourself.
+
+> · You can take any follower you want, as long as it's helpful
+
+> · You can bring any followers you want, as long as they can help.
+
+> · Some things come in handy in combat.
+
+
+### «Innocent Victim»  [22w · 6 slots · 4 branches] · addresses you, named person
+
+> While fretting over what the cultists might do with your Conquest Card, you hear reports of a terrifying monster ravaging your territory...
+
+**slot lines:**
+
+> · Predator
+
+> · Captive Followers
+
+> · The Sultan Card you gave the cultists
+
+> · You must face this monster yourself
+
+> · You can seek assistance
+
+
+### «Food Relief»  [21w · 3 slots · 3 branches] · addresses you, named person
+
+> Again, the hungry poor squeeze outside the tent waiting for your alms. Following Aziz's advice, you entrust today's porridge to Inal.
+
+**slot lines:**
+
+> · It costs at least 5 Gold Coins.
+
+> · You put Inal in charge of today's porridge.
+
+> · You instruct Aziz to maintain order today.
+
+
+### «Sultan's Demand»  [21w · 5 slots · 1 branches] · addresses you, named person
+
+> Today, you face the most common, difficult and urgent task of the cabinet – the Sultan will approach for demanding money.
+
+**slot lines:**
+
+> · Vizier Abdul's Seat
+
+> · Strive to rebuke. (Don't have to persuade Abdul, just make sure the Sultan won't have you put to The Boats)
+
+> · Give money, agree with Abdul's approach
+
+> · Consumable
+
+> · Only a Gold-tier Bloodshed Card can eliminate the Vizier.
+
+
+### «Stop Now»  [37w · 7 slots · 4 branches] · addresses you, named person
+
+> You don't believe you've done anything wrong - just some drunken words, a momentary slip. You're even willing to apologize - but the Roaming Swordsman refuses. His dead sisters never wanted apologies. Tonight, he must kill you.
+
+**slot lines:**
+
+> · Roaming Swordsman
+
+> · Rage Incarnate
+
+> · You can go yourself, or dispatch any follower to face him
+
+> · You can go yourself, or dispatch any follower to face him
+
+> · There are things that can help you get through a crisis.
+
+
+### «Royal Chef»  [19w · 3 slots · 0 branches] · addresses you, named person
+
+> "Do you think you should have a chef better than mine?" the Sultan asks as he leaves your guesthouse...
+
+**slot lines:**
+
+> · The Sultan demands your skillful chef
+
+> · Are you considering sending someone to convince the Sultan to let Habib remain at your guesthouse?
+
+> · Consumables to help persuade the Sultan.
+
+
+### «Opportunist»  [21w · 3 slots · 0 branches] · named person
+
+> After reading the parchment, his face drains of color. "But I'm... comfortable now," he stammers. "This could cost me my head..."
+
+**slot lines:**
+
+> · Noble or Swordsman
+
+> · Consumable
+
+> · Testaments to Bygone Oaths
+
+
+### «House of Delights»  [42w · 5 slots · 1 branches] · named person
+
+> The city's brothel, said to have a history older than the city's walls and palace. Regardless, it's a good place to break the Sultan Cards, because no matter how beautiful and praised they are, they are just playthings indulged in for money.
+
+**slot lines:**
+
+> · Many practice with Junah before marriage to gain confidence when facing their wife.
+
+> · Pay her 2 Gold Coins to become her guest. If you pay double, you can break an Extravagance Card in the corresponding tier.
+
+> · One person for physical joy and a companionship of double person is to gamble, you can't ask someone else to help you with that right?
+
+> · You can use this opportunity to break a Sultan Card of no higher than the Stone tier – Carnality, Bloodshed, Extravagance… or simply to seek pure joy.
+
+> · Certain items can help you perform better...
+
+
+### «The Grand Hunt»  [35w · 17 slots · 19 branches] · addresses you
+
+> The season of the hunt has arrived. Among nobles, this is the time to boast of their falcons or hounds, yet you have something rarer to display: a skilled hunter-slave whose prowess outshines any beast.
+
+**slot lines:**
+
+> · Gullis shall serve as the Hunting Guide.
+
+> · Guests to Invite – Noble allies with Combat no less than 3.
+
+> · Gullis shall serve as the Hunting Guide.
+
+> · Gullis shall serve as the Hunting Guide.
+
+> · And of course, his loyal hounds must be included.
+
+
+### «Struggle Among Slave Girls»  [52w · 2 slots · 1 branches] · named person
+
+> The Sultan does sometimes take an interest in his slave girls, and once, passing by Arzuna, his gaze lingers on her slender waist. Everyone notices—eunuchs, slave girls, scribes, and nobles. It's a flicker of hope... and a tightening noose. For the other slave girls, watching a peer rise is agony beyond killing.
+
+**slot lines:**
+
+> · You may do it yourself, or have a palace-eligible noble to take care of it.
+
+> · Bribe the eunuch for just 5 Gold Coins.
+
+
+### «A Delicacy»  [13w · 4 slots · 13 branches] · named person
+
+> The Sultan has prepared a courtly banquet... Share this weighty favor alongside Hassan.
+
+**slot lines:**
+
+> · A Poet's Tribute
+
+> · The Wretched Hassan
+
+> · The Wretched Witness
+
+> · Consumable
+
+
+### «Biding Your Time»  [26w · 6 slots · 0 branches] · addresses you, named person
+
+> If the time is right, you can send a message to Consort Ansuya, who will steal the Sultan's ring, creating an opportunity for your regicide plot.
+
+**slot lines:**
+
+> · Ansuya's personal maid.
+
+> · Mute Bells
+
+> · Regicide Plot
+
+> · You can do this job yourself, or send any of your followers to do it.
+
+> · Perhaps a secret passage, or bribes for the guards.
+
+
+### «Reckless Revenge»  [65w · 9 slots · 0 branches] · addresses you, named person
+
+> Aziz has completely betrayed you, now hiding in the shantytown outside the city, a large group of barbarians have gathered around him, these muscle-brained brutes claim Aziz is their tribal leader – the slave merchant who sold him to you never mentioned this!
+
+A few slaves frantically tell you they've heard Aziz plans to gather a band of thugs and kill you personally for revenge.
+
+**slot lines:**
+
+> · He is no longer a slave, but a leader.
+
+> · Their tribe has been destroyed by the Sultan, but their beliefs have not.
+
+> · They blindly follow the strongest leader.
+
+> · Aziz had submitted to fate, but for her, he could change everything again.
+
+> · Aziz has been waiting for a chance for revenge...
+
+
+### «The Poet's Lamb»  [53w · 5 slots · 6 branches] · addresses you, named person
+
+> As the cups are raised and laughter flows, you find yourself speaking with Hassan about his little lamb... When did it begin following him? How old could it be? Yet the moment the questions form, a strange presence seems to nudge you away, pushing those thoughts back into the mist where they belong.
+
+**slot lines:**
+
+> · Hassan
+
+> · You must set foot there in person.
+
+> · Consumable
+
+> · Characters tied to Hassan by unseen forces.
+
+> · Characters tied to Hassan by unseen forces.
 
 
 ---
+# WHAT THIS SET SHOWS THAT THE OLD ONE DID NOT
 
-# TIER 2 — ENDORSED BY THE DESIGNER AS A SET ("all look good though", 2026-08-24)
+1. **Most job cards are about STRANGERS.** "This Freeman Hunting Band operate from a riverside
+   outpost. As you approach, they're unloading weapon crates from moored vessels — steel will decide
+   this day." No prior relationship, no named face. The earlier claim that the reference works only
+   because the player knows everyone was an artefact of a skewed sample.
+2. **The wry aside is everywhere, including in grave work.** "You've heard of a gold mine ruled by
+   trolls... but can trolls even mine? It's the first time you've ever heard of such a thing —
+   though it's not important." The card mocks its own premise and keeps going.
+3. **Closers lean rather than settle**, in several distinct ways: a flat threat ("steel will decide
+   this day"), a self-answered question ("Is this the attacker's lair? Perhaps."), a worry ("You
+   wonder what the cost of failure would be"), a failed precedent ("all returned empty-handed").
+4. **Slot lines carry the ask openly**, and their register is plain: "A guide, with at least 4 in
+   Survival." · "A bulwark, with at least 4 in Combat." · "To deal with the jinn's trickery, you
+   need someone clever, with at least 4 in Wisdom." · "More companions, more help."
+5. **Subject range is wide**: court demands, a duel you cannot refuse, beast hunts, expeditions to
+   ruins, raids on a rival's hideout, famine relief, a rival ruining your name, a slave-girl's
+   dangerous good luck. Ours are almost entirely "a thing is missing / a person left".
+6. **Length is bimodal by stakes, not by rule** — 12-22w for routine beats, 45-65w when a saga turns.
 
-Sorted short to long.
-
-> [17w] The Sultan, in a whimiscial mood, asks you to judge the most beautiful female in his harem...
-
-> [20w] Recently, several wells in the royal city have suddenly turned bitter, prompting many complaints. The Sultan asks for your opinion...
-
-> [21w] A poet kept by a nearby clan has been writing satirical poems about you lately, annoying and persistent like a fly.
-
-> [21w] Recently, a highly explicit picture book has been circulating secretly in the city, with you and the Sultan as the protagonists...
-
-> [23w] Your farmers are worried because somsone has recently drawn many mysterious sigils near their homes... Perhaps wise Master, you can find something out?
-
-> [23w] Your neighbor, a scholar, complained that your feast was too noisy, interrupting his creative flow and preventing him from finishing his great work!
-
-> [35w] Someone accuses their neighbor of smashing a sacred stone they carry- a relic housing their family's good. The neighbor fires back, furious, calling it a sham- anyone can see it's just a common cracked rock!
-
-> [35w] Your neighbor- a fool who always competes with you- beats his own wife's face just to warn her not to talk to someone like you (a man who commits adultery with women using magician cards).,
-
-> [37w] Earlier, when you were still prosperous, you lent some moeny to a friend. Now, in your time of need, he found various excuses to refuse... The newly bought gemstone ring swayed in front of you, particularly annoying.
-
-> [37w] Several friends from your old school gather at your home. After a few drinks, you all discuss a topic that had sparked debates back then: What distinguishes humans from animals - the soul, intellect, body, or divinity?
-
-> [39w] In the city, a noble's mansion suddenly caught fire! The lady of the house cried out that her pet cat was still inside, but people were holding her back, saying it's not worth risking her life for a cat...
-
-> [41w] A strangely dressed itinerant monk claimed that you have a connection to the god he worships, and wanted to give you an ancient statue. The statue had a serene and compassionate look, but you always felt something was off about it...
-
-> [45w] A strange merchant invites you to invest in their caravan. They plan to depart soon, traveling along the coast to transport Eastern goods to the distant North... If they arrive smoothly, a hefty profit awaits. However, long-distance trade journeys are always fraught with various risks.
-
-> [46w] On the street, a peculiar man stops you and invites you to join a mysterious game... He tells you that if you successfully complete it, you will receive a rare treasure, and the game is very simple, with every step clearly written in this ancient manual...
-
-> [46w] When disaster struck, you and your wife dismissed most of the servants to keep them from being caught up in this cruel game. Unfortunately, not everyone appreciated your goodwill ;one person stole some money... Luckily, he was caught just as he was about to spend it.
-
-> [48w] Someone beats drums and gongs at your doorstep, singing hymns loudly. As you open the door, a group of children shower you with white flowers and shout 'Hooray' and 'Thank you.' Before you figure out what's going on, they pull out a donation banner 'for the pure children'...
-
-> [50w] It's about to rain heavily, and a group of passing travelers  hope to rest under your roof. They look weary and travel-worn. However, you notice faint bloodstains on the hems of their cloaks and the outlines of their weapons under their tarps. They are certainly not ordinary Merchants... you decide?
-
-> [50w] You recently discovered that the soldiers' training performances have been extremely slack. Upon investigation, you found out that someone has been spreading an evil belief among them, teaching them to seize the comfort and glory of this world and not to worry about the crises and depravity of the afterlife...
-
-> [51w] Envoys from a neighboring country come to request permission from the Sultan to establish a trade route. They want to transport the rice and spices from the Sultan's lands to their own coutnry. This trade deal is certainly beneficial, but the neighboring country is experiencing a famine, making price negotiations tricky...
-
-> [55w] Maggie had a beloved piece of jewelry stolen-who could have done it? Inal, the maid who came with her dowry, has the easiest access to her jewelry box; and the boy, Zephyr, often runs errands in the city and can easily fence stolen goods... Or... could it be a friend who recently visited your wife?
-
-> [55w] Two people in the city are arguing. One claims that his neighbor stole his sheep, while the neighbor says that he abandoned the sick lamb, and if not for him taking it in and treating it, the lamb would have died in the desert... They ask you to judge who the sheep should belong to.
-
-> [56w] Someone entrusts their child to a sandfolk tribe with some trade ties, convinced that growing up in the desert toughens the body and sharpens the mind. But after an undeard-of sandstorm sweeps through, the sandfolks tell him the child vanishes- a gentle way of putting it. Everyone knows no kid survives alone in that merciless desert...
-
-> [58w] This morning, Maggie seemed very troubled. She said she had a nightmare where she was on a small boat with a dog, a rope, and a flute. The boat was drifting on the sea, and she felt increasingly afraid but didn't know how to sue these three items. She seeks your comfort. How would you explain the dream?
-
-> [59w] There is a dispute at the city gate. After inquiries, you learn these travelers want to enter the city for pilgrimage but cannot provide a guarantee. The guards firmly insist they might be spies and refuse entry. A guarantee? You've never heard of a city entry guarantee. Maybe it's a new ruse by the soldiers to extort. You decide...
-
-> [64w] A poor man complains that he invested all his savings to help his brother start a business, which has since prospered. However, his brother now refuses to share any of the profits. While his brother has grown wealthy, he struggles to even provide for his daughter. The brother, now a successful merchant, angrily insists that the borrowed money was repaid in full years ago.
-
-> [65w] Someone presented a popular booklet from the market, which told a legendary love story between a king and a fallen princess. In the story, the princess, having lost her country, has to work as a washerwoman. She meets the handsome monarch by the river while washing clothes, and the two overcome many difficulties to find happiness. The Sultan asks what you think of this matter...
-
-> [66w] A noble stopped you, hoping you could tell him the tier of himself and his archenemy. You recalled his name and made a judgment silently in your heart- he was just a Bronze-tiered young man, and his archenemy, who was about to inherit the family property, would soon reach Silver tier. "Your archenemy is Silver tier, as for you..." You hesitated whether to tell the truth.
-
-> [66w] Someone pounds on your door, staring at you with hollow eyes. "A demon nests in your heart... It gnaws at you, bends you, and, in the end, devours your soul, turning you into a puppet of its will... Only I can save you, only I can save you." His eyes twitch wildly. "Let me split your chest open - let me rip it out for you."
-
-> [70w] A river that flowed through the territories of two Nobles suddenly changed its course recently. Now it flows through one Noble's land but hardly through the other's. The latter presented this matter to the Sultan, requesting an adjustment of their land borders. He is willing to cede a larger piece of land in exchange for the area where the river flows. The Sultan asked what you think about this matter...
-
-> [83w] A plainly dressed man angrily blocks your path. You remember him as the young prisoner you rescued from jail for speaking against the Sultan. During this time out of prison, he has figured out the current situation- you have become a player of the Sultan's Game! "How can you do this?" he appears deeply disappointed, "I never thought I was rescued by someone like you... I'd rather go back to prison and wait for that Bloodshed card pointed at me! Ha, it's absurd!"
-
-> [85w] The sultan had a strange dream that left him unsettled. He asked you to interpret the dream for him. In the dream, the Sultan saw a beautiful woman standing on the edge of a cliff. As he approached her, she began to slowly jump off the cliff, and he ran to see her shattered body below. Then, he suddenly saw the woman standing next to him again, jumping off the cliff and shattering once more. This scen repeated countless times until he finally woke up.
-
-> [92w] A wanton Noble lady demands the Sultan's judgment on her marriage. She married a Noble, but the husband, feeling insecure about his performance inb ed, secretly had his brother fulfill his marital duties. The Noble lady didn't realize that the nightly visitor wasn't her husband until her husband died unexpectedly in a fall, and the unaware brother sneaked into her bedroom that very night! Now, the enraged and grieving Noble lady demands the entire property of her deceased husband's family - including the brother's share - as compensation for the family's deceit.
-
-> [97w] At a court meeting, a minister pleads for aid as disaster strikes his territory, seeking funds from the Sultan. The courtiers immediately mock him, saying he deserves his fate - years ago, after struggling with infertility, he made a sacred vow to a deity. He had promised to give up his third child in exchange for divine blessing. The deity answered his prayers, granting him children. But when his third child was finally born, a father's love stayed his hand from fulfilling the sacred vow. Now his lands suffer under divine wrath - punishment for his faithlessness!
-
-> [109w] A maid takes a great risk to ask for your help. The mistress of her lord, a tax collector, went back to her hometown with her child some time ago and never returned. After a brief investigation, her hometown people claimed they had never seen her. The official handling the case thus ruled that the tax collector murdered her to get her dowry and fabricated her disappearance. But the maid insists her master would never do such a thing; he and his wife have always been very loving. She heard you are a rare kind noble and plucks up the courage to seek your help to find the truth.
-
-> [137w] While the bookstore owner and the book seller were bargaining, you noticed a few children slowly approaching you, pretending to look straight ahead but glancing at you like cats crouching near pigeons. So, you pretended to look at the book in the book seller's hand and suddenly reached back to catch a little dirty hand reaching for your belt. You swiftly grabbed the book seller and flipped him to the ground before he could escape. This guy wanted to make twice the money, both from the book and from the cut he got from the thief... Now he and the little thief beg for mercy, saying they were wrong to target your wallet. To demonstrate his sincerity, the man slaps himself while the little thief knocks his head hard. Everyone around is watching... What will you do?
-
-
----
-
-# HOW TO USE THIS
-- Any prompt change is judged by whether its output could sit in TIER 1 without looking out of place.
-- The numbers above are the target distribution, not a single target value. Card size is BIMODAL and
-  scales with the quest (see `GUIDELINE.md` A3/A3b) — a routine job gets a short card.
-- Re-run the containment audit (`GUIDELINE.md`, self-audit section) after ANY edit to the numbers.
-- Both tiers are authoritative. The 42 event intros have **no prose outcomes available** — the Steam
-  guide records their outcomes as stat deltas — so the RESULT-side gold standard is smaller: the four
-  designer quests plus the graded English outcome sets in `research/samples_sultans.md` PART 1
-  ("Catching a Thief", "Charges and Defence", "Absurd Joy").
+# THE OLDER TIERS ARE KEPT BELOW
+The designer's four transcribed quests (`REFERENCE_SULTANS_RESULTS.md`) and the endorsed random-event
+intros remain endorsed and useful — but they are the EVENT form, not the rite form, and their length
+distribution (median 46w) should not be used to size our cards. Use the 389-rite figures above.
