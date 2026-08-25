@@ -179,3 +179,52 @@ fort"/"the asker", which deal a *scene*, not a structure. They pushed "gate" fro
 79% of outputs (control amplified nothing: 42% in, 45% out). Purifying them fixed the leak but
 halved their effect — **concrete tokens get used and leak; abstract tokens are clean and ignored.**
 That tension is w4's copy law seen from the other side, and it caps what any dealt token can do.
+
+---
+# ✅ CORRECTION AND BREAKTHROUGH — the template BREAKS, and no ruling is needed
+*(same session, two arms later. The section above blamed the anonymity ruling. **That was wrong**,
+and I falsified it myself with the arm I had built to price it.)*
+
+**Arm G lifted the anonymity ruling entirely** — people may be named, the already-known may be
+referred to definitely. Result: **24/24 still opened "A …", and the model used almost no names
+(6/24).** Lifting the constraint changed nothing, so the constraint was never the cause.
+
+What it actually is, is our own **§10: a cheap model reads PERMISSION as PROHIBITION.** "You may use
+names" buys nothing. The discriminator is permission vs mandate vs *dealt* mandate:
+
+| arm | what changed | opens `A/An` | distinct 1st words | names | lint-clean |
+|---|---|---|---|---|---|
+| A control | — | 24/24 | 1 | 3/24 | 92% |
+| G | *permission* to name | 24/24 | 2 | 6/24 | 83% |
+| H | *mandate* names, in prompt text | 22/24 | 3 | **16/24** | 88% |
+| **I** | **dealt `openWith` mandate, one per card** | **11/24** | **10** | 6/24 | **92%** |
+| ref | — | 5% | 221/713 | 64% | — |
+
+### The law this establishes
+**A feature is installed by a MANDATE; VARIETY is installed by a mandate that is DEALT.** Prompt text
+can only ever hold one value, so a mandate in prompt text produces one shape (H: names in 16/24, but
+still one opening). The same mandate dealt per call produces N shapes at no quality cost — arm I
+matched the control's 92% clean rate exactly while going from 1 distinct opening to 10.
+
+This is the *corrected* form of what w3 and w4 converged on. They were right that the lever is a
+dealt field; my first implementation failed because I dealt **descriptions** ("open on a physical
+object; let who and why arrive after it") rather than **commands** ("Begin the card with the word
+'You'."). Descriptive tokens are advisory and get overridden by the model's default frame; imperative
+tokens are obeyed. Same field, same rotation — the grammatical mood is the whole difference.
+
+### Remaining defect in arm I — the pool needs tuning, not the mechanism
+~4/24 cards are clumsy where the mandated frame fights the dealt content:
+> "Cleared the barn, a sergeant stands at your gate…" · "A cart, a shipmaster cut, waits at your
+> ford…" · "A hive a woman dragged into Thornhollow's ruin and handed to a man who swore fealty;"
+
+The lint does not catch these — they are grammatical but graceless. The two abstract tokens
+("Begin with a statement of fact that turns out to be about someone", "Begin with the physical
+object") are the main offenders; the concrete ones ("Begin with the word 'You'") are clean. Tune the
+pool toward frames that survive any content.
+
+### What still stands from the section above
+- The monotony measurement itself (96% vs 5%, one distinct first word vs 221) — unchanged and real.
+- **The voice overshoot** — reference 4% voiced vs w4's champion 87% — unchanged and still a
+  designer call.
+- Ruling #1 is still open, but it is now **cheap to price**: names need a MANDATE (H: 16/24), never
+  permission (G: 6/24). The ruling is not blocking variety; it only costs the 64% name rate.

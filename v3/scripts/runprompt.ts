@@ -9,6 +9,7 @@ import { lintCard } from './cardlint.js';
 import { MOTIVES2 } from './motives2.js';
 import { SHAPES } from './shapes.js';
 import { STRUCTURES } from './structures.js';
+import { OPENINGS } from './openings.js';
 import type { QuestWriteInput } from '../src/ai/provider.js';
 
 const arg = (n: string, d?: string) => { const i = process.argv.indexOf('--' + n); return i >= 0 ? process.argv[i + 1]! : d; };
@@ -16,6 +17,7 @@ const promptPath = arg('prompt')!, n = Number(arg('n', '24')), out = arg('out', 
 // --structure deals a CARD-STRUCTURE token per call (structures.ts). OPT-IN: without the flag the
 // payload is byte-identical to before, so earlier runs stay comparable.
 const useStructure = process.argv.includes('--structure');
+const useOpening = process.argv.includes('--opening');
 if (!promptPath) { console.error('need --prompt <file>'); process.exit(1) }
 const system = fs.readFileSync(promptPath, 'utf8');
 
@@ -48,6 +50,7 @@ const userOf = (i: QuestWriteInput, k: number) => {
     opening: i.opening, intake: i.intake, slotCount: i.slotCount,
     shape: SHAPES[((k + seed) * 13) % SHAPES.length],
     ask: m.want, seen: m.tell,
+    ...(useOpening ? { openWith: OPENINGS[((k + seed) * 7) % OPENINGS.length] } : {}),
     ...(useStructure ? { structure: STRUCTURES[((k + seed) * 11) % STRUCTURES.length] } : {}),
   });
 };
