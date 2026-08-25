@@ -207,9 +207,25 @@ const tagVocab = (withQuarry: boolean) => '════ TAG VOCABULARY ═══
 
 const ASK_SPEC = '- ask: EXACTLY slotCount entries — one per soldier the job needs. attribute (str|dex|int|cha|con): what the test truly demands — force→str, stealth or speed→dex, wits→int, parley→cha, endurance→con; extraAttribute (same five) only when the work is genuinely two-natured. favored (ARRAY of 1-3 TAG VOCABULARY words): traits that help. clashing (ARRAY of 0-2, same list): traits that hurt.\n- requiredTag (rare — at most ONE slot per card, most cards none): one TAG VOCABULARY word the job truly DEMANDS; may carry a rank — "word (low|mid|high)" — when mere dabbling won\'t do.';
 
+/** Only the archetype ACTUALLY dealt reaches the model. The old line defined all eight (77 words,
+ *  ~68 of them about jobs not in play) — dead mass for a cheap model (§0) and seven concrete
+ *  instances free to leak (L13). */
+const ARCHETYPE_GLOSS: Record<string, string> = {
+  raid: 'hit a holdout for spoils',
+  capture: 'take someone alive',
+  rescue: 'free someone held',
+  escort: 'guard a journey',
+  investigate: 'uncover a hidden thing',
+  hunt: 'track down a person or beast',
+  contract: 'an agreed task for set pay — the work IS the premise',
+  'lead-hunt': 'sweep for rumors; never promise "further work" — the engine announces leads',
+};
+const archetypeLine = (a?: string): string =>
+  a && ARCHETYPE_GLOSS[a] ? `- archetype: ${a} — ${ARCHETYPE_GLOSS[a]}. The job matches it, specific to this place.` : '';
+
 function oneOffSystem(input: QuestWriteInput): string {
   return [
-    '═══ THE JOB ═══\nYou write ONE job card for a dark-fantasy mercenary-fort GAME. The player is the company BOSS at the fort; ' + (CARD_VARIANT === 'dlg' ? 'the card is the matter arriving in a VOICE — the words of whoever or whatever brought it to the fort, set down for the boss: what is wrong, what they want done, what it pays.' : 'the card is a short briefing TO them ("you"): what came in, what the job is, what it pays.') + ' They read it once and pick which soldiers to SEND — the boss never goes, and the job has not started. Only what has reached the fort goes on the card. GAME WRITING, not literature: every sentence gives the player something to use — the problem, the place, the client, the task, the hands, the pay, or the risk; a mood-only sentence is cut. Plain everyday words a farmhand would say; short sentences, mostly one clause, no semicolons. People stay NAMELESS BY TRADE — a name appears only when this message hands you one, and only for someone the job centers on. Introduce each person by WHAT THEY ARE TO THE OTHERS IN THE MATTER — whose servant, whose kin, who they answer to — never by a bare category standing alone. Where a person has held their place a long time, say so in plain words (a servant of many years, a steward since boyhood) — never a count of years.',
+    '═══ THE JOB ═══\nYou write ONE job card for a dark-fantasy mercenary-fort GAME. The player is the company BOSS at the fort; ' + (CARD_VARIANT === 'dlg' ? 'the card is the matter arriving in a VOICE — the words of whoever or whatever brought it to the fort, set down for the boss: what is wrong, what they want done, what it pays.' : 'the card is a short briefing TO them ("you"): what came in, what the job is, what it pays.') + ' They read it once and pick which soldiers to SEND — the boss never goes, and the job has not started. Only what has reached the fort goes on the card. GAME WRITING, not literature: every sentence gives the player something to use — the problem, the place, the client, the task, the hands, the pay, or the risk; a mood-only sentence is cut. Plain everyday words a farmhand would say; short sentences, mostly one clause, no semicolons. People stay NAMELESS BY TRADE — a name appears only when this message hands you one, and only for someone the job centers on. Introduce each person by WHAT THEY ARE TO THE OTHERS IN THE MATTER — whose servant, whose kin, who they answer to — never by a bare category standing alone.',
     '═══ YOUR INPUTS ═══',
     '- location: the land and its anchor facts. A named landmark may be used bare (never with an epithet); other places come from placeNameSuggestions or coined small places of the land.',
     input.intake ? '- intake: HOW this matter reached the company — a settled FACT: the opening must agree with it, but most cards need NO sentence for it; never quote its wording.' : '',
@@ -219,7 +235,7 @@ function oneOffSystem(input: QuestWriteInput): string {
     input.gravity ? '- gravity: sets TONE only — small jobs read brisk, serious matters straight, only a grave affair reads heavy; when a keyword pulls against it, gravity wins.' : '',
     '- rewardEnvelope: the payout\'s shape — the fiction makes it plausible and the pay plain (they work for PAY, never a payoff-free plea). Goods beyond the pay stay UNNAMED on the card (what the job turns up is the report\'s to tell); no talk of stores or inventories.'
       + (/person/.test(input.rewardEnvelope) ? ' The promised person\'s claim stands on its OWN footing (they have nowhere to return, choose to come, owe a debt, or are lawfully taken): no payer "hands", "grants", or "lets keep" a person they do not hold.' : ''),
-    '- archetype (when given): raid = hit a holdout for spoils; capture = take someone alive; rescue = free someone held; escort = guard a journey; investigate = uncover a hidden thing; hunt = track down a person or beast; contract = an agreed task for set pay (the work IS the premise); lead-hunt = sweep for rumors (never promise "further work" — the engine announces leads). The job matches its archetype, specific to this place.',
+    archetypeLine(input.archetype),
     input.framedCharacter ? '- framedCharacter: the person the job delivers — the ONE person who must carry their given name, FIRST in the situation (grounded there) before any other field may use it; match them exactly (name, pronoun, tags). A dossier or lastSeen means the world knows them: continue their story in NEW words (lastSeen\'s FACTS are settled — captors, place, cause may not change).' : '',
     input.avoid?.length ? '- avoid: the player\'s recent cards — different premise, different props, never a reused name.' : '',
     input.framedCharacter ? TAGS_NOTE : '',
