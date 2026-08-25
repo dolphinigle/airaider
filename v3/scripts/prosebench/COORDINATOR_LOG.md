@@ -594,3 +594,48 @@ persistent cast the reader already knows.
 3. Chasing corpus-wide statistics (names, openings, voice rates) is chasing numbers produced by a
    game structure we do not have. This is L15 with a much sharper edge: **the reference's numbers are
    not targets, and for the context-dependent ones they are not even meaningful for us.**
+
+---
+# 🏆 FINAL RESULT — V3 IS THE NEW CHAMPION, and this one survives the statistics
+Batch 4 was properly powered: 96 cards, 3 seats, **every card of each of our arms judged** (24 each,
+so zero sampling variance on our side). Pooled with batches 2 and 3 — all on the one instrument:
+
+| arm | n | mean | 95% CI | ≥7 |
+|---|---|---|---|---|
+| **V3_both (CHAMPION)** | 46 | **5.80** | [5.39, 6.22] | **13/46 (28%)** |
+| GOLD_endorsed | 22 | 5.70 | [4.84, 6.55] | 9/22 |
+| w2_v43 | 36 | 5.37 | [5.00, 5.74] | 3/36 |
+| P54_control (old champion) | 46 | 5.24 | [4.93, 5.55] | **4/46 (8%)** |
+| GOLD_pool (contaminated) | 24 | 5.11 | [4.35, 5.87] | 6/24 |
+
+**V3 − P54 = +0.57 ± 0.52 → significant**, and the direction is consistent across all three
+independent batches (+0.20, +0.72, +0.64).
+**Hit rate ≥7: 28% vs 8% — Fisher exact two-sided p = 0.0295.** That is the metric the designer
+actually asked about ("get to 8+ as much as you can"), and it is a 3.5× improvement.
+
+Within batch 4 alone the paired per-fixture differences are NOT individually significant
+(V3−P54 = +0.64 ± 0.65). **The result rests on pooling all 46 cards per arm across three batches plus
+the consistent direction — not on any single batch.** Stated plainly so nobody later quotes a
+stronger claim than the data carries.
+
+## What V3 actually is
+`CHAMPION_V3.txt` = P54 with ONE rule changed. P54's `seen` rule said:
+> *"Set it down as a plain fact in its own right… Standing alone as a short sentence is usually
+> better."* — plus a separate line, *"The thing that can be SEEN closes the card. Set it down and
+> stop."*
+
+V3 replaces that with: the closing fact must be **about someone or something already named on this
+card**, and must **leave one thing said earlier untrue, or true in a way nobody meant** — the reader
+revises what they just read rather than merely adding to it. The standalone-closer instruction and
+the "set it down and stop" line are deleted.
+
+Note the honest tension: w2 measured that the already-named constraint *manufactures restatement*
+(L17), and it is right that this is a trade-off. But V3 pairs it with the contradiction requirement,
+and only the PAIR beats the control — referent alone (V1, 4.77) and contradiction alone (V2, 4.33)
+both scored *below* P54. **The two rules cancel each other's failure mode.** Do not ship either half.
+
+## Next round's obvious move (NOT yet tested)
+w2's v43 reaches the same goal by a better-argued route — an ACCOUNT carrying a stated purpose, and a
+BREAK that changes WHY rather than WHAT — and it scored 5.37 without V3's restatement cost. Merging
+V3's contradiction requirement with v43's account/purpose structure is the clear next experiment.
+Per L17, do NOT stack V3's already-named rule on top of v43.
