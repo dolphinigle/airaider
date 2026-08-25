@@ -99,6 +99,20 @@ before checking that it was real and that it discriminated.
 - [ ] **Dogfood via CLI** (`npm run cli -- --ai`), read every call type, iterate.
 - [ ] Then hand to the designer for GUI playtest.
 
+## 4b. ⚠️ DO NOT RE-OPEN — measured decisions that look like easy wins
+Three separate times this session I started to "fix" something the project had already settled
+deliberately. Check here before editing a prompt.
+
+| looks like a win | why it is not |
+|---|---|
+| Making the saga pay a single clause | `rewardEnvelope` is a deliberately **paste-clean pre-shaped string pool** (`game.ts` ~1518) and the prompt mandates pasting it AS GIVEN. A prompt rule fighting it is a contradiction — the exact §0 failure. |
+| Telling the writer to use only ONE keyword | `sampleKeywords` deals 3–4 atoms **on purpose**; pool MIX drives variety. The real defect was *welding* two atoms into one noun, fixed by labelling them by axis in the engine (L18). |
+| Turning on `SHAPE_ROTATION` for resolution closers | It is **lab lineage, measured NET-NEGATIVE** and deliberately not shipped — see commit `27eeb56`: *"Shipped default = diet+stack (4-rule ceiling measured; rotation and fix-stacks net-negative)."* It only fires under `PROSE_VARIANT=r2`; the shipped default is `diet`. |
+
+**Also from `27eeb56`: the resolve prose has a MEASURED 4-RULE CEILING.** Do not add rules there —
+adding a fifth was measured to cost quality. This is why the consequence-ending idea (§5.1) cannot
+simply be written into the resolve prompt.
+
 ## 5. 🔒 OPEN DESIGNER RULINGS (all measured, all blocking further gain)
 1. **May a card state what the FORT stands to lose?** Prompt-side installation is **measured dead** —
    it produced the vocabulary of stakes while regressing `asks you to` 2/24 → 9/24 against a
