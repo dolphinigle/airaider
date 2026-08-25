@@ -518,3 +518,40 @@ genuinely new material at this size no matter how the rule is phrased. Unsolved.
 
 **Known defect it carries**: the `⟨Name⟩ the ⟨trade⟩` stamp is at ~100% — its round-1 unsolved defect,
 untouched. Round 1 says variety is not the bottleneck, so this is accepted for now, not fixed.
+
+---
+# ⚠️ STATISTICAL CORRECTION — batch sizes were too small to rank arms, mine included
+Batch 3 (48 cards) returned V3 6.11, w2_v43 5.44, GOLD **5.11**, P54 5.39 — with **GOLD scoring 5.00
+median where batch 2 gave it 7.00**. Same instrument, same sampling method, an arm that did not
+change. That swing sizes the noise directly.
+
+Pooled across batches 2+3, card-level means with 95% CIs:
+| arm | n | mean | 95% CI | ≥7 |
+|---|---|---|---|---|
+| V3_both | 22 | 5.71 | [5.05, 6.37] | 7/22 |
+| GOLD_endorsed | 22 | 5.70 | [4.84, 6.55] | 9/22 |
+| w2_v43 | 12 | 5.44 | [4.78, 6.10] | 2/12 |
+| P54_control | 22 | 5.23 | [4.76, 5.70] | 2/22 |
+
+Same-arm batch-to-batch swing: **GOLD 1.29**, V3 0.88, P54 0.36 — the gold arm's own instability is
+larger than any gap between arms. **Every CI overlaps.**
+
+**What this retracts:** my earlier statement that gold beats us by ~2 points ("gold 7.12 vs ours
+5.0–5.6"). Pooled, gold is **5.70** and V3 is **5.71**. That gap was substantially an artefact of
+drawing 10–12 cards from only **20** endorsed intros. The hit rate still separates the control
+(2/22 ≥7) from gold (9/22) and V3 (7/22), and that is the more robust signal — but it is not a
+two-point quality gap and I should not have quoted one.
+
+**What this does NOT retract:** the qualitative finding stands on its own evidence — gold's top cards
+put the PLAYER at risk while ours put a stranger's problem in front of the player, and the
+prompt-side attempt to install stakes produced the vocabulary of stakes without the substance
+(`asks you to` 2/24 → 9/24 against a reference rate of 0.3%). That was measured on regression
+markers, not on the noisy score.
+
+**Fix applied for batch 4 (96 cards, 3 seats):** judge EVERY card of each arm (24 each — zero
+sampling variance on our side), and draw the gold arm from a **425-text** pool built with a tighter
+job filter (complete sentence, addresses the player, 14–70 words, no placeholders, no ending texts)
+instead of the 20 endorsed intros. Arms: P54_control · V3_both · w2_v43 · GOLD_pool.
+
+**Standing lesson: an 8–12 card arm cannot rank prompts.** Every per-arm number recorded in this log
+before batch 4 carries a ±0.5–0.9 standard error and the rankings between adjacent arms are noise.
