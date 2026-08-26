@@ -122,7 +122,8 @@ function lineClass(l: string): string {
   if (l.startsWith('⚄')) return 'r-roll';
   if (l.startsWith('   ')) return 'r-coins';
   if (l.startsWith('▸')) return 'r-turn';
-  if (/^[⏸🕮⚠🕯🧭⛓💰🩸✦]/u.test(l)) return 'r-news';
+  // any line opening on a symbol is engine news or a consequence, never narration
+  if (/^(\p{Extended_Pictographic}|[✦⚑†])/u.test(l)) return 'r-news';
   return 'r-prose';
 }
 
