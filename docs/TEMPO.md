@@ -185,10 +185,14 @@ care about sits behind two things they fired idly — new friction, invented by 
 **A8. Arrival is announced, never intrusive.** When a quest lands: no modal, no view jump, nothing
 stolen from under a click or a read. The player decides when to look.
 
-**A9. At most 2–3 generations run at once.** 🔒 **Ruled 2026-08-26:** the queue is unbounded to the
-player, **2–3 in flight**, and pursuit carries no other price. That also bounds the arrival load —
-five pursuits fired at once would otherwise return five cards to read *and* five assignment decisions,
-which is `DESIGN §11.3`'s "wall of text" risk relocated into the fort phase.
+**A9. A few generations run at once, and the number is a knob.** 🔒 **Ruled 2026-08-26:** the queue
+is unbounded to the player, **2–3 in flight to start, and that number must be adjustable** — it is a
+practical setting, not a balance gate. Pursuit carries no other price: *"ultimately it's fine if the
+player wants to rapid-fire AI calls since they'll pay per AI call."* **So the cap exists only to keep
+the machine and the provider happy, never to ration the player's choices** — anything that reads as
+rationing is the wrong design. What is still worth watching is arrival *load*: five pursuits at once
+return five cards to read **and** five assignment decisions, which is `DESIGN §11.3`'s "wall of text"
+risk relocated into the fort phase — a `B`-style pacing problem, not a reason to throttle.
 
 **A10. Refusals explain themselves.** Any control disabled because of in-flight work names the work
 that is blocking it.
@@ -198,8 +202,9 @@ in-flight pursuits drain on the reckoning screen, so no quest card crosses a cyc
 consequences to design around: a card that lands there can only be *read* (assignment is a fort-phase
 act, so it is used next cycle), and the drain must not be the only thing on screen — see `B3`.
 
-**A12. Running cost and concurrency stay on screen.** Several calls at once must not multiply the
-bill invisibly. *(Cost display exists today; it must survive concurrency — see `I8`.)*
+**A12. Running cost and concurrency stay on screen.** Since the player's own bill is the only real
+throttle (`A9`), the meter has to be honest and always visible: how much has been spent, and how many
+calls are out right now. *(Cost display exists today; it must survive concurrency — see `I8`.)*
 
 **A13. Blocked time per cycle does not grow with the campaign.** More sagas running must not mean
 more *waiting*; more to read and more to decide is the game working, not a tax.
@@ -444,10 +449,13 @@ change: bench it, don't assume it.
 pulls the eye back to the wait `A1` just hid. **Recommendation: alive, not progress** — show *that*
 the map table is working and that nothing is lost; never a percentage or an ETA.
 
-**R5 — What is pursuit's price? ✅ RULED 2026-08-26: none — cap the work instead.** The queue is
-unbounded to the player with **2–3 generations in flight**; no gold cost, no lead-supply change. *(The
-argument that was made for a fiction-flavoured, upgradeable cap is kept below in case the flat 2–3
-ever needs to become progression.)* Today the wait is the
+**R5 — What is pursuit's price? ✅ RULED 2026-08-26: none.** No gold cost, no lead-supply change, no
+in-fiction gate. **2–3 generations in flight to start, adjustable.** The designer's reasoning is
+explicit and it overrides the concern below: *"ultimately it's fine if the player wants to rapid-fire
+AI calls since they'll pay per AI call"* — the player's own bill is the throttle, and the cap is a
+technical setting. *(The argument that was made for a fiction-flavoured, upgradeable cap is kept below
+only in case a flat number ever needs to become progression. Do not reintroduce it as a limit on
+choice.)* Today the wait is the
 only thing making pursuit scarce, and `DESIGN §3` calls the lead board "the strategic surface" where
 the player "decides where to spend scarce effort". Remove the wait and pursuit becomes free — the
 decision moves to assignment, where a decision already lives, and the game loses one.
