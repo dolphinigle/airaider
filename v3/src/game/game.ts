@@ -1704,11 +1704,22 @@ export class Game {
   // TEMPO P11/P15: the reckoning as it is being written — an ordered list of blocks (head, one
   // per marching quest, tail) so a landed report can be READ while the slow ones are still out
   private reckoning: { writing: boolean; blocks: string[][] } | null = null;
+  /** the finished reckoning's shape, kept after the cycle ends — a surface that prints as it goes
+   *  (a terminal) needs to know what the blocks it never caught actually turned into */
+  private lastBlocks: string[][] = [];
 
   /** non-null from the first instant of a reckoning until it ends; `writing` false once every
-   *  line is in (the 12-16s flesh tail must not hold the player on the screen) */
-  reckoningView(): { writing: boolean; lines: string[] } | null {
-    return this.reckoning ? { writing: this.reckoning.writing, lines: this.reckoning.blocks.flat() } : null;
+   *  line is in (the 12-16s flesh tail must not hold the player on the screen).
+   *  `blocks` is the SHAPE — head, one per marching quest in id order, tail — which a surface that
+   *  cannot rewrite what it already printed (a terminal) needs in order to tell what actually
+   *  landed. A page that re-renders can keep using `lines`. */
+  /** the last completed reckoning, block by block (empty before the first one) */
+  lastReckoningBlocks(): string[][] { return this.lastBlocks.map(b => [...b]) }
+
+  reckoningView(): { writing: boolean; lines: string[]; blocks: string[][] } | null {
+    if (!this.reckoning) return null;
+    const blocks = this.reckoning.blocks.map(b => [...b]);
+    return { writing: this.reckoning.writing, lines: blocks.flat(), blocks };
   }
 
   async endCycle(): Promise<string[]> {
@@ -2013,6 +2024,7 @@ export class Game {
 
     this.state.rngState = this.rng.state();
     this.state.idCounter = idCounter();
+    this.lastBlocks = blocks.map(b => [...b]);
     return blocks.flat();
   }
 

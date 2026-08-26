@@ -6,6 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Be terse. Save tokens.** Short answers, minimal preamble, no recap of what you just did.
 - **Principles, not instance-patches.** In prompts and code alike, fix the CLASS, never bolt on the specific example that failed — examples are sticky, instance-patches brittle. Full rule: `docs/PROMPT_RULES.md` §8.
 - **Prompts are written for CHEAP models.** A rule buried in a long prompt does not exist for gpt-5-mini; adding a rule means merging or cutting another first. Full rule: `docs/PROMPT_RULES.md` §0.
+- **The text UI is how you playtest — keep it at PARITY.** You cannot drive a browser. `v3/cli/` is
+  the only surface you can actually play, and that is the entire reason it exists: same engine,
+  different UI. So **every player-facing feature ships in the CLI in the same session it ships in
+  the web GUI** — not "later", not "the CLI is the batch/reference surface". Never dogfood by
+  *simulating* a UI you cannot run (copying client logic into a test harness): a simulation can only
+  confirm what you already believed, and it is blind to rendering. Full rule + the failure that
+  taught it: `docs/DOGFOODING.md`.
 - **Division of labor (designer-ruled 2026-07-19): Fable plans, Opus codes.** Plans, code plans, prompt design, and judging/synthesis stay with Fable (the main session); manual coding tasks are delegated to Opus subagents, whose output Fable verifies.
 
 ## Project status

@@ -283,4 +283,18 @@ export const render = {
     const head = `━━━ CYCLE ${g.state.cycle} RESOLVES ━━━`;
     return [head, ...(report.length ? report : ['(a quiet cycle — nothing committed)']), this.status(g)].join('\n');
   },
+
+  /** THE RECKONING, streamed — the text UI's version of the GUI's reckoning page. The terminal is
+   *  append-only, so a quest's slot is announced once and its report printed when it lands; the
+   *  elapsed stamp is the point of the exercise (this is the surface we dogfood tempo on). */
+  reckoningHead(g: Game): string {
+    return `\n━━━ THE RECKONING · CYCLE ${g.state.cycle} ━━━`;
+  },
+  reckoningLine(line: string, elapsedMs: number): string {
+    return `${`[+${(elapsedMs / 1000).toFixed(1)}s]`.padStart(9)} ${line}`;
+  },
+  reckoningFoot(g: Game, elapsedMs: number, tailMs: number | null): string {
+    const t = `report complete at +${(elapsedMs / 1000).toFixed(1)}s`;
+    return `\n${t}${tailMs !== null ? ` · the cycle ran on for another ${(tailMs / 1000).toFixed(1)}s writing people up` : ''}\n${this.status(g)}`;
+  },
 };

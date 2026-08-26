@@ -77,6 +77,75 @@ async function main() {
   }
 }
 
+/** THE RECKONING, live. The text UI shows the SAME thing the GUI's reckoning page does — each
+ *  quest's slot held open the moment END is pressed, then filled when its own call lands — because
+ *  this is the surface that can actually be played here, and a feature that only exists in the
+ *  surface nobody can drive is a feature nobody has tried. Batch mode still runs to completion
+ *  (the facade contract): it renders the same stream, it just never waits for a keypress. */
+async function runReckoning(game: Game): Promise<string[]> {
+  const t0 = Date.now();
+  const done = game.endCycle();
+  let settled: string[] | null = null;
+  let failed: unknown;
+  done.then(r => { settled = r }, e => { failed = e });
+
+  console.log(render.reckoningHead(game));
+  // A terminal cannot rewrite what it printed, so it prints each BLOCK once when first seen — the
+  // placeholder, which already carries the quest's title and its CARD, so there is something to
+  // read during the wait exactly as there is on the page — and then appends only what the landed
+  // report ADDS. The placeholder's lines are a prefix of the finished block by construction.
+  const printedLen = new Map<number, number>();
+  let completeAt: number | null = null;
+  const stamp = (l: string) => console.log(render.reckoningLine(l, Date.now() - t0));
+
+  const sweep = (blocks: string[][]) => {
+    blocks.forEach((b, i) => {
+      if (!b.length) return;
+      const was = printedLen.get(i) ?? 0;
+      if (b.length === was) return;
+      // how much of what we printed still stands? (a block that was REVISED rather than extended —
+      // the error path replaces its lines — must be reprinted, not silently half-shown)
+      const prev = printedBlocks.get(i) ?? [];
+      let common = 0;
+      while (common < prev.length && common < b.length && prev[common] === b[common]) common++;
+      // the ✎ line is the one thing a landed block DROPS rather than keeps, so losing exactly it
+      // is not a revision — it is the report arriving. The stale line stays on screen above, which
+      // is how a terminal reads anyway: "…being written…", then the report.
+      const kept = was - (prev[was - 1]?.startsWith('✎') ? 1 : 0);
+      if (common < kept) { stamp('(revised)'); for (const l of b) stamp(l) }
+      else {
+        // the arriving lines are detached from the header printed minutes of screen ago — on a page
+        // the block fills under its own title, in a stream it needs to say whose report this is
+        if (was > 0 && b.length > kept) stamp(`▸ ${b[0]!.replace(/^— /, '')}`);
+        for (let k = Math.max(common, kept); k < b.length; k++) stamp(b[k]!);
+      }
+      printedLen.set(i, b.length);
+      printedBlocks.set(i, [...b]);
+    });
+  };
+  const printedBlocks = new Map<number, string[]>();
+
+  while (settled === null && failed === undefined) {
+    const v = game.reckoningView();
+    if (v) {
+      sweep(v.blocks);
+      if (!v.writing && completeAt === null) completeAt = Date.now() - t0;
+    }
+    await new Promise(r => setTimeout(r, 150));
+  }
+  if (failed !== undefined) {
+    console.log(`\n⚠ the reckoning broke off — this cycle could not be resolved.\n  (${(failed as Error).message?.slice(0, 160)})`);
+    throw failed;
+  }
+  const report = settled as unknown as string[];
+  // a fast provider can finish the whole cycle between two polls — the final shape is kept by the
+  // engine precisely so nothing goes unprinted just because we blinked
+  sweep(game.lastReckoningBlocks());
+  const total = Date.now() - t0;
+  console.log(render.reckoningFoot(game, completeAt ?? total, completeAt === null ? null : total - completeAt));
+  return report;
+}
+
 /** returns true to quit */
 async function exec(game: Game, line: string): Promise<boolean> {
   if (!line) return false;
@@ -145,8 +214,7 @@ async function exec(game: Game, line: string): Promise<boolean> {
     }
 
     case 'end': {
-      const report = await game.endCycle();
-      console.log(render.cycleReport(game, report));
+      const report = await runReckoning(game);
       slog({ cycle: game.state.cycle, action: 'end', report, ai: game.ai.usage() });
       break;
     }

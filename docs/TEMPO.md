@@ -435,9 +435,13 @@ and 5–8 by cycle 10** (§2c's run), which is already the whole strategic surfa
 with `P8`: a late campaign with more sagas running competes for the same N, so the number has to
 be raisable — which is why the designer ruled it adjustable.
 
-**R6 — Does the CLI get any of this?** **Recommendation: no.** `I11` puts the requirement on the
-facade; the CLI stays the straight-line, work-to-completion reference that scripts and agents drive.
-The designer's complaint came from the GUI and `M4` is judged there.
+**R6 — Does the CLI get any of this? ✅ RULED 2026-08-26: YES — and this recommendation was WRONG.**
+It originally read *"no — the CLI stays the straight-line, work-to-completion reference."* The
+designer overruled it: *"isn't the reason that text based UI exists is so that you can playtest it
+using the SAME ENGINE but only the UI differs?"* Correct. `I11`'s work-to-completion requirement is
+on the **facade**, not on the CLI's rendering, and the two never conflicted. **Every player-facing
+feature ships in the CLI too** — see `DOGFOODING.md`, which also records the bug the CLI found in its
+first run that the HTTP harness was structurally blind to.
 
 **R7 — May the machine write ahead of the click?** The only answer to **the genesis problem** (§3) that actually removes the
 minute: draft a saga's genesis when its lead appears, before the player pursues it. Costs money on leads never pursued (~$0.01 a genesis, against a board carrying 2–8 leads —
@@ -493,7 +497,14 @@ cycle actually finished at 32.4s              → 19.3s of tail the player never
 to the pre-change baseline (`a4eae82` in a worktree): 261 quests (175 s / 65 p / 21 f) and 344
 (251/78/15). The CLI's batch mode still plays a full loop (`I11`).
 
-**Two bugs the playtest found and fixed:**
+**The CLI plays it too** (`DOGFOODING.md`). Five real-AI cycles through `npm run cli -- --ai`
+covered every shape the reckoning has — two quests landing 3.8s apart, a single quest with a 13.2s
+flesh tail, a `⏸` stall line in the head block, a saga beat, an injury, a level-up, a relic, a
+failure, and a finale with approaches and a fate. The text UI renders the same feature: each quest's
+slot opens with its title and card, and its report is appended when it lands, stamped with the
+elapsed time. `R6` was ruled the wrong way at first and is corrected.
+
+**Two server bugs the harness found and fixed:**
 - **A double END ran TWO whole cycles.** Actions are serialised, so the engine's own re-entrancy
   guard never fires — the second request simply waited its turn and resolved another cycle, whose
   report replaced the one being read. Measured: cycle 3 → 5. A second END is now refused at the
