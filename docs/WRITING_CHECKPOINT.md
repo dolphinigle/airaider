@@ -113,6 +113,23 @@ deliberately. Check here before editing a prompt.
 adding a fifth was measured to cost quality. This is why the consequence-ending idea (§5.1) cannot
 simply be written into the resolve prompt.
 
+## 4c. LAB-vs-SHIPPED DIFF — done 2026-08-26, comes back clean
+Three defects this session traced to rules that existed only in the LAB prompt
+(`prosebench/CHAMPION.txt`) and had never been ported: the no-orders rule, the `we/us/our` POV ban,
+and the `ask` paste ban. Rather than keep finding them one playtest at a time I diffed the two
+prompts rule by rule. Eight candidates, all resolved:
+- **covered already** under different wording (boss-stays-at-the-fort; keyword welding, now fixed
+  better by labelling atoms in the engine);
+- **deliberately divergent**: the lab uses `gravity` as a length CEILING, the shipped prompt uses
+  `rarity` for size and `gravity` for TONE;
+- **deliberately NOT ported**: the lab's *"Everyone gets introduced… *a* drover, *a* woman who keeps
+  the ford"* — those instances are what produced the 24/24 "A <trade>" opening template;
+- **checked and unnecessary**: the false-connective rule (*join it only if the join is really true*).
+  Measured `because` at **0/88 cards** in shipped output against the reference corpus's 1.4%.
+
+**Keep this diff in mind after any lab work**: the lab prompt is a research artifact and nothing in
+it reaches the game until ported by hand.
+
 ## 5. 🔒 OPEN DESIGNER RULINGS (all measured, all blocking further gain)
 1. **May a card state what the FORT stands to lose?** Prompt-side installation is **measured dead** —
    it produced the vocabulary of stakes while regressing `asks you to` 2/24 → 9/24 against a
