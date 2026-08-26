@@ -649,8 +649,13 @@ export function makeOpenAiProvider(): AiProvider {
       };
     },
 
-    async resolve(inputs: ResolveQuestInput[]): Promise<ResolveQuestOut[]> {
+    async resolve(inputs: ResolveQuestInput[], onEach?: (out: ResolveQuestOut) => void): Promise<ResolveQuestOut[]> {
       purposeCtx = 'resolve';
+      // a throwing consumer must never take the batch down with it (2026-08-26: onEach runs
+      // engine effects — the reckoning still owes the player the other quests' reports)
+      const emit = (out: ResolveQuestOut) => {
+        try { onEach?.(out) } catch (e) { console.error('[ai] resolve onEach threw:', (e as Error).message?.slice(0, 300)) }
+      };
       // one batched call per quest, fired in parallel (the cycle's single reckoning);
       // §0: two self-contained prompts (one-off / saga) — no arbitration clauses, rules
       // stated once, output spec + critical rules at the END
@@ -662,12 +667,17 @@ export function makeOpenAiProvider(): AiProvider {
         const { sceneMode, ...rest } = q;
         return JSON.stringify(rest);
       };
-      const outs = await Promise.all(inputs.map(q =>
+      // each call announces itself the instant IT settles — the fallback path included, so a
+      // failed narration fills its slot on the screen instead of leaving a placeholder
+      return await Promise.all(inputs.map(q =>
         callR(WRITER_MODEL, pick(q), userJson(q), zResolveOne).catch((e): ResolveQuestOut => {
           if (process.env.AI_DEBUG) console.error(`[ai] resolve fallback for ${q.questId}:`, (e as Error).message?.slice(0, 500));
           return fallbackResolve(q);
+        }).then(o => {
+          const out: ResolveQuestOut = { ...o, storyUpdate: o.storyUpdate ?? undefined };
+          emit(out);
+          return out;
         })));
-      return outs.map(o => ({ ...o, storyUpdate: o.storyUpdate ?? undefined }));
 
       function fallbackResolve(q: ResolveQuestInput): ResolveQuestOut {
         // deliveredSummary carries engine numbers — it must NEVER surface raw (the engine's

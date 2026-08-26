@@ -69,6 +69,9 @@ function cardView(c: NonNullable<ReturnType<Game['card']>>) {
 function stateView() {
   const st = game.state;
   const p = game.prestige();
+  // TEMPO P11: the live, still-growing report of a reckoning in flight. /api/state is a plain GET
+  // that is NOT queued behind the action chain, so the client can read it while endCycle() awaits.
+  const live = game.reckoningView();
   const need = GH_THRESHOLDS[st.fort.ghTier + 1] ?? null;
   return {
     cycle: st.cycle, gold: game.gold(), prestige: p, ghTier: st.fort.ghTier, ghNeed: need,
@@ -78,7 +81,11 @@ function stateView() {
     menus: game.menuGates(),
     can: { heal: game.hasRoom('hospital'), interrogate: game.hasRoom('interrogation') },
     rosterCap: game.rosterCapacity(), captiveCap: game.captiveCapacity(),
-    lastReport,
+    // while a cycle is resolving the live lines win; the module variable is the finished cycle's
+    // copy, kept so `⚄ last reckoning` still works after PROCEED
+    lastReport: live ? live.lines : lastReport,
+    // false once every report line is in — even though endCycle() is still running its flesh tail
+    reckoningWriting: !!live?.writing,
     fort: {
       cells: st.fort.cells,
       rooms: st.fort.rooms.map(r => {

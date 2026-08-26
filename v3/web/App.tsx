@@ -38,6 +38,10 @@ export function App() {
   // the reckoning is its own PAGE, not a panel on the fort tab: it opens the instant END is
   // clicked (so the screen exists before the first word of narration does) and closes on PROCEED
   const [reckoning, setReckoning] = useState(false);
+  // s.cycle at the moment END was clicked, or null when reopening a finished report. The engine
+  // bumps the cycle on the FIRST line of endCycle(), so `s.cycle > reckAt` is the exact, race-free
+  // test for "these lines belong to the new reckoning, not the stale previous one".
+  const [reckAt, setReckAt] = useState<number | null>(null);
 
   const refresh = useCallback(async () => {
     setS(await (await fetch('/api/state')).json());
@@ -66,8 +70,17 @@ export function App() {
     }
   };
 
+  // TEMPO P11: each quest's block must show up when it lands, and the 1.2s doAct poll is too coarse
+  // to read as "as it arrives". Faster ONLY while the reckoning page is actually open and working.
+  const reckLive = reckoning && (busy || !!s?.reckoningWriting);
+  useEffect(() => {
+    if (!reckLive) return;
+    const t = setInterval(() => { refresh().catch(() => {}) }, 500);
+    return () => clearInterval(t);
+  }, [reckLive, refresh]);
+
   if (!s) return <div className="app">loading…</div>;
-  if (reckoning) return <Reckoning s={s} busy={busy} onProceed={() => setReckoning(false)} />;
+  if (reckoning) return <Reckoning s={s} busy={busy} reckAt={reckAt} onProceed={() => setReckoning(false)} />;
 
   return (
     <div className="app">
@@ -81,8 +94,8 @@ export function App() {
         <span>captives {s.captives.length}/{s.captiveCap}</span>
         <span className="ai">AI: {s.aiName} ({s.ai.calls} calls{s.aiName === 'openai' ? `, ~$${s.ai.costUsd.toFixed(2)}` : ''})</span>
         {s.lastReport?.length > 0 &&
-          <button className="reopen" onClick={() => setReckoning(true)}>⚄ last reckoning</button>}
-        <button className="end" disabled={busy} onClick={() => { setReckoning(true); doAct('end') }}>{busy ? '…' : 'END CYCLE ▶'}</button>
+          <button className="reopen" onClick={() => { setReckAt(null); setReckoning(true) }}>⚄ last reckoning</button>}
+        <button className="end" disabled={busy} onClick={() => { setReckAt(s.cycle); setReckoning(true); doAct('end') }}>{busy ? '…' : 'END CYCLE ▶'}</button>
       </header>
       {pending && <div className="pending"><span className="spin" /> working: <b>{pending}</b>… <i>story generation can take a minute — watch the AI tab</i></div>}
       {toast && <div className="toast">{toast}</div>}
@@ -122,13 +135,26 @@ function lineClass(l: string): string {
   if (l.startsWith('⚄')) return 'r-roll';
   if (l.startsWith('   ')) return 'r-coins';
   if (l.startsWith('▸')) return 'r-turn';
+  // a quest whose narration hasn't landed yet — must read as a held place, not as prose.
+  // ✎ not ⏳: ⏳ is already the engine's "this quest lapsed" marker, which means the opposite.
+  if (l.startsWith('✎')) return 'r-pending';
   // any line opening on a symbol is engine news or a consequence, never narration
   if (/^(\p{Extended_Pictographic}|[✦⚑†])/u.test(l)) return 'r-news';
   return 'r-prose';
 }
 
-function Reckoning({ s, busy, onProceed }: { s: S; busy: boolean; onProceed: () => void }) {
-  const lines: string[] = busy ? [] : (s.lastReport ?? []);   // while resolving, the OLD report is stale
+function Reckoning({ s, busy, reckAt, onProceed }: { s: S; busy: boolean; reckAt: number | null; onProceed: () => void }) {
+  // CYCLE guard, not a busy guard: the previous cycle's report is stale until the engine bumps the
+  // cycle, and from that instant every line on the wire belongs to THIS reckoning — so they render
+  // one by one as they land instead of waiting for the POST to return.
+  const fresh = reckAt === null || s.cycle > reckAt;
+  const lines: string[] = fresh ? (s.lastReport ?? []) : [];
+  // the flesh tail (12-16s) keeps the POST open long after the last report line is in — the player
+  // must not be held for it, so the door opens on `reckoningWriting`, not on `busy`
+  // Gate on `busy` FIRST: `s` only advances when a poll succeeds, and every poll failure is
+  // swallowed — so a dead server would freeze reckoningWriting=true and trap the player on a page
+  // whose only button is disabled. Once the POST has settled (or failed), the door always opens.
+  const held = busy && (!fresh || !!s.reckoningWriting);
   return (
     <div className="app reckpage">
       <header className="reckhead">
@@ -137,12 +163,14 @@ function Reckoning({ s, busy, onProceed }: { s: S; busy: boolean; onProceed: () 
         <span className="ai">AI: {s.aiName} ({s.ai.calls} calls{s.aiName === 'openai' ? `, ~$${s.ai.costUsd.toFixed(2)}` : ''})</span>
       </header>
       <main className="reckbody">
-        {busy && <p className="working"><span className="spin" /> the company is still out — the report is being written…</p>}
         {lines.map((l, i) => <p key={i} className={lineClass(l)}>{l}</p>)}
-        {!busy && lines.length === 0 && <p className="hint">Nothing to report.</p>}
+        {/* below the lines, not above: at the top it would yank the whole report up a line the
+            moment writing ends — the one place this page is allowed to move is its end */}
+        {held && <p className="working"><span className="spin" /> the company is still out — the report is being written…</p>}
+        {!held && lines.length === 0 && <p className="hint">Nothing to report.</p>}
       </main>
       <footer className="reckfoot">
-        <button className="proceed" disabled={busy} onClick={onProceed}>{busy ? 'resolving…' : 'PROCEED ▶'}</button>
+        <button className="proceed" disabled={held} onClick={onProceed}>{held ? 'resolving…' : 'PROCEED ▶'}</button>
       </footer>
     </div>
   );

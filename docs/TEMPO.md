@@ -194,31 +194,50 @@ gets fixed without a ruling.
   *"the company is still out — the report is being written…"* while the call runs, renders the report
   as a sequence of beats (card / prose / the roll / the coins / fort news, each styled), and closes on
   an explicit **PROCEED ▶** at the bottom. 🔒 Designer request, 2026-08-26.
-- **P11** 🔒 Each quest's report appears the moment it lands; the slowest never holds up a finished
-  one. The resolve calls already run one-per-quest in parallel (`openai.ts:665`).
-- **P12** On a one-quest cycle — most of them — something still has to fill the ~10s. ⚠ `R3`.
-- **P13** The player can outrun the reveal: one click shows everything that has arrived. A paced
-  reveal nobody can skip is new dead time we invented.
+- **P11** ✅ **BUILT + MEASURED.** The report is now a list of BLOCKS — a head, one per marching
+  quest in id order, a tail — and each quest's block is replaced when **its own** call settles
+  (`AiProvider.resolve(inputs, onEach)`; `doEndCycle`'s `arrive`). `Game.reckoningView()` publishes
+  `{writing, lines}` on `/api/state`; the client polls at 500ms while the page is open. Pinned by
+  `test/reckoning.test.ts`. **Real-provider run, two marching quests:** placeholders at **t+0.3s**,
+  first report **t+13.0s**, second **t+14.0s**, PROCEED unlocked at t+14.0s while the cycle ran on to
+  t+27.9s — the player is spared a **14s** tail.
+- **P12** ◐ **PARTLY.** Each quest's slot opens immediately with its title, **the card the player
+  already read** (`「situation」`), and who marched — lines identical to the ones the finished report
+  re-prints, so nothing moves when it lands. Real content to re-read, but still no NEW beat for ~10s
+  on a one-quest cycle, which is ~70% of them (§2c). ⚠ `R3` is not closed by this.
+- **P13** ✅ **MOOT — by not inventing the problem.** The reveal is paced by *arrival*, not by a
+  timer, so nothing is withheld and a skip button would reveal nothing. ⚠ One real gap: PROCEED
+  unlocks on the LAST quest, so on a many-quest cycle a player who has read the one they care about
+  is still held.
 - **P14** The player can always tell whether the game is still working or has finished — and that is
   *all* the progress reporting. No percentages, no "2 of 3, ~8s left": a job status tells the player
   exactly when to stop reading and start waiting.
-- **P15** Order is fixed when the screen opens and never rearranges. *(True today — quests resolve in
-  id order, `game.ts:1729` — and must stay true when calls return out of order.)*
+- **P15** ✅ **BUILT.** Blocks are allocated in id order before any call is made; arrival replaces a
+  block's contents and never moves one. Pinned by `test/reckoning.test.ts`, which lands the reports in
+  REVERSE order and asserts the telling order is unchanged.
 - **P16** A failed narration degrades to the plain engine truth for that quest only. *(Shipped:
   `fallbackResolve`, `openai.ts:672`.)*
 - **P17** Consequences stay attached to the report that earned them. *(True today, `game.ts:2230`.)*
-- **P18** Fort news (healing, expiries, lapses, drips, tavern churn) comes after the quest stories —
-  it is known instantly and must never sit between the player and a story still being written.
-  ⚠ Changes shipped output: stall and lapse lines print *before* the resolutions today
-  (`game.ts:1738`). Veto this one and the rest still stands.
+- **P18** ◐ **HALF, deliberately.** Everything pushed after the resolutions (healing, expiries,
+  drips, tavern/holding churn, liabilities, echoes) is now a tail block, after every story. The
+  **head** block — tier-ups, ⏸ stalls, lapses, "a quiet cycle" — still prints first, and that is now
+  a feature rather than the defect P18 named: those lines are known instantly, so on an otherwise
+  empty page they are the first thing to read. They are not between the player and a story; they are
+  ahead of one that does not exist yet.
 - **P19** The reckoning is leavable and returnable. ◐ **Half built:** a `⚄ last reckoning` button in
   the header reopens the page after PROCEED. It still lives in a server-process variable
   (`server/main.ts:47`), so a restart loses it.
-- **P20** Closing it lands the player in a fort that is already true — nothing finishes applying
-  itself afterwards.
-- **P21** The `flesh` tail (12–16s) does not hold the door — but must not leave a person blank
-  either. It runs at step 7 *deliberately*, so people minted this reckoning have a face before the
-  player meets them (`game.ts:1723`). ⚠ `R8`.
+- **P20** ❌ **NOW VIOLATED, knowingly — the price of `P21`.** PROCEED unlocks while `flesh` is still
+  running (measured **14s**). Proceed immediately and Roster/People can show a merc hired this
+  reckoning, or a finale prize in the tavern, with **no who, no backstory, no quirks** — the fields
+  are simply absent, then appear ~14s later. Worse, the fort in that window only *looks* live: every
+  action POST queues behind the still-open `end` request (`server/main.ts` `actionChain`), so a build
+  or an assign silently stalls until the tail finishes. ⚠ `R8` exists to rule on exactly this, and
+  its recommendation — flesh a person the moment they appear — is the half not built.
+- **P21** ◐ **DOOR: BUILT. BLANK PERSON: NOT SOLVED.** `writing` flips false immediately before the
+  flesh call, so PROCEED unlocks ~14s early (measured). But flesh runs at step 7 *deliberately*, so
+  that people minted this reckoning have a face before the player meets them (`game.ts:1723`) — and
+  that guarantee is now gone. See `P20`. ⚠ `R8`.
 
 ---
 

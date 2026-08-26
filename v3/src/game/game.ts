@@ -40,7 +40,7 @@ import { hasClash, queryMatches } from '../engine/overlap.js';
 import { questXp, grantXp, rollBase, rollGrowthLean, growToLevel } from '../engine/growth.js';
 import { coins, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, explainCoins, type SlotTest, type Outcome, type QuestRollResult } from '../engine/roll.js';
 import { sampleKeywords, sampleSeed, sampleOpening, sampleGravity, pickTone } from '../ai/keywords.js';
-import type { AiProvider, ResolveQuestInput, AskSlotOut, QuestWriteOut } from '../ai/provider.js';
+import type { AiProvider, ResolveQuestInput, ResolveQuestOut, AskSlotOut, QuestWriteOut } from '../ai/provider.js';
 
 export interface LogEntry { cycle: number; kind: string; text: string; questId?: string }
 
@@ -1701,22 +1701,38 @@ export class Game {
   // ---- END CYCLE (the reckoning) -----------------------------------------------------------------------
 
   private cycleInFlight = false;
+  // TEMPO P11/P15: the reckoning as it is being written — an ordered list of blocks (head, one
+  // per marching quest, tail) so a landed report can be READ while the slow ones are still out
+  private reckoning: { writing: boolean; blocks: string[][] } | null = null;
+
+  /** non-null from the first instant of a reckoning until it ends; `writing` false once every
+   *  line is in (the 12-16s flesh tail must not hold the player on the screen) */
+  reckoningView(): { writing: boolean; lines: string[] } | null {
+    return this.reckoning ? { writing: this.reckoning.writing, lines: this.reckoning.blocks.flat() } : null;
+  }
 
   async endCycle(): Promise<string[]> {
-    // re-entrancy guard: a double END (GUI double-click) must never interleave
+    // re-entrancy guard: a double END (GUI double-click) must never interleave — and must not
+    // clear the reckoning it exists to protect (TEMPO I10)
     if (this.cycleInFlight) return ['(the cycle is already resolving)'];
     this.cycleInFlight = true;
     try {
       return await this.doEndCycle();
     } finally {
       this.cycleInFlight = false;
+      this.reckoning = null;
     }
   }
 
   private async doEndCycle(): Promise<string[]> {
     const st = this.state;
     st.cycle += 1;
-    const report: string[] = [];
+    // the report is a list of BLOCKS read as it grows (see `reckoning`); `report` points at
+    // whichever block the current push sites belong to — the head now, the tail after step 3
+    const blocks: string[][] = [];
+    let report: string[] = [];
+    blocks.push(report);
+    this.reckoning = { writing: true, blocks };
     // tier-ups from this cycle's fort phase lead the report (the moment must be SEEN)
     if (st.pendingTierLines?.length) { report.push(...st.pendingTierLines); st.pendingTierLines = [] }
 
@@ -1744,6 +1760,7 @@ export class Game {
     st.quests = st.quests.filter(q => q.state === 'open');
     if (ready.length === 0) report.push('A quiet cycle — no one marched.');
     const resolutions: Resolution[] = [];
+    const questBlocks = new Map<string, string[]>();
     for (const q of ready) {
       const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
       const party = active.map(s => this.card(s.filledBy!)!);
@@ -1755,7 +1772,22 @@ export class Game {
         if (chain) fate = finaleFate(this.rng, chain, rolled.outcome);
       }
       resolutions.push({ quest: q, outcome: rolled.outcome, delivery, party, fate, rolled });
+      // This quest's slot on the screen, held open in id order until its own call lands. The
+      // first two lines are EXACTLY what applyResolution re-pushes, so the card the player is
+      // re-reading does not move when the report replaces the placeholder — and the card is the
+      // only real content there is to fill the wait on a one-quest cycle (TEMPO P12 / R2).
+      // The glyph is ✎ and not ⏳ because ⏳ already means "this quest lapsed" (abandonQuest).
+      const block = [`— ${q.title} (${q.id})`,
+        ...(q.situation ? [`「${q.situation}」`] : []),
+        `✎ ${party.map(p => p.name).join(', ')} march out — the report is being written…`];
+      questBlocks.set(q.id, block); blocks.push(block);
     }
+    // everything pushed from here on is fort news and lands AFTER the stories. NOTE the head
+    // block (tier-ups, ⏸ stalls, lapses, 'a quiet cycle') still prints BEFORE them — TEMPO P18's
+    // reordering is deliberately not done here; those lines are instant, so at the top they are
+    // the first thing on an otherwise empty screen rather than a wall between the player and a
+    // story still being written.
+    report = [];
 
     // 2) ONE batched AI call for all resolutions
     const aiInputs: ResolveQuestInput[] = resolutions.map(r => ({
@@ -1806,19 +1838,46 @@ export class Game {
         rejectedApproaches: r.quest.approaches?.filter(a => a.id !== r.quest.chosenApproach).map(a => a.label),
       } : undefined,
     }));
-    const aiOuts = aiInputs.length ? await this.ai.resolve(aiInputs) : [];
+    // 3) apply engine effects + AI outputs; lore write-backs AFTER all (collected first)
+    const pendingEdges: { from: string; to: string; type: string; blurb: string; importance: number }[] = [];
+    const byQuest = new Map(resolutions.map(r => [r.quest.id, r]));
+    const applied = new Set<string>();
+    // a throw inside applyResolution used to escape doEndCycle and surface as `engine error:` —
+    // the providers now swallow callback throws so one bad quest cannot kill the batch, so the
+    // error is CARRIED and re-thrown after the await. Silently losing a quest (and stranding its
+    // party in a deleted quest's slot) is the one outcome this must never have.
+    let arriveError: unknown;
+    const arrive = (out: ResolveQuestOut) => {
+      const r = byQuest.get(out.questId), block = questBlocks.get(out.questId);
+      if (!r || !block || applied.has(out.questId)) return;
+      applied.add(out.questId);   // set BEFORE, so a half-applied quest is never applied twice
+      block.length = 0;   // applyResolution re-pushes the title line itself
+      try {
+        this.applyResolution(r, out, block, pendingEdges);
+      } catch (e) {
+        arriveError ??= e;
+        block.push(`— ${r.quest.title} (${r.quest.id})`, '⚠ this report could not be applied.');
+      }
+    };
+    // engine effects therefore land in ARRIVAL order, not id order (TEMPO I1: replay
+    // determinism explicitly not required); the TELLING order stays id order — that is the blocks
+    const aiOuts = aiInputs.length ? await this.ai.resolve(aiInputs, arrive) : [];
+    // defensive: a quest the callback never reached still resolves (undefined out = engine truth)
+    for (const r of resolutions) {
+      if (applied.has(r.quest.id)) continue;
+      applied.add(r.quest.id);
+      const block = questBlocks.get(r.quest.id)!;
+      block.length = 0;
+      this.applyResolution(r, aiOuts.find(o => o.questId === r.quest.id), block, pendingEdges);
+    }
+    if (arriveError) throw arriveError;   // loud, as it was before the callback existed
     // COLD-READER GATE on saga reports REMOVED (reviewlab 84001 + blind judge, 2026-07-17):
     // the redo made reports WORSE in 6/7 fired cases (pre-redo mean 7.29 vs shipped 6.14) at
     // ~5.5s review + ~15s redo on 58-67% of saga resolutions — the strongest nag-degradation
     // measurement of the three gates. Report-defect classes (ledger breaks, ambiguous
     // antecedents) get fixed at the resolve prompt instead.
 
-    // 3) apply engine effects + AI outputs; lore write-backs AFTER all (collected first)
-    const pendingEdges: { from: string; to: string; type: string; blurb: string; importance: number }[] = [];
-    for (const r of resolutions) {
-      const out = aiOuts.find(o => o.questId === r.quest.id);
-      this.applyResolution(r, out, report, pendingEdges);
-    }
+    blocks.push(report);   // the tail: fort news, after every story
     guardEdges(st.lore, pendingEdges, st.cycle, () => freshId('e'));
 
     // 4) housekeeping: healing, decay, staging timers, breaking
@@ -1944,7 +2003,9 @@ export class Game {
     }
 
     // 7) FLESH pass — every merc and staged person deserves a who/backstory/quirks
-    // (attachment starts here; persisted per producer-2, so this runs at most once each)
+    // (attachment starts here; persisted per producer-2, so this runs at most once each).
+    // Every report line is in by now, so the player is released BEFORE this 12-16s tail.
+    if (this.reckoning) this.reckoning.writing = false;
     await this.fleshPass();
 
     // keep the save lean: the log is a UI convenience, not the archive (lore is)
@@ -1952,7 +2013,7 @@ export class Game {
 
     this.state.rngState = this.rng.state();
     this.state.idCounter = idCounter();
-    return report;
+    return blocks.flat();
   }
 
   abandon(questId: string): { ok: boolean; msg: string } {

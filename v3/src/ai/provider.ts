@@ -210,7 +210,9 @@ export interface AiProvider {
   readonly name: string;
   writeQuest(input: QuestWriteInput): Promise<QuestWriteOut>;
   genesis(input: GenesisInput): Promise<GenesisOut>;
-  resolve(inputs: ResolveQuestInput[]): Promise<ResolveQuestOut[]>;  // ONE batched call (parallel inside)
+  /** ONE batched call (parallel inside). `onEach` fires as each quest's call settles — the
+   *  reckoning is read WHILE it is written, so a finished report never waits on a slow one */
+  resolve(inputs: ResolveQuestInput[], onEach?: (out: ResolveQuestOut) => void): Promise<ResolveQuestOut[]>;
   flesh(inputs: FleshInput[]): Promise<FleshOut[]>;                  // ONE batched call
   themeRoll(input: ThemeRollInput): Promise<ThemeRollOut>;
   select(input: SelectorInput): Promise<string[]>;

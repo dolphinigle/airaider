@@ -90,8 +90,10 @@ export class MockProvider implements AiProvider {
     };
   }
 
-  async resolve(inputs: ResolveQuestInput[]): Promise<ResolveQuestOut[]> {
+  async resolve(inputs: ResolveQuestInput[], onEach?: (out: ResolveQuestOut) => void): Promise<ResolveQuestOut[]> {
     this.tick();
+    // the mock settles instantly, so onEach fires in SUBMISSION order — the suite and the sims
+    // stay bit-identical while the real provider fires in arrival order
     return inputs.map(q => {
       const lead = q.party[0];
       const before = `${q.party.map(p => p.name).join(', ')} set out: ${q.job.toLowerCase()}`;
@@ -118,7 +120,7 @@ export class MockProvider implements AiProvider {
         : q.outcome === 'failure' && q.party.length >= 1
           ? [{ from: q.party[0]!.id, to: q.party[0]!.id, type: 'scarred-by', blurb: `carries the failure of ${q.title}`, importance: 0.45 }]
           : [];
-      return {
+      const out: ResolveQuestOut = {
         questId: q.questId, before, after, injuries, fleshed,
         edges: edges.filter(e => e.from !== e.to),
         storyUpdate: q.chainContext ? {
@@ -127,6 +129,9 @@ export class MockProvider implements AiProvider {
           openThreads: ['what the broker is not saying'],
         } : undefined,
       };
+      // a throwing consumer never fails the batch — but it is never silent either
+      try { onEach?.(out) } catch (e) { console.error('[mock] resolve onEach threw:', (e as Error).message) }
+      return out;
     });
   }
 

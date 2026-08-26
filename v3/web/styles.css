@@ -79,6 +79,10 @@ nav button.locked { opacity: .45; }
 .r-coins { color: #6a7280; font-size: 12px; }
 .r-turn { color: #b6c6d8; }
 .r-news { color: #8a93a3; }
+/* a quest still being written — dim and italic so it reads as a held place, not as prose. It sits
+   under the quest's title and its card, both of which are IDENTICAL in the placeholder and in the
+   finished report, so those two lines never move; the report still grows downward beneath them. */
+.r-pending { color: #5d6470; font-style: italic; line-height: 1.55; margin: 10px 0 !important; }
 .working { color: #8a93a3; font-style: italic; }
 .reckfoot { position: sticky; bottom: 0; padding: 14px; text-align: center;
   background: linear-gradient(transparent, #10141a 40%); }
