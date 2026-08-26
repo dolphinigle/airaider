@@ -285,14 +285,18 @@ Each is stated as something a test or a player can observe. Several are true tod
 server runs one action at a time (`server/main.ts:205`); they are listed because that is exactly what
 this work removes.
 
-**I1. Same seed, same choices, same numbers.** A scripted campaign that interleaves three pursuits
-and one that runs them one at a time produce byte-identical saves. ⚠ Hard: `game.rng` is one stream
-drawn on **both sides** of every AI await (`game.ts:820–896`, then `958–966`), so overlapping
-generations interleave draws in network-completion order.
+**I1. Replay determinism is NOT required.** 🔒 **Ruled 2026-08-26 — "doesn't matter".** Overlapping
+generations may draw from `game.rng` in network-completion order (`game.ts:820–896`, then `958–966`)
+and the same save + same clicks need not replay identically. What this costs, so nobody is surprised
+later: reproducing a player's bug from their save. What it does **not** cost: `npm test`, the sim
+baselines, `chaos.test.ts` or any lab script — they all drive the facade serially through
+`MockProvider` (`I11`). *If a per-job random stream falls out of the design for free — one number
+drawn at click time, in click order, the job private thereafter — take it. Do not restructure for it.*
 
-**I2. Ids do not race.** `freshId` is a module-global counter (`cards.ts:79`) and the reckoning
-resolves quests **sorted by id** — so under concurrency the *resolution order itself*, and every
-random draw that follows it, becomes a function of which model call returned first.
+**I2. Resolution order stays the cycle's, not the network's.** The reckoning resolves quests **sorted
+by id** (`game.ts:1729`) off a module-global counter (`cards.ts:79`). Ids allocated inside a race make
+the *order the stories are told in* depend on which model call returned first — which the player sees,
+unlike `I1`. Allocating a quest's id when its pursuit is **clicked** costs nothing and settles it.
 
 **I3. Anti-repetition memory survives concurrency and a save.** Save mid-campaign, reload, pursue:
 the next card is the one the unbroken run would have dealt. Seven in-memory windows — recent NPC
@@ -394,8 +398,10 @@ it. Run on the **GUI**, which is the surface the complaint came from.
 
 *These are the decisions the goals cannot make. Recommendations attached so they can be ruled fast.*
 
-**R0 — Does determinism survive concurrency, and is it worth what it costs?** ⚠ **Rule this one
-first; it sizes the whole job.** `I1` demands that interleaved play and one-at-a-time play produce
+**R0 — Does determinism survive concurrency? ✅ RULED 2026-08-26: it doesn't matter.** Replay is not
+a requirement (`I1`); the anti-repetition windows (`I3`) and the writing quality they protect (`I4`)
+still are, and so does a stable telling order (`I2`). *(The framing and options are kept below because
+they explain WHY `I3`/`I4` are the load-bearing half — the same code causes both.)* `I1` demands that interleaved play and one-at-a-time play produce
 identical saves. That is expensive: `game.rng` is a single stream drawn on *both sides* of every AI
 await (`game.ts:820–896`, then `:958–966`), ids come from one global counter that also decides
 resolution order (`cards.ts:79`, `game.ts:1729`), and seven dedup windows are read-before/written-after
