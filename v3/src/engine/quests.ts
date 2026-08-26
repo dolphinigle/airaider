@@ -152,6 +152,7 @@ export interface Quest {
   job: string;
   level: number;
   rarity: Rarity;
+  gravity?: string;                // the card's weight — also drives the report's word budget
   region: string;
   archetype: Archetype;
   chainId?: string;

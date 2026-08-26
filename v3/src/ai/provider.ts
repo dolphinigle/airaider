@@ -103,7 +103,10 @@ export interface GenesisOut {
 export interface ResolveQuestInput {
   questId: string;
   title: string; situation: string; job: string;
-  rarity: string;                // drives the word budget
+  rarity: string;
+  gravity?: string;              // drives the word budget (2026-08-26): everyday jobs get a
+                                 // SHORT report, grave affairs keep the room a prior A/B showed
+                                 // they need (long 5.8 vs short 5.2)
   outcome: 'success' | 'partial' | 'failure';
   party: { id: string; name: string; tags: string; dossier?: string }[];  // dossier only when it adds lines beyond the blurb
   sceneFacet?: string;           // engine-rolled facet the before-text opens on (§2 seed —

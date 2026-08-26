@@ -968,7 +968,7 @@ export class Game {
       if (person) rewardCards.push(person);
     }
     return {
-      id: freshId('q'), leadId: lead.id, title: out.title, situation: out.situation, job: out.job,
+      id: freshId('q'), leadId: lead.id, title: out.title, situation: out.situation, job: out.job, gravity,
       level: lead.level, rarity: lead.rarity, region: lead.region, archetype: lead.archetype,
       slots: this.buildSlots(n, lead.level, lead.rarity, lead.archetype, out.ask),
       rewardSpecs: specs, rewardCards, state: 'open', createdCycle: this.state.cycle,
@@ -1596,6 +1596,7 @@ export class Game {
     chain.lastGeneratedBeat = chain.beatIndex + 1;
     const quest: Quest = {
       id: freshId('q'), leadId: lead.id, title: out.title, situation: out.situation, job: out.job,
+      gravity: sampleGravity(this.rng, chain.rarity),
       level: chain.level, rarity: chain.rarity, region: chain.region, archetype: lead.archetype,
       chainId: chain.id, beatIndex: chain.beatIndex + 1, isFinale,
       slots: this.buildSlots(n, chain.level, chain.rarity, 'investigate', out.ask, cap,
@@ -1758,7 +1759,7 @@ export class Game {
 
     // 2) ONE batched AI call for all resolutions
     const aiInputs: ResolveQuestInput[] = resolutions.map(r => ({
-      questId: r.quest.id, title: r.quest.title, situation: r.quest.situation, job: r.quest.job,
+      questId: r.quest.id, title: r.quest.title, situation: r.quest.situation, job: r.quest.job, gravity: r.quest.gravity,
       rarity: r.quest.rarity, outcome: r.outcome,
       // habits reach the narrator only ~40% of the time — a habit not shown cannot become a
       // signature stamp (the scar-tic appeared in 9 of 15 resolutions when always sent)
