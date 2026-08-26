@@ -2204,6 +2204,7 @@ export class Game {
     // narrate in the fiction's own order — setup, THEN the dice, THEN the outcome
     // (QUESTS §7: before-roll blind → after-roll sighted; the DICE are always shown, DESIGN §5)
     report.push(`— ${q.title} (${q.id})`);
+    if (q.situation) report.push(`「${q.situation}」`);
     const bubbles = process.env.SPEECH_ANCHORS === '1' && out?.speech?.length ? out.speech : null;
     if (out) report.push(...(bubbles ? this.renderWithBubbles(out.before, bubbles) : [out.before]));
     report.push(r.rolled.totalCoins === 0

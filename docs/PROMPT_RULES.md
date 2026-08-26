@@ -174,7 +174,21 @@ the card nor re-tells the situation in new words. Our resolver does the second t
 re-imagines from engine facts a scene the player has already read, discarding the card's own images,
 client and hook at the moment they would pay off.
 
-What this implies for our prompts (targets — not yet implemented):
+**✅ IMPLEMENTED 2026-08-26** (designer caught that it was still missing after a GUI playtest):
+- **The card now prints above the resolution** (`game.ts`, resolution report: `「situation」` between
+  the title and the lead-in). Both UIs render the same report, so both get it.
+- **The resolver is TOLD the card is on screen above its own text.** This is the half that is easy to
+  miss: it already RECEIVED `situation`, but without knowing the player has just read it, it
+  re-establishes a premise the reader already has. Added to the head frame — *"The job's CARD is
+  printed directly above your text and the player has just read it: never re-tell what it already
+  said — begin where it left off, and let its own people, places and hook carry through."*
+- Result, verbatim: card 「*Eneriell was seized from Thornhollow. A band of brigands took her and
+  holds her inside the ruin…*」 → lead-in *"Arlie came to Thornhollow at dusk and found the ruin
+  naked against the sky. From the hollowed hall came a round of low singing that tried to sound like
+  work, and under it a thin, muffled voice that answered once and then fell silent."* — it adds the
+  singing and the muffled captive rather than restating the seizure.
+
+Remaining targets (not yet implemented):
 - The resolver RECEIVES the card's situation text and writes what happens NEXT. It does not restate
   the situation, and it does not repeat it either.
 - Consider showing the card text above the resolution in both UIs, as the reference does — that is
