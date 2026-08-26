@@ -61,7 +61,7 @@ export function rollRelicName(rng: Rng, form: string): string {
 export function rollPlaceName(rng: Rng): string {
   const a = ['Ash', 'Bram', 'Cold', 'Dun', 'Elm', 'Fal', 'Grey', 'Haw', 'Mill', 'Oak', 'Raven', 'Stone', 'Thorn', 'Wold',
     'Bir', 'Crag', 'Dew', 'Fern', 'Harrow', 'Ling', 'Marl', 'Nether', 'Peat', 'Rush', 'Sedge', 'Tarn', 'Whin', 'Yar'];
-  const b = ['brook', 'combe', 'ford', 'gate', 'hollow', 'march', 'mere', 'stead', 'well', 'wick',
+  const b = ['brook', 'combe', 'ford', 'hollow', 'march', 'mere', 'stead', 'well', 'wick',
     'barrow', 'bourne', 'cot', 'croft', 'dale', 'fen', 'garth', 'gill', 'holt', 'lea', 'moss', 'shaw', 'thorpe', 'worth'];
   return rng.pick(a) + rng.pick(b);
 }

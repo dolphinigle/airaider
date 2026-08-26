@@ -1079,7 +1079,9 @@ export class Game {
     const avoidRich = this.state.chains.slice(-5).map(c =>
       `${c.bible.title} — ${c.bible.kernel} (people: ${c.bible.cast.map(x => x.name).join(', ')}) ${c.bible.arc.join(' ')} ${c.bible.tensions.join(' ')}`);
     const genesisInput = {
-      seed: sampleSeed(this.rng), keywords: sampleKeywords(this.rng),
+      // labels are for the CARD writer, which is told what they mean; genesis is not, and its goal
+      // sentence gets pasted into every briefing of the saga — so it receives the bare atoms.
+      seed: sampleSeed(this.rng), keywords: sampleKeywords(this.rng).map(k => k.replace(/^[a-z-]+: /, '')),
       // most sagas must live AWAY from the landmark — omission beats the ignored "set it elsewhere"
       // nudge (both sagas of a read centered Thornhollow when genesis could always see it)
       location: this.locationLine(lead.region, this.rng.chance(0.15)),

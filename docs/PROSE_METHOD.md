@@ -151,6 +151,19 @@ cards reported `gate` at 31%; separating the populations showed 936 were lab fix
 live rate was **18%**, with `charcoal` (19%) actually the top trope. Filter: `oneofflab.ts` /
 campaign output = live; anything whose first line matches `# <path> — n=` = lab, exclude it.
 
+### ⚠️ CORRECTION 2026-08-26 — I fixed the MINOR sources and missed the dominant ones
+An independent review of the diff caught this. The commit `ed72e32` claimed to "de-charcoal the place
+pool"; it removed `'by the charcoal camps'` from `SPARK_WHERE` (1 of 16, dealt on a fraction of
+cards) while **`the charcoal-burners' camps` remained a `forests` REGION ANCHOR** (`regions.ts:33`),
+dealt in the `location` line of EVERY forests card. Likewise `gate` was removed from a ~250-entry
+noun pool while it remained a `rollPlaceName` SUFFIX with **two place suggestions dealt per card**
+(`names.ts:64`).
+**Before claiming a trope is fixed, enumerate EVERY path that deals it** — pools, region anchors,
+name generators, intake facts, sparks — and rank them by how often each is actually dealt. A 1-in-250
+pool entry cannot produce a 19% rate; something dealt on every card can.
+*(The region anchor is left in place deliberately: a region with charcoal camps having charcoal jobs
+is the routine-is-fine case. What was wrong was the claim, not the anchor.)*
+
 ### Fixed so far (live rates, before → after)
 | trope | before | after | dealt by |
 |---|---|---|---|
