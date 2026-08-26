@@ -31,13 +31,32 @@ export class MockProvider implements AiProvider {
   private rng: Rng;
   private _usage: AiUsage = { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 };
 
-  constructor(seed = 1337) { this.rng = new Rng(seed) }
+  /** TEMPO I13: the mock answers instantly, so nothing that depends on a call being SLOW —
+   *  the progressive reckoning, the queue, anything concurrent — is observable against it.
+   *  AIRAIDER_MOCK_LATENCY_MS makes it take its time. Default 0: the suite and the sims are
+   *  untouched. Jitter comes from a SEPARATE stream so it can never perturb a game draw. */
+  private latencyMs: number;
+  private lagRng: Rng;
+
+  constructor(seed = 1337, latencyMs = Number(process.env.AIRAIDER_MOCK_LATENCY_MS ?? 0)) {
+    this.rng = new Rng(seed);
+    this.latencyMs = latencyMs;
+    this.lagRng = new Rng((seed ^ 0x5eed5eed) >>> 0);
+  }
+
+  /** wait like a real model would; `spread` scales it (0.4 = a fast call, 1.6 = a slow one) */
+  private async lag(spread = 1): Promise<void> {
+    if (!this.latencyMs) return;
+    const ms = this.latencyMs * spread * (0.6 + 0.8 * this.lagRng.next());
+    await new Promise(r => setTimeout(r, ms));
+  }
   usage(): AiUsage { return { ...this._usage } }
   callLog() { return [] }
   private tick() { this._usage.calls++ }
 
   async writeQuest(input: QuestWriteInput): Promise<QuestWriteOut> {
     this.tick();
+    await this.lag();
     const kw = (input.keywords ?? []).slice(0, 2).join(', ');
     const arch = input.archetype ?? 'investigate';
     const title = input.kind === 'finale'
@@ -66,6 +85,7 @@ export class MockProvider implements AiProvider {
 
   async genesis(input: GenesisInput): Promise<GenesisOut> {
     this.tick();
+    await this.lag(5);   // the real genesis is the 50-66s outlier
     const f = input.focal.name;
     const extraName = input.assignedNames[0] ?? 'a stranger';
     const slate = input.slate ?? [];
@@ -92,51 +112,65 @@ export class MockProvider implements AiProvider {
 
   async resolve(inputs: ResolveQuestInput[], onEach?: (out: ResolveQuestOut) => void): Promise<ResolveQuestOut[]> {
     this.tick();
-    // the mock settles instantly, so onEach fires in SUBMISSION order — the suite and the sims
-    // stay bit-identical while the real provider fires in arrival order
-    return inputs.map(q => {
-      const lead = q.party[0];
-      const before = `${q.party.map(p => p.name).join(', ')} set out: ${q.job.toLowerCase()}`;
-      const after =
-        q.outcome === 'success' ? `It goes clean. ${q.deliveredSummary}. ${lead?.name ?? 'The party'} takes the credit.` :
-        q.outcome === 'partial' ? `It gets messy, but they come away with something: ${q.deliveredSummary}. Questions will follow.` :
-        `It falls apart at the worst moment. Nothing to show but the walk home.`;
-      const injuries = q.party.map(p => {
-        let band: 'none' | 'low' | 'med' | 'high' = 'none';
-        if (q.outcome === 'failure' && this.rng.chance(0.5)) band = this.rng.chance(0.3) ? 'med' : 'low';
-        else if (q.outcome === 'partial' && this.rng.chance(0.2)) band = 'low';
-        // cause must NAME the merc (multi-party guard drops nameless wounds — sims were blind
-        // to the whole wound channel until 2026-07-10)
-        return { characterId: p.id, band, cause: band === 'none' ? null : `${p.name} takes a knock ${q.outcome === 'failure' ? 'at the worst moment' : 'as it gets messy'}` };
-      });
-      const fleshed = q.deliveredCharacters.map(c => ({
-        characterId: c.id,
-        who: `known around ${this.rng.pick(['the docks', 'the market rows', 'the back roads', 'the old quarter'])} — ${c.tags.split(';')[0] ?? ''}`,
-        backstory: `${c.name} ended up in this life the usual way: one bad season and one worse promise.`,
-        quirks: [this.rng.pick(['counts coins twice', 'never sits with their back to a door', 'hums while working', 'keeps a pressed flower in a boot'])],
-      }));
-      const edges = q.party.length >= 2 && q.outcome !== 'failure'
-        ? [{ from: q.party[0]!.id, to: q.party[1]!.id, type: 'served-with', blurb: `stood together — ${q.title}`, importance: 0.35 }]
-        : q.outcome === 'failure' && q.party.length >= 1
-          ? [{ from: q.party[0]!.id, to: q.party[0]!.id, type: 'scarred-by', blurb: `carries the failure of ${q.title}`, importance: 0.45 }]
-          : [];
-      const out: ResolveQuestOut = {
-        questId: q.questId, before, after, injuries, fleshed,
-        edges: edges.filter(e => e.from !== e.to),
-        storyUpdate: q.chainContext ? {
-          currentSituation: q.outcome === 'failure' ? 'The trail cools; doors close.' : 'The next thread is in hand.',
-          newlyRevealed: q.outcome !== 'failure' ? ['another layer of the affair'] : [],
-          openThreads: ['what the broker is not saying'],
-        } : undefined,
-      };
+    // AIRAIDER_MOCK_FAIL_RESOLVE makes the reckoning's AI call blow up, so the error path can be
+    // played instead of reasoned about: the player must not be stranded on a half-written page
+    if (process.env.AIRAIDER_MOCK_FAIL_RESOLVE) { await this.lag(); throw new Error('mock: resolve failed on purpose') }
+    const fire = (o: ResolveQuestOut) => {
       // a throwing consumer never fails the batch — but it is never silent either
-      try { onEach?.(out) } catch (e) { console.error('[mock] resolve onEach threw:', (e as Error).message) }
-      return out;
+      try { onEach?.(o) } catch (e) { console.error('[mock] resolve onEach threw:', (e as Error).message) }
+    };
+    // With no latency configured the mock settles instantly and onEach fires in SUBMISSION order —
+    // that is why the suite and the sims stay bit-identical. Under AIRAIDER_MOCK_LATENCY_MS each
+    // quest waits on its OWN clock, so they land out of order exactly as the real provider does.
+    if (this.latencyMs) {
+      const outs = inputs.map(q => this.resolveOne(q));
+      await Promise.all(outs.map(async o => { await this.lag(0.5 + this.lagRng.next()); fire(o) }));
+      return outs;
+    }
+    return inputs.map(q => { const out = this.resolveOne(q); fire(out); return out });
+  }
+
+  /** one quest's report — pure, drawn from the game rng exactly as before */
+  private resolveOne(q: ResolveQuestInput): ResolveQuestOut {
+    const lead = q.party[0];
+    const before = `${q.party.map(p => p.name).join(', ')} set out: ${q.job.toLowerCase()}`;
+    const after =
+      q.outcome === 'success' ? `It goes clean. ${q.deliveredSummary}. ${lead?.name ?? 'The party'} takes the credit.` :
+      q.outcome === 'partial' ? `It gets messy, but they come away with something: ${q.deliveredSummary}. Questions will follow.` :
+      `It falls apart at the worst moment. Nothing to show but the walk home.`;
+    const injuries = q.party.map(p => {
+      let band: 'none' | 'low' | 'med' | 'high' = 'none';
+      if (q.outcome === 'failure' && this.rng.chance(0.5)) band = this.rng.chance(0.3) ? 'med' : 'low';
+      else if (q.outcome === 'partial' && this.rng.chance(0.2)) band = 'low';
+      // cause must NAME the merc (multi-party guard drops nameless wounds — sims were blind
+      // to the whole wound channel until 2026-07-10)
+      return { characterId: p.id, band, cause: band === 'none' ? null : `${p.name} takes a knock ${q.outcome === 'failure' ? 'at the worst moment' : 'as it gets messy'}` };
     });
+    const fleshed = q.deliveredCharacters.map(c => ({
+      characterId: c.id,
+      who: `known around ${this.rng.pick(['the docks', 'the market rows', 'the back roads', 'the old quarter'])} — ${c.tags.split(';')[0] ?? ''}`,
+      backstory: `${c.name} ended up in this life the usual way: one bad season and one worse promise.`,
+      quirks: [this.rng.pick(['counts coins twice', 'never sits with their back to a door', 'hums while working', 'keeps a pressed flower in a boot'])],
+    }));
+    const edges = q.party.length >= 2 && q.outcome !== 'failure'
+      ? [{ from: q.party[0]!.id, to: q.party[1]!.id, type: 'served-with', blurb: `stood together — ${q.title}`, importance: 0.35 }]
+      : q.outcome === 'failure' && q.party.length >= 1
+        ? [{ from: q.party[0]!.id, to: q.party[0]!.id, type: 'scarred-by', blurb: `carries the failure of ${q.title}`, importance: 0.45 }]
+        : [];
+    return {
+      questId: q.questId, before, after, injuries, fleshed,
+      edges: edges.filter(e => e.from !== e.to),
+      storyUpdate: q.chainContext ? {
+        currentSituation: q.outcome === 'failure' ? 'The trail cools; doors close.' : 'The next thread is in hand.',
+        newlyRevealed: q.outcome !== 'failure' ? ['another layer of the affair'] : [],
+        openThreads: ['what the broker is not saying'],
+      } : undefined,
+    };
   }
 
   async flesh(inputs: FleshInput[]): Promise<FleshOut[]> {
     this.tick();
+    await this.lag(1.3);   // the cycle's 12-16s tail
     return inputs.map(i => ({
       characterId: i.characterId,
       who: i.saga
@@ -151,6 +185,7 @@ export class MockProvider implements AiProvider {
 
   async themeRoll(input: ThemeRollInput): Promise<ThemeRollOut> {
     this.tick();
+    await this.lag(0.4);
     const wants = [...input.hintWords];
     // style adds its cultural want; plus one flavorful extra from the vocabulary
     const extra = this.rng.pick(input.vocabulary.filter(v => !wants.includes(v)));
@@ -160,6 +195,7 @@ export class MockProvider implements AiProvider {
 
   async select(input: SelectorInput): Promise<string[]> {
     this.tick();
+    await this.lag(0.3);
     return input.candidates.slice(0, input.max).map(c => c.id);
   }
 

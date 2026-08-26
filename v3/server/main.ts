@@ -211,13 +211,25 @@ app.get('/api/state', async () => stateView());
 // never interleave inside an awaiting action
 let actionChain: Promise<unknown> = Promise.resolve();
 
+// A second END must be REFUSED, not queued. Actions are serialised, so the engine's own
+// re-entrancy guard never fires — the second request simply waits its turn and then resolves a
+// WHOLE EXTRA CYCLE, whose report replaces the one the player was reading. Measured 2026-08-26:
+// two simultaneous ENDs took the game from cycle 3 to cycle 5. The GUI disables the button while
+// busy, but a second tab, a reload, or a stray double-click all reach here.
+let endQueued = false;
+
 app.post<{ Body: { type: string; args: (string | number)[] } }>('/api/action', async (req) => {
+  if (req.body?.type === 'end') {
+    if (endQueued) return { ok: false, msg: 'the cycle is already resolving' };
+    endQueued = true;
+  }
   const run = actionChain.then(() => handleAction(req.body))
     .catch((e: Error) => {
       slog({ action: req.body?.type, error: e.message?.slice(0, 400) });
       return { ok: false, msg: `engine error: ${e.message?.slice(0, 200)} (logged)` };
     });
   actionChain = run.catch(() => undefined);
+  if (req.body?.type === 'end') run.finally(() => { endQueued = false });
   return run;
 });
 
@@ -255,7 +267,16 @@ async function handleAction(body: { type: string; args: (string | number)[] }) {
       result = game.setFocus(s(a[0]), focus as never); break;
     }
     case 'end': {
-      lastReport = await game.endCycle();
+      // On a throw the live reckoning is gone, and `lastReport` still holds the PREVIOUS cycle —
+      // which the player would read as this cycle's, having just watched it being written. Say
+      // what happened instead. (The outer catch still logs and toasts the engine error.)
+      try {
+        lastReport = await game.endCycle();
+      } catch (e) {
+        lastReport = ['⚠ The reckoning broke off — this cycle could not be resolved.',
+          `(${(e as Error).message?.slice(0, 160)})`];
+        throw e;
+      }
       result = { ok: true, msg: `cycle ${game.state.cycle} resolved` };
       break;
     }

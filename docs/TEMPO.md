@@ -310,10 +310,11 @@ all keep working straight through. Async is a *player-surface* feature; the requ
 that could release it, or a job whose lead is gone — otherwise `chaos.test.ts` (4000 random actions
 under audit) goes blind to exactly the new bug class.
 
-**I13. The async path is testable at all.** Every invariant above is stated as observable, but the
-suite, the sims and the labs all run `MockProvider` at ~0 latency, so nothing ever interleaves there.
-Testing any of this needs a mock that can *be slow on purpose* — a small, required piece of work with
-no line item anywhere else.
+**I13. The async path is testable at all.** ✅ **BUILT.** `AIRAIDER_MOCK_LATENCY_MS` makes the mock
+take its time (per-call, scaled — genesis 5×, flesh 1.3×; jitter from a SEPARATE rng stream so it can
+never perturb a game draw), and `AIRAIDER_MOCK_FAIL_RESOLVE` makes the reckoning's call blow up.
+Default 0 / unset: the suite, the sims and the labs are untouched. `scripts/_guiplay.ts` runs the
+React client's exact state machine against a real server on top of it — see §9.
 
 **I14. The prototype stays a prototype.** No job servers, no databases, no retry frameworks
 (`README` doctrine). The smallest thing that delivers the behaviours above.
@@ -462,7 +463,51 @@ forbids. **Recommendation: in scope, cheapest possible** — same queue, no cere
 
 ---
 
-## 9. Scope and sequencing
+## 9. Playtest — 2026-08-26
+
+`v3/scripts/_guiplay.ts` drives a real server with the **React client's own state machine** (`fresh`
+/ `held` / the 500ms poll, copied from `App.tsx`); the mock is slowed with
+`AIRAIDER_MOCK_LATENCY_MS` so concurrency is observable. Seven scenarios, all passing:
+
+| | scenario | result |
+|---|---|---|
+| S1 | first cycle: a quest marching **and** a guaranteed flesh tail | slot held 2.0s, report at 2.5s, PROCEED at 2.5s vs cycle end 6.1s |
+| S1b | a cycle with nothing marching | the quiet-cycle line, PROCEED immediately |
+| S2 | two quests marching | `0.5s[6L 2✎]` → `2.0s[12L 1✎ 1⚄]` → `3.5s[17L 0✎ 2⚄]` — **one report readable while the other was still out** |
+| S3 | act in the fort right after PROCEED | fine when there is no tail; ⚠ see `P20` when there is |
+| S4 | double END (double-click, second tab) | one cycle, second refused |
+| S5 | a new tab opens mid-reckoning | sees the live report, never trapped |
+| S6 | server killed mid-reckoning | PROCEED still opens; restart is not stuck |
+| S7 | the reckoning's AI call fails | says so, clears, fort still playable |
+
+**Real AI, through the server** (`_guiplay.ts <port> 0 real`):
+
+```
+t+ 0.0s   6 lines · 2 still out · held        both slots open with title + card
+t+ 8.1s  10 lines · 1 still out · held        first report readable while the other is out
+t+13.2s  16 lines · 0 still out · PROCEED     second lands
+cycle actually finished at 32.4s              → 19.3s of tail the player never sees
+```
+
+**Regression check.** 120-cycle mock campaigns on seeds 11/77/404 produce **byte-identical** results
+to the pre-change baseline (`a4eae82` in a worktree): 261 quests (175 s / 65 p / 21 f) and 344
+(251/78/15). The CLI's batch mode still plays a full loop (`I11`).
+
+**Two bugs the playtest found and fixed:**
+- **A double END ran TWO whole cycles.** Actions are serialised, so the engine's own re-entrancy
+  guard never fires — the second request simply waited its turn and resolved another cycle, whose
+  report replaced the one being read. Measured: cycle 3 → 5. A second END is now refused at the
+  route. The GUI disables the button, but a second tab, a reload, or a stray double-click all reach
+  the server.
+- **A broken reckoning showed the PREVIOUS cycle's report** as if it were this one — more convincing
+  now that the player has just watched a report being written. It says it broke off instead.
+
+**Known, not fixed** — after PROCEED, while the flesh tail runs, the fort *looks* live but every
+action queues behind the still-open request (`P20`). That is `R8`'s ruling.
+
+---
+
+## 10. Scope and sequencing
 
 **The two halves are independently approvable and independently shippable.** They share the machinery
 but not the risk: `G1` (pursue several at once) is where the concurrency hazards in §5 live; `G3`
