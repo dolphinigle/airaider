@@ -123,6 +123,10 @@ Validated split (keep, revisit model names as they update): a **stronger model**
   behind pre-generation, background jobs, and parallel fan-out. **The prototype is exempt**:
   serial blocking calls with pending-state feedback are fine (design-learning per hour beats
   robustness there).
+- ⚠ **Under revision 2026-08-26 — see [TEMPO.md](TEMPO.md).** Play overturned the exemption: the
+  designer's report is *"lots of waiting making the prototype very awkward to play"*, and the measured
+  blocking waits are 10s a pursuit and **50–66s to start a saga**. TEMPO.md holds the goals; this
+  bullet is amended once they are approved.
 
 ---
 
