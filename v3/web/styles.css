@@ -63,3 +63,26 @@ h3 { font-size: 15px; }
 /* menu gating (gate rooms open menus) */
 nav button.locked { opacity: .45; }
 .lockmsg { margin: 8px 0; padding: 10px 14px; background: #3a2f24; border-radius: 6px; }
+
+/* ── the reckoning: its own page, not a panel on the fort tab ───────────────────────── */
+.reckpage { display: flex; flex-direction: column; min-height: 100vh; }
+.reckhead { display: flex; align-items: baseline; gap: 14px; padding: 10px 16px;
+  border-bottom: 1px solid #2b3b55; background: #141a24; }
+.reckhead b { color: #d8c08a; letter-spacing: 2px; }
+.reckbody { flex: 1; max-width: 820px; margin: 0 auto; padding: 22px 20px 90px; }
+.reckbody p { margin: 4px 0; white-space: pre-wrap; }
+.r-title { color: #d8c08a; font-weight: bold; font-size: 16px; margin-top: 26px !important;
+  border-top: 1px solid #2b3b55; padding-top: 16px; }
+.r-card { color: #8fa8c4; font-style: italic; margin-bottom: 10px !important; }
+.r-prose { line-height: 1.55; margin: 10px 0 !important; }
+.r-roll { color: #c9a94f; font-weight: bold; margin-top: 12px !important; }
+.r-coins { color: #6a7280; font-size: 12px; }
+.r-turn { color: #b6c6d8; }
+.r-news { color: #8a93a3; }
+.working { color: #8a93a3; font-style: italic; }
+.reckfoot { position: sticky; bottom: 0; padding: 14px; text-align: center;
+  background: linear-gradient(transparent, #10141a 40%); }
+.proceed { font-size: 15px; padding: 10px 28px; letter-spacing: 1px;
+  background: #2c4468; border: 1px solid #47679a; color: #e6eefc; border-radius: 6px; cursor: pointer; }
+.proceed:disabled { opacity: 0.5; cursor: default; }
+.reopen { background: none; border: 1px solid #3a4150; color: #8a93a3; }

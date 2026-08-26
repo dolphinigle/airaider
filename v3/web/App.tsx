@@ -35,6 +35,9 @@ export function App() {
   const [busy, setBusy] = useState(false);
   const [pending, setPending] = useState<string | null>(null);
   const [detail, setDetail] = useState<string | null>(null);
+  // the reckoning is its own PAGE, not a panel on the fort tab: it opens the instant END is
+  // clicked (so the screen exists before the first word of narration does) and closes on PROCEED
+  const [reckoning, setReckoning] = useState(false);
 
   const refresh = useCallback(async () => {
     setS(await (await fetch('/api/state')).json());
@@ -64,6 +67,7 @@ export function App() {
   };
 
   if (!s) return <div className="app">loading…</div>;
+  if (reckoning) return <Reckoning s={s} busy={busy} onProceed={() => setReckoning(false)} />;
 
   return (
     <div className="app">
@@ -76,7 +80,9 @@ export function App() {
         <span>mercs {s.roster.length}/{s.rosterCap}</span>
         <span>captives {s.captives.length}/{s.captiveCap}</span>
         <span className="ai">AI: {s.aiName} ({s.ai.calls} calls{s.aiName === 'openai' ? `, ~$${s.ai.costUsd.toFixed(2)}` : ''})</span>
-        <button className="end" disabled={busy} onClick={() => doAct('end')}>{busy ? '…' : 'END CYCLE ▶'}</button>
+        {s.lastReport?.length > 0 &&
+          <button className="reopen" onClick={() => setReckoning(true)}>⚄ last reckoning</button>}
+        <button className="end" disabled={busy} onClick={() => { setReckoning(true); doAct('end') }}>{busy ? '…' : 'END CYCLE ▶'}</button>
       </header>
       {pending && <div className="pending"><span className="spin" /> working: <b>{pending}</b>… <i>story generation can take a minute — watch the AI tab</i></div>}
       {toast && <div className="toast">{toast}</div>}
@@ -104,13 +110,39 @@ export function App() {
           {tab === 'ai' && <AiLog s={s} />}
         </>}
       </main>
-      {s.lastReport?.length > 0 && tab === 'fort' && (
-        <section className="report">
-          <h3>Last reckoning</h3>
-          {s.lastReport.map((l: string, i: number) => <p key={i}>{l}</p>)}
-        </section>
-      )}
       {detail && <RoomDetail s={s} roomId={detail} doAct={doAct} close={() => setDetail(null)} />}
+    </div>
+  );
+}
+
+/** one report line → a class, so the page reads as a sequence of beats instead of a paragraph wall */
+function lineClass(l: string): string {
+  if (l.startsWith('— ')) return 'r-title';
+  if (l.startsWith('「')) return 'r-card';
+  if (l.startsWith('⚄')) return 'r-roll';
+  if (l.startsWith('   ')) return 'r-coins';
+  if (l.startsWith('▸')) return 'r-turn';
+  if (/^[⏸🕮⚠🕯🧭⛓💰🩸✦]/u.test(l)) return 'r-news';
+  return 'r-prose';
+}
+
+function Reckoning({ s, busy, onProceed }: { s: S; busy: boolean; onProceed: () => void }) {
+  const lines: string[] = busy ? [] : (s.lastReport ?? []);   // while resolving, the OLD report is stale
+  return (
+    <div className="app reckpage">
+      <header className="reckhead">
+        <b>THE RECKONING</b>
+        <span>cycle {s.cycle}</span>
+        <span className="ai">AI: {s.aiName} ({s.ai.calls} calls{s.aiName === 'openai' ? `, ~$${s.ai.costUsd.toFixed(2)}` : ''})</span>
+      </header>
+      <main className="reckbody">
+        {busy && <p className="working"><span className="spin" /> the company is still out — the report is being written…</p>}
+        {lines.map((l, i) => <p key={i} className={lineClass(l)}>{l}</p>)}
+        {!busy && lines.length === 0 && <p className="hint">Nothing to report.</p>}
+      </main>
+      <footer className="reckfoot">
+        <button className="proceed" disabled={busy} onClick={onProceed}>{busy ? 'resolving…' : 'PROCEED ▶'}</button>
+      </footer>
     </div>
   );
 }

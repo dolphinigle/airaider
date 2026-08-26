@@ -189,7 +189,11 @@ gets fixed without a ruling.
 
 **The reckoning (serves `G2`, `G3`):**
 
-- **P10** END CYCLE shows the screen instantly — it exists before the first word of narration does.
+- **P10** ✅ **BUILT.** The reckoning is **its own page**, not a panel on the fort tab, and it opens
+  the instant END is clicked — the screen exists before the first word of narration does. It shows
+  *"the company is still out — the report is being written…"* while the call runs, renders the report
+  as a sequence of beats (card / prose / the roll / the coins / fort news, each styled), and closes on
+  an explicit **PROCEED ▶** at the bottom. 🔒 Designer request, 2026-08-26.
 - **P11** 🔒 Each quest's report appears the moment it lands; the slowest never holds up a finished
   one. The resolve calls already run one-per-quest in parallel (`openai.ts:665`).
 - **P12** On a one-quest cycle — most of them — something still has to fill the ~10s. ⚠ `R3`.
@@ -207,8 +211,9 @@ gets fixed without a ruling.
   it is known instantly and must never sit between the player and a story still being written.
   ⚠ Changes shipped output: stall and lapse lines print *before* the resolutions today
   (`game.ts:1738`). Veto this one and the rest still stands.
-- **P19** The reckoning is leavable and returnable, restart included. *(Today it is a variable in the
-  server process, `server/main.ts:47`.)*
+- **P19** The reckoning is leavable and returnable. ◐ **Half built:** a `⚄ last reckoning` button in
+  the header reopens the page after PROCEED. It still lives in a server-process variable
+  (`server/main.ts:47`), so a restart loses it.
 - **P20** Closing it lands the player in a fort that is already true — nothing finishes applying
   itself afterwards.
 - **P21** The `flesh` tail (12–16s) does not hold the door — but must not leave a person blank
