@@ -4,6 +4,13 @@
 > this line.** If card prose ever reads worse than the samples below, something in this checkpoint
 > was undone — diff against it before debugging anything else.
 
+**STATUS: LOCKED — AND THE PHASE IS CLOSED.** 2026-08-26, after a GUI playtest, the designer's
+verdict was **"game is actually fun."** Work moved on to prototype plumbing for a full playthrough
+(async requests and similar). **Do not reopen the writing without a reason that came from PLAY** —
+the do-not-reopen list in §4b exists because three settled decisions kept looking like easy wins.
+Later additions verified after the lock: gravity-varied resolution length and the ownerless-loot fix
+(`d24bd94`), both blind-A/B'd as quality-neutral-or-better.
+
 **STATUS: LOCKED.** The prose bar below is settled. Later work may OPTIMIZE the prompts (cut dead
 weight, tighten for cheap models) but must not lower this bar — re-run the §6 check after any edit.
 
