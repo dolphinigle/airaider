@@ -139,8 +139,10 @@ that minute needs something else — see **the genesis problem** (§3) and `R7`.
 while we get them** — 🔒 the designer's own framing, 2026-08-26: *"the big goal is: we want to be able
 to pursue several leads at the same time and overall less downtime if we can help it."*
 
-**G1 — Pursue several leads at the same time.** Click, click, click; they all get written; the board
-stays live the whole time. No click ever freezes the fort.
+**G1 — Pursue several leads at the same time.** ✅ **BUILT + PLAYED.** Click, click, click; they all
+get written; the board stays live throughout. The queue lives in the `Game` facade, so both UIs have
+it. Measured in a 20-cycle real-AI CLI session: three pursuits accepted instantly, 2 writing + 1
+queued, `roster`/`fort`/`status` all answering while they ran.
 
 **G2 — Less downtime, everywhere we can get it.** Not "hide the wait behind a nicer spinner" —
 actually less time in which the player has nothing to do. Measured, not asserted (§7).
@@ -165,20 +167,24 @@ gets fixed without a ruling.
 
 **Fort phase (serves `G1`, `G2`):**
 
-- **P1** A click is answered in ~100ms and stays visible until the work is actually done — two
-  overlapping actions are two visible things. *(Today's banner is single-slot: a second click
-  overwrites it and the first completion clears it while work is still out.)*
-- **P2** A lead being worked reads as *being worked*, where it stands: not pursuable twice, not
-  expiring under the work, never shown as simply available.
+- **P1** ✅ **BUILT.** `enqueuePursue` returns synchronously (test: <50ms against a 400ms provider).
+  The GUI's `queueAct` never touches the global `busy`/`pending`, so overlapping work is several
+  visible things rather than one banner overwriting another.
+- **P2** ✅ **BUILT.** The lead is reserved at the click; `leads` shows `✎WRITING` / `⋯QUEUED` (amber
+  row + disabled button in the GUI); both lead-dropping passes in `doEndCycle` skip reserved leads;
+  a second pursuit of the same lead is refused.
 - **P3** Nothing is spent until something is delivered — a failed pursuit costs no lead and no gold,
   and leaves no half-made quest. *(True for pursue; `renovate` charges gold before its call,
   `game.ts:433`.)*
 - **P4** Failures are visible and retryable in one click, and the game sets its own deadline —
   the only timeout today is the SDK's 10 minutes × its own retries, which no player will sit through.
-- **P5** Queued work can be dropped, and reordered.
+- **P5** ◐ **DROP: BUILT** (`cancel <jobId>`, `×` in the GUI; a running job refuses — its call is
+  already out). **REORDER: NOT BUILT** — with a cap of 2–3 and a board of 2–8 leads it has not yet
+  been worth anything in play.
 - **P6** Arrival is announced without stealing anything: no modal, no view jump, nothing yanked
   mid-click or mid-read.
-- **P7** A control disabled by in-flight work names the work that is blocking it.
+- **P7** ✅ **BUILT.** END reads `END CYCLE ▶ (2 still writing)`; the CLI prints *"the cycle waits
+  for the map table…"* and names what is out.
 - **P8** 🔒 **2–3 generations in flight, adjustable.** No price on pursuit: *"ultimately it's fine if
   the player wants to rapid-fire AI calls since they'll pay per AI call."* The cap keeps the machine
   and the provider happy; it never rations the player. Which makes the cost meter load-bearing — spent

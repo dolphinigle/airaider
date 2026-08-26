@@ -58,22 +58,56 @@ async function main() {
     for (const line of lines) {
       console.log(`\n> ${line}`);
       const done = await exec(game, line);
+      announceJobs(game);
       if (done) break;
     }
     return;
   }
 
+  // a card that lands while you are staring at the fort should reach you there, not the next time
+  // you happen to type something
+  const ticker = setInterval(() => {
+    const before = jobsSeen.size;
+    announceJobs(game);
+    if (before !== jobsSeen.size || game.jobs().some(j => j.state === 'done' || j.state === 'failed')) prompt();
+  }, 1000);
+  ticker.unref?.();
+
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout, terminal: process.stdin.isTTY ?? false });
-  const prompt = () => { if (process.stdin.isTTY) rl.setPrompt(`\n[c${game.state.cycle} | ${game.gold()}g | P${game.prestige().toFixed(0)} | GH T${game.state.fort.ghTier}] > `); if (process.stdin.isTTY) rl.prompt() };
+  const prompt = () => {
+    if (!process.stdin.isTTY) return;
+    const out = game.jobs().filter(j => j.state === 'queued' || j.state === 'running').length;
+    rl.setPrompt(`\n[c${game.state.cycle} | ${game.gold()}g | P${game.prestige().toFixed(0)} | GH T${game.state.fort.ghTier}${out ? ` | ✎${out}` : ''}] > `);
+    rl.prompt();
+  };
   prompt();
   for await (const line of rl) {
     try {
       const done = await exec(game, line.trim());
       if (done) break;
+      announceJobs(game);
     } catch (e) {
       console.log(`error: ${(e as Error).message}`);
     }
     prompt();
+  }
+}
+
+/** A job that finished must SAY so, wherever the player's attention is — the board updating
+ *  silently is how you end up re-reading the leads list to find out if anything happened. */
+const jobsSeen = new Map<string, string>();
+function announceJobs(game: Game): void {
+  for (const j of game.jobs()) {
+    if (jobsSeen.get(j.id) === j.state) continue;
+    const was = jobsSeen.get(j.id);
+    jobsSeen.set(j.id, j.state);
+    if (!was && j.state !== 'done' && j.state !== 'failed') continue;   // first sighting while still working
+    if (j.state === 'done') {
+      console.log(`\n✔ ${j.title} — the card is ready${j.questId ? ` (${j.questId})` : ''}.`);
+      if (j.questId) console.log(render.questDetail(game, j.questId));
+    } else if (j.state === 'failed') {
+      console.log(`\n✗ ${j.title} — could not be written: ${j.error ?? 'no reason given'}. The lead is still on the board.`);
+    }
   }
 }
 
@@ -89,7 +123,11 @@ async function runReckoning(game: Game): Promise<string[]> {
   let failed: unknown;
   done.then(r => { settled = r }, e => { failed = e });
 
-  console.log(render.reckoningHead(game));
+  // the header is printed on the first sighting of a live reckoning, NOT before: END now drains the
+  // map table first, so the cycle number does not bump until that finishes, and a header printed
+  // eagerly names the cycle that is ending rather than the one resolving
+  let headed = false;
+  const header = () => { if (!headed) { headed = true; console.log(render.reckoningHead(game)) } };
   // A terminal cannot rewrite what it printed, so it prints each BLOCK once when first seen — the
   // placeholder, which already carries the quest's title and its CARD, so there is something to
   // read during the wait exactly as there is on the page — and then appends only what the landed
@@ -128,6 +166,7 @@ async function runReckoning(game: Game): Promise<string[]> {
   while (settled === null && failed === undefined) {
     const v = game.reckoningView();
     if (v) {
+      header();
       sweep(v.blocks);
       if (!v.writing && completeAt === null) completeAt = Date.now() - t0;
     }
@@ -138,6 +177,7 @@ async function runReckoning(game: Game): Promise<string[]> {
     throw failed;
   }
   const report = settled as unknown as string[];
+  header();
   // a fast provider can finish the whole cycle between two polls — the final shape is kept by the
   // engine precisely so nothing goes unprinted just because we blinked
   sweep(game.lastReckoningBlocks());
@@ -163,7 +203,13 @@ async function exec(game: Game, line: string): Promise<boolean> {
 
   switch (cmd) {
     case 'help': console.log(render.help()); break;
-    case 'quit': case 'exit': return true;
+    case 'quit': case 'exit': {
+      // N3: work does not survive closing the game — but it must SAY so rather than vanish, and
+      // the process must not sit for a minute holding a genesis nobody will ever read
+      const b = render.jobsBrief(game);
+      if (b) console.log(`${b} — dropped: the map table does not work while the game is closed.`);
+      return true;
+    }
 
     // ---- views
     case 'fort': console.log(render.fort(game)); break;
@@ -193,7 +239,29 @@ async function exec(game: Game, line: string): Promise<boolean> {
     case 'gh': say(game.ghUpgrade()); break;
     case 'slot': say(game.slot(rest[0]!, Number(rest[1]), rest[2]!)); break;
     case 'unslot': say(game.unslot(rest[0]!, Number(rest[1]))); break;
-    case 'pursue': { const r = await game.pursue(rest[0]!); say(r); if (r.ok && r.questId) console.log(render.questDetail(game, r.questId)); break }
+    // TEMPO G1: the click is ANSWERED, not obeyed — the map table takes the job and the board
+    // stays yours. The card arrives when it arrives (announceJobs prints it).
+    case 'pursue': {
+      const r = game.enqueuePursue(rest[0]!);
+      say(r);
+      if (r.ok) { const b = render.jobsBrief(game); if (b) console.log(b) }
+      break;
+    }
+    case 'jobs': console.log(render.jobs(game)); break;
+    case 'cancel': say(game.cancelJob(rest[0]!)); break;
+    case 'inflight': {
+      const n = Math.max(1, Math.min(6, Number(rest[0]) || game.maxInFlight));
+      game.maxInFlight = n;
+      say({ ok: true, msg: `the map table works ${n} job(s) at once` });
+      break;
+    }
+    case 'wait': {
+      const b = render.jobsBrief(game);
+      console.log(b ? `${b} — waiting…` : '(nothing out)');
+      await game.drain();
+      announceJobs(game);
+      break;
+    }
     case 'assign': say(game.assign(rest[0]!, Number(rest[1]), rest[2]!)); break;
     case 'unassign': say(game.unassign(rest[0]!, Number(rest[1]))); break;
     case 'approach': say(game.chooseApproach(rest[0]!, rest[1]!)); break;
@@ -214,6 +282,8 @@ async function exec(game: Game, line: string): Promise<boolean> {
     }
 
     case 'end': {
+      const b = render.jobsBrief(game);
+      if (b) { console.log(`${b} — the cycle waits for the map table…`); await game.drain(); announceJobs(game) }
       const report = await runReckoning(game);
       slog({ cycle: game.state.cycle, action: 'end', report, ai: game.ai.usage() });
       break;
@@ -232,4 +302,6 @@ async function exec(game: Game, line: string): Promise<boolean> {
   return false;
 }
 
-main().catch(e => { console.error(e); process.exit(1) });
+// an in-flight AI call keeps node alive long after the player has left — quitting must actually
+// quit (measured 2026-08-26: a 66s genesis held the process for nearly two minutes after `quit`)
+main().then(() => process.exit(0)).catch(e => { console.error(e); process.exit(1) });

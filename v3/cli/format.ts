@@ -32,6 +32,7 @@ export const render = {
       '        excavate · gh   (styles: human elven wolfkin lizardkin ancient exotic)',
       'CARDS   slot <roomId> <idx> <cardId> · unslot <roomId> <idx> · focus <mercId> single|dual|none <attr> [attr2]',
       'QUESTS  pursue <leadId> · assign <qId> <slot> <mercId> · unassign <qId> <slot> · approach <qId> <gId>',
+      'QUEUE   jobs · wait · cancel <jobId> · inflight <n>   (pursue returns at once; cards arrive later)',
       'PEOPLE  hire <id> · accept <id> · ransom <id> · sell <id> · settle <id> · interrogate <id> · heal <id>',
       'TURN    end   — commit the cycle: everything rolls, the AI narrates',
       'META    save [name] · quit',
@@ -44,7 +45,8 @@ export const render = {
       `cycle ${g.state.cycle} · gold ${g.gold()} · prestige ${g.prestige().toFixed(1)}${need ? `/${need} for GH T${g.state.fort.ghTier + 1}` : ''} · GH T${g.state.fort.ghTier}`,
       `roster ${g.roster().length}/${g.rosterCapacity()} · captives ${g.captives().length}/${g.captiveCapacity()} · regions: ${g.state.unlockedRegions.join(', ') || 'none'}`,
       `leads ${g.visibleLeads().length} · open quests ${g.state.quests.filter(q => q.state === 'open').length} · live chains ${g.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending').length}`,
-    ].join('\n');
+      this.jobsBrief(g),
+    ].filter(Boolean).join('\n');
   },
 
   fort(g: Game): string {
@@ -130,11 +132,38 @@ export const render = {
   leads(g: Game): string {
     const leads = g.visibleLeads();
     if (!leads.length) return g.hasRoom('map-room') ? '(the board is empty — earn leads through quests and hunts)' : '(build a Map room first)';
+    // a lead the map table is already working must never read as simply available (TEMPO P2)
+    const working = new Map(g.jobs().filter(j => j.state === 'queued' || j.state === 'running').map(j => [j.leadId, j.state]));
     return leads.map(l => {
       const exp = l.expiresAtCycle === null ? 'standing' : `c${l.expiresAtCycle}`;
       const chain = l.chainInfo.kind === 'none' ? '' : l.chainInfo.kind === 'starts-new' ? ' ✦STORY' : ' ⛓CONT';
-      return `${l.id.padEnd(9)} ${l.rarity.padEnd(8)} L${String(l.level).padEnd(3)} ${REGION[l.region]!.name.padEnd(18)} ${l.archetype.padEnd(12)}${chain} exp:${exp}${l.title ? ` — ${l.title}` : ''}`;
+      const job = working.get(l.id);
+      const mark = job === 'running' ? ' ✎WRITING' : job === 'queued' ? ' ⋯QUEUED' : '';
+      return `${l.id.padEnd(9)} ${l.rarity.padEnd(8)} L${String(l.level).padEnd(3)} ${REGION[l.region]!.name.padEnd(18)} ${l.archetype.padEnd(12)}${chain}${mark} exp:${exp}${l.title ? ` — ${l.title}` : ''}`;
     }).join('\n');
+  },
+
+  /** what the map table has OUT (TEMPO P2/P5) — finished work is not a list, it is a card on the
+   *  board and a line that already announced itself. By cycle 7 of a playtest this was eight rows
+   *  of ✔ from cycles ago, which is a history nobody asked for. Failures stay: they need retrying. */
+  jobs(g: Game): string {
+    const all = g.jobs();
+    const js = all.filter(j => j.state !== 'done');
+    const done = all.length - js.length;
+    if (!js.length) return `(the map table is idle${done ? ` — ${done} card(s) delivered` : ''})`;
+    return js.map(j => {
+      const mark = j.state === 'running' ? '✎ writing ' : j.state === 'queued' ? '⋯ queued  ' : '✗ FAILED  ';
+      const tail = j.state === 'failed' ? ` — ${j.error ?? 'no reason given'} (pursue it again to retry)` : '';
+      return `${j.id.padEnd(7)} ${mark} ${j.title}${tail}`;
+    }).join('\n') + `\n(at most ${g.maxInFlight} at once — 'inflight <n>' to change)`;
+  },
+
+  /** one line naming what is out, for the prompt and for post-command nudges */
+  jobsBrief(g: Game): string | null {
+    const js = g.jobs().filter(j => j.state === 'queued' || j.state === 'running');
+    if (!js.length) return null;
+    const r = js.filter(j => j.state === 'running').length;
+    return `✎ the map table: ${r} writing${js.length - r ? `, ${js.length - r} queued` : ''}`;
   },
 
   quests(g: Game): string {

@@ -510,12 +510,17 @@ export function makeOpenAiProvider(): AiProvider {
   const client = new OpenAI({ apiKey: loadKey() });
   const usage: AiUsage = { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 };
   const records: AiCallRecord[] = [];
-  let purposeCtx = '?';           // set by each public method before calling
+  // TEMPO I8: purpose used to be ONE mutable variable set by whichever method ran last, and the
+  // ordinal was read before it was incremented. With calls in flight at once that mislabels every
+  // row and collides the numbering — and this log is the instrument the whole tempo phase is
+  // measured with, so it has to be right BEFORE anything is concurrent. Both now travel with
+  // the call.
+  let ordinal = 0;
 
-  async function call<S extends z.ZodTypeAny>(model: string, system: string, user: string, schema: S, effort?: 'minimal' | 'low' | 'medium'): Promise<z.output<S>> {
+  async function call<S extends z.ZodTypeAny>(purpose: string, model: string, system: string, user: string, schema: S, effort?: 'minimal' | 'low' | 'medium'): Promise<z.output<S>> {
     const t0 = Date.now();
     const rec: AiCallRecord = {
-      n: usage.calls + 1, purpose: purposeCtx, model, durationMs: 0,
+      n: ++ordinal, purpose, model, durationMs: 0,
       inputTokens: 0, outputTokens: 0, cachedTokens: 0, costUsd: 0, ok: false,
       systemPreview: system, userPrompt: user.slice(0, 20000),
     };
@@ -557,11 +562,11 @@ export function makeOpenAiProvider(): AiProvider {
   }
 
   /** one retry on parse/validation failure — a single hiccup must not ship fallback prose */
-  async function callR<S extends z.ZodTypeAny>(model: string, system: string, user: string, schema: S, effort?: 'minimal' | 'low' | 'medium'): Promise<z.output<S>> {
-    try { return await call(model, system, user, schema, effort) }
+  async function callR<S extends z.ZodTypeAny>(purpose: string, model: string, system: string, user: string, schema: S, effort?: 'minimal' | 'low' | 'medium'): Promise<z.output<S>> {
+    try { return await call(purpose, model, system, user, schema, effort) }
     catch (e) {
       if (process.env.AI_DEBUG) console.error('[ai] retrying after:', (e as Error).message?.slice(0, 200));
-      return call(model, system, user, schema, effort);
+      return call(purpose, model, system, user, schema, effort);
     }
   }
 
@@ -571,7 +576,6 @@ export function makeOpenAiProvider(): AiProvider {
     callLog: () => [...records],
 
     async writeQuest(input: QuestWriteInput): Promise<QuestWriteOut> {
-      purposeCtx = 'writeQuest';
       // §0 + 2026-07-13 research ruling: TWO self-contained prompts (one-off / saga) — the old
       // shared-prompt-plus-override ("THIS BLOCK WINS") shipped a contradiction small models
       // can't arbitrate; every rule stated ONCE; output spec + critical rules at the END.
@@ -604,7 +608,7 @@ export function makeOpenAiProvider(): AiProvider {
       });
       // 🛠 effort A/B (2026-07-12, seeds 39019 low vs 40020 medium): medium bought NO judge-score
       // gain on cards (4-5/10 both) at 2.3x cost and 3x latency — cards stay LOW; structure over effort
-      const out = await callR(WRITER_MODEL, system, user, zQuestWrite);
+      const out = await callR('writeQuest', WRITER_MODEL, system, user, zQuestWrite);
       return {
         ...out,
         approaches: out.approaches ?? undefined,
@@ -616,7 +620,6 @@ export function makeOpenAiProvider(): AiProvider {
     },
 
     async genesis(input: GenesisInput): Promise<GenesisOut> {
-      purposeCtx = 'genesis';
       const system = [
         'You are the writers\'-room for a saga in a dark-fantasy mercenary-fort game: the player runs a mercenary company for profit and takes this saga\'s jobs one at a time. Build the hidden BIBLE — the settled truth behind the whole saga, told plainly. COMMIT TO THE TRUTH: nothing "unknown" in the bible; every fact has a cause. Invent the WORLD\'s past freely — never the COMPANY\'s (the slate and dossiers hold ALL company history that exists). The saga is a QUEST the company takes for gain; the player is a participant, never a spectator.',
         '═══ THE ARC — the story\'s spine ═══\nA SIMPLE, LINEAR story a tired player could retell in one breath, written as a CAUSAL CHAIN of EXACTLY expectedBeats steps. Each step: "<one errand at one place, using the previous step\'s yield> → yields: <the ONE thing found, learned, or changed that the next step uses>". Step 1 REACHES the first ground the client named and turns up the first lead: its errand half names ONLY what the client itself knows, and its yield POINTS onward (a fact, a sighting, an object that leads on) — whatever the kind, step 1 LOCATES or gains access; it never grabs. Every person and place the saga discovers enters as some step\'s yield, never before. Every earlier step changes the SITUATION — new ground, a barrier down, fresh leverage — and leaves the prize still to win. The last step is the arc\'s HARDEST: the CAST\'s own opposing entry stands in it and is beaten, bought, or outwitted THERE — never already overcome at an earlier step, never replaced by a new opponent invented for the ending; a final step of bare travel, pickup, or unopposed handover is mis-scoped. No two steps share a place or a person-outcome. Anyone the arc names must be in cast (or stay nameless by trade).',
@@ -641,7 +644,7 @@ export function makeOpenAiProvider(): AiProvider {
       // is different — it does the causal-chain reasoning, and a LOW A/B (batch S medium vs batch T
       // low, 2026-07-14) measured ARC 7→6 and CARD 8→6.5 (step-1-fulfils-goal, unused yields, twist
       // self-contradiction all appeared at LOW). Effort matters HERE; keep MEDIUM despite the latency.
-      const out = await callR(WRITER_MODEL, system, JSON.stringify(input), zGenesis, 'medium');
+      const out = await callR('genesis', WRITER_MODEL, system, JSON.stringify(input), zGenesis, 'medium');
       return {
         ...out,
         twistReveal: out.twistReveal ?? null,
@@ -650,7 +653,6 @@ export function makeOpenAiProvider(): AiProvider {
     },
 
     async resolve(inputs: ResolveQuestInput[], onEach?: (out: ResolveQuestOut) => void): Promise<ResolveQuestOut[]> {
-      purposeCtx = 'resolve';
       // a throwing consumer must never take the batch down with it (2026-08-26: onEach runs
       // engine effects — the reckoning still owes the player the other quests' reports)
       const emit = (out: ResolveQuestOut) => {
@@ -670,7 +672,7 @@ export function makeOpenAiProvider(): AiProvider {
       // each call announces itself the instant IT settles — the fallback path included, so a
       // failed narration fills its slot on the screen instead of leaving a placeholder
       return await Promise.all(inputs.map(q =>
-        callR(WRITER_MODEL, pick(q), userJson(q), zResolveOne).catch((e): ResolveQuestOut => {
+        callR('resolve', WRITER_MODEL, pick(q), userJson(q), zResolveOne).catch((e): ResolveQuestOut => {
           if (process.env.AI_DEBUG) console.error(`[ai] resolve fallback for ${q.questId}:`, (e as Error).message?.slice(0, 500));
           return fallbackResolve(q);
         }).then(o => {
@@ -694,7 +696,6 @@ export function makeOpenAiProvider(): AiProvider {
     },
 
     async flesh(inputs: FleshInput[]): Promise<FleshOut[]> {
-      purposeCtx = 'flesh';
       if (!inputs.length) return [];
       const system = [
         'You breathe life into characters of a dark-fantasy mercenary company. Each person comes with: name (use as-is), tags, role = what they are to the company (merc = one of its own soldiers, captive = held in its cells, hireling = staff), and context = how they came to the fort — let role and context shape the telling. The tags fix the person\'s SEX and STATION: "female" is she/her and "male" is he/him in every clause, whatever the name\'s sound; who/backstory keep whatever standing the tags and saga (when given) establish — never demote a story\'s central figure to background staff. For EACH person, write:',
@@ -708,32 +709,29 @@ export function makeOpenAiProvider(): AiProvider {
         'Make the people DISTINCT from each other — no two in a batch open their who-line with the same station phrase (context says how they came; the STATION is yours to individuate). No semicolons — split into two sentences. One prop is BANNED (the trade\'s most overused): the account-book — ledger, manifest, registry, record-book by any name.',
         '═══ ABOVE ALL (write now) ═══\n1. Every line is plain and concrete — a fact the reader can hold, never a mood, metaphor, or riddle.\n2. who is TIMELESS; habits live only in quirks; nothing contradicts a tag.\n3. Each person in the batch is DISTINCT: different station openers, different kinds of habit.\nRespond as JSON: {people:[{characterId, who, backstory, quirks:[...]}]} — ids exactly as given, nothing else.',
       ].join('\n');
-      const out = await callR(WRITER_MODEL, system, JSON.stringify(inputs), zFleshBatch);
+      const out = await callR('flesh', WRITER_MODEL, system, JSON.stringify(inputs), zFleshBatch);
       const legal = new Set(inputs.map(i => i.characterId));
       return out.people.filter(p => legal.has(p.characterId));
     },
 
     async themeRoll(input: ThemeRollInput): Promise<ThemeRollOut> {
-      purposeCtx = 'themeRoll';
       const system = [
         'A player renovates a fort room in a style. Choose 3-5 wanted tag WORDS for the room theme — strictly from the provided vocabulary list. One flavor line.',
         NUMBER_BAN,
         'Respond as JSON: {wants:[words], flavorLine}',
       ].join('\n');
       // mechanical tier: a vocab pick + one line — nano, not the prose model (STORY_ENGINE §10.5)
-      return call(NANO_MODEL, system, JSON.stringify(input), zTheme);
+      return call('themeRoll', NANO_MODEL, system, JSON.stringify(input), zTheme);
     },
 
     async select(input: SelectorInput): Promise<string[]> {
-      purposeCtx = 'select';
       const system = 'Pick which candidates need FULL dossier context for the writing task. Respond as JSON: {ids:[...]} — at most the requested max. Ids exactly as given.';
-      const out = await call(NANO_MODEL, system, JSON.stringify(input), zSelect);
+      const out = await call('select', NANO_MODEL, system, JSON.stringify(input), zSelect);
       const legal = new Set(input.candidates.map(c => c.id));
       return out.ids.filter(id => legal.has(id.replace(/^id=/, ''))).slice(0, input.max);
     },
 
     async review(input: ReviewInput): Promise<ReviewOut> {
-      purposeCtx = 'review';
       const system = [
         'You are a tired player skimming ONE piece of quest text once. You run a mercenary company from your fort: "you", "the company", "the fort", your soldiers, and pay/loot phrasing are ALWAYS known to you. Report ONLY defects of these three kinds:',
         '1) UNPARSEABLE: a sentence that does not parse one way on one read (garden path, a pronoun with two plausible antecedents, self-contradiction within the text, word salad).',
@@ -742,7 +740,7 @@ export function makeOpenAiProvider(): AiProvider {
         'Judge like a player, not an editor: flag only what would actually stop or mislead you mid-read. Style, tone, length, and mild oddness pass. Quote each defective phrase.',
         'Respond as JSON: {ok: true|false, defects: ["<kind>: <quoted phrase> — <why in a few words>", ... at most 3]}. ok=true with [] when nothing would stop you.',
       ].join('\n');
-      const out = await call(WRITER_MODEL, system, JSON.stringify(input), zReview);
+      const out = await call('review', WRITER_MODEL, system, JSON.stringify(input), zReview);
       return { ok: !!out.ok && out.defects.length === 0, defects: out.defects.slice(0, 3) };
     },
   };

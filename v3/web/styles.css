@@ -90,3 +90,25 @@ nav button.locked { opacity: .45; }
   background: #2c4468; border: 1px solid #47679a; color: #e6eefc; border-radius: 6px; cursor: pointer; }
 .proceed:disabled { opacity: 0.5; cursor: default; }
 .reopen { background: none; border: 1px solid #3a4150; color: #8a93a3; }
+
+/* ── the writing queue (TEMPO P1/P4/P5): quiet, one line, on screen from any tab ────── */
+.queue { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center;
+  margin: 6px 0 0; padding: 5px 12px; background: #191d23; border: 1px solid #262b33;
+  border-radius: 6px; font-size: 12px; color: #8a93a3; }
+.qjob { display: inline-flex; align-items: center; gap: 5px; }
+.qmark { color: #6a7280; }
+.q-running { color: #c9b86a; }
+.q-done { color: #7f9e6a; }
+.q-failed { color: #c98a8a; }
+.q-failed i { color: #a87a7a; font-style: normal; }
+.qx { background: none !important; border: none !important; color: #6a7280 !important;
+  padding: 0 3px !important; font-size: 13px; cursor: pointer; }
+.qx:hover { color: #cfd3da !important; }
+/* the cap stepper sits with the cost meter — it is what the cost is made of */
+.cap { color: #6a7280; font-size: 12px; display: inline-flex; align-items: center; gap: 3px; }
+.cap button { background: none; border: 1px solid #2c313a; color: #8a93a3;
+  border-radius: 4px; padding: 0 5px; cursor: pointer; font-size: 12px; }
+.cap button:disabled { opacity: 0.35; cursor: default; }
+/* P2: a lead being written reads as being worked, where it stands */
+tr.leadworking { color: #c9b86a; }
+tr.leadworking button:disabled { color: #c9b86a; border-color: #4a4130; cursor: default; }

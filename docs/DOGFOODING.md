@@ -82,7 +82,15 @@ Then five real-AI cycles through the CLI covered every shape the reckoning has: 
 apart, a single quest with a flesh tail, a `⏸` stall line in the head block, a saga beat, an injury,
 a level-up, a relic, a failure, and a finale with approaches and a fate. All correct.
 
-## 6. The checklist
+## 6. Testing must not touch what the designer is playing
+
+A harness on a different PORT is not isolated: `server/main.ts` derives its save path from the
+working directory, so a test server happily overwrote `saves/web.json` — gitignored, therefore
+unrecoverable — and the designer's GUI game was gone. `AIRAIDER_SAVE` now names the file, and
+`scripts/_guiplay.ts` always sets it. **Before booting any server: check the port is free AND that
+the save is not the real one.**
+
+## 7. The checklist
 
 Before claiming a player-facing change is playtested:
 

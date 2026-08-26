@@ -44,6 +44,20 @@ import type { AiProvider, ResolveQuestInput, ResolveQuestOut, AskSlotOut, QuestW
 
 export interface LogEntry { cycle: number; kind: string; text: string; questId?: string }
 
+// ---- TEMPO G1: background work (the queue) ------------------------------------------------------
+// A pursuit is a JOB. In-memory only — never in GameState, never saved (N3: work does not survive
+// closing the game; the lead comes back). The UIs render the "being worked" state off jobs().
+export type JobState = 'queued' | 'running' | 'done' | 'failed';
+export interface Job { id: string; leadId: string; title: string; state: JobState; questId?: string; error?: string }
+interface JobRec {
+  job: Job;
+  lead: Lead;
+  settled: Promise<void>;          // resolves when the job leaves queued/running — never rejects
+  settle: () => void;
+  result?: { ok: boolean; msg: string; questId?: string };
+  thrown?: unknown;                // what pursue() must re-throw to behave exactly as it did
+}
+
 // staging & lead lifetimes (🛠 one named constant per mechanism — no twin-path drift)
 export const STAGE_TTL_HOLDING = 4;
 export const STAGE_TTL_TAVERN = 5;
@@ -705,27 +719,106 @@ export class Game {
     return this.state.leads.filter(l => !paused(l));
   }
 
+  /** UNCHANGED to every caller (TEMPO I11): the work-to-completion path `npm test`, the §20 sim
+   *  baselines, realplay/autoplay and the CLI's batch mode all drive. It becomes a job like any
+   *  other pursuit, but starts IMMEDIATELY — cap or no cap — so a scripted caller can never
+   *  deadlock behind queued player work. */
   async pursue(leadId: string): Promise<{ ok: boolean; msg: string; questId?: string }> {
+    const res = this.reservePursue(leadId);
+    if (!res.lead) return { ok: false, msg: res.msg };
+    const rec = this.addJob(res.lead);
+    await this.startJob(rec);
+    if (rec.thrown) throw rec.thrown;   // exactly what the old straight-line pursue did
+    return rec.result ?? { ok: false, msg: rec.job.error ?? 'the writing failed' };
+  }
+
+  // ---- the pursuit queue (TEMPO G1) ----------------------------------------------------------
+  // Split in two: a SYNCHRONOUS half that guards and reserves at the click (P2/I6), and an async
+  // half that spends nothing until a quest exists (P3). Between them sits the queue.
+
+  /** 🛠 P8/R5 (designer, 2026-08-26): the cap is a TECHNICAL setting — the player's own AI bill is
+   *  the throttle — so it is raisable at runtime and NEVER rations queueing. */
+  maxInFlight = Math.max(1, Number(process.env.AIRAIDER_MAX_INFLIGHT ?? 2) || 2);
+  private jobRecs: JobRec[] = [];
+  private jobSeq = 0;
+  private inFlight = 0;
+  /** leadIds a live job holds: not pursuable twice, and doEndCycle may not expire them (I6) */
+  private reserved = new Set<string>();
+
+  /** queued + running + recently finished, oldest first */
+  jobs(): Job[] { return this.jobRecs.map(r => ({ ...r.job })) }
+
+  /** leads held by live work — the auditor cross-checks this against jobs() (I12) */
+  reservedLeads(): string[] { return [...this.reserved] }
+
+  /** returns IMMEDIATELY (P1): the guards and the reservation are synchronous, the writing is not */
+  enqueuePursue(leadId: string): { ok: boolean; msg: string; jobId?: string } {
+    const res = this.reservePursue(leadId);
+    if (!res.lead) return { ok: false, msg: res.msg };
+    const rec = this.addJob(res.lead);
+    this.pump();
+    return { ok: true, msg: `the map table takes it up: ${rec.job.title}`, jobId: rec.job.id };
+  }
+
+  /** P5: queued work can be dropped. A running job cannot — its call is already out. */
+  cancelJob(id: string): { ok: boolean; msg: string } {
+    const rec = this.jobRecs.find(r => r.job.id === id);
+    if (!rec) return { ok: false, msg: 'no such job' };
+    if (rec.job.state === 'running') return { ok: false, msg: 'already being written' };
+    if (rec.job.state !== 'queued') return { ok: false, msg: 'already finished' };
+    this.jobRecs = this.jobRecs.filter(r => r !== rec);
+    this.reserved.delete(rec.job.leadId);
+    rec.settle();
+    return { ok: true, msg: `dropped: ${rec.job.title}` };
+  }
+
+  /** resolves when nothing is queued or running (jobs never reject — a failure is a job STATE) */
+  async drain(): Promise<void> {
+    for (;;) {
+      const live = this.jobRecs.filter(r => r.job.state === 'queued' || r.job.state === 'running');
+      if (!live.length) return;
+      await Promise.all(live.map(r => r.settled));
+    }
+  }
+
+  /** the whole SYNCHRONOUS half of a pursuit: every guard, plus the reservation itself. It runs at
+   *  the CLICK — today's duplicate guards read state written only AFTER the call, so they were
+   *  blind for the whole 10–60s it took (I6). */
+  private reservePursue(leadId: string): { msg: string; lead?: Lead } {
     const lead = this.visibleLeads().find(l => l.id === leadId);
-    if (!lead) return { ok: false, msg: 'no such lead' };
+    if (!lead) return { msg: 'no such lead' };
+    if (this.reserved.has(lead.id)) return { msg: 'the map table is already working that lead' };
     if (lead.expiresAtCycle === null && this.state.quests.some(q => q.leadId === lead.id && q.state === 'open'))
-      return { ok: false, msg: 'that hunt is already underway' };
+      return { msg: 'that hunt is already underway' };
     if (lead.chainInfo.kind === 'continues') {
       const chain = this.state.chains.find(c => c.id === (lead.chainInfo as { chainId: string }).chainId);
       if (!chain || (chain.state !== 'active' && chain.state !== 'finale-pending')) {
         this.state.leads = this.state.leads.filter(l => l.id !== leadId);
-        return { ok: false, msg: 'that story has already ended — the lead is stale' };
+        return { msg: 'that story has already ended — the lead is stale' };
       }
       if (this.state.quests.some(q => q.chainId === chain.id && q.state === 'open'))
-        return { ok: false, msg: 'that story already has an open quest' };
+        return { msg: 'that story already has an open quest' };
+      // a beat still being WRITTEN is not yet an open quest — same guard, extended to work in
+      // flight: two concurrent beats of one saga would race its bible and its beat cache
+      if (this.state.leads.some(l => l.id !== lead.id && this.reserved.has(l.id)
+        && l.chainInfo.kind === 'continues' && (l.chainInfo as { chainId: string }).chainId === chain.id))
+        return { msg: 'that story already has a step being written' };
     }
     if (lead.expiresAtCycle === null) {
-      // standing hunts track the roster: re-level into the region band at pursue time
+      // standing hunts track the roster: re-level into the region band at pursue time — still
+      // ONCE, still before the call. The click is when the company takes the hunt on.
       const band = REGION[lead.region]!.levelBand;
       const levels = this.roster().map(m => m.character!.level);
       const median = levels.length ? [...levels].sort((a, b) => a - b)[Math.floor(levels.length / 2)]! : band[0];
       lead.level = Math.max(band[0], Math.min(band[1], median));
     }
+    this.reserved.add(lead.id);
+    return { msg: 'reserved', lead };
+  }
+
+  /** the async half. Spends NOTHING until the quest exists (P3): a throw anywhere above leaves the
+   *  lead on the board, so pursuing it again IS the retry (P4). */
+  private async runPursue(lead: Lead): Promise<{ ok: boolean; msg: string; questId?: string }> {
     let quest: Quest;
     if (lead.chainInfo.kind === 'continues') {
       const chain = this.state.chains.find(c => c.id === (lead.chainInfo as { chainId: string }).chainId);
@@ -739,9 +832,64 @@ export class Game {
     this.state.quests.push(quest);
     // consume the lead — only repeatable faucets (lead-hunts, recruiting posts) stay standing
     if (lead.expiresAtCycle !== null || (lead.archetype !== 'lead-hunt' && lead.source !== 'recruiting')) {
-      this.state.leads = this.state.leads.filter(l => l.id !== leadId);
+      this.state.leads = this.state.leads.filter(l => l.id !== lead.id);
     }
     return { ok: true, msg: `Quest generated: ${quest.title}`, questId: quest.id };
+  }
+
+  private addJob(lead: Lead): JobRec {
+    let settle!: () => void;
+    const settled = new Promise<void>(r => { settle = r });
+    // job ids are their OWN counter — the game's idCounter is saved state and jobs are not
+    const rec: JobRec = {
+      job: { id: `job-${++this.jobSeq}`, leadId: lead.id, title: lead.title ?? `${lead.archetype} — ${REGION[lead.region]?.name ?? lead.region}`, state: 'queued' },
+      lead, settled, settle,
+    };
+    this.jobRecs.push(rec);
+    return rec;
+  }
+
+  private pump(): void {
+    while (this.inFlight < this.maxInFlight) {
+      const next = this.jobRecs.find(r => r.job.state === 'queued');
+      if (!next) return;
+      void this.startJob(next);
+    }
+  }
+
+  /** starting a job runs its whole SYNCHRONOUS prefix right here — JS is single-threaded, so every
+   *  anti-repetition window that prefix reads and writes is closed before the next job begins (I3) */
+  private startJob(rec: JobRec): Promise<void> {
+    rec.job.state = 'running';
+    this.inFlight++;
+    return this.runJob(rec);
+  }
+
+  private async runJob(rec: JobRec): Promise<void> {
+    try {
+      rec.result = await this.runPursue(rec.lead);
+      rec.job.state = rec.result.ok ? 'done' : 'failed';
+      if (rec.result.ok) rec.job.questId = rec.result.questId; else rec.job.error = rec.result.msg;
+    } catch (e) {
+      // P4: the failure is the job's, not the game's — nothing escapes into enqueuePursue's caller
+      rec.job.state = 'failed';
+      rec.job.error = ((e as Error)?.message ?? '').slice(0, 160) || 'the writing failed';
+      rec.thrown = e;
+    } finally {
+      this.reserved.delete(rec.job.leadId);
+      this.inFlight--;
+      rec.settle();
+      this.pruneJobs();
+      this.pump();
+    }
+  }
+
+  /** finished jobs are recent history, not an archive — the UIs read them once and move on */
+  private pruneJobs(): void {
+    const done = this.jobRecs.filter(r => r.job.state === 'done' || r.job.state === 'failed');
+    if (done.length <= 12) return;
+    const drop = new Set(done.slice(0, done.length - 12));
+    this.jobRecs = this.jobRecs.filter(r => !drop.has(r));
   }
 
   private buildSlots(n: number, level: number, rarity: Rarity, archetype: Lead['archetype'], ask: AskSlotOut[],
@@ -943,6 +1091,10 @@ export class Game {
       } : null,
       avoid: this.recentCardTitles.slice(-10),
     }));
+    // ⚠ TEMPO I3/I4 — the ONE anti-repetition window that concurrency actually exposes: `avoid`
+    // was read from this list BEFORE the call (above) and the title only exists AFTER it, so two
+    // one-offs written at once are each blind to the other's title. Unhoistable by construction;
+    // maxInFlight (2) bounds the blindness to that many cards. Do not "fix" it with a lock.
     this.recentCardTitles.push(`${out.title} — ${out.job}`);
     if (this.recentCardTitles.length > 12) this.recentCardTitles.shift();
     // §4 pattern-B phase 2: canonicalize the writer's quarryTags (type from the AI, TIER from
@@ -1069,6 +1221,11 @@ export class Game {
     const assignedNames = assigned.map(a => a.name);
     // coined cast never become cards — remember these names or their epithets get re-dealt
     // ("Ashveil" once stamped three unrelated clients across chains)
+    // ⚠ TEMPO I3/I4: this block sits after an await (the slate), so it is the one NPC-name site
+    // concurrency can reach. The roll-and-push is contiguous — no await between the
+    // nameTooSimilar reads above and this push — so two genesis calls cannot deal the same name;
+    // what stays exposed is the cast the MODEL returns while another genesis is still out.
+    // Unhoistable (the names must be rolled against the slate); maxInFlight bounds it.
     this.recentNpcNames.push(...assignedNames);
     while (this.recentNpcNames.length > 60) this.recentNpcNames.shift();
     // the MODEL sees a LEAN fingerprint — showing full arc+tensions in avoid (round 5) made
@@ -1723,6 +1880,10 @@ export class Game {
   }
 
   async endCycle(): Promise<string[]> {
+    // TEMPO P9 (designer ruling 2026-08-26): END WAITS for work in flight — before the guard,
+    // before the cycle number moves, so a card being written still lands on the board it was
+    // pursued from and no reserved lead meets the expiry passes below
+    await this.drain();
     // re-entrancy guard: a double END (GUI double-click) must never interleave — and must not
     // clear the reckoning it exists to protect (TEMPO I10)
     if (this.cycleInFlight) return ['(the cycle is already resolving)'];
@@ -1978,7 +2139,8 @@ export class Game {
     // a LAPSED continuation lead ends its story cleanly (built 2026-07-10 — chains used to zombify
     // 'active' forever with the focal stranded invisibly in limbo): the player let it lapse
     // (STORY_ENGINE §8), so the focal slips to the lore graph and a road back exists (§21-4a)
-    for (const l of st.leads.filter(l => l.expiresAtCycle !== null && l.expiresAtCycle <= st.cycle && l.chainInfo.kind === 'continues')) {
+    for (const l of st.leads.filter(l => l.expiresAtCycle !== null && l.expiresAtCycle <= st.cycle && l.chainInfo.kind === 'continues'
+      && !this.reserved.has(l.id))) {   // a lead a job holds cannot lapse under the work (I6)
       const chain = st.chains.find(c => c.id === (l.chainInfo as { chainId: string }).chainId);
       if (!chain || (chain.state !== 'active' && chain.state !== 'finale-pending')) continue;
       chain.state = 'slipped'; chain.bank = 0;
@@ -1996,7 +2158,10 @@ export class Game {
       }
       report.push(`🕮 The company let "${chain.bible.title}" lapse — ${focal?.name ?? 'its center'} passes out of reach, for now.`);
     }
-    st.leads = st.leads.filter(l => l.expiresAtCycle === null || l.expiresAtCycle > st.cycle);
+    // a RESERVED lead survives its own expiry: the quest it is being turned into must have a lead
+    // to consume when it lands (I6). endCycle drains first, so this only fires on a path that
+    // reaches doEndCycle with work still out.
+    st.leads = st.leads.filter(l => l.expiresAtCycle === null || l.expiresAtCycle > st.cycle || this.reserved.has(l.id));
     for (const c of st.cards.filter(isLiability)) {
       const age = st.cycle - (st.liabilityBirth[c.id] ?? st.cycle);
       // one live collector per liability at a time

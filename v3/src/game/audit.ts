@@ -140,6 +140,17 @@ export function auditGame(g: Game): string[] {
       errs.push(`continuation lead ${l.id} references missing chain`);
   }
 
+  // ---- work in flight (TEMPO I12) --------------------------------------------------------
+  // chaos.test.ts drives 4000 random actions under this checker; without these two lines it is
+  // blind to the whole new bug class (a lead reserved forever, a job writing a quest for a lead
+  // that expired under it).
+  const live = g.jobs().filter(j => j.state === 'queued' || j.state === 'running');
+  const liveLeads = new Set(live.map(j => j.leadId));
+  for (const j of live)
+    if (!st.leads.some(l => l.id === j.leadId)) errs.push(`job ${j.id} works missing lead ${j.leadId}`);
+  for (const id of g.reservedLeads())
+    if (!liveLeads.has(id)) errs.push(`lead ${id} is reserved by no live job`);
+
   // ---- lore -------------------------------------------------------------------------------
   for (const e of st.lore.edges) {
     if (!st.lore.nodes[e.from] || !st.lore.nodes[e.to]) errs.push(`lore edge ${e.id} endpoint missing`);

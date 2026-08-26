@@ -19,7 +19,10 @@ import { ransomRate, marketSellRate } from '../src/engine/fort.js';
 import { xpNeeded } from '../src/engine/growth.js';
 import { fillScore } from '../src/engine/overlap.js';
 
-const SAVE = path.join(process.cwd(), 'saves', 'web.json');
+// AIRAIDER_SAVE names the file, so a test server on another port cannot clobber the save the
+// designer is actually playing (2026-08-26: a harness on :3298 wrote over saves/web.json, which is
+// gitignored and therefore unrecoverable — the port was different, the save path was not)
+const SAVE = path.join(process.cwd(), 'saves', process.env.AIRAIDER_SAVE ?? 'web.json');
 const LOG_DIR = path.join(process.cwd(), 'logs');
 const SESSION_LOG = path.join(LOG_DIR, `session-web.jsonl`);
 
@@ -46,6 +49,10 @@ if (fs.existsSync(SAVE) && !process.env.AIRAIDER_FRESH) {
 }
 let lastReport: string[] = [];
 
+// Fires after every action. A background job (TEMPO P1) finishes OUTSIDE any action, so the quest
+// it wrote may not reach the file until the NEXT action saves. Deliberate: a timer here would race
+// the engine mid-mutation and tear the save (I7). Nothing below may assume state only moves inside
+// an action — every view is rebuilt from `game` on each GET.
 function autosave() {
   fs.mkdirSync(path.dirname(SAVE), { recursive: true });
   fs.writeFileSync(SAVE, game.save());
@@ -86,6 +93,10 @@ function stateView() {
     lastReport: live ? live.lines : lastReport,
     // false once every report line is in — even though endCycle() is still running its flesh tail
     reckoningWriting: !!live?.writing,
+    // TEMPO P1: several pursuits can be out at once, so "what is in flight" is a LIST on the state,
+    // never a single busy flag on the client. A job settles OUTSIDE any action — this GET is the
+    // only thing that tells the board about it.
+    jobs: game.jobs(), maxInFlight: game.maxInFlight,
     fort: {
       cells: st.fort.cells,
       rooms: st.fort.rooms.map(r => {
@@ -238,7 +249,7 @@ async function handleAction(body: { type: string; args: (string | number)[] }) {
   const a = args ?? [];
   const s = (x: unknown) => String(x);
   const n = (x: unknown) => Number(x);
-  let result: { ok: boolean; msg: string; questId?: string };
+  let result: { ok: boolean; msg: string; questId?: string; jobId?: string };
   switch (type) {
     case 'build': result = game.build(s(a[0]), a[1] ? s(a[1]) : undefined); break;
     case 'upgrade': result = game.upgrade(s(a[0])); break;
@@ -247,7 +258,19 @@ async function handleAction(body: { type: string; args: (string | number)[] }) {
     case 'gh': result = game.ghUpgrade(); break;
     case 'slot': result = game.slot(s(a[0]), n(a[1]), s(a[2])); break;
     case 'unslot': result = game.unslot(s(a[0]), n(a[1])); break;
-    case 'pursue': result = await game.pursue(s(a[0])); break;
+    // TEMPO P1: pursuit is QUEUED — this POST returns in milliseconds instead of after a 10-66s
+    // call, and the card arrives on the board later, outside any action.
+    case 'pursue': result = game.enqueuePursue(s(a[0])); break;
+    // TEMPO P5: drop a job that has not started. The engine refuses one already running.
+    case 'cancel': result = game.cancelJob(s(a[0])); break;
+    // TEMPO P8: the cap is the player's, not the game's — it keeps the provider happy, it never
+    // rations. Clamped here because the client is not the only caller (curl, a second tab).
+    case 'inflight': {
+      const cap = Math.max(1, Math.min(6, Math.round(n(a[0])) || 1));
+      game.maxInFlight = cap;
+      result = { ok: true, msg: `writing up to ${cap} at once` };
+      break;
+    }
     case 'assign': result = game.assign(s(a[0]), n(a[1]), s(a[2])); break;
     case 'unassign': result = game.unassign(s(a[0]), n(a[1])); break;
     case 'approach': result = game.chooseApproach(s(a[0]), s(a[1])); break;

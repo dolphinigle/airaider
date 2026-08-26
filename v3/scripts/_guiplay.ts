@@ -41,7 +41,9 @@ async function boot(fresh = true, extra: Record<string, string> = {}): Promise<C
   // detached so the whole GROUP can be killed: `npx` is a wrapper around a wrapper around node,
   // and killing the pid we get back leaves the actual server holding the port
   const p = spawn('npx', ['tsx', 'server/main.ts'], {
-    env: { ...process.env, PORT: String(PORT), AIRAIDER_MOCK_LATENCY_MS: LAT, ...(fresh ? { AIRAIDER_FRESH: '1' } : {}), ...extra },
+    // never the designer's save (AIRAIDER_SAVE), never the designer's port
+    env: { ...process.env, PORT: String(PORT), AIRAIDER_MOCK_LATENCY_MS: LAT, AIRAIDER_SAVE: `harness-${PORT}.json`,
+      ...(fresh ? { AIRAIDER_FRESH: '1' } : {}), ...extra },
     stdio: ['ignore', 'pipe', 'pipe'], detached: true,
   });
   p.stderr!.on('data', d => { const t = String(d); if (!/ExperimentalWarning/.test(t)) console.log(`   [server:err] ${t.trim().slice(0, 200)}`) });

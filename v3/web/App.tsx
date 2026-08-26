@@ -1,5 +1,5 @@
 // Airaider v3 web GUI — tabs over the /api view-model. The human-facing board.
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 
 type S = any; // the /api/state view-model (prototype: untyped client)
 
@@ -70,6 +70,27 @@ export function App() {
     }
   };
 
+  // TEMPO P1: a QUEUED action (pursue, and the queue's own controls) must never touch `busy`.
+  // `busy` is one flag and the first completion clears it — with several pursuits out that flag
+  // would describe the wrong job and then lie that nothing is running. These POSTs return in
+  // milliseconds; what is actually in flight is read from `s.jobs`.
+  const queueAct = async (type: string, ...args: (string | number)[]) => {
+    try {
+      const r = await act(type, ...args);
+      setToast(r.msg);
+    } catch (e) {
+      setToast(`request failed: ${(e as Error).message ?? e}`);
+    } finally {
+      await refresh().catch(() => {});
+      setTimeout(() => setToast(''), 4000);
+    }
+  };
+
+  const jobs: any[] = s?.jobs ?? [];
+  const live = jobs.filter(j => j.state === 'queued' || j.state === 'running');
+  // identity, not the array: /api/state hands back a fresh array every poll
+  const jobSig = jobs.map(j => `${j.id}:${j.state}`).join(',');
+
   // TEMPO P11: each quest's block must show up when it lands, and the 1.2s doAct poll is too coarse
   // to read as "as it arrives". Faster ONLY while the reckoning page is actually open and working.
   const reckLive = reckoning && (busy || !!s?.reckoningWriting);
@@ -79,8 +100,31 @@ export function App() {
     return () => clearInterval(t);
   }, [reckLive, refresh]);
 
+  // TEMPO P1/P6: a job finishes OUTSIDE any action, so nothing else would ever tell the board about
+  // it. Same shape as the reckoning poll above: quick while work is out, a slow heartbeat otherwise
+  // (a finished job still has to leave the strip). Skipped while the reckoning already polls faster.
+  useEffect(() => {
+    if (reckLive) return;
+    const t = setInterval(() => { refresh().catch(() => {}) }, live.length ? 1000 : 5000);
+    return () => clearInterval(t);
+  }, [reckLive, live.length, refresh]);
+
+  // TEMPO P6: arrival is ANNOUNCED, never staged — a line under the header, no modal, no view jump.
+  // The board itself has already updated by the time this fires; the toast only says where to look.
+  const seenJobs = useRef<Record<string, string>>({});
+  useEffect(() => {
+    for (const j of jobs) {
+      const was = seenJobs.current[j.id];
+      seenJobs.current[j.id] = j.state;
+      if (!was || was === j.state || (j.state !== 'done' && j.state !== 'failed')) continue;
+      setToast(j.state === 'done' ? `✦ ${j.title} — the card is on the quests board`
+        : `✗ ${j.title} — the writing failed; the lead is still on the board`);
+      setTimeout(() => setToast(''), 5000);
+    }
+  }, [jobSig]);
+
   if (!s) return <div className="app">loading…</div>;
-  if (reckoning) return <Reckoning s={s} busy={busy} reckAt={reckAt} onProceed={() => setReckoning(false)} />;
+  if (reckoning) return <Reckoning s={s} busy={busy} reckAt={reckAt} jobs={jobs} onProceed={() => setReckoning(false)} />;
 
   return (
     <div className="app">
@@ -92,11 +136,25 @@ export function App() {
         <span>GH T{s.ghTier}</span>
         <span>mercs {s.roster.length}/{s.rosterCap}</span>
         <span>captives {s.captives.length}/{s.captiveCap}</span>
-        <span className="ai">AI: {s.aiName} ({s.ai.calls} calls{s.aiName === 'openai' ? `, ~$${s.ai.costUsd.toFixed(2)}` : ''})</span>
+        <span className="ai">AI: {s.aiName} ({s.ai.calls} calls{s.aiName === 'openai' ? `, ~$${s.ai.costUsd.toFixed(2)}` : ''}{live.length ? `, ${live.length} out` : ''})</span>
+        {/* TEMPO P8: the cap is adjustable and lives next to the cost meter, because the cost is
+            what it governs. Guarded so a state without a queue simply shows nothing. */}
+        {s.maxInFlight > 0 && <span className="cap" title="how many cards may be written at once">
+          <button disabled={s.maxInFlight <= 1} onClick={() => queueAct('inflight', s.maxInFlight - 1)}>−</button>
+          ✎{s.maxInFlight}
+          <button disabled={s.maxInFlight >= 6} onClick={() => queueAct('inflight', s.maxInFlight + 1)}>+</button>
+        </span>}
         {s.lastReport?.length > 0 &&
           <button className="reopen" onClick={() => { setReckAt(null); setReckoning(true) }}>⚄ last reckoning</button>}
-        <button className="end" disabled={busy} onClick={() => { setReckAt(s.cycle); setReckoning(true); doAct('end') }}>{busy ? '…' : 'END CYCLE ▶'}</button>
+        {/* TEMPO P9: END waits for the queue — the engine drains it. The button says what it waits on
+            rather than going dead, because the wait is not a refusal. */}
+        <button className="end" disabled={busy} onClick={() => { setReckAt(s.cycle); setReckoning(true); doAct('end') }}>
+          {busy ? '…' : live.length ? `END CYCLE ▶ (${live.length} still writing)` : 'END CYCLE ▶'}</button>
       </header>
+      {/* P1 says a click stays visible until the work is DONE — so a finished job leaves the strip
+          (its arrival is the toast, and its card is on the quests board). A FAILED one stays: it is
+          the only place P4's plain-words failure lives, and the engine keeps it for a dozen jobs. */}
+      <Queue jobs={jobs.filter((j: any) => j.state !== 'done')} queueAct={queueAct} />
       {pending && <div className="pending"><span className="spin" /> working: <b>{pending}</b>… <i>story generation can take a minute — watch the AI tab</i></div>}
       {toast && <div className="toast">{toast}</div>}
       <nav>
@@ -111,7 +169,7 @@ export function App() {
         {tabLock(s, tab) ? <p className="lockmsg">🔒 Locked — build a <b>{tabLock(s, tab)}</b> first.</p> : <>
           {tab === 'fort' && <Fort s={s} doAct={doAct} setDetail={setDetail} />}
           {tab === 'build' && <Build s={s} doAct={doAct} />}
-          {tab === 'leads' && <Leads s={s} doAct={doAct} />}
+          {tab === 'leads' && <Leads s={s} queueAct={queueAct} />}
           {tab === 'quests' && <Quests s={s} doAct={doAct} />}
           {tab === 'roster' && <Roster s={s} doAct={doAct} />}
           {tab === 'captives' && <Captives s={s} doAct={doAct} />}
@@ -143,7 +201,7 @@ function lineClass(l: string): string {
   return 'r-prose';
 }
 
-function Reckoning({ s, busy, reckAt, onProceed }: { s: S; busy: boolean; reckAt: number | null; onProceed: () => void }) {
+function Reckoning({ s, busy, reckAt, jobs, onProceed }: { s: S; busy: boolean; reckAt: number | null; jobs: any[]; onProceed: () => void }) {
   // CYCLE guard, not a busy guard: the previous cycle's report is stale until the engine bumps the
   // cycle, and from that instant every line on the wire belongs to THIS reckoning — so they render
   // one by one as they land instead of waiting for the POST to return.
@@ -162,6 +220,11 @@ function Reckoning({ s, busy, reckAt, onProceed }: { s: S; busy: boolean; reckAt
         <span>cycle {s.cycle}</span>
         <span className="ai">AI: {s.aiName} ({s.ai.calls} calls{s.aiName === 'openai' ? `, ~$${s.ai.costUsd.toFixed(2)}` : ''})</span>
       </header>
+      {/* TEMPO P9: END waits for the queue and the engine drains it HERE — so the strip has to be on
+          this page too, or the player watches an unexplained wait. Read-only: cancelling a job the
+          reckoning is already draining is not a thing to offer. */}
+      {jobs.some(j => j.state === 'queued' || j.state === 'running') &&
+        <Queue jobs={jobs.filter(j => j.state === 'queued' || j.state === 'running')} queueAct={null} />}
       <main className="reckbody">
         {lines.map((l, i) => <p key={i} className={lineClass(l)}>{l}</p>)}
         {/* below the lines, not above: at the top it would yank the whole report up a line the
@@ -253,21 +316,51 @@ function Build({ s, doAct }: any) {
   );
 }
 
-function Leads({ s, doAct }: any) {
+function Leads({ s, queueAct }: any) {
   if (!s.leads.length) return <p>The board is empty — leads are earned: run hunts, finish quests.</p>;
+  const jobs: any[] = s.jobs ?? [];
   return (
     <table><tbody>
-      {s.leads.map((l: any) => (
-        <tr key={l.id}>
+      {s.leads.map((l: any) => {
+        // TEMPO P2: a lead being worked reads as being worked WHERE IT STANDS. The queue strip is
+        // not enough — this row is where the player is about to click again.
+        const job = jobs.find((j: any) => j.leadId === l.id && (j.state === 'queued' || j.state === 'running'));
+        return (
+        <tr key={l.id} className={job ? 'leadworking' : ''}>
           <td style={{ color: RARITY_COLOR[l.rarity] }}>{l.rarity}</td>
           <td>L{l.level}</td><td>{l.region}</td><td>{l.archetype}</td>
           <td>{l.chain === 'starts-new' ? '✦ story' : l.chain === 'continues' ? '⛓ continues' : ''}</td>
           <td>{l.title ?? ''}</td>
           <td>{l.expires === null ? 'standing' : `expires c${l.expires}`}</td>
-          <td><button onClick={() => doAct('pursue', l.id)}>pursue</button></td>
+          <td>{job
+            ? <button disabled>{job.state === 'queued' ? '⋯ queued' : '✎ writing…'}</button>
+            : <button onClick={() => queueAct('pursue', l.id)}>pursue</button>}</td>
         </tr>
-      ))}
+        );
+      })}
     </tbody></table>
+  );
+}
+
+/** TEMPO P1/P4/P5: everything out for writing, in one quiet strip that is on screen from any tab. */
+function Queue({ jobs, queueAct }: { jobs: any[]; queueAct: any }) {
+  if (!jobs.length) return null;
+  return (
+    <div className="queue">
+      {jobs.map((j: any) => (
+        <span key={j.id} className={`qjob q-${j.state}`}>
+          {j.state === 'running' ? <span className="spin" /> : null}
+          <span className="qmark">{j.state === 'queued' ? '⋯' : j.state === 'done' ? '✓' : j.state === 'failed' ? '✗' : ''}</span>
+          {j.title}
+          {/* P4: plain words on the job's OWN item, and the lead is still on the board — so the
+              retry is just pursuing it again, with no separate retry machinery to explain. */}
+          {j.state === 'failed' && <i> — {j.error ?? 'the writing failed'}. Pursue the lead again.</i>}
+          {/* P5: only a job that has not started can be dropped (and only where dropping is offered) */}
+          {j.state === 'queued' && queueAct && <button className="qx" title="drop from the queue"
+            onClick={() => queueAct('cancel', j.id)}>×</button>}
+        </span>
+      ))}
+    </div>
   );
 }
 
