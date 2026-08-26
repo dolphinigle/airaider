@@ -70,7 +70,7 @@ heal, focus — is engine-only and returns in under a millisecond.
 
 **Why genesis is the outlier:** it is the one call in the game that runs at
 `reasoning_effort: 'medium'` (`openai.ts:644`); everything else runs at `low`. That is a deliberate
-quality choice, not an accident — which is why `N1` puts it out of scope and `A6` needs an answer
+quality choice, not an accident — which is why `N1` puts it out of scope and **the genesis problem** (§3) needs an answer
 that is not "make it faster".
 
 **And the worst case is not 140s, it is minutes.** Three retry layers stack, and the doc should be
@@ -129,157 +129,95 @@ where the board is thinnest, is exactly where a first saga is most likely to be 
 
 ⚠ **This is the finding that shapes everything.** A queue makes a 10s pursuit disappear into normal
 play. It does **not** make a 60s genesis disappear; it only stops the board lying about it. Filling
-that minute needs something else — see `A6` and `R7`.
+that minute needs something else — see **the genesis problem** (§3) and `R7`.
 
 ---
 
-## 3. The principle
+## 3. THE GOALS
 
-> **The machine may take its time. The player may never be made to sit still for it.**
+**Three. Everything else in this doc is either a consequence of these or a thing that must not break
+while we get them** — 🔒 the designer's own framing, 2026-08-26: *"the big goal is: we want to be able
+to pursue several leads at the same time and overall less downtime if we can help it."*
 
-Two different problems wear the same face:
+**G1 — Pursue several leads at the same time.** Click, click, click; they all get written; the board
+stays live the whole time. No click ever freezes the fort.
 
-- **The fort phase** — the waiting is *removable*: there is other work to do, or the cycle can simply
-  move on without the result. → §4.
-- **The reckoning** — the waiting is *not* removable: the player asked for this exact story and wants
-  nothing else right now. So it must stop being a wait and become **the show**. → §5.
+**G2 — Less downtime, everywhere we can get it.** Not "hide the wait behind a nicer spinner" —
+actually less time in which the player has nothing to do. Measured, not asserted (§7).
 
-A spinner is an admission that we had nothing to give.
+**G3 — Results appear as they land, not all at the end.** 🔒 *"say you have 3 quests being done this
+week — then as soon as the first one has result, output it in screen."*
 
----
+The one thing the measurements say these three do **not** cover, which is why it gets a line of its
+own rather than being buried:
 
-## 4. Goals A — the fort phase must never make the player sit still
-
-**A1. A click is acknowledged in under ~100ms, always.** Every action either completes or visibly
-becomes *work in progress* within that budget — and stays visible until it is actually done. Two
-overlapping actions are two visible things, not one banner overwriting the other (§2).
-
-**A2. Work stacks.** The player may set several pursuits going in any order and keep building,
-slotting, assigning and hiring while they run. Starting the second never waits on the first. *(The
-designer's literal ask.)*
-
-**A3. Work in progress is visible where its result will appear, and it never lies.** A lead being
-worked reads as *being worked*, on the lead board, from the instant of the click: it cannot be
-pursued twice, cannot expire or lapse out from under the work, and never reads as simply available.
-The player can see everything that is out for writing. ⚠ How much detail that gets — alive, or a
-progress bar — is `R4`.
-
-**A4. Nothing is spent until something is delivered.** A pursuit that fails or is abandoned costs no
-lead, no gold, and leaves no half-made quest. *(True today by luck of ordering — `game.ts:739` — and
-NOT true for `renovate`, which spends gold before its call: `game.ts:433`.)*
-
-**A5. Failure is a visible, recoverable event, and the deadline is the game's, not the SDK's.** Work
-that errors says so on its own item in plain words, and retry is one click. Work still out past a
-deadline **the game chose** is declared dead and treated as a failure — the code sets no timeout of
-its own today, so the effective one is the provider SDK's 10 minutes per attempt, times its retries.
-No player waits that long, so the game must give up sooner and say so.
-
-**A6. Starting a saga must stop being the worst moment in the game.** 50–66s (up to ~140s) on the
-single click the player is most excited about, at the point in the campaign where the board is
-thinnest (§2c). `A1`–`A5` make it survivable; they do not make it *good*. Something must actually
-answer this one. ⚠ `R1`, `R7`.
-
-**A7. The player can drop work not yet begun, and say what matters first.** Otherwise the work they
-care about sits behind two things they fired idly — new friction, invented by the fix.
-
-**A8. Arrival is announced, never intrusive.** When a quest lands: no modal, no view jump, nothing
-stolen from under a click or a read. The player decides when to look.
-
-**A9. A few generations run at once, and the number is a knob.** 🔒 **Ruled 2026-08-26:** the queue
-is unbounded to the player, **2–3 in flight to start, and that number must be adjustable** — it is a
-practical setting, not a balance gate. Pursuit carries no other price: *"ultimately it's fine if the
-player wants to rapid-fire AI calls since they'll pay per AI call."* **So the cap exists only to keep
-the machine and the provider happy, never to ration the player's choices** — anything that reads as
-rationing is the wrong design. What is still worth watching is arrival *load*: five pursuits at once
-return five cards to read **and** five assignment decisions, which is `DESIGN §11.3`'s "wall of text"
-risk relocated into the fort phase — a `B`-style pacing problem, not a reason to throttle.
-
-**A10. Refusals explain themselves.** Any control disabled because of in-flight work names the work
-that is blocking it.
-
-**A11. END CYCLE waits for work in flight, and says so.** 🔒 **Ruled 2026-08-26: END waits.** The
-in-flight pursuits drain on the reckoning screen, so no quest card crosses a cycle boundary. ⚠ Two
-consequences to design around: a card that lands there can only be *read* (assignment is a fort-phase
-act, so it is used next cycle), and the drain must not be the only thing on screen — see `B3`.
-
-**A12. Running cost and concurrency stay on screen.** Since the player's own bill is the only real
-throttle (`A9`), the meter has to be honest and always visible: how much has been spent, and how many
-calls are out right now. *(Cost display exists today; it must survive concurrency — see `I8`.)*
-
-**A13. Blocked time per cycle does not grow with the campaign.** More sagas running must not mean
-more *waiting*; more to read and more to decide is the game working, not a tax.
+**⚠ The 50–66s saga genesis is not solved by any of them.** The fort phase holds 1–7 clicks a cycle
+(§2c), so there is nothing to fill that minute with; and on the ~70% of cycles that resolve a single
+quest, `G3` has nothing to interleave. Both need an answer that is not "queue it" — see `R3`, `R7`.
 
 ---
 
-## 5. Goals B — the reckoning must unfold
+## 4. What that means in practice
 
-**The reveal order is already designed and shipped** (`game.ts:2207`, citing `QUESTS §7` blind→sighted
-and `DESIGN §5` dice-always-shown):
+**Not goals — the checklist the design has to satisfy.** Listed so nothing is forgotten, not so
+anything is argued about; anything here that turns out to be wrong at build time is just wrong, and
+gets fixed without a ruling.
 
-> card title → 「the situation」 → **before** → ⚄ **the roll** (heads vs bar, and each soldier's coins
-> explained) → the turn → **after** → what it cost and what it won
+**Fort phase (serves `G1`, `G2`):**
 
-That order is 🔒 and this doc does not touch it. §5 is about **how the wait is distributed across
-those beats**, nothing else.
+- **P1** A click is answered in ~100ms and stays visible until the work is actually done — two
+  overlapping actions are two visible things. *(Today's banner is single-slot: a second click
+  overwrites it and the first completion clears it while work is still out.)*
+- **P2** A lead being worked reads as *being worked*, where it stands: not pursuable twice, not
+  expiring under the work, never shown as simply available.
+- **P3** Nothing is spent until something is delivered — a failed pursuit costs no lead and no gold,
+  and leaves no half-made quest. *(True for pursue; `renovate` charges gold before its call,
+  `game.ts:433`.)*
+- **P4** Failures are visible and retryable in one click, and the game sets its own deadline —
+  the only timeout today is the SDK's 10 minutes × its own retries, which no player will sit through.
+- **P5** Queued work can be dropped, and reordered.
+- **P6** Arrival is announced without stealing anything: no modal, no view jump, nothing yanked
+  mid-click or mid-read.
+- **P7** A control disabled by in-flight work names the work that is blocking it.
+- **P8** 🔒 **2–3 generations in flight, adjustable.** No price on pursuit: *"ultimately it's fine if
+  the player wants to rapid-fire AI calls since they'll pay per AI call."* The cap keeps the machine
+  and the provider happy; it never rations the player. Which makes the cost meter load-bearing — spent
+  so far, and how many calls are out right now, always on screen.
+- **P9** 🔒 **END CYCLE waits** for work in flight and says so on the button. Consequence to design
+  around: a card that lands on the reckoning screen can only be *read* — assignment is a fort-phase
+  act, so it is used next cycle.
 
-**B1. END CYCLE shows the reckoning instantly.** The screen exists before the first word of narration
-does. Zero-latency transition, always.
+**The reckoning (serves `G2`, `G3`):**
 
-**B2. Each quest's report appears the MOMENT it lands** — 🔒 **ruled by the designer 2026-08-26**:
-*"say you have 3 quests being done this week. then as soon as the first one has result, output it in
-screen."* The resolve calls already run in parallel, one per quest; the reckoning shows each as it
-returns instead of holding them all for the slowest.
-
-**B3. On a one-quest cycle the screen still must not sit dead.** ⚠ Measured: **14 resolve calls
-across 11 reckonings** (§2a) ≈ **1.3 marching quests a cycle** — so `B2` alone fires on a minority of
-cycles, and on the rest the player watches a 10s blank exactly as before. Something has to fill that
-(the march, the roll, the queue draining — `R3`). This is a *secondary* goal: `B2` is what was asked
-for, `B3` is what the measurement says is still missing after it.
-
-**B4. The player can outrun the reveal.** At cycle 30, having read sixty reports, one click shows
-everything that has arrived. A paced reveal the player cannot skip is new dead time this work
-invented.
-
-**B5. Reading is never blocked by writing.** What has arrived is readable at once and at the player's
-pace; the slowest report never holds up a finished one; arriving text never scrolls the page out from
-under the reader.
-
-**B6. The player can always tell whether the game is still working or has finished** — and that is
-all the progress reporting the screen gets. No percentages, no "2 of 3, ~8s left": a job status tells
-the player exactly when to stop reading and start waiting, which is the opposite of a reveal. (Sultan's
-Game never tells you how many cards are left; that is why the flip has tension.)
-
-**B7. Order is fixed when the screen opens and never rearranges.** *(True today: quests resolve in id
-order, `game.ts:1729`. The goal is that it stays true when calls return out of order.)*
-
-**B8. A failed narration degrades to the plain truth, for that quest only.** *(Already shipped:
-`fallbackResolve`, `openai.ts:672`. The goal is that it stays true and becomes visible.)*
-
-**B9. Consequence travels with its story.** What was won, lost, taken, and who was hurt appears
-attached to the report that earned it. *(Already true, `game.ts:2230`.)*
-
-**B10. Fort news comes after the field.** Healing, expiries, lapses, drips, tavern churn — grouped,
-after the quest stories, because they are known instantly and must never sit between the player and a
-story that is still being written. ⚠ **This changes shipped output**: stall and lapse lines are pushed
-*before* the resolutions today (`game.ts:1738`). It is the one place §5 moves something the designer
-did not ask to move — veto it and the rest still stands.
-
-**B11. The reckoning is leavable and returnable.** Backing out to the fort and coming back shows the
-same reckoning, whole, until the next one replaces it — a restart included. *(Today it is a variable
-in the server process, `server/main.ts:47`; a restart loses it.)*
-
-**B12. Closing the reckoning lands the player in a fort that is already true.** Nothing finishes
-applying itself afterwards; no number changes on its own once the screen is closed.
-
-**B13. Tail work never holds the door — but never leaves a person blank either.** The one AI tail in
-a cycle is `flesh` (12–16s); lore write-backs are pure engine and cost nothing. `flesh` runs at step 7
-*deliberately*, so that people minted this reckoning have a face before the player meets them
-(`game.ts:1723`). Moving it off the critical path must not mean the player meets a finale prize as a
-tag list. ⚠ `R8`.
+- **P10** END CYCLE shows the screen instantly — it exists before the first word of narration does.
+- **P11** 🔒 Each quest's report appears the moment it lands; the slowest never holds up a finished
+  one. The resolve calls already run one-per-quest in parallel (`openai.ts:665`).
+- **P12** On a one-quest cycle — most of them — something still has to fill the ~10s. ⚠ `R3`.
+- **P13** The player can outrun the reveal: one click shows everything that has arrived. A paced
+  reveal nobody can skip is new dead time we invented.
+- **P14** The player can always tell whether the game is still working or has finished — and that is
+  *all* the progress reporting. No percentages, no "2 of 3, ~8s left": a job status tells the player
+  exactly when to stop reading and start waiting.
+- **P15** Order is fixed when the screen opens and never rearranges. *(True today — quests resolve in
+  id order, `game.ts:1729` — and must stay true when calls return out of order.)*
+- **P16** A failed narration degrades to the plain engine truth for that quest only. *(Shipped:
+  `fallbackResolve`, `openai.ts:672`.)*
+- **P17** Consequences stay attached to the report that earned them. *(True today, `game.ts:2230`.)*
+- **P18** Fort news (healing, expiries, lapses, drips, tavern churn) comes after the quest stories —
+  it is known instantly and must never sit between the player and a story still being written.
+  ⚠ Changes shipped output: stall and lapse lines print *before* the resolutions today
+  (`game.ts:1738`). Veto this one and the rest still stands.
+- **P19** The reckoning is leavable and returnable, restart included. *(Today it is a variable in the
+  server process, `server/main.ts:47`.)*
+- **P20** Closing it lands the player in a fort that is already true — nothing finishes applying
+  itself afterwards.
+- **P21** The `flesh` tail (12–16s) does not hold the door — but must not leave a person blank
+  either. It runs at step 7 *deliberately*, so people minted this reckoning have a face before the
+  player meets them (`game.ts:1723`). ⚠ `R8`.
 
 ---
 
-## 6. Invariants — what must survive
+## 5. Invariants — what must survive
 
 Each is stated as something a test or a player can observe. Several are true today only because the
 server runs one action at a time (`server/main.ts:205`); they are listed because that is exactly what
@@ -328,7 +266,7 @@ paid for with a finished quest; a renovation is either unpaid-and-unstyled or pa
 **I8. The AI log tells the truth about what is running.** Three calls in flight show three rows, each
 with its own purpose and sequence number. Today the purpose is one mutable closure variable
 (`openai.ts:513`) and the ordinal is read before it is incremented — concurrent calls mislabel each
-other. This is the instrument `A3`, `A12` and §8 are measured with; it has to be right first.
+other. This is the instrument `P2`, `P8` and §7 are measured with; it has to be right first.
 
 **I9. Parallelism is bounded and rate limits are survivable.** However many pursuits are queued, only
 so many calls are ever open at once, and a provider rejection surfaces as a retryable item, never a
@@ -358,10 +296,10 @@ no line item anywhere else.
 
 ---
 
-## 7. Non-goals
+## 6. Non-goals
 
 **N1. Tuning prompts or models for speed.** Latency is taken as given in this phase; we are hiding
-it, not shortening it. *(This is why `A6` needs `R7` — the one place hiding is not enough.)*
+it, not shortening it. *(This is why **the genesis problem** (§3) needs `R7` — the one place hiding is not enough.)*
 **N2.** Multi-user, multi-session, multi-device anything.
 **N3.** Work that continues while the app or tab is closed. The player-facing rule is: **do not close
 the tab mid-saga — the work is lost, the lead comes back.**
@@ -373,16 +311,16 @@ work the player already asked for does.
 
 ---
 
-## 8. How we will know it worked
+## 7. How we will know it worked
 
 **M1. Blocked seconds per cycle → ~0 in the fort phase.** Wall-clock where the player clicked and
 could not act. ⚠ On its own this number goes to zero *by construction* and would report success
-exactly when `A6`/§2c fails — so it is never reported alone.
+exactly when the genesis problem (§3) / §2c fails — so it is never reported alone.
 
 **M2. Seconds with nothing worth doing.** §2c's click count against §2a's latency, per cycle: does
 the board hold the player for the length of the wait? Pass mark: **clicks-available × ~2s ≥ the wait
 the player just started.** Today at cycle 1 that is 1 click ≈ 2s against a 50–66s genesis — a 30×
-shortfall, which is `A6` in one number. This is the honest version of `M1`, and `M1` is never
+shortfall, which is the genesis problem in one number. This is the honest version of `M1`, and `M1` is never
 reported without it.
 
 **M3. Longest still moment on the reckoning screen < ~5s**, counting a *beat* — a card, a paragraph,
@@ -394,7 +332,7 @@ it. Run on the **GUI**, which is the surface the complaint came from.
 
 ---
 
-## 9. Open rulings for the designer 🟡
+## 8. Open rulings for the designer 🟡
 
 *These are the decisions the goals cannot make. Recommendations attached so they can be ruled fast.*
 
@@ -437,8 +375,8 @@ seconds. **Recommendation: the card and the march** — the title, the situation
 read, and who walked out of the gate — and nothing that pre-empts a beat further down the order.
 
 **R3 — What paces the reveal? ✅ PARTLY RULED 2026-08-26.** The designer's clarification settles the
-unit: **per QUEST, as each result lands** (`B2`). What stays open is the one-quest cycle, which is
-most of them (`B3`): with a single report there is nothing to interleave, and the screen is blank for
+unit: **per QUEST, as each result lands** (`P11`). What stays open is the one-quest cycle, which is
+most of them (`P12`): with a single report there is nothing to interleave, and the screen is blank for
 ~10s unless something else fills it. The options below are about *that* remainder.
 *(Original framing: what paces the reveal inside one report?)* (a) stream the model's tokens — **dead**, §2b;
 (b) reveal the JSON's fields as the single call completes — everything still lands at once; (c) pace
@@ -452,7 +390,7 @@ call, and no faith in the provider, and its pacing stays constant whether the ca
 change: bench it, don't assume it.
 
 **R4 — Does a pursuit show progress, or only that it is alive?** A progress bar on background work
-pulls the eye back to the wait `A1` just hid. **Recommendation: alive, not progress** — show *that*
+pulls the eye back to the wait `P1` just hid. **Recommendation: alive, not progress** — show *that*
 the map table is working and that nothing is lost; never a percentage or an ETA.
 
 **R5 — What is pursuit's price? ✅ RULED 2026-08-26: none.** No gold cost, no lead-supply change, no
@@ -469,14 +407,14 @@ decision moves to assignment, where a decision already lives, and the game loses
 and a room upgrade raises N. That turns the throttle into progression, which is the only kind of cap
 a player enjoys. **Do not** answer it by cutting lead supply: the board carries **2 leads at cycle 1
 and 5–8 by cycle 10** (§2c's run), which is already the whole strategic surface. ⚠ Note the tension
-with `A13`: a late campaign with more sagas running competes for the same N, so either N grows with
-the fort or `A13` is understood as *blocked* time only.
+with `P8`: a late campaign with more sagas running competes for the same N, so the number has to
+be raisable — which is why the designer ruled it adjustable.
 
 **R6 — Does the CLI get any of this?** **Recommendation: no.** `I11` puts the requirement on the
 facade; the CLI stays the straight-line, work-to-completion reference that scripts and agents drive.
 The designer's complaint came from the GUI and `M4` is judged there.
 
-**R7 — May the machine write ahead of the click?** The only answer to `A6` that actually removes the
+**R7 — May the machine write ahead of the click?** The only answer to **the genesis problem** (§3) that actually removes the
 minute: draft a saga's genesis when its lead appears, before the player pursues it. Costs money on leads never pursued (~$0.01 a genesis, against a board carrying 2–8 leads —
 so the bill scales with what the board *offers*, not with what the player *does*). ⚠ And the
 invariant it breaks is **`I1`, not `I6`**: a speculative draft draws from `game.rng` for a lead that
@@ -495,26 +433,25 @@ turns one call a cycle into N, which is a cost decision, not only a tempo one.
 meet** (a hire, a finale prize), batched as now for the rest.
 
 **R9 — Is `renovate` in scope?** It is the third blocking call and it is done in bursts (build a
-kitchen, a gallery, a menagerie; style each). It also spends gold *before* its call, which `A4`
+kitchen, a gallery, a menagerie; style each). It also spends gold *before* its call, which `P3`
 forbids. **Recommendation: in scope, cheapest possible** — same queue, no ceremony.
 
 ---
 
-## 10. Scope and sequencing
+## 9. Scope and sequencing
 
-**§4 and §5 are independently approvable and independently shippable.** They share the machinery but
-not the risk: §4 (the fort phase) is where the concurrency hazards in §6 live and where `R0` decides
-the cost; §5 (the reckoning) touches no concurrency at all under `R3`(c) — it is a presentation of
-work the engine already does serially.
+**The two halves are independently approvable and independently shippable.** They share the machinery
+but not the risk: `G1` (pursue several at once) is where the concurrency hazards in §5 live; `G3`
+(results as they land) touches no concurrency at all — the resolve calls already run in parallel, it
+is only the screen that holds them.
 
-Order that follows from the measurements, if the designer wants one:
+Order that follows from the measurements:
 
 1. **`I8` and `I13`** — fix the AI log so it can tell the truth about concurrent calls, and give the
    mock a way to be slow on purpose. Nothing below can be *tested* before this.
-2. **§5, the reckoning** — smaller, no concurrency, and `B2` (each report the moment it lands) is the
-   ruled behaviour. It also fixes a 10s stare on every cycle, which `B3` says is the part `B2` misses.
-3. **§4, the fort phase queue** — 2–3 in flight, adjustable; `I3`/`I4` (the anti-repetition windows)
-   ship *with* it, not after, or concurrency starts dealing duplicate sparks and names.
-4. **`A6`/`R7`, the 50–66s genesis** — last. With `R1` ruled as *END waits*, nothing absorbs that
-   minute except the fort phase itself, which §2c measures at 1–7 clicks. Expect this one to come
-   back from play.
+2. **`G3`, the reckoning** — smaller, no concurrency, already-ruled behaviour, and it fixes a stare on
+   *every* cycle. `P12` (the one-quest cycle) is the part `G3` alone misses.
+3. **`G1`, the fort-phase queue** — 2–3 in flight, adjustable. `I3`/`I4` (the anti-repetition windows)
+   ship *with* it, not after, or concurrency starts dealing duplicate sparks and near-identical names.
+4. **The genesis minute** — last. With END ruled to *wait*, nothing absorbs those 50–66s except the
+   fort phase itself, which §2c measures at 1–7 clicks. Expect this one back from play. ⚠ `R7`.
