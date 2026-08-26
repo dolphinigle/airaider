@@ -509,8 +509,12 @@ work the engine already does serially.
 
 Order that follows from the measurements, if the designer wants one:
 
-1. **`R0`, then `I8` and `I14`** — decide determinism's price; fix the AI log so it can tell the truth
-   about concurrent calls; give the mock a way to be slow. Nothing below can be tested before this.
-2. **§5, the reckoning** — smaller, no concurrency, and it fixes a 10s stare on *every* cycle.
-3. **§4, the fort phase queue** — the bigger job, and the one that needs `R1`/`R5` ruled first.
-4. **`A6`/`R7`, the 60s genesis** — last, and only if `R1`(c) has not already made it invisible.
+1. **`I8` and `I13`** — fix the AI log so it can tell the truth about concurrent calls, and give the
+   mock a way to be slow on purpose. Nothing below can be *tested* before this.
+2. **§5, the reckoning** — smaller, no concurrency, and `B2` (each report the moment it lands) is the
+   ruled behaviour. It also fixes a 10s stare on every cycle, which `B3` says is the part `B2` misses.
+3. **§4, the fort phase queue** — 2–3 in flight, adjustable; `I3`/`I4` (the anti-repetition windows)
+   ship *with* it, not after, or concurrency starts dealing duplicate sparks and names.
+4. **`A6`/`R7`, the 50–66s genesis** — last. With `R1` ruled as *END waits*, nothing absorbs that
+   minute except the fort phase itself, which §2c measures at 1–7 clicks. Expect this one to come
+   back from play.
