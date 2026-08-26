@@ -185,15 +185,18 @@ care about sits behind two things they fired idly — new friction, invented by 
 **A8. Arrival is announced, never intrusive.** When a quest lands: no modal, no view jump, nothing
 stolen from under a click or a read. The player decides when to look.
 
-**A9. Arrival load is the player's choice, and an honest one.** Five pursuits fired at once return
-five cards to read *and* five assignment decisions — `DESIGN §11.3`'s "wall of text" risk, relocated
-from the reckoning into the fort phase. Either the player is choosing that knowingly, or the game
-bounds it. ⚠ `R5`.
+**A9. At most 2–3 generations run at once.** 🔒 **Ruled 2026-08-26:** the queue is unbounded to the
+player, **2–3 in flight**, and pursuit carries no other price. That also bounds the arrival load —
+five pursuits fired at once would otherwise return five cards to read *and* five assignment decisions,
+which is `DESIGN §11.3`'s "wall of text" risk relocated into the fort phase.
 
 **A10. Refusals explain themselves.** Any control disabled because of in-flight work names the work
 that is blocking it.
 
-**A11. Whatever END CYCLE does with work in flight, the button says so before the click.** ⚠ `R1`.
+**A11. END CYCLE waits for work in flight, and says so.** 🔒 **Ruled 2026-08-26: END waits.** The
+in-flight pursuits drain on the reckoning screen, so no quest card crosses a cycle boundary. ⚠ Two
+consequences to design around: a card that lands there can only be *read* (assignment is a fort-phase
+act, so it is used next cycle), and the drain must not be the only thing on screen — see `B3`.
 
 **A12. Running cost and concurrency stay on screen.** Several calls at once must not multiply the
 bill invisibly. *(Cost display exists today; it must survive concurrency — see `I8`.)*
@@ -217,13 +220,16 @@ those beats**, nothing else.
 **B1. END CYCLE shows the reckoning instantly.** The screen exists before the first word of narration
 does. Zero-latency transition, always.
 
-**B2. Something new reaches the screen every few seconds.** The reckoning *unfolds*. Stated as an
-observable rate on purpose — it does not care where the new thing comes from, only that the screen is
-never still for long. It cannot be met by streaming the model (§2b). ⚠ `R3`.
+**B2. Each quest's report appears the MOMENT it lands** — 🔒 **ruled by the designer 2026-08-26**:
+*"say you have 3 quests being done this week. then as soon as the first one has result, output it in
+screen."* The resolve calls already run in parallel, one per quest; the reckoning shows each as it
+returns instead of holding them all for the slowest.
 
-**B3. Progressive means *within one quest*, not merely between quests.** Most cycles resolve exactly
-ONE quest — **14 resolve calls across 11 reckonings** in the §2a runs, ≈1.3 marching quests a cycle. A
-design that only reveals quest-by-quest does nothing on the common case, which is the whole case.
+**B3. On a one-quest cycle the screen still must not sit dead.** ⚠ Measured: **14 resolve calls
+across 11 reckonings** (§2a) ≈ **1.3 marching quests a cycle** — so `B2` alone fires on a minority of
+cycles, and on the rest the player watches a 10s blank exactly as before. Something has to fill that
+(the march, the roll, the queue draining — `R3`). This is a *secondary* goal: `B2` is what was asked
+for, `B3` is what the measurement says is still missing after it.
 
 **B4. The player can outrun the reveal.** At cycle 30, having read sixty reports, one click shows
 everything that has arrived. A paced reveal the player cannot skip is new dead time this work
@@ -397,9 +403,11 @@ scripted/sim path (`I11`), which the tests and `GENERATION_FLOW §20` actually d
 `chaos.test.ts` and the sim baselines meaningful, and (c) quietly ends the ability to reproduce a
 player's bug from their save. But this is a real cost and it is the designer's to price.
 
-**R1 — END CYCLE with pursuits in flight.** (a) refuse END until the queue drains; (b) END waits,
+**R1 — END CYCLE with pursuits in flight. ✅ RULED 2026-08-26: (b) — END waits**, draining on the
+reckoning screen. *(Recorded below: the case that was made for (c), and what (b) costs, so the
+reasoning is not lost if it is revisited.)* (a) refuse END until the queue drains; (b) END waits,
 draining on the reckoning screen; (c) in-flight work lands on the **next** cycle's board.
-**Recommendation: (c).** A quest card arriving on the reckoning screen can only be looked at —
+**Recommendation was (c).** A quest card arriving on the reckoning screen can only be looked at —
 assignment is a fort-phase act — so (b) drops the card where it cannot be used and puts a loading bar
 on the one screen that is supposed to be the show. (c) moves no engine state across the boundary (a
 card on the board has not marched), it has an in-fiction reading the player already thinks in — *the
@@ -417,7 +425,11 @@ is shown, after `before` and before `after`. So the question is only what may fi
 seconds. **Recommendation: the card and the march** — the title, the situation the player already
 read, and who walked out of the gate — and nothing that pre-empts a beat further down the order.
 
-**R3 — What paces the reveal inside one report?** (a) stream the model's tokens — **dead**, §2b;
+**R3 — What paces the reveal? ✅ PARTLY RULED 2026-08-26.** The designer's clarification settles the
+unit: **per QUEST, as each result lands** (`B2`). What stays open is the one-quest cycle, which is
+most of them (`B3`): with a single report there is nothing to interleave, and the screen is blank for
+~10s unless something else fills it. The options below are about *that* remainder.
+*(Original framing: what paces the reveal inside one report?)* (a) stream the model's tokens — **dead**, §2b;
 (b) reveal the JSON's fields as the single call completes — everything still lands at once; (c) pace
 the reckoning with the **engine's own beats** (the march, the roll, the take) around the single call;
 (d) split the report into two sequential calls so text arrives twice — a second call's latency and a
@@ -432,7 +444,10 @@ change: bench it, don't assume it.
 pulls the eye back to the wait `A1` just hid. **Recommendation: alive, not progress** — show *that*
 the map table is working and that nothing is lost; never a percentage or an ETA.
 
-**R5 — What is pursuit's price, once it is no longer ten seconds of staring?** Today the wait is the
+**R5 — What is pursuit's price? ✅ RULED 2026-08-26: none — cap the work instead.** The queue is
+unbounded to the player with **2–3 generations in flight**; no gold cost, no lead-supply change. *(The
+argument that was made for a fiction-flavoured, upgradeable cap is kept below in case the flat 2–3
+ever needs to become progression.)* Today the wait is the
 only thing making pursuit scarce, and `DESIGN §3` calls the lead board "the strategic surface" where
 the player "decides where to spend scarce effort". Remove the wait and pursuit becomes free — the
 decision moves to assignment, where a decision already lives, and the game loses one.
