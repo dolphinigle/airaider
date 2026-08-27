@@ -1,0 +1,54 @@
+{
+ "seed": 5100,
+ "chainId": "chain-13",
+ "title": "The Pact-Chest at Fallow Hollow",
+ "bible": {
+  "title": "The Pact-Chest at Fallow Hollow",
+  "kernel": "A former paymaster hires mercenaries to recover a stolen chest. The forest keeper will not hand it over.",
+  "cast": [
+   {
+    "name": "Jeelus-Tei",
+    "who": "former garrison paymaster who now pleads for a last clean account",
+    "want": "to recover the garrison's payroll chest",
+    "role": "client",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Ilindhar",
+    "who": "an elf entertainer who lives alone in the old-growth and answers to no market",
+    "want": "to keep the pact-chest and its promise",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Thelma",
+    "who": "raider captain who took to guarding what she prizes",
+    "want": "to keep the chest and the raiders' claim it carries",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   }
+  ],
+  "situation": "Jeelus-Tei says raiders stole the garrison payroll and names a clearing in the Western Forests where they camp. He hires the company to fetch the chest. The forests hold a known solitary elf, but the client knows nothing more.",
+  "goal": "to retrieve the garrison's payroll chest and return it to the client",
+  "arc": [
+   "Scout the raider camp at Fallow Hollow the client named and confirm who holds the chest → yields: a carved wooden whistle stamped with a Greenmantle mark",
+   "Use the whistle as a call to find Ilindhar in his grove and press him for what the raiders took → yields: a sealed iron chest beneath his hearth that bears the garrison's signed pledge-will and Ilindhar's sworn oath to keep it",
+   "Bring the sealed pledge-chest back to Fallow Hollow to hand it over for the client and face the raider captain who claims it → yields: the pledge-chest delivered into Jeelus-Tei's hands after Thelma was beaten and her claim driven off"
+  ],
+  "twist": "the chest is not payroll coin; it contains the garrison's signed pledge-will that grants command and lands to its holder, and Ilindhar is the chest's sworn keeper",
+  "tensions": [
+   "the client's own sale of the garrison makes him compromised and desperate",
+   "Ilindhar's oath and lonely stewardship will not yield the chest without cost",
+   "Thelma and her raiders hold force at the named clearing and will fight to keep the claim"
+  ],
+  "openDirections": [
+   "offer Ilindhar a substitute pledge: a new oath or a companion to break his solitude and win the chest willingly",
+   "word spreads that other bands learn the pledge-will's power and move to seize it whether the company succeeds or fails"
+  ]
+ },
+ "shipped": {
+  "title": "Scout Fallow Hollow",
+  "situation": "Jeelus-Tei sits with a folded payroll and pleads for one last clean account. He says the garrison chest left the fort and vanished into the Western Forests. Scouts report a fresh raider camp at Fallow Hollow with new smoke and tracks. The pay is fixed, and what else the job shakes loose the company keeps. The matter smells of a payout worth a string of small jobs.",
+  "job": "Scout the raider camp at Fallow Hollow and confirm who holds the payroll chest"
+ }
+}

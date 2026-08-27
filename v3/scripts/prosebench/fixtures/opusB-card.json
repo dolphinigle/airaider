@@ -1,0 +1,18 @@
+{
+  "title": "What Fenmarket Knows",
+  "situation": "Gundo of Millbrook rode up to the fort and asked the company to bring an elf named Romlyn back to him at Millbrook, alive. He would not say what Romlyn is to him, and he asked whether the company hurts men it does not have to. Romlyn sang for the elven wood courts west of here, and no one has put a place to him since. Traders and traveling players push every rumor through Fenmarket on the river, and Gundo says the stall-keepers there knew Romlyn's face. The players who shared those stalls with him will not talk about him now. A straight answer out of Fenmarket, where Romlyn went and who moved him, is what this comes to. The client pays the agreed coin, and the company keeps whatever the road turns up. Word runs that the one at the heart of this is worth more than a season of common hires.",
+  "job": "Ask at Fenmarket after Romlyn: where did he go, and who moved him?",
+  "ask": [
+    {
+      "attribute": "cha",
+      "favored": ["social", "performance"],
+      "clashing": ["intimidation"]
+    },
+    {
+      "attribute": "int",
+      "extraAttribute": "dex",
+      "favored": ["roguery", "lore"],
+      "clashing": ["hotheaded"]
+    }
+  ]
+}

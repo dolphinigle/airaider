@@ -1,0 +1,17 @@
+{
+  "title": "Who Feeds the Pass",
+  "situation": "A carter has come up the low road to say his winter hauling stops unless Harrowgate Pass is kept fed. He wants the woman who leaves the cakes at the pass brought into the company, so the fort's winter stores keep crossing the gap. He would not sit down until he had told the whole of it. He holds that the cakes are made with honey out of the western clearings, and that the beekeepers there know the hand that buys it. A name out of those clearings is what the company wants back. Coin as promised, and the pick of whatever the job turns up. Word runs that the one at the heart of this would be worth a place on any roster.",
+  "job": "Ask the beekeepers of the western clearings who keeps Harrowgate Pass fed.",
+  "ask": [
+    {
+      "attribute": "cha",
+      "favored": ["social", "gregarious"],
+      "clashing": ["hotheaded", "intimidation"]
+    },
+    {
+      "attribute": "con",
+      "favored": ["nature", "serious"],
+      "clashing": ["greedy"]
+    }
+  ]
+}

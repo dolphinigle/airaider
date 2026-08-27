@@ -1,0 +1,45 @@
+{
+ "title": "Parsnip and Pledge",
+ "kernel": "Syndus hires the company to fetch Lariane the Elder, the exile who came home richer than the manor.",
+ "cast": [
+  {
+   "name": "Syndus",
+   "who": "steward of a minor manor who keeps grudges",
+   "want": "to have Lariane the Elder returned alive to Syndus at his manor",
+   "role": "client",
+   "loreId": "lore-13"
+  },
+  {
+   "name": "Lariane the Elder",
+   "who": "exiled woodward recently returned to the Western Forests",
+   "want": "to reach the elder glade and avoid being taken by Syndus",
+   "role": "quarry",
+   "loreId": "c9"
+  },
+  {
+   "name": "Synnove",
+   "who": "former keep-hand turned doe-hunter who shelters fugitives",
+   "want": "to hide Lariane from Syndus and refuse handover",
+   "role": "obstacle",
+   "loreId": "lore-14"
+  }
+ ],
+ "situation": "Syndus hires the company to bring Lariane the Elder alive to Syndus's manor. Syndus says she returned to the Western Forests after exile and is being sheltered there.",
+ "goal": "to return Lariane the Elder alive to Syndus at Syndus's manor",
+ "arc": [
+  "Search Fernbank Hollow, the spot Syndus says Lariane was last seen, using Syndus's report → yields: a scrap of Lariane's exile cloak stuffed with a parsnip root and stained with deer hair, with a single line of small-hoof prints heading west.",
+  "Follow the small-hoof prints into Hollan's Retreat, using the parsnip-stuffed scrap for a scent → yields: Synnove, who sheltered Lariane and flatly refuses to hand her over, demanding payment or fight.",
+  "Press Synnove for Lariane's refuge, trading the company's parsnip stores or force for directions → yields: the hidden trail that climbs to Thistlepond where Lariane is holed up.",
+  "Take the hidden trail to Thistlepond, seize Lariane, and carry her to Syndus's manor using the route Synnove gave, where Synnove appears to block the handover and is bought off or beaten there → yields: Lariane delivered alive to Syndus at Syndus's manor."
+ ],
+ "twist": null,
+ "tensions": [
+  "Synnove's fierce loyalty to Lariane and willingness to fight",
+  "the Old-growth hides tracks and gives hunters false leads",
+  "Lariane's new wealth draws attention and hardens her resolve"
+ ],
+ "openDirections": [
+  "Bribe or bluster Synnove into revealing the hidden trail to Thistlepond.",
+  "If delivery is delayed or bungled, Syndus will blacklist the company and hire harsher men."
+ ]
+}

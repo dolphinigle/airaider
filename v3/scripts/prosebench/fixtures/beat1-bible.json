@@ -1,0 +1,44 @@
+{
+ "title": "The Keeper of the Gatecakes",
+ "kernel": "A company seeks to recruit the keeper who keeps Harrowgate Pass clear in winter.",
+ "cast": [
+  {
+   "name": "Nenime Rootward",
+   "who": "an elven feeder from the Western Forests who tends a winter feeder above the pass.",
+   "want": "to be offered a steady place in the company in exchange for safe passage for her feeder",
+   "role": "prize",
+   "loreId": "c9"
+  },
+  {
+   "name": "Theodahad",
+   "who": "a beekeeper of the clearings who keeps crooked account of wax and gossip.",
+   "want": "to be paid in a barrel of wax",
+   "role": "ally",
+   "loreId": "lore-12"
+  },
+  {
+   "name": "Eileua Greyfell",
+   "who": "a rampart sergeant sworn to the forest pledges and quick with the charter of claims.",
+   "want": "to collect the forest pledge from any moved cache",
+   "role": "obstacle",
+   "loreId": "lore-13"
+  }
+ ],
+ "situation": "The company wants to recruit the person who keeps Harrowgate Pass open in winter. The lane stays clear because someone brings food to a thing at the pass. Reports last pointed to the beekeepers' clearings. The company has no outside client and plans to bring the keeper back to the fort as new hire.",
+ "goal": "to recruit the keeper of the Harrowgate winter feeder so she will join the company and secure their winter supply line",
+ "arc": [
+  "Travel to the beekeepers' clearings to ask who keeps Harrowgate Pass fed → yields: a torn map-scrap that names Coldwell Ryke as the wax-store that supplies the pass.",
+  "Go to Coldwell Ryke using the map-scrap and inspect the cold-store there → yields: Nenime Rootward, who will join only if the wax-cakes from the cache arrive safely at the fort.",
+  "Bring the wax-cakes to the fort to fulfill Nenime's condition and face Eileua Greyfell, the rampart sergeant who claims the forest pledge. Beat, buy, or outwit her so Nenime signs on"
+ ],
+ "twist": null,
+ "tensions": [
+  "Eileua Greyfell enforces forest pledges and will block any removal of the wax cache",
+  "The beekeepers keep their stores close and demand wax payment for information",
+  "Nenime will not join until the cache reaches the fort unharmed"
+ ],
+ "openDirections": [
+  "secure the wax cache at Coldwell Ryke and move it under escort to the fort",
+  "if the wax moves, forest wardens will press legal claims that could force the company to accept local obligations"
+ ]
+}

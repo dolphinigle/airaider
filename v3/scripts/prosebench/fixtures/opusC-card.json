@@ -1,0 +1,18 @@
+{
+  "title": "Last Seen at Fernbank Hollow",
+  "situation": "Syndus rode to the fort gate himself and asked to have a woman brought out of the western woods alive. Lariane the Elder came home to those woods after years of exile, and it is her he wants standing in his manor yard. He calls her his old woodward in a kind voice, and he will not say what she did to be sent away. By his account she was last seen at Fernbank Hollow, the wet ground at the forest's edge where exiles slip into the trees. Whether she is still near that hollow, and which way she went from it, is what wants finding. The men who work that hollow for pelts turn back anyone who asks after names. Honest coin for the work, and any small spoils ride home besides. They say the one at the heart of this would fetch a ransom worth a season of contracts.",
+  "job": "Search Fernbank Hollow for sign of Lariane the Elder and which way she went.",
+  "ask": [
+    {
+      "attribute": "int",
+      "favored": ["nature", "serious"],
+      "clashing": ["hotheaded"],
+      "requiredTag": "nature (mid)"
+    },
+    {
+      "attribute": "cha",
+      "favored": ["social", "intimidation", "cool"],
+      "clashing": ["hotheaded"]
+    }
+  ]
+}

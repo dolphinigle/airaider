@@ -1,0 +1,46 @@
+{
+ "title": "The Condemned Robe",
+ "kernel": "A Millbrook merchant hires mercenaries to fetch Romlyn from an elven warden, but a stolen maker's spindle will decide whether he can be taken alive.",
+ "cast": [
+  {
+   "name": "Gundo of Millbrook",
+   "who": "Millbrook merchant who hired the company and named a market to begin inquiries",
+   "want": "to have Romlyn delivered alive to Gundo at Millbrook",
+   "role": "client",
+   "loreId": "lore-13"
+  },
+  {
+   "name": "Romlyn",
+   "who": "an elf entertainer with a history in the wood courts",
+   "want": "to choose his fate once freed",
+   "role": "prize",
+   "loreId": "c9"
+  },
+  {
+   "name": "Caranya",
+   "who": "warden of an old grove who enforces elven adjudication",
+   "want": "to keep the condemned in elven custody until the maker answers",
+   "role": "obstacle",
+   "loreId": "lore-14"
+  }
+ ],
+ "situation": "Gundo hires the company and points them to a market where Romlyn was last seen. The merchant expects the company to fetch Romlyn and hand him over at Millbrook. The elven warden Caranya took Romlyn after a small elven court condemned him. The company must find the warden and arrange the transfer.",
+ "goal": "to have Romlyn delivered alive to Gundo at Millbrook",
+ "arc": [
+  "Travel to the market the client named and ask vendors about the person the client named → yields: an innkeeper points to Fenwarden Grove and names the warden Caranya as the holder.",
+  "Go to Fenwarden Grove and demand the person the client named from the warden named in the yield → yields: Caranya shows the condemned robe and says the maker's spindle was stolen to the Deep Fens (she names Jee-Tah).",
+  "Ride to the camp the previous yield named and recover the maker's spindle from Jee-Tah of the Deep Fens → yields: the maker's spindle bound with the maker's mark.",
+  "Bring the spindle to Millbrook, use it to unweave the condemned robe so Romlyn may be carried, and present Romlyn to the client at Millbrook. Caranya arrives to stop the transfer and is beaten, bought, or outwitted there"
+ ],
+ "twist": "The robe on Romlyn is a condemned weave that kills or lays a living poison on anyone who moves or carries its bearer; only the maker's spindle can safely unweave it.",
+ "tensions": [
+  "Caranya refuses to release Romlyn until the robe's maker answers and exacts proof",
+  "The condemned robe will doom anyone who moves Romlyn unless unbound",
+  "Jee-Tah of the Deep Fens stole the maker's spindle and will demand a price to return it",
+  "Delivering Romlyn to Gundo forces the company to face the elven warden in a public market"
+ ],
+ "openDirections": [
+  "Recover the maker's spindle from Jee-Tah in the Deep Fens to enable safe unweaving",
+  "Word of the condemned robe could rally more elven wardens or push the merchant to change terms"
+ ]
+}
