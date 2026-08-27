@@ -165,3 +165,68 @@ name is enough to find them in the logs.
   everyone the resolver doesn't flesh, and it currently cannot help but invent.
 - A rescued person who *"thanks you and moves on"* becomes a lore node; if they later resurface as a
   hire, does anything remember how the company met them?
+
+### N4 follow-up — playtested 2026-08-27. The claim is TRUE, and there are TWO causes, both mine.
+
+**The design (GENERATION_FLOW §4 "pattern-B", implemented at `game.ts:974-1010` and `:1113-1130`).**
+A person a one-off hands over is a COLLABORATION between engine and card writer:
+
+1. the engine pre-rolls **identity only** — race, gender, name (`pendingIdentity`)
+2. it deals that to the card writer as `framedCharacter { partial: true }`
+3. **the card writer describes who they are**, by emitting `quarryTags` — up to 3 vocabulary words
+   with a rank, e.g. `priest (mid)`, `soldier (low)`
+4. the engine canonicalises those tags, rolls a tier inside each proposed band, and **builds the
+   person to match**, pricing the rest back to budget
+
+So by design the delivered person is AUTHORED BY THE CARD. That is the whole mechanism, and it is
+why they normally match.
+
+**CAUSE 1 — the routine card prompt never asks for `quarryTags`.** The full one-off prompt puts it
+in the output schema and carries a bullet explaining it (`openai.ts:294`, `:301`). The routine prompt
+written today has **neither** (`openai.ts:250`). So `out.quarryTags` is undefined, `personSpec.required`
+stays empty, and the engine builds the person from generic pools with no connection to the card.
+
+**Evidence from the designer's live game** (cycle 1, `q12`):
+
+```
+CARD      「An elven woman vanished within the old woods and the clan refuses to search deeper.」
+DELIVERED  Castarnisse — female; elf ✓ ; courtesan (1); loner; clever (1)
+```
+
+Race and sex match — those are the pre-rolled identity, dealt to the writer, which is why the card
+could say "an elven woman". Everything that makes her a *person* — her trade, her temper — is
+unconnected to the job. A missing wood-elf the clan won't search for comes back a courtesan.
+
+**Independent reproduction** (probe, real AI, fresh seed):
+
+```
+CARD      "A novice vanished after leaving a woodland shrine and the parish cannot spare folk
+           to mount a search."
+DELIVERED  Kinburga — female; human; roguery (low); servant (low); nimble (low); nature (low)
+```
+
+A shrine novice arrives as a nimble servant with light fingers. No `priest`, no `mystic`.
+
+**The contrast that proves the mechanism is otherwise sound** — the SAGA path still works, because a
+saga's cast is authored in the bible:
+
+```
+BIBLE      Adeliza — "An entertainer and light-finger who has been moving through the Western Forests."
+DELIVERED  Adeliza — entertainer (5); roguery (6); scrawny; craft; serious; gregarious; tough
+```
+
+**CAUSE 2 — the routine report prompt tells the resolver to flesh nobody** (the `fleshed: always []`
+line, already written up above). So even the person's STORY is not written by the call that knows the
+circumstances; `fleshPass` invents one afterwards from a four-string generic context.
+
+Together these two explain the symptom completely: on a routine job the delivered person gets neither
+their traits nor their story from the quest they came out of.
+
+**For triage — three separable questions:**
+1. Restore `quarryTags` to the routine card prompt? (Cheap. But note a one-sentence card has less to
+   go on than a 40-word one, so the tags it authors may be thinner.)
+2. Fix the `fleshed` contradiction? (One line.)
+3. The deeper one, which predates today: should `fleshPass`'s `context` ever be generic? It is the
+   fallback for everyone the resolver does not flesh, and with four fixed strings it cannot help but
+   invent an origin. Nothing tells it the quest, the region, or how the person came into the
+   company's hands.
