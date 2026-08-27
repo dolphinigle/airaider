@@ -1668,6 +1668,13 @@ export class Game {
           // hand-the-telling-clean fix — the goal alone IS the client's telling for a beat.
           // twist: whole-story knowledge, never a beat's to see.
           kernel: undefined,
+          // the saga TITLE is dead to a beat writer (its own `title` must be about THIS step) and
+          // it leaks: a live bible titled "The Reluctant Heir" hands the writer the twist for free
+          title: undefined,
+          // both are dealt at the top level of the payload; a second copy inside the bible is a
+          // byte-duplicate a cold reader has to reconcile, and it ignored both
+          stakeIfLost: undefined,
+          arrival: undefined,
           tensions: undefined,
           openDirections: undefined,
           arc: undefined,

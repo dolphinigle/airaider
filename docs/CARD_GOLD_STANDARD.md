@@ -118,6 +118,27 @@ step 1    reach the keeper at Wheelstead, using the reeve's letter
 
 ---
 
+---
+
+## THE LEDGER — what has been measured against this page
+
+`v3/scripts/cardlab.ts` runs both instruments on real captured prompts: MECHANICAL checks that
+replicate, and the JUDGED four-question test (whose "yes" only counts when the judge can quote the
+words from the card that answer it — an ungrounded yes scores as a no).
+
+| | shipped prompt (n=15) | after |
+|---|---|---|
+| cards with NO unintroduced name | **33%** | `v3/scripts/prosebench/lab-new.json` |
+| opens on a person acting | 60% | " |
+| "why it takes armed strangers" answerable | **0%** | " |
+| all four questions answerable | **0%** | " |
+| words / sentences | 79 / 5.0 | " |
+
+**Read the cards, not only the table.** Every round of this work found its next defect by reading
+twelve live cards, and three of those defects were *caused by the previous fix*: a sticky example
+that collapsed every trade to one word, an engine-dealt string that became a stamp on 6/6 cards, and
+an over-stressed article rule that brought bare-name openers back from 1/8 to 5/10.
+
 ## WHAT WOULD MAKE THIS FAIL
 
 Written down so the iteration cannot quietly drift:

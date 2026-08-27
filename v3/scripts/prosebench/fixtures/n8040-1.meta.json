@@ -1,0 +1,60 @@
+{
+ "seed": 8040,
+ "chainId": "chain-14",
+ "title": "The Aldermill Tithe",
+ "bible": {
+  "title": "The Aldermill Tithe",
+  "kernel": "A matchmaker hires the company to find a vanished suitor. The pond that takes lambs hides him and a keeper will demand the tithe back at the shore.",
+  "cast": [
+   {
+    "name": "Ricohard Stonebridge",
+    "who": "A man who brokers matches and settlement pledges for the riverside village.",
+    "want": "to have Vevos returned to sign the settlement pledge",
+    "trade": "matchmaker",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Mjorn Stormhide",
+    "who": "A grizzled ex-miller who lives beside the pond and keeps odd vows to it.",
+    "want": "to claim the pond's tithe for the village chest",
+    "trade": "trapper",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   },
+   {
+    "name": "Vevos",
+    "who": "An elven suitor, scrawny and charming, last seen near the millpond.",
+    "want": "to refuse the settlement pledge and keep his choice",
+    "trade": "adventurer",
+    "role": "quarry",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Ricohard hired the company because Vevos vanished after leaving the village toward the millpond. The pond will pull warm-blooded animals under the water and keep them from returning. Mjorn has tended the pond and enforces an old tithe: he expects a living claim on anything the pond takes. The settlement needs Vevos back to sign a pledge that protects the tithe chest from the lord's claim.",
+  "goal": "to locate and return a missing elven suitor to Ricohard Stonebridge.",
+  "arc": [
+   "Go to Alderpond the client named and search the north shore for signs the suitor left there → yields: a length of wet elven braid knotted with a red match-seal.",
+   "Follow the braid into the western grove to a kiln hut and show the braid there to whoever knows the pond → yields: Mjorn Stormhide, who admits he pulled a mossbound iron key from the water and points to the ruined millrace.",
+   "Take the mossbound key to the ruined millrace and force open the submerged sluice to reach the undercroft → yields: Vevos alive in a shallow air chamber, shackled to a flat righteous stone that hums at warm breath.",
+   "Bring Vevos back to Alderpond as Ricohard demanded, while Mjorn claims the captive and exacts the pond's tithe. Defeat, buy, or outwit Mjorn on the shore and hand Vevos over to Ricohard"
+  ],
+  "twist": null,
+  "tensions": [
+   "Mjorn enforces an old vow and will not release what the pond claims without payment or proof.",
+   "The pond's hunger takes only warm beasts, so the company must reach living captives underwater.",
+   "The settlement's pledge and the tithe chest draw the lord's collectors soon if Vevos does not sign.",
+   "Vevos resists the settlement pledge and may refuse handover once freed."
+  ],
+  "openDirections": [
+   "The village's tax claim and the tithe chest will either be seized by the lord or defended by villagers depending on the company's pace and choices."
+  ],
+  "stakeIfLost": "If the company fails, the settlement must hand its tithe chest over to the lord and lose its levy funds.",
+  "arrival": "sent word twice before coming · brought no one with them"
+ },
+ "shipped": {
+  "title": "Search Alderpond north shore",
+  "situation": "Ricohard, a man who brokers matches and settlement pledges for the riverside village, arrived after sending word twice and set a leather packet on the table. Ricohard says the suitor's name and goes quiet. He wants you to go to Alderpond and search the north shore for signs the suitor left there, the pay is honest coin, and any small spoils besides. A trapper means to claim the pond's tithe for the village chest and could interfere. He says that if you fail, the settlement must hand its tithe chest over to the lord and lose its levy funds.",
+  "job": "Search Alderpond's north shore for signs the suitor left there."
+ }
+}

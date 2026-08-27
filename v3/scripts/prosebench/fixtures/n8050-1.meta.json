@@ -1,0 +1,59 @@
+{
+ "seed": 8050,
+ "chainId": "chain-12",
+ "title": "The Victory Bottle",
+ "bible": {
+  "title": "The Victory Bottle",
+  "kernel": "Erilthil hires the company to recover a carved victory bottle lost in an old raid. The trail leads to Lycurgos and to Skatinava.",
+  "cast": [
+   {
+    "name": "Erilthil Fernbrook",
+    "who": "Leader of the beekeepers' clearings and guardian of their spring rites.",
+    "want": "to have the carved victory bottle returned to her clearings.",
+    "trade": "beekeeper",
+    "role": "client",
+    "loreId": "lore-10"
+   },
+   {
+    "name": "Skatinava",
+    "who": "A lizardfolk minstrel who travels with old raid-songs and half-burned verses.",
+    "want": "to avoid being handed to Erilthil.",
+    "trade": "minstrel",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Lycurgos",
+    "who": "A grizzled former raider who kept the raid's trophies and a burned armlet.",
+    "want": "to keep the bottle as his right of spoil.",
+    "trade": "raider",
+    "role": "obstacle",
+    "loreId": "lore-11"
+   }
+  ],
+  "situation": "Erilthil Fernbrook has hired the company to recover a carved victory bottle taken from her clearing in a past raid. The bottle's current location is unknown.",
+  "goal": "to recover the carved victory bottle stolen in the raid.",
+  "arc": [
+   "Search Erilthil Fernbrook's beekeepers' clearings for the carved victory bottle she lost → yields: a rusted shard stamped with Lycurgos's old mark and a trail toward Brindle Hollow.",
+   "Follow the shard's trail into Brindle Hollow to question villagers and seek Lycurgos's cache → yields: a sealed bottle-case stamped with Skatinava's name.",
+   "Track the case's markings along the tree-line and find the minstrel named on its seal, using the case as warrant to detain her → yields: Skatinava taken alive carrying the sealed case and confessing the bottle hides a crushed ant-queen used in the raid.",
+   "Return to Erilthil Fernbrook's beekeepers' clearings with Skatinava and the case to hand the bottle over as hired. Lycurgos appears and must be beaten, bought, or outwitted there."
+  ],
+  "twist": "The carved victory bottle hides a crushed ant-queen used as a weapon in the raid, proof the 'victory' was a massacre.",
+  "tensions": [
+   "Lycurgos will claim the bottle as his spoil and refuse to yield it.",
+   "Skatinava will refuse to be turned over to the beekeepers and speaks against the raid's story.",
+   "Hidden ant-colonies and forest hunters guard caches and slow travel."
+  ],
+  "openDirections": [
+   "Whether the bottle is returned or buried, its proof of massacre will force legal reckoning and may rally old raider bands or powerful hands to bury the truth."
+  ],
+  "stakeIfLost": "If the bottle is not returned, Erilthil will lose the right to hold the spring feast and thus lose the legal claim that protects her clearings when neighbors press theirs.",
+  "arrival": "arrived out of the weather · asked for the boss by name"
+ },
+ "shipped": {
+  "title": "Search the beekeepers' clearings",
+  "situation": "A beekeepers' leader, Erilthil Fernbrook, arrived out of the weather and asked for the boss by name, standing too close as she said the bottle must come back. She says that if the bottle is not returned she will lose the right to hold the spring feast and so lose the legal claim that protects her clearings when neighbors press theirs. She wants you to search Erilthil Fernbrook's beekeepers' clearings for the carved victory bottle she lost, the coin comes at the finish with the pick of what the job turns up. A raider claims he will keep the bottle as his right of spoil.",
+  "job": "Search the beekeepers' clearings for the carved victory bottle and report whether it is there."
+ }
+}

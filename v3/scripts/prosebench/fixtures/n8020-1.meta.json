@@ -1,0 +1,59 @@
+{
+ "seed": 8020,
+ "chainId": "chain-14",
+ "title": "The Heir Who Would Not Be Found",
+ "bible": {
+  "title": "The Heir Who Would Not Be Found",
+  "kernel": "A steward hires the company to bring back a missing heir who has fled and refuses return.",
+  "cast": [
+   {
+    "name": "Percius Fairweather",
+    "who": "a borderhold steward sworn to the house's charge, anxious and blunt",
+    "want": "to have the missing heir returned alive to his custody",
+    "trade": "steward",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Alofnorr",
+    "who": "a weathered shrine keeper born in Thornbarrow with a hard pledge",
+    "want": "to keep the heir secret and safe within Thornbarrow and Silverfen",
+    "trade": "keeper",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   },
+   {
+    "name": "Luraxith",
+    "who": "a lizard-born heir hiding in the Western Forests to avoid a claim",
+    "want": "to remain hidden at Silverfen and not be returned",
+    "trade": "adventurer",
+    "role": "quarry",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Percius Fairweather holds legal charge of a small landed household but the blood heir fled years ago to avoid the household role. The heir is Luraxith, who chose exile and secret life in the Western Forests rather than accept the claim. Alofnorr, once a retainer of the household and sworn in blood to protect the child, bought a single polished crystal spoon from Asterhall and kept it with the ward. Alofnorr shelters Luraxith at a hollow rootstone in Silverfen and refuses outside custody. He will fight or run rather than hand the heir to outsiders. Percius cannot press his claim without the heir present and hires the company to locate and deliver the heir alive.",
+  "goal": "to locate and bring back the missing heir the client names, alive and in custody",
+  "arc": [
+   "Search the old elf road where Percius last expected any movement of the household's people → yields: a polished crystal spoon stamped with the maker's mark of Asterhall",
+   "Bring the spoon to Asterhall and question the glassworks about its buyer → yields: the glassmaster points to Alofnorr, keeper at Thornbarrow, as the buyer",
+   "Go to Thornbarrow shrine and demand the heir from Alofnorr, showing the spoon as proof → yields: Alofnorr refuses, snatches the spoon and flees into Silverfen, but in his haste he reveals the hollow rootstone at Silverfen where the missing heir hides, named there as Luraxith",
+   "At the old elf road, bring Luraxith from Silverfen to hand them to Percius, where Alofnorr intercepts and resists. Defeat or outwit Alofnorr there → yields: Luraxith handed alive to Percius Fairweather"
+  ],
+  "twist": null,
+  "tensions": [
+   "Alofnorr will refuse custody and may fight or steal proof to keep the heir",
+   "Luraxith will resist being returned and may flee rather than submit",
+   "Forest travel and old paths hide the rootstone and delay the handover"
+  ],
+  "openDirections": [
+   "If handed to Percius, Luraxith may still press for sanctuary or draw rival claimants, forcing the company to pick a side."
+  ],
+  "stakeIfLost": "If the heir is not returned, Percius's legal charge collapses and rival lords will seize the household's land and rights.",
+  "arrival": "came to the fort themselves · would not name the place until the terms were set"
+ },
+ "shipped": {
+  "title": "Search the old elf road",
+  "situation": "A borderhold steward, Percius Fairweather, came to the fort himself and holds his gloves while he speaks. He says the missing heir must be found and returned to his custody. If the heir is not returned, Percius's legal charge collapses and rival lords will seize the household's land and rights. He wants you to search the old elf road where he last expected any movement of the household's people, with the fee as agreed, and any spoils ride home with it. A keeper opposes this and will try to keep the heir secret and safe within Thornbarrow and Silverfen.",
+  "job": "Locate signs of the household's movement on the old elf road"
+ }
+}

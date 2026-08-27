@@ -1,0 +1,59 @@
+{
+ "seed": 8080,
+ "chainId": "chain-14",
+ "title": "The Caged Refrain",
+ "bible": {
+  "title": "The Caged Refrain",
+  "kernel": "A shrine warden hires mercenaries to fetch a caged singer whose songs set crowds moving.",
+  "cast": [
+   {
+    "name": "Avarya Duskbough",
+    "who": "A shrine warden from the Western Forests who keeps old pledge-rites for a small hollow.",
+    "want": "to have a caged singer delivered alive to her at the fort",
+    "trade": "warden",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Honoratus Greyfell",
+    "who": "A human ex-soldier turned tavern singer from the forest edge, lately held in a cage.",
+    "want": "to join the company for coin and protection",
+    "trade": "singer",
+    "role": "prize",
+    "loreId": "c8"
+   },
+   {
+    "name": "Ondunlmo",
+    "who": "A hunter of the Western Forests who traffics captives and keeps a blind at Thornbarrow.",
+    "want": "to collect his price for the captive and sell him on",
+    "trade": "hunter",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   }
+  ],
+  "situation": "Avarya Duskbough has paid the company to fetch a caged singer and bring him to her at the fort. The singer is Honoratus Greyfell. Ondunlmo holds Honoratus as collateral and intends to sell him to a buyer. Honoratus's songs incite violent unrest in crowds. Anyone who brings him through market places risks riots. The company is to fetch and deliver the living captive to Avarya under the agreed terms.",
+  "goal": "To retrieve a caged singer alive and deliver him to Avarya Duskbough at the fort.",
+  "arc": [
+   "Go to Bellfen Hollow the client named and question the shrine acolyte she trusts → yields: a scrap of song-lyric the acolyte remembers, a private refrain matching Honoratus's voice that points toward Yewblind Lodge",
+   "Travel to Yewblind Lodge using the lyric's lines to unlock a hunter's blind → yields: a rusted cage key stamped with Ondunlmo's mark and a folded note pointing to Thornbarrow Pen",
+   "Use the rusted key at Thornbarrow Pen to free the captive there without drawing Ondunlmo's main band → yields: the captive, Honoratus Greyfell, injured and clutching a frantic refrain that unsettles nearby guards",
+   "Escort Honoratus to Avarya's tent at the fort to hand him over as contracted while Ondunlmo appears to claim his price. Outwit Ondunlmo there and deliver Honoratus to Avarya"
+  ],
+  "twist": null,
+  "tensions": [
+   "Honoratus's songs inflame crowds and risk riots if he is exposed near markets or gatherings",
+   "Ondunlmo treats Honoratus as collateral and will press a sale or fee when the handover is attempted",
+   "Forest wardens punish the moving of bound entertainers, threatening the company with fines or seizure"
+  ],
+  "openDirections": [
+   "A buyer tracked by Ondunlmo may arrive at the fort to bid on the singer if delivery stalls, forcing a sale or a gambit"
+  ],
+  "stakeIfLost": "If the singer is not returned, Avarya will lose the shrine's oath-bell, which rings only with its singer and keeps the hollow's pledge-ward. Without it their pledge-keepers will abandon their charge.",
+  "arrival": "walked in with the market crowd · named a price before being asked"
+ },
+ "shipped": {
+  "title": "Question Avarya's acolyte at Bellfen Hollow",
+  "situation": "A warden, Avarya Duskbough, walked in with the market crowd and named a price before being asked. She stands too close while she says she needs a caged singer returned to her alive, the fee is fixed, and what else shakes loose the company keeps. If the singer is not returned, Avarya says, the shrine will lose the oath-bell and its pledge-keepers will abandon their charge. This step asks that you go to Bellfen Hollow and question the shrine acolyte she trusts. A hunter intends to collect his price for the captive and sell him on.",
+  "job": "Question the shrine acolyte Avarya trusts at Bellfen Hollow about the caged singer"
+ }
+}
