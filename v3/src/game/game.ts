@@ -39,7 +39,7 @@ import { rollName, rollPlaceName } from '../engine/names.js';
 import { hasClash, queryMatches } from '../engine/overlap.js';
 import { questXp, grantXp, rollBase, rollGrowthLean, growToLevel } from '../engine/growth.js';
 import { coins, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, explainCoins, type SlotTest, type Outcome, type QuestRollResult } from '../engine/roll.js';
-import { sampleKeywords, sampleKeywordsLight, sampleSeed, sampleOpening, sampleGravity, pickTone } from '../ai/keywords.js';
+import { sampleKeywords, sampleKeywordsLight, sampleSeed, sampleOpening, sampleGravity, pickTone, sampleArrival, sampleTell } from '../ai/keywords.js';
 import type { AiProvider, ResolveQuestInput, ResolveQuestOut, AskSlotOut, QuestWriteOut } from '../ai/provider.js';
 
 export interface LogEntry { cycle: number; kind: string; text: string; questId?: string }
@@ -1567,6 +1567,9 @@ export class Game {
       bible: {
         title: g.title, kernel: g.kernel, cast: g.cast, situation: g.situation, goal: g.goal,
         arc: g.arc, twist: g.twistReveal, tensions: g.tensions, openDirections: g.openDirections,
+        stakeIfLost: g.stakeIfLost,
+        // rolled ONCE at hiring and kept, so a re-offered beat 1 tells the same arrival twice
+        arrival: sampleArrival(this.rng),
       },
       // player-facing story state starts from the APPARENT goal — the bible's situation and
       // directions are the hidden truth and must never seed a surface the UIs display. The
@@ -1678,7 +1681,9 @@ export class Game {
       kind: (isFinale ? 'finale' : 'beat') as 'finale' | 'beat',
       // beats see the landmark ONLY when this saga's bible actually uses it (else it re-tempts drift)
       location: this.locationLine(chain.region, !!REGION[chain.region]?.landmark && JSON.stringify(chain.bible).includes(REGION[chain.region]!.landmark!), false),
-      level: chain.level, rarity: chain.rarity, slotCount: n,
+      // rarity's only stated job on a saga card was "permission to run long", and the length
+      // budget is now fixed — nine blind writer-reports called it dead and ignored it
+      level: chain.level, slotCount: n,
       // the person's NAME, never engine words — "custody of the focal" once printed on a card
       // world-worded AND rotated — any fixed string stamps (models echo DATA fields:
       // 'side loot' ×4, then its replacement ×5; rotation breaks the stamp)
@@ -1687,31 +1692,50 @@ export class Game {
         // FULL in-voice sentences, not gists: the writer is told to reword these, but cheap
         // models paste the DATA verbatim (batch O: "pay as agreed…" ended a card lowercase) — so
         // a paste must itself read as a clean card sentence (§8 input-shaping over nagging)
+        // CLAUSE-shaped, because the writer is now told to ride the pay on a sentence doing
+        // other work — the old pool was whole sentences, and a dealt string gets pasted WHOLE
+        // ("A warden watches the chest and will resist anyone who opens it, and the pay is fixed,
+        // and what else the job shakes loose the company keeps." — live, 2026-08-27)
         : this.rng.pick([
-            'The client pays the agreed coin, and the company keeps whatever the road turns up.',
-            'Honest coin for the work, and any small spoils ride home besides.',
-            // every string sex-neutral: a hardcoded 'She pays…' was pasted under male clients
-            'Pay stands as agreed, and what the company hauls back is its own to keep.',
-            'Coin as promised, and the pick of whatever the job turns up.',
-            // pool of 4 stamped visibly (same string verbatim on 3 cards per campaign) — widened
-            // "…carries home besides is the company's" parsed two ways — our own cold reader
-            // flagged the canned string twice (reviewlab 84001); paste-clean strings only
-            'Coin when the work is done. Anything else the party carries home is the company\'s.',
-            'The fee is agreed, and any spoils along the way stay with the company.',
-            'Plain coin for plain work, and what the road yields is the company\'s to keep.',
-            'The pay is fixed, and what else the job shakes loose the company keeps.',
+            'the agreed coin, and what the road turns up',
+            'honest coin, and any small spoils besides',
+            'the fee as agreed, and the company keeps what it hauls back',
+            'coin when the work is done, and the pick of what the job turns up',
+            'plain coin for plain work, and what the road yields stays the company\'s',
+            'the pay is fixed, and what else shakes loose the company keeps',
+            'coin at the finish, and anything carried home is the company\'s',
+            'the coin they named, and any spoils that ride home with it',
           ]),
       // R1 sell-the-stake (designer ruling 2026-07-18, STAKE=1 lab flag): beat 1 tells the boss
       // what the WHOLE matter is rumored to be worth — engine-known kind + payoff band, dealt as
       // a paste-clean rumor sentence (sticky-string law); rumor-toned so a later slip breaks no promise
       // SHIPPED default (batch I blind A/B: stake 5.5 vs control 4.25; boss_pull yes 5-0):
       // STAKE=0 restores stake-less beat-1 cards
-      ...(process.env.STAKE !== '0' && chain.beatIndex === 0 && !isFinale
+      ...(process.env.STAKE !== '0' && chain.beatIndex === 0 && !isFinale && !chain.bible.stakeIfLost
         ? { stake: this.stakeGloss(chain, focal?.character?.role === 'merc' ? focal.name : undefined) }
         : {}),
       // beats get NO opening spark (🛠 2026-07-10): a random spark fought the saga — the card
-      // opens from the story state, and beat 1 from how the bible says the matter arrived
-      placeNameSuggestions: [this.freshPlaceName(chain.region)],
+      // opens from the story state, and beat 1 from how the bible says the matter arrived.
+      // BEAT 1 gets no place suggestion either: its ground is already named by arcStep or by
+      // relevantLore, the bible's geography outranks the suggestion anyway, and the one-place
+      // budget is spent — 3/3 blind writers dropped it unused and asked why it was dealt.
+      ...(isBeat1 ? {} : { placeNameSuggestions: [this.freshPlaceName(chain.region)] }),
+      // ─── BEAT 1's OWN FACTS (prosebench/ROUND2_3: the three questions cards lose) ───
+      ...(isBeat1 ? {
+        // WHY. Nine writer-reports lost this question; the one handed a written stake answered it
+        // and said so: "the one question cards usually lose is the one the input handed me pre-written."
+        stakeIfLost: chain.bible.stakeIfLost || undefined,
+        // HOW IT REACHED THE FORT — invented by 6/6 writers before it was dealt
+        arrival: chain.bible.arrival,
+        // WHY IT TAKES ARMED STRANGERS — what the client openly knows stands against them. The
+        // reveal cadence keeps the obstacle's NAME and identity off the card; what they will DO
+        // about this matter is the client's own knowledge and belongs on the first card.
+        knownObstacle: (o => o?.want
+          ? `a ${o.trade || 'stranger'} who means ${this.scrubUnmet(chain, o.want)}`
+          : undefined)(chain.bible.cast.find(m => m.role === 'obstacle') ?? chain.bible.cast.find(m => m.role === 'quarry')),
+        // the CARE MOMENT, dealt rather than derived from a tag word
+        ...(chain.bible.cast.some(m => m.role === 'client') ? { tell: sampleTell(this.rng) } : { noClient: true }),
+      } : {}),
       // roster dealt ONLY when the focal is the company's own (the one case a saga card may
       // name a soldier) — otherwise it's never-use data, pure copy-bait (context-free audit)
       ...(focal?.character?.role === 'merc'
@@ -1731,6 +1755,10 @@ export class Game {
       // beat 1 has no record yet — an all-empty storyState scaffold is pure parse-load
       storyState: chain.beatIndex === 0 && !isFinale ? undefined : chain.story,
       relevantLore,
+      // beat 1's lore is trimmed to the ground this step actually stands on: a second entry is
+      // always a later step's ground, and `relationPhrase` reads the same on every entry, so it
+      // discriminates nothing — 3/3 blind writers could not tell what it wanted of them
+      ...(isBeat1 ? { relevantLore: relevantLore.slice(0, 1).map(({ relationPhrase: _rp, ...e }) => e) } : {}),
       focalDossier: (d => d.includes('\n') ? d : undefined)(this.dossier(chain.focalId)),
       // expectedBeats deliberately NOT sent to the card writer: the system never explains it,
       // and the total arc length is whole-story knowledge a beat card must not lean on
@@ -1740,7 +1768,10 @@ export class Game {
       arcStep: cardStep,
       // focalName only when the staged bible still carries the name — an unmet focal whose
       // identity is the saga's discovery must not re-enter through this side door
-      focalName: focal && `${JSON.stringify(stagedBible)} ${cardStep}`.includes(focal.name.split(' ')[0]!) ? focal.name : undefined,
+      // focalName only when the staged bible still carries the name AND the focal is the
+      // company's own soldier — otherwise the goal already names them and the field is inert
+      // ("focalName changed nothing about my writing" — 3/3 blind writers)
+      focalName: focal?.character?.role === 'merc' && `${JSON.stringify(stagedBible)} ${cardStep}`.includes(focal.name.split(' ')[0]!) ? focal.name : undefined,
       // runtime truth, not genesis-time: a focal HIRED mid-saga is the company's own now
       focalIsMerc: focal?.character?.role === 'merc',
     });
@@ -2670,6 +2701,22 @@ export class Game {
   /** reveal-cadence staging (shared by the beat writer AND the resolver — 37017: "Watkyn"
    *  debuted in a resolution): cast the player hasn't met is passed WITHOUT their name, and
    *  the name is scrubbed from every bible string, so an unmet person CANNOT be named. */
+  /** Replace every UNMET cast member's name with "another party" — the same gate stageBible
+   *  uses, exposed so beat 1 can deal an offstage pressure's WANT without dealing their identity. */
+  private scrubUnmet(chain: Chain, text: string, stepText = ''): string {
+    const met = (name: string) => {
+      const words = name.toLowerCase().split(/[^a-z]+/).filter(w => w.length > 2);
+      const seen = [stepText, chain.bible.goal, ...(chain.story.introducedNames ?? [])].join(' ').toLowerCase();
+      return words.some(w => seen.includes(w));
+    };
+    const escRe = (x: string) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return chain.bible.cast.filter(m => !(m.role === 'client' || met(m.name))).reduce((t, m) => {
+      for (const n of new Set([m.name.trim(), m.name.trim().split(/\s+/)[0]!]))
+        t = t.replace(new RegExp(`\\b${escRe(n)}('s)?\\b`, 'g'), (_, pos) => pos ? "another party's" : 'another party');
+      return t;
+    }, text);
+  }
+
   private stageBible(chain: Chain, stepText: string, withholdTwist = false) {
     const met = (name: string) => {
       const words = name.toLowerCase().split(/[^a-z]+/).filter(w => w.length > 2);
@@ -2703,9 +2750,12 @@ export class Game {
       // "remembers a wandering lizardman smith", the step-2 prize). Omission is the fix.
       // Retained entries get SCRUBBED who/want too — an offstage focal's name once leaked
       // through the client's want ("to receive Udara…") while her own entry was nameless.
+      // TRADE survives the scrub where who/want cannot: it is one common noun, carries no
+      // identity, and is the only thing that makes "shows nameless by trade" performable. Three
+      // blind writers, given {role, offstage: true}, each had to invent the entire danger.
       cast: chain.bible.cast.map((m): unknown => offstageCast.includes(m)
-        ? { role: m.role, offstage: true }
-        : { ...m, who: scrub(m.who), want: scrub(m.want) }),
+        ? { role: m.role, offstage: true, ...(m.trade ? { trade: m.trade } : {}) }
+        : { ...m, loreId: undefined, who: scrub(m.who), want: scrub(m.want) }),
     };
   }
 

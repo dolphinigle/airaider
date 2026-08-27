@@ -9,7 +9,7 @@ import {
 } from './economy.js';
 import type { Outcome } from './roll.js';
 
-export interface BibleCastEntry { name: string; who: string; want: string; role: string; loreId?: string }
+export interface BibleCastEntry { name: string; trade?: string; who: string; want: string; role: string; loreId?: string }
 
 export interface Bible {
   title: string;
@@ -21,6 +21,11 @@ export interface Bible {
   twist: string | null;        // engine-rolled 30%
   tensions: string[];
   openDirections: string[];
+  /** what the client says BREAKS if the saga fails — beat 1's WHY (see prosebench/ROUND2_3) */
+  stakeIfLost?: string;
+  /** engine-rolled at hiring: HOW this matter reached the fort (the one-off `intake` channel,
+   *  which sagas never got). All six blind writers invented it, both rounds. */
+  arrival?: string;
 }
 
 export interface ChainStoryState {

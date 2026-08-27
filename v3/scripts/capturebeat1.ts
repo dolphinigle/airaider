@@ -26,13 +26,13 @@ for (let c = 0; c < 10 && got < want; c++) {
     if (!rec?.systemPreview) continue;
     const chain = g.state.chains.find(ch => ch.id === q.chainId);
     const id = `${seed}-${++got}`;
-    fs.writeFileSync(`${OUT}/f${id}.system.txt`, rec.systemPreview);
-    fs.writeFileSync(`${OUT}/f${id}.user.json`, rec.userPrompt ?? '');
-    fs.writeFileSync(`${OUT}/f${id}.meta.json`, JSON.stringify({
+    fs.writeFileSync(`${OUT}/n${id}.system.txt`, rec.systemPreview);
+    fs.writeFileSync(`${OUT}/n${id}.user.json`, rec.userPrompt ?? '');
+    fs.writeFileSync(`${OUT}/n${id}.meta.json`, JSON.stringify({
       seed, chainId: q.chainId, title: chain?.bible.title, bible: chain?.bible,
       shipped: { title: q.title, situation: q.situation, job: q.job },
     }, null, 1));
-    console.log(`f${id}  ${chain?.bible.title}\n   ${q.situation}\n`);
+    console.log(`n${id}  ${chain?.bible.title}\n   ${q.situation}\n`);
   }
   await g.endCycle();
 }

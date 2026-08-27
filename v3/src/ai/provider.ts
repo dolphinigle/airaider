@@ -19,10 +19,18 @@ export interface QuestWriteInput {
   kind: 'one-off' | 'beat' | 'finale';
   archetype?: string;            // one-offs only — beats serve the bible's story instead
   location: string;              // "Western Forests — old-growth elven woods; Thornhollow at their heart"
-  level: number; rarity: string;
+  level: number;
+  rarity?: string;               // one-offs only — on a saga beat its sole stated job was
+                                 // "permission to run long", and the budget is fixed now
   slotCount: number;
   rewardEnvelope: string;        // "a captive and coin" — the engine's kind list, no numbers
   stake?: string;                // beat 1 only (R1 sell-the-stake): what the WHOLE matter is rumored to be worth to the company — paste-clean, rumor-toned, no numbers
+  // ── beat 1's own dealt facts (prosebench/ROUND2_3 — the questions cards lose) ──
+  stakeIfLost?: string;          // what the client says BREAKS if the saga fails: beat 1's WHY
+  arrival?: string;              // two atoms: how this reached the fort, and the client's manner
+  knownObstacle?: string;        // what the client openly knows stands against them — never a name
+  tell?: string;                 // one physical habit the client has while talking: the CARE MOMENT
+  noClient?: boolean;            // this saga has no outside client — nobody hired the company
   keywords?: string[];           // one-offs: §5 sampler (1 BOND + 1 TIE + 1-2 WILDCARDS)
   opening?: { spark: string };   // one-offs only — arrival SPARK, time folded in ("a friar, a plea — at dusk"): a standalone time field taught cards to open "At dusk, ...".
                                  // Beats get NO spark: a random spark fought the saga (a cart from nowhere).
@@ -43,7 +51,7 @@ export interface QuestWriteInput {
   storyState?: unknown;          // chain story-so-far
   // two-part lore prompting (LORE.md): the selector already picked who gets full dossiers;
   // the writer receives the world's relevant memory around this saga
-  relevantLore?: { id: string; name: string; blurb: string; relationPhrase: string; companySoldier?: boolean; companyCaptive?: boolean; atTheFort?: boolean; outOfReach?: boolean; dossier?: string }[];
+  relevantLore?: { id: string; name: string; blurb: string; relationPhrase?: string; companySoldier?: boolean; companyCaptive?: boolean; atTheFort?: boolean; outOfReach?: boolean; dossier?: string }[];
   focalDossier?: string;         // what the world currently remembers of the focal (evolves each cycle)
   fixNotes?: string[];           // cold-reader gate: defects found in the rejected previous draft
   beatIndex?: number; expectedBeats?: number;
@@ -85,9 +93,10 @@ export interface GenesisInput {
 export interface GenesisOut {
   title: string;
   kernel: string;
-  cast: { name: string; who: string; want: string; role: string; loreId?: string }[];
+  cast: { name: string; trade?: string; who: string; want: string; role: string; loreId?: string }[];
   situation: string;
   goal: string;
+  stakeIfLost?: string;
   arc: string[];
   twistReveal: string | null;
   tensions: string[];

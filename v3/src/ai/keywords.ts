@@ -556,6 +556,40 @@ export function sampleOpening(rng: Rng, opts?: { gentle?: boolean; channel?: Int
   return { spark: atoms.join(' · '), sparkCore: core, landmarkAllowed: rng.chance(0.15), channel, intake: rng.pick(INTAKE_FACT[channel]) };
 }
 
+/** SAGA ARRIVAL — how the client brought this to the fort, as two atoms the writer combines.
+ *  Every one of six blind Opus writers invented this, both rounds, and named it the single
+ *  most-invented thing on a beat-1 card. The one-off `intake` channel has dealt it for months;
+ *  sagas never got it. Atoms, never authored phrases (the seed-list law): a fixed string stamps.
+ *  Measured value: the two live sentences on the best v3 card were the dealt `arrival` and `tell`
+ *  — "the dealt facts outperformed my writing everywhere they existed." */
+const ARRIVAL_HOW = [
+  'came to the fort themselves', 'sent a rider ahead and came behind it', 'came in with the day\'s callers',
+  'sent a servant with a token and followed', 'was waiting at first light', 'came up with the last carts',
+  'came on foot, having walked it', 'sent word twice before coming', 'arrived out of the weather',
+  'came in the night and would not wait for morning',
+];
+const ARRIVAL_MANNER = [
+  'would not sit down', 'had the coin counted before speaking', 'kept looking back down the road',
+  'asked for the boss by name', 'brought no one with them', 'spoke low, and only to the boss',
+  'would not give a reason until the door was shut', 'was in a hurry and did not hide it',
+  'had rehearsed it', 'said the whole of it standing',
+];
+/** ONE physical habit the client has while they talk — the CARE MOMENT, dealt instead of derived.
+ *  Three writers reported deriving a human moment from a tag word ("calculating") guarantees
+ *  invention; the one who was handed a tell called it the best line on his card. */
+const CLIENT_TELL = [
+  'counts the soldiers in the yard while talking', 'watches your hands, not your face',
+  'keeps turning something over in one palm', 'will not look at the door',
+  'answers a question with a question', 'stops talking whenever anyone walks past',
+  'says the same fact twice, in different words', 'wipes their hands on their coat, over and over',
+  'laughs in the wrong place', 'finishes your sentences for you',
+  'goes quiet when the person they want is named', 'stands too close',
+];
+export function sampleArrival(rng: Rng): string {
+  return `${rng.pick(ARRIVAL_HOW)} · ${rng.pick(ARRIVAL_MANNER)}`;
+}
+export function sampleTell(rng: Rng): string { return rng.pick(CLIENT_TELL) }
+
 /** one-off gravity — not every job is dire (v2's per-card register knob, rarity-weighted).
  *  Engine-rolled seed: most common jobs are small; rare ones lean grave. */
 // Gravity sets tone AND the length budget, so it decides how heavy a job READS. It used to be
