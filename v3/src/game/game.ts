@@ -1697,14 +1697,14 @@ export class Game {
         // ("A warden watches the chest and will resist anyone who opens it, and the pay is fixed,
         // and what else the job shakes loose the company keeps." — live, 2026-08-27)
         : this.rng.pick([
-            'the agreed coin, and what the road turns up',
-            'honest coin, and any small spoils besides',
-            'the fee agreed, and whatever the company hauls back',
-            'coin at the finish, and the pick of what the job turns up',
-            'plain coin, and the road\'s yield to the company',
-            'a fixed fee, and what else shakes loose',
-            'coin when it is done, and anything carried home',
-            'the agreed fee, and any spoils that ride home',
+            'the pay is the agreed coin, and what the road turns up',
+            'the pay is honest coin, and any small spoils besides',
+            'the fee is as agreed, and the company keeps what it hauls back',
+            'the coin comes at the finish, with the pick of what the job turns up',
+            'the pay is plain coin, and the road\'s yield goes to the company',
+            'the fee is fixed, and what else shakes loose the company keeps',
+            'the coin comes when it is done, and anything carried home is the company\'s',
+            'the fee is as agreed, and any spoils ride home with it',
           ]),
       // R1 sell-the-stake (designer ruling 2026-07-18, STAKE=1 lab flag): beat 1 tells the boss
       // what the WHOLE matter is rumored to be worth — engine-known kind + payoff band, dealt as

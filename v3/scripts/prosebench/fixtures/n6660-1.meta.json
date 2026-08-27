@@ -1,0 +1,59 @@
+{
+ "seed": 6660,
+ "chainId": "chain-13",
+ "title": "Names to Burn",
+ "bible": {
+  "title": "Names to Burn",
+  "kernel": "A lender hires the company to fetch a stolen list of names from the ford. The trail runs to a midwife, to a hidden anvil, and back to the ford where a closed smith will try to take the prize.",
+  "cast": [
+   {
+    "name": "Artheur Thatcher",
+    "who": "river-hamlet lender who presses debts and prefers quiet settlements.",
+    "want": "to recover the stolen list of names and receive it in hand",
+    "trade": "lender",
+    "role": "client",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Berela",
+    "who": "sickly elven entertainer from the Western Forests who keeps odd talismans and names.",
+    "want": "to keep the list hidden and protect the place it hides",
+    "trade": "entertainer",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Adord",
+    "who": "forge-born smith who closed his hearth and guards the old glade with a stubborn eye.",
+    "want": "to seize the sealed iron chest and claim what it hides for himself",
+    "trade": "smith",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   }
+  ],
+  "situation": "A single torn list naming men the respectable begged to burn was hidden by its keeper inside a sealed iron chest placed beneath an old anvil in a shaded glade. The chest bears two seals: a midwife's knot and a smith's mark. Artheur Thatcher hired the company to fetch that list to satisfy his loan bargain. Berela holds the list's location and refuses to hand it over. Adord wants the chest and the hoard it points to and will try to take it for himself.",
+  "goal": "to recover the stolen list of names and deliver it to the lender who hired them",
+  "arc": [
+   "Search the river shallows the client named for signs of the stolen list, using only what the client supplied at hire → yields: a soaked scrap naming Berela and stitched with a midwife's cord",
+   "Take the stitched scrap to the midwife's hut the cord points to and press for help using the scrap as proof → yields: Nathyne Rootward, who trades a bone key and directions to a hidden glade with an old anvil",
+   "Follow Nathyne's directions into the hidden glade and search beneath the old anvil using the bone key to probe for caches → yields: a sealed iron chest stamped with a smith-mark and more than one lock",
+   "Bring the sealed iron chest and the midwife key to the river ford where Artheur awaits. Adord arrives to claim the chest. Defeat or outbid Adord, take his key, open the chest in Artheur's presence, and hand the recovered list to Artheur"
+  ],
+  "twist": null,
+  "tensions": [
+   "Adord will claim the chest and the hoard for himself and will not hand it over",
+   "Berela refuses to part with the list and will bargain or flee if pressed",
+   "Artheur's creditors press for settlement and will act if the loan remains unsettled"
+  ],
+  "openDirections": [
+   "The lender's creditor tightens pressure and may send men to seize the smithy whether the company succeeds or not"
+  ],
+  "stakeIfLost": "the client's smithy will be seized by his creditors, including its tools and right to trade",
+  "arrival": "came down from higher ground · asked for the boss by name"
+ },
+ "shipped": {
+  "title": "Search the river shallows",
+  "situation": "A river-hamlet lender, Artheur Thatcher, came down from higher ground and asked for you at the door. He looks at the door before answering and says the list was taken from his locked chest by the river last night. If this fails, his smithy will be seized by his creditors, including its tools and right to trade. He wants the shallow reach of the river searched for signs of the stolen list, using only what he supplied at hire. A smith in the hamlet is moving to seize the sealed iron chest and claim what it hides for himself. He set a damp bundle and a soaked wax candle on the table, and he offers coin when it is done, and anything carried home.",
+  "job": "Find any trace of the stolen list in the river shallows?"
+ }
+}

@@ -1,0 +1,59 @@
+{
+ "seed": 6220,
+ "chainId": "chain-12",
+ "title": "The Last Quiet at Thornhollow",
+ "bible": {
+  "title": "The Last Quiet at Thornhollow",
+  "kernel": "A bishop hires the company to bring an elven archer in alive from the Thornhollow ruins.",
+  "cast": [
+   {
+    "name": "Robertus",
+    "who": "A senior churchman who claims the Thornhollow tithe and speaks for the chapter.",
+    "want": "to receive the named elven archer alive at the fort",
+    "trade": "bishop",
+    "role": "client",
+    "loreId": "lore-10"
+   },
+   {
+    "name": "Undbjolf",
+    "who": "A hard-faced woodsman who fled Thornhollow and lives rough near the Western Forests.",
+    "want": "to lead the company to where he fled",
+    "trade": "veteran",
+    "role": "ally",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Mertis",
+    "who": "An exiled elven archer who survived Thornhollow and avoids human settlements.",
+    "want": "to live free in the Western Forests",
+    "trade": "archer",
+    "role": "quarry",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Bishop Robertus has hired the company to seize Mertis, an elven archer last seen around Thornhollow, and bring him alive to the fort. The celebrated human victory at Thornhollow was in truth a massacre: troops slaughtered fleeing elves and cleared the elven vault. Mertis escaped into the Western Forests. Robertus intends to try or silence him and to secure the Thornhollow reliquary for the chapter.",
+  "goal": "To seize and deliver Mertis alive, recovered from the Thornhollow ruins, to Bishop Robertus at the fort.",
+  "arc": [
+   "Search the Thornhollow ruins the client named for any sign of the archer → yields: a charred route-marker pointing toward Bramblebarrow",
+   "Follow the route to Bramblebarrow and question the local lanes using the previous marker → yields: Undbjolf, a wounded Thornhollow veteran who fled there",
+   "Question Undbjolf where he hid and press him for the archer's intent using the veteran's memory → yields: Mertis plans to slip back to Thornhollow for a memorial night",
+   "Intercept Mertis at Thornhollow, subdue him when he resists, and hand him alive to Bishop Robertus as contracted"
+  ],
+  "twist": null,
+  "tensions": [
+   "Rain and leaf-fall erase tracks faster than pursuit",
+   "Elven kin may come to rescue Mertis rather than parley",
+   "Robertus insists on the prisoner alive and will punish unlawful death"
+  ],
+  "openDirections": [
+   "If the company delays, the rival chapter will send armed clerics to seize the Thornhollow vault and hire their own muscle."
+  ],
+  "stakeIfLost": "Robertus's claimed right to the Thornhollow reliquary will be lost. A rival chapter will seize the silver reliquary and the tithe rights tied to it.",
+  "arrival": "was brought as far as the gate and came the rest alone · would give only half a reason"
+ },
+ "shipped": {
+  "title": "Search Thornhollow for signs of the archer",
+  "situation": "A churchman, Robertus, was brought as far as the gate and came the rest alone, and he stops talking whenever anyone walks past. He says he must receive the elven archer, Mertis, alive at the fort, and offers coin at the finish and the pick of what the job turns up. Robertus claims that if you fail his claimed right to the Thornhollow reliquary will be lost and a rival chapter will seize the silver reliquary and the tithe rights tied to it. The matter now is whether Mertis remains in the ruin called Thornhollow or slipped away. This stands against an archer, Mertis, who intends to live free in the Western Forests rather than be taken to a house of men.",
+  "job": "Find whether Mertis remains in the Thornhollow ruins."
+ }
+}

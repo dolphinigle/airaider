@@ -4,56 +4,56 @@
  "title": "The Birch Singer",
  "bible": {
   "title": "The Birch Singer",
-  "kernel": "A temple steward hires the company to seize a caged singer whose music sets crowds to quarrel and return them alive.",
+  "kernel": "A temple priest hires the company to fetch a caged singer whose songs start riots, and the company must retrieve him from a fringe worshipper's hold and deliver him to the temple.",
   "cast": [
    {
     "name": "Roldofin Leafshade",
-    "who": "an elven steward of a western temple who worries the singer's commotions will ruin his house.",
-    "want": "to receive the client's captive singer alive",
-    "trade": "steward",
+    "who": "A temple priest at the Silverbough Reliquary who guards a birch votive.",
+    "want": "to recover the temple's caged singer and deliver them to temple custody",
+    "trade": "priest",
     "role": "client",
     "loreId": "lore-12"
    },
    {
     "name": "Llevas Ashveil",
-    "who": "an elf raised in old-growth choirs now bound inside a birch cage and still singing.",
-    "want": "to remain at the grove and keep singing",
+    "who": "An elf captured for his songs, once a shrine performer from the Western Forests.",
+    "want": "to avoid being returned to temple custody",
     "trade": "singer",
     "role": "quarry",
     "loreId": "c8"
    },
    {
-    "name": "Fairynn",
-    "who": "an exile woman who leads a birch-worship circle and claims the singer as sacred to her rites.",
-    "want": "to keep the singer and their song for her congregation",
-    "trade": "priest",
+    "name": "Faendal",
+    "who": "A charismatic lay worshipper who leads a fringe birch-cult in the Western Forests.",
+    "want": "to keep the singer for public songs that stir his followers",
+    "trade": "worshipper",
     "role": "obstacle",
     "loreId": "lore-13"
    }
   ],
-  "situation": "Roldofin has hired the company to stop unrest by taking a singer believed captive at a birch shrine. The singer, Llevas, is held by Fairynn's birch-worship circle in a fenced grove. Fairynn uses Llevas' voice to call crowds, and those songs have already started quarrels in nearby clearings. The company's task is straightforward: go, seize the singer, and return them to Roldofin alive.",
-  "goal": "to bring the client's captive singer back to the client alive.",
+  "situation": "Roldofin hires the company to fetch a singer whose songs start riots and to return him to temple custody. The singer exists and has been held in cages that move between small shrine outposts and private holds. Fringe worshippers value the singer as a means to rally quarrels among forest folk, and those worshippers conceal him and trade tokens among allies. The company has a clear fee and an explicit delivery requirement to hand the singer back to Roldofin.",
+  "goal": "to recover the temple's caged singer and deliver them to temple custody",
   "arc": [
-   "Search Birchward Hollow, the birch shrine the client named, for the caged singer the client reported → yields: a braided birch token burned with Fairynn's personal mark",
-   "Take the birch token to Dulwen Ford and ask the old trader who uses that mark → yields: directions to the grove named Birchring",
-   "Enter Birchring and demand the singer the token points to → yields: Llevas caged at the altar and Fairynn refusing to hand them over",
-   "Bring Llevas toward Birchward Hollow and stand before Roldofin while Fairynn and her followers block the clearing. Force, buy, or outwit Fairynn there and deliver Llevas to Roldofin as contracted"
+   "Travel to the Birchward Clearing that Roldofin named to inspect the temple's holding cage → yields: a birch-tagged note signed Faendal pointing to Garanth Hollow",
+   "Use Faendal's note to find Garanth Hollow and confront the cult there → yields: Faendal refuses and flees, dropping a copper sigil stamped with a moss-keeper's mark",
+   "Trace the sigil to Mossward Nook and bargain with the keeper for access → yields: an iron key stamped with the Silverbough Reliquary's mark and the news that Llevas now waits at the Reliquary",
+   "Go to the Silverbough Reliquary, use the key to open the cage, and deliver Llevas to Roldofin while Faendal returns to block the handover. Overcome Faendal and complete the delivery"
   ],
   "twist": null,
   "tensions": [
-   "Fairynn will not give Llevas and brings followers to defend her claim",
-   "Llevas' songs can still whip up mobs if released during the transfer",
-   "Forest patrols and worshipers know the grove's paths and will complicate travel"
+   "Faendal's followers will rally at any public singing and drag crowds into quarrel.",
+   "Local keepers fear the singer's effect and will only bargain for heavy prices or favors.",
+   "The temple demands sighted delivery and will not accept a substitute or payment in place of the singer."
   ],
   "openDirections": [
-   "If the singer's songs spread further, villages will arm and the region will narrow movement and trade."
+   "The birch-cult grows bolder and may press the temple for a public performance that could spill beyond the groves."
   ],
-  "stakeIfLost": "If the company fails, the client's temple will be sacked by rioters drawn by the singer and its birch reliquary burned.",
+  "stakeIfLost": "If the company fails, the temple's birch pillar will be torn down when the singer's songs incite a mob, ending the temple's claim over the grove.",
   "arrival": "crossed the river to get here · refused food and drink"
  },
  "shipped": {
-  "title": "Search the birch shrine",
-  "situation": "An elven steward, Roldofin Leafshade, crossed the river to get here and refused food and drink. He rubs a thumb along a scar as he says the birch shrine in Birchward Hollow holds a singer locked in a cage. He says if the company fails, the client's temple will be sacked by rioters and its birch reliquary burned. A priest intends to keep the singer and their song for her congregation, and that priest still holds the shrine. Roldofin wants the singer brought back alive, and will give coin when it is done, and anything carried home.",
-  "job": "Search Birchward Hollow's birch shrine for the caged singer reported to the steward."
+  "title": "Inspect the holding cage at Birchward Clearing",
+  "situation": "A priest, Roldofin Leafshade, crossed the river to the fort and refused food and drink. He rubs a thumb along a scar as he says the place to check is the Birchward Clearing. He wants you to travel there to inspect the temple's holding cage and coin when it is done, and anything carried home. He asks you to confirm the singer is still caged rather than released to the grove. A fringe worshipper means to keep the singer for public songs and will try to stop anyone who moves the captive. \"If the company fails, the temple's birch pillar will be torn down when the singer's songs incite a mob, ending the temple's claim over the grove,\" he warns.",
+  "job": "Travel to the Birchward Clearing to inspect the temple's holding cage"
  }
 }

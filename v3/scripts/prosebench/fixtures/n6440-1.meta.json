@@ -1,0 +1,59 @@
+{
+ "seed": 6440,
+ "chainId": "chain-13",
+ "title": "The Creep of the Western Stone",
+ "bible": {
+  "title": "The Creep of the Western Stone",
+  "kernel": "Cicely hires soldiers to find and seize Ilring, the elf who slides the March's western border stone a pinch each winter.",
+  "cast": [
+   {
+    "name": "Cicely of the Marches",
+    "who": "March reeve who enforces the bounds and signs off winter levies.",
+    "want": "to recover the March's western border marker and restore it to its peg",
+    "trade": "reeve",
+    "role": "client",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Ilring Brightwater",
+    "who": "a sickly elven forager who keeps to himself near the western wood.",
+    "want": "to protect his hidden winter chest of medicines and seed",
+    "trade": "forager",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Gogrolf Winterborn",
+    "who": "charcoal foreman who runs the camps west of the March and guards the stacks.",
+    "want": "to keep the moved marker where it rests so his burners retain winter wood rights",
+    "trade": "burner",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   }
+  ],
+  "situation": "Cicely has hired the company to find the person moving the March's western border stone and return the marker to its peg. She warns that, if the line creeps, the charcoal-burners will claim the March's winter wood and the March will lack fuel through the cold. The company is sent to the charcoal-burners' camps to locate evidence and the mover.",
+  "goal": "to recover a border marker and return it to the March's western peg.",
+  "arc": [
+   "Search the charcoal-burners' camps for signs of the moved marker using the client's report → yields: a burned peg driven into a stump with a scrap of elven weave tied to it, angled west.",
+   "Follow the peg's line into Ashroot Stand and confront the burners there. Gogrolf refuses and forces the company off the stacks, smashing their access pegs as a price → yields: a stub of iron pried from the moved marker, cut with fine elven grooves and pointing deeper into Bristle-Cedar Hollow.",
+   "Track the iron stub into Bristle-Cedar Hollow and lever at the scrape where the marker was slid → yields: the border stone lifts to show a sealed peat chest of winter medicine and Ilring dropped low beside it.",
+   "Return to the charcoal-burners' camps with the lifted stone and Ilring. Gogrolf stands between the company and delivery and must be beaten, bought, or outwitted there so Cicely receives the returned marker and Ilring as prisoner"
+  ],
+  "twist": "The border stone hides a sealed peat chest of winter medicines and seed; Ilring shifts the stone a little each year to keep that chest inside March land so he can reach it in winter.",
+  "tensions": [
+   "Gogrolf will fight to keep the shifted marker because it secures his burners' winter claims",
+   "Returning the stone will expose Ilring's chest and risk destroying his medicine supply",
+   "The company must hand Ilring over to Cicely or risk mercy and wrath from both the reeve and the burners"
+  ],
+  "openDirections": [
+   "If the company returns the marker and hands over Ilring, Cicely restores the March's line but the burners may press small raids. If the company spares Ilring, his medicines survive but Cicely's authority and winter stores are weakened."
+  ],
+  "stakeIfLost": "If the marker is not returned, the burners will claim the March's winter wood and the March will be left without winter fuel.",
+  "arrival": "came up with the last carts · wanted it settled the same day"
+ },
+ "shipped": {
+  "title": "Sweep the burners' camps",
+  "situation": "A reeve, Cicely of the Marches, came up with the last carts and turns a ring around one finger while she says the western marker was moved. She wants the March's western border marker found and returned to its peg today. She says, If the marker is not returned, the burners will claim the March's winter wood and the March will be left without winter fuel. The moved marker is believed to lie somewhere among the charcoal-burners' camps around Bristle-Cedar Hollow. You may recover plain coin, and the road's yield goes to the company when you bring news and signs of the marker.",
+  "job": "Search the charcoal-burners' camps for signs of the moved marker using the client's report"
+ }
+}
