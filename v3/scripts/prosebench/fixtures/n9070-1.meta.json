@@ -1,0 +1,59 @@
+{
+ "seed": 9070,
+ "chainId": "chain-14",
+ "title": "The Return That Was Arranged",
+ "bible": {
+  "title": "The Return That Was Arranged",
+  "kernel": "A riverside fishmonger hires the company to fetch a missing lizard scion. The company tracks a staged 'flight', confronts the exile's broker at the handover, and wins the scion for the hire.",
+  "cast": [
+   {
+    "name": "Rechimund Thatcher",
+    "who": "A riverside market seller whose stall anchors the Brook-Mouth fair.",
+    "want": "to have Seed-Neeus returned to his stall at Brook-Mouth",
+    "trade": "fishmonger",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Caranya",
+    "who": "An elven exile broker who arranges passages and hides folk the courts wish away.",
+    "want": "to keep Seed-Neeus placed in exile out of the market's hands",
+    "trade": "broker",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   },
+   {
+    "name": "Seed-Neeus Scale-of-Bronze",
+    "who": "A young lizard scion cast out from her house and surviving in the woodlands.",
+    "want": "to remain safe away from the market and her old house",
+    "trade": "ruler",
+    "role": "prize",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Rechimund Thatcher hired the company to fetch Seed-Neeus, who did not run away. Caranya arranged a staged flight and placed Seed-Neeus in exile at Marrow Hollow to keep her safe from the market and her house. The client knows only that the scion left and asks for her returned to his stall.",
+  "goal": "to bring Seed-Neeus Scale-of-Bronze back to Rechimund Thatcher at his stall in Brook-Mouth",
+  "arc": [
+   "Search Lowford Dock, the ferry landing the client first named, for any sign of the missing scion the client described → yields: a scrap of paper bearing Caranya's mark",
+   "Follow the scrap's directions to Elm Turn and question the carts that passed that night, using the scrap as lead → yields: a tracked route into Marrow Hollow",
+   "Scout Marrow Hollow and examine the exile lean-to along that route, using the tracked route to guide the company → yields: Seed-Neeus found in place and refusing to go without safe terms",
+   "Escort Seed-Neeus to Brook-Mouth for the handover the client required, using her consent and the company's escort. At the stall Caranya appears to stop the exchange and is beaten, bought, or outwitted, and Rechimund receives Seed-Neeus"
+  ],
+  "twist": null,
+  "tensions": [
+   "Caranya will refuse any handover and plans to intercept at the delivery point",
+   "Seed-Neeus fears the market and may resist returning to the client",
+   "Local folk expect discretion and will punish any public fight over an exile"
+  ],
+  "openDirections": [
+   "The elven houses and the market wardens will press differing claims on Seed-Neeus once she is back in public, forcing political choices."
+  ],
+  "stakeIfLost": "Rechimund says his stall tenancy at Brook-Mouth will be revoked if the missing charge is not returned, costing him his livelihood.",
+  "arrival": "was waiting at first light · refused food and drink"
+ },
+ "shipped": {
+  "title": "Search Lowford Dock",
+  "situation": "A riverside market seller, Rechimund Thatcher, was waiting at first light and refused food and drink. He says he wants Seed-Neeus returned to his stall at Brook-Mouth, keeping something turned over in one palm, and the fee is as agreed, and the company keeps what it hauls back. He says his stall tenancy at Brook-Mouth will be revoked if the missing charge is not returned. Search Lowford Dock, the ferry landing the client first named, for any sign of the missing scion the client described. A broker means to keep Seed-Neeus placed in exile out of the market's hands.",
+  "job": "Search Lowford Dock for any sign of Seed-Neeus Scale-of-Bronze"
+ }
+}

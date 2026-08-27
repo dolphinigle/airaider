@@ -1,0 +1,59 @@
+{
+ "seed": 9080,
+ "chainId": "chain-14",
+ "title": "The Staged Flight",
+ "bible": {
+  "title": "The Staged Flight",
+  "kernel": "A steward hires mercenaries to bring back an elven priest taken in a staged flight to a shrine.",
+  "cast": [
+   {
+    "name": "Phillipos",
+    "who": "a village steward from the green who keeps community pledges and hires guards.",
+    "want": "to have the elf returned to the client at the old elf road",
+    "trade": "steward",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Anirione",
+    "who": "an elven priest from the Western Forests who holds second sight and tended the grove",
+    "want": "to reach Moonfall Shrine",
+    "trade": "priest",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Gilyne",
+    "who": "a scarred hunter from the forest edge bent by old wrongs into violent work",
+    "want": "to bind Anirione at Moonfall Shrine",
+    "trade": "hunter",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   }
+  ],
+  "situation": "A steward paid the company to fetch back an elf who left the settlement green for the old elf road. The elf was taken, not runaway. A hunter kidnapped her and disguised the seizure as a flight. The hunter plans to carry the prisoner to Moonfall Shrine to perform a binding rite that will mark her damned.",
+  "goal": "Return the client's elf who left the settlement green for the old elf road and hand her to the client at the old elf road.",
+  "arc": [
+   "Search the settlement green where the priest left, using the client's directions → yields: a scorched scrap of the priest's cloak snagged on the green's thorn.",
+   "Follow the side path toward the ruined lookout called Harrow Post, using the scorched scrap as identification → yields: a splintered post carved with the name Gilyne.",
+   "Use Gilyne's name to find the ashbarrow hut and search it, using the splintered post as proof of pursuit → yields: a crude map from the hut showing a secret return path from Moonfall Shrine.",
+   "Ambush where the secret return path meets the old elf road to take the captive and hand her to Phillipos, using the hut map → yields: Anirione handed to Phillipos."
+  ],
+  "twist": null,
+  "tensions": [
+   "Gilyne plans a binding rite that will mark the priest damned and will fight to finish it",
+   "Many villagers mistrust the priest's second sight and may refuse help",
+   "The shrine's rites could complicate any rescue and stir local wrath"
+  ],
+  "openDirections": [
+   "If the company delays the hunter will finish the binding at Moonfall Shrine or the village magistrates may seize the seed chest claimed as penalty."
+  ],
+  "stakeIfLost": "If she is not returned the client says the village must surrender its stored seed chest to meet the grove's pledges.",
+  "arrival": "crossed the river to get here · refused food and drink"
+ },
+ "shipped": {
+  "title": "Locate where the priest left on the green",
+  "situation": "A village steward, Phillipos, crossed the river to get here and refused food and drink. He says if she is not returned the village must surrender its stored seed chest to meet the grove's pledges. He says find the spot on the settlement green where a priest left her and goes quiet when the person is named, and the pay is the agreed coin and what the road turns up. A hunter watches the green and will likely oppose strangers.",
+  "job": "Search the settlement green for the spot where the priest left the girl, following Phillipos's directions."
+ }
+}
