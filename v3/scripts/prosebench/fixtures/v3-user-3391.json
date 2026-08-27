@@ -1,0 +1,45 @@
+{
+ "location": "Western Forests \u2014 Old-growth elven forests west of the fort.",
+ "slotCount": 2,
+ "bible": {
+  "cast": [
+   {
+    "name": "Syndus",
+    "want": "to have Lariane the Elder returned alive to Syndus at his manor",
+    "role": "client",
+    "tags": "human. Male. serious. calculating (mid)",
+    "stakeIfLost": "He says the manor's year-money walked out of the door with her, and that it is his own neck if it does not walk back in.",
+    "who": "steward of a minor manor",
+    "tell": "he counts the soldiers in the yard while he talks"
+   },
+   {
+    "name": "Lariane the Elder",
+    "who": "exiled woodward recently returned to the Western Forests",
+    "want": "to reach the elder glade and avoid being taken by Syndus",
+    "role": "quarry",
+    "tags": "human. Female. nature (mid). loner"
+   },
+   {
+    "role": "obstacle",
+    "offstage": true,
+    "trade": "hunter",
+    "standsTo": "shelters people the manors want and will not give them up"
+   }
+  ],
+  "goal": "to return Lariane the Elder alive to Syndus at Syndus's manor"
+ },
+ "relevantLore": [
+  {
+   "id": "place-10",
+   "name": "Fernbank Hollow",
+   "blurb": "A low, wet hollow at the forest's edge where exiles first slip into the trees."
+  }
+ ],
+ "beat": 1,
+ "arcStep": "Search Fernbank Hollow, the spot Syndus says Lariane was last seen, using Syndus's report",
+ "focalIsMerc": false,
+ "pay": "the agreed coin, and what the road turns up",
+ "stepFriction": "The old-growth hides tracks and gives hunters false leads.",
+ "arrival": "he sent a rider ahead and came behind it the same night",
+ "knownObstacle": "someone in those woods shelters the people the manors want, and will not hand them over"
+}

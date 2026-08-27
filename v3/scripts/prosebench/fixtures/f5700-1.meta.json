@@ -1,0 +1,54 @@
+{
+ "seed": 5700,
+ "chainId": "chain-14",
+ "title": "The Deserter's Map",
+ "bible": {
+  "title": "The Deserter's Map",
+  "kernel": "A forest warden hires the company to fetch a deserter who knows where the dead lie.",
+  "cast": [
+   {
+    "name": "Haldoril Brightwater",
+    "who": "an elven warden of the Western Forests who guards boundary markers and frets over succession.",
+    "want": "to receive Ondunlmo alive for questioning.",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Ondunlmo",
+    "who": "a sickly elf deserter from the border patrol, thin and furtive.",
+    "want": "to trade the locations of the buried bodies for protection.",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Adord Ironjaw",
+    "who": "a poacher lord from Brinefall Gorge who runs trap-lines and sells safe haven.",
+    "want": "to keep Ondunlmo free to barter.",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   }
+  ],
+  "situation": "Haldoril hired the company to bring back Ondunlmo alive. Ondunlmo deserted into the Western Forests and knows where several bodies were hidden. He has sheltered among poachers led by Adord Ironjaw and plans to use the burial locations as bargaining material. Haldoril will only accept Ondunlmo alive for questioning.",
+  "goal": "to bring Ondunlmo to Haldoril Brightwater alive for questioning about the buried bodies.",
+  "arc": [
+   "Go to Greyfen Hollow, the place Haldoril named, and search the clearing → yields: a scrap of map marked for Brinefall Gorge with a crude poacher's sigil.",
+   "Follow the scrap map into Brinefall Gorge and press the poacher line there, using the map from Greyfen Hollow → yields: Adord Ironjaw, who turns up to bar the pass and refuses to hand Ondunlmo over.",
+   "Work the trails and trap-lines around Adord's camp, using the fact of Adord's presence to find his gang's routes → yields: Ondunlmo's fresh trail heading back toward Greyfen Hollow at dusk.",
+   "Lie in wait at Greyfen Hollow at dusk and intercept Ondunlmo on the trail, using his fresh track to identify and force him into custody, then hand him over to Haldoril"
+  ],
+  "twist": null,
+  "tensions": [
+   "Adord Ironjaw refuses to surrender Ondunlmo and will fight to keep him.",
+   "Ondunlmo intends to barter the burial locations and will resist capture."
+  ],
+  "openDirections": [
+   "Stage a guarded stakeout at Greyfen Hollow for dusk and prepare iron restraints and a quick route to hand Ondunlmo to Haldoril.",
+   "Adord may attempt to ambush the handover or sell Ondunlmo to a rival band if the company hesitates."
+  ]
+ },
+ "shipped": {
+  "title": "Search Greyfen Hollow",
+  "situation": "Haldoril Brightwater came to the fort and pointed at a worn patrol map. He reported Ondunlmo was seen at Greyfen Hollow last night. Greyfen Hollow sits at the forest edge and holds a moss-ringed clearing with patrol markers. The work wanted is to search that clearing and bring Ondunlmo to Haldoril alive for questioning. The pay is fixed, and what else the job shakes loose the company keeps. They say the one at the heart of this would fetch a ransom worth a season of contracts.",
+  "job": "Go to Greyfen Hollow and search the clearing for Ondunlmo. Secure him alive for delivery to Haldoril."
+ }
+}

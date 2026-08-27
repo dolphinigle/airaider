@@ -1,0 +1,17 @@
+{
+  "title": "What Fenmarket Knows",
+  "situation": "A merchant up from Millbrook, Gundo, came to the fort gate himself with his purse already counted. He wants an elf entertainer named Romlyn, who once played the wood courts, brought to him at Millbrook alive. He says the elf is promised on to another man already, and that a trader who breaks that promise never trades in Millbrook again. By his own telling, wardens of an old grove hold Romlyn under a judgment of their own and will not give him up. What the work turns on first is where those wardens are keeping him now. News of traveling players runs through Fenmarket, the market on the river, where the elf's name buys silence instead of answers. Gundo watches your hands while he talks, and he will pay the coin agreed for that answer, along with whatever the road turns up.",
+  "job": "Ask at Fenmarket where the wardens are holding Romlyn.",
+  "ask": [
+    {
+      "attribute": "cha",
+      "favored": ["social", "performance"],
+      "clashing": ["intimidation", "hotheaded"]
+    },
+    {
+      "attribute": "int",
+      "favored": ["roguery", "calculating"],
+      "clashing": ["loner"]
+    }
+  ]
+}

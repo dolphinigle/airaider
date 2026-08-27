@@ -1,0 +1,17 @@
+{
+  "title": "Word at Fenmarket",
+  "situation": "A merchant up from Millbrook has come to the fort gate looking for armed men, and he gives his name as Gundo. He says an elf singer called Romlyn owes him. He wants that elf brought to Millbrook standing and alive, and no other way. What is wanted first is word of where Romlyn went, out of the sellers at Fenmarket, the riverside market where travelling players and traders swap news. The market has its own reasons not to answer that question, and a stranger who keeps asking gets a shrug or worse. Gundo watches your hands while he sets his coin down, and says that whatever the road turns up along the way is yours to keep.",
+  "job": "Ask the sellers at Fenmarket where Romlyn went.",
+  "ask": [
+    {
+      "attribute": "cha",
+      "favored": ["social", "performance", "cool"],
+      "clashing": ["intimidation"]
+    },
+    {
+      "attribute": "dex",
+      "favored": ["roguery", "calculating"],
+      "clashing": ["hotheaded"]
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+ "seed": 5400,
+ "chainId": "chain-13",
+ "title": "The Sold Garrison",
+ "bible": {
+  "title": "The Sold Garrison",
+  "kernel": "A sergeant hires mercenaries to fetch the garrison payroll from the charcoal-burners' camps, and the trail leads to an elven tomb and a betrayed paymaster.",
+  "cast": [
+   {
+    "name": "Anglor",
+    "who": "Sergeant of the fort's garrison and an old scout with tired hands.",
+    "want": "to recover the garrison payroll chest and return it to the fort",
+    "role": "client",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Eminalime Dawnsinger",
+    "who": "An elven tomb-ward who once served a temple and learned to keep secrets.",
+    "want": "to secure a place among the company's ranks",
+    "role": "prize",
+    "loreId": "c8"
+   },
+   {
+    "name": "Goldyeue Coalgate",
+    "who": "Paymaster of the garrison and a winter-charcoal trader with blunt manners.",
+    "want": "to hand the garrison payroll chest to the raider lord",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   }
+  ],
+  "situation": "Anglor hires the company to fetch the garrison payroll chest left among the charcoal-burners' camps and bring it back to the fort. The company believes the chest is missing after a raid and that returning it will restore the garrison's pay.",
+  "goal": "to retrieve the garrison payroll chest left at the charcoal-burners' camps and return it to the fort",
+  "arc": [
+   "Travel to the charcoal-burners' camps as Anglor described and question the burn crews and watchers → yields: a burnt tent and a woodsman witness who points to a scorched trail west and says a woman paid the guards off before leaving",
+   "Follow the scorched trail to the roadside ash-shrine to check for tokens or signifiers the witness mentioned → yields: a sealed pledge in Goldyeue Coalgate's signet that names a raider lord as new paymaster of the garrison",
+   "Use the pledge to track the raiders' lodge at Molderbranch Hollow and search where they stowed goods → yields: Eminalime Dawnsinger found at an old elven tomb hold, holding the chest's reliquary key and asking terms to go with the company",
+   "Escort Eminalime and the payroll chest to the fort for delivery to Anglor and confront Goldyeue when she appears to stop the handover → yields: the chest handed to Anglor and Eminalime sworn into the company"
+  ],
+  "twist": "Goldyeue Coalgate sold the garrison to the raider lord and pledged the payroll chest to him, making the chest legally claimed by the raiders.",
+  "tensions": [
+   "Goldyeue's sale gives the raiders a standing claim and armed men who will press it",
+   "Eminalime's devotion to her ancestor and the tomb's rites restrict how she will move and what she will allow",
+   "Forest watchers and a spiderweb of spies may report the company's moves back to the raiders"
+  ],
+  "openDirections": [
+   "Escort Eminalime to her ancestral tomb to complete her rite and secure her cooperation",
+   "The raider lord may press his claim on the fort's stores and force a siege if the chest is not delivered"
+  ]
+ },
+ "shipped": {
+  "title": "Question the burners at Ashcall Rise",
+  "situation": "Anglor points to the road on the map and taps the cluster of charcoal burners he scouted. He says the garrison payroll chest was left among those camps, not on the main road. Ashcall Rise marks the nearest landmark the burners use and keeps the stray offerings the crews trade in. Anglor asks it quietly: do not let the garrison go unpaid. The client pays the agreed coin, and the company keeps whatever the road turns up. Word runs that the one at the heart of this is worth more than a season of common hires.",
+  "job": "Which burner or watcher at the charcoal-burners' camps saw the payroll chest, or where did it go?"
+ }
+}

@@ -1,0 +1,44 @@
+{
+ "location": "Western Forests \u2014 Old-growth elven forests west of the fort.",
+ "rarity": "uncommon",
+ "slotCount": 2,
+ "bible": {
+  "title": "The Condemned Robe",
+  "cast": [
+   {
+    "name": "Gundo of Millbrook",
+    "who": "Millbrook merchant who hired the company and named a market to begin inquiries",
+    "want": "to have Romlyn delivered alive to Gundo at Millbrook",
+    "role": "client",
+    "tags": "human. Male. greedy (mid). calculating",
+    "because": "He says the elf owes him and he means to have him standing in Millbrook, alive and no other way."
+   },
+   {
+    "name": "Romlyn",
+    "who": "an elf entertainer with a history in the wood courts",
+    "want": "to choose his fate once freed",
+    "role": "prize",
+    "tags": "elf. Male. performance (high). playful"
+   },
+   {
+    "role": "obstacle",
+    "offstage": true,
+    "trade": "warden",
+    "standsTo": "holds the elf under an elven judgment and will not let him go"
+   }
+  ],
+  "goal": "to have Romlyn delivered alive to Gundo at Millbrook"
+ },
+ "relevantLore": [
+  {
+   "id": "place-10",
+   "name": "Fenmarket",
+   "blurb": "A riverside market where traveling entertainers and merchants trade news."
+  }
+ ],
+ "beat": 1,
+ "arcStep": "Travel to the market and ask vendors about the person",
+ "focalIsMerc": false,
+ "pay": "the agreed coin, and what the road turns up",
+ "stepFriction": "The market has its reasons not to answer questions about where the elf went."
+}

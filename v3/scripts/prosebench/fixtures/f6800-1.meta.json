@@ -1,0 +1,54 @@
+{
+ "seed": 6800,
+ "chainId": "chain-12",
+ "title": "Two Claims at Willowford",
+ "bible": {
+  "title": "Two Claims at Willowford",
+  "kernel": "A lender hires the company to fetch a pledged woman and finds a rival master already on her trail.",
+  "cast": [
+   {
+    "name": "Herve Greyfell",
+    "who": "moneylender from a river town with claims that reach the forest edge",
+    "want": "to collect a pledged woman",
+    "role": "client",
+    "loreId": "lore-10"
+   },
+   {
+    "name": "Breduin",
+    "who": "forestwarden who enforces long-standing claim-lines among hamlets",
+    "want": "to assert his prior pledge over the woman",
+    "role": "obstacle",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Hermione",
+    "who": "Willowford peasant who keeps the village ditch and talks easy with neighbors",
+    "want": "to stay free in the village",
+    "role": "quarry",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Herve Greyfell has hired the company to collect a woman pledged as collateral from a village he named. The village has been answering demands from lenders and from forest claimants and cannot meet both sets of claims. The company will be paid on delivery of the pledged person to Herve.",
+  "goal": "to collect a pledged woman held by a village",
+  "arc": [
+   "Go to the Willowford outskirts at the river and present Herve Greyfell's claim, using only what Herve supplied. → yields: Hermione, a short, gregarious peasant turning the village ditch and named by the villagers as the pledged woman.",
+   "With Hermione located, follow her trail to the ditch at Thornhollow's edge to learn who else claims her pledge. → yields: a second wooden pledge token stamped with Breduin's mark, proving a rival claim against Herve.",
+   "Return to the Willowford green with the token to force Breduin to make his stand, outwit him there, and hand the pledged woman to Herve Greyfell."
+  ],
+  "twist": "Hermione is legally pledged to both Herve Greyfell and Breduin; both masters hold tokens claiming her.",
+  "tensions": [
+   "a second pledge in the forestwarden's hand that cancels a simple pickup",
+   "villagers who will block a forced removal of one of their own",
+   "Hermione's refusal to go without guarantees"
+  ],
+  "openDirections": [
+   "negotiate a split settlement or a work-for-release with Breduin to secure Herve's claim",
+   "the village's twin debts will push more pledges into circulation, drawing fresh claimants whether the company acts or not"
+  ]
+ },
+ "shipped": {
+  "title": "Present the Claim at Willowford",
+  "situation": "Herve Greyfell stands in the yard and lays a folded claim on the table. You are to collect a pledged woman held by a village. Herve says this packet is all he will give and watches you count its seals with a tired look. The village sits at Willowford's river edge. The meeting must be on the outskirts by the water. The client pays the agreed coin, and the company keeps whatever the road turns up. They say the one at the heart of this would fetch a proper ransom in the right hands.",
+  "job": "Go to the Willowford river outskirts and present Herve Greyfell's claim using only what he supplied."
+ }
+}

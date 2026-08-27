@@ -1,0 +1,55 @@
+{
+ "seed": 6300,
+ "chainId": "chain-14",
+ "title": "The Ribbon and the Name",
+ "bible": {
+  "title": "The Ribbon and the Name",
+  "kernel": "A temple hires the company to fetch a vanished novice from the Western Forests.",
+  "cast": [
+   {
+    "name": "Akenehi",
+    "who": "Akenehi — keeper and elder acolyte of the Moonwell shrine, used to pleading for wayfarers.",
+    "want": "to recover a missing temple novice and return them to the Moonwell shrine",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Owai-La",
+    "who": "Owai-La — a lizardman novice raised at the shrine under another name, sickly but steady.",
+    "want": "to be offered a place in a mercenary company",
+    "role": "prize",
+    "loreId": "c8"
+   },
+   {
+    "name": "Esmie Redhand",
+    "who": "Esmie Redhand — a blunt ex-ranger who still patrols the forest edges and keeps strict custody claims.",
+    "want": "to keep the novice within the forest and enforce her claim",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   }
+  ],
+  "situation": "A Moonwell shrine acolyte vanished into the Western Forests while on a small errand. The missing novice is a lizardman raised at the shrine under another name and suffers a chronic sickness. The shrine wants the novice returned. Esmie Redhand claims a right to keep the novice in the forest and will oppose any removal.",
+  "goal": "to recover a missing temple novice and return them to the Moonwell shrine",
+  "arc": [
+   "Search the Moonwell shrine at the forest edge for any trace the client knew to expect → yields: a lizard-stitched prayer ribbon with a crude sketch leading toward Thornfall Hollow.",
+   "Follow the ribbon into Thornfall Hollow and inspect recent camps, using the ribbon's sketch → yields: a child's carved amulet nailed to a marker that points on toward Greengale Copse.",
+   "Search Greengale Copse for whoever left the amulet, using the amulet's mark → yields: a sickly lizard-priest sheltered there who answers to a different name and says she will only go if Esmie Redhand cannot block her return.",
+   "Bring the sickly lizard-priest back to the Moonwell shrine and force Esmie Redhand's claim to be settled there, using the priest's insistence and the shrine's demand and either bargain with, buy off, or defeat Esmie Redhand at the shrine to hand the novice to Akenehi"
+  ],
+  "twist": null,
+  "tensions": [
+   "Esmie Redhand insists on custody and will refuse or fight to keep the novice.",
+   "The novice's chronic sickness makes travel risky and slow trust between parties.",
+   "Forest clans distrust outsiders and may close paths or mislead trackers."
+  ],
+  "openDirections": [
+   "Seek a sworn pledge or payment that will persuade Esmie to yield custody at the shrine.",
+   "The shrine's patience and public face thin with time and may withdraw support if the novice is not returned soon."
+  ]
+ },
+ "shipped": {
+  "title": "Sweep the Moonwell shrine for traces",
+  "situation": "Akenehi comes to the fort and lays a torn novice sash and a bowl of muddied consecration water on the table. The sash is ripped and the water smells of pine and river silt anyone can name. She fingers the sash in silence as if trying to hear where the wearer went. The job wants you to find at the Moonwell shrine any trace she already expected to be there. The pay is fixed, and what else the job shakes loose the company keeps. Word runs that the one at the heart of this is worth more than a season of common hires.",
+  "job": "Search the Moonwell shrine at the forest edge for the traces Akenehi expects."
+ }
+}

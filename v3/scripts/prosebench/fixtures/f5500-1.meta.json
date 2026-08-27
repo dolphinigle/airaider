@@ -1,0 +1,48 @@
+{
+ "seed": 5500,
+ "chainId": "chain-13",
+ "title": "The Pledge That Wouldn't Hold",
+ "bible": {
+  "title": "The Pledge That Wouldn't Hold",
+  "kernel": "Mercenaries hunt down a pledged bride seized by a raider to recruit her into their company.",
+  "cast": [
+   {
+    "name": "Marcelle",
+    "who": "raider queen of a broken border warband, showy and ruthless",
+    "want": "to keep Harsinia under her control",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Harsinia Reed",
+    "who": "mystic pledged in a lob-sided alliance, loud and quick to anger",
+    "want": "to join the mercenary company",
+    "role": "prize",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "The company seeks Harsinia Reed to recruit her. She was promised in a marriage meant to stop raids but the marriage never took hold. Marcelle seized Harsinia as leverage and moves her like a trophy. Graves nearby were disturbed to hide their tracks. The company can still win Harsinia and bring her to the fort if they outwit Marcelle.",
+  "goal": "to recruit Harsinia Reed into the mercenary company.",
+  "arc": [
+   "At Craneford Gate, search the rain-slick road where the pledged party was last seen → yields: a rain-soaked marriage token signed by Marthe.",
+   "At Mirefen Shrine, show Marthe's signature to the shrine keeper to learn who signed → yields: the captors marched for Stonewrit Hollow.",
+   "At Stonewrit Hollow, follow the captors' trail and question a taken scout under guard → yields: the scout Auizia swears Marcelle will move the bride toward Thornhollow next night.",
+   "At the fort, using the scout's warning that Marcelle will move the bride, lure Marcelle into a summons, outwit her, seize Harsinia, and take her into the company's hands"
+  ],
+  "twist": null,
+  "tensions": [
+   "Marcelle's raiders will fight rather than yield Harsinia",
+   "rain and bog wash away tracks and ruin written proofs",
+   "the elven forest forbids grave disturbance and may attack intruders"
+  ],
+  "openDirections": [
+   "forge a convincing summons claiming the signing moved to the fort and prepare an ambush",
+   "Marcelle could sell Harsinia or parade her publicly, forcing a sudden rescue or costly buy-off"
+  ]
+ },
+ "shipped": {
+  "title": "Tracks from Craneford Gate",
+  "situation": "A traveller from Craneford Gate arrived at the fort with a plea and a damp scrap of cloak. The traveller says the scrap came from Harsinia Reed's pledged party. At Craneford Gate the rain-slick road now shows fresh prints and a cut wheel-track that end at the first tangle of undergrowth. Honest coin for the work, and any small spoils ride home besides. Word runs that the one at the heart of this is worth more than a season of common hires.",
+  "job": "Search the rain-slick road at Craneford Gate where the pledged party was last seen."
+ }
+}

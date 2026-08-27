@@ -1,0 +1,217 @@
+[
+ {
+  "fx": "beat1-user.json",
+  "card": "The client arrives with a new lead pointing to the beekeepers' clearings. They press a flake of beeswax into your palm and rub a cracked thumb over it. The client says the company must recruit the keeper of the Harrowgate feeder to secure the winter supply line. Coin as promised, and the pick of whatever the job turns up. Word runs that the one at the heart of this would be worth a place on any roster.",
+  "q": {
+   "hirer": false,
+   "matter": true,
+   "why": true,
+   "steel": false,
+   "note": "Unknown client; recruit keeper; secure winter supply"
+  },
+  "naked": [],
+  "coined": [],
+  "opens": true,
+  "w": 77,
+  "s": 5
+ },
+ {
+  "fx": "beat1-user.json",
+  "card": "Your contact at the fort pushes a smudged note across the table and points at Harrowgate Pass. The harvest wardens report smoke rings over the beekeepers' clearings yesterday, where the feeding plinth sits. The company's goal is to recruit the keeper of the Harrowgate winter feeder so she will join the company and secure their winter supply line. Coin as promised, and the pick of whatever the job turns up. Word runs that the one at the heart of this would be worth a place on any roster.",
+  "q": {
+   "hirer": false,
+   "matter": true,
+   "why": true,
+   "steel": false,
+   "note": "Recruit keeper to secure company supplies."
+  },
+  "naked": [],
+  "coined": [],
+  "opens": false,
+  "w": 88,
+  "s": 5
+ },
+ {
+  "fx": "beat1-user.json",
+  "card": "The quartermaster slaps a damp note on the table and points at Harrowgate Pass by name. The note says a keeper still tends the winter feeder there and names nearby clearings as likely lead. The fort wants that keeper recruited to secure the winter supply line. Coin as promised, and the pick of whatever the job turns up. Word runs that the one at the heart of this would be worth a place on any roster.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false,
+   "note": "Fort seeks keeper to secure winter supply"
+  },
+  "naked": [],
+  "coined": [],
+  "opens": true,
+  "w": 76,
+  "s": 5
+ },
+ {
+  "fx": "beat1-user.json",
+  "card": "A foreman from Millford arrived and unrolled a crude map to the Harrowgate feeder. He pointed at a ring of beekeepers' clearings west of the pass and asked if you could find the keeper. He says the feeder is kept tended from those clearings and that the keeper might be persuaded to join a company that guarantees winter food. Coin as promised, and the pick of whatever the job turns up. Word runs that the one at the heart of this would be worth a place on any roster.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false,
+   "note": "Foreman hires you to recruit keeper."
+  },
+  "naked": [],
+  "coined": [],
+  "opens": false,
+  "w": 89,
+  "s": 5
+ },
+ {
+  "fx": "beat1-user-7712.json",
+  "card": "Gundo of Millbrook came to the fort and pressed a folded note onto the table. He named Fenmarket where traders and troupes pass and asked you to begin there. The client's goal is to have Romlyn delivered alive to Gundo at Millbrook. Gundo fingers the note and says quietly that Romlyn must be found whole, and that the man's choice will be honored. The client pays the agreed coin, and the company keeps whatever the road turns up. Word runs that the one at the heart of this is worth more than a season of common hires.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false,
+   "note": "Hirer and goal clear; risk not specified."
+  },
+  "naked": [
+   "Gundo of Millbrook",
+   "Romlyn"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 97,
+  "s": 6
+ },
+ {
+  "fx": "beat1-user-7712.json",
+  "card": "Gundo of Millbrook pushed a coin pouch across the table and named Fenmarket as where to begin. Gundo wants Romlyn delivered alive to Millbrook. Fenmarket is a riverside market where vendors trade news and entertainers gather. The client pays the agreed coin, and the company keeps whatever the road turns up. Word runs that the one at the heart of this is worth more than a season of common hires.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false,
+   "note": "Capture-and-delivery to Millbrook."
+  },
+  "naked": [
+   "Gundo of Millbrook",
+   "Romlyn"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 70,
+  "s": 5
+ },
+ {
+  "fx": "beat1-user-7712.json",
+  "card": "Gundo of Millbrook handed you a folded note and named a market to begin inquiries. He told you plainly he wants Romlyn delivered alive to Gundo at Millbrook and asked for haste. He paused long enough to remind you that Romlyn once performed in wood courts. The client pays the agreed coin, and the company keeps whatever the road turns up. Word runs that the one at the heart of this is worth more than a season of common hires.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false,
+   "note": "Gundo hires delivery of Romlyn alive."
+  },
+  "naked": [
+   "Gundo of Millbrook",
+   "Romlyn"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 80,
+  "s": 5
+ },
+ {
+  "fx": "beat1-user-7712.json",
+  "card": "Gundo of Millbrook has sent word and named Fenmarket as the first place to ask. Fenmarket is a riverside market where entertainers trade news and move fast. The client wants Romlyn delivered alive to Gundo at Millbrook. The client pays the agreed coin, and the company keeps whatever the road turns up. Word runs that the one at the heart of this is worth more than a season of common hires.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false,
+   "note": "Gundo hires delivery of Romlyn alive."
+  },
+  "naked": [
+   "Gundo of Millbrook",
+   "Romlyn"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 71,
+  "s": 5
+ },
+ {
+  "fx": "beat1-user-3391.json",
+  "card": "Syndus spreads a blunt map and points at the low wet hollow he calls Fernbank Hollow. He says Lariane the Elder slipped into that hollow and never came back out. The client wants Lariane returned alive to Syndus at his manor. Honest coin for the work, and any small spoils ride home besides. They say the one at the heart of this would fetch a ransom worth a season of contracts.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true,
+   "note": "Syndus hires rescue of Lariane; dangerous hollow"
+  },
+  "naked": [
+   "Syndus",
+   "Lariane the Elder"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 71,
+  "s": 5
+ },
+ {
+  "fx": "beat1-user-3391.json",
+  "card": "Syndus spreads a crude map and points at Fernbank Hollow as where Lariane was last seen. Syndus says he wants Lariane returned alive to his manor. Syndus fingers a carved leaf and asks you to be careful; he sounds uneasy and oddly relieved. Honest coin for the work, and any small spoils ride home besides. They say the one at the heart of this would fetch a ransom worth a season of contracts.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false,
+   "note": "Syndus wants Lariane returned alive."
+  },
+  "naked": [
+   "Syndus"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 73,
+  "s": 5
+ },
+ {
+  "fx": "beat1-user-3391.json",
+  "card": "A new report narrows Lariane's last seen place to Fernbank Hollow. Syndus arrives at the fort and spreads a damp map, insisting she slipped into the hollow and asking for her returned alive. The client's goal is to return Lariane the Elder alive to Syndus at Syndus's manor. Honest coin for the work, and any small spoils ride home besides. They say the one at the heart of this would fetch a ransom worth a season of contracts.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": false,
+   "steel": false,
+   "note": "Client and task clear; motive, danger unclear"
+  },
+  "naked": [
+   "Syndus",
+   "Lariane the Elder"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 78,
+  "s": 5
+ },
+ {
+  "fx": "beat1-user-3391.json",
+  "card": "Syndus slaps a torn hunting cloak on the table and says it was pulled from Fernbank Hollow. He asks that Lariane the Elder be returned alive to his manor. His voice goes soft when he says he will not take a corpse. Honest coin for the work, and any small spoils ride home besides. They say the one at the heart of this would fetch a ransom worth a season of contracts.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false,
+   "note": "Rescue Lariane alive for Syndus; danger implied"
+  },
+  "naked": [
+   "Syndus",
+   "Lariane the Elder"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 72,
+  "s": 5
+ }
+]

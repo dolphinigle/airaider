@@ -1,0 +1,55 @@
+{
+ "seed": 5600,
+ "chainId": "chain-14",
+ "title": "Three Sales, One Song",
+ "bible": {
+  "title": "Three Sales, One Song",
+  "kernel": "A steward hires the company to reclaim a pledged iron casket at a named waystation. The party follows a chain of physical pawns to a final holder who keeps the human collateral needed to open it.",
+  "cast": [
+   {
+    "name": "Halion",
+    "who": "Halion — steward to a margrave and recent purchaser of a pledged claim.",
+    "want": "to recover the pledged iron casket kept at Harrowford Waystation and deliver it to him",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Sigar",
+    "who": "Sigar — a river-hauler turned claim-broker who runs a holding at the bend of a tributary.",
+    "want": "to retain the person he bought as surety and the rights that come with her",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   },
+   {
+    "name": "Ralsa Thistledown",
+    "who": "Ralsa Thistledown — an elven servant recently shifted between owners, small and sickly but taught a household song.",
+    "want": "to be freed from sale or else keep the song she knows from being used",
+    "role": "quarry",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Halion hired the company to go to Harrowford Waystation and collect a pledged iron casket he says is owed to him. The waystation holds the casket under local custody and the steward expects the company to claim and deliver it for his payment.",
+  "goal": "to recover the pledged iron casket kept at Harrowford Waystation and hand its contents to Halion.",
+  "arc": [
+   "Travel to Harrowford Waystation the client named and demand production of the pledged casket → yields: a stamped brass pawn bearing Baxlof's mark.",
+   "Take the pawn to Baxlof's Thornwalk Lodge and press him to honor his sale → yields: a second pawn stamped with Ellaire Reed's sign and a map note.",
+   "Carry Ellaire Reed's pawn to Silverbough Hollow and force her to account for the pledge → yields: the admission that the pledge was resold again to Sigar at Marrowe Bend and that Ralsa Thistledown is the pledged collateral who alone can open the iron casket.",
+   "Bring Ralsa from Marrowe Bend to Harrowford Waystation, confront Sigar as he tries to reclaim her, use Ralsa's song to open the iron casket, and hand the chest's contents to Halion."
+  ],
+  "twist": "Ralsa Thistledown herself was the pledged collateral; the pledge passed ownership twice and now Sigar holds her, and Ralsa alone can open the casket by song.",
+  "tensions": [
+   "The pledged human was sold through multiple owners who still claim rights.",
+   "Ralsa resists being treated as a thing and may refuse to cooperate.",
+   "Halion will not accept excuses — he expects the chest and pays only for delivery."
+  ],
+  "openDirections": [
+   "Negotiate with Sigar at Marrowe Bend to buy or trade for Ralsa's presence at Harrowford.",
+   "Other purchasers of the pledge could press their claims with armed men as the company moves Ralsa and the chest."
+  ]
+ },
+ "shipped": {
+  "title": "Demand the pledged casket at Harrowford",
+  "situation": "Halion presses a stamped warrant and the margrave's transfer into your messenger's hand. The waystation keeper now refuses to produce the pledged iron casket. To recover the pledged iron casket kept at Harrowford Waystation and hand its contents to Halion. Pay stands as agreed, and what the company hauls back is its own to keep. The matter smells of a payout worth a season of small jobs.",
+  "job": "Travel to Harrowford Waystation and demand production of the pledged iron casket."
+ }
+}

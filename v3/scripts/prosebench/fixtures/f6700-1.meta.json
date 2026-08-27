@@ -1,0 +1,55 @@
+{
+ "seed": 6700,
+ "chainId": "chain-12",
+ "title": "Peg and Keel",
+ "bible": {
+  "title": "Peg and Keel",
+  "kernel": "A trader hires mercenaries to seize a road crossing. That work drags them into an elven ruin and a scholar who guards buried coin.",
+  "cast": [
+   {
+    "name": "Milam",
+    "who": "A river-trader who runs pack-boats and keeps a long list of grudges.",
+    "want": "to take control of the Crowspan bridge and deliver it to Milam",
+    "role": "client",
+    "loreId": "lore-10"
+   },
+   {
+    "name": "Norion",
+    "who": "An exiled elven scholar who carries a folded satchel and avoids towns.",
+    "want": "to keep the satchel closed and refuse to go to Crowspan",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Herve Blackbrook",
+    "who": "A petty lord who holds a charter and enforces levies with hired men.",
+    "want": "to keep his charter and stop Milam from taking the bridge",
+    "role": "obstacle",
+    "loreId": "lore-11"
+   }
+  ],
+  "situation": "A river-trader hires the company to seize control of a forest crossing and hand it over. He says the current keeper keeps the tolls from merchants and must be removed.",
+  "goal": "To take control of the Crowspan bridge and hand it to Milam.",
+  "arc": [
+   "Seize the Crowspan bridge the client named and search the tollbox the client pointed out → yields: a small wooden peg stamped with an elven rune and branded with Blackbrook's mark.",
+   "Follow the peg's rune into the old-growth and inspect the ruined waypost the peg matches → yields: a carved mural that calls the pegs pledge-markers and names Norion beside Thornhollow.",
+   "Use Norion's name from the mural to track him at Thornhollow and force him to answer → yields: a ribbon-wrapped iron sigil Norion will not let go of.",
+   "Bring the iron sigil back to Crowspan, present it at the bridge keystone to unseal the hidden vault, and overcome Herve Blackbrook's attempt to seize the chest before handing the chest to Milam."
+  ],
+  "twist": "The wooden pegs are pledge-markers: each peg binds a living name into a seal on a hidden vault; Norion's name is bound to the vault beneath the bridge and his presence and token are the lock's key.",
+  "tensions": [
+   "Norion will not sell his freedom and will refuse to travel or open his satchel without coercion.",
+   "Herve Blackbrook holds the bridge's charter and can raise men to contest any transfer of control.",
+   "The pegs are old and sacred to elven craft. Tampering risks angering local guardians and the ruin's wards."
+  ],
+  "openDirections": [
+   "Press the mural's trail into Thornhollow to force Norion to yield the sigil.",
+   "If Milam seizes Crowspan the charter's men will harry traffic until the bridge is returned or Herve is paid."
+  ]
+ },
+ "shipped": {
+  "title": "Crowspan bridge — take and search",
+  "situation": "Milam points at a map and names the Crowspan bridge as his target. He says the job is to take control of the Crowspan bridge and hand it to Milam. He marked a tollbox beneath the southern arch as the place to search. Coin when the work is done. Anything else the party carries home is the company's. The matter smells of a payout worth a season of small jobs.",
+  "job": "Seize the Crowspan bridge and search the marked tollbox."
+ }
+}

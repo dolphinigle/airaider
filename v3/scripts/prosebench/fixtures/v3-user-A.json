@@ -1,0 +1,42 @@
+{
+ "location": "Western Forests \u2014 Old-growth elven forests west of the fort.",
+ "slotCount": 2,
+ "bible": {
+  "cast": [
+   {
+    "role": "prize",
+    "offstage": true,
+    "trade": "feeder",
+    "standsTo": "tends the pass and asks something in return for coming in"
+   },
+   {
+    "role": "ally",
+    "offstage": true,
+    "trade": "beekeeper",
+    "standsTo": "trades what they know, for a price"
+   },
+   {
+    "role": "obstacle",
+    "offstage": true,
+    "trade": "sergeant",
+    "standsTo": "holds the forest pledges and will contest anything moved"
+   }
+  ],
+  "goal": "to recruit the keeper of the Harrowgate winter feeder so she will join the company and secure their winter supply line",
+  "noClient": true,
+  "stakeIfLost": "If the feeder stops, the lane closes, and the fort goes into winter with what is already inside the walls."
+ },
+ "relevantLore": [
+  {
+   "id": "place-10",
+   "name": "Harrowgate Pass",
+   "blurb": "a narrow winter gap with iron posts and a single feeding plinth at its throat."
+  }
+ ],
+ "beat": 1,
+ "arcStep": "Travel to the beekeepers' clearings to ask who keeps Harrowgate Pass fed",
+ "focalIsMerc": false,
+ "pay": "the agreed coin, and what the road turns up",
+ "stepFriction": "The beekeepers keep their stores close and want paying before they answer.",
+ "arrival": "word came down the low road with the last carts before the snow"
+}

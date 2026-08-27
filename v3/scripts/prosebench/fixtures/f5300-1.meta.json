@@ -1,0 +1,54 @@
+{
+ "seed": 5300,
+ "chainId": "chain-12",
+ "title": "The Passkeeper's Sausage",
+ "bible": {
+  "title": "The Passkeeper's Sausage",
+  "kernel": "Orla Bonechewer hires the company to bring Lefricus of Millbrook to her at the warden-stones for a stolen crate of smoked sausage.",
+  "cast": [
+   {
+    "name": "Orla Bonechewer",
+    "who": "Caravan master from the northern road with a barked voice and an eye for lost cargo.",
+    "want": "to recover a stolen crate of Bonechewer smoked sausage",
+    "role": "client",
+    "loreId": "lore-10"
+   },
+   {
+    "name": "Lefricus of Millbrook",
+    "who": "A scrawny courtesan from Millbrook who survives by petty tricks and quick hands.",
+    "want": "to remain free and keep the sausages",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Illaria the Younger",
+    "who": "A young ridge-keeper of the warden-stones who runs the winter route and its fees.",
+    "want": "to be paid for the passage she controls",
+    "role": "obstacle",
+    "loreId": "lore-11"
+   }
+  ],
+  "situation": "Orla's crate of smoked sausage was taken from her wagons. The winter road through the pass stays open because someone keeps feeding the scavenger that clears the route. Orla knows the pass and the theft but not who stole the crate. She hires the company to find the cargo and deliver the thief to her at the warden-stones.",
+  "goal": "to recover a stolen crate of Bonechewer smoked sausage and deliver the thief to Orla at the warden-stones.",
+  "arc": [
+   "Travel to the warden-stones ridgeline to follow Orla's complaint and inspect the feeding hearths and tracks there → yields: a sausage-stained scrap of cloak sewn with a Millbrook tailor's stitch, pointing toward Millbrook Hollow.",
+   "Go into Millbrook Hollow using the scrap to question inns and neighbors and track the thief's last moves → yields: a tacked cloth token tied in Illaria's ridge-knot that promises to ferry 'the small man' to the warden-stones at dusk.",
+   "Wait the dusk at the warden-stones, intercept the promised handover and force the issue against Illaria the Younger who demands payment. Beat or outwit her and bring Lefricus into Orla's custody"
+  ],
+  "twist": null,
+  "tensions": [
+   "Someone keeps the pass open by feeding the scavenger, and whoever pays the feeder controls when the road clears.",
+   "Illaria the Younger profits from selling safe passage and will refuse to hand over a client without coin.",
+   "Lefricus is slippery and will hide among townsfolk who look the other way for a cut."
+  ],
+  "openDirections": [
+   "Search Millbrook Hollow for the thief's loose habits and any pledge-tokens tied to the ridge-keepers.",
+   "The ridge-keeper trade in passage will widen: other convoys may pay Illaria, raising the price of moving through the pass whether the company acts or not."
+  ]
+ },
+ "shipped": {
+  "title": "Ridge hearths and fresh tracks",
+  "situation": "Orla Bonechewer comes to the fort and points to the warden-stones ridgeline as the place to check. She says a crate of Bonechewer smoked sausage was taken from her winter wagon. The feeding hearths along the ridge now show fresh coals and boot marks to follow. The fee is agreed, and any spoils along the way stay with the company. They say the one at the heart of this would fetch a proper ransom in the right hands.",
+  "job": "Ride the warden-stones ridgeline and inspect the feeding hearths and tracks for signs of the stolen crate."
+ }
+}

@@ -1,0 +1,54 @@
+{
+ "seed": 7000,
+ "chainId": "chain-12",
+ "title": "The Laurel Ribbon",
+ "bible": {
+  "title": "The Laurel Ribbon",
+  "kernel": "Laudus hires the company to fetch the elven courtesan Trivura, last seen after a celebrated victory that ended in slaughter.",
+  "cast": [
+   {
+    "name": "Laudus Wexcombe",
+    "who": "A former magistrate who manages a wood-claim and keeps tight pledges.",
+    "want": "to receive Trivura into his custody",
+    "role": "client",
+    "loreId": "lore-10"
+   },
+   {
+    "name": "Lanfranc the Elder",
+    "who": "A retired hunt-master who holds old pledges and still commands a small band.",
+    "want": "to press his hunters' pledge and profit from Trivura",
+    "role": "obstacle",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Trivura",
+    "who": "An elven courtesan who escaped the ridge after the town's 'victory'.",
+    "want": "to secure a safe contract or safe passage",
+    "role": "prize",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Laudus Wexcombe hired the company to bring Trivura to him. She was last seen near the warden-stones after a celebrated clash that left many dead. Lanfranc the Elder claims a hunters' pledge over her and plans to press that claim for profit. The company must locate Trivura, reach the handover, and hand her to Laudus.",
+  "goal": "to bring Trivura from her last known location at the warden-stones into Laudus Wexcombe's custody",
+  "arc": [
+   "Travel to the warden-stones ridge using Laudus's report of Trivura's last sighting → yields: a burned hunting lair below the stones, a ginger-silk ribbon from an elven shawl, and boot tracks leading west.",
+   "Follow the boot tracks into Gingerfen Hollow, using the ginger ribbon as proof to rouse witnesses → yields: a root-pouch holding a signed pledge token of Lanfranc the Elder and a scrawled note setting a handover at the warden-stones at dawn.",
+   "Return to the warden-stones at the appointed hour, using Lanfranc's pledge token as leverage to force a settlement with him. Confront and outwit or buy off Lanfranc, then deliver Trivura to Laudus Wexcombe."
+  ],
+  "twist": null,
+  "tensions": [
+   "Lanfranc's hunters will demand coin, blood, or a fight to yield Trivura",
+   "the forest's slow trails invite laziness and missed chances among trackers",
+   "Laudus's neat pledges may not satisfy those who remember the ridge's slaughter"
+  ],
+  "openDirections": [
+   "Question the witnesses at Gingerfen Hollow to fix the hour and motive of the handover.",
+   "If Lanfranc refuses at the stones, the claim will sour into reputation trouble that spreads through the wood-claims."
+  ]
+ },
+ "shipped": {
+  "title": "Warden‑stones Ridge sighting",
+  "situation": "Laudus Wexcombe has come with a fresh report and points to the warden-stones ridge. The report says Trivura was seen leaving the ridge alone on the night before last. Lanfranc the Elder's hunters control the forest approaches and will contest strangers who force the tracks. The pay is fixed, and what else the job shakes loose the company keeps. Word runs that the one at the heart of this would be worth a place on any roster.",
+  "job": "Travel to the warden-stones ridge using Laudus's report of Trivura's last sighting."
+ }
+}

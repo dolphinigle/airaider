@@ -1,0 +1,18 @@
+{
+  "title": "Last Seen at Fernbank",
+  "situation": "A steward of a minor manor, Syndus, rode up to the fort's gate at dusk and asked for the boss by name. He wants an exiled woodward, Lariane the Elder, taken alive and stood before him in his own hall. He says she left his service in disgrace and came home carrying more than the manor holds. He answers plainly, then asks his own questions about which soldiers you keep. By his telling she was last seen at Fernbank Hollow, the wet ground at the forest's edge where exiles slip into the trees. The old-growth there closes over tracks, and the hunters who work it hand strangers a wrong trail and stand by it. Whatever comes out of that hollow he wants brought back to him, for the coin he named at the gate and what the road turns up.",
+  "job": "Search Fernbank Hollow for word of where Lariane the Elder went from there.",
+  "ask": [
+    {
+      "attribute": "int",
+      "favored": ["nature", "cool", "serious"],
+      "clashing": ["hotheaded"],
+      "requiredTag": "nature (mid)"
+    },
+    {
+      "attribute": "cha",
+      "favored": ["social", "calculating"],
+      "clashing": ["intimidation", "hotheaded"]
+    }
+  ]
+}

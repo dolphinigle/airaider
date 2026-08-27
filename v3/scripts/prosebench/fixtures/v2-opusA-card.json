@@ -1,0 +1,18 @@
+{
+  "title": "Who Feeds Harrowgate",
+  "situation": "Something at the throat of Harrowgate Pass is fed by hand, and the pass stays open only while it eats. The fort's winter stores come home by that lane and no other. Nobody at the fort knows who carries the food up to the feeding plinth, only that it has kept arriving. The beekeepers out in the old elven clearings hear everything that moves under those trees, and they sell what they hear. The company wants that name, and then whoever answers to it on its own rolls before the cold sets in. The clearing folk keep their stores close and will not answer for nothing, and there is coin waiting for whoever gets them talking, along with what the road turns up.",
+  "job": "Reach the beekeepers' clearings and learn who keeps Harrowgate Pass fed.",
+  "ask": [
+    {
+      "attribute": "cha",
+      "favored": ["social", "generous", "gregarious"],
+      "clashing": ["intimidation", "greedy"]
+    },
+    {
+      "attribute": "int",
+      "extraAttribute": "con",
+      "favored": ["nature", "cool"],
+      "clashing": ["hotheaded"]
+    }
+  ]
+}

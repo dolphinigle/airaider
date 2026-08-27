@@ -1,0 +1,18 @@
+{
+  "title": "Who Feeds Harrowgate",
+  "situation": "Someone still keeps the feeding plinth at Harrowgate Pass stocked, and no one at the fort knows who. Word of it came down the low road with the last carts before the snow. If that feeding stops, the pass closes, and the fort goes into winter on what is already inside the walls. The company wants that keeper brought in as one of its own before the drifts settle. A beekeeper works the clearings out that way and can put a name to whoever tends the plinth. The beekeepers keep their stores close and want paying before they answer. A sergeant out there holds the old forest pledges and will contest anything carried off them, and the agreed coin waits on a name brought back, with what the road turns up.",
+  "job": "Ask among the beekeepers' clearings who keeps the Harrowgate feeding plinth stocked.",
+  "ask": [
+    {
+      "attribute": "cha",
+      "favored": ["social", "generous"],
+      "clashing": ["greedy", "intimidation"]
+    },
+    {
+      "attribute": "con",
+      "extraAttribute": "dex",
+      "favored": ["nature", "cool"],
+      "clashing": ["hotheaded"]
+    }
+  ]
+}

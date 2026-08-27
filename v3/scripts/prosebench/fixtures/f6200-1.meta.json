@@ -1,0 +1,55 @@
+{
+ "seed": 6200,
+ "chainId": "chain-13",
+ "title": "The Funeral Trail",
+ "bible": {
+  "title": "The Funeral Trail",
+  "kernel": "A warden hires the company to bring Haize to the warden-stones to answer a fine.",
+  "cast": [
+   {
+    "name": "Roulant Ashworth",
+    "who": "warden of the western ridgeline who keeps order and collects fines.",
+    "want": "to have Haize brought to the warden-stones to answer a fine",
+    "role": "client",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Gundrea",
+    "who": "a mourner from a wood hamlet who trains a wild predator to seize those who owe fines.",
+    "want": "to keep Haize as surety and collect the fine",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Haize",
+    "who": "a short human field healer who makes simple dandelion remedies for the road.",
+    "want": "to avoid paying the fine",
+    "role": "quarry",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Roulant hires mercenaries to bring Haize to the warden-stones to answer a fine. Haize left a funeral at the ridgeline and fled into the western old-growth. A predator has learned to follow funerals and takes captives. Gundrea uses that predator to hold people as surety and press fines. The company must trace the funeral trail, find where Haize was taken, and force or buy a handover at the warden-stones.",
+  "goal": "to bring Haize to the warden-stones to answer a fine",
+  "arc": [
+   "Ride to the warden-stones and search the funeral clearing the client named → yields: a fresh ring of funeral ash and crushed dandelion petals marking a path down into Dandelrift Hollow.",
+   "Follow the ash-and-dandelion path into Dandelrift Hollow to pick up the trail → yields: deep, heavy paw prints and a tuft of dark pelt snagged on a briar that point toward Sable Cairn.",
+   "Sweep Sable Cairn for signs of a lair using the pelt and petals as bait → yields: a torn ugly band that belongs to Haize and a carved bone token stamped with Gundrea's mark.",
+   "Bring the bone token and the torn band to the warden-stones and confront Gundrea there to recover Haize and close the fine"
+  ],
+  "twist": null,
+  "tensions": [
+   "a predator that follows funerals and tears at pursuers",
+   "Gundrea will refuse to release Haize without payment or a fight",
+   "the ridgeline is under strict bans and the warden watches every move"
+  ],
+  "openDirections": [
+   "Lay a snare at Sable Cairn to catch the predator and recover Haize's trail.",
+   "If Gundrea keeps seizing mourners, the warden will tighten passage bans and levy fines on all who cross the ridgeline."
+  ]
+ },
+ "shipped": {
+  "title": "Search the funeral clearing",
+  "situation": "Roulant Ashworth plants a folded fine on the table and points west. He says he wants Haize brought to the warden-stones to answer the fine. A fresh scrape of earth and trampled funeral flowers mark a new clearing in Dandelrift Hollow. The pay is fixed, and what else the job shakes loose the company keeps. They say the one at the heart of this would fetch a ransom worth a season of contracts.",
+  "job": "Ride to the warden-stones and search the funeral clearing"
+ }
+}

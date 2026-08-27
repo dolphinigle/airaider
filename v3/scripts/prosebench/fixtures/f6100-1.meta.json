@@ -1,0 +1,54 @@
+{
+ "seed": 6100,
+ "chainId": "chain-13",
+ "title": "Bones of the Open Drift",
+ "bible": {
+  "title": "Bones of the Open Drift",
+  "kernel": "A hamlet hires the company to fetch saint's bones from a ruined forest chapel. An elven scholar refuses to give them up.",
+  "cast": [
+   {
+    "name": "Jusanne Longshanks",
+    "who": "Hearthward widow and keeper of a small chapel on the forest rim who trades relic favors for coin.",
+    "want": "to recover saint's bones from a ruined chapel in the Western Forests and receive them at her chapel",
+    "role": "client",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Tovisa",
+    "who": "an elf scholar exiled into the old-growth who hoards stray lore and relics in fever and habit.",
+    "want": "to keep the saint's bones under her charge",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Gebun",
+    "who": "a rough prospector who works the forest edge and scavenges the upheavals left by storms.",
+    "want": "to be paid and to guide the company to the hollow he saw opened by an avalanche",
+    "role": "ally",
+    "loreId": "lore-12"
+   }
+  ],
+  "situation": "Jusanne Longshanks hires the company to bring her saint's bones recovered from a ruined chapel somewhere in the Western Forests. Recent forest upheaval has exposed burial ground and a prospector claims something valuable showed in the open drift. Whoever brings the bones to Jusanne will complete the hire and take any agreed fee and share.",
+  "goal": "to recover saint's bones from a ruined chapel in the Western Forests and deliver them to Jusanne Longshanks",
+  "arc": [
+   "Go to the hamlet the client named at the forest edge to question villagers, using only what Jusanne reported → yields: Gebun, a prospector who says he saw an avalanche rip open a hollow called Rendscar Hollow",
+   "Enter Rendscar Hollow and search the freshly opened drift, using Gebun's lead → yields: a rain-smeared note signed by Tovisa that claims custody and includes a scrap map pointing to Serene Chapel",
+   "Go to the ruined chapel the scrap map names, using the note. Confront Tovisa there and force, buy, or outwit her, then hand the saint's bones to Jusanne as contracted"
+  ],
+  "twist": null,
+  "tensions": [
+   "An avalanche has opened the burial drift and can close or collapse again at any moment",
+   "Tovisa refuses to hand over the bones and will demand terms or fight to keep them",
+   "Claimants from nearby groves may press to take any hoard the bones point to once word spreads"
+  ],
+  "openDirections": [
+   "Secure Rendscar Hollow and hire Gebun as guide to beat rival claimants to Serene Chapel",
+   "If the bones change hands in the forest, news of the hoard will draw more claimants and armed seekers"
+  ]
+ },
+ "shipped": {
+  "title": "Question the hamlet at the forest rim",
+  "situation": "Jusanne Longshanks pressed a damp scrap of chapel ledger into your hands. The scrap names Rendscar Hollow and a ruined chapel near the old-growth. She says she wants you to recover saint's bones from that ruined chapel and deliver them to Jusanne Longshanks. You must go to the hamlet at the forest edge and question villagers, using only what Jusanne reported. The fee is agreed, and any spoils along the way stay with the company. The matter smells of a payout worth a string of small jobs.",
+  "job": "Question hamlet villagers at the forest edge to confirm the ruined chapel's location, using only Jusanne's report."
+ }
+}

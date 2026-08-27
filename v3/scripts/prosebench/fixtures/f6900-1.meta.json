@@ -1,0 +1,54 @@
+{
+ "seed": 6900,
+ "chainId": "chain-14",
+ "title": "The Funeral Hound",
+ "bible": {
+  "title": "The Funeral Hound",
+  "kernel": "A beekeeper hires mercenaries to fetch an elven thief who runs a hound that follows funerals.",
+  "cast": [
+   {
+    "name": "Gadela Greenmantle",
+    "who": "a beekeeper who runs a cluster of hive-lots on the forest edge and trades honey for order",
+    "want": "to take Ranyna into Gadela Greenmantle's custody",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Ranyna",
+    "who": "an elven scavenger who moves the old paths and lifts small goods from processions",
+    "want": "to avoid custody and keep her hound free",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Ageio the Lame",
+    "who": "a limping gravedigger who tends cairns and knows funeral routes by sight",
+    "want": "to receive a sack of salted meat before he betrays Ranyna",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   }
+  ],
+  "situation": "Gadela Greenmantle hired the company after funerary offerings began vanishing near her hive-lots. Ranyna has been taking small goods from funeral parties and uses a lean, trained hound that has learned to follow corteges for scraps. She taught the animal by leaving food scented with mourners along routes. Ageio sheltered Ranyna after she helped him through a winter injury and now refuses to give her up without concrete pay. The hound reliably trails funerals and will defend Ranyna if she is threatened.",
+  "goal": "to bring Ranyna alive into Gadela Greenmantle's custody",
+  "arc": [
+   "go to Cairn-edge Clearing to meet Gadela Greenmantle and inspect the most recent funeral traces → yields: a torn mourning cloak snagged on a stake and Ageio the Lame's copper token",
+   "use Ageio's token to find Ageio at his Mossfall lean-to and press him for Ranyna. Ageio refuses without a sack of salted meat and demands payment or a fight → yields: directions to Fenrow Apiary where Ranyna hides",
+   "move on Fenrow Apiary and intercept Ranyna as she slips toward the handover. Overcome her resistance and deliver Ranyna alive to Gadela's Hive-lot for custody"
+  ],
+  "twist": null,
+  "tensions": [
+   "Ageio will not betray Ranyna without being paid his strange, concrete price",
+   "Ranyna's funeral-trained hound attacks anyone who comes for her",
+   "Gadela expects Ranyna alive and will punish failure or a corpse"
+  ],
+  "openDirections": [
+   "bring Ageio the sack of salted meat he demands to secure Ranyna's location",
+   "if Ranyna is taken, the hound may begin following other funeral routes and menace nearby mourners"
+  ]
+ },
+ "shipped": {
+  "title": "Meet at Cairn-edge Clearing",
+  "situation": "Gadela Greenmantle came to the fort and asked that Ranyna be brought alive into her custody. She says recent funeral processions passed through Cairn-edge Clearing and left fresh traces this week. Gadela wants us to meet her there and inspect the most recent funeral traces. The fee is agreed, and any spoils along the way stay with the company. They say the one at the heart of this would fetch a proper ransom in the right hands.",
+  "job": "Meet Gadela at Cairn-edge Clearing and inspect the latest funeral traces."
+ }
+}

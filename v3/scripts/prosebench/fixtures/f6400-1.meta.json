@@ -1,0 +1,55 @@
+{
+ "seed": 6400,
+ "chainId": "chain-12",
+ "title": "The Winter Toll",
+ "bible": {
+  "title": "The Winter Toll",
+  "kernel": "A foreman hires the company to secure whoever keeps the pass clear, and they must seize that keeper and bring them back.",
+  "cast": [
+   {
+    "name": "Theodahad",
+    "who": "charcoal-burner foreman at the camps who will pay to keep wagons moving",
+    "want": "to secure the person who keeps the winter pass open",
+    "role": "client",
+    "loreId": "lore-10"
+   },
+   {
+    "name": "Innuwae",
+    "who": "wandering elf merchant who tends an odd trade at lonely stands",
+    "want": "to keep her work and her place in the pass",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Mainet",
+    "who": "winter woodsman who watches the high drift and takes what travellers leave",
+    "want": "to seize Innuwae and sell them for coin",
+    "role": "obstacle",
+    "loreId": "lore-11"
+   }
+  ],
+  "situation": "Theodahad has hired the company to keep the winter pass open to the charcoal-burners' camps. The pass remains clear because a feeder is tended at the high hollow every dusk. Locals feed grease and offal and a trader keeps the practice going. The woodsman Mainet profits by blocking and taxing travellers at the pass. The company is to secure the person who keeps the pass open and deliver them to Theodahad at the camps.",
+  "goal": "to secure the person who keeps the winter pass open",
+  "arc": [
+   "Ride to the charcoal-burners' camps the client named to inspect the pass and its upkeep → yields: a trail of tarred crow feathers and smeared tallow leading up the pass",
+   "Follow the tarred-crow trail up the pass using the feathers as a guide → yields: a low lean-to where Mainet sits beside offal and a carved crow-call and refuses passage without coin",
+   "Press Mainet at the lean-to using the crow-call and his offal pile to learn who tends the feeder → yields: the dusk stall at Ashfall Stand where a cloaked trader, Innuwae, comes to feed the hollow",
+   "Escort Innuwae from Ashfall Stand down to the charcoal-burners' camps to hand them to Theodahad while Mainet attempts interception and is beaten or outwitted there"
+  ],
+  "twist": null,
+  "tensions": [
+   "Mainet's tolls and willingness to ambush travellers",
+   "Innuwae will resist leaving the feeder she tends",
+   "keeping the feeder supplied means steady runs into the pass"
+  ],
+  "openDirections": [
+   "mount a guarded convoy to Ashfall Stand to escort supplies and secure the feeder",
+   "if Innuwae is detained, forest traders will shift routes and the pass will need a permanent keeper"
+  ]
+ },
+ "shipped": {
+  "title": "Inspect the charcoal camps and the pass upkeep",
+  "situation": "Theodahad came to the fort and asked help to keep the winter pass open. A runner from the charcoal camps arrived with a snapped bell-rope and burned trail markers. Theodahad worried and kept touching the cuff of his coat as he spoke. The client wants the passkeeper secured and the upkeep checked. Coin when the work is done. They say the one at the heart of this would fetch a ransom worth a season of contracts.",
+  "job": "Ride to the charcoal-burners' camps, inspect the pass markers and the upkeep works, and report who now tends the pass"
+ }
+}

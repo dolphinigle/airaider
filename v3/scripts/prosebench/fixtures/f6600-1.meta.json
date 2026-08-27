@@ -1,0 +1,55 @@
+{
+ "seed": 6600,
+ "chainId": "chain-14",
+ "title": "The Beads of Eldergrove",
+ "bible": {
+  "title": "The Beads of Eldergrove",
+  "kernel": "A shrine elder hires the company to recover a missing set of ceremonial beads that will lead them through the passes.",
+  "cast": [
+   {
+    "name": "Angalanwen",
+    "who": "elder of the grove shrine who keeps the village rites and its beadwork",
+    "want": "to recover a stolen set of ceremonial beads and return them to their owner",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Ottglund of the Pass",
+    "who": "a wandering wolfman artisan who camps the mountain passes and trades carved trinkets",
+    "want": "to keep the beads and the carved bead that serves as a map to a hidden hoard",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Anselm",
+    "who": "a river-trader and fence who buys curios and sells information on the sly",
+    "want": "to keep or sell any beads he can fence rather than hand them over",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   }
+  ],
+  "situation": "The shrine's ceremonial beads were removed by Ottglund in the night because one bead hides a carved map bead. Ottglund intends to use that carved bead to find a buried hoard and will not admit theft. Anselm bought a clue piece and will only name Ottglund for a price. The pass-watch token shows the beads passed through the Greyspine route.",
+  "goal": "to recover a stolen set of ceremonial beads and return them to their owner",
+  "arc": [
+   "Travel to the Eldergrove Shrine the client named to inspect the bead altar and the shrine keepers' reports → yields: a torn pass-token stamped by the pass-watch",
+   "Take the pass-token to Greyspine Pass to question the pass-watch and follow where their patrol points → yields: a tattered wolf-cloak snagged on a bramble",
+   "Track the wolf-cloak to Moss-crib Clearing and force answers from the fence who trades in oddments, paying his price → yields: word that Ottglund plans to return to Eldergrove at dusk",
+   "Wait at the Eldergrove Shrine the client named and confront Ottglund when he arrives. The company defeats or outbids him and hands the ceremonial beads to Angalanwen"
+  ],
+  "twist": null,
+  "tensions": [
+   "Anselm will demand the wolf-cloak or a costly price before naming Ottglund",
+   "Ottglund refuses to surrender the beads and guards the hoard's secret fiercely",
+   "The pass-watch enforces patrol claims and can delay or extort the company"
+  ],
+  "openDirections": [
+   "With Ottglund in custody, press him for the buried hoard's site and bargain terms to retrieve it",
+   "Whether the company digs or not, Anselm and the pass-watch may press claims on any treasure recovered"
+  ]
+ },
+ "shipped": {
+  "title": "Inspect the Eldergrove shrine reports",
+  "situation": "Angalanwen unwrapped a cloth and set the empty bead cord on the table. To recover a stolen set of ceremonial beads and return them to their owner. She says the shrine keepers sent a brief report of theft at the bead altar and that the carved bead that marks a map is gone. Coin when the work is done. The matter smells of a payout worth a season of small jobs.",
+  "job": "Travel to the Eldergrove Shrine and inspect the bead altar and the shrine keepers' reports"
+ }
+}

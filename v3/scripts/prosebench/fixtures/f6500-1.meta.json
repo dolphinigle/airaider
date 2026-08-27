@@ -1,0 +1,54 @@
+{
+ "seed": 6500,
+ "chainId": "chain-13",
+ "title": "Tolls and Cinnamon",
+ "bible": {
+  "title": "Tolls and Cinnamon",
+  "kernel": "A merchant hires the company to stop a named bridge's tolls and bring its takings to her camp. A spice-streaked shipment on the river leads to a captive elf who then chooses to join.",
+  "cast": [
+   {
+    "name": "Thaeraen",
+    "who": "merchant from the loggers' winter huts who keeps a small camp at Gingerfen.",
+    "want": "to end the tolls at Fallowspan Bridge and receive what it collects at Gingerfen",
+    "role": "client",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Autodikos the Younger",
+    "who": "tollmaster and spice-trader who runs the gate at Fallowspan.",
+    "want": "to keep Fallowspan's tolls running",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Sarayn",
+    "who": "an elven soldier seized on the road and carried with the toll's shipments.",
+    "want": "to be free from his bonds",
+    "role": "prize",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Thaeraen says Fallowspan Bridge's tolls are being collected by Autodikos and sent off in spice-streaked coffers. She hires the company to stop the tolls and bring whatever those coffers carry to her camp at Gingerfen. The route runs downriver past the loggers' winter huts.",
+  "goal": "to end the tolls at Fallowspan Bridge and deliver what they collect to Thaeraen at Gingerfen",
+  "arc": [
+   "Ride to Fallowspan Bridge and watch the toll collection the client named to learn who takes the passage → yields: Autodikos the Younger hauling a spice-streaked coffer downriver toward the loggers' winter huts.",
+   "Intercept Autodikos' shipment at the loggers' winter huts to seize what he carries → yields: Autodikos fleeing by raft for Gingerfen with a carved, cinnamon-scented idol and a chained elf, Sarayn.",
+   "Pursue Autodikos to Gingerfen and force him, by fight, coin, or trick, to hand over the captive as the client demands → yields: Sarayn handed to Thaeraen at Gingerfen and then choosing to join the company."
+  ],
+  "twist": "The bridge toll does not only buy coin; it buys living recruits who are bound to a cinnamon-scented carved idol.",
+  "tensions": [
+   "Autodikos will fight or flee rather than give up the idol and the captives",
+   "Loggers and river crews profit from the shipments and will warn or hide Autodikos",
+   "Thaeraen expects the takings at Gingerfen and will not accept a partial result"
+  ],
+  "openDirections": [
+   "Track river traffic from the winter huts to Gingerfen and lie in wait at the landing.",
+   "If the tolls continue, more captives will be bought and bound to the idol each run. The cult grows even without immediate company action."
+  ]
+ },
+ "shipped": {
+  "title": "Watch Fallowspan's Collection",
+  "situation": "Thaeraen has come to the fort and demands the tolls at Fallowspan be ended. He shows the fort a list of crossings and says Gingerfen loses what the gate collects. The immediate need is to ride to Fallowspan Bridge and watch the toll collection to learn who takes the passage. The fee is agreed, and any spoils along the way stay with the company. Word runs that the one at the heart of this would be worth a place on any roster.",
+  "job": "Ride to Fallowspan Bridge and watch the toll collection to learn who takes the passage"
+ }
+}

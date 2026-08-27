@@ -1,0 +1,45 @@
+{
+ "location": "Western Forests \u2014 Old-growth elven forests west of the fort.",
+ "slotCount": 2,
+ "bible": {
+  "cast": [
+   {
+    "name": "Gundo of Millbrook",
+    "want": "to have Romlyn delivered alive to Gundo at Millbrook",
+    "role": "client",
+    "tags": "human. Male. greedy (mid). calculating",
+    "stakeIfLost": "He says he has already promised the elf on to someone else, and that a man who breaks that promise does not trade in Millbrook again.",
+    "who": "a merchant up from Millbrook",
+    "tell": "he watches your hands while he talks"
+   },
+   {
+    "name": "Romlyn",
+    "who": "an elf entertainer with a history in the wood courts",
+    "want": "to choose his fate once freed",
+    "role": "prize",
+    "tags": "elf. Male. performance (high). playful"
+   },
+   {
+    "role": "obstacle",
+    "offstage": true,
+    "trade": "warden",
+    "standsTo": "holds the elf under an elven judgment and will not let him go"
+   }
+  ],
+  "goal": "to have Romlyn delivered alive to Gundo at Millbrook"
+ },
+ "relevantLore": [
+  {
+   "id": "place-10",
+   "name": "Fenmarket",
+   "blurb": "A riverside market where traveling entertainers and merchants trade news."
+  }
+ ],
+ "beat": 1,
+ "arcStep": "Travel to the market and ask vendors about the person",
+ "focalIsMerc": false,
+ "pay": "the agreed coin, and what the road turns up",
+ "stepFriction": "The market has its reasons not to answer questions about where the elf went.",
+ "arrival": "he came up to the gate himself with a purse already counted",
+ "knownObstacle": "wardens of an old grove hold the elf under a judgment of their own, and will not give him up"
+}

@@ -1,0 +1,54 @@
+{
+ "seed": 5200,
+ "chainId": "chain-14",
+ "title": "Mallet for a Life",
+ "bible": {
+  "title": "Mallet for a Life",
+  "kernel": "A rumor says a lord paid a wager with a person. Retrieve and win them to the company.",
+  "cast": [
+   {
+    "name": "Sulahkeesh",
+    "who": "a lizardman peasant taken in a wager, scrawny and sickly with a clumsy gait.",
+    "want": "to be left alone in the Western Forest",
+    "role": "prize",
+    "loreId": "c8"
+   },
+   {
+    "name": "Aengvir Duskbough",
+    "who": "a minor lord of the Duskbough demesne and a habitual gambler.",
+    "want": "to keep his wagered forfeits and deliver them to his hall",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Juillen",
+    "who": "a village gravedigger who keeps odd hours and never sleeps in plain sight.",
+    "want": "to be paid coin to show where he carried the wagered person",
+    "role": "ally",
+    "loreId": "lore-13"
+   }
+  ],
+  "situation": "Aengvir Duskbough lost a late wager and turned over Sulahkeesh to a gravedigger. The gravedigger hid Sulahkeesh near an old elven burial ring at Hollowmound Crypt. The company has heard the rumor and intends to win Sulahkeesh into its service.",
+  "goal": "to recruit the wagered captive into the company",
+  "arc": [
+   "Go to Bellman's Rest the rumor named and question the keeper about any gravediggers seen leaving with a candle and mallet → yields: Juillen, a gravedigger who admits he ferried a wagered captive toward Hollowmound Crypt",
+   "Follow Juillen's spoor into Hollowmound Crypt and search the sidings he marked with his candle → yields: a carved mallet stamped with Aengvir Duskbough's crest",
+   "At Fort Blackmead use the Duskbough mallet to call the wager's hand and demand the captive while Aengvir Duskbough arrives to stop the handover → yields: Sulahkeesh, handed to the company and agreeing to join"
+  ],
+  "twist": null,
+  "tensions": [
+   "Aengvir's pride and private guards who will contest any public claim",
+   "locals' superstition about disturbing elven graves that slows travel and draws eyes",
+   "Sulahkeesh's instinctive fear and wish to be left alone"
+  ],
+  "openDirections": [
+   "Secure Juillen's cooperation with coin and a promise of clean passage to Hollowmound",
+   "Aengvir will likely rally claimants or muscle at the fort once the mallet's crest is shown"
+  ]
+ },
+ "shipped": {
+  "title": "Ask at Bellman's Rest",
+  "situation": "A fresh nail has been driven into the low gate at Bellman's Rest. The client stands at the gate and calls himself the keeper while he counts his small candle stubs. He fingers a worn mallet tucked beneath his cloak as he talks and looks tired but watchful. You need to learn whether any gravediggers left last night carrying a candle and a mallet. The client pays the agreed coin, and the company keeps whatever the road turns up. Word runs that the one at the heart of this would be worth a place on any roster.",
+  "job": "Ask the keeper at Bellman's Rest whether any gravediggers left last night carrying a candle and a mallet."
+ }
+}
