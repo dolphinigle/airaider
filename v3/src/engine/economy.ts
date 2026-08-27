@@ -180,6 +180,9 @@ export function generateCard(rng: Rng, opts: GenOptions): Card {
   const raceBias = RACE_BODY_BIAS[tags.find(t => CONCEPT[t.concept]?.group === 'race')?.concept ?? 'human'] ?? {};
   for (let iter = 0; iter < 24 && tags.length < 12; iter++) {
     const remaining = opts.targetV - spent;
+    // NOT lowered to the cheapest tag's price (6): letting the fill loop keep buying TAGS to use
+    // up the budget pushed the median card to the 12-tag cap, which is exactly the "tag-count
+    // sprawl" §3b goal 5 forbids. The remainder is spent on TIERS instead, below.
     if (remaining < 12) break;
     const excluded = new Set(opts.excludeConcepts ?? []);
     const skillCount = tags.filter(t => CONCEPT[t.concept]?.group === 'skill').length;
@@ -204,6 +207,35 @@ export function generateCard(rng: Rng, opts: GenOptions): Card {
     // roll on top of the relative weighting (usually 0-1 per card, never five)
     if ((c.appearOdds ?? 1) < 0.05 && !rng.chance((c.appearOdds ?? 1) * 10)) continue;
     place({ concept: id, tier: c.depth > 1 ? rollTier(rng, id, ceiling, Math.max(0, remaining)) : undefined });
+    spent = Math.max(0, tagsValue(tags));
+  }
+
+  // TOP-UP BY QUALITY — ECONOMY §4 step 2 ("LOOP until R ~spent") and §3b goal 5 ("Value through
+  // QUALITY (tier/intensity), not tag-count sprawl"). The fill loop above buys bottom-weighted
+  // tiers and stops as soon as it cannot afford another TAG, which measured a ONE-DIRECTIONAL
+  // shortfall against §3's "E[value] ≈ target": 0.62× target at L1, rising to 0.94 by L20 — worst
+  // exactly where the player is poorest. So spend what is left by raising tiers already on the
+  // card rather than adding more tags. The pick is uniform among the affordable upgrades so the
+  // distribution's shape (bottom-weighted, right tail from rollTier) is left alone.
+  for (let guard = 0; guard < 40; guard++) {
+    const remaining = opts.targetV - spent;
+    if (remaining <= 0) break;
+    const up = tags
+      .map(t => ({ t, c: CONCEPT[t.concept] }))
+      .filter((x): x is { t: TagInstance; c: NonNullable<typeof x.c> } => {
+        const { t, c } = x;
+        if (!c || !t.tier || c.negative || c.zeroValue || GROUPS[c.group]?.identity) return false;
+        return t.tier < Math.min(c.depth, ceiling);
+      })
+      .map(x => ({ ...x, cost: tagValue({ concept: x.t.concept, tier: x.t.tier! + 1 }) - tagValue(x.t) }))
+      // "~spent" (§4 step 2) means NEAREST, not always-under: at a small target the last step
+      // costs more than is left, and stopping short is what left L1 units at 0.87 of their mark.
+      // Take an overstep only when it lands CLOSER to the target than stopping does — which also
+      // gives the small overshoots §3b goal 8 calls the jackpot side of the same lottery.
+      .filter(x => x.cost > 0 && (x.cost <= remaining || Math.abs(remaining - x.cost) < remaining));
+    if (!up.length) break;
+    const pick = rng.pick(up);
+    pick.t.tier = pick.t.tier! + 1;
     spent = Math.max(0, tagsValue(tags));
   }
 
@@ -352,18 +384,19 @@ export function unitPeak(card: { tags: TagInstance[] }): { concept: string; tier
  *     opening soldiers read "·" — the marker was wrong about them, not the other way round.
  *
  *  So the reference is the level itself: worth ÷ the coin-equivalent of vBase(level). Level-stable
- *  from L2 on (median 0.69→0.78, p97 ≈0.94 across L1-L30, 40k units), and defined for anyone with
- *  a level. Thresholds are the measured percentiles:
- *    ★★★★  ~2%   a chase unit
- *    ★★★  ~15%   notably better than their level suggests
- *    ★★   ~58%   what you expect to see
- *    ★    ~92%   thin
- *    ·     ~8%   the dud end of the lottery (GENERATION_FLOW §8's "jackpot/dud")   */
+ *  at EVERY level (median 0.82-0.84, p97 ≈1.00 across L1-L30, 48k units) and defined for anyone
+ *  with a level. Recalibrated after the §3 generation fix, which moved the whole distribution up.
+ *  Thresholds are the measured percentiles:
+ *    ★★★★ ~3.5%  a chase unit
+ *    ★★★  ~18%   notably better than their level suggests
+ *    ★★   ~45%   what you expect to see
+ *    ★    ~26%   thin
+ *    ·     ~7%   the dud end of the lottery (GENERATION_FLOW §8's "jackpot/dud")   */
 export function unitStars(card: { tags: TagInstance[]; value: number; character?: { level: number } | null }): number {
   // a card with no level (a relic) still has a mark, and vBase inverts cleanly
   const level = card.character?.level ?? Math.max(1, 1 + Math.log(Math.max(1, card.value) / 30) / Math.log(1.35));
   const r = unitWorth(card) / Math.max(1, cashValue(vBase(level)));
-  return r >= 0.95 ? 4 : r >= 0.85 ? 3 : r >= 0.70 ? 2 : r >= 0.55 ? 1 : 0;
+  return r >= 1.00 ? 4 : r >= 0.90 ? 3 : r >= 0.80 ? 2 : r >= 0.70 ? 1 : 0;
 }
 
 

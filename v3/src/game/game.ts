@@ -978,6 +978,7 @@ export class Game {
     let pendingIdentity: { race: string; gender: 'male' | 'female'; name: string } | undefined;
     if (returning?.character) {
       // an echo rescue: the reward IS the person who was left behind (same card, same memories)
+      this.unslotCard(returning);   // a room slot must never keep pointing at a card that left it
       returning.location = HELD('limbo');
       rewardCards = [returning];
     } else {
@@ -1169,6 +1170,7 @@ export class Game {
     else if (isPersonal) focal = this.card(personalMercId!)!;
     else if (returning) {
       focal = returning;
+      this.unslotCard(focal);           // never leave a room slot pointing at them
       focal.location = HELD('limbo');   // back within reach, not yet owned
     } else {
       const spec = { kind: 'captive' as const, value: eco.focalTarget };
@@ -2129,6 +2131,12 @@ export class Game {
       st.pendingEchoes = st.pendingEchoes.filter(e => e !== echo);
       const person = this.card(echo.focalId);
       if (!person?.character) continue;
+      // "left behind out there" must still BE out there. The company can have acquired them since
+      // — taken them captive, hired them, even slotted them in a room — and a rescue lead for
+      // someone standing in your own fort then drags them back out of it (audit, 2026-08-27:
+      // "card c460 slotted at room-289#0 but location says limbo").
+      if (person.location.kind === 'room'
+        || (person.location.kind === 'held' && person.location.state !== 'lore')) continue;
       const lead = this.freshLead('reward');
       lead.archetype = 'rescue';
       lead.chainInfo = { kind: 'none' };

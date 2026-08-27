@@ -24,13 +24,19 @@ class StaggeredMock extends MockProvider {
   }
 }
 
-/** drive a game until `want` quests march in the same cycle */
+/** drive a game until `want` quests march in the same cycle.
+ *  Pushes its OWN one-slot leads rather than taking whatever the board happens to offer: the
+ *  board's mix is seeded, so any engine change that shifts the rng stream used to make this test
+ *  fail with "could not stage 2" — a seed-luck failure, not a product one (2026-08-27). */
 async function stage(g: Game, want: number): Promise<void> {
   g.build('map-room'); g.build('lead-room');
+  let n = 0;
   for (let i = 0; i < 12; i++) {
-    for (const lead of g.visibleLeads().slice(0, want)) {
-      if (g.state.quests.filter(q => q.state === 'open').length >= want) break;
-      await g.pursue(lead.id);
+    while (g.state.quests.filter(q => q.state === 'open').length < want) {
+      g.state.leads.push({ id: `lead-stage${++n}`, rarity: 'common', level: 1, region: 'forests',
+        archetype: 'contract', chainInfo: { kind: 'none' }, expiresAtCycle: 99, source: 'starter' });
+      const lead = g.visibleLeads().at(-1)!;
+      if (!(await g.pursue(lead.id)).ok) break;
     }
     for (const q of g.state.quests.filter(q => q.state === 'open')) {
       if (q.approaches && !q.chosenApproach) g.chooseApproach(q.id, q.approaches[0]!.id);

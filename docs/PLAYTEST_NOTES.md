@@ -255,7 +255,7 @@ samples, so a future change can be compared against these same numbers).
 person would be *good at* the job, when they are the one being rescued. If anyone rebuilds this
 harness, that is the trap.
 
-## N5 🔍 Founders are bottom-6% units carrying a full-price mark
+## N5 🔍 Founders are bottom-percentile units carrying a full-price mark
 
 Found while building the rarity marker (2026-08-27), not reported from play.
 
@@ -284,3 +284,23 @@ are all computed from.
   work tuned.
 
 The marker ships as-is because it is telling the truth. Ruling wanted before anything moves.
+
+### N5 update — 2026-08-27, after the §3 generation fix
+
+The generation shortfall that made this look worse than it was is now fixed (E[substance] ≈ target,
+per ECONOMY §3), so quest-delivered people got RICHER while founders did not move at all — they are
+built by `freshCharacter`, which still hands out four tags and stamps a 60g mark without pricing
+anything. The gap therefore widened rather than closed.
+
+Seen side by side in the CLI, which is the point of the marker:
+
+```
+HOLDING   Aduna of the Ford   ★★★★   64g     ← a quest-delivered captive
+ROSTER    Ragna Stormhide     ·      17g     ← a founder, same game
+          Gaufrid             ·      11g
+```
+
+Still a balance ruling, not a bug. The two options are unchanged — accept it as progression (your
+openers are the weakest people you will ever own, and every recruit visibly outclasses them), or
+price founders through the same path as everyone else, which strengthens the opening pair and
+touches the early-game pacing that was tuned deliberately.
