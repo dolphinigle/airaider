@@ -109,7 +109,7 @@ own TTL?
   genesis, which is a different problem — see `TEMPO.md`.)
 - Does the quests board need to show that a saga beat arrived, the way `P6` announces a pursued card?
 
-## N4 🆕 A recruit's story doesn't match where they were recruited from
+## N4 ✅ A recruit's story doesn't match where they were recruited from
 
 > *"big issue: recruit story / text does not match where they got recruited from? pls check is this
 > true?"*
@@ -230,3 +230,27 @@ their traits nor their story from the quest they came out of.
    fallback for everyone the resolver does not flesh, and with four fixed strings it cannot help but
    invent an origin. Nothing tells it the quest, the region, or how the person came into the
    company's hands.
+
+### N4 RESOLVED — 2026-08-27, commit 51ae1c0
+
+Four fixes, measured before/after on the same 13 saved samples with one judge (only the build
+differs): **2.85 ± 0.26 → 4.38 ± 0.26, +1.53 ± 0.37 (~4σ)**. Zero 5s before, eight after.
+
+1. `quarryTags` restored to the routine card prompt — the card authors the person again (§4
+   pattern-B, one call, no new AI call).
+2. The resolver fleshes whoever it hands over (the `fleshed: always []` contradiction).
+3. `FleshInput.quest` + `character.origin` — a delivered person remembers the job, so the fallback
+   path is no longer forced to invent. This is the structural gap the designer spotted; it mirrors
+   the `saga` block that already existed for genesis focals.
+4. **Tag echo stripped in the engine, not banned in the prompt.** The prompt already forbade
+   echoing its own wording; banning the *label* just moved the echo — it came back as
+   `(human. Male. Ranged (low). Instinctive)` at the head of the who-line. The detector now tests
+   CONTENT: a bracketed run that is ≥75% tag vocabulary is dropped. 3/3 clean against the real
+   model, on the exact people it happened to.
+
+Harness kept: `scripts/matchscore.ts` (generate + judge) and `scripts/rejudge.ts` (re-score saved
+samples, so a future change can be compared against these same numbers).
+
+⚠ **Left open, deliberately:** the first judge scored the wrong thing — whether the delivered
+person would be *good at* the job, when they are the one being rescued. If anyone rebuilds this
+harness, that is the trap.
