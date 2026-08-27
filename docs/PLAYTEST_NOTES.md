@@ -78,3 +78,33 @@ it matters, and why it takes hired steel has failed."* The rule exists and did n
   the hook and its WHY"*. Is beat 1 failing specifically, or do all beats do this?
 - Related and possibly the same root: *"the one at the heart of this would fetch a ransom"* — the
   card's closing line refers to a person it never named.
+
+## N3 🆕 A saga's next beat should generate itself, not go back to the lead board
+
+> *"for quest chains, i think just auto generate the next quest, no need to git back to lead board."*
+> *"(asynchronously, of course)"*
+
+**Today:** finishing a beat pushes a **continuation lead** onto the board (`⛓CONT — the story
+continues`). The player must go to Leads and pursue it to get the next card. So a running saga costs
+a lead-board trip and a pursue click per beat.
+
+**Wanted:** the next beat writes itself when the previous one resolves, and lands on the quests
+board — through the queue built for `G1`, so nothing blocks.
+
+**The thing triage has to answer first:** the continuation lead is currently doing a **second job** —
+it is how a saga ENDS when the player isn't interested. Letting it expire slips the chain
+(`game.ts:2155`), and re-offering the same beat three times slips it too (`reOffers >= 3`,
+`game.ts:2237`). Both exist because a beat card was once re-offered 28 times over 90 cycles. If the
+next beat simply appears, **there is no longer a way to decline a saga by ignoring it** — so the
+design needs a replacement: abandon the quest? a stated "let it go"? does a beat still lapse on its
+own TTL?
+
+**Other open questions:**
+- **Cost and pacing.** Auto-generation fires a `writeQuest` per resolved beat with nobody asking for
+  it. Three live sagas = three calls every reckoning, on the player's bill. Acceptable? Does it
+  respect the in-flight cap, or jump the queue?
+- **When exactly?** During the reckoning that resolved the previous beat (so the card is waiting when
+  the player returns to the fort), or at the start of the next fort phase?
+- Does this apply to the FIRST beat too, or only continuations? (Starting a saga is the 50–66s
+  genesis, which is a different problem — see `TEMPO.md`.)
+- Does the quests board need to show that a saga beat arrived, the way `P6` announces a pursued card?
