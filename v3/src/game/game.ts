@@ -1787,7 +1787,7 @@ export class Game {
       // runtime truth, not genesis-time: a focal HIRED mid-saga is the company's own now
       focalIsMerc: focal?.character?.role === 'merc',
     });
-    const out = this.stripJobEcho(isRepose && cached && cached.beat === chain.beatIndex + 1 ? cached.out : await this.ai.writeQuest(wqInput));
+    const out = this.capitalizeCard(this.stripJobEcho(isRepose && cached && cached.beat === chain.beatIndex + 1 ? cached.out : await this.ai.writeQuest(wqInput)));
     // COLD-READER GATE REMOVED (reviewlab 83001/84001 + blind judge, 2026-07-17): the review
     // roundtrip cost ~5.5s per card and its fixNotes rewrites made cards WORSE (pre-rewrite won
     // 6/9, mean 7.44 vs 7.11) — same nag-degradation as the genesis guard. The dup-restatement
@@ -2595,6 +2595,14 @@ export class Game {
    *  that essentially IS the job line. Bidirectional ≥0.85 only — the 0.7 one-way lint
    *  over-fired (situation and job naturally share words); dropping a whole sentence is the
    *  proven safe mechanical move. Never touches a card with fewer than 2 sentences. */
+  /** A card that opens lowercase is a rendering defect the player sees before any prose —
+   *  measured 2/10 on a live sweep ("an elven apiarist, Nithonda, stands in the yard…"). The
+   *  engine owns the first character; no prompt rule is needed for a one-line deterministic fix. */
+  private capitalizeCard<T extends { situation: string; title: string }>(out: T): T {
+    const up = (t: string) => t.replace(/^\s*([a-z])/, (_m, c: string) => c.toUpperCase());
+    return { ...out, situation: up(out.situation), title: up(out.title) };
+  }
+
   private stripJobEcho<T extends { situation: string; job: string }>(out: T): T {
     const words = (s: string) => s.toLowerCase().replace(/[^a-z ]/g, ' ').split(/\s+/)
       .filter(w => w.length > 3).map(w => w.replace(/s$/, ''));
