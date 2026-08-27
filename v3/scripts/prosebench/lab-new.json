@@ -1,1 +1,806 @@
-[{"fx": "n11010-1.user.json", "card": "An elder merchant, Marienne Fairweather, came back a second time and asks what the company has lost lately. She says the guild will lose its sworn right to export western forest wares if the pledged pot is not returned. Find the guild's pledged pot in Thornhollow's ruined lodge and bring it back, the pay is honest coin, and any small spoils besides. A warden opposes the recovery and means to keep the pledged pot bound to the forest. She looks at the door before answering and asks if the fort understands the old pledge.", "q": {"hirer": true, "matter": true, "why": true, "steel": false}, "naked": ["Marienne Fairweather"], "coined": [], "opens": false, "w": 94, "s": 5, "names": ["Marienne Fairweather"]}, {"fx": "n11010-1.user.json", "card": "An elder merchant, Marienne Fairweather, came back a second time and, looking at the door before she answered, asked what the company had lost lately. \"If we fail, the guild will lose its sworn right to export western forest wares,\" she says. She wants the guild's pledged pot returned to her at Thornhollow, the pay is honest coin, and any small spoils besides. The work now is to search Thornhollow's ruined lodge for that pledged pot. A warden intends to keep the oath-pot bound to the forest where the vow was sworn.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Marienne Fairweather"], "coined": [], "opens": false, "w": 92, "s": 5, "names": ["Marienne Fairweather"]}, {"fx": "n11020-1.user.json", "card": "A steward of the ford, Lothiel Fernbrook, came down from higher ground and asked for you by name. She wipes her hands on her coat as she says the exile must be brought back alive to her at the ford, the fee is fixed, and what else shakes loose the company keeps. \"If we fail,\" she says, \"the lord will reclaim my holding and I will lose the ferry and hunting rights.\" Search the river ford's shallows for signs of the exile seen there. A young noble, Osgar the Younger, still means to seize the exile and recover his hunting rights.", "q": {"hirer": true, "matter": true, "why": true, "steel": false}, "naked": ["Lothiel Fernbrook", "Osgar the Younger"], "coined": [], "opens": false, "w": 101, "s": 4, "names": ["Lothiel Fernbrook", "Osgar the Younger"]}, {"fx": "n11020-1.user.json", "card": "A steward of the river ford, Lothiel Fernbrook, came down from higher ground and asked for the boss by name. If you fail, she says, the lord will reclaim the holding and she will lose the ferry and hunting rights. She wants the exile returned alive to her at the ford, and the fee is fixed, and what else shakes loose the company keeps. A young lord, Osgar the Younger, means to seize the exile and recover his hunting rights. She says \"Bring him back alive,\" and she wipes her hands on her coat over and over while she says it.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Lothiel Fernbrook", "Osgar the Younger"], "coined": [], "opens": false, "w": 101, "s": 5, "names": ["Lothiel Fernbrook", "Osgar the Younger"]}, {"fx": "n11030-1.user.json", "card": "A forester taps the western border stone at Greenmark Clearing to check if its base was shifted. That stone marks the fort's woodlot line and must hold. If the company fails, the fort will lose the Greenmark woodlot used for winter stores when the line is redrawn in law. You need the stone inspected for signs of tampering, the pay is the agreed coin and what the road turns up. A raider band works the edges and will press the clearing's boundary outward to claim timber.", "q": {"hirer": false, "matter": true, "why": true, "steel": true}, "naked": [], "coined": [], "opens": true, "w": 86, "s": 5, "names": []}, {"fx": "n11030-1.user.json", "card": "a woodsman brings a clod of turf and points at the western border stone. the fort's steward wants the stone proved true, the pay is the agreed coin, and what the road turns up. if the company fails the Greenmark woodlot will fall when the line is redrawn. this errand is to inspect the western border stone at Greenmark Clearing for signs of tampering. a raider is pushing the clearing's boundary outward to claim timber and will have men on the track. the steward waited at first light and would not name the place until the terms were set.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": [], "coined": [], "opens": false, "w": 99, "s": 6, "names": []}, {"fx": "n11040-1.user.json", "card": "A tollkeeper, Vigilius, came after sending a rider ahead and rubs a thumb along a scar as he gives only half a reason. If we fail, the Bitterpass will freeze shut and the fort will be cut off from supply wagons. He wants this season's ration left at Bitterpass, and the fee is as agreed, and any spoils ride home with it. A ruler, Waisale the Quiet, lies bound beneath the pass in an iron belt. A warden opposes and will keep the ward confined at the pass.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Vigilius", "Waisale the Quiet"], "coined": [], "opens": false, "w": 88, "s": 5, "names": ["Vigilius", "Waisale the Quiet"]}, {"fx": "n11040-1.user.json", "card": "A low official at the fort, Vigilius, sent a rider ahead and came behind it with a sealed ration for the pass. He rubs a thumb along a scar while he says he wants this season's ration left at Bitterpass, the fee is as agreed, and any spoils ride home with it. He warns that if the company fails, the Bitterpass will freeze shut and the fort will be cut off from supply wagons. The bound ruler under the pass, Waisale the Quiet, is the one who must be kept fed. A warden at the pass keeps the ward confined and will resist any attempt to feed it. Vigilius gave only half a reason for his haste.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Vigilius", "Waisale the Quiet"], "coined": [], "opens": false, "w": 117, "s": 6, "names": ["Vigilius", "Waisale the Quiet"]}, {"fx": "n11050-1.user.json", "card": "an elven apiarist, Nithonda, arrived out of the weather and asked for the boss by name. The fort loses the clearing's winter honey allotment and the pledged stores will be claimed by rival bands if Nithonda is not brought back. The company must ride to the beekeepers' clearings the fort named and question the survivors, using the fort's pass to enter the yards. A band of mercenaries claims captives and means to sell any they take, which raises the risk inside the yards. The fee is as agreed, and the company keeps what it hauls back. Nithonda is playful and stubborn and wants to join the company, and she waits while you decide.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": [], "coined": [], "opens": false, "w": 113, "s": 6, "names": ["Nithonda"]}, {"fx": "n11050-1.user.json", "card": "an elven apiarist, Nithonda, arrived out of the weather and asked for the boss by name. Nithonda wants to join the company, the fee is as agreed, and the company keeps what it hauls back. If Nithonda stays away, the fort loses the clearing's winter honey allotment and the pledged stores will be claimed by rival bands. The company must ride to the beekeepers' clearings the fort named and question the survivors, using the fort's pass to enter the yards. A hired mercenary wants to sell any captive from the clearings for coin and will oppose questioning and removal.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": [], "coined": [], "opens": false, "w": 99, "s": 5, "names": ["Nithonda"]}, {"fx": "n11060-1.user.json", "card": "A widower from the burned ridge, Firaelion, counts the soldiers in the yard while he apologises for the hour and says he needs men to find those who burned his farm. He says that if the men are not brought, his remaining seed and stores will be taken by creditors. He wants proof from the White Stag Shrine that links those men to the fire, the pay is plain coin, and the road's yield goes to the company. The errand is proof at the White Stag Shrine that matches Firaelion's description. A raider means to avoid capture and keep his companions free. You must search using only what Firaelion told you.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Firaelion"], "coined": [], "opens": true, "w": 111, "s": 6, "names": ["Firaelion"]}, {"fx": "n11060-1.user.json", "card": "A widower from the burned ridge, Firaelion, was let in past the hour and apologised for the hour. He counts the soldiers in the yard while he says he needs men to buy and present the men who burned his farm. If the men are not brought, Firaelion says his remaining seed and stores will be taken by creditors because he cannot plant alone. He asks that you meet him at the White Stag Shrine and search the shrine for recent signs using only what he told you, the pay is plain coin, and the road's yield goes to the company. Raiders who will try to avoid capture and keep their companions free are the likely opposition.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Firaelion"], "coined": [], "opens": true, "w": 117, "s": 5, "names": ["Firaelion"]}, {"fx": "n11070-1.user.json", "card": "A city merchant turned patron, Savor Sorrowsong, was waiting at first light and named a price before being asked. \"If the list is not recovered, the patron's charter that unlocks promised funds for Savor's artists will be void and the pledge money will be lost,\" he says while he counts the soldiers in the yard. He wants to recover a rolled list of names he lost, the coin comes at the finish, with the pick of what the job turns up. At the Waning Oath chapel, search the shrine and grounds for signs the list passed through. A keeper of the chapel opposes the list and may try to burn it to protect the named. The patron watches each reply for a promise he can use to placate his artists.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Savor Sorrowsong"], "coined": [], "opens": true, "w": 130, "s": 6, "names": ["Savor Sorrowsong"]}, {"fx": "n11070-1.user.json", "card": "A city merchant turned patron, Savor Sorrowsong, was waiting at first light and named a price before you asked. He counts the soldiers in the yard while he says the list holds the names of artists who must be paid. If the list is not recovered, he says the charter that unlocks funds will be void and the pledge money lost. At the Waning Oath chapel he wants you to search the shrine and grounds for signs the rolled list passed through, the coin comes at the finish, with the pick of what the job turns up. A keeper intends to burn the list to protect the named.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Savor Sorrowsong"], "coined": [], "opens": true, "w": 108, "s": 5, "names": ["Savor Sorrowsong"]}, {"fx": "n11080-1.user.json", "card": "A trading-house agent, Plente, walked in with the market crowd and would not give a reason until the door was shut. He kept one hand on the door frame while he spoke. He warns that if you fail, Plente's trading house will lose its reserve chest and the merchant stalls will close. He wants the false coin stopped by searching the beekeepers' clearings and questioning the wax-workers and painters there, the pay is plain coin, and the road's yield goes to the company. A counterfeiter in those clearings will try to escape arrest and keep his dies.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Plente"], "coined": [], "opens": false, "w": 97, "s": 5, "names": ["Plente"]}, {"fx": "n11080-1.user.json", "card": "A trading-house agent, Plente, walked in with the market crowd and kept one hand on the door frame. Keeping one hand on the frame, they say that if we fail Plente's trading house loses its reserve chest and cannot pay its suppliers, forcing the merchant stalls to close. They want the company to search the beekeepers' clearings and question the wax-workers and painters at Painter's Hollow, the pay is plain coin, and the road's yield goes to the company. The obstacle is a counterfeiter who will try to escape arrest and keep his dies. They would not give a reason until the door was shut.", "q": {"hirer": true, "matter": true, "why": true, "steel": false}, "naked": ["Plente"], "coined": [], "opens": false, "w": 105, "s": 5, "names": ["Plente"]}, {"fx": "n11090-1.user.json", "card": "A bridgekeeper, Abarne Stonebridge, came behind a short letter and asked what the company had lost lately. Abarne says the loggers' winter huts will be burned and families driven from their camps, wrecking the season's supplies. At the loggers' winter huts, Abarne wants Kyknos located by searching the cooking sheds and questioning the families according to her directions, the pay is honest coin, and any small spoils besides. An enforcer opposes the work and will try to keep Kyknos under guard and keep the tolls running. Abarne holds their gloves and does not put them on.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Abarne Stonebridge", "Kyknos"], "coined": [], "opens": false, "w": 96, "s": 5, "names": ["Abarne Stonebridge", "Kyknos"]}, {"fx": "n11090-1.user.json", "card": "a bridgekeeper, Abarne Stonebridge, arrived behind a letter and holds their gloves while saying they want Kyknos brought to them alive, the pay is honest coin, and any small spoils besides. If we fail, the loggers' winter huts will be burned and families driven from their camps, Abarne says. The task is to search the loggers' winter huts' cooking sheds and speak with the families there using Abarne's directions to find Kyknos. An enforcer opposes this and will try to keep Kyknos under guard and keep the tolls running. The loggers keep to their own and may lie to protect one of their own. Abarne waits on the ford and does not put their gloves on while they talk.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": [], "coined": [], "opens": false, "w": 119, "s": 6, "names": ["Abarne Stonebridge", "Kyknos"]}, {"fx": "n11100-1.user.json", "card": "A grain trader from the fort with a ruined stall and urgent creditors, Anese, was let in past the hour and set a rough map on the table while she will not look at the door as she says she needs the harvest taken and brought to her, the fee is as agreed, and the company keeps what it hauls back. If you fail, she says she will lose the grain she pledged as collateral and her creditors will seize her market stalls. The task is to inspect Hearthgate Crossing to check the convoy route and any marks left at the road entrance. A beggar claims he will seize the granary's grain for his band. Anese was in a hurry and did not hide it.", "q": {"hirer": true, "matter": true, "why": true, "steel": false}, "naked": [], "coined": [], "opens": false, "w": 125, "s": 5, "names": ["Anese"]}, {"fx": "n11100-1.user.json", "card": "A grain trader from the fort with a ruined stall and urgent creditors, Anese, was let in past the hour and did not hide her hurry. She will not look at the door as she says, \"The granary's harvest must reach me before my creditors take the stalls.\" If we fail, she says, her pledged grain will be seized and her market stalls taken by creditors. She wants Hearthgate Crossing inspected for the convoy route and any marks left at the road entrance, the fee is as agreed, and the company keeps what it hauls back. A beggar intends to seize the granary's grain for his band.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": [], "coined": [], "opens": false, "w": 107, "s": 4, "names": ["Anese"]}, {"fx": "n11110-1.user.json", "card": "An aged elven steward, Ginnade the Elder, arrived behind a letter that said less and stood while she said the whole of it, keeping something turning over in one palm. The village's tithe chest of winter grain will be seized by the border lord if the deserter is not returned. She wants the deserter seized and handed over, the coin comes when it is done and anything carried home is the company's. Hunters in Thorncleft Clearing have a history of closing ranks and will stand against strangers. You are to search Thorncleft Clearing and question its hunters and elders.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Ginnade the Elder"], "coined": [], "opens": true, "w": 99, "s": 5, "names": ["Ginnade the Elder"]}, {"fx": "n11110-1.user.json", "card": "An aged elven steward, Ginnade the Elder, came behind a letter that said less and said the whole of it standing while he turned a small bone over in one palm. He says the village's tithe chest of winter grain will be seized by the border lord if the deserter is not returned. He says he wants the deserter seized and handed over, the coin comes when it is done, and anything carried home is the company's. Hunters and elders at Thorncleft Clearing hold the clearing's knowledge and may close ranks to protect the deserter.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Ginnade the Elder"], "coined": [], "opens": true, "w": 95, "s": 4, "names": ["Ginnade the Elder"]}, {"fx": "n11120-1.user.json", "card": "A miller, Vincelle of Millbrook, walked in with the market crowd and says that her sister's chest was taken at the wake while she turns a ring around one finger. She says if you fail she will lose her mill because the chest holds the deed and the sealed pledge. She wants the pallbearers on Millbrook's burial road questioned to learn which of them kept the iron-bound chest, the fee is as agreed, and any spoils ride home with it. A sailor among the pallbearers intends to keep the chest to present it at Millbrook.", "q": {"hirer": true, "matter": true, "why": true, "steel": false}, "naked": ["Vincelle of Millbrook"], "coined": [], "opens": false, "w": 95, "s": 4, "names": ["Vincelle of Millbrook"]}, {"fx": "n11120-1.user.json", "card": "A miller, Vincelle of Millbrook, walked in with the market crowd and turns a ring while she says the iron-bound chest was taken at the wake. If we fail, she says, Millbrook will lose the mill because the chest holds the deed and the sealed pledge that protect her from seizure. She wants you to travel to Millbrook's burial road and question the pallbearers until they point out who left with the chest, the fee is as agreed, and any spoils ride home with it. A sailor among the mourners intends to keep the chest to present at Millbrook as proof of his claim.", "q": {"hirer": true, "matter": true, "why": true, "steel": false}, "naked": ["Vincelle of Millbrook"], "coined": [], "opens": false, "w": 104, "s": 4, "names": ["Vincelle of Millbrook"]}, {"fx": "n11130-1.user.json", "card": "A tenant of the burned farm at the forest edge, Earnona, sent word twice before coming and asked what the company had lost lately. She says that if you fail, the chest stays hidden and she cannot raise coin to buy back her farm's deed, leaving her land to the raiders. She wants the beekeepers' clearings searched for traces the men left. A woodsman and any bidders will sell an idol-shard and the men's names to the highest bidder and so stand against the search. She repeats that she wants those clearings searched, the pay is the agreed coin, and what the road turns up. While she says \"do what you can,\" she keeps turning something over in one palm.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Earnona"], "coined": [], "opens": true, "w": 120, "s": 6, "names": ["Earnona"]}, {"fx": "n11130-1.user.json", "card": "A tenant of the burned farm, Earnona, sent word twice before coming and keeps turning something over in one palm. If you fail, the chest stays hidden and I cannot raise coin to buy back my deed, leaving the land to the raiders. She wants the beekeepers' clearings searched for traces the men left, the pay is the agreed coin and what the road turns up. A woodsman plans to sell an idol-shard and the men's names to the highest bidder. She asked what the company had lost lately.", "q": {"hirer": true, "matter": true, "why": true, "steel": false}, "naked": ["Earnona"], "coined": [], "opens": true, "w": 89, "s": 5, "names": ["Earnona"]}, {"fx": "n11140-1.user.json", "card": "The tollwarden, Trihild of the Pass, came back a second time and hurried into the fort while she laughed in the wrong place as she told you the road had been robbed. She says if you fail the Pass loses the captive and merchants will avoid the road, shutting off its trade. She wants the captive found where her scouts last saw anyone taken in the Western Forests and returned to the Pass, the fee is as agreed, and the company keeps what it hauls back. A ring of poachers hunts those woods and means to keep the captive long enough to sell them on the next trade night. Trihild kept her bearings and handed them over before she left, her grin too quick for comfort.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Trihild of the Pass"], "coined": [], "opens": false, "w": 126, "s": 5, "names": ["Trihild of the Pass"]}, {"fx": "n11140-1.user.json", "card": "a warden, Trihild of the Pass, came back a second time and hurried into the hall with a map. She says, If we fail, the Pass loses the captive and merchants will avoid the road. She wants the captive recovered and returned to the Pass, the fee is as agreed, and the company keeps what it hauls back. The errand is to search the Western Forests where her scouts last saw anyone taken, using the warden's bearings. A poacher intends to keep the captive long enough to sell them on the next trade night. She laughs in the wrong place while she points at places on the map and names which tracks to follow.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": [], "coined": [], "opens": false, "w": 114, "s": 6, "names": ["Trihild of the Pass"]}, {"fx": "n11150-1.user.json", "card": "A forewoman of an Ashfire camp, Hrefgerda Nightrunner, walked into the market crowd with the whole of it written out. She says \"Return the Moss-Wreathed Banner to me at Ashfire Ring,\" and the fee is fixed, and what else shakes loose the company keeps. While she repeats the name she watches your hands, not your face. \"If the banner is not returned, Hrefgerda's lord will lose the pledge that binds his levy and thus lose the claim that keeps the charcoal concessions,\" she says. The task kept at the fort is a search of Ember Clearing among the charcoal-burners' camps for the banner. A camp warden and his burn crews hold Ember Clearing and will resist an armed search.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Hrefgerda Nightrunner"], "coined": [], "opens": false, "w": 119, "s": 6, "names": ["Hrefgerda Nightrunner"]}, {"fx": "n11150-1.user.json", "card": "A steward, Hrefgerda Nightrunner, walked in with the market crowd and had the whole of it written out. She says that if the banner is not returned her lord will lose the pledge that binds his levy and thus lose the claim that keeps the charcoal concessions. She wants the Moss-Wreathed Banner found in Ember Clearing and handed to her at Ashfire Ring, the fee is fixed, and what else shakes loose the company keeps. Wardens for the charcoal-burners guard Ember Clearing and will resist searches. She watches your hands, not your face, and says, 'Bring it back to Ashfire Ring.'", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Hrefgerda Nightrunner"], "coined": [], "opens": false, "w": 101, "s": 5, "names": ["Hrefgerda Nightrunner"]}, {"fx": "n11160-1.user.json", "card": "A miller, Juliane of Millbrook, came down from higher ground and kept looking back down the road. She says that if the cup is not returned she will lose her final trade contract because traders refuse untested grain without her proof cup. She wants you to go to the loggers' winter huts and ask who saw the silver cup last, the fee is as agreed, and the company keeps what it hauls back. A roadwarden intends to keep the cup and press the elf into his service. She keeps turning something over in one palm as she speaks.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Juliane of Millbrook"], "coined": [], "opens": false, "w": 98, "s": 5, "names": ["Juliane of Millbrook"]}, {"fx": "n11160-1.user.json", "card": "A miller, Juliane of Millbrook, came down from higher ground and kept looking back down the road. She keeps turning something over in one palm while she says, \"If the cup is not returned, I'll lose my final trade contract.\" She says traders refuse untested grain without her proof cup. She wants you to go to the loggers' winter huts and learn who saw her cup last, the fee is as agreed, and the company keeps what it hauls back. A roadwarden means to keep the cup and press the elf who found it into his service.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Juliane of Millbrook"], "coined": [], "opens": false, "w": 97, "s": 4, "names": ["Juliane of Millbrook"]}, {"fx": "n11170-1.user.json", "card": "A forewoman of a charcoal-burners' camp, Bakene, came on foot, having walked it, and set her cloak on the table. She says the camp must take Quiver Wexcombe into custody, and if you fail, Bakene's charcoal contract with the fort will be torn up, leaving the camp without buyers and forcing its people out. She wants to receive Quiver Wexcombe into her custody at the charcoal-burners' camp, the pay is the agreed coin, and what the road turns up. A warden keeps Quiver safe within the wood and will try to stop anyone hauling the minstrel out. She turns a ring around one finger while she says, \"Bring him here, or we have no buyers left.\"", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Quiver Wexcombe"], "coined": [], "opens": false, "w": 116, "s": 5, "names": ["Bakene", "Quiver Wexcombe"]}, {"fx": "n11170-1.user.json", "card": "A matron, Bakene, came on foot and had rehearsed what she would say. A minstrel, Quiver Wexcombe, is avoiding leaving the forest. She turns a ring around one finger as she says if she fails to get Quiver back, her charcoal contract with the fort will be torn up and the camp forced out. This step is to question the charcoal-burners' camp about Quiver Wexcombe. A wood warden opposes the move and means to keep Quiver safe within the wood. The pay is the agreed coin and what the road turns up.", "q": {"hirer": true, "matter": true, "why": true, "steel": false}, "naked": ["Bakene", "Quiver Wexcombe"], "coined": [], "opens": false, "w": 92, "s": 6, "names": ["Bakene", "Quiver Wexcombe"]}, {"fx": "n11180-1.user.json", "card": "A river-stall trader, Aime of the Ford, came back a second time. If the company fails to deliver the reliquary at Silvertine Crossing, Aime will forfeit the pledged trade-right that keeps his crossing berth, and rival merchants will seize his stall. He said settle it the same day while he held his gloves and would not put them on. He wants the elven reliquary delivered to Silvertine Crossing, the fee is as agreed, and the company keeps what it hauls back. He asks you to search the charcoal-burners' camps for signs of the lost reliquary using his instructions. A burner is trying to prevent any digging in the camps.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Aime of the Ford"], "coined": [], "opens": false, "w": 109, "s": 6, "names": ["Aime of the Ford"]}, {"fx": "n11180-1.user.json", "card": "A river-stall trader, Aime of the Ford, came back a second time and wants it settled the same day. If the company fails to deliver the reliquary at Silvertine Crossing, Aime will forfeit the pledged trade-right that keeps his crossing berth, and rival merchants will seize his stall. Find signs of the lost reliquary in the charcoal-burners' camps, the fee is as agreed, and the company keeps what it hauls back. A burner intends to prevent any digging in the camps. They say the handover must look clean while holding their gloves and not putting them on.", "q": {"hirer": true, "matter": true, "why": true, "steel": false}, "naked": ["Aime of the Ford"], "coined": [], "opens": false, "w": 97, "s": 5, "names": ["Aime of the Ford"]}, {"fx": "n11190-1.user.json", "card": "A foreman, Fainorume Palebough, came in wet and named a price before you asked. He kept a hand flat on the table while he named the winter huts to check. He wants the deserter returned alive for custody, the fee as agreed and any spoils ride home with it. He says if the deserter is not returned the logging crew will lose the pledged cutting rights and be driven from the winter huts. A hunter opposes this and means to seize the deserter and sell her to a rival crew.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Fainorume Palebough"], "coined": [], "opens": false, "w": 90, "s": 5, "names": ["Fainorume Palebough"]}, {"fx": "n11190-1.user.json", "card": "A foreman, Fainorume Palebough, came in wet through and named a price before being asked. He says if the deserter is not returned, the logging crew will lose the pledged cutting rights and be driven from the winter huts. He keeps a hand flat on the table and says he wants the deserter returned alive for custody, the fee is as agreed, and any spoils ride home with it. A hunter opposes them and will try to seize the deserter and sell her to a rival crew. You are to search the loggers' winter huts the foreman named for recent traces of flight.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Fainorume Palebough"], "coined": [], "opens": false, "w": 103, "s": 5, "names": ["Fainorume Palebough"]}, {"fx": "n11200-1.user.json", "card": "An agent of the Bishop's house, Tivela, came on foot and was in a hurry and says, \"The terrace must be checked before the river rises,\" while she turns a ring around one finger. \"If the company fails, the Bishop loses the villagers' pledged labor that feeds its stores when the flood scatters the households,\" she says. She wants the church terrace, the high meadow by the old elf road, scouted for approaches and safe ground, the fee is as agreed, and any spoils ride home with it. A lender opposes this by keeping the villagers bound to repay by holding their carved pledge-token. The terrace lies above Low Hollow and must be judged for space and slope for moving households. She watches your face as she waits.", "q": {"hirer": true, "matter": true, "why": true, "steel": false}, "naked": ["Tivela"], "coined": [], "opens": false, "w": 128, "s": 6, "names": ["Tivela"]}, {"fx": "n11200-1.user.json", "card": "An agent of the Bishop's house, Tivela, came on foot and made plain she was in a hurry. She says the Bishop must take custody of the flood-threatened village on the church terrace, and the fee is as agreed, and any spoils ride home with it. This step is to scout the church terrace, the high meadow by the old elf road, and report whether it will hold the households. A lender opposes the move and will keep the villagers bound to repay by holding their carved pledge-token. If the company fails, the Bishop loses the villagers' pledged labor that feeds its stores when the flood scatters the households. She turns a ring around one finger while she says the Bishop will not wait.", "q": {"hirer": true, "matter": true, "why": true, "steel": false}, "naked": ["Tivela"], "coined": [], "opens": false, "w": 124, "s": 6, "names": ["Tivela"]}, {"fx": "n11210-1.user.json", "card": "A caravan patron, Erlendr, arrived out of the weather and kept looking back down the road. \"My ward will die without the healer's care,\" he says if this fails. Search Nettleford Clearing for signs and witnesses of the healer. A warden has been seen near the hollow and might stop anyone asking questions. The coin comes when it is done, and anything carried home is the company's. He laughs in the wrong place while he waits at the gate.", "q": {"hirer": true, "matter": true, "why": true, "steel": false}, "naked": ["Erlendr"], "coined": [], "opens": false, "w": 79, "s": 6, "names": ["Erlendr"]}, {"fx": "n11210-1.user.json", "card": "A caravan patron from the west, Erlendr, arrived out of the weather and kept looking back down the road. He laughs in the wrong place and says the healer was famed in his lands. \"My ward will die without the healer's care, because no other hand can stop the wound,\" he says. He wants signs and witnesses from Nettleford Clearing that show where the healer went, the coin comes when it is done, and anything carried home is the company's. A warden patrols the hollow and questions travelers.", "q": {"hirer": true, "matter": true, "why": true, "steel": false}, "naked": ["Erlendr"], "coined": [], "opens": false, "w": 88, "s": 5, "names": ["Erlendr"]}, {"fx": "n11220-1.user.json", "card": "A forewoman of the winter huts, Renenfwe Leafshade, came behind a letter that said less and would not sit down. She says the winter huts will be burned and the river claim lost if her niece is not returned. She wants you to find survivors at the winter huts and ask about her niece, the fee is as agreed, and the company keeps what it hauls back. Raiders pressed the huts and drove off most hands. While she speaks she stands too close.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Renenfwe Leafshade"], "coined": [], "opens": true, "w": 83, "s": 5, "names": ["Renenfwe Leafshade"]}, {"fx": "n11220-1.user.json", "card": "A forewoman of the winter huts, Renenfwe Leafshade, came behind a letter that said less and stands too close as she says, \"Raiders took my niece from the winter huts.\" She says that if her niece is not returned the winter huts will be burned and the logging hold lost because the raiders will escalate reprisals. She wants survivors at the winter huts questioned and any news about her niece reported back, the fee is as agreed, and the company keeps what it hauls back. Raiders still patrol the approaches. A slow bend in the river, Blackwater Bend, holds a beached skiff that may hide where the raiders went.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Renenfwe Leafshade"], "coined": [], "opens": true, "w": 109, "s": 4, "names": ["Renenfwe Leafshade"]}, {"fx": "n11230-1.user.json", "card": "An innkeeper, Ildebad, came behind a letter that said less and wants his missing midday payment recovered. He says the road-keeper will seize his inn if he cannot return the pledged chest. He wants you to go to Highwater Ford and question ferrymen and passing drivers about the night the money went missing, the coin comes at the finish, with the pick of what the job turns up. Brigands in the ford's lanes mean to keep the payment and the man bought with it. He will not take the chair offered while he speaks.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Ildebad"], "coined": [], "opens": false, "w": 94, "s": 5, "names": ["Ildebad"]}, {"fx": "n11230-1.user.json", "card": "An innkeeper, Ildebad, came with a brief letter and says, 'Set this right today,' while he will not take the chair offered. He says the road-keeper will seize his inn when he cannot return the pledged chest. He wants to recover a payment taken from his purse, the coin comes at the finish, with the pick of what the job turns up. Go to Highwater Ford and question ferrymen and passing drivers about the night the money went missing. Brigands took the payment and mean to keep both the coin and the performer bought with it.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Ildebad"], "coined": [], "opens": false, "w": 96, "s": 5, "names": ["Ildebad"]}, {"fx": "n11240-1.user.json", "card": "An elven wool merchant, Nesulmawen Ashveil, sent a servant with a token and followed. She turns a ring around one finger and says she needs the woman brought to Thornvein Hollow, the coin comes when it is done, and anything carried home is the company's. She says failure will let the runner walk off with her last promised bale and the secret note that keeps her buyers, breaking her deliveries and costing the pledges that hold her stall. She wants you to question her stallhands at Harrowmarket about the lost shipment. Local foresters mean to protect the Thornvein handoff and its runners and will dodge questions.", "q": {"hirer": true, "matter": true, "why": true, "steel": false}, "naked": ["Nesulmawen Ashveil"], "coined": [], "opens": false, "w": 106, "s": 5, "names": ["Nesulmawen Ashveil", "Fathasa Fernbrook"]}, {"fx": "n11240-1.user.json", "card": "An elven wool merchant, Nesulmawen Ashveil, sent a servant with a token and followed, and while turning a ring around one finger she said, \"Find Fathasa and bring her to Thornvein Hollow.\". She says failure will let the runner walk off with her last promised bale and the secret note that keeps her buyers, breaking her deliveries and costing the pledges that hold her stall. This errand is to question her stallhands at Harrowmarket about the lost shipment, the coin comes when it is done, and anything carried home is the company's. A forester who protects the Thornvein handoff and its runners is said to have chased the shipment. She left the whole of it written out and pressed the paper into your hands.", "q": {"hirer": true, "matter": true, "why": true, "steel": true}, "naked": ["Nesulmawen Ashveil"], "coined": [], "opens": false, "w": 124, "s": 5, "names": ["Nesulmawen Ashveil", "Fathasa Fernbrook"]}]
+[
+ {
+  "fx": "n11010-1.user.json",
+  "card": "An elder merchant who runs the guild's western house came back a second time asking what the company had lost lately, Marienne Fairweather. Marienne says the guild will lose its sworn right to export western forest wares if the pledged pot is not returned. She wants the guild's pledged pot found in Thornhollow's ruined lodge and brought back, the pay is honest coin, and any small spoils besides. A forest warden moves to keep the oath-pot bound to the grove. Thornhollow's ruined lodge holds loose rafters and narrow rooms that hide buried things. She looks at the door before answering.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [],
+  "coined": [],
+  "opens": true,
+  "w": 100,
+  "s": 6
+ },
+ {
+  "fx": "n11010-1.user.json",
+  "card": "An elder merchant who runs the guild's western house, Marienne Fairweather, came back a second time and asked what the company had lost lately. She looks at the door before answering and says she needs the guild's pledged pot returned to her at Thornhollow, the pay is honest coin, and any small spoils besides. She says the guild will lose its sworn right to export western forest wares if the pledged pot is not returned. Search Thornhollow's ruined lodge for the guild's pledged pot. A warden, a forest keeper, intends to keep the oath-pot bound to the forest and will try to stop anyone who carries it away.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Marienne Fairweather"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 108,
+  "s": 5
+ },
+ {
+  "fx": "n11020-1.user.json",
+  "card": "A steward of the river ford, Lothiel Fernbrook, came down from higher ground and asked for you by name. If you fail, she warns, the lord will reclaim the holding and she will lose the ferry and hunting rights at the ford. She wipes her hands on her coat and says she wants you to search the river ford's shallows for signs of the exile seen there, the fee fixed and what else shakes loose the company keeps. A young noble, Osgar the Younger, intends to seize the exile and recover his hunting rights.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false
+  },
+  "naked": [
+   "Lothiel Fernbrook",
+   "Osgar the Younger"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 94,
+  "s": 4
+ },
+ {
+  "fx": "n11020-1.user.json",
+  "card": "A steward, Lothiel Fernbrook, came down from higher ground and asked for you by name. She wants the exile returned alive to her at the ford, the fee is fixed, and what else shakes loose the company keeps. If the company fails, Lothiel loses the ferry and hunting rights at the ford, and her household will be forced from its holding when the lord reclaims them. Search the river ford's shallows for signs of the exile seen there. A young noble, Osgar the Younger, intends to seize the exile and recover his hunting rights. She wipes her hands on her coat while saying that she cannot risk the lord taking the ford back.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Lothiel Fernbrook",
+   "Osgar the Younger"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 113,
+  "s": 6
+ },
+ {
+  "fx": "n11030-1.user.json",
+  "card": "A ruler's messenger came at first light and would not name the sender until terms were set. If the inspection fails, the fort may lose the Greenmark woodlot when the line is redrawn. The western border stone at Greenmark Clearing must be inspected for signs of tampering, the pay is the agreed coin, and what the road turns up. A raider intends to push the clearing's boundary outward to claim timber for his band. The messenger waits to hear your report before he will move on.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [],
+  "coined": [],
+  "opens": false,
+  "w": 86,
+  "s": 5
+ },
+ {
+  "fx": "n11030-1.user.json",
+  "card": "A rider was waiting at first light and would not name the place until the terms were set. If the company fails, the fort will lose the Greenmark woodlot used for winter stores when the line is redrawn in law. The western border stone at Greenmark Clearing must be inspected for signs of tampering, the pay is the agreed coin, and what the road turns up. A raider band wants to push the clearing's boundary outward to claim timber for his band. The stone's setting may show fresh work or a recent marker moved; the report must say which.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [],
+  "coined": [],
+  "opens": true,
+  "w": 99,
+  "s": 5
+ },
+ {
+  "fx": "n11040-1.user.json",
+  "card": "A low official at the fort who runs the road's fees, Vigilius, sent a rider ahead and came behind it asking for a single thing. He says, If the company fails, the Bitterpass will freeze shut and the fort will be cut off from supply wagons. He wants this season's ration left at the Bitterpass to feed the ward, the fee is as agreed, and any spoils ride home with it. A warden at the pass opposes releasing or moving the ward and will keep the belt where it lies. Vigilius rubs a thumb along a scar without noticing and adds, \"You know why I do not give more.\"",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Vigilius"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 109,
+  "s": 5
+ },
+ {
+  "fx": "n11040-1.user.json",
+  "card": "A low official at the fort who runs the road's fees, Vigilius, sent a rider ahead and came behind it. He rubs a thumb along a scar while he says he will give only half a reason and asks you for one thing. If the company fails, the Bitterpass will freeze shut and the fort will be cut off from supply wagons. He wants this season's ration left at the pass to feed the ward, the fee is as agreed, and any spoils ride home with it. A scrawny former petty ruler, Waisale the Quiet, strains at an iron belt beneath the pass and needs the feed. A warden at the pass keeps the ward confined and will block any party that tries to deliver or divert the ration.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Vigilius",
+   "Waisale the Quiet"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 129,
+  "s": 6
+ },
+ {
+  "fx": "n11050-1.user.json",
+  "card": "an elven apiarist, Nithonda, has ridden in out of the weather and asks for the boss by name, she wants to join the company and the fee is as agreed, and the company keeps what it hauls back. If she is not recovered, the fort loses the clearing's winter honey allotment and the pledged stores will be claimed by rival bands. Ride to the beekeepers' clearings the fort named and question the survivors, and gain entry to the yards with the fort's pass to learn who remains. a mercenary hopes to take any captive and sell them for coin. The fort's pass may be checked at Mirehold Watch on the way in.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false
+  },
+  "naked": [],
+  "coined": [],
+  "opens": false,
+  "w": 112,
+  "s": 5
+ },
+ {
+  "fx": "n11050-1.user.json",
+  "card": "An elven apiarist, Nithonda, arrived out of the weather and asked for the boss by name. If this fails, the fort loses the clearing's winter honey allotment and the pledged stores will be claimed by rival bands. Ride to the beekeepers' clearings the fort named and question the survivors using the fort's pass to enter the yards, the fee is as agreed, and the company keeps what it hauls back. A mercenary band intends to sell the captive for coin. She speaks playful and stubborn.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false
+  },
+  "naked": [
+   "Nithonda"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 85,
+  "s": 5
+ },
+ {
+  "fx": "n11060-1.user.json",
+  "card": "A farmer, Firaelion, was let in past the hour and apologised for the hour. If the men are not brought, Firaelion says his remaining seed and stores will be taken by creditors because he cannot plant alone. He asks you to go to the White Stag Shrine to meet him and search the shrine for recent signs using only what he told you, the pay is plain coin, and the road's yield goes to the company. Raiders will oppose this and will try to avoid capture and keep their companions free. He counted the soldiers in the yard while he spoke and kept watching them as he finished his plea.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Firaelion"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 110,
+  "s": 5
+ },
+ {
+  "fx": "n11060-1.user.json",
+  "card": "A widower from the burned ridge, devout and blunt in manner, Firaelion was let in past the hour and apologised for the hour. If the men are not brought, Firaelion says his remaining seed and stores will be taken by creditors because he cannot plant alone. He wants you to meet him at the White Stag Shrine and search the shrine for recent signs using only what he told you, the pay is plain coin, and the road's yield goes to the company. A raider means to avoid capture and keep his companions free. He counts the soldiers in the yard while he speaks.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Firaelion"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 104,
+  "s": 5
+ },
+ {
+  "fx": "n11070-1.user.json",
+  "card": "A city merchant turned patron, Savor Sorrowsong, came at first light and named a price before being asked. \"If the list is not recovered, the patron's charter that unlocks promised funds for Savor's artists will be void and the pledge money will be lost,\" he says. At the Waning Oath chapel, recover the rolled list by searching the shrine and grounds for signs the list passed through, the coin comes at the finish, with the pick of what the job turns up. A keeper intends to burn the list to protect the named priest. He counts the soldiers in the yard as he says, \"Find it cleanly and fast.\"",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Savor Sorrowsong"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 109,
+  "s": 5
+ },
+ {
+  "fx": "n11070-1.user.json",
+  "card": "A city merchant turned patron, Savor Sorrowsong, was waiting at first light and counted the soldiers in the yard while he named a price and said he needed a rolled list returned, the coin comes at the finish, with the pick of what the job turns up. If the list is not recovered, the patron's charter that unlocks promised funds for Savor's artists will be void and the pledge money will be lost. At the Waning Oath chapel, search the shrine and grounds for signs the list passed through. A keeper opposes the recovery and will try to burn the list to protect the named.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Savor Sorrowsong"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 105,
+  "s": 4
+ },
+ {
+  "fx": "n11080-1.user.json",
+  "card": "A trading-house agent, Plente, walked in with the market crowd and would not give a reason until the door was shut. If this fails, Plente says the trading house will lose its reserve chest and the market stalls will close. They want the beekeepers' clearings searched and the wax-workers and painters questioned, the pay is plain coin, and the road's yield goes to the company. A counterfeiter intends to escape arrest and keep his dies. Plente keeps one hand on the door frame and says you must bring the forger to Hillwater market.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Plente"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 93,
+  "s": 5
+ },
+ {
+  "fx": "n11080-1.user.json",
+  "card": "A trading-house agent, Plente, walked in with the market crowd and kept one hand on the door frame while asking for help. If this fails, Plente says the trading house will lose its reserve chest and the market stalls will close. Plente wants the counterfeiter stopped and the person responsible delivered to Hillwater market, the pay is plain coin, and the road's yield goes to the company. The task now is to search the beekeepers' clearings and question the wax-workers and painters there. The counterfeiter opposes arrest and will try to escape and keep his dies.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Plente"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 96,
+  "s": 5
+ },
+ {
+  "fx": "n11090-1.user.json",
+  "card": "A bridgekeeper, Abarne Stonebridge, holds their gloves, came behind a letter that said less, and asks what the company has lost lately. If the company fails, the loggers' winter huts will be burned and families driven from their camps, wrecking the season's supplies. You are to search the cooking sheds and speak with the families at the loggers' winter huts using Abarne's directions. An enforcer means to keep Kyknos under guard and keep the tolls running. Abarne wants to receive Kyknos alive, the pay is honest coin, and any small spoils besides.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Abarne Stonebridge",
+   "Kyknos"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 92,
+  "s": 5
+ },
+ {
+  "fx": "n11090-1.user.json",
+  "card": "A keeper of the ford, Abarne Stonebridge, arrived behind a brief letter, holds their gloves and says, 'I need Kyknos delivered alive,' the pay is honest coin, and any small spoils besides. A sickly peasant, Kyknos, hawked ham and pie at the logging camps and is said to be trying to slip into the Old-growth to hide. He warns that if the company fails, the loggers' winter huts will be burned and families driven from their camps, wrecking the season's supplies. This step must search the loggers' winter huts, open the cooking sheds, and speak with the families for anyone sheltering Kyknos. An enforcer works the road to keep Kyknos under guard and keep the tolls running, and they will try to stop questions.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Abarne Stonebridge"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 124,
+  "s": 5
+ },
+ {
+  "fx": "n11100-1.user.json",
+  "card": "A grain trader from the fort with a ruined stall and urgent creditors, Anese, was let in past the hour and moved in a hurry. If this fails, Anese loses the grain she pledged as collateral and her creditors will seize her market stalls. She wants the harvest taken into her possession and delivered to her, the fee is as agreed, and the company keeps what it hauls back. The task is to inspect Hearthgate Crossing for the convoy route and any marks left at the road entrance. A beggar plans to seize the granary's grain for his band and may be at the crossing. She will not look at the door while she says, \"Find any marks at the road entrance and tell me what they show.\"",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [],
+  "coined": [],
+  "opens": false,
+  "w": 128,
+  "s": 6
+ },
+ {
+  "fx": "n11100-1.user.json",
+  "card": "A grain trader from the fort with a ruined stall and urgent creditors, Anese, was let in past the hour and did not hide her hurry. She will not look at the door as she says that if they fail she will lose the grain she pledged as collateral and creditors will seize her market stalls. She wants Hearthgate Crossing inspected for the convoy route and for any marks left at the road entrance, the fee is as agreed, and the company keeps what it hauls back. A beggar means to seize the granary's grain for his band and so stands in the way.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [],
+  "coined": [],
+  "opens": false,
+  "w": 104,
+  "s": 4
+ },
+ {
+  "fx": "n11110-1.user.json",
+  "card": "An aged elven steward, Ginnade the Elder, came behind a letter that said less and said the whole of it standing. If the deserter is not returned the border lord will seize the village's tithe chest of winter grain, Ginnade says. She wants Thorncleft Clearing searched and its hunters and elders questioned for the deserter, the coin comes when it is done and anything carried home is the company's. The clearing's hunters keep their own counsel and the deserter once served as a soldier, so answers will be guarded. Ginnade keeps turning something over in one palm while she speaks.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Ginnade the Elder"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 100,
+  "s": 5
+ },
+ {
+  "fx": "n11110-1.user.json",
+  "card": "An aged elven steward, Ginnade the Elder, came behind a brief letter and keeps turning something over in one palm as he says the whole of it standing: \"Seize the deserter and hand him over.\". \"If he is not returned the border lord will take our winter grain,\" he says. The steward wants Thorncleft Clearing searched and its hunters and elders questioned, the coin comes when it is done, and anything carried home is the company's. A hunter in the ring is known to shelter runaways and will not speak for free. Ginnade speaks flat and steady as he watches you decide.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Ginnade the Elder"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 102,
+  "s": 5
+ },
+ {
+  "fx": "n11120-1.user.json",
+  "card": "A miller, Vincelle of Millbrook, walked in with the market crowd and turns a ring around one finger as she speaks. She says the chest holds the deed and the sealed pledge that protect her from seizure, and that she will lose her mill if she cannot show them. She wants you to travel to Millbrook's burial road and question the pallbearers she described, the fee is as agreed, and any spoils ride home with it. A sailor plans to keep the chest and present it at Millbrook as proof of his claim. She brought no one with her.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false
+  },
+  "naked": [
+   "Vincelle of Millbrook"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 99,
+  "s": 5
+ },
+ {
+  "fx": "n11120-1.user.json",
+  "card": "a miller of Millbrook, Vincelle of Millbrook, walked in with the market crowd. She turns a ring around one finger and says the chest holds the deed and the sealed pledge that protect her from seizure. She wants you to find and question the pallbearers on Millbrook's burial road, using her description, the fee is as agreed, and any spoils ride home with it. A sailor among the wake took the iron-bound chest and plans to keep it to present at Millbrook as proof of his claim.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false
+  },
+  "naked": [],
+  "coined": [],
+  "opens": false,
+  "w": 87,
+  "s": 4
+ },
+ {
+  "fx": "n11130-1.user.json",
+  "card": "A tenant of the burned farm, Earnona, sent word twice before coming and asks what the company has lost lately while she keeps turning something over in one palm. She says if you fail the chest stays hidden and she cannot raise coin to buy back her farm's deed, leaving her land to the raiders. She wants you to search the beekeepers' clearings for traces the men left, with the pay the agreed coin, and what the road turns up. A woodsman opposes you by selling his idol-shard and the men's names to the highest bidder.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false
+  },
+  "naked": [
+   "Earnona"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 96,
+  "s": 4
+ },
+ {
+  "fx": "n11130-1.user.json",
+  "card": "A tenant of the burned farm, Earnona, sent word twice before coming and, while turning a carved bead in one palm, says the chest must be found before the buyers get the men's names. She says that if the company fails the chest stays hidden and she cannot raise coin to buy back her farm's deed, leaving her land to the raiders. She wants traces the men left in the beekeepers' clearings, and the pay is the agreed coin, and what the road turns up. A woodsman opposes her by selling his idol-shard and the men's names to the highest bidder. Those clearings hold only thin traces and a buyer could lift them before you do.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false
+  },
+  "naked": [
+   "Earnona"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 116,
+  "s": 5
+ },
+ {
+  "fx": "n11140-1.user.json",
+  "card": "The tollwarden, Trihild of the Pass, came back a second time and was in a hurry. She laughs in the wrong place and says her scouts last saw the captive in the Western Forests. If you fail, the Pass loses the captive and merchants will avoid the road, shutting off its trade. She wants you to search the Western Forests where her scouts last saw anyone taken, using her bearings, and have the captive brought back, the fee is as agreed, and the company keeps what it hauls back. A poacher opposes this and intends to keep the captive long enough to sell them on the next trade night.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Trihild of the Pass"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 109,
+  "s": 5
+ },
+ {
+  "fx": "n11140-1.user.json",
+  "card": "A tollwarden, Trihild of the Pass, came back a second time in a hurry and wants the captive taken from the road returned, the fee is as agreed, and the company keeps what it hauls back. If the company fails, the Pass loses the captive and merchants will avoid the road, shutting off its trade. Search the Western Forests where Trihild's scouts last saw anyone taken, using the warden's bearings. A poacher means to keep the captive long enough to sell them on the next trade night. Trihild laughs in the wrong place and says the scouts marked the last sighting near a thin valley of old fir. The work must find the captive or find where the trail ended before the sale night arrives.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false
+  },
+  "naked": [
+   "Trihild of the Pass"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 125,
+  "s": 6
+ },
+ {
+  "fx": "n11150-1.user.json",
+  "card": "A forewoman of an Ashfire camp, Hrefgerda Nightrunner, walked in with the market crowd and set a written list on the table. She watches your hands, not your face, and says, \"If the banner is not returned, my lord will lose the pledge that binds his levy and thus lose the claim that keeps the charcoal concessions.\" She wants the Moss-Wreathed Banner returned and handed to her at Ashfire Ring, the fee is fixed, and what else shakes loose the company keeps. She named Ember Clearing among the charcoal-burners' camps as the place to search for it. A warden and armed charcoal-burners hold the clearing and will contest anyone who comes for the banner.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Hrefgerda Nightrunner"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 114,
+  "s": 4
+ },
+ {
+  "fx": "n11150-1.user.json",
+  "card": "A steward, Hrefgerda Nightrunner, walked in with the market crowd and had the whole of it written out. She says that if the banner is not returned, her lord will lose the pledge that binds his levy and thus lose the claim that keeps the charcoal concessions. She says \"Find it at Ember Clearing and bring it to Ashfire Ring,\" while she watches your hands, not your face, the fee is fixed, and what else shakes loose the company keeps. Warden crews patrol the charcoal-burners' camps and will resist strangers. Ember Clearing is a low ring of tents and pits where charcoal is finished and stacked.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Hrefgerda Nightrunner"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 106,
+  "s": 5
+ },
+ {
+  "fx": "n11160-1.user.json",
+  "card": "A miller, Juliane of Millbrook, came down from higher ground and kept looking back down the road. If the cup is not returned, Juliane says she will lose her final trade contract because traders refuse untested grain without her proof cup. She wants you to go to the loggers' winter huts and ask who saw her silver cup last, the fee is as agreed, and the company keeps what it hauls back. A roadwarden wants to keep the cup and press the elf into his service. She keeps turning something over in one palm and says the cup proves her grain.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Juliane of Millbrook"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 101,
+  "s": 5
+ },
+ {
+  "fx": "n11160-1.user.json",
+  "card": "A miller, Juliane of Millbrook, came down from higher ground and kept looking back down the road. If the cup is not returned, Juliane will lose her final trade contract because traders refuse untested grain without her proof cup. She wants you to go to the loggers' winter huts and learn who last saw her silver cup, the fee is as agreed, and the company keeps what it hauls back. A roadwarden opposes recovery and means to keep the cup and press an elf into his service. She keeps turning something over in one palm as she adds, \"I need proof before the traders will buy my grain.\"",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Juliane of Millbrook"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 108,
+  "s": 5
+ },
+ {
+  "fx": "n11170-1.user.json",
+  "card": "A matron, Bakene, came on foot and had rehearsed what she would say. She turns a ring around one finger as she says, \"If this fails, the charcoal contract will be torn up and the camp forced out.\" Bakene wants a report that the charcoal-burners' camp will hand Quiver Wexcombe to her, paying the agreed coin and what the road turns up. A warden intends to keep Quiver Wexcombe safe within the wood. Bakene spoke plainly and without flourish while she asked for this answer.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false
+  },
+  "naked": [
+   "Bakene"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 85,
+  "s": 4
+ },
+ {
+  "fx": "n11170-1.user.json",
+  "card": "A forewoman of a charcoal-burners' camp, Bakene, came on foot and had rehearsed it. She turns a ring around one finger and says she wants Quiver Wexcombe into her custody, the pay is the agreed coin, and what the road turns up. Bakene says the charcoal contract with the fort will be torn up if she loses Quiver, leaving the camp without buyers and forcing its people out. She asks you to question the charcoal-burners' camp about Quiver Wexcombe. A warden sworn to keep Quiver safe within the wood stands against that.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [],
+  "coined": [],
+  "opens": false,
+  "w": 92,
+  "s": 5
+ },
+ {
+  "fx": "n11180-1.user.json",
+  "card": "A river-stall trader, Aime of the Ford, came back a second time and wanted it settled the same day. Aime says that if the company fails to deliver the reliquary at Silvertine Crossing, he will forfeit the pledged trade-right that keeps his crossing berth and rival merchants will seize his stall. He wants you to search the charcoal-burners' camps for signs of the lost reliquary using his instructions, the fee is as agreed, and the company keeps what it hauls back. Charcoal-burners in the camps oppose any digging and will try to prevent work. He says, \"Search the burners' camps with care,\" while holding his gloves and not putting them on.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Aime of the Ford"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 111,
+  "s": 5
+ },
+ {
+  "fx": "n11180-1.user.json",
+  "card": "A river-stall trader, Aime of the Ford, came back a second time and wants it settled the same day. \"If the company fails to deliver the reliquary at Silvertine Crossing, Aime will forfeit the pledged trade-right that keeps his crossing berth, and rival merchants will seize his stall,\" he says. Find signs of the lost elven reliquary in the charcoal-burners' camps using Aime's instructions, the fee is as agreed, and the company keeps what it hauls back. The charcoal-burners will try to prevent any digging in the camps. He holds his gloves and does not put them on as he speaks.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Aime of the Ford"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 101,
+  "s": 5
+ },
+ {
+  "fx": "n11190-1.user.json",
+  "card": "A foreman, Fainorume Palebough, came in wet through and named a price before you asked. He keeps a hand flat on the table and says he must receive the deserter alive, the fee as agreed and any spoils ride home with it. If the deserter is not returned, the logging crew will lose the pledged cutting rights and be driven from the winter huts. The task now is to search the loggers' winter huts he named for recent traces of flight. A hunter opposes this and means to seize the deserter and sell her to a rival crew.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Fainorume Palebough"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 98,
+  "s": 5
+ },
+ {
+  "fx": "n11190-1.user.json",
+  "card": "A foreman of the western logging outfit, Fainorume Palebough, came in wet through and named a price before you asked. He keeps a hand flat on the table and says he needs the deserter alive for custody, the fee is as agreed, and any spoils ride home with it. If the deserter is not returned, the logging crew will lose the pledged cutting rights and be driven from the winter huts. You are to search the loggers' winter huts he named for recent traces of flight. A hunter aims to seize the deserter and sell her to a rival crew.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Fainorume Palebough"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 100,
+  "s": 5
+ },
+ {
+  "fx": "n11200-1.user.json",
+  "card": "An agent of the Bishop's house, Tivela, came on foot and said she wants custody of the flood-threatened village at the church terrace, the fee is as agreed, and any spoils ride home with it. She turns a ring around one finger as she says the Bishop will lose the villagers' pledged labor that feeds its stores if the flood scatters the households. She needs the church terrace, the high meadow by the old elf road, scouted to learn who holds the villagers' carved pledge-token. A lender intends to keep the villagers bound by holding that token and may try to hold it on the terrace. She was in a hurry and did not hide it.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false
+  },
+  "naked": [
+   "Tivela"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 116,
+  "s": 5
+ },
+ {
+  "fx": "n11200-1.user.json",
+  "card": "An agent of the Bishop's house, Tivela, came on foot, in a hurry, and set a damp cloak on the table. She turns a ring around one finger and says she needs the church terrace secured before the water reaches Low Hollow, the fee is as agreed, and any spoils ride home with it. If the company fails, the Bishop loses the villagers' pledged labor that feeds its stores when the flood scatters the households. This step is to scout the church terrace, the high meadow by the old elf road, and report whether it will hold the village. A lender opposes the move and will try to keep the villagers bound by holding their carved pledge-token.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Tivela"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 117,
+  "s": 5
+ },
+ {
+  "fx": "n11210-1.user.json",
+  "card": "A caravan patron, Erlendr, arrived out of the weather and kept looking back down the road. He says his ward will die without the healer's care. He wants Nettleford Clearing searched for signs and witnesses of the healer, and the coin comes when it is done, and anything carried home is the company's. A warden has been driving people off the hollow. Erlendr laughs in the wrong place as he says, \"Bring them back alive.\"",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Erlendr"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 75,
+  "s": 5
+ },
+ {
+  "fx": "n11210-1.user.json",
+  "card": "A caravan patron from the west, Erlendr, arrived out of the weather and kept looking back down the road. Their ward will die without the healer's care, Erlendr says, and he laughs in the wrong place. He wants signs and witnesses of the healer from Nettleford Clearing, the coin comes when it is done, and anything carried home is the company's. A warden of the clearing drives folk off and will contest any questioners there. Erlendr keeps a small leather case in his lap and will wait at the fort until you bring news.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Erlendr"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 94,
+  "s": 5
+ },
+ {
+  "fx": "n11220-1.user.json",
+  "card": "A forewoman of the winter huts, Renenfwe Leafshade, came behind a letter that said less and would not sit down. She stands too close and says she wants her niece returned, the fee is as agreed, and the company keeps what it hauls back. \"If my niece is not returned, my winter huts will be burned and the logging hold lost,\" she says. You are to travel to the loggers' winter huts and question survivors of the siege to learn where the niece was taken. Raiders who struck the huts stand between you and clear answers.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Renenfwe Leafshade"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 96,
+  "s": 5
+ },
+ {
+  "fx": "n11220-1.user.json",
+  "card": "A Forewoman of the winter huts, Renenfwe Leafshade, came behind a letter that said less and would not sit down. She says the winter huts will be burned and the logging hold lost if her niece is not returned. She stands too close as she asks that survivors at the winter huts be questioned and any news of her niece found. Raiders hold the clearing around the huts and will resist anyone who asks. The fee is as agreed, and the company keeps what it hauls back.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Renenfwe Leafshade"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 87,
+  "s": 5
+ },
+ {
+  "fx": "n11230-1.user.json",
+  "card": "A roadside innkeeper, Ildebad, came behind a letter that said less and wanted it settled the same day. If this fails, he says the road-keeper will seize his inn when he cannot return the pledged chest. He wants you to go to Highwater Ford and question ferrymen and passing drivers about the night the money went missing, the coin comes at the finish, with the pick of what the job turns up. He warns a brigand intends to keep the payment and the performer bought with it. He will not take the chair offered and repeats that it must be settled today.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Ildebad"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 102,
+  "s": 5
+ },
+ {
+  "fx": "n11230-1.user.json",
+  "card": "An innkeeper, Ildebad, came behind a letter that said less and asked it settled the same day. He says: \"Ildebad's inn will be seized by the road-keeper when he cannot return the pledged chest.\" He wants the payment recovered, the coin comes at the finish with the pick of what the job turns up. He asks you to go to Highwater Ford and question ferrymen and passing drivers about the night the money went missing. A brigand opposes the search and intends to keep the payment and the performer he bought. He will not take the chair offered while he speaks.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Ildebad"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 101,
+  "s": 5
+ },
+ {
+  "fx": "n11240-1.user.json",
+  "card": "An elven wool merchant, Nesulmawen Ashveil, sent a servant with a token and followed to the fort and asks that Fathasa Fernbrook be brought to Thornvein Hollow, the coin comes when it is done, and anything carried home is the company's. She turns a ring around one finger and says, \"You must not let her vanish.\" Nesulmawen says failure will let the runner walk off with her last promised bale and the secret note that keeps her buyers, breaking her deliveries and costing the pledges that hold her stall. Question Nesulmawen's stallhands at Harrowmarket about the lost shipment. A forester plans to protect the Thornvein handoff and its runners.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false
+  },
+  "naked": [
+   "Nesulmawen Ashveil"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 109,
+  "s": 4
+ },
+ {
+  "fx": "n11240-1.user.json",
+  "card": "An elven wool merchant, Nesulmawen Ashveil, sent a servant with a token and followed. She turned a ring around one finger as she said she wants her stallhands at Harrowmarket questioned about the lost shipment, the coin comes when it is done, and anything carried home is the company's. She says failure will let the runner walk off with her last promised bale and the secret note that keeps her buyers, breaking her deliveries and costing the pledges that hold her stall. A forester will try to protect the Thornvein handoff and its runners.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Nesulmawen Ashveil"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 94,
+  "s": 4
+ }
+]

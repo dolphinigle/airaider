@@ -1765,7 +1765,9 @@ export class Game {
       // blank it so the writer opens from the client's telling, not a stock scaffolding line
       bible: stagedBible,
       // beat 1 has no record yet — an all-empty storyState scaffold is pure parse-load
-      storyState: chain.beatIndex === 0 && !isFinale ? undefined : chain.story,
+      storyState: chain.beatIndex === 0 && !isFinale ? undefined
+        : focal?.character?.role === 'merc' ? chain.story
+        : this.deSoldier(chain.story),
       relevantLore,
       // beat 1's lore is trimmed to the ground this step actually stands on: a second entry is
       // always a later step's ground, and `relationPhrase` reads the same on every entry, so it
@@ -2599,7 +2601,9 @@ export class Game {
    *  measured 2/10 on a live sweep ("an elven apiarist, Nithonda, stands in the yard…"). The
    *  engine owns the first character; no prompt rule is needed for a one-line deterministic fix. */
   private capitalizeCard<T extends { situation: string; title: string }>(out: T): T {
-    const up = (t: string) => t.replace(/^\s*([a-z])/, (_m, c: string) => c.toUpperCase());
+    const up = (t: string) => t
+      .replace(/^\s*([a-z])/, (_m, c: string) => c.toUpperCase())
+      .replace(/([.!?]["'\u201d]?\s+)([a-z])/g, (_m, sep: string, c: string) => sep + c.toUpperCase());
     return { ...out, situation: up(out.situation), title: up(out.title) };
   }
 
@@ -2639,6 +2643,18 @@ export class Game {
     if (/\b(your task is|this step is|the hire)\b/i.test(`${out.situation} ${out.job}`))
       d.push('scaffold voice on the card ("your task is", "this step is", "the hire") — say the errand as the outcome wanted, in world words');
     return d;
+  }
+
+  /** Strip the company's own soldiers out of the story record handed to a CARD writer. The
+   *  resolver names them (it must — they fought), the record keeps those sentences, and the next
+   *  card reads them and stages a soldier by name. The roster is never card material unless the
+   *  saga is ABOUT one of them. */
+  private deSoldier<T>(story: T): T {
+    const names = this.rosterForWriters().names;
+    if (!names.length) return story;
+    const esc = (x: string) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(`\\b(?:${names.flatMap(n => [esc(n), esc(n.split(/\s+/)[0]!)]).join('|')})('s)?\\b`, 'g');
+    return JSON.parse(JSON.stringify(story).replace(re, (_m, pos: string) => pos ? "the party's" : 'the party')) as T;
   }
 
   private rosterForWriters(): { names: string[]; pronouns: Record<string, string> } {
