@@ -19,6 +19,8 @@ Airaider is a persistent, single-player, **AI-driven character-collection fort g
 ## Supporting
 
 - **[BIBLE.md](BIBLE.md)** — the LOCKED bible-authoring spec (wins over QUEST_BIBLE.md where they differ) · **[PROMPT_RULES.md](PROMPT_RULES.md)** — prompt-craft rules (v2 code paths; principles current). · **[WRITING_CHECKPOINT.md](WRITING_CHECKPOINT.md)** — ⛳ the designer-approved writing baseline (2026-08-25) + what remains to implement. · **[PROSE_METHOD.md](PROSE_METHOD.md)** — ⭐ card-writing guiding principles + the blind-measurement protocol and its five traps. Read before touching any writing prompt.
+- **[CARD_GOLD_STANDARD.md](CARD_GOLD_STANDARD.md)** — ⛳ what a saga's FIRST card must be: the goal in one sentence, the designer's own Sultan sample read clause by clause, the seven testable properties, and the four-question cold-reader test every writing iteration is scored against.
+- **[REFERENCE_CHARACTER_INTROS.md](REFERENCE_CHARACTER_INTROS.md)** — all 22 of Sultan's Game's character introductions, verbatim, and the structural fact behind them: a character is introduced on their OWN CARD with a role-title, and quests afterwards use the bare name freely.
 - **[DOGFOODING.md](DOGFOODING.md)** — 🔒 how this game gets playtested: the text UI is at PARITY with the web GUI, and playtesting means *playing* a real UI, never simulating one. Read before claiming anything is playtested.
 - **[TEMPO.md](TEMPO.md)** — 🟡 **goals** for the current phase: no dead time. Async work in the fort phase + a reckoning that unfolds. Measured latency baseline lives here; lifts `STORY_ENGINE §9`'s prototype exemption.
 - **[AI_PROVIDER.md](AI_PROVIDER.md)** — model selection, structured-output strategy.

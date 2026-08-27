@@ -1,0 +1,58 @@
+{
+ "seed": 6110,
+ "chainId": "chain-14",
+ "title": "The Reluctant Heir",
+ "bible": {
+  "title": "The Reluctant Heir",
+  "kernel": "A landholder hires the company to fetch his rightful heir who refuses to return.",
+  "cast": [
+   {
+    "name": "Falandamil Palebough",
+    "who": "A minor lord of a ruined demesne near the Western Forests, anxious about his line.",
+    "want": "to have his rightful heir produced and returned to his custody",
+    "trade": "landholder",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Olyffe",
+    "who": "A young woman raised as a servant among wandering players, secretly the named heir who fled custody.",
+    "want": "to remain at liberty in the forest with the troupe and avoid handover",
+    "trade": "servant",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Wanam-Jaa",
+    "who": "A feral leader of a human wolf-pack that ranges the old woods, blunt and hard to bargain with.",
+    "want": "to keep Olyffe as part of her pack",
+    "trade": "hunter",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   }
+  ],
+  "situation": "Olyffe fled her lord's household and has been living with a traveling troupe sheltered in the Western Forests, guarded and claimed by Wanam-Jaa's pack. Falandamil knows only that the heir vanished into the woods and fears rivals will take his claim if she does not return.",
+  "goal": "to produce the named heir and return them safely to the client's custody",
+  "arc": [
+   "Travel to the Greenmantle Lodge the client named and search the troupe's camp for any trace of the missing heir → yields: a Palebough brooch hidden in a performer's trunk that points to Hollowbriar Thicket as the troupe's next camp.",
+   "Track the troupe to Hollowbriar Thicket using the brooch and confront the camp to take custody of the heir while the pack is present → yields: Olyffe captured from Wanam-Jaa's pack and brought into custody.",
+   "Ride to the Palebough Hall the client named and present the captured heir to the client while Wanam-Jaa appears to reclaim her, and overcome Wanam-Jaa there to complete the delivery"
+  ],
+  "twist": null,
+  "tensions": [
+   "Wanam-Jaa claims a blood-right over any young who comes under her protection.",
+   "Troupe members will fight to keep one of their own from being taken by outsiders.",
+   "Rival claimants and merchants press to profit from the demesne if no heir appears soon."
+  ],
+  "openDirections": [
+   "If the heir is not returned quickly, outside bidders and wood-merchants will press legal and violent moves to seize the hall's standing rights."
+  ],
+  "stakeIfLost": "If the company fails, the family's claim to the forest will be lost and rival interests will move to seize the demesne's standing rights.",
+  "arrival": "walked in with the market crowd · would not sit down"
+ },
+ "shipped": {
+  "title": "Search Greenmantle troupe camp",
+  "situation": "A landholder, Falandamil Palebough, walked in with the market crowd and would not sit down. He laughs in the wrong place and says, \"They took my child from the troupe.\" He says he needs the named heir produced and returned to his custody. If the company fails, the family's claim to the forest will be lost and rival interests will move to seize the demesne's standing rights. The players at Greenmantle keep secrets and stage false trails, and a hunter is said to watch the approaches, and he offers plain coin and the road's yield to the company.",
+  "job": "Travel to Greenmantle Lodge and search the troupe's camp for any trace of the missing heir."
+ }
+}

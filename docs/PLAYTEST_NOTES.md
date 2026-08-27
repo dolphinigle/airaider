@@ -30,7 +30,7 @@ one sentence anyway?
 
 ---
 
-## N2 🆕 Saga cards use their people with no introduction — from the very first card
+## N2 ✅ Saga cards use their people with no introduction — from the very first card
 
 > *"for quest chains: the game uses the characters without introduction even at start (pls find the
 > corresponding quest chain and quest: 'look the ford over for Adeliza'). no context so no idea
@@ -78,6 +78,51 @@ it matters, and why it takes hired steel has failed."* The rule exists and did n
   the hook and its WHY"*. Is beat 1 failing specifically, or do all beats do this?
 - Related and possibly the same root: *"the one at the heart of this would fetch a ransom"* — the
   card's closing line refers to a person it never named.
+
+### ✅ FIXED 2026-08-27 — and the fix was the INPUTS, not the rules
+
+Full working: `v3/scripts/prosebench/INTRO_COHERENCE.md` (can it be prompted? measured: no),
+`ROUND1_PROMPT_AUDIT.md` and `ROUND2_3_INPUT_SHAPING.md` (nine blind Opus writer-reports), against
+the target in `docs/CARD_GOLD_STANDARD.md`.
+
+**The principle has a name.** The **known-new contract**, and its article rule, the **anaphoric
+chain**: a first mention takes an INDEFINITE reference, later mentions definite ones. A proper noun
+is inherently definite, so *"Ermina meets you at the river ford"* tells a first-time reader they
+already know her. A presupposition failure, not a style preference — and the designer's own
+hand-written Sultan sample obeys it exactly (*"A female craftsman who calls herself an inventor…"*,
+the name arriving only in the result).
+
+**Prompting it does not work.** 2×2 over three real captured prompts, run twice: the rule's effect
+on unexplained proper nouns reversed sign between runs. Consistent with §0/L18 — wording is the
+weakest lever this project has.
+
+**What did work, in order of how much:**
+
+1. **The engine deals what the writer was inventing.** `stakeIfLost` (what BREAKS if this fails,
+   carrying its mechanism), `standsAgainst` (who is already known to oppose it), `arrival` (how it
+   reached the fort), `clientTell` (one physical habit). Two were named unprompted by the blind
+   writers; one writer, handed a written stake, said *"the one question cards usually lose is the
+   one the input handed me pre-written."*
+2. **The payload stops dealing what nobody could use** — `rarity`, the beat-1 place suggestion, the
+   second lore entry, `relationPhrase`, `loreId`, `focalName`, and the stake rumour that was pasted
+   35/36 times while naming no one.
+3. **The rule, restated positionally** — the card never opens on a name; its first words say what
+   someone IS; whatever you call them first you call them every time.
+
+**Five live-capture rounds fixed five defects the change itself introduced**, each found by reading
+real cards: a sticky example collapsing every trade to "steward"; my own pre-shaped `standsAgainst`
+string pasted on 6/6 cards; the tell welded to the pay; a bare-name regression caused by
+over-stressing the article rule; and the card switching to an unintroduced name three sentences in.
+
+**Two things this did NOT fix, both for the designer:**
+- **The stake rumour is now suppressed whenever `stakeIfLost` exists** (`STAKE=1` forces it back).
+  The A/B that shipped the rumour measured it against NOTHING; it has never been measured against a
+  real why.
+- **Beat 1 is structurally a travel-and-ask errand** (genesis: *"step 1 LOCATES or gains access; it
+  never grabs"*), so *"why armed strangers"* can only be answered by a danger one step ahead. Writer
+  B's unprompted proposal: make each step's friction carry an ACTOR present on THAT ground, not an
+  atmosphere. Not built.
+
 
 ## N3 🆕 A saga's next beat should generate itself, not go back to the lead board
 

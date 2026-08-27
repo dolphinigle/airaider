@@ -1,0 +1,59 @@
+{
+ "seed": 6330,
+ "chainId": "chain-14",
+ "title": "The Birch Singer",
+ "bible": {
+  "title": "The Birch Singer",
+  "kernel": "A temple steward hires the company to seize a caged singer whose music sets crowds to quarrel and return them alive.",
+  "cast": [
+   {
+    "name": "Roldofin Leafshade",
+    "who": "an elven steward of a western temple who worries the singer's commotions will ruin his house.",
+    "want": "to receive the client's captive singer alive",
+    "trade": "steward",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Llevas Ashveil",
+    "who": "an elf raised in old-growth choirs now bound inside a birch cage and still singing.",
+    "want": "to remain at the grove and keep singing",
+    "trade": "singer",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Fairynn",
+    "who": "an exile woman who leads a birch-worship circle and claims the singer as sacred to her rites.",
+    "want": "to keep the singer and their song for her congregation",
+    "trade": "priest",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   }
+  ],
+  "situation": "Roldofin has hired the company to stop unrest by taking a singer believed captive at a birch shrine. The singer, Llevas, is held by Fairynn's birch-worship circle in a fenced grove. Fairynn uses Llevas' voice to call crowds, and those songs have already started quarrels in nearby clearings. The company's task is straightforward: go, seize the singer, and return them to Roldofin alive.",
+  "goal": "to bring the client's captive singer back to the client alive.",
+  "arc": [
+   "Search Birchward Hollow, the birch shrine the client named, for the caged singer the client reported → yields: a braided birch token burned with Fairynn's personal mark",
+   "Take the birch token to Dulwen Ford and ask the old trader who uses that mark → yields: directions to the grove named Birchring",
+   "Enter Birchring and demand the singer the token points to → yields: Llevas caged at the altar and Fairynn refusing to hand them over",
+   "Bring Llevas toward Birchward Hollow and stand before Roldofin while Fairynn and her followers block the clearing. Force, buy, or outwit Fairynn there and deliver Llevas to Roldofin as contracted"
+  ],
+  "twist": null,
+  "tensions": [
+   "Fairynn will not give Llevas and brings followers to defend her claim",
+   "Llevas' songs can still whip up mobs if released during the transfer",
+   "Forest patrols and worshipers know the grove's paths and will complicate travel"
+  ],
+  "openDirections": [
+   "If the singer's songs spread further, villages will arm and the region will narrow movement and trade."
+  ],
+  "stakeIfLost": "If the company fails, the client's temple will be sacked by rioters drawn by the singer and its birch reliquary burned.",
+  "arrival": "crossed the river to get here · refused food and drink"
+ },
+ "shipped": {
+  "title": "Search the birch shrine",
+  "situation": "An elven steward, Roldofin Leafshade, crossed the river to get here and refused food and drink. He rubs a thumb along a scar as he says the birch shrine in Birchward Hollow holds a singer locked in a cage. He says if the company fails, the client's temple will be sacked by rioters and its birch reliquary burned. A priest intends to keep the singer and their song for her congregation, and that priest still holds the shrine. Roldofin wants the singer brought back alive, and will give coin when it is done, and anything carried home.",
+  "job": "Search Birchward Hollow's birch shrine for the caged singer reported to the steward."
+ }
+}
