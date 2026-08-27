@@ -1,0 +1,59 @@
+{
+ "seed": 9110,
+ "chainId": "chain-14",
+ "title": "The Returner's Knot",
+ "bible": {
+  "title": "The Returner's Knot",
+  "kernel": "An exiled elf has come back with coin and the fort will try to recruit her before the lord reclaims her.",
+  "cast": [
+   {
+    "name": "Motistaari Thistledown",
+    "who": "an exiled elf recently returned to the Western Forests, quick and guarded.",
+    "want": "to secure a private landing and a barge of her own",
+    "trade": "ropewright",
+    "role": "prize",
+    "loreId": "c8"
+   },
+   {
+    "name": "Laenafil Windrow",
+    "who": "a minor lord who once banished Motistaari and keeps a private barge at the slip.",
+    "want": "to see Motistaari Thistledown returned to her custody",
+    "trade": "noble",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Tethis",
+    "who": "a rough-handed human who runs a lane yard in Brindleyard and quietly shelters exiles.",
+    "want": "to keep Motistaari safe in his yard until a fair price or favor is given",
+    "trade": "rope-maker",
+    "role": "ally",
+    "loreId": "lore-13"
+   }
+  ],
+  "situation": "Motistaari Thistledown has returned from exile richer than the lord who banished her. She hides around the beekeepers' clearings in the Western Forests and keeps to craft and river work. The fort wants to recruit her before the lord reclaims her. Laenafil still claims legal right to seize the exile, and local ropewrights and ferry folk hold the threads that lead to Motistaari.",
+  "goal": "to recruit Motistaari Thistledown into the company at the fort.",
+  "arc": [
+   "Search the beekeepers' clearings for Motistaari Thistledown, using the fort's tip → yields: a coil of fine cord sewn with Motistaari's knot and a sketched path toward Marrowfen.",
+   "Take the sketched path into Marrowfen and question the reedfolk, using the cord as proof → yields: a reedfolk's sighting of a passenger bound for Brindleyard and a scrap of ribbon bearing Laenafil Windrow's mark.",
+   "Go to Brindleyard and follow the rope-makers' trail, using the reedfolk's sighting → yields: Tethis's yard, his refusal to hand over Motistaari, and his word that Motistaari plans to claim Laenafil's private barge at Highgull Slip.",
+   "Intercept the claim at Highgull Slip and bring Motistaari to the fort, facing Laenafil in public"
+  ],
+  "twist": null,
+  "tensions": [
+   "Laenafil's open legal claim to seize any returned exile",
+   "Tethis demands payment or a favor before he will surrender Motistaari",
+   "forest folk distrust outsiders who serve lords and may block the company's approach"
+  ],
+  "openDirections": [
+   "Laenafil's kin will press for formal seizure at the slip whether the company acts or not."
+  ],
+  "stakeIfLost": "the fort loses its berth at Highgull Slip, ending a steady freight income.",
+  "arrival": "came on foot, having walked it · spoke low, and only to the boss"
+ },
+ "shipped": {
+  "title": "Find Motistaari in the beekeeper clearings",
+  "situation": "an exiled elf recently returned to the Western Forests, Motistaari Thistledown, moves among the beekeepers' clearings. The fort loses its berth at Highgull Slip if Motistaari is not brought in, ending a steady freight income. The company wants Motistaari Thistledown enlisted, the coin comes when it is done, and anything carried home is the company's. A noble seeks to seize Motistaari and carry her back to custody. A tip from the fort narrows the search to the old beekeepers' clearings near Marrowfen.",
+  "job": "Search the beekeepers' clearings for Motistaari Thistledown."
+ }
+}

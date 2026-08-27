@@ -1,0 +1,59 @@
+{
+ "seed": 9350,
+ "chainId": "chain-13",
+ "title": "Three Sales, One Collar",
+ "bible": {
+  "title": "Three Sales, One Collar",
+  "kernel": "A beekeeper hires the company to bring a named debtor to her clearing so the pledged claim can be discharged.",
+  "cast": [
+   {
+    "name": "Sjarla",
+    "who": "An aging keeper of the beekeepers' clearings who runs a small charity store.",
+    "want": "to receive the named debtor and discharge the pledged claim in her clearing",
+    "trade": "steward",
+    "role": "client",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Dothy",
+    "who": "A traveling seller recently pressed into pledge for a bad credit note and now hunted along the rivers and roads.",
+    "want": "to avoid capture and keep her freedom",
+    "trade": "merchant",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Hakon",
+    "who": "A foreman at a forge-camp near the logging ring, hard-faced and marked by old burns.",
+    "want": "to reclaim the bought pledge and press Dothy into service at his camp",
+    "trade": "smith",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   }
+  ],
+  "situation": "Sjarla asks the company to bring the named debtor to her clearing so the pledged claim can be discharged. The debtor's claim has been traded through smiths and merchants along river and wood.",
+  "goal": "To bring Dothy to Sjarla's clearing so Sjarla can discharge the pledged claim.",
+  "arc": [
+   "At Sjarla's clearing, accept the client's order to bring Dothy to the clearing → yields: a battered transfer token stamped thrice, the last mark a smith's hammer and a scrawled track toward Hakon's forge-camp.",
+   "At Hakon's Hammer, use the transfer token to press the foremen for who holds the claim next → yields: a torn sales stub signed with Lithyyorion Palebough's river-mark and a note naming Greenfold Lodge.",
+   "At Greenfold Lodge, use Lithyyorion's stub to find and free the named debtor → yields: Dothy, stripped of coin and wearing a steel collar, now in the company's hold.",
+   "At Sjarla's clearing, bring Dothy for formal discharge. Hakon arrives to press his claim and is beaten, bought, or outwitted there."
+  ],
+  "twist": null,
+  "tensions": [
+   "Hakon will insist the debt is still his to press and will come to reclaim Dothy",
+   "Lithyyorion's river-mark promises quick resale if delays occur",
+   "Greenfold keeps hunters who enforce guest silence and hide guests' names"
+  ],
+  "openDirections": [
+   "The market for pledged labor will keep trading anyone not formally discharged, pressuring the clearing beyond this job"
+  ],
+  "stakeIfLost": "If Dothy is not delivered, the clearing's winter food stores will be seized and sold to satisfy the outstanding pledge.",
+  "arrival": "came on foot, having walked it · had the whole of it written out"
+ },
+ "shipped": {
+  "title": "Deliver the named debtor",
+  "situation": "An aging steward, Sjarla, came on foot and keeps one hand on the door frame as she says, \"Bring Dothy to my clearing to discharge the pledge.\" She says if Dothy is not delivered, the clearing's winter food stores will be seized and sold to satisfy the outstanding pledge. She wants to receive the named debtor, Dothy, in her clearing so she can discharge the pledged claim, the fee is as agreed, and the company keeps what it hauls back. A smith seeks to reclaim the bought pledge and press Dothy into service at his camp.",
+  "job": "Bring Dothy to Sjarla's clearing."
+ }
+}

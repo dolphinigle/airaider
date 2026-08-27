@@ -1,0 +1,59 @@
+{
+ "seed": 9380,
+ "chainId": "chain-14",
+ "title": "The Sold Garrison",
+ "bible": {
+  "title": "The Sold Garrison",
+  "kernel": "A paymaster hires the company to recover a garrison's payroll stolen when the post fell.",
+  "cast": [
+   {
+    "name": "Iustina",
+    "who": "Paymaster of Harrowfen Garrison who hires the company and speaks as if wronged.",
+    "want": "the garrison's payroll jar",
+    "trade": "paymaster",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Osuuol",
+    "who": "Leader of the raiders who now hold the ruined garrison and patrol the forest roads.",
+    "want": "to keep the payroll jar for his band",
+    "trade": "raider",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   },
+   {
+    "name": "Galithor Elmwhisper",
+    "who": "An elven courtesan from the Western Forests who keeps small private things and strange baubles.",
+    "want": "to keep the sealed jar and its secret unless bought or sheltered",
+    "trade": "courtesan",
+    "role": "quarry",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Iustina, Harrowfen's paymaster, says the garrison fell and its payroll was taken by raiders under Osuuol. She hired the company to recover the payroll jar. Raiders hold a small sealed jar taken from the post. The Western Forests lie near where the garrison fell.",
+  "goal": "to recover the garrison's payroll jar said to have been stolen when Harrowfen fell",
+  "arc": [
+   "Search Harrowfen Garrison for the stolen payroll at Iustina's order → yields: Eglentine, a terrified clerk who names Osuuol and says raiders carried off a small sealed jar to Oakreach Clearing.",
+   "Track Osuuol's band at Oakreach Clearing to intercept the jar Eglentine described → yields: a torn, signed letter from Iustina arranging the garrison's sale and naming Moonless Hovel as the handoff.",
+   "Go to Moonless Hovel using Iustina's letter to stop the handoff → yields: Galithor Elmwhisper, who holds the small sealed jar and offers its secret for shelter or coin.",
+   "Return to Harrowfen Garrison to hand the jar to Iustina as contracted while Osuuol moves to reclaim it. The company defeats Osuuol and delivers the jar to Iustina"
+  ],
+  "twist": "Iustina sold Harrowfen to Osuuol and took the payroll before the garrison fell.",
+  "tensions": [
+   "Iustina's betrayal rewrites who really lost the payroll",
+   "Osuuol's raiders will fight to keep what they claim",
+   "Galithor demands shelter or coin in exchange for the jar's secret"
+  ],
+  "openDirections": [
+   "Whether handed over or kept, the jar's secret will draw claimants and violence across the Western Forests."
+  ],
+  "stakeIfLost": "If the company fails, the garrison's payroll will not reach the defenders and the garrison will break apart, leaving the local folk without organized defense.",
+  "arrival": "sent a rider ahead and came behind it · kept looking back down the road"
+ },
+ "shipped": {
+  "title": "Recover the payroll jar from Harrowfen Garrison",
+  "situation": "A paymaster, Iustina, sent a rider ahead and then came herself, keeping her eyes on the road. She looks at the door before answering and says, \"We need what's ours back.\" She warns that if it fails, the garrison's payroll will not reach the defenders and the garrison will break apart, leaving the local folk without organized defense. She wants the garrison's payroll jar recovered from Harrowfen Garrison, the fee is fixed, and what else shakes loose the company keeps. A raider intends to keep the payroll jar for his band and still holds the garrison's ruins against visitors.",
+  "job": "Search Harrowfen Garrison for the stolen payroll jar"
+ }
+}

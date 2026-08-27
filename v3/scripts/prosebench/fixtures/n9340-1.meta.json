@@ -1,0 +1,58 @@
+{
+ "seed": 9340,
+ "chainId": "chain-13",
+ "title": "The Reed-Runner",
+ "bible": {
+  "title": "The Reed-Runner",
+  "kernel": "A fort hires the company to snatch a runner from an old smuggler lane through the Western Forests and bring her back alive.",
+  "cast": [
+   {
+    "name": "Baseenar Salt-born",
+    "who": "lizardfolk born on salt flats who learned river lanes and reed tracks.",
+    "want": "to reach the elven corridor and slip her passengers through",
+    "trade": "runner",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Tiede Coalgate",
+    "who": "elven boundary warden who keeps an eye on the Reed-veil pass and takes quiet deals",
+    "want": "to keep the corridor open for those she will not hand over",
+    "trade": "warden",
+    "role": "obstacle",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Reja",
+    "who": "river-hand who ferries bargains and talks in docks and waystations",
+    "want": "to keep the lane's callers unknown and safe",
+    "trade": "broker",
+    "role": "ally",
+    "loreId": "lore-12"
+   }
+  ],
+  "situation": "The fort orders the company to intercept the runner who guides an old smuggler lane through the Western Forests and bring her back alive to the fort.",
+  "goal": "to seize and deliver the runner who runs the old smuggler's route through the Western Forests to the fort.",
+  "arc": [
+   "Search Fenbar Landing, the mooring the fort named, for recent signs the runner used the docks → yields: Reja the river-hand, who points to the Reed-veil pass and names warden Tiede Coalgate.",
+   "Follow Reja's lead into Reed-veil Hollow and search the reed camps for the clasp she described → yields: Padeehei Reedspear found hiding with a folded oath-braid that proves the route ferries people as well as goods.",
+   "Bring Padeehei back to Fenbar Landing to take her under the company's guard, where Tiede Coalgate arrives to stop the handover. The company beats, buys, or outwits Tiede and secures Padeehei in the fort's custody."
+  ],
+  "twist": "The runner is not only a smuggler of goods but a ferryman of people; she moves refugees and deserters through a guarded elven corridor.",
+  "tensions": [
+   "The Western Forests are patrolled by wardens who treat outsiders as threats to elven lanes.",
+   "Padeehei will resist capture and knows the reed tracks and hiding places better than anyone.",
+   "Tiede Coalgate will risk a public clash to keep people moving through the pass."
+  ],
+  "openDirections": [
+   "If questioned alive, Padeehei's list of names forces the company into bargains with elven wardens or brokers who want those people alive."
+  ],
+  "stakeIfLost": "If the company fails, the fort loses its only leverage to hold or exchange wanted fugitives, letting them vanish across the border.",
+  "arrival": "was waiting at first light · said the whole of it standing"
+ },
+ "shipped": {
+  "title": "Signs at Fenbar Landing",
+  "situation": "A ferryman hauls rime-soaked ropes at Fenbar Landing, checking the lines for fresh wakes. If the company fails, the fort loses its only leverage to hold or exchange wanted fugitives and they can vanish across the border. Find recent signs at Fenbar Landing that the runner used the docks, the pay being plain coin, and the road's yield going to the company. A warden will interfere, keeping the corridor open for those she will not hand over. Reed-veil Hollow's reed camps feed the landing and its folk may say what they saw at dawn.",
+  "job": "Locate and document recent traces at Fenbar Landing that prove the runner used these docks."
+ }
+}

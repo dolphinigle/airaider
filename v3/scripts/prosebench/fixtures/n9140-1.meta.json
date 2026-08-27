@@ -1,0 +1,58 @@
+{
+ "seed": 9140,
+ "chainId": "chain-12",
+ "title": "The Two Claims",
+ "bible": {
+  "title": "The Two Claims",
+  "kernel": "Fadile hires mercenaries to fetch a reliquary both her shrine and Bertrand's shrine claim, and they find Ivramie who might join them.",
+  "cast": [
+   {
+    "name": "Fadile Elmwhisper",
+    "who": "Head priest of a small western grove shrine who leans on old pledges and blunt prayers.",
+    "want": "to have the reliquary returned to her shrine",
+    "trade": "priest",
+    "role": "client",
+    "loreId": "lore-10"
+   },
+   {
+    "name": "Bertrand",
+    "who": "Caretaker of a rival forest shrine who claims ancestral ward over the warden-stones.",
+    "want": "to keep the reliquary under his ward at the east stone",
+    "trade": "warden",
+    "role": "obstacle",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Ivramie Windrow",
+    "who": "A sickly elven mystic who fled both shrines and knows the reliquary's rites and trails.",
+    "want": "to join the company",
+    "trade": "mystic",
+    "role": "prize",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Fadile has hired the company to recover a single reliquary that both her grove shrine and Bertrand's rival shrine claim. Ivramie, a sickly elf who knows the relic's lore, hides among the warden-stones. Bertrand holds the relic beneath the east stone and will not hand it over without a contest.",
+  "goal": "to retrieve the reliquary claimed by Fadile's shrine and return it to that shrine",
+  "arc": [
+   "Search the warden-stones ridgeline the client named for any sign of the reliquary or those who claim it → yields: Ivramie Windrow, a sickly elf hiding in a crevice who clutches a copied pilgrim's cloak stitched with Bertrand's sigil.",
+   "Use Ivramie's cloak and directions to travel into Ashfen Hollow and question the shrine there for who moved the reliquary → yields: a brass shim cut to fit the east-stone cavity and carved with Bertrand's mark.",
+   "Return to the warden-stones with the shim, force the east stone, overcome Bertrand's hold by argument or force, and hand the reliquary to Fadile at the ridge"
+  ],
+  "twist": null,
+  "tensions": [
+   "Bertrand will refuse to yield, insisting the reliquary secures his shrine's ancient rights",
+   "Ivramie's illness can fail her at a crucial moment and slow the company",
+   "Forest watchers may take Bertrand's side and reveal the company's movements"
+  ],
+  "openDirections": [
+   "The public feud between the two shrines can widen, drawing forest watchers and raiders. The company can either broker the relic or sell its custody for gain."
+  ],
+  "stakeIfLost": "If the reliquary is not returned, the shrine's pledge to the nearby hamlet will be void, and the hamlet will be left free to be taken by raiders.",
+  "arrival": "arrived out of the weather · was in a hurry and did not hide it"
+ },
+ "shipped": {
+  "title": "Scan the warden-stones ridgeline",
+  "situation": "A priest, Fadile Elmwhisper, arrived out of the weather and was in a hurry. She watches your hands, not your face, and says the reliquary must be brought back. She says if the reliquary is not returned the shrine's pledge to the nearby hamlet will be void, and the hamlet will be left free to be taken by raiders. She wants the reliquary returned to her shrine, the fee is fixed, and what else shakes loose the company keeps. She says the warden keeps it under his ward at the east stone and asks you to search the warden-stones ridgeline for any sign of it or those who claim it.",
+  "job": "Search the warden-stones ridgeline for any sign of the reliquary or those who claim it."
+ }
+}

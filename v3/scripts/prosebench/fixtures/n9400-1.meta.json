@@ -1,0 +1,58 @@
+{
+ "seed": 9400,
+ "chainId": "chain-13",
+ "title": "Bell at Gutterfall",
+ "bible": {
+  "title": "Bell at Gutterfall",
+  "kernel": "Agote Stonebridge hires the company to stop a thing taking animals from her millpond. A Thornhollow bell leads into the ruin where Danburga hides with a ring that can raise a submerged hoard, and Jakild Bonechewer will fight at the pond to claim it.",
+  "cast": [
+   {
+    "name": "Agote Stonebridge",
+    "who": "A miller at the forest edge who must keep her mill running to feed the hamlet.",
+    "want": "to stop the millpond from taking lambs and dogs and recover what it has taken",
+    "trade": "miller",
+    "role": "client",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Danburga",
+    "who": "A tall human shepherd who fled Thornhollow and keeps a stubborn secret.",
+    "want": "to keep the iron ring she stole from Thornhollow hidden",
+    "trade": "shepherd",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Jakild Bonechewer",
+    "who": "A fierce scavenger of the Western Forest ruins who stakes claims by force.",
+    "want": "to seize the Thornhollow hoard and carry it off",
+    "trade": "scavenger",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   }
+  ],
+  "situation": "A submerged winch and cavity sit under the pond at Stonebridge Mill. Someone has been leaving a small bell as a decoy that drives lambs and dogs into the opening. Danburga fled Thornhollow with an iron ring that fits the winch. Jakild Bonechewer knows Thornhollow's signs and will come to claim any raised hoard.",
+  "goal": "Recover the thing taking lambs and dogs from Agote Stonebridge's millpond.",
+  "arc": [
+   "Inspect Agote Stonebridge's millpond for what is taking her livestock → yields: a brass child's bell stamped with Thornhollow ruinwork",
+   "Carry the bell into Thornhollow ruin to follow its maker and draw out who left it → yields: Danburga, hiding in a collapsed storeroom, clutching an iron ring stamped like the bell",
+   "Return to Stonebridge Mill with Danburga and use her ring to raise the pond hoard while Jakild Bonechewer moves to seize it. Settle the hoard with Agote Stonebridge"
+  ],
+  "twist": null,
+  "tensions": [
+   "Jakild Bonechewer claims Thornhollow's hoard and will fight to take it at the pond",
+   "Danburga wants the ring kept secret and may refuse to hand it over",
+   "The pond's submerged winch is old and may fail while hauling the hoard"
+  ],
+  "openDirections": [
+   "If left unchecked, neighboring farmers will drag the pond and try to take the hoard themselves, forcing fresh claims and violence."
+  ],
+  "stakeIfLost": "If the company fails, Stonebridge Mill cannot pay for repairs and will be sold, cutting the hamlet off from milling.",
+  "arrival": "sent word twice before coming · would not sit down"
+ },
+ "shipped": {
+  "title": "Inspect the millpond",
+  "situation": "A miller at the forest edge, Agote Stonebridge, sent word twice before coming and demands attention to her millpond. She says if the company fails, Stonebridge Mill cannot pay for repairs and will be sold, cutting the hamlet off from milling. She wants the millpond inspected for what is taking lambs and dogs, the pay is plain coin, and the road's yield goes to the company. Scavengers from the woods mean to seize the Thornhollow hoard and carry it off. She would not sit down and laughs in the wrong place while she speaks.",
+  "job": "Inspect Agote Stonebridge's millpond and report what is taking lambs and dogs."
+ }
+}

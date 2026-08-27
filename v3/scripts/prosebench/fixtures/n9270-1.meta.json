@@ -1,0 +1,59 @@
+{
+ "seed": 9270,
+ "chainId": "chain-13",
+ "title": "The Hound for the Guilty",
+ "bible": {
+  "title": "The Hound for the Guilty",
+  "kernel": "A fort hires the company to fetch a missing accused elf from the loggers' huts. The trail leads into old growth, a binding spear, and a keeper who will not hand her over.",
+  "cast": [
+   {
+    "name": "Edrasa Palebough",
+    "who": "A lean, lone elf who ran small trade wagons through the Western Forests.",
+    "want": "to join the company",
+    "trade": "merchant",
+    "role": "prize",
+    "loreId": "c8"
+   },
+   {
+    "name": "Irvsie Rootward",
+    "who": "Foreman of the winter huts, blunt and watchful over his cutters.",
+    "want": "to see Edrasa answer for the burned cutter's hut",
+    "trade": "logger",
+    "role": "ally",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Urani Rootward",
+    "who": "Keeper of the cutting circle and the old forest rites, kin to the loggers.",
+    "want": "to keep the forest's judgment intact by guarding the beast",
+    "trade": "herbalist",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   }
+  ],
+  "situation": "A pale hunting hound tied to an old spear roams the Western Forests and kills only those judged guilty by the rites bound to that spear. Edrasa Palebough set a logging hut alight to hide a theft. She is guilty by the rites. Urani Rootward tends the spear's binding and prefers the forest's verdict. The fort needs Edrasa alive before the solstice sharpens the hound's hunt.",
+  "goal": "To bring the accused Edrasa Palebough alive to the fort for questioning.",
+  "arc": [
+   "Go to the loggers' winter huts the fort named to look for the accused Edrasa Palebough → yields: Irvsie Rootward at the huts, who points to a scorched trail into the old growth.",
+   "Follow the scorched trail into Harrowoak Clearing where the fires ran to search the wrecked ground → yields: a spear head stuck in a fallen oak, its shaft wrapped in hair and ash.",
+   "Plant the found spear in the cutting circle to draw whatever hunts by that iron and rite → yields: the pale hound's wake leading away from the clearing toward Palewatch Ruin.",
+   "Enter Palewatch Ruin where the wake ends to take the accused for the fort → yields: Urani Rootward stands guard and is outwitted at the ruin. Edrasa Palebough is taken back to the fort and joins the company."
+  ],
+  "twist": null,
+  "tensions": [
+   "The forest hound attacks only the guilty, so approaching the accused risks death if she is guilty.",
+   "Urani Rootward will refuse to surrender Edrasa and will guard the ruin by rite.",
+   "Loggers' anger over the burned hut could erupt into mob action before the company finishes."
+  ],
+  "openDirections": [
+   "The coming solstice will strengthen the spear's binding and quicken the hound's hunt, pushing the loggers toward violent judgment whether the company acts or not."
+  ],
+  "stakeIfLost": "If Edrasa is not returned, the loggers will seize the winter wood and the fort will be left without its fuel supply.",
+  "arrival": "came in with the day's callers · spoke low, and only to the boss"
+ },
+ "shipped": {
+  "title": "Find Edrasa at the winter huts",
+  "situation": "A lean, lone elf, Edrasa Palebough, came in with the day's callers and spoke low to you. If Edrasa is not returned, the loggers will seize the winter wood and the fort will be left without its fuel supply. Edrasa wants to join the company, and the coin comes when it is done, and anything carried home is the company's. The fort names the loggers' winter huts at Harrowoak Clearing as where to look for Edrasa. The outcome wanted is Edrasa found there and brought alive to the fort. A herbalist opposes this and means to keep the forest's judgment intact by guarding the accused.",
+  "job": "Locate Edrasa Palebough at the loggers' winter huts and bring her alive to the fort."
+ }
+}

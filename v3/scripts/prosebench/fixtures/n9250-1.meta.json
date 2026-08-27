@@ -1,0 +1,59 @@
+{
+ "seed": 9250,
+ "chainId": "chain-12",
+ "title": "The Forgotten Bargain",
+ "bible": {
+  "title": "The Forgotten Bargain",
+  "kernel": "Nelso hires the company to fetch a hostage gone into her clearings and the search uncovers Vistha under Thornhollow.",
+  "cast": [
+   {
+    "name": "Nelso",
+    "who": "Leader of the beekeepers' clearings who runs the brood routes and local sales.",
+    "want": "to recover a hostage taken into the beekeepers' clearings.",
+    "trade": "beekeeper",
+    "role": "client",
+    "loreId": "lore-10"
+   },
+   {
+    "name": "Cressin Redhand",
+    "who": "Exiled woodsman turned raider who claims Thornhollow as his camp.",
+    "want": "to hold Vistha as leverage until a debt is answered.",
+    "trade": "raider",
+    "role": "obstacle",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Vistha Marshwalker",
+    "who": "Lizardman sailor with scorch-marked hands who washed ashore near the clearings.",
+    "want": "to win a place in the company.",
+    "trade": "sailor",
+    "role": "prize",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Nelso believes a hostage was taken into her clearings and hired the company to fetch them. In truth the hostage is Vistha Marshwalker, taken after a wreck and held by Cressin Redhand beneath Thornhollow as bargaining stock. Both Nelso and Cressin prefer silence about how the capture tied to brood routes.",
+  "goal": "to recover a hostage taken into the beekeepers' clearings.",
+  "arc": [
+   "Search the beekeepers' clearings Nelso named for signs of a raid → yields: a scuffed boot stamped with Cressin Redhand's mark pointing toward Thornhollow",
+   "Follow the boot's mark to Thornhollow's outer ruins and search the ruined hive → yields: a hidden stone trapdoor sunk beneath the ruined hive",
+   "Open the trapdoor and clear the buried passage under Thornhollow using the trapdoor → yields: Vistha Marshwalker chained in a low cell, the chains bearing Cressin's brand",
+   "Carry Vistha back to the beekeepers' clearings and complete the handover to Nelso while Cressin Redhand moves to stop the exchange. The company defeats or outbids him there and delivers Vistha to Nelso"
+  ],
+  "twist": null,
+  "tensions": [
+   "Cressin will demand payment or keep Vistha to force concessions from Nelso",
+   "Thornhollow's buried halls are narrow and trap-prone, slowing any rescue",
+   "Nelso wants an immediate handover and will not tolerate delays or bargaining"
+  ],
+  "openDirections": [
+   "If returned, Vistha may name the men who profited from the capture and force reckonings among the clearings' brokers."
+  ],
+  "stakeIfLost": "If the hostage is not retrieved, the beekeepers' brood shipments will be halted and this year's harvest will be lost.",
+  "arrival": "was let in past the hour · named a price before being asked"
+ },
+ "shipped": {
+  "title": "Search Nelso's clearings for raid signs",
+  "situation": "A beekeeper, Nelso, counts the soldiers in the yard and names a price after being let in past the hour. Nelso says if the hostage is not retrieved, the beekeepers' brood shipments will be halted and this year's harvest will be lost. They want the hostage recovered from their clearings, the pay is plain coin, and the road's yield goes to the company. Raiders may be sheltering near the Mirecoil Vault, a low, water-dark cell under Thornhollow where old stores rot. Nelso keeps watching each face while they speak.",
+  "job": "Search the beekeepers' clearings Nelso named for signs of a raid"
+ }
+}

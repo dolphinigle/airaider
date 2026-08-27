@@ -1,0 +1,209 @@
+[
+ {
+  "fx": "n8090-1.user.json",
+  "card": "Alyva of the Ford is a human leader who rehearsed her coming, sent word twice, and wants to join the company, the pay is the agreed coin, and what the road turns up. If Alyva is not returned, the fort's supply pledge from the Western Houses will be revoked, cutting off the convoy that keeps the yard provisioned. The current errand is to ride to Thornford Gate and get a report on whether Alyva passed that way. A librarian is likely to claim she must stay inside the archive's care. Thornford Gate is a worn gatehouse beside the ford where travelers ask after lost garrison captains.",
+  "q": {
+   "hirer": false,
+   "matter": true,
+   "why": true,
+   "steel": false
+  },
+  "naked": [
+   "Alyva of the Ford"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 106,
+  "s": 5
+ },
+ {
+  "fx": "n8090-1.user.json",
+  "card": "A rider leans into Thornford Gate and shouts for news of Alyva of the Ford. They had sent word twice before coming. If Alyva is not returned, the fort's supply pledge from the Western Houses will be revoked, cutting off the convoy that keeps the yard provisioned. Ride to Thornford Gate and ask there for news of Alyva of the Ford, the pay is the agreed coin, and what the road turns up. A librarian in the archive is likely to refuse to hand Alyva over and will argue she must remain under the archive's care. Answers at the gate run guarded and rehearsed.",
+  "q": {
+   "hirer": false,
+   "matter": true,
+   "why": true,
+   "steel": false
+  },
+  "naked": [
+   "Alyva of the Ford"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 104,
+  "s": 6
+ },
+ {
+  "fx": "n8090-1.user.json",
+  "card": "A gatekeeper at Thornford Gate is stopping riders and asking if they seek Alyva of the Ford. If Alyva is not returned, the fort's supply pledge from the Western Houses will be revoked. You are to ride to Thornford Gate and bring back whatever news of Alyva you can, the pay is the agreed coin, and what the road turns up. A librarian is likely to refuse outside interference and intends to keep Alyva safe inside the archive's care. The last messenger sent word twice before coming.",
+  "q": {
+   "hirer": false,
+   "matter": true,
+   "why": true,
+   "steel": false
+  },
+  "naked": [
+   "Alyva of the Ford"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 87,
+  "s": 5
+ },
+ {
+  "fx": "n8100-1.user.json",
+  "card": "A minor lord, Mercuro Coalgate, sent word twice before coming and named a price before he arrived. While he watches your hands, he says, \"Bring the exile to Rookford for judgment,\" the fee is as agreed, and any spoils ride home with it. He warns that if Thallik is not returned his tollhouse deed will be seized by creditors and his income lost. Go to Ashen Ford and question the ferry tavern for signs of the exile named Thallik Bonechewer. An elven warden means to keep the exile under elven protection and stop his delivery to human courts.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Mercuro Coalgate",
+   "Thallik Bonechewer"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 98,
+  "s": 5
+ },
+ {
+  "fx": "n8100-1.user.json",
+  "card": "A minor lord, Mercuro Coalgate, sent word twice before coming and named a price before he asked. He says if Thallik is not returned, creditors will seize his tollhouse deed and he will lose the toll income that keeps him solvent. He wants you to go to Ashen Ford and question the ferry tavern for signs of the exile, the fee is as agreed, and any spoils ride home with it. An elven warden intends to keep the exile under forest protection and stop his delivery to human courts. While he speaks he watches your hands, not your face.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Mercuro Coalgate",
+   "Thallik Bonechewer"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 99,
+  "s": 5
+ },
+ {
+  "fx": "n8100-1.user.json",
+  "card": "A minor lord, Mercuro Coalgate, sent word twice before coming and named a price before you spoke. He says his tollhouse deed will be seized by creditors if the exile Thallik is not returned. Go to Ashen Ford and question the ferry tavern for signs of the exile. An elven warden opposes this and means to keep the exile under forest protection and block any handover. Mercuro wants Thallik delivered to Rookford for judgment, the fee is as agreed, and any spoils ride home with it. He watches your hands, not your face while he waits.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Mercuro Coalgate",
+   "Thallik Bonechewer"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 96,
+  "s": 6
+ },
+ {
+  "fx": "n8110-1.user.json",
+  "card": "Naddu Brightwater came in the night and refused food and drink while speaking, laughing in the wrong place as he demanded his family's pledged chest. He says that if the heir and chest are not returned, his house will lose the pledged chest and be forced to surrender its river toll rights to creditors. He wants the warden-stones searched for any sign the heir left, the coin comes at the finish, with the pick of what the job turns up. The heir is thought to have buried the chest and to want to keep it and remain unclaimed. A ritualist sheltering near Martenford is named as someone who might help hide tracks.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false
+  },
+  "naked": [
+   "Naddu Brightwater"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 112,
+  "s": 5
+ },
+ {
+  "fx": "n8110-1.user.json",
+  "card": "A river-house steward, Naddu Brightwater, came in the night and refused food and drink. Naddu says that if the heir and the pledged chest are not returned, the house will lose the pledged chest and be forced to surrender its river toll rights to creditors. Naddu wants the warden-stones inspected for any sign the heir left, the coin comes at the finish, with the pick of what the job turns up. The heir means to keep the buried chest and remain unclaimed. Naddu laughs in the wrong place and says the stones will tell who passed that way last.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false
+  },
+  "naked": [
+   "Naddu Brightwater"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 99,
+  "s": 5
+ },
+ {
+  "fx": "n8110-1.user.json",
+  "card": "A river-house steward, Naddu Brightwater, came in the night and would not wait for morning, and refused food and drink. He says he wants to reclaim the family hoard and its pledged chest, the coin comes at the finish, with the pick of what the job turns up. He says if the heir and chest are not returned, Naddu's house will lose the pledged chest and be forced to surrender its river toll rights to creditors. He says the heir intends to keep the buried chest and remain unclaimed. He reports that a set of warden-stones marks where the heir passed, and he wants those stones searched for any sign the heir left. He laughs in the wrong place while he says this, as if daring the creditors.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": false
+  },
+  "naked": [
+   "Naddu Brightwater"
+  ],
+  "coined": [],
+  "opens": false,
+  "w": 128,
+  "s": 6
+ },
+ {
+  "fx": "n8120-1.user.json",
+  "card": "An elder who runs the beekeepers' clearings, Nushala Palebough, came in the night and asked for the boss by name. She watches your hands while she says the artisan must tend the pass to keep the winter feeding going. She says the beekeepers' stacked honeycombs will spoil and the clearings will be cut off when the pass freezes. She wants you to go to the beekeepers' clearings she names and ask who keeps the pass open, the fee is as agreed, and any spoils ride home with it. She adds that soldiers are already taking able-bodied artisans for the conscription rolls.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Nushala Palebough"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 101,
+  "s": 5
+ },
+ {
+  "fx": "n8120-1.user.json",
+  "card": "An elder who runs the beekeepers' clearings, Nushala Palebough, came in the night and would not wait for morning. She says the beekeepers cannot lose the road: the stacked honeycombs will spoil and the clearings will be cut off when the pass freezes. She wants you to go to the beekeepers' clearings she named and ask who keeps the pass open, the fee is as agreed, and any spoils ride home with it. Soldiers on the road are seizing able-bodied artisans for the conscription rolls. She says that plainly and watches your hands, not your face.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Nushala Palebough"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 96,
+  "s": 5
+ },
+ {
+  "fx": "n8120-1.user.json",
+  "card": "An elder who runs the beekeepers' clearings, Nushala Palebough, came in the night and asked for the boss by name. She watches your hands, not your face, and says the beekeepers' stacked honeycombs will spoil and the clearings will be cut off when the pass freezes. She wants you to go to the beekeepers' clearings she named and ask who keeps the pass open, the fee is as agreed, and any spoils ride home with it. Soldiers mean to seize able-bodied artisans for the conscription rolls.",
+  "q": {
+   "hirer": true,
+   "matter": true,
+   "why": true,
+   "steel": true
+  },
+  "naked": [
+   "Nushala Palebough"
+  ],
+  "coined": [],
+  "opens": true,
+  "w": 86,
+  "s": 4
+ }
+]

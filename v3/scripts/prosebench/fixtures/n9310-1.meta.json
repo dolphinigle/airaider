@@ -1,0 +1,58 @@
+{
+ "seed": 9310,
+ "chainId": "chain-13",
+ "title": "Bought One by One",
+ "bible": {
+  "title": "Bought One by One",
+  "kernel": "A widow hires the company to buy the last man who burned her farm. The man is an elf who may prefer to join the company.",
+  "cast": [
+   {
+    "name": "Felise the Lame",
+    "who": "a widow from a burned farm who has been buying the men who burned her land one at a time",
+    "want": "to buy and have brought to her one of the men who burned her farm",
+    "trade": "widow",
+    "role": "client",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Sattir",
+    "who": "a forest raider who led the crew that burned the farm and hunts any member who sells out",
+    "want": "to stop the widow from buying any of the crew and to reclaim or kill them",
+    "trade": "raider",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Goler",
+    "who": "an elf artisan and loner hiding in the Western Forests who was present at the fire",
+    "want": "to find work and safety, and to be spared or bought free",
+    "trade": "artisan",
+    "role": "prize",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Felise has been buying the men who burned her farm one by one. One man remains, an elf named Goler hiding in the Western Forests. The raider Sattir led the burning and still searches for survivors. The men burned the farm while drugged into delirium by a goblin cult's blasphemous rite. Felise hires the company to buy and bring that last man to her for payment.",
+  "goal": "to buy and deliver to the widow one of the men who burned her farm",
+  "arc": [
+   "Go to Crowmarket the widow named and ask the loggers and drovers for any man who rode with the raiders → yields: a drunken drover points to Rook-Lodge and says a scrawny elf artisan took shelter there after the fire.",
+   "Travel to Rook-Lodge to find and bargain with the sheltered man the drover named → yields: Goler is found. He admits he burned in a fever after a goblin-blasphemy rite and says Sattir will come to Crowmarket to reclaim him.",
+   "Return to Crowmarket to deliver Goler to Felise and hold him while she takes him. Sattir arrives to reclaim Goler and is beaten in the market, and Felise receives Goler as bought."
+  ],
+  "twist": null,
+  "tensions": [
+   "Sattir will try to reclaim or kill any man sold before the sale completes",
+   "Goler's part in the burning came under a goblin-cult fever and he may relapse, flee, or lash out",
+   "Forest bands and cult followers still watch roads and can ambush or harry travel"
+  ],
+  "openDirections": [
+   "The goblin-blasphemy cult that drugged the raiders may press the raiders or spread raids through the forests."
+  ],
+  "stakeIfLost": "If the company fails, she will lose her last fields when creditors seize them and she will be driven from the village.",
+  "arrival": "came up with the last carts · refused food and drink"
+ },
+ "shipped": {
+  "title": "Crowmarket inquiries",
+  "situation": "A widow, Felise the Lame, came up with the last carts and refused food and drink. She sets things straight while saying she will pay for any man who rode with the raiders. If we fail, she says creditors will seize her last fields and drive her from the village. She wants one who rode with the raiders found at Crowmarket and brought to her, the fee is fixed, and what else shakes loose the company keeps. Raider bands mean to stop her buying any of their crew and to reclaim or kill whoever they can.",
+  "job": "Go to Crowmarket and ask the loggers and drovers for any man who rode with the raiders."
+ }
+}

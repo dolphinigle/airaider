@@ -1,0 +1,58 @@
+{
+ "seed": 9280,
+ "chainId": "chain-12",
+ "title": "The Late Letter",
+ "bible": {
+  "title": "The Late Letter",
+  "kernel": "A charcoal-burner hires the company to hand over a sealed letter written long ago. The letter is a surrender bargain that forces choices about leadership and belonging.",
+  "cast": [
+   {
+    "name": "Vidrald of the Pass",
+    "who": "an aging charcoal-burner from the Pass who kept a sealed letter he wrote twenty years ago.",
+    "want": "to have the sealed letter handed to the woman he wrote it to.",
+    "trade": "burner",
+    "role": "client",
+    "loreId": "lore-10"
+   },
+   {
+    "name": "Eilonwy",
+    "who": "an elf who left the Pass decades ago and tends a small shrine deep in Old-root Hollow.",
+    "want": "to be allowed to leave the forest and join the company.",
+    "trade": "priest",
+    "role": "prize",
+    "loreId": "c8"
+   },
+   {
+    "name": "Vurlop of the Pass",
+    "who": "a raider who leads a small band in the Western Forests and marks camps with moth sigils.",
+    "want": "to stop the letter from reaching Vidrald and to keep his leadership unexposed.",
+    "trade": "raider",
+    "role": "obstacle",
+    "loreId": "lore-11"
+   }
+  ],
+  "situation": "Vidrald came to the fort with a sealed letter he wrote twenty years ago and wants the company to hand it to the woman he loved, who left the Pass long ago. He named the charcoal-burners' camps as the place to begin the search.",
+  "goal": "Deliver a sealed letter Vidrald wrote twenty years ago to the woman it was meant for.",
+  "arc": [
+   "Go to the charcoal-burners' camps Vidrald named to ask after the woman and show the seal → yields: a moth-marked scrap sewn to a brooch that names Old-root Hollow.",
+   "Take the moth brooch into Old-root Hollow to find the addressee and offer the sealed letter → yields: Eilonwy, who reads the letter and reveals it is a surrender bargain naming Vurlop as ringleader.",
+   "Bring Eilonwy and the revealed bargain back to Vidrald at his charcoal-burners' camps to hand the sealed letter over, while Vurlop tries to stop the delivery and is outwitted there."
+  ],
+  "twist": "The sealed letter is not a love note but a surrender bargain that names Vurlop as ringleader and offers amnesty in exchange for his surrender.",
+  "tensions": [
+   "Vurlop will stop the letter at all costs rather than face exposure.",
+   "Eilonwy distrusts anyone bringing the letter and may refuse it or demand terms.",
+   "The Western Forests hide loyalties and give locals paths strangers do not know."
+  ],
+  "openDirections": [
+   "If the bargain reaches Vidrald, nearby bands may accept surrender or lash out, changing who controls the Pass."
+  ],
+  "stakeIfLost": "Vidrald says he will lose his chance to secure a surrender that would keep the Pass safe if the letter never reaches its addressee.",
+  "arrival": "arrived out of the weather · wanted it settled the same day"
+ },
+ "shipped": {
+  "title": "Ask at the burners' camps",
+  "situation": "An aging charcoal-burner, Vidrald of the Pass, arrived out of the weather and wanted it settled the same day. He wants the sealed letter handed to the woman he wrote it to, and the pay is the agreed coin and what the road turns up. He says he will lose his chance to secure a surrender that would keep the Pass safe if the letter never reaches its addressee. This step asks you to visit the charcoal-burners' camps Vidrald named to ask after the woman and show the seal. A raider, Vurlop of the Pass, marks camps with moth sigils and will try to stop the letter and keep his leadership unexposed. Vidrald says the letter must reach her, and goes quiet when her name is spoken.",
+  "job": "Visit the charcoal-burners' camps Vidrald named to ask after the woman and show the seal."
+ }
+}

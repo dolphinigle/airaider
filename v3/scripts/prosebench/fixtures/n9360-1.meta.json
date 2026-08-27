@@ -1,0 +1,58 @@
+{
+ "seed": 9360,
+ "chainId": "chain-14",
+ "title": "The Millpond Brood",
+ "bible": {
+  "title": "The Millpond Brood",
+  "kernel": "A miller hires the company to fetch a brass-bound chest from the millpond. The search uncovers a trader, her demoted journeyman, and a hoard that must be seized and delivered.",
+  "cast": [
+   {
+    "name": "Hosmunt Hollis",
+    "who": "miller on the western road who sent a cart through the charcoal-burners' camps and lost a brass-bound chest to his millpond",
+    "want": "to have the brass-bound chest returned to him",
+    "trade": "miller",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Eileua",
+    "who": "travelling trader who keeps a small hooded raft and a trained falcon",
+    "want": "to hide and keep the brass-bound chest she pulled from the pond",
+    "trade": "merchant",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Alcmaion",
+    "who": "a journeyman falconer recently demoted by Eileua and nursing a grudge",
+    "want": "to seize the chest for himself rather than hand it to the miller",
+    "trade": "falconer",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   }
+  ],
+  "situation": "Hosmunt Hollis hired the company to retrieve his brass-bound chest from the millpond. The chest was not lost at the pond bottom long. Eileua pulled it out and secreted it on her moored raft, then lied in the camps to keep the find quiet. Alcmaion, once her journeyman and now demoted, knows where she stashed the chest and wants to sell it. He will show up to claim it. The millpond is strange: it swallows lambs and dogs but leaves fish undisturbed, so recoveries need care and local help from the charcoal-burners and a hand on the water.",
+  "goal": "To recover the brass-bound chest lost in the millpond and return it to its owner.",
+  "arc": [
+   "Question the charcoal-burners at the Kilnstead Camps about the pond and search the shoreline → yields: a wet falconer's glove marked with Eileua's trader stitch, tying her to the pond",
+   "Visit Eileua's stall at Barrelbridge Way with the glove and press her for what she took from the water → yields: a folded note stowed in the glove that sketches the millpond and names Alcmaion as the man who kept the chest",
+   "Go to Grindle Millpond with the note and the company and force the raft where Eileua hid the chest, then meet Alcmaion who arrives to seize it → yields: the brass-bound chest handed to Hosmunt Hollis after Alcmaion is beaten or bought off"
+  ],
+  "twist": null,
+  "tensions": [
+   "Alcmaion will fight to keep the chest and claim a right over Eileua's take",
+   "The charcoal-burners demand payment or favors for help on the water",
+   "Recovering gear and a chest from the pond risks losing animals and tools to the pool's strange appetite"
+  ],
+  "openDirections": [
+   "If the company keeps or sells contents of the chest, traders who trust Eileua will pressure the fort and burn bridges in the Western Forests"
+  ],
+  "stakeIfLost": "If the chest is not returned, Hosmunt cannot unlock the mill's toll apparatus kept inside and the mill will be forced to close, costing him his season's trade.",
+  "arrival": "sent word twice before coming · said the whole of it standing"
+ },
+ "shipped": {
+  "title": "Ask the burn-camps and sweep the pond edge",
+  "situation": "A miller, Hosmunt Hollis, sent word twice before coming and stands and says he wants the brass-bound chest returned. He rubs a thumb along a scar without noticing as he says: If the chest is not returned, Hosmunt cannot unlock the mill's toll apparatus kept inside and the mill will be forced to close, costing him his season's trade. He wants you to question the charcoal-burners at the Kilnstead Camps and to search the Grindle Millpond shoreline, the pay is plain coin, and the road's yield goes to the company. A falconer opposes the recovery and means to seize the chest for himself rather than hand it to the miller.",
+  "job": "Question the Kilnstead charcoal-burners about Grindle Millpond and search the shoreline."
+ }
+}

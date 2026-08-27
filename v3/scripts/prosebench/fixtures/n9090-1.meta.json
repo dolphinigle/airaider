@@ -1,0 +1,58 @@
+{
+ "seed": 9090,
+ "chainId": "chain-12",
+ "title": "Parsley at Branwater",
+ "bible": {
+  "title": "Parsley at Branwater",
+  "kernel": "A recruiter hires the company to fetch a runaway elven servant last seen at the ford and into the millpond's reach.",
+  "cast": [
+   {
+    "name": "Ranis",
+    "who": "a recruiter working from the fort who needs new hands for a patron.",
+    "want": "to have Firanarth brought to the fort to enlist her",
+    "trade": "recruiter",
+    "role": "client",
+    "loreId": "lore-10"
+   },
+   {
+    "name": "Firanarth",
+    "who": "a sickly elven servant who ran from her master and hoards small things",
+    "want": "to join the company",
+    "trade": "servant",
+    "role": "prize",
+    "loreId": "c8"
+   },
+   {
+    "name": "Utzaei",
+    "who": "an old miller who tends Branwater Pond and keeps odd offerings out back",
+    "want": "to keep Firanarth to tend the pond's offerings",
+    "trade": "miller",
+    "role": "obstacle",
+    "loreId": "lore-11"
+   }
+  ],
+  "situation": "Ranis hired the company to find Firanarth, last seen near the river ford and its shallows. Locals at the ford have lost lambs and dogs to water near the old mill upstream. A millpond at Branwater takes warm-blooded animals if not fed, and Utzaei the miller keeps a handful of such offerings and shelters the runaway in exchange for labor and secrecy. The company can follow leads from the ford to Branwater and must settle Utzaei's claim before Ranis can take Firanarth.",
+  "goal": "Find and return Firanarth to Ranis at the fort.",
+  "arc": [
+   "At the river ford and its shallows, act on Ranis's directions and search the shoreline for signs of the runaway → yields: Secile of the Ford, who points upstream toward Branwater Pond.",
+   "At Branwater Pond, use Secile's lead to question locals and test the shore with bait and parsley where animals were taken → yields: Utzaei the miller, who keeps Firanarth hidden in his dry barn.",
+   "At the fort, bring Utzaei and Firanarth forward as Ranis ordered and force, bribe, or outwit Utzaei there to settle his claim, then hand Firanarth over to Ranis"
+  ],
+  "twist": null,
+  "tensions": [
+   "Branwater Pond must be fed or it will keep taking livestock from locals",
+   "Utzaei demands long service in exchange for releasing Firanarth",
+   "Secile and other ford folk will turn hostile if their lost lambs are not accounted for"
+  ],
+  "openDirections": [
+   "Pilgrim and merchant traffic may avoid the ford until the pond's losses stop, cutting tolls and work across the route"
+  ],
+  "stakeIfLost": "If the company fails, Ranis will lose the promised recruit and with it the commission from her patron, because she cannot deliver the scout she pledged.",
+  "arrival": "came back a second time · would not sit down"
+ },
+ "shipped": {
+  "title": "Search the river ford shallows",
+  "situation": "A recruiter, Ranis, came back a second time and would not sit down. She says she wants Firanarth brought to the fort to enlist her, the coin comes at the finish, with the pick of what the job turns up. She says that if the company fails she will lose the promised recruit and the commission from her patron. Her directions point to the river ford and its shallows. A miller means to keep Firanarth to tend the pond's offerings. She laughs in the wrong place while she waits.",
+  "job": "Search the river ford's shallows for signs of Firanarth."
+ }
+}

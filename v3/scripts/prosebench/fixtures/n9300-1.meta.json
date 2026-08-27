@@ -1,0 +1,59 @@
+{
+ "seed": 9300,
+ "chainId": "chain-12",
+ "title": "Quiet Siege, Loud Return",
+ "bible": {
+  "title": "Quiet Siege, Loud Return",
+  "kernel": "A ruler taken after a siege must be found on the hill and brought back to the envoy at the old elf road.",
+  "cast": [
+   {
+    "name": "Sergia Harrow",
+    "who": "Envoy of Bracken who oversaw the parley after the siege.",
+    "want": "to have Aginaga returned alive to the old elf road",
+    "trade": "envoy",
+    "role": "client",
+    "loreId": "lore-10"
+   },
+   {
+    "name": "Aginaga",
+    "who": "Hill-thane taken in the siege, blunt and stubborn.",
+    "want": "to escape custody and vanish into the Western Forests",
+    "trade": "ruler",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Curinure",
+    "who": "Wounded scout who fled the end of the siege and still limps.",
+    "want": "to be paid safe conduct and coin",
+    "trade": "scout",
+    "role": "companion",
+    "loreId": "lore-11"
+   }
+  ],
+  "situation": "A siege around Thornhollow ended without mass graves or trophy banners. The ruler Aginaga disappeared in the dark that followed. Sergia suspects a small band dragged Aginaga into the nearby hills to hold for ransom and hires the company to get her back at the old elf road.",
+  "goal": "return Aginaga to Sergia Harrow alive at the old elf road",
+  "arc": [
+   "Ride the old elf road the client named and question passing carts and tramps → yields: Curinure, a wounded scout who offers a lead to Fenrill Hill",
+   "Follow Curinure to Fenrill Hill and watch the camp from the ridge → yields: a sighting of Aginaga held inside a ring of pickets",
+   "Use the ridge sighting to slip into the camp by the watch trails at night → yields: a buried rope-ladder and a torn watch-rotation note giving an approach window",
+   "Force into the picket ring at the noted hour, subdue Aginaga when she resists, and escort her back to the old elf road for Sergia Harrow → yields: Aginaga handed to Sergia at the road"
+  ],
+  "twist": null,
+  "tensions": [
+   "Curinure demands coin and safe conduct before he guides the company",
+   "Aginaga will not be carried without a fight. She resists custody",
+   "The captors use the hills and trailwork. A wrong step alerts the whole ring"
+  ],
+  "openDirections": [
+   "A local lord may claim Aginaga or press a rival claim if the recovery drags out."
+  ],
+  "stakeIfLost": "Sergia says the annual grain convoy from Bracken will be halted if Aginaga is not returned, because her house controls the passes the convoy uses.",
+  "arrival": "sent a servant with a token and followed · wanted it settled the same day"
+ },
+ "shipped": {
+  "title": "Ride the old elf road and question passers",
+  "situation": "An envoy, Sergia Harrow, sent a servant with a token and followed, and keeps turning something over in one palm while she says she wants Aginaga returned alive to the old elf road. She says the annual grain convoy from Bracken will be halted if Aginaga is not returned, because her house controls the passes the convoy uses. They need the old elf road ridden and passing carts and tramps questioned, and the fee is fixed, and what else shakes loose the company keeps. A ruler means to escape custody and vanish into the Western Forests. Sergia waits with the token in her hand.",
+  "job": "Ride the old elf road and question passing carts and tramps."
+ }
+}

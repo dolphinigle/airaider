@@ -1,0 +1,59 @@
+{
+ "seed": 9130,
+ "chainId": "chain-13",
+ "title": "The Ward at Riversbend",
+ "bible": {
+  "title": "The Ward at Riversbend",
+  "kernel": "A sanctuary pays a company to fetch a ward raised under another man's name, and the ward must choose between home and the life he grew into.",
+  "cast": [
+   {
+    "name": "Hodierne",
+    "who": "steward of the riverside sanctuary and keeper of its pledges.",
+    "want": "to have the sanctuary's ward returned to the riverside sanctuary",
+    "trade": "steward",
+    "role": "client",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Barothlas Windrow",
+    "who": "riverward tavernkeeper who has long kept a foundling as his own helper.",
+    "want": "to keep the child as his steward at the inn",
+    "trade": "innkeeper",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Delven Fairweather",
+    "who": "a foundling raised under another man's name, playful and eager for honest work.",
+    "want": "to find honest work beyond the inn",
+    "trade": "steward",
+    "role": "prize",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Hodierne's riverside sanctuary sponsored a foundling years ago as a ward. Barothlas Windrow took the child in and raised the child at his inn under Barothlas's name. The child, Delven Fairweather, learned kitchen and steward work at the inn and later left to seek work near Thornhollow. Hodierne wants the ward returned to serve as the sanctuary's sworn witness. Barothlas will refuse to hand the child over without a price.",
+  "goal": "to recover the sanctuary's ward and return that ward to the riverside sanctuary",
+  "arc": [
+   "Search Hodierne's riverside sanctuary garden for signs of the ward the client named → yields: a child's wool cuff stamped with Barothlas Windrow's inn mark",
+   "Take the cuff to Barothlas Windrow's inn and question him about the cuff → yields: Barothlas admits he raised the child and gives a carved wooden spoon with the child's maker mark",
+   "Follow the spoon's maker mark along the old elf road to Thornhollow and search the ruin's kitchen → yields: Delven Fairweather found at Thornhollow, who agrees to return to Hodierne at the riverside sanctuary at dusk",
+   "Bring Delven to Hodierne's riverside sanctuary at dusk for the handover, where Barothlas stands to block the transfer and must be overcome"
+  ],
+  "twist": null,
+  "tensions": [
+   "Barothlas refuses to part with the child and will fight or demand a price",
+   "Delven may choose independence over the sanctuary's pledge",
+   "Travel along the old elf road to Thornhollow risks weather and lonely thieves"
+  ],
+  "openDirections": [
+   "If the company fails or Delven refuses the sanctuary, Hodierne must find another sworn witness or forfeit the rites to the river guild"
+  ],
+  "stakeIfLost": "the sanctuary loses its chartered right to host the river-guild's annual rites because the ward is the sworn witness who seals the charter",
+  "arrival": "sent a rider ahead and came behind it · named a price before being asked"
+ },
+ "shipped": {
+  "title": "Search the sanctuary garden",
+  "situation": "A steward, Hodierne, sent a rider ahead and came behind it. \"If this fails, the sanctuary loses its charter right to host the river-guild's annual rites because the ward is the sworn witness who seals the charter,\" they say. They want signs of the ward found in the riverside sanctuary garden, the fee is fixed, and what else shakes loose the company keeps. An innkeeper at Windrow Hold means to keep the child as his steward at the inn. They keep a hand flat on the table and say the ward must come home.",
+  "job": "Search the riverside sanctuary garden for signs of the ward"
+ }
+}

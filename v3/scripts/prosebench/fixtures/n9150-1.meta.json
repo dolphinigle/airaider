@@ -1,0 +1,51 @@
+{
+ "seed": 9150,
+ "chainId": "chain-13",
+ "title": "The Oath That Held",
+ "bible": {
+  "title": "The Oath That Held",
+  "kernel": "A tarred token points into the old-growth. The company must fetch the woman who still keeps an oath.",
+  "cast": [
+   {
+    "name": "Arlette",
+    "who": "Riverfront performer who fled after breaking a toll oath, restless and quick-tongued.",
+    "want": "to keep the oath's token safe until she can honor the pledge",
+    "trade": "performer",
+    "role": "prize",
+    "loreId": "c8"
+   },
+   {
+    "name": "Daighre",
+    "who": "Old-growth burner who enforces pledges with tar and blunt law.",
+    "want": "to hold Arlette until the pledge is fulfilled at the root-circle",
+    "trade": "burner",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   }
+  ],
+  "situation": "The fort contracted the company to bring Arlette to its gate to answer for breaking a toll oath. She fled west into the Old-growth and left a tar-stained token behind.",
+  "goal": "to bring Arlette to the fort to answer for breaking a toll oath",
+  "arc": [
+   "Search Tarfen Crossing for signs the fugitive passed, following the fort's lead → yields: a tarred ribbon stamped with an old oath-mark.",
+   "Follow the ribbon to Blackvat Hollow and press the tar-makers about who brands that mark → yields: a broken spindle scored with the name Daighre and a smear leading deeper west.",
+   "Take the spindle to Fenwatch Hut and question the wood-cutter who trades with the tarworks, using the smear → yields: the wood-cutter's warning that Daighre claims Arlette for an oath at Glimmerroot and a splintered pledge-talon as proof.",
+   "Push into Glimmerroot and force the root-circle where Daighre holds watch, using the pledge-talon to demand surrender → yields: Arlette handed to the fort at its outer gate."
+  ],
+  "twist": null,
+  "tensions": [
+   "Daighre enforces old oaths and will not hand over a bound woman without a spectacle or price",
+   "tar-smear trails are easy to lose in the moss and the company works on a tight season before the lord's inspectors arrive",
+   "the Old-growth's law and its elven neighbors frown on hauling pledged business into the fort"
+  ],
+  "openDirections": [
+   "Arlette's fate after delivery — whether she is kept, sold, or bargained into company service — will depend on the fort's purse and the company's willingness to bargain."
+  ],
+  "stakeIfLost": "If Arlette is not returned, the fort will lose its river-toll right when the lord strips its license and hands the toll-house to a rival, cutting the fort's income.",
+  "arrival": "turned up with the tally-carts · named a price before being asked"
+ },
+ "shipped": {
+  "title": "Tracks at Tarfen Crossing",
+  "situation": "A riverfront performer, Arlette, turned up with the tally-carts and named a price before being asked. The fort wants Arlette returned to answer for breaking a toll oath. If Arlette is not returned the fort will lose its river-toll right when the lord strips its license and hands the toll-house to a rival, cutting the fort's income. This step must find signs that she passed Tarfen Crossing, the pay is plain coin, and the road's yield goes to the company. A burner may be holding her near the root-circle until the pledge is fulfilled.",
+  "job": "Find signs at Tarfen Crossing whether Arlette passed that way."
+ }
+}

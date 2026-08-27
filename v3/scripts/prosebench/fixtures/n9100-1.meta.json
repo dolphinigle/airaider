@@ -1,0 +1,59 @@
+{
+ "seed": 9100,
+ "chainId": "chain-14",
+ "title": "Two Shrines, One Chain",
+ "bible": {
+  "title": "Two Shrines, One Chain",
+  "kernel": "A steward hires the company to fetch a relic both shrines claim. Tracking leads from the burners' camps to an elf who can join them, they must deliver the chain to the steward while a rival priest tries to take it.",
+  "cast": [
+   {
+    "name": "Liutpert Hollis",
+    "who": "keeper of a roadside waypost and small shrine, pragmatic and worried for his post.",
+    "want": "to have a relic both shrines claim delivered to him at his waypost",
+    "trade": "steward",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Falkyn",
+    "who": "head of the rival northern shrine, sharp-eyed and quick to arm acolytes.",
+    "want": "to secure the relic for her shrine",
+    "trade": "priest",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   },
+   {
+    "name": "Murilam",
+    "who": "an exiled elf hiding in the Western Forests, clever and restless",
+    "want": "to join the company in exchange for handing over the relic",
+    "trade": "thief",
+    "role": "prize",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Liutpert Hollis hired the company to fetch a relic two nearby shrines both claim. The relic is a short iron chain whose links bear shrine marks. An elf named Murilam holds the chain and will trade it and his service to escape alone. Falkyn, the rival shrine's priest, intends to claim the chain in person.",
+  "goal": "to recover a relic both shrines claim and deliver it to Liutpert Hollis at his waypost",
+  "arc": [
+   "Go to the charcoal-burners' camps the client named and ask the burners about passing pilgrims and odd goods → yields: a single heavy link of chain stamped with Erranenen's shrine knot",
+   "Take the chain to Erranenen's hill-shrine and press the priest for routes and claimants using the stamped link → yields: Erranenen himself, who recognizes the mark, names the emerald glade where Murilam fled, and agrees to travel to Liutpert's waypost as witness",
+   "Use Erranenen's directions to search the emerald glade for the elf named Murilam and negotiate the chain's custody → yields: Murilam, who offers the chain and his promise of service in exchange for a place with the company",
+   "Escort Murilam and Erranenen to Liutpert Hollis's waypost to hand the chain over. Falkyn arrives to claim the relic and is outwitted there so the chain reaches Liutpert"
+  ],
+  "twist": null,
+  "tensions": [
+   "Falkyn will appear to claim the chain and brings acolytes who will press the matter with force",
+   "Burners distrust outsiders and can withhold or bend leads at a price",
+   "Murilam's willingness to join depends on safe treatment, not just payment"
+  ],
+  "openDirections": [
+   "The two shrines may escalate the claim into raids on the waypost whether or not the company completes the delivery"
+  ],
+  "stakeIfLost": "Liutpert says that if the relic is not produced, his waypost will lose the donation that keeps the keeper supplied, forcing the post to close.",
+  "arrival": "walked in with the market crowd · would not name the place until the terms were set"
+ },
+ "shipped": {
+  "title": "Question the charcoal-burners",
+  "situation": "A steward, Liutpert Hollis, walked in with the market crowd and rubbed a thumb along a scar while he asked for help. He says that if the relic is not produced his waypost will lose the donation that keeps the keeper supplied and the post will have to close. He wants the charcoal-burners at their camps asked about passing pilgrims and any odd goods, the pay being the agreed coin and what the road turns up. A priest intends to secure the relic for her shrine and will move to claim it if it appears. He kept his place name until terms were set.",
+  "job": "Do the charcoal-burners at their camps remember any pilgrim carrying a small relic?"
+ }
+}

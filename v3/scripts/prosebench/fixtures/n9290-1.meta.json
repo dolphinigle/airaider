@@ -1,0 +1,58 @@
+{
+ "seed": 9290,
+ "chainId": "chain-14",
+ "title": "The Riot Singer",
+ "bible": {
+  "title": "The Riot Singer",
+  "kernel": "Hired to fetch Lokir the caged singer and deliver him alive to Philbert the Younger.",
+  "cast": [
+   {
+    "name": "Philbert the Younger",
+    "who": "Brinebridge trader who fears losing his market to mob violence.",
+    "want": "to receive the caged singer alive at his warehouse in Brinebridge",
+    "trade": "merchant",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Lokir",
+    "who": "river-hamlet wolfman known for songs that rile crowds and stir fights.",
+    "want": "to avoid being handed over and to keep singing in public",
+    "trade": "singer",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Valenn Thistledown",
+    "who": "Fenpool stallkeeper who claims a penance-right over troublemakers she cages.",
+    "want": "to keep Lokir to extract penance and prevent Philbert from taking him",
+    "trade": "stallkeeper",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   }
+  ],
+  "situation": "Philbert hired the company to fetch a caged singer and deliver him to Philbert's warehouse. The singer, Lokir, is currently held in a cage and fitted with an iron collar that makes his singing dangerous. Philbert named Valenn Thistledown's stall at Fenpool as the first place to check and Philbert's warehouse at Brinebridge as the place of delivery. Valenn claims a right to Lokir and will try to stop the handover.",
+  "goal": "to bring a caged singer alive to Philbert the Younger at his warehouse",
+  "arc": [
+   "Travel to Valenn Thistledown's stall at Fenpool the client named and inspect the cage there → yields: a bone token stamped with Felldir's rune",
+   "Take Felldir's bone token into Hollow Mire and use it at Felldir's hut to bargain for what binds the singer → yields: an iron key that silences Lokir's collar",
+   "Bring the caged Lokir and the iron key to Philbert's warehouse at Brinebridge, face Valenn's claim, and use the key to silence the collar so Philbert can take him"
+  ],
+  "twist": null,
+  "tensions": [
+   "a necromancer will traffic in singers and weaponize their songs",
+   "Valenn claims local rights and the people's sympathy, and will demand payment or penance",
+   "the iron collar forces riotous song unless it is silenced with the right key"
+  ],
+  "openDirections": [
+   "Word spreads of Lokir's collar. Rival buyers and town magistrates may move to seize him if delayed"
+  ],
+  "stakeIfLost": "If the company fails, Philbert's river market will be set alight when Lokir next sings, destroying his season's stock and breaking his trade.",
+  "arrival": "turned up with the tally-carts · asked what the company had lost lately"
+ },
+ "shipped": {
+  "title": "Inspect the cage at Fenpool",
+  "situation": "A merchant, Philbert the Younger, turned up with the tally-carts asking after a caged singer. Philbert says if we fail his river market will be set alight when another party next sings. The current step is to travel to Fenpool and inspect the cage at a stall said to belong to Valenn Thistledown. A stallkeeper at Fenpool is reported to be hostile and may refuse entry. Philbert will pay in honest coin and any small spoils besides if the singer arrives alive at his warehouse. Philbert stops talking whenever anyone walks past.",
+  "job": "Inspect the cage at the stall said to belong to Valenn Thistledown in Fenpool and report on its condition and occupant"
+ }
+}
