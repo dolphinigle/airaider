@@ -40,6 +40,39 @@ const zStrArr = z.union([z.array(z.string()), z.string(), z.null()]).default([])
 // "…renounce the…" handed every beat writer a broken fact.
 // SEMICOLON SPLITTER: the no-semicolon rule was ignored ~23×/campaign — prose semicolons
 // splice independent clauses, so splitting into two sentences is mechanically safe here
+/** A cheap model told its prose "must be consistent with every tag" demonstrates compliance by
+ *  PRINTING the tags — "(Tags: human, male, ranged (low), instinctive)" appended to a backstory,
+ *  or a "TAGS NOTATION:" preamble. Reproduced 3/3 on 2026-08-27 after it reached the designer's
+ *  own game. The prompt already forbids echoing its own wording and the model does it anyway
+ *  (L1: a rule's wording comes back as prose), so this is engine enforcement, not a fifth ban. */
+/** every word the tag system can produce — the test is CONTENT, not the label "Tags:", because
+ *  banning that label just moved the echo: it came back as "(human. Male. Ranged (low). Instinctive)"
+ *  at the head of the who-line instead (2026-08-27, second round) */
+const TAG_ECHO_WORDS = new Set([
+  'male', 'female', 'human', 'elf', 'wolfman', 'lizardman', 'low', 'mid', 'high', 'legendary', 'tags', 'tag', 'notation',
+  'melee', 'ranged', 'leadership', 'social', 'roguery', 'lore', 'heal', 'craft', 'nature', 'performance', 'intimidation', 'food',
+  'cool', 'hotheaded', 'serious', 'playful', 'greedy', 'generous', 'loner', 'gregarious', 'lustful', 'chaste', 'dominant',
+  'submissive', 'calculating', 'instinctive', 'tall', 'short', 'endowed', 'flat', 'muscular', 'scrawny', 'nimble', 'clumsy',
+  'clever', 'dull', 'beautiful', 'ugly', 'tough', 'sickly', 'ruler', 'soldier', 'criminal', 'priest', 'mystic', 'artisan',
+  'adventurer', 'entertainer', 'merchant', 'scholar', 'courtesan', 'sailor', 'slave', 'hunter', 'peasant', 'servant',
+]);
+/** a run of text is a TAG LIST when nearly every word in it is one of those words */
+const isTagList = (inner: string): boolean => {
+  const words = inner.toLowerCase().split(/[^a-z-]+/).filter(w => w.length > 2);
+  if (words.length < 3) return false;
+  return words.filter(w => TAG_ECHO_WORDS.has(w)).length / words.length >= 0.75;
+};
+
+const stripTagEcho = (s: string) => {
+  let out = s;
+  // a bracketed aside anywhere that is just the tag line (one level of nesting: "ranged (low)")
+  out = out.replace(/\s*\((?:[^()]|\([^()]*\))*\)/g, m => isTagList(m.slice(1, -1)) ? '' : m);
+  out = out.replace(/\s*\[(?:[^[\]()]|\([^()]*\))*\]/g, m => isTagList(m.slice(1, -1)) ? '' : m);
+  // or a bare label-and-list opening the field: "TAGS NOTATION: male, human, criminal (low)."
+  out = out.replace(/^[^.!?]*[:：][^.!?]*[.!?]\s*/, m => isTagList(m) ? '' : m);
+  return out.replace(/\s+([.,;!?])/g, '$1').replace(/\s{2,}/g, ' ').trim();
+};
+
 const desemi = (s: string) => {
   // hash-seeded alternation so different texts break stamps differently (a per-call counter
   // once turned every "Expect" into "Count on" — and substituting words into arbitrary clauses
@@ -82,7 +115,7 @@ const desemi = (s: string) => {
       (_, p: string, c: string) => p + c.toUpperCase());
 };
 const zProse = (max: number) => z.string().transform(raw => {
-  const s = desemi(raw);
+  const s = desemi(stripTagEcho(raw));
   if (s.length <= max) return s;
   const cut = s.slice(0, max);
   const lastStop = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('! '), cut.lastIndexOf('? '));
@@ -247,7 +280,7 @@ function oneOffLightSystem(input: QuestWriteInput): string {
     input.avoid?.length ? '- avoid: the player\'s recent cards. Different trouble, different props.' : '',
     NUMBER_BAN,
     tagVocab(!!input.framedCharacter?.partial),
-    '═══ YOUR OUTPUT — respond as JSON: {title, situation, job, ask: [{attribute, extraAttribute?, favored, clashing, requiredTag?}] }',
+    `═══ YOUR OUTPUT — respond as JSON: {title, situation, job, ask: [{attribute, extraAttribute?, favored, clashing, requiredTag?}]${input.framedCharacter?.partial ? ', quarryTags' : ''} }`,
     // first run produced "Punctured Barrels Report" and "Hollow Refuge Inquiry" — a card FILE
     // rather than a job. A title names the trouble, the way a person would say it out loud.
     '- title: three or four plain words naming the trouble, the way one of the company would say it to another. No name of any person or place.',
@@ -262,6 +295,9 @@ function oneOffLightSystem(input: QuestWriteInput): string {
     // twice", both amounts in prose, banned two lines above (cold-reads, 2026-08-27).
     '  Three of the right LENGTH, deliberately unalike: "Sheep keep going missing and the shepherd has stopped saying how." · "The tanner\'s daughter has not been seen since the fair and her father will not go to the watch." · "Something is in the flooded workings and the diggers have stopped going down."',
     '- job (ONE terse line): the errand itself, plainly — what the company is actually being sent to do. It names what the situation left out.',
+    // The engine BUILDS the delivered person out of these words, so they are not decoration:
+    // whatever the card implies the person is, say it here or they arrive as somebody else.
+    input.framedCharacter?.partial ? '- quarryTags: up to 3 TAG VOCABULARY words for the person this job is about — their trade and their nature, as your sentence implies them (a shrine novice is a priest; a missing shepherd is a hunter or a peasant). Race and sex are already set: spend every word on something new. Optional rank: "word (low|mid|high)".' : '',
     ASK_SPEC,
     // TWO rules, not five. The first draft's block restated the situation rule, the tag rule and
     // the diction rule that all sit a few lines above it — a third of the prompt spent saying
@@ -548,7 +584,9 @@ const oneOffLightResolveSystem = (q: ResolveQuestInput): string => {
   canBond
     ? '- edges: BOTH ends must be an id from party — nobody else in this scene has one. Routine work rarely leaves a mark: [] is the normal answer, and 1 is the most a job like this ever earns. blurb one line; importance a NUMBER 0-1 (0.3 routine, 0.9 defining).'
     : '- edges: always [] — one soldier went out alone, and an edge joins two of the company\'s own.',
-  '- fleshed: always [] — nobody is handed over on a job like this.',
+  q.deliveredCharacters?.length
+    ? '- fleshed: one entry per deliveredCharacters id — this is the ONLY call that knows how they came into the company\'s hands, so their who/backstory must belong to THIS job.'
+    : '- fleshed: [] — nobody is handed over on this job.',
   '═══ ABOVE ALL (write now) ═══\n1. Every sentence parses ONE way on one skim — subject and verb early.\n2. The result is unmistakable: what was won or lost, what the company now holds — and a FAILED job wins NOTHING.\n3. The report ENDS at the job\'s last act in the field; the coin and the walk home stay outside your text. GOLD IS NEVER STAGED and no numbers appear in prose.\n4. Period diction; never echo an instruction or a field name ("approach", "plan", "outcome", "step", "dice", "roll", "obstacle" are system words that never appear in prose).\nRespond as the JSON object specified below — nothing else.',
   'Respond as JSON matching: {questId (copy it back exactly), before, after, injuries:[{characterId (an id from party), band: STRICTLY "low"|"med"|"high" — note "med", not "mid", cause}], fleshed:'
     + (q.deliveredCharacters?.length ? '[{characterId,who,backstory,quirks}]' : ' []')
@@ -801,6 +839,9 @@ export function makeOpenAiProvider(): AiProvider {
         '- who: their CHARACTER-CARD line — the sentence under a hero\'s portrait. Shape: their station or origin, then ONE hook (a drive, a past, or a temper): "A [what they are/were]. [What drives or marks them.]" Two short plain sentences at most, third person. TIMELESS identity only — never current custody, quest-state, or willingness (those change; the line must not), never a micro-habit (habits live in quirks), never a metaphor or simile ("like a…" and "wore X like Y" are the tell), never merely their name, never a riddle or a poem.',
         '- backstory: 2 sentences of origin that FIT their tags and how they arrived, carrying one detail a reader could love, pity, or worry over — SHOWN inside the telling, never announced as a labeled fact. Plain concrete events — who, where, what happened; never lyrical vagueness or withheld mysteries (a fact the reader can hold beats a mood they cannot). Every word must be consistent with every tag — never contradict one. Never echo these instructions or their wording in the prose.',
         '- if a `saga` is given, that person IS who that story was about (saga.kernel = the one-line idea it was built on; saga.want = what they wanted in it): their backstory must grow out of it so a player who followed the saga recognizes them. Never contradict the saga; never retell it — tell what came BEFORE it.',
+        // Without this the fallback path knew only a four-word `context` string and had no choice
+        // but to invent an origin — a rescued shrine novice was written a courtesan's past.
+        '- if a `quest` is given, that is the JOB the company took to reach this person, and the card the player read (quest.situation) is what the player already believes about them. Their who and backstory must fit it: the trouble named there is the trouble they were in. Never retell the job — tell who they were BEFORE the company came for them.',
         '- quirks: 1-2 concrete PHYSICAL habits a watcher could notice (an action, never an adjective; each a short phrase of a few words). BANNED stock quirks: fingering/thumbing an object, humming or whistling, rubbing a wrist, folding a cloth corner — reach wider (gait, eating, grooming, small rituals, how they stand or carry things), give each person in this batch a DIFFERENT kind of habit, and avoidQuirks (when given) lists habits living characters already own: never re-deal one.',
         'Make the people DISTINCT from each other — no two in a batch open their who-line with the same station phrase (context says how they came; the STATION is yours to individuate). No semicolons — split into two sentences. One prop is BANNED (the trade\'s most overused): the account-book — ledger, manifest, registry, record-book by any name.',
         '═══ ABOVE ALL (write now) ═══\n1. Every line is plain and concrete — a fact the reader can hold, never a mood, metaphor, or riddle.\n2. who is TIMELESS; habits live only in quirks; nothing contradicts a tag.\n3. Each person in the batch is DISTINCT: different station openers, different kinds of habit.\nRespond as JSON: {people:[{characterId, who, backstory, quirks:[...]}]} — ids exactly as given, nothing else.',

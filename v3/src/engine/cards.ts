@@ -32,6 +32,10 @@ export interface CharacterData {
   who?: string;             // AI-written one-liner
   backstory?: string;
   quirks?: string[];
+  /** the job this person came out of, kept so their story can be written to FIT it. The resolver
+   *  normally writes them at delivery; this is what the fallback flesh pass has to work from when
+   *  it doesn't (2026-08-27: without it a rescued shrine novice was given a courtesan's past). */
+  origin?: { title: string; situation: string; job: string };
 }
 
 export interface Card {

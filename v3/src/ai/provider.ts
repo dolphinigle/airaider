@@ -151,6 +151,14 @@ export interface FleshInput {
   tags: string;              // rendered tag line
   role: string;              // merc / captive / hireling
   context: string;           // how they came to the fort ("founding member", "won at the finale of <saga>")
+  /** set when this person came out of a QUEST — the fallback flesh path otherwise knows only a
+   *  four-string `context` and can do nothing but invent an origin. Mirrors `saga` below, which
+   *  was added for exactly this reason on the genesis-focal path (2026-08-27) */
+  quest?: {
+    title: string;
+    situation: string;       // the card the player read when they took the job
+    job: string;             // the errand as the board stated it
+  };
   saga?: {                   // set when this person is a chain's focal: backstory must FIT this story
     title: string;
     kernel: string;          // the one-line collision the saga is built on

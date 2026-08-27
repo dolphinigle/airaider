@@ -2384,6 +2384,10 @@ export class Game {
     // delivery
     for (const c of r.delivery.cards) {
       if (c.character) {
+        // remember the job that handed them over. The resolver writes their story right here and
+        // normally that is the end of it — but when it doesn't (a fallback resolution, a model
+        // that skipped the field), the flesh pass is the only thing left and it knows nothing.
+        c.character.origin = { title: r.quest.title, situation: r.quest.situation ?? '', job: r.quest.job ?? '' };
         const fleshed = out?.fleshed.find(f => f.characterId === c.id);
         if (fleshed) { c.character.who = fleshed.who; c.character.backstory = fleshed.backstory; c.character.quirks = fleshed.quirks }
         this.ensureLoreNode(c);
@@ -3009,6 +3013,7 @@ export class Game {
         return {
           characterId: c.id, name: c.name, tags: renderTags(c.tags),
           role: c.character!.role,
+          quest: c.character!.origin,
           context: genesis
             ? (genesis.state === 'slipped'
               ? `the person the saga "${genesis.bible.title}" is about — they slipped through the company's fingers once already`
