@@ -36,7 +36,13 @@ function nakedNames(card: string, names: string[]): string[] {
     const i = card.search(new RegExp(`\\b${first.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`));
     if (i < 0) continue;
     const sentStart = Math.max(0, card.lastIndexOf('.', i - 1) + 1);
-    if (!/\b(a|an)\s+[a-z]/.test(card.slice(sentStart, i))) out.push(n);
+    // CASE-INSENSITIVE, and this is not a nicety: without the `i` flag the check never matched a
+    // card that OPENS with its designation ("An elder merchant, Marienne Fairweather, came back…"),
+    // which is the exact shape the whole change was built to produce. The broken detector reported
+    // 17% clean where the cards were 91% clean — a measuring bug that nearly sent me chasing a
+    // regression that did not exist. Verify an instrument against hand-counted cards before
+    // trusting a number it produces.
+    if (!/\b(?:a|an)\s+[a-z]/i.test(card.slice(sentStart, i))) out.push(n);
   }
   return out;
 }
@@ -46,8 +52,10 @@ function coined(card: string, payload: string): string[] {
   return [...new Set((card.match(/(?<=[a-z,;:]\s)[A-Z][a-z]{2,}/g) ?? []))]
     .filter(w => !STOP.has(w) && !payload.includes(w));
 }
-const opensOnPerson = (card: string) => /^(A|An|The)\s+[a-z-]+(\s+[a-z-]+){0,4}\s+(who\s+\S+\s+)?[a-z]+(s|ed)\b/.test(card.trim())
-  || /^[A-Z][a-z]+(\s+of\s+[A-Z][a-z]+)?\s+[a-z]+(s|ed)\b/.test(card.trim());
+/** the shipped rule, measured literally: "the card's FIRST WORDS say what someone IS". The old
+ *  version demanded the verb within five words and so failed on every appositive opener — the
+ *  construction the naming rule actually produces. */
+const opensOnPerson = (card: string) => /^\s*(?:A|An|The)\s+[a-z]/.test(card);
 
 const JUDGE = `You are handed a job posting from a mercenary company's board. You know nothing else —
 no prior cards, no story so far. Answer strictly from the posting.
@@ -76,7 +84,7 @@ const grounded = (card: string, v: unknown): boolean => {
   return q.filter(w => c.includes(w)).length / q.length >= 0.7;
 };
 
-type Row = { fx: string; card: string; q: Record<string, boolean>; naked: string[]; coined: string[]; opens: boolean; w: number; s: number };
+type Row = { fx: string; card: string; names: string[]; q: Record<string, boolean>; naked: string[]; coined: string[]; opens: boolean; w: number; s: number };
 const rows: Row[] = [];
 // 'v1' = the three frozen pre-change captures (the baseline). 'new' = every fixture the current
 // engine has captured, so the arms are measured on prompts the code actually produces.
@@ -102,7 +110,7 @@ for (const [sysF, usrF] of fixtures) {
       const raw = JSON.parse(r.choices[0]!.message.content || '{}');
       for (const k of ['hirer', 'matter', 'why', 'steel']) q[k] = grounded(card, raw[k]);
     } catch { /* skip */ }
-    rows.push({ fx: usrF, card, q, naked: nakedNames(card, names), coined: coined(card, user), opens: opensOnPerson(card), w: words(card), s: sentences(card).length });
+    rows.push({ fx: usrF, card, names, q, naked: nakedNames(card, names), coined: coined(card, user), opens: opensOnPerson(card), w: words(card), s: sentences(card).length });
   }
 }
 
