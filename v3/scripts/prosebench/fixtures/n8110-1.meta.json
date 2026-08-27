@@ -1,0 +1,59 @@
+{
+ "seed": 8110,
+ "chainId": "chain-13",
+ "title": "Claim of the Bound Heir",
+ "bible": {
+  "title": "Claim of the Bound Heir",
+  "kernel": "A steward hires the company to find a hidden heir so he can reclaim his house's pledged chest.",
+  "cast": [
+   {
+    "name": "Naddu Brightwater",
+    "who": "river-house steward who holds a minor family claim and fears the house's creditors.",
+    "want": "to reclaim the family hoard and its pledged chest",
+    "trade": "steward",
+    "role": "client",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Susane",
+    "who": "a sickly mystic who fled into the western wood and refuses to be found.",
+    "want": "to keep the buried chest and remain unclaimed",
+    "trade": "heir",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Autodikos",
+    "who": "a rusted-ford ritualist who trades in severing bonds and demands exact payment.",
+    "want": "to perform the severing ritual for agreed payment",
+    "trade": "ritualist",
+    "role": "ally",
+    "loreId": "lore-12"
+   }
+  ],
+  "situation": "Naddu Brightwater hires the company to find the lost heir and recover the family's pledged chest so the house can settle its debts. The client names the warden-stones ridgeline as the first place to search.",
+  "goal": "to bring the named heir before Naddu Brightwater so the client may reclaim the family's pledged chest",
+  "arc": [
+   "Go to the warden-stones the client named and search the stones for any sign the heir left → yields: a strip of silk bearing the Brightwater sigil snagged in lichen",
+   "Follow the silk along a moss-choked ditch to the low hollow the ribbon leads toward and find whoever left it → yields: Susane tending a sealed chest sunk in the ditch. She refuses to leave and names Autodikos as the only one who can loosen the chest's hold on her",
+   "Find Autodikos at the rusted ford the woman named and bargain for his severing rite using his terms → yields: Autodikos will perform the severing only if the chest is presented again before the client and he is paid on the ridgeline",
+   "Bring the chest from the hollow to the warden-stones as Autodikos demands and present it before Naddu Brightwater while the ritual is done. Settle Susane's refusal there → yields: the chest is freed from its hold and handed to Naddu Brightwater, settling the hire"
+  ],
+  "twist": "Susane's life is magically bound to the buried chest; removing the hoard will break the bond and kill her.",
+  "tensions": [
+   "Susane will refuse to be taken while the chest remains bound to her",
+   "Autodikos demands exact payment and terms that force the final act to happen before the client",
+   "Old forest rites and nearby claimants will take interest once the chest is moved"
+  ],
+  "openDirections": [
+   "Delivering the chest to Naddu will draw the attention of old claimants in the wood who may contest the Brightwater recovery"
+  ],
+  "stakeIfLost": "If the heir and chest are not returned, Naddu's house will lose the pledged chest and be forced to surrender its river toll rights to creditors.",
+  "arrival": "came in the night and would not wait for morning · refused food and drink"
+ },
+ "shipped": {
+  "title": "Search the warden-stones",
+  "situation": "A steward came in the night and refused food and drink, Naddu Brightwater. If the heir and chest are not returned, Naddu says his house will lose the pledged chest and be forced to surrender its river toll rights to creditors. Naddu wants the warden-stones searched for any sign the heir left, the coin comes at the finish, with the pick of what the job turns up. A hidden heir will try to keep the pledged chest and remain unclaimed. He laughs in the wrong place and says the house will not fold for lack of a chest.",
+  "job": "Are there any signs the heir left at the warden-stones?"
+ }
+}

@@ -1,0 +1,59 @@
+{
+ "seed": 8120,
+ "chainId": "chain-12",
+ "title": "The Feather at the Pass",
+ "bible": {
+  "title": "The Feather at the Pass",
+  "kernel": "A beekeeper hires the company to fetch the artisan who keeps the winter road open, and they must deliver him while a conscription officer tries to take him.",
+  "cast": [
+   {
+    "name": "Nushala Palebough",
+    "who": "an elder who runs the beekeepers' clearings and pays for the pass to be kept open",
+    "want": "to have the artisan brought to the beekeepers' clearings to maintain the winter feeding",
+    "trade": "beekeeper",
+    "role": "client",
+    "loreId": "lore-10"
+   },
+   {
+    "name": "Sinyaruton",
+    "who": "an exiled elf from the Western Forests who crafts swan-feather lures and keeps a secret grievance",
+    "want": "to be safe from seizure and to choose his own work",
+    "trade": "artisan",
+    "role": "prize",
+    "loreId": "c8"
+   },
+   {
+    "name": "Galenwe",
+    "who": "a hard-faced recruit sergeant sent to take craftsmen into the winter levy",
+    "want": "to seize able-bodied artisans for the conscription rolls",
+    "trade": "soldier",
+    "role": "obstacle",
+    "loreId": "lore-11"
+   }
+  ],
+  "situation": "A lonely feeding ritual at the winter pass keeps the lane melting. Beekeepers supply offerings but the lure-maker is an exiled elven artisan who refuses to leave without protection. The beekeepers cannot spare him, the winter road depends on the feeding, and a soldier sent to press men into service will move to claim any craftsman at hand.",
+  "goal": "to bring the artisan who tends the pass's feeding to the beekeepers' clearings so the winter road stays open.",
+  "arc": [
+   "Go to the beekeepers' clearings named by Nushala and ask who keeps the pass open → yields: a thin trail of swan-feather scraps that heads east toward Hollow-thatch.",
+   "Follow the feather trail to the Hollow-thatch workshop and seek the artisan there → yields: Sinyaruton at his bench, who will agree to travel only if the company shields him from any seizure at the handover.",
+   "Escort Sinyaruton toward the clearings on the outer road using his consent to time the approach → yields: scouts report a conscription picket marching toward the beekeepers' clearings led by Galenwe.",
+   "Bring Sinyaruton to the beekeepers' clearings, stand with Nushala, and face Galenwe as he arrives to claim the artisan"
+  ],
+  "twist": null,
+  "tensions": [
+   "Galenwe will claim any able-bodied artisan for the winter levy and will not accept excuses.",
+   "Sinyaruton's defrocking and private grievance make him distrustful and unwilling to be carted off.",
+   "Thin roads and surprise patrols can force the company into a hard choice at the handover."
+  ],
+  "openDirections": [
+   "If the company delivers Sinyaruton safely, he may demand a place or a share in pay. If they fail, the draft will seize other craftsmen in the forests."
+  ],
+  "stakeIfLost": "the beekeepers' stacked honeycombs will spoil and the clearings will be cut off when the pass freezes.",
+  "arrival": "came in the night and would not wait for morning · asked for the boss by name"
+ },
+ "shipped": {
+  "title": "Ask who keeps the pass open",
+  "situation": "An elder who runs the beekeepers' clearings, Nushala Palebough, came in at night and asked for you. She says the artisan who tends the pass must be brought to the clearings to maintain the winter feeding, the fee is as agreed, and any spoils ride home with it. If this fails, the beekeepers' stacked honeycombs will spoil and the clearings will be cut off when the pass freezes. She watches your hands, not your face, as she says, 'Who keeps the pass open?' A soldier intending to seize able-bodied artisans for the conscription rolls is moving through the lanes and could take the artisan first.",
+  "job": "Go to the beekeepers' clearings named by Nushala and ask who keeps the pass open"
+ }
+}

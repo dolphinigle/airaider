@@ -54,6 +54,47 @@ this card has already put on the page") killed the mold outright and produced th
 the whole lab: a knife cleaned and sharpened this morning though its owner is gone; a boot set
 neatly by the door; the missing man's keepsake resting on the foreman's bench.
 
+**L19. A DEALT STRING IS PASTED WHERE IT LANDS — so it must be grammatical there.** Measured hard,
+twice over. The old beat-1 pay envelope survived **36/36** generations and the stake rumour
+**35/36**, including in an arm whose prompt explicitly said *"the rumour is cut"* — ~25 of ~80 words,
+a third of the card, immovable by instruction. The corollary bit back the moment the pay was
+reshaped: dealt as a bare noun phrase (`"the agreed coin, and what the road turns up"`) it landed
+appositive and shipped as *"…watch who tends the winter road, payment the agreed coin and what the
+road turns up."* Every dealt clause now carries its own verb. **The strongest form of this law: if
+you want a sentence on the card, deal the sentence.**
+
+**L20. …which means a pre-shaped string you deal is a STAMP you built yourself.** `standsAgainst`
+was dealt as `a ${trade} who means ${want}` and appeared on **6 of 6** live cards as "A trader means
+to keep…", "A soldier who means to hold…", "An acolyte means to assert…". It is two atoms now, as
+`arrival` is, and the writer must build the sentence. L19 and L20 are the same fact from both ends:
+**deal a sentence only where you want that exact sentence; deal atoms everywhere else.**
+
+**L21. A payload KEY that reads like card English becomes card English.** *"Known obstacles are that
+scavengers…"*, then after renaming, *"What stands against this is a hunter who…"* — the field name
+became the sentence, twice, under two names. `KEYWORDS` is the one label in this codebase that has
+never leaked, and it earns that two ways: a shouted, un-Englishy key **and** an explicit
+never-print-the-label rule. Renaming alone is not the fix; it just moves the leak.
+
+**L22. Count the obligations against the length cap, in sentences, before shipping any prompt.**
+Nine blind writer-reports and one zero-context auditor independently did this arithmetic and reached
+the same verdict: ~13 sentences of mandated content against a 7-sentence ceiling. *"It guarantees I
+break a stated rule on every generation, and leaves the choice of WHICH to chance."* An
+over-subscribed prompt does not degrade gracefully — it degrades **randomly**, and the thing dropped
+is whatever the model reached last. Every list of required content needs a **keep-in-this-order**
+line, the shape the resolve prompt has used for months.
+
+**L23. Fixing one defect by adding emphasis reliably breaks a neighbouring one.** Live, in sequence:
+stressing that a name takes no article ("a Meluririe Dawnsinger") pushed bare-name openers from
+**1/8 to 5/10** — the very defect the rule existed to prevent. Naming the money sentence as the
+tell's home welded the tell to the pay on **5/8**. The safe form of a rule is POSITIONAL and
+POSITIVE ("the card's first words say what someone IS"), never a prohibition with an intensifier.
+
+**L24. The lever hierarchy, restated by a writer who had never heard of it.** After a day of doing
+the job blind: ***"The dealt facts outperformed my writing everywhere they existed."*** On the best
+card of that round the only two live sentences were the engine-dealt `arrival` and `clientTell`,
+*"barely touched"*. Nine reports, three rounds, one conclusion — and it is §0 #2, arrived at from
+the other side.
+
 ## PART 2 — literature, and how it lines up
 
 - **The "pink elephant" problem — negative instructions are weak.** To suppress a concept the model

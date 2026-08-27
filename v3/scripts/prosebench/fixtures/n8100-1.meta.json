@@ -1,0 +1,58 @@
+{
+ "seed": 8100,
+ "chainId": "chain-14",
+ "title": "Return to Rookford",
+ "bible": {
+  "title": "Return to Rookford",
+  "kernel": "A lord hires the company to fetch his exiled enemy back to town. The trail runs through an elven border and a stubborn warden who will block the final handover.",
+  "cast": [
+   {
+    "name": "Mercuro Coalgate",
+    "who": "Minor lord who holds the tollhouse at Rookford and fears losing his income.",
+    "want": "to receive the exile named by the client in Rookford for judgment.",
+    "trade": "lord",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Nevrasa",
+    "who": "An elven warden who enforces refuge inside the Western Forests and answers to no human lord.",
+    "want": "to keep the exile under elven protection and prevent his delivery to human courts.",
+    "trade": "warden",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   },
+   {
+    "name": "Thallik Bonechewer",
+    "who": "Exiled wolfman sailor who returned from sea with coin and odd goods and took forest refuge.",
+    "want": "to remain at liberty to sell trout at market and stay out of Mercuro's custody.",
+    "trade": "sailor",
+    "role": "quarry",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Mercuro Coalgate once banished Thallik Bonechewer for theft. Thallik went to sea, found and traded a wreck's stores, and returned with coin enough to buy shelter and rights from an elven warden. Nevrasa accepted Thallik into an elven border camp in exchange for work guarding trout runs. Thallik now appears in the human market to sell trout while living under Nevrasa's ward. Mercuro hires a company to bring Thallik back to Rookford so Mercuro can press charges and recover property.",
+  "goal": "to capture Thallik Bonechewer and deliver him to Mercuro Coalgate at Rookford for judgment.",
+  "arc": [
+   "Go to Ashen Ford, the first place Mercuro named, and question the ferry tavern for signs of the exile → yields: a paid ferry token from Ashen Ford stamped toward Mourgrove with Thallik's knot.",
+   "Use the ferry token to reach Mourgrove, the elven border camp, and press its wardens there → yields: Nevrasa admits sheltering Thallik and says he sells trout at Rookford market.",
+   "Go to Rookford, the market place Mercuro named, and seize Thallik where he appears. Nevrasa follows and tries to stop the handover and is outwitted, leaving Thallik in custody to hand to Mercuro"
+  ],
+  "twist": null,
+  "tensions": [
+   "Nevrasa will refuse to hand over those under her ward and will force a costly choice.",
+   "Thallik is unpredictable and may flee or fight in market crowds during capture.",
+   "Mercuro's rivals could use the affair to stir the market and block the company's work."
+  ],
+  "openDirections": [
+   "If Thallik is delivered or freed, Nevrasa's ward gains reputation that shifts local claims on trout runs and toll rights."
+  ],
+  "stakeIfLost": "Mercuro says his woodland tollhouse deed will be seized by creditors if Thallik is not returned, costing him the toll income that keeps him solvent.",
+  "arrival": "sent word twice before coming · named a price before being asked"
+ },
+ "shipped": {
+  "title": "Question the ferry tavern at Ashen Ford",
+  "situation": "A minor lord, Mercuro Coalgate, sent word twice before coming and named a price before being asked. He watches your hands, not your face as he says his woodland tollhouse deed will be seized by creditors if Thallik is not returned, costing him the toll income that keeps him solvent. He wants you to bring the exile, Thallik Bonechewer, to Rookford for judgment, the fee is as agreed, and any spoils ride home with it. He named Ashen Ford as the first stop and asks you to question the ferry tavern for signs of the exile. A warden opposes this by keeping the exile under elven protection and preventing his delivery to human courts.",
+  "job": "Find whether Thallik Bonechewer is at the ferry tavern in Ashen Ford."
+ }
+}
