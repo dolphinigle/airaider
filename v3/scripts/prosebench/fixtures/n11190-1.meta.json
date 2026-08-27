@@ -1,0 +1,58 @@
+{
+ "seed": 11190,
+ "chainId": "chain-12",
+ "title": "The Hedgehog Cloak",
+ "bible": {
+  "title": "The Hedgehog Cloak",
+  "kernel": "A foreman hires the company to fetch a deserter who knows where the murdered loggers lie.",
+  "cast": [
+   {
+    "name": "Fainorume Palebough",
+    "who": "Foreman of the western logging outfit who needs proof to keep the cutters' pledge.",
+    "want": "to receive the deserter alive for custody",
+    "trade": "foreman",
+    "role": "client",
+    "loreId": "lore-10"
+   },
+   {
+    "name": "Paduxi",
+    "who": "A freelance forest hunter who profits by taking deserters to the highest bidder.",
+    "want": "to seize the deserter and sell her to a rival crew",
+    "trade": "hunter",
+    "role": "obstacle",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Hixultvutar",
+    "who": "A lizardman servant who deserted the logging crew and keeps to the western ruins.",
+    "want": "to remain hidden in Thornhollow and avoid being taken back to the foreman",
+    "trade": "servant",
+    "role": "quarry",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Fainorume Palebough has hired the company to find a deserter who knows where several loggers' bodies lie. The deserter has slipped into the western old-growth and hides among ruin and vagabond troupes, using a moth-eaten cloak marked with a hedgehog token as a disguise. A freelance hunter named Paduxi also tracks the deserter, intending to claim her for sale. The foreman will lose the cutters' pledged rights if he cannot present the deserter and the testimony she holds.",
+  "goal": "to bring the deserter who knows where the loggers' bodies lie back alive to the foreman",
+  "arc": [
+   "Search the loggers' winter huts the foreman named for recent traces of flight → yields: a moth-eaten gray cloak pinned beneath a beam, sewn with a small hedgehog token",
+   "Take the cloak to the roadside traders at Mothpine Clearing and force answers about that hedgehog mark → yields: a bitter trader points to a broken acting troupe wintering in the ruin of Thornhollow",
+   "Ride into Thornhollow, seize the deserter there and bring her back to the loggers' winter huts to hand her over to Fainorume Palebough, then defeat Paduxi when he appears to claim her and complete the delivery"
+  ],
+  "twist": null,
+  "tensions": [
+   "Paduxi's arrival at the handover threatens to rip the deal for profit",
+   "The troupe at Thornhollow is rude, disguised, and refuses help without payment",
+   "The ruin is unstable and slows movement, risking delay before the handover"
+  ],
+  "openDirections": [
+   "Neighboring crews press their challenge to the western cutting pledge. Delay lets rivals seize the huts."
+  ],
+  "stakeIfLost": "If the deserter is not returned, the logging crew will lose the pledged cutting rights and be driven from the winter huts.",
+  "arrival": "came in wet through · named a price before being asked"
+ },
+ "shipped": {
+  "title": "Sweep the winter huts for signs of flight",
+  "situation": "A foreman, Fainorume Palebough, came in wet through and named a price before being asked. He wants the deserter returned alive, the fee is as agreed, and any spoils ride home with it. If the deserter is not returned, the logging crew will lose the pledged cutting rights and be driven from the winter huts. A hunter intends to seize the deserter and sell her to a rival crew. He keeps a hand flat on the table when he points out the huts by Thornhollow's edge.",
+  "job": "Search the winter huts the foreman named for recent traces of flight"
+ }
+}

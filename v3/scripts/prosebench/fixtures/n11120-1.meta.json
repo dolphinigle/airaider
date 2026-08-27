@@ -1,0 +1,50 @@
+{
+ "seed": 11120,
+ "chainId": "chain-11",
+ "title": "The Funeral Trail",
+ "bible": {
+  "title": "The Funeral Trail",
+  "kernel": "A miller hires the company to fetch a stolen iron chest. A pale elf takes it into the old forest and plans to bring it back to Millbrook for proof.",
+  "cast": [
+   {
+    "name": "Vincelle of Millbrook",
+    "who": "the miller of Millbrook who buried her sister last week and lost a family chest at the wake.",
+    "want": "to have the iron-bound chest returned to her at Millbrook.",
+    "trade": "miller",
+    "role": "client",
+    "loreId": "lore-10"
+   },
+   {
+    "name": "Candariel Elmwhisper",
+    "who": "an elf from the Western Forests with a sailor's past who has been seen leaving funerals alone.",
+    "want": "to keep the chest to present it at Millbrook as proof of her claim.",
+    "trade": "sailor",
+    "role": "quarry",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Vincelle's iron-bound chest vanished during the village funeral. Tracks head into the Western Forests and the ruin at the heart has fresh fires. Local talk says a pale, keen animal learned to trail funerals and follows those who carry away such things.",
+  "goal": "to recover the iron-bound chest taken during Vincelle's sister's funeral and return it to Vincelle at Millbrook.",
+  "arc": [
+   "Travel to Millbrook's burial road and question the pallbearers the client named, using Vincelle's description → yields: a pallbearer reports that an elf slipped from the mourners with the small iron chest and followed the body into the Western Forests toward Thornhollow.",
+   "Pursue the funerary track into the Western Forests to the ruins of Thornhollow, using the pallbearer's direction → yields: Candariel Elmwhisper holds the iron-bound chest at Thornhollow and keeps a pale wolf that learned to trail funerals as company and guard.",
+   "Wait the dawn on Millbrook's burial road and intercept Candariel when she returns, drive her wolf off with sharp vinegar, and force or bargain the chest back to hand it over to Vincelle at Millbrook"
+  ],
+  "twist": null,
+  "tensions": [
+   "a funeral-stalking wolf guards the ruin and will attack anyone who seems to seize its charge",
+   "Candariel intends to bring the chest to Millbrook and will not hand it over quietly",
+   "Millbrook townsfolk distrust armed companies and may refuse the mercenaries entry without proof"
+  ],
+  "openDirections": [
+   "If the chest reaches Millbrook in Candariel's hands the town may split into jury and mob, forcing bargains, public claims, or a violent vote."
+  ],
+  "stakeIfLost": "If the company fails, Vincelle will lose her mill because the chest holds the deed and the sealed pledge that protect her from seizure.",
+  "arrival": "walked in with the market crowd · brought no one with them"
+ },
+ "shipped": {
+  "title": "Question the pallbearers on Millbrook road",
+  "situation": "A woman miller, Vincelle of Millbrook, walked in with the market crowd. She turns a ring around one finger and says she last saw the iron-bound chest vanish from her sister's grave at Millbrook. She says that if the chest is not found she will lose her mill because it holds the deed and the sealed pledge. She asks that you travel to Millbrook's burial road and question the pallbearers using her description, the fee is as agreed, and any spoils ride home with it. A sailor claims he will keep the chest to present it at Millbrook as proof of his claim.",
+  "job": "Travel to Millbrook's burial road and question the pallbearers about the iron-bound chest."
+ }
+}

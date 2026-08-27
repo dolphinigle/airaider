@@ -1,0 +1,59 @@
+{
+ "seed": 11170,
+ "chainId": "chain-14",
+ "title": "Drums at Cinder Fold",
+ "bible": {
+  "title": "Drums at Cinder Fold",
+  "kernel": "Hired to fetch a famed minstrel, the company picks a ragged trail into the old wood to bring him home.",
+  "cast": [
+   {
+    "name": "Bakene",
+    "who": "forewoman of a charcoal-burners' camp who runs the camp's deliveries and fears losing its buyers.",
+    "want": "to receive Quiver Wexcombe into her custody at the charcoal-burners' camp",
+    "trade": "matron",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Nushala Leafshade",
+    "who": "elf ranger of the old-growth who shelters and tends those broken by the battle.",
+    "want": "to keep Quiver Wexcombe safe within the wood",
+    "trade": "warden",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   },
+   {
+    "name": "Quiver Wexcombe",
+    "who": "wandering minstrel famed for leading a triumph that became a slaughter",
+    "want": "to avoid leaving the forest",
+    "trade": "entertainer",
+    "role": "quarry",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Quiver Wexcombe fled into the Western Forests after the victory he led became a massacre of a hunting party. He is wounded and has taken refuge in the old-growth. Nushala Leafshade, an elven warden, shelters him and refuses to hand him to humans. Bakene's camp risks losing its charcoal buyers unless Quiver is returned.",
+  "goal": "to bring Quiver Wexcombe back to Bakene at the charcoal-burners' camp",
+  "arc": [
+   "Question the charcoal-burners' camp the client named about Quiver Wexcombe → yields: Kraval, a foreman who saw Quiver slip away at dusk along a deer-track toward the timber",
+   "Follow Kraval's deer-track into the Western Forests, using his sighting to guide the route → yields: Enalde, a spinster watch who found a torn part of Quiver's costume stuck on a cross-stake",
+   "Push from Enalde's watch along the marked path, using the torn costume's direction to reach an elder-ring of pines → yields: an elven trail-mark that names Nushala Leafshade as sheltering Quiver",
+   "Bring Nushala to the charcoal-burners' camp the client named and force, bribe, or outwit her to surrender Quiver Wexcombe to Bakene"
+  ],
+  "twist": null,
+  "tensions": [
+   "Nushala will not hand over someone under her care and will demand a price or fight to keep him",
+   "A drum or signal could summon other wardens from the old-growth before the company can move",
+   "Company soldiers may balk at hauling a broken minstrel back to face judgment"
+  ],
+  "openDirections": [
+   "Buyers at the fort press for a quick closure. The camp's fate will be decided with or without the company's success."
+  ],
+  "stakeIfLost": "Bakene's charcoal contract with the fort will be torn up, leaving the camp without buyers and forcing its people out.",
+  "arrival": "came on foot, having walked it · had rehearsed it"
+ },
+ "shipped": {
+  "title": "Ask the burners about Quiver",
+  "situation": "A matron of charcoal-burners, Bakene, came on foot and has rehearsed her words. She turns a ring around one finger as she says, \"Bring Quiver to our camp,\" and the pay is the agreed coin, and what the road turns up. She says if this fails, her charcoal contract with the fort will be torn up, leaving the camp without buyers and forcing its people out. Question the charcoal-burners' camp about Quiver Wexcombe's whereabouts and intentions. A warden means to keep Quiver safe within the wood.",
+  "job": "Question the charcoal-burners' camp about Quiver Wexcombe"
+ }
+}

@@ -1,0 +1,58 @@
+{
+ "seed": 11080,
+ "chainId": "chain-13",
+ "title": "The Honeyed Dies",
+ "bible": {
+  "title": "The Honeyed Dies",
+  "kernel": "A merchant hires the company to stop a ring of superior fake coin traced to the bee-clearings, leading them to a painter's clue and then to a meeting where the forger must be seized at market.",
+  "cast": [
+   {
+    "name": "Plente",
+    "who": "A trading-house agent from the forest edge who lost real coin to passing false pieces.",
+    "want": "to stop the false coin and receive the person responsible at Hillwater market",
+    "trade": "merchant",
+    "role": "client",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Mientje",
+    "who": "A painter who works for beekeepers and sells painted tokens and painted metalwork in the clearings.",
+    "want": "to be paid for a painted token and to avoid imprisonment",
+    "trade": "painter",
+    "role": "ally",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Gizon",
+    "who": "A scrawny ex-priest turned engraver who hides his metalwork in the western woods.",
+    "want": "to escape arrest and keep his dies",
+    "trade": "counterfeiter",
+    "role": "quarry",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Superior counterfeit coins have begun to circulate from the western beekeepers' clearings. Plente hires the company to find who makes them, stop the run, and hand the maker over at a named market. The counterfeiter uses beeswax and painted metalwork in his process and moves trade through a painter in the clearings.",
+  "goal": "to stop the false coin and deliver the person responsible to Plente at Hillwater market",
+  "arc": [
+   "Search the beekeepers' clearings the client named and question the wax-workers and painters there → yields: Mientje, a painter who shows a beeswax token and says she traded painted dies to a thin man.",
+   "Use Mientje's beeswax token to find and force entry at a ruined painter's hollow beyond the clearings → yields: a sealed beeswax satchel of faintly struck false coin and a folded note promising a buyer at Hillwater market.",
+   "Set bait with the satchel and lie in wait at Hillwater market, using the note to draw the meeting. Confront the arriving forger Gizon who resists and is taken, then hand him to Plente at Hillwater → yields: Plente receives Gizon and the satchel, ending the hire."
+  ],
+  "twist": null,
+  "tensions": [
+   "Mientje will demand coin or protection before she hands over the token.",
+   "Gizon knows the woods and will try to flee if he senses a trap.",
+   "Beekeepers distrust armed outsiders and may delay questioning, costing time."
+  ],
+  "openDirections": [
+   "If capture fails, rival buyers at Hillwater will secure Gizon's work and keep the dies moving through other hands."
+  ],
+  "stakeIfLost": "If the company fails, Plente's trading house loses its reserve chest and cannot pay its suppliers, forcing the merchant stalls to close.",
+  "arrival": "walked in with the market crowd · would not give a reason until the door was shut"
+ },
+ "shipped": {
+  "title": "Ask at the beekeepers' clearings",
+  "situation": "A trading-house agent, Plente, walked in with the market crowd and kept one hand on the door frame while saying you must find the maker. They want to stop the false coin and receive the person responsible at Hillwater market, the pay is plain coin, and the road's yield goes to the company. If you fail, Plente says their trading house will lose its reserve chest and cannot pay suppliers, and the merchant stalls will close. A counterfeiter stands against you and will try to escape arrest and keep his dies.",
+  "job": "Search the beekeepers' clearings and question the wax-workers and painters there."
+ }
+}

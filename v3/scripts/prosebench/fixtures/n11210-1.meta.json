@@ -1,0 +1,59 @@
+{
+ "seed": 11210,
+ "chainId": "chain-14",
+ "title": "The Nettle Healer",
+ "bible": {
+  "title": "The Nettle Healer",
+  "kernel": "A patron hires the company to fetch a famed forest healer. Finding him uncovers a living nettle graft that keys a buried elven hoard.",
+  "cast": [
+   {
+    "name": "Erlendr",
+    "who": "a caravan patron from the west who pays for rare services and answers few questions",
+    "want": "to receive the famed field healer alive at the fort",
+    "trade": "collector",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Patey",
+    "who": "a short, clumsy human who learned folk medicine among children and keeps odd vows",
+    "want": "to refuse removal and to keep the nettle graft and its secret",
+    "trade": "healer",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Dravasa Leafshade",
+    "who": "an elven path warden sworn to old pledges who watches nettle rites and buried claims",
+    "want": "to keep Patey from strangers and to protect the hoard's secrecy",
+    "trade": "warden",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   }
+  ],
+  "situation": "A collector hires the company to fetch a famed field healer last seen in the old-growth west. The client says the healer was last seen near nettle groves and must reach the fort to tend a dying ward. The forest is old, secretive, and full of folk who will not welcome mercenaries.",
+  "goal": "to bring the famed field healer the client named to the fort alive.",
+  "arc": [
+   "Search Nettleford Clearing, the place the client named, for signs and witnesses of the healer → yields: a small child confesses that a clumsy short man called Patey slipped away carrying a nettle-wrapped wooden token.",
+   "Carry the nettle-wrapped token to the silent gate along the old elven path and offer it to any watcher there → yields: Dravasa Leafshade appears, reads the token, and reveals that Patey's shoulder bears a living nettle graft that maps to a buried elven hoard and that Patey fled to the Thistle Pools.",
+   "Track Patey to the Thistle Pools and parley, using Dravasa's claim about the graft as leverage to keep force low → yields: Patey refuses to be handed over but gives the company a nettle-seed pendant and a childhood confession that names the wardens' oath wording Dravasa respects.",
+   "Bring Patey, the nettle-seed pendant, and his confession to the fort to hand him to the client, and meet Dravasa there who demands Patey remain. Outwit her with the pendant and the confession and deliver Patey to the client."
+  ],
+  "twist": "Patey's forearm hides a living nettle graft whose root-veins form a living map to a buried elven hoard, and handing him away hands over the hoard.",
+  "tensions": [
+   "Dravasa will oppose any transfer of Patey and will enforce old pledges.",
+   "Patey refuses to be used and may withhold himself or flee.",
+   "Forest folk distrust outsiders and may mislead or attack trackers."
+  ],
+  "openDirections": [
+   "If Patey is handed to the client, the wardens' claim on the hoard will press the fort by law or by force."
+  ],
+  "stakeIfLost": "The client says their ward will die without the healer's care, because no other hand can stop the wound.",
+  "arrival": "arrived out of the weather · kept looking back down the road"
+ },
+ "shipped": {
+  "title": "Search Nettleford Clearing",
+  "situation": "A caravan patron from the west, Erlendr, arrived out of the weather and kept looking back down the road. He said, \"Bring the famed field healer to the fort alive,\" and laughs in the wrong place, the coin comes when it is done, and anything carried home is the company's. \"They will die without the healer's hand,\" he says. Search Nettleford Clearing for signs and witnesses of the healer. A warden watches the clearing and will try to keep people silent.",
+  "job": "Locate signs or witnesses at Nettleford Clearing that point to the healer's recent presence."
+ }
+}

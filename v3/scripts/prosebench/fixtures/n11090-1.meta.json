@@ -1,0 +1,58 @@
+{
+ "seed": 11090,
+ "chainId": "chain-12",
+ "title": "The Toll Tin",
+ "bible": {
+  "title": "The Toll Tin",
+  "kernel": "A bridgekeeper hires the company to fetch Kyknos alive after a toll that buys men who burn the loggers' huts.",
+  "cast": [
+   {
+    "name": "Abarne Stonebridge",
+    "who": "keeper of the ford on the logging road, thin-jowled and quick to anger.",
+    "want": "to receive Kyknos alive",
+    "trade": "bridgekeeper",
+    "role": "client",
+    "loreId": "lore-10"
+   },
+   {
+    "name": "Kyknos",
+    "who": "a sickly peasant who hawked ham and pie at the logging camps.",
+    "want": "to slip away into the Old-growth and hide",
+    "trade": "peasant",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Ularfire",
+    "who": "a former logger turned enforcer, sleeve seared and voice like iron.",
+    "want": "to keep Kyknos under guard and keep the tolls running",
+    "trade": "enforcer",
+    "role": "obstacle",
+    "loreId": "lore-11"
+   }
+  ],
+  "situation": "Abarne Stonebridge says the bridge toll is real and the coins buy a small band of enforcers and paid arsonists who burn winter huts to push loggers onto tolled routes. Kyknos ran the collections, fled the camps, and must be brought back alive. The mercenaries are hired to take him to Abarne so the tolling can be stopped.",
+  "goal": "to deliver Kyknos alive to Abarne Stonebridge",
+  "arc": [
+   "At the loggers' winter huts, using Abarne's direction to search the cooking sheds and speak with the families → yields: a torn tavern token from Sunderway Toll-house left beside Kyknos' ham tin.",
+   "At Sunderway Toll-house, using the torn token to claim entrance and trade pie and ham for a seat, press the keeper for Kyknos' trail → yields: the keeper says Kyknos was handed to Ularfire and that Ularfire will bring him to the loggers' winter huts tonight for questioning.",
+   "At the loggers' winter huts, using the keeper's warning to lie in wait, confront Ularfire when he arrives and beat, buy, or outwit his guard, then hand Kyknos alive over to Abarne Stonebridge"
+  ],
+  "twist": null,
+  "tensions": [
+   "Ularfire's enforcers demand payment or fight when questioned",
+   "Kyknos is fevered and may not survive rough handling during capture",
+   "The loggers' outrage could turn into a mob that refuses to hand Kyknos to anyone"
+  ],
+  "openDirections": [
+   "If the toll continues, enforcers will widen checkpoints and push more settlements from the Old-growth, changing the forest's routes and control."
+  ],
+  "stakeIfLost": "If the company fails, the loggers' winter huts will be burned and families driven from their camps, wrecking the season's supplies.",
+  "arrival": "came behind a letter that said less · asked what the company had lost lately"
+ },
+ "shipped": {
+  "title": "Search the winter huts",
+  "situation": "A bridgekeeper, Abarne Stonebridge, came behind a curt letter and asked what the company had lost lately. If we fail, the loggers' winter huts will be burned and families driven from their camps, wrecking the season's supplies. They want you to search the loggers' winter huts, follow Abarne's directions, and find Kyknos alive by checking cooking sheds and questioning families, the pay is honest coin, and any small spoils besides. An enforcer, offstage, means to keep Kyknos under guard and keep the tolls running. Abarne holds their gloves and will not put them on.",
+  "job": "Search the loggers' winter huts for Kyknos's whereabouts and question the families."
+ }
+}

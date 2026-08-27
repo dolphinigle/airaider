@@ -1,0 +1,50 @@
+{
+ "seed": 11050,
+ "chainId": "chain-12",
+ "title": "Quiet Siege, Loud Nails",
+ "bible": {
+  "title": "Quiet Siege, Loud Nails",
+  "kernel": "A fort sends the company to fetch a missing elven beekeeper taken after a siege. The trail runs on a nail-marked merc and ends at the fort gates.",
+  "cast": [
+   {
+    "name": "Nithonda",
+    "who": "an elven apiarist from the beekeepers' clearings, playful and stubborn at odds with surrender.",
+    "want": "to join the company",
+    "trade": "beekeeper",
+    "role": "prize",
+    "loreId": "c8"
+   },
+   {
+    "name": "Deroh-Zah",
+    "who": "a merc leader from the western raider bands who brands loot with iron nails.",
+    "want": "to sell the captive for coin",
+    "trade": "mercenary",
+    "role": "obstacle",
+    "loreId": "lore-11"
+   }
+  ],
+  "situation": "After a siege at a beekeepers' clearing ended without a fight, a merc leader named Deroh-Zah took prisoners and moved them east. The fort fears one captive, the elven apiarist Nithonda, will be sold on the road. The clearing's people kept their hives with a payment, and Deroh-Zah left with a few bound folk and crates marked by his nail brand.",
+  "goal": "bring Nithonda back to the fort",
+  "arc": [
+   "Ride to the beekeepers' clearings the fort named and question the survivors, using the fort's pass to enter the yards → yields: an iron nail driven through a honey crate bearing Deroh-Zah's crude mark.",
+   "Follow the nail-marked trail along forest lanes to Mirehold Watch and sift the overturned pit, using the crate nail to read the merc rout → yields: a bound woman stumbling at dawn on the far track, calling for the clearing — the woman is Nithonda.",
+   "Hurry the trail back toward the fort and meet Deroh-Zah as he comes for a sale at Gulfen Gate, using the sighting of Nithonda to cut his path. Fight, buy, or outwit him there → yields: Nithonda freed and choosing to stay and join the company."
+  ],
+  "twist": null,
+  "tensions": [
+   "Deroh-Zah's merc band will fight or set a price for the captive",
+   "the Western Forests hide lanes and force searches into close, enclosed ground",
+   "Nithonda refuses easy charity and distrusts anyone who hands her over"
+  ],
+  "openDirections": [
+   "If Nithonda stays, her ties to the clearings and their quiet honey trade may pull the company into slow deals with forest apiarists."
+  ],
+  "stakeIfLost": "the fort loses the clearing's winter honey allotment and the pledged stores will be claimed by rival bands.",
+  "arrival": "arrived out of the weather · asked for the boss by name"
+ },
+ "shipped": {
+  "title": "Question the beekeepers at the clearings",
+  "situation": "an elven apiarist, Nithonda, stands in the yard and asks to join the company, the fee is as agreed, and the company keeps what it hauls back. Losing the clearings will cost the fort its winter honey allotment and let rival bands claim the pledged stores. The company wants survivors at the beekeepers' clearings questioned and the yards opened under the fort's pass. A band of mercenaries intends to seize any elven workers and sell them for coin. Nithonda is playful and stubborn and will not quietly accept being taken.",
+  "job": "Question survivors at the beekeepers' clearings and secure the yards under the fort's pass"
+ }
+}

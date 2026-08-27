@@ -1,0 +1,59 @@
+{
+ "seed": 11040,
+ "chainId": "chain-14",
+ "title": "The Belt at Bitterpass",
+ "bible": {
+  "title": "The Belt at Bitterpass",
+  "kernel": "A tollkeeper hires the company to keep a winter pass open by feeding its ward. The feeding turns out to be a bound man who can be freed and may join them.",
+  "cast": [
+   {
+    "name": "Vigilius",
+    "who": "A low official at the fort who runs the road's fees and fears the winter's stoppage.",
+    "want": "to keep the winter road through Bitterpass open this season",
+    "trade": "tollkeeper",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Frenenora",
+    "who": "An old-growth forest warden who tends the pass by oath and answers no authority but her own.",
+    "want": "to keep the ward confined at the pass",
+    "trade": "warden",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   },
+   {
+    "name": "Waisale the Quiet",
+    "who": "A scrawny former petty ruler now found bound and forced to work beneath the pass.",
+    "want": "to be free of the iron belt",
+    "trade": "ruler",
+    "role": "prize",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Vigilius hires the company to keep the winter pass open by keeping the pass's ward fed. Someone has fed the ward every winter and the fort depends on that service this season.",
+  "goal": "to keep the winter road through Bitterpass open by feeding the ward at the pass.",
+  "arc": [
+   "Go to Bitterpass as Vigilius ordered to leave this season's ration at the pass → yields: a scorched bolted stump, Keldstump, fitted with a ring for feeding",
+   "Use the bolted ring at Keldstump to open what it holds → yields: a chained man, Waisale the Quiet, bound in a heated iron belt",
+   "Carry Waisale to Eldermire Hollow to warm him and learn who bound him → yields: Frenenora arriving to claim him and refusing to let him go",
+   "Bring Frenenora, Waisale, and the claim to Gorsefen Toll to settle the hire with Vigilius and outwit, buy, or defeat Frenenora there"
+  ],
+  "twist": "The ward kept fed at Bitterpass is not a totem or furnace but a bound man, Waisale the Quiet, imprisoned in a heated iron belt whose heat clears the road.",
+  "tensions": [
+   "Frenenora will refuse to give up the ward and will demand payment or a fight",
+   "Freeing Waisale risks killing him if the belt is unlatched wrong",
+   "Waisale may bargain his freedom for coin or betray the company to save himself"
+  ],
+  "openDirections": [
+   "If the company takes over feeding, they gain control of the pass but inherit Frenenora's enemies and the obligation to keep a man chained each winter."
+  ],
+  "stakeIfLost": "If the company fails, the Bitterpass will freeze shut and the fort will be cut off from supply wagons.",
+  "arrival": "sent a rider ahead and came behind it · would give only half a reason"
+ },
+ "shipped": {
+  "title": "Leave the ration at Bitterpass",
+  "situation": "a tollkeeper, Vigilius, sent a rider ahead and came behind it. If the company fails, the Bitterpass will freeze shut and the fort will be cut off from supply wagons. Vigilius wants this season's ration left at Bitterpass, the fee is as agreed, and any spoils ride home with it. A warden opposes the plan and keeps the ward confined at the pass. The pay rides with the ration. He rubs a thumb along a scar without noticing as he gives only half a reason.",
+  "job": "Deliver and leave this season's ration at the ward in Bitterpass"
+ }
+}

@@ -1,0 +1,59 @@
+{
+ "seed": 11160,
+ "chainId": "chain-13",
+ "title": "The Safer Road",
+ "bible": {
+  "title": "The Safer Road",
+  "kernel": "Juliane of Millbrook hires the company to reclaim her silver cup from Glaurolin Windrow, who holds it after fortifying the road where an elf was seen.",
+  "cast": [
+   {
+    "name": "Juliane of Millbrook",
+    "who": "A miller who runs a small roadside mill and guards a silver cup used to prove her grain.",
+    "want": "to recover her missing silver cup",
+    "trade": "miller",
+    "role": "client",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Breduin",
+    "who": "An elf from the Western Forests who drifted into town and left with a carved cup.",
+    "want": "to be taken into the company",
+    "trade": "rogue",
+    "role": "prize",
+    "loreId": "c8"
+   },
+   {
+    "name": "Glaurolin Windrow",
+    "who": "A petty landholder who made a nearby lane safer by posting guards and charging passage.",
+    "want": "to keep the cup and press the elf into his service",
+    "trade": "roadwarden",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   }
+  ],
+  "situation": "Juliane's silver cup was taken after a visit near the loggers' winter huts. A pale elf was seen leaving there. A barge carried that passenger to Windward Gate, where Glaurolin Windrow now holds the elf and claims the cup under his guard.",
+  "goal": "to recover Juliane of Millbrook's missing silver cup",
+  "arc": [
+   "Go to the loggers' winter huts the client named and ask who saw Juliane's cup last → yields: a logger shows a splinter from the cup and says an elf boarded a barge at Hearthshead Landing",
+   "Follow the barge at Hearthshead Landing and question its crew about that passenger → yields: the crew point to Windward Gate and one turns over a coin stamped with Glaurolin Windrow's mark",
+   "Reach Windward Gate and find a way past the road-guards to learn where Glaurolin keeps the passenger → yields: a scuffle with a guard produces a lodge pass that names Glaurolin's ride to the loggers' huts tonight to collect the cup",
+   "Wait at the loggers' winter huts the client named and intercept Glaurolin when he arrives. Beat, buy, or outwit him there and hand the cup back to Juliane while taking Breduin into the company"
+  ],
+  "twist": null,
+  "tensions": [
+   "Glaurolin's guarded lane blocks casual travel and answers only to his men",
+   "Breduin is slippery and clumsy, likely to flee or break evidence in a panic",
+   "The barge crew trades passengers to landholders for coin, so delays raise the cup's price"
+  ],
+  "openDirections": [
+   "If the company stalls, Glaurolin may try to sell the cup to a coastal troupe or move it farther along his guarded road"
+  ],
+  "stakeIfLost": "If the cup is not returned, Juliane will lose her final trade contract because traders refuse untested grain without her proof cup.",
+  "arrival": "came down from higher ground · kept looking back down the road"
+ },
+ "shipped": {
+  "title": "Ask the loggers who saw the cup",
+  "situation": "A miller, Juliane of Millbrook, came down from higher ground and kept looking back down the road while she kept turning something over in one palm. She says, \"If the cup is not returned, I will lose my final trade contract. Traders refuse untested grain without my proof cup.\" She wants the loggers' winter huts asked who saw the cup last, the fee as agreed, and the company keeps what it hauls back. A roadwarden opposes this and means to keep the cup and press the rogue he claims into his service.",
+  "job": "Ask the loggers at the winter huts who saw Juliane's silver cup last."
+ }
+}

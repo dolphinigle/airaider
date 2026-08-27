@@ -1,0 +1,59 @@
+{
+ "seed": 11020,
+ "chainId": "chain-12",
+ "title": "Return to the Ford",
+ "bible": {
+  "title": "Return to the Ford",
+  "kernel": "A steward hires mercenaries to bring back an exile who reappeared at the ford. The exile's return forces a clash with the lord who once banished her.",
+  "cast": [
+   {
+    "name": "Lothiel Fernbrook",
+    "who": "steward of the river ford and its small household, keeper of the ford's receipts.",
+    "want": "to have the exile returned alive to her at the ford",
+    "trade": "steward",
+    "role": "client",
+    "loreId": "lore-10"
+   },
+   {
+    "name": "Elaninwe",
+    "who": "an elf exile who has come back into the Western Forests after years away.",
+    "want": "to keep her chest of foreign coin",
+    "trade": "adventurer",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Osgar the Younger",
+    "who": "the young lord who once banished the elf and still lays claim to the forest hunting rights.",
+    "want": "to seize the exile and recover his hunting rights",
+    "trade": "noble",
+    "role": "obstacle",
+    "loreId": "lore-11"
+   }
+  ],
+  "situation": "Lothiel Fernbrook hires the company to find and return the exile who reappeared at the river ford so the exile can answer the terms of banishment.",
+  "goal": "to capture and return alive the exile who reappeared at the river ford to Lothiel Fernbrook",
+  "arc": [
+   "Search the river ford's shallows for signs of the exile seen there → yields: a mud-stained silk ribbon threaded with a centipede bead and a trail leading into Silverbloom Hollow",
+   "Follow the trail into the Western Forests and locate the camp the ribbon leads to at Silverbloom Hollow → yields: Elaninwe's camp and a chest of foreign coin",
+   "Secure the exile and prepare to move her back toward the ford while watching the routes Osgar would use → yields: a hunting horn stamped with Osgar the Younger's crest, showing he rides to intercept at the ford",
+   "Bring Elaninwe to the river ford for Lothiel to receive while Osgar arrives to stop delivery. Buy him off with a portion of the chest and hand Elaninwe over to Lothiel at the ford"
+  ],
+  "twist": "Elaninwe returned with foreign coin and pledges enough to buy the woodsmen's support and outmatch Osgar's local claims.",
+  "tensions": [
+   "Osgar will move to seize the exile and press his claim to the ford's rights",
+   "Elaninwe's new wealth tempts the forest crews to side with her instead of the lord",
+   "Lothiel's legal power at the ford is thin without the exile in her hands"
+  ],
+  "openDirections": [
+   "If the company delays, local crews may sell their pledges to the highest bidder and change which side controls the ford."
+  ],
+  "stakeIfLost": "If the company fails, Lothiel loses the ferry and hunting rights at the ford, and her household will be forced from its holding when the lord reclaims them.",
+  "arrival": "came down from higher ground · asked for the boss by name"
+ },
+ "shipped": {
+  "title": "Search the ford shallows",
+  "situation": "A steward of the river ford, Lothiel Fernbrook, came down from higher ground and told you the ford had an unwanted guest. She warns that if you fail, the lord will reclaim the holding and she will lose the ferry and hunting rights at the ford. She wants the exile returned alive and asks you to search the river ford's shallows for signs of the exile seen there, the fee fixed and what else shakes loose the company keeps. The noble Osgar the Younger intends to seize the exile and recover his hunting rights. She wiped her hands on her coat as she repeated the ask.",
+  "job": "Find any sign of the exile in the river ford's shallows."
+ }
+}

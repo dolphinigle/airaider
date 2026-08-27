@@ -1,0 +1,59 @@
+{
+ "seed": 11100,
+ "chainId": "chain-14",
+ "title": "Full Store, Empty Year",
+ "bible": {
+  "title": "Full Store, Empty Year",
+  "kernel": "A grain trader hires the company to secure a forest granary. A lone elf found with sacks might be persuaded to join.",
+  "cast": [
+   {
+    "name": "Anese",
+    "who": "a grain trader from the fort with a ruined stall and urgent creditors",
+    "want": "to take possession of the harvest and have it brought to her",
+    "trade": "merchant",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Lothiel",
+    "who": "a lone elf of the Western Forests who hoards and watches from the trees",
+    "want": "a place among fighters and a steady share of provisions",
+    "trade": "hunter",
+    "role": "prize",
+    "loreId": "c8"
+   },
+   {
+    "name": "Voneesh",
+    "who": "a lean man who leads a band of road beggars and claims need as right",
+    "want": "to seize the granary's grain for his band",
+    "trade": "beggar",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   }
+  ],
+  "situation": "Anese has hired the company to secure a forest granary whose harvest she claims. Villages around the woods are thin from a poor year. The granary sits under old trees and has not been opened since the last owner vanished. The hire is to take possession and hand the harvest to Anese.",
+  "goal": "To secure and deliver the harvest stored at the granary to the client.",
+  "arc": [
+   "Inspect Hearthgate Crossing the client named to check the convoy route and any marks left at the road entrance → yields: a torn merchant tag stamped with Anese's mark and small elven shoeprints heading east.",
+   "Follow the elven shoeprints along Mossrun Path to their source → yields: a hidden camp at Greenbarrow Lodge and the lone elf Lothiel beside a small cache of sacks.",
+   "Take Lothiel's word to Rookfen Hollow to learn who else claims the harvest → yields: Voneesh, the beggar-leader, sworn to hold Branmoss Granary and move there to stop any delivery.",
+   "Return to Branmoss Granary the client named and deliver the harvest to Anese while Voneesh blocks the doors. Buy him off with a share so Anese receives her grain and Lothiel signs on to the company."
+  ],
+  "twist": null,
+  "tensions": [
+   "Voneesh's beggar band will press a claim and resist armed removal",
+   "a nest of large centipedes gnaws at exposed sacks along forest trails",
+   "nearby starving hamlets may try to swarm the store if word leaks"
+  ],
+  "openDirections": [
+   "Starving villages may gather to raid the granary if distribution stalls."
+  ],
+  "stakeIfLost": "If they fail, Anese loses the grain she pledged as collateral and her creditors will seize her market stalls.",
+  "arrival": "was let in past the hour · was in a hurry and did not hide it"
+ },
+ "shipped": {
+  "title": "Inspect Hearthgate Crossing",
+  "situation": "A grain trader, Anese, was let in past the hour and said, \"I need the harvest moved before dawn,\" while she would not look at the door. She wants to take possession of the harvest and have it brought to her, the fee is as agreed, and the company keeps what it hauls back. If they fail, Anese loses the grain she pledged as collateral and her creditors will seize her market stalls. She needs Hearthgate Crossing inspected to check the convoy route and any marks left at the road entrance. A beggar, the obstacle, intends to seize the granary's grain for his band.",
+  "job": "Inspect Hearthgate Crossing and report any marks at the road entrance"
+ }
+}

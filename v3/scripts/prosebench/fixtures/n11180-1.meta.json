@@ -1,0 +1,59 @@
+{
+ "seed": 11180,
+ "chainId": "chain-14",
+ "title": "The Quiet Siege's Toll",
+ "bible": {
+  "title": "The Quiet Siege's Toll",
+  "kernel": "A river merchant hires mercenaries to pry a buried elven reliquary from its keeper after a siege ended too quietly.",
+  "cast": [
+   {
+    "name": "Aime of the Ford",
+    "who": "A river-stall trader who moves goods at crossings and speaks of old spoils.",
+    "want": "to receive the elven reliquary at Silvertine Crossing",
+    "trade": "merchant",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Meratille",
+    "who": "An elf noble of the old forest court, fallen ill and clinging to a wartime duty.",
+    "want": "to keep the reliquary buried with the siege dead",
+    "trade": "ruler",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Tim-Kasi",
+    "who": "Leader among the charcoal-burners' camps in the Western Forests, blunt and fierce about camp rights.",
+    "want": "to prevent any digging in the camps",
+    "trade": "burner",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   }
+  ],
+  "situation": "Aime hired the company to fetch an old elven reliquary and receive it at a named crossing. The reliquary survived the siege and was kept close afterward. Meratille took custody of it out of vow and illness keeps her near the old forest places. The charcoal-burners claim rights over the siege ground and forbid disturbance. The reliquary is sealed to respond only to an old mourning-song the elves still remember.",
+  "goal": "to recover an elven reliquary said to have been left near the charcoal-burners' camps and hand it over to the client at Silvertine Crossing.",
+  "arc": [
+   "Search the charcoal-burners' camps for signs of the lost reliquary, using Aime's instructions → yields: a singed fragment of an elven mourning-song stitched into a burner’s apron that names the Sundered Battery.",
+   "Use the song fragment to reach the Sundered Battery and pry into its ruined guardroom → yields: Elm Hollow, a living hollow in an old oak where the mourning-song is still sung.",
+   "Go to Elm Hollow and confront the singer using the fragment → yields: Meratille herself, holding a small nailed box and refusing to let it be disturbed.",
+   "Escort Meratille to Silvertine Crossing and secure the nailed box before Aime while Meratille resists. Beat, buy, or outwit her so the client receives the reliquary."
+  ],
+  "twist": null,
+  "tensions": [
+   "Meratille will not surrender the box without bargain or force",
+   "The charcoal-burners will mobilize to block any digging at their camps",
+   "Old elven wards require the mourning-song to open the reliquary"
+  ],
+  "openDirections": [
+   "If the nailed box is opened in public, nearby elven claimants or forest kin may arrive to press wider claims."
+  ],
+  "stakeIfLost": "If the company fails to deliver the reliquary at Silvertine Crossing, Aime will forfeit the pledged trade-right that keeps his crossing berth, and rival merchants will seize his stall.",
+  "arrival": "came back a second time · wanted it settled the same day"
+ },
+ "shipped": {
+  "title": "Search the burners' camps",
+  "situation": "A trader, Aime of the Ford, came back a second time and holds their gloves while speaking. Aime wants the elven reliquary found and brought to Silvertine Crossing, the fee is as agreed, and the company keeps what it hauls back. Aime says that if the reliquary does not arrive he will forfeit the pledged trade-right that keeps his crossing berth and rival merchants will seize his stall. The charcoal-burners oppose any digging and will try to prevent work at their camps. The task is to search the charcoal-burners' camps for signs of the lost reliquary using Aime's instructions.",
+  "job": "Search the charcoal-burners' camps for signs of the lost reliquary, following Aime's instructions."
+ }
+}

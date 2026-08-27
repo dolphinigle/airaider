@@ -1,0 +1,59 @@
+{
+ "seed": 11010,
+ "chainId": "chain-13",
+ "title": "The Oath-Bound Vessel",
+ "bible": {
+  "title": "The Oath-Bound Vessel",
+  "kernel": "A west-trader hires mercenaries to reclaim a small relic from Thornhollow. Its maker still keeps her old promise.",
+  "cast": [
+   {
+    "name": "Marienne Fairweather",
+    "who": "an elder merchant who runs the guild's western house and still speaks for old pledges",
+    "want": "to have the guild's pledged pot returned to her at Thornhollow",
+    "trade": "merchant",
+    "role": "client",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Sela",
+    "who": "a potter of the Western Forests who vanished from trade and lives by kiln and oath",
+    "want": "to be sworn into the company as its potter and leave the woods",
+    "trade": "artisan",
+    "role": "prize",
+    "loreId": "c8"
+   },
+   {
+    "name": "Virngring",
+    "who": "a thorn-wood warden born in the hollow who enforces forest vows without lenience",
+    "want": "to keep the oath-pot bound to the forest where the vow was sworn",
+    "trade": "warden",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   }
+  ],
+  "situation": "Marienne hired the company to take back a pledged pot she believes sits at Thornhollow. The pot was made by Sela and bound by an old spoken oath that names a forest warden as its guardian. Sela lives in a ruined kiln-camp and still honors the spoken vow. Virngring enforces that vow and will not hand the pot over except under the ritual condition he names.",
+  "goal": "to recover a pledged pot from Thornhollow and return it to Marienne Fairweather.",
+  "arc": [
+   "Search Thornhollow's ruined lodge for the guild's pledged pot → yields: a clay disk stamped with Sela's potmark and a crude map to Bramblefen",
+   "Follow the map to Bramblefen's ruined kiln-camp and question the few living there → yields: Sela herself, who says she swore the pot to the woodward and that Virngring now keeps it at Hollowfell",
+   "Track Virngring at Hollowfell and press him for terms, using Sela as witness → yields: Virngring will only transfer the pot at Thornhollow in the voice of the guild. He refuses any handover elsewhere",
+   "Return to Thornhollow with Marienne and face Virngring, forcing the transfer by combat, purchase, or oath-work → yields: the pledged pot handed to Marienne and Sela sworn into the company"
+  ],
+  "twist": null,
+  "tensions": [
+   "Virngring refuses any handover away from Thornhollow and will fight to keep the pot",
+   "Sela's sacred oath complicates a simple payment or theft",
+   "The forest's paths and kiln-ruins hide rival claimants and slow the company"
+  ],
+  "openDirections": [
+   "Rival merchants watching the western routes may claim the pot if delays mount, pressing the guild to act harder."
+  ],
+  "stakeIfLost": "Marienne says the guild will lose its sworn right to export western forest wares if the pledged pot is not returned.",
+  "arrival": "came back a second time · asked what the company had lost lately"
+ },
+ "shipped": {
+  "title": "Search Thornhollow lodge",
+  "situation": "An elder merchant who runs the guild's western house, Marienne Fairweather, came back a second time and asked what the company had lost lately. She looks at the door before answering and says the guild will lose its sworn right to export western forest wares if the pledged pot is not returned. Search Thornhollow's ruined lodge for the guild's pledged pot, the pay is honest coin, and any small spoils besides. A forest warden intends to keep the oath-pot bound to the forest where the vow was sworn. Marienne waits on the fort's threshold while she watches the road.",
+  "job": "Search Thornhollow's ruined lodge for the guild's pledged pot"
+ }
+}

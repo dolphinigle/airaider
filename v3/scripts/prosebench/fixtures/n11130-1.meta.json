@@ -1,0 +1,58 @@
+{
+ "seed": 11130,
+ "chainId": "chain-13",
+ "title": "Shard for Shard",
+ "bible": {
+  "title": "Shard for Shard",
+  "kernel": "Earnona hires the company to track down and buy each raider who burned her farm, ending with Cornar Thistledown.",
+  "cast": [
+   {
+    "name": "Earnona",
+    "who": "tenant of the burned farm at the forest edge, blunt and determined.",
+    "want": "to find the men who burned her farm and buy from them the map to a lost chest.",
+    "trade": "widow",
+    "role": "client",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Clibergus",
+    "who": "former raider hiding among the beekeepers' clearings, loud and quick to bargain.",
+    "want": "to sell his idol-shard and the men's names to the highest bidder.",
+    "trade": "woodsman",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Cornar Thistledown",
+    "who": "elf sailor turned fugitive who kept a carved idol and a secret in the Western Forests.",
+    "want": "to keep the hidden chest and the carved idol that proves his claim.",
+    "trade": "sailor",
+    "role": "quarry",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "A band of raiders burned Earnona's farm and stole a small chest of coin. They broke the chest's location into pieces and marked their shares with carved idol-objects. Earnona has been buying the raiders one by one, believing that buying their pieces will reunite the map and reveal the chest. She hired the company to find and buy them. Clibergus holds the first shard and will only bargain. Cornar kept the idol that ties the pieces together and kept the chest hidden at an old mill beneath Kinwright Weir. Earnona named the beekeepers' clearings for the first meeting and Kinwright Weir as the place for final settlement.",
+  "goal": "to find the men who burned her farm and buy from them the map leading to a lost chest.",
+  "arc": [
+   "Search the beekeepers' clearings for traces the men left → yields: Clibergus, found hiding and bargaining, who offers a burned idol-shard carved with a palisade sketch pointing toward Kinwright.",
+   "Follow the palisade sketch into Palisade Hollow and force the shrine keeper's hand → yields: a cracked oath-nail carved with Cornar's boat-name and the Old Mill at Kinwright Weir.",
+   "Take the carved nail to the Old Mill at Kinwright Weir, confront Cornar, and complete Earnona's purchase at the ground she named."
+  ],
+  "twist": null,
+  "tensions": [
+   "Clibergus will demand higher coin or a violent favor before he gives the shard.",
+   "The shrine at Palisade Hollow draws desperate men who will contest any search.",
+   "Cornar refuses to sell the chest and uses the idol as leverage to rally protection."
+  ],
+  "openDirections": [
+   "Neighbors and claimants press on the burned fields. If the chest's coin does not arrive before the harvest, Earnona risks losing her legal standing."
+  ],
+  "stakeIfLost": "If the company fails, the chest stays hidden and Earnona cannot raise coin to buy back her farm's deed, leaving her land to the raiders.",
+  "arrival": "sent word twice before coming · asked what the company had lost lately"
+ },
+ "shipped": {
+  "title": "Sweep the beekeepers' clearings",
+  "situation": "a tenant of the burned farm at the forest edge, Earnona, came after sending word twice and asked what the company had lately lost. If you fail, the chest stays hidden and Earnona cannot raise coin to buy back her farm's deed, leaving her land to the raiders. She wants traces found in the beekeepers' clearings so you can learn which camp holds the men, the pay is the agreed coin, and what the road turns up. a woodsman plans to sell his idol-shard and the men's names to the highest bidder and will comb those same clearings. She keeps turning something over in one palm while she waits.",
+  "job": "Search the beekeepers' clearings for traces the men left."
+ }
+}

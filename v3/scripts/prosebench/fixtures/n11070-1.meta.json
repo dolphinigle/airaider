@@ -1,0 +1,59 @@
+{
+ "seed": 11070,
+ "chainId": "chain-14",
+ "title": "The Patron's Burn List",
+ "bible": {
+  "title": "The Patron's Burn List",
+  "kernel": "A patron hires the company to recover a rolled list of names lost in the Western Forests. The trail leads to an elf keeper who will burn the list unless paid or stopped, and rescuing it brings the named man into the company.",
+  "cast": [
+   {
+    "name": "Savor Sorrowsong",
+    "who": "city merchant turned patron, holding a private charter and a looming milestone to meet",
+    "want": "to recover a rolled list of names he lost",
+    "trade": "patron",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Minervina",
+    "who": "elf born in the Western Forests who watches sealing rites and destroys papers she judges dangerous",
+    "want": "to burn the list to protect the named",
+    "trade": "keeper",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   },
+   {
+    "name": "Graccus",
+    "who": "wandering human priest turned scrounger, keeping to roads and shrines and avoiding ties",
+    "want": "to sign on as a hired hand",
+    "trade": "priest",
+    "role": "prize",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Savor Sorrowsong hired the company and named the Waning Oath chapel west of the fort as the first ground to search. A rolled list of names that he once kept is lost somewhere in the Western Forests and is not in his hands. Savor says recovering the list is needed to keep a pledge and its charter alive.",
+  "goal": "to recover a rolled list of names the client lost and return it to the client",
+  "arc": [
+   "At the Waning Oath chapel the client named, search the shrine and grounds for signs the list passed through → yields: a scorched ribbon bearing the single stitched name Graccus",
+   "At the roadside hunter's stand beyond the chapel, show the ribbon and question travelers who move toward the woods → yields: an old hunter's muttered direction to Dryfen Hollow where Graccus was seen heading",
+   "At Dryfen Hollow, follow the hunter's direction into the Sealing Ring Grove and track who took the ribbon → yields: Graccus sheltering in the grove beside Minervina, who holds the rolled list and intends to burn it",
+   "Return to the Waning Oath chapel the client named, hand the list over to Savor while Minervina arrives to stop the handover, and beat, buy, or outwit her so the client receives the list and Graccus agrees to sign on with the company"
+  ],
+  "twist": null,
+  "tensions": [
+   "Minervina will destroy any list she judges dangerous rather than let names be used against people",
+   "Woodland elders and hunters distrust outsiders, slowing questions and travel",
+   "Savor's rivals press him for the milestone and may publicize delays to void his pledge"
+  ],
+  "openDirections": [
+   "If the list leaks or the handover is delayed, rival patrons may force Savor's charter to unravel and the city's small artists will lose promised backing"
+  ],
+  "stakeIfLost": "If the list is not recovered, the patron's charter that unlocks promised funds for Savor's artists will be void and the pledge money will be lost.",
+  "arrival": "was waiting at first light · named a price before being asked"
+ },
+ "shipped": {
+  "title": "Search Waning Oath shrine",
+  "situation": "A city merchant turned patron, Savor Sorrowsong, was waiting at first light and named a price before being asked. If the list is not recovered, the charter that unlocks funds for Savor's artists will be void and the pledge money will be lost. At the Waning Oath chapel he wants the shrine and grounds searched for signs the rolled list passed through, the coin comes at the finish, with the pick of what the job turns up. A keeper intends to burn the list to protect the named. He counts the soldiers in the yard while he says, \"Find any trace of the list and bring it to me.\"",
+  "job": "Search the Waning Oath chapel shrine and grounds for signs the rolled list passed through."
+ }
+}

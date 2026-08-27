@@ -1,0 +1,59 @@
+{
+ "seed": 11060,
+ "chainId": "chain-14",
+ "title": "Buying Back the Burners",
+ "bible": {
+  "title": "Buying Back the Burners",
+  "kernel": "A widower hires the company to buy and present, one by one, the men who burned his farm. The trail runs through an elven scholar's papers and ends with that scholar himself.",
+  "cast": [
+   {
+    "name": "Firaelion",
+    "who": "a widower from the burned ridge, devout and blunt in manner.",
+    "want": "to buy and present the men who burned his farm",
+    "trade": "farmer",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Vedam Sorrowsong",
+    "who": "an elf scholar of the Western Forests, sickly and oddly clumsy in motion.",
+    "want": "to protect the men who sheltered with him",
+    "trade": "scholar",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Gaifer",
+    "who": "a hard-edged raider who led the night attack, quick with a promise and quicker on a hillside.",
+    "want": "to avoid capture and keep his companions free",
+    "trade": "raider",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   }
+  ],
+  "situation": "Firaelion's farm was burned by a raiding band. Vedam Sorrowsong sheltered some of those men after fleeing his village with a farmhand. Firaelion is buying the raiders, one by one, and wants the scholar handed to him last at the place he named.",
+  "goal": "to buy and present the men who burned his farm",
+  "arc": [
+   "Go to the White Stag Shrine the client named to meet Firaelion and search the shrine for recent signs, using only what the client told you → yields: a hymn-scroll with a pressed deer feather and a neat marginal note in Vedam's hand.",
+   "Ride to Mosskeep, the ruined scholar-stack the marginal note points to, to read the note and search the stacks using Vedam's marginalia → yields: an elopement pact signed by Vedam and a farmhand named Gaifer and a burned scrap bearing a raider mark.",
+   "Track Gaifer from the pact to the Fallow Fold hunters' hollow and seize him using the pact as leverage and the raider mark as proof → yields: Gaifer captured, who trades a rough camp map pointing to Namus's band and admits Vedam promised to meet at the White Stag Shrine.",
+   "Return to the White Stag Shrine and force the meeting Vedam promised, using Gaifer's confession as leverage. Vedam resists in person and is subdued and handed over to Firaelion."
+  ],
+  "twist": null,
+  "tensions": [
+   "Vedam's elven kin hold a quiet reverence for sanctuary and may object to handing him over.",
+   "Forest paths hide raider fallback camps that can free prisoners at a turn.",
+   "Local priests press for a public penance rather than private purchase."
+  ],
+  "openDirections": [
+   "If the company succeeds, Firaelion's practice of buying men may spread into a crude local justice market. If it fails, the raiders may regroup and burn more holdings."
+  ],
+  "stakeIfLost": "If the men are not brought, Firaelion says his remaining seed and stores will be taken by creditors because he cannot plant alone.",
+  "arrival": "was let in past the hour · apologised for the hour"
+ },
+ "shipped": {
+  "title": "White Stag meeting and shrine search",
+  "situation": "A widower from the burned ridge, Firaelion, was let in past the hour and apologised for the hour. He counts the soldiers in the yard while saying he wants the men who burned his farm bought and presented, the pay is plain coin, and the road's yield goes to the company. If the men are not brought, Firaelion says his remaining seed and stores will be taken by creditors because he cannot plant alone. This step asks you to meet him at the White Stag Shrine and search the shrine for recent signs, using only what he told you. Raiders will try to avoid capture and keep their companions free.",
+  "job": "Meet Firaelion at the White Stag Shrine and search the shrine for recent signs based only on his account."
+ }
+}

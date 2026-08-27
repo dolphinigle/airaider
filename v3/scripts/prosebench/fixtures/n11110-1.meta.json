@@ -1,0 +1,59 @@
+{
+ "seed": 11110,
+ "chainId": "chain-14",
+ "title": "The Bones the Deserted Know",
+ "bible": {
+  "title": "The Bones the Deserted Know",
+  "kernel": "A village steward hires mercenaries to seize a deserter who knows where the dead were left. The company must find him in the western old-growth and bring him back.",
+  "cast": [
+   {
+    "name": "Ginnade the Elder",
+    "who": "An aged elven steward who keeps the clearing's tithe and fears its loss.",
+    "want": "to have the deserter seized and handed over",
+    "trade": "steward",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Kaleb Nightrunner",
+    "who": "An elven hunter and keeper of clearing rites who shelters those who flee into the woods.",
+    "want": "to stop the company from taking Ricohard",
+    "trade": "hunter",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   },
+   {
+    "name": "Ricohard Fairweather",
+    "who": "A handsome, clumsy human soldier who deserted and hid among the old-growth.",
+    "want": "to avoid the fort's cells and slip south past the ford",
+    "trade": "soldier",
+    "role": "quarry",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Ginnade has hired the company to seize a deserter who knows where bodies were left in the Western Forests. Ricohard Fairweather fled into the old-growth and took shelter among local hunters. The clearing fears losing its tithe chest if the deserter is not returned.",
+  "goal": "To seize and hand over the deserter who knows where the bodies lie.",
+  "arc": [
+   "Search Thorncleft Clearing the client named and question its hunters and elders → yields: Kaleb Nightrunner, an elven hunter who claims to know Ricohard's route but refuses to hand him over.",
+   "Use Kaleb's grudging direction to search the wrecked Witherbarn granary and its smoking yard → yields: a torn tunic stamped with Ricohard's regimental badge.",
+   "Follow the tunic's trail to Blackpale Mill and search its hollow under the wheelhouse without seizing anyone → yields: Ricohard Fairweather found hiding and refusing to go quietly.",
+   "Bring Ricohard along Crossfen Road back to Thorncleft Clearing where Ginnade waits. Kaleb blocks the pass and demands Ricohard stay, and the company must beat, buy, or outwit Kaleb and hand Ricohard over to Ginnade."
+  ],
+  "twist": null,
+  "tensions": [
+   "Kaleb will refuse or fight to keep Ricohard and will demand payment or promise.",
+   "Ricohard is hotheaded and will resist capture, risking blood among the company.",
+   "Old-growth rites and local anger make questioning and moving bodies dangerous and slow."
+  ],
+  "openDirections": [
+   "A border lord watches the village's tithe. Delay or failure invites him to seize the chest."
+  ],
+  "stakeIfLost": "The village's tithe chest of winter grain will be seized by the border lord if the deserter is not returned.",
+  "arrival": "came behind a letter that said less · said the whole of it standing"
+ },
+ "shipped": {
+  "title": "Find the deserter in Thorncleft",
+  "situation": "An aged elven steward, Ginnade the Elder, came behind a letter that said less and, keeping a bead of carved bone turned over in one palm, said the deserter must be returned. He says the village's tithe chest of winter grain will be seized by the border lord if the deserter is not returned. They want the deserter seized and handed over, and search Thorncleft Clearing and question its hunters and elders, the coin comes when it is done, and anything carried home is the company's. Hunters of Thorncleft Clearing have gone quiet and the elders there close ranks around the deserter.",
+  "job": "Search Thorncleft Clearing and question its hunters and elders."
+ }
+}

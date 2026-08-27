@@ -1,0 +1,58 @@
+{
+ "seed": 11140,
+ "chainId": "chain-13",
+ "title": "The Lost Guarantor",
+ "bible": {
+  "title": "The Lost Guarantor",
+  "kernel": "Trihild hires the company to retrieve a captive held by Douze Hollis in the Western Forests so the captive can be returned to the Pass.",
+  "cast": [
+   {
+    "name": "Trihild of the Pass",
+    "who": "the tollwarden who keeps the narrow road through the passes and bargains for safe passage.",
+    "want": "to recover a captive taken from the road and have them returned to the Pass",
+    "trade": "warden",
+    "role": "client",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Snaeke Greypelt",
+    "who": "a wolfman fighter who ran from a border band and carries a private stain no house will claim.",
+    "want": "to earn a safe place and the chance to join the mercenary company",
+    "trade": "soldier",
+    "role": "prize",
+    "loreId": "c8"
+   },
+   {
+    "name": "Douze Hollis",
+    "who": "a woman who runs a small gang of trappers and moves contraband through the lower groves.",
+    "want": "to keep her captive long enough to sell them to buyers on the next trade night",
+    "trade": "poacher",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   }
+  ],
+  "situation": "Trihild hired the company to fetch a captive taken from her road in the Western Forests. The captive is Snaeke Greypelt, a wolfman who was seized while trespassing the old elven groves because she carries an illicit parentage that both the elven houses and the Pass prefer ignored. Douze Hollis's poachers took Snaeke intending to sell her to buyers. The company must track the poachers, secure Snaeke, and hand her back where Trihild named.",
+  "goal": "to bring a captive taken from the Western Forests back to the Pass as Trihild ordered",
+  "arc": [
+   "Search the Western Forests where Trihild's scouts last saw anyone taken, using the warden's bearings → yields: a torn strip of a wolfman's tabard knotted with a poacher's braid stamped with Hollis that points toward Greybriar Hollow",
+   "Follow the Hollis braid into Greybriar Hollow to watch the poacher lines and scout for a camp using the tabard strip → yields: Snaeke Greypelt bound inside a hollow root at Blackbind Camp, watched by two poachers and a single fire",
+   "Ride with Snaeke toward the Pass meeting-place the client named while Douze Hollis returns to claim payment and tries to sell the captive, and then beat, buy, or outwit Douze there and hand Snaeke to Trihild"
+  ],
+  "twist": null,
+  "tensions": [
+   "the elven watch will press anyone who drags a captive through the old groves",
+   "poacher gangs trade captives quickly and will sell to the highest bidder",
+   "Trihild will insist on a clean handover and punish anyone who brings scandal to the Pass"
+  ],
+  "openDirections": [
+   "If Snaeke's parentage becomes known, elven houses or wolf-bands may press legal or violent claims on her."
+  ],
+  "stakeIfLost": "If the company fails, the Pass loses the captive and merchants will avoid the road, shutting off its trade.",
+  "arrival": "came back a second time · was in a hurry and did not hide it"
+ },
+ "shipped": {
+  "title": "Search the scouts' bearings",
+  "situation": "A warden, Trihild of the Pass, came back a second time and was in a hurry. She laughs in the wrong place and says her scouts last saw someone taken by the old oak in the Western Forests. If the company fails, the Pass loses the captive and merchants will avoid the road, shutting off its trade. Trihild wants that captive found along the scouts' bearings and returned to the Pass, the fee is as agreed, and the company keeps what it hauls back. A poacher intends to keep the captive until the next trade night to sell them to buyers.",
+  "job": "Search the Western Forests along the scouts' bearings and locate the captive."
+ }
+}

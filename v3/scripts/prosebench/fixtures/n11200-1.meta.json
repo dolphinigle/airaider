@@ -1,0 +1,59 @@
+{
+ "seed": 11200,
+ "chainId": "chain-14",
+ "title": "Kiln and Claim",
+ "bible": {
+  "title": "Kiln and Claim",
+  "kernel": "An envoy of the Bishop hires mercenaries to escort a flood-threatened village to the church terrace. A village potter will only go if his kiln moves, and a river lender holds the villagers' pledge-token.",
+  "cast": [
+   {
+    "name": "Tivela",
+    "who": "an agent of the Bishop's house who commands the church's claim on the terrace by the elf road",
+    "want": "to take custody of the flood-threatened village at the church terrace the Bishop claims",
+    "trade": "cleric",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Tikaasi Salt-born",
+    "who": "river boathouse owner who once lent grain in hard years and now holds household pledges",
+    "want": "to keep the villagers bound to repay by holding their carved pledge-token",
+    "trade": "lender",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   },
+   {
+    "name": "Gocelinus",
+    "who": "a village woodcrafter and kilnkeeper who will not leave without his kiln",
+    "want": "to have his kiln moved intact",
+    "trade": "potter",
+    "role": "prize",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "The Bishop's house owns a high terrace beside the old elf road and has declared it a refuge. Spring melt will push a dammed stretch of the river into the low meadow and flood the village unless the households relocate first. The villagers are split. A lender at the river boathouse holds a carved pledge-token that keeps many families bound by debt. The village potter will not move unless his kiln goes with him. Tivela has hired the company to bring the whole village to the church terrace before the rise.",
+  "goal": "To move the flood-threatened village onto the church terrace the Bishop claims before the rising water scatters the households.",
+  "arc": [
+   "Scout the church terrace the client named, the high meadow by the old elf road → yields: a nailed plea left at a post, signed in Gocelinus's mark asking for help to save his kiln",
+   "Follow Gocelinus's plea to the village low meadow and take his directions to the households' council → yields: Gocelinus refuses to go unless his kiln travels with him and names Tikaasi's boathouse as where pledges stay",
+   "Act on the boathouse direction and confront the lender at the river → yields: the company seizes the carved pledge-token from the boathouse, and Tikaasi vows to reclaim it by force if brought to market",
+   "Return to the church terrace the client named, escort the households there with the token as leverage, and face Tikaasi when he arrives to block the move. Beat, buy, or outwit him and hand the relocated village to Tivela while Gocelinus accepts a place with the company"
+  ],
+  "twist": null,
+  "tensions": [
+   "A lender holds the carved pledge-token that keeps many households bound and will not yield it freely",
+   "Village councils are split and slow to choose a single site, costing time against the rising water",
+   "Gocelinus refuses to abandon his kiln. Without it he will not relocate"
+  ],
+  "openDirections": [
+   "If the move fails, rival landlords and lenders will press claims on scattered households, turning refugees into wards of stronger houses and sowing wider unrest."
+  ],
+  "stakeIfLost": "If the company fails, the Bishop loses the villagers' pledged labor that feeds its stores when the flood scatters the households.",
+  "arrival": "came on foot, having walked it · was in a hurry and did not hide it"
+ },
+ "shipped": {
+  "title": "Scout the church terrace",
+  "situation": "An agent of the Bishop's house, Tivela, came on foot and was in a hurry. She says the church must take custody of the flood-threatened village at the terrace by the elf road. If the company fails, the Bishop loses the villagers' pledged labor that feeds its stores when the flood scatters the households. This errand is to scout the church terrace, the high meadow by the old elf road, and report whether it can hold the village before the rising water. A lender intends to keep the villagers bound by holding their carved pledge-token and may contest the terrace. The fee is as agreed, and any spoils ride home with it. She turns a ring around one finger while she says she cannot wait.",
+  "job": "Survey the church terrace and report whether it can receive the village before the flood"
+ }
+}

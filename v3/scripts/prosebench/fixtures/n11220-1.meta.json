@@ -1,0 +1,59 @@
+{
+ "seed": 11220,
+ "chainId": "chain-13",
+ "title": "Quiet Siege, Loud Rivers",
+ "bible": {
+  "title": "Quiet Siege, Loud Rivers",
+  "kernel": "A logger hires the company to retrieve her niece taken after a silent siege. The trail runs by river and ends in a raider perch where the niece must be won and may then join the company.",
+  "cast": [
+   {
+    "name": "Renenfwe Leafshade",
+    "who": "Forewoman of the winter huts who holds the river claim.",
+    "want": "to have her niece returned",
+    "trade": "logger",
+    "role": "client",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Wubcke",
+    "who": "A woman who led the reprisal band that swept the siege field.",
+    "want": "to keep Sulahkeesh as leverage",
+    "trade": "raider",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Sulahkeesh",
+    "who": "A lizardman sailor who fled the logging camp during the siege.",
+    "want": "to join the company",
+    "trade": "sailor",
+    "role": "prize",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Renenfwe Leafshade hired the company to find and return her niece Sulahkeesh, taken after the nearby siege ended too quietly. The raiders slipped a skiff downriver and hold prisoners as payment.",
+  "goal": "to bring the client's niece safely back to the client",
+  "arc": [
+   "Travel to the loggers' winter huts to question survivors of the siege and ask about the client's niece → yields: Staas, a shaken logger who says raiders forced the niece aboard a skiff and went downriver",
+   "Use Staas's directions at the riverbank he named to search for the skiff he described → yields: a hidden skiff at Blackwater Bend, its prow marked with Wubcke's carved token",
+   "Launch the skiff and follow the river where the raiders left to search the banks and ruined ground they skirted → yields: a rough trail up into the elms marked with Wubcke's token leading to a perched lair",
+   "Push the trail into the raider perch, force Wubcke to surrender Sulahkeesh by fight, bargain, or trick, and return Sulahkeesh to Renenfwe at the winter huts"
+  ],
+  "twist": null,
+  "tensions": [
+   "Local codes of obedience make villagers fear crossing raider councils.",
+   "Raider reprisal is immediate and visible. Delay invites fire at the huts.",
+   "Sulahkeesh may not welcome rescue on the raiders' terms."
+  ],
+  "openDirections": [
+   "If the company stalls, the raiders will burn the winter huts in reprisal and scatter the hold."
+  ],
+  "stakeIfLost": "If the niece is not returned, the client's winter huts will be burned and the logging hold lost because the raiders will escalate reprisals.",
+  "arrival": "came behind a letter that said less · would not sit down"
+ },
+ "shipped": {
+  "title": "Question survivors at the winter huts",
+  "situation": "A forewoman of the winter huts, Renenfwe Leafshade, came behind a brief letter and would not sit down. If the niece is not returned, the client's winter huts will be burned and the logging hold lost because the raiders will escalate reprisals. She wants survivors at the loggers' winter huts questioned to learn where the niece was taken, the fee is as agreed, and the company keeps what it hauls back. Raider bands hold the approaches and prey on anyone who returns to the huts. She stands too close while she talks.",
+  "job": "Go to the loggers' winter huts and question survivors about the client's niece."
+ }
+}

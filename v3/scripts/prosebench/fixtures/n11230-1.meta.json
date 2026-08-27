@@ -1,0 +1,58 @@
+{
+ "seed": 11230,
+ "chainId": "chain-13",
+ "title": "Three Sales and a Scrawny Man",
+ "bible": {
+  "title": "Three Sales and a Scrawny Man",
+  "kernel": "An innkeeper hires mercenaries to bring back a payment and the man sold with it.",
+  "cast": [
+   {
+    "name": "Ildebad",
+    "who": "Roadside innkeeper who lost a midday payment and cannot cover his pledge.",
+    "want": "to recover a payment taken from him",
+    "trade": "innkeeper",
+    "role": "client",
+    "loreId": "lore-11"
+   },
+   {
+    "name": "Enrith Rootward",
+    "who": "Forester-born raider who runs raids from a hidden camp and speaks bluntly.",
+    "want": "to keep the payment and the man bought with it",
+    "trade": "brigand",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Herve",
+    "who": "A scrawny, sickly entertainer who travelled with the bought payment and cannot stand for himself.",
+    "want": "to join the company",
+    "trade": "performer",
+    "role": "prize",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Ildebad's inn lost a payment taken by a courier. The payment passed through market hands and into a bandit band, and the buyer now claims both coin and a bound man sold with it.",
+  "goal": "to recover a payment taken from the client's purse",
+  "arc": [
+   "Go to the ford the client named and question ferrymen and passing drivers about the night the money went missing → yields: word that a courier rode off to Dryhale Market and left a pawn-token with Tendris's stall",
+   "Find Tendris's stall at Dryhale Market and press him about the pawn-token the courier left there → yields: a brittle pawn-token naming Enrith Rootward as buyer and showing the bound man to be delivered again at the ford",
+   "Wait the meeting at the ford the client named, where Enrith comes to claim the sale. Beat Enrith, free Herve, take the payment, and hand it back to Ildebad while Herve chooses to join the company"
+  ],
+  "twist": null,
+  "tensions": [
+   "Tendris will resell small pledges unless bought off or threatened",
+   "Enrith's raiders will fight for both coin and the captive",
+   "The road-keeper expects the pledged chest returned before the next rent day"
+  ],
+  "openDirections": [
+   "Dryhale Market's trade in pawned people and small debts may spawn new buyers or buyers' quarrels after the sale"
+  ],
+  "stakeIfLost": "Ildebad's inn will be seized by the road-keeper when he cannot return the pledged chest.",
+  "arrival": "came behind a letter that said less · wanted it settled the same day"
+ },
+ "shipped": {
+  "title": "Question witnesses at Highwater Ford",
+  "situation": "An innkeeper, Ildebad, came behind a letter that said less and wanted it settled the same day. He says that if the payment is not returned the road-keeper will seize Ildebad's inn. Go to Highwater Ford and question ferrymen and passing drivers about the night the money went missing, the coin comes at the finish, with the pick of what the job turns up. A brigand wants to keep the payment and the man bought with it. The man will not take the chair offered.",
+  "job": "Ask ferrymen and passing drivers at Highwater Ford what they saw the night the payment vanished."
+ }
+}

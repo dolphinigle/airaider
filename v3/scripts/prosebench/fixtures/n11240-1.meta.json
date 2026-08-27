@@ -1,0 +1,58 @@
+{
+ "seed": 11240,
+ "chainId": "chain-14",
+ "title": "Handoff at Thornvein",
+ "bible": {
+  "title": "Handoff at Thornvein",
+  "kernel": "A wool merchant hires mercenaries to seize a smuggler who moves people and messages through the Western Forests.",
+  "cast": [
+   {
+    "name": "Nesulmawen Ashveil",
+    "who": "an elven wool merchant who runs a stall at Harrowmarket and lost a promised shipment to forest runners",
+    "want": "to have the woman Fathasa Fernbrook brought to Thornvein Hollow",
+    "trade": "merchant",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Fathasa Fernbrook",
+    "who": "an elven smuggler born in the Western Forests who moves people and stolen wool along a secret route",
+    "want": "to slip the net and keep running her route",
+    "trade": "smuggler",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Alabyran Rootward",
+    "who": "a human forester born in the Western Forests who patrols the Greyfen road and takes informal tolls",
+    "want": "to protect the Thornvein handoff and its runners",
+    "trade": "forester",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   }
+  ],
+  "situation": "Nesulmawen lost a shipment and suspects an elven runner takes stolen wool and people through a covert line of handoffs. The route uses Greyfen Mill and a Thornvein Hollow meeting, and the forester Alabyran shields the handoffs for his cut. The runners carry hopeful fugitives and secret notes that can drive neighbours to denunciation.",
+  "goal": "to have the woman Fathasa Fernbrook brought to Thornvein Hollow",
+  "arc": [
+   "Question Nesulmawen's stallhands at Harrowmarket about the lost shipment → yields: a woven shipment tag hidden in a bale stamped for Greyfen Mill.",
+   "Follow the woven tag to Greyfen Mill and search the mill outbuildings for signs of the route → yields: a passenger cloak folded with a short note naming Thornvein Hollow and warning that Alabyran will meet the handoff.",
+   "Lie in wait at Thornvein Hollow at the scheduled handoff, use the prior warning to force the handoff, buy off Alabyran Rootward, take custody of Fathasa Fernbrook, and hand her to Nesulmawen Ashveil."
+  ],
+  "twist": null,
+  "tensions": [
+   "the Greyfen miller shelters runners for coin",
+   "Alabyran will confront anyone who breaks the Thornvein handoff",
+   "neighbouring farmers may denounce Nesulmawen if force is used"
+  ],
+  "openDirections": [
+   "Neighboring farms will begin to pick sides and either shield the runners or bring formal denunciations that fracture local trade."
+  ],
+  "stakeIfLost": "Nesulmawen says failure will let the runner walk off with her last promised bale and the secret note that keeps her buyers, breaking her deliveries and costing the pledges that hold her stall.",
+  "arrival": "sent a servant with a token and followed · had the whole of it written out"
+ },
+ "shipped": {
+  "title": "Question Harrowmarket stallhands",
+  "situation": "An elven wool merchant who runs a stall at Harrowmarket and lost a promised shipment, Nesulmawen Ashveil, sent a servant with a token and followed, bringing the whole incident written out. She says failure will let the runner walk off with her last promised bale and the secret note that keeps her buyers, breaking her deliveries and costing the pledges that hold her stall. The task now is to question her stallhands at Harrowmarket about the missing shipment and any hint of who handled the bale, the coin comes when it is done, and anything carried home is the company's. An elven smuggler born in the Western Forests who moves people and stolen wool along a secret route, Fathasa Fernbrook, is named in the written account as the likely runner. A forester means to protect the Thornvein handoff and its runners. She turns a ring around one finger as she asks that you fetch the truth from her hands and point the woman toward Thornvein Hollow.",
+  "job": "Ask Nesulmawen's Harrowmarket stallhands who handled the missing bale and whether they saw Fathasa Fernbrook"
+ }
+}

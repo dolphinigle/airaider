@@ -1,0 +1,50 @@
+{
+ "seed": 11030,
+ "chainId": "chain-12",
+ "title": "The Moved Stone",
+ "bible": {
+  "title": "The Moved Stone",
+  "kernel": "A border stone shifted by night draws the company into an ambush that frees Alendis and settles the line.",
+  "cast": [
+   {
+    "name": "Alendis",
+    "who": "young elven scion from the bordering grove, hotheaded and quick to act.",
+    "want": "to find a place among soldiers and learn to hold a blade.",
+    "trade": "ruler",
+    "role": "prize",
+    "loreId": "c8"
+   },
+   {
+    "name": "Poguf Nightrunner",
+    "who": "human tracker born to timberfolk, fleet and sly along deer paths.",
+    "want": "to push the clearing's boundary outward to claim timber for his band.",
+    "trade": "raider",
+    "role": "obstacle",
+    "loreId": "lore-11"
+   }
+  ],
+  "situation": "The western border stone at Greenmark Clearing has been nudged a little each year. The fort wants the stone fixed and the mover stopped before the line is changed again.",
+  "goal": "to stop whoever is moving the western border stone and secure the stone's place.",
+  "arc": [
+   "Inspect the western border stone at Greenmark Clearing for signs of tampering → yields: a scrap of black cloth stitched with a snared-hare mark and fresh ash.",
+   "Follow the scrap's snare-mark and ash along the sap-trail to Bleak Ridge's old hunter fire → yields: a torn summons naming Alendis for handoff at Greenmark Clearing tonight, signed in Poguf's scrawl.",
+   "Lie in wait at Greenmark Clearing for the night handoff using the summons, force a meeting with Poguf Nightrunner there, defeat him, free Alendis, and bring the elf back to the fort where he accepts a post with the company."
+  ],
+  "twist": null,
+  "tensions": [
+   "Poguf knows every blind path and makes the forest lie for him.",
+   "Local elven custom distrusts armed strangers, so blunt force costs trust.",
+   "Alendis's hotheadedness risks making him act before bargains are struck."
+  ],
+  "openDirections": [
+   "Settlers and timber crews may press the moved line to claim more wood, forcing repeated patrols."
+  ],
+  "stakeIfLost": "If the company fails, the fort will lose the Greenmark woodlot used for winter stores when the line is redrawn in law.",
+  "arrival": "was waiting at first light · would not name the place until the terms were set"
+ },
+ "shipped": {
+  "title": "Check Greenmark's border stone",
+  "situation": "A forester is kneeling at the cleared ring, brushing grit from the western border stone at Greenmark Clearing. The forester speaks for the fort's winter woodlot and wants the stone verified as fixed or tampered with, the pay is the agreed coin and what the road turns up. If the company fails, the fort will lose the Greenmark woodlot used for winter stores when the line is redrawn in law. The errand is an inspection of the border stone for signs of tampering or recent resetting. A raider is said to be pushing the clearing's boundary outward to claim timber for his band.",
+  "job": "Inspect the western border stone at Greenmark Clearing for signs of tampering"
+ }
+}

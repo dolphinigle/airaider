@@ -1,0 +1,59 @@
+{
+ "seed": 11150,
+ "chainId": "chain-14",
+ "title": "Banner and Maker",
+ "bible": {
+  "title": "Banner and Maker",
+  "kernel": "Hired to fetch a field-banner from the charcoal camps, the company finds the maker sheltered by an elven warden and must win him back.",
+  "cast": [
+   {
+    "name": "Hrefgerda Nightrunner",
+    "who": "Forewoman of an Ashfire camp who claims the field-banner as her lord's prize.",
+    "want": "the Moss-Wreathed Banner returned and handed to her at Ashfire Ring",
+    "trade": "steward",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Filbolrel Elmwhisper",
+    "who": "An elven warden of the north glade who sheltered the survivors of the field fight.",
+    "want": "to keep Theodoric and the banner from being taken away",
+    "trade": "warden",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   },
+   {
+    "name": "Theodoric",
+    "who": "A maimed human maker who bore the maker-mark on the lost banner and survived the field clash.",
+    "want": "to be allowed to choose where he goes and who keeps his work",
+    "trade": "artisan",
+    "role": "prize",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "A battle of the wood was a one-sided slaughter. The Moss-Wreathed Banner was taken where a band was cut down. Theodoric made that banner and survived badly wounded. Filbolrel found the maker and the banner and sheltered both in the north glade. Hrefgerda's camp claims the banner as the token of their lord's victory and hires the company to fetch it.",
+  "goal": "Recover the Moss-Wreathed Banner from the charcoal-burners' camps and hand it to Hrefgerda Nightrunner at Ashfire Ring.",
+  "arc": [
+   "Search Ember Clearing among the charcoal-burners' camps for the Moss-Wreathed Banner as Hrefgerda ordered → yields: a torn corner of the banner stamped with Theodoric's maker-mark and a crude rubbing that points north",
+   "Follow the rubbing into the north glade and demand the maker who holds the banner from those in the trees → yields: Filbolrel Elmwhisper, who refuses release and insists the maker's apprentice Nikulund must vouch before any handover",
+   "Track Nikulund to an ash-heap camp and bring him back to the glade to force a vow → yields: Nikulund, who will only corroborate ownership if paid the maker's pledged fee",
+   "Bring Nikulund and the banner to Ashfire Ring for the handover Hrefgerda set. Filbolrel attends to block the transfer and must be beaten, bought, or outwitted there so the company can deliver the Moss-Wreathed Banner to Hrefgerda"
+  ],
+  "twist": null,
+  "tensions": [
+   "Filbolrel claims moral custody of Theodoric and will not yield without proof or a bargain",
+   "Nikulund will not vouch without the maker's pledged fee, turning proof into a price",
+   "The charcoal-burners' camps distrust mercenaries and may seize the banner if the exchange drags"
+  ],
+  "openDirections": [
+   "If the handover fails, Hrefgerda's lord may raise men to seize the banner by force, forcing the fort to choose sides"
+  ],
+  "stakeIfLost": "If the banner is not returned, Hrefgerda's lord will lose the pledge that binds his levy and thus lose the claim that keeps the charcoal concessions.",
+  "arrival": "walked in with the market crowd · had the whole of it written out"
+ },
+ "shipped": {
+  "title": "Search Ember Clearing",
+  "situation": "A Forewoman of an Ashfire camp, Hrefgerda Nightrunner, walked in with the market crowd and had the whole of it written out. She says \"Find the Moss-Wreathed Banner at Ember Clearing and bring it to Ashfire Ring,\" watching your hands, not your face, the fee is fixed, and what else shakes loose the company keeps. If the banner is not returned, Hrefgerda's lord will lose the pledge that binds his levy and thus lose the claim that keeps the charcoal concessions. The charcoal-burners' wardens hold Ember Clearing and will resist strangers there.",
+  "job": "Search Ember Clearing for the Moss-Wreathed Banner."
+ }
+}
