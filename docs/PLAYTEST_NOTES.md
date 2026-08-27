@@ -108,3 +108,60 @@ own TTL?
 - Does this apply to the FIRST beat too, or only continuations? (Starting a saga is the 50–66s
   genesis, which is a different problem — see `TEMPO.md`.)
 - Does the quests board need to show that a saga beat arrived, the way `P6` announces a pursued card?
+
+## N4 🆕 A recruit's story doesn't match where they were recruited from
+
+> *"big issue: recruit story / text does not match where they got recruited from? pls check is this
+> true?"*
+
+**Checked. Partly confirmed, and one cause is a regression introduced 2026-08-27 (mine).**
+
+### How it is SUPPOSED to work
+A person a quest hands over is fleshed by the **resolver**, which is the only call that knows the
+circumstances — it is given `deliveredCharacters` and told *"people the job handed over — flesh each"*
+(`openai.ts:469`), and the engine applies what comes back (`game.ts:2387`). Everyone else — founders,
+tavern walk-ins — is fleshed later by `fleshPass`, which knows only a coarse `context` string:
+
+```
+genesis focal → "the person the saga X was about"
+merc          → "a founding member of the company" (cycle<=2) | "a sword the company took on"
+captive       → "a captive taken on a quest"
+otherwise     → "someone the road washed up at the gate"
+```
+
+### CONFIRMED DEFECT 1 — the routine report prompt tells the model to flesh nobody
+The new routine one-off report prompt contains, unconditionally:
+
+> `- fleshed: always [] — nobody is handed over on a job like this.`
+
+…in the same prompt that, when someone IS handed over, also carries the `deliveredCharacters` bullet
+telling it to flesh them. **A direct contradiction, and mine wins by being later and in the output
+spec.** So a routine job that delivers a recruit or captive now produces `fleshed: []` — the person
+arrives blank, `fleshPass` later fills them in from the generic context above, and invents an origin
+that has nothing to do with the job they came out of. **That is exactly the reported symptom.**
+Introduced today; one line to fix.
+
+### CONFIRMED DEFECT 2 — tag dumps leaking into backstory
+Second sighting, now in the designer's own game. `Hosmunt`, in the tavern:
+
+> *backstory:* **"TAGS NOTATION: male, human, criminal (low), melee (low), endowed (low), serious."**
+> *He turned up at the gate after a downpour…*
+
+The flesh prompt's tag notation is being echoed verbatim into player-facing prose. (First seen on
+`Kepanuu`, a finale prize, 2026-08-26.) Separate from N4's main claim but found while checking it.
+
+### NOT CONFIRMED — the specific instance
+The live save (seed 230593368, cycle 8) has **no quest-recruited merc** to inspect: the roster is the
+two founders, both with origin-appropriate stories, and the only recruit on offer is Hosmunt in the
+tavern, whose *"road-washed castaway… turned up at the gate"* correctly matches a tavern walk-in.
+Rescued people so far (Belknar, Castarnisse) *"thanked you and moved on"* rather than joining.
+
+**Question for the designer:** which character was it? If it was someone from an earlier session, the
+name is enough to find them in the logs.
+
+### Open questions for triage
+- Should `fleshPass`'s `context` carry the real circumstance (the quest title, the region, how they
+  came into the company's hands) instead of four generic strings? It is the fallback path for
+  everyone the resolver doesn't flesh, and it currently cannot help but invent.
+- A rescued person who *"thanks you and moves on"* becomes a lore node; if they later resurface as a
+  hire, does anything remember how the company met them?
