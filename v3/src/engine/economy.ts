@@ -121,6 +121,25 @@ function defaultOdds(group: string): number {
  * (drop-weight, mutex-safe, tier weighted low ≤ ceiling) until the target is ~spent.
  * The card's value is MARKED = targetV regardless of the substance (§2.5).
  */
+/** THE WEALTH ROLL — GENERATION_FLOW §3: "a wealth parameter … shapes the distribution so
+ *  E[value] ≈ target; right tail from rare top tiers", and ECONOMY §4's "jackpot/DUD lottery".
+ *
+ *  The point of unit generation is that it is RANDOM with the target as its EXPECTATION, not that
+ *  every card converges on the target. A first pass at fixing the old shortfall spent the budget
+ *  down deterministically and produced p10 0.99 / p90 1.08 — the mean was right and the lottery
+ *  was gone: no duds, and never the "substance ≫ mark" that ECONOMY §1 calls the jackpot gap.
+ *
+ *  So the TARGET itself is rolled: mostly near 1, a dud tail below, a rare heavy tail above. The
+ *  card is still MARKED at the plain target (§1), so a lucky roll really is worth more than its
+ *  mark says — which is the whole thrill, and what the ★ marker reads. Mean is held at ≈1.00 by
+ *  construction: the three branches' weights and spans are chosen so they cancel. */
+function rollWealth(rng: Rng): number {
+  const r = rng.next();
+  if (r < 0.10) return 0.55 + rng.float(0, 0.30);        // dud      0.55-0.85   (mean 0.70)
+  if (r < 0.94) return 0.85 + rng.float(0, 0.24);        // ordinary 0.85-1.09   (mean 0.97)
+  return 1.13 + rng.float(0, 1.20);                       // jackpot  1.13-2.33   (mean 1.73)
+}
+
 export function generateCard(rng: Rng, opts: GenOptions): Card {
   const ceiling = maxTier(opts.contentLevel);
   const tags: TagInstance[] = [{ concept: opts.domain }];
@@ -175,11 +194,13 @@ export function generateCard(rng: Rng, opts: GenOptions): Card {
     }
   }
 
-  // spend the remainder (budget-driven; flavor flats ride along via their odds)
+  // spend the remainder against the ROLLED budget — the mark below stays the plain target, so
+  // substance may land under it (a dud) or well over it (the jackpot gap, ECONOMY §1)
+  const budget = opts.targetV * rollWealth(rng);
   let spent = Math.max(0, tagsValue(tags));
   const raceBias = RACE_BODY_BIAS[tags.find(t => CONCEPT[t.concept]?.group === 'race')?.concept ?? 'human'] ?? {};
   for (let iter = 0; iter < 24 && tags.length < 12; iter++) {
-    const remaining = opts.targetV - spent;
+    const remaining = budget - spent;
     // NOT lowered to the cheapest tag's price (6): letting the fill loop keep buying TAGS to use
     // up the budget pushed the median card to the 12-tag cap, which is exactly the "tag-count
     // sprawl" §3b goal 5 forbids. The remainder is spent on TIERS instead, below.
@@ -218,7 +239,7 @@ export function generateCard(rng: Rng, opts: GenOptions): Card {
   // card rather than adding more tags. The pick is uniform among the affordable upgrades so the
   // distribution's shape (bottom-weighted, right tail from rollTier) is left alone.
   for (let guard = 0; guard < 40; guard++) {
-    const remaining = opts.targetV - spent;
+    const remaining = budget - spent;
     if (remaining <= 0) break;
     const up = tags
       .map(t => ({ t, c: CONCEPT[t.concept] }))
@@ -384,19 +405,21 @@ export function unitPeak(card: { tags: TagInstance[] }): { concept: string; tier
  *     opening soldiers read "·" — the marker was wrong about them, not the other way round.
  *
  *  So the reference is the level itself: worth ÷ the coin-equivalent of vBase(level). Level-stable
- *  at EVERY level (median 0.82-0.84, p97 ≈1.00 across L1-L30, 48k units) and defined for anyone
- *  with a level. Recalibrated after the §3 generation fix, which moved the whole distribution up.
- *  Thresholds are the measured percentiles:
- *    ★★★★ ~3.5%  a chase unit
- *    ★★★  ~18%   notably better than their level suggests
- *    ★★   ~45%   what you expect to see
- *    ★    ~26%   thin
- *    ·     ~7%   the dud end of the lottery (GENERATION_FLOW §8's "jackpot/dud")   */
+ *  at EVERY level (median 0.96-0.97, p97 ≈1.37 across L2-L30, 64k units) and defined for anyone
+ *  with a level. Calibrated against the CHARACTER's level, which is what this function reads — a
+ *  first pass calibrated against the CONTENT level they were generated at, one higher, and vBase
+ *  moves 1.35× per level, so 25% of units came out ★★★★ where 5% was intended.
+ *  Thresholds are the measured percentiles, so the scale means something:
+ *    ★★★★  ~6%  a chase unit — substance well over its mark, the §1 jackpot gap
+ *    ★★★  ~22%
+ *    ★★   ~26%  what you expect to see
+ *    ★    ~36%
+ *    ·    ~10%  the dud end of the same lottery (ECONOMY §4)   */
 export function unitStars(card: { tags: TagInstance[]; value: number; character?: { level: number } | null }): number {
   // a card with no level (a relic) still has a mark, and vBase inverts cleanly
   const level = card.character?.level ?? Math.max(1, 1 + Math.log(Math.max(1, card.value) / 30) / Math.log(1.35));
   const r = unitWorth(card) / Math.max(1, cashValue(vBase(level)));
-  return r >= 1.00 ? 4 : r >= 0.90 ? 3 : r >= 0.80 ? 2 : r >= 0.70 ? 1 : 0;
+  return r >= 1.20 ? 4 : r >= 1.05 ? 3 : r >= 0.94 ? 2 : r >= 0.82 ? 1 : 0;
 }
 
 

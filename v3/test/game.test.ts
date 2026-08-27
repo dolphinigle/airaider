@@ -91,9 +91,12 @@ describe('game loop (mock AI)', () => {
     }
     if (q.slots.every(s => s.filledBy)) {
       await g.endCycle();
-      expect(chain.beatIndex).toBe(1);
+      // the beat is CONSUMED either way — it advances on a win and books a failure on a loss.
+      // Asserting beatIndex === 1 outright was asserting a lucky roll: any engine change that
+      // shifts the rng stream flipped this beat to a failure and failed the test (2026-08-27).
+      expect(chain.beatIndex + chain.failures).toBe(1);
       expect(chain.cyclesSpent).toBeGreaterThan(0);       // effort banked even on failure
-      // a continuation lead exists
+      // and the story waits for the company either way
       expect(g.state.leads.some(l => l.chainInfo.kind === 'continues')).toBe(true);
     }
   });
