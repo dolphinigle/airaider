@@ -1,0 +1,51 @@
+{
+ "seed": 9010,
+ "chainId": "chain-12",
+ "title": "Song for Sale",
+ "bible": {
+  "title": "Song for Sale",
+  "kernel": "A company is hired by the fort to fetch a caged elven singer from the charcoal-burners' camps. The burners want to keep him as a bargaining chip and the company must bring him home, while the camp leader haggles and blocks the handover.",
+  "cast": [
+   {
+    "name": "Brethas Ashveil",
+    "who": "An elf of the Western Forests taught to hunt and to carry a voice that moves crowds.",
+    "want": "to join a company and travel away from the camps",
+    "trade": "singer",
+    "role": "prize",
+    "loreId": "c8"
+   },
+   {
+    "name": "Nalia",
+    "who": "Leader of a charcoal-burners' camp who trades access to the singer's performances for coin and favors.",
+    "want": "to keep the singer as the camp's bargaining chip and source of income",
+    "trade": "burner",
+    "role": "obstacle",
+    "loreId": "lore-11"
+   }
+  ],
+  "situation": "The fort sent the company to the charcoal-burners' camps in the Western Forests to fetch Brethas Ashveil. The burners caged him and sell controlled performances. Nalia holds him as a priced asset. The company must recover the singer before merchants gather for market day.",
+  "goal": "to fetch the singer from the charcoal-burners' camps and bring him to the fort.",
+  "arc": [
+   "Ride to the charcoal-burners' camps the fort named to locate the singer → yields: a caged Brethas Ashveil locked in an iron pit beneath the camp and watched by Nalia",
+   "Use the caged Brethas and the camp watch to bargain and learn who keeps the key → yields: Werinbert the Elder's kiln-apron hiding the rusted key to the pit",
+   "Slip to Werinbert's kiln, take the apron and use the rusted key to open the iron pit, then move Brethas toward the fort → yields: Brethas freed and walking with the company toward the fort",
+   "Bring Brethas to the fort gate to hand him over as the mission names while Nalia and her burners arrive to block the pass. Beat, buy, or outwit Nalia at the gate and settle the matter at the fort"
+  ],
+  "twist": null,
+  "tensions": [
+   "Nalia will refuse to hand over the singer without a ransom or cut and will press the camp to stand with her",
+   "Werinbert may balk at surrendering the kiln-apron and the key he hides on principle or for coin",
+   "Brethas's voice still risks stirring a crowd if he sings while angry or afraid"
+  ],
+  "openDirections": [
+   "Market day draws nearer and every day Brethas remains, paid crowds gather and offers for him rise."
+  ],
+  "stakeIfLost": "The fort's market will be sacked when the singer's songs drive a mob that smashes the merchants' stalls and takes the stores.",
+  "arrival": "came to the fort themselves · refused food and drink"
+ },
+ "shipped": {
+  "title": "Locate the singer in the burners' camps",
+  "situation": "A fort officer is watching the road and wants the singer found, the pay is plain coin, and the road's yield goes to the company. If the singer's songs stir a mob, the market will be sacked. This errand is to ride to the charcoal-burners' camps the fort named and locate the singer. A burner at Werinbert's cracked kiln is pulling tarps over the stacks and looks likely to keep the singer as the camp's bargaining chip. The burners will not hand him over without a fight. The one who sent word came to the fort themselves and refused food or drink.",
+  "job": "Ride to the charcoal-burners' camps the fort named and locate the singer."
+ }
+}

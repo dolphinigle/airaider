@@ -1,0 +1,59 @@
+{
+ "seed": 9030,
+ "chainId": "chain-14",
+ "title": "The Three-Wax Key",
+ "bible": {
+  "title": "The Three-Wax Key",
+  "kernel": "Three enemies each hold a shard of a vault key. Retrieve the shards and bring them home.",
+  "cast": [
+   {
+    "name": "Alcmaion Blackbrook",
+    "who": "A hunter from the outer copse who once found and swore to guard a wounded giant.",
+    "want": "to keep the last key piece and keep the giant sealed and spared",
+    "trade": "hunter",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Synnove",
+    "who": "A towering forager turned bandit who holds sway over High Comb Ridge.",
+    "want": "to be paid with sacks of grain and a formal pardon",
+    "trade": "bandit",
+    "role": "obstacle",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Nesh-Tan",
+    "who": "A silver‑tongued peddler who flatters taxmen to sell contraband out of the clearings.",
+    "want": "to receive coin and safe passage out of the forest",
+    "trade": "peddler",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   }
+  ],
+  "situation": "Three enemies each hold a piece of the fort's vault key scattered through the Western Forests. The fort wants those pieces returned.",
+  "goal": "Recover the vault key pieces and secure them at the fort.",
+  "arc": [
+   "Search the beekeepers' clearings for the vault key pieces the fort named → yields: a honey‑stained scrap bearing Nesh‑Tan's mark and a scrawl pointing to Hollow Mead Hall.",
+   "Go to Hollow Mead Hall and force Nesh‑Tan to trade or flee with her piece → yields: Nesh‑Tan's carved key fragment and her confession that the full key opens a sealed hollow housing a wounded giant.",
+   "Use Nesh‑Tan's confession to move to High Comb Ridge and force Synnove's hand → yields: Synnove's key fragment and a folded note from Alcmaion naming the beekeepers' clearings for parley.",
+   "Hold the beekeepers' clearings and use Alcmaion's note to draw him in. He appears to keep the last fragment, resists, and is beaten, bought, or outwitted, and the company delivers the complete key to the fort."
+  ],
+  "twist": "Assembling the vault key will open a sealed hollow that keeps a wounded giant alive.",
+  "tensions": [
+   "Locals have sworn mercy to the giant and may refuse to hand pieces to mercenaries",
+   "Tax flatterers in town will try to seize any recovered piece before the fort can secure it",
+   "Synnove will demand grain and a pardon rather than hand over her shard"
+  ],
+  "openDirections": [
+   "If the company delays, tax flatterers backed by officials may raid the clearings to seize any pieces and break the mercy pact, forcing the giant's fate."
+  ],
+  "stakeIfLost": "The fort will lose the taxed chest kept under lock. Without it the garrison cannot buy seed and grain for the winter.",
+  "arrival": "was let in past the hour · brought no one with them"
+ },
+ "shipped": {
+  "title": "Search the beekeepers' clearings",
+  "situation": "A hunter scans the beekeepers' clearings for the fort's named key pieces and reports nothing yet. The fort will lose the taxed chest kept under lock. Without it the garrison cannot buy seed and grain for the winter. Locate which clearings hold the named key pieces, the pay is honest coin, and any small spoils besides. A bandit aims to buy the key with sacks of grain and a formal pardon. A peddler moves between hives selling jars and questions to anyone who will listen.",
+  "job": "Find which beekeepers' clearings hold the vault key pieces the fort named"
+ }
+}

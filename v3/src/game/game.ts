@@ -1731,7 +1731,9 @@ export class Game {
       ...(isBeat1 ? {
         // WHY. Nine writer-reports lost this question; the one handed a written stake answered it
         // and said so: "the one question cards usually lose is the one the input handed me pre-written."
-        stakeIfLost: chain.bible.stakeIfLost || undefined,
+        // scrubbed like every other dealt string: genesis writes stakes that name the quarry
+        // ("If Alyva is not returned…"), and a dealt name is a PASTED name (L19)
+        stakeIfLost: chain.bible.stakeIfLost ? this.scrubUnmet(chain, chain.bible.stakeIfLost) : undefined,
         // HOW IT REACHED THE FORT — invented by 6/6 writers before it was dealt
         arrival: chain.bible.arrival,
         // WHY IT TAKES ARMED STRANGERS — what the client openly knows stands against them. The

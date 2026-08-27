@@ -1,0 +1,58 @@
+{
+ "seed": 9240,
+ "chainId": "chain-14",
+ "title": "Bridge Trade",
+ "bible": {
+  "title": "Bridge Trade",
+  "kernel": "A merchant hires mercenaries to fetch a sold hostage back from a hunter who plans a trade at the old elf road.",
+  "cast": [
+   {
+    "name": "Imyne Stonebridge",
+    "who": "A river-road trader from the low towns with a blunt temper and a narrow pride.",
+    "want": "to have the hostage returned at the old elf road",
+    "trade": "trader",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Vipir of the High Fells",
+    "who": "A high-fells hunter and fence who takes prisoners in raids and deals them for strange goods.",
+    "want": "to sell the captive in exchange for an alchemist draught",
+    "trade": "hunter",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   },
+   {
+    "name": "Idaug",
+    "who": "A scrawny wolfman trader seized during a road raid and held as barter.",
+    "want": "to reach Imyne at the old elf road alive",
+    "trade": "merchant",
+    "role": "quarry",
+    "loreId": "c8"
+   }
+  ],
+  "situation": "Imyne hired the company to retrieve a hostage taken on the old elf road. Vipir seized the prisoner and intends to trade them for an alchemist draught at a meeting on the road. The hostage remains alive in Vipir's custody until that trade is made.",
+  "goal": "recover the hostage taken near the old elf road",
+  "arc": [
+   "Search the south ford on the old elf road the client named for signs of the raid → yields: a length of pack-rope knotted with Vipir of the High Fells' hunter-knot",
+   "Track the knot to the cairn camp on the High Fells using the rope as a lead → yields: a soaked scrap that names Stone Bridge as the trade meeting and mentions an 'alchemist draught' as payment",
+   "Ambush the trade at Stone Bridge using the scrap's meeting. Beat Vipir and deliver the hostage to Imyne Stonebridge at Stone Bridge"
+  ],
+  "twist": null,
+  "tensions": [
+   "Vipir refuses to hand over the captive and will fight or flee rather than be robbed of his price",
+   "The buyer might bring armed backup to the bridge and force a larger clash",
+   "The old elf road floods and the crossing runs deep and quick, threatening drowning and muddled pursuit"
+  ],
+  "openDirections": [
+   "If the buyer does not appear, Vipir may flee with the hostage into the High Fells, forcing a trailing hunt beyond the road"
+  ],
+  "stakeIfLost": "Imyne says that if the hostage is not returned, the buyer will seize and sell her caravan's pack-beasts.",
+  "arrival": "was let in past the hour · named a price before being asked"
+ },
+ "shipped": {
+  "title": "Signs at the south ford",
+  "situation": "A river-road trader, Imyne Stonebridge, was let in past the hour and named a price before you asked. She wants the hostage returned at the old elf road, the pay is honest coin, and any small spoils besides. She says that if the hostage is not returned, the buyer will seize and sell her caravan's pack-beasts, holding her gloves and not putting them on. A High Fells hunter, Vipir of the High Fells, has taken the captive and seeks to sell her in exchange for an alchemist draught.",
+  "job": "Search the south ford of the old elf road for signs of the raid."
+ }
+}

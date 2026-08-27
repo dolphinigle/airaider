@@ -1,0 +1,59 @@
+{
+ "seed": 9040,
+ "chainId": "chain-12",
+ "title": "The Scholar and the Iron Cipher",
+ "bible": {
+  "title": "The Scholar and the Iron Cipher",
+  "kernel": "A landholder hires the company to recover her ward from a staged runaway. The ward holds the cipher to an elven iron chest under Thornhollow.",
+  "cast": [
+   {
+    "name": "Dothy Greyfell",
+    "who": "widowed landholder on the forest edge who holds a pending claim around Thornhollow",
+    "want": "to have her ward returned alive to the winter huts",
+    "trade": "landholder",
+    "role": "client",
+    "loreId": "lore-10"
+   },
+   {
+    "name": "Ionnina",
+    "who": "young scholar from the Western Forests who studied Thornhollow's ruins and guarded an iron cipher",
+    "want": "to keep the iron cipher safe",
+    "trade": "scholar",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Sirinaire",
+    "who": "ex-logger now raiding old claims and pressing ancient rights with force",
+    "want": "to seize the elven iron chest beneath Thornhollow",
+    "trade": "raider",
+    "role": "obstacle",
+    "loreId": "lore-11"
+   }
+  ],
+  "situation": "Ionnina did not simply run away. She was taken by Sirinaire's band from the Glenbarrow Shrine beneath Thornhollow and is held because she alone knows the iron cipher to the elven chest. Dothy hired the company to recover her and secure the cipher before rival crews seize the chest.",
+  "goal": "recover the client's ward alive and return her to the client's winter huts",
+  "arc": [
+   "Search the loggers' winter huts for signs the ward left on her own, using Dothy's description → yields: a torn journal page marked for Thornhollow and a crude silver token stamped with Sirinaire's mark",
+   "Take the torn journal page into the ruined stones of Thornhollow and inspect where the scholar marked the map, using the journal page → yields: a loose paving stone that opens onto a stair and fresh prints heading down",
+   "Descend the Glenbarrow Shrine stair and follow the prints to any captives or guards, using the stair and the prints → yields: Ionnina alive, the iron cipher she guarded, and a scrap noting Sirinaire will meet at the winter huts to buy the cipher",
+   "Return to the loggers' winter huts and force the exchange, using the cipher and Ionnina to hold Sirinaire to account"
+  ],
+  "twist": null,
+  "tensions": [
+   "Sirinaire's band patrols the forest and can cut off retreat",
+   "Ionnina refuses to hand over the cipher to Dothy without guarantees",
+   "Rival claimants press the suit that will let them seize any recovered chest"
+  ],
+  "openDirections": [
+   "Rival crews and the courts press to claim the chest once its cipher is known, forcing rapid settlement or public suit."
+  ],
+  "stakeIfLost": "If the ward is not returned, Dothy's legal claim to the Thornhollow iron chest will be void and rival crews will seize the chest.",
+  "arrival": "came up with the last carts · spoke low, and only to the boss"
+ },
+ "shipped": {
+  "title": "Search the loggers' winter huts",
+  "situation": "A widowed landholder, Dothy Greyfell, came up with the last carts and said she wants her ward returned alive to the winter huts, watching your hands not your face. She says if the ward is not returned, her legal claim to the Thornhollow iron chest will be void and rival crews will seize the chest. She asks you to search the loggers' winter huts for signs the ward left on her own, using the description Dothy gave, the fee is as agreed, and any spoils ride home with it. A band of raiders intends to seize the elven iron chest beneath Thornhollow and will be watching anyone who moves around the shrine.",
+  "job": "Did the ward leave the loggers' winter huts on her own, as Dothy describes?"
+ }
+}

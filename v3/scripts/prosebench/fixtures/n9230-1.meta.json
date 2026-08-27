@@ -1,0 +1,59 @@
+{
+ "seed": 9230,
+ "chainId": "chain-14",
+ "title": "The Foundling's Mark",
+ "bible": {
+  "title": "The Foundling's Mark",
+  "kernel": "A caller claims a lost infant and hires the company to fetch a woman who bears the household token.",
+  "cast": [
+   {
+    "name": "Cirithiel",
+    "who": "an elven householder seeking a child lost long ago, speaking with old pledges.",
+    "want": "to recover the child and take her home",
+    "trade": "noble",
+    "role": "client",
+    "loreId": "lore-12"
+   },
+   {
+    "name": "Flacassia",
+    "who": "a human woman raised by a local keeper in the western trees, fond of jokes and quick tempers.",
+    "want": "to remain in the care that raised her",
+    "trade": "scholar",
+    "role": "quarry",
+    "loreId": "c8"
+   },
+   {
+    "name": "Chalda Ironjaw",
+    "who": "a hard-handed gravedigger who found and raised the woman and keeps her secret close.",
+    "want": "to keep the woman and refuse giving her up",
+    "trade": "gravedigger",
+    "role": "obstacle",
+    "loreId": "lore-13"
+   }
+  ],
+  "situation": "The caller says a child was stolen long ago and points to a woman who now wears a household token. The woman lives under the charge of a gravedigger in a moss hut. The caller will pay for that woman to be brought to the grove the caller named.",
+  "goal": "to recover a woman the caller identifies by an old household token and return her to the caller at the grove the caller named.",
+  "arc": [
+   "Search the grave ring the caller named at Grimfen Ring for any sign tying the lost infant to the caller → yields: a silver locket half-buried beneath a tilted stone stamped with the caller's household mark",
+   "Follow the locket's trail to the moss hut the ring's paths point to at Mosswell Hut and seek who keeps it → yields: the woman who wears the locket living there and the gravedigger who watches her, Chalda Ironjaw",
+   "Search Chalda Ironjaw's trunk at Ironjaw Clearing for proof the woman is the caller's child, using Chalda's refusal as leverage → yields: a folded midwife's oath in the caller's hand naming the infant as theirs",
+   "Bring the proof and the woman to the grove the caller named and force Chalda Ironjaw to yield custody there by fight, bargain, or payment"
+  ],
+  "twist": "the woman is the caller's long-lost child.",
+  "tensions": [
+   "Chalda Ironjaw refuses to give the woman up and will fight or bargain at every turn",
+   "Flacassia doubts the caller's claim and may resist being taken from the only home she knows",
+   "Forest holders and old oaths complicate moving a contested person through the western trees"
+  ],
+  "openDirections": [
+   "Rival kin may press a formal challenge to the returned child's claim whether or not the company completes the delivery."
+  ],
+  "stakeIfLost": "The caller says their ancestral claim and the grove's pledge will be forfeit to a rival house if the child is not returned, allowing that rival to press for the caller's land.",
+  "arrival": "came in wet through · apologised for the hour"
+ },
+ "shipped": {
+  "title": "Search Grimfen Ring for the token trace",
+  "situation": "An elven householder, Cirithiel, came in wet and apologised for the hour while she counted the soldiers in the yard. She says a woman bears an old household token and must be brought home, the fee is as agreed, and the company keeps what it hauls back. The caller says their ancestral claim and the grove's pledge will be forfeit to a rival house if the child is not returned. This step asks you to search the grave ring she named at Grimfen Ring for any sign tying the lost infant to the caller. A gravedigger opposes the search and intends to keep the woman and refuse giving her up.",
+  "job": "Search the Grimfen Ring grave ring for signs linking the caller's household token to the lost infant."
+ }
+}
