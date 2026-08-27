@@ -14,7 +14,7 @@ import { renderTags } from '../src/engine/tags.js';
 import { cardType, stackKind, isLiability, hasTag } from '../src/engine/cards.js';
 import { slotThreshold, coins, explainCoins } from '../src/engine/roll.js';
 import { QUEST_TTL } from '../src/game/game.js';
-import { hireCost, RANSOM_RATE, SELL_RATE } from '../src/engine/economy.js';
+import { hireCost, RANSOM_RATE, SELL_RATE, unitWorth, unitStars, unitPeak } from '../src/engine/economy.js';
 import { ransomRate, marketSellRate } from '../src/engine/fort.js';
 import { xpNeeded } from '../src/engine/growth.js';
 import { fillScore } from '../src/engine/overlap.js';
@@ -61,6 +61,11 @@ function autosave() {
 function cardView(c: NonNullable<ReturnType<Game['card']>>) {
   return {
     id: c.id, name: c.name, tags: renderTags(c.tags), value: c.value,
+    // the rarity marker: `value` is the MARK (the budget spent) and reads the same for a jackpot
+    // and a dud, so the board shows what the card actually IS — its tags' worth in coin, and how
+    // that compares to a typical unit of its level
+    worth: unitWorth(c), stars: unitStars(c),
+    peak: (p => p ? `${p.concept} (${p.rank})` : null)(unitPeak(c)),
     type: cardType(c), qty: c.qty, liability: isLiability(c),
     location: c.location,
     character: c.character ? {

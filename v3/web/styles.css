@@ -112,3 +112,11 @@ nav button.locked { opacity: .45; }
 /* P2: a lead being written reads as being worked, where it stands */
 tr.leadworking { color: #c9b86a; }
 tr.leadworking button:disabled { color: #c9b86a; border-color: #4a4130; cursor: default; }
+
+/* the rarity marker — what a card IS worth, beside what was spent on it */
+.worth { font-size: 12px; padding: 1px 6px; border-radius: 10px; border: 1px solid #3a4150;
+  color: #8a93a3; background: #171c24; white-space: nowrap; cursor: help; }
+.worth.s0 { color: #6a7280; }
+.worth.s2 { color: #9fb0c4; border-color: #46536b; }
+.worth.s3 { color: #7fd08a; border-color: #3f6b46; }
+.worth.s4 { color: #e0c063; border-color: #7a6320; background: #221d0e; }

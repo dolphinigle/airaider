@@ -8,6 +8,7 @@ import { Game } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
 import type { QuestWriteInput, QuestWriteOut, ResolveQuestInput, ResolveQuestOut, FleshInput, FleshOut } from '../src/ai/provider.js';
 import type { Lead } from '../src/engine/quests.js';
+import { unitWorth, unitStars, unitPeak } from '../src/engine/economy.js';
 
 /** a writer that always proposes the same three traits, so the engine's half is observable */
 class TagMock extends MockProvider {
@@ -139,5 +140,43 @@ describe('tag echo never reaches player-facing prose', () => {
       'A quiet man. He answers questions with questions.',
     ];
     for (const k2 of keep) expect(strip(k2)).toBe(k2);
+  });
+});
+
+// The rarity marker (2026-08-27, designer: "so players can at a glance see how rare they would be").
+// `value` is the MARK — the budget spent — and reads identically for a jackpot and a dud, so the
+// marker reads SUBSTANCE instead, against a level baseline.
+describe('the rarity marker', () => {
+  const mk = (tags: { concept: string; tier?: number }[], value: number, level?: number) =>
+    ({ tags, value, character: level ? { level } : null } as never);
+
+  it('separates two cards with the SAME mark but different substance', () => {
+    const dud = mk([{ concept: 'character' }, { concept: 'melee', tier: 1 }], 100, 5);
+    const jack = mk([{ concept: 'character' }, { concept: 'melee', tier: 9 }, { concept: 'lore', tier: 6 }], 100, 5);
+    expect(unitWorth(dud)).toBeLessThan(unitWorth(jack));
+    expect(unitStars(dud)).toBeLessThan(unitStars(jack));
+    // the mark, which the board used to show, cannot tell them apart at all
+    expect((dud as { value: number }).value).toBe((jack as { value: number }).value);
+  });
+
+  it('never rates someone by a NEGATIVE or cosmetic trait', () => {
+    // a first pass ranked by raw tier and proudly starred a "legendary ugly"
+    const ugly = mk([{ concept: 'character' }, { concept: 'ugly', tier: 18 }], 100, 5);
+    expect(unitPeak(ugly)).toBeNull();
+    const tall = mk([{ concept: 'character' }, { concept: 'tall', tier: 5 }], 100, 5);
+    expect(unitPeak(tall)).toBeNull();
+    const real = mk([{ concept: 'character' }, { concept: 'ugly', tier: 18 }, { concept: 'melee', tier: 4 }], 100, 5);
+    expect(unitPeak(real)?.concept).toBe('melee');
+  });
+
+  it('is level-relative — the same tags mean less on a higher-level person', () => {
+    const tags = [{ concept: 'character' }, { concept: 'melee', tier: 5 }];
+    expect(unitStars(mk(tags, 100, 3))).toBeGreaterThan(unitStars(mk(tags, 100, 20)));
+  });
+
+  it('rates a card with no level at all, from its mark', () => {
+    const relic = mk([{ concept: 'relic' }, { concept: 'melee', tier: 6 }], 120);
+    expect(unitStars(relic)).toBeGreaterThanOrEqual(0);
+    expect(unitWorth(relic)).toBeGreaterThan(0);
   });
 });

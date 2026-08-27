@@ -254,3 +254,33 @@ samples, so a future change can be compared against these same numbers).
 ⚠ **Left open, deliberately:** the first judge scored the wrong thing — whether the delivered
 person would be *good at* the job, when they are the one being rescued. If anyone rebuilds this
 harness, that is the trap.
+
+## N5 🔍 Founders are bottom-6% units carrying a full-price mark
+
+Found while building the rarity marker (2026-08-27), not reported from play.
+
+The marker measures a person's SUBSTANCE — what their tags are worth — against a typical person of
+their level. Both starting soldiers come out at the bottom of the scale, and the marker is right:
+
+```
+Ixidor Blackbrook   L2   substance 11.4   worth 17g   typical for L2 ≈ 36g   ratio 0.47
+Audmund Snowtracker L2   substance  9.3   worth 15g                          ratio 0.42
+generated L2 people:  p10 0.47 · median 0.69 · p90 0.81
+→ the founders sit at the 6th percentile of people a quest would hand over at their level
+```
+
+**Why:** founders are built by `freshCharacter`, which gives them one skill tag, one personality tag,
+a race and a sex — and never prices those tags to a budget. Quest-delivered people go through
+`generateCard`, which fills tags until it has spent the target. Both carry a 60g mark.
+
+**So the mark overstates them**, and the mark is what ransom, sale value and hire-equivalent pricing
+are all computed from.
+
+**Not fixed — it is a balance question, not a bug:**
+- Is it *right* that your two openers are visibly the weakest people you will ever own? It reads as
+  intentional progression (every recruit outclasses them), and it gives the ★ scale somewhere to go.
+- Or should `freshCharacter` price founders to their mark like everyone else? That makes the opening
+  pair meaningfully stronger, which changes early pacing — the very thing the early-game smoothing
+  work tuned.
+
+The marker ships as-is because it is telling the truth. Ruling wanted before anything moves.

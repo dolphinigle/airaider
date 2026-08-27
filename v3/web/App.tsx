@@ -13,6 +13,14 @@ async function act(type: string, ...args: (string | number)[]) {
 
 const RARITY_COLOR: Record<string, string> = { common: '#9aa', uncommon: '#6c6', rare: '#c8f' };
 
+/** the rarity marker — what a card is actually worth from its tags, and how that compares to a
+ *  typical one of its level. `value` is the mark (the budget spent) and can never show this. */
+function Worth({ c }: { c: any }) {
+  if (c.worth == null) return null;
+  const t = `worth ${c.worth}g from its tags${c.peak ? ` · best: ${c.peak}` : ''}\nmark ${c.value}g — what was spent making it`;
+  return <span className={`worth s${c.stars}`} title={t}>{'★'.repeat(c.stars) || '·'} {c.worth}g</span>;
+}
+
 // tab → menu-gate key (server `menus`, from game.menuGates()); unmapped tabs are always open
 const TAB_GATE: Record<string, string> = {
   leads: 'leads', quests: 'quests', captives: 'captives', items: 'items', lore: 'lore',
@@ -425,7 +433,7 @@ function Roster({ s, doAct }: any) {
     <div>
       {s.roster.map((m: any) => (
         <div className="cardrow" key={m.id}>
-          <h3>{m.name} <small>L{m.character.level}/{m.cap}{m.character.level >= m.cap ? ' ⛔CAP' : ''} · xp {m.character.xp}/{m.xpNeeded} · {m.character.injury > 0 ? `🩸${m.character.injury} (~${m.healEta?.cycles}c to heal)` : 'healthy'} · {m.location.kind === 'quest' ? '⚔ committed' : 'free'}</small></h3>
+          <h3>{m.name} <Worth c={m} /> <small>L{m.character.level}/{m.cap}{m.character.level >= m.cap ? ' ⛔CAP' : ''} · xp {m.character.xp}/{m.xpNeeded} · {m.character.injury > 0 ? `🩸${m.character.injury} (~${m.healEta?.cycles}c to heal)` : 'healthy'} · {m.location.kind === 'quest' ? '⚔ committed' : 'free'}</small></h3>
           <p className="tags">{m.tags}</p>
           <p>STR {m.character.attrs.str.toFixed(1)} · DEX {m.character.attrs.dex.toFixed(1)} · INT {m.character.attrs.int.toFixed(1)} · CHA {m.character.attrs.cha.toFixed(1)} · CON {m.character.attrs.con.toFixed(1)}</p>
           {m.character.who && <p><i>{m.character.who}</i></p>}
@@ -454,7 +462,7 @@ function Captives({ s, doAct }: any) {
     <div>
       {s.captives.map((c: any) => (
         <div className="cardrow" key={c.id}>
-          <h3>{c.name} <small>mark {c.value}g · ransom ~{c.ransomEst}g · sell ~{c.sellEst}g · {c.character.obedient ? 'obedient' : c.breaking ? `breaking (done c${c.breaking})` : 'raw'}{c.location.kind === 'room' ? ` · stationed` : ''}</small></h3>
+          <h3>{c.name} <Worth c={c} /> <small>mark {c.value}g · ransom ~{c.ransomEst}g · sell ~{c.sellEst}g · {c.character.obedient ? 'obedient' : c.breaking ? `breaking (done c${c.breaking})` : 'raw'}{c.location.kind === 'room' ? ` · stationed` : ''}</small></h3>
           <p className="tags">{c.tags}</p>
           <div className="row">
             <button onClick={() => doAct('ransom', c.id)}>ransom</button>
@@ -479,7 +487,7 @@ function Items({ s, doAct }: any) {
       ))}
       {s.relics.map((c: any) => (
         <div className="cardrow" key={c.id}>
-          <h3>{c.name} <small>mark {c.value}g · sell ~{c.sellEst}g{c.location.kind === 'room' ? ' · displayed' : ''}</small></h3>
+          <h3>{c.name} <Worth c={c} /> <small>mark {c.value}g · sell ~{c.sellEst}g{c.location.kind === 'room' ? ' · displayed' : ''}</small></h3>
           <p className="tags">{c.tags}</p>
           {c.location.kind !== 'room' && <button onClick={() => doAct('sell', c.id)}>sell (~{c.sellEst}g)</button>}
         </div>
@@ -524,7 +532,7 @@ function People({ s, doAct }: any) {
       {s.tavern.length === 0 && <p>Nobody drinking today.</p>}
       {s.tavern.map((c: any) => (
         <div className="cardrow" key={c.id}>
-          <h3>{c.name} <small>L{c.character.level} · leaves c{c.expires}</small></h3>
+          <h3>{c.name} <Worth c={c} /> <small>L{c.character.level} · leaves c{c.expires}</small></h3>
           {c.character.who && <p><i>{c.character.who}</i></p>}
           <p className="tags">{c.tags}</p>
           {c.character.backstory && <p>{c.character.backstory}</p>}
@@ -545,7 +553,7 @@ function PeopleHolding({ s, doAct }: any) {
       {s.holding.length === 0 && <p>Holding is empty.</p>}
       {s.holding.map((c: any) => (
         <div className="cardrow" key={c.id}>
-          <h3>{c.name} <small>mark {c.value}g · decide by c{c.expires}</small></h3>
+          <h3>{c.name} <Worth c={c} /> <small>mark {c.value}g · decide by c{c.expires}</small></h3>
           {c.character.who && <p><i>{c.character.who}</i></p>}
           <p className="tags">{c.tags}</p>
           <div className="row">

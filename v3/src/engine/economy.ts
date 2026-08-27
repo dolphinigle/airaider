@@ -3,8 +3,8 @@
 
 import type { Rng } from './rng.js';
 import {
-  CONCEPTS, CONCEPT, GROUPS, tagValue, tagsValue, maxTier, RACE_BODY_BIAS,
-  type TagInstance, type Domain,
+  CONCEPTS, CONCEPT, GROUPS, tagValue, tagsValue, maxTier, RACE_BODY_BIAS, rankOf,
+  type TagInstance, type Domain, type Rank,
 } from './tags.js';
 import { freshId, HELD, mintStackable, type Card, type CharRole } from './cards.js';
 import { growToLevel } from './growth.js';
@@ -310,6 +310,62 @@ export const SELL_RATE = 0.5;        // relics/dead drops
 /** hire cost ≥ the grow-investment (ECONOMY §6 lean) */
 // hires are paid in CASH — priced on the income curve, or high-level recruits become unpayable
 export function hireCost(mark: number): number { return Math.round(cashValue(mark) * 1.2) }
+
+// ---- WHAT A UNIT IS ACTUALLY WORTH (2026-08-27, designer: "a marker for unit rarity … so players
+// can at a glance see how rare they would be") ------------------------------------------------
+//
+// A card's `value` is the MARK — the budget SPENT generating it (§1) — so it is the same for a
+// jackpot and a dud and can never show rarity. What varies is the SUBSTANCE: the tags actually
+// rolled. Measured over 36k generated units, substance/mark runs 0.62 at L1 up to 0.94 by L20,
+// with the top ~2% overshooting the mark — that overshoot is the jackpot the docs promise
+// ("jackpot = substance ≫ mark, that gap is the thrill", GENERATION_FLOW §8).
+//
+// So the marker is two honest readings, and NOT a ratio: the ratio's baseline slides with level,
+// so a fixed threshold on it would only ever report "higher level = rarer".
+//   worth — what their tags are really worth in coin, directly comparable to the price asked
+//   rank  — the game's own band word for their best tag, which is what makes them useful in a slot
+
+/** coin worth of what a card actually IS, from its tags (not from the budget spent on it) */
+export function unitWorth(card: { tags: TagInstance[] }): number {
+  return cashValue(Math.max(0, tagsValue(card.tags)));
+}
+
+/** the strongest thing they can DO — the best positively-valued tag, as the game's own rank word.
+ *  Sign matters: a first pass ranked by raw tier and proudly starred a "legendary ugly". */
+export function unitPeak(card: { tags: TagInstance[] }): { concept: string; tier: number; rank: Rank } | null {
+  let best: { concept: string; tier: number; rank: Rank } | null = null;
+  for (const t of card.tags) {
+    if (!t.tier || t.tier < 1 || tagValue(t) <= 0) continue;
+    const c = CONCEPT[t.concept];
+    if (!c || c.zeroValue) continue;          // tall/short carry intensity, not power
+    if (!best || t.tier > best.tier) best = { concept: t.concept, tier: t.tier, rank: rankOf(t.concept, t.tier) };
+  }
+  return best;
+}
+
+/** 0-4 stars: how this person compares to a TYPICAL person of their level.
+ *
+ *  Two earlier bases were wrong and the measurements said so:
+ *   - by RANK: rank is absolute, so by L20 86% of everyone was "high" and the mark said nothing;
+ *   - vs their OWN mark: only honest for units generateCard priced to a budget. Founders and
+ *     tavern walk-ins are built by freshCharacter, which never prices tags to their mark, so both
+ *     opening soldiers read "·" — the marker was wrong about them, not the other way round.
+ *
+ *  So the reference is the level itself: worth ÷ the coin-equivalent of vBase(level). Level-stable
+ *  from L2 on (median 0.69→0.78, p97 ≈0.94 across L1-L30, 40k units), and defined for anyone with
+ *  a level. Thresholds are the measured percentiles:
+ *    ★★★★  ~2%   a chase unit
+ *    ★★★  ~15%   notably better than their level suggests
+ *    ★★   ~58%   what you expect to see
+ *    ★    ~92%   thin
+ *    ·     ~8%   the dud end of the lottery (GENERATION_FLOW §8's "jackpot/dud")   */
+export function unitStars(card: { tags: TagInstance[]; value: number; character?: { level: number } | null }): number {
+  // a card with no level (a relic) still has a mark, and vBase inverts cleanly
+  const level = card.character?.level ?? Math.max(1, 1 + Math.log(Math.max(1, card.value) / 30) / Math.log(1.35));
+  const r = unitWorth(card) / Math.max(1, cashValue(vBase(level)));
+  return r >= 0.95 ? 4 : r >= 0.85 ? 3 : r >= 0.70 ? 2 : r >= 0.55 ? 1 : 0;
+}
+
 
 /** per-cycle passive trickle is ZERO — income is quest gold (ECONOMY §6). */
 

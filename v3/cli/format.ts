@@ -3,7 +3,7 @@
 import type { Game } from '../src/game/game.js';
 import { renderTags } from '../src/engine/tags.js';
 import { ROOM_TYPE, GH_THRESHOLDS, maxSlotsAtTier, upgradeCost, excavateCost, ransomRate, marketSellRate } from '../src/engine/fort.js';
-import { RANSOM_RATE, SELL_RATE } from '../src/engine/economy.js';
+import { RANSOM_RATE, SELL_RATE, unitWorth, unitStars, unitPeak } from '../src/engine/economy.js';
 import { REGION } from '../src/engine/regions.js';
 import { cardType, stackKind, isLiability } from '../src/engine/cards.js';
 import { slotThreshold, coins, explainCoins } from '../src/engine/roll.js';
@@ -12,6 +12,12 @@ import { QUEST_TTL } from '../src/game/game.js';
 import { xpNeeded } from '../src/engine/growth.js';
 
 const pct = (x: number | null) => x === null ? '—' : `${Math.round(x * 100)}%`;
+
+/** the rarity marker (2026-08-27): what a person is actually WORTH from their tags, and how that
+ *  compares to what was spent making them. `value` is the mark and is identical for a jackpot and
+ *  a dud, so it can never show this. */
+const mark = (c: { tags: { concept: string; tier?: number }[]; value: number }) =>
+  `${('★'.repeat(unitStars(c as never)) || '·').padEnd(4)} ${String(unitWorth(c as never)).padStart(5)}g`;
 
 export const render = {
   welcome(): string {
@@ -109,7 +115,7 @@ export const render = {
       const busy = m.location.kind === 'quest' ? ` ⚔ on ${m.location.questId}` : '';
       const injury = ch.injuryTiers > 0 ? ` 🩸${ch.injuryTiers}(~${g.healEta(m).cycles}c)` : '';
       const cap = g.capOf(m.id);
-      return `${m.id.padEnd(5)} ${m.name.padEnd(22)} L${ch.level}/${cap}${ch.level >= cap ? '⛔CAP' : ''} S${a.str.toFixed(0)} D${a.dex.toFixed(0)} I${a.int.toFixed(0)} C${a.cha.toFixed(0)} N${a.con.toFixed(0)}${injury}${busy}\n      ${renderTags(m.tags)}`;
+      return `${m.id.padEnd(5)} ${m.name.padEnd(22)} L${ch.level}/${cap}${ch.level >= cap ? '⛔CAP' : ''} S${a.str.toFixed(0)} D${a.dex.toFixed(0)} I${a.int.toFixed(0)} C${a.cha.toFixed(0)} N${a.con.toFixed(0)} ${mark(m)}${injury}${busy}\n      ${renderTags(m.tags)}`;
     }).join('\n') || '(no mercs)';
   },
 
@@ -120,6 +126,7 @@ export const render = {
     return [
       `${m.name} — L${ch.level} (cap ${g.capOf(m.id)}) ${ch.role} · xp ${ch.xp}/${xpNeeded(ch.level)} to L${ch.level + 1}` +
       (ch.injuryTiers > 0 ? ` · 🩸${ch.injuryTiers} (~${g.healEta(m).cycles}c ${g.healEta(m).viaInfirmary ? 'infirmary' : 'rest — build an Infirmary'}${g.hasRoom('hospital') ? ', or pay-heal' : ''})` : ''),
+      (() => { const pk = unitPeak(m); return `worth ${unitWorth(m)}g from their tags ${'★'.repeat(unitStars(m)) || '·'}${pk ? ` · best: ${pk.concept} (${pk.rank})` : ''}   [mark ${m.value}g — what was spent making them]` })(),
       `tags: ${renderTags(m.tags)}`,
       `attrs: STR ${ch.attrs.str.toFixed(1)} DEX ${ch.attrs.dex.toFixed(1)} INT ${ch.attrs.int.toFixed(1)} CHA ${ch.attrs.cha.toFixed(1)} CON ${ch.attrs.con.toFixed(1)}`,
       `focus: ${ch.focus.kind === 'none' ? 'none (generalist growth)' : ch.focus.kind === 'single' ? `${ch.focus.attr.toUpperCase()} (one GREAT stat)` : `${ch.focus.a.toUpperCase()}+${ch.focus.b.toUpperCase()} (two GOOD)`} · who: ${ch.who ?? '—'}`,
@@ -230,7 +237,7 @@ export const render = {
       const brk = g.state.breaking.find(b => b.cardId === c.id);
       const office = g.state.fort.rooms.find(r => r.type === 'ransom-office');
       const rate = office ? ransomRate(g.comfort(office)) : RANSOM_RATE;
-      return `${c.id.padEnd(5)} ${c.name.padEnd(22)} mark ${c.value}g (ransom ~${Math.round(c.value * rate)}g · sell ~${Math.round(c.value * SELL_RATE)}g)${ob}${brk ? ` (breaking, done c${brk.doneAtCycle})` : ''} ${where}\n      ${renderTags(c.tags)}`;
+      return `${c.id.padEnd(5)} ${c.name.padEnd(22)} ${mark(c)} (ransom ~${Math.round(c.value * rate)}g · sell ~${Math.round(c.value * SELL_RATE)}g)${ob}${brk ? ` (breaking, done c${brk.doneAtCycle})` : ''} ${where}\n      ${renderTags(c.tags)}`;
     }).join('\n');
   },
 
@@ -285,7 +292,7 @@ export const render = {
       const c = g.card(s.cardId)!;
       const who = c.character!.who ? `\n      "${c.character!.who}"` : '';
       const story = c.character!.backstory ? `\n      ${c.character!.backstory}` : '';
-      return `${c.id.padEnd(5)} ${c.name.padEnd(22)} L${c.character!.level} mark ${c.value}g — hire ~${Math.round(c.value * 1.2)}g, leaves c${s.expiresAtCycle}${who}\n      ${renderTags(c.tags)}${story}`;
+      return `${c.id.padEnd(5)} ${c.name.padEnd(22)} L${c.character!.level} ${mark(c)} — hire ~${Math.round(c.value * 1.2)}g, leaves c${s.expiresAtCycle}${who}\n      ${renderTags(c.tags)}${story}`;
     }).join('\n') || '(nobody drinking today)';
   },
 
@@ -293,7 +300,7 @@ export const render = {
     return g.state.holding.map(s => {
       const c = g.card(s.cardId)!;
       const who = c.character!.who ? `\n      "${c.character!.who}"` : '';
-      return `${c.id.padEnd(5)} ${c.name.padEnd(22)} mark ${c.value}g — accept before c${s.expiresAtCycle}${who}\n      ${renderTags(c.tags)}`;
+      return `${c.id.padEnd(5)} ${c.name.padEnd(22)} ${mark(c)} — accept before c${s.expiresAtCycle}${who}\n      ${renderTags(c.tags)}`;
     }).join('\n') || '(holding is empty)';
   },
 
