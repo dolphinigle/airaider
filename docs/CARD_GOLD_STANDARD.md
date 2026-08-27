@@ -126,13 +126,25 @@ step 1    reach the keeper at Wheelstead, using the reeve's letter
 replicate, and the JUDGED four-question test (whose "yes" only counts when the judge can quote the
 words from the card that answer it — an ungrounded yes scores as a no).
 
-| | shipped prompt (n=15) | after |
-|---|---|---|
-| cards with NO unintroduced name | **33%** | `v3/scripts/prosebench/lab-new.json` |
-| opens on a person acting | 60% | " |
-| "why it takes armed strangers" answerable | **0%** | " |
-| all four questions answerable | **0%** | " |
-| words / sentences | 79 / 5.0 | " |
+| | shipped (n=15) | run A (n=48) | run B (n=48) |
+|---|---|---|---|
+| card's first words say what someone IS | 33% | **89%** | **93%** |
+| cards with NO unintroduced name | 33% | **91%** | **97%** |
+| who hires you | 73% | 97% | 100% |
+| what the matter is | 100% | 100% | 100% |
+| **why it matters** | 86% | **100%** | **100%** |
+| **why it takes armed strangers** | **0%** | **70%** | **77%** |
+| **all four answerable** | **0%** | **68%** | **77%** |
+| mean words | 78 | 104 | 102 |
+
+Two independent runs, per this page's own rule. The one regression is length: the added facts
+bought comprehension and spent words. An eighty-word ceiling shipped after these runs and is not
+yet in them.
+
+**A broken instrument nearly cost a false regression.** The naked-name check used `/\b(a|an)\s/`
+with no case flag, so it never matched a card that OPENS with its designation — the exact shape the
+change produces. It reported 17% clean where hand-counting gave 91%. Verify a detector against
+hand-counted cards before trusting a number from it.
 
 **Read the cards, not only the table.** Every round of this work found its next defect by reading
 twelve live cards, and three of those defects were *caused by the previous fix*: a sticky example
