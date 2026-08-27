@@ -39,7 +39,7 @@ import { rollName, rollPlaceName } from '../engine/names.js';
 import { hasClash, queryMatches } from '../engine/overlap.js';
 import { questXp, grantXp, rollBase, rollGrowthLean, growToLevel } from '../engine/growth.js';
 import { coins, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, explainCoins, type SlotTest, type Outcome, type QuestRollResult } from '../engine/roll.js';
-import { sampleKeywords, sampleSeed, sampleOpening, sampleGravity, pickTone } from '../ai/keywords.js';
+import { sampleKeywords, sampleKeywordsLight, sampleSeed, sampleOpening, sampleGravity, pickTone } from '../ai/keywords.js';
 import type { AiProvider, ResolveQuestInput, ResolveQuestOut, AskSlotOut, QuestWriteOut } from '../ai/provider.js';
 
 export interface LogEntry { cycle: number; kind: string; text: string; questId?: string }
@@ -1040,10 +1040,17 @@ export class Game {
     // landmark cooldown: once dealt, the landmark rests several cycles (Thornhollow ×8/run)
     const lmOk = opening.landmarkAllowed && this.state.cycle - (this.lastLandmarkDeal[lead.region] ?? -99) > 6;
     if (lmOk) this.lastLandmarkDeal[lead.region] = this.state.cycle;
-    const gravity = sampleGravity(this.rng, lead.rarity);
+    const gravity = sampleGravity(this.rng, lead.rarity, 'one-off');
+    // THE INPUT DIET (designer, 2026-08-27: "one off shouldnt even have names etc… best is one
+    // sentence"). A one-sentence card cannot absorb four keyword atoms + a spark + an intake fact
+    // + two place-name suggestions — a model handed eight things to use will use them, and the
+    // ceiling loses to the material. So a SMALL job is dealt almost nothing: two atoms, no spark,
+    // no intake, no place names, no landmark. Cutting the inputs is what shortens the card; the
+    // prompt only says how to spend what it got. Serious/grave one-offs keep the full deal.
+    const light = gravity.startsWith('a small');
     const out = this.stripJobEcho(await this.ai.writeQuest({
       kind: 'one-off', archetype: lead.archetype,
-      location: this.locationLine(lead.region, lmOk),
+      location: this.locationLine(lead.region, light ? false : lmOk, !light),
       level: lead.level, rarity: lead.rarity,
       // engine kind names are NOT writer-safe: 'lead' read as the METAL (12 lead-bar fetches in
       // one campaign, "a parcel of lead" pay in another) — translate kinds to plain words.
@@ -1058,11 +1065,11 @@ export class Game {
         { relic: this.rng.pick(['the pick of what the job turns up', 'first claim on what the road yields', 'whatever worth the work shakes loose']),
           recruit: 'a person who may join the company', captive: 'a person taken', gold: 'coin' } as Record<string, string>
       )[s.kind] ?? s.kind).join(' + '),
-      keywords: sampleKeywords(this.rng),
-      opening: dealSpark && lead.source !== 'interrogation' ? { spark: opening.spark } : undefined,
-      intake,
+      keywords: light ? sampleKeywordsLight(this.rng) : sampleKeywords(this.rng),
+      opening: !light && dealSpark && lead.source !== 'interrogation' ? { spark: opening.spark } : undefined,
+      intake: light ? undefined : intake,
       gravity,
-      placeNameSuggestions: [this.freshPlaceName(lead.region), this.freshPlaceName(lead.region)],
+      placeNameSuggestions: light ? undefined : [this.freshPlaceName(lead.region), this.freshPlaceName(lead.region)],
       // ANONYMITY BY OMISSION (2026-07-06; widened 2026-07-16 designer ruling): one-off folk
       // stay nameless by trade with NO gravity exception — any dealt name gravitates the card
       // ("Briis" made routine work read important). The quarry keeps theirs via
@@ -1073,18 +1080,24 @@ export class Game {
       // never name prizes; the RESOLVER names them at discovery via deliveredSummary.)
       // roster deliberately NOT dealt to one-offs (2026-07-16): its only rule was "never use
       // these" — pure copy-bait for a cheap model. Saga cards still get it (focalIsMerc).
+      // A NAME ONLY WHEN THE PLAYER ALREADY KNOWS IT. Anonymity-by-omission (2026-07-06) kept
+      // one-off FOLK nameless but let the quarry keep theirs, and that one name was enough to
+      // gravitate a routine card. On a small job the quarry is now a station too — except on an
+      // echo, where the whole point is that this is someone you lost. The report still names
+      // whoever is delivered, at the moment the party reaches them, which is when it means
+      // something.
       framedCharacter: framed ? {
-        name: framed.name, tags: renderTags(framed.tags),
+        name: light && !lead.echoNote ? '' : framed.name, tags: renderTags(framed.tags),
         // pronoun EXPLICIT — an echo-rescued "Claet" once flipped sex and peril on return
         pronoun: framed.tags.some(t => t.concept === 'female') ? 'she' : framed.tags.some(t => t.concept === 'male') ? 'he' : 'they',
         // a RETURNING person brings their memories AND where the story left them
-        dossier: (d => d.includes('\n') ? d : undefined)(this.dossier(framed.id)),
+        dossier: light && !lead.echoNote ? undefined : (d => d.includes('\n') ? d : undefined)(this.dossier(framed.id)),
         lastSeen: lead.echoNote
           ?? (lead.source === 'reward' && lead.focalId
             ? [...this.state.log].reverse().find(l => l.text.includes(framed.name) && l.kind === 'resolve')?.text
             : undefined),
       } : pendingIdentity ? {
-        name: pendingIdentity.name,
+        name: light ? '' : pendingIdentity.name,
         tags: `${pendingIdentity.race}; ${pendingIdentity.gender}`,
         pronoun: pendingIdentity.gender === 'female' ? 'she' : 'he',
         partial: true,   // the writer SHAPES this person via quarryTags
@@ -1753,7 +1766,7 @@ export class Game {
     chain.lastGeneratedBeat = chain.beatIndex + 1;
     const quest: Quest = {
       id: freshId('q'), leadId: lead.id, title: out.title, situation: out.situation, job: out.job,
-      gravity: sampleGravity(this.rng, chain.rarity),
+      gravity: sampleGravity(this.rng, chain.rarity, 'saga'),
       level: chain.level, rarity: chain.rarity, region: chain.region, archetype: lead.archetype,
       chainId: chain.id, beatIndex: chain.beatIndex + 1, isFinale,
       slots: this.buildSlots(n, chain.level, chain.rarity, 'investigate', out.ask, cap,

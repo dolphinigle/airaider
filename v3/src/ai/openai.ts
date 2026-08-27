@@ -223,7 +223,57 @@ const ARCHETYPE_GLOSS: Record<string, string> = {
 const archetypeLine = (a?: string): string =>
   a && ARCHETYPE_GLOSS[a] ? `- archetype: ${a} — ${ARCHETYPE_GLOSS[a]}. The job matches it, specific to this place.` : '';
 
+/** A ROUTINE JOB (designer ruling, 2026-08-27, from play: "reading one off quests become tiring
+ *  after a while… one off shouldnt even have names etc… i think one sentence better").
+ *
+ *  A one-off is WORK, not a story: the board above the card already says what kind of job it is,
+ *  where, how hard, and what it pays, so the prose owes the reader exactly ONE thing the row does
+ *  not have — the reason this job is worse than the last one like it. Everything else is what made
+ *  twenty of these tiring.
+ *
+ *  This prompt is deliberately a fraction of the full one (~1470 words). Its shortness is not
+ *  thrift, it is the instruction: a model given eight things to use will use all eight, and the
+ *  engine has already stopped dealing most of them (see THE INPUT DIET in game.ts). Serious and
+ *  grave one-offs still get the full card prompt below. */
+function oneOffLightSystem(input: QuestWriteInput): string {
+  return [
+    '═══ THE JOB ═══\nYou write ONE job card for a dark-fantasy mercenary-fort GAME. The player is the company BOSS at the fort; the card is the notice that reaches their table. This one is ROUTINE work — the kind the company does between the matters that mean something.',
+    '═══ YOUR INPUTS ═══',
+    '- location: the kind of country this job is in. It decides what trouble is PLAUSIBLE here — never name it.',
+    input.keywords?.length ? '- KEYWORDS: a single seed word. It is there to make this job different from the last one — let it suggest what has gone wrong, and never write the word itself. Where it has more than one sense, any sense will do; pick one and commit.' : '',
+    '- archetype: the shape of the work. slotCount: how many soldiers go — write EXACTLY that many ask entries.',
+    archetypeLine(input.archetype),
+    input.framedCharacter ? '- framedCharacter: the person this job is about, given by TAGS. On this card they have no name — call them by station or relation (the miller\'s son, a hired man, the widow). They are named later, in the report, when the company reaches them.' : '',
+    input.avoid?.length ? '- avoid: the player\'s recent cards. Different trouble, different props.' : '',
+    NUMBER_BAN,
+    tagVocab(!!input.framedCharacter?.partial),
+    '═══ YOUR OUTPUT — respond as JSON: {title, situation, job, ask: [{attribute, extraAttribute?, favored, clashing, requiredTag?}] }',
+    // first run produced "Punctured Barrels Report" and "Hollow Refuge Inquiry" — a card FILE
+    // rather than a job. A title names the trouble, the way a person would say it out loud.
+    '- title: three or four plain words naming the trouble, the way one of the company would say it to another. No name of any person or place.',
+    '- situation: ONE SENTENCE saying what is WRONG — the trouble that makes this job worth hiring armed strangers for. The errand itself goes in `job`, not here; the player is shown that separately. NO PROPER NOUNS AT ALL: no person\'s name, no place name, no house, guild or company name. Everyone is their station (a miller, the smith\'s widow, a bailiff) and every place is what it is. No pay, no messenger, no weather, no scenery. TWENTY WORDS AT MOST, and twelve is better.',
+    // Examples teach LENGTH and nothing else, so they are built to be uncopyable: no shared
+    // syntax between them, and none of them touches this region's terrain. The first draft's
+    // examples wrote "the last two escorts" and "took the coin" — a number and a payment, both
+    // banned two lines above, in the most imitable position in the prompt (cold-read, 2026-08-27).
+    // These teach LENGTH. They are built so there is nothing else to take: no shared sentence
+    // shape, three different registers (a theft, a person, a thing), and no number or payment in
+    // any of them — an earlier set wrote "the last two escorts" and "the well has been fouled
+    // twice", both amounts in prose, banned two lines above (cold-reads, 2026-08-27).
+    '  Three of the right LENGTH, deliberately unalike: "Sheep keep going missing and the shepherd has stopped saying how." · "The tanner\'s daughter has not been seen since the fair and her father will not go to the watch." · "Something is in the flooded workings and the diggers have stopped going down."',
+    '- job (ONE terse line): the errand itself, plainly — what the company is actually being sent to do. It names what the situation left out.',
+    ASK_SPEC,
+    // TWO rules, not five. The first draft's block restated the situation rule, the tag rule and
+    // the diction rule that all sit a few lines above it — a third of the prompt spent saying
+    // things twice, in the position a cheap model reads hardest (§0: rule mass has a floor).
+    '═══ ABOVE ALL (write now) ═══\n1. The situation is ONE sentence, twenty words at most, no proper nouns.\n2. Every word in favored, clashing' + (input.framedCharacter?.partial ? ', requiredTag or quarryTags' : ' or requiredTag') + ' is copied EXACTLY from TAG VOCABULARY — a near-synonym is thrown away by the engine.\nRespond as the JSON object specified above — nothing else.',
+  ].filter(Boolean).join('\n');
+}
+
 function oneOffSystem(input: QuestWriteInput): string {
+  // gravity is engine-rolled and one-offs now skew small (keywords.ts) — that roll is what picks
+  // the register, so the two prompts never have to arbitrate between themselves
+  if (input.gravity?.startsWith('a small')) return oneOffLightSystem(input);
   return [
     '═══ THE JOB ═══\nYou write ONE job card for a dark-fantasy mercenary-fort GAME. The player is the company BOSS at the fort; ' + (CARD_VARIANT === 'dlg' ? 'the card is the matter arriving in a VOICE — the words of whoever or whatever brought it to the fort, set down for the boss: what is wrong, what they want done, what it pays.' : 'the card is a short briefing TO them ("you"): what came in, what the job is, what it pays.') + ' They read it once and pick which soldiers to SEND — the boss never goes, and the job has not started. The card speaks TO the boss as \'you\'; the company is never \'we\', \'us\' or \'our\'. Only what has reached the fort goes on the card. GAME WRITING, not literature: every sentence gives the player something to use; a mood-only sentence is cut. Plain everyday words a farmhand would say; short sentences, mostly one clause, no semicolons. People stay NAMELESS BY TRADE — a name appears only when this message hands you one, and only for someone the job centers on. Introduce each person by WHAT THEY ARE TO THE OTHERS IN THE MATTER — who they serve, who they answer to, who they belong to — never by a bare word for a class of person standing alone.',
     '═══ YOUR INPUTS ═══',
@@ -475,7 +525,41 @@ function rollShape(): string[] | null {
   return null;
 }
 
+/** THE REPORT ON A ROUTINE JOB. Two beats — a staged arrival, then the outcome — is what a story
+ *  step needs; on a job the company does between the matters that mean something, the arrival is
+ *  filler and the reader has read twenty of them. One beat in, one beat out (designer, 2026-08-27).
+ *  The craft stack (rhythm, speech, scene-mode, the rotated closer) is deliberately absent: it is
+ *  what makes a saga step worth reading and what makes a routine one exhausting. */
+const oneOffLightResolveSystem = (q: ResolveQuestInput): string => {
+  const canBond = q.party.length > 1;   // both ends of an edge must be a soldier who was there
+  return [
+  resolveCoreHead(),
+  resolveInputs(q),
+  TAGS_NOTE, NUMBER_BAN, canBond ? EDGE_TYPES_LINE : '',
+  '═══ YOUR OUTPUT ═══',
+  '1) "before" — ONE sentence: the party is on the ground and the thing in their way is visible. No approach, no weather, no journey, and nothing is taken yet. TWENTY WORDS AT MOST.',
+  '- inside "after": whatever the company ends up with (deliveredSummary) changes hands in ONE clause of the work itself — no separate discovery, no amounts. If there is only coin to take, the report simply ends on the job done.',
+  '2) "after" — what happened, knowing the outcome, and what it cost WHEN it cost something: a clean success costs nothing and says so by not mentioning it. Open on the decisive moment, not on a restatement of the job. FORTY-FIVE WORDS AT MOST, and coming in well under is better. No closing image, no line of speech, no second beat: it ends the moment the result is plain.',
+  '- injuries: ONLY when the fiction put a member in harm\'s way — a clean success lists none, never invent one to fill the field. cause NAMES the member.',
+  // Cards no longer carry names, so on a routine job the only people with ids are the soldiers
+  // sent — a cold reader correctly refused to write an edge to "the widow" because it had no id
+  // and was forbidden to coin one, and emitted [] for the wrong reason. Say the real rule: this
+  // is routine work, it usually leaves no mark, and only the company's own people can be an end.
+  canBond
+    ? '- edges: BOTH ends must be an id from party — nobody else in this scene has one. Routine work rarely leaves a mark: [] is the normal answer, and 1 is the most a job like this ever earns. blurb one line; importance a NUMBER 0-1 (0.3 routine, 0.9 defining).'
+    : '- edges: always [] — one soldier went out alone, and an edge joins two of the company\'s own.',
+  '- fleshed: always [] — nobody is handed over on a job like this.',
+  '═══ ABOVE ALL (write now) ═══\n1. Every sentence parses ONE way on one skim — subject and verb early.\n2. The result is unmistakable: what was won or lost, what the company now holds — and a FAILED job wins NOTHING.\n3. The report ENDS at the job\'s last act in the field; the coin and the walk home stay outside your text. GOLD IS NEVER STAGED and no numbers appear in prose.\n4. Period diction; never echo an instruction or a field name ("approach", "plan", "outcome", "step", "dice", "roll", "obstacle" are system words that never appear in prose).\nRespond as the JSON object specified below — nothing else.',
+  'Respond as JSON matching: {questId (copy it back exactly), before, after, injuries:[{characterId (an id from party), band: STRICTLY "low"|"med"|"high" — note "med", not "mid", cause}], fleshed:'
+    + (q.deliveredCharacters?.length ? '[{characterId,who,backstory,quirks}]' : ' []')
+    + ', edges:[{from,to,type,blurb,importance}]}',
+  ].filter(Boolean).join('\n');
+};
+
 const oneOffResolveSystem = (q: ResolveQuestInput, shape = rollShape()) => {
+  // a small job is ROUTINE work and gets the one-beat report; serious and grave one-offs keep the
+  // full craft stack, which is what the saga steps use
+  if (q.gravity?.startsWith('a small') && PROSE_VARIANT !== 'beat') return oneOffLightResolveSystem(q);
   const beat = PROSE_VARIANT === 'beat';
   return [
     resolveCoreHead(),
@@ -580,16 +664,22 @@ export function makeOpenAiProvider(): AiProvider {
       // shared-prompt-plus-override ("THIS BLOCK WINS") shipped a contradiction small models
       // can't arbitrate; every rule stated ONCE; output spec + critical rules at the END.
       const system = (input.kind === 'one-off' ? oneOffSystem(input) : sagaSystem(input));
+      // a ROUTINE card is dealt only what it can spend. level/rarity/gravity/rewardEnvelope exist
+      // for it only to be told to ignore them, and a cold reader counted that as a third of the
+      // prompt spent introducing dead fields (2026-08-27).
+      const routine = input.kind === 'one-off' && !!input.gravity?.startsWith('a small');
 
       const user = JSON.stringify({
         archetype: input.archetype, location: input.location,
         // level was explained to the writer but never SENT — the verifier caught the model
         // hunting for a field that wasn't there (weight-class calibration silently dead)
         // level dealt to one-offs only — the saga system never explains it (context-free audit)
-        rarity: input.rarity, level: input.kind === 'one-off' ? input.level : undefined, slotCount: input.slotCount, rewardEnvelope: input.rewardEnvelope,
+        ...(routine ? { slotCount: input.slotCount } : {
+          rarity: input.rarity, level: input.kind === 'one-off' ? input.level : undefined,
+          slotCount: input.slotCount, rewardEnvelope: input.rewardEnvelope, gravity: input.gravity,
+        }),
         stake: input.stake,
         KEYWORDS: input.keywords?.join(' · ') || undefined,
-        gravity: input.gravity,
         rewardItems: input.rewardItems?.length ? input.rewardItems : undefined,
         placeNameSuggestions: input.placeNameSuggestions,
         rosterNames: input.rosterNames,
@@ -667,6 +757,12 @@ export function makeOpenAiProvider(): AiProvider {
       const userJson = (q: ResolveQuestInput) => {
         if (PROSE_VARIANT === 'beat') return JSON.stringify(q);
         const { sceneMode, ...rest } = q;
+        // a routine report is never told what gravity or rarity are for, because there is nothing
+        // for it to do with them — the prompt it got is already the one they chose (2026-08-27)
+        if (!q.chainContext && q.gravity?.startsWith('a small')) {
+          const { gravity, rarity, ...lean } = rest;
+          return JSON.stringify(lean);
+        }
         return JSON.stringify(rest);
       };
       // each call announces itself the instant IT settles — the fallback path included, so a

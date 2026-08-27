@@ -558,13 +558,36 @@ export function sampleOpening(rng: Rng, opts?: { gentle?: boolean; channel?: Int
 
 /** one-off gravity — not every job is dire (v2's per-card register knob, rarity-weighted).
  *  Engine-rolled seed: most common jobs are small; rare ones lean grave. */
-const GRAVITY: Record<string, [string, number][]> = {
+// Gravity sets tone AND the length budget, so it decides how heavy a job READS. It used to be
+// rolled from rarity alone, which meant a routine one-off had a ~57% chance of being commissioned
+// as a serious matter — measured 2026-08-27 across 145 quest blocks, one-off reports came out
+// LONGER than saga steps (median 53w vs 26w). The designer, after a playtest: "reading one off
+// quests become tiring after a while." A one-off is WORK; a saga is the story. They now roll from
+// different tables, which is the dealt-fact lever rather than another rule nobody reads.
+const GRAVITY_SAGA: Record<string, [string, number][]> = {
   common: [['a small, everyday job', 5], ['a serious matter', 4], ['a grave affair', 1]],
   uncommon: [['a small, everyday job', 2], ['a serious matter', 5], ['a grave affair', 3]],
   rare: [['a serious matter', 2], ['a grave affair', 3]],
 };
-export function sampleGravity(rng: Rng, rarity: string): string {
-  return rng.weighted(GRAVITY[rarity] ?? GRAVITY.common!);
+const GRAVITY_ONE_OFF: Record<string, [string, number][]> = {
+  common: [['a small, everyday job', 9], ['a serious matter', 1]],
+  uncommon: [['a small, everyday job', 6], ['a serious matter', 3], ['a grave affair', 1]],
+  rare: [['a small, everyday job', 2], ['a serious matter', 5], ['a grave affair', 3]],
+};
+export function sampleGravity(rng: Rng, rarity: string, kind: 'one-off' | 'saga' = 'saga'): string {
+  const t = kind === 'one-off' ? GRAVITY_ONE_OFF : GRAVITY_SAGA;
+  return rng.weighted(t[rarity] ?? t.common!);
+}
+
+/** ONE bare seed word for a one-sentence card.
+ *  Full cards get 3-4 atoms LABELLED by axis, because unlabelled atoms get welded into a single
+ *  noun phrase ("a cask of election milk"). At two atoms that reverses: each one is so load-bearing
+ *  that the LABEL itself gets pasted — a live run dealt `bond: grief` and the card said "a snapped
+ *  grief-bond" (2026-08-27). One bare word has nothing to weld to and no label to paste, and one
+ *  word is all a twenty-word sentence has room to be about. */
+export function sampleKeywordsLight(rng: Rng): string[] {
+  const r = rng.next();
+  return [r < 0.45 ? rng.pick(BOND) : r < 0.8 ? rng.pick(TIE) : rng.pick(WILDCARD_NOUNS)];
 }
 
 /** saga tone, weighted toward lighter (BIBLE.md tone knob; PLAYER_PREFERENCES shift is a later 🛠)
