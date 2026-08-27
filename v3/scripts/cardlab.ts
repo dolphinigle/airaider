@@ -78,8 +78,11 @@ const grounded = (card: string, v: unknown): boolean => {
 
 type Row = { fx: string; card: string; q: Record<string, boolean>; naked: string[]; coined: string[]; opens: boolean; w: number; s: number };
 const rows: Row[] = [];
-const fixtures = variant === 'v2'
-  ? [['v2-system.txt', 'v2-user-A.json'], ['v2-system.txt', 'v2-user-7712.json'], ['v2-system.txt', 'v2-user-3391.json']]
+// 'v1' = the three frozen pre-change captures (the baseline). 'new' = every fixture the current
+// engine has captured, so the arms are measured on prompts the code actually produces.
+const fixtures = variant === 'new'
+  ? fs.readdirSync(FX).filter(f => /^n.*\.system\.txt$/.test(f)).sort()
+      .map(f => [f, f.replace('.system.txt', '.user.json')] as [string, string])
   : [['beat1-system.txt', 'beat1-user.json'], ['beat1-system-7712.txt', 'beat1-user-7712.json'], ['beat1-system-3391.txt', 'beat1-user-3391.json']];
 
 for (const [sysF, usrF] of fixtures) {

@@ -1699,12 +1699,12 @@ export class Game {
         : this.rng.pick([
             'the agreed coin, and what the road turns up',
             'honest coin, and any small spoils besides',
-            'the fee as agreed, and the company keeps what it hauls back',
-            'coin when the work is done, and the pick of what the job turns up',
-            'plain coin for plain work, and what the road yields stays the company\'s',
-            'the pay is fixed, and what else shakes loose the company keeps',
-            'coin at the finish, and anything carried home is the company\'s',
-            'the coin they named, and any spoils that ride home with it',
+            'the fee agreed, and whatever the company hauls back',
+            'coin at the finish, and the pick of what the job turns up',
+            'plain coin, and the road\'s yield to the company',
+            'a fixed fee, and what else shakes loose',
+            'coin when it is done, and anything carried home',
+            'the agreed fee, and any spoils that ride home',
           ]),
       // R1 sell-the-stake (designer ruling 2026-07-18, STAKE=1 lab flag): beat 1 tells the boss
       // what the WHOLE matter is rumored to be worth — engine-known kind + payoff band, dealt as
@@ -1730,9 +1730,12 @@ export class Game {
         // WHY IT TAKES ARMED STRANGERS — what the client openly knows stands against them. The
         // reveal cadence keeps the obstacle's NAME and identity off the card; what they will DO
         // about this matter is the client's own knowledge and belongs on the first card.
-        knownObstacle: (o => o?.want
-          ? `a ${o.trade || 'stranger'} who means ${this.scrubUnmet(chain, o.want)}`
-          : undefined)(chain.bible.cast.find(m => m.role === 'obstacle') ?? chain.bible.cast.find(m => m.role === 'quarry')),
+        knownObstacle: (o => {
+          if (!o?.want) return undefined;
+          const want = this.scrubUnmet(chain, o.want);
+          if (/another party/.test(want)) return undefined;   // the scrub fired — say nothing
+          return `${o.trade || 'a stranger'} · ${want.replace(/^to\s+/, '')}`;
+        })(chain.bible.cast.find(m => m.role === 'obstacle') ?? chain.bible.cast.find(m => m.role === 'quarry')),
         // the CARE MOMENT, dealt rather than derived from a tag word
         ...(chain.bible.cast.some(m => m.role === 'client') ? { tell: sampleTell(this.rng) } : { noClient: true }),
       } : {}),

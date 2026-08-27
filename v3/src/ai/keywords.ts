@@ -566,13 +566,19 @@ const ARRIVAL_HOW = [
   'came to the fort themselves', 'sent a rider ahead and came behind it', 'came in with the day\'s callers',
   'sent a servant with a token and followed', 'was waiting at first light', 'came up with the last carts',
   'came on foot, having walked it', 'sent word twice before coming', 'arrived out of the weather',
-  'came in the night and would not wait for morning',
+  'came in the night and would not wait for morning', 'came behind a letter that said less',
+  'walked in with the market crowd', 'came back a second time', 'was let in past the hour',
+  'came down from higher ground', 'turned up with the tally-carts', 'crossed the river to get here',
+  'was brought as far as the gate and came the rest alone', 'came in wet through',
 ];
 const ARRIVAL_MANNER = [
   'would not sit down', 'had the coin counted before speaking', 'kept looking back down the road',
   'asked for the boss by name', 'brought no one with them', 'spoke low, and only to the boss',
   'would not give a reason until the door was shut', 'was in a hurry and did not hide it',
-  'had rehearsed it', 'said the whole of it standing',
+  'had rehearsed it', 'said the whole of it standing', 'named a price before being asked',
+  'would give only half a reason', 'wanted it settled the same day', 'apologised for the hour',
+  'had the whole of it written out', 'refused food and drink', 'asked what the company had lost lately',
+  'would not name the place until the terms were set',
 ];
 /** ONE physical habit the client has while they talk — the CARE MOMENT, dealt instead of derived.
  *  Three writers reported deriving a human moment from a tag word ("calculating") guarantees
@@ -580,10 +586,14 @@ const ARRIVAL_MANNER = [
 const CLIENT_TELL = [
   'counts the soldiers in the yard while talking', 'watches your hands, not your face',
   'keeps turning something over in one palm', 'will not look at the door',
-  'answers a question with a question', 'stops talking whenever anyone walks past',
-  'says the same fact twice, in different words', 'wipes their hands on their coat, over and over',
-  'laughs in the wrong place', 'finishes your sentences for you',
-  'goes quiet when the person they want is named', 'stands too close',
+  'stops talking whenever anyone walks past', 'keeps one hand on the door frame',
+  'will not take the chair offered', 'turns a ring around one finger',
+  'wipes their hands on their coat, over and over',
+  'laughs in the wrong place', 'goes quiet when the person they want is named', 'stands too close',
+  'keeps a hand flat on the table', 'looks at the door before answering',
+  'holds their gloves and does not put them on',
+  'rubs a thumb along a scar without noticing', 'keeps their back to the wall',
+  'sets things straight while talking',
 ];
 export function sampleArrival(rng: Rng): string {
   return `${rng.pick(ARRIVAL_HOW)} · ${rng.pick(ARRIVAL_MANNER)}`;
