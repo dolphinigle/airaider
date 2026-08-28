@@ -1900,6 +1900,96 @@ export class Game {
     slot.filledBy = null;
   }
 
+  /** THE PEOPLE ON THIS MATTER — the saga's cast as the player may see them, for the quest
+   *  screen's held cards. Gated on the SAME met() the card writer uses, so this surface can
+   *  never show a face the card deliberately withheld. Designer ruling 2026-08-28: an unmet
+   *  person is not shown at all — SHOW_UNMET_CAST brings the face-down card back. */
+  static SHOW_UNMET_CAST = false;
+  questCast(questId: string): { name: string; trade: string; role: string; who: string; met: boolean }[] {
+    const q = this.state.quests.find(x => x.id === questId);
+    const chain = q?.chainId ? this.state.chains.find(c => c.id === q.chainId) : undefined;
+    if (!q || !chain) return [];
+    // what THIS card has already put on the page counts as met, on top of the record
+    const step = `${q.situation} ${q.job}`;
+    const ROLE: Record<string, string> = {
+      client: 'the one asking', quarry: 'the one wanted', prize: 'the one wanted',
+      obstacle: 'stands against', ally: 'may help', companion: 'rides with you',
+    };
+    return chain.bible.cast
+      .map(m => ({
+        name: m.name, trade: m.trade ?? '', role: ROLE[m.role] ?? m.role, who: m.who,
+        met: m.role === 'client' || this.isMet(chain, m.name, step),
+      }))
+      .filter(m => m.met || Game.SHOW_UNMET_CAST);
+  }
+
+  /** MAN A QUEST, greedily. Score every (slot, soldier) pair, take the best pair whose halves
+   *  are both still free, repeat. It only ever FILLS EMPTY SLOTS — a hand-picked soldier is
+   *  never displaced, because silently undoing the player's own choice is worse than doing
+   *  nothing (Clear, then Auto, to reshuffle).
+   *
+   *  Every placement goes through assign(), so must-be, must-have, approach gating and the
+   *  one-quest-per-soldier rule stay in exactly one place.
+   *
+   *  Both UIs call THIS. A second copy in the web would end the CLI's standing as a playtest
+   *  surface (docs/DOGFOODING.md), which is the only surface this project can actually play. */
+  autoAssign(questId: string): { ok: boolean; msg: string; placed: number } {
+    const q = this.state.quests.find(x => x.id === questId);
+    if (!q || q.state !== 'open') return { ok: false, msg: 'no such quest', placed: 0 };
+    // recruit vs captive vs cash-out is a STORY choice. Auto must not make it silently.
+    if (q.approaches && !q.chosenApproach)
+      return { ok: false, msg: 'pick an approach first — that choice is yours', placed: 0 };
+    const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
+    const empty = active.filter(s => !s.filledBy);
+    if (!empty.length) return { ok: true, msg: 'already manned', placed: 0 };
+    const free = this.roster().filter(m => m.location.kind === 'held');
+    const pairs: { idx: number; id: string; score: number; worth: number }[] = [];
+    for (const s of empty) {
+      const idx = q.slots.indexOf(s);
+      for (const m of free) {
+        if (s.requirement.kind === 'must-be' && s.requirement.cardId !== m.id) continue;
+        if (s.requirement.kind === 'must-have'
+          && !queryMatches(m.tags, { match: s.requirement.concept, minRank: s.requirement.minRank })) continue;
+        // a wound is a PENALTY, not a bar: the engine lets the hurt march, and whether to spend
+        // them is the player's call — auto merely prefers not to
+        pairs.push({ idx, id: m.id, score: coins(m, s.test) - 2 * (m.character?.injuryTiers ?? 0), worth: m.value });
+      }
+    }
+    // best fit first; on a tie take the CHEAPER soldier, so a routine bounty does not quietly
+    // consume the company's best when a lesser hand clears the same bar
+    pairs.sort((a, b) => b.score - a.score || a.worth - b.worth);
+    const tookSlot = new Set<number>(), tookMerc = new Set<string>();
+    let placed = 0;
+    for (const p of pairs) {
+      if (tookSlot.has(p.idx) || tookMerc.has(p.id)) continue;
+      if (!this.assign(questId, p.idx, p.id).ok) continue;
+      tookSlot.add(p.idx); tookMerc.add(p.id); placed++;
+    }
+    const short = empty.length - placed;
+    return {
+      ok: placed > 0,
+      msg: placed === 0 ? 'nobody free fits this'
+        : short > 0 ? `${placed} named, ${short} still short` : `${placed} named`,
+      placed,
+    };
+  }
+
+  /** Man every open quest. One soldier can only be on one quest, so ORDER decides who gets the
+   *  good people: quests that NAME someone or demand a tag have the fewest ways to be manned and
+   *  go first; then the ones closest to lapsing. */
+  autoAssignAll(): { ok: boolean; msg: string; placed: number } {
+    const rank = (q: Quest) => {
+      const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
+      return active.some(s => s.requirement.kind === 'must-be') ? 0
+        : active.some(s => s.requirement.kind === 'must-have') ? 1 : 2;
+    };
+    const open = this.state.quests.filter(q => q.state === 'open' && !(q.approaches && !q.chosenApproach))
+      .sort((a, b) => rank(a) - rank(b) || a.createdCycle - b.createdCycle);
+    let placed = 0;
+    for (const q of open) placed += this.autoAssign(q.id).placed;
+    return { ok: placed > 0, msg: placed ? `${placed} named across ${open.length} quests` : 'nobody free fits anything', placed };
+  }
+
   /** raw odds — ALWAYS visible (QUESTS §3); the Oracle adds computed % */
   questOdds(questId: string): { coins: number; bar: number; success: number | null; partial: number | null; precision: 0 | 1 | 2 } {
     const q = this.state.quests.find(x => x.id === questId)!;
@@ -2739,12 +2829,16 @@ export class Game {
    *  the name is scrubbed from every bible string, so an unmet person CANNOT be named. */
   /** Replace every UNMET cast member's name with "another party" — the same gate stageBible
    *  uses, exposed so beat 1 can deal an offstage pressure's WANT without dealing their identity. */
+  /** Has the player actually MET this person? The one definition — the beat writer's staging,
+   *  the dealt-string scrub and the quest screen's cast all ask this, and they must agree. */
+  private isMet(chain: Chain, name: string, stepText = ''): boolean {
+    const words = name.toLowerCase().split(/[^a-z]+/).filter(w => w.length > 2);
+    const seen = [stepText, chain.bible.goal, ...(chain.story.introducedNames ?? [])].join(' ').toLowerCase();
+    return words.some(w => seen.includes(w));
+  }
+
   private scrubUnmet(chain: Chain, text: string, stepText = ''): string {
-    const met = (name: string) => {
-      const words = name.toLowerCase().split(/[^a-z]+/).filter(w => w.length > 2);
-      const seen = [stepText, chain.bible.goal, ...(chain.story.introducedNames ?? [])].join(' ').toLowerCase();
-      return words.some(w => seen.includes(w));
-    };
+    const met = (name: string) => this.isMet(chain, name, stepText);
     const escRe = (x: string) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     return chain.bible.cast.filter(m => !(m.role === 'client' || met(m.name))).reduce((t, m) => {
       for (const n of new Set([m.name.trim(), m.name.trim().split(/\s+/)[0]!]))
@@ -2754,14 +2848,10 @@ export class Game {
   }
 
   private stageBible(chain: Chain, stepText: string, withholdTwist = false) {
-    const met = (name: string) => {
-      const words = name.toLowerCase().split(/[^a-z]+/).filter(w => w.length > 2);
-      // the focal is NOT unconditionally met (lab batch H: when discovering the focal's
-      // identity IS the mystery, the old exemption pre-named them on beat 1) — they count
-      // as met only where the goal, the step text, or the record names them
-      const seen = [stepText, chain.bible.goal, ...(chain.story.introducedNames ?? [])].join(' ').toLowerCase();
-      return words.some(w => seen.includes(w));
-    };
+    // the focal is NOT unconditionally met (lab batch H: when discovering the focal's identity IS
+    // the mystery, the old exemption pre-named them on beat 1) — they count as met only where the
+    // goal, the step text, or the record names them
+    const met = (name: string) => this.isMet(chain, name, stepText);
     const offstageCast = chain.bible.cast.filter(m => !(m.role === 'client' || met(m.name)));
     // beat 1 never sees the twist (40020: a beat-1 card printed the chain's twist verbatim,
     // pre-spoiling the finale — withholding beats instructing)
