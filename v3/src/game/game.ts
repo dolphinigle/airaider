@@ -756,7 +756,7 @@ export class Game {
 
   /** 🛠 P8/R5 (designer, 2026-08-26): the cap is a TECHNICAL setting — the player's own AI bill is
    *  the throttle — so it is raisable at runtime and NEVER rations queueing. */
-  maxInFlight = Math.max(1, Number(process.env.AIRAIDER_MAX_INFLIGHT ?? 2) || 2);
+  maxInFlight = Math.max(1, Number(process.env.AIRAIDER_MAX_INFLIGHT ?? 5) || 5);
   private jobRecs: JobRec[] = [];
   private jobSeq = 0;
   private inFlight = 0;
@@ -1133,7 +1133,7 @@ export class Game {
     // ⚠ TEMPO I3/I4 — the ONE anti-repetition window that concurrency actually exposes: `avoid`
     // was read from this list BEFORE the call (above) and the title only exists AFTER it, so two
     // one-offs written at once are each blind to the other's title. Unhoistable by construction;
-    // maxInFlight (2) bounds the blindness to that many cards. Do not "fix" it with a lock.
+    // maxInFlight bounds the blindness to that many cards. Do not "fix" it with a lock.
     this.recentCardTitles.push(`${out.title} — ${out.job}`);
     if (this.recentCardTitles.length > 12) this.recentCardTitles.shift();
     // §4 pattern-B phase 2: canonicalize the writer's quarryTags (type from the AI, TIER from

@@ -470,7 +470,7 @@ function Board({ s, doAct, setOpen }: any) {
           <div className="qrow" key={q.id}>
             <button className="open" onClick={() => setOpen(q.id)}>
               <div className="t">{q.title}</div>
-              <div className="sit">{clip(q.situation, 150)}</div>
+              <div className="sit">{clip(q.situation, 300)}</div>
               <div className="tag">
                 <span className="pay">{q.rewardEnvelope}</span>
                 <span>{q.rarity} · level {q.level}</span>
