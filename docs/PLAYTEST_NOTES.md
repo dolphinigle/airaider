@@ -349,3 +349,58 @@ Still a balance ruling, not a bug. The two options are unchanged — accept it a
 openers are the weakest people you will ever own, and every recruit visibly outclasses them), or
 price founders through the same path as everyone else, which strengthens the opening pair and
 touches the early-game pacing that was tuned deliberately.
+
+---
+
+## N6 — ✅ FIXED · a heavy one-off card named places nobody had introduced (2026-08-28)
+
+Found while playtesting the ~110-row archetype widening; it had nothing to do with the widening.
+
+A one-off card takes one of two registers, picked by an engine-rolled `gravity`. The **light**
+register (a small, everyday job — 90 % of common one-offs) bans proper nouns outright and was
+always clean. The **heavy** register (a serious matter / a grave affair) had no naming contract at
+all, and it showed:
+
+> *"Venison bound for **Fernbourne** did not arrive. Raiders answering to **Thornhollow** hold the
+> packs at **Hawford**."*
+
+Three toponyms in one card, none of which the reader has ever heard of. **0 of 8 heavy cards were
+clean.** This is exactly the N2 failure — a proper noun is definite, so naming a stranger is a
+presupposition failure — on the side of the game N2 never touched.
+
+The fix is a ladder, and the ladder is the finding. Full numbers, both seeds per rung, and the
+two laws it produced (L25, L26) live in `v3/scripts/prosebench/CHEAP_MODEL_PROMPTING.md`:
+
+| lever | clean |
+|---|---|
+| the rule, written into the card spec | **0 %** — no movement whatsoever |
+| the same rule, moved into `ABOVE ALL` | 39 % |
+| + the engine deals the place already introduced (`"a mill town, Sedgedale"`) | 63 % |
+| + the engine splices the introduction back when the card drops it | **100 %** |
+| + the engine closes the appositive it opened | 94 % · **31/32 over the last two rungs** |
+
+Two things to carry forward:
+
+- **The 39 % ceiling was the engine arguing with itself.** The prompt said "no proper nouns" while
+  `placeNameSuggestions` was, in the same payload, handing the card two bare toponyms to use. A rule
+  the input contradicts is dead, not weak — always check what the engine already does before
+  writing the rule (L24's corollary, hit again).
+- **Only enforcement reached the tail.** The engine knows both the bare name and the introduced
+  form, so putting the introduction back is a string splice, not a second call — this does not
+  touch the single-shot ruling, which is about AI verifying AI.
+
+Also fixed in the same read: the card spec required the first sentence to name *"the wrong in it"*,
+which forced a victim onto every card — so an archetype where the **company** is the offense came
+back inverted (`press-ganging` was written as a *rescue from* a press-gang). The first sentence may
+now name what is simply THERE to be taken.
+
+## N7 — 🟡 OPEN · a saga beat-1 sentence came back ungrammatical (2026-08-28)
+
+One card in an 8-cycle real-AI CLI campaign (seed 9310):
+
+> *"A householder, Ohtarona Leafshade, came down from higher ground and **said the whole of it
+> standing**."*
+
+The introduction is correct (N2's fix holding); the predicate is not English. One instance, one
+seed, on the saga path — recorded, not yet measured. Worth a targeted sample of beat-1 openers
+before touching anything: a single bad sentence is not yet a class.
