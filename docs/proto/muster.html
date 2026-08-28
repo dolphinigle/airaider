@@ -1,0 +1,457 @@
+<title>The Muster Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+/* ═══ The fort at night, by tallow light. One committed look; every colour painted.
+       TWO surfaces only, and they never mix their tokens:
+         PAPER  — vellum ground, ink text        (the writ, the cards)
+         RACK   — dark ground, light text        (the table, the panel, the list)
+       Body text is never rotated, skewed or arced. Designer ruling, 2026-08-28. ═══ */
+:root{
+  --desk:#101316; --rack:#1b2126; --rack-hi:#222a30; --sunk:#0d1013;
+  --vellum:#d5cdba; --vellum-2:#c4bba5; --ink:#211c17; --ink-soft:#4b4238; --rule:#a79c85;
+  --iron:#767f8b; --iron-dim:#39414a; --brass:#c69440; --brass-dim:#8a6529;
+  --blood:#a83f35; --green:#6f9469;
+  --text:#c9ced5; --text-dim:#8d959f; --text-faint:#5c646e;
+  --serif:"Spectral",Georgia,serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --cw:134px; --ch:192px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--desk);color:var(--text);font-family:var(--serif);font-size:15px;
+  line-height:1.55;overflow:hidden;display:flex;flex-direction:column}
+#grain{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;text-align:left}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.chrome{position:relative;z-index:3;flex:0 0 auto;display:flex;align-items:center;gap:16px;
+  padding:7px 16px;background:var(--sunk);border-bottom:1px solid var(--iron-dim);
+  font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--text-faint)}
+.chrome b{color:var(--text-dim);font-weight:500}
+.chrome .right{margin-left:auto;display:flex;gap:10px;align-items:center}
+.stage{position:relative;z-index:1;flex:1 1 auto;overflow:auto;padding:24px}
+
+/* ─── PAPER ──────────────────────────────────────────────────────────────────────────── */
+.paper{background:linear-gradient(172deg,var(--vellum),var(--vellum-2));color:var(--ink);
+  box-shadow:0 24px 55px -22px #000,0 2px 6px -2px rgba(0,0,0,.6);position:relative;border-radius:2px}
+.writ{padding:34px 38px 30px;align-self:start}
+.writ h1{font-size:28px;font-weight:600;margin:0 0 6px;font-variant:small-caps;text-wrap:balance;color:var(--ink)}
+.writ .meta{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink-soft);margin-bottom:17px;display:flex;gap:14px;flex-wrap:wrap}
+.writ p{margin:0 0 13px;font-size:15.5px;line-height:1.68;color:var(--ink)}
+.writ .errand{margin-top:19px;padding-top:14px;border-top:1px solid var(--rule);
+  font-family:var(--mono);font-size:11.5px;line-height:1.8;color:var(--ink-soft)}
+.writ .errand b{color:var(--ink);font-weight:600;letter-spacing:.06em}
+.seal{position:absolute;right:28px;bottom:24px;width:54px;height:54px;border-radius:50%;
+  background:radial-gradient(circle at 36% 32%,#b9453a,#6f231d 70%);
+  box-shadow:0 3px 7px rgba(0,0,0,.55),inset 0 -3px 6px rgba(0,0,0,.35);
+  display:grid;place-items:center;font-family:var(--mono);font-size:7.5px;letter-spacing:.09em;color:#eed7d1}
+
+/* ─── CARDS (paper) ──────────────────────────────────────────────────────────────────── */
+.card{width:var(--cw);height:var(--ch);border-radius:3px;position:relative;flex:0 0 auto;
+  background:linear-gradient(170deg,var(--vellum),#b9b09a);color:var(--ink);border:1px solid #8d8470;
+  padding:11px;display:flex;flex-direction:column;cursor:grab;box-shadow:0 8px 18px -9px #000;
+  transition:transform .13s,box-shadow .13s,opacity .13s}
+.card:hover{transform:translateY(-5px);box-shadow:0 18px 30px -12px #000}
+.card:active{cursor:grabbing}
+.card .nm{font-size:14.5px;font-weight:600;line-height:1.18;text-wrap:balance;color:var(--ink)}
+.card .sub{font-family:var(--mono);font-size:9px;letter-spacing:.07em;color:var(--ink-soft);
+  text-transform:uppercase;margin-top:3px}
+.card .tags{margin-top:auto;font-family:var(--mono);font-size:9.5px;line-height:1.6;color:var(--ink-soft)}
+.card .tags i{font-style:normal;display:block}
+.card .fit{position:absolute;top:8px;right:8px;font-family:var(--mono);font-size:12px;font-weight:600;
+  padding:2px 6px;border-radius:2px;background:var(--ink);color:var(--vellum)}
+.card .fit.good{background:#2e4a2b;color:#d5e7d1} .card .fit.bad{background:#4b231f;color:#eecbc6}
+.card .stars{position:absolute;bottom:9px;right:10px;font-size:10px;color:var(--brass-dim);letter-spacing:-1px}
+.card.dim{opacity:.22;filter:saturate(.2)}
+.card.picked{outline:2px solid var(--brass);outline-offset:1px}
+.card.injured::after{content:"";position:absolute;inset:0;border-radius:3px;pointer-events:none;
+  background:repeating-linear-gradient(135deg,transparent 0 10px,rgba(168,63,53,.15) 10px 12px)}
+/* INVOLVED — held down with iron brackets. Readable, never movable. */
+.card.held{cursor:pointer;background:linear-gradient(170deg,#ccc4af,#ada494)}
+.card.held::before,.card.held::after{content:"";position:absolute;left:20px;right:20px;height:10px;
+  border-radius:2px;background:linear-gradient(180deg,#98a1ad,#4a515a);box-shadow:0 1px 3px rgba(0,0,0,.55)}
+.card.held::before{top:-5px} .card.held::after{bottom:-5px}
+.card.unknown{background:linear-gradient(170deg,#262d34,#1a1f24);border-color:var(--iron-dim)}
+.card.unknown .nm{color:var(--text-dim)} .card.unknown .sub{color:var(--text-faint)}
+.card.unknown .qm{margin:auto;font-size:40px;color:var(--iron-dim);text-align:center}
+
+/* ─── SLOTS (on the rack) ────────────────────────────────────────────────────────────── */
+.slot{width:var(--cw);height:var(--ch);border-radius:3px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:9px;background:rgba(0,0,0,.3);
+  border:1px dashed var(--iron-dim);transition:border-color .12s,background .12s,transform .12s}
+.slot.required{border-color:color-mix(in srgb,var(--blood) 55%,transparent)}
+.slot.active{border-color:var(--brass);border-style:solid;background:rgba(198,148,64,.1)}
+.slot.over{border-color:var(--brass);background:rgba(198,148,64,.16);transform:translateY(-3px)}
+.slot .ghost{width:40px;height:50px;opacity:.34}
+.slot .ghost path{fill:var(--iron)} .slot.required .ghost path{fill:var(--blood)}
+.slot .want{font-family:var(--mono);font-size:9px;letter-spacing:.09em;color:var(--text-faint)}
+.slotwrap{display:flex;flex-direction:column;gap:8px;width:var(--cw)}
+.slotwrap .asks{font-size:13.5px;font-style:italic;color:var(--text-dim);line-height:1.35;text-wrap:balance}
+.slotwrap .demand{font-family:var(--mono);font-size:9.5px;letter-spacing:.04em;color:var(--text-faint);line-height:1.55}
+.slotwrap .demand .up{color:var(--green)} .slotwrap .demand .down{color:var(--blood)}
+
+/* ─── THE HAND — persistent furniture on every screen ────────────────────────────────── */
+.hand{position:relative;z-index:2;flex:0 0 auto;background:var(--sunk);border-top:1px solid var(--iron-dim);
+  padding:9px 16px 11px;display:flex;align-items:center;gap:14px}
+.handlabel{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--text-faint);border-right:1px solid var(--iron-dim);padding-right:12px;max-width:74px;line-height:1.5}
+.handscroll{display:flex;gap:10px;overflow-x:auto;padding:6px 2px 7px;flex:1 1 auto}
+.handscroll .card{--cw:118px;--ch:150px}
+.handscroll::-webkit-scrollbar{height:7px}
+.handscroll::-webkit-scrollbar-thumb{background:var(--iron-dim);border-radius:4px}
+.handnote{font-family:var(--mono);font-size:10px;color:var(--text-faint);max-width:160px;line-height:1.55}
+
+/* ─── ODDS & THE GAUGE ───────────────────────────────────────────────────────────────── */
+.odds{display:flex;flex-direction:column;gap:6px;flex:1 1 auto;min-width:0}
+.odds .line{font-size:14.5px;font-style:italic;color:var(--text-dim);text-wrap:balance}
+.odds .nums{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;color:var(--text-faint);
+  font-variant-numeric:tabular-nums}
+.gauge{display:flex;align-items:center;gap:20px}
+.needle{transition:transform .45s cubic-bezier(.4,1.4,.5,1);transform-origin:60px 66px}
+
+.acts{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.act{font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+  padding:10px 17px;border:1px solid var(--iron-dim);border-radius:3px;color:var(--text-dim);
+  transition:border-color .12s,color .12s,background .12s}
+.act:hover{border-color:var(--iron);color:var(--text)}
+.act.go{border-color:var(--brass-dim);color:var(--brass);background:rgba(198,148,64,.1)}
+.act.go:hover{background:var(--brass);color:#191307}
+.act.auto{border-color:var(--iron);color:var(--text)}
+.act[disabled]{opacity:.32;cursor:not-allowed}
+
+.sect{font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--text-faint);margin-bottom:12px;display:flex;align-items:center;gap:11px}
+.sect::after{content:"";flex:1;height:1px;background:var(--iron-dim)}
+.people{display:flex;gap:15px;flex-wrap:wrap}
+.person{display:flex;flex-direction:column;gap:7px;width:var(--cw)}
+.person .cap{font-family:var(--mono);font-size:9px;color:var(--text-faint);line-height:1.45}
+.board{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start}
+
+/* ─── THE QUEST SCREEN ───────────────────────────────────────────────────────────────── */
+.quest{display:grid;grid-template-columns:minmax(0,620px) minmax(0,1fr);gap:32px;min-height:100%;
+  max-width:1560px;margin:0 auto}
+.panel{display:flex;flex-direction:column;gap:20px;min-width:0}
+.rk{background:var(--rack);border:1px solid var(--iron-dim);border-radius:3px;padding:22px 24px}
+.instrument{background:var(--rack-hi);border:1px solid var(--iron-dim);border-radius:3px;
+  padding:22px 24px;display:flex;flex-direction:column;gap:18px}
+.back{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint)}
+.back:hover{color:var(--text)}
+
+/* ─── THE BOARD (quest list) ─────────────────────────────────────────────────────────── */
+.list{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.listhead{display:flex;align-items:baseline;gap:16px;margin-bottom:4px}
+.listhead h2{font-size:23px;font-weight:600;margin:0;font-variant:small-caps;color:var(--text)}
+.listhead .n{font-family:var(--mono);font-size:11px;color:var(--text-faint)}
+.listhead .acts{margin-left:auto}
+.row{background:var(--rack);border:1px solid var(--iron-dim);border-radius:3px;padding:16px 20px;
+  display:grid;grid-template-columns:1fr 190px 210px;gap:20px;align-items:center;
+  transition:border-color .12s,background .12s;width:100%}
+.row:hover{border-color:var(--iron);background:var(--rack-hi)}
+.row .t{font-size:17px;font-weight:600;color:var(--text);margin-bottom:3px}
+.row .s{font-size:13.5px;color:var(--text-dim);line-height:1.5;max-width:64ch}
+.row .tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text-faint);margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}
+.row .tag .saga{color:var(--brass)}
+.pips{display:flex;gap:6px;align-items:center}
+.pip{width:15px;height:21px;border-radius:2px;border:1px dashed var(--iron-dim);background:rgba(0,0,0,.3)}
+.pip.req{border-color:color-mix(in srgb,var(--blood) 55%,transparent)}
+.pip.on{background:var(--vellum);border:1px solid #8d8470}
+.rowodds{font-family:var(--mono);font-size:10.5px;color:var(--text-faint);line-height:1.6;font-variant-numeric:tabular-nums}
+.rowodds b{color:var(--green);font-weight:500}
+.rowodds b.thin{color:var(--blood)}
+.rowacts{display:flex;gap:8px;justify-content:flex-end}
+.rowacts .act{padding:8px 13px;font-size:10px}
+
+/* ─── THE READER ─────────────────────────────────────────────────────────────────────── */
+.reader{position:fixed;inset:0;background:rgba(6,8,10,.75);display:none;align-items:center;
+  justify-content:center;padding:24px;z-index:30}
+.reader.on{display:flex}
+.sheet{background:var(--rack);border:1px solid var(--iron);border-radius:3px;max-width:470px;
+  padding:28px 30px;box-shadow:0 34px 80px -24px #000;color:var(--text)}
+.sheet h2{font-size:23px;font-weight:600;margin:0 0 4px;font-variant:small-caps;color:var(--text)}
+.sheet .role{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--brass);margin-bottom:15px}
+.sheet p{margin:0 0 12px;color:var(--text-dim);font-size:14.5px;line-height:1.62}
+.sheet .why{margin-top:14px;padding-top:12px;border-top:1px solid var(--iron-dim);
+  font-size:13.5px;font-style:italic;color:var(--text-faint)}
+.sheet .tagline{margin-top:15px;font-family:var(--mono);font-size:10.5px;color:var(--text-faint);line-height:1.7}
+</style>
+
+<canvas id="grain"></canvas>
+
+<div class="chrome">
+  <b>THE MUSTER BOARD</b>
+  <span>prototype · real data, seed 4242</span>
+  <div class="right"><span>cycle 3 · 180g</span></div>
+</div>
+
+<div class="stage"><div id="stage"></div></div>
+
+<div class="hand">
+  <div class="handlabel">The company</div>
+  <div class="handscroll" id="hand"></div>
+  <div class="handnote" id="handnote">Click a slot to see who fits.</div>
+</div>
+
+<div class="reader" id="reader"><div class="sheet" id="sheet"></div></div>
+
+<script>
+/* Real data from a live game (seed 4242, v3/scripts/uidump.ts). The two routine one-offs are
+   verbatim from a real campaign log — one sentence each, which is what routine cards actually
+   look like, and the reason the quest screen has to survive a nearly empty writ. */
+const QUESTS = [
+  { id:"q16", title:"Search a warden-stone", rarity:"uncommon", level:2, beat:1, lapses:8, saga:"The Warden's Stones",
+    situation:"A ridgetop warden sworn to the stones, Pylenor Greyfell, came back a second time and keeps turning something over in one palm. He says his sworn right to tend the ridgeline will be lost, allowing rival bands to seize its harvest. A young elven priest wanting to leave the ridgetop, Sanaso Brightwater, is who he names. He wants you to search a warden-stone on the ridgeline for signs of Sanaso Brightwater, the coin comes at the finish, with the pick of what the job turns up. Pylenor warns a hunter will extract a price for returning Sanaso or profit from keeping her hidden.",
+    job:"Search a ridgeline warden-stone for signs of Sanaso Brightwater.",
+    reward:"Coin at the finish, and the pick of what the job turns up.",
+    slots:[{idx:0,asks:"Someone who can read the ground",attr:"INT",bar:1.8,favored:["lore","nature","magic-earth"],clashing:["hotheaded"]},
+           {idx:1,asks:"Someone who can stay out there",attr:"CON",bar:1.8,favored:["melee","ranged","serious"],clashing:["magic-fire","playful"]}],
+    cast:[{name:"Pylenor Greyfell",trade:"warden",role:"the one asking",met:true,
+           who:"Ridgetop warden sworn to the stones, aging and blunt.",
+           why:"He keeps turning something over in one palm while he talks."},
+          {name:"Sanaso Brightwater",trade:"priest",role:"the one wanted",met:true,
+           who:"Young elven priest from a nearby grove, wanting independence from the stones.",
+           why:"She is what the warden is paying for. She has agreed to nothing."},
+          {name:null,trade:"hunter",role:"stands against",met:false,
+           who:"The warden says a hunter will want paying for her — or will keep her hidden and profit by it.",
+           why:"You have not met them. Their card turns face up when you do."}],
+    coins:[[6,8],[5,7],[11,6],[9,7],[13,5],[2,9],[4,1],[5,10]] },
+  { id:"q9", title:"Marked Outlaw Hunt", rarity:"common", level:1, lapses:5, saga:null,
+    situation:"A notice lists a wanted hand whose tracks lead into the old-growth. The hunters refuse to go deeper.",
+    job:"Follow the tracks into the old-growth and take the wanted hand.",
+    reward:"The bounty as posted.",
+    slots:[{idx:0,asks:"Someone who can follow a trail",attr:"INT",bar:1.5,favored:["nature","ranged"],clashing:["hotheaded"]}],
+    cast:[], coins:[[5],[7],[9],[11],[4],[3],[2],[8]] },
+  { id:"q11", title:"Rescue at Lodge", rarity:"common", level:2, lapses:6, saga:null,
+    situation:"An elf hunter was taken near the old glade and held inside a timber lodge by armed hands.",
+    job:"Get the hunter out of the lodge alive.",
+    reward:"Coin from the hunter's people, and what the lodge holds.",
+    slots:[{idx:0,asks:"Someone who can force a door",attr:"STR",bar:2.2,favored:["melee","intimidation"],clashing:["submissive"]},
+           {idx:1,asks:"Someone who can go quietly",attr:"DEX",bar:1.9,favored:["roguery","cool"],clashing:["hotheaded"]}],
+    cast:[], coins:[[9,4],[6,6],[3,7],[5,8],[4,5],[11,2],[2,6],[7,9]] },
+];
+const ROSTER = [
+  {id:"m1",name:"Ragna Stormhide",lvl:2,stars:2,worth:17,race:"wolfman",tags:["melee (low)","generous"]},
+  {id:"m2",name:"Gaufrid",lvl:2,stars:1,worth:11,race:"human",tags:["ranged (low)","lustful"]},
+  {id:"m3",name:"Alveno",lvl:3,stars:3,worth:34,race:"elf",tags:["lore (mid)","nature","serious"]},
+  {id:"m4",name:"Peukestes Thatcher",lvl:2,stars:2,worth:19,race:"human",tags:["nature (mid)","cool"]},
+  {id:"m5",name:"Hazeca",lvl:4,stars:4,worth:61,race:"lizardman",tags:["magic-earth (mid)","lore (low)","calculating"]},
+  {id:"m6",name:"Jerromec",lvl:3,stars:2,worth:28,race:"human",tags:["melee (mid)","hotheaded"],injured:true},
+  {id:"m7",name:"Telare",lvl:2,stars:1,worth:13,race:"elf",tags:["magic-fire (low)","playful"]},
+  {id:"m8",name:"Galondorn",lvl:3,stars:3,worth:31,race:"wolfman",tags:["ranged (mid)","serious"]},
+];
+
+const S={view:"board",questId:null,assign:{},active:null};   // assign: {"q16:0": "m3"}
+const key=(q,i)=>`${q}:${i}`;
+const byId=id=>ROSTER.find(m=>m.id===id);
+const quest=()=>QUESTS.find(q=>q.id===S.questId);
+const coinOf=(q,mId,slot)=>q.coins[ROSTER.findIndex(m=>m.id===mId)][slot];
+const spokenFor=id=>Object.keys(S.assign).find(k=>S.assign[k]===id);
+const slotOf=(q,i)=>S.assign[key(q.id,i)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const GHOST=`<svg class="ghost" viewBox="0 0 36 46" aria-hidden="true"><path d="M18 4a7.5 7.5 0 1 1 0 15 7.5 7.5 0 0 1 0-15Zm0 17c8.6 0 15 5.2 15 12.6V46H3V33.6C3 26.2 9.4 21 18 21Z"/></svg>`;
+
+/* ── GREEDY AUTO-ASSIGN ─────────────────────────────────────────────────────────────────
+   Score every (slot, soldier) pair, sort best-first, walk the list and take a pair whenever
+   both halves are still free. Injured soldiers carry a penalty so they are picked only when
+   nobody else can do it. Ties break toward the CHEAPER soldier, so a routine job does not
+   quietly consume the company's best. */
+function autoAssign(q){
+  const free = ROSTER.filter(m => { const k = spokenFor(m.id); return !k || k.startsWith(q.id + ":") });
+  const pairs = [];
+  q.slots.forEach(s => free.forEach(m =>
+    pairs.push({ slot:s.idx, id:m.id, score: coinOf(q,m.id,s.idx) - (m.injured ? 4 : 0), worth:m.worth })));
+  pairs.sort((a,b) => b.score - a.score || a.worth - b.worth);
+  q.slots.forEach(s => delete S.assign[key(q.id,s.idx)]);
+  const usedSlot = new Set(), usedMerc = new Set();
+  for (const p of pairs) {
+    if (usedSlot.has(p.slot) || usedMerc.has(p.id)) continue;
+    usedSlot.add(p.slot); usedMerc.add(p.id); S.assign[key(q.id,p.slot)] = p.id;
+  }
+}
+function odds(q){
+  let coins=0,bar=0,filled=0;
+  q.slots.forEach(s=>{bar+=s.bar;const id=slotOf(q,s.idx);if(id){coins+=coinOf(q,id,s.idx);filled++}});
+  const ready=filled===q.slots.length;
+  const pct=ready?Math.min(.97,Math.max(.03,1-Math.pow(0.5,coins-bar)*0.5)):0;
+  return {coins,bar,ready,pct,filled,of:q.slots.length};
+}
+const oddsLine=o=> !o.ready ? (o.filled===0?`${o.of===1?"One":"Two"} must go. Nobody is on the board yet.`:"One more still to name.")
+  : o.pct>.8 ? "They should manage this between them."
+  : o.pct>.55? "It could go either way, but the odds lean your way."
+  : o.pct>.3 ? "Thin. Someone will likely come home hurt."
+  : "You are sending them to fail.";
+
+/* ── pieces ─────────────────────────────────────────────────────────────────────────── */
+function cardHTML(m,q,slotIdx){
+  const fit=slotIdx!=null?coinOf(q,m.id,slotIdx):null;
+  const cls=fit!=null?(fit>=8?"good":fit<=3?"bad":""):"";
+  const dim=S.active!=null&&slotIdx==null;
+  return `<button class="card${m.injured?" injured":""}${dim?" dim":""}${spokenFor(m.id)?" picked":""}"
+      draggable="true" data-card="${m.id}" title="${esc(m.name)} — ${esc(m.tags.join(", "))}">
+    ${fit!=null?`<span class="fit ${cls}">${fit}c</span>`:""}
+    <span class="nm">${esc(m.name)}</span><span class="sub">${esc(m.race)} · lvl ${m.lvl}</span>
+    <span class="tags">${m.tags.map(t=>`<i>${esc(t)}</i>`).join("")}</span>
+    <span class="stars">${"★".repeat(m.stars)}${"☆".repeat(4-m.stars)}</span></button>`;
+}
+function heldHTML(c,i){
+  if(!c.met) return `<button class="card held unknown" data-cast="${i}"><span class="nm">A ${esc(c.trade)}</span>
+    <span class="sub">${esc(c.role)}</span><span class="qm">?</span></button>`;
+  return `<button class="card held" data-cast="${i}"><span class="nm">${esc(c.name)}</span>
+    <span class="sub">${esc(c.trade)}</span><span class="tags"><i>${esc(c.role)}</i></span></button>`;
+}
+function slotHTML(q,s){
+  const id=slotOf(q,s.idx), m=id&&byId(id);
+  if(m) return `<div class="slotwrap"><div data-slot="${s.idx}" class="dropzone">${cardHTML(m,q,s.idx)}</div>
+    <div class="asks">${esc(s.asks)}</div>
+    <div class="demand">${s.attr} · bar ${s.bar.toFixed(1)} · <span class="up">${coinOf(q,id,s.idx)}c</span></div></div>`;
+  return `<div class="slotwrap">
+    <div class="slot required dropzone${S.active===s.idx?" active":""}" data-slot="${s.idx}" role="button" tabindex="0">
+      ${GHOST}<span class="want">DRAG OR CLICK</span></div>
+    <div class="asks">${esc(s.asks)}</div>
+    <div class="demand">${s.attr} · bar ${s.bar.toFixed(1)} · <span class="up">${s.favored.join(" ")}</span> · <span class="down">${s.clashing.join(" ")}</span></div></div>`;
+}
+function gaugeHTML(q){
+  const o=odds(q), a=-120+240*o.pct;
+  return `<div class="gauge">
+    <svg width="120" height="78" viewBox="0 0 120 78" aria-hidden="true">
+      <path d="M14 66a46 46 0 0 1 92 0" fill="none" stroke="#39414a" stroke-width="9" stroke-linecap="round"/>
+      <path d="M14 66a46 46 0 0 1 92 0" fill="none" stroke="url(#gg)" stroke-width="9" stroke-linecap="round"
+            stroke-dasharray="145" stroke-dashoffset="${145-145*o.pct}"/>
+      <defs><linearGradient id="gg" x1="0" x2="1"><stop offset="0" stop-color="#8a6529"/><stop offset="1" stop-color="#6f9469"/></linearGradient></defs>
+      <g class="needle" style="transform:rotate(${a}deg)"><line x1="60" y1="66" x2="60" y2="26" stroke="#c69440" stroke-width="2.5" stroke-linecap="round"/></g>
+      <circle cx="60" cy="66" r="4.5" fill="#c69440"/></svg>
+    <div class="odds"><div class="line">${oddsLine(o)}</div>
+      <div class="nums">${o.coins} coins against a bar of ${o.bar.toFixed(1)}${o.ready?` · about ${Math.round(o.pct*100)}%`:` · ${o.filled}/${o.of} named`}</div></div></div>`;
+}
+
+/* ── THE BOARD ──────────────────────────────────────────────────────────────────────── */
+function boardView(){
+  return `<div class="list">
+    <div class="listhead"><h2>The board</h2><span class="n">${QUESTS.length} open · cycle 3</span>
+      <div class="acts"><button class="act auto" data-autoall>Auto-fill every quest</button></div></div>
+    ${QUESTS.map(q=>{
+      const o=odds(q);
+      return `<button class="row" data-open="${q.id}">
+        <div><div class="t">${esc(q.title)}</div>
+          <div class="s">${esc(q.situation.length>150?q.situation.slice(0,148)+"…":q.situation)}</div>
+          <div class="tag"><span>${q.rarity} · level ${q.level}</span>
+            ${q.saga?`<span class="saga">${esc(q.saga)} · beat ${q.beat}</span>`:`<span>one-off</span>`}
+            <span>lapses in ${q.lapses}</span></div></div>
+        <div class="pips">${q.slots.map(s=>`<span class="pip req${slotOf(q,s.idx)?" on":""}"></span>`).join("")}
+          <span class="rowodds" style="margin-left:8px">${o.filled}/${o.of}</span></div>
+        <div class="rowacts">
+          <span class="rowodds">${o.ready?`<b class="${o.pct<.4?"thin":""}">${Math.round(o.pct*100)}%</b><br>${o.coins}c vs ${o.bar.toFixed(1)}`:"not manned"}</span>
+          <button class="act auto" data-auto="${q.id}">Auto</button></div>
+      </button>`}).join("")}
+  </div>`;
+}
+
+/* ── THE QUEST SCREEN ───────────────────────────────────────────────────────────────── */
+function questView(){
+  const q=quest(), o=odds(q);
+  return `<div class="quest">
+    <div>
+      <button class="back" data-back>← the board</button>
+      <div class="paper writ" style="margin-top:12px">
+        <h1>${esc(q.title)}</h1>
+        <div class="meta"><span>${q.rarity} · level ${q.level}</span>
+          ${q.saga?`<span>${esc(q.saga)} · beat ${q.beat}</span>`:`<span>one-off</span>`}
+          <span>lapses in ${q.lapses} cycles</span></div>
+        <p>${esc(q.situation)}</p>
+        <div class="errand"><b>THE ERRAND</b> ${esc(q.job)}<br><b>THE PAY</b> ${esc(q.reward)}</div>
+        <div class="seal">SEALED</div>
+      </div>
+    </div>
+    <div class="panel">
+      ${q.cast.length?`<div class="rk"><div class="sect">On this matter</div>
+        <div class="people">${q.cast.map((c,i)=>`<div class="person">${heldHTML(c,i)}
+          <div class="cap">${c.met?"held to this matter":"turns face up when you meet them"}</div></div>`).join("")}</div></div>`:""}
+      <div class="rk"><div class="sect">Who you send</div>
+        <div class="board">${q.slots.map(s=>slotHTML(q,s)).join("")}</div></div>
+      <div class="instrument">
+        ${gaugeHTML(q)}
+        <div class="acts">
+          <button class="act go" ${o.ready?"":"disabled"}>${o.ready?"Send them":`${o.of-o.filled} still to name`}</button>
+          <button class="act auto" data-auto="${q.id}">Auto-assign</button>
+          <button class="act" data-clear>Clear</button>
+          <button class="act" data-back>Leave it on the board</button>
+        </div></div>
+    </div></div>`;
+}
+
+function render(){
+  document.getElementById("stage").innerHTML = S.view==="board" ? boardView() : questView();
+  const q = S.view==="quest" ? quest() : null;
+  const free = ROSTER.filter(m=>!spokenFor(m.id));
+  document.getElementById("hand").innerHTML = free.map(m=>cardHTML(m,q,q&&S.active!=null?S.active:null)).join("");
+  document.getElementById("handnote").textContent = S.view==="board"
+    ? `${free.length} of ${ROSTER.length} unspoken for.`
+    : S.active==null ? "Click a slot to see who fits." : `${q.slots[S.active].asks.toLowerCase()} — best first.`;
+  if(S.view==="quest" && S.active!=null){
+    const box=document.getElementById("hand");
+    [...box.children].sort((a,b)=>coinOf(q,b.dataset.card,S.active)-coinOf(q,a.dataset.card,S.active))
+      .forEach(n=>box.appendChild(n));
+  }
+}
+
+let dragging=null;
+document.addEventListener("dragstart",e=>{const c=e.target.closest(".card");
+  if(!c||c.classList.contains("held"))return; dragging=c.dataset.card; e.dataTransfer.effectAllowed="move"});
+document.addEventListener("dragover",e=>{const z=e.target.closest(".dropzone");
+  if(!z||!dragging)return; e.preventDefault(); z.classList.add("over")});
+document.addEventListener("dragleave",e=>e.target.closest(".dropzone")?.classList.remove("over"));
+document.addEventListener("drop",e=>{const z=e.target.closest(".dropzone");
+  if(!z||!dragging)return; e.preventDefault(); place(Number(z.dataset.slot),dragging); dragging=null});
+function place(slot,id){const p=spokenFor(id); if(p)delete S.assign[p];
+  S.assign[key(S.questId,slot)]=id; S.active=null; render()}
+
+document.addEventListener("click",e=>{
+  if(e.target.closest("[data-autoall]")){QUESTS.forEach(autoAssign);return render()}
+  const auto=e.target.closest("[data-auto]");
+  if(auto){autoAssign(QUESTS.find(q=>q.id===auto.dataset.auto));S.active=null;return render()}
+  if(e.target.closest("[data-clear]")){quest().slots.forEach(s=>delete S.assign[key(S.questId,s.idx)]);return render()}
+  if(e.target.closest("[data-back]")){S.view="board";S.questId=null;S.active=null;return render()}
+  const open=e.target.closest("[data-open]");
+  if(open){S.view="quest";S.questId=open.dataset.open;S.active=null;return render()}
+  const held=e.target.closest("[data-cast]"); if(held)return openReader(quest().cast[Number(held.dataset.cast)]);
+  const slot=e.target.closest(".slot");
+  if(slot){const i=Number(slot.dataset.slot);S.active=S.active===i?null:i;return render()}
+  const filled=e.target.closest(".slotwrap .card");
+  if(filled){const k=spokenFor(filled.dataset.card);
+    if(k){delete S.assign[k];S.active=Number(k.split(":")[1]);return render()}}
+  const card=e.target.closest("#hand .card");
+  if(card && S.view==="quest"){
+    if(S.active!=null)return place(S.active,card.dataset.card);
+    const s=quest().slots.find(s=>!slotOf(quest(),s.idx)); if(s)return place(s.idx,card.dataset.card);
+  }
+  if(e.target.closest(".reader")&&!e.target.closest(".sheet"))closeReader();
+});
+function openReader(c){
+  document.getElementById("sheet").innerHTML=`<h2>${esc(c.met?c.name:"A "+c.trade)}</h2>
+    <div class="role">${esc(c.role)}${c.met?"":" · not yet met"}</div>
+    <p>${esc(c.who)}</p><div class="why">${esc(c.why)}</div>
+    <div class="tagline">Held to this matter. You can read them; you cannot move them.</div>`;
+  document.getElementById("reader").classList.add("on");
+}
+const closeReader=()=>document.getElementById("reader").classList.remove("on");
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Escape")return;
+  if(document.getElementById("reader").classList.contains("on"))return closeReader();
+  if(S.active!=null){S.active=null;return render()}
+  if(S.view==="quest"){S.view="board";S.questId=null;render()}
+});
+
+/* a very quiet grain, so the dark ground reads as a surface rather than as absence */
+(function(){const c=document.getElementById("grain"),x=c.getContext("2d");
+  function paint(){c.width=innerWidth;c.height=innerHeight;
+    const d=x.createImageData(c.width,c.height),p=d.data;
+    for(let i=0;i<p.length;i+=4){const v=Math.random()*255;p[i]=p[i+1]=p[i+2]=v;p[i+3]=7}
+    x.putImageData(d,0,0)}
+  paint();let t;addEventListener("resize",()=>{clearTimeout(t);t=setTimeout(paint,180)})})();
+render();
+</script>
