@@ -78,7 +78,12 @@ export function rollFreshLead(rng: Rng, ctx: LeadRollCtx, idGen: () => string,
   const pool = boardPool(ctx);
   const fresh = pool.filter(a => !ctx.recentArchetypes?.includes(a));
   const archetype = rng.pick(fresh.length ? fresh : pool);
-  const startChance = rarity === 'rare' ? 0.7 : rarity === 'uncommon' ? 0.3 : 0.08;
+  // 🛠 designer 2026-08-28: the saga rate should SCALE 4% → 10% across the Great Hall tiers.
+  // These are per-RARITY, and the tier only decides which rarities exist (rollRarity), so the
+  // blend is what the player feels: T1 common-only = 4.0% · T2 +uncommon = 7.8% · T3+ +rare =
+  // 10.1%, and it saturates there because rares are only 5% of the pool. Rare stays ~2.3× uncommon
+  // so a rare lead still reads as the story-bearing one.
+  const startChance = rarity === 'rare' ? 0.55 : rarity === 'uncommon' ? 0.24 : 0.04;
   return {
     id: idGen(), rarity, level: rollLevel(rng, ctx, region), region, archetype,
     chainInfo: rng.chance(startChance) ? { kind: 'starts-new' } : { kind: 'none' },
