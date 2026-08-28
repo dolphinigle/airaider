@@ -58,3 +58,50 @@ payloads arrive as `fealty, seduction, pulley, tongs` or `astonishment, perjury,
 All three independent writers reported the abstract half unusable: an abstraction cannot be
 depicted in a 25-word card, only named, and naming it reads as filler. **Rebalancing that mix toward
 concrete pools is a live engine change, unresolved.**
+
+---
+
+## Round 2 (2026-08-28) — the keyword MIX is not a lever either
+
+Designer: *"i think you need to look at the keyword/seeds list too. i expect easier words too like
+sword, etc mostly?"* The §5 style bar agrees in principle ("a curious twelve-year-old must know the
+word"), and the abstract-half problem was left open at the bottom of this file. So it was benched:
+three keyword mixes, same twelve archetypes, same seed, three blind judges (inter-judge r 0.82–0.90).
+
+| mix | mean |
+|---|---|
+| `action` — TIE-led, BOND dropped | 5.81 |
+| `base` — shipped (1 BOND + 1 TIE + wildcards) | 5.67 |
+| `concrete` — a QUALITY on a THING, no abstraction at all | 5.61 |
+
+**A 0.20 spread at n=12 is nothing.** This replicates the round-1 finding on a different surface:
+swapping which nouns arrive does not change what the job IS, so it does not change the card. That
+`action` (transactions: oath, ransom, parley) edges the other two is consistent with the axis
+finding — vary the VERB — but not at a magnitude worth shipping.
+
+### The pool audit, which is a separate matter
+
+| pool | latinate/long | ≤5 letters | share of a LIGHT card's single word |
+|---|---|---|---|
+| BOND | **42%** | 15% | 45% |
+| TIE | 32% | 15% | 35% |
+| THINGS | 3% | 56% | 20% |
+
+`THINGS` already holds exactly the register the designer expected — sword, rope, horse, bread,
+knife, axe, boot, cart, key, coin, well, fire, door, bone, cloak, bow, salt, goat, nail — and it
+wins one light-card draw in five. `BOND` (*homesickness, vindication, infatuation, reverence,
+restlessness*) wins nearly half and fails §5's own bar. **Purging BOND's latinate tail is right on
+the style bar and is NOT expected to move the bench** — say so when doing it, rather than booking it
+as an improvement.
+
+### What the round actually surfaced
+
+Heavy cards scored **5.15** against light cards' **5.88** (n=9 vs 27; register and voiced-format are
+confounded here, so this is not evidence against the voice — arm-level rounds had voice ahead). All
+three judges named the same causes, unprompted, and neither is a keyword:
+
+> *"pile up unglossed place names, filler openings ('I rode back with word') and hedged
+> double-asks"* · *"buries its one good image under provenance and payment bookkeeping"*
+
+That is the pay clause and place-name traffic — PLAYTEST_NOTES N8 item 3 and DIALOGUE_AB failure
+class 2, both still untested. **That** is the next experiment, not the word lists.

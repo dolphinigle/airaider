@@ -450,10 +450,28 @@ export const MOODS: string[] = [
 // is always a concrete noun, so a modifier never lands alone ("grief, theft, only" read as
 // nonsense; a quality needs a noun in the draw to bite on: 'banned' + 'festival').
 const WILDCARD_NOUNS = [...THINGS, ...OCCASIONS, ...PEOPLE, ...UNCANNY, ...MOODS];
+/** KW lab (2026-08-28) — prosebench/SEEDING.md left this open: sampleKeywords deals BOND + TIE,
+ *  two ABSTRACT words, and all three independent writers reported the abstract half unusable — an
+ *  abstraction cannot be depicted in a twenty-word card, only named, and naming it reads as filler.
+ *  Its other finding names the axis: variety comes from varying the ACTION a job asks for, not the
+ *  nouns in it. BOND is pure feeling; TIE is transactions (oath, ransom, parley) — actions.
+ *    base = shipped mix · action = TIE-led, BOND dropped · concrete = a QUALITY on a THING */
+const KW = process.env.KW ?? 'base';
+
 export function sampleKeywords(rng: Rng): string[] {
   // LABELLED by axis on purpose. The atoms come from different pools and seed different parts of a
   // card; dealt as a bare list the writer welds two into one noun phrase (a cask of "election milk").
   // Three prompt-side rewrites failed to stop it — §0: wording is the weakest lever, shaping wins.
+  if (KW === 'action') {
+    const d = [`happening: ${rng.pick(TIE)}`, `thing: ${rng.pick(WILDCARD_NOUNS)}`, `quality: ${rng.pick(QUALITIES)}`];
+    if (rng.chance(0.4)) d.push(`happening: ${rng.pick(TIE)}`);
+    return d;
+  }
+  if (KW === 'concrete') {
+    const d = [`thing: ${rng.pick(WILDCARD_NOUNS)}`, `quality: ${rng.pick(QUALITIES)}`, `thing: ${rng.pick(WILDCARD_NOUNS)}`];
+    if (rng.chance(0.4)) d.push(`quality: ${rng.pick(QUALITIES)}`);
+    return d;
+  }
   const draw = [`bond: ${rng.pick(BOND)}`, `happening: ${rng.pick(TIE)}`, `thing: ${rng.pick(WILDCARD_NOUNS)}`];
   if (!rng.chance(0.25)) draw.push(rng.chance(0.35) ? `quality: ${rng.pick(QUALITIES)}` : `thing: ${rng.pick(WILDCARD_NOUNS)}`);
   return draw;
@@ -631,6 +649,10 @@ export function sampleGravity(rng: Rng, rarity: string, kind: 'one-off' | 'saga'
  *  word is all a twenty-word sentence has room to be about. */
 export function sampleKeywordsLight(rng: Rng): string[] {
   const r = rng.next();
+  // 80% of a LIGHT card's single seed word is currently an abstraction (BOND or TIE), and a light
+  // card has twenty words to spend — it cannot depict one, only name it.
+  if (KW === 'action') return [r < 0.7 ? rng.pick(TIE) : rng.pick(WILDCARD_NOUNS)];
+  if (KW === 'concrete') return [r < 0.5 ? rng.pick(WILDCARD_NOUNS) : `${rng.pick(QUALITIES)} ${rng.pick(WILDCARD_NOUNS)}`];
   return [r < 0.45 ? rng.pick(BOND) : r < 0.8 ? rng.pick(TIE) : rng.pick(WILDCARD_NOUNS)];
 }
 
