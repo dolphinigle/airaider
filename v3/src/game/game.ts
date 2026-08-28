@@ -397,7 +397,9 @@ export class Game {
     this.log('build', `Built: ${rt.name}`);
     if (rt.unlocks === 'quests') {
       // day-0 bootstrap: the Map room grants a visible starter lead packet
-      this.state.leads.push(...starterPacket(this.rng, this.state.cycle, () => freshId('lead-')));
+      const packet = starterPacket(this.rng, this.state.cycle, () => freshId('lead-'));
+      for (const l of packet) this.noteLeadArchetype(l.archetype);   // the packet is FIXED, but the drip that follows must not echo it
+      this.state.leads.push(...packet);
       this.log('leads', 'The map table fills: first leads are in.');
     }
     if (rt.roomKind === 'scouting' && rt.region) {
@@ -701,16 +703,21 @@ export class Game {
 
   /** 🛠 2026-07-10 premise-variety: recently dealt archetypes rotate out of the next roll */
   private recentLeadArchetypes: Archetype[] = [];
+  /** EVERY path that mints a lead records here, or the window silently stops covering it — the
+   *  starter drip read the window for twenty cycles without ever writing to it, so the early
+   *  game (the one stretch where every card is a first impression) was the only place archetypes
+   *  could repeat freely. The size DERIVES from the pool: a hardcoded 20, written for a ~100-row
+   *  pool, became larger than the whole board when the pool went back to 22, at which point the
+   *  filter matches nothing and either pins one archetype or falls through entirely. */
+  private noteLeadArchetype(a: Archetype): void {
+    this.recentLeadArchetypes.push(a);
+    const window = Math.max(3, Math.floor(ARCHETYPE_NAMES.length / 3));
+    while (this.recentLeadArchetypes.length > window) this.recentLeadArchetypes.shift();
+  }
   private freshLead(source: Lead['source'], bonus = 0): Lead {
     const l = rollFreshLead(this.rng, this.leadCtx(), () => freshId('lead-'), source);
     if (bonus > 0) l.bonus = Math.round(bonus);
-    this.recentLeadArchetypes.push(l.archetype);
-    // DERIVED from the pool, never a constant: a fixed 20 was written for a ~100-row pool and
-    // silently became larger than the whole board when the pool went back to 22 — at which point
-    // `fresh` is empty on almost every draw and the anti-repeat either pins one archetype or falls
-    // through entirely. A third of the pool is a stretch you can feel without starving the draw.
-    const window = Math.max(3, Math.floor(ARCHETYPE_NAMES.length / 3));
-    while (this.recentLeadArchetypes.length > window) this.recentLeadArchetypes.shift();
+    this.noteLeadArchetype(l.archetype);
     return l;
   }
 
@@ -3291,7 +3298,9 @@ export class Game {
     if (!this.hasRoom('map-room')) return;
     st.starterDripped ??= (st.cycle > 1 ? STARTER_DRIP_COUNT : 0);   // old saves: no retro-drip
     if (st.starterDripped >= STARTER_DRIP_COUNT) return;
-    st.leads.push(starterDripLead(this.rng, st.starterDripped, st.cycle, () => freshId('lead-')));
+    const drip = starterDripLead(this.rng, st.starterDripped, st.cycle, () => freshId('lead-'), this.recentLeadArchetypes);
+    this.noteLeadArchetype(drip.archetype);
+    st.leads.push(drip);
     st.starterDripped += 1;
     this.log('leads', 'New word reaches the map table.');
   }

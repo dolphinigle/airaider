@@ -110,13 +110,18 @@ export function starterPacket(rng: Rng, cycle: number, idGen: () => string): Lea
  *  The RAMP (level 1,1,2,2) is fixed because it is the learning curve; the WORK is rolled from
  *  the pool, because a hardcoded seq of four meant the first twenty cycles never met the ~100
  *  archetypes at all — found by playing it (2026-08-28: 7 distinct archetypes in 26 cycles). */
-export function starterDripLead(rng: Rng, i: number, cycle: number, idGen: () => string): Lead {
+export function starterDripLead(rng: Rng, i: number, cycle: number, idGen: () => string,
+  recent: Archetype[] = []): Lead {
   const RAMP: [Rarity, number][] = [['common', 1], ['common', 1], ['common', 2], ['common', 2]];
   const [rarity, level] = RAMP[i % RAMP.length]!;
   // no Dungeon on day 0, and the lodge posts its own lead-hunt — so this is the ungated pool
   const pool = boardPool({ hasDungeon: false });
+  // the drip used to pick blind, so the EARLY game — the one stretch where every card is a
+  // player's first impression of what this game offers — was the only place archetypes could
+  // repeat freely. Measured on a fresh board: contract three times in the first seven leads.
+  const fresh = pool.filter(a => !recent.includes(a));
   return {
-    id: idGen(), rarity, level, region: 'forests', archetype: rng.pick(pool),
+    id: idGen(), rarity, level, region: 'forests', archetype: rng.pick(fresh.length ? fresh : pool),
     chainInfo: { kind: 'none' }, expiresAtCycle: cycle + 40, source: 'starter',
   };
 }
