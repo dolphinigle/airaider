@@ -1192,6 +1192,9 @@ export class Game {
     // the focal character FIRST (§2): personal → the merc; sequel → the SLIPPED focal
     // returns from the lore graph (§21-4a); else generated at the payoff value
     let focal: Card;
+    /** RECURRING_CAST §5 — set when this saga returns to a face the player has already met, so the
+     *  chain can open KNOWING them instead of staging them as a stranger. */
+    let returningFace: { name: string; record: string } | undefined;
     if (returningIsMerc) focal = returning!;
     else if (isPersonal) focal = this.card(personalMercId!)!;
     else if (returning) {
@@ -1239,6 +1242,18 @@ export class Game {
           if (e.to === nd.id) e.to = focal.id;
         }
         this.knownCastSagas++;
+        // KNOWN_FACE=0 disables the §5 seeding, for A/B only
+        // ⚠ UNMEASURED — default OFF. The v1 shape of this measured WORSE (known faces reached
+        // the card more often, 3 -> 5, but were still introduced like strangers, 33% -> 80%), and
+        // v2 (deal the actual memory + carve the naming exception) could not be benched: the
+        // OpenAI account hit credit_balance_exhausted mid-run. KNOWN_FACE=1 to bench it.
+        if (process.env.KNOWN_FACE === '1') {
+          // the MEMORY, not the fact of one: "sold a prisoner out from under the company and kept
+          // the fee" is something a card can be written from; "has dealt with them before" is not.
+          const lines = (this.dossier(focal.id) || '').split('\n').slice(1)
+            .map(l => l.replace(/^[-\s]+/, '').trim()).filter(Boolean);
+          returningFace = { name: focal.name, record: lines[0] ?? '' };
+        }
       } else {
         focal = materializeReward(this.rng, spec, lead.level, lead.region,
           { excludeConcepts: recentFocalTags, maxSkills: 2 })[0]!;
@@ -1613,7 +1628,21 @@ export class Game {
       // "has just taken this up" contradicted beat 1's own definition (the taking-up IS beat 1)
       // no goal text here — the goal rides in its own bible field, and printing it twice made
       // the exact sentence a paste-magnet for the beat-1 writer (verifier, 33013 render)
-      story: { currentSituation: 'The matter has just come before the company; nothing has been done yet.', knownToPlayer: [], openThreads: [], actorStates: {}, introducedNames: [] },
+      story: {
+        currentSituation: 'The matter has just come before the company; nothing has been done yet.',
+        // RECURRING_CAST §5: the reveal cadence is per-chain, so a face the company has known for
+        // three sagas was being staged as a stranger — 7 of 16 returning-face cards did not name
+        // them at all ("find any trace of the missing priest", of someone the player has a defining
+        // memory with). They ARE introduced: seeding these two lists is what isMet(), scrubUnmet()
+        // and the beat writer's naming rule all already read.
+        knownToPlayer: returningFace
+          ? [returningFace.record
+              ? `${returningFace.name} and the company have history: ${returningFace.record}`
+              : `The company has dealt with ${returningFace.name} before.`]
+          : [],
+        openThreads: [], actorStates: {},
+        introducedNames: returningFace ? [returningFace.name] : [],
+      },
       state: 'active', createdCycle: this.state.cycle,
     };
     focal.chainIds.push(chain.id);

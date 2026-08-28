@@ -18,7 +18,7 @@ function worldWithCast(seed: number) {
   });
   const TYPES = ['party-to', 'rival-of', 'owes'] as const;
   for (let t = 0; t < 3; t++)
-    guardEdges(g.state.lore, [{ from: 'lore-x0', to: `lore-x${t + 1}`, type: TYPES[t],
+    guardEdges(g.state.lore, [{ from: 'lore-x0', to: `lore-x${t + 1}`, type: TYPES[t]!,
       blurb: 'a past matter', importance: 0.5 }], 1, () => `ea${t}`);
   return g;
 }
