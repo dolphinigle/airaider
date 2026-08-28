@@ -352,7 +352,7 @@ touches the early-game pacing that was tuned deliberately.
 
 ---
 
-## N6 — ✅ FIXED · a heavy one-off card named places nobody had introduced (2026-08-28)
+## N6 — ❌ REVERTED · a heavy one-off card named places nobody had introduced (2026-08-28)
 
 Found while playtesting the ~110-row archetype widening; it had nothing to do with the widening.
 
@@ -379,6 +379,9 @@ two laws it produced (L25, L26) live in `v3/scripts/prosebench/CHEAP_MODEL_PROMP
 | + the engine splices the introduction back when the card drops it | **100 %** |
 | + the engine closes the appositive it opened | 94 % · **31/32 over the last two rungs** |
 
+**This was reverted the same day.** The measurement was sound and the change was still wrong —
+see the blind bench in N8 below. Both facts are kept on purpose.
+
 Two things to carry forward:
 
 - **The 39 % ceiling was the engine arguing with itself.** The prompt said "no proper nouns" while
@@ -404,3 +407,44 @@ One card in an 8-cycle real-AI CLI campaign (seed 9310):
 The introduction is correct (N2's fix holding); the predicate is not English. One instance, one
 seed, on the saga path — recorded, not yet measured. Worth a targeted sample of beat-1 openers
 before touching anything: a single bad sentence is not yet a class.
+
+
+## N8 — 🟡 OPEN · what a blind bench says is actually wrong with a one-off card (2026-08-28)
+
+Designer, on the cards after the N6 work: *"they are becoming rather weird and not very well
+written."* So the N6 fix, the job-shape rule and the rewritten glosses all went to a blind bench:
+two rounds, 48 cards each, three independent judges per round against `prosebench/RUBRIC.md`,
+inter-judge r 0.78–0.88, four builds sampled across the same twelve archetypes on the same seed.
+
+| build | round 1 | round 2 |
+|---|---|---|
+| before any of that work | 5.36 | **5.33** |
+| + N6's naming ladder | 5.08 | 5.08 |
+| + one-action job rule + errand-shaped glosses | — | **4.39** |
+
+All of it is reverted. The value is in what the judges converged on **independently**, none of
+which any of those changes touched:
+
+1. **The template is the ceiling, and nothing reaches 8.** *"Every entry is a two-clause situation
+   plus an imperative triplet."* *"No card carries a spoken line."* The cards that do reach 7 all
+   do the same thing — one withheld fact or one seen image, and a job aimed at exactly that: *the
+   coffin now holds someone else* · *marked trees bleed dark sap* · *a small book of names, and
+   nobody will speak* · *hanged for planting strange seed*. None of them is longer than the rest.
+2. **Contradiction loops are the hardest defect, and the ONE LEDGER rule is not stopping them.**
+   Six of forty-eight: *"the smuggler holds him yet pays you to fetch him out"*, *"Lingbourne hires
+   the theft, then pays to undo it"*, *"valuables already stripped, and the job is to retrieve the
+   valuables"*. Judge, unprompted: *"hard defects, not quibbles."* The rule is already in
+   `ABOVE ALL`, so wording and position are both spent — the untried lever is INPUT SHAPING. A
+   one-off is dealt no client and no opposition (a saga beat gets `OPPOSES` and a client tell), so
+   the writer invents both parties and collapses them into one. That is the experiment to run.
+3. **The pay clause is where cards go wrong.** *"Appositive name-drops and boilerplate reward
+   wording bury a decent hook under repeated proper nouns."* Worth testing: the card need not carry
+   the pay at all — the engine already prints `rewardEnvelope` on its own line in **both** UIs, so
+   the clause is duplicated, and it is the single obligation that drags in a payer, a holder and a
+   place name at once.
+4. **Bookkeeping archetypes deflate a good opening.** *"Census and proof-of-take jobs kill more
+   cards than bad sentences do."* `census-taking`, `surveying`, `mapping`, `standing-watch`,
+   `listening` — a vivid situation followed by "count them and report back". Rewriting their
+   glosses was in the reverted bundle and is untested on its own.
+
+Ruling wanted on 3 before it is built: does the designer want the card to stop naming the pay?
