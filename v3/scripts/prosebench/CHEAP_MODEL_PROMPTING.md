@@ -333,3 +333,44 @@ told to give ONE action. Comma-verbs per job fell 2.6 → 0.1 — the rule lande
 then scored *worst of four*, with the most `ungrammatical` tags of any variant: stripped of its
 list, the writer started returning bare fragments ("exhume the coffin") beside finished sentences.
 Fixing what the judges complained about is not the same as fixing what was wrong.
+
+
+---
+
+**L29. What actually raised a one-off card, measured across five blind rounds.** The designer,
+looking at a 5.3 bench: *"the scoring is really bad isnt it? can you do something to improve it to
+7-8?"* Three changes took it to 6.1–6.3, replicated on two seeds, three judges a round, inter-judge
+r 0.81–0.92:
+
+| arm | seed 7001 | seed 7002 |
+|---|---|---|
+| base | 5.28 | 5.03 |
+| + voiced card | 5.47 | — |
+| + voiced + one seen thing | 5.81 | — |
+| + voiced + seen + one-action job | **6.33** | 5.72 |
+| + voiced + seen + rewritten job | — | **6.06** |
+
+- **The biggest lever was already built and shelved.** `CARD_VARIANT=dlg` was benched in July at
+  +0.6 with unanimous per-pair preference and left env-gated behind a designer ruling. Search the
+  lab before inventing a lever.
+- **"Say what is WRONG" → "build it on ONE THING SOMEBODY SAW"** was the largest of the three new
+  changes, and all three judges named it independently in nearly the same words before it existed.
+  Ask the bench what is missing; it answers more usefully than it scores.
+- **The rule that fixes a defect can be the rule that causes one.** The light card's job clause
+  said to name *"what the situation left out"* — the literal instruction for the "job reaches for a
+  target the card never introduced" defect every judge flagged. Before adding a rule against a
+  defect, check whether a rule is CAUSING it.
+
+**L30. Rules interact, and the sign can flip.** The one-action job rule measured **−0.45 alone**
+(4.83, `nonsense`×8 — "cut the rope before the drop" for a man already hanging) and **+0.52 on top
+of the seen rule**. A terse job attached to an abstract situation has nothing to be terse *about*,
+so it invents; give the card one concrete thing first and the same rule aims the job at it. The
+same rule shipped alone in the morning and reverted; shipped in company in the evening and held.
+**Never bench a prompt rule in isolation and conclude it is bad — bench it in the company it will
+keep.**
+
+**L31. A right diagnosis licenses no instrument.** The contradiction loops (the captor who also
+pays you to free his captive) really were caused by the one-off being dealt neither party while a
+saga beat is dealt both. Dealing them — `PAYS: a mill reeve` / `OPPOSES: a charcoal crew · means to
+keep it` — scored **−0.45**, because a dealt generic party writes exactly the generic card it
+sounds like. Diagnosis and remedy are separate claims and each needs its own measurement.

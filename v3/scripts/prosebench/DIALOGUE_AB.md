@@ -55,7 +55,12 @@ briefing register keeps failing.
 2. Place-name scatter in voice (P1's peddler card smeared the ask across 3 names).
 3. Self-narrated gestures ("I press a small pewter token into your palm") — stage-direction-in-mouth.
 
-## Verdict (pending designer ruling — player-facing format change)
+## SHIPPED 2026-08-28 for one-offs (see CHEAP_MODEL_PROMPTING L29)
+Re-benched on the current prompts and shipped: `CARD_VARIANT` now defaults to `dlg` and the
+saga branches are **removed**, not merely disabled — failure class 1 below is still unfixed,
+so a saga card must never take the voice until it is. Resolutions stay prose, as ruled here.
+
+## Verdict (2026-07-19, pending designer ruling — player-facing format change)
 - Resolutions: KEEP PROSE. Script format is measured-worse on both instruments.
 - Cards: the VOICED PITCH is a real lever (+1 median, unanimous preference on commons) — candidate
   to ship for one-offs; saga cards need the voice-break class fixed and re-benched first.
