@@ -1076,7 +1076,10 @@ export class Game {
       opening: !light && dealSpark && lead.source !== 'interrogation' ? { spark: opening.spark } : undefined,
       intake: light ? undefined : intake,
       gravity,
-      placeNameSuggestions: light ? undefined : [this.freshPlaceName(lead.region), this.freshPlaceName(lead.region)],
+      // NOPLACE=1 (lab): deal no invented toponym at all — blind judges named piled-up place
+      // names as the heavy card's drag, and DIALOGUE_AB failure class 2 is 'place-name scatter'
+      placeNameSuggestions: light || process.env.NOPLACE === '1' ? undefined
+        : [this.freshPlaceName(lead.region), this.freshPlaceName(lead.region)],
       // ANONYMITY BY OMISSION (2026-07-06; widened 2026-07-16 designer ruling): one-off folk
       // stay nameless by trade with NO gravity exception — any dealt name gravitates the card
       // ("Briis" made routine work read important). The quarry keeps theirs via

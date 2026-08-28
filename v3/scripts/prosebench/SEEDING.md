@@ -105,3 +105,51 @@ three judges named the same causes, unprompted, and neither is a keyword:
 
 That is the pay clause and place-name traffic — PLAYTEST_NOTES N8 item 3 and DIALOGUE_AB failure
 class 2, both still untested. **That** is the next experiment, not the word lists.
+
+## Round 3 (2026-08-28) — the pay clause and the place names
+
+Two things all three judges named as the heavy card's drag, benched as arms (seed 7001, twelve
+archetypes, three blind judges, r ≈ 0.90):
+
+| arm | seed 7001 | seed 7002 |
+|---|---|---|
+| no invented place names (`NOPLACE`) | **5.89** | 5.42 |
+| no place + no pay | 5.58 | — |
+| base | 5.22 | 5.33 |
+| no pay clause (`NOPAY`) | 5.03 | — |
+
+- **Dropping the pay clause is −0.19 and does not ship.** It was the change the reasoning most
+  favoured — ECONOMY §7.1b now prints a banded reward on its own line in both UIs, so the card's
+  clause is duplicated — and the bench said no. A duplicated fact in prose is apparently not the
+  same as a redundant one: the pay is *why a mercenary takes the job*, and a card that never names
+  it reads as a rumour with no hire in it. This answers the open ruling in PLAYTEST_NOTES N8 item 3.
+- **Dropping invented place names looked like +0.67 and did NOT replicate (+0.09).** Not shipped.
+  Second time in one day that replication caught a change that a single seed made look good.
+
+Both arms stay env-gated (`NOPAY=1`, `NOPLACE=1`) and default OFF.
+
+## The standing #1, measured over the whole day
+
+204 distinct cards across five blind rounds, three judges each, overall mean **5.53**:
+
+| tag | share of judgements |
+|---|---|
+| flat | 26% |
+| unclear | 25% |
+| clutter | 17% |
+| formula | 10% |
+| nonsense | 8% |
+
+The tag counts understate the real problem, because every round's prose summary named the same
+single cause and it splits across `unclear`/`nonsense`: **the JOB contradicts or outruns its
+SITUATION.** Verbatim, from three different judges in three different rounds:
+
+> *"a corpse found stripped then ordered stripped, a rope already sawn through then ordered cut"* ·
+> *"the job names a place or object the situation never introduced (grove holdout, hidden stashes,
+> pledged peasant)"* · *"Situations generally outclass their jobs."*
+
+The `JOB2` rewrite (shipped) reduced this and did not close it. **This is the highest-value target
+left on the one-off card, and it is an engine-checkable defect** — the situation and the job are two
+strings the engine holds at the same moment, and "the job names a noun absent from the situation" is
+a mechanical test, not a prompt rule. That is the next thing to try, and §0 says enforcement outranks
+the three prompt levers already spent on it.
