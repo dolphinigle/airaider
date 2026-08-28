@@ -80,3 +80,53 @@ Felt (read real AI output):
   world with faces at creation is the candidate fix; unruled.
 - Whether one-off quests should contribute faces at all (currently they contribute none, by the
   anonymity-by-omission ruling) — unruled, and it fights an existing 🔒.
+
+
+---
+
+## 8. Measured — the mechanism works (2026-08-29)
+
+Three parallel real-AI campaigns, 12 sagas each (`v3/scripts/_castlab.ts`; the mock cannot test
+this — see §9):
+
+| | c1 | c2 | c3 |
+|---|---|---|---|
+| sagas featuring a face the player already knows | 5/12 | 6/12 | 5/12 |
+| final reuse pool | 4 | 8 | 8 |
+| edgeless nodes | 0 | 0 | 0 |
+
+**~44% of sagas now return to a known face**, against an effective 0% before. `P(new)` walks down
+as designed — 100% → 80% → 67% → 44% → 40% over one campaign — the pool grows sub-linearly, and
+nothing is ever deleted. §6's mechanical bar is met.
+
+The history accumulates and reads as a world, not a ledger:
+
+> **Belknar of the Pass** — focal of one saga; three ties, two of them defining; later resurfaces
+> as *"rival-of — stood against the company in the matter of 'The Cage Singer'"*.
+> **Kymme Ashworth** — *"sold by Nahikari to cover a market debt before the company took Nahikari
+> into custody"* (defining), carried across sagas.
+
+Place names recur on their own too — "Hollowfall" anchors several stories in one campaign.
+
+### The two guards that hid all of this
+
+The rules were correct and measured **0 reuses in 14 real-AI sagas**, because two twin-name guards
+(the focal similarity guard, and a second inside `addCard`) rerolled every promoted focal into a
+stranger: a face the world knows is IN the lorebook, which is exactly what `nameTooSimilar()` reads
+as a collision. The lore node had already been remapped onto the card id, so node and card then
+disagreed about who the person was. Both now take a `keepName` exemption; locked in
+`test/recurringcast.test.ts`.
+
+**Method note worth keeping:** the POOL needs real AI prose to fill (`introducedNames` is filled by
+scanning player-facing text), but the SELECTION does not. Testing selection against an *injected*
+pool turned a 46-minute debug loop into a 3-second one.
+
+## 9. Still open — §5 is NOT met
+
+**7 of 16 returning-face sagas never name the person at all.** The player holds a defining memory
+with Kymme Ashworth; the card says *"the chapel must have its priest returned… find any trace of the
+missing priest."* Not Kymme — "the missing priest".
+
+Cause: the reveal-cadence gate (`isMet`) is **per-chain**. The focal has not been introduced *in
+this saga*, so the writer withholds them — right for a stranger, exactly wrong for someone the
+company has history with. The engine knows which case it is and never tells the writer.
