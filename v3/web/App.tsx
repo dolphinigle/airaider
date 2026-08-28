@@ -346,7 +346,9 @@ function Leads({ s, queueAct }: any) {
           <td>{l.chain === 'starts-new' ? '✦ story' : l.chain === 'continues' ? '⛓ continues' : ''}</td>
           <td className="leadpay" title={l.pay?.band ? `carries a bonus onto the quest it opens` : ''}>
             {l.pay?.band ? <><span className="stars">{l.pay.stars}</span> {l.pay.label}</> : ''}</td>
-          <td>{l.title ?? ''}</td>
+          {/* ~110 archetypes: the slug is an identity, not something a player learns. When the
+              lead has no title yet, say what the job would BE. */}
+          <td>{l.title ?? l.gloss ?? ''}</td>
           <td>{l.expires === null ? 'standing' : `expires c${l.expires}`}</td>
           <td>{job
             ? <button disabled>{job.state === 'queued' ? '⋯ queued' : '✎ writing…'}</button>
