@@ -21,7 +21,7 @@ describe('leadBand', () => {
     // 200 on a common L3 investigate is a windfall; on a rare L5 raid it is pocket change
     const small = leadBand(lead({ bonus: 200 }));                                        // baseV ≈ 82
     const big = leadBand(lead({ bonus: 200, level: 5, rarity: 'rare', archetype: 'raid' })); // baseV ≈ 1225
-    expect(small.band).toBeGreaterThanOrEqual(3);   // 2.44× — a chest
+    expect(small.band).toBe(4);                     // 2.44× — worth more than the job itself
     expect(big.band).toBe(1);                       // 0.16× — a few coins more
     expect(small.band).toBeGreaterThan(big.band);
   });
@@ -37,7 +37,7 @@ describe('leadBand', () => {
   });
 
   it('names and stars line up with the band', () => {
-    for (const [ratio, label] of [[0.2, 'a few coins more'], [0.7, 'a purse'], [2, 'a chest'], [5, 'a fortune']] as const) {
+    for (const [ratio, label] of [[0.2, 'a few coins more'], [0.4, 'a purse'], [0.8, 'a chest'], [2, 'a fortune']] as const) {
       const baseV = vBase(3) * RARITY_MULT.common * expectedSlots('investigate', 'common');
       const b = leadBand(lead({ bonus: Math.round(baseV * ratio) }));
       expect(b.label).toBe(label);

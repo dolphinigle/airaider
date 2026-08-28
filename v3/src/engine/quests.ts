@@ -221,7 +221,13 @@ export function oneOffValue(rng: Rng, level: number, rarity: Rarity, n: number):
  *  windfall at level 1 and pocket change at level 8, and no single threshold describes both.
  *  Derived at call time, never stored, so retuning re-bands every lead already on the board.
  *  🛠 thresholds are a knob — set from 11,251 simulated grants (≈52/29/13/6 across the bands). */
-export const LEAD_BANDS = [0.4, 1.0, 2.5];   // 🛠
+// 🛠 retuned 2026-08-28 from PLAY, not from the design space. The first cut (0.4/1.0/2.5) came
+// from a sim that sampled source level and lead level independently, which manufactures
+// mismatches the game never produces: in play both track the roster and the GH tier, so ratios
+// compress hard — measured p50 0.31 and a MAX of 1.11 over 225 cycles, which made 3★ 3% and 4★
+// unreachable. These cuts give 43/37/17/3, and put the landmark on the top rung:
+// A FORTUNE IS WHEN THE LEAD IS WORTH MORE THAN THE QUEST IT OPENS.
+export const LEAD_BANDS = [0.25, 0.55, 1.0];   // 🛠
 export const LEAD_BAND_WORDS = ['a few coins more', 'a purse', 'a chest', 'a fortune'];
 export function leadBand(lead: Lead): { band: 0 | 1 | 2 | 3 | 4; label: string; stars: string } {
   const bonus = lead.bonus ?? 0;

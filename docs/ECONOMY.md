@@ -129,23 +129,31 @@ lead on the board instead of leaving frozen labels behind.
 | ratio | band | on the face |
 |---|---|---|
 | 0 | — | *(no marker)* |
-| ≤ 0.4 | ★☆☆☆ | a few coins more |
-| ≤ 1.0 | ★★☆☆ | a purse |
-| ≤ 2.5 | ★★★☆ | a chest |
-| > 2.5 | ★★★★ | a fortune |
+| ≤ 0.25 | ★☆☆☆ | a few coins more |
+| ≤ 0.55 | ★★☆☆ | a purse |
+| ≤ 1.0 | ★★★☆ | a chest |
+| > 1.0 | ★★★★ | a fortune |
 
 Four rungs, deliberately **not** reusing `common/uncommon/rare` (collides with the lead's own
 rarity) nor `low/mid/high/legendary` (the §9b format-lock describes a *trait's* intensity, and §8
 reserves "legendary" for tiers 13–16, 13k–92k — a lead bonus never reaches it). The ★ glyph mirrors
 `unitStars` on purpose: it answers the same question — *how far above par is this, for its level* —
 so a player who has read the marker on a soldier reads a lead for free. `1.0` is the teachable
-landmark: **a purse tops out at doubling the job.**
+landmark: **a fortune is when the lead is worth more than the quest it opens.**
 
-🛠 Thresholds are a tuning knob, set from measurement (`scripts/_leadbands.ts`, 11,251 simulated
-grants): they give ≈52 / 29 / 13 / **6%** across the four bands. An earlier 0.3/0.8/1.6 cut put "a
-fortune" at 11% — better than one banded lead in nine, which is not a fortune. **No cap** on the
-bonus: the measured maximum is ×7.7, and §3b goal 1 wants exactly that ("jackpots are possible,
-rare, exciting"). Percentages are of *banded* leads; unbanded ones outnumber all four on a real board.
+🛠 **Thresholds are a knob, and they were set from PLAY, not from a simulation.** The first cut
+(0.4 / 1.0 / 2.5) came from sampling the design space — source level and lead level drawn
+independently — which manufactures mismatches the game never produces. In real play both track the
+roster and the Great-Hall tier, so ratios compress hard: measured over **225 cycles**
+(`scripts/_leadsoak.ts`, 389 leads granted), p50 is **0.31** and the **maximum is 1.11**, which made
+3★ a 3% event and 4★ *literally unreachable*. Two of four rungs were dead content. The cuts above
+give **43 / 37 / 17 / 3%** of banded leads, and four fortunes in those 225 cycles — rare, and real.
+Percentages are of *banded* leads; unbanded ones outnumber all four (264 of 389 on a real board).
+**No cap** on the bonus itself: §3b goal 1 wants jackpots to be possible.
+
+> ⚠ The lesson is worth keeping: a distribution measured over the *design* space is not the
+> distribution the *player* meets. Band thresholds, drop rates and anything else tuned to "how often
+> should this feel special" must be measured by playing, not by sampling parameters.
 
 ### 7.3 Where bonuses come from
 
@@ -153,7 +161,7 @@ rare, exciting"). Percentages are of *banded* leads; unbanded ones outnumber all
 |---|---|
 | a quest's reserved lead share (`splitOneOff`) | the reserved value, which today is **computed and discarded** |
 | **lead-hunt** — the Scouting-lodge faucet | its existing `V × 0.7` share; measured median ratio **0.57** vs 0.26 from every other source |
-| a sequel lead when a focal slips away (§21-4a) | rarity-priced |
+| a sequel lead when a focal slips away (§21-4a) | **none** — "rarity-priced" there means the lead's own RARITY is raised by the chain's (already built). A bonus would refund the forfeited bank, and §21-4a is explicit that the forfeit *is* the sting |
 | the day-0 starter packet | 0 — no reward behind it |
 
 **Lead-hunting is prospecting, not restocking** — that falls out of the existing 0.7 share with no

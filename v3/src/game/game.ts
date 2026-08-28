@@ -2624,7 +2624,9 @@ export class Game {
       const nl = this.freshLead('reward', bonus);
       st.leads.push(nl);
       const b = leadBand(nl);
-      say(`🧭 A lead earned: ${nl.title ?? 'word worth chasing'}${b.band ? ` — ${b.label}` : ''} — see the Leads tab.`);
+      say(nl.title
+        ? `🧭 A lead earned — ${nl.title}${b.band ? `, and ${b.label} in it` : ''}. See the Leads tab.`
+        : `🧭 A lead earned${b.band ? `, with ${b.label} in it` : ''} — see the Leads tab.`);
     }
     // collector quest won → the liability is buried
     if (q.liabilityId && r.outcome !== 'failure') {
