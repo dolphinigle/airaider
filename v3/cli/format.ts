@@ -186,7 +186,10 @@ export const render = {
       const odds = filled < active.length ? 'not manned'
         : o.success !== null ? `${Math.round(o.success * 100)}% · ${o.coins}c vs ${o.bar.toFixed(1)}`
         : `${o.coins}c vs ${o.bar.toFixed(1)}`;
-      return `${q.id.padEnd(5)} ${q.title.slice(0, 38).padEnd(38)} L${q.level} ${q.rarity.padEnd(8)} ${(pips || '—').padEnd(5)} ${odds.padEnd(20)} lapses c${q.createdCycle + QUEST_TTL}${q.isFinale ? ' 🎬FINALE' : q.chainId ? ` 📖beat${q.beatIndex}` : ''}`;
+      // the reward is the most decision-relevant thing on the row, so it gets room; the rest is
+      // tightened to keep the line scannable at a normal terminal width
+      const pay = g.questReward(q.id);
+      return `${q.id.padEnd(5)} ${q.title.slice(0, 30).padEnd(30)} L${q.level} ${q.rarity.slice(0, 8).padEnd(8)} ${(pips || '—').padEnd(4)} ${odds.padEnd(17)} ${pay.slice(0, 42).padEnd(42)} c${q.createdCycle + QUEST_TTL}${q.isFinale ? ' 🎬' : q.chainId ? ` 📖${q.beatIndex}` : ''}`;
     }).join('\n');
   },
 
@@ -200,7 +203,7 @@ export const render = {
       // held to this matter: readable, never movable — the text form of the bracketed cards
       ...(cast.length ? ['ON THIS MATTER (held here — you can read them, not move them):',
         ...cast.map(c => `  ⊟ ${c.name}${c.trade ? `, ${c.trade}` : ''} — ${c.role}\n      ${c.who}`)] : []),
-      `REWARD envelope: ${q.rewardSpecs.map(r => r.kind).join(' + ') || (q.isFinale ? 'the focal character' : 'side loot')}`,
+      `REWARD: ${g.questReward(q.id)}`,
     ];
     if (q.approaches) {
       lines.push(`APPROACHES (pick one)${q.chosenApproach ? ` — chosen: ${q.chosenApproach}` : ''}:`);

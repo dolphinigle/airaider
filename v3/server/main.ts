@@ -160,7 +160,7 @@ function stateView() {
         chainId: q.chainId ?? null, beat: q.beatIndex ?? null, isFinale: !!q.isFinale,
         ready: (q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots).every(s => s.filledBy),
         approaches: q.approaches ?? null, chosenApproach: q.chosenApproach ?? null,
-        rewardEnvelope: q.rewardSpecs.map(r => r.kind).join(' + ') || (q.isFinale ? 'the focal character' : 'side loot'),
+        rewardEnvelope: game.questReward(q.id),
         odds: o,
         cast: game.questCast(q.id),
         lapsesAtCycle: q.createdCycle + QUEST_TTL,

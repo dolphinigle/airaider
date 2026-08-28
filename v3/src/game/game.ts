@@ -1991,6 +1991,33 @@ export class Game {
     return { ok: placed > 0, msg: placed ? `${n(placed, 'soldier')} named across ${n(open.length, 'quest')}` : 'nobody free fits anything', placed };
   }
 
+  /** WHAT THIS PAYS, in the player's words — the ENVELOPE (QUESTS §68: kind and shape, and the
+   *  engine's own numbers, which the game states plainly everywhere else). One implementation, so
+   *  the board, the quest page and the text UI can never disagree about what a job is worth.
+   *
+   *  A saga BEAT names both halves: the side loot it pays now, and what the whole matter comes to
+   *  — that second number is the reason to take the next beat, and a beat that only advertises its
+   *  loot undersells itself badly. A FINALE pays the person at the centre, named only once the
+   *  player has met them (the same gate the card writer uses). */
+  questReward(questId: string): string {
+    const q = this.state.quests.find(x => x.id === questId);
+    if (!q) return '';
+    const chain = q.chainId ? this.state.chains.find(c => c.id === q.chainId) : undefined;
+    const NAME: Record<string, string> = {
+      captive: 'a captive', recruit: 'a recruit', relic: 'a relic', lead: 'a lead',
+    };
+    const gold = q.rewardSpecs.filter(r => r.kind === 'gold').reduce((n, r) => n + r.value, 0);
+    const parts = q.rewardSpecs.filter(r => r.kind !== 'gold').map(r => NAME[r.kind] ?? r.kind);
+    if (gold >= 1) parts.push(`${Math.round(gold)}g`);
+    if (q.isFinale) {
+      const focal = chain ? this.card(chain.focalId) : undefined;
+      const named = !!focal && !!chain && this.isMet(chain, focal.name, `${q.situation} ${q.job}`);
+      parts.unshift(named ? focal!.name : 'the one at the heart of it');
+    }
+    const now = parts.join(' + ') || 'side loot';
+    return chain && !q.isFinale ? `${now} · ~${Math.round(chain.payoff)}g when it's done` : now;
+  }
+
   /** raw odds — ALWAYS visible (QUESTS §3); the Oracle adds computed % */
   questOdds(questId: string): { coins: number; bar: number; success: number | null; partial: number | null; precision: 0 | 1 | 2 } {
     const q = this.state.quests.find(x => x.id === questId)!;

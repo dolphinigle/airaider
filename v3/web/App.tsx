@@ -468,6 +468,7 @@ function Board({ s, doAct, setOpen }: any) {
               <div className="t">{q.title}</div>
               <div className="sit">{clip(q.situation, 150)}</div>
               <div className="tag">
+                <span className="pay">{q.rewardEnvelope}</span>
                 <span>{q.rarity} · level {q.level}</span>
                 {q.isFinale ? <span className="saga">🎬 finale</span>
                   : q.chainId ? <span className="saga">beat {q.beat}</span> : <span>one-off</span>}

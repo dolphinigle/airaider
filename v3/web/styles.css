@@ -147,6 +147,7 @@ tr.leadworking button:disabled { color: #c9b86a; border-color: #4a4130; cursor: 
 .qrow .tag{margin-top:6px;display:flex;gap:12px;flex-wrap:wrap;font-size:10px;letter-spacing:.07em;
   text-transform:uppercase;color:#5c646e}
 .qrow .tag .saga{color:var(--brass)}
+.qrow .tag .pay{color:#cbb37a;text-transform:none;letter-spacing:.02em;font-size:11px}
 .qrow .side{flex:0 0 auto;display:flex;align-items:center;gap:15px;padding:14px 16px 14px 8px}
 .pips{display:flex;gap:5px}
 .pip{width:14px;height:20px;border-radius:2px;background:rgba(0,0,0,.3);
