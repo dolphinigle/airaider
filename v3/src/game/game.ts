@@ -36,7 +36,7 @@ import {
   newGraph, recall, renderDossier, decayPass, guardEdges, chronicleOf, addEdge, touchEdge,
   type LoreGraph, type LoreNode,
 } from '../engine/lore.js';
-import { rollName, rollPlaceName } from '../engine/names.js';
+import { rollName, rollPlaceName, introducePlace } from '../engine/names.js';
 import { hasClash, queryMatches } from '../engine/overlap.js';
 import { questXp, grantXp, rollBase, rollGrowthLean, growToLevel } from '../engine/growth.js';
 import { coins, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, explainCoins, type SlotTest, type Outcome, type QuestRollResult } from '../engine/roll.js';
@@ -105,6 +105,20 @@ export interface GameState {
    *  default to done — no retro-drip mid-campaign) */
   starterDripped?: number;
   log: LogEntry[];
+}
+
+/** An appositive opens with a comma and must close with one: dealt "a river hamlet, Tarnford",
+ *  the writer pastes "The gravedigger of the river hamlet, Tarnford took it" and the sentence
+ *  reads as a list until the reader backs up. The engine deals the phrase, so the engine owns
+ *  its punctuation (L19: a dealt string is pasted where it lands, so it must PARSE there). */
+function closeAppositive(text: string, name: string): string {
+  const i = text.indexOf(name);
+  if (i < 0) return text;
+  const before = text.slice(0, i), after = text.slice(i + name.length);
+  if (!/,\s*$/.test(before)) return text;                 // not an appositive here
+  if (after === '' || /^\s*$/.test(after)) return text;
+  if (/^[,.;:!?)]|^'s\b|^\u2019s\b/.test(after)) return text;   // already closed, or a possessive
+  return before + name + ',' + after;
 }
 
 export class Game {
@@ -1055,7 +1069,10 @@ export class Game {
     // no intake, no place names, no landmark. Cutting the inputs is what shortens the card; the
     // prompt only says how to spend what it got. Serious/grave one-offs keep the full deal.
     const light = gravity.startsWith('a small');
-    const out = this.stripJobEcho(await this.ai.writeQuest({
+    // ONE place, dealt already introduced ("a mill town, Sedgedale") — two suggestions is
+    // exactly how a card ended up carrying three toponyms the reader could not place
+    const dealtPlace = light ? undefined : introducePlace(this.freshPlaceName(lead.region), this.rng);
+    const out = this.introduceDealtPlace(dealtPlace, this.stripJobEcho(await this.ai.writeQuest({
       kind: 'one-off', archetype: lead.archetype,
       location: this.locationLine(lead.region, light ? false : lmOk, !light),
       level: lead.level, rarity: lead.rarity,
@@ -1076,7 +1093,9 @@ export class Game {
       opening: !light && dealSpark && lead.source !== 'interrogation' ? { spark: opening.spark } : undefined,
       intake: light ? undefined : intake,
       gravity,
-      placeNameSuggestions: light ? undefined : [this.freshPlaceName(lead.region), this.freshPlaceName(lead.region)],
+      // ONE place, dealt already introduced ("a mill town, Sedgedale") — two suggestions is
+      // exactly how a card ended up carrying three toponyms the reader could not place
+      placeNameSuggestions: dealtPlace ? [dealtPlace] : undefined,
       // ANONYMITY BY OMISSION (2026-07-06; widened 2026-07-16 designer ruling): one-off folk
       // stay nameless by trade with NO gravity exception — any dealt name gravitates the card
       // ("Briis" made routine work read important). The quarry keeps theirs via
@@ -1110,7 +1129,7 @@ export class Game {
         partial: true,   // the writer SHAPES this person via quarryTags
       } : null,
       avoid: this.recentCardTitles.slice(-10),
-    }));
+    })));
     // ⚠ TEMPO I3/I4 — the ONE anti-repetition window that concurrency actually exposes: `avoid`
     // was read from this list BEFORE the call (above) and the title only exists AFTER it, so two
     // one-offs written at once are each blind to the other's title. Unhoistable by construction;
@@ -2734,6 +2753,28 @@ export class Game {
   /** A card that opens lowercase is a rendering defect the player sees before any prose —
    *  measured 2/10 on a live sweep ("an elven apiarist, Nithonda, stands in the yard…"). The
    *  engine owns the first character; no prompt rule is needed for a one-line deterministic fix. */
+  /** The engine deals ONE place, already introduced ("a mill town, Sedgedale"), and the card is
+   *  told to paste it whole. Measured 2026-08-28: it pastes the NAME and drops the introduction
+   *  often enough to matter, and no prompt lever moved that last stretch (0% -> 39% by position,
+   *  -> 63% by dealing the introduction, then flat). So the engine puts it back: it knows both
+   *  forms, this is a string splice and not a second call, and §0 ranks enforcement above wording.
+   *  The FIRST mention gets the introduction; later ones are correct English as they stand. */
+  private introduceDealtPlace<T extends { situation: string }>(dealt: string | undefined, out: T): T {
+    if (!dealt) return out;
+    const [kind, name] = [dealt.slice(0, dealt.lastIndexOf(', ')), dealt.slice(dealt.lastIndexOf(', ') + 2)];
+    if (!name || !kind) return out;
+    const at = out.situation.indexOf(name);
+    if (at < 0) return out;                                   // the card never used it — fine
+    const before = out.situation.slice(0, at);
+    const introduced = /(a|an|the)\s+[a-z' -]+,\s*$/i.test(before);   // the writer introduced it itself
+    const body = introduced
+      ? out.situation
+      // sentence-initial: "Sedgedale pays coin" -> "A mill town, Sedgedale, pays coin"
+      : before + (before === '' || /[.!?]\s+$/.test(before) ? kind.charAt(0).toUpperCase() + kind.slice(1) : kind)
+        + ', ' + out.situation.slice(at);
+    return { ...out, situation: closeAppositive(body, name) };
+  }
+
   private capitalizeCard<T extends { situation: string; title: string }>(out: T): T {
     const up = (t: string) => t
       .replace(/^\s*([a-z])/, (_m, c: string) => c.toUpperCase())

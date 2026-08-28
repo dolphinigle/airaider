@@ -8,6 +8,7 @@ import { makeOpenAiProvider } from '../src/ai/openai.js';
 import { ARCHETYPE_NAMES, glossOf } from '../src/engine/archetypes.js';
 import { Rng } from '../src/engine/rng.js';
 import type { Lead } from '../src/engine/quests.js';
+import { REGION } from '../src/engine/regions.js';
 
 const seed = Number(process.argv[2] ?? 8001);
 const want = Number(process.argv[3] ?? 12);
@@ -16,7 +17,8 @@ const pool = ARCHETYPE_NAMES.filter(a => a !== 'lead-hunt');
 
 /** a capitalised token that is NOT sentence-initial and is not introduced appositively
  *  ("a mill town, Hawford") is a name the reader was handed cold. */
-function nakedNames(text: string): string[] {
+function nakedNames(text: string, dealt: string[] = []): string[] {
+  const known = new Set(dealt.flatMap(d => d.split(/[^A-Za-z']+/)).filter(Boolean));
   const out: string[] = [];
   for (const sent of text.split(/(?<=[.!?])\s+/)) {
     const toks = sent.split(/\s+/);
@@ -26,7 +28,7 @@ function nakedNames(text: string): string[] {
       if (/^(The|A|An|He|She|They|It|His|Her|Their|No|Not|Their)$/.test(w)) continue;
       const prev = toks[i - 1]!;
       const appositive = /,$/.test(prev);            // "…a mill town, Hawford…"
-      if (!appositive) out.push(w);
+      if (!appositive && !known.has(w) && !known.has(w.replace(/'s$/, ''))) out.push(w);
     }
   }
   return out;
@@ -45,7 +47,10 @@ for (let i = 0; i < want; i++) {
   const r = await g.pursue(lead.id);
   if (!r.ok || !r.questId) { console.log(`!! ${arch}: ${r.msg}`); continue }
   const q = g.state.quests.find(x => x.id === r.questId)!;
-  const naked = nakedNames(q.situation);
+  // only the REGION is something the player already knows. A dealt person's name still has to be
+  // introduced on the card — that it was dealt is no help to the reader meeting it.
+  const dealt = [REGION[lead.region]?.name ?? '', REGION[lead.region]?.landmark ?? ''].filter(Boolean);
+  const naked = nakedNames(q.situation, dealt);
   rows.push({ arch, gravity: q.gravity ?? '?', card: q.situation, naked });
   console.log(`### ${arch} — ${q.gravity}\nGLOSS: ${glossOf(arch as never)}\nCARD:  ${q.situation}\nNAKED: ${naked.join(', ') || '—'}\n`);
 }

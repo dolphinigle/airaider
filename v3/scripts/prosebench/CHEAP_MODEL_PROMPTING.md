@@ -250,3 +250,46 @@ INPUT would have to be for the defect to be impossible.
 something deliberate in that area. Two of my prompt edits (a saga pay rule, this keyword mandate)
 contradicted deliberate engine design and had to be reverted. A contradiction inside a cheap-model
 prompt is worse than either instruction alone.
+
+---
+
+**L25. The whole lever hierarchy, measured end to end on one defect, in one sitting.** The defect:
+a heavy one-off card hands the reader invented place names it never introduces — *"Raiders from
+Tarncombe hold the packs at Hawford"*, three toponyms in one card, none of which mean anything to
+anyone. Clean cards, out of the heavy cards in each run, as each lever was applied in turn
+(gpt-5-mini, `low` effort, two seeds per rung, 8–23 heavy cards per rung):
+
+| rung | lever | clean |
+|---|---|---|
+| 0 | no rule at all | **0 %** |
+| 1 | the rule, written mid-bullet in the card spec | **0 %** |
+| 2 | the same rule, moved into the numbered `ABOVE ALL` block | **39 %** |
+| 3 | + the engine deals the place already introduced (`"a mill town, Sedgedale"`) | **63 %** |
+| 4 | + the prompt stops ordering the person's name FIRST | 62 % (noise) |
+| 5 | + the engine splices the introduction back in when the card drops it | **100 %** |
+| 6 | + the engine closes the appositive it opened | **94 %** (31/32 over rungs 5–6) |
+
+Read the table as the hierarchy itself: **wording bought nothing** (rung 1 — the same words, and
+the model never once obeyed them). **Position bought 39 points** for zero extra words. **Input
+shaping bought 24 more.** **Enforcement bought the rest**, and only enforcement ever reached the
+tail.
+
+Three things worth keeping:
+
+- **Rung 1 failing at *zero* is the finding.** Not "it helped a little" — the rule was present,
+  legible, and unambiguous, and it changed nothing at all. A cheap model does not weigh a rule it
+  reads in passing.
+- **Rung 2 stalled at 39 % because the engine was contradicting the rule.** The prompt said "no
+  proper nouns" while the payload was, at that very moment, handing the card two bare toponyms to
+  use. A rule the input contradicts is not a weak rule, it is a dead one. (See the L24 corollary:
+  check what the engine already does before writing the rule.)
+- **Rung 4 is in the table because it did nothing.** It was a real fix — the prompt genuinely did
+  order the framed person's name to come FIRST, which is the very defect the saga side had already
+  been fixed for — and the measurement still says 62 % against 63 %. Keep the change for being
+  right; do not claim it as an improvement. A rung that measures flat is worth writing down.
+
+**L26. When you deal a phrase, you own its punctuation.** Rung 5 got every place introduced and
+still read badly: *"The gravedigger of the river hamlet, Tarnford took it."* The writer pasted the
+dealt appositive faithfully and never closed it, so the sentence reads as a list until the reader
+backs up. This is L19 with the other shoe dropped — a dealt string has to *parse* where it lands,
+not merely be grammatical on its own. The engine opened the comma, so the engine closes it.
