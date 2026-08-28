@@ -38,7 +38,13 @@ function tabLock(s: S, t: string): string | null {
 
 export function App() {
   const [s, setS] = useState<S | null>(null);
-  const [tab, setTab] = useState('fort');
+  // ?quest=<id> deep-links straight to a quest page (and is how a headless browser gets there)
+  // ?tab=<name> and ?quest=<id> deep-link into the app (and are how a headless browser reaches
+  // a screen that normally needs clicks)
+  const [tab, setTab] = useState(() => {
+    const p = new URLSearchParams(location.search);
+    return p.get('quest') ? 'quests' : p.get('tab') || 'fort';
+  });
   const [toast, setToast] = useState('');
   const [busy, setBusy] = useState(false);
   const [pending, setPending] = useState<string | null>(null);
@@ -372,58 +378,222 @@ function Queue({ jobs, queueAct }: { jobs: any[]; queueAct: any }) {
   );
 }
 
+/* ═══ THE QUEST SURFACE ══════════════════════════════════════════════════════════════════
+   Two screens, per docs/QUEST_SCREEN.md. THE BOARD is a list you can man without opening
+   anything (G4). THE QUEST is its own page: the writ on paper, the saga's own people held in
+   brackets beside it, the slots, and the odds (G1-G3). Every placement goes through the engine
+   (G5) — assign / auto / autoall are the same calls the CLI's `auto` makes. */
 function Quests({ s, doAct }: any) {
+  // ?quest=<id> opens a quest straight away — a real deep link, and the only way to put the
+  // quest page in front of a headless browser for a screenshot
+  const [open, setOpen] = useState<string | null>(new URLSearchParams(location.search).get('quest'));
+  const [active, setActive] = useState<number | null>(null);   // the slot being filled
+  const [read, setRead] = useState<any>(null);                 // a held card being read
+  const q = open ? s.quests.find((x: any) => x.id === open) : null;
+  useEffect(() => { if (open && !q) setOpen(null) }, [open, q]);   // it lapsed or marched
+  useEffect(() => { setActive(null) }, [open]);
   if (!s.quests.length) return <p>No open quests. Pursue a lead.</p>;
+  const slots = q ? activeSlots(q) : [];
+  const free = s.roster.filter((m: any) => m.location?.kind === 'held');
+  const place = (idx: number, id: string) => { setActive(null); doAct('assign', q.id, idx, id) };
+  return (<>
+    {q
+      ? <QuestPage s={s} q={q} doAct={doAct} active={active} setActive={setActive}
+          back={() => setOpen(null)} read={read} setRead={setRead} />
+      : <Board s={s} doAct={doAct} setOpen={setOpen} />}
+    <Hand free={free} slots={slots} active={active} onPick={(id: string) => {
+      if (!q) return;
+      if (active != null) return place(active, id);
+      const first = slots.find((x: any) => !x.filledBy); if (first) place(first.idx, id);
+    }} note={!q ? `${free.length} of ${s.roster.length} unspoken for.`
+      : active == null ? 'Click a slot to see who fits.' : 'Best first.'} />
+  </>);
+}
+
+const activeSlots = (q: any) => q.approaches ? q.slots.filter((x: any) => x.groupId === q.chosenApproach) : q.slots;
+const clip = (t: string, n: number) => t.length <= n ? t : t.slice(0, t.lastIndexOf(' ', n)) + '…';
+
+function Hand({ free, slots, active, onPick, note }: any) {
+  const fitOf = (id: string) => active == null ? null
+    : slots.find((x: any) => x.idx === active)?.fits.find((f: any) => f.id === id)?.coins ?? null;
+  const shown = active == null ? free : [...free].sort((a: any, b: any) => (fitOf(b.id) ?? 0) - (fitOf(a.id) ?? 0));
   return (
-    <div>
-      {s.quests.map((q: any) => (
-        <div className="quest" key={q.id}>
-          <h3>{q.title} <small>L{q.level} · <span style={{ color: RARITY_COLOR[q.rarity] }}>{q.rarity}</span> · {q.region} · lapses c{q.lapsesAtCycle}{q.isFinale ? ' · 🎬 FINALE' : q.chainId ? ` · beat ${q.beat}` : ''}</small></h3>
-          <p style={{ whiteSpace: 'pre-wrap' }}>{q.situation}</p>
-          <p><b>REWARD:</b> {q.rewardEnvelope}</p>
-          {q.approaches && (
-            <div className="approaches">
-              <b>APPROACH (each branch rolls its own test):</b>
-              {q.approaches.map((a: any) => {
-                const sl = q.slots.find((x: any) => x.groupId === a.id);
-                return (
-                  <div key={a.id} className="slotrow">
-                    <button className={q.chosenApproach === a.id ? 'on' : ''}
-                      onClick={() => doAct('approach', q.id, a.id)}>{a.label} → {a.rewardKind}</button>
-                    {sl && <span>tests <b>{sl.test.attributes.join('+').toUpperCase()}</b> ({sl.test.difficulty}, bar {sl.test.bar.toFixed(1)})
-                      {sl.test.favored.length > 0 && <> · favors <i>{sl.test.favored.join(', ')}</i></>}
-                      {sl.fits?.[0] && <> · best: {sl.fits[0].name} {sl.fits[0].coins}c</>}</span>}
-                  </div>
-                );
-              })}
+    <div className="qhand">
+      <div className="handlabel">The company</div>
+      <div className="handscroll">
+        {shown.length === 0 && <span className="handnote">Everyone is spoken for.</span>}
+        {shown.map((m: any) => {
+          const fit = fitOf(m.id);
+          return (
+            <button className={'qcard' + (m.character.injury > 0 ? ' injured' : '')} key={m.id} draggable
+              onDragStart={e => e.dataTransfer.setData('text/plain', m.id)}
+              onClick={() => onPick(m.id)}>
+              {fit != null && <span className={'fit' + (fit >= 8 ? ' good' : fit <= 3 ? ' bad' : '')}>{fit}c</span>}
+              <span className="nm">{m.name}</span>
+              <span className="sub">lvl {m.character.level} · {'★'.repeat(m.stars)}{'☆'.repeat(4 - m.stars)}</span>
+              <span className="tags">{m.tags}</span>
+            </button>);
+        })}
+      </div>
+      <div className="handnote">{note}</div>
+    </div>
+  );
+}
+
+function Board({ s, doAct, setOpen }: any) {
+  return (
+    <div className="board-list">
+      <div className="listhead">
+        <h3>The board</h3>
+        <span className="n">{s.quests.length} open · cycle {s.cycle}</span>
+        <button className="act auto" onClick={() => doAct('autoall')}>Auto-fill every quest</button>
+      </div>
+      {s.quests.map((q: any) => {
+        const act = activeSlots(q), filled = act.filter((x: any) => x.filledBy).length;
+        return (
+          <div className="qrow" key={q.id}>
+            <button className="open" onClick={() => setOpen(q.id)}>
+              <div className="t">{q.title}</div>
+              <div className="sit">{clip(q.situation, 150)}</div>
+              <div className="tag">
+                <span>{q.rarity} · level {q.level}</span>
+                {q.isFinale ? <span className="saga">🎬 finale</span>
+                  : q.chainId ? <span className="saga">beat {q.beat}</span> : <span>one-off</span>}
+                <span>lapses c{q.lapsesAtCycle}</span>
+              </div>
+            </button>
+            <div className="side">
+              <div className="pips">{act.map((x: any, i: number) =>
+                <span key={i} className={'pip' + (x.filledBy ? ' on' : '')} />)}</div>
+              <div className="rowstate">
+                <span>{filled}/{act.length} named</span>
+                <span>{filled < act.length ? 'not manned'
+                  : q.odds.success !== null
+                    ? <><b className={q.odds.success < .4 ? 'thin' : ''}>{Math.round(q.odds.success * 100)}%</b> · {q.odds.coins}c vs {q.odds.bar.toFixed(1)}</>
+                    : <>{q.odds.coins}c vs {q.odds.bar.toFixed(1)}</>}</span>
+              </div>
+              <button className="act auto" onClick={() => doAct('auto', q.id)}>Auto</button>
             </div>
-          )}
-          {q.slots.filter((sl: any) => !q.approaches || sl.groupId === q.chosenApproach).map((sl: any) => (
-            <div key={sl.idx} className="slotrow">
-              <span>
-                tests <b>{sl.test.attributes.join('+').toUpperCase()}</b> ({sl.test.difficulty}, bar {sl.test.bar.toFixed(1)})
-                {sl.test.favored.length > 0 && <> · favors <i>{sl.test.favored.join(', ')}</i></>}
-                {sl.test.clashing.length > 0 && <> · clashes <i>{sl.test.clashing.join(', ')}</i></>}
-                {sl.requirement && <> · <b>⚑ {sl.requirement}</b></>}
-              </span>
-              {sl.filledBy
-                ? <span title={sl.filledExplain ?? ''}><b>{sl.filledBy}</b> <small>({sl.filledExplain})</small> <button onClick={() => doAct('unassign', q.id, sl.idx)}>×</button></span>
-                : <select defaultValue="" onChange={e => e.target.value && doAct('assign', q.id, sl.idx, e.target.value)}>
-                    <option value="">— assign (best coins first) —</option>
-                    {sl.fits.map((f: any) => <option key={f.id} value={f.id} title={f.explain}>{f.name} ({f.coins}c · {f.explain})</option>)}
-                  </select>}
-            </div>
-          ))}
-          <p className="odds">
-            {q.approaches && !q.chosenApproach ? <>ODDS: pick an approach first</>
-              : !q.ready ? <>⏸ will not march — every slot must be filled</>
-              : <>ODDS: {q.odds.coins} coins vs bar {q.odds.bar.toFixed(1)}</>}
-            {q.odds.success !== null && <> → success <b>{Math.round(q.odds.success * 100)}%</b> · partial+ {Math.round(q.odds.partial * 100)}%{q.odds.precision === 1 ? ' (coarse)' : ''}</>}
-            {q.odds.success === null && ' (build an Oracle for %)'}
-            <button className="danger" onClick={() => doAct('abandon', q.id)}>abandon</button>
-          </p>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function QuestPage({ s, q, doAct, active, setActive, back, read, setRead }: any) {
+  const act = activeSlots(q), filled = act.filter((x: any) => x.filledBy).length;
+  const ready = filled === act.length && act.length > 0;
+  const free = s.roster.filter((m: any) => m.location?.kind === 'held');
+  const place = (idx: number, id: string) => { setActive(null); doAct('assign', q.id, idx, id) };
+  const line = !ready
+    ? (filled === 0 ? `${['Nobody','One','Two','Three','Four','Five'][act.length] ?? act.length} must go. Nobody is on the board yet.` : `${act.length - filled} still to name.`)
+    : q.odds.success === null ? 'They are named. Build an Oracle to read the odds.'
+    : q.odds.success > .8 ? 'They should manage this between them.'
+    : q.odds.success > .55 ? 'It could go either way, but the odds lean your way.'
+    : q.odds.success > .3 ? 'Thin. Someone will likely come home hurt.'
+    : 'You are sending them to fail.';
+  const pct = ready && q.odds.success !== null ? q.odds.success : 0;
+  return (
+    <div className="questpage">
+      <div className="qleft">
+        <button className="back" onClick={back}>← the board</button>
+        <div className="writ">
+          <h1>{q.title}</h1>
+          <div className="wmeta">
+            <span>{q.rarity} · level {q.level}</span>
+            {q.isFinale ? <span>finale</span> : q.chainId ? <span>beat {q.beat}</span> : <span>one-off</span>}
+            <span>lapses c{q.lapsesAtCycle}</span>
+          </div>
+          <p>{q.situation}</p>
+          <div className="errand"><b>THE ERRAND</b> {q.job}<br /><b>THE PAY</b> {q.rewardEnvelope}</div>
         </div>
-      ))}
+        {q.approaches && (
+          <div className="instrument">
+            <div className="sect">Pick an approach — each rolls its own test</div>
+            <div className="acts">{q.approaches.map((a: any) =>
+              <button key={a.id} className={'act' + (q.chosenApproach === a.id ? ' go' : '')}
+                onClick={() => doAct('approach', q.id, a.id)}>{a.label} → {a.rewardKind}</button>)}</div>
+          </div>
+        )}
+        <div className="instrument">
+          <div className="gauge">
+            {q.odds.success !== null && <svg width="120" height="78" viewBox="0 0 120 78" aria-hidden="true">
+              <path d="M14 66a46 46 0 0 1 92 0" fill="none" stroke="#39414a" strokeWidth="9" strokeLinecap="round" />
+              <path d="M14 66a46 46 0 0 1 92 0" fill="none" stroke="#c69440" strokeWidth="9" strokeLinecap="round"
+                strokeDasharray="145" strokeDashoffset={145 - 145 * pct} />
+              <g style={{ transform: `rotate(${-90 + 180 * pct}deg)`, transformOrigin: '60px 66px', transition: 'transform .45s' }}>
+                <line x1="60" y1="66" x2="60" y2="26" stroke="#c69440" strokeWidth="2.5" strokeLinecap="round" /></g>
+              <circle cx="60" cy="66" r="4.5" fill="#c69440" />
+            </svg>}
+            <div className="oddstext">
+              <div className="line">{line}</div>
+              <div className="nums">{q.odds.coins} coins against a bar of {q.odds.bar.toFixed(1)}
+                {ready && q.odds.success !== null ? ` · about ${Math.round(q.odds.success * 100)}%` : ` · ${filled}/${act.length} named`}</div>
+            </div>
+          </div>
+          <div className="acts">
+            <button className="act go" disabled={!ready}>Send them</button>
+            <button className="act auto" onClick={() => doAct('auto', q.id)}>Auto-assign</button>
+            <button className="act" onClick={() => act.forEach((x: any) => x.filledBy && doAct('unassign', q.id, x.idx))}>Clear</button>
+            <button className="act" onClick={back}>Leave it</button>
+          </div>
+        </div>
+      </div>
+
+      <div className="qright">
+        {q.cast?.length > 0 && (
+          <div className="rack">
+            <div className="sect">On this matter</div>
+            <div className="people">{q.cast.map((c: any, i: number) => (
+              <div className="person" key={i}>
+                <button className="qcard held" onClick={() => setRead(c)}>
+                  <span className="nm">{c.name}</span>
+                  {c.trade && <span className="sub">{c.trade}</span>}
+                  <span className="tags">{c.role}</span>
+                </button>
+                <div className="cap">held to this matter</div>
+              </div>))}</div>
+          </div>
+        )}
+        <div className="rack">
+          <div className="sect">Who you send</div>
+          <div className="slots">{act.map((sl: any) => {
+            const m = sl.filledBy ? s.roster.find((r: any) => r.id === sl.filledId) : null;
+            return (
+              <div className="slotwrap" key={sl.idx}>
+                <div className={'dropzone' + (active === sl.idx ? ' active' : '')}
+                  onDragOver={e => { e.preventDefault(); e.currentTarget.classList.add('over') }}
+                  onDragLeave={e => e.currentTarget.classList.remove('over')}
+                  onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('over');
+                    const id = e.dataTransfer.getData('text/plain'); if (id) place(sl.idx, id) }}>
+                  {m
+                    ? <button className="qcard picked" onClick={() => doAct('unassign', q.id, sl.idx)} title="click to free">
+                        <span className="fit">{sl.filledCoins}c</span>
+                        <span className="nm">{m.name}</span>
+                        <span className="sub">lvl {m.character.level} · {'★'.repeat(m.stars)}{'☆'.repeat(4 - m.stars)}</span>
+                        <span className="tags">{m.tags}</span></button>
+                    : <button className="slot required" onClick={() => setActive(active === sl.idx ? null : sl.idx)}>
+                        <svg viewBox="0 0 36 46" className="ghost" aria-hidden="true"><path d="M18 4a7.5 7.5 0 1 1 0 15 7.5 7.5 0 0 1 0-15Zm0 17c8.6 0 15 5.2 15 12.6V46H3V33.6C3 26.2 9.4 21 18 21Z" /></svg>
+                        <span className="want">DRAG OR CLICK</span></button>}
+                </div>
+                <div className="demand">
+                  <div>{sl.test.attributes.join('+').toUpperCase()} · bar {sl.test.bar.toFixed(1)}</div>
+                  {sl.test.favored.length > 0 && <div className="up">helps: {sl.test.favored.join(', ')}</div>}
+                  {sl.test.clashing.length > 0 && <div className="down">hurts: {sl.test.clashing.join(', ')}</div>}
+                  {sl.requirement && <div><b>⚑ {sl.requirement}</b></div>}</div>
+              </div>);
+          })}</div>
+        </div>
+      </div>
+
+      {read && <div className="reader" onClick={() => setRead(null)}>
+        <div className="sheet" onClick={e => e.stopPropagation()}>
+          <h2>{read.name}</h2>
+          <div className="role">{read.trade} · {read.role}</div>
+          <p>{read.who}</p>
+          <div className="tagline">Held to this matter. You can read them; you cannot move them.</div>
+        </div></div>}
     </div>
   );
 }

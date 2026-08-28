@@ -162,6 +162,7 @@ function stateView() {
         approaches: q.approaches ?? null, chosenApproach: q.chosenApproach ?? null,
         rewardEnvelope: q.rewardSpecs.map(r => r.kind).join(' + ') || (q.isFinale ? 'the focal character' : 'side loot'),
         odds: o,
+        cast: game.questCast(q.id),
         lapsesAtCycle: q.createdCycle + QUEST_TTL,
         slots: q.slots.map((s, i) => ({
           idx: i, groupId: s.groupId ?? null,
@@ -171,6 +172,7 @@ function stateView() {
           test: { ...s.test, bar: slotThreshold(s.test) },
           filledBy: s.filledBy ? game.card(s.filledBy)!.name : null, filledId: s.filledBy,
           filledExplain: s.filledBy ? explainCoins(game.card(s.filledBy)!, s.test) : null,
+          filledCoins: s.filledBy ? coins(game.card(s.filledBy)!, s.test) : null,
           fits: game.roster().filter(m => m.location.kind === 'held')
             .map(m => ({ id: m.id, name: m.name, coins: coins(m, s.test), explain: explainCoins(m, s.test) }))
             .sort((a, b) => b.coins - a.coins),
@@ -277,6 +279,8 @@ async function handleAction(body: { type: string; args: (string | number)[] }) {
       break;
     }
     case 'assign': result = game.assign(s(a[0]), n(a[1]), s(a[2])); break;
+    case 'auto': result = game.autoAssign(s(a[0])); break;
+    case 'autoall': result = game.autoAssignAll(); break;
     case 'unassign': result = game.unassign(s(a[0]), n(a[1])); break;
     case 'approach': result = game.chooseApproach(s(a[0]), s(a[1])); break;
     case 'abandon': result = game.abandon(s(a[0])); break;
