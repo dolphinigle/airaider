@@ -1,0 +1,82 @@
+# RECURRING CAST — the goal 🔒
+
+**Status:** GOAL, set by the designer 2026-08-28. Mechanisms ruled; implementation and tuning open.
+This supersedes LORE.md's assumption that decay alone keeps the world's population healthy — see §4.
+
+## 1. The goal, in the designer's words
+
+> *"btw npcs are reusable right? eg you can re-met the same npc and their history grow?"*
+> *"instead of growing it each time [it] should do something so the list remains ok sized OR the
+> unit chance to appear is ok ish"*
+> *"i think instead of hard deletion, just make the units weighted proportionally by edge count?
+> also yes probably want the chance of making a new NPC to get LOWER AND LOWER as the number of
+> npc increase?"*
+
+**The world should have a CAST, not a census.** A handful of people the player actually knows, who
+come back, whose history with the company accumulates — and against whom the occasional stranger
+still arrives. Not thirty names met once each.
+
+## 2. What is wrong today (measured 2026-08-28)
+
+- A saga brings back a known face **~0.14 times per campaign** — about once in seven campaigns.
+- When it does, it picks **uniformly** over every character ever recorded, so a given person's
+  chance is 1/N and falls as the world fills. This is the designer's "each unit reappear chance
+  becomes tiny".
+- Nothing bounds N. `decayPass` retires **edges**, never nodes, and half of all character nodes are
+  created with **no edge at all** (see §4), so they have no salience to decay and can never be
+  forgotten. The list only grows.
+
+## 3. The two ruled mechanisms 🔒
+
+1. **The chance of coining a NEW person falls as the cast grows.** A sliding chance, never a hard
+   cap — the world must stay able to surprise. `P(new) = θ / (θ + N)`.
+2. **Reuse is weighted proportionally by EDGE COUNT** — how many matters that person has already
+   been part of. Someone in three of your sagas is three times likelier than someone in one.
+
+**No hard deletion, and no eviction.** 🔒 Nothing is pruned; the list simply stops needing to grow.
+(LORE.md's soft-delete rule stands: nothing is ever hard-deleted, and the Chronicle keeps everything.)
+
+These interlock, and neither works alone: weighting is uniform while everyone has one edge, and a
+falling coin-rate alone just rotates strangers evenly. Rule 1 forces a reuse → the reuse adds an
+edge → rule 2 favours that person next time. That bootstrap is the whole design.
+
+## 4. The blocker this must fix on the way
+
+`LORE.md` §10 specifies story-NPC write-back at saga CLOSE: met-only, **cap 2/saga**, each with one
+memory edge. That code exists (`game.ts:3130`) and never runs: a second write-back at
+`game.ts:1575` fires first at GENESIS, records **every** cast member — unmet, uncapped, **and with
+no edge** — and the close-time path then skips them on its name check. Deleting the genesis
+write-back is a prerequisite, not a nicety: **edge-count weighting is a no-op unless every recorded
+person has edges.**
+
+## 5. The story must SAY when you already know someone 🔒
+
+> *"also need to note in story whether you already know someone or not i think then?"*
+
+A returning face is worth nothing if the card introduces them as a stranger. When a saga reuses
+someone, the prose must land as recognition — the known-new contract inverted: a person the player
+has met is **already definite**, and re-introducing them ("a widow, Maldea") reads as amnesia.
+The engine knows which it is; the writer must be told, and the card must show it.
+
+## 6. What "achieved" means
+
+Mechanical (simulate):
+- cast size grows **sub-linearly** in sagas played — no cap needed to make that true;
+- a campaign of ~12 sagas produces **one face in 4+ of them** and a supporting cast of 3–4;
+- the top face's chance of being the next return is **~25%**, not 1/N;
+- **zero** edgeless character nodes.
+
+Felt (read real AI output):
+- a returning face reads as returning — the card knows the player has met them;
+- their accumulated history is visible and consistent with what actually happened;
+- the world still admits strangers, and a stranger reads as a stranger.
+
+## 7. Open
+
+- **θ** — the coining-rate dial. 3 = a dominant nemesis · 4 = a lead plus a supporting cast ·
+  8 = a wide world, softer recurrence. 🛠 tune by play.
+- **Scarcity is a separate problem.** At ~2.4 sagas per campaign this machinery gets ~5 slots to
+  work with, so it reads right in a long game and barely registers in a short one. Seeding the
+  world with faces at creation is the candidate fix; unruled.
+- Whether one-off quests should contribute faces at all (currently they contribute none, by the
+  anonymity-by-omission ruling) — unruled, and it fights an existing 🔒.
