@@ -397,7 +397,7 @@ which forced a victim onto every card — so an archetype where the **company** 
 back inverted (`press-ganging` was written as a *rescue from* a press-gang). The first sentence may
 now name what is simply THERE to be taken.
 
-## N7 — 🟡 OPEN · a saga beat-1 sentence came back ungrammatical (2026-08-28)
+## N7 — 🔴 CONFIRMED CLASS · a saga beat-1 card pastes its dealt atoms raw (2026-08-28)
 
 One card in an 8-cycle real-AI CLI campaign (seed 9310):
 
@@ -407,6 +407,26 @@ One card in an 8-cycle real-AI CLI campaign (seed 9310):
 The introduction is correct (N2's fix holding); the predicate is not English. One instance, one
 seed, on the saga path — recorded, not yet measured. Worth a targeted sample of beat-1 openers
 before touching anything: a single bad sentence is not yet a class.
+
+**Update, same day — it is a class.** Two further real-AI campaigns produced it again, and the
+cause is now plain: the beat-1 payload's `arrival` and `clientTell` atoms are being pasted VERBATIM
+instead of rebuilt. All three from live cards:
+
+> *"…came on foot **and kept one hand on the door frame** as he spoke."* … *"**He had rehearsed his
+> account.**"*  ← two `arrival` atoms and a `clientTell`, quoted whole
+> *"…**sent a rider ahead and came behind it** and **said the whole of it standing**."*  ← two
+> `arrival` atoms welded with "and", which is where the ungrammatical sentence came from
+> *"Salmo **will not look at the door** while you work."*  ← the `clientTell`, pasted and then
+> tacked onto the errand
+
+The prompt says "combine them in your own words, never quote them" and it is simply not obeyed —
+which is L19/L20 again: a pre-shaped dealt string is a stamp, and these atoms are shaped like
+finished clauses, so they get stamped. Note the one-off path does NOT have this problem, because
+its atoms are single words that cannot stand as clauses (`atomized-seed-lists`).
+
+Untouched by the 2026-08-28 card work, which is one-off only. The fix to TEST is atomising these
+pools the way KEYWORDS already are — but it needs its own bench, and L31 applies: a right
+diagnosis licenses no instrument.
 
 
 ## N8 — 🟡 OPEN · what a blind bench says is actually wrong with a one-off card (2026-08-28)
@@ -448,3 +468,37 @@ which any of those changes touched:
    glosses was in the reverted bundle and is untested on its own.
 
 Ruling wanted on 3 before it is built: does the designer want the card to stop naming the pay?
+
+
+## N9 — ✅ SHIPPED · what raised the one-off card from 5.0 to 6.1 (2026-08-28)
+
+Designer: *"the scoring is really bad isnt it? can you do something to improve it to 7-8."*
+
+Five blind rounds against `prosebench/RUBRIC.md`, three independent judges each, arms sampled
+across the same twelve archetypes. Landed at **6.06–6.33 against a 5.03–5.28 base, replicated on
+two seeds**, inter-judge r 0.81–0.92. Shipped: the voiced card for one-offs, the situation built on
+one thing somebody SAW, and a job that acts on what the situation showed. Full ladder and the three
+laws it produced (L29–L31) are in `prosebench/CHEAP_MODEL_PROMPTING.md`.
+
+**It is +1.0, not the 7–8 the designer asked for**, and the gap is worth naming precisely. The
+remaining mass is `flat` — cards that are clear, correct and unmemorable. Judges are consistent
+about what the 7s and 8s have and the 5s do not:
+
+> *The stone over the newly filled plot bears one name, while the corpse inside has inked fingers
+> and a mason's scar.* · *The bailiff found the miller's son bound to a hawthorn with a creditor's
+> writ pinned to his coat.* · *The watch stool was left upright, the brazier cold, and the keeper's
+> horn hung unused at dusk.*
+
+Each is one seen particular plus one human refusal or absence. What is NOT yet tried, in the order
+the evidence favours:
+
+1. **The bookkeeping archetypes still deflate a good opening** — `census-taking`, `surveying`,
+   `mapping`, `standing-watch`, `listening`. Judges killed them in every round ("a spreadsheet in
+   costume"). Their glosses were rewritten inside a bundle that measured negative and were reverted
+   with it; they have never been tested alone.
+2. **A job phrased as a QUESTION scored well** wherever it appeared (*"Who are this child's
+   parents?"*, *"Who scrubbed the crew column and why?"*). The heavy spec has a pose-the-question
+   rule; the light spec now has one too, but nothing yet makes a find-job PREFER the question form.
+3. **Nothing in the card ever makes a person speak or act.** Every judge in every round noted it.
+   The voiced format supplies this on the ~10–30 % of one-offs that are heavy; the light register
+   (most cards) has no equivalent lever tested.
