@@ -566,6 +566,9 @@ function QuestPage({ s, q, doAct, active, setActive, back, read, setRead }: any)
                   <span className="nm">{c.name}</span>
                   {c.trade && <span className="sub">{c.trade}</span>}
                   <span className="tags">{c.role}</span>
+                  {/* the focal IS the payoff — what they ARE is the reason to chase the saga.
+                      Their WORTH stays hidden (ECONOMY §7.1b: a reward is a rumour). */}
+                  {c.tags && <span className="casttags">{c.tags}</span>}
                 </button>
                 <div className="cap">held to this matter</div>
               </div>))}</div>

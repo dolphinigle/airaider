@@ -1925,7 +1925,7 @@ export class Game {
    *  never show a face the card deliberately withheld. Designer ruling 2026-08-28: an unmet
    *  person is not shown at all — SHOW_UNMET_CAST brings the face-down card back. */
   static SHOW_UNMET_CAST = false;
-  questCast(questId: string): { name: string; trade: string; role: string; who: string; met: boolean }[] {
+  questCast(questId: string): { name: string; trade: string; role: string; who: string; met: boolean; tags?: string }[] {
     const q = this.state.quests.find(x => x.id === questId);
     const chain = q?.chainId ? this.state.chains.find(c => c.id === q.chainId) : undefined;
     if (!q || !chain) return [];
@@ -1936,10 +1936,20 @@ export class Game {
       obstacle: 'stands against', ally: 'may help', companion: 'rides with you',
     };
     return chain.bible.cast
-      .map(m => ({
-        name: m.name, trade: m.trade ?? '', role: ROLE[m.role] ?? m.role, who: m.who,
-        met: m.role === 'client' || this.isMet(chain, m.name, step),
-      }))
+      .map(m => {
+        // Only cast who EXIST as engine cards have traits — that is the focal, and (on a personal
+        // saga) a soldier of your own. Secondaries are bible prose until they materialize
+        // (GENERATION_FLOW: secondaries materialize lazily, only when actually acquired).
+        // Designer 2026-08-28: "if your entire goal is to recruit someone surely you want to see
+        // their traits so you are motivated?" — so the tags show. Their WORTH does not: that is
+        // the deferred reward, and ECONOMY §7.1b keeps a reward a rumour rather than an invoice.
+        const card = m.loreId ? this.card(m.loreId) : undefined;
+        return {
+          name: m.name, trade: m.trade ?? '', role: ROLE[m.role] ?? m.role, who: m.who,
+          met: m.role === 'client' || this.isMet(chain, m.name, step),
+          tags: card ? renderTags(card.tags) : undefined,
+        };
+      })
       .filter(m => m.met || Game.SHOW_UNMET_CAST);
   }
 

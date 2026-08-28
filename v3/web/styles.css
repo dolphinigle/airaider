@@ -270,3 +270,6 @@ tr.leadworking button:disabled { color: #c9b86a; border-color: #4a4130; cursor: 
 /* ECONOMY §7.2 — what a lead carries, as a band. The number stays with the engine. */
 .leadpay{color:#cbb37a;white-space:nowrap;font-size:12px}
 .leadpay .stars{color:#c69440;letter-spacing:-1px;margin-right:4px}
+
+/* traits on a held cast card — the focal's, when the engine has a card for them */
+.qcard.held .casttags{display:block;margin-top:5px;font-size:10px;line-height:1.45;color:#7c8595;white-space:normal}

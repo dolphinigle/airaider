@@ -206,7 +206,7 @@ export const render = {
       q.situation,
       // held to this matter: readable, never movable — the text form of the bracketed cards
       ...(cast.length ? ['ON THIS MATTER (held here — you can read them, not move them):',
-        ...cast.map(c => `  ⊟ ${c.name}${c.trade ? `, ${c.trade}` : ''} — ${c.role}\n      ${c.who}`)] : []),
+        ...cast.map(c => `  ⊟ ${c.name}${c.trade ? `, ${c.trade}` : ''} — ${c.role}\n      ${c.who}${c.tags ? `\n      ${c.tags}` : ''}`)] : []),
       `REWARD: ${g.questReward(q.id)}`,
     ];
     if (q.approaches) {
