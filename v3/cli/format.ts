@@ -3,7 +3,7 @@
 import type { Game } from '../src/game/game.js';
 import { renderTags } from '../src/engine/tags.js';
 import { ROOM_TYPE, GH_THRESHOLDS, maxSlotsAtTier, upgradeCost, excavateCost, ransomRate, marketSellRate } from '../src/engine/fort.js';
-import { RANSOM_RATE, SELL_RATE, unitWorth, unitStars, unitPeak } from '../src/engine/economy.js';
+import { coinBand, RANSOM_RATE, SELL_RATE, unitWorth, unitStars, unitPeak } from '../src/engine/economy.js';
 import { leadBand } from '../src/engine/quests.js';
 import { REGION } from '../src/engine/regions.js';
 import { cardType, stackKind, isLiability } from '../src/engine/cards.js';
@@ -276,7 +276,7 @@ export const render = {
   chains(g: Game): string {
     return g.state.chains.map(c => {
       const focal = g.card(c.focalId);
-      return `${c.id.padEnd(9)} ${c.bible.title.slice(0, 36).padEnd(36)} ${c.state.padEnd(14)} beat ${c.beatIndex}/${c.expectedBeats} bank ${c.bank.toFixed(0)}g focal: ${focal?.name ?? '?'}`;
+      return `${c.id.padEnd(9)} ${c.bible.title.slice(0, 36).padEnd(36)} ${c.state.padEnd(14)} beat ${c.beatIndex}/${c.expectedBeats} ${(coinBand(c.bank) || '—').padEnd(22)} focal: ${focal?.name ?? '?'}`;
     }).join('\n') || '(no stories yet — pursue a ✦STORY lead)';
   },
 
@@ -286,7 +286,7 @@ export const render = {
     const focal = g.card(c.focalId);
     return [
       `═══ ${c.bible.title} ═══ (${c.state})`,
-      `focal: ${focal?.name} · likely fate: ${c.kind} · payoff ~${c.payoff.toFixed(0)}g · bank ${c.bank.toFixed(0)}g · effort ${c.cyclesSpent.toFixed(0)}/${(c.expectedBeats * 1.5).toFixed(0)} merc-cycles · failures ${c.failures}/${c.failureBudget}`,
+      `focal: ${focal?.name} · likely fate: ${c.kind} · spoils so far ${coinBand(c.bank) || '—'} · effort ${c.cyclesSpent.toFixed(0)}/${(c.expectedBeats * 1.5).toFixed(0)} merc-cycles · failures ${c.failures}/${c.failureBudget}`,
       `now: ${c.story.currentSituation}`,
       c.story.knownToPlayer.length ? `known: ${c.story.knownToPlayer.join(' · ')}` : '',
       c.story.openThreads.length ? `threads: ${c.story.openThreads.join(' · ')}` : '',

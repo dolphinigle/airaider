@@ -450,3 +450,26 @@ export function unitStars(card: { tags: TagInstance[]; value: number; character?
 /** per-cycle passive trickle is ZERO — income is quest gold (ECONOMY §6). */
 
 export { mintStackable };
+
+/** ── what a reward looks like FROM THE BOARD ────────────────────────────────────────────────
+ *  ECONOMY §7.2's architecture, applied to the quest itself: "fine TIERS engine-side, coarse
+ *  BANDS for the reader" — an offer is a rumour, not an invoice. The engine keeps the number;
+ *  the card says roughly what it is worth.
+ *
+ *  These are ABSOLUTE, unlike the lead band, and deliberately so: a lead's bonus is a ratio
+ *  because it rides on a quest whose level you do not know yet, whereas a player reading the
+ *  board is choosing BETWEEN quests of different levels and wants to know which pays more.
+ *
+ *  🛠 The register is a soldier's pay because that is the reader's own yardstick, and it avoids
+ *  colliding with the lead band's purse/chest/fortune (§7.2 took the same care). Thresholds are
+ *  an impl knob: they sit near V_base(1), V_base(4), V_base(8) and one stride beyond. */
+const COIN_BANDS: [number, string][] = [
+  [25, 'a few days\' pay'],
+  [60, 'a week\'s pay'],
+  [150, 'a month\'s pay'],
+  [400, 'a season\'s pay'],
+];
+export function coinBand(gold: number): string {
+  if (gold < 1) return '';
+  return COIN_BANDS.find(([cap]) => gold <= cap)?.[1] ?? 'more than a season\'s pay';
+}

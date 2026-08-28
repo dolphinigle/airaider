@@ -15,7 +15,7 @@ import { cardType, stackKind, isLiability, hasTag } from '../src/engine/cards.js
 import { slotThreshold, coins, explainCoins } from '../src/engine/roll.js';
 import { leadBand } from '../src/engine/quests.js';
 import { QUEST_TTL } from '../src/game/game.js';
-import { hireCost, RANSOM_RATE, SELL_RATE, unitWorth, unitStars, unitPeak } from '../src/engine/economy.js';
+import { coinBand, hireCost, RANSOM_RATE, SELL_RATE, unitWorth, unitStars, unitPeak } from '../src/engine/economy.js';
 import { ransomRate, marketSellRate } from '../src/engine/fort.js';
 import { xpNeeded } from '../src/engine/growth.js';
 import { fillScore } from '../src/engine/overlap.js';
@@ -187,7 +187,9 @@ function stateView() {
     chains: st.chains.map(c => ({
       id: c.id, title: c.bible.title, state: c.state, kind: c.kind, personal: c.isPersonal,
       focal: game.card(c.focalId)?.name ?? '?', beat: c.beatIndex, expectedBeats: c.expectedBeats,
-      bank: Math.round(c.bank), payoff: Math.round(c.payoff),
+      // §7.2 / REWARD_BANK §5: 'spoils so far' as a BAND, and the projected payoff is not sent
+      // at all — the deferred reward is hidden, so the client is never given the number.
+      bank: coinBand(c.bank),
       effort: c.cyclesSpent, effortTarget: c.expectedBeats * 1.5,
       failures: c.failures, failureBudget: c.failureBudget,
       situation: c.story.currentSituation, known: c.story.knownToPlayer, threads: c.story.openThreads,

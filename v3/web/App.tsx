@@ -691,7 +691,7 @@ function Chains({ s }: any) {
       {s.chains.slice().reverse().map((c: any) => (
         <div className="cardrow" key={c.id}>
           <h3>{c.title} <small>{c.state} · beat {c.beat}/{c.expectedBeats} · focal <b>{c.focal}</b>{c.personal ? ' (personal)' : ''}</small></h3>
-          <p>bank {c.bank}g of ~{c.payoff}g · effort {c.effort}/{c.effortTarget} · failures {c.failures}/{c.failureBudget}</p>
+          <p>spoils so far: {c.bank || '—'} · effort {c.effort}/{c.effortTarget} · failures {c.failures}/{c.failureBudget}</p>
           <p><i>{c.situation}</i></p>
           {c.known.length > 0 && <p>known: {c.known.join(' · ')}</p>}
           <details><summary>cast & goal</summary>

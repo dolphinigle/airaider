@@ -165,6 +165,38 @@ whole chain — so it surfaces as a better focal character at the finale rather 
 **The bonus shares the reward's fate** (§5 🔒: fixed at birth, the roll only scales down): a partial
 pays half of it, a failure loses it. A fortune can be squandered.
 
+### 7.1b The quest's own reward is banded too 🛠 *(2026-08-28)*
+
+Designer, seeing an exact figure on a card: *"dont show exact numbers for quest rewards etc and
+ESPECIALLY for deferred rewards theyre supposed to be hidden."* §7.2's doctrine is not special to
+leads — **fine tiers engine-side, coarse bands for the reader** governs any reward the player is
+being *offered*, because an offer is a rumour and a number makes it an invoice.
+
+So `questReward()` names the KINDS (a captive · a recruit · a relic · a lead — already coarse) and
+the coin as a band. Unlike the lead band these thresholds are **absolute**, and deliberately: a
+lead's bonus is a ratio because it rides on a quest whose level is not yet known, whereas a player
+reading the board is choosing *between* quests of different levels and needs to know which pays
+more.
+
+| gold | on the face |
+|---|---|
+| ≤ 25 | a few days' pay |
+| ≤ 60 | a week's pay |
+| ≤ 150 | a month's pay |
+| ≤ 400 | a season's pay |
+| > 400 | more than a season's pay |
+
+A soldier's pay is the reader's own yardstick, and the register avoids colliding with the lead
+band's purse/chest/fortune — §7.2 took the same care over its rungs. Thresholds sit near
+`V_base(1)`, `V_base(4)`, `V_base(8)` and one stride past.
+
+**The DEFERRED reward is not banded — it is hidden.** A mid-saga beat used to close with
+`~262g when it's done`, a straight projection of `chain.payoff`. That is the number the player is
+most not meant to hold: REWARD_BANK §5 sanctions showing only `bank` ("spoils so far") and
+PROMPT_RULES forbids surfacing banked-payoff text at all. A beat now says only that *the saga still
+owes*, `chain.payoff` is not sent to the web client in the first place, and `bank` renders through
+the same band.
+
 ### 7.2 The band — what the player sees 🛠
 
 The engine holds the exact number; the **player reads a band**. This is §8's architecture with the

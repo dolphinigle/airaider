@@ -19,7 +19,7 @@ import {
 import { infirmaryHealRate, healTick, rollInjuryTiers, payHealCost, REST_HEAL_PER_CYCLE, type InjuryBand } from '../engine/injury.js';
 import { REGION, REGIONS } from '../engine/regions.js';
 import {
-  vBase, RARITY_MULT, splitOneOff, hireCost, RANSOM_RATE, SELL_RATE, KEEP_THRESHOLD, cashValue,
+  vBase, RARITY_MULT, splitOneOff, hireCost, RANSOM_RATE, SELL_RATE, KEEP_THRESHOLD, cashValue, coinBand,
   type Rarity, type Archetype, type RewardSpec,
 } from '../engine/economy.js';
 import {
@@ -2014,14 +2014,20 @@ export class Game {
     };
     const gold = q.rewardSpecs.filter(r => r.kind === 'gold').reduce((n, r) => n + r.value, 0);
     const parts = q.rewardSpecs.filter(r => r.kind !== 'gold').map(r => NAME[r.kind] ?? r.kind);
-    if (gold >= 1) parts.push(`${Math.round(gold)}g`);
+    // ECONOMY §7.2: the player reads a BAND, never the engine's number — an offer is a rumour,
+    // not an invoice. (Designer, 2026-08-28: "dont show exact numbers for quest rewards".)
+    if (gold >= 1) parts.push(coinBand(gold));
     if (q.isFinale) {
       const focal = chain ? this.card(chain.focalId) : undefined;
       const named = !!focal && !!chain && this.isMet(chain, focal.name, `${q.situation} ${q.job}`);
       parts.unshift(named ? focal!.name : 'the one at the heart of it');
     }
     const now = parts.join(' + ') || 'side loot';
-    return chain && !q.isFinale ? `${now} · ~${Math.round(chain.payoff)}g when it's done` : now;
+    // A mid-saga beat NEVER advertises the ending's payout. That number is the deferred reward and
+    // the player is not meant to hold it (REWARD_BANK §5 sanctions only `bank` — "spoils so far" —
+    // and PROMPT_RULES forbids surfacing banked-payoff text). What a beat honestly promises is that
+    // the saga is still owed something.
+    return chain && !q.isFinale ? `${now} · and the saga still owes` : now;
   }
 
   /** raw odds — ALWAYS visible (QUESTS §3); the Oracle adds computed % */
