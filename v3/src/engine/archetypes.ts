@@ -52,6 +52,20 @@ export const ARCHETYPES = {
   'recover': { gloss: 'get back a specific thing that was taken', profile: 'relic', slots: [1, 2] },
   'explore': { gloss: 'go into ground nobody has crossed and come back knowing it', profile: 'lead', slots: [1, 2] },
   'trade': { gloss: 'buy, sell, or broker a thing whose price is somebody\'s trouble', profile: 'coin', slots: [1, 1] },
+
+  // batch 2 — five approved from the Sultan taxonomy, plus the designer's `occult` and `fight`.
+  // ritual vs occult is a deliberate split: ritual PERFORMS a working (the company supplies the
+  // hands), occult CONFRONTS one already there. fight replaces the narrower `duel`.
+  'assassinate': { gloss: 'kill one named person and be gone', profile: 'coin', slots: [1, 2] },
+  'occult': { gloss: 'face something that should not be, and end or contain it', profile: 'relic', slots: [2, 3] },
+  'ritual': { gloss: 'see a working through — someone must hold the circle', profile: 'bloody', slots: [2, 3] },
+  'negotiate': { gloss: 'get a yes without drawing steel', profile: 'lead', slots: [1, 2] },
+  'fight': { gloss: 'a fight that was arranged, and is watched', profile: 'coin', slots: [1, 2] },
+  'research': { gloss: 'work a text or a site until it gives up its meaning', profile: 'find', slots: [1, 1] },
+  'heist': { gloss: 'take a thing out of a guarded place without being seen', profile: 'relic', slots: [2, 3] },
+  'adventure': { gloss: 'go into a dangerous place and come back with what is in it', profile: 'relic', slots: [2, 3] },
+  'bounty-hunt': { gloss: 'a posted name, brought in for the price on it', profile: 'captive', slots: [1, 2], gate: 'dungeon' },
+  'gather': { gloss: 'bring back a quantity of something that grows where people do not go', profile: 'coin', slots: [1, 2] },
 } as const satisfies Record<string, ArchetypeDef>;
 
 export type Archetype = keyof typeof ARCHETYPES;

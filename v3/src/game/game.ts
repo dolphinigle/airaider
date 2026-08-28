@@ -18,6 +18,7 @@ import {
 } from '../engine/fort.js';
 import { infirmaryHealRate, healTick, rollInjuryTiers, payHealCost, REST_HEAL_PER_CYCLE, type InjuryBand } from '../engine/injury.js';
 import { REGION, REGIONS } from '../engine/regions.js';
+import { ARCHETYPE_NAMES } from '../engine/archetypes.js';
 import {
   vBase, RARITY_MULT, splitOneOff, hireCost, RANSOM_RATE, SELL_RATE, KEEP_THRESHOLD, cashValue, coinBand,
   type Rarity, type Archetype, type RewardSpec,
@@ -704,9 +705,12 @@ export class Game {
     const l = rollFreshLead(this.rng, this.leadCtx(), () => freshId('lead-'), source);
     if (bonus > 0) l.bonus = Math.round(bonus);
     this.recentLeadArchetypes.push(l.archetype);
-    // widened with the pool (2026-08-28): at eight archetypes a window of 3 was already most of
-    // the board; at ~100 it can hold a proper stretch without starving the draw
-    while (this.recentLeadArchetypes.length > 20) this.recentLeadArchetypes.shift();
+    // DERIVED from the pool, never a constant: a fixed 20 was written for a ~100-row pool and
+    // silently became larger than the whole board when the pool went back to 22 — at which point
+    // `fresh` is empty on almost every draw and the anti-repeat either pins one archetype or falls
+    // through entirely. A third of the pool is a stretch you can feel without starving the draw.
+    const window = Math.max(3, Math.floor(ARCHETYPE_NAMES.length / 3));
+    while (this.recentLeadArchetypes.length > window) this.recentLeadArchetypes.shift();
     return l;
   }
 
