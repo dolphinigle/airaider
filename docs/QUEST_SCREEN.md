@@ -93,3 +93,24 @@ existing saves still load.
 - **M3** screenshots of the real page at three content shapes (one-sentence one-off · saga beat ·
   finale with approaches), read and judged.
 - **M4** the beat-1 writing numbers unchanged from `docs/CARD_GOLD_STANDARD.md`.
+
+---
+
+## 7 · WHERE THIS STOPPED (2026-08-28)
+
+**Phases 1–3 are done, playtested and pushed.** Tag `questscreen-v1`.
+
+- **Engine** — `autoAssign` / `autoAssignAll` / `questCast` / `questReward`, one `isMet` shared by
+  the staging, the scrub and the cast. 11 tests in `test/assign.test.ts`; 120 green overall.
+- **CLI** — `auto [qId|all]`, ON THIS MATTER, pips + odds + reward on the list.
+- **Web** — the board and the quest page, drag AND click-to-place, the held cards, the gauge.
+- **Browser playtest** — `scripts/uiplay.ts`, 27 checks driving real Chrome, run across two quest
+  shapes so nothing is silently skipped. It found the Escape trap on the reader.
+
+**Phase 4 is NOT built, on purpose:** the plain-language slot line (*"Someone who can read the
+ground"*). It needs either a new AI output field or an engine phrase table; the first risks the
+beat-1 prompt just stabilised, the second will stamp (L19/L20). It ships as its own measured change.
+
+**Also open, from the designer's own playtest:**
+- the board list wants a real design round now that it can be used
+- `?tab=` / `?quest=` deep links exist; the reckoning and fort screens are untouched
