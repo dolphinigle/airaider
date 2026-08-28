@@ -5,7 +5,7 @@ import type { Rng } from './rng.js';
 import { REGION } from './regions.js';
 import { boardPool, profileOf, slotRangeOf, type Profile } from './archetypes.js';
 import {
-  vBase, RARITY_MULT, splitOneOff, generateCard, type Rarity, type Archetype, type RewardSpec,
+  vBase, RARITY_MULT, chainPayoff, splitOneOff, generateCard, type Rarity, type Archetype, type RewardSpec,
 } from './economy.js';
 import { rollName, rollRelicName } from './names.js';
 import { mintStackable, HELD, type Card } from './cards.js';
@@ -232,10 +232,25 @@ export function oneOffValue(rng: Rng, level: number, rarity: Rarity, n: number):
 // A FORTUNE IS WHEN THE LEAD IS WORTH MORE THAN THE QUEST IT OPENS.
 export const LEAD_BANDS = [0.25, 0.55, 1.0];   // 🛠
 export const LEAD_BAND_WORDS = ['a few coins more', 'a purse', 'a chest', 'a fortune'];
+/** expected beats per rarity — the midpoint of rollChainShape's range, so the band can be figured
+ *  at DISPLAY time (§7.2) without knowing the shape the pursue roll will pick. */
+const EXPECTED_BEATS: Record<Rarity, number> = { common: 2.5, uncommon: 3.5, rare: 5 };
+
+/** what the quest this lead opens is worth. A `starts-new` lead opens a SAGA, not a one-off, and
+ *  pricing its bonus against a one-off overstates the band by 2-5x — every 4★ on a chain lead was
+ *  a promise the top rung's own landmark could not keep (measured 2026-08-28: no chain 4★ ever
+ *  exceeded 0.67 of the saga it opened, against a rung that means "worth MORE than the quest").
+ *  ~12-15% of banded leads are chain leads, rising with the GH tier as rares appear. */
+export function leadQuestWorth(lead: Lead): number {
+  if (lead.chainInfo.kind === 'starts-new')
+    return chainPayoff(EXPECTED_BEATS[lead.rarity], lead.level, lead.rarity);
+  return vBase(lead.level) * RARITY_MULT[lead.rarity] * expectedSlots(lead.archetype, lead.rarity);
+}
+
 export function leadBand(lead: Lead): { band: 0 | 1 | 2 | 3 | 4; label: string; stars: string } {
   const bonus = lead.bonus ?? 0;
   if (bonus <= 0) return { band: 0, label: '', stars: '' };
-  const baseV = vBase(lead.level) * RARITY_MULT[lead.rarity] * expectedSlots(lead.archetype, lead.rarity);
+  const baseV = leadQuestWorth(lead);
   const r = bonus / Math.max(1, baseV);
   const i = r <= LEAD_BANDS[0]! ? 0 : r <= LEAD_BANDS[1]! ? 1 : r <= LEAD_BANDS[2]! ? 2 : 3;
   const band = (i + 1) as 1 | 2 | 3 | 4;

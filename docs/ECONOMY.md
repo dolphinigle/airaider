@@ -208,8 +208,17 @@ windfall at level 1 and pocket change at level 8, and one threshold cannot descr
 
 ```
 baseV(lead) = V_base(level) × rarityMult[rarity] × expectedSlots(archetype, rarity)
+            = chainPayoff(expectedBeats[rarity], level, rarity)   ← when chainInfo is starts-new
 band        = bonus ÷ baseV
 ```
+
+**The divisor is the quest this lead ACTUALLY opens.** A `starts-new` lead opens a saga, not a
+one-off, and a saga is worth two to five times as much — so pricing its bonus against a one-off
+overstated the band by a rung or two, and made the top rung tell a lie: no chain 4★ ever exceeded
+0.67 of the saga it opened, against a rung that MEANS "worth more than the quest" (measured
+2026-08-28; ~12% of banded leads are chain leads, ~15% once rares appear at higher GH tiers).
+`expectedBeats` is the midpoint of `rollChainShape`'s range per rarity (2.5 / 3.5 / 5), so the
+band is still figured at display time without knowing the shape the pursue roll will pick.
 
 `expectedSlots` is the midpoint of the archetype's `slotCount` range, +1 for rare, capped at 4 —
 every input is known at mint. The ±20% generation roll (mean 1.0) and the roster clamp are not

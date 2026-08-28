@@ -2,7 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import { Game } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
-import { leadBand, expectedSlots, computeDelivery, oneOffValue, LEAD_BANDS, type Lead, type Quest } from '../src/engine/quests.js';
+import { leadBand, leadQuestWorth, expectedSlots, computeDelivery, oneOffValue, LEAD_BANDS, type Lead, type Quest } from '../src/engine/quests.js';
 import { splitOneOff, vBase, RARITY_MULT } from '../src/engine/economy.js';
 import { Rng } from '../src/engine/rng.js';
 
@@ -131,5 +131,41 @@ describe('the whole point', () => {
     // was 0.000 before this design — the value was computed, deducted from the player's gold,
     // and thrown away (see ECONOMY §7.1 and the §21.2 note)
     expect(carried / reserved).toBeGreaterThan(0.99);
+  });
+});
+
+describe('a chain lead is banded against the SAGA it opens', () => {
+  const mk = (over: Partial<Lead>): Lead => ({
+    id: 'l', rarity: 'uncommon', level: 3, region: 'forests', archetype: 'investigate',
+    chainInfo: { kind: 'none' }, expiresAtCycle: null, source: 'reward', ...over,
+  });
+
+  it('prices a starts-new lead on the chain payoff, not the one-off value', () => {
+    const oneOff = leadQuestWorth(mk({}));
+    const saga = leadQuestWorth(mk({ chainInfo: { kind: 'starts-new' } }));
+    expect(saga).toBeGreaterThan(oneOff * 2);   // a saga is worth multiples of a one-off
+  });
+
+  it('the same bonus reads LOWER on a chain lead, because the quest is bigger', () => {
+    const bonus = 236;
+    const plain = leadBand(mk({ bonus }));
+    const chain = leadBand(mk({ bonus, chainInfo: { kind: 'starts-new' } }));
+    expect(plain.band).toBe(4);                 // a fortune against a one-off
+    expect(chain.band).toBeLessThan(plain.band);// …but not against a whole saga
+  });
+
+  it("never promises a fortune it cannot keep: 4★ means 'worth more than the quest it opens'", () => {
+    // §7.2's landmark, checked on the surface that used to break it. Sweep the plausible bonus
+    // range on chain leads at every rarity: a 4★ must imply the bonus really does exceed the saga.
+    for (const rarity of ['common', 'uncommon', 'rare'] as const) {
+      for (const level of [1, 3, 5, 7]) {
+        const worth = leadQuestWorth(mk({ rarity, level, chainInfo: { kind: 'starts-new' } }));
+        for (const ratio of [0.1, 0.3, 0.6, 0.9, 1.2]) {
+          const lead = mk({ rarity, level, chainInfo: { kind: 'starts-new' }, bonus: Math.round(worth * ratio) });
+          const b = leadBand(lead);
+          if (b.band === 4) expect((lead.bonus ?? 0) / worth).toBeGreaterThan(1);
+        }
+      }
+    }
   });
 });
