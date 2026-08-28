@@ -344,6 +344,8 @@ function Leads({ s, queueAct }: any) {
           <td style={{ color: RARITY_COLOR[l.rarity] }}>{l.rarity}</td>
           <td>L{l.level}</td><td>{l.region}</td><td>{l.archetype}</td>
           <td>{l.chain === 'starts-new' ? '✦ story' : l.chain === 'continues' ? '⛓ continues' : ''}</td>
+          <td className="leadpay" title={l.pay?.band ? `carries a bonus onto the quest it opens` : ''}>
+            {l.pay?.band ? <><span className="stars">{l.pay.stars}</span> {l.pay.label}</> : ''}</td>
           <td>{l.title ?? ''}</td>
           <td>{l.expires === null ? 'standing' : `expires c${l.expires}`}</td>
           <td>{job

@@ -71,11 +71,13 @@ export function rollChainShape(rng: Rng, rarity: Rarity): { beats: number; failu
   return { beats, failureBudget: Math.max(2, Math.ceil(beats / 2)) };
 }
 
-export function newChainEconomy(rng: Rng, level: number, rarity: Rarity): {
+/** `bonus` is what the opening lead carried (ECONOMY §7.1) — added to the whole matter's payoff,
+ *  so it surfaces as a better focal character at the finale rather than as coin today. */
+export function newChainEconomy(rng: Rng, level: number, rarity: Rarity, bonus = 0): {
   beats: number; failureBudget: number; payoff: number; focalTarget: number; kind: ChainKind; twist: boolean;
 } {
   const { beats, failureBudget } = rollChainShape(rng, rarity);
-  const payoff = chainPayoff(beats, level, rarity);
+  const payoff = chainPayoff(beats, level, rarity) + bonus;
   return {
     beats, failureBudget, payoff,
     focalTarget: chainFocalTarget(rng, payoff),

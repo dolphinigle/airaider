@@ -25,6 +25,7 @@ import {
 import {
   rollFreshLead, starterPacket, starterDripLead, STARTER_DRIP_COUNT, huntLead, recruitLead, slotCount, rollDifficulty, oneOffValue,
   materializeReward, computeDelivery, defaultAsk, liabilityTriggers, LEAD_TTL,
+  leadBand,
   type Lead, type Quest, type QuestSlot,
 } from '../engine/quests.js';
 import {
@@ -699,8 +700,9 @@ export class Game {
 
   /** 🛠 2026-07-10 premise-variety: recently dealt archetypes rotate out of the next roll */
   private recentLeadArchetypes: Archetype[] = [];
-  private freshLead(source: Lead['source']): Lead {
+  private freshLead(source: Lead['source'], bonus = 0): Lead {
     const l = rollFreshLead(this.rng, this.leadCtx(), () => freshId('lead-'), source);
+    if (bonus > 0) l.bonus = Math.round(bonus);
     this.recentLeadArchetypes.push(l.archetype);
     while (this.recentLeadArchetypes.length > 3) this.recentLeadArchetypes.shift();
     return l;
@@ -966,7 +968,9 @@ export class Game {
     // fillability guard (same class as #79): never deal a card with more slots than the
     // player HAS soldiers — a 3-slot quest against a 2-merc roster can never march
     const n = Math.max(1, Math.min(slotCount(this.rng, lead.archetype, lead.rarity), this.roster().length));
-    const V = oneOffValue(this.rng, lead.level, lead.rarity, n);
+    // ECONOMY §7.1: whatever the lead carried is added to this quest's budget — and to nothing
+    // else. Same level, same slots, same bar: a rich lead is a richer haul, never a harder fight.
+    const V = oneOffValue(this.rng, lead.level, lead.rarity, n) + (lead.bonus ?? 0);
     const specs = splitOneOff(this.rng, V, lead.archetype, lead.level);
     let rewardCards: Card[];
     const returning = lead.focalId ? this.card(lead.focalId) : undefined;
@@ -1162,7 +1166,7 @@ export class Game {
     // (never yank a roster merc into limbo)
     const returningIsMerc = returning?.character?.role === 'merc';
     const isPersonal = (!!personalMercId && !!this.card(personalMercId)) || returningIsMerc;
-    const eco = newChainEconomy(this.rng, lead.level, lead.rarity);
+    const eco = newChainEconomy(this.rng, lead.level, lead.rarity, lead.bonus ?? 0);
     // the focal character FIRST (§2): personal → the merc; sequel → the SLIPPED focal
     // returns from the lore graph (§21-4a); else generated at the payoff value
     let focal: Card;
@@ -2345,6 +2349,12 @@ export class Game {
     // a RESERVED lead survives its own expiry: the quest it is being turned into must have a lead
     // to consume when it lands (I6). endCycle drains first, so this only fires on a path that
     // reaches doEndCycle with work still out.
+    // ECONOMY §7.3: a banded lead going cold is a real loss — name it, so the sting is legible
+    // rather than silent. An unbanded lead lapses quietly, as it always has.
+    for (const l of st.leads.filter(l => l.expiresAtCycle !== null && l.expiresAtCycle <= st.cycle && !this.reserved.has(l.id))) {
+      const b = leadBand(l);
+      if (b.band >= 2) report.push(`🧭 A lead worth ${b.label} went cold — ${l.title ?? `${l.archetype} in ${REGION[l.region]!.name}`}.`);
+    }
     st.leads = st.leads.filter(l => l.expiresAtCycle === null || l.expiresAtCycle > st.cycle || this.reserved.has(l.id));
     for (const c of st.cards.filter(isLiability)) {
       const age = st.cycle - (st.liabilityBirth[c.id] ?? st.cycle);
@@ -2609,10 +2619,12 @@ export class Game {
         st.cards = st.cards.filter(c => c.id !== lost.id);   // lost objects just vanish
       }
     }
-    for (let i = 0; i < r.delivery.leadGrants; i++) {
-      const nl = this.freshLead('reward');
+    for (const bonus of r.delivery.leadGrants) {
+      // the value the split reserved rides ON the lead now, instead of being discarded (§7.1)
+      const nl = this.freshLead('reward', bonus);
       st.leads.push(nl);
-      say(`🧭 A lead earned: ${nl.title ?? 'word worth chasing'} — see the Leads tab.`);
+      const b = leadBand(nl);
+      say(`🧭 A lead earned: ${nl.title ?? 'word worth chasing'}${b.band ? ` — ${b.label}` : ''} — see the Leads tab.`);
     }
     // collector quest won → the liability is buried
     if (q.liabilityId && r.outcome !== 'failure') {

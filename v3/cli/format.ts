@@ -4,6 +4,7 @@ import type { Game } from '../src/game/game.js';
 import { renderTags } from '../src/engine/tags.js';
 import { ROOM_TYPE, GH_THRESHOLDS, maxSlotsAtTier, upgradeCost, excavateCost, ransomRate, marketSellRate } from '../src/engine/fort.js';
 import { RANSOM_RATE, SELL_RATE, unitWorth, unitStars, unitPeak } from '../src/engine/economy.js';
+import { leadBand } from '../src/engine/quests.js';
 import { REGION } from '../src/engine/regions.js';
 import { cardType, stackKind, isLiability } from '../src/engine/cards.js';
 import { slotThreshold, coins, explainCoins } from '../src/engine/roll.js';
@@ -147,7 +148,10 @@ export const render = {
       const chain = l.chainInfo.kind === 'none' ? '' : l.chainInfo.kind === 'starts-new' ? ' ✦STORY' : ' ⛓CONT';
       const job = working.get(l.id);
       const mark = job === 'running' ? ' ✎WRITING' : job === 'queued' ? ' ⋯QUEUED' : '';
-      return `${l.id.padEnd(9)} ${l.rarity.padEnd(8)} L${String(l.level).padEnd(3)} ${REGION[l.region]!.name.padEnd(18)} ${l.archetype.padEnd(12)}${chain}${mark} exp:${exp}${l.title ? ` — ${l.title}` : ''}`;
+      // ECONOMY §7.2: what the lead CARRIES, as a band — the engine holds the number
+      const b = leadBand(l);
+      const pay = b.band ? ` ${b.stars} ${b.label}` : '';
+      return `${l.id.padEnd(9)} ${l.rarity.padEnd(8)} L${String(l.level).padEnd(3)} ${REGION[l.region]!.name.padEnd(18)} ${l.archetype.padEnd(12)}${chain}${mark}${pay.padEnd(24)} exp:${exp}${l.title ? ` — ${l.title}` : ''}`;
     }).join('\n');
   },
 

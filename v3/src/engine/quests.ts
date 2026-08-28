@@ -30,6 +30,10 @@ export interface Lead {
   liabilityId?: string;            // collector leads: beating the quest settles THIS liability
   personalMercId?: string;         // personal-chain leads: the merc whose main chain this starts
   echoNote?: string;               // echo rescues: the peril exactly as the story left this person
+  /** ECONOMY §7.1: value banked ONTO this lead, added to the budget of the quest it opens.
+   *  A lead's own worth is zero — access is free; this is the premium riding on it. Absent on
+   *  saves written before the design, which reads as 0. */
+  bonus?: number;
 }
 
 export const LEAD_TTL = 6; // cycles before an unpursued lead lapses 🛠
@@ -171,15 +175,25 @@ export interface Quest {
 }
 
 /** slot count N from the archetype (engine, BEFORE reward gen — §8 one-off flow) */
+const SLOT_RANGE: Record<Archetype, [number, number]> = {
+  raid: [2, 3], capture: [2, 3], rescue: [1, 2], escort: [1, 2],
+  investigate: [1, 2], hunt: [1, 2], contract: [1, 1], 'lead-hunt': [1, 1],
+};
+
 export function slotCount(rng: Rng, archetype: Archetype, rarity: Rarity): number {
-  const base: Record<Archetype, [number, number]> = {
-    raid: [2, 3], capture: [2, 3], rescue: [1, 2], escort: [1, 2],
-    investigate: [1, 2], hunt: [1, 2], contract: [1, 1], 'lead-hunt': [1, 1],
-  };
-  const [lo, hi] = base[archetype];
+  const [lo, hi] = SLOT_RANGE[archetype];
   let n = rng.range(lo, hi);
   if (rarity === 'rare') n = Math.min(4, n + 1);
   return n;
+}
+
+/** ECONOMY §7.2: what a lead's quest is EXPECTED to want, in soldiers — the midpoint of the
+ *  archetype's own range, +1 for rare, capped at 4. Mirrors slotCount() exactly; the ±20% value
+ *  roll and the roster clamp are not modelled because both wash out. */
+export function expectedSlots(archetype: Archetype, rarity: Rarity): number {
+  const [lo, hi] = SLOT_RANGE[archetype];
+  const mid = (lo + hi) / 2;
+  return rarity === 'rare' ? Math.min(4, mid + 1) : mid;
 }
 
 /** difficulty roll 🛠 (E-roll weights — impl knob, sim-calibrated later) */
@@ -198,6 +212,25 @@ export function rollDifficulty(rng: Rng, rarity: Rarity, ghTier = 1): Difficulty
 /** one-off reward value: V = V_base(level) × rarity × N × random split (§8 step 3) */
 export function oneOffValue(rng: Rng, level: number, rarity: Rarity, n: number): number {
   return Math.round(vBase(level) * RARITY_MULT[rarity] * n * rng.float(0.8, 1.2));
+}
+
+/** ECONOMY §7.2 — what the player reads on a lead's face. The engine holds the exact number;
+ *  the player gets a BAND, which is §8's architecture with the audience swapped.
+ *
+ *  Banded as a RATIO against the quest this lead will make, never an absolute: 200 gold is a
+ *  windfall at level 1 and pocket change at level 8, and no single threshold describes both.
+ *  Derived at call time, never stored, so retuning re-bands every lead already on the board.
+ *  🛠 thresholds are a knob — set from 11,251 simulated grants (≈52/29/13/6 across the bands). */
+export const LEAD_BANDS = [0.4, 1.0, 2.5];   // 🛠
+export const LEAD_BAND_WORDS = ['a few coins more', 'a purse', 'a chest', 'a fortune'];
+export function leadBand(lead: Lead): { band: 0 | 1 | 2 | 3 | 4; label: string; stars: string } {
+  const bonus = lead.bonus ?? 0;
+  if (bonus <= 0) return { band: 0, label: '', stars: '' };
+  const baseV = vBase(lead.level) * RARITY_MULT[lead.rarity] * expectedSlots(lead.archetype, lead.rarity);
+  const r = bonus / Math.max(1, baseV);
+  const i = r <= LEAD_BANDS[0]! ? 0 : r <= LEAD_BANDS[1]! ? 1 : r <= LEAD_BANDS[2]! ? 2 : 3;
+  const band = (i + 1) as 1 | 2 | 3 | 4;
+  return { band, label: LEAD_BAND_WORDS[i]!, stars: '★'.repeat(band) + '☆'.repeat(4 - band) };
 }
 
 /** materialize a reward spec into actual cards (engine — names engine-rolled, §4b) */
@@ -243,7 +276,7 @@ export interface Delivery {
   cards: Card[];               // what actually lands
   goldDelta: number;           // convenience: gold among cards
   liability: Card | null;      // partial: the attached negative stackable
-  leadGrants: number;          // how many leads to mint
+  leadGrants: number[];        // ECONOMY §7.1: the BONUS each granted lead carries (was a bare count — the value was computed and thrown away)
   forfeited: Card[];           // what was lost (failure)
 }
 
@@ -251,12 +284,12 @@ export interface Delivery {
 export function computeDelivery(rng: Rng, quest: Quest, outcome: Outcome): Delivery {
   const specs = quest.rewardSpecs;
   const V = specs.reduce((s, r) => s + r.value, 0);
-  const leadGrants = specs.filter(s => s.kind === 'lead').length;
+  const leadGrants = specs.filter(s => s.kind === 'lead').map(s => Math.round(s.value));
   if (outcome === 'success') {
     return { cards: [...quest.rewardCards, ...goldCards(specs)], goldDelta: goldOf(specs), liability: null, leadGrants, forfeited: [] };
   }
   if (outcome === 'failure') {
-    return { cards: [], goldDelta: 0, liability: null, leadGrants: 0, forfeited: quest.rewardCards };
+    return { cards: [], goldDelta: 0, liability: null, leadGrants: [], forfeited: quest.rewardCards };
   }
   // partial = half: keep the unit + a liability sized to net V/2, else V/2 gold (KEEP≈0.4)
   const unit = quest.rewardCards.find(c => c.character) ?? quest.rewardCards[0] ?? null;
@@ -265,10 +298,10 @@ export function computeDelivery(rng: Rng, quest: Quest, outcome: Outcome): Deliv
     const liability = liabilitySize > 0
       ? mintStackable(rng.chance(0.5) ? 'evidence' : 'mess', liabilitySize)
       : null;
-    return { cards: [unit], goldDelta: 0, liability, leadGrants: 0, forfeited: quest.rewardCards.filter(c => c !== unit) };
+    return { cards: [unit], goldDelta: 0, liability, leadGrants: [], forfeited: quest.rewardCards.filter(c => c !== unit) };
   }
   const half = mintStackable('gold', Math.max(1, Math.round(V / 2)));
-  return { cards: [half], goldDelta: half.qty!, liability: null, leadGrants: 0, forfeited: quest.rewardCards };
+  return { cards: [half], goldDelta: half.qty!, liability: null, leadGrants: [], forfeited: quest.rewardCards };
 }
 
 function goldOf(specs: RewardSpec[]): number {

@@ -164,6 +164,14 @@ working as intended. 🛠 If the §20 sim says the faucet floods, that `0.7` is 
 **Expiry** is a plain loss, as any unpursued lead is; the log names it when a *banded* one goes cold
 so the sting is legible rather than silent.
 
+**Measured in play (2026-08-28, built):** before a Scouting lodge exists, essentially every earned
+lead reads **★☆☆☆ a few coins more** — the only source is the 22% lottery at `V × 0.15`, which on
+early-game values is a bonus of 4–14 against a baseV of 50–100. Once the lodge is up, its `V × 0.7`
+share puts *a purse* on the board regularly (measured bonuses 32–75 by cycle ~10). This is §7.3
+working as designed — **the lodge is what makes the marker mean anything** — but it is worth knowing
+that the band is nearly flat for the first hours, so a thin early game is not a bug. 🛠 If it should
+bite sooner, the lever is the lottery's `0.15`, not the thresholds.
+
 ---
 
 ## 8. Design knobs 🛠
