@@ -392,6 +392,18 @@ function Quests({ s, doAct }: any) {
   const q = open ? s.quests.find((x: any) => x.id === open) : null;
   useEffect(() => { if (open && !q) setOpen(null) }, [open, q]);   // it lapsed or marched
   useEffect(() => { setActive(null) }, [open]);
+  // Escape backs out one layer at a time: the sheet, then the armed slot, then the quest. A modal
+  // with no keyboard exit traps the player (found by driving the real page, scripts/uiplay.ts).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (read) return setRead(null);
+      if (active != null) return setActive(null);
+      if (open) setOpen(null);
+    };
+    addEventListener('keydown', onKey);
+    return () => removeEventListener('keydown', onKey);
+  }, [read, active, open]);
   if (!s.quests.length) return <p>No open quests. Pursue a lead.</p>;
   const slots = q ? activeSlots(q) : [];
   const free = s.roster.filter((m: any) => m.location?.kind === 'held');
@@ -589,6 +601,8 @@ function QuestPage({ s, q, doAct, active, setActive, back, read, setRead }: any)
 
       {read && <div className="reader" onClick={() => setRead(null)}>
         <div className="sheet" onClick={e => e.stopPropagation()}>
+          {/* click-outside and Escape both close it, but a mouse user needs something to aim at */}
+          <button className="sheetclose" onClick={() => setRead(null)} aria-label="Close">✕</button>
           <h2>{read.name}</h2>
           <div className="role">{read.trade} · {read.role}</div>
           <p>{read.who}</p>

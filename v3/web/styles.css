@@ -253,10 +253,14 @@ tr.leadworking button:disabled { color: #c9b86a; border-color: #4a4130; cursor: 
 /* ── reading a held card ──────────────────────────────────────────────────────────────── */
 .reader{position:fixed;inset:0;background:rgba(6,8,10,.75);display:flex;align-items:center;
   justify-content:center;padding:24px;z-index:30}
-.reader .sheet{background:#1b2126;border:1px solid var(--iron);border-radius:3px;max-width:460px;
+.reader .sheet{position:relative;background:#1b2126;border:1px solid var(--iron);border-radius:3px;max-width:460px;
   padding:26px 28px;box-shadow:0 34px 80px -24px #000;color:#c9ced5}
 .reader h2{margin:0 0 4px;font-size:22px;font-variant:small-caps}
 .reader .role{font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--brass);margin-bottom:14px}
 .reader p{margin:0 0 12px;color:#8d959f;font-size:14.5px;line-height:1.6}
 .reader .tagline{margin-top:14px;font-size:10.5px;color:#5c646e;line-height:1.7;
   font-family:ui-monospace,Menlo,monospace}
+
+.sheetclose{position:absolute;top:10px;right:12px;font-size:15px;line-height:1;padding:6px 8px;
+  color:#5c646e;background:none;border:none;cursor:pointer;border-radius:3px}
+.sheetclose:hover{color:#c9ced5;background:rgba(255,255,255,.06)}
