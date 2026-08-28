@@ -691,3 +691,4 @@ const SEEDS = [
   'a healer who chooses who is worth saving',
 ];
 export function sampleSeed(rng: Rng): string { return rng.pick(SEEDS) }
+
