@@ -82,6 +82,88 @@ Income and costs both scale with progression, so the *feel* stays constant. The 
 
 A lead is a **deferred reward** — priced by the access it grants (its rarity premium), not the reward behind it. Lead-hunting quests (region Scouting lodges) are the renewable faucet.
 
+### 7.1 The carried bonus ✅ (designed 2026-08-28; closes GENERATION_FLOW §21.2)
+
+**Access is free; the premium rides on the lead.** A lead's own worth is **zero** — any lead opens a
+quest, and that quest is worth what its level, rarity and archetype say. What a lead may carry is a
+**bonus**: value banked onto it at mint, spent when it is pursued.
+
+```
+Lead.bonus : number        gold-equivalent, default 0 (absent on old saves = 0)
+on pursue  : V = oneOffValue(level, rarity, slots) + lead.bonus   → splitOneOff(V, …) unchanged
+```
+
+**Strictly orthogonal 🔒.** The bonus changes NOTHING about how the quest plays: same level, same
+slot count, same bar, same difficulty, same archetype. It is added to the value budget and nothing
+else. A rich lead is a richer haul, never a harder fight.
+
+Because it enters *before* the split, it flows through `splitOneOff` naturally — a fat `capture`
+lead yields a **better captive**, not merely more coin. Nothing in the AI's inputs changes: the
+writer sees the same `rewardEnvelope` shape it always did, so **this design touches no prompt.**
+
+For a saga lead (`chainInfo: starts-new`) the bonus is added to `chainPayoff` — the "quest" is the
+whole chain — so it surfaces as a better focal character at the finale rather than as coin today.
+
+**The bonus shares the reward's fate** (§5 🔒: fixed at birth, the roll only scales down): a partial
+pays half of it, a failure loses it. A fortune can be squandered.
+
+### 7.2 The band — what the player sees 🛠
+
+The engine holds the exact number; the **player reads a band**. This is §8's architecture with the
+audience swapped ("fine TIERS engine-side, coarse BANDS for the reader"), and it keeps a lead a
+rumour rather than an invoice.
+
+The band is a **ratio against the quest this lead will make**, never an absolute — 200 gold is a
+windfall at level 1 and pocket change at level 8, and one threshold cannot describe both:
+
+```
+baseV(lead) = V_base(level) × rarityMult[rarity] × expectedSlots(archetype, rarity)
+band        = bonus ÷ baseV
+```
+
+`expectedSlots` is the midpoint of the archetype's `slotCount` range, +1 for rare, capped at 4 —
+every input is known at mint. The ±20% generation roll (mean 1.0) and the roster clamp are not
+modelled; both wash out. **Computed at display time, never stored**, so retuning re-bands every
+lead on the board instead of leaving frozen labels behind.
+
+| ratio | band | on the face |
+|---|---|---|
+| 0 | — | *(no marker)* |
+| ≤ 0.4 | ★☆☆☆ | a few coins more |
+| ≤ 1.0 | ★★☆☆ | a purse |
+| ≤ 2.5 | ★★★☆ | a chest |
+| > 2.5 | ★★★★ | a fortune |
+
+Four rungs, deliberately **not** reusing `common/uncommon/rare` (collides with the lead's own
+rarity) nor `low/mid/high/legendary` (the §9b format-lock describes a *trait's* intensity, and §8
+reserves "legendary" for tiers 13–16, 13k–92k — a lead bonus never reaches it). The ★ glyph mirrors
+`unitStars` on purpose: it answers the same question — *how far above par is this, for its level* —
+so a player who has read the marker on a soldier reads a lead for free. `1.0` is the teachable
+landmark: **a purse tops out at doubling the job.**
+
+🛠 Thresholds are a tuning knob, set from measurement (`scripts/_leadbands.ts`, 11,251 simulated
+grants): they give ≈52 / 29 / 13 / **6%** across the four bands. An earlier 0.3/0.8/1.6 cut put "a
+fortune" at 11% — better than one banded lead in nine, which is not a fortune. **No cap** on the
+bonus: the measured maximum is ×7.7, and §3b goal 1 wants exactly that ("jackpots are possible,
+rare, exciting"). Percentages are of *banded* leads; unbanded ones outnumber all four on a real board.
+
+### 7.3 Where bonuses come from
+
+| source | bonus |
+|---|---|
+| a quest's reserved lead share (`splitOneOff`) | the reserved value, which today is **computed and discarded** |
+| **lead-hunt** — the Scouting-lodge faucet | its existing `V × 0.7` share; measured median ratio **0.57** vs 0.26 from every other source |
+| a sequel lead when a focal slips away (§21-4a) | rarity-priced |
+| the day-0 starter packet | 0 — no reward behind it |
+
+**Lead-hunting is prospecting, not restocking** — that falls out of the existing 0.7 share with no
+new rule. It also makes the lodge value-positive: 0.7V now becomes 0.7V later *plus* a whole extra
+quest's own baseV. The price is merc-cycles, paid twice — which is §21.1's **"LOSS = mostly TIME"**
+working as intended. 🛠 If the §20 sim says the faucet floods, that `0.7` is the only lever to touch.
+
+**Expiry** is a plain loss, as any unpursued lead is; the log names it when a *banded* one goes cold
+so the sting is legible rather than silent.
+
 ---
 
 ## 8. Design knobs 🛠

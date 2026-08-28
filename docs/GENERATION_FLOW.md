@@ -1791,6 +1791,12 @@ checklist (GAME_STATE/QUESTS/ECONOMY/LORE/TAGS + CARDS/FORT §18-§20 retouch) �
 2. **Leads stay STRICT 🔒** — earned only, NO ambient trickle. If supply needs leeway, fix it in
    the MATH: fold a **lead grant into the quest-reward budget as a priced component** (ECONOMY §7
    prices leads; splitValue can allocate a lead share) so supply scales with play, not with a faucet.
+   ✅ **DESIGNED 2026-08-28 → ECONOMY §7.1–§7.3.** The reserving half had shipped and the spending
+   half had not: `splitOneOff` deducted a lead's price from the player's gold and `materializeReward`
+   then discarded it (measured: ~16% of all reserved reward value, delivered/reserved = 0.000 for
+   `lead` against 1.000 for every other kind). Resolution: a lead's own worth is ZERO and the
+   reserved value rides on it as a **carried bonus**, added to the quest's budget when pursued —
+   strictly orthogonal to how that quest plays. Not yet implemented.
 3. **Known-cast cadence 🛠 (derived, verify in playtest):** target ≈ **2 known-cast saga geneses per
    GH tier** (~every 60 cycles ≈ 3h; ~0.5% of quests — apex-scarce), gated on a recurrable pool ≥ ~8;
    continuation beats carry faces between. Rarity weights derived from this target at impl.
