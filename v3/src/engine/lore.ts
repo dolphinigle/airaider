@@ -186,3 +186,15 @@ export function guardEdges(g: LoreGraph, proposed: {
   }
   return ok;
 }
+
+/** How many matters this person is already part of — RECURRING_CAST §3's reuse weight. Counts
+ *  ACTIVE edges only, so a tie the graph has already forgotten stops pulling them back. Floored at
+ *  1 so a face with one appearance is still reachable. */
+export function edgeCount(g: LoreGraph, id: string, cycle: number): number {
+  let n = 0;
+  for (const e of g.edges) {
+    if (!e.active) continue;
+    if (e.from === id || e.to === id) n += effectiveSalience(e, cycle) >= SALIENCE_FLOOR ? 1 : 0;
+  }
+  return Math.max(1, n);
+}

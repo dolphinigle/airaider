@@ -34,7 +34,7 @@ import {
   type Chain, type Bible, type FinaleFate,
 } from '../engine/chains.js';
 import {
-  newGraph, recall, renderDossier, decayPass, guardEdges, chronicleOf, addEdge, touchEdge,
+  newGraph, recall, renderDossier, decayPass, guardEdges, chronicleOf, addEdge, touchEdge, edgeCount,
   type LoreGraph, type LoreNode,
 } from '../engine/lore.js';
 import { rollName, rollPlaceName } from '../engine/names.js';
@@ -107,6 +107,8 @@ export interface GameState {
   starterDripped?: number;
   log: LogEntry[];
 }
+
+const CAST_THETA = Number(process.env.CAST_THETA ?? 4);
 
 export class Game {
   state: GameState;
@@ -1206,8 +1208,16 @@ export class Game {
       // here, and their lore node (memories, ties) is remapped onto it so their story follows
       const loreCast = Object.values(this.state.lore.nodes).filter(nd =>
         nd.active && nd.kind === 'character' && !this.card(nd.id) && !this.state.cards.some(c => c.name === nd.name));
-      if (loreCast.length >= 3 && this.knownCastSagas < this.state.fort.ghTier * 2 && this.rng.chance(0.35)) {
-        const nd = this.rng.pick(loreCast);
+      // RECURRING_CAST §3 🔒 — two rules, replacing a >=3 gate, a per-tier cap and a flat 35%:
+      //   1. the chance of coining a NEW face falls as the cast grows: P(new) = θ/(θ+N)
+      //   2. reuse is weighted by EDGE COUNT — the matters that person is already part of
+      // They interlock. Weighting alone is uniform while everyone has one edge; a falling coin
+      // rate alone just rotates strangers evenly. Rule 1 forces a reuse, the reuse adds an edge,
+      // rule 2 then favours that person — which is how a recurring cast forms instead of a census.
+      const N = loreCast.length;
+      if (N > 0 && !this.rng.chance(CAST_THETA / (CAST_THETA + N))) {
+        const nd = this.rng.weighted(loreCast.map(n =>
+          [n, edgeCount(this.state.lore, n.id, this.state.cycle)] as [typeof n, number]));
         const text = `${nd.blurb} ${nd.identity}`;
         const race = /\belv|elf\b/i.test(text) ? 'elf' : /wolfman/i.test(text) ? 'wolfman'
           : /lizardman/i.test(text) ? 'lizardman' : /\bhuman\b/i.test(text) ? 'human' : undefined;
@@ -1568,17 +1578,12 @@ export class Game {
         if (m !== focalEntry && (m.role === 'quarry' || m.role === 'prize')) m.role = 'obstacle';
       }
     }
-    // LORE §1 / STORY_ENGINE §3: coined cast PERSIST as lore-only people — the world populates
-    // itself with recurring faces (they surface in later recalls/slates and can be acquired);
-    // without this only focals ever entered the graph
-    for (const member of g.cast) {
-      if (member.loreId && this.state.lore.nodes[member.loreId]) continue;      // already known
-      if (member.name === focal.name) continue;                                  // focal has a card+node
-      const id = freshId('lore-');
-      const b = this.clampBlurb(member.who);
-      this.state.lore.nodes[id] = { id, kind: 'character', name: member.name, blurb: b, identity: b, active: true, createdCycle: this.state.cycle };
-      member.loreId = id;
-    }
+    // Coined cast are NOT persisted here. LORE.md §10 puts story-NPC write-back at saga CLOSE —
+    // met-only, capped 2/saga, each with one memory edge — and this genesis pass used to pre-empt
+    // it, recording every cast member unmet, uncapped and EDGELESS. An edgeless node can never
+    // decay (decayPass retires edges, not nodes) and carries no weight for RECURRING_CAST §3's
+    // reuse, so the graph filled with people who could neither be forgotten nor come back.
+    // Live-chain cast are absent from the slate meanwhile, which LORE.md §10 states is intended.
     const chain: Chain = {
       id: freshId('chain-'), kind: eco.kind, isPersonal, focalId: focal.id,
       level: lead.level, rarity: lead.rarity, region: lead.region,
@@ -2883,6 +2888,9 @@ export class Game {
   /** last generated beat card per chain — lapsed unmarched beats re-offer VERBATIM (🛠) */
   private cachedBeatOut = new Map<string, { beat: number; out: QuestWriteOut }>();
   /** known-cast sagas served so far (§21-3 cadence: ~2 per GH tier, pool-gated) */
+  /** RECURRING_CAST §7 🛠 — the coining-rate dial. P(a new face) = θ/(θ+N), so θ is the cast size
+   *  at which coining and reusing are equally likely. 3 = a dominant nemesis · 4 = a lead plus a
+   *  supporting cast · 8 = a wide world with softer recurrence. */
   private knownCastSagas = 0;
 
   private locationLine(region: string, landmarkAllowed: boolean, anchorOk = true): string {
@@ -3038,7 +3046,11 @@ export class Game {
     // the focal is named ONLY once the cards have introduced them (46026: "Ungrien stays at
     // the heart of it" told the player a total stranger anchored their chain)
     const focalMet = !!focal && (chain.story.introducedNames ?? []).includes(focal.name);
-    report.push(`📖 ${chain.bible.title}: ${chain.bank.toFixed(0)}g earned toward this matter's ~${chain.payoff.toFixed(0)}g worth (${delta >= 0 ? '+' : ''}${delta}g today)${finaleReady(chain) ? ' — it now comes to a head' : ''}.${focalMet ? ` ${focal!.name} stays at the heart of it.` : ''}`);
+    // ECONOMY §7.1b: the bank reads as a BAND and the projected payoff is not shown at all — this
+    // line was still printing "129g earned toward this matter's ~262g worth" after questReward and
+    // the chains tab were fixed, which is the one number the designer most wanted hidden.
+    const sofar = coinBand(chain.bank);
+    report.push(`📖 ${chain.bible.title}: ${sofar ? `${sofar} set aside so far` : 'nothing set aside yet'}${delta > 0 ? ', and today added to it' : ''}${finaleReady(chain) ? ' — it now comes to a head' : ''}.${focalMet ? ` ${focal!.name} stays at the heart of it.` : ''}`);
   }
 
   /** LORE §1 story-NPC write-back (built 2026-07-18): when a saga closes, coined cast the
