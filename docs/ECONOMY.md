@@ -36,6 +36,64 @@
 
 ---
 
+### 3.1 What the split ACTUALLY produces — measured 2026-08-28 📏
+
+Read off the shipped `splitOneOff`, not from intent (`v3/scripts/_rewardshape.ts`, 20k rolls per
+archetype). Recorded because the shape surprised the designer, and because two of these are faults.
+
+**Pieces per reward: 1.57 – 2.22.** Three-piece bundles run 7–22% depending on archetype. Note the
+lottery takes its cut from the GOLD portion only, so the primary reward is never diluted by it.
+
+| archetype | most common shapes |
+|---|---|
+| raid · escort · contract | **gold 51%** · gold+relic 27% · gold+lead 15% |
+| capture | captive+gold 83% · captive+gold+lead 17% |
+| rescue | gold+recruit 78% · gold+lead+recruit 22% |
+| hunt · investigate | gold+relic 51% · gold 16% · gold+lead 16% |
+| lead-hunt | gold+lead 78% · **gold+lead+lead 22%** |
+
+**Where a campaign's reward value goes** (equal archetype mix): **gold 56%** · lead 13% · relic 12%
+· captive 10% · recruit 9%.
+
+Three things worth acting on, none yet acted on:
+
+1. **Over half of all reward value is gold**, and raid/escort/contract pay *nothing but* gold 51% of
+   the time. A level-2 raid is `gold 72`, full stop.
+2. **Relics are frequently single-tag trinkets.** A level-2 hunt pays `relic 39`; against the §8 tag
+   curve (t4 = 41) that buys about one tier-4 tag. §7 calls relics "dopamine-first"; at this size
+   they are not.
+3. 🐛 **`lead-hunt` grants TWO leads 22% of the time** — the archetype pushes one and the 22% lottery
+   pushes another, because it never checks whether the bundle already has one. Under §7.1 that is
+   two separately-banded leads off one quest. The lottery's value should thicken the existing lead.
+
+**Leads are a ONE-OFF reward only** — every `kind: 'lead'` lives in `splitOneOff`. A saga beat pays
+gold, or gold + a relic at 35%; a finale pays the bank. Correct as it stands: a chain already mints
+its own continuation lead, so loot-granting another would open an unrelated thread mid-story.
+
+### 6.1 What a SAGA actually pays — measured 2026-08-28 📏
+
+A saga has no archetype split at all (`v3/scripts/_chainshape.ts`; level 3, party of 2, all beats
+succeeding):
+
+| rarity | beats | payoff | focal mark | side-loot total | bank |
+|---|---|---|---|---|---|
+| common | 2.5 | 164 | 115 | 38 | 235 |
+| uncommon | 3.5 | 414 | 290 | 95 | 595 |
+| rare | 5.0 | 1150 | 808 | 265 | 1651 |
+
+**⚠ `focalTarget` is NOT the payout.** It is 55–85% of E[payoff] (≈70% on average) and it sizes the
+focal's *tag substance* — what they are good at, what they ransom for. What the player RECEIVES is
+**the bank**, and §2's value-invariance means the three finale dispositions pay the same total:
+cash-out is `round(bank)`; recruiting is the person (marked `focal.value`) plus `bank − focal.value`.
+
+So: **every saga is ABOUT a person (🔒 §2 story seed, gold-hoard sagas included), and none forces
+you to TAKE one.** `gold-hoard` as a kind only frames the bible.
+
+📏 **Side loot is nearly invisible while you play.** 15g a beat on a common saga against a beat that
+banks 109 — ~14% of what the beat earns, and the only thing actually delivered before the finale.
+Mid-saga beats feel like they pay almost nothing because they nearly do. 🛠 If saga pacing ever feels
+flat mid-story, `beatSideLoot`'s `0.2–0.5` band is the lever.
+
 ## 4. `generateCard(targetV, ceiling, required[])` 🔒 🛠
 
 Pure engine; the AI only names/stories after (the handoff).
