@@ -45,6 +45,13 @@ export const ARCHETYPES = {
   'hunt': { gloss: 'track down a person or beast', profile: 'find', slots: [1, 2] },
   'contract': { gloss: 'an agreed task for set pay — the work IS the premise', profile: 'coin', slots: [1, 1] },
   'lead-hunt': { gloss: 'sweep for rumors; never promise "further work" — the engine announces leads', profile: 'lead', slots: [1, 1] },
+
+  // ── APPROVED BY THE DESIGNER, one batch at a time (2026-08-28) ────────────────────────────
+  // guard/recover proposed and approved; explore/trade are the designer's own additions.
+  'guard': { gloss: 'hold a place or a person against whatever comes', profile: 'coin', slots: [1, 2] },
+  'recover': { gloss: 'get back a specific thing that was taken', profile: 'relic', slots: [1, 2] },
+  'explore': { gloss: 'go into ground nobody has crossed and come back knowing it', profile: 'lead', slots: [1, 2] },
+  'trade': { gloss: 'buy, sell, or broker a thing whose price is somebody\'s trouble', profile: 'coin', slots: [1, 1] },
 } as const satisfies Record<string, ArchetypeDef>;
 
 export type Archetype = keyof typeof ARCHETYPES;
