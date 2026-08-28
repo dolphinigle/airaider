@@ -14,7 +14,6 @@ import { renderTags } from '../src/engine/tags.js';
 import { cardType, stackKind, isLiability, hasTag } from '../src/engine/cards.js';
 import { slotThreshold, coins, explainCoins } from '../src/engine/roll.js';
 import { leadBand } from '../src/engine/quests.js';
-import { glossOf } from '../src/engine/archetypes.js';
 import { QUEST_TTL } from '../src/game/game.js';
 import { hireCost, RANSOM_RATE, SELL_RATE, unitWorth, unitStars, unitPeak } from '../src/engine/economy.js';
 import { ransomRate, marketSellRate } from '../src/engine/fort.js';
@@ -152,7 +151,7 @@ function stateView() {
     holding: st.holding.map(s => ({ ...cardView(game.card(s.cardId)!), expires: s.expiresAtCycle })),
     leads: game.visibleLeads().map(l => ({
       id: l.id, rarity: l.rarity, level: l.level, region: REGION[l.region]!.name,
-      archetype: l.archetype, gloss: glossOf(l.archetype) ?? null, chain: l.chainInfo.kind, expires: l.expiresAtCycle, title: l.title ?? null, source: l.source,
+      archetype: l.archetype, chain: l.chainInfo.kind, expires: l.expiresAtCycle, title: l.title ?? null, source: l.source,
       // ECONOMY §7.2 — the band comes from the engine, never rebuilt client-side, so the board and
       // the text UI can never disagree about what a lead promises
       pay: leadBand(l),
