@@ -1987,7 +1987,8 @@ export class Game {
       .sort((a, b) => rank(a) - rank(b) || a.createdCycle - b.createdCycle);
     let placed = 0;
     for (const q of open) placed += this.autoAssign(q.id).placed;
-    return { ok: placed > 0, msg: placed ? `${placed} named across ${open.length} quests` : 'nobody free fits anything', placed };
+    const n = (x: number, one: string, many = one + 's') => `${x} ${x === 1 ? one : many}`;
+    return { ok: placed > 0, msg: placed ? `${n(placed, 'soldier')} named across ${n(open.length, 'quest')}` : 'nobody free fits anything', placed };
   }
 
   /** raw odds — ALWAYS visible (QUESTS §3); the Oracle adds computed % */

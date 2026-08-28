@@ -38,6 +38,7 @@ export const render = {
       '        excavate · gh   (styles: human elven wolfkin lizardkin ancient exotic)',
       'CARDS   slot <roomId> <idx> <cardId> · unslot <roomId> <idx> · focus <mercId> single|dual|none <attr> [attr2]',
       'QUESTS  pursue <leadId> · assign <qId> <slot> <mercId> · unassign <qId> <slot> · approach <qId> <gId>',
+      '        auto [qId|all]   — man a quest (or every quest) with the best fit going',
       'QUEUE   jobs · wait · cancel <jobId> · inflight <n>   (pursue returns at once; cards arrive later)',
       'PEOPLE  hire <id> · accept <id> · ransom <id> · sell <id> · settle <id> · interrogate <id> · heal <id>',
       'TURN    end   — commit the cycle: everything rolls, the AI narrates',
@@ -177,17 +178,28 @@ export const render = {
     const qs = g.state.quests.filter(q => q.state === 'open');
     if (!qs.length) return '(no open quests — pursue a lead)';
     return qs.map(q => {
-      const filled = q.slots.filter(s => s.filledBy).length;
-      return `${q.id.padEnd(5)} ${q.title.slice(0, 40).padEnd(40)} L${q.level} ${q.rarity} ${filled}/${q.slots.length} filled · lapses c${q.createdCycle + QUEST_TTL}${q.isFinale ? ' 🎬FINALE' : q.chainId ? ` 📖beat${q.beatIndex}` : ''}`;
+      const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
+      const filled = active.filter(s => s.filledBy).length;
+      // the same pips the board shows: ◼ manned, ◻ still to name
+      const pips = active.map(s => s.filledBy ? '◼' : '◻').join('');
+      const o = g.questOdds(q.id);
+      const odds = filled < active.length ? 'not manned'
+        : o.success !== null ? `${Math.round(o.success * 100)}% · ${o.coins}c vs ${o.bar.toFixed(1)}`
+        : `${o.coins}c vs ${o.bar.toFixed(1)}`;
+      return `${q.id.padEnd(5)} ${q.title.slice(0, 38).padEnd(38)} L${q.level} ${q.rarity.padEnd(8)} ${(pips || '—').padEnd(5)} ${odds.padEnd(20)} lapses c${q.createdCycle + QUEST_TTL}${q.isFinale ? ' 🎬FINALE' : q.chainId ? ` 📖beat${q.beatIndex}` : ''}`;
     }).join('\n');
   },
 
   questDetail(g: Game, id: string): string {
     const q = g.state.quests.find(x => x.id === id);
     if (!q) return 'no such quest';
+    const cast = g.questCast(q.id);
     const lines = [
       `═══ ${q.title} ═══  (${q.id}, L${q.level} ${q.rarity}, ${REGION[q.region]!.name}, lapses c${q.createdCycle + QUEST_TTL})`,
       q.situation,
+      // held to this matter: readable, never movable — the text form of the bracketed cards
+      ...(cast.length ? ['ON THIS MATTER (held here — you can read them, not move them):',
+        ...cast.map(c => `  ⊟ ${c.name}${c.trade ? `, ${c.trade}` : ''} — ${c.role}\n      ${c.who}`)] : []),
       `REWARD envelope: ${q.rewardSpecs.map(r => r.kind).join(' + ') || (q.isFinale ? 'the focal character' : 'side loot')}`,
     ];
     if (q.approaches) {

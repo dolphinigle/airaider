@@ -263,6 +263,8 @@ async function exec(game: Game, line: string): Promise<boolean> {
       break;
     }
     case 'assign': say(game.assign(rest[0]!, Number(rest[1]), rest[2]!)); break;
+    // the SAME engine call the web's Auto button makes — never a second implementation (G5)
+    case 'auto': say(!rest[0] || rest[0] === 'all' ? game.autoAssignAll() : game.autoAssign(rest[0]!)); break;
     case 'unassign': say(game.unassign(rest[0]!, Number(rest[1]))); break;
     case 'approach': say(game.chooseApproach(rest[0]!, rest[1]!)); break;
     case 'abandon': say(game.abandon(rest[0]!)); break;
