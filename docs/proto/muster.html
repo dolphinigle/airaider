@@ -37,12 +37,12 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;tex
 /* ─── PAPER ──────────────────────────────────────────────────────────────────────────── */
 .paper{background:linear-gradient(172deg,var(--vellum),var(--vellum-2));color:var(--ink);
   box-shadow:0 24px 55px -22px #000,0 2px 6px -2px rgba(0,0,0,.6);position:relative;border-radius:2px}
-.writ{padding:34px 38px 30px;align-self:start}
+.writ{padding:30px 36px 26px;align-self:start}
 .writ h1{font-size:28px;font-weight:600;margin:0 0 6px;font-variant:small-caps;text-wrap:balance;color:var(--ink)}
 .writ .meta{font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;
   color:var(--ink-soft);margin-bottom:17px;display:flex;gap:14px;flex-wrap:wrap}
 .writ p{margin:0 0 13px;font-size:15.5px;line-height:1.68;color:var(--ink)}
-.writ .errand{margin-top:19px;padding-top:14px;border-top:1px solid var(--rule);
+.writ .errand{margin-top:19px;padding-top:14px;padding-right:76px;border-top:1px solid var(--rule);
   font-family:var(--mono);font-size:11.5px;line-height:1.8;color:var(--ink-soft)}
 .writ .errand b{color:var(--ink);font-weight:600;letter-spacing:.06em}
 .seal{position:absolute;right:28px;bottom:24px;width:54px;height:54px;border-radius:50%;
@@ -96,11 +96,14 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;tex
 
 /* ─── THE HAND — persistent furniture on every screen ────────────────────────────────── */
 .hand{position:relative;z-index:2;flex:0 0 auto;background:var(--sunk);border-top:1px solid var(--iron-dim);
-  padding:9px 16px 11px;display:flex;align-items:center;gap:14px}
+  padding:8px 16px 8px;display:flex;align-items:center;gap:14px}
 .handlabel{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--text-faint);border-right:1px solid var(--iron-dim);padding-right:12px;max-width:74px;line-height:1.5}
-.handscroll{display:flex;gap:10px;overflow-x:auto;padding:6px 2px 7px;flex:1 1 auto}
-.handscroll .card{--cw:118px;--ch:150px}
+.handscroll{display:flex;gap:10px;overflow-x:auto;padding:5px 2px 6px;flex:1 1 auto}
+.handscroll .card{--cw:126px;--ch:152px;padding:9px}
+.handscroll .card .nm{font-size:13px}
+.handscroll .card .tags{font-size:9px;line-height:1.5}
+.handscroll .card .stars{bottom:7px;right:8px}
 .handscroll::-webkit-scrollbar{height:7px}
 .handscroll::-webkit-scrollbar-thumb{background:var(--iron-dim);border-radius:4px}
 .handnote{font-family:var(--mono);font-size:10px;color:var(--text-faint);max-width:160px;line-height:1.55}
@@ -133,38 +136,40 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;tex
 
 /* ─── THE QUEST SCREEN ───────────────────────────────────────────────────────────────── */
 .quest{display:grid;grid-template-columns:minmax(0,620px) minmax(0,1fr);gap:32px;min-height:100%;
-  max-width:1560px;margin:0 auto}
+  max-width:1560px;margin:0 auto;align-items:start}
+.quest>div:first-child{display:flex;flex-direction:column;gap:18px}
 .panel{display:flex;flex-direction:column;gap:20px;min-width:0}
 .rk{background:var(--rack);border:1px solid var(--iron-dim);border-radius:3px;padding:22px 24px}
 .instrument{background:var(--rack-hi);border:1px solid var(--iron-dim);border-radius:3px;
-  padding:22px 24px;display:flex;flex-direction:column;gap:18px}
+  padding:18px 22px;display:flex;flex-direction:column;gap:15px}
 .back{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint)}
 .back:hover{color:var(--text)}
 
 /* ─── THE BOARD (quest list) ─────────────────────────────────────────────────────────── */
-.list{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.list{max-width:1020px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
 .listhead{display:flex;align-items:baseline;gap:16px;margin-bottom:4px}
 .listhead h2{font-size:23px;font-weight:600;margin:0;font-variant:small-caps;color:var(--text)}
 .listhead .n{font-family:var(--mono);font-size:11px;color:var(--text-faint)}
 .listhead .acts{margin-left:auto}
-.row{background:var(--rack);border:1px solid var(--iron-dim);border-radius:3px;padding:16px 20px;
-  display:grid;grid-template-columns:1fr 190px 210px;gap:20px;align-items:center;
-  transition:border-color .12s,background .12s;width:100%}
+.row{background:var(--rack);border:1px solid var(--iron-dim);border-radius:3px;
+  display:flex;align-items:stretch;transition:border-color .12s,background .12s;overflow:hidden}
 .row:hover{border-color:var(--iron);background:var(--rack-hi)}
+.row .open{flex:1 1 auto;min-width:0;padding:15px 20px;display:block}
+.row .side{flex:0 0 auto;display:flex;align-items:center;gap:16px;padding:15px 18px 15px 8px}
 .row .t{font-size:17px;font-weight:600;color:var(--text);margin-bottom:3px}
-.row .s{font-size:13.5px;color:var(--text-dim);line-height:1.5;max-width:64ch}
+.row .s{font-size:13.5px;color:var(--text-dim);line-height:1.5}
 .row .tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
   color:var(--text-faint);margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}
 .row .tag .saga{color:var(--brass)}
-.pips{display:flex;gap:6px;align-items:center}
+.pips{display:flex;gap:5px;align-items:center}
 .pip{width:15px;height:21px;border-radius:2px;border:1px dashed var(--iron-dim);background:rgba(0,0,0,.3)}
 .pip.req{border-color:color-mix(in srgb,var(--blood) 55%,transparent)}
 .pip.on{background:var(--vellum);border:1px solid #8d8470}
 .rowodds{font-family:var(--mono);font-size:10.5px;color:var(--text-faint);line-height:1.6;font-variant-numeric:tabular-nums}
 .rowodds b{color:var(--green);font-weight:500}
 .rowodds b.thin{color:var(--blood)}
-.rowacts{display:flex;gap:8px;justify-content:flex-end}
-.rowacts .act{padding:8px 13px;font-size:10px}
+.rowacts .act{padding:8px 14px;font-size:10px}
+.rowstate{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:96px}
 
 /* ─── THE READER ─────────────────────────────────────────────────────────────────────── */
 .reader{position:fixed;inset:0;background:rgba(6,8,10,.75);display:none;align-items:center;
@@ -245,6 +250,7 @@ const ROSTER = [
   {id:"m8",name:"Galondorn",lvl:3,stars:3,worth:31,race:"wolfman",tags:["ranged (mid)","serious"]},
 ];
 
+const SHOW_UNMET=false;   // designer 2026-08-28: unmet cast are not shown at all
 const S={view:"board",questId:null,assign:{},active:null};   // assign: {"q16:0": "m3"}
 const key=(q,i)=>`${q}:${i}`;
 const byId=id=>ROSTER.find(m=>m.id===id);
@@ -253,6 +259,7 @@ const coinOf=(q,mId,slot)=>q.coins[ROSTER.findIndex(m=>m.id===mId)][slot];
 const spokenFor=id=>Object.keys(S.assign).find(k=>S.assign[k]===id);
 const slotOf=(q,i)=>S.assign[key(q.id,i)];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const clip=(t,n)=>t.length<=n?t:t.slice(0,t.lastIndexOf(" ",n))+"…";
 const GHOST=`<svg class="ghost" viewBox="0 0 36 46" aria-hidden="true"><path d="M18 4a7.5 7.5 0 1 1 0 15 7.5 7.5 0 0 1 0-15Zm0 17c8.6 0 15 5.2 15 12.6V46H3V33.6C3 26.2 9.4 21 18 21Z"/></svg>`;
 
 /* ── GREEDY AUTO-ASSIGN ─────────────────────────────────────────────────────────────────
@@ -316,7 +323,7 @@ function slotHTML(q,s){
     <div class="demand">${s.attr} · bar ${s.bar.toFixed(1)} · <span class="up">${s.favored.join(" ")}</span> · <span class="down">${s.clashing.join(" ")}</span></div></div>`;
 }
 function gaugeHTML(q){
-  const o=odds(q), a=-120+240*o.pct;
+  const o=odds(q), a=-90+180*o.pct;
   return `<div class="gauge">
     <svg width="120" height="78" viewBox="0 0 120 78" aria-hidden="true">
       <path d="M14 66a46 46 0 0 1 92 0" fill="none" stroke="#39414a" stroke-width="9" stroke-linecap="round"/>
@@ -336,18 +343,20 @@ function boardView(){
       <div class="acts"><button class="act auto" data-autoall>Auto-fill every quest</button></div></div>
     ${QUESTS.map(q=>{
       const o=odds(q);
-      return `<button class="row" data-open="${q.id}">
-        <div><div class="t">${esc(q.title)}</div>
-          <div class="s">${esc(q.situation.length>150?q.situation.slice(0,148)+"…":q.situation)}</div>
+      return `<div class="row">
+        <button class="open" data-open="${q.id}">
+          <div class="t">${esc(q.title)}</div>
+          <div class="s">${esc(clip(q.situation,150))}</div>
           <div class="tag"><span>${q.rarity} · level ${q.level}</span>
             ${q.saga?`<span class="saga">${esc(q.saga)} · beat ${q.beat}</span>`:`<span>one-off</span>`}
-            <span>lapses in ${q.lapses}</span></div></div>
-        <div class="pips">${q.slots.map(s=>`<span class="pip req${slotOf(q,s.idx)?" on":""}"></span>`).join("")}
-          <span class="rowodds" style="margin-left:8px">${o.filled}/${o.of}</span></div>
-        <div class="rowacts">
-          <span class="rowodds">${o.ready?`<b class="${o.pct<.4?"thin":""}">${Math.round(o.pct*100)}%</b><br>${o.coins}c vs ${o.bar.toFixed(1)}`:"not manned"}</span>
-          <button class="act auto" data-auto="${q.id}">Auto</button></div>
-      </button>`}).join("")}
+            <span>lapses in ${q.lapses}</span></div>
+        </button>
+        <div class="side">
+          <div class="pips">${q.slots.map(s=>`<span class="pip req${slotOf(q,s.idx)?" on":""}"></span>`).join("")}</div>
+          <div class="rowstate"><span class="rowodds">${o.filled}/${o.of} named</span>
+            <span class="rowodds">${o.ready?`<b class="${o.pct<.4?"thin":""}">${Math.round(o.pct*100)}%</b> · ${o.coins}c vs ${o.bar.toFixed(1)}`:"not manned"}</span></div>
+          <div class="rowacts"><button class="act auto" data-auto="${q.id}">Auto</button></div>
+        </div></div>`}).join("")}
   </div>`;
 }
 
@@ -366,21 +375,21 @@ function questView(){
         <div class="errand"><b>THE ERRAND</b> ${esc(q.job)}<br><b>THE PAY</b> ${esc(q.reward)}</div>
         <div class="seal">SEALED</div>
       </div>
-    </div>
-    <div class="panel">
-      ${q.cast.length?`<div class="rk"><div class="sect">On this matter</div>
-        <div class="people">${q.cast.map((c,i)=>`<div class="person">${heldHTML(c,i)}
-          <div class="cap">${c.met?"held to this matter":"turns face up when you meet them"}</div></div>`).join("")}</div></div>`:""}
-      <div class="rk"><div class="sect">Who you send</div>
-        <div class="board">${q.slots.map(s=>slotHTML(q,s)).join("")}</div></div>
       <div class="instrument">
         ${gaugeHTML(q)}
         <div class="acts">
-          <button class="act go" ${o.ready?"":"disabled"}>${o.ready?"Send them":`${o.of-o.filled} still to name`}</button>
+          <button class="act go" ${o.ready?"":"disabled"}>Send them</button>
           <button class="act auto" data-auto="${q.id}">Auto-assign</button>
           <button class="act" data-clear>Clear</button>
-          <button class="act" data-back>Leave it on the board</button>
+          <button class="act" data-back>Leave it</button>
         </div></div>
+    </div>
+    <div class="panel">
+      ${q.cast.filter(c=>c.met||SHOW_UNMET).length?`<div class="rk"><div class="sect">On this matter</div>
+        <div class="people">${q.cast.map((c,i)=>[c,i]).filter(([c])=>c.met||SHOW_UNMET).map(([c,i])=>`<div class="person">${heldHTML(c,i)}
+          <div class="cap">${c.met?"held to this matter":"turns face up when you meet them"}</div></div>`).join("")}</div></div>`:""}
+      <div class="rk"><div class="sect">Who you send</div>
+        <div class="board">${q.slots.map(s=>slotHTML(q,s)).join("")}</div></div>
     </div></div>`;
 }
 
@@ -453,5 +462,8 @@ document.addEventListener("keydown",e=>{
     for(let i=0;i<p.length;i+=4){const v=Math.random()*255;p[i]=p[i+1]=p[i+2]=v;p[i+3]=7}
     x.putImageData(d,0,0)}
   paint();let t;addEventListener("resize",()=>{clearTimeout(t);t=setTimeout(paint,180)})})();
+const P=new URLSearchParams(location.search), q0=P.get("q");
+if(q0&&QUESTS.some(q=>q.id===q0)){S.view="quest";S.questId=q0}
+if(P.get("auto"))QUESTS.forEach(autoAssign);   // exercise the real greedy path for a screenshot
 render();
 </script>
