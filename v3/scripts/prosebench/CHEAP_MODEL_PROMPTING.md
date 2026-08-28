@@ -293,3 +293,43 @@ still read badly: *"The gravedigger of the river hamlet, Tarnford took it."* The
 dealt appositive faithfully and never closed it, so the sentence reads as a list until the reader
 backs up. This is L19 with the other shoe dropped — a dealt string has to *parse* where it lands,
 not merely be grammatical on its own. The engine opened the comma, so the engine closes it.
+
+---
+
+**L27. A defect measured by a detector is not a defect measured by a reader — and the cure can
+score worse than the disease.** L25/L26 above are correct about what they measured: heavy one-off
+cards went from 0 % to 94 % free of un-introduced proper nouns, replicated on two seeds. Then the
+designer said the cards had got *"rather weird and not very well written"*, and a blind bench said
+so too. Two rounds, 48 cards each, 3 independent judges per round, inter-judge r 0.78–0.88, four
+builds sampled on the SAME twelve archetypes and the same seed:
+
+| build | round 1 | round 2 |
+|---|---|---|
+| before any of it | 5.36 | **5.33** |
+| + the naming ladder (L25/L26) | 5.08 | 5.08 |
+| + one-action job rule + errand-shaped glosses | — | **4.39** |
+
+Every step made it worse, and the judges named the cure by name: *"gazetteer appositives ('a
+shepherds' hamlet, Bramwell')"*, *"Bramwell thrice"*, *"appositive name-drops and boilerplate
+reward wording bury a decent hook under repeated proper nouns."* The naming fix traded a defect
+readers barely noticed for one they noticed a lot. **Introducing a name does not make it worth
+carrying**: "a shepherds' hamlet, Bramwell" tells the reader nothing "Bramwell" did not, and costs
+four more words in a card whose whole budget is twenty-five. The right answer to invented toponyms
+was FEWER of them, not better-dressed ones.
+
+Three rules fall out of this, and they are the expensive kind:
+
+- **Never ship a prose change on a mechanical metric.** A regex can count un-introduced names. It
+  cannot tell you the introductions read as a template. Any measure whose numerator is a pattern
+  match needs a reader before it becomes a commit.
+- **A negative result needs the same replication as a positive one.** The ladder was replicated
+  twice and was still measuring the wrong thing. Replication buys reliability, not validity.
+- **The 0 %→94 % number was real and the change was still wrong.** Keep both facts. The temptation
+  is to decide the measurement was bad; it was fine, it just answered a question nobody asked.
+
+**L28. The one-action job rule backfired through its neighbour (L23 again).** Blind judges in round
+1 all named the JOB line's three-verb comma list as what flattened the cards, so the prompt was
+told to give ONE action. Comma-verbs per job fell 2.6 → 0.1 — the rule landed exactly. The build
+then scored *worst of four*, with the most `ungrammatical` tags of any variant: stripped of its
+list, the writer started returning bare fragments ("exhume the coffin") beside finished sentences.
+Fixing what the judges complained about is not the same as fixing what was wrong.

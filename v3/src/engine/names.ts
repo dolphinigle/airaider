@@ -65,18 +65,3 @@ export function rollPlaceName(rng: Rng): string {
     'barrow', 'bourne', 'cot', 'croft', 'dale', 'fen', 'garth', 'gill', 'holt', 'lea', 'moss', 'shaw', 'thorpe', 'worth'];
   return rng.pick(a) + rng.pick(b);
 }
-
-/** What a place IS, for the pre-shaped toponym below. Plain kinds only: the reader has to be able
- *  to picture it from three words. */
-const PLACE_KIND = ['a mill town', 'a river hamlet', 'a market village', 'a fishing hamlet',
-  'a crossroads village', 'a hill farmstead', 'a ferry landing', 'a mining camp', 'a droving town',
-  'a walled village', 'a charcoal camp', 'a shepherds\' hamlet', 'a timber camp', 'a ford village'];
-
-/** A toponym the card can paste WHOLE and have it already introduced: "a mill town, Sedgedale".
- *  Measured 2026-08-28: heavy one-offs invented 2-3 bare place names per card and no prompt rule
- *  moved it (0% clean; the ABOVE ALL ban reached 39% and stalled, because the engine was at the
- *  same time DEALING bare toponyms for the card to use). A dealt string is pasted where it lands
- *  (L19), so the engine deals the introduction rather than asking for one. */
-export function introducePlace(place: string, rng: Rng): string {
-  return `${rng.pick(PLACE_KIND)}, ${place}`;
-}
