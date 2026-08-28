@@ -223,6 +223,11 @@ function stateView() {
 
 const app = Fastify();
 
+// This is the API, not the game. Opening the API port in a browser is the obvious mistake to
+// make — the startup log prints this URL — so send people to the UI instead of a bare 404.
+const WEB = `http://localhost:${process.env.WEB_PORT ?? 5273}`;
+app.get('/', async (_req, reply) => reply.redirect(WEB));
+
 app.get('/api/state', async () => stateView());
 
 // actions run strictly one-at-a-time — concurrent requests (double-clicks) must
@@ -322,5 +327,6 @@ async function handleAction(body: { type: string; args: (string | number)[] }) {
 
 const port = Number(process.env.PORT ?? 3210);
 app.listen({ port, host: '127.0.0.1' }).then(() => {
-  console.log(`[server] http://127.0.0.1:${port} · AI: ${ai.name}`);
+  console.log(`[server] API on http://127.0.0.1:${port} · AI: ${ai.name}`);
+  console.log(`[server] THE GAME IS AT ${WEB}  ← open this one`);
 });
