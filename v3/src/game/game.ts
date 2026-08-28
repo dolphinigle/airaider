@@ -196,14 +196,18 @@ export class Game {
   // ---- helpers -------------------------------------------------------------------------------
 
   card(id: string): Card | undefined { return this.state.cards.find(c => c.id === id) }
-  private addCard(c: Card) {
+  /** `keepName` — this card's name is DELIBERATE (a face the world already knows, coming back).
+   *  Without it the twin-name guard below rerolls them: a returning person's name is in the
+   *  lorebook by definition, which is exactly what the guard treats as a collision. Two guards
+   *  had this bug; both now take the same exemption. */
+  private addCard(c: Card, keepName = false) {
     if (cardType(c) === 'stackable') {
       const mate = this.state.cards.find(x => sameStack(x, c) && x.location.kind === 'held');
       if (mate) { mate.qty = (mate.qty ?? 0) + (c.qty ?? 0); return }
     }
     // §4b corollary: two characters must never share a name — NOR near-twin names
     // (a colliding "Fenlin" merged NPC and soldier; twin focals "Pellthil"/"Pellnith" read as one saga twice)
-    if (c.character) {
+    if (c.character && !keepName) {
       const race = c.tags.find(t => ['human', 'elf', 'wolfman', 'lizardman'].includes(t.concept))?.concept ?? 'human';
       for (let i = 0; i < 12 && this.nameTooSimilar(c.name); i++)
         c.name = rollName(this.rng, race);
@@ -1215,7 +1219,9 @@ export class Game {
       // rate alone just rotates strangers evenly. Rule 1 forces a reuse, the reuse adds an edge,
       // rule 2 then favours that person — which is how a recurring cast forms instead of a census.
       const N = loreCast.length;
+      let promoted = false;
       if (N > 0 && !this.rng.chance(CAST_THETA / (CAST_THETA + N))) {
+        promoted = true;
         const nd = this.rng.weighted(loreCast.map(n =>
           [n, edgeCount(this.state.lore, n.id, this.state.cycle)] as [typeof n, number]));
         const text = `${nd.blurb} ${nd.identity}`;
@@ -1238,13 +1244,17 @@ export class Game {
           { excludeConcepts: recentFocalTags, maxSkills: 2 })[0]!;
       }
       // focal names skipped the similarity guard — two unrelated "Hessossk Scale-of-Bronze"s
-      // anchored back-to-back sagas
-      for (let i = 0; i < 12 && this.nameTooSimilar(focal.name); i++) {
+      // anchored back-to-back sagas. But a PROMOTED focal is a face the world already knows, so
+      // their name is IN the lorebook by definition and the guard read that as a collision and
+      // rerolled them into a stranger — silently undoing every reuse (measured: the branch fired
+      // 17 times in 30 and produced 0 returning faces). The guard is for coincidence, not for a
+      // deliberate return.
+      for (let i = 0; !promoted && i < 12 && this.nameTooSimilar(focal.name); i++) {
         focal.name = rollName(this.rng, focal.tags.find(t => ['elf', 'human', 'wolfman', 'lizardman'].includes(t.concept))?.concept ?? 'human',
           focal.tags.some(t => t.concept === 'female') ? 'female' : 'male');
       }
       focal.location = HELD('limbo');
-      this.addCard(focal);
+      this.addCard(focal, promoted);
     }
     this.ensureLoreNode(focal);
     // soldiers are NEVER-USE data at genesis (their only rule is "context, never cast" — the
