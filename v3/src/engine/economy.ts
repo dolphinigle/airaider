@@ -8,6 +8,7 @@ import {
 } from './tags.js';
 import { freshId, HELD, mintStackable, type Card, type CharRole } from './cards.js';
 import { growToLevel } from './growth.js';
+import { profileOf, type Archetype } from './archetypes.js';
 
 // ---- the master chart -------------------------------------------------------------
 
@@ -283,7 +284,7 @@ export function generateCard(rng: Rng, opts: GenOptions): Card {
 
 // ---- the split (ECONOMY §3) ----------------------------------------------------------
 
-export type Archetype = 'raid' | 'capture' | 'rescue' | 'escort' | 'investigate' | 'hunt' | 'contract' | 'lead-hunt';
+export type { Archetype } from './archetypes.js';   // the pool is a data table now (archetypes.ts)
 export type RewardKind = 'gold' | 'captive' | 'recruit' | 'relic' | 'lead';
 
 export interface RewardSpec {
@@ -297,47 +298,70 @@ export interface RewardSpec {
 export function splitOneOff(rng: Rng, V: number, archetype: Archetype, level = 1): RewardSpec[] {
   const out: RewardSpec[] = [];
   const unitShare = (lo: number, hi: number) => rng.float(lo, hi);
-  switch (archetype) {
-    case 'capture': {
+  // ARCHETYPES is ~100 rows over these EIGHT shapes (archetypes.ts). Nothing switches on the
+  // name — the name is the premise the writer sees, the profile is the money.
+  switch (profileOf(archetype)) {
+    case 'captive': {
       const s = unitShare(0.7, 0.9);
       out.push({ kind: 'captive', value: V * s }, { kind: 'gold', value: V * (1 - s) });
       break;
     }
-    case 'rescue': {
+    case 'recruit': {
       const s = unitShare(0.6, 0.85);
       out.push({ kind: 'recruit', value: V * s }, { kind: 'gold', value: V * (1 - s) });
       break;
     }
-    case 'hunt': case 'investigate': {
-      // 🛠 2026-07-10: was ALWAYS relic-primary — with escort/raid relic chances on top, ~half of
-      // all one-offs read as fetch-the-object (premise monotony). Sometimes the prize is coin,
-      // or coin and a trail worth following.
-      if (rng.chance(0.65)) {
-        const s = unitShare(0.3, 0.6);
-        out.push({ kind: 'relic', value: V * s }, { kind: 'gold', value: V * (1 - s) });
-      } else if (rng.chance(0.4)) {
-        out.push({ kind: 'lead', value: V * 0.3 }, { kind: 'gold', value: V * 0.7 });
-      } else out.push({ kind: 'gold', value: V });
+    case 'relic': {
+      // the object IS the job — relic-primary, and thicker than the old 30–60% so it buys more
+      // than a single tag (📏 §3.1: a level-2 hunt paid `relic 39` against a t4 tag costing 41)
+      const s = unitShare(0.55, 0.85);
+      out.push({ kind: 'relic', value: V * s }, { kind: 'gold', value: V * (1 - s) });
       break;
     }
-    case 'lead-hunt': {
+    case 'find': {
+      // you went looking and found something — object AND coin, neither dominant
+      if (rng.chance(0.7)) {
+        const s = unitShare(0.35, 0.6);
+        out.push({ kind: 'relic', value: V * s }, { kind: 'gold', value: V * (1 - s) });
+      } else out.push({ kind: 'lead', value: V * 0.3 }, { kind: 'gold', value: V * 0.7 });
+      break;
+    }
+    case 'lead': {
       out.push({ kind: 'lead', value: V * 0.7 }, { kind: 'gold', value: V * 0.3 });
       break;
     }
-    default: // raid / contract / escort → gold-primary with a relic chance
-      if (rng.chance(0.35)) {
+    case 'spoils': {
+      // what you carry off a place you took: coin, and often something off the floor
+      if (rng.chance(0.5)) {
         const s = unitShare(0.25, 0.5);
         out.push({ kind: 'relic', value: V * s }, { kind: 'gold', value: V * (1 - s) });
       } else out.push({ kind: 'gold', value: V });
+      break;
+    }
+    case 'bloody': {
+      // the pay is only coin, and the job is the kind that costs you. It pays BETTER than agreed
+      // work of the same weight — that premium is the whole point of the shape.
+      out.push({ kind: 'gold', value: V });
+      break;
+    }
+    default: {   // 'coin' — agreed work, agreed price
+      if (rng.chance(0.2)) {
+        const s = unitShare(0.2, 0.4);
+        out.push({ kind: 'relic', value: V * s }, { kind: 'gold', value: V * (1 - s) });
+      } else out.push({ kind: 'gold', value: V });
+    }
   }
-  // lottery: a bonus lead (priced — §21.2: lead grants are a budget component;
-  // 🛠 rate must carry the pre-lodge early game)
+  // lottery: a bonus lead (priced — §21.2, and §7.1 now spends that price). A bundle that ALREADY
+  // grants a lead gets its lead thickened instead of a second one bolted on (📏 §3.1 bug: lead-hunt
+  // handed out two separate leads 22% of the time).
   if (rng.chance(0.22)) {
     const leadCost = V * 0.15;
     const goldPart = out.find(r => r.kind === 'gold');
     if (goldPart && goldPart.value > leadCost) {
       goldPart.value -= leadCost;
-      out.push({ kind: 'lead', value: leadCost });
+      const existing = out.find(r => r.kind === 'lead');
+      if (existing) existing.value += leadCost;
+      else out.push({ kind: 'lead', value: leadCost });
     }
   }
   return out.map(r => ({ ...r, value: Math.round(r.kind === 'gold' ? r.value * incomeScale(level) : r.value) }));

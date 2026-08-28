@@ -3,6 +3,7 @@
 // Key from OPENAI_API_KEY via ../.env or ~/.airaider/openai.env (never printed/committed).
 
 import OpenAI from 'openai';
+import { glossOf, type Archetype } from '../engine/archetypes.js';
 import { z } from 'zod';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -254,18 +255,10 @@ const ASK_SPEC = '- ask: EXACTLY slotCount entries — one per soldier the job n
 /** Only the archetype ACTUALLY dealt reaches the model. The old line defined all eight (77 words,
  *  ~68 of them about jobs not in play) — dead mass for a cheap model (§0) and seven concrete
  *  instances free to leak (L13). */
-const ARCHETYPE_GLOSS: Record<string, string> = {
-  raid: 'hit a holdout for spoils',
-  capture: 'take someone alive',
-  rescue: 'free someone held',
-  escort: 'guard a journey',
-  investigate: 'uncover a hidden thing',
-  hunt: 'track down a person or beast',
-  contract: 'an agreed task for set pay — the work IS the premise',
-  'lead-hunt': 'sweep for rumors; never promise "further work" — the engine announces leads',
-};
+// the gloss now lives ON the archetype row (engine/archetypes.ts) — ~100 of them, and only the
+// DRAWN one ever renders, so the pool costs the same prompt as the old eight did.
 const archetypeLine = (a?: string): string =>
-  a && ARCHETYPE_GLOSS[a] ? `- archetype: ${a} — ${ARCHETYPE_GLOSS[a]}. The job matches it, specific to this place.` : '';
+  (g => g ? `- archetype: ${a} — ${g}. The job matches it, specific to this place.` : '')(a ? glossOf(a as Archetype) : undefined);
 
 /** A ROUTINE JOB (designer ruling, 2026-08-27, from play: "reading one off quests become tiring
  *  after a while… one off shouldnt even have names etc… i think one sentence better").

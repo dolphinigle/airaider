@@ -704,7 +704,9 @@ export class Game {
     const l = rollFreshLead(this.rng, this.leadCtx(), () => freshId('lead-'), source);
     if (bonus > 0) l.bonus = Math.round(bonus);
     this.recentLeadArchetypes.push(l.archetype);
-    while (this.recentLeadArchetypes.length > 3) this.recentLeadArchetypes.shift();
+    // widened with the pool (2026-08-28): at eight archetypes a window of 3 was already most of
+    // the board; at ~100 it can hold a proper stretch without starving the draw
+    while (this.recentLeadArchetypes.length > 20) this.recentLeadArchetypes.shift();
     return l;
   }
 
@@ -3276,7 +3278,7 @@ export class Game {
     if (!this.hasRoom('map-room')) return;
     st.starterDripped ??= (st.cycle > 1 ? STARTER_DRIP_COUNT : 0);   // old saves: no retro-drip
     if (st.starterDripped >= STARTER_DRIP_COUNT) return;
-    st.leads.push(starterDripLead(st.starterDripped, st.cycle, () => freshId('lead-')));
+    st.leads.push(starterDripLead(this.rng, st.starterDripped, st.cycle, () => freshId('lead-')));
     st.starterDripped += 1;
     this.log('leads', 'New word reaches the map table.');
   }

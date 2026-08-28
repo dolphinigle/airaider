@@ -3,6 +3,7 @@
 
 import type { Rng } from './rng.js';
 import { REGION } from './regions.js';
+import { boardPool, profileOf, slotRangeOf, type Profile } from './archetypes.js';
 import {
   vBase, RARITY_MULT, splitOneOff, generateCard, type Rarity, type Archetype, type RewardSpec,
 } from './economy.js';
@@ -38,7 +39,6 @@ export interface Lead {
 
 export const LEAD_TTL = 6; // cycles before an unpursued lead lapses 🛠
 
-const ONE_OFF_ARCHETYPES: Archetype[] = ['raid', 'capture', 'rescue', 'escort', 'investigate', 'hunt', 'contract'];
 
 export interface LeadRollCtx {
   cycle: number;
@@ -75,7 +75,7 @@ export function rollFreshLead(rng: Rng, ctx: LeadRollCtx, idGen: () => string,
   const newest = ctx.unlockedRegions[ctx.unlockedRegions.length - 1];
   const region = rng.weighted(ctx.unlockedRegions.map(r => [r, r === newest && ctx.unlockedRegions.length > 1 ? 2 : 1] as [string, number]));
   const rarity = rollRarity(rng, ctx.ghTier);
-  const pool = ONE_OFF_ARCHETYPES.filter(a => a !== 'capture' || ctx.hasDungeon);
+  const pool = boardPool(ctx);
   const fresh = pool.filter(a => !ctx.recentArchetypes?.includes(a));
   const archetype = rng.pick(fresh.length ? fresh : pool);
   const startChance = rarity === 'rare' ? 0.7 : rarity === 'uncommon' ? 0.3 : 0.08;
@@ -106,14 +106,17 @@ export function starterPacket(rng: Rng, cycle: number, idGen: () => string): Lea
   return leads;
 }
 
-/** the rest of the old day-0 packet, dripped one per cycle after the Map room stands */
-export function starterDripLead(i: number, cycle: number, idGen: () => string): Lead {
-  const seq: [Archetype, Rarity, number][] = [
-    ['raid', 'common', 1], ['hunt', 'common', 1], ['investigate', 'common', 2], ['raid', 'common', 2],
-  ];
-  const [archetype, rarity, level] = seq[i % seq.length]!;
+/** the rest of the old day-0 packet, dripped one per cycle after the Map room stands.
+ *  The RAMP (level 1,1,2,2) is fixed because it is the learning curve; the WORK is rolled from
+ *  the pool, because a hardcoded seq of four meant the first twenty cycles never met the ~100
+ *  archetypes at all — found by playing it (2026-08-28: 7 distinct archetypes in 26 cycles). */
+export function starterDripLead(rng: Rng, i: number, cycle: number, idGen: () => string): Lead {
+  const RAMP: [Rarity, number][] = [['common', 1], ['common', 1], ['common', 2], ['common', 2]];
+  const [rarity, level] = RAMP[i % RAMP.length]!;
+  // no Dungeon on day 0, and the lodge posts its own lead-hunt — so this is the ungated pool
+  const pool = boardPool({ hasDungeon: false });
   return {
-    id: idGen(), rarity, level, region: 'forests', archetype,
+    id: idGen(), rarity, level, region: 'forests', archetype: rng.pick(pool),
     chainInfo: { kind: 'none' }, expiresAtCycle: cycle + 40, source: 'starter',
   };
 }
@@ -175,13 +178,8 @@ export interface Quest {
 }
 
 /** slot count N from the archetype (engine, BEFORE reward gen — §8 one-off flow) */
-const SLOT_RANGE: Record<Archetype, [number, number]> = {
-  raid: [2, 3], capture: [2, 3], rescue: [1, 2], escort: [1, 2],
-  investigate: [1, 2], hunt: [1, 2], contract: [1, 1], 'lead-hunt': [1, 1],
-};
-
 export function slotCount(rng: Rng, archetype: Archetype, rarity: Rarity): number {
-  const [lo, hi] = SLOT_RANGE[archetype];
+  const [lo, hi] = slotRangeOf(archetype);
   let n = rng.range(lo, hi);
   if (rarity === 'rare') n = Math.min(4, n + 1);
   return n;
@@ -191,7 +189,7 @@ export function slotCount(rng: Rng, archetype: Archetype, rarity: Rarity): numbe
  *  archetype's own range, +1 for rare, capped at 4. Mirrors slotCount() exactly; the ±20% value
  *  roll and the roster clamp are not modelled because both wash out. */
 export function expectedSlots(archetype: Archetype, rarity: Rarity): number {
-  const [lo, hi] = SLOT_RANGE[archetype];
+  const [lo, hi] = slotRangeOf(archetype);
   const mid = (lo + hi) / 2;
   return rarity === 'rare' ? Math.min(4, mid + 1) : mid;
 }
@@ -330,19 +328,23 @@ export function liabilityTriggers(rng: Rng, ageCycles: number): boolean {
 
 // ---- ask defaults (mock-side; the AI provider authors the real ask) --------------------------
 
-const ARCHETYPE_TESTS: Record<Archetype, { attrs: Attribute[]; favored: string[]; clashing: string[] }[]> = {
-  raid: [{ attrs: ['str'], favored: ['melee', 'intimidation'], clashing: [] }, { attrs: ['dex'], favored: ['ranged', 'roguery'], clashing: [] }],
-  capture: [{ attrs: ['str'], favored: ['melee', 'intimidation'], clashing: ['hotheaded'] }, { attrs: ['dex'], favored: ['roguery', 'nature'], clashing: [] }],
-  rescue: [{ attrs: ['dex'], favored: ['roguery', 'nature'], clashing: [] }, { attrs: ['cha'], favored: ['social', 'heal'], clashing: [] }],
-  escort: [{ attrs: ['con'], favored: ['melee', 'nature'], clashing: [] }, { attrs: ['cha'], favored: ['social', 'leadership'], clashing: [] }],
-  investigate: [{ attrs: ['int'], favored: ['lore', 'roguery'], clashing: ['hotheaded'] }, { attrs: ['cha'], favored: ['social'], clashing: [] }],
-  hunt: [{ attrs: ['dex'], favored: ['nature', 'ranged'], clashing: [] }, { attrs: ['con'], favored: ['nature', 'melee'], clashing: [] }],
-  contract: [{ attrs: ['cha'], favored: ['social', 'performance'], clashing: [] }, { attrs: ['int'], favored: ['lore', 'craft'], clashing: [] }],
-  'lead-hunt': [{ attrs: ['dex'], favored: ['nature', 'roguery'], clashing: [] }, { attrs: ['cha'], favored: ['social'], clashing: [] }],
+/** FALLBACK only — the AI writes the real ask from the card it just wrote (see buildSlots); this
+ *  fires when it under-delivers entries. One default per reward PROFILE covers the whole pool,
+ *  and it is where the magic skills finally get one-off work: nothing in the old eight-archetype
+ *  table ever favoured magic-*, so a mage had no job outside a saga. */
+const PROFILE_TESTS: Record<Profile, { attrs: Attribute[]; favored: string[]; clashing: string[] }[]> = {
+  spoils: [{ attrs: ['str'], favored: ['melee', 'intimidation'], clashing: [] }, { attrs: ['dex'], favored: ['ranged', 'roguery'], clashing: [] }],
+  bloody: [{ attrs: ['con'], favored: ['melee', 'leadership'], clashing: ['submissive'] }, { attrs: ['str'], favored: ['melee', 'intimidation'], clashing: ['hotheaded'] }],
+  captive: [{ attrs: ['str'], favored: ['melee', 'intimidation'], clashing: ['hotheaded'] }, { attrs: ['dex'], favored: ['roguery', 'nature'], clashing: [] }],
+  recruit: [{ attrs: ['dex'], favored: ['roguery', 'nature'], clashing: [] }, { attrs: ['cha'], favored: ['social', 'heal'], clashing: [] }],
+  relic: [{ attrs: ['int'], favored: ['lore', 'craft'], clashing: ['hotheaded'] }, { attrs: ['int'], favored: ['magic-earth', 'magic-dark'], clashing: [] }],
+  find: [{ attrs: ['dex'], favored: ['nature', 'ranged'], clashing: [] }, { attrs: ['int'], favored: ['lore', 'roguery'], clashing: ['hotheaded'] }],
+  lead: [{ attrs: ['cha'], favored: ['social'], clashing: ['intimidation'] }, { attrs: ['dex'], favored: ['nature', 'roguery'], clashing: [] }],
+  coin: [{ attrs: ['cha'], favored: ['social', 'performance'], clashing: [] }, { attrs: ['con'], favored: ['melee', 'nature'], clashing: [] }],
 };
 
 export function defaultAsk(rng: Rng, archetype: Archetype): { attrs: Attribute[]; favored: string[]; clashing: string[] } {
-  const options = ARCHETYPE_TESTS[archetype];
+  const options = PROFILE_TESTS[profileOf(archetype)];
   const pick = rng.pick(options);
   // occasional multi-stat test (§10: pooled per-unit, bar ×(n+1)/2)
   if (rng.chance(0.15)) {
