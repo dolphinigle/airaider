@@ -97,6 +97,9 @@ function stateView() {
     // while a cycle is resolving the live lines win; the module variable is the finished cycle's
     // copy, kept so `⚄ last reckoning` still works after PROCEED
     lastReport: live ? live.lines : lastReport,
+    // a light INDEX of the archive — the bodies are fetched on demand from /api/reckoning, so a
+    // 1-second poll does not carry a dozen reports
+    reckoningCycles: game.reckonings().map(r => r.cycle),
     // false once every report line is in — even though endCycle() is still running its flesh tail
     reckoningWriting: !!live?.writing,
     // TEMPO P1: several pursuits can be out at once, so "what is in flight" is a LIST on the state,
@@ -235,6 +238,14 @@ const WEB = `http://localhost:${process.env.WEB_PORT ?? 5273}`;
 app.get('/', async (_req, reply) => reply.redirect(WEB));
 
 app.get('/api/state', async () => stateView());
+
+/** re-read a past reckoning. The archive lives in the SAVE, so this survives a restart and
+ *  can look further back than the cycle just resolved. */
+app.get('/api/reckoning', async (req) => {
+  const c = Number((req.query as { cycle?: string }).cycle);
+  const r = game.reckoningAt(Number.isFinite(c) ? c : undefined);
+  return r ?? { cycle: null, lines: [] };
+});
 
 // actions run strictly one-at-a-time — concurrent requests (double-clicks) must
 // never interleave inside an awaiting action

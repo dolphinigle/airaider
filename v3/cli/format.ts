@@ -34,7 +34,7 @@ export const render = {
     return [
       'VIEWS   fort · rooms · room <id> · roster · merc <id> · leads · quests · quest <id>',
       '        captives · items · chains · chain <id> · lore <id> · tavern · holding',
-      '        buildable · status · log [n]',
+      '        buildable · status · log [n] · reckoning [cycle|list]',
       'BUILD   build <type> [ownerId] · upgrade <roomId> · renovate <roomId> <style>',
       '        excavate · gh   (styles: human elven wolfkin lizardkin ancient exotic)',
       'CARDS   slot <roomId> <idx> <cardId> · unslot <roomId> <idx> · focus <mercId> single|dual|none <attr> [attr2]',
@@ -153,6 +153,21 @@ export const render = {
       const pay = b.band ? ` ${b.stars} ${b.label}` : '';
       return `${l.id.padEnd(9)} ${l.rarity.padEnd(8)} L${String(l.level).padEnd(3)} ${REGION[l.region]!.name.padEnd(18)} ${l.archetype.padEnd(18)}${chain}${mark}${pay.padEnd(24)} exp:${exp}${l.title ? ` — ${l.title}` : ''}`;
     }).join('\n');
+  },
+
+  /** re-read a past reckoning — the reports are archived in the save (RECKONINGS_KEPT), so this
+   *  works after you have advanced, and after a restart. */
+  reckoning(g: Game, arg?: string): string {
+    const all = g.reckonings();
+    if (!all.length) return '(no reckoning yet — end a cycle first)';
+    if (arg === 'list') {
+      return ['KEPT RECKONINGS (reckoning <cycle> to read one):',
+        ...all.map(r => `  cycle ${String(r.cycle).padEnd(4)} ${r.lines.length} lines · ${(r.lines.find(l => l.startsWith('— ')) ?? r.lines[0] ?? '').slice(0, 60)}`)].join('\n');
+    }
+    const want = arg ? Number(arg) : undefined;
+    const r = g.reckoningAt(Number.isFinite(want) ? want : undefined);
+    if (!r) return `(no reckoning kept for cycle ${arg} — 'reckoning list' shows what is kept)`;
+    return [`━━━ THE RECKONING · CYCLE ${r.cycle} ━━━`, ...r.lines].join('\n');
   },
 
   /** what the map table has OUT (TEMPO P2/P5) — finished work is not a list, it is a card on the

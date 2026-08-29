@@ -216,11 +216,20 @@ function lineClass(l: string): string {
 }
 
 function Reckoning({ s, busy, reckAt, jobs, onProceed }: { s: S; busy: boolean; reckAt: number | null; jobs: any[]; onProceed: () => void }) {
+  // ARCHIVE: `⚄ last reckoning` used to reopen exactly one cycle, held in server memory, so it was
+  // gone after a restart and could never look further back. The reports are now kept in the SAVE
+  // and fetched on demand, so a player can re-read what happened after moving on.
+  const kept: number[] = s.reckoningCycles ?? [];
+  const [past, setPast] = useState<{ cycle: number; lines: string[] } | null>(null);
+  const openPast = async (cycle: number) => {
+    const r = await (await fetch(`/api/reckoning?cycle=${cycle}`)).json();
+    setPast(r?.lines?.length ? r : null);
+  };
   // CYCLE guard, not a busy guard: the previous cycle's report is stale until the engine bumps the
   // cycle, and from that instant every line on the wire belongs to THIS reckoning — so they render
   // one by one as they land instead of waiting for the POST to return.
   const fresh = reckAt === null || s.cycle > reckAt;
-  const lines: string[] = fresh ? (s.lastReport ?? []) : [];
+  const lines: string[] = past ? past.lines : fresh ? (s.lastReport ?? []) : [];
   // the flesh tail (12-16s) keeps the POST open long after the last report line is in — the player
   // must not be held for it, so the door opens on `reckoningWriting`, not on `busy`
   // Gate on `busy` FIRST: `s` only advances when a poll succeeds, and every poll failure is
@@ -231,7 +240,17 @@ function Reckoning({ s, busy, reckAt, jobs, onProceed }: { s: S; busy: boolean; 
     <div className="app reckpage">
       <header className="reckhead">
         <b>THE RECKONING</b>
-        <span>cycle {s.cycle}</span>
+        <span>cycle {past ? past.cycle : s.cycle}{past ? ' — looking back' : ''}</span>
+        {/* step back through the kept reckonings; the archive lives in the save */}
+        {kept.length > 1 && (
+          <span className="reckback">
+            {kept.map(c => (
+              <button key={c} className={'rbtn' + ((past ? past.cycle === c : c === kept[kept.length - 1] && !past) ? ' on' : '')}
+                onClick={() => (past && past.cycle === c ? setPast(null) : openPast(c))}>{c}</button>
+            ))}
+            {past && <button className="rbtn now" onClick={() => setPast(null)}>now</button>}
+          </span>
+        )}
         <span className="ai">AI: {s.aiName} ({s.ai.calls} calls{s.aiName === 'openai' ? `, ~$${s.ai.costUsd.toFixed(2)}` : ''})</span>
       </header>
       {/* TEMPO P9: END waits for the queue and the engine drains it HERE — so the strip has to be on

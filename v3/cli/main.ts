@@ -226,6 +226,7 @@ async function exec(game: Game, line: string): Promise<boolean> {
     case 'chain': console.log(render.chainDetail(game, arg)); break;
     case 'lore': console.log(locked('lore') ?? render.lore(game, arg)); break;
     case 'log': console.log(render.log(game, Number(arg) || 15)); break;
+    case 'reckoning': case 'last': console.log(render.reckoning(game, arg)); break;
     case 'tavern': console.log(locked('recruits') ?? render.tavern(game)); break;
     case 'holding': console.log(locked('staging') ?? render.holding(game)); break;
     case 'buildable': console.log(render.buildable(game)); break;

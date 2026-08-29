@@ -105,8 +105,13 @@ export interface GameState {
   /** early-game smoothing 2026-07-18: how many starterDripLead grants have fired (old saves
    *  default to done — no retro-drip mid-campaign) */
   starterDripped?: number;
+  /** the last dozen reckonings, kept so a player can re-read what happened after they have
+   *  moved on. The GUI's `⚄ last reckoning` was one cycle deep and lived in server memory, so it
+   *  vanished on restart and could never look further back than the cycle just resolved. */
+  reckonings?: { cycle: number; lines: string[] }[];
   log: LogEntry[];
 }
+export const RECKONINGS_KEPT = 12;
 
 const CAST_THETA = Number(process.env.CAST_THETA ?? 4);
 
@@ -2457,10 +2462,26 @@ export class Game {
     // keep the save lean: the log is a UI convenience, not the archive (lore is)
     if (st.log.length > 600) st.log = st.log.slice(-400);
 
+    // archive the reckoning BEFORE returning, so it survives the save and the player can look
+    // back after advancing (the cycle number was already bumped at the top of this pass)
+    const lines = blocks.flat();
+    if (lines.length) {
+      (st.reckonings ??= []).push({ cycle: st.cycle, lines });
+      while (st.reckonings.length > RECKONINGS_KEPT) st.reckonings.shift();
+    }
+
     this.state.rngState = this.rng.state();
     this.state.idCounter = idCounter();
     this.lastBlocks = blocks.map(b => [...b]);
-    return blocks.flat();
+    return lines;
+  }
+
+  /** every kept reckoning, oldest first */
+  reckonings(): { cycle: number; lines: string[] }[] { return this.state.reckonings ?? [] }
+  /** one reckoning by cycle number, or the most recent when no cycle is given */
+  reckoningAt(cycle?: number): { cycle: number; lines: string[] } | undefined {
+    const all = this.reckonings();
+    return cycle === undefined ? all[all.length - 1] : all.find(r => r.cycle === cycle);
   }
 
   abandon(questId: string): { ok: boolean; msg: string } {

@@ -273,3 +273,11 @@ tr.leadworking button:disabled { color: #c9b86a; border-color: #4a4130; cursor: 
 
 /* traits on a held cast card — the focal's, when the engine has a card for them */
 .qcard.held .casttags{display:block;margin-top:5px;font-size:10px;line-height:1.45;color:#7c8595;white-space:normal}
+
+/* the reckoning archive stepper — re-read a past cycle after moving on */
+.reckback{display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-left:6px}
+.reckback .rbtn{font-size:11px;padding:2px 7px;border-radius:5px;border:1px solid #2b3240;
+  background:#171c24;color:#8a93a3;cursor:pointer;line-height:1.6}
+.reckback .rbtn:hover{border-color:#3d4655;color:var(--ink)}
+.reckback .rbtn.on{background:#2a3242;color:var(--ink);border-color:#46506180}
+.reckback .rbtn.now{color:#cbb37a}
