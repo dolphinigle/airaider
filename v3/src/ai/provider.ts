@@ -28,6 +28,8 @@ export interface QuestWriteInput {
   // ── beat 1's own dealt facts (prosebench/ROUND2_3 — the questions cards lose) ──
   stakeIfLost?: string;          // what the client says BREAKS if the saga fails: beat 1's WHY
   arrival?: string;              // two atoms: how this reached the fort, and the client's manner
+  /** HOW this job gets done this time — one word, combined with KEYWORDS by the writer */
+  method?: string;
   knownObstacle?: string;        // what the client openly knows stands against them — never a name
   tell?: string;                 // one physical habit the client has while talking: the CARE MOMENT
   noClient?: boolean;            // this saga has no outside client — nobody hired the company

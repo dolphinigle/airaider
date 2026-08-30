@@ -24,6 +24,18 @@ export interface ArchetypeDef {
   profile: Profile;
   slots: [number, number];
   gate?: 'dungeon';              // a captive needs somewhere to put them
+  /** HOW this kind of work gets done, as single words. The engine deals ONE per card, and the
+   *  writer combines it with the keywords' concrete noun — `method: listening` + `thing: tavern`
+   *  becomes "go to the tavern and fish for news". Single words on purpose: a dealt string that is
+   *  a complete predicate gets pasted verbatim (N7, measured — `arrival` and `clientTell` do
+   *  exactly that), and a one-word method cannot be. This is what varies two cards of the SAME
+   *  kind of work, so the gloss can stay a general description instead of naming one scenario. */
+  methods?: string[];
+  /** a writer-facing CONSTRAINT for this kind of work, rendered as its own sentence. It is kept
+   *  out of `gloss` on purpose: the gloss is DATA describing the job, and a prohibition parked
+   *  inside it ("sweep for rumors; never promise further work") both muddies the description and
+   *  reads as part of the work. Only lead-hunt has needed one so far. */
+  rule?: string;
 }
 
 /** the ROW for every kind of one-off work. Pool sizes ARE the draw weights — a uniform pick over
@@ -37,41 +49,49 @@ export const ARCHETYPES = {
   // specific archetype is a scenario the writer can only transcribe, so it buys one story, not a
   // category. A good row is reusable across a hundred different premises; the SPECIFICS come from
   // the keywords and the framed character, never from the row's own name.
-  'raid': { gloss: 'hit a holdout for spoils', profile: 'spoils', slots: [2, 3] },
-  'capture': { gloss: 'take someone alive', profile: 'captive', slots: [2, 3], gate: 'dungeon' },
-  'rescue': { gloss: 'free someone held', profile: 'recruit', slots: [1, 2] },
-  'escort': { gloss: 'guard a journey', profile: 'coin', slots: [1, 2] },
-  'investigate': { gloss: 'uncover a hidden thing', profile: 'find', slots: [1, 2] },
-  'hunt': { gloss: 'track down a person or beast', profile: 'find', slots: [1, 2] },
-  'contract': { gloss: 'an agreed task for set pay — the work IS the premise', profile: 'coin', slots: [1, 1] },
-  'lead-hunt': { gloss: 'sweep for rumors; never promise "further work" — the engine announces leads', profile: 'lead', slots: [1, 1] },
+  'raid': { methods: ['storming', 'burning', 'ambushing', 'surrounding', 'breaching', 'outnumbering'], gloss: 'hit a holdout for spoils', profile: 'spoils', slots: [2, 3] },
+  'capture': { methods: ['cornering', 'luring', 'tracking', 'outnumbering', 'drugging', 'waylaying'], gloss: 'take someone alive', profile: 'captive', slots: [2, 3], gate: 'dungeon' },
+  'rescue': { methods: ['sneaking', 'bargaining', 'storming', 'bribing', 'distracting', 'cutting'], gloss: 'free someone held', profile: 'recruit', slots: [1, 2] },
+  'escort': { methods: ['guarding', 'outpacing', 'hiding', 'rerouting', 'shadowing', 'bluffing'], gloss: 'guard a journey', profile: 'coin', slots: [1, 2] },
+  'investigate': { methods: ['questioning', 'watching', 'searching', 'following', 'listening', 'comparing'], gloss: 'uncover a hidden thing', profile: 'find', slots: [1, 2] },
+  'hunt': { methods: ['tracking', 'baiting', 'trapping', 'cornering', 'waiting', 'driving'], gloss: 'track down a person or beast', profile: 'find', slots: [1, 2] },
+  'contract': { methods: ['labouring', 'hauling', 'mending', 'clearing', 'standing', 'digging'], gloss: 'an agreed task for set pay — the work IS the premise', profile: 'coin', slots: [1, 1] },
+  // designer 2026-08-30: "shouldnt it be something like 'go to tavern and fish for news'" — the old
+  // gloss ('sweep for rumors') was too vague to produce one, so the writer made mysteries instead:
+  // a live card had the company tracking a missing apprentice into the woods. Name the ACTIVITY.
+  'lead-hunt': {
+    methods: ['listening', 'asking', 'drinking', 'waiting', 'loitering', 'bribing', 'eavesdropping'],
+    gloss: 'go where people talk — a tavern, a market, a ford crossing — and come back knowing where the next job is',
+    rule: 'Never promise "further work" or more jobs: the card is the ASKING, and the engine announces whatever it turns up.',
+    profile: 'lead', slots: [1, 1],
+  },
 
   // ── APPROVED BY THE DESIGNER, one batch at a time (2026-08-28) ────────────────────────────
   // guard/recover proposed and approved; explore/trade are the designer's own additions.
-  'guard': { gloss: 'hold a place or a person against whatever comes', profile: 'coin', slots: [1, 2] },
-  'recover': { gloss: 'get back a specific thing that was taken', profile: 'relic', slots: [1, 2] },
-  'explore': { gloss: 'go into ground nobody has crossed and come back knowing it', profile: 'lead', slots: [1, 2] },
-  'trade': { gloss: 'buy, sell, or broker a thing whose price is somebody\'s trouble', profile: 'coin', slots: [1, 1] },
+  'guard': { methods: ['watching', 'patrolling', 'barring', 'standing', 'hiding', 'waiting'], gloss: 'hold a place or a person against whatever comes', profile: 'coin', slots: [1, 2] },
+  'recover': { methods: ['searching', 'buying', 'stealing', 'digging', 'demanding', 'trading'], gloss: 'get back a specific thing that was taken', profile: 'relic', slots: [1, 2] },
+  'explore': { methods: ['walking', 'mapping', 'climbing', 'wading', 'fording', 'scouting'], gloss: 'go into ground nobody has crossed and come back knowing it', profile: 'lead', slots: [1, 2] },
+  'trade': { methods: ['haggling', 'bribing', 'undercutting', 'brokering', 'smuggling', 'appraising'], gloss: 'buy, sell, or broker a thing whose price is somebody\'s trouble', profile: 'coin', slots: [1, 1] },
 
   // batch 2 — five approved from the Sultan taxonomy, plus the designer's `occult` and `fight`.
   // ritual vs occult is a deliberate split: ritual PERFORMS a working (the company supplies the
   // hands), occult CONFRONTS one already there. fight replaces the narrower `duel`.
-  'assassinate': { gloss: 'kill one named person and be gone', profile: 'coin', slots: [1, 2] },
-  'occult': { gloss: 'face something that should not be, and end or contain it', profile: 'relic', slots: [2, 3] },
-  'ritual': { gloss: 'see a working through — someone must hold the circle', profile: 'bloody', slots: [2, 3] },
-  'negotiate': { gloss: 'get a yes without drawing steel', profile: 'lead', slots: [1, 2] },
-  'fight': { gloss: 'a fight that was arranged, and is watched', profile: 'coin', slots: [1, 2] },
-  'research': { gloss: 'work a text or a site until it gives up its meaning', profile: 'find', slots: [1, 1] },
-  'heist': { gloss: 'take a thing out of a guarded place without being seen', profile: 'relic', slots: [2, 3] },
-  'adventure': { gloss: 'go into a dangerous place and come back with what is in it', profile: 'relic', slots: [2, 3] },
-  'bounty-hunt': { gloss: 'a posted name, brought in for the price on it', profile: 'captive', slots: [1, 2], gate: 'dungeon' },
-  'gather': { gloss: 'bring back a quantity of something that grows where people do not go', profile: 'coin', slots: [1, 2] },
+  'assassinate': { methods: ['poisoning', 'ambushing', 'waylaying', 'drowning', 'arranging', 'waiting'], gloss: 'kill one named person and be gone', profile: 'coin', slots: [1, 2] },
+  'occult': { methods: ['burning', 'binding', 'banishing', 'salting', 'breaking', 'sealing'], gloss: 'face something that should not be, and end or contain it', profile: 'relic', slots: [2, 3] },
+  'ritual': { methods: ['attending', 'guarding', 'supplying', 'carrying', 'holding', 'witnessing'], gloss: 'see a working through — someone must hold the circle', profile: 'bloody', slots: [2, 3] },
+  'negotiate': { methods: ['bargaining', 'threatening', 'flattering', 'bribing', 'waiting', 'conceding'], gloss: 'get a yes without drawing steel', profile: 'lead', slots: [1, 2] },
+  'fight': { methods: ['duelling', 'brawling', 'wrestling', 'outlasting', 'disarming', 'feinting'], gloss: 'a fight that was arranged, and is watched', profile: 'coin', slots: [1, 2] },
+  'research': { methods: ['reading', 'copying', 'questioning', 'measuring', 'comparing', 'digging'], gloss: 'work a text or a site until it gives up its meaning', profile: 'find', slots: [1, 1] },
+  'heist': { methods: ['sneaking', 'picking', 'distracting', 'tunnelling', 'impersonating', 'waiting'], gloss: 'take a thing out of a guarded place without being seen', profile: 'relic', slots: [2, 3] },
+  'adventure': { methods: ['descending', 'climbing', 'wading', 'torching', 'mapping', 'digging'], gloss: 'go into a dangerous place and come back with what is in it', profile: 'relic', slots: [2, 3] },
+  'bounty-hunt': { methods: ['tracking', 'ambushing', 'bribing', 'waiting', 'cornering', 'baiting'], gloss: 'a posted name, brought in for the price on it', profile: 'captive', slots: [1, 2], gate: 'dungeon' },
+  'gather': { methods: ['cutting', 'digging', 'picking', 'netting', 'felling', 'hauling'], gloss: 'bring back a quantity of something that grows where people do not go', profile: 'coin', slots: [1, 2] },
 
   // ── FAUCET-ONLY, never on the ordinary board ──────────────────────────────────────────────
   // `hire` belongs to the Recruiting post's standing lead (QUESTS §19) and nothing else. That
   // faucet used to deal `rescue`, so every hire from your own recruiting post read as freeing a
   // captive — the wrong job entirely for a post whose whole purpose is to bring on paid hands.
-  'hire': { gloss: 'find someone worth paying, and bring them back willing', profile: 'recruit', slots: [1, 2] },
+  'hire': { methods: ['persuading', 'outbidding', 'buying', 'promising', 'drinking', 'vouching'], gloss: 'find someone worth paying, and bring them back willing', profile: 'recruit', slots: [1, 2] },
 } as const satisfies Record<string, ArchetypeDef>;
 
 export type Archetype = keyof typeof ARCHETYPES;
@@ -83,6 +103,8 @@ const defOf = (a: Archetype): ArchetypeDef => ARCHETYPES[a] as ArchetypeDef;
 export const profileOf = (a: Archetype): Profile => defOf(a).profile;
 export const slotRangeOf = (a: Archetype): [number, number] => defOf(a).slots;
 export const glossOf = (a: Archetype): string | undefined => ARCHETYPES[a] ? defOf(a).gloss : undefined;
+export const methodsOf = (a: Archetype): string[] | undefined => ARCHETYPES[a] ? defOf(a).methods : undefined;
+export const ruleOf = (a: Archetype): string | undefined => ARCHETYPES[a] ? defOf(a).rule : undefined;
 
 /** the random board pool: everything the fort can actually take on. `lead-hunt` is excluded —
  *  it is the Scouting lodge's own standing repeatable, not a thing the board rolls. */

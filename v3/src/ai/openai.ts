@@ -3,7 +3,7 @@
 // Key from OPENAI_API_KEY via ../.env or ~/.airaider/openai.env (never printed/committed).
 
 import OpenAI from 'openai';
-import { glossOf, type Archetype } from '../engine/archetypes.js';
+import { glossOf, ruleOf, type Archetype } from '../engine/archetypes.js';
 import { z } from 'zod';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -257,8 +257,13 @@ const ASK_SPEC = '- ask: EXACTLY slotCount entries — one per soldier the job n
  *  instances free to leak (L13). */
 // the gloss now lives ON the archetype row (engine/archetypes.ts) — ~100 of them, and only the
 // DRAWN one ever renders, so the pool costs the same prompt as the old eight did.
-const archetypeLine = (a?: string): string =>
-  (g => g ? `- archetype: ${a} — ${g}. The job matches it, specific to this place.` : '')(a ? glossOf(a as Archetype) : undefined);
+const archetypeLine = (a?: string): string => {
+  const g = a ? glossOf(a as Archetype) : undefined;
+  if (!g) return '';
+  // the rule (when a kind of work has one) is its OWN sentence, never folded into the gloss
+  const r = a ? ruleOf(a as Archetype) : undefined;
+  return `- archetype: ${a} — ${g}. The job matches it, specific to this place.${r ? ` ${r}` : ''}`;
+};
 
 /** A ROUTINE JOB (designer ruling, 2026-08-27, from play: "reading one off quests become tiring
  *  after a while… one off shouldnt even have names etc… i think one sentence better").
@@ -277,6 +282,7 @@ function oneOffLightSystem(input: QuestWriteInput): string {
     '═══ THE JOB ═══\nYou write ONE job card for a dark-fantasy mercenary-fort GAME. The player is the company BOSS at the fort; the card is the notice that reaches their table. This one is ROUTINE work — the kind the company does between the matters that mean something.',
     '═══ YOUR INPUTS ═══',
     '- location: the kind of country this job is in. It decides what trouble is PLAUSIBLE here — never name it.',
+    input.method ? '- method: HOW the work gets done this time. Bend the job toward it and put it in your own words — never write the word itself.' : '',
     input.keywords?.length ? '- KEYWORDS: a single seed word. It is there to make this job different from the last one — let it suggest what has gone wrong, and never write the word itself. Where it has more than one sense, any sense will do; pick one and commit.' : '',
     '- archetype: the shape of the work. slotCount: how many soldiers go — write EXACTLY that many ask entries.',
     archetypeLine(input.archetype),
@@ -326,6 +332,7 @@ function oneOffSystem(input: QuestWriteInput): string {
     '- location: the land and its anchor facts. A named landmark may be used bare (never with an epithet); other places come from placeNameSuggestions or coined small places of the land.',
     input.intake ? '- intake: HOW this matter reached the company — a settled FACT: the opening must agree with it, but most cards need NO sentence for it; never quote its wording.' : '',
     input.opening ? '- opening.spark: seed atoms for how the matter arrives, separated by " · " — combine into an opening of your own; use what serves; never quote their wording.' : '',
+    input.method ? '- method: HOW the work gets done this time. Bend the job toward it and write it in your own words — never write the word itself.' : '',
     input.keywords?.length ? '- KEYWORDS: sparks for the world, each LABELLED by what kind of seed it is (bond / happening / thing / quality) — use what serves and drop the rest. A label tells you where its word belongs; two of them never become one name or thing. NEVER print a label itself — only the word after it may reach the card. Rebuild phrasing in your own words; a modern word is rendered as its period idea. A feeling word colors what happens — never an adjective stapled onto a person.' : '',
     '- rarity: how uncommon the work is. level: the weight-class of the work — high level means matters worthy of veterans. slotCount: how many soldiers.',
     input.gravity ? '- gravity: sets TONE and the card\'s HARD WORD CEILING, which is a limit and never a target — a small everyday job: NO MORE THAN 25 WORDS, and one sentence is a perfectly good card; a serious matter: no more than 40; a grave affair: no more than 60. Coming in well under is always better than reaching it. Small jobs read brisk, serious matters straight, only a grave affair reads heavy; when a keyword pulls against it, gravity wins.' : '',
@@ -724,7 +731,7 @@ export function makeOpenAiProvider(): AiProvider {
       const routine = input.kind === 'one-off' && !!input.gravity?.startsWith('a small');
 
       const user = JSON.stringify({
-        archetype: input.archetype, location: input.location,
+        archetype: input.archetype, location: input.location, method: input.method,
         // level was explained to the writer but never SENT — the verifier caught the model
         // hunting for a field that wasn't there (weight-class calibration silently dead)
         // level dealt to one-offs only — the saga system never explains it (context-free audit)

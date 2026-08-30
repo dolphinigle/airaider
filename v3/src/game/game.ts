@@ -18,7 +18,7 @@ import {
 } from '../engine/fort.js';
 import { infirmaryHealRate, healTick, rollInjuryTiers, payHealCost, REST_HEAL_PER_CYCLE, type InjuryBand } from '../engine/injury.js';
 import { REGION, REGIONS } from '../engine/regions.js';
-import { ARCHETYPE_NAMES } from '../engine/archetypes.js';
+import { ARCHETYPE_NAMES, methodsOf } from '../engine/archetypes.js';
 import {
   vBase, RARITY_MULT, splitOneOff, hireCost, RANSOM_RATE, SELL_RATE, KEEP_THRESHOLD, cashValue, coinBand,
   type Rarity, type Archetype, type RewardSpec,
@@ -1111,6 +1111,16 @@ export class Game {
           recruit: 'a person who may join the company', captive: 'a person taken', gold: 'coin' } as Record<string, string>
       )[s.kind] ?? s.kind).join(' + '),
       keywords: light ? sampleKeywordsLight(this.rng) : sampleKeywords(this.rng),
+      // HOW this job gets done THIS time. The gloss says what kind of work it is; the method is
+      // what makes two cards of that kind different, and it combines with the keywords' concrete
+      // noun rather than naming a scenario itself (see archetypes.ts).
+      // ⚠ OFF by default — the cold-reader gate rejected this design before it shipped. Two
+      // independent zero-context readers found the method has NO LEGAL LANDING SITE: the prompt
+      // says "bend the job toward it" while the job line says "never a person, place or object the
+      // situation did not already show", and the situation is twelve words of ONE SEEN THING. So
+      // the method can reach neither field and vanishes. METHOD=1 to experiment.
+      method: process.env.METHOD === '1'
+        ? (m => m?.length ? this.rng.pick(m) : undefined)(methodsOf(lead.archetype)) : undefined,
       opening: !light && dealSpark && lead.source !== 'interrogation' ? { spark: opening.spark } : undefined,
       intake: light ? undefined : intake,
       gravity,

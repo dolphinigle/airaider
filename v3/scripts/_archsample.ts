@@ -14,8 +14,8 @@ const seed = Number(process.argv[2] ?? 6001);
 const want = Number(process.argv[3] ?? 18);
 const off = Number(process.argv[4] ?? 0);
 const rng = new Rng(seed);
-const pool = ARCHETYPE_NAMES.filter(a => a !== 'lead-hunt');
-const picks = pool.slice(off).filter((_, i) => i % Math.max(1, Math.floor((pool.length - off) / want)) === 0).slice(0, want);
+const pool = [...ARCHETYPE_NAMES];   // ALL of them, faucets included
+const picks = pool.slice(off, off + want);
 
 const g = new Game(makeOpenAiProvider(), seed);
 g.build('map-room'); g.build('dungeon');

@@ -502,3 +502,72 @@ the evidence favours:
 3. **Nothing in the card ever makes a person speak or act.** Every judge in every round noted it.
    The voiced format supplies this on the ~10–30 % of one-offs that are heavy; the light register
    (most cards) has no equivalent lever tested.
+
+## N10 — 🔴 the one-off card's variety cap is that NOTHING DEALT MAY REACH THE PAGE (2026-08-30)
+
+Designer: *"lead hunt quest texts feels like theyre not leading to a lead… shouldnt it be something
+like 'go to tavern and fish for news'"*, then *"maybe you should have a seed for each type of one
+off too"*, then *"check the generated prompts will likely generate varying but making sense quests
+for ALL the quest type/seed combinations."*
+
+An archetype×method design was built (a per-archetype pool of one-word methods — `listening`,
+`storming`, `haggling` — dealt one per card) and put through the context-free verifier gate before
+shipping. **Two independent zero-context readers rejected it**, and their reasons are the useful
+part. It is env-gated OFF (`METHOD=1`).
+
+### The finding, in one line
+
+> *"Variety cannot come from fields the writer is forbidden to write."*
+
+On a LIGHT card (most cards) the payload is `location` — "never name it" · `method` — "never write
+the word itself" · `KEYWORDS` — "never write the word itself", and the keyword is an **abstraction**
+(`disrespect`, `desecration`, `bachelor`). **Three inputs, all unprintable, none concrete.** The
+card is therefore written entirely from the archetype gloss, so two cards of one archetype collapse
+into each other — and the writer invents the concrete layer from the prompt's three worked examples,
+which is why every card is a miller, a missing girl, or a flooded working.
+
+### The hard contradiction (reader B)
+
+> *"'method: bend the job toward it' vs 'job: never a person, place or object the situation did not
+> already show'. The method may not appear in the situation (that is a seen thing, twelve words),
+> and the job may introduce nothing new. **Method has no legal landing site.** I obey the job rule
+> and the method vanishes."*
+
+### Why lead-hunt could never have worked
+
+Not the gloss — the FORM. The situation spec permits three openers: *what was found, what is
+missing, what someone has stopped doing.* All three are **mystery** shapes; "go ask around for work"
+is none of them. A prohibition ("never promise further work") bolted onto a mandatory form loses to
+the form. On HEAVY it is worse: a bearer must speak and `rewardEnvelope` demands one hand pays —
+nobody pays a company to go drinking — so the writer invents a patron with a grievance and the card
+becomes an `investigate`.
+
+### Half the methods are postures, not acts
+
+> *"methods that name a different ACT vary the card; methods that name a POSTURE OF PRESENCE do not."*
+
+`waiting` sits in seven archetypes and is inert in all seven; `hiding`/`standing`/`loitering`/
+`watching` across five more. `occult`'s binding/banishing/breaking/sealing are four words for its own
+gloss; `ritual`'s attending/witnessing/holding are three words for "hold the circle". The third that
+DO work name a distinct act: `bribing`, `salting`, `drugging`, `impersonating`, `undercutting`,
+`tunnelling`, `smuggling`.
+
+### The proposed redesign (unbuilt, unruled)
+
+Deal a **concrete obstacle that can reach the situation**, not an adverb of success:
+`obstacle: "nobody at the crossing will talk to a stranger"` rather than `method: "loitering"`.
+A fact can be SEEN, so it lands in the twelve-word situation, forces the `attribute` and the ask, and
+cannot be satisfied by a word swap. To stay combinatorial rather than a stamp (L20) it should be
+built from atoms — a station plus a refusal — not authored whole.
+
+### Pre-existing defects the gate surfaced (separate worklist)
+
+- LIGHT says the location is "never named"; HEAVY says a landmark "may be used bare". Same field.
+- `assassinate`'s intent is "kill one NAMED person" while both registers forbid coining names — the
+  pair is unwritable as specified.
+- `trade`/`hire` methods need a price; numbers in prose are banned.
+- `rarity` "uncommon and rare may run longer" contradicts `gravity`'s hard word ceiling.
+- HEAVY bans "weight" as purple, then writes "the weight-class of the work".
+- HEAVY uses "ONE LEDGER" as its own key metaphor while banning the account-book as a plot object.
+- The situation rule is stated verbatim twice (spec + ABOVE ALL #1); the naming rule three times.
+- LIGHT's three worked examples are sticky enough that both readers predicted the same cards.
