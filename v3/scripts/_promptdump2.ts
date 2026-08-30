@@ -16,4 +16,4 @@ const lead: Lead = { id: 'x', rarity: process.argv[3] === 'heavy' ? 'rare' : 'co
   chainInfo: { kind: 'none' }, expiresAtCycle: null, source: 'reward' };
 g.state.leads.push(lead);
 await g.pursue('x');
-console.log(JSON.stringify({ archetype: cap.archetype, method: cap.method, keywords: cap.keywords, gravity: cap.gravity }, null, 1));
+console.log(JSON.stringify({ archetype: cap.archetype, method: cap.method, obstacle: cap.obstacle, keywords: cap.keywords, gravity: cap.gravity }, null, 1));

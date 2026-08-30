@@ -18,7 +18,7 @@ import {
 } from '../engine/fort.js';
 import { infirmaryHealRate, healTick, rollInjuryTiers, payHealCost, REST_HEAL_PER_CYCLE, type InjuryBand } from '../engine/injury.js';
 import { REGION, REGIONS } from '../engine/regions.js';
-import { ARCHETYPE_NAMES, methodsOf } from '../engine/archetypes.js';
+import { ARCHETYPE_NAMES, methodsOf, isSelfDirected } from '../engine/archetypes.js';
 import {
   vBase, RARITY_MULT, splitOneOff, hireCost, RANSOM_RATE, SELL_RATE, KEEP_THRESHOLD, cashValue, coinBand,
   type Rarity, type Archetype, type RewardSpec,
@@ -41,7 +41,7 @@ import { rollName, rollPlaceName } from '../engine/names.js';
 import { hasClash, queryMatches } from '../engine/overlap.js';
 import { questXp, grantXp, rollBase, rollGrowthLean, growToLevel } from '../engine/growth.js';
 import { coins, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, explainCoins, type SlotTest, type Outcome, type QuestRollResult } from '../engine/roll.js';
-import { sampleKeywords, sampleKeywordsLight, sampleSeed, sampleOpening, sampleGravity, pickTone, sampleArrival, sampleTell } from '../ai/keywords.js';
+import { sampleKeywords, sampleKeywordsLight, sampleSeed, sampleOpening, sampleGravity, pickTone, sampleArrival, sampleTell, sampleObstacle, sampleShape } from '../ai/keywords.js';
 import type { AiProvider, ResolveQuestInput, ResolveQuestOut, AskSlotOut, QuestWriteOut } from '../ai/provider.js';
 
 export interface LogEntry { cycle: number; kind: string; text: string; questId?: string }
@@ -1119,6 +1119,11 @@ export class Game {
       // says "bend the job toward it" while the job line says "never a person, place or object the
       // situation did not already show", and the situation is twelve words of ONE SEEN THING. So
       // the method can reach neither field and vanishes. METHOD=1 to experiment.
+      // OBSTACLE=1 (N10 redesign): a fact that can be SEEN, so it can land in the situation —
+      // unlike `method`, which had no legal landing site
+      shape: process.env.SHAPE === '1' ? sampleShape(this.rng) : undefined,
+      obstacle: process.env.OBSTACLE === '1' ? sampleObstacle(this.rng) : undefined,
+      selfDirected: process.env.OWNBIZ === '1' && isSelfDirected(lead.archetype) || undefined,
       method: process.env.METHOD === '1'
         ? (m => m?.length ? this.rng.pick(m) : undefined)(methodsOf(lead.archetype)) : undefined,
       opening: !light && dealSpark && lead.source !== 'interrogation' ? { spark: opening.spark } : undefined,

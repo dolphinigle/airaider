@@ -31,6 +31,12 @@ export interface ArchetypeDef {
    *  exactly that), and a one-word method cannot be. This is what varies two cards of the SAME
    *  kind of work, so the gloss can stay a general description instead of naming one scenario. */
   methods?: string[];
+  /** work NOBODY brings to the fort — the company goes looking of its own accord. The one-off
+   *  frame otherwise says "what came in… only what has reached the fort goes on the card", which
+   *  forces the writer to invent an arrival, and an invented arrival is a grievance, and a
+   *  grievance is a mystery. That is why lead-hunt cards read as investigations however the gloss
+   *  is worded (N10). The saga path has had this branch as `noClient` all along. */
+  selfDirected?: boolean;
   /** a writer-facing CONSTRAINT for this kind of work, rendered as its own sentence. It is kept
    *  out of `gloss` on purpose: the gloss is DATA describing the job, and a prohibition parked
    *  inside it ("sweep for rumors; never promise further work") both muddies the description and
@@ -60,6 +66,7 @@ export const ARCHETYPES = {
   // gloss ('sweep for rumors') was too vague to produce one, so the writer made mysteries instead:
   // a live card had the company tracking a missing apprentice into the woods. Name the ACTIVITY.
   'lead-hunt': {
+    selfDirected: true,
     methods: ['listening', 'asking', 'drinking', 'waiting', 'loitering', 'bribing', 'eavesdropping'],
     gloss: 'go where people talk — a tavern, a market, a ford crossing — and come back knowing where the next job is',
     rule: 'Never promise "further work" or more jobs: the card is the ASKING, and the engine announces whatever it turns up.',
@@ -70,7 +77,7 @@ export const ARCHETYPES = {
   // guard/recover proposed and approved; explore/trade are the designer's own additions.
   'guard': { methods: ['watching', 'patrolling', 'barring', 'standing', 'hiding', 'waiting'], gloss: 'hold a place or a person against whatever comes', profile: 'coin', slots: [1, 2] },
   'recover': { methods: ['searching', 'buying', 'stealing', 'digging', 'demanding', 'trading'], gloss: 'get back a specific thing that was taken', profile: 'relic', slots: [1, 2] },
-  'explore': { methods: ['walking', 'mapping', 'climbing', 'wading', 'fording', 'scouting'], gloss: 'go into ground nobody has crossed and come back knowing it', profile: 'lead', slots: [1, 2] },
+  'explore': { selfDirected: true, methods: ['walking', 'mapping', 'climbing', 'wading', 'fording', 'scouting'], gloss: 'go into ground nobody has crossed and come back knowing it', profile: 'lead', slots: [1, 2] },
   'trade': { methods: ['haggling', 'bribing', 'undercutting', 'brokering', 'smuggling', 'appraising'], gloss: 'buy, sell, or broker a thing whose price is somebody\'s trouble', profile: 'coin', slots: [1, 1] },
 
   // batch 2 — five approved from the Sultan taxonomy, plus the designer's `occult` and `fight`.
@@ -81,11 +88,11 @@ export const ARCHETYPES = {
   'ritual': { methods: ['attending', 'guarding', 'supplying', 'carrying', 'holding', 'witnessing'], gloss: 'see a working through — someone must hold the circle', profile: 'bloody', slots: [2, 3] },
   'negotiate': { methods: ['bargaining', 'threatening', 'flattering', 'bribing', 'waiting', 'conceding'], gloss: 'get a yes without drawing steel', profile: 'lead', slots: [1, 2] },
   'fight': { methods: ['duelling', 'brawling', 'wrestling', 'outlasting', 'disarming', 'feinting'], gloss: 'a fight that was arranged, and is watched', profile: 'coin', slots: [1, 2] },
-  'research': { methods: ['reading', 'copying', 'questioning', 'measuring', 'comparing', 'digging'], gloss: 'work a text or a site until it gives up its meaning', profile: 'find', slots: [1, 1] },
+  'research': { selfDirected: true, methods: ['reading', 'copying', 'questioning', 'measuring', 'comparing', 'digging'], gloss: 'work a text or a site until it gives up its meaning', profile: 'find', slots: [1, 1] },
   'heist': { methods: ['sneaking', 'picking', 'distracting', 'tunnelling', 'impersonating', 'waiting'], gloss: 'take a thing out of a guarded place without being seen', profile: 'relic', slots: [2, 3] },
   'adventure': { methods: ['descending', 'climbing', 'wading', 'torching', 'mapping', 'digging'], gloss: 'go into a dangerous place and come back with what is in it', profile: 'relic', slots: [2, 3] },
   'bounty-hunt': { methods: ['tracking', 'ambushing', 'bribing', 'waiting', 'cornering', 'baiting'], gloss: 'a posted name, brought in for the price on it', profile: 'captive', slots: [1, 2], gate: 'dungeon' },
-  'gather': { methods: ['cutting', 'digging', 'picking', 'netting', 'felling', 'hauling'], gloss: 'bring back a quantity of something that grows where people do not go', profile: 'coin', slots: [1, 2] },
+  'gather': { selfDirected: true, methods: ['cutting', 'digging', 'picking', 'netting', 'felling', 'hauling'], gloss: 'bring back a quantity of something that grows where people do not go', profile: 'coin', slots: [1, 2] },
 
   // ── FAUCET-ONLY, never on the ordinary board ──────────────────────────────────────────────
   // `hire` belongs to the Recruiting post's standing lead (QUESTS §19) and nothing else. That
@@ -103,6 +110,7 @@ const defOf = (a: Archetype): ArchetypeDef => ARCHETYPES[a] as ArchetypeDef;
 export const profileOf = (a: Archetype): Profile => defOf(a).profile;
 export const slotRangeOf = (a: Archetype): [number, number] => defOf(a).slots;
 export const glossOf = (a: Archetype): string | undefined => ARCHETYPES[a] ? defOf(a).gloss : undefined;
+export const isSelfDirected = (a: Archetype): boolean => !!(ARCHETYPES[a] && defOf(a).selfDirected);
 export const methodsOf = (a: Archetype): string[] | undefined => ARCHETYPES[a] ? defOf(a).methods : undefined;
 export const ruleOf = (a: Archetype): string | undefined => ARCHETYPES[a] ? defOf(a).rule : undefined;
 

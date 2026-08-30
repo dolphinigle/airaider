@@ -714,3 +714,88 @@ const SEEDS = [
 ];
 export function sampleSeed(rng: Rng): string { return rng.pick(SEEDS) }
 
+
+
+/** ── the OBSTACLE atoms (N10 redesign) ────────────────────────────────────────────────────────
+ *  Two cold readers rejected `method` because a one-word adverb of success has nowhere to land: the
+ *  situation is twelve words of ONE SEEN THING and the job may introduce nothing the situation did
+ *  not show. Their proposal: deal a CONCRETE OBSTACLE instead — a fact that can be SEEN, so it
+ *  lands in the situation, forces the attribute and the ask, and cannot be satisfied by a word swap.
+ *  Combinatorial (station x refusal) rather than authored whole, so it is not a stamp (L20). */
+const OBSTACLE_WHO = [
+  'the ferryman', 'the miller', 'the reeve', 'the woodward', 'the sexton', 'the innkeeper',
+  'the gatekeeper', 'the drover', 'the smith', 'the shepherd', 'the bailiff', 'the carter',
+  'the widow who keeps the crossing', 'the boy who tends the horses', 'the man who found it',
+  'the household', 'the whole hamlet', 'the watch', 'the woodcutters', 'the beekeepers',
+];
+const OBSTACLE_WHAT = [
+  'will not talk to a stranger', 'has been paid to say nothing', 'bars the door after dark',
+  'will not go back for any money', 'wants coin before a word', 'denies it ever happened',
+  'has already sold what you came for', 'answers to someone else now', 'swears they saw nothing',
+  'will not be found before dusk', 'sends you the long way round on purpose',
+  'has moved it and will not say where', 'keeps a dog that knows strangers',
+  'counts every soul who comes up the road', 'will only speak to one of their own',
+  'has burned what you were sent to read', 'holds the only key and sleeps on it',
+  'is owed money by the man who hired you',
+];
+/** a concrete, seeable obstacle: who stands in the way, and what they do about it */
+export function sampleObstacle(rng: Rng): string {
+  return `${rng.pick(OBSTACLE_WHO)} ${rng.pick(OBSTACLE_WHAT)}`;
+}
+
+/** ── STORY SHAPES (2026-08-24, wired into the engine 2026-08-30) ──────────────────────────────
+ *  A shape says nothing about WHAT happens; it says what KIND OF TURN the story takes. It is
+ *  ORTHOGONAL to the archetype (what kind of work) and to KEYWORDS (the props), which is the
+ *  dimension the N10 measurements found missing: six cards of one archetype scored ~3/6 on
+ *  distinctness because they all had the SAME SHAPE and only the nouns moved — "the worst vary
+ *  only the noun on the empty peg" (blind judge, unprompted).
+ *
+ *  Authored for exactly this by prosebench/SEEDING.md, whose recommendation was to add a shape as
+ *  a third dimension and then confirm it with a blind round. The pool was written; the round was
+ *  never run. This is that round.
+ *
+ *  These are ABSTRACT on purpose. A shape cannot be pasted into a card as prose the way `arrival`
+ *  and the obstacle atoms were (L20 / N10) — there is no sentence here to lift. */
+export const SHAPES: string[] = [
+  'someone is not what they are taken for',
+  'a person with an unexpected background',
+  'the one who asks for help caused the trouble',
+  'two people want the same thing for opposite reasons',
+  'a kindness that has become a trap',
+  'an old debt coming due at the worst moment',
+  'a thing that is not what it appears to be',
+  'someone protecting a secret at a cost',
+  'a rule being obeyed to the letter and broken in spirit',
+  'a small wrong that has grown out of proportion',
+  'someone who has already given up and will not say so',
+  'a bargain both sides intend to break',
+  'the danger is real but not the one named',
+  'a person doing the right thing for a bad reason',
+  'someone taking the blame for another',
+  'an inheritance nobody wants',
+  'a stranger who knows too much about the place',
+  'a job that is easy for a reason nobody likes',
+  'a person who cannot go back',
+  'a habit that has turned into a compulsion',
+  'someone being paid to look the other way',
+  'a reputation that no longer matches the person',
+  'a duty inherited from the dead',
+  'two versions of the same story, both partly true',
+  'a promise kept too literally',
+  'someone hiding a person rather than a thing',
+  'a crowd that has decided something without evidence',
+  'a professional out of their depth',
+  'a thing returned that should have stayed lost',
+  'someone whose usefulness is running out',
+  'a rescue that the rescued will resent',
+  'an outsider taking a local custom seriously',
+  'a person waiting for something that will not come',
+  'a favour that puts you in someone else\'s quarrel',
+  'a fear that is justified for the wrong reason',
+  'someone who has done this before and did not learn',
+  'a thing everyone can see and nobody will name',
+  'a person who profits either way',
+  'an accident that keeps happening',
+  'somebody who needs the problem to continue',
+];
+export function sampleShape(rng: Rng): string { return rng.pick(SHAPES) }

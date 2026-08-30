@@ -30,6 +30,12 @@ export interface QuestWriteInput {
   arrival?: string;              // two atoms: how this reached the fort, and the client's manner
   /** HOW this job gets done this time — one word, combined with KEYWORDS by the writer */
   method?: string;
+  /** a concrete obstacle the card can SHOW: who stands in the way and what they do about it */
+  obstacle?: string;
+  /** nobody brought this in — the company goes looking of its own accord */
+  selfDirected?: boolean;
+  /** what KIND OF TURN this story takes — orthogonal to the archetype and the keywords */
+  shape?: string;
   knownObstacle?: string;        // what the client openly knows stands against them — never a name
   tell?: string;                 // one physical habit the client has while talking: the CARE MOMENT
   noClient?: boolean;            // this saga has no outside client — nobody hired the company
