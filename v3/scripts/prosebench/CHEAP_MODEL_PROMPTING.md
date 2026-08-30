@@ -374,3 +374,27 @@ pays you to free his captive) really were caused by the one-off being dealt neit
 saga beat is dealt both. Dealing them — `PAYS: a mill reeve` / `OPPOSES: a charcoal crew · means to
 keep it` — scored **−0.45**, because a dealt generic party writes exactly the generic card it
 sounds like. Diagnosis and remedy are separate claims and each needs its own measurement.
+
+## L32 — the form the prompt asks for outranks every fact you deal into it
+
+MEASURED 2026-08-30. Personal sagas (a chain minted off a mercenary's own past) were being written
+as somebody-else's errand with the soldier appended. First fix: deal the soldier's OWN lore edge as
+the seed instead of a random one. Aboutness 2.5 → 5.1 — real, but only 2/10 sagas made him the
+protagonist. Both blind judges independently named the same residual: *"client-hires-fetch kernel +
+soldier clause appended."*
+
+The seed was right and the prompt still overrode it, because genesis asks for a JOB, and a job in
+this world has a hirer. The dealt fact loses to the shape of the form. Removing the client — telling
+genesis outright that nobody hires the company for this one — moved aboutness 5.1 → **7.9** and
+protagonist share 2/10 → **10/10**, with prose flat (5.2 / 4.6 / 5.3), r 0.97.
+
+So: when a dealt fact is being demoted, check whether the OUTPUT SHAPE has a slot that outranks it.
+L19 says a dealt string is pasted where it lands — L32 is the limit of that: it lands wherever the
+requested form has room, and if the form's primary slot belongs to someone else, your fact becomes
+the subordinate clause. Change the form, not the emphasis (L23).
+
+Corollary, and the reason this is not just "delete constraints": the judges checked for the obvious
+risk and it did not appear. Clientless sagas are not engineless — the model substituted a stake of
+its own (*he'll quit; the fort loses his service*). Removing a structural slot lets the model supply
+what belongs there; it only collapses when nothing else in the input can fill it — which is exactly
+what the OLD arm's three collapse cases were, where the past never appeared at all.
