@@ -148,7 +148,18 @@ export class Game {
   }
   static load(ai: AiProvider, json: string): Game {
     const st = JSON.parse(json) as GameState;
+    Game.migrate(st);
     return new Game(ai, st.seed, st);
+  }
+
+  /** Save migrations. A standing faucet lead is minted ONCE, when its building goes up, and then
+   *  lives forever — so a change to what that faucet deals never reaches a game already in
+   *  progress. The Recruiting post dealt `rescue` before `hire` existed, which left live saves
+   *  posting "free someone held" from the building whose whole purpose is paid hands. */
+  private static migrate(st: GameState): void {
+    for (const l of st.leads ?? []) {
+      if (l.source === 'recruiting' && l.archetype === 'rescue') l.archetype = 'hire';
+    }
   }
 
   // ---- bootstrap (day 0) ------------------------------------------------------------------
