@@ -208,7 +208,7 @@ export const render = {
       // the reward is the most decision-relevant thing on the row, so it gets room; the rest is
       // tightened to keep the line scannable at a normal terminal width
       const pay = g.questReward(q.id);
-      return `${q.id.padEnd(5)} ${q.title.slice(0, 30).padEnd(30)} L${q.level} ${q.rarity.slice(0, 8).padEnd(8)} ${(pips || '—').padEnd(4)} ${odds.padEnd(17)} ${pay.slice(0, 42).padEnd(42)} c${q.createdCycle + QUEST_TTL}${q.isFinale ? ' 🎬' : q.chainId ? ` 📖${q.beatIndex}` : ''}`;
+      return `${q.id.padEnd(5)} ${q.title.slice(0, 30).padEnd(30)} L${q.level} ${q.rarity.slice(0, 8).padEnd(8)} ${(pips || '—').padEnd(4)} ${odds.padEnd(17)} ${pay.slice(0, 42).padEnd(42)} ${g.questIsFaucet(q) ? 'this cycle' : `c${g.questLapsesAt(q)}`.padEnd(10)}${q.isFinale ? ' 🎬' : q.chainId ? ` 📖${q.beatIndex}` : ''}`;
     }).join('\n') + (g.canReroll()
       ? "\n(a card you will not read is not a dead end: 'abandon <id>' puts the lead back — once a cycle)"
       : "\n(a lead has already been taken back up this cycle — 'abandon <id>' now spends the card)");
@@ -219,7 +219,7 @@ export const render = {
     if (!q) return 'no such quest';
     const cast = g.questCast(q.id);
     const lines = [
-      `═══ ${q.title} ═══  (${q.id}, L${q.level} ${q.rarity}, ${REGION[q.region]!.name}, lapses c${q.createdCycle + QUEST_TTL})`,
+      `═══ ${q.title} ═══  (${q.id}, L${q.level} ${q.rarity}, ${REGION[q.region]!.name}, ${g.questIsFaucet(q) ? 'goes cold at the end of this cycle — the post will put up another' : `lapses c${g.questLapsesAt(q)}`})`,
       q.situation,
       // held to this matter: readable, never movable — the text form of the bracketed cards
       ...(cast.length ? ['ON THIS MATTER (held here — you can read them, not move them):',

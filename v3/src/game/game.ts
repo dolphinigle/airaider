@@ -2384,7 +2384,7 @@ export class Game {
 
     // 5) pursued-quest expiry (impl ruling on QUESTS §10 🟡: TTL 10; a lapsed chain
     // beat respawns its continuation lead — the story waits, the quest doesn't)
-    for (const q of st.quests.filter(q => q.state === 'open' && st.cycle - q.createdCycle >= QUEST_TTL)) {
+    for (const q of st.quests.filter(q => q.state === 'open' && st.cycle - q.createdCycle >= this.questTtl(q))) {
       this.abandonQuest(q, report);
     }
     st.quests = st.quests.filter(q => q.state === 'open');
@@ -2504,6 +2504,21 @@ export class Game {
    *  rationed, so a player is never stuck with a card they will not read.) */
   canReroll(): boolean { return this.state.lastRerollCycle !== this.state.cycle }
 
+  /** How long a quest may sit unmarched. A quest written from a STANDING lead (the Scouting
+   *  lodge's lead-hunt, the Recruiting post's hire) lasts ONE cycle, because its lead is never
+   *  consumed: there is nothing to save by holding it and nothing lost by letting it go — pursue
+   *  the post again and it writes you another. Ordinary quests keep the full TTL, where holding one
+   *  while you build up to it is legitimate play and the lead is genuinely spent. */
+  private questTtl(q: Quest): number {
+    return q.fromLead?.expiresAtCycle === null ? 1 : QUEST_TTL;
+  }
+
+  /** the cycle this quest goes cold — ONE surface of truth, so a board cannot advertise a life the
+   *  expiry pass will not honour (a faucet quest was showing c10 while lapsing after one cycle) */
+  questLapsesAt(q: Quest): number { return q.createdCycle + this.questTtl(q) }
+  /** a faucet quest is not lost when it goes — the post that wrote it is still standing */
+  questIsFaucet(q: Quest): boolean { return q.fromLead?.expiresAtCycle === null }
+
   abandon(questId: string): { ok: boolean; msg: string } {
     const q = this.state.quests.find(x => x.id === questId && x.state === 'open');
     if (!q) return { ok: false, msg: 'no such open quest' };
@@ -2573,7 +2588,11 @@ export class Game {
         }
       }
     }
-    report.push(`⏳ ${q.title} lapsed — the moment passed.`);
+    // a faucet quest lapsing is NOT a loss — the post that wrote it is still standing, and saying
+    // so is the difference between "you missed it" and "ask again"
+    report.push(q.fromLead?.expiresAtCycle === null
+      ? `⏳ ${q.title} went cold — the ${q.fromLead.source === 'recruiting' ? 'recruiting post' : 'map table'} will put up another.`
+      : `⏳ ${q.title} lapsed — the moment passed.`);
     this.log('expire', `${q.title} lapsed unpursued`);
   }
 

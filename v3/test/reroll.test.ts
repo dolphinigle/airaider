@@ -69,3 +69,32 @@ describe('abandoning a quest returns its lead', () => {
     expect(g.canReroll()).toBe(true);            // and it did not spend the cycle's re-roll
   });
 });
+
+describe('a quest from a STANDING lead lives one cycle', () => {
+  const standing = (id: string, archetype: string, source: string) => ({
+    id, rarity: 'common' as const, level: 2, region: 'forests', archetype,
+    chainInfo: { kind: 'none' as const }, expiresAtCycle: null, source,
+  });
+
+  it('lapses after a single cycle, because its lead is never consumed', async () => {
+    const g = new Game(new MockProvider(11), 11);
+    g.build('map-room');
+    g.state.leads.push(standing('lead-f', 'lead-hunt', 'hunt') as never);
+    const r = await g.pursue('lead-f');
+    expect(g.state.quests.some(q => q.id === r.questId)).toBe(true);
+    expect(g.state.leads.some(l => l.id === 'lead-f')).toBe(true);   // the faucet stays standing
+    await g.endCycle();
+    expect(g.state.quests.some(q => q.id === r.questId)).toBe(false);
+    expect(g.state.leads.some(l => l.id === 'lead-f')).toBe(true);   // …so another can be asked for
+  });
+
+  it('an ordinary quest still keeps the full TTL — holding one is legitimate play', async () => {
+    const g = new Game(new MockProvider(12), 12);
+    g.build('map-room');
+    g.state.leads.push({ id: 'lead-o', rarity: 'common', level: 2, region: 'forests',
+      archetype: 'contract', chainInfo: { kind: 'none' }, expiresAtCycle: 60, source: 'reward' } as never);
+    const r = await g.pursue('lead-o');
+    for (let i = 0; i < 3; i++) await g.endCycle();
+    expect(g.state.quests.some(q => q.id === r.questId)).toBe(true);
+  });
+});

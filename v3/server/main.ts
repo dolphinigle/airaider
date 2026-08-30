@@ -173,7 +173,7 @@ function stateView() {
         // a card the player will not read is a dead slot: abandoning returns the LEAD so the
         // job can be written again, once a cycle
         canReroll: !q.chainId && game.canReroll(),
-        lapsesAtCycle: q.createdCycle + QUEST_TTL,
+        lapsesAtCycle: game.questLapsesAt(q), faucet: game.questIsFaucet(q) || undefined,
         slots: q.slots.map((s, i) => ({
           idx: i, groupId: s.groupId ?? null,
           requirement: s.requirement.kind === 'must-be'

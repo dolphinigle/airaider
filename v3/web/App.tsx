@@ -493,7 +493,7 @@ function Board({ s, doAct, setOpen }: any) {
                 <span>{q.rarity} · level {q.level}</span>
                 {q.isFinale ? <span className="saga">🎬 finale</span>
                   : q.chainId ? <span className="saga">beat {q.beat}</span> : <span>one-off</span>}
-                <span>lapses c{q.lapsesAtCycle}</span>
+                <span>{q.faucet ? "goes cold this cycle" : `lapses c${q.lapsesAtCycle}`}</span>
               </div>
             </button>
             <div className="side">
