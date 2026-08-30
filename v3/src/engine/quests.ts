@@ -140,10 +140,12 @@ export function huntLead(region: string, level: number, idGen: () => string): Le
   };
 }
 
-/** the Recruiting post's standing faucet (§19): a repeatable get-a-recruit quest for its region */
+/** the Recruiting post's standing faucet (§19): a repeatable get-a-recruit quest for its region.
+ *  Its archetype is `hire` and nothing else uses it — boardPool fences it out, so a hire only ever
+ *  exists because the player built the post that posts it. */
 export function recruitLead(region: string, level: number, idGen: () => string): Lead {
   return {
-    id: idGen(), rarity: 'common', level, region, archetype: 'rescue',
+    id: idGen(), rarity: 'common', level, region, archetype: 'hire',
     chainInfo: { kind: 'none' }, expiresAtCycle: null, source: 'recruiting',
   };
 }

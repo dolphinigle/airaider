@@ -66,6 +66,12 @@ export const ARCHETYPES = {
   'adventure': { gloss: 'go into a dangerous place and come back with what is in it', profile: 'relic', slots: [2, 3] },
   'bounty-hunt': { gloss: 'a posted name, brought in for the price on it', profile: 'captive', slots: [1, 2], gate: 'dungeon' },
   'gather': { gloss: 'bring back a quantity of something that grows where people do not go', profile: 'coin', slots: [1, 2] },
+
+  // ── FAUCET-ONLY, never on the ordinary board ──────────────────────────────────────────────
+  // `hire` belongs to the Recruiting post's standing lead (QUESTS §19) and nothing else. That
+  // faucet used to deal `rescue`, so every hire from your own recruiting post read as freeing a
+  // captive — the wrong job entirely for a post whose whole purpose is to bring on paid hands.
+  'hire': { gloss: 'find someone worth paying, and bring them back willing', profile: 'recruit', slots: [1, 2] },
 } as const satisfies Record<string, ArchetypeDef>;
 
 export type Archetype = keyof typeof ARCHETYPES;
@@ -80,7 +86,12 @@ export const glossOf = (a: Archetype): string | undefined => ARCHETYPES[a] ? def
 
 /** the random board pool: everything the fort can actually take on. `lead-hunt` is excluded —
  *  it is the Scouting lodge's own standing repeatable, not a thing the board rolls. */
+/** archetypes that belong to a FAUCET and must never be rolled onto an ordinary lead: each is
+ *  minted by one standing lead and would misread anywhere else (a `hire` that nobody posted, a
+ *  `lead-hunt` without a Scouting lodge). */
+const FAUCET_ONLY: Archetype[] = ['lead-hunt', 'hire'];
+
 export function boardPool(ctx: { hasDungeon: boolean }): Archetype[] {
   return ARCHETYPE_NAMES.filter(a =>
-    a !== 'lead-hunt' && (defOf(a).gate !== 'dungeon' || ctx.hasDungeon));
+    !FAUCET_ONLY.includes(a) && (defOf(a).gate !== 'dungeon' || ctx.hasDungeon));
 }
