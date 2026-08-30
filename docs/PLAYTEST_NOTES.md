@@ -571,3 +571,26 @@ built from atoms — a station plus a refusal — not authored whole.
 - HEAVY uses "ONE LEDGER" as its own key metaphor while banning the account-book as a plot object.
 - The situation rule is stated verbatim twice (spec + ABOVE ALL #1); the naming rule three times.
 - LIGHT's three worked examples are sticky enough that both readers predicted the same cards.
+
+## N11 — personal sagas were somebody else's errand (FIXED, measured)
+
+Designer, 2026-08-30: *"the 'past stirs' quest (personal quest chains) seems to be not working
+correctly story wise? it doesnt seem to involve the past guy?"*
+
+Two independent causes, both fixed and both measured (3 arms × 10 sagas, 2 blind judges, r 0.97):
+
+1. **The seed was random.** `seed: sampleSeed(this.rng)` was dealt unconditionally, so a personal
+   chain got a generic what-if that outranked the soldier. Live save proof: the chain *"Paid to the
+   Wrong Hands"* matches the seed-pool entry `a ransom paid to the wrong hands` verbatim, with the
+   focal mercenary demoted to `companion` and the man from his lore edge recast as a generic
+   obstacle. Now `personalSeed(merc)` deals his highest-salience active lore edge (falling back to
+   the first sentence of his backstory). Aboutness 2.5 → 5.1.
+
+2. **Genesis asks for a job, and a job has a hirer.** Fixing the seed was not enough — 8/10 sagas
+   still opened with a client hiring the company and the soldier's past as an appended clause. A
+   personal saga now tells genesis there is NO client: the past came to him, the company acts on
+   its own account, and the stake is what the FORT loses. Aboutness 5.1 → **7.9**, soldier-as-
+   protagonist 2/10 → **10/10**, prose unchanged.
+
+The class, recorded as L32: a dealt fact loses to the SHAPE of the output you asked for. When a fact
+is being demoted, look for the slot that outranks it rather than adding emphasis (L23).
