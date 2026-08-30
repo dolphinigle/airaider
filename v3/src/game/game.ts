@@ -1352,6 +1352,14 @@ export class Game {
       // PERSONAL_SEED=0 restores the old behaviour (a generic what-if even for a personal
       // saga), for A/B only
       seed: isPersonal && process.env.PERSONAL_SEED !== '0' ? this.personalSeed(focal) : sampleSeed(this.rng),
+      // NOCLIENT=1 (lab): a personal saga has no client at all — both blind judges named
+      // 'client-hires-fetch kernel + soldier clause appended' as what still holds it back
+      // MEASURED and shipped: a personal saga has NO client. Blind A/B, 2 judges, 30 sagas,
+      // inter-judge r 0.97 — aboutness 2.5 (generic seed) -> 5.1 (their own past) -> 7.9 (no
+      // client), soldier-led 0/10 -> 2/10 -> 10/10, prose flat throughout. Judge, unprompted:
+      // "clientless read STRONGER — the soldier WANTS something", and they are not engineless:
+      // the stake becomes what the FORT loses if he walks. NOCLIENT=0 restores a client.
+      noClientWanted: isPersonal && process.env.NOCLIENT !== '0' || undefined,
       keywords: sampleKeywords(this.rng).map(k => k.replace(/^[a-z-]+: /, '')),
       // most sagas must live AWAY from the landmark — omission beats the ignored "set it elsewhere"
       // nudge (both sagas of a read centered Thornhollow when genesis could always see it)

@@ -96,6 +96,8 @@ export interface GenesisInput {
   expectedBeats: number;         // the arc must have exactly this many steps (chain shape is engine-rolled)
   slate?: { id: string; name: string; blurb: string; relationPhrase: string; companySoldier?: boolean; companyCaptive?: boolean; atTheFort?: boolean; outOfReach?: boolean; dossier?: string }[];  // omitted when empty
   assignedNames: string[];       // pre-rolled names for any NEW cast the AI coins (§4b)
+  /** a personal saga: no client should exist at all — the soldier's own past is the reason */
+  noClientWanted?: boolean;
 }
 
 export interface GenesisOut {
