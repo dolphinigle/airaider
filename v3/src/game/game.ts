@@ -1344,7 +1344,13 @@ export class Game {
     const genesisInput = {
       // labels are for the CARD writer, which is told what they mean; genesis is not, and its goal
       // sentence gets pasted into every briefing of the saga — so it receives the bare atoms.
-      seed: sampleSeed(this.rng), keywords: sampleKeywords(this.rng).map(k => k.replace(/^[a-z-]+: /, '')),
+      // A PERSONAL saga is about a soldier's own past, so its spark must come FROM that past.
+      // Dealt a generic what-if it loses to it every time: the designer's live game produced
+      // "Paid to the Wrong Hands" — the seed pool's 'a ransom paid to the wrong hands' verbatim —
+      // with the soldier demoted to a companion in a stranger's ransom plot, and the woman who
+      // once saved his life recast as a generic obstacle.
+      seed: isPersonal ? this.personalSeed(focal) : sampleSeed(this.rng),
+      keywords: sampleKeywords(this.rng).map(k => k.replace(/^[a-z-]+: /, '')),
       // most sagas must live AWAY from the landmark — omission beats the ignored "set it elsewhere"
       // nudge (both sagas of a read centered Thornhollow when genesis could always see it)
       location: this.locationLine(lead.region, this.rng.chance(0.15)),
@@ -2967,6 +2973,22 @@ export class Game {
 
   /** LORE.md recall → selector → labeled slate: what the world remembers around a focal.
    *  Shared by genesis AND every beat/finale (§4 tiering: dossiers for the picked few, blurbs for the rest). */
+  /** the spark for a soldier's OWN saga: the strongest thing the world remembers about them,
+   *  else the backstory they were fleshed with. Never the generic what-if pool — that is what
+   *  turned a personal saga into somebody else's ransom job. */
+  private personalSeed(merc: Card): string {
+    const mine = this.state.lore.edges
+      .filter(e => e.active && !!e.blurb && (e.from === merc.id || e.to === merc.id))
+      .sort((a, b) => (Number(b.core) - Number(a.core)) || (b.salience - a.salience));
+    if (mine[0]?.blurb) return mine[0].blurb;
+    const back = merc.character?.backstory;
+    if (back) {
+      const first = back.split(/(?<=[.!?])\s+/)[0] ?? back;
+      return first.length > 20 ? first : back.slice(0, 160);
+    }
+    return `something ${merc.name} left unfinished before the company`;
+  }
+
   private async buildLoreSlate(focalId: string, purpose: string) {
     const wildcardPool = Object.values(this.state.lore.nodes).filter(n => n.active && n.id !== focalId).map(n => n.id);
     const wildcards = this.rng.shuffle([...wildcardPool]).slice(0, 3);
