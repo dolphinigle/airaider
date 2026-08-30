@@ -1349,7 +1349,9 @@ export class Game {
       // "Paid to the Wrong Hands" — the seed pool's 'a ransom paid to the wrong hands' verbatim —
       // with the soldier demoted to a companion in a stranger's ransom plot, and the woman who
       // once saved his life recast as a generic obstacle.
-      seed: isPersonal ? this.personalSeed(focal) : sampleSeed(this.rng),
+      // PERSONAL_SEED=0 restores the old behaviour (a generic what-if even for a personal
+      // saga), for A/B only
+      seed: isPersonal && process.env.PERSONAL_SEED !== '0' ? this.personalSeed(focal) : sampleSeed(this.rng),
       keywords: sampleKeywords(this.rng).map(k => k.replace(/^[a-z-]+: /, '')),
       // most sagas must live AWAY from the landmark — omission beats the ignored "set it elsewhere"
       // nudge (both sagas of a read centered Thornhollow when genesis could always see it)
