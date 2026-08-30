@@ -209,7 +209,9 @@ export const render = {
       // tightened to keep the line scannable at a normal terminal width
       const pay = g.questReward(q.id);
       return `${q.id.padEnd(5)} ${q.title.slice(0, 30).padEnd(30)} L${q.level} ${q.rarity.slice(0, 8).padEnd(8)} ${(pips || '—').padEnd(4)} ${odds.padEnd(17)} ${pay.slice(0, 42).padEnd(42)} c${q.createdCycle + QUEST_TTL}${q.isFinale ? ' 🎬' : q.chainId ? ` 📖${q.beatIndex}` : ''}`;
-    }).join('\n');
+    }).join('\n') + (g.canReroll()
+      ? "\n(a card you will not read is not a dead end: 'abandon <id>' puts the lead back — once a cycle)"
+      : "\n(a lead has already been taken back up this cycle — 'abandon <id>' now spends the card)");
   },
 
   questDetail(g: Game, id: string): string {

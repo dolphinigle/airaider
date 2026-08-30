@@ -109,6 +109,8 @@ export interface GameState {
    *  moved on. The GUI's `⚄ last reckoning` was one cycle deep and lived in server memory, so it
    *  vanished on restart and could never look further back than the cycle just resolved. */
   reckonings?: { cycle: number; lines: string[] }[];
+  /** the cycle a lead was last put back by abandoning its quest — the re-roll is once a cycle */
+  lastRerollCycle?: number;
   log: LogEntry[];
 }
 export const RECKONINGS_KEPT = 12;
@@ -866,6 +868,9 @@ export class Game {
     } else {
       quest = await this.generateOneOff(lead);
     }
+    // keep the lead whole on the quest so abandoning can put it back (a re-roll, not a dead end).
+    // Only for ONE-OFFS: a saga beat's lead belongs to the chain, not to the player's choice.
+    if (!quest.chainId) quest.fromLead = { ...lead };
     this.state.quests.push(quest);
     // consume the lead — only repeatable faucets (lead-hunts, recruiting posts) stay standing
     if (lead.expiresAtCycle !== null || (lead.archetype !== 'lead-hunt' && lead.source !== 'recruiting')) {
@@ -2495,12 +2500,32 @@ export class Game {
     return cycle === undefined ? all[all.length - 1] : all.find(r => r.cycle === cycle);
   }
 
+  /** Is a re-roll available this cycle? (Abandoning always works; only PUTTING THE LEAD BACK is
+   *  rationed, so a player is never stuck with a card they will not read.) */
+  canReroll(): boolean { return this.state.lastRerollCycle !== this.state.cycle }
+
   abandon(questId: string): { ok: boolean; msg: string } {
     const q = this.state.quests.find(x => x.id === questId && x.state === 'open');
     if (!q) return { ok: false, msg: 'no such open quest' };
+    // A card the player will not read is a dead slot on the board. Abandoning returns the LEAD so
+    // it can be written again — the same job, a different card. Rationed to once a cycle so it is
+    // a second look, not a slot machine: rerolling costs the cycle's one chance at any other card.
+    const lead = q.fromLead;
+    const reroll = !!lead && !q.chainId && this.canReroll()
+      && !this.state.leads.some(l => l.id === lead.id);
     this.abandonQuest(q, []);
     this.state.quests = this.state.quests.filter(x => x !== q);
-    return { ok: true, msg: `${q.title} abandoned` };
+    if (!reroll) {
+      const why = q.chainId ? ' (a saga step has no lead to return to)'
+        : !lead ? ''
+        : !this.canReroll() ? ' — the lead is spent; a lead can only be taken up again once a cycle'
+        : '';
+      return { ok: true, msg: `${q.title} abandoned${why}` };
+    }
+    this.state.leads.push(lead!);
+    this.state.lastRerollCycle = this.state.cycle;
+    this.log('leads', `The company set aside "${q.title}" — the ${lead!.archetype} is back on the map table.`);
+    return { ok: true, msg: `${q.title} set aside — the lead is back on the map table, to be taken up again` };
   }
 
   private abandonQuest(q: Quest, report: string[]) {

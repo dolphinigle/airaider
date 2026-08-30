@@ -170,6 +170,9 @@ function stateView() {
         rewardEnvelope: game.questReward(q.id),
         odds: o,
         cast: game.questCast(q.id),
+        // a card the player will not read is a dead slot: abandoning returns the LEAD so the
+        // job can be written again, once a cycle
+        canReroll: !q.chainId && game.canReroll(),
         lapsesAtCycle: q.createdCycle + QUEST_TTL,
         slots: q.slots.map((s, i) => ({
           idx: i, groupId: s.groupId ?? null,

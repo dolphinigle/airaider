@@ -166,6 +166,10 @@ export interface ApproachGroup { id: string; label: string; rewardKind: 'recruit
 export interface Quest {
   id: string;
   leadId: string;
+  /** the lead this quest was written from, kept whole so abandoning can PUT IT BACK — a card you
+   *  do not like is a re-roll, not a dead end. Absent on saga beats, which have no lead to return
+   *  to, and on old saves. */
+  fromLead?: Lead;
   title: string;
   situation: string;               // AI prose (card)
   job: string;

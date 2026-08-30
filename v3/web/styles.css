@@ -281,3 +281,7 @@ tr.leadworking button:disabled { color: #c9b86a; border-color: #4a4130; cursor: 
 .reckback .rbtn:hover{border-color:#3d4655;color:var(--ink)}
 .reckback .rbtn.on{background:#2a3242;color:var(--ink);border-color:#46506180}
 .reckback .rbtn.now{color:#cbb37a}
+
+/* set-aside returns the lead; it reads as a second look, not a destructive discard */
+.acts .act.setaside{color:#cbb37a;border-color:#3a3527}
+.acts .act.setaside:hover{border-color:#5a5137}

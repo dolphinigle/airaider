@@ -571,6 +571,19 @@ function QuestPage({ s, q, doAct, active, setActive, back, read, setRead }: any)
             <button className="act auto" onClick={() => doAct('auto', q.id)}>Auto-assign</button>
             <button className="act" onClick={() => act.forEach((x: any) => x.filledBy && doAct('unassign', q.id, x.idx))}>Clear</button>
             <button className="act" onClick={back}>Leave it</button>
+            {/* not a discard: the LEAD comes back, so the same job can be written again. Once a
+                cycle, so it is a second look rather than a slot machine. */}
+            <button className="act setaside"
+              title={q.canReroll
+                ? 'Set this card aside — the lead returns to the map table and can be taken up again'
+                : q.chainId ? 'A saga step has no lead to return to'
+                : 'Already taken a lead back up this cycle — abandoning now spends the card'}
+              onClick={() => { if (confirm(q.canReroll
+                ? 'Set this aside? The lead goes back to the map table and can be taken up again — once a cycle.'
+                : 'Abandon this? The lead does NOT come back — you have already taken one up again this cycle.'))
+                { doAct('abandon', q.id); back() } }}>
+              {q.canReroll ? 'Set aside ↺' : 'Abandon'}
+            </button>
           </div>
         </div>
       </div>
