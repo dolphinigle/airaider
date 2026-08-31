@@ -2987,8 +2987,15 @@ export class Game {
    *  else the backstory they were fleshed with. Never the generic what-if pool — that is what
    *  turned a personal saga into somebody else's ransom job. */
   private personalSeed(merc: Card): string {
+    // A seed may only name people the SAGA CAN CAST. Genesis is dealt no company soldier but the
+    // focal (the slate filter above) and is told assignedNames are the only names it may coin —
+    // so an edge pointing at a fellow soldier hands it a name it cannot use, and it silently
+    // coins a stranger in their place. Worse, the premise is incoherent anyway: you cannot ride
+    // out to find someone who is standing in your own yard. Skip those edges. (2026-08-31)
+    const inTheCompany = (id: string) => this.card(id)?.character?.role === 'merc';
     const mine = this.state.lore.edges
       .filter(e => e.active && !!e.blurb && (e.from === merc.id || e.to === merc.id))
+      .filter(e => !inTheCompany(e.from === merc.id ? e.to : e.from))
       .sort((a, b) => (Number(b.core) - Number(a.core)) || (b.salience - a.salience));
     if (mine[0]?.blurb) return mine[0].blurb;
     const back = merc.character?.backstory;

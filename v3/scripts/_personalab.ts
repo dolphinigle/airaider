@@ -11,8 +11,14 @@ const out: string[] = [];
 for (let k = 0; k < N; k++) {
   const g = new Game(makeOpenAiProvider(), SEED + k * 31);
   g.build('map-room'); g.build('lead-room');
-  const merc = g.roster()[0]!, other = g.roster()[1]!;
-  g.ensureLoreNode(merc); g.ensureLoreNode(other);
+  const merc = g.roster()[0]!;
+  g.ensureLoreNode(merc);
+  // the other party is an NPC OUT IN THE WORLD, not a fellow soldier — a saga cannot send you to
+  // find someone standing in your own yard, and genesis is dealt no company soldier but the focal
+  const NPCS = ['Nevil Ashgate', 'Arver Stonefield', 'Amflisia Longshanks', 'Varasa Quill'];
+  const other = { id: `npc-${k}`, name: NPCS[k % NPCS.length]! };
+  g.state.lore.nodes[other.id] = { id: other.id, kind: 'character', name: other.name,
+    blurb: 'someone the fort has had dealings with', identity: '', active: true, createdCycle: 1 };
   // a past the game itself would have recorded
   const pasts = [
     [`${other.name} once tended ${merc.name}'s wound in the woods and kept him from dying`, 'saved-by'],
