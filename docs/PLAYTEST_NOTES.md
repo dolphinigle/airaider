@@ -594,3 +594,22 @@ Two independent causes, both fixed and both measured (3 arms × 10 sagas, 2 blin
 
 The class, recorded as L32: a dealt fact loses to the SHAPE of the output you asked for. When a fact
 is being demoted, look for the slot that outranks it rather than adding emphasis (L23).
+
+### N11b — the past's OTHER person was being re-invented (FIXED)
+
+Found by reading six shipped-config sagas rather than trusting the N11 score. All six were
+correctly about the soldier — but given the past *"Biddy left Arver behind at a crossing"*, the
+saga went looking for **Duryn Fernbrook**. Three of the four pasts that named a second person
+replaced them with a coined stranger.
+
+Cause: `game.ts` strips every company soldier but the focal from the genesis slate, and genesis is
+told `assignedNames` are the only names it may coin. A seed naming a fellow soldier therefore hands
+it a name it has no permission to use, and it quietly invents someone else. The premise was broken
+anyway — you cannot ride out to find someone standing in your own yard.
+
+Fix: `personalSeed` skips edges whose other endpoint is still in the company. Re-read with pasts
+pointing at NPCs: 4/4 named people now reach the cast under their real names, twice as the arc's
+opposing entry (*"A merchant, Arver Stonefield, refuses return and will claim theft"*).
+
+The class: **a seed may only name people the saga can cast.** Any dealt string that names someone
+the writer is forbidden to use produces a silent substitution, not an error.
