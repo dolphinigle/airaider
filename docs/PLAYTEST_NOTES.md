@@ -778,3 +778,13 @@ bring it in, alive or dead") was pasted verbatim on 8/8 cards (L20).
 Prose flat (5.53 → 5.38 in the last round, +0.3 in the first). The first survey's research/fight
 zeroes did not replicate at n=6 — small samples are noisy here. Remaining hunt misses are HEAVY
 (voiced) cards, which the light-register opener does not reach.
+
+### N16 — every saga leaned on "pledge" (FIXED, measured)
+
+In a 26-cycle campaign all 6 sagas mention "pledge" 4-13 times (pledged hoard, household pledge,
+bond-pledge, pledged chest…). The genesis prompt carried a worked example list — *"Law and claims
+speak in period words — rights, pledges, sworn witness"* — and a listed example is a stamp (L20).
+Now *"Law and custom speak in period words, never modern ones."* 10 fresh sagas per arm on paired
+seeds: "pledge" 6/10 → 3/10, "sworn" 3/10 → 0/10; the stories are otherwise the same stories.
+LAWWORDS=1 restores. (In a live campaign the recurring villain's own `who` — "presses ancient
+household claims on village pledges" — keeps some of it alive; that is the character, not a stamp.)
