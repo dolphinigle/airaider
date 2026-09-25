@@ -2868,10 +2868,12 @@ export class Game {
       // A wound listed WITHOUT a cause still counts when the report plainly shows it on that
       // soldier: "Ervalir's upper arm bled from the wire" came with {band: med} and no cause, and
       // was dropped (playtest 2026-09-25).
-      const cited = !!merc0 && (inj.cause
-        ? causeShown(inj.cause, out?.after ?? '')
-          && (r.party.length === 1 || inj.cause.toLowerCase().includes(merc0.name.split(' ')[0]!.toLowerCase()))
-        : woundShownOn(merc0.name, out?.after ?? '', r.party.length === 1));
+      // …and when a cause IS given but paraphrased past recognition ("struck by a riverman's oar"
+      // vs "caught him across the face with an oar… blood on his cheek"), the same test decides
+      const cited = !!merc0 && ((!!inj.cause
+          && causeShown(inj.cause, out?.after ?? '')
+          && (r.party.length === 1 || inj.cause.toLowerCase().includes(merc0.name.split(' ')[0]!.toLowerCase())))
+        || woundShownOn(merc0.name, out?.after ?? '', r.party.length === 1));
       if (!cited) continue;
       const merc = this.card(inj.characterId);
       if (!merc?.character || !r.party.includes(merc)) continue;
