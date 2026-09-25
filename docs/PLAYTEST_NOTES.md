@@ -707,3 +707,24 @@ Eight sagas each, before → after: visitor arrivals 4/8 → 0/8, fee language 8
 introduced like a stranger 5/8 → 1/8. After: *"Renee, who once left a man at a crossing and will
 not say why, is returning to Ashroot Crossing to look where she left Arver Stonefield."*
 PERSONAL_CARD=0 restores the old inputs.
+
+### N13b — naming the earned lead in the report (MEASURED, NOT SHIPPED)
+
+A scouting report ends on "a foreman named his next job" and then a random job type lands on the
+board. Earned leads are now minted BEFORE narration (engine-side, harmless) so a report CAN be told
+what the work is (`earnedLead`, lab `LEADWORD=1`). 28 reports per arm, 2 blind judges:
+
+| arm | report names the work you get (0-2) | reads pasted | prose |
+|---|---|---|---|
+| base | 0.89 | 5/28 | 5.05 |
+| earnedLead dealt | 1.71 | 18/28 | 4.54 |
+
+The connection doubles, but the label is pasted verbatim ("learned of unwalked ground to scout",
+"a deal seeking a broker was mentioned") and prose drops half a point — L27, the cure scoring worse
+than the disease. A first try dealing archetype glosses was worse still ("left with the lead: a
+working through").
+
+🟡 For the designer: the unpasteable direction is the reverse — the report says what it heard in
+its own words and the lead TAKES ITS SHAPE from that (the resolver picks the lead's archetype from
+the list, the engine keeps the value). That hands a category choice to the writer, so it is a
+ruling, not an implementation detail.
