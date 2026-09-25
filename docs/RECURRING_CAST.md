@@ -130,3 +130,16 @@ missing priest."* Not Kymme — "the missing priest".
 Cause: the reveal-cadence gate (`isMet`) is **per-chain**. The focal has not been introduced *in
 this saga*, so the writer withholds them — right for a stranger, exactly wrong for someone the
 company has history with. The engine knows which case it is and never tells the writer.
+
+## §10 — §5 measured at beat 1: the wrong beat (2026-09-25)
+
+A parallel harness (`scripts/_knownface2.ts`, 20 worlds per arm, each holding six known faces with
+real memories) judged only returning-face sagas' FIRST card. The returning face appeared on 5/24
+cards in total and `KNOWN_FACE=1` changed nothing (2/12 vs 3/12). That is the arc working as
+designed — step 1 LOCATES the person the saga is about, so they are legitimately offstage on beat 1
+(the same metric error §8 already names). §5 has to be judged at the beat where the face first
+appears, which needs sagas played through several beats. Still open; `KNOWN_FACE` stays off.
+
+One real defect surfaced: a known face whose lore node carries neither sex nor race nor pronouns
+("A widow who holds the burned grange") came back as a wolfman. New nodes now record both
+(2026-09-25); nodes written before that still guess.
