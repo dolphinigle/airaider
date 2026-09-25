@@ -602,7 +602,9 @@ const oneOffLightResolveSystem = (q: ResolveQuestInput): string => {
   '═══ YOUR OUTPUT ═══',
   // LAB BEFORE2: the old line's own shape IS the template judges named ("[Name] stood at X. [Thing]
   // lay.") — the party standing, then a noun lying there. Open on what is in the way, DOING something.
-  process.env.BEFORE2 === '1'
+  process.env.BEFORE3 === '1'
+    ? '1) "before" — ONE sentence, TWENTY WORDS AT MOST: the trouble the CARD named, as the party finds it — what it is doing, or what has been done to it. Only people and things the card or job already named; never open on the party standing or arriving; no weather, no journey, and nothing is taken yet.'
+    : process.env.BEFORE2 === '1'
     ? '1) "before" — ONE sentence, TWENTY WORDS AT MOST: whatever stands in the job\'s way, caught in the act — what it is DOING as the party reaches it. Never open on the party standing or arriving; no weather, no journey, and nothing is taken yet.'
     : '1) "before" — ONE sentence: the party is on the ground and the thing in their way is visible. No approach, no weather, no journey, and nothing is taken yet. TWENTY WORDS AT MOST.',
   // MEASURED 2026-09-25 (with NOCOIN, same cards and outcomes, 2 blind judges, r 0.87): the job

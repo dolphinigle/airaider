@@ -2705,7 +2705,10 @@ export class Game {
     // stamp the model pastes into the scene as a purse or a pouch (L19). MEASURED 2026-09-25, 14
     // routine reports x 2 blind judges: staged pay 6/14 -> 0/14, prose 3.89 -> 4.21. NOCOIN=0 restores.
     const noCoin = process.env.NOCOIN !== '0';
-    const bits = r.delivery.cards.filter(c => !(noCoin && !c.character && c.qty)).map(c => {
+    // LAB (LIGHTNORELIC=1): a routine report is not dealt the relic either — the 🗝 line reports it,
+    // and judges in two rounds named loot "welded in" (an iron vase in a raven's beak) as a top defect
+    const noRelic = process.env.LIGHTNORELIC === '1' && !!r.quest.gravity?.startsWith('a small') && !r.quest.chainId;
+    const bits = r.delivery.cards.filter(c => !(noCoin && !c.character && c.qty) && !(noRelic && !c.character && !c.qty)).map(c => {
       if (!c.character) return c.qty ? `${c.qty} gold` : `the ${c.name}`;
       if (c.character.role === 'captive') return `${c.name} taken captive`;
       return !this.hasRoom('tavern')
@@ -2774,9 +2777,13 @@ export class Game {
       // person — "the shaft caved" once passed the substring check while narrating no wound.
       // SOLO parties skip the name check: the harmed one is unambiguous, and requiring the name
       // was silently dropping real 🩸 while the prose kept the wound (5×/run mismatch)
-      const cited = !!inj.cause && !!merc0
-        && causeShown(inj.cause, out?.after ?? '')
-        && (r.party.length === 1 || inj.cause.toLowerCase().includes(merc0.name.split(' ')[0]!.toLowerCase()));
+      // A wound listed WITHOUT a cause still counts when the report plainly shows it on that
+      // soldier: "Ervalir's upper arm bled from the wire" came with {band: med} and no cause, and
+      // was dropped (playtest 2026-09-25).
+      const cited = !!merc0 && (inj.cause
+        ? causeShown(inj.cause, out?.after ?? '')
+          && (r.party.length === 1 || inj.cause.toLowerCase().includes(merc0.name.split(' ')[0]!.toLowerCase()))
+        : woundShownOn(merc0.name, out?.after ?? '', r.party.length === 1));
       if (!cited) continue;
       const merc = this.card(inj.characterId);
       if (!merc?.character || !r.party.includes(merc)) continue;
@@ -3581,6 +3588,14 @@ export { renderTags, ROOM_TYPE, REGION, REGIONS, GH_THRESHOLDS, U };
  *  dropped, so the report said she bled and the engine said she was fine (both saga wounds in a
  *  2026-09-25 playtest). Word overlap keeps the guard's purpose — an uncited wound is invented —
  *  without demanding the model quote itself exactly. */
+/** no cited phrase: is a wound shown on THIS soldier anyway? Solo — any wound sentence (the harmed
+ *  one is unambiguous); a party — a wound sentence that names them. */
+const WOUND = /\b(bled|bleed|blood|cut|gash|slash|wound|stab|bruis|broke|burn|struck|nick|torn|scor|lame|limp|pierc|bit )/i;
+export function woundShownOn(name: string, after: string, solo: boolean): boolean {
+  const first = name.split(' ')[0]!.toLowerCase();
+  return after.split(/(?<=[.!?])\s+/).some(sn => WOUND.test(sn) && (solo || sn.toLowerCase().includes(first)));
+}
+
 export function causeShown(cause: string, after: string): boolean {
   const words = (t: string) => t.toLowerCase().match(/[a-z]{4,}/g) ?? [];
   const STOP = new Set(['with', 'from', 'into', 'onto', 'their', 'there', 'that', 'this', 'while', 'when', 'were', 'they', 'them', 'have', 'been', 'over', 'under']);

@@ -22,3 +22,18 @@ describe('a wound cited in the report', () => {
     expect(causeShown('hit', after)).toBe(false);
   });
 });
+
+import { woundShownOn } from '../src/game/game.js';
+describe('a wound listed without a cause', () => {
+  const a = "Ervalir kept the two apart while they tested the snare. The cord gave at the old cut and the apprentice's claim held, but Ervalir's upper arm bled from the wire during the check.";
+  it('counts for a solo soldier when the report shows a wound', () => {
+    expect(woundShownOn('Ervalir Fernbrook', a, true)).toBe(true);
+  });
+  it('in a party, counts only on the soldier the wound sentence names', () => {
+    expect(woundShownOn('Ervalir Fernbrook', a, false)).toBe(true);
+    expect(woundShownOn('Felawen', a, false)).toBe(false);
+  });
+  it('does not count when nothing in the report hurts anyone', () => {
+    expect(woundShownOn('Felawen', 'Felawen read the ledger aloud and the singer answered.', true)).toBe(false);
+  });
+});

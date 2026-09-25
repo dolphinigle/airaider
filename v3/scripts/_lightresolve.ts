@@ -45,10 +45,14 @@ for (const c of light) {
 }
 async function arm(name: string, env: Record<string, string>) {
   for (const [k, v] of Object.entries(env)) process.env[k] = v;
-  const outs = await base.resolve(light.map(c => ({ ...c.input, deliveredSummary: stripCoin(c.input.deliveredSummary ?? '') })));
+  // mirror the engine's describeDelivery for arms that change what is dealt
+  const deal = (d: string) => { let x = stripCoin(d);
+    if (env.LIGHTNORELIC === '1') x = x.split(', ').filter(b => !/^the [A-Z]/.test(b)).join(', ') || 'nothing beyond the job itself';
+    return x };
+  const outs = await base.resolve(light.map(c => ({ ...c.input, deliveredSummary: deal(c.input.deliveredSummary ?? '') })));
   for (const [k] of Object.entries(env)) delete process.env[k];
   outs.forEach((o, k) => { const i = light[k]!.input;
-    rows.push({ id: '', arm: name, card: i.situation ?? '', job: light[k]!.job, outcome: i.outcome, delivered: stripCoin(i.deliveredSummary ?? ''), before: o.before, after: o.after }) });
+    rows.push({ id: '', arm: name, card: i.situation ?? '', job: light[k]!.job, outcome: i.outcome, delivered: deal(i.deliveredSummary ?? ''), before: o.before, after: o.after }) });
 }
 // ARMS="D:BEFORE2=1;E:CLOSE2=1;F:BEFORE2=1,CLOSE2=1" — each arm re-narrates the SAME inputs.
 // Unset: the original N12 arms (B no coin, C no coin + job-first).
