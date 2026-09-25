@@ -2416,6 +2416,13 @@ export class Game {
       sceneFacet: this.rng.pick(['the ground and what stands on it', 'the weather and the light',
         'what can be heard', 'the people in view', 'the enemy\'s posture or handiwork', 'what the party carries or readies']),
       deliveredSummary: this.describeDelivery(r),
+      // what a one-off PARTIAL costs, rolled by the engine (🛠 a wound 1 time in 3): QUESTS §105 —
+      // injury comes typically on failure, "occasionally a minor one on a costly partial"
+      partialCost: r.outcome === 'partial' && !r.quest.chainId
+        // ONE WORD, never a sentence: a dealt phrase is pasted whole ("…raise alarm. goodwill —
+        // someone there now holds it against the company.") — L19
+        ? (this.rng.chance(0.33) ? 'wound' : this.rng.pick(['gear', 'time', 'goodwill', 'finish']))
+        : undefined,
       // glosses mix verb and noun phrases, so the frame is a colon, never "wants hands to …"; the
       // contract gloss is writer-facing ("the work IS the premise") and is said plainly instead
       earnedLead: (ls => ls?.length ? ls.map(l => LEAD_WORD[l.archetype] ?? 'paid work').join('; ') : undefined)(preLeads.get(r.quest.id)),

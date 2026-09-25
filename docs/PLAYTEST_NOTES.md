@@ -804,3 +804,24 @@ the fort, and self-directed work (explore, research, gather) is work nobody brin
 contradiction lead-hunt had. Self-directed types now always take the routine register (like
 lead-hunt and hire); a rare sample then read 12/12 as their own type. The voiced opener is kept
 (small gain, no cost). SELFLIGHT=0 / SEENV=0 restore.
+
+## N17 — every partial wounded someone (FIXED, measured)
+
+Once dropped wounds were fixed (N-series, 2026-09-25) the wounds the prose narrated started to
+STICK — and the prose narrates one on nearly every partial. Forced-partial A/B, same cards:
+**20/20** (and 13/13 in the first round) partial reports listed a wound. QUESTS §105 says injury
+comes "typically on failure … occasionally a minor one on a costly partial"; each partial wound
+benches a soldier ~4 cycles.
+
+The engine now rolls what a one-off partial costs (🛠 wound 1 in 3; else gear, time, goodwill or a
+rough finish) and deals it as ONE word (`partialCost`); the report shows that price happening.
+A first version dealt phrases and one was pasted whole ("…raise alarm. goodwill — someone there now
+holds it against the company.") — L19; one-word atoms fixed it.
+
+| arm | wounds | reads as a partial | clear | prose |
+|---|---|---|---|---|
+| base | 20/20 | 20/20 | 16/20 | 4.83 |
+| engine-rolled price | 7/20 (exactly the rolled ones) | 14/20 | 16/20 | 4.80 |
+
+Known cost: a bloodless partial reads a little less plainly as partial (the dice line still says
+[PARTIAL]). PCOST=0 restores. Sagas are untouched (their stakes carry their own costs).
