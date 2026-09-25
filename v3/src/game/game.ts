@@ -1050,6 +1050,9 @@ export class Game {
         const d = defaultAsk(this.rng, archetype);
         test = { attributes: d.attrs, favored: d.favored, clashing: d.clashing, difficulty, level };
       }
+      // a trait is never favored AND clashing on one test — the dice line read "+match 7.5 clash
+      // -7.5" and the soldier was rewarded and punished for the same thing (playtest 2026-09-25)
+      test.clashing = test.clashing.filter(c => !test.favored.includes(c));
       slots.push({ requirement, test, filledBy: null });
     }
     return slots;
@@ -2055,7 +2058,7 @@ export class Game {
           ? 'standard' as const : rollDifficulty(this.rng, chain.rarity, this.state.fort.ghTier);
         return {
           requirement: { kind: 'open' as const },
-          test: { ...template.test, attributes, favored, difficulty },
+          test: { ...template.test, attributes, favored, difficulty, clashing: template.test.clashing.filter(c => !favored.includes(c)) },
           groupId: `g${i}`, filledBy: null,
         };
       });

@@ -788,3 +788,9 @@ Now *"Law and custom speak in period words, never modern ones."* 10 fresh sagas 
 seeds: "pledge" 6/10 → 3/10, "sworn" 3/10 → 0/10; the stories are otherwise the same stories.
 LAWWORDS=1 restores. (In a live campaign the recurring villain's own `who` — "presses ancient
 household claims on village pledges" — keeps some of it alive; that is the character, not a stamp.)
+
+### Measured nulls, 2026-09-25 (routine report)
+
+- **ANSWER** — "a job that asks something gets its answer, said plainly" folded into the job line.
+  20 question jobs x 2 arms, 2 judges: fully answered 13/19 → 15/19, prose 4.95 → 4.67. The base
+  already answers most; not worth the prose. Off (`ANSWER=1`).
