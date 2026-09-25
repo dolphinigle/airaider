@@ -3514,7 +3514,7 @@ export class Game {
       const sequel: Lead = {
         id: freshId('lead-'), rarity: fate.sequelRarity, level: chain.level, region: chain.region,
         archetype: 'investigate', chainInfo: { kind: 'starts-new' }, expiresAtCycle: null,
-        source: 'sequel', title: `${focal?.name ?? 'They'} resurface, someday`,
+        source: 'sequel', title: focal ? `${focal.name} resurfaces, someday` : 'They resurface, someday',
         focalId: focal?.id,   // §21-4a: the road back leads to the SAME person
       };
       st.leads.push(sequel);
