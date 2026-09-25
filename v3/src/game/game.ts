@@ -3687,7 +3687,7 @@ export { renderTags, ROOM_TYPE, REGION, REGIONS, GH_THRESHOLDS, U };
  *  without demanding the model quote itself exactly. */
 /** no cited phrase: is a wound shown on THIS soldier anyway? Solo — any wound sentence (the harmed
  *  one is unambiguous); a party — a wound sentence that names them. */
-const WOUND = /\b(bled|bleed|blood|cut|gash|slash|wound|stab|bruis|broke|burn|struck|nick|torn|scor|lame|limp|pierc|bit |split|punch|fist|knock|crack|sprain|twist|swoll|welt|gouge|graz|scrap|singe|scald|claw|fang|bite|spear|arrow|bolt|blade|hurt|injur)/i;
+const WOUND = /\b(bled|bleed|blood|cut|gash|slash|wound|stab|bruis|broke|burn|struck|nick|torn|scor|lame|limp|pierc|bit |split|punch|fist|knocked|cracked|sprain|twisted|swoll|welt|gouge|grazed|scraped|singed|scald|clawed|fang|bitten|hurt|injur)/i;
 export function woundShownOn(name: string, after: string, solo: boolean): boolean {
   const first = name.split(' ')[0]!.toLowerCase();
   return after.split(/(?<=[.!?])\s+/).some(sn => WOUND.test(sn) && (solo || sn.toLowerCase().includes(first)));
