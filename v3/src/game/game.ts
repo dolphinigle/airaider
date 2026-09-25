@@ -1972,7 +1972,7 @@ export class Game {
       bible: stagedBible,
       // beat 1 has no record yet — an all-empty storyState scaffold is pure parse-load
       storyState: chain.beatIndex === 0 && !isFinale ? undefined
-        : focal?.character?.role === 'merc' ? chain.story
+        : focal?.character?.role === 'merc' ? this.deSoldier(chain.story, [focal.name])
         : this.deSoldier(chain.story),
       relevantLore,
       // beat 1's lore is trimmed to the ground this step actually stands on: a second entry is
@@ -2414,7 +2414,7 @@ export class Game {
         // the resolver's met-text includes the FULL dealt step (yields intact) so it may
         // NAME what this step's yield reveals — the card posed the question, the report answers
         bible: (c => c ? this.stageBible(c, `${r.quest.situation} ${r.quest.job} ${(r.quest.beatIndex ? c.bible.arc[Math.min(r.quest.beatIndex - 1, c.bible.arc.length - 1)] : '') ?? ''}`, r.quest.beatIndex === 1 && !r.quest.isFinale) : undefined)(this.state.chains.find(c => c.id === r.quest.chainId)),
-        storyState: this.state.chains.find(c => c.id === r.quest.chainId)?.story,
+        storyState: (c => c ? this.deSoldier(c.story, [...r.party.map(p => p.name), ...(c.isPersonal ? [this.card(c.focalId)?.name ?? ''] : [])]) : undefined)(this.state.chains.find(c => c.id === r.quest.chainId)),
         isFinale: !!r.quest.isFinale,
         // the ONE step this job covers — resolutions overreached even when the card was scoped
         arcStep: (c => c && r.quest.beatIndex
@@ -3095,8 +3095,12 @@ export class Game {
    *  resolver names them (it must — they fought), the record keeps those sentences, and the next
    *  card reads them and stages a soldier by name. The roster is never card material unless the
    *  saga is ABOUT one of them. */
-  private deSoldier<T>(story: T): T {
-    const names = this.rosterForWriters().names;
+  /** the saga record with the company's soldiers written as "the party" — every soldier but those
+   *  in `keep`. A soldier who held something at one step is not there at the next unless sent:
+   *  "Keesa holds the button" reached a finale's report whose only soldier was Tun-Zeeus, and Keesa
+   *  walked into the scene (playtest 2026-09-25). */
+  private deSoldier<T>(story: T, keep: string[] = []): T {
+    const names = this.rosterForWriters().names.filter(n => !keep.includes(n));
     if (!names.length) return story;
     const esc = (x: string) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const re = new RegExp(`\\b(?:${names.flatMap(n => [esc(n), esc(n.split(/\s+/)[0]!)]).join('|')})('s)?\\b`, 'g');
