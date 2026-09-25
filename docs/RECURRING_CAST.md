@@ -143,3 +143,25 @@ appears, which needs sagas played through several beats. Still open; `KNOWN_FACE
 One real defect surfaced: a known face whose lore node carries neither sex nor race nor pronouns
 ("A widow who holds the burned grange") came back as a wolfman. New nodes now record both
 (2026-09-25); nodes written before that still guess.
+
+### §10b — measured where the face appears (2026-09-25)
+
+`_knownface2.ts` now plays two beats per world and keeps the first text that names the returning
+face. 24 worlds per arm; 2 blind judges.
+
+- **The history is never stated: 0/21** across both arms scored "the text makes plain the company
+  has dealt with them AND what happened".
+- With `KNOWN_FACE=1` the face surfaces by name far more often (15 vs 6 worlds) — but 10 of those 15
+  are only the engine's report footer ("📖 … Maldea stays at the heart of it"), which names the focal
+  the moment they count as met, while the story itself is about someone else.
+- Where the story body does bring them in: stranger intros 3/6 (off) vs 1/5 (on). Small n.
+
+Why the memory never reaches the page: beat 1's writer gets NO storyState (and so no
+`knownToPlayer`), and the one line `KNOWN_FACE` adds is a generic "X and the company have history:
+…" sentence in a field the writer is told is immovable but never told to SAY. Not shipped.
+
+🟡 For the designer — the shape that would satisfy §5 is a design choice, not a wording fix:
+deal the shared memory to the writer AT THE BEAT WHERE THE FACE ENTERS (the reveal gate already
+knows that moment), as the one concrete thing that happened ("sold a prisoner out from under the
+company and kept the fee"), with the card required to open their entry on it. The engine footer
+should also wait until the prose has actually brought them on.

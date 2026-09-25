@@ -28,8 +28,27 @@ await Promise.all(Array.from({ length: N }, async (_, k) => {
   const r = await g.pursue('kf');
   const chain = g.state.chains.at(-1); const focal = chain ? g.card(chain.focalId) : undefined;
   if (!r.questId || !focal || !FACES.some(f => f[0] === focal.name)) return;
-  const q = g.state.quests.find(x => x.id === r.questId)!;
-  rows.push({ face: focal.name, record: FACES.find(f => f[0] === focal.name)![2], card: q.situation ?? '', job: q.job ?? '' });
+  // play up to two beats, collecting every player-facing text in order; keep the FIRST one that
+  // names the face (step 1 locates them, so they often surface only in a report or a later card)
+  const texts: string[] = [];
+  const first = focal.name.split(' ')[0]!;
+  let qid: string | undefined = r.questId;
+  for (let beat = 1; beat <= 2 && qid; beat++) {
+    const q = g.state.quests.find(x => x.id === qid)!;
+    texts.push(`BEAT ${beat} CARD: ${q.situation} ERRAND: ${q.job}`);
+    if (q.situation?.includes(first)) break;
+    g.autoAssign(qid);
+    const report = await g.endCycle();
+    const mine = report.join('\n').split(/\n(?=— )/).find(b => b.includes(q.title)) ?? '';
+    texts.push(`BEAT ${beat} REPORT: ${mine.split('\n').filter(l => !l.startsWith('— ') && !l.includes('「')).join(' ')}`);
+    if (mine.includes(first)) break;
+    const cont = g.state.leads.find(l => l.source === 'continuation');
+    if (!cont) break;
+    qid = (await g.pursue(cont.id)).questId;
+  }
+  const hit = texts.findIndex(t => t.includes(first));
+  if (hit < 0) return;
+  rows.push({ face: focal.name, record: FACES.find(f => f[0] === focal.name)![2], card: texts.slice(Math.max(0, hit - 1), hit + 1).join('\n'), job: '' });
 }));
 fs.writeFileSync(process.env.OUT!, JSON.stringify(rows));
 console.log(rows.length, 'returning-face cards', `$${ai.usage().costUsd.toFixed(2)}`);
