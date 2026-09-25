@@ -640,3 +640,23 @@ A/B, 14 cards x 3 arms on the same rolled outcomes, 2 blind judges (r 0.85 prose
 Still open, named by both judges unprompted: every routine report runs one template — *"[Name]
 stood at X. [Scene noun] lay. [Action]."* — and closes on bookkeeping (*"the job was done"*, *"into
 the company's hands"*). Nobody speaks. Prose ~4.6 is report-speak on the rubric.
+
+### N12b — the routine report's bookkeeping closer (FIXED, measured x3)
+
+Both judges in every round named it: routine reports end on *"the job was done"*, *"into the
+company's hands"*, *"returned with empty hands"*. The cause was in ABOVE ALL #2 — *"the result is
+unmistakable: what was won or lost, what the company now holds"* — which asks for exactly that
+sentence. Now: the result is unmistakable FROM THE ACT ITSELF, and the last sentence is the job's
+last act in the field or what it leaves behind to see.
+
+Three rounds (16-17 cards each, 2 blind judges, r 0.86-0.89), pooled against the shipped version:
+prose 3.93 -> 4.63, bookkeeping closers 35/49 -> 9/49, clarity 30/49 vs 29/49.
+
+Measured and NOT shipped: opening `before` on the obstacle mid-act (+0.8 prose, but it invented
+figures nobody explains — "a pale hand", "a crouched figure"; the clarity-safe rewrite gained
+nothing); keeping #2 and changing only the closer (worse on both); not dealing the relic to a
+routine report (no prose change).
+
+Still open, every round: the opener template (*"X stood at the Y. The Z lay."*), reward items that
+arrive unexplained, and question jobs ("who", "what pact") answered vaguely or not at all. Prose
+~4.6 is the rubric's report-speak band.

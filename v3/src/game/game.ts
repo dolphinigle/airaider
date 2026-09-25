@@ -1167,7 +1167,7 @@ export class Game {
       // unlike `method`, which had no legal landing site
       shape: process.env.SHAPE === '1' ? sampleShape(this.rng) : undefined,
       obstacle: process.env.OBSTACLE === '1' ? sampleObstacle(this.rng) : undefined,
-      selfDirected: process.env.OWNBIZ === '1' && isSelfDirected(lead.archetype) || undefined,
+      selfDirected: (process.env.OWNBIZ === '1' || process.env.LH2 === '1') && isSelfDirected(lead.archetype) || undefined,
       method: process.env.METHOD === '1'
         ? (m => m?.length ? this.rng.pick(m) : undefined)(methodsOf(lead.archetype)) : undefined,
       opening: !light && dealSpark && lead.source !== 'interrogation' ? { spark: opening.spark } : undefined,
@@ -1737,7 +1737,11 @@ export class Game {
               : `The company has dealt with ${returningFace.name} before.`]
           : [],
         openThreads: [], actorStates: {},
-        introducedNames: returningFace ? [returningFace.name] : [],
+        // a personal saga's focal is the company's OWN soldier — the player knows them, so the card
+        // must never introduce them like a stranger ("A peasant scout, Keesa, came down from higher
+        // ground…" — live, 2026-09-25). PERSONAL_CARD=0 restores the old input for A/B.
+        introducedNames: returningFace ? [returningFace.name]
+          : isPersonal && process.env.PERSONAL_CARD !== '0' ? [focal.name] : [],
       },
       state: 'active', createdCycle: this.state.cycle,
     };
@@ -1863,6 +1867,13 @@ export class Game {
         // other work — the old pool was whole sentences, and a dealt string gets pasted WHOLE
         // ("A warden watches the chest and will resist anyone who opens it, and the pay is fixed,
         // and what else the job shakes loose the company keeps." — live, 2026-08-27)
+        // a personal saga has no client (NOCLIENT, measured) — so no FEE: "the fee is as agreed"
+        // on a clientless card invents the hirer the genesis was told does not exist
+        : chain.isPersonal && process.env.PERSONAL_CARD !== '0' ? this.rng.pick([
+            'nobody pays for this one — what the road turns up is the company\'s',
+            'there is no fee in it, only what the company hauls back',
+            'no coin is owed on this, but what the work shakes loose rides home',
+          ])
         : this.rng.pick([
             'the pay is the agreed coin, and what the road turns up',
             'the pay is honest coin, and any small spoils besides',
@@ -1895,7 +1906,9 @@ export class Game {
         // ("If Alyva is not returned…"), and a dealt name is a PASTED name (L19)
         stakeIfLost: chain.bible.stakeIfLost ? this.scrubUnmet(chain, chain.bible.stakeIfLost) : undefined,
         // HOW IT REACHED THE FORT — invented by 6/6 writers before it was dealt
-        arrival: chain.bible.arrival,
+        // …except on a personal saga: nobody arrives, the soldier already lives here, and a dealt
+        // arrival ("came down from higher ground") stamps them as a visitor (L19)
+        arrival: chain.isPersonal && process.env.PERSONAL_CARD !== '0' ? undefined : chain.bible.arrival,
         // WHY IT TAKES ARMED STRANGERS — what the client openly knows stands against them. The
         // reveal cadence keeps the obstacle's NAME and identity off the card; what they will DO
         // about this matter is the client's own knowledge and belongs on the first card.

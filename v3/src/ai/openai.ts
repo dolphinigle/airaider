@@ -296,7 +296,12 @@ function oneOffLightSystem(input: QuestWriteInput): string {
     // first run produced "Punctured Barrels Report" and "Hollow Refuge Inquiry" — a card FILE
     // rather than a job. A title names the trouble, the way a person would say it out loud.
     '- title: three or four plain words naming the trouble, the way one of the company would say it to another. No name of any person or place.',
-    (process.env.SEEN !== '0'
+    // LAB LH2: the three permitted openers (found / missing / stopped) are all MYSTERY shapes, and
+    // L32 says the form outranks the fact — so a lead-hunt ("go where people talk and come back
+    // knowing where the next job is") was always written as an investigation. Give it its own form.
+    (input.selfDirected && process.env.LH2 === '1'
+      ? '- situation: ONE SENTENCE: a place where word gathers — a common room, a market, a crossing — and who is talking there. NOBODY BROUGHT THIS IN and nobody is hiring you: the company goes to LISTEN, and comes back knowing where the next job is. Never state the job it hopes to hear of, and nothing is wrong at the place itself.'
+      : process.env.SEEN !== '0'
       ? '- situation: ONE SENTENCE built on ONE THING SOMEBODY SAW — what was found, what is missing, what someone has stopped doing — and let that carry the trouble. A thing seen tells a reader more than the same trouble stated as a fact, and it is what makes this job worth hiring armed strangers for.'
       : '- situation: ONE SENTENCE saying what is WRONG — the trouble that makes this job worth hiring armed strangers for.')
       + ' The errand itself goes in `job`, not here; the player is shown that separately. NO PROPER NOUNS AT ALL: no person\'s name, no place name, no house, guild or company name. Everyone is their station (a miller, the smith\'s widow, a bailiff) and every place is what it is. No pay, no messenger, no weather, no scenery. TWENTY WORDS AT MOST, and twelve is better.',
@@ -308,7 +313,7 @@ function oneOffLightSystem(input: QuestWriteInput): string {
     // shape, three different registers (a theft, a person, a thing), and no number or payment in
     // any of them — an earlier set wrote "the last two escorts" and "the well has been fouled
     // twice", both amounts in prose, banned two lines above (cold-reads, 2026-08-27).
-    process.env.NOEG === '1' ? '' : '  Three of the right LENGTH, deliberately unalike: "Sheep keep going missing and the shepherd has stopped saying how." · "The tanner\'s daughter has not been seen since the fair and her father will not go to the watch." · "Something is in the flooded workings and the diggers have stopped going down."',
+    process.env.NOEG === '1' || (input.selfDirected && process.env.LH2 === '1') ? '' : '  Three of the right LENGTH, deliberately unalike: "Sheep keep going missing and the shepherd has stopped saying how." · "The tanner\'s daughter has not been seen since the fair and her father will not go to the watch." · "Something is in the flooded workings and the diggers have stopped going down."',
     (process.env.JOB2 !== '0'
       ? '- job (ONE terse line): ONE action, about the very thing the situation put in front of the reader — never a checklist, and never a person, place or object the situation did not already show. Where the job is to find something out, it ASKS the question and never states the answer.'
       : '- job (ONE terse line): the errand itself, plainly — what the company is actually being sent to do. It names what the situation left out.'
@@ -600,13 +605,9 @@ const oneOffLightResolveSystem = (q: ResolveQuestInput): string => {
   resolveInputs(q),
   TAGS_NOTE, NUMBER_BAN, canBond ? EDGE_TYPES_LINE : '',
   '═══ YOUR OUTPUT ═══',
-  // LAB BEFORE2: the old line's own shape IS the template judges named ("[Name] stood at X. [Thing]
-  // lay.") — the party standing, then a noun lying there. Open on what is in the way, DOING something.
-  process.env.BEFORE3 === '1'
-    ? '1) "before" — ONE sentence, TWENTY WORDS AT MOST: the trouble the CARD named, as the party finds it — what it is doing, or what has been done to it. Only people and things the card or job already named; never open on the party standing or arriving; no weather, no journey, and nothing is taken yet.'
-    : process.env.BEFORE2 === '1'
-    ? '1) "before" — ONE sentence, TWENTY WORDS AT MOST: whatever stands in the job\'s way, caught in the act — what it is DOING as the party reaches it. Never open on the party standing or arriving; no weather, no journey, and nothing is taken yet.'
-    : '1) "before" — ONE sentence: the party is on the ground and the thing in their way is visible. No approach, no weather, no journey, and nothing is taken yet. TWENTY WORDS AT MOST.',
+  // (BEFORE2/BEFORE3 — opening on the obstacle mid-act — measured 2026-09-25: +0.8 prose but
+  // invented unexplained figures, and the clarity-safe rewrite gained nothing. Not shipped.)
+  '1) "before" — ONE sentence: the party is on the ground and the thing in their way is visible. No approach, no weather, no journey, and nothing is taken yet. TWENTY WORDS AT MOST.',
   // MEASURED 2026-09-25 (with NOCOIN, same cards and outcomes, 2 blind judges, r 0.87): the job
   // actually done 9/14 -> 14/14, prose 3.89 -> 4.61. The old line made "whatever the company ends
   // up with" the subject of the report, so a stolen-totem job came home with a shield and no totem.
@@ -625,11 +626,11 @@ const oneOffLightResolveSystem = (q: ResolveQuestInput): string => {
   q.deliveredCharacters?.length
     ? '- fleshed: one entry per deliveredCharacters id — this is the ONLY call that knows how they came into the company\'s hands, so their who/backstory must belong to THIS job.'
     : '- fleshed: [] — nobody is handed over on this job.',
-  // LAB CLOSE2: "what the company now holds" asked for exactly the bookkeeping closer both judges
-  // named ("into the company's hands", "the job was done") — the result is shown by the act instead
-  (process.env.CLOSE2 === '1'
-    ? '═══ ABOVE ALL (write now) ═══\n1. Every sentence parses ONE way on one skim — subject and verb early.\n2. The result is unmistakable FROM THE ACT ITSELF — a FAILED job wins NOTHING.\n3. The last sentence is the job\'s last act in the field, or what it leaves behind to see — never a sentence saying the job is done, the task complete, or where the goods went. No numbers in prose.\n4.'
-    : '═══ ABOVE ALL (write now) ═══\n1. Every sentence parses ONE way on one skim — subject and verb early.\n2. The result is unmistakable: what was won or lost, what the company now holds — and a FAILED job wins NOTHING.\n3. The report ENDS at the job\'s last act in the field; the coin and the walk home stay outside your text. GOLD IS NEVER STAGED and no numbers appear in prose.\n4.') + ' Period diction; never echo an instruction or a field name ("approach", "plan", "outcome", "step", "dice", "roll", "obstacle" are system words that never appear in prose).\nRespond as the JSON object specified below — nothing else.',
+  // MEASURED 2026-09-25, 3 rounds x ~16 cards, 2 blind judges each (r 0.86-0.89): "what the company
+  // now holds" asked for the bookkeeping closer judges named every round ("into the company's
+  // hands", "the job was done"). Showing the result by the act instead: prose 3.93 -> 4.63 pooled,
+  // bookkeeping closers 35/49 -> 9/49, clarity unchanged (30/49 vs 29/49).
+  '═══ ABOVE ALL (write now) ═══\n1. Every sentence parses ONE way on one skim — subject and verb early.\n2. The result is unmistakable FROM THE ACT ITSELF — a FAILED job wins NOTHING.\n3. The last sentence is the job\'s last act in the field, or what it leaves behind to see — never a sentence saying the job is done, the task complete, or where the goods went. No numbers in prose.\n4. Period diction; never echo an instruction or a field name ("approach", "plan", "outcome", "step", "dice", "roll", "obstacle" are system words that never appear in prose).\nRespond as the JSON object specified below — nothing else.',
   'Respond as JSON matching: {questId (copy it back exactly), before, after, injuries:[{characterId (an id from party), band: STRICTLY "low"|"med"|"high" — note "med", not "mid", cause}], fleshed:'
     + (q.deliveredCharacters?.length ? '[{characterId,who,backstory,quirks}]' : ' []')
     + ', edges:[{from,to,type,blurb,importance}]}',
