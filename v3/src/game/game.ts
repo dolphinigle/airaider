@@ -366,6 +366,27 @@ export class Game {
       card?.character ? { who: card.character.who, quirks: opts?.habits === false ? undefined : card.character.quirks } : undefined);
   }
   chronicle(id: string) { return chronicleOf(this.state.lore, id) }
+  /** A saga as the COMPANY knows it — the one view both UIs render. The bible is hidden truth:
+   *  its cast includes people later steps exist to discover, and the writer's openThreads are the
+   *  remaining arc in its own words (the CLI printed "At Bramble Hollow present Edmundus for the
+   *  unbinding…" — the finale — after beat 1). So: only people the cards have already put in front
+   *  of the player, the focal named only once met (the 46026 rule the reckoning line already
+   *  follows), and no threads, no wants, no roles. */
+  chainViews() {
+    return this.state.chains.map(c => {
+      const met = new Set(c.story.introducedNames ?? []);
+      const focal = this.card(c.focalId);
+      return {
+        id: c.id, title: c.bible.title, state: c.state, kind: c.kind, personal: c.isPersonal,
+        focal: focal && (met.has(focal.name) || c.isPersonal) ? focal.name : null,
+        beat: c.beatIndex, expectedBeats: c.expectedBeats,
+        bank: coinBand(c.bank), effort: c.cyclesSpent, effortTarget: c.expectedBeats * 1.5,
+        failures: c.failures, failureBudget: c.failureBudget,
+        situation: c.story.currentSituation, known: c.story.knownToPlayer, goal: c.bible.goal,
+        met: c.bible.cast.filter(p => met.has(p.name)).map(p => ({ name: p.name, who: p.who })),
+      };
+    });
+  }
 
   // ---- fort actions ---------------------------------------------------------------------------
 
@@ -753,8 +774,13 @@ export class Game {
     // the recruiting faucet PAUSES while the tavern queue is already deep (🛠 2026-07-11:
     // ~50 rescuees walked out unhired in one long campaign — dead "may join" promises)
     const paused = (l: Lead) => l.source === 'recruiting' && this.state.tavern.length >= 3;
+    // A saga the player already took is not news from the board — its next step must never hide
+    // behind the Lead room. It did: the day-0 packet deals a ✦STORY lead pre-Lead-room, beat 1
+    // resolved, and beat 2's continuation sat invisible, so the saga silently stalled for the ~14
+    // cycles the median opening takes to build one (playtest 2026-09-25).
     if (!this.hasRoom('lead-room'))
-      return this.state.leads.filter(l => !paused(l) && (l.source === 'starter' || l.source === 'reward' || l.expiresAtCycle === null));
+      return this.state.leads.filter(l => !paused(l) && (l.source === 'starter' || l.source === 'reward'
+        || l.source === 'continuation' || l.expiresAtCycle === null));
     return this.state.leads.filter(l => !paused(l));
   }
 
@@ -2675,7 +2701,10 @@ export class Game {
     if (r.outcome === 'failure') return 'they return with empty hands (say what was lost, in-fiction)';
     // the person's REAL fate is engine-decided — deal it, or prose promises "they may stay"
     // while the engine line says "moves on" (both shipped on one card)
-    const bits = r.delivery.cards.map(c => {
+    // LAB (NOCOIN=1): coin is never dealt to the narrator — the 💰 line already reports it, and a
+    // dealt '38 gold' is a stamp the model pastes into the scene as a purse or a pouch (L19)
+    const noCoin = process.env.NOCOIN === '1';
+    const bits = r.delivery.cards.filter(c => !(noCoin && !c.character && c.qty)).map(c => {
       if (!c.character) return c.qty ? `${c.qty} gold` : `the ${c.name}`;
       if (c.character.role === 'captive') return `${c.name} taken captive`;
       return !this.hasRoom('tavern')
@@ -2685,7 +2714,7 @@ export class Game {
           : `${c.name} rescued — they will wait at the fort's tavern, open to joining if hired`;
     });
     if (r.delivery.liability) bits.push(`a ${r.delivery.liability.name} left behind`);
-    return bits.join(', ') || 'a token result';
+    return bits.join(', ') || (noCoin ? 'nothing beyond the job itself' : 'a token result');
   }
 
   private applyResolution(
@@ -2736,7 +2765,7 @@ export class Game {
       // SOLO parties skip the name check: the harmed one is unambiguous, and requiring the name
       // was silently dropping real 🩸 while the prose kept the wound (5×/run mismatch)
       const cited = !!inj.cause && !!merc0
-        && (out?.after ?? '').toLowerCase().includes(inj.cause.toLowerCase().slice(0, 25))
+        && causeShown(inj.cause, out?.after ?? '')
         && (r.party.length === 1 || inj.cause.toLowerCase().includes(merc0.name.split(' ')[0]!.toLowerCase()));
       if (!cited) continue;
       const merc = this.card(inj.characterId);
@@ -3542,3 +3571,20 @@ export class Game {
 }
 
 export { renderTags, ROOM_TYPE, REGION, REGIONS, GH_THRESHOLDS, U };
+
+/** Is this wound actually SHOWN in the after-text? The check was a verbatim 25-character prefix,
+ *  and cheap models paraphrase their own sentence when they cite it: "cut across the thigh BY a
+ *  sentry's short spear" against prose reading "cut HER across the thigh WITH a short spear" was
+ *  dropped, so the report said she bled and the engine said she was fine (both saga wounds in a
+ *  2026-09-25 playtest). Word overlap keeps the guard's purpose — an uncited wound is invented —
+ *  without demanding the model quote itself exactly. */
+export function causeShown(cause: string, after: string): boolean {
+  const words = (t: string) => t.toLowerCase().match(/[a-z]{4,}/g) ?? [];
+  const STOP = new Set(['with', 'from', 'into', 'onto', 'their', 'there', 'that', 'this', 'while', 'when', 'were', 'they', 'them', 'have', 'been', 'over', 'under']);
+  const want = words(cause).filter(w => !STOP.has(w));
+  if (!want.length) return false;
+  const have = new Set(words(after).map(w => w.slice(0, 5)));
+  const hit = want.filter(w => have.has(w.slice(0, 5))).length;
+  return hit >= Math.min(2, want.length) && hit / want.length >= 0.6;
+}
+

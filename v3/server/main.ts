@@ -190,17 +190,8 @@ function stateView() {
         createdCycle: q.createdCycle,
       };
     }),
-    chains: st.chains.map(c => ({
-      id: c.id, title: c.bible.title, state: c.state, kind: c.kind, personal: c.isPersonal,
-      focal: game.card(c.focalId)?.name ?? '?', beat: c.beatIndex, expectedBeats: c.expectedBeats,
-      // §7.2 / REWARD_BANK §5: 'spoils so far' as a BAND, and the projected payoff is not sent
-      // at all — the deferred reward is hidden, so the client is never given the number.
-      bank: coinBand(c.bank),
-      effort: c.cyclesSpent, effortTarget: c.expectedBeats * 1.5,
-      failures: c.failures, failureBudget: c.failureBudget,
-      situation: c.story.currentSituation, known: c.story.knownToPlayer, threads: c.story.openThreads,
-      cast: c.bible.cast, goal: c.bible.goal,
-    })),
+    // one view for both UIs — the saga as the company knows it (Game.chainViews)
+    chains: game.chainViews(),
     lore: Object.values(st.lore.nodes).map(n => ({
       id: n.id, name: n.name, kind: n.kind, blurb: n.blurb, active: n.active,
       dossier: game.dossier(n.id),

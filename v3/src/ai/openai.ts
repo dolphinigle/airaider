@@ -601,7 +601,9 @@ const oneOffLightResolveSystem = (q: ResolveQuestInput): string => {
   TAGS_NOTE, NUMBER_BAN, canBond ? EDGE_TYPES_LINE : '',
   '═══ YOUR OUTPUT ═══',
   '1) "before" — ONE sentence: the party is on the ground and the thing in their way is visible. No approach, no weather, no journey, and nothing is taken yet. TWENTY WORDS AT MOST.',
-  '- inside "after": whatever the company ends up with (deliveredSummary) changes hands in ONE clause of the work itself — no separate discovery, no amounts. If there is only coin to take, the report simply ends on the job done.',
+  process.env.LIGHTJOB === '1'
+    ? '- inside "after": the card\'s JOB is what gets done — its own objective, as the job words it, finished on screen. Anything deliveredSummary lists comes to hand in the same stroke, never instead of it — no separate discovery, no amounts.'
+    : '- inside "after": whatever the company ends up with (deliveredSummary) changes hands in ONE clause of the work itself — no separate discovery, no amounts. If there is only coin to take, the report simply ends on the job done.',
   '2) "after" — what happened, knowing the outcome, and what it cost WHEN it cost something: a clean success costs nothing and says so by not mentioning it. Open on the decisive moment, not on a restatement of the job. FORTY-FIVE WORDS AT MOST, and coming in well under is better. No closing image, no line of speech, no second beat: it ends the moment the result is plain.',
   '- injuries: ONLY when the fiction put a member in harm\'s way — a clean success lists none, never invent one to fill the field. cause NAMES the member.',
   // Cards no longer carry names, so on a routine job the only people with ids are the soldiers

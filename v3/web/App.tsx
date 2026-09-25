@@ -725,14 +725,12 @@ function Chains({ s }: any) {
     <div>
       {s.chains.slice().reverse().map((c: any) => (
         <div className="cardrow" key={c.id}>
-          <h3>{c.title} <small>{c.state} · beat {c.beat}/{c.expectedBeats} · focal <b>{c.focal}</b>{c.personal ? ' (personal)' : ''}</small></h3>
-          <p>spoils so far: {c.bank || '—'} · effort {c.effort}/{c.effortTarget} · failures {c.failures}/{c.failureBudget}</p>
+          <h3>{c.title} <small>{c.state} · beat {c.beat}/{c.expectedBeats}{c.focal ? <> · focal <b>{c.focal}</b></> : ''}{c.personal ? ' (personal)' : ''}</small></h3>
+          <p>goal: {c.goal}</p>
+          <p>likely fate: {c.kind} · spoils so far: {c.bank || '—'} · effort {c.effort}/{c.effortTarget} · failures {c.failures}/{c.failureBudget}</p>
           <p><i>{c.situation}</i></p>
           {c.known.length > 0 && <p>known: {c.known.join(' · ')}</p>}
-          <details><summary>cast & goal</summary>
-            <p>{c.goal}</p>
-            <ul>{c.cast.map((p: any, i: number) => <li key={i}><b>{p.name}</b> ({p.role}): {p.who} — wants {p.want}</li>)}</ul>
-          </details>
+          {c.met.length > 0 && <ul>{c.met.map((p: any) => <li key={p.name}><b>{p.name}</b>: {p.who}</li>)}</ul>}
         </div>
       ))}
     </div>

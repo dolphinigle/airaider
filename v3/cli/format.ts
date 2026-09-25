@@ -34,7 +34,7 @@ export const render = {
     return [
       'VIEWS   fort · rooms · room <id> · roster · merc <id> · leads · quests · quest <id>',
       '        captives · items · chains · chain <id> · lore <id> · tavern · holding',
-      '        buildable · status · log [n] · reckoning [cycle|list]',
+      '        buildable · status · log [n] · reckoning [cycle|list] · ailog',
       'BUILD   build <type> [ownerId] · upgrade <roomId> · renovate <roomId> <style>',
       '        excavate · gh   (styles: human elven wolfkin lizardkin ancient exotic)',
       'CARDS   slot <roomId> <idx> <cardId> · unslot <roomId> <idx> · focus <mercId> single|dual|none <attr> [attr2]',
@@ -224,6 +224,10 @@ export const render = {
       // held to this matter: readable, never movable — the text form of the bracketed cards
       ...(cast.length ? ['ON THIS MATTER (held here — you can read them, not move them):',
         ...cast.map(c => `  ⊟ ${c.name}${c.trade ? `, ${c.trade}` : ''} — ${c.role}\n      ${c.who}${c.tags ? `\n      ${c.tags}` : ''}`)] : []),
+      // parity with the GUI's writ: THE ERRAND is the job line (QUESTS 2026-07-06 (a) — the situation
+      // is the card, the job its ledger line). The CLI never printed it, so a text-UI player read
+      // "a woodcutter saw someone in a woman's cloak slip toward the gate" with no job at all.
+      ...(q.job ? [`ERRAND: ${q.job}`] : []),
       `REWARD: ${g.questReward(q.id)}`,
     ];
     if (q.approaches) {
@@ -291,22 +295,21 @@ export const render = {
   },
 
   chains(g: Game): string {
-    return g.state.chains.map(c => {
-      const focal = g.card(c.focalId);
-      return `${c.id.padEnd(9)} ${c.bible.title.slice(0, 36).padEnd(36)} ${c.state.padEnd(14)} beat ${c.beatIndex}/${c.expectedBeats} ${(coinBand(c.bank) || '—').padEnd(22)} focal: ${focal?.name ?? '?'}`;
-    }).join('\n') || '(no stories yet — pursue a ✦STORY lead)';
+    return g.chainViews().map(c =>
+      `${c.id.padEnd(9)} ${c.title.slice(0, 36).padEnd(36)} ${c.state.padEnd(14)} beat ${c.beat}/${c.expectedBeats} ${(c.bank || '—').padEnd(22)}${c.focal ? ` focal: ${c.focal}` : ''}`,
+    ).join('\n') || '(no stories yet — pursue a ✦STORY lead)';
   },
 
   chainDetail(g: Game, id: string): string {
-    const c = g.state.chains.find(x => x.id === id);
+    const c = g.chainViews().find(x => x.id === id);
     if (!c) return 'no such chain';
-    const focal = g.card(c.focalId);
     return [
-      `═══ ${c.bible.title} ═══ (${c.state})`,
-      `focal: ${focal?.name} · likely fate: ${c.kind} · spoils so far ${coinBand(c.bank) || '—'} · effort ${c.cyclesSpent.toFixed(0)}/${(c.expectedBeats * 1.5).toFixed(0)} merc-cycles · failures ${c.failures}/${c.failureBudget}`,
-      `now: ${c.story.currentSituation}`,
-      c.story.knownToPlayer.length ? `known: ${c.story.knownToPlayer.join(' · ')}` : '',
-      c.story.openThreads.length ? `threads: ${c.story.openThreads.join(' · ')}` : '',
+      `═══ ${c.title} ═══ (${c.state})${c.personal ? ' — personal' : ''}`,
+      `goal: ${c.goal}`,
+      `${c.focal ? `focal: ${c.focal} · ` : ''}likely fate: ${c.kind} · spoils so far ${c.bank || '—'} · effort ${c.effort.toFixed(0)}/${c.effortTarget.toFixed(0)} merc-cycles · failures ${c.failures}/${c.failureBudget}`,
+      `now: ${c.situation}`,
+      c.known.length ? `known: ${c.known.join(' · ')}` : '',
+      ...c.met.map(p => `  ${p.name}: ${p.who}`),
     ].filter(Boolean).join('\n');
   },
 
