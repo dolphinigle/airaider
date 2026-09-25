@@ -1144,7 +1144,12 @@ export class Game {
     // landmark cooldown: once dealt, the landmark rests several cycles (Thornhollow ×8/run)
     const lmOk = opening.landmarkAllowed && this.state.cycle - (this.lastLandmarkDeal[lead.region] ?? -99) > 6;
     if (lmOk) this.lastLandmarkDeal[lead.region] = this.state.cycle;
-    const gravity = sampleGravity(this.rng, lead.rarity, 'one-off');
+    // a scouting run is routine by nature — the heavy register is voiced by "whoever brought it
+    // to the fort", and nobody brings a scouting run in, so 2/8 heavy lead-hunts came out as voiced
+    // mysteries ("the wagon hangs a foot off the ground… the miller will pay"). The roll is still
+    // drawn so the RNG stream is unchanged.
+    const rolledGravity = sampleGravity(this.rng, lead.rarity, 'one-off');
+    const gravity = lead.archetype === 'lead-hunt' && process.env.SCOUT !== '0' ? 'a small, everyday job' : rolledGravity;
     // THE INPUT DIET (designer, 2026-08-27: "one off shouldnt even have names etc… best is one
     // sentence"). A one-sentence card cannot absorb four keyword atoms + a spark + an intake fact
     // + two place-name suggestions — a model handed eight things to use will use them, and the

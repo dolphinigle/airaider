@@ -69,7 +69,8 @@ export const ARCHETYPES = {
     selfDirected: true,
     methods: ['listening', 'asking', 'drinking', 'waiting', 'loitering', 'bribing', 'eavesdropping'],
     gloss: 'go where people talk — a tavern, a market, a ford crossing — and come back knowing where the next job is',
-    rule: 'Never promise "further work" or more jobs: the card is the ASKING, and the engine announces whatever it turns up.',
+    // (the 'never promise further work' rule is gone: the scouting form IS "go and come back with
+    // word of paying work", and a cold reader flagged the two as pulling against each other)
     profile: 'lead', slots: [1, 1],
   },
 
