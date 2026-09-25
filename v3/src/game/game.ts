@@ -3510,7 +3510,7 @@ export class Game {
       // §21-4a: bank forfeit; focal slips away FOR NOW — alive in the lore graph, sequel lead back
       chain.state = 'slipped'; chain.bank = 0;
       if (focalIsOwnMerc) {
-        report.push(`💨 The matter around ${focal!.name} slips out of reach — for now. The season's bank is forfeit. ${focal!.name} stays with the company.`);
+        report.push(`💨 The matter around ${focal!.name} slips out of reach — for now. What was set aside is lost. ${focal!.name} stays with the company.`);
         return;
       }
       if (focal && !chain.isPersonal) focal.location = HELD('lore');
@@ -3524,7 +3524,7 @@ export class Game {
       // the WORLD must remember the slip — a later saga once staged a slipped focal "held in
       // your cells" because her lore node never recorded that she got away
       if (focal) guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `at large — slipped the company when "${chain.bible.title}" ended; in no one's custody`, importance: 0.8 }], st.cycle, () => freshId('e'));
-      report.push(`💨 ${focal?.name ?? 'The prize'} slips away — for now. The season's bank is forfeit. A road back exists (${fate.sequelRarity} sequel lead).`);
+      report.push(`💨 ${focal?.name ?? 'The prize'} slips away — for now, and what was set aside is lost. A road back exists (${fate.sequelRarity} sequel lead).`);
       return;
     }
     chain.state = 'done';
@@ -3551,7 +3551,7 @@ export class Game {
         chainInfo: { kind: 'starts-new' }, expiresAtCycle: null,
         source: 'sequel', title: `${focal.name} resurfaces, someday`, focalId: focal.id,
       });
-      report.push(`💨 The season ran too thin to keep ${focal.name} — the affair yields 💰 +${pay}g and they pass out of reach, for now. A road back exists.`);
+      report.push(`💨 The work earned too little to keep ${focal.name} — the affair pays 💰 +${pay}g and they pass out of reach, for now. A road back exists.`);
       guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `the saga ${chain.bible.title} ended with ${focal.name} out of reach`, importance: 0.85 }], st.cycle, () => freshId('e'));
       return;
     }
@@ -3563,7 +3563,7 @@ export class Game {
       const pay = fate.fate === 'saddled' ? Math.round(full * 0.7) : full;
       this.addGold(pay);
       focal.location = HELD('lore');
-      report.push(`💰 The season crystallizes as coin: +${pay}g${fate.fate === 'saddled' ? ' (a hard bargain — the full price slipped away)' : ''}. ${focal.name} passes out of your hands.`);
+      report.push(`💰 The whole affair pays out: +${pay}g${fate.fate === 'saddled' ? ' (a hard bargain — the full price slipped away)' : ''}. ${focal.name} passes out of your hands.`);
     } else if (kind === 'recruit') {
       // §2 value-invariance: the bank already paid the mark — a recruit finale JOINS CLEAN
       // (staging them at the tavern re-charged 1.2×mark on top; that double-charge is gone)
@@ -3575,12 +3575,12 @@ export class Game {
       if (this.roster().length < this.rosterCapacity()) {
         focal.location = HELD('roster');
         this.spawnPersonalChainLead(focal);
-        report.push(`🎬 Finale: ${focal.name} joins the company — clean${shortDebt > 0 ? `, though the season ran short: a ${shortDebt}g debt comes with them` : ''}. Surplus: ${surplus}g (the bank beyond their mark).`);
+        report.push(`🎬 Finale: ${focal.name} joins the company${shortDebt > 0 ? ` — the work earned less than they are worth, so a ${shortDebt}g debt comes with them` : ''}.${surplus > 0 ? ` 💰 +${surplus}g left over.` : ''}`);
       } else {
         focal.character!.role = 'npc';
         st.tavern.push({ cardId: focal.id, expiresAtCycle: st.cycle + STAGE_TTL_FINALE, prepaid: true });
         focal.location = HELD('staged');
-        report.push(`🎬 Finale: ${focal.name} is yours — no roster room, so they wait at the tavern (already paid for)${shortDebt > 0 ? `; a ${shortDebt}g season-shortfall debt comes with them` : ''}. Surplus: ${surplus}g (the bank beyond their mark).`);
+        report.push(`🎬 Finale: ${focal.name} is yours — no roster room, so they wait at the tavern (already paid for)${shortDebt > 0 ? `; the work earned less than they are worth, so a ${shortDebt}g debt comes with them` : ''}.${surplus > 0 ? ` 💰 +${surplus}g left over.` : ''}`);
       }
     } else {
       focal.character!.role = 'captive';
@@ -3591,7 +3591,7 @@ export class Game {
       // ONE debt rule: the shortfall between the bank and the focal's mark (QUESTS §5)
       const shortDebt = Math.max(0, Math.round(focal.value - chain.bank));
       if (shortDebt > 0) this.addCard(mintStackable('debt', shortDebt));
-      report.push(`🎬 Finale: ${focal.name} is yours — captive${shortDebt > 0 ? `, but the season ran short: a ${shortDebt}g debt comes with them` : ''}. Surplus: ${surplus}g (the bank beyond their mark).`);
+      report.push(`🎬 Finale: ${focal.name} is yours — captive${shortDebt > 0 ? `, but the work earned less than they are worth, so a ${shortDebt}g debt comes with them` : ''}.${surplus > 0 ? ` 💰 +${surplus}g left over.` : ''}`);
     }
     // the ARRANGEMENT joins the memory — dossiers once missed that a focal ended as a paid
     // informer because only the outcome word was recorded
