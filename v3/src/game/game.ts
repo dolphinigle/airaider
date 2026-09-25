@@ -40,7 +40,7 @@ import {
 import { rollName, rollPlaceName } from '../engine/names.js';
 import { hasClash, queryMatches } from '../engine/overlap.js';
 import { questXp, grantXp, rollBase, rollGrowthLean, growToLevel } from '../engine/growth.js';
-import { coins, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, explainCoins, type SlotTest, type Outcome, type QuestRollResult } from '../engine/roll.js';
+import { coins, PARTIAL_FRAC, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, explainCoins, type SlotTest, type Outcome, type QuestRollResult } from '../engine/roll.js';
 import { sampleKeywords, sampleKeywordsLight, sampleSeed, sampleOpening, sampleGravity, pickTone, sampleArrival, sampleTell, sampleObstacle, sampleShape } from '../ai/keywords.js';
 import type { AiProvider, ResolveQuestInput, ResolveQuestOut, AskSlotOut, QuestWriteOut } from '../ai/provider.js';
 
@@ -2996,7 +2996,9 @@ export class Game {
     if (out) report.push(...(bubbles ? this.renderWithBubbles(out.before, bubbles) : [out.before]));
     report.push(r.rolled.totalCoins === 0
       ? `⚄ [${r.outcome.toUpperCase()}] · the party had no usable dice for this work (needed ${r.rolled.totalBar.toFixed(1)})`
-      : `⚄ [${r.outcome.toUpperCase()}] · rolled ${r.rolled.heads} heads of ${r.rolled.totalCoins} coins vs bar ${r.rolled.totalBar.toFixed(1)}`);
+      // the partial mark on the line itself — "11 heads vs bar 17.3" read as a miss, yet it was a
+      // partial (≥60% of the bar), and nothing on screen said where that line sits
+      : `⚄ [${r.outcome.toUpperCase()}] · rolled ${r.rolled.heads} heads of ${r.rolled.totalCoins} coins vs bar ${r.rolled.totalBar.toFixed(1)} (partial from ${(PARTIAL_FRAC * r.rolled.totalBar).toFixed(1)})`);
     // the WHY under the dice (designer 2026-07-24): each sent merc's coins traced to the card's
     // ask — attribute value, favored/clash, injury — via the engine's own explainCoins
     if (coinTerms.length) report.push(`   ${coinTerms.join('  ·  ')}`);
