@@ -426,6 +426,9 @@ export class Game {
       }
       if (!reason && !rt.multiBuild && this.hasRoom(rt.id)) reason = 'already built';
       if (!reason && cost > this.gold()) reason = `costs ${cost}g`;
+      // the list said "✓ buildable" for every room while the fort had no free cell, and the
+      // build then failed — say so where the player is choosing (playtest 2026-09-25)
+      if (!reason && !this.freeCells().length) reason = `no free cell — excavate first (${excavateCost(this.state.fort.cells.length)}g)`;
       return { type: rt.id, cost, reason };
     });
   }
