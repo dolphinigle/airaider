@@ -37,3 +37,9 @@ describe('a wound listed without a cause', () => {
     expect(woundShownOn('Felawen', 'Felawen read the ledger aloud and the singer answered.', true)).toBe(false);
   });
 });
+
+describe('wound words beyond cuts', () => {
+  it('counts a beating the report shows', () => {
+    expect(woundShownOn('Ervalir Fernbrook', 'A ranger rose, spat, Ervalir snapped, a fist opened his face, he left with a split nose.', true)).toBe(true);
+  });
+});

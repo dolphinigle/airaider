@@ -117,6 +117,19 @@ export const RECKONINGS_KEPT = 12;
 
 const CAST_THETA = Number(process.env.CAST_THETA ?? 4);
 
+/** the work an earned lead turns out to be, in the words someone at a bench would use — dealt to
+ *  the report so it can say what was heard. Glosses were tried first and got pasted whole ("left
+ *  with the lead: a working through"): a dealt string lands where it is dealt (L19). */
+const LEAD_WORD: Partial<Record<string, string>> = {
+  raid: 'a holdout worth raiding', capture: 'someone wanted taken alive', rescue: 'someone held who needs freeing',
+  escort: 'a journey that wants guarding', investigate: 'something that wants looking into', hunt: 'a hunt',
+  contract: 'plain paid work', guard: 'guard work', recover: 'something taken that wants getting back',
+  explore: 'unwalked ground to scout', trade: 'a deal that wants brokering', assassinate: 'a killing',
+  occult: 'something uncanny that wants putting down', ritual: 'a rite that wants guarding', negotiate: 'terms that want settling',
+  fight: 'a fight for money', research: 'something old that wants reading', heist: 'a quiet theft',
+  adventure: 'a bad place worth plundering', 'bounty-hunt': 'a bounty', gather: 'a gathering job', hire: 'someone worth hiring',
+};
+
 export class Game {
   state: GameState;
   rng: Rng;
@@ -2370,7 +2383,7 @@ export class Game {
       deliveredSummary: this.describeDelivery(r),
       // glosses mix verb and noun phrases, so the frame is a colon, never "wants hands to …"; the
       // contract gloss is writer-facing ("the work IS the premise") and is said plainly instead
-      earnedLead: (ls => ls?.length ? ls.map(l => `word of paying work: ${l.archetype === 'contract' ? 'plain work for agreed pay' : defOf(l.archetype).gloss.split(' — ')[0]}`).join('; ') : undefined)(preLeads.get(r.quest.id)),
+      earnedLead: (ls => ls?.length ? ls.map(l => LEAD_WORD[l.archetype] ?? 'paid work').join('; ') : undefined)(preLeads.get(r.quest.id)),
       // beat variant (engine-dealt, no RNG): how this job turns — physical / wits / social
       sceneMode: this.sceneModeFor(r.quest),
       // a finale's delivered PERSON is the focal — give them an id here so the narrator can
@@ -3674,7 +3687,7 @@ export { renderTags, ROOM_TYPE, REGION, REGIONS, GH_THRESHOLDS, U };
  *  without demanding the model quote itself exactly. */
 /** no cited phrase: is a wound shown on THIS soldier anyway? Solo — any wound sentence (the harmed
  *  one is unambiguous); a party — a wound sentence that names them. */
-const WOUND = /\b(bled|bleed|blood|cut|gash|slash|wound|stab|bruis|broke|burn|struck|nick|torn|scor|lame|limp|pierc|bit )/i;
+const WOUND = /\b(bled|bleed|blood|cut|gash|slash|wound|stab|bruis|broke|burn|struck|nick|torn|scor|lame|limp|pierc|bit |split|punch|fist|knock|crack|sprain|twist|swoll|welt|gouge|graz|scrap|singe|scald|claw|fang|bite|spear|arrow|bolt|blade|hurt|injur)/i;
 export function woundShownOn(name: string, after: string, solo: boolean): boolean {
   const first = name.split(' ')[0]!.toLowerCase();
   return after.split(/(?<=[.!?])\s+/).some(sn => WOUND.test(sn) && (solo || sn.toLowerCase().includes(first)));
