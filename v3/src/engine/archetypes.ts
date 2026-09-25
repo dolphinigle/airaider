@@ -106,7 +106,7 @@ export type Archetype = keyof typeof ARCHETYPES;
 export const ARCHETYPE_NAMES = Object.keys(ARCHETYPES) as Archetype[];
 /** `as const` keeps the KEYS literal (so Archetype is the union of names) but narrows each row to
  *  its own shape, which loses the optional `gate`. Read rows through here. */
-const defOf = (a: Archetype): ArchetypeDef => ARCHETYPES[a] as ArchetypeDef;
+export const defOf = (a: Archetype): ArchetypeDef => ARCHETYPES[a] as ArchetypeDef;
 export const profileOf = (a: Archetype): Profile => defOf(a).profile;
 export const slotRangeOf = (a: Archetype): [number, number] => defOf(a).slots;
 export const glossOf = (a: Archetype): string | undefined => ARCHETYPES[a] ? defOf(a).gloss : undefined;

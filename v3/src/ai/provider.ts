@@ -133,6 +133,7 @@ export interface ResolveQuestInput {
   sceneFacet?: string;           // engine-rolled facet the before-text opens on (§2 seed —
                                  // 'crouched' terrain openers owned 22 of ~30 reports)
   deliveredSummary: string;      // engine-computed delivery, named for the AI to narrate
+  earnedLead?: string;           // the work an earned lead turns out to be (pre-minted), so the report can name it
   deliveredCharacters: { id: string; name: string; tags: string }[]; // to flesh (who/backstory)
   chainContext?: {
     bible: unknown; storyState: unknown; isFinale: boolean;

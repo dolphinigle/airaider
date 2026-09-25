@@ -18,7 +18,7 @@ import {
 } from '../engine/fort.js';
 import { infirmaryHealRate, healTick, rollInjuryTiers, payHealCost, REST_HEAL_PER_CYCLE, type InjuryBand } from '../engine/injury.js';
 import { REGION, REGIONS } from '../engine/regions.js';
-import { ARCHETYPE_NAMES, methodsOf, isSelfDirected } from '../engine/archetypes.js';
+import { ARCHETYPE_NAMES, methodsOf, isSelfDirected, defOf } from '../engine/archetypes.js';
 import {
   vBase, RARITY_MULT, splitOneOff, hireCost, RANSOM_RATE, SELL_RATE, KEEP_THRESHOLD, cashValue, coinBand,
   type Rarity, type Archetype, type RewardSpec,
@@ -826,6 +826,8 @@ export class Game {
   private jobSeq = 0;
   private inFlight = 0;
   /** leadIds a live job holds: not pursuable twice, and doEndCycle may not expire them (I6) */
+  /** earned leads minted before this cycle's narration, by quest id */
+  private preMintedLeads = new Map<string, Lead[]>();
   private reserved = new Set<string>();
 
   /** queued + running + recently finished, oldest first */
@@ -2329,6 +2331,12 @@ export class Game {
     // story still being written.
     report = [];
 
+    // earned leads are minted BEFORE narration, so the report can say what work it heard of and the
+    // lead the player then finds IS that work (a scouting report used to end on "found the trace"
+    // while a random job type landed on the board)
+    const preLeads = this.preMintedLeads = new Map<string, Lead[]>();
+    for (const r of resolutions) if (r.delivery.leadGrants.length)
+      preLeads.set(r.quest.id, r.delivery.leadGrants.map(b => this.freshLead('reward', b)));
     // 2) ONE batched AI call for all resolutions
     const aiInputs: ResolveQuestInput[] = resolutions.map(r => ({
       questId: r.quest.id, title: r.quest.title, situation: r.quest.situation, job: r.quest.job, gravity: r.quest.gravity,
@@ -2342,6 +2350,7 @@ export class Game {
       sceneFacet: this.rng.pick(['the ground and what stands on it', 'the weather and the light',
         'what can be heard', 'the people in view', 'the enemy\'s posture or handiwork', 'what the party carries or readies']),
       deliveredSummary: this.describeDelivery(r),
+      earnedLead: (ls => ls?.length ? ls.map(l => `somebody wants hands to ${defOf(l.archetype).gloss}`).join('; ') : undefined)(preLeads.get(r.quest.id)),
       // beat variant (engine-dealt, no RNG): how this job turns — physical / wits / social
       sceneMode: this.sceneModeFor(r.quest),
       // a finale's delivered PERSON is the focal — give them an id here so the narrator can
@@ -2880,9 +2889,11 @@ export class Game {
         st.cards = st.cards.filter(c => c.id !== lost.id);   // lost objects just vanish
       }
     }
-    for (const bonus of r.delivery.leadGrants) {
-      // the value the split reserved rides ON the lead now, instead of being discarded (§7.1)
-      const nl = this.freshLead('reward', bonus);
+    const minted = this.preMintedLeads.get(q.id);
+    for (const [k, bonus] of r.delivery.leadGrants.entries()) {
+      // the value the split reserved rides ON the lead now, instead of being discarded (§7.1);
+      // minted before narration so the report and the board agree on what the work is
+      const nl = minted?.[k] ?? this.freshLead('reward', bonus);
       st.leads.push(nl);
       const b = leadBand(nl);
       say(nl.title

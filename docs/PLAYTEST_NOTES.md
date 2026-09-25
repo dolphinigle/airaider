@@ -688,3 +688,22 @@ knifing"*). Known cost: the errand repeats (*"buy a round, sit with the talkers,
 hands"*) — the example actions in the errand line are copied. Removing them made errands long
 lists and scored worse. For a card the scouting post offers every cycle, a steady errand with a
 varying grumble is arguably right; flagged, not ruled.
+
+### N11c — a personal saga introduced the company's own soldier as a stranger (FIXED)
+
+Live, 2026-09-25: *"A peasant scout, Keesa, came down from higher ground and said the whole of it
+standing … the fee is as agreed."* Keesa lives in the fort. Three dealt strings contradicted the
+saga the genesis wrote, each pasted where it landed (L19):
+
+1. `arrival` ("came down from higher ground") — a client's arrival, dealt to a saga with no client.
+   Not dealt to personal sagas.
+2. the pay line ("the fee is as agreed") — invents the hirer NOCLIENT removed. Personal sagas get a
+   no-fee pool ("nobody pays for this one — what the road turns up is the company's").
+3. the naming rule — "the card never opens on a name; every person arrives as what they are" —
+   exempted only `introducedNames`, which beat 1 never receives. The exemption now also covers
+   `rosterNames` (the company's own soldiers) whenever the focal is a merc.
+
+Eight sagas each, before → after: visitor arrivals 4/8 → 0/8, fee language 8/8 → 0/8, soldier
+introduced like a stranger 5/8 → 1/8. After: *"Renee, who once left a man at a crossing and will
+not say why, is returning to Ashroot Crossing to look where she left Arver Stonefield."*
+PERSONAL_CARD=0 restores the old inputs.

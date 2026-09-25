@@ -546,6 +546,8 @@ const resolveInputs = (q: ResolveQuestInput) => [
     ? '- deliveredSummary: nothing changes hands beyond the job itself — report the work, nothing else.'
     : '- deliveredSummary: what ends in the COMPANY\'s hands — weave any ITEMS or PEOPLE it lists into the action as things changing hands in-fiction, never repeating its amounts or wording (a take that is ONLY coin has nothing to weave — the report simply ends on the job done). THE CARD\'S FICTION IS BINDING: the job\'s own objective, as the card words it, resolves on screen FIRST and completely, and changes hands EXACTLY ONCE — never taken, handed over, or seized twice; an item this lists that the card never mentioned comes to hand DURING the work, in the place the scene is already standing in and as part of an action someone takes — never appended once the job is done, never on premises anyone on the card owns, lives on, or works, and never renamed to stand in for the card\'s objective. Do not invent unowned ground for it to lie on. GOLD IS NEVER STAGED: no purses, no payment moments, no telling of pay received, reported, or logged — pay lives entirely outside your text. If the job\'s wording seems to promise away something this lists, the company\'s take wins — the fiction explains how.',
   q.deliveredCharacters?.length ? '- deliveredCharacters: people the job handed over — flesh each: who = ONE character-card line, shape "A [station or origin]. [One hook — a drive, a past, or a temper.]" — timeless identity, never current custody or quest-state; backstory = 2 sentences of concrete events growing out of THIS job\'s fiction, one detail a reader could love, pity, or worry over; quirks = 1-2 concrete PHYSICAL habits, an action never an adjective (never the stock fidgets: fingering an object, humming, wrist-rubbing, cloth-folding).' : '',
+  // LAB LEADWORD: the lead this job earns, minted before narration so the report can name it
+  q.earnedLead && process.env.LEADWORD === '1' ? '- earnedLead: paying work the company comes home having HEARD OF — show them learning of it, in the field, in a clause; it is news of a job, never a job done.' : '',
   q.fixNotes?.length ? '- fixNotes: defects a zero-context reader found in your REJECTED previous report — write it afresh with none of them.' : '',
   PROSE_VARIANT === 'beat' ? '- sceneMode: how this job turns — physical = a bodily act decides it; wits = a found thing or fact decides it; social = words decide it (the speech IS the turn).' : '',
 ].filter(Boolean).join('\n');
@@ -854,7 +856,8 @@ export function makeOpenAiProvider(): AiProvider {
       // it OUT of the user JSON otherwise (an unexplained field to a non-beat cold model)
       const userJson = (q: ResolveQuestInput) => {
         if (PROSE_VARIANT === 'beat') return JSON.stringify(q);
-        const { sceneMode, ...rest } = q;
+        const { sceneMode, earnedLead, ...rest0 } = q;
+        const rest = earnedLead && process.env.LEADWORD === '1' ? { ...rest0, earnedLead } : rest0;
         // a routine report is never told what gravity or rarity are for, because there is nothing
         // for it to do with them — the prompt it got is already the one they chose (2026-08-27)
         if (!q.chainContext && q.gravity?.startsWith('a small')) {
