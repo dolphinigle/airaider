@@ -825,3 +825,17 @@ holds it against the company.") — L19; one-word atoms fixed it.
 
 Known cost: a bloodless partial reads a little less plainly as partial (the dice line still says
 [PARTIAL]). PCOST=0 restores. Sagas are untouched (their stakes carry their own costs).
+
+### N10 addendum — the SHAPE arm, judged at last (2026-09-25): mixed, not shipped
+
+8 cards per type, blind, "how many genuinely different jobs" (2 judges agree closely):
+
+| type | shapes off | shapes on | clear off → on |
+|---|---|---|---|
+| recover | 2/8 | 5/8 | 7 → 4.5 |
+| guard | 5.5/8 | 2.5/6 | 4 → 2.5 |
+
+Shapes widen recover and narrow guard, and cost clarity in both; prose flat (4.0 vs 4.0). Not
+shipped. The recover baseline is the variety cap in its purest form — every card "a carved item is
+gone from its hook, put it back", which is the "what is missing" opener doing all the work. Per-type
+`seen` openers (N15) are the lever that worked for other types; recover has none yet.
