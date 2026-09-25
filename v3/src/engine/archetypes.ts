@@ -47,6 +47,10 @@ export interface ArchetypeDef {
    *  the fact (L32): a blind survey (2026-09-25) read hunt, research and adventure cards as
    *  investigations 0-0.5 times in 4. A type that sets `seen` gets its own opener instead. */
   seen?: string;
+  /** the ERRAND shape for this kind of work, when the default job rule warps it. That rule asks a
+   *  question wherever something is to be found out — right for investigate, wrong for a hunt,
+   *  whose quarry is already known ("find WHAT is making the false footprints" read as investigate). */
+  errand?: string;
 }
 
 /** the ROW for every kind of one-off work. Pool sizes ARE the draw weights — a uniform pick over
@@ -65,7 +69,7 @@ export const ARCHETYPES = {
   'rescue': { methods: ['sneaking', 'bargaining', 'storming', 'bribing', 'distracting', 'cutting'], gloss: 'free someone held', profile: 'recruit', slots: [1, 2] },
   'escort': { methods: ['guarding', 'outpacing', 'hiding', 'rerouting', 'shadowing', 'bluffing'], gloss: 'guard a journey', profile: 'coin', slots: [1, 2] },
   'investigate': { methods: ['questioning', 'watching', 'searching', 'following', 'listening', 'comparing'], gloss: 'uncover a hidden thing', profile: 'find', slots: [1, 2] },
-  'hunt': { seen: "the quarry's sign — what it left, took, or did, and who it is doing it to", methods: ['tracking', 'baiting', 'trapping', 'cornering', 'waiting', 'driving'], gloss: 'track down a person or beast', profile: 'find', slots: [1, 2] },
+  'hunt': { seen: "the quarry itself, named for what it is — a beast or a person folk already know — and the harm it keeps doing", errand: "how the soldier runs THIS quarry to ground, in your own words — the chase that fits what it is and where it goes; the card already said what it is, so never a question of who or what", methods: ['tracking', 'baiting', 'trapping', 'cornering', 'waiting', 'driving'], gloss: 'track down a person or beast', profile: 'find', slots: [1, 2] },
   'contract': { methods: ['labouring', 'hauling', 'mending', 'clearing', 'standing', 'digging'], gloss: 'an agreed task for set pay — the work IS the premise', profile: 'coin', slots: [1, 1] },
   // designer 2026-08-30: "shouldnt it be something like 'go to tavern and fish for news'" — the old
   // gloss ('sweep for rumors') was too vague to produce one, so the writer made mysteries instead:
@@ -83,7 +87,7 @@ export const ARCHETYPES = {
   // guard/recover proposed and approved; explore/trade are the designer's own additions.
   'guard': { methods: ['watching', 'patrolling', 'barring', 'standing', 'hiding', 'waiting'], gloss: 'hold a place or a person against whatever comes', profile: 'coin', slots: [1, 2] },
   'recover': { methods: ['searching', 'buying', 'stealing', 'digging', 'demanding', 'trading'], gloss: 'get back a specific thing that was taken', profile: 'relic', slots: [1, 2] },
-  'explore': { seen: "the edge of ground nobody has crossed — what stops people going on, and who wants it known", selfDirected: true, methods: ['walking', 'mapping', 'climbing', 'wading', 'fording', 'scouting'], gloss: 'go into ground nobody has crossed and come back knowing it', profile: 'lead', slots: [1, 2] },
+  'explore': { seen: "unwalked ground — what lies past the last path, and why nobody has gone on", errand: "how the soldier gets into THAT ground and what they must come back knowing, in your own words; never a culprit to find", selfDirected: true, methods: ['walking', 'mapping', 'climbing', 'wading', 'fording', 'scouting'], gloss: 'go into ground nobody has crossed and come back knowing it', profile: 'lead', slots: [1, 2] },
   'trade': { methods: ['haggling', 'bribing', 'undercutting', 'brokering', 'smuggling', 'appraising'], gloss: 'buy, sell, or broker a thing whose price is somebody\'s trouble', profile: 'coin', slots: [1, 1] },
 
   // batch 2 — five approved from the Sultan taxonomy, plus the designer's `occult` and `fight`.
@@ -132,3 +136,4 @@ export function boardPool(ctx: { hasDungeon: boolean }): Archetype[] {
     !FAUCET_ONLY.includes(a) && (defOf(a).gate !== 'dungeon' || ctx.hasDungeon));
 }
 export const seenOf = (a: Archetype): string | undefined => ARCHETYPES[a] ? defOf(a).seen : undefined;
+export const errandOf = (a: Archetype): string | undefined => ARCHETYPES[a] ? defOf(a).errand : undefined;

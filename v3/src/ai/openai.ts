@@ -3,7 +3,7 @@
 // Key from OPENAI_API_KEY via ../.env or ~/.airaider/openai.env (never printed/committed).
 
 import OpenAI from 'openai';
-import { glossOf, ruleOf, seenOf, type Archetype } from '../engine/archetypes.js';
+import { glossOf, ruleOf, seenOf, errandOf, type Archetype } from '../engine/archetypes.js';
 import { z } from 'zod';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -333,6 +333,8 @@ function oneOffLightSystem(input: QuestWriteInput): string {
       ? '- job (ONE terse line, under twelve words): what the soldier offers to sign them on — never a fight, a capture or a rescue.'
       : input.scouting && process.env.SCOUT !== '0'
       ? '- job (ONE terse line): what the soldier does THERE to hear of work — sit with whoever talks, stand a round, ask who is hiring. Never someone or something to find: nobody yet knows what the work will be.'
+      : process.env.SEEN2 === '1' && errandOf(input.archetype as never)
+      ? '- job (ONE terse line): ' + errandOf(input.archetype as never) + '.'
       : process.env.JOB2 !== '0'
       ? '- job (ONE terse line): ONE action, about the very thing the situation put in front of the reader — never a checklist, and never a person, place or object the situation did not already show. Where the job is to find something out, it ASKS the question and never states the answer.'
       : '- job (ONE terse line): the errand itself, plainly — what the company is actually being sent to do. It names what the situation left out.'
@@ -633,12 +635,10 @@ const oneOffLightResolveSystem = (q: ResolveQuestInput): string => {
   '═══ YOUR OUTPUT ═══',
   // (BEFORE2/BEFORE3 — opening on the obstacle mid-act — measured 2026-09-25: +0.8 prose but
   // invented unexplained figures, and the clarity-safe rewrite gained nothing. Not shipped.)
-  // LAB BEFORE4: "the thing in their way" makes every job adversarial — a peaceful hire came back
-  // with the recruit "fevered" and "two elder-keepers blocking the yard" (playtest 2026-09-25).
-  // What the job is about is in view; an obstacle only where the card put one.
-  process.env.BEFORE4 === '1'
-    ? '1) "before" — ONE sentence: the party is on the ground and what the job is about is in view — as the card left it, with nothing added that the card did not put there. No approach, no weather, no journey, and nothing is taken yet. TWENTY WORDS AT MOST.'
-    : '1) "before" — ONE sentence: the party is on the ground and the thing in their way is visible. No approach, no weather, no journey, and nothing is taken yet. TWENTY WORDS AT MOST.',
+  // (BEFORE4 — "what the job is about is in view" instead of "the thing in their way" — measured
+  // 2026-09-25 on a mixed set incl. hires: invented obstacles 3/17 -> 1/17 but job done 1.85 -> 1.62
+  // and prose 4.79 -> 4.38. Not shipped.)
+  '1) "before" — ONE sentence: the party is on the ground and the thing in their way is visible. No approach, no weather, no journey, and nothing is taken yet. TWENTY WORDS AT MOST.',
   // MEASURED 2026-09-25 (with NOCOIN, same cards and outcomes, 2 blind judges, r 0.87): the job
   // actually done 9/14 -> 14/14, prose 3.89 -> 4.61. The old line made "whatever the company ends
   // up with" the subject of the report, so a stolen-totem job came home with a shield and no totem.
