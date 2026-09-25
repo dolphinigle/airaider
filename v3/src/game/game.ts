@@ -2202,8 +2202,13 @@ export class Game {
     if (gold >= 1) parts.push(coinBand(gold));
     if (q.isFinale) {
       const focal = chain ? this.card(chain.focalId) : undefined;
-      const named = !!focal && !!chain && this.isMet(chain, focal.name, `${q.situation} ${q.job}`);
-      parts.unshift(named ? focal!.name : 'the one at the heart of it');
+      // a personal finale settles the soldier's OWN matter — they are already the company's, so
+      // "REWARD: Keesa" read as an offer to recruit someone standing in the yard (playtest 2026-09-25)
+      if (chain?.isPersonal && focal) parts.unshift(`${focal.name}'s matter, settled`);
+      else {
+        const named = !!focal && !!chain && this.isMet(chain, focal.name, `${q.situation} ${q.job}`);
+        parts.unshift(named ? focal!.name : 'the one at the heart of it');
+      }
     }
     const now = parts.join(' + ') || 'side loot';
     // A mid-saga beat NEVER advertises the ending's payout. That number is the deferred reward and
@@ -2211,6 +2216,16 @@ export class Game {
     // and PROMPT_RULES forbids surfacing banked-payoff text). What a beat honestly promises is that
     // the saga is still owed something.
     return chain && !q.isFinale ? `${now} · and the saga still owes` : now;
+  }
+
+  /** what choosing this finale plan does to the person at its heart — '' on a personal saga, whose
+   *  every plan ends the same way (the soldier stays; the season pays out). Both UIs print it after
+   *  the plan's label; "→ recruit" on your own soldier's finale offered to hire someone you have. */
+  approachOutcome(questId: string, approachId: string): string {
+    const q = this.state.quests.find(x => x.id === questId);
+    const chain = q?.chainId ? this.state.chains.find(c => c.id === q.chainId) : undefined;
+    if (!q || chain?.isPersonal) return '';
+    return q.approaches?.find(a => a.id === approachId)?.rewardKind ?? '';
   }
 
   /** raw odds — ALWAYS visible (QUESTS §3); the Oracle adds computed % */

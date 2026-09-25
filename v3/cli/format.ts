@@ -242,7 +242,7 @@ export const render = {
         const best = g.roster().filter(m => m.location.kind === 'held')
           .map(m => ({ m, n: coins(m, t) })).sort((x, y) => y.n - x.n)[0];
         const mark = q.chosenApproach === a.id ? '▶' : ' ';
-        lines.push(`${mark} [${a.id}] ${a.label} → ${a.rewardKind} · tests ${t.attributes.join('+').toUpperCase()} (${t.difficulty}, bar ${slotThreshold(t).toFixed(1)})${t.favored.length ? ` favors ${t.favored.join(',')}` : ''}${best ? ` · best: ${best.m.name} ${best.n}c` : ''}`);
+        lines.push(`${mark} [${a.id}] ${a.label}${(o => o ? ` → ${o}` : '')(g.approachOutcome(q.id, a.id))} · tests ${t.attributes.join('+').toUpperCase()} (${t.difficulty}, bar ${slotThreshold(t).toFixed(1)})${t.favored.length ? ` favors ${t.favored.join(',')}` : ''}${best ? ` · best: ${best.m.name} ${best.n}c` : ''}`);
       }
     }
     const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;

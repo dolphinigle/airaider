@@ -548,7 +548,7 @@ function QuestPage({ s, q, doAct, active, setActive, back, read, setRead }: any)
             <div className="sect">Pick an approach — each rolls its own test</div>
             <div className="acts">{q.approaches.map((a: any) =>
               <button key={a.id} className={'act' + (q.chosenApproach === a.id ? ' go' : '')}
-                onClick={() => doAct('approach', q.id, a.id)}>{a.label} → {a.rewardKind}</button>)}</div>
+                onClick={() => doAct('approach', q.id, a.id)}>{a.label}{a.outcome ? ` → ${a.outcome}` : ''}</button>)}</div>
           </div>
         )}
         <div className="instrument">

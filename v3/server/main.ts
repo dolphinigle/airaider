@@ -167,7 +167,7 @@ function stateView() {
         level: q.level, rarity: q.rarity, region: REGION[q.region]!.name,
         chainId: q.chainId ?? null, beat: q.beatIndex ?? null, isFinale: !!q.isFinale,
         ready: (q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots).every(s => s.filledBy),
-        approaches: q.approaches ?? null, chosenApproach: q.chosenApproach ?? null,
+        approaches: q.approaches?.map(a => ({ ...a, outcome: game.approachOutcome(q.id, a.id) })) ?? null, chosenApproach: q.chosenApproach ?? null,
         rewardEnvelope: game.questReward(q.id),
         odds: o,
         cast: game.questCast(q.id),
