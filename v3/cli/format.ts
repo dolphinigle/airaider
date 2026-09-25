@@ -308,7 +308,7 @@ export const render = {
     return [
       `═══ ${c.title} ═══ (${c.state})${c.personal ? ' — personal' : ''}`,
       `goal: ${c.goal}`,
-      `${c.focal ? `focal: ${c.focal} · ` : ''}likely fate: ${c.kind} · spoils so far ${c.bank || '—'} · effort ${c.effort.toFixed(0)}/${c.effortTarget.toFixed(0)} merc-cycles · failures ${c.failures}/${c.failureBudget}`,
+      `${c.focal ? `focal: ${c.focal} · ` : ''}likely end: ${c.fate} · set aside so far ${c.bank || '—'} · progress ${c.effort.toFixed(0)} of ~${c.effortTarget.toFixed(0)} · setbacks ${c.failures} of ${c.failureBudget} before it slips away`,
       `now: ${c.situation}`,
       c.known.length ? `known: ${c.known.join(' · ')}` : '',
       ...c.met.map(p => `  ${p.name}: ${p.who}`),

@@ -728,7 +728,7 @@ function Chains({ s }: any) {
         <div className="cardrow" key={c.id}>
           <h3>{c.title} <small>{c.state} · beat {c.beat}/{c.expectedBeats}{c.focal ? <> · focal <b>{c.focal}</b></> : ''}{c.personal ? ' (personal)' : ''}</small></h3>
           <p>goal: {c.goal}</p>
-          <p>likely fate: {c.kind} · spoils so far: {c.bank || '—'} · effort {c.effort}/{c.effortTarget} · failures {c.failures}/{c.failureBudget}</p>
+          <p>likely end: {c.fate} · set aside so far: {c.bank || '—'} · progress {Math.round(c.effort)} of ~{Math.round(c.effortTarget)} · setbacks {c.failures} of {c.failureBudget} before it slips away</p>
           <p><i>{c.situation}</i></p>
           {c.known.length > 0 && <p>known: {c.known.join(' · ')}</p>}
           {c.met.length > 0 && <ul>{c.met.map((p: any) => <li key={p.name}><b>{p.name}</b>: {p.who}</li>)}</ul>}

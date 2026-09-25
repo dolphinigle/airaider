@@ -400,6 +400,8 @@ export class Game {
       const focal = this.card(c.focalId);
       return {
         id: c.id, title: c.bible.title, state: c.state, kind: c.kind, personal: c.isPersonal,
+        // the likely ending in the player's words — the kind names ("gold-hoard") are engine vocabulary
+        fate: c.isPersonal ? 'their matter settled' : ({ recruit: 'they may join you', captive: 'they may end in your cells', 'gold-hoard': 'a treasure they are the key to' } as Record<string, string>)[c.kind] ?? c.kind,
         focal: focal && (met.has(focal.name) || c.isPersonal) ? focal.name : null,
         beat: c.beatIndex, expectedBeats: c.expectedBeats,
         bank: coinBand(c.bank), effort: c.cyclesSpent, effortTarget: c.expectedBeats * 1.5,
