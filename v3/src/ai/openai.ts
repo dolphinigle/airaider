@@ -285,7 +285,7 @@ function oneOffLightSystem(input: QuestWriteInput): string {
     input.shape ? '- shape: the KIND OF TURN this job takes — not what happens in it. Two jobs of the same kind should not read alike, and this is what makes them differ: let it decide WHO is really behind the trouble, or what the reader has wrong at first. It is never written on the card, only obeyed.' : '',
     input.obstacle ? '- obstacle: WHO stands in the way and what they do about it. This is a fact somebody could see, so BUILD THE SENTENCE ON IT — it is what makes this job different from the last one of its kind. Say it in your own words; the person is a station, never a name.' : '',
     input.method ? '- method: HOW the work gets done this time. Bend the job toward it and put it in your own words — never write the word itself.' : '',
-    input.keywords?.length && input.scouting && process.env.SCOUT !== '0' ? '- KEYWORDS: a single seed word. Let it colour what the talkers grumble about, and never write the word itself.' : input.keywords?.length ? '- KEYWORDS: a single seed word. It is there to make this job different from the last one — let it suggest what has gone wrong, and never write the word itself. Where it has more than one sense, any sense will do; pick one and commit.' : '',
+    input.keywords?.length && input.hiring && process.env.HIRE2 !== '0' ? '- KEYWORDS: a single seed word. Let it colour WHY this person would come now, and never write the word itself.' :     input.keywords?.length && input.scouting && process.env.SCOUT !== '0' ? '- KEYWORDS: a single seed word. Let it colour what the talkers grumble about, and never write the word itself.' : input.keywords?.length ? '- KEYWORDS: a single seed word. It is there to make this job different from the last one — let it suggest what has gone wrong, and never write the word itself. Where it has more than one sense, any sense will do; pick one and commit.' : '',
     '- archetype: the shape of the work. slotCount: how many soldiers go — write EXACTLY that many ask entries.',
     archetypeLine(input.archetype),
     input.framedCharacter ? '- framedCharacter: the person this job is about, given by TAGS. On this card they have no name — call them by station or relation (the miller\'s son, a hired man, the widow). They are named later, in the report, when the company reaches them.' : '',
@@ -301,7 +301,14 @@ function oneOffLightSystem(input: QuestWriteInput): string {
     // always written as an investigation — designer: "shouldnt it be something like 'go to tavern
     // and fish for news'". MEASURED 2026-09-25, 2 rounds x 10 cards, 2 blind judges: reads as
     // scouting for work 0.0 -> 2.0 (of 2), prose 5.05 -> 4.9. SCOUT=0 restores the old card.
-    (input.scouting && process.env.SCOUT !== '0'
+    // A hire (the recruiting post's faucet, whose whole purpose is to gain a recruit) fell into the
+    // same L32 trap as the scouting run: built on "one thing somebody saw" it came out "the miller
+    // saw the hunter peering through his shutter", and 8/10 errands hired a THIRD party to fix a
+    // mystery. MEASURED 2026-09-25, 10 cards per arm, 2 blind judges: reads as a recruitment offer
+    // 0.45 -> 2.0 (of 2), "I'd want this person" 0.1 -> 1.4, prose 4.15 -> 4.45. HIRE2=0 restores.
+    (input.hiring && process.env.HIRE2 !== '0'
+      ? '- situation: ONE SENTENCE: someone worth hiring, seen at what they do well — and why they would JOIN the company now. They are not in trouble with anyone, they need nothing done for them, and nothing else is wrong.'
+      : input.scouting && process.env.SCOUT !== '0'
       ? '- situation: ONE SENTENCE: a place where word gathers — a common room, a market, a crossing — who passes through it, and the kind of trouble out in the country around that they grumble about. NOBODY BROUGHT THIS IN and nobody is hiring you: the company goes to LISTEN and comes back with word of paying work. Nothing is wrong at the place itself, and no single incident is named.'
       : process.env.SEEN !== '0'
       ? '- situation: ONE SENTENCE built on ONE THING SOMEBODY SAW — what was found, what is missing, what someone has stopped doing — and let that carry the trouble. A thing seen tells a reader more than the same trouble stated as a fact, and it is what makes this job worth hiring armed strangers for.'
@@ -315,10 +322,12 @@ function oneOffLightSystem(input: QuestWriteInput): string {
     // shape, three different registers (a theft, a person, a thing), and no number or payment in
     // any of them — an earlier set wrote "the last two escorts" and "the well has been fouled
     // twice", both amounts in prose, banned two lines above (cold-reads, 2026-08-27).
-    process.env.NOEG === '1' || (input.scouting && process.env.SCOUT !== '0') ? '' : '  Three of the right LENGTH, deliberately unalike: "Sheep keep going missing and the shepherd has stopped saying how." · "The tanner\'s daughter has not been seen since the fair and her father will not go to the watch." · "Something is in the flooded workings and the diggers have stopped going down."',
+    process.env.NOEG === '1' || (input.scouting && process.env.SCOUT !== '0') || (input.hiring && process.env.HIRE2 !== '0') ? '' : '  Three of the right LENGTH, deliberately unalike: "Sheep keep going missing and the shepherd has stopped saying how." · "The tanner\'s daughter has not been seen since the fair and her father will not go to the watch." · "Something is in the flooded workings and the diggers have stopped going down."',
     // …and its own errand: JOB2's "where the job is to find something out, it ASKS the question"
     // turned every scouting errand into a manhunt ("find which speaker bragged of the knifing")
-    (input.scouting && process.env.SCOUT !== '0'
+    (input.hiring && process.env.HIRE2 !== '0'
+      ? '- job (ONE terse line, under twelve words): what the soldier offers to sign them on — never a fight, a capture or a rescue.'
+      : input.scouting && process.env.SCOUT !== '0'
       ? '- job (ONE terse line): what the soldier does THERE to hear of work — sit with whoever talks, stand a round, ask who is hiring. Never someone or something to find: nobody yet knows what the work will be.'
       : process.env.JOB2 !== '0'
       ? '- job (ONE terse line): ONE action, about the very thing the situation put in front of the reader — never a checklist, and never a person, place or object the situation did not already show. Where the job is to find something out, it ASKS the question and never states the answer.'

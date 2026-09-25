@@ -36,6 +36,8 @@ export interface QuestWriteInput {
   selfDirected?: boolean;
   /** a scouting run (lead-hunt): the light card is written as going where people talk to hear of work */
   scouting?: boolean;
+  /** a hire (the recruiting post's faucet): the light card presents someone worth paying */
+  hiring?: boolean;
   /** what KIND OF TURN this story takes — orthogonal to the archetype and the keywords */
   shape?: string;
   knownObstacle?: string;        // what the client openly knows stands against them — never a name

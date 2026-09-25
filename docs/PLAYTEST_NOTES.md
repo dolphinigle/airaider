@@ -728,3 +728,28 @@ working through").
 its own words and the lead TAKES ITS SHAPE from that (the resolver picks the lead's archetype from
 the list, the engine keeps the value). That hands a category choice to the writer, so it is a
 ruling, not an implementation detail.
+
+## N14 — hire cards now present a recruit (FIXED, measured)
+
+The designer added `hire` as "specific ONLY for the standing lead to gain a recruit". Live, it read
+*"The miller saw the hunter peering through his shutter at dusk. ERRAND: Hire the hunter and bring
+him back willing"* — and a 10-card sample showed worse: 8/10 errands hired a THIRD party to fix a
+mystery (*"find and hire a healer to treat the sick hunter's son"*). Same L32 trap as N13: the
+situation form only allows found / missing / stopped openers.
+
+A hire card now has its own form: someone worth hiring, seen at what they do well, and why they
+would JOIN now (nothing wrong, nobody in trouble); its errand is what the soldier offers to sign
+them on. Like the scouting run it always takes the routine register (the voiced heavy card kept
+turning hires into rescues). 10 cards per arm, 2 blind judges:
+
+| arm | reads as a recruitment offer (0-2) | "I'd want this person" (0-2) | prose |
+|---|---|---|---|
+| old | 0.45 | 0.1 | 4.15 |
+| new | 2.0 | 1.4 | 4.45 |
+
+Known cost: the motive repeats ("will join for steady work and shelter"); the seed keyword now
+colours WHY they would come, which should vary it (unmeasured).
+
+🟡 For the designer: a won hire delivers the recruit to the TAVERN, where hiring them costs gold
+again (~140g at L4). For a job whose whole purpose is the recruit, that double payment may not be
+what you intend — ruling, not a bug.

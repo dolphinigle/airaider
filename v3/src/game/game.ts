@@ -1152,7 +1152,8 @@ export class Game {
     // mysteries ("the wagon hangs a foot off the ground… the miller will pay"). The roll is still
     // drawn so the RNG stream is unchanged.
     const rolledGravity = sampleGravity(this.rng, lead.rarity, 'one-off');
-    const gravity = lead.archetype === 'lead-hunt' && process.env.SCOUT !== '0' ? 'a small, everyday job' : rolledGravity;
+    const routine = (lead.archetype === 'lead-hunt' && process.env.SCOUT !== '0') || (lead.archetype === 'hire' && process.env.HIRE2 !== '0');
+    const gravity = routine ? 'a small, everyday job' : rolledGravity;
     // THE INPUT DIET (designer, 2026-08-27: "one off shouldnt even have names etc… best is one
     // sentence"). A one-sentence card cannot absorb four keyword atoms + a spark + an intake fact
     // + two place-name suggestions — a model handed eight things to use will use them, and the
@@ -1192,6 +1193,7 @@ export class Game {
       obstacle: process.env.OBSTACLE === '1' ? sampleObstacle(this.rng) : undefined,
       selfDirected: process.env.OWNBIZ === '1' && isSelfDirected(lead.archetype) || undefined,
       scouting: lead.archetype === 'lead-hunt' || undefined,
+      hiring: lead.archetype === 'hire' || undefined,
       method: process.env.METHOD === '1'
         ? (m => m?.length ? this.rng.pick(m) : undefined)(methodsOf(lead.archetype)) : undefined,
       opening: !light && dealSpark && lead.source !== 'interrogation' ? { spark: opening.spark } : undefined,
