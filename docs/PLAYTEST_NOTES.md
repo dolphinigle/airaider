@@ -613,3 +613,30 @@ opposing entry (*"A merchant, Arver Stonefield, refuses return and will claim th
 
 The class: **a seed may only name people the saga can cast.** Any dealt string that names someone
 the writer is forbidden to use produces a silent substitution, not an error.
+
+## N12 — the routine report grabbed the reward instead of doing the job (FIXED, measured)
+
+Playtest 2026-09-25 (seed 51507, real AI, CLI). Three of three routine one-off reports staged the
+pay as loot at the scene (*"seized the offered purse"*, *"swept the pouch free"*, *"the payment she
+found there"*), and two of three replaced the job with the reward: a stolen-totem job came home
+with a shield and a coin pouch and no totem.
+
+Two causes, both in what the light report is handed:
+1. `deliveredSummary` dealt `38 gold`. The prompt said GOLD IS NEVER STAGED, and the dealt string
+   won (L19). Coin is no longer dealt to any narrator — the 💰 line already reports it.
+2. The light prompt's line made the TAKE the subject — *"whatever the company ends up with changes
+   hands in ONE clause of the work itself"* — so the report's job became the handover. Rewritten:
+   the card's JOB is what gets done; anything delivered comes to hand in the same stroke, never
+   instead of it.
+
+A/B, 14 cards x 3 arms on the same rolled outcomes, 2 blind judges (r 0.85 prose, 0.87 job):
+
+| arm | job done | pay staged | prose |
+|---|---|---|---|
+| base | 9/14 | 6/14 | 3.89 |
+| no coin dealt | 9/14 | 0/14 | 4.21 |
+| + job-first line | 14/14 | 0/14 | 4.61 |
+
+Still open, named by both judges unprompted: every routine report runs one template — *"[Name]
+stood at X. [Scene noun] lay. [Action]."* — and closes on bookkeeping (*"the job was done"*, *"into
+the company's hands"*). Nobody speaks. Prose ~4.6 is report-speak on the rubric.

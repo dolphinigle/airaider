@@ -2701,9 +2701,10 @@ export class Game {
     if (r.outcome === 'failure') return 'they return with empty hands (say what was lost, in-fiction)';
     // the person's REAL fate is engine-decided — deal it, or prose promises "they may stay"
     // while the engine line says "moves on" (both shipped on one card)
-    // LAB (NOCOIN=1): coin is never dealt to the narrator — the 💰 line already reports it, and a
-    // dealt '38 gold' is a stamp the model pastes into the scene as a purse or a pouch (L19)
-    const noCoin = process.env.NOCOIN === '1';
+    // Coin is never dealt to the narrator: the 💰 line already reports it, and a dealt '38 gold' is a
+    // stamp the model pastes into the scene as a purse or a pouch (L19). MEASURED 2026-09-25, 14
+    // routine reports x 2 blind judges: staged pay 6/14 -> 0/14, prose 3.89 -> 4.21. NOCOIN=0 restores.
+    const noCoin = process.env.NOCOIN !== '0';
     const bits = r.delivery.cards.filter(c => !(noCoin && !c.character && c.qty)).map(c => {
       if (!c.character) return c.qty ? `${c.qty} gold` : `the ${c.name}`;
       if (c.character.role === 'captive') return `${c.name} taken captive`;

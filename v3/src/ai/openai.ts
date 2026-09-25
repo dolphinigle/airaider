@@ -601,7 +601,10 @@ const oneOffLightResolveSystem = (q: ResolveQuestInput): string => {
   TAGS_NOTE, NUMBER_BAN, canBond ? EDGE_TYPES_LINE : '',
   '═══ YOUR OUTPUT ═══',
   '1) "before" — ONE sentence: the party is on the ground and the thing in their way is visible. No approach, no weather, no journey, and nothing is taken yet. TWENTY WORDS AT MOST.',
-  process.env.LIGHTJOB === '1'
+  // MEASURED 2026-09-25 (with NOCOIN, same cards and outcomes, 2 blind judges, r 0.87): the job
+  // actually done 9/14 -> 14/14, prose 3.89 -> 4.61. The old line made "whatever the company ends
+  // up with" the subject of the report, so a stolen-totem job came home with a shield and no totem.
+  process.env.LIGHTJOB !== '0'
     ? '- inside "after": the card\'s JOB is what gets done — its own objective, as the job words it, finished on screen. Anything deliveredSummary lists comes to hand in the same stroke, never instead of it — no separate discovery, no amounts.'
     : '- inside "after": whatever the company ends up with (deliveredSummary) changes hands in ONE clause of the work itself — no separate discovery, no amounts. If there is only coin to take, the report simply ends on the job done.',
   '2) "after" — what happened, knowing the outcome, and what it cost WHEN it cost something: a clean success costs nothing and says so by not mentioning it. Open on the decisive moment, not on a restatement of the job. FORTY-FIVE WORDS AT MOST, and coming in well under is better. No closing image, no line of speech, no second beat: it ends the moment the result is plain.',
