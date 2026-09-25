@@ -2207,7 +2207,19 @@ export class Game {
     const open = this.state.quests.filter(q => q.state === 'open' && !(q.approaches && !q.chosenApproach))
       .sort((a, b) => rank(a) - rank(b) || a.createdCycle - b.createdCycle);
     let placed = 0;
-    for (const q of open) placed += this.autoAssign(q.id).placed;
+    for (const q of open) {
+      const active = () => q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
+      const before = active().map(s => s.filledBy);
+      const got = this.autoAssign(q.id).placed;
+      // a quest that cannot be FULLY manned does not march, so soldiers left in it are wasted —
+      // "3 soldiers named across 3 quests" left one idle in a half-manned raid while another quest
+      // went unmanned (playtest 2026-09-25). Undo this pass's placements on a quest left short.
+      if (got && active().some(s => !s.filledBy)) {
+        active().forEach((s, i) => { if (s.filledBy && s.filledBy !== before[i]) this.unassign(q.id, q.slots.indexOf(s)) });
+        continue;
+      }
+      placed += got;
+    }
     const n = (x: number, one: string, many = one + 's') => `${x} ${x === 1 ? one : many}`;
     return { ok: placed > 0, msg: placed ? `${n(placed, 'soldier')} named across ${n(open.length, 'quest')}` : 'nobody free fits anything', placed };
   }
