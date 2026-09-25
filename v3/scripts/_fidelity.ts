@@ -13,7 +13,7 @@ const rows: { arch: string; card: string; job: string }[] = [];
 await Promise.all(Array.from({ length: N }, async (_, k) => {
   const g = new Game(ai, SEED + k * 7);
   g.build('map-room'); g.build('dungeon');
-  for (const a of pool) g.state.leads.push({ id: `f-${a}`, rarity: 'common', level: 2, region: 'forests',
+  for (const a of pool) g.state.leads.push({ id: `f-${a}`, rarity: (process.env.RARITY ?? 'common') as never, level: 2, region: 'forests',
     archetype: a, chainInfo: { kind: 'none' }, expiresAtCycle: 40, source: 'reward' });
   await Promise.all(pool.map(async a => {
     const r = await g.pursue(`f-${a}`);

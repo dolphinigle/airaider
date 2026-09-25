@@ -794,3 +794,13 @@ household claims on village pledges" — keeps some of it alive; that is the cha
 - **ANSWER** — "a job that asks something gets its answer, said plainly" folded into the job line.
   20 question jobs x 2 arms, 2 judges: fully answered 13/19 → 15/19, prose 4.95 → 4.67. The base
   already answers most; not worth the prose. Off (`ANSWER=1`).
+
+### N15b — the voiced register cannot carry self-directed work (FIXED)
+
+The `seen` openers reach only the light card. On rare cards (mostly the voiced register), a blind
+classification read explore 0/6 in BOTH arms, hunt 1→2/6 and adventure 1→2/6 with the opener added
+to the voiced form (prose flat, 4.33 vs 4.31). The voiced card is a bearer bringing a grievance to
+the fort, and self-directed work (explore, research, gather) is work nobody brings in — the same
+contradiction lead-hunt had. Self-directed types now always take the routine register (like
+lead-hunt and hire); a rare sample then read 12/12 as their own type. The voiced opener is kept
+(small gain, no cost). SELFLIGHT=0 / SEENV=0 restore.

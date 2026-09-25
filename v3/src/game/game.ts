@@ -1157,7 +1157,11 @@ export class Game {
     // mysteries ("the wagon hangs a foot off the ground… the miller will pay"). The roll is still
     // drawn so the RNG stream is unchanged.
     const rolledGravity = sampleGravity(this.rng, lead.rarity, 'one-off');
-    const routine = (lead.archetype === 'lead-hunt' && process.env.SCOUT !== '0') || (lead.archetype === 'hire' && process.env.HIRE2 !== '0');
+    // …and so is any SELF-DIRECTED work (explore, research, gather): the heavy card is a bearer
+    // bringing a grievance to the fort, and nobody brings these in — rare explore cards read as
+    // explore 0/6 in the voiced register, every one a rescue or a recovery (2026-09-25)
+    const routine = (lead.archetype === 'lead-hunt' && process.env.SCOUT !== '0') || (lead.archetype === 'hire' && process.env.HIRE2 !== '0')
+      || (isSelfDirected(lead.archetype) && process.env.SELFLIGHT !== '0');
     const gravity = routine ? 'a small, everyday job' : rolledGravity;
     // THE INPUT DIET (designer, 2026-08-27: "one off shouldnt even have names etc… best is one
     // sentence"). A one-sentence card cannot absorb four keyword atoms + a spark + an intake fact
