@@ -753,3 +753,28 @@ colours WHY they would come, which should vary it (unmeasured).
 🟡 For the designer: a won hire delivers the recruit to the TAVERN, where hiring them costs gold
 again (~140g at L4). For a job whose whole purpose is the recruit, that double payment may not be
 what you intend — ruling, not a bug.
+
+## N15 — job types that did not read as themselves (PARTLY FIXED, measured)
+
+N10's variety cap, seen from a new angle: the board has 22 types on paper, but a blind survey
+(84 cards, 2 judges classifying each from the type list alone) read only 62/84 as their own type.
+research and adventure 0/4, hunt 0.5/4, explore 2/4, fight 2.5/4 — misread almost always as
+`investigate`. contract (0/4) is a catch-all by design and was left alone.
+
+Cause, same class as N13/N14 (L32): the card's opener menu (found / missing / stopped) is a mystery
+menu, and the errand rule asks a question wherever something is to be found out — so every hunt
+became "find WHAT is making the false footprints". The archetype table now carries an optional
+`seen` (the thing seen that fits this work) for hunt, explore, adventure, research and fight, and
+an `errand` for hunt and explore, written as guidance: a first errand sentence ("track it down and
+bring it in, alive or dead") was pasted verbatim on 8/8 cards (L20).
+
+| type | before | after |
+|---|---|---|
+| hunt | 2/8 | 5/8 |
+| explore | 3/8 | 7/8 |
+| adventure | 3/6 | 4/6 |
+| research | 5/6 | 6/6 |
+
+Prose flat (5.53 → 5.38 in the last round, +0.3 in the first). The first survey's research/fight
+zeroes did not replicate at n=6 — small samples are noisy here. Remaining hunt misses are HEAVY
+(voiced) cards, which the light-register opener does not reach.
