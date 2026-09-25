@@ -76,3 +76,21 @@ describe('a personal saga re-rolled for a hard defect', () => {
     expect(merc.character!.backstory).toContain(ai.seeds[1]!);
   });
 });
+
+describe('a personal saga for a soldier the company won', () => {
+  it('is seeded from who they were, not from the job that brought them in', async () => {
+    const ai = new SeedSpy();
+    const g = new Game(ai, 268);
+    g.build('map-room'); g.build('lead-room');
+    const merc = g.roster()[0]!;
+    merc.character!.who = 'A Deep Fens hunter. He keeps to low places.';
+    merc.character!.backstory = 'They found him pressed to the mill shutter and he agreed to wait at the fort tavern for hire.';
+    merc.character!.origin = { title: 'Nosy Forest Hunter', situation: '', job: '' };
+    g.ensureLoreNode(merc);
+    (g as unknown as { spawnPersonalChainLead(m: unknown): void }).spawnPersonalChainLead(merc);
+    await g.pursue(g.state.leads.find(l => l.source === 'personal')!.id);
+    const seed = ai.seeds.at(-1)!;
+    expect(seed).not.toMatch(/shutter|tavern/);
+    expect(seed).toContain('Deep Fens');
+  });
+});

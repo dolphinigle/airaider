@@ -3119,7 +3119,7 @@ export class Game {
    *  copied the saga already running (Felawen's past became Keesa's tally, playtest 2026-09-25). */
   private personalSeeds(merc: Card): string[] {
     const first = this.personalSeed(merc);
-    const back = merc.character?.backstory;
+    const back = merc.character?.origin ? undefined : merc.character?.backstory;   // job-born: not their past
     const sentences = back ? back.split(/(?<=[.!?])\s+/).filter(x => x.length > 20) : [];
     const edges = this.state.lore.edges
       .filter(e => e.active && !!e.blurb && (e.from === merc.id || e.to === merc.id))
@@ -3140,6 +3140,12 @@ export class Game {
       .filter(e => !inTheCompany(e.from === merc.id ? e.to : e.from))
       .sort((a, b) => (Number(b.core) - Number(a.core)) || (b.salience - a.salience));
     if (mine[0]?.blurb) return mine[0].blurb;
+    // A soldier the company WON (rescued, hired, turned) has a backstory written at the moment it
+    // found them — "they found Tun-Zeeus pressed to the mill shutter…" — which is the company's own
+    // history, not their past. Seeded from it, a personal saga set out to learn "who led him away"
+    // (the company did) (playtest 2026-09-25). Their past is who they were: use that.
+    const who = merc.character?.who;
+    if (merc.character?.origin && who) return `${merc.name}'s life before the company — ${who}`;
     const back = merc.character?.backstory;
     if (back) {
       const first = back.split(/(?<=[.!?])\s+/)[0] ?? back;
