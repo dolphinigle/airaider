@@ -21,6 +21,10 @@ export interface LoreNode {
   name: string;
   blurb: string;            // ≤~25 tokens, stable, prompt-cacheable
   identity: string;         // stable identity line (race/background/origin) — dossier base
+  /** a coined person's sex and race, known when the engine rolled their name — so a face that
+   *  returns keeps them (a female juggler once came back a male merchant) */
+  sex?: 'male' | 'female';
+  race?: string;
   active: boolean;
   createdCycle: number;
 }

@@ -95,3 +95,21 @@ describe('edgeCount', () => {
     expect(edgeCount(g, 'a', 2)).toBe(2);
   });
 });
+
+describe('a returning face keeps who they were', () => {
+  it('comes back with the sex their name was rolled with, even when the blurb has no pronoun', async () => {
+    let checked = 0;
+    for (let s = 0; s < 30 && checked < 4; s++) {
+      const g = worldWithCast(s);
+      for (const n of Object.values(g.state.lore.nodes)) if (n.id.startsWith('lore-x')) n.sex = 'female';
+      g.state.leads.push(sagaLead());
+      const r = await g.pursue('RL');
+      if (!r.ok) continue;
+      const focal = g.card(g.state.chains.at(-1)!.focalId);
+      if (!focal || !NAMES.includes(focal.name)) continue;
+      checked++;
+      expect(focal.tags.some(t => t.concept === 'female')).toBe(true);
+    }
+    expect(checked).toBeGreaterThan(0);
+  });
+});

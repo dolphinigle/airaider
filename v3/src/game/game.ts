@@ -1334,10 +1334,12 @@ export class Game {
         const nd = this.rng.weighted(loreCast.map(n =>
           [n, edgeCount(this.state.lore, n.id, this.state.cycle)] as [typeof n, number]));
         const text = `${nd.blurb} ${nd.identity}`;
-        const race = /\belv|elf\b/i.test(text) ? 'elf' : /wolfman/i.test(text) ? 'wolfman'
-          : /lizardman/i.test(text) ? 'lizardman' : /\bhuman\b/i.test(text) ? 'human' : undefined;
-        const gender = /\b(she|her|hers|woman|widow|daughter|sister|bride)\b/i.test(text) ? 'female'
-          : /\b(he|him|his|man|widower|son|brother)\b/i.test(text) ? 'male' : undefined;
+        // the sex and race the name was rolled with win; the blurb's pronouns are only a fallback
+        // for nodes written before they were recorded
+        const race = nd.race ?? (/\belv|elf\b/i.test(text) ? 'elf' : /wolfman/i.test(text) ? 'wolfman'
+          : /lizardman/i.test(text) ? 'lizardman' : /\bhuman\b/i.test(text) ? 'human' : undefined);
+        const gender = nd.sex ?? (/\b(she|her|hers|woman|widow|daughter|sister|bride)\b/i.test(text) ? 'female'
+          : /\b(he|him|his|man|widower|son|brother)\b/i.test(text) ? 'male' : undefined);
         focal = materializeReward(this.rng, spec, lead.level, lead.region,
           { excludeConcepts: recentFocalTags, maxSkills: 2, presetName: nd.name, race, gender })[0]!;
         // remap the node onto the card id — edges and memories follow the person
@@ -1388,11 +1390,12 @@ export class Game {
     // Rolled WITH a sex and dealt annotated (a gender-opaque list once forced "Ithion" onto the
     // story's veiled lady because order was mandatory)
     const takenNames = new Set(this.state.cards.filter(x => x.character).map(x => x.name));
-    const assigned: { name: string; gender: string }[] = [];
+    const assigned: { name: string; gender: string; race: string }[] = [];
     for (let i = 0; assigned.length < 4 && i < 60; i++) {
       const gender = this.rng.pick(['male', 'female']);
-      const n = rollName(this.rng, this.rng.weighted(races), gender);
-      if (!takenNames.has(n) && !assigned.some(a => a.name === n) && !this.nameTooSimilar(n)) assigned.push({ name: n, gender });
+      const race = this.rng.weighted(races);
+      const n = rollName(this.rng, race, gender);
+      if (!takenNames.has(n) && !assigned.some(a => a.name === n) && !this.nameTooSimilar(n)) assigned.push({ name: n, gender, race });
     }
     const assignedNames = assigned.map(a => a.name);
     // coined cast never become cards — remember these names or their epithets get re-dealt
@@ -1736,6 +1739,7 @@ export class Game {
     // Live-chain cast are absent from the slate meanwhile, which LORE.md §10 states is intended.
     const chain: Chain = {
       id: freshId('chain-'), kind: eco.kind, isPersonal, focalId: focal.id,
+      castIdentity: Object.fromEntries(assigned.map(a => [a.name, { sex: a.gender as 'male' | 'female', race: a.race }])),
       level: lead.level, rarity: lead.rarity, region: lead.region,
       expectedBeats: eco.beats, payoff: eco.payoff, bank: 0, cyclesSpent: 0,
       failureBudget: eco.failureBudget, failures: 0, beatIndex: 0,
@@ -3469,7 +3473,9 @@ export class Game {
       const b = m.who.length > 120
         ? (c => { const d = c.lastIndexOf('. '); return d > 60 ? c.slice(0, d + 1) : c.replace(/\s+\S*$/, '') })(m.who.slice(0, 120))
         : m.who;
-      this.state.lore.nodes[id] = { id, kind: 'character', name: m.name, blurb: b, identity: b, active: true, createdCycle: this.state.cycle };
+      const who = chain.castIdentity?.[m.name];
+      this.state.lore.nodes[id] = { id, kind: 'character', name: m.name, blurb: b, identity: b,
+        ...(who ? { sex: who.sex, race: who.race } : {}), active: true, createdCycle: this.state.cycle };
       guardEdges(this.state.lore, [{
         from: id, to: chain.focalId,
         type: m.role === 'obstacle' ? 'rival-of' : 'party-to',

@@ -43,6 +43,9 @@ export interface Chain {
   id: string;
   kind: ChainKind;             // generation-time suggestion; finale disposition is free (§2)
   isPersonal: boolean;         // main chain: focal = the joining merc
+  /** the sex and race each coined cast name was rolled with (keyed by name) — carried onto the
+   *  lore node when the saga closes, so a returning face keeps them */
+  castIdentity?: Record<string, { sex: 'male' | 'female'; race: string }>;
   focalId: string;             // the focal card (limbo until delivered; personal: the merc)
   level: number;
   rarity: Rarity;
