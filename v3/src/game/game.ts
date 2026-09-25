@@ -3100,9 +3100,6 @@ export class Game {
     return candidates.map(c => {
       const card = this.card(c.node.id);
       const role = card?.character?.role;
-      // a soldier/captive's company relation OVERRIDES a "thematic wildcard" phrase — the two contradicted
-      const relationPhrase = role === 'merc' ? "one of the company's own soldiers"
-        : role === 'captive' ? "held in the company's cells" : c.relationPhrase;
       // anyone physically AT the fort (tavern guest, staged) must not be cast as an off-site
       // faction leader — a tavern guest was once written leading a hamlet while she waited
       const atTheFort = !!card && card.location.kind === 'held' &&
@@ -3111,6 +3108,13 @@ export class Game {
       // "in your cells" 19 cycles later — flag them gone
       const outOfReach = !!card && card.location.kind === 'held' &&
         (card.location as { state?: string }).state === 'lore';
+      // a soldier/captive's company relation OVERRIDES a "thematic wildcard" phrase — the two
+      // contradicted. Guarded like the flags below: a saga focal handed over at its finale keeps
+      // role 'captive' while out in the world, and was dealt outOfReach AND "held in the company's
+      // cells" in one entry — the writer took the phrase (playtest 2026-09-25, no dungeon built)
+      const relationPhrase = outOfReach ? c.relationPhrase
+        : role === 'merc' ? "one of the company's own soldiers"
+        : role === 'captive' ? "held in the company's cells" : c.relationPhrase;
       // a dossier that is just "name — tags" adds nothing over the blurb — send only fuller ones
       const d = picked.includes(c.node.id) ? this.dossier(c.node.id) : '';
       return {
