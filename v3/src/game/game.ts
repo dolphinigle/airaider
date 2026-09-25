@@ -162,6 +162,15 @@ export class Game {
     for (const l of st.leads ?? []) {
       if (l.source === 'recruiting' && l.archetype === 'rescue') l.archetype = 'hire';
     }
+    // A quest's reward can BE a card that already exists — an echo rescue delivers the very person
+    // left behind. In memory that is one object; JSON makes it two with one id, so after a load the
+    // resolution fleshed and staged the quest's copy while the tavern read the stale one: Keesa's
+    // job-born history ("pinned under bark bindings until Felawen cut her free") was lost and then
+    // overwritten by a generic flesh pass (playtest 2026-09-25). Re-link to the one true card.
+    const byId = new Map((st.cards ?? []).map(c => [c.id, c]));
+    for (const q of st.quests ?? []) {
+      q.rewardCards = (q.rewardCards ?? []).map(c => byId.get(c.id) ?? c);
+    }
   }
 
   // ---- bootstrap (day 0) ------------------------------------------------------------------
