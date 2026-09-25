@@ -50,8 +50,13 @@ async function arm(name: string, env: Record<string, string>) {
   outs.forEach((o, k) => { const i = light[k]!.input;
     rows.push({ id: '', arm: name, card: i.situation ?? '', job: light[k]!.job, outcome: i.outcome, delivered: stripCoin(i.deliveredSummary ?? ''), before: o.before, after: o.after }) });
 }
-await arm('B', { NOCOIN: '1' });
-await arm('C', { NOCOIN: '1', LIGHTJOB: '1' });
+// ARMS="D:BEFORE2=1;E:CLOSE2=1;F:BEFORE2=1,CLOSE2=1" — each arm re-narrates the SAME inputs.
+// Unset: the original N12 arms (B no coin, C no coin + job-first).
+const spec = process.env.ARMS ?? 'B:LIGHTJOB=0;C:';
+for (const a of spec.split(';').filter(Boolean)) {
+  const [name, envs] = a.split(':');
+  await arm(name!, Object.fromEntries((envs ?? '').split(',').filter(Boolean).map(kv => kv.split('=') as [string, string])));
+}
 
 // blind: shuffle, label R01.., key kept separately
 const shuffled = rows.map(r => ({ r, k: Math.random() })).sort((a, b) => a.k - b.k).map(x => x.r);

@@ -600,7 +600,11 @@ const oneOffLightResolveSystem = (q: ResolveQuestInput): string => {
   resolveInputs(q),
   TAGS_NOTE, NUMBER_BAN, canBond ? EDGE_TYPES_LINE : '',
   '═══ YOUR OUTPUT ═══',
-  '1) "before" — ONE sentence: the party is on the ground and the thing in their way is visible. No approach, no weather, no journey, and nothing is taken yet. TWENTY WORDS AT MOST.',
+  // LAB BEFORE2: the old line's own shape IS the template judges named ("[Name] stood at X. [Thing]
+  // lay.") — the party standing, then a noun lying there. Open on what is in the way, DOING something.
+  process.env.BEFORE2 === '1'
+    ? '1) "before" — ONE sentence, TWENTY WORDS AT MOST: whatever stands in the job\'s way, caught in the act — what it is DOING as the party reaches it. Never open on the party standing or arriving; no weather, no journey, and nothing is taken yet.'
+    : '1) "before" — ONE sentence: the party is on the ground and the thing in their way is visible. No approach, no weather, no journey, and nothing is taken yet. TWENTY WORDS AT MOST.',
   // MEASURED 2026-09-25 (with NOCOIN, same cards and outcomes, 2 blind judges, r 0.87): the job
   // actually done 9/14 -> 14/14, prose 3.89 -> 4.61. The old line made "whatever the company ends
   // up with" the subject of the report, so a stolen-totem job came home with a shield and no totem.
@@ -619,7 +623,11 @@ const oneOffLightResolveSystem = (q: ResolveQuestInput): string => {
   q.deliveredCharacters?.length
     ? '- fleshed: one entry per deliveredCharacters id — this is the ONLY call that knows how they came into the company\'s hands, so their who/backstory must belong to THIS job.'
     : '- fleshed: [] — nobody is handed over on this job.',
-  '═══ ABOVE ALL (write now) ═══\n1. Every sentence parses ONE way on one skim — subject and verb early.\n2. The result is unmistakable: what was won or lost, what the company now holds — and a FAILED job wins NOTHING.\n3. The report ENDS at the job\'s last act in the field; the coin and the walk home stay outside your text. GOLD IS NEVER STAGED and no numbers appear in prose.\n4. Period diction; never echo an instruction or a field name ("approach", "plan", "outcome", "step", "dice", "roll", "obstacle" are system words that never appear in prose).\nRespond as the JSON object specified below — nothing else.',
+  // LAB CLOSE2: "what the company now holds" asked for exactly the bookkeeping closer both judges
+  // named ("into the company's hands", "the job was done") — the result is shown by the act instead
+  (process.env.CLOSE2 === '1'
+    ? '═══ ABOVE ALL (write now) ═══\n1. Every sentence parses ONE way on one skim — subject and verb early.\n2. The result is unmistakable FROM THE ACT ITSELF — a FAILED job wins NOTHING.\n3. The last sentence is the job\'s last act in the field, or what it leaves behind to see — never a sentence saying the job is done, the task complete, or where the goods went. No numbers in prose.\n4.'
+    : '═══ ABOVE ALL (write now) ═══\n1. Every sentence parses ONE way on one skim — subject and verb early.\n2. The result is unmistakable: what was won or lost, what the company now holds — and a FAILED job wins NOTHING.\n3. The report ENDS at the job\'s last act in the field; the coin and the walk home stay outside your text. GOLD IS NEVER STAGED and no numbers appear in prose.\n4.') + ' Period diction; never echo an instruction or a field name ("approach", "plan", "outcome", "step", "dice", "roll", "obstacle" are system words that never appear in prose).\nRespond as the JSON object specified below — nothing else.',
   'Respond as JSON matching: {questId (copy it back exactly), before, after, injuries:[{characterId (an id from party), band: STRICTLY "low"|"med"|"high" — note "med", not "mid", cause}], fleshed:'
     + (q.deliveredCharacters?.length ? '[{characterId,who,backstory,quirks}]' : ' []')
     + ', edges:[{from,to,type,blurb,importance}]}',

@@ -2726,6 +2726,15 @@ export class Game {
   ) {
     const st = this.state;
     const q = r.quest;
+    // the WHY under the dice must be the soldiers AS THEY ROLLED. It was computed at render time,
+    // after this job's own wounds and level-ups had landed: a soldier who rolled 5 coins showed
+    // "CHA 4.9 injury -4.4 = 0", blaming the failure on a wound the failure itself caused.
+    const coinTerms = r.rolled.totalCoins > 0
+      ? (q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots).filter(s => s.filledBy).map(s => {
+          const u = this.card(s.filledBy!);
+          return u ? `${u.name} — ${explainCoins(u, s.test)}` : '';
+        }).filter(Boolean)
+      : [];
     q.state = 'resolved';
     // the reveal reads: title → before → after → consequences (injuries/staging/etc.)
     const after: string[] = [];
@@ -2868,14 +2877,7 @@ export class Game {
       : `⚄ [${r.outcome.toUpperCase()}] · rolled ${r.rolled.heads} heads of ${r.rolled.totalCoins} coins vs bar ${r.rolled.totalBar.toFixed(1)}`);
     // the WHY under the dice (designer 2026-07-24): each sent merc's coins traced to the card's
     // ask — attribute value, favored/clash, injury — via the engine's own explainCoins
-    if (r.rolled.totalCoins > 0) {
-      const activeSlots = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
-      const terms = activeSlots.filter(s => s.filledBy).map(s => {
-        const u = this.card(s.filledBy!);
-        return u ? `${u.name} — ${explainCoins(u, s.test)}` : '';
-      }).filter(Boolean);
-      if (terms.length) report.push(`   ${terms.join('  ·  ')}`);
-    }
+    if (coinTerms.length) report.push(`   ${coinTerms.join('  ·  ')}`);
     // beat variant: the engine assembles the strip's turn caption + speech around its dice line
     if (out?.turn) report.push(`▸ ${out.turnActor ?? '—'} — ${out.turn}`);
     if (!bubbles) for (const s of out?.speech ?? []) report.push(`  ${s.who}: "${s.says}"`);
