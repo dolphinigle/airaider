@@ -140,7 +140,9 @@ export const render = {
 
   leads(g: Game): string {
     const leads = g.visibleLeads();
-    if (!leads.length) return g.hasRoom('map-room') ? '(the board is empty — earn leads through quests and hunts)' : '(build a Map room first)';
+    const waiting = g.leadsAwaitingLeadRoom();
+    const tail = waiting ? `\n(+${waiting} more lead${waiting === 1 ? '' : 's'} earned — they wait on a Lead room to be read)` : '';
+    if (!leads.length) return (g.hasRoom('map-room') ? '(the board is empty — earn leads through quests and hunts)' : '(build a Map room first)') + tail;
     // a lead the map table is already working must never read as simply available (TEMPO P2)
     const working = new Map(g.jobs().filter(j => j.state === 'queued' || j.state === 'running').map(j => [j.leadId, j.state]));
     return leads.map(l => {
@@ -152,7 +154,7 @@ export const render = {
       const b = leadBand(l);
       const pay = b.band ? ` ${b.stars} ${b.label}` : '';
       return `${l.id.padEnd(9)} ${l.rarity.padEnd(8)} L${String(l.level).padEnd(3)} ${REGION[l.region]!.name.padEnd(18)} ${l.archetype.padEnd(18)}${chain}${mark}${pay.padEnd(24)} exp:${exp}${l.title ? ` — ${l.title}` : ''}`;
-    }).join('\n');
+    }).join('\n') + tail;
   },
 
   /** re-read a past reckoning — the reports are archived in the save (RECKONINGS_KEPT), so this

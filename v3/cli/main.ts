@@ -217,7 +217,7 @@ async function exec(game: Game, line: string): Promise<boolean> {
     case 'room': console.log(render.roomDetail(game, arg)); break;
     case 'roster': console.log(render.roster(game)); break;
     case 'merc': console.log(render.merc(game, arg)); break;
-    case 'leads': console.log(locked('leads') ?? render.leads(game)); break;
+    case 'leads': console.log(game.leadsAwaitingLeadRoom() ? render.leads(game) : locked('leads') ?? render.leads(game)); break;
     case 'quests': console.log(locked('quests') ?? render.quests(game)); break;
     case 'quest': console.log(render.questDetail(game, arg)); break;
     case 'captives': console.log(locked('captives') ?? render.captives(game)); break;

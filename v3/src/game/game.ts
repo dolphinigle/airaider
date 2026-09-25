@@ -793,6 +793,15 @@ export class Game {
     return this.state.leads.filter(l => !paused(l));
   }
 
+  /** leads the player has EARNED but cannot read until a Lead room stands — the gate is the design
+   *  (FORT §5), silence about it was not: a lead-hunt printed "🧭 The sweep pays: 2 new lead(s)"
+   *  twice and the player saw nothing, and a new hire's personal saga sat unseen (playtest 2026-09-25) */
+  leadsAwaitingLeadRoom(): number {
+    if (!this.hasRoom('map-room') || this.hasRoom('lead-room')) return 0;
+    const shown = new Set(this.visibleLeads().map(l => l.id));
+    return this.state.leads.filter(l => !shown.has(l.id) && !(l.source === 'recruiting' && this.state.tavern.length >= 3)).length;
+  }
+
   /** UNCHANGED to every caller (TEMPO I11): the work-to-completion path `npm test`, the §20 sim
    *  baselines, realplay/autoplay and the CLI's batch mode all drive. It becomes a job like any
    *  other pursuit, but starts IMMEDIATELY — cap or no cap — so a scripted caller can never
@@ -2878,7 +2887,9 @@ export class Game {
     if (q.archetype === 'lead-hunt' && r.outcome !== 'failure') {
       const extra = r.outcome === 'success' ? 2 : 1;
       for (let i = 0; i < extra; i++) st.leads.push(this.freshLead('hunt'));
-      say(`🧭 The sweep pays: ${extra} new lead(s).`);
+      say(this.hasRoom('lead-room')
+        ? `🧭 The sweep pays: ${extra} new lead(s).`
+        : `🧭 The sweep turns up ${extra} more lead(s) — they wait on a Lead room to be read.`);
     }
     // lore edges from the AI (validated later in one pass)
     pendingEdges.push(...(out?.edges ?? []));

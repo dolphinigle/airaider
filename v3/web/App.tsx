@@ -350,10 +350,11 @@ function Build({ s, doAct }: any) {
 }
 
 function Leads({ s, queueAct }: any) {
-  if (!s.leads.length) return <p>The board is empty — leads are earned: run hunts, finish quests.</p>;
+  const waiting = s.leadsWaiting ? <p className="lockmsg">+{s.leadsWaiting} more lead{s.leadsWaiting === 1 ? '' : 's'} earned — they wait on a <b>Lead room</b> to be read.</p> : null;
+  if (!s.leads.length) return <><p>The board is empty — leads are earned: run hunts, finish quests.</p>{waiting}</>;
   const jobs: any[] = s.jobs ?? [];
   return (
-    <table><tbody>
+    <><table><tbody>
       {s.leads.map((l: any) => {
         // TEMPO P2: a lead being worked reads as being worked WHERE IT STANDS. The queue strip is
         // not enough — this row is where the player is about to click again.
@@ -373,7 +374,7 @@ function Leads({ s, queueAct }: any) {
         </tr>
         );
       })}
-    </tbody></table>
+    </tbody></table>{waiting}</>
   );
 }
 

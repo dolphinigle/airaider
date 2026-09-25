@@ -152,6 +152,7 @@ function stateView() {
     liabilities: st.cards.filter(isLiability).filter(c => (c.qty ?? 0) > 0).map(c => cardView(c)),
     tavern: st.tavern.map(s => ({ ...cardView(game.card(s.cardId)!), expires: s.expiresAtCycle, hireCost: hireCost(game.card(s.cardId)!.value) })),
     holding: st.holding.map(s => ({ ...cardView(game.card(s.cardId)!), expires: s.expiresAtCycle })),
+    leadsWaiting: game.leadsAwaitingLeadRoom(),
     leads: game.visibleLeads().map(l => ({
       id: l.id, rarity: l.rarity, level: l.level, region: REGION[l.region]!.name,
       archetype: l.archetype, chain: l.chainInfo.kind, expires: l.expiresAtCycle, title: l.title ?? null, source: l.source,
