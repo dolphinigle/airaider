@@ -3,7 +3,7 @@
 import type { Game } from '../src/game/game.js';
 import { renderTags } from '../src/engine/tags.js';
 import { ROOM_TYPE, GH_THRESHOLDS, ghUpgradeCost, maxSlotsAtTier, upgradeCost, excavateCost, ransomRate, marketSellRate } from '../src/engine/fort.js';
-import { coinBand, RANSOM_RATE, SELL_RATE, unitWorth, unitStars, unitPeak } from '../src/engine/economy.js';
+import { coinBand, hireCost, RANSOM_RATE, SELL_RATE, unitWorth, unitStars, unitPeak } from '../src/engine/economy.js';
 import { leadBand } from '../src/engine/quests.js';
 import { REGION } from '../src/engine/regions.js';
 import { cardType, stackKind, isLiability } from '../src/engine/cards.js';
@@ -333,7 +333,7 @@ export const render = {
       const c = g.card(s.cardId)!;
       const who = c.character!.who ? `\n      "${c.character!.who}"` : '';
       const story = c.character!.backstory ? `\n      ${c.character!.backstory}` : '';
-      return `${c.id.padEnd(5)} ${c.name.padEnd(22)} L${c.character!.level} ${mark(c)} — hire ~${Math.round(c.value * 1.2)}g, leaves c${s.expiresAtCycle}${who}\n      ${renderTags(c.tags)}${story}`;
+      return `${c.id.padEnd(5)} ${c.name.padEnd(22)} L${c.character!.level} ${mark(c)} — hire ${hireCost(c.value)}g, leaves c${s.expiresAtCycle}${who}\n      ${renderTags(c.tags)}${story}`;
     }).join('\n') || '(nobody drinking today)';
   },
 
