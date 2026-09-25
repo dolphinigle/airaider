@@ -2,7 +2,7 @@
 
 import type { Game } from '../src/game/game.js';
 import { renderTags } from '../src/engine/tags.js';
-import { ROOM_TYPE, GH_THRESHOLDS, maxSlotsAtTier, upgradeCost, excavateCost, ransomRate, marketSellRate } from '../src/engine/fort.js';
+import { ROOM_TYPE, GH_THRESHOLDS, ghUpgradeCost, maxSlotsAtTier, upgradeCost, excavateCost, ransomRate, marketSellRate } from '../src/engine/fort.js';
 import { coinBand, RANSOM_RATE, SELL_RATE, unitWorth, unitStars, unitPeak } from '../src/engine/economy.js';
 import { leadBand } from '../src/engine/quests.js';
 import { REGION } from '../src/engine/regions.js';
@@ -50,7 +50,7 @@ export const render = {
   status(g: Game): string {
     const need = GH_THRESHOLDS[g.state.fort.ghTier + 1];
     return [
-      `cycle ${g.state.cycle} · gold ${g.gold()} · prestige ${g.prestige().toFixed(1)}${need ? `/${need} for GH T${g.state.fort.ghTier + 1}` : ''} · GH T${g.state.fort.ghTier}`,
+      `cycle ${g.state.cycle} · gold ${g.gold()} · prestige ${g.prestige().toFixed(1)}${need ? `/${need} and ${ghUpgradeCost(g.state.fort.ghTier + 1)}g for GH T${g.state.fort.ghTier + 1} ('gh')` : ''} · GH T${g.state.fort.ghTier}`,
       `roster ${g.roster().length}/${g.rosterCapacity()} · captives ${g.captives().length}/${g.captiveCapacity()} · regions: ${g.state.unlockedRegions.join(', ') || 'none'}`,
       `leads ${g.visibleLeads().length} · open quests ${g.state.quests.filter(q => q.state === 'open').length} · live chains ${g.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending').length}`,
       this.jobsBrief(g),
