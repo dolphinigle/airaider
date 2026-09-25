@@ -1601,7 +1601,10 @@ export class Game {
       let issue = issues(g);
       if (issue?.hard) {
         this.log('chain', `saga draft rejected (one re-roll): ${issue.why.slice(0, 120)}…`);
-        g = await this.ai.genesis({ ...genesisInput, seed: sampleSeed(this.rng), avoid: [...avoid, issue.why] });
+        const reseed = isPersonal && process.env.PERSONAL_SEED !== '0'
+          ? (seeds => seeds.find(x => x !== genesisInput.seed) ?? genesisInput.seed)(this.personalSeeds(focal))
+          : sampleSeed(this.rng);
+        g = await this.ai.genesis({ ...genesisInput, seed: reseed, avoid: [...avoid, issue.why] });
         issue = issues(g);
       }
       if (issue) this.log('chain', `saga draft lint (${issue.hard ? 'HARD, shipping anyway' : 'log-only'}): ${issue.why.slice(0, 120)}…`);
@@ -2350,7 +2353,9 @@ export class Game {
       sceneFacet: this.rng.pick(['the ground and what stands on it', 'the weather and the light',
         'what can be heard', 'the people in view', 'the enemy\'s posture or handiwork', 'what the party carries or readies']),
       deliveredSummary: this.describeDelivery(r),
-      earnedLead: (ls => ls?.length ? ls.map(l => `somebody wants hands to ${defOf(l.archetype).gloss}`).join('; ') : undefined)(preLeads.get(r.quest.id)),
+      // glosses mix verb and noun phrases, so the frame is a colon, never "wants hands to …"; the
+      // contract gloss is writer-facing ("the work IS the premise") and is said plainly instead
+      earnedLead: (ls => ls?.length ? ls.map(l => `word of paying work: ${l.archetype === 'contract' ? 'plain work for agreed pay' : defOf(l.archetype).gloss.split(' — ')[0]}`).join('; ') : undefined)(preLeads.get(r.quest.id)),
       // beat variant (engine-dealt, no RNG): how this job turns — physical / wits / social
       sceneMode: this.sceneModeFor(r.quest),
       // a finale's delivered PERSON is the focal — give them an id here so the narrator can
@@ -3070,6 +3075,21 @@ export class Game {
   /** the spark for a soldier's OWN saga: the strongest thing the world remembers about them,
    *  else the backstory they were fleshed with. Never the generic what-if pool — that is what
    *  turned a personal saga into somebody else's ransom job. */
+  /** every spark a soldier's own saga could start from, strongest first — a retry takes the next
+   *  one. The genesis re-roll burned the seed with sampleSeed(), so a personal saga whose first
+   *  draft was rejected came back built on a GENERIC what-if ("a debt sold three times over") and
+   *  copied the saga already running (Felawen's past became Keesa's tally, playtest 2026-09-25). */
+  private personalSeeds(merc: Card): string[] {
+    const first = this.personalSeed(merc);
+    const back = merc.character?.backstory;
+    const sentences = back ? back.split(/(?<=[.!?])\s+/).filter(x => x.length > 20) : [];
+    const edges = this.state.lore.edges
+      .filter(e => e.active && !!e.blurb && (e.from === merc.id || e.to === merc.id))
+      .filter(e => this.card(e.from === merc.id ? e.to : e.from)?.character?.role !== 'merc')
+      .map(e => e.blurb!);
+    return [...new Set([first, ...edges, ...sentences])];
+  }
+
   private personalSeed(merc: Card): string {
     // A seed may only name people the SAGA CAN CAST. Genesis is dealt no company soldier but the
     // focal (the slate filter above) and is told assignedNames are the only names it may coin —

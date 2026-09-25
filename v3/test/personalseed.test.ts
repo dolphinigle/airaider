@@ -47,3 +47,32 @@ describe('personal saga seed', () => {
     expect(await seedFor('merc')).not.toContain('at a crossing');
   });
 });
+
+// The genesis re-roll (one, for HARD defects) burned the seed with sampleSeed(): a personal saga
+// whose first draft was rejected came back on a generic what-if and copied the live saga.
+class DropFocalOnce extends MockProvider {
+  seeds: string[] = [];
+  private first = true;
+  override async genesis(i: GenesisInput): Promise<GenesisOut> {
+    this.seeds.push(i.seed);
+    const out = await super.genesis(i);
+    if (this.first) { this.first = false; return { ...out, cast: out.cast.filter(c => c.loreId !== i.focal.id && c.name !== i.focal.name) } }
+    return out;
+  }
+}
+
+describe('a personal saga re-rolled for a hard defect', () => {
+  it('re-rolls on another piece of the soldier\'s own past, never a generic seed', async () => {
+    const ai = new DropFocalOnce();
+    const g = new Game(ai, 268);
+    g.build('map-room'); g.build('lead-room');
+    const merc = g.roster()[0]!;
+    merc.character!.backstory = 'She mended mail at her mother\'s brazier before she could lift a sword. She left home the winter the forge went cold.';
+    g.ensureLoreNode(merc);
+    (g as unknown as { spawnPersonalChainLead(m: unknown): void }).spawnPersonalChainLead(merc);
+    await g.pursue(g.state.leads.find(l => l.source === 'personal')!.id);
+    expect(ai.seeds.length).toBe(2);
+    expect(ai.seeds[1]).not.toBe(ai.seeds[0]);
+    expect(merc.character!.backstory).toContain(ai.seeds[1]!);
+  });
+});
