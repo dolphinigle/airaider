@@ -660,3 +660,31 @@ routine report (no prose change).
 Still open, every round: the opener template (*"X stood at the Y. The Z lay."*), reward items that
 arrive unexplained, and question jobs ("who", "what pact") answered vaguely or not at all. Prose
 ~4.6 is the rubric's report-speak band.
+
+## N13 — lead-hunt cards now read as scouting for work (FIXED, measured)
+
+The designer's open complaint from N10: *"lead hunt quest texts feels like theyre not leading to a
+lead… shouldnt it be something like 'go to tavern and fish for news'"*. Still true in a live
+2026-09-25 playthrough (*"Find where the coin changed hands"*, *"Ask who last saw the kitchenhand"*).
+
+N10 had the diagnosis and it held: the light card's situation form permits only MYSTERY openers
+(found / missing / stopped), and the form outranks the fact (L32). The no-client framing written
+for lead-hunt (`selfDirected`) was also behind an unshipped lab flag and never reached the light
+card at all. A lead-hunt card now gets its own situation form (a place where word gathers, who
+passes through, what they grumble about; nothing wrong at the place itself) and its own errand line.
+
+Two rounds, 10 cards per arm, 2 blind judges each, "reads as scouting for work" 0-2:
+
+| arm | scouting | prose |
+|---|---|---|
+| old | 0.0 | 5.05 |
+| situation form only | 1 (venue right, errand a manhunt) | — |
+| + scouting errand (shipped) | 2.0 | 4.9 |
+| + errand without example actions | 1.75 | 4.25 |
+
+The situation form alone was not enough: the errand rule *"where the job is to find something
+out, it ASKS the question"* turned the venue into a manhunt (*"find which speaker bragged of the
+knifing"*). Known cost: the errand repeats (*"buy a round, sit with the talkers, ask who needs
+hands"*) — the example actions in the errand line are copied. Removing them made errands long
+lists and scored worse. For a card the scouting post offers every cycle, a steady errand with a
+varying grumble is arguably right; flagged, not ruled.

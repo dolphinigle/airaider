@@ -34,6 +34,8 @@ export interface QuestWriteInput {
   obstacle?: string;
   /** nobody brought this in — the company goes looking of its own accord */
   selfDirected?: boolean;
+  /** a scouting run (lead-hunt): the light card is written as going where people talk to hear of work */
+  scouting?: boolean;
   /** what KIND OF TURN this story takes — orthogonal to the archetype and the keywords */
   shape?: string;
   knownObstacle?: string;        // what the client openly knows stands against them — never a name

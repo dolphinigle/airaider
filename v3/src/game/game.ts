@@ -1167,7 +1167,8 @@ export class Game {
       // unlike `method`, which had no legal landing site
       shape: process.env.SHAPE === '1' ? sampleShape(this.rng) : undefined,
       obstacle: process.env.OBSTACLE === '1' ? sampleObstacle(this.rng) : undefined,
-      selfDirected: (process.env.OWNBIZ === '1' || process.env.LH2 === '1') && isSelfDirected(lead.archetype) || undefined,
+      selfDirected: process.env.OWNBIZ === '1' && isSelfDirected(lead.archetype) || undefined,
+      scouting: lead.archetype === 'lead-hunt' || undefined,
       method: process.env.METHOD === '1'
         ? (m => m?.length ? this.rng.pick(m) : undefined)(methodsOf(lead.archetype)) : undefined,
       opening: !light && dealSpark && lead.source !== 'interrogation' ? { spark: opening.spark } : undefined,
