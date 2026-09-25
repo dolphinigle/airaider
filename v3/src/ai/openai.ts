@@ -3,7 +3,7 @@
 // Key from OPENAI_API_KEY via ../.env or ~/.airaider/openai.env (never printed/committed).
 
 import OpenAI from 'openai';
-import { glossOf, ruleOf, type Archetype } from '../engine/archetypes.js';
+import { glossOf, ruleOf, seenOf, type Archetype } from '../engine/archetypes.js';
 import { z } from 'zod';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -310,6 +310,10 @@ function oneOffLightSystem(input: QuestWriteInput): string {
       ? '- situation: ONE SENTENCE: someone worth hiring, seen at what they do well — and why they would JOIN the company now. They are not in trouble with anyone, they need nothing done for them, and nothing else is wrong.'
       : input.scouting && process.env.SCOUT !== '0'
       ? '- situation: ONE SENTENCE: a place where word gathers — a common room, a market, a crossing — who passes through it, and the kind of trouble out in the country around that they grumble about. NOBODY BROUGHT THIS IN and nobody is hiring you: the company goes to LISTEN and comes back with word of paying work. Nothing is wrong at the place itself, and no single incident is named.'
+      : process.env.SEEN !== '0' && process.env.SEEN2 === '1' && seenOf(input.archetype as never)
+      // LAB SEEN2: a type with its own `seen` opener — the found/missing/stopped menu is a MYSTERY
+      // menu, and a blind survey read hunt/research/adventure cards as investigations
+      ? '- situation: ONE SENTENCE built on ONE THING SOMEBODY SAW: ' + seenOf(input.archetype as never) + '. Let that carry the job. A thing seen tells a reader more than the same matter stated as a fact, and it is what makes this job worth hiring armed strangers for.'
       : process.env.SEEN !== '0'
       ? '- situation: ONE SENTENCE built on ONE THING SOMEBODY SAW — what was found, what is missing, what someone has stopped doing — and let that carry the trouble. A thing seen tells a reader more than the same trouble stated as a fact, and it is what makes this job worth hiring armed strangers for.'
       : '- situation: ONE SENTENCE saying what is WRONG — the trouble that makes this job worth hiring armed strangers for.')
@@ -629,7 +633,12 @@ const oneOffLightResolveSystem = (q: ResolveQuestInput): string => {
   '═══ YOUR OUTPUT ═══',
   // (BEFORE2/BEFORE3 — opening on the obstacle mid-act — measured 2026-09-25: +0.8 prose but
   // invented unexplained figures, and the clarity-safe rewrite gained nothing. Not shipped.)
-  '1) "before" — ONE sentence: the party is on the ground and the thing in their way is visible. No approach, no weather, no journey, and nothing is taken yet. TWENTY WORDS AT MOST.',
+  // LAB BEFORE4: "the thing in their way" makes every job adversarial — a peaceful hire came back
+  // with the recruit "fevered" and "two elder-keepers blocking the yard" (playtest 2026-09-25).
+  // What the job is about is in view; an obstacle only where the card put one.
+  process.env.BEFORE4 === '1'
+    ? '1) "before" — ONE sentence: the party is on the ground and what the job is about is in view — as the card left it, with nothing added that the card did not put there. No approach, no weather, no journey, and nothing is taken yet. TWENTY WORDS AT MOST.'
+    : '1) "before" — ONE sentence: the party is on the ground and the thing in their way is visible. No approach, no weather, no journey, and nothing is taken yet. TWENTY WORDS AT MOST.',
   // MEASURED 2026-09-25 (with NOCOIN, same cards and outcomes, 2 blind judges, r 0.87): the job
   // actually done 9/14 -> 14/14, prose 3.89 -> 4.61. The old line made "whatever the company ends
   // up with" the subject of the report, so a stolen-totem job came home with a shield and no totem.

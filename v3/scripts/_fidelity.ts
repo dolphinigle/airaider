@@ -8,7 +8,7 @@ import { makeOpenAiProvider } from '../src/ai/openai.js';
 import { boardPool, ARCHETYPES } from '../src/engine/archetypes.js';
 const N = Number(process.argv[2] ?? 4), SEED = Number(process.argv[3] ?? 9090);
 const ai = makeOpenAiProvider();
-const pool = boardPool({ hasDungeon: true });
+const pool = process.env.TYPES ? process.env.TYPES.split(',') as never[] : boardPool({ hasDungeon: true });
 const rows: { arch: string; card: string; job: string }[] = [];
 await Promise.all(Array.from({ length: N }, async (_, k) => {
   const g = new Game(ai, SEED + k * 7);
