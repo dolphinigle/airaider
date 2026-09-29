@@ -44,7 +44,7 @@ existing saves still load.
 ## 2 · NON-GOALS (say no to these)
 
 - Rebuilding the fort, roster, or reckoning screens. Only the quest surface.
-- New art or per-location illustration. The design exists *because* we have none.
+- New art or per-location illustration. The design exists *because* we have none. *(Superseded 2026-09-29: soldier portraits and room icons are in — see `UI.md`.)*
 - The plain-language slot line (*"Someone who can read the ground"*) — **Phase 4, deliberately.** It
   needs either a new AI output field, which risks the prompt just stabilised, or an engine phrase
   table, which will stamp exactly as L19/L20 predict. It ships as its own measured change.

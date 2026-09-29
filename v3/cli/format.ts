@@ -2,6 +2,7 @@
 
 import type { Game } from '../src/game/game.js';
 import { renderTags } from '../src/engine/tags.js';
+import { roomDesc, roomWants } from '../src/game/roomInfo.js';
 import { ROOM_TYPE, GH_THRESHOLDS, ghUpgradeCost, maxSlotsAtTier, upgradeCost, excavateCost, ransomRate, marketSellRate } from '../src/engine/fort.js';
 import { coinBand, hireCost, RANSOM_RATE, SELL_RATE, unitWorth, unitStars, unitPeak } from '../src/engine/economy.js';
 import { leadBand } from '../src/engine/quests.js';
@@ -40,6 +41,7 @@ export const render = {
       'CARDS   slot <roomId> <idx> <cardId> · unslot <roomId> <idx> · focus <mercId> single|dual|none <attr> [attr2]',
       'QUESTS  pursue <leadId> · assign <qId> <slot> <mercId> · unassign <qId> <slot> · approach <qId> <gId>',
       '        auto [qId|all]   — man a quest (or every quest) with the best fit going',
+      '        send <qId> <mercId> — into their best free place there · fit <mercId> — their best place on every quest',
       'QUEUE   jobs · wait · cancel <jobId> · inflight <n>   (pursue returns at once; cards arrive later)',
       'PEOPLE  hire <id> · accept <id> · ransom <id> · sell <id> · settle <id> · interrogate <id> · heal <id>',
       'TURN    end   — commit the cycle: everything rolls, the AI narrates',
@@ -348,8 +350,22 @@ export const render = {
   buildable(g: Game): string {
     return g.buildableTypes()
       .filter(b => !b.reason || !b.reason.startsWith('already'))
-      .map(b => `${b.type.padEnd(22)} ${String(b.cost).padStart(6)}g ${b.reason ? `— ${b.reason}` : '✓ buildable'}`)
+      .map(b => {
+        const wants = roomWants(b.type);
+        return `${b.type.padEnd(22)} ${String(b.cost).padStart(6)}g ${b.reason ? `— ${b.reason}` : '✓ buildable'}\n      ${roomDesc(b.type)}${wants.length ? ` (wants: ${wants.join(', ')})` : ''}`;
+      })
       .join('\n');
+  },
+
+  /** the soldier's best free place on every open quest — the GUI's drag-over-the-map, as text */
+  fit(g: Game, id: string): string {
+    const m = g.card(id);
+    if (!m?.character || m.character.role !== 'merc') return 'no such merc';
+    const rows = g.placementsFor(id);
+    if (!rows.length) return `${m.name}: no open place on any quest (a finale needs its approach picked first)`;
+    return `${m.name} — best place on each quest (coins vs bar):\n` + rows
+      .map(r => `  ${r.questId.padEnd(6)} ${r.title.slice(0, 40).padEnd(40)} slot ${r.idx} ${r.attr.padEnd(7)} ${r.coins.toFixed(1).padStart(5)} vs ${r.bar.toFixed(1)}${r.coins >= r.bar ? ' ✓' : ''}`)
+      .join('\n') + `\n  send <qId> ${id}`;
   },
 
   log(g: Game, n: number): string {

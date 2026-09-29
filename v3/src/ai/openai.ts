@@ -18,7 +18,7 @@ import type {
 const WRITER_MODEL = process.env.AIRAIDER_WRITER_MODEL || 'gpt-5-mini';
 const NANO_MODEL = process.env.AIRAIDER_NANO_MODEL || 'gpt-5-nano';
 
-function loadKey(): string {
+export function loadKey(): string {
   if (process.env.OPENAI_API_KEY) return process.env.OPENAI_API_KEY;
   for (const p of [path.resolve(process.cwd(), '../.env'), path.resolve(process.cwd(), '.env'), path.join(os.homedir(), '.airaider/openai.env')]) {
     try {

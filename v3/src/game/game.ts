@@ -2199,6 +2199,45 @@ export class Game {
     };
   }
 
+  /** THE BEST PLACE FOR ONE SOLDIER on every open quest — what dragging a card over the map shows,
+   *  what the card sheet's "send to" lists, and where sendTo() puts them. A soldier already
+   *  committed is scored as if free (sending moves them). Slots they cannot legally take are
+   *  skipped, so every row here is a place sendTo() will actually accept. */
+  placementsFor(cardId: string): { questId: string; title: string; idx: number; attr: string; coins: number; bar: number }[] {
+    const m = this.card(cardId);
+    if (!m?.character || m.character.role !== 'merc') return [];
+    const out: { questId: string; title: string; idx: number; attr: string; coins: number; bar: number }[] = [];
+    for (const q of this.state.quests) {
+      if (q.state !== 'open' || (q.approaches && !q.chosenApproach)) continue;
+      let best: (typeof out)[number] | null = null;
+      q.slots.forEach((s, idx) => {
+        if (q.approaches && s.groupId !== q.chosenApproach) return;
+        if (s.filledBy && s.filledBy !== cardId) return;
+        if (s.requirement.kind === 'must-be' && s.requirement.cardId !== cardId) return;
+        if (s.requirement.kind === 'must-have' && !queryMatches(m.tags, { match: s.requirement.concept, minRank: s.requirement.minRank })) return;
+        const c = coins(m, s.test);
+        if (!best || c > best.coins) best = { questId: q.id, title: q.title, idx, attr: s.test.attributes.join('+').toUpperCase(), coins: c, bar: slotThreshold(s.test) };
+      });
+      if (best) out.push(best);
+    }
+    return out;
+  }
+
+  /** Send one soldier to a quest, into their best free place there (moving them off any other). */
+  sendTo(questId: string, cardId: string): { ok: boolean; msg: string } {
+    const p = this.placementsFor(cardId).find(x => x.questId === questId);
+    const q = this.state.quests.find(x => x.id === questId);
+    if (!q) return { ok: false, msg: 'no such quest' };
+    if (q.approaches && !q.chosenApproach) return { ok: false, msg: 'pick an approach first' };
+    if (!p) return { ok: false, msg: `no free place on ${q.title} for them` };
+    const m = this.card(cardId)!;
+    if (m.location.kind === 'quest') {
+      if (m.location.questId === questId && m.location.slot === p.idx) return { ok: true, msg: `${m.name} is already there` };
+      this.unassign(m.location.questId, m.location.slot);
+    }
+    return this.assign(questId, p.idx, cardId);
+  }
+
   /** Man every open quest. One soldier can only be on one quest, so ORDER decides who gets the
    *  good people: quests that NAME someone or demand a tag have the fewest ways to be manned and
    *  go first; then the ones closest to lapsing. */

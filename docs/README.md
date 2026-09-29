@@ -23,6 +23,7 @@ Airaider is a persistent, single-player, **AI-driven character-collection fort g
 - **[REFERENCE_CHARACTER_INTROS.md](REFERENCE_CHARACTER_INTROS.md)** — all 22 of Sultan's Game's character introductions, verbatim, and the structural fact behind them: a character is introduced on their OWN CARD with a role-title, and quests afterwards use the bare name freely.
 - **[DOGFOODING.md](DOGFOODING.md)** — 🔒 how this game gets playtested: the text UI is at PARITY with the web GUI, and playtesting means *playing* a real UI, never simulating one. Read before claiming anything is playtested.
 - **[TEMPO.md](TEMPO.md)** — 🟡 **goals** for the current phase: no dead time. Async work in the fort phase + a reckoning that unfolds. Measured latency baseline lives here; lifts `STORY_ENGINE §9`'s prototype exemption.
+- **[UI.md](UI.md)** — the Sultan-style GUI (built 2026-09-29): map home, board sidebar, the hand + bags, card sheet, fort build list, portraits. Supersedes QUEST_SCREEN's no-art non-goal.
 - **[AI_PROVIDER.md](AI_PROVIDER.md)** — model selection, structured-output strategy.
 - **[PLAYER_PREFERENCES.md](PLAYER_PREFERENCES.md)** — player-facing flavor knobs (tone, writing style) that flow into AI prompts without touching engine math.
 

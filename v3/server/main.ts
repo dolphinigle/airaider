@@ -9,7 +9,9 @@ import { Game } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
 import { makeOpenAiProvider } from '../src/ai/openai.js';
 import { ROOM_TYPE, buildCost, upgradeCost, renovateCost, ghUpgradeCost, GH_THRESHOLDS, maxSlotsAtTier, excavateCost } from '../src/engine/fort.js';
-import { REGION } from '../src/engine/regions.js';
+import { REGION, REGIONS } from '../src/engine/regions.js';
+import { roomDesc, roomWants, roomCategory } from '../src/game/roomInfo.js';
+import { Portraits } from './portraits.js';
 import { renderTags } from '../src/engine/tags.js';
 import { cardType, stackKind, isLiability, hasTag } from '../src/engine/cards.js';
 import { slotThreshold, coins, explainCoins } from '../src/engine/roll.js';
@@ -49,6 +51,9 @@ if (fs.existsSync(SAVE) && !process.env.AIRAIDER_FRESH) {
   console.log(`[server] fresh game (seed ${seed} — set AIRAIDER_SEED to replay it)`);
 }
 let lastReport: string[] = [];
+// soldier portraits, cached next to the save (one folder per save file)
+const portraits = new Portraits(path.join(path.dirname(SAVE), 'portraits', path.basename(SAVE, '.json')),
+  useOpenAi && process.env.AIRAIDER_PORTRAITS !== '0');
 
 // Fires after every action. A background job (TEMPO P1) finishes OUTSIDE any action, so the quest
 // it wrote may not reach the file until the NEXT action saves. Deliberate: a timer here would race
@@ -69,6 +74,9 @@ function cardView(c: NonNullable<ReturnType<Game['card']>>) {
     peak: (p => p ? `${p.concept} (${p.rank})` : null)(unitPeak(c)),
     type: cardType(c), qty: c.qty, liability: isLiability(c),
     location: c.location,
+    // soldiers only — see server/portraits.ts for the cost rule
+    portrait: c.character?.role === 'merc' && portraits.has(c.id) ? `/api/portrait/${c.id}` : null,
+    painting: c.character?.role === 'merc' && portraits.isPainting(c.id),
     character: c.character ? {
       role: c.character.role, level: c.character.level, xp: c.character.xp,
       attrs: c.character.attrs, injury: c.character.injuryTiers,
@@ -86,11 +94,13 @@ function stateView() {
   // that is NOT queued behind the action chain, so the client can read it while endCycle() awaits.
   const live = game.reckoningView();
   const need = GH_THRESHOLDS[st.fort.ghTier + 1] ?? null;
+  portraits.ensure(game.roster());
   return {
     cycle: st.cycle, gold: game.gold(), prestige: p, ghTier: st.fort.ghTier, ghNeed: need,
     ghCost: need ? ghUpgradeCost(st.fort.ghTier + 1) : null,
     maxSlots: maxSlotsAtTier(st.fort.ghTier),
     unlockedRegions: st.unlockedRegions,
+    regions: REGIONS.filter(r => r.id !== 'outskirts').map(r => ({ id: r.id, name: r.name, ghTier: r.ghTier, unlocked: st.unlockedRegions.includes(r.id) })),
     menus: game.menuGates(),
     can: { heal: game.hasRoom('hospital'), interrogate: game.hasRoom('interrogation') },
     rosterCap: game.rosterCapacity(), captiveCap: game.captiveCapacity(),
@@ -111,7 +121,7 @@ function stateView() {
       rooms: st.fort.rooms.map(r => {
         const rt = ROOM_TYPE[r.type]!;
         return {
-          id: r.id, type: r.type, name: rt.name, species: rt.species, benefit: rt.benefit,
+          id: r.id, type: r.type, name: rt.name, species: rt.species, benefit: rt.benefit, desc: roomDesc(r.type),
           cell: r.cell, style: r.style,
           comfort: rt.species === 'comfort' ? game.comfort(r) : null,
           wants: game.effectiveWants(r).map(w => w.match),
@@ -127,13 +137,14 @@ function stateView() {
         };
       }),
     },
-    buildable: game.buildableTypes().map(b => ({ ...b, name: ROOM_TYPE[b.type]!.name })),
+    buildable: game.buildableTypes().map(b => ({ ...b, name: ROOM_TYPE[b.type]!.name, desc: roomDesc(b.type), wants: roomWants(b.type), category: roomCategory(b.type) })),
     freeCells: game.freeCells().length,
     excavateCost: excavateCost(st.fort.cells.length),
     roster: game.roster().map(m => ({
       ...cardView(m), cap: game.capOf(m.id), dossier: game.dossier(m.id),
       healEta: m.character!.injuryTiers > 0 ? game.healEta(m) : null,
       xpNeeded: xpNeeded(m.character!.level),
+      placements: game.placementsFor(m.id),
     })),
     captives: game.captives().map(c => {
       const office = st.fort.rooms.find(r => r.type === 'ransom-office');
@@ -164,7 +175,7 @@ function stateView() {
       const o = game.questOdds(q.id);
       return {
         id: q.id, title: q.title, situation: q.situation, job: q.job,
-        level: q.level, rarity: q.rarity, region: REGION[q.region]!.name,
+        level: q.level, rarity: q.rarity, region: REGION[q.region]!.name, regionId: q.region, archetype: q.archetype,
         chainId: q.chainId ?? null, beat: q.beatIndex ?? null, isFinale: !!q.isFinale,
         ready: (q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots).every(s => s.filledBy),
         approaches: q.approaches?.map(a => ({ ...a, outcome: game.approachOutcome(q.id, a.id) })) ?? null, chosenApproach: q.chosenApproach ?? null,
@@ -234,6 +245,12 @@ app.get('/', async (_req, reply) => reply.redirect(WEB));
 
 app.get('/api/state', async () => stateView());
 
+app.get<{ Params: { id: string } }>('/api/portrait/:id', async (req, reply) => {
+  const b = portraits.read(req.params.id);
+  if (!b) return reply.code(404).send();
+  return reply.header('content-type', 'image/webp').header('cache-control', 'max-age=86400').send(b);
+});
+
 /** re-read a past reckoning. The archive lives in the SAVE, so this survives a restart and
  *  can look further back than the cycle just resolved. */
 app.get('/api/reckoning', async (req) => {
@@ -297,6 +314,7 @@ async function handleAction(body: { type: string; args: (string | number)[] }) {
     }
     case 'assign': result = game.assign(s(a[0]), n(a[1]), s(a[2])); break;
     case 'auto': result = game.autoAssign(s(a[0])); break;
+    case 'send': result = game.sendTo(s(a[0]), s(a[1])); break;
     case 'autoall': result = game.autoAssignAll(); break;
     case 'unassign': result = game.unassign(s(a[0]), n(a[1])); break;
     case 'approach': result = game.chooseApproach(s(a[0]), s(a[1])); break;
