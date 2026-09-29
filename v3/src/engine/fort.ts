@@ -125,6 +125,15 @@ export function maxSlotsAtTier(ghTier: number): number {
   return 6;
 }
 
+/** the first tier above `ghTier` where rooms take MORE places (null when no higher tier does) —
+ *  maxSlotsAtTier is flat across tiers, so "raise the hall for another place" is only true when
+ *  the NEXT tier is one of these (raising T2→T3 added no rack and still read "More racks at T3") */
+export function nextSlotTier(ghTier: number): number | null {
+  const now = maxSlotsAtTier(ghTier);
+  for (let t = ghTier + 1; GH_THRESHOLDS[t] !== undefined; t++) if (maxSlotsAtTier(t) > now) return t;
+  return null;
+}
+
 // costs (§20.1/FORT §6): build 120·1.32^(T−1) at the room's unlock tier
 export function buildCost(type: RoomType): number {
   const base = 120 * Math.pow(1.32, type.ghTier - 1);

@@ -1,0 +1,159 @@
+/* Quest surface: the quest page, niches, gauge, the writ. Loaded after styles.css. */
+/* ── the quest page ────────────────────────────────────────────────────── */
+.questpage { position: absolute; inset: 0; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; padding: 14px; }
+.scene { position: relative; border-radius: 6px; overflow-y: auto; background-color: #16241f; background-image: radial-gradient(circle, rgba(125,190,170,.12) 1.2px, transparent 1.7px); background-size: 22px 22px; box-shadow: inset 0 0 0 1px #2c4a42, inset 0 0 80px rgba(0,0,0,.6); padding: 18px 26px 0; display: flex; flex-direction: column; gap: 16px; }
+.scene .lbl { color: #9cc7bd; }
+.scene .lbl.center { text-align: center; }
+.questpage .held { display: flex; flex-direction: column; gap: 10px; }
+.heldrow { display: flex; gap: 18px; flex-wrap: wrap; }
+.heldone { display: flex; flex-direction: column; gap: 5px; width: 96px; }
+.hc { position: relative; width: 96px; height: 132px; border-radius: 6px; background: #cfd6cf; box-shadow: 0 0 0 1px #5f6f68, 0 4px 10px rgba(0,0,0,.5); color: #1f2622; text-align: left; }
+.hc .nm { position: absolute; left: 0; top: 0; right: 0; padding: 5px 7px; font-size: 12px; font-weight: 700; line-height: 1.1; border-bottom: 1px dotted #7d8a84; }
+.hc .mono { position: absolute; left: 0; right: 0; top: 46px; text-align: center; font-family: var(--sc); font-size: 32px; color: #55645d; }
+.hc .rl { position: absolute; left: 0; right: 0; bottom: 0; padding: 3px 7px; font: 500 9.5px var(--mono); color: #44524b; border-top: 1px dotted #7d8a84; }
+.clasp { position: absolute; top: 54px; width: 10px; height: 26px; background: linear-gradient(#f1d38c, #8a6529); border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,.6); }
+.clasp.l { left: -6px; } .clasp.r { right: -6px; }
+.hwho { font-size: 11.5px; line-height: 1.3; color: #b9cfc8; font-style: italic; }
+
+/* ── how a finale ends: one compact row, each card with its facts ── */
+.approaches { display: flex; flex-direction: column; gap: 8px; }
+.apps { display: grid; gap: 8px; }
+.appr { --ap: #9cc7bd; text-align: left; padding: 8px 10px 8px 12px; border-radius: 6px; border: 1px solid #4d6a60; border-left: 4px solid var(--ap); background: #10201b; color: #dcebe6; display: flex; flex-direction: column; gap: 3px; min-width: 0; transition: border-color .15s, background .15s; }
+.appr:hover { border-color: #9cc7bd; border-left-color: var(--ap); background: #142a23; }
+.appr.on { border-color: var(--ap); background: #2a2117; color: var(--cream); box-shadow: 0 0 0 1px var(--ap), 0 0 14px rgba(0,0,0,.4); cursor: default; }
+.appr .al { font-size: 13.5px; font-weight: 600; line-height: 1.25; }
+.appr .ao { font: 400 11px var(--mono); color: #9cc7bd; }
+/* this ending's own warning ('brings a captive · no Dungeon') — on its card, not the quest's */
+.appr .aw { font: 500 11px/1.3 var(--mono); color: #ffd48a; }
+.appr .af { display: flex; flex-direction: column; gap: 3px; font: 400 11px/1.35 var(--mono); color: #c3d6cf; }
+.appr .af b { color: var(--ap); font-weight: 600; }
+.appr .best { align-self: flex-start; max-width: 100%; padding: 1px 6px; border-radius: 3px; color: #0b0d0f; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.appr .best.none { background: #3b3f43; color: #e8ecef; font-weight: 500; }
+
+/* ── the niches ── */
+.scene.choosing .approaches { order: 2; }
+.stagerow { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: flex-start; gap: 14px 26px; }
+.stagerow .held { flex: none; max-width: 100%; }
+.sendblock { flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.scene.dragging .sendlbl { visibility: hidden; }   /* the drop chips speak for it mid-drag */
+.niches { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; padding-top: 22px; }
+.niche { position: relative; display: flex; flex-direction: column; align-items: center; gap: 5px; width: 150px; }
+.arch { position: relative; width: 128px; height: 186px; border-radius: 64px 64px 8px 8px; background: #2a2a1a; background-image: repeating-linear-gradient(45deg, rgba(226,184,95,.07) 0 4px, transparent 4px 10px);
+  box-shadow: inset 0 0 0 2px #6b5a2c, inset 0 0 0 5px #1d1b12, inset 0 0 0 6px #8a7437, 0 6px 18px rgba(0,0,0,.6); display: flex; align-items: flex-end; justify-content: center; padding-bottom: 14px; color: #d8cba6;
+  transition: scale .15s, box-shadow .15s, opacity .15s, filter .15s; }
+.arch.hued { outline: 2px solid var(--ap); outline-offset: 3px; }
+.arch.armed { box-shadow: inset 0 0 0 2px #ffe3a0, inset 0 0 0 5px #1d1b12, inset 0 0 0 6px #ffe3a0, 0 0 26px rgba(255,214,120,.45); }
+.arch.req { color: #e0776b; }
+.arch .empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: inherit; opacity: .8; border-radius: inherit; padding: 0; font-style: normal; }
+/* mid-drag: legal places glow (resting style = the ring, so reduced motion still shows it); the best
+   one rings stronger; places the soldier can't take dim; the one under the cursor lifts */
+.arch.target { box-shadow: inset 0 0 0 2px #e2b85f, inset 0 0 0 5px #1d1b12, inset 0 0 0 6px #e2b85f, 0 0 18px rgba(255,214,120,.35); animation: glow 1.4s ease-in-out infinite; }
+.arch.best { box-shadow: inset 0 0 0 3px #ffe3a0, inset 0 0 0 5px #1d1b12, inset 0 0 0 7px #ffe3a0, 0 0 30px rgba(255,214,120,.6); }
+.arch.nogo { opacity: .5; filter: saturate(.4); }
+.arch.over { scale: 1.06; box-shadow: inset 0 0 0 3px #fff1c8, inset 0 0 0 5px #1d1b12, inset 0 0 0 7px #fff1c8, 0 0 36px rgba(255,226,150,.8); }
+.arch.nogo.over { scale: 1; opacity: .85; filter: none; box-shadow: inset 0 0 0 2px #e0776b, inset 0 0 0 5px #1d1b12, inset 0 0 0 6px #e0776b, 0 6px 18px rgba(0,0,0,.6); }
+.dchip { position: absolute; left: 50%; bottom: calc(100% + 6px); translate: -50% 0; z-index: 6; pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 3px 8px; border-radius: 6px; background: #d9d0bb; color: #0b0d0f; font: 600 11.5px/1.2 var(--mono); white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.6); animation: drop-in .18s ease-out; }
+.dchip em { font: 500 10px/1.2 var(--mono); font-style: normal; opacity: .85; }
+.dchip.good { background: var(--good); } .dchip.part { background: var(--part); } .dchip.bad { background: var(--bad); }
+.dchip.no { background: #3b3f43; color: #e8ecef; font-weight: 500; white-space: normal; width: max-content; max-width: 170px; text-align: center; }
+.dchip.here { background: #2a2117; color: var(--cream); border: 1px solid var(--brass-dim); }
+/* a card seated in a niche: it LANDS (scale + glow, ending at rest), ✕ in the corner sends it back */
+.seat { position: relative; animation: q-land .32s ease-out; }
+@keyframes q-land { from { scale: 1.14; filter: drop-shadow(0 0 14px rgba(255,214,120,.95)); } }
+.sendback { position: absolute; top: -8px; right: -8px; z-index: 5; width: 22px; height: 22px; border-radius: 50%; background: #1d1812; border: 1px solid #8a6529; color: #f1d38c; font: 600 11px/1 var(--mono); display: flex; align-items: center; justify-content: center; opacity: .75; box-shadow: 0 1px 4px rgba(0,0,0,.6); }
+.seat:hover .sendback, .sendback:focus-visible { opacity: 1; }
+.sendback:hover { background: #3a1c19; border-color: var(--bad); color: #ffd9d2; }
+.niche .test { font: 500 12px var(--mono); color: #e7dcc3; display: flex; gap: 10px; }
+.niche .test span { color: var(--text-dim); }
+.helps { font: 400 11.5px var(--mono); color: #9fcf97; text-align: center; }
+.hurts { font: 400 11.5px var(--mono); color: #e59488; text-align: center; }
+.helps .hit, .hurts .hit { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.helps .hit { color: #c9f0bf; } .hurts .hit { color: #ffb8ad; }
+.reqline { font: 500 11.5px var(--mono); color: #f0b3a9; text-align: center; }
+
+/* ── the roll: the engine's pooled band, pinned to the scene's foot ── */
+.gauge { position: sticky; bottom: 0; z-index: 4; margin: auto -26px 0; padding: 12px 26px 14px; display: flex; flex-direction: column; gap: 8px; background: #12201b; border-top: 1px solid #2c4a42; box-shadow: 0 -8px 16px rgba(10,18,15,.7); }
+.questpage .verdict { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.gk { font: 500 10.5px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: #9cc7bd; }
+.vw { font: 700 17px var(--mono); color: #f1e6cc; text-align: right; }
+.vw.wait { font: 400 12.5px var(--mono); color: #c3d6cf; }
+.vw[data-c="good"] { color: var(--good); } .vw[data-c="even"] { color: var(--even); } .vw[data-c="part"] { color: var(--part); } .vw[data-c="bad"] { color: #ff8e80; }
+.meter { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+.seg { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.seg i { display: block; height: 10px; border-radius: 3px; background: #1c2d27; box-shadow: inset 0 0 0 1px #2c4a42; transition: background .2s, box-shadow .2s; }
+.seg em { font: 400 10.5px/1.2 var(--mono); font-style: normal; color: #6f8a82; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.meter.lit .seg i { background: #1a2723; }
+.seg.on i { height: 14px; margin-top: -2px; box-shadow: 0 0 12px rgba(255,255,255,.18); }
+.seg.on[data-c="good"] i { background: var(--good); } .seg.on[data-c="even"] i { background: var(--even); }
+.seg.on[data-c="part"] i { background: var(--part); } .seg.on[data-c="bad"] i { background: var(--bad); }
+.seg.on em { color: #f1e6cc; font-weight: 600; }
+.gl { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; font: 400 12px var(--mono); color: var(--text-dim); }
+
+/* ── the writ ── */
+.writ { position: relative; border-radius: 6px; background: #141110; box-shadow: inset 0 0 0 1px #5b4526, inset 0 0 0 6px #141110, inset 0 0 0 7px #3a2c18; display: flex; flex-direction: column; min-height: 0; }
+.writ .wh { padding: 16px 26px 0; display: flex; flex-direction: column; gap: 7px; }
+.questpage .back { align-self: flex-start; font: 500 12px var(--mono); color: var(--text); border: 1px solid #3a444c; border-radius: 5px; height: 30px; padding: 0 10px; }
+.questpage .back span { color: var(--text-faint); margin-left: 6px; }
+.questpage .kind { font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--brass); }
+.titlerow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.titlerow h1 { font-size: 27px; font-weight: 700; color: #f3e9d2; line-height: 1.15; text-wrap: balance; }
+.questpage .chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.questpage .clock { height: 22px; padding: 0 8px; border-radius: 3px; background: #3a2c18; color: #f1d38c; font: 500 11.5px var(--mono); display: flex; align-items: center; white-space: nowrap; }
+.questpage .clock.hot { background: #9b2f26; color: #fff; }
+/* a standing post renews every cycle: neutral teal, never the alarm red (the map's '↻ daily') */
+.questpage .clock.renew { background: #17302e; color: #9fd0c8; border: 1px solid #2f7a74; }
+.questpage .loot { height: 22px; padding: 0 9px; border-radius: 11px; background: #2a2117; border: 1px solid #8a6529; color: #f1d38c; font: 500 11.5px var(--mono); display: flex; align-items: center; white-space: nowrap; }
+.questpage .loot::before { content: '✦'; margin-right: 5px; color: var(--brass-hi); font-size: 10px; }
+.questpage .owed { font: 400 11.5px var(--mono); color: #b8ab8f; font-style: italic; }
+.questpage .rwarn { height: 22px; padding: 0 8px; border-radius: 3px; background: #3d2a10; border: 1px solid #b07a24; color: #ffd48a; font: 500 11px var(--mono); display: flex; align-items: center; }
+.questpage .saga { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 14px; padding: 7px 10px; border-radius: 5px; background: #0f1a18; border: 1px solid #2b4a44; font: 400 11.5px var(--mono); color: #b9cfc8; }
+.questpage .sg-t { color: #7fd1c6; font-weight: 600; }
+.questpage .sg-i { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.questpage .sg-i b { color: #e7dcc3; font-weight: 500; }
+.questpage .sg-i.hot { color: #ffb0a4; }
+.questpage .pips { display: inline-flex; gap: 3px; }
+.questpage .pips i { width: 9px; height: 9px; border-radius: 50%; background: #1d302c; box-shadow: inset 0 0 0 1px #3d6a62; }
+.questpage .pips i.done { background: #3d8c86; box-shadow: none; }
+.questpage .pips i.now { background: #7fd1c6; box-shadow: 0 0 6px rgba(127,209,198,.8); }
+.questpage .pips i.fin { background: var(--brass-hi); box-shadow: 0 0 6px rgba(226,184,95,.8); }
+.questpage .pips.sb i { border-radius: 2px; }
+.questpage .pips.sb i.last { box-shadow: inset 0 0 0 1px #9b2f26; }
+.questpage .pips.sb i.hit { background: #c9973f; box-shadow: none; }
+.questpage .pips.sb i.hit.last { background: var(--bad); }
+.questpage .eff { display: inline-block; width: 54px; height: 5px; border-radius: 3px; background: #1d302c; overflow: hidden; }
+.questpage .eff i { display: block; height: 100%; background: #3d8c86; }
+.questpage .meta { font: 400 12px var(--mono); color: var(--text-faint); }
+.writ .body { padding: 12px 26px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+.questpage .sit { font-size: 16.5px; line-height: 1.62; color: #dcd3c1; max-width: 64ch; }
+.hr { height: 1px; background: #2e2620; }
+.lineh { display: flex; flex-direction: column; gap: 3px; }
+.lk { font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-faint); }
+.lv { font-size: 15px; line-height: 1.5; color: #e9e0cb; }
+.writ .btns { position: relative; min-height: 63px; display: flex; gap: 8px; align-items: center; padding: 12px 16px; border-top: 1px solid #2e2620; background: #100d0c; border-radius: 0 0 6px 6px; }
+.consequence { position: absolute; left: 10px; right: 10px; bottom: calc(100% + 6px); z-index: 5; padding: 8px 12px; border-radius: 5px; background: #3a1c19; border: 1px solid var(--bad); color: #ffd9d2; font: 500 12px/1.4 var(--mono); box-shadow: 0 4px 14px rgba(0,0,0,.6); animation: drop-in .18s ease-out; }
+.questpage .ok { margin-left: auto; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; height: 38px; padding: 0 14px; border-radius: 19px; background: #3f6b3a; color: #eaf5e6; font: 600 12px var(--mono); display: flex; align-items: center; white-space: nowrap; }
+.questpage .ok.off { background: #2a251d; color: #8d8472; }
+.btns.arming .ok { display: none; }   /* the 3s confirm owns the row; the consequence strip says what is lost */
+.questpage .ok.lit { background: #3a3222; color: var(--cream); }
+.questpage .ok.good { background: var(--good); color: #0b0d0f; }
+.questpage .ok.even { background: var(--even); color: #0b0d0f; }
+.questpage .ok.part { background: var(--part); color: #0b0d0f; }
+.questpage .ok.bad { background: var(--bad); color: #0b0d0f; }
+/* the moment the last place fills: a level wax stamp scales in over the writ, then lifts away.
+   Resting style = gone, so a reduced-motion player just reads the pill. Never rotated (G6). */
+.sealed { position: absolute; left: 0; right: 0; top: 96px; z-index: 8; display: flex; justify-content: center; pointer-events: none; opacity: 0; animation: q-seal 1.8s ease-out; }
+.sealed span { padding: 10px 26px; border-radius: 8px; background: #8c231b; color: #ffe9cf; font: 700 30px/1 var(--sc); letter-spacing: .28em; box-shadow: inset 0 0 0 3px #b8463a, inset 0 0 0 5px #8c231b, inset 0 0 0 6px #e7a58c, 0 6px 22px rgba(0,0,0,.7); }
+@keyframes q-seal { 0% { opacity: 0; scale: 2.1; } 18% { opacity: 1; scale: .96; } 26% { scale: 1; } 72% { opacity: 1; scale: 1; } 100% { opacity: 0; scale: 1.02; } }
+
+/* short screens (1280×800): the niche and the roll must fit under a cast and three approaches */
+@media (max-height: 840px) {
+  .scene { gap: 10px; padding-top: 12px; }
+  .approaches { gap: 6px; } .appr { padding: 6px 9px 6px 11px; gap: 2px; }
+  .gauge { padding: 10px 26px 12px; gap: 6px; }
+  .hc { height: 112px; } .hc .mono { top: 38px; font-size: 28px; } .clasp { top: 44px; }
+  .arch { width: 116px; height: 160px; border-radius: 58px 58px 8px 8px; padding-bottom: 10px; }
+  .niches { padding-top: 12px; }
+  .writ .wh { padding-top: 12px; gap: 6px; }
+  .titlerow h1 { font-size: 24px; }
+  .questpage .sit { font-size: 15.5px; line-height: 1.55; }
+}

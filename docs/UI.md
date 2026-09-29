@@ -23,16 +23,20 @@ sheet**. The reckoning stays its own page (TEMPO P10).
 
 ## 2 · The map
 
-- A quest is a marker (glyph = kind of work; teal ring = saga; crown = finale) with a name banner, fill
-  pips and a chip: lapse countdown (red at ≤2) · `ready` · `choose` (finale needs its approach).
+- A quest is a marker (glyph = kind of work; teal ring = saga; crown = finale) with a name banner and a token
+  row: one attribute chip per place (solid once filled) and reward-kind icons (captive / recruit / relic / lead / gold).
+  Its chip: lapse countdown (red at ≤2) · `ready · <band>` coloured by the engine's pooled odds band · `choose an ending`
+  · `↻ daily` on standing posts. New arrivals drop in with a NEW ribbon.
 - **Hover** = the gist: kind, the errand, who's placed, odds, pay, lapse, cast. **Click** = the quest page.
 - Locked regions are veiled with what opens them. One quest per region row (banners never overlap).
 - **Leads are NOT map markers** (designer ruling 2026-09-29): they are the board's Leads tab.
 
 ## 3 · The hand — the Sultan card strip
 
-- Always on screen. Four **bags**: Soldiers · Captives · Relics · Stores (keys 1–4). In the fort it opens
-  on Relics (things you set in rooms).
+- Always on screen. Four **bags**: Soldiers · Captives · Relics · Stores (keys 1–4). In the fort a **selected
+  room arms the hand**: it switches to the bag that fills that room, dims what the room refuses and badges what it would
+  gain; a 0-place room shows `Add a place · Ng` in the hand bar. Captive cards carry a state chip (RAW / RACK cN / TAMED /
+  ON SHOW · room); relics on show say where.
 - Overflow squeezes into **slivers** (hover to peek); **All cards** (B) opens the drawer: search, bag
   filter, relics filed into **folders by kind** that fan out, stackables as one card with a count.
 - Card face: name, portrait, level, wound chip, where they're placed. Numbers appear only when they help
@@ -41,13 +45,37 @@ sheet**. The reckoning stays its own page (TEMPO P10).
 
 ## 4 · Who goes where (the QoL that must survive)
 
-Every path is ONE engine call both UIs make (G5):
-- **Drag a soldier over the map** → every marker shows their best place and coins vs bar; **drop** →
+Every path is ONE engine call both UIs make (G5). Words, not coin arithmetic: the pooled quest shows the engine's
+5-word band (likely / coin-flip / a partial at best / long shot / hopeless — `oddsBand`), single places and cards show
+only strong / fair / weak (`slotStrength`), with why-chips (`+roguery`, `−playful`, `wound −N`).
+- **Drag a soldier over the map** → every marker shows their best place, coins and strength (and the quest they
+  would leave); **drop** →
   `Game.sendTo` (their best free place there; moves them off another quest). CLI: `send <q> <merc>`.
 - **Card sheet → "Send them to"** lists their best place on every quest (`Game.placementsFor`). CLI: `fit <merc>`.
-- Quest page: click a place then a card, or drag onto a niche (`assign`); Auto (`autoAssign`); board
-  Auto-fill every quest (`autoAssignAll`). Clicking a card with nothing armed sends them to their best
-  place on the open quest.
+- Quest page: click a place then a card, or drag onto a niche — both `sendTo(q, merc, slot)`: moves a soldier off
+  another quest, and a taken niche SWAPS. Auto (`autoAssign`); board Auto-fill every quest (`autoAssignAll`). Clicking a
+  card with nothing armed sends them to their best place on the open quest. Finale approaches show their facts.
+
+## 4b · Prisoners & relics into rooms (the 2026-09-30 pass)
+
+- One engine planner: `Game.roomPlacementsFor(card)` (every room that could take it, the gain, or the refusal + a
+  one-click fix) and `Game.setInRoom(room, card, idx?)`. CLI: `fit <captive|relic>`, `setin <card> <room> [idx]`.
+- Drop a captive/relic on a **room tile** or a place: tiles glow with the gain (`tamed by c29`, `+2.7 ✦`, `⇄ swap`) and dim
+  with the reason. The card sheet lists **Set them in**. Clicking a placed card opens it; removing is an explicit ✕.
+- The rack shows a countdown; taking a captive off wipes breaking progress, behind a two-step confirm; racks never
+  swap. The **Dungeon panel is the prisoner hub**: Holding → Cells → Rack → Tamed → On show, with engine price quotes.
+- Rooms still start with 0 places; every room shows a ghost `Add a place · Ng`.
+
+## 4c · The turn
+
+- **Next steps** row under the header (`Game.nextSteps`, CLI `next`/`status`): the top 3 concrete actions, each opens
+  its target.
+- **END guard**: when `Game.endWarnings()` is non-empty the first click (or E) arms the seal and lists what END leaves
+  behind; the second ends. CLI: `end` prints the warnings and needs `end!`.
+- **Reckoning**: one block per quest with an outcome stamp and coin row; a **spoils tally** beside PROCEED (gold,
+  prestige, level-ups, wounds, captives, relics, tamed — chips open what they name). CLI prints a TALLY line.
+- Header: the Great Hall pill always shows progress and what the next tier opens; gold/prestige changes float.
+- Every action result is toasted (green ok / amber warn / red refused).
 
 ## 5 · Portraits
 
@@ -65,7 +93,29 @@ Every room shows its drawn icon, cost, **what it does** (one plain line, `src/ga
 
 ## 7 · Checks
 
-- `scripts/uiplay.ts <webPort>` — drives real Chrome on a scratch save: markers, hover, a **real drag**
-  onto the map, quest page arm/place/clear/auto, sheet, leads, drawer search, fort. 21 checks.
+- `scripts/uiplay.ts <webPort>` — drives real Chrome on a scratch save (`scripts/_mkfixture.ts` builds
+  `saves/_fixture.json`: gold, captive rooms, prisoners in every state): real drags onto the map, niches and room tiles,
+  the rack confirm, Set them in, the END guard, reckoning stamps + tally, and one check per 2026-09-30 audit fix. 105 checks.
 - `scripts/_uishots.ts <outDir> <url>` — screenshots every screen; judge from pixels.
 - G6 still binds: no rotated text anywhere (slivers carry no text for this reason).
+
+## 8 · Defaults taken without a designer ruling (2026-09-30) — confirm or overturn
+
+1. Leaving a rack wipes breaking progress (behind a confirm); racks never swap.
+2. Pooled quest = 5 band words even without an Oracle (the Oracle adds the %). Places = strong/fair/weak only.
+3. `Pursue all (n)` exists (vs. standing posts re-posting themselves).
+4. The next-steps row is always shown.
+5. END needs a second click whenever something would go cold, not march, or lacks an ending.
+6. A captive on show still occupies a cell.
+7. New comfort rooms (incl. the Torture chamber) start with 0 places.
+
+Added by the 2026-09-30 audit fixes (doc gaps — confirm or overturn):
+8. Your own bedroom (owner = you) has NO effect: v3 has no levelling player, so FORT §3 / GENERATION_FLOW §B "your
+   bedroom gates YOUR level cap" is unbuilt. It takes no places and no planner ranks it.
+9. Mess hall, Storage and Holding cell have NO effect: their menus are never enforced (`menuGates` `locks:false`). The
+   build list says so; no bag says "build X first"; holding works without a Holding cell.
+10. The END guard also covers a saga's continuation lead going cold, a lead carrying money going cold, a captive handed
+    off from holding and a hireable tavern guest leaving. "Nobody marches while soldiers idle" is NOT guarded.
+11. Auto on a quest the idle soldiers cannot fully man places nobody (Auto-fill-all already undid such placements).
+12. A move into a free place that LOSES prestige is allowed, labelled with the loss (only a full room's swap must gain).
+13. The scroll names a prestige room to build when the Great Hall waits on prestige and none stands; no Tavern hint.

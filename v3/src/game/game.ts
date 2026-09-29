@@ -11,8 +11,8 @@ import {
 import { T, renderTags, parseAiTag, CONCEPT, CONCEPTS, GROUPS, validateTags, type Attribute, hasTag, bandWindow, type TagInstance } from '../engine/tags.js';
 import {
   newFort, ROOM_TYPE, ROOM_TYPES, buildCost, upgradeCost, renovateCost, ghUpgradeCost,
-  excavateCost, maxSlotsAtTier, GH_THRESHOLDS, roomComfort, globalPrestige, capFromComfort,
-  canSlot, defaultWants, breakDuration, marketSellRate, ransomRate, oraclePrecision,
+  excavateCost, maxSlotsAtTier, nextSlotTier, GH_THRESHOLDS, roomComfort, globalPrestige, capFromComfort,
+  canSlot, slotAccepts, defaultWants, breakDuration, marketSellRate, ransomRate, oraclePrecision,
   BUNK_ROSTER_SLOTS, BUNK_CAP_FLOOR, ENDGAME_BAND_LIFT,
   type FortState, type Room,
 } from '../engine/fort.js';
@@ -38,9 +38,9 @@ import {
   type LoreGraph, type LoreNode,
 } from '../engine/lore.js';
 import { rollName, rollPlaceName } from '../engine/names.js';
-import { hasClash, queryMatches } from '../engine/overlap.js';
+import { hasClash, queryMatches, fillScore, acceptsCard } from '../engine/overlap.js';
 import { questXp, grantXp, rollBase, rollGrowthLean, growToLevel } from '../engine/growth.js';
-import { coins, PARTIAL_FRAC, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, explainCoins, type SlotTest, type Outcome, type QuestRollResult } from '../engine/roll.js';
+import { coins, PARTIAL_FRAC, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, explainCoins, oddsBand, slotStrength, coinsWhy, INJURY_FRAC, BAND_TEXT, type SlotTest, type Outcome, type QuestRollResult, type Band, type Strength, type CoinsWhy } from '../engine/roll.js';
 import { sampleKeywords, sampleKeywordsLight, sampleSeed, sampleOpening, sampleGravity, pickTone, sampleArrival, sampleTell, sampleObstacle, sampleShape } from '../ai/keywords.js';
 import type { AiProvider, ResolveQuestInput, ResolveQuestOut, AskSlotOut, QuestWriteOut } from '../ai/provider.js';
 
@@ -50,7 +50,9 @@ export interface LogEntry { cycle: number; kind: string; text: string; questId?:
 // A pursuit is a JOB. In-memory only — never in GameState, never saved (N3: work does not survive
 // closing the game; the lead comes back). The UIs render the "being worked" state off jobs().
 export type JobState = 'queued' | 'running' | 'done' | 'failed';
-export interface Job { id: string; leadId: string; title: string; state: JobState; questId?: string; error?: string }
+/** `seq` = settle order (1, 2, …) once done or failed — a surface announces every job with a seq
+ *  above the last it announced (Game.arrivals); `questTitle` = the card that landed */
+export interface Job { id: string; leadId: string; title: string; state: JobState; questId?: string; questTitle?: string; error?: string; seq?: number }
 interface JobRec {
   job: Job;
   lead: Lead;
@@ -66,6 +68,8 @@ export const STAGE_TTL_TAVERN = 5;
 export const STAGE_TTL_FINALE = 6;
 export const CONTINUATION_TTL_BONUS = 6;   // continuation leads outlive fresh ones a bit
 export const QUEST_TTL = 10;               // pursued quests lapse after this many cycles (IMPL #1)
+export const STALL_LIMIT = 3;              // a part-filled quest that fails to march this many ENDs running is set aside
+export const LAPSE_URGENT = 2;             // a quest's countdown turns urgent (red) at this many cycles left
 export const INTERROGATE_BASE = 30;        // 🛠 priced per-captive action
 export const INTERROGATE_FRAC = 0.1;
 
@@ -79,7 +83,126 @@ interface Resolution {
   fate?: FinaleFate;   // finales: decided BEFORE narration (P11)
   rolled: QuestRollResult;   // the dice, shown in the reveal (loss must be OWNED — DESIGN §5)
 }
-export interface Breaking { cardId: string; roomId: string; doneAtCycle: number }
+/** startCycle = when they went on (older saves: absent) — the rack's progress is doneAt−start, never
+ *  the room's CURRENT duration, which moves whenever the rack's contents do */
+export interface Breaking { cardId: string; roomId: string; doneAtCycle: number; startCycle?: number }
+
+// ---- view contracts both UIs read (the engine's verdicts, never re-derived client-side) ---------
+
+/** the ONE thing that would clear a refusal: an engine action (a button) or a place to go.
+ *  `block` on an action fix = why that action itself can't run yet (null = it can, right now). */
+export type Fix =
+  | { action: 'upgrade'; roomId: string; cost: number; label: string; block: string | null }
+  | { action: 'build'; type: string; cost: number; label: string; block: string | null }
+  | { action: 'excavate'; cost: number; label: string; block: string | null }
+  // tier = the Great Hall tier this fix is about (the one that actually delivers what it promises)
+  | { action: 'gh'; cost: number; label: string; block: string | null; tier: number }
+  | { screen: 'fort' | 'build' | 'leads' | 'map'; id?: string; label: string };
+/** a refusal said BEFORE the click, with what would fix it */
+export interface Block { reason: string; fix: Fix | null }
+
+/** one soldier's best free place on one quest (Game.placementsFor) */
+export interface Placement {
+  questId: string; title: string; idx: number; attr: string; coins: number; bar: number;
+  strength: Strength;
+  here: boolean;         // they already stand in this place
+  from: { questId: string; title: string } | null;   // the OTHER quest they stand on now (sending leaves it)
+}
+/** one soldier against one quest place (Game.slotFits) */
+export interface SlotFit {
+  id: string; name: string; coins: number; explain: string;
+  strength: Strength; why: CoinsWhy;
+  blocked: string | null;                                        // canTake's refusal
+  gated: boolean;        // refused ONLY by the finale's approach gate (otherwise legal: an approach card may name them)
+  from: { questId: string; idx: number; title: string } | null;  // where they stand now
+}
+export interface QuestOdds {
+  coins: number; bar: number; success: number | null; partial: number | null; precision: 0 | 1 | 2;
+  band: Band | null;     // the pooled verdict, once every active place is filled
+  partialAt: number;     // heads a partial needs (PARTIAL_FRAC × bar)
+  filled: number; of: number;
+}
+export type RewardKindTag = 'gold' | 'captive' | 'recruit' | 'relic' | 'lead';
+
+export type RoomKind = 'rack' | 'prestige' | 'function';
+/** where a relic or captive could go (Game.roomPlacementsFor) — ONE row per comfort room, the
+ *  best move into it, previewed by actually making the full move and reverting it */
+export interface RoomPlacement {
+  roomId: string | null;       // null = a room you don't have yet (its fix builds it)
+  roomName: string; roomType: string; kind: RoomKind;
+  idx: number | null;          // the place it would take (null when refused)
+  swapWith: string | null; swapWithName: string | null;
+  ok: boolean;
+  reason: string | null;       // why not, in the player's words
+  fix: Fix | null;
+  here: boolean;               // it already sits in this room
+  breaksAtCycle: number | null;                  // racks: tamed at this cycle
+  prestigeBefore: number; prestigeAfter: number; // GLOBAL prestige, the whole move modelled
+  comfortBefore: number; comfortAfter: number;   // the target room
+  gain: number;                                  // prestigeAfter − prestigeBefore
+  effectAfter: string | null;                    // the room's effect label after the move
+  matched: string[];                             // the card's tags this room wants
+  label: string;               // one line for a chip: 'tamed by cycle 29' · '+2.7 prestige' · 'swap for X · +0.4 prestige' ·
+                               // 'heals ×1.2 · −2.7 prestige' · the reason
+  badge: string;               // the SHORT signed version for a card badge: 'tamed by c29' · '−2.1 prestige' · 'heals ×1.2'
+  tone: 'good' | 'bad' | 'neutral';   // the badge's colour: what the move does to the fort (a prestige loss is bad)
+}
+export type CaptiveState = 'raw' | 'breaking' | 'tamed' | 'onShow';
+
+/** R5: what END would throw away (Game.endWarnings) — the seal's confirm and the CLI's `end!`.
+ *  Quests (cold / short / no ending), a saga's continuation lead or a lead worth money going cold,
+ *  a captive handed off from holding, a hireable guest leaving the tavern. */
+export interface EndWarning {
+  key: string;                  // unique per warning (quest id, lead id, card id)
+  questId: string | null;       // the quest, for quest warnings
+  title: string;
+  why: 'lapses' | 'short' | 'needs-approach' | 'lead-lapses' | 'handoff' | 'leaves';
+  filled: number; of: number;   // a quest's active places (0/0 otherwise)
+  lapsesNow: boolean;           // something goes for good at this END
+  text: string;                 // the one line both UIs print: 'goes cold this END — nobody placed'
+  target: NextStep['target'];   // where to go to deal with it
+}
+/** one concrete thing to do next (Game.nextSteps). `act` = one click does it: a POST /api/action
+ *  {type, args} for the web, the typed command `cli` for the text UI; `block` = why it can't run yet */
+export interface NextStep {
+  kind: 'build' | 'approach' | 'man' | 'pursue' | 'holding' | 'hire' | 'gh' | 'setin' | 'rack' | 'addplace' | 'end';
+  text: string;
+  detail: string | null;
+  target: { screen: 'map' | 'leads' | 'quest' | 'fort' | 'room' | 'build' | 'holding' | 'tavern'; questId?: string; roomId?: string; type?: string; cardId?: string };
+  urgent: boolean;
+  /** `then` = what still has to follow the one click (a dig that makes room for a build) */
+  act: { type: string; args: (string | number)[]; label: string; cli: string; block: string | null; then?: string | null } | null;
+}
+/** one marching quest, as the reckoning rolled it — the verdict a page can colour (SUCCESS / PARTIAL /
+ *  FAILURE) without parsing glyphs. `from`/`to` = its block's line range in the reckoning's `lines`. */
+export interface ReckonMeta {
+  questId: string; title: string; outcome: Outcome;
+  heads: number; coins: number; bar: number; partialAt: number;
+  party: string[]; partyIds: string[];
+  isFinale: boolean; chainId: string | null;
+  from: number; to: number;
+}
+/** the cycle, totalled from a before/after snapshot (the tally strip and the CLI TALLY line) */
+export interface CycleSummary {
+  cycle: number;
+  goldBefore: number; goldAfter: number;
+  prestigeBefore: number; prestigeAfter: number;
+  outcomes: { success: number; partial: number; failure: number };
+  levelUps: { id: string; name: string; level: number }[];
+  wounds: { id: string; name: string; tiers: number }[];
+  newLeads: number; newLeadIds: string[];
+  captivesTaken: { id: string; name: string }[];   // into holding (accept or ransom them)
+  recruits: { id: string; name: string }[];        // waiting at the tavern
+  relicsGained: { id: string; name: string }[];
+  tamed: { id: string; name: string }[];           // came off the rack, ready to be set in a room
+  lapsed: string[];                                // quests lost (a faucet's is not a loss — not listed)
+  stalled: string[];                               // part-filled quests that did not march
+  leadsCold: string[];                             // leads that went cold
+  handedOff?: { id: string; name: string; gold: number }[];   // captives whose holding ran out (older archives: absent)
+  debts?: { id: string; name: string; amount: number }[];     // debts taken on this cycle (older archives: absent)
+  setbacks?: { chainId: string; title: string; failures: number; budget: number }[];   // saga beats that failed
+}
+export interface ReckoningRecord { cycle: number; lines: string[]; meta: ReckonMeta[]; summary: CycleSummary | null }
 
 export interface GameState {
   seed: number;
@@ -108,7 +231,7 @@ export interface GameState {
   /** the last dozen reckonings, kept so a player can re-read what happened after they have
    *  moved on. The GUI's `⚄ last reckoning` was one cycle deep and lived in server memory, so it
    *  vanished on restart and could never look further back than the cycle just resolved. */
-  reckonings?: { cycle: number; lines: string[] }[];
+  reckonings?: { cycle: number; lines: string[]; meta?: ReckonMeta[]; summary?: CycleSummary }[];
   /** the cycle a lead was last put back by abandoning its quest — the re-roll is once a cycle */
   lastRerollCycle?: number;
   log: LogEntry[];
@@ -180,9 +303,17 @@ export class Game {
     // resolution fleshed and staged the quest's copy while the tavern read the stale one: Keesa's
     // job-born history ("pinned under bark bindings until Felawen cut her free") was lost and then
     // overwritten by a generic flesh pass (playtest 2026-09-25). Re-link to the one true card.
+    // lint telemetry is the developer's, not the player's log (kind 'dev'); older saves logged it
+    // under 'chain'
+    for (const l of st.log ?? []) {
+      if (l.kind === 'chain' && /^(saga card lint|saga draft |card body echoed)/.test(l.text)) l.kind = 'dev';
+    }
     const byId = new Map((st.cards ?? []).map(c => [c.id, c]));
     for (const q of st.quests ?? []) {
       q.rewardCards = (q.rewardCards ?? []).map(c => byId.get(c.id) ?? c);
+      // a trait is never favored AND clashing on one test (generation filters it since 2026-09-25;
+      // saves written before that still carry finale plans like 'helps: social · hurts: social')
+      for (const s of q.slots ?? []) s.test.clashing = (s.test.clashing ?? []).filter(c => !s.test.favored.includes(c));
     }
   }
 
@@ -283,23 +414,28 @@ export class Game {
   // Gate rooms open menus (GENERATION_FLOW §12.1 / DESIGN capability list). "open" also honors
   // content the game already put in front of the player (starter leads, a staged finale focal)
   // so a locked menu can never hide owned cards.
-  menuGates(): { key: string; open: boolean; need: string }[] {
-    const g = (key: string, roomId: string, orContent = false) =>
-      ({ key, open: this.hasRoom(roomId) || orContent, need: ROOM_TYPE[roomId]!.name });
+  /** `locks` = the gate room ACTUALLY holds something back. False for a gate the engine never
+   *  enforces (a relic drops, sits and sells with no Storage; holding works with no Holding cell; the
+   *  roster is always open) — a UI must never say "build X first" for one of those. */
+  menuGates(): { key: string; open: boolean; need: string; locks: boolean }[] {
+    const g = (key: string, roomId: string, orContent = false, locks = true) =>
+      ({ key, open: this.hasRoom(roomId) || orContent, need: ROOM_TYPE[roomId]!.name, locks });
     return [
       g('quests', 'map-room'),
       // pre-Map-room the honest hint is the Map room (it brings the starter packet)
       g('leads', this.hasRoom('map-room') ? 'lead-room' : 'map-room', this.visibleLeads().length > 0),
       g('recruits', 'tavern', this.state.tavern.length > 0),
-      g('staging', 'holding-cell', this.state.holding.length > 0),
+      // ⚠ doc-gap: captives land in holding and are ransomed, sold or accepted with no Holding cell
+      g('staging', 'holding-cell', this.state.holding.length > 0, false),
       g('captives', 'dungeon', this.captives().length > 0),
-      g('items', 'storage', this.state.cards.some(c => cardType(c) === 'relic' && c.location.kind === 'held')),
+      // ⚠ doc-gap: FORT §5 gives Storage the stores, but relics are kept and sold without one
+      g('items', 'storage', this.state.cards.some(c => cardType(c) === 'relic' && c.location.kind === 'held'), false),
       g('lore', 'library'),
       // FORT §5 / LORE §5: the Chronicle room exposes the archive (was a dead building)
       g('chronicle', 'chronicle'),
       // ⚠ doc-gap: §12.1 gives Mess hall → merc list, but FOCUS is a base function (§12.1 CUT
       // note) and lives in the roster menu — always open pending a designer ruling.
-      g('roster', 'mess-hall', true),
+      g('roster', 'mess-hall', true, false),
     ];
   }
 
@@ -408,31 +544,62 @@ export class Game {
         failures: c.failures, failureBudget: c.failureBudget,
         situation: c.story.currentSituation, known: c.story.knownToPlayer, goal: c.bible.goal,
         met: c.bible.cast.filter(p => met.has(p.name)).map(p => ({ name: p.name, who: p.who })),
+        // the saga strip's link back into play: its step on the map, or the lead that continues it
+        ...this.chainNext(c),
       };
     });
+  }
+  /** where a saga stands in play — its open quest, the lead that continues it, and one word for
+   *  what the player does next ('choose the ending' · 'on the map' · 'being written' · 'a lead to
+   *  pursue' · 'waiting for word' · 'finished' · 'slipped away') */
+  private chainNext(c: Chain): { questId: string | null; leadId: string | null; next: string; live: boolean } {
+    const live = c.state === 'active' || c.state === 'finale-pending';
+    const q = this.state.quests.find(x => x.state === 'open' && x.chainId === c.id);
+    const lead = this.state.leads.find(l => l.chainInfo.kind === 'continues' && (l.chainInfo as { chainId: string }).chainId === c.id);
+    const writing = !!lead && this.jobRecs.some(r => r.job.leadId === lead.id && (r.job.state === 'queued' || r.job.state === 'running'));
+    const next = c.state === 'done' ? 'finished' : c.state === 'slipped' ? 'slipped away'
+      : q ? (q.approaches && !q.chosenApproach ? 'choose the ending' : 'on the map')
+      : writing ? 'being written' : lead ? 'a lead to pursue' : 'waiting for word';
+    return { questId: q?.id ?? null, leadId: lead?.id ?? null, next, live };
   }
 
   // ---- fort actions ---------------------------------------------------------------------------
 
-  buildableTypes(): { type: string; cost: number; reason?: string }[] {
+  /** every room type and whether it can be built now. `blocker` names the KIND of refusal (the
+   *  build list sorts on it: null → cell → gold → tier/region); `firstPlaceCost` = what a comfort
+   *  room's first place costs (they are built with none). */
+  buildableTypes(): { type: string; cost: number; reason?: string; blocker: 'gold' | 'cell' | 'tier' | 'region' | 'built' | null; ghTier: number; firstPlaceCost: number | null; owners?: { id: string; name: string }[] }[] {
     const t = this.state.fort.ghTier;
+    // a region room waits on that region's Scouting lodge (it is what writes the region into
+    // unlockedRegions) — say the ROOM, never "open X first" while X already shows on the map
+    const lodgeFirst = (id: string) => `build the ${ROOM_TYPE[`scouting-${id}`]?.name ?? `Scouting lodge (${REGION[id]?.name ?? id})`} first`;
     return ROOM_TYPES.filter(rt => rt.id !== 'great-hall').map(rt => {
       const cost = buildCost(rt);
       let reason: string | undefined;
-      if (rt.ghTier > t) reason = `needs Great Hall T${rt.ghTier}`;
+      let blocker: 'gold' | 'cell' | 'tier' | 'region' | 'built' | null = null;
+      if (rt.ghTier > t) { reason = `needs Great Hall T${rt.ghTier}`; blocker = 'tier' }
       else if (rt.region && rt.roomKind === 'scouting') {
         const region = REGION[rt.region]!;
-        if (region.prev && !this.state.unlockedRegions.includes(region.prev)) reason = `open ${region.prev} first`;
+        if (region.prev && !this.state.unlockedRegions.includes(region.prev)) { reason = lodgeFirst(region.prev); blocker = 'region' }
       } else if (rt.region && rt.roomKind !== 'scouting' && !this.state.unlockedRegions.includes(rt.region)) {
-        reason = `open ${rt.region} first`;
+        reason = lodgeFirst(rt.region); blocker = 'region';
       }
-      if (!reason && !rt.multiBuild && this.hasRoom(rt.id)) reason = 'already built';
-      if (!reason && cost > this.gold()) reason = `costs ${cost}g`;
+      if (!reason && !rt.multiBuild && this.hasRoom(rt.id)) { reason = 'already built'; blocker = 'built' }
+      const owners = rt.benefit === 'cap' ? this.bedOwners() : undefined;
+      if (!reason && owners && !owners.length) { reason = 'everyone has a bedroom'; blocker = 'built' }
+      if (!reason && cost > this.gold()) { reason = `costs ${cost}g (short ${cost - this.gold()}g)`; blocker = 'gold' }
       // the list said "✓ buildable" for every room while the fort had no free cell, and the
       // build then failed — say so where the player is choosing (playtest 2026-09-25)
-      if (!reason && !this.freeCells().length) reason = `no free cell — excavate first (${excavateCost(this.state.fort.cells.length)}g)`;
-      return { type: rt.id, cost, reason };
+      if (!reason && !this.freeCells().length) { reason = `no free cell — excavate first (${excavateCost(this.state.fort.cells.length)}g)`; blocker = 'cell' }
+      return { type: rt.id, cost, reason, blocker, ghTier: rt.ghTier, firstPlaceCost: rt.species === 'comfort' ? upgradeCost(rt, 0) : null, ...(owners ? { owners } : {}) };
     });
+  }
+
+  /** who a bedroom can be built for right now — the SAME rule build() enforces (a merc of yours,
+   *  or you, without one already). Soldiers first: theirs raise a level cap and the roster. */
+  bedOwners(): { id: string; name: string }[] {
+    const has = (id: string) => this.state.fort.rooms.some(r => ROOM_TYPE[r.type]!.benefit === 'cap' && r.ownerId === id);
+    return [...this.roster().map(m => ({ id: m.id, name: m.name })), { id: 'you', name: 'you' }].filter(o => !has(o.id));
   }
 
   freeCells(): { floor: number; col: number }[] {
@@ -440,11 +607,13 @@ export class Game {
       !this.state.fort.rooms.some(r => r.cell.floor === cell.floor && r.cell.col === cell.col));
   }
 
-  build(typeId: string, ownerId?: string): { ok: boolean; msg: string } {
+  build(typeId: string, ownerId?: string): { ok: boolean; msg: string; id?: string } {
     const rt = ROOM_TYPE[typeId];
     if (!rt) return { ok: false, msg: 'no such room type' };
     const check = this.buildableTypes().find(b => b.type === typeId);
     if (check?.reason) return { ok: false, msg: check.reason };
+    // no owner named: the first one the engine offers (bedOwners — the list both UIs show)
+    if (rt.benefit === 'cap') ownerId ??= this.bedOwners()[0]?.id ?? 'you';
     if (rt.benefit === 'cap') {
       const owner = ownerId ?? 'you';
       if (this.state.fort.rooms.some(r => ROOM_TYPE[r.type]!.benefit === 'cap' && r.ownerId === owner))
@@ -462,7 +631,8 @@ export class Game {
     };
     this.state.fort.rooms.push(room);
     this.onBuilt(rt, room);
-    return { ok: true, msg: `${rt.name} built (${room.id})` };
+    const place = rt.species === 'comfort' ? ` — no places yet: add one for ${upgradeCost(rt, 0)}g` : '';
+    return { ok: true, msg: `${rt.name} built${place}`, id: room.id };
   }
 
   private onBuilt(rt: (typeof ROOM_TYPES)[number], room: Room) {
@@ -499,18 +669,20 @@ export class Game {
     }
   }
 
-  upgrade(roomId: string): { ok: boolean; msg: string } {
+  upgrade(roomId: string): { ok: boolean; msg: string; id?: string } {
     const room = this.room(roomId);
     if (!room) return { ok: false, msg: 'no such room' };
     const rt = ROOM_TYPE[room.type]!;
     if (rt.species !== 'comfort' && rt.species !== 'capacity') return { ok: false, msg: 'not upgradable (pure gate)' };
     if (rt.species === 'capacity') return { ok: false, msg: 'cells are not upgraded — build more' };
+    if (!this.roomHasEffect(room)) return { ok: false, msg: this.noEffectReason(room) };
     const max = maxSlotsAtTier(this.state.fort.ghTier);
-    if (room.slots.length >= max) return { ok: false, msg: `slot depth gated: max ${max} at GH T${this.state.fort.ghTier}` };
+    if (room.slots.length >= max) return { ok: false, msg: this.maxPlacesReason(room) };
     const cost = upgradeCost(rt, room.slots.length);
-    if (!this.spendGold(cost)) return { ok: false, msg: `costs ${cost}g` };
+    if (!this.spendGold(cost)) return { ok: false, msg: `costs ${cost}g (short ${cost - this.gold()}g)` };
     room.slots.push(null);
-    return { ok: true, msg: `${rt.name} upgraded: ${room.slots.length} slot(s)` };
+    const n = room.slots.length;
+    return { ok: true, msg: `${rt.name} gains a ${rt.benefit === 'break' ? 'rack' : 'place'} (${n} now, ${cost}g)`, id: room.id };
   }
 
   async renovate(roomId: string, style: string): Promise<{ ok: boolean; msg: string }> {
@@ -553,10 +725,8 @@ export class Game {
 
   ghUpgrade(): { ok: boolean; msg: string } {
     const to = this.state.fort.ghTier + 1;
-    const need = GH_THRESHOLDS[to];
-    if (need === undefined) return { ok: false, msg: 'the Great Hall is at its final tier' };  // (!need read a 0 threshold as "final")
-    const p = this.prestige();
-    if (p < need) return { ok: false, msg: `needs prestige ${need} (have ${p.toFixed(0)})` };
+    const block = this.ghBlock();
+    if (block) return { ok: false, msg: block.reason };
     const cost = ghUpgradeCost(to);
     if (!this.spendGold(cost)) return { ok: false, msg: `costs ${cost}g` };
     this.state.fort.ghTier = to;
@@ -570,44 +740,447 @@ export class Game {
     return { ok: true, msg: `Great Hall → T${to}${unlocked.length ? ` — newly within reach: ${unlocked.join(', ')}` : ''}` };
   }
 
-  slot(roomId: string, slotIdx: number, cardId: string): { ok: boolean; msg: string } {
-    const room = this.room(roomId);
-    const card = this.card(cardId);
-    if (!room || !card) return { ok: false, msg: 'not found' };
-    if (slotIdx < 0 || slotIdx >= room.slots.length) return { ok: false, msg: 'no such slot' };
-    if (room.slots[slotIdx]) return { ok: false, msg: 'slot occupied' };
-    if (card.location.kind === 'quest') return { ok: false, msg: 'on a quest' };
-    if (card.location.kind === 'held' && card.location.state !== 'roster' && card.location.state !== 'inventory')
-      return { ok: false, msg: 'not yours yet (staged/limbo cards must be accepted first)' };
-    const rt = ROOM_TYPE[room.type]!;
-    if (rt.benefit === 'break') {
-      // torture chamber racks take RAW captives (the breaking pipe, §21.4)
-      if (card.character?.role !== 'captive') return { ok: false, msg: 'racks take captives' };
-      if (hasTag(card.tags, 'obedient')) return { ok: false, msg: 'already broken' };
-      this.unslotCard(card);
-      room.slots[slotIdx] = card.id;
-      card.location = { kind: 'room', roomId, slot: slotIdx };
-      const done = this.state.cycle + breakDuration(this.comfort(room));
-      this.state.breaking.push({ cardId: card.id, roomId, doneAtCycle: done });
-      return { ok: true, msg: `${card.name} on the rack — breaks c${done}` };
-    }
-    if (!canSlot(room, card)) return { ok: false, msg: 'slot refuses it (mercs never staff rooms; captives must be obedient)' };
-    this.unslotCard(card);
-    room.slots[slotIdx] = card.id;
-    card.location = { kind: 'room', roomId, slot: slotIdx };
-    return { ok: true, msg: `${card.name} → ${rt.name} #${slotIdx}` };
+  // ---- setting cards in rooms (FORT §2/§18) — ONE path: setInRoom -------------------------------
+
+  /** the old primitive, kept for callers: exactly setInRoom with a place named */
+  slot(roomId: string, slotIdx: number, cardId: string): { ok: boolean; msg: string; warn?: boolean } {
+    return this.setInRoom(roomId, cardId, slotIdx);
   }
 
-  unslot(roomId: string, slotIdx: number): { ok: boolean; msg: string } {
+  /** what a room's places are for — null for a room whose places would do nothing (gates, cells,
+   *  landmarks, and a bedroom with no soldier to level: YOUR bedroom, whose comfort v3 reads nowhere) */
+  roomKind(room: Room): RoomKind | null {
+    const rt = ROOM_TYPE[room.type]!;
+    if (rt.species !== 'comfort' || !this.roomHasEffect(room)) return null;
+    return rt.benefit === 'break' ? 'rack' : rt.benefit === 'prestige' ? 'prestige' : 'function';
+  }
+  /** does filling this comfort room change anything the game reads? A bedroom's comfort is its
+   *  owner's level cap (capOf) — and only a merc HAS a cap.
+   *  ⚠ doc-gap (FORT §3 / GENERATION_FLOW §B: "your bedroom … gates YOUR level cap"): v3 has no
+   *  levelling player, so the owner=you bedroom has no effect — flagged for a designer ruling. */
+  private roomHasEffect(room: Room): boolean {
+    const rt = ROOM_TYPE[room.type]!;
+    return !(rt.benefit === 'cap' && (!room.ownerId || room.ownerId === 'you'));
+  }
+  private noEffectReason(room: Room): string {
+    return ROOM_TYPE[room.type]!.benefit === 'cap' ? 'your own bedroom has no effect yet — only a soldier’s bedroom raises a cap' : 'no effect';
+  }
+  /** at the tier's slot depth: which tier gives MORE places (nextSlotTier), in the player's words */
+  private maxPlacesReason(room: Room): string {
+    const t = this.state.fort.ghTier, max = maxSlotsAtTier(t), nt = nextSlotTier(t);
+    const noun = ROOM_TYPE[room.type]!.benefit === 'break' ? 'racks' : 'places';
+    return `max ${max} ${noun} at GH T${t}${nt ? ` — more at GH T${nt}${nt > t + 1 ? ` (T${t + 1} adds none)` : ''}` : ' — the deepest a room goes'}`;
+  }
+
+  /** where a captive stands: raw in the cells, breaking on a rack, tamed, or on show in a room */
+  captiveState(cardId: string): { state: CaptiveState; doneAt: number | null; breakTotal: number | null; whereId: string | null; whereName: string | null } | null {
+    const c = this.card(cardId);
+    if (c?.character?.role !== 'captive') return null;
+    const b = this.state.breaking.find(x => x.cardId === cardId);
+    const room = c.location.kind === 'room' ? this.room(c.location.roomId) : undefined;
+    const whereName = room ? ROOM_TYPE[room.type]!.name : null;
+    if (b) return { state: 'breaking', doneAt: b.doneAtCycle, breakTotal: this.breakTotal(b), whereId: room?.id ?? b.roomId, whereName };
+    if (room) return { state: 'onShow', doneAt: null, breakTotal: null, whereId: room.id, whereName };
+    return { state: hasTag(c.tags, 'obedient') ? 'tamed' : 'raw', doneAt: null, breakTotal: null, whereId: null, whereName: null };
+  }
+  /** how many cycles THIS captive's breaking takes — fixed when they went on (an older save's
+   *  record has no start: the rack's duration now is the best guess) */
+  private breakTotal(b: Breaking): number {
+    if (b.startCycle !== undefined) return Math.max(1, b.doneAtCycle - b.startCycle);
+    const r = this.room(b.roomId);
+    return Math.max(1, b.doneAtCycle - this.state.cycle, r ? breakDuration(this.comfort(r)) : 1);
+  }
+
+  /** the room a card sits in, by name (relics and captives on show) */
+  whereName(cardId: string): string | null {
+    const c = this.card(cardId);
+    if (c?.location.kind !== 'room') return null;
+    const r = this.room(c.location.roomId);
+    return r ? ROOM_TYPE[r.type]!.name : null;
+  }
+
+  /** what taking this card off its rack throws away — the two-step confirm's text (R1), or null
+   *  when it is not on a rack */
+  rackLoss(cardId: string): string | null {
+    const b = this.state.breaking.find(x => x.cardId === cardId);
+    return b ? `breaking lost (was due c${b.doneAtCycle})` : null;
+  }
+
+  /** a room's effect, one plain label from the engine curves — the tile subline, the panel head,
+   *  the CLI `room` line */
+  roomEffect(room: Room, comfort?: number): string {
+    const rt = ROOM_TYPE[room.type]!;
+    if (rt.species === 'capacity') return `holds ${rt.cellSlots ?? 0} · ${this.captives().length}/${this.captiveCapacity()} held`;
+    if (rt.species !== 'comfort') return '';
+    if (!this.roomHasEffect(room)) return 'no effect yet';
+    // the label is the SAME curve the effect reads, at the room's comfort (0 when it has no
+    // places): an Oracle with no places already gives coarse odds, a Market already sells at 50%
+    const c = comfort ?? this.comfort(room);
+    const none = !room.slots.length;
+    const eff = ((): string => {
+      switch (rt.benefit) {
+        case 'prestige': return c > 0 ? `+${c.toFixed(1)} prestige` : '';
+        case 'cap': return `level cap ${Math.max(BUNK_CAP_FLOOR, capFromComfort(c))}`;
+        case 'heal': return `heals ×${(infirmaryHealRate(c) / REST_HEAL_PER_CYCLE).toFixed(1)}`;
+        case 'prices': return `relics sell at ${Math.round(marketSellRate(c) * 100)}%`;
+        case 'ransom': return `ransoms at ${Math.round(ransomRate(c) * 100)}%`;
+        case 'break': return none ? '' : `breaks in ${breakDuration(c)} cycles`;
+        case 'leads': return `${Math.round(this.interrogateLift(c) * 100)}% chance of a richer lead`;
+        case 'odds': return oraclePrecision(c) === 2 ? 'exact odds' : 'coarse odds (exact at comfort 15)';
+        case 'payheal': return `pay-heal · +${(0.25 * c).toFixed(1)} prestige`;
+        default: return c > 0 ? `comfort ${c.toFixed(1)}` : '';
+      }
+    })();
+    if (none) return eff ? `${eff} · no places yet` : 'no places yet';
+    return eff || (rt.benefit === 'prestige' ? 'empty — no prestige yet' : '');
+  }
+  /** interrogation room: the chance a lead comes back one rarity richer */
+  private interrogateLift(comfort: number): number { return Math.min(0.6, comfort / 40) }
+
+  /** what "Add a place" costs here, as a fix — or, at the tier's depth, raising the Great Hall */
+  addPlaceFix(room: Room): Fix | null {
+    const rt = ROOM_TYPE[room.type]!;
+    if (rt.species !== 'comfort' || !this.roomHasEffect(room)) return null;
+    const t = this.state.fort.ghTier;
+    if (room.slots.length >= maxSlotsAtTier(t)) {
+      // at the tier's depth the fix is the tier that ADDS places — only the next raise is a
+      // one-click fix, and only when that raise is the one that deepens the room
+      const nt = nextSlotTier(t);
+      if (nt === null) return null;
+      if (nt === t + 1) return this.ghFix();
+      const noun = rt.benefit === 'break' ? 'racks' : 'places';
+      let cost = 0;
+      for (let x = t + 1; x <= nt; x++) cost += ghUpgradeCost(x);
+      return { action: 'gh', tier: nt, cost, label: `More ${noun} at GH T${nt} · ${cost}g`, block: `GH T${t + 1} adds no ${noun} — they come at T${nt}` };
+    }
+    const cost = upgradeCost(rt, room.slots.length);
+    const gold = this.gold();
+    return { action: 'upgrade', roomId: room.id, cost, label: `${rt.benefit === 'break' ? 'Add a rack' : 'Add a place'} · ${cost}g`, block: gold < cost ? `short ${cost - gold}g` : null };
+  }
+  /** why "Add a place" can't run now ('short 26g' | 'max 2 places at GH T2 — more at GH T4'), null when it can */
+  upgradeBlock(room: Room): string | null {
+    const rt = ROOM_TYPE[room.type]!;
+    if (rt.species !== 'comfort') return 'not upgradable';
+    if (!this.roomHasEffect(room)) return this.noEffectReason(room);
+    if (room.slots.length >= maxSlotsAtTier(this.state.fort.ghTier)) return this.maxPlacesReason(room);
+    const cost = upgradeCost(rt, room.slots.length);
+    return this.gold() < cost ? `short ${cost - this.gold()}g` : null;
+  }
+  /** "Build a X" as a fix, carrying buildableTypes' own refusal */
+  buildFix(type: string): Fix | null {
+    const rt = ROOM_TYPE[type];
+    if (!rt) return null;
+    const b = this.buildableTypes().find(x => x.type === type);
+    return { action: 'build', type, cost: buildCost(rt), label: `Build a ${rt.name} · ${buildCost(rt)}g`, block: b?.reason ?? null };
+  }
+  /** "Raise the Great Hall" as a fix (null at the final tier) */
+  private ghFix(): Fix | null {
+    const to = this.state.fort.ghTier + 1;
+    if (GH_THRESHOLDS[to] === undefined) return null;
+    const cost = ghUpgradeCost(to);
+    return { action: 'gh', tier: to, cost, label: `Raise the Great Hall to T${to} · ${cost}g`, block: this.ghBlock()?.reason ?? null };
+  }
+
+  /** the card's own refusal for a room, before any question of free places (null = it could go) */
+  private roomRefusal(room: Room, card: Card): string | null {
+    const rt = ROOM_TYPE[room.type]!;
+    const kind = this.roomKind(room);
+    if (!kind) return rt.species === 'capacity' ? 'cells hold captives by themselves — accepted captives already count here'
+      : rt.species === 'comfort' ? this.noEffectReason(room) : `the ${rt.name} has no places`;
+    if (card.character && card.character.role !== 'captive') return 'soldiers never staff rooms';
+    if (kind === 'rack') {
+      if (card.character?.role !== 'captive') return 'captives only';
+      if (hasTag(card.tags, 'obedient')) return 'raw captives only — already tamed';
+      const b = this.state.breaking.find(x => x.cardId === card.id);
+      if (b) return `already on the rack — tamed by cycle ${b.doneAtCycle}`;
+      return null;
+    }
+    if (card.character?.role === 'captive' && !hasTag(card.tags, 'obedient')) return 'tamed captives only — break them on a rack first';
+    if (!acceptsCard(slotAccepts(room), card.tags)) return `the ${rt.name} doesn't take this kind`;
+    return null;
+  }
+
+  /** what `read` says after `move` runs on the slots of `rooms` — the move is made for real on
+   *  those slot arrays and reverted, so a preview can never drift from what the engine reads.
+   *  Only the rooms a move can touch are snapshotted (a late fort previews thousands of moves). */
+  private previewSlots<T>(rooms: Room[], move: () => void, read: () => T): T {
+    const snap = rooms.map(r => [...r.slots]);
+    try { move(); return read() } finally { rooms.forEach((r, i) => { r.slots = snap[i]! }) }
+  }
+  /** what one room adds to global prestige — globalPrestige is exactly the sum of these, and a
+   *  room's comfort reads only its own places (+ its neighbours' TYPES), so a move changes prestige
+   *  by the change in the rooms it touches */
+  private prestigeOf(room: Room, comfort?: number): number {
+    const rt = ROOM_TYPE[room.type]!;
+    if (rt.benefit !== 'prestige' && !rt.smallPrestige) return 0;
+    const c = comfort ?? this.comfort(room);
+    return rt.benefit === 'prestige' ? c : 0.25 * c;
+  }
+
+  /** the slot-level half of a move: card into room[idx]; an occupant goes to the card's old room
+   *  place when it may legally sit there (a true swap), else back to the hand. Returns where the
+   *  displaced card went (null = no occupant). Used by BOTH the preview and setInRoom. */
+  private moveSlots(card: Card, room: Room, idx: number): { displaced: string | null; to: { roomId: string; slot: number } | null } {
+    const src = card.location.kind === 'room' ? { room: this.room(card.location.roomId), slot: card.location.slot } : null;
+    const occupant = room.slots[idx] ?? null;
+    if (src?.room) src.room.slots[src.slot] = null;
+    room.slots[idx] = card.id;
+    if (!occupant) return { displaced: null, to: null };
+    const oc = this.card(occupant);
+    if (oc && src?.room && this.roomKind(src.room) !== 'rack' && src.room.slots[src.slot] === null && canSlot(src.room, oc)) {
+      src.room.slots[src.slot] = occupant;
+      return { displaced: occupant, to: { roomId: src.room.id, slot: src.slot } };
+    }
+    return { displaced: occupant, to: null };
+  }
+
+  /** plan the best move of `card` into `room` (or into place `slotIdx`) — the ONE planner behind
+   *  roomPlacementsFor (every row), roomSlotPlans (every place) and setInRoom (every move), so a
+   *  row that says ok is a move the engine makes, and its prestigeAfter is what prestige() reads
+   *  after it. `pBefore` = prestige() now (a caller planning many moves passes it once). */
+  private planRoomMove(room: Room, card: Card, slotIdx?: number, pBefore = this.prestige()): RoomPlacement {
+    const rt = ROOM_TYPE[room.type]!;
+    const kind = this.roomKind(room) ?? 'function';
+    const wants = this.effectiveWants(room);
+    const matched = [...new Set(card.tags.filter(t => wants.some(w => queryMatches([t], w))).map(t => t.concept))];
+    const cBefore = this.comfort(room);
+    const base: RoomPlacement = {
+      roomId: room.id, roomName: rt.name, roomType: room.type, kind, idx: null, swapWith: null, swapWithName: null,
+      ok: false, reason: null, fix: null, here: card.location.kind === 'room' && card.location.roomId === room.id,
+      breaksAtCycle: null, prestigeBefore: pBefore, prestigeAfter: pBefore, comfortBefore: cBefore, comfortAfter: cBefore,
+      gain: 0, effectAfter: null, matched, label: '', badge: '', tone: 'neutral',
+    };
+    const refuse = (reason: string, fix: Fix | null = null): RoomPlacement => ({ ...base, reason, fix, label: reason, badge: reason.split(' — ')[0]! });
+    const why = this.roomRefusal(room, card);
+    if (why) return refuse(why);
+    if (!room.slots.length) return refuse(kind === 'rack' ? 'no racks yet — add one' : 'no places yet — add one', this.addPlaceFix(room));
+    const src = card.location.kind === 'room' ? this.room(card.location.roomId) : undefined;
+    const touched = src && src !== room ? [room, src] : [room];
+    const others = touched.slice(1);
+    const touchedBefore = this.prestigeOf(room, cBefore) + others.reduce((n, r) => n + this.prestigeOf(r), 0);
+    const evalAt = (idx: number): RoomPlacement => {
+      const occupant = room.slots[idx] ?? null;
+      // the room's comfort read ONCE per preview, and every figure (its prestige, its effect) from it
+      const [touchedAfter, cAfter, effectAfter] = this.previewSlots(touched, () => { this.moveSlots(card, room, idx) },
+        () => { const c = this.comfort(room); return [this.prestigeOf(room, c) + others.reduce((n, r) => n + this.prestigeOf(r), 0), c, this.roomEffect(room, c)] as const });
+      const pAfter = pBefore + (touchedAfter - touchedBefore);
+      const occ = occupant ? this.card(occupant) : undefined;
+      const breaksAtCycle = kind === 'rack' ? this.state.cycle + breakDuration(cAfter) : null;
+      const gain = pAfter - pBefore;
+      const signed = `${gain >= 0 ? '+' : '−'}${Math.abs(gain).toFixed(1)} prestige`;
+      const moved = Math.abs(gain) > 0.05;
+      // every kind says what the move does to prestige when it moves it — a function room's
+      // "heals ×1.2" hid a −2.7 prestige move (the relic left a prestige room on the way)
+      const effectLine = kind === 'rack' ? `tamed by cycle ${breaksAtCycle}`
+        : kind === 'prestige' ? signed
+        : moved ? `${effectAfter} · ${signed}` : effectAfter ?? '';
+      const badge = kind === 'rack' ? `tamed by c${breaksAtCycle}` : kind === 'prestige' ? signed : moved ? signed : effectAfter ?? '';
+      const tone: RoomPlacement['tone'] = kind === 'rack' ? 'good'
+        : gain < -0.05 ? 'bad' : gain > 0.05 ? 'good'
+        : kind === 'function' && cAfter - cBefore > 1e-9 ? 'good' : 'neutral';
+      return {
+        ...base, ok: true, idx, swapWith: occupant, swapWithName: occ?.name ?? null,
+        breaksAtCycle, prestigeAfter: pAfter, comfortAfter: cAfter, gain, effectAfter,
+        label: occ ? `swap for ${occ.name} · ${effectLine}` : effectLine, badge, tone,
+      };
+    };
+    if (slotIdx !== undefined) {
+      if (!Number.isInteger(slotIdx) || slotIdx < 0 || slotIdx >= room.slots.length) return refuse('no such place');
+      if (room.slots[slotIdx] === card.id) return refuse('already there');
+      const occ = room.slots[slotIdx];
+      if (occ && kind === 'rack') return refuse(`that rack holds ${this.card(occ)?.name ?? 'someone'} — racks never swap (take them off first)`);
+      return evalAt(slotIdx);
+    }
+    if (base.here && kind !== 'rack') return refuse('already here');
+    const free = room.slots.findIndex(x => x === null);
+    if (free >= 0) return evalAt(free);
+    if (kind === 'rack') return refuse(`rack full ${room.slots.length}/${room.slots.length}`, this.addPlaceFix(room));
+    // full: swap only when it GAINS (prestige rooms: prestige; function rooms: the room's comfort)
+    let best: RoomPlacement | null = null;
+    for (let i = 0; i < room.slots.length; i++) {
+      const r = evalAt(i);
+      const score = kind === 'prestige' ? r.gain : r.comfortAfter - cBefore;
+      const bestScore = best ? (kind === 'prestige' ? best.gain : best.comfortAfter - cBefore) : -Infinity;
+      if (score > bestScore) best = r;
+    }
+    const bestScore = best ? (kind === 'prestige' ? best.gain : best.comfortAfter - cBefore) : 0;
+    // a drop on ONE place still swaps (roomSlotPlans says what that costs) — the room as a whole
+    // just has no swap that gains
+    if (!best || bestScore <= 1e-9) return refuse('full — no swap gains here (a place can still be swapped by hand)', this.addPlaceFix(room));
+    return best;
+  }
+
+  /** every place of a room for one card — what dropping it on THAT place does (an occupied place
+   *  swaps, and says what the swap costs). The fort drop overlay and the CLI `fit <card> <room>`. */
+  roomSlotPlans(roomId: string, cardId: string): RoomPlacement[] {
+    const room = this.room(roomId), card = this.card(cardId);
+    if (!room || !card || !this.roomKind(room)) return [];
+    const p = this.prestige();
+    return room.slots.map((_, i) => this.planRoomMove(room, card, i, p));
+  }
+
+  /** the rooms of your fort a card to set could go, one row each, ok rows first then by gain.
+   *  Racks are left out for a card already breaking. When nothing you own can take it, one row for
+   *  a room you could BUILD that would (roomId null, fix = build). Cards that never sit in rooms
+   *  (soldiers, stores) get []. Rooms whose places do nothing (roomKind null) are not rows. */
+  roomPlacementsFor(cardId: string): RoomPlacement[] {
+    const card = this.card(cardId);
+    if (!card || card.location.kind === 'quest' || !this.isOwned(card)) return [];
+    const isCaptive = card.character?.role === 'captive';
+    if (!isCaptive && cardType(card) !== 'relic') return [];
+    const breaking = this.state.breaking.some(b => b.cardId === cardId);
+    const pNow = this.prestige();
+    const rows = this.state.fort.rooms
+      .filter(r => this.roomKind(r) && !(breaking && this.roomKind(r) === 'rack'))
+      .map(r => this.planRoomMove(r, card, undefined, pNow));
+    rows.sort((a, b) => Number(b.ok) - Number(a.ok) || b.gain - a.gain || (b.comfortAfter - b.comfortBefore) - (a.comfortAfter - a.comfortBefore));
+    if (!rows.some(r => r.ok) && !breaking) {
+      const raw = isCaptive && !hasTag(card.tags, 'obedient');
+      const own = (pred: (rt: (typeof ROOM_TYPES)[number]) => boolean) => this.state.fort.rooms.some(r => pred(ROOM_TYPE[r.type]!));
+      let type: string | null = null;
+      if (raw && !own(rt => rt.benefit === 'break')) type = 'torture-chamber';
+      else if (!raw && !own(rt => rt.benefit === 'prestige')) type = this.bestPrestigeBuild(card);
+      if (type) {
+        const rt = ROOM_TYPE[type]!;
+        rows.push({
+          roomId: null, roomName: rt.name, roomType: type, kind: rt.benefit === 'break' ? 'rack' : 'prestige', idx: null,
+          swapWith: null, swapWithName: null, ok: false, reason: `no ${rt.name} yet`, fix: this.buildFix(type), here: false,
+          breaksAtCycle: null, prestigeBefore: pNow, prestigeAfter: pNow, comfortBefore: 0, comfortAfter: 0, gain: 0,
+          effectAfter: null, matched: [], label: `no ${rt.name} yet`, badge: `no ${rt.name} yet`, tone: 'neutral',
+        });
+      }
+    }
+    return rows;
+  }
+  /** the prestige room you could build now (or once you dig / save up) that would want this card
+   *  most — or, with no card, the cheapest one */
+  private bestPrestigeBuild(card?: Card): string | null {
+    const cands = this.buildableTypes()
+      .filter(b => ROOM_TYPE[b.type]!.benefit === 'prestige' && (!b.blocker || b.blocker === 'gold' || b.blocker === 'cell'))
+      .map(b => ({ type: b.type, cost: b.cost, fit: card ? fillScore(card.tags, defaultWants(ROOM_TYPE[b.type]!, null)) : 0 }))
+      .sort((x, y) => y.fit - x.fit || x.cost - y.cost);
+    return cands[0]?.type ?? null;
+  }
+
+  /** THE PLACE TO MAKE for a card nothing will take — its rack for a raw captive, else a prestige
+   *  room before a function room; a place you can afford before one you can't, then the cheapest.
+   *  The ONE choice behind the next-steps scroll, the prisoner hub and the CLI Dungeon view. */
+  placeFixFor(cardId: string, rows = this.roomPlacementsFor(cardId)): { roomId: string | null; roomName: string; fix: Fix } | null {
+    if (rows.some(r => r.ok)) return null;
+    const rank = (k: RoomKind) => k === 'rack' || k === 'prestige' ? 0 : 1;
+    const act = (r: RoomPlacement) => r.fix && 'action' in r.fix ? r.fix : null;
+    // a place you can buy (a place, a room) before a Great Hall raise; one you can afford first
+    const best = rows.filter(r => !!act(r))
+      .sort((a, b) => rank(a.kind) - rank(b.kind) || Number(act(a)!.action === 'gh') - Number(act(b)!.action === 'gh')
+        || Number(!!act(a)!.block) - Number(!!act(b)!.block) || act(a)!.cost - act(b)!.cost)[0];
+    return best ? { roomId: best.roomId, roomName: best.roomName, fix: best.fix! } : null;
+  }
+
+  /** every card you could set in this room, ranked — the room panel's candidates and the CLI's
+   *  `room <id>` list (the same rows roomPlacementsFor gives each card, for this one room) */
+  roomCandidates(roomId: string): (RoomPlacement & { cardId: string; name: string })[] {
+    const room = this.room(roomId);
+    if (!room || !this.roomKind(room)) return [];
+    const p = this.prestige();
+    return this.state.cards
+      .filter(c => (c.character?.role === 'captive' || cardType(c) === 'relic') && c.location.kind !== 'quest' && this.isOwned(c))
+      .filter(c => !(c.location.kind === 'room' && c.location.roomId === roomId))
+      .map(c => ({ ...this.planRoomMove(room, c, undefined, p), cardId: c.id, name: c.name }))
+      .filter(r => r.reason !== 'soldiers never staff rooms')
+      .sort((a, b) => Number(b.ok) - Number(a.ok) || b.gain - a.gain || (b.comfortAfter - b.comfortBefore) - (a.comfortAfter - a.comfortBefore));
+  }
+
+  /** SET A CARD IN A ROOM — the one path for the fort drop, the sheet's "Set them in", the armed
+   *  hand, `slot` and the CLI `setin`. Without a place: the first free one, else (prestige and
+   *  function rooms) a swap with the occupant whose replacement gains the most, only if it gains.
+   *  With a place: exactly that one, swapping its occupant (the occupant takes the card's old
+   *  place when it legally can, else goes back to the hand). Racks NEVER swap. */
+  setInRoom(roomId: string, cardId: string, slotIdx?: number): { ok: boolean; msg: string; warn?: boolean } {
+    const room = this.room(roomId);
+    const card = this.card(cardId);
+    if (!room) return { ok: false, msg: 'no such room' };
+    if (!card) return { ok: false, msg: 'no such card' };
+    if (card.location.kind === 'quest') return { ok: false, msg: `${card.name} is on a quest` };
+    if (!this.isOwned(card)) return { ok: false, msg: 'not yours yet (staged cards must be accepted first)' };
+    const plan = this.planRoomMove(room, card, slotIdx !== undefined && Number.isFinite(slotIdx) ? slotIdx : undefined);
+    if (!plan.ok || plan.idx === null) return { ok: false, msg: plan.fix && 'label' in plan.fix ? `${plan.reason} (${plan.fix.label})` : plan.reason ?? 'refused' };
+    const rt = ROOM_TYPE[room.type]!;
+    const effBefore = this.roomEffect(room);
+    const srcName = this.whereName(card.id);
+    const moved = this.moveSlots(card, room, plan.idx);
+    card.location = { kind: 'room', roomId, slot: plan.idx };
+    let swapLine = '';
+    if (moved.displaced) {
+      const oc = this.card(moved.displaced)!;
+      if (moved.to) {
+        oc.location = { kind: 'room', roomId: moved.to.roomId, slot: moved.to.slot };
+        swapLine = ` (in place of ${oc.name}, who moves to the ${srcName ?? 'old room'})`;
+      } else {
+        oc.location = HELD(cardType(oc) === 'relic' ? 'inventory' : 'roster');
+        swapLine = ` (in place of ${oc.name}, back ${cardType(oc) === 'relic' ? 'in your stores' : 'to the cells'})`;
+      }
+    }
+    if (plan.kind === 'rack') {
+      // one breaking entry per captive, ever (a second one doubled the "is broken" line and the tag)
+      this.state.breaking = this.state.breaking.filter(b => b.cardId !== card.id);
+      const done = this.state.cycle + breakDuration(this.comfort(room));
+      this.state.breaking.push({ cardId: card.id, roomId, doneAtCycle: done, startCycle: this.state.cycle });
+      const n = done - this.state.cycle;
+      return { ok: true, msg: `${card.name} on the rack in the ${rt.name} — tamed at c${done} (${n} cycle${n === 1 ? '' : 's'})` };
+    }
+    const pAfter = this.prestige();
+    const change = plan.kind === 'prestige' || Math.abs(pAfter - plan.prestigeBefore) > 0.05
+      ? `prestige ${plan.prestigeBefore.toFixed(1)} → ${pAfter.toFixed(1)}`
+      : `${effBefore || 'nothing'} → ${this.roomEffect(room)}`;
+    const warn = pAfter < plan.prestigeBefore - 1e-9;
+    return { ok: true, msg: `${card.name} set in the ${rt.name}${swapLine} — ${change}`, ...(warn ? { warn } : {}) };
+  }
+
+  /** what emptying one place would cost: prestige lost, and the room's effect after */
+  slotShare(roomId: string, slotIdx: number): { prestige: number; effectAfter: string } | null {
+    const room = this.room(roomId);
+    if (!room || !room.slots[slotIdx]) return null;
+    const before = this.prestigeOf(room);
+    const [after, eff] = this.previewSlots([room], () => { room.slots[slotIdx] = null }, () => [this.prestigeOf(room), this.roomEffect(room)] as const);
+    return { prestige: Math.max(0, before - after), effectAfter: eff };
+  }
+
+  /** take a card out of a room place, back to the hand — saying honestly what it cost. Off a rack
+   *  it wipes the breaking (R1: both UIs confirm first, with rackLoss()). */
+  unslot(roomId: string, slotIdx: number): { ok: boolean; msg: string; warn?: boolean } {
     const room = this.room(roomId);
     if (!room || !room.slots[slotIdx]) return { ok: false, msg: 'nothing there' };
     const card = this.card(room.slots[slotIdx]!);
+    const rt = ROOM_TYPE[room.type]!;
+    const pBefore = this.prestige(), effBefore = this.roomEffect(room);
+    const loss = card ? this.rackLoss(card.id) : null;
     room.slots[slotIdx] = null;
-    if (card) {
-      card.location = HELD(cardType(card) === 'relic' ? 'inventory' : 'roster');
-      this.state.breaking = this.state.breaking.filter(b => b.cardId !== card.id);
-    }
-    return { ok: true, msg: 'freed' };
+    if (!card) return { ok: true, msg: 'freed' };
+    card.location = HELD(cardType(card) === 'relic' ? 'inventory' : 'roster');
+    this.state.breaking = this.state.breaking.filter(b => b.cardId !== card.id);
+    if (loss) return { ok: true, msg: `${card.name} off the rack — ${loss}`, warn: true };
+    const pAfter = this.prestige();
+    const change = Math.abs(pAfter - pBefore) > 0.05 || this.roomKind(room) === 'prestige'
+      ? `prestige ${pBefore.toFixed(1)} → ${pAfter.toFixed(1)}` : `${effBefore} → ${this.roomEffect(room)}`;
+    return { ok: true, msg: `${card.name} out of the ${rt.name} — ${change}` };
+  }
+
+  /** what cashing out (ransom / sell) a card that sits in a room throws away — the prestige it was
+   *  earning, or the room's effect — said BEFORE the click (both UIs confirm on it) and in the
+   *  result. null when it is not in a room, or its going changes nothing. A card on a RACK says
+   *  rackLoss() instead. */
+  cashOutLoss(cardId: string): string | null {
+    const card = this.card(cardId);
+    if (card?.location.kind !== 'room' || this.state.breaking.some(b => b.cardId === cardId)) return null;
+    const room = this.room(card.location.roomId);
+    if (!room || room.slots[card.location.slot] !== cardId) return null;
+    const slot = card.location.slot;
+    const pBefore = this.prestige(), before = this.prestigeOf(room), effBefore = this.roomEffect(room);
+    const [after, effAfter] = this.previewSlots([room], () => { room.slots[slot] = null }, () => [this.prestigeOf(room), this.roomEffect(room)] as const);
+    const pAfter = pBefore + (after - before);
+    if (Math.abs(pAfter - pBefore) > 0.05) return `prestige ${pBefore.toFixed(1)} → ${pAfter.toFixed(1)}`;
+    if (effBefore !== effAfter) return `the ${ROOM_TYPE[room.type]!.name}: ${effBefore || 'nothing'} → ${effAfter || 'nothing'}`;
+    return null;
   }
 
   private unslotCard(card: Card) {
@@ -615,6 +1188,16 @@ export class Game {
       const r = this.room(card.location.roomId);
       if (r) r.slots[card.location.slot] = null;
     }
+  }
+
+  /** the rooms that give prestige, biggest first (the prestige bar's breakdown) */
+  prestigeSources(): { roomId: string; name: string; prestige: number; effect: string }[] {
+    return this.state.fort.rooms.map(r => {
+      const rt = ROOM_TYPE[r.type]!;
+      const p = rt.benefit === 'prestige' ? this.comfort(r) : rt.smallPrestige ? 0.25 * this.comfort(r) : 0;
+      return { roomId: r.id, name: rt.name, prestige: p, effect: this.roomEffect(r) };
+    }).filter(x => x.prestige > 0 || ROOM_TYPE[this.room(x.roomId)!.type]!.benefit === 'prestige')
+      .sort((a, b) => b.prestige - a.prestige);
   }
 
   setFocus(mercId: string, focus: Card['character'] extends undefined ? never : NonNullable<Card['character']>['focus']): { ok: boolean; msg: string } {
@@ -627,12 +1210,10 @@ export class Game {
   // ---- staging (GAME_STATE §6) -------------------------------------------------------------------
 
   hire(cardId: string): { ok: boolean; msg: string } {
-    if (!this.hasRoom('tavern')) return { ok: false, msg: 'build a Tavern' };
-    const staged = this.state.tavern.find(s => s.cardId === cardId);
-    const card = this.card(cardId);
-    if (!staged || !card) return { ok: false, msg: 'not at the tavern' };
-    if (this.roster().length >= this.rosterCapacity()) return { ok: false, msg: 'no roster room (bedrooms grant +1 each)' };
-    const cost = staged.prepaid ? 0 : hireCost(card.value);   // a won finale focal is already paid for
+    const block = this.hireBlock(cardId);
+    if (block) return { ok: false, msg: block.reason };
+    const card = this.card(cardId)!;
+    const cost = this.hireQuote(cardId)!;   // a won finale focal is already paid for
     if (!this.spendGold(cost)) return { ok: false, msg: `costs ${cost}g` };
     card.character!.role = 'merc';
     card.location = HELD('roster');
@@ -644,18 +1225,16 @@ export class Game {
   }
 
   acceptCaptive(cardId: string): { ok: boolean; msg: string } {
-    const staged = this.state.holding.find(s => s.cardId === cardId);
-    const card = this.card(cardId);
-    if (!staged || !card) return { ok: false, msg: 'not in holding' };
-    if (!this.hasRoom('dungeon')) return { ok: false, msg: 'build a Dungeon' };
-    if (this.captives().length >= this.captiveCapacity()) return { ok: false, msg: 'cells are full — build more' };
+    const block = this.acceptBlock(cardId);
+    if (block) return { ok: false, msg: block.reason };
+    const card = this.card(cardId)!;
     card.location = HELD('roster');
     this.state.holding = this.state.holding.filter(s => s.cardId !== cardId);
     this.ensureLoreNode(card);
     // STORY_ENGINE §5 trigger 2 (built 2026-07-10): a captive joining SOMETIMES stirs a story
     // (🛠 rate) — their past does not stay outside the walls
     if (this.rng.chance(0.3)) this.spawnPersonalChainLead(card);
-    return { ok: true, msg: `${card.name} moved to the cells` };
+    return { ok: true, msg: `${card.name} moved to the cells (${this.captives().length}/${this.captiveCapacity()})` };
   }
 
   /** ownership boundary — dispositions apply only to cards that are actually YOURS
@@ -667,15 +1246,126 @@ export class Game {
       (card.location.state === 'roster' || card.location.state === 'inventory');
   }
 
-  ransom(captiveId: string): { ok: boolean; msg: string } {
+  // ---- quotes & blocks: a button shows its true number and its refusal BEFORE the click --------
+  // ONE formula each, shared with the action that pays it (the board once showed value×rate while
+  // the engine paid cashValue(value)×rate — 42g shown, 30g paid).
+
+  /** what ransoming this captive pays now (owned or in holding), or null */
+  ransomQuote(id: string): number | null {
+    const card = this.card(id);
+    if (card?.character?.role !== 'captive') return null;
+    if (!this.isOwned(card) && !this.state.holding.some(s => s.cardId === id)) return null;
+    const office = this.state.fort.rooms.find(r => r.type === 'ransom-office');
+    const rate = office ? ransomRate(this.comfort(office)) : RANSOM_RATE;
+    return Math.round(cashValue(card.value) * rate);
+  }
+  /** what selling this captive or relic pays now, or null */
+  sellQuote(id: string): number | null {
+    const card = this.card(id);
+    if (!card) return null;
+    if (card.character?.role === 'captive') {
+      if (!this.isOwned(card) && !this.state.holding.some(s => s.cardId === id)) return null;
+      return Math.round(cashValue(card.value) * SELL_RATE);
+    }
+    if (cardType(card) !== 'relic' || !this.isOwned(card) || card.location.kind === 'quest') return null;
+    const market = this.state.fort.rooms.find(r => r.type === 'market');
+    const rate = market ? marketSellRate(this.comfort(market)) : SELL_RATE;
+    return Math.round(cashValue(card.value) * rate);
+  }
+  /** what a holding candidate fetches if their clock runs out (the quick price), or null */
+  lapseQuote(id: string): number | null {
+    const card = this.card(id);
+    if (!card || !this.state.holding.some(s => s.cardId === id)) return null;
+    return Math.round(cashValue(card.value) * SELL_RATE);
+  }
+  /** a holding captive's clock in the player's words — the END that runs `cycle` up to the
+   *  expiry hands them off, so the last cycle you can decide in is expires−1 ('handed off at this
+   *  END' | 'handed off in 2 cycles'). Every surface prints THIS, never its own date maths. */
+  holdingDeadline(cardId: string): string | null {
+    const h = this.state.holding.find(s => s.cardId === cardId);
+    if (!h) return null;
+    const left = h.expiresAtCycle - this.state.cycle;
+    return left <= 1 ? 'handed off at this END' : `handed off in ${left} cycles`;
+  }
+  /** a tavern guest's clock, the same way ('leaves at this END' | 'leaves in 3 cycles' | null for a
+   *  prepaid prize, who waits) */
+  tavernDeadline(cardId: string): string | null {
+    const t = this.state.tavern.find(s => s.cardId === cardId);
+    if (!t || t.prepaid) return null;
+    const left = t.expiresAtCycle - this.state.cycle;
+    return left <= 1 ? 'leaves at this END' : `leaves in ${left} cycles`;
+  }
+  /** what hiring this tavern guest costs (0 for a prepaid finale prize), or null */
+  hireQuote(id: string): number | null {
+    const staged = this.state.tavern.find(s => s.cardId === id);
+    const card = this.card(id);
+    if (!staged || !card) return null;
+    return staged.prepaid ? 0 : hireCost(card.value);
+  }
+
+  /** why "To the cells" can't run, with the fix — null when it can */
+  acceptBlock(cardId: string): Block | null {
+    if (!this.state.holding.some(s => s.cardId === cardId) || !this.card(cardId)) return { reason: 'not in holding', fix: null };
+    if (!this.hasRoom('dungeon')) return { reason: 'no Dungeon — build one', fix: this.buildFix('dungeon') };
+    const n = this.captives().length, cap = this.captiveCapacity();
+    if (n >= cap) return { reason: cap ? `cells full ${n}/${cap}` : 'no cells yet', fix: this.buildFix('dungeon-cell') };
+    return null;
+  }
+  /** why "Hire" can't run, with the fix — null when it can */
+  hireBlock(cardId: string): Block | null {
+    if (!this.hasRoom('tavern')) return { reason: 'no Tavern — build one', fix: this.buildFix('tavern') };
+    const cost = this.hireQuote(cardId);
+    if (cost === null) return { reason: 'not at the tavern', fix: null };
+    const n = this.roster().length, cap = this.rosterCapacity();
+    if (n >= cap) return { reason: `roster full ${n}/${cap} — a soldier's own bedroom adds one`, fix: { screen: 'build', id: 'bedroom', label: 'Build a bedroom for a soldier' } };
+    if (this.gold() < cost) return { reason: `costs ${cost}g (short ${cost - this.gold()}g)`, fix: null };
+    return null;
+  }
+  /** why the Great Hall can't be raised now, with the fix — null when it can */
+  ghBlock(): Block | null {
+    const to = this.state.fort.ghTier + 1;
+    const need = GH_THRESHOLDS[to];
+    if (need === undefined) return { reason: 'the Great Hall is at its final tier', fix: null };  // (!need read a 0 threshold as "final")
+    const p = this.prestige();
+    if (p < need) {
+      // no prestige room yet: the fix is BUILDING one (the scroll never named one and the goal sat
+      // at 0.0 for five cycles of following it)
+      const owned = this.state.fort.rooms.some(r => ROOM_TYPE[r.type]!.benefit === 'prestige');
+      const type = owned ? null : this.bestPrestigeBuild();
+      return { reason: `needs prestige ${need} (have ${p.toFixed(1)})`,
+        fix: type ? this.buildFix(type) : { screen: 'fort', label: 'Set relics and tamed captives in prestige rooms' } };
+    }
+    const cost = ghUpgradeCost(to);
+    if (this.gold() < cost) return { reason: `costs ${cost}g (short ${cost - this.gold()}g)`, fix: null };
+    return null;
+  }
+  /** the Great Hall goal, whole: the next tier, what it needs, what it opens */
+  ghInfo(): { tier: number; next: number | null; need: number | null; have: number; cost: number | null; gold: number; ready: boolean; block: string | null; unlocks: { type: string; name: string }[] } {
+    const tier = this.state.fort.ghTier;
+    const next = GH_THRESHOLDS[tier + 1] === undefined ? null : tier + 1;
+    const block = this.ghBlock();
+    return {
+      tier, next, need: next ? GH_THRESHOLDS[next]! : null, have: this.prestige(),
+      cost: next ? ghUpgradeCost(next) : null, gold: this.gold(), ready: !block, block: block?.reason ?? null,
+      unlocks: next ? ROOM_TYPES.filter(rt => rt.ghTier === next && rt.id !== 'great-hall' && rt.roomKind !== 'endgame').map(rt => ({ type: rt.id, name: rt.name })) : [],
+    };
+  }
+
+  /** a wound's cost on every roll, in coins (the injury term of the roll, at their level) */
+  woundPenalty(mercId: string): number {
+    const ch = this.card(mercId)?.character;
+    if (!ch || ch.injuryTiers <= 0) return 0;
+    return Math.round(ch.injuryTiers * INJURY_FRAC * U(ch.level) * 10) / 10;
+  }
+
+  ransom(captiveId: string): { ok: boolean; msg: string; warn?: boolean } {
     const card = this.card(captiveId);
     if (card?.character?.role !== 'captive') return { ok: false, msg: 'not a captive' };
     // owned captives AND holding candidates — "ransom now" is half the holding decision (§6)
     if (!this.isOwned(card) && !this.state.holding.some(s => s.cardId === captiveId))
       return { ok: false, msg: 'not yours to ransom (accept them first)' };
-    const office = this.state.fort.rooms.find(r => r.type === 'ransom-office');
-    const rate = office ? ransomRate(this.comfort(office)) : RANSOM_RATE;
-    const pay = Math.round(cashValue(card.value) * rate);
+    const pay = this.ransomQuote(captiveId)!;
+    const loss = this.rackLoss(captiveId) ?? this.cashOutLoss(captiveId);
     this.unslotCard(card);
     card.location = HELD('lore');   // gone from play, alive in the world
     this.state.holding = this.state.holding.filter(s => s.cardId !== captiveId);
@@ -683,10 +1373,10 @@ export class Game {
     this.addGold(pay);
     this.noteCustodyChange(card.id, `${card.name} was ransomed away — no longer in the company's hands`);
     this.log('ransom', `${card.name} ransomed for ${pay}g.`);
-    return { ok: true, msg: `+${pay}g` };
+    return { ok: true, msg: `${card.name} ransomed: +${pay}g${loss ? ` · ${loss}` : ''}`, ...(loss ? { warn: true } : {}) };
   }
 
-  sell(id: string): { ok: boolean; msg: string } {
+  sell(id: string): { ok: boolean; msg: string; warn?: boolean } {
     const card = this.card(id);
     if (!card) return { ok: false, msg: 'no such card' };
     // captive disposition (DESIGN/GAME_STATE §6): sell = the slaver's price, below ransom's —
@@ -694,7 +1384,8 @@ export class Game {
     if (card.character?.role === 'captive') {
       if (!this.isOwned(card) && !this.state.holding.some(s => s.cardId === id))
         return { ok: false, msg: 'not yours to sell (accept them first)' };
-      const pay = Math.round(cashValue(card.value) * SELL_RATE);
+      const pay = this.sellQuote(id)!;
+      const loss = this.rackLoss(id) ?? this.cashOutLoss(id);
       this.unslotCard(card);
       card.location = HELD('lore');
       this.state.holding = this.state.holding.filter(s => s.cardId !== id);
@@ -702,28 +1393,33 @@ export class Game {
       this.addGold(pay);
       this.noteCustodyChange(card.id, `${card.name} was sold on — no longer in the company's hands`);
       this.log('sell', `${card.name} sold for ${pay}g.`);
-      return { ok: true, msg: `+${pay}g` };
+      return { ok: true, msg: `${card.name} sold: +${pay}g${loss ? ` · ${loss}` : ''}`, ...(loss ? { warn: true } : {}) };
     }
     if (cardType(card) !== 'relic') return { ok: false, msg: 'not a relic or captive' };
     if (!this.isOwned(card)) return { ok: false, msg: 'not yours to sell' };
-    const market = this.state.fort.rooms.find(r => r.type === 'market');
-    const rate = market ? marketSellRate(this.comfort(market)) : SELL_RATE;
-    const pay = Math.round(cashValue(card.value) * rate);
+    const pay = this.sellQuote(id)!;
+    const loss = this.cashOutLoss(id);
     this.unslotCard(card);
     this.state.cards = this.state.cards.filter(c => c.id !== id);
     this.addGold(pay);
-    return { ok: true, msg: `${card.name} sold: +${pay}g` };
+    return { ok: true, msg: `${card.name} sold: +${pay}g${loss ? ` · ${loss}` : ''}`, ...(loss ? { warn: true } : {}) };
   }
 
+  /** what settling this debt costs (the one formula payOffLiability pays), or null */
+  settleQuote(id: string): number | null {
+    const card = this.card(id);
+    if (!card || !isLiability(card)) return null;
+    return Math.round(Math.abs(card.value) * (card.qty ?? 1));
+  }
   payOffLiability(id: string): { ok: boolean; msg: string } {
     const card = this.card(id);
     if (!card || !isLiability(card)) return { ok: false, msg: 'not a liability' };
-    const cost = Math.abs(card.value) * (card.qty ?? 1);
-    if (!this.spendGold(Math.round(cost))) return { ok: false, msg: `costs ${Math.round(cost)}g to settle` };
+    const cost = this.settleQuote(id)!;
+    if (!this.spendGold(cost)) return { ok: false, msg: `costs ${cost}g to settle` };
     this.state.cards = this.state.cards.filter(c => c.id !== id);
     delete this.state.liabilityBirth[id];
-    this.log('liability', `Settled: ${card.name} (${Math.round(cost)}g).`);
-    return { ok: true, msg: 'settled' };
+    this.log('liability', `Settled: ${card.name} (${cost}g).`);
+    return { ok: true, msg: `${card.name} settled (${cost}g)` };
   }
 
   interrogate(captiveId: string): { ok: boolean; msg: string } {
@@ -740,7 +1436,7 @@ export class Game {
     const lead = this.freshLead('interrogation');
     // the room's comfort IS its benefit (FORT §5: leads only) — good comfort loosens tongues:
     // a chance to upgrade the lead's rarity one step
-    if (this.rng.chance(Math.min(0.6, this.comfort(room) / 40))) {
+    if (this.rng.chance(this.interrogateLift(this.comfort(room)))) {
       if (lead.rarity === 'common') lead.rarity = 'uncommon';
       else if (lead.rarity === 'uncommon') lead.rarity = 'rare';
     }
@@ -765,7 +1461,7 @@ export class Game {
   private leadCtx() {
     return {
       cycle: this.state.cycle,
-      unlockedRegions: this.state.unlockedRegions.length ? this.state.unlockedRegions : ['forests'],
+      unlockedRegions: this.activeRegions(),
       ghTier: this.state.fort.ghTier,
       rosterLevels: this.roster().map(m => m.character!.level),
       hasDungeon: this.hasRoom('dungeon'),
@@ -850,6 +1546,14 @@ export class Game {
 
   /** queued + running + recently finished, oldest first */
   jobs(): Job[] { return this.jobRecs.map(r => ({ ...r.job })) }
+  private settleSeq = 0;
+  /** the last settle number handed out (0 before any job settles) — a surface starts from here */
+  arrivalSeq(): number { return this.settleSeq }
+  /** ARRIVALS: every job that settled after `afterSeq`, in settle order — the ONE rule both UIs
+   *  announce by (a job that finishes between two looks is still announced, once) */
+  arrivals(afterSeq: number): Job[] {
+    return this.jobs().filter(j => (j.seq ?? 0) > afterSeq).sort((a, b) => a.seq! - b.seq!);
+  }
 
   /** leads held by live work — the auditor cross-checks this against jobs() (I12) */
   reservedLeads(): string[] { return [...this.reserved] }
@@ -887,7 +1591,9 @@ export class Game {
   /** the whole SYNCHRONOUS half of a pursuit: every guard, plus the reservation itself. It runs at
    *  the CLICK — today's duplicate guards read state written only AFTER the call, so they were
    *  blind for the whole 10–60s it took (I6). */
-  private reservePursue(leadId: string): { msg: string; lead?: Lead } {
+  /** every refusal a pursuit can meet, WITHOUT side effects — pursueBlock() and reservePursue()
+   *  share it, so the board's disabled Pursue button and the click can never disagree */
+  private pursueGuard(leadId: string): { msg: string; stale?: boolean } | null {
     const lead = this.visibleLeads().find(l => l.id === leadId);
     if (!lead) return { msg: 'no such lead' };
     if (this.reserved.has(lead.id)) return { msg: 'the map table is already working that lead' };
@@ -895,10 +1601,8 @@ export class Game {
       return { msg: 'that hunt is already underway' };
     if (lead.chainInfo.kind === 'continues') {
       const chain = this.state.chains.find(c => c.id === (lead.chainInfo as { chainId: string }).chainId);
-      if (!chain || (chain.state !== 'active' && chain.state !== 'finale-pending')) {
-        this.state.leads = this.state.leads.filter(l => l.id !== leadId);
-        return { msg: 'that story has already ended — the lead is stale' };
-      }
+      if (!chain || (chain.state !== 'active' && chain.state !== 'finale-pending'))
+        return { msg: 'that story has already ended — the lead is stale', stale: true };
       if (this.state.quests.some(q => q.chainId === chain.id && q.state === 'open'))
         return { msg: 'that story already has an open quest' };
       // a beat still being WRITTEN is not yet an open quest — same guard, extended to work in
@@ -907,6 +1611,67 @@ export class Game {
         && l.chainInfo.kind === 'continues' && (l.chainInfo as { chainId: string }).chainId === chain.id))
         return { msg: 'that story already has a step being written' };
     }
+    return null;
+  }
+
+  /** why "Pursue" can't run for this lead, null when it can (with a fix pointing at the quest
+   *  already on the board, when that is the reason) */
+  pursueBlock(leadId: string): Block | null {
+    const g = this.pursueGuard(leadId);
+    if (!g) return null;
+    const on = this.leadOnBoard(leadId);
+    return { reason: g.msg, fix: on ? { screen: 'map', id: on, label: 'Open the quest on the map' } : null };
+  }
+
+  /** the open quest this lead's quest already is (standing posts and saga continuations), or null */
+  private leadOnBoard(leadId: string): string | null {
+    const lead = this.state.leads.find(l => l.id === leadId);
+    if (!lead) return null;
+    const direct = this.state.quests.find(q => q.state === 'open' && q.leadId === leadId);
+    if (direct) return direct.id;
+    if (lead.chainInfo.kind === 'continues') {
+      const cid = (lead.chainInfo as { chainId: string }).chainId;
+      return this.state.quests.find(q => q.state === 'open' && q.chainId === cid)?.id ?? null;
+    }
+    return null;
+  }
+
+  /** the regions in play — never empty (a fresh fort's home is the forests) */
+  activeRegions(): string[] {
+    return this.state.unlockedRegions.length ? [...this.state.unlockedRegions] : ['forests'];
+  }
+
+  /** THE LEADS BOARD in play order: saga continuations, then new stories, then what goes cold
+   *  soonest, then standing posts — each with its block (null = pursuable), the quest it is
+   *  already on the map as, and the map table's work on it */
+  leadBoard(): { lead: Lead; blocked: string | null; onBoard: string | null; working: 'queued' | 'running' | null }[] {
+    const working = new Map(this.jobRecs.filter(r => r.job.state === 'queued' || r.job.state === 'running').map(r => [r.job.leadId, r.job.state as 'queued' | 'running']));
+    const rank = (l: Lead) => l.chainInfo.kind === 'continues' ? 0 : l.chainInfo.kind === 'starts-new' ? 1 : l.expiresAtCycle !== null ? 2 : 3;
+    return this.visibleLeads()
+      .map(l => ({ lead: l, blocked: this.pursueGuard(l.id)?.msg ?? null, onBoard: this.leadOnBoard(l.id), working: working.get(l.id) ?? null }))
+      .sort((a, b) => rank(a.lead) - rank(b.lead) || (a.lead.expiresAtCycle ?? Infinity) - (b.lead.expiresAtCycle ?? Infinity));
+  }
+
+  /** R3: queue every pursuable lead (the map table's in-flight cap still paces the writing) */
+  pursueAll(): { ok: boolean; msg: string; jobIds: string[] } {
+    const jobIds: string[] = [];
+    for (const row of this.leadBoard()) {
+      if (row.blocked) continue;
+      const r = this.enqueuePursue(row.lead.id);
+      if (r.ok && r.jobId) jobIds.push(r.jobId);
+    }
+    return jobIds.length
+      ? { ok: true, msg: `the map table takes up ${jobIds.length} lead${jobIds.length === 1 ? '' : 's'} (${Math.min(jobIds.length, this.maxInFlight)} at once)`, jobIds }
+      : { ok: false, msg: 'nothing to pursue — every lead is underway or on the board', jobIds };
+  }
+
+  private reservePursue(leadId: string): { msg: string; lead?: Lead } {
+    const g = this.pursueGuard(leadId);
+    if (g) {
+      if (g.stale) this.state.leads = this.state.leads.filter(l => l.id !== leadId);
+      return { msg: g.msg };
+    }
+    const lead = this.visibleLeads().find(l => l.id === leadId)!;
     if (lead.expiresAtCycle === null) {
       // standing hunts track the roster: re-level into the region band at pursue time — still
       // ONCE, still before the call. The click is when the company takes the hunt on.
@@ -982,6 +1747,8 @@ export class Game {
       rec.job.error = ((e as Error)?.message ?? '').slice(0, 160) || 'the writing failed';
       rec.thrown = e;
     } finally {
+      rec.job.seq = ++this.settleSeq;
+      if (rec.job.questId) rec.job.questTitle = this.state.quests.find(q => q.id === rec.job.questId)?.title;
       this.reserved.delete(rec.job.leadId);
       this.inFlight--;
       rec.settle();
@@ -1132,7 +1899,7 @@ export class Game {
       Object.entries(specialPools).map(([k, v]) => [k, this.rng.pick(v!)]));
     // the fort stands in the HOME region — "seen from the walls" is impossible for a far-region
     // matter ("from the fort walls you watched a Brass Quarter lender's back room")
-    const homeRegion = this.state.unlockedRegions[0] ?? 'forests';
+    const homeRegion = this.activeRegions()[0]!;
     const sparkOpts = {
       channel: lead.source === 'hunt' || lead.source === 'reward' ? 'patrol' as const
         : lead.source === 'collector' ? 'notice' as const
@@ -1288,7 +2055,7 @@ export class Game {
   private spawnPersonalChainLead(merc: Card) {
     const lead: Lead = {
       id: freshId('lead-'), rarity: 'uncommon', level: Math.max(1, merc.character!.level),
-      region: this.state.unlockedRegions[0] ?? 'forests', archetype: 'investigate',
+      region: this.activeRegions()[0]!, archetype: 'investigate',
       chainInfo: { kind: 'starts-new' }, expiresAtCycle: this.state.cycle + LEAD_TTL * 3,
       source: 'personal', title: `${merc.name}'s past stirs`,
     };
@@ -1635,14 +2402,14 @@ export class Game {
       // seed IS the mechanical fix for a clash). Duplicate cast stays free: mechanical recast.
       let issue = issues(g);
       if (issue?.hard) {
-        this.log('chain', `saga draft rejected (one re-roll): ${issue.why.slice(0, 120)}…`);
+        this.log('dev', `saga draft rejected (one re-roll): ${issue.why.slice(0, 120)}…`);
         const reseed = isPersonal && process.env.PERSONAL_SEED !== '0'
           ? (seeds => seeds.find(x => x !== genesisInput.seed) ?? genesisInput.seed)(this.personalSeeds(focal))
           : sampleSeed(this.rng);
         g = await this.ai.genesis({ ...genesisInput, seed: reseed, avoid: [...avoid, issue.why] });
         issue = issues(g);
       }
-      if (issue) this.log('chain', `saga draft lint (${issue.hard ? 'HARD, shipping anyway' : 'log-only'}): ${issue.why.slice(0, 120)}…`);
+      if (issue) this.log('dev', `saga draft lint (${issue.hard ? 'HARD, shipping anyway' : 'log-only'}): ${issue.why.slice(0, 120)}…`);
       // recast a stubborn duplicate client/obstacle as a FRESH person — a new villain beats
       // the same face fronting a fourth concurrent saga. The rename must be COMPLETE: reach
       // the bible's free text (33013: a recast client lived on in situation/arc and the beat
@@ -2010,7 +2777,7 @@ export class Game {
     // 6/9, mean 7.44 vs 7.11) — same nag-degradation as the genesis guard. The dup-restatement
     // lint also over-fired (situation and job line naturally share words: 10/12 cards). Lint is
     // LOG-ONLY telemetry now; fix defect classes at the prompt, never by re-generation.
-    for (const flaw of this.lintCard(out)) this.log('chain', `saga card lint (log-only): ${flaw}`);
+    for (const flaw of this.lintCard(out)) this.log('dev', `saga card lint (log-only): ${flaw}`);
     if (!isFinale) this.cachedBeatOut.set(chain.id, { beat: chain.beatIndex + 1, out });
     // QUESTS §6: middle-beat side-loot = gold OR a relic among it (was always bare gold)
     const specs: RewardSpec[] = isFinale ? [] : [{ kind: 'gold' as const, value: sideLootV }];
@@ -2078,36 +2845,115 @@ export class Game {
     if (!q?.approaches) return { ok: false, msg: 'not a branched quest' };
     if (!q.approaches.some(a => a.id === groupId)) return { ok: false, msg: 'no such approach' };
     q.chosenApproach = groupId;
-    for (const s of q.slots) if (s.groupId !== groupId && s.filledBy) this.doUnassign(q, s);
-    return { ok: true, msg: `Approach: ${q.approaches.find(a => a.id === groupId)!.label}` };
+    const sentBack: string[] = [];
+    for (const s of q.slots) if (s.groupId !== groupId && s.filledBy) {
+      sentBack.push(this.card(s.filledBy)?.name ?? '?');
+      this.doUnassign(q, s);
+    }
+    const label = q.approaches.find(a => a.id === groupId)!.label;
+    return { ok: true, msg: `Approach: ${label}${sentBack.length ? ` — ${sentBack.join(', ')} sent back to the hand` : ''}` };
+  }
+  /** what switching this finale to another approach throws away — the soldiers placed on the
+   *  current one go back to the hand. Said BEFORE the click (both UIs confirm on it); null = free. */
+  approachSwitchLoss(questId: string, groupId: string): string | null {
+    const q = this.state.quests.find(x => x.id === questId);
+    if (!q?.approaches || !q.chosenApproach || q.chosenApproach === groupId) return null;
+    const back = q.slots.filter(s => s.groupId !== groupId && s.filledBy).map(s => this.card(s.filledBy!)?.name ?? '?');
+    return back.length ? `switching plans sends ${back.join(', ')} back to the hand` : null;
+  }
+  /** the soldier an approach card names for one of its places: whoever holds it, else the
+   *  strongest who could take it once the approach is chosen (slotFits, legal but for the gate) —
+   *  `from` set when they stand on another quest (sending moves them). The CLI and the quest page
+   *  both print THIS. */
+  approachBest(questId: string, slotIdx: number): { id: string; name: string; coins: number; strength: Strength; from: { questId: string; title: string } | null; holder: boolean } | null {
+    const q = this.state.quests.find(x => x.id === questId);
+    const s = q?.slots[slotIdx];
+    if (!q || !s) return null;
+    if (s.filledBy) {
+      const m = this.card(s.filledBy)!;
+      const c = coins(m, s.test);
+      return { id: m.id, name: m.name, coins: c, strength: slotStrength(c, slotThreshold(s.test)), from: null, holder: true };
+    }
+    const f = this.slotFits(questId, slotIdx).filter(x => !x.blocked || x.gated).sort((a, b) => b.coins - a.coins)[0];
+    return f ? { id: f.id, name: f.name, coins: f.coins, strength: f.strength, from: f.from && f.from.questId !== questId ? { questId: f.from.questId, title: f.from.title } : null, holder: false } : null;
+  }
+  /** everyone off this quest, back to the hand — ONE action (the quest page's Clear, the CLI's
+   *  `clear`), so a double click can never race a loop of unassigns into a false error */
+  clearQuest(questId: string): { ok: boolean; msg: string } {
+    const q = this.state.quests.find(x => x.id === questId && x.state === 'open');
+    if (!q) return { ok: false, msg: 'no such open quest' };
+    const names = q.slots.filter(s => s.filledBy).map(s => this.card(s.filledBy!)?.name ?? '?');
+    for (const s of q.slots) if (s.filledBy) this.doUnassign(q, s);
+    return { ok: true, msg: names.length ? `${names.join(', ')} back in the hand` : 'nobody was placed' };
   }
 
   // ---- assignment -----------------------------------------------------------------------------------
 
-  assign(questId: string, slotIdx: number, mercId: string): { ok: boolean; msg: string } {
+  /** THE ONE LEGALITY PREDICATE for putting a soldier in a quest place — null when legal, else the
+   *  reason in the player's words. Every placement path (assign, sendTo, autoAssign, placementsFor,
+   *  the views' fits) asks THIS, so no two surfaces can disagree about who may go where.
+   *  It deliberately does NOT refuse a soldier committed elsewhere (sending MOVES them) nor a place
+   *  someone else holds (sendTo SWAPS them) — assign() is the strict primitive that does. */
+  canTake(questId: string, slotIdx: number, mercId: string, opts: { ignoreApproach?: boolean } = {}): string | null {
     const q = this.state.quests.find(x => x.id === questId);
-    const merc = this.card(mercId);
-    if (!q || q.state !== 'open') return { ok: false, msg: 'no such quest' };
-    if (!merc?.character || merc.character.role !== 'merc') return { ok: false, msg: 'only mercs quest' };
+    if (!q || q.state !== 'open') return 'no such quest';
+    const m = this.card(mercId);
+    if (!m?.character || m.character.role !== 'merc') return 'only soldiers go on quests';
+    if (m.location.kind !== 'quest' && !(m.location.kind === 'held' && m.location.state === 'roster')) return 'not on your roster';
     const slot = q.slots[slotIdx];
-    if (!slot) return { ok: false, msg: 'no such slot' };
-    if (q.approaches && slot.groupId !== q.chosenApproach) return { ok: false, msg: 'pick that approach first' };
-    if (slot.filledBy) return { ok: false, msg: 'slot filled' };
+    if (!slot) return 'no such place';
+    if (slot.requirement.kind === 'must-be' && slot.requirement.cardId !== mercId)
+      return `this place names ${this.card(slot.requirement.cardId)?.name ?? 'someone else'}`;
+    if (slot.requirement.kind === 'must-have' && !queryMatches(m.tags, { match: slot.requirement.concept, minRank: slot.requirement.minRank }))
+      return `needs ${slot.requirement.concept}${slot.requirement.minRank ? ` (${slot.requirement.minRank}+)` : ''}`;
+    // the approach gates come LAST, so on an unchosen finale 'pick an approach first' means
+    // "otherwise legal" — the approach cards can name their best fit before the choice
+    if (opts.ignoreApproach) return null;
+    if (q.approaches && !q.chosenApproach) return 'pick an approach first';
+    if (q.approaches && slot.groupId !== q.chosenApproach) return 'that place belongs to another approach';
+    return null;
+  }
+
+  /** the place in the player's words: "the STR place" */
+  private placeName(q: Quest, idx: number): string {
+    return `the ${q.slots[idx]!.test.attributes.map(a => a.toUpperCase()).join('+')} place`;
+  }
+
+  /** what a placement just did, in one line: who, where, their strength there, and the party's
+   *  verdict once manned. `warn` when that verdict (or, short-handed, this place) is poor. */
+  private placedMsg(q: Quest, idx: number, merc: Card, lead = ''): { ok: true; msg: string; warn?: boolean } {
+    const s = q.slots[idx]!;
+    const c = coins(merc, s.test);
+    const strength = slotStrength(c, slotThreshold(s.test));
+    const o = this.questOdds(q.id);
+    const left = o.of - o.filled;
+    const tail = o.band ? ` · the party: ${BAND_TEXT[o.band]}` : ` · ${left} place${left === 1 ? '' : 's'} still open`;
+    const warn = o.band ? (o.band === 'long' || o.band === 'hopeless') : strength === 'weak';
+    return { ok: true, msg: `${lead}${merc.name} takes ${this.placeName(q, idx)} on ${q.title} — ${c} coins (${strength})${tail}`, ...(warn ? { warn } : {}) };
+  }
+
+  /** the STRICT primitive: an empty place, a free soldier. (sendTo is the forgiving path.) */
+  assign(questId: string, slotIdx: number, mercId: string): { ok: boolean; msg: string; warn?: boolean } {
+    const why = this.canTake(questId, slotIdx, mercId);
+    if (why) return { ok: false, msg: why };
+    const q = this.state.quests.find(x => x.id === questId)!;
+    const merc = this.card(mercId)!;
+    const slot = q.slots[slotIdx]!;
+    if (slot.filledBy === mercId) return { ok: false, msg: `${merc.name} is already there` };
+    if (slot.filledBy) return { ok: false, msg: `${this.card(slot.filledBy)?.name ?? 'someone'} holds that place` };
     if (merc.location.kind === 'quest') return { ok: false, msg: `${merc.name} is already committed` };
-    if (slot.requirement.kind === 'must-be' && slot.requirement.cardId !== mercId) return { ok: false, msg: 'this slot names someone else' };
-    if (slot.requirement.kind === 'must-have' && !queryMatches(merc.tags, { match: slot.requirement.concept, minRank: slot.requirement.minRank }))
-      return { ok: false, msg: `needs ${slot.requirement.concept}${slot.requirement.minRank ? ` (${slot.requirement.minRank}+)` : ''}` };
     slot.filledBy = mercId;
     merc.location = { kind: 'quest', questId, slot: slotIdx };
-    return { ok: true, msg: `${merc.name} → slot ${slotIdx}` };
+    return this.placedMsg(q, slotIdx, merc);
   }
 
   unassign(questId: string, slotIdx: number): { ok: boolean; msg: string } {
     const q = this.state.quests.find(x => x.id === questId);
     const slot = q?.slots[slotIdx];
     if (!q || !slot?.filledBy) return { ok: false, msg: 'nothing to unassign' };
+    const name = this.card(slot.filledBy)?.name ?? 'they';
     this.doUnassign(q, slot);
-    return { ok: true, msg: 'freed' };
+    return { ok: true, msg: `${name} back in the hand` };
   }
   private doUnassign(q: Quest, slot: QuestSlot) {
     const merc = slot.filledBy ? this.card(slot.filledBy) : null;
@@ -2158,90 +3004,163 @@ export class Game {
    *
    *  Both UIs call THIS. A second copy in the web would end the CLI's standing as a playtest
    *  surface (docs/DOGFOODING.md), which is the only surface this project can actually play. */
-  autoAssign(questId: string): { ok: boolean; msg: string; placed: number } {
+  autoAssign(questId: string): { ok: boolean; msg: string; placed: number; warn?: boolean } {
     const q = this.state.quests.find(x => x.id === questId);
     if (!q || q.state !== 'open') return { ok: false, msg: 'no such quest', placed: 0 };
     // recruit vs captive vs cash-out is a STORY choice. Auto must not make it silently.
     if (q.approaches && !q.chosenApproach)
       return { ok: false, msg: 'pick an approach first — that choice is yours', placed: 0 };
-    const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
+    const plan = this.autoPlan(q);
+    if (!plan.empty) return { ok: true, msg: 'already manned', placed: 0 };
+    if (!plan.pairs.length) return { ok: false, msg: 'nobody free fits this', placed: 0 };
+    // a quest that cannot be FULLY manned does not march — parking soldiers in it half-manned
+    // wastes them (autoAssignAll undoes exactly that; one Auto used to leave them there, green)
+    if (plan.short > 0)
+      return { ok: false, msg: `can't fully man it — ${plan.short} of ${plan.empty} empty place${plan.empty === 1 ? '' : 's'} ${plan.short === 1 ? 'has' : 'have'} nobody free who fits (nobody placed)`, placed: 0 };
+    let placed = 0;
+    for (const p of plan.pairs) if (this.assign(questId, p.idx, p.id).ok) placed++;
+    const band = this.questOdds(questId).band;
+    return {
+      ok: placed > 0,
+      msg: `${placed} placed — the party: ${band ? BAND_TEXT[band] : '?'}`,
+      placed,
+      ...(band === 'long' || band === 'hopeless' ? { warn: true } : {}),
+    };
+  }
+  /** the greedy fill autoAssign would make — (slot, free soldier) pairs by fit, best first, a tie
+   *  going to the CHEAPER soldier — without making it. `short` = empty places nobody free fits.
+   *  The ONE test of "can the idle soldiers man this" (autoAssign, the next-steps scroll). */
+  private autoPlan(q: Quest): { empty: number; short: number; pairs: { idx: number; id: string }[] } {
+    const active = this.activeSlots(q);
     const empty = active.filter(s => !s.filledBy);
-    if (!empty.length) return { ok: true, msg: 'already manned', placed: 0 };
     const free = this.roster().filter(m => m.location.kind === 'held');
     const pairs: { idx: number; id: string; score: number; worth: number }[] = [];
     for (const s of empty) {
       const idx = q.slots.indexOf(s);
       for (const m of free) {
-        if (s.requirement.kind === 'must-be' && s.requirement.cardId !== m.id) continue;
-        if (s.requirement.kind === 'must-have'
-          && !queryMatches(m.tags, { match: s.requirement.concept, minRank: s.requirement.minRank })) continue;
+        if (this.canTake(q.id, idx, m.id)) continue;
         // a wound is a PENALTY, not a bar: the engine lets the hurt march, and whether to spend
         // them is the player's call — auto merely prefers not to
         pairs.push({ idx, id: m.id, score: coins(m, s.test) - 2 * (m.character?.injuryTiers ?? 0), worth: m.value });
       }
     }
-    // best fit first; on a tie take the CHEAPER soldier, so a routine bounty does not quietly
-    // consume the company's best when a lesser hand clears the same bar
     pairs.sort((a, b) => b.score - a.score || a.worth - b.worth);
-    const tookSlot = new Set<number>(), tookMerc = new Set<string>();
-    let placed = 0;
+    const tookSlot = new Set<number>(), tookMerc = new Set<string>(), out: { idx: number; id: string }[] = [];
     for (const p of pairs) {
       if (tookSlot.has(p.idx) || tookMerc.has(p.id)) continue;
-      if (!this.assign(questId, p.idx, p.id).ok) continue;
-      tookSlot.add(p.idx); tookMerc.add(p.id); placed++;
+      tookSlot.add(p.idx); tookMerc.add(p.id); out.push({ idx: p.idx, id: p.id });
     }
-    const short = empty.length - placed;
-    return {
-      ok: placed > 0,
-      msg: placed === 0 ? 'nobody free fits this'
-        : short > 0 ? `${placed} named, ${short} still short` : `${placed} named`,
-      placed,
-    };
+    return { empty: empty.length, short: empty.length - out.length, pairs: out };
+  }
+  /** can the soldiers standing idle fill every empty place of this quest right now? */
+  canFullyMan(questId: string): boolean {
+    const q = this.state.quests.find(x => x.id === questId && x.state === 'open');
+    if (!q || (q.approaches && !q.chosenApproach)) return false;
+    const plan = this.autoPlan(q);
+    return plan.empty > 0 && plan.short === 0;
   }
 
   /** THE BEST PLACE FOR ONE SOLDIER on every open quest — what dragging a card over the map shows,
    *  what the card sheet's "send to" lists, and where sendTo() puts them. A soldier already
-   *  committed is scored as if free (sending moves them). Slots they cannot legally take are
-   *  skipped, so every row here is a place sendTo() will actually accept. */
-  placementsFor(cardId: string): { questId: string; title: string; idx: number; attr: string; coins: number; bar: number }[] {
+   *  committed is scored as if free (sending moves them). Only FREE places (or their own) count —
+   *  sendTo without a place never displaces anyone — and only places canTake() allows. */
+  placementsFor(cardId: string): Placement[] {
     const m = this.card(cardId);
     if (!m?.character || m.character.role !== 'merc') return [];
-    const out: { questId: string; title: string; idx: number; attr: string; coins: number; bar: number }[] = [];
+    const out: Placement[] = [];
+    const loc = m.location;
+    const onQ = loc.kind === 'quest' ? this.state.quests.find(x => x.id === loc.questId) : undefined;
     for (const q of this.state.quests) {
       if (q.state !== 'open' || (q.approaches && !q.chosenApproach)) continue;
-      let best: (typeof out)[number] | null = null;
+      let best: Placement | null = null;
+      const from = onQ && onQ.id !== q.id ? { questId: onQ.id, title: onQ.title } : null;
       q.slots.forEach((s, idx) => {
-        if (q.approaches && s.groupId !== q.chosenApproach) return;
         if (s.filledBy && s.filledBy !== cardId) return;
-        if (s.requirement.kind === 'must-be' && s.requirement.cardId !== cardId) return;
-        if (s.requirement.kind === 'must-have' && !queryMatches(m.tags, { match: s.requirement.concept, minRank: s.requirement.minRank })) return;
+        if (this.canTake(q.id, idx, cardId)) return;
         const c = coins(m, s.test);
-        if (!best || c > best.coins) best = { questId: q.id, title: q.title, idx, attr: s.test.attributes.join('+').toUpperCase(), coins: c, bar: slotThreshold(s.test) };
+        const bar = slotThreshold(s.test);
+        if (!best || c > best.coins) best = { questId: q.id, title: q.title, idx, attr: s.test.attributes.join('+').toUpperCase(), coins: c, bar, strength: slotStrength(c, bar), here: s.filledBy === cardId, from };
       });
       if (best) out.push(best);
     }
     return out;
   }
 
-  /** Send one soldier to a quest, into their best free place there (moving them off any other). */
-  sendTo(questId: string, cardId: string): { ok: boolean; msg: string } {
-    const p = this.placementsFor(cardId).find(x => x.questId === questId);
+  /** EVERY roster soldier against one quest place, for the quest page / hand / CLI candidates:
+   *  legal first, then by coins. `from` = where they stand now (sending moves them); `blocked` =
+   *  canTake's refusal. The soldier already in this place is left out. */
+  slotFits(questId: string, slotIdx: number): SlotFit[] {
     const q = this.state.quests.find(x => x.id === questId);
+    const s = q?.slots[slotIdx];
+    if (!q || !s) return [];
+    const bar = slotThreshold(s.test);
+    return this.roster().filter(m => m.id !== s.filledBy).map(m => {
+      const c = coins(m, s.test);
+      const loc = m.location;
+      const fromQ = loc.kind === 'quest' ? this.state.quests.find(x => x.id === loc.questId) : undefined;
+      const blocked = this.canTake(questId, slotIdx, m.id);
+      return {
+        id: m.id, name: m.name, coins: c, explain: explainCoins(m, s.test),
+        strength: slotStrength(c, bar), why: coinsWhy(m, s.test),
+        blocked,
+        gated: !!blocked && !this.canTake(questId, slotIdx, m.id, { ignoreApproach: true }),
+        from: loc.kind === 'quest' ? { questId: loc.questId, idx: loc.slot, title: fromQ?.title ?? loc.questId } : null,
+      };
+    }).sort((a, b) => (a.blocked ? 1 : 0) - (b.blocked ? 1 : 0) || (a.from ? 1 : 0) - (b.from ? 1 : 0) || b.coins - a.coins);
+  }
+
+  /** Send one soldier to a quest. Without a place: their best FREE place there. With one: exactly
+   *  that place — moving them off wherever they stand, and SWAPPING if someone holds it (the
+   *  displaced soldier takes the mover's old place when they legally can, else goes back to the
+   *  hand). One class with the room slots: an occupied target swaps. */
+  sendTo(questId: string, cardId: string, slotIdx?: number): { ok: boolean; msg: string; warn?: boolean } {
+    const q = this.state.quests.find(x => x.id === questId && x.state === 'open');
     if (!q) return { ok: false, msg: 'no such quest' };
     if (q.approaches && !q.chosenApproach) return { ok: false, msg: 'pick an approach first' };
-    if (!p) return { ok: false, msg: `no free place on ${q.title} for them` };
-    const m = this.card(cardId)!;
-    if (m.location.kind === 'quest') {
-      if (m.location.questId === questId && m.location.slot === p.idx) return { ok: true, msg: `${m.name} is already there` };
-      this.unassign(m.location.questId, m.location.slot);
+    const m = this.card(cardId);
+    if (!m?.character || m.character.role !== 'merc') return { ok: false, msg: 'only soldiers go on quests' };
+    let idx = slotIdx;
+    if (idx === undefined || !Number.isFinite(idx)) {
+      const p = this.placementsFor(cardId).find(x => x.questId === questId);
+      if (!p) {
+        const why = q.slots.map((_, i) => this.canTake(questId, i, cardId)).find(Boolean);
+        return { ok: false, msg: `no free place on ${q.title} for ${m.name}${why ? ` (${why})` : ''}` };
+      }
+      idx = p.idx;
     }
-    return this.assign(questId, p.idx, cardId);
+    const why = this.canTake(questId, idx, cardId);
+    if (why) return { ok: false, msg: why };
+    const slot = q.slots[idx]!;
+    if (slot.filledBy === cardId) return { ok: true, msg: `${m.name} is already there` };
+    const from = m.location.kind === 'quest' ? { questId: m.location.questId, idx: m.location.slot } : null;
+    const fq = from ? this.state.quests.find(x => x.id === from.questId) : undefined;
+    const fqWasReady = !!fq && fq.id !== q.id && this.isCommitted(fq);
+    let lead = '';
+    if (from) this.unassign(from.questId, from.idx);
+    if (slot.filledBy) {
+      const other = this.card(slot.filledBy)!;
+      this.doUnassign(q, slot);
+      // the displaced soldier takes the mover's old place when they can — a true swap
+      if (from && fq && !this.canTake(from.questId, from.idx, other.id) && this.assign(from.questId, from.idx, other.id).ok) {
+        lead = `${other.name} swaps to ${this.placeName(fq, from.idx)}${fq.id === q.id ? '' : ` on ${fq.title}`}; `;
+      } else lead = `${other.name} back in the hand; `;
+    }
+    slot.filledBy = cardId;
+    m.location = { kind: 'quest', questId, slot: idx };
+    const res = this.placedMsg(q, idx, m, lead);
+    // a move OFF another quest can break the party it left — say so, in the result both UIs print
+    if (fq && fq.id !== q.id && !fq.slots[from!.idx]!.filledBy) {
+      const a = this.activeSlots(fq), n = a.filter(s => s.filledBy).length;
+      const tail = ` — leaves ${fq.title}${n ? ` (now ${n} of ${a.length}${fqWasReady ? ", won't march" : ''})` : ' (now unmanned)'}`;
+      return { ...res, msg: res.msg + tail, ...(fqWasReady ? { warn: true } : {}) };
+    }
+    return res;
   }
 
   /** Man every open quest. One soldier can only be on one quest, so ORDER decides who gets the
    *  good people: quests that NAME someone or demand a tag have the fewest ways to be manned and
    *  go first; then the ones closest to lapsing. */
-  autoAssignAll(): { ok: boolean; msg: string; placed: number } {
+  autoAssignAll(): { ok: boolean; msg: string; placed: number; warn?: boolean } {
     const rank = (q: Quest) => {
       const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
       return active.some(s => s.requirement.kind === 'must-be') ? 0
@@ -2249,7 +3168,8 @@ export class Game {
     };
     const open = this.state.quests.filter(q => q.state === 'open' && !(q.approaches && !q.chosenApproach))
       .sort((a, b) => rank(a) - rank(b) || a.createdCycle - b.createdCycle);
-    let placed = 0;
+    let placed = 0, kept = 0;
+    const short: string[] = [];
     for (const q of open) {
       const active = () => q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
       const before = active().map(s => s.filledBy);
@@ -2257,14 +3177,28 @@ export class Game {
       // a quest that cannot be FULLY manned does not march, so soldiers left in it are wasted —
       // "3 soldiers named across 3 quests" left one idle in a half-manned raid while another quest
       // went unmanned (playtest 2026-09-25). Undo this pass's placements on a quest left short.
-      if (got && active().some(s => !s.filledBy)) {
-        active().forEach((s, i) => { if (s.filledBy && s.filledBy !== before[i]) this.unassign(q.id, q.slots.indexOf(s)) });
+      if (active().some(s => !s.filledBy)) {
+        if (got) active().forEach((s, i) => { if (s.filledBy && s.filledBy !== before[i]) this.unassign(q.id, q.slots.indexOf(s)) });
+        const need = active().filter(s => !s.filledBy).length;
+        short.push(`${q.title} needs ${need} more`);
         continue;
       }
-      placed += got;
+      if (got) { placed += got; kept++ }
     }
     const n = (x: number, one: string, many = one + 's') => `${x} ${x === 1 ? one : many}`;
-    return { ok: placed > 0, msg: placed ? `${n(placed, 'soldier')} named across ${n(open.length, 'quest')}` : 'nobody free fits anything', placed };
+    const ready = open.length - short.length;
+    const shortTail = short.length ? ` · short: ${short.slice(0, 3).join('; ')}${short.length > 3 ? ` (+${short.length - 3})` : ''}` : '';
+    // a manned party that marches into a poor verdict is worth a second look before END
+    const poor = open.map(q => ({ q, b: this.questOdds(q.id).band })).filter(x => x.b === 'long' || x.b === 'hopeless');
+    const poorTail = poor.length ? ` · poor odds: ${poor.slice(0, 3).map(x => `${x.q.title} (${BAND_TEXT[x.b!]})`).join('; ')}` : '';
+    return {
+      ok: placed > 0,
+      msg: placed
+        ? `${n(placed, 'soldier')} placed on ${n(kept, 'quest')} · ${n(ready, 'quest')} ready${shortTail}${poorTail}`
+        : `nobody free fits anything${shortTail}${poorTail}`,
+      placed,
+      ...(poor.length ? { warn: true } : {}),
+    };
   }
 
   /** WHAT THIS PAYS, in the player's words — the ENVELOPE (QUESTS §68: kind and shape, and the
@@ -2315,19 +3249,345 @@ export class Game {
     return q.approaches?.find(a => a.id === approachId)?.rewardKind ?? '';
   }
 
-  /** raw odds — ALWAYS visible (QUESTS §3); the Oracle adds computed % */
-  questOdds(questId: string): { coins: number; bar: number; success: number | null; partial: number | null; precision: 0 | 1 | 2 } {
+  /** raw odds — ALWAYS visible (QUESTS §3); the Oracle adds computed %. `band` is the engine's
+   *  plain-words verdict on the POOLED roll, shown at every Oracle precision once every active
+   *  place is filled (null before); `partialAt` = the heads a partial needs. */
+  questOdds(questId: string): QuestOdds {
     const q = this.state.quests.find(x => x.id === questId)!;
     const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
-    let totalCoins = 0, totalBar = 0;
+    let totalCoins = 0, totalBar = 0, filled = 0;
     for (const s of active) {
       totalBar += slotThreshold(s.test);
-      if (s.filledBy) totalCoins += coins(this.card(s.filledBy)!, s.test);
+      if (s.filledBy) { totalCoins += coins(this.card(s.filledBy)!, s.test); filled++ }
     }
     const oracle = this.state.fort.rooms.find(r => r.type === 'oracle');
     const precision = oraclePrecision(oracle ? this.comfort(oracle) : null);
     const o = precision > 0 ? odds(totalCoins, totalBar) : null;
-    return { coins: totalCoins, bar: totalBar, success: o?.success ?? null, partial: o?.partialOrBetter ?? null, precision };
+    const manned = active.length > 0 && filled === active.length;
+    return {
+      coins: totalCoins, bar: totalBar, success: o?.success ?? null, partial: o?.partialOrBetter ?? null, precision,
+      band: manned ? oddsBand(totalCoins, totalBar) : null, partialAt: PARTIAL_FRAC * totalBar,
+      filled, of: active.length,
+    };
+  }
+
+  /** what a quest brings, as kinds (known at birth) — the marker/board icons. A finale lists
+   *  its approaches' outcomes (the chosen one only, once chosen). */
+  questRewardKinds(questId: string): RewardKindTag[] {
+    const q = this.state.quests.find(x => x.id === questId);
+    if (!q) return [];
+    const kinds = new Set<RewardKindTag>();
+    for (const r of q.rewardSpecs) if (r.kind !== 'gold' || r.value >= 1) kinds.add(r.kind);
+    const chain = q.chainId ? this.state.chains.find(c => c.id === q.chainId) : undefined;
+    if (q.isFinale && q.approaches && !chain?.isPersonal) {
+      for (const a of q.approaches) if (!q.chosenApproach || a.id === q.chosenApproach) kinds.add(a.rewardKind);
+    }
+    const ORDER: RewardKindTag[] = ['captive', 'recruit', 'relic', 'lead', 'gold'];
+    return ORDER.filter(k => kinds.has(k));
+  }
+
+  /** a warning about what the quest brings versus what the fort can hold ("brings a captive ·
+   *  cells full"), or null */
+  questRewardWarn(questId: string): string | null {
+    const q = this.state.quests.find(x => x.id === questId);
+    if (!q) return null;
+    // an unchosen finale's endings are POSSIBLE kinds, not what it brings: each ending's own warning
+    // sits on its approach card (approachRewardWarn), never on the quest as a certainty
+    const kinds = q.isFinale && q.approaches && !q.chosenApproach
+      ? [...new Set(q.rewardSpecs.filter(r => r.kind !== 'gold' || r.value >= 1).map(r => r.kind))]
+      : this.questRewardKinds(questId);
+    return this.rewardWarnFor(kinds);
+  }
+  /** one finale approach's warning ('brings a captive · no Dungeon — they will be handed off'), or null */
+  approachRewardWarn(questId: string, approachId: string): string | null {
+    const kind = this.approachOutcome(questId, approachId);
+    return kind ? this.rewardWarnFor([kind as RewardKindTag]) : null;
+  }
+  /** what the fort cannot hold of what these rewards bring — the one rule behind both warnings */
+  private rewardWarnFor(kinds: RewardKindTag[]): string | null {
+    if (kinds.includes('captive')) {
+      if (!this.hasRoom('dungeon')) return 'brings a captive · no Dungeon — they will be handed off';
+      if (this.captives().length >= this.captiveCapacity()) return `brings a captive · cells full ${this.captives().length}/${this.captiveCapacity()}`;
+    }
+    if (kinds.includes('recruit')) {
+      // a rescued recruit with no Tavern pays what they can and MOVES ON (applyResolution) — the
+      // roster count is beside the point until there is somewhere for them to wait
+      if (!this.hasRoom('tavern')) return 'brings a recruit · no Tavern — they will thank you and move on';
+      if (this.roster().length >= this.rosterCapacity()) return `brings a recruit · roster full ${this.roster().length}/${this.rosterCapacity()}`;
+    }
+    return null;
+  }
+
+  /** what abandoning this quest costs, said BEFORE the click (both UIs' two-step confirm) */
+  abandonConsequence(questId: string): string {
+    const q = this.state.quests.find(x => x.id === questId && x.state === 'open');
+    if (!q) return 'no such open quest';
+    const party = q.slots.filter(s => s.filledBy).length;
+    const back = party ? ` ${party === 1 ? 'The soldier goes' : party === 2 ? 'Both soldiers go' : `All ${party} soldiers go`} back to the hand.` : '';
+    if (q.chainId) {
+      const out = this.abandonChainOutcome(q);
+      return out === 'continues' ? `A saga step: the card is gone, the thread dangles — a continuation lead returns to the board.${back}`
+        : out === 'slips' ? `A saga step: this step has now been left untaken three times — the saga slips out of reach${this.state.chains.find(c => c.id === q.chainId)?.state === 'finale-pending' ? ', finale and all' : ''}.${back}`
+        : `A saga step whose story is already over — nothing comes back.${back}`;
+    }
+    if (!q.fromLead) return `The card is gone for good.${back}`;
+    if (this.state.leads.some(l => l.id === q.fromLead!.id)) return `The card is gone; its post is still standing.${back}`;
+    if (!this.canReroll()) return `The lead does NOT come back — a lead can only be taken up again once a cycle.${back}`;
+    return `Set aside: the lead goes back on the board, to be written again (once a cycle).${back}`;
+  }
+
+  // ---- TURN GUIDANCE (R4/R5): what END would throw away, and what to do next ---------------------------
+
+  /** the active places of a quest (a finale's chosen approach only) */
+  private activeSlots(q: Quest) { return q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots }
+
+  /** R5: everything END would lose or leave behind, one list for the seal and the CLI's `end!`:
+   *  a finale with no approach; a quest that goes cold at this END (its TTL, or the stall rule —
+   *  both read questLapsesAt); a part-filled quest that will not march; a part-filled STANDING-POST
+   *  quest (its placement walks back when the post's quest goes; an empty one is no loss, the post
+   *  writes another); a saga's continuation lead, or a lead worth money, going cold; a captive handed
+   *  off from holding; a hireable guest leaving the tavern. The predicates are doEndCycle's own. */
+  endWarnings(): EndWarning[] {
+    const next = this.state.cycle + 1;
+    const out: EndWarning[] = [];
+    const quest = (q: Quest) => ({ screen: 'quest' as const, questId: q.id });
+    for (const q of this.state.quests.filter(x => x.state === 'open').sort((a, b) => this.questLapsesAt(a) - this.questLapsesAt(b))) {
+      if (this.isCommitted(q)) continue;
+      const active = this.activeSlots(q);
+      const filled = active.filter(s => s.filledBy).length, of = active.length;
+      const faucet = this.questIsFaucet(q);
+      const goes = this.questLapsesAt(q) <= next;
+      const lapsesNow = goes && (!faucet || filled > 0);
+      const base = { key: q.id, questId: q.id, title: q.title, filled, of, lapsesNow, target: quest(q) };
+      if (q.approaches && !q.chosenApproach) {
+        out.push({ ...base, why: 'needs-approach', text: `needs its ending chosen${lapsesNow ? ' — and goes cold this END' : ''}` });
+      } else if (lapsesNow) {
+        out.push({ ...base, why: 'lapses', text: faucet
+          ? `goes cold this END — ${filled} of ${of} placed walk back; the post will put up another`
+          : `goes cold this END — ${filled ? `${filled} of ${of} placed` : 'nobody placed'}${this.questStallAt(q) !== null ? ` (it has failed to march ${q.stalls ?? 0} time${(q.stalls ?? 0) === 1 ? '' : 's'})` : ''}` });
+      } else if (filled > 0) {
+        out.push({ ...base, why: 'short', text: `won't march — ${filled} of ${of} placed` });
+      }
+    }
+    for (const l of this.leadsGoingCold()) {
+      const chain = l.chainInfo.kind === 'continues' ? this.state.chains.find(c => c.id === (l.chainInfo as { chainId: string }).chainId) : undefined;
+      const b = leadBand(l);
+      out.push({ key: l.id, questId: null, title: chain ? chain.bible.title : l.title ?? `${l.archetype} in ${REGION[l.region]?.name ?? l.region}`,
+        why: 'lead-lapses', filled: 0, of: 0, lapsesNow: true, target: { screen: 'leads' },
+        text: chain ? `the saga slips this END unless its lead is pursued (${l.id})` : `a lead worth ${b.label} goes cold this END (${l.id})` });
+    }
+    for (const h of this.state.holding.filter(x => x.expiresAtCycle <= next)) {
+      const c = this.card(h.cardId);
+      if (!c) continue;
+      out.push({ key: c.id, questId: null, title: c.name, why: 'handoff', filled: 0, of: 0, lapsesNow: true, target: { screen: 'holding', cardId: c.id },
+        text: `handed off at this END at the quick price ~${this.lapseQuote(c.id) ?? 0}g — ransom ~${this.ransomQuote(c.id) ?? 0}g, or keep them` });
+    }
+    for (const t of this.state.tavern.filter(x => !x.prepaid && x.expiresAtCycle <= next && !this.hireBlock(x.cardId))) {
+      const c = this.card(t.cardId);
+      if (!c) continue;
+      out.push({ key: c.id, questId: null, title: c.name, why: 'leaves', filled: 0, of: 0, lapsesNow: true, target: { screen: 'tavern', cardId: c.id },
+        text: `leaves the tavern at this END — hire for ${this.hireQuote(c.id) ?? 0}g` });
+    }
+    return out;
+  }
+  /** leads the player could pursue that go cold at this END AND are a real loss: a saga's
+   *  continuation (the saga slips) or a lead carrying money (leadBand ≥ 2 — the reckoning names
+   *  those as lost; an unbanded lead lapses quietly, as it always has) */
+  private leadsGoingCold(): Lead[] {
+    const next = this.state.cycle + 1;
+    return this.leadBoard().filter(r => !r.blocked && r.lead.expiresAtCycle !== null && r.lead.expiresAtCycle <= next
+      && (r.lead.chainInfo.kind === 'continues' || leadBand(r.lead).band >= 2)).map(r => r.lead);
+  }
+  /** true when no party would march at this END */
+  nobodyMarches(): boolean { return this.marching() === 0 }
+  /** how many parties march at this END */
+  marching(): number { return this.state.quests.filter(q => q.state === 'open' && this.isCommitted(q)).length }
+
+  /** R4: the next concrete things to do, most pressing first (max 6), each with where it happens
+   *  and, when one engine action does it, that action. Ends on "end the cycle" when END is safe.
+   *  `placements` = a cache of roomPlacementsFor by card id (the server computes them once a view). */
+  nextSteps(placements?: Map<string, RoomPlacement[]>): NextStep[] {
+    const st = this.state;
+    const steps: NextStep[] = [];
+    const cyc = (n: number) => `${n} cycle${n === 1 ? '' : 's'}`;
+    const open = st.quests.filter(q => q.state === 'open');
+    // 1) no Map room: nothing reaches the board
+    if (!this.hasRoom('map-room')) {
+      const cost = buildCost(ROOM_TYPE['map-room']!);
+      steps.push({ kind: 'build', text: 'Build a Map room', detail: 'quests go up on its table', urgent: true,
+        target: { screen: 'build', type: 'map-room' },
+        act: { type: 'build', args: ['map-room'], label: `Build · ${cost}g`, cli: 'build map-room', block: this.buildableTypes().find(b => b.type === 'map-room')?.reason ?? null } });
+    }
+    // 2) a finale waits on its ending
+    for (const q of open.filter(x => x.approaches && !x.chosenApproach)) {
+      steps.push({ kind: 'approach', text: `Choose how "${q.title}" ends`, detail: `${q.approaches!.length} ways to end it`, urgent: true,
+        target: { screen: 'quest', questId: q.id }, act: null });
+    }
+    // 3) quests nobody is marching on, while soldiers stand idle — only those the idle soldiers
+    //    can FULLY man get an Auto button (a half-manned party does not march; the button was a
+    //    dead click every cycle when none could be)
+    const idle = this.roster().filter(m => m.location.kind === 'held').length;
+    const unmanned = open.filter(q => !(q.approaches && !q.chosenApproach) && !this.isCommitted(q));
+    const fillable = idle ? unmanned.filter(q => this.canFullyMan(q.id)) : [];
+    const goesCold = (q: Quest) => (!this.questIsFaucet(q) || this.activeSlots(q).some(s => s.filledBy)) && this.questLapsesAt(q) <= st.cycle + 1;
+    if (fillable.length) {
+      const cold = fillable.filter(goesCold).length;
+      const idleTxt = `${idle} soldier${idle === 1 ? '' : 's'} idle${cold ? ` · ${cold} go${cold === 1 ? 'es' : ''} cold this END` : ''}`;
+      if (fillable.length === 1) {
+        const q = fillable[0]!, a = this.activeSlots(q);
+        steps.push({ kind: 'man', text: `Man "${q.title}"`, detail: `${a.filter(s => s.filledBy).length} of ${a.length} placed · ${idleTxt}`, urgent: cold > 0,
+          target: { screen: 'quest', questId: q.id }, act: { type: 'auto', args: [q.id], label: 'Auto-fill', cli: `auto ${q.id}`, block: null } });
+      } else {
+        steps.push({ kind: 'man', text: `${fillable.length} quests unmanned`, detail: idleTxt, urgent: cold > 0,
+          target: { screen: 'map' }, act: { type: 'autoall', args: [], label: 'Auto-fill every quest', cli: 'auto all', block: null } });
+      }
+    } else if (idle && unmanned.length) {
+      // soldiers idle, quests open, and no quest they can fill: say so (no button — nothing to click)
+      steps.push({ kind: 'man', text: `${unmanned.length} quest${unmanned.length === 1 ? '' : 's'} the idle can't fully man`,
+        detail: `${idle} soldier${idle === 1 ? '' : 's'} idle — each quest needs more hands or a better fit`, urgent: false,
+        target: { screen: 'map' }, act: null });
+    }
+    // 4) leads the map table could be writing
+    const pursuable = this.leadBoard().filter(r => !r.blocked);
+    if (pursuable.length) {
+      const cold = pursuable.filter(r => r.lead.expiresAtCycle !== null && r.lead.expiresAtCycle <= st.cycle + 1).length;
+      // urgent only for a REAL loss (the END guard's own predicate: a saga's lead, a lead with money in it)
+      const loss = this.leadsGoingCold().length > 0;
+      const one = pursuable[0]!.lead;
+      const title = one.title ?? `${one.archetype} in ${REGION[one.region]?.name ?? one.region}`;
+      steps.push(pursuable.length === 1
+        ? { kind: 'pursue', text: `Pursue a lead — ${title}`, detail: cold ? 'goes cold this END' : null, urgent: loss,
+            target: { screen: 'leads' }, act: { type: 'pursue', args: [one.id], label: 'Pursue', cli: `pursue ${one.id}`, block: null } }
+        : { kind: 'pursue', text: `Pursue ${pursuable.length} leads`, detail: cold ? `${cold} go${cold === 1 ? 'es' : ''} cold this END` : null, urgent: loss,
+            target: { screen: 'leads' }, act: { type: 'pursueall', args: [], label: `Pursue all (${pursuable.length})`, cli: 'pursue all', block: null } });
+    }
+    // 5) a captive in holding about to be handed off at the quick price
+    const hold = [...st.holding].sort((a, b) => a.expiresAtCycle - b.expiresAtCycle).find(h => h.expiresAtCycle - st.cycle <= 2);
+    const hc = hold ? this.card(hold.cardId) : undefined;
+    if (hold && hc) {
+      const left = hold.expiresAtCycle - st.cycle;
+      const block = this.acceptBlock(hc.id);
+      // keeping them is the step; when the cells can't take them, the step is what makes room
+      steps.push({ kind: 'holding', text: `${hc.name} in holding — ${this.holdingDeadline(hc.id)}`,
+        detail: `ransom ~${this.ransomQuote(hc.id) ?? 0}g, or keep them${block ? ` — ${block.reason}` : ''}`, urgent: left <= 1,
+        target: { screen: 'holding', cardId: hc.id },
+        act: block ? this.fixAct(block.fix) : { type: 'accept', args: [hc.id], label: 'To the cells', cli: `accept ${hc.id}`, block: null } });
+    }
+    // 6) someone at the tavern you can hire now
+    const guest = [...st.tavern].filter(t => !this.hireBlock(t.cardId))
+      .sort((a, b) => Number(!!b.prepaid) - Number(!!a.prepaid) || a.expiresAtCycle - b.expiresAtCycle)[0];
+    const gc = guest ? this.card(guest.cardId) : undefined;
+    if (guest && gc) {
+      const cost = this.hireQuote(gc.id) ?? 0;
+      steps.push({ kind: 'hire', text: `Hire ${gc.name}${cost ? ` · ${cost}g` : ' — already paid for'}`,
+        detail: guest.prepaid ? null : this.tavernDeadline(gc.id),
+        urgent: !guest.prepaid && guest.expiresAtCycle <= st.cycle + 1,
+        target: { screen: 'tavern', cardId: gc.id }, act: { type: 'hire', args: [gc.id], label: cost ? `Hire · ${cost}g` : 'Hire', cli: `hire ${gc.id}`, block: null } });
+    }
+    // 7) the Great Hall can go up
+    const gh = this.ghInfo();
+    if (gh.ready) {
+      const hall = st.fort.rooms.find(r => r.type === 'great-hall');
+      steps.push({ kind: 'gh', text: `Raise the Great Hall — ready · ${gh.cost}g`,
+        detail: gh.unlocks.length ? `opens ${gh.unlocks.slice(0, 3).map(u => u.name).join(', ')}${gh.unlocks.length > 3 ? '…' : ''}` : null, urgent: false,
+        target: hall ? { screen: 'room', roomId: hall.id } : { screen: 'fort' },
+        act: { type: 'gh', args: [], label: `Raise · ${gh.cost}g`, cli: 'gh', block: null } });
+    }
+    // 8) a stored card with somewhere to go: a raw captive to rack, a tamed one or a relic to show —
+    //    or, when nothing takes it, the one purchase that makes a place for it
+    const stored = [...this.captives(), ...this.relics().filter(r => this.isOwned(r))]
+      .filter(c => c.location.kind !== 'room' && !st.breaking.some(b => b.cardId === c.id));
+    let rack: NextStep | null = null, show: (NextStep & { gain: number; tamed: boolean }) | null = null, place: NextStep | null = null;
+    for (const c of stored) {
+      const rows = placements?.get(c.id) ?? this.roomPlacementsFor(c.id);
+      const best = rows.find(p => p.ok && p.roomId);
+      const cs = this.captiveState(c.id);
+      if (best) {
+        const act = { type: 'setin', args: [best.roomId!, c.id], label: 'Set in', cli: `setin ${c.id} ${best.roomId}`, block: null };
+        const target = { screen: 'room' as const, roomId: best.roomId!, cardId: c.id };
+        if (best.kind === 'rack') {
+          rack ??= { kind: 'rack', text: `Rack ${c.name} — ${best.label}`, detail: `the ${best.roomName}`, urgent: false, target, act: { ...act, label: 'To the rack' } };
+        } else if (cs?.state === 'tamed' || best.gain > 1e-9 || best.comfortAfter - best.comfortBefore > 1e-9) {
+          const tamed = cs?.state === 'tamed';
+          const cand = { kind: 'setin' as const, text: tamed ? `Tamed ${c.name} — set them in a room` : `Set ${c.name} in the ${best.roomName}`,
+            detail: `${best.roomName}: ${best.label}`, urgent: false, target, act, gain: best.gain, tamed };
+          if (!show || (tamed && !show.tamed) || (tamed === show.tamed && cand.gain > show.gain)) show = cand;
+        }
+      } else if (!place) {
+        // the place that serves what the card is FOR (placeFixFor — the prisoner hub and the CLI's
+        // Dungeon view make the same choice): a place to add, or a room to BUILD
+        const pf = this.placeFixFor(c.id, rows);
+        if (pf && 'action' in pf.fix && pf.fix.action !== 'gh') {
+          const f = pf.fix;
+          place = { kind: f.action === 'build' ? 'build' : 'addplace',
+            text: f.action === 'build' ? `Build a ${pf.roomName}` : f.action === 'upgrade' ? `Add a place to the ${pf.roomName}` : f.label.split(' · ')[0]!,
+            detail: `${c.name} has nowhere to go`, urgent: false,
+            target: f.action === 'upgrade' ? { screen: 'room', roomId: f.roomId, cardId: c.id } : f.action === 'build' ? { screen: 'build', type: f.type } : { screen: 'fort' },
+            act: this.fixAct(f) };
+        }
+      }
+    }
+    if (show) { const { gain: _g, tamed: _t, ...s } = show; steps.push(s) }
+    if (rack) steps.push(rack);
+    if (place) steps.push(place);
+    // 9) GROW: the Great Hall waits on prestige and no room earns any — name the room that would
+    //    (following the scroll alone never moved the goal off 0.0)
+    if (!gh.ready && gh.next !== null && gh.have < (gh.need ?? 0) && !place
+      && !st.fort.rooms.some(r => ROOM_TYPE[r.type]!.benefit === 'prestige')) {
+      const type = this.bestPrestigeBuild();
+      const f = type ? this.buildFix(type) : null;
+      if (type && f) steps.push({ kind: 'build', text: `Build a ${ROOM_TYPE[type]!.name} — prestige raises the Great Hall`,
+        detail: `the Great Hall's next tier needs ${gh.need} prestige; relics and tamed captives on show there earn it`, urgent: false,
+        target: { screen: 'build', type }, act: this.fixAct(f) });
+    }
+    // urgent first, the rest in the order above; END closes the list when it is safe
+    const ordered = [...steps.filter(s => s.urgent), ...steps.filter(s => !s.urgent)].slice(0, 5);
+    if (!ordered.length || (!ordered.some(s => s.urgent) && !this.endWarnings().length)) {
+      const n = this.marching();
+      ordered.push({ kind: 'end', text: ordered.length ? (n ? `Or end the cycle — ${n} part${n === 1 ? 'y marches' : 'ies march'}` : 'Or end the cycle')
+        : n ? `All set — ${n} part${n === 1 ? 'y marches' : 'ies march'}` : 'All set — end the cycle',
+        detail: null, urgent: false, target: { screen: 'map' }, act: null });
+    }
+    return ordered;
+  }
+
+  /** a Fix that is an engine action, as a next step's one-click act (a place-to-go fix has none) */
+  private fixAct(f: Fix | null): NextStep['act'] {
+    if (!f || !('action' in f)) return null;
+    // a build that first needs a free cell: the one click is the dig (never a dead, disabled Build)
+    if (f.action === 'build' && f.block && this.buildableTypes().find(b => b.type === f.type)?.blocker === 'cell') {
+      const cost = excavateCost(this.state.fort.cells.length);
+      // the label is what THIS click does (short, so it never crowds the step's own words);
+      // what must follow rides in `then`
+      return { type: 'excavate', args: [], label: `Dig a cell · ${cost}g`, cli: 'excavate',
+        block: this.gold() < cost ? `short ${cost - this.gold()}g` : null, then: `${f.label.split(' · ')[0]} ('build ${f.type}')` };
+    }
+    const args = f.action === 'upgrade' ? [f.roomId] : f.action === 'build' ? [f.type] : [];
+    return { type: f.action, args, label: f.label, cli: [f.action, ...args].join(' '), block: f.block };
+  }
+
+  /** the cycle's spoils in one line — the CLI TALLY and the web's after-PROCEED toast say the same */
+  static tallyLine(s: CycleSummary): string {
+    const names = (xs: { name: string }[], one: string, many: string) => xs.length > 2 ? `${xs.length} ${many}` : xs.map(x => x.name).join(', ') + (one ? ` ${one}` : '');
+    const dg = s.goldAfter - s.goldBefore, dp = s.prestigeAfter - s.prestigeBefore;
+    const parts = [
+      dg ? `${dg > 0 ? '+' : '−'}${Math.abs(dg)}g` : '',
+      Math.abs(dp) >= 0.05 ? `${dp > 0 ? '+' : '−'}${Math.abs(dp).toFixed(1)} prestige` : '',
+      ...s.levelUps.map(l => `⭐ ${l.name} L${l.level}`),
+      s.wounds.length ? `🩸 ${names(s.wounds, 'wounded', 'wounded')}` : '',
+      s.captivesTaken.length ? `⛓ ${names(s.captivesTaken, 'taken', 'captives taken')}` : '',
+      s.recruits.length ? `🍺 ${names(s.recruits, 'at the tavern', 'at the tavern')}` : '',
+      s.relicsGained.length ? `🗝 ${names(s.relicsGained, '', 'relics')}` : '',
+      s.tamed.length ? `🔗 ${names(s.tamed, 'tamed', 'tamed')}` : '',
+      s.newLeads ? `+${s.newLeads} lead${s.newLeads === 1 ? '' : 's'}` : '',
+      s.lapsed.length ? `${s.lapsed.length} went cold` : '',
+      s.leadsCold.length ? `${s.leadsCold.length} lead${s.leadsCold.length === 1 ? '' : 's'} lost` : '',
+      s.stalled.length ? `${s.stalled.length} did not march` : '',
+      (s.handedOff ?? []).length ? `⛓ ${names(s.handedOff!, 'handed off', 'handed off')}` : '',
+      ...(s.debts ?? []).map(d => `⚠ ${d.amount}g debt`),
+      ...(s.setbacks ?? []).map(b => `✗ setback ${b.failures}/${b.budget} — ${b.title}`),
+    ].filter(Boolean);
+    return parts.join(' · ') || 'nothing changed hands';
   }
 
   // ---- END CYCLE (the reckoning) -----------------------------------------------------------------------
@@ -2335,7 +3595,11 @@ export class Game {
   private cycleInFlight = false;
   // TEMPO P11/P15: the reckoning as it is being written — an ordered list of blocks (head, one
   // per marching quest, tail) so a landed report can be READ while the slow ones are still out
-  private reckoning: { writing: boolean; blocks: string[][] } | null = null;
+  private reckoning: { writing: boolean; blocks: string[][]; meta: (Omit<ReckonMeta, 'from' | 'to'> & { block: number })[]; landed: Set<string> } | null = null;
+  /** what the cycle's own events add to the tally (wounds, tamings, losses) — set only while a
+   *  reckoning runs; everything else in the summary is a before/after diff */
+  private cycleAcc: { wounds: CycleSummary['wounds']; tamed: CycleSummary['tamed']; lapsed: string[]; stalled: string[]; leadsCold: string[];
+    handedOff: NonNullable<CycleSummary['handedOff']>; setbacks: NonNullable<CycleSummary['setbacks']> } | null = null;
   /** the finished reckoning's shape, kept after the cycle ends — a surface that prints as it goes
    *  (a terminal) needs to know what the blocks it never caught actually turned into */
   private lastBlocks: string[][] = [];
@@ -2348,10 +3612,20 @@ export class Game {
   /** the last completed reckoning, block by block (empty before the first one) */
   lastReckoningBlocks(): string[][] { return this.lastBlocks.map(b => [...b]) }
 
-  reckoningView(): { writing: boolean; lines: string[]; blocks: string[][] } | null {
+  reckoningView(): { writing: boolean; lines: string[]; blocks: string[][]; meta: ReckonMeta[] } | null {
     if (!this.reckoning) return null;
     const blocks = this.reckoning.blocks.map(b => [...b]);
-    return { writing: this.reckoning.writing, lines: blocks.flat(), blocks };
+    // only quests whose report has LANDED — the verdict must not beat its own story to the page
+    const landed = this.reckoning.landed;
+    return { writing: this.reckoning.writing, lines: blocks.flat(), blocks,
+      meta: Game.placeMeta(this.reckoning.meta.filter(m => landed.has(m.questId)), blocks) };
+  }
+  /** a meta row's line range = where its block sits in the flattened lines */
+  private static placeMeta(meta: (Omit<ReckonMeta, 'from' | 'to'> & { block: number })[], blocks: string[][]): ReckonMeta[] {
+    const starts: number[] = [];
+    let at = 0;
+    for (const b of blocks) { starts.push(at); at += b.length }
+    return meta.map(({ block, ...m }) => ({ ...m, from: starts[block] ?? 0, to: (starts[block] ?? 0) + (blocks[block]?.length ?? 0) }));
   }
 
   async endCycle(): Promise<string[]> {
@@ -2368,18 +3642,30 @@ export class Game {
     } finally {
       this.cycleInFlight = false;
       this.reckoning = null;
+      this.cycleAcc = null;
     }
   }
 
   private async doEndCycle(): Promise<string[]> {
     const st = this.state;
+    // the TALLY's before-snapshot, taken at the press of END (nothing below reads it back)
+    const before = {
+      gold: this.gold(), prestige: this.prestige(),
+      levels: new Map(this.roster().map(m => [m.id, m.character!.level])),
+      leads: new Set(this.visibleLeads().map(l => l.id)),
+      holding: new Set(st.holding.map(h => h.cardId)), tavern: new Set(st.tavern.map(t => t.cardId)),
+      relics: new Set(this.relics().filter(r => this.isOwned(r)).map(r => r.id)),
+      // debts by id → amount: a new debt can MERGE into a held stack, so the tally diffs amounts
+      debts: new Map(st.cards.filter(isLiability).map(c => [c.id, Math.abs(c.value) * (c.qty ?? 1)])),
+    };
+    this.cycleAcc = { wounds: [], tamed: [], lapsed: [], stalled: [], leadsCold: [], handedOff: [], setbacks: [] };
     st.cycle += 1;
     // the report is a list of BLOCKS read as it grows (see `reckoning`); `report` points at
     // whichever block the current push sites belong to — the head now, the tail after step 3
     const blocks: string[][] = [];
     let report: string[] = [];
     blocks.push(report);
-    this.reckoning = { writing: true, blocks };
+    this.reckoning = { writing: true, blocks, meta: [], landed: new Set() };
     // tier-ups from this cycle's fort phase lead the report (the moment must be SEEN)
     if (st.pendingTierLines?.length) { report.push(...st.pendingTierLines); st.pendingTierLines = [] }
 
@@ -2397,11 +3683,15 @@ export class Game {
       const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
       const filled = active.filter(s => s.filledBy).length;
       if (filled === 0) { q.stalls = 0; continue }
+      // a quest this END's expiry pass takes anyway is reported ONCE, as gone cold — not also as
+      // "did not march" (the tally counted one lost quest twice)
+      if (st.cycle - q.createdCycle >= this.questTtl(q)) continue;
       q.stalls = (q.stalls ?? 0) + 1;
-      if (q.stalls >= 3 && !q.isFinale) {
+      if (q.stalls >= STALL_LIMIT && !q.isFinale) {
         this.abandonQuest(q, report);   // its own lapse line suffices — a second read as spam
       } else {
         report.push(`⏸ ${q.title} did not march — every slot must be filled (${filled} of ${active.length}).`);
+        this.cycleAcc?.stalled.push(q.title);
       }
     }
     st.quests = st.quests.filter(q => q.state === 'open');
@@ -2428,6 +3718,9 @@ export class Game {
         ...(q.situation ? [`「${q.situation}」`] : []),
         `✎ ${party.map(p => p.name).join(', ')} march out — the report is being written…`];
       questBlocks.set(q.id, block); blocks.push(block);
+      this.reckoning.meta.push({ questId: q.id, title: q.title, outcome: rolled.outcome, heads: rolled.heads, coins: rolled.totalCoins,
+        bar: rolled.totalBar, partialAt: PARTIAL_FRAC * rolled.totalBar, party: party.map(p => p.name), partyIds: party.map(p => p.id),
+        isFinale: !!q.isFinale, chainId: q.chainId ?? null, block: blocks.length - 1 });
     }
     // everything pushed from here on is fort news and lands AFTER the stories. NOTE the head
     // block (tier-ups, ⏸ stalls, lapses, 'a quiet cycle') still prints BEFORE them — TEMPO P18's
@@ -2517,6 +3810,7 @@ export class Game {
       block.length = 0;   // applyResolution re-pushes the title line itself
       try {
         this.applyResolution(r, out, block, pendingEdges);
+        this.reckoning?.landed.add(out.questId);
       } catch (e) {
         arriveError ??= e;
         block.push(`— ${r.quest.title} (${r.quest.id})`, '⚠ this report could not be applied.');
@@ -2532,6 +3826,7 @@ export class Game {
       const block = questBlocks.get(r.quest.id)!;
       block.length = 0;
       this.applyResolution(r, aiOuts.find(o => o.questId === r.quest.id), block, pendingEdges);
+      this.reckoning?.landed.add(r.quest.id);
     }
     if (arriveError) throw arriveError;   // loud, as it was before the callback existed
     // COLD-READER GATE on saga reports REMOVED (reviewlab 84001 + blind judge, 2026-07-17):
@@ -2563,13 +3858,14 @@ export class Game {
     for (const s of st.holding.filter(s => s.expiresAtCycle <= st.cycle)) {
       const c = this.card(s.cardId);
       if (c) {
-        const pay = Math.round(cashValue(c.value) * SELL_RATE);
+        const pay = this.lapseQuote(c.id) ?? Math.round(cashValue(c.value) * SELL_RATE);
         this.ensureLoreNode(c); c.location = HELD('lore');
         this.addGold(pay);
         guardEdges(st.lore, [{ from: c.id, to: c.id, type: 'party-to', blurb: 'handed off by the company when their holding lapsed — no longer at the fort', importance: 0.7 }], st.cycle, () => freshId('e'));
         this.noteCustodyChange(c.id, `${c.name} was handed off — no longer in the company's hands`);
         this.log('sell', `${c.name} handed off at the quick price (holding lapsed).`);
         report.push(`⛓ Time ran out on ${c.name} — handed off at the quick price. 💰 +${pay}g (a ransom before the clock pays better).`);
+        this.cycleAcc?.handedOff.push({ id: c.id, name: c.name, gold: pay });
       }
     }
     st.holding = st.holding.filter(s => s.expiresAtCycle > st.cycle);
@@ -2661,6 +3957,7 @@ export class Game {
     // ECONOMY §7.3: a banded lead going cold is a real loss — name it, so the sting is legible
     // rather than silent. An unbanded lead lapses quietly, as it always has.
     for (const l of st.leads.filter(l => l.expiresAtCycle !== null && l.expiresAtCycle <= st.cycle && !this.reserved.has(l.id))) {
+      if (before.leads.has(l.id)) this.cycleAcc?.leadsCold.push(l.title ?? `${l.archetype} in ${REGION[l.region]!.name}`);
       const b = leadBand(l);
       if (b.band >= 2) report.push(`🧭 A lead worth ${b.label} went cold — ${l.title ?? `${l.archetype} in ${REGION[l.region]!.name}`}.`);
     }
@@ -2681,6 +3978,36 @@ export class Game {
       }
     }
 
+    // archive the reckoning — its lines, verdicts and TALLY — the moment every line is in, BEFORE
+    // the flesh tail: the player is released from the page right here, and PROCEED must find the
+    // spoils already totalled (flesh writes who/backstory only; nothing in the summary moves)
+    const lines = blocks.flat();
+    const meta = Game.placeMeta(this.reckoning?.meta ?? [], blocks);
+    const acc = this.cycleAcc!;
+    const summary: CycleSummary = {
+      cycle: st.cycle,
+      goldBefore: before.gold, goldAfter: this.gold(),
+      prestigeBefore: before.prestige, prestigeAfter: this.prestige(),
+      outcomes: { success: meta.filter(m => m.outcome === 'success').length, partial: meta.filter(m => m.outcome === 'partial').length, failure: meta.filter(m => m.outcome === 'failure').length },
+      levelUps: this.roster().filter(m => before.levels.has(m.id) && m.character!.level > before.levels.get(m.id)!)
+        .map(m => ({ id: m.id, name: m.name, level: m.character!.level })),
+      wounds: acc.wounds,
+      newLeadIds: this.visibleLeads().filter(l => !before.leads.has(l.id)).map(l => l.id),
+      newLeads: 0,
+      captivesTaken: st.holding.filter(h => !before.holding.has(h.cardId)).map(h => ({ id: h.cardId, name: this.card(h.cardId)?.name ?? '?' })),
+      recruits: st.tavern.filter(t => !before.tavern.has(t.cardId)).map(t => ({ id: t.cardId, name: this.card(t.cardId)?.name ?? '?' })),
+      relicsGained: this.relics().filter(r => this.isOwned(r) && !before.relics.has(r.id)).map(r => ({ id: r.id, name: r.name })),
+      tamed: acc.tamed, lapsed: acc.lapsed, stalled: acc.stalled, leadsCold: acc.leadsCold,
+      handedOff: acc.handedOff, setbacks: acc.setbacks,
+      debts: st.cards.filter(isLiability).map(c => ({ id: c.id, name: c.name, amount: Math.abs(c.value) * (c.qty ?? 1) - (before.debts.get(c.id) ?? 0) }))
+        .filter(d => d.amount > 0),
+    };
+    summary.newLeads = summary.newLeadIds.length;
+    if (lines.length) {
+      (st.reckonings ??= []).push({ cycle: st.cycle, lines, meta, summary });
+      while (st.reckonings.length > RECKONINGS_KEPT) st.reckonings.shift();
+    }
+
     // 7) FLESH pass — every merc and staged person deserves a who/backstory/quirks
     // (attachment starts here; persisted per producer-2, so this runs at most once each).
     // Every report line is in by now, so the player is released BEFORE this 12-16s tail.
@@ -2690,24 +4017,18 @@ export class Game {
     // keep the save lean: the log is a UI convenience, not the archive (lore is)
     if (st.log.length > 600) st.log = st.log.slice(-400);
 
-    // archive the reckoning BEFORE returning, so it survives the save and the player can look
-    // back after advancing (the cycle number was already bumped at the top of this pass)
-    const lines = blocks.flat();
-    if (lines.length) {
-      (st.reckonings ??= []).push({ cycle: st.cycle, lines });
-      while (st.reckonings.length > RECKONINGS_KEPT) st.reckonings.shift();
-    }
-
     this.state.rngState = this.rng.state();
     this.state.idCounter = idCounter();
     this.lastBlocks = blocks.map(b => [...b]);
     return lines;
   }
 
-  /** every kept reckoning, oldest first */
-  reckonings(): { cycle: number; lines: string[] }[] { return this.state.reckonings ?? [] }
+  /** every kept reckoning, oldest first (an archive from before the tally reads meta [] / summary null) */
+  reckonings(): ReckoningRecord[] {
+    return (this.state.reckonings ?? []).map(r => ({ cycle: r.cycle, lines: r.lines, meta: r.meta ?? [], summary: r.summary ?? null }));
+  }
   /** one reckoning by cycle number, or the most recent when no cycle is given */
-  reckoningAt(cycle?: number): { cycle: number; lines: string[] } | undefined {
+  reckoningAt(cycle?: number): ReckoningRecord | undefined {
     const all = this.reckonings();
     return cycle === undefined ? all[all.length - 1] : all.find(r => r.cycle === cycle);
   }
@@ -2727,7 +4048,23 @@ export class Game {
 
   /** the cycle this quest goes cold — ONE surface of truth, so a board cannot advertise a life the
    *  expiry pass will not honour (a faucet quest was showing c10 while lapsing after one cycle) */
-  questLapsesAt(q: Quest): number { return q.createdCycle + this.questTtl(q) }
+  questLapsesAt(q: Quest): number {
+    const ttl = q.createdCycle + this.questTtl(q);
+    return this.questStallAt(q) ?? ttl;
+  }
+  /** the cycle a PART-FILLED quest is set aside at by the stall rule (STALL_LIMIT failed marches
+   *  running, doEndCycle) when that comes before its TTL — null when it does not apply. Recomputed
+   *  from the placement NOW: nobody placed resets the count at END. */
+  questStallAt(q: Quest): number | null {
+    if (q.isFinale || q.state !== 'open' || this.isCommitted(q)) return null;
+    if (!this.activeSlots(q).some(s => s.filledBy)) return null;
+    const at = this.state.cycle + Math.max(1, STALL_LIMIT - (q.stalls ?? 0));
+    return at < q.createdCycle + this.questTtl(q) ? at : null;
+  }
+  /** its countdown is urgent (red on every surface): a real loss LAPSE_URGENT cycles or less away */
+  questUrgent(q: Quest): boolean {
+    return !this.questIsFaucet(q) && this.questLapsesAt(q) - this.state.cycle <= LAPSE_URGENT;
+  }
   /** a faucet quest is not lost when it goes — the post that wrote it is still standing */
   questIsFaucet(q: Quest): boolean { return q.fromLead?.expiresAtCycle === null }
 
@@ -2740,10 +4077,15 @@ export class Game {
     const lead = q.fromLead;
     const reroll = !!lead && !q.chainId && this.canReroll()
       && !this.state.leads.some(l => l.id === lead.id);
-    this.abandonQuest(q, []);
+    const chainOut = this.abandonChainOutcome(q);
+    const said: string[] = [];
+    this.abandonQuest(q, said);
     this.state.quests = this.state.quests.filter(x => x !== q);
     if (!reroll) {
-      const why = q.chainId ? ' (a saga step has no lead to return to)'
+      // the reply says what abandonQuest actually DID to the saga (a continuation lead, or a slip)
+      const why = q.chainId ? (chainOut === 'continues' ? ' — the thread dangles: a continuation lead is back on the board'
+          : chainOut === 'slips' ? ` — ${said.find(l => l.startsWith('🕮'))?.replace(/^🕮 /, '') ?? 'the saga slips out of reach'}`
+          : ' — its story was already over')
         : !lead ? ''
         : !this.canReroll() ? ' — the lead is spent; a lead can only be taken up again once a cycle'
         : '';
@@ -2755,6 +4097,13 @@ export class Game {
     return { ok: true, msg: `${q.title} set aside — the lead is back on the map table, to be taken up again` };
   }
 
+  /** what setting a saga step aside does to its saga — the SAME branch abandonQuest takes, so the
+   *  confirm can never promise what the engine will not give */
+  private abandonChainOutcome(q: Quest): 'continues' | 'slips' | 'none' {
+    const chain = q.chainId ? this.state.chains.find(c => c.id === q.chainId) : undefined;
+    if (!chain || (chain.state !== 'active' && chain.state !== 'finale-pending')) return 'none';
+    return (chain.reOffers ?? 0) + 1 >= 3 ? 'slips' : 'continues';
+  }
   private abandonQuest(q: Quest, report: string[]) {
     for (const s of q.slots) this.doUnassign(q, s);
     // forfeit the pre-generated rewards: objects vanish, PEOPLE pass to the lore graph
@@ -2802,12 +4151,20 @@ export class Game {
     }
     // a faucet quest lapsing is NOT a loss — the post that wrote it is still standing, and saying
     // so is the difference between "you missed it" and "ask again"
+    // the tally counts a LOSS; a faucet's quest is not one (the post puts up another)
+    if (q.fromLead?.expiresAtCycle !== null) this.cycleAcc?.lapsed.push(q.title);
     report.push(q.fromLead?.expiresAtCycle === null
       ? `⏳ ${q.title} went cold — the ${q.fromLead.source === 'recruiting' ? 'recruiting post' : 'map table'} will put up another.`
       : `⏳ ${q.title} lapsed — the moment passed.`);
     this.log('expire', `${q.title} lapsed unpursued`);
   }
 
+  /** every active place filled — the party marches at END (the view's `ready`; a finale with no
+   *  approach chosen has no active places, so it is never ready) */
+  isReady(questId: string): boolean {
+    const q = this.state.quests.find(x => x.id === questId);
+    return !!q && q.state === 'open' && this.isCommitted(q);
+  }
   private isCommitted(q: Quest): boolean {
     const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
     return active.length > 0 && active.every(s => s.filledBy);   // ALL party slots filled (no partial sends)
@@ -2946,6 +4303,7 @@ export class Game {
       if (!merc?.character || !r.party.includes(merc)) continue;
       const tiers = rollInjuryTiers(this.rng, band);
       merc.character.injuryTiers += tiers;
+      this.cycleAcc?.wounds.push({ id: merc.id, name: merc.name, tiers });
       say(`🩸 ${merc.name} is wounded (${band}, ${tiers} tier${tiers === 1 ? '' : 's'}).`);
     }
     // delivery
@@ -3138,7 +4496,7 @@ export class Game {
       return !(hit >= jw.size * 0.85 && hit >= new Set(sw).size * 0.85);
     });
     if (kept.length === sents.length || kept.length === 0) return out;
-    this.log('chain', 'card body echoed the job line near-verbatim — sentence dropped');
+    this.log('dev', 'card body echoed the job line near-verbatim — sentence dropped');
     return { ...out, situation: kept.join(' ') };
   }
 
@@ -3450,7 +4808,14 @@ export class Game {
     // line was still printing "129g earned toward this matter's ~262g worth" after questReward and
     // the chains tab were fixed, which is the one number the designer most wanted hidden.
     const sofar = coinBand(chain.bank);
-    report.push(`📖 ${chain.bible.title}: ${sofar ? `${sofar} set aside so far` : 'nothing set aside yet'}${delta > 0 ? ', and today added to it' : ''}${finaleReady(chain) ? ' — it now comes to a head' : ''}.${focalMet ? ` ${focal!.name} stays at the heart of it.` : ''}`);
+    // a failed beat spends one of the saga's setbacks — said HERE, at the moment it happens (it
+    // showed only as a pip on the next quest page)
+    const failed = r.outcome === 'failure';
+    if (failed) this.cycleAcc?.setbacks.push({ chainId: chain.id, title: chain.bible.title, failures: chain.failures, budget: chain.failureBudget });
+    const setback = !failed ? ''
+      : chain.failures >= chain.failureBudget ? ` A setback — ${chain.failures} of ${chain.failureBudget}; the setbacks are spent, so the last chance comes next.`
+      : ` A setback — ${chain.failures} of ${chain.failureBudget}${chain.failures === chain.failureBudget - 1 ? '; one more and it comes to a last chance' : ''}.`;
+    report.push(`📖 ${chain.bible.title}: ${sofar ? `${sofar} set aside so far` : 'nothing set aside yet'}${delta > 0 ? ', and today added to it' : ''}${finaleReady(chain) && !(failed && chain.failures >= chain.failureBudget) ? ' — it now comes to a head' : ''}.${setback}${focalMet ? ` ${focal!.name} stays at the heart of it.` : ''}`);
   }
 
   /** LORE §1 story-NPC write-back (built 2026-07-18): when a saga closes, coined cast the
@@ -3637,8 +5002,11 @@ export class Game {
       this.addGold(surplus);
       const shortDebt = Math.max(0, Math.round(focal.value - chain.bank));
       if (shortDebt > 0) this.addCard(mintStackable('debt', shortDebt));
-      focal.character!.role = 'merc';
-      if (this.roster().length < this.rosterCapacity()) {
+      // room is counted BEFORE the focal becomes a merc: roster() counts every held merc, so a
+      // focal still waiting in limbo counted ITSELF and a 4/5 roster read as full
+      const room = this.roster().filter(m => m.id !== focal.id).length < this.rosterCapacity();
+      if (room) {
+        focal.character!.role = 'merc';
         focal.location = HELD('roster');
         this.spawnPersonalChainLead(focal);
         report.push(`🎬 Finale: ${focal.name} joins the company${shortDebt > 0 ? ` — the work earned less than they are worth, so a ${shortDebt}g debt comes with them` : ''}.${surplus > 0 ? ` 💰 +${surplus}g left over.` : ''}`);
@@ -3769,7 +5137,8 @@ export class Game {
       // off the rack, back to the cells — ready to be stationed
       this.unslotCard(card);
       card.location = HELD('roster');
-      report.push(`🔗 ${card.name} is broken — obedient, stationable.`);
+      report.push(`🔗 ${card.name} is broken — tamed, ready to be set in a room.`);
+      this.cycleAcc?.tamed.push({ id: card.id, name: card.name });
     }
   }
 }

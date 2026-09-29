@@ -5,7 +5,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as readline from 'node:readline';
-import { Game } from '../src/game/game.js';
+import { Game, type ReckonMeta } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
 import { makeOpenAiProvider } from '../src/ai/openai.js';
 import { render } from './format.js';
@@ -49,7 +49,7 @@ async function main() {
     game = new Game(ai, seed);
   }
 
-  console.log(render.welcome());
+  console.log(render.welcome(game));
   console.log(render.fort(game));
 
   const scriptPath = opt('script');
@@ -67,9 +67,7 @@ async function main() {
   // a card that lands while you are staring at the fort should reach you there, not the next time
   // you happen to type something
   const ticker = setInterval(() => {
-    const before = jobsSeen.size;
-    announceJobs(game);
-    if (before !== jobsSeen.size || game.jobs().some(j => j.state === 'done' || j.state === 'failed')) prompt();
+    if (announceJobs(game)) prompt();
   }, 1000);
   ticker.unref?.();
 
@@ -94,21 +92,23 @@ async function main() {
 }
 
 /** A job that finished must SAY so, wherever the player's attention is — the board updating
- *  silently is how you end up re-reading the leads list to find out if anything happened. */
-const jobsSeen = new Map<string, string>();
-function announceJobs(game: Game): void {
-  for (const j of game.jobs()) {
-    if (jobsSeen.get(j.id) === j.state) continue;
-    const was = jobsSeen.get(j.id);
-    jobsSeen.set(j.id, j.state);
-    if (!was && j.state !== 'done' && j.state !== 'failed') continue;   // first sighting while still working
+ *  silently is how you end up re-reading the leads list to find out if anything happened.
+ *  ARRIVALS are announced by settle number (Game.arrivals) — the same rule the GUI's toast uses,
+ *  so a job that lands between two looks is announced exactly once on both surfaces.
+ *  Returns how many were announced. */
+let arrivalSeen = 0;
+function announceJobs(game: Game): number {
+  const got = game.arrivals(arrivalSeen);
+  for (const j of got) {
+    arrivalSeen = Math.max(arrivalSeen, j.seq ?? 0);
     if (j.state === 'done') {
-      console.log(`\n✔ ${j.title} — the card is ready${j.questId ? ` (${j.questId})` : ''}.`);
+      console.log(`\n✔ ${j.questTitle ?? j.title} — the card is ready${j.questId ? ` (${j.questId})` : ''}.`);
       if (j.questId) console.log(render.questDetail(game, j.questId));
     } else if (j.state === 'failed') {
       console.log(`\n✗ ${j.title} — could not be written: ${j.error ?? 'no reason given'}. The lead is still on the board.`);
     }
   }
+  return got.length;
 }
 
 /** THE RECKONING, live. The text UI shows the SAME thing the GUI's reckoning page does — each
@@ -135,6 +135,17 @@ async function runReckoning(game: Game): Promise<string[]> {
   const printedLen = new Map<number, number>();
   let completeAt: number | null = null;
   const stamp = (l: string) => console.log(render.reckoningLine(l, Date.now() - t0));
+  // the verdict banner goes up once, when a quest's report LANDS (the engine lists a quest's meta
+  // only then) — '━━ SUCCESS ━━ title'
+  const bannered = new Set<string>();
+  let meta: ReckonMeta[] = [];
+  const banner = (b: string[]) => {
+    const m = meta.find(x => b[0]?.endsWith(`(${x.questId})`));
+    if (!m || bannered.has(m.questId)) return false;
+    bannered.add(m.questId);
+    stamp(render.verdictBanner(m));
+    return true;
+  };
 
   const sweep = (blocks: string[][]) => {
     blocks.forEach((b, i) => {
@@ -154,7 +165,8 @@ async function runReckoning(game: Game): Promise<string[]> {
       else {
         // the arriving lines are detached from the header printed minutes of screen ago — on a page
         // the block fills under its own title, in a stream it needs to say whose report this is
-        if (was > 0 && b.length > kept) stamp(`▸ ${b[0]!.replace(/^— /, '')}`);
+        const bannerUp = b.length > kept && banner(b);
+        if (was > 0 && b.length > kept && !bannerUp) stamp(`▸ ${b[0]!.replace(/^— /, '')}`);
         for (let k = Math.max(common, kept); k < b.length; k++) stamp(b[k]!);
       }
       printedLen.set(i, b.length);
@@ -167,6 +179,7 @@ async function runReckoning(game: Game): Promise<string[]> {
     const v = game.reckoningView();
     if (v) {
       header();
+      meta = v.meta;
       sweep(v.blocks);
       if (!v.writing && completeAt === null) completeAt = Date.now() - t0;
     }
@@ -180,25 +193,45 @@ async function runReckoning(game: Game): Promise<string[]> {
   header();
   // a fast provider can finish the whole cycle between two polls — the final shape is kept by the
   // engine precisely so nothing goes unprinted just because we blinked
+  meta = game.reckoningAt()?.meta ?? [];
   sweep(game.lastReckoningBlocks());
   const total = Date.now() - t0;
+  // the printout ends on the TALLY — the cycle's spoils, totalled by the engine
+  const sum = game.reckoningAt()?.summary;
+  if (sum) console.log(`\n${render.tally(sum)}`);
   console.log(render.reckoningFoot(game, completeAt ?? total, completeAt === null ? null : total - completeAt));
   return report;
 }
 
+/** a destructive command waiting on its confirm: the same line again (or the `!` form) runs it */
+let pendingConfirm: string | null = null;
+
 /** returns true to quit */
 async function exec(game: Game, line: string): Promise<boolean> {
   if (!line) return false;
-  const [cmd, ...rest] = line.split(/\s+/);
+  const [rawCmd, ...rest] = line.split(/\s+/);
+  // `abandon!` / `unslot!` / `ransom!` / `sell!` = confirmed; repeating the exact line confirms too
+  const bang = rawCmd!.endsWith('!');
+  const cmd = bang ? rawCmd!.slice(0, -1) : rawCmd;
+  const confirmed = bang || pendingConfirm === `${cmd} ${rest.join(' ')}`;
+  pendingConfirm = null;
   const arg = rest.join(' ');
-  const say = (r: { ok: boolean; msg: string }) => {
-    console.log(r.ok ? `✓ ${r.msg}` : `✗ ${r.msg}`);
+  const say = (r: { ok: boolean; msg: string; warn?: boolean }) => {
+    console.log(r.ok ? `${r.warn ? '⚠' : '✓'} ${r.msg}` : `✗ ${r.msg}`);
     slog({ cycle: game.state.cycle, action: cmd, args: rest, ok: r.ok, msg: r.msg });
+  };
+  /** R1/critic c: a command that throws something away says what, and waits for its confirm */
+  const guard = (what: string | null, form: string): boolean => {
+    if (!what || confirmed) return true;
+    pendingConfirm = `${cmd} ${rest.join(' ')}`;
+    console.log(`⚠ ${what}\n  '${form}' (or the same command again) to go ahead.`);
+    return false;
   };
   // gate rooms open menus — view commands report the missing room instead of an empty list
   const locked = (key: string): string | null => {
     const g = game.menuGates().find(m => m.key === key);
-    return g && !g.open ? `🔒 locked — build a ${g.need} first` : null;
+    // a gate the engine never enforces (locks:false) never says "build X first"
+    return g && !g.open && g.locks ? `🔒 locked — build a ${g.need} first` : null;
   };
 
   switch (cmd) {
@@ -225,7 +258,7 @@ async function exec(game: Game, line: string): Promise<boolean> {
     case 'chains': console.log(render.chains(game)); break;
     case 'chain': console.log(render.chainDetail(game, arg)); break;
     case 'lore': console.log(locked('lore') ?? render.lore(game, arg)); break;
-    case 'log': console.log(render.log(game, Number(arg) || 15)); break;
+    case 'log': console.log(render.log(game, Number(rest.find(x => Number(x))) || 15, rest.includes('dev'))); break;
     // the GUI's 'ai' tab, for the text UI: every recent call's full prompt and raw reply, to a file
     case 'ailog': {
       fs.mkdirSync(LOG_DIR, { recursive: true });
@@ -240,19 +273,34 @@ async function exec(game: Game, line: string): Promise<boolean> {
     case 'holding': console.log(locked('staging') ?? render.holding(game)); break;
     case 'buildable': console.log(render.buildable(game)); break;
     case 'status': console.log(render.status(game)); break;
+    case 'next': console.log(render.nextSteps(game)); break;
 
     // ---- actions
-    case 'build': say(game.build(rest[0]!, rest[1])); break;
+    case 'build': { const r = game.build(rest[0]!, rest[1]); say({ ...r, msg: r.id ? `${r.msg} (${r.id})` : r.msg }); break }
     case 'upgrade': say(game.upgrade(rest[0]!)); break;
     case 'renovate': say(await game.renovate(rest[0]!, rest[1] ?? 'human')); break;
     case 'excavate': say(game.excavate()); break;
     case 'gh': say(game.ghUpgrade()); break;
     case 'slot': say(game.slot(rest[0]!, Number(rest[1]), rest[2]!)); break;
-    case 'unslot': say(game.unslot(rest[0]!, Number(rest[1]))); break;
+    // THE room path both UIs share (Game.setInRoom). Either order: setin <card> <room> [idx]
+    case 'setin': {
+      const [x, y, idx] = rest;
+      const [roomId, cardId] = game.room(x ?? '') ? [x!, y!] : [y!, x!];
+      say(game.setInRoom(roomId, cardId, idx === undefined ? undefined : Number(idx)));
+      break;
+    }
+    case 'unslot': {
+      const room = game.room(rest[0]!);
+      const id = room?.slots[Number(rest[1])];
+      const loss = id ? game.rackLoss(id) : null;
+      if (!guard(loss && `${game.card(id!)?.name} comes off the rack — ${loss}.`, `unslot! ${rest.join(' ')}`)) break;
+      say(game.unslot(rest[0]!, Number(rest[1])));
+      break;
+    }
     // TEMPO G1: the click is ANSWERED, not obeyed — the map table takes the job and the board
     // stays yours. The card arrives when it arrives (announceJobs prints it).
     case 'pursue': {
-      const r = game.enqueuePursue(rest[0]!);
+      const r = rest[0] === 'all' ? game.pursueAll() : game.enqueuePursue(rest[0]!);
       say(r);
       if (r.ok) { const b = render.jobsBrief(game); if (b) console.log(b) }
       break;
@@ -275,15 +323,34 @@ async function exec(game: Game, line: string): Promise<boolean> {
     case 'assign': say(game.assign(rest[0]!, Number(rest[1]), rest[2]!)); break;
     // the SAME engine call the web's Auto button makes — never a second implementation (G5)
     case 'auto': say(!rest[0] || rest[0] === 'all' ? game.autoAssignAll() : game.autoAssign(rest[0]!)); break;
-    case 'send': say(game.sendTo(rest[0]!, rest[1]!)); break;
-    case 'fit': console.log(render.fit(game, arg)); break;
+    case 'send': say(game.sendTo(rest[0]!, rest[1]!, rest[2] === undefined ? undefined : Number(rest[2]))); break;
+    case 'fit': console.log(render.fit(game, rest[0] ?? '', rest[1])); break;
     case 'unassign': say(game.unassign(rest[0]!, Number(rest[1]))); break;
-    case 'approach': say(game.chooseApproach(rest[0]!, rest[1]!)); break;
-    case 'abandon': say(game.abandon(rest[0]!)); break;
+    case 'clear': say(game.clearQuest(rest[0]!)); break;
+    case 'approach': {
+      // switching a manned plan sends its party back — the quest page confirms on the same line
+      const loss = game.approachSwitchLoss(rest[0]!, rest[1]!);
+      if (!guard(loss && `${loss[0]!.toUpperCase()}${loss.slice(1)}.`, `approach! ${rest.join(' ')}`)) break;
+      say(game.chooseApproach(rest[0]!, rest[1]!));
+      break;
+    }
+    case 'abandon': {
+      const q = game.state.quests.find(x => x.id === rest[0] && x.state === 'open');
+      if (q && !guard(`Abandon ${q.title}? ${game.abandonConsequence(q.id)}`, `abandon! ${rest[0]}`)) break;
+      say(game.abandon(rest[0]!));
+      break;
+    }
     case 'hire': say(game.hire(rest[0]!)); break;
     case 'accept': say(game.acceptCaptive(rest[0]!)); break;
-    case 'ransom': say(game.ransom(rest[0]!)); break;
-    case 'sell': say(game.sell(rest[0]!)); break;
+    case 'ransom': case 'sell': {
+      // ONE rule with the GUI: a card on a rack or on show says what cashing it out throws away, twice
+      const rack = game.rackLoss(rest[0]!), show = game.cashOutLoss(rest[0]!);
+      const what = rack ? `${game.card(rest[0]!)?.name} is on the rack — ${rack}.`
+        : show ? `${game.card(rest[0]!)?.name} is on show — ${show}.` : null;
+      if (!guard(what, `${cmd}! ${rest[0]}`)) break;
+      say(cmd === 'ransom' ? game.ransom(rest[0]!) : game.sell(rest[0]!));
+      break;
+    }
     case 'settle': say(game.payOffLiability(rest[0]!)); break;
     case 'interrogate': say(game.interrogate(rest[0]!)); break;
     case 'heal': say(game.payHeal(rest[0]!)); break;
@@ -296,6 +363,9 @@ async function exec(game: Game, line: string): Promise<boolean> {
     }
 
     case 'end': {
+      // R5: END with something to lose prints it and waits for 'end!' (or 'end' again)
+      const w = game.endWarnings();
+      if (w.length && !guard(render.endWarnings(w), 'end!')) break;
       const b = render.jobsBrief(game);
       if (b) { console.log(`${b} — the cycle waits for the map table…`); await game.drain(); announceJobs(game) }
       const report = await runReckoning(game);

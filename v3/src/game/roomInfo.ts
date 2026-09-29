@@ -8,11 +8,14 @@ import { REGION } from '../engine/regions.js';
 const DESC: Record<string, string> = {
   'map-room': 'Opens the map, so quests can be taken on.',
   'lead-room': 'Reads the extra leads your jobs bring back.',
-  'mess-hall': 'Opens the roster: levels, focus and healing for every soldier.',
-  'storage': 'Opens the stores, where relics are kept and sold and debts settled.',
+  // ⚠ doc-gap (flagged 2026-09-30): FORT §5 / §12.1 give these gates a menu each, but v3 never
+  // enforces them — the roster is always open, relics are kept and sold with no Storage, holding
+  // works with no Holding cell (Game.menuGates marks them locks:false). Said plainly, not promised.
+  'mess-hall': 'No effect yet — the roster, focus and healing work without it.',
+  'storage': 'No effect yet — relics are kept and sold, and debts settled, without it.',
   'tavern': 'Soldiers looking for work drift in here to be hired.',
   'dungeon': 'Opens the captives: ransom, sell or break them.',
-  'holding-cell': 'Keeps a newly taken captive while you decide what to do with them.',
+  'holding-cell': 'No effect yet — a newly taken captive waits in holding without it.',
   'library': 'Opens the lore: every person and place you have met.',
   'chronicle': 'The full history of every name, forgotten parts included.',
   'dungeon-cell': 'Room for three more captives.',
@@ -28,13 +31,17 @@ const DESC: Record<string, string> = {
   'great-hall': 'The heart of the hold. Raising it opens new rooms and regions; it takes prestige and gold.',
 };
 
-/** the one-line "what it does" for a room type */
-export function roomDesc(typeId: string): string {
+/** the one-line "what it does" for a room type. `activeRegions` = Game.activeRegions() — a
+ *  region already on the map (a fresh fort's home) is not "opened" by its lodge; the lodge then
+ *  says what it adds there. */
+export function roomDesc(typeId: string, activeRegions: string[] = []): string {
   const rt: RoomType | undefined = ROOM_TYPE[typeId];
   if (!rt) return '';
   if (DESC[typeId]) return DESC[typeId]!;
   const region = rt.region ? REGION[rt.region]?.name ?? rt.region : '';
-  if (rt.roomKind === 'scouting') return `Opens ${region} on the map, with its own scouting jobs.`;
+  if (rt.roomKind === 'scouting') return rt.region && activeRegions.includes(rt.region)
+    ? `Scouts ${region}: its lead-hunt goes on the board, and its Recruiting post can be built.`
+    : `Opens ${region} on the map, with its own scouting jobs.`;
   if (rt.roomKind === 'recruiting') return `Recruitment jobs in ${region}.`;
   if (rt.roomKind === 'endgame') return `A landmark of ${region}: raises how comfortable every bedroom can get.`;
   if (rt.benefit === 'prestige') {

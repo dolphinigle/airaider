@@ -71,7 +71,7 @@ for (let c = 0; c < cycles; c++) {
     let k = 0;
     for (const sl of slots) { if (k >= free.length) break; await say(`assign ${q} ${sl} ${free[k++]}`) }
   }
-  await say('end', 900);
+  await say('end!', 900);   // 'end' alone stops on END warnings (R5)
   await say('status');
 }
 await say('quit');

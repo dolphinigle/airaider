@@ -75,11 +75,18 @@ export interface CoinsBreakdown {
   clash: number;       // −0.5U if ≥1 clashing (negative or 0)
   injury: number;      // −0.2U × tiers (negative or 0)
   total: number;       // floored at 0, rounded — the coin count
+  /** the unit's concepts that earned the match bonus (favored concept or group owned) */
+  matchedFavored: string[];
+  /** the unit's concepts that triggered the clash (a clashing concept, or a favored one's opposite) */
+  matchedClashing: string[];
+  /** body tags that pushed a tested attribute up / down (statAttr tags) */
+  bodyPlus: string[];
+  bodyMinus: string[];
 }
 
 export function coinsBreakdown(unit: Card, t: SlotTest): CoinsBreakdown {
   const ch = unit.character;
-  if (!ch) return { attr: 0, match: 0, bodyBg: 0, clash: 0, injury: 0, total: 0 };
+  if (!ch) return { attr: 0, match: 0, bodyBg: 0, clash: 0, injury: 0, total: 0, matchedFavored: [], matchedClashing: [], bodyPlus: [], bodyMinus: [] };
   const u = U(ch.level);
   let attr = 0, bodyBg = 0;
   for (const a of t.attributes) {
@@ -90,7 +97,30 @@ export function coinsBreakdown(unit: Card, t: SlotTest): CoinsBreakdown {
   const clash = hasClash(unit.tags, t.favored, t.clashing) ? -TAG_FRAC * u : 0;
   const injury = -ch.injuryTiers * INJURY_FRAC * u;
   const total = Math.max(0, Math.round(attr + bodyBg + match + clash + injury));
-  return { attr, match, bodyBg, clash, injury, total };
+  // the NAMES behind the terms — the same predicates as hasFavored/hasClash, so a "why" can never
+  // name a tag the dice did not count
+  const matchedFavored = unit.tags.filter(tg => t.favored.some(f => tg.concept === f || CONCEPT[tg.concept]?.group === f)).map(tg => tg.concept);
+  const opposites = t.favored.map(f => CONCEPT[f]?.opposite).filter(Boolean) as string[];
+  const matchedClashing = unit.tags.filter(tg => t.clashing.includes(tg.concept) || opposites.includes(tg.concept)).map(tg => tg.concept);
+  const bodyPlus: string[] = [], bodyMinus: string[] = [];
+  for (const tg of unit.tags) {
+    const c = CONCEPT[tg.concept];
+    if (!c?.statAttr || !t.attributes.includes(c.statAttr)) continue;
+    (c.negative ? bodyMinus : bodyPlus).push(tg.concept);
+  }
+  return { attr, match, bodyBg, clash, injury, total, matchedFavored, matchedClashing, bodyPlus, bodyMinus };
+}
+
+/** the coin reasons as the UIs print them: `+roguery`, `−playful`, and the wound's cost in coins
+ *  (positive; 0 when unhurt). One source, so the hand, the quest page and the CLI agree. */
+export interface CoinsWhy { plus: string[]; minus: string[]; wound: number }
+export function coinsWhy(unit: Card, t: SlotTest): CoinsWhy {
+  const b = coinsBreakdown(unit, t);
+  return {
+    plus: [...new Set([...b.matchedFavored, ...b.bodyPlus])],
+    minus: [...new Set([...b.matchedClashing, ...b.bodyMinus])],
+    wound: Math.round(-b.injury * 10) / 10,
+  };
 }
 
 /** compact human string: "DEX 4 +match 3.5 −injury 1.4 = 8" */
@@ -146,4 +176,41 @@ export function odds(totalCoins: number, totalBar: number): { success: number; p
     return Math.min(1, s);
   };
   return { success: tail(totalBar), partialOrBetter: tail(PARTIAL_FRAC * totalBar) };
+}
+
+// ---- verdict words (R2, designer-ruled 2026-09-30) -------------------------------------------
+// The POOLED quest gets a 5-word band from the exact binomial; a single place gets only a
+// strength colour, because a per-slot band would contradict the pooled roll (a slot can be a
+// "long shot" on its own while the party it sits in is "likely"). The engine owns both words.
+
+export type Band = 'likely' | 'even' | 'partial' | 'long' | 'hopeless';
+/** the band as the text UI and engine messages say it (web/band.ts mirrors these words) */
+export const BAND_TEXT: Record<Band, string> = {
+  likely: 'likely', even: 'coin-flip', partial: 'a partial at best', long: 'long shot', hopeless: 'hopeless',
+};
+/** 🛠 band cut points on the pooled odds */
+export const BAND_LIKELY = 0.65;     // P(success) ≥ → likely
+export const BAND_EVEN = 0.35;       // P(success) ≥ → coin-flip
+export const BAND_PARTIAL = 0.5;     // P(partial or better) ≥ → a partial at best
+export const BAND_LONG = 0.05;       // P(partial or better) ≥ → long shot; below → hopeless
+
+export function oddsBand(totalCoins: number, totalBar: number): Band {
+  const o = odds(totalCoins, totalBar);
+  if (o.success >= BAND_LIKELY) return 'likely';
+  if (o.success >= BAND_EVEN) return 'even';
+  if (o.partialOrBetter >= BAND_PARTIAL) return 'partial';
+  if (o.partialOrBetter >= BAND_LONG) return 'long';
+  return 'hopeless';
+}
+
+export type Strength = 'strong' | 'fair' | 'weak';
+/** 🛠 strength cut points: expected heads (coins/2) against this place's own bar. Scale-free, so
+ *  three "strong" places always pool into a party whose expected heads clear the pooled bar. */
+export const STRENGTH_STRONG = 1.1;
+export const STRENGTH_FAIR = 0.8;
+
+export function slotStrength(coinCount: number, bar: number): Strength {
+  if (bar <= 0) return 'strong';
+  const r = coinCount / 2 / bar;
+  return r >= STRENGTH_STRONG ? 'strong' : r >= STRENGTH_FAIR ? 'fair' : 'weak';
 }

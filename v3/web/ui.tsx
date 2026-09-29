@@ -17,6 +17,11 @@ export const activeSlots = (q: any) => q.approaches ? q.slots.filter((x: any) =>
 export const gateOf = (s: S, key: string) => (s.menus ?? []).find((m: any) => m.key === key);
 export const shortTitle = (t: string) => clip(t.replace(/^(the|a|an) /i, ''), 22);
 export const cap1 = (t: string) => t ? t[0]!.toUpperCase() + t.slice(1) : t;
+/** the fort panel's pseudo-selection for the holding list — reachable with no Holding cell room */
+export const HOLDING_SEL = '@holding';
+/** reduced motion: scroll without the glide (an explicit 'smooth' in a call beats the CSS guard) */
+export const scrollBehavior = (): ScrollBehavior =>
+  typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
 
 /* ── drawn icons (stroke, currentColor) ─────────────────────────────────────────────── */
 const P: Record<string, string> = {
@@ -131,16 +136,48 @@ export const FORM_LABEL: Record<string, string> = {
 };
 
 /* ── the card face ──────────────────────────────────────────────────────────────────── */
-export function CardFace({ c, badge, badgeCls, note, dim, onClick, onDragStart, onDragEnd, small, title }: {
+/** a captive's / relic's status in one chip, from the engine's state + where it sits */
+export function cardStatus(c: any): { text: string; cls: string } | null {
+  if (c.character?.role === 'captive') {
+    switch (c.state) {
+      case 'raw': return { text: 'RAW', cls: 'raw' };
+      case 'breaking': return { text: c.doneAt != null ? `RACK · c${c.doneAt}` : 'ON THE RACK', cls: 'rack' };
+      case 'tamed': return { text: 'TAMED', cls: 'tamed' };
+      case 'onShow': return { text: `ON SHOW${c.whereName ? ' · ' + c.whereName : ''}`, cls: 'show' };
+    }
+    return null;
+  }
+  if (c.type === 'relic' && c.location?.kind === 'room') return { text: `ON SHOW${c.whereName ? ' · ' + c.whereName : ''}`, cls: 'show' };
+  return null;
+}
+export type Ribbon = { text: string; tone: 'gold' | 'red' | 'teal' };
+/** the engine's reasons for one soldier's coins at one place, as chips: +roguery · −playful · wound −9 */
+export function WhyChips({ why }: { why?: { plus?: string[]; minus?: string[]; wound?: number } | null }) {
+  if (!why) return null;
+  const chips = [...(why.plus ?? []).map(t => ['p', '+' + t]), ...(why.minus ?? []).map(t => ['m', '−' + t]),
+    ...(why.wound ? [['w', `wound −${Math.round(why.wound)}`]] : [])];
+  if (!chips.length) return null;
+  return <span className="why">{chips.map(([k, t], i) => <i key={i} className={k}>{t}</i>)}</span>;
+}
+
+export function CardFace({ c, badge, badgeCls, note, dim, onClick, onDragStart, onDragEnd, small, title, ribbon, why, block, here }: {
   c: any; badge?: string; badgeCls?: string; note?: string; dim?: boolean; small?: boolean; title?: string;
   onClick?: () => void; onDragStart?: (e: React.DragEvent) => void; onDragEnd?: () => void;
+  /** optional additions (all additive): a one-cycle ribbon ('+1 LV'), the engine's why-chips, a
+   *  refusal reason (greyed, not clickable), and 'here' (already placed where the hand is armed) */
+  ribbon?: Ribbon | null; why?: { plus?: string[]; minus?: string[]; wound?: number } | null; block?: string | null; here?: boolean;
 }) {
   const ch = c.character;
   const kind = c.liability ? 'liab' : c.type === 'relic' ? 'relic' : ch?.role === 'captive' ? 'captive' : ch ? 'soldier' : 'stack';
   const drag = !!onDragStart;
+  const st = cardStatus(c);
+  const stars = c.stars > 0 && (kind === 'relic' || kind === 'captive') ? '★'.repeat(Math.min(5, c.stars)) : '';
+  const capped = kind === 'soldier' && c.cap != null && ch.level >= c.cap;
+  const xpPct = kind === 'soldier' && c.xpNeeded ? Math.min(100, ch.xp / Math.max(1, c.xpNeeded) * 100) : null;
+  const cls = ['card', kind, dim && 'dim', small && 'small', block && 'blocked', here && 'here', ribbon && 'has-rib'].filter(Boolean).join(' ');
   return (
-    <button className={`card ${kind}${dim ? ' dim' : ''}${small ? ' small' : ''}`} onClick={onClick} title={title ?? c.name}
-      draggable={drag} onDragStart={onDragStart} onDragEnd={onDragEnd}>
+    <button className={cls} onClick={block ? undefined : onClick} title={title ?? (block ? `${c.name} — ${block}` : c.name)}
+      aria-disabled={block ? true : undefined} draggable={drag} onDragStart={onDragStart} onDragEnd={onDragEnd}>
       {kind === 'soldier' && (c.portrait
         ? <img src={c.portrait} alt="" draggable={false} />
         : <span className="paint"><Silhouette size={30} />{c.painting ? 'being painted…' : ''}</span>)}
@@ -148,17 +185,47 @@ export function CardFace({ c, badge, badgeCls, note, dim, onClick, onDragStart, 
       {kind === 'relic' && <span className="art"><Glyph name={formOf(c.tags) === 'document' ? 'scroll' : formOf(c.tags).includes('weapon') ? 'dagger' : formOf(c.tags) === 'armor' ? 'shield' : 'chest'} size={small ? 30 : 40} /></span>}
       {(kind === 'liab' || kind === 'stack') && <span className="art"><Glyph name="scales" size={small ? 30 : 40} /></span>}
       <span className="nm">{c.name}</span>
-      {ch && ch.injury > 0 && <span className="wnd">wound {ch.injury}</span>}
+      {ribbon && <span className={'rib ' + ribbon.tone}>{ribbon.text}</span>}
+      {ch && ch.injury > 0 && <span className="wnd">wound {ch.injury}{c.woundPenalty ? ` · −${Math.round(c.woundPenalty)}` : ''}</span>}
       {badge && <span className={'badge ' + (badgeCls ?? '')}>{badge}</span>}
-      {note && <span className="note">{note}</span>}
       {c.qty > 1 && <span className="qty">{c.qty}</span>}
+      <span className="low">
+        {st && <span className={'stc ' + st.cls}>{st.text}</span>}
+        {block && <span className="bk">{block}</span>}
+        <WhyChips why={why} />
+        {note && <span className="note">{note}</span>}
+        {xpPct != null && <span className={'xpl' + (capped ? ' capd' : xpPct >= 100 ? ' full' : '')} title={`${ch.xp} / ${c.xpNeeded} xp`}><i style={{ width: `${xpPct}%` }} /></span>}
+      </span>
       <span className="ft">
-        {ch ? <><span>L{ch.level}{ch.role === 'captive' ? ' · captive' : ''}</span><span>{ch.role === 'captive' ? (ch.obedient ? 'tamed' : '') : ''}</span></>
-          : c.liability ? <><span>liability</span><span>×{c.qty}</span></>
-          : <><span>{FORM_ONE[formOf(c.tags)]}</span><span>{c.location?.kind === 'room' ? 'on show' : ''}</span></>}
+        {ch ? <><span>L{ch.level}{kind === 'captive' ? ' · captive' : ''}</span>
+          {capped ? <span className="cap" title={`held at level ${c.cap} — experience is going to waste`}>⛔ CAP</span> : stars ? <span className="st">{stars}</span> : null}</>
+          : c.liability ? <span>liability</span>
+          : <><span>{FORM_ONE[formOf(c.tags)]}</span>{stars && <span className="st">{stars}</span>}</>}
       </span>
     </button>
   );
 }
 
-export const fitCls = (coins: number, bar: number) => coins >= bar ? 'good' : coins >= 0.6 * bar ? 'part' : 'bad';
+/** a Fix (the engine's "what would clear this": Game Fix) as one button. `go` handles the screen
+ *  fixes ({screen:'fort'|'build', id}); a build that itself needs a cell shows the build row's own
+ *  fix (excavate) first — never a dead end. Blocked fixes render disabled with the reason. */
+export function FixButton({ s, fix, quick, go, solid, lead }: {
+  s: S; fix: any; quick: (type: string, ...a: any[]) => any; go?: (screen: string, id: string | null) => void; solid?: boolean; lead?: string;
+}) {
+  if (!fix) return null;
+  let f = fix, then: string | null = null;
+  const first = f.action === 'build' && f.block ? (s.buildable ?? []).find((b: any) => b.type === f.type)?.fix : null;
+  if (first) { then = f.label; f = first }
+  if ('screen' in f) {
+    if (go && (f.screen === 'fort' || f.screen === 'build')) return <button className="btn sm ghost" onClick={() => go(f.screen, f.id ?? null)}>{lead ? lead + ' ' : ''}{f.label} →</button>;
+    return <span className="fixnote">{f.label}</span>;
+  }
+  const run = () => f.action === 'upgrade' ? quick('upgrade', f.roomId) : f.action === 'build' ? quick('build', f.type)
+    : f.action === 'excavate' ? quick('excavate') : quick('gh');
+  return <>
+    <button className={'btn sm' + (solid && !f.block ? ' solid' : '')} disabled={!!f.block} onClick={run} title={f.block ?? f.label}>
+      {lead ? lead + ' ' : ''}{f.label}{f.block ? <em className="blk-why"> · {f.block}</em> : null}</button>
+    {then && <span className="fixnote">then {then}</span>}
+  </>;
+}
+
