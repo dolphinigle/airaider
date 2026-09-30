@@ -1,0 +1,23 @@
+{
+  "id": "A12",
+  "set": "A",
+  "seed": 106,
+  "path": "personal",
+  "shape": "rescue",
+  "spark": "Jervaise left her younger brother bound to a debt-master to buy her own way out of the valley, and never went back for him",
+  "focal": {
+    "name": "Jervaise Greyfell",
+    "sex": "female",
+    "race": "human",
+    "seed": 1112,
+    "value": 150,
+    "who": "A quiet swordswoman from the hill valleys who sends coin somewhere every season.",
+    "backstory": "Jervaise Greyfell bought her way out of a debt-bound valley by leaving her younger brother bound to the debt-master in her place. She swore she would come back for him, and she never has."
+  },
+  "N": 4,
+  "kind": "recruit",
+  "personal": true,
+  "twist": false,
+  "level": 2,
+  "rarity": "uncommon"
+}

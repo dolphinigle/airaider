@@ -11,6 +11,7 @@ import { mintStackable, HELD, type Card } from './cards.js';
 import { tierOf, CONCEPT, T } from './tags.js';
 import type { Attribute, Rank } from './tags.js';
 import { type SlotTest, type DifficultyName, type Outcome } from './roll.js';
+import type { LabFixture } from './lab.js';
 
 // ---- leads (QUESTS §1) -----------------------------------------------------------------
 
@@ -34,6 +35,9 @@ export interface Lead {
    *  A lead's own worth is zero — access is free; this is the premium riding on it. Absent on
    *  saves written before the design, which reads as 0. */
   bonus?: number;
+  /** SAGA LAB only (docs/STORYTELLER.md §5.0): the fixture this lead's genesis must use — posted by
+   *  the CLI's hidden `lab saga` command, never in play */
+  lab?: LabFixture;
 }
 
 export const LEAD_TTL = 6; // cycles before an unpursued lead lapses 🛠

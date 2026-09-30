@@ -1,0 +1,21 @@
+{
+  "id": "B07",
+  "set": "B",
+  "seed": 204,
+  "path": "clean",
+  "shape": "heist",
+  "spark": "a counterfeiter whose fakes are better than the mint’s coin",
+  "focal": {
+    "name": "Andrash Coalgate",
+    "sex": "male",
+    "race": "human",
+    "seed": 2127,
+    "value": 150
+  },
+  "N": 5,
+  "kind": "gold-hoard",
+  "personal": false,
+  "twist": false,
+  "level": 2,
+  "rarity": "rare"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "B11",
+  "set": "B",
+  "seed": 206,
+  "path": "bumpy",
+  "shape": "hunt",
+  "spark": "a dead man seen buying horses at three fairs",
+  "focal": {
+    "name": "Antyaume the Younger",
+    "sex": "male",
+    "race": "human",
+    "seed": 2111,
+    "value": 150
+  },
+  "N": 3,
+  "kind": "captive",
+  "personal": false,
+  "twist": false,
+  "level": 2,
+  "rarity": "common"
+}

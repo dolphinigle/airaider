@@ -1,0 +1,21 @@
+{
+  "id": "A01",
+  "set": "A",
+  "seed": 101,
+  "path": "clean",
+  "shape": "hunt",
+  "spark": "a predator that has learned to follow funerals",
+  "focal": {
+    "name": "Eussorus",
+    "sex": "male",
+    "race": "human",
+    "seed": 1101,
+    "value": 150
+  },
+  "N": 2,
+  "kind": "captive",
+  "personal": false,
+  "twist": false,
+  "level": 2,
+  "rarity": "common"
+}

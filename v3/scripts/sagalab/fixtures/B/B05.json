@@ -1,0 +1,21 @@
+{
+  "id": "B05",
+  "set": "B",
+  "seed": 203,
+  "path": "lastchance",
+  "shape": "feud",
+  "spark": "a widow buying, one by one, the men who burned her farm",
+  "focal": {
+    "name": "Ernarde the Elder",
+    "sex": "female",
+    "race": "human",
+    "seed": 2105,
+    "value": 150
+  },
+  "N": 4,
+  "kind": "captive",
+  "personal": false,
+  "twist": false,
+  "level": 2,
+  "rarity": "uncommon"
+}

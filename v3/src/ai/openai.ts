@@ -12,6 +12,7 @@ import type {
   AiProvider, AiUsage, AiCallRecord, QuestWriteInput, QuestWriteOut, GenesisInput, GenesisOut,
   ResolveQuestInput, ResolveQuestOut, ThemeRollInput, ThemeRollOut, SelectorInput, ReviewInput, ReviewOut,
   FleshInput, FleshOut, CampaignDirection, DirectionRead } from './provider.js';
+import { appendCallLog } from './calllog.js';
 
 // 🛠 lab-overridable (model A/B, e.g. AIRAIDER_WRITER_MODEL=gpt-5.4-nano)
 const WRITER_MODEL = process.env.AIRAIDER_WRITER_MODEL || 'gpt-5-mini';
@@ -738,6 +739,15 @@ export function makeOpenAiProvider(): AiProvider {
     };
     records.push(rec);
     if (records.length > 120) records.splice(0, records.length - 120);
+    // AIRAIDER_CALL_LOG: the whole call, untruncated, as it settles (logging only)
+    let rawOut: string | undefined;
+    const logFull = () => appendCallLog({
+      t: new Date().toISOString(), provider: 'openai', n: rec.n, purpose, model,
+      effort: /^gpt-5/.test(model) ? effort ?? (model === NANO_MODEL ? 'minimal' : 'low') : undefined,
+      durationMs: rec.durationMs, inputTokens: rec.inputTokens, outputTokens: rec.outputTokens,
+      cachedTokens: rec.cachedTokens, costUsd: rec.costUsd, ok: rec.ok, error: rec.error,
+      system, user, output: rawOut,
+    });
     try {
       // effort per tier (STORY_ENGINE §10.5): prose at low (PROMPTS.md — latency is gameplay),
       // the mechanical nano tier at minimal
@@ -763,12 +773,15 @@ export function makeOpenAiProvider(): AiProvider {
       rec.inputTokens = inTok; rec.outputTokens = outTok; rec.cachedTokens = cached; rec.costUsd = cost;
       const raw = res.choices[0]?.message?.content ?? '{}';
       rec.output = raw.slice(0, 8000);
+      rawOut = raw;
       const out = schema.parse(JSON.parse(raw));
       rec.ok = true;
+      logFull();
       return out;
     } catch (e) {
       rec.durationMs = Date.now() - t0;
       rec.error = (e as Error).message?.slice(0, 300);
+      logFull();
       throw e;
     }
   }

@@ -7,6 +7,7 @@ import type {
   ResolveQuestInput, ResolveQuestOut, ThemeRollInput, ThemeRollOut, SelectorInput,
   FleshInput, FleshOut,
 } from './provider.js';
+import { appendCallLog, callLogPath } from './calllog.js';
 
 const JOBS: Record<string, string[]> = {
   raid: ['Hit the camp before first light and take what they owe.', 'Storm the stockade; leave the rest to burn.'],
@@ -53,8 +54,23 @@ export class MockProvider implements AiProvider {
   usage(): AiUsage { return { ...this._usage } }
   callLog() { return [] }
   private tick() { this._usage.calls++ }
+  /** AIRAIDER_CALL_LOG (the saga lab): the mock's calls too, so a mock drive leaves the same trail
+   *  as a real one — input and output as JSON, zero tokens. Logging only; draws nothing. */
+  private logged = 0;
+  private logCall<T>(purpose: string, input: unknown, out: T, t0: number): T {
+    if (callLogPath()) appendCallLog({
+      t: new Date().toISOString(), provider: 'mock', n: ++this.logged, purpose, model: 'mock',
+      durationMs: Date.now() - t0, inputTokens: 0, outputTokens: 0, cachedTokens: 0, costUsd: 0, ok: true,
+      system: '(mock)', user: JSON.stringify(input), output: JSON.stringify(out),
+    });
+    return out;
+  }
 
   async writeQuest(input: QuestWriteInput): Promise<QuestWriteOut> {
+    const t0 = Date.now();
+    return this.logCall('writeQuest', input, await this.writeQuestInner(input), t0);
+  }
+  private async writeQuestInner(input: QuestWriteInput): Promise<QuestWriteOut> {
     this.tick();
     await this.lag();
     const kw = (input.keywords ?? []).slice(0, 2).join(', ');
@@ -84,6 +100,10 @@ export class MockProvider implements AiProvider {
   }
 
   async genesis(input: GenesisInput): Promise<GenesisOut> {
+    const t0 = Date.now();
+    return this.logCall('genesis', input, await this.genesisInner(input), t0);
+  }
+  private async genesisInner(input: GenesisInput): Promise<GenesisOut> {
     this.tick();
     await this.lag(5);   // the real genesis is the 50-66s outlier
     const f = input.focal.name;
@@ -115,7 +135,9 @@ export class MockProvider implements AiProvider {
     // AIRAIDER_MOCK_FAIL_RESOLVE makes the reckoning's AI call blow up, so the error path can be
     // played instead of reasoned about: the player must not be stranded on a half-written page
     if (process.env.AIRAIDER_MOCK_FAIL_RESOLVE) { await this.lag(); throw new Error('mock: resolve failed on purpose') }
+    const t0 = Date.now();
     const fire = (o: ResolveQuestOut) => {
+      this.logCall('resolve', inputs.find(q => q.questId === o.questId), o, t0);
       // a throwing consumer never fails the batch — but it is never silent either
       try { onEach?.(o) } catch (e) { console.error('[mock] resolve onEach threw:', (e as Error).message) }
     };
@@ -169,9 +191,10 @@ export class MockProvider implements AiProvider {
   }
 
   async flesh(inputs: FleshInput[]): Promise<FleshOut[]> {
+    const t0 = Date.now();
     this.tick();
     await this.lag(1.3);   // the cycle's 12-16s tail
-    return inputs.map(i => ({
+    return this.logCall('flesh', inputs, inputs.map(i => ({
       characterId: i.characterId,
       who: i.saga
         ? `the one the story of ${i.saga.title} was about`
@@ -180,7 +203,7 @@ export class MockProvider implements AiProvider {
         ? `Before "${i.saga.title}" there was already this: ${i.saga.kernel} ${i.name} wanted ${i.saga.want ?? 'out'}, and the company's season decided how that ended.`
         : `${i.name} came to the company as ${i.context}. What they left behind, they do not say.`,
       quirks: [this.rng.pick(['whets an already-sharp knife', 'braids and unbraids a leather cord', 'taps the doorframe twice on leaving', 'saves the crust of every loaf'])],
-    }));
+    })), t0);
   }
 
   async themeRoll(input: ThemeRollInput): Promise<ThemeRollOut> {
@@ -194,9 +217,10 @@ export class MockProvider implements AiProvider {
   }
 
   async select(input: SelectorInput): Promise<string[]> {
+    const t0 = Date.now();
     this.tick();
     await this.lag(0.3);
-    return input.candidates.slice(0, input.max).map(c => c.id);
+    return this.logCall('select', input, input.candidates.slice(0, input.max).map(c => c.id), t0);
   }
 
   async review(): Promise<{ ok: boolean; defects: string[] }> {

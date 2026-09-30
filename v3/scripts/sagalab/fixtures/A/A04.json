@@ -1,0 +1,21 @@
+{
+  "id": "A04",
+  "set": "A",
+  "seed": 102,
+  "path": "failing",
+  "shape": "feud",
+  "spark": "a border stone moved by night, a little each year",
+  "focal": {
+    "name": "Rautio",
+    "sex": "male",
+    "race": "human",
+    "seed": 1104,
+    "value": 150
+  },
+  "N": 3,
+  "kind": "captive",
+  "personal": false,
+  "twist": false,
+  "level": 2,
+  "rarity": "uncommon"
+}

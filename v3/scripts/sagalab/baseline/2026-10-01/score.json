@@ -1,0 +1,290 @@
+{
+  "label": "base (Phase 0: today's storyteller)",
+  "runs": [
+    "base_A",
+    "base_B"
+  ],
+  "metrics": [
+    {
+      "id": "M1",
+      "name": "Follow, objective (J2: paraphrase 3/3)",
+      "value": 1,
+      "lo": 1,
+      "hi": 1,
+      "n": 12,
+      "den": 47
+    },
+    {
+      "id": "M2",
+      "name": "Follow, felt (J1 ease 0–10, cards)",
+      "value": 6.695652173913044,
+      "lo": 6.465909090909091,
+      "hi": 6.924731182795699,
+      "n": 24,
+      "den": 184
+    },
+    {
+      "id": "M3",
+      "name": "Want the next part (J1 0–10, reports)",
+      "value": 6,
+      "lo": 5.795180722891566,
+      "hi": 6.184782608695652,
+      "n": 24,
+      "den": 184
+    },
+    {
+      "id": "M3b",
+      "name": "Want to send (J1 0–10, cards)",
+      "value": 6.440217391304348,
+      "lo": 6.263736263736264,
+      "hi": 6.625,
+      "n": 24,
+      "den": 184
+    },
+    {
+      "id": "M4",
+      "name": "Send on card 1 (J1 yes)",
+      "value": 1,
+      "lo": 1,
+      "hi": 1,
+      "n": 24,
+      "den": 48
+    },
+    {
+      "id": "M5",
+      "name": "Reread (texts where BOTH J1 seats quote one)",
+      "value": 0.5760869565217391,
+      "lo": 0.46703296703296704,
+      "hi": 0.6896551724137931,
+      "n": 24,
+      "den": 184
+    },
+    {
+      "id": "M5′",
+      "name": "Reread (any one seat quotes one, per seat-text)",
+      "value": 0.7771739130434783,
+      "lo": 0.7196969696969697,
+      "hi": 0.8370786516853933,
+      "n": 24,
+      "den": 368
+    },
+    {
+      "id": "M6a",
+      "name": "Report clarity: J1 right on outcome (J2)",
+      "value": 0.9148936170212766,
+      "lo": 0.8205128205128205,
+      "hi": 0.9811320754716981,
+      "n": 12,
+      "den": 47
+    },
+    {
+      "id": "M6b",
+      "name": "Report clarity: J1 right on change (J2)",
+      "value": 1,
+      "lo": 1,
+      "hi": 1,
+      "n": 12,
+      "den": 47
+    },
+    {
+      "id": "M7",
+      "name": "Retell: facts of 3 (J2)",
+      "value": 2.75,
+      "lo": 2.5,
+      "hi": 3,
+      "n": 12,
+      "den": 12
+    },
+    {
+      "id": "M8",
+      "name": "Question answered (J2)",
+      "value": 0.5,
+      "lo": 0.25,
+      "hi": 0.75,
+      "n": 12,
+      "den": 12
+    },
+    {
+      "id": "M9",
+      "name": "Answer NOT guessable from card 1 (J2)",
+      "value": 0.4166666666666667,
+      "lo": 0.16666666666666666,
+      "hi": 0.6666666666666666,
+      "n": 12,
+      "den": 12
+    },
+    {
+      "id": "M11",
+      "name": "Continuity errors per saga (J2)",
+      "value": 5.75,
+      "lo": 4.583333333333333,
+      "hi": 6.916666666666667,
+      "n": 12,
+      "den": 12
+    },
+    {
+      "id": "M12a",
+      "name": "Spoilers per saga (J2)",
+      "value": 0.9166666666666666,
+      "lo": 0.4166666666666667,
+      "hi": 1.5,
+      "n": 12,
+      "den": 12
+    },
+    {
+      "id": "M12b",
+      "name": "Unmet-name leaks per saga (J2)",
+      "value": 1.5,
+      "lo": 0.9166666666666666,
+      "hi": 2.25,
+      "n": 12,
+      "den": 12
+    },
+    {
+      "id": "M12c",
+      "name": "Unmet-name leaks per saga (code)",
+      "value": 1.125,
+      "lo": 0.8333333333333334,
+      "hi": 1.375,
+      "n": 24,
+      "den": 24
+    },
+    {
+      "id": "M12d",
+      "name": "Soldier names on cards per saga (code)",
+      "value": 0.25,
+      "lo": 0.08333333333333333,
+      "hi": 0.4583333333333333,
+      "n": 24,
+      "den": 24
+    },
+    {
+      "id": "M13",
+      "name": "Paperwork jobs (J2)",
+      "value": 0.22857142857142856,
+      "lo": 0.08333333333333333,
+      "hi": 0.3684210526315789,
+      "n": 12,
+      "den": 35
+    },
+    {
+      "id": "ES",
+      "name": "Engine-speak quotes per saga (J2)",
+      "value": 6.25,
+      "lo": 4.583333333333333,
+      "hi": 8.166666666666666,
+      "n": 12,
+      "den": 12
+    },
+    {
+      "id": "PW",
+      "name": "Part-word labels per saga (J2)",
+      "value": 0.75,
+      "lo": 0,
+      "hi": 2.0833333333333335,
+      "n": 12,
+      "den": 12
+    },
+    {
+      "id": "M14b",
+      "name": "Cards ending on \"?\" (code)",
+      "value": 0,
+      "lo": 0,
+      "hi": 0,
+      "n": 24,
+      "den": 92
+    },
+    {
+      "id": "M15a",
+      "name": "Caps held, raw output (code)",
+      "value": 0.39492753623188404,
+      "lo": 0.34385964912280703,
+      "hi": 0.44814814814814813,
+      "n": 24,
+      "den": 276
+    },
+    {
+      "id": "M15b",
+      "name": "Hard failures per attempt (code)",
+      "value": 0,
+      "lo": 0,
+      "hi": 0,
+      "n": 24,
+      "den": 92
+    },
+    {
+      "id": "M16a",
+      "name": "Cost per saga (saga calls)",
+      "value": 0.04027565208333334,
+      "lo": 0.03704344791666667,
+      "hi": 0.04364586875000001,
+      "n": 24,
+      "den": 24
+    },
+    {
+      "id": "M16b",
+      "name": "Cost per beat",
+      "value": 0.01050669184782609,
+      "lo": 0.010190580392156865,
+      "hi": 0.01088469593023256,
+      "n": 24,
+      "den": 92
+    },
+    {
+      "id": "M17a",
+      "name": "Latency pursue→card 1, the saga written (mean)",
+      "value": 85212.20833333333,
+      "lo": 81470.91666666667,
+      "hi": 88842.29166666667,
+      "n": 24,
+      "den": 24
+    },
+    {
+      "id": "M17a′",
+      "name": "Latency pursue→a later card (mean)",
+      "value": 14308.279411764706,
+      "lo": 13492.985507246376,
+      "hi": 15191.283582089553,
+      "n": 24,
+      "den": 68
+    },
+    {
+      "id": "M17b",
+      "name": "Latency card call (mean)",
+      "value": 14065.391304347826,
+      "lo": 13391.41111111111,
+      "hi": 14778.989010989011,
+      "n": 24,
+      "den": 92
+    },
+    {
+      "id": "M17c",
+      "name": "Latency report call (mean)",
+      "value": 16779.07608695652,
+      "lo": 16155.232558139534,
+      "hi": 17358.141304347828,
+      "n": 24,
+      "den": 92
+    },
+    {
+      "id": "PR",
+      "name": "Paste rate, beat-1 card (code)",
+      "value": 0.5757347309641986,
+      "lo": 0.5093381571110605,
+      "hi": 0.6366408737813695,
+      "n": 24,
+      "den": 24
+    }
+  ],
+  "j3": [
+    {
+      "dir": "base_B/j3_gpt5/vs_base_B2",
+      "n": 12
+    },
+    {
+      "dir": "base_B/j3_opus/vs_base_B2",
+      "n": 12
+    }
+  ],
+  "j4": 4
+}

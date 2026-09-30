@@ -1,0 +1,21 @@
+{
+  "id": "B08",
+  "set": "B",
+  "seed": 204,
+  "path": "bumpy",
+  "shape": "beast",
+  "spark": "a beast that only hunts the guilty",
+  "focal": {
+    "name": "Malma",
+    "sex": "female",
+    "race": "wolfman",
+    "seed": 2108,
+    "value": 150
+  },
+  "N": 4,
+  "kind": "recruit",
+  "personal": false,
+  "twist": true,
+  "level": 2,
+  "rarity": "uncommon"
+}

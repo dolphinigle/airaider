@@ -1,0 +1,23 @@
+{
+  "id": "B06",
+  "set": "B",
+  "seed": 203,
+  "path": "personal",
+  "shape": "hunt",
+  "spark": "Bangin once led a patrol that left a wounded man to the wolves, and the man lived and has been asking after him",
+  "focal": {
+    "name": "Bangin Longshanks",
+    "sex": "male",
+    "race": "human",
+    "seed": 2106,
+    "value": 150,
+    "who": "A long-legged former patrol sergeant who keeps first watch every night.",
+    "backstory": "Bangin Longshanks led a border patrol that ran from a wolf pack and left a wounded man behind. Years later, word reached him that the man had lived."
+  },
+  "N": 3,
+  "kind": "recruit",
+  "personal": true,
+  "twist": false,
+  "level": 2,
+  "rarity": "uncommon"
+}

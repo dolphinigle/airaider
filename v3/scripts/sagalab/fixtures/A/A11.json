@@ -1,0 +1,21 @@
+{
+  "id": "A11",
+  "set": "A",
+  "seed": 106,
+  "path": "bumpy",
+  "shape": "heist",
+  "spark": "a smuggler’s route that moves more than goods",
+  "focal": {
+    "name": "Secile",
+    "sex": "female",
+    "race": "human",
+    "seed": 1111,
+    "value": 150
+  },
+  "N": 5,
+  "kind": "gold-hoard",
+  "personal": false,
+  "twist": false,
+  "level": 2,
+  "rarity": "rare"
+}

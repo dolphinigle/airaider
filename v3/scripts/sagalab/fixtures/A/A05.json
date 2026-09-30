@@ -1,0 +1,21 @@
+{
+  "id": "A05",
+  "set": "A",
+  "seed": 103,
+  "path": "lastchance",
+  "shape": "escort",
+  "spark": "a betrothal that would end a feud",
+  "focal": {
+    "name": "Marsilia",
+    "sex": "female",
+    "race": "human",
+    "seed": 1105,
+    "value": 150
+  },
+  "N": 2,
+  "kind": "recruit",
+  "personal": false,
+  "twist": false,
+  "level": 2,
+  "rarity": "common"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "B09",
+  "set": "B",
+  "seed": 205,
+  "path": "failing",
+  "shape": "defense",
+  "spark": "a garrison sold to raiders by its own paymaster",
+  "focal": {
+    "name": "Maginulf Blackbrook",
+    "sex": "male",
+    "race": "human",
+    "seed": 2109,
+    "value": 150
+  },
+  "N": 5,
+  "kind": "captive",
+  "personal": false,
+  "twist": false,
+  "level": 2,
+  "rarity": "rare"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "A02",
+  "set": "A",
+  "seed": 101,
+  "path": "bumpy",
+  "shape": "rescue",
+  "spark": "a kidnapping staged to look like a running-away",
+  "focal": {
+    "name": "Gudytha",
+    "sex": "female",
+    "race": "human",
+    "seed": 1102,
+    "value": 150
+  },
+  "N": 3,
+  "kind": "recruit",
+  "personal": false,
+  "twist": false,
+  "level": 2,
+  "rarity": "common"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "A08",
+  "set": "A",
+  "seed": 104,
+  "path": "bumpy",
+  "shape": "recovery",
+  "spark": "a relic that two shrines both claim",
+  "focal": {
+    "name": "Muvulrea",
+    "sex": "female",
+    "race": "elf",
+    "seed": 1108,
+    "value": 150
+  },
+  "N": 4,
+  "kind": "captive",
+  "personal": false,
+  "twist": true,
+  "level": 2,
+  "rarity": "uncommon"
+}

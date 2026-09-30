@@ -1,0 +1,23 @@
+{
+  "id": "A06",
+  "set": "A",
+  "seed": 103,
+  "path": "personal",
+  "shape": "feud",
+  "spark": "Hronolf walked out on his raiding pack rather than burn a mill with a family inside, and the pack's leader swore to collect on it",
+  "focal": {
+    "name": "Hronolf",
+    "sex": "male",
+    "race": "wolfman",
+    "seed": 1106,
+    "value": 150,
+    "who": "A wolfman who left a raiding pack and will not say why.",
+    "backstory": "Hronolf ran with a wolfman raiding pack in the high pines until the night he refused to burn a mill with a family inside. The pack's leader, his own cousin, swore in front of the whole pack to collect on it."
+  },
+  "N": 3,
+  "kind": "recruit",
+  "personal": true,
+  "twist": false,
+  "level": 2,
+  "rarity": "uncommon"
+}

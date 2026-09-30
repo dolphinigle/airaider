@@ -1,0 +1,21 @@
+{
+  "id": "B10",
+  "set": "B",
+  "seed": 205,
+  "path": "lastchance",
+  "shape": "recovery",
+  "spark": "a debt sold three times over",
+  "focal": {
+    "name": "Bastheladir Greenmantle",
+    "sex": "male",
+    "race": "elf",
+    "seed": 2110,
+    "value": 150
+  },
+  "N": 2,
+  "kind": "gold-hoard",
+  "personal": false,
+  "twist": true,
+  "level": 2,
+  "rarity": "common"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "B03",
+  "set": "B",
+  "seed": 202,
+  "path": "clean",
+  "shape": "escort",
+  "spark": "a love letter delivered twenty years late",
+  "focal": {
+    "name": "Belate",
+    "sex": "female",
+    "race": "human",
+    "seed": 2103,
+    "value": 150
+  },
+  "N": 2,
+  "kind": "recruit",
+  "personal": false,
+  "twist": true,
+  "level": 2,
+  "rarity": "common"
+}

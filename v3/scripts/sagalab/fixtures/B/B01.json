@@ -1,0 +1,21 @@
+{
+  "id": "B01",
+  "set": "B",
+  "seed": 201,
+  "path": "clean",
+  "shape": "rescue",
+  "spark": "an heir who does not want to be found",
+  "focal": {
+    "name": "Ravania Windrow",
+    "sex": "female",
+    "race": "elf",
+    "seed": 2101,
+    "value": 150
+  },
+  "N": 3,
+  "kind": "captive",
+  "personal": false,
+  "twist": false,
+  "level": 2,
+  "rarity": "common"
+}

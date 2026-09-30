@@ -8,6 +8,7 @@ import {
   type Rarity, type ChainKind,
 } from './economy.js';
 import type { Outcome } from './roll.js';
+import type { ChainLab } from './lab.js';
 
 export interface BibleCastEntry { name: string; trade?: string; who: string; want: string; role: string; loreId?: string }
 
@@ -64,6 +65,8 @@ export interface Chain {
   reOffers?: number;           // lapse counter — 3 unmarched offers of a beat slips the chain (2026-07-11)
   state: 'active' | 'finale-pending' | 'done' | 'slipped';
   createdCycle: number;
+  /** SAGA LAB only (docs/STORYTELLER.md §5.0): the fixture and its forced rolls — absent in play */
+  lab?: ChainLab;
 }
 
 export const TWIST_CHANCE = 0.30;

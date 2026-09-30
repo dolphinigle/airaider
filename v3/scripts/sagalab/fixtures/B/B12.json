@@ -1,0 +1,23 @@
+{
+  "id": "B12",
+  "set": "B",
+  "seed": 206,
+  "path": "personal",
+  "shape": "recovery",
+  "spark": "Sawen-Geet pawned her mother's egg-stone to buy passage north, and the pawnbroker has just sold it on",
+  "focal": {
+    "name": "Sawen-Geet",
+    "sex": "female",
+    "race": "lizardman",
+    "seed": 2112,
+    "value": 150,
+    "who": "A lizardman archer from the southern marshes who never gambles and never explains why.",
+    "backstory": "Sawen-Geet pawned her mother's egg-stone, the one thing her clan trusted her with, to buy passage north. She has been saving to buy it back ever since."
+  },
+  "N": 5,
+  "kind": "recruit",
+  "personal": true,
+  "twist": false,
+  "level": 2,
+  "rarity": "rare"
+}

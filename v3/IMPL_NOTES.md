@@ -1743,3 +1743,18 @@ Cost: zero AI calls, zero latency; prompt size O(1) via CANDIDATE_CAP.
   quota's staple-mode (summary then quote) is a real defect class. SPEECH_MODE=quota restores.
   D (rotating axis) parked — C delivers "sometimes" from engine data. Full samples for the
   designer: prosebench/SAMPLES_SPARSE_AB.md.
+
+## Saga lab — Phase 0 tooling (2026-10-01, docs/STORYTELLER.md §5.0/§5.1)
+
+Lab-only flags and dev commands (registered here per STORYTELLER §4.4; none changes a prompt or AI behaviour):
+
+| flag / command | what it does | where |
+|---|---|---|
+| `AIRAIDER_FORCE_OUTCOMES=1` | a lab saga's quest gets its fixture path's outcome (§5.0 path rules, `engine/lab.ts`) and the dice heads to match, so the ⚄ line agrees. Unset: the hook returns the roll untouched (`test/forceoutcomes.test.ts`, state-hash equality) | `Game.forceOutcome` (one function, called once in `doEndCycle`) |
+| `AIRAIDER_CALL_LOG=<file>` | every AI call appended whole as JSONL (full system + user, raw output, tokens, ms) — the mock's calls too | `src/ai/calllog.ts`, `openai.ts` `call`, `mock.ts` |
+| `lab saga <fixture.json>` | posts a pinned ✦STORY lead (spark, focal card spec, N, kind, personal, twist) and gives the fort what any ending needs (Map/Lead room, Tavern, Dungeon + cell, 4 soldiers) without an AI call; today's genesis uses the pins | CLI only, hidden from `help` · `Game.labSaga` |
+| `lab state` | one JSON line for the driver (chains, quests, leads, jobs, the last reckoning's lines per quest) | CLI only · `Game.labState` |
+| `mark <token>` | echoes `⟦mark token⟧` so a piped driver knows where a command's output ends | CLI only |
+| `ailog json <file>` | the whole call log (AIRAIDER_CALL_LOG's) as one JSON array | CLI only |
+
+Pipeline (`scripts/sagalab/`): `drive.ts` (plays the real CLI) → `extract.ts` (one file per text) → `mech.ts` (M12–M17, paste rate, §D.3) → `judge_gpt.ts` (gpt-5 J1 progressive / J3 / J4) + Opus seats from `judge/*.md` → `score.ts` (§1.1 table, bootstrap CIs, REPORT.md). Fixtures: `fixtures/{A,B}/`, 12 each on 6 seeds. Runs land in `runs/` (gitignored).

@@ -1,0 +1,21 @@
+{
+  "id": "A10",
+  "set": "A",
+  "seed": 105,
+  "path": "lastchance",
+  "shape": "hunt",
+  "spark": "a deserter who knows where the bodies are",
+  "focal": {
+    "name": "Wilminn",
+    "sex": "male",
+    "race": "wolfman",
+    "seed": 1110,
+    "value": 150
+  },
+  "N": 3,
+  "kind": "captive",
+  "personal": false,
+  "twist": true,
+  "level": 2,
+  "rarity": "common"
+}

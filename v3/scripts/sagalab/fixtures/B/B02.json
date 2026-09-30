@@ -1,0 +1,21 @@
+{
+  "id": "B02",
+  "set": "B",
+  "seed": 201,
+  "path": "bumpy",
+  "shape": "recovery",
+  "spark": "a theft the victim refuses to admit happened",
+  "focal": {
+    "name": "Ariphron",
+    "sex": "male",
+    "race": "human",
+    "seed": 2102,
+    "value": 150
+  },
+  "N": 3,
+  "kind": "gold-hoard",
+  "personal": false,
+  "twist": false,
+  "level": 2,
+  "rarity": "uncommon"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "A09",
+  "set": "A",
+  "seed": 105,
+  "path": "failing",
+  "shape": "defense",
+  "spark": "a village that pays two masters and can afford neither",
+  "focal": {
+    "name": "Benjamund",
+    "sex": "male",
+    "race": "human",
+    "seed": 1109,
+    "value": 150
+  },
+  "N": 4,
+  "kind": "gold-hoard",
+  "personal": false,
+  "twist": false,
+  "level": 2,
+  "rarity": "uncommon"
+}

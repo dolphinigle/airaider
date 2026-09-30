@@ -43,7 +43,8 @@ import { questXp, grantXp, rollBase, rollGrowthLean, growToLevel } from '../engi
 import { coins, PARTIAL_FRAC, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, explainCoins, oddsBand, slotStrength, coinsWhy, INJURY_FRAC, BAND_TEXT, type SlotTest, type Outcome, type QuestRollResult, type Band, type Strength, type CoinsWhy } from '../engine/roll.js';
 import { sampleKeywords, sampleKeywordsLight, sampleSeed, sampleOpening, sampleGravity, pickTone, sampleArrival, sampleTell, sampleObstacle, sampleShape } from '../ai/keywords.js';
 import type { AiProvider, ResolveQuestInput, ResolveQuestOut, AskSlotOut, QuestWriteOut, CampaignDirection, DirectionRead } from '../ai/provider.js';
-import { prefPick, type TraitPrefs } from '../engine/economy.js';
+import { prefPick, chainPayoff, type TraitPrefs } from '../engine/economy.js';
+import { labFixtureProblems, nextLabOutcome, forceRoll, type LabFixture } from '../engine/lab.js';
 
 export interface LogEntry { cycle: number; kind: string; text: string; questId?: string }
 
@@ -2108,6 +2109,122 @@ export class Game {
     this.state.leads.push(lead);
   }
 
+  // ---- SAGA LAB (docs/STORYTELLER.md §5.0) — dev tooling, reached only through the CLI's hidden
+  // `lab` commands and the AIRAIDER_FORCE_OUTCOMES flag. Nothing here runs in play.
+
+  /** post a fixture's pinned ✦STORY lead. The fort is made able to run the saga to any ending —
+   *  the board, a Lead room, a Tavern and cells for the finale's person, four soldiers — without
+   *  a single AI call, so everything up to the saga's genesis stays identical across arms. */
+  labSaga(fx: LabFixture): { ok: boolean; msg: string; leadId?: string } {
+    const bad = labFixtureProblems(fx);
+    if (bad.length) return { ok: false, msg: `bad fixture: ${bad.join('; ')}` };
+    const level = fx.level ?? 2;
+    const region = fx.region ?? this.activeRegions()[0]!;
+    const rarity = fx.rarity ?? (fx.N <= 2 ? 'common' : fx.N <= 4 ? 'uncommon' : 'rare');
+    this.labFort(level);
+    const lead: Lead = {
+      id: freshId('lead-'), rarity, level, region, archetype: 'investigate',
+      chainInfo: { kind: 'starts-new' },
+      // never null: a standing lead is re-levelled to the roster at pursue, which would move the pin
+      expiresAtCycle: this.state.cycle + 999, source: fx.personal ? 'personal' : 'starter',
+      title: `lab ${fx.id}`, lab: fx,
+    };
+    if (fx.personal) {
+      const merc = this.labFocal(fx, level, region, 'merc');
+      merc.location = HELD('roster');
+      this.addCard(merc, true);
+      this.ensureLoreNode(merc);
+      lead.personalMercId = merc.id;
+    }
+    this.state.leads.push(lead);
+    return { ok: true, msg: `lab saga ${fx.id} (${fx.path}, N${fx.N}, ${fx.personal ? 'personal' : fx.kind}) posted: ${lead.id}`, leadId: lead.id };
+  }
+
+  /** the lab's standing fort: rooms placed directly (no build side effects, no gold), and the
+   *  roster topped up to four from the game's own rolls */
+  private labFort(level: number): void {
+    for (const type of ['map-room', 'lead-room', 'tavern', 'dungeon', 'dungeon-cell']) {
+      if (this.hasRoom(type)) continue;
+      if (!this.freeCells().length) this.state.fort.cells.push({ floor: Math.max(...this.state.fort.cells.map(c => c.floor)) + 1, col: 0 });
+      const rt = ROOM_TYPE[type]!;
+      this.state.fort.rooms.push({ id: freshId('room-'), type, cell: this.freeCells()[0]!, slots: [], wants: defaultWants(rt, null), style: null });
+    }
+    while (this.roster().length < 4) {
+      const merc = this.freshCharacter('merc', level, 60, 'forests');
+      merc.location = HELD('roster');
+      this.addCard(merc);
+      this.ensureLoreNode(merc);
+    }
+  }
+
+  /** the fixture's person, rolled on a private Rng from the fixture's own seed */
+  private labFocal(fx: LabFixture, level: number, region: string, as: 'captive' | 'merc'): Card {
+    const f = fx.focal;
+    const card = materializeReward(new Rng(f.seed >>> 0), {
+      kind: as === 'merc' ? 'recruit' : 'captive', value: f.value ?? 120,
+      required: f.tags?.map(concept => ({ concept })),
+    }, level, region, { presetName: f.name, race: f.race, gender: f.sex, maxSkills: 2 })[0]!;
+    if (as === 'merc' && card.character) {
+      card.character.role = 'merc';
+      card.character.level = level;
+      if (f.who) card.character.who = f.who;
+      if (f.backstory) card.character.backstory = f.backstory;
+    }
+    return card;
+  }
+
+  /** the pins win over the economy roll (which still ran, so every later draw is the same) */
+  private applyLabPins(eco: ReturnType<typeof newChainEconomy>, pin: LabFixture, lead: Lead): void {
+    const payoff = chainPayoff(pin.N, lead.level, lead.rarity) + (lead.bonus ?? 0);
+    eco.focalTarget = Math.round(eco.focalTarget * payoff / Math.max(1, eco.payoff));
+    eco.payoff = payoff;
+    eco.beats = pin.N;
+    eco.failureBudget = Math.max(2, Math.ceil(pin.N / 2));
+    eco.kind = pin.kind;
+    eco.twist = pin.twist;
+  }
+
+  /** AIRAIDER_FORCE_OUTCOMES — the ONE place a lab run bends the dice. A lab saga's quest gets its
+   *  fixture path's outcome (engine/lab.ts) and the heads to match, so the ⚄ line agrees. Unset —
+   *  every game that is not a lab run — it returns the roll untouched: no rng, no state. */
+  private forceOutcome(q: Quest, rolled: QuestRollResult): QuestRollResult {
+    if (!process.env.AIRAIDER_FORCE_OUTCOMES) return rolled;
+    const lab = q.chainId ? this.state.chains.find(c => c.id === q.chainId)?.lab : undefined;
+    if (!lab) return rolled;
+    const job = q.beatIndex ?? 1;
+    const outcome = nextLabOutcome(lab, !!q.isFinale, job);
+    lab.log.push({ job, finale: !!q.isFinale, outcome });
+    return forceRoll(rolled, outcome);
+  }
+
+  /** one JSON line for the lab driver: where every saga, quest, lead and job stands, and the last
+   *  reckoning's lines per quest — the very lines `reckoning` prints, so a transcript is cut per
+   *  report without guessing where a block ends (the extractor checks them against the print) */
+  labState() {
+    const rk = this.reckoningAt();
+    return {
+      lab: 1, cycle: this.state.cycle, roster: this.roster().length,
+      chains: this.state.chains.map(c => ({
+        id: c.id, title: c.bible.title, state: c.state, beat: c.beatIndex, expectedBeats: c.expectedBeats,
+        failures: c.failures, failureBudget: c.failureBudget, lab: c.lab ?? null,
+      })),
+      quests: this.state.quests.filter(q => q.state === 'open').map(q => ({
+        id: q.id, title: q.title, chainId: q.chainId ?? null, beatIndex: q.beatIndex ?? null, isFinale: !!q.isFinale,
+        approaches: q.approaches?.map(a => ({ id: a.id, label: a.label, rewardKind: a.rewardKind })) ?? null,
+        chosen: q.chosenApproach ?? null, ready: this.isCommitted(q),
+      })),
+      leads: this.state.leads.map(l => ({
+        id: l.id, kind: l.chainInfo.kind, chainId: l.chainInfo.kind === 'continues' ? l.chainInfo.chainId : null,
+        lab: l.lab?.id ?? null, title: l.title ?? null,
+      })),
+      jobs: this.jobs().map(j => ({ id: j.id, leadId: j.leadId, state: j.state, questId: j.questId ?? null, error: j.error ?? null })),
+      reckoning: rk ? { cycle: rk.cycle, meta: rk.meta.map(m => ({
+        questId: m.questId, title: m.title, chainId: m.chainId, outcome: m.outcome, isFinale: m.isFinale,
+        heads: m.heads, coins: m.coins, bar: m.bar, lines: rk.lines.slice(m.from, m.to),
+      })) } : null,
+    };
+  }
+
   private async generateGenesis(lead: Lead): Promise<Quest> {
     const personalMercId = lead.personalMercId;
     const returning = lead.focalId ? this.card(lead.focalId) : undefined;
@@ -2116,6 +2233,9 @@ export class Game {
     const returningIsMerc = returning?.character?.role === 'merc';
     const isPersonal = (!!personalMercId && !!this.card(personalMercId)) || returningIsMerc;
     const eco = newChainEconomy(this.rng, lead.level, lead.rarity, lead.bonus ?? 0);
+    // SAGA LAB (docs/STORYTELLER.md §5.0): a lab lead's pins win over what the roll dealt
+    const pin = lead.lab;
+    if (pin) this.applyLabPins(eco, pin, lead);
     // the focal character FIRST (§2): personal → the merc; sequel → the SLIPPED focal
     // returns from the lore graph (§21-4a); else generated at the payoff value
     let focal: Card;
@@ -2128,6 +2248,11 @@ export class Game {
       focal = returning;
       this.unslotCard(focal);           // never leave a room slot pointing at them
       focal.location = HELD('limbo');   // back within reach, not yet owned
+    } else if (pin) {
+      // the fixture's person, built from its own seed — the same face in every run and every arm
+      focal = this.labFocal(pin, lead.level, lead.region, 'captive');
+      focal.location = HELD('limbo');
+      this.addCard(focal, true);
     } else {
       const spec = { kind: 'captive' as const, value: eco.focalTarget };
       // focal variety (BIBLE lock): recent focals' skill/body/standing tags are excluded so
@@ -2246,7 +2371,7 @@ export class Game {
       // once saved his life recast as a generic obstacle.
       // PERSONAL_SEED=0 restores the old behaviour (a generic what-if even for a personal
       // saga), for A/B only
-      seed: isPersonal && process.env.PERSONAL_SEED !== '0' ? this.personalSeed(focal) : sampleSeed(this.rng),
+      seed: pin ? pin.spark : isPersonal && process.env.PERSONAL_SEED !== '0' ? this.personalSeed(focal) : sampleSeed(this.rng),
       // NOCLIENT=1 (lab): a personal saga has no client at all — both blind judges named
       // 'client-hires-fetch kernel + soldier clause appended' as what still holds it back
       // MEASURED and shipped: a personal saga has NO client. Blind A/B, 2 judges, 30 sagas,
@@ -2449,7 +2574,7 @@ export class Game {
       let issue = issues(g);
       if (issue?.hard) {
         this.log('dev', `saga draft rejected (one re-roll): ${issue.why.slice(0, 120)}…`);
-        const reseed = isPersonal && process.env.PERSONAL_SEED !== '0'
+        const reseed = pin ? pin.spark : isPersonal && process.env.PERSONAL_SEED !== '0'
           ? (seeds => seeds.find(x => x !== genesisInput.seed) ?? genesisInput.seed)(this.personalSeeds(focal))
           : sampleSeed(this.rng);
         g = await this.ai.genesis({ ...genesisInput, seed: reseed, avoid: [...avoid, issue.why] });
@@ -2599,6 +2724,7 @@ export class Game {
           : isPersonal && process.env.PERSONAL_CARD !== '0' ? [focal.name] : [],
       },
       state: 'active', createdCycle: this.state.cycle,
+      ...(pin ? { lab: { fixture: pin.id, path: pin.path, N: pin.N, log: [] } } : {}),
     };
     focal.chainIds.push(chain.id);
     this.state.chains.push(chain);
@@ -3747,7 +3873,7 @@ export class Game {
     for (const q of ready) {
       const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
       const party = active.map(s => this.card(s.filledBy!)!);
-      const rolled = resolvePooled(this.rng, active.map(s => ({ unit: this.card(s.filledBy!)!, test: s.test })));
+      const rolled = this.forceOutcome(q, resolvePooled(this.rng, active.map(s => ({ unit: this.card(s.filledBy!)!, test: s.test }))));
       const delivery = computeDelivery(this.rng, q, rolled.outcome);
       let fate: FinaleFate | undefined;
       if (q.isFinale && q.chainId) {

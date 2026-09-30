@@ -1,0 +1,21 @@
+{
+  "id": "A07",
+  "set": "A",
+  "seed": 104,
+  "path": "clean",
+  "shape": "beast",
+  "spark": "something in the millpond that takes lambs and dogs but never fish",
+  "focal": {
+    "name": "Natalgreesh",
+    "sex": "female",
+    "race": "lizardman",
+    "seed": 1107,
+    "value": 150
+  },
+  "N": 3,
+  "kind": "recruit",
+  "personal": false,
+  "twist": false,
+  "level": 2,
+  "rarity": "common"
+}

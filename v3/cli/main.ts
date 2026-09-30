@@ -10,6 +10,7 @@ import { MockProvider } from '../src/ai/mock.js';
 import { makeOpenAiProvider } from '../src/ai/openai.js';
 import { render } from './format.js';
 import type { AiProvider } from '../src/ai/provider.js';
+import { readCallLog, callLogPath } from '../src/ai/calllog.js';
 
 const args = process.argv.slice(2);
 const flag = (name: string) => args.includes(`--${name}`);
@@ -261,6 +262,16 @@ async function exec(game: Game, line: string): Promise<boolean> {
     case 'log': console.log(render.log(game, Number(rest.find(x => Number(x))) || 15, rest.includes('dev'))); break;
     // the GUI's 'ai' tab, for the text UI: every recent call's full prompt and raw reply, to a file
     case 'ailog': {
+      // lab: `ailog json <file>` — the WHOLE call log (AIRAIDER_CALL_LOG's, untruncated) as one JSON
+      // array; without the flag set, the provider's own ring is all there is
+      if (rest[0] === 'json') {
+        const out = path.resolve(rest[1] || path.join(LOG_DIR, `ai-calls-c${game.state.cycle}.json`));
+        const recs = callLogPath() ? readCallLog() : game.ai.callLog();
+        fs.mkdirSync(path.dirname(out), { recursive: true });
+        fs.writeFileSync(out, JSON.stringify(recs, null, 1));
+        console.log(`${recs.length} calls → ${out}${callLogPath() ? '' : ' (the ring only — set AIRAIDER_CALL_LOG for every call)'}`);
+        break;
+      }
       fs.mkdirSync(LOG_DIR, { recursive: true });
       const p = path.join(LOG_DIR, `ai-calls-c${game.state.cycle}.jsonl`);
       const recs = game.ai.callLog();
@@ -389,6 +400,20 @@ async function exec(game: Game, line: string): Promise<boolean> {
       const p = path.join(SAVE_DIR, `${arg || 'game'}.json`);
       fs.writeFileSync(p, game.save());
       console.log(`saved → ${p}`);
+      break;
+    }
+
+    // ---- SAGA LAB dev commands (docs/STORYTELLER.md §5.0) — CLI-only by design, not in 'help'.
+    // `mark <token>` echoes, so a driver piping one command at a time knows where its output ends
+    case 'mark': console.log(`⟦mark ${arg}⟧`); break;
+    case 'lab': {
+      if (rest[0] === 'saga' && rest[1]) {
+        const p = path.resolve(rest.slice(1).join(' '));
+        let fx: unknown;
+        try { fx = JSON.parse(fs.readFileSync(p, 'utf8')) } catch (e) { console.log(`✗ cannot read fixture ${p}: ${(e as Error).message}`); break }
+        say(game.labSaga(fx as never));
+      } else if (rest[0] === 'state') console.log(JSON.stringify(game.labState()));
+      else console.log('lab saga <fixture.json> · lab state');
       break;
     }
 
