@@ -24,6 +24,7 @@ Airaider is a persistent, single-player, **AI-driven character-collection fort g
 - **[DOGFOODING.md](DOGFOODING.md)** — 🔒 how this game gets playtested: the text UI is at PARITY with the web GUI, and playtesting means *playing* a real UI, never simulating one. Read before claiming anything is playtested.
 - **[TEMPO.md](TEMPO.md)** — 🟡 **goals** for the current phase: no dead time. Async work in the fort phase + a reckoning that unfolds. Measured latency baseline lives here; lifts `STORY_ENGINE §9`'s prototype exemption.
 - **[UI.md](UI.md)** — the Sultan-style GUI (built 2026-09-29): map home, board sidebar, the hand + bags, card sheet, fort build list, portraits. Supersedes QUEST_SCREEN's no-art non-goal.
+- **[STORYTELLER.md](STORYTELLER.md)** — the saga storyteller rebuild (v4), 2026-10-01: short story-first prompts, a plan call with a hidden question/answer, engine-owned mechanics, a ≥1,000-theme seed library, structure tested as arms (shaped / loose / hybrid) against a repetition metric; built in measured phases behind a saga lab. Supersedes parts of GENERATION_FLOW / PROMPTS / STORY_ENGINE / QUEST_BIBLE at its G2 gate.
 - **[AI_PROVIDER.md](AI_PROVIDER.md)** — model selection, structured-output strategy.
 - **[PLAYER_PREFERENCES.md](PLAYER_PREFERENCES.md)** — player-facing flavor knobs (tone, writing style) that flow into AI prompts without touching engine math.
 
