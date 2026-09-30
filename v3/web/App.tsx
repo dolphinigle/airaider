@@ -10,6 +10,8 @@ import { CardSheet } from './Sheets';
 import { FortScreen } from './FortScreen';
 import { Chronicle, Reckoning } from './Chronicle';
 import { ConfirmButton, useDeltaFloater, useBump } from './fx';
+import { sfx, sfxForAction, sfxSettings } from './sfx';
+import { Settings } from './Settings';
 
 type Tone = 'ok' | 'warn' | 'bad';
 // an engine result's tone: refused = red, done-with-a-caveat (r.warn) = amber, done = green
@@ -57,6 +59,8 @@ export function App() {
   const [sealHover, setSealHover] = useState(false);
   const [ghOpen, setGhOpen] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [mutedUi, setMutedUi] = useState(sfxSettings.muted);
   const [moreSteps, setMoreSteps] = useState(false);
   // the hand folded to a strip — a per-viewer convenience (browser storage may be missing: then it just starts open)
   const [handMin, setHandMin] = useState(() => { try { return localStorage.getItem(HAND_KEY) === '1' } catch { return false } });
@@ -81,26 +85,26 @@ export function App() {
   const doAct = async (type: string, ...args: (string | number)[]) => {
     setBusy(true); setPending(type);
     const poll = setInterval(() => { refresh().catch(() => {}) }, 1200);
-    try { const r = await act(type, ...args); say(r.msg, toneOf(r)) }
-    catch (e) { say(`request failed: ${(e as Error).message ?? e}`, 'bad') }
+    try { const r = await act(type, ...args); sfxForAction(type, r.ok, !!(r as any).warn); say(r.msg, toneOf(r)) }
+    catch (e) { sfx('refuse'); say(`request failed: ${(e as Error).message ?? e}`, 'bad') }
     finally { clearInterval(poll); setPending(null); setBusy(false); await refresh().catch(() => {}) }
   };
   // TEMPO P1: queued actions (pursue, cancel, inflight) never touch `busy`
   const queueAct = async (type: string, ...args: (string | number)[]) => {
-    try { const r = await act(type, ...args); say(r.msg, toneOf(r)) }
-    catch (e) { say(`request failed: ${(e as Error).message ?? e}`, 'bad') }
+    try { const r = await act(type, ...args); sfxForAction(type, r.ok, !!(r as any).warn); say(r.msg, toneOf(r)) }
+    catch (e) { sfx('refuse'); say(`request failed: ${(e as Error).message ?? e}`, 'bad') }
     finally { await refresh().catch(() => {}) }
   };
   // quick placements: no pending banner, just the result
   const quick = async (type: string, ...args: (string | number)[]) => {
-    try { const r = await act(type, ...args); say(r.msg, toneOf(r)) }
-    catch (e) { say(`request failed: ${(e as Error).message ?? e}`, 'bad') }
+    try { const r = await act(type, ...args); sfxForAction(type, r.ok, !!(r as any).warn); say(r.msg, toneOf(r)) }
+    catch (e) { sfx('refuse'); say(`request failed: ${(e as Error).message ?? e}`, 'bad') }
     await refresh().catch(() => {});
   };
   // END: the reckoning page opens at once; its "cycle N resolved" is not news — PROCEED toasts the tally
   const endCycle = async () => {
     if (!s || busy) return;
-    setReckAt(s.cycle); setReckoning(true);
+    sfx('end'); setReckAt(s.cycle); setReckoning(true);
     setBusy(true); setPending('end');
     const poll = setInterval(() => { refresh().catch(() => {}) }, 1200);
     try { const r = await act('end'); if (!r.ok) say(r.msg, 'bad') }
@@ -139,9 +143,9 @@ export function App() {
     const failTxt = failed.length ? ` · ✗ ${failed.map(j => j.title).join(', ')} — the writing failed; the lead is still there` : '';
     if (done.length === 1 && done[0].questId) {
       const j = done[0];
-      say(`✦ ${j.questTitle ?? j.title} is on the map${failTxt}`, 'ok', 7000, { label: 'Open', run: () => openQuest(j.questId) });
+      sfx('notify'); say(`✦ ${j.questTitle ?? j.title} is on the map${failTxt}`, 'ok', 7000, { label: 'Open', run: () => openQuest(j.questId) });
     } else if (done.length > 1) {
-      say(`✦ ${done.length} new quests are on the map: ${done.map(j => j.questTitle ?? j.title).join(' · ')}${failTxt}`, 'ok', 7000,
+      sfx('notify'); say(`✦ ${done.length} new quests are on the map: ${done.map(j => j.questTitle ?? j.title).join(' · ')}${failTxt}`, 'ok', 7000,
         { label: 'Open', run: () => { setBoardTab('quests'); go('map') } });
     } else if (failed.length) {
       say(failTxt.slice(3), 'bad', 7000);
@@ -301,7 +305,7 @@ export function App() {
         <span className="crest">AIRAIDER</span>
         <nav className="nav" aria-label="Screens">
           {NAV.map(([k, label, d]) => (
-            <button key={k} className={screen === k ? 'on' : ''} onClick={() => go(k)}>
+            <button key={k} className={screen === k ? 'on' : ''} onClick={() => { sfx('tick'); go(k) }}>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d={d} /></svg>
               {label}
               {k === 'map' && s.quests.length > 0 && <span className="dot">{s.quests.length}</span>}
@@ -355,6 +359,17 @@ export function App() {
               </span>}
             </div>}
           </span>
+          {/* sound on/off at a click; everything else lives in Settings */}
+          <button className="hico" onClick={() => { sfxSettings.muted = !sfxSettings.muted; setMutedUi(sfxSettings.muted); if (!sfxSettings.muted) sfx('tick') }}
+            aria-label={mutedUi ? 'Sound off — turn on' : 'Sound on — turn off'} title={mutedUi ? 'Sound off' : 'Sound on'}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M4 9h4l5-4v14l-5-4H4z" />{mutedUi ? <path d="M17 9l5 6M22 9l-5 6" /> : <path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" />}</svg>
+          </button>
+          <button className={'hico' + (s.direction ? ' on' : '')} onClick={() => { sfx('tick'); setSettingsOpen(true) }} aria-label="Settings"
+            title={s.direction ? `Settings — direction: ${s.direction.text}` : 'Settings — story direction, sound'}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" /></svg>
+          </button>
         </div>
       </header>
 
@@ -407,6 +422,7 @@ export function App() {
         </div>
       </div>
 
+      {settingsOpen && <Settings s={s} doAct={doAct} close={() => setSettingsOpen(false)} />}
       {sheet && <CardSheet s={s} id={sheet.id} cast={sheet.cast} doAct={doAct} quick={quick} close={() => setSheet(null)} openQuest={(id: string) => { setSheet(null); openQuest(id) }}
         openRoom={(id: string | null) => { setSheet(null); openRoom(id) }} say={say} />}
     </div>

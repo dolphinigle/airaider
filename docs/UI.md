@@ -138,3 +138,17 @@ Added by the 2026-09-30 audit fixes (doc gaps — confirm or overturn):
 11. Auto on a quest the idle soldiers cannot fully man places nobody (Auto-fill-all already undid such placements).
 12. A move into a free place that LOSES prestige is allowed, labelled with the loss (only a full room's swap must gain).
 13. The scroll names a prestige room to build when the Great Hall waits on prestige and none stands; no Tavern hint.
+
+## 9 · Settings & sound (2026-09-30)
+
+- **Story direction** (header ⚙ → Settings; CLI `direction [text|clear]`). The player types free text — a tone, a setting,
+  what the people they meet or recruit are like. ONE writer-model read (`interpretDirection`, once per save of the
+  setting) turns it into `guidance` (1–2 plain instructions, appended to every writer call's system prompt as a
+  CAMPAIGN DIRECTION block — only when set, so default prompts are unchanged) and **trait preferences** as engine tag ids,
+  separately for strangers (`npc`) and recruits: avoided traits never roll; preferred ones weigh ×5; a single preferred
+  race or sex is always used (`prefPick`, `generateCard(prefs)`). The engine keeps only ids it knows. Applies to what is
+  written and rolled from then on (designer: "preferences for traits, not just sex").
+- **Sound effects** (`web/sfx.ts`): synthesised live with Web Audio — no files, no cost (the ../mahjong make_sounds
+  approach). Every engine action has a sound (place, refuse, build, dig, raise, coin, quill…), END is a gong, each
+  reckoning verdict lands with a stamp, the tally rings coins / a level-up arpeggio, card pick-up and popups swish.
+  Header 🔊 mutes; Settings has volume + test. Per-viewer (localStorage).

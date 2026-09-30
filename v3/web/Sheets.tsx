@@ -2,6 +2,7 @@
 // Every button is an engine action. "Send them to" reads Game.placementsFor (the CLI's `fit <merc>`);
 // "Set them in" reads Game.roomPlacementsFor (the CLI's `fit <captive|relic>` + `setin`). Prices,
 // refusals and fixes are the engine's quotes/blocks — nothing here re-derives a rule.
+import { sfx } from './sfx';
 import React, { useEffect, useRef } from 'react';
 import { type S, Tags, Silhouette, Glyph, RoomIcon, FixButton, cardStatus, formOf, cap1, FORM_ONE, shortTitle, useKeyScroll } from './ui';
 import { strengthCls, STRENGTH_WORD } from './band';
@@ -22,6 +23,7 @@ export function CardSheet({ s, id, cast, doAct, quick, close, openQuest, openRoo
   s: S; id: string; cast?: any; doAct: any; quick: any; close: () => void; openQuest: (id: string) => void;
   openRoom?: (id: string | null) => void; say?: (msg: string, tone?: 'ok' | 'warn' | 'bad') => void;
 }) {
+  useEffect(() => { sfx('open'); return () => sfx('close') }, []);
   const lists: [string, any[]][] = [['roster', s.roster], ['captive', s.captives], ['relic', s.relics], ['debt', s.liabilities], ['tavern', s.tavern], ['holding', s.holding]];
   let kind = 'cast', c: any = cast;
   if (!cast) for (const [k, l] of lists) { const f = l.find((x: any) => x.id === id); if (f) { kind = k; c = f; break } }

@@ -1,4 +1,5 @@
 // THE CHRONICLE — sagas, people & places, the log, the AI ledger; and the reckoning page.
+import { sfx } from './sfx';
 import React, { useEffect, useRef, useState } from 'react';
 import { type S, gateOf, useKeyScroll } from './ui';
 
@@ -153,6 +154,8 @@ function CoinRow({ m }: { m: Meta }) {
 /** one quest's report: the verdict stamp on the title row, the roll as coins, the coin sums behind "why?" */
 function Block({ seg, fresh }: { seg: Extract<Seg, { kind: 'block' }>; fresh: boolean }) {
   const { meta: m, outcome } = seg;
+  // the verdict lands with a stamp (once, when this block arrives)
+  useEffect(() => { if (fresh && outcome) sfx(outcome === 'success' ? 'stampOk' : outcome === 'partial' ? 'stampPartial' : 'stampFail') }, [fresh, outcome]);
   const title = m?.title ?? cleanTitle(seg.lines[0] ?? '');
   const body = seg.lines.slice(1);
   const pending = !outcome && body.some(l => l.startsWith('✎'));
@@ -188,6 +191,12 @@ function Tally({ sum, openRoom, openCard, openLeads, openHolding, cardExists, ro
   openHolding: (cardId?: string) => void; cardExists: (id: string) => boolean; roomOfType: (t: string) => string | null;
 }) {
   const chips: { k: string; text: string; tone: 'good' | 'bad' | 'info'; go?: () => void; title?: string }[] = [];
+  // the spoils ring in: coins for gold won, an arpeggio for a level-up (once per tally)
+  useEffect(() => {
+    const gold = (sum?.goldAfter ?? 0) - (sum?.goldBefore ?? 0);
+    if (gold > 0) setTimeout(() => sfx('coin'), 250);
+    if ((sum?.levelUps ?? []).length) setTimeout(() => sfx('levelup'), 600);
+  }, [sum?.cycle]);
   const names = (xs: { name: string }[]) => xs.length > 2 ? `${xs.length}` : xs.map(x => x.name).join(', ');
   // a chip for a card that is no longer anywhere (sold, ransomed, gone since) links nowhere
   const card = (id: string) => cardExists(id) ? () => openCard(id) : undefined;

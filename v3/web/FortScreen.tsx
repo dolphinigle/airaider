@@ -3,6 +3,7 @@
 // prisoner hub (Dungeon), the tavern or holding. Every number and verdict on this screen is the
 // engine's (fort.rooms[].effect, roomPlacements, quotes, blocks, fixes) — this file only shows them.
 // Every placement is ONE engine call: quick('setin', roomId, cardId, idx?) = Game.setInRoom (CLI `setin`).
+import { sfx } from './sfx';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { type S, RoomIcon, CardFace, Tags, FixButton as SharedFix, HOLDING_SEL, scrollBehavior, useKeyScroll } from './ui';
 import { ConfirmButton, useDeltaFloater, useFloaters } from './fx';
@@ -300,6 +301,7 @@ let wantDone = 0;
  *  what it wants, its first place, why not). A modal over the fort; Esc / ✕ / the scrim close it. */
 function BuildModal({ s, cat, setCat, quick, hi, cell, close, dig }: any) {
   const [owner, setOwner] = useState('');
+  useEffect(() => { sfx('open'); return () => sfx('close') }, []);
   // ONE scroll region: the page keys reach it with no click first; a focused row scrolls in BELOW the
   // stuck header (scroll-padding = the header's measured height); a new category opens at its top
   const body = useRef<HTMLDivElement>(null);

@@ -42,7 +42,8 @@ import { hasClash, queryMatches, fillScore, acceptsCard } from '../engine/overla
 import { questXp, grantXp, rollBase, rollGrowthLean, growToLevel } from '../engine/growth.js';
 import { coins, PARTIAL_FRAC, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, explainCoins, oddsBand, slotStrength, coinsWhy, INJURY_FRAC, BAND_TEXT, type SlotTest, type Outcome, type QuestRollResult, type Band, type Strength, type CoinsWhy } from '../engine/roll.js';
 import { sampleKeywords, sampleKeywordsLight, sampleSeed, sampleOpening, sampleGravity, pickTone, sampleArrival, sampleTell, sampleObstacle, sampleShape } from '../ai/keywords.js';
-import type { AiProvider, ResolveQuestInput, ResolveQuestOut, AskSlotOut, QuestWriteOut } from '../ai/provider.js';
+import type { AiProvider, ResolveQuestInput, ResolveQuestOut, AskSlotOut, QuestWriteOut, CampaignDirection, DirectionRead } from '../ai/provider.js';
+import { prefPick, type TraitPrefs } from '../engine/economy.js';
 
 export interface LogEntry { cycle: number; kind: string; text: string; questId?: string }
 
@@ -205,6 +206,8 @@ export interface CycleSummary {
 export interface ReckoningRecord { cycle: number; lines: string[]; meta: ReckonMeta[]; summary: CycleSummary | null }
 
 export interface GameState {
+  /** the player's campaign direction (Settings) — writer guidance + trait preferences */
+  direction?: CampaignDirection;
   seed: number;
   rngState: RngState;
   idCounter: number;
@@ -287,7 +290,9 @@ export class Game {
   static load(ai: AiProvider, json: string): Game {
     const st = JSON.parse(json) as GameState;
     Game.migrate(st);
-    return new Game(ai, st.seed, st);
+    const g = new Game(ai, st.seed, st);
+    ai.setDirection?.(st.direction ?? null);
+    return g;
   }
 
   /** Save migrations. A standing faucet lead is minted ONCE, when its building goes up, and then
@@ -319,6 +324,38 @@ export class Game {
     }
   }
 
+  // ---- the player's campaign direction (Settings) ---------------------------------------------
+
+  /** the trait vocabulary a direction may name — character tags the engine actually rolls */
+  static directionVocab(): Record<string, string[]> {
+    const groups = ['race', 'gender', 'body', 'personality', 'background', 'skill', 'standing'];
+    return Object.fromEntries(groups.map(g => [g, CONCEPTS.filter(c => c.group === g).map(c => c.id)]));
+  }
+  direction(): CampaignDirection | null { return this.state.direction ?? null }
+  /** who a roll is for: strangers the company meets ('npc') or people who join it ('recruit') */
+  private prefsFor(role: 'npc' | 'recruit'): TraitPrefs | undefined { return this.state.direction?.[role] }
+
+  /** SET THE DIRECTION from the player's free text (Settings; CLI 'direction'). One cheap AI read
+   *  turns it into writer guidance + trait preferences; the engine keeps only ids it knows. Empty
+   *  text clears it. Applies to what is written and rolled from now on. */
+  async setDirection(text: string): Promise<{ ok: boolean; msg: string }> {
+    const t = text.trim().slice(0, 500);
+    if (!t) {
+      this.state.direction = undefined; this.ai.setDirection?.(null);
+      return { ok: true, msg: 'Direction cleared — the storyteller is back to its defaults.' };
+    }
+    const vocab = Game.directionVocab();
+    let read: DirectionRead;
+    try { read = this.ai.interpretDirection ? await this.ai.interpretDirection(t, vocab) : readDirectionPlain(t, vocab) }
+    catch (e) { return { ok: false, msg: `could not read that direction (${(e as Error).message?.slice(0, 80)}) — try again` } }
+    const known = new Set(Object.values(vocab).flat());
+    const ids = (xs: string[]) => [...new Set(xs.map(x => x.toLowerCase().trim()).filter(x => known.has(x)))].slice(0, 12);
+    const prefs = (p: TraitPrefs) => { const avoid = ids(p.avoid); return { prefer: ids(p.prefer).filter(x => !avoid.includes(x)), avoid } };
+    const d: CampaignDirection = { text: t, guidance: read.guidance?.trim() || t, npc: prefs(read.npc), recruit: prefs(read.recruit), avoid: (read.avoid ?? []).slice(0, 8) };
+    this.state.direction = d; this.ai.setDirection?.(d);
+    return { ok: true, msg: `Direction set — ${directionSummary(d)}` };
+  }
+
   // ---- bootstrap (day 0) ------------------------------------------------------------------
 
   private bootstrap() {
@@ -341,7 +378,8 @@ export class Game {
 
   private freshCharacter(role: 'merc' | 'captive' | 'npc', level: number, targetV: number, region: string): Card {
     const races = Object.entries(REGION[region]!.poolWeights) as [string, number][];
-    const race = this.rng.weighted(races);
+    const prefs = this.prefsFor(role === 'merc' ? 'recruit' : 'npc');
+    const race = prefPick(this.rng, races.map(r => r[0]), prefs, m => races.find(r => r[0] === m)![1]);
     const card: Card = {
       id: freshId('c'), name: '', value: Math.round(targetV),
       tags: [{ concept: 'character' }, T(race)],
@@ -358,9 +396,9 @@ export class Game {
     const skillWords = CONCEPTS.filter(c => c.group === 'skill' && !c.id.startsWith('magic-')).map(c => c.id);
     const persWords = CONCEPTS.filter(c => c.group === 'personality').map(c => c.id);
     const genders = CONCEPTS.filter(c => c.group === 'gender').map(c => c.id);
-    card.tags.push(T(this.rng.pick(skillWords), this.rng.range(1, 3)));
-    card.tags.push(T(this.rng.pick(persWords)));
-    const gender = this.rng.pick(genders);
+    card.tags.push(T(prefPick(this.rng, skillWords, prefs), this.rng.range(1, 3)));
+    card.tags.push(T(prefPick(this.rng, persWords, prefs)));
+    const gender = prefPick(this.rng, genders, prefs);
     card.tags.push(T(gender));
     card.name = rollName(this.rng, race, gender);   // gender first — name never contradicts it
     return card;
@@ -1870,8 +1908,9 @@ export class Game {
         ? materializeReward(this.rng, s, lead.level, lead.region) : []);
       if (personSpec) {
         const races = Object.entries(REGION[lead.region]!.poolWeights) as [string, number][];
-        const race = this.rng.weighted(races);
-        const gender = this.rng.pick(['male', 'female'] as const);
+        const prefs = this.prefsFor(personSpec.kind === 'recruit' ? 'recruit' : 'npc');
+        const race = prefPick(this.rng, races.map(r => r[0]), prefs, m => races.find(r => r[0] === m)![1]);
+        const gender = prefPick(this.rng, ['male', 'female'], prefs) as 'male' | 'female';
         let name = rollName(this.rng, race, gender);
         for (let i = 0; i < 12 && this.nameTooSimilar(name); i++) name = rollName(this.rng, race, gender);
         pendingIdentity = { race, gender, name };
@@ -2044,7 +2083,7 @@ export class Game {
       }
       personSpec.required = required.length ? required : undefined;
       const [person] = materializeReward(this.rng, personSpec, lead.level, lead.region,
-        { gender: pendingIdentity.gender, presetName: pendingIdentity.name, race: pendingIdentity.race });
+        { gender: pendingIdentity.gender, presetName: pendingIdentity.name, race: pendingIdentity.race, prefs: this.prefsFor(personSpec.kind === 'recruit' ? 'recruit' : 'npc') });
       if (person) rewardCards.push(person);
     }
     return {
@@ -2123,7 +2162,7 @@ export class Game {
         const gender = nd.sex ?? (/\b(she|her|hers|woman|widow|daughter|sister|bride)\b/i.test(text) ? 'female'
           : /\b(he|him|his|man|widower|son|brother)\b/i.test(text) ? 'male' : undefined);
         focal = materializeReward(this.rng, spec, lead.level, lead.region,
-          { excludeConcepts: recentFocalTags, maxSkills: 2, presetName: nd.name, race, gender })[0]!;
+          { excludeConcepts: recentFocalTags, maxSkills: 2, presetName: nd.name, race, gender, prefs: this.prefsFor('npc') })[0]!;
         // remap the node onto the card id — edges and memories follow the person
         delete this.state.lore.nodes[nd.id];
         this.state.lore.nodes[focal.id] = { ...nd, id: focal.id, identity: renderTags(focal.tags) };
@@ -2146,7 +2185,7 @@ export class Game {
         }
       } else {
         focal = materializeReward(this.rng, spec, lead.level, lead.region,
-          { excludeConcepts: recentFocalTags, maxSkills: 2 })[0]!;
+          { excludeConcepts: recentFocalTags, maxSkills: 2, prefs: this.prefsFor('npc') })[0]!;
       }
       // focal names skipped the similarity guard — two unrelated "Hessossk Scale-of-Bronze"s
       // anchored back-to-back sagas. But a PROMOTED focal is a face the world already knows, so
@@ -2174,8 +2213,9 @@ export class Game {
     const takenNames = new Set(this.state.cards.filter(x => x.character).map(x => x.name));
     const assigned: { name: string; gender: string; race: string }[] = [];
     for (let i = 0; assigned.length < 4 && i < 60; i++) {
-      const gender = this.rng.pick(['male', 'female']);
-      const race = this.rng.weighted(races);
+      const npcPrefs = this.prefsFor('npc');
+      const gender = prefPick(this.rng, ['male', 'female'], npcPrefs);
+      const race = prefPick(this.rng, races.map(r => r[0]), npcPrefs, m => races.find(r => r[0] === m)![1]);
       const n = rollName(this.rng, race, gender);
       if (!takenNames.has(n) && !assigned.some(a => a.name === n) && !this.nameTooSimilar(n)) assigned.push({ name: n, gender, race });
     }
@@ -5173,5 +5213,25 @@ export function causeShown(cause: string, after: string): boolean {
   const have = new Set(words(after).map(w => w.slice(0, 5)));
   const hit = want.filter(w => have.has(w.slice(0, 5))).length;
   return hit >= Math.min(2, want.length) && hit / want.length >= 0.6;
+}
+
+/** the plain words for what a direction does (the Settings echo + the CLI) */
+export function directionSummary(d: CampaignDirection): string {
+  const side = (label: string, p: TraitPrefs) => [p.prefer.length ? `${label} lean ${p.prefer.join(', ')}` : '', p.avoid.length ? `${label} never ${p.avoid.join(', ')}` : ''].filter(Boolean);
+  return [d.guidance, ...side('strangers', d.npc), ...side('recruits', d.recruit), d.avoid.length ? `keep out: ${d.avoid.join(', ')}` : ''].filter(Boolean).join(' · ');
+}
+
+/** no AI to read it (the mock): trait words named in the text, 'no X' / 'without X' as avoid, both roles */
+function readDirectionPlain(text: string, vocab: Record<string, string[]>): DirectionRead {
+  const low = ` ${text.toLowerCase()} `;
+  const alias: Record<string, string> = { men: 'male', males: 'male', man: 'male', women: 'female', females: 'female', woman: 'female', elves: 'elf', lizardfolk: 'lizardman', wolfkin: 'wolfman', humans: 'human' };
+  const prefer: string[] = [], avoid: string[] = [];
+  const words = [...Object.values(vocab).flat().map(id => [id, id] as const), ...Object.entries(alias)];
+  for (const [w, id] of words) {
+    const m = low.match(new RegExp(`(no |not |without |never )?\\b${w.replace(/[-]/g, '[- ]')}s?\\b`));
+    if (m) (m[1] ? avoid : prefer).push(id);
+  }
+  const p = { prefer: [...new Set(prefer)], avoid: [...new Set(avoid)] };
+  return { guidance: text, npc: p, recruit: { prefer: [...p.prefer], avoid: [...p.avoid] }, avoid: [] };
 }
 

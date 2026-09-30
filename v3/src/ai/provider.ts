@@ -239,8 +239,26 @@ export interface AiCallRecord {
   output?: string;           // the raw model response (recorded even when schema validation fails)
 }
 
+/** THE PLAYER'S CAMPAIGN DIRECTION (Settings; designer 2026-09-30: "a free text that they can tell the
+ *  AI for the story theme etc … 'Dark fantasy' or 'Generate males for npcs'"). The free text is read ONCE
+ *  (interpretDirection) into writer guidance + engine knobs: the guidance is appended to the writer
+ *  prompts; npcSex / recruitSex steer the ENGINE's identity rolls (the engine owns who exists). */
+export interface TraitPrefs { prefer: string[]; avoid: string[] }   // tag concept ids (engine vocabulary)
+export interface CampaignDirection {
+  text: string;                                   // what the player typed
+  guidance: string;                               // 1-2 plain sentences for the writer (tone, setting, content)
+  npc: TraitPrefs;                                // strangers: clients, cast, captives
+  recruit: TraitPrefs;                            // people who join the company
+  avoid: string[];                                // story content the player does not want
+}
+export type DirectionRead = Omit<CampaignDirection, 'text'>;
+
 export interface AiProvider {
   readonly name: string;
+  /** read the player's free-text direction into guidance + knobs (one cheap call) */
+  interpretDirection?(text: string, vocab: Record<string, string[]>): Promise<DirectionRead>;
+  /** the direction every writer call follows from now on (null = none) */
+  setDirection?(d: CampaignDirection | null): void;
   writeQuest(input: QuestWriteInput): Promise<QuestWriteOut>;
   genesis(input: GenesisInput): Promise<GenesisOut>;
   /** ONE batched call (parallel inside). `onEach` fires as each quest's call settles — the

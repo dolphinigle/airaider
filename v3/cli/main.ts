@@ -5,7 +5,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as readline from 'node:readline';
-import { Game, type ReckonMeta } from '../src/game/game.js';
+import { Game, type ReckonMeta, directionSummary } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
 import { makeOpenAiProvider } from '../src/ai/openai.js';
 import { render } from './format.js';
@@ -329,6 +329,11 @@ async function exec(game: Game, line: string): Promise<boolean> {
     case 'assign': say(game.assign(rest[0]!, Number(rest[1]), rest[2]!)); break;
     // the SAME engine call the web's Auto button makes — never a second implementation (G5)
     case 'auto': say(!rest[0] || rest[0] === 'all' ? game.autoAssignAll() : game.autoAssign(rest[0]!)); break;
+    // direction [text|clear] — the Settings screen's free text for the AI storyteller (theme + trait preferences)
+    case 'direction': {
+      if (!arg) { const d = game.direction(); console.log(d ? `DIRECTION: "${d.text}"\n  → ${directionSummary(d)}` : '(no direction set — e.g. direction Dark fantasy, grim; make the NPCs men)'); break }
+      say(await game.setDirection(arg === 'clear' ? '' : arg)); break;
+    }
     case 'send': say(game.sendTo(rest[0]!, rest[1]!, rest[2] === undefined ? undefined : Number(rest[2]))); break;
     case 'fit': console.log(render.fit(game, rest[0] ?? '', rest[1])); break;
     case 'unassign': say(game.unassign(rest[0]!, Number(rest[1]))); break;

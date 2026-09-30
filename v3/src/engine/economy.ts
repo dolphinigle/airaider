@@ -46,6 +46,19 @@ export function chainPayoff(expectedBeats: number, level: number, rarity: Rarity
 
 // ---- generateCard (ECONOMY §4) ------------------------------------------------------
 
+/** the player's trait preferences (Settings → campaign direction), as tag concept ids */
+export interface TraitPrefs { prefer: string[]; avoid: string[] }
+
+/** pick one of `members` honouring `prefs`: avoided members drop out (unless that would leave none),
+ *  and if any preferred member remains the pick is made among the preferred only — so ONE preferred
+ *  race or sex is always used. With no prefs it is the plain weighted pick. */
+export function prefPick(rng: Rng, members: readonly string[], prefs?: TraitPrefs, weight: (m: string) => number = () => 1): string {
+  const allowed = prefs ? members.filter(m => !prefs.avoid.includes(m)) : [...members];
+  const pool = allowed.length ? allowed : [...members];
+  const pref = prefs ? pool.filter(m => prefs.prefer.includes(m)) : [];
+  return rng.weighted((pref.length ? pref : pool).map(m => [m, weight(m)] as const));
+}
+
 export interface GenOptions {
   domain: Domain;                 // character or relic
   targetV: number;                // the mark
@@ -58,6 +71,7 @@ export interface GenOptions {
   jackpotChance?: number;         // small jackpot-with-catch lottery
   excludeConcepts?: string[];     // focal variety (BIBLE): recent focals' tags — never re-roll
   maxSkills?: number;             // focal cap (BIBLE): skills capped so archetypes vary
+  prefs?: TraitPrefs;             // the player's trait preferences: avoided tags never roll, preferred ones weigh ×5
 }
 
 /**
@@ -174,9 +188,9 @@ export function generateCard(rng: Rng, opts: GenOptions): Card {
     let pick: string;
     if (group === 'race' && opts.race && members.includes(opts.race)) pick = opts.race;
     else if (group === 'gender' && opts.gender && members.includes(opts.gender)) pick = opts.gender;
-    else if (group === 'race') pick = rng.weighted(members.map(m => [m, m === 'human' ? 3 : 1] as const));
-    else if (group === 'style') pick = rng.weighted(members.map(m => [m, m === 'human-style' ? 3 : 1] as const));
-    else pick = rng.pick(members);
+    else if (group === 'race') pick = prefPick(rng, members, opts.prefs, m => m === 'human' ? 3 : 1);
+    else if (group === 'style') pick = prefPick(rng, members, opts.prefs, m => m === 'human-style' ? 3 : 1);
+    else pick = prefPick(rng, members, opts.prefs);
     const c = CONCEPT[pick]!;
     place({ concept: pick, tier: c.depth > 1 ? rollTier(rng, pick, ceiling, opts.targetV) : undefined });
   }
@@ -206,7 +220,7 @@ export function generateCard(rng: Rng, opts: GenOptions): Card {
     // up the budget pushed the median card to the 12-tag cap, which is exactly the "tag-count
     // sprawl" §3b goal 5 forbids. The remainder is spent on TIERS instead, below.
     if (remaining < 12) break;
-    const excluded = new Set(opts.excludeConcepts ?? []);
+    const excluded = new Set([...(opts.excludeConcepts ?? []), ...(opts.prefs?.avoid ?? [])]);
     const skillCount = tags.filter(t => CONCEPT[t.concept]?.group === 'skill').length;
     const cand = pool.rollable.filter(r => {
       const c = CONCEPT[r.id]!;
@@ -221,6 +235,7 @@ export function generateCard(rng: Rng, opts: GenOptions): Card {
     const weights = cand.map(r => {
       let w = r.odds * (raceBias[r.id] ?? 1);
       if ((CONCEPT[r.id]!.depth ?? 1) > 1) w *= 4;   // earning lines carry the budget
+      if (opts.prefs?.prefer.includes(r.id)) w *= 5; // the player asked for more of this
       return [r.id, w] as const;
     });
     const id = rng.weighted(weights);

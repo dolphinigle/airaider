@@ -1,6 +1,7 @@
 // THE HAND — every card you own, always along the bottom, in four bags. Overflow squeezes into
 // slivers (hover to peek); "All cards" (B) opens the drawer with search, filters and relic folders.
 // On an open quest the hand re-sorts for the armed place and badges each soldier's coins there.
+import { sfx } from './sfx';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { type S, type Ribbon, CardFace, FixButton, gateOf, shortTitle, formOf, FORM_LABEL, activeSlots, scrollBehavior, useKeyScroll } from './ui';
 import { strengthCls, coinBadge } from './band';
@@ -191,7 +192,7 @@ export function Hand({ s, q, armed, pick, drag, setDrag, openDrawer, drawer, mod
     const draggable = c.character?.role === 'merc' || (fortMode && isSetCard(c) && !isHolding(s, c));
     return <CardFace key={c.id} c={c} badge={v.badge} badgeCls={v.badgeCls} note={v.note} more={v.more} dim={v.dim} why={v.why} block={v.block} here={v.here}
       ribbon={ribbons[c.id]} onClick={() => pick(c)}
-      onDragStart={draggable ? (e => { e.dataTransfer.setData('text/plain', c.id); e.dataTransfer.effectAllowed = 'move'; setDrag(c.id) }) : undefined}
+      onDragStart={draggable ? (e => { e.dataTransfer.setData('text/plain', c.id); e.dataTransfer.effectAllowed = 'move'; setDrag(c.id); sfx('pick') }) : undefined}
       onDragEnd={() => setDrag(null)} />;
   };
 

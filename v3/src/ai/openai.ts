@@ -11,8 +11,7 @@ import * as os from 'node:os';
 import type {
   AiProvider, AiUsage, AiCallRecord, QuestWriteInput, QuestWriteOut, GenesisInput, GenesisOut,
   ResolveQuestInput, ResolveQuestOut, ThemeRollInput, ThemeRollOut, SelectorInput, ReviewInput, ReviewOut,
-  FleshInput, FleshOut,
-} from './provider.js';
+  FleshInput, FleshOut, CampaignDirection, DirectionRead } from './provider.js';
 
 // 🛠 lab-overridable (model A/B, e.g. AIRAIDER_WRITER_MODEL=gpt-5.4-nano)
 const WRITER_MODEL = process.env.AIRAIDER_WRITER_MODEL || 'gpt-5-mini';
@@ -721,8 +720,16 @@ export function makeOpenAiProvider(): AiProvider {
   // measured with, so it has to be right BEFORE anything is concurrent. Both now travel with
   // the call.
   let ordinal = 0;
+  // the player's campaign direction (Settings): appended to every WRITER call's system prompt, and
+  // only when set — with none, every prompt is byte-for-byte what it was
+  let direction: CampaignDirection | null = null;
+  const DIRECTED = new Set(['writeQuest', 'genesis', 'resolve', 'flesh', 'themeRoll']);
+  const directionBlock = (d: CampaignDirection) => `\n\nCAMPAIGN DIRECTION — the player chose this for their game. Let it shape the tone, `
+    + `the setting details and who appears, within everything above. Never quote it or name it.\n${d.guidance}`
+    + (d.avoid.length ? `\nKeep out of the story: ${d.avoid.join('; ')}.` : '');
 
-  async function call<S extends z.ZodTypeAny>(purpose: string, model: string, system: string, user: string, schema: S, effort?: 'minimal' | 'low' | 'medium'): Promise<z.output<S>> {
+  async function call<S extends z.ZodTypeAny>(purpose: string, model: string, system0: string, user: string, schema: S, effort?: 'minimal' | 'low' | 'medium'): Promise<z.output<S>> {
+    const system = direction && DIRECTED.has(purpose) ? system0 + directionBlock(direction) : system0;
     const t0 = Date.now();
     const rec: AiCallRecord = {
       n: ++ordinal, purpose, model, durationMs: 0,
@@ -775,8 +782,37 @@ export function makeOpenAiProvider(): AiProvider {
     }
   }
 
+  // tolerant: a list, a comma string, or an object of lists (by group) all become one flat id list
+  const zIds = z.preprocess(v => Array.isArray(v) ? v : typeof v === 'string' ? v.split(/[,;]/)
+    : v && typeof v === 'object' ? Object.values(v as Record<string, unknown>).flat() : [], z.array(z.string()).transform(a => a.slice(0, 12)));
+  const zDirection = z.object({
+    guidance: z.string().default(''), npcPrefer: zIds, npcAvoid: zIds, recruitPrefer: zIds, recruitAvoid: zIds, avoid: zIds,
+  });
   return {
     name: 'openai',
+    setDirection(d: CampaignDirection | null) { direction = d },
+    async interpretDirection(text: string, vocab: Record<string, string[]>): Promise<DirectionRead> {
+      const system = [
+        'A player typed a free-text direction for the AI storyteller of their fantasy mercenary-company game.',
+        'Turn it into JSON with exactly these fields:',
+        '- guidance: the player\'s OWN tone/setting/content wishes restated as one or two plain instructions to a writer',
+        '  (a bare genre like "dark fantasy" becomes what that means for the writing: tone, events, atmosphere). Add nothing',
+        '  the player did not ask for. Leave out trait wishes — the lists below carry them. Empty string if they gave none.',
+        '- npcPrefer / npcAvoid: TRAITS the player wants more of / never for the people the company MEETS (clients, villains,',
+        '  captives, strangers). recruitPrefer / recruitAvoid: the same for people who JOIN the company as soldiers.',
+        '  A wish about "characters" or "everyone" goes in both. Use ONLY ids from this vocabulary (group: ids):',
+        ...Object.entries(vocab).map(([g, ids]) => `    ${g}: ${ids.join(', ')}`),
+        '  Empty lists when the player says nothing about traits.',
+        '- avoid: short phrases for story CONTENT the player explicitly does not want (empty list if none).',
+        'Ignore anything that is not about the story or its people.',
+        'Reply with ONE JSON object of exactly this shape (every list is a flat list of id strings):',
+        '{"guidance": "...", "npcPrefer": [], "npcAvoid": [], "recruitPrefer": [], "recruitAvoid": [], "avoid": []}',
+      ].join('\n');
+      // once per settings save, so the writer model (accuracy over a fraction of a cent)
+      const out = await call('direction', WRITER_MODEL, system, text, zDirection);
+      return { guidance: out.guidance.slice(0, 400), npc: { prefer: out.npcPrefer, avoid: out.npcAvoid },
+        recruit: { prefer: out.recruitPrefer, avoid: out.recruitAvoid }, avoid: out.avoid.map(a => a.slice(0, 80)) };
+    },
     usage: () => ({ ...usage }),
     callLog: () => [...records],
 

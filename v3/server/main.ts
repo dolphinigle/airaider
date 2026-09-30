@@ -5,7 +5,7 @@
 import Fastify from 'fastify';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { Game } from '../src/game/game.js';
+import { Game, directionSummary } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
 import { makeOpenAiProvider } from '../src/ai/openai.js';
 import { ROOM_TYPE, upgradeCost, renovateCost, ghUpgradeCost, GH_THRESHOLDS, maxSlotsAtTier, excavateCost } from '../src/engine/fort.js';
@@ -119,6 +119,8 @@ function stateView() {
     maxSlots: maxSlotsAtTier(st.fort.ghTier),
     bootId: BOOT,
     unlockedRegions: st.unlockedRegions,
+    // Settings: the player's campaign direction and what the engine made of it
+    direction: game.direction(), directionSummary: game.direction() ? directionSummary(game.direction()!) : null, directionVocab: Game.directionVocab(),
     // the regions in play (never empty: a fresh fort's home is the forests)
     activeRegions: game.activeRegions(),
     // unlocked = in play, or already holding an open quest (a quest never sits on a veil)
@@ -458,6 +460,7 @@ async function handleAction(body: { type: string; args: (string | number)[] }) {
     case 'assign': result = game.assign(s(a[0]), n(a[1]), s(a[2])); break;
     case 'auto': result = game.autoAssign(s(a[0])); break;
     // send(questId, mercId, slotIdx?) — into that place (swapping its holder) or their best free one
+    case 'direction': result = await game.setDirection(s(a[0] ?? '')); break;
     case 'send': result = game.sendTo(s(a[0]), s(a[1]), a[2] === undefined || a[2] === null || a[2] === '' ? undefined : n(a[2])); break;
     case 'autoall': result = game.autoAssignAll(); break;
     case 'unassign': result = game.unassign(s(a[0]), n(a[1])); break;

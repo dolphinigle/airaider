@@ -90,6 +90,7 @@ export const render = {
       "        a saga's lead, a captive in holding, a guest at the tavern), a part-filled quest won't march or a",
       '        finale has no approach, it lists them: end! (or end again) to go on',
       '        next  — what to do next, most pressing first (status shows the top 3)',
+      'SETTINGS direction [text|clear] — tell the AI storyteller your theme and trait wishes (e.g. "Dark fantasy; make the NPCs men")',
       'META    save [name] · quit',
     ].join('\n');
   },
