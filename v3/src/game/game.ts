@@ -25,7 +25,7 @@ import {
 } from '../engine/economy.js';
 import {
   rollFreshLead, starterPacket, starterDripLead, STARTER_DRIP_COUNT, huntLead, recruitLead, slotCount, rollDifficulty, oneOffValue,
-  materializeReward, computeDelivery, defaultAsk, liabilityTriggers, LEAD_TTL,
+  materializeReward, computeDelivery, defaultAsk, liabilityTriggers, LEAD_TTL, STARTER_TTL,
   leadBand,
   type Lead, type Quest, type QuestSlot,
 } from '../engine/quests.js';
@@ -297,6 +297,8 @@ export class Game {
   private static migrate(st: GameState): void {
     for (const l of st.leads ?? []) {
       if (l.source === 'recruiting' && l.archetype === 'rescue') l.archetype = 'hire';
+      // starter leads were stamped cycle + 40; they now last STARTER_TTL (designer 2026-09-30)
+      if (l.source === 'starter' && l.expiresAtCycle !== null && l.expiresAtCycle > st.cycle + STARTER_TTL) l.expiresAtCycle = st.cycle + STARTER_TTL;
     }
     // A quest's reward can BE a card that already exists — an echo rescue delivers the very person
     // left behind. In memory that is one object; JSON makes it two with one id, so after a load the
@@ -2060,7 +2062,7 @@ export class Game {
     const lead: Lead = {
       id: freshId('lead-'), rarity: 'uncommon', level: Math.max(1, merc.character!.level),
       region: this.activeRegions()[0]!, archetype: 'investigate',
-      chainInfo: { kind: 'starts-new' }, expiresAtCycle: this.state.cycle + LEAD_TTL * 3,
+      chainInfo: { kind: 'starts-new' }, expiresAtCycle: this.state.cycle + LEAD_TTL * 2,
       source: 'personal', title: `${merc.name}'s past stirs`,
     };
     lead.personalMercId = merc.id;

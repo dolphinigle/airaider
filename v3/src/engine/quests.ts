@@ -38,6 +38,9 @@ export interface Lead {
 }
 
 export const LEAD_TTL = 6; // cycles before an unpursued lead lapses 🛠
+/** the day-0 packet and the early drip: a learning window, but not a standing board (designer 2026-09-30:
+ *  "the leads expire too slowly (40 turns???)" — was cycle + 40) 🛠 */
+export const STARTER_TTL = 10;
 
 
 export interface LeadRollCtx {
@@ -106,8 +109,8 @@ export function starterPacket(rng: Rng, cycle: number, idGen: () => string): Lea
   ];
   // one early story hook
   leads.push({ ...mk('investigate', 'uncommon', 2), chainInfo: { kind: 'starts-new' } });
-  // a generous learning window: the day-0 packet lingers (leads thereafter are strictly earned)
-  for (const l of leads) l.expiresAtCycle = cycle + 40;
+  // a learning window: the day-0 packet lingers a little longer than an earned lead
+  for (const l of leads) l.expiresAtCycle = cycle + STARTER_TTL;
   return leads;
 }
 
@@ -127,7 +130,7 @@ export function starterDripLead(rng: Rng, i: number, cycle: number, idGen: () =>
   const fresh = pool.filter(a => !recent.includes(a));
   return {
     id: idGen(), rarity, level, region: 'forests', archetype: rng.pick(fresh.length ? fresh : pool),
-    chainInfo: { kind: 'none' }, expiresAtCycle: cycle + 40, source: 'starter',
+    chainInfo: { kind: 'none' }, expiresAtCycle: cycle + STARTER_TTL, source: 'starter',
   };
 }
 export const STARTER_DRIP_COUNT = 4;
