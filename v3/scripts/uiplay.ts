@@ -22,6 +22,13 @@ const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 const count = (p: Page, sel: string) => p.$$eval(sel, els => els.length);
 const text = (p: Page, sel: string) => p.$eval(sel, e => e.textContent ?? '').catch(() => '');
 const state = async () => (await fetch(`${BASE}/api/state`)).json() as Promise<any>;
+/** open the fort's build popup: click a free cell, or dig one (the dig spot picks the new cell) */
+async function openBuild(p: Page) {
+  const free = await p.$('.cell.free');
+  if (free) await free.click(); else await (await p.$('.cell.dig'))?.click();
+  await new Promise(r => setTimeout(r, 900));
+  return !!(await p.$('.buildmodal'));
+}
 const post = async (type: string, ...args: (string | number)[]) => (await fetch(`${BASE}/api/action`, {
   method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ type, args }) })).json() as Promise<any>;
 /** poll until `fn` holds (or time runs out) — the page re-renders on its own heartbeat */
@@ -498,8 +505,8 @@ if (s.ghReady) {
   await goto('/?screen=fort');
   await page.evaluate(() => { (window as any).__scrolls = []; const o = Element.prototype.scrollIntoView;
     Element.prototype.scrollIntoView = function (a?: any) { (window as any).__scrolls.push(a?.behavior ?? null); return o.call(this, a) } });
-  if (!(await state()).freeCells) { await (await page.$('.btn.dig1'))?.click(); await sleep(700) }
-  const row = await page.$('.brow[data-btype="bedroom"]');
+  await openBuild(page);
+  const row = await page.$('.buildmodal .brow[data-btype="bedroom"]');
   if (row && await row.$('select')) {
     const shown = await row.$eval('select', e => { const s = e as HTMLSelectElement; return { v: s.value, t: s.options[s.selectedIndex]?.text ?? '' } });
     const before = (await state()).fort.rooms.filter((r: any) => r.benefit === 'cap').length;
@@ -590,8 +597,14 @@ await page.keyboard.press('Escape'); await sleep(200);
 await goto('/?screen=fort');
 s = await state();
 check(await count(page, '.cell svg') >= s.fort.rooms.length, 'every room is drawn with its icon');
-const rows = await page.$$eval('.brow .d', els => els.map(e => e.textContent ?? ''));
-check(rows.length > 0 && rows.every(t => t.length > 10), 'every build row says what the room does', `${rows.length} rows`);
+check(await count(page, '.panel') === 0 && await count(page, '.fortscreen.nopanel') === 1, 'no build list on the right: with nothing selected the hold takes the full width');
+check(await openBuild(page), 'clicking a free cell (or digging one) opens the build popup');
+const rows = await page.$$eval('.buildmodal .brow .d', els => els.map(e => e.textContent ?? ''));
+check(rows.length > 0 && rows.every(t => t.length > 10), 'every room card in the popup says what the room does', `${rows.length} rows`);
+const dsz = await page.$eval('.buildmodal .brow .d', e => parseFloat(getComputedStyle(e).fontSize)).catch(() => 0);
+check(dsz >= 13.5, 'the popup\'s descriptions are readable (≥13.5px, unclamped)', `${dsz}px`);
+await page.keyboard.press('Escape'); await sleep(300);
+check(await count(page, '.buildmodal') === 0, 'Esc closes the build popup');
 await (await page.$('.cell:not(.free):not(.dig)'))?.click(); await sleep(300);
 check(await count(page, '.rd h2') === 1, 'clicking a room opens its panel');
 await page.keyboard.press('Escape'); await sleep(300);
@@ -610,10 +623,10 @@ await shot(page, '07-fort');
   if (free) {
     const picked = await page.$eval('.cell.free.picked', e => ({ l: (e as HTMLElement).style.left, t: (e as HTMLElement).style.top })).catch(() => null);
     check(!!picked, 'clicking a free cell picks it');
-    check((await text(page, '.panel .ph .ht')).trim() === 'BUILD HERE', 'the panel becomes BUILD HERE for the picked cell', await text(page, '.panel .ph .h'));
+    check((await text(page, '.buildmodal .ph .ht')).trim() === 'BUILD HERE', 'the popup reads BUILD HERE for the picked cell', await text(page, '.buildmodal .ph .h'));
     const s1 = await state();
     const freeBefore = new Set(s1.fort.cells.filter((c: any) => !s1.fort.rooms.some((r: any) => r.cell.floor === c.floor && r.cell.col === c.col)).map((c: any) => `${c.floor},${c.col}`));
-    const btn = await page.$('.brow:not(.blocked) .btn.solid');
+    const btn = await page.$('.buildmodal .brow:not(.blocked) .btn.solid');
     if (btn) {
       await btn.click(); await sleep(900);
       const s2 = await state();
@@ -852,16 +865,17 @@ for (const [W, H] of [[1280, 650], [1536, 740]] as const) {
 {
   await page.setViewport({ width: 1366, height: 650 });
   await goto('/?screen=fort');
-  const body = await page.$('.panel .pbody');
+  await openBuild(page);
+  const body = await page.$('.buildmodal .pbody');
   if (body) {
     const b = (await body.boundingBox())!;
     await page.mouse.move(b.x + b.width / 2, b.y + b.height - 40);
     await page.mouse.wheel({ deltaY: 500 }); await sleep(500);
-    const read = () => page.evaluate(() => { const p = document.querySelector('.panel .pbody') as HTMLElement; const ph = p.querySelector('.ph')!.getBoundingClientRect();
+    const read = () => page.evaluate(() => { const p = document.querySelector('.buildmodal .pbody') as HTMLElement; const ph = p.querySelector('.ph')!.getBoundingClientRect();
       return { top: Math.round(p.scrollTop), max: p.scrollHeight - p.clientHeight, stuck: Math.abs(ph.top - p.getBoundingClientRect().top) <= 2 } });
     const r = await read();
-    check(r.max > 0 && r.top > 0 && r.stuck, 'the build list scrolls with the mouse wheel; the BUILD line and its categories stay on top (build-list-scroll)', `${r.top}/${r.max}px`);
-    await page.focus('.panel .pbody'); await page.keyboard.press('Home'); await sleep(500);
+    check(r.max > 0 && r.top > 0 && r.stuck, 'the build popup scrolls with the mouse wheel; its title and categories stay on top (build-list-scroll)', `${r.top}/${r.max}px`);
+    await page.focus('.buildmodal .pbody'); await page.keyboard.press('Home'); await sleep(500);
     const k0 = await read();
     await page.keyboard.press('End'); await sleep(500);
     const k = await read();

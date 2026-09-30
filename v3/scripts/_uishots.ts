@@ -43,8 +43,10 @@ await shot('09c-fort-dungeon', '/?screen=fort', room(roomOf('dungeon')));
 await shot('09d-fort-holding', '/?screen=fort', room(roomOf('holding-cell')));
 await shot('09e-fort-gh', '/?screen=fort', room(roomOf('great-hall')));
 await shot('09f-fort-bare', '/?screen=fort', room(st.fort.rooms.find((r: any) => r.kind && !r.slots.length)?.id));
-await shot('08b-fort-build-scrolled', '/?screen=fort', async () => {
-  const el = await p.$('.panel .pbody'); const bx = await el?.boundingBox();
+await shot('08b-fort-build-popup', '/?screen=fort', async () => {
+  const free = await p.$('.cell.free'); if (free) await free.click(); else await (await p.$('.cell.dig'))?.click();
+  await new Promise(r => setTimeout(r, 900));
+  const el = await p.$('.buildmodal .pbody'); const bx = await el?.boundingBox();
   if (bx) { await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height - 40); await p.mouse.wheel({ deltaY: 400 }) }
 });
 await shot('10-chronicle', '/?screen=chronicle');

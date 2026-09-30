@@ -221,3 +221,33 @@
 .cell.free:hover, .cell.free:focus-visible { border-color: var(--brass); color: var(--cream); background: rgba(226,184,95,.06); }
 .cell.free.picked { border: 2px solid #ffe3a0; color: #ffe3a0; background: rgba(255,227,160,.1); box-shadow: 0 0 18px rgba(255,214,120,.25); }
 .pickhint { font: 400 11.5px/1.4 var(--mono); color: var(--text-dim); }
+
+/* ── THE BUILD POPUP (designer 2026-09-30: "make it a popup … the building list is not readable") ──
+   No build list on the right any more: the side panel exists only for a selected room or holding, and the
+   hold takes the full width otherwise. Picking a free cell opens this dialog of readable room cards. */
+.fortscreen.nopanel { grid-template-columns: minmax(0, 1fr); }
+.bscrim { position: fixed; inset: 0; z-index: 70; background: rgba(5, 6, 7, .7); display: flex; align-items: center; justify-content: center; padding: 24px; }
+.buildmodal { width: min(1200px, 100%); max-height: 100%; display: flex; flex-direction: column; background: var(--rack); border: 1px solid #6b5230; border-radius: 8px; box-shadow: 0 0 0 6px #0f0c0a, 0 0 0 7px #3a2c18, 0 30px 80px rgba(0,0,0,.8); overflow: hidden; }
+.buildmodal .pbody { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+.buildmodal .ph { padding: 14px 18px 12px; gap: 10px; }
+.buildmodal .ph .ht { font-size: 21px; }
+.buildmodal .ph .hs { font-size: 13px; }
+.buildmodal .ph .bx { margin-left: auto; width: 34px; height: 34px; justify-content: center; font-size: 15px; }
+.buildmodal .ph .dig1 + .bx { margin-left: 8px; }
+.bgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; padding: 14px 18px; }
+.buildmodal .brow { grid-template-columns: 52px minmax(0, 1fr); grid-template-rows: auto auto; gap: 10px 14px; padding: 14px; border: 1px solid #3a2e22; border-radius: 8px; background: #16120f; }
+.buildmodal .brow:hover { border-color: #6b5230; }
+.buildmodal .brow.blocked { background: #131110; }
+.buildmodal .brow .ic { width: 52px; height: 52px; border-radius: 8px; }
+.buildmodal .brow .ic svg { width: 36px; height: 36px; }
+.buildmodal .brow .n { font-size: 17px; }
+.buildmodal .brow .d { font-size: 14px; line-height: 1.45; margin-top: 3px; }
+.buildmodal .brow .w { font-size: 12px; margin-top: 5px; }
+.buildmodal .brow .right { grid-column: 1 / -1; max-width: none; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px 12px; text-align: left; border-top: 1px dotted #3a2e22; padding-top: 10px; }
+.buildmodal .brow .right .why, .buildmodal .brow .right .fp { margin-right: auto; font-size: 12.5px; }
+.buildmodal .brow .right .cb { order: 3; }
+.buildmodal .brow .c { font-size: 15px; }
+.buildmodal .brow .cb .btn { height: 34px; padding: 0 16px; font-size: 13px; }
+.buildmodal .tierh { padding: 10px 18px; }
+.buildmodal .builtline, .buildmodal .phsub { padding-left: 18px; padding-right: 18px; }
+@media (max-height: 700px) { .bscrim { padding: 12px; } .bgrid { gap: 10px; padding: 12px 14px; } .buildmodal .brow { padding: 11px; } }
