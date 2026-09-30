@@ -6,7 +6,7 @@
 // pitch glide) and a NOISE burst (filtered white noise — paper, gravel, the scrape in a thud). Struck
 // things = a fast attack + exponential decay; soft UI things stay quiet and short.
 
-type Name = 'tick' | 'pick' | 'drop' | 'place' | 'refuse' | 'warn' | 'coin' | 'build' | 'dig' | 'raise' | 'end'
+type Name = 'tick' | 'dead' | 'pick' | 'drop' | 'place' | 'refuse' | 'warn' | 'coin' | 'build' | 'dig' | 'raise' | 'end'
   | 'stampOk' | 'stampPartial' | 'stampFail' | 'levelup' | 'notify' | 'open' | 'close' | 'quill' | 'heal';
 
 let ctx: AudioContext | null = null;
@@ -63,7 +63,10 @@ const thud = (c: AudioContext, t: number, g = 0.35) => { tone(c, t, 150, { g, d:
 const notes = (c: AudioContext, t: number, fs: number[], step: number, o: ToneOpts = {}) => fs.forEach((f, i) => tone(c, t + i * step, f, o));
 
 const SOUNDS: Record<Name, (c: AudioContext, t: number) => void> = {
-  tick: (c, t) => { noise(c, t, { f: 3200, q: 3, g: 0.08, len: 0.025 }); tone(c, t, 1100, { g: 0.04, d: 0.015 }) },
+  // the UI click: a crisp wooden tap — a pitched blip that drops, over a short bright noise transient
+  tick: (c, t) => { tone(c, t, 1500, { g: 0.2, a: 0.002, d: 0.018, to: 900, type: 'triangle' }); noise(c, t, { f: 4200, q: 2, g: 0.14, a: 0.001, len: 0.03 }) },
+  // a disabled control: a dull, low tap (it heard you; it can't)
+  dead: (c, t) => { tone(c, t, 260, { g: 0.14, a: 0.002, d: 0.03, to: 200 }); noise(c, t, { type: 'lowpass', f: 900, g: 0.08, len: 0.04 }) },
   pick: (c, t) => noise(c, t, { type: 'highpass', f: 900, to: 3400, g: 0.1, a: 0.02, len: 0.11 }),                  // a card lifted: paper swish
   drop: (c, t) => thud(c, t, 0.28),                                                                                     // a card set down
   place: (c, t) => { thud(c, t, 0.3); tone(c, t + 0.05, 659, { g: 0.07, d: 0.12, type: 'triangle' }) },                 // it went where you meant
@@ -96,6 +99,23 @@ export function sfx(name: Name) {
   } catch { /* sound must never break play */ }
 }
 
+/** EVERY click gets an instant sound (designer 2026-09-30: "sound effects are still missing on the critical ones
+ *  like CLICKING BUTTONS"): one capture-phase listener on the document — buttons, links, tabs, cards, checkboxes,
+ *  selects, role=button. A disabled control gets the dull 'dead' tap. The action's own result sound (place,
+ *  build, coin…) follows when the engine answers. Opt out per element with data-sfx="off". */
+export function installClickSounds() {
+  const SEL = 'button, a[href], [role="button"], [role="tab"], select, input[type="checkbox"], input[type="radio"], summary, .card, .sliver';
+  const on = (e: PointerEvent) => {
+    if (e.button !== 0) return;
+    const el = (e.target as HTMLElement | null)?.closest?.(SEL) as HTMLElement | null;
+    if (!el || el.closest('[data-sfx="off"]')) return;
+    const off = (el as HTMLButtonElement).disabled || el.getAttribute('aria-disabled') === 'true';
+    sfx(off ? 'dead' : 'tick');
+  };
+  document.addEventListener('pointerdown', on, true);
+  return () => document.removeEventListener('pointerdown', on, true);
+}
+
 /** the sound an engine action makes when it succeeds (App's action wrapper plays it) */
 export function sfxForAction(type: string, ok: boolean, warn?: boolean) {
   if (!ok) return sfx('refuse');
@@ -106,7 +126,7 @@ export function sfxForAction(type: string, ok: boolean, warn?: boolean) {
     build: 'build', upgrade: 'build', renovate: 'build', excavate: 'dig', gh: 'raise',
     ransom: 'coin', sell: 'coin', settle: 'coin', hire: 'coin', accept: 'drop',
     pursue: 'quill', pursueall: 'quill', interrogate: 'quill', heal: 'heal',
-    focus: 'tick', approach: 'tick', abandon: 'drop', cancel: 'drop', inflight: 'tick',
+    abandon: 'drop', cancel: 'drop',   // focus, approach, inflight: the click's own tick is the sound
   };
   const n = map[type]; if (n) sfx(n);
 }

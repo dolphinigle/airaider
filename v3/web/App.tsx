@@ -10,7 +10,7 @@ import { CardSheet } from './Sheets';
 import { FortScreen } from './FortScreen';
 import { Chronicle, Reckoning } from './Chronicle';
 import { ConfirmButton, useDeltaFloater, useBump } from './fx';
-import { sfx, sfxForAction, sfxSettings } from './sfx';
+import { sfx, sfxForAction, sfxSettings, installClickSounds } from './sfx';
 import { Settings } from './Settings';
 
 type Tone = 'ok' | 'warn' | 'bad';
@@ -68,6 +68,7 @@ export function App() {
   // a next step / fix that names a room type to build: the build list scrolls to it and flashes it
   const [buildHi, setBuildHi] = useState<{ type: string; n: number } | null>(null);
 
+  useEffect(() => installClickSounds(), []);
   const refresh = useCallback(async () => { setS(await (await fetch('/api/state')).json()) }, []);
   // the card sheet is a modal: while it is up, the page's own keys (1–4 bags, B, E) stand down
   const modal = !!sheet;
@@ -305,7 +306,7 @@ export function App() {
         <span className="crest">AIRAIDER</span>
         <nav className="nav" aria-label="Screens">
           {NAV.map(([k, label, d]) => (
-            <button key={k} className={screen === k ? 'on' : ''} onClick={() => { sfx('tick'); go(k) }}>
+            <button key={k} className={screen === k ? 'on' : ''} onClick={() => go(k)}>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d={d} /></svg>
               {label}
               {k === 'map' && s.quests.length > 0 && <span className="dot">{s.quests.length}</span>}
@@ -360,12 +361,12 @@ export function App() {
             </div>}
           </span>
           {/* sound on/off at a click; everything else lives in Settings */}
-          <button className="hico" onClick={() => { sfxSettings.muted = !sfxSettings.muted; setMutedUi(sfxSettings.muted); if (!sfxSettings.muted) sfx('tick') }}
+          <button className="hico" onClick={() => { sfxSettings.muted = !sfxSettings.muted; setMutedUi(sfxSettings.muted) }}
             aria-label={mutedUi ? 'Sound off — turn on' : 'Sound on — turn off'} title={mutedUi ? 'Sound off' : 'Sound on'}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M4 9h4l5-4v14l-5-4H4z" />{mutedUi ? <path d="M17 9l5 6M22 9l-5 6" /> : <path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" />}</svg>
           </button>
-          <button className={'hico' + (s.direction ? ' on' : '')} onClick={() => { sfx('tick'); setSettingsOpen(true) }} aria-label="Settings"
+          <button className={'hico' + (s.direction ? ' on' : '')} onClick={() => setSettingsOpen(true)} aria-label="Settings"
             title={s.direction ? `Settings — direction: ${s.direction.text}` : 'Settings — story direction, sound'}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" /></svg>
