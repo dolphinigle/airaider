@@ -276,7 +276,13 @@ async function exec(game: Game, line: string): Promise<boolean> {
     case 'next': console.log(render.nextSteps(game)); break;
 
     // ---- actions
-    case 'build': { const r = game.build(rest[0]!, rest[1]); say({ ...r, msg: r.id ? `${r.msg} (${r.id})` : r.msg }); break }
+    // build <type> [ownerId] [F,C] — F,C = the free cell's floor and column (see 'fort'); default: the first free cell
+    case 'build': {
+      const at = rest.slice(1).find(t => /^\d+[,:]\d+$/.test(t));
+      const owner = rest.slice(1).find(t => t !== at);
+      const cell = at ? { floor: Number(at.split(/[,:]/)[0]), col: Number(at.split(/[,:]/)[1]) } : undefined;
+      const r = game.build(rest[0]!, owner, cell); say({ ...r, msg: r.id ? `${r.msg} (${r.id})` : r.msg }); break
+    }
     case 'upgrade': say(game.upgrade(rest[0]!)); break;
     case 'renovate': say(await game.renovate(rest[0]!, rest[1] ?? 'human')); break;
     case 'excavate': say(game.excavate()); break;

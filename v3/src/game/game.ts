@@ -607,7 +607,8 @@ export class Game {
       !this.state.fort.rooms.some(r => r.cell.floor === cell.floor && r.cell.col === cell.col));
   }
 
-  build(typeId: string, ownerId?: string): { ok: boolean; msg: string; id?: string } {
+  /** build a room — into the free cell the player picked (`cell`), else the first free one */
+  build(typeId: string, ownerId?: string, cell?: { floor: number; col: number }): { ok: boolean; msg: string; id?: string } {
     const rt = ROOM_TYPE[typeId];
     if (!rt) return { ok: false, msg: 'no such room type' };
     const check = this.buildableTypes().find(b => b.type === typeId);
@@ -621,11 +622,14 @@ export class Game {
       if (owner !== 'you' && this.card(owner)?.character?.role !== 'merc')
         return { ok: false, msg: 'bedrooms belong to mercs (or you)' };
     }
-    const cell = this.freeCells()[0];
-    if (!cell) return { ok: false, msg: 'no free cells — excavate first' };
+    const free = this.freeCells();
+    const target = cell ? free.find(c => c.floor === cell.floor && c.col === cell.col) : free[0];
+    if (cell && !target) return { ok: false, msg: this.state.fort.cells.some(c => c.floor === cell.floor && c.col === cell.col)
+      ? 'that cell is already built on' : 'no such cell — excavate first' };
+    if (!target) return { ok: false, msg: 'no free cells — excavate first' };
     if (!this.spendGold(buildCost(rt))) return { ok: false, msg: 'not enough gold' };
     const room: Room = {
-      id: freshId('room-'), type: typeId, cell,
+      id: freshId('room-'), type: typeId, cell: target,
       slots: [], wants: defaultWants(rt, null), style: null,
       ownerId: rt.benefit === 'cap' ? (ownerId ?? 'you') : undefined,
     };

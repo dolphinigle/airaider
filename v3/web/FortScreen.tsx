@@ -83,6 +83,21 @@ export function FortScreen(props: {
   const [over, setOver] = useState<string | null>(null);
   const rooms: any[] = s.fort.rooms;
   const room = sel ? rooms.find(r => r.id === sel) : null;
+  // THE PICKED FREE CELL (designer 2026-09-30: "click a free cell, then you are offered options to build"):
+  // the panel becomes 'Build here' and Build sends this cell to Game.build. Picking a cell deselects any
+  // room; selecting a room drops the pick; a pick that is no longer free (just built on) clears itself.
+  const [pick, setPick] = useState<{ floor: number; col: number } | null>(null);
+  const isFree = (c: { floor: number; col: number }) => s.fort.cells.some((x: any) => x.floor === c.floor && x.col === c.col)
+    && !rooms.some(r => r.cell.floor === c.floor && r.cell.col === c.col);
+  useEffect(() => { if (pick && !isFree(pick)) setPick(null) }, [pick, rooms.length, s.fort.cells.length]);
+  useEffect(() => { if (sel) setPick(null) }, [sel]);
+  useEffect(() => {
+    if (!pick) return;
+    const k = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.stopPropagation(); setPick(null) } };
+    addEventListener('keydown', k, true);
+    return () => removeEventListener('keydown', k, true);
+  }, [pick]);
+  const choose = (c: { floor: number; col: number }) => { setSel(null); setPick(p => p && p.floor === c.floor && p.col === c.col ? null : c) };
   const floors = Math.max(...s.fort.cells.map((c: any) => c.floor)) + 1;
   const cols = Math.max(...s.fort.cells.map((c: any) => c.col)) + 1;
 
@@ -169,14 +184,19 @@ export function FortScreen(props: {
           {s.fort.cells.map((cell: any) => {
             const r = rooms.find(x => x.cell.floor === cell.floor && x.cell.col === cell.col);
             const pos = at(cell.floor, cell.col);
-            if (!r) return <div key={`${cell.floor}:${cell.col}`} className="cell free" style={pos}><span>Free cell</span></div>;
+            if (!r) {
+              const on = !!pick && pick.floor === cell.floor && pick.col === cell.col;
+              return <button key={`${cell.floor}:${cell.col}`} className={'cell free' + (on ? ' picked' : '')} style={pos}
+                aria-pressed={on} onClick={() => choose(cell)} title="Choose what to build in this cell">
+                <span className="fplus" aria-hidden="true">+</span><span>{on ? 'Building here…' : 'Build here'}</span></button>;
+            }
             return <RoomTile key={r.id} s={s} r={r} pos={pos} size={size} narrow={CW < SUB_MIN} sel={sel === r.id} fresh={!!fresh[r.id]}
               onSel={() => setSel(sel === r.id ? null : r.id)} quick={quick}
               dragging={!!dragCard} place={placeFor(r.id)} over={over === r.id}
               onOver={(v: boolean) => setOver(o => v ? r.id : o === r.id ? null : o)} onDrop={dropOn(r.id)} />;
           })}
           {/* where Game.excavate digs next: a tile in the deepest row while it has room, else a strip below */}
-          <button className={'cell dig' + (digInRow ? '' : ' strip')} disabled={!!s.excavateBlock} onClick={() => quick('excavate')}
+          <button className={'cell dig' + (digInRow ? '' : ' strip')} disabled={!!s.excavateBlock} onClick={async () => { await quick('excavate'); setSel(null); setPick(dig) }}
             style={digInRow ? at(dig.floor, dig.col) : { left: X0, top: rowTop(dig.floor), width: Math.max(CW, 210), height: DIG_H }}
             title={s.excavateBlock ?? `dig one more cell to build in · ${s.excavateCost}g`}>
             <span className="hd"><span className="ic"><RoomIcon type="excavate" size={digInRow && size === 'l' ? 34 : 22} /></span><span className="n">Excavate a cell</span></span>
@@ -190,7 +210,8 @@ export function FortScreen(props: {
         {room ? <RoomPanel key={room.id} s={s} room={room} doAct={doAct} quick={quick} openCard={openCard} setSel={setSel}
           drag={drag} setDrag={setDrag} dragCard={dragCard} place={placeFor(room.id)} back={() => setSel(null)} />
           : sel === HOLDING_SEL ? <HoldingPanel s={s} quick={quick} openCard={openCard} setSel={setSel} />
-          : <BuildPanel s={s} cat={cat} setCat={setCat} doAct={doAct} quick={quick} hi={props.buildHi ?? null} />}
+          : <BuildPanel s={s} cat={cat} setCat={setCat} doAct={doAct} quick={quick} hi={props.buildHi ?? null}
+              cell={pick} clearCell={() => setPick(null)} />}
       </aside>
 
       {banner && <button className="ghbanner fx-drop-in" onClick={() => setBanner(null)} aria-label="dismiss">
@@ -249,7 +270,7 @@ function RoomTile({ s, r, pos, size, narrow, sel, fresh, onSel, quick, dragging,
 }
 
 let hiDone = 0;
-function BuildPanel({ s, cat, setCat, quick, hi }: any) {
+function BuildPanel({ s, cat, setCat, quick, hi, cell, clearCell }: any) {
   const [owner, setOwner] = useState('');
   // ONE scroll region: the page keys reach it with no click first; a focused row scrolls in BELOW the
   // stuck header (scroll-padding = the header's measured height); a new category opens at its top
@@ -316,7 +337,11 @@ function BuildPanel({ s, cat, setCat, quick, hi }: any) {
         </div>
         <div className="right">
           <div className="cb"><span className="c">{b.cost}g</span>
-            {!b.blocker && <button className="btn sm solid" onClick={e => { e.stopPropagation(); seen(b.type); b.type === 'bedroom' ? quick('build', b.type, ownerSel) : quick('build', b.type) }}>Build</button>}</div>
+            {!b.blocker && <button className="btn sm solid" onClick={e => {
+              e.stopPropagation(); seen(b.type)
+              const who = b.type === 'bedroom' ? ownerSel : ''
+              cell ? quick('build', b.type, who, cell.floor, cell.col) : who ? quick('build', b.type, who) : quick('build', b.type)
+            }}>{cell ? 'Build here' : 'Build'}</button>}</div>
           {/* what its first place costs on top, beside the price — never in a clipped tail */}
           {b.firstPlaceCost ? <span className="fp" title="each place is bought separately; this is the first one">+{b.firstPlaceCost}g first place</span> : null}
           {why && <span className="why">{why}</span>}
@@ -329,12 +354,14 @@ function BuildPanel({ s, cat, setCat, quick, hi }: any) {
   return (
     <div className="pbody" tabIndex={-1} ref={body} style={{ scrollPaddingTop: phh + 4, ['--phh' as any]: `${phh}px` }}>
     <div className="ph" ref={head}>
-      <div className="h"><span className="ht">BUILD</span>
-        <span className="hs">{s.gold}g · {plural(s.freeCells, 'free cell')}</span>
+      <div className="h"><span className="ht">{cell ? 'BUILD HERE' : 'BUILD'}</span>
+        <span className="hs">{cell ? `${cell.floor === 0 ? 'surface' : `depth ${cell.floor}`} · cell ${cell.col + 1} · ${s.gold}g` : `${s.gold}g · ${plural(s.freeCells, 'free cell')}`}</span>
+        {cell && <button className="btn sm ghost" onClick={clearCell} title="Esc">✕ any cell</button>}
         {s.freeCells === 0 && <button className="btn sm solid dig1" disabled={!!s.excavateBlock} onClick={() => quick('excavate')}
           title={s.excavateBlock ?? 'dig one more cell — every room needs a free cell'}>
           Excavate · {s.excavateCost}g{s.excavateBlock ? ` — ${s.excavateBlock}` : ''}</button>}
       </div>
+      {!cell && s.freeCells > 0 && <div className="pickhint">Click a free cell in the hold to choose where it goes — or Build puts it in the first free one.</div>}
       <div className="cats">{CATS.map(([k, l]) => <button key={k} className={'fc' + (cat === k ? ' on' : '')} onClick={() => pickCat(k)}>{l}</button>)}</div>
     </div>
     <div className="blist">

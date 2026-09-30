@@ -424,7 +424,9 @@ async function handleAction(body: { type: string; args: (string | number)[] }) {
   // id: the room a build/upgrade touched; jobIds: what 'pursueall' queued
   let result: { ok: boolean; msg: string; questId?: string; jobId?: string; warn?: boolean; id?: string; jobIds?: string[]; tally?: string };
   switch (type) {
-    case 'build': result = game.build(s(a[0]), a[1] ? s(a[1]) : undefined); break;
+    // args: type, owner ('' = none), then optionally the picked cell's floor and col
+    case 'build': result = game.build(s(a[0]), a[1] ? s(a[1]) : undefined,
+      a[2] !== undefined && a[3] !== undefined ? { floor: n(a[2]), col: n(a[3]) } : undefined); break;
     case 'upgrade': result = game.upgrade(s(a[0])); break;
     case 'renovate': result = await game.renovate(s(a[0]), s(a[1])); break;
     case 'excavate': result = game.excavate(); break;

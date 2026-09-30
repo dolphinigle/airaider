@@ -71,7 +71,7 @@ export const render = {
       'VIEWS   fort · rooms · room <id> · roster · merc <id> · leads · quests · quest <id>',
       '        captives · items · chains · chain <id> · lore <id> · tavern · holding',
       '        buildable · status · next · log [n|dev] · reckoning [cycle|list] · ailog',
-      'BUILD   build <type> [ownerId] · upgrade <roomId> · renovate <roomId> <style>',
+      'BUILD   build <type> [ownerId] [F,C] · upgrade <roomId> · renovate <roomId> <style>',
       '        excavate · gh   (styles: human elven wolfkin lizardkin ancient exotic)',
       'ROOMS   setin <cardId> <roomId> [idx] — set a relic / captive in a room (best free place, or a swap that gains)',
       '        fit <cardId> — where it could go: a soldier on every quest, a captive or relic in every room',
@@ -142,12 +142,13 @@ export const render = {
       const cols = g.state.fort.cells.filter(c => c.floor === f).length;
       for (let c = 0; c < cols; c++) {
         const room = g.state.fort.rooms.find(r => r.cell.floor === f && r.cell.col === c);
-        row.push(room ? `[${ROOM_TYPE[room.type]!.name.slice(0, 14).padEnd(14)}]` : '[ · empty · · ]');
+        row.push(room ? `[${ROOM_TYPE[room.type]!.name.slice(0, 14).padEnd(14)}]` : `[ free · ${f},${c}`.padEnd(15) + ']');
       }
       floors.set(f, row);
     }
     const lines = [...floors.entries()].map(([f, row]) => `F${f}  ${row.join(' ')}`);
-    return `${this.status(g)}\n${lines.join('\n')}`;
+    const free = g.freeCells();
+    return `${this.status(g)}\n${lines.join('\n')}${free.length ? `\n(build into a free cell: build <type> F,C — e.g. build ${g.buildableTypes().find(b => !b.reason)?.type ?? 'garden'} ${free[0]!.floor},${free[0]!.col})` : ''}`;
   },
 
   rooms(g: Game): string {

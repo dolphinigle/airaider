@@ -214,3 +214,10 @@
 .cand.loses .cl { color: #ffc27a; }
 .rslot.over.swap.loses { border-color: var(--bad); background: rgba(224,119,107,.12); }
 .rslot.over.swap.loses .ov { border-color: var(--bad); color: #ffd9d2; }
+
+/* a free cell is a button: hover says "Build here"; the picked one glows (the panel is then 'Build here') */
+.cell.free { cursor: pointer; flex-direction: row; gap: 6px; font: 500 12px var(--mono); }
+.cell.free .fplus { font: 400 22px/1 var(--serif); color: inherit; opacity: .7; }
+.cell.free:hover, .cell.free:focus-visible { border-color: var(--brass); color: var(--cream); background: rgba(226,184,95,.06); }
+.cell.free.picked { border: 2px solid #ffe3a0; color: #ffe3a0; background: rgba(255,227,160,.1); box-shadow: 0 0 18px rgba(255,214,120,.25); }
+.pickhint { font: 400 11.5px/1.4 var(--mono); color: var(--text-dim); }

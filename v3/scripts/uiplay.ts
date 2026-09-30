@@ -598,6 +598,34 @@ await page.keyboard.press('Escape'); await sleep(300);
 check(await count(page, '.rd h2') === 0, 'Esc deselects the fort room');
 await shot(page, '07-fort');
 
+// ── pick a free cell, then build INTO it (designer 2026-09-30: "click a free cell then … offered options to build") ──
+{
+  const before = await state();
+  let free = await page.$('.cell.free');
+  if (!free && !before.excavateBlock) {           // no free cell: the dig spot digs AND picks the new cell
+    await (await page.$('.cell.dig'))?.click(); await sleep(900);
+    check(await count(page, '.cell.free.picked') === 1, 'the dig spot digs a cell and picks it for building');
+    free = await page.$('.cell.free.picked');
+  } else if (free) { await free.click(); await sleep(300) }
+  if (free) {
+    const picked = await page.$eval('.cell.free.picked', e => ({ l: (e as HTMLElement).style.left, t: (e as HTMLElement).style.top })).catch(() => null);
+    check(!!picked, 'clicking a free cell picks it');
+    check((await text(page, '.panel .ph .ht')).trim() === 'BUILD HERE', 'the panel becomes BUILD HERE for the picked cell', await text(page, '.panel .ph .h'));
+    const s1 = await state();
+    const freeBefore = new Set(s1.fort.cells.filter((c: any) => !s1.fort.rooms.some((r: any) => r.cell.floor === c.floor && r.cell.col === c.col)).map((c: any) => `${c.floor},${c.col}`));
+    const btn = await page.$('.brow:not(.blocked) .btn.solid');
+    if (btn) {
+      await btn.click(); await sleep(900);
+      const s2 = await state();
+      const born = s2.fort.rooms.find((r: any) => !s1.fort.rooms.some((o: any) => o.id === r.id));
+      // the new room sits in the cell that was picked — and only that cell stopped being free
+      check(!!born && freeBefore.has(`${born.cell.floor},${born.cell.col}`), 'Build here puts the room in the picked cell', born ? `${born.name} @ ${born.cell.floor},${born.cell.col}` : 'nothing built');
+      check(await count(page, '.cell.free.picked') === 0, 'the pick clears once the cell is built on');
+    } else skip('build into the picked cell', 'no buildable room');
+  } else skip('pick a free cell', before.excavateBlock ?? 'no free cell and no dig');
+  await page.keyboard.press('Escape'); await sleep(200);
+}
+
 // a captive DRAGGED onto a room TILE is set there (Game.setInRoom)
 const raw = s.captives.find((c: any) => c.state === 'raw' && (c.roomPlacements ?? []).some((p: any) => p.ok && p.kind === 'rack' && p.roomId));
 if (raw) {

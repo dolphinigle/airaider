@@ -91,6 +91,10 @@ only strong / fair / weak (`slotStrength`), with why-chips (`+roguery`, `−play
 
 ## 6 · The build list
 
+**Where:** click a free cell in the hold (or the dig spot, which digs and picks the new cell) — the panel becomes
+BUILD HERE and every row's button builds into that cell (`Game.build(type, owner, cell)`; CLI `build <type> [owner] F,C`,
+and `fort` prints each free cell's F,C). Without a pick, Build uses the first free cell.
+
 Every room shows its drawn icon, cost, **what it does** (one plain line, `src/game/roomInfo.ts` — the CLI
 `buildable` prints the same line) and, for comfort rooms, what it wants.
 
