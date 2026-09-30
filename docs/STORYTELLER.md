@@ -13,6 +13,8 @@ Once signed, this is the saga spec and wins over the sections in §4.6, whose **
 ## D. The designer's answers (2026-10-01) — they amend everything below
 
 > **PRIORITY (designer, 2026-10-01): *"key and most important point is followable though. repetition is almost acceptable as long as its followable. pls dont forget the previous one were not even followable or even easily readable."***
+> *"just rmb repetition can be 'fixed' later by seeding. thats the key part, the design must support this in the future. so if currently its not thats fine."*
+> **Requirement, not a metric:** the plan call takes a **dealt `seed` input from day one** (a theme from the library, optionally a few atoms), chosen by the engine from `storyRng` through ONE dealer function. Fixing repetition later = adding seed content or changing the dealer — never a prompt change and never a redesign. The ≥ 1,000-theme library ships as the first content of that slot; its size and quality can grow afterwards.
 > So every choice and gate ranks: **(1) FOLLOWABLE** — M1 (the cold reader's paraphrase is right), M5 (no rereads), M2 (easy on one read) — **(2) wants the next part** (M3) — **(3) not repetitive** (M19). Repetition never outranks followability: an arm that is easier to follow wins even if it repeats more; M19 only breaks ties and is watched, never a blocking gate.
 
 > *"no idea, i think you should test which one is better esp when repeated. my worry if too constrained is that it becomes repetitive / noticeably repetition. the usual way to make it non repetitive is to compile by hand a list of 1000+ 'themes' to feed to ai as 'seeds'."* · (card rules) *"same no idea"* · (old sagas) *"just delete all saves"* · (order) *"no idea you decide"*
