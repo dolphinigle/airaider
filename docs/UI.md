@@ -68,8 +68,8 @@ only strong / fair / weak (`slotStrength`), with why-chips (`+roguery`, `−play
 
 ## 4c · The turn
 
-- **Next steps** row under the header (`Game.nextSteps`, CLI `next`/`status`): the top 3 concrete actions, each opens
-  its target.
+- **Next steps** live in the one header bar (`Game.nextSteps`, CLI `next`/`status`): as many whole chips as fit, the rest
+  behind `+N`; urgent steps never hide. Each opens its target.
 - **END guard**: when `Game.endWarnings()` is non-empty the first click (or E) arms the seal and lists what END leaves
   behind; the second ends. CLI: `end` prints the warnings and needs `end!`.
 - **Reckoning**: one block per quest with an outcome stamp and coin row; a **spoils tally** beside PROCEED (gold,
@@ -79,7 +79,10 @@ only strong / fair / weak (`slotStrength`), with why-chips (`+roguery`, `−play
 
 ## 5 · Portraits
 
-- Painted by `gpt-image-1-mini`, quality low (~a few tenths of a cent), inked tarot style, **only for
+- Painted by `gpt-image-2.5-sunburst`, quality low (~half a US cent; 158 output tokens), in the ../mahjong reference
+  style (refined anime, flat two-tone cel shading, chest-up bust, transparent ground; the prompt is built from the
+  soldier's traits and leans attractive — designer 2026-09-30). Cache is versioned (`.v2.webp`), so a style change
+  repaints. **Only for
   roster soldiers, only once they are on the roster** (founders count — they are on the roster). Never
   tavern candidates, captives or quest cast (cast show initials). Cached per save in
   `saves/portraits/<save>/`. Real AI only; `AIRAIDER_PORTRAITS=0` turns it off. `server/portraits.ts`.
@@ -91,11 +94,20 @@ only strong / fair / weak (`slotStrength`), with why-chips (`+roguery`, `−play
 Every room shows its drawn icon, cost, **what it does** (one plain line, `src/game/roomInfo.ts` — the CLI
 `buildable` prints the same line) and, for comfort rooms, what it wants.
 
+## 6b · Space (2026-09-30 — designer: "header way too big", fort "scroll inside a tiny box", BUILD "can't scroll")
+
+- Chrome ≤ ~170px at 1536×740 (was 292): one 46px header bar; the hand, cards and END seal scale with the viewport
+  height (`--card-h: clamp(104px, 15vh, 148px)`); the hand can fold to a strip.
+- The fort cross-section sizes its tiles from width AND height, so the whole hold is visible without scrolling.
+- Every panel has at most ONE scroll region (wheel + keyboard), with sticky headers. Nothing is drawn over a card's name
+  or its portrait's face. No text under 11px, no control under 28px.
+
 ## 7 · Checks
 
 - `scripts/uiplay.ts <webPort>` — drives real Chrome on a scratch save (`scripts/_mkfixture.ts` builds
   `saves/_fixture.json`: gold, captive rooms, prisoners in every state): real drags onto the map, niches and room tiles,
-  the rack confirm, Set them in, the END guard, reckoning stamps + tally, and one check per 2026-09-30 audit fix. 105 checks.
+  the rack confirm, Set them in, the END guard, reckoning stamps + tally, one check per 2026-09-30 audit fix, the chrome budget and fort fit at 1280×650 and 1536×740, build-list wheel/keyboard
+  scroll, hand fold. 113 checks.
 - `scripts/_uishots.ts <outDir> <url>` — screenshots every screen; judge from pixels.
 - G6 still binds: no rotated text anywhere (slivers carry no text for this reason).
 
