@@ -2,7 +2,7 @@
 // slivers (hover to peek); "All cards" (B) opens the drawer with search, filters and relic folders.
 // On an open quest the hand re-sorts for the armed place and badges each soldier's coins there.
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { type S, type Ribbon, CardFace, FixButton, gateOf, shortTitle, formOf, FORM_LABEL, activeSlots, scrollBehavior } from './ui';
+import { type S, type Ribbon, CardFace, FixButton, gateOf, shortTitle, formOf, FORM_LABEL, activeSlots, scrollBehavior, useKeyScroll } from './ui';
 import { strengthCls, coinBadge } from './band';
 
 type Bag = 'soldiers' | 'captives' | 'relics' | 'stores';
@@ -23,10 +23,13 @@ function bagLock(s: S, bag: Bag): string | null {
 }
 /** '−2.1 prestige' → '−2.1 ✦' (display only) */
 const star = (t: string) => t.replace(/(\d) prestige\b/g, '$1 ✦');
+/** the engine's refusal, first clause only ('tamed captives only — break them first' → 'tamed captives only') */
+const shortReason = (r: string | null | undefined) => (r ?? '').split(' — ')[0]!;
 const where = (s: S, m: any) => m.location?.kind === 'quest' ? s.quests.find((q: any) => q.id === m.location.questId) : null;
 const isSetCard = (c: any) => c.type === 'relic' || c.character?.role === 'captive';
-// sliver + stack-button widths (css: .sliver 13px − 4px overlap + 8px gap; .stack 78px + gap)
-const CARD_W = 114, SLIVER_W = 17, MAX_SLIVERS = 12, STACK_W = 90;
+// a card's width follows its height (css: .card = var(--card-h) × .74, 8px gap); a sliver is 13px − 4px
+// overlap + 8px gap; the stack is .72 of a card + its margin and gap
+const CARD_RATIO = .74, GAP = 8, SLIVER_W = 17, MAX_SLIVERS = 12;
 
 /** the one-cycle ribbons from the last reckoning's tally (engine-owned): who grew, who got hurt, what's new */
 function ribbonsOf(s: S): Record<string, Ribbon> {
@@ -58,7 +61,7 @@ function roomHint(room: any): string {
   return `The ${room.name}${room.effect ? ` (${room.effect})` : ''} takes relics & tamed captives — click one to set it here`;
 }
 
-export function Hand({ s, q, armed, pick, drag, setDrag, openDrawer, drawer, modal, fortMode, room, quick }: any) {
+export function Hand({ s, q, armed, pick, drag, setDrag, openDrawer, drawer, modal, fortMode, room, quick, folded, canFold, setFolded }: any) {
   const [bag, setBag] = useState<Bag>(fortMode ? 'relics' : 'soldiers');
   const [filter, setFilter] = useState<'all' | 'free' | 'wounded' | 'placed'>('all');
   useEffect(() => { setBag(fortMode ? 'relics' : 'soldiers') }, [fortMode]);
@@ -77,14 +80,17 @@ export function Hand({ s, q, armed, pick, drag, setDrag, openDrawer, drawer, mod
     addEventListener('keydown', onKey);
     return () => removeEventListener('keydown', onKey);
   }, [modal, drawer]);
+  // the cards row's size: its height IS the card height (it scales with the window), so how many
+  // whole cards fit is read from the row itself, never from a constant
   const box = useRef<HTMLDivElement>(null);
-  const [w, setW] = useState(1100);
+  const [dim, setDim] = useState({ w: 1100, h: 111 });
   useLayoutEffect(() => {
     if (!box.current) return;
-    const ro = new ResizeObserver(e => setW(e[0]!.contentRect.width));
+    const ro = new ResizeObserver(e => { const r = e[0]!.contentRect; setDim(d => d.w === r.width && d.h === r.height ? d : { w: r.width, h: r.height }) });
     ro.observe(box.current);
     return () => ro.disconnect();
-  }, []);
+  }, [folded]);
+  const w = dim.w, CARD_W = Math.round(dim.h * CARD_RATIO) + GAP, STACK_W = Math.round(dim.h * CARD_RATIO * .72) + 6 + GAP;
   // a bag's counter pulses when it grows
   const counts: Record<Bag, number> = { soldiers: s.roster.length, captives: s.captives.length + (s.holding ?? []).length, relics: s.relics.length, stores: s.liabilities.length };
   const prevCounts = useRef<Record<Bag, number> | null>(null);
@@ -102,20 +108,24 @@ export function Hand({ s, q, armed, pick, drag, setDrag, openDrawer, drawer, mod
   const roomArmed = !!(room && room.kind && (bag === 'captives' || bag === 'relics'));
   const roomRow = (c: any) => roomArmed ? c.roomPlacements?.find((p: any) => p.roomId === room.id) ?? null : null;
 
-  // one verdict per card for whatever the hand is armed by (all engine fields — no client rules)
-  type V = { badge?: string; badgeCls?: string; note?: string; why?: any; block?: string | null; here?: boolean; dim?: boolean; rank: number };
+  // one verdict per card for whatever the hand is armed by (all engine fields — no client rules).
+  // The face gets a SHORT reason (the engine's own short form where it has one); `more` carries it whole
+  // to the tooltip. Its status chip already says HOLDING, so a holding card's note is just the engine's deadline.
+  type V = { badge?: string; badgeCls?: string; note?: string; more?: string; why?: any; block?: string | null; here?: boolean; dim?: boolean; rank: number };
+  const places = q ? activeSlots(q).length : 0;
   const verdict = (c: any): V => {
     const soldier = c.character?.role === 'merc';
-    if (isHolding(s, c)) return { note: `in holding · ${c.deadline ?? ''}`, rank: -500 };
+    if (isHolding(s, c)) return { note: c.deadline, more: `in holding · ${c.deadline ?? ''}`, rank: -500 };
     const on = soldier ? where(s, c) : null;
     const away = on ? `→ ${shortTitle(on.title)}` : undefined;
+    const awayFull = on ? `placed on ${on.title}` : undefined;
     if (soldier && slot) {
       const f = slot.fits.find((x: any) => x.id === c.id);
       if (!f) return { here: true, note: 'here', rank: -2000 };                       // the one in this place
-      if (f.from?.questId === q.id) return { here: true, note: `here · ${q.slots[f.from.idx]?.attr ?? 'another'} place`, rank: -1500 };
-      if (f.blocked) return { block: f.blocked, rank: -1000 + f.coins };
+      if (f.from?.questId === q.id) return { here: true, note: `here · ${q.slots[f.from.idx]?.attr ?? 'another'}`, more: `here, in the ${q.slots[f.from.idx]?.attr ?? 'other'} place`, rank: -1500 };
+      if (f.blocked) return { block: shortReason(f.blocked), more: f.blocked, rank: -1000 + f.coins };
       return { badge: coinBadge(f.coins, f.strength), badgeCls: strengthCls(f.strength), why: f.why,
-        note: f.from ? `moves from ${shortTitle(f.from.title)}` : undefined, rank: f.coins };
+        note: f.from ? `leaves ${shortTitle(f.from.title)}` : undefined, more: f.from ? `moves from ${f.from.title}` : undefined, rank: f.coins };
     }
     if (soldier && q) {
       const p = c.placements?.find((x: any) => x.questId === q.id);
@@ -125,20 +135,22 @@ export function Hand({ s, q, armed, pick, drag, setDrag, openDrawer, drawer, mod
         // (the chosen approach's places only — the other endings' places always say "another approach")
         const pool = q.approaches && q.chosenApproach ? activeSlots(q) : q.slots;
         const bl = pool.map((sl: any) => sl.fits?.find((f: any) => f.id === c.id)?.blocked).find(Boolean);
-        return bl ? { block: bl, rank: -1000 } : { dim: true, note: away ?? 'no free place here', rank: -1000 };
+        return bl ? { block: shortReason(bl), more: bl, rank: -1000 } : { dim: true, note: away ?? 'no free place', more: awayFull, rank: -1000 };
       }
-      return { badge: coinBadge(p.coins, p.strength, p.attr), badgeCls: strengthCls(p.strength), note: away, rank: p.coins };
+      // the badge is one line (coins + word); which place it is rides in the note on a many-place quest
+      return { badge: coinBadge(p.coins, p.strength), badgeCls: strengthCls(p.strength),
+        note: away ?? (places > 1 ? `${p.attr} place` : undefined), more: `best place here: ${p.attr}${awayFull ? ` — ${awayFull}` : ''}`, rank: p.coins };
     }
     if (roomArmed && isSetCard(c)) {
       if (c.whereId === room.id) return { here: true, note: 'here', rank: -2000 };
       const p = roomRow(c);
       if (!p) return { dim: true, rank: -1000 };
-      if (!p.ok) return { dim: true, note: p.reason ?? p.label, rank: -1000 };
+      if (!p.ok) return { dim: true, note: p.badge ?? shortReason(p.reason ?? p.label), more: p.reason ?? p.label, rank: -1000 };
       // the engine's own short, signed badge and its tone — a losing move is never a green "+2.7"
       return { badge: star(p.badge ?? p.label), badgeCls: p.tone === 'good' ? 'good' : p.tone === 'bad' ? 'bad' : 'neutral',
-        note: p.swapWithName ? `swap for ${p.swapWithName}` : undefined, rank: p.gain + 1 };
+        note: p.swapWithName ? `⇄ ${p.swapWithName}` : undefined, more: star(p.label), rank: p.gain + 1 };
     }
-    return { note: away, rank: 0 };
+    return { note: away, more: awayFull, rank: 0 };
   };
 
   let cards = bagCards(s, bag);
@@ -147,6 +159,14 @@ export function Hand({ s, q, armed, pick, drag, setDrag, openDrawer, drawer, mod
       || (filter === 'wounded' && m.character.injury > 0) || (filter === 'placed' && m.location.kind === 'quest'));
   }
   const vs = new Map(cards.map((c: any) => [c.id, verdict(c)]));
+  // a refusal EVERY card shares is said once, by the hint — not printed over every face
+  const vals = [...vs.values()];
+  const sharedOf = (get: (v: V) => string | null | undefined) => {
+    const t = vals.length > 1 ? get(vals[0]!) : null;
+    return t && vals.every(v => get(v) === t) ? t : null;
+  };
+  const shared = sharedOf(v => v.block) ?? sharedOf(v => v.dim ? v.note : null);
+  if (shared) for (const v of vals) { v.block = null; v.dim = true; if (v.note === shared) v.note = undefined }
   const armedAny = !!q || roomArmed;
   cards = [...cards].sort((a, b) => armedAny ? (vs.get(b.id)!.rank - vs.get(a.id)!.rank) || b.character?.level - a.character?.level || 0
     : bag === 'soldiers' ? b.character.level - a.character.level
@@ -154,22 +174,30 @@ export function Hand({ s, q, armed, pick, drag, setDrag, openDrawer, drawer, mod
     : bag === 'captives' || bag === 'relics' ? (Number(a.location?.kind === 'room') - Number(b.location?.kind === 'room')) || (b.stars ?? 0) - (a.stars ?? 0)
     : 0);
   const lock = bagLock(s, bag);
-  const fitAll = cards.length * CARD_W <= w;
-  const nFull = fitAll ? cards.length : Math.max(1, Math.floor((w - MAX_SLIVERS * SLIVER_W - STACK_W) / CARD_W));
+  // as many whole cards as the row holds (up to the seal) beside the slivers and the stack the REST needs
+  const fitAll = cards.length * CARD_W <= w + GAP;
+  let nFull = cards.length;
+  if (!fitAll) {
+    nFull = 1;
+    for (let n = cards.length - 1; n >= 1; n--) {
+      if (n * CARD_W + Math.min(MAX_SLIVERS, cards.length - n) * SLIVER_W + STACK_W <= w + GAP) { nFull = n; break }
+    }
+  }
   const full = cards.slice(0, nFull), rest = cards.slice(nFull);
   const slivers = rest.slice(0, MAX_SLIVERS), hidden = rest.length - slivers.length;
 
   const face = (c: any) => {
     const v = vs.get(c.id)!;
     const draggable = c.character?.role === 'merc' || (fortMode && isSetCard(c) && !isHolding(s, c));
-    return <CardFace key={c.id} c={c} badge={v.badge} badgeCls={v.badgeCls} note={v.note} dim={v.dim} why={v.why} block={v.block} here={v.here}
-      ribbon={ribbons[c.id] ?? (isHolding(s, c) ? { text: 'HOLDING', tone: 'red' } : undefined)} onClick={() => pick(c)}
+    return <CardFace key={c.id} c={c} badge={v.badge} badgeCls={v.badgeCls} note={v.note} more={v.more} dim={v.dim} why={v.why} block={v.block} here={v.here}
+      ribbon={ribbons[c.id]} onClick={() => pick(c)}
       onDragStart={draggable ? (e => { e.dataTransfer.setData('text/plain', c.id); e.dataTransfer.effectAllowed = 'move'; setDrag(c.id) }) : undefined}
       onDragEnd={() => setDrag(null)} />;
   };
 
   const labels: [Bag, string][] = [['soldiers', 'Soldiers'], ['captives', 'Captives'], ['relics', 'Relics'], ['stores', 'Stores']];
-  const hint = slot ? `Sorted for the ${slot.test.attributes.join('+').toUpperCase()} place — best first. Click a card to place it.`
+  const hint = shared && q && !(q.approaches && !q.chosenApproach) ? `${shared[0]!.toUpperCase()}${shared.slice(1)} — every card here.`
+    : slot ? `Sorted for the ${slot.test.attributes.join('+').toUpperCase()} place — best first. Click a card to place it.`
     : q && q.approaches && !q.chosenApproach ? 'Pick how it ends first — then the hand sorts itself for it.'
     : q ? 'Best for this quest first. Click a card to send them to their best place here.'
     : room && fortMode && (bag === 'captives' || bag === 'relics') ? roomHint(room)
@@ -177,20 +205,32 @@ export function Hand({ s, q, armed, pick, drag, setDrag, openDrawer, drawer, mod
     : fortMode && bag === 'captives' ? 'Raw captives go on a rack, tamed ones on show — click a room to arm the hand, or drag onto one'
     : fortMode && bag === 'relics' ? 'Relics on show raise prestige — click a room to arm the hand, or drag onto one'
     : bag === 'captives' || bag === 'relics' ? 'Click a card to read it and set it in a room' : '';
+  const fold = canFold && setFolded
+    ? <button className="fold" onClick={() => setFolded(!folded)} aria-expanded={!folded}
+        title={folded ? 'show the cards' : 'fold the hand to a strip (it opens by itself on a quest or a room)'}>{folded ? '▴ show cards' : '▾ fold'}</button>
+    : null;
+  const bagBtns = labels.map(([b, label], i) => (
+    <button key={b} role="tab" aria-selected={bag === b} className={'bag' + (bag === b ? ' on' : '')} title={`key ${i + 1}`}
+      onClick={() => { setBag(b); if (folded) setFolded?.(false) }}>
+      {label}<span key={grew[b] ?? 0} className={'c' + (grew[b] ? ' fx-pulse-once grew' : '')}>{counts[b]}</span></button>));
+  const allc = <button className={'allc' + (drawer ? ' on' : '')} onClick={openDrawer} aria-expanded={!!drawer} title="every card — search, filters, relic folders (B)">All cards <span>B</span></button>;
+  if (folded) return (
+    <div className="hand folded">
+      <div className="bags" role="tablist" aria-label="Card bags">{bagBtns}{allc}{fold}</div>
+    </div>
+  );
   return (
     <div className={'hand' + (roomArmed ? ' armed' : '')}>
       <div className="bags" role="tablist" aria-label="Card bags">
-        {labels.map(([b, label], i) => (
-          <button key={b} role="tab" className={'bag' + (bag === b ? ' on' : '')} onClick={() => setBag(b)} title={`key ${i + 1}`}>
-            {label}<span key={grew[b] ?? 0} className={'c' + (grew[b] ? ' fx-pulse-once grew' : '')}>{counts[b]}</span></button>))}
-        <button className={'allc' + (drawer ? ' on' : '')} onClick={openDrawer}>All cards {drawer ? '▾' : '▴'} <span>B</span></button>
+        {bagBtns}
+        <div className="brow3">{allc}{fold}</div>
       </div>
       <div className="handbar">
-        {bag === 'soldiers' && (['all', 'free', 'wounded', 'placed'] as const).map(f =>
-          <button key={f} className={'fc' + (filter === f ? ' on' : '')} onClick={() => setFilter(f)}>{f}</button>)}
-        {roomArmed && <span className="armchip">{room.name}</span>}
-        {roomArmed && !room.slots?.length && room.addPlace && quick && <FixButton s={s} fix={room.addPlace} quick={quick} solid />}
-        <span className="hint" title={hint}>{hint}</span>
+        {bag === 'soldiers' && <div className="filters">{(['all', 'free', 'wounded', 'placed'] as const).map(f =>
+          <button key={f} className={'fc' + (filter === f ? ' on' : '')} onClick={() => setFilter(f)}>{f}</button>)}</div>}
+        {roomArmed && <span className="armchip" title={room.name}>{room.name}</span>}
+        {hint && <span className="hint" title={hint}>{hint}</span>}
+        {roomArmed && !room.slots?.length && room.addPlace && quick && <div className="fixrow"><FixButton s={s} fix={room.addPlace} quick={quick} solid /></div>}
       </div>
       <div className="cards" ref={box}>
         {lock ? <span className="empty">Build a {lock} first.</span>
@@ -213,6 +253,8 @@ export function Inventory({ s, close, pick, modal }: { s: S; close: () => void; 
   const [text, setText] = useState('');
   const [open, setOpen] = useState<string | null>(null);
   const subRef = useRef<HTMLDivElement>(null);
+  const scroller = useRef<HTMLDivElement>(null);
+  useKeyScroll(scroller);
   useEffect(() => { if (open) subRef.current?.scrollIntoView({ block: 'nearest', behavior: scrollBehavior() }) }, [open]);
   // the drawer's OWN bag keys: 0 = all, 1–4 = a bag — from anywhere in the drawer, the search box
   // included while it is empty (a digit typed after a word stays a search)
@@ -237,7 +279,7 @@ export function Inventory({ s, close, pick, modal }: { s: S; close: () => void; 
   for (const r of relics) (forms[formOf(r.tags)] ??= []).push(r);
   const grid = (cards: any[]) => <div className="grid">{cards.map(c =>
     <CardFace key={c.id} c={c} small onClick={() => pick(c)} note={c.location?.kind === 'quest' ? '→ ' + shortTitle(where(s, c)?.title ?? '')
-      : isHolding(s, c) ? `in holding · ${c.deadline ?? ''}` : undefined} />)}</div>;
+      : isHolding(s, c) ? c.deadline : undefined} />)}</div>;
   const total = s.roster.length + allCaptives.length + s.relics.length + s.liabilities.length;
   const shown = (b: Bag, n: number, all: number) => sec(b) && (t ? n > 0 : all > 0);
   const nothing = t && !roster.length && !captives.length && !relics.length && !debts.length;
@@ -254,14 +296,20 @@ export function Inventory({ s, close, pick, modal }: { s: S; close: () => void; 
         <div className="dbar">
           <input className="search" type="search" autoFocus placeholder="Search names and tags…" aria-label="Search cards" value={text}
             onChange={e => setText(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); (e.target as HTMLInputElement).blur(); close() } }} />
+            onKeyDown={e => {
+              if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); (e.target as HTMLInputElement).blur(); close() }
+              // the page keys read the cards from the search box too (typing stays in it)
+              if ((e.key === 'PageDown' || e.key === 'PageUp') && scroller.current) { e.preventDefault(); scroller.current.scrollBy({ top: (e.key === 'PageDown' ? 1 : -1) * scroller.current.clientHeight * 0.85 }) }
+            }} />
           <button className="btn" onClick={close}>Close ▾</button>
         </div>
-        <div className="dscroll">
+        <div className="dscroll" ref={scroller} tabIndex={-1}>
           {nothing && <p className="empty">Nothing matches “{text}”.</p>}
-          {shown('soldiers', roster.length, s.roster.length) && <><div className="dsec">Soldiers <span>{t ? `${roster.length} of ${s.roster.length}` : roster.length}</span></div>{grid(roster)}</>}
-          {shown('captives', captives.length, allCaptives.length) && <><div className="dsec">Captives <span>{t ? `${captives.length} of ${allCaptives.length}` : captives.length}</span></div>{grid(captives)}</>}
-          {shown('relics', relics.length, s.relics.length) && <>
+          {/* the sections flow side by side on a wide window (each as wide as its cards need) */}
+          <div className="dgroups">
+          {shown('soldiers', roster.length, s.roster.length) && <div className="dgroup"><div className="dsec">Soldiers <span>{t ? `${roster.length} of ${s.roster.length}` : roster.length}</span></div>{grid(roster)}</div>}
+          {shown('captives', captives.length, allCaptives.length) && <div className="dgroup"><div className="dsec">Captives <span>{t ? `${captives.length} of ${allCaptives.length}` : captives.length}</span></div>{grid(captives)}</div>}
+          {shown('relics', relics.length, s.relics.length) && <div className="dgroup">
             <div className="dsec">Relics <span>{relics.length}{t ? ` of ${s.relics.length}` : ''} in {Object.keys(forms).length} folder{Object.keys(forms).length === 1 ? '' : 's'}</span></div>
             <div className="grid">{Object.entries(forms).map(([f, rs]) => (
               <button key={f} className={'folder' + (open === f ? ' open' : '')} onClick={() => setOpen(open === f ? null : f)} aria-expanded={open === f}>
@@ -270,8 +318,9 @@ export function Inventory({ s, close, pick, modal }: { s: S; close: () => void; 
               </button>))}
             </div>
             {open && forms[open] && <div className="sub" ref={subRef}>{grid(forms[open]!)}</div>}
-          </>}
-          {shown('stores', debts.length, s.liabilities.length) && <><div className="dsec">Stores <span>debts & stacks</span></div>{grid(debts)}</>}
+          </div>}
+          {shown('stores', debts.length, s.liabilities.length) && <div className="dgroup"><div className="dsec">Stores <span>debts & stacks</span></div>{grid(debts)}</div>}
+          </div>
         </div>
       </div>
     </section>

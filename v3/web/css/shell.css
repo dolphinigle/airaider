@@ -1,116 +1,157 @@
 /* Shell surface: top bar, toasts, the seal, the chronicle, the reckoning. Loaded after styles.css. */
 /* ── shell ─────────────────────────────────────────────────────────────── */
-/* rows: header · the next-steps scroll · the stage · the hand */
-.app { height: 100vh; display: grid; grid-template-rows: auto auto minmax(0, 1fr) 200px; position: relative; }
+/* rows: ONE bar (crest · screens · next steps · resources) · the stage · the hand. The hand's height
+   comes from the viewport height (--card-h, styles.css), so the stage keeps most of a short window. */
+.app { height: 100vh; display: grid; grid-template-rows: var(--top-h) minmax(0, 1fr) var(--hand-h); position: relative; }
 .app.loading { display: flex; align-items: center; justify-content: center; color: var(--text-dim); }
-.top { min-height: 56px; background: var(--bar); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 18px; padding: 0 18px; min-width: 0; position: relative; z-index: 65; }
-.crest { font-family: var(--sc); font-size: 20px; letter-spacing: .14em; color: var(--brass-hi); }
-.nav { display: flex; gap: 4px; }
-.nav button { display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 14px; border-radius: 6px; font-family: var(--sc); font-size: 15px; letter-spacing: .06em; color: var(--text-dim); border: 1px solid transparent; }
+.top { height: var(--top-h); background: var(--bar); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 12px; padding: 0 12px; min-width: 0; position: relative; z-index: 65; }
+.crest { flex: none; font-family: var(--sc); font-size: 17px; letter-spacing: .12em; color: var(--brass-hi); }
+.nav { flex: none; display: flex; gap: 2px; }
+.nav button { display: flex; align-items: center; gap: 7px; height: 34px; padding: 0 10px; border-radius: 6px; font-family: var(--sc); font-size: 14px; letter-spacing: .04em; color: var(--text-dim); border: 1px solid transparent; }
 .nav button:hover { background: #1c2227; color: var(--text); }
 .nav button.on { background: #221a12; border-color: #5b4526; color: var(--brass-hi); }
 .dot { min-width: 18px; height: 18px; border-radius: 9px; background: #8a3a30; color: #fff; font: 500 11px var(--mono); display: inline-flex; align-items: center; justify-content: center; padding: 0 5px; }
-/* the resources take what row 1 leaves and wrap their own items, so the page never scrolls sideways */
-.res { display: flex; gap: 14px; align-items: center; justify-content: flex-end; flex-wrap: wrap; row-gap: 4px; flex: 1 1 0; min-width: 320px; margin-left: auto; font: 500 12.5px var(--mono); color: var(--text-dim); white-space: nowrap; }
+/* the resources keep their natural width; the next steps take (and give back) whatever is left */
+.res { flex: none; display: flex; gap: 12px; align-items: center; font: 500 12px var(--mono); color: var(--text-dim); white-space: nowrap; }
 .res b { color: var(--text); font-weight: 500; display: inline-block; }
 .res .gold b { color: var(--brass-hi); }
 .res .val { position: relative; }
-/* the Great Hall goal: always the next tier, prestige toward it, and what it opens */
+.res .cyc { display: inline-flex; align-items: center; gap: 4px; }
+/* the last report, beside the cycle it reports on */
+.lastrep { height: 28px; min-width: 28px; padding: 0 6px; border-radius: 5px; border: 1px solid transparent; font: 500 12px var(--mono); color: var(--brass-hi); }
+.lastrep:hover { background: #1c2227; border-color: #333b42; color: #fff; }
+/* a resource says its name in words on a wide bar, as a glyph on a narrow one (the tooltip keeps the word) */
+.res .sh { display: none; }
+/* the Great Hall goal: always the next tier, prestige toward it; what it opens is in its tooltip + popover */
 .ghwrap { display: inline-flex; }
-.res .gh { display: flex; flex-direction: column; gap: 3px; padding: 3px 8px; margin: 0 -8px; border-radius: 5px; border: 1px solid transparent; text-align: left; font: inherit; color: inherit; }
-.res .gh:hover { background: #1c2227; border-color: #333b42; }
-.res .gh .l1, .res .gh .l2 { display: flex; min-width: 0; max-width: 330px; white-space: nowrap; }
-.res .gh .k { flex: none; }
-.res .gh .op { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.res .gh .bar { width: 100%; min-width: 130px; height: 5px; background: #262d33; border-radius: 3px; overflow: hidden; }
+.res .gh { display: flex; flex-direction: column; justify-content: center; gap: 3px; height: 34px; padding: 0 8px; border-radius: 5px; border: 1px solid #2c343a; text-align: left; font: inherit; color: inherit; }
+.res .gh:hover { background: #1c2227; border-color: #3a444c; }
+.res .gh .l1 { display: flex; min-width: 0; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.res .gh .bar { width: 100%; min-width: 96px; height: 4px; background: #262d33; border-radius: 2px; overflow: hidden; }
 .res .gh .bar i { display: block; height: 100%; background: var(--brass); }
-.res .gh.ready { margin: 0; padding: 4px 12px; background: linear-gradient(#e9c570, #b9882f); border-color: #ffe3a0; color: #1a1208; }
+.res .gh.ready { flex-direction: row; align-items: center; background: linear-gradient(#e9c570, #b9882f); border-color: #ffe3a0; color: #1a1208; padding: 0 12px; font: 600 13px var(--sc); letter-spacing: .04em; }
 .res .gh.ready:hover { background: linear-gradient(#f3d58a, #c9973f); }
-.res .gh.ready .l1 { font: 600 13.5px var(--sc); letter-spacing: .05em; }
-.res .gh.ready .l2 { font: 500 10.5px var(--mono); color: #3d2c0f; max-width: 240px; }
-.ghpop { position: absolute; top: calc(100% - 2px); left: -8px; width: 300px; display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; background: #15110f; border: 1px solid #6b5230; border-radius: 6px; box-shadow: 0 14px 40px rgba(0,0,0,.75); z-index: 80; white-space: normal; }
+.ghpop { position: absolute; top: calc(100% + 4px); right: 0; width: 300px; display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; background: #15110f; border: 1px solid #6b5230; border-radius: 6px; box-shadow: 0 14px 40px rgba(0,0,0,.75); z-index: 80; white-space: normal; }
 .ghpop .why { font: 500 12px var(--mono); color: var(--part); margin-bottom: 4px; }
-.ghpop .src { display: flex; justify-content: space-between; gap: 10px; padding: 4px 6px; border-radius: 4px; font: 400 12.5px var(--mono); color: var(--text); text-align: left; }
+.ghpop .opens1 { font: 400 12px var(--mono); color: var(--text); margin-bottom: 4px; }
+.ghpop .src { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 28px; padding: 4px 6px; border-radius: 4px; font: 400 12.5px var(--mono); color: var(--text); text-align: left; }
 .ghpop .src:hover { background: #221a12; }
 .ghpop .src .on { color: var(--brass-hi); }
-.res .ai { color: var(--text-faint); }
-.capctl { display: inline-flex; align-items: center; gap: 4px; }
-.capctl button { width: 20px; height: 20px; border: 1px solid #3a444c; border-radius: 3px; font-size: 12px; line-height: 1; }
+.aiwrap { display: inline-flex; }
+.res .ai { height: 28px; padding: 0 7px; border-radius: 5px; border: 1px solid transparent; color: var(--text-faint); font: 500 12px var(--mono); }
+.res .ai:hover, .res .ai[aria-expanded="true"] { border-color: #333b42; background: #1c2227; color: var(--text); }
+.aipop { position: absolute; top: calc(100% + 4px); right: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; background: #15110f; border: 1px solid #6b5230; border-radius: 6px; box-shadow: 0 14px 40px rgba(0,0,0,.75); z-index: 80; font: 400 12px var(--mono); color: var(--text); white-space: nowrap; }
+.capctl { display: inline-flex; align-items: center; gap: 6px; }
+.capctl button { width: 28px; height: 28px; border: 1px solid #3a444c; border-radius: 4px; font-size: 14px; line-height: 1; }
 .link { color: var(--brass-hi); font: 500 12px var(--mono); }
-/* narrow screens: the header wraps instead of pushing the page sideways */
-@media (max-width: 1359px) {
-  .top { flex-wrap: wrap; row-gap: 2px; padding: 6px 14px; gap: 12px; }
-  .nav button { padding: 0 10px; }
-  .res { gap: 11px; }
-  .res .gh .l1, .res .gh .l2 { max-width: 236px; }
-  .res .gh.ready .l2 { max-width: 200px; }
-  .nextsteps .step .d { display: none; }
+/* a narrower bar: glyphs for words, a smaller crest, no "NEXT" label */
+@media (max-width: 1699px) {
+  .crest { font-size: 15px; letter-spacing: .1em; }
+  .res .lg { display: none; }
+  .res .sh { display: inline; }
+  .nextsteps > .lbl { display: none; }
 }
-kbd.key { display: inline-block; font: 500 10px/14px var(--mono); padding: 0 4px; border: 1px solid currentColor; border-radius: 3px; opacity: .65; margin-left: 6px; vertical-align: 1px; }
+@media (max-width: 1599px) {
+  .top { gap: 10px; padding: 0 10px; }
+  .nav button { padding: 0 8px; gap: 6px; font-size: 13.5px; }
+  .res { gap: 10px; }
+}
+/* a laptop-width bar: the crest (branding, no function) gives its room to the next steps */
+@media (max-width: 1439px) {
+  .top .crest { display: none; }
+  .res .gh.ready { padding: 0 10px; font-size: 12.5px; letter-spacing: .02em; }
+}
+kbd.key { display: inline-block; font: 500 11px/14px var(--mono); padding: 0 4px; border: 1px solid currentColor; border-radius: 3px; opacity: .65; margin-left: 6px; vertical-align: 1px; }
 
-/* ── the next-steps scroll (R4): its own row, so it never covers a screen ─ */
-.nextsteps { position: relative; z-index: 60; display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 14px; min-width: 0; background: linear-gradient(#1a1511, #13100d); border-bottom: 1px solid #3a2c18; }
+/* ── the next steps (R4): chips inside the bar — as many WHOLE ones as fit (App measures them), the rest behind "+N" ── */
+.nextsteps { position: relative; flex: 1 1 0; min-width: 0; display: flex; align-items: center; gap: 8px; height: 100%; }
 .nextsteps > .lbl { color: var(--brass); flex: none; }
-.nextsteps .steps { display: flex; gap: 8px; min-width: 0; flex: 1 1 auto; overflow: hidden; }
-.nextsteps .step { display: flex; align-items: center; gap: 4px; min-width: 0; flex: 0 1 auto; max-width: calc((100% - 16px) / 3); height: 26px; padding-right: 3px; border: 1px solid #4a3a22; border-radius: 13px; background: #1d1812; }
-.nextsteps .step .go { display: flex; align-items: center; gap: 7px; min-width: 0; height: 100%; padding: 0 8px 0 3px; border-radius: 13px; }
-.nextsteps .step .g { flex: none; width: 20px; height: 20px; border-radius: 50%; background: #2c2217; color: var(--brass-hi); display: inline-flex; align-items: center; justify-content: center; font: 600 11px var(--mono); }
-.nextsteps .step .t { font: 500 12px var(--mono); color: var(--cream); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 14ch; flex: 1 1 auto; }
-.nextsteps .step .d { font: 400 11px var(--mono); color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 0 100 auto; }
+.nextsteps .steps { display: flex; gap: 6px; min-width: 0; flex: 0 1 auto; overflow: hidden; }
+.nextsteps .step { display: flex; align-items: center; gap: 4px; min-width: 0; flex: 0 1 auto; height: 34px; padding-right: 3px; border: 1px solid #4a3a22; border-radius: 17px; background: #1d1812; }
+.nextsteps .step .go { display: flex; align-items: center; gap: 7px; min-width: 0; height: 100%; padding: 0 8px 0 4px; border-radius: 17px; flex: 0 1 auto; }
+.nextsteps .step .g { flex: none; width: 24px; height: 24px; border-radius: 50%; background: #2c2217; color: var(--brass-hi); display: inline-flex; align-items: center; justify-content: center; font: 600 12px var(--mono); }
+/* only the step's own words give way (the last resort: one step, in a bar too narrow for it) */
+.nextsteps .step .t { font: 500 12px var(--mono); color: var(--cream); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 8ch; flex: 0 1 auto; }
+/* the detail shows only WHOLE (App decides: .withd) — else it lives in the tooltip and in "+N" */
+.nextsteps .step .d { display: none; font: 400 11.5px var(--mono); color: var(--text-dim); white-space: nowrap; flex: none; }
+.nextsteps .step.withd .d { display: inline; }
 .nextsteps .step .go:hover .t { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
-/* the step's words win the room: its button shrinks and clips (its title carries the full label) */
-.nextsteps .step .go { flex: 1 1 auto; }
-.nextsteps .step .btn.sm { flex: 0 0 auto; min-width: 0; max-width: 45%; overflow: hidden; text-overflow: ellipsis; display: block; line-height: 20px; height: 20px; padding: 0 9px; border-radius: 10px; font-size: 11px; }
+/* the one-click button keeps its whole label (the engine's price is in it) */
+.nextsteps .step .btn.sm { flex: none; height: 28px; padding: 0 10px; border-radius: 14px; font-size: 11.5px; }
 .nextsteps .step.urgent { border-color: #9b3a2f; background: #26140f; }
 .nextsteps .step.urgent .g { background: #6a261e; color: #ffe1da; }
 .nextsteps .step.urgent .d { color: #f0a295; }
 .nextsteps .step.end { border-color: #3f6a45; background: #121a13; }
 .nextsteps .step.end .g { background: #1f3322; color: var(--good); }
-.nextsteps .more { flex: none; height: 24px; min-width: 32px; padding: 0 8px; border-radius: 12px; border: 1px solid #4a3a22; font: 500 11.5px var(--mono); color: var(--brass-hi); }
+/* an urgent step the bar could not give room to: its glyph, red, its words in the tooltip and in "+N" */
+.stepmini { flex: none; width: 28px; height: 28px; border-radius: 50%; border: 1px solid #9b3a2f; background: #6a261e; color: #ffe1da; font: 600 12px var(--mono); display: inline-flex; align-items: center; justify-content: center; }
+.stepmini:hover { border-color: #ff8a78; }
+.nextsteps .more { flex: none; height: 30px; min-width: 36px; padding: 0 8px; border-radius: 15px; border: 1px solid #4a3a22; font: 500 12px var(--mono); color: var(--brass-hi); }
 .nextsteps .more[aria-expanded="true"] { background: #2a2117; }
-.morepop { position: absolute; top: calc(100% + 4px); right: 14px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; padding: 10px; background: #15110f; border: 1px solid #6b5230; border-radius: 6px; box-shadow: 0 14px 40px rgba(0,0,0,.75); max-width: min(720px, 90vw); }
-.nextsteps .morepop .step { max-width: 100%; }
+/* "+N": every step in full — its words and detail wrap, its button whole, rows left-aligned */
+.morepop { position: absolute; top: calc(100% + 2px); right: 0; width: min(640px, 92vw); display: flex; flex-direction: column; align-items: stretch; gap: 6px; padding: 10px; background: #15110f; border: 1px solid #6b5230; border-radius: 6px; box-shadow: 0 14px 40px rgba(0,0,0,.75); z-index: 70; }
+.nextsteps .morepop .step { height: auto; min-height: 36px; border-radius: 10px; padding: 3px 4px 3px 0; }
+.nextsteps .morepop .step .go { flex: 1 1 auto; height: auto; align-items: center; border-radius: 10px; padding: 2px 8px 2px 4px; text-align: left; }
+.nextsteps .morepop .step .t { white-space: normal; overflow: visible; min-width: 0; flex: 0 1 auto; }
+.nextsteps .morepop .step .d { display: inline; white-space: normal; flex: 1 1 auto; min-width: 0; }
+/* the hidden copy App measures: natural widths, detail shown, never laid out in the bar */
+.stepmeas { position: absolute; left: 0; top: 0; width: 0; height: 0; overflow: hidden; visibility: hidden; pointer-events: none; }
+.stepmeas-in { position: absolute; left: 0; top: 0; display: flex; gap: 6px; width: max-content; }
+.stepmeas .step { flex: none; }
+.stepmeas .step .t { overflow: visible; min-width: 0; }
+.stepmeas .step .d { display: inline; }
 
 .stage { position: relative; min-height: 0; overflow: hidden; }
 /* toasts sit top centre and are click-through (bar their own button), so they never cover the
    writ's buttons or the fort's bottom row; z above the card sheet, so a result from the sheet is seen too */
-.toast, .pending { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); background: #15110f; border: 1px solid #6b5230; border-radius: 4px; padding: 8px 14px; font: 400 12.5px var(--mono); color: var(--cream); z-index: 90; max-width: 70%; pointer-events: none; box-shadow: 0 8px 24px rgba(0,0,0,.6); }
+.toast, .pending { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); background: #15110f; border: 1px solid #6b5230; border-radius: 4px; padding: 8px 14px; font: 400 12.5px var(--mono); color: var(--cream); z-index: 90; max-width: 70%; pointer-events: none; box-shadow: 0 8px 24px rgba(0,0,0,.6); }
 .toast { display: flex; align-items: center; gap: 12px; }
 .toast .btn { pointer-events: auto; flex: none; }
-.pending { top: 58px; }
+.pending { top: 54px; }
+/* on a quest the toast sits over the scene (the left column), never over the writ's back button and title */
+.stage.questing .toast, .stage.questing .pending { left: calc(14px + (100% - 44px) * 1.15 / 4.3); max-width: calc((100% - 44px) * 1.15 / 2.15 - 16px); }
 .toast[data-tone="ok"] { border-left: 4px solid var(--good); }
 .toast[data-tone="warn"] { border-left: 4px solid var(--part); }
 .toast[data-tone="bad"] { border-left: 4px solid var(--bad); color: #ffd9d2; }
 
 /* ── the seal ──────────────────────────────────────────────────────────── */
-.sealbox { position: absolute; right: 8px; bottom: 4px; width: 170px; display: flex; flex-direction: column; align-items: center; gap: 3px; z-index: 40; }
-.seal { position: relative; width: 142px; height: 142px; border-radius: 50%; background: radial-gradient(circle at 38% 32%, #f3d895, #c9973f 45%, #6d4d1c 100%);
-  box-shadow: 0 0 0 4px #2a1c0a, 0 0 0 6px var(--brass), 0 8px 24px rgba(0,0,0,.7); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #241505; transition: scale .08s ease-out; }
-.seal:hover:not(:disabled) { box-shadow: 0 0 0 4px #2a1c0a, 0 0 0 6px #ffe3a0, 0 0 26px rgba(255,214,120,.5); }
+/* it lives inside the hand's right edge (the hand pads its cards clear of it) and grows with the hand */
+.sealbox { position: absolute; right: 8px; bottom: var(--hand-pad); width: var(--sealbox-w); height: calc(var(--hand-h) - 2 * var(--hand-pad)); display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px; z-index: 40; }
+.seal { position: relative; flex: none; width: var(--seal); height: var(--seal); border-radius: 50%; background: radial-gradient(circle at 38% 32%, #f3d895, #c9973f 45%, #6d4d1c 100%);
+  box-shadow: 0 0 0 3px #2a1c0a, 0 0 0 5px var(--brass), 0 6px 18px rgba(0,0,0,.7); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; color: #241505; transition: scale .08s ease-out; }
+.seal:hover:not(:disabled) { box-shadow: 0 0 0 3px #2a1c0a, 0 0 0 5px #ffe3a0, 0 0 22px rgba(255,214,120,.5); }
 .seal:active:not(:disabled) { scale: .94; }
-.seal .a { font-family: var(--sc); font-size: 21px; line-height: 1; letter-spacing: .08em; font-weight: 600; }
-.seal .a.sm { font-size: 17px; }
-.seal .b { font: 500 10.5px/1.25 var(--mono); margin-top: 3px; max-width: 112px; text-align: center; }
-.seal .key { position: absolute; bottom: 14px; left: 50%; translate: -50% 0; margin: 0; }
+.seal .a { font-family: var(--sc); font-size: calc(var(--seal) * .165); line-height: 1; letter-spacing: .08em; font-weight: 600; }
+.seal .a.sm { font-size: max(11px, calc(var(--seal) * .13)); }
+.seal .b { font: 500 11px/1.2 var(--mono); margin-top: 2px; max-width: calc(var(--seal) - 14px); text-align: center; }
+.seal .key { margin: 3px 0 0; }
+/* a small seal drops the key hint (E still works; the button's label says so) */
+@media (max-height: 859px) { .seal .key { display: none; } }
 /* every quest set, someone marches: the seal breathes */
 .seal.ready { animation: glow 1.8s ease-in-out infinite; }
 /* armed (R5): the next click ends the cycle anyway */
 /* the highlight sits off to the rim; behind the centred text the ground is ≤ #8f2a21, so the near-white
    ink holds ≥ 4.5:1 across END / ANYWAY? / the warning line */
-.seal.is-armed { outline: none; background: radial-gradient(circle at 26% 18%, #c2574a 0%, #8f2a21 22%, #6e1d16 55%, #3d0e09 100%); color: #fff6f2; box-shadow: 0 0 0 4px #2a0c08, 0 0 0 6px #ff8a78, 0 0 30px rgba(255,110,90,.55); text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+.seal.is-armed { outline: none; background: radial-gradient(circle at 26% 18%, #c2574a 0%, #8f2a21 22%, #6e1d16 55%, #3d0e09 100%); color: #fff6f2; box-shadow: 0 0 0 3px #2a0c08, 0 0 0 5px #ff8a78, 0 0 26px rgba(255,110,90,.55); text-shadow: 0 1px 2px rgba(0,0,0,.6); }
 .seal.is-armed .b { color: #fff0ea; }
-.sealwarn { min-height: 16px; width: 100%; text-align: center; font: 400 11px var(--mono); color: var(--text-faint); }
+/* the warning under the seal: two whole lines (the hover list has each one) */
+.sealwarn { flex: none; height: 28px; width: 100%; text-align: center; font: 400 11px/14px var(--mono); color: var(--text-faint); overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .sealwarn.sw-warn { color: #f0a295; }
 .sealwarn.sw-ok { color: var(--good); }
-.lastrep { height: 18px; font: 500 11px var(--mono); color: var(--brass-hi); }
-.lastrep:hover { color: #fff; }
-.sealwarns { position: absolute; right: 0; bottom: calc(100% - 4px); width: 340px; display: flex; flex-direction: column; gap: 3px; padding: 10px 10px 8px; background: #1b100d; border: 1px solid #9b2f26; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,.75); }
+.sealwarns { position: absolute; right: 0; bottom: calc(100% + 4px); width: 340px; display: flex; flex-direction: column; gap: 3px; padding: 10px 10px 8px; background: #1b100d; border: 1px solid #9b2f26; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,.75); max-height: calc(100vh - var(--hand-h) - var(--top-h) - 8px); overflow-y: auto; }
 .sealwarns .lbl { color: #f0a295; margin: 0 4px 2px; }
 .sealwarns button { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; padding: 5px 6px; border-radius: 4px; text-align: left; }
 .sealwarns button:hover { background: #2c1813; }
 .sealwarns b { font: 600 14px var(--serif); color: #f3e9d2; }
 .sealwarns span { font: 400 11.5px var(--mono); color: var(--part); }
 .sealwarns span.cold { color: #ff9d90; }
+/* the hand folded to a strip: the seal becomes a pill in it, its warning beside it */
+.app.handmin .sealbox { width: auto; flex-direction: row-reverse; align-items: center; justify-content: flex-start; gap: 10px; }
+.app.handmin .seal { width: auto; height: 32px; border-radius: 16px; flex-direction: row; gap: 6px; padding: 0 16px; }
+.app.handmin .seal .a, .app.handmin .seal .a.sm { font-size: 14px; }
+.app.handmin .seal .b { margin: 0 0 0 4px; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.app.handmin .seal .key { display: none; }
+.app.handmin .sealwarn { width: auto; max-width: 300px; height: auto; max-height: 28px; text-align: left; }
 
 /* ── the chronicle ─────────────────────────────────────────────────────── */
 .chronicle { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 14px 14px 0; }
@@ -125,7 +166,7 @@ kbd.key { display: inline-block; font: 500 10px/14px var(--mono); padding: 0 4px
 .sagacard h3 small { font: 500 11px var(--mono); color: var(--brass); margin-left: 8px; }
 .sagacard .goal { font-style: italic; color: #d8ceb9; }
 .sagacard .meta { display: flex; gap: 14px; flex-wrap: wrap; font: 400 11.5px var(--mono); color: var(--text-dim); }
-.sagago { align-self: flex-start; height: 24px; padding: 0 11px; border-radius: 12px; border: 1px solid #5b4526; background: #1d1812; font: 500 12px var(--mono); color: var(--brass-hi); display: inline-flex; align-items: center; }
+.sagago { align-self: flex-start; height: 28px; padding: 0 12px; border-radius: 14px; border: 1px solid #5b4526; background: #1d1812; font: 500 12px var(--mono); color: var(--brass-hi); display: inline-flex; align-items: center; }
 button.sagago:hover { background: #2a2117; }
 .sagago.hot { background: var(--brass); color: #1a1208; border-color: var(--brass); }
 .sagago.idle { border-style: dashed; color: var(--text-dim); }
@@ -142,13 +183,14 @@ pre, .log { font: 400 12px/1.55 var(--mono); color: #b9c0c7; white-space: pre-wr
 
 /* ── the reckoning ─────────────────────────────────────────────────────── */
 /* every row pinned: a quiet cycle (no queue strip) must not float PROCEED mid-screen */
-.reckpage { height: 100vh; display: grid; grid-template-rows: 56px auto minmax(0, 1fr) auto; background: var(--ground); }
+.reckpage { height: 100vh; display: grid; grid-template-rows: var(--top-h) auto minmax(0, 1fr) auto; background: var(--ground); }
 .reckhead { grid-row: 1; background: var(--bar); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 18px; padding: 0 18px; font: 500 12.5px var(--mono); color: var(--text-dim); }
 .reckback { display: flex; gap: 4px; margin-left: auto; flex-wrap: wrap; }
-.rbtn { height: 24px; min-width: 28px; padding: 0 6px; border: 1px solid #3a444c; border-radius: 3px; font: 500 11px var(--mono); color: var(--text-dim); }
+.rbtn { height: 28px; min-width: 28px; padding: 0 7px; border: 1px solid #3a444c; border-radius: 4px; font: 500 11.5px var(--mono); color: var(--text-dim); }
 .rbtn.on { border-color: var(--brass); color: var(--cream); }
 .reckqueue { grid-row: 2; padding: 8px 18px; font: 400 12px var(--mono); color: #7cc7bf; border-bottom: 1px solid var(--line-2); }
-.reckbody { grid-row: 3; min-height: 0; overflow-y: auto; padding: 24px max(24px, calc(50% - 400px)) 40px; display: flex; flex-direction: column; gap: 10px; }
+.reckbody:focus, .cbody:focus { outline: none; }
+.reckbody { grid-row: 3; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 18px max(20px, calc(50% - 400px)) 28px; display: flex; flex-direction: column; gap: 10px; }
 .reckbody p { max-width: 70ch; }
 .rloose { display: flex; flex-direction: column; gap: 6px; padding: 4px 22px; }
 .r-title { font-size: 21px; font-weight: 700; color: #f3e9d2; margin-top: 18px; }
@@ -185,16 +227,18 @@ pre, .log { font: 400 12px/1.55 var(--mono); color: #b9c0c7; white-space: pre-wr
 .coinrow .tick { position: absolute; top: -5px; bottom: -5px; width: 2px; translate: -1px 0; border-radius: 1px; }
 .coinrow .tick.part { background: var(--part); }
 .coinrow .tick.bar { background: var(--good); }
-.coinrow .tick em { position: absolute; left: 50%; translate: -50% 0; font: 500 9.5px var(--mono); font-style: normal; white-space: nowrap; }
+.coinrow .tick em { position: absolute; left: 50%; translate: -50% 0; font: 500 11px var(--mono); font-style: normal; white-space: nowrap; }
+.coinrow .tick.start em { left: 0; translate: 0 0; }
+.coinrow .tick.end em { left: auto; right: 0; translate: 0 0; }
 .coinrow .tick.bar em { bottom: 100%; color: var(--good); }
 .coinrow .tick.part em { top: 100%; color: var(--part); }
-.rwhy summary { width: max-content; font: 500 11px var(--mono); color: var(--brass); cursor: pointer; }
+.rwhy summary { width: max-content; padding: 6px 0; font: 500 11.5px var(--mono); color: var(--brass); cursor: pointer; }
 .rwhy[open] summary { margin-bottom: 4px; }
 /* the footer: the spoils beside PROCEED */
-.reckfoot { grid-row: 4; min-height: 70px; display: flex; align-items: center; justify-content: center; gap: 18px; padding: 10px 18px; flex-wrap: wrap; border-top: 1px solid var(--line); background: var(--bar); }
+.reckfoot { grid-row: 4; min-height: 62px; display: flex; align-items: center; justify-content: center; gap: 18px; padding: 10px 18px; flex-wrap: wrap; border-top: 1px solid var(--line); background: var(--bar); }
 .tally { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; min-width: 0; flex: 0 1 auto; }
 .tally .lbl { margin-right: 4px; color: var(--brass); }
-.tchip { height: 26px; padding: 0 11px; border-radius: 13px; display: inline-flex; align-items: center; border: 1px solid #4a3a22; background: #1d1812; font: 500 12px var(--mono); color: var(--cream); white-space: nowrap; }
+.tchip { height: 28px; padding: 0 11px; border-radius: 14px; display: inline-flex; align-items: center; border: 1px solid #4a3a22; background: #1d1812; font: 500 12px var(--mono); color: var(--cream); white-space: nowrap; }
 .tchip.good { border-color: #4f7e49; color: #c6e8bd; background: #141c13; }
 .tchip.bad { border-color: #9b2f26; color: #ff9d90; background: #241512; }
 .tchip.info { color: var(--text-dim); }

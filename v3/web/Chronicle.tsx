@@ -1,17 +1,20 @@
 // THE CHRONICLE — sagas, people & places, the log, the AI ledger; and the reckoning page.
 import React, { useEffect, useRef, useState } from 'react';
-import { type S, gateOf } from './ui';
+import { type S, gateOf, useKeyScroll } from './ui';
 
 export function Chronicle({ s, openQuest, openLeads }: { s: S; openQuest?: (id: string) => void; openLeads?: () => void }) {
   const [tab, setTab] = useState<'sagas' | 'lore' | 'log' | 'ai'>('sagas');
   const lore = gateOf(s, 'lore');
+  const body = useRef<HTMLDivElement>(null);
+  useKeyScroll(body);
+  useEffect(() => { body.current?.scrollTo({ top: 0 }) }, [tab]);
   return (
     <div className="chronicle">
       <div className="ctabs" role="tablist">
         {([['sagas', 'Sagas'], ['lore', 'People & places'], ['log', 'Log'], ['ai', 'AI ledger']] as const).map(([k, l]) =>
           <button key={k} role="tab" className={tab === k ? 'on' : ''} onClick={() => setTab(k)}>{l}</button>)}
       </div>
-      <div className="cbody">
+      <div className="cbody" ref={body} tabIndex={-1}>
         {tab === 'sagas' && <Chains s={s} openQuest={openQuest} openLeads={openLeads} />}
         {tab === 'lore' && (lore && !lore.open ? <p className="empty">Build a <b>{lore.need}</b> to keep the lore.</p> : <Lore s={s} />)}
         {tab === 'log' && <pre className="log">{s.log.map((l: any) => `c${l.cycle} [${l.kind}] ${l.text}`).join('\n')}</pre>}
@@ -136,11 +139,13 @@ function CoinRow({ m }: { m: Meta }) {
   const n = Math.max(m.coins, Math.ceil(m.bar), 1);
   const pitch = Math.max(6, Math.min(16, Math.floor(560 / n)));
   const x = (v: number) => Math.min(v, n) * pitch;
+  const edge = (px: number) => px < 32 ? ' start' : px > n * pitch - 32 ? ' end' : '';
   return (
     <div className="coinrow" style={{ width: n * pitch }} role="img" aria-label={`${m.heads} heads of ${m.coins} coins; partial at ${m.partialAt.toFixed(1)}, success at ${m.bar.toFixed(1)}`}>
       {Array.from({ length: n }, (_, i) => <i key={i} className={i < m.heads ? 'h' : i < m.coins ? 't' : 'x'} style={{ width: pitch - 2 }} />)}
-      <span className="tick part" style={{ left: x(m.partialAt) }}><em>partial</em></span>
-      <span className="tick bar" style={{ left: x(m.bar) }}><em>success</em></span>
+      {/* a label near either end of the row hangs INTO the row, never past it */}
+      <span className={'tick part' + edge(x(m.partialAt))} style={{ left: x(m.partialAt) }}><em>partial</em></span>
+      <span className={'tick bar' + edge(x(m.bar))} style={{ left: x(m.bar) }}><em>success</em></span>
     </div>
   );
 }
@@ -259,13 +264,25 @@ export function Reckoning({ s, busy, reckAt, jobs, onProceed, openQuest: _openQu
   const initial = useRef<Set<string> | null>(null);
   if (initial.current === null) initial.current = new Set(meta.map(m => m.questId));
 
-  // Enter / Space = PROCEED (only when nothing interactive has the focus — a focused button keeps its own keys)
+  // the report takes the page keys from the moment it opens (it has the focus; the page keys fall back to it)
+  const bodyRef = useRef<HTMLElement>(null);
+  useKeyScroll(bodyRef);
+  useEffect(() => { bodyRef.current?.focus({ preventScroll: true }) }, []);
+  // Enter = PROCEED. Space reads on (a page down) while there is more below, and proceeds only at the
+  // end — the browser's page-down key must not skip an unread report. Neither fires on a focused
+  // button, link or disclosure (those keep their own keys).
   const proceedRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === 'BUTTON' || tag === 'INPUT' || tag === 'SUMMARY' || tag === 'A' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (e.key === ' ') {
+        if (e.defaultPrevented) return;                      // the page keys already read on
+        const b = bodyRef.current;
+        if (b && b.scrollTop + b.clientHeight < b.scrollHeight - 4) { e.preventDefault(); b.scrollBy({ top: Math.max(40, b.clientHeight * 0.85) }); return }
+      }
       if (proceedRef.current && !proceedRef.current.disabled) { e.preventDefault(); proceedRef.current.click() }
     };
     addEventListener('keydown', onKey);
@@ -284,7 +301,7 @@ export function Reckoning({ s, busy, reckAt, jobs, onProceed, openQuest: _openQu
         </span>}
       </header>
       {out.length > 0 && <div className="reckqueue">✎ still writing: {out.map(j => j.title).join(' · ')}</div>}
-      <main className="reckbody">
+      <main className="reckbody" ref={bodyRef} tabIndex={-1}>
         {segs.map(sg => sg.kind === 'loose'
           ? <div key={`l${sg.at}`} className="rloose">{sg.lines.map((l, k) => <p key={k} className={lineClass(l)}>{l}</p>)}</div>
           : <Block key={`b${sg.at}-${sg.meta?.questId ?? ''}`} seg={sg} fresh={!past && !!sg.meta && !initial.current!.has(sg.meta.questId)} />)}

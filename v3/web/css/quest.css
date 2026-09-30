@@ -10,7 +10,7 @@
 .hc { position: relative; width: 96px; height: 132px; border-radius: 6px; background: #cfd6cf; box-shadow: 0 0 0 1px #5f6f68, 0 4px 10px rgba(0,0,0,.5); color: #1f2622; text-align: left; }
 .hc .nm { position: absolute; left: 0; top: 0; right: 0; padding: 5px 7px; font-size: 12px; font-weight: 700; line-height: 1.1; border-bottom: 1px dotted #7d8a84; }
 .hc .mono { position: absolute; left: 0; right: 0; top: 46px; text-align: center; font-family: var(--sc); font-size: 32px; color: #55645d; }
-.hc .rl { position: absolute; left: 0; right: 0; bottom: 0; padding: 3px 7px; font: 500 9.5px var(--mono); color: #44524b; border-top: 1px dotted #7d8a84; }
+.hc .rl { position: absolute; left: 0; right: 0; bottom: 0; padding: 2px 6px; font: 500 11.5px/15px var(--cond); color: #3a4741; border-top: 1px dotted #7d8a84; }
 .clasp { position: absolute; top: 54px; width: 10px; height: 26px; background: linear-gradient(#f1d38c, #8a6529); border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,.6); }
 .clasp.l { left: -6px; } .clasp.r { right: -6px; }
 .hwho { font-size: 11.5px; line-height: 1.3; color: #b9cfc8; font-style: italic; }
@@ -27,12 +27,19 @@
 .appr .aw { font: 500 11px/1.3 var(--mono); color: #ffd48a; }
 .appr .af { display: flex; flex-direction: column; gap: 3px; font: 400 11px/1.35 var(--mono); color: #c3d6cf; }
 .appr .af b { color: var(--ap); font-weight: 600; }
-.appr .best { align-self: flex-start; max-width: 100%; padding: 1px 6px; border-radius: 3px; color: #0b0d0f; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* who the card names wraps rather than lose its tail ('(busy)' — sending them pulls them off another quest) */
+.appr .best { align-self: flex-start; max-width: 100%; padding: 1px 6px; border-radius: 3px; color: #0b0d0f; font-weight: 600; }
+/* chosen: each ending is one line; the chosen one's places are the niches below (its facts in the tooltip) */
+.approaches.slim .appr { flex-direction: row; align-items: center; gap: 8px; min-height: 34px; padding: 5px 9px 5px 11px; }
+.approaches.slim .appr .al { min-width: 0; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.approaches.slim .appr .aw { flex: none; max-width: 50%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .appr .best.none { background: #3b3f43; color: #e8ecef; font-weight: 500; }
 
 /* ── the niches ── */
 .scene.choosing .approaches { order: 2; }
 .stagerow { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: flex-start; gap: 14px 26px; }
+/* a tall window: the niches sit mid-scene, not stuck under the top edge above an empty field */
+.scene:not(.choosing) .stagerow { margin-block: auto; }
 .stagerow .held { flex: none; max-width: 100%; }
 .sendblock { flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
 .scene.dragging .sendlbl { visibility: hidden; }   /* the drop chips speak for it mid-drag */
@@ -53,14 +60,15 @@
 .arch.over { scale: 1.06; box-shadow: inset 0 0 0 3px #fff1c8, inset 0 0 0 5px #1d1b12, inset 0 0 0 7px #fff1c8, 0 0 36px rgba(255,226,150,.8); }
 .arch.nogo.over { scale: 1; opacity: .85; filter: none; box-shadow: inset 0 0 0 2px #e0776b, inset 0 0 0 5px #1d1b12, inset 0 0 0 6px #e0776b, 0 6px 18px rgba(0,0,0,.6); }
 .dchip { position: absolute; left: 50%; bottom: calc(100% + 6px); translate: -50% 0; z-index: 6; pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 3px 8px; border-radius: 6px; background: #d9d0bb; color: #0b0d0f; font: 600 11.5px/1.2 var(--mono); white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.6); animation: drop-in .18s ease-out; }
-.dchip em { font: 500 10px/1.2 var(--mono); font-style: normal; opacity: .85; }
+.dchip em { font: 500 11px/1.2 var(--mono); font-style: normal; opacity: .9; }
 .dchip.good { background: var(--good); } .dchip.part { background: var(--part); } .dchip.bad { background: var(--bad); }
 .dchip.no { background: #3b3f43; color: #e8ecef; font-weight: 500; white-space: normal; width: max-content; max-width: 170px; text-align: center; }
 .dchip.here { background: #2a2117; color: var(--cream); border: 1px solid var(--brass-dim); }
 /* a card seated in a niche: it LANDS (scale + glow, ending at rest), ✕ in the corner sends it back */
 .seat { position: relative; animation: q-land .32s ease-out; }
 @keyframes q-land { from { scale: 1.14; filter: drop-shadow(0 0 14px rgba(255,214,120,.95)); } }
-.sendback { position: absolute; top: -8px; right: -8px; z-index: 5; width: 22px; height: 22px; border-radius: 50%; background: #1d1812; border: 1px solid #8a6529; color: #f1d38c; font: 600 11px/1 var(--mono); display: flex; align-items: center; justify-content: center; opacity: .75; box-shadow: 0 1px 4px rgba(0,0,0,.6); }
+/* ✕ sits on the arch beside the card (a sliver over its edge) — never on its name, face or verdict */
+.sendback { position: absolute; bottom: 26px; right: -25px; z-index: 5; width: 28px; height: 28px; border-radius: 50%; background: #1d1812; border: 1px solid #8a6529; color: #f1d38c; font: 600 13px/1 var(--mono); display: flex; align-items: center; justify-content: center; opacity: .8; box-shadow: 0 1px 4px rgba(0,0,0,.6); }
 .seat:hover .sendback, .sendback:focus-visible { opacity: 1; }
 .sendback:hover { background: #3a1c19; border-color: var(--bad); color: #ffd9d2; }
 .niche .test { font: 500 12px var(--mono); color: #e7dcc3; display: flex; gap: 10px; }
@@ -74,14 +82,14 @@
 /* ── the roll: the engine's pooled band, pinned to the scene's foot ── */
 .gauge { position: sticky; bottom: 0; z-index: 4; margin: auto -26px 0; padding: 12px 26px 14px; display: flex; flex-direction: column; gap: 8px; background: #12201b; border-top: 1px solid #2c4a42; box-shadow: 0 -8px 16px rgba(10,18,15,.7); }
 .questpage .verdict { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.gk { font: 500 10.5px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: #9cc7bd; }
+.gk { font: 500 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: #9cc7bd; }
 .vw { font: 700 17px var(--mono); color: #f1e6cc; text-align: right; }
 .vw.wait { font: 400 12.5px var(--mono); color: #c3d6cf; }
 .vw[data-c="good"] { color: var(--good); } .vw[data-c="even"] { color: var(--even); } .vw[data-c="part"] { color: var(--part); } .vw[data-c="bad"] { color: #ff8e80; }
 .meter { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
 .seg { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .seg i { display: block; height: 10px; border-radius: 3px; background: #1c2d27; box-shadow: inset 0 0 0 1px #2c4a42; transition: background .2s, box-shadow .2s; }
-.seg em { font: 400 10.5px/1.2 var(--mono); font-style: normal; color: #6f8a82; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seg em { font: 400 11px/1.2 var(--mono); font-style: normal; color: #8fa9a1; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .meter.lit .seg i { background: #1a2723; }
 .seg.on i { height: 14px; margin-top: -2px; box-shadow: 0 0 12px rgba(255,255,255,.18); }
 .seg.on[data-c="good"] i { background: var(--good); } .seg.on[data-c="even"] i { background: var(--even); }
@@ -92,9 +100,10 @@
 /* ── the writ ── */
 .writ { position: relative; border-radius: 6px; background: #141110; box-shadow: inset 0 0 0 1px #5b4526, inset 0 0 0 6px #141110, inset 0 0 0 7px #3a2c18; display: flex; flex-direction: column; min-height: 0; }
 .writ .wh { padding: 16px 26px 0; display: flex; flex-direction: column; gap: 7px; }
+.writ .whtop { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .questpage .back { align-self: flex-start; font: 500 12px var(--mono); color: var(--text); border: 1px solid #3a444c; border-radius: 5px; height: 30px; padding: 0 10px; }
 .questpage .back span { color: var(--text-faint); margin-left: 6px; }
-.questpage .kind { font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--brass); }
+.questpage .kind { font: 500 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--brass); }
 .titlerow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .titlerow h1 { font-size: 27px; font-weight: 700; color: #f3e9d2; line-height: 1.15; text-wrap: balance; }
 .questpage .chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
@@ -103,7 +112,7 @@
 /* a standing post renews every cycle: neutral teal, never the alarm red (the map's '↻ daily') */
 .questpage .clock.renew { background: #17302e; color: #9fd0c8; border: 1px solid #2f7a74; }
 .questpage .loot { height: 22px; padding: 0 9px; border-radius: 11px; background: #2a2117; border: 1px solid #8a6529; color: #f1d38c; font: 500 11.5px var(--mono); display: flex; align-items: center; white-space: nowrap; }
-.questpage .loot::before { content: '✦'; margin-right: 5px; color: var(--brass-hi); font-size: 10px; }
+.questpage .loot::before { content: '✦'; margin-right: 5px; color: var(--brass-hi); font-size: 11px; }
 .questpage .owed { font: 400 11.5px var(--mono); color: #b8ab8f; font-style: italic; }
 .questpage .rwarn { height: 22px; padding: 0 8px; border-radius: 3px; background: #3d2a10; border: 1px solid #b07a24; color: #ffd48a; font: 500 11px var(--mono); display: flex; align-items: center; }
 .questpage .saga { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 14px; padding: 7px 10px; border-radius: 5px; background: #0f1a18; border: 1px solid #2b4a44; font: 400 11.5px var(--mono); color: #b9cfc8; }
@@ -127,7 +136,7 @@
 .questpage .sit { font-size: 16.5px; line-height: 1.62; color: #dcd3c1; max-width: 64ch; }
 .hr { height: 1px; background: #2e2620; }
 .lineh { display: flex; flex-direction: column; gap: 3px; }
-.lk { font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-faint); }
+.lk { font: 500 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-faint); }
 .lv { font-size: 15px; line-height: 1.5; color: #e9e0cb; }
 .writ .btns { position: relative; min-height: 63px; display: flex; gap: 8px; align-items: center; padding: 12px 16px; border-top: 1px solid #2e2620; background: #100d0c; border-radius: 0 0 6px 6px; }
 .consequence { position: absolute; left: 10px; right: 10px; bottom: calc(100% + 6px); z-index: 5; padding: 8px 12px; border-radius: 5px; background: #3a1c19; border: 1px solid var(--bad); color: #ffd9d2; font: 500 12px/1.4 var(--mono); box-shadow: 0 4px 14px rgba(0,0,0,.6); animation: drop-in .18s ease-out; }
@@ -156,4 +165,11 @@
   .writ .wh { padding-top: 12px; gap: 6px; }
   .titlerow h1 { font-size: 24px; }
   .questpage .sit { font-size: 15.5px; line-height: 1.55; }
+}
+/* a tall window: the niches — and the soldiers in them — grow into the scene instead of leaving it empty */
+@media (min-height: 900px) {
+  .niche { width: 178px; }
+  .arch { width: 152px; height: 222px; border-radius: 76px 76px 8px 8px; padding-bottom: 16px; }
+  .arch .card.small { width: 110px; height: 156px; }
+  .hc { width: 110px; height: 150px; } .heldone { width: 110px; } .hc .mono { top: 56px; font-size: 36px; } .clasp { top: 62px; }
 }

@@ -7,7 +7,20 @@
   --good: #8fc285; --even: #d7d27a; --part: #e2b04f; --bad: #e0776b;
   --text: #d3d7dc; --text-dim: #9aa2ab; --text-faint: #8a939c; --cream: #ecd9ae;
   --serif: "Spectral", Georgia, serif; --sc: "Spectral SC", "Spectral", Georgia, serif; --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  /* the card face's small print: a condensed face gets more words into a 77px card at a READABLE size */
+  --cond: "IBM Plex Sans Condensed", "Arial Narrow", sans-serif;
+  /* the chrome budget: ONE top bar, and a hand whose cards scale with the window's HEIGHT, so a short
+     laptop window still gives the stage most of the screen (1536×740: 46 + 125 = 171px of chrome) */
+  --top-h: 46px;
+  --card-h: clamp(104px, 15vh, 148px);
+  --card-w: calc(var(--card-h) * .74);
+  --hand-pad: 7px;
+  --hand-h: calc(var(--card-h) + 2 * var(--hand-pad));
+  --seal: calc(var(--hand-h) - 2 * var(--hand-pad) - 30px);   /* room under it for a two-line warning */
+  --sealbox-w: 150px;
 }
+/* the hand folded to a strip (a per-viewer choice; it unfolds whenever it is armed) */
+.app.handmin { --hand-h: 46px; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body, #root { height: 100%; }
 body { background: var(--ground); color: var(--text); font: 15px/1.5 var(--serif); overflow: hidden; }
@@ -19,15 +32,15 @@ select { background: #0e1214; border: 1px solid #3a444c; border-radius: 4px; pad
 .empty { font-style: italic; color: var(--text-dim); padding: 14px; }
 .dimp { color: var(--text-faint); }
 .p { font-size: 14.5px; line-height: 1.55; color: #c9c3b6; }
-.lbl { font: 500 10.5px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-faint); }
+.lbl { font: 500 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-faint); }
 .btn { height: 32px; padding: 0 13px; border-radius: 5px; border: 1px solid #5b4526; background: #1d1812; color: var(--cream); font: 500 12px var(--mono); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .btn:hover:not(:disabled) { background: #2a2117; border-color: var(--brass-dim); }
 .btn.solid { background: var(--brass); color: #1a1208; border-color: var(--brass); }
 .btn.solid:hover:not(:disabled) { background: var(--brass-hi); }
 .btn.ghost { border-color: #333b42; background: transparent; color: var(--text-dim); }
-.btn.sm { height: 26px; padding: 0 9px; font-size: 11.5px; }
+.btn.sm { height: 28px; padding: 0 10px; font-size: 11.5px; }
 .btn.on { background: var(--brass); color: #1a1208; border-color: var(--brass); }
-.fc { height: 24px; padding: 0 10px; border-radius: 12px; border: 1px solid #2c343a; color: var(--text-dim); font: 400 11.5px var(--mono); }
+.fc { height: 28px; padding: 0 10px; border-radius: 14px; border: 1px solid #2c343a; color: var(--text-dim); font: 400 11.5px var(--mono); }
 .fc.on { border-color: var(--brass-dim); color: var(--cream); background: #221a12; }
 .spin { display: inline-block; width: 11px; height: 11px; border: 2px solid var(--brass-dim); border-top-color: var(--brass-hi); border-radius: 50%; animation: spin .7s linear infinite; vertical-align: -1px; }
 @keyframes spin { to { transform: rotate(360deg); } }

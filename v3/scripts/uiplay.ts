@@ -147,7 +147,7 @@ s = await state();
     const h = s.holding[0];
     check((await text(page, '.holdrow .lapse')).startsWith(h.deadline), 'the holding row prints the engine\'s deadline words (holding-deadline-wording)', await text(page, '.holdrow .lapse'));
     await (await byText(page, '.hand .bag', /Captives/))?.click(); await sleep(300);
-    const holdCards = await page.$$eval('.hand .card .rib', els => els.filter(e => e.textContent === 'HOLDING').length);
+    const holdCards = await page.$$eval('.hand .card .stc.hold', els => els.filter(e => e.textContent === 'HOLDING').length);
     check(holdCards === s.holding.length, 'the hand\'s Captives bag shows the ones in holding (holding-unreachable-no-cell)', `${holdCards}/${s.holding.length}`);
     await goto(`/?card=${h.id}`);
     const sheetTxt = await text(page, '.sheet');
@@ -241,8 +241,12 @@ s = await state();
     ?? (await state()).quests.find((q: any) => !q.approaches && q.slots.length >= 2);
   if (mq) {
     await goto(`/?quest=${mq.id}`);
-    const unarmed = await page.$$eval('.hand .card.soldier .badge', els => els.map(e => e.textContent ?? ''));
-    check(unarmed.length > 0 && unarmed.every(b => /^[A-Z+]+ \d+c · (strong|fair|weak)$/.test(b)), 'unarmed hand badges say the place, the coins WITH the unit, and the word (badge-unit-and-word)', unarmed[0]);
+    // the badge is ONE line on the foot row (coins with the unit, and the word); which place rides in the
+    // card's note (or, when the note says where they are placed now, in its tooltip) — never over the face
+    const unarmed = await page.$$eval('.hand .card.soldier', els => els.filter(e => e.querySelector('.badge')).map(e => ({
+      b: e.querySelector('.badge')!.textContent ?? '', n: e.querySelector('.note')?.textContent ?? '', t: e.getAttribute('title') ?? '' })));
+    check(unarmed.length > 0 && unarmed.every(u => /^\d+c · (strong|fair|weak)$/.test(u.b) && (/^[A-Z+]+ place$/.test(u.n) || /best place here: [A-Z+]+/.test(u.t))),
+      'unarmed hand badges say the coins WITH the unit and the word; the card says the place (badge-unit-and-word)', unarmed[0] ? `${unarmed[0].b} · ${unarmed[0].n}` : 'none');
     await (await page.$('.arch .empty'))?.click(); await sleep(300);
     const armed = await page.$$eval('.hand .card.soldier .badge', els => els.map(e => e.textContent ?? ''));
     check(armed.length > 0 && armed.every(b => /^\d+c · (strong|fair|weak)$/.test(b)), 'armed hand badges carry the unit and the strength word', armed[0]);
@@ -801,6 +805,59 @@ if (s.pursuable > 0 && s.quests.length + s.pursuable <= 14) {
       return { fb: f.bottom, tb: t.bottom, ft: f.top, tt: t.top } }) : null;
     check(!!box && box.fb <= box.tb + 1 && box.ft >= box.tt - 1, 'a header floater stays inside the header bar (floater-over-nextsteps)', box ? `${Math.round(box.ft)}–${Math.round(box.fb)} in ${Math.round(box.tt)}–${Math.round(box.tb)}` : 'no floater seen');
   } else skip('header floater', 'no relic to sell');
+}
+
+// ── the space budget (designer 2026-09-30: "wdym i have to scroll inside the page for the surface in a tiny box
+//    … the header way too big" · "the BUILD menu is even worse, i cant even scroll it down") ──
+for (const [W, H] of [[1280, 650], [1536, 740]] as const) {
+  await page.setViewport({ width: W, height: H });
+  await goto('/?screen=fort');
+  // (a string: tsx would wrap an arrow helper inside the page function in __name, which the page lacks)
+  const m = await page.evaluate(`(() => {
+    const h = sel => document.querySelector(sel)?.getBoundingClientRect().height ?? 0;
+    const xs = document.querySelector('.xs');
+    return { chrome: h('.top') + h('.hand'), stage: h('.stage'), fits: !!xs && xs.scrollHeight <= xs.clientHeight + 1, says: !!document.querySelector('.xsmore') };
+  })()`) as { chrome: number; stage: number; fits: boolean; says: boolean };
+  check(m.chrome <= 180, `the top bar + hand leave the stage the window at ${W}×${H} (chrome-budget)`, `chrome ${Math.round(m.chrome)}px · stage ${Math.round(m.stage)}px`);
+  check(m.fits || m.says, `the whole hold shows without a scroll box at ${W}×${H} — or, too deep, says so (fort-scroll-box)`, m.fits ? 'fits' : 'scrolls, marked');
+}
+{
+  await page.setViewport({ width: 1366, height: 650 });
+  await goto('/?screen=fort');
+  const body = await page.$('.panel .pbody');
+  if (body) {
+    const b = (await body.boundingBox())!;
+    await page.mouse.move(b.x + b.width / 2, b.y + b.height - 40);
+    await page.mouse.wheel({ deltaY: 500 }); await sleep(500);
+    const read = () => page.evaluate(() => { const p = document.querySelector('.panel .pbody') as HTMLElement; const ph = p.querySelector('.ph')!.getBoundingClientRect();
+      return { top: Math.round(p.scrollTop), max: p.scrollHeight - p.clientHeight, stuck: Math.abs(ph.top - p.getBoundingClientRect().top) <= 2 } });
+    const r = await read();
+    check(r.max > 0 && r.top > 0 && r.stuck, 'the build list scrolls with the mouse wheel; the BUILD line and its categories stay on top (build-list-scroll)', `${r.top}/${r.max}px`);
+    await page.focus('.panel .pbody'); await page.keyboard.press('Home'); await sleep(500);
+    const k0 = await read();
+    await page.keyboard.press('End'); await sleep(500);
+    const k = await read();
+    check(k0.top === 0 && k.top >= k.max - 2, 'the build list scrolls from the keyboard too — Home to its top, End to its last row (build-list-scroll)', `${k0.top} → ${k.top}/${k.max}px`);
+  } else skip('build list scroll', 'no build list on the fort screen');
+}
+{
+  await page.setViewport({ width: 1440, height: 900 });
+  await goto('/?screen=chronicle');
+  const handH = () => page.$eval('.hand', e => Math.round(e.getBoundingClientRect().height)).catch(() => 0);
+  const open0 = await handH();
+  await (await page.$('.hand .fold'))?.click(); await sleep(300);
+  const folded = await handH();
+  await goto('/?screen=chronicle');
+  const kept = await handH();
+  const seal = await count(page, 'button.seal');
+  const q0 = (await state()).quests.find((q: any) => !q.approaches)?.id;
+  await goto(q0 ? `/?quest=${q0}` : '/?screen=fort');
+  const armed = await handH();
+  check(open0 > 100 && folded < 60 && kept < 60 && seal === 1 && armed > 100,
+    'the hand folds to a strip, stays folded on reload, keeps the seal, and opens by itself on a quest (hand-fold)', `${open0} → ${folded} → reload ${kept} → quest ${armed}px`);
+  await goto('/?screen=chronicle');
+  await (await page.$('.hand .fold'))?.click(); await sleep(300);
+  check(await handH() > 100, 'the folded hand opens again from its strip (hand-fold)');
 }
 
 // ── 1280×800: no horizontal scroll on any screen ──

@@ -43,7 +43,14 @@ await shot('09c-fort-dungeon', '/?screen=fort', room(roomOf('dungeon')));
 await shot('09d-fort-holding', '/?screen=fort', room(roomOf('holding-cell')));
 await shot('09e-fort-gh', '/?screen=fort', room(roomOf('great-hall')));
 await shot('09f-fort-bare', '/?screen=fort', room(st.fort.rooms.find((r: any) => r.kind && !r.slots.length)?.id));
+await shot('08b-fort-build-scrolled', '/?screen=fort', async () => {
+  const el = await p.$('.panel .pbody'); const bx = await el?.boundingBox();
+  if (bx) { await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height - 40); await p.mouse.wheel({ deltaY: 400 }) }
+});
 await shot('10-chronicle', '/?screen=chronicle');
+// the hand folded to a strip (then unfolded again, so the later shots see the whole hand)
+await shot('10b-chronicle-hand-folded', '/?screen=chronicle', async () => { await (await p.$('.hand .fold'))?.click() });
+await (await p.$('.hand .fold'))?.click(); await wait(300);
 await shot('11-drawer', '/?drawer=1');
 if (merc) await shot('12-sheet', `/?card=${merc}`);
 const cap = st.captives.find((c: any) => c.state === 'breaking') ?? st.captives[0];

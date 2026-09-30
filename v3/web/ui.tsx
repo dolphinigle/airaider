@@ -1,5 +1,5 @@
 // Shared bits for every screen: the action call, drawn icons, card faces, tag chips.
-import React from 'react';
+import React, { useEffect } from 'react';
 
 export type S = any; // the /api/state view-model (prototype: untyped client)
 export type Act = (type: string, ...args: (string | number)[]) => Promise<void>;
@@ -22,6 +22,46 @@ export const HOLDING_SEL = '@holding';
 /** reduced motion: scroll without the glide (an explicit 'smooth' in a call beats the CSS guard) */
 export const scrollBehavior = (): ScrollBehavior =>
   typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+
+/* ── the page keys ─────────────────────────────────────────────────────────────────────
+   The document never scrolls (body is overflow:hidden), so PageUp/PageDown/Home/End/the arrows — and
+   Space, when the focus is not on something Space presses — had nowhere to go until the player clicked
+   inside a panel. Each reading surface registers its scroll region; the topmost one takes those keys
+   whenever the focus is not already inside something that scrolls (or types). */
+const keyScrollers: React.RefObject<HTMLElement | null>[] = [];
+let keyScrollOn = false;
+function scrollsItself(el: Element | null): boolean {
+  for (let e = el as HTMLElement | null; e && e !== document.body; e = e.parentElement) {
+    const oy = getComputedStyle(e).overflowY;
+    if ((oy === 'auto' || oy === 'scroll') && e.scrollHeight > e.clientHeight + 1) return true;
+  }
+  return false;
+}
+function onPageKey(e: KeyboardEvent) {
+  if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
+  const el = [...keyScrollers].reverse().map(r => r.current).find(x => x?.isConnected);
+  if (!el) return;
+  const t = e.target as HTMLElement | null;
+  if (t?.closest?.('input, textarea, select, [contenteditable="true"]')) return;
+  if (t && t !== document.body && scrollsItself(t)) return;            // it already scrolls where the focus is
+  const page = Math.max(40, el.clientHeight * 0.85);
+  const presses = !!t?.closest?.('button, a, summary, [role="button"], [role="tab"]');
+  const by: Record<string, number> = { PageDown: page, PageUp: -page, ArrowDown: 40, ArrowUp: -40, Home: -1e9, End: 1e9 };
+  const d = e.key === ' ' ? (presses ? undefined : e.shiftKey ? -page : page) : by[e.key];
+  if (d == null) return;
+  // a region already at that end lets the key through (the reckoning's Space proceeds at the end)
+  if (d > 0 ? el.scrollTop + el.clientHeight >= el.scrollHeight - 2 : el.scrollTop <= 0) return;
+  e.preventDefault();
+  el.scrollBy({ top: d, behavior: Math.abs(d) > 1e8 ? 'auto' : scrollBehavior() });
+}
+export function useKeyScroll(ref: React.RefObject<HTMLElement | null>, on = true) {
+  useEffect(() => {
+    if (!on) return;
+    keyScrollers.push(ref);
+    if (!keyScrollOn) { addEventListener('keydown', onPageKey); keyScrollOn = true }
+    return () => { const i = keyScrollers.lastIndexOf(ref); if (i >= 0) keyScrollers.splice(i, 1) };
+  }, [on]);
+}
 
 /* ── drawn icons (stroke, currentColor) ─────────────────────────────────────────────── */
 const P: Record<string, string> = {
@@ -137,71 +177,88 @@ export const FORM_LABEL: Record<string, string> = {
 
 /* ── the card face ──────────────────────────────────────────────────────────────────── */
 /** a captive's / relic's status in one chip, from the engine's state + where it sits */
-export function cardStatus(c: any): { text: string; cls: string } | null {
+/** (`short`: the card face's form — the green chip already says "on show"; the sheet says it whole) */
+export function cardStatus(c: any): { text: string; cls: string; short?: string } | null {
   if (c.character?.role === 'captive') {
+    // taken on a job, not yet yours (holding): not in the cells, so not "raw" — held, on a clock
+    if (c.location?.kind === 'held' && c.location?.state === 'staged') return { text: 'HOLDING', cls: 'hold' };
     switch (c.state) {
       case 'raw': return { text: 'RAW', cls: 'raw' };
       case 'breaking': return { text: c.doneAt != null ? `RACK · c${c.doneAt}` : 'ON THE RACK', cls: 'rack' };
       case 'tamed': return { text: 'TAMED', cls: 'tamed' };
-      case 'onShow': return { text: `ON SHOW${c.whereName ? ' · ' + c.whereName : ''}`, cls: 'show' };
+      case 'onShow': return { text: `ON SHOW${c.whereName ? ' · ' + c.whereName : ''}`, cls: 'show', short: c.whereName ? `in ${c.whereName}` : undefined };
     }
     return null;
   }
-  if (c.type === 'relic' && c.location?.kind === 'room') return { text: `ON SHOW${c.whereName ? ' · ' + c.whereName : ''}`, cls: 'show' };
+  if (c.type === 'relic' && c.location?.kind === 'room') return { text: `ON SHOW${c.whereName ? ' · ' + c.whereName : ''}`, cls: 'show', short: c.whereName ? `in ${c.whereName}` : undefined };
   return null;
 }
 export type Ribbon = { text: string; tone: 'gold' | 'red' | 'teal' };
-/** the engine's reasons for one soldier's coins at one place, as chips: +roguery · −playful · wound −9 */
+/** the engine's reasons for one soldier's coins at one place: +roguery · −playful · wound −9 */
+const whyList = (why?: { plus?: string[]; minus?: string[]; wound?: number } | null): [string, string][] => !why ? [] :
+  [...(why.plus ?? []).map(t => ['p', '+' + t] as [string, string]), ...(why.minus ?? []).map(t => ['m', '−' + t] as [string, string]),
+    ...(why.wound ? [['w', `wound −${Math.round(why.wound)}`] as [string, string]] : [])];
 export function WhyChips({ why }: { why?: { plus?: string[]; minus?: string[]; wound?: number } | null }) {
-  if (!why) return null;
-  const chips = [...(why.plus ?? []).map(t => ['p', '+' + t]), ...(why.minus ?? []).map(t => ['m', '−' + t]),
-    ...(why.wound ? [['w', `wound −${Math.round(why.wound)}`]] : [])];
+  const chips = whyList(why);
   if (!chips.length) return null;
   return <span className="why">{chips.map(([k, t], i) => <i key={i} className={k}>{t}</i>)}</span>;
 }
 
-export function CardFace({ c, badge, badgeCls, note, dim, onClick, onDragStart, onDragEnd, small, title, ribbon, why, block, here }: {
+/** THE CARD FACE — a column, top to bottom: the NAME (in flow: nothing ever covers it) · the PICTURE
+ *  (it gives way: whatever else the card says makes it smaller, never covers it — a bust is cropped
+ *  face-first, so a small picture is still the face) · one status chip · ONE reason (a refusal, else
+ *  the note, else the why-chips, else the wound — two lines at most) · the xp line · the FOOT row
+ *  (level or kind, and a ribbon tag). When the hand is armed the verdict badge takes the whole foot
+ *  row. Everything the face had to leave out (the full reason, the why, the wound) is in its tooltip. */
+export function CardFace({ c, badge, badgeCls, note, more, dim, onClick, onDragStart, onDragEnd, small, title, ribbon, why, block, here }: {
   c: any; badge?: string; badgeCls?: string; note?: string; dim?: boolean; small?: boolean; title?: string;
   onClick?: () => void; onDragStart?: (e: React.DragEvent) => void; onDragEnd?: () => void;
   /** optional additions (all additive): a one-cycle ribbon ('+1 LV'), the engine's why-chips, a
-   *  refusal reason (greyed, not clickable), and 'here' (already placed where the hand is armed) */
-  ribbon?: Ribbon | null; why?: { plus?: string[]; minus?: string[]; wound?: number } | null; block?: string | null; here?: boolean;
+   *  refusal reason (greyed, not clickable), 'here' (already placed where the hand is armed), and
+   *  `more` — the reason in full, for the tooltip, when the face shows a short form */
+  ribbon?: Ribbon | null; why?: { plus?: string[]; minus?: string[]; wound?: number } | null; block?: string | null; here?: boolean; more?: string;
 }) {
   const ch = c.character;
   const kind = c.liability ? 'liab' : c.type === 'relic' ? 'relic' : ch?.role === 'captive' ? 'captive' : ch ? 'soldier' : 'stack';
   const drag = !!onDragStart;
   const st = cardStatus(c);
-  const stars = c.stars > 0 && (kind === 'relic' || kind === 'captive') ? '★'.repeat(Math.min(5, c.stars)) : '';
+  const stars = c.stars > 0 && (kind === 'relic' || kind === 'captive') ? `${Math.min(5, c.stars)}★` : '';
   const capped = kind === 'soldier' && c.cap != null && ch.level >= c.cap;
   const xpPct = kind === 'soldier' && c.xpNeeded ? Math.min(100, ch.xp / Math.max(1, c.xpNeeded) * 100) : null;
-  const cls = ['card', kind, dim && 'dim', small && 'small', block && 'blocked', here && 'here', ribbon && 'has-rib'].filter(Boolean).join(' ');
+  const wound = ch && ch.injury > 0 ? `wound ${ch.injury}${c.woundPenalty ? ` · −${Math.round(c.woundPenalty)}` : ''}` : '';
+  const whys = whyList(why);
+  // the ONE reason line: a refusal, else the note, else the why-chips, else the wound
+  const reason = block ? <span className="bk">{block}</span>
+    : note ? <span className="note">{note}</span>
+    : whys.length ? <WhyChips why={why} />
+    : wound && !badge ? <span className="wnd">{wound}</span> : null;
+  const tip = title ?? [c.name + (kind === 'captive' ? ` — captive, L${ch.level}` : kind === 'soldier' ? ` — L${ch.level}` : ''),
+    st && (st.short ? `on show ${st.short}` : st.text.toLowerCase()), badge, more ?? block ?? note, whys.map(w => w[1]).join(' '), wound, ribbon?.text].filter(Boolean).join(' — ');
+  const cls = ['card', kind, dim && 'dim', small && 'small', block && 'blocked', here && 'here'].filter(Boolean).join(' ');
   return (
-    <button className={cls} onClick={block ? undefined : onClick} title={title ?? (block ? `${c.name} — ${block}` : c.name)}
+    <button className={cls} onClick={block ? undefined : onClick} title={tip}
       aria-disabled={block ? true : undefined} draggable={drag} onDragStart={onDragStart} onDragEnd={onDragEnd}>
-      {kind === 'soldier' && (c.portrait
-        ? <img src={c.portrait} alt="" draggable={false} />
-        : <span className="paint"><Silhouette size={30} />{c.painting ? 'being painted…' : ''}</span>)}
-      {kind === 'captive' && <span className="paint cap"><Silhouette size={30} /></span>}
-      {kind === 'relic' && <span className="art"><Glyph name={formOf(c.tags) === 'document' ? 'scroll' : formOf(c.tags).includes('weapon') ? 'dagger' : formOf(c.tags) === 'armor' ? 'shield' : 'chest'} size={small ? 30 : 40} /></span>}
-      {(kind === 'liab' || kind === 'stack') && <span className="art"><Glyph name="scales" size={small ? 30 : 40} /></span>}
-      <span className="nm">{c.name}</span>
-      {ribbon && <span className={'rib ' + ribbon.tone}>{ribbon.text}</span>}
-      {ch && ch.injury > 0 && <span className="wnd">wound {ch.injury}{c.woundPenalty ? ` · −${Math.round(c.woundPenalty)}` : ''}</span>}
-      {badge && <span className={'badge ' + (badgeCls ?? '')}>{badge}</span>}
-      {c.qty > 1 && <span className="qty">{c.qty}</span>}
-      <span className="low">
-        {st && <span className={'stc ' + st.cls}>{st.text}</span>}
-        {block && <span className="bk">{block}</span>}
-        <WhyChips why={why} />
-        {note && <span className="note">{note}</span>}
-        {xpPct != null && <span className={'xpl' + (capped ? ' capd' : xpPct >= 100 ? ' full' : '')} title={`${ch.xp} / ${c.xpNeeded} xp`}><i style={{ width: `${xpPct}%` }} /></span>}
+      <span className="nm"><span className="nmt">{c.name}</span></span>
+      <span className="pic">
+        {kind === 'soldier' && (c.portrait
+          ? <img src={c.portrait} alt="" draggable={false} />
+          : <span className="paint"><Silhouette size={30} />{c.painting ? <em>being painted…</em> : null}</span>)}
+        {kind === 'captive' && <span className="paint cap"><Silhouette size={30} /></span>}
+        {kind === 'relic' && <span className="art"><Glyph name={formOf(c.tags) === 'document' ? 'scroll' : formOf(c.tags).includes('weapon') ? 'dagger' : formOf(c.tags) === 'armor' ? 'shield' : 'chest'} size={40} /></span>}
+        {(kind === 'liab' || kind === 'stack') && <span className="art"><Glyph name="scales" size={40} /></span>}
+        {c.qty > 1 && <span className="qty">{c.qty}</span>}
       </span>
-      <span className="ft">
-        {ch ? <><span>L{ch.level}{kind === 'captive' ? ' · captive' : ''}</span>
-          {capped ? <span className="cap" title={`held at level ${c.cap} — experience is going to waste`}>⛔ CAP</span> : stars ? <span className="st">{stars}</span> : null}</>
-          : c.liability ? <span>liability</span>
-          : <><span>{FORM_ONE[formOf(c.tags)]}</span>{stars && <span className="st">{stars}</span>}</>}
-      </span>
+      {st && <span className={'stc ' + st.cls}>{st.short ?? st.text}</span>}
+      {reason}
+      {xpPct != null && <span className={'xpl' + (capped ? ' capd' : xpPct >= 100 ? ' full' : '')} title={`${ch.xp} / ${c.xpNeeded} xp`}><i style={{ width: `${xpPct}%` }} /></span>}
+      {badge
+        ? <span className={'ft verdict badge ' + (badgeCls ?? '')}>{badge}</span>
+        : <span className="ft">
+          {ch ? <span>L{ch.level}</span> : c.liability ? <span>liability</span> : <span>{FORM_ONE[formOf(c.tags)]}</span>}
+          {ribbon ? <span className={'rib ' + ribbon.tone}>{ribbon.text}</span>
+            : capped ? <span className="cap" title={`held at level ${c.cap} — experience is going to waste`}>⛔ CAP</span>
+            : stars ? <span className="st">{stars}</span> : null}
+        </span>}
     </button>
   );
 }

@@ -1,7 +1,7 @@
 // Airaider v3 web GUI — the Sultan-style table: a map (home), the fort, the chronicle, and the
 // hand of cards always along the bottom. Design: docs/UI.md. Every action goes through /api/action
 // → the same Game methods the CLI calls (docs/DOGFOODING.md).
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useState, useCallback, useRef } from 'react';
 import { act, type S, HOLDING_SEL } from './ui';
 import { MapScreen } from './MapScreen';
 import { QuestPage } from './QuestPage';
@@ -27,6 +27,8 @@ const FORT_TARGETS = new Set(['fort', 'room', 'build', 'holding', 'tavern']);
 const STEP_GLYPH: Record<string, string> = {
   build: '⚒', approach: '♛', man: '⚔', pursue: '✎', holding: '⛓', hire: '✚', gh: '▲', setin: '✦', rack: '⛓', addplace: '+', end: '▸',
 };
+
+const HAND_KEY = 'airaider.hand.folded';
 
 type Toast = { id: number; msg: string; tone: Tone; open?: { label: string; run: () => void } };
 
@@ -54,7 +56,11 @@ export function App() {
   const [sealArmed, setSealArmed] = useState(false);
   const [sealHover, setSealHover] = useState(false);
   const [ghOpen, setGhOpen] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
   const [moreSteps, setMoreSteps] = useState(false);
+  // the hand folded to a strip — a per-viewer convenience (browser storage may be missing: then it just starts open)
+  const [handMin, setHandMin] = useState(() => { try { return localStorage.getItem(HAND_KEY) === '1' } catch { return false } });
+  const foldHand = (v: boolean) => { setHandMin(v); try { localStorage.setItem(HAND_KEY, v ? '1' : '0') } catch { /* private window */ } };
   // a next step / fix that names a room type to build: the build list scrolls to it and flashes it
   const [buildHi, setBuildHi] = useState<{ type: string; n: number } | null>(null);
 
@@ -281,39 +287,48 @@ export function App() {
   const ghFill = gh.need ? Math.min(1, s.prestige / gh.need) : 1;
   const hallId = roomOfType('great-hall');
 
+  // the hand folds to a strip (per viewer); whenever it is ARMED (an open quest, a selected room) it unfolds.
+  // The drawer folds it too: the drawer shows every card, so it takes the hand's room as well
+  const handArmed = (screen === 'map' && !!q) || (screen === 'fort' && !!fortSel);
+  const handFolded = drawer || (handMin && !handArmed);
+  const report = (s.reckoningCycles ?? []).length > 0
+    ? <button className="lastrep" title="the last report — read the last reckoning again" aria-label="last report"
+        onClick={() => { setSealHover(false); setReckAt(null); setReckoning(true) }}>📜</button> : null;
+
   return (
-    <div className="app">
+    <div className={'app' + (handFolded ? ' handmin' : '')}>
       <header className="top">
         <span className="crest">AIRAIDER</span>
         <nav className="nav" aria-label="Screens">
           {NAV.map(([k, label, d]) => (
             <button key={k} className={screen === k ? 'on' : ''} onClick={() => go(k)}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d={d} /></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d={d} /></svg>
               {label}
               {k === 'map' && s.quests.length > 0 && <span className="dot">{s.quests.length}</span>}
               {k === 'fort' && fortSteps.length > 0 && <span className="dot" title={fortSteps.map(x => x.text).join('\n')}>{fortSteps.length}</span>}
             </button>
           ))}
         </nav>
+        <NextSteps steps={steps} more={moreSteps} setMore={setMoreSteps} goTarget={goTarget} quick={quick} />
         <div className="res">
-          <span>Cycle <b>{s.cycle}</b></span>
+          <span className="cyc">Cycle <b>{s.cycle}</b>{report}</span>
           <span className="gold val"><b key={goldBump} className={goldBump ? 'fx-flash' : ''}>{s.gold}g</b>{goldFloat}</span>
           <span className="ghwrap val" onMouseLeave={() => setGhOpen(false)}>
             {gh.ready
-              ? <button className="gh ready fx-glow" onClick={() => quick('gh')} title={`raise it now — opens ${ghNames.join(', ')}`}>
-                  <span className="l1">▲ Raise Great Hall · {gh.cost}g</span>
-                  <span className="l2"><span className="op">T{gh.next}{opens}</span></span>
+              ? <button className="gh ready fx-glow" onClick={() => quick('gh')} title={`raise the Great Hall to T${gh.next} now — opens ${ghNames.join(', ')}`}>
+                  ▲ Raise <span className="lg">&nbsp;Great Hall</span><span className="sh">&nbsp;GH</span>&nbsp;· {gh.cost}g
                 </button>
               : <button className="gh" onClick={() => setGhOpen(o => !o)} aria-expanded={ghOpen}
-                  title={gh.need ? (s.ghBlock ?? `raise the Great Hall to T${gh.next} at ${gh.need} prestige and ${gh.cost}g`) : 'the Great Hall is at its peak'}>
+                  title={gh.need ? `${s.ghBlock ?? `raise the Great Hall to T${gh.next} at ${gh.need} prestige and ${gh.cost}g`}${ghNames.length ? ` — opens ${ghNames.join(', ')}` : ''}` : 'the Great Hall is at its peak'}>
                   <span className="l1">{gh.need
-                    ? <><span className="k">Great Hall T{gh.next}: <b key={presBump} className={presBump ? 'fx-flash' : ''}>{s.prestige.toFixed(1)}</b>/{gh.need} ✦</span><span className="op">{opens}</span></>
-                    : <span className="k">Great Hall T{gh.tier} · <b>{s.prestige.toFixed(1)}</b> ✦ · at its peak</span>}</span>
+                    ? <><span className="lg">Great Hall&nbsp;</span><span className="sh">GH&nbsp;</span>T{gh.next}:&nbsp;<b key={presBump} className={presBump ? 'fx-flash' : ''}>{s.prestige.toFixed(1)}</b>/{gh.need}&nbsp;✦</>
+                    : <><span className="lg">Great Hall&nbsp;</span><span className="sh">GH&nbsp;</span>T{gh.tier} ·&nbsp;<b>{s.prestige.toFixed(1)}</b>&nbsp;✦ · peak</>}</span>
                   <span className="bar"><i style={{ width: `${ghFill * 100}%` }} /></span>
                 </button>}
             {presFloat}
             {ghOpen && !gh.ready && <div className="ghpop" role="dialog" aria-label="Prestige">
               {s.ghBlock && <p className="why">{s.ghBlock}</p>}
+              {ghNames.length > 0 && <p className="opens1">T{gh.next} opens {ghNames.join(', ')}</p>}
               <span className="lbl">Prestige comes from</span>
               {(s.prestigeSources ?? []).length === 0 && <p className="p dimp">No room gives prestige yet — set relics or tamed captives in a Garden, Dining hall…</p>}
               {(s.prestigeSources ?? []).map((p: any) => (
@@ -322,20 +337,28 @@ export function App() {
                 </button>))}
             </div>}
           </span>
-          <span>Soldiers <b>{s.roster.length}</b>/{s.rosterCap}</span>
-          {s.captiveCap > 0 && <span title="counts captives in the cells, on the rack or on show — holding does not count until you take them">Captives <b>{s.captives.length}</b>/{s.captiveCap}</span>}
-          <span className="ai" title="AI calls and cost this session">{s.aiName === 'openai' ? `AI ~$${s.ai.costUsd.toFixed(2)}` : 'AI: mock'}{live.length ? ` · ✎ ${live.length} writing` : ''}</span>
-          {s.maxInFlight > 0 && <span className="capctl" title="how many quests may be written at once">
-            <button disabled={s.maxInFlight <= 1} onClick={() => queueAct('inflight', s.maxInFlight - 1)} aria-label="fewer at once">−</button>
-            ✎{s.maxInFlight}
-            <button disabled={s.maxInFlight >= 6} onClick={() => queueAct('inflight', s.maxInFlight + 1)} aria-label="more at once">+</button>
-          </span>}
+          <span title={`Soldiers: ${s.roster.length} of ${s.rosterCap}`}><span className="lg">Soldiers </span><span className="sh">⚔ </span><b>{s.roster.length}</b>/{s.rosterCap}</span>
+          {s.captiveCap > 0 && <span title="Captives — counts captives in the cells, on the rack or on show; holding does not count until you take them"><span className="lg">Captives </span><span className="sh">⛓ </span><b>{s.captives.length}</b>/{s.captiveCap}</span>}
+          {/* the AI's cost (and how many quests it writes at once) — one small chip, the control in its popover */}
+          <span className="aiwrap val" onMouseLeave={() => setAiOpen(false)}>
+            <button className="ai" aria-expanded={aiOpen} onClick={() => setAiOpen(o => !o)}
+              title={`AI calls and cost this session${s.maxInFlight > 0 ? ' — click to set how many quests are written at once' : ''}`}>
+              {s.aiName === 'openai' ? `AI $${s.ai.costUsd.toFixed(2)}` : 'AI mock'}{live.length ? ` · ✎${live.length}` : ''}
+            </button>
+            {aiOpen && <div className="aipop" role="dialog" aria-label="The AI">
+              <span>{s.aiName === 'openai' ? `OpenAI · ~$${s.ai.costUsd.toFixed(2)} this session` : 'Mock AI — no cost'}</span>
+              {live.length > 0 && <span>✎ {plural(live.length, 'quest', 'quests')} being written</span>}
+              {s.maxInFlight > 0 && <span className="capctl">written at once:
+                <button disabled={s.maxInFlight <= 1} onClick={() => queueAct('inflight', s.maxInFlight - 1)} aria-label="fewer at once">−</button>
+                <b>{s.maxInFlight}</b>
+                <button disabled={s.maxInFlight >= 6} onClick={() => queueAct('inflight', s.maxInFlight + 1)} aria-label="more at once">+</button>
+              </span>}
+            </div>}
+          </span>
         </div>
       </header>
 
-      <NextSteps steps={steps} more={moreSteps} setMore={setMoreSteps} goTarget={goTarget} quick={quick} />
-
-      <main className="stage">
+      <main className={'stage' + (screen === 'map' && q ? ' questing' : '')}>
         {screen === 'map' && (q
           ? <QuestPage s={s} q={q} doAct={doAct} quick={quick} armed={armed} setArmed={setArmed} back={() => setQuest(null)}
               readCast={(c: any) => setSheet({ id: '', cast: c })} drag={drag} setDrag={setDrag} openCard={openCard} say={say} />
@@ -353,7 +376,8 @@ export function App() {
       </main>
 
       <Hand s={s} q={screen === 'map' ? q : null} armed={armed} pick={pickCard} drag={drag} setDrag={setDrag}
-        openDrawer={() => setDrawer(d => !d)} drawer={drawer} modal={modal} fortMode={screen === 'fort'} room={screen === 'fort' ? fortRoom : null} quick={quick} />
+        openDrawer={() => setDrawer(d => !d)} drawer={drawer} modal={modal} fortMode={screen === 'fort'} room={screen === 'fort' ? fortRoom : null} quick={quick}
+        folded={handFolded} canFold={!handArmed && !drawer} setFolded={foldHand} />
 
       {/* THE SEAL — END CYCLE. With warnings (R5) the first click arms it and says what END would
           leave behind; the second ends the cycle. Nothing at risk: one click. */}
@@ -365,10 +389,9 @@ export function App() {
               <b>{w.title}</b><span className={w.lapsesNow ? 'cold' : ''}>{w.text}</span>
             </button>))}
         </div>}
-        {(s.reckoningCycles ?? []).length > 0 && <button className="lastrep" onClick={() => { setSealHover(false); setReckAt(null); setReckoning(true) }}>📜 last report</button>}
         <ConfirmButton className={'seal' + (sealReady ? ' ready' : '')} disabled={busy} needsConfirm={warns.length > 0} ms={4000}
           onArm={setSealArmed} onConfirm={endCycle}
-          aria-label={warns.length ? `End the cycle — ${warnSum}` : 'End the cycle'}
+          aria-label={warns.length ? `End the cycle — ${warnSum}` : 'End the cycle'} title={`End the cycle (E)${warns.length ? ` — ${warnSum}` : ''}`}
           label={<>
             <span className="a">END</span><span className="a">CYCLE</span>
             <span className="b">{busy ? '…' : live.length ? `${live.length} writing` : marching ? `${plural(marching, 'party marches', 'parties march')}` : 'nobody marches'}</span>
@@ -376,9 +399,10 @@ export function App() {
           </>}
           armedLabel={<>
             <span className="a">END</span><span className="a sm">ANYWAY?</span>
-            <span className="b">{warnSum}</span>
+            {/* a long sum would overrun the seal: its count here, each one in the list beside it */}
+            <span className="b">{warnSum.length > 14 ? `${warns.length} left behind` : warnSum}</span>
           </>} />
-        <div className={'sealwarn' + (warns.length ? ' sw-warn' : sealReady ? ' sw-ok' : '')}>
+        <div className={'sealwarn' + (warns.length ? ' sw-warn' : sealReady ? ' sw-ok' : '')} title={warns.length ? warnSum : undefined}>
           {warns.length ? `⚑ ${warnSum}` : sealReady ? 'all set' : ''}
         </div>
       </div>
@@ -395,31 +419,80 @@ const pingSeal = () => {
   document.querySelector('button.seal')?.animate?.([{ scale: '1' }, { scale: '1.08' }, { scale: '1' }], { duration: 500 });
 };
 
-/** THE NEXT-STEPS SCROLL (R4) — the engine's own list (Game.nextSteps), most pressing first. The
- *  step goes where it points; its button (when it has one) does it in one click, the same action
- *  the CLI's `next` names. Always shown, on its own row, so it never covers a screen. */
+/** THE NEXT STEPS (R4) — the engine's own list (Game.nextSteps), most pressing first. The step goes
+ *  where it points; its button (when it has one) does it in one click, the same action the CLI's
+ *  `next` names. Always shown, inside the top bar: as many WHOLE steps as the bar has room for, from
+ *  their measured widths (a hidden copy of the chips, laid out once per change), the rest behind "+N".
+ *  A step's button label — and the price in it — is never clipped; its detail shows only whole (else
+ *  it is in the tooltip and in "+N"); only the step's words give way, and only when one step is left. */
 function NextSteps({ steps, more, setMore, goTarget, quick }: {
   steps: any[]; more: boolean; setMore: (f: (b: boolean) => boolean) => void; goTarget: (t: any) => void; quick: (type: string, ...a: (string | number)[]) => void;
 }) {
-  const shown = steps.slice(0, 3), rest = steps.slice(3);
-  // the step's whole words ride in its tooltip — its text can be clipped, who and why never lost
-  const one = (st: any, i: number) => (
-    <div key={`${st.kind}-${i}`} className={'step' + (st.urgent ? ' urgent' : '') + (st.kind === 'end' ? ' end' : '')} title={st.detail ? `${st.text} — ${st.detail}` : st.text}>
-      <button className="go" onClick={() => { setMore(() => false); st.kind === 'end' ? pingSeal() : goTarget(st.target) }}>
+  const box = useRef<HTMLElement>(null);
+  const meas = useRef<HTMLDivElement>(null);
+  const [w, setW] = useState(0);
+  useLayoutEffect(() => {
+    const el = box.current; if (!el) return;
+    const read = () => setW(el.clientWidth);
+    const ro = new ResizeObserver(read); ro.observe(el); read();
+    return () => ro.disconnect();
+  }, []);
+  // each step's natural width, with and without its detail (the hidden copy below; re-read once the
+  // web fonts land, since they change every width)
+  const sig = steps.map(st => `${st.kind}|${st.text}|${st.detail ?? ''}|${st.act?.label ?? ''}`).join('¦');
+  const [nat, setNat] = useState<{ sig: string; full: number[]; bare: number[]; title: number[]; lbl: number }>({ sig: '', full: [], bare: [], title: [], lbl: 0 });
+  const [fontsIn, setFontsIn] = useState(0);
+  useEffect(() => { document.fonts?.ready.then(() => setFontsIn(n => n + 1)).catch(() => {}) }, []);
+  useLayoutEffect(() => {
+    const el = meas.current; if (!el) return;
+    const kids = [...el.querySelectorAll<HTMLElement>(':scope > .step')];
+    const full = kids.map(k => Math.ceil(k.getBoundingClientRect().width));
+    const bare = kids.map((k, i) => { const d = k.querySelector<HTMLElement>('.d'); return d ? full[i]! - Math.ceil(d.getBoundingClientRect().width) - 7 : full[i]! });
+    const title = kids.map(k => Math.ceil(k.querySelector<HTMLElement>('.t')?.getBoundingClientRect().width ?? 0));
+    const lbl = box.current?.querySelector<HTMLElement>(':scope > .lbl')?.offsetWidth ?? 0;
+    setNat({ sig, full, bare, title, lbl });
+  }, [sig, fontsIn, w]);
+  const GAP = 6, MORE = 42, MINI = 34;
+  const room = w - (nat.lbl ? nat.lbl + 8 : 0);
+  const ready = nat.sig === sig && w > 0;
+  // as many steps as fit (the first always shows): every one whole but the LAST shown, which may give up
+  // the tail of its words (never below ~16 characters; its button stays whole) — so free room in the bar
+  // goes to one more step. An URGENT step (a real loss — the engine lists them first) that cannot fit
+  // shows as its red glyph, its words in the tooltip and in "+N"
+  const TMIN = 16 * 7.2;
+  const least = (i: number) => (nat.bare[i] ?? 0) - Math.max(0, (nat.title[i] ?? 0) - TMIN);
+  let fit = 1;
+  if (ready) for (let k = 2; k <= Math.min(3, steps.length); k++) {
+    const used = nat.bare.slice(0, k - 1).reduce((a, b) => a + b, 0) + least(k - 1) + GAP * (k - 1);
+    const urgentLeft = steps.slice(k).filter(st => st.urgent).length;
+    if (used + (k < steps.length ? GAP + MORE : 0) + urgentLeft * MINI > room) break;
+    fit = k;
+  }
+  const shown = steps.slice(0, fit), rest = steps.slice(fit), minis = rest.filter(st => st.urgent);
+  const tail = (rest.length ? GAP + MORE : 0) + minis.length * MINI;
+  // one step alone shows its detail only if the WHOLE detail fits (never "3 w…")
+  const withDetail = ready && fit === 1 && !!steps[0]?.detail && (nat.full[0] ?? Infinity) + tail <= room;
+  const one = (st: any, i: number, where: 'bar' | 'pop' | 'meas') => (
+    <div key={`${st.kind}-${i}`} className={'step' + (st.urgent ? ' urgent' : '') + (st.kind === 'end' ? ' end' : '') + (where === 'bar' && withDetail ? ' withd' : '')}
+      title={st.detail ? `${st.text} — ${st.detail}` : st.text} style={where === 'bar' && i < fit - 1 ? { flexShrink: 0 } : undefined}>
+      <button className="go" tabIndex={where === 'meas' ? -1 : undefined} onClick={() => { setMore(() => false); st.kind === 'end' ? pingSeal() : goTarget(st.target) }}>
         <span className="g" aria-hidden="true">{STEP_GLYPH[st.kind] ?? '▸'}</span>
         <span className="t">{st.text}</span>
         {st.detail && <span className="d">{st.detail}</span>}
       </button>
-      {st.act && <button className="btn sm" disabled={!!st.act.block} title={st.act.block ?? `${st.act.label}${st.act.then ? `, then ${st.act.then}` : ''}`}
+      {st.act && <button className="btn sm" tabIndex={where === 'meas' ? -1 : undefined} disabled={!!st.act.block} title={st.act.block ?? `${st.act.label}${st.act.then ? `, then ${st.act.then}` : ''}`}
         onClick={() => { setMore(() => false); quick(st.act.type, ...st.act.args) }}>{st.act.label}</button>}
     </div>
   );
   return (
-    <nav className="nextsteps" aria-label="Next steps">
+    <nav className="nextsteps" aria-label="Next steps" ref={box}>
       <span className="lbl">Next</span>
-      <div className="steps">{shown.map(one)}</div>
-      {rest.length > 0 && <button className="more" aria-expanded={more} onClick={() => setMore(m => !m)}>+{rest.length}</button>}
-      {more && rest.length > 0 && <div className="morepop">{rest.map((st, i) => one(st, i + 3))}</div>}
+      <div className="steps">{shown.map((st, i) => one(st, i, 'bar'))}</div>
+      {minis.map((st, i) => <button key={`m-${st.kind}-${i}`} className="stepmini urgent" title={st.detail ? `${st.text} — ${st.detail}` : st.text}
+        aria-label={st.text} onClick={() => { setMore(() => false); goTarget(st.target) }}>{STEP_GLYPH[st.kind] ?? '▸'}</button>)}
+      {rest.length > 0 && <button className="more" aria-expanded={more} onClick={() => setMore(m => !m)} title={`${rest.length} more next step${rest.length === 1 ? '' : 's'}`}>+{rest.length}</button>}
+      {more && rest.length > 0 && <div className="morepop">{rest.map((st, i) => one(st, i + fit, 'pop'))}</div>}
+      <div className="stepmeas" aria-hidden="true"><div className="stepmeas-in" ref={meas}>{steps.map((st, i) => one(st, i, 'meas'))}</div></div>
     </nav>
   );
 }

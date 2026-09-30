@@ -3,7 +3,7 @@
 // "Set them in" reads Game.roomPlacementsFor (the CLI's `fit <captive|relic>` + `setin`). Prices,
 // refusals and fixes are the engine's quotes/blocks — nothing here re-derives a rule.
 import React, { useEffect, useRef } from 'react';
-import { type S, Tags, Silhouette, Glyph, RoomIcon, FixButton, cardStatus, formOf, cap1, FORM_ONE, shortTitle } from './ui';
+import { type S, Tags, Silhouette, Glyph, RoomIcon, FixButton, cardStatus, formOf, cap1, FORM_ONE, shortTitle, useKeyScroll } from './ui';
 import { strengthCls, STRENGTH_WORD } from './band';
 import { ConfirmButton } from './fx';
 
@@ -29,6 +29,8 @@ export function CardSheet({ s, id, cast, doAct, quick, close, openQuest, openRoo
   // whatever opened it when it closes (Tab used to walk the page hidden under the scrim)
   const ref = useRef<HTMLElement>(null);
   const opener = useRef<Element | null>(null);
+  // the sheet ITSELF scrolls (the focused dialog), so the page keys and the wheel work anywhere on it
+  useKeyScroll(ref);
   useEffect(() => {
     opener.current = document.activeElement;
     ref.current?.focus();
@@ -51,24 +53,28 @@ export function CardSheet({ s, id, cast, doAct, quick, close, openQuest, openRoo
   const go = (screen: string, rid: string | null) => { if (!openRoom) return close(); openRoom(screen === 'fort' ? rid : null) };
   const fix = (f: any, solid?: boolean, lead?: string) => <FixButton s={s} fix={f} quick={quick} go={go} solid={solid} lead={lead} />;
 
+  // a painted bust gets its picture column; with none, a small emblem beside the name (a tall grey
+  // silhouette column took 240px from the facts and said nothing)
+  const caption = c.portrait ? 'Painted when they joined the company.'
+    : c.painting ? 'The portrait is being painted…'
+    : kind === 'roster' ? (s.aiName === 'openai' ? 'No portrait yet.' : 'Portraits are painted with the real AI on.')
+    : kind === 'cast' ? 'Held to this matter — you can read them, not move them.' : '';
+  const emblem = kind === 'relic' || kind === 'debt' ? <Glyph name={kind === 'debt' ? 'scales' : 'chest'} size={34} /> : <Silhouette size={30} />;
   return (
     <div className="scrim" onClick={close}>
-      <section className={'sheet ' + kind} role="dialog" aria-modal="true" aria-label={c.name} tabIndex={-1} ref={ref as any}
+      <section className={'sheet ' + kind + (c.portrait ? ' has-pic' : '')} role="dialog" aria-modal="true" aria-label={c.name} tabIndex={-1} ref={ref as any}
         onKeyDown={trap} onClick={e => e.stopPropagation()}>
-        <div className="pic">
-          {c.portrait ? <img src={c.portrait} alt={`Portrait of ${c.name}`} />
-            : kind === 'relic' || kind === 'debt' ? <span className="bigart"><Glyph name={kind === 'debt' ? 'scales' : 'chest'} size={120} /></span>
-            : <span className="bigart"><Silhouette size={150} /></span>}
-          <div className="cap">{c.portrait ? 'Painted when they joined the company.'
-            : c.painting ? 'The portrait is being painted…'
-            : kind === 'roster' ? (s.aiName === 'openai' ? 'No portrait yet.' : 'Portraits are painted with the real AI on.')
-            : kind === 'cast' ? 'Held to this matter — you can read them, not move them.' : ''}</div>
-        </div>
+        {c.portrait && <div className="pic">
+          <img src={c.portrait} alt={`Portrait of ${c.name}`} />
+          <div className="cap">{caption}</div>
+        </div>}
         <div className="info">
           <div className="head">
-            <div>
+            {!c.portrait && <span className="emblem" aria-hidden="true">{emblem}</span>}
+            <div className="hname">
               <h1>{c.name}</h1>
               {(ch?.who || c.who) && <p className="who">{ch?.who ?? c.who}</p>}
+              {!c.portrait && caption && <p className="dimp small capline0">{caption}</p>}
             </div>
             <button className="x" onClick={close} aria-label="Close">✕</button>
           </div>

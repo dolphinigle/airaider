@@ -83,7 +83,10 @@ function Toks({ s, q, chip = true, pops }: { s: S; q: any; chip?: boolean; pops:
 // ── layout: rows from the zone's PIXEL height, no marker over another, a label or a plaque ──
 type Box = [number, number, number, number];   // x0 y0 x1 y1 (px)
 // a marker is two rects: the coin (±21) and its text (banner −13 · token row to +34)
-const ROW = 56, ROW_DENSE = 48, LABEL = 34, BAN_MAX = 190, EDGE = 20;   // EDGE: inside the map's brass frame
+const ROW = 56, ROW_DENSE = 48, LABEL = 34, EDGE = 20;   // EDGE: inside the map's brass frame
+// a banner holds the whole title where the map has the room (a wide map), else it is capped (the tip has it)
+let BAN_MAX = 190;
+const banMaxFor = (W: number) => W >= 1000 ? 270 : W >= 800 ? 220 : 190;
 const hit = (a: Box, b: Box) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
 const banW = (q: any) => Math.min(BAN_MAX, 30 + q.title.length * 7.3);
 function tokW(s: S, q: any) {
@@ -213,6 +216,7 @@ export function MapScreen({ s, doAct, quick, queueAct, openQuest, drag, setDrag,
     return () => ro.disconnect();
   }, []);
   const W = size.w || 1000, H = size.h || 600;
+  BAN_MAX = banMaxFor(W);
 
   // arrivals
   const seen = seenStore(s);
@@ -349,7 +353,7 @@ export function MapScreen({ s, doAct, quick, queueAct, openQuest, drag, setDrag,
               <button className="ros" onClick={() => open(q.id)} onFocus={() => setHover(q.id)} onBlur={() => setHover(h => h === q.id ? null : h)} aria-label={`Open ${q.title}`}>
                 <Glyph name={glyphOf(q.archetype, q.isFinale)} size={20} />
               </button>
-              <span className={'ban' + (sp.left ? ' left' : '')} onClick={() => open(q.id)}>
+              <span className={'ban' + (sp.left ? ' left' : '')} style={{ maxWidth: BAN_MAX }} title={q.title} onClick={() => open(q.id)}>
                 <span className="bt">{q.title}</span>
                 {fresh && <span className="newrib">NEW</span>}
               </span>

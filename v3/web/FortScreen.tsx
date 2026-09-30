@@ -4,11 +4,15 @@
 // engine's (fort.rooms[].effect, roomPlacements, quotes, blocks, fixes) — this file only shows them.
 // Every placement is ONE engine call: quick('setin', roomId, cardId, idx?) = Game.setInRoom (CLI `setin`).
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { type S, RoomIcon, CardFace, Tags, FixButton as SharedFix, HOLDING_SEL, scrollBehavior } from './ui';
+import { type S, RoomIcon, CardFace, Tags, FixButton as SharedFix, HOLDING_SEL, scrollBehavior, useKeyScroll } from './ui';
 import { ConfirmButton, useDeltaFloater, useFloaters } from './fx';
 
-// the cross-section grid: tiles are sized from the section's width (fit at 1280), never below CW_MIN
-const CH = 120, GX = 12, GY = 16, X0 = 16, Y0 = 70, CW_MAX = 158, CW_MIN = 120, SUB_MIN = 136;
+// the cross-section: tiles are sized from BOTH the section's width and its height, so the whole hold
+// shows without scrolling. Only a hold too deep for its box even at CH_MIN tiles scrolls (and says so).
+// SKY band · ground · per floor: a label line + a tile row · the dig (a tile in the deepest row when the
+// engine would dig there, else a thin strip row below it — Game.excavate's own rule: 5 cells a floor).
+const SKY = 22, GROUND = 3, LBL = 15, GYP = 6, PADB = 10, GX = 10, X0 = 14, DIG_H = 38, FLOOR_COLS = 5;
+const CH_MIN = 52, CH_MAX = 150, CW_MIN = 112, CW_MAX = 250, SUB_MIN = 136;
 const CATS: [string, string][] = [['all', 'All'], ['unlocks', 'Unlocks'], ['living', 'Living'], ['prestige', 'Prestige'], ['regions', 'Regions']];
 
 // the rooms a Great Hall raise just opened — "NEW" on their build rows until built or clicked.
@@ -82,18 +86,31 @@ export function FortScreen(props: {
   const floors = Math.max(...s.fort.cells.map((c: any) => c.floor)) + 1;
   const cols = Math.max(...s.fort.cells.map((c: any) => c.col)) + 1;
 
-  // tile width from the section's width, so every column fits at 1280
+  // the section's size → the tile size (both axes), the size class, and where the dig goes
   const xsRef = useRef<HTMLElement>(null);
-  const [xsW, setXsW] = useState(0);
+  const [xs, setXs] = useState({ w: 0, h: 0 });
   useLayoutEffect(() => {
     const el = xsRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(() => setXsW(el.clientWidth));
-    ro.observe(el); setXsW(el.clientWidth);
+    const read = () => setXs(o => o.w === el.clientWidth && o.h === el.clientHeight ? o : { w: el.clientWidth, h: el.clientHeight });
+    const ro = new ResizeObserver(read);
+    ro.observe(el); read();
     return () => ro.disconnect();
   }, []);
-  const CW = xsW ? Math.max(CW_MIN, Math.min(CW_MAX, Math.floor((xsW - X0 - 14 - (cols - 1) * GX) / cols))) : CW_MAX;
-  const at = (f: number, c: number) => ({ left: X0 + c * (CW + GX), top: Y0 + f * (CH + GY), width: CW });
+  const lastRow = s.fort.cells.filter((c: any) => c.floor === floors - 1).length;
+  const digInRow = lastRow < FLOOR_COLS;                               // the next cell lands in the deepest row
+  const dig = digInRow ? { floor: floors - 1, col: lastRow } : { floor: floors, col: 0 };
+  const gridCols = Math.max(cols, digInRow ? lastRow + 1 : 1);
+  const digExtra = digInRow ? 0 : GYP + LBL + DIG_H;
+  const fitH = xs.h ? Math.floor((xs.h - SKY - GROUND - PADB - floors * LBL - (floors - 1) * GYP - digExtra) / floors) : CH_MAX;
+  const CH = Math.max(CH_MIN, Math.min(CH_MAX, fitH));
+  const CW = xs.w ? Math.max(CW_MIN, Math.min(CW_MAX, Math.floor((xs.w - 2 * X0 - (gridCols - 1) * GX) / gridCols))) : 158;
+  const size = CH >= 100 ? 'l' : CH >= 74 ? 'm' : 's';
+  const rowTop = (f: number) => SKY + GROUND + LBL + f * (LBL + CH + GYP);
+  const at = (f: number, c: number) => ({ left: X0 + c * (CW + GX), top: rowTop(f), width: CW, height: CH });
+  const innerH = digInRow ? rowTop(floors - 1) + CH + PADB : rowTop(floors) + DIG_H + PADB;
+  const deep = xs.h > 0 && innerH > xs.h + 1;                          // too deep even at CH_MIN: it scrolls
+  const [atEnd, setAtEnd] = useState(false);
 
   // a new or changed room flashes; a new one scrolls into view
   const sigOf = (r: any) => `${r.slots.map((x: any) => x?.id ?? '-').join(',')}|${r.comfort ?? ''}|${r.style ?? ''}`;
@@ -143,37 +160,36 @@ export function FortScreen(props: {
 
   return (
     <div className="fortscreen">
-      <section className={'xs' + (dragCard ? ' dragging' : '')} ref={xsRef} aria-label="The hold, in cross-section">
-        <div className="xsin" style={{ width: X0 + cols * (CW + GX) + 2, height: Y0 + (floors + 1) * (CH + GY) + 20 }}>
-          <div className="sky" /><div className="ground" />
-          {Array.from({ length: floors + 1 }, (_, f) => <span key={f} className="flabel" style={{ top: Y0 + f * (CH + GY) - 14 }}>{f === 0 ? 'SURFACE' : `DEPTH ${f}`}</span>)}
+      <section className={'xs sz-' + size + (dragCard ? ' dragging' : '') + (deep ? ' deep' : '') + (deep && atEnd ? ' at-end' : '')} ref={xsRef}
+        aria-label="The hold, in cross-section"
+        onScroll={deep ? e => { const el = e.currentTarget; setAtEnd(el.scrollTop + el.clientHeight >= el.scrollHeight - 4) } : undefined}>
+        <div className="xsin" style={{ width: X0 + gridCols * (CW + GX), height: innerH }}>
+          <div className="sky" style={{ height: SKY }} /><div className="ground" style={{ top: SKY, height: GROUND }} />
+          {Array.from({ length: digInRow ? floors : floors + 1 }, (_, f) => <span key={f} className="flabel" style={{ top: rowTop(f) - LBL + 1, left: X0 }}>{f === 0 ? 'SURFACE' : `DEPTH ${f}`}</span>)}
           {s.fort.cells.map((cell: any) => {
             const r = rooms.find(x => x.cell.floor === cell.floor && x.cell.col === cell.col);
             const pos = at(cell.floor, cell.col);
             if (!r) return <div key={`${cell.floor}:${cell.col}`} className="cell free" style={pos}><span>Free cell</span></div>;
-            return <RoomTile key={r.id} s={s} r={r} pos={pos} narrow={CW < SUB_MIN} sel={sel === r.id} fresh={!!fresh[r.id]}
+            return <RoomTile key={r.id} s={s} r={r} pos={pos} size={size} narrow={CW < SUB_MIN} sel={sel === r.id} fresh={!!fresh[r.id]}
               onSel={() => setSel(sel === r.id ? null : r.id)} quick={quick}
               dragging={!!dragCard} place={placeFor(r.id)} over={over === r.id}
               onOver={(v: boolean) => setOver(o => v ? r.id : o === r.id ? null : o)} onDrop={dropOn(r.id)} />;
           })}
-          <button className="cell dig" style={at(floors, 0)} disabled={!!s.excavateBlock} onClick={() => quick('excavate')}
-            title={s.excavateBlock ?? 'dig one more cell to build in'}>
-            <span className="ic"><RoomIcon type="excavate" size={34} /></span><span className="n">Excavate a cell</span>
+          {/* where Game.excavate digs next: a tile in the deepest row while it has room, else a strip below */}
+          <button className={'cell dig' + (digInRow ? '' : ' strip')} disabled={!!s.excavateBlock} onClick={() => quick('excavate')}
+            style={digInRow ? at(dig.floor, dig.col) : { left: X0, top: rowTop(dig.floor), width: Math.max(CW, 210), height: DIG_H }}
+            title={s.excavateBlock ?? `dig one more cell to build in · ${s.excavateCost}g`}>
+            <span className="hd"><span className="ic"><RoomIcon type="excavate" size={digInRow && size === 'l' ? 34 : 22} /></span><span className="n">Excavate a cell</span></span>
             <span className="d">{s.excavateCost}g{s.excavateBlock ? ` · ${s.excavateBlock}` : ''}</span>
           </button>
         </div>
+        {deep && !atEnd && <span className="xsmore" aria-hidden="true">▾ deeper — scroll</span>}
       </section>
 
       <aside className="panel">
         {room ? <RoomPanel key={room.id} s={s} room={room} doAct={doAct} quick={quick} openCard={openCard} setSel={setSel}
           drag={drag} setDrag={setDrag} dragCard={dragCard} place={placeFor(room.id)} back={() => setSel(null)} />
-          : sel === HOLDING_SEL ? <div className="rd">
-              {/* holding, with no Holding cell room: the same decisions, the engine never needs the room */}
-              <button className="btn sm" onClick={() => setSel(null)}>← Build list</button>
-              <div className="t"><span className="ic big"><RoomIcon type="holding-cell" size={48} /></span>
-                <div><h2>Holding</h2><div className="k">{s.holding.length} taken on jobs — decide before the clock runs out</div></div></div>
-              <Holding s={s} quick={quick} openCard={openCard} setSel={setSel} />
-            </div>
+          : sel === HOLDING_SEL ? <HoldingPanel s={s} quick={quick} openCard={openCard} setSel={setSel} />
           : <BuildPanel s={s} cat={cat} setCat={setCat} doAct={doAct} quick={quick} hi={props.buildHi ?? null} />}
       </aside>
 
@@ -189,7 +205,7 @@ export function FortScreen(props: {
 
 /** one room in the cross-section: its icon, its effect, its places — and, while a captive or relic
  *  is dragged, a DROP TARGET that says what the card would do here (or why not) */
-function RoomTile({ s, r, pos, narrow, sel, fresh, onSel, quick, dragging, place, over, onOver, onDrop }: any) {
+function RoomTile({ s, r, pos, size, narrow, sel, fresh, onSel, quick, dragging, place, over, onOver, onDrop }: any) {
   const gh = r.type === 'great-hall';
   const ready = gh && s.ghReady;
   // juice: the room's prestige floats its change; a rack floats the new captive's due cycle
@@ -210,14 +226,14 @@ function RoomTile({ s, r, pos, narrow, sel, fresh, onSel, quick, dragging, place
     drop && (place.ok ? 'can' : place.here ? 'here' : 'no'), dragging && !place && 'na', over && 'over'].filter(Boolean).join(' ');
   const hubPips = isHub(r) && s.captiveCap > 0;
   return (
-    <div className={cls} style={pos} data-room={r.id} role="button" tabIndex={0} aria-pressed={sel}
+    <div className={cls} style={pos} data-room={r.id} role="button" tabIndex={0} aria-pressed={sel} title={`${r.name} — ${roomLine(s, r)}`}
       onClick={onSel} onKeyDown={e => { if (e.target !== e.currentTarget) return; if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSel() } }}
       onDragEnter={place ? e => { e.preventDefault(); onOver(true) } : undefined}
       onDragOver={place ? e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; if (!over) onOver(true) } : undefined}
       onDragLeave={place ? e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) onOver(false) } : undefined}
       onDrop={place ? onDrop : undefined}>
-      <span className="ic"><RoomIcon type={r.type} size={narrow ? 30 : 34} /></span>
-      <span className="n">{r.name.replace(/ \(.*\)$/, '')}</span>
+      <span className="hd"><span className="ic"><RoomIcon type={r.type} size={size === 'l' ? (narrow ? 30 : 34) : size === 'm' ? 26 : 18} /></span>
+        <span className="n">{r.name.replace(/ \(.*\)$/, '')}</span></span>
       {!(narrow && drop) && <span className="d">{roomLine(s, r)}</span>}
       {r.slots.length > 0 && <span className="sl">{r.slots.map((x: any, i: number) => <i key={i} className={x ? 'on' : ''} />)}</span>}
       {r.kind && r.slots.length === 0 && !drop && <span className="sl"><i className="ghost" title="no places yet" /></span>}
@@ -235,6 +251,19 @@ function RoomTile({ s, r, pos, narrow, sel, fresh, onSel, quick, dragging, place
 let hiDone = 0;
 function BuildPanel({ s, cat, setCat, quick, hi }: any) {
   const [owner, setOwner] = useState('');
+  // ONE scroll region: the page keys reach it with no click first; a focused row scrolls in BELOW the
+  // stuck header (scroll-padding = the header's measured height); a new category opens at its top
+  const body = useRef<HTMLDivElement>(null);
+  const head = useRef<HTMLDivElement>(null);
+  const [phh, setPhh] = useState(80);
+  useKeyScroll(body);
+  useLayoutEffect(() => {
+    const el = head.current; if (!el) return;
+    const ro = new ResizeObserver(() => setPhh(Math.ceil(el.getBoundingClientRect().height)));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const pickCat = (k: string) => { setCat(k); body.current?.scrollTo({ top: 0 }) };
   const [, bump] = useState(0);
   const [openTier, setOpenTier] = useState<number | null>(null);
   const [flash, setFlash] = useState<string | null>(null);
@@ -268,42 +297,50 @@ function BuildPanel({ s, cat, setCat, quick, hi }: any) {
   for (const b of s.buildable.filter((b: any) => inCat(b) && b.blocker === 'tier')) tiers.set(b.ghTier, [...(tiers.get(b.ghTier) ?? []), b]);
   const builtRows = s.buildable.filter((b: any) => b.blocker === 'built' && inCat(b));
 
+  // with no free cell EVERY row shares one block — the header says it (and digs); the rows don't repeat it
+  const allNeedCell = s.freeCells === 0 && live.length > 0 && live.every((b: any) => b.blocker === 'cell');
   const row = (b: any) => {
     const isNew = newRooms.includes(b.type);
-    const why = b.blocker === 'gold' ? (b.reason?.match(/short \d+g/)?.[0] ?? b.reason) : b.blocker === 'cell' ? 'needs a free cell' : b.reason;
+    const why = b.blocker === 'gold' ? (b.reason?.match(/short \d+g/)?.[0] ?? b.reason) : b.blocker === 'cell' ? (allNeedCell ? null : 'needs a free cell') : b.reason;
+    // a blocked row says so in its reason and its price colour — its words stay at full contrast
     return (
-      <div key={b.type} data-btype={b.type} className={'brow' + (b.blocker ? ' dim' : '') + (b.blocker === 'tier' ? ' locked' : '') + (flash === b.type ? ' hi fx-flash' : '')} onClick={() => seen(b.type)}>
-        <span className="ic"><RoomIcon type={b.type} size={34} /></span>
-        <div>
+      <div key={b.type} data-btype={b.type} className={'brow' + (b.blocker ? ' blocked' : '') + (b.blocker === 'tier' ? ' locked' : '') + (flash === b.type ? ' hi fx-flash' : '')} onClick={() => seen(b.type)}>
+        <span className="ic"><RoomIcon type={b.type} size={26} /></span>
+        <div className="bm">
           <div className="n">{b.name}{isNew && <span className="newchip">NEW</span>}</div>
           <div className="d">{b.desc}</div>
-          {(b.wants?.length > 0 || b.firstPlaceCost) && <div className="w">
-            {b.wants?.length > 0 && <>wants: {b.wants.join(' · ')}</>}
-            {b.firstPlaceCost ? <span className="fp">{b.wants?.length ? ' · ' : ''}first place +{b.firstPlaceCost}g</span> : null}</div>}
+          {b.wants?.length > 0 && <div className="w">wants: {b.wants.join(' · ')}</div>}
           {!b.blocker && b.type === 'bedroom' && <label className="bed">whose bedroom
             <select value={ownerSel} onChange={e => setOwner(e.target.value)}>
               {owners.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}</select></label>}
         </div>
         <div className="right">
-          <span className="c">{b.cost}g</span>
-          {b.blocker ? <span className="why">{why}</span>
-            : <button className="btn sm solid" onClick={e => { e.stopPropagation(); seen(b.type); b.type === 'bedroom' ? quick('build', b.type, ownerSel) : quick('build', b.type) }}>Build</button>}
+          <div className="cb"><span className="c">{b.cost}g</span>
+            {!b.blocker && <button className="btn sm solid" onClick={e => { e.stopPropagation(); seen(b.type); b.type === 'bedroom' ? quick('build', b.type, ownerSel) : quick('build', b.type) }}>Build</button>}</div>
+          {/* what its first place costs on top, beside the price — never in a clipped tail */}
+          {b.firstPlaceCost ? <span className="fp" title="each place is bought separately; this is the first one">+{b.firstPlaceCost}g first place</span> : null}
+          {why && <span className="why">{why}</span>}
         </div>
       </div>);
   };
 
-  return (<>
-    <div className="ph">
-      <div className="h">BUILD <span>{s.gold}g · {plural(s.freeCells, 'free cell')}</span></div>
-      {s.freeCells === 0 && <button className="btn solid dig1" disabled={!!s.excavateBlock} onClick={() => quick('excavate')}>
-        Excavate a cell · {s.excavateCost}g{s.excavateBlock ? ` — ${s.excavateBlock}` : ''}</button>}
-      <p className="phsub">Rooms that show relics and tamed captives earn prestige; prestige raises the Great Hall, which opens more rooms and regions.</p>
-      <div className="cats">{CATS.map(([k, l]) => <button key={k} className={'fc' + (cat === k ? ' on' : '')} onClick={() => setCat(k)}>{l}</button>)}</div>
+  // ONE scroll container for the whole panel body; a THIN header (the BUILD line with its dig button,
+  // then the category chips) sticks to its top, and an open tier's header sticks under it
+  return (
+    <div className="pbody" tabIndex={-1} ref={body} style={{ scrollPaddingTop: phh + 4, ['--phh' as any]: `${phh}px` }}>
+    <div className="ph" ref={head}>
+      <div className="h"><span className="ht">BUILD</span>
+        <span className="hs">{s.gold}g · {plural(s.freeCells, 'free cell')}</span>
+        {s.freeCells === 0 && <button className="btn sm solid dig1" disabled={!!s.excavateBlock} onClick={() => quick('excavate')}
+          title={s.excavateBlock ?? 'dig one more cell — every room needs a free cell'}>
+          Excavate · {s.excavateCost}g{s.excavateBlock ? ` — ${s.excavateBlock}` : ''}</button>}
+      </div>
+      <div className="cats">{CATS.map(([k, l]) => <button key={k} className={'fc' + (cat === k ? ' on' : '')} onClick={() => pickCat(k)}>{l}</button>)}</div>
     </div>
     <div className="blist">
       {live.map(row)}
       {[...tiers.entries()].sort((a, b) => a[0] - b[0]).map(([t, bs]) => (
-        <div key={t} className="tiergrp">
+        <div key={t} className={'tiergrp' + (openTier === t ? ' open' : '')}>
           <button className="tierh" onClick={() => setOpenTier(openTier === t ? null : t)} aria-expanded={openTier === t}>
             <span>{openTier === t ? '▾' : '▸'} Opens at Great Hall T{t} ({bs.length})</span>
             <span className="tic">{bs.slice(0, 7).map((b: any) => <RoomIcon key={b.type} type={b.type} size={20} />)}</span>
@@ -311,8 +348,10 @@ function BuildPanel({ s, cat, setCat, quick, hi }: any) {
           {openTier === t && bs.map(row)}
         </div>))}
       {builtRows.length > 0 && <div className="builtline">Built: {builtRows.map((b: any) => b.name).join(' · ')}</div>}
+      <p className="phsub">Rooms that show relics and tamed captives earn prestige; prestige raises the Great Hall, which opens more rooms and regions.</p>
     </div>
-  </>);
+    </div>
+  );
 }
 
 function RoomPanel({ s, room, doAct, quick, openCard, setSel, drag, setDrag, dragCard, place, back }: any) {
@@ -356,13 +395,15 @@ function RoomPanel({ s, room, doAct, quick, openCard, setSel, drag, setDrag, dra
     onDrop: dropSlot(i),
   });
   const g = s.gh;
+  const rdRef = useRef<HTMLDivElement>(null);
+  useKeyScroll(rdRef);
 
   return (
-    <div className="rd">
-      <button className="btn sm" onClick={back}>← Build list</button>
-      <div className="t"><span className="ic big"><RoomIcon type={room.type} size={48} /></span>
-        <div><h2>{room.name}{room.style ? ` · ${room.style}` : ''}</h2><div className="k">{roomLine(s, room)}</div></div></div>
-      <p className="p">{room.desc}</p>
+    <div className="rd" ref={rdRef} tabIndex={-1}>
+      {/* the way back and the room's name stay stuck on top while its panel scrolls */}
+      <div className="rdh"><button className="btn sm" onClick={back}>← Build list</button><h2 title={room.name}>{room.name}{room.style ? ` · ${room.style}` : ''}</h2></div>
+      <div className="t"><span className="ic big"><RoomIcon type={room.type} size={40} /></span>
+        <div className="tb"><div className="k">{roomLine(s, room)}</div><p className="p">{room.desc}</p></div></div>
 
       {room.type === 'great-hall' && (g?.next ? <div className="blk ghp">
         <span className="lbl">Raise to Tier {g.next}</span>
@@ -455,6 +496,18 @@ function RoomPanel({ s, room, doAct, quick, openCard, setSel, drag, setDrag, dra
           onClick={() => doAct('renovate', room.id, st)}>{st}</button>)}</span></div>}
     </div>
   );
+}
+
+/** holding, with no Holding cell room: the same decisions — the engine never needs the room */
+function HoldingPanel({ s, quick, openCard, setSel }: any) {
+  const ref = useRef<HTMLDivElement>(null);
+  useKeyScroll(ref);
+  return <div className="rd" ref={ref} tabIndex={-1}>
+    <div className="rdh"><button className="btn sm" onClick={() => setSel(null)}>← Build list</button><h2>Holding</h2></div>
+    <div className="t"><span className="ic big"><RoomIcon type="holding-cell" size={40} /></span>
+      <div className="tb"><div className="k">{s.holding.length} taken on jobs — decide before the clock runs out</div></div></div>
+    <Holding s={s} quick={quick} openCard={openCard} setSel={setSel} />
+  </div>;
 }
 
 /** holding: every decision with its price, and the full-cells refusal BEFORE the click */

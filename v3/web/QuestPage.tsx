@@ -82,12 +82,16 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
     <div className="questpage">
       <section className={'scene' + (choose ? ' choosing' : '') + (dragging ? ' dragging' : '')} aria-label="Who goes">
         {q.approaches && (
-          <div className="approaches">
+          <div className={'approaches' + (choose ? '' : ' slim')}>
             <span className="lbl">How it ends{choose ? ' — pick one' : ''}</span>
             <div className="apps" style={{ gridTemplateColumns: `repeat(${q.approaches.length}, minmax(0, 1fr))` }}>{q.approaches.map((a: any, ai: number) => {
               const slots = q.slots.filter((sl: any) => sl.groupId === a.id);
               const on = q.chosenApproach === a.id;
-              const body = <>
+              // once one is chosen, each ending is ONE line (its facts are in its tooltip, the chosen one's
+              // places are the niches below) — the scene then fits without a scroll of its own
+              const facts = [a.label, a.outcome && `→ ${a.outcome}`, a.warn && `⚠ ${a.warn}`,
+                ...slots.map((sl: any) => `${attrOf(sl)} · bar ${sl.test.bar.toFixed(1)}${sl.best ? ` · ${sl.best.holder ? 'sent' : 'best'}: ${sl.best.name} ${coinBadge(sl.best.coins, sl.best.strength)}` : ''}`)].filter(Boolean).join('\n');
+              const body = !choose ? <><span className="al">{a.label}</span>{on && a.warn && <span className="aw">⚠ {a.warn}</span>}</> : <>
                 <span className="al">{a.label}</span>
                 {a.outcome && <span className="ao">→ {a.outcome}</span>}
                 {a.warn && <span className="aw">⚠ {a.warn}</span>}
@@ -107,10 +111,10 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
               const style = { ['--ap' as any]: AP_HUE[ai % AP_HUE.length] };
               // switching away from a MANNED plan sends its party back: it asks twice, and says who
               return a.switchLoss
-                ? <ConfirmButton key={a.id} className="appr" style={style} aria-pressed={false} ms={4000}
+                ? <ConfirmButton key={a.id} className="appr" style={style} aria-pressed={false} ms={4000} title={facts}
                     label={body} armedLabel={<><span className="al">Switch plans?</span><span className="aw">{a.switchLoss} — click again</span></>}
                     onConfirm={() => quick('approach', q.id, a.id)} />
-                : <button key={a.id} className={'appr' + (on ? ' on' : '')} style={style}
+                : <button key={a.id} className={'appr' + (on ? ' on' : '')} style={style} title={choose ? undefined : facts}
                     onClick={() => { if (!on) quick('approach', q.id, a.id) }} aria-pressed={on}>{body}</button>;
             })}</div>
           </div>
@@ -204,8 +208,10 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
       <article className="writ">
         {sealOn && <div className="sealed" aria-hidden="true"><span>SEALED</span></div>}
         <div className="wh">
-          <button className="back" onClick={back}>← Map <span>Esc</span></button>
-          <span className="kind">{q.isFinale ? 'Saga finale' : q.chainId ? `Saga · beat ${q.beat}` : q.faucet ? 'Standing post' : 'One-off job'} · {q.region}</span>
+          <div className="whtop">
+            <button className="back" onClick={back}>← Map <span>Esc</span></button>
+            <span className="kind">{q.isFinale ? 'Saga finale' : q.chainId ? `Saga · beat ${q.beat}` : q.faucet ? 'Standing post' : 'One-off job'} · {q.region}</span>
+          </div>
           <div className="titlerow">
             <h1>{q.title}</h1>
           </div>
