@@ -1,0 +1,44 @@
+[
+ {
+  "file": "card__edge+finale+have+mystery+personal.txt, card__edge+finale+have+mystery.txt (and every finale card)",
+  "where": "Reply line {\"card\": \"at most 90 words\"} vs steps 1-4 'in this order'",
+  "problem": "The finale card must include latest, helping, the question plus every learned item, job, why, each have with its helps, trouble, fate and lose: up to about 12 sentences when a saga has 3 learned and 3 haves (as the F6_3 and F1_3 finale cards in the report payloads do). The cap stays fixed at 90 words. Even the F2_1 payload (2 learned, 2 haves) needs about 115 words in tight prose. The writer has to drop items without knowing which ones matter, usually the helps or the learned clues, or squeeze them into a list-like card, or go over the cap.",
+  "fix": "Scale the cap with the number of learned and have items, as the report caps already scale. Or allow the learned items to merge into one sentence and the haves into one sentence, and say which item to cut first."
+ },
+ {
+  "file": "report__success__*.txt, report__partial__*.txt (every middle report with clue)",
+  "where": "Data line 'clue: what this win brings to light; show it found, seen or said'",
+  "problem": "The report writer turns the clue into a scene. The card it receives repeats the open question ('Nobody knows what the hunter is hiding'), and the antagonist is often in people. Nothing in the prompt says not to answer the question. The card prompt has 'never guess the answer'; the report prompt has no equivalent. A writer adding dialogue to 'show it said' will likely give the antagonist a line that explains the mystery, for example a hint about who set the fire. That invented answer can contradict the planned secret before the finale truth.",
+  "fix": "Extend the clue line: 'show only that much; the question stays open'. Do not add an example."
+ },
+ {
+  "file": "plan__full__personal+stake+types.txt, plan__lean__personal+types.txt",
+  "where": "Data line 'seed: the idea under the story, never pasted' vs Write line 'soldier: ... past: the old wrong'",
+  "problem": "In the personal plans the seed already states the old wrong in full ('Jervaise left her younger brother bound to a debt-master...'). The past field asks for exactly that content, while the prompt says the seed is never pasted. The writer either pastes or compresses the seed into past, breaking the rule, or obeys and writes something vague ('an old wrong left behind'). Card 1 then shows the vague version as the premise's past.",
+  "fix": "Make past a derived field, for example 'past: the old wrong in your own words, naming who was wronged'. Or exempt past from 'never pasted'."
+ },
+ {
+  "file": "card__edge+finale+have+mystery+personal.txt",
+  "where": "Step 4: 'fate: who stands in your soldier's way; this settles it'",
+  "problem": "Nothing in this prompt or payload defines 'it': there is no past field and no mention of an old matter. helping only says 'to save a life'. The writer will likely paste 'this settles it' verbatim or guess what 'it' means. The finale then loses its framing as the soldier's old wrong.",
+  "fix": "State what is settled: 'this settles your soldier's old wrong with them'. Or carry premise.past into the finale payload as a past line."
+ },
+ {
+  "file": "card__*.txt (all cards)",
+  "where": "'Speak to them as \"you\"' vs payload text such as retry 'The company tried...', memory 'The company won Laudus's betrothal token...' and latest lines",
+  "problem": "The card prompt never says that 'you' is the company. The payload sentences use 'the company'. A cheap writer pastes them unchanged and mixes 'you' with 'the company' in the same card, for example 'You try again. The company tried to get into Ferngarth...'.",
+  "fix": "Add a few words: 'you are the company; turn \"the company\" in the data into \"you\"'."
+ },
+ {
+  "file": "plan__*.txt (all plans)",
+  "where": "Write line 'win: what success changes, from the kind of win'",
+  "problem": "'from the kind of win' can be read as 'copy the type's kind'. The kind strings are generic ('someone or somewhere is found', 'they are beaten or driven off'). The writer is tempted to paste them as win, which gives wins that state no specific change.",
+  "fix": "Reword as 'win: what success changes here, naming who or what; a case of the type's kind'."
+ },
+ {
+  "file": "plan__full__personal+stake+types.txt, plan__lean__personal+types.txt",
+  "where": "Opening line 'Nobody hires the company; failing may cost that soldier.' with stake 'a life'",
+  "problem": "It is unclear what 'failing may cost that soldier' means: her life, her place in the company, or something else. The full stake 'a life' does not say whose life either. Read together, the two lines push lose toward the soldier's own death instead of the person the seed puts at risk (the brother). That changes the whole stake of the story.",
+  "fix": "Say plainly what failing costs, for example 'if it fails, the soldier loses what lose names'. Or deal the stake with an owner, such as 'a life dear to the soldier'."
+ }
+]

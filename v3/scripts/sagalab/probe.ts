@@ -57,7 +57,7 @@ import type { CallLogLine } from '../../src/ai/calllog.js';
 import type { TextRec } from './extract.js';
 import {
   type Arm, type Structure, type NamesArm, type CastArm, type ProbeFixture, type World, type Draw, type PlanCtx,
-  type SagaPlan, type Knowing, type Hurt, armKey, newKnowing, buildWorld, leanWorld, makeDraw, planPayload, validatePlan, planLint, mockPlan,
+  type SagaPlan, type Knowing, type Hurt, type SagaState, armKey, newKnowing, newState, bank, buildWorld, leanWorld, makeDraw, planPayload, validatePlan, planLint, mockPlan,
   mockCard, mockReport, firstCardPayload, laterCardPayload, reportPayload, noteDelivered, onThisMatter, outcomeFor,
   pickParty, rollDice, rollHurt, fateSentence, choiceTarget, buttonLine, helped, hashStr, zCardOut, zReportOut, zPlanOut,
 } from './v4lab.js';
@@ -321,6 +321,8 @@ async function runSaga(job: Job): Promise<Row> {
   const problems: string[] = [];
   const capBreaks: string[] = [];
   const k: Knowing = newKnowing(w.cast);
+  // (R2) the saga's record: the learns and gains of won middle jobs (a lost job banks nothing)
+  const banked: SagaState = newState();
   const ctx: PlanCtx = { w, arm, draw, avoid: job.avoid, direction: DIRECTION };
 
   // ── the plan: one call, repairs, one plain re-draw on a hard defect, else the mock (§2.7)
@@ -355,9 +357,11 @@ async function runSaga(job: Job): Promise<Row> {
     const e = finale ? plan.showdown : plan.episodes[jobN - 1]!;
     kk++;
     const questId = `${job.id}.q${kk}`;
-    // the card: card 1 is always its own call (R1, C3), every later card carries its job's why (C1)
+    // the card: card 1 is always its own call (R1, C3), every later card carries its job's why (C1); a
+    // re-posed job is marked (R2, S5), and later cards get what was learned and what is held (S1, S2)
+    const tryOnJob = finale ? 1 : (tries.get(jobN) ?? 0) + 1;
     const cc = kk === 1 ? firstCardPayload(plan, w, arm, k, DIRECTION)
-      : laterCardPayload(plan, e, latest, arm, k, { finale, lastchance, direction: DIRECTION });
+      : laterCardPayload(plan, e, latest, arm, k, { finale, lastchance, retry: tryOnJob > 1, state: { learned: [...banked.learned], held: [...banked.held] }, direction: DIRECTION });
     const cr = await write({ saga: job.id, calls, purpose: 'card', flags: cc.flags, vars: cc.vars, payload: cc.payload, effort: 'low', schema: zCardOut, mock: () => mockCard(cc.payload, cc.flags) });
     if (kk === 1) card1Ms = planMs + cr.ms;
     let card = cr.out?.card?.trim() ?? '';
@@ -365,7 +369,6 @@ async function runSaga(job: Job): Promise<Row> {
     if (words(card) > cc.vars.MAX!) capBreaks.push(`card_${kk} ${words(card)}/${cc.vars.MAX}`);
     if (kk === 1) card1 = card;
     noteDelivered(card, plan, k, false);
-    const tryOnJob = finale ? 1 : (tries.get(jobN) ?? 0) + 1;
     const setbackLine = !finale && tryOnJob > 1 ? ` · a setback — ${failures} of ${budget} before it slips away` : '';
     const matter = onThisMatter(plan, card);
     const cardMd = [
@@ -394,7 +397,7 @@ async function runSaga(job: Job): Promise<Row> {
     attempts.push({ k: kk, questId, isFinale: finale, outcome });
 
     // the report
-    const rp = reportPayload({ plan, e, card, party, decides: dice.decides, outcome, finale, hurt, cost, option, fate, arm, k, gravity, direction: DIRECTION });
+    const rp = reportPayload({ plan, e, card, party, decides: dice.decides, outcome, finale, hurt, cost, option, fate, arm, k, gravity, direction: DIRECTION, state: { learned: [...banked.learned], held: [...banked.held] } });
     const r = await write({ saga: job.id, calls, purpose: 'report', flags: rp.flags, vars: rp.vars, payload: rp.payload, effort: 'low', schema: zReportOut, mock: () => mockReport(rp.payload, rp.flags), variant: `report__${finale ? 'finale-' : ''}${outcome}` });
     let rep: { before: string; after: string; summary: string; truth?: string } | null = r.out ? { before: r.out.before.trim(), after: r.out.after.trim(), summary: (r.out.summary ?? '').trim(), truth: r.out.truth?.trim() || undefined } : null;
     if (!rep) { rep = mockReport(rp.payload, rp.flags); problems.push(`report_${kk}: the writer failed, the template stood in`) }
@@ -406,6 +409,7 @@ async function runSaga(job: Job): Promise<Row> {
     if (words(rep.after) > rp.vars.A!) capBreaks.push(`report_${kk} after ${words(rep.after)}/${rp.vars.A}`);
     if (words(rep.summary) > 25) capBreaks.push(`report_${kk} summary ${words(rep.summary)}/25`);
     noteDelivered(`${rep.before} ${rep.after} ${rep.summary}`, plan, k, true);
+    bank(banked, e, outcome);
     lines.push({ n: finale ? N : jobN, attempt: kk, outcome, party: party.map(p => p.name), text: rep.summary, hurt });
     if (!finale && outcome === 'failure') { failures++; if (failures >= budget) lastchance = true }
     const status = finale ? (outcome === 'failure' ? 'it slips away, for now' : 'it is settled')
@@ -463,7 +467,7 @@ async function runSaga(job: Job): Promise<Row> {
     },
     planInput: planIn, plan, rawPlan,
     validation: { repairs, defects, redraws, fallback },
-    lint, capBreaks, lines, met: [...k.met], named: [...k.named], seen: [...k.seen],
+    lint, capBreaks, lines, banked, met: [...k.met], named: [...k.named], seen: [...k.seen],
     cost, latency: { planMs, card1Ms, calls: calls.map(c => ({ purpose: c.purpose, ms: c.durationMs })) },
   }, null, 2));
   const meta = {
@@ -547,6 +551,15 @@ async function main() {
       ['plan, full cast', k => k.startsWith('plan__full__')], ['plan, lean cast', k => k.startsWith('plan__lean__')],
       ['card 1 (first)', cardWith('first')], ['a later card', cardWith('later')], ['the finale card', cardWith('finale')],
       ['a last-chance finale card', cardWith('lastchance')], ['a personal card', cardWith('personal')], ['a card with a memory', cardWith('memory')],
+      // R2: a retry card, a later card with learned clues, the finale with gains held (and their edges) and with none
+      ['a retry card (S5)', cardWith('retry')], ['a later card with learned clues (S1)', (_k, c) => c.purpose === 'card' && c.flags.includes('later') && c.flags.includes('mystery')],
+      ['a finale card with gains held (S2)', (_k, c) => c.purpose === 'card' && c.flags.includes('finale') && c.flags.includes('edge')],
+      ['a finale card with no gains held (S2)', (_k, c) => c.purpose === 'card' && c.flags.includes('finale') && !c.flags.includes('have')],
+      ['a won middle report with clue + gain (S1, S2)', (_k, c) => c.purpose === 'report' && c.flags.includes('clue') && c.flags.includes('brought')],
+      ['a middle report with known clues and holdings (S1, S2)', (_k, c) => c.purpose === 'report' && c.flags.includes('known') && !c.flags.includes('answer')],
+      ['a finale report with known clues (S1)', (_k, c) => c.purpose === 'report' && c.flags.includes('answer') && c.flags.includes('known')],
+      ['a finale report with gains held (S2)', (_k, c) => c.purpose === 'report' && c.flags.includes('answer') && c.flags.includes('edge')],
+      ['a finale report with no gains held (S2)', (_k, c) => c.purpose === 'report' && c.flags.includes('answer') && !c.flags.includes('have')],
       ['a success report', k => k.startsWith('report__success__')], ['a partial report', k => k.startsWith('report__partial__')],
       ['a failure report', k => k.startsWith('report__failure__')], ['a finale report', k => k.startsWith('report__finale-')],
       ['the answer (truth) report', (_k, c) => c.purpose === 'report' && c.flags.includes('answer')],
@@ -563,10 +576,10 @@ async function main() {
       'File names: `plan__<cast arm>__<flags>` · `card__<flags>` · `report__<outcome, finale- for the finale>__<flags>`.', '',
       'Flags (each turns on the template lines, spans or skeleton fields it names; a flag is on only when the payload carries what it explains):',
       '- plan: `shape` shape dealt · `episodes` job list dealt (arm S) · `types` job types to pick from (arms H, L) · `stake` a stake dealt (full cast) · `notrade` someone in cast has no trade (lean cast) · `personal` the story is a soldier\'s own past · `memory` a returning face · `direction` the player\'s wish · `avoid` recent stories.',
-      '- card: `first` / `later` / `finale` which card · `loses` card 1\'s premise carries the loss · `personal` a soldier\'s own past (card 1, finale) · `memory` a returning face met here · `lastchance` the failure budget is spent · `direction`.',
-      '- report: `saga` the reply has a summary · `moved` its summary says what changed · `failure` + `stopped` a failed job, its summary says what stopped it · `people` someone besides the soldiers acts in the job · `personal` the soldier whose past the story is went (the summary may name them) · `decides` `result` `option` `hurt` `cost` `brought` `direction` one data line each · `hurtprice` a partial whose price is the wound (no cost dealt) · `answer` the finale\'s answer, returned as its own `truth`.',
+      '- card: `first` / `later` / `finale` which card · `loses` card 1\'s premise carries the loss · `personal` a soldier\'s own past (card 1, finale) · `memory` a returning face met here · `lastchance` the failure budget is spent · `retry` a re-posed job (what stopped the last try) · `mystery` the question with what was learned so far · `have` what the company holds from won jobs · `edge` (finale) how each held gain helps · `direction`.',
+      '- report: `saga` the reply has a summary · `moved` its summary says what changed · `failure` + `stopped` a failed job, its summary says what stopped it · `people` someone besides the soldiers acts in the job · `personal` the soldier whose past the story is went (the summary may name them) · `decides` `result` `option` `hurt` `cost` `direction` one data line each · `brought` a won job\'s gain · `clue` what a won job brings to light · `known` what earlier won jobs found (middle or finale) · `have` what the company holds (`edge`: at the finale, how each helps) · `hurtprice` a partial whose price is the wound (no cost dealt) · `answer` the finale\'s question and its secret (the plan\'s answer), returned as its own `truth` (the moment it comes out).',
       '',
-      missing.length ? `**Not reached this pass:** ${missing.join(' · ')}.` : 'Every variant class the verifier needs is here: plan full and lean; card first, later, finale, last chance, personal, memory; report success, partial, failure, finale, answer, personal.', '',
+      missing.length ? `**Not reached this pass:** ${missing.join(' · ')}.` : 'Every variant class the verifier needs is here: plan full and lean; card first, later, finale, last chance, personal, memory, retry, learned clues, finale with and without gains; report success, partial, failure, finale (with and without gains, with known clues), answer, personal, won middle with clue + gain, middle with known clues.', '',
       'The writer column says whose earlier outputs fed the payload: a real run (the plan, cards and summaries the model wrote) or the mock floor (template text).', '',
       '| file | call | flags | words | from saga | writer |', '|---|---|---|---|---|---|', ...rows, ''].join('\n'));
     console.log(`rendered ${RENDERED.size} prompt variants → ${path.relative(V3, rd)}${missing.length ? ` · NOT reached: ${missing.join(', ')}` : ' · every variant class reached'}`);

@@ -3,6 +3,7 @@
 //
 //   npx tsx scripts/sagalab/score.ts --runs A_RUN[,B_RUN] [--label base] [--out RUN]
 //   npx tsx scripts/sagalab/score.ts --pair X_RUN,Y_RUN      (paired: arm X − arm Y, e.g. probe2/L_lean,probe2/L_full)
+//   either mode: --m5 j1_sonnet picks M5's second seat (default: the first alongside seat a saga has)
 //
 // Reads, per run: sagas/*/meta.json · mech.json (run mech.ts first) · judge/j1_*/<saga>.json ·
 // judge/j2_*/<saga>.json · judge/j3_*/vs_*/<saga>.json · judge/j4_*/*.json, and <saga>/j2_strict.json
@@ -45,7 +46,10 @@ const files = (p: string) => fs.existsSync(p) ? fs.readdirSync(p).filter(f => f.
 const sagaRoot = (runDir: string) => fs.existsSync(path.join(runDir, 'sagas')) ? path.join(runDir, 'sagas') : runDir;
 /** the primary J1 seat for taste scores (Phase-0 calibration), and the seats reported alongside it */
 const PRIMARY_J1 = 'j1_opus';
-const ALONGSIDE_J1 = ['j1_gpt5'];
+const ALONGSIDE_J1 = ['j1_gpt5', 'j1_sonnet'];
+/** M5's second seat (the primary is always the first): --m5 SEAT, else the first alongside seat the saga has.
+ *  Named, never folder order, so a paired run compares the same two seats on both arms. */
+const M5_SEAT = opt('m5');
 
 interface J1 { seat: string; texts: { text: string; kind: string; paraphrase?: string; ease?: number; want_to_send?: number; want_next?: number; reread?: string; send?: boolean }[]; end?: J }
 /** a J2 grade of one paraphrase part: true · "unclear" (the card left it unclear) · false. Legacy
@@ -205,8 +209,9 @@ const METRICS: Metric[] = [
   ...tasteMetrics(PRIMARY_J1, ''),
   ...ALONGSIDE_J1.flatMap(seat => tasteMetrics(seat, `·${seat.replace(/^j1_/, '')}`)),
   { id: 'M5', name: 'Reread (texts where BOTH J1 seats quote one)', fmt: 'pct', target: 'G3 ≤ 10% · G2 ≤ 15%', note: 'needs 2 J1 seats; with one seat, see M5′', f: s => {
-    if (s.j1.length < 2) return [0, 0];
-    const [a, b] = s.j1;
+    const a = s.j1.find(j => j.seat === PRIMARY_J1);
+    const b = s.j1.find(j => M5_SEAT ? j.seat === M5_SEAT : ALONGSIDE_J1.includes(j.seat));
+    if (!a || !b) return [0, 0];
     let x = 0, d = 0;
     for (const t of a!.texts) { const u = b!.texts.find(v => v.text === t.text); if (!u) continue; d++; if (nonEmpty(t.reread) && nonEmpty(u.reread)) x++ }
     return [x, d];
@@ -266,7 +271,7 @@ function entropyOf(labels: string[]): { distinct: number; bits: number; top: str
 }
 
 /** the rows the paired mode reports (the §D order: follow first — M1, M5, M2 — then M3, then the checks) */
-const PAIRED_IDS = ['M1', 'M1c1', 'M5', 'M2', 'M2·gpt5', 'M3', 'M3·gpt5', 'M8', 'M11', 'M12a', 'M12b', 'M12c', 'M13'];
+const PAIRED_IDS = ['M1', 'M1c1', 'M5', 'M2', 'M2·gpt5', 'M2·sonnet', 'M3', 'M3·gpt5', 'M3·sonnet', 'M8', 'M11', 'M12a', 'M12b', 'M12c', 'M13'];
 
 /** arm X − arm Y over the fixture_draw slots both played, with a paired bootstrap 95% CI */
 function paired(x: string, y: string) {

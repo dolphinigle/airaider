@@ -580,6 +580,17 @@ Opus codes; Fable plans and verifies. **Each phase ends in a gate. Stop rule:** 
 - **Runs:** `runs/probe2/{L_full,L_lean}/<fx>_<draw>/`, paired slot for slot with probe1 (same soldiers, dice, path and seed). `score.ts --pair` reads the gap. The repetition series now deals each draw its own cast.
 - ⏳ **If L_lean wins, the asker's trade and the stake move from the engine to the plan** (§2.2, §2.4.2, §2.4.3). That is a designer ruling, and it is not written in here as decided.
 
+#### Lab writer + R2 (2026-10-02)
+- **Designer ruling:** develop the storyteller with Claude as the lab writer (headless CLI, `probe.ts --writer sonnet`) until the structure is right; the shipping model is chosen later. The lab arm is L_lean; the trade and stake move above stays ⏳.
+- **Sonnet as the writer** (`v3/scripts/sagalab/reports/2026-10-02-sonnet-writer-probe3.md`): followability up on every §D row; what is left is structure, not the model.
+- **R2 fixes those structure classes** (lab-only: `v4lab.ts`, `probe.ts`, the templates; budgets unchanged):
+  - **S1, the answer is earned:** the answer says who or what and why; each middle job has a `learn`, the one piece its win brings to light (the showdown keeps the last). The engine banks a won job's learn; later cards get the mystery so far; the finale's `truth` is the moment the answer comes out, tied to what was learned.
+  - **S2, middle wins carry forward:** each middle job has a `gain` (what the company then holds); the engine keeps won gains as saga state; later texts get `have`; the showdown's `edge` per gain reaches the finale only for gains held. A lost job banks nothing, and the finale still works.
+  - **S3:** the finale card gets whose fate it decides and what is lost (`fate`, `lose`), never the ways.
+  - **S4:** a person's `part` reaches a text only when they are in that job.
+  - **S5:** a re-posed job's card gets `retry` (what stopped the last try) in place of `latest`.
+  - **S6:** `why` is what the one who asked needs the job for, never what it will find, prove or reveal.
+
 ### 5.3 Phase 2: build (each step green on the mock)
 - **2a Engine:** `saga.ts` (shapes, types, tests, stakes, casting + fences, places, record, injuries, deciding soldier, event edges incl. NPC → soldier); `themes.ts` (the ≥ 1,000-theme library + the dealer); `plainwords.ts`; `chains.ts`; `storyRngState`; `lore.ts` edge helper; `injury.ts`. Tests: saga, castrules, storyrng, themes (no repeat within 50). The structure arm chosen at G1 is the one built; the others stay lab-only.
 - **2b AI:** `storyteller.ts` (rendering, builders + names filter, zod, §2.7); templates; `provider.ts` (`planSaga`, `writeCard`, `writeReport`; one-off `writeQuest`/`resolve` kept); `openai.ts` wiring via `callR`; `mock.ts`. Tests: promptbudget, payloadlint, nameleak, planvalidate.
