@@ -1,30 +1,28 @@
-You plan a short story for a fantasy game about a mercenary company, played as a few jobs: the player reads a card, sends soldiers, reads what happened.[[personal]] The story is the past of the company's soldier in cast. Nobody hires the company; failing may cost that soldier.[[/personal]]
+You plan a short story for a fantasy game about a mercenary company, played as a few jobs.[[personal]] The story is the past of the company's soldier in cast; nobody hires the company.[[/personal]]
 
 The data:
 - seed: the idea under the story, never pasted.
 [[shape]]- shape: the kind of story.[[episodes]] episodes: the jobs before the showdown, in order, with what the soldiers do and the kind of win.[[/episodes]]
 [[types]]- jobs: how many before the showdown. types: kinds of job: what soldiers do, the kind of win.
-- cast: the people.[[notrade]] One with no trade gets one that fits the seed.[[/notrade]] Use them all as the seed's people; add nobody else who matters unless the seed mentions them. Name only those given a name; the rest by label.[[memory]] memory, where: their past with the company, where they are now; build on both.[[/memory]]
+- cast: the people; traits: what they are like.[[notrade]] One with no trade gets one that fits the seed.[[/notrade]] Use them all as the seed's people; add nobody who matters unless the seed has them. Name only those given a name; the rest by label.[[memory]] memory, where: their past with the company, where they are now; build on both.[[/memory]]
 [[stake]]- stake: what is at risk; lose makes it concrete.
 [[!personal]]- ending: whose fate the showdown decides. likely: the end it builds toward. ways: how it can end, and what each means.
 [[personal]]- ending: whose old matter the showdown settles. likely: the way it builds toward. ways: how it can be settled.
-- land, places: where to set it; places may repeat.
+- land, places: the setting; places may repeat.
 - tone: how it should feel.
 [[direction]]- direction: the player's wish; it wins over tone.
 [[avoid]]- avoid: recent stories; differ in pattern, not only names.
 
 Write:
 - title: a few plain words.
-- question: one sentence starting "Nobody knows": something hidden the player most wants to know, never which way it ends. answer: who or what, and why, in one or two sentences: surprising, not in the seed, no new person.
-- cast: [[personal]]except the soldier, [[/personal]]a label: two or three plain words a stranger sees, ending in their trade, never a name.
-- [[!personal]]asker: want, what the one who asked wants[[/!personal]][[personal]]soldier: want, what they want[[/personal]] to happen, naming who or what[[!personal]]; never what becomes of the person in ending[[/!personal]].[[personal]] past: the old wrong.[[/personal]]
-- episodes, in order. job: a verb, whom or what, and where. people: ids of those there[[!personal]]; episode 1 includes the person in ending[[/!personal]]; ids nowhere else. trouble: who stands in the way, by label if in cast, always armed people or a beast, with what, and what they will do. win: what success changes, from the kind of win. gain: a thing, captive or ally the company then holds. learn: a piece of the answer the win uncovers; together they leave part hidden till the showdown. why: what [[!personal]]the one who asked[[/!personal]][[personal]]the soldier[[/personal]] needs this job for and what each thing or person in it is; never what it will find, prove or reveal.
-- showdown: job, people, trouble, why as above. edge: how each job's gain, in order, helps here. settles: a done fact, no "if": how [[!personal]]the one who asked[[/!personal]][[personal]]the soldier[[/personal]] gets what they want. Job, why, edge and settles fit every way in ending. lose: what [[!personal]]the one who asked[[/!personal]][[personal]]the soldier[[/personal]] loses for good if the company fails.
-- options: for each way in ending, what the soldiers do, verb first.
+- question: one sentence starting "Nobody knows": the hidden thing the player most wants to know, not the ending. answer: who or what, and why, in a sentence or two: surprising, not in the seed, no new person.
+- cast: [[personal]]except the soldier, [[/personal]]a label: two or three plain words a stranger sees, ending in their trade, no name or traits.
+- [[!personal]]asker: want, what the one who asked wants[[/!personal]][[personal]]soldier: want, what they want[[/personal]] to happen, naming who or what[[!personal]]; never what becomes of the person in ending[[/!personal]].[[personal]] past: the old wrong, retold, naming who was wronged.[[/personal]]
+- episodes, in order. job: a verb, whom or what, and one place; it follows the last win. people: ids of those there[[!personal]]; episode 1 includes the person in ending[[/!personal]]; ids nowhere else. trouble: who stands in the way (by label if in cast; armed people or a beast), with what, and what they will do. win: what success changes, naming who or what. gain: a thing, captive or ally the company then holds. learn: a plain fact the win brings out, clear on its own, that narrows the answer, never naming what the question asks for; the showdown keeps the last piece. why: what the job's thing or person is and what having it lets [[!personal]]the one who asked[[/!personal]][[personal]]the soldier[[/personal]] do for their want; never what the win brings out.
+- showdown: job, people, trouble, why as above. edge: how each job's gain, in order, helps here. settles: a done fact, no "if": how [[!personal]]the one who asked[[/!personal]][[personal]]the soldier[[/personal]] gets their want. Job, trouble, why, edge and settles fit every way in ending, even after failed jobs or an answer that changes how the person in ending looks. lose: what [[!personal]]the one who asked[[/!personal]][[personal]]the soldier[[/personal]] loses for good if the company fails.
+- options: per way in ending, what the soldiers do, verb first.
 
-A story that works:
-- One person wants one thing badly, and someone stands in the way, each for a plain human reason.
-- Each job is at one place and follows the last win; the showdown works even if earlier jobs failed.
+A story that works: one person wants one thing badly, and someone stands in the way, each for a plain human reason.
 
 Plain words, third person; no numbers, nothing modern, no pay. The company never met anyone in cast[[personal]] but its own soldier[[/personal]][[memory]][[personal]] and[[/personal]][[!personal]] but[[/!personal]] the one with a memory[[/memory]]; only the company lives at its fort.
 

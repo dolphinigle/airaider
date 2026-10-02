@@ -1,0 +1,50 @@
+[
+ {
+  "file": "card__have+later+latest+mystery.txt, card__have+later+mystery+retry.txt, card-personal__have+later+*.txt, card__finale+*.txt, card-personal__finale+have+lose+mystery.txt, card__first+loses+personal.txt",
+  "where": "Reply line: {\"card\": \"at most 70 words\"} (later/first) and \"at most 90 words\" (finale), against the ordered fact list",
+  "problem": "The cap is too small for what the data requires. A later card must cover six ordered items: latest, mystery (question plus each learned fact), job, why, have and trouble. That is about 60 words of raw data before any connecting words. A finale card has seven items with two learned facts. The first personal card's premise alone has five sub-fields: who, wants, past, loses, unknown. In the real Sonnet run on this same template (L_lean_sonnet_v2), 8 of 9 cards went over the cap: 75, 78, 82, 84, 85, 96 and 97 words against 70, and 106 against 90. The personal card 1 kept to the cap by dropping `past` (the old wrong), which is the story's best fact. A cheaper model will either overflow or silently drop an item, and you can't predict which.",
+  "fix": "Make the cap fit the load. Either derive it from the number of items sent (about 12 words per ordered item), or cut an item: for example, merge `why` into `job` as one sentence, since why mostly restates the want. For card 1 of a personal story, put `past` in the fact order on its own (premise, past, job, ...) so it can't be the item that gets dropped."
+ },
+ {
+  "file": "card__finale+have+mystery.txt, card__finale+have+mystery+part.txt, card__finale+have+lose+mystery.txt, card__finale+have+lose+mystery+part.txt, card-personal__finale+have+lose+mystery.txt (and, more weakly, every later card with `have`)",
+  "where": "\"have: things won earlier; one clause at most, only where useful here.\" plus payload \"have\":[\"a map to ...\", ...] (bare strings)",
+  "problem": "The writer is asked to judge where each holding is useful and how, but gets no information about its use. The plan already wrote `edge` (how each gain helps at the showdown), and the finale REPORT receives it as have[].helps. The finale CARD gets only bare names. The writer has two options. It can invent a use, which may contradict the report's helps. Or it can write filler: the real Sonnet finale card printed \"Her trade map and tally-book help you.\" when the plan's edges were \"the map shows the quiet road to Tarngarth\" and \"the tally-book shows which chest holds the bond-papers\".",
+  "fix": "Send the finale card the same {holds, helps} objects the finale report gets, with the gloss \"have: what you hold; helps: its use here, one clause\". On middle cards, where no helps exists, change the gloss to \"have: what you bring, named only; never say how it helps\"."
+ },
+ {
+  "file": "card__finale+have+lose+mystery.txt, card__finale+have+lose+mystery+part.txt, card-personal__finale+have+lose+mystery.txt, card__first+intro+loses.txt, card__first+loses+memory.txt, card__first+loses+personal.txt",
+  "where": "payload premise.loses / lose.loses vs premise.wants / helping.wants; order line \"... trouble, lose\"",
+  "problem": "The gate that should send `lose` only \"when it adds to the want\" checks for repeated words, so a paraphrase passes. The wording changes but the meaning doesn't. When the words repeat it does drop: \"to save his livelihood\" / \"his livelihood\" (F3_1) and \"to keep her home\" / \"her home\" (F1_1). Every paraphrase passes: \"to clear his name\" / \"his good name\", \"to keep his promise\" / \"the promise he made\", \"to save a life\" / \"a life dear to her\". The writer then gets the same fact as two ordered items, or three counting `why` (\"...is his good name safe for Gwinir\"), and is also told \"Say each fact once\". It either restates the want or breaks the order. Real Sonnet finale: \"He wants his bond ended... Taking it lets you tear up the bond... If you fail, Adelroth stays bound for good.\" The plan prompt makes this the common case, because asker.want and showdown.lose are both derived from one `stake`.",
+  "fix": "Drop the word-level gate. Send want and loss as one item, for example premise/helping: {who, wants, fails: \"what is lost for good if you fail\"}, with the gloss \"one or two sentences: what they want, and what failing costs them\". The writer then says it as a single beat. Send `lose` as a separate item only at a last chance."
+ },
+ {
+  "file": "card__later+retry.txt, card__finale+lastchance+latest+lose.txt",
+  "where": "payload has no `mystery` key at all (F3_3: no job won yet)",
+  "problem": "`mystery` is only sent when at least one fact has been learned. A saga with no won jobs therefore states its open question only on card 1. The finale card (the last chance) never mentions it. The finale report then has to reveal the secret (\"The secret comes out within it\") and answer a question the player last saw two or more cards earlier. The card writer can't bring the question back because it isn't in the data.",
+  "fix": "Always send mystery.question while the question is open, with an empty `learned` list. Change the gloss to \"the question still open; any facts found so far, in one sentence\" so that an empty list reads naturally."
+ },
+ {
+  "file": "card__finale+have+mystery+part.txt, card__finale+have+lose+mystery+part.txt",
+  "where": "\"names: ... part: their side, shown, not stated.\" with names entry {\"name\":\"Marsilia\",...,\"part\":\"is caught between the two sides\"}",
+  "problem": "The person carrying `part` has no role in any card fact (job, why, trouble, have, lose) and no place in the \"Say each fact once ... in this order\" list. Showing a side means writing a moment of action, but the card is a briefing and the data gives that person nothing to do. To obey \"shown, not stated\", the writer has to invent a scene (\"Marsilia watches from the doorway, torn\"), which breaks \"Use only the data\". Otherwise it ignores the line. It can't tell whether this person is even at the showdown.",
+  "fix": "Remove the `part` gloss from card prompts and leave showing to the report, where the person is present. If the card should mention them, add an ordered fact with a plain statement, for example \"there: who else will be at the showdown, and whose side they lean to\"."
+ },
+ {
+  "file": "plan__full__stake+types.txt, plan__full__memory+stake+types.txt, plan__full__personal+stake+types.txt, plan__lean__*.txt",
+  "where": "\"cast: a label: two or three plain words a stranger sees, ending in their trade, no name or traits.\"",
+  "problem": "This line contradicts itself. Race and things like \"thin\", \"plain-faced\" or \"stern\" are exactly what a stranger sees, yet they are traits. The real Sonnet plans on this same line produced \"Stern lizardfolk merchant\", \"Young wolfkin bonded servant\" (four words, with an invented age), \"Human timber merchant\" and \"Elf funeral singer\": capitalised, with race and traits. Labels feed every card's names list and get printed (\"the stern lizardfolk merchant\", \"Benjamund \u2014 Human timber merchant\"). So the contradiction leaks traits and odd capitals into all the downstream prose.",
+  "fix": "State the rule without the contradiction: \"label: lowercase, 'a' or 'an' plus their trade, at most one plain word of look or place; never their race or a word from traits\". Drop \"a stranger sees\"."
+ },
+ {
+  "file": "report__finale-partial__*.txt, report__finale-success__answer+decides+edge+have+*.txt",
+  "where": "\"have: ... helps: its use; show each used in after.\" + \"after: at most 140 words\" + \"summary: ... at most 25 words\"",
+  "problem": "The finale's `after` must fit all of these into 140 words: the deciding moment, the plan, the result (two facts), the secret built from up to three known facts, every holding shown in use (up to three), cost and/or hurt, and up to three people, one introduced and each with their side shown. In the dense payloads (for example F1_3: three holdings, three people, an intro, a hurt) that adds up to roughly 150 words or more. The real Sonnet finale reports wrote 154 words against 140, and summaries of 26 and 28 words against 25, because the finale `result` is two sentences.",
+  "fix": "Either scale the finale `after` cap with the number of holdings and people, or loosen \"show each used\" to \"show the holdings that matter, one clause each\". Allow about 30 words for the finale summary, or give the finale `result` as one sentence."
+ },
+ {
+  "file": "plan__full__personal+stake+types.txt, plan__lean__personal+types.txt",
+  "where": "\"seed: ... never pasted\" vs \"past: the old wrong, retold, naming who was wronged\" vs JSON \"past\": \"few words\"",
+  "problem": "In a personal story the seed is the old wrong (\"Jervaise left her younger brother bound to a debt-master...\"). The writer gets three instructions that conflict: retell it, never paste the seed, and keep it to a few words. The real Sonnet plan kept the seed almost word for word as one long sentence (\"She left her younger brother bound to the slaver to buy her own way out of the valley, and never went back for him.\"), which went straight into card 1's premise.past.",
+  "fix": "Make the three agree: \"past: the old wrong, one sentence in your own words, naming who was wronged\", JSON \"past\": \"one sentence\". Exempt it from \"seed: never pasted\", or reword that line to \"never copied word for word\"."
+ }
+]

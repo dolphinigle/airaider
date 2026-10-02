@@ -39,7 +39,7 @@ export interface TextRec {
   beat?: number | 'finale';                                         // the saga step (card's SAGA line)
   prose?: string; errand?: string; approaches?: string[];          // card
   before?: string; after?: string; outcome?: string; diceLine?: string;   // report
-  truth?: string;                                                   // probe finale report: the answer, its own line (R1)
+  truth?: string;                                                   // probe finale report: the answer in one plain sentence (R3: for the chronicle, not printed)
 }
 export interface SagaMeta {
   fixture: LabFixture; run: string; chainId: string | null; chainState: string | null;

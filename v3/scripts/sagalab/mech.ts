@@ -82,6 +82,8 @@ export interface SagaMech {
   pasteBeat1: number | null; pasteAll: number | null;
   card1: string; title: string; jobSeq: string[]; paperworkJobs: number; jobs: number;
   cardWords: number[]; beforeWords: number[]; afterWords: number[];
+  /** (R3) probe sagas only: prompt-gloss runs printed in card and report prose, per text (`card_3: this job decides`) */
+  glossEchoes?: string[];
 }
 
 function readJsonl<T>(p: string): T[] {
@@ -98,6 +100,24 @@ export function pasteRate(out: string, input: string): number | null {
   const covered = new Array(ow.length).fill(false);
   for (let i = 0; i + 4 <= ow.length; i++) if (inGrams.has(ow.slice(i, i + 4).join(' '))) for (let j = i; j < i + 4; j++) covered[j] = true;
   return covered.filter(Boolean).length / ow.length;
+}
+
+/** (R3, W3) gloss echo, log-only: the prompt's own wording printed as story — a 3-word run of the SYSTEM prompt
+ *  (with at least one content word) that the output carries and the payload does not ("this job decides", "you
+ *  try this"). A data gloss says what to cover; when its words come back as a sentence, the gloss was read as
+ *  text to copy. Returns each echoed run once, merged where runs overlap */
+export function glossEchoes(system: string, user: string, output: string): string[] {
+  const sys = words(system.replace(/Reply with JSON only:[\s\S]*$/, ''));
+  const content = (g: string[]) => g.some(w => w.length >= 3 && !STOP.has(w));
+  const sysGrams = new Set<string>();
+  for (let i = 0; i + 3 <= sys.length; i++) { const g = sys.slice(i, i + 3); if (content(g)) sysGrams.add(g.join(' ')) }
+  const inGrams = new Set(grams(words(user), 3));
+  const ow = words(output);
+  const hit = ow.map(() => false);
+  for (let i = 0; i + 3 <= ow.length; i++) { const g = ow.slice(i, i + 3).join(' '); if (sysGrams.has(g) && !inGrams.has(g)) hit[i] = hit[i + 1] = hit[i + 2] = true }
+  const out: string[] = [];
+  for (let i = 0; i < ow.length; i++) if (hit[i]) { let j = i; while (j < ow.length && hit[j]) j++; out.push(ow.slice(i, j).join(' ')); i = j }
+  return [...new Set(out)];
 }
 
 export function sagaMech(runDir: string, id: string): SagaMech {
@@ -257,8 +277,17 @@ export function sagaMechProbe(runDir: string, id: string): SagaMech {
     else if (c.purpose === 'report') {
       check('before', o.before, cap(c.system, /before: at most (\d+) words/));
       check('after', o.after, cap(c.system, /after: at most (\d+) words/));
-      check('summary', o.summary, cap(c.system, /summary: one sentence of at most (\d+) words/));
+      check('summary', o.summary, cap(c.system, /summary: one sentence(?:,| of) at most (\d+) words/));
     }
+  }
+  // (R3, W3) gloss echo over every card and report the writer returned (prose fields only)
+  const echoes: string[] = [];
+  let nCard = 0, nRep = 0;
+  for (const c of calls.filter(x => x.ok && (x.purpose === 'card' || x.purpose === 'report'))) {
+    const o = tryJson(c.output); if (!o) continue;
+    const label = c.purpose === 'card' ? `card_${++nCard}` : `report_${++nRep}`;
+    const prose = c.purpose === 'card' ? String(o.card ?? '') : [o.before, o.after].filter(x => typeof x === 'string').join(' ');
+    for (const g of glossEchoes(c.system, c.user, prose)) echoes.push(`${label}: ${g}`);
   }
   const softErrors = calls.filter(x => !x.ok).length;
   const hardFailures = Number(!!pf.validation.fallback) + meta.problems.filter(p => /fallback/.test(p)).length;
@@ -289,6 +318,7 @@ export function sagaMechProbe(runDir: string, id: string): SagaMech {
     pasteBeat1: lastFirst?.rate ?? null, pasteAll: mean(pastes.map(p => p.rate)),
     card1: cards[0]?.prose ?? '', title: plan?.title ?? cards[0]?.title ?? '', jobSeq, paperworkJobs, jobs: eps.length,
     cardWords: cards.map(c => wc(c.prose)), beforeWords: reports.map(r => wc(r.before)), afterWords: reports.map(r => wc(r.after)),
+    glossEchoes: echoes,
   };
 }
 
@@ -353,6 +383,9 @@ export function runMech(runDir: string) {
     D3_topOpeningStamp: topStamp ? `${topStamp[0]} ×${topStamp[1]}` : null,
     D3_topOpeningStampShare: topStamp && per.length ? topStamp[1] / per.length : null,
     M13_paperworkProxy: (j => j ? per.reduce((s, p) => s + p.paperworkJobs, 0) / j : null)(per.reduce((s, p) => s + p.jobs, 0)),
+    GE_glossEchoes: per.reduce((s, p) => s + (p.glossEchoes?.length ?? 0), 0),
+    GE_textsWithEcho: per.reduce((s, p) => s + new Set((p.glossEchoes ?? []).map(x => x.split(':')[0])).size, 0),
+    GE_top: (() => { const n = new Map<string, number>(); per.flatMap(p => p.glossEchoes ?? []).map(x => x.replace(/^[^:]*: /, '')).forEach(g => n.set(g, (n.get(g) ?? 0) + 1)); return [...n.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12).map(([g, c]) => `${g}×${c}`) })(),
   };
   return { run: path.basename(runDir), perSaga: per, aggregate: agg };
 }
@@ -392,6 +425,7 @@ function main() {
     `| §D.3 job types | ${Object.entries(a.D3_jobTypes).map(([k, v]) => `${k} ${v}`).join(' · ')} |`,
     `| §D.3 top card-1 opening stamp | ${a.D3_topOpeningStamp ?? '—'} (${pct(a.D3_topOpeningStampShare)}) |`,
     `| M13 paperwork (errand keyword proxy; J2 decides) | ${pct(a.M13_paperworkProxy)} |`,
+    `| GE gloss echo (prompt 3-word runs in prose, not in the payload; log-only) | ${a.GE_glossEchoes} runs in ${a.GE_textsWithEcho} texts · ${a.GE_top.join(' · ')} |`,
     '',
   ].join('\n');
   fs.writeFileSync(path.join(runDir, 'mech.md'), md);

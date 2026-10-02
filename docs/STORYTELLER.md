@@ -591,6 +591,41 @@ Opus codes; Fable plans and verifies. **Each phase ends in a gate. Stop rule:** 
   - **S5:** a re-posed job's card gets `retry` (what stopped the last try) in place of `latest`.
   - **S6:** `why` is what the one who asked needs the job for, never what it will find, prove or reveal.
 
+#### R3 (2026-10-03, lab-only, unjudged: probe5)
+- **R3 keeps R2's spine** (learns banked per won job, gains held and used at the finale, no ending menu, part tags only on-job, retries marked). It changes how the fields are worded and rendered (report `2026-10-03-R2-probe4.md` §5):
+  - **W1:** `why` says what the job's thing or person is, and what having it lets the one who asked do toward their want. It never says what the win brings out.
+  - **W2:** `learn` is one plain fact that makes sense on its own. It narrows the answer but never names what the question asks for, and the showdown keeps the last piece. The report shows it found plainly and adds nothing past it.
+  - **W3:** card and report glosses say what to cover. They are not sentences the writer can copy (fate, "you hold", "not met yet", "try this same job again"). A label-only entry no longer carries `intro`. `mech.ts` counts gloss echo (log-only).
+  - **W4:** the finale card gets held things by name, in one clause at most and only where useful. It gets learned facts in one sentence, with no `latest` after a win, no trouble `will`, and `lose` only when it adds to the want or at a last chance. `helps` goes only to the finale report.
+  - **W5:** the secret comes out inside the finale report's `after`, in time order. `truth` is one plain sentence kept in the chronicle and not printed in the report. A log-only lint flags an `after` that lacks the answer's key words.
+  - **W6:** the plan line asks that job, trouble, why, edge and settles still fit once the answer changes how the person in ending looks.
+  - **Card latency:** R2 cards were thinking because of the merged checklist and the ambiguous `intro` gloss. R3 goes back to R1's frame (a data list plus a short order list). Without thinking, the cards also overshoot their word caps.
+  - **Verifier round (probe5 rendered + the Sonnet F6_3 run):** each fact in one field, dealt where the player needs it.
+    - `helping` is dealt only on the finale; card 1 has it in its premise. On every card it came back almost word for word and pushed all five cards past the cap. A middle card's `why` names whom the job helps (W1). Caps stay 70 / 90.
+    - The card's order line lists data keys (`latest, mystery, job, why, have, trouble`), never a sentence a card could print ("the question, and what you know"). The card-voice glosses are gone ("their loss if nobody acts").
+    - The report summary gives what was done and the result, never the clue. The clue reaches the next card once, as `learned`.
+    - A report's `people` are the people present: the plan's people for the job, the one the finale decides, and anyone the job, the trouble's side, the result or the gain names as there. A mention as owner only ("the merchant's axemen") does not count, and the one the company acts for gets no part line.
+    - `decides` and `plan` are glossed as deeds ("whose deed wins it", "how the soldiers go about it"), not as choice words.
+    - Plan labels carry no traits.
+  - **Verifier round 2 (probe5 rendered):** no rule the data breaks, no read line dealt whole again, every key with a stated use.
+    - Card: `you` is the company ("Speak to the company as you"), because payload lines say "the company". The order line opens "Say each fact once": a retry line that holds the job, and a want restated by `why` and `lose`, were each printed twice.
+    - Card: `retry` is what stopped the last try. `names` are the people the card may mention, not the people present. The `intro` and `part` glosses are flag-gated to entries that carry them, on cards and reports alike.
+    - Card: later cards get the question bare ("why the hunter stands in the way"). Card 1's "Nobody knows …" sentence was pasted on every card.
+    - Card 1 (personal): the gloss is now `who: one of your own soldiers`. The old "nobody hires you" was printed as "Nobody hires you this time."
+    - **Check run (`probe5/L_lean_sonnet_v2`, Sonnet, 3 sagas, plus 42 replays of single card calls):**
+      - No card repeated "Nobody knows", mixed "the company" with "you", or stated a retried job twice. The secret came out inside `after`.
+      - Middle cards never think (0 of 23 calls).
+      - "Say each fact once" makes cards shorter. Finale cards ran 86 to 109 words with it and 88 to 120 without it; middle cards ran 79 to 102 with it and 84 to 114 without it.
+      - The same line makes dense finale cards think, in 5 of 9 replays against 1 of 9 without it. Those calls take about 10 to 15 s instead of about 2.5 s, and the cards that think land on the 90-word cap.
+      - The cause is payload size: helping, the question, two or three facts, why, the things held and lose do not fit in 90 words. Moving the same rule into the style line removed the thinking and the shortening together (finales 106 to 127 words).
+      - Middle cards still overshoot 70 words.
+    - Report: "Invent no names" replaces "name only the soldiers and the people given", since result, clue and known name absent people. `part` is their side, shown and not stated. `after` tells what `result` says in the writer's own words, because result is dealt in the present tense and "exactly" invited pasting it. The finale `plan` is shown in `after`.
+    - Plan: `traits` is what the person is like (the label still never carries them). "the player sends soldiers on" was cut to keep 620.
+    - Declined, each with a reason:
+      - `helps` on the finale card: W4 rules against it.
+      - Putting every showdown person on the card: reports are where strangers are met (§2.5). It happens 0 of 24 times on L_lean finales, so it is an L_full bystander artifact, and an unreferenced entry brings back the "Odo is an ally." line.
+      - Leaving the personal soldier out of the plan's `people`: the engine sends them on every job (§2.6 must-be; `pickParty`).
+
 ### 5.3 Phase 2: build (each step green on the mock)
 - **2a Engine:** `saga.ts` (shapes, types, tests, stakes, casting + fences, places, record, injuries, deciding soldier, event edges incl. NPC → soldier); `themes.ts` (the ≥ 1,000-theme library + the dealer); `plainwords.ts`; `chains.ts`; `storyRngState`; `lore.ts` edge helper; `injury.ts`. Tests: saga, castrules, storyrng, themes (no repeat within 50). The structure arm chosen at G1 is the one built; the others stay lab-only.
 - **2b AI:** `storyteller.ts` (rendering, builders + names filter, zod, §2.7); templates; `provider.ts` (`planSaga`, `writeCard`, `writeReport`; one-off `writeQuest`/`resolve` kept); `openai.ts` wiring via `callR`; `mock.ts`. Tests: promptbudget, payloadlint, nameleak, planvalidate.

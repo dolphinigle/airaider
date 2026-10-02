@@ -36,7 +36,7 @@ export function renderTemplate(tpl: string, on: Iterable<string>, vars: Record<s
     if (m) { if (!has(m[1]!)) continue; l = l.slice(m[0].length) }
     if (line.trim() && !l.trim()) continue;   // a line made only of spans that are off
     for (const [k, v] of Object.entries(vars)) l = l.replaceAll(`{{${k}}}`, String(v));
-    out.push(l);
+    out.push(l.trimEnd());   // a line whose last span is off keeps no dangling space
   }
   const s = out.join('\n').replace(/\n{3,}/g, '\n\n').trim();
   const left = s.match(/\[\[[^\]]*\]\]|\{\{[^}]*\}\}/);

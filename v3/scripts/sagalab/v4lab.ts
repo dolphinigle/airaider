@@ -643,6 +643,26 @@ const contentWords = (s: string) => (s.toLowerCase().match(/[a-z]{4,}/g) ?? []).
  *  "his promise is broken" repeats; a line that only repeats gets pasted as its own sentence) */
 const adds = (line: string, to: string, min = 2) => { const have = new Set(contentWords(to).map(stem)); return contentWords(line).filter(x => !have.has(stem(x))).length >= min };
 
+/** the answer's key words: its content words minus the seed, labels, names, places and the question's own words
+ *  (card 1 prints the question, and an answer shares its subject: "what answers the song?" / "the answering
+ *  voice is…"). Shared by the plan lint (leaks before the finale) and the R3 report lint (the reveal in `after`) */
+export function answerKeys(plan: SagaPlan, w: World, seed = w.fx.seed ?? ''): { answerWords: string[]; plainStems: Set<string> } {
+  const plainSet = new Set([...seed.toLowerCase().split(/\W+/), ...plan.cast.flatMap(p => [...p.label.toLowerCase().split(/\W+/), ...nameParts(p).map(x => x.toLowerCase())]),
+    ...w.places.map(x => x.toLowerCase()), ...plan.question.toLowerCase().split(/\W+/)]);
+  const plainStems = new Set([...plainSet].map(stem));
+  return { answerWords: (plan.answer.toLowerCase().match(/[a-z]{4,}/g) ?? []).filter(x => !STOP.has(x) && !plainStems.has(stem(x))), plainStems };
+}
+/** (R3, W5) log-only: the finale's `after` should carry the reveal (the secret comes out inside it, in time
+ *  order); a share of the answer's key words below the bar says it was left out or saved for the unprinted
+ *  `truth`. Nothing re-rolls on it */
+export function revealLint(plan: SagaPlan, w: World, after: string, seed = w.fx.seed ?? ''): string | null {
+  const keys = [...new Set(answerKeys(plan, w, seed).answerWords.map(stem))];
+  if (keys.length < 2) return null;
+  const said = new Set((after.toLowerCase().match(/[a-z]{4,}/g) ?? []).map(stem));
+  const got = keys.filter(x => said.has(x)).length;
+  return got / keys.length < 0.34 ? `finale after lacks the answer (${got}/${keys.length} key words)` : null;
+}
+
 /** §2.7 log-only telemetry: nothing here re-rolls anything */
 export function planLint(plan: SagaPlan, w: World, seed = w.fx.seed ?? ''): string[] {
   const out: string[] = [];
@@ -656,12 +676,7 @@ export function planLint(plan: SagaPlan, w: World, seed = w.fx.seed ?? ''): stri
   const stray = [...new Set(fields.flatMap(f => f.split(/[.!?:;"]\s*/).flatMap(s => s.trim().split(/\s+/).slice(1)))
     .map(t => t.replace(/[^A-Za-z'-]/g, '').replace(/'s$/, '')).filter(t => /^[A-Z][a-z]{2,}/.test(t) && !known.has(t) && !skip.has(t)))];
   if (stray.length) out.push(`stray capitalised: ${stray.join(', ')}`);
-  // the seed, labels, names, places and the question's own words are no leak: card 1 prints the question,
-  // and an answer shares its subject ("what answers the song?" / "the answering voice is…")
-  const plainSet = new Set([...seed.toLowerCase().split(/\W+/), ...plan.cast.flatMap(p => [...p.label.toLowerCase().split(/\W+/), ...nameParts(p).map(x => x.toLowerCase())]),
-    ...w.places.map(x => x.toLowerCase()), ...plan.question.toLowerCase().split(/\W+/)]);
-  const plainStems = new Set([...plainSet].map(stem));
-  const answerWords = (plan.answer.toLowerCase().match(/[a-z]{4,}/g) ?? []).filter(x => !STOP.has(x) && !plainStems.has(stem(x)));
+  const { answerWords, plainStems } = answerKeys(plan, w, seed);
   // lose reaches card 1 (the premise) and a last-chance card, every why reaches a card (the showdown's
   // the finale card), and the want of the one the company acts for reaches every card, so all count as early.
   // (R2) the answer is pieced together: a word an earlier job's learn already brought to light is no leak
@@ -686,6 +701,11 @@ export function planLint(plan: SagaPlan, w: World, seed = w.fx.seed ?? ''): stri
     const lstems = new Set(lw.map(stem));
     if (answerWords.length >= 3 && answerWords.filter(x => lstems.has(stem(x))).length >= 0.75 * answerWords.length) out.push(`episode ${e.n} learn tells the whole answer`);
   });
+  // (R3, W2) a who-question's who named by a learn spends the answer mid-saga: the person the answer names first
+  if (/^nobody knows who\b/i.test(plan.question.trim())) {
+    const who = plan.cast.filter(p => mentions(plan.answer, p)).sort((a, b) => firstAt(plan.answer, a) - firstAt(plan.answer, b))[0];
+    if (who) plan.episodes.forEach(e => { if (e.learn && mentions(e.learn, who)) out.push(`episode ${e.n} learn names the who the question asks for`) });
+  }
   // ...and together: the learns of every job leave the showdown nothing to bring out (the finale card said
   // "the mystery is solved" and the truth restated the last learn)
   // (word overlap is coarse: a paraphrased learn hides its share, so the bar is low and the share is printed)
@@ -746,6 +766,18 @@ export function headNoun(label: string): string {
 const saysName = (text: string, p: Person) => nameParts(p).some(n => new RegExp(`\\b${esc(n)}\\b`).test(text));
 const saysLabel = (text: string, p: CastEntry) => { const noun = headNoun(p.label); return noun.length > 2 && new RegExp(`\\b${esc(noun)}s?\\b`).test(text.toLowerCase()) };
 export const mentions = (text: string, p: CastEntry) => saysName(text, p) || saysLabel(text, p);
+/** (R3 verify) a mention that places the person in the scene: by name or label's head noun, never only as an owner
+ *  ("the merchant's axemen", "Benjamund's yard" refer to him without putting him there) */
+const placesThere = (text: string, p: CastEntry) => {
+  const noun = headNoun(p.label);
+  const direct = (x: string, flags: string) => new RegExp(`\\b${esc(x)}s?\\b(?!['’]s\\b)`, flags).test(flags.includes('i') ? text.toLowerCase() : text);
+  return nameParts(p).some(n => direct(n, '')) || (noun.length > 2 && direct(noun, 'i'));
+};
+/** where a text first refers to a person (name or label's head noun), for ordering; Infinity when it never does */
+const firstAt = (text: string, p: CastEntry): number => {
+  const at = [...nameParts(p).map(n => text.search(new RegExp(`\\b${esc(n)}\\b`))), text.toLowerCase().search(new RegExp(`\\b${esc(headNoun(p.label))}s?\\b`))].filter(i => i >= 0);
+  return at.length ? Math.min(...at) : Infinity;
+};
 const mayName = (p: CastEntry, arm: Arm, k: Knowing) => arm.names === 'named' || k.met.has(p.id);
 /** someone already in the story, as a field names them: their name once it may be said, else "the <label>"
  *  ("a merchant" on the finale card read as somebody new) */
@@ -759,9 +791,11 @@ const callName = (p: CastEntry, arm: Arm, k: Knowing) => mayName(p, arm, k) ? p.
 const labelOf = (p: CastEntry, view: 'card' | 'report') => p.seat !== 'soldier' ? p.label : view === 'card' ? 'one of your soldiers' : "one of the company's soldiers";
 const entry = (p: CastEntry, k: Knowing, view: 'card' | 'report'): Entry =>
   ({ name: p.name, label: labelOf(p, view), sex: manWoman(p.sex), ...(k.named.has(p.id) ? {} : { intro: true }) });
-/** one person as a card receives them: the unnamed keep only their label (§2.5) */
+/** one person as a card receives them: the unnamed keep only their label (§2.5). (R3) A label-only entry
+ *  carries no `intro`: "bring them in by label and any name" on an entry with no name made the writer weigh
+ *  inventing one (thinking on 9 of 12 replays, one invented name) and echoed as "a hunter you have not met" */
 const cardEntry = (p: CastEntry, arm: Arm, k: Knowing): Entry =>
-  mayName(p, arm, k) ? entry(p, k, 'card') : { label: labelOf(p, 'card'), sex: manWoman(p.sex), ...(k.seen.has(p.id) ? {} : { intro: true }) };
+  mayName(p, arm, k) ? entry(p, k, 'card') : { label: labelOf(p, 'card'), sex: manWoman(p.sex) };
 /** a report names whoever is there (reports are where strangers are met, §2.5) */
 const reportEntry = (p: CastEntry, k: Knowing) => entry(p, k, 'report');
 export const displayName = (p: CastEntry, arm: Arm, k: Knowing) => mayName(p, arm, k) ? p.name : p.label;
@@ -796,8 +830,9 @@ export function bank(state: SagaState, e: Episode, outcome: Outcome): void {
   state.held.push(e.n);
   if (e.learn) state.learned.push(e.learn);
 }
-/** what the company holds, as a later text receives it: the gains of won jobs; at the finale each with the
- *  showdown's edge for it (only the edges whose gain is held ever reach the finale) */
+/** what the company holds, as a later text receives it: the gains of won jobs; in the FINALE REPORT each with
+ *  the showdown's edge for it (only the edges whose gain is held ever reach it). (R3, W4) Cards get the held
+ *  things by name only: dealt each one's `helps`, the finale card recited them as a list and broke its cap */
 export function haveOf(plan: SagaPlan, state: SagaState, finale: boolean): string[] | { holds: string; helps: string }[] {
   const held = state.held.map(n => plan.episodes[n - 1]).filter((e): e is Episode => !!e?.gain);
   return finale ? held.map(e => ({ holds: e.gain!, helps: plan.showdown.edge?.[e.n - 1] ?? '' })).filter(x => x.helps) : held.map(e => e.gain!);
@@ -806,12 +841,24 @@ export function haveOf(plan: SagaPlan, state: SagaState, finale: boolean): strin
  *  dealt text merely mentioned was printed as a story claim ("X stands in the way" on a job X was not in) */
 const inJob = (plan: SagaPlan, e: Episode, finale: boolean): string[] => [...e.people, ...(finale ? [choiceTarget(plan).id] : [])];
 // (R2, S3) the finale card no longer receives the ways as endings (CHOICE_END): the card recited them as a
-// menu the buttons already list; it gets `fate` (whose fate) and `lose` (what is at stake)
+// menu the buttons already list. (R3) Nor `fate`: whose fate is the buttons' to say; the card gets `lose`
 /** the one the company acts for: the client, or on a personal saga its own soldier */
 const clientOf = (plan: SagaPlan) => plan.cast.find(p => p.seat === 'client' || p.seat === 'soldier')!;
 /** whom the finale's choice is about: the focal, or, when the focal is the company's own soldier, the
  *  one in their way (the options settle the soldier's matter WITH that person) */
 export const choiceTarget = (plan: SagaPlan) => plan.cast.find(p => p.focal && p.seat !== 'soldier') ?? plan.cast.find(p => p.seat === 'opponent')!;
+
+/** (R3 verify 2) a names/people gloss only for a key some entry carries (§2.8.2): "any part" and an `intro` line
+ *  reached cards whose entries had neither */
+const entryFlags = (xs: Entry[]) => [...(xs.some(n => n.intro) ? ['intro'] : []), ...(xs.some(n => n.part) ? ['part'] : [])];
+/** (R3 verify 2) the saga's question as a later card receives it: the open question bare ("why the hunter stands
+ *  in the way"), never card 1's finished "Nobody knows …" sentence. Dealt whole on every card, that sentence was
+ *  pasted on each, word for word: a line the player already read, printed again (a fragment has to be built into
+ *  the writer's own sentence) */
+export const openQuestion = (q: string) => {
+  const m = q.trim().match(/^(?:nobody|no one|no-one)\s+knows\s+(.+?)[.?!]*$/i);
+  return m ? m[1]! : q.trim();
+};
 
 export function firstCardPayload(plan: SagaPlan, w: World, arm: Arm, k: Knowing, direction?: string): CardCall {
   const e = plan.episodes[0] ?? plan.showdown;
@@ -831,6 +878,7 @@ export function firstCardPayload(plan: SagaPlan, w: World, arm: Arm, k: Knowing,
   if (premise.loses) flags.push('loses');
   if (w.fx.personal) flags.push('personal');
   if (names.some(n => n.memory)) flags.push('memory');
+  flags.push(...entryFlags(names));
   if (direction) flags.push('direction');
   // no question and no closing sight (R1, C1/C2): the closing-hook rule made every card end on a dangling
   // clue nothing paid off; `why` says what the job's thing or person is and how getting it helps
@@ -839,34 +887,48 @@ export function firstCardPayload(plan: SagaPlan, w: World, arm: Arm, k: Knowing,
 
 export function laterCardPayload(plan: SagaPlan, e: Episode, latest: string, arm: Arm, k: Knowing, o: { finale: boolean; lastchance: boolean; retry?: boolean; state: SagaState; direction?: string }): CardCall {
   const client = clientOf(plan), target = choiceTarget(plan);
-  const always = [client.id, ...(o.finale ? [target.id] : [])];
-  const have = haveOf(plan, o.state, o.finale);
-  const mystery = o.state.learned.length ? { question: plan.question, learned: o.state.learned } : undefined;
+  // (R3 verify) the finale carries the one the company acts for and the one its plans are about; a middle card
+  // carries whoever its dealt text names (its `why` names the one it helps)
+  const always = o.finale ? [client.id, target.id] : [];
+  // (R3, W4) held things by name only, on every card (their `helps` is the finale report's)
+  const have = haveOf(plan, o.state, false) as string[];
+  // (R3, W4) a finale after a win gets no `latest`: that win's learn and gain already reach it (mystery, have),
+  // and its summary retold them in a sentence the cap had no room for. A last chance keeps it: what failed is
+  // why this is the last chance. A re-posed job gets `retry` in its place (R2, S5)
+  const showLatest = !o.retry && (!o.finale || o.lastchance);
+  // a learned piece the dealt `latest` already says is not dealt twice (a line that only repeats another got
+  // pasted as its own sentence: the newest clue printed twice on one card)
+  const learned = showLatest ? o.state.learned.filter(l => adds(l, latest)) : o.state.learned;
+  const mystery = learned.length ? { question: openQuestion(plan.question), learned } : undefined;
   const planText = `${e.job} ${e.why} ${JSON.stringify(e.trouble)} ${JSON.stringify(have)} ${o.state.learned.join(' ')}`;
-  const names = namesFor(plan, [...always, ...e.people], `${latest} ${planText}`, arm, k, always, e.trouble.who, inJob(plan, e, o.finale));
+  // (R3) the finale's choice is no longer a `fate` field (printed as a stock "X's fate rests here" 17 times): the
+  // person the plans below are about gets their part, as anyone else in this job does, unless the trouble places them
+  const names = namesFor(plan, [...always, ...e.people], `${o.retry || showLatest ? latest : ''} ${planText}`, arm, k, always, e.trouble.who, inJob(plan, e, o.finale), [client.id]);
   const flags = [o.finale ? 'finale' : 'later'];
-  // a personal saga's finale settles the soldier's matter with the one in the way, not a fate
-  if (o.finale && client.seat === 'soldier') flags.push('personal');
   if (names.some(n => n.memory)) flags.push('memory');
+  flags.push(...entryFlags(names));
   if (o.finale && o.lastchance) flags.push('lastchance');
-  if (o.retry) flags.push('retry');
+  if (o.retry) flags.push('retry'); else if (showLatest) flags.push('latest');
+  if (o.finale && e.lose && (o.lastchance || adds(e.lose, client.want, 1))) flags.push('lose');
   if (mystery) flags.push('mystery');
-  if (have.length) flags.push('have', ...(o.finale ? ['edge'] : []));
+  if (have.length) flags.push('have');
   if (o.direction) flags.push('direction');
-  // `helping` on every card: who the company acts for and what they want, so a job ties back to why
-  // (a key named `for` read as the idiom "the one in for"). A re-posed job (R2, S5) gets `retry` in place
-  // of `latest`: what stopped the last try at this same job (unmarked, the retry re-posed a done step)
-  const payload: Record<string, unknown> = { ...(o.retry ? { retry: latest } : { latest }), helping: { who: displayName(client, arm, k), wants: client.want } };
-  // (R2, S1) the mystery builds: the question with every piece learned so far; (S2) what the company holds,
-  // at the finale with how each helps there, so a middle win is used and never reappears in enemy hands
+  // `helping` (who the company acts for and what they want; a key named `for` read as the idiom "the one in for")
+  // only on the finale, beside card 1's premise: the cards that frame the story. (R3 verify) Dealt on every card,
+  // it came back near word for word on each (a third of a 70-word cap) and pushed every card past it; a middle
+  // card's `why` already ties the job to the one it helps (W1). One fact in one field, where the player needs it
+  const payload: Record<string, unknown> = { ...(o.retry ? { retry: latest } : showLatest ? { latest } : {}), ...(o.finale ? { helping: { who: displayName(client, arm, k), wants: client.want } } : {}) };
+  // (R2, S1) the mystery builds: the question with every piece learned so far; (S2) what the company holds
   if (mystery) payload.mystery = mystery;
   payload.job = e.job; payload.why = e.why;
   if (have.length) payload.have = have;
-  payload.trouble = e.trouble;
-  // (R2, S3) the finale names whose fate it decides and what is at stake, never the ways: the buttons list
-  // them, and dealt to the card they were recited as a menu (19 and 18 of 24). `lose` carries its owner: a
-  // bare "his livelihood" after `fate` read as the fated one's loss, flipping the stakes
-  if (o.finale) { payload.fate = callName(target, arm, k); if (e.lose) payload.lose = { who: callName(client, arm, k), loses: e.lose } }
+  // (R3, W4) the finale's trouble without `will`: what they will do restated the loss in the opponent's voice ("he
+  // will burn the grove" beside "Lariane loses the grove") and was a sentence the cap had no room for; `lose` says it
+  payload.trouble = o.finale ? { who: e.trouble.who, carry: e.trouble.carry } : e.trouble;
+  // `lose` carries its owner: a bare "his livelihood" read as the one the plans decide about, flipping the stakes.
+  // (R3, W4) As on card 1, only when it adds to the want (a loss that restates the want was a sentence the cap had no
+  // room for), and always at a last chance, which it announces
+  if (o.finale && e.lose && (o.lastchance || adds(e.lose, client.want, 1))) payload.lose = { who: callName(client, arm, k), loses: e.lose };
   payload.names = names;
   if (o.direction) payload.direction = o.direction;
   // the finale card gained the why (R1) and lost nothing, so its cap grew by the why's room
@@ -884,11 +946,12 @@ const partIn = (p: CastEntry, plan: SagaPlan, arm: Arm) => {
  *  ally."), plus the ones the card must carry (the one it acts for, the choice on the finale). Anyone
  *  the dealt text names counts, in the job's people or not: `latest` named someone who was not, and the
  *  card printed a name it had no label or sex for */
-function namesFor(plan: SagaPlan, ids: string[], dealt: string, arm: Arm, k: Knowing, always: string[], troubleWho: string, here: string[]): Entry[] {
+function namesFor(plan: SagaPlan, ids: string[], dealt: string, arm: Arm, k: Knowing, always: string[], troubleWho: string, here: string[], roleGiven = always): Entry[] {
   const out: Entry[] = [];
-  // whose role another field already gives: the one the company acts for (premise / helping), the one the
-  // finale's choice is about (always, beside the client), and whoever the trouble names
-  const placed = (p: CastEntry) => always.includes(p.id) || mentions(troubleWho, p);
+  // whose role another field already gives: the one the company acts for (premise, helping, or the `why` that names them) and whoever the
+  // trouble names. (R3) The finale's target is always carried but no field gives their role any more, so
+  // `roleGiven` (default: everyone carried) leaves them out and they get their part
+  const placed = (p: CastEntry) => roleGiven.includes(p.id) || mentions(troubleWho, p);
   for (const id of [...new Set([...ids, ...plan.cast.map(p => p.id)])]) {
     const p = plan.cast.find(c => c.id === id);
     if (!p || (!always.includes(id) && !mentions(dealt, p))) continue;
@@ -925,13 +988,15 @@ export function reportPayload(a: {
   const result = failedJob ? undefined : a.finale ? `${a.fate} ${a.outcome === 'failure' ? lossSentence(plan) : e.settles}` : e.win;
   // a won middle job brings its gain home and its learn to light (R2, S1/S2); a failed one neither
   const won = !a.finale && !failedJob;
-  // people (R1, C6): only those who act in THIS job — whoever the job and the trouble refer to (the
-  // trouble's side, the one the job is about), whoever the result refers to, and the one the finale
-  // decides about; never a soldier sent. Everyone the card or the plan's people list held turned every
-  // report into a roll-call ("X stood caught between the sides", "Y watched and begged them on")
+  // people: those PRESENT in this job, never a soldier sent. (R3 verify) Presence is the plan's own list of who is
+  // there (`people`), the one the finale decides about, and whoever the job, the trouble's side, the result or the
+  // gain names as there. A mere reference is not presence: built from every text mention (R1, C6), an owner's
+  // mention ("the merchant's axemen") put the antagonist on scene at every job and blunted the showdown, while the
+  // asker the plan placed there, named by no text, was left out and used anyway. The one the company acts for gets
+  // no part line (below), so a present asker is no roll-call ("Lariane asked for help")
   const sent = new Set(a.party.map(s => s.name));
-  const refs = `${e.job} ${e.trouble.who} ${e.trouble.carry} ${e.trouble.will} ${result ?? ''}${won ? ` ${e.gain ?? ''} ${e.learn ?? ''}` : ''}`;
-  const ids = [...new Set([...(a.finale ? [choiceTarget(plan).id] : []), ...plan.cast.filter(p => mentions(refs, p)).map(p => p.id)])];
+  const there = `${e.job} ${e.trouble.who} ${result ?? ''}${won ? ` ${e.gain ?? ''}` : ''}`;
+  const ids = [...new Set([...e.people, ...(a.finale ? [choiceTarget(plan).id] : []), ...plan.cast.filter(p => placesThere(there, p)).map(p => p.id)])];
   const flags = ['saga'];
   // a personal saga's own soldier is marked in the words the summary rule uses, so the summary may name
   // them (R1 verify 2): "name no soldier" made it drop the one the story is about, or break the rule
@@ -942,12 +1007,13 @@ export function reportPayload(a: {
   if (a.outcome !== 'failure') { payload.decides = a.decides; flags.push('decides') }
   // a part that points at the company's soldier names them: a report meets people as a list, often
   // beside two soldiers, so "knows the soldier's past" had no referent
-  // (R2, S4) the part only for someone in this job: one the result or the learn merely mentions keeps name and label
-  const here = inJob(plan, e, a.finale);
+  // (R2, S4) the part only for someone in this job: one the result merely names keeps name and label. (R3 verify) And
+  // not for the one the company acts for, whose role the card above gives, as cards leave it out (namesFor)
+  const here = inJob(plan, e, a.finale), client = clientOf(plan);
   const people = ids.map(id => plan.cast.find(p => p.id === id)).filter((p): p is CastEntry => !!p && !sent.has(p.name))
-    .map(p => ({ ...reportEntry(p, k), ...(here.includes(p.id) ? { part: partIn(p, plan, arm) } : {}) }));
+    .map(p => ({ ...reportEntry(p, k), ...(here.includes(p.id) && p.id !== client.id ? { part: partIn(p, plan, arm) } : {}) }));
   // a job fought against nameless thugs has nobody else in it: no list, and no line explaining one
-  if (people.length) { payload.people = people; flags.push('people') }
+  if (people.length) { payload.people = people; flags.push('people', ...entryFlags(people)) }
   // a failed job's report has its outcome in the prompt itself, so the key would be spare
   if (!failedJob) payload.outcome = a.outcome;
   if (result !== undefined) { payload.result = result; flags.push('result') }
@@ -968,10 +1034,10 @@ export function reportPayload(a: {
   if (a.state.learned.length) { payload.known = a.state.learned; flags.push('known') }
   const have = haveOf(plan, a.state, a.finale);
   if (have.length) { payload.have = have; flags.push('have', ...(a.finale ? ['edge'] : [])) }
-  // the answer travels with the question it answers; the report returns it as its own `truth`, printed after
-  // `after` — the moment it comes out, shown, from what is known (R2, S1: a restated plan sentence read as
-  // tacked on in 21 of 24). The plan's answer goes in as `secret`: an input named `truth` beside the output
-  // `truth` invited pasting it as the output, word for word
+  // the answer travels with the question it answers. (R3, W5) It comes out inside `after`, in time order, from what
+  // is known (printed after `after`, a secret found mid-action read backwards); the report also returns `truth`, one
+  // plain sentence for the chronicle, never printed. The plan's answer goes in as `secret`: an input named `truth`
+  // beside the output `truth` invited pasting it as the output, word for word
   if (a.finale) { payload.answer = { question: plan.question, secret: plan.answer }; flags.push('answer') }
   if (a.direction) { payload.direction = a.direction; flags.push('direction') }
   flags.push(...(failedJob ? ['failure', 'stopped'] : ['moved']));
@@ -1128,6 +1194,7 @@ const MOCK_PERSONAL: MockAnswer = {
   pieces: [(o, c) => `${o} knew ${c} long before the company did.`, (o) => `${o} grew rich the year the old wrong was done.`, (o, c) => `${o} has told everyone that ${c} is dead.`, (o) => `${o} still keeps a paper from those days.`],
 };
 const cap = (s: string) => s ? s[0]!.toUpperCase() + s.slice(1) : s;
+const lc1 = (s: string) => s ? s[0]!.toLowerCase() + s.slice(1) : s;
 const sentence = (s: string) => s.trim() ? cap(s.trim()).replace(/([^.!?])$/, '$1.') : '';
 const firstSentence = (s: string) => s.trim().match(/^.*?[.!?](?=\s|$)/)?.[0] ?? s.trim();
 const the = theLabel;
@@ -1155,7 +1222,9 @@ export function mockPlan(ctx: PlanCtx): Record<string, unknown> {
     const place = w.places[i % w.places.length]!;
     return {
       n: i + 1, ...(arm.structure === 'S' ? {} : { type: ty }), title: `${cap(ty)} at ${place}`, job: TYPE_JOB[ty](place, o),
-      people: w.cast.filter(p => p.seat !== 'client' && p.seat !== 'soldier').map(p => p.id),
+      // who is there, as the plan's rule has it: episode 1 holds the person in ending; the later jobs face that
+      // person's men or beast, so nobody of the cast is there (R3 verify: reports take presence from this list)
+      people: i === 0 ? [w.fx.personal ? opp.id : w.focal.id] : [],
       trouble: ty === 'hunt' ? { who: `the beast ${o} keeps`, carry: 'teeth and claws', will: TYPE_WILL[ty] } : { who: `${o}'s men`, carry: 'clubs and knives', will: TYPE_WILL[ty] },
       win: cap(TYPE_WIN[ty](place, o)), gain: TYPE_GAIN[ty](place, o), learn: cap(ans.pieces[i % ans.pieces.length]!(o, cRef)), why: why(place),
     };
@@ -1190,7 +1259,7 @@ export function mockCard(payload: Record<string, unknown>, flags: string[]): { c
   const t = payload.trouble as Trouble;
   const job = String(payload.job);
   const names = (payload.names ?? []) as Entry[];
-  const troubleLine = `${cap(t.who)} with ${t.carry} will ${t.will}.`;
+  const troubleLine = t.will ? `${cap(t.who)} with ${t.carry} will ${t.will}.` : `${cap(t.who)} stand in the way with ${t.carry}.`;
   const why = sentence(String(payload.why ?? ''));
   if (flags.includes('first')) {
     const p = payload.premise as Record<string, string>;
@@ -1199,17 +1268,21 @@ export function mockCard(payload: Record<string, unknown>, flags: string[]): { c
     const unknown = p.unknown ? ` ${sentence(p.unknown)}` : '';
     return { card: `${who} ${p.past ? `has a past: ${p.past}. ${cap(sub)} wants ${p.wants}` : `asks for your help ${p.wants}`}.${p.loses ? ` If nobody acts, ${sub} loses ${p.loses}.` : ''} ${job} ${why} ${troubleLine}${unknown}` };
   }
-  // (R2) a re-posed job says so; the mystery with what was learned; what is held, at the finale how it helps
-  const opener = payload.retry !== undefined ? `You try this job again. Last time: ${sentence(String(payload.retry))}` : String(payload.latest);
+  // (R2) a re-posed job says what stopped the last try; (R3) the mystery with what was learned, in one sentence;
+  // what is held in one clause, by name; no fate line (the buttons say whose end it is); who the company acts for
+  // only on the finale (a middle card's why names them)
+  const opener = payload.retry !== undefined ? `Last time, ${lc1(sentence(String(payload.retry)))}` : payload.latest !== undefined ? String(payload.latest) : '';
+  const help = payload.helping as { who: string; wants: string } | undefined;
+  const helping = help ? ` ${cap(mockRef(help.who, names))} wants ${help.wants}.` : '';
   const m = payload.mystery as { question: string; learned: string[] } | undefined;
-  const mystery = m ? ` ${sentence(m.question)} So far you know this: ${m.learned.map(sentence).join(' ')}` : '';
-  const held = payload.have as (string | { holds: string; helps: string })[] | undefined;
-  const have = !held ? '' : flags.includes('edge') ? ` ${held.map(h => typeof h === 'string' ? '' : `${cap(h.holds)} will help: ${sentence(h.helps)}`).join(' ')}`
-    : ` You hold ${held.map(String).join(' and ')}.`;
+  const known = m ? ` You know this: ${m.learned.map((l, i) => (i ? lc1(l) : l).replace(/[.!?]+$/, '')).join('; ')}.` : '';
+  const mystery = m ? ` You still do not know ${m.question.replace(/[.?!]+$/, '')}.${known}` : '';
+  const held = payload.have as string[] | undefined;
+  const have = held?.length ? ` You bring ${held.join(' and ')}.` : '';
   const last = flags.includes('lastchance') ? ' This is your last chance.' : '';
-  const fate = !flags.includes('finale') || payload.fate === undefined ? ''
-    : ` ${flags.includes('personal') ? `This settles your soldier's matter with ${mockRef(String(payload.fate), names)}.` : `This decides the fate of ${mockRef(String(payload.fate), names)}.`}${payload.lose ? ` If it fails, ${(payload.lose as { who: string; loses: string }).who} loses ${(payload.lose as { who: string; loses: string }).loses} for good.` : ''}`;
-  return { card: `${opener}${mystery} ${job} ${why}${have} ${troubleLine}${last}${fate}` };
+  const lose = payload.lose as { who: string; loses: string } | undefined;
+  const loss = flags.includes('finale') && lose ? ` If it fails, ${lose.who} loses ${lose.loses} for good.` : '';
+  return { card: `${opener}${helping}${mystery} ${job} ${why}${have} ${troubleLine}${last}${loss}`.trim() };
 }
 
 export function mockReport(payload: Record<string, unknown>, flags: string[]): { before: string; after: string; summary: string; truth?: string } {
@@ -1230,15 +1303,17 @@ export function mockReport(payload: Record<string, unknown>, flags: string[]): {
   const brought = ((payload.brought as string[] | undefined) ?? []).map(b => ` They came away with ${b}.`).join('');
   const learn = payload.clue ? ` They found this out: ${sentence(String(payload.clue))}` : '';
   const used = flags.includes('edge') ? ((payload.have as { holds: string; helps: string }[] | undefined) ?? []).map(h => ` ${cap(h.holds)} helped: ${sentence(h.helps)}`).join('') : '';
+  // (R3, W5) the secret comes out inside after, in time order, tied to what was learned; `truth` is one plain
+  // sentence for the chronicle, never printed in the report
+  const tied = known?.length ? ` What they had found came together: ${sentence(known[known.length - 1]!)}` : '';
+  const reveal = ans ? `${tied} Then the truth came out: ${sentence(ans.secret)}` : '';
   const after = flags.includes('failure') ? `They were beaten back, and the job was not done.${hurt}`
-    : `${String(payload.decides ?? who)} ${payload.outcome === 'success' ? 'carried it' : payload.outcome === 'partial' ? 'carried it, at a price' : 'could not carry it'}.${used} ${sentence(result)}${brought}${learn}${hurt}${cost}`.trim();
+    : `${String(payload.decides ?? who)} ${payload.outcome === 'success' ? 'carried it' : payload.outcome === 'partial' ? 'carried it, at a price' : 'could not carry it'}.${used}${reveal} ${sentence(result)}${brought}${learn}${hurt}${cost}`.trim();
   // the summary says what changed, from the result (a "The company managed to <job>." template read stiff and got copied)
   const changed = sentence(firstSentence(result));
   const summary = flags.includes('stopped') || !changed ? `The company tried to ${lc} and was driven back.`
     : payload.outcome === 'partial' ? changed.replace(/[.!?]$/, ', but at a price.') : changed;
-  // the truth is its own line (R1, C4), never inside after; (R2) the moment it comes out, tied to what was learned
-  const tied = known?.length ? `What they had found came together: ${sentence(known[known.length - 1]!)} ` : '';
-  return { before, after, summary, ...(ans ? { truth: `${tied}Then the truth came out. ${sentence(ans.secret)}` } : {}) };
+  return { before, after, summary, ...(ans ? { truth: sentence(firstSentence(ans.secret)) } : {}) };
 }
 
 /** the floor's words for a cost's atoms (the model realises them its own way) */
