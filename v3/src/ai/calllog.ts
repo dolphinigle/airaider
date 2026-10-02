@@ -8,7 +8,7 @@ import * as path from 'node:path';
 
 export interface CallLogLine {
   t: string;                 // ISO time the call settled
-  provider: 'openai' | 'mock';
+  provider: 'openai' | 'claude' | 'mock';
   n: number;                 // the provider's call ordinal
   purpose: string;           // writeQuest / genesis / resolve / flesh / select / themeRoll / review / direction
   model: string;
@@ -17,7 +17,8 @@ export interface CallLogLine {
   inputTokens: number;
   outputTokens: number;
   cachedTokens: number;
-  costUsd: number;
+  costUsd: number;            // billed (0 on the claude transport: the subscription pays)
+  listCostUsd?: number;      // claude transport: the API list price, for information
   ok: boolean;
   error?: string;
   system: string;

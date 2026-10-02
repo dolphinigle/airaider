@@ -348,16 +348,19 @@ export function App() {
           <span className="aiwrap val" onMouseLeave={() => setAiOpen(false)}>
             <button className="ai" aria-expanded={aiOpen} onClick={() => setAiOpen(o => !o)}
               title={`AI calls and cost this session${s.maxInFlight > 0 ? ' — click to set how many quests are written at once' : ''}`}>
-              {s.aiName === 'openai' ? `AI $${s.ai.costUsd.toFixed(2)}` : 'AI mock'}{live.length ? ` · ✎${live.length}` : ''}
+              {s.aiName === 'openai' ? `AI $${s.ai.costUsd.toFixed(2)}` : s.aiName === 'claude' ? 'AI Claude · free' : 'AI mock'}{live.length ? ` · ✎${live.length}` : ''}
             </button>
             {aiOpen && <div className="aipop" role="dialog" aria-label="The AI">
-              <span>{s.aiName === 'openai' ? `OpenAI · ~$${s.ai.costUsd.toFixed(2)} this session` : 'Mock AI — no cost'}</span>
+              <span>{s.aiName === 'openai' ? `OpenAI · ~$${s.ai.costUsd.toFixed(2)} this session`
+                : s.aiName === 'claude' ? `Claude subscription (playtest) · free — ~$${(s.ai.listCostUsd ?? 0).toFixed(2)} at API list price`
+                : 'Mock AI — no cost'}</span>
               {live.length > 0 && <span>✎ {plural(live.length, 'quest', 'quests')} being written</span>}
               {s.maxInFlight > 0 && <span className="capctl">written at once:
                 <button disabled={s.maxInFlight <= 1} onClick={() => queueAct('inflight', s.maxInFlight - 1)} aria-label="fewer at once">−</button>
                 <b>{s.maxInFlight}</b>
                 <button disabled={s.maxInFlight >= 6} onClick={() => queueAct('inflight', s.maxInFlight + 1)} aria-label="more at once">+</button>
               </span>}
+              {s.aiPool != null && <span>{s.maxInFlight > s.aiPool ? `but only ${s.aiPool}` : `at most ${s.aiPool}`} AI calls run at a time — the reckoning's reports share them</span>}
             </div>}
           </span>
           {/* sound on/off at a click; everything else lives in Settings */}

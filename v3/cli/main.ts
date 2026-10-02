@@ -1,13 +1,14 @@
 // Text UI — the dogfooding shell. Interactive REPL over the Game facade, plus a
 // batch mode (`--script file` or commands via stdin pipe) so an agent can play it.
-// Usage: npm run cli [-- --ai] [--seed N] [--load save.json] [--script cmds.txt]
+// Usage: npm run cli [-- --ai | --claude] [--seed N] [--load save.json] [--script cmds.txt]
+//   --ai (or AIRAIDER_AI=openai) = OpenAI, production, billed · --claude (or AIRAIDER_AI=claude) = the
+//   designer's FREE playtest transport: the same prompts via the headless Claude CLI on the subscription
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as readline from 'node:readline';
 import { Game, type ReckonMeta, directionSummary } from '../src/game/game.js';
-import { MockProvider } from '../src/ai/mock.js';
-import { makeOpenAiProvider } from '../src/ai/openai.js';
+import { aiKindFrom, makeAi } from '../src/ai/select.js';
 import { render } from './format.js';
 import type { AiProvider } from '../src/ai/provider.js';
 import { readCallLog, callLogPath } from '../src/ai/calllog.js';
@@ -32,14 +33,15 @@ function slog(entry: Record<string, unknown>) {
 async function main() {
   // fresh seed per run — a fixed default replayed the same draws every game (--seed pins one)
   const seed = Number(opt('seed') ?? Date.now() % 2 ** 31);
+  // the same picker as the GUI server (AIRAIDER_AI), plus the flags, which win
+  const picked = aiKindFrom(process.env.AIRAIDER_AI, { ai: flag('ai'), claude: flag('claude') });
+  if (picked.warning) console.log(picked.warning);
   let ai: AiProvider;
-  if (flag('ai')) {
-    ai = makeOpenAiProvider();
-    console.log('AI: OpenAI (real)');
-  } else {
-    ai = new MockProvider(seed);
-    console.log('AI: mock (deterministic; use --ai for the real thing)');
-  }
+  try {
+    const made = makeAi(picked.kind, seed);
+    ai = made.ai;
+    console.log(made.banner);
+  } catch (e) { console.error((e as Error).message); process.exit(1) }
 
   let game: Game;
   const loadPath = opt('load');
@@ -260,6 +262,18 @@ async function exec(game: Game, line: string): Promise<boolean> {
     case 'chain': console.log(render.chainDetail(game, arg)); break;
     case 'lore': console.log(locked('lore') ?? render.lore(game, arg)); break;
     case 'log': console.log(render.log(game, Number(rest.find(x => Number(x))) || 15, rest.includes('dev'))); break;
+    // the GUI's AI chip: which AI is live and what this session cost (the claude transport: free, list price for information)
+    case 'ai': {
+      const u = game.ai.usage();
+      console.log(game.ai.name === 'openai' ? `AI: OpenAI · ~$${u.costUsd.toFixed(2)} this session`
+        : game.ai.name === 'claude' ? `AI: Claude subscription (playtest) · free — ~$${(u.listCostUsd ?? 0).toFixed(2)} at API list price`
+        : 'AI: mock — no cost');
+      console.log(`  ${u.calls} calls · ${u.inputTokens} in / ${u.outputTokens} out · the map table writes ${game.maxInFlight} at once ('inflight <n>')`);
+      // the same line as the GUI popover: a provider that caps calls below that says so
+      const pool = game.ai.concurrency;
+      if (pool !== undefined) console.log(`  ${game.maxInFlight > pool ? `but only ${pool}` : `at most ${pool}`} AI calls run at a time — the reckoning's reports share them`);
+      break;
+    }
     // the GUI's 'ai' tab, for the text UI: every recent call's full prompt and raw reply, to a file
     case 'ailog': {
       // lab: `ailog json <file>` — the WHOLE call log (AIRAIDER_CALL_LOG's, untruncated) as one JSON

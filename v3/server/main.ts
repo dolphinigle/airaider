@@ -1,13 +1,14 @@
 // Thin JSON API over the Game facade — the web GUI's backend.
 // One game instance; autosaves to saves/web.json every cycle.
-// AIRAIDER_AI=openai for the real AI (default mock). Port 3210.
+// AIRAIDER_AI=openai for the real AI (production, billed), AIRAIDER_AI=claude for the designer's FREE
+// playtest transport (the same prompts via the headless Claude CLI on the subscription); default mock. Port 3210.
 
 import Fastify from 'fastify';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Game, directionSummary } from '../src/game/game.js';
-import { MockProvider } from '../src/ai/mock.js';
-import { makeOpenAiProvider } from '../src/ai/openai.js';
+import { loadKey } from '../src/ai/openai.js';
+import { aiKindFrom, makeAi } from '../src/ai/select.js';
 import { ROOM_TYPE, upgradeCost, renovateCost, ghUpgradeCost, GH_THRESHOLDS, maxSlotsAtTier, excavateCost } from '../src/engine/fort.js';
 import { REGION, REGIONS } from '../src/engine/regions.js';
 import { roomDesc, roomWants, roomCategory } from '../src/game/roomInfo.js';
@@ -34,11 +35,23 @@ function slog(entry: Record<string, unknown>) {
     fs.appendFileSync(SESSION_LOG, JSON.stringify({ t: new Date().toISOString(), ...entry }) + '\n');
   } catch { /* logging must never break play */ }
 }
-const useOpenAi = process.env.AIRAIDER_AI === 'openai';
+const picked = aiKindFrom(process.env.AIRAIDER_AI);
+if (picked.warning) console.log(`[server] ${picked.warning}`);
 // a fresh game rolls a fresh seed — a fixed default (42) replayed the exact same keyword/name
 // draw sequence every restart ("shyness" on every playthrough). Pin AIRAIDER_SEED for repro.
 const seed = Number(process.env.AIRAIDER_SEED ?? Date.now() % 2 ** 31);
-const ai = useOpenAi ? makeOpenAiProvider() : new MockProvider(seed);
+const { ai, banner } = (() => {
+  try { return makeAi(picked.kind, seed) }
+  catch (e) { console.error(`[server] ${(e as Error).message}`); process.exit(1) }
+})();
+// portraits are OpenAI images whichever AI writes (Claude has no image model): on with openai AND claude
+// unless AIRAIDER_PORTRAITS=0; the claude transport still needs the OpenAI key for them
+const portraitsOn = picked.kind !== 'mock' && process.env.AIRAIDER_PORTRAITS !== '0'
+  && (() => { try { return !!loadKey() } catch { return false } })();
+console.log(`[server] ${banner}`);
+if (picked.kind !== 'mock') console.log(`[server] portraits: ${portraitsOn
+  ? `ON — OpenAI images, ≈ half a US cent per recruited soldier${picked.kind === 'claude' ? ' (billed to OpenAI even on the Claude transport)' : ''}; AIRAIDER_PORTRAITS=0 turns them off`
+  : process.env.AIRAIDER_PORTRAITS === '0' ? 'off (AIRAIDER_PORTRAITS=0)' : 'off (no OPENAI_API_KEY found)'}`);
 
 let game: Game;
 if (fs.existsSync(SAVE) && !process.env.AIRAIDER_FRESH) {
@@ -57,7 +70,7 @@ let lastReport: string[] = lastRec?.lines ?? [];
 const BOOT = Date.now().toString(36);
 // soldier portraits, cached next to the save (one folder per save file)
 const portraits = new Portraits(path.join(path.dirname(SAVE), 'portraits', path.basename(SAVE, '.json')),
-  useOpenAi && process.env.AIRAIDER_PORTRAITS !== '0');
+  portraitsOn);
 
 // Fires after every action. A background job (TEMPO P1) finishes OUTSIDE any action, so the quest
 // it wrote may not reach the file until the NEXT action saves. Deliberate: a timer here would race
@@ -347,6 +360,10 @@ function stateView() {
     log: st.log.filter(l => l.kind !== 'dev').slice(-40),
     ai: game.ai.usage(),
     aiName: game.ai.name,
+    // the provider's own cap on calls at once (the claude CLI pool) — the 'written at once' control is honest with it
+    aiPool: game.ai.concurrency ?? null,
+    // whether soldier portraits will ever be painted (the roster caption must not promise one that won't come)
+    portraitsOn,
     aiLog: game.ai.callLog().slice(-40).reverse(),
     // every card you could set in each room, RANKED — card ids only: the rows themselves are each
     // card's roomPlacements (a late fort sent every row twice, ~1MB of duplicate)

@@ -69,7 +69,7 @@ function AiLog({ s }: { s: S }) {
   const pretty = (t?: string | null) => !t ? '(not recorded)' : (() => { try { return JSON.stringify(JSON.parse(t), null, 2) } catch { return t } })();
   if (!s.aiLog?.length) return <p className="empty">No AI calls yet{s.aiName === 'mock' ? ' (mock provider)' : ''}. Totals: {u.calls} calls · ~${u.costUsd.toFixed(3)}</p>;
   return <div className="ailog">
-    <p><b>totals:</b> {u.calls} calls · {u.inputTokens} in / {u.outputTokens} out · ~${u.costUsd.toFixed(3)}</p>
+    <p><b>totals:</b> {u.calls} calls · {u.inputTokens} in / {u.outputTokens} out · ~${u.costUsd.toFixed(3)}{u.listCostUsd !== undefined ? ` billed (Claude subscription; ~$${u.listCostUsd.toFixed(3)} at API list price)` : ''}</p>
     <table><tbody>
       <tr><td>#</td><td>purpose</td><td>model</td><td>ms</td><td>in</td><td>out</td><td>$</td><td>ok</td></tr>
       {s.aiLog.map((r: any) => {

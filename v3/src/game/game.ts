@@ -34,7 +34,7 @@ import {
   type Chain, type Bible, type FinaleFate,
 } from '../engine/chains.js';
 import {
-  newGraph, recall, renderDossier, decayPass, guardEdges, chronicleOf, addEdge, touchEdge, edgeCount,
+  newGraph, recall, renderDossier, decayPass, guardEdges, modelEdges, chronicleOf, addEdge, touchEdge, edgeCount,
   type LoreGraph, type LoreNode,
 } from '../engine/lore.js';
 import { rollName, rollPlaceName } from '../engine/names.js';
@@ -243,6 +243,56 @@ export interface GameState {
 export const RECKONINGS_KEPT = 12;
 
 const CAST_THETA = Number(process.env.CAST_THETA ?? 4);
+
+/** a quirk is a habit PHRASE ("counts the doors twice") that the dossier joins with '; ' — a writer that
+ *  hands back sentences ("Counts the doors.") read "doors.; Coughs…" in every dossier after. One shape
+ *  at ingestion, whichever writer or flesh path produced it */
+export function normQuirks(quirks: string[]): string[] {
+  return quirks.map(q => q.trim().replace(/[\s.;,]+$/, '').replace(/^[A-Z](?=[a-z])/, ch => ch.toLowerCase())).filter(Boolean);
+}
+
+// PREMISE FINGERPRINT (2026-10-02) — the genesis guard's premise clash. It used to overlap EVERY
+// word of four characters or more across title+kernel+arc+tensions+cast against a bar of 2 shared
+// words — so it fired on every saga after the first (every unrelated pair of 54 real bibles cleared
+// it, median 11 shared words): the arc's own format token ("→ yields:"), the dealt region ("forest",
+// "west"), the hire's own frame ("company", "hires", "fetch") and plain English ("must", "first",
+// "where"). Each false fire burned a seed, a second genesis call (~50s) and an avoid nag, and the
+// re-roll failed the same way and shipped anyway. A premise lives in its title, kernel and goal; the
+// words that can show a REPEAT are the ones neither the game's fixed fiction nor the engine handed over:
+//  · stop — English function words
+//  · FRAME — the fiction every saga shares by construction: the company at its fort taking a hire,
+//    and the hire's own errand verbs
+//  · dealt — what the engine gave the drafts: their regions (name, seed, landmark, anchors), the
+//    location line, the soldiers' names (two sagas about one soldier are allowed)
+// Cast repeats are not a premise: the same-person guards fence them, and a stubborn duplicate is
+// recast mechanically.
+const PREMISE_STOP = new Set(('the,a,an,of,to,in,that,and,who,for,with,on,at,by,from,their,its,his,her,they,them,into,over,under,'
+  + 'must,will,would,could,should,shall,might,what,when,where,which,while,there,then,than,this,these,those,after,before,'
+  + 'about,only,back,such,each,every,some,more,most,other,another,also,just,even,still,very,much,many,like,been,being,'
+  + 'have,having,were,onto,upon,your,whose,whom,first').split(','));
+const premiseStem = (w: string) => w.length > 4 && w.endsWith('ies') ? `${w.slice(0, -3)}y` : w.length > 4 && w.endsWith('s') && !w.endsWith('ss') ? w.slice(0, -1) : w;
+// the arc's own format marker ("→ yields:") is the bible's syntax, never its content
+const premiseTokens = (s: string) => (s.replace(/→\s*yields:/gi, ' ').toLowerCase().match(/[a-z]+/g) ?? []).filter(w => w.length > 3 && !PREMISE_STOP.has(w)).map(premiseStem);
+const PREMISE_FRAME = premiseTokens('company fort mercenary soldier client hire hired band fetch recover deliver bring return retrieve reclaim find');
+const regionWords = (id: string) => (r => r ? premiseTokens(`${r.name} ${r.seed} ${r.landmark ?? ''} ${(r.anchors ?? []).join(' ')}`) : [])(REGION[id]);
+/** 🛠 the clash bars — a LIVE chain (or one of the last two) at 3 shared premise words, any of the
+ *  last five at 4. Measured on 54 real bibles (15 same-seed pairs vs 1416 unrelated): ≥2 caught 15/15
+ *  at 4.9% unrelated fires, ≥3 13/15 at 1.0%, ≥4 9/15 at 0.4%. On the 17 bibles of real campaigns (136
+ *  pairs, mostly personal sagas) ≥2 still fired on 13% — everyday words ("claim"+"means",
+ *  "home"+"learn") no word list can bound — while every ≥4 pair was a genuine repeat (a re-rolled
+ *  draft and its twin; two dead-man's-debt sagas) */
+export const PREMISE_CLASH = { live: 3, recent: 4 };
+
+/** the premise fingerprint for one genesis: `draftRegion` and `dealt` (the location line, the focal's
+ *  and the soldiers' names) are what the engine handed this draft. Returns the fingerprint of a bible —
+ *  pass a prior chain's region so its own dealt geography drops out too */
+export function premiseFingerprint(draftRegion: string, dealt: string[]): (b: { title: string; kernel: string; goal: string }, region?: string) => Set<string> {
+  const not = new Set([...PREMISE_FRAME, ...regionWords(draftRegion), ...dealt.flatMap(premiseTokens)]);
+  return (b, region) => {
+    const own = new Set(region ? regionWords(region) : []);
+    return new Set(premiseTokens(`${b.title} ${b.kernel} ${b.goal}`).filter(w => !not.has(w) && !own.has(w)));
+  };
+}
 
 /** the work an earned lead turns out to be, in the words someone at a bench would use — dealt to
  *  the report so it can say what was heard. Glosses were tried first and got pasted whole ("left
@@ -2329,8 +2379,8 @@ export class Game {
     // soldiers are NEVER-USE data at genesis (their only rule is "context, never cast" — the
     // 32012 Koralla class shipped a merc as another saga's claimant anyway): don't deal them.
     // A 10+ roster otherwise floods the 14-entry slate. The focal stays (personal sagas).
-    const slate = (await this.buildLoreSlate(focal.id, 'who needs full dossiers for this saga'))
-      .filter(e => !e.companySoldier || e.id === focal.id);
+    const slate = await this.buildLoreSlate(focal.id, 'who needs full dossiers for this saga',
+      e => !e.companySoldier || e.id === focal.id);
     const races = Object.entries(REGION[lead.region]!.poolWeights) as [string, number][];
     // pre-rolled names for NEW cast — must not collide with any living character (§4b corollary).
     // Rolled WITH a sex and dealt annotated (a gender-opaque list once forced "Ithion" onto the
@@ -2356,7 +2406,7 @@ export class Game {
     while (this.recentNpcNames.length > 60) this.recentNpcNames.shift();
     // the MODEL sees a LEAN fingerprint — showing full arc+tensions in avoid (round 5) made
     // avoid an ATTRACTOR per §8 (42022: seven token-to-oak-judgment sagas in one campaign);
-    // the rich text feeds only the engine-side clash lint below
+    // the rich text feeds only the engine-side ceremony lint below (the clash reads premises)
     const avoid = this.state.chains.slice(-5).map(c =>
       `${c.bible.title} — ${c.bible.kernel} (people: ${c.bible.cast.map(x => x.name).join(', ')})${c.state === 'done' || c.state === 'slipped' ? ` [SETTLED: ${c.story.currentSituation}]` : ''}`);
     const avoidRich = this.state.chains.slice(-5).map(c =>
@@ -2426,8 +2476,8 @@ export class Game {
     // loreIds by name first, every draft is re-validated, and a stubborn duplicate cast member
     // is mechanically recast with a fresh name.
     {
-      const stop = new Set('the,a,an,of,to,in,that,and,who,for,with,on,at,by,from,their,its,his,her,they,them,into,over,under'.split(','));
-      const words = (s: string) => new Set((s.toLowerCase().match(/[a-z]+/g) ?? []).filter(w => w.length > 3 && !stop.has(w)));
+      // the PREMISE CLASH reads premise words only — see premiseFingerprint()
+      const premiseWords = premiseFingerprint(lead.region, [genesisInput.location ?? '', focal.name, ...this.roster().map(m => m.name)]);
       const loreByName = new Map(Object.values(this.state.lore.nodes)
         .filter(n => n.kind === 'character' && n.active).map(n => [n.name, n.id]));
       // canonical person key: lore id when the world knows them, else the bare name — BOTH the
@@ -2448,16 +2498,16 @@ export class Game {
       const soldierKeys = new Set(this.roster().flatMap(m => [m.id, m.name]));
       const issues = (d: typeof g): { why: string; hard?: boolean; dup?: (typeof g.cast)[number] } | null => {
         for (const m of d.cast) if (!m.loreId && loreByName.has(m.name)) m.loreId = loreByName.get(m.name);
-        // cast + coined places join the fingerprint — five deliver-to-a-ceremony sagas with the
-        // same client shipped in one run while title+kernel alone stayed just under the bar
-        const kw = words(`${d.title} ${d.kernel} ${d.arc.join(' ')} ${d.tensions.join(' ')} ${d.cast.map(c => `${c.name} ${c.role}`).join(' ')} ${d.newPlaces.map(p => p.name).join(' ')}`);
-        const hits = (a: string) => { const aw = words(a); let hit = 0; kw.forEach(w => { if (aw.has(w)) hit++ }); return hit };
+        const kw = premiseWords(d);
+        const hits = (c: Chain) => { let hit = 0; premiseWords(c.bible, c.region).forEach(w => { if (kw.has(w)) hit++ }); return hit };
         // a LIVE chain's premise clashes at a LOWER bar — the player holds both stories at
-        // once (37017: two concurrent foundling-escorted-to-a-rite sagas passed the ≥3 gate);
+        // once (37017: two concurrent foundling-escorted-to-a-rite sagas passed the recent bar);
         // the LAST TWO chains regardless of state too (39019: back-to-back dies-forgery sagas)
-        const liveFp = [...this.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending'), ...this.state.chains.slice(-2)]
-          .map(c => `${c.bible.title} — ${c.bible.kernel} ${c.bible.arc.join(' ')} ${c.bible.tensions.join(' ')}`);
-        const clash = avoidRich.find(a => hits(a) >= 3) ?? liveFp.find(a => hits(a) >= 2);
+        const live = [...this.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending'), ...this.state.chains.slice(-2)];
+        const clashChain = this.state.chains.slice(-5).find(c => hits(c) >= PREMISE_CLASH.recent) ?? live.find(c => hits(c) >= PREMISE_CLASH.live);
+        // quoted LEAN into the re-roll's avoid note — the rich text (arc + tensions) in avoid is an
+        // attractor (see `avoid` above)
+        const clash = clashChain && `${clashChain.bible.title} — ${clashChain.bible.kernel}`;
         // dispute-shape monoculture: campaigns converge on ONE settling device (42022: seven
         // oath/judgment-at-a-tree sagas). When the draft AND 2+ recent chains settle by
         // ceremony, the draft must settle its matter another way
@@ -2598,7 +2648,7 @@ export class Game {
         : p.blurb;
       this.state.lore.nodes[id] = { id, kind: 'place', name: p.name || rollPlaceName(this.rng), blurb: b, identity: b, active: true, createdCycle: this.state.cycle };
     }
-    guardEdges(this.state.lore, g.newEdges, this.state.cycle, () => freshId('e'));
+    guardEdges(this.state.lore, modelEdges(g.newEdges), this.state.cycle, () => freshId('e'));
     // §4b NAME GUARD: the AI never invents character names. Known-cast entries keep their
     // lore-node names; NEW cast entries must use engine-rolled names (assignedNames, in order).
     {
@@ -2746,18 +2796,17 @@ export class Game {
     const otherLiveCast = new Set(this.state.chains
       .filter(c2 => c2.id !== chain.id && (c2.state === 'active' || c2.state === 'finale-pending'))
       .flatMap(c2 => c2.bible.cast.flatMap(m => [m.loreId ?? '', m.name].filter(Boolean))));
-    const relevantLore = (await this.buildLoreSlate(chain.focalId, 'who needs full dossiers for this saga step'))
-      .filter(e => !otherLiveCast.has(e.id) && !otherLiveCast.has(e.name))
+    const inCast = (e: { id: string; name: string }) => chain.bible.cast.some(m => m.loreId === e.id || m.name === e.name);
+    const relevantLore = await this.buildLoreSlate(chain.focalId, 'who needs full dossiers for this saga step', e =>
+      !otherLiveCast.has(e.id) && !otherLiveCast.has(e.name)
       // same never-use fence as genesis: soldiers reach a beat card only when the BIBLE binds
       // them (focal / cast entry); the rest of the roster is copy-bait, not context
-      .filter(e => !e.companySoldier || e.id === chain.focalId
-        || chain.bible.cast.some(m => m.loreId === e.id || m.name === e.name))
+      && (!e.companySoldier || e.id === chain.focalId || inCast(e))
       // a cast member's lore entry that adds NO flag is a byte-duplicate of bible.cast
       // (context-free audit: same person described twice in one payload) — drop it. The FOCAL
       // is exempt: their lore identity carries the tags/sex the writer has no other source
       // for (bible cast entries hold who/want only — dropping it left a named focal sexless)
-      .filter(e => e.id === chain.focalId || e.companySoldier || e.companyCaptive || e.atTheFort || e.outOfReach
-        || !chain.bible.cast.some(m => m.loreId === e.id || m.name === e.name));
+      && (e.id === chain.focalId || !!e.companySoldier || !!e.companyCaptive || !!e.atTheFort || !!e.outOfReach || !inCast(e)));
     // 🛠 2026-07-10 (reverses the earlier arrive-FRESH ruling): a lapsed unmarched beat is
     // re-offered VERBATIM from cache — a re-rendered "fresh telling" drifted settled facts
     // (a mute girl became talkative between two renders of the same step)
@@ -4486,7 +4535,7 @@ export class Game {
         // that skipped the field), the flesh pass is the only thing left and it knows nothing.
         c.character.origin = { title: r.quest.title, situation: r.quest.situation ?? '', job: r.quest.job ?? '' };
         const fleshed = out?.fleshed.find(f => f.characterId === c.id);
-        if (fleshed) { c.character.who = fleshed.who; c.character.backstory = fleshed.backstory; c.character.quirks = fleshed.quirks }
+        if (fleshed) { c.character.who = fleshed.who; c.character.backstory = fleshed.backstory; c.character.quirks = normQuirks(fleshed.quirks) }
         this.ensureLoreNode(c);
         if (c.character.role === 'captive') {
           st.holding.push({ cardId: c.id, expiresAtCycle: st.cycle + STAGE_TTL_HOLDING });
@@ -4563,7 +4612,7 @@ export class Game {
         : `🧭 The sweep turns up ${extra} more lead(s) — they wait on a Lead room to be read.`);
     }
     // lore edges from the AI (validated later in one pass)
-    pendingEdges.push(...(out?.edges ?? []));
+    pendingEdges.push(...modelEdges(out?.edges));
     // narrate in the fiction's own order — setup, THEN the dice, THEN the outcome
     // (QUESTS §7: before-roll blind → after-roll sighted; the DICE are always shown, DESIGN §5)
     report.push(`— ${q.title} (${q.id})`);
@@ -4763,14 +4812,16 @@ export class Game {
     return `something ${merc.name} left unfinished before the company`;
   }
 
-  private async buildLoreSlate(focalId: string, purpose: string) {
+  /** the lore slate: everyone recall surfaces around the focal, flagged, then the selector picks who
+   *  gets a full dossier. `admit` is the CALLER's fence (soldiers, other sagas' cast…), applied BEFORE
+   *  the pick — a candidate the caller will drop must never take one of the selector's few picks
+   *  (both writers' pickers spent 3 of 4 on the company's own soldiers, which the beat path then
+   *  dropped, leaving one dossier) */
+  private async buildLoreSlate(focalId: string, purpose: string, admit: (e: { id: string; name: string; companySoldier?: true; companyCaptive?: true; atTheFort?: true; outOfReach?: true }) => boolean = () => true) {
     const wildcardPool = Object.values(this.state.lore.nodes).filter(n => n.active && n.id !== focalId).map(n => n.id);
     const wildcards = this.rng.shuffle([...wildcardPool]).slice(0, 3);
     const candidates = recall(this.state.lore, focalId, this.state.cycle, wildcards);
-    const picked = candidates.length > 8
-      ? await this.ai.select({ purpose, candidates: candidates.map(c => ({ id: c.node.id, name: c.node.name, blurb: c.node.blurb, relationPhrase: c.relationPhrase })), max: 4 })
-      : candidates.map(c => c.node.id);
-    return candidates.map(c => {
+    const entries = candidates.map(c => {
       const card = this.card(c.node.id);
       const role = card?.character?.role;
       // anyone physically AT the fort (tavern guest, staged) must not be cast as an off-site
@@ -4788,16 +4839,21 @@ export class Game {
       const relationPhrase = outOfReach ? c.relationPhrase
         : role === 'merc' ? "one of the company's own soldiers"
         : role === 'captive' ? "held in the company's cells" : c.relationPhrase;
-      // a dossier that is just "name — tags" adds nothing over the blurb — send only fuller ones
-      const d = picked.includes(c.node.id) ? this.dossier(c.node.id) : '';
-      return {
+      return { c, e: {
         id: c.node.id, name: c.node.name, blurb: c.node.blurb, relationPhrase,
         companySoldier: role === 'merc' || undefined,
         companyCaptive: role === 'captive' && !outOfReach || undefined,
         atTheFort: atTheFort || undefined,
         outOfReach: outOfReach || undefined,
-        dossier: d.includes('\n') ? d : undefined,
-      };
+      } };
+    }).filter(x => admit(x.e));
+    const picked = entries.length > 8
+      ? await this.ai.select({ purpose, candidates: entries.map(({ c }) => ({ id: c.node.id, name: c.node.name, blurb: c.node.blurb, relationPhrase: c.relationPhrase })), max: 4 })
+      : entries.map(x => x.e.id);
+    return entries.map(({ e }) => {
+      // a dossier that is just "name — tags" adds nothing over the blurb — send only fuller ones
+      const d = picked.includes(e.id) ? this.dossier(e.id) : '';
+      return { ...e, dossier: d.includes('\n') ? d : undefined };
     });
   }
 
@@ -5248,7 +5304,7 @@ export class Game {
         if (!card?.character) continue;
         card.character.who = o.who || card.character.who;
         card.character.backstory = o.backstory || card.character.backstory;
-        if (o.quirks.length) card.character.quirks = o.quirks.slice(0, 2);
+        if (o.quirks.length) card.character.quirks = normQuirks(o.quirks).slice(0, 2);
         const node = this.state.lore.nodes[card.id];
         if (node && o.who) node.blurb = this.clampBlurb(o.who);
       }

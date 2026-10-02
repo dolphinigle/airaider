@@ -59,7 +59,7 @@ export function CardSheet({ s, id, cast, doAct, quick, close, openQuest, openRoo
   // silhouette column took 240px from the facts and said nothing)
   const caption = c.portrait ? 'Painted when they joined the company.'
     : c.painting ? 'The portrait is being painted…'
-    : kind === 'roster' ? (s.aiName === 'openai' ? 'No portrait yet.' : 'Portraits are painted with the real AI on.')
+    : kind === 'roster' ? (s.portraitsOn ? 'No portrait yet.' : s.aiName === 'mock' ? 'Portraits are painted with the real AI on.' : 'Portraits are off this session.')
     : kind === 'cast' ? 'Held to this matter — you can read them, not move them.' : '';
   const emblem = kind === 'relic' || kind === 'debt' ? <Glyph name={kind === 'debt' ? 'scales' : 'chest'} size={34} /> : <Silhouette size={30} />;
   return (

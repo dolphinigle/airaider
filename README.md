@@ -19,7 +19,9 @@ npm run gui          # server + web UI
 npm test             # engine invariants + sim baselines
 ```
 
-Real AI needs `OPENAI_API_KEY` (via `.env`, never committed).
+Real AI needs `OPENAI_API_KEY` (via `.env`, never committed): `npm run cli -- --ai` / `npm run gui:ai`.
+Free playtests on a Claude subscription: `npm run cli -- --claude` / `npm run gui:claude` (the same prompts through
+the headless `claude` CLI — a playtest transport, not production; see [docs/AI_PROVIDER.md](docs/AI_PROVIDER.md) §6.1).
 
 ## Status
 

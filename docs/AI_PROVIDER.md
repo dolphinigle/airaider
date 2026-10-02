@@ -184,6 +184,45 @@ Two implementations (`OpenAIScenarioLLM`, `ClaudeScenarioLLM`). One config flag 
 **What NOT to abstract:**
 - Provider-specific features like Anthropic's prompt caching or OpenAI's parallel function calls — these are leaky abstractions; use them directly when needed
 
+### 6.1 The Claude playtest transport (designer 2026-10-02)
+
+`AIRAIDER_AI=claude` (server) / `--claude` (CLI) sends **the same prompts, byte for byte,** through the headless
+`claude -p` CLI on the designer's Claude subscription, so his own playthroughs cost nothing. It is a *playtest
+transport*, not a provider decision: **production stays GPT** (far cheaper per call), and the prompts are
+optimized for gpt-5 at the Steam/monetization stretch. Code: `v3/src/ai/claudecli.ts` (the runner) behind
+`openai.ts`'s one `call()`; `v3/src/ai/select.ts` picks mock / openai / claude for both UIs.
+
+- Tiers: writer → `AIRAIDER_CLAUDE_WRITER` (default `sonnet`, `--effort` low, medium where OpenAI gets medium);
+  mechanical → `AIRAIDER_CLAUDE_NANO` (default `haiku`, thinking off — Haiku ignores `--effort`).
+- Knobs: `AIRAIDER_CLAUDE_BIN` (default `claude`), `AIRAIDER_CLAUDE_POOL` (CLI processes at once, default 4),
+  `AIRAIDER_CLAUDE_TIMEOUT_MS` (default 240000; the child is killed), `AIRAIDER_CLAUDE_CWD` (an empty dir
+  outside the repo, default `~/.airaider/claude-cwd`).
+- The meter: `costUsd` stays 0 (the subscription is not billed per call); the API list price rides along as
+  `listCostUsd` in the call record and `AIRAIDER_CALL_LOG`, for information.
+- Portraits stay OpenAI images (Claude has no image model) — on with claude too, ≈ half a US cent per recruited
+  soldier; `AIRAIDER_PORTRAITS=0` turns them off (and with no OpenAI key they are off; the roster says so).
+- The ONE byte the transport adds: the CLI reads stdin as typed input, so a user message opening with `/` would
+  run as a slash command or skill (`/cost …` returned the account's usage with no model call). Such a message
+  goes out with one leading space. Only the player's own direction text can open with `/`; every other game
+  message is JSON.
+- `AIRAIDER_CLAUDE_POOL` is shared by card writes AND the reckoning's reports; when it is below the map table's
+  "written at once", the GUI popover and the CLI `ai` line say how many calls really run at a time.
+- Every transport failure (limit, logout, timeout, unknown CLI error) prints one `[claude] …` line, at most once
+  a minute per kind; a reply with no JSON is the writer's miss and stays on the normal retry path.
+
+**Reading a Claude playtest — Sonnet is not gpt-5-mini.** The prompts stay identical (ruling), so these model
+differences are KNOWN and stay unpatched on this transport; judge them on a GPT spot-check, never by a prompt
+edit made for Sonnet (measured on a 15-cycle Sonnet run vs the gpt-5-mini lab baselines, 2026-10-02):
+- **Length caps overshoot.** Saga cards: median 102 words, 12/14 over the 80-word ceiling (gpt-5-mini: median
+  82, 56% over). Also one-off cards (20-word cap, 5/12 over by 1-5), the voiced card's "3-5 short sentences"
+  (one ran 9 sentences / 103 words), report `before` (7/9 over by 1-3), flesh backstory "2 sentences" (3 in 3/3;
+  gpt: 147/152 at 2). Card-length and pacing judgments made on Claude need a GPT check.
+- **Tense slips** in report `before`: 3/26 setups end — or run — in present tense inside a past-tense report.
+- **Screenplay dialogue:** 9/26 reports put spoken lines in their own paragraphs (`\n\n`; gpt: 0/139). The CLI
+  keeps the stamp gutter for multi-line blocks; the GUI collapses them to one paragraph.
+- **Haiku on the mechanical tier** wraps every reply in a code fence and adds a "Reasoning:" essay (~200 output
+  tokens, 6-7 s per select vs ~1 s on gpt-5-nano); extraction copes, but a late saga beat waits ~6 s longer.
+
 ---
 
 ## 7. Local / open-source — defer
@@ -222,6 +261,7 @@ Two implementations (`OpenAIScenarioLLM`, `ClaudeScenarioLLM`). One config flag 
 | (today) | Defer local/open-source models | Iteration speed > per-call cost at prototype phase |
 | (today) | Use strict JSON Schema with embedded narrative field | Best balance of validation rigor and storytelling flexibility |
 | (today) | Build thin provider abstraction, skip LiteLLM | Avoid premature framework adoption |
+| 2026-10-02 | Ship a Claude *playtest transport* (`AIRAIDER_AI=claude` / `--claude`): the same prompts via the headless Claude CLI on the subscription (§6.1) | Designer: "the goal isn't production — production will use gpt since it's a LOT cheaper. It's so that my testings are free … At the final stretch (Steam / monetization) we optimize for gpt-5." |
 
 ---
 

@@ -13,6 +13,7 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "gui:ai": "AIRAIDER_AI=openai concurrently -k -n server,web -c blue,magenta \"npm run server\" \"npm run web\"",
+    "gui:claude": "AIRAIDER_AI=claude concurrently -k -n server,web -c blue,magenta \"npm run server\" \"npm run web\"",
     "fresh": "rm -rf saves"
   },
   "dependencies": {

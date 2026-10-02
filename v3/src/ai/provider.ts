@@ -220,7 +220,11 @@ export interface SelectorInput {
 
 // ---- the provider ----------------------------------------------------------------------------
 
-export interface AiUsage { calls: number; inputTokens: number; outputTokens: number; costUsd: number }
+export interface AiUsage {
+  calls: number; inputTokens: number; outputTokens: number;
+  costUsd: number;               // what the session was BILLED (0 on the claude playtest transport — the subscription pays)
+  listCostUsd?: number;          // claude transport only: what it would have cost at API list price (information)
+}
 
 /** one record per AI call — the GUI's ai-log tab and the debugging trail */
 export interface AiCallRecord {
@@ -232,6 +236,7 @@ export interface AiCallRecord {
   outputTokens: number;
   cachedTokens: number;
   costUsd: number;
+  listCostUsd?: number;      // claude transport: the API list price of a call the subscription paid for (costUsd 0)
   ok: boolean;
   error?: string;
   systemPreview: string;     // first part of the system prompt
@@ -255,6 +260,9 @@ export type DirectionRead = Omit<CampaignDirection, 'text'>;
 
 export interface AiProvider {
   readonly name: string;
+  /** how many calls this provider actually runs at once, when it caps them below the game's own
+   *  limits (the claude transport's CLI pool — card writes and the reckoning share it); absent = no cap */
+  readonly concurrency?: number;
   /** read the player's free-text direction into guidance + knobs (one cheap call) */
   interpretDirection?(text: string, vocab: Record<string, string[]>): Promise<DirectionRead>;
   /** the direction every writer call follows from now on (null = none) */

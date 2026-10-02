@@ -70,7 +70,7 @@ export const render = {
     return [
       'VIEWS   fort · rooms · room <id> · roster · merc <id> · leads · quests · quest <id>',
       '        captives · items · chains · chain <id> · lore <id> · tavern · holding',
-      '        buildable · status · next · log [n|dev] · reckoning [cycle|list] · ailog',
+      '        buildable · status · next · log [n|dev] · reckoning [cycle|list] · ai · ailog',
       'BUILD   build <type> [ownerId] [F,C] · upgrade <roomId> · renovate <roomId> <style>',
       '        excavate · gh   (styles: human elven wolfkin lizardkin ancient exotic)',
       'ROOMS   setin <cardId> <roomId> [idx] — set a relic / captive in a room (best free place, or a swap that gains)',
@@ -550,8 +550,12 @@ export const render = {
   reckoningHead(g: Game): string {
     return `\n━━━ THE RECKONING · CYCLE ${g.state.cycle} ━━━`;
   },
+  /** one stamped line; a block that spans lines (prose laid out in paragraphs, a voiced card's
+   *  '[bearer]' line) keeps the gutter — its later lines sit under the text, never flush-left */
   reckoningLine(line: string, elapsedMs: number): string {
-    return `${`[+${(elapsedMs / 1000).toFixed(1)}s]`.padStart(9)} ${line}`;
+    const stamp = `[+${(elapsedMs / 1000).toFixed(1)}s]`.padStart(9);
+    const pad = ' '.repeat(stamp.length + 1);
+    return `${stamp} ${line.split('\n').map((l, i) => i && l ? pad + l : l).join('\n')}`;
   },
   reckoningFoot(g: Game, elapsedMs: number, tailMs: number | null): string {
     const t = `report complete at +${(elapsedMs / 1000).toFixed(1)}s`;

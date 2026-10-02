@@ -1,6 +1,8 @@
 // OpenAI provider — gpt-5-mini (writer/genesis/resolution/theme), gpt-5-nano (selector).
 // Every response zod-validated; the engine canonicalizes tags and guards names/edges.
 // Key from OPENAI_API_KEY via ../.env or ~/.airaider/openai.env (never printed/committed).
+// Transport 'claude' (AIRAIDER_AI=claude / --claude): the same prompts through the headless Claude CLI on
+// the designer's subscription — the free PLAYTEST transport; production stays here on GPT (claudecli.ts).
 
 import OpenAI from 'openai';
 import { glossOf, ruleOf, seenOf, errandOf, type Archetype } from '../engine/archetypes.js';
@@ -13,10 +15,12 @@ import type {
   ResolveQuestInput, ResolveQuestOut, ThemeRollInput, ThemeRollOut, SelectorInput, ReviewInput, ReviewOut,
   FleshInput, FleshOut, CampaignDirection, DirectionRead } from './provider.js';
 import { appendCallLog } from './calllog.js';
+import { runClaude, claudeOptsFor, claudePool } from './claudecli.js';
 
 // 🛠 lab-overridable (model A/B, e.g. AIRAIDER_WRITER_MODEL=gpt-5.4-nano)
 const WRITER_MODEL = process.env.AIRAIDER_WRITER_MODEL || 'gpt-5-mini';
 const NANO_MODEL = process.env.AIRAIDER_NANO_MODEL || 'gpt-5-nano';
+export const OPENAI_MODELS = { writer: WRITER_MODEL, nano: NANO_MODEL };
 
 export function loadKey(): string {
   if (process.env.OPENAI_API_KEY) return process.env.OPENAI_API_KEY;
@@ -711,9 +715,16 @@ function sagaResolveSystem(q: ResolveQuestInput): string {
   ].filter(Boolean).join('\n');
 }
 
-export function makeOpenAiProvider(): AiProvider {
-  const client = new OpenAI({ apiKey: loadKey() });
-  const usage: AiUsage = { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 };
+/** the writer's TRANSPORT. 'openai' = production (and the default real AI). 'claude' = the designer's
+ *  FREE playtest transport: the same prompts, byte for byte, sent through the headless Claude CLI on the
+ *  Claude subscription (claudecli.ts; designer 2026-10-02 — production stays GPT) */
+export type WriterTransport = 'openai' | 'claude';
+
+export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): AiProvider {
+  const transport: WriterTransport = opts.transport ?? 'openai';
+  let client: OpenAI | null = null;   // built on the first OpenAI call — the claude transport never needs the key
+  if (transport === 'openai') client = new OpenAI({ apiKey: loadKey() });
+  const usage: AiUsage = { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0, ...(transport === 'claude' ? { listCostUsd: 0 } : {}) };
   const records: AiCallRecord[] = [];
   // TEMPO I8: purpose used to be ONE mutable variable set by whichever method ran last, and the
   // ordinal was read before it was incremented. With calls in flight at once that mislabels every
@@ -741,23 +752,46 @@ export function makeOpenAiProvider(): AiProvider {
     if (records.length > 120) records.splice(0, records.length - 120);
     // AIRAIDER_CALL_LOG: the whole call, untruncated, as it settles (logging only)
     let rawOut: string | undefined;
+    const tierEffort = effort ?? (model === NANO_MODEL ? 'minimal' : 'low');
+    const claudeOpts = transport === 'claude' ? claudeOptsFor(model === NANO_MODEL ? 'nano' : 'writer', tierEffort) : null;
     const logFull = () => appendCallLog({
-      t: new Date().toISOString(), provider: 'openai', n: rec.n, purpose, model,
-      effort: /^gpt-5/.test(model) ? effort ?? (model === NANO_MODEL ? 'minimal' : 'low') : undefined,
+      t: new Date().toISOString(), provider: transport, n: rec.n, purpose, model: rec.model,
+      effort: claudeOpts ? claudeOpts.effort ?? `thinking ${claudeOpts.thinkingTokens}` : /^gpt-5/.test(model) ? tierEffort : undefined,
       durationMs: rec.durationMs, inputTokens: rec.inputTokens, outputTokens: rec.outputTokens,
-      cachedTokens: rec.cachedTokens, costUsd: rec.costUsd, ok: rec.ok, error: rec.error,
-      system, user, output: rawOut,
+      cachedTokens: rec.cachedTokens, costUsd: rec.costUsd, ...(rec.listCostUsd !== undefined ? { listCostUsd: rec.listCostUsd } : {}),
+      ok: rec.ok, error: rec.error, system, user, output: rawOut,
     });
     try {
+      if (claudeOpts) {
+        // the playtest transport: same system + user text, the subscription pays (costUsd stays 0; the
+        // API list price is kept as listCostUsd, for information only)
+        rec.model = claudeOpts.model;
+        const r = await runClaude(system, user, claudeOpts);
+        usage.calls++;
+        usage.inputTokens += r.inputTokens;
+        usage.outputTokens += r.outputTokens;
+        usage.listCostUsd = (usage.listCostUsd ?? 0) + r.listCostUsd;
+        rec.model = r.model;
+        rec.durationMs = Date.now() - t0;
+        rec.inputTokens = r.inputTokens; rec.outputTokens = r.outputTokens; rec.cachedTokens = r.cachedTokens; rec.listCostUsd = r.listCostUsd;
+        rec.output = r.text.slice(0, 8000);
+        rawOut = r.text;
+        if (!r.json) throw new Error('no JSON object in the reply');
+        const out = schema.parse(r.json);
+        rec.ok = true;
+        logFull();
+        return out;
+      }
       // effort per tier (STORY_ENGINE §10.5): prose at low (PROMPTS.md — latency is gameplay),
       // the mechanical nano tier at minimal
       // reasoning_effort exists only on the gpt-5 (reasoning) family; 4.x models reject it
       const isReasoning = /^gpt-5/.test(model);
+      client ??= new OpenAI({ apiKey: loadKey() });
       const res = await client.chat.completions.create({
         model,
         messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
         response_format: { type: 'json_object' },
-        ...(isReasoning ? { reasoning_effort: effort ?? (model === NANO_MODEL ? 'minimal' : 'low') } : {}),
+        ...(isReasoning ? { reasoning_effort: tierEffort } : {}),
       } as never) as OpenAI.Chat.Completions.ChatCompletion;
       usage.calls++;
       const inTok = res.usage?.prompt_tokens ?? 0;
@@ -802,7 +836,8 @@ export function makeOpenAiProvider(): AiProvider {
     guidance: z.string().default(''), npcPrefer: zIds, npcAvoid: zIds, recruitPrefer: zIds, recruitAvoid: zIds, avoid: zIds,
   });
   return {
-    name: 'openai',
+    name: transport,
+    ...(transport === 'claude' ? { concurrency: claudePool() } : {}),
     setDirection(d: CampaignDirection | null) { direction = d },
     async interpretDirection(text: string, vocab: Record<string, string[]>): Promise<DirectionRead> {
       const system = [

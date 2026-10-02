@@ -32,12 +32,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 ```bash
 cd v3
-npm run cli                   # text game (mock AI default; --ai for OpenAI)
-npm run gui                   # server + web
+npm run cli                   # text game (mock AI default; --ai for OpenAI; --claude = free playtest transport)
+npm run gui                   # server + web (AIRAIDER_AI=openai | claude; npm run gui:ai / gui:claude)
 npm test                      # vitest suite
 npm test -- -t "name"         # single test by pattern
 npm run typecheck             # tsc --noEmit
 ```
+`--claude` / `AIRAIDER_AI=claude` = the designer's FREE playtest transport: the same prompts via the headless
+`claude` CLI on the Claude subscription (src/ai/claudecli.ts). Not production — production = GPT (optimize for
+gpt-5 at the Steam stretch). Portraits stay OpenAI images either way (`AIRAIDER_PORTRAITS=0` = off).
 
 ## Secrets
 `OPENAI_API_KEY` lives in `/home/irvan/airaider/.env` + `~/.airaider/openai.env` (gitignored). Read for dogfooding only; never print or commit.

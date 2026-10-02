@@ -160,6 +160,14 @@ export function chronicleOf(g: LoreGraph, id: string): RelEdge[] {
 
 // ---- write-back guards (LORE §3.3) ----------------------------------------------------------
 
+/** the edges a MODEL proposes, minus any that tie a person to themself — the engine writes self edges
+ *  on purpose (a saga memory, a hand-off), so guardEdges must keep accepting them; a model's self edge
+ *  is filler (a solo party left no second id: "c11 party-to c11 — placeholder" sat in a dossier and
+ *  rode into the finale prompts) */
+export function modelEdges<T extends { from: string; to: string }>(proposed: T[] | undefined): T[] {
+  return (proposed ?? []).filter(e => e.from !== e.to);
+}
+
 /** persist AI-emitted edges, guarded: both endpoints must resolve; type must be in the enum */
 export function guardEdges(g: LoreGraph, proposed: {
   from: string; to: string; type: string; blurb: string; importance: number;
