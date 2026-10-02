@@ -9,6 +9,16 @@
 //
 // A CI is the 2.5–97.5 percentile of 2,000 resamples of the SAGAS (seeded, so a re-run prints the
 // same numbers). Ratio metrics resample numerator and denominator together.
+//
+// Calibration (Phase 0 findings, docs/STORYTELLER.md §5.0):
+//   M1 is STRICT: a card part J2 grades "unclear" (the card left it unclear) is NOT followed; the old
+//      lenient reading stays as M1-lax. M1-said adds "the reader's paraphrase says 'unclear' nowhere":
+//      the rule the frozen baseline (legacy boolean J2 files) was scored with, so the cross-version row.
+//   Taste scores (M2, M3, M3b, M4) come from the PRIMARY seat, j1_opus; gpt-5 rows sit alongside.
+//      Never compare them across runs read by a different mix of seats.
+//   J3 (M10) scores only ORDER-BALANCED pairs: each pair read in both orders, a pick counts only when
+//      it holds in both. A single-order read is shown, never scored.
+// A run folder holds its sagas under sagas/ (drive runs) or directly (probe runs).
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -24,11 +34,20 @@ type J = Record<string, unknown>;
 const readJson = <T = J>(p: string): T | null => { try { return JSON.parse(fs.readFileSync(p, 'utf8')) as T } catch { return null } };
 const dirs = (p: string) => fs.existsSync(p) ? fs.readdirSync(p).filter(f => fs.statSync(path.join(p, f)).isDirectory()) : [];
 const files = (p: string) => fs.existsSync(p) ? fs.readdirSync(p).filter(f => f.endsWith('.json')) : [];
+/** where a run keeps its saga folders: sagas/ for drive runs, the run folder itself for probe runs */
+const sagaRoot = (runDir: string) => fs.existsSync(path.join(runDir, 'sagas')) ? path.join(runDir, 'sagas') : runDir;
+/** the primary J1 seat for taste scores (Phase-0 calibration), and the seats reported alongside it */
+const PRIMARY_J1 = 'j1_opus';
+const ALONGSIDE_J1 = ['j1_gpt5'];
 
-interface J1 { seat: string; texts: { text: string; kind: string; ease?: number; want_to_send?: number; want_next?: number; reread?: string; send?: boolean }[]; end?: J }
+interface J1 { seat: string; texts: { text: string; kind: string; paraphrase?: string; ease?: number; want_to_send?: number; want_next?: number; reread?: string; send?: boolean }[]; end?: J }
+/** a J2 grade of one paraphrase part: true · "unclear" (the card left it unclear) · false. Legacy
+ *  files hold booleans only, graded leniently */
+type Grade = boolean | 'unclear';
+type PartGrades = { who_wants_what?: Grade; what_to_do?: Grade; who_in_way?: Grade };
 interface J2 {
   seat: string;
-  cards?: { text: string; paraphrase_right?: Record<string, { who_wants_what?: boolean; what_to_do?: boolean; who_in_way?: boolean }>; paperwork?: boolean; job_type?: string; unmet_names?: string[]; spoiler?: string; engine_speak?: string[]; part_word_labels?: string[] }[];
+  cards?: { text: string; paraphrase_right?: Record<string, PartGrades>; paperwork?: boolean; job_type?: string; unmet_names?: string[]; spoiler?: string; engine_speak?: string[]; part_word_labels?: string[] }[];
   reports?: { text: string; j1_right?: Record<string, { outcome?: boolean; change?: boolean }>; spoiler?: string; engine_speak?: string[]; part_word_labels?: string[] }[];
   retell?: Record<string, { ask?: boolean; answer?: boolean; ending?: boolean }>;
   question_category?: string; answer_category?: string; question_answered?: boolean; answer_guessable_from_card1?: boolean;
@@ -64,20 +83,34 @@ const cardsOf = (j: J1) => j.texts.filter(t => t.kind === 'card');
 const reportsOf = (j: J1) => j.texts.filter(t => t.kind === 'report');
 const avgOver = (vals: (number | undefined)[]): [number, number] => { const v = vals.filter((x): x is number => typeof x === 'number'); return [v.reduce((a, b) => a + b, 0), v.length] };
 
-/** a J3 row in one shape: the API seat writes keep/follow/firstShown as run names; a file seat
- *  writes X/Y picks and the two folders it was given (a run name or a path under runs/) */
-function normalizeJ3(r: J): J {
-  if (r.keep && r.follow && r.firstShown) return r;
+/** one J3 read, in run names. The API seat writes both orders of a pair in one file (`reads`); a legacy
+ *  file holds one read; a file seat writes X/Y picks and the two folders it was given (a run name
+ *  or a path under runs/), one file per order. */
+interface J3Read { saga: string; firstShown: string | null; keep: string | null; follow: string | null }
+function j3Reads(r: J, self: string, other: string, file: string): J3Read[] {
+  const saga = String(r.saga ?? file.split('.')[0]);
+  if (Array.isArray(r.reads)) return (r.reads as J[]).flatMap(x => j3Reads({ ...x, saga }, self, other, file));
   const a = (r.answer ?? r) as J;
-  const runOf = (folder: unknown) => { const f = String(folder ?? ''); return f.match(/runs\/([^/]+)/)?.[1] ?? f.split('/')[0] ?? f };
+  const names = [self, other].sort((p, q) => q.length - p.length);
+  const runOf = (folder: unknown): string | null => {
+    const f = String(folder ?? '');
+    if (!f) return null;
+    return names.find(c => f === c || f.includes(`runs/${c}/`) || f.startsWith(`${c}/`) || f.endsWith(`/${c}`))
+      ?? f.match(/runs\/([^/]+)/)?.[1] ?? f.split('/')[0] ?? f;
+  };
   const x = runOf(r.x), y = runOf(r.y);
   const pick = (v: unknown) => v === 'X' ? x : v === 'Y' ? y : null;
-  return { ...r, keep: r.keep ?? pick(a.rather_keep_playing), follow: r.follow ?? pick(a.follow_more_easily), firstShown: r.firstShown ?? x };
+  const known = (v: unknown) => typeof v === 'string' && names.includes(v) ? v : null;
+  return [{
+    saga, firstShown: known(r.firstShown) ?? x,
+    keep: known(r.keep) ?? pick(a.rather_keep_playing), follow: known(r.follow) ?? pick(a.follow_more_easily),
+  }];
 }
+interface J3Set { dir: string; self: string; other: string; reads: J3Read[] }
 
-function load(runs: string[]): { sagas: Saga[]; j3: { dir: string; rows: J[] }[]; j4: J[]; mech: J[] } {
+function load(runs: string[]): { sagas: Saga[]; j3: J3Set[]; j4: J[]; mech: J[] } {
   const sagas: Saga[] = [];
-  const j3: { dir: string; rows: J[] }[] = [];
+  const j3: J3Set[] = [];
   const j4: J[] = [];
   const mech: J[] = [];
   for (const run of runs) {
@@ -86,37 +119,79 @@ function load(runs: string[]): { sagas: Saga[]; j3: { dir: string; rows: J[] }[]
     if (m) mech.push(m.aggregate);
     const judge = path.join(rd, 'judge');
     const seats = dirs(judge);
-    for (const id of dirs(path.join(rd, 'sagas')).filter(d => fs.existsSync(path.join(rd, 'sagas', d, 'meta.json'))).sort()) {
+    const root = sagaRoot(rd);
+    for (const id of dirs(root).filter(d => fs.existsSync(path.join(root, d, 'meta.json'))).sort()) {
+      // the seat is the folder the file sits in, whatever the file calls itself
+      const seatFiles = <T extends { seat: string }>(pre: string) => seats.filter(s => s.startsWith(pre))
+        .map(s => { const x = readJson<T>(path.join(judge, s, `${id}.json`)); return x ? { ...x, seat: s } : null }).filter((x): x is T => !!x);
       sagas.push({
         run, id,
-        j1: seats.filter(s => s.startsWith('j1_')).map(s => readJson<J1>(path.join(judge, s, `${id}.json`))).filter((x): x is J1 => !!x),
-        j2: seats.filter(s => s.startsWith('j2_')).map(s => readJson<J2>(path.join(judge, s, `${id}.json`))).filter((x): x is J2 => !!x),
+        j1: seatFiles<J1>('j1_'),
+        j2: seatFiles<J2>('j2_'),
         mech: m?.perSaga.find(p => p.id === id) ?? null,
       });
     }
     for (const s of seats.filter(s => s.startsWith('j3_'))) for (const vs of dirs(path.join(judge, s)))
-      j3.push({ dir: `${run}/${s}/${vs}`, rows: files(path.join(judge, s, vs)).map(f => readJson(path.join(judge, s, vs, f))!).filter(Boolean).map(normalizeJ3) });
+    {
+      // the other run's name: as the file records it (a nested probe run cannot be a folder name), else the folder's
+      const got = files(path.join(judge, s, vs)).map(f => ({ f, x: readJson(path.join(judge, s, vs, f)) })).filter((e): e is { f: string; x: J } => !!e.x);
+      const other = String(got.find(e => e.x.other)?.x.other ?? vs.replace(/^vs_/, ''));
+      j3.push({ dir: `${run}/${s}/${vs}`, self: run, other, reads: got.flatMap(e => j3Reads(e.x, run, other, e.f)) });
+    }
     for (const s of seats.filter(s => s.startsWith('j4_'))) for (const f of files(path.join(judge, s))) { const x = readJson(path.join(judge, s, f)); if (x) j4.push(x) }
   }
   return { sagas, j3, j4, mech };
 }
 
+/** M1 per saga: cards × graded seats.
+ *   parts — all three parts graded `true` (the §5.0 strict rule: J2 grades a part the card leaves
+ *           unclear as "unclear", never `true`). On a legacy boolean-only J2 file this is the lenient
+ *           reading, so it is never compared across rubric versions.
+ *   said  — `parts`, and the seat's paraphrase says "unclear" nowhere: the rule the frozen baseline's
+ *           M1-strict (59.6%) was computed with, so the one row comparable across rubric versions.
+ *           Stricter than `parts` on the new rubric (it also fails "why: unclear" outside the 3 parts).
+ *   lax   — every part `true` or "unclear" (watch only).
+ *  The mode is chosen per ROW, never guessed per file: an all-`true` grade looks the same in both rubrics. */
+function m1(s: Saga, mode: 'parts' | 'said' | 'lax'): [number, number] {
+  let x = 0, d = 0;
+  for (const j2 of s.j2) for (const c of j2.cards ?? []) for (const [seat, g] of Object.entries(c.paraphrase_right ?? {})) {
+    const parts = [g.who_wants_what, g.what_to_do, g.who_in_way];
+    d++;
+    if (mode === 'lax') { if (parts.every(p => p === true || p === 'unclear')) x++; continue }
+    const said = s.j1.find(j => j.seat === seat)?.texts.find(t => t.text === c.text)?.paraphrase ?? '';
+    if (parts.every(p => p === true) && !(mode === 'said' && /\bunclear\b/i.test(said))) x++;
+  }
+  return [x, d];
+}
+/** the same, on card 1 only (§5.2: card 1 three ways) */
+const m1Card1 = (s: Saga, mode: 'parts' | 'said'): [number, number] =>
+  m1({ ...s, j2: s.j2.map(j => ({ ...j, cards: (j.cards ?? []).filter(c => c.text === 'card_1.md') })) }, mode);
+
+/** the taste scores of ONE J1 seat (the primary seat's rows carry the §1.1 ids) */
+function tasteMetrics(seat: string, sfx: string): Metric[] {
+  const of = (s: Saga) => s.j1.filter(j => j.seat === seat);
+  const who = sfx ? `${seat} alongside` : `${seat}, primary`;
+  return [
+    { id: `M2${sfx}`, name: `Follow, felt (J1 ease 0–10, cards; ${who})`, fmt: 'num', target: sfx ? '—' : 'G3 ≥ base+1.0, above floor · G2 ≥ base', f: s => avgOver(of(s).flatMap(j => cardsOf(j).map(t => t.ease))) },
+    { id: `M3${sfx}`, name: `Want the next part (J1 0–10, reports; ${who})`, fmt: 'num', target: sfx ? '—' : 'G3 ≥ base+1.0, above floor · G2 ≥ base', f: s => avgOver(of(s).flatMap(j => reportsOf(j).map(t => t.want_next))) },
+    { id: `M3b${sfx}`, name: `Want to send (J1 0–10, cards; ${who})`, fmt: 'num', target: '—', f: s => avgOver(of(s).flatMap(j => cardsOf(j).map(t => t.want_to_send))) },
+    { id: `M4${sfx}`, name: `Send on card 1 (J1 yes; ${who})`, fmt: 'pct', target: sfx ? '—' : '≥ base, above floor', f: s => {
+      const v = of(s).map(j => cardsOf(j)[0]?.send).filter((x): x is boolean => typeof x === 'boolean');
+      return [v.filter(Boolean).length, v.length];
+    } },
+  ];
+}
+
 /** the §1.1 metrics that live on sagas — each a Frac, so every one gets the same bootstrap */
-const METRICS: { id: string; name: string; f: Frac; fmt: 'pct' | 'num' | 'usd' | 'sec'; target: string; note?: string }[] = [
-  { id: 'M1', name: 'Follow, objective (J2: paraphrase 3/3)', fmt: 'pct', target: 'G3 ≥ 90% & ≥ min(base+15pp, 97%) · G2 ≥ 85%', f: s => {
-    let x = 0, d = 0;
-    for (const j2 of s.j2) for (const c of j2.cards ?? []) for (const g of Object.values(c.paraphrase_right ?? {})) {
-      d++; if (g.who_wants_what && g.what_to_do && g.who_in_way) x++;
-    }
-    return [x, d];
-  } },
-  { id: 'M2', name: 'Follow, felt (J1 ease 0–10, cards)', fmt: 'num', target: 'G3 ≥ base+1.0, above floor · G2 ≥ base', f: s => { const a = s.j1.flatMap(j => cardsOf(j).map(t => t.ease)); return avgOver(a) } },
-  { id: 'M3', name: 'Want the next part (J1 0–10, reports)', fmt: 'num', target: 'G3 ≥ base+1.0, above floor · G2 ≥ base', f: s => avgOver(s.j1.flatMap(j => reportsOf(j).map(t => t.want_next))) },
-  { id: 'M3b', name: 'Want to send (J1 0–10, cards)', fmt: 'num', target: '—', f: s => avgOver(s.j1.flatMap(j => cardsOf(j).map(t => t.want_to_send))) },
-  { id: 'M4', name: 'Send on card 1 (J1 yes)', fmt: 'pct', target: '≥ base, above floor', f: s => {
-    const v = s.j1.map(j => cardsOf(j)[0]?.send).filter((x): x is boolean => typeof x === 'boolean');
-    return [v.filter(Boolean).length, v.length];
-  } },
+interface Metric { id: string; name: string; f: Frac; fmt: 'pct' | 'num' | 'usd' | 'sec'; target: string; note?: string }
+const METRICS: Metric[] = [
+  { id: 'M1', name: 'Follow, objective, STRICT (J2 parts 3/3 `true`; "unclear" = not followed; new rubric only)', fmt: 'pct', target: 'G3 ≥ 90% & ≥ min(base+15pp, 97%) · G2 ≥ 85%', f: s => m1(s, 'parts') },
+  { id: 'M1c1', name: 'M1 on card 1 only', fmt: 'pct', target: '—', f: s => m1Card1(s, 'parts') },
+  { id: 'M1-said', name: 'M1, and the reader wrote "unclear" nowhere (the frozen base\'s M1-strict rule: compare to base 59.6%)', fmt: 'pct', target: 'not below base (G1)', f: s => m1(s, 'said') },
+  { id: 'M1-said c1', name: 'M1-said on card 1 only (base 25%)', fmt: 'pct', target: '—', f: s => m1Card1(s, 'said') },
+  { id: 'M1-lax', name: 'Follow, objective, lenient ("unclear" on a part the card never says = right)', fmt: 'pct', target: '(watch only)', f: s => m1(s, 'lax') },
+  ...tasteMetrics(PRIMARY_J1, ''),
+  ...ALONGSIDE_J1.flatMap(seat => tasteMetrics(seat, `·${seat.replace(/^j1_/, '')}`)),
   { id: 'M5', name: 'Reread (texts where BOTH J1 seats quote one)', fmt: 'pct', target: 'G3 ≤ 10% · G2 ≤ 15%', note: 'needs 2 J1 seats; with one seat, see M5′', f: s => {
     if (s.j1.length < 2) return [0, 0];
     const [a, b] = s.j1;
@@ -188,24 +263,31 @@ function main() {
   const out: string[] = [
     `# Saga lab — ${label}`, '',
     `Runs: ${runs.join(', ')} · ${sagas.length} sagas · seats: ${seatsSeen.join(', ') || 'none yet'} · J3 sets: ${j3.length} · J4 series: ${j4.length}`,
-    `CIs: bootstrap 95% over sagas (2,000 resamples, seeded). n = sagas with data.`, '',
+    `CIs: bootstrap 95% over sagas (2,000 resamples, seeded). n = sagas with data.`,
+    `Taste scores (M2, M3, M3b, M4) are the ${PRIMARY_J1} seat's; ${ALONGSIDE_J1.join(', ')} rows sit alongside. Compare them only with runs read by the same seats. M1 is strict ("unclear" = not followed).`, '',
     '## §1.1 table', '',
     '| # | metric | value | 95% CI | n | target |', '|---|---|---|---|---|---|',
     ...rows.map(({ m, e }) => `| ${m.id} | ${m.name}${m.note ? ` (${m.note})` : ''} | ${fmt(e.value, m.fmt)} | ${e.lo === null ? '—' : `${fmt(e.lo, m.fmt)} – ${fmt(e.hi, m.fmt)}`} | ${e.n} | ${m.target} |`),
   ];
 
-  // M10 — pair preference per J3 set: share of pairs the set's own run was kept, and position bias
-  out.push('', '## M10 — pair preference (J3)', '');
-  if (!j3.length) out.push('— (no J3 run yet: `judge_gpt.ts j3 --run X --vs Y`, plus the Opus seat)');
+  // M10 — pair preference per J3 set, ORDER-BALANCED: a pair counts only when it was read in both
+  // orders, and a pick only when it holds in both; single-order reads are shown, never scored
+  out.push('', '## M10 — pair preference (J3, order-balanced)', '');
+  if (!j3.length) out.push('— (no J3 run yet: `judge_gpt.ts j3 --run X --vs Y` reads every pair in both orders, plus the Opus seat)');
   else {
-    out.push('| set | pairs | kept = this run | followed = this run | kept = shown first | followed = shown first |', '|---|---|---|---|---|---|');
+    out.push('| set | pairs read in both orders / all | kept = this run, both orders | followed = this run, both orders | keep / follow held across orders | kept = shown first (all reads) | followed = shown first (all reads) |', '|---|---|---|---|---|---|---|');
     for (const s of j3) {
-      const self = s.dir.split('/')[0]!;
-      const n = s.rows.length || 1;
-      const share = (f: (r: J) => boolean) => `${(100 * s.rows.filter(f).length / n).toFixed(0)}%`;
-      out.push(`| ${s.dir} | ${s.rows.length} | ${share(r => r.keep === self)} | ${share(r => r.follow === self)} | ${share(r => r.keep === r.firstShown)} | ${share(r => r.follow === r.firstShown)} |`);
+      const bySaga = new Map<string, J3Read[]>();
+      for (const r of s.reads) bySaga.set(r.saga, [...(bySaga.get(r.saga) ?? []), r]);
+      const pairs = [...bySaga.values()];
+      const balanced = pairs.filter(rs => rs.some(r => r.firstShown === s.self) && rs.some(r => r.firstShown === s.other));
+      const held = (rs: J3Read[], k: 'keep' | 'follow') => rs.every(r => r[k] && r[k] === rs[0]![k]) ? rs[0]![k] : null;
+      const nb = balanced.length;
+      const share = (n: number, d: number) => d ? `${(100 * n / d).toFixed(0)}% (${n}/${d})` : '—';
+      const reads = s.reads.length;
+      out.push(`| ${s.dir} | ${nb} / ${pairs.length} | ${share(balanced.filter(rs => held(rs, 'keep') === s.self).length, nb)} | ${share(balanced.filter(rs => held(rs, 'follow') === s.self).length, nb)} | ${share(balanced.filter(rs => held(rs, 'keep')).length, nb)} / ${share(balanced.filter(rs => held(rs, 'follow')).length, nb)} | ${share(s.reads.filter(r => r.keep && r.keep === r.firstShown).length, reads)} | ${share(s.reads.filter(r => r.follow && r.follow === r.firstShown).length, reads)} |`);
     }
-    out.push('', 'Phase-0 calibration: base B vs regenerated B′ — both should sit near 50%; the distance from 50% is the noise floor M10 must clear, and "shown first" is the position bias.');
+    out.push('', 'M10 = "kept = this run, both orders" over pairs read in both orders; a pick that flips with the order is position, not preference. Phase-0 calibration: base B vs regenerated B′ should sit near 50%.');
   }
 
   // M19 — J4 series repetition
@@ -239,7 +321,7 @@ function main() {
 
   const dest = path.join(LAB, 'runs', opt('out') ?? runs[0]!);
   fs.writeFileSync(path.join(dest, 'REPORT.md'), out.join('\n'));
-  fs.writeFileSync(path.join(dest, 'score.json'), JSON.stringify({ label, runs, metrics: rows.map(({ m, e }) => ({ id: m.id, name: m.name, ...e })), j3: j3.map(s => ({ dir: s.dir, n: s.rows.length })), j4: j4.length }, null, 2));
+  fs.writeFileSync(path.join(dest, 'score.json'), JSON.stringify({ label, runs, seats: seatsSeen, primaryJ1: PRIMARY_J1, metrics: rows.map(({ m, e }) => ({ id: m.id, name: m.name, ...e })), j3: j3.map(s => ({ dir: s.dir, reads: s.reads.length })), j4: j4.length }, null, 2));
   console.log(out.join('\n'));
   console.log(`\n→ ${path.relative(V3, path.join(dest, 'REPORT.md'))}`);
 }

@@ -1,0 +1,9 @@
+{
+ "id": "F7",
+ "base": "A11",
+ "shape": "heist",
+ "variant": "A",
+ "N": 5,
+ "kind": "captive",
+ "personal": false
+}

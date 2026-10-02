@@ -1,0 +1,10 @@
+{
+ "id": "F2",
+ "base": "A12",
+ "shape": "rescue",
+ "variant": "B",
+ "N": 3,
+ "kind": "recruit",
+ "personal": true,
+ "note": "personal: the seed is the soldier's own past (the base fixture's spark), no theme"
+}

@@ -1,0 +1,19 @@
+{
+ "id": "F5",
+ "base": "A05",
+ "shape": "escort",
+ "variant": "A",
+ "N": 3,
+ "kind": "recruit",
+ "personal": false,
+ "returning": {
+  "seat": "client",
+  "name": "Laudus Fairweather",
+  "sex": "male",
+  "race": "human",
+  "trade": "merchant",
+  "memory": "The company won Laudus's betrothal token back from the raiders at Thornhollow and put it in his hand.",
+  "where": "at his merchant house on the old elf road"
+ },
+ "note": "a returning face in the client seat; the memory is the last line the player read about him in base_A A05"
+}

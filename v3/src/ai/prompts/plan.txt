@@ -1,0 +1,32 @@
+You plan a short story for a fantasy game about a mercenary company, played as a few jobs: the player reads a card, picks soldiers, then reads what happened. [[pitch]]You write the first card; others write the rest.[[/pitch]][[!pitch]]Others write the cards and reports from your plan.[[/!pitch]][[personal]] The story is the past of the company's soldier in cast. Nobody hires the company; if it fails, it may lose that soldier.[[/personal]]
+
+The data:
+- seed: the idea under the story; build on it, never paste it.
+[[shape]]- shape: the kind of story.[[episodes]] episodes: the jobs before the showdown, in order, with what the soldiers do and the kind of win.[[/episodes]]
+[[types]]- jobs: how many before the showdown. types: kinds of job, with what the soldiers do and the kind of win.
+- cast: the people, with sex, part, trade, and any traits. Use them all; add nobody who matters unless the seed needs them. Name only those given a name; the rest go by label.[[memory]] memory: their past with the company. where: where they are now. Build on both.[[/memory]]
+- stake: what is at risk if nobody acts.
+[[!personal]]- ending: whose fate the showdown decides. likely: the end the story builds toward. ways: how it can end, and what each means.
+[[personal]]- ending: whose old matter the showdown settles. likely: the way the story builds toward. ways: how it can be settled.
+- land and places: where to set it; reuse a place if you run out.
+- tone: how it should feel.
+[[direction]]- direction: the player's wish; it wins over tone.
+[[avoid]]- avoid: recent titles and questions; differ in pattern, not only names.
+
+Write:
+- title: a few plain words.
+- question: what the player most wants to know, about something hidden, never which way it ends. answer: the truth behind it, one plain fact hidden until the showdown, which nobody could guess.
+- cast: [[personal]]for all but the soldier, [[/personal]]a label, what a stranger sees: two or three plain words ending in their trade, never a name. And one concrete thing they want.[[personal]] For the soldier, past: the old wrong.[[/personal]]
+- episodes, in order. [[types]]type: from types. [[/types]]title: a few plain words. job: a verb, whom or what, and where. people: ids of those there[[!personal]]; episode 1 includes the person in ending[[/!personal]][[personal]], always the soldier's[[/personal]]; ids go nowhere else. trouble: who stands in the way, always armed people or a beast, with what, and what they will do. win: what changes when they succeed, from the kind of win. opens: the question the win raises, which the next job goes after.
+- showdown: title, job, people and trouble as above. settles: a done fact with no "if", true whichever way it ends: how [[!personal]]the stake is saved for the one who asked; never what becomes of the person in ending[[/!personal]][[personal]]the soldier's old matter ends[[/personal]]. lose: what [[!personal]]the one who asked[[/!personal]][[personal]]the soldier[[/personal]] loses for good if the company fails.
+- options: for each way in ending, what the soldiers do, starting with a verb.
+[[pitch]]- pitch: the first card, short complete sentences to the player as "you": present tense, past for what already happened. [[!personal]]Who is in trouble and what went wrong,[[/!personal]][[personal]]Whose past caught up with them and how,[[/personal]] the first job, and who or what stands in the way, with the loss made concrete.[[memory]] Recall the memory in new words.[[/memory]] End on a small sight, sound or object that raises the question; never ask it.
+
+A story that works:
+- One person wants one thing badly, and someone stands in the way, each for a plain human reason.
+- Each job happens at one place and follows from the last win; the showdown makes sense even if earlier jobs failed.
+
+Plain words, no numbers, nothing modern, never the company's pay. The company never met anyone in cast[[personal]] but its own soldier[[/personal]][[memory]][[personal]] and[[/personal]][[!personal]] but[[/!personal]] the one with a memory[[/memory]]; only the company lives at its fort.
+
+Reply with JSON only:
+{"title": "text", "question": "text", "answer": "one sentence", "cast": [{"id": "cast id", "label": "text", "want": "text"[[personal]], "past": "few words"[[/personal]]}], "episodes": [{"n": 1, [[types]]"type": "from types", [[/types]]"title": "text", "job": "text", "people": ["cast id"], "trouble": {"who": "few words", "carry": "few words", "will": "few words"}, "win": "text", "opens": "text"}], "showdown": {"title": "text", "job": "text", "people": ["cast id"], "trouble": {"who": "few words", "carry": "few words", "will": "few words"}, "settles": "one sentence", "lose": "few words"}, "options": [{"way": "from ending ways", "label": "at most 12 words"}][[pitch]], "pitch": "at most 70 words"[[/pitch]]}

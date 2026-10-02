@@ -5,7 +5,9 @@
 //                                                                            one text per API turn, the
 //                                                                            conversation carried turn to turn
 //   npx tsx scripts/sagalab/judge_gpt.ts j3 --run NAME --vs OTHER [--sagas …]  J3 pair reader, same fixture
-//                                                                            in both runs, X/Y order alternated
+//                                                                            in both runs, EVERY pair read
+//                                                                            in both orders (score.ts counts
+//                                                                            a pick only when it holds in both)
 //   npx tsx scripts/sagalab/judge_gpt.ts j4 --runs A_RUN,B_RUN [--size 10]    J4 series reader: the sagas of
 //                                                                            the runs in order, in series of 10
 // Common: [--model gpt-5] [--effort medium] [--concurrency 4] [--force] [--dry]
@@ -13,7 +15,9 @@
 //
 // Writes (JSON, one file per unit):
 //   j1 → runs/NAME/judge/j1_gpt5/<saga>.json   {seat, model, saga, texts:[…per text…], end:{…}, usage}
-//   j3 → runs/NAME/judge/j3_gpt5/vs_OTHER/<saga>.json   {seat, saga, x, y, answer, keep, follow, firstShown, usage}
+//   j3 → runs/NAME/judge/j3_gpt5/vs_OTHER/<saga>.json   {seat, saga, reads:[{x, y, firstShown, answer, keep, follow}
+//        ×2 orders], keep, follow (the run picked in BOTH orders, else null), usage}
+// A run folder holds its sagas under sagas/ (drive runs) or directly (probe runs, e.g. --run probe1/S_labels_pitch).
 //   j4 → runs/<first run>/judge/j4_gpt5/<series>.json   {seat, series, sagas:[{label, run, saga}], answer, usage}
 
 import OpenAI from 'openai';
@@ -67,8 +71,10 @@ async function chat(messages: Msg[], u: Usage): Promise<{ json: Record<string, u
 }
 
 const rubric = (name: string) => fs.readFileSync(path.join(LAB, 'judge', `${name}.md`), 'utf8');
+/** where a run keeps its saga folders: sagas/ for drive runs, the run folder itself for probe runs */
+const sagaRoot = (runDir: string) => fs.existsSync(path.join(runDir, 'sagas')) ? path.join(runDir, 'sagas') : runDir;
 const readingOrder = (sd: string) => fs.readFileSync(path.join(sd, 'order.txt'), 'utf8').split('\n').map(s => s.trim()).filter(f => /^(card|report)_\d+\.md$/.test(f));
-const sagasOf = (runDir: string) => fs.readdirSync(path.join(runDir, 'sagas')).filter(f => fs.existsSync(path.join(runDir, 'sagas', f, 'order.txt'))).sort();
+const sagasOf = (runDir: string) => fs.readdirSync(sagaRoot(runDir)).filter(f => fs.existsSync(path.join(sagaRoot(runDir), f, 'order.txt'))).sort();
 const pick = (all: string[]) => { const s = opt('sagas')?.split(','); return s ? all.filter(x => s.includes(x)) : all };
 const textBlock = (sd: string, f: string) => `${f}\n\n${fs.readFileSync(path.join(sd, f), 'utf8').trim()}`;
 
@@ -85,7 +91,7 @@ async function j1(run: string) {
   await pool(pick(sagasOf(runDir)), Number(opt('concurrency') ?? 4), async saga => {
     const out = path.join(outDir, `${saga}.json`);
     if (fs.existsSync(out) && !FORCE) { console.log(`[j1 ${saga}] exists — skipped (--force to redo)`); return }
-    const sd = path.join(runDir, 'sagas', saga);
+    const sd = path.join(sagaRoot(runDir), saga);
     const files = readingOrder(sd);
     const messages: Msg[] = [{ role: 'system', content: rubric('j1_player') }];
     if (DRY) { console.log(`--- system ---\n${messages[0]!.content}\n--- user (turn 1 of ${files.length + 1}) ---\n${textBlock(sd, files[0]!)}`); process.exit(0) }
@@ -104,28 +110,31 @@ async function j1(run: string) {
   });
 }
 
-/** J3 — the same fixture from two runs, blind; X/Y alternates down the list so position bias shows */
+/** J3 — the same fixture from two runs, blind, read in BOTH orders (Phase-0 calibration: position bias
+ *  ran in opposite directions per family, so a single order measures the seat, not the story) */
 async function j3(run: string, vs: string) {
   const aDir = path.join(LAB, 'runs', run), bDir = path.join(LAB, 'runs', vs);
   const both = pick(sagasOf(aDir).filter(s => sagasOf(bDir).includes(s)));
-  const outDir = path.join(aDir, 'judge', `j3_${SEAT}`, `vs_${vs}`);
+  const outDir = path.join(aDir, 'judge', `j3_${SEAT}`, `vs_${vs.replace(/\//g, '_')}`);
   fs.mkdirSync(outDir, { recursive: true });
   const whole = (sd: string) => readingOrder(sd).map(f => `--- ${f} ---\n${fs.readFileSync(path.join(sd, f), 'utf8').trim()}`).join('\n\n');
-  await pool(both.map((s, i) => ({ s, flip: i % 2 === 1 })), Number(opt('concurrency') ?? 4), async ({ s, flip }) => {
+  const dirOf = (r: string, s: string) => path.join(sagaRoot(path.join(LAB, 'runs', r)), s);
+  await pool(both, Number(opt('concurrency') ?? 4), async s => {
     const out = path.join(outDir, `${s}.json`);
     if (fs.existsSync(out) && !FORCE) { console.log(`[j3 ${s}] exists — skipped`); return }
-    const [xRun, yRun] = flip ? [vs, run] : [run, vs];
-    const user = `SAGA X\n\n${whole(path.join(LAB, 'runs', xRun, 'sagas', s))}\n\n\nSAGA Y\n\n${whole(path.join(LAB, 'runs', yRun, 'sagas', s))}`;
-    const messages: Msg[] = [{ role: 'system', content: rubric('j3_pair') }, { role: 'user', content: user }];
-    if (DRY) { console.log(`--- system ---\n${messages[0]!.content}\n--- user ---\n${user}`); process.exit(0) }
     const u = newUsage();
-    const r = await chat(messages, u);
-    const runOf = (xy: unknown) => xy === 'X' ? xRun : xy === 'Y' ? yRun : null;
-    fs.writeFileSync(out, JSON.stringify({
-      seat: `j3_${SEAT}`, model: MODEL, saga: s, x: xRun, y: yRun, firstShown: xRun, answer: r.json,
-      keep: runOf(r.json.rather_keep_playing), follow: runOf(r.json.follow_more_easily), usage: u,
-    }, null, 2));
-    console.log(`[j3 ${s}] keep ${runOf(r.json.rather_keep_playing)} · follow ${runOf(r.json.follow_more_easily)} · $${u.costUsd.toFixed(3)}`);
+    const reads: Record<string, unknown>[] = [];
+    for (const [xRun, yRun] of [[run, vs], [vs, run]] as const) {
+      const user = `SAGA X\n\n${whole(dirOf(xRun, s))}\n\n\nSAGA Y\n\n${whole(dirOf(yRun, s))}`;
+      const messages: Msg[] = [{ role: 'system', content: rubric('j3_pair') }, { role: 'user', content: user }];
+      if (DRY) { console.log(`--- system ---\n${messages[0]!.content}\n--- user ---\n${user}`); process.exit(0) }
+      const r = await chat(messages, u);   // a fresh conversation per order: neither read sees the other
+      const runOf = (xy: unknown) => xy === 'X' ? xRun : xy === 'Y' ? yRun : null;
+      reads.push({ x: xRun, y: yRun, firstShown: xRun, answer: r.json, keep: runOf(r.json.rather_keep_playing), follow: runOf(r.json.follow_more_easily) });
+    }
+    const held = (k: 'keep' | 'follow') => reads.every(r => r[k] && r[k] === reads[0]![k]) ? reads[0]![k] : null;
+    fs.writeFileSync(out, JSON.stringify({ seat: `j3_${SEAT}`, model: MODEL, saga: s, self: run, other: vs, reads, keep: held('keep'), follow: held('follow'), usage: u }, null, 2));
+    console.log(`[j3 ${s}] keep ${held('keep') ?? 'flips with order'} · follow ${held('follow') ?? 'flips with order'} · $${u.costUsd.toFixed(3)}`);
   });
 }
 
@@ -139,11 +148,11 @@ async function j4(runs: string[]) {
   if (all.length % size) console.log(`note: ${all.length % size} saga(s) past the last full series of ${size} are left out`);
   const outDir = path.join(LAB, 'runs', runs[0]!, 'judge', `j4_${SEAT}`);
   fs.mkdirSync(outDir, { recursive: true });
-  await pool(series.map((s, i) => ({ s, name: `series_${i + 1}_of_${runs.join('+')}` })), Number(opt('concurrency') ?? 2), async ({ s, name }) => {
+  await pool(series.map((s, i) => ({ s, name: `series_${i + 1}_of_${runs.join('+').replace(/\//g, '_')}` })), Number(opt('concurrency') ?? 2), async ({ s, name }) => {
     const out = path.join(outDir, `${name}.json`);
     if (fs.existsSync(out) && !FORCE) { console.log(`[j4 ${name}] exists — skipped`); return }
     const user = s.map(({ run, saga }, i) => {
-      const sd = path.join(LAB, 'runs', run, 'sagas', saga);
+      const sd = path.join(sagaRoot(path.join(LAB, 'runs', run)), saga);
       const cards = readingOrder(sd).filter(f => f.startsWith('card_'));
       const read = (f: string) => fs.existsSync(path.join(sd, f)) ? fs.readFileSync(path.join(sd, f), 'utf8').trim() : '(missing)';
       return `S${i + 1}\n\n--- card 1 ---\n${read(cards[0]!)}\n\n--- the finale card ---\n${read(cards[cards.length - 1]!)}\n\n--- the chronicle ---\n${read('chain.md')}`;

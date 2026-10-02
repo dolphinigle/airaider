@@ -14,7 +14,11 @@ Read the plan first, then the texts in order, then the answers.
 ## What to decide
 
 **Each card:**
-- `paraphrase_right`, per seat: three yes/no grades of that seat's paraphrase: `who_wants_what`, `what_to_do`, `who_in_way`. Right means it matches what the card says and the plan intends. If the card itself never says a part, a paraphrase that says "unclear" or "no one" for it is right, and one that invents an answer is wrong.
+- `paraphrase_right`, per seat: three grades of that seat's paraphrase: `who_wants_what`, `what_to_do`, `who_in_way`. Each grade is one of:
+  - `true`: the paraphrase gets that part right, matching what the card says and what the plan intends.
+  - `"unclear"`: the card leaves that part unclear, and the paraphrase says so ("unclear", "no one"). The reader was honest, but the card was not followed on that part.
+  - `false`: anything else. The paraphrase is wrong, invents an answer, or calls a part "unclear" that the card does make plain.
+  A card that leaves a part unclear has failed that part. Grade it `"unclear"`, never `true`.
 - `job_type`: what the soldiers are sent to do, one of `fight` (fight armed people) · `guard` (hold a place against an attack) · `catch` (chase someone down) · `hunt` (track a beast) · `sneak` (get in and out unseen) · `free` (break someone out) · `find` (track down a person or hiding place) · `talk` (win someone over) · `escort` (bring someone through danger) · `showdown` (the finale) · `paperwork` · `other`.
 - `paperwork`: `true` when the job's point is getting, delivering, reading or proving a document, record, letter, seal, deed, map or testimony.
 - `unmet_names`: every person the card names although the player has no way to know them yet: not the one who brings the job or asks for help, not one of the company's own soldiers, and not someone an earlier **report** already named. `[]` if none.
@@ -46,7 +50,7 @@ Read the plan first, then the texts in order, then the answers.
   "cards": [
     {"text": "card_1.md",
      "paraphrase_right": {"j1_gpt5": {"who_wants_what": true, "what_to_do": true, "who_in_way": false},
-                          "j1_opus": {"who_wants_what": true, "what_to_do": true, "who_in_way": true}},
+                          "j1_opus": {"who_wants_what": true, "what_to_do": true, "who_in_way": "unclear"}},
      "job_type": "find", "paperwork": false,
      "unmet_names": [], "spoiler": "", "engine_speak": [], "part_word_labels": []}
   ],

@@ -1,0 +1,24 @@
+Write the report of one job in a fantasy game about a mercenary company. The player read the card, printed above your report, and sent these soldiers. Pick up where it ends and never repeat it.
+
+The data:
+- card: what the player read. job: the task it set.
+- soldiers: who went, and what each one is like.[[decides]] decides: the soldier whose act settles it.[[/decides]]
+- people: others in the card or at the job, with label, sex, part. Call each by name; intro: new to the player, so bring them in by label and name.
+[[!failure]]- outcome: success, partial (done, at a price), or failure.[[result]] result: exactly what came of it.[[/result]]
+[[option]]- plan: how the player chose to end it, in your own words.
+[[hurt]]- hurt: who gets hurt, and how badly. Show each one taking it.
+[[cost]]- cost: the price of the partial success. Show it being paid.
+[[brought]]- brought: who or what comes home with the soldiers; show each.
+[[answer]]- answer: the player's question, and the truth; reveal it plainly in after, in your own words.
+[[direction]]- direction: the player's wish; it changes the telling, never what happens.
+
+Write:
+- before: at most {{B}} words. The soldiers arrive and meet what stands in their way. No hint of how it goes.
+[[!failure]]- after: at most {{A}} words. The deciding moment and what came of it, exactly as the data say; nothing else changes. End on something seen, done or said that shows the change.
+[[failure]]- after: at most {{A}} words. What stood in the way beats them, and the job is not done; nothing else changes. End on something seen, done or said.
+[[moved]]- summary: one sentence of at most 25 words: what the company did and what is different now. Name no soldier; say the company.
+[[stopped]]- summary: one sentence of at most 25 words: what the company tried and what stopped it. Name no soldier; say the company.
+
+Past tense, plain words, short complete sentences, in the order things happened. Name only the soldiers and the people given. No numbers, nothing modern, never the company's pay.
+
+Reply with JSON only: {"before": "text", "after": "text"[[saga]], "summary": "text"[[/saga]]}

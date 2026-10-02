@@ -196,9 +196,107 @@ export function sagaMech(runDir: string, id: string): SagaMech {
   };
 }
 
+/** a probe saga's plan.json (probe.ts): the engine side, the validated plan, and what the probe logged */
+interface ProbePlanFile {
+  probe: { arm: { structure: string; names: string; card1: string }; seed: { text: string } };
+  engine: { cast: { id: string; name: string; trade?: string }[]; roster: { name: string }[]; places: string[] };
+  plan: { title: string; answer: string; question: string; cast: { name: string; label?: string; known: boolean }[];
+    episodes: { type?: string; job: string }[] } | null;
+  validation: { defects: string[]; redraws: number; fallback: boolean };
+  latency: { planMs: number; card1Ms: number };
+}
+type ProbeCall = CallLogLine & { template?: string; flags?: string[] };
+
+/** the same measures on a PROBE saga (probe.ts, §5.2): v4 calls are plan · card · report, and each call's
+ *  own system prompt states its caps, so caps are read from the prompt that asked */
+export function sagaMechProbe(runDir: string, id: string): SagaMech {
+  const sd = path.join(runDir, id);
+  const texts = JSON.parse(fs.readFileSync(path.join(sd, 'texts.json'), 'utf8')) as TextRec[];
+  const meta = JSON.parse(fs.readFileSync(path.join(sd, 'meta.json'), 'utf8')) as SagaMeta;
+  const pf = JSON.parse(fs.readFileSync(path.join(sd, 'plan.json'), 'utf8')) as ProbePlanFile;
+  const calls = readJsonl<ProbeCall>(path.join(sd, 'calls.jsonl'));
+  const cards = texts.filter(t => t.kind === 'card'), reports = texts.filter(t => t.kind === 'report');
+  const plan = pf.plan;
+  const nameRx = (n: string) => new RegExp(`\\b${esc(n.split(/\s+/)[0]!)}\\b`);
+
+  // M12 (code): the labels arm lets a name out only once a report met the person; the named arm names
+  // everyone from card 1 by design, so nothing there is a leak
+  const unmet: string[] = [];
+  if (pf.probe.arm.names === 'labels') for (const c of (plan?.cast ?? []).filter(c => !c.known)) {
+    const rx = nameRx(c.name);
+    const first = texts.find(t => rx.test(t.kind === 'card' ? t.prose ?? '' : `${t.before} ${t.after}`));
+    if (first?.kind === 'card') unmet.push(c.name);
+  }
+  const castNames = new Set(pf.engine.cast.map(c => c.name));
+  const soldiers = pf.engine.roster.map(r => r.name).filter(n => !castNames.has(n));
+  const soldierHits = [...new Set(soldiers.filter(n => cards.some(c => nameRx(n).test(c.prose ?? ''))))];
+  // answer words (§2.7 lint): the answer's content words minus those in the seed, labels, places and names
+  const common = new Set([...words(pf.probe.seed.text), ...pf.engine.places.flatMap(words),
+    ...pf.engine.cast.flatMap(c => [...words(c.name), ...words(c.trade ?? '')]), ...(plan?.cast ?? []).flatMap(c => words(c.label ?? ''))]);
+  const twistWords = [...new Set(words(plan?.answer ?? '').filter(w => w.length >= 5 && !STOP.has(w) && !common.has(w)))];
+  const preSet = new Set(texts.filter(t => !(t.kind === 'report' && t.isFinale)).flatMap(t => words(`${t.prose ?? ''} ${t.before ?? ''} ${t.after ?? ''}`)));
+  const leaked = twistWords.filter(w => preSet.has(w));
+
+  const cardOpeners = cards.map(c => words(c.prose ?? '').slice(0, 3).join(' '));
+  const questionEndings = cards.filter(c => /\?["”’']?\s*$/.test(c.prose ?? '')).length;
+
+  // M15: every cap the asking prompt set — card, pitch, before, after, summary
+  let held = 0, checked = 0;
+  const capBreaks: string[] = [];
+  const cap = (sys: string, rx: RegExp) => { const m = sys.match(rx); return m ? Number(m[1]) : null };
+  const check = (label: string, text: unknown, max: number | null) => {
+    if (max === null || typeof text !== 'string') return;
+    checked++; const n = wc(text);
+    if (n <= max) held++; else capBreaks.push(`${label} ${n}/${max}`);
+  };
+  for (const c of calls.filter(x => x.ok)) {
+    const o = tryJson(c.output); if (!o) continue;
+    if (c.purpose === 'card') check('card', o.card, cap(c.system, /"card": "at most (\d+) words"/));
+    else if (c.purpose === 'plan') check('pitch', o.pitch, cap(c.system, /"pitch": "at most (\d+) words"/));
+    else if (c.purpose === 'report') {
+      check('before', o.before, cap(c.system, /before: at most (\d+) words/));
+      check('after', o.after, cap(c.system, /after: at most (\d+) words/));
+      check('summary', o.summary, cap(c.system, /summary: one sentence of at most (\d+) words/));
+    }
+  }
+  const softErrors = calls.filter(x => !x.ok).length;
+  const hardFailures = Number(!!pf.validation.fallback) + meta.problems.filter(p => /fallback/.test(p)).length;
+
+  const costSaga = calls.reduce((s, x) => s + x.costUsd, 0);
+  const ms = (p: string, f?: (c: ProbeCall) => boolean) => calls.filter(x => x.ok && x.purpose === p && (!f || f(x))).map(x => x.durationMs);
+  const laterCards = ms('card', c => !(c.flags ?? []).includes('first'));
+
+  // paste: each card against the input of the call that wrote it (card 1 on the pitch arm = the plan call)
+  const outs = calls.filter(x => x.ok && (x.purpose === 'card' || (x.purpose === 'plan' && pf.probe.arm.card1 === 'pitch')));
+  const pastes = outs.map(x => { const o = tryJson(x.output); const t = String((x.purpose === 'plan' ? o?.pitch : o?.card) ?? ''); return { first: x.purpose === 'plan' || (x.flags ?? []).includes('first'), rate: pasteRate(t, x.user) } })
+    .filter(p => p.rate !== null) as { first: boolean; rate: number }[];
+  const lastFirst = pastes.filter(p => p.first).at(-1);
+  const mean = (xs: number[]) => xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null;
+
+  const eps = plan?.episodes ?? [];
+  const jobSeq = cards.length > 1 || meta.attempts.length ? [...eps.map(e => e.type ?? jobType(e.job, false)), 'showdown'] : eps.map(e => e.type ?? jobType(e.job, false));
+  const paperworkJobs = eps.filter(e => PAPERWORK.test(e.job)).length;
+  const first = pf.latency.card1Ms;
+  return {
+    id, attempts: meta.attempts.length, complete: meta.complete, cards: cards.length, reports: reports.length,
+    unmetNameLeaks: unmet, soldierNamesOnCards: soldierHits, answerWordLeaks: leaked.length >= 2 ? leaked : [],
+    cardOpeners, questionEndings, capsHeld: held, capsChecked: checked, capBreaks,
+    hardFailures, softErrors,
+    costSaga, costAll: costSaga, costPerBeat: meta.attempts.length ? costSaga / meta.attempts.length : 0,
+    pursueMs: [first, ...laterCards], pursueFirstMs: [first], pursueLaterMs: laterCards,
+    genesisMs: ms('plan'), cardMs: ms('card'), reportMs: ms('report'),
+    pasteBeat1: lastFirst?.rate ?? null, pasteAll: mean(pastes.map(p => p.rate)),
+    card1: cards[0]?.prose ?? '', title: plan?.title ?? cards[0]?.title ?? '', jobSeq, paperworkJobs, jobs: eps.length,
+    cardWords: cards.map(c => wc(c.prose)), beforeWords: reports.map(r => wc(r.before)), afterWords: reports.map(r => wc(r.after)),
+  };
+}
+
 export function runMech(runDir: string) {
-  const ids = fs.readdirSync(path.join(runDir, 'sagas')).filter(f => fs.existsSync(path.join(runDir, 'sagas', f, 'texts.json'))).sort();
-  const per = ids.map(id => sagaMech(runDir, id));
+  // a drive run keeps its sagas under sagas/; a probe run (probe.ts) keeps them in the run folder itself
+  const probe = !fs.existsSync(path.join(runDir, 'sagas'));
+  const root = probe ? runDir : path.join(runDir, 'sagas');
+  const ids = fs.readdirSync(root).filter(f => fs.existsSync(path.join(root, f, 'texts.json'))).sort();
+  const per = ids.map(id => probe ? sagaMechProbe(runDir, id) : sagaMech(runDir, id));
   const allOpeners = per.flatMap(p => p.cardOpeners.filter(Boolean));
   const openerCount = new Map<string, number>();
   for (const o of allOpeners) openerCount.set(o, (openerCount.get(o) ?? 0) + 1);

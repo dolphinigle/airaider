@@ -1,0 +1,13 @@
+{
+ "id": "F1",
+ "base": "A04",
+ "shape": "feud",
+ "variant": "A",
+ "N": 4,
+ "kind": "captive",
+ "personal": false,
+ "seed": "a border stone moved by night, a little each year",
+ "stake": "a home",
+ "tone": "grim",
+ "note": "the designer's example (§2.9.1, §3.2): the seed is pinned, not dealt"
+}

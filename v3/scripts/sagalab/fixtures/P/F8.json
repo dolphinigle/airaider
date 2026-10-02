@@ -1,0 +1,9 @@
+{
+ "id": "F8",
+ "base": "A07",
+ "shape": "beast",
+ "variant": "B",
+ "N": 3,
+ "kind": "recruit",
+ "personal": false
+}

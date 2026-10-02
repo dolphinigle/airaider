@@ -1,0 +1,9 @@
+{
+ "id": "F3",
+ "base": "A01",
+ "shape": "hunt",
+ "variant": "A",
+ "N": 2,
+ "kind": "gold",
+ "personal": false
+}

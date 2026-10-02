@@ -546,6 +546,10 @@ Opus codes; Fable plans and verifies. **Each phase ends in a gate. Stop rule:** 
   - **J3 pair**, 1 Opus + 1 gpt-5, **Phase-0 calibration, G2, G3 only**: base vs new, blind; "rather keep playing?", "follow more easily?", with a why.
   - **Context-free verifier** before every live run. **Designer:** probe sagas (G1), 3 pairs (G2), a playtest (G6). Judges steer; the designer decides.
 - **Cost:** ≈ $0.7–1.3 per set; Opus runs: Phase 0 ≈ 48, per change 12, per gate 24–36.
+- **Calibration (Phase 0 findings, `baseline/2026-10-01/REPORT.md`; in `j2_auditor.md`, `score.ts`, `judge_gpt.ts`):**
+  - **M1 is strict.** J2 grades each paraphrase part `true` / `"unclear"` / `false`. A part the card leaves unclear counts as not followed. The lenient number stays as M1-lax (watch only). The base is M1 59.6% (M1-lax 100%, a ceiling), and 25% on card 1.
+  - **The Opus J1 seat is primary for taste scores** (M2, M3, M3b, M4). gpt-5 is reported alongside: it scores about 2.9 points higher and agrees with Opus at only r ≈ 0.4. Taste scores are compared only between runs read by the same seats.
+  - **J3 reads every pair in both orders**, in a fresh conversation each time. M10 counts a pick only when it holds in both orders. Position bias runs in opposite directions per family (gpt-5 picks the second saga, Opus the first), so a read in one order only is shown but never scored.
 
 ### 5.1 Phase 0: lab + baseline on the CURRENT storyteller
 - **Files:** sagalab scripts, rubrics, fixtures, `forceoutcomes.test`; `game.ts` force hook and `lab saga` grant; CLI dev commands; `openai.ts` **logging only**: with `AIRAIDER_CALL_LOG`, every call (full system and user, output, tokens, latency) goes to `calls.jsonl` (today: a 120-record ring, user prompts cut at 20k chars). Model plumbing waits for Phase 5 so the baseline cannot move.

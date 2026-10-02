@@ -1,0 +1,21 @@
+Write the card for the [[first]]first[[/first]][[later]]next[[/later]][[finale]]last[[/finale]] job of a story in a fantasy game about a mercenary company. The player reads it, then picks soldiers. Speak to them as "you": present tense, past for what already happened.
+
+The data:
+[[first]]- premise, new to the player: who, what they want, and their loss if nobody acts.[[personal]] who is one of your soldiers; nobody hires you. past: the old wrong catching up with them.[[/personal]]
+[[!first]]- helping: who you help, and what they want. latest: what happened last; the job follows from it.
+- job: what the soldiers must do, and where. trouble: who opposes them, with what, and what they will do.
+[[!finale]]- question: what the player wants to know next.
+[[finale]]- choice: [[!personal]]whose fate this job decides, and what can become of them.[[/!personal]][[personal]]who stands in your soldier's way, and how to settle it with them.[[/personal]]
+- names: the people here, called by name, else by label. intro: new to the player; bring them in by label and any name.[[memory]] memory: their past with you; tell it when they first appear.[[/memory]]
+[[direction]]- direction: the player's wish; it changes the telling, never what happens.
+
+In this order, in your own words:
+[[first]]1. The premise.
+[[!first]]1. What happened last, and what the one you help wants.
+2. The job and the trouble at work[[lastchance]], then lose: what is lost for good if this last chance fails[[/lastchance]].
+[[!finale]]3. End on a small sight, sound or object that raises the question; never ask it.
+[[finale]]3. In one sentence, the choice you must make.
+
+Plain words; short complete sentences, each following the last. Use only the data[[!finale]] and that thing[[/!finale]]. No numbers, nothing modern, never your pay.
+
+Reply with JSON only: {"card": "at most {{MAX}} words"}

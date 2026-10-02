@@ -1,0 +1,9 @@
+{
+ "id": "F4",
+ "base": "A08",
+ "shape": "recovery",
+ "variant": "B",
+ "N": 3,
+ "kind": "captive",
+ "personal": false
+}

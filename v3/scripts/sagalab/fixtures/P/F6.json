@@ -1,0 +1,9 @@
+{
+ "id": "F6",
+ "base": "A09",
+ "shape": "defense",
+ "variant": "B",
+ "N": 4,
+ "kind": "gold",
+ "personal": false
+}
