@@ -1,12 +1,20 @@
 // SAGA LAB — the Phase-1 prompt probe (docs/STORYTELLER.md §5.2). Plays the v4 storyteller's calls on
 // REAL engine inputs, with NO game wiring: a MockProvider world per fixture (v4lab.ts buildWorld), a
-// dealt theme seed (src/engine/themes.ts), then the real writer — gpt-5-mini, plan at medium, card and
+// dealt theme seed (src/engine/themes.ts), then the real writer — gpt-5-mini (or Claude, --writer), plan at medium, card and
 // report at low — for plan → card 1 → report → card → … → the finale card with its plans → the finale
 // report, on scripted outcomes (the §5.0 path rules; the ⚄ line agrees).
 //
 //   npx tsx scripts/sagalab/probe.ts [--arm L|S|H|all] [--cast full|lean|all] [--names labels|named|all]
 //        [--fixtures F1,F2|all] [--draws 3 | --draw 1,3] [--mock] [--render] [--avoid] [--direction TEXT]
-//        [--run probe2] [--concurrency 4] [--force]
+//        [--run probe2] [--concurrency 4] [--force] [--writer openai|sonnet|haiku] [--cli-pool 6]
+//
+//   --writer   who writes (default openai = gpt-5-mini). sonnet / haiku: each call runs the headless
+//              Claude CLI (subscription auth; modelcmp/replay.py's flags), system prompt from a file, the
+//              payload on stdin, no tools / settings / MCP / auto-memory, cwd an empty dir under
+//              runs/<run>/_claude/. Reasoning: sonnet --effort medium (plan) / low (card, report); haiku
+//              ignores --effort, so MAX_THINKING_TOKENS 4000 / 1024. Up to 2 retries on a failed or
+//              non-JSON reply; at most --cli-pool CLI processes at once. Arm folders get a _<writer>
+//              suffix, e.g. runs/probe3/L_lean_sonnet/F6_3/.
 //
 //   --cast     R1 (C5): `full` = Phase 1's casting and stake; `lean` = the one who asks (no trade) + the
 //              person the ending decides (+ the personal soldier / a returning face), no stake
@@ -33,6 +41,7 @@
 // slot for slot. Card 1 is always the separate `first` card call (R1, C3).
 
 import OpenAI from 'openai';
+import { spawn } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -65,6 +74,11 @@ const SLOTS = opt('slots')?.split(',').map(s => s.trim()).filter(Boolean);
 const RUN = opt('run') ?? 'probe2';
 const DIRECTION = opt('direction');
 const MODEL = 'gpt-5-mini';
+type Writer = 'openai' | 'sonnet' | 'haiku';
+const WRITER = (opt('writer') ?? 'openai') as Writer;
+if (!['openai', 'sonnet', 'haiku'].includes(WRITER)) { console.error(`--writer: ${WRITER} is not one of openai/sonnet/haiku`); process.exit(2) }
+const CLAUDE = !MOCK && WRITER !== 'openai';
+const CLI_POOL = Math.max(1, Number(opt('cli-pool') ?? 6));
 const listOf = <T extends string>(name: string, all: readonly T[], dflt: T): T[] => {
   const v = opt(name);
   if (!v) return [dflt];
@@ -78,7 +92,7 @@ const ARMS: Arm[] = listOf<Structure>('arm', ['S', 'L', 'H'], 'L').flatMap(struc
   listOf<CastArm>('cast', ['full', 'lean'], 'full').flatMap(cast =>
     listOf<NamesArm>('names', ['labels', 'named'], 'labels').map(names => ({ structure, names, cast }))));
 const DRAWS: number[] = opt('draw') ? opt('draw')!.split(',').map(Number) : Array.from({ length: Number(opt('draws') ?? 3) }, (_, i) => i + 1);
-const CONCURRENCY = AVOID ? 1 : Number(opt('concurrency') ?? (MOCK ? 8 : 4));
+const CONCURRENCY = AVOID ? 1 : Number(opt('concurrency') ?? (MOCK ? 8 : CLAUDE ? CLI_POOL : 4));
 
 // ─── fixtures, worlds, seeds ────────────────────────────────────────────────────────────────────
 
@@ -114,10 +128,122 @@ const SEEDS = new Map<string, DealtSeed>();
 
 // ─── the writer: the model, or the mock floor; every call logged whole ─────────────────────────
 
-interface CallRec extends CallLogLine { template: TemplateName; flags: string[]; saga: string }
+interface CallRec extends Omit<CallLogLine, 'provider'> {
+  provider: CallLogLine['provider'] | 'claude'; template: TemplateName; flags: string[]; saga: string;
+  /** the Claude CLI: thinking tokens (inside outputTokens), and the whole reply when `output` is only its JSON */
+  thinkingTokens?: number; raw?: string;
+}
 const RENDERED = new Map<string, CallRec>();
 let client: OpenAI | null = null;
 const PRICE = { in: 0.25, cached: 0.025, out: 2 };   // gpt-5-mini per 1M tokens
+
+// ─── the Claude writer: the headless CLI, one process per call (modelcmp/replay.py's run()) ─────
+
+interface CliResult { text: string; json: unknown; ms: number; inTok: number; outTok: number; cached: number; think?: number; cost: number; model?: string; error?: string }
+let cliDirs: { cwd: string; sp: string; nomcp: string } | null = null;
+let spN = 0, cliActive = 0;
+const cliWait: (() => void)[] = [];
+
+/** the CLI's scratch: an EMPTY cwd (nothing to discover), the system-prompt files and the no-MCP config beside it */
+function cliSetup() {
+  if (cliDirs) return cliDirs;
+  const base = path.join(LAB, 'runs', RUN, '_claude');
+  const cwd = path.join(base, 'cwd'), sp = path.join(base, 'sp'), nomcp = path.join(base, 'nomcp.json');
+  fs.mkdirSync(cwd, { recursive: true });
+  fs.mkdirSync(sp, { recursive: true });
+  if (fs.readdirSync(cwd).length) { console.error(`${cwd} must be empty`); process.exit(2) }
+  fs.writeFileSync(nomcp, '{"mcpServers":{}}');
+  return cliDirs = { cwd, sp, nomcp };
+}
+
+/** at most CLI_POOL processes at once; a freed slot passes straight to the next waiter */
+async function cliSlot<T>(fn: () => Promise<T>): Promise<T> {
+  if (cliActive < CLI_POOL) cliActive++;
+  else await new Promise<void>(r => cliWait.push(r));
+  try { return await fn() } finally { const next = cliWait.shift(); if (next) next(); else cliActive-- }
+}
+
+/** JSON.parse, or the same with raw control characters inside strings escaped (Python's strict=False) */
+function parseLenient(s: string): unknown {
+  try { return JSON.parse(s) } catch { /* lenient below */ }
+  let o = '', inStr = false, esc = false;
+  for (const ch of s) {
+    if (inStr) {
+      if (esc) esc = false;
+      else if (ch === '\\') esc = true;
+      else if (ch === '"') inStr = false;
+      else if (ch.charCodeAt(0) < 0x20) { o += ch === '\n' ? '\\n' : ch === '\r' ? '\\r' : ch === '\t' ? '\\t' : `\\u${ch.charCodeAt(0).toString(16).padStart(4, '0')}`; continue }
+    } else if (ch === '"') inStr = true;
+    o += ch;
+  }
+  try { return JSON.parse(o) } catch { return undefined }
+}
+
+/** the reply's JSON object, tolerantly: whatever wraps it (code fences, prose) is ignored, and when the
+ *  reply holds several objects (a reply that corrects itself) the LAST one that parses is its final word;
+ *  first `{` to last `}` is the fallback */
+function extractJson(text: string): unknown {
+  const spans: string[] = [];
+  let depth = 0, start = -1, inStr = false, esc = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i]!;
+    if (inStr) { if (esc) esc = false; else if (ch === '\\') esc = true; else if (ch === '"') inStr = false; continue }
+    if (ch === '"') { if (depth > 0) inStr = true }
+    else if (ch === '{') { if (depth++ === 0) start = i }
+    else if (ch === '}' && depth > 0 && --depth === 0) spans.push(text.slice(start, i + 1));
+  }
+  const i = text.indexOf('{'), j = text.lastIndexOf('}');
+  for (const s of [...spans.reverse(), ...(i >= 0 && j > i ? [text.slice(i, j + 1)] : [])]) {
+    const v = parseLenient(s);
+    if (v && typeof v === 'object' && !Array.isArray(v)) return v;
+  }
+  return null;
+}
+
+function runCli(system: string, user: string, effort: 'low' | 'medium'): Promise<CliResult> {
+  return cliSlot(() => new Promise<CliResult>(resolve => {
+    const d = cliSetup();
+    const spFile = path.join(d.sp, `${process.pid}_${++spN}.txt`);
+    fs.writeFileSync(spFile, system);
+    const args = ['-p', '--model', WRITER, '--system-prompt-file', spFile, '--tools', '', '--setting-sources', '',
+      '--strict-mcp-config', '--mcp-config', d.nomcp, '--exclude-dynamic-system-prompt-sections', '--output-format', 'json', '--effort', effort];
+    // a clean env: nothing inherited from a parent Claude session (its effort, session ids), no auto-memory
+    // (it rides in by the repo, not the cwd); haiku ignores --effort, so its thinking is capped instead
+    const env: NodeJS.ProcessEnv = Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^CLAUDE/.test(k) || k === 'CLAUDE_CONFIG_DIR'));
+    delete env.MAX_THINKING_TOKENS;
+    env.CLAUDE_CODE_DISABLE_AUTO_MEMORY = '1';
+    if (WRITER === 'haiku') env.MAX_THINKING_TOKENS = effort === 'medium' ? '4000' : '1024';
+    const t0 = Date.now();
+    let out = '', err = '', settled = false;
+    const done = (r: Omit<CliResult, 'ms'>) => { if (settled) return; settled = true; clearTimeout(timer); fs.rmSync(spFile, { force: true }); resolve({ ...r, ms: Date.now() - t0 }) };
+    const fail = (error: string) => done({ text: out, json: null, inTok: 0, outTok: 0, cached: 0, cost: 0, error: error.slice(0, 300) });
+    const p = spawn('claude', args, { cwd: d.cwd, env, stdio: ['pipe', 'pipe', 'pipe'] });
+    const timer = setTimeout(() => { p.kill('SIGKILL'); fail('timeout after 400s') }, 400_000);
+    p.stdout.on('data', b => { out += b });
+    p.stderr.on('data', b => { err += b });
+    p.on('error', e => fail(e.message));
+    p.on('close', code => {
+      let r: {
+        result?: string; is_error?: boolean; total_cost_usd?: number;
+        modelUsage?: Record<string, { inputTokens?: number; outputTokens?: number; cacheReadInputTokens?: number; cacheCreationInputTokens?: number; thinkingTokens?: number; costUSD?: number; canonicalModel?: string }>;
+      };
+      try { r = JSON.parse(out) } catch { return fail(`exit ${code}, no JSON from the CLI: ${(err || out).trim()}`) }
+      const mus = Object.values(r.modelUsage ?? {});
+      const sum = (f: (m: typeof mus[number]) => number | undefined) => mus.reduce((s, m) => s + (f(m) ?? 0), 0);
+      const main = [...mus].sort((a, b) => (b.costUSD ?? 0) - (a.costUSD ?? 0))[0];
+      const text = r.result ?? '';
+      done({
+        text, json: r.is_error ? null : extractJson(text),
+        inTok: sum(m => (m.inputTokens ?? 0) + (m.cacheReadInputTokens ?? 0) + (m.cacheCreationInputTokens ?? 0)),
+        outTok: sum(m => m.outputTokens), cached: sum(m => m.cacheReadInputTokens), think: sum(m => m.thinkingTokens),
+        cost: r.total_cost_usd ?? sum(m => m.costUSD), model: main?.canonicalModel,
+        error: r.is_error ? `CLI error: ${text.trim()}`.slice(0, 300) : undefined,
+      });
+    });
+    p.stdin.on('error', () => { /* the process died early: 'close' reports it */ });
+    p.stdin.end(user);
+  }));
+}
 
 async function write<S extends z.ZodTypeAny>(a: {
   saga: string; calls: CallRec[]; purpose: TemplateName; flags: string[]; vars?: Record<string, number>;
@@ -128,8 +254,8 @@ async function write<S extends z.ZodTypeAny>(a: {
   const system = render(a.purpose, a.flags, a.vars);
   const user = JSON.stringify(a.payload);
   const t0 = Date.now();
-  const base = { provider: (MOCK ? 'mock' : 'openai') as 'mock' | 'openai', purpose: a.purpose, model: MOCK ? 'mock' : MODEL, effort: MOCK ? undefined : a.effort, system, user, template: a.purpose, flags: [...a.flags].sort(), saga: a.saga };
-  const log = (rec: Omit<CallRec, keyof typeof base | 'n' | 't'>) => {
+  const base = { provider: (MOCK ? 'mock' : CLAUDE ? 'claude' : 'openai') as CallRec['provider'], purpose: a.purpose, model: MOCK ? 'mock' : CLAUDE ? WRITER as string : MODEL, effort: MOCK ? undefined : a.effort, system, user, template: a.purpose, flags: [...a.flags].sort(), saga: a.saga };
+  const log = (rec: Omit<CallRec, keyof typeof base | 'n' | 't'> & { model?: string }) => {
     const line: CallRec = { t: new Date().toISOString(), n: a.calls.length + 1, ...base, ...rec };
     a.calls.push(line);
     const key = `${a.variant ?? a.purpose}__${line.flags.join('+') || 'plain'}`;
@@ -139,6 +265,23 @@ async function write<S extends z.ZodTypeAny>(a: {
     const out = a.mock();
     log({ durationMs: Date.now() - t0, inputTokens: 0, outputTokens: 0, cachedTokens: 0, costUsd: 0, ok: true, output: JSON.stringify(out) });
     return { out: a.schema.parse(out), ms: 0 };
+  }
+  if (CLAUDE) {
+    for (let attempt = 0; attempt < 3; attempt++) {   // up to 2 retries on a failed, non-JSON or off-schema reply
+      const r = await runCli(system, user, a.effort);
+      const parsed = r.json === null ? null : a.schema.safeParse(r.json);
+      // `output` stays JSON.parse-able (mech.ts reads it): the reply itself when it is bare JSON, else its
+      // JSON, with the whole reply (fences, prose) kept as `raw`
+      const bare = (() => { try { JSON.parse(r.text); return true } catch { return false } })();
+      const wrapped = r.json !== null && !bare;
+      log({
+        model: r.model ?? WRITER, durationMs: r.ms, inputTokens: r.inTok, outputTokens: r.outTok, cachedTokens: r.cached, thinkingTokens: r.think, costUsd: r.cost,
+        ok: !!parsed?.success, error: r.error ?? (!parsed ? 'no JSON in the reply' : parsed.success ? undefined : parsed.error.message.slice(0, 300)),
+        output: wrapped ? JSON.stringify(r.json) : r.text, ...(wrapped ? { raw: r.text } : {}),
+      });
+      if (parsed?.success) return { out: parsed.data, ms: Date.now() - t0 };
+    }
+    return { out: null, ms: Date.now() - t0 };
   }
   client ??= new OpenAI({ apiKey: loadKey() });
   for (let attempt = 0; attempt < 2; attempt++) {   // callR: one retry on a failed or unparseable call
@@ -312,7 +455,7 @@ async function runSaga(job: Job): Promise<Row> {
   fs.writeFileSync(path.join(dir, 'texts.json'), JSON.stringify(texts, null, 2));
   fs.writeFileSync(path.join(dir, 'calls.jsonl'), calls.map(c => JSON.stringify(c)).join('\n') + '\n');
   fs.writeFileSync(path.join(dir, 'plan.json'), JSON.stringify({
-    probe: { fixture: w.fx, base: w.base.id, arm, armKey: armKey(arm), draw: draw.n, path: draw.path, seed: draw.seed, tone: draw.tone, mock: MOCK },
+    probe: { fixture: w.fx, base: w.base.id, arm, armKey: armKey(arm), draw: draw.n, path: draw.path, seed: draw.seed, tone: draw.tone, mock: MOCK, writer: MOCK ? 'mock' : WRITER },
     engine: {
       cast: w.cast, stake: w.stake, places: w.places, land: w.land, region: w.region,
       focal: { id: w.focal.id, name: w.focal.name, tags: renderTags(w.focal.tags) },
@@ -350,7 +493,7 @@ async function main() {
   for (const arm of ARMS) {
     const armName = SERIES ? `series_${armKey(arm)}` : armKey(arm);
     if (opt('as') && ARMS.length > 1) { console.error('--as takes one arm'); process.exit(2) }
-    const armDir = path.join(runDir, opt('as') ?? `${MOCK ? 'mock-' : ''}${armName}`);
+    const armDir = path.join(runDir, opt('as') ?? `${MOCK ? 'mock-' : ''}${armName}${CLAUDE ? `_${WRITER}` : ''}`);
     const jobs: Job[] = [];
     for (const { fx, d } of PLAY) {
       const id = `${fx.id}_${d}`;
@@ -379,7 +522,7 @@ async function main() {
     rows.sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
     fs.mkdirSync(armDir, { recursive: true });
     fs.writeFileSync(path.join(armDir, 'INDEX.md'), [
-      `# ${RUN} · ${MOCK ? 'mock floor · ' : ''}${SERIES ? 'repetition series (plan + card 1) · ' : ''}arm ${armKey(arm)} (structure ${arm.structure}, cast ${arm.cast}, names ${arm.names}, card 1 first)`, '',
+      `# ${RUN} · ${MOCK ? 'mock floor · ' : ''}${CLAUDE ? `writer ${WRITER} (Claude CLI) · ` : ''}${SERIES ? 'repetition series (plan + card 1) · ' : ''}arm ${armKey(arm)} (structure ${arm.structure}, cast ${arm.cast}, names ${arm.names}, card 1 first)`, '',
       '| saga | title | path | N | outcomes | files | complete | plan defects (re-draws) | fallback | lint | $ | card 1 after |',
       '|---|---|---|---|---|---|---|---|---|---|---|---|',
       ...rows.map(r => `| ${r.id} | ${r.title} | ${r.path} | ${r.N} | ${r.outcomes} | ${r.files} | ${r.complete ? '✓' : `✗ ${r.problems.join('; ')}`} | ${r.defects.length ? `${r.defects.join('; ')} (${r.redraws})` : '—'} | ${r.fallback ? '✗' : '—'} | ${r.lint.join('; ') || '—'} | ${r.cost.toFixed(4)} | ${(r.card1Ms / 1000).toFixed(1)}s |`),
