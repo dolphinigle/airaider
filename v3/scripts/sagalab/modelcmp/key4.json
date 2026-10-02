@@ -1,0 +1,1442 @@
+{
+ "a1:1": {
+  "id": "S_labels_first/F3_1/4",
+  "kind": "rep_finale",
+  "letters": {
+   "A": "sonnet",
+   "B": "haiku",
+   "C": "luna",
+   "D": "gpt"
+  }
+ },
+ "a1:2": {
+  "id": "S_labels_first/F2_1/2",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "gpt",
+   "B": "sonnet",
+   "C": "haiku",
+   "D": "luna"
+  }
+ },
+ "a1:3": {
+  "id": "H_labels_pitch/F8_3/4",
+  "kind": "card_later",
+  "letters": {
+   "A": "luna",
+   "B": "haiku",
+   "C": "sonnet",
+   "D": "gpt"
+  }
+ },
+ "a1:4": {
+  "id": "H_labels_pitch/F1_1/0",
+  "kind": "plan",
+  "letters": {
+   "A": "luna",
+   "B": "haiku",
+   "C": "gpt",
+   "D": "sonnet"
+  }
+ },
+ "a1:5": {
+  "id": "H_labels_pitch/F6_1/5",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "sonnet",
+   "B": "luna",
+   "C": "gpt",
+   "D": "haiku"
+  }
+ },
+ "a1:6": {
+  "id": "H_labels_pitch/F7_1/2",
+  "kind": "card_later",
+  "letters": {
+   "A": "haiku",
+   "B": "sonnet",
+   "C": "gpt",
+   "D": "luna"
+  }
+ },
+ "a2:1": {
+  "id": "S_labels_first/F8_1/4",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "luna",
+   "B": "gpt",
+   "C": "sonnet",
+   "D": "haiku"
+  }
+ },
+ "a2:2": {
+  "id": "L_labels_pitch/F8_3/5",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "luna",
+   "B": "haiku",
+   "C": "sonnet",
+   "D": "gpt"
+  }
+ },
+ "a2:3": {
+  "id": "L_labels_pitch/F4_3/3",
+  "kind": "rep_fail",
+  "letters": {
+   "A": "haiku",
+   "B": "luna",
+   "C": "sonnet",
+   "D": "gpt"
+  }
+ },
+ "a2:4": {
+  "id": "S_labels_first/F4_1/1",
+  "kind": "card_first",
+  "letters": {
+   "A": "gpt",
+   "B": "luna",
+   "C": "haiku",
+   "D": "sonnet"
+  }
+ },
+ "a2:5": {
+  "id": "L_labels_pitch/F8_1/1",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "luna",
+   "B": "sonnet",
+   "C": "gpt",
+   "D": "haiku"
+  }
+ },
+ "a2:6": {
+  "id": "S_labels_first/F8_1/3",
+  "kind": "card_later",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "luna",
+   "D": "haiku"
+  }
+ },
+ "a3:1": {
+  "id": "S_labels_pitch/F7_1/0",
+  "kind": "plan",
+  "letters": {
+   "A": "luna",
+   "B": "haiku",
+   "C": "gpt",
+   "D": "sonnet"
+  }
+ },
+ "a3:2": {
+  "id": "L_labels_pitch/F3_3/0",
+  "kind": "plan",
+  "letters": {
+   "A": "haiku",
+   "B": "gpt",
+   "C": "sonnet",
+   "D": "luna"
+  }
+ },
+ "a3:3": {
+  "id": "S_labels_pitch/F1_1/2",
+  "kind": "card_later",
+  "letters": {
+   "A": "gpt",
+   "B": "haiku",
+   "C": "sonnet",
+   "D": "luna"
+  }
+ },
+ "a3:4": {
+  "id": "L_labels_pitch/F1_1/0",
+  "kind": "plan",
+  "letters": {
+   "A": "haiku",
+   "B": "sonnet",
+   "C": "luna",
+   "D": "gpt"
+  }
+ },
+ "a3:5": {
+  "id": "S_labels_pitch/F8_3/6",
+  "kind": "card_finale",
+  "letters": {
+   "A": "haiku",
+   "B": "sonnet",
+   "C": "gpt",
+   "D": "luna"
+  }
+ },
+ "a3:6": {
+  "id": "H_labels_pitch/F5_3/3",
+  "kind": "rep_fail",
+  "letters": {
+   "A": "sonnet",
+   "B": "luna",
+   "C": "gpt",
+   "D": "haiku"
+  }
+ },
+ "a4:1": {
+  "id": "L_labels_pitch/F8_3/2",
+  "kind": "card_later",
+  "letters": {
+   "A": "luna",
+   "B": "haiku",
+   "C": "gpt",
+   "D": "sonnet"
+  }
+ },
+ "a4:2": {
+  "id": "S_labels_pitch/F7_1/9",
+  "kind": "rep_finale",
+  "letters": {
+   "A": "luna",
+   "B": "sonnet",
+   "C": "gpt",
+   "D": "haiku"
+  }
+ },
+ "a4:3": {
+  "id": "H_labels_pitch/F7_3/6",
+  "kind": "card_later",
+  "letters": {
+   "A": "haiku",
+   "B": "luna",
+   "C": "gpt",
+   "D": "sonnet"
+  }
+ },
+ "a4:4": {
+  "id": "S_labels_first/F6_1/1",
+  "kind": "card_first",
+  "letters": {
+   "A": "sonnet",
+   "B": "luna",
+   "C": "haiku",
+   "D": "gpt"
+  }
+ },
+ "a4:5": {
+  "id": "S_labels_first/F1_1/1",
+  "kind": "card_first",
+  "letters": {
+   "A": "gpt",
+   "B": "luna",
+   "C": "sonnet",
+   "D": "haiku"
+  }
+ },
+ "a4:6": {
+  "id": "S_labels_pitch/F6_3/6",
+  "kind": "card_later",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "luna",
+   "D": "haiku"
+  }
+ },
+ "a5:1": {
+  "id": "S_labels_pitch/F7_1/4",
+  "kind": "card_later",
+  "letters": {
+   "A": "sonnet",
+   "B": "luna",
+   "C": "haiku",
+   "D": "gpt"
+  }
+ },
+ "a5:2": {
+  "id": "S_labels_first/F5_1/6",
+  "kind": "rep_finale",
+  "letters": {
+   "A": "luna",
+   "B": "gpt",
+   "C": "sonnet",
+   "D": "haiku"
+  }
+ },
+ "a5:3": {
+  "id": "L_labels_pitch/F7_3/2",
+  "kind": "card_later",
+  "letters": {
+   "A": "luna",
+   "B": "haiku",
+   "C": "gpt",
+   "D": "sonnet"
+  }
+ },
+ "a5:4": {
+  "id": "S_labels_pitch/F8_3/0",
+  "kind": "plan",
+  "letters": {
+   "A": "sonnet",
+   "B": "haiku",
+   "C": "gpt",
+   "D": "luna"
+  }
+ },
+ "a5:5": {
+  "id": "L_labels_pitch/F6_3/0",
+  "kind": "plan",
+  "letters": {
+   "A": "luna",
+   "B": "gpt",
+   "C": "haiku",
+   "D": "sonnet"
+  }
+ },
+ "a5:6": {
+  "id": "S_labels_pitch/F7_1/3",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "sonnet",
+   "B": "haiku",
+   "C": "luna",
+   "D": "gpt"
+  }
+ },
+ "a6:1": {
+  "id": "S_labels_pitch/F6_3/7",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "gpt",
+   "B": "luna",
+   "C": "sonnet",
+   "D": "haiku"
+  }
+ },
+ "a6:2": {
+  "id": "S_labels_first/F7_1/1",
+  "kind": "card_first",
+  "letters": {
+   "A": "gpt",
+   "B": "luna",
+   "C": "haiku",
+   "D": "sonnet"
+  }
+ },
+ "a6:3": {
+  "id": "L_labels_pitch/F3_3/5",
+  "kind": "rep_finale",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "haiku",
+   "D": "luna"
+  }
+ },
+ "a6:4": {
+  "id": "H_labels_pitch/F3_1/3",
+  "kind": "rep_finale",
+  "letters": {
+   "A": "gpt",
+   "B": "sonnet",
+   "C": "haiku",
+   "D": "luna"
+  }
+ },
+ "a6:5": {
+  "id": "L_labels_pitch/F6_3/2",
+  "kind": "card_later",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "haiku",
+   "D": "luna"
+  }
+ },
+ "a6:6": {
+  "id": "S_labels_pitch/F6_1/2",
+  "kind": "card_later",
+  "letters": {
+   "A": "gpt",
+   "B": "haiku",
+   "C": "luna",
+   "D": "sonnet"
+  }
+ },
+ "a7:1": {
+  "id": "H_labels_pitch/F1_3/8",
+  "kind": "card_finale",
+  "letters": {
+   "A": "sonnet",
+   "B": "haiku",
+   "C": "luna",
+   "D": "gpt"
+  }
+ },
+ "a7:2": {
+  "id": "S_labels_first/F8_1/1",
+  "kind": "card_first",
+  "letters": {
+   "A": "luna",
+   "B": "gpt",
+   "C": "sonnet",
+   "D": "haiku"
+  }
+ },
+ "a7:3": {
+  "id": "S_labels_first/F5_1/1",
+  "kind": "card_first",
+  "letters": {
+   "A": "luna",
+   "B": "sonnet",
+   "C": "gpt",
+   "D": "haiku"
+  }
+ },
+ "a7:4": {
+  "id": "L_labels_pitch/F8_3/7",
+  "kind": "rep_finale",
+  "letters": {
+   "A": "haiku",
+   "B": "gpt",
+   "C": "luna",
+   "D": "sonnet"
+  }
+ },
+ "a7:5": {
+  "id": "L_labels_pitch/F6_3/8",
+  "kind": "card_finale",
+  "letters": {
+   "A": "gpt",
+   "B": "sonnet",
+   "C": "haiku",
+   "D": "luna"
+  }
+ },
+ "a7:6": {
+  "id": "S_labels_first/F1_1/7",
+  "kind": "card_finale",
+  "letters": {
+   "A": "gpt",
+   "B": "sonnet",
+   "C": "haiku",
+   "D": "luna"
+  }
+ },
+ "a8:1": {
+  "id": "H_labels_pitch/F5_1/0",
+  "kind": "plan",
+  "letters": {
+   "A": "gpt",
+   "B": "sonnet",
+   "C": "luna",
+   "D": "haiku"
+  }
+ },
+ "a8:2": {
+  "id": "H_labels_pitch/F1_1/6",
+  "kind": "card_finale",
+  "letters": {
+   "A": "haiku",
+   "B": "luna",
+   "C": "sonnet",
+   "D": "gpt"
+  }
+ },
+ "a8:3": {
+  "id": "S_labels_pitch/F3_3/3",
+  "kind": "rep_fail",
+  "letters": {
+   "A": "luna",
+   "B": "haiku",
+   "C": "sonnet",
+   "D": "gpt"
+  }
+ },
+ "a8:4": {
+  "id": "S_labels_first/F3_1/1",
+  "kind": "card_first",
+  "letters": {
+   "A": "haiku",
+   "B": "luna",
+   "C": "sonnet",
+   "D": "gpt"
+  }
+ },
+ "a8:5": {
+  "id": "S_labels_pitch/F7_3/3",
+  "kind": "rep_fail",
+  "letters": {
+   "A": "sonnet",
+   "B": "haiku",
+   "C": "gpt",
+   "D": "luna"
+  }
+ },
+ "a8:6": {
+  "id": "S_labels_first/F4_1/0",
+  "kind": "plan",
+  "letters": {
+   "A": "sonnet",
+   "B": "haiku",
+   "C": "luna",
+   "D": "gpt"
+  }
+ },
+ "a9:1": {
+  "id": "L_labels_pitch/F8_3/3",
+  "kind": "rep_fail",
+  "letters": {
+   "A": "sonnet",
+   "B": "haiku",
+   "C": "luna",
+   "D": "gpt"
+  }
+ },
+ "a9:2": {
+  "id": "S_labels_pitch/F6_3/0",
+  "kind": "plan",
+  "letters": {
+   "A": "luna",
+   "B": "gpt",
+   "C": "haiku",
+   "D": "sonnet"
+  }
+ },
+ "a9:3": {
+  "id": "L_labels_pitch/F7_1/5",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "haiku",
+   "B": "gpt",
+   "C": "luna",
+   "D": "sonnet"
+  }
+ },
+ "a9:4": {
+  "id": "S_labels_first/F7_1/7",
+  "kind": "card_later",
+  "letters": {
+   "A": "sonnet",
+   "B": "haiku",
+   "C": "gpt",
+   "D": "luna"
+  }
+ },
+ "a9:5": {
+  "id": "S_labels_first/F1_1/0",
+  "kind": "plan",
+  "letters": {
+   "A": "sonnet",
+   "B": "luna",
+   "C": "gpt",
+   "D": "haiku"
+  }
+ },
+ "a9:6": {
+  "id": "L_labels_pitch/F2_1/4",
+  "kind": "card_finale",
+  "letters": {
+   "A": "haiku",
+   "B": "gpt",
+   "C": "luna",
+   "D": "sonnet"
+  }
+ },
+ "a10:1": {
+  "id": "S_labels_first/F6_1/0",
+  "kind": "plan",
+  "letters": {
+   "A": "gpt",
+   "B": "sonnet",
+   "C": "haiku",
+   "D": "luna"
+  }
+ },
+ "a10:2": {
+  "id": "H_labels_pitch/F3_3/3",
+  "kind": "rep_fail",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "luna",
+   "D": "haiku"
+  }
+ },
+ "a10:3": {
+  "id": "H_labels_pitch/F6_3/9",
+  "kind": "rep_finale",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "haiku",
+   "D": "luna"
+  }
+ },
+ "a10:4": {
+  "id": "H_labels_pitch/F6_1/0",
+  "kind": "plan",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "luna",
+   "D": "haiku"
+  }
+ },
+ "a10:5": {
+  "id": "S_labels_first/F7_1/9",
+  "kind": "card_finale",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "haiku",
+   "D": "luna"
+  }
+ },
+ "a10:6": {
+  "id": "S_labels_first/F2_1/1",
+  "kind": "card_first",
+  "letters": {
+   "A": "gpt",
+   "B": "luna",
+   "C": "sonnet",
+   "D": "haiku"
+  }
+ },
+ "a11:1": {
+  "id": "L_labels_pitch/F3_3/2",
+  "kind": "card_later",
+  "letters": {
+   "A": "sonnet",
+   "B": "haiku",
+   "C": "gpt",
+   "D": "luna"
+  }
+ },
+ "a11:2": {
+  "id": "S_labels_pitch/F5_1/2",
+  "kind": "card_later",
+  "letters": {
+   "A": "gpt",
+   "B": "luna",
+   "C": "haiku",
+   "D": "sonnet"
+  }
+ },
+ "a11:3": {
+  "id": "S_labels_pitch/F4_1/4",
+  "kind": "card_finale",
+  "letters": {
+   "A": "gpt",
+   "B": "luna",
+   "C": "sonnet",
+   "D": "haiku"
+  }
+ },
+ "a11:4": {
+  "id": "S_labels_first/F4_1/2",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "sonnet",
+   "B": "haiku",
+   "C": "gpt",
+   "D": "luna"
+  }
+ },
+ "a11:5": {
+  "id": "H_labels_pitch/F8_1/1",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "gpt",
+   "B": "haiku",
+   "C": "sonnet",
+   "D": "luna"
+  }
+ },
+ "a11:6": {
+  "id": "S_labels_pitch/F5_3/5",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "gpt",
+   "B": "haiku",
+   "C": "luna",
+   "D": "sonnet"
+  }
+ },
+ "a12:1": {
+  "id": "S_labels_first/F1_1/5",
+  "kind": "card_later",
+  "letters": {
+   "A": "sonnet",
+   "B": "haiku",
+   "C": "luna",
+   "D": "gpt"
+  }
+ },
+ "a12:2": {
+  "id": "S_labels_first/F4_1/3",
+  "kind": "card_later",
+  "letters": {
+   "A": "haiku",
+   "B": "sonnet",
+   "C": "gpt",
+   "D": "luna"
+  }
+ },
+ "a12:3": {
+  "id": "S_labels_first/F3_1/2",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "sonnet",
+   "B": "luna",
+   "C": "gpt",
+   "D": "haiku"
+  }
+ },
+ "a12:4": {
+  "id": "S_labels_pitch/F7_3/7",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "sonnet",
+   "B": "haiku",
+   "C": "gpt",
+   "D": "luna"
+  }
+ },
+ "a12:5": {
+  "id": "H_labels_pitch/F7_1/1",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "gpt",
+   "B": "sonnet",
+   "C": "luna",
+   "D": "haiku"
+  }
+ },
+ "a12:6": {
+  "id": "S_labels_pitch/F8_1/5",
+  "kind": "rep_finale",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "luna",
+   "D": "haiku"
+  }
+ },
+ "b1:1": {
+  "id": "S_labels_first/F3_1/4",
+  "kind": "rep_finale",
+  "letters": {
+   "A": "gpt",
+   "B": "haiku",
+   "C": "sonnet",
+   "D": "luna"
+  }
+ },
+ "b1:2": {
+  "id": "S_labels_first/F2_1/2",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "luna",
+   "B": "haiku",
+   "C": "gpt",
+   "D": "sonnet"
+  }
+ },
+ "b1:3": {
+  "id": "H_labels_pitch/F8_3/4",
+  "kind": "card_later",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "haiku",
+   "D": "luna"
+  }
+ },
+ "b1:4": {
+  "id": "H_labels_pitch/F1_1/0",
+  "kind": "plan",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "haiku",
+   "D": "luna"
+  }
+ },
+ "b1:5": {
+  "id": "H_labels_pitch/F6_1/5",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "sonnet",
+   "B": "luna",
+   "C": "gpt",
+   "D": "haiku"
+  }
+ },
+ "b1:6": {
+  "id": "H_labels_pitch/F7_1/2",
+  "kind": "card_later",
+  "letters": {
+   "A": "luna",
+   "B": "haiku",
+   "C": "gpt",
+   "D": "sonnet"
+  }
+ },
+ "b2:1": {
+  "id": "S_labels_first/F8_1/4",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "haiku",
+   "B": "gpt",
+   "C": "sonnet",
+   "D": "luna"
+  }
+ },
+ "b2:2": {
+  "id": "L_labels_pitch/F8_3/5",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "luna",
+   "B": "gpt",
+   "C": "haiku",
+   "D": "sonnet"
+  }
+ },
+ "b2:3": {
+  "id": "L_labels_pitch/F4_3/3",
+  "kind": "rep_fail",
+  "letters": {
+   "A": "luna",
+   "B": "sonnet",
+   "C": "haiku",
+   "D": "gpt"
+  }
+ },
+ "b2:4": {
+  "id": "S_labels_first/F4_1/1",
+  "kind": "card_first",
+  "letters": {
+   "A": "luna",
+   "B": "sonnet",
+   "C": "gpt",
+   "D": "haiku"
+  }
+ },
+ "b2:5": {
+  "id": "L_labels_pitch/F8_1/1",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "haiku",
+   "B": "sonnet",
+   "C": "gpt",
+   "D": "luna"
+  }
+ },
+ "b2:6": {
+  "id": "S_labels_first/F8_1/3",
+  "kind": "card_later",
+  "letters": {
+   "A": "luna",
+   "B": "haiku",
+   "C": "sonnet",
+   "D": "gpt"
+  }
+ },
+ "b3:1": {
+  "id": "S_labels_pitch/F7_1/0",
+  "kind": "plan",
+  "letters": {
+   "A": "sonnet",
+   "B": "haiku",
+   "C": "luna",
+   "D": "gpt"
+  }
+ },
+ "b3:2": {
+  "id": "L_labels_pitch/F3_3/0",
+  "kind": "plan",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "luna",
+   "D": "haiku"
+  }
+ },
+ "b3:3": {
+  "id": "S_labels_pitch/F1_1/2",
+  "kind": "card_later",
+  "letters": {
+   "A": "luna",
+   "B": "gpt",
+   "C": "haiku",
+   "D": "sonnet"
+  }
+ },
+ "b3:4": {
+  "id": "L_labels_pitch/F1_1/0",
+  "kind": "plan",
+  "letters": {
+   "A": "haiku",
+   "B": "gpt",
+   "C": "sonnet",
+   "D": "luna"
+  }
+ },
+ "b3:5": {
+  "id": "S_labels_pitch/F8_3/6",
+  "kind": "card_finale",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "luna",
+   "D": "haiku"
+  }
+ },
+ "b3:6": {
+  "id": "H_labels_pitch/F5_3/3",
+  "kind": "rep_fail",
+  "letters": {
+   "A": "gpt",
+   "B": "luna",
+   "C": "sonnet",
+   "D": "haiku"
+  }
+ },
+ "b4:1": {
+  "id": "L_labels_pitch/F8_3/2",
+  "kind": "card_later",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "haiku",
+   "D": "luna"
+  }
+ },
+ "b4:2": {
+  "id": "S_labels_pitch/F7_1/9",
+  "kind": "rep_finale",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "luna",
+   "D": "haiku"
+  }
+ },
+ "b4:3": {
+  "id": "H_labels_pitch/F7_3/6",
+  "kind": "card_later",
+  "letters": {
+   "A": "luna",
+   "B": "haiku",
+   "C": "sonnet",
+   "D": "gpt"
+  }
+ },
+ "b4:4": {
+  "id": "S_labels_first/F6_1/1",
+  "kind": "card_first",
+  "letters": {
+   "A": "luna",
+   "B": "gpt",
+   "C": "sonnet",
+   "D": "haiku"
+  }
+ },
+ "b4:5": {
+  "id": "S_labels_first/F1_1/1",
+  "kind": "card_first",
+  "letters": {
+   "A": "gpt",
+   "B": "sonnet",
+   "C": "luna",
+   "D": "haiku"
+  }
+ },
+ "b4:6": {
+  "id": "S_labels_pitch/F6_3/6",
+  "kind": "card_later",
+  "letters": {
+   "A": "haiku",
+   "B": "sonnet",
+   "C": "luna",
+   "D": "gpt"
+  }
+ },
+ "b5:1": {
+  "id": "S_labels_pitch/F7_1/4",
+  "kind": "card_later",
+  "letters": {
+   "A": "sonnet",
+   "B": "luna",
+   "C": "haiku",
+   "D": "gpt"
+  }
+ },
+ "b5:2": {
+  "id": "S_labels_first/F5_1/6",
+  "kind": "rep_finale",
+  "letters": {
+   "A": "haiku",
+   "B": "sonnet",
+   "C": "luna",
+   "D": "gpt"
+  }
+ },
+ "b5:3": {
+  "id": "L_labels_pitch/F7_3/2",
+  "kind": "card_later",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "haiku",
+   "D": "luna"
+  }
+ },
+ "b5:4": {
+  "id": "S_labels_pitch/F8_3/0",
+  "kind": "plan",
+  "letters": {
+   "A": "haiku",
+   "B": "gpt",
+   "C": "sonnet",
+   "D": "luna"
+  }
+ },
+ "b5:5": {
+  "id": "L_labels_pitch/F6_3/0",
+  "kind": "plan",
+  "letters": {
+   "A": "sonnet",
+   "B": "haiku",
+   "C": "gpt",
+   "D": "luna"
+  }
+ },
+ "b5:6": {
+  "id": "S_labels_pitch/F7_1/3",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "luna",
+   "B": "gpt",
+   "C": "haiku",
+   "D": "sonnet"
+  }
+ },
+ "b6:1": {
+  "id": "S_labels_pitch/F6_3/7",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "luna",
+   "D": "haiku"
+  }
+ },
+ "b6:2": {
+  "id": "S_labels_first/F7_1/1",
+  "kind": "card_first",
+  "letters": {
+   "A": "gpt",
+   "B": "sonnet",
+   "C": "haiku",
+   "D": "luna"
+  }
+ },
+ "b6:3": {
+  "id": "L_labels_pitch/F3_3/5",
+  "kind": "rep_finale",
+  "letters": {
+   "A": "haiku",
+   "B": "sonnet",
+   "C": "luna",
+   "D": "gpt"
+  }
+ },
+ "b6:4": {
+  "id": "H_labels_pitch/F3_1/3",
+  "kind": "rep_finale",
+  "letters": {
+   "A": "luna",
+   "B": "gpt",
+   "C": "haiku",
+   "D": "sonnet"
+  }
+ },
+ "b6:5": {
+  "id": "L_labels_pitch/F6_3/2",
+  "kind": "card_later",
+  "letters": {
+   "A": "gpt",
+   "B": "sonnet",
+   "C": "haiku",
+   "D": "luna"
+  }
+ },
+ "b6:6": {
+  "id": "S_labels_pitch/F6_1/2",
+  "kind": "card_later",
+  "letters": {
+   "A": "gpt",
+   "B": "luna",
+   "C": "sonnet",
+   "D": "haiku"
+  }
+ },
+ "b7:1": {
+  "id": "H_labels_pitch/F1_3/8",
+  "kind": "card_finale",
+  "letters": {
+   "A": "luna",
+   "B": "sonnet",
+   "C": "gpt",
+   "D": "haiku"
+  }
+ },
+ "b7:2": {
+  "id": "S_labels_first/F8_1/1",
+  "kind": "card_first",
+  "letters": {
+   "A": "gpt",
+   "B": "sonnet",
+   "C": "haiku",
+   "D": "luna"
+  }
+ },
+ "b7:3": {
+  "id": "S_labels_first/F5_1/1",
+  "kind": "card_first",
+  "letters": {
+   "A": "haiku",
+   "B": "luna",
+   "C": "sonnet",
+   "D": "gpt"
+  }
+ },
+ "b7:4": {
+  "id": "L_labels_pitch/F8_3/7",
+  "kind": "rep_finale",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "luna",
+   "D": "haiku"
+  }
+ },
+ "b7:5": {
+  "id": "L_labels_pitch/F6_3/8",
+  "kind": "card_finale",
+  "letters": {
+   "A": "sonnet",
+   "B": "haiku",
+   "C": "gpt",
+   "D": "luna"
+  }
+ },
+ "b7:6": {
+  "id": "S_labels_first/F1_1/7",
+  "kind": "card_finale",
+  "letters": {
+   "A": "haiku",
+   "B": "gpt",
+   "C": "sonnet",
+   "D": "luna"
+  }
+ },
+ "b8:1": {
+  "id": "H_labels_pitch/F5_1/0",
+  "kind": "plan",
+  "letters": {
+   "A": "luna",
+   "B": "sonnet",
+   "C": "gpt",
+   "D": "haiku"
+  }
+ },
+ "b8:2": {
+  "id": "H_labels_pitch/F1_1/6",
+  "kind": "card_finale",
+  "letters": {
+   "A": "sonnet",
+   "B": "haiku",
+   "C": "gpt",
+   "D": "luna"
+  }
+ },
+ "b8:3": {
+  "id": "S_labels_pitch/F3_3/3",
+  "kind": "rep_fail",
+  "letters": {
+   "A": "haiku",
+   "B": "sonnet",
+   "C": "luna",
+   "D": "gpt"
+  }
+ },
+ "b8:4": {
+  "id": "S_labels_first/F3_1/1",
+  "kind": "card_first",
+  "letters": {
+   "A": "haiku",
+   "B": "gpt",
+   "C": "luna",
+   "D": "sonnet"
+  }
+ },
+ "b8:5": {
+  "id": "S_labels_pitch/F7_3/3",
+  "kind": "rep_fail",
+  "letters": {
+   "A": "luna",
+   "B": "sonnet",
+   "C": "haiku",
+   "D": "gpt"
+  }
+ },
+ "b8:6": {
+  "id": "S_labels_first/F4_1/0",
+  "kind": "plan",
+  "letters": {
+   "A": "gpt",
+   "B": "sonnet",
+   "C": "haiku",
+   "D": "luna"
+  }
+ },
+ "b9:1": {
+  "id": "L_labels_pitch/F8_3/3",
+  "kind": "rep_fail",
+  "letters": {
+   "A": "haiku",
+   "B": "sonnet",
+   "C": "gpt",
+   "D": "luna"
+  }
+ },
+ "b9:2": {
+  "id": "S_labels_pitch/F6_3/0",
+  "kind": "plan",
+  "letters": {
+   "A": "sonnet",
+   "B": "haiku",
+   "C": "luna",
+   "D": "gpt"
+  }
+ },
+ "b9:3": {
+  "id": "L_labels_pitch/F7_1/5",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "haiku",
+   "B": "sonnet",
+   "C": "luna",
+   "D": "gpt"
+  }
+ },
+ "b9:4": {
+  "id": "S_labels_first/F7_1/7",
+  "kind": "card_later",
+  "letters": {
+   "A": "haiku",
+   "B": "luna",
+   "C": "sonnet",
+   "D": "gpt"
+  }
+ },
+ "b9:5": {
+  "id": "S_labels_first/F1_1/0",
+  "kind": "plan",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "luna",
+   "D": "haiku"
+  }
+ },
+ "b9:6": {
+  "id": "L_labels_pitch/F2_1/4",
+  "kind": "card_finale",
+  "letters": {
+   "A": "sonnet",
+   "B": "haiku",
+   "C": "luna",
+   "D": "gpt"
+  }
+ },
+ "b10:1": {
+  "id": "S_labels_first/F6_1/0",
+  "kind": "plan",
+  "letters": {
+   "A": "haiku",
+   "B": "gpt",
+   "C": "sonnet",
+   "D": "luna"
+  }
+ },
+ "b10:2": {
+  "id": "H_labels_pitch/F3_3/3",
+  "kind": "rep_fail",
+  "letters": {
+   "A": "luna",
+   "B": "haiku",
+   "C": "sonnet",
+   "D": "gpt"
+  }
+ },
+ "b10:3": {
+  "id": "H_labels_pitch/F6_3/9",
+  "kind": "rep_finale",
+  "letters": {
+   "A": "luna",
+   "B": "sonnet",
+   "C": "gpt",
+   "D": "haiku"
+  }
+ },
+ "b10:4": {
+  "id": "H_labels_pitch/F6_1/0",
+  "kind": "plan",
+  "letters": {
+   "A": "luna",
+   "B": "gpt",
+   "C": "haiku",
+   "D": "sonnet"
+  }
+ },
+ "b10:5": {
+  "id": "S_labels_first/F7_1/9",
+  "kind": "card_finale",
+  "letters": {
+   "A": "gpt",
+   "B": "haiku",
+   "C": "sonnet",
+   "D": "luna"
+  }
+ },
+ "b10:6": {
+  "id": "S_labels_first/F2_1/1",
+  "kind": "card_first",
+  "letters": {
+   "A": "haiku",
+   "B": "luna",
+   "C": "gpt",
+   "D": "sonnet"
+  }
+ },
+ "b11:1": {
+  "id": "L_labels_pitch/F3_3/2",
+  "kind": "card_later",
+  "letters": {
+   "A": "sonnet",
+   "B": "luna",
+   "C": "haiku",
+   "D": "gpt"
+  }
+ },
+ "b11:2": {
+  "id": "S_labels_pitch/F5_1/2",
+  "kind": "card_later",
+  "letters": {
+   "A": "sonnet",
+   "B": "haiku",
+   "C": "luna",
+   "D": "gpt"
+  }
+ },
+ "b11:3": {
+  "id": "S_labels_pitch/F4_1/4",
+  "kind": "card_finale",
+  "letters": {
+   "A": "gpt",
+   "B": "luna",
+   "C": "haiku",
+   "D": "sonnet"
+  }
+ },
+ "b11:4": {
+  "id": "S_labels_first/F4_1/2",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "haiku",
+   "B": "gpt",
+   "C": "sonnet",
+   "D": "luna"
+  }
+ },
+ "b11:5": {
+  "id": "H_labels_pitch/F8_1/1",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "sonnet",
+   "B": "gpt",
+   "C": "luna",
+   "D": "haiku"
+  }
+ },
+ "b11:6": {
+  "id": "S_labels_pitch/F5_3/5",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "haiku",
+   "B": "luna",
+   "C": "gpt",
+   "D": "sonnet"
+  }
+ },
+ "b12:1": {
+  "id": "S_labels_first/F1_1/5",
+  "kind": "card_later",
+  "letters": {
+   "A": "luna",
+   "B": "haiku",
+   "C": "gpt",
+   "D": "sonnet"
+  }
+ },
+ "b12:2": {
+  "id": "S_labels_first/F4_1/3",
+  "kind": "card_later",
+  "letters": {
+   "A": "haiku",
+   "B": "gpt",
+   "C": "luna",
+   "D": "sonnet"
+  }
+ },
+ "b12:3": {
+  "id": "S_labels_first/F3_1/2",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "luna",
+   "B": "sonnet",
+   "C": "gpt",
+   "D": "haiku"
+  }
+ },
+ "b12:4": {
+  "id": "S_labels_pitch/F7_3/7",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "luna",
+   "B": "gpt",
+   "C": "sonnet",
+   "D": "haiku"
+  }
+ },
+ "b12:5": {
+  "id": "H_labels_pitch/F7_1/1",
+  "kind": "rep_moved",
+  "letters": {
+   "A": "gpt",
+   "B": "luna",
+   "C": "sonnet",
+   "D": "haiku"
+  }
+ },
+ "b12:6": {
+  "id": "S_labels_pitch/F8_1/5",
+  "kind": "rep_finale",
+  "letters": {
+   "A": "gpt",
+   "B": "luna",
+   "C": "sonnet",
+   "D": "haiku"
+  }
+ }
+}

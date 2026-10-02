@@ -244,6 +244,121 @@
    "cost": 0.0298364,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\n  \"title\": \"The Answering Song\",\n  \"question\": \"What answers the matriarch's funeral song?\",\n  \"answer\": \"The answering voice is the dead matriarch's own, carried by a bronze mask buried beneath her grave.\",\n  \"cast\": [\n    {\n      \"id\": \"p1\",\n      \"label\": \"grieving elf baker\",\n      \"want\": \"Keep her bakehouse as her home.\"\n    },\n    {\n      \"id\": \"c72\",\n      \"label\": \"stern human merchant\",\n      \"want\": \"Sell the buried treasure to pay his debts.\"\n    },\n    {\n      \"id\": \"p2\",\n      \"label\": \"wary forest trapper\",\n      \"want\": \"Stay free of the merchant's men.\"\n    }\n  ],\n  \"episodes\": [\n    {\n      \"n\": 1,\n      \"type\": \"fight\",\n      \"title\": \"The Debt Comes Due\",\n      \"job\": \"Drive c72's men from the bakehouse in Harrowford.\",\n      \"people\": [\"p1\", \"c72\"],\n      \"trouble\": {\n        \"who\": \"c72's hired guards\",\n        \"carry\": \"swords\",\n        \"will\": \"evict Lariane tonight\"\n      },\n      \"win\": \"The guards are driven off, leaving an order that names Stonegill as the trapper's holding place.\",\n      \"opens\": \"Can the trapper be freed before c72's men silence him?\"\n    },\n    {\n      \"n\": 2,\n      \"type\": \"free\",\n      \"title\": \"The Held Trapper\",\n      \"job\": \"Free the trapper at Stonegill.\",\n      \"people\": [\"p1\", \"p2\"],\n      \"trouble\": {\n        \"who\": \"c72's guards\",\n        \"carry\": \"bows\",\n        \"will\": \"silence the trapper\"\n      },\n      \"win\": \"The trapper is freed from c72's men.\",\n      \"opens\": \"Where does c72 keep the ledger that names his prize?\"\n    },\n    {\n      \"n\": 3,\n      \"type\": \"sneak\",\n      \"title\": \"The Merchant's Ledger\",\n      \"job\": \"Take c72's ledger unseen from his counting room in Woldshaw.\",\n      \"people\": [\"p1\", \"p2\"],\n      \"trouble\": {\n        \"who\": \"armed counting-house guards\",\n        \"carry\": \"crossbows\",\n        \"will\": \"catch intruders\"\n      },\n      \"win\": \"The ledger is taken unseen from the counting room.\",\n      \"opens\": \"Can the company stop c72 reaching the burial grove to dig?\"\n    }\n  ],\n  \"showdown\": {\n    \"title\": \"The Grave's Reply\",\n    \"job\": \"Drive c72's guards from the burial grove at Woldshaw.\",\n    \"people\": [\"p1\", \"p2\", \"c72\"],\n    \"trouble\": {\n      \"who\": \"c72's grave guards\",\n      \"carry\": \"axes\",\n      \"will\": \"keep the company from c72\"\n    },\n    \"settles\": \"Lariane's bakehouse is freed from c72's debt claim and remains her home.\",\n    \"lose\": \"Lariane's bakehouse and home\"\n  },\n  \"options\": [\n    {\n      \"way\": \"gold\",\n      \"label\": \"Take his buried treasure\"\n    },\n    {\n      \"way\": \"captive\",\n      \"label\": \"Bind him and take him to the cells\"\n    },\n    {\n      \"way\": \"recruit\",\n      \"label\": \"Offer him a place among the company\"\n    }\n  ],\n  \"pitch\": \"At your fort, Lariane, an elf baker, begs you to save her Harrowford bakehouse. The human merchant c72 holds her debt and means to seize her home tonight. She says the dead matriarch's funeral song has begun drawing an answer from the burial grove. Drive c72's armed guards from the bakehouse before they evict her. As the song fades, a second voice answers from the trees.\"\n}",
+   "json": {
+    "title": "The Answering Song",
+    "question": "What answers the matriarch's funeral song?",
+    "answer": "The answering voice is the dead matriarch's own, carried by a bronze mask buried beneath her grave.",
+    "cast": [
+     {
+      "id": "p1",
+      "label": "grieving elf baker",
+      "want": "Keep her bakehouse as her home."
+     },
+     {
+      "id": "c72",
+      "label": "stern human merchant",
+      "want": "Sell the buried treasure to pay his debts."
+     },
+     {
+      "id": "p2",
+      "label": "wary forest trapper",
+      "want": "Stay free of the merchant's men."
+     }
+    ],
+    "episodes": [
+     {
+      "n": 1,
+      "type": "fight",
+      "title": "The Debt Comes Due",
+      "job": "Drive c72's men from the bakehouse in Harrowford.",
+      "people": [
+       "p1",
+       "c72"
+      ],
+      "trouble": {
+       "who": "c72's hired guards",
+       "carry": "swords",
+       "will": "evict Lariane tonight"
+      },
+      "win": "The guards are driven off, leaving an order that names Stonegill as the trapper's holding place.",
+      "opens": "Can the trapper be freed before c72's men silence him?"
+     },
+     {
+      "n": 2,
+      "type": "free",
+      "title": "The Held Trapper",
+      "job": "Free the trapper at Stonegill.",
+      "people": [
+       "p1",
+       "p2"
+      ],
+      "trouble": {
+       "who": "c72's guards",
+       "carry": "bows",
+       "will": "silence the trapper"
+      },
+      "win": "The trapper is freed from c72's men.",
+      "opens": "Where does c72 keep the ledger that names his prize?"
+     },
+     {
+      "n": 3,
+      "type": "sneak",
+      "title": "The Merchant's Ledger",
+      "job": "Take c72's ledger unseen from his counting room in Woldshaw.",
+      "people": [
+       "p1",
+       "p2"
+      ],
+      "trouble": {
+       "who": "armed counting-house guards",
+       "carry": "crossbows",
+       "will": "catch intruders"
+      },
+      "win": "The ledger is taken unseen from the counting room.",
+      "opens": "Can the company stop c72 reaching the burial grove to dig?"
+     }
+    ],
+    "showdown": {
+     "title": "The Grave's Reply",
+     "job": "Drive c72's guards from the burial grove at Woldshaw.",
+     "people": [
+      "p1",
+      "p2",
+      "c72"
+     ],
+     "trouble": {
+      "who": "c72's grave guards",
+      "carry": "axes",
+      "will": "keep the company from c72"
+     },
+     "settles": "Lariane's bakehouse is freed from c72's debt claim and remains her home.",
+     "lose": "Lariane's bakehouse and home"
+    },
+    "options": [
+     {
+      "way": "gold",
+      "label": "Take his buried treasure"
+     },
+     {
+      "way": "captive",
+      "label": "Bind him and take him to the cells"
+     },
+     {
+      "way": "recruit",
+      "label": "Offer him a place among the company"
+     }
+    ],
+    "pitch": "At your fort, Lariane, an elf baker, begs you to save her Harrowford bakehouse. The human merchant c72 holds her debt and means to seize her home tonight. She says the dead matriarch's funeral song has begun drawing an answer from the burial grove. Drive c72's armed guards from the bakehouse before they evict her. As the song fades, a second voice answers from the trees."
+   },
+   "ms": 65389,
+   "in": 1233,
+   "out": 7356,
+   "think": 6399,
+   "cost": 0.0038013,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_pitch/F8_3/0": {
@@ -448,6 +563,103 @@
    "cost": 0.037083599999999994,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\n  \"title\": \"The Clay Beast\",\n  \"question\": \"Why does the beast quiet at the merchant's song?\",\n  \"answer\": \"The merchant hatched the beast from an egg she warmed in the old potter's kiln as his apprentice.\",\n  \"cast\": [\n    {\n      \"id\": \"p1\",\n      \"label\": \"steady charcoal-burner\",\n      \"want\": \"to keep his charcoal yard and ovens in business\"\n    },\n    {\n      \"id\": \"p2\",\n      \"label\": \"hard magistrate\",\n      \"want\": \"to keep the beast as a guard for his timber stores\"\n    },\n    {\n      \"id\": \"c96\",\n      \"label\": \"serious merchant\",\n      \"want\": \"to fire one last pot beside the potter, then choose her own road\"\n    },\n    {\n      \"id\": \"potter\",\n      \"label\": \"old potter\",\n      \"want\": \"to fire his kiln again with the apprentice he cast out\"\n    }\n  ],\n  \"episodes\": [\n    {\n      \"n\": 1,\n      \"title\": \"The Burning Kiln\",\n      \"job\": \"Hold the old potter's kiln against the beast at Yarstead.\",\n      \"people\": [\"p1\", \"c96\", \"potter\"],\n      \"trouble\": {\n        \"who\": \"the magistrate's beast\",\n        \"carry\": \"horns and claws\",\n        \"will\": \"smash the kiln\"\n      },\n      \"win\": \"You drive the beast back, keeping the kiln and Adelroth's ovens intact.\",\n      \"opens\": \"Where has the magistrate hidden the beast between attacks?\"\n    },\n    {\n      \"n\": 2,\n      \"title\": \"The Hidden Pen\",\n      \"job\": \"Track the beast to its hidden pen at Ravengarth.\",\n      \"people\": [\"c96\", \"p2\"],\n      \"trouble\": {\n        \"who\": \"armed wardens\",\n        \"carry\": \"bows and spears\",\n        \"will\": \"bar the pen\"\n      },\n      \"win\": \"You find the pen and a clay flute the merchant knows from the potter's kiln.\",\n      \"opens\": \"Why does the beast still quiet at the merchant's song?\"\n    }\n  ],\n  \"showdown\": {\n    \"title\": \"The Magistrate's Beast\",\n    \"job\": \"Confront the magistrate and free the beast at Tarngarth.\",\n    \"people\": [\"c96\", \"p2\"],\n    \"trouble\": {\n      \"who\": \"armed guards\",\n      \"carry\": \"swords and shields\",\n      \"will\": \"keep the beast under their master's command\"\n    },\n    \"settles\": \"The magistrate loses control of the beast, and Adelroth's ovens are safe to burn again.\",\n    \"lose\": \"Adelroth's charcoal yard\"\n  },\n  \"options\": [\n    {\n      \"way\": \"recruit\",\n      \"label\": \"Invite the merchant into the company on her own terms.\"\n    },\n    {\n      \"way\": \"gold\",\n      \"label\": \"Accept her offered treasure share, then let her go her way.\"\n    }\n  ],\n  \"pitch\": \"Adelroth asks you to save his charcoal yard: the magistrate's beast has killed workers and driven him from his ovens. The beast now attacks the old potter's kiln, where the merchant he cast out is the only one who knows his glaze. Hold the kiln at Yarstead; the beast blocks you. Fail, and Adelroth loses his ovens. A clay bead clicks between the beast's teeth.\"\n}",
+   "json": {
+    "title": "The Clay Beast",
+    "question": "Why does the beast quiet at the merchant's song?",
+    "answer": "The merchant hatched the beast from an egg she warmed in the old potter's kiln as his apprentice.",
+    "cast": [
+     {
+      "id": "p1",
+      "label": "steady charcoal-burner",
+      "want": "to keep his charcoal yard and ovens in business"
+     },
+     {
+      "id": "p2",
+      "label": "hard magistrate",
+      "want": "to keep the beast as a guard for his timber stores"
+     },
+     {
+      "id": "c96",
+      "label": "serious merchant",
+      "want": "to fire one last pot beside the potter, then choose her own road"
+     },
+     {
+      "id": "potter",
+      "label": "old potter",
+      "want": "to fire his kiln again with the apprentice he cast out"
+     }
+    ],
+    "episodes": [
+     {
+      "n": 1,
+      "title": "The Burning Kiln",
+      "job": "Hold the old potter's kiln against the beast at Yarstead.",
+      "people": [
+       "p1",
+       "c96",
+       "potter"
+      ],
+      "trouble": {
+       "who": "the magistrate's beast",
+       "carry": "horns and claws",
+       "will": "smash the kiln"
+      },
+      "win": "You drive the beast back, keeping the kiln and Adelroth's ovens intact.",
+      "opens": "Where has the magistrate hidden the beast between attacks?"
+     },
+     {
+      "n": 2,
+      "title": "The Hidden Pen",
+      "job": "Track the beast to its hidden pen at Ravengarth.",
+      "people": [
+       "c96",
+       "p2"
+      ],
+      "trouble": {
+       "who": "armed wardens",
+       "carry": "bows and spears",
+       "will": "bar the pen"
+      },
+      "win": "You find the pen and a clay flute the merchant knows from the potter's kiln.",
+      "opens": "Why does the beast still quiet at the merchant's song?"
+     }
+    ],
+    "showdown": {
+     "title": "The Magistrate's Beast",
+     "job": "Confront the magistrate and free the beast at Tarngarth.",
+     "people": [
+      "c96",
+      "p2"
+     ],
+     "trouble": {
+      "who": "armed guards",
+      "carry": "swords and shields",
+      "will": "keep the beast under their master's command"
+     },
+     "settles": "The magistrate loses control of the beast, and Adelroth's ovens are safe to burn again.",
+     "lose": "Adelroth's charcoal yard"
+    },
+    "options": [
+     {
+      "way": "recruit",
+      "label": "Invite the merchant into the company on her own terms."
+     },
+     {
+      "way": "gold",
+      "label": "Accept her offered treasure share, then let her go her way."
+     }
+    ],
+    "pitch": "Adelroth asks you to save his charcoal yard: the magistrate's beast has killed workers and driven him from his ovens. The beast now attacks the old potter's kiln, where the merchant he cast out is the only one who knows his glaze. Hold the kiln at Yarstead; the beast blocks you. Fail, and Adelroth loses his ovens. A clay bead clicks between the beast's teeth."
+   },
+   "ms": 105069,
+   "in": 1102,
+   "out": 10216,
+   "think": 9332,
+   "cost": 0.0052182,
+   "model": "gpt-6-luna"
   }
  },
  "H_labels_pitch/F6_1/0": {
@@ -695,6 +907,120 @@
    "cost": 0.041173999999999995,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\n  \"title\": \"Ash Under Harrowford\",\n  \"question\": \"What truly set the paper dragon alight at the lantern festival?\",\n  \"answer\": \"The merchant hid an oil-soaked ember wick inside the dragon to burn the guildhall and expose the buried gold beneath it.\",\n  \"cast\": [\n    {\n      \"id\": \"p1\",\n      \"label\": \"Guildhall baker\",\n      \"want\": \"Keep her bakehouse standing as her home.\"\n    },\n    {\n      \"id\": \"c72\",\n      \"label\": \"Shrewd serious merchant\",\n      \"want\": \"Recover the buried gold to settle his debts and save his trade.\"\n    },\n    {\n      \"id\": \"p2\",\n      \"label\": \"Forest trapper\",\n      \"want\": \"Keep the cellar passage open to defend the bakehouse.\"\n    }\n  ],\n  \"episodes\": [\n    {\n      \"n\": 1,\n      \"type\": \"fight\",\n      \"title\": \"The Stonegill Road\",\n      \"job\": \"Drive the merchant's scouts from the Stonegill road.\",\n      \"people\": [\"p1\", \"c72\"],\n      \"trouble\": {\n        \"who\": \"merchant's armed scouts\",\n        \"carry\": \"spears and torches\",\n        \"will\": \"bar the road to Harrowford\"\n      },\n      \"win\": \"The scouts are driven off the Stonegill road.\",\n      \"opens\": \"Where has the merchant hidden oil for his next strike?\"\n    },\n    {\n      \"n\": 2,\n      \"type\": \"find\",\n      \"title\": \"The Hidden Oil\",\n      \"job\": \"Find the merchant's oil store in Woldshaw.\",\n      \"people\": [\"p2\"],\n      \"trouble\": {\n        \"who\": \"armed store guards\",\n        \"carry\": \"knives and bows\",\n        \"will\": \"burn the oil before you reach it\"\n      },\n      \"win\": \"The hidden oil store in Woldshaw is found.\",\n      \"opens\": \"Which home is marked for the oil?\"\n    },\n    {\n      \"n\": 3,\n      \"type\": \"guard\",\n      \"title\": \"The Bakehouse Cellar\",\n      \"job\": \"Hold Lariane's bakehouse cellar in Harrowford.\",\n      \"people\": [\"p1\", \"p2\"],\n      \"trouble\": {\n        \"who\": \"merchant's armed sappers\",\n        \"carry\": \"axes and shields\",\n        \"will\": \"break into the cellar\"\n      },\n      \"win\": \"The attack on the bakehouse is beaten back.\",\n      \"opens\": \"What does the merchant hope to reach beneath the bakehouse?\"\n    }\n  ],\n  \"showdown\": {\n    \"title\": \"The Dragon's Ember\",\n    \"job\": \"Hold Lariane's bakehouse cellar in Harrowford against the merchant's final assault.\",\n    \"people\": [\"p1\", \"p2\", \"c72\"],\n    \"trouble\": {\n      \"who\": \"the merchant and armed guards\",\n      \"carry\": \"spears and firepots\",\n      \"will\": \"break through to the buried gold\"\n    },\n    \"settles\": \"Lariane keeps her bakehouse standing as her home.\",\n    \"lose\": \"Lariane's bakehouse, burned beyond repair\"\n  },\n  \"options\": [\n    {\n      \"way\": \"gold\",\n      \"label\": \"Take the merchant's treasure.\"\n    },\n    {\n      \"way\": \"captive\",\n      \"label\": \"Capture the merchant and lock him in the fort cells.\"\n    },\n    {\n      \"way\": \"recruit\",\n      \"label\": \"Invite the merchant to join the company.\"\n    }\n  ],\n  \"pitch\": \"Lariane asks you to save the bakehouse where she sleeps. A paper dragon burned the guildhall beside it, and now the merchant's armed scouts are closing the Stonegill road. You must drive them off before they reach Harrowford; if you fail, Lariane loses her home. In the ash, a black wick curls from a dragon's tin eye.\"\n}",
+   "json": {
+    "title": "Ash Under Harrowford",
+    "question": "What truly set the paper dragon alight at the lantern festival?",
+    "answer": "The merchant hid an oil-soaked ember wick inside the dragon to burn the guildhall and expose the buried gold beneath it.",
+    "cast": [
+     {
+      "id": "p1",
+      "label": "Guildhall baker",
+      "want": "Keep her bakehouse standing as her home."
+     },
+     {
+      "id": "c72",
+      "label": "Shrewd serious merchant",
+      "want": "Recover the buried gold to settle his debts and save his trade."
+     },
+     {
+      "id": "p2",
+      "label": "Forest trapper",
+      "want": "Keep the cellar passage open to defend the bakehouse."
+     }
+    ],
+    "episodes": [
+     {
+      "n": 1,
+      "type": "fight",
+      "title": "The Stonegill Road",
+      "job": "Drive the merchant's scouts from the Stonegill road.",
+      "people": [
+       "p1",
+       "c72"
+      ],
+      "trouble": {
+       "who": "merchant's armed scouts",
+       "carry": "spears and torches",
+       "will": "bar the road to Harrowford"
+      },
+      "win": "The scouts are driven off the Stonegill road.",
+      "opens": "Where has the merchant hidden oil for his next strike?"
+     },
+     {
+      "n": 2,
+      "type": "find",
+      "title": "The Hidden Oil",
+      "job": "Find the merchant's oil store in Woldshaw.",
+      "people": [
+       "p2"
+      ],
+      "trouble": {
+       "who": "armed store guards",
+       "carry": "knives and bows",
+       "will": "burn the oil before you reach it"
+      },
+      "win": "The hidden oil store in Woldshaw is found.",
+      "opens": "Which home is marked for the oil?"
+     },
+     {
+      "n": 3,
+      "type": "guard",
+      "title": "The Bakehouse Cellar",
+      "job": "Hold Lariane's bakehouse cellar in Harrowford.",
+      "people": [
+       "p1",
+       "p2"
+      ],
+      "trouble": {
+       "who": "merchant's armed sappers",
+       "carry": "axes and shields",
+       "will": "break into the cellar"
+      },
+      "win": "The attack on the bakehouse is beaten back.",
+      "opens": "What does the merchant hope to reach beneath the bakehouse?"
+     }
+    ],
+    "showdown": {
+     "title": "The Dragon's Ember",
+     "job": "Hold Lariane's bakehouse cellar in Harrowford against the merchant's final assault.",
+     "people": [
+      "p1",
+      "p2",
+      "c72"
+     ],
+     "trouble": {
+      "who": "the merchant and armed guards",
+      "carry": "spears and firepots",
+      "will": "break through to the buried gold"
+     },
+     "settles": "Lariane keeps her bakehouse standing as her home.",
+     "lose": "Lariane's bakehouse, burned beyond repair"
+    },
+    "options": [
+     {
+      "way": "gold",
+      "label": "Take the merchant's treasure."
+     },
+     {
+      "way": "captive",
+      "label": "Capture the merchant and lock him in the fort cells."
+     },
+     {
+      "way": "recruit",
+      "label": "Invite the merchant to join the company."
+     }
+    ],
+    "pitch": "Lariane asks you to save the bakehouse where she sleeps. A paper dragon burned the guildhall beside it, and now the merchant's armed scouts are closing the Stonegill road. You must drive them off before they reach Harrowford; if you fail, Lariane loses her home. In the ash, a black wick curls from a dragon's tin eye."
+   },
+   "ms": 78879,
+   "in": 1247,
+   "out": 7789,
+   "think": 6834,
+   "cost": 0.0040192,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F1_1/0": {
@@ -934,6 +1260,116 @@
    "cost": 0.03058,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\n  \"title\": \"The Shifting Stone\",\n  \"question\": \"Who has been moving the boundary stone toward Endolale's home?\",\n  \"answer\": \"The goatherd has shifted the stone west each winter to keep her goats' spring pasture within her master's claim.\",\n  \"cast\": [\n    {\n      \"id\": \"p1\",\n      \"label\": \"Woman woodcutter\",\n      \"want\": \"Keep Endolale's home and woodlot.\"\n    },\n    {\n      \"id\": \"c12\",\n      \"label\": \"Thin hunter\",\n      \"want\": \"Restore his family's old hunting ground.\"\n    },\n    {\n      \"id\": \"p2\",\n      \"label\": \"Woman goatherd\",\n      \"want\": \"Keep a spring pasture for her goats.\"\n    }\n  ],\n  \"episodes\": [\n    {\n      \"n\": 1,\n      \"title\": \"The Hawmere Stand\",\n      \"job\": \"Hold Endolale's woodlot against an attack at Hawmere.\",\n      \"people\": [\"p1\", \"c12\"],\n      \"trouble\": {\n        \"who\": \"c12's hunters\",\n        \"carry\": \"bows and hatchets\",\n        \"will\": \"drive Endolale from her woodlot\"\n      },\n      \"win\": \"The hunters are beaten back, and Endolale keeps her home for now.\",\n      \"opens\": \"Who has been moving the boundary stone toward Endolale's home?\"\n    },\n    {\n      \"n\": 2,\n      \"title\": \"Tracks at Ferngarth\",\n      \"job\": \"Chase the goatherd down at Ferngarth.\",\n      \"people\": [\"p2\"],\n      \"trouble\": {\n        \"who\": \"c12's armed riders\",\n        \"carry\": \"spears and bows\",\n        \"will\": \"cut off the chase and carry the goatherd away\"\n      },\n      \"win\": \"The goatherd is caught before c12's riders can take her.\",\n      \"opens\": \"Can the captured goatherd be won over to Endolale's side?\"\n    },\n    {\n      \"n\": 3,\n      \"title\": \"A Side to Take\",\n      \"job\": \"Win the goatherd over to Endolale's side at Bramcombe.\",\n      \"people\": [\"p1\", \"p2\"],\n      \"trouble\": {\n        \"who\": \"c12's armed guards\",\n        \"carry\": \"clubs and hunting knives\",\n        \"will\": \"stop the goatherd from speaking against their master\"\n      },\n      \"win\": \"The goatherd takes Endolale's side and agrees to face c12 at the boundary.\",\n      \"opens\": \"What will the boundary stone reveal when they confront c12?\"\n    }\n  ],\n  \"showdown\": {\n    \"title\": \"The Old Boundary\",\n    \"job\": \"Confront the hunter over the boundary stone at Hawmere.\",\n    \"people\": [\"p1\", \"c12\", \"p2\"],\n    \"trouble\": {\n      \"who\": \"c12's hunters\",\n      \"carry\": \"bows and axes\",\n      \"will\": \"hold the stone and force Endolale from her home\"\n    },\n    \"settles\": \"The old boundary is restored, and Endolale's home and woodlot remain on her side.\",\n    \"lose\": \"Endolale's home\"\n  },\n  \"options\": [\n    {\n      \"way\": \"captive\",\n      \"label\": \"Capture him and leave him in the company's cells.\"\n    },\n    {\n      \"way\": \"recruit\",\n      \"label\": \"Recruit him into the company.\"\n    },\n    {\n      \"way\": \"gold\",\n      \"label\": \"Take his treasure for the company.\"\n    }\n  ]\n}",
+   "json": {
+    "title": "The Shifting Stone",
+    "question": "Who has been moving the boundary stone toward Endolale's home?",
+    "answer": "The goatherd has shifted the stone west each winter to keep her goats' spring pasture within her master's claim.",
+    "cast": [
+     {
+      "id": "p1",
+      "label": "Woman woodcutter",
+      "want": "Keep Endolale's home and woodlot."
+     },
+     {
+      "id": "c12",
+      "label": "Thin hunter",
+      "want": "Restore his family's old hunting ground."
+     },
+     {
+      "id": "p2",
+      "label": "Woman goatherd",
+      "want": "Keep a spring pasture for her goats."
+     }
+    ],
+    "episodes": [
+     {
+      "n": 1,
+      "title": "The Hawmere Stand",
+      "job": "Hold Endolale's woodlot against an attack at Hawmere.",
+      "people": [
+       "p1",
+       "c12"
+      ],
+      "trouble": {
+       "who": "c12's hunters",
+       "carry": "bows and hatchets",
+       "will": "drive Endolale from her woodlot"
+      },
+      "win": "The hunters are beaten back, and Endolale keeps her home for now.",
+      "opens": "Who has been moving the boundary stone toward Endolale's home?"
+     },
+     {
+      "n": 2,
+      "title": "Tracks at Ferngarth",
+      "job": "Chase the goatherd down at Ferngarth.",
+      "people": [
+       "p2"
+      ],
+      "trouble": {
+       "who": "c12's armed riders",
+       "carry": "spears and bows",
+       "will": "cut off the chase and carry the goatherd away"
+      },
+      "win": "The goatherd is caught before c12's riders can take her.",
+      "opens": "Can the captured goatherd be won over to Endolale's side?"
+     },
+     {
+      "n": 3,
+      "title": "A Side to Take",
+      "job": "Win the goatherd over to Endolale's side at Bramcombe.",
+      "people": [
+       "p1",
+       "p2"
+      ],
+      "trouble": {
+       "who": "c12's armed guards",
+       "carry": "clubs and hunting knives",
+       "will": "stop the goatherd from speaking against their master"
+      },
+      "win": "The goatherd takes Endolale's side and agrees to face c12 at the boundary.",
+      "opens": "What will the boundary stone reveal when they confront c12?"
+     }
+    ],
+    "showdown": {
+     "title": "The Old Boundary",
+     "job": "Confront the hunter over the boundary stone at Hawmere.",
+     "people": [
+      "p1",
+      "c12",
+      "p2"
+     ],
+     "trouble": {
+      "who": "c12's hunters",
+      "carry": "bows and axes",
+      "will": "hold the stone and force Endolale from her home"
+     },
+     "settles": "The old boundary is restored, and Endolale's home and woodlot remain on her side.",
+     "lose": "Endolale's home"
+    },
+    "options": [
+     {
+      "way": "captive",
+      "label": "Capture him and leave him in the company's cells."
+     },
+     {
+      "way": "recruit",
+      "label": "Recruit him into the company."
+     },
+     {
+      "way": "gold",
+      "label": "Take his treasure for the company."
+     }
+    ]
+   },
+   "ms": 47230,
+   "in": 1035,
+   "out": 4432,
+   "think": 3583,
+   "cost": 0.0023195,
+   "model": "gpt-6-luna"
   }
  },
  "L_labels_pitch/F1_1/0": {
@@ -1179,6 +1615,121 @@
    "cost": 0.0343856,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\n  \"title\": \"The Shifting Stone\",\n  \"question\": \"What is the hunter trying to reach by edging the boundary toward Endolale's house?\",\n  \"answer\": \"The hunter buried his hoard beneath Endolale's hearth before her house was built.\",\n  \"cast\": [\n    {\n      \"id\": \"p1\",\n      \"label\": \"quiet woman woodcutter\",\n      \"want\": \"To keep her house and woodlot on her side of the old boundary.\"\n    },\n    {\n      \"id\": \"c12\",\n      \"label\": \"thin human hunter\",\n      \"want\": \"To claim the patch of ground beside Endolale's house.\"\n    },\n    {\n      \"id\": \"p2\",\n      \"label\": \"wary woman goatherd\",\n      \"want\": \"To keep the old goat track open for her herd.\"\n    }\n  ],\n  \"episodes\": [\n    {\n      \"n\": 1,\n      \"type\": \"fight\",\n      \"title\": \"The Old Stone\",\n      \"job\": \"Drive the hunter from the boundary stone at Bramcombe.\",\n      \"people\": [\"p1\", \"c12\"],\n      \"trouble\": {\n        \"who\": \"the hunter\",\n        \"carry\": \"bow and knife\",\n        \"will\": \"drive Endolale from the stone\"\n      },\n      \"win\": \"The hunter is driven off the stone.\",\n      \"opens\": \"Where does he go when driven from the boundary?\"\n    },\n    {\n      \"n\": 2,\n      \"type\": \"find\",\n      \"title\": \"The Hidden Cache\",\n      \"job\": \"Find the hunter's hidden map cache at Ferngarth.\",\n      \"people\": [\"p1\", \"p2\"],\n      \"trouble\": {\n        \"who\": \"armed warders\",\n        \"carry\": \"bows and spears\",\n        \"will\": \"keep the company from the cache\"\n      },\n      \"win\": \"The hunter's hidden map cache is found.\",\n      \"opens\": \"What does the map's final mark point to?\"\n    },\n    {\n      \"n\": 3,\n      \"type\": \"sneak\",\n      \"title\": \"The Last Mark\",\n      \"job\": \"Take the map from the cache unseen at Ferngarth.\",\n      \"people\": [\"p1\", \"p2\"],\n      \"trouble\": {\n        \"who\": \"armed warders\",\n        \"carry\": \"bows and spears\",\n        \"will\": \"watch the cache\"\n      },\n      \"win\": \"The map is taken unseen.\",\n      \"opens\": \"What lies beneath the hearth marked on the map?\"\n    }\n  ],\n  \"showdown\": {\n    \"title\": \"The Hearth\",\n    \"job\": \"Stop the hunter from claiming Endolale's house at Bramcombe.\",\n    \"people\": [\"p1\", \"p2\", \"c12\"],\n    \"trouble\": {\n      \"who\": \"the hunter\",\n      \"carry\": \"bow and knife\",\n      \"will\": \"force Endolale from her house\"\n    },\n    \"settles\": \"The boundary is restored to its old line, leaving Endolale's house safely in her woodlot.\",\n    \"lose\": \"Endolale's house is burned and lost\"\n  },\n  \"options\": [\n    {\n      \"way\": \"captive\",\n      \"label\": \"Lock the hunter in the company's cells\"\n    },\n    {\n      \"way\": \"recruit\",\n      \"label\": \"Offer the hunter a place in the company\"\n    },\n    {\n      \"way\": \"gold\",\n      \"label\": \"Take the hunter's hoard\"\n    }\n  ],\n  \"pitch\": \"A plea from Endolale Dawnsinger reaches your fort: a thin hunter has edged the boundary stone toward her house at Bramcombe, year by year. Your first job is to drive him from the stone, but he waits there with bow and knife. If you fail, her house is lost. A fresh notch on the stone points straight at her hearth.\"\n}",
+   "json": {
+    "title": "The Shifting Stone",
+    "question": "What is the hunter trying to reach by edging the boundary toward Endolale's house?",
+    "answer": "The hunter buried his hoard beneath Endolale's hearth before her house was built.",
+    "cast": [
+     {
+      "id": "p1",
+      "label": "quiet woman woodcutter",
+      "want": "To keep her house and woodlot on her side of the old boundary."
+     },
+     {
+      "id": "c12",
+      "label": "thin human hunter",
+      "want": "To claim the patch of ground beside Endolale's house."
+     },
+     {
+      "id": "p2",
+      "label": "wary woman goatherd",
+      "want": "To keep the old goat track open for her herd."
+     }
+    ],
+    "episodes": [
+     {
+      "n": 1,
+      "type": "fight",
+      "title": "The Old Stone",
+      "job": "Drive the hunter from the boundary stone at Bramcombe.",
+      "people": [
+       "p1",
+       "c12"
+      ],
+      "trouble": {
+       "who": "the hunter",
+       "carry": "bow and knife",
+       "will": "drive Endolale from the stone"
+      },
+      "win": "The hunter is driven off the stone.",
+      "opens": "Where does he go when driven from the boundary?"
+     },
+     {
+      "n": 2,
+      "type": "find",
+      "title": "The Hidden Cache",
+      "job": "Find the hunter's hidden map cache at Ferngarth.",
+      "people": [
+       "p1",
+       "p2"
+      ],
+      "trouble": {
+       "who": "armed warders",
+       "carry": "bows and spears",
+       "will": "keep the company from the cache"
+      },
+      "win": "The hunter's hidden map cache is found.",
+      "opens": "What does the map's final mark point to?"
+     },
+     {
+      "n": 3,
+      "type": "sneak",
+      "title": "The Last Mark",
+      "job": "Take the map from the cache unseen at Ferngarth.",
+      "people": [
+       "p1",
+       "p2"
+      ],
+      "trouble": {
+       "who": "armed warders",
+       "carry": "bows and spears",
+       "will": "watch the cache"
+      },
+      "win": "The map is taken unseen.",
+      "opens": "What lies beneath the hearth marked on the map?"
+     }
+    ],
+    "showdown": {
+     "title": "The Hearth",
+     "job": "Stop the hunter from claiming Endolale's house at Bramcombe.",
+     "people": [
+      "p1",
+      "p2",
+      "c12"
+     ],
+     "trouble": {
+      "who": "the hunter",
+      "carry": "bow and knife",
+      "will": "force Endolale from her house"
+     },
+     "settles": "The boundary is restored to its old line, leaving Endolale's house safely in her woodlot.",
+     "lose": "Endolale's house is burned and lost"
+    },
+    "options": [
+     {
+      "way": "captive",
+      "label": "Lock the hunter in the company's cells"
+     },
+     {
+      "way": "recruit",
+      "label": "Offer the hunter a place in the company"
+     },
+     {
+      "way": "gold",
+      "label": "Take the hunter's hoard"
+     }
+    ],
+    "pitch": "A plea from Endolale Dawnsinger reaches your fort: a thin hunter has edged the boundary stone toward her house at Bramcombe, year by year. Your first job is to drive him from the stone, but he waits there with bow and knife. If you fail, her house is lost. A fresh notch on the stone points straight at her hearth."
+   },
+   "ms": 59575,
+   "in": 1233,
+   "out": 6545,
+   "think": 5623,
+   "cost": 0.0033958,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_pitch/F6_3/0": {
@@ -1423,6 +1974,120 @@
    "cost": 0.040148399999999994,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\n  \"title\": \"The Answering Song\",\n  \"question\": \"What answers the matriarch's funeral song from Woldshaw's burial grove?\",\n  \"answer\": \"A bronze bird buried with the matriarch repeats the song when wind runs through a root tunnel beneath Lariane's cellar.\",\n  \"cast\": [\n    {\n      \"id\": \"p1\",\n      \"label\": \"grieving village baker\",\n      \"want\": \"Keep her bakehouse as her home.\"\n    },\n    {\n      \"id\": \"c72\",\n      \"label\": \"strained human merchant\",\n      \"want\": \"Find the matriarch's gold to keep his failing trade alive.\"\n    },\n    {\n      \"id\": \"p2\",\n      \"label\": \"quiet woods trapper\",\n      \"want\": \"Keep his traplines open.\"\n    }\n  ],\n  \"episodes\": [\n    {\n      \"n\": 1,\n      \"title\": \"Take the Trapper's Side\",\n      \"job\": \"Win the trapper over to Lariane's defense at Harrowford.\",\n      \"people\": [\"p1\", \"p2\", \"c72\"],\n      \"trouble\": {\n        \"who\": \"the merchant\",\n        \"carry\": \"a drawn sword\",\n        \"will\": \"threaten the trapper into silence\"\n      },\n      \"win\": \"The trapper takes Lariane's side and agrees to defend her bakehouse.\",\n      \"opens\": \"When will the merchant strike the bakehouse again?\"\n    },\n    {\n      \"n\": 2,\n      \"title\": \"Hold the Bakehouse\",\n      \"job\": \"Hold Lariane's bakehouse against the attack at Harrowford.\",\n      \"people\": [\"p1\", \"p2\", \"c72\"],\n      \"trouble\": {\n        \"who\": \"the merchant's guards\",\n        \"carry\": \"bows and axes\",\n        \"will\": \"force their way into the cellar\"\n      },\n      \"win\": \"The defenders beat back the attack, and the guards flee.\",\n      \"opens\": \"Which road has the merchant taken toward Stonegill?\"\n    },\n    {\n      \"n\": 3,\n      \"title\": \"Catch the Merchant\",\n      \"job\": \"Catch the merchant at Stonegill.\",\n      \"people\": [\"p2\", \"c72\"],\n      \"trouble\": {\n        \"who\": \"the merchant's guards\",\n        \"carry\": \"crossbows\",\n        \"will\": \"cover the merchant's escape\"\n      },\n      \"win\": \"The merchant is caught with his map to Woldshaw.\",\n      \"opens\": \"What is answering the funeral song beneath Woldshaw's graves?\"\n    }\n  ],\n  \"showdown\": {\n    \"title\": \"The Song Beneath the Roots\",\n    \"job\": \"Uncover the song's source and the merchant's gold at Woldshaw's burial grove.\",\n    \"people\": [\"p1\", \"p2\", \"c72\"],\n    \"trouble\": {\n      \"who\": \"the merchant's guards\",\n      \"carry\": \"swords and bows\",\n      \"will\": \"keep the company from the grave mound\"\n    },\n    \"settles\": \"Lariane's bakehouse is secured as her home when the root tunnel is sealed.\",\n    \"lose\": \"Lariane's burned bakehouse\"\n  },\n  \"options\": [\n    {\n      \"way\": \"gold\",\n      \"label\": \"Take his gold and leave the merchant free.\"\n    },\n    {\n      \"way\": \"captive\",\n      \"label\": \"Deliver the merchant to the fort's cells.\"\n    },\n    {\n      \"way\": \"recruit\",\n      \"label\": \"Offer the merchant a place in the company.\"\n    }\n  ],\n  \"pitch\": \"A plea from Lariane reaches your fort: the merchant's armed men have driven her from her Harrowford bakehouse. You must win the trapper over before they break into its cellar. The merchant stands in the doorway with a drawn sword, threatening him. If you fail, Lariane loses her only home to fire. From Woldshaw, a second voice answers the matriarch's funeral song.\"\n}",
+   "json": {
+    "title": "The Answering Song",
+    "question": "What answers the matriarch's funeral song from Woldshaw's burial grove?",
+    "answer": "A bronze bird buried with the matriarch repeats the song when wind runs through a root tunnel beneath Lariane's cellar.",
+    "cast": [
+     {
+      "id": "p1",
+      "label": "grieving village baker",
+      "want": "Keep her bakehouse as her home."
+     },
+     {
+      "id": "c72",
+      "label": "strained human merchant",
+      "want": "Find the matriarch's gold to keep his failing trade alive."
+     },
+     {
+      "id": "p2",
+      "label": "quiet woods trapper",
+      "want": "Keep his traplines open."
+     }
+    ],
+    "episodes": [
+     {
+      "n": 1,
+      "title": "Take the Trapper's Side",
+      "job": "Win the trapper over to Lariane's defense at Harrowford.",
+      "people": [
+       "p1",
+       "p2",
+       "c72"
+      ],
+      "trouble": {
+       "who": "the merchant",
+       "carry": "a drawn sword",
+       "will": "threaten the trapper into silence"
+      },
+      "win": "The trapper takes Lariane's side and agrees to defend her bakehouse.",
+      "opens": "When will the merchant strike the bakehouse again?"
+     },
+     {
+      "n": 2,
+      "title": "Hold the Bakehouse",
+      "job": "Hold Lariane's bakehouse against the attack at Harrowford.",
+      "people": [
+       "p1",
+       "p2",
+       "c72"
+      ],
+      "trouble": {
+       "who": "the merchant's guards",
+       "carry": "bows and axes",
+       "will": "force their way into the cellar"
+      },
+      "win": "The defenders beat back the attack, and the guards flee.",
+      "opens": "Which road has the merchant taken toward Stonegill?"
+     },
+     {
+      "n": 3,
+      "title": "Catch the Merchant",
+      "job": "Catch the merchant at Stonegill.",
+      "people": [
+       "p2",
+       "c72"
+      ],
+      "trouble": {
+       "who": "the merchant's guards",
+       "carry": "crossbows",
+       "will": "cover the merchant's escape"
+      },
+      "win": "The merchant is caught with his map to Woldshaw.",
+      "opens": "What is answering the funeral song beneath Woldshaw's graves?"
+     }
+    ],
+    "showdown": {
+     "title": "The Song Beneath the Roots",
+     "job": "Uncover the song's source and the merchant's gold at Woldshaw's burial grove.",
+     "people": [
+      "p1",
+      "p2",
+      "c72"
+     ],
+     "trouble": {
+      "who": "the merchant's guards",
+      "carry": "swords and bows",
+      "will": "keep the company from the grave mound"
+     },
+     "settles": "Lariane's bakehouse is secured as her home when the root tunnel is sealed.",
+     "lose": "Lariane's burned bakehouse"
+    },
+    "options": [
+     {
+      "way": "gold",
+      "label": "Take his gold and leave the merchant free."
+     },
+     {
+      "way": "captive",
+      "label": "Deliver the merchant to the fort's cells."
+     },
+     {
+      "way": "recruit",
+      "label": "Offer the merchant a place in the company."
+     }
+    ],
+    "pitch": "A plea from Lariane reaches your fort: the merchant's armed men have driven her from her Harrowford bakehouse. You must win the trapper over before they break into its cellar. The merchant stands in the doorway with a drawn sword, threatening him. If you fail, Lariane loses her only home to fire. From Woldshaw, a second voice answers the matriarch's funeral song."
+   },
+   "ms": 79689,
+   "in": 1115,
+   "out": 8241,
+   "think": 7266,
+   "cost": 0.004232,
+   "model": "gpt-6-luna"
   }
  },
  "H_labels_pitch/F1_1/0": {
@@ -1668,6 +2333,123 @@
    "cost": 0.0341798,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\n  \"title\": \"The Wandering Stone\",\n  \"question\": \"What has been making the border stone creep toward Endolale's house?\",\n  \"answer\": \"A buried spring beneath the marker at Hawmere has been washing soil from its uphill side and sliding the stone toward Endolale's house.\",\n  \"cast\": [\n    {\n      \"id\": \"p1\",\n      \"label\": \"tired woodcutter\",\n      \"want\": \"Keep her house and woodlot.\"\n    },\n    {\n      \"id\": \"c12\",\n      \"label\": \"thin hunter\",\n      \"want\": \"Have a dry roof for the coming winter.\"\n    },\n    {\n      \"id\": \"p2\",\n      \"label\": \"quiet goatherd\",\n      \"want\": \"Keep her goats on the green slope below Hawmere.\"\n    }\n  ],\n  \"episodes\": [\n    {\n      \"n\": 1,\n      \"type\": \"fight\",\n      \"title\": \"At Her Door\",\n      \"job\": \"Drive the hunter and goatherd from Endolale's home at Bramcombe.\",\n      \"people\": [\"p1\", \"c12\", \"p2\"],\n      \"trouble\": {\n        \"who\": \"the hunter and goatherd\",\n        \"carry\": \"bow and sling\",\n        \"will\": \"drive Endolale from her home\"\n      },\n      \"win\": \"The hunter and goatherd are driven from her threshold.\",\n      \"opens\": \"Where did the border stone stand before it crept onto Endolale's woodlot?\"\n    },\n    {\n      \"n\": 2,\n      \"type\": \"find\",\n      \"title\": \"The Old Socket\",\n      \"job\": \"Find the marker's first socket beneath the roots at Ferngarth.\",\n      \"people\": [\"p1\", \"p2\"],\n      \"trouble\": {\n        \"who\": \"the goatherd\",\n        \"carry\": \"sling and staff\",\n        \"will\": \"keep you from the old socket\"\n      },\n      \"win\": \"The marker's first socket is found beneath the roots.\",\n      \"opens\": \"Where does the stone rest now?\"\n    },\n    {\n      \"n\": 3,\n      \"type\": \"find\",\n      \"title\": \"The New Resting Place\",\n      \"job\": \"Find the marker at Hawmere.\",\n      \"people\": [\"p1\", \"c12\", \"p2\"],\n      \"trouble\": {\n        \"who\": \"the hunter and goatherd\",\n        \"carry\": \"bow and sling\",\n        \"will\": \"keep you from the marker\"\n      },\n      \"win\": \"The marker is found at Hawmere.\",\n      \"opens\": \"What keeps making the stone creep toward Endolale's home?\"\n    }\n  ],\n  \"showdown\": {\n    \"title\": \"Under the Stone\",\n    \"job\": \"Dig beneath the marker at Hawmere and end the hunter's claim.\",\n    \"people\": [\"p1\", \"c12\", \"p2\"],\n    \"trouble\": {\n      \"who\": \"the hunter and goatherd\",\n      \"carry\": \"silver bow and sling\",\n      \"will\": \"stop you digging beneath the marker\"\n    },\n    \"settles\": \"Endolale keeps her house, and the shifting marker gives the hunter no claim to it.\",\n    \"lose\": \"Endolale's house lost to the hunter\"\n  },\n  \"options\": [\n    {\n      \"way\": \"captive\",\n      \"label\": \"Keep the hunter in the company's cells\"\n    },\n    {\n      \"way\": \"recruit\",\n      \"label\": \"Bring the hunter into the company\"\n    },\n    {\n      \"way\": \"gold\",\n      \"label\": \"Take the hunter's silver-inlaid bow\"\n    }\n  ],\n  \"pitch\": \"Endolale Dawnsinger's house is in trouble: the border stone has crept across her woodlot, and the thin hunter now claims her roof for winter. You take your first job at Bramcombe, driving him and his goatherd ally from her threshold. Their bow and sling are raised. If you fail, Endolale loses her home. In the dusk, a fresh groove cuts the stone's base.\"\n}",
+   "json": {
+    "title": "The Wandering Stone",
+    "question": "What has been making the border stone creep toward Endolale's house?",
+    "answer": "A buried spring beneath the marker at Hawmere has been washing soil from its uphill side and sliding the stone toward Endolale's house.",
+    "cast": [
+     {
+      "id": "p1",
+      "label": "tired woodcutter",
+      "want": "Keep her house and woodlot."
+     },
+     {
+      "id": "c12",
+      "label": "thin hunter",
+      "want": "Have a dry roof for the coming winter."
+     },
+     {
+      "id": "p2",
+      "label": "quiet goatherd",
+      "want": "Keep her goats on the green slope below Hawmere."
+     }
+    ],
+    "episodes": [
+     {
+      "n": 1,
+      "type": "fight",
+      "title": "At Her Door",
+      "job": "Drive the hunter and goatherd from Endolale's home at Bramcombe.",
+      "people": [
+       "p1",
+       "c12",
+       "p2"
+      ],
+      "trouble": {
+       "who": "the hunter and goatherd",
+       "carry": "bow and sling",
+       "will": "drive Endolale from her home"
+      },
+      "win": "The hunter and goatherd are driven from her threshold.",
+      "opens": "Where did the border stone stand before it crept onto Endolale's woodlot?"
+     },
+     {
+      "n": 2,
+      "type": "find",
+      "title": "The Old Socket",
+      "job": "Find the marker's first socket beneath the roots at Ferngarth.",
+      "people": [
+       "p1",
+       "p2"
+      ],
+      "trouble": {
+       "who": "the goatherd",
+       "carry": "sling and staff",
+       "will": "keep you from the old socket"
+      },
+      "win": "The marker's first socket is found beneath the roots.",
+      "opens": "Where does the stone rest now?"
+     },
+     {
+      "n": 3,
+      "type": "find",
+      "title": "The New Resting Place",
+      "job": "Find the marker at Hawmere.",
+      "people": [
+       "p1",
+       "c12",
+       "p2"
+      ],
+      "trouble": {
+       "who": "the hunter and goatherd",
+       "carry": "bow and sling",
+       "will": "keep you from the marker"
+      },
+      "win": "The marker is found at Hawmere.",
+      "opens": "What keeps making the stone creep toward Endolale's home?"
+     }
+    ],
+    "showdown": {
+     "title": "Under the Stone",
+     "job": "Dig beneath the marker at Hawmere and end the hunter's claim.",
+     "people": [
+      "p1",
+      "c12",
+      "p2"
+     ],
+     "trouble": {
+      "who": "the hunter and goatherd",
+      "carry": "silver bow and sling",
+      "will": "stop you digging beneath the marker"
+     },
+     "settles": "Endolale keeps her house, and the shifting marker gives the hunter no claim to it.",
+     "lose": "Endolale's house lost to the hunter"
+    },
+    "options": [
+     {
+      "way": "captive",
+      "label": "Keep the hunter in the company's cells"
+     },
+     {
+      "way": "recruit",
+      "label": "Bring the hunter into the company"
+     },
+     {
+      "way": "gold",
+      "label": "Take the hunter's silver-inlaid bow"
+     }
+    ],
+    "pitch": "Endolale Dawnsinger's house is in trouble: the border stone has crept across her woodlot, and the thin hunter now claims her roof for winter. You take your first job at Bramcombe, driving him and his goatherd ally from her threshold. Their bow and sling are raised. If you fail, Endolale loses her home. In the dusk, a fresh groove cuts the stone's base."
+   },
+   "ms": 98280,
+   "in": 1255,
+   "out": 10151,
+   "think": 9140,
+   "cost": 0.005201,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F6_1/0": {
@@ -1904,6 +2686,120 @@
    "cost": 0.0143816,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\n  \"title\": \"Ash Below the Oven\",\n  \"question\": \"What lies hidden beneath the baker's oven?\",\n  \"answer\": \"A stone stair beneath the baker's oven leads to the old guildhall's buried gold.\",\n  \"cast\": [\n    {\n      \"id\": \"p1\",\n      \"label\": \"smoke-marked baker\",\n      \"want\": \"Keep her bakehouse as her home.\"\n    },\n    {\n      \"id\": \"c72\",\n      \"label\": \"grim road merchant\",\n      \"want\": \"Recover the guildhall's gold to pay his debts.\"\n    },\n    {\n      \"id\": \"p2\",\n      \"label\": \"wood-wise trapper\",\n      \"want\": \"Keep his forest traplines open.\"\n    }\n  ],\n  \"episodes\": [\n    {\n      \"n\": 1,\n      \"title\": \"The Trapper's Choice\",\n      \"job\": \"Win the trapper to the baker's side at Harrowford.\",\n      \"people\": [\"p1\", \"p2\", \"c72\"],\n      \"trouble\": {\n        \"who\": \"the merchant's guards\",\n        \"carry\": \"crossbows and firepots\",\n        \"will\": \"burn the bakehouse door\"\n      },\n      \"win\": \"The trapper takes the baker's side and helps defend her home.\",\n      \"opens\": \"The guards retreat toward Stonegill, where the merchant is gathering a larger force.\"\n    },\n    {\n      \"n\": 2,\n      \"title\": \"Hold the Ford\",\n      \"job\": \"Hold Stonegill's ford against the merchant's attack.\",\n      \"people\": [\"p1\", \"p2\", \"c72\"],\n      \"trouble\": {\n        \"who\": \"the merchant's hired guards\",\n        \"carry\": \"spears and shields\",\n        \"will\": \"force the ford and seize the storehouse\"\n      },\n      \"win\": \"The attack is beaten back, and the ford stays in the defenders' hands.\",\n      \"opens\": \"The merchant flees toward Woldshaw, leaving his plans behind at the ford.\"\n    },\n    {\n      \"n\": 3,\n      \"title\": \"The Merchant's Trail\",\n      \"job\": \"Chase the merchant down at Woldshaw.\",\n      \"people\": [\"p1\", \"p2\", \"c72\"],\n      \"trouble\": {\n        \"who\": \"the merchant's outriders\",\n        \"carry\": \"swords and hunting nets\",\n        \"will\": \"hold the road while the merchant escapes\"\n      },\n      \"win\": \"The merchant is caught before he can leave Woldshaw.\",\n      \"opens\": \"His plans end at the bakehouse oven, raising the question of what lies beneath it.\"\n    }\n  ],\n  \"showdown\": {\n    \"title\": \"Beneath the Oven\",\n    \"job\": \"Secure the hidden stair and decide the merchant's fate at the bakehouse in Harrowford.\",\n    \"people\": [\"p1\", \"p2\", \"c72\"],\n    \"trouble\": {\n      \"who\": \"the merchant's remaining guards\",\n      \"carry\": \"swords and firepots\",\n      \"will\": \"storm the bakehouse and get their master free\"\n    },\n    \"settles\": \"The bakehouse stands intact and remains the baker's home.\",\n    \"lose\": \"the baker's home\"\n  },\n  \"options\": [\n    {\n      \"way\": \"gold\",\n      \"label\": \"Seize the merchant's treasure\"\n    },\n    {\n      \"way\": \"captive\",\n      \"label\": \"Lock the merchant in the company's cells\"\n    },\n    {\n      \"way\": \"recruit\",\n      \"label\": \"Enlist the merchant in the company\"\n    }\n  ]\n}",
+   "json": {
+    "title": "Ash Below the Oven",
+    "question": "What lies hidden beneath the baker's oven?",
+    "answer": "A stone stair beneath the baker's oven leads to the old guildhall's buried gold.",
+    "cast": [
+     {
+      "id": "p1",
+      "label": "smoke-marked baker",
+      "want": "Keep her bakehouse as her home."
+     },
+     {
+      "id": "c72",
+      "label": "grim road merchant",
+      "want": "Recover the guildhall's gold to pay his debts."
+     },
+     {
+      "id": "p2",
+      "label": "wood-wise trapper",
+      "want": "Keep his forest traplines open."
+     }
+    ],
+    "episodes": [
+     {
+      "n": 1,
+      "title": "The Trapper's Choice",
+      "job": "Win the trapper to the baker's side at Harrowford.",
+      "people": [
+       "p1",
+       "p2",
+       "c72"
+      ],
+      "trouble": {
+       "who": "the merchant's guards",
+       "carry": "crossbows and firepots",
+       "will": "burn the bakehouse door"
+      },
+      "win": "The trapper takes the baker's side and helps defend her home.",
+      "opens": "The guards retreat toward Stonegill, where the merchant is gathering a larger force."
+     },
+     {
+      "n": 2,
+      "title": "Hold the Ford",
+      "job": "Hold Stonegill's ford against the merchant's attack.",
+      "people": [
+       "p1",
+       "p2",
+       "c72"
+      ],
+      "trouble": {
+       "who": "the merchant's hired guards",
+       "carry": "spears and shields",
+       "will": "force the ford and seize the storehouse"
+      },
+      "win": "The attack is beaten back, and the ford stays in the defenders' hands.",
+      "opens": "The merchant flees toward Woldshaw, leaving his plans behind at the ford."
+     },
+     {
+      "n": 3,
+      "title": "The Merchant's Trail",
+      "job": "Chase the merchant down at Woldshaw.",
+      "people": [
+       "p1",
+       "p2",
+       "c72"
+      ],
+      "trouble": {
+       "who": "the merchant's outriders",
+       "carry": "swords and hunting nets",
+       "will": "hold the road while the merchant escapes"
+      },
+      "win": "The merchant is caught before he can leave Woldshaw.",
+      "opens": "His plans end at the bakehouse oven, raising the question of what lies beneath it."
+     }
+    ],
+    "showdown": {
+     "title": "Beneath the Oven",
+     "job": "Secure the hidden stair and decide the merchant's fate at the bakehouse in Harrowford.",
+     "people": [
+      "p1",
+      "p2",
+      "c72"
+     ],
+     "trouble": {
+      "who": "the merchant's remaining guards",
+      "carry": "swords and firepots",
+      "will": "storm the bakehouse and get their master free"
+     },
+     "settles": "The bakehouse stands intact and remains the baker's home.",
+     "lose": "the baker's home"
+    },
+    "options": [
+     {
+      "way": "gold",
+      "label": "Seize the merchant's treasure"
+     },
+     {
+      "way": "captive",
+      "label": "Lock the merchant in the company's cells"
+     },
+     {
+      "way": "recruit",
+      "label": "Enlist the merchant in the company"
+     }
+    ]
+   },
+   "ms": 44388,
+   "in": 1027,
+   "out": 4622,
+   "think": 3774,
+   "cost": 0.0024137,
+   "model": "gpt-6-luna"
   }
  },
  "L_labels_pitch/F3_3/0": {
@@ -2087,6 +2983,88 @@
    "cost": 0.024921600000000002,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"title\":\"The Last Cat\",\"question\":\"What does the merchant plan to do with all the cats?\",\"answer\":\"He bought them to hunt rats in a grain loft and save seed he promised to sow for Whinstead's hungry households.\",\"cast\":[{\"id\":\"p1\",\"label\":\"woodland bird fowler\",\"want\":\"Get his trained cat back so he can keep earning his living.\"},{\"id\":\"c36\",\"label\":\"clumsy sociable merchant\",\"want\":\"Save the seed grain he promised to sow for Whinstead's hungry households.\"},{\"id\":\"p2\",\"label\":\"river crossing ferryman\",\"want\":\"Keep her ferry earning through the winter.\"}],\"episodes\":[{\"n\":1,\"type\":\"find\",\"title\":\"The Cat Ledger\",\"job\":\"Find the merchant's cat shipment records at Whinstead.\",\"people\":[\"p1\",\"c36\",\"p2\"],\"trouble\":{\"who\":\"the merchant's guards\",\"carry\":\"clubs and short spears\",\"will\":\"hold the records against intruders\"},\"win\":\"The cats' route to a grain loft in Ravencroft is found.\",\"opens\":\"What does the merchant plan to do with all the cats?\"}],\"showdown\":{\"title\":\"The Grain Loft\",\"job\":\"Confront the merchant at his grain loft in Ravencroft.\",\"people\":[\"p1\",\"c36\",\"p2\"],\"trouble\":{\"who\":\"the merchant's grain guards\",\"carry\":\"pikes and bows\",\"will\":\"bar the loft and keep the cats inside\"},\"settles\":\"Indure gets his trained cat back and can earn his living as a fowler.\",\"lose\":\"Indure's trained cat and fowling livelihood\"},\"options\":[{\"way\":\"gold\",\"label\":\"Seize his treasure to repay Indure's lost earnings\"},{\"way\":\"captive\",\"label\":\"Lock the merchant in the company's cells\"},{\"way\":\"recruit\",\"label\":\"Offer the merchant a place in the company\"}],\"pitch\":\"You meet Indure Palebough, a fowler whose trained cat a merchant bought with every other cat in Whinstead. Without it, Indure loses his livelihood. At Whinstead, find the merchant's shipment records; his armed guards stand in your way. A damp ledger page bears a pawprint beside the name Ravencroft.\"}",
+   "json": {
+    "title": "The Last Cat",
+    "question": "What does the merchant plan to do with all the cats?",
+    "answer": "He bought them to hunt rats in a grain loft and save seed he promised to sow for Whinstead's hungry households.",
+    "cast": [
+     {
+      "id": "p1",
+      "label": "woodland bird fowler",
+      "want": "Get his trained cat back so he can keep earning his living."
+     },
+     {
+      "id": "c36",
+      "label": "clumsy sociable merchant",
+      "want": "Save the seed grain he promised to sow for Whinstead's hungry households."
+     },
+     {
+      "id": "p2",
+      "label": "river crossing ferryman",
+      "want": "Keep her ferry earning through the winter."
+     }
+    ],
+    "episodes": [
+     {
+      "n": 1,
+      "type": "find",
+      "title": "The Cat Ledger",
+      "job": "Find the merchant's cat shipment records at Whinstead.",
+      "people": [
+       "p1",
+       "c36",
+       "p2"
+      ],
+      "trouble": {
+       "who": "the merchant's guards",
+       "carry": "clubs and short spears",
+       "will": "hold the records against intruders"
+      },
+      "win": "The cats' route to a grain loft in Ravencroft is found.",
+      "opens": "What does the merchant plan to do with all the cats?"
+     }
+    ],
+    "showdown": {
+     "title": "The Grain Loft",
+     "job": "Confront the merchant at his grain loft in Ravencroft.",
+     "people": [
+      "p1",
+      "c36",
+      "p2"
+     ],
+     "trouble": {
+      "who": "the merchant's grain guards",
+      "carry": "pikes and bows",
+      "will": "bar the loft and keep the cats inside"
+     },
+     "settles": "Indure gets his trained cat back and can earn his living as a fowler.",
+     "lose": "Indure's trained cat and fowling livelihood"
+    },
+    "options": [
+     {
+      "way": "gold",
+      "label": "Seize his treasure to repay Indure's lost earnings"
+     },
+     {
+      "way": "captive",
+      "label": "Lock the merchant in the company's cells"
+     },
+     {
+      "way": "recruit",
+      "label": "Offer the merchant a place in the company"
+     }
+    ],
+    "pitch": "You meet Indure Palebough, a fowler whose trained cat a merchant bought with every other cat in Whinstead. Without it, Indure loses his livelihood. At Whinstead, find the merchant's shipment records; his armed guards stand in your way. A damp ledger page bears a pawprint beside the name Ravencroft."
+   },
+   "ms": 48476,
+   "in": 1230,
+   "out": 5133,
+   "think": 4610,
+   "cost": 0.0026895,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_pitch/F7_1/0": {
@@ -2353,6 +3331,133 @@
    "cost": 0.0405204,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\n  \"title\": \"The Dead Man's Stock\",\n  \"question\": \"What does the sealed death notice prove about p2?\",\n  \"answer\": \"P2's signed notice says he saw Gaddan alive at the Birgill quay before reporting him dead.\",\n  \"cast\": [\n    {\n      \"id\": \"p1\",\n      \"label\": \"weathered man peddler\",\n      \"want\": \"to reclaim his peddling stock and earn his living again\"\n    },\n    {\n      \"id\": \"c84\",\n      \"label\": \"short hot-headed sailor\",\n      \"want\": \"to keep her boat provisioned through winter\"\n    },\n    {\n      \"id\": \"p2\",\n      \"label\": \"quiet man potter\",\n      \"want\": \"to keep his kiln, even if he confesses his false report\"\n    }\n  ],\n  \"episodes\": [\n    {\n      \"n\": 1,\n      \"title\": \"The Empty Store\",\n      \"job\": \"Find c84 and her hidden store at Duncroft.\",\n      \"people\": [\"p1\", \"c84\"],\n      \"trouble\": {\n        \"who\": \"armed store guards\",\n        \"carry\": \"clubs\",\n        \"will\": \"bar the store\"\n      },\n      \"win\": \"They find the empty store and a clay mark linking its crates to p2.\",\n      \"opens\": \"Can the potter be won over to reveal where c84 moved Gaddan's stock?\"\n    },\n    {\n      \"n\": 2,\n      \"title\": \"The Potter's Side\",\n      \"job\": \"Turn p2 to Gaddan's side at Marlmarch.\",\n      \"people\": [\"p2\"],\n      \"trouble\": {\n        \"who\": \"armed sailors\",\n        \"carry\": \"short knives\",\n        \"will\": \"silence p2\"\n      },\n      \"win\": \"P2 takes Gaddan's side and names c84's boathouse in Birgill.\",\n      \"opens\": \"Can the boathouse tally be stolen unseen?\"\n    },\n    {\n      \"n\": 3,\n      \"title\": \"The Hidden Tally\",\n      \"job\": \"Steal the cargo tally unseen from c84's boathouse at Birgill.\",\n      \"people\": [\"p1\", \"p2\"],\n      \"trouble\": {\n        \"who\": \"armed house guards\",\n        \"carry\": \"spears\",\n        \"will\": \"stop anyone entering\"\n      },\n      \"win\": \"They take the tally unseen; it places Gaddan's stock and a sealed death notice in the boathouse.\",\n      \"opens\": \"Can they drive off the guards and reach the sealed notice?\"\n    },\n    {\n      \"n\": 4,\n      \"title\": \"The Boathouse Guard\",\n      \"job\": \"Drive c84's guards from the boathouse at Birgill.\",\n      \"people\": [\"p1\", \"c84\"],\n      \"trouble\": {\n        \"who\": \"armed boat guards\",\n        \"carry\": \"hooks and axes\",\n        \"will\": \"hold the boathouse\"\n      },\n      \"win\": \"The guards are driven off, and the sealed notice is found beneath the floorboards.\",\n      \"opens\": \"What does the sealed notice prove about p2?\"\n    }\n  ],\n  \"showdown\": {\n    \"title\": \"The Sealed Notice\",\n    \"job\": \"Read the sealed notice and reclaim Gaddan's stock from c84 at Birgill.\",\n    \"people\": [\"p1\", \"c84\", \"p2\"],\n    \"trouble\": {\n      \"who\": \"c84's armed sailors\",\n      \"carry\": \"boarding axes\",\n      \"will\": \"keep Gaddan from his stock\"\n    },\n    \"settles\": \"Gaddan's peddling stock is returned to him.\",\n    \"lose\": \"Gaddan's peddling stock and livelihood\"\n  },\n  \"options\": [\n    {\n      \"way\": \"captive\",\n      \"label\": \"Take c84 alive to the fort's cells.\"\n    },\n    {\n      \"way\": \"recruit\",\n      \"label\": \"Recruit c84 as a sailor in the company.\"\n    },\n    {\n      \"way\": \"gold\",\n      \"label\": \"Seize c84's hidden silver hoard.\"\n    }\n  ],\n  \"pitch\": \"Gaddan's stock is held by c84, his former betrothed, now married to the man who reported him dead. That report left Gaddan with no goods to earn a living. You must find c84 at her hidden store in Duncroft; armed guards with clubs bar the way. If you fail, Gaddan loses his peddling stock for good. A clay seal at the store door bears p2's mark.\"\n}",
+   "json": {
+    "title": "The Dead Man's Stock",
+    "question": "What does the sealed death notice prove about p2?",
+    "answer": "P2's signed notice says he saw Gaddan alive at the Birgill quay before reporting him dead.",
+    "cast": [
+     {
+      "id": "p1",
+      "label": "weathered man peddler",
+      "want": "to reclaim his peddling stock and earn his living again"
+     },
+     {
+      "id": "c84",
+      "label": "short hot-headed sailor",
+      "want": "to keep her boat provisioned through winter"
+     },
+     {
+      "id": "p2",
+      "label": "quiet man potter",
+      "want": "to keep his kiln, even if he confesses his false report"
+     }
+    ],
+    "episodes": [
+     {
+      "n": 1,
+      "title": "The Empty Store",
+      "job": "Find c84 and her hidden store at Duncroft.",
+      "people": [
+       "p1",
+       "c84"
+      ],
+      "trouble": {
+       "who": "armed store guards",
+       "carry": "clubs",
+       "will": "bar the store"
+      },
+      "win": "They find the empty store and a clay mark linking its crates to p2.",
+      "opens": "Can the potter be won over to reveal where c84 moved Gaddan's stock?"
+     },
+     {
+      "n": 2,
+      "title": "The Potter's Side",
+      "job": "Turn p2 to Gaddan's side at Marlmarch.",
+      "people": [
+       "p2"
+      ],
+      "trouble": {
+       "who": "armed sailors",
+       "carry": "short knives",
+       "will": "silence p2"
+      },
+      "win": "P2 takes Gaddan's side and names c84's boathouse in Birgill.",
+      "opens": "Can the boathouse tally be stolen unseen?"
+     },
+     {
+      "n": 3,
+      "title": "The Hidden Tally",
+      "job": "Steal the cargo tally unseen from c84's boathouse at Birgill.",
+      "people": [
+       "p1",
+       "p2"
+      ],
+      "trouble": {
+       "who": "armed house guards",
+       "carry": "spears",
+       "will": "stop anyone entering"
+      },
+      "win": "They take the tally unseen; it places Gaddan's stock and a sealed death notice in the boathouse.",
+      "opens": "Can they drive off the guards and reach the sealed notice?"
+     },
+     {
+      "n": 4,
+      "title": "The Boathouse Guard",
+      "job": "Drive c84's guards from the boathouse at Birgill.",
+      "people": [
+       "p1",
+       "c84"
+      ],
+      "trouble": {
+       "who": "armed boat guards",
+       "carry": "hooks and axes",
+       "will": "hold the boathouse"
+      },
+      "win": "The guards are driven off, and the sealed notice is found beneath the floorboards.",
+      "opens": "What does the sealed notice prove about p2?"
+     }
+    ],
+    "showdown": {
+     "title": "The Sealed Notice",
+     "job": "Read the sealed notice and reclaim Gaddan's stock from c84 at Birgill.",
+     "people": [
+      "p1",
+      "c84",
+      "p2"
+     ],
+     "trouble": {
+      "who": "c84's armed sailors",
+      "carry": "boarding axes",
+      "will": "keep Gaddan from his stock"
+     },
+     "settles": "Gaddan's peddling stock is returned to him.",
+     "lose": "Gaddan's peddling stock and livelihood"
+    },
+    "options": [
+     {
+      "way": "captive",
+      "label": "Take c84 alive to the fort's cells."
+     },
+     {
+      "way": "recruit",
+      "label": "Recruit c84 as a sailor in the company."
+     },
+     {
+      "way": "gold",
+      "label": "Seize c84's hidden silver hoard."
+     }
+    ],
+    "pitch": "Gaddan's stock is held by c84, his former betrothed, now married to the man who reported him dead. That report left Gaddan with no goods to earn a living. You must find c84 at her hidden store in Duncroft; armed guards with clubs bar the way. If you fail, Gaddan loses his peddling stock for good. A clay seal at the store door bears p2's mark."
+   },
+   "ms": 111029,
+   "in": 1146,
+   "out": 11207,
+   "think": 10067,
+   "cost": 0.0057181,
+   "model": "gpt-6-luna"
   }
  },
  "H_labels_pitch/F5_1/0": {
@@ -2559,6 +3664,101 @@
    "cost": 0.04257199999999999,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\n  \"title\": \"The Funeral Writ\",\n  \"question\": \"What does the elven house mean to bury at Harrowbourne?\",\n  \"answer\": \"It burns the daughter-name it gave c60 when it adopted her, ending its claim on her.\",\n  \"cast\": [\n    {\n      \"id\": \"n1\",\n      \"label\": \"roadside merchant\",\n      \"want\": \"To put his betrothal token in c60's hands and let her choose.\"\n    },\n    {\n      \"id\": \"p1\",\n      \"label\": \"stern village reeve\",\n      \"want\": \"To keep Rushford's old road open for winter trade.\"\n    },\n    {\n      \"id\": \"c60\",\n      \"label\": \"quick human artisan\",\n      \"want\": \"To reach her wedding and choose whether to wear Laudus's token.\"\n    }\n  ],\n  \"episodes\": [\n    {\n      \"n\": 1,\n      \"type\": \"escort\",\n      \"title\": \"The Ford\",\n      \"job\": \"Escort c60 across the ford at Rushford.\",\n      \"people\": [\"n1\", \"p1\", \"c60\"],\n      \"trouble\": {\n        \"who\": \"reeve's spearmen\",\n        \"carry\": \"spears and bows\",\n        \"will\": \"bar the ford and seize c60\"\n      },\n      \"win\": \"c60 crosses the ford safely.\",\n      \"opens\": \"Why does the reeve risk open violence to keep her from the elven funeral?\"\n    },\n    {\n      \"n\": 2,\n      \"type\": \"find\",\n      \"title\": \"The Hidden Writ\",\n      \"job\": \"Find the hidden funeral writ in Ashhollow's tollhouse.\",\n      \"people\": [\"p1\", \"c60\"],\n      \"trouble\": {\n        \"who\": \"reeve's toll guards\",\n        \"carry\": \"spears and clubs\",\n        \"will\": \"drive intruders from the records loft\"\n      },\n      \"win\": \"The hidden writ is found in the tollhouse loft.\",\n      \"opens\": \"What does the elven house mean to bury at Harrowbourne?\"\n    }\n  ],\n  \"showdown\": {\n    \"title\": \"The Funeral Green\",\n    \"job\": \"Escort c60 through Harrowbourne's funeral green to the bier.\",\n    \"people\": [\"n1\", \"p1\", \"c60\"],\n    \"trouble\": {\n      \"who\": \"reeve's men\",\n      \"carry\": \"spears and bows\",\n      \"will\": \"seize c60 before she reaches the bier\"\n    },\n    \"settles\": \"At the bier, Laudus places the recovered token in c60's hand, keeping his promise to leave its meaning to her.\",\n    \"lose\": \"Laudus's betrothal token\"\n  },\n  \"options\": [\n    {\n      \"way\": \"recruit\",\n      \"label\": \"Welcome her into the company after the rite\"\n    },\n    {\n      \"way\": \"gold\",\n      \"label\": \"Accept her treasure share and let her go\"\n    }\n  ],\n  \"pitch\": \"You once won Laudus Fairweather's betrothal token back from Thornhollow raiders and returned it to him. Now his human bride-to-be, an artisan raised as an elven house's daughter, must reach her wedding at Harrowbourne. The house has prepared a funeral for her, and the reeve blocks the road, fearing reprisals that will close Rushford's trade. You escort her across Rushford's ford against his spearmen. If you fail, Laudus loses the token forever. A black mourning ribbon knots the token box.\"\n}",
+   "json": {
+    "title": "The Funeral Writ",
+    "question": "What does the elven house mean to bury at Harrowbourne?",
+    "answer": "It burns the daughter-name it gave c60 when it adopted her, ending its claim on her.",
+    "cast": [
+     {
+      "id": "n1",
+      "label": "roadside merchant",
+      "want": "To put his betrothal token in c60's hands and let her choose."
+     },
+     {
+      "id": "p1",
+      "label": "stern village reeve",
+      "want": "To keep Rushford's old road open for winter trade."
+     },
+     {
+      "id": "c60",
+      "label": "quick human artisan",
+      "want": "To reach her wedding and choose whether to wear Laudus's token."
+     }
+    ],
+    "episodes": [
+     {
+      "n": 1,
+      "type": "escort",
+      "title": "The Ford",
+      "job": "Escort c60 across the ford at Rushford.",
+      "people": [
+       "n1",
+       "p1",
+       "c60"
+      ],
+      "trouble": {
+       "who": "reeve's spearmen",
+       "carry": "spears and bows",
+       "will": "bar the ford and seize c60"
+      },
+      "win": "c60 crosses the ford safely.",
+      "opens": "Why does the reeve risk open violence to keep her from the elven funeral?"
+     },
+     {
+      "n": 2,
+      "type": "find",
+      "title": "The Hidden Writ",
+      "job": "Find the hidden funeral writ in Ashhollow's tollhouse.",
+      "people": [
+       "p1",
+       "c60"
+      ],
+      "trouble": {
+       "who": "reeve's toll guards",
+       "carry": "spears and clubs",
+       "will": "drive intruders from the records loft"
+      },
+      "win": "The hidden writ is found in the tollhouse loft.",
+      "opens": "What does the elven house mean to bury at Harrowbourne?"
+     }
+    ],
+    "showdown": {
+     "title": "The Funeral Green",
+     "job": "Escort c60 through Harrowbourne's funeral green to the bier.",
+     "people": [
+      "n1",
+      "p1",
+      "c60"
+     ],
+     "trouble": {
+      "who": "reeve's men",
+      "carry": "spears and bows",
+      "will": "seize c60 before she reaches the bier"
+     },
+     "settles": "At the bier, Laudus places the recovered token in c60's hand, keeping his promise to leave its meaning to her.",
+     "lose": "Laudus's betrothal token"
+    },
+    "options": [
+     {
+      "way": "recruit",
+      "label": "Welcome her into the company after the rite"
+     },
+     {
+      "way": "gold",
+      "label": "Accept her treasure share and let her go"
+     }
+    ],
+    "pitch": "You once won Laudus Fairweather's betrothal token back from Thornhollow raiders and returned it to him. Now his human bride-to-be, an artisan raised as an elven house's daughter, must reach her wedding at Harrowbourne. The house has prepared a funeral for her, and the reeve blocks the road, fearing reprisals that will close Rushford's trade. You escort her across Rushford's ford against his spearmen. If you fail, Laudus loses the token forever. A black mourning ribbon knots the token box."
+   },
+   "ms": 105780,
+   "in": 1310,
+   "out": 9589,
+   "think": 8706,
+   "cost": 0.0049255,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F4_1/0": {
@@ -2765,6 +3965,99 @@
    "cost": 0.028103600000000003,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\n  \"title\": \"The Broken Hook\",\n  \"question\": \"Who made the gallows hook fail after it left Gwinir's forge?\",\n  \"answer\": \"C48 filed the hook's locking notch after Gwinir sold it, saving the condemned survivor and framing the smith.\",\n  \"cast\": [\n    {\n      \"id\": \"p1\",\n      \"label\": \"worried smith\",\n      \"want\": \"Have his good name restored among the western smiths.\"\n    },\n    {\n      \"id\": \"c48\",\n      \"label\": \"short elf wanderer\",\n      \"want\": \"Keep the condemned survivor's refuge secret.\"\n    },\n    {\n      \"id\": \"p2\",\n      \"label\": \"tired healer\",\n      \"want\": \"Keep armed strangers away from the patients in their care.\"\n    }\n  ],\n  \"episodes\": [\n    {\n      \"n\": 1,\n      \"title\": \"A Side Taken\",\n      \"job\": \"Win C48 over at Yarcombe, where the hanged survivor claims the law has freed him.\",\n      \"people\": [\"p1\", \"c48\"],\n      \"trouble\": {\n        \"who\": \"armed bailiffs\",\n        \"carry\": \"clubs\",\n        \"will\": \"drag C48 away\"\n      },\n      \"win\": \"C48 takes Gwinir's side and agrees to help recover the missing gallows hook.\",\n      \"opens\": \"Where has C48 hidden the hook that let the survivor claim his freedom?\"\n    },\n    {\n      \"n\": 2,\n      \"title\": \"The Hidden Hook\",\n      \"job\": \"Track down the missing hook at Birdale with the healer's help.\",\n      \"people\": [\"p2\"],\n      \"trouble\": {\n        \"who\": \"armed foresters\",\n        \"carry\": \"bows\",\n        \"will\": \"drive the searchers away\"\n      },\n      \"win\": \"The hook is found beneath the healer's herb shed.\",\n      \"opens\": \"Who filed the hook after Gwinir sold it, and why?\"\n    }\n  ],\n  \"showdown\": {\n    \"title\": \"The Notch\",\n    \"job\": \"Confront C48 with the recovered hook at Netherbourne.\",\n    \"people\": [\"p1\", \"c48\"],\n    \"trouble\": {\n      \"who\": \"armed bailiffs\",\n      \"carry\": \"spears\",\n      \"will\": \"seize C48 and the hook\"\n    },\n    \"settles\": \"Gwinir's name is cleared among the western smiths, restoring his standing for good.\",\n    \"lose\": \"Gwinir's good name forever\"\n  },\n  \"options\": [\n    {\n      \"way\": \"captive\",\n      \"label\": \"Deliver C48 to the company's cells.\"\n    },\n    {\n      \"way\": \"recruit\",\n      \"label\": \"Offer C48 a place in the company.\"\n    },\n    {\n      \"way\": \"gold\",\n      \"label\": \"Take C48's treasure as the price of silence.\"\n    }\n  ]\n}",
+   "json": {
+    "title": "The Broken Hook",
+    "question": "Who made the gallows hook fail after it left Gwinir's forge?",
+    "answer": "C48 filed the hook's locking notch after Gwinir sold it, saving the condemned survivor and framing the smith.",
+    "cast": [
+     {
+      "id": "p1",
+      "label": "worried smith",
+      "want": "Have his good name restored among the western smiths."
+     },
+     {
+      "id": "c48",
+      "label": "short elf wanderer",
+      "want": "Keep the condemned survivor's refuge secret."
+     },
+     {
+      "id": "p2",
+      "label": "tired healer",
+      "want": "Keep armed strangers away from the patients in their care."
+     }
+    ],
+    "episodes": [
+     {
+      "n": 1,
+      "title": "A Side Taken",
+      "job": "Win C48 over at Yarcombe, where the hanged survivor claims the law has freed him.",
+      "people": [
+       "p1",
+       "c48"
+      ],
+      "trouble": {
+       "who": "armed bailiffs",
+       "carry": "clubs",
+       "will": "drag C48 away"
+      },
+      "win": "C48 takes Gwinir's side and agrees to help recover the missing gallows hook.",
+      "opens": "Where has C48 hidden the hook that let the survivor claim his freedom?"
+     },
+     {
+      "n": 2,
+      "title": "The Hidden Hook",
+      "job": "Track down the missing hook at Birdale with the healer's help.",
+      "people": [
+       "p2"
+      ],
+      "trouble": {
+       "who": "armed foresters",
+       "carry": "bows",
+       "will": "drive the searchers away"
+      },
+      "win": "The hook is found beneath the healer's herb shed.",
+      "opens": "Who filed the hook after Gwinir sold it, and why?"
+     }
+    ],
+    "showdown": {
+     "title": "The Notch",
+     "job": "Confront C48 with the recovered hook at Netherbourne.",
+     "people": [
+      "p1",
+      "c48"
+     ],
+     "trouble": {
+      "who": "armed bailiffs",
+      "carry": "spears",
+      "will": "seize C48 and the hook"
+     },
+     "settles": "Gwinir's name is cleared among the western smiths, restoring his standing for good.",
+     "lose": "Gwinir's good name forever"
+    },
+    "options": [
+     {
+      "way": "captive",
+      "label": "Deliver C48 to the company's cells."
+     },
+     {
+      "way": "recruit",
+      "label": "Offer C48 a place in the company."
+     },
+     {
+      "way": "gold",
+      "label": "Take C48's treasure as the price of silence."
+     }
+    ]
+   },
+   "ms": 49088,
+   "in": 1015,
+   "out": 5094,
+   "think": 4391,
+   "cost": 0.0026485,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F6_1/1": {
@@ -2810,6 +4103,18 @@
    "cost": 0.010242,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"The baker, Lariane, needs her home. If you fail, she loses it and her hearth for good. At Harrowford, you must win over a serious merchant. Two armed clerks bar your way with spears and crossbows, and will raise the town watch. The lantern dragon burned the guildhall. What did the merchant want then?\"}",
+   "json": {
+    "card": "The baker, Lariane, needs her home. If you fail, she loses it and her hearth for good. At Harrowford, you must win over a serious merchant. Two armed clerks bar your way with spears and crossbows, and will raise the town watch. The lantern dragon burned the guildhall. What did the merchant want then?"
+   },
+   "ms": 6371,
+   "in": 368,
+   "out": 550,
+   "think": 461,
+   "cost": 0.0003118,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F4_1/1": {
@@ -2855,6 +4160,18 @@
    "cost": 0.01477,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"The village smith, Gwinir, needs his maker\u2019s ring returned. If no one acts, his good name is lost forever. You must win the forest wanderer at Yarcombe. Town constables wait with halberds; they mean to seize her and bar your company. Nearby, a hanged man insists the law will free him.\"}",
+   "json": {
+    "card": "The village smith, Gwinir, needs his maker\u2019s ring returned. If no one acts, his good name is lost forever. You must win the forest wanderer at Yarcombe. Town constables wait with halberds; they mean to seize her and bar your company. Nearby, a hanged man insists the law will free him."
+   },
+   "ms": 4255,
+   "in": 362,
+   "out": 364,
+   "think": 278,
+   "cost": 0.0002182,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F5_1/1": {
@@ -2901,6 +4218,18 @@
    "cost": 0.005628,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You meet Laudus Fairweather, an old-road merchant. At Thornhollow, you won his betrothal token back from raiders and put it in his hand. Now he needs the house\u2019s pledge honored; if no one acts, his bargain with the house is forfeit. Win the town reeve over at his manor in Rushford. Armed town watch carry spears and staves; they will close the road and turn travelers back. The token rests in Laudus\u2019s palm.\"}",
+   "json": {
+    "card": "You meet Laudus Fairweather, an old-road merchant. At Thornhollow, you won his betrothal token back from raiders and put it in his hand. Now he needs the house\u2019s pledge honored; if no one acts, his bargain with the house is forfeit. Win the town reeve over at his manor in Rushford. Armed town watch carry spears and staves; they will close the road and turn travelers back. The token rests in Laudus\u2019s palm."
+   },
+   "ms": 6090,
+   "in": 417,
+   "out": 554,
+   "think": 438,
+   "cost": 0.0003187,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F2_1/1": {
@@ -2947,6 +4276,18 @@
    "cost": 0.005506,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"One of your soldiers, Jervaise Greyfell, wants to atone for leaving her brother bound to a debt-master. If nobody acts, he loses his life. You must win over the village miller in Millthorpe. The town constable and two thugs carry heavy cudgels. They mean to break up your meeting and drive you off. Jervaise watches the road out of the village.\"}",
+   "json": {
+    "card": "One of your soldiers, Jervaise Greyfell, wants to atone for leaving her brother bound to a debt-master. If nobody acts, he loses his life. You must win over the village miller in Millthorpe. The town constable and two thugs carry heavy cudgels. They mean to break up your meeting and drive you off. Jervaise watches the road out of the village."
+   },
+   "ms": 5712,
+   "in": 400,
+   "out": 403,
+   "think": 303,
+   "cost": 0.0002415,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F7_1/1": {
@@ -2992,6 +4333,18 @@
    "cost": 0.014256000000000001,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"Gaddan, a peddler, wants his trading cart and charter back. If nobody acts, he loses them and his customers for good. You must track down the sailor in Birgill. She married a man who said Gaddan was dead. Dock watchmen carry boarding pikes and lanterns; they detain strangers and question papers. A watchman\u2019s lantern swings toward you.\"}",
+   "json": {
+    "card": "Gaddan, a peddler, wants his trading cart and charter back. If nobody acts, he loses them and his customers for good. You must track down the sailor in Birgill. She married a man who said Gaddan was dead. Dock watchmen carry boarding pikes and lanterns; they detain strangers and question papers. A watchman\u2019s lantern swings toward you."
+   },
+   "ms": 5984,
+   "in": 373,
+   "out": 518,
+   "think": 421,
+   "cost": 0.0002963,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F1_1/1": {
@@ -3037,6 +4390,18 @@
    "cost": 0.01939,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"Endolale Dawnsinger, a forest woodcutter, wants to keep her cottage and the oak boundary. If no one acts, she loses her cleared plot and the boundary. At Bramcombe, you must hold her cottage against a forest hunter\u2019s kin. They carry long knives and ropes, and mean to tear down the cairn and haul its stone inward. The border stone rests just inside the oak boundary.\"}",
+   "json": {
+    "card": "Endolale Dawnsinger, a forest woodcutter, wants to keep her cottage and the oak boundary. If no one acts, she loses her cleared plot and the boundary. At Bramcombe, you must hold her cottage against a forest hunter\u2019s kin. They carry long knives and ropes, and mean to tear down the cairn and haul its stone inward. The border stone rests just inside the oak boundary."
+   },
+   "ms": 6043,
+   "in": 369,
+   "out": 507,
+   "think": 407,
+   "cost": 0.00029039999999999996,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F3_1/1": {
@@ -3082,6 +4447,18 @@
    "cost": 0.015098,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"The pale fowler, Indure Palebough, wants the widow kept free. If no one acts, he loses his livelihood. You must track the sociable merchant in Whinstead. A creditor\u2019s footman carries a pike and writ; he will raise the alarm and seize the merchant. The writ waits in the footman\u2019s hand.\"}",
+   "json": {
+    "card": "The pale fowler, Indure Palebough, wants the widow kept free. If no one acts, he loses his livelihood. You must track the sociable merchant in Whinstead. A creditor\u2019s footman carries a pike and writ; he will raise the alarm and seize the merchant. The writ waits in the footman\u2019s hand."
+   },
+   "ms": 4279,
+   "in": 358,
+   "out": 346,
+   "think": 260,
+   "cost": 0.0002088,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F8_1/1": {
@@ -3127,6 +4504,18 @@
    "cost": 0.013542,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"The soft-spoken charcoal-burner, Adelroth, wants to keep his kiln and customers. If nobody acts, he loses his kiln, trade, and livelihood. You must hold Yarstead against angry woodsfolk carrying torches and pikes. They will overturn the kiln and seize the servant. By the kiln, a wolfkin\u2019s faint breath fogs the glass.\"}",
+   "json": {
+    "card": "The soft-spoken charcoal-burner, Adelroth, wants to keep his kiln and customers. If nobody acts, he loses his kiln, trade, and livelihood. You must hold Yarstead against angry woodsfolk carrying torches and pikes. They will overturn the kiln and seize the servant. By the kiln, a wolfkin\u2019s faint breath fogs the glass."
+   },
+   "ms": 3625,
+   "in": 354,
+   "out": 271,
+   "think": 179,
+   "cost": 0.0001709,
+   "model": "gpt-6-luna"
   }
  },
  "L_labels_pitch/F7_3/2": {
@@ -3172,6 +4561,18 @@
    "cost": 0.005334,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You chased the dancing bear, seized it, and freed the chained bag; Gaddan\u2019s takings spilled into the square. The weathered peddler, Gaddan, wants his fair takings back. You track Secile, the short sailor, to the Marlmarch riverbank. River thieves wait with tarred ropes and knives, ready to ambush you and hide her footmarks. A trail of prints ends at the water\u2019s edge.\"}",
+   "json": {
+    "card": "You chased the dancing bear, seized it, and freed the chained bag; Gaddan\u2019s takings spilled into the square. The weathered peddler, Gaddan, wants his fair takings back. You track Secile, the short sailor, to the Marlmarch riverbank. River thieves wait with tarred ropes and knives, ready to ambush you and hide her footmarks. A trail of prints ends at the water\u2019s edge."
+   },
+   "ms": 5381,
+   "in": 386,
+   "out": 482,
+   "think": 373,
+   "cost": 0.0002796,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_pitch/F6_1/2": {
@@ -3217,6 +4618,18 @@
    "cost": 0.00537,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You won the rough trapper, Fridugis, to the defenders, and the guildhall now has an ally inside. The soft-voiced baker, Lariane, wants the guildhall as her home. You must hold it against an assault at Woldshaw. A cutthroat band comes with torches and grappling hooks, ready to set fire to the hall and batter its doors. One hook glints beside the doors.\"}",
+   "json": {
+    "card": "You won the rough trapper, Fridugis, to the defenders, and the guildhall now has an ally inside. The soft-voiced baker, Lariane, wants the guildhall as her home. You must hold it against an assault at Woldshaw. A cutthroat band comes with torches and grappling hooks, ready to set fire to the hall and batter its doors. One hook glints beside the doors."
+   },
+   "ms": 3968,
+   "in": 391,
+   "out": 336,
+   "think": 229,
+   "cost": 0.0002071,
+   "model": "gpt-6-luna"
   }
  },
  "H_labels_pitch/F7_1/2": {
@@ -3262,6 +4675,18 @@
    "cost": 0.016436,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You found Gaddan\u2019s stolen locket and sealed paper in Secile\u2019s house. The weathered peddler, Gaddan, wants his stall and locket back. Now you must sneak the paper from beneath a mattress in Marlmarch. The hot-headed sailor, Secile, has two deckhands on patrol with cutlasses and a bell. They sound the alarm at a whisper. The bell sways softly in the dark.\"}",
+   "json": {
+    "card": "You found Gaddan\u2019s stolen locket and sealed paper in Secile\u2019s house. The weathered peddler, Gaddan, wants his stall and locket back. Now you must sneak the paper from beneath a mattress in Marlmarch. The hot-headed sailor, Secile, has two deckhands on patrol with cutlasses and a bell. They sound the alarm at a whisper. The bell sways softly in the dark."
+   },
+   "ms": 4349,
+   "in": 405,
+   "out": 421,
+   "think": 315,
+   "cost": 0.000251,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F8_1/3": {
@@ -3307,6 +4732,18 @@
    "cost": 0.005378,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You held Yarstead and drove off the mob; the kiln and caravan stayed intact, and trade can continue. Now soft-spoken charcoal-burner Adelroth wants to keep his kiln and customers. You must track the wolfkin to their hidden huts at Tarngarth. River hunters bar your way with nets and bows, claiming legal custody. A net lies across the path.\"}",
+   "json": {
+    "card": "You held Yarstead and drove off the mob; the kiln and caravan stayed intact, and trade can continue. Now soft-spoken charcoal-burner Adelroth wants to keep his kiln and customers. You must track the wolfkin to their hidden huts at Tarngarth. River hunters bar your way with nets and bows, claiming legal custody. A net lies across the path."
+   },
+   "ms": 4769,
+   "in": 374,
+   "out": 382,
+   "think": 289,
+   "cost": 0.0002284,
+   "model": "gpt-6-luna"
   }
  },
  "L_labels_pitch/F8_3/2": {
@@ -3352,6 +4789,18 @@
    "cost": 0.005868,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You forced the issue in Yarstead and won support from Natalgreesh, the domineering merchant; the magistrate\u2019s men withdrew. Now Adelroth, the lean charcoal-burner, wants you to return the apprentice to the potter. Sneak into the magistrate\u2019s storehouse in Ravengarth. Filbert Reed\u2019s watch guards it with locked chests and spears. They will hold the records and sound an alarm. The kiln deed is the record you must find.\"}",
+   "json": {
+    "card": "You forced the issue in Yarstead and won support from Natalgreesh, the domineering merchant; the magistrate\u2019s men withdrew. Now Adelroth, the lean charcoal-burner, wants you to return the apprentice to the potter. Sneak into the magistrate\u2019s storehouse in Ravengarth. Filbert Reed\u2019s watch guards it with locked chests and spears. They will hold the records and sound an alarm. The kiln deed is the record you must find."
+   },
+   "ms": 5578,
+   "in": 414,
+   "out": 441,
+   "think": 326,
+   "cost": 0.00026189999999999997,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_pitch/F5_1/2": {
@@ -3397,6 +4846,18 @@
    "cost": 0.005674,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You persuaded the elven house to grant safe passage to Marsilia, the artisan. Laudus Fairweather wants his daughter\u2019s token delivered to his hands. Escort Marsilia to Laudus\u2019s merchant house on the old road. The forest reeve, Girardus, and his crossbowmen will raise a warrant, halt you, and seize the token. A writ rests in Girardus\u2019s hand.\"}",
+   "json": {
+    "card": "You persuaded the elven house to grant safe passage to Marsilia, the artisan. Laudus Fairweather wants his daughter\u2019s token delivered to his hands. Escort Marsilia to Laudus\u2019s merchant house on the old road. The forest reeve, Girardus, and his crossbowmen will raise a warrant, halt you, and seize the token. A writ rests in Girardus\u2019s hand."
+   },
+   "ms": 3503,
+   "in": 419,
+   "out": 285,
+   "think": 187,
+   "cost": 0.0001844,
+   "model": "gpt-6-luna"
   }
  },
  "H_labels_pitch/F7_3/6": {
@@ -3442,6 +4903,18 @@
    "cost": 0.005388,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You caught the cutpurse and returned Gaddan\u2019s market chest, though a soldier\u2019s leather bracer broke. The wronged peddler wanted his chest back. Now you must find the short sailor Secile\u2019s safehouse in Birgill. Armed house guards carry lanterns and clubs; they will deny you entry and sound the alarm. A pouch lies beside the lantern light.\"}",
+   "json": {
+    "card": "You caught the cutpurse and returned Gaddan\u2019s market chest, though a soldier\u2019s leather bracer broke. The wronged peddler wanted his chest back. Now you must find the short sailor Secile\u2019s safehouse in Birgill. Armed house guards carry lanterns and clubs; they will deny you entry and sound the alarm. A pouch lies beside the lantern light."
+   },
+   "ms": 5445,
+   "in": 379,
+   "out": 401,
+   "think": 306,
+   "cost": 0.0002384,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F4_1/3": {
@@ -3487,6 +4960,18 @@
    "cost": 0.005338,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{ \"card\": \"At Birdale, you secured a private parley and gained a lead from Muvulrea, the forest wanderer. Gwinir, the village smith, wants his maker\u2019s ring returned. Now you must track its hiding place in Netherbourne. Two bandits with short swords mean to ambush you and hold the cache against anyone who comes. A fresh footprint leads into the trees.\" }",
+   "json": {
+    "card": "At Birdale, you secured a private parley and gained a lead from Muvulrea, the forest wanderer. Gwinir, the village smith, wants his maker\u2019s ring returned. Now you must track its hiding place in Netherbourne. Two bandits with short swords mean to ambush you and hold the cache against anyone who comes. A fresh footprint leads into the trees."
+   },
+   "ms": 1753,
+   "in": 390,
+   "out": 91,
+   "think": 0,
+   "cost": 8.45e-05,
+   "model": "gpt-6-luna"
   }
  },
  "L_labels_pitch/F3_3/2": {
@@ -3532,6 +5017,18 @@
    "cost": 0.005632,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"The fowler, Indure Palebough, wants cats to stay in town so his trade survives. Last time, you tried to force the merchant, Eussorus, at the wharf, but he and the ferryman, Belardirwe Ashveil, held you off. The trail ended at the quay. Now track Eussorus to Ravencroft wharf. Dock thugs with heavy clubs bar your way and shout you off the quayside. A cat stays in town.\"}",
+   "json": {
+    "card": "The fowler, Indure Palebough, wants cats to stay in town so his trade survives. Last time, you tried to force the merchant, Eussorus, at the wharf, but he and the ferryman, Belardirwe Ashveil, held you off. The trail ended at the quay. Now track Eussorus to Ravencroft wharf. Dock thugs with heavy clubs bar your way and shout you off the quayside. A cat stays in town."
+   },
+   "ms": 4102,
+   "in": 419,
+   "out": 362,
+   "think": 244,
+   "cost": 0.0002229,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_pitch/F6_3/6": {
@@ -3577,6 +5074,18 @@
    "cost": 0.015504,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You drove Benjamund\u2019s men back and kept the burial grove. The families stayed, and the defenders closed the gate. Lariane, the village baker, wants a safe home for her family. Now you must chase a lone courier to Harrowford. He carries a dagger and a sealed ledger; if he escapes, he will warn Benjamund, the shrewd city merchant. The sealed ledger bobs as the courier runs.\"}",
+   "json": {
+    "card": "You drove Benjamund\u2019s men back and kept the burial grove. The families stayed, and the defenders closed the gate. Lariane, the village baker, wants a safe home for her family. Now you must chase a lone courier to Harrowford. He carries a dagger and a sealed ledger; if he escapes, he will warn Benjamund, the shrewd city merchant. The sealed ledger bobs as the courier runs."
+   },
+   "ms": 3898,
+   "in": 398,
+   "out": 322,
+   "think": 216,
+   "cost": 0.0002008,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F1_1/5": {
@@ -3622,6 +5131,18 @@
    "cost": 0.016514,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You chased the runner into Ferngarth, where someone was caught and Hrefgerda, the valley goatherd, was seized, a wet smear on her cloak. Endolale Dawnsinger, a forest woodcutter, wants to keep her cottage and the oak boundary. At Hawmere, you must win Hrefgerda over. A thin hunter\u2019s man with a spear and watch dog will seize her and drag her back to the hunters. A wet mark shines on a stone.\"}",
+   "json": {
+    "card": "You chased the runner into Ferngarth, where someone was caught and Hrefgerda, the valley goatherd, was seized, a wet smear on her cloak. Endolale Dawnsinger, a forest woodcutter, wants to keep her cottage and the oak boundary. At Hawmere, you must win Hrefgerda over. A thin hunter\u2019s man with a spear and watch dog will seize her and drag her back to the hunters. A wet mark shines on a stone."
+   },
+   "ms": 4863,
+   "in": 425,
+   "out": 432,
+   "think": 314,
+   "cost": 0.0002585,
+   "model": "gpt-6-luna"
   }
  },
  "L_labels_pitch/F6_3/2": {
@@ -3667,6 +5188,18 @@
    "cost": 0.005356,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You forced the shrewd merchant Benjamund\u2019s blockade and found an answering voice beneath the stones in Woldshaw\u2019s burial grove. The village baker, Lariane, wants to keep her home. You must catch the merchant\u2019s runner on the road to Harrowford. The courier carries a short blade and sealed satchel; they will bolt and summon reinforcements. Beneath the stones, the answering voice waits.\"}",
+   "json": {
+    "card": "You forced the shrewd merchant Benjamund\u2019s blockade and found an answering voice beneath the stones in Woldshaw\u2019s burial grove. The village baker, Lariane, wants to keep her home. You must catch the merchant\u2019s runner on the road to Harrowford. The courier carries a short blade and sealed satchel; they will bolt and summon reinforcements. Beneath the stones, the answering voice waits."
+   },
+   "ms": 3167,
+   "in": 392,
+   "out": 272,
+   "think": 169,
+   "cost": 0.00017519999999999998,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_pitch/F1_1/2": {
@@ -3712,6 +5245,18 @@
    "cost": 0.005235999999999999,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You repelled the attack; Bramcombe held, and the border stone remained, keeping the quiet woodcutter Endolale Dawnsinger\u2019s home inside its line. Now Endolale wants you to chase a fugitive to Ferngarth. Two hired cutthroats with short swords bar the path, set on reclaiming the fugitive. A rope lies across the path.\"}",
+   "json": {
+    "card": "You repelled the attack; Bramcombe held, and the border stone remained, keeping the quiet woodcutter Endolale Dawnsinger\u2019s home inside its line. Now Endolale wants you to chase a fugitive to Ferngarth. Two hired cutthroats with short swords bar the path, set on reclaiming the fugitive. A rope lies across the path."
+   },
+   "ms": 4967,
+   "in": 381,
+   "out": 501,
+   "think": 407,
+   "cost": 0.0002886,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F7_1/7": {
@@ -3757,6 +5302,18 @@
    "cost": 0.005176,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You took Gaddan\u2019s papers and small trunk, hidden beneath a blanket. The peddler wants his cart and charter back. Now you must fight pursuers on the road toward Duncroft. Informer\u2019s men and a coastal patrol are closing in with spears, boarding axes, and short blades. They mean to reclaim the cart and papers by force. A spearhead flashes beyond the bend.\"}",
+   "json": {
+    "card": "You took Gaddan\u2019s papers and small trunk, hidden beneath a blanket. The peddler wants his cart and charter back. Now you must fight pursuers on the road toward Duncroft. Informer\u2019s men and a coastal patrol are closing in with spears, boarding axes, and short blades. They mean to reclaim the cart and papers by force. A spearhead flashes beyond the bend."
+   },
+   "ms": 4019,
+   "in": 382,
+   "out": 361,
+   "think": 262,
+   "cost": 0.00021869999999999998,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_pitch/F7_1/4": {
@@ -3802,6 +5359,18 @@
    "cost": 0.00929,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You recovered Bormir, the broad potter, and returned his vessel. Secile, the short sailor, took your side. Now Gaddan, a ragged peddler, wants his market stall back. You must get the deed in and out unseen from the Marlmarch house. A house guard carries a cudgel and oil lantern; he will lock doors and beat intruders. The lantern glows beyond the door.\"}",
+   "json": {
+    "card": "You recovered Bormir, the broad potter, and returned his vessel. Secile, the short sailor, took your side. Now Gaddan, a ragged peddler, wants his market stall back. You must get the deed in and out unseen from the Marlmarch house. A house guard carries a cudgel and oil lantern; he will lock doors and beat intruders. The lantern glows beyond the door."
+   },
+   "ms": 4088,
+   "in": 407,
+   "out": 332,
+   "think": 227,
+   "cost": 0.00020669999999999998,
+   "model": "gpt-6-luna"
   }
  },
  "H_labels_pitch/F8_3/4": {
@@ -3847,6 +5416,18 @@
    "cost": 0.019076,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You hunted the beast, but its clay-matted hide and sudden strikes stopped you. Adelroth, a sober charcoal-burner, wants his apprentice returned to save the potter\u2019s kiln. Now you must hunt the killing beast near Ravengarth. It carries matted clay shards and fresh blood, and attacks without warning. Filbert Reed, the stern magistrate, waits beside a locked door streaked with clay.\"}",
+   "json": {
+    "card": "You hunted the beast, but its clay-matted hide and sudden strikes stopped you. Adelroth, a sober charcoal-burner, wants his apprentice returned to save the potter\u2019s kiln. Now you must hunt the killing beast near Ravengarth. It carries matted clay shards and fresh blood, and attacks without warning. Filbert Reed, the stern magistrate, waits beside a locked door streaked with clay."
+   },
+   "ms": 4202,
+   "in": 391,
+   "out": 312,
+   "think": 210,
+   "cost": 0.0001951,
+   "model": "gpt-6-luna"
   }
  },
  "H_labels_pitch/F1_3/8": {
@@ -3892,6 +5473,18 @@
    "cost": 0.006122,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You stole an iron hook and a folded map scrap from Hawmere\u2019s night pen, but left the pen as it was. Now Endolale Dawnsinger, the quiet woodcutter, wants the border stone fixed at her door. At the boundary, you must decide the thin hunter, Rautio\u2019s fate. He and Hrefgerda, a hill goatherd, bar the boundary with spear and staff, hide a box, and insist on their claim. You must choose whether Rautio stays in your cells, joins your company, or gives up his treasure and goes free.\"}",
+   "json": {
+    "card": "You stole an iron hook and a folded map scrap from Hawmere\u2019s night pen, but left the pen as it was. Now Endolale Dawnsinger, the quiet woodcutter, wants the border stone fixed at her door. At the boundary, you must decide the thin hunter, Rautio\u2019s fate. He and Hrefgerda, a hill goatherd, bar the boundary with spear and staff, hide a box, and insist on their claim. You must choose whether Rautio stays in your cells, joins your company, or gives up his treasure and goes free."
+   },
+   "ms": 3386,
+   "in": 437,
+   "out": 249,
+   "think": 111,
+   "cost": 0.0001682,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_pitch/F8_3/6": {
@@ -3937,6 +5530,18 @@
    "cost": 0.0059819999999999995,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You broke through the guards, followed the apprentice\u2019s trail to a merchant caravan, and drew wide notice. The bent charcoal-burner Adelroth wants the apprentice returned. You must retrieve the apprentice from Natalgreesh, the domineering merchant, at the old potter\u2019s kiln. Filbert Reed, the stern magistrate, sends his warded boar in an iron collar and chain to crush your pleas. You decide whether Natalgreesh joins your company or shares her treasure and goes her way.\"}",
+   "json": {
+    "card": "You broke through the guards, followed the apprentice\u2019s trail to a merchant caravan, and drew wide notice. The bent charcoal-burner Adelroth wants the apprentice returned. You must retrieve the apprentice from Natalgreesh, the domineering merchant, at the old potter\u2019s kiln. Filbert Reed, the stern magistrate, sends his warded boar in an iron collar and chain to crush your pleas. You decide whether Natalgreesh joins your company or shares her treasure and goes her way."
+   },
+   "ms": 3258,
+   "in": 418,
+   "out": 211,
+   "think": 93,
+   "cost": 0.0001473,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F7_1/9": {
@@ -3982,6 +5587,18 @@
    "cost": 0.018661999999999998,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You drove off the pursuers and kept the small trunk and papers, while the cart\u2019s charter stayed hidden and the ribbon remained on the trunk. The peddler Gaddan wants his trading cart and charter back. You must confront the sailor Secile at Birgill\u2019s quay and place the papers where they can secure Gaddan\u2019s livelihood. The informer\u2019s brother and his sailors hold the quay with cutlasses and boarding hooks, ready to seize the trunk and stop any surrender. You must decide whether Secile stays in your cells, joins you, or gives up her treasure and goes free.\"}",
+   "json": {
+    "card": "You drove off the pursuers and kept the small trunk and papers, while the cart\u2019s charter stayed hidden and the ribbon remained on the trunk. The peddler Gaddan wants his trading cart and charter back. You must confront the sailor Secile at Birgill\u2019s quay and place the papers where they can secure Gaddan\u2019s livelihood. The informer\u2019s brother and his sailors hold the quay with cutlasses and boarding hooks, ready to seize the trunk and stop any surrender. You must decide whether Secile stays in your cells, joins you, or gives up her treasure and goes free."
+   },
+   "ms": 1975,
+   "in": 418,
+   "out": 131,
+   "think": 0,
+   "cost": 0.0001073,
+   "model": "gpt-6-luna"
   }
  },
  "L_labels_pitch/F6_3/8": {
@@ -4027,6 +5644,18 @@
    "cost": 0.005698,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"The villagers now guard Lariane\u2019s door, after you won them to shelter the village baker\u2019s home. She wants to keep it. You must fight the shrewd merchant, Benjamund, at the Woldshaw mound. His hired cutthroats carry spears, crossbows, and a brass horn; they will seize the chest and burn the markers to claim the land. You must decide whether Benjamund gives up his treasure and goes free, stays in your cells, or joins your company.\"}",
+   "json": {
+    "card": "The villagers now guard Lariane\u2019s door, after you won them to shelter the village baker\u2019s home. She wants to keep it. You must fight the shrewd merchant, Benjamund, at the Woldshaw mound. His hired cutthroats carry spears, crossbows, and a brass horn; they will seize the chest and burn the markers to claim the land. You must decide whether Benjamund gives up his treasure and goes free, stays in your cells, or joins your company."
+   },
+   "ms": 1891,
+   "in": 405,
+   "out": 115,
+   "think": 0,
+   "cost": 9.8e-05,
+   "model": "gpt-6-luna"
   }
  },
  "H_labels_pitch/F1_1/6": {
@@ -4072,6 +5701,18 @@
    "cost": 0.013871999999999999,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You found the sullen goatherd Hrefgerda\u2019s cabin and ledger, and now hold the border record. Endolale Dawnsinger, a vehement woodcutter, wants you to fix the stone so her house keeps its land. At Bramcombe, you must hunt the sett beneath the stone. A badger matron and her family will rise and lash out with claws and fierce stubbornness at anyone below. You decide whether the thin hunter Rautio stays in your cells, joins your company, or gives up his treasure and goes free.\"}",
+   "json": {
+    "card": "You found the sullen goatherd Hrefgerda\u2019s cabin and ledger, and now hold the border record. Endolale Dawnsinger, a vehement woodcutter, wants you to fix the stone so her house keeps its land. At Bramcombe, you must hunt the sett beneath the stone. A badger matron and her family will rise and lash out with claws and fierce stubbornness at anyone below. You decide whether the thin hunter Rautio stays in your cells, joins your company, or gives up his treasure and goes free."
+   },
+   "ms": 4855,
+   "in": 434,
+   "out": 373,
+   "think": 243,
+   "cost": 0.0002299,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_pitch/F4_1/4": {
@@ -4117,6 +5758,18 @@
    "cost": 0.005664000000000001,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You recovered the smith Gwinir\u2019s lost signet, restoring his mark and clearing his name. That is what he wanted. Now you must bring the wanderer elf Muvulrea before Birdale\u2019s assembly. Her followers carry bows and daggers; they will shoot to scatter you and seize her away. You must decide whether Muvulrea is held in your cells, joins your company, or gives up her treasure and goes free.\"}",
+   "json": {
+    "card": "You recovered the smith Gwinir\u2019s lost signet, restoring his mark and clearing his name. That is what he wanted. Now you must bring the wanderer elf Muvulrea before Birdale\u2019s assembly. Her followers carry bows and daggers; they will shoot to scatter you and seize her away. You must decide whether Muvulrea is held in your cells, joins your company, or gives up her treasure and goes free."
+   },
+   "ms": 3683,
+   "in": 401,
+   "out": 303,
+   "think": 197,
+   "cost": 0.0001916,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F1_1/7": {
@@ -4162,6 +5815,18 @@
    "cost": 0.0062180000000000004,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You persuaded the valley goatherd, Hrefgerda, to back the forest woodcutter, Endolale Dawnsinger, and speak of what she saw. Endolale wants to keep her cottage and the oak boundary. At Hawmere, you must settle the forest hunter, Rautio, and the stone. A water thing beneath the marker will lunge with slick root-arms and cold teeth, dragging any hand that pries at the stone into the underflow. You must decide whether Rautio is held in your cells, joins your company, or gives up his treasure and goes free.\"}",
+   "json": {
+    "card": "You persuaded the valley goatherd, Hrefgerda, to back the forest woodcutter, Endolale Dawnsinger, and speak of what she saw. Endolale wants to keep her cottage and the oak boundary. At Hawmere, you must settle the forest hunter, Rautio, and the stone. A water thing beneath the marker will lunge with slick root-arms and cold teeth, dragging any hand that pries at the stone into the underflow. You must decide whether Rautio is held in your cells, joins your company, or gives up his treasure and goes free."
+   },
+   "ms": 3485,
+   "in": 439,
+   "out": 291,
+   "think": 149,
+   "cost": 0.0001894,
+   "model": "gpt-6-luna"
   }
  },
  "L_labels_pitch/F2_1/4": {
@@ -4208,6 +5873,18 @@
    "cost": 0.0056040000000000005,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"card\":\"You retrieved the debt-house key and note, then returned to a town turned against you. Jervaise Greyfell, one of your soldiers, wants to save a life. You must confront the valley slaver Jofstrom at the holding pit in Dunbrook. He and his guards carry swords and manacles, and may kill, sell, or parley over the captive. You must talk Jofstrom round, beat him in a fight, or slip past him unseen.\"}",
+   "json": {
+    "card": "You retrieved the debt-house key and note, then returned to a town turned against you. Jervaise Greyfell, one of your soldiers, wants to save a life. You must confront the valley slaver Jofstrom at the holding pit in Dunbrook. He and his guards carry swords and manacles, and may kill, sell, or parley over the captive. You must talk Jofstrom round, beat him in a fight, or slip past him unseen."
+   },
+   "ms": 3540,
+   "in": 407,
+   "out": 296,
+   "think": 184,
+   "cost": 0.00018869999999999998,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_pitch/F6_3/7": {
@@ -4260,6 +5937,20 @@
    "cost": 0.008396,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Odeel-Shehs and Nicholina Redhand followed the linen scrap to Harrowford. The courier rode ahead alone, with a dagger at his hip and the sealed ledger in hand.\",\"after\":\"Odeel-Shehs darted in and caught the courier before he could ride on. Nicholina Redhand held him while Odeel-Shehs seized the sealed ledger.\",\"summary\":\"The company caught the courier and seized the ledger, keeping it from Benjamund.\"}",
+   "json": {
+    "before": "Odeel-Shehs and Nicholina Redhand followed the linen scrap to Harrowford. The courier rode ahead alone, with a dagger at his hip and the sealed ledger in hand.",
+    "after": "Odeel-Shehs darted in and caught the courier before he could ride on. Nicholina Redhand held him while Odeel-Shehs seized the sealed ledger.",
+    "summary": "The company caught the courier and seized the ledger, keeping it from Benjamund."
+   },
+   "ms": 6254,
+   "in": 564,
+   "out": 360,
+   "think": 250,
+   "cost": 0.0002364,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F3_1/2": {
@@ -4312,6 +6003,20 @@
    "cost": 0.007752,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Alabyran and Hrormir reached the Whinstead yard, where the creditor\u2019s footman searched nearby with pike and writ ready.\",\"after\":\"Alabyran spotted Eussorus half-hidden in a backyard and drew him out of sight of the footman. Eussorus told them he had not died as claimed.\",\"summary\":\"The company tracked down Eussorus and learned he was alive despite the claim of his death.\"}",
+   "json": {
+    "before": "Alabyran and Hrormir reached the Whinstead yard, where the creditor\u2019s footman searched nearby with pike and writ ready.",
+    "after": "Alabyran spotted Eussorus half-hidden in a backyard and drew him out of sight of the footman. Eussorus told them he had not died as claimed.",
+    "summary": "The company tracked down Eussorus and learned he was alive despite the claim of his death."
+   },
+   "ms": 3418,
+   "in": 540,
+   "out": 240,
+   "think": 136,
+   "cost": 0.000174,
+   "model": "gpt-6-luna"
   }
  },
  "L_labels_pitch/F7_1/5": {
@@ -4364,6 +6069,20 @@
    "cost": 0.008502000000000001,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Godgiva Greyfell and Niraselya Leafshade reached the registrar\u2019s office in Marlmarch. The guard stood watch with short spears and ledger chains. Gaddan waited with the certificate, while Bormir, the quiet potter caught between the two sides, kept apart.\",\"after\":\"Godgiva Greyfell laid the certificate before the registrar and pointed out the fresh ink at its fold. Bormir stepped beside Gaddan. The quiet potter had taken a side.\",\"summary\":\"The company brought Gaddan\u2019s certificate to the registrar, and Bormir took a side.\"}",
+   "json": {
+    "before": "Godgiva Greyfell and Niraselya Leafshade reached the registrar\u2019s office in Marlmarch. The guard stood watch with short spears and ledger chains. Gaddan waited with the certificate, while Bormir, the quiet potter caught between the two sides, kept apart.",
+    "after": "Godgiva Greyfell laid the certificate before the registrar and pointed out the fresh ink at its fold. Bormir stepped beside Gaddan. The quiet potter had taken a side.",
+    "summary": "The company brought Gaddan\u2019s certificate to the registrar, and Bormir took a side."
+   },
+   "ms": 7602,
+   "in": 526,
+   "out": 548,
+   "think": 409,
+   "cost": 0.0003266,
+   "model": "gpt-6-luna"
   }
  },
  "H_labels_pitch/F7_1/1": {
@@ -4416,6 +6135,20 @@
    "cost": 0.008834000000000002,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Niraselya Leafshade and Godgiva Greyfell stepped past the empty chair. Secile, the hot-headed sailor, blocked the way, while Bormir, the mud-splashed potter, stayed inside the house. Knives glinted in the hands of Secile\u2019s guests.\",\"after\":\"Niraselya Leafshade kept Secile talking while Godgiva Greyfell searched the house. She found the peddler\u2019s locket and a sealed paper. Niraselya held the two discoveries up for Secile to see.\",\"summary\":\"The company found the peddler\u2019s locket and a sealed paper in Secile\u2019s house.\"}",
+   "json": {
+    "before": "Niraselya Leafshade and Godgiva Greyfell stepped past the empty chair. Secile, the hot-headed sailor, blocked the way, while Bormir, the mud-splashed potter, stayed inside the house. Knives glinted in the hands of Secile\u2019s guests.",
+    "after": "Niraselya Leafshade kept Secile talking while Godgiva Greyfell searched the house. She found the peddler\u2019s locket and a sealed paper. Niraselya held the two discoveries up for Secile to see.",
+    "summary": "The company found the peddler\u2019s locket and a sealed paper in Secile\u2019s house."
+   },
+   "ms": 6673,
+   "in": 592,
+   "out": 458,
+   "think": 308,
+   "cost": 0.0002882,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_pitch/F5_3/5": {
@@ -4469,6 +6202,20 @@
    "cost": 0.00715,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Jofstrom and Medallus reached the shoals with Laudus Fairweather and met Marsilia, a traveling artisan, as armed skiffs closed around the barge.\",\"after\":\"Medallus repaired the steering gear under fire, guiding the barge through the shoals. Marsilia and her cargo reached Ashhollow unharmed, but the locals turned against the company.\",\"summary\":\"The company brought Marsilia and her cargo through the Ashhollow shoals unharmed, but the locals turned against it.\"}",
+   "json": {
+    "before": "Jofstrom and Medallus reached the shoals with Laudus Fairweather and met Marsilia, a traveling artisan, as armed skiffs closed around the barge.",
+    "after": "Medallus repaired the steering gear under fire, guiding the barge through the shoals. Marsilia and her cargo reached Ashhollow unharmed, but the locals turned against the company.",
+    "summary": "The company brought Marsilia and her cargo through the Ashhollow shoals unharmed, but the locals turned against it."
+   },
+   "ms": 4939,
+   "in": 567,
+   "out": 505,
+   "think": 386,
+   "cost": 0.0003092,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F2_1/2": {
@@ -4521,6 +6268,20 @@
    "cost": 0.007638000000000001,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Jervaise Greyfell and Niraselya Leafshade reached Millthorpe and met Hrolda, the village miller. The constable and two thugs stood nearby with heavy cudgels.\",\"after\":\"Niraselya Leafshade spoke playfully with Hrolda, who knew Jervaise Greyfell\u2019s past. Hrolda agreed to shelter a message and quietly vouch for Jervaise.\",\"summary\":\"The company won over Millthorpe\u2019s miller, who agreed to shelter a message and quietly vouch for Jervaise.\"}",
+   "json": {
+    "before": "Jervaise Greyfell and Niraselya Leafshade reached Millthorpe and met Hrolda, the village miller. The constable and two thugs stood nearby with heavy cudgels.",
+    "after": "Niraselya Leafshade spoke playfully with Hrolda, who knew Jervaise Greyfell\u2019s past. Hrolda agreed to shelter a message and quietly vouch for Jervaise.",
+    "summary": "The company won over Millthorpe\u2019s miller, who agreed to shelter a message and quietly vouch for Jervaise."
+   },
+   "ms": 3450,
+   "in": 540,
+   "out": 277,
+   "think": 148,
+   "cost": 0.0001925,
+   "model": "gpt-6-luna"
   }
  },
  "L_labels_pitch/F8_3/5": {
@@ -4575,6 +6336,20 @@
    "cost": 0.008016,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Henaamo and Orani reached the magistrate\u2019s storehouse in Ravengarth. Adelroth, the lean charcoal-burner, had asked them to help. Filbert Reed, the stern magistrate, stood with the watch, who carried locked chests and spears. Kiln dust marked a guard\u2019s cuff.\",\"after\":\"Henaamo slipped past the watch and took the kiln deed from the records unseen. Orani was hurt lightly in the fight. The fight drew eyes, and word of it spread.\",\"summary\":\"The company took the kiln deed unseen, but the fight drew eyes and word of it spread.\"}",
+   "json": {
+    "before": "Henaamo and Orani reached the magistrate\u2019s storehouse in Ravengarth. Adelroth, the lean charcoal-burner, had asked them to help. Filbert Reed, the stern magistrate, stood with the watch, who carried locked chests and spears. Kiln dust marked a guard\u2019s cuff.",
+    "after": "Henaamo slipped past the watch and took the kiln deed from the records unseen. Orani was hurt lightly in the fight. The fight drew eyes, and word of it spread.",
+    "summary": "The company took the kiln deed unseen, but the fight drew eyes and word of it spread."
+   },
+   "ms": 6057,
+   "in": 599,
+   "out": 537,
+   "think": 394,
+   "cost": 0.00032839999999999996,
+   "model": "gpt-6-luna"
   }
  },
  "H_labels_pitch/F8_1/1": {
@@ -4627,6 +6402,20 @@
    "cost": 0.006986000000000001,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Orani and Anirione Fernbrook reached Yarstead and faced the caged beast with the lizardfolk merchant, Natalgreesh.\",\"after\":\"Orani spoke to Natalgreesh. Natalgreesh took their side and gave them a charm and directions.\",\"summary\":\"The company persuaded Natalgreesh to take its side, and she gave them a charm and directions.\"}",
+   "json": {
+    "before": "Orani and Anirione Fernbrook reached Yarstead and faced the caged beast with the lizardfolk merchant, Natalgreesh.",
+    "after": "Orani spoke to Natalgreesh. Natalgreesh took their side and gave them a charm and directions.",
+    "summary": "The company persuaded Natalgreesh to take its side, and she gave them a charm and directions."
+   },
+   "ms": 11154,
+   "in": 538,
+   "out": 424,
+   "think": 334,
+   "cost": 0.0002658,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_pitch/F7_3/7": {
@@ -4679,6 +6468,20 @@
    "cost": 0.007774,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Godgiva Greyfell and Calpydir Rootward reached the sailor\u2019s house. Secile, the short sailor, watched from the lane\u2019s shadow. A mastiff stood at the threshold, ready to bark.\",\"after\":\"Godgiva Greyfell quieted the mastiff and led the way inside. Bormir, the house potter, worked within, unaware. They found a sealed pouch and took it without being seen. Godgiva and Calpydir left unseen, and Secile watched the empty lane.\",\"summary\":\"The company entered the sailor\u2019s house unseen and took a sealed pouch.\"}",
+   "json": {
+    "before": "Godgiva Greyfell and Calpydir Rootward reached the sailor\u2019s house. Secile, the short sailor, watched from the lane\u2019s shadow. A mastiff stood at the threshold, ready to bark.",
+    "after": "Godgiva Greyfell quieted the mastiff and led the way inside. Bormir, the house potter, worked within, unaware. They found a sealed pouch and took it without being seen. Godgiva and Calpydir left unseen, and Secile watched the empty lane.",
+    "summary": "The company entered the sailor\u2019s house unseen and took a sealed pouch."
+   },
+   "ms": 5227,
+   "in": 578,
+   "out": 434,
+   "think": 295,
+   "cost": 0.0002748,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F4_1/2": {
@@ -4731,6 +6534,20 @@
    "cost": 0.008494,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"At Yarcombe, Orani and Anirione Fernbrook found town constables guarding against the forest wanderer, halberds ready. A scrap of paper fluttered from the jacket of a hanged man. Muvulrea, the forest wanderer, was there.\",\"after\":\"Orani persuaded Muvulrea to agree to a private parley at Birdale. There, Muvulrea offered a lead.\",\"summary\":\"The company won Muvulrea\u2019s cooperation, and a private parley at Birdale brought a lead.\"}",
+   "json": {
+    "before": "At Yarcombe, Orani and Anirione Fernbrook found town constables guarding against the forest wanderer, halberds ready. A scrap of paper fluttered from the jacket of a hanged man. Muvulrea, the forest wanderer, was there.",
+    "after": "Orani persuaded Muvulrea to agree to a private parley at Birdale. There, Muvulrea offered a lead.",
+    "summary": "The company won Muvulrea\u2019s cooperation, and a private parley at Birdale brought a lead."
+   },
+   "ms": 7698,
+   "in": 530,
+   "out": 575,
+   "think": 449,
+   "cost": 0.0003405,
+   "model": "gpt-6-luna"
   }
  },
  "L_labels_pitch/F8_1/1": {
@@ -4783,6 +6600,20 @@
    "cost": 0.007126,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Orani and Anirione entered Natalgreesh's storeroom. Natalgreesh, domineering lizardfolk merchant, faced Adelroth, haggard charcoal-burner. Filbert Reed, stern magistrate, barred entry.\",\"after\":\"Orani searched the storeroom closely and found where the bonded wolfkin hid.\",\"summary\":\"The company searched Natalgreesh's storeroom and found the bonded wolfkin's hiding place.\"}",
+   "json": {
+    "before": "Orani and Anirione entered Natalgreesh's storeroom. Natalgreesh, domineering lizardfolk merchant, faced Adelroth, haggard charcoal-burner. Filbert Reed, stern magistrate, barred entry.",
+    "after": "Orani searched the storeroom closely and found where the bonded wolfkin hid.",
+    "summary": "The company searched Natalgreesh's storeroom and found the bonded wolfkin's hiding place."
+   },
+   "ms": 10970,
+   "in": 576,
+   "out": 1159,
+   "think": 1042,
+   "cost": 0.0006371,
+   "model": "gpt-6-luna"
   }
  },
  "H_labels_pitch/F6_1/5": {
@@ -4836,6 +6667,20 @@
    "cost": 0.0075060000000000005,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Odeel-Shehs and Nicholina Redhand reached Woldshaw, where merchant scouts waited with shortbows and knives. The grim trapper Fridugis aided the defenders from within.\",\"after\":\"The shrewd merchant Benjamund attacked. Odeel-Shehs took a light wound but found the merchant\u2019s cache. He stood beside it, blood on his scales.\",\"summary\":\"The company found the merchant\u2019s cache at Woldshaw, despite the attack and Odeel-Shehs\u2019s wound.\"}",
+   "json": {
+    "before": "Odeel-Shehs and Nicholina Redhand reached Woldshaw, where merchant scouts waited with shortbows and knives. The grim trapper Fridugis aided the defenders from within.",
+    "after": "The shrewd merchant Benjamund attacked. Odeel-Shehs took a light wound but found the merchant\u2019s cache. He stood beside it, blood on his scales.",
+    "summary": "The company found the merchant\u2019s cache at Woldshaw, despite the attack and Odeel-Shehs\u2019s wound."
+   },
+   "ms": 5537,
+   "in": 586,
+   "out": 411,
+   "think": 292,
+   "cost": 0.0002641,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_pitch/F7_1/3": {
@@ -4888,6 +6733,20 @@
    "cost": 0.007804,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Niraselya Leafshade and Calpydir Rootward reached the holder\u2019s house in Marlmarch. Inside, they met Bormir, the broad potter, and a house apprentice with a short knife and a horn.\",\"after\":\"Niraselya Leafshade spoke playfully to Bormir while the apprentice watched. Bormir took a side and stood with the company.\",\"summary\":\"The company won Bormir\u2019s support, and he took its side.\"}",
+   "json": {
+    "before": "Niraselya Leafshade and Calpydir Rootward reached the holder\u2019s house in Marlmarch. Inside, they met Bormir, the broad potter, and a house apprentice with a short knife and a horn.",
+    "after": "Niraselya Leafshade spoke playfully to Bormir while the apprentice watched. Bormir took a side and stood with the company.",
+    "summary": "The company won Bormir\u2019s support, and he took its side."
+   },
+   "ms": 11675,
+   "in": 568,
+   "out": 460,
+   "think": 347,
+   "cost": 0.00028680000000000003,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F8_1/4": {
@@ -4940,6 +6799,20 @@
    "cost": 0.009044,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Eddusa Reed and Anirione Fernbrook reached Tarngarth and met river hunters carrying nets and bows. They denied them access and claimed legal custody. Filbert Reed, the stubborn magistrate who kept the beast, stood among them.\",\"after\":\"Anirione Fernbrook tracked the wolfkin past the hunters\u2019 claim. She found the hiding place and revealed the wolfkin\u2019s shelter. The hidden huts at Tarngarth were no longer hidden.\",\"summary\":\"The company found the wolfkin\u2019s hiding place and revealed their shelter at Tarngarth.\"}",
+   "json": {
+    "before": "Eddusa Reed and Anirione Fernbrook reached Tarngarth and met river hunters carrying nets and bows. They denied them access and claimed legal custody. Filbert Reed, the stubborn magistrate who kept the beast, stood among them.",
+    "after": "Anirione Fernbrook tracked the wolfkin past the hunters\u2019 claim. She found the hiding place and revealed the wolfkin\u2019s shelter. The hidden huts at Tarngarth were no longer hidden.",
+    "summary": "The company found the wolfkin\u2019s hiding place and revealed their shelter at Tarngarth."
+   },
+   "ms": 8410,
+   "in": 551,
+   "out": 551,
+   "think": 424,
+   "cost": 0.0003306,
+   "model": "gpt-6-luna"
   }
  },
  "L_labels_pitch/F8_3/3": {
@@ -4991,6 +6864,20 @@
    "cost": 0.006588,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Henaamo and Orani found spear-bearing watch guarding locked chests, with Filbert Reed, the stern magistrate, and Natalgreesh, the domineering merchant caught between the sides.\",\"after\":\"The watch held the records close and sounded the alarm. Filbert Reed blocked their way, and Natalgreesh stayed caught between the sides. Henaamo and Orani were driven off without completing the job.\",\"summary\":\"The company tried to sneak into the storehouse, but the watch held the records and raised the alarm.\"}",
+   "json": {
+    "before": "Henaamo and Orani found spear-bearing watch guarding locked chests, with Filbert Reed, the stern magistrate, and Natalgreesh, the domineering merchant caught between the sides.",
+    "after": "The watch held the records close and sounded the alarm. Filbert Reed blocked their way, and Natalgreesh stayed caught between the sides. Henaamo and Orani were driven off without completing the job.",
+    "summary": "The company tried to sneak into the storehouse, but the watch held the records and raised the alarm."
+   },
+   "ms": 7168,
+   "in": 512,
+   "out": 741,
+   "think": 613,
+   "cost": 0.0004217,
+   "model": "gpt-6-luna"
   }
  },
  "H_labels_pitch/F3_3/3": {
@@ -5043,6 +6930,20 @@
    "cost": 0.007552,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Trelon Thistledown and Hrormir Ironjaw reached the Woldcot wharves. The river ferryman, Belardirwe Ashveil, showed them the slick quay. Wharf thugs waited with hooks and knives.\",\"after\":\"The thugs rushed them. A hook grazed Hrormir, lightly wounding him, and the others forced the company back across the slick stones. They seized Eussorus, the city merchant, and dragged him out of sight. Belardirwe pointed to the empty trail. The small bell lay still among the pawprints.\",\"summary\":\"The company tried to find Eussorus on the wharves, but the thugs drove them off and took the merchant away.\"}",
+   "json": {
+    "before": "Trelon Thistledown and Hrormir Ironjaw reached the Woldcot wharves. The river ferryman, Belardirwe Ashveil, showed them the slick quay. Wharf thugs waited with hooks and knives.",
+    "after": "The thugs rushed them. A hook grazed Hrormir, lightly wounding him, and the others forced the company back across the slick stones. They seized Eussorus, the city merchant, and dragged him out of sight. Belardirwe pointed to the empty trail. The small bell lay still among the pawprints.",
+    "summary": "The company tried to find Eussorus on the wharves, but the thugs drove them off and took the merchant away."
+   },
+   "ms": 7779,
+   "in": 538,
+   "out": 742,
+   "think": 572,
+   "cost": 0.0004248,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_pitch/F7_3/3": {
@@ -5094,6 +6995,20 @@
    "cost": 0.007091999999999999,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Godgiva Greyfell and Calpydir Rootward reached Duncroft market. They found Gaddan, a roadside peddler, beside Secile, a short sailor. Market wardens blocked the way with batons and ropes.\",\"after\":\"Godgiva tried to reason with Gaddan, while Calpydir stood ready beside her. The wardens broke up their appeal and dragged them away from the stall. Gaddan stayed unconvinced, and the fair\u2019s takings remained unrestored. A baton struck the flagstones.\",\"summary\":\"The company tried to win Gaddan over, but the market wardens broke up their appeal.\"}",
+   "json": {
+    "before": "Godgiva Greyfell and Calpydir Rootward reached Duncroft market. They found Gaddan, a roadside peddler, beside Secile, a short sailor. Market wardens blocked the way with batons and ropes.",
+    "after": "Godgiva tried to reason with Gaddan, while Calpydir stood ready beside her. The wardens broke up their appeal and dragged them away from the stall. Gaddan stayed unconvinced, and the fair\u2019s takings remained unrestored. A baton struck the flagstones.",
+    "summary": "The company tried to win Gaddan over, but the market wardens broke up their appeal."
+   },
+   "ms": 5394,
+   "in": 481,
+   "out": 497,
+   "think": 345,
+   "cost": 0.0002966,
+   "model": "gpt-6-luna"
   }
  },
  "L_labels_pitch/F4_3/3": {
@@ -5145,6 +7060,20 @@
    "cost": 0.007014,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"At Birdale, Eddusa Reed and Orani found the short wanderer Muvulrea barring the road. The runner\u2019s tracks led beyond her into the village.\",\"after\":\"They got past Muvulrea, but the rustlers turned on them with knives. The runner escaped on the swift mare, carrying Gwinir, the lost smith\u2019s, stamp away to sell. Eddusa Reed and Orani could not catch them. The empty road stretched ahead.\",\"summary\":\"The company chased the stamp thief through Birdale, but the rustlers drove them back and the runner escaped.\"}",
+   "json": {
+    "before": "At Birdale, Eddusa Reed and Orani found the short wanderer Muvulrea barring the road. The runner\u2019s tracks led beyond her into the village.",
+    "after": "They got past Muvulrea, but the rustlers turned on them with knives. The runner escaped on the swift mare, carrying Gwinir, the lost smith\u2019s, stamp away to sell. Eddusa Reed and Orani could not catch them. The empty road stretched ahead.",
+    "summary": "The company chased the stamp thief through Birdale, but the rustlers drove them back and the runner escaped."
+   },
+   "ms": 6985,
+   "in": 463,
+   "out": 643,
+   "think": 506,
+   "cost": 0.0003678,
+   "model": "gpt-6-luna"
   }
  },
  "H_labels_pitch/F5_3/3": {
@@ -5197,6 +7126,20 @@
    "cost": 0.00692,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"At Rushford docks, Jofstrom and Medallus met the stout reeve, Girardus, and his halberd-bearing deputies blocking the way.\",\"after\":\"Girardus ordered his deputies forward. They seized the records and drove Jofstrom and Medallus back; a halberd haft bruised Medallus lightly. The crew was detained, and the loader remained untracked.\",\"summary\":\"The company tried to track the loader at Rushford docks, but Girardus and his deputies stopped them.\"}",
+   "json": {
+    "before": "At Rushford docks, Jofstrom and Medallus met the stout reeve, Girardus, and his halberd-bearing deputies blocking the way.",
+    "after": "Girardus ordered his deputies forward. They seized the records and drove Jofstrom and Medallus back; a halberd haft bruised Medallus lightly. The crew was detained, and the loader remained untracked.",
+    "summary": "The company tried to track the loader at Rushford docks, but Girardus and his deputies stopped them."
+   },
+   "ms": 5462,
+   "in": 527,
+   "out": 484,
+   "think": 362,
+   "cost": 0.0002947,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_pitch/F3_3/3": {
@@ -5249,6 +7192,20 @@
    "cost": 0.007544,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Trelon Thistledown and Hrormir Ironjaw entered Whinstead market. The pale-bough fowler, Indure Palebough, waited by a stall. The city merchant, Eussorus, moved ahead as watchmen closed the lane with staves and rope.\",\"after\":\"The watchmen drove Trelon and Hrormir back from the stalls. Hrormir took a light blow from a stave. The cordon held, and Eussorus slipped from sight. The company could not follow him. The watchmen locked the lane and stood across it.\",\"summary\":\"The company tried to pursue Eussorus through the market, but the watchmen drove them back and locked the lane.\"}",
+   "json": {
+    "before": "Trelon Thistledown and Hrormir Ironjaw entered Whinstead market. The pale-bough fowler, Indure Palebough, waited by a stall. The city merchant, Eussorus, moved ahead as watchmen closed the lane with staves and rope.",
+    "after": "The watchmen drove Trelon and Hrormir back from the stalls. Hrormir took a light blow from a stave. The cordon held, and Eussorus slipped from sight. The company could not follow him. The watchmen locked the lane and stood across it.",
+    "summary": "The company tried to pursue Eussorus through the market, but the watchmen drove them back and locked the lane."
+   },
+   "ms": 3915,
+   "in": 521,
+   "out": 384,
+   "think": 224,
+   "cost": 0.0002441,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F5_1/6": {
@@ -5303,6 +7260,20 @@
    "cost": 0.009662,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Jofstrom, Medallus, and Llivas brought Marsilia, the quick artisan, to the elven house in Harrowbourne. Its household guards barred the threshold with thin blades and ritual knives, demanding the pledge or a living pledge.\",\"after\":\"Jofstrom told Marsilia the house\u2019s insistence came from the dead elf\u2019s private request: she had asked Marsilia to stand for her in the rite. He invited Marsilia to swear on the company banner and join them, and she joined. The company delivered the daughter\u2019s betrothal token into the house\u2019s custody, securing Laudus Fairweather\u2019s pledge.\",\"summary\":\"The company escorted Marsilia and delivered the token, securing Laudus\u2019s pledge as Marsilia joined them.\"}",
+   "json": {
+    "before": "Jofstrom, Medallus, and Llivas brought Marsilia, the quick artisan, to the elven house in Harrowbourne. Its household guards barred the threshold with thin blades and ritual knives, demanding the pledge or a living pledge.",
+    "after": "Jofstrom told Marsilia the house\u2019s insistence came from the dead elf\u2019s private request: she had asked Marsilia to stand for her in the rite. He invited Marsilia to swear on the company banner and join them, and she joined. The company delivered the daughter\u2019s betrothal token into the house\u2019s custody, securing Laudus Fairweather\u2019s pledge.",
+    "summary": "The company escorted Marsilia and delivered the token, securing Laudus\u2019s pledge as Marsilia joined them."
+   },
+   "ms": 10694,
+   "in": 712,
+   "out": 767,
+   "think": 595,
+   "cost": 0.0004547,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_pitch/F8_1/5": {
@@ -5357,6 +7328,20 @@
    "cost": 0.010248,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"At Tarngarth, Anirione Fernbrook, Eddusa Reed, and Henaamo found Natalgreesh, a lizardfolk merchant, facing Filbert Reed, a steady magistrate, and his armed men. A chained wolfkin stood among them, while keys and writs lay ready. Adelroth, a grimed charcoal-burner, waited nearby, hoping to keep his kiln and trade safe.\",\"after\":\"Anirione bound Natalgreesh to her oath. Natalgreesh joined the company, and the wolfkin became its ward. She confessed that she had quietly bought his blood-price and kept him as her bonded servant. The ledger was unsealed. Under the company's covenant, Adelroth's kiln and right to take charcoal wood were secured. Natalgreesh stood beside the company as the wolfkin's chain was taken in hand as a ward's burden, not a merchant's bond.\",\"summary\":\"The company unsealed the ledger, gained Natalgreesh, secured Adelroth's livelihood, and took the wolfkin as its ward.\"}",
+   "json": {
+    "before": "At Tarngarth, Anirione Fernbrook, Eddusa Reed, and Henaamo found Natalgreesh, a lizardfolk merchant, facing Filbert Reed, a steady magistrate, and his armed men. A chained wolfkin stood among them, while keys and writs lay ready. Adelroth, a grimed charcoal-burner, waited nearby, hoping to keep his kiln and trade safe.",
+    "after": "Anirione bound Natalgreesh to her oath. Natalgreesh joined the company, and the wolfkin became its ward. She confessed that she had quietly bought his blood-price and kept him as her bonded servant. The ledger was unsealed. Under the company's covenant, Adelroth's kiln and right to take charcoal wood were secured. Natalgreesh stood beside the company as the wolfkin's chain was taken in hand as a ward's burden, not a merchant's bond.",
+    "summary": "The company unsealed the ledger, gained Natalgreesh, secured Adelroth's livelihood, and took the wolfkin as its ward."
+   },
+   "ms": 7490,
+   "in": 722,
+   "out": 458,
+   "think": 226,
+   "cost": 0.0003012,
+   "model": "gpt-6-luna"
   }
  },
  "L_labels_pitch/F3_3/5": {
@@ -5411,6 +7396,20 @@
    "cost": 0.009632,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Trelon Thistledown, Alabyran, and Hrormir Ironjaw reached Woldcot market square. The fowler, Indure Palebough, asked them to save his trade. The merchant Eussorus stood against them, while his thugs blocked the square with short spears. The ferryman, Belardirwe Ashveil, was caught between the sides.\",\"after\":\"Trelon Thistledown pressed Eussorus on why he was buying every cat in town. Eussorus admitted he meant to carry them to the Western Forests for a forester who paid him to relocate them there. The company took Eussorus's purse and ledger, then left town. Eussorus went free, and Indure's livelihood was secured because the cats stayed where he needed them. Belardirwe stood clear of the square as the company departed.\",\"summary\":\"The company took Eussorus's treasure and left town, securing Indure's trade and keeping the cats in Woldcot.\"}",
+   "json": {
+    "before": "Trelon Thistledown, Alabyran, and Hrormir Ironjaw reached Woldcot market square. The fowler, Indure Palebough, asked them to save his trade. The merchant Eussorus stood against them, while his thugs blocked the square with short spears. The ferryman, Belardirwe Ashveil, was caught between the sides.",
+    "after": "Trelon Thistledown pressed Eussorus on why he was buying every cat in town. Eussorus admitted he meant to carry them to the Western Forests for a forester who paid him to relocate them there. The company took Eussorus's purse and ledger, then left town. Eussorus went free, and Indure's livelihood was secured because the cats stayed where he needed them. Belardirwe stood clear of the square as the company departed.",
+    "summary": "The company took Eussorus's treasure and left town, securing Indure's trade and keeping the cats in Woldcot."
+   },
+   "ms": 8272,
+   "in": 736,
+   "out": 542,
+   "think": 317,
+   "cost": 0.00034460000000000003,
+   "model": "gpt-6-luna"
   }
  },
  "H_labels_pitch/F3_1/3": {
@@ -5465,6 +7464,20 @@
    "cost": 0.009786,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Trelon Thistledown, Alabyran, and Agnedir reached Ravencroft and found Eussorus, the clumsy merchant, in hiding. Indure Palebough, the lean fowler, asked them to save his nets and fowling rights. Creditors\u2019 bailiffs closed in with chains and warrants, threatening to bind the widow and seize Indure\u2019s livelihood.\",\"after\":\"Alabyran confronted Eussorus and took his strongbox, then handed over the coin. Eussorus went free. The company learned the truth: the trader had never died; he had shed his name and now traveled as Eussorus. Indure\u2019s nets and fowling rights were declared exempt from the trader\u2019s debts. The bailiffs left them untouched.\",\"summary\":\"The company took Eussorus\u2019s treasure, and Indure\u2019s nets and fowling rights were spared from seizure.\"}",
+   "json": {
+    "before": "Trelon Thistledown, Alabyran, and Agnedir reached Ravencroft and found Eussorus, the clumsy merchant, in hiding. Indure Palebough, the lean fowler, asked them to save his nets and fowling rights. Creditors\u2019 bailiffs closed in with chains and warrants, threatening to bind the widow and seize Indure\u2019s livelihood.",
+    "after": "Alabyran confronted Eussorus and took his strongbox, then handed over the coin. Eussorus went free. The company learned the truth: the trader had never died; he had shed his name and now traveled as Eussorus. Indure\u2019s nets and fowling rights were declared exempt from the trader\u2019s debts. The bailiffs left them untouched.",
+    "summary": "The company took Eussorus\u2019s treasure, and Indure\u2019s nets and fowling rights were spared from seizure."
+   },
+   "ms": 6124,
+   "in": 701,
+   "out": 434,
+   "think": 231,
+   "cost": 0.00028710000000000004,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_first/F3_1/4": {
@@ -5519,6 +7532,20 @@
    "cost": 0.009590000000000001,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Trelon Thistledown, Alabyran, and Agnedir entered the old-growth forest. The river ferryman, Belardirwe Ashveil, showed them the ground. They found Eussorus with the creditors\u2019 captain and his men, who carried shackles and writs.\",\"after\":\"Alabyran decided to take Eussorus\u2019s treasure and march the chest back to the fort. Eussorus surrendered it and went free. The company lodged his ledger with the magistrate, voiding creditor claims on local tenancies and preserving Indure Palebough\u2019s livelihood. The widow was worth holding as bond because she alone held the elven deed that put the house and its tenancies beyond mortal creditors. The ledger rested with the magistrate.\",\"summary\":\"The company took Eussorus\u2019s treasure and lodged his ledger with the magistrate, voiding creditor claims on local tenancies.\"}",
+   "json": {
+    "before": "Trelon Thistledown, Alabyran, and Agnedir entered the old-growth forest. The river ferryman, Belardirwe Ashveil, showed them the ground. They found Eussorus with the creditors\u2019 captain and his men, who carried shackles and writs.",
+    "after": "Alabyran decided to take Eussorus\u2019s treasure and march the chest back to the fort. Eussorus surrendered it and went free. The company lodged his ledger with the magistrate, voiding creditor claims on local tenancies and preserving Indure Palebough\u2019s livelihood. The widow was worth holding as bond because she alone held the elven deed that put the house and its tenancies beyond mortal creditors. The ledger rested with the magistrate.",
+    "summary": "The company took Eussorus\u2019s treasure and lodged his ledger with the magistrate, voiding creditor claims on local tenancies."
+   },
+   "ms": 7806,
+   "in": 742,
+   "out": 530,
+   "think": 329,
+   "cost": 0.0003392,
+   "model": "gpt-6-luna"
   }
  },
  "S_labels_pitch/F7_1/9": {
@@ -5573,6 +7600,20 @@
    "cost": 0.009522,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Calpydir Rootward, Roruld, and Godgiva Greyfell reached the pier to confront Secile, the short sailor who held the stall taken from Gaddan, the ragged peddler. An informer and two hired constables stood nearby with halberds and a stamped protest.\",\"after\":\"Roruld bound Secile and carried her to the fort\u2019s cells. She told them she had accepted the deed because her husband showed her a forged death notice and the clerk\u2019s seal, and she believed the stall had come to her by law. The town clerk agreed to read and certify whichever paper was presented at the market bell. The public reading would decide who kept the stall.\",\"summary\":\"The company took Secile to the fort\u2019s cells, and the town clerk set a public reading to decide who would keep Gaddan\u2019s stall.\"}",
+   "json": {
+    "before": "Calpydir Rootward, Roruld, and Godgiva Greyfell reached the pier to confront Secile, the short sailor who held the stall taken from Gaddan, the ragged peddler. An informer and two hired constables stood nearby with halberds and a stamped protest.",
+    "after": "Roruld bound Secile and carried her to the fort\u2019s cells. She told them she had accepted the deed because her husband showed her a forged death notice and the clerk\u2019s seal, and she believed the stall had come to her by law. The town clerk agreed to read and certify whichever paper was presented at the market bell. The public reading would decide who kept the stall.",
+    "summary": "The company took Secile to the fort\u2019s cells, and the town clerk set a public reading to decide who would keep Gaddan\u2019s stall."
+   },
+   "ms": 11144,
+   "in": 730,
+   "out": 811,
+   "think": 615,
+   "cost": 0.0004785,
+   "model": "gpt-6-luna"
   }
  },
  "L_labels_pitch/F8_3/7": {
@@ -5629,6 +7670,20 @@
    "cost": 0.009918,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Anirione Fernbrook, Eddusa Reed, and Orani reached the potter\u2019s kiln in Tarngarth. The lean charcoal-burner Adelroth stood with the potter. The stern magistrate Filbert Reed blocked the way with his watch, writs, and spears. The domineering merchant Natalgreesh stood between the two sides.\",\"after\":\"Orani persuaded Natalgreesh to join the company. Natalgreesh was the former apprentice, now a lizard merchant, and the legal deed to the potter\u2019s workshop belonged to her. Anirione was lightly hurt, and a piece of the company\u2019s gear broke. Natalgreesh joined them, and the potter\u2019s workshop kept operating and serving its customers. The magistrate\u2019s claim remained a threat to the kiln.\",\"summary\":\"The company guarded the potter\u2019s kiln, and its workshop continued operating with its customers served.\"}",
+   "json": {
+    "before": "Anirione Fernbrook, Eddusa Reed, and Orani reached the potter\u2019s kiln in Tarngarth. The lean charcoal-burner Adelroth stood with the potter. The stern magistrate Filbert Reed blocked the way with his watch, writs, and spears. The domineering merchant Natalgreesh stood between the two sides.",
+    "after": "Orani persuaded Natalgreesh to join the company. Natalgreesh was the former apprentice, now a lizard merchant, and the legal deed to the potter\u2019s workshop belonged to her. Anirione was lightly hurt, and a piece of the company\u2019s gear broke. Natalgreesh joined them, and the potter\u2019s workshop kept operating and serving its customers. The magistrate\u2019s claim remained a threat to the kiln.",
+    "summary": "The company guarded the potter\u2019s kiln, and its workshop continued operating with its customers served."
+   },
+   "ms": 7267,
+   "in": 756,
+   "out": 540,
+   "think": 340,
+   "cost": 0.0003456,
+   "model": "gpt-6-luna"
   }
  },
  "H_labels_pitch/F6_3/9": {
@@ -5684,6 +7739,20 @@
    "cost": 0.009502,
    "model": "claude-sonnet-5-5",
    "error": null
+  },
+  "luna": {
+   "text": "{\"before\":\"Nicholina Redhand, Henyon, and Malene reached the burial grove as Benjamund\u2019s force approached with a war-horn, ropes, and iron hooks. Fridugis, a woodland trapper, helped the defenders from inside the grove. Lariane, the village baker, asked them to guard her house and oven as well.\",\"after\":\"The war-horn sounded, and the attackers pressed through a long, costly delay. Malene spoke with Benjamund and claimed his chest and coin. The company seized his treasure, and Benjamund went free. They held the grove, and Lariane\u2019s house remained under her care. Malene learned that the voice answering the funeral song was a wolf, forced to sing by a charm kept with Benjamund. The merchant left the grove empty-handed.\",\"summary\":\"The company held the burial grove and took Benjamund\u2019s treasure; he went free, and Lariane kept her house.\"}",
+   "json": {
+    "before": "Nicholina Redhand, Henyon, and Malene reached the burial grove as Benjamund\u2019s force approached with a war-horn, ropes, and iron hooks. Fridugis, a woodland trapper, helped the defenders from inside the grove. Lariane, the village baker, asked them to guard her house and oven as well.",
+    "after": "The war-horn sounded, and the attackers pressed through a long, costly delay. Malene spoke with Benjamund and claimed his chest and coin. The company seized his treasure, and Benjamund went free. They held the grove, and Lariane\u2019s house remained under her care. Malene learned that the voice answering the funeral song was a wolf, forced to sing by a charm kept with Benjamund. The merchant left the grove empty-handed.",
+    "summary": "The company held the burial grove and took Benjamund\u2019s treasure; he went free, and Lariane kept her house."
+   },
+   "ms": 7520,
+   "in": 733,
+   "out": 578,
+   "think": 367,
+   "cost": 0.0003623,
+   "model": "gpt-6-luna"
   }
  }
 }
