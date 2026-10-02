@@ -2,10 +2,17 @@
 // several, e.g. set A + set B of the baseline) into the §1.1 table, with bootstrap 95% CIs over sagas:
 //
 //   npx tsx scripts/sagalab/score.ts --runs A_RUN[,B_RUN] [--label base] [--out RUN]
+//   npx tsx scripts/sagalab/score.ts --pair X_RUN,Y_RUN      (paired: arm X − arm Y, e.g. probe2/L_lean,probe2/L_full)
 //
 // Reads, per run: sagas/*/meta.json · mech.json (run mech.ts first) · judge/j1_*/<saga>.json ·
-// judge/j2_*/<saga>.json · judge/j3_*/vs_*/<saga>.json · judge/j4_*/*.json. A seat that has not run
-// shows as —. Writes REPORT.md (and score.json) into the first run's folder (or --out).
+// judge/j2_*/<saga>.json · judge/j3_*/vs_*/<saga>.json · judge/j4_*/*.json, and <saga>/j2_strict.json
+// (a J2 re-grade on the strict rubric, e.g. of the frozen base: rows M1s, which never touch the rows
+// the frozen baseline score.json was made from). A seat that has not run shows as —. Writes REPORT.md
+// (and score.json) into the first run's folder (or --out).
+//
+// --pair X,Y: the same fixture_draw folders played by two arms (probe.ts: same soldiers, dice, path and
+// seed, only the writing differs). Per metric, X − Y with a PAIRED bootstrap CI (resampling slots, both
+// arms together), over the slots where both arms have data. Writes PAIRED_vs_<Y>.md/.json into X.
 //
 // A CI is the 2.5–97.5 percentile of 2,000 resamples of the SAGAS (seeded, so a re-run prints the
 // same numbers). Ratio metrics resample numerator and denominator together.
@@ -54,8 +61,8 @@ interface J2 {
   continuity_errors?: unknown[];
 }
 
-/** one saga's raw material, every seat that ran on it */
-interface Saga { run: string; id: string; j1: J1[]; j2: J2[]; mech: SagaMech | null }
+/** one saga's raw material, every seat that ran on it; j2strict = <saga>/j2_strict.json when present */
+interface Saga { run: string; id: string; j1: J1[]; j2: J2[]; j2strict: J2 | null; mech: SagaMech | null }
 
 /** a per-saga [numerator, denominator] (den 0 = no data on this saga) */
 type Frac = (s: Saga) => [number, number];
@@ -128,6 +135,7 @@ function load(runs: string[]): { sagas: Saga[]; j3: J3Set[]; j4: J[]; mech: J[] 
         run, id,
         j1: seatFiles<J1>('j1_'),
         j2: seatFiles<J2>('j2_'),
+        j2strict: readJson<J2>(path.join(root, id, 'j2_strict.json')),
         mech: m?.perSaga.find(p => p.id === id) ?? null,
       });
     }
@@ -189,6 +197,10 @@ const METRICS: Metric[] = [
   { id: 'M1c1', name: 'M1 on card 1 only', fmt: 'pct', target: '—', f: s => m1Card1(s, 'parts') },
   { id: 'M1-said', name: 'M1, and the reader wrote "unclear" nowhere (the frozen base\'s M1-strict rule: compare to base 59.6%)', fmt: 'pct', target: 'not below base (G1)', f: s => m1(s, 'said') },
   { id: 'M1-said c1', name: 'M1-said on card 1 only (base 25%)', fmt: 'pct', target: '—', f: s => m1Card1(s, 'said') },
+  // the frozen base was graded on the old boolean rubric; a strict re-grade sits beside it as its own file,
+  // so M1 and M1-said above stay exactly as the frozen score.json computed them
+  { id: 'M1s', name: 'M1 strict from a J2 strict re-grade (<saga>/j2_strict.json; for the frozen base: compare with a probe\'s M1)', fmt: 'pct', target: 'not below base (G1)', f: s => s.j2strict ? m1({ ...s, j2: [s.j2strict] }, 'parts') : [0, 0] },
+  { id: 'M1s c1', name: 'M1s on card 1 only', fmt: 'pct', target: '—', f: s => s.j2strict ? m1Card1({ ...s, j2: [s.j2strict] }, 'parts') : [0, 0] },
   { id: 'M1-lax', name: 'Follow, objective, lenient ("unclear" on a part the card never says = right)', fmt: 'pct', target: '(watch only)', f: s => m1(s, 'lax') },
   ...tasteMetrics(PRIMARY_J1, ''),
   ...ALONGSIDE_J1.flatMap(seat => tasteMetrics(seat, `·${seat.replace(/^j1_/, '')}`)),
@@ -253,7 +265,52 @@ function entropyOf(labels: string[]): { distinct: number; bits: number; top: str
   return { distinct: c.size, bits, top };
 }
 
+/** the rows the paired mode reports (the §D order: follow first — M1, M5, M2 — then M3, then the checks) */
+const PAIRED_IDS = ['M1', 'M1c1', 'M5', 'M2', 'M2·gpt5', 'M3', 'M3·gpt5', 'M8', 'M11', 'M12a', 'M12b', 'M12c', 'M13'];
+
+/** arm X − arm Y over the fixture_draw slots both played, with a paired bootstrap 95% CI */
+function paired(x: string, y: string) {
+  const ax = new Map(load([x]).sagas.map(s => [s.id, s])), ay = new Map(load([y]).sagas.map(s => [s.id, s]));
+  const slots = [...ax.keys()].filter(id => ay.has(id)).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  if (!slots.length) { console.log(`no fixture_draw folder is in both ${x} and ${y}`); process.exit(2) }
+  const ratio = (ps: [number, number][]) => { const d = ps.reduce((t, p) => t + p[1], 0); return d ? ps.reduce((t, p) => t + p[0], 0) / d : NaN };
+  const rows = PAIRED_IDS.map(id => METRICS.find(m => m.id === id)!).map(m => {
+    // a slot counts only when BOTH arms have data on it, so every resample stays paired
+    const both = slots.map(id => [m.f(ax.get(id)!), m.f(ay.get(id)!)] as const).filter(([p, q]) => p[1] > 0 && q[1] > 0);
+    if (!both.length) return { m, n: 0, vx: null, vy: null, d: null, lo: null, hi: null };
+    const px = both.map(b => b[0]), py = both.map(b => b[1]);
+    const vx = ratio(px), vy = ratio(py);
+    const rnd = mulberry32(20261002);
+    const st: number[] = [];
+    for (let b = 0; b < 4000; b++) {
+      const ix = both.map(() => Math.floor(rnd() * both.length));
+      const v = ratio(ix.map(i => px[i]!)) - ratio(ix.map(i => py[i]!));
+      if (Number.isFinite(v)) st.push(v);
+    }
+    st.sort((a, b) => a - b);
+    return { m, n: both.length, vx, vy, d: vx - vy, lo: st[Math.floor(0.025 * st.length)] ?? null, hi: st[Math.floor(0.975 * st.length)] ?? null };
+  });
+  const diff = (v: number | null, f: Metric['fmt']) => v === null || Number.isNaN(v) ? '—' : f === 'pct' ? `${v >= 0 ? '+' : ''}${(100 * v).toFixed(1)}pp` : `${v >= 0 ? '+' : ''}${v.toFixed(2)}`;
+  const out = [
+    `# Paired: ${x} − ${y}`, '',
+    `${slots.length} fixture_draw slots in both (${slots.join(' ')}). Same soldiers, dice, path and seed per slot; only the writing differs.`,
+    'CI: paired bootstrap 95% (4,000 resamples of the slots, both arms together, seeded). A row uses only the slots where both arms have data (n). * = the CI excludes zero.',
+    `Taste rows are per seat; compare them only between arms read by the same seats. M1 is strict ("unclear" = not followed).`, '',
+    `| # | metric | ${x} | ${y} | X − Y | 95% CI | n | |`, '|---|---|---|---|---|---|---|---|',
+    ...rows.map(r => `| ${r.m.id} | ${r.m.name} | ${fmt(r.vx, r.m.fmt)} | ${fmt(r.vy, r.m.fmt)} | ${diff(r.d, r.m.fmt)} | ${r.lo === null ? '—' : `${diff(r.lo, r.m.fmt)} – ${diff(r.hi, r.m.fmt)}`} | ${r.n} | ${r.lo !== null && r.hi !== null && (r.lo > 0 || r.hi < 0) ? '*' : ''} |`),
+    '', 'Lower is better for M5, M11, M12, M13; higher for the rest.', '',
+  ];
+  const dest = path.join(LAB, 'runs', x);
+  const tag = y.replace(/[\\/]+/g, '_');
+  fs.writeFileSync(path.join(dest, `PAIRED_vs_${tag}.md`), out.join('\n'));
+  fs.writeFileSync(path.join(dest, `PAIRED_vs_${tag}.json`), JSON.stringify({ x, y, slots, rows: rows.map(r => ({ id: r.m.id, name: r.m.name, x: r.vx, y: r.vy, diff: r.d, lo: r.lo, hi: r.hi, n: r.n })) }, null, 2));
+  console.log(out.join('\n'));
+  console.log(`\n→ ${path.relative(V3, path.join(dest, `PAIRED_vs_${tag}.md`))}`);
+}
+
 function main() {
+  const pair = opt('pair')?.split(',').map(s => s.trim()).filter(Boolean);
+  if (pair) { if (pair.length !== 2) { console.log('usage: --pair X_RUN,Y_RUN'); process.exit(2) } return paired(pair[0]!, pair[1]!) }
   const runs = (opt('runs') ?? opt('run') ?? '').split(',').map(s => s.trim()).filter(Boolean);
   if (!runs.length) { console.log('usage: npx tsx scripts/sagalab/score.ts --runs A_RUN[,B_RUN] [--label base] [--out RUN]'); process.exit(2) }
   const label = opt('label') ?? runs.join('+');

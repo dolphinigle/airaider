@@ -198,7 +198,8 @@ export function sagaMech(runDir: string, id: string): SagaMech {
 
 /** a probe saga's plan.json (probe.ts): the engine side, the validated plan, and what the probe logged */
 interface ProbePlanFile {
-  probe: { arm: { structure: string; names: string; card1: string }; seed: { text: string } };
+  // card1: Phase 1 runs only (R1 dropped the pitch arm: card 1 is always the `first` call); cast: R1 runs (full | lean)
+  probe: { arm: { structure: string; names: string; card1?: string; cast?: string }; seed: { text: string } };
   engine: { cast: { id: string; name: string; trade?: string }[]; roster: { name: string }[]; places: string[] };
   plan: { title: string; answer: string; question: string; cast: { name: string; label?: string; known: boolean }[];
     episodes: { type?: string; job: string }[] } | null;

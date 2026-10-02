@@ -1,24 +1,25 @@
-Write the report of one job in a fantasy game about a mercenary company. The player read the card, printed above your report, and sent these soldiers. Pick up where it ends and never repeat it.
+Write the report of one job in a fantasy game about a mercenary company. The player read the card, printed above your report, and sent these soldiers.
 
 The data:
 - card: what the player read. job: the task it set.
-- soldiers: who went, and what each one is like.[[decides]] decides: the soldier whose act settles it.[[/decides]]
-- people: others in the card or at the job, with label, sex, part. Call each by name; intro: new to the player, so bring them in by label and name.
+- soldiers: who went, and what each is like.[[decides]] decides: the soldier whose act settles it.[[/decides]]
+[[people]]- people: the others in this job, with label, sex, part, called by name; intro: new to the player, so give label and name.
 [[!failure]]- outcome: success, partial (done, at a price), or failure.[[result]] result: exactly what came of it.[[/result]]
 [[option]]- plan: how the player chose to end it, in your own words.
-[[hurt]]- hurt: who gets hurt, and how badly. Show each one taking it.
-[[cost]]- cost: the price of the partial success. Show it being paid.
-[[brought]]- brought: who or what comes home with the soldiers; show each.
-[[answer]]- answer: the player's question, and the truth; reveal it plainly in after, in your own words.
-[[direction]]- direction: the player's wish; it changes the telling, never what happens.
+[[hurt]]- hurt: [[hurtprice]]the price paid: [[/hurtprice]]who is hurt, and how badly; show each taking it.
+[[cost]]- cost: the price; show it paid.
+[[brought]]- brought: who or what comes home with them; show each.
+[[answer]]- answer: the story's question, and its truth.
+[[direction]]- direction: the player's wish for the telling only.
 
 Write:
-- before: at most {{B}} words. The soldiers arrive and meet what stands in their way. No hint of how it goes.
+- before: at most {{B}} words. The soldiers arrive and meet what stands in their way, adding only what the card did not say. No hint of how it goes.
 [[!failure]]- after: at most {{A}} words. The deciding moment and what came of it, exactly as the data say; nothing else changes. End on something seen, done or said that shows the change.
 [[failure]]- after: at most {{A}} words. What stood in the way beats them, and the job is not done; nothing else changes. End on something seen, done or said.
-[[moved]]- summary: one sentence of at most 25 words: what the company did and what is different now. Name no soldier; say the company.
-[[stopped]]- summary: one sentence of at most 25 words: what the company tried and what stopped it. Name no soldier; say the company.
+[[answer]]- truth: one sentence telling the answer plainly in your own words; after leaves it out.
+[[moved]]- summary: one sentence of at most 25 words: what the company did and what is different now, no wound. Name no soldier[[personal]] but the one whose past this story is[[/personal]]; say the company.
+[[stopped]]- summary: one sentence of at most 25 words: what the company tried and what stopped it, no wound. Name no soldier[[personal]] but the one whose past this story is[[/personal]]; say the company.
 
-Past tense, plain words, short complete sentences, in the order things happened. Name only the soldiers and the people given. No numbers, nothing modern, never the company's pay.
+Past tense, plain words, short complete sentences, in the order things happened. Name only the soldiers and the people given. No numbers, nothing modern, no pay.
 
-Reply with JSON only: {"before": "text", "after": "text"[[saga]], "summary": "text"[[/saga]]}
+Reply with JSON only: {"before": "text", "after": "text"[[answer]], "truth": "one sentence"[[/answer]][[saga]], "summary": "text"[[/saga]]}

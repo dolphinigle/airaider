@@ -4,28 +4,33 @@
 // report at low — for plan → card 1 → report → card → … → the finale card with its plans → the finale
 // report, on scripted outcomes (the §5.0 path rules; the ⚄ line agrees).
 //
-//   npx tsx scripts/sagalab/probe.ts [--arm S|L|H|all] [--names labels|named|all] [--card1 pitch|first|all]
+//   npx tsx scripts/sagalab/probe.ts [--arm L|S|H|all] [--cast full|lean|all] [--names labels|named|all]
 //        [--fixtures F1,F2|all] [--draws 3 | --draw 1,3] [--mock] [--render] [--avoid] [--direction TEXT]
-//        [--run probe1] [--concurrency 4] [--force]
+//        [--run probe2] [--concurrency 4] [--force]
 //
+//   --cast     R1 (C5): `full` = Phase 1's casting and stake; `lean` = the one who asks (no trade) + the
+//              person the ending decides (+ the personal soldier / a returning face), no stake
 //   --mock     the template floor (§4.4): the mock writer in place of the model, no key needed
-//   --render   also dump every prompt variant the run rendered, with its real payload, to
-//              runs/<run>/rendered/ (for the context-free verifier)
+//   --render   clear runs/<run>/rendered/, then dump every prompt variant this pass rendered, each with
+//              the real payload it was sent (for the context-free verifier); INDEX.md lists any of
+//              the variants the verifier needs that this pass did not reach
 //   --avoid    deal each plan the title and question of the arm's previous five sagas (runs that arm in order)
 //   --slots F1_4,F3_5   run exactly these fixture_draw sagas (in place of --fixtures × --draws)
 //   --as NAME  write the arm to runs/<run>/NAME/ (one arm only), e.g. a clean floor folder
-//   --series   plan + card 1 only (the §D.3 repetition series), into runs/<run>/series_<arm>/
+//   --series   plan + card 1 only (the §D.3 repetition series), into runs/<run>/series_<arm>/; each
+//              series draw gets its own cast and places (the main draws keep the fixture's)
 //
 // Writes each saga in the folder format the judges read (extract.ts), one folder per saga:
-//   runs/<run>/<arm>/<fixture>_<draw>/   (mock runs: runs/<run>/mock-<arm>/…)
+//   runs/<run>/<arm>/<fixture>_<draw>/   e.g. runs/probe2/L_lean/F6_3/ (mock runs: runs/<run>/mock-<arm>/…)
 //     card_k.md · report_k.md · chain.md (with So far) · order.txt · texts.json · plan.json ·
 //     calls.jsonl · meta.json
-// and runs/<run>/<arm>/INDEX.md. Judge an arm with e.g. `judge_gpt.ts j1 --run probe1/S_labels_pitch`.
+// and runs/<run>/<arm>/INDEX.md. Judge an arm with e.g. `judge_gpt.ts j1 --run probe2/L_lean`.
 //
 // Draws: 1–2 play clean (a personal fixture: the personal path), draw 3 a failure and a re-pose
 // (bumpy; lastchance when N = 2). Fixture, draw and path fix the soldiers, dice and wounds, so every
 // arm plays the same game; only the writing differs. The theme dealt to a fixture's draw is the same
-// in every arm.
+// in every arm, and the same as probe1's (the dealer sequence is unchanged), so probe2 pairs with probe1
+// slot for slot. Card 1 is always the separate `first` card call (R1, C3).
 
 import OpenAI from 'openai';
 import * as fs from 'node:fs';
@@ -42,10 +47,10 @@ import type { LabFixture } from '../../src/engine/lab.js';
 import type { CallLogLine } from '../../src/ai/calllog.js';
 import type { TextRec } from './extract.js';
 import {
-  type Arm, type Structure, type NamesArm, type Card1Arm, type ProbeFixture, type World, type Draw, type PlanCtx,
-  type SagaPlan, type Knowing, type Hurt, armKey, newKnowing, buildWorld, makeDraw, planPayload, validatePlan, planLint, mockPlan,
+  type Arm, type Structure, type NamesArm, type CastArm, type ProbeFixture, type World, type Draw, type PlanCtx,
+  type SagaPlan, type Knowing, type Hurt, armKey, newKnowing, buildWorld, leanWorld, makeDraw, planPayload, validatePlan, planLint, mockPlan,
   mockCard, mockReport, firstCardPayload, laterCardPayload, reportPayload, noteDelivered, onThisMatter, outcomeFor,
-  pickParty, rollDice, rollHurt, fateSentence, buttonLine, helped, hashStr, zCardOut, zReportOut, zPlanOut,
+  pickParty, rollDice, rollHurt, fateSentence, choiceTarget, buttonLine, helped, hashStr, zCardOut, zReportOut, zPlanOut,
 } from './v4lab.js';
 
 const V3 = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -57,7 +62,7 @@ const opt = (name: string): string | undefined => { const i = argv.indexOf(`--${
 const flag = (name: string) => argv.includes(`--${name}`);
 const MOCK = flag('mock'), RENDER = flag('render'), AVOID = flag('avoid'), FORCE = flag('force'), SERIES = flag('series');
 const SLOTS = opt('slots')?.split(',').map(s => s.trim()).filter(Boolean);
-const RUN = opt('run') ?? 'probe1';
+const RUN = opt('run') ?? 'probe2';
 const DIRECTION = opt('direction');
 const MODEL = 'gpt-5-mini';
 const listOf = <T extends string>(name: string, all: readonly T[], dflt: T): T[] => {
@@ -68,9 +73,10 @@ const listOf = <T extends string>(name: string, all: readonly T[], dflt: T): T[]
   for (const x of xs) if (!all.includes(x)) { console.error(`--${name}: ${x} is not one of ${all.join('/')}`); process.exit(2) }
   return xs;
 };
-const ARMS: Arm[] = listOf<Structure>('arm', ['S', 'L', 'H'], 'S').flatMap(structure =>
-  listOf<NamesArm>('names', ['labels', 'named'], 'labels').flatMap(names =>
-    listOf<Card1Arm>('card1', ['pitch', 'first'], 'pitch').map(card1 => ({ structure, names, card1 }))));
+if (opt('card1')) { console.error('--card1 is gone: card 1 is always the `first` card call (R1, C3)'); process.exit(2) }
+const ARMS: Arm[] = listOf<Structure>('arm', ['S', 'L', 'H'], 'L').flatMap(structure =>
+  listOf<CastArm>('cast', ['full', 'lean'], 'full').flatMap(cast =>
+    listOf<NamesArm>('names', ['labels', 'named'], 'labels').map(names => ({ structure, names, cast }))));
 const DRAWS: number[] = opt('draw') ? opt('draw')!.split(',').map(Number) : Array.from({ length: Number(opt('draws') ?? 3) }, (_, i) => i + 1);
 const CONCURRENCY = AVOID ? 1 : Number(opt('concurrency') ?? (MOCK ? 8 : 4));
 
@@ -83,10 +89,20 @@ const baseOf = (id: string): LabFixture => readJson<LabFixture>(path.join(LAB, '
 const wantFx = opt('fixtures') && opt('fixtures') !== 'all' ? opt('fixtures')!.split(',') : ALL_FX.map(f => f.id);
 // every world, in a fixed order, whatever is selected: card ids come from a process-wide counter
 const WORLDS = new Map(ALL_FX.map(fx => [fx.id, buildWorld(fx, baseOf(fx.base))]));
+// the sagas this pass plays, the same for every arm
+const PLAY: { fx: ProbeFixture; d: number }[] = SLOTS
+  ? SLOTS.map(sl => { const [f, d] = sl.split('_'); const fx = ALL_FX.find(x => x.id === f); if (!fx || !(Number(d) >= 1)) { console.error(`bad slot in --slots: ${sl}`); process.exit(2) } return { fx, d: Number(d) } })
+  : DRAWS.flatMap(d => ALL_FX.filter(f => wantFx.includes(f.id)).map(fx => ({ fx, d })));
+// the repetition series: each draw meets its own people and places (a frozen cast per fixture made J4
+// read triplets with the same patron, foe and town). Built after WORLDS, in slot order, so the main
+// worlds' card ids never move
+const SERIES_WORLDS = new Map<string, World>();
+if (SERIES) for (const { fx, d } of [...PLAY].sort((a, b) => `${a.fx.id}_${a.d}`.localeCompare(`${b.fx.id}_${b.d}`, undefined, { numeric: true })))
+  if (!SERIES_WORLDS.has(`${fx.id}_${d}`)) SERIES_WORLDS.set(`${fx.id}_${d}`, buildWorld(fx, baseOf(fx.base), d));
 // the seeds: one dealer sequence over draw × fixture, the same in every arm and every subset
 const SEEDS = new Map<string, DealtSeed>();
 {
-  const rng = new Rng(hashStr('probe1-seeds'));
+  const rng = new Rng(hashStr('probe1-seeds'));   // probe1's dealer sequence: probe2 pairs with it slot for slot
   const recent: string[] = [];
   for (let d = 1; d <= Math.max(...DRAWS, 3, ...(SLOTS ?? []).map(s => Number(s.split('_')[1]))); d++) for (const fx of ALL_FX) {
     if (fx.seed || fx.personal) continue;
@@ -106,6 +122,8 @@ const PRICE = { in: 0.25, cached: 0.025, out: 2 };   // gpt-5-mini per 1M tokens
 async function write<S extends z.ZodTypeAny>(a: {
   saga: string; calls: CallRec[]; purpose: TemplateName; flags: string[]; vars?: Record<string, number>;
   payload: Record<string, unknown>; effort: 'low' | 'medium'; schema: S; mock: () => unknown;
+  /** the rendered-variant class this call belongs to (--render), when its flags alone do not tell it */
+  variant?: string;
 }): Promise<{ out: z.output<S> | null; ms: number }> {
   const system = render(a.purpose, a.flags, a.vars);
   const user = JSON.stringify(a.payload);
@@ -114,7 +132,7 @@ async function write<S extends z.ZodTypeAny>(a: {
   const log = (rec: Omit<CallRec, keyof typeof base | 'n' | 't'>) => {
     const line: CallRec = { t: new Date().toISOString(), n: a.calls.length + 1, ...base, ...rec };
     a.calls.push(line);
-    const key = `${a.purpose}__${line.flags.join('+') || 'plain'}`;
+    const key = `${a.variant ?? a.purpose}__${line.flags.join('+') || 'plain'}`;
     if (!RENDERED.has(key)) RENDERED.set(key, line);
   };
   if (MOCK) {
@@ -167,7 +185,7 @@ async function runSaga(job: Job): Promise<Row> {
   let plan: SagaPlan | null = null, repairs: string[] = [], rawPlan: unknown = null, redraws = 0, fallback = false, planMs = 0;
   const defects: string[] = [];
   for (let attempt = 0; attempt < 2 && !plan; attempt++) {
-    const r = await write({ saga: job.id, calls, purpose: 'plan', flags: planFlags, payload: planIn, effort: 'medium', schema: zPlanOut, mock: () => mockPlan(ctx) });
+    const r = await write({ saga: job.id, calls, purpose: 'plan', flags: planFlags, payload: planIn, effort: 'medium', schema: zPlanOut, mock: () => mockPlan(ctx), variant: `plan__${arm.cast}` });
     planMs += r.ms;
     rawPlan = r.out;
     const v = r.out ? validatePlan(r.out, ctx) : { plan: null, repairs: [], defects: ['the call failed'] };
@@ -175,8 +193,7 @@ async function runSaga(job: Job): Promise<Row> {
     else { defects.push(...v.defects.map(d => `draw ${attempt + 1}: ${d}`)); if (attempt === 0) redraws++ }
   }
   if (!plan) { fallback = true; const v = validatePlan(mockPlan(ctx), ctx); plan = v.plan!; repairs = v.repairs; problems.push('plan-fallback: the mock plan stood in') }
-  if (plan.pitch && words(plan.pitch) > 70) capBreaks.push(`pitch ${words(plan.pitch)}/70`);
-  const lint = planLint(plan, w);
+  const lint = planLint(plan, w, draw.seed.text);
   const focal = plan.cast.find(p => p.focal)!;
 
   // ── play it
@@ -195,18 +212,14 @@ async function runSaga(job: Job): Promise<Row> {
     const e = finale ? plan.showdown : plan.episodes[jobN - 1]!;
     kk++;
     const questId = `${job.id}.q${kk}`;
-    // the card
-    let card: string;
-    if (kk === 1 && arm.card1 === 'pitch') { card = plan.pitch!; card1Ms = planMs }
-    else {
-      const cc = kk === 1 ? firstCardPayload(plan, w, arm, k, DIRECTION)
-        : laterCardPayload(plan, e, latest, jobN === 1 ? plan.question : plan.episodes[jobN - 2]?.opens ?? plan.question, arm, k, { finale, lastchance, direction: DIRECTION });
-      const r = await write({ saga: job.id, calls, purpose: 'card', flags: cc.flags, vars: cc.vars, payload: cc.payload, effort: 'low', schema: zCardOut, mock: () => mockCard(cc.payload, cc.flags) });
-      if (kk === 1) card1Ms = planMs + r.ms;
-      card = r.out?.card?.trim() ?? '';
-      if (!card) { card = mockCard(cc.payload, cc.flags).card; problems.push(`card_${kk}: the writer failed, the template stood in`) }
-      if (words(card) > cc.vars.MAX!) capBreaks.push(`card_${kk} ${words(card)}/${cc.vars.MAX}`);
-    }
+    // the card: card 1 is always its own call (R1, C3), every later card carries its job's why (C1)
+    const cc = kk === 1 ? firstCardPayload(plan, w, arm, k, DIRECTION)
+      : laterCardPayload(plan, e, latest, arm, k, { finale, lastchance, direction: DIRECTION });
+    const cr = await write({ saga: job.id, calls, purpose: 'card', flags: cc.flags, vars: cc.vars, payload: cc.payload, effort: 'low', schema: zCardOut, mock: () => mockCard(cc.payload, cc.flags) });
+    if (kk === 1) card1Ms = planMs + cr.ms;
+    let card = cr.out?.card?.trim() ?? '';
+    if (!card) { card = mockCard(cc.payload, cc.flags).card; problems.push(`card_${kk}: the writer failed, the template stood in`) }
+    if (words(card) > cc.vars.MAX!) capBreaks.push(`card_${kk} ${words(card)}/${cc.vars.MAX}`);
     if (kk === 1) card1 = card;
     noteDelivered(card, plan, k, false);
     const tryOnJob = finale ? 1 : (tries.get(jobN) ?? 0) + 1;
@@ -234,15 +247,18 @@ async function runSaga(job: Job): Promise<Row> {
     const { hurt, cost } = rollHurt(rng, outcome, party, dice.lowest);
     const gravity = sampleGravity(rng, w.base.rarity ?? 'common', 'saga');
     const option = finale ? plan.options[0]! : undefined;   // the likely way: the options come likely first
-    const fate = option ? fateSentence(option.way, outcome, focal) : undefined;
+    const fate = option ? fateSentence(option.way, outcome, focal, choiceTarget(plan)) : undefined;
     attempts.push({ k: kk, questId, isFinale: finale, outcome });
 
     // the report
     const rp = reportPayload({ plan, e, card, party, decides: dice.decides, outcome, finale, hurt, cost, option, fate, arm, k, gravity, direction: DIRECTION });
-    const r = await write({ saga: job.id, calls, purpose: 'report', flags: rp.flags, vars: rp.vars, payload: rp.payload, effort: 'low', schema: zReportOut, mock: () => mockReport(rp.payload, rp.flags) });
-    let rep = r.out ? { before: r.out.before.trim(), after: r.out.after.trim(), summary: (r.out.summary ?? '').trim() } : null;
+    const r = await write({ saga: job.id, calls, purpose: 'report', flags: rp.flags, vars: rp.vars, payload: rp.payload, effort: 'low', schema: zReportOut, mock: () => mockReport(rp.payload, rp.flags), variant: `report__${finale ? 'finale-' : ''}${outcome}` });
+    let rep: { before: string; after: string; summary: string; truth?: string } | null = r.out ? { before: r.out.before.trim(), after: r.out.after.trim(), summary: (r.out.summary ?? '').trim(), truth: r.out.truth?.trim() || undefined } : null;
     if (!rep) { rep = mockReport(rp.payload, rp.flags); problems.push(`report_${kk}: the writer failed, the template stood in`) }
     if (!rep.summary) { rep.summary = mockReport(rp.payload, rp.flags).summary; problems.push(`report_${kk}: no summary, the template's stood in`) }
+    // the finale's answer is its own line (R1, C4); a reply without it gets the plan's answer, as dealt
+    if (finale && !rep.truth) { rep.truth = mockReport(rp.payload, rp.flags).truth; problems.push(`report_${kk}: no truth, the plan's answer stood in`) }
+    if (!finale) delete rep.truth;
     if (words(rep.before) > rp.vars.B!) capBreaks.push(`report_${kk} before ${words(rep.before)}/${rp.vars.B}`);
     if (words(rep.after) > rp.vars.A!) capBreaks.push(`report_${kk} after ${words(rep.after)}/${rp.vars.A}`);
     if (words(rep.summary) > 25) capBreaks.push(`report_${kk} summary ${words(rep.summary)}/25`);
@@ -254,20 +270,21 @@ async function runSaga(job: Job): Promise<Row> {
       : jobN + 1 > N - 1 ? 'it now comes to a head' : 'the story moves on';
     const repMd = [
       `━━ ${outcome.toUpperCase()} ━━ ${e.title}${finale ? ' ♛' : ''}`, rep.before, dice.line, rep.after,
+      ...(rep.truth ? [rep.truth] : []),
       ...hurt.map(h => `🩸 ${h.name} is wounded (${HOW_BAND[h.how]}).`),
       `📖 ${plan.title}: ${status}. ${rep.summary}`,
     ].join('\n') + '\n';
     const repFile = `report_${kk}.md`;
     fs.writeFileSync(path.join(dir, repFile), repMd);
     order.push(repFile);
-    texts.push({ file: repFile, kind: 'report', k: kk, questId, isFinale: finale, title: e.title, before: rep.before, after: rep.after, outcome, diceLine: dice.line });
+    texts.push({ file: repFile, kind: 'report', k: kk, questId, isFinale: finale, title: e.title, before: rep.before, after: rep.after, ...(rep.truth ? { truth: rep.truth } : {}), outcome, diceLine: dice.line });
     latest = rep.summary;
     if (finale) break;
     if (outcome !== 'failure') jobN++;
     if (kk > 20) { problems.push('runaway saga (> 20 attempts)'); break }
   }
 
-  // the chronicle (§4.3 chainDetail): title, state, pitch, the likely-end line, So far, People
+  // the chronicle (§4.3 chainDetail): title, state, card 1 (the plan writes no pitch), the likely-end line, So far, People
   const lastOutcome = attempts[attempts.length - 1]?.outcome;
   const state = SERIES ? 'planned' : lastOutcome === 'failure' ? 'slipped' : 'done';
   const mark: Record<string, string> = { success: '✓', partial: '~', failure: '✗' };
@@ -327,20 +344,18 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
 
 async function main() {
   const runDir = path.join(LAB, 'runs', RUN);
-  const fixtures = ALL_FX.filter(f => wantFx.includes(f.id));
-  if (!fixtures.length) { console.error(`no fixtures match ${wantFx.join(',')}`); process.exit(2) }
+  if (!PLAY.length) { console.error(`no fixtures match ${wantFx.join(',')}`); process.exit(2) }
+  if (RENDER) fs.rmSync(path.join(runDir, 'rendered'), { recursive: true, force: true });
   let total = 0;
   for (const arm of ARMS) {
-    const armName = SERIES ? `series_${arm.names === 'labels' && arm.card1 === 'pitch' ? arm.structure : armKey(arm)}` : armKey(arm);
+    const armName = SERIES ? `series_${armKey(arm)}` : armKey(arm);
     if (opt('as') && ARMS.length > 1) { console.error('--as takes one arm'); process.exit(2) }
     const armDir = path.join(runDir, opt('as') ?? `${MOCK ? 'mock-' : ''}${armName}`);
     const jobs: Job[] = [];
-    const slots = SLOTS ? SLOTS.map(s => { const [f, d] = s.split('_'); return { fx: ALL_FX.find(x => x.id === f), d: Number(d) } })
-      : DRAWS.flatMap(d => fixtures.map(fx => ({ fx, d })));
-    for (const { fx, d } of slots) {
-      if (!fx || !(d >= 1)) { console.error(`bad slot in --slots ${SLOTS?.join(',')}`); process.exit(2) }
-      const w = WORLDS.get(fx.id)!;
+    for (const { fx, d } of PLAY) {
       const id = `${fx.id}_${d}`;
+      const world = SERIES ? SERIES_WORLDS.get(id)! : WORLDS.get(fx.id)!;
+      const w = arm.cast === 'lean' ? leanWorld(world) : world;
       const dir = path.join(armDir, id);
       if (!FORCE && fs.existsSync(path.join(dir, 'meta.json'))) { console.log(`[${armKey(arm)} ${id}] exists — skipped (--force to redo)`); continue }
       jobs.push({ w, arm, draw: makeDraw(w, d, SEEDS.get(id) ?? null), dir, id });
@@ -364,7 +379,7 @@ async function main() {
     rows.sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
     fs.mkdirSync(armDir, { recursive: true });
     fs.writeFileSync(path.join(armDir, 'INDEX.md'), [
-      `# ${RUN} · ${MOCK ? 'mock floor · ' : ''}${SERIES ? 'repetition series (plan + card 1) · ' : ''}arm ${armKey(arm)} (structure ${arm.structure}, names ${arm.names}, card 1 ${arm.card1})`, '',
+      `# ${RUN} · ${MOCK ? 'mock floor · ' : ''}${SERIES ? 'repetition series (plan + card 1) · ' : ''}arm ${armKey(arm)} (structure ${arm.structure}, cast ${arm.cast}, names ${arm.names}, card 1 first)`, '',
       '| saga | title | path | N | outcomes | files | complete | plan defects (re-draws) | fallback | lint | $ | card 1 after |',
       '|---|---|---|---|---|---|---|---|---|---|---|---|',
       ...rows.map(r => `| ${r.id} | ${r.title} | ${r.path} | ${r.N} | ${r.outcomes} | ${r.files} | ${r.complete ? '✓' : `✗ ${r.problems.join('; ')}`} | ${r.defects.length ? `${r.defects.join('; ')} (${r.redraws})` : '—'} | ${r.fallback ? '✗' : '—'} | ${r.lint.join('; ') || '—'} | ${r.cost.toFixed(4)} | ${(r.card1Ms / 1000).toFixed(1)}s |`),
@@ -382,22 +397,36 @@ async function main() {
     for (const [key, c] of RENDERED) {
       fs.writeFileSync(path.join(rd, `${key}.txt`), `=== SYSTEM (${c.purpose} · ${c.flags.join(', ') || 'no flags'} · ${wordCount(c.system)} words · from ${c.saga} · ${c.provider === 'mock' ? 'mock writer' : c.model}) ===\n${c.system}\n\n=== USER ===\n${c.user}\n`);
     }
-    // the index covers every variant in the folder, so passes with and without --direction add up
+    // the variants the verifier needs (§5.2 verify 1); the folder was cleared, so only this pass counts
+    const has = (f: (key: string, c: CallRec) => boolean) => [...RENDERED].some(([key, c]) => f(key, c));
+    const cardWith = (flag: string) => (_k: string, c: CallRec) => c.purpose === 'card' && c.flags.includes(flag);
+    const NEED: [string, (key: string, c: CallRec) => boolean][] = [
+      ['plan, full cast', k => k.startsWith('plan__full__')], ['plan, lean cast', k => k.startsWith('plan__lean__')],
+      ['card 1 (first)', cardWith('first')], ['a later card', cardWith('later')], ['the finale card', cardWith('finale')],
+      ['a last-chance finale card', cardWith('lastchance')], ['a personal card', cardWith('personal')], ['a card with a memory', cardWith('memory')],
+      ['a success report', k => k.startsWith('report__success__')], ['a partial report', k => k.startsWith('report__partial__')],
+      ['a failure report', k => k.startsWith('report__failure__')], ['a finale report', k => k.startsWith('report__finale-')],
+      ['the answer (truth) report', (_k, c) => c.purpose === 'report' && c.flags.includes('answer')],
+      ['a personal report', (_k, c) => c.purpose === 'report' && c.flags.includes('personal')],
+    ];
+    const missing = NEED.filter(([, f]) => !has(f)).map(([name]) => name);
     const rows = fs.readdirSync(rd).filter(f => f.endsWith('.txt')).sort().map(f => {
       const head = fs.readFileSync(path.join(rd, f), 'utf8').split('\n')[0]!.match(/^=== SYSTEM \((\w+) · (.*) · (\d+) words · from (.*)\) ===$/);
       const [saga, writer] = (head?.[4] ?? '?').split(' · ');
       return `| ${f} | ${head?.[1] ?? '?'} | ${head?.[2] ?? '?'} | ${head?.[3] ?? '?'} | ${saga} | ${writer ?? '?'} |`;
     });
     fs.writeFileSync(path.join(rd, 'INDEX.md'), [`# ${RUN} — every prompt variant rendered, each with the real payload it was sent`, '',
-      'Each file: the system prompt as the model reads it, then the user message exactly as sent (JSON).', '',
+      'Each file: the system prompt as the model reads it, then the user message exactly as sent (JSON).',
+      'File names: `plan__<cast arm>__<flags>` · `card__<flags>` · `report__<outcome, finale- for the finale>__<flags>`.', '',
       'Flags (each turns on the template lines, spans or skeleton fields it names; a flag is on only when the payload carries what it explains):',
-      '- plan: `shape` shape dealt · `episodes` job list dealt (arm S) · `types` job types to pick from (arms H, L) · `pitch` the plan writes card 1 · `personal` the story is a soldier\'s own past · `memory` a returning face · `direction` the player\'s wish · `avoid` recent stories.',
-      '- card: `first` / `later` / `finale` which card · `personal` a soldier\'s own past (card 1, finale) · `memory` a returning face met here · `lastchance` the failure budget is spent · `direction`.',
-      '- report: `saga` the reply has a summary · `moved` its summary says what changed · `failure` + `stopped` a failed job, its summary says what stopped it · `decides` `result` `option` `hurt` `cost` `brought` `answer` `direction` one data line each.',
+      '- plan: `shape` shape dealt · `episodes` job list dealt (arm S) · `types` job types to pick from (arms H, L) · `stake` a stake dealt (full cast) · `notrade` someone in cast has no trade (lean cast) · `personal` the story is a soldier\'s own past · `memory` a returning face · `direction` the player\'s wish · `avoid` recent stories.',
+      '- card: `first` / `later` / `finale` which card · `loses` card 1\'s premise carries the loss · `personal` a soldier\'s own past (card 1, finale) · `memory` a returning face met here · `lastchance` the failure budget is spent · `direction`.',
+      '- report: `saga` the reply has a summary · `moved` its summary says what changed · `failure` + `stopped` a failed job, its summary says what stopped it · `people` someone besides the soldiers acts in the job · `personal` the soldier whose past the story is went (the summary may name them) · `decides` `result` `option` `hurt` `cost` `brought` `direction` one data line each · `hurtprice` a partial whose price is the wound (no cost dealt) · `answer` the finale\'s answer, returned as its own `truth`.',
       '',
+      missing.length ? `**Not reached this pass:** ${missing.join(' · ')}.` : 'Every variant class the verifier needs is here: plan full and lean; card first, later, finale, last chance, personal, memory; report success, partial, failure, finale, answer, personal.', '',
       'The writer column says whose earlier outputs fed the payload: a real run (the plan, cards and summaries the model wrote) or the mock floor (template text).', '',
       '| file | call | flags | words | from saga | writer |', '|---|---|---|---|---|---|', ...rows, ''].join('\n'));
-    console.log(`rendered ${RENDERED.size} prompt variants this pass (${rows.length} in the folder) → ${path.relative(V3, rd)}`);
+    console.log(`rendered ${RENDERED.size} prompt variants → ${path.relative(V3, rd)}${missing.length ? ` · NOT reached: ${missing.join(', ')}` : ' · every variant class reached'}`);
   }
   console.log(`total: $${total.toFixed(4)} → ${path.relative(V3, runDir)}`);
 }

@@ -568,6 +568,18 @@ Opus codes; Fable plans and verifies. **Each phase ends in a gate. Stop rule:** 
   5. **Repetition (§D.3):** ≥ 20 cheap plans + card 1 per arm (themes dealt) → J4 series reader + mech; the names arm (§D.4) rides along.
 - **G1:** the §D answers applied; **one structure arm chosen by followability** (M1, then M5, then M2; M3 next; M19 only on a tie); names arm chosen by M1/M11; verifier clean; ≥ 22/24 plans defect-free; answer-not-guessable ≥ 14/24; paperwork ≤ 1 in 8; 0 spoilers; M1, M3, M5 not below base. **Card 1, symmetric:** higher follow wins; within noise, latency decides (`first` adds a sequential call); both AI arms must beat the floor on want-to-send, else fix the plan prompt (one revision, then the stop rule). **Later cards:** if the AI card does not beat the template on follow or want-to-send, drop the call (−5–14 s per continuation). The designer reads 2–3 probe sagas.
 
+#### Phase 1 result + R1 (2026-10-02)
+- **G1 is not met** (`v3/scripts/sagalab/reports/2026-10-02-G1-probe1.md`): followability did not improve (M1 strict ≈ 55% in all three arms). Chosen: **arm L**, **labels until met**, and **card 1 = the `first` card call** (the pitch spoiled 5–7 of 16 card 1s and told job 1 as done; `first` 0 of 8).
+- **R1 is the one revision the stop rule allows.** Each fix targets a class:
+  - **C1, cards starved of why:** later cards named the job's thing or person but never said what it was or how getting it helped. The plan now writes `why` for each job and the showdown: how the job brings the one who asked closer to what they want, saying what any thing or person in it is. It replaces `opens`, and cards get it in place of `question`.
+  - **C2, noise objects:** the "end on a small sight, sound or object" rule, and the `question` input that fed it, are cut. They closed every card on a clue that nothing paid off.
+  - **C3:** card 1 is always the `first` call, so the plan loses its pitch (plan budget 660 → 620).
+  - **C4:** the finale report returns the answer as its own `truth` line, printed after `after`. The engine still decides when the answer is dealt (§2.5).
+  - **C5, an arm and not a ruling:** **L_full** keeps today's casting and stake. **L_lean** casts only the one who asks (with no trade), the person the ending decides, and the personal soldier or a returning face when one is dealt. It has no third seat and no stake.
+  - **C6, roll-call reports:** a report's people are only those that the job, the trouble or the result refer to, plus the person the finale decides. `before` adds only what the card did not say.
+- **Runs:** `runs/probe2/{L_full,L_lean}/<fx>_<draw>/`, paired slot for slot with probe1 (same soldiers, dice, path and seed). `score.ts --pair` reads the gap. The repetition series now deals each draw its own cast.
+- ⏳ **If L_lean wins, the asker's trade and the stake move from the engine to the plan** (§2.2, §2.4.2, §2.4.3). That is a designer ruling, and it is not written in here as decided.
+
 ### 5.3 Phase 2: build (each step green on the mock)
 - **2a Engine:** `saga.ts` (shapes, types, tests, stakes, casting + fences, places, record, injuries, deciding soldier, event edges incl. NPC → soldier); `themes.ts` (the ≥ 1,000-theme library + the dealer); `plainwords.ts`; `chains.ts`; `storyRngState`; `lore.ts` edge helper; `injury.ts`. Tests: saga, castrules, storyrng, themes (no repeat within 50). The structure arm chosen at G1 is the one built; the others stay lab-only.
 - **2b AI:** `storyteller.ts` (rendering, builders + names filter, zod, §2.7); templates; `provider.ts` (`planSaga`, `writeCard`, `writeReport`; one-off `writeQuest`/`resolve` kept); `openai.ts` wiring via `callR`; `mock.ts`. Tests: promptbudget, payloadlint, nameleak, planvalidate.
