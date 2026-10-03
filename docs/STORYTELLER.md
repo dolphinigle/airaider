@@ -25,6 +25,7 @@ Once signed, this is the saga spec and wins over the sections in §4.6, whose **
 |---|---|---|---|
 | `storyteller-best-keep-r3` | b2c3e58 | want-the-next-part (keep) | the incumbent: R4 lost to it 15–33 / 13–35; R5 lost keep 16–32 but won follow 32–16 |
 | `storyteller-best-follow-r5` | fb7556e | followability (quest log + scene cards, answer first, why as a hope) | follow 32–16 over R3 (held 15–7) |
+| — (not a checkpoint) | b884c87 | R6: spoilers 17→5, paperwork 34%→20%, engine buttons — but the reveal lost its reason (M8 79%) | follow vs R3 only 25–23; R7 builds on it minus that change |
 
 6. **WHAT IS MEASURED SO FAR (class laws):** (a) the model matters most — Sonnet out-writes gpt-5-mini on identical prompts (plans 7.8 vs 3.7); (b) every field the writer gets as its own labelled item becomes its own stock sentence — rewording only moves the stamp, so bookkeeping belongs in an engine-rendered quest log; (c) a written sequence outline ("road ahead", each job with its "so…") is the biggest single followability win (95–0–7) — but only when written from the story's own plan, never by a call blind to it (detour jobs) and never from hindsight text (spoilers); (d) the answer must be written FIRST so the clues can point at it; (e) the job→want link in a mystery is the information the job promises, phrased as a hope, never as a fact; (f) a rule that forces the answer to fit every ending (the gold way) makes stock "buried hoard" answers.
 
