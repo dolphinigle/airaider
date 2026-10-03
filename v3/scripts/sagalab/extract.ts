@@ -41,6 +41,7 @@ export interface TextRec {
   before?: string; after?: string; outcome?: string; diceLine?: string;   // report
   truth?: string;                                                   // probe finale report: the answer in one plain sentence (R3: for the chronicle, not printed)
   log?: string;                                                     // probe card (R4): the engine's quest log printed above the prose
+  ledger?: string;                                                  // probe report (R7): the engine's ledger lines printed under the prose
 }
 export interface SagaMeta {
   fixture: LabFixture; run: string; chainId: string | null; chainState: string | null;

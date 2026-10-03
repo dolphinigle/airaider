@@ -6,8 +6,13 @@
 // the plan's own why (v4lab.ts printedHopes), printed after its job on the road rows ahead and dealt, the same words, to
 // that job's card as `why` and to its report as `hope`, unless the engine keeps it off the screen (whyFlags: a gain, a
 // learn, answer words, an asserted knowing verb); every card is printed under the engine's quest log (v4lab.ts questLog:
-// For · Road ahead · Known · Held · Open question; card 1's has neither For nor Open question, its prose tells the
-// premise). R6 (F2): the PLANS buttons are the engine's templates per way (v4lab.ts cannedOption), never the plan's.
+// For · Road ahead · Known · Held · Open question; card 1's has no For line, its prose tells who needs you). R6 (F2): the
+// PLANS buttons are the engine's templates per way (v4lab.ts cannedOption), never the plan's. R7 (readability): every report
+// prints the engine's ledger under its prose (v4lab.ts ledgerLines: Learned · Took · Cost · Outcome); the Open question is
+// on card 1's log too, whose prose tells what went wrong; the finale card states its stakes; engine lines call a met person
+// by name (metNames); a road hope prints only where it reads as one sentence (hopeLine); one town plus the landmark.
+// R7 verify 2: the finale's stakes are the log's last line (stakesLine), a blank line parts log and prose, road rows read
+// "<job> — hoping to …", and everyone a report is dealt as there is met afterwards (notePresent).
 //
 //   npx tsx scripts/sagalab/probe.ts [--arm L|S|H|all] [--cast full|lean|all] [--names labels|named|all]
 //        [--fixtures F1,F2|all] [--draws 3 | --draw 1,3] [--mock] [--render] [--avoid] [--direction TEXT]
@@ -66,9 +71,9 @@ import type { TextRec } from './extract.js';
 import {
   type Arm, type Structure, type NamesArm, type CastArm, type ProbeFixture, type World, type Draw, type PlanCtx,
   type SagaPlan, type Knowing, type Hurt, type SagaState, armKey, newKnowing, newState, bank, buildWorld, leanWorld, makeDraw, planPayload, validatePlan, planLint, mockPlan,
-  mockCard, mockReport, firstCardPayload, laterCardPayload, reportPayload, noteDelivered, onThisMatter, outcomeFor,
-  pickParty, rollDice, rollHurt, fateSentence, choiceTarget, buttonLine, helped, hashStr, zCardOut, zReportOut, zPlanOut, revealLint,
-  questLog, roadLines, printedHopes, whyFlags, jobWhy, forLineShown, triedLine, winIsGain, gainKinds, gainDeal,
+  mockCard, mockReport, firstCardPayload, laterCardPayload, reportPayload, noteDelivered, notePresent, onThisMatter, outcomeFor,
+  pickParty, rollDice, rollHurt, fateSentence, choiceTarget, clientOf, buttonLine, hashStr, zCardOut, zReportOut, zPlanOut, revealLint,
+  questLog, roadLines, jobHopes, whyFlags, jobWhy, forLineShown, triedLine, winIsGain, gainKinds, gainDeal, ledgerLines, finaleOptions,
 } from './v4lab.js';
 import { glossEchoes, cardStamps } from './mech.js';
 
@@ -342,11 +347,11 @@ async function runSaga(job: Job): Promise<Row> {
   const ctx: PlanCtx = { w, arm, draw, avoid: job.avoid, direction: DIRECTION };
 
   // ── the plan: one call, repairs, one plain re-draw on a hard defect, else the mock (§2.7)
-  const { payload: planIn, flags: planFlags } = planPayload(ctx);
+  const { payload: planIn, flags: planFlags, vars: planVars } = planPayload(ctx);
   let plan: SagaPlan | null = null, repairs: string[] = [], rawPlan: unknown = null, redraws = 0, fallback = false, planMs = 0;
   const defects: string[] = [];
   for (let attempt = 0; attempt < 2 && !plan; attempt++) {
-    const r = await write({ saga: job.id, calls, purpose: 'plan', flags: planFlags, payload: planIn, effort: 'medium', schema: zPlanOut, mock: () => mockPlan(ctx), variant: `plan__${arm.cast}` });
+    const r = await write({ saga: job.id, calls, purpose: 'plan', flags: planFlags, vars: planVars, payload: planIn, effort: 'medium', schema: zPlanOut, mock: () => mockPlan(ctx), variant: `plan__${arm.cast}` });
     planMs += r.ms;
     rawPlan = r.out;
     const v = r.out ? validatePlan(r.out, ctx) : { plan: null, repairs: [], defects: ['the call failed'] };
@@ -359,8 +364,10 @@ async function runSaga(job: Job): Promise<Row> {
   const focal = plan.cast.find(p => p.focal)!;
 
   // ── (R6, F1) each job's hope: the plan's own why, as the road rows ahead print it and its card and report are dealt it,
-  // or none where the engine keeps it off the screen; a saga with fewer than two jobs before the finale gets no road
-  const hopes = printedHopes(plan, w, arm, k, draw.seed.text);
+  // or none where the engine keeps it off the screen; a saga with fewer than two jobs before the finale gets no road.
+  // (R7, R4) printed only where it reads as one sentence (else the row shows the job alone), dealt wherever it is not flagged
+  const jh = jobHopes(plan, w, arm, k, draw.seed.text);
+  const hopes = jh.map(h => h.print), dealtHopes = jh.map(h => h.deal);
   const whyFlagged = whyFlags(plan, w, draw.seed.text);
   const road = plan.episodes.length >= 2 ? roadLines(plan, hopes) : null;
   const tCard1 = Date.now();
@@ -393,8 +400,8 @@ async function runSaga(job: Job): Promise<Row> {
     // (R5 verify) from card 2 the log's For line names and labels the one the company acts for above the prose
     if (kk > 1) forLineShown(plan, k);
     // (R5 verify 2) a later job's why is its road line's hope, one owner per job (`jobWhy`); job 1's the plan's; the finale none
-    const cc = kk === 1 ? firstCardPayload(plan, w, arm, k, DIRECTION, hopes[0])
-      : laterCardPayload(plan, e, latest, arm, k, { finale, lastchance, retry: tryOnJob > 1, direction: DIRECTION, why: jobWhy(plan, finale ? N : jobN, hopes) });
+    const cc = kk === 1 ? firstCardPayload(plan, w, arm, k, DIRECTION, dealtHopes[0])
+      : laterCardPayload(plan, e, latest, arm, k, { finale, lastchance, retry: tryOnJob > 1, direction: DIRECTION, why: jobWhy(plan, finale ? N : jobN, dealtHopes) });
     // (R3) a personal saga's later cards carry no flag of their own (the template is the same), so --render keys
     // them apart: the verifier reads a personal finale with its own payload (the soldier as the one you act for)
     const cr = await write({ saga: job.id, calls, purpose: 'card', flags: cc.flags, vars: cc.vars, payload: cc.payload, effort: 'low', schema: zCardOut, mock: () => mockCard(cc.payload, cc.flags), variant: w.fx.personal && kk > 1 ? 'card-personal' : undefined });
@@ -405,26 +412,34 @@ async function runSaga(job: Job): Promise<Row> {
     if (kk === 1) card1 = card;
     // (R4, Q1) the quest log, rendered by the engine from data right after the header: who the company acts for and
     // what they want, the road, what is known and held, the open question. The card prose carries none of it
-    // (R5, P5) card 1's prose tells the premise (who needs you, their want, what nobody knows), so its log prints neither
-    // the For line nor the Open question (R5 verify: one owner per fact)
-    const log = questLog(plan, arm, k, banked, { lines: road, done, at: finale ? N : jobN, retry: !finale && tryOnJob > 1 }, { forLine: kk > 1, open: kk > 1 });
+    // (R5, P5) card 1's prose tells who needs you and their want, so its log prints no For line (R5 verify: one owner per
+    // fact); (R7, R3) the Open question is the log's from card 1 on (R6's card 1 dropped it in 6 of 24, N25)
+    // (R7 verify 2) the finale's stakes are the log's last line (`stakesLine`), no longer the card writer's
+    const log = questLog(plan, arm, k, banked, { lines: road, done, at: finale ? N : jobN, retry: !finale && tryOnJob > 1 }, { forLine: kk > 1, open: true, stakes: finale });
     const shownText = `${log.join('\n')}\n${card}`;
     noteDelivered(shownText, plan, k, false);
-    const setbackLine = !finale && tryOnJob > 1 ? ` · a setback — ${failures} of ${budget} before it slips away` : '';
-    const matter = onThisMatter(plan, shownText);
+    // (R7 verify) ON THIS MATTER leaves out whom the For line just named and labelled (the one the company acts for, card 2 on)
+    const matter = onThisMatter(plan, shownText, kk > 1 ? [clientOf(plan).id] : []);
+    // (R7, R2) the buttons name the one they decide once the player has met them (`finaleOptions`)
+    const opts = finale ? finaleOptions(plan, arm, k) : [];
+    // (R7 verify) card 1's prose comes first and its log under it: printed above, the Road ahead named the asker and the Open
+    // question asked about a problem before the card had told either. Every later card keeps its log on top (the For line
+    // brings the asker in). The footer drops the saga title (the header has it) and says the setbacks one way
+    // (R7 verify 2) a blank line between the log and the prose: run on under "Open question: …" the prose read as the log's next
+    // line, easy to skip as bookkeeping. A personal saga has no hirer, so its footer promises no pay (the game pays it as spoils)
     const cardMd = [
-      `═══ ${e.title} · ${plan.title} ═══`, ...log, card,
+      `═══ ${e.title} · ${plan.title} ═══`, ...(kk === 1 ? [card, '', ...log] : [...log, '', card]),
       ...(matter.length ? [`ON THIS MATTER: ${matter.join(' · ')}`] : []),
-      finale ? 'REWARD: the rest of the saga\'s pay, and what the ending brings' : "REWARD: a few days' pay",
-      finale ? `SAGA: ${plan.title} · the finale${lastchance ? ' · the last chance' : ''} · setbacks ${failures} of ${budget}`
-        : `SAGA: ${plan.title} · part ${jobN} of ${N}${setbackLine || ` · setbacks ${failures} of ${budget}`}`,
-      ...(finale ? [`PLANS (pick one) — chosen: g${chosen}`, ...plan.options.map((o, i) => buttonLine(o, i, i === chosen, helped(focal)))] : []),
+      w.fx.personal ? (finale ? 'REWARD: the rest of the spoils, and what the ending brings' : 'REWARD: some spoils')
+        : finale ? 'REWARD: the rest of the saga\'s pay, and what the ending brings' : "REWARD: a few days' pay",
+      `SAGA: ${finale ? `the finale${lastchance ? ' · the last chance' : ''}` : `part ${jobN} of ${N}${tryOnJob > 1 ? ' (again)' : ''}`} · setbacks ${failures} of ${budget}`,
+      ...(finale ? [`PLANS (pick one) — chosen: g${chosen}`, ...opts.map((o, i) => buttonLine(o, i, i === chosen))] : []),
     ].join('\n') + '\n';
     const cardFile = `card_${kk}.md`;
     fs.writeFileSync(path.join(dir, cardFile), cardMd);
     if (cr.rec) cr.rec.shown = cardMd;
     order.push(cardFile);
-    texts.push({ file: cardFile, kind: 'card', k: kk, questId, isFinale: finale, title: e.title, beat: finale ? 'finale' : jobN, prose: card, log: log.join('\n'), errand: '', approaches: finale ? plan.options.map((o, i) => buttonLine(o, i, i === chosen, helped(focal)).slice(2)) : [] });
+    texts.push({ file: cardFile, kind: 'card', k: kk, questId, isFinale: finale, title: e.title, beat: finale ? 'finale' : jobN, prose: card, log: log.join('\n'), errand: '', approaches: finale ? opts.map((o, i) => buttonLine(o, i, i === chosen).slice(2)) : [] });
     if (SERIES) break;   // the repetition series: plan + card 1 only
 
     // the outcome, forced by the path; the soldiers, dice and wounds from the play rng
@@ -434,12 +449,12 @@ async function runSaga(job: Job): Promise<Row> {
     const dice = rollDice(rng, party, outcome);
     const { hurt, cost } = rollHurt(rng, outcome, party, dice.lowest);
     const gravity = sampleGravity(rng, w.base.rarity ?? 'common', 'saga');
-    const option = finale ? plan.options[chosen]! : undefined;   // the options come likely first (R6, F7: `chosen`)
+    const option = finale ? opts[chosen]! : undefined;   // the options come likely first (R6, F7: `chosen`)
     const fate = option ? fateSentence(option.way, outcome, focal, choiceTarget(plan)) : undefined;
     attempts.push({ k: kk, questId, isFinale: finale, outcome });
 
     // the report
-    const rp = reportPayload({ plan, e, card, party, decides: dice.decides, outcome, finale, hurt, cost, option, fate, arm, k, gravity, direction: DIRECTION, state: { learned: [...banked.learned], held: [...banked.held] }, hope: finale ? undefined : hopes[jobN - 1] });
+    const rp = reportPayload({ plan, e, card, party, decides: dice.decides, outcome, finale, hurt, cost, option, arm, k, gravity, direction: DIRECTION, state: { learned: [...banked.learned], held: [...banked.held] }, hope: finale ? undefined : dealtHopes[jobN - 1] });
     const r = await write({ saga: job.id, calls, purpose: 'report', flags: rp.flags, vars: rp.vars, payload: rp.payload, effort: 'low', schema: zReportOut, mock: () => mockReport(rp.payload, rp.flags), variant: `report__${finale ? 'finale-' : ''}${outcome}` });
     let rep: { before: string; after: string; summary: string } | null = r.out ? { before: r.out.before.trim(), after: r.out.after.trim(), summary: (r.out.summary ?? '').trim() } : null;
     if (!rep) { rep = mockReport(rp.payload, rp.flags); problems.push(`report_${kk}: the writer failed, the template stood in`) }
@@ -448,6 +463,11 @@ async function runSaga(job: Job): Promise<Row> {
     if (words(rep.after) > rp.vars.A!) capBreaks.push(`report_${kk} after ${words(rep.after)}/${rp.vars.A}`);
     if (words(rep.summary) > 25) capBreaks.push(`report_${kk} summary ${words(rep.summary)}/25`);
     noteDelivered(`${rep.before} ${rep.after} ${rep.summary}`, plan, k, true);
+    // (R7 verify 2) everyone the report was dealt as there in person is met, named in the prose or not (`notePresent`)
+    notePresent(rp.payload.people, plan, k);
+    // (R7, R1) the engine's ledger under the prose: Learned · Took · Cost · the finale's Outcome (read after the report is
+    // delivered, so a person it just met is called by name)
+    const ledger = ledgerLines({ plan, e, outcome, finale, cost, fate, arm, k });
     bank(banked, e, outcome);
     // (R5 verify) a failed job's summary is only what stopped the company (the retry card is dealt it alone); the
     // chronicle puts the job in front of it
@@ -458,20 +478,23 @@ async function runSaga(job: Job): Promise<Row> {
     if (!finale && outcome === 'failure') { failures++; if (failures >= budget) { lastchance = true; done.set(jobN, 'lost') } }
     else if (!finale) done.set(jobN, 'won');
     const status = finale ? (outcome === 'failure' ? 'it slips away, for now' : 'it is settled')
-      : outcome === 'failure' ? `a setback — ${failures} of ${budget}${lastchance ? '; the setbacks are spent, so the last chance comes next' : ''}`
+      : outcome === 'failure' ? `setbacks ${failures} of ${budget}${lastchance ? '; they are spent, so the last chance comes next' : ''}`
       : jobN + 1 > N - 1 ? 'it now comes to a head' : 'the story moves on';
     // (R3, W5) the secret comes out inside `after`, in time order (printed after `after`, a secret found mid-action read
     // backwards). (R5 verify) The chronicle's answer line is the plan's answer, not a copy the report returned
     if (finale) { const rl = revealLint(plan, w, rep.after, draw.seed.text); if (rl) textLint.push(rl) }
     const repMd = [
-      `━━ ${outcome.toUpperCase()} ━━ ${e.title}${finale ? ' ♛' : ''}`, rep.before, dice.line, rep.after,
+      `━━ ${outcome.toUpperCase()} ━━ ${e.title}${finale ? ' ♛' : ''}`, rep.before, dice.line, rep.after, ...ledger,
       ...hurt.map(h => `🩸 ${h.name} is wounded (${HOW_BAND[h.how]}).`),
-      `📖 ${plan.title}: ${status}. ${rep.summary}`,
+      // (R7 verify) the saga's status alone: the summary retold the result `after` had just ended on (at the finale a third time,
+      // under the Outcome line); it stays the chronicle's and a retry's
+      `📖 ${plan.title}: ${status}.`,
     ].join('\n') + '\n';
     const repFile = `report_${kk}.md`;
     fs.writeFileSync(path.join(dir, repFile), repMd);
+    if (r.rec) r.rec.shown = repMd;
     order.push(repFile);
-    texts.push({ file: repFile, kind: 'report', k: kk, questId, isFinale: finale, title: e.title, before: rep.before, after: rep.after, outcome, diceLine: dice.line });
+    texts.push({ file: repFile, kind: 'report', k: kk, questId, isFinale: finale, title: e.title, before: rep.before, after: rep.after, outcome, diceLine: dice.line, ledger: ledger.join('\n') });
     // (R4 verify) the next card opens on what happened last, from engine data that holds no clue by construction: a won
     // job's `win` (the plan's, which the report was told to tell). The writer's summary retold the clue ("took his
     // ledger, which showed years of secret dealings") and the card repeated what the log above it lists as Known; a
@@ -511,7 +534,8 @@ async function runSaga(job: Job): Promise<Row> {
     'So far:', ...lines.map(l => `  ${l.n} ${mark[l.outcome]} ${l.party.join(', ')} — ${l.text}${l.hurt.length ? ` · ${l.hurt.map(h => `${h.name} hurt (${HOW_BAND[h.how]})`).join(', ')}` : ''}`),
     // (R3, W5) the answer, for the record (the report shows it come out, in time order); (R5 verify) the plan's own
     ...(finaleOutcome ? [`The answer: ${plan.answer}`] : []),
-    'People:', ...plan.cast.filter(p => k.seen.has(p.id)).map(p => k.named.has(p.id) ? `  ${p.name} — ${p.label.replace(/^an? /, '')}` : `  ${p.label}`),
+    // (R7 verify) a personal saga's wronged kin with their tie
+    'People:', ...plan.cast.filter(p => k.seen.has(p.id)).map(p => `  ${k.named.has(p.id) ? `${p.name} — ${p.label.replace(/^an? /, '')}` : p.label}${p.tie ? `, ${p.tie}` : ''}`),
   ].join('\n') + '\n';
   fs.writeFileSync(path.join(dir, 'chain.md'), chain);
   order.push('chain.md');
@@ -539,7 +563,7 @@ async function runSaga(job: Job): Promise<Row> {
     },
     planInput: planIn, plan, rawPlan,
     // (R6) each job's hope (null: kept off the screen, with why), the gain kinds dealt, the ending played
-    hopes: { printed: hopes, flagged: whyFlagged, road }, gainKinds: kinds, gainsDealt: gainDeal(ctx), ending: { chosen, option: plan.options[chosen] ?? null },
+    hopes: { printed: hopes, dealt: dealtHopes, flagged: whyFlagged, road }, gainKinds: kinds, gainsDealt: gainDeal(ctx), ending: { chosen, option: plan.options[chosen] ?? null },
     validation: { repairs, defects, redraws, fallback },
     lint, textLint, capBreaks, lines, banked, met: [...k.met], named: [...k.named], seen: [...k.seen],
     cost, latency: { planMs, card1Ms, calls: calls.map(c => ({ purpose: c.purpose, ms: c.durationMs })) },
@@ -617,7 +641,10 @@ async function main() {
     fs.mkdirSync(rd, { recursive: true });
     for (const [key, c] of RENDERED) {
       // (R4) a card also shows what the player sees: the card under its header and the engine's quest log
-      fs.writeFileSync(path.join(rd, `${key}.txt`), `=== SYSTEM (${c.purpose} · ${c.flags.join(', ') || 'no flags'} · ${wordCount(c.system)} words · from ${c.saga} · ${c.provider === 'mock' ? 'mock writer' : c.model}) ===\n${c.system}\n\n=== USER ===\n${c.user}\n${c.shown ? `\n=== THE PLAYER SEES (header, the engine's quest log, then the card the writer returned) ===\n${c.shown}` : ''}`);
+      // (R7) a report shows it too: the prose the writer returned with the engine's ledger lines under it
+      // (R7 verify) card 1's prose comes before its log
+      const sees = c.purpose === 'card' ? (c.flags.includes('first') ? "header, the card the writer returned, then the engine's quest log" : "header, the engine's quest log, then the card the writer returned") : "the report the writer returned, with the engine's ledger lines (Learned · Took · Cost · Outcome) and the 🩸 / 📖 lines under it";
+      fs.writeFileSync(path.join(rd, `${key}.txt`), `=== SYSTEM (${c.purpose} · ${c.flags.join(', ') || 'no flags'} · ${wordCount(c.system)} words · from ${c.saga} · ${c.provider === 'mock' ? 'mock writer' : c.model}) ===\n${c.system}\n\n=== USER ===\n${c.user}\n${c.shown ? `\n=== THE PLAYER SEES (${sees}) ===\n${c.shown}` : ''}`);
     }
     // the variants the verifier needs (§5.2 verify 1); the folder was cleared, so only this pass counts
     const has = (f: (key: string, c: CallRec) => boolean) => [...RENDERED].some(([key, c]) => f(key, c));
@@ -640,8 +667,15 @@ async function main() {
       ['a retry card (S5)', cardWith('retry')],
       ['a card whose log has a road ahead (Q1)', (_k, c) => c.purpose === 'card' && !!c.shown?.includes('Road ahead:')],
       ['a card whose log has known facts and held gains (Q1)', (_k, c) => c.purpose === 'card' && !!c.shown?.includes('\nKnown:') && !!c.shown?.includes('\nHeld:')],
-      ['a finale card after a win (latest, no lose)', (_k, c) => c.purpose === 'card' && c.flags.includes('finale') && c.flags.includes('latest') && !c.flags.includes('lose')],
-      ['a last-chance finale card with lose', (_k, c) => c.purpose === 'card' && c.flags.includes('lastchance') && c.flags.includes('lose')],
+      // R7: card 1's log carries the Open question (R3); the finale card states its stakes and has no latest after a win (R3);
+      // a report carries the engine's ledger lines (R1): Learned and Took on a won middle job, Cost on a partial, Outcome on the finale
+      ['card 1 whose log has the Open question (R7 R3)', (_k, c) => c.purpose === 'card' && c.flags.includes('first') && !!c.shown?.includes('\nOpen question:')],
+      // R7 verify 2: the finale's stakes are the log's last line (At stake:), no longer dealt to the writer
+      ['a finale card after a win (At stake line, no latest; R7 R3, R7 verify 2)', (_k, c) => c.purpose === 'card' && c.flags.includes('finale') && !!c.shown?.includes('\nAt stake: ') && !c.flags.includes('latest')],
+      ['a last-chance finale card (At stake line and latest)', (_k, c) => c.purpose === 'card' && c.flags.includes('lastchance') && !!c.shown?.includes('\nAt stake: ') && c.flags.includes('latest')],
+      ['a won report with Learned and Took lines (R7 R1)', (_k, c) => c.purpose === 'report' && !!c.shown?.includes('\nLearned: ') && !!c.shown?.includes('\nTook: ')],
+      ['a partial report with a Cost line (R7 R1)', (_k, c) => c.purpose === 'report' && !!c.shown?.includes('\nCost: ')],
+      ['a finale report with its Outcome line (R7 R1)', (_k, c) => c.purpose === 'report' && c.flags.includes('answer') && !!c.shown?.includes('\nOutcome: ')],
       ['a won middle report with clue + gain (S1, S2)', (_k, c) => c.purpose === 'report' && c.flags.includes('clue') && c.flags.includes('brought')],
       ['a middle report with known clues and holdings (S1, S2)', (_k, c) => c.purpose === 'report' && c.flags.includes('known') && !c.flags.includes('answer')],
       ['a finale report with known clues (S1)', (_k, c) => c.purpose === 'report' && c.flags.includes('answer') && c.flags.includes('known')],
@@ -661,13 +695,13 @@ async function main() {
     fs.writeFileSync(path.join(rd, 'INDEX.md'), [`# ${RUN} — every prompt variant rendered, each with the real payload it was sent`, '',
       'Each file: the system prompt as the model reads it, then the user message exactly as sent (JSON).',
       'File names: `plan__<cast arm>__<flags>` · `card__<flags>` (`card-personal__` for a personal saga\'s later card) · `report__<outcome, finale- for the finale>__<flags>`.',
-      'A card file ends with THE PLAYER SEES: the card under its header and the quest log the ENGINE renders from data (For · Road ahead · Known · Held · Open question, each left out when empty; R5: For is a sentence, "For: <who>, <label>, who wants to …"; Road ahead shows done jobs (✓/✗) and this job (▶) by title, the jobs ahead by their road line (R6: the job, then the plan\'s own why for it, unless the engine kept that why off the screen); the PLANS buttons are engine templates per way (R6 F2); neither For nor Open question on card 1, whose prose tells the premise). The writer never sees or writes the log; it is shown so the card can be read as the player reads it.', '',
+      'A card file ends with THE PLAYER SEES: the card under its header and the quest log the ENGINE renders from data (For · Road ahead · Known · Held · Open question, each left out when empty; R5: For is a sentence, "For: <who>, <label>, who wants to …"; Road ahead shows done jobs (✓/✗) and this job (▶) by title, the jobs ahead by their road line (R6: the job, then the plan\'s own why for it, unless the engine kept that why off the screen); the PLANS buttons are engine templates per way (R6 F2), naming the one they decide once met (R7 R2); no For line on card 1, whose prose tells who needs you, but the Open question from card 1 on (R7 R3); every engine line calls a met person by name (R7 R2); R7 verify: card 1\'s prose comes first and its log under it, every later card keeps the log on top; the SAGA footer has no saga title and one setback wording; ON THIS MATTER leaves out whom the For line names, and gives a personal saga\'s wronged kin with their tie; a PLANS button shows only what its words do not (the gold way\'s coin) and its stat; R7 verify 2: a blank line parts the log from the prose; a road row ahead is "<job> — hoping to …"; the finale\'s log ends on the engine\'s stakes line, "At stake: <whose> fate. If you fail, <who> loses <what> for good."; a personal saga\'s footer promises spoils, not pay; buttons and the stakes line name a person once the player has read their name beside their role). A report file ends with THE PLAYER SEES too: its prose, then the engine\'s ledger lines from data (R7 R1: Learned · Took · Cost · the finale\'s Outcome, each left out when empty) and the 🩸 / 📖 lines (R7 verify: 📖 is the saga\'s status alone; the summary is the chronicle\'s and a retry\'s; the ⚄ line in whole coins). R7 verify: every string a card or report is dealt names a person the player has met by name (`metNames`), as the log and ledger do; the card text a report is dealt stays as the player read it. The writer never sees or writes the log or the ledger; they are shown so each text can be read as the player reads it.', '',
       'Flags (each turns on the template lines, spans or skeleton fields it names; a flag is on only when the payload carries what it explains):',
-      '- plan (R6 verify 2: `gains` deals a record as an atom (the kind word alone collapsed to "ledger"), "a letter", "a map"; a thing, a person, a beast or a place as the kind; a personal saga casts the one the soldier\'s past wronged): `shape` shape dealt · `episodes` job list dealt (arm S) · `types` job types to pick from (arms H, L) · `stake` a stake dealt (full cast) · `notrade` someone in cast has no trade (lean cast) · `personal` the story is a soldier\'s own past · `memory` a returning face · `direction` the player\'s wish · `avoid` recent stories.',
-      '- card: `first` / `later` / `finale` which card (R5: card 1 always carries its premise: who needs you, their want, what nobody knows) · `personal` card 1\'s premise is a soldier\'s own past · `returning` card 1\'s premise carries the asker\'s past with you (a returning face; R5 verify) · `memory` someone else in names is a returning face met here · `lastchance` the failure budget is spent · `latest` what happened last (every later card but a retry, and R6 F5: none after a win that restated its gain, which the log\'s Held line shows) · `retry` a re-posed job (what stopped the last try; its trouble has no `will`, R5 verify) · `why` the job\'s hope, from its one owner (R6 F1: the plan\'s why, the same words its road row showed; none where the engine kept it off the screen; the finale has none, as the showdown\'s was the For line\'s want) · `will` what the trouble will do (card 1 again since R6 F3, later cards and the finale; not a retry or a last chance with `lose`) · `intro` / `part` some entry in names carries one (a gloss only for a key that is there) · `lose` what is lost for good, at a last chance only · `direction`. R4: on later cards, who the company acts for and their want, what is known, what is held and the open question are the quest log\'s, never the card\'s (R5 verify: on card 1 the premise is the prose\'s alone, so its log has no For line and the asker is dealt as new, `intro`); whose fate the finale settles is the PLANS buttons\'. A named entry carries its label only with `intro`, for the company\'s own soldier, or where the dealt text calls them by it (R4 verify; reports too). R6 verify: a later or finale card\'s cap (MAX) is sized to what it is dealt (about 1.4 words per dealt word, at least 45, never past 70 / 90); card 1 keeps 80.',
-      '- report: `saga` the reply has a summary · `moved` its summary says what changed · `failure` + `stopped` a failed job, its summary says only what stopped it (R5 verify: the retry card is dealt it alone; the chronicle puts the job in front) · `people` someone besides the soldiers is there (the plan\'s people for the job, the one the finale decides, or someone the job, trouble or gain names as there; an owner\'s mention is not presence, nor is the result\'s) · `intro` / `part` some entry in people carries one · `personal` the soldier whose past the story is went (the summary may name them) · `decides` `result` `option` `hurt` `cost` `direction` one data line each · `brought` a won job\'s gain · `clue` what a won job brings to light · `hope` the hope its card printed, within reach or why not (R6 F1, won middle jobs) · `away` some entry in people is named by a dealt field but not at the job (R6 verify 2: name and sex only, so no pronoun is guessed and nobody is placed there) · `known` what earlier won jobs found (middle or finale) · `have` what the company holds (`edge`: at the finale, how each helps) · `hurtprice` a partial whose price is the wound (no cost dealt) · `answer` the finale\'s question and its secret (the plan\'s answer): it comes out inside `after`, in pieces (R6 F4) (R5 verify: no `truth` reply, a copy of the secret; the chronicle prints the plan\'s answer).',
+      '- plan (R6 verify 2: `gains` deals a record as an atom (the kind word alone collapsed to "ledger"), "a letter", "a map"; a thing, a person, a beast or a place as the kind; a personal saga casts the one the soldier\'s past wronged; R7 verify: no cast `traits`, and `MID` names the job by which everyone in cast is met; R7 verify 2: a person gain where nobody in cast can be held is dealt with its sex, "a man" / "a woman"; labels lose any inner article): `shape` shape dealt · `episodes` job list dealt (arm S) · `types` job types to pick from (arms H, L) · `stake` a stake dealt (full cast) · `notrade` someone in cast has no trade (lean cast) · `personal` the story is a soldier\'s own past · `memory` a returning face · `direction` the player\'s wish · `avoid` recent stories.',
+      '- card: `first` / `later` / `finale` which card (R5: card 1 always carries its premise: who needs you, their want; R7 R3: what went wrong, `problem`, while the question is the log\'s; R7 verify: its cap sized to its data, 70 to 80) · `personal` card 1\'s premise is a soldier\'s own past · `returning` card 1\'s premise carries the asker\'s past with you (a returning face; R5 verify) · `memory` someone else in names is a returning face met here · `lastchance` the failure budget is spent · `latest` what happened last (every later card but a retry, and R6 F5: none after a win that restated its gain, which the log\'s Held line shows) · `retry` a re-posed job (what stopped the last try; its trouble has no `will`, R5 verify) · `why` the job\'s hope, from its one owner (R6 F1: the plan\'s why, the same words its road row showed; none where the engine kept it off the screen; the finale has none, as the showdown\'s was the For line\'s want) · `will` what the trouble will do (card 1 again since R6 F3, later cards and the finale; not a retry or a last chance with `lose`) · `intro` / `part` some entry in names carries one (a gloss only for a key that is there) · `direction` (R7 R3: the finale has no `latest` but at a last chance; R7 verify 2: no `stakes`, the log\'s At stake line says them; a personal finale carries the one the soldier\'s past wronged in names, with their tie; a person gain that is nobody in cast comes in names, label and the sex the engine dealt, where the dealt text speaks of them). R4: on later cards, who the company acts for and their want, what is known, what is held and the open question are the quest log\'s, never the card\'s (R5 verify: on card 1 the premise is the prose\'s alone, so its log has no For line and the asker is dealt as new, `intro`); whose fate the finale settles is the PLANS buttons\'. A named entry carries its label only with `intro`, for the company\'s own soldier, or where the dealt text calls them by it (R4 verify; reports too). R6 verify: a later or finale card\'s cap (MAX) is sized to what it is dealt (about 1.4 words per dealt word, at least 45, never past 70 / 90); R7 verify: card 1 too, at least 70, never past 80.',
+      '- report: `saga` the reply has a summary · `moved` its summary says what changed · `failure` + `stopped` a failed job, its summary says only what stopped it (R5 verify: the retry card is dealt it alone; the chronicle puts the job in front) · `people` someone besides the soldiers is there (the plan\'s people for the job, the one the finale decides, or someone the job, trouble or gain names as there; an owner\'s mention is not presence, nor is the result\'s) · `intro` / `part` some entry in people carries one · `personal` the soldier whose past the story is went (the summary may name them) · `decides` `result` `option` `hurt` `cost` `direction` one data line each (R7 verify: `carried` a won finale, whose plan the soldiers carry out) · `brought` a won job\'s gain · `clue` what a won job brings to light · `hope` the hope its card printed, said plainly what this win does for it (R6 F1, won middle jobs; R7 verify) · `away` some entry in people is named by a dealt field but not at the job (R6 verify 2: name and sex only, so no pronoun is guessed and nobody is placed there) · `known` what earlier won jobs found (middle or finale) · `have` what the company holds (`edge`: at the finale, how each helps) · `hurtprice` a partial whose price is the wound (no cost dealt) · `answer` the finale\'s question and its secret (the plan\'s answer): it comes out inside `after`, in time order, built from known, its reason said plainly (R7 R0, back from R6\'s "in pieces") (R5 verify: no `truth` reply, a copy of the secret; the chronicle prints the plan\'s answer). R7 R1: `clue` and `cost` are printed below the report (the ledger), so the prose only shows where the clue turns up; the finale\'s `result` is settles or the loss, the fate being the Outcome line. R7 verify: hurt, cost, brought and clue share one line ("printed below the report; show the moment each happens", a `[[hurt|cost|brought|clue]]` line), cost shown as paid ("nothing else changes but the price"); the closing rule bans the company\'s wages, not a payment the gold way stages. R7 verify 2: clue is "a fact found or heard here" (shown as the moment it is found or heard; the Learned line states it); a person gain that is nobody in cast comes in `brought` and `have` with the sex the engine dealt ({who|holds, sex}); everyone a report is dealt as there in person is met afterwards (`notePresent`), so a present foe the prose left out is brought in by the next card.',
       '',
-      missing.length ? `**Not reached this pass:** ${missing.join(' · ')}.` : 'Every variant class the verifier needs is here: plan full and lean; card first (with the trouble\'s will), a later card with no latest, later, finale, last chance (with lose), personal, memory, retry, finale after a win (latest), cards whose log has a road, known facts and held gains; report success, partial, failure, finale (with and without gains, with known clues), answer, personal, won middle with clue + gain, middle with known clues, an away entry; a personal plan with the wronged one in cast.', '',
+      missing.length ? `**Not reached this pass:** ${missing.join(' · ')}.` : 'Every variant class the verifier needs is here: plan full and lean; card first (with the trouble\'s will, its log with the Open question), a later card with no latest, later, finale (stakes, no latest), last chance (stakes and latest), reports with ledger lines (Learned and Took, Cost, Outcome), personal, memory, retry, finale after a win (latest), cards whose log has a road, known facts and held gains; report success, partial, failure, finale (with and without gains, with known clues), answer, personal, won middle with clue + gain, middle with known clues, an away entry; a personal plan with the wronged one in cast.', '',
       'The writer column says whose earlier outputs fed the payload: a real run (the plan, cards and summaries the model wrote) or the mock floor (template text).', '',
       '| file | call | flags | words | from saga | writer |', '|---|---|---|---|---|---|', ...rows, ''].join('\n'));
     console.log(`rendered ${RENDERED.size} prompt variants → ${path.relative(V3, rd)}${missing.length ? ` · NOT reached: ${missing.join(', ')}` : ' · every variant class reached'}`);

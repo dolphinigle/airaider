@@ -86,6 +86,58 @@ export interface SagaMech {
   glossEchoes?: string[];
   /** (R5 verify 2) probe sagas only: per card stamp, the cards whose prose carries it (`cardStamps`) */
   cardStamps?: Record<string, number>;
+  /** (R7, R5) probe sagas only, log-only readability rows (`readability`) */
+  read?: Readability;
+}
+
+/** (R7, R5) log-only readability rows, over the prose the writer returned (card prose; report before + after):
+ *  words per sentence and sentences past 20 words; proper nouns per text (distinct people and places by name: a person is
+ *  one noun however many name parts are printed) and the INVENTED ones among them (a capitalised word mid-sentence that no
+ *  dealt name, soldier, place or land word holds); words on screen per card (the engine's log + the prose) and per report
+ *  (the prose + the engine's ledger lines) */
+export interface Readability {
+  sentenceWords: number[]; longSentences: number;
+  namesCard: number[]; namesReport: number[]; inventedCard: number[]; inventedReport: number[]; invented: string[];
+  screenCard1: number[]; screenMiddle: number[]; screenFinale: number[]; screenReport: number[];
+}
+/** a text's sentences: a stop (or a closing quote after it) then space */
+export const sentencesOf = (text: string): string[] => text.split(/(?<=[.!?]["”’]?)\s+/).map(x => x.trim()).filter(x => wc(x) > 0);
+/** capitalised words that open no sentence (a quote opens one too), possessive cut */
+export function midCaps(text: string): string[] {
+  const out: string[] = [];
+  for (const seg of text.split(/(?<=[.!?:;]["”’]?)\s+|\s*["“”]\s*/)) {
+    for (const tok of seg.trim().split(/\s+/).filter(Boolean).slice(1)) {
+      const w = tok.replace(/^[^A-Za-z]+|[^A-Za-z'’-]+$/g, '').replace(/['’]s$/, '');
+      if (/^[A-Z][a-z'’-]+/.test(w)) out.push(w);
+    }
+  }
+  return out;
+}
+export function readability(texts: TextRec[], people: string[], placeWords: string[]): Readability {
+  // a name part → the whole name it belongs to (so "Nicholina" and "Redhand" are one person)
+  const owner = new Map<string, string>();
+  for (const n of people) for (const part of n.split(/\s+/).filter(x => /^[A-Z]/.test(x) && x.length > 2)) if (!owner.has(part)) owner.set(part, n);
+  const places = new Set(placeWords.filter(x => /^[A-Z]/.test(x)));
+  const NOT_NAMES = new Set(['I']);
+  const keys = (t: string) => { const all = midCaps(t).filter(w => !NOT_NAMES.has(w)); return { names: new Set(all.map(w => owner.get(w) ?? w)), invented: new Set(all.filter(w => !owner.has(w) && !places.has(w))) } };
+  const r: Readability = { sentenceWords: [], longSentences: 0, namesCard: [], namesReport: [], inventedCard: [], inventedReport: [], invented: [], screenCard1: [], screenMiddle: [], screenFinale: [], screenReport: [] };
+  const inv = new Set<string>();
+  for (const t of texts) {
+    const prose = t.kind === 'card' ? t.prose ?? '' : `${t.before ?? ''} ${t.after ?? ''}`;
+    for (const sn of sentencesOf(prose)) { const n = wc(sn); r.sentenceWords.push(n); if (n > 20) r.longSentences++ }
+    const k = keys(prose);
+    k.invented.forEach(x => inv.add(x));
+    if (t.kind === 'card') {
+      r.namesCard.push(k.names.size); r.inventedCard.push(k.invented.size);
+      const screen = wc(t.log) + wc(t.prose);
+      (t.k === 1 ? r.screenCard1 : t.isFinale ? r.screenFinale : r.screenMiddle).push(screen);
+    } else {
+      r.namesReport.push(k.names.size); r.inventedReport.push(k.invented.size);
+      r.screenReport.push(wc(t.before) + wc(t.after) + wc(t.ledger));
+    }
+  }
+  r.invented = [...inv];
+  return r;
 }
 
 function readJsonl<T>(p: string): T[] {
@@ -222,7 +274,7 @@ export function sagaMech(runDir: string, id: string): SagaMech {
 interface ProbePlanFile {
   // card1: Phase 1 runs only (R1 dropped the pitch arm: card 1 is always the `first` call); cast: R1 runs (full | lean)
   probe: { arm: { structure: string; names: string; card1?: string; cast?: string }; seed: { text: string } };
-  engine: { cast: { id: string; name: string; trade?: string }[]; roster: { name: string }[]; places: string[] };
+  engine: { cast: { id: string; name: string; trade?: string }[]; roster: { name: string }[]; places: string[]; land?: string };
   plan: { title: string; answer: string; question: string; cast: { name: string; label?: string; known: boolean }[];
     episodes: { type?: string; job: string }[] } | null;
   validation: { defects: string[]; redraws: number; fallback: boolean };
@@ -331,6 +383,25 @@ export function sagaMechProbe(runDir: string, id: string): SagaMech {
     cardWords: cards.map(c => wc(c.prose)), beforeWords: reports.map(r => wc(r.before)), afterWords: reports.map(r => wc(r.after)),
     glossEchoes: echoes,
     cardStamps: Object.fromEntries(CARD_STAMPS.map(([k]) => [k, cards.filter(c => cardStamps(c.prose ?? '').includes(k)).length])),
+    read: readability(texts, [...pf.engine.cast.map(c => c.name), ...pf.engine.roster.map(r => r.name)], [...pf.engine.places, pf.engine.land ?? ''].flatMap(x => x.split(/[^A-Za-z'’-]+/))),
+  };
+}
+
+/** (R7, R5) the readability rows across a run (probe sagas only) */
+function readAgg(per: SagaMech[]) {
+  const rs = per.map(p => p.read).filter((x): x is Readability => !!x);
+  const all = <K extends keyof Readability>(k: K) => rs.flatMap(r => r[k] as number[]);
+  const mean = (xs: number[]) => xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null;
+  const sw = all('sentenceWords'), long = rs.reduce((n, r) => n + r.longSentences, 0);
+  const inv = new Map<string, number>(); rs.forEach(r => r.invented.forEach(x => inv.set(x, (inv.get(x) ?? 0) + 1)));
+  return {
+    RD_sentences: sw.length, RD_wordsPerSentence: mean(sw), RD_long: long, RD_longShare: sw.length ? long / sw.length : null,
+    RD_namesPerCard: mean(all('namesCard')), RD_namesPerReport: mean(all('namesReport')),
+    RD_inventedPerCard: mean(all('inventedCard')), RD_inventedPerReport: mean(all('inventedReport')),
+    RD_inventedPerSaga: rs.length ? rs.reduce((n, r) => n + r.invented.length, 0) / rs.length : null,
+    RD_inventedTop: [...inv.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([w, n]) => `${w}×${n}`),
+    RD_screenCard: median([...all('screenCard1'), ...all('screenMiddle'), ...all('screenFinale')]), RD_screenCard1: median(all('screenCard1')),
+    RD_screenMiddle: median(all('screenMiddle')), RD_screenFinale: median(all('screenFinale')), RD_screenReport: median(all('screenReport')),
   };
 }
 
@@ -398,6 +469,7 @@ export function runMech(runDir: string) {
     GE_glossEchoes: per.reduce((s, p) => s + (p.glossEchoes?.length ?? 0), 0),
     GE_textsWithEcho: per.reduce((s, p) => s + new Set((p.glossEchoes ?? []).map(x => x.split(':')[0])).size, 0),
     CS_cardStamps: Object.fromEntries(CARD_STAMPS.map(([k]) => [k, per.reduce((s, p) => s + (p.cardStamps?.[k] ?? 0), 0)])),
+    ...readAgg(per),
     GE_top: (() => { const n = new Map<string, number>(); per.flatMap(p => p.glossEchoes ?? []).map(x => x.replace(/^[^:]*: /, '')).forEach(g => n.set(g, (n.get(g) ?? 0) + 1)); return [...n.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12).map(([g, c]) => `${g}×${c}`) })(),
   };
   return { run: path.basename(runDir), perSaga: per, aggregate: agg };
@@ -440,6 +512,13 @@ function main() {
     `| M13 paperwork (errand keyword proxy; J2 decides) | ${pct(a.M13_paperworkProxy)} |`,
     `| CS card stamps (cards carrying each; watch-only) | ${Object.entries(a.CS_cardStamps).map(([k, v]) => `"${k}" ${v}`).join(' · ')} of ${a.cards} cards |`,
     `| GE gloss echo (prompt 3-word runs in prose, not in the payload; log-only) | ${a.GE_glossEchoes} runs in ${a.GE_textsWithEcho} texts · ${a.GE_top.join(' · ')} |`,
+    ...(a.RD_sentences ? [
+      `| RD words per sentence, mean · sentences over 20 words (R7; log-only) | ${a.RD_wordsPerSentence?.toFixed(1) ?? '—'} · ${pct(a.RD_longShare)} (${a.RD_long} of ${a.RD_sentences}) |`,
+      `| RD proper nouns per card · per report, mean (people and places by name) | ${a.RD_namesPerCard?.toFixed(2) ?? '—'} · ${a.RD_namesPerReport?.toFixed(2) ?? '—'} |`,
+      `| RD invented proper nouns per card · per report, mean · per saga (distinct) | ${a.RD_inventedPerCard?.toFixed(2) ?? '—'} · ${a.RD_inventedPerReport?.toFixed(2) ?? '—'} · ${a.RD_inventedPerSaga?.toFixed(2) ?? '—'} ${a.RD_inventedTop.join(' ')} |`,
+      `| RD words on screen per card (log + prose), median: all · card 1 · middle · finale | ${a.RD_screenCard ?? '—'} · ${a.RD_screenCard1 ?? '—'} · ${a.RD_screenMiddle ?? '—'} · ${a.RD_screenFinale ?? '—'} |`,
+      `| RD words on screen per report (prose + ledger), median | ${a.RD_screenReport ?? '—'} |`,
+    ] : []),
     '',
   ].join('\n');
   fs.writeFileSync(path.join(runDir, 'mech.md'), md);

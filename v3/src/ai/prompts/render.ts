@@ -2,6 +2,7 @@
 //   [[x]] at the start of a line   the line is kept only when x is on
 //   [[x]]…[[/x]] inside a line     the span is kept only when x is on
 //   [[!x]]                         the same, when x is off
+//   [[x|y]]                        kept when any of x, y is on ([[!x|y]]: when none is)
 //   {{VAR}}                        replaced by vars.VAR
 // A rule about absent data never reaches the model: the caller turns a flag on only when the
 // payload carries the field it explains.
@@ -26,6 +27,16 @@ export type TemplateName = 'plan' | 'card' | 'report';
 // R6 verify: budgets unchanged (plan 600, card 157, report 310: the hope line's "within reach, not done" fills report's last 3)
 // R6 verify 2: budgets unchanged (plan 620: the why-question dropped "never who …" for the people rule; report 310: `away` and
 // the finale secret's speaker paid for by cuts in clue, have and the time-order line)
+// R7 (readability): budgets unchanged (plan 617: one naming rule for people and places paid by "by label if in cast", the
+// intro and "plain"; card 156: `problem` for `unknown`, `stakes` for the last-chance `lose`; report 310: the clue and cost
+// printed below the report, the reveal back to R5's with its reason said plainly, known never new at the finale too)
+// R7 verify: budgets unchanged (plan 620: no traits, "by job {{MID}}", the why's form and owner, memory told and where a job's
+// place; report 310: one line for all printed below it (🩸, Took, Learned, Cost) with cost and brought shown as moments, "but
+// the price", the hope said plainly, a won finale's plan carried out, paid by "No hint of the outcome"; card 156: a personal
+// finale's stakes settle the soldier's old wrong, in a span the worst variant never carries)
+// R7 verify 2: budgets unchanged (plan 620: the label "race then trade", the race in the cast override, "people by trade", the
+// question among what is shown before play and "is listed by job {{MID}}, the person in ending at job 1", paid by "places may
+// repeat"; card: no stakes, the engine's log line says them; report 310: the clue "show the find or words that tell it")
 export const WORD_BUDGET: Record<TemplateName, number> = { plan: 620, card: 160, report: 310 };
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
@@ -38,12 +49,13 @@ export function template(name: TemplateName): string {
 
 export function renderTemplate(tpl: string, on: Iterable<string>, vars: Record<string, string | number> = {}): string {
   const set = new Set(on);
-  const has = (k: string) => k.startsWith('!') ? !set.has(k.slice(1)) : set.has(k);
+  const any = (k: string) => k.split('|').some(x => set.has(x));
+  const has = (k: string) => k.startsWith('!') ? !any(k.slice(1)) : any(k);
   const out: string[] = [];
   for (const line of tpl.split('\n')) {
     let l = line;
-    for (let prev = ''; prev !== l;) { prev = l; l = l.replace(/\[\[(!?[a-z]+)\]\](.*?)\[\[\/\1\]\]/, (_m, k: string, body: string) => has(k) ? body : '') }
-    const m = l.match(/^\[\[(!?[a-z]+)\]\]/);
+    for (let prev = ''; prev !== l;) { prev = l; l = l.replace(/\[\[(!?[a-z|]+)\]\](.*?)\[\[\/\1\]\]/, (_m, k: string, body: string) => has(k) ? body : '') }
+    const m = l.match(/^\[\[(!?[a-z|]+)\]\]/);
     if (m) { if (!has(m[1]!)) continue; l = l.slice(m[0].length) }
     if (line.trim() && !l.trim()) continue;   // a line made only of spans that are off
     for (const [k, v] of Object.entries(vars)) l = l.replaceAll(`{{${k}}}`, String(v));

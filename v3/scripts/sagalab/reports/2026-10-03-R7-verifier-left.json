@@ -1,0 +1,56 @@
+[
+ {
+  "file": "rendered/report__success__away+brought+clue+decides+have+hope+hurt+known+moved+people+result+saga.txt (also report__success__away+brought+clue+decides+have+hope+intro+known+moved+part+people+result+saga.txt, report__partial__brought+clue+...+personal+result+saga.txt x2; engine: v4lab.ts placesThere ~l.1002)",
+  "where": "report payload people[]: {\"name\":\"Benjamund\",\"sex\":\"man\"} at 'Track the beast Benjamund keeps near Harrowford'; Rautio at 'take what Rautio keeps there'; Jofstrom at 'Track the beast Jofstrom keeps near Thornhollow'",
+  "problem": "If an owner is mentioned in a relative clause ('the beast X keeps', 'what X keeps there'), the engine deals X as present in person. It gives no away flag and no part. placesThere only treats \"X's\" as an owner mention. The plan did not put him at the job (F2_1 job 2 people = [c24,p2]). The INDEX also says an owner's mention is not presence. As the writer, I would put the antagonist at the beast hunt or the unseen theft. That also breaks the sneak and blunts the showdown. notePresent then counts him as met.",
+  "fix": "Decide presence from the plan's people list plus the one the finale decides, not from a regex over the job text. If the text scan stays, treat '<noun> X keeps/holds/owns' and 'what X keeps' as owner mentions, the same way \"X's\" is treated."
+ },
+ {
+  "file": "rendered/plan__full__memory+stake+types.txt (downstream: report__partial__away+brought+clue+cost+decides+have+hope+known+moved+part+people+result+saga.txt, report__finale-partial__answer+away+carried+decides+edge+have+hurt+hurtprice+...txt; engine: v4lab.ts gainDeal ~l.395)",
+  "where": "plan data gains:[\"a person\",\"a person\"]; plan line 'gain: what the company then holds, of the kind dealt, never the person in ending'",
+  "problem": "The plan prompt never says whether an 'a person' gain should be someone in cast or someone new. The engine deals a sex ('a man'/'a woman') only when no cast member at all can be held. It assumes any plain 'a person' gain will be a cast member. In F5 full, two person gains are dealt but only one cast member (the reeve) can be held, so the second one has to be a new person. Plans do invent people: 'one of the reeve's men', 'a captain of Rautio's men'. They reach brought/have and the finale edge ('the one taken tells where Rautio will be waiting') with no sex, so the writers guess pronouns. This is the exact failure gainSex was added to stop.",
+  "fix": "Either deal a sex with every person gain that does not get a cast id, or have the plan return the cast id it holds (a gain field like {\"who\": cast id}) and deal a sex when that field is empty. Count holdable cast per gain, not as a yes/no for the whole cast."
+ },
+ {
+  "file": "rendered/plan__full__notrade+personal+stake+types.txt, rendered/plan__lean__notrade+personal+types.txt",
+  "where": "'ending: whose old matter the showdown settles' with ending.about = c24 (the soldier); 'gain: what the company then holds, of the kind dealt.'; 'showdown: job, people, trouble as above.'",
+  "problem": "In a personal saga the engine's buttons and holdable logic target the opponent: choiceTarget falls back to seat 'opponent', giving 'Talk it out with Jofstrom'. The personal plan prompt drops both of the guards the other plan prompts have: 'never the person in ending' on gain, and 'its job names the person in ending' on the showdown. It also points ending at the soldier. As the writer, I could take the slaver as a mid-saga person gain, or write a showdown that never faces him. The buttons would then decide someone the showdown left out.",
+  "fix": "In the personal variant, name the one who stands in the way as the person the showdown faces and decides: 'its job names the one who stands in the way; gain: never them'. Or point ending.about at that id."
+ },
+ {
+  "file": "rendered/report__finale-success__answer+away+carried+decides+moved+option+part+people+result+saga.txt (all finale reports with away; also report__failure__away+failure+have+known+people+saga+stopped.txt)",
+  "where": "'people: who else is there, by name. ... away: not at the job.' and finale after: 'The secret comes out within it ... said by one in people'",
+  "problem": "people mixes people who are at the job with away entries. In finales the away entry is usually the asker (Indure Palebough, Endolale Dawnsinger, Gwinir), and the secret is about them. 'said by one in people' therefore lets the writer have someone who is not there speak the secret. In F7_3 every entry is away, yet the gloss calls people 'who else is there'.",
+  "fix": "Deal away entries in their own list (e.g. 'named: not at the job; name and sex only'), or change the finale rule to 'said by one who is there'."
+ },
+ {
+  "file": "rendered/card-personal__finale+part+will.txt (also report__partial__...+personal..., report__failure__...+personal..., report__finale-*__...+personal...)",
+  "where": "names/people entry {\"name\":\"Exaduis\",\"label\":\"Jervaise Greyfell's brother\",\"part\":\"was wronged by Jervaise Greyfell\"} under the gloss 'part: their side' (card) / 'part: their side, shown, not stated' (report)",
+  "problem": "'was wronged by Jervaise Greyfell' is a tie, not a side, so the gloss does not fit. On the finale card the brother has no slot in the order 'job, trouble', and nothing says whether he is at Thornhollow. The report then deals him as present. So the writer either drops him or invents where he is and what he does. If the writer drops him, nothing on the finale screen names him: ON THIS MATTER lists only names read on screen, and the At stake line says only 'a life dear to her'. The player never sees who the stakes are about. In middle-job reports he is present with no role at all. At the escort job, 'Bring a guide ...', the writer will likely merge him with the guide.",
+  "fix": "Gloss this key on its own terms ('tie: how they are bound to the story'). On the personal finale, place him in a dealt field (the job text, or a 'whose fate' line the card must say), and have the stakes line or ON THIS MATTER name him with his tie however the prose reads."
+ },
+ {
+  "file": "rendered/report__*.txt (player render; probe.ts l.487)",
+  "where": "THE PLAYER SEES: '\u2501\u2501 SUCCESS \u2501\u2501 Sneak at Thornhollow' above the before-prose, then '\u2684 [SUCCESS] \u00b7 4 of 6 coins came up'",
+  "problem": "The outcome is printed in the header before the player reads 'before'. The writer is told 'No hint of the outcome' for exactly that paragraph. The \u2684 line then repeats it. So the outcome is shown twice and out of order, and the before rule cannot have any effect.",
+  "fix": "Header shows the job title only (and \u265b for the finale). The outcome is revealed once, on the \u2684 line between before and after."
+ },
+ {
+  "file": "rendered/card-personal__finale+part+will.txt (v4lab.ts stakesLine ~l.1624)",
+  "where": "'At stake: Jervaise Greyfell's old wrong. If you fail, she loses a life dear to her for good.'",
+  "problem": "On a personal saga the template puts '<soldier>'s old wrong' where other sagas have '<who>'s fate'. Read as a player, it says the wrong itself is at stake. It names neither the outcome being settled nor the kin whose life 'a life dear to her' means.",
+  "fix": "Say what is settled and for whom, e.g. 'At stake: setting right Jervaise Greyfell's old wrong against Exaduis, her brother.' Or use '<kin>'s fate' when a wronged kin is cast."
+ },
+ {
+  "file": "rendered/card__first+intro+why+will.txt (also card__first+personal..., card__first+returning...)",
+  "where": "prose 'Endolale Dawnsinger, a woodcutter, needs you' then footer 'ON THIS MATTER: Endolale Dawnsinger \u2014 woodcutter'",
+  "problem": "Card 1's prose already introduces the asker by name and trade (intro rule). ON THIS MATTER repeats it a few lines down. Later cards drop the For-line person for this same reason, but the skip applies only from card 2 (onThisMatter skip only when kk>1).",
+  "fix": "On card 1, leave out of ON THIS MATTER the one the premise introduces (premise.who)."
+ },
+ {
+  "file": "rendered/card__first+intro+why+will.txt (all card-1 variants)",
+  "where": "premise.problem 'the hunter stands in the way' and log 'Open question: why the hunter stands in the way'",
+  "problem": "problem is the plan's question with 'Nobody knows why' removed. Card 1's prose states the clause, and the Open question line right under it repeats it word for word with 'why' in front. The player reads the same clause twice on one screen.",
+  "fix": "Give card 1 a problem that is not the question clause (e.g. from the first trouble or the stake: what went wrong on the ground). Or have the prose end on the question, so the log line is not a repeat."
+ }
+]
