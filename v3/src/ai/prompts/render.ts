@@ -12,10 +12,14 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export type TemplateName = 'plan' | 'card' | 'report';
+/** outline (R4, Q3): the road ahead, one small call per saga at its start, beside card 1 */
+export type TemplateName = 'plan' | 'card' | 'report' | 'outline';
 /** §2.8.7: a rule cannot land without cutting another — every variant, all its lines on, skeleton included */
 // plan 660 → 620 at R1 (2026-10-02): card 1 left the plan call, so its pitch section went with it
-export const WORD_BUDGET: Record<TemplateName, number> = { plan: 620, card: 215, report: 310 };
+// card 215 → 180 at R4 (2026-10-03): the quest log took helping, mystery and have off the card
+// card 180 → 170, outline 140 → 130 at R4 verify: `fate` and card 1's "who needs you" left the card; the outline writes
+// only the "so" clause and no end line
+export const WORD_BUDGET: Record<TemplateName, number> = { plan: 620, card: 170, report: 310, outline: 130 };
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const cache = new Map<TemplateName, string>();

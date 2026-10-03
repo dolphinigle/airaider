@@ -1,13 +1,14 @@
 Write the card for the [[first]]first[[/first]][[later]]next[[/later]][[finale]]last[[/finale]] job of a story in a fantasy game about a mercenary company. Speak to the company as "you": present tense, past for what is done.
 
 The data:
-[[first]]- premise, new to the player: who needs you, and what they want.[[loses]] loses: what they stand to lose.[[/loses]] unknown: the open question.[[personal]] who: one of your own soldiers. past: their old wrong.[[/personal]]
-[[!first]]- [[latest]]latest: what happened last. [[/latest]][[retry]]retry: what stopped the last try at this same job. [[/retry]][[finale]]helping: whose want the jobs serve, and that want. [[/finale]][[mystery]]mystery: the question still open; the facts found so far, in one sentence; never guess past them.[[/mystery]]
-- job: the task, and where. why: what its thing or person is; whom it helps, and how.[[have]] have: things won earlier; one clause at most, only where useful here.[[/have]] trouble: who opposes you, with what[[!finale]], and what they will do[[/!finale]].[[lose]] lose: who loses what for good if this[[lastchance]] last chance[[/lastchance]] fails.[[/lose]]
-- names: people the card may mention: name, else label.[[intro]] intro: new to the player; bring them in by label and name.[[/intro]][[part]] part: their side, shown, not stated.[[/part]][[memory]] memory: their past with you, told on first appearance.[[/memory]]
+[[premise]]- premise. who: the one it is about.[[loses]] loses: what they stand to lose.[[/loses]][[personal]] past: their old wrong.[[/personal]]
+[[latest]]- latest: what happened last.
+[[retry]]- retry: what stopped the last try at this same job.
+- job: the task, and where. why: why it matters. trouble: who opposes you, with what[[!finale]], and what they will do[[/!finale]].[[lose]] lose: who loses what for good if this last chance fails.[[/lose]]
+- names: people the card may mention: name, else label.[[intro]] intro: new to the player; first mention gives label and name.[[/intro]][[part]] part: their side, shown, not stated.[[/part]][[memory]] memory: their past with you, told on first appearance.[[/memory]]
 [[direction]]- direction: the player's wish for the telling only.
 
-Say each fact once, in your own words, in this order: [[first]]premise, [[/first]][[latest]]latest, [[/latest]][[retry]]retry, [[/retry]][[finale]]helping, [[/finale]][[mystery]]mystery, [[/mystery]]job, why, [[have]]have, [[/have]]trouble[[lose]], lose[[/lose]].
+Say each fact once, in your own words, in this order: [[premise]]premise, [[/premise]][[latest]]latest, [[/latest]][[retry]]retry, [[/retry]]job, why, trouble[[lose]], lose[[/lose]].
 
 Plain words; short complete sentences, each following the last. Use only the data. No numbers, nothing modern, never your pay.
 

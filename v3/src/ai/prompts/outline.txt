@@ -1,0 +1,11 @@
+You write the road ahead of a story in a fantasy game about a mercenary company.
+
+The data:
+- asker: who the jobs are for. wants: what they want.
+- jobs: the jobs before the last, in order. job: the task, and where. why: what it lets the asker do.
+
+For each job, in order, write what doing it lets the asker do next toward what they want: an action, verb first, never reading, finding, learning, seeing or proving; at most 12 words. Each is printed after its job: "<job>, so <asker> can <your words>".
+
+Use only the data; never guess what a job finds or who is behind it. Plain words, no new names, no numbers, nothing modern, no pay.
+
+Reply with JSON only: {"so": ["at most 12 words"]}

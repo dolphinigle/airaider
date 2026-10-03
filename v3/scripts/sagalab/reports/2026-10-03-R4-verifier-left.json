@@ -1,0 +1,56 @@
+[
+ {
+  "file": "/home/irvan/airaider/v3/src/ai/prompts/plan.txt",
+  "where": "line 21 'job: ... it follows the last win' + line 26 'Titles, jobs, whys and troubles, the showdown's too, are shown before play: never a learn or the answer.'",
+  "problem": "Since R4, the Road ahead prints every job on card 1. The plan writer can't know that: it reads 'before play' as 'before that job is played', and 'follows the last win' tells it to build each job on the one before. The result is later jobs that act on an earlier learn, which card 1 then prints. Real r4v2 F6_3: job 3 'take one of the pipes from the boughs' is on card 1, while learn 1 is 'long hollow wooden pipes' and learn 3 is 'the answering song comes from carved pipes hung in the boughs'. The question is 'who makes the grove answer', so its mechanism is spoiled before job 1 (lint: 'answer words before the finale: pipes'). Real F7_1: job 2 'Find the rider who carried the death letter in Marlmarch' gives away learn 1 ('letter sent from Marlmarch') on card 1.",
+  "fix": "Make line 26 say when: 'Every title, job, why and trouble is printed on the first card, before any job is played: none may use an earlier job's learn or gain, nor the answer.' Change 'it follows the last win' to 'it follows the last job' (drop 'win'), or remove it."
+ },
+ {
+  "file": "/home/irvan/airaider/v3/src/ai/prompts/plan.txt",
+  "where": "showdown 'job, people, trouble, why as above; its job names the person in ending' + JSON order: showdown written before 'answer' (last key)",
+  "problem": "In 2 of the 4 real r4v2 plans, the showdown job or why states the answer, and the finale card prints it before the reveal. F6_3: answer 'the merchant himself rigged the pipes'; showdown job 'Corner the merchant ... and end his false song'; card 5 says 'Corner Benjamund there and end his false song.' F7_1: answer 'the sailor herself asked for him to be named dead'; showdown why 'demand she take back the false report'; card 5 says 'make her take back the false report.' The job must name the person in ending, and when that person is also the answer's 'who', the natural verb is their deed. The answer is written last, so when the writer composes the showdown it has no fixed answer text to check against.",
+  "fix": "Move 'answer' to right after 'question', both in the Write list and in the JSON shape, so the learns and showdown are written against a fixed answer. Extend the shown-before-play line with 'nor anything the answer says: who did it or what they did'."
+ },
+ {
+  "file": "/home/irvan/airaider/v3/src/ai/prompts/plan.txt",
+  "where": "JSON shape, episodes: '... \"win\", \"gain\", \"learn\", \"why\"' (why written last, right after gain and learn)",
+  "problem": "The rule 'why: ... with only what the job names' loses to position. The writer composes why immediately after gain and learn, so it carries them into a field shown before play, and the outline then copies them onto card 1. Real r4v2 F5_1: ep1 why 'bring the wagon's carved tokens' (gain: wagon of carvings; learn: carved funeral tokens). Card 1 printed 'Its carved tokens could let Laudus...', and the road printed 'carry the carved tokens'. Real F7_1: ep4 why 'hold the captain as a hostage' (gain: the riders' captain) is on the card 1 road and in card 4's body before the job. The lint flagged both.",
+  "fix": "In the episode and showdown JSON, put \"why\" directly after \"job\" (before trouble, win, gain, learn), and order the Write list the same way, so the before-play fields are written before the after-play ones."
+ },
+ {
+  "file": "/home/irvan/airaider/v3/src/ai/prompts/outline.txt",
+  "where": "line 7 'write what doing it lets the asker do next toward what they want ... at most 12 words' (input why is defined the same way)",
+  "problem": "The input `why` already is 'what it lets the asker do', so the only room left is 'toward what they want': the writer pastes the why and appends an invented step toward `wants`. That repeats the For line, invents accusations, and breaks the 12-word cap. Real r4v2: F5_1 '...send his betrothal token to the daughter and ask the house to bless the wedding' (15/12 words; the tail is the For line). F2_1 '...and press him to release her brother' (13/12). F7_1 '...lay the chest's papers before the Duncroft elders and name the husband' ('name the husband' is not in the why; it guesses who is behind the death report, which the prompt bans, and it points at the wrong person). As a side effect, the same why is printed on the road from card 1 and again in each later card's body.",
+  "fix": "Either 'Shorten its why to at most 12 words, verb first; add nothing it does not say', or drop the call: cap the plan's why at 12 words and have the engine print the why with its '<asker> can' prefix removed."
+ },
+ {
+  "file": "/home/irvan/airaider/v3/src/ai/prompts/plan.txt",
+  "where": "why: 'an action, never seeing, knowing, learning, showing or proving' and outline.txt 'never reading, finding, learning, seeing or proving'",
+  "problem": "These are two different verb lists, and they patch instances instead of naming the class. Any info-getting verb that isn't listed gets through. Real r4v2 F7_1: ep1 why 'ask the ferrymen who carried the letter', which the outline turned into 'Question the ferrymen on the open quay about who carried the letter', printed on card 2's road. It is a step that only gets information, pointed at the question.",
+  "fix": "Use one class rule in both prompts: 'an action that changes something for them, never one that only gets word, sight or proof (asking, reading, finding, learning ...)'."
+ },
+ {
+  "file": "/home/irvan/airaider/v3/src/ai/prompts/plan.txt",
+  "where": "line 24 'answer: who or what, and why, in a sentence or two' (JSON \"answer\": \"text\")",
+  "problem": "There is no number, so the answer runs long, and the finale report must fit it inside `after` together with the result, the plan, each have and each part. Real r4v2 F5_1: the answer is 3 sentences and about 52 words, and report_3's after came in at 152/140 (cap break).",
+  "fix": "answer: 'at most 30 words', with the cap also in the JSON shape."
+ },
+ {
+  "file": "/home/irvan/airaider/v3/src/ai/prompts/report.txt",
+  "where": "finale: 'have: ... helps: its use; show each used' (fed by the plan's showdown.edge)",
+  "problem": "The edge lines get written for the likely way, but the finale report must 'show each used' whatever plan the player picks. Real r4v2 F6_3: the edges 'the wagon carries off his strongbox' and 'the ledger shows where his silver lies' only fit gold. A player who picks captive or recruit gets a report forced to haul off a strongbox. The lab never shows this, because probe.ts always plays plan.options[0], the likely way.",
+  "fix": "Finale: 'helps: its use; show each used where it helps the plan' (as the middle reports say), or drop edges that name another way's outcome. In the lab, play a non-likely option on some draws."
+ },
+ {
+  "file": "/home/irvan/airaider/v3/src/ai/prompts/report.txt",
+  "where": "finale after: 'The secret comes out within it, in time order: said, seen or found, built from known' + 'decides: whose deed wins it'",
+  "problem": "'Said ... built from known' lets a soldier, usually the decider, announce the secret as a deduction that claims more than the known facts hold. Real r4v2 F2_1 report_3: Calpydir, a meek brawler, says 'Her payment cleared both debts, and you hid the page', but known only has the counting room and the cut page's year. A cheap model will do this more often.",
+  "fix": "'said by someone there who knows it, or found written or seen; a soldier may only put known facts side by side, never state more'."
+ },
+ {
+  "file": "/home/irvan/airaider/v3/src/ai/prompts/report.txt",
+  "where": "line 6 '[[intro]] intro: new to the player; first mention gives label and name' (a gloss in the data list)",
+  "problem": "The gloss gets skipped. Real r4v2 F2_1 report_3: Jofstrom has intro:true and label 'wolfkin slaver', but the writer opens with 'Jofstrom waited in the yard...' and never gives the label. Every card called him only 'the wolfkin slaver', so the player is never told that the name and the slaver are the same person.",
+  "fix": "Shape the input instead: on an intro entry the engine sends the first mention ready-made (e.g. \"name\": \"Jofstrom, the wolfkin slaver\") and drops the gloss."
+ }
+]

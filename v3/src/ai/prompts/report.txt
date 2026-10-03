@@ -2,8 +2,8 @@ Write the report of one job in a fantasy game about a mercenary company.
 
 The data:
 - card: what the player just read. job: its task.
-- soldiers: who went, and what each is like.[[decides]] decides: whose deed wins it.[[/decides]]
-[[people]]- people: who else is there, by name.[[intro]] intro: new to the player; bring them in by label and name.[[/intro]][[part]] part: their side, shown, not stated.[[/part]]
+- soldiers: who went, what each is like.[[decides]] decides: whose deed wins it.[[/decides]]
+[[people]]- people: who else is there, by name.[[intro]] intro: new to the player; first mention gives label and name.[[/intro]][[part]] part: their side, shown, not stated.[[/part]]
 [[!failure]]- outcome: success, partial (done, at a price), or failure.[[result]] result: what came of it.[[/result]]
 [[option]]- plan: what the soldiers do, shown in after, in your own words.
 [[hurt]]- hurt: [[hurtprice]]the price paid: [[/hurtprice]]who is hurt, how badly; show each taking it.
@@ -11,12 +11,12 @@ The data:
 [[brought]]- brought: who or what the company now holds; show each gained.
 [[clue]]- clue: a fact this win brings out; show it found, seen or said, plainly, and nothing past it.
 [[known]]- known: what earlier jobs found; never shown as new.
-[[have]]- have: what the company holds, never in enemy hands[[edge]]; helps: its use; show each used in after[[/edge]][[!edge]]; use it only where it helps this job[[/!edge]].
+[[have]]- have: what the company holds, never in enemy hands[[edge]]; helps: its use; show each used[[/edge]][[!edge]]; use it only where it helps this job[[/!edge]].
 [[answer]]- answer: the question and its secret.
 [[direction]]- direction: the player's wish for the telling only.
 
 Write:
-- before: at most {{B}} words. The soldiers arrive and meet what stands in their way, never repeating the card. No hint of how it goes.
+- before: at most {{B}} words. The soldiers meet what stands in their way, short of the goal, never repeating the card. No hint of how it goes.
 [[!failure]]- after: at most {{A}} words. The deciding moment, then what [[result]]result says [[/result]]came of it, in your own words; nothing else changes.[[answer]] The secret comes out within it, in time order: said, seen or found[[known]], built from known[[/known]].[[/answer]] End on something seen, done or said that shows the change.
 [[failure]]- after: at most {{A}} words. What stood in the way beats them, and the job is not done; nothing else changes. End on something seen, done or said.
 [[answer]]- truth: the secret in one plain sentence, for the chronicle.
