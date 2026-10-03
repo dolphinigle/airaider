@@ -3,14 +3,19 @@
 // shipped prompts and repairs (never the lab's v4lab.ts) — so a winning arm ships by changing one default
 // (engine/saga.ts SEED_ARM):
 //
-//   A0  themes               today's: a theme from the library, the lean cast (the default)
+//   A0  themes               the theme library, the lean cast (R5's seed)
 //   A1  kit                  one situation + 1–3 keyword atoms (each from a different pool); the client + 1–3 supporting
 //                            people with no part (the person the ending decides among them)
-//   A2  kit+pick             one situation + ~10 keywords; a small pick call keeps the 1–3 that fit one clear story
+//   A2  kit+pick             one situation + ~10 keywords; a small pick call keeps the 1–3 that fit one clear story (the
+//                            build's default since seed1)
+//   A2b kit+pick             A2 again on A2's own deals (each slot's dealt world read back from A2's plan.json): the
+//                            noise floor — different text, the same inputs
 //   A3  kit+pick+situation   as A2 with three situations; the pick also chooses the situation
 //   A4  kit+pick+premise     A2, then a small premise call writes three sentences — the plan's seed
+//   B1  kit+pick+cast        A2's deal with 3–4 supporting people; the same pick keeps the 0–1 its story needs (the plan
+//                            never sees the rest) and ranks its keywords (the plan gets the top two)
 //
-//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A3|A4|all] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
+//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A3|A4|B1|all] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
 //        [--slots F6_3,F1_1] [--writer sonnet|haiku|openai] [--mock] [--pool 6] [--run seed1] [--force]
 //   npx tsx scripts/sagalab/seedlab.ts --stats [--run seed1]     spend and latency per call kind over the run's folders
 //   npx tsx scripts/sagalab/seedlab.ts --check [--run seed1]     which saga folders are missing or incomplete
@@ -49,7 +54,7 @@ import { labOutcome, type LabFixture, type LabPath } from '../../src/engine/lab.
 import type { Outcome, SlotTest } from '../../src/engine/roll.js';
 import type { Attribute } from '../../src/engine/tags.js';
 import { renderTags } from '../../src/engine/tags.js';
-import { hashStr, seedOf, type SeedArm, type Face, type Hurt } from '../../src/engine/saga.js';
+import { hashStr, seedOf, type SeedArm, type Face, type Hurt, type SagaRecord, type SagaWorld } from '../../src/engine/saga.js';
 import { logLines, matterLine, buttonLine } from '../../src/ai/storyteller.js';
 import * as flow from '../../src/game/sagaflow.js';
 import type { TextRec } from './extract.js';
@@ -75,7 +80,10 @@ if (!MOCK && WRITER !== 'openai') {
   delete process.env.AIRAIDER_CLAUDE_PLAN;
 }
 
-export const ARMS: Record<string, SeedArm> = { A0: 'themes', A1: 'kit', A2: 'kit+pick', A3: 'kit+pick+situation', A4: 'kit+pick+premise' };
+export const ARMS: Record<string, SeedArm> = { A0: 'themes', A1: 'kit', A2: 'kit+pick', A2b: 'kit+pick', A3: 'kit+pick+situation', A4: 'kit+pick+premise', B1: 'kit+pick+cast' };
+/** an arm that plays another arm's deals: each slot's dealt world is read back from that arm's plan.json (the noise
+ *  control: a later change to the deal — the supporting trades — cannot move its inputs) */
+const REPLAY: Record<string, string> = { A2b: 'A2' };
 const armArg = opt('arm') ?? 'all';
 const ARM_IDS = armArg === 'all' ? Object.keys(ARMS) : armArg.split(',').map(s => s.trim());
 for (const a of ARM_IDS) if (!ARMS[a]) { console.error(`--arm: ${a} is not one of ${Object.keys(ARMS).join('/')}`); process.exit(2) }
@@ -98,6 +106,20 @@ const PLAY: { fx: ProbeFixture; d: number }[] = SLOTS
   : DRAWS.flatMap(d => ALL_FX.filter(f => wantFx.includes(f.id)).map(fx => ({ fx, d })));
 const pathOf = (fx: ProbeFixture, d: number): LabPath => d < 3 ? (fx.personal ? 'personal' : 'clean') : fx.N >= 3 ? 'bumpy' : 'lastchance';
 const armDir = (arm: string) => path.join(LAB, 'runs', RUN, `${MOCK ? 'mock-' : ''}${arm}`);
+
+/** the dealt world of another arm's saga in the same slot, in place of this deal's (REPLAY). The slot's own facts — the
+ *  focal, N, kind, region, level — must agree; returns the fields that differed from this deal */
+function replayDeal(sagaRec: SagaRecord, from: string, slot: string): string[] {
+  const src = readJson<{ dealt: { seed: SagaWorld['seed']; tone: string; kit: SagaWorld['kit'] | null; cast?: SagaWorld['cast'] }; engine: { cast: SagaWorld['cast']; stake: string; shape: SagaWorld['shape']; places: string[]; land: string; region: string; N: number; kind: SagaWorld['kind']; focal: { id: string } } }>(path.join(armDir(from), slot, 'plan.json'));
+  const w = sagaRec.world, e = src.engine;
+  if (e.focal.id !== w.focalId || e.N !== w.N || e.kind !== w.kind || e.region !== w.region) throw new Error(`${slot}: ${from}'s world is another slot's`);
+  const kit = src.dealt.kit ? { arm: src.dealt.kit.arm, situations: src.dealt.kit.situations, keywords: src.dealt.kit.keywords } : undefined;
+  const dealt: SagaWorld = { ...w, cast: src.dealt.cast ?? e.cast, stake: e.stake, shape: e.shape, places: e.places, land: e.land, seed: src.dealt.seed, tone: src.dealt.tone, ...(kit ? { kit } : {}) };
+  if (!kit) delete dealt.kit;
+  const diff = (Object.keys(dealt) as (keyof SagaWorld)[]).filter(k => JSON.stringify(dealt[k]) !== JSON.stringify(w[k]));
+  Object.assign(sagaRec, flow.newRecord(JSON.parse(JSON.stringify(dealt)) as SagaWorld));
+  return diff;
+}
 
 // ─── the world of a slot: the base fixture's game, the focal, the chain ───────────────────────
 
@@ -231,6 +253,7 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
 
   // the deal (synchronous), then the kit's pick and premise and the plan
   const sagaRec = flow.deal(host, chain, undefined, focal, pins);
+  const replayed = REPLAY[armId] ? { from: REPLAY[armId]!, differed: replayDeal(sagaRec, REPLAY[armId]!, id) } : undefined;
   const world0 = JSON.parse(JSON.stringify(sagaRec.world)) as typeof sagaRec.world;   // as dealt, before the pick
   const t0 = Date.now();
   const plan = await flow.plan(host, chain);
@@ -333,7 +356,7 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
       roster: game.roster().map(c => ({ id: c.id, name: c.name, tags: renderTags(c.tags) })),
     },
     // what the dealer dealt (before the pick), then what the pick and premise made of it, and the seed the plan got
-    dealt: { seed: world0.seed, tone: world0.tone, kit: world0.kit ?? null },
+    dealt: { seed: world0.seed, tone: world0.tone, kit: world0.kit ?? null, cast: world0.cast }, ...(replayed ? { replayed } : {}),
     kit: final.world.kit ?? null, seedToPlan: seed,
     pick: io('pick')[0] ?? null, premise: io('premise')[0] ?? null,
     planInput: (io('plan').at(-1)?.input) ?? null, rawPlan: io('plan').at(-1)?.output ?? null, plan, planCalls: callOf('plan').length,

@@ -202,6 +202,8 @@ describe('saga golden parity — the game flow (B)', () => {
       rng: undefined as never, storyRng: undefined as never, ai, state: { chains: [chain] } as unknown as GameState,
       card: () => undefined, roster: () => [], direction: () => undefined, log: (_k, t) => dev.push(t),
       takenName: () => false, noteNpcName: () => {}, hasRoom: () => true, rosterCapacity: () => 9, captiveCount: () => 0, captiveCapacity: () => 9,
+      // R5 dealt a theme: the parity is the theme arm's, whatever seed arm the build ships (engine/saga.ts SEED_ARM)
+      seedArm: () => 'themes',
     };
     const plan = await flow.plan(host, chain);
     expect(plan).toEqual(g.plan.plan);

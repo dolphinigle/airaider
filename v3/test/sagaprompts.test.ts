@@ -19,7 +19,7 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, num
     .filter(s => !(s.includes('will') && (s.includes('retry') || s.includes('lose'))))
     .map(extra => ({ flags: [pos, ...extra], vars: { MAX: pos === 'finale' ? 90 : 70 } }))),
   outline: [{ flags: [], vars: {} }],
-  pick: [[], ['situations'], ['personal']].map(flags => ({ flags, vars: {} })),
+  pick: [[], ['situations'], ['personal'], ['people'], ['people', 'personal']].map(flags => ({ flags, vars: {} })),
   premise: [[], ['personal']].map(flags => ({ flags, vars: {} })),
   report: subsets(['people', 'personal', 'decides', 'result', 'option', 'hurt', 'cost', 'hurtprice', 'brought', 'clue', 'known', 'have', 'edge', 'answer', 'direction', 'intro', 'part'])
     .filter(s => s.includes('people') || !s.some(f => f === 'intro' || f === 'part'))
@@ -52,6 +52,9 @@ describe('saga prompt budget (the shipped R5 templates)', () => {
     expect(renderSaga('pick', [])).not.toMatch(/situations|past/);
     expect(renderSaga('pick', ['situations'])).toContain('"situation": "one of situations"');
     expect(renderSaga('pick', ['personal'])).toContain('- past:');
+    expect(renderSaga('pick', [])).not.toMatch(/keywords, people|best first|"person"/);
+    expect(renderSaga('pick', ['people'])).toContain('"person": "one of people, or none"');
+    expect(renderSaga('pick', ['people'])).toContain('Choose, best first,');
   });
   it('a rule about absent data never reaches the model', () => {
     expect(renderSaga('card', ['later', 'memory'], { MAX: 70 })).toContain('memory:');

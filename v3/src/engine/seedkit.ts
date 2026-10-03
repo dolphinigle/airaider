@@ -9,14 +9,19 @@
 //   kit+pick             one situation + ~10 keywords; a small pick call keeps the 1–3 that fit one clear story
 //   kit+pick+situation   as kit+pick, but 3 situations; the pick also chooses the situation
 //   kit+pick+premise     kit+pick, then a small premise call writes the story's start in three sentences (the plan's seed)
+//   kit+pick+cast        kit+pick, "deal plenty, keep few" for people too: 3–4 supporting people, the same pick call keeps
+//                        the 0–1 its story needs (the plan never sees the rest) and ranks its keywords (the plan gets the
+//                        top two)
 
 import type { Rng } from './rng.js';
 import raw from './data/seedkit.json';
 
-export type SeedArm = 'themes' | 'kit' | 'kit+pick' | 'kit+pick+situation' | 'kit+pick+premise';
-export const SEED_ARMS: readonly SeedArm[] = ['themes', 'kit', 'kit+pick', 'kit+pick+situation', 'kit+pick+premise'];
+export type SeedArm = 'themes' | 'kit' | 'kit+pick' | 'kit+pick+situation' | 'kit+pick+premise' | 'kit+pick+cast';
+export const SEED_ARMS: readonly SeedArm[] = ['themes', 'kit', 'kit+pick', 'kit+pick+situation', 'kit+pick+premise', 'kit+pick+cast'];
 /** the arms whose seed passes through the pick call */
-export const PICKS = new Set<SeedArm>(['kit+pick', 'kit+pick+situation', 'kit+pick+premise']);
+export const PICKS = new Set<SeedArm>(['kit+pick', 'kit+pick+situation', 'kit+pick+premise', 'kit+pick+cast']);
+/** the arms whose pick also keeps the supporting people its story needs (KIT_DEAL.cast) */
+export const CASTS = new Set<SeedArm>(['kit+pick+cast']);
 
 export type KitPool = 'things' | 'creatures' | 'places' | 'occasions' | 'uncanny';
 export const KIT: Record<KitPool | 'situations' | 'qualities', readonly string[]> = {
@@ -33,6 +38,11 @@ export const KIT_DEAL = {
   offer: { things: 3, creatures: 2, places: 3, occasions: 2 } as Record<Exclude<KitPool, 'uncanny'>, number>,
   /** kit+pick+situation: how many situations the pick chooses from */
   situations: 3,
+  /** the most keywords the plan gets from a pick: the first the pick names */
+  keep: 3,
+  /** kit+pick+cast: deal plenty, keep few — 3–4 supporting people coined, of whom the pick keeps at most one; the pick
+   *  names its keywords best first and the plan gets the top two (a third was the one forced in, seed-arms report N1) */
+  cast: { support: [3, 4] as const, keep: 2 },
 };
 const BASE_POOLS: Exclude<KitPool, 'uncanny'>[] = ['things', 'creatures', 'places', 'occasions'];
 

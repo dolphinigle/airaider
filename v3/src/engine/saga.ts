@@ -15,7 +15,7 @@ import { prefPick } from './economy.js';
 import { REGION } from './regions.js';
 import { rollName, rollPlaceName } from './names.js';
 import { dealSeed, THEME_NO_REPEAT } from './themes.js';
-import { dealKit, PICKS, type SeedArm } from './seedkit.js';
+import { dealKit, PICKS, CASTS, KIT_DEAL, type SeedArm } from './seedkit.js';
 import { pickTone } from '../ai/keywords.js';   // a pure weighted table (no AI); the lab dealt the tone from it too
 import { raceOf, sexOf, soldierTrade, tradeOf, traitsOf } from './plainwords.js';
 
@@ -29,9 +29,10 @@ export interface Arm { structure: Structure; names: NamesArm; cast: CastArm }
  *  lab's other branches were pruned after the golden diff, test/sagagolden.test.ts) */
 export const ARM: Arm = { structure: 'L', names: 'labels', cast: 'lean' };
 export type { SeedArm } from './seedkit.js';
-/** the seed arm this build ships (North Star 7): the theme library until the seed lab (scripts/sagalab/seedlab.ts) picks
- *  a winner — shipping one is changing this default. A host may name another (SagaHost.seedArm, the lab) */
-export const SEED_ARM: SeedArm = 'themes';
+/** the seed arm this build ships (North Star 7): kit+pick, the seed lab's follow winner over the theme library and over
+ *  purely random keywords (scripts/sagalab/reports/2026-10-04-seed-arms.md). A host may name another (SagaHost.seedArm:
+ *  the lab; the golden parity test pins 'themes', the R5 lab's seed) */
+export const SEED_ARM: SeedArm = 'kit+pick';
 
 // ─── shapes, job types, ways (§2.4.1) ──────────────────────────────────────────────────────────
 
@@ -117,11 +118,14 @@ const POWER_TRADES = ['reeve', 'moneylender', 'steward', 'landlord', 'bandit chi
   'hedge knight', 'guild master', 'smuggler', 'forester', 'slaver', 'mercenary captain', 'magistrate', 'horse dealer',
   'abbot', 'poacher', 'cattle baron'];
 const TRADE_SEX: Record<string, 'male' | 'female'> = { widow: 'female', midwife: 'female' };
+/** the company's own trade: as a supporting person it reads as the company's double (the client hires them instead,
+ *  seed-arms report N3); as a personal saga's opponent it stays, a rival of the soldier's own kind */
+const COMPANY_TRADES = new Set(['mercenary captain']);
 /** a kit arm's supporting people: folk and power trades alike (the lab's FOLK_TRADES + POWER_TRADES) — nobody is dealt as
  *  a friend or a foe, the plan decides */
 const SUPPORT_TRADES = ['miller', 'weaver', 'shepherd', 'beekeeper', 'ferryman', 'brewer', 'woodcutter', 'potter', 'fisher',
   'innkeeper', 'carter', 'herbalist', 'mason', 'tanner', 'widow', 'farmer', 'smith', 'peddler', 'charcoal-burner', 'midwife',
-  'goatherd', 'trapper', 'baker', 'thatcher', 'healer', 'fowler', 'tinker', 'cooper', ...POWER_TRADES];
+  'goatherd', 'trapper', 'baker', 'thatcher', 'healer', 'fowler', 'tinker', 'cooper', ...POWER_TRADES.filter(t => !COMPANY_TRADES.has(t))];
 
 /** one source per feeling: a theme labelled with a feeling passes it on; otherwise the engine's tone roll */
 export const TONE_FROM_THEME: Record<string, string> = { funny: 'wry', tender: 'warm', grim: 'grim', tense: 'tense' };
@@ -178,8 +182,9 @@ export interface SagaKit {
   arm: Exclude<SeedArm, 'themes'>;
   /** dealt: the situation(s) (none on a personal saga, whose seed is the soldier's past) and the keyword atoms */
   situations: string[]; keywords: string[];
-  /** the pick call's choice (kit+pick arms); `floor`: the call failed and the floor's choice stood in */
-  picked?: { situation?: string; keywords: string[]; floor?: boolean };
+  /** the pick call's choice (kit+pick arms); `floor`: the call failed and the floor's choice stood in. kit+pick+cast:
+   *  `person`, the id of the one supporting person the pick kept (none: it kept nobody) */
+  picked?: { situation?: string; keywords: string[]; person?: string; floor?: boolean };
   /** kit+pick+premise: the premise call's sentences (who wants what and why; what stands in the way and why; what nobody
    *  knows yet) — the plan's seed */
   premise?: string[]; premiseFloor?: boolean;
@@ -195,6 +200,13 @@ export function seedOf(w: Pick<SagaWorld, 'seed' | 'kit'>): { text: string; keyw
 }
 /** every word the seed dealt, for the log-only lints (a seed word in the plan is no stray, no answer leak) */
 export const seedText = (w: Pick<SagaWorld, 'seed' | 'kit'>): string => { const s = seedOf(w); return s.keywords ? `${s.text} ${s.keywords.join(' ')}` : s.text };
+/** kit+pick+cast, once picked: the cast keeps only the supporting person the pick kept — the plan, the cards, the reports
+ *  and the chronicle never see the others (the one who asks and the person the ending decides are never supporting) */
+export function keepPicked(w: SagaWorld): void {
+  if (!w.kit?.picked || !CASTS.has(w.kit.arm)) return;
+  const keep = w.kit.picked.person;
+  w.cast = w.cast.filter(p => p.seat !== 'support' || p.id === keep);
+}
 /** whether a kit arm still waits on its pick or premise call before the plan */
 export const seedPending = (w: Pick<SagaWorld, 'kit'>): boolean => !!w.kit && ((PICKS.has(w.kit.arm) && !w.kit.picked) || (w.kit.arm === 'kit+pick+premise' && !w.kit.premise));
 /** one attempt as the chronicle keeps it. `decides`: whose deed decided a job that was not failed (the game sets it after
@@ -264,13 +276,15 @@ export function dealSaga(storyRng: Rng, recentThemeIds: string[], a: { personal:
   const stake = storyRng.weighted(STAKES[a.personal ? 'personal' : shape]);
   return { seed, tone, shape, stake };
 }
-/** a kit arm's deal (North Star 7): the kit (situation(s), keywords), the supporting cast's size (1–3 with the person the
- *  ending decides, so 0–2 coined beside them), the tone roll (no theme brings one), the shape (read only for the floor's
- *  stake) and the stake. A personal saga's seed stays its own past; a lab spark still wins. Every draw on `storyRng` */
+/** a kit arm's deal (North Star 7): the kit (situation(s), keywords), the supporting cast's size (0–2 coined beside the
+ *  person the ending decides; kit+pick+cast 3–4, of whom its pick keeps at most one), the tone roll (no theme brings
+ *  one), the shape (read only for the floor's stake) and the stake. A personal saga's seed stays its own past; a lab
+ *  spark still wins. Every draw on `storyRng`, one per field in every arm (so arms that deal alike draw alike) */
 function dealKitSaga(storyRng: Rng, arm: Exclude<SeedArm, 'themes'>, a: { personal: boolean; personalSeed?: string; spark?: string }): SagaDeal {
   const personal = a.personal && !!a.personalSeed;
   const k = dealKit(storyRng, arm, personal);
-  const support = storyRng.int(3);
+  const [lo, hi] = KIT_DEAL.cast.support;
+  const support = CASTS.has(arm) ? storyRng.range(lo, hi) : storyRng.int(3);
   const seed = { id: null, text: a.spark ?? (personal ? a.personalSeed! : k.situations[0]!) };
   const tone = pickTone(storyRng);
   const shape = storyRng.pick(SHAPE_IDS);
@@ -310,7 +324,7 @@ export function castSaga(storyRng: Rng, a: CastInput): SagaCast {
   const reg = REGION[a.region]!;
   const races = Object.entries(reg.poolWeights) as [string, number][];
   let n = 0;
-  // a kit cast coins up to four strangers, so a name already in this cast is taken too (the theme arm's two never met)
+  // a kit cast coins up to six strangers, so a name already in this cast is taken too (the theme arm's two never met)
   const taken = a.kit ? (name: string) => a.taken(name) || cast.some(p => p.name === name) : a.taken;
   const coin = (seat: Seat, part: string, trade: boolean | readonly string[]): SagaPerson => {
     const sex = prefPick(storyRng, ['male', 'female'], a.prefs) as 'male' | 'female';
@@ -344,8 +358,9 @@ export function castSaga(storyRng: Rng, a: CastInput): SagaCast {
       trade: tradeOf(f), traits: traitsOf(f), known: !!a.focalMemory, ...(a.focalMemory ? { memory: a.focalMemory.memory, where: a.focalMemory.where } : {}),
     });
   }
-  // a kit arm's potential supporting cast, after the people above (so a theme deal's draws never move)
-  for (let i = 0; a.kit && i < a.kit.support; i++) cast.push(coin('support', '', SUPPORT_TRADES));
+  // a kit arm's potential supporting cast, after the people above (so a theme deal's draws never move); each a trade
+  // nobody in the cast has (two "human weavers" offered to the pick are one choice, and a cast of twins to the plan)
+  for (let i = 0; a.kit && i < a.kit.support; i++) cast.push(coin('support', '', SUPPORT_TRADES.filter(t => !cast.some(p => p.trade === t))));
   const places: string[] = [];
   for (let i = 0; places.length < 3 && i < 40; i++) {
     const p = rollPlaceName(storyRng);

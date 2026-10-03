@@ -15,10 +15,10 @@ import { RACE_WORD, an, manWoman, soldierIs } from '../engine/plainwords.js';
 import {
   TYPES, JOB_TYPES, WAY_ENDING, WAY_ATTR, NUMBER_WORD, helped, wayMeans, wayWord, wayOf, partOf, waysOf, hashStr, seedOf, seedText,
   type JobType, type Way, type SagaPerson, type Trouble, type Episode, type CastEntry, type SagaPlan, type SagaState,
-  type SagaWorld, type Hurt, type Cost, type LogRow, type SagaRecord,
+  type SagaWorld, type Hurt, type Cost, type LogRow, type SagaRecord, keepPicked,
 } from '../engine/saga.js';
 import { renderSaga, wordCount, type SagaTemplate } from './prompts/saga/render.js';
-import { PICKS } from '../engine/seedkit.js';
+import { PICKS, CASTS, KIT_DEAL } from '../engine/seedkit.js';
 import type { AiProvider } from './provider.js';
 
 // ─── the plan call's payload (§2.9.1) ───────────────────────────────────────────────────────────
@@ -1140,7 +1140,10 @@ const castLine = (p: SagaPerson): string => {
   const who = an(`${RACE_WORD[p.race] ?? p.race} ${p.trade ?? manWoman(p.sex)}`);
   return !part ? who : /^one of\b/.test(part) ? `${who}, ${part}` : `${who} who ${part}`;
 };
-/** the situation(s) — or a personal saga's past — the tone, the cast in plain words, and every keyword dealt */
+/** kit+pick+cast: the supporting people its pick chooses among (the rest of the cast is always kept) */
+const offeredPeople = (w: SagaWorld): SagaPerson[] => CASTS.has(w.kit!.arm) ? w.cast.filter(p => p.seat === 'support') : [];
+/** the situation(s) — or a personal saga's past — the tone, the cast in plain words, and every keyword dealt;
+ *  kit+pick+cast: the supporting people as `people`, apart from the cast, for the pick to keep the one it needs or none */
 export function pickPayload(w: SagaWorld): { payload: Record<string, unknown>; flags: string[] } {
   const k = w.kit!;
   const flags: string[] = [];
@@ -1149,21 +1152,27 @@ export function pickPayload(w: SagaWorld): { payload: Record<string, unknown>; f
   else if (k.situations.length > 1) { flags.push('situations'); payload.situations = k.situations }
   else payload.situation = k.situations[0];
   payload.tone = w.tone;
-  payload.cast = w.cast.map(castLine);
+  const offered = offeredPeople(w);
+  payload.cast = w.cast.filter(p => !offered.includes(p)).map(castLine);
   payload.keywords = k.keywords;
+  if (offered.length) { flags.push('people'); payload.people = offered.map(castLine) }
   return { payload, flags };
 }
 const zStrs = z.union([z.array(z.union([z.string(), z.number()]).transform(String)), z.string().transform(x => x.split(/[,;]/))]).optional().catch(undefined);
-export const zPickOut = z.object({ situation: zs, keywords: zStrs }).passthrough();
-/** the floor's choice: the first situation dealt, the first two keywords (the deal's own order is already random) */
-export function mockPick(payload: Record<string, unknown>): { situation?: string; keywords: string[] } {
+/** one person, or the first of a list */
+const zOne = z.union([z.string(), z.number(), z.null(), z.array(z.union([z.string(), z.number()]))]).transform(x => x === null ? undefined : String(Array.isArray(x) ? x[0] ?? '' : x)).optional().catch(undefined);
+export const zPickOut = z.object({ situation: zs, keywords: zStrs, person: zOne }).passthrough();
+/** the floor's choice: the first situation dealt, the first two keywords (the deal's own order is already random), and
+ *  nobody from people (a lean cast carries a story) */
+export function mockPick(payload: Record<string, unknown>): { situation?: string; keywords: string[]; person?: string } {
   const sits = payload.situations as string[] | undefined;
-  return { ...(sits ? { situation: sits[0] } : {}), keywords: (payload.keywords as string[]).slice(0, 2) };
+  return { ...(sits ? { situation: sits[0] } : {}), keywords: (payload.keywords as string[]).slice(0, 2), ...(payload.people ? { person: 'none' } : {}) };
 }
 const normAtom = (x: string) => x.toLowerCase().replace(/^\s*(?:an?|the)\s+/, '').replace(/[^a-z' -]/g, '').replace(/\s+/g, ' ').trim();
-/** the pick as the plan will get it: only what was dealt (matched loosely, kept as dealt), at most three keywords, one
- *  situation; whatever does not match is dropped (a dev line), and nothing usable is the floor's choice */
-export function readPick(raw: unknown, k: Pick<NonNullable<SagaWorld['kit']>, 'situations' | 'keywords'>, payload: Record<string, unknown>): { situation?: string; keywords: string[]; dropped: string[]; floor: boolean } {
+/** the pick as the plan will get it: only what was dealt (matched loosely, kept as dealt), its first keywords up to the
+ *  arm's keep (KIT_DEAL), one situation; kit+pick+cast: the one of `people` it named (a line as offered), or none.
+ *  Whatever does not match is dropped (a dev line), and nothing usable is the floor's choice */
+export function readPick(raw: unknown, k: Pick<NonNullable<SagaWorld['kit']>, 'situations' | 'keywords'> & { arm?: NonNullable<SagaWorld['kit']>['arm'] }, payload: Record<string, unknown>): { situation?: string; keywords: string[]; person?: string; dropped: string[]; floor: boolean } {
   const o = zPickOut.safeParse(raw);
   const dropped: string[] = [];
   const keywords: string[] = [];
@@ -1177,9 +1186,15 @@ export function readPick(raw: unknown, k: Pick<NonNullable<SagaWorld['kit']>, 's
     situation = k.situations.find(d => normAtom(d) === normAtom(got ?? ''));
     if (!situation && got) dropped.push(got);
   }
+  // a person not offered is dropped, and so is nobody ("none", or no reply): the plan then gets no supporting person
+  const people = payload.people as string[] | undefined;
+  const said = o.success ? o.data.person?.trim() : undefined;
+  const person = people && said ? people.find(d => normAtom(d) === normAtom(said)) : undefined;
+  if (people && said && !person && !/^(?:none|no one|nobody)\b/i.test(said)) dropped.push(said);
   const floor = mockPick(payload);
   const useFloor = !keywords.length || (k.situations.length > 1 && !situation);
-  return { ...(k.situations.length > 1 ? { situation: situation ?? floor.situation } : {}), keywords: keywords.length ? keywords.slice(0, 3) : floor.keywords, dropped, floor: useFloor };
+  const keep = k.arm && CASTS.has(k.arm) ? KIT_DEAL.cast.keep : KIT_DEAL.keep;
+  return { ...(k.situations.length > 1 ? { situation: situation ?? floor.situation } : {}), keywords: keywords.length ? keywords.slice(0, keep) : floor.keywords, ...(person ? { person } : {}), dropped, floor: useFloor };
 }
 
 /** the picked inputs as the premise call sees them: the situation (or the past), the keywords, the tone, and the cast —
@@ -1290,7 +1305,8 @@ export async function pickSeed(ai: AiProvider, w: SagaWorld, log: Log = () => {}
   const r = readPick(raw, w.kit!, payload);
   if (r.dropped.length) log('dev', `saga pick (log-only): not dealt, dropped: ${r.dropped.join('; ')}`);
   if (r.floor) log('dev', 'saga pick: nothing usable, the floor\'s choice stood in');
-  return { ...(r.situation ? { situation: r.situation } : {}), keywords: r.keywords, ...(r.floor ? { floor: true } : {}) };
+  const person = r.person ? offeredPeople(w).find(p => castLine(p) === r.person)?.id : undefined;
+  return { ...(r.situation ? { situation: r.situation } : {}), keywords: r.keywords, ...(person ? { person } : {}), ...(r.floor ? { floor: true } : {}) };
 }
 /** the premise (kit+pick+premise): one writer call at low effort; the floor's sentences when it fails */
 export async function writePremise(ai: AiProvider, w: SagaWorld, log: Log = () => {}): Promise<{ premise: string[]; floor: boolean }> {
@@ -1308,7 +1324,7 @@ export async function writePremise(ai: AiProvider, w: SagaWorld, log: Log = () =
 export async function seedSteps(ai: AiProvider, w: SagaWorld, log: Log = () => {}): Promise<void> {
   const k = w.kit;
   if (!k) return;
-  if (PICKS.has(k.arm) && !k.picked) k.picked = await pickSeed(ai, w, log);
+  if (PICKS.has(k.arm) && !k.picked) { k.picked = await pickSeed(ai, w, log); keepPicked(w) }
   if (k.arm === 'kit+pick+premise' && !k.premise) { const r = await writePremise(ai, w, log); k.premise = r.premise; if (r.floor) k.premiseFloor = true }
 }
 

@@ -15,8 +15,8 @@ import { fileURLToPath } from 'node:url';
 /** pick, premise: a kit seed arm's small steps before the plan (North Star 7–8; engine/seedkit.ts) */
 export type SagaTemplate = 'plan' | 'card' | 'report' | 'outline' | 'pick' | 'premise';
 /** §2.8.7: a rule cannot land without cutting another — every variant, all its lines on, skeleton included (R5's budgets;
- *  the seed lab's two small calls at most 80) */
-export const SAGA_WORD_BUDGET: Record<SagaTemplate, number> = { plan: 620, card: 160, report: 310, outline: 115, pick: 80, premise: 80 };
+ *  the seed lab's two small calls at most 80; the pick 85, as kit+pick+cast's names two things, its keywords and a person) */
+export const SAGA_WORD_BUDGET: Record<SagaTemplate, number> = { plan: 620, card: 160, report: 310, outline: 115, pick: 85, premise: 80 };
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const cache = new Map<SagaTemplate, string>();
