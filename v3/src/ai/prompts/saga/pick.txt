@@ -1,0 +1,13 @@
+You choose ideas for a story in a fantasy game about a mercenary company.
+
+The data:
+[[!situations]][[!personal]]- situation: what the story is about.[[/!personal]]
+[[situations]]- situations: what the story could be about.
+[[personal]]- past: a company soldier's old wrong, the story's root.
+- tone: how it should feel.
+- cast: its people.
+- keywords: things it could use.
+
+Choose[[situations]] the one situation and[[/situations]] the one to three keywords that best fit [[situations]]the cast, the tone and each other[[/situations]][[!situations]]the [[!personal]]situation[[/!personal]][[personal]]past[[/personal]], the tone and the cast[[/!situations]] in one clear story. Copy each exactly.
+
+Reply with JSON only: {[[situations]]"situation": "one of situations", [[/situations]]"keywords": ["one of keywords"]}

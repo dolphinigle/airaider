@@ -12,9 +12,11 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export type SagaTemplate = 'plan' | 'card' | 'report' | 'outline';
-/** §2.8.7: a rule cannot land without cutting another — every variant, all its lines on, skeleton included (R5's budgets) */
-export const SAGA_WORD_BUDGET: Record<SagaTemplate, number> = { plan: 620, card: 160, report: 310, outline: 115 };
+/** pick, premise: a kit seed arm's small steps before the plan (North Star 7–8; engine/seedkit.ts) */
+export type SagaTemplate = 'plan' | 'card' | 'report' | 'outline' | 'pick' | 'premise';
+/** §2.8.7: a rule cannot land without cutting another — every variant, all its lines on, skeleton included (R5's budgets;
+ *  the seed lab's two small calls at most 80) */
+export const SAGA_WORD_BUDGET: Record<SagaTemplate, number> = { plan: 620, card: 160, report: 310, outline: 115, pick: 80, premise: 80 };
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const cache = new Map<SagaTemplate, string>();

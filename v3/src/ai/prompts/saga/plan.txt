@@ -1,10 +1,12 @@
 You plan a story for a fantasy game about a mercenary company.[[personal]] The story is the past of the company's soldier in cast; nobody hires the company.[[/personal]]
 
 The data:
-- seed: the idea under the story, never pasted.
+[[!premise]]- seed: the idea under the story, never pasted.
+[[premise]]- seed: how the story starts; build on it, never paste it.
+[[keywords]]- keywords: use each where it matters.
 [[shape]]- shape: the kind of story.[[episodes]] episodes: the jobs before the showdown, in order: what the soldiers do, the kind of win.[[/episodes]]
 [[types]]- jobs: how many before the showdown. types: what soldiers do, the kind of win.
-- cast: the people; traits: what they are like.[[notrade]] One with no trade gets one that fits the seed.[[/notrade]] Use them all as the seed's people; add nobody who matters unless the seed has them. Name only those given a name; the rest by label.[[memory]] memory, where: their past with the company, where they are now; use both.[[/memory]]
+- cast: the people; traits: what they are like.[[notrade]] One with no trade gets one that fits the seed.[[/notrade]] [[!support]]Use them all as the seed's people; add nobody who matters unless the seed has them.[[/!support]][[support]]Use [[!personal]]the asker and the person in ending[[/!personal]][[personal]]those with a part[[/personal]], others only as needed; add nobody who matters.[[/support]] Name only those given a name; the rest by label.[[memory]] memory, where: their past with the company, where they are now; use both.[[/memory]]
 [[stake]]- stake: what is at risk; lose makes it concrete.
 [[!personal]]- ending: whose fate the showdown decides. likely: the end it builds toward. ways: how it can end, and what each means.
 [[personal]]- ending: whose old matter the showdown settles. likely: the way it builds toward. ways: how it can be settled.

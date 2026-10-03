@@ -1,0 +1,72 @@
+// THE SEED KIT (docs/STORYTELLER.md North Star 7, designer 2026-10-04): the saga seed as ONE generic situation + a few
+// random keyword atoms + the dealt cast, in place of a finished theme from themes.json ("too specific, and it doesn't even
+// make sense"). Pure: the caller passes the rng (storyRng in play). The pools are data/seedkit.json, hand-curated; a pool
+// grows by editing the file, never by a prompt rule (CHEAP_MODEL_PROMPTING L12: variety comes only from a dealt mandate).
+//
+// The seed arms the lab compares (scripts/sagalab/seedlab.ts); the game ships `SEED_ARM` (engine/saga.ts):
+//   themes               today's: a theme from the library
+//   kit                  one situation + 1–3 keywords, each from a different pool
+//   kit+pick             one situation + ~10 keywords; a small pick call keeps the 1–3 that fit one clear story
+//   kit+pick+situation   as kit+pick, but 3 situations; the pick also chooses the situation
+//   kit+pick+premise     kit+pick, then a small premise call writes the story's start in three sentences (the plan's seed)
+
+import type { Rng } from './rng.js';
+import raw from './data/seedkit.json';
+
+export type SeedArm = 'themes' | 'kit' | 'kit+pick' | 'kit+pick+situation' | 'kit+pick+premise';
+export const SEED_ARMS: readonly SeedArm[] = ['themes', 'kit', 'kit+pick', 'kit+pick+situation', 'kit+pick+premise'];
+/** the arms whose seed passes through the pick call */
+export const PICKS = new Set<SeedArm>(['kit+pick', 'kit+pick+situation', 'kit+pick+premise']);
+
+export type KitPool = 'things' | 'creatures' | 'places' | 'occasions' | 'uncanny';
+export const KIT: Record<KitPool | 'situations' | 'qualities', readonly string[]> = {
+  situations: raw.situations, things: raw.things, creatures: raw.creatures, places: raw.places, occasions: raw.occasions,
+  qualities: raw.qualities, uncanny: raw.uncanny,
+};
+/** 🛠 the deal's knobs */
+export const KIT_DEAL = {
+  /** a thing takes a quality in front of it about 1 in 3 ("a cracked bell") */
+  quality: 1 / 3,
+  /** the uncanny comes into about 1 saga in 5 */
+  uncanny: 0.2,
+  /** the pick arms' offer, spread across the pools (10 atoms; + 1 uncanny on an uncanny deal) */
+  offer: { things: 3, creatures: 2, places: 3, occasions: 2 } as Record<Exclude<KitPool, 'uncanny'>, number>,
+  /** kit+pick+situation: how many situations the pick chooses from */
+  situations: 3,
+};
+const BASE_POOLS: Exclude<KitPool, 'uncanny'>[] = ['things', 'creatures', 'places', 'occasions'];
+
+/** what the dealer dealt for one saga: the situation(s) (none on a personal saga, whose own past is its seed) and the
+ *  keyword atoms */
+export interface KitDeal { situations: string[]; keywords: string[] }
+
+type AtomPool = KitPool | 'situations';
+const atom = (rng: Rng, pool: AtomPool): string => {
+  const a = rng.pick(KIT[pool]);
+  return pool === 'things' && rng.chance(KIT_DEAL.quality) ? `${rng.pick(KIT.qualities)} ${a}` : a;
+};
+/** n distinct atoms of one pool (a thing's quality makes its own atom distinct) */
+const atoms = (rng: Rng, pool: AtomPool, n: number, have: string[]): string[] => {
+  const out: string[] = [];
+  for (let i = 0; out.length < n && i < n * 8; i++) { const a = atom(rng, pool); if (!have.includes(a) && !out.includes(a)) out.push(a) }
+  return out;
+};
+
+/** ONE deal of the kit, every draw on the rng: the situation(s), then the keywords. `kit` deals 1–3 atoms, each from a
+ *  different pool, the uncanny taking one of them about 1 saga in 5; a pick arm deals the whole offer (KIT_DEAL.offer),
+ *  shuffled so no pool sits first. A personal saga deals no situation (its seed is the soldier's own past) */
+export function dealKit(rng: Rng, arm: Exclude<SeedArm, 'themes'>, personal: boolean): KitDeal {
+  const situations = personal ? [] : arm === 'kit+pick+situation' ? atoms(rng, 'situations', KIT_DEAL.situations, []) : [rng.pick(KIT.situations)];
+  const keywords: string[] = [];
+  if (!PICKS.has(arm)) {
+    const n = 1 + rng.int(3);
+    const pools: KitPool[] = rng.shuffle([...BASE_POOLS]).slice(0, n);
+    if (rng.chance(KIT_DEAL.uncanny)) pools[n - 1] = 'uncanny';
+    for (const p of pools) keywords.push(...atoms(rng, p, 1, keywords));
+  } else {
+    for (const p of BASE_POOLS) keywords.push(...atoms(rng, p, KIT_DEAL.offer[p], keywords));
+    if (rng.chance(KIT_DEAL.uncanny)) keywords.push(...atoms(rng, 'uncanny', 1, keywords));
+    rng.shuffle(keywords);
+  }
+  return { situations, keywords };
+}

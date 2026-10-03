@@ -13,11 +13,12 @@ import type { Card } from '../engine/cards.js';
 import type { Outcome } from '../engine/roll.js';
 import { RACE_WORD, an, manWoman, soldierIs } from '../engine/plainwords.js';
 import {
-  TYPES, JOB_TYPES, WAY_ENDING, WAY_ATTR, NUMBER_WORD, helped, wayMeans, wayWord, wayOf, partOf, waysOf, hashStr,
+  TYPES, JOB_TYPES, WAY_ENDING, WAY_ATTR, NUMBER_WORD, helped, wayMeans, wayWord, wayOf, partOf, waysOf, hashStr, seedOf, seedText,
   type JobType, type Way, type SagaPerson, type Trouble, type Episode, type CastEntry, type SagaPlan, type SagaState,
   type SagaWorld, type Hurt, type Cost, type LogRow, type SagaRecord,
 } from '../engine/saga.js';
 import { renderSaga, wordCount, type SagaTemplate } from './prompts/saga/render.js';
+import { PICKS } from '../engine/seedkit.js';
 import type { AiProvider } from './provider.js';
 
 // ─── the plan call's payload (§2.9.1) ───────────────────────────────────────────────────────────
@@ -36,19 +37,28 @@ export function planPayload(ctx: PlanCtx): { payload: Record<string, unknown>; f
   if (w.cast.some(p => !p.trade)) flags.push('notrade');
   if (ctx.direction) flags.push('direction');
   if (ctx.avoid?.length) flags.push('avoid');
-  const payload: Record<string, unknown> = { seed: w.seed.text };
+  // a kit seed arm (North Star 7): the situation and its keywords, or a premise; a supporting cast dealt with no part
+  const seed = seedOf(w);
+  if (seed.keywords) flags.push('keywords');
+  if (seed.premise) flags.push('premise');
+  if (w.cast.some(p => p.part === '')) flags.push('support');
+  const payload: Record<string, unknown> = { seed: seed.text };
+  if (seed.keywords) payload.keywords = seed.keywords;
   payload.jobs = NUMBER_WORD[w.N - 1];
   payload.types = JOB_TYPES.map(t => ({ type: t, do: TYPES[t].do, kind: TYPES[t].kind }));
   // (R4 verify) everyone's race reaches the plan: the lean asker had none, and the label rule "what a stranger sees" made
   // the writer coin one off the seed ("pale elf grove singer" for a human). (R5 verify 2) On its own key, as the trade is:
   // the label is race and trade, and a race dealt only inside `traits` ("human, slow-witted, thin") took the traits into
   // the label with it
-  payload.cast = w.cast.map(p => ({
-    id: p.id, sex: manWoman(p.sex), race: RACE_WORD[p.race] ?? p.race, part: partOf(p),
-    ...(p.trade ? { trade: p.trade } : {}), ...(p.traits ? { traits: p.traits } : {}),
-    ...(p.known ? { name: p.name } : {}),
-    ...(p.memory ? { memory: p.memory, where: p.where } : {}),
-  }));
+  payload.cast = w.cast.map(p => {
+    const part = partOf(p);
+    return {
+      id: p.id, sex: manWoman(p.sex), race: RACE_WORD[p.race] ?? p.race, ...(part ? { part } : {}),
+      ...(p.trade ? { trade: p.trade } : {}), ...(p.traits ? { traits: p.traits } : {}),
+      ...(p.known ? { name: p.name } : {}),
+      ...(p.memory ? { memory: p.memory, where: p.where } : {}),
+    };
+  });
   const ways = waysOf(w), isHelped = helped(focalOf(w));
   payload.ending = w.personal ? { about: w.focalId, likely: wayWord(ways[0]!), ways: ways.map(wayWord) }
     : { about: w.focalId, likely: ways[0], ways: ways.map(v => ({ way: v, means: wayMeans(v, isHelped) })) };
@@ -369,7 +379,7 @@ const contentWords = (s: string) => (s.toLowerCase().match(/[a-z]{4,}/g) ?? []).
 /** the answer's key words: its content words minus the seed, labels, names, places and the question's own words
  *  (card 1 prints the question, and an answer shares its subject). Shared by the plan lint (leaks before the finale) and
  *  the report lint (the reveal in `after`) */
-export function answerKeys(plan: SagaPlan, w: SagaWorld, seed = w.seed.text): { answerWords: string[]; plainStems: Set<string> } {
+export function answerKeys(plan: SagaPlan, w: SagaWorld, seed = seedText(w)): { answerWords: string[]; plainStems: Set<string> } {
   const plainSet = new Set([...seed.toLowerCase().split(/\W+/), ...plan.cast.flatMap(p => [...p.label.toLowerCase().split(/\W+/), ...nameParts(p).map(x => x.toLowerCase())]),
     ...w.places.map(x => x.toLowerCase()), ...plan.question.toLowerCase().split(/\W+/)]);
   const plainStems = new Set([...plainSet].map(stem));
@@ -377,7 +387,7 @@ export function answerKeys(plan: SagaPlan, w: SagaWorld, seed = w.seed.text): { 
 }
 /** (R3, W5) log-only: the finale's `after` should carry the reveal; a share of the answer's key words below the bar says
  *  it was left out. Nothing re-rolls on it */
-export function revealLint(plan: SagaPlan, w: SagaWorld, after: string, seed = w.seed.text): string | null {
+export function revealLint(plan: SagaPlan, w: SagaWorld, after: string, seed = seedText(w)): string | null {
   const keys = [...new Set(answerKeys(plan, w, seed).answerWords.map(stem))];
   if (keys.length < 2) return null;
   const said = new Set((after.toLowerCase().match(/[a-z]{4,}/g) ?? []).map(stem));
@@ -386,7 +396,7 @@ export function revealLint(plan: SagaPlan, w: SagaWorld, after: string, seed = w
 }
 
 /** §2.7 log-only telemetry: nothing here re-rolls anything */
-export function planLint(plan: SagaPlan, w: SagaWorld, seed = w.seed.text): string[] {
+export function planLint(plan: SagaPlan, w: SagaWorld, seed = seedText(w)): string[] {
   const out: string[] = [];
   // (a person the seed names may appear, so the seed's own words are no stray either)
   const known = new Set([...w.cast.flatMap(p => nameParts(p)), ...w.places, ...w.land.split(/\W+/), ...seed.split(/\W+/)]);
@@ -830,7 +840,7 @@ function namesFor(plan: SagaPlan, ids: string[], dealt: string, k: Knowing, alwa
     if (!p || (!always.includes(id) && !mentions(dealt, p))) continue;
     const entry = cardEntry(p, k, `${dealt} ${shown}`);
     // the part of anyone no other field places, only for someone in this job (R2, S4)
-    if (!placed(p) && here.includes(p.id)) entry.part = partIn(p, plan);
+    if (!placed(p) && here.includes(p.id) && partIn(p, plan)) entry.part = partIn(p, plan);
     if (p.memory && !k.seen.has(p.id)) entry.memory = toYou(p.memory);
     out.push(entry);
   }
@@ -878,7 +888,7 @@ export function reportPayload(a: {
   const dealt = [a.card, e.job, JSON.stringify(e.trouble), result ?? '', a.option?.label ?? '', won ? `${e.gain ?? ''} ${e.learn ?? ''}` : '', ...a.state.learned,
     JSON.stringify(haveOf(plan, a.state, a.finale)), a.finale ? `${plan.question} ${plan.answer}` : ''].join(' ');
   const people = ids.map(id => plan.cast.find(p => p.id === id)).filter((p): p is CastEntry => !!p && !sent.has(p.name))
-    .map(p => ({ ...reportEntry(p, k, dealt), ...(here.includes(p.id) && p.id !== client.id ? { part: partIn(p, plan) } : {}) }));
+    .map(p => ({ ...reportEntry(p, k, dealt), ...(here.includes(p.id) && p.id !== client.id && partIn(p, plan) ? { part: partIn(p, plan) } : {}) }));
   // a job fought against nameless thugs has nobody else in it: no list, and no line explaining one
   if (people.length) { payload.people = people; flags.push('people', ...entryFlags(people)) }
   if (!failedJob) payload.outcome = a.outcome;
@@ -1120,6 +1130,93 @@ export const roadOf = (rec: SagaRecord, at?: number, retry?: boolean, finale?: '
 /** undefined → null for the save (JSON keeps arrays positional) */
 export const toNullable = (xs: (string | undefined)[] | null): (string | null)[] | null => xs ? xs.map(x => x ?? null) : null;
 
+// ─── a kit seed arm's small steps before the plan (North Star 7–8: deal → pick → premise → plan) ───
+// Both are SELECTION / DECOMPOSITION steps, one call each, never a re-roll or a gate (the single-shot ruling): a failed or
+// unusable reply leaves the floor's choice in its place and the plan goes on.
+
+/** one person as the pick call sees them: race and trade (or sex), and a part where one was dealt */
+const castLine = (p: SagaPerson): string => {
+  const part = partOf(p);
+  const who = an(`${RACE_WORD[p.race] ?? p.race} ${p.trade ?? manWoman(p.sex)}`);
+  return !part ? who : /^one of\b/.test(part) ? `${who}, ${part}` : `${who} who ${part}`;
+};
+/** the situation(s) — or a personal saga's past — the tone, the cast in plain words, and every keyword dealt */
+export function pickPayload(w: SagaWorld): { payload: Record<string, unknown>; flags: string[] } {
+  const k = w.kit!;
+  const flags: string[] = [];
+  const payload: Record<string, unknown> = {};
+  if (!k.situations.length) { flags.push('personal'); payload.past = w.seed.text }
+  else if (k.situations.length > 1) { flags.push('situations'); payload.situations = k.situations }
+  else payload.situation = k.situations[0];
+  payload.tone = w.tone;
+  payload.cast = w.cast.map(castLine);
+  payload.keywords = k.keywords;
+  return { payload, flags };
+}
+const zStrs = z.union([z.array(z.union([z.string(), z.number()]).transform(String)), z.string().transform(x => x.split(/[,;]/))]).optional().catch(undefined);
+export const zPickOut = z.object({ situation: zs, keywords: zStrs }).passthrough();
+/** the floor's choice: the first situation dealt, the first two keywords (the deal's own order is already random) */
+export function mockPick(payload: Record<string, unknown>): { situation?: string; keywords: string[] } {
+  const sits = payload.situations as string[] | undefined;
+  return { ...(sits ? { situation: sits[0] } : {}), keywords: (payload.keywords as string[]).slice(0, 2) };
+}
+const normAtom = (x: string) => x.toLowerCase().replace(/^\s*(?:an?|the)\s+/, '').replace(/[^a-z' -]/g, '').replace(/\s+/g, ' ').trim();
+/** the pick as the plan will get it: only what was dealt (matched loosely, kept as dealt), at most three keywords, one
+ *  situation; whatever does not match is dropped (a dev line), and nothing usable is the floor's choice */
+export function readPick(raw: unknown, k: Pick<NonNullable<SagaWorld['kit']>, 'situations' | 'keywords'>, payload: Record<string, unknown>): { situation?: string; keywords: string[]; dropped: string[]; floor: boolean } {
+  const o = zPickOut.safeParse(raw);
+  const dropped: string[] = [];
+  const keywords: string[] = [];
+  for (const x of (o.success ? o.data.keywords : undefined) ?? []) {
+    const hit = k.keywords.find(d => normAtom(d) === normAtom(x));
+    if (hit && !keywords.includes(hit)) keywords.push(hit); else if (!hit) dropped.push(x);
+  }
+  let situation: string | undefined;
+  if (k.situations.length > 1) {
+    const got = o.success ? o.data.situation : undefined;
+    situation = k.situations.find(d => normAtom(d) === normAtom(got ?? ''));
+    if (!situation && got) dropped.push(got);
+  }
+  const floor = mockPick(payload);
+  const useFloor = !keywords.length || (k.situations.length > 1 && !situation);
+  return { ...(k.situations.length > 1 ? { situation: situation ?? floor.situation } : {}), keywords: keywords.length ? keywords.slice(0, 3) : floor.keywords, dropped, floor: useFloor };
+}
+
+/** the picked inputs as the premise call sees them: the situation (or the past), the keywords, the tone, and the cast —
+ *  named only where known, the one whose fate the end decides marked (never an id: the premise is prose) */
+export function premisePayload(w: SagaWorld): { payload: Record<string, unknown>; flags: string[] } {
+  const k = w.kit!;
+  const s = seedOf({ seed: w.seed, kit: { ...k, premise: undefined } });
+  const flags: string[] = [];
+  const payload: Record<string, unknown> = {};
+  if (!k.situations.length) { flags.push('personal'); payload.past = w.seed.text } else payload.situation = s.text;
+  payload.keywords = s.keywords ?? [];
+  payload.tone = w.tone;
+  // whose fate the end decides: the focal, or on a personal saga the one in the soldier's way (choiceTarget)
+  const ending = w.personal ? w.cast.find(p => p.seat === 'opponent')?.id : w.focalId;
+  payload.cast = w.cast.map(p => {
+    const part = partOf(p);
+    return {
+      ...(p.known ? { name: p.name } : {}), sex: manWoman(p.sex), race: RACE_WORD[p.race] ?? p.race,
+      ...(p.trade ? { trade: p.trade } : {}), ...(part ? { part } : {}), ...(p.id === ending ? { ending: true } : {}),
+    };
+  });
+  return { payload, flags };
+}
+export const zPremiseOut = z.object({ premise: zStrs }).passthrough();
+/** the floor's premise, from the payload alone: who asks and what for, who stands in the way, a keyword unexplained */
+export function mockPremise(payload: Record<string, unknown>): { premise: string[] } {
+  const cast = payload.cast as Record<string, string | boolean>[];
+  const desc = (p: Record<string, string | boolean>) => p.name ? String(p.name) : `the ${p.race} ${p.trade ?? p.sex}`;
+  const asks = cast.find(p => p.part && !p.ending) ?? cast[0]!, end = cast.find(p => p.ending) ?? cast[cast.length - 1]!;
+  const kw = (payload.keywords as string[])[0];
+  return { premise: [
+    payload.past ? `${cap(desc(asks))} wants to set right an old wrong: ${String(payload.past).replace(/[.!]+$/, '')}.` : `${cap(desc(asks))} needs help to ${String(payload.situation)}.`,
+    `${cap(desc(end))} stands in the way, for reasons of their own.`,
+    kw ? `Nobody yet knows what the ${kw} has to do with it.` : 'Nobody yet knows why.',
+  ] };
+}
+
 // ─── the typed calls (Step 3): one template-keyed provider call each, the floor on any failure ─
 
 type Log = (kind: string, text: string) => void;
@@ -1182,6 +1279,37 @@ export async function writeReport(ai: AiProvider, rp: ReportCall, log: Log = () 
   if (words(rep.after) > rp.vars.A!) log('dev', `saga report cap (log-only): after ${words(rep.after)}/${rp.vars.A}`);
   if (words(rep.summary) > 25) log('dev', `saga report cap (log-only): summary ${words(rep.summary)}/25`);
   return rep;
+}
+
+/** the pick (kit+pick arms): one writer call at low effort; the floor's choice when it fails */
+export async function pickSeed(ai: AiProvider, w: SagaWorld, log: Log = () => {}): Promise<NonNullable<NonNullable<SagaWorld['kit']>['picked']>> {
+  const { payload, flags } = pickPayload(w);
+  let raw: unknown = null;
+  try { raw = await ai.sagaCall({ template: 'pick', flags, vars: {}, payload, tier: 'writer', effort: 'low', schema: zPickOut, floor: () => mockPick(payload) }) }
+  catch (e) { log('dev', `saga pick: the call failed (${(e as Error).message?.slice(0, 120)})`) }
+  const r = readPick(raw, w.kit!, payload);
+  if (r.dropped.length) log('dev', `saga pick (log-only): not dealt, dropped: ${r.dropped.join('; ')}`);
+  if (r.floor) log('dev', 'saga pick: nothing usable, the floor\'s choice stood in');
+  return { ...(r.situation ? { situation: r.situation } : {}), keywords: r.keywords, ...(r.floor ? { floor: true } : {}) };
+}
+/** the premise (kit+pick+premise): one writer call at low effort; the floor's sentences when it fails */
+export async function writePremise(ai: AiProvider, w: SagaWorld, log: Log = () => {}): Promise<{ premise: string[]; floor: boolean }> {
+  const { payload, flags } = premisePayload(w);
+  let lines: string[] = [];
+  try {
+    const out = await ai.sagaCall({ template: 'premise', flags, vars: {}, payload, tier: 'writer', effort: 'low', schema: zPremiseOut, floor: () => mockPremise(payload) }) as z.infer<typeof zPremiseOut>;
+    lines = (out.premise ?? []).map(x => sentence(x)).filter(Boolean);
+  } catch (e) { log('dev', `saga premise: the call failed (${(e as Error).message?.slice(0, 120)})`) }
+  if (lines.length && lines.length !== 3) log('dev', `saga premise (log-only): ${lines.length} sentences`);
+  if (!lines.length) { log('dev', 'saga premise: the writer failed, the floor stood in'); return { premise: mockPremise(payload).premise, floor: true } }
+  return { premise: lines, floor: false };
+}
+/** a kit arm's steps before the plan, each run once (their results stay on the world, so a re-planned saga reuses them) */
+export async function seedSteps(ai: AiProvider, w: SagaWorld, log: Log = () => {}): Promise<void> {
+  const k = w.kit;
+  if (!k) return;
+  if (PICKS.has(k.arm) && !k.picked) k.picked = await pickSeed(ai, w, log);
+  if (k.arm === 'kit+pick+premise' && !k.premise) { const r = await writePremise(ai, w, log); k.premise = r.premise; if (r.floor) k.premiseFloor = true }
 }
 
 /** the system prompt a saga call sends (the call log and the golden test read it) */

@@ -17,12 +17,12 @@ import type { Lead } from '../engine/quests.js';
 import { coins, type Outcome, type SlotTest } from '../engine/roll.js';
 import { KEEP_THRESHOLD, type TraitPrefs } from '../engine/economy.js';
 import {
-  dealSaga, castSaga, rollHurt, clampHurt, helped, EPISODE_TESTS, WAY_TESTS, WAY_REWARD, HOW_BAND,
-  type SagaRecord, type SagaWorld, type SagaPlan, type SagaPos, type LogRow, type Matter, type Hurt, type Cost, type Way,
+  dealSaga, castSaga, rollHurt, clampHurt, helped, EPISODE_TESTS, WAY_TESTS, WAY_REWARD, HOW_BAND, SEED_ARM,
+  type SagaRecord, type SeedArm, type SagaWorld, type SagaPlan, type SagaPos, type LogRow, type Matter, type Hurt, type Cost, type Way,
   type EpisodeType, type CastEntry, type Face, type EpisodeTest,
 } from '../engine/saga.js';
 import {
-  newKnowing, newState, planSaga, writeOutline, writeCard, writeReport, firstCardPayload, laterCardPayload, reportPayload,
+  newKnowing, newState, planSaga, seedSteps, writeOutline, writeCard, writeReport, firstCardPayload, laterCardPayload, reportPayload,
   questLog, logLines, noteDelivered, forLineShown, onThisMatter, jobWhy, roadLines, roadHopes, mockOutline, bank, triedLine,
   revealLint, choiceTarget, fateSentence, knowingOf, keepKnowing, roadOf, toNullable, PRONOUN,
   type ReportCall,
@@ -46,6 +46,8 @@ export interface SagaHost {
   npcPrefs?(): TraitPrefs | undefined;
   /** a place name the game still wants rested */
   placeOk?(p: string): boolean;
+  /** the seed arm to deal (North Star 7); absent: the build's SEED_ARM. The seed lab names one */
+  seedArm?(): SeedArm;
   // the predicates settleFinale reads, for the Outcome line (sagaFate)
   hasRoom(type: string): boolean;
   rosterCapacity(): number;
@@ -70,16 +72,18 @@ export interface DealPins { personalSeed?: string; focalMemory?: { memory: strin
 export function deal(host: SagaHost, chain: Chain, lead: Pick<Lead, 'lab'> | undefined, focal: Card, pins: DealPins = {}): SagaRecord {
   const personal = chain.isPersonal;
   host.state.recentThemeIds ??= [];
-  const d = dealSaga(host.storyRng, host.state.recentThemeIds, { personal, personalSeed: pins.personalSeed, spark: lead?.lab?.spark });
+  const arm = host.seedArm?.() ?? SEED_ARM;
+  const d = dealSaga(host.storyRng, host.state.recentThemeIds, { personal, personalSeed: pins.personalSeed, spark: lead?.lab?.spark, ...(arm !== 'themes' ? { arm } : {}) });
   const c = castSaga(host.storyRng, {
     focal, personal, region: chain.region, shape: d.shape, taken: n => host.takenName(n), prefs: host.npcPrefs?.(),
     focalMemory: pins.focalMemory, returningClient: pins.returningClient, seedPerson: pins.seedPerson, placeOk: host.placeOk ? p => host.placeOk!(p) : undefined,
+    ...(d.kit ? { kit: { support: d.support ?? 0 } } : {}),
   });
   for (const p of c.cast) if (!p.focal && !p.memory) host.noteNpcName(p.name);
   const world: SagaWorld = {
     personal, N: chain.expectedBeats, kind: chain.kind === 'gold-hoard' ? 'gold' : chain.kind, shape: d.shape,
     focalId: focal.id, cast: c.cast, stake: d.stake, places: c.places, land: c.land, seed: d.seed, tone: d.tone,
-    region: chain.region, level: chain.level,
+    region: chain.region, level: chain.level, ...(d.kit ? { kit: d.kit } : {}),
   };
   const rec = newRecord(world);
   chain.saga = rec;
@@ -97,9 +101,11 @@ export function newRecord(world: SagaWorld): SagaRecord {
 
 // ─── plan ───────────────────────────────────────────────────────────────────────────────────────
 
-/** the plan call (at most 2, then the floor). avoid: the last five sagas' title and question */
+/** the plan call (at most 2, then the floor). avoid: the last five sagas' title and question. A kit arm's pick and
+ *  premise calls run first, once (North Star 8: deal → pick → premise → plan); their results stay on the world */
 export async function plan(host: SagaHost, chain: Chain): Promise<SagaPlan> {
   const rec = recOf(chain);
+  await seedSteps(host.ai, rec.world, (kind, t) => host.log(kind, t));
   const avoid = host.state.chains.filter(c => c !== chain && c.saga?.plan).slice(-5).map(c => ({ title: c.saga!.plan!.title, question: c.saga!.plan!.question }));
   const r = await planSaga(host.ai, { w: rec.world, avoid, direction: host.direction() }, chain.id, (kind, t) => host.log(kind, t));
   rec.plan = r.plan;

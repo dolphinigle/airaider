@@ -11,13 +11,16 @@ import { renderSaga, wordCount, SAGA_WORD_BUDGET, type SagaTemplate } from '../s
 const subsets = <T,>(xs: T[]): T[][] => xs.reduce<T[][]>((acc, x) => acc.concat(acc.map(a => [...a, x])), [[]]);
 
 const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, number> }[]> = {
-  plan: [['notrade'], []].flatMap(cast => subsets(['personal', 'memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra], vars: {} }))),
+  // the seed arms (North Star 7; engine/seedkit.ts): none (themes), a kit's keywords, a premise; with a kit cast, `support`
+  plan: [[], ['keywords', 'support'], ['premise', 'support']].flatMap(seed => [['notrade'], []].flatMap(cast => subsets(['personal', 'memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, ...seed], vars: {} })))),
   card: ['first', 'later', 'finale'].flatMap(pos => subsets(['memory', 'direction', 'intro', 'part', ...(pos === 'first' ? ['personal', 'returning'] : []), ...(pos === 'finale' ? ['lastchance', 'lose'] : []),
     ...(pos !== 'first' ? ['latest', 'retry', 'will'] : []), ...(pos !== 'finale' ? ['why'] : [])])
     .filter(s => !(s.includes('latest') && s.includes('retry')) && !(pos === 'finale' && s.includes('retry')) && s.includes('lastchance') === s.includes('lose') && !(s.includes('personal') && s.includes('returning')))
     .filter(s => !(s.includes('will') && (s.includes('retry') || s.includes('lose'))))
     .map(extra => ({ flags: [pos, ...extra], vars: { MAX: pos === 'finale' ? 90 : 70 } }))),
   outline: [{ flags: [], vars: {} }],
+  pick: [[], ['situations'], ['personal']].map(flags => ({ flags, vars: {} })),
+  premise: [[], ['personal']].map(flags => ({ flags, vars: {} })),
   report: subsets(['people', 'personal', 'decides', 'result', 'option', 'hurt', 'cost', 'hurtprice', 'brought', 'clue', 'known', 'have', 'edge', 'answer', 'direction', 'intro', 'part'])
     .filter(s => s.includes('people') || !s.some(f => f === 'intro' || f === 'part'))
     .filter(s => !s.includes('hurtprice') || (s.includes('hurt') && !s.includes('cost')))
@@ -38,6 +41,18 @@ describe('saga prompt budget (the shipped R5 templates)', () => {
       expect(max, `${name} worst variant: ${worst}`).toBeLessThanOrEqual(SAGA_WORD_BUDGET[name]);
     });
   }
+  it('a seed arm\'s lines reach the plan only with their data', () => {
+    const plain = renderSaga('plan', ['types', 'notrade']);
+    expect(plain).not.toMatch(/keywords|starts|the others/);
+    expect(renderSaga('plan', ['types', 'notrade', 'keywords', 'support'])).toContain('- keywords: use each where it matters.');
+    expect(renderSaga('plan', ['types', 'notrade', 'keywords', 'support'])).toContain('Use the asker and the person in ending, others only as needed');
+    expect(renderSaga('plan', ['types', 'personal', 'keywords', 'support'])).toContain('Use those with a part, others only as needed');
+    expect(renderSaga('plan', ['types', 'notrade', 'premise', 'support'])).toContain('- seed: how the story starts');
+    expect(renderSaga('plan', ['types', 'notrade', 'premise', 'support'])).not.toContain('the idea under the story');
+    expect(renderSaga('pick', [])).not.toMatch(/situations|past/);
+    expect(renderSaga('pick', ['situations'])).toContain('"situation": "one of situations"');
+    expect(renderSaga('pick', ['personal'])).toContain('- past:');
+  });
   it('a rule about absent data never reaches the model', () => {
     expect(renderSaga('card', ['later', 'memory'], { MAX: 70 })).toContain('memory:');
     expect(renderSaga('card', ['later'], { MAX: 70 })).not.toContain('memory');
@@ -50,7 +65,7 @@ describe('saga prompt budget (the shipped R5 templates)', () => {
   });
   it('the templates are the measured ones, and never the lab\'s working copies', () => {
     const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), '../src/ai/prompts/saga');
-    expect(fs.readdirSync(dir).filter(f => f.endsWith('.txt')).sort()).toEqual(['card.txt', 'outline.txt', 'plan.txt', 'report.txt']);
+    expect(fs.readdirSync(dir).filter(f => f.endsWith('.txt')).sort()).toEqual(['card.txt', 'outline.txt', 'pick.txt', 'plan.txt', 'premise.txt', 'report.txt']);
     // (byte identity with the lab at the tag is held by test/sagagolden.test.ts, which renders every recorded variant)
   });
 });

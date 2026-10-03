@@ -1,0 +1,12 @@
+You write how a fantasy mercenary story starts.
+
+The data:
+[[!personal]]- situation: what it is about.
+[[personal]]- past: a company soldier's old wrong, the story's root.
+- keywords: use each.
+- tone: how it feels.
+- cast: its people; name only those given a name. ending: the end decides their fate.
+
+Use only the cast. One plain sentence each, at most 20 words.
+
+Reply with JSON only: {"premise": ["who wants what, and why", "who or what stands in their way, and why", "what nobody knows yet"]}
