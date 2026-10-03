@@ -84,6 +84,8 @@ export interface SagaMech {
   cardWords: number[]; beforeWords: number[]; afterWords: number[];
   /** (R3) probe sagas only: prompt-gloss runs printed in card and report prose, per text (`card_3: this job decides`) */
   glossEchoes?: string[];
+  /** (R5 verify 2) probe sagas only: per card stamp, the cards whose prose carries it (`cardStamps`) */
+  cardStamps?: Record<string, number>;
 }
 
 function readJsonl<T>(p: string): T[] {
@@ -230,6 +232,15 @@ type ProbeCall = CallLogLine & { template?: string; flags?: string[] };
 
 /** the same measures on a PROBE saga (probe.ts, §5.2): v4 calls are plan · card · report, and each call's
  *  own system prompt states its caps, so caps are read from the prompt that asked */
+/** (R5 verify 2) log-only: the card stamps counted round to round and not fixed (§D: repetition is watch-only; R3 N9:
+ *  rewording a gloss only moves its stamp). The order list's seams ("Now you", "you must", the trouble opener) and the
+ *  premise and retry openers. Returns the stamps a card's prose carries */
+export const CARD_STAMPS: [string, RegExp][] = [
+  ['now you', /\bnow you\b/i], ['you must', /\byou must\b/i], ['last time', /\blast time\b/i], ['needs you', /\bneeds? you\b/i],
+  ['nobody knows', /\b(?:nobody|no one|no-one)\s+knows\b/i], ['stands against you', /\bstands? (?:against you|in your way)\b|\bopposes? you\b/i],
+];
+export const cardStamps = (prose: string): string[] => CARD_STAMPS.filter(([, rx]) => rx.test(prose)).map(([k]) => k);
+
 export function sagaMechProbe(runDir: string, id: string): SagaMech {
   const sd = path.join(runDir, id);
   const texts = JSON.parse(fs.readFileSync(path.join(sd, 'texts.json'), 'utf8')) as TextRec[];
@@ -319,6 +330,7 @@ export function sagaMechProbe(runDir: string, id: string): SagaMech {
     card1: cards[0]?.prose ?? '', title: plan?.title ?? cards[0]?.title ?? '', jobSeq, paperworkJobs, jobs: eps.length,
     cardWords: cards.map(c => wc(c.prose)), beforeWords: reports.map(r => wc(r.before)), afterWords: reports.map(r => wc(r.after)),
     glossEchoes: echoes,
+    cardStamps: Object.fromEntries(CARD_STAMPS.map(([k]) => [k, cards.filter(c => cardStamps(c.prose ?? '').includes(k)).length])),
   };
 }
 
@@ -385,6 +397,7 @@ export function runMech(runDir: string) {
     M13_paperworkProxy: (j => j ? per.reduce((s, p) => s + p.paperworkJobs, 0) / j : null)(per.reduce((s, p) => s + p.jobs, 0)),
     GE_glossEchoes: per.reduce((s, p) => s + (p.glossEchoes?.length ?? 0), 0),
     GE_textsWithEcho: per.reduce((s, p) => s + new Set((p.glossEchoes ?? []).map(x => x.split(':')[0])).size, 0),
+    CS_cardStamps: Object.fromEntries(CARD_STAMPS.map(([k]) => [k, per.reduce((s, p) => s + (p.cardStamps?.[k] ?? 0), 0)])),
     GE_top: (() => { const n = new Map<string, number>(); per.flatMap(p => p.glossEchoes ?? []).map(x => x.replace(/^[^:]*: /, '')).forEach(g => n.set(g, (n.get(g) ?? 0) + 1)); return [...n.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12).map(([g, c]) => `${g}×${c}`) })(),
   };
   return { run: path.basename(runDir), perSaga: per, aggregate: agg };
@@ -425,6 +438,7 @@ function main() {
     `| §D.3 job types | ${Object.entries(a.D3_jobTypes).map(([k, v]) => `${k} ${v}`).join(' · ')} |`,
     `| §D.3 top card-1 opening stamp | ${a.D3_topOpeningStamp ?? '—'} (${pct(a.D3_topOpeningStampShare)}) |`,
     `| M13 paperwork (errand keyword proxy; J2 decides) | ${pct(a.M13_paperworkProxy)} |`,
+    `| CS card stamps (cards carrying each; watch-only) | ${Object.entries(a.CS_cardStamps).map(([k, v]) => `"${k}" ${v}`).join(' · ')} of ${a.cards} cards |`,
     `| GE gloss echo (prompt 3-word runs in prose, not in the payload; log-only) | ${a.GE_glossEchoes} runs in ${a.GE_textsWithEcho} texts · ${a.GE_top.join(' · ')} |`,
     '',
   ].join('\n');

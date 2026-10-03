@@ -19,7 +19,9 @@ export type TemplateName = 'plan' | 'card' | 'report' | 'outline';
 // card 215 → 180 at R4 (2026-10-03): the quest log took helping, mystery and have off the card
 // card 180 → 170, outline 140 → 130 at R4 verify: `fate` and card 1's "who needs you" left the card; the outline writes
 // only the "so" clause and no end line
-export const WORD_BUDGET: Record<TemplateName, number> = { plan: 620, card: 170, report: 310, outline: 130 };
+// card 170 → 160, outline 130 → 115 at R5: card 1 deals no loss and no trouble `will`, the card no `premise` flag set;
+// the outline only shortens each why, and the want is no longer dealt
+export const WORD_BUDGET: Record<TemplateName, number> = { plan: 620, card: 160, report: 310, outline: 115 };
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const cache = new Map<TemplateName, string>();

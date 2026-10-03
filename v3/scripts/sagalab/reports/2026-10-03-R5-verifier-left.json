@@ -1,0 +1,74 @@
+[
+ {
+  "file": "v3/src/ai/prompts/plan.txt (win) + v3/scripts/sagalab/probe.ts:487 (latest = e.win); seen in rendered/card-personal__later+latest+why+will.txt, card-personal__finale+latest+will.txt, card__finale+latest+will.txt, card__finale+latest+part+will.txt",
+  "where": "later/finale card `latest` (the plan's `win`) next to the log's Held line",
+  "problem": "The later card's `latest` is the previous job's plan `win`. For catch, free, sneak and find jobs the win is the gain itself, so the card opens on what the log just above it already shows: 'The slaver's runner is caught before reaching Millthorpe.' under 'Held: the slaver's runner, caught near Millthorpe'. The same happens with beast trapped / beast caged and hiding place found / map to the hiding place. That is 4 of the 5 later and finale cards here, and it breaks R4's rule that what is held belongs to the log, never the card. plan.txt never says that `win` is shown on the next card, and it never says to keep `win` apart from `gain` and `learn`.",
+  "fix": "Change plan.txt win to: 'what success changes for the one who asked or the foe, never the thing taken (gain) or the fact found (learn), which are shown apart.' Or fix it in the engine: when `win` restates the gain, leave out `latest`, because the road's tick and the Held line already say it."
+ },
+ {
+  "file": "v3/scripts/sagalab/v4lab.ts reportPayload (personal); rendered/report__finale-success__...+personal+..., report__finale-partial__...+personal+..., report__partial__...+personal+...",
+  "where": "personal-saga report payload: no `past`, but part/known/answer point at it",
+  "problem": "The soldier's past (the plan's soldier.past) only ever reaches card 1. Personal reports still deal text that depends on it: part 'knows Jervaise Greyfell's past' (to be shown, not stated), known 'The slaver grew rich the year the old wrong was done', and the secret 'The slaver has lived off Jervaise Greyfell's old wrong'. The writer is told to show or reveal something it never sees, so it either invents the wrong, which may contradict card 1, or stays vague.",
+  "fix": "In personal reports where the soldier is sent or anything mentions the past, deal `past` (plan soldier.past) with one gloss line: 'past: the soldier's old wrong, as the player read it; never shown as new.'"
+ },
+ {
+  "file": "v3/src/ai/prompts/plan.txt line 20 (why) + line 24; rendered/plan__*.txt",
+  "where": "episodes[].why for episodes 2..N",
+  "problem": "Every episode is asked for a why, under the densest rule in the prompt (~45 words). Only episode 1's is ever dealt (v4lab: 'Only job 1's why prints'). Later cards and the road use the outline's hope instead. Line 24 even claims 'whys ... are shown before play'. So N-1 outputs are thrown away, and the rule spends a cheap model's attention on them.",
+  "fix": "Ask for why on job 1 only, e.g. drop `why` from the episode schema and add a top-level \"first_why\": \"one sentence\", or say 'why: job 1 only'. Change line 24 to 'Titles, jobs, job 1's why and troubles ...'."
+ },
+ {
+  "file": "v3/scripts/sagalab/v4lab.ts:1033 (MAX finale 90) + card.txt; rendered/card__finale+*.txt, card-personal__finale+latest+will.txt",
+  "where": "finale card cap",
+  "problem": "The finale card gets 3 short facts (latest, job, trouble), plus lose at a last chance, but the widest cap: 90 words. Card 1 has to fit 6-7 facts into 70. Cheap models treat the cap as a target, so the finale card gets padded with invented scene and threat, against 'Use only the data'. Mock finales come to 25-60 words.",
+  "fix": "Scale MAX by the facts dealt, as the report does (about 15 words per fact): finale about 50, last chance about 65. Or set it equal to the later-card cap."
+ },
+ {
+  "file": "v3/scripts/sagalab/v4lab.ts laterCardPayload (namesFor excludes client); rendered/card__finale+lastchance+latest+lose.txt",
+  "where": "last-chance card: lose.who vs names",
+  "problem": "`names` is glossed as 'people the card may mention', yet lose.who names the asker (Indure Palebough), who is missing from names. The data contradicts itself. A literal model may avoid the name ('the one who hired you') or think it is breaking the list. The asker's sex is also never dealt, so the pronoun is a guess.",
+  "fix": "Whenever `lose` is dealt, add the one the company acts for to names (name and sex, no label)."
+ },
+ {
+  "file": "v3/scripts/sagalab/v4lab.ts:1112 outlinePayload; rendered/outline__plain.txt",
+  "where": "outline input `asker`",
+  "problem": "The asker is dealt as 'Name, a label' with no sex. Hope lines naturally carry a possessive ('can then rebuild her mill'), and each one is printed after the asker's name on the road and dealt as the later card's `why`. When `wants` has no pronoun ('to save a life', 'to clear a name'), the writer has to guess, and a wrong guess shows on every card from card 1 on.",
+  "fix": "Deal asker as {\"name\",\"label\",\"sex\"}, or append the pronoun ('Endolale Dawnsinger, a woodcutter, she')."
+ },
+ {
+  "file": "v3/src/ai/prompts/report.txt line 23 (stopped summary) + v4lab.ts triedLine",
+  "where": "failure summary embedded after 'but'",
+  "problem": "The failure summary is printed as 'The company tried to <job>, but <summary>.' in the chronicle and in the last-chance card's latest. The prompt says 'say the company' and asks for 'what stopped the company', which invites 'The company was driven back by ...'. The result is '... but the company was driven back ...', with the company twice. The writer is never told the clause follows 'but'.",
+  "fix": "Stopped summary: 'what stopped the company, with what stopped it as the subject (\"the beast's charge broke the line\")'. Keep 'say the company' only for the object."
+ },
+ {
+  "file": "v3/src/ai/prompts/report.txt line 20 ([[answer]]); rendered/report__finale-*.txt",
+  "where": "finale after: the secret",
+  "problem": "The secret is dealt as one finished sentence, and 'said, seen or found' invites quoting it word for word as dialogue. 'In your own words' covers only `result`. Without `known` (report__finale-success__answer+decides+moved+...) nothing pushes the writer to build the secret from parts, so it gets pasted, and it repeats the plan answer the chronicle already prints.",
+  "fix": "'The secret comes out within it, in your own words and in pieces, never as one line: said, seen or found[, built from known].'"
+ },
+ {
+  "file": "v3/src/ai/prompts/report.txt line 22 (moved summary)",
+  "where": "finale summary",
+  "problem": "The middle summary has 'not the clue'. The finale summary has no matching 'not the secret', yet the chronicle prints the plan's answer itself. A finale summary of 'what the company did and the result' often carries the reveal, so the \ud83d\udcd6 line and the answer line say it twice.",
+  "fix": "Add '[[answer]], not the secret[[/answer]]' to the moved summary line."
+ },
+ {
+  "file": "v3/src/ai/prompts/plan.txt line 24",
+  "where": "shown-before-play guard on job text",
+  "problem": "Later job texts appear on card 1's road and go to the outline call, which is meant to get no gain. But the only guard is 'never a learn or the answer'. Nothing stops a job from naming an earlier job's gain or win ('Use the captured runner to find ...'). That puts a gain on the road before it is won, and feeds it to the outline.",
+  "fix": "'Titles, jobs, whys and troubles ... are shown before play: never a learn, another job's gain, or the answer.'"
+ },
+ {
+  "file": "v3/src/ai/prompts/plan.txt (personal) + seed/cast deal; rendered/plan__*__personal+*.txt",
+  "where": "personal plan: the wronged person has no cast id",
+  "problem": "The prompt asks for 'past: the old wrong, naming who was wronged', and the seed's central person is 'her younger brother'. He has no cast entry, so he can never be in `people`. Reports never deal him as present, even at a showdown about him. Writers either drop him or invent his presence, and 'name only those given a name' leaves him nameless on every surface.",
+  "fix": "When the seed names a wronged person, deal them as a cast entry (part 'was wronged'). Or tell the personal plan to make the wronged someone already in cast."
+ },
+ {
+  "file": "v3/src/ai/prompts/plan.txt schema (why: \"one sentence\") + card.txt MAX 70; rendered/card__first+returning+why.txt, card__first+personal+why.txt",
+  "where": "card 1 cap vs uncapped plan why",
+  "problem": "Card 1 must carry premise, memory or past, unknown, job, why and trouble in 70 words. The returning and personal mocks already come to about 65-66 words. The plan's why is uncapped ('one sentence'), while every other dealt field has a cap. A 20-25 word why pushes the card over 70 or forces it to drop a fact (usually trouble or why).",
+  "fix": "Cap the plan why ('\u226414 words'), or raise MAX to 80 when memory or past is dealt."
+ }
+]

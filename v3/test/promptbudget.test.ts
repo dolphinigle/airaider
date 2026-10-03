@@ -13,15 +13,19 @@ const variants: Record<'plan' | 'card' | 'report' | 'outline', { flags: string[]
   // the cast arms (R1, C5): full deals a stake; lean deals none and may leave the one who asks without a trade
   plan: Object.values(STRUCTURE).flatMap(arm => [['stake'], ['notrade'], []].flatMap(cast =>
     subsets(['personal', 'memory', 'direction', 'avoid']).map(extra => ({ flags: [...arm, ...cast, ...extra], vars: {} })))),
-  // premise: card 1 carries what it alone adds, `loses` (the loss; a want that already says it gets none) and/or
-  // `personal` (a soldier's old wrong), and none without either. `retry` re-poses a later job (a finale is never
-  // re-posed); every other later card has `latest`. R4: what is known, held and still open, and whom the company acts
-  // for, are the engine's quest log, never the card's, and whose fate the finale settles is the buttons' (R4 verify);
-  // `lose` comes only at a last chance. R3 verify 2: `intro` / `part` only when some entry in names carries one
-  card: ['first', 'later', 'finale'].flatMap(pos => subsets(['memory', 'direction', 'intro', 'part', ...(pos === 'first' ? ['premise', 'loses', 'personal'] : []), ...(pos === 'finale' ? ['lastchance', 'lose'] : []),
-    ...(pos !== 'first' ? ['latest', 'retry'] : [])])
-    .filter(s => !(s.includes('latest') && s.includes('retry')) && !(pos === 'finale' && s.includes('retry')) && s.includes('lastchance') === s.includes('lose'))
-    .filter(s => s.includes('premise') === (s.includes('loses') || s.includes('personal')))
+  // R5 (P5): card 1 always carries its premise (who needs you, their want, what nobody knows); `personal` makes it a
+  // soldier's old wrong. `retry` re-poses a later job (a finale is never re-posed); every other later card has `latest`.
+  // R4: on later cards what is known, held and still open, and whom the company acts for, are the engine's quest log,
+  // never the card's, and whose fate the finale settles is the buttons' (R4 verify); `lose` comes only at a last
+  // chance. R3 verify 2: `intro` / `part` only when some entry in names carries one
+  // R5 verify: `returning` puts a returning asker's past with you in card 1's premise (no personal saga has one)
+  // R5 verify 2: `why` the job's hope, from its one owner (job 1: the plan's why; a later job: its road line), never on the
+  // finale (the showdown's why was the For line's want); `will` the trouble's deed, on a later card or finale with neither a
+  // retry (the stopper was that deed) nor `lose` (the deed restated the loss)
+  card: ['first', 'later', 'finale'].flatMap(pos => subsets(['memory', 'direction', 'intro', 'part', ...(pos === 'first' ? ['personal', 'returning'] : []), ...(pos === 'finale' ? ['lastchance', 'lose'] : []),
+    ...(pos !== 'first' ? ['latest', 'retry', 'will'] : []), ...(pos !== 'finale' ? ['why'] : [])])
+    .filter(s => !(s.includes('latest') && s.includes('retry')) && !(pos === 'finale' && s.includes('retry')) && s.includes('lastchance') === s.includes('lose') && !(s.includes('personal') && s.includes('returning')))
+    .filter(s => !(s.includes('will') && (s.includes('retry') || s.includes('lose'))))
     .map(extra => ({ flags: [pos, ...extra], vars: { MAX: pos === 'finale' ? 90 : 70 } }))),
   // R4 (Q3): the road ahead, one variant
   outline: [{ flags: [], vars: {} }],
@@ -62,13 +66,14 @@ describe('storyteller prompt budget', () => {
     expect(render('plan', ['types', 'stake'])).not.toContain('pitch');
     expect(render('plan', ['types', 'stake'])).toContain('"why"');
     expect(render('plan', ['types'])).not.toContain('stake:');
-    expect(render('report', ['saga', 'moved', 'answer'], { B: 60, A: 140 })).toContain('"truth"');
+    // R5 verify: no `truth` reply (asked for the secret in one sentence with the secret dealt as one, the writer pasted
+    // it back, a blind copy field); the chronicle prints the plan's answer
+    expect(render('report', ['saga', 'moved', 'answer'], { B: 60, A: 140 })).not.toContain('truth');
     expect(render('report', ['saga', 'moved'], { B: 60, A: 140 })).not.toContain('truth');
     // a personal plan asks the soldier for want and past in an object of its own, never past on every cast entry
     expect(render('plan', ['types', 'personal'])).toContain('"soldier": {"want"');
     expect(render('plan', ['types'])).not.toContain('"past"');
-    // a rule about absent data never reaches the model (R1 verify 2): no loss line without a loss
-    expect(render('card', ['first', 'premise', 'loses'], { MAX: 70 })).toContain('loses:');
+    // a rule about absent data never reaches the model (R1 verify 2): no loss line without a loss (R5: card 1 deals none)
     expect(render('card', ['first'], { MAX: 70 })).not.toContain('lose');
     expect(render('report', ['saga', 'moved', 'personal'], { B: 60, A: 140 })).toContain('whose past this story is');
     // R2: the plan writes gain and learn per job and an edge per gain; the finale card names whose fate it
@@ -82,9 +87,34 @@ describe('storyteller prompt budget', () => {
     expect(render('card', ['later', 'retry'], { MAX: 70 })).toContain('retry:');
     expect(render('card', ['later'], { MAX: 70 })).not.toMatch(/retry|mystery|have:|latest/);
     expect(render('card', ['later', 'latest'], { MAX: 70 })).toMatch(/latest: what happened last[\s\S]*in this order: latest, job/);
-    // R4 (Q1, Q2): no card carries the bookkeeping the quest log prints (whom the company acts for and their want,
-    // what is known, what is held, the open question): each labelled field came back as its own stock sentence
-    for (const v of variants.card) expect(render('card', v.flags, v.vars), v.flags.join(',')).not.toMatch(/helping|mystery|have:|unknown|wants|learned|question/);
+    // R4 (Q1, Q2): no later card carries the bookkeeping the quest log prints (whom the company acts for and their want,
+    // what is known, what is held, the open question): each labelled field came back as its own stock sentence.
+    // R5 (P5): card 1 tells its premise in prose again (who needs you, their want, what nobody knows): R4's card 1 lost
+    // the want and the mystery to the log (ease and want-to-send fell); its log drops the Open question line instead
+    for (const v of variants.card) expect(render('card', v.flags, v.vars), v.flags.join(',')).not.toMatch(v.flags.includes('first') ? /helping|mystery|have:|learned|question/ : /helping|mystery|have:|unknown|wants|learned|question/);
+    expect(render('card', ['first', 'why'], { MAX: 70 })).toMatch(/- premise\. who: the one who needs you\. wants: what they want\. unknown: what nobody knows yet\.\n[\s\S]*in this order: premise, job, why, trouble\./);
+    // R5 (P5): card 1's trouble carries no `will` (with the premise back it broke the cap)
+    // R5 verify 2: the trouble gloss names the keys in the third person, never the card's voice ("who opposes you, with
+    // what" came back as "A thin hunter opposes you with bow and snare-lines", J2 engine-speak and a gloss-echo lint hit)
+    expect(render('card', ['first', 'why'], { MAX: 70 })).toContain('trouble: the foe, what they carry.');
+    expect(render('card', ['later', 'latest', 'why', 'will'], { MAX: 70 })).toContain('trouble: the foe, what they carry, what they will do.');
+    for (const v of variants.card) expect(render('card', v.flags, v.vars), v.flags.join(',')).not.toMatch(/opposes you/);
+    expect(render('card', ['first', 'personal'], { MAX: 70 })).toMatch(/- premise\. who: one of your own soldiers\. wants: what they want\. past: their old wrong\. unknown: what nobody knows yet\./);
+    // R5 verify: a returning asker's past with you is in the premise, which the order line places (under names it had no
+    // slot, and the floor dropped it); a memory gloss in names is for someone else
+    expect(render('card', ['first', 'returning', 'why'], { MAX: 70 })).toMatch(/- premise\. who: the one who needs you\. wants: what they want\. memory: your past with them\. unknown: what nobody knows yet\.\n[\s\S]*in this order: premise, job, why, trouble\./);
+    expect(render('card', ['first', 'returning'], { MAX: 70 })).not.toContain('told on first appearance');
+    // R5 verify: a retry's trouble has no `will` (what stopped the last try is most often that deed: said twice)
+    expect(render('card', ['later', 'retry', 'why'], { MAX: 70 })).toContain('trouble: the foe, what they carry.');
+    // R5 verify 2: the finale has no why (the showdown's "what it gets them toward their want" was the want itself, printed
+    // two rows under the log's For line in 3 of 3 real runs) and keeps the trouble's deed unless a last chance deals `lose`
+    expect(render('card', ['finale', 'latest', 'will'], { MAX: 90 })).toMatch(/- job: the task, and where\. trouble: the foe, what they carry, what they will do\./);
+    expect(render('card', ['finale', 'latest', 'will'], { MAX: 90 })).toMatch(/in this order: latest, job, trouble\./);
+    // R5 (P2): a why may be a hope ("hopes …"), dealt as the plan wrote it; the card gets no gloss about hopes ("a hope
+    // stays a hope" came back as its own sentence, "That is only a hope.", R3 W3's class)
+    expect(render('card', ['later', 'latest', 'why'], { MAX: 70 })).toContain('why: why it matters.');
+    expect(render('card', ['later', 'latest'], { MAX: 70 })).not.toContain('why');
+    expect(render('card', ['finale', 'latest'], { MAX: 90 })).not.toContain('hope');
     expect(render('report', ['saga', 'moved', 'clue', 'brought'], { B: 60, A: 140 })).toMatch(/clue:[\s\S]*brought:|brought:[\s\S]*clue:/);
     expect(render('report', ['saga', 'moved'], { B: 60, A: 140 })).not.toMatch(/clue|known|brought|have:/);
     // R2 verify: what is known and held has a stated role (never new; the held thing used in after at the finale,
@@ -101,7 +131,6 @@ describe('storyteller prompt budget', () => {
     // report speaks in the third person (the card above it says "you"); the card never guesses past what is known
     const fr = render('report', ['saga', 'moved', 'answer'], { B: 60, A: 140 });
     expect(fr).toMatch(/- after:.*The secret comes out within it, in time order/);
-    expect(fr).toMatch(/- truth: the secret in one plain sentence/);
     expect(render('report', ['saga', 'moved'], { B: 60, A: 140 })).toContain('third person');
     // R3 (W3): glosses say what to cover; no state words a card or report would print ("not met yet", "you try this
     // same job again", "whose fate this job decides", "what you hold"), and no "any name" on an entry with none
@@ -114,17 +143,32 @@ describe('storyteller prompt budget', () => {
     // ending (R3's twists the ending could not react to): one merged line, and question and answer close the reply
     // R4 verify 2: why uses only what the job names ("what the job's thing or person is" asked for what the job yields:
     // the gain, often the learn, printed before play)
-    expect(plan).toMatch(/why: what the one who asked can then do toward their want with only what the job names: an action, never seeing, knowing, learning, showing or proving/);
-    expect(plan).not.toMatch(/thing or person is/);
+    // R5 (P2): why is what the asker HOPES the job gets them: a thing or person, what they can then do; word or proof,
+    // only as a hope. R4's action-only why ("never seeing, knowing…") made the plan invent uses the story never needed
+    // (N12); R3's "what it lets X do" kept the link but stated contents (spoilers). Written right after the job, before
+    // the after-play fields (win, gain, learn), so it cannot carry them (verifier r3 #3)
+    // R5 verify 2: a step short of the want (job 1's why, the only one printed, restated card 1's premise want); the
+    // showdown writes no why (it was the want itself, and the finale card printed it under the For line)
+    expect(plan).toMatch(/why: what the one who asked hopes this job gets them, a step short of their want, with only what the job names: for a thing or person, what they can then do; word or proof only as a hope \("hopes …"\)\./);
+    expect(plan).toContain('- showdown: job, people, trouble as above;');
+    expect(plan).toMatch(/"showdown": \{"title": "few words", "job": "text", "people"/);
+    expect(plan).not.toMatch(/thing or person is|never seeing, knowing/);
+    expect(plan).toMatch(/- episodes, in order\. job: [^\n]*?\. why: /);
+    expect(plan.indexOf('"why"')).toBeLessThan(plan.indexOf('"win"'));
+    expect(plan.indexOf('"why"')).toBeLessThan(plan.indexOf('"learn"'));
+    expect(plan).not.toContain('follows the last win');
+    // R5 (P4): the want is a clause the engine prints after "wants to" (For: <who>, <label>, who wants to …): R4's
+    // noun-phrase want after a dash was misread
+    expect(plan).toContain('asker: want, printed after "wants to": verb first, naming who or what; never what becomes of the person in ending.');
+    expect(plan).toContain('"want": "verb first, few words"');
     expect(plan).toMatch(/learn: a plain fact the win brings out, clear on its own, that narrows the answer, never naming what the question asks for/);
     expect(plan).toMatch(/fit every way in ending, even after failed jobs\./);
-    // R4 verify: each field is written after what it must fit. The question comes before the episodes, so each learn is
-    // written toward it (written last, every learn came before the question it narrows); the answer stays last
-    // (Q5), fitting the learns as well as the fixed ending
-    expect(plan).toMatch(/- question:[^\n]*\n- episodes,/);
-    expect(plan).toMatch(/- options:[^\n]*\n- answer: [^\n]*fitting the learns, every way in ending and settles\./);
-    expect(plan.indexOf('"question"')).toBeLessThan(plan.indexOf('"episodes"'));
-    expect(plan.indexOf('"answer"')).toBeGreaterThan(plan.indexOf('"options"'));
+    // R5 (P1): the answer is written FIRST again, right after the question and before the episodes, so every learn is
+    // written toward a known answer. R4's answer written last was fitted to learns written without one (N11: J1
+    // "answered" 79% → 42%). R4's merged line stays: the answer fits every way in ending and settles
+    expect(plan).toMatch(/- question:[^\n]*\. answer: who or what, and why, in a sentence or two: surprising, not in the seed, no new person, fitting every way in ending and settles\.\n- episodes,/);
+    expect(plan.indexOf('"question"')).toBeLessThan(plan.indexOf('"answer"'));
+    expect(plan.indexOf('"answer"')).toBeLessThan(plan.indexOf('"episodes"'));
     // R4 verify: titles, job and why are on screen before their job is played (the road ahead prints every job and why
     // on card 1), so none carries a learn or the answer. R4 verify 2: the trouble too (every card prints it), the
     // showdown's included, on a line of its own (at the tail of the longest bullet it reached the showdown only "as above")
@@ -134,7 +178,11 @@ describe('storyteller prompt budget', () => {
     // few-words fields the cards restate carry a number (trouble ran long in all four real runs; a personal past
     // "retold" was the seed pasted)
     expect(plan).toContain('people: ids of those there in person;');
-    expect(plan).toContain('why as above; its job names the person in ending.');
+    // R5 verify: the person in ending stays free until the showdown decides them ("episode 1 includes the person in ending"
+    // beside "gain: a … captive" made them job 1's captive, and the plans then decided someone the company held)
+    expect(plan).toContain('gain: a thing, captive or ally the company then holds, never the person in ending.');
+    expect(render('plan', ['types', 'personal'])).toContain('gain: a thing, captive or ally the company then holds.');
+    expect(plan).toContain('trouble as above; its job names the person in ending.');
     expect(render('plan', ['types', 'personal'])).not.toContain('person in ending');
     expect(plan).toContain('"trouble": {"who": "≤6 words", "carry": "≤6 words", "will": "≤6 words"}');
     expect(render('plan', ['types', 'personal'])).toMatch(/past: the old wrong, naming who was wronged\.[\s\S]*"past": "≤8 words"/);
@@ -149,14 +197,11 @@ describe('storyteller prompt budget', () => {
     // R4 verify: card 1's premise is only what card 1 alone adds (the loss, a personal past): who needs you is the log's
     // For line, and dealt here too it came back as a second introduction under it; with neither, no premise at all
     // R4 verify 2: not "new to the player" (who is the log's For line, already on screen)
-    expect(render('card', ['first', 'premise', 'loses'], { MAX: 70 })).toMatch(/- premise\. who: the one it is about\. loses:[\s\S]*in this order: premise, job, why, trouble\./);
-    expect(render('card', ['first', 'premise', 'loses'], { MAX: 70 })).not.toContain('new to the player. who');
-    expect(render('card', ['first'], { MAX: 70 })).not.toMatch(/premise|needs you/);
-    expect(render('card', ['first'], { MAX: 70 })).toMatch(/in this order: job, why, trouble\./);
-    expect(render('card', ['finale', 'latest'], { MAX: 90 })).toMatch(/in this order: latest, job, why, trouble\./);
-    expect(render('card', ['finale', 'latest', 'lastchance', 'lose'], { MAX: 90 })).toMatch(/in this order: latest, job, why, trouble, lose\./);
-    expect(render('card', ['later', 'retry'], { MAX: 70 })).toMatch(/in this order: retry, job, why, trouble\./);
-    for (const t of [render('card', ['first', 'loses'], { MAX: 70 }), render('card', ['later', 'latest'], { MAX: 70 }), render('card', ['finale', 'latest', 'lastchance', 'lose'], { MAX: 90 })])
+    expect(render('card', ['first'], { MAX: 70 })).not.toContain('new to the player. who');
+    expect(render('card', ['finale', 'latest'], { MAX: 90 })).toMatch(/in this order: latest, job, trouble\./);
+    expect(render('card', ['finale', 'latest', 'lastchance', 'lose'], { MAX: 90 })).toMatch(/in this order: latest, job, trouble, lose\./);
+    expect(render('card', ['later', 'retry', 'why'], { MAX: 70 })).toMatch(/in this order: retry, job, why, trouble\./);
+    for (const t of [render('card', ['first'], { MAX: 70 }), render('card', ['later', 'latest'], { MAX: 70 }), render('card', ['finale', 'latest', 'lastchance', 'lose'], { MAX: 90 })])
       expect(t).not.toMatch(/nobody acts|what you know|who wants what/);
     // the summary says what was done and its result, never the clue (it travels as clue, known and learned); the
     // report's people are those present; the deciding soldier and the plan in deeds, never choice words
@@ -168,7 +213,10 @@ describe('storyteller prompt budget', () => {
     expect(fo).not.toMatch(/settles it|chosen|choice/);
     // R4 verify: a label is built from the data alone, their trade and at most one trait word ("what a stranger sees" made
     // the writer coin looks and a race the engine never dealt: "pale elf grove singer" for a human), never a name
-    expect(plan).toMatch(/a label: at most one of their traits, then their trade; no name\./);
+    // R5 verify: race and trade only; a trait word in the label became a fixed epithet in every job, trouble and card
+    // ("the clumsy scholar" four times in one plan); traits show in prose
+    expect(plan).toMatch(/a label: their race and trade; no name\./);
+    expect(plan).not.toMatch(/one of their traits/);
     expect(plan).not.toMatch(/stranger sees/);
     // R3 verify 2: every dealt key has a stated use (traits: what the person is like; the label never carries them)
     expect(plan).toContain('traits: what they are like');
@@ -181,8 +229,11 @@ describe('storyteller prompt budget', () => {
     expect(c).toContain('retry: what stopped the last try at this same job');
     expect(c).toContain('names: people the card may mention: name, else label.');
     expect(c).not.toMatch(/people here|any part|intro:|part:/);
-    expect(render('card', ['first', 'premise', 'personal'], { MAX: 70 })).not.toContain('nobody hires');   // printed as "Nobody hires you this time."
-    expect(render('card', ['later', 'latest', 'intro', 'part'], { MAX: 70 })).toMatch(/intro: new to the player[\s\S]*part: their side, shown, not stated/);
+    expect(render('card', ['first', 'personal'], { MAX: 70 })).not.toContain('nobody hires');   // printed as "Nobody hires you this time."
+    // R5 verify 2: on a card, a part is their side, said (a 70-90-word scene under "Use only the data" cannot stage it; the
+    // report, with room, shows it)
+    expect(render('card', ['later', 'latest', 'intro', 'part'], { MAX: 70 })).toMatch(/intro: new to the player[\s\S]*part: their side\./);
+    expect(render('card', ['later', 'latest', 'part'], { MAX: 70 })).not.toContain('shown');
     // the report: no rule the data itself breaks (people named in result, clue or known are not in people); a part
     // shown, never pasted as a description; result in the writer's own words (it is dealt in the present); the plan
     // carried out in after
@@ -197,16 +248,36 @@ describe('storyteller prompt budget', () => {
     // R4 verify 2: before stops short of the job's goal (for a find or catch job, arriving IS the goal: before did the
     // job, then the failure contradicted it)
     expect(render('report', ['saga', 'failure', 'stopped'], { B: 60, A: 140 })).toContain('- before: at most 60 words. The soldiers meet what stands in their way, short of the goal, never repeating the card.');
+    // R5 verify: a failed job's summary is only what stopped the company: the retry card is dealt it as `retry`, and "what
+    // the company tried and what stopped it" put the job on the card twice (the chronicle puts the job in front)
+    // R5 verify 2: "no wound" says why (the wound is printed beside the summary): a partial whose price is the wound took its
+    // summary to owe that price ("though a soldier was hurt", 28/25)
+    expect(render('report', ['saga', 'failure', 'stopped'], { B: 60, A: 140 })).toContain('- summary: one sentence, at most 25 words: what stopped the company, no wound (shown beside it).');
+    expect(render('report', ['saga', 'moved', 'hurt', 'hurtprice'], { B: 60, A: 140 })).toContain('the result; no wound (shown beside it).');
     // R4 (Q3): the road ahead reads card-1-safe input only (the one the jobs are for and their want, each earlier job's
     // text and why); no key for a learn, gain, edge, the answer, a title or the finale job. R4 verify: it writes only
     // what each job lets the asker do (the engine prints "<job>, so <asker> can <that>": written whole, the job pasted
     // as told left the purpose no room under the cap, and a bare "so" took verb-first clauses ungrammatically), and no line for the end (it could only restate the log's For line)
     const ol = render('outline', []);
-    expect(ol).toMatch(/- asker: who the jobs are for\. wants: what they want\.\n- jobs: the jobs before the last, in order\. job: the task, and where\. why: what it lets the asker do\./);
-    // R4 verify 2: no knowing verbs in the outline either ("Read the slaver's claims ... and find the debt's true amount"
-    // guessed at the clue)
-    expect(ol).toContain('an action, verb first, never reading, finding, learning, seeing or proving; at most 12 words. Each is printed after its job: "<job>, so <asker> can <your words>".');
-    expect(ol).toContain('{"so": ["at most 12 words"]}');
-    expect(ol).not.toMatch(/\blearn\b|gain|edge|answer|title|showdown|finale|the end/);
+    // R5 verify: the input is what card 1 itself shows (the asker, their want, what nobody knows, each job's text), never
+    // the plan's why: written knowing the answer and the learns, its hope carried them, and an outline that only shortened
+    // it printed them on card 1 ("hopes the papers show what bound the husband and the scholar"). It writes the hope in
+    // P2's form: a thing or person, what they can then do; news, the unknown it may answer ("the part of the unknown" came back as "hopes to learn part of why…")
+    // R5 verify 2: nor what nobody knows ("for news, the unknown it may answer" put the one unknown into every news job's
+    // line, past the cap, beside card 1's "Nobody knows" and the Open question row, promising a middle job the answer): a
+    // line is what the job puts in hand or opens and what the asker can then do, short of the want (the For line's). Nor
+    // job 1: its hope is the plan's why (card 1 is written beside this call), and its road row is ▶ title only
+    expect(ol).toMatch(/- asker: who the jobs are for\. wants: what they want\.\n- jobs: the jobs after the first, before the last\./);
+    expect(ol).toContain('in at most 8 words: one thing they can then do with what it puts in hand or opens, short of what they want. Never guess what it finds.');
+    expect(ol).not.toMatch(/unknown|nobody knows|news/);
+    // the printed form shown whole ("<job>. <asker> <your words>.") was written whole, job and all; "come before it" and
+    // "are printed first" were each read as "write the job first" in a replay
+    expect(ol).toContain('Write only those words: the job and asker\'s name are printed before them.');
+    expect(ol).not.toContain('<job>');
+    // asked below the engine's 12-word target so the line lands within it: asked 12, Sonnet wrote 13-17 (26 of 39 lines over
+    // 12); asked 10, 6 and 8 of 39 in two replays. R5 verify 2: a hope with a use ("…, so she can …") ran longer, 11 of 27
+    // over 12 asked 10, 0 of 27 asked 8 (Sonnet replay on the probe7 plans)
+    expect(ol).toContain('{"lines": ["at most 8 words"]}');
+    expect(ol).not.toMatch(/\bwhy:|\blearn\b|gain|edge|answer:|title|showdown|finale|the end/);
   });
 });

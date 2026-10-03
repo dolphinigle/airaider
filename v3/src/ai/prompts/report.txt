@@ -19,10 +19,9 @@ Write:
 - before: at most {{B}} words. The soldiers meet what stands in their way, short of the goal, never repeating the card. No hint of how it goes.
 [[!failure]]- after: at most {{A}} words. The deciding moment, then what [[result]]result says [[/result]]came of it, in your own words; nothing else changes.[[answer]] The secret comes out within it, in time order: said, seen or found[[known]], built from known[[/known]].[[/answer]] End on something seen, done or said that shows the change.
 [[failure]]- after: at most {{A}} words. What stood in the way beats them, and the job is not done; nothing else changes. End on something seen, done or said.
-[[answer]]- truth: the secret in one plain sentence, for the chronicle.
-[[moved]]- summary: one sentence, at most 25 words: what the company did and the result[[clue]], not the clue[[/clue]]; no wound. Name no soldier[[personal]] but the one whose past this story is[[/personal]]; say the company.
-[[stopped]]- summary: one sentence, at most 25 words: what the company tried and what stopped it, no wound. Name no soldier[[personal]] but the one whose past this story is[[/personal]]; say the company.
+[[moved]]- summary: one sentence, at most 25 words: what the company did and the result[[clue]], not the clue[[/clue]]; no wound (shown beside it). Name no soldier[[personal]] but the one whose past this story is[[/personal]]; say the company.
+[[stopped]]- summary: one sentence, at most 25 words: what stopped the company, no wound (shown beside it). Name no soldier[[personal]] but the one whose past this story is[[/personal]]; say the company.
 
 Past tense, third person, plain words, short complete sentences, in the order things happened. Invent no names. No numbers, nothing modern, no pay.
 
-Reply with JSON only: {"before": "text", "after": "text"[[answer]], "truth": "text"[[/answer]][[saga]], "summary": "text"[[/saga]]}
+Reply with JSON only: {"before": "text", "after": "text"[[saga]], "summary": "text"[[/saga]]}
