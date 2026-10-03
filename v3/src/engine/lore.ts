@@ -132,7 +132,7 @@ export function recall(g: LoreGraph, focalId: string, cycle: number, wildcardIds
 /** dossier = stable identity (+who/quirks when known) + top-K salience-ranked ACTIVE
  *  memory-edges (never a growing blob). The extras are what let the narrator individuate. */
 export function renderDossier(g: LoreGraph, id: string, cycle: number,
-  extras?: { who?: string; quirks?: string[] }): string {
+  extras?: { who?: string; quirks?: string[]; player?: boolean }): string {
   const node = g.nodes[id];
   if (!node) return '';
   const memories = g.edges
@@ -141,6 +141,10 @@ export function renderDossier(g: LoreGraph, id: string, cycle: number,
     .slice(0, DOSSIER_TOP_K)
     .map(e => {
       const other = g.nodes[e.from === id ? e.to : e.from]?.name ?? '?';
+      // a memory of their own (an engine-written self edge: a saga they came through, a slip, a hand-off) ties them to
+      // nobody else: the player reads it as the memory alone, never "Serlon Reed (scarred-by) — came through …" under
+      // Serlon Reed's own name. (The AI-fed dossier keeps its old form: `player` is set by the UIs only)
+      if (extras?.player && e.from === e.to) return `- ${e.blurb}${e.core ? ' (defining memory)' : ''}`;
       // direction-NEUTRAL label: AI-emitted edges sometimes invert from/to, and a directional
       // label then contradicts its own gloss ("they: saved-by Oridir — Rhieth hauled Oridir out");
       // the blurb carries the truth, so the label only names the tie and the other party

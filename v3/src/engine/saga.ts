@@ -171,6 +171,10 @@ export interface SagaRecord {
   world: SagaWorld;
   /** null until the plan call lands */
   plan: SagaPlan | null;
+  /** a personal saga: the middle jobs whose people the plan itself wrote the soldier into (validatePlan `ownJobs`, before
+   *  the repair adds them everywhere) — the only jobs that pin the soldier to a place. Absent in saves before 2026-10-03:
+   *  no pin */
+  ownJobs?: number[];
   /** the floor's plan stood in */
   fallback: boolean;
   knowing: { met: string[]; named: string[]; seen: string[] };
@@ -185,6 +189,8 @@ export interface SagaRecord {
   /** card 1's prose ('' until it is written) */
   card1: string;
   lines: SagaLine[];
+  /** how the saga ended: the finale's Outcome sentence (sagaflow.sagaFate), set when its report lands */
+  ending?: string;
   /** the card on offer, re-offered verbatim while unmarched (D15); cleared by every report */
   cache?: { pos: SagaPos; title: string; prose: string; job: string; rows: LogRow[]; matter: Matter[] };
 }

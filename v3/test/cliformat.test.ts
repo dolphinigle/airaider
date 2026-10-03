@@ -8,6 +8,7 @@ import { MockProvider } from '../src/ai/mock.js';
 import { seedIdCounter } from '../src/engine/cards.js';
 import { logLines, matterLine } from '../src/ai/storyteller.js';
 import { render } from '../cli/format.js';
+import { soFarLine } from '../src/game/sagaflow.js';
 
 async function playTo(g: Game, cards: number) {
   g.build('map-room');
@@ -41,7 +42,9 @@ describe('the CLI prints the rows the server exposes', () => {
     expect(out[2 + log.length]).toBe(q.situation);
     const matter = matterLine(g.questCast(q.id));
     if (matter) expect(out[3 + log.length]).toBe(matter);
-    expect(out.find(l => l.startsWith('SAGA: '))).toBe(`SAGA: part ${q.saga!.part} of ${q.saga!.of} · setbacks ${q.saga!.setbacks} of ${q.saga!.budget}`);
+    // the web's saga strip, in its order: this card's part (pips), the setbacks, what is set aside so far
+    const pip = (n: number, of: number, on: string, off: string) => on.repeat(n) + off.repeat(of - n);
+    expect(out.find(l => l.startsWith('SAGA: '))).toBe(`SAGA: ${pip(q.saga!.part!, q.saga!.of, '●', '○')} part ${q.saga!.part} of ${q.saga!.of} · setbacks ${pip(q.saga!.setbacks, q.saga!.budget, '✗', '·')} ${q.saga!.setbacks} of ${q.saga!.budget} · set aside so far: ${chain.bank || 'nothing yet'}`);
     expect(out.some(l => l.startsWith('ERRAND:'))).toBe(false);
   });
 
@@ -53,9 +56,13 @@ describe('the CLI prints the rows the server exposes', () => {
     const out = render.chainDetail(g, c.id).split('\n');
     expect(out[0]).toBe(`═══ ${c.title} ═══ (${c.state})`);
     expect(out.slice(1, 1 + c.rows.length)).toEqual(logLines(c.rows));
-    expect(out[1 + c.rows.length]).toBe(c.card1);
+    // card 1 is set off from the log, as on a card
+    expect(out[1 + c.rows.length]).toBe('');
+    expect(out[2 + c.rows.length]).toBe(c.card1);
+    expect(out[3 + c.rows.length]).toBe(`likely end: ${c.likely} · setbacks ${c.failures} of ${c.failureBudget} · set aside ${c.bank || '—'}`);
     expect(out).toContain('So far:');
-    for (const l of c.soFar) expect(out).toContain(l);
+    for (const r of c.soFar) expect(out).toContain(soFarLine(r));
+    expect(out.some(l => /progress/.test(l))).toBe(false);
     for (const p of c.people) expect(out).toContain(p.name ? `  ${p.name} — ${p.label}` : `  ${p.label}`);
     expect(out.some(l => l.startsWith('The answer: '))).toBe(false);   // not before the finale
   });

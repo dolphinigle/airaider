@@ -212,7 +212,7 @@ export interface CycleSummary {
   stalled: string[];                               // part-filled quests that did not march
   leadsCold: string[];                             // leads that went cold
   handedOff?: { id: string; name: string; gold: number }[];   // captives whose holding ran out (older archives: absent)
-  debts?: { id: string; name: string; amount: number }[];     // debts taken on this cycle (older archives: absent)
+  debts?: { id: string; name: string; amount: number; text?: string }[];     // debts taken on this cycle (older archives: absent; text: Game.debtText)
   setbacks?: { chainId: string; title: string; failures: number; budget: number }[];   // saga beats that failed
 }
 export interface ReckoningRecord { cycle: number; lines: string[]; meta: ReckonMeta[]; summary: CycleSummary | null }
@@ -353,6 +353,9 @@ export class Game {
     for (const l of st.log ?? []) {
       if (l.kind === 'chain' && /^(saga card lint|saga draft |card body echoed)/.test(l.text)) l.kind = 'dev';
     }
+    // a save taken while a saga was being planned or its card 1 written (the server autosaves mid-pursuit) holds a chain
+    // that never began: no quest will ever come of it, and its lead is still on the board — pursuing it again starts afresh
+    for (const c of (st.chains ?? []).filter(c => c.saga && !Game.sagaBegun(c, st))) Game.unbegin(st, c);
     const byId = new Map((st.cards ?? []).map(c => [c.id, c]));
     for (const q of st.quests ?? []) {
       q.rewardCards = (q.rewardCards ?? []).map(c => byId.get(c.id) ?? c);
@@ -360,6 +363,22 @@ export class Game {
       // saves written before that still carry finale plans like 'helps: social · hurts: social')
       for (const s of q.slots ?? []) s.test.clashing = (s.test.clashing ?? []).filter(c => !s.test.favored.includes(c));
     }
+  }
+
+  /** a saga has begun once its card 1 is written (the pursuit's quest is pushed right after); one with no plan, or a plan
+   *  but no card 1 and no quest, is a pursuit still in flight — or, in a save, one that died with the process */
+  private static sagaBegun(c: Chain, st: GameState): boolean {
+    return !!c.saga?.plan && (!!c.saga.card1 || (st.quests ?? []).some(q => q.chainId === c.id));
+  }
+  /** take back a saga that never began: the chain goes, the focal's chain list forgets it, and a focal held in limbo for
+   *  it returns to the lore (where a sequel or a promoted face came from). Its dealt names are free again (the live-saga
+   *  cast fence reads the chains). A personal saga's soldier stays on the roster */
+  private static unbegin(st: GameState, chain: Chain): void {
+    st.chains = st.chains.filter(c => c !== chain);
+    const focal = (st.cards ?? []).find(c => c.id === chain.focalId);
+    if (!focal) return;
+    focal.chainIds = focal.chainIds.filter(id => id !== chain.id);
+    if (focal.location.kind === 'held' && focal.location.state === 'limbo' && !focal.chainIds.length) focal.location = HELD('lore');
   }
 
   // ---- the player's campaign direction (Settings) ---------------------------------------------
@@ -596,32 +615,32 @@ export class Game {
     this.state.lore.nodes[c.id] = node;
     return node;
   }
-  dossier(id: string, opts?: { habits?: boolean }): string {
+  /** a person's dossier. `player`: the UIs' view (a memory of their own reads without a relation to themself) */
+  dossier(id: string, opts?: { habits?: boolean; player?: boolean }): string {
     const card = this.card(id);
     return renderDossier(this.state.lore, id, this.state.cycle,
-      card?.character ? { who: card.character.who, quirks: opts?.habits === false ? undefined : card.character.quirks } : undefined);
+      { ...(card?.character ? { who: card.character.who, quirks: opts?.habits === false ? undefined : card.character.quirks } : {}), ...(opts?.player ? { player: true } : {}) });
   }
   chronicle(id: string) { return chronicleOf(this.state.lore, id) }
   /** A saga as the COMPANY knows it — the one view both UIs render (the CLI's `chains`/`chain`, the GUI's saga strip and
    *  chronicle). The plan is hidden truth: the view is the saga flow's chronicle (sagaflow.chronicle) — the quest log as
    *  it stands, card 1, So far, the answer once the finale is played, and the people the player has seen, by name only
-   *  once their name was read — plus the economy fields. A saga still being planned is not shown (its lead's job is). */
+   *  once their name was read — plus the economy fields. A saga still being planned, or whose card 1 is still being
+   *  written, is not shown (its lead's job is). */
   chainViews() {
-    return this.state.chains.filter(c => c.saga?.plan).map(c => {
+    return this.state.chains.filter(c => c.saga?.plan && c.saga.card1).map(c => {
       const ch = flow.chronicle(c)!;
-      const rec = c.saga!, plan = rec.plan!, k = knowingOf(rec);
-      const focal = plan.cast.find(p => p.focal)!;
+      const rec = c.saga!;
       const done = c.state === 'done' || c.state === 'slipped';
       return {
         id: c.id, title: ch.title, state: c.state, kind: c.kind, personal: c.isPersonal,
-        // the likely ending in the player's words
-        likely: ch.likely,
-        focal: k.named.has(focal.id) ? focal.name : null,
-        // "part n of N": the job on offer (or next); the finale's is N
+        // the likely ending in the player's words, while the saga is live; how it ended, once it is over
+        likely: ch.likely, ending: ch.ending ?? null, endLine: flow.endLine(ch),
+        // "part n of N": the job on offer (or next); the finale's is N — the saga's one measure of how far along it is
         part: done ? rec.world.N : flow.posOf(rec).job, of: rec.world.N,
-        bank: coinBand(c.bank), effort: c.cyclesSpent, effortTarget: c.expectedBeats * 1.5,
+        bank: coinBand(c.bank),
         failures: c.failures, failureBudget: c.failureBudget,
-        rows: ch.rows, card1: ch.card1, lines: ch.lines, soFar: flow.soFarLines(ch.lines),
+        rows: ch.rows, card1: ch.card1, lines: ch.lines, soFar: ch.soFar,
         answer: ch.answer, people: ch.people,
         // the saga strip's link back into play: its step on the map, or the lead that continues it
         ...this.chainNext(c),
@@ -2474,8 +2493,7 @@ export class Game {
       return await this.sagaStep(chain, lead);
     } catch (e) {
       // the pursuit failed and its lead stays on the board (TEMPO P4): the saga it was writing never began
-      this.state.chains = this.state.chains.filter(c => c !== chain);
-      focal.chainIds = focal.chainIds.filter(id => id !== chain.id);
+      Game.unbegin(this.state, chain);
       throw e;
     }
   }
@@ -2527,8 +2545,9 @@ export class Game {
       // beat pacing (QUESTS §8-B): beat 1 is the low-stakes CARE moment — cap its difficulty at standard; beat 2 still
       // escalating — cap at hard; then free
       const cap = pos.job <= 1 ? 'standard' as const : pos.job === 2 ? 'hard' as const : undefined;
-      // a personal saga pins its soldier to slot 0 when the job's people include them (D1 — today's rule, now from data)
-      slots = this.buildSlots(n, chain.level, chain.rarity, 'investigate', flow.asks(e.type, n, chain.isPersonal, e.people.includes(chain.focalId)), cap,
+      // a personal saga pins its soldier to slot 0 only on a job the plan itself put them in (D1 — the pre-v4 rule: the
+      // step stages their own matter in person); the repair that adds them to every job's people is for the prose only
+      slots = this.buildSlots(n, chain.level, chain.rarity, 'investigate', flow.asks(e.type, n, chain.isPersonal, flow.pinsSoldier(rec, pos.job)), cap,
         chain.isPersonal && focal?.character?.role === 'merc' ? focal.id : undefined);
     }
     return {
@@ -2911,7 +2930,7 @@ export class Game {
         // named only once the player has read the name (the saga's Knowing — the gate every card obeys)
         const fe = chain?.saga?.plan?.cast.find(p => p.focal);
         const named = !!focal && !!fe && knowingOf(chain!.saga!).named.has(fe.id);
-        parts.unshift(named ? focal!.name : 'the one at the heart of it');
+        parts.unshift(this.finaleBrings(q, chain, named ? focal!.name : 'the one at the heart of it'));
       }
     }
     const now = parts.join(' + ') || 'side loot';
@@ -2920,6 +2939,20 @@ export class Game {
     // and PROMPT_RULES forbids surfacing banked-payoff text). What a beat honestly promises is that
     // the saga is still owed something.
     return chain && !q.isFinale ? `${now} · and the saga still owes` : now;
+  }
+
+  /** what a (non-personal) finale brings the company: the person at its centre — until a plan is chosen that lets them go.
+   *  Read the way settleFinale reads it (sagaflow.fateFacts): the gold plan pays out what was set aside and they go free;
+   *  a keep plan on a bank too thin to keep them (the void) pays salvage coin and they slip away */
+  private finaleBrings(q: Quest, chain: Chain | undefined, who: string): string {
+    const a = q.approaches?.find(x => x.id === q.chosenApproach);
+    if (!a?.way || !chain?.saga?.plan) return who;
+    const f = flow.fateFacts(this.sagaHost(), chain, a.way, 'success');
+    if (f.focalIsMerc) return who;
+    const coin = coinBand(chain.bank);
+    if (a.rewardKind === 'gold') return `what was set aside, in coin${coin ? ` (${coin})` : ''}`;
+    if (f.void) return `salvage coin${coin ? ` (${coin})` : ''} — too little was set aside to keep ${who}`;
+    return who;
   }
 
   /** what choosing this finale plan does, as the short fate fact both UIs print after the plan's label ("joins the
@@ -2981,24 +3014,37 @@ export class Game {
     const kinds = q.isFinale && q.approaches && !q.chosenApproach
       ? [...new Set(q.rewardSpecs.filter(r => r.kind !== 'gold' || r.value >= 1).map(r => r.kind))]
       : this.questRewardKinds(questId);
-    return this.rewardWarnFor(kinds);
+    const chain = q.isFinale && q.chainId ? this.state.chains.find(c => c.id === q.chainId) : undefined;
+    return this.rewardWarnFor(kinds, chain);
   }
-  /** one finale approach's warning ('brings a captive · no Dungeon — they will be handed off'), or null */
+  /** one finale approach's warning ('brings a captive · no Dungeon — they can only be ransomed or sold'), or null */
   approachRewardWarn(questId: string, approachId: string): string | null {
     const q = this.state.quests.find(x => x.id === questId);
     const a = q?.approaches?.find(x => x.id === approachId);
     const chain = q?.chainId ? this.state.chains.find(c => c.id === q.chainId) : undefined;
     // a personal finale settles the soldier's own matter whichever plan wins — it brings no one to keep
     if (!a || chain?.isPersonal) return null;
-    return this.rewardWarnFor([a.rewardKind]);
+    return this.rewardWarnFor([a.rewardKind], chain);
   }
-  /** what the fort cannot hold of what these rewards bring — the one rule behind both warnings */
-  private rewardWarnFor(kinds: RewardKindTag[]): string | null {
+  /** what the fort cannot hold of what these rewards bring — the one rule behind both warnings, saying what then
+   *  happens. A finale's person (`finale`: its chain) is settled by settleFinale; a one-off's by applyResolution */
+  private rewardWarnFor(kinds: RewardKindTag[], finale?: Chain): string | null {
+    // a focal who already stands with the company is never re-disposed of (settleFinale): nobody arrives
+    if (finale && this.card(finale.focalId)?.character?.role === 'merc') return null;
     if (kinds.includes('captive')) {
-      if (!this.hasRoom('dungeon')) return 'brings a captive · no Dungeon — they will be handed off';
-      if (this.captives().length >= this.captiveCapacity()) return `brings a captive · cells full ${this.captives().length}/${this.captiveCapacity()}`;
+      // a captive waits in holding either way (settleFinale and applyResolution alike): without a Dungeon, or with every
+      // cell taken, holding is all there is — ransom or sell them there, or they are handed off when its clock runs out
+      if (!this.hasRoom('dungeon')) return 'brings a captive · no Dungeon — they can only be ransomed or sold from holding';
+      if (this.captives().length >= this.captiveCapacity()) return `brings a captive · cells full ${this.captives().length}/${this.captiveCapacity()} — they wait in holding`;
     }
     if (kinds.includes('recruit')) {
+      if (finale) {
+        // a finale's recruit joins the roster when there is room, else waits at the tavern, already paid for — Tavern or
+        // not (settleFinale counts the room without the focal, who may still be waiting in limbo)
+        const n = this.roster().filter(m => m.id !== finale.focalId).length, cap = this.rosterCapacity();
+        if (n >= cap) return `brings a recruit · roster full ${n}/${cap} — they wait at the tavern, already paid for${this.hasRoom('tavern') ? '' : ', until a Tavern is built to take them on'}`;
+        return null;
+      }
       // a rescued recruit with no Tavern pays what they can and MOVES ON (applyResolution) — the
       // roster count is beside the point until there is somewhere for them to wait
       if (!this.hasRoom('tavern')) return 'brings a recruit · no Tavern — they will thank you and move on';
@@ -3255,6 +3301,14 @@ export class Game {
     return { type: f.action, args, label: f.label, cli: [f.action, ...args].join(' '), block: f.block };
   }
 
+  /** a liability taken on this cycle, said plainly: it is a card the company holds, never taken out of its gold on its own
+   *  — "⚠ 5g debt" beside 752g read as a sum the company somehow could not pay. A finale's shortfall is a debt; a partial's
+   *  leavings are evidence or a mess; each is settled by hand ('settle', the card's button), or collectors come */
+  static debtText(d: { name: string; amount: number }): string {
+    const what = d.name === 'evidence' ? 'evidence left behind' : d.name === 'mess' ? 'a mess left behind' : 'a debt';
+    return `⚠ ${what}, ${d.amount}g to settle — not paid from your gold until you settle it`;
+  }
+
   /** the cycle's spoils in one line — the CLI TALLY and the web's after-PROCEED toast say the same */
   static tallyLine(s: CycleSummary): string {
     const names = (xs: { name: string }[], one: string, many: string) => xs.length > 2 ? `${xs.length} ${many}` : xs.map(x => x.name).join(', ') + (one ? ` ${one}` : '');
@@ -3273,7 +3327,7 @@ export class Game {
       s.leadsCold.length ? `${s.leadsCold.length} lead${s.leadsCold.length === 1 ? '' : 's'} lost` : '',
       s.stalled.length ? `${s.stalled.length} did not march` : '',
       (s.handedOff ?? []).length ? `⛓ ${names(s.handedOff!, 'handed off', 'handed off')}` : '',
-      ...(s.debts ?? []).map(d => `⚠ ${d.amount}g debt`),
+      ...(s.debts ?? []).map(d => d.text ?? Game.debtText(d)),
       ...(s.setbacks ?? []).map(b => `✗ setback ${b.failures}/${b.budget} — ${b.title}`),
     ].filter(Boolean);
     return parts.join(' · ') || 'nothing changed hands';
@@ -3413,7 +3467,7 @@ export class Game {
       // The glyph is ✎ and not ⏳ because ⏳ already means "this quest lapsed" (abandonQuest).
       const block = [`— ${q.title} (${q.id})`,
         ...(q.situation ? [`「${q.situation}」`] : []),
-        `✎ ${party.map(p => p.name).join(', ')} march out — the report is being written…`];
+        `✎ ${party.map(p => p.name).join(', ')} ${party.length === 1 ? 'marches' : 'march'} out — the report is being written…`];
       questBlocks.set(q.id, block); blocks.push(block);
       this.reckoning.meta.push({ questId: q.id, title: q.title, outcome: rolled.outcome, heads: rolled.heads, coins: rolled.totalCoins,
         bar: rolled.totalBar, partialAt: PARTIAL_FRAC * rolled.totalBar, party: party.map(p => p.name), partyIds: party.map(p => p.id),
@@ -3669,7 +3723,7 @@ export class Game {
       tamed: acc.tamed, lapsed: acc.lapsed, stalled: acc.stalled, leadsCold: acc.leadsCold,
       handedOff: acc.handedOff, setbacks: acc.setbacks,
       debts: st.cards.filter(isLiability).map(c => ({ id: c.id, name: c.name, amount: Math.abs(c.value) * (c.qty ?? 1) - (before.debts.get(c.id) ?? 0) }))
-        .filter(d => d.amount > 0),
+        .filter(d => d.amount > 0).map(d => ({ ...d, text: Game.debtText(d) })),
     };
     summary.newLeads = summary.newLeadIds.length;
     if (lines.length) {
@@ -4208,7 +4262,7 @@ export class Game {
     const chain = st.chains.find(c => c.id === q.chainId);
     if (!chain?.saga?.plan || !r.saga) return;
     const host = this.sagaHost();
-    const a = { outcome: r.outcome, party: r.party, hurt: r.saga.inn.hurt };
+    const a = { outcome: r.outcome, party: r.party, hurt: r.saga.inn.hurt, fate: r.saga.inn.fate };
     // whose deed decided it rides on the chronicle line (the memory edge at the saga's close reads it, §2.6)
     const decided = () => { const l = chain.saga!.lines[chain.saga!.lines.length - 1]; if (l && r.outcome !== 'failure') l.decides = r.saga!.inn.decides };
     if (q.isFinale) {
@@ -4300,7 +4354,10 @@ export class Game {
       const theirs = rec.lines.filter(l => inLine(l, p.id));
       const last = theirs[theirs.length - 1] ?? rec.lines[rec.lines.length - 1];
       const edges: { from: string; to: string; type: string; blurb: string; importance: number }[] = [];
-      if (last) edges.push({ from: id, to: chain.focalId, type: p.seat === 'opponent' ? 'rival-of' : 'party-to', blurb: last.text, importance: 0.5 });
+      // a saga that closed before any report has no line to remember them by: the memory is their part in the matter,
+      // under the title the player read (the pre-v4 edge) — never a remembered person with no memory at all
+      const part = p.seat === 'opponent' ? 'stood against the company' : p.seat === 'client' ? 'asked the company for help' : 'was caught up';
+      edges.push({ from: id, to: chain.focalId, type: p.seat === 'opponent' ? 'rival-of' : 'party-to', blurb: last?.text ?? `${part} in the matter of "${plan.title}"`, importance: 0.5 });
       const deed = [...theirs].reverse().find(l => l.decides && l.outcome !== 'failure');
       const soldier = deed ? this.roster().find(m => m.name === deed.decides) ?? this.state.cards.find(c => c.character && c.name === deed.decides) : undefined;
       if (deed && soldier) {
@@ -4457,7 +4514,8 @@ export class Game {
             title: plan.title,
             kernel: origin!.saga!.lines.some(l => l.n >= origin!.saga!.world.N) ? plan.answer : plan.question,
             situation: origin!.saga!.lines[origin!.saga!.lines.length - 1]?.text ?? origin!.saga!.card1,
-            want: plan.cast.find(e => e.id === c.id)?.want ?? null,
+            // only the one the company acts for has a want (validatePlan leaves everyone else's ''): none is null, never ''
+            want: plan.cast.find(e => e.id === c.id)?.want || null,
           } : undefined,
           // cross-batch quirk dedup — "tilts head when listening" landed on 4 people
           avoidQuirks: st.cards.flatMap(x => x.character?.quirks ?? []).slice(-20),

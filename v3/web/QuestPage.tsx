@@ -173,7 +173,7 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
                             onDragEnd={() => { setDrag(null); setOver(null) }} />
                           <button className="sendback" onClick={() => quick('unassign', q.id, sl.idx)} aria-label={`Send ${m.name} back to the hand`} title="send back to the hand">✕</button>
                         </div>
-                      : <button className="empty" onClick={() => setArmed(armed === sl.idx ? null : sl.idx)} aria-label={`Place ${sl.idx + 1}: ${attrOf(sl)}`}>
+                      : <button className="empty" onClick={() => setArmed(armed === sl.idx ? null : sl.idx)} aria-label={`Place ${act.indexOf(sl) + 1}: ${attrOf(sl)}`}>
                           <Silhouette size={56} /></button>}
                   </div>
                   <div className="test"><b>{attrOf(sl)}</b><span>bar {sl.test.bar.toFixed(1)}</span></div>
@@ -252,12 +252,12 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
   );
 }
 
-/** the saga's stakes in one strip (Game.chainViews): part pips, progress, setbacks, what is set aside */
+/** the saga's stakes in one strip (Game.chainViews; the CLI's SAGA line says the same, in this order): part pips — the
+ *  saga's one measure of how far along it is — setbacks, what is set aside */
 function SagaStrip({ c, q }: { c: any; q: any }) {
   const total = Math.max(1, q.saga?.of ?? c.of ?? 1);
   const now = q.isFinale ? total : Math.max(1, Math.min(total, q.saga?.part ?? c.part ?? 1));   // this card's part, 1-based
   const budget = Math.max(0, c.failureBudget ?? 0);
-  const prog = c.effortTarget ? Math.min(1, (c.effort ?? 0) / c.effortTarget) : 0;
   const where = q.isFinale ? `the finale${q.saga?.lastchance ? ' · the last chance' : ''}` : `part ${now} of ${total}${q.saga?.again ? ' (again)' : ''}`;
   return (
     <div className="saga" aria-label="The saga">
@@ -266,9 +266,6 @@ function SagaStrip({ c, q }: { c: any; q: any }) {
         <span className="pips">{Array.from({ length: total }, (_, i) =>
           <i key={i} className={i < now - 1 ? 'done' : i === now - 1 ? (q.isFinale ? 'now fin' : 'now') : ''} />)}</span>
         {where}
-      </span>
-      <span className="sg-i" title={`progress ${Math.round(c.effort ?? 0)} of ~${Math.round(c.effortTarget ?? 0)} (soldier-cycles spent on it)`}>
-        <span className="eff"><i style={{ width: `${prog * 100}%` }} /></span>progress
       </span>
       {budget > 0 && <span className={'sg-i' + (c.failures >= budget - 1 && c.failures > 0 ? ' hot' : '')}
         title={`${budget} setbacks and the saga is forced to its last chance`}>

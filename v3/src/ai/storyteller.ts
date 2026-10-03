@@ -88,12 +88,15 @@ const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 // repair turned every "the" in a plan into a label
 const nameParts = (p: SagaPerson) => p.name.split(/\s+/).filter(x => x.length > 2 && /^\p{Lu}/u.test(x));
 
-/** §2.7: the repairs are mechanical and silent; a hard defect earns one plain re-draw */
-export function validatePlan(raw: unknown, ctx: PlanCtx): { plan: SagaPlan | null; repairs: string[]; defects: string[] } {
+/** §2.7: the repairs are mechanical and silent; a hard defect earns one plain re-draw.
+ *  `ownJobs`: the middle jobs whose people, AS THE PLAN WROTE THEM, include a personal saga's soldier — the jobs that
+ *  stage the soldier's own matter in person. Only these pin the soldier to a place (the pre-v4 rule); the repair that
+ *  adds the soldier to every job's people feeds the prose payloads, never the pin */
+export function validatePlan(raw: unknown, ctx: PlanCtx): { plan: SagaPlan | null; repairs: string[]; defects: string[]; ownJobs: number[] } {
   const { w } = ctx;
-  const repairs: string[] = [], defects: string[] = [];
+  const repairs: string[] = [], defects: string[] = [], ownJobs: number[] = [];
   const parsed = zPlanOut.safeParse(raw);
-  if (!parsed.success) return { plan: null, repairs, defects: ['not a plan object'] };
+  if (!parsed.success) return { plan: null, repairs, defects: ['not a plan object'], ownJobs };
   const o = parsed.data;
   const ids = new Set(w.cast.map(p => p.id));
   const need = (v: string | undefined, what: string) => { if (!v?.trim()) defects.push(`missing ${what}`); return v?.trim() ?? '' };
@@ -157,11 +160,13 @@ export function validatePlan(raw: unknown, ctx: PlanCtx): { plan: SagaPlan | nul
     if (p.seat === 'soldier' && !past) defects.push('missing soldier past');
     return { ...p, label, want: actFor ? want || cannedWant(p, w.stake) : '', ...(past ? { past } : {}) };
   });
-  // a personal saga's soldier goes on every job (pickParty), so they are in every job's people
+  // a personal saga's soldier is in every job's people, for the prose (the lab's pickParty sent them on every job); the
+  // game pins them to a place only on the jobs the plan itself put them in (`ownJobs`)
   const soldier = w.cast.find(p => p.seat === 'soldier');
-  const people = (xs: string[] | undefined, where: string) => {
+  const people = (xs: string[] | undefined, where: string, job?: number) => {
     const kept = (xs ?? []).filter(x => ids.has(x));
     if ((xs ?? []).length !== kept.length) repairs.push(`unknown ids dropped from ${where}`);
+    if (soldier && kept.includes(soldier.id) && job !== undefined) ownJobs.push(job);
     if (soldier && !kept.includes(soldier.id)) { kept.unshift(soldier.id); repairs.push(`soldier added to ${where}`) }
     return [...new Set(kept)];
   };
@@ -182,7 +187,7 @@ export function validatePlan(raw: unknown, ctx: PlanCtx): { plan: SagaPlan | nul
     used.push(type);
     return {
       n: i + 1, type, title: need(e.title, `episode ${i + 1} title`), job: need(e.job, `episode ${i + 1} job`),
-      people: people(e.people, `episode ${i + 1}`), trouble: trouble(e.trouble, `episode ${i + 1}`),
+      people: people(e.people, `episode ${i + 1}`, i + 1), trouble: trouble(e.trouble, `episode ${i + 1}`),
       win: need(e.win, `episode ${i + 1} win`), gain: need(e.gain, `episode ${i + 1} gain`), learn: need(e.learn, `episode ${i + 1} learn`),
       why: need(e.why, `episode ${i + 1} why`),
     };
@@ -288,7 +293,7 @@ export function validatePlan(raw: unknown, ctx: PlanCtx): { plan: SagaPlan | nul
     // the question is card 1's (what nobody knows yet)
     plan.question = fix(plan.question);
   }
-  return { plan, repairs, defects };
+  return { plan, repairs, defects, ownJobs };
 }
 
 /** the showdown's edges, one per middle job in job order (R2, S2). A line that names its job ("job": 2)
@@ -659,7 +664,7 @@ export const wantPhrase = (want: string) => {
  *  `show.forLine` / `show.open` are off on card 1, whose prose tells the premise. Road marks: ✓ won and ✗ lost (title
  *  only), ▶ this job (title only), · ahead (its road line); a job the setbacks skipped is left out. The finale row is a
  *  bare "Finale" until it is played, then its title */
-export function questLog(plan: SagaPlan, k: Knowing, state: SagaState, road: RoadState, show: { forLine: boolean; open: boolean }): LogRow[] {
+export function questLog(plan: SagaPlan, k: Knowing, state: SagaState, road: RoadState, show: { forLine: boolean; open: boolean }, places: readonly string[] = []): LogRow[] {
   const client = clientOf(plan);
   const out: LogRow[] = show.forLine ? [{ kind: 'for', text: `${displayName(client, k)}, ${client.seat === 'soldier' ? labelOf(client, 'card') : aLabel(client.label)}, who wants ${wantPhrase(client.want)}.` }] : [];
   const N = plan.episodes.length + 1;
@@ -678,12 +683,19 @@ export function questLog(plan: SagaPlan, k: Knowing, state: SagaState, road: Roa
       : { kind: 'roadrow', mark: '·', text: 'Finale' });
   }
   if (state.learned.length) out.push({ kind: 'known', text: 'Known' }, ...state.learned.map(l => ({ kind: 'knownrow' as const, text: l })));
-  const held = haveOf(plan, state, false) as string[];
+  // each gain stands mid-list, so it reads as the plan's common noun ("the cart and its crates, a marked map"), never with
+  // the capital the plan wrote it with ("The cart and its crates, A marked map"); a name or a place keeps its own
+  const held = (haveOf(plan, state, false) as string[]).map(h => leadsWithName(h, plan, places) ? h.trim() : lc1(h.trim()));
   // comma-separated, unless a gain holds a comma of its own ("the runner, caught near Stonegill")
   if (held.length) out.push({ kind: 'held', text: held.join(held.some(h => h.includes(',')) ? '; ' : ', ') });
   if (show.open) out.push({ kind: 'open', text: openQuestion(plan.question) });
   return out;
 }
+/** whether a text opens on a proper name: someone in the cast, or a place the engine dealt */
+const leadsWithName = (t: string, plan: SagaPlan, places: readonly string[]) => {
+  const w0 = (t.trim().split(/\s+/)[0] ?? '').replace(/['’]s$/, '').replace(/[^\p{L}'-]/gu, '');
+  return plan.cast.some(p => nameParts(p).includes(w0)) || places.some(pl => pl.split(/\s+/)[0] === w0);
+};
 /** the quest log as the lab printed it (the CLI's text; byte-identical to scripts/sagalab at storyteller-build-src) */
 export function logLines(rows: LogRow[]): string[] {
   return rows.map(r => {
@@ -1073,12 +1085,19 @@ export function mockReport(payload: Record<string, unknown>, flags: string[]): {
   return { before, after, summary };
 }
 
-/** (R5 verify) a failed try as the chronicle and a last-chance finale's `latest` tell it: the job, then what stopped it */
+/** a summary whose own subject is the company ("the company was stopped…", "your soldiers found…", "we…"): the try's
+ *  "The company tried to …" already says who acted, so it never runs on into it after a "but" */
+const COMPANY_SUBJECT = /^(?:the company(?:['’]s\s+[a-z]+)?|(?:your|our) (?:soldiers|party|company|band)|we)\b/i;
+/** (R5 verify) a failed try as the chronicle and a last-chance finale's `latest` tell it: the job, then what stopped it.
+ *  A summary that opens on the company as its subject keeps that subject in a sentence of its own (a "but" join read
+ *  "The company tried to …, but the company was stopped when …") */
 export function triedLine(job: string, stopper: string, plan: SagaPlan, w: SagaWorld): string {
   const s = bare(stopper);
+  const tried = `The company tried to ${lc1(bare(job))}`;
+  if (COMPANY_SUBJECT.test(s)) return `${tried}. ${sentence(s)}`;
   const w0 = (s.split(/\s+/)[0] ?? '').replace(/['’]s$/, '');
   const proper = plan.cast.some(p => nameParts(p).includes(w0)) || w.places.some(pl => pl.startsWith(w0));
-  return `The company tried to ${lc1(bare(job))}, but ${proper ? s : lc1(s)}.`;
+  return `${tried}, but ${proper ? s : lc1(s)}.`;
 }
 
 /** the floor's words for a cost's atoms (the model realises them its own way) */
@@ -1107,7 +1126,7 @@ type Log = (kind: string, text: string) => void;
 const words = (s: string | undefined) => (s ?? '').split(/\s+/).filter(Boolean).length;
 
 /** the plan: at most 2 calls (a hard defect earns one plain re-draw), then the floor and a `plan-fallback` dev line */
-export async function planSaga(ai: AiProvider, ctx: PlanCtx, seedKey: string, log: Log = () => {}): Promise<{ plan: SagaPlan; repairs: string[]; defects: string[]; fallback: boolean; lint: string[] }> {
+export async function planSaga(ai: AiProvider, ctx: PlanCtx, seedKey: string, log: Log = () => {}): Promise<{ plan: SagaPlan; repairs: string[]; defects: string[]; fallback: boolean; lint: string[]; ownJobs: number[] }> {
   const { payload, flags } = planPayload(ctx);
   const floor = () => mockPlan(ctx, seedKey);
   const defects: string[] = [];
@@ -1119,13 +1138,13 @@ export async function planSaga(ai: AiProvider, ctx: PlanCtx, seedKey: string, lo
     if (v.plan && !v.defects.length) {
       const lint = planLint(v.plan, ctx.w);
       for (const l of lint) log('dev', `saga plan lint (log-only): ${l}`);
-      return { plan: v.plan, repairs: v.repairs, defects, fallback: false, lint };
+      return { plan: v.plan, repairs: v.repairs, defects, fallback: false, lint, ownJobs: v.ownJobs };
     }
     defects.push(...v.defects.map(d => `draw ${attempt + 1}: ${d}`));
   }
   const v = validatePlan(floor(), ctx);
   log('dev', `plan-fallback: the floor's plan stood in (${defects.join('; ')})`);
-  return { plan: v.plan!, repairs: v.repairs, defects, fallback: true, lint: planLint(v.plan!, ctx.w) };
+  return { plan: v.plan!, repairs: v.repairs, defects, fallback: true, lint: planLint(v.plan!, ctx.w), ownJobs: v.ownJobs };
 }
 /** R5: the road ahead — each later job's hope; null when the writer failed (the floor's lines then stand in) */
 export async function writeOutline(ai: AiProvider, plan: SagaPlan, k: Knowing, log: Log = () => {}): Promise<{ lines: string[] | null; payload: Record<string, unknown> }> {

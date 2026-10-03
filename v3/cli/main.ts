@@ -9,7 +9,7 @@ import * as path from 'node:path';
 import * as readline from 'node:readline';
 import { Game, type ReckonMeta, directionSummary } from '../src/game/game.js';
 import { aiKindFrom, makeAi } from '../src/ai/select.js';
-import { render } from './format.js';
+import { render, slotAt } from './format.js';
 import type { AiProvider } from '../src/ai/provider.js';
 import { readCallLog, callLogPath } from '../src/ai/calllog.js';
 
@@ -219,6 +219,7 @@ async function exec(game: Game, line: string): Promise<boolean> {
   const confirmed = bang || pendingConfirm === `${cmd} ${rest.join(' ')}`;
   pendingConfirm = null;
   const arg = rest.join(' ');
+  const questOf = (id: string | undefined) => game.state.quests.find(q => q.id === id);
   const say = (r: { ok: boolean; msg: string; warn?: boolean }) => {
     console.log(r.ok ? `${r.warn ? '⚠' : '✓'} ${r.msg}` : `✗ ${r.msg}`);
     slog({ cycle: game.state.cycle, action: cmd, args: rest, ok: r.ok, msg: r.msg });
@@ -351,7 +352,8 @@ async function exec(game: Game, line: string): Promise<boolean> {
       announceJobs(game);
       break;
     }
-    case 'assign': say(game.assign(rest[0]!, Number(rest[1]), rest[2]!)); break;
+    // a place number is the quest screen's: counted within the places in play (a chosen finale plan's own)
+    case 'assign': say(game.assign(rest[0]!, slotAt(questOf(rest[0]), Number(rest[1])), rest[2]!)); break;
     // the SAME engine call the web's Auto button makes — never a second implementation (G5)
     case 'auto': say(!rest[0] || rest[0] === 'all' ? game.autoAssignAll() : game.autoAssign(rest[0]!)); break;
     // direction [text|clear] — the Settings screen's free text for the AI storyteller (theme + trait preferences)
@@ -359,9 +361,9 @@ async function exec(game: Game, line: string): Promise<boolean> {
       if (!arg) { const d = game.direction(); console.log(d ? `DIRECTION: "${d.text}"\n  → ${directionSummary(d)}` : '(no direction set — e.g. direction Dark fantasy, grim; make the NPCs men)'); break }
       say(await game.setDirection(arg === 'clear' ? '' : arg)); break;
     }
-    case 'send': say(game.sendTo(rest[0]!, rest[1]!, rest[2] === undefined ? undefined : Number(rest[2]))); break;
+    case 'send': say(game.sendTo(rest[0]!, rest[1]!, rest[2] === undefined ? undefined : slotAt(questOf(rest[0]), Number(rest[2])))); break;
     case 'fit': console.log(render.fit(game, rest[0] ?? '', rest[1])); break;
-    case 'unassign': say(game.unassign(rest[0]!, Number(rest[1]))); break;
+    case 'unassign': say(game.unassign(rest[0]!, slotAt(questOf(rest[0]), Number(rest[1])))); break;
     case 'clear': say(game.clearQuest(rest[0]!)); break;
     case 'approach': {
       // switching a manned plan sends its party back — the quest page confirms on the same line

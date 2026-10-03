@@ -57,13 +57,41 @@ const worldOf = (g: Gold): SagaWorld => ({
   cast: g.world.cast, stake: g.world.stake, places: g.world.places, land: g.world.land,
   seed: { id: g.world.seed.id, text: g.world.seed.text }, tone: g.world.tone, region: g.world.region, level: g.world.level,
 });
+// DELIBERATE DIVERGENCES from the lab's bytes — the engine-line fixes of 2026-10-03 (North Star 0: no prompt, payload
+// shape or mechanic changed). The fixtures stay exactly as the lab recorded them; each fix is applied to the expectation
+// here, literally, so any other drift still fails:
+//   D3 — a failed try whose summary opens on the company keeps that subject in a sentence of its own (never "The company
+//        tried to …, but the company …"); a last-chance finale's `latest` is that line, so its card payload follows
+//   D6 — the Held row writes each gain mid-list, without the capital the plan gave it (a name or a place keeps its own)
+//   D4 — the chronicle's "likely end" becomes how it ended (the finale's Outcome sentence) once the finale is played
+//   D5 — So far numbers the finale "finale", not N (a skipped job read "1, 2, 2, 4")
+const TRIED_FIX: [string, string][] = [
+  ["in Woldcot, but the company found the merchant's yard", "in Woldcot. The company found the merchant's yard"],
+  ["in Woldcot, but the company met the merchant's cudgel-and-net guards", "in Woldcot. The company met the merchant's cudgel-and-net guards"],
+];
+const HELD_FIX: [string, string][] = [
+  ['Held: The cart and its crates', 'Held: the cart and its crates'], [', A marked map of the track', ', a marked map of the track'],
+  [', Boar hides to pad the crates', ', boar hides to pad the crates'], [', A captured axeman', ', a captured axeman'],
+];
+const swap = (s: string, pairs: [string, string][]) => pairs.reduce((t, [a, b]) => t.split(a).join(b), s);
+/** a tried line, a `latest`, or a payload as JSON, as the game now writes it */
+const fixTried = (s: string) => swap(s, TRIED_FIX);
+const fixLog = (log: string[]) => log.map(l => l.startsWith('Held: ') ? swap(l, HELD_FIX) : l);
+/** the lab's chain.md as the game now prints it */
+function fixChain(g: Gold): string {
+  const fin = g.attempts.find(a => a.finale)!;
+  return fixTried(g.end.chain).split('\n').map(l => l.startsWith('Held: ') ? swap(l, HELD_FIX) : l)
+    .map(l => l.replace(/^likely end: .*? · setbacks /, `ending: ${fin.fate} · setbacks `))
+    .map(l => l.replace(new RegExp(`^  ${g.world.N} (?=[✓~✗] )`), '  finale '))
+    .join('\n');
+}
 const sets = (k: Knowing) => ({ met: [...k.met].sort(), named: [...k.named].sort(), seen: [...k.seen].sort() });
 const sorted = (k: { met: string[]; named: string[]; seen: string[] }) => ({ met: [...k.met].sort(), named: [...k.named].sort(), seen: [...k.seen].sort() });
 /** a call as the game would send it, against the lab's */
 function sameCall(got: { flags: string[]; vars: Record<string, number>; payload: Record<string, unknown> }, want: Call, template: SagaTemplate) {
   expect(got.flags).toEqual(want.flags);
   expect(got.vars).toEqual(want.vars);
-  expect(JSON.stringify(got.payload)).toBe(JSON.stringify(want.payload));
+  expect(JSON.stringify(got.payload)).toBe(fixTried(JSON.stringify(want.payload)));
   expect(renderSaga(template, got.flags, got.vars)).toBe(want.system);
 }
 
@@ -104,8 +132,8 @@ describe('saga golden parity — the ported text side (A)', () => {
         : laterCardPayload(plan, e, latest, k, { finale: a.finale, lastchance, retry: a.tryOnJob > 1, why: jobWhy(plan, a.finale ? N : a.jobN, hopes) });
       sameCall(cc, a.card, 'card');
       const card = a.card.text;
-      const log = logLines(questLog(plan, k, state, { lines: road, done, at: a.finale ? N : a.jobN, retry: !a.finale && a.tryOnJob > 1 }, { forLine: a.kk > 1, open: a.kk > 1 }));
-      expect(log).toEqual(a.card.log);
+      const log = logLines(questLog(plan, k, state, { lines: road, done, at: a.finale ? N : a.jobN, retry: !a.finale && a.tryOnJob > 1 }, { forLine: a.kk > 1, open: a.kk > 1 }, w.places));
+      expect(log).toEqual(fixLog(a.card.log));
       const shown = `${log.join('\n')}\n${card}`;
       noteDelivered(shown, plan, k, false);
       expect(sets(k)).toEqual(sorted(a.knowingAfterCard));
@@ -120,16 +148,16 @@ describe('saga golden parity — the ported text side (A)', () => {
       expect(state).toEqual(a.banked);
       const failedJob = !a.finale && a.outcome === 'failure';
       const tried = failedJob ? triedLine(e.job, rep.summary, plan, w) : rep.summary;
-      expect(tried).toBe(a.tried);
+      expect(tried).toBe(fixTried(a.tried));
       if (failedJob) { failures++; if (failures >= budget) { lastchance = true; done.set(a.jobN, 'lost') } }
       else if (!a.finale) done.set(a.jobN, 'won');
       expect(lastchance).toBe(a.lastchance);
       latest = !a.finale && a.outcome !== 'failure' && e.win ? e.win : failedJob && !lastchance ? rep.summary : tried;
-      if (!a.finale) expect(latest).toBe(a.latestAfter);
+      if (!a.finale) expect(latest).toBe(fixTried(a.latestAfter));
     }
     const fin = g.attempts.find(a => a.finale)!;
-    const endLog = logLines(questLog(plan, k, state, { lines: road, done, finale: fin.outcome === 'failure' ? 'lost' : 'won' }, { forLine: true, open: false }));
-    expect(endLog).toEqual(g.end.endLog);
+    const endLog = logLines(questLog(plan, k, state, { lines: road, done, finale: fin.outcome === 'failure' ? 'lost' : 'won' }, { forLine: true, open: false }, w.places));
+    expect(endLog).toEqual(fixLog(g.end.endLog));
   });
 });
 
@@ -146,7 +174,7 @@ function replay(g: Gold) {
       if (!want) { errors.push(`no recorded ${c.template} call left`); throw new Error('no call left') }
       const sys = renderSaga(c.template, c.flags, c.vars), user = JSON.stringify(c.payload);
       if (sys !== want.system) errors.push(`${c.template} system differs:\n${sys}\n--- want ---\n${want.system}`);
-      if (user !== JSON.stringify(want.payload)) errors.push(`${c.template} user differs:\n${user}\n--- want ---\n${JSON.stringify(want.payload)}`);
+      if (user !== fixTried(JSON.stringify(want.payload))) errors.push(`${c.template} user differs:\n${user}\n--- want ---\n${JSON.stringify(want.payload)}`);
       for (const raw of want.raw) { const p = c.schema.safeParse(raw); if (p.success) return p.data }
       errors.push(`${c.template}: no recorded reply parsed`);
       throw new Error('no reply parsed');
@@ -183,7 +211,7 @@ describe('saga golden parity — the game flow (B)', () => {
       expect(errors).toEqual([]);
       expect(out.pos).toEqual({ job: a.finale ? w.N : a.jobN, finale: a.finale, attempt: a.finale ? 1 : a.tryOnJob });
       expect(out.prose).toBe(a.card.text);
-      expect(logLines(out.rows)).toEqual(a.card.log);
+      expect(logLines(out.rows)).toEqual(fixLog(a.card.log));
       expect(matterLine(out.matter)).toBe(a.card.matter.length ? `ON THIS MATTER: ${a.card.matter.join(' · ')}` : '');
       expect(sorted(chain.saga!.knowing)).toEqual(sorted(a.knowingAfterCard));
       // the card's header and, on the finale, the PLANS buttons (the likely way chosen), as the lab printed them
@@ -199,20 +227,20 @@ describe('saga golden parity — the game flow (B)', () => {
       const rep = await flow.writeSagaReport(host, call);
       expect(rep).toEqual(a.report.out);
       bankBeat(chain, a.party.length, a.outcome, 0);   // the host's part (advanceChain), before afterReport
-      const after = flow.afterReport(host, chain, out.pos, { outcome: a.outcome, party: a.party, hurt: a.hurt }, rep);
+      const after = flow.afterReport(host, chain, out.pos, { outcome: a.outcome, party: a.party, hurt: a.hurt, fate: a.fate }, rep);
       expect(after.status).toBe(a.status);
-      expect(after.tried).toBe(a.tried);
+      expect(after.tried).toBe(fixTried(a.tried));
       expect(after.book).toBe(a.report.md.trimEnd().split('\n').pop());
       expect(chain.saga!.lastchance).toBe(a.lastchance);
       expect(chain.saga!.state).toEqual(a.banked);
       expect(sorted(chain.saga!.knowing)).toEqual(sorted(a.knowingAfterReport));
-      if (!a.finale) expect(chain.saga!.latest).toBe(a.latestAfter);
+      if (!a.finale) expect(chain.saga!.latest).toBe(fixTried(a.latestAfter));
     }
     expect(errors).toEqual([]);
     expect(Object.values(q).every(x => x.length === 0)).toBe(true);
     expect(dev.filter(d => /fallback|floor stood in/.test(d))).toEqual([]);
     // the chronicle, as the lab's chain.md printed it
-    expect(flow.chronicleText(flow.chronicle(chain)!).join('\n') + '\n').toBe(g.end.chain);
+    expect(flow.chronicleText(flow.chronicle(chain)!).join('\n') + '\n').toBe(fixChain(g));
     // the record survives the save
     expect(JSON.parse(JSON.stringify(chain.saga))).toEqual(chain.saga);
   });

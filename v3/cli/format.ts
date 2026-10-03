@@ -11,6 +11,8 @@ import { cardType, stackKind, isLiability } from '../src/engine/cards.js';
 import { slotThreshold, coins, explainCoins, coinsWhy, slotStrength, BAND_TEXT } from '../src/engine/roll.js';
 import { xpNeeded } from '../src/engine/growth.js';
 import { logLines, matterLine } from '../src/ai/storyteller.js';
+import { soFarLine } from '../src/game/sagaflow.js';
+import type { Quest } from '../src/engine/quests.js';
 
 const pct = (x: number | null) => x === null ? '—' : `${Math.round(x * 100)}%`;
 
@@ -30,6 +32,17 @@ const stepLine = (st: NextStep) =>
 
 /** what the captive count counts — ONE phrase for every surface that shows it */
 export const CAPTIVE_COUNT_NOTE = 'counts captives in the cells, on the rack or on show — holding does not count until you take them';
+
+/** a row of pips: n of `of` lit ("●●○○" — a saga's parts; "✗✗·" — its setbacks) */
+const pips = (n: number, of: number, on = '●', off = '○') => on.repeat(Math.max(0, Math.min(n, of))) + off.repeat(Math.max(0, of - n));
+
+/** a quest's places as the player numbers them: the places in play — a chosen finale plan's own, counted from 0 within
+ *  that plan (its third place overall read "slot 2" while it was the plan's only one). `slotAt` maps such a number back
+ *  to the engine's place (assign / unassign / send) */
+export const activePlaces = (q: Pick<Quest, 'slots' | 'approaches' | 'chosenApproach'>): number[] =>
+  q.slots.map((s, i) => [s, i] as const).filter(([s]) => !q.approaches || !q.chosenApproach || s.groupId === q.chosenApproach).map(([, i]) => i);
+export const placeNo = (q: Pick<Quest, 'slots' | 'approaches' | 'chosenApproach'>, idx: number) => { const k = activePlaces(q).indexOf(idx); return k < 0 ? idx : k };
+export const slotAt = (q: Pick<Quest, 'slots' | 'approaches' | 'chosenApproach'> | undefined, n: number) => q ? activePlaces(q)[n] ?? NaN : n;
 
 /** reward kinds as the board's icons say them */
 const KIND_WORD: Record<string, string> = { captive: '⛓captive', recruit: '☺recruit', relic: '◆relic', lead: '🧭lead', gold: '¤gold' };
@@ -251,7 +264,7 @@ export const render = {
       `focus: ${ch.focus.kind === 'none' ? 'none (generalist growth)' : ch.focus.kind === 'single' ? `${ch.focus.attr.toUpperCase()} (one GREAT stat)` : `${ch.focus.a.toUpperCase()}+${ch.focus.b.toUpperCase()} (two GOOD)`} · who: ${ch.who ?? '—'}`,
       ch.backstory ? `backstory: ${ch.backstory}` : '',
       ch.quirks?.length ? `quirks: ${ch.quirks.join('; ')}` : '',
-      `dossier:\n${g.dossier(m.id) || '  (no memories yet)'}`,
+      `dossier:\n${g.dossier(m.id, { player: true }) || '  (no memories yet)'}`,
     ].filter(Boolean).join('\n');
   },
 
@@ -340,7 +353,8 @@ export const render = {
     if (!q) return 'no such quest';
     const due = g.questIsFaucet(q) ? 'goes cold at the end of this cycle — the post will put up another' : `lapses c${g.questLapsesAt(q)}${g.questStallAt(q) !== null ? ` — set aside then unless it marches (it has failed to march ${q.stalls ?? 0}×)` : ''}`;
     const tail = `(${q.id}, L${q.level} ${q.rarity}, ${REGION[q.region]!.name}, ${due})`;
-    const reward = `REWARD: ${g.questReward(q.id)}  [${kindsLine(g.questRewardKinds(q.id))}]${(w => w ? `  ⚠ ${w}` : '')(g.questRewardWarn(q.id))}`;
+    const kinds = kindsLine(g.questRewardKinds(q.id));
+    const reward = `REWARD: ${g.questReward(q.id)}${kinds ? `  [${kinds}]` : ''}${(w => w ? `  ⚠ ${w}` : '')(g.questRewardWarn(q.id))}`;
     const sg = q.saga;
     const lines = sg ? (() => {
       // a saga card: the quest log the engine rendered (the GUI's rows), the prose, the people it names — the same
@@ -349,12 +363,16 @@ export const render = {
       const log = logLines(sg.rows);
       const matter = matterLine(g.questCast(q.id));
       const where = sg.part === null ? `the finale${sg.lastchance ? ' · the last chance' : ''}` : `part ${sg.part} of ${sg.of}${sg.again ? ' (again)' : ''}`;
+      // the web's saga strip, in the same order: this card's part among the saga's, the setbacks, what is set aside
+      const now = sg.part ?? sg.of;
+      const strip = `SAGA: ${pips(now, sg.of)} ${where} · setbacks ${pips(sg.setbacks, sg.budget, '✗', '·')} ${sg.setbacks} of ${sg.budget} · set aside so far: ${c?.bank || 'nothing yet'}`;
+      const gap = log.length ? [''] : [];
       return [
         `═══ ${q.title} · ${c?.title ?? 'a saga'} ═══  ${tail}`,
-        ...(sg.logFirst ? [...log, '', q.situation] : [q.situation, '', ...log]),
+        ...(sg.logFirst ? [...log, ...gap, q.situation] : [q.situation, ...gap, ...log]),
         ...(matter ? [matter] : []),
         reward,
-        `SAGA: ${where} · setbacks ${sg.setbacks} of ${sg.budget}`,
+        strip,
       ];
     })() : [
       `═══ ${q.title} ═══  ${tail}`,
@@ -383,13 +401,15 @@ export const render = {
     const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
     q.slots.forEach((s, i) => {
       if (q.approaches && !active.includes(s)) return;
+      // numbered within the places in play (a finale's chosen plan), the number assign / unassign / send take
+      const no = active.indexOf(s);
       const t = s.test;
       const bar = slotThreshold(t).toFixed(1);
       const merc = s.filledBy ? g.card(s.filledBy) : null;
       const c = merc ? ` ← ${merc.name} (${explainCoins(merc, t)}, ${slotStrength(coins(merc, t), slotThreshold(t))}${(w => w ? ` · ${w}` : '')(whyLine(coinsWhy(merc, t)))})` : '';
       const req = s.requirement.kind === 'must-be' ? ` ⚑ must be ${g.card(s.requirement.cardId)?.name ?? '?'}`
         : s.requirement.kind === 'must-have' ? ` ⚑ needs ${s.requirement.concept}${s.requirement.minRank ? ` (${s.requirement.minRank}+)` : ''}` : '';
-      lines.push(`  slot ${i}: tests ${t.attributes.join('+').toUpperCase()} (${t.difficulty}, bar ${bar})${t.favored.length ? ` favors ${t.favored.join(',')}` : ''}${t.clashing.length ? ` clashes ${t.clashing.join(',')}` : ''}${req}${c}`);
+      lines.push(`  slot ${no}: tests ${t.attributes.join('+').toUpperCase()} (${t.difficulty}, bar ${bar})${t.favored.length ? ` favors ${t.favored.join(',')}` : ''}${t.clashing.length ? ` clashes ${t.clashing.join(',')}` : ''}${req}${c}`);
       if (!merc) {
         // the same rows the quest page's niches read (Game.slotFits): legal first, then by coins
         const fits = g.slotFits(q.id, i);
@@ -397,7 +417,7 @@ export const render = {
         const barred = fits.filter(f => f.blocked).slice(0, 2);
         if (legal.length) lines.push(`      candidates: ${legal.map(f => `${f.name} ${f.coins}c ${f.strength}${(w => w ? ` (${w})` : '')(whyLine(f.why))}${f.from ? ` [on ${f.from.questId}]` : ''}`).join(' · ')}`);
         if (barred.length) lines.push(`      ✗ ${barred.map(f => `${f.name} — ${f.blocked}`).join(' · ')}`);
-        if (legal.length) lines.push(`      send ${q.id} <mercId> ${i}`);
+        if (legal.length) lines.push(`      send ${q.id} <mercId> ${no}`);
       }
     });
     if (!q.approaches || q.chosenApproach) {
@@ -438,29 +458,31 @@ export const render = {
   },
 
   chains(g: Game): string {
-    const pips = (n: number, of: number, on = '●', off = '○') => on.repeat(Math.max(0, Math.min(n, of))) + off.repeat(Math.max(0, of - n));
-    // live sagas first; each ends on where it stands in play (its quest, or the lead that continues it)
+    // live sagas first; each ends on where it stands in play (its quest, or the lead that continues it). How far along: part
+    // n of N, the saga's one measure (the web's Sagas tab)
     const where = (c: ReturnType<Game['chainViews']>[number]) =>
       ` → ${c.next}${c.questId ? ` ('quest ${c.questId}')` : c.leadId && c.next === 'a lead to pursue' ? ` ('pursue ${c.leadId}')` : ''}`;
     return [...g.chainViews()].sort((a, b) => Number(b.live) - Number(a.live)).map(c =>
-      `${c.id.padEnd(9)} ${c.title.slice(0, 36).padEnd(36)} ${c.state.padEnd(14)} part ${pips(c.part, c.of)} ${c.part}/${c.of} · progress ${c.effort.toFixed(0)}/${c.effortTarget.toFixed(0)} · setbacks ${pips(c.failures, c.failureBudget, '✗', '·')} · ${(c.bank || '—')}${c.focal ? ` · ${c.focal}` : ''}${where(c)}`,
+      `${c.id.padEnd(9)} ${c.title.slice(0, 36).padEnd(36)} ${c.state.padEnd(14)} part ${pips(c.part, c.of)} ${c.part}/${c.of} · setbacks ${pips(c.failures, c.failureBudget, '✗', '·')} ${c.failures}/${c.failureBudget} · set aside ${(c.bank || '—')}${where(c)}`,
     ).join('\n') || '(no stories yet — pursue a ✦STORY lead)';
   },
 
   /** the saga as the chronicle shows it (the GUI's Sagas tab, same rows, same order): the quest log as it stands, card
-   *  1, the likely end and the economy, So far, the answer once the finale is played, the people seen */
+   *  1 (set off from the log, as on a card), the likely end — how it ended, once it is over — and the economy, So far,
+   *  the answer once the finale is played, the people seen */
   chainDetail(g: Game, id: string): string {
     const c = g.chainViews().find(x => x.id === id);
     if (!c) return 'no such chain';
+    const log = logLines(c.rows);
     return [
       `═══ ${c.title} ═══ (${c.state})${c.personal ? ' — personal' : ''}`,
-      ...logLines(c.rows),
-      c.card1,
-      `likely end: ${c.likely} · setbacks ${c.failures} of ${c.failureBudget} · set aside ${c.bank || '—'} · progress ${c.effort.toFixed(0)} of ~${c.effortTarget.toFixed(0)}`,
-      'So far:', ...(c.soFar.length ? c.soFar : ['  (nothing played yet)']),
+      ...log,
+      ...(c.card1 ? [...(log.length ? [''] : []), c.card1] : []),
+      `${c.endLine} · setbacks ${c.failures} of ${c.failureBudget} · set aside ${c.bank || '—'}`,
+      'So far:', ...(c.soFar.length ? c.soFar.map(soFarLine) : ['  (nothing played yet)']),
       ...(c.answer ? [`The answer: ${c.answer}`] : []),
       ...(c.people.length ? ['People:', ...c.people.map(p => p.name ? `  ${p.name} — ${p.label}` : `  ${p.label}`)] : []),
-    ].filter(x => x !== '').join('\n');
+    ].join('\n');
   },
 
   lore(g: Game, id: string): string {
@@ -468,7 +490,7 @@ export const render = {
       return Object.values(g.state.lore.nodes).map(n =>
         `${n.id.padEnd(8)} ${(n.active ? '' : '(inactive) ') + n.name.padEnd(24)} ${n.kind.padEnd(9)} ${n.blurb.slice(0, 60)}`).join('\n') || '(empty)';
     }
-    const dossier = g.dossier(id);
+    const dossier = g.dossier(id, { player: true });
     const past = g.chronicle(id).filter(e => !e.active);
     return [
       dossier || 'no such entry',
@@ -523,7 +545,7 @@ export const render = {
       // coins flipped and heads needed are different units ("15c vs 11.5" read as a pass): the
       // engine's strength word is the verdict, as on the GUI sheet
       return `${m.name} — best free place on each quest (coins · strength):\n` + rows
-        .map(r => `  ${r.questId.padEnd(6)} ${r.title.slice(0, 40).padEnd(40)} slot ${r.idx} ${r.attr.padEnd(7)} ${String(r.coins).padStart(3)}c · ${r.strength}${r.here ? ' (here now)' : ''}${r.from ? ` (leaves ${r.from.title})` : ''}`)
+        .map(r => `  ${r.questId.padEnd(6)} ${r.title.slice(0, 40).padEnd(40)} slot ${(q => q ? placeNo(q, r.idx) : r.idx)(g.state.quests.find(x => x.id === r.questId))} ${r.attr.padEnd(7)} ${String(r.coins).padStart(3)}c · ${r.strength}${r.here ? ' (here now)' : ''}${r.from ? ` (leaves ${r.from.title})` : ''}`)
         .join('\n') + `\n  send <qId> ${id} [slot]`;
     }
     // one room, place by place: what a drop on THAT place does (an occupied place swaps — the price)

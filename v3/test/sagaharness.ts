@@ -82,7 +82,7 @@ export async function playSaga(g: Game, chain: Chain, path: LabPath, focal: Card
     const party = partyFor(g, chain, pos.finale);
     const e = pos.finale ? rec.plan!.showdown : rec.plan!.episodes[pos.job - 1]!;
     const ways = pos.finale ? flow.approaches(rec).map(a => a.way) : [];
-    const asks = flow.asks(e.type, party.length, chain.isPersonal, e.people.includes(chain.focalId), ways);
+    const asks = flow.asks(e.type, party.length, chain.isPersonal, !pos.finale && flow.pinsSoldier(rec, pos.job), ways);
     const way = pos.finale ? ways[0] : undefined;
     const tests = pos.finale ? party.map(() => testOf(flow.approaches(rec)[0]!.test)) : party.map((_m, j) => testOf(asks[j % asks.length]!));
     const inn = flow.reportIn(host, chain, pos, out.prose, { outcome, party, tests, gravity: 'a small, everyday job', way, fate: pos.finale ? { fate: outcome === 'success' ? 'clean' : outcome === 'partial' ? 'saddled' : 'slipped', ...(outcome === 'failure' ? { sequelRarity: 'uncommon' as const } : {}) } as never : undefined });

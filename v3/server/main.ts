@@ -251,7 +251,7 @@ function stateView() {
     excavateCost: excavateCost(st.fort.cells.length),
     excavateBlock: game.gold() < excavateCost(st.fort.cells.length) ? `short ${excavateCost(st.fort.cells.length) - game.gold()}g` : null,
     roster: game.roster().map(m => ({
-      ...cardView(m), cap: game.capOf(m.id), dossier: game.dossier(m.id),
+      ...cardView(m), cap: game.capOf(m.id), dossier: game.dossier(m.id, { player: true }),
       healEta: m.character!.injuryTiers > 0 ? game.healEta(m) : null,
       xpNeeded: xpNeeded(m.character!.level),
       // their best FREE place on every open quest: {questId,title,idx,attr,coins,bar,strength,here}
@@ -357,7 +357,7 @@ function stateView() {
     chains: game.chainViews(),
     lore: Object.values(st.lore.nodes).map(n => ({
       id: n.id, name: n.name, kind: n.kind, blurb: n.blurb, active: n.active,
-      dossier: game.dossier(n.id),
+      dossier: game.dossier(n.id, { player: true }),
       // FORT §5 / LORE §5: the FULL history (inactive edges included) is the Chronicle room's
       // exposure; without it the Library shows living memory only
       chronicle: game.menuGates().find(m => m.key === 'chronicle')?.open

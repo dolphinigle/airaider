@@ -129,8 +129,6 @@
 .questpage .pips.sb i.last { box-shadow: inset 0 0 0 1px #9b2f26; }
 .questpage .pips.sb i.hit { background: #c9973f; box-shadow: none; }
 .questpage .pips.sb i.hit.last { background: var(--bad); }
-.questpage .eff { display: inline-block; width: 54px; height: 5px; border-radius: 3px; background: #1d302c; overflow: hidden; }
-.questpage .eff i { display: block; height: 100%; background: #3d8c86; }
 .questpage .meta { font: 400 12px var(--mono); color: var(--text-faint); }
 .writ .body { padding: 12px 26px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; flex: 1; }
 .questpage .sit { font-size: 16.5px; line-height: 1.62; color: #dcd3c1; max-width: 64ch; }

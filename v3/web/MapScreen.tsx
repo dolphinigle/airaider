@@ -4,7 +4,7 @@
 // list, not map markers). Every verdict shown here is the engine's (q.odds.band, fits[].strength,
 // leads[].blocked/onBoard); this file only lays them out.
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { type S, Glyph, glyphOf, activeSlots, gateOf, cap1, clip, shortTitle } from './ui';
+import { type S, Glyph, glyphOf, activeSlots, gateOf, cap1, clip, shortTitle, questKind } from './ui';
 import { BAND_WORD, bandCls, strengthCls, coinBadge, STRENGTH_MARK, type Band } from './band';
 
 // x, y, w, h in % of the map. The forests start right of the home marker (the forest wash is
@@ -404,7 +404,7 @@ function Tip({ s, q, tipRef }: { s: S; q: any; tipRef: React.RefObject<HTMLDivEl
   };
   return (
     <div className="tip" ref={tipRef}>
-      <div className="k">{q.isFinale ? 'Saga finale' : q.chainId ? `Saga · part ${q.saga?.part ?? '?'}` : q.faucet ? 'Standing post' : 'One-off job'} · {q.rarity} · level {q.level} · {q.region}</div>
+      <div className="k">{questKind(q)} · {q.rarity} · level {q.level} · {q.region}</div>
       <div className="t">{q.title}</div>
       <div className="j">{clip(q.job, 220)}</div>
       <div className="rows">

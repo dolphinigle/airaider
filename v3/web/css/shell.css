@@ -168,7 +168,7 @@ kbd.key { display: inline-block; font: 500 11px/14px var(--mono); padding: 0 4px
 .sagacard .card1 { font-style: italic; color: #d8ceb9; }
 .sagacard .sk { display: block; font-weight: 600; color: #ecd9ae; font-size: 14.5px; margin-bottom: 2px; }
 .sagacard .sofar ol { list-style: none; display: flex; flex-direction: column; gap: 4px; }
-.sagacard .sf { display: grid; grid-template-columns: 1.4em 1.4em minmax(0, 1fr); align-items: baseline; font-size: 14px; line-height: 1.5; color: #d8cfbd; }
+.sagacard .sf { display: grid; grid-template-columns: 3.4em 1.4em minmax(0, 1fr); align-items: baseline; font-size: 14px; line-height: 1.5; color: #d8cfbd; }
 .sagacard .sfn { color: #a7aeb5; font: 500 12px var(--mono); }
 .sagacard .sfm { font-weight: 700; text-align: center; }
 .sagacard .sf.success .sfm { color: #8fc285; } .sagacard .sf.partial .sfm { color: #e2b04f; } .sagacard .sf.failure .sfm { color: #d98b80; }

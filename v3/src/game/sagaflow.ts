@@ -104,6 +104,7 @@ export async function plan(host: SagaHost, chain: Chain): Promise<SagaPlan> {
   const r = await planSaga(host.ai, { w: rec.world, avoid, direction: host.direction() }, chain.id, (kind, t) => host.log(kind, t));
   rec.plan = r.plan;
   rec.fallback = r.fallback;
+  rec.ownJobs = r.ownJobs;
   return r.plan;
 }
 
@@ -160,7 +161,7 @@ export async function card(host: SagaHost, chain: Chain): Promise<SagaCardOut> {
     }
   } else prose = await writeCard(host.ai, cc, log);
   // (R4, Q1) the quest log, rendered by the engine from data above the prose
-  const rows = questLog(plan, k, rec.state, roadOf(rec, pos.finale ? w.N : pos.job, !pos.finale && retry), { forLine: !first, open: !first });
+  const rows = questLog(plan, k, rec.state, roadOf(rec, pos.finale ? w.N : pos.job, !pos.finale && retry), { forLine: !first, open: !first }, w.places);
   const shown = `${logLines(rows).join('\n')}\n${prose}`;
   noteDelivered(shown, plan, k, false);
   keepKnowing(rec, k);
@@ -173,12 +174,17 @@ export async function card(host: SagaHost, chain: Chain): Promise<SagaCardOut> {
 // ─── the mechanics the plan's §3 defaults hand the flow ────────────────────────────────────────
 
 const askOf = (t: EpisodeTest, mustBeFocal: boolean): AskSlotOut => ({ attribute: t.attribute, favored: [...t.favored], clashing: [...t.clashing], ...(mustBeFocal ? { mustBeFocal: true } : {}) });
-/** D1: a job's asks from its type (slot i takes option i % 2); a personal saga pins the soldier to slot 0 when they are in
- *  the job's people. The showdown's are its ways' tests, one per way */
+/** D1: a job's asks from its type (slot i takes option i % 2); a personal saga pins the soldier to slot 0 when the job
+ *  stages their own matter in person (`soldierInJob` — the plan's people as written, `pinsSoldier`). The showdown's are its
+ *  ways' tests, one per way */
 export function asks(type: EpisodeType, n: number, personal: boolean, soldierInJob: boolean, ways: Way[] = []): AskSlotOut[] {
   if (type === 'showdown') return ways.map((v, i) => askOf(WAY_TESTS[v], personal && soldierInJob && i === 0));
   return Array.from({ length: n }, (_, i) => askOf(EPISODE_TESTS[type][i % 2]!, personal && soldierInJob && i === 0));
 }
+/** whether job `n` pins a personal saga's soldier to a place: only a job the plan itself put them in (`ownJobs`), never
+ *  one the repair added them to (validatePlan) — before v4 the writer pinned the soldier only when the step staged their
+ *  own matter in person, "in doubt, omit" */
+export const pinsSoldier = (rec: SagaRecord, n: number): boolean => rec.world.personal && (rec.ownJobs ?? []).includes(n);
 /** D2: the finale's approach groups from the plan's ways: the plan's label, the way's reward kind and its test */
 export function approaches(rec: SagaRecord): { id: string; label: string; rewardKind: 'recruit' | 'captive' | 'gold'; way: Way; test: EpisodeTest }[] {
   return planOf(rec).options.map((o, i) => ({ id: `g${i}`, label: o.label, rewardKind: WAY_REWARD[o.way], way: o.way, test: WAY_TESTS[o.way] }));
@@ -233,7 +239,7 @@ export interface AfterReport { status: string; book: string; tried: string }
  *  chain.failures, beatIndex and cyclesSpent are this attempt's. Knowing takes the report (a name read in it is met);
  *  a won middle job banks its learn and gain; the attempt's SagaLine is appended; the setbacks or the stall guard bring
  *  the last chance; `latest` is what the next card opens on. Returns the 📖 line (R5: status, then the summary) */
-export function afterReport(host: SagaHost, chain: Chain, pos: SagaPos, a: { outcome: Outcome; party: Card[]; hurt: Hurt[] }, rep: { before: string; after: string; summary: string }): AfterReport {
+export function afterReport(host: SagaHost, chain: Chain, pos: SagaPos, a: { outcome: Outcome; party: Card[]; hurt: Hurt[]; fate?: string }, rep: { before: string; after: string; summary: string }): AfterReport {
   const rec = recOf(chain), plan = planOf(rec), w = rec.world, N = w.N;
   const e = pos.finale ? plan.showdown : plan.episodes[pos.job - 1]!;
   const k = knowingOf(rec);
@@ -244,6 +250,8 @@ export function afterReport(host: SagaHost, chain: Chain, pos: SagaPos, a: { out
   const failedJob = !pos.finale && a.outcome === 'failure';
   const tried = failedJob ? triedLine(e.job, rep.summary, plan, w) : rep.summary;
   rec.lines.push({ n: pos.finale ? N : pos.job, attempt: rec.lines.length + 1, outcome: a.outcome, party: a.party.map(p => p.name), text: tried, hurt: a.hurt });
+  // how it ended, in the finale's Outcome sentence (sagaFate — every branch settleFinale takes): the views' "ending"
+  if (pos.finale && a.fate) rec.ending = a.fate;
   const wonMiddle = !pos.finale && a.outcome !== 'failure';
   const failures = chain.failures, budget = chain.failureBudget;
   if (!pos.finale) {
@@ -320,11 +328,16 @@ export function sagaFate(x: FateFacts): string {
 
 const LIKELY: Record<string, string> = { recruit: 'they may join the company', captive: 'they may end in your cells', gold: 'their treasure may pay out', talk: "a soldier's past to settle" };
 const MARK: Record<Outcome, string> = { success: '✓', partial: '~', failure: '✗' };
+/** one row of So far, as both UIs print it: `n` is the job's number, or "finale" — the finale is no job number (a skipped
+ *  job left "1, 2, 2, 4") */
+export interface SoFarRow { n: string; mark: string; outcome: Outcome; party: string; text: string; hurt: string }
 export interface Chronicle {
   title: string; state: 'planned' | 'active' | 'done' | 'slipped';
   rows: LogRow[]; card1: string;
-  likely: string; setbacks: { failures: number; budget: number };
+  /** the likely end while the saga is live; `ending` replaces it once the saga is over */
+  likely: string; ending?: string; setbacks: { failures: number; budget: number };
   lines: SagaRecord['lines'];
+  soFar: SoFarRow[];
   /** after the finale only (done or slipped) */
   answer?: string;
   /** the people the player has seen: by name and label once their name was read, else by label */
@@ -340,25 +353,38 @@ export function chronicle(chain: Chain): Chronicle | null {
   // the finale's line: posed at job N (a middle job is always below N)
   const fin = rec.lines.find(l => l.n === N);
   const finale = fin ? (fin.outcome === 'failure' ? 'lost' as const : 'won' as const) : undefined;
-  const rows = questLog(plan, k, rec.state, roadOf(rec, undefined, false, finale), { forLine: true, open: !finale });
+  // a saga let go before its finale (lapsed, or left untaken three times) is over too
+  const gone = !finale && chain.state === 'slipped';
+  // the finale is next (every job won, or the last chance): a job never reached is no longer ahead
+  const at = !finale && !gone && (rec.lastchance || posOf(rec).finale) ? N : undefined;
+  const rows = questLog(plan, k, rec.state, roadOf(rec, at, false, finale), { forLine: true, open: !finale }, rec.world.places);
   return {
-    title: plan.title, state: !rec.lines.length && !rec.card1 ? 'planned' : finale ? (finale === 'lost' ? 'slipped' : 'done') : 'active',
+    title: plan.title, state: !rec.lines.length && !rec.card1 ? 'planned' : finale ? (finale === 'lost' ? 'slipped' : 'done') : gone ? 'slipped' : 'active',
     rows, card1: rec.card1,
-    likely: LIKELY[rec.world.personal ? 'talk' : rec.world.kind]!, setbacks: { failures: chain.failures, budget: chain.failureBudget },
+    likely: LIKELY[rec.world.personal ? 'talk' : rec.world.kind]!,
+    ...(fin ? { ending: rec.ending ?? fin.text } : gone ? { ending: 'it slipped away before its finale' } : {}),
+    setbacks: { failures: chain.failures, budget: chain.failureBudget },
     lines: rec.lines.map(l => ({ ...l, party: [...l.party], hurt: l.hurt.map(h => ({ ...h })) })),
+    soFar: soFarRows(rec.lines, N),
     ...(finale ? { answer: plan.answer } : {}),
     people: plan.cast.filter(p => k.seen.has(p.id)).map(p => k.named.has(p.id) ? { id: p.id, name: p.name, label: p.label.replace(/^an? /, '') } : { id: p.id, label: p.label }),
   };
 }
-/** So far, as the lab printed it: "  n ✓ party — text · X hurt (band)" */
-export const soFarLines = (lines: SagaRecord['lines']): string[] =>
-  lines.map(l => `  ${l.n} ${MARK[l.outcome]} ${l.party.join(', ')} — ${l.text}${l.hurt.length ? ` · ${l.hurt.map(h => `${h.name} hurt (${HOW_BAND[h.how]})`).join(', ')}` : ''}`);
-/** the chronicle as the lab's chain.md printed it (the CLI's chain detail) */
+/** So far's rows (N: the saga's job count, the finale's number) */
+export const soFarRows = (lines: SagaRecord['lines'], N: number): SoFarRow[] => lines.map(l => ({
+  n: l.n >= N ? 'finale' : String(l.n), mark: MARK[l.outcome], outcome: l.outcome, party: l.party.join(', '), text: l.text,
+  hurt: l.hurt.map(h => `${h.name} hurt (${HOW_BAND[h.how]})`).join(', '),
+}));
+/** one So far row as text: "  n ✓ party — text · X hurt (band)" (the lab's line; the finale's n is "finale") */
+export const soFarLine = (r: SoFarRow): string => `  ${r.n} ${r.mark} ${r.party} — ${r.text}${r.hurt ? ` · ${r.hurt}` : ''}`;
+/** the likely end while the saga is live; how it ended once it is over */
+export const endLine = (c: { likely: string; ending?: string }): string => c.ending ? `ending: ${c.ending}` : `likely end: ${c.likely}`;
+/** the chronicle as the lab's chain.md printed it */
 export function chronicleText(c: Chronicle): string[] {
   return [
     `═══ ${c.title} ═══ (${c.state})`, ...logLines(c.rows), c.card1,
-    `likely end: ${c.likely} · setbacks ${c.setbacks.failures} of ${c.setbacks.budget}`,
-    'So far:', ...soFarLines(c.lines),
+    `${endLine(c)} · setbacks ${c.setbacks.failures} of ${c.setbacks.budget}`,
+    'So far:', ...c.soFar.map(soFarLine),
     ...(c.answer ? [`The answer: ${c.answer}`] : []),
     'People:', ...c.people.map(p => p.name ? `  ${p.name} — ${p.label}` : `  ${p.label}`),
   ];

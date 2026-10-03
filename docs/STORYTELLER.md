@@ -526,7 +526,7 @@ Lore schema and dossiers are unchanged. **RC §5 🔒 holds by construction:** m
 > Where these differ from scripts/sagalab at tag storyteller-build-src, the lab code is the spec.
 
 - **`questDetail`:** `episode · saga` title; the card; **no ERRAND on saga quests**; ON THIS MATTER = met/known people (name — label); REWARD; finale `a) <label> → <ending> · <attribute>  ⚠ <warn>` via the GUI's `approachOutcome` and **kept `approachRewardWarn`**.
-- **`chainDetail`:** title, state, pitch, the likely-end/bank/progress/setbacks line, **So far** (`n ✓/~/✗ party text · hurt`), **People**, `next`; `goal:`/`now:`/`known:` go. **`leads`** and the GUI lead list show the new continuation title.
+- **`chainDetail`:** title, state, pitch, the ending (or likely end while live)/bank/setbacks — part n of N, no progress counter line, **So far** (`n ✓/~/✗ party text · hurt`), **People**, `next`; `goal:`/`now:`/`known:` go. **`leads`** and the GUI lead list show the new continuation title.
 - **Reckoning:** the 📖 status line (bank set aside, "it now comes to a head", setbacks) stays, then the summary.
 - **GUI:** QuestPage (no errand row on sagas; ending + warn per button; tooltip at :257 `c.goal` → `c.pitch`), Chronicle (So far, People). `chainViews()` gains `pitch`, `lines`, `people`; drops `goal`, `situation`, `known`, `met`.
 - **`mark`, `lab saga`, `ailog json` are CLI-only by design** (lab tooling).

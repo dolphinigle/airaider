@@ -109,6 +109,8 @@ export function CardSheet({ s, id, cast, doAct, quick, close, openQuest, openRoo
                 <span className="lbl">Their story</span>
                 {ch.backstory && <p className="p">{ch.backstory}</p>}
                 {ch.quirks?.length > 0 && <p className="p quirk">{ch.quirks.join(' · ')}</p>}
+                {/* a memory of their own (a saga they came through) — the CLI's dossier prints the same lines */}
+                {ownMemories(c.dossier).map((t, i) => <p className="p" key={'m' + i}>{t}</p>)}
               </div>
               <div className="blk">
                 <span className="lbl">Bonds</span>
@@ -265,6 +267,10 @@ function Cash({ label, loss, onGo }: { label: string; loss: string | null; onGo:
   return <ConfirmButton className="btn" label={label} armedLabel={`${label} — ${loss}?`} onConfirm={onGo} />;
 }
 
+/** the dossier's memories of their own (no other party: "- came through …") */
+function ownMemories(dossier: string): string[] {
+  return (dossier ?? '').split('\n').filter(l => l.startsWith('- ') && !/^- .+? \([^)]+\) — /.test(l)).map(l => l.slice(2).replace(/ \(defining memory\)$/, ''));
+}
 /** the dossier's relationship lines → bonds */
 function bonds(dossier: string, self: string): { name: string; rel: string; text: string }[] {
   return (dossier ?? '').split('\n').map(l => l.match(/^- (.+?) \(([^)]+)\) — (.*)$/)).filter(Boolean)

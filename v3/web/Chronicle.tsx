@@ -35,11 +35,10 @@ function SagaNext({ c, openQuest, openLeads }: { c: any; openQuest?: (id: string
     : <span className="sagago idle">{c.next}</span>;
 }
 
-const SO_FAR_MARK: Record<string, string> = { success: '✓', partial: '~', failure: '✗' };
-const HURT_BAND: Record<string, string> = { lightly: 'light', badly: 'serious', gravely: 'grave' };
 /** the sagas as the chronicle shows them (Game.chainViews — the CLI's `chain <id>` prints the same, in this order):
- *  the quest log as it stands, card 1, the likely end and the economy, So far, the answer once the finale is played,
- *  the people the player has seen (by name only once their name was read) */
+ *  the quest log as it stands, card 1, the likely end (how it ended, once over) and the economy, So far (the engine's
+ *  rows: the job's number or "finale", the mark, the party, the line, who was hurt), the answer once the finale is
+ *  played, the people the player has seen (by name only once their name was read) */
 function Chains({ s, openQuest, openLeads }: { s: S; openQuest?: (id: string) => void; openLeads?: () => void }) {
   if (!s.chains.length) return <p className="empty">No sagas yet — pursue a lead marked “new saga”.</p>;
   // live sagas first (newest first within each), as the CLI lists them
@@ -50,14 +49,14 @@ function Chains({ s, openQuest, openLeads }: { s: S; openQuest?: (id: string) =>
       {c.live && <SagaNext c={c} openQuest={openQuest} openLeads={openLeads} />}
       <QuestLog rows={c.rows} />
       {c.card1 && <p className="p card1">{c.card1}</p>}
-      <div className="meta"><span>likely end: {c.likely}</span><span>set aside: {c.bank || '—'}</span><span>progress {Math.round(c.effort)} / ~{Math.round(c.effortTarget)}</span><span>setbacks {c.failures} / {c.failureBudget}</span></div>
+      <div className="meta"><span>{c.endLine}</span><span>set aside: {c.bank || '—'}</span><span>setbacks {c.failures} / {c.failureBudget}</span></div>
       <div className="sofar">
         <span className="sk">So far</span>
-        {(c.lines ?? []).length === 0 ? <p className="p dimp">Nothing played yet.</p>
-          : <ol>{c.lines.map((l: any, i: number) => (
-            <li key={i} className={'sf ' + l.outcome}>
-              <span className="sfn">{l.n}</span><span className="sfm" role="img" aria-label={l.outcome}>{SO_FAR_MARK[l.outcome] ?? '·'}</span>
-              <span className="sft"><b>{l.party.join(', ')}</b> — {l.text}{l.hurt?.length > 0 && <span className="sfh"> · {l.hurt.map((h: any) => `${h.name} hurt (${HURT_BAND[h.how] ?? h.how})`).join(', ')}</span>}</span>
+        {(c.soFar ?? []).length === 0 ? <p className="p dimp">Nothing played yet.</p>
+          : <ol>{c.soFar.map((r: any, i: number) => (
+            <li key={i} className={'sf ' + r.outcome}>
+              <span className="sfn">{r.n}</span><span className="sfm" role="img" aria-label={r.outcome}>{r.mark}</span>
+              <span className="sft"><b>{r.party}</b> — {r.text}{r.hurt && <span className="sfh"> · {r.hurt}</span>}</span>
             </li>))}</ol>}
       </div>
       {c.answer && <p className="p answer"><b>The answer:</b> {c.answer}</p>}
@@ -242,7 +241,8 @@ function Tally({ sum, openRoom, openCard, openLeads, openHolding, cardExists, ro
   if (sum.leadsCold?.length) chips.push({ k: 'q', text: `${sum.leadsCold.length} lead${sum.leadsCold.length === 1 ? '' : 's'} lost`, tone: 'bad', title: sum.leadsCold.join(' · ') });
   // the losses the tally used to fold into gold: captives handed off, debts taken on, saga setbacks
   if (sum.handedOff?.length) chips.push({ k: 'h', text: `⛓ ${names(sum.handedOff)} handed off`, tone: 'bad', title: sum.handedOff.map((h: any) => `${h.name} +${h.gold}g`).join(' · ') });
-  for (const d of sum.debts ?? []) chips.push({ k: 'd' + d.id, text: `⚠ ${d.amount}g debt`, tone: 'bad', go: card(d.id), title: 'a debt draws collectors until it is settled' });
+  // the engine's words (Game.debtText — the CLI tally prints the same); an archive older than them keeps its old chip
+  for (const d of sum.debts ?? []) chips.push({ k: 'd' + d.id, text: d.text ?? `⚠ ${d.amount}g debt`, tone: 'bad', go: card(d.id), title: 'unsettled, it draws collectors — settle it from its card' });
   for (const b of sum.setbacks ?? []) chips.push({ k: 'b' + b.chainId, text: `✗ setback ${b.failures}/${b.budget}`, tone: 'bad', title: b.title });
   const o = sum.outcomes ?? {};
   const marched = [o.success && `${o.success} success`, o.partial && `${o.partial} partial`, o.failure && `${o.failure} failed`].filter(Boolean).join(' · ');
