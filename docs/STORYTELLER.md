@@ -124,6 +124,8 @@ Novel prose (~4 style rules is the cheap-model ceiling) · economy and finale me
 
 ## 2. Architecture
 
+> Where these differ from scripts/sagalab at tag storyteller-build-src, the lab code is the spec.
+
 ### 2.1 Calls
 
 | call | when | model · effort | returns | replaces |
@@ -465,6 +467,8 @@ Voiced = shipped `CARD_VARIANT=dlg` (+1 serious/grave). The reward `person` is e
 ## 3. What the player reads
 
 ### 3.1 Shapes
+> Where these differ from scripts/sagalab at tag storyteller-build-src, the lab code is the spec.
+
 Cards run ≤ 70 words (finale ≤ 80) in the prompts' order and end on the open question (the finale on the choice, then buttons "label → ending" with any warning; a re-post opens on the setback). Reports: before · 🎲 · after · 📖 status line + summary. **No ERRAND line under a saga card:** the card states the job (card 1 must, for M1), so ERRAND is the duplicate C's probe printed ("Guard the lane to Low Ferring." twice); a job atom would only make it a paraphrase. `q.job` still feeds the report and the map hover gist; one-offs keep ERRAND until Phase 4. Touches QUESTS 2026-07-06 (a) (R1).
 
 ### 3.2 A saga, imagined. HAND-WRITTEN, not model output
@@ -519,6 +523,8 @@ The designer: *"just delete all saves"*. When v4 ships, `saves/` is cleared and 
 Lore schema and dossiers are unchanged. **RC §5 🔒 holds by construction:** memory is dealt at first appearance with "Say it when they come in" (RC §10b; dealt at genesis it reached the page 0 of 21 times). The slip sequel reuses the focal; lore promotion, approaches, `chooseApproach`, the canned-trio fallback, bank, side-loot, debt/void, `settleFinale` dispositions and REWARD are unchanged.
 
 ### 4.3 Text UI parity (same commit as the GUI)
+> Where these differ from scripts/sagalab at tag storyteller-build-src, the lab code is the spec.
+
 - **`questDetail`:** `episode · saga` title; the card; **no ERRAND on saga quests**; ON THIS MATTER = met/known people (name — label); REWARD; finale `a) <label> → <ending> · <attribute>  ⚠ <warn>` via the GUI's `approachOutcome` and **kept `approachRewardWarn`**.
 - **`chainDetail`:** title, state, pitch, the likely-end/bank/progress/setbacks line, **So far** (`n ✓/~/✗ party text · hurt`), **People**, `next`; `goal:`/`now:`/`known:` go. **`leads`** and the GUI lead list show the new continuation title.
 - **Reckoning:** the 📖 status line (bank set aside, "it now comes to a head", setbacks) stays, then the summary.

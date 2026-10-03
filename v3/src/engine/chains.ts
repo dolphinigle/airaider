@@ -9,6 +9,7 @@ import {
 } from './economy.js';
 import type { Outcome } from './roll.js';
 import type { ChainLab } from './lab.js';
+import type { SagaRecord } from './saga.js';
 
 export interface BibleCastEntry { name: string; trade?: string; who: string; want: string; role: string; loreId?: string }
 
@@ -67,6 +68,9 @@ export interface Chain {
   createdCycle: number;
   /** SAGA LAB only (docs/STORYTELLER.md §5.0): the fixture and its forced rolls — absent in play */
   lab?: ChainLab;
+  /** the v4 storyteller's record (docs/STORYTELLER.md; Phase 2): world, plan, Knowing, road, lines. Unset until the saga
+   *  flow is wired into the game (Step 5a); `bible` and `story` stay until Step 5b */
+  saga?: SagaRecord;
 }
 
 export const TWIST_CHANCE = 0.30;

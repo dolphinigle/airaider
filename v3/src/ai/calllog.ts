@@ -10,7 +10,9 @@ export interface CallLogLine {
   t: string;                 // ISO time the call settled
   provider: 'openai' | 'claude' | 'mock';
   n: number;                 // the provider's call ordinal
-  purpose: string;           // writeQuest / genesis / resolve / flesh / select / themeRoll / review / direction
+  purpose: string;           // writeQuest / genesis / resolve / flesh / select / themeRoll / review / direction / plan / outline / card / report
+  template?: string;         // a saga call (v4 storyteller): its template — mech.ts and drive.ts read real game runs by it
+  flags?: string[];          // a saga call: the template flags, sorted
   model: string;
   effort?: string;
   durationMs: number;

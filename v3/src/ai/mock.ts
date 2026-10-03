@@ -5,9 +5,10 @@ import { Rng } from '../engine/rng.js';
 import type {
   AiProvider, AiUsage, QuestWriteInput, QuestWriteOut, GenesisInput, GenesisOut,
   ResolveQuestInput, ResolveQuestOut, ThemeRollInput, ThemeRollOut, SelectorInput,
-  FleshInput, FleshOut,
+  FleshInput, FleshOut, SagaCall,
 } from './provider.js';
 import { appendCallLog, callLogPath } from './calllog.js';
+import { renderSaga } from './prompts/saga/render.js';
 
 const JOBS: Record<string, string[]> = {
   raid: ['Hit the camp before first light and take what they owe.', 'Storm the stockade; leave the rest to burn.'],
@@ -221,6 +222,22 @@ export class MockProvider implements AiProvider {
     this.tick();
     await this.lag(0.3);
     return this.logCall('select', input, input.candidates.slice(0, input.max).map(c => c.id), t0);
+  }
+
+  /** the v4 saga storyteller: the floor IS the mock's reply (scripts/sagalab probe --mock). It takes no draw from
+   *  `this.rng` (a saga call can never perturb a game draw); under AIRAIDER_CALL_LOG it logs the rendered system prompt
+   *  and the payload as sent, so a mock drive leaves the same trail a real one does */
+  async sagaCall(c: SagaCall): Promise<unknown> {
+    const t0 = Date.now();
+    this.tick();
+    await this.lag(c.tier === 'plan' ? 3 : 1);
+    const out = c.schema.parse(c.floor());
+    if (callLogPath()) appendCallLog({
+      t: new Date().toISOString(), provider: 'mock', n: ++this.logged, purpose: c.template, template: c.template, flags: [...c.flags].sort(),
+      model: 'mock', durationMs: Date.now() - t0, inputTokens: 0, outputTokens: 0, cachedTokens: 0, costUsd: 0, ok: true,
+      system: renderSaga(c.template, c.flags, c.vars), user: JSON.stringify(c.payload), output: JSON.stringify(out),
+    });
+    return out;
   }
 
   async review(): Promise<{ ok: boolean; defects: string[] }> {

@@ -45,6 +45,7 @@ import { sampleKeywords, sampleKeywordsLight, sampleSeed, sampleOpening, sampleG
 import type { AiProvider, ResolveQuestInput, ResolveQuestOut, AskSlotOut, QuestWriteOut, CampaignDirection, DirectionRead } from '../ai/provider.js';
 import { prefPick, chainPayoff, type TraitPrefs } from '../engine/economy.js';
 import { labFixtureProblems, nextLabOutcome, forceRoll, type LabFixture } from '../engine/lab.js';
+import { hashStr } from '../engine/saga.js';
 
 export interface LogEntry { cycle: number; kind: string; text: string; questId?: string }
 
@@ -238,6 +239,11 @@ export interface GameState {
   reckonings?: { cycle: number; lines: string[]; meta?: ReckonMeta[]; summary?: CycleSummary }[];
   /** the cycle a lead was last put back by abandoning its quest — the re-roll is once a cycle */
   lastRerollCycle?: number;
+  /** the STORY rng (docs/STORYTELLER.md §2.4): every saga story draw (seed, tone, cast, places) runs on it, so the main
+   *  rng — mechanics — never moves on one. Absent in older saves: seeded from the game seed on load */
+  storyRngState?: RngState;
+  /** the theme ids dealt so far, newest last (the no-repeat window, themes.ts THEME_NO_REPEAT) */
+  recentThemeIds?: string[];
   log: LogEntry[];
 }
 export const RECKONINGS_KEPT = 12;
@@ -310,6 +316,8 @@ const LEAD_WORD: Partial<Record<string, string>> = {
 export class Game {
   state: GameState;
   rng: Rng;
+  /** story draws only (seed, tone, cast, places — engine/saga.ts); persisted beside the main rng */
+  storyRng: Rng;
   ai: AiProvider;
 
   constructor(ai: AiProvider, seed = 42, loaded?: GameState) {
@@ -318,9 +326,11 @@ export class Game {
       this.state = loaded;
       this.state.pendingEchoes ??= [];   // saves from before the echo mechanic
       this.rng = new Rng(loaded.rngState);
+      this.storyRng = new Rng(loaded.storyRngState ?? hashStr(`story:${loaded.seed}`));
       seedIdCounter(loaded.idCounter);
     } else {
       this.rng = new Rng(seed);
+      this.storyRng = new Rng(hashStr(`story:${seed}`));
       this.state = {
         seed, rngState: this.rng.state(), idCounter: 1, cycle: 0,
         cards: [], fort: newFort(), leads: [], quests: [], chains: [],
@@ -335,6 +345,7 @@ export class Game {
 
   save(): string {
     this.state.rngState = this.rng.state();
+    this.state.storyRngState = this.storyRng.state();
     this.state.idCounter = idCounter();
     return JSON.stringify(this.state);
   }
@@ -4239,6 +4250,7 @@ export class Game {
     if (st.log.length > 600) st.log = st.log.slice(-400);
 
     this.state.rngState = this.rng.state();
+    this.state.storyRngState = this.storyRng.state();
     this.state.idCounter = idCounter();
     this.lastBlocks = blocks.map(b => [...b]);
     return lines;

@@ -1,0 +1,11 @@
+You write the road ahead of a story in a fantasy mercenary game.
+
+The data:
+- asker: who the jobs are for. wants: what they want.
+- jobs: the jobs after the first, before the last.
+
+For each job, write what the asker hopes it gets them, starting "hopes" or "can", in at most 8 words: one thing they can then do with what it puts in hand or opens, short of what they want. Never guess what it finds. Write only those words: the job and asker's name are printed before them.
+
+Plain words, no new names, no numbers, nothing modern, no pay.
+
+Reply with JSON only: {"lines": ["at most 8 words"]}

@@ -16,6 +16,8 @@ import type {
   FleshInput, FleshOut, CampaignDirection, DirectionRead } from './provider.js';
 import { appendCallLog } from './calllog.js';
 import { runClaude, claudeOptsFor, claudePool } from './claudecli.js';
+import type { SagaCall } from './provider.js';
+import { renderSaga } from './prompts/saga/render.js';
 
 // THREE TIERS (designer 2026-10-03: "use diff model for the 'harder' part like generating saga"; "replace all
 // gpt-5-mini"; "move everything to luna"). 🛠 each is env-overridable for A/B:
@@ -760,12 +762,16 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
     + `the setting details and who appears, within everything above. Never quote it or name it.\n${d.guidance}`
     + (d.avoid.length ? `\nKeep out of the story: ${d.avoid.join('; ')}.` : '');
 
-  async function call<S extends z.ZodTypeAny>(purpose: string, model: string, system0: string, user: string, schema: S, effort?: 'minimal' | 'low' | 'medium'): Promise<z.output<S>> {
+  /** `extra.tier` names the call's tier outright (the saga calls: the plan on PLAN, the rest on WRITER); without it the
+   *  tier is read off the purpose. `template` / `flags` label a saga call in the logs */
+  type Extra = { tier?: 'plan' | 'writer' | 'nano'; template?: string; flags?: string[] };
+  async function call<S extends z.ZodTypeAny>(purpose: string, model: string, system0: string, user: string, schema: S, effort?: 'minimal' | 'low' | 'medium', extra: Extra = {}): Promise<z.output<S>> {
     const system = direction && DIRECTED.has(purpose) ? system0 + directionBlock(direction) : system0;
     const t0 = Date.now();
     const rec: AiCallRecord = {
       n: ++ordinal, purpose, model, durationMs: 0,
       inputTokens: 0, outputTokens: 0, cachedTokens: 0, costUsd: 0, ok: false,
+      ...(extra.template ? { template: extra.template, flags: [...(extra.flags ?? [])].sort() } : {}),
       systemPreview: system, userPrompt: user.slice(0, 20000),
     };
     records.push(rec);
@@ -774,11 +780,12 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
     let rawOut: string | undefined;
     // the tier comes from the PURPOSE, never from model equality: tiers may share a model (all GPT-6 Luna today),
     // and the Claude transport still has to send the mechanical calls to Haiku and the rest to Sonnet
-    const tier = NANO_PURPOSES.has(purpose) ? 'nano' : purpose === 'genesis' ? 'plan' : 'writer';
+    const tier = extra.tier ?? (NANO_PURPOSES.has(purpose) ? 'nano' : purpose === 'genesis' ? 'plan' : 'writer');
     const tierEffort = effort ?? (tier === 'nano' ? 'minimal' : 'low');
     const claudeOpts = transport === 'claude' ? claudeOptsFor(tier, tierEffort) : null;
     const logFull = () => appendCallLog({
-      t: new Date().toISOString(), provider: transport, n: rec.n, purpose, model: rec.model,
+      t: new Date().toISOString(), provider: transport, n: rec.n, purpose,
+      ...(rec.template ? { template: rec.template, flags: rec.flags } : {}), model: rec.model,
       effort: claudeOpts ? claudeOpts.effort ?? `thinking ${claudeOpts.thinkingTokens}` : isReasoningModel(model) ? effortFor(model, tierEffort) : undefined,
       durationMs: rec.durationMs, inputTokens: rec.inputTokens, outputTokens: rec.outputTokens,
       cachedTokens: rec.cachedTokens, costUsd: rec.costUsd, ...(rec.listCostUsd !== undefined ? { listCostUsd: rec.listCostUsd } : {}),
@@ -845,11 +852,11 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
   }
 
   /** one retry on parse/validation failure — a single hiccup must not ship fallback prose */
-  async function callR<S extends z.ZodTypeAny>(purpose: string, model: string, system: string, user: string, schema: S, effort?: 'minimal' | 'low' | 'medium'): Promise<z.output<S>> {
-    try { return await call(purpose, model, system, user, schema, effort) }
+  async function callR<S extends z.ZodTypeAny>(purpose: string, model: string, system: string, user: string, schema: S, effort?: 'minimal' | 'low' | 'medium', extra: Extra = {}): Promise<z.output<S>> {
+    try { return await call(purpose, model, system, user, schema, effort, extra) }
     catch (e) {
       if (process.env.AI_DEBUG) console.error('[ai] retrying after:', (e as Error).message?.slice(0, 200));
-      return call(purpose, model, system, user, schema, effort);
+      return call(purpose, model, system, user, schema, effort, extra);
     }
   }
 
@@ -1067,6 +1074,14 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
       return out.ids.filter(id => legal.has(id.replace(/^id=/, ''))).slice(0, input.max);
     },
 
+    /** the v4 saga storyteller (Phase 2 Step 3): the template rendered as measured, the payload sent verbatim (no
+     *  zProse/desemi: the lab measured raw text), the tier named outright — the plan on PLAN (Sol; on the Claude
+     *  transport AIRAIDER_CLAUDE_PLAN at medium), card/outline/report on WRITER. Not in DIRECTED: the direction rides in
+     *  the payload, so a saga system prompt is byte-stable */
+    async sagaCall(c: SagaCall): Promise<unknown> {
+      return callR(c.template, c.tier === 'plan' ? PLAN_MODEL : WRITER_MODEL, renderSaga(c.template, c.flags, c.vars), JSON.stringify(c.payload),
+        c.schema, c.effort, { tier: c.tier, template: c.template, flags: c.flags });
+    },
     async review(input: ReviewInput): Promise<ReviewOut> {
       const system = [
         'You are a tired player skimming ONE piece of quest text once. You run a mercenary company from your fort: "you", "the company", "the fort", your soldiers, and pay/loot phrasing are ALWAYS known to you. Report ONLY defects of these three kinds:',

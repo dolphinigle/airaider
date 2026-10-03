@@ -4,6 +4,9 @@
 // 3-producer discipline (GAME_STATE §2): creative outputs are persisted by the caller;
 // picker outputs (the selector) are discarded after use.
 
+import type { z } from 'zod';
+import type { SagaTemplate } from './prompts/saga/render.js';
+
 export interface AskSlotOut {
   attribute: string;             // primary tested attribute (engine validates)
   extraAttribute?: string | null; // optional 2nd (multi-stat)
@@ -226,10 +229,28 @@ export interface AiUsage {
   listCostUsd?: number;          // claude transport only: what it would have cost at API list price (information)
 }
 
+// ---- ⑥ the v4 saga storyteller (docs/STORYTELLER.md; Phase 2 Step 3) ---------------------------
+
+/** ONE template-keyed call for every saga text (plan · outline · card · report). The engine builds the payload and the
+ *  template flags (src/ai/storyteller.ts); the provider renders the template, sends the payload verbatim as the user
+ *  message and returns the schema-parsed JSON. The player's direction rides in the payload (§2.8.5), never in the
+ *  system prompt, so a saga system prompt is byte-stable per flag set */
+export interface SagaCall {
+  template: SagaTemplate; flags: string[]; vars: Record<string, number>;
+  payload: Record<string, unknown>;
+  /** which model tier: the plan call is the hardest (PLAN), everything the player reads is the WRITER's */
+  tier: 'plan' | 'writer'; effort: 'low' | 'medium';
+  schema: z.ZodTypeAny;
+  /** the floor's reply: the mock answers with it; the caller falls back to it. Never sent */
+  floor: () => unknown;
+}
+
 /** one record per AI call — the GUI's ai-log tab and the debugging trail */
 export interface AiCallRecord {
   n: number;                 // call ordinal
   purpose: string;           // writeQuest / genesis / resolve / flesh / themeRoll / select
+  template?: string;         // a saga call: its template (plan / outline / card / report)
+  flags?: string[];          // a saga call: the template flags it rendered with
   model: string;
   durationMs: number;
   inputTokens: number;
@@ -275,6 +296,8 @@ export interface AiProvider {
   flesh(inputs: FleshInput[]): Promise<FleshOut[]>;                  // ONE batched call
   themeRoll(input: ThemeRollInput): Promise<ThemeRollOut>;
   select(input: SelectorInput): Promise<string[]>;
+  /** the v4 saga storyteller's one call: schema-parsed JSON; throws on a transport failure (after the one retry) */
+  sagaCall(c: SagaCall): Promise<unknown>;
   /** cold-reader gate: a zero-context read of one player-facing text — the defects it returns
    *  feed ONE guided rewrite (the judge-loop plateau traced to ~1-2 unparseable/ungrounded
    *  sentences per chain, each capping a chain's readability) */
