@@ -10,6 +10,23 @@ Once signed, this is the saga spec and wins over the sections in §4.6, whose **
 
 🔒 locked once ruled · 🛠 tunable · 🟡 open · ⏳ awaiting a ruling.
 
+## ★ NORTH STAR — read this before every round (designer, recorded 2026-10-03 so it cannot drift)
+
+> *"i want you to record and not forget/drift of the overall goal. if you plateau you can save that state. if you want to keep trying (you probably should) you should do bigger changes then like the earlier experiment with changing how the saga works."*
+
+1. **THE GOAL:** a WORKING saga storyteller that a player can **FOLLOW** (first — who wants what, what to do, who is in the way, what happened, why each job leads to the next) and that is **INTERESTING** (second — the player wants the next part). Not novel-grade prose: plain, readable game writing. Repetition comes last and is fixed later by seed content (the dealt seed slot, §D), never by redesign.
+2. **HOW WE KNOW:** blind whole-saga pairs (J3: *rather keep playing* / *follow more easily*, both orders, held-in-both-orders rule) against the best checkpoint, plus J1/J2 (M1, M5, M2, M3). A round that wins a sub-metric but loses the whole-saga pair has not moved the goal.
+3. **MODEL POLICY:** production = GPT (cheap; GPT-6 Luna leads — beat gpt-5-mini blind at ¼ the cost, `scripts/sagalab/modelcmp/RESULT4.md`); the designer's playtests run free on the Claude subscription (`AIRAIDER_AI=claude`, `docs/AI_PROVIDER.md` §6.1); the lab writer is Sonnet until the structure is right; GPT optimisation comes at the Steam stretch.
+4. **PLATEAU RULE:** when two rounds in a row fail to beat the best checkpoint on the whole-saga pair, SAVE the state (tag + table below) and make a BIGGER change to how the saga works — not another wording pass.
+5. **CHECKPOINTS** (git tags; reports in `v3/scripts/sagalab/reports/`):
+
+| tag | commit | best at | whole-saga pair |
+|---|---|---|---|
+| `storyteller-best-keep-r3` | b2c3e58 | want-the-next-part (keep) | the incumbent: R4 lost to it 15–33 / 13–35; R5 lost keep 16–32 but won follow 32–16 |
+| `storyteller-best-follow-r5` | fb7556e | followability (quest log + scene cards, answer first, why as a hope) | follow 32–16 over R3 (held 15–7) |
+
+6. **WHAT IS MEASURED SO FAR (class laws):** (a) the model matters most — Sonnet out-writes gpt-5-mini on identical prompts (plans 7.8 vs 3.7); (b) every field the writer gets as its own labelled item becomes its own stock sentence — rewording only moves the stamp, so bookkeeping belongs in an engine-rendered quest log; (c) a written sequence outline ("road ahead", each job with its "so…") is the biggest single followability win (95–0–7) — but only when written from the story's own plan, never by a call blind to it (detour jobs) and never from hindsight text (spoilers); (d) the answer must be written FIRST so the clues can point at it; (e) the job→want link in a mystery is the information the job promises, phrased as a hope, never as a fact; (f) a rule that forces the answer to fit every ending (the gold way) makes stock "buried hoard" answers.
+
 ## D. The designer's answers (2026-10-01) — they amend everything below
 
 > **PRIORITY (designer, 2026-10-01): *"key and most important point is followable though. repetition is almost acceptable as long as its followable. pls dont forget the previous one were not even followable or even easily readable."***
