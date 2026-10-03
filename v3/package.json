@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Airaider prototype v3 — AI-driven character-collection fort game. Shared engine core; text CLI (dogfooding) + web GUI.",
+  "description": "Airaider prototype v3 \u2014 AI-driven character-collection fort game. Shared engine core; text CLI (dogfooding) + web GUI.",
   "scripts": {
     "cli": "tsx cli/main.ts",
     "server": "tsx server/main.ts",
@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit",
     "gui:ai": "AIRAIDER_AI=openai concurrently -k -n server,web -c blue,magenta \"npm run server\" \"npm run web\"",
     "gui:claude": "AIRAIDER_AI=claude concurrently -k -n server,web -c blue,magenta \"npm run server\" \"npm run web\"",
+    "gui:sonnet": "AIRAIDER_AI=sonnet concurrently -k -n server,web -c blue,magenta \"npm run server\" \"npm run web\"",
     "fresh": "rm -rf saves"
   },
   "dependencies": {

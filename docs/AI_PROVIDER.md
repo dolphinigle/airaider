@@ -117,6 +117,20 @@ For the production game, organize OpenAI calls by purpose. The gpt-5 family (rel
 
 `gpt-5-nano` is the cheapest reliable option. `gpt-4o-mini` (older default) is 12× more expensive than gpt-5-nano on input. Never use it.
 
+### Three tiers as wired (designer 2026-10-03) — supersedes the two-tier table below
+
+| Tier | Default (OpenAI) | Env | Used by | Claude transport |
+|---|---|---|---|---|
+| **plan** — the hardest call, once per saga | `gpt-6-sol` ($2 / $10) | `AIRAIDER_PLAN_MODEL` | saga genesis (and the v4 plan call when it ships) | `AIRAIDER_CLAUDE_PLAN` (default = the writer) |
+| **writer** — everything the player reads | `gpt-6-luna` ($0.10 / $0.50) | `AIRAIDER_WRITER_MODEL` | quest cards, reports, flesh, direction | `AIRAIDER_CLAUDE_WRITER` (sonnet) |
+| **nano** — mechanical (ids, picks) | `gpt-5-nano` ($0.05 / $0.40) | `AIRAIDER_NANO_MODEL` | themeRoll, select | `AIRAIDER_CLAUDE_NANO` (haiku) |
+
+GPT-6 Luna beat gpt-5-mini blind on the same storyteller prompts at ¼ the cost (`v3/scripts/sagalab/modelcmp/RESULT4.md`);
+gpt-5-nano stays because it is still cheaper than Luna. GPT-6 has no `minimal` effort — it is sent as `low`. Measured on a
+2-cycle CLI run (2026-10-03): genesis on Sol 34 s / $0.032; Luna writes ~7 s / ~$0.0005 each. **Known Luna gap:** one voiced
+one-off card came back as the bracket alone (`"situation": "[a tenant farmer]"`) — the prompts were tuned on gpt-5-mini;
+Luna tuning belongs to the Steam stretch.
+
 ### Narrative-vs-mechanical tier split (production wiring)
 
 The prototype runs one model (`AIRAIDER_LLM_MODEL`, default `gpt-5-mini`) for every callsite. Production should split into two tiers — narrative (player reads it) gets a stronger model; mechanical (engine consumes IDs) gets the cheapest model that can follow JSON schema.
@@ -262,6 +276,7 @@ edit made for Sonnet (measured on a 15-cycle Sonnet run vs the gpt-5-mini lab ba
 | (today) | Use strict JSON Schema with embedded narrative field | Best balance of validation rigor and storytelling flexibility |
 | (today) | Build thin provider abstraction, skip LiteLLM | Avoid premature framework adoption |
 | 2026-10-02 | Ship a Claude *playtest transport* (`AIRAIDER_AI=claude` / `--claude`): the same prompts via the headless Claude CLI on the subscription (§6.1) | Designer: "the goal isn't production — production will use gpt since it's a LOT cheaper. It's so that my testings are free … At the final stretch (Steam / monetization) we optimize for gpt-5." |
+| 2026-10-03 | Three tiers: **plan = GPT-6 Sol** (saga genesis), **writer = GPT-6 Luna** (replaces gpt-5-mini everywhere), **nano = gpt-5-nano** (kept: cheaper than Luna). `AIRAIDER_AI=sonnet` / `--sonnet` / `npm run gui:sonnet` name the Claude transport | Designer: "replace all gpt-5-mini … if its cheaper might as well replace nano with it too"; "can we use like before where we use diff model for the 'harder' part like generating saga"; "do implement ai=sonnet option" |
 
 ---
 

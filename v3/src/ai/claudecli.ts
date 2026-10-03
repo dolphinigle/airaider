@@ -231,8 +231,9 @@ export function runClaude(system: string, user: string, o: ClaudeCallOpts): Prom
 /** the game's two tiers on the subscription: WRITER (prose) → Sonnet at the tier's effort; NANO (the
  *  mechanical picker/theme tier) → Haiku with thinking off. Haiku 4.5 ignores --effort, so a Haiku
  *  model is bounded by a thinking budget instead (unbounded it spent 15k tokens / 150 s on one plan) */
-export function claudeOptsFor(tier: 'writer' | 'nano', effort: 'minimal' | 'low' | 'medium'): ClaudeCallOpts {
-  const model = tier === 'nano' ? process.env.AIRAIDER_CLAUDE_NANO || 'haiku' : process.env.AIRAIDER_CLAUDE_WRITER || 'sonnet';
+export function claudeOptsFor(tier: 'plan' | 'writer' | 'nano', effort: 'minimal' | 'low' | 'medium'): ClaudeCallOpts {
+  const writer = process.env.AIRAIDER_CLAUDE_WRITER || 'sonnet';
+  const model = tier === 'nano' ? process.env.AIRAIDER_CLAUDE_NANO || 'haiku' : tier === 'plan' ? process.env.AIRAIDER_CLAUDE_PLAN || writer : writer;
   if (/haiku/i.test(model)) return { model, thinkingTokens: tier === 'nano' ? 0 : effort === 'medium' ? 4000 : 1024 };
   return { model, effort: effort === 'medium' ? 'medium' : 'low' };
 }

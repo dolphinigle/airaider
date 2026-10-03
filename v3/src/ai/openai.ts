@@ -17,10 +17,27 @@ import type {
 import { appendCallLog } from './calllog.js';
 import { runClaude, claudeOptsFor, claudePool } from './claudecli.js';
 
-// 🛠 lab-overridable (model A/B, e.g. AIRAIDER_WRITER_MODEL=gpt-5.4-nano)
-const WRITER_MODEL = process.env.AIRAIDER_WRITER_MODEL || 'gpt-5-mini';
+// THREE TIERS (designer 2026-10-03: "use diff model for the 'harder' part like generating saga"; "replace all
+// gpt-5-mini"; nano stays only while it is cheaper). 🛠 each is env-overridable for A/B:
+//   PLAN   — the saga's genesis, the hardest call (once per saga): GPT-6 Sol
+//   WRITER — everything the player reads (cards, reports, flesh): GPT-6 Luna — beat gpt-5-mini blind at ¼ the
+//            cost on the same prompts (scripts/sagalab/modelcmp/RESULT4.md)
+//   NANO   — the mechanical tier (ids, picks): gpt-5-nano, still cheaper than Luna
+const PLAN_MODEL = process.env.AIRAIDER_PLAN_MODEL || 'gpt-6-sol';
+const WRITER_MODEL = process.env.AIRAIDER_WRITER_MODEL || 'gpt-6-luna';
 const NANO_MODEL = process.env.AIRAIDER_NANO_MODEL || 'gpt-5-nano';
-export const OPENAI_MODELS = { writer: WRITER_MODEL, nano: NANO_MODEL };
+export const OPENAI_MODELS = { plan: PLAN_MODEL, writer: WRITER_MODEL, nano: NANO_MODEL };
+/** list price per 1M tokens: [input, cached input, output] — the meter's rates (unknown models meter as gpt-5-mini) */
+const PRICES: Record<string, [number, number, number]> = {
+  'gpt-5-mini': [0.25, 0.025, 2], 'gpt-5-nano': [0.05, 0.005, 0.4], 'gpt-5.4-mini': [0.75, 0.075, 4.5],
+  'gpt-5.6-luna': [0.2, 0.02, 1.2], 'gpt-6-luna': [0.1, 0.01, 0.5], 'gpt-6-sol': [2, 0.2, 10], 'gpt-6.1-sol': [2, 0.2, 10],
+  'gpt-6-astra': [10, 1, 50],
+};
+const priceOf = (m: string) => PRICES[m] ?? PRICES['gpt-5-mini']!;
+/** the gpt-5 and gpt-6 families are reasoning models (reasoning_effort); 4.x reject it */
+const isReasoningModel = (m: string) => /^gpt-[56]/.test(m);
+/** 'minimal' exists only on the original gpt-5 family; GPT-6 takes none|low|medium|high — the nearest is low */
+const effortFor = (m: string, e: 'minimal' | 'low' | 'medium') => e === 'minimal' && !/^gpt-5(-mini|-nano)?$/.test(m) ? 'low' : e;
 
 export function loadKey(): string {
   if (process.env.OPENAI_API_KEY) return process.env.OPENAI_API_KEY;
@@ -753,10 +770,10 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
     // AIRAIDER_CALL_LOG: the whole call, untruncated, as it settles (logging only)
     let rawOut: string | undefined;
     const tierEffort = effort ?? (model === NANO_MODEL ? 'minimal' : 'low');
-    const claudeOpts = transport === 'claude' ? claudeOptsFor(model === NANO_MODEL ? 'nano' : 'writer', tierEffort) : null;
+    const claudeOpts = transport === 'claude' ? claudeOptsFor(model === NANO_MODEL ? 'nano' : purpose === 'genesis' ? 'plan' : 'writer', tierEffort) : null;
     const logFull = () => appendCallLog({
       t: new Date().toISOString(), provider: transport, n: rec.n, purpose, model: rec.model,
-      effort: claudeOpts ? claudeOpts.effort ?? `thinking ${claudeOpts.thinkingTokens}` : /^gpt-5/.test(model) ? tierEffort : undefined,
+      effort: claudeOpts ? claudeOpts.effort ?? `thinking ${claudeOpts.thinkingTokens}` : isReasoningModel(model) ? effortFor(model, tierEffort) : undefined,
       durationMs: rec.durationMs, inputTokens: rec.inputTokens, outputTokens: rec.outputTokens,
       cachedTokens: rec.cachedTokens, costUsd: rec.costUsd, ...(rec.listCostUsd !== undefined ? { listCostUsd: rec.listCostUsd } : {}),
       ok: rec.ok, error: rec.error, system, user, output: rawOut,
@@ -784,14 +801,14 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
       }
       // effort per tier (STORY_ENGINE §10.5): prose at low (PROMPTS.md — latency is gameplay),
       // the mechanical nano tier at minimal
-      // reasoning_effort exists only on the gpt-5 (reasoning) family; 4.x models reject it
-      const isReasoning = /^gpt-5/.test(model);
+      // reasoning_effort exists only on the reasoning families (gpt-5, gpt-6); 4.x models reject it
+      const isReasoning = isReasoningModel(model);
       client ??= new OpenAI({ apiKey: loadKey() });
       const res = await client.chat.completions.create({
         model,
         messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
         response_format: { type: 'json_object' },
-        ...(isReasoning ? { reasoning_effort: tierEffort } : {}),
+        ...(isReasoning ? { reasoning_effort: effortFor(model, tierEffort) } : {}),
       } as never) as OpenAI.Chat.Completions.ChatCompletion;
       usage.calls++;
       const inTok = res.usage?.prompt_tokens ?? 0;
@@ -800,8 +817,9 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
         ?.prompt_tokens_details?.cached_tokens ?? 0;
       usage.inputTokens += inTok;
       usage.outputTokens += outTok;
-      // rough gpt-5-mini pricing for the meter (cached input at 10%)
-      const cost = ((inTok - cached) * 0.25 + cached * 0.025 + outTok * 2) / 1e6;
+      // list pricing per model for the meter
+      const [pIn, pCached, pOut] = priceOf(model);
+      const cost = ((inTok - cached) * pIn + cached * pCached + outTok * pOut) / 1e6;
       usage.costUsd += cost;
       rec.durationMs = Date.now() - t0;
       rec.inputTokens = inTok; rec.outputTokens = outTok; rec.cachedTokens = cached; rec.costUsd = cost;
@@ -945,7 +963,7 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
       // is different — it does the causal-chain reasoning, and a LOW A/B (batch S medium vs batch T
       // low, 2026-07-14) measured ARC 7→6 and CARD 8→6.5 (step-1-fulfils-goal, unused yields, twist
       // self-contradiction all appeared at LOW). Effort matters HERE; keep MEDIUM despite the latency.
-      const out = await callR('genesis', WRITER_MODEL, system, JSON.stringify(input), zGenesis, 'medium');
+      const out = await callR('genesis', PLAN_MODEL, system, JSON.stringify(input), zGenesis, 'medium');
       return {
         ...out,
         twistReveal: out.twistReveal ?? null,

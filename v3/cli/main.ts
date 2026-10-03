@@ -1,6 +1,6 @@
 // Text UI — the dogfooding shell. Interactive REPL over the Game facade, plus a
 // batch mode (`--script file` or commands via stdin pipe) so an agent can play it.
-// Usage: npm run cli [-- --ai | --claude] [--seed N] [--load save.json] [--script cmds.txt]
+// Usage: npm run cli [-- --ai | --sonnet (= --claude)] [--seed N] [--load save.json] [--script cmds.txt]
 //   --ai (or AIRAIDER_AI=openai) = OpenAI, production, billed · --claude (or AIRAIDER_AI=claude) = the
 //   designer's FREE playtest transport: the same prompts via the headless Claude CLI on the subscription
 
@@ -34,7 +34,7 @@ async function main() {
   // fresh seed per run — a fixed default replayed the same draws every game (--seed pins one)
   const seed = Number(opt('seed') ?? Date.now() % 2 ** 31);
   // the same picker as the GUI server (AIRAIDER_AI), plus the flags, which win
-  const picked = aiKindFrom(process.env.AIRAIDER_AI, { ai: flag('ai'), claude: flag('claude') });
+  const picked = aiKindFrom(process.env.AIRAIDER_AI, { ai: flag('ai'), claude: flag('claude'), sonnet: flag('sonnet') });
   if (picked.warning) console.log(picked.warning);
   let ai: AiProvider;
   try {

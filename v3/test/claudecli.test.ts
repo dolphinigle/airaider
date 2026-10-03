@@ -75,6 +75,19 @@ describe('claudeChildEnv — nothing of a parent Claude session leaks into the c
   });
 });
 
+describe('claudeOptsFor — the plan tier follows the writer unless set', () => {
+  it('plan = writer by default; AIRAIDER_CLAUDE_PLAN overrides it', () => {
+    const was = { p: process.env.AIRAIDER_CLAUDE_PLAN, w: process.env.AIRAIDER_CLAUDE_WRITER };
+    delete process.env.AIRAIDER_CLAUDE_PLAN; delete process.env.AIRAIDER_CLAUDE_WRITER;
+    expect(claudeOptsFor('plan', 'medium')).toEqual({ model: 'sonnet', effort: 'medium' });
+    process.env.AIRAIDER_CLAUDE_PLAN = 'opus';
+    expect(claudeOptsFor('plan', 'medium')).toEqual({ model: 'opus', effort: 'medium' });
+    expect(claudeOptsFor('writer', 'low')).toEqual({ model: 'sonnet', effort: 'low' });
+    if (was.p === undefined) delete process.env.AIRAIDER_CLAUDE_PLAN; else process.env.AIRAIDER_CLAUDE_PLAN = was.p;
+    if (was.w === undefined) delete process.env.AIRAIDER_CLAUDE_WRITER; else process.env.AIRAIDER_CLAUDE_WRITER = was.w;
+  });
+});
+
 describe('claudeOptsFor — the two tiers on the subscription', () => {
   const saved = { w: process.env.AIRAIDER_CLAUDE_WRITER, n: process.env.AIRAIDER_CLAUDE_NANO };
   afterEach(() => {
@@ -123,6 +136,11 @@ describe('aiKindFrom — the same picker for the server and the CLI', () => {
     expect(aiKindFrom('claude').kind).toBe('claude');
     expect(aiKindFrom('mock', { claude: true }).kind).toBe('claude');
     expect(aiKindFrom('claude', { ai: true }).kind).toBe('openai');
+  });
+  it("'sonnet' is the designer's name for the Claude transport (env and --sonnet)", () => {
+    expect(aiKindFrom('sonnet').kind).toBe('claude');
+    expect(aiKindFrom('Sonnet').kind).toBe('claude');
+    expect(aiKindFrom(undefined, { sonnet: true }).kind).toBe('claude');
   });
   it('an unknown value falls back to the mock, said out loud', () => {
     const r = aiKindFrom('claud');
