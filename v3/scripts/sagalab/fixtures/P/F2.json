@@ -6,5 +6,9 @@
  "N": 3,
  "kind": "recruit",
  "personal": true,
- "note": "personal: the seed is the soldier's own past (the base fixture's spark), no theme"
+ "wronged": {
+  "sex": "male",
+  "kin": "brother"
+ },
+ "note": "personal: the seed is the soldier's own past (the base fixture's spark), no theme; wronged: the younger brother the spark names (R6 verify 2: cast by the engine, so he has an id, a sex and a label)"
 }

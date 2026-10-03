@@ -12,8 +12,9 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-/** outline (R4, Q3): the road ahead, one small call per saga at its start, beside card 1 */
-export type TemplateName = 'plan' | 'card' | 'report' | 'outline';
+/** (R6, F1) no `outline`: R4's road-ahead call (R5: each later job's hope, written blind to the story) is gone; every job's
+ *  hope is the plan's own why, which the engine prints or keeps off the screen */
+export type TemplateName = 'plan' | 'card' | 'report';
 /** §2.8.7: a rule cannot land without cutting another — every variant, all its lines on, skeleton included */
 // plan 660 → 620 at R1 (2026-10-02): card 1 left the plan call, so its pitch section went with it
 // card 215 → 180 at R4 (2026-10-03): the quest log took helping, mystery and have off the card
@@ -21,7 +22,11 @@ export type TemplateName = 'plan' | 'card' | 'report' | 'outline';
 // only the "so" clause and no end line
 // card 170 → 160, outline 130 → 115 at R5: card 1 deals no loss and no trouble `will`, the card no `premise` flag set;
 // the outline only shortens each why, and the want is no longer dealt
-export const WORD_BUDGET: Record<TemplateName, number> = { plan: 620, card: 160, report: 310, outline: 115 };
+// R6: the outline call dropped; budgets unchanged (the plan's options went to the engine, card 1's `will` came back by a cut)
+// R6 verify: budgets unchanged (plan 600, card 157, report 310: the hope line's "within reach, not done" fills report's last 3)
+// R6 verify 2: budgets unchanged (plan 620: the why-question dropped "never who …" for the people rule; report 310: `away` and
+// the finale secret's speaker paid for by cuts in clue, have and the time-order line)
+export const WORD_BUDGET: Record<TemplateName, number> = { plan: 620, card: 160, report: 310 };
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const cache = new Map<TemplateName, string>();

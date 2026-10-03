@@ -1,0 +1,68 @@
+[
+ {
+  "file": "plan__*.txt (all 6 variants)",
+  "where": "Write > episodes > learn: \"narrows the answer: what was done or how, never why; only the showdown tells why\"",
+  "problem": "SPOILER. The question is always 'Nobody knows why <odd thing>', and the answer to it is a WHAT (a hidden act or cause). So 'what was done, never why' does not protect the answer: the learns answer the question before the finale. Real runs: F2_1 r6v4 Known = 'bond written in his own hand' + 'signed the day her fee was paid', and the answer is 'he signed it himself the day her fee was due'. F5_3 r6v5 learn 1 ('casks refilled with something heavy') already answers 'why does the barge sit low'. F3_2 learn = the first sentence of the answer. F6_3 r6v4 three learns put the answer together. Nothing limits what all the learns reveal together.",
+  "fix": "Replace that clause, same length: \"a sign the answer explains, never a piece of the answer; even all of them together leave the question open until the showdown\"."
+ },
+ {
+  "file": "report__finale-*.txt (every one with known)",
+  "where": "Data 'known: what earlier jobs found.' (the finale drops 'never shown as new') + after: 'tied to known, never retold'",
+  "problem": "Old clues come back as new finds at the finale. 'never retold' is ambiguous: it can mean don't repeat the secret, or don't repeat the known facts. The middle-job guard is gone here. Real F2_1 r6v4 finale: 'He found the bond, and the hand was her brother's own. The date matched the day her fee was paid.' Both known facts are found again as new.",
+  "fix": "Keep the middle-job wording in the finale ('known: what earlier jobs found; never shown as new'). Change 'tied to known, never retold' to 'pointing back to known without restating it'."
+ },
+ {
+  "file": "report__success__...personal... / report__finale-...personal... (part on the wronged one)",
+  "where": "people entry {\"name\":\"Exaduis\",\"part\":\"Jervaise Greyfell's brother\"} + gloss 'part: their side, shown, not stated'",
+  "problem": "Here part holds a family tie, not a side, and the rule says not to state it. The writer obeys, so no report ever says Exaduis is the brother named in the For line. Real F2_1 r6v4: in every report and the finale he is only 'Exaduis'. The People list shows 'human woodcutter'. The player has to guess that he is the brother the whole saga is about.",
+  "fix": "Engine: deal a family tie as a fact to state, e.g. put it in the label at intro ('Jervaise Greyfell's brother, a woodcutter'). Keep part for side values only, the ones that are shown, not stated."
+ },
+ {
+  "file": "card__first+*.txt (all card-1 variants) + engine quest log",
+  "where": "premise.unknown + 'neither For nor Open question on card 1, whose prose tells the premise'",
+  "problem": "Card 1's 80 words must cover 6 or 7 facts, and nothing checks that the unknown makes it in. Real F8_3 r6v5 card 1 leaves out 'why Odolina needs her cast-out apprentice' entirely. Card 1's log never shows Open question, so the player starts the saga without its question.",
+  "fix": "Engine, no re-roll: if the card text lacks the unknown's content words, print the Open question line on card 1 too."
+ },
+ {
+  "file": "plan__*.txt (all 6 variants)",
+  "where": "episodes > why: 'for a thing or person, what they can then do' (printed after '<name> hopes')",
+  "problem": "'they' can mean the asker or the thing/person, so writers describe what the gained beast or witness does. That breaks after '<name> hopes', and the line is printed on the road before play. Real F4_1 r6v5: 'Benunius hopes taken, the beast can lead them to where the writ is kept.' r6v4: 'Benunius hopes the den shows where the rope's venom came from.'",
+  "fix": "Name the subject: 'for a thing or person, what <name> can then do with them'."
+ },
+ {
+  "file": "report__success__*.txt, report__partial__*.txt (hope)",
+  "where": "'hope: what the card promised; show it within reach, not done, or why not.'",
+  "problem": "(a) The plan's why is often fully met by the win (why 'learn where the stone-mover keeps his tools', win 'finds the hollow oak where he keeps his gear'). 'not done' then makes the writer contradict the result or ignore the line. Nothing tells it when to choose 'why not'. (b) The words get printed as a stock line. Real r6v3 F4_2: 'Gwinir's hope was within reach.'",
+  "fix": "'hope: what the card promised; show where this win leaves it.' No stock words to echo, and no clash with result."
+ },
+ {
+  "file": "report__failure__away+failure+intro+part+people+saga+stopped.txt (and every report with intro/part/hope)",
+  "where": "before 30 / after 45 caps (v4lab.ts: shows = hurt + cost + brought + clue)",
+  "problem": "The cap counts only hurt, cost, gain and clue. Each intro (label and name), each part to show, and the hope are also things to show but are not counted. This light failure must introduce Eussorus and Belardirwe Ashveil, show both sides, the defeat and an end beat in 30+45 words. A failure with no intros gets 105. A cheap writer drops a show or breaks the cap.",
+  "fix": "Add each intro, each part and the hope to `shows`."
+ },
+ {
+  "file": "card__*.txt (first and later)",
+  "where": "job dealt as a bare command ('Track down the hidden Marigold\u2026') into a 'you', present-tense card",
+  "problem": "Stock opener. With an order and a 'you' voice, the writer frames every job as 'You must \u2026' or 'Now you must \u2026'. Real r6v5: 6 of 8 card 1s, and most later cards in F6_3 r6v4. textLint already flags 'you must' and 'now you' as stamps.",
+  "fix": "Shape the input: the engine deals job in card voice ('you track down the hidden Marigold\u2026'), so there is no command left to soften."
+ },
+ {
+  "file": "card__first+*.txt",
+  "where": "gloss 'unknown: what nobody knows yet' + the payload's bare 'why \u2026' clause",
+  "problem": "Stock sentence. The gloss supplies the frame, so 7 of 8 real card 1s (r6v5) say 'Nobody knows why \u2026' or 'No one knows why \u2026'. textLint flags 'nobody knows'.",
+  "fix": "Gloss without the stock words, e.g. 'unknown: the mystery under it'. Better: deal it as a question the asker can't answer, so the frame does not come from the gloss."
+ },
+ {
+  "file": "engine quest log (Road ahead) \u2014 whys hidden by the answer-words lint",
+  "where": "v4lab.ts answer-words check on plan whys",
+  "problem": "Common verbs from the answer mark harmless whys as leaks, and they disappear from the road. Real r6v5 F7_2 hides 'Birila hopes to bring the glass down to Colddale in one piece' because of 'bring'. r6v4 flags 'kept' and 'fill'. The road loses its hope line with nothing spoiled.",
+  "fix": "Only count distinctive answer words: leave out function words and common verbs, plus words already in the question or the job."
+ },
+ {
+  "file": "plan__*memory*, plan__*personal* (\"jobs\":\"two\")",
+  "where": "'every cast id \u2026 appears by the middle job'",
+  "problem": "Two jobs have no middle job, so the writer guesses whether the rest of the cast must appear by job 1 or job 2. In personal plans 'every cast id' also takes in the company's own soldier. The real F2_1 plan lists c24 'there in person' on every job, though the player decides who goes.",
+  "fix": "Write 'by job <n>', worked out by the engine. In personal plans leave the soldier out ('every cast id but the soldier's')."
+ }
+]

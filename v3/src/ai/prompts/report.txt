@@ -1,27 +1,28 @@
-Write the report of one job in a fantasy game about a mercenary company.
+Write the report of one job in a fantasy mercenary game.
 
 The data:
 - card: what the player just read. job: its task.
 - soldiers: who went, what each is like.[[decides]] decides: whose deed wins it.[[/decides]]
-[[people]]- people: who else is there, by name.[[intro]] intro: new to the player; first mention gives label and name.[[/intro]][[part]] part: their side, shown, not stated.[[/part]]
+[[people]]- people: who else is there, by name.[[intro]] intro: new to the player; first mention gives label and name.[[/intro]][[part]] part: their side, shown, not stated.[[/part]][[away]] away: not at the job.[[/away]]
 [[!failure]]- outcome: success, partial (done, at a price), or failure.[[result]] result: what came of it.[[/result]]
 [[option]]- plan: what the soldiers do, shown in after, in your own words.
 [[hurt]]- hurt: [[hurtprice]]the price paid: [[/hurtprice]]who is hurt, how badly; show each taking it.
 [[cost]]- cost: the price; show it paid.
 [[brought]]- brought: who or what the company now holds; show each gained.
-[[clue]]- clue: a fact this win brings out; show it found, seen or said, plainly, and nothing past it.
-[[known]]- known: what earlier jobs found; never shown as new.
-[[have]]- have: what the company holds, never in enemy hands[[edge]]; helps: its use; show each used[[/edge]][[!edge]]; use it only where it helps this job[[/!edge]].
+[[clue]]- clue: a fact this win brings out; show it found, seen or said, plainly, nothing past it.
+[[hope]]- hope: what the card promised; show it within reach, not done, or why not.
+[[known]]- known: what earlier jobs found[[!answer]]; never shown as new[[/!answer]].
+[[have]]- have: what the company holds, never in enemy hands[[edge]]; helps: its use; show each used[[/edge]][[!edge]]; use it only where it helps[[/!edge]].
 [[answer]]- answer: the question and its secret.
 [[direction]]- direction: the player's wish for the telling only.
 
 Write:
 - before: at most {{B}} words. The soldiers meet what stands in their way, short of the goal, never repeating the card. No hint of how it goes.
-[[!failure]]- after: at most {{A}} words. The deciding moment, then what [[result]]result says [[/result]]came of it, in your own words; nothing else changes.[[answer]] The secret comes out within it, in time order: said, seen or found[[known]], built from known[[/known]].[[/answer]] End on something seen, done or said that shows the change.
+[[!failure]]- after: at most {{A}} words. The deciding moment, then what [[result]]result says [[/result]]came of it, in your own words; nothing else changes.[[answer]] The secret comes out in pieces across the deciding moment, in your own words, never as one line: said[[people]] by one in people[[/people]], seen or found[[known]], tied to known, never retold[[/known]].[[/answer]] End on something seen, done or said that shows the change.
 [[failure]]- after: at most {{A}} words. What stood in the way beats them, and the job is not done; nothing else changes. End on something seen, done or said.
 [[moved]]- summary: one sentence, at most 25 words: what the company did and the result[[clue]], not the clue[[/clue]]; no wound (shown beside it). Name no soldier[[personal]] but the one whose past this story is[[/personal]]; say the company.
-[[stopped]]- summary: one sentence, at most 25 words: what stopped the company, no wound (shown beside it). Name no soldier[[personal]] but the one whose past this story is[[/personal]]; say the company.
+[[stopped]]- summary: one sentence, at most 25 words, whose subject is what stopped the company; no wound (shown beside it). Name no soldier[[personal]] but the one whose past this story is[[/personal]]; say the company.
 
-Past tense, third person, plain words, short complete sentences, in the order things happened. Invent no names. No numbers, nothing modern, no pay.
+Past tense, third person, plain words, short complete sentences, in time order. Invent no names. No numbers, nothing modern, no pay.
 
 Reply with JSON only: {"before": "text", "after": "text"[[saga]], "summary": "text"[[/saga]]}

@@ -1,10 +1,10 @@
-Write the card for the [[first]]first[[/first]][[later]]next[[/later]][[finale]]last[[/finale]] job of a story in a fantasy game about a mercenary company. Speak to the company as "you": present tense, past for what is done.
+Write the card for the [[first]]first[[/first]][[later]]next[[/later]][[finale]]last[[/finale]] job of a story in a fantasy mercenary game. Speak to the company as "you": present tense, past for what is done.
 
 The data:
 [[first]]- premise. who: [[!personal]]the one who needs you[[/!personal]][[personal]]one of your own soldiers[[/personal]]. wants: what they want.[[personal]] past: their old wrong.[[/personal]][[returning]] memory: your past with them.[[/returning]] unknown: what nobody knows yet.
 [[latest]]- latest: what happened last.
 [[retry]]- retry: what stopped the last try at this same job.
-- job: the task, and where.[[why]] why: why it matters.[[/why]] trouble: the foe, what they carry[[will]], what they will do[[/will]].[[lose]] lose: who loses what for good if this last chance fails.[[/lose]]
+- job: the task, and where.[[why]] why: why it matters.[[/why]] trouble: the foe, with what[[will]], what they will do[[/will]].[[lose]] lose: who loses what for good if this last chance fails.[[/lose]]
 - names: people the card may mention: name, else label.[[intro]] intro: new to the player; first mention gives label and name.[[/intro]][[part]] part: their side.[[/part]][[memory]] memory: their past with you, told on first appearance.[[/memory]]
 [[direction]]- direction: the player's wish for the telling only.
 
