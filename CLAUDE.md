@@ -40,7 +40,7 @@ npm run typecheck             # tsc --noEmit
 ```
 `--claude` / `AIRAIDER_AI=claude` = the designer's FREE playtest transport: the same prompts via the headless
 `claude` CLI on the Claude subscription (src/ai/claudecli.ts). Not production — production = GPT in three tiers
-(plan GPT-6 Sol · writer GPT-6 Luna · nano gpt-5-nano; docs/AI_PROVIDER.md), tuned at the Steam stretch. Portraits stay OpenAI images either way (`AIRAIDER_PORTRAITS=0` = off).
+(plan GPT-6 Sol · everything else GPT-6 Luna; docs/AI_PROVIDER.md), tuned at the Steam stretch. Portraits stay OpenAI images either way (`AIRAIDER_PORTRAITS=0` = off).
 
 ## Secrets
 `OPENAI_API_KEY` lives in `/home/irvan/airaider/.env` + `~/.airaider/openai.env` (gitignored). Read for dogfooding only; never print or commit.

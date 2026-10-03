@@ -1,8 +1,8 @@
 // WHICH AI IS LIVE — one picker shared by the GUI server and the text CLI, so every way to choose the AI
 // exists in both (docs/DOGFOODING.md parity):
 //   mock   (default) — deterministic, free, no key
-//   openai (AIRAIDER_AI=openai / --ai)     — PRODUCTION: GPT-6 Sol plans sagas, GPT-6 Luna writes, gpt-5-nano
-//          does the mechanical tier; billed per call (openai.ts OPENAI_MODELS)
+//   openai (AIRAIDER_AI=openai / --ai)     — PRODUCTION: GPT-6 Sol plans sagas, GPT-6 Luna does everything else;
+//          billed per call (openai.ts OPENAI_MODELS)
 //   claude (AIRAIDER_AI=claude or sonnet / --claude or --sonnet) — the designer's FREE PLAYTEST transport: the same
 //          prompts through the headless Claude CLI on the Claude subscription, Sonnet writing (designer 2026-10-02;
 //          claudecli.ts). 'sonnet' is the designer's name for it (2026-10-03: "do implement ai=sonnet option")

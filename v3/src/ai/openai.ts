@@ -18,14 +18,15 @@ import { appendCallLog } from './calllog.js';
 import { runClaude, claudeOptsFor, claudePool } from './claudecli.js';
 
 // THREE TIERS (designer 2026-10-03: "use diff model for the 'harder' part like generating saga"; "replace all
-// gpt-5-mini"; nano stays only while it is cheaper). 🛠 each is env-overridable for A/B:
+// gpt-5-mini"; "move everything to luna"). 🛠 each is env-overridable for A/B:
 //   PLAN   — the saga's genesis, the hardest call (once per saga): GPT-6 Sol
 //   WRITER — everything the player reads (cards, reports, flesh): GPT-6 Luna — beat gpt-5-mini blind at ¼ the
 //            cost on the same prompts (scripts/sagalab/modelcmp/RESULT4.md)
-//   NANO   — the mechanical tier (ids, picks): gpt-5-nano, still cheaper than Luna
+//   NANO   — the mechanical tier (ids, picks): GPT-6 Luna too ("move everything to luna" — gpt-5-nano was cheaper
+//            by well under a cent a playthrough; one model family, better instruction-following)
 const PLAN_MODEL = process.env.AIRAIDER_PLAN_MODEL || 'gpt-6-sol';
 const WRITER_MODEL = process.env.AIRAIDER_WRITER_MODEL || 'gpt-6-luna';
-const NANO_MODEL = process.env.AIRAIDER_NANO_MODEL || 'gpt-5-nano';
+const NANO_MODEL = process.env.AIRAIDER_NANO_MODEL || 'gpt-6-luna';
 export const OPENAI_MODELS = { plan: PLAN_MODEL, writer: WRITER_MODEL, nano: NANO_MODEL };
 /** list price per 1M tokens: [input, cached input, output] — the meter's rates (unknown models meter as gpt-5-mini) */
 const PRICES: Record<string, [number, number, number]> = {
@@ -34,6 +35,8 @@ const PRICES: Record<string, [number, number, number]> = {
   'gpt-6-astra': [10, 1, 50],
 };
 const priceOf = (m: string) => PRICES[m] ?? PRICES['gpt-5-mini']!;
+/** the mechanical tier's call purposes */
+const NANO_PURPOSES = new Set(['themeRoll', 'select']);
 /** the gpt-5 and gpt-6 families are reasoning models (reasoning_effort); 4.x reject it */
 const isReasoningModel = (m: string) => /^gpt-[56]/.test(m);
 /** 'minimal' exists only on the original gpt-5 family; GPT-6 takes none|low|medium|high — the nearest is low */
@@ -769,8 +772,11 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
     if (records.length > 120) records.splice(0, records.length - 120);
     // AIRAIDER_CALL_LOG: the whole call, untruncated, as it settles (logging only)
     let rawOut: string | undefined;
-    const tierEffort = effort ?? (model === NANO_MODEL ? 'minimal' : 'low');
-    const claudeOpts = transport === 'claude' ? claudeOptsFor(model === NANO_MODEL ? 'nano' : purpose === 'genesis' ? 'plan' : 'writer', tierEffort) : null;
+    // the tier comes from the PURPOSE, never from model equality: tiers may share a model (all GPT-6 Luna today),
+    // and the Claude transport still has to send the mechanical calls to Haiku and the rest to Sonnet
+    const tier = NANO_PURPOSES.has(purpose) ? 'nano' : purpose === 'genesis' ? 'plan' : 'writer';
+    const tierEffort = effort ?? (tier === 'nano' ? 'minimal' : 'low');
+    const claudeOpts = transport === 'claude' ? claudeOptsFor(tier, tierEffort) : null;
     const logFull = () => appendCallLog({
       t: new Date().toISOString(), provider: transport, n: rec.n, purpose, model: rec.model,
       effort: claudeOpts ? claudeOpts.effort ?? `thinking ${claudeOpts.thinkingTokens}` : isReasoningModel(model) ? effortFor(model, tierEffort) : undefined,
