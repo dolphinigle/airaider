@@ -1,0 +1,77 @@
+{
+  "_note": "DRAFT 2026-10-04 for designer review. Replaces themes.json as the saga seed slot: ONE generic situation + 1-3 keyword atoms + the dealt cast (the client + 1-3 potential supporting cast). Hand-curated: concrete, easy to picture, fantasy-plain, no modern words, no paperwork.",
+  "situations": [
+    "rescue someone",
+    "get back something stolen",
+    "stop an attack",
+    "find out who did it",
+    "deliver something safely",
+    "settle a quarrel",
+    "protect someone",
+    "get rid of a beast",
+    "collect what is owed",
+    "expose a lie",
+    "find someone who is missing",
+    "free a prisoner",
+    "bring someone home",
+    "catch a runaway",
+    "guard something precious",
+    "recover something lost",
+    "drive someone out",
+    "win someone over",
+    "keep a promise",
+    "lift a curse",
+    "hide someone",
+    "bring someone to justice",
+    "stop a wedding",
+    "save a home",
+    "end a haunting"
+  ],
+  "things": [
+    "lantern", "bell", "ring", "key", "cloak", "sword", "bow", "cart", "boat", "barrel",
+    "chest", "crown", "mask", "drum", "harp", "flute", "mirror", "locket", "dagger", "shield",
+    "banner", "candle", "rope", "anvil", "axe", "scythe", "plough", "millstone", "beehive", "loom",
+    "cauldron", "bread", "wine", "honey", "cheese", "salt", "silk", "wool", "fur", "feather",
+    "egg", "seed", "apple", "herbs", "mushroom", "rose", "acorn", "antler", "tusk", "horn",
+    "bone", "skull", "pearl", "amber", "coin", "goblet", "jewel", "statue", "idol", "doll",
+    "toy", "kite", "saddle", "boots", "hat", "veil", "gown", "armour", "helmet", "spear",
+    "net", "hook", "fishing rod", "oar", "anchor", "sail", "wagon", "wheel", "ladder", "spade",
+    "pickaxe", "lockbox", "cradle", "coffin", "gravestone", "bonfire", "torch", "pipe", "dice", "chess set",
+    "music box", "bottle", "potion", "perfume", "spices", "tea", "ale", "pie", "cake", "stew",
+    "pig roast", "wedding ring", "necklace", "brooch", "earring", "comb", "scarf", "gloves", "quilt", "tapestry",
+    "painting", "carving", "figurine", "weathervane", "sundial", "hourglass", "compass", "spyglass", "birdcage", "kennel"
+  ],
+  "creatures": [
+    "puppy", "kitten", "foal", "lamb", "goat", "sheep", "cow", "ox", "pig", "hen",
+    "goose", "duck", "falcon", "hawk", "hound", "wolf cub", "fox", "bear cub", "deer", "stag",
+    "boar", "raven", "owl", "crow", "swan", "eel", "pike", "frog", "toad", "snake",
+    "lizard", "tortoise", "bees", "rats", "mule", "donkey", "pony", "warhorse", "ferret", "badger",
+    "otter", "hare", "squirrel", "magpie", "nightingale", "peacock", "monkey", "parrot", "bull", "ram"
+  ],
+  "places": [
+    "mill", "bridge", "ferry", "well", "chapel", "shrine", "tower", "cave", "quarry", "mine",
+    "orchard", "vineyard", "farm", "barn", "inn", "tavern", "market", "harbour", "lighthouse", "ruin",
+    "graveyard", "crossroads", "ford", "marsh", "island", "waterfall", "glade", "hunting lodge", "watchtower", "toll gate",
+    "smithy", "bakery", "bathhouse", "monastery", "stable", "garden", "maze", "camp", "gallows", "dam",
+    "manor", "castle", "keep", "wall", "gatehouse", "village green", "pond", "lake", "river bend", "hilltop",
+    "standing stones", "barrow", "old road", "forest edge", "hollow tree", "kiln", "brewery", "tannery", "dye works", "workshop",
+    "boathouse", "dovecote", "beehives", "sheepfold", "pasture", "hayfield", "hermitage", "pilgrim hostel", "ferry landing", "cellar"
+  ],
+  "occasions": [
+    "harvest", "wedding", "funeral", "festival", "fair", "feast", "hunt", "storm", "flood", "fire",
+    "frost", "famine", "market day", "coronation", "duel", "tournament", "horse race", "birth", "naming day", "pilgrimage",
+    "trial", "siege", "eclipse", "midsummer", "midwinter", "first snow", "spring thaw", "sheep shearing", "lambing", "haymaking",
+    "grape harvest", "wake", "betrothal", "anniversary", "homecoming", "farewell", "drought", "heatwave", "fog", "gale"
+  ],
+  "qualities": [
+    "broken", "cursed", "golden", "silver", "burnt", "buried", "haunted", "singing", "glowing", "ancient",
+    "borrowed", "fake", "cracked", "rusted", "frozen", "poisoned", "lucky", "enchanted", "hollow", "sealed",
+    "missing", "half-eaten", "bloodstained", "blessed", "stolen", "lost", "famous", "giant", "tiny", "talking",
+    "weeping", "whispering", "rotten", "brand-new", "priceless", "worthless", "forbidden", "sacred", "smuggled", "runaway"
+  ],
+  "uncanny": [
+    "ghost", "curse", "witch", "spirit", "dragon", "troll", "fairy ring", "will-o'-the-wisp", "omen", "prophecy",
+    "werewolf", "giant", "sprite", "banshee", "wraith", "hag", "changeling", "shapeshifter", "sea serpent", "griffin",
+    "basilisk", "ogre", "goblin", "imp", "golem", "phoenix", "unicorn", "kraken", "wyvern", "barrow-wight"
+  ]
+}
