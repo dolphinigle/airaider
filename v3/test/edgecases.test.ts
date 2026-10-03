@@ -227,6 +227,12 @@ describe('§21-4a sequel road-back', () => {
     expect(g.card(focalId)!.location).toEqual(HELD('limbo'));
     const newChain = g.state.chains.find(c => c.id !== chain.id)!;
     expect(newChain.focalId).toBe(focalId);
+    // D9: a face the player already knows comes back KNOWN — named from card 1, with their past with the company
+    // (the slip the world remembered), and the client seat goes to a stranger (one returning face a saga)
+    const f = newChain.saga!.world.cast.find(p => p.focal)!;
+    expect(f).toMatchObject({ known: true, seat: 'opponent' });
+    expect(f.memory).toMatch(/slipped the company/);
+    expect(newChain.saga!.world.cast.filter(p => p.memory)).toHaveLength(1);
     // and the sequel lead is consumed (no double-pursue into parallel sagas)
     expect(g.state.leads.some(l => l.source === 'sequel')).toBe(false);
     const errs = auditGame(g);

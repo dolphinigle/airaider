@@ -157,7 +157,9 @@ export interface SagaWorld {
   seed: { id: string | null; text: string }; tone: string;
   region: string; level: number;
 }
-export interface SagaLine { n: number; attempt: number; outcome: Outcome; party: string[]; text: string; hurt: Hurt[] }
+/** one attempt as the chronicle keeps it. `decides`: whose deed decided a job that was not failed (the game sets it after
+ *  the report lands; the memory edge to the deciding soldier reads it at the saga's close, §2.6) */
+export interface SagaLine { n: number; attempt: number; outcome: Outcome; party: string[]; text: string; hurt: Hurt[]; decides?: string }
 /** one row of the quest log as the engine renders it (the GUI gets the structure, the CLI the lab's text) */
 export type LogRow = { kind: 'for' | 'road' | 'roadrow' | 'known' | 'knownrow' | 'held' | 'open'; mark?: '▶' | '✓' | '✗' | '·'; text: string };
 /** ON THIS MATTER: a person the card calls by name (label without its article) */

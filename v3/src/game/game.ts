@@ -27,25 +27,31 @@ import {
   rollFreshLead, starterPacket, starterDripLead, STARTER_DRIP_COUNT, huntLead, recruitLead, slotCount, rollDifficulty, oneOffValue,
   materializeReward, computeDelivery, defaultAsk, liabilityTriggers, LEAD_TTL, STARTER_TTL,
   leadBand,
-  type Lead, type Quest, type QuestSlot,
+  type Lead, type Quest, type QuestSlot, type ApproachGroup,
 } from '../engine/quests.js';
 import {
   newChainEconomy, bankBeat, finaleReady, beatSideLoot, finaleFate, crystallize,
-  type Chain, type Bible, type FinaleFate,
+  type Chain, type FinaleFate,
 } from '../engine/chains.js';
 import {
-  newGraph, recall, renderDossier, decayPass, guardEdges, modelEdges, chronicleOf, addEdge, touchEdge, edgeCount,
-  type LoreGraph, type LoreNode,
+  newGraph, renderDossier, decayPass, guardEdges, modelEdges, chronicleOf, addEdge, touchEdge, edgeCount, effectiveSalience,
+  type LoreGraph, type LoreNode, type RelEdge,
 } from '../engine/lore.js';
 import { rollName, rollPlaceName } from '../engine/names.js';
 import { hasClash, queryMatches, fillScore, acceptsCard } from '../engine/overlap.js';
 import { questXp, grantXp, rollBase, rollGrowthLean, growToLevel } from '../engine/growth.js';
 import { coins, PARTIAL_FRAC, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, explainCoins, oddsBand, slotStrength, coinsWhy, INJURY_FRAC, BAND_TEXT, type SlotTest, type Outcome, type QuestRollResult, type Band, type Strength, type CoinsWhy } from '../engine/roll.js';
-import { sampleKeywords, sampleKeywordsLight, sampleSeed, sampleOpening, sampleGravity, pickTone, sampleArrival, sampleTell, sampleObstacle, sampleShape } from '../ai/keywords.js';
-import type { AiProvider, ResolveQuestInput, ResolveQuestOut, AskSlotOut, QuestWriteOut, CampaignDirection, DirectionRead } from '../ai/provider.js';
+import { sampleKeywords, sampleKeywordsLight, sampleOpening, sampleGravity, sampleObstacle, sampleShape } from '../ai/keywords.js';
+import type { AiProvider, ResolveQuestInput, ResolveQuestOut, AskSlotOut, CampaignDirection, DirectionRead } from '../ai/provider.js';
 import { prefPick, chainPayoff, type TraitPrefs } from '../engine/economy.js';
 import { labFixtureProblems, nextLabOutcome, forceRoll, type LabFixture } from '../engine/lab.js';
-import { hashStr } from '../engine/saga.js';
+import {
+  hashStr, castableClients, pickClientFace, recentFaces, helped, HURT_BAND, WAY_ENDING, OPPONENT_EDGES,
+  type FaceCandidate, type Face, type SagaPos, type CastEntry,
+} from '../engine/saga.js';
+import { raceOf, sexOf } from '../engine/plainwords.js';
+import { knowingOf, mockReport } from '../ai/storyteller.js';
+import * as flow from './sagaflow.js';
 
 export interface LogEntry { cycle: number; kind: string; text: string; questId?: string }
 
@@ -85,7 +91,11 @@ interface Resolution {
   party: Card[];
   fate?: FinaleFate;   // finales: decided BEFORE narration (P11)
   rolled: QuestRollResult;   // the dice, shown in the reveal (loss must be OWNED — DESIGN §5)
+  /** a saga quest: where its card sat, and the report facts the flow decided in the roll loop (hurt, decides, fate) */
+  saga?: { pos: SagaPos; inn: flow.ReportIn };
 }
+/** a saga quest's report as its writer (or the floor) returned it */
+type SagaReport = { before: string; after: string; summary: string };
 /** startCycle = when they went on (older saves: absent) — the rack's progress is doneAt−start, never
  *  the room's CURRENT duration, which moves whenever the rack's contents do */
 export interface Breaking { cardId: string; roomId: string; doneAtCycle: number; startCycle?: number }
@@ -257,49 +267,6 @@ export function normQuirks(quirks: string[]): string[] {
   return quirks.map(q => q.trim().replace(/[\s.;,]+$/, '').replace(/^[A-Z](?=[a-z])/, ch => ch.toLowerCase())).filter(Boolean);
 }
 
-// PREMISE FINGERPRINT (2026-10-02) — the genesis guard's premise clash. It used to overlap EVERY
-// word of four characters or more across title+kernel+arc+tensions+cast against a bar of 2 shared
-// words — so it fired on every saga after the first (every unrelated pair of 54 real bibles cleared
-// it, median 11 shared words): the arc's own format token ("→ yields:"), the dealt region ("forest",
-// "west"), the hire's own frame ("company", "hires", "fetch") and plain English ("must", "first",
-// "where"). Each false fire burned a seed, a second genesis call (~50s) and an avoid nag, and the
-// re-roll failed the same way and shipped anyway. A premise lives in its title, kernel and goal; the
-// words that can show a REPEAT are the ones neither the game's fixed fiction nor the engine handed over:
-//  · stop — English function words
-//  · FRAME — the fiction every saga shares by construction: the company at its fort taking a hire,
-//    and the hire's own errand verbs
-//  · dealt — what the engine gave the drafts: their regions (name, seed, landmark, anchors), the
-//    location line, the soldiers' names (two sagas about one soldier are allowed)
-// Cast repeats are not a premise: the same-person guards fence them, and a stubborn duplicate is
-// recast mechanically.
-const PREMISE_STOP = new Set(('the,a,an,of,to,in,that,and,who,for,with,on,at,by,from,their,its,his,her,they,them,into,over,under,'
-  + 'must,will,would,could,should,shall,might,what,when,where,which,while,there,then,than,this,these,those,after,before,'
-  + 'about,only,back,such,each,every,some,more,most,other,another,also,just,even,still,very,much,many,like,been,being,'
-  + 'have,having,were,onto,upon,your,whose,whom,first').split(','));
-const premiseStem = (w: string) => w.length > 4 && w.endsWith('ies') ? `${w.slice(0, -3)}y` : w.length > 4 && w.endsWith('s') && !w.endsWith('ss') ? w.slice(0, -1) : w;
-// the arc's own format marker ("→ yields:") is the bible's syntax, never its content
-const premiseTokens = (s: string) => (s.replace(/→\s*yields:/gi, ' ').toLowerCase().match(/[a-z]+/g) ?? []).filter(w => w.length > 3 && !PREMISE_STOP.has(w)).map(premiseStem);
-const PREMISE_FRAME = premiseTokens('company fort mercenary soldier client hire hired band fetch recover deliver bring return retrieve reclaim find');
-const regionWords = (id: string) => (r => r ? premiseTokens(`${r.name} ${r.seed} ${r.landmark ?? ''} ${(r.anchors ?? []).join(' ')}`) : [])(REGION[id]);
-/** 🛠 the clash bars — a LIVE chain (or one of the last two) at 3 shared premise words, any of the
- *  last five at 4. Measured on 54 real bibles (15 same-seed pairs vs 1416 unrelated): ≥2 caught 15/15
- *  at 4.9% unrelated fires, ≥3 13/15 at 1.0%, ≥4 9/15 at 0.4%. On the 17 bibles of real campaigns (136
- *  pairs, mostly personal sagas) ≥2 still fired on 13% — everyday words ("claim"+"means",
- *  "home"+"learn") no word list can bound — while every ≥4 pair was a genuine repeat (a re-rolled
- *  draft and its twin; two dead-man's-debt sagas) */
-export const PREMISE_CLASH = { live: 3, recent: 4 };
-
-/** the premise fingerprint for one genesis: `draftRegion` and `dealt` (the location line, the focal's
- *  and the soldiers' names) are what the engine handed this draft. Returns the fingerprint of a bible —
- *  pass a prior chain's region so its own dealt geography drops out too */
-export function premiseFingerprint(draftRegion: string, dealt: string[]): (b: { title: string; kernel: string; goal: string }, region?: string) => Set<string> {
-  const not = new Set([...PREMISE_FRAME, ...regionWords(draftRegion), ...dealt.flatMap(premiseTokens)]);
-  return (b, region) => {
-    const own = new Set(region ? regionWords(region) : []);
-    return new Set(premiseTokens(`${b.title} ${b.kernel} ${b.goal}`).filter(w => !not.has(w) && !own.has(w)));
-  };
-}
-
 /** the work an earned lead turns out to be, in the words someone at a bench would use — dealt to
  *  the report so it can say what was heard. Glosses were tried first and got pasted whole ("left
  *  with the lead: a working through"): a dealt string lands where it is dealt (L19). */
@@ -355,6 +322,15 @@ export class Game {
     const g = new Game(ai, st.seed, st);
     ai.setDirection?.(st.direction ?? null);
     return g;
+  }
+
+  /** the road back to a focal who slipped out of reach (§21-4a): a standing sequel lead that starts a new saga about them */
+  private sequelLead(chain: Chain, focal: Card, rarity: Rarity = chain.rarity === 'common' ? 'uncommon' : 'rare'): Lead {
+    return {
+      id: freshId('lead-'), rarity, level: chain.level, region: chain.region, archetype: 'investigate',
+      chainInfo: { kind: 'starts-new' }, expiresAtCycle: null,
+      source: 'sequel', title: `${focal.name} resurfaces, someday`, focalId: focal.id,
+    };
   }
 
   /** Save migrations. A standing faucet lead is minted ONCE, when its building goes up, and then
@@ -626,26 +602,27 @@ export class Game {
       card?.character ? { who: card.character.who, quirks: opts?.habits === false ? undefined : card.character.quirks } : undefined);
   }
   chronicle(id: string) { return chronicleOf(this.state.lore, id) }
-  /** A saga as the COMPANY knows it — the one view both UIs render. The bible is hidden truth:
-   *  its cast includes people later steps exist to discover, and the writer's openThreads are the
-   *  remaining arc in its own words (the CLI printed "At Bramble Hollow present Edmundus for the
-   *  unbinding…" — the finale — after beat 1). So: only people the cards have already put in front
-   *  of the player, the focal named only once met (the 46026 rule the reckoning line already
-   *  follows), and no threads, no wants, no roles. */
+  /** A saga as the COMPANY knows it — the one view both UIs render (the CLI's `chains`/`chain`, the GUI's saga strip and
+   *  chronicle). The plan is hidden truth: the view is the saga flow's chronicle (sagaflow.chronicle) — the quest log as
+   *  it stands, card 1, So far, the answer once the finale is played, and the people the player has seen, by name only
+   *  once their name was read — plus the economy fields. A saga still being planned is not shown (its lead's job is). */
   chainViews() {
-    return this.state.chains.map(c => {
-      const met = new Set(c.story.introducedNames ?? []);
-      const focal = this.card(c.focalId);
+    return this.state.chains.filter(c => c.saga?.plan).map(c => {
+      const ch = flow.chronicle(c)!;
+      const rec = c.saga!, plan = rec.plan!, k = knowingOf(rec);
+      const focal = plan.cast.find(p => p.focal)!;
+      const done = c.state === 'done' || c.state === 'slipped';
       return {
-        id: c.id, title: c.bible.title, state: c.state, kind: c.kind, personal: c.isPersonal,
-        // the likely ending in the player's words — the kind names ("gold-hoard") are engine vocabulary
-        fate: c.isPersonal ? 'their matter settled' : ({ recruit: 'they may join you', captive: 'they may end in your cells', 'gold-hoard': 'a treasure they are the key to' } as Record<string, string>)[c.kind] ?? c.kind,
-        focal: focal && (met.has(focal.name) || c.isPersonal) ? focal.name : null,
-        beat: c.beatIndex, expectedBeats: c.expectedBeats,
+        id: c.id, title: ch.title, state: c.state, kind: c.kind, personal: c.isPersonal,
+        // the likely ending in the player's words
+        likely: ch.likely,
+        focal: k.named.has(focal.id) ? focal.name : null,
+        // "part n of N": the job on offer (or next); the finale's is N
+        part: done ? rec.world.N : flow.posOf(rec).job, of: rec.world.N,
         bank: coinBand(c.bank), effort: c.cyclesSpent, effortTarget: c.expectedBeats * 1.5,
         failures: c.failures, failureBudget: c.failureBudget,
-        situation: c.story.currentSituation, known: c.story.knownToPlayer, goal: c.bible.goal,
-        met: c.bible.cast.filter(p => met.has(p.name)).map(p => ({ name: p.name, who: p.who })),
+        rows: ch.rows, card1: ch.card1, lines: ch.lines, soFar: flow.soFarLines(ch.lines),
+        answer: ch.answer, people: ch.people,
         // the saga strip's link back into play: its step on the map, or the lead that continues it
         ...this.chainNext(c),
       };
@@ -1477,7 +1454,6 @@ export class Game {
     this.state.holding = this.state.holding.filter(s => s.cardId !== captiveId);
     this.state.breaking = this.state.breaking.filter(b => b.cardId !== captiveId);
     this.addGold(pay);
-    this.noteCustodyChange(card.id, `${card.name} was ransomed away — no longer in the company's hands`);
     this.log('ransom', `${card.name} ransomed for ${pay}g.`);
     return { ok: true, msg: `${card.name} ransomed: +${pay}g${loss ? ` · ${loss}` : ''}`, ...(loss ? { warn: true } : {}) };
   }
@@ -1497,7 +1473,6 @@ export class Game {
       this.state.holding = this.state.holding.filter(s => s.cardId !== id);
       this.state.breaking = this.state.breaking.filter(b => b.cardId !== id);
       this.addGold(pay);
-      this.noteCustodyChange(card.id, `${card.name} was sold on — no longer in the company's hands`);
       this.log('sell', `${card.name} sold for ${pay}g.`);
       return { ok: true, msg: `${card.name} sold: +${pay}g${loss ? ` · ${loss}` : ''}`, ...(loss ? { warn: true } : {}) };
     }
@@ -1712,7 +1687,7 @@ export class Game {
       if (this.state.quests.some(q => q.chainId === chain.id && q.state === 'open'))
         return { msg: 'that story already has an open quest' };
       // a beat still being WRITTEN is not yet an open quest — same guard, extended to work in
-      // flight: two concurrent beats of one saga would race its bible and its beat cache
+      // flight: two concurrent beats of one saga would race its record and its card cache
       if (this.state.leads.some(l => l.id !== lead.id && this.reserved.has(l.id)
         && l.chainInfo.kind === 'continues' && (l.chainInfo as { chainId: string }).chainId === chain.id))
         return { msg: 'that story already has a step being written' };
@@ -1796,10 +1771,10 @@ export class Game {
     let quest: Quest;
     if (lead.chainInfo.kind === 'continues') {
       const chain = this.state.chains.find(c => c.id === (lead.chainInfo as { chainId: string }).chainId);
-      if (!chain) return { ok: false, msg: 'the chain is gone' };
-      quest = await this.generateChainBeat(chain, lead);
+      if (!chain?.saga?.plan) return { ok: false, msg: 'the chain is gone' };
+      quest = await this.sagaStep(chain, lead);
     } else if (lead.chainInfo.kind === 'starts-new') {
-      quest = await this.generateGenesis(lead);
+      quest = await this.startSaga(lead);
     } else {
       quest = await this.generateOneOff(lead);
     }
@@ -2175,7 +2150,7 @@ export class Game {
 
   /** post a fixture's pinned ✦STORY lead. The fort is made able to run the saga to any ending —
    *  the board, a Lead room, a Tavern and cells for the finale's person, four soldiers — without
-   *  a single AI call, so everything up to the saga's genesis stays identical across arms. */
+   *  a single AI call, so everything up to the saga's deal stays identical across arms. */
   labSaga(fx: LabFixture): { ok: boolean; msg: string; leadId?: string } {
     const bad = labFixtureProblems(fx);
     if (bad.length) return { ok: false, msg: `bad fixture: ${bad.join('; ')}` };
@@ -2266,7 +2241,7 @@ export class Game {
     return {
       lab: 1, cycle: this.state.cycle, roster: this.roster().length,
       chains: this.state.chains.map(c => ({
-        id: c.id, title: c.bible.title, state: c.state, beat: c.beatIndex, expectedBeats: c.expectedBeats,
+        id: c.id, title: this.sagaTitle(c), state: c.state, beat: c.beatIndex, expectedBeats: c.expectedBeats,
         failures: c.failures, failureBudget: c.failureBudget, lab: c.lab ?? null,
       })),
       quests: this.state.quests.filter(q => q.state === 'open').map(q => ({
@@ -2286,7 +2261,102 @@ export class Game {
     };
   }
 
-  private async generateGenesis(lead: Lead): Promise<Quest> {
+  // ---- sagas: the v4 storyteller (docs/STORYTELLER.md; src/game/sagaflow.ts) -----------------------------
+  // The engine keeps every number it always had — the economy roll, the focal, slot counts, difficulty and its caps,
+  // the fillability guard, side loot and relics, the bank, the failure budget, the stall guard, the finale's fates and
+  // settleFinale. The flow owns what the story says, plus the few mechanics the build plan's §3 defaults hand it: asks
+  // by job type (D1), the finale's ways (D2), injuries by rollHurt under today's guard (D3), who decides a job (D5).
+
+  /** the saga flow's view of the game */
+  private sagaHost(): flow.SagaHost {
+    const live = this.liveSagaCast();
+    return {
+      rng: this.rng, storyRng: this.storyRng, ai: this.ai, state: this.state,
+      card: id => this.card(id), roster: () => this.roster(),
+      direction: () => flow.directionText(this.state.direction),
+      log: (kind, text) => this.log(kind, text),
+      // the roster, the lore, the recent NPC window, near-misses — and every live saga's cast
+      takenName: n => live.names.has(n) || this.nameTooSimilar(n),
+      noteNpcName: n => { this.recentNpcNames.push(n); while (this.recentNpcNames.length > 60) this.recentNpcNames.shift() },
+      npcPrefs: () => this.prefsFor('npc'),
+      placeOk: p => this.placeRested(p),
+      hasRoom: t => this.hasRoom(t), rosterCapacity: () => this.rosterCapacity(),
+      captiveCount: () => this.captives().length, captiveCapacity: () => this.captiveCapacity(),
+    };
+  }
+  /** a saga's title wherever the game prints one */
+  private sagaTitle(c: Chain): string { return c.saga?.plan?.title ?? 'a saga' }
+  /** the people of every saga still in play, by id and by name — the live-saga cast fence */
+  private liveSagaCast(): { ids: Set<string>; names: Set<string> } {
+    const cast = this.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending').flatMap(c => c.saga?.world.cast ?? []);
+    return { ids: new Set(cast.map(p => p.id)), names: new Set(cast.map(p => p.name)) };
+  }
+  /** "in the Western Forests" — where a returning face is, as far as the company knows */
+  private regionIn(region: string): string {
+    const n = REGION[region]?.name ?? region;
+    return `in ${n.startsWith('The ') ? n.replace(/^The/, 'the') : `the ${n}`}`;
+  }
+  /** a person's strongest memory WITH the company (D9): an engine-written line about them and the company, an edge a
+   *  saga left, or one to a soldier — every one a line the player read */
+  private companyEdge(id: string): RelEdge | undefined {
+    const cyc = this.state.cycle;
+    return this.state.lore.edges
+      .filter(e => e.active && !!e.blurb.trim() && (e.from === id || e.to === id)
+        && (e.from === e.to || !!e.sourceChainId || this.card(e.from === id ? e.to : e.from)?.character?.role === 'merc'))
+      .sort((a, b) => Number(b.core) - Number(a.core) || effectiveSalience(b, cyc) - effectiveSalience(a, cyc))[0];
+  }
+  /** a returning focal's memory and where they are (D9), or nothing when the player holds no memory of them */
+  private faceMemory(id: string, region: string): { memory: string; where: string } | undefined {
+    const e = this.companyEdge(id);
+    return e ? { memory: e.blurb, where: this.regionIn(region) } : undefined;
+  }
+  /** every lore face as a saga seat would see it: where it stands (the slate's old fences) and its strongest company
+   *  edge. A face with no recorded sex is left out — the cast never guesses one */
+  private faceCandidates(region: string, liveIds: Set<string>): FaceCandidate[] {
+    const out: FaceCandidate[] = [];
+    for (const nd of Object.values(this.state.lore.nodes)) {
+      if (!nd.active || nd.kind !== 'character') continue;
+      const card = this.card(nd.id);
+      const sex = nd.sex ?? (card ? sexOf(card) : undefined);
+      if (!sex) continue;
+      const role = card?.character?.role;
+      const where = card?.location.kind === 'held' ? card.location.state : card ? card.location.kind : undefined;
+      const top = this.companyEdge(nd.id);
+      out.push({
+        id: nd.id, name: nd.name, sex, race: nd.race ?? (card ? raceOf(card) : 'human'),
+        memory: top?.blurb ?? '', where: this.regionIn(region), edgeType: top?.type ?? '', edges: edgeCount(this.state.lore, nd.id, this.state.cycle),
+        ...(role === 'merc' ? { companySoldier: true } : {}),
+        ...(role === 'captive' && where !== 'lore' ? { companyCaptive: true } : {}),
+        ...(where === 'roster' || where === 'staged' || where === 'inventory' || where === 'room' || where === 'quest' ? { atTheFort: true } : {}),
+        ...(where === 'lore' ? { outOfReach: true } : {}),
+        ...(liveIds.has(nd.id) || where === 'limbo' ? { staged: true } : {}),
+      });
+    }
+    return out;
+  }
+  /** D9: the client seat reuses a fenced lore face with a client-type edge at P(new) = θ/(θ+N), at most one returning
+   *  face a saga, two sagas' cooldown — else the deal coins a stranger */
+  private returningClient(focalId: string, region: string, liveIds: Set<string>): Face | undefined {
+    const eligible = castableClients(this.faceCandidates(region, liveIds).filter(c => c.id !== focalId), recentFaces(this.state.chains));
+    return pickClientFace(this.storyRng, eligible, CAST_THETA);
+  }
+  /** a personal saga's seed (D12) and, when it came from an edge to a castable lore person, that person (D10): known,
+   *  their memory the edge's line; a rival-type edge seats them in the way instead of a coined opponent */
+  private personalSeedOf(merc: Card, region: string, liveIds: Set<string>): { seed: string; person?: Face & { rival: boolean } } {
+    const seed = this.personalSeed(merc);
+    const e = this.personalEdges(merc)[0];
+    if (!e || e.blurb !== seed || e.from === e.to) return { seed };
+    const other = e.from === merc.id ? e.to : e.from;
+    const c = this.faceCandidates(region, liveIds).find(x => x.id === other);
+    if (!c || c.companySoldier || c.companyCaptive || c.atTheFort || c.outOfReach || c.staged || recentFaces(this.state.chains).includes(c.id)) return { seed };
+    return { seed, person: { id: c.id, name: c.name, sex: c.sex, race: c.race, memory: e.blurb, where: c.where, rival: OPPONENT_EDGES.has(e.type) } };
+  }
+
+  /** A saga lead pursued. The focal FIRST (§2): personal → the soldier; a sequel → the one who slipped away; a lab
+   *  fixture's person; else, sometimes, a face the world already knows (lore promotion), or a new one at the payoff
+   *  value. Then the deal — synchronous, in the pursuit's prefix, so two pursuits at once never share a theme, a name or
+   *  a returning face (TEMPO I3) — then the plan, and card 1 beside the road ahead. */
+  private async startSaga(lead: Lead): Promise<Quest> {
     const personalMercId = lead.personalMercId;
     const returning = lead.focalId ? this.card(lead.focalId) : undefined;
     // a sequel whose focal has since become YOUR merc = a personal chain about them
@@ -2297,18 +2367,17 @@ export class Game {
     // SAGA LAB (docs/STORYTELLER.md §5.0): a lab lead's pins win over what the roll dealt
     const pin = lead.lab;
     if (pin) this.applyLabPins(eco, pin, lead);
-    // the focal character FIRST (§2): personal → the merc; sequel → the SLIPPED focal
-    // returns from the lore graph (§21-4a); else generated at the payoff value
+    const live = this.liveSagaCast();
     let focal: Card;
-    /** RECURRING_CAST §5 — set when this saga returns to a face the player has already met, so the
-     *  chain can open KNOWING them instead of staging them as a stranger. */
-    let returningFace: { name: string; record: string } | undefined;
+    /** the focal is a face the player already knows (D9): a sequel's, or a lore face promoted to a card */
+    let known = false;
     if (returningIsMerc) focal = returning!;
     else if (isPersonal) focal = this.card(personalMercId!)!;
     else if (returning) {
       focal = returning;
       this.unslotCard(focal);           // never leave a room slot pointing at them
       focal.location = HELD('limbo');   // back within reach, not yet owned
+      known = true;
     } else if (pin) {
       // the fixture's person, built from its own seed — the same face in every run and every arm
       focal = this.labFocal(pin, lead.level, lead.region, 'captive');
@@ -2325,9 +2394,10 @@ export class Game {
       });
       // §21-3 known-cast cadence + LORE §1 lazy promotion (built 2026-07-10): some sagas return
       // to a FACE THE WORLD ALREADY KNOWS — a lore-only coined person gets a full Card rolled
-      // here, and their lore node (memories, ties) is remapped onto it so their story follows
+      // here, and their lore node (memories, ties) is remapped onto it so their story follows.
+      // Never someone already in a live saga's cast (the live-saga fence)
       const loreCast = Object.values(this.state.lore.nodes).filter(nd =>
-        nd.active && nd.kind === 'character' && !this.card(nd.id) && !this.state.cards.some(c => c.name === nd.name));
+        nd.active && nd.kind === 'character' && !this.card(nd.id) && !this.state.cards.some(c => c.name === nd.name) && !live.ids.has(nd.id));
       // RECURRING_CAST §3 🔒 — two rules, replacing a >=3 gate, a per-tier cap and a flat 35%:
       //   1. the chance of coining a NEW face falls as the cast grows: P(new) = θ/(θ+N)
       //   2. reuse is weighted by EDGE COUNT — the matters that person is already part of
@@ -2356,19 +2426,7 @@ export class Game {
           if (e.from === nd.id) e.from = focal.id;
           if (e.to === nd.id) e.to = focal.id;
         }
-        this.knownCastSagas++;
-        // KNOWN_FACE=0 disables the §5 seeding, for A/B only
-        // ⚠ UNMEASURED — default OFF. The v1 shape of this measured WORSE (known faces reached
-        // the card more often, 3 -> 5, but were still introduced like strangers, 33% -> 80%), and
-        // v2 (deal the actual memory + carve the naming exception) could not be benched: the
-        // OpenAI account hit credit_balance_exhausted mid-run. KNOWN_FACE=1 to bench it.
-        if (process.env.KNOWN_FACE === '1') {
-          // the MEMORY, not the fact of one: "sold a prisoner out from under the company and kept
-          // the fee" is something a card can be written from; "has dealt with them before" is not.
-          const lines = (this.dossier(focal.id) || '').split('\n').slice(1)
-            .map(l => l.replace(/^[-\s]+/, '').trim()).filter(Boolean);
-          returningFace = { name: focal.name, record: lines[0] ?? '' };
-        }
+        known = true;
       } else {
         focal = materializeReward(this.rng, spec, lead.level, lead.region,
           { excludeConcepts: recentFocalTags, maxSkills: 2, prefs: this.prefsFor('npc') })[0]!;
@@ -2379,7 +2437,7 @@ export class Game {
       // rerolled them into a stranger — silently undoing every reuse (measured: the branch fired
       // 17 times in 30 and produced 0 returning faces). The guard is for coincidence, not for a
       // deliberate return.
-      for (let i = 0; !promoted && i < 12 && this.nameTooSimilar(focal.name); i++) {
+      for (let i = 0; !promoted && i < 12 && (this.nameTooSimilar(focal.name) || live.names.has(focal.name)); i++) {
         focal.name = rollName(this.rng, focal.tags.find(t => ['elf', 'human', 'wolfman', 'lizardman'].includes(t.concept))?.concept ?? 'human',
           focal.tags.some(t => t.concept === 'female') ? 'female' : 'male');
       }
@@ -2387,689 +2445,106 @@ export class Game {
       this.addCard(focal, promoted);
     }
     this.ensureLoreNode(focal);
-    // soldiers are NEVER-USE data at genesis (their only rule is "context, never cast" — the
-    // 32012 Koralla class shipped a merc as another saga's claimant anyway): don't deal them.
-    // A 10+ roster otherwise floods the 14-entry slate. The focal stays (personal sagas).
-    const slate = await this.buildLoreSlate(focal.id, 'who needs full dossiers for this saga',
-      e => !e.companySoldier || e.id === focal.id);
-    const races = Object.entries(REGION[lead.region]!.poolWeights) as [string, number][];
-    // pre-rolled names for NEW cast — must not collide with any living character (§4b corollary).
-    // Rolled WITH a sex and dealt annotated (a gender-opaque list once forced "Ithion" onto the
-    // story's veiled lady because order was mandatory)
-    const takenNames = new Set(this.state.cards.filter(x => x.character).map(x => x.name));
-    const assigned: { name: string; gender: string; race: string }[] = [];
-    for (let i = 0; assigned.length < 4 && i < 60; i++) {
-      const npcPrefs = this.prefsFor('npc');
-      const gender = prefPick(this.rng, ['male', 'female'], npcPrefs);
-      const race = prefPick(this.rng, races.map(r => r[0]), npcPrefs, m => races.find(r => r[0] === m)![1]);
-      const n = rollName(this.rng, race, gender);
-      if (!takenNames.has(n) && !assigned.some(a => a.name === n) && !this.nameTooSimilar(n)) assigned.push({ name: n, gender, race });
-    }
-    const assignedNames = assigned.map(a => a.name);
-    // coined cast never become cards — remember these names or their epithets get re-dealt
-    // ("Ashveil" once stamped three unrelated clients across chains)
-    // ⚠ TEMPO I3/I4: this block sits after an await (the slate), so it is the one NPC-name site
-    // concurrency can reach. The roll-and-push is contiguous — no await between the
-    // nameTooSimilar reads above and this push — so two genesis calls cannot deal the same name;
-    // what stays exposed is the cast the MODEL returns while another genesis is still out.
-    // Unhoistable (the names must be rolled against the slate); maxInFlight bounds it.
-    this.recentNpcNames.push(...assignedNames);
-    while (this.recentNpcNames.length > 60) this.recentNpcNames.shift();
-    // the MODEL sees a LEAN fingerprint — showing full arc+tensions in avoid (round 5) made
-    // avoid an ATTRACTOR per §8 (42022: seven token-to-oak-judgment sagas in one campaign);
-    // the rich text feeds only the engine-side ceremony lint below (the clash reads premises)
-    const avoid = this.state.chains.slice(-5).map(c =>
-      `${c.bible.title} — ${c.bible.kernel} (people: ${c.bible.cast.map(x => x.name).join(', ')})${c.state === 'done' || c.state === 'slipped' ? ` [SETTLED: ${c.story.currentSituation}]` : ''}`);
-    const avoidRich = this.state.chains.slice(-5).map(c =>
-      `${c.bible.title} — ${c.bible.kernel} (people: ${c.bible.cast.map(x => x.name).join(', ')}) ${c.bible.arc.join(' ')} ${c.bible.tensions.join(' ')}`);
-    const genesisInput = {
-      // labels are for the CARD writer, which is told what they mean; genesis is not, and its goal
-      // sentence gets pasted into every briefing of the saga — so it receives the bare atoms.
-      // A PERSONAL saga is about a soldier's own past, so its spark must come FROM that past.
-      // Dealt a generic what-if it loses to it every time: the designer's live game produced
-      // "Paid to the Wrong Hands" — the seed pool's 'a ransom paid to the wrong hands' verbatim —
-      // with the soldier demoted to a companion in a stranger's ransom plot, and the woman who
-      // once saved his life recast as a generic obstacle.
-      // PERSONAL_SEED=0 restores the old behaviour (a generic what-if even for a personal
-      // saga), for A/B only
-      seed: pin ? pin.spark : isPersonal && process.env.PERSONAL_SEED !== '0' ? this.personalSeed(focal) : sampleSeed(this.rng),
-      // NOCLIENT=1 (lab): a personal saga has no client at all — both blind judges named
-      // 'client-hires-fetch kernel + soldier clause appended' as what still holds it back
-      // MEASURED and shipped: a personal saga has NO client. Blind A/B, 2 judges, 30 sagas,
-      // inter-judge r 0.97 — aboutness 2.5 (generic seed) -> 5.1 (their own past) -> 7.9 (no
-      // client), soldier-led 0/10 -> 2/10 -> 10/10, prose flat throughout. Judge, unprompted:
-      // "clientless read STRONGER — the soldier WANTS something", and they are not engineless:
-      // the stake becomes what the FORT loses if he walks. NOCLIENT=0 restores a client.
-      noClientWanted: isPersonal && process.env.NOCLIENT !== '0' || undefined,
-      keywords: sampleKeywords(this.rng).map(k => k.replace(/^[a-z-]+: /, '')),
-      // most sagas must live AWAY from the landmark — omission beats the ignored "set it elsewhere"
-      // nudge (both sagas of a read centered Thornhollow when genesis could always see it)
-      location: this.locationLine(lead.region, this.rng.chance(0.15)),
-      rarity: lead.rarity,
-      stakes: (lead.rarity === 'rare' ? 'high' : lead.rarity === 'uncommon' ? 'mid' : 'low') as 'low' | 'mid' | 'high',
-      tone: pickTone(this.rng),
-      // empty avoid/slate omitted outright — a "[]" field with no rule referencing it is
-      // parse-load for a cold model (context-free audit 2026-07-17)
-      avoid: avoid.length ? avoid : undefined,
-      // dossier only when it adds lines beyond the blurb — a byte-identical duplicate of tags
-      // taught the writer nothing and broke "dossier outranks blurb" (context-free audit)
-      focal: { id: focal.id, name: focal.name, tags: renderTags(focal.tags), dossier: (d => d.includes('\n') ? d : undefined)(this.dossier(focal.id)), isExistingMerc: isPersonal },
-      kind: isPersonal ? 'development' : eco.kind, twist: eco.twist,
-      expectedBeats: eco.beats,
-      slate: slate.length ? slate : undefined,
-      assignedNames: assigned.map(a => `${a.name} (${a.gender === 'female' ? 'a woman\'s name' : 'a man\'s name'})`),
-    };
-    let g = await this.ai.genesis(genesisInput);
-    // names dealt by the dup-recast below — the NAME GUARD must honor them (34014/35015: the
-    // guard clobbered a recast client with assignedNames[0], a name the model had already
-    // spent on another cast member → one bible carried "Serrin" as client AND obstacle while
-    // the bible TEXT kept the recast name; three sagas shipped with cast/text name splits)
-    const recastNames: string[] = [];
-    const recastMember = (d: { name: string; loreId?: string }, extraTaken: Iterable<string> = []) => {
-      const taken = new Set([focal.name, ...slate.map(x => x.name), ...assignedNames, ...g.cast.map(x => x.name), ...extraTaken]);
-      let fresh = rollName(this.rng, this.rng.weighted(races));
-      for (let i = 0; i < 8 && taken.has(fresh); i++) fresh = rollName(this.rng, this.rng.weighted(races));
-      const escRe2 = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const forms = [...new Set([d.name, d.name.split(/\s+/)[0]!])];
-      const ren = (s: string) => forms.reduce((t, f) => t.replace(new RegExp(`\\b${escRe2(f)}\\b`, 'g'), fresh), s);
-      d.name = fresh;
-      recastNames.push(fresh);
-      delete d.loreId;
-      g.title = ren(g.title); g.kernel = ren(g.kernel); g.situation = ren(g.situation); g.goal = ren(g.goal);
-      g.arc = g.arc.map(ren); g.tensions = g.tensions.map(ren); g.openDirections = g.openDirections.map(ren);
-      for (const m of g.cast) { m.who = ren(m.who); m.want = ren(m.want); }
-    };
-    // KERNEL-NOVELTY GUARD (mechanical — the `avoid` rule alone was ignored: two
-    // reliquary-in-a-cellar sagas shipped in one campaign). 2026-07-12: the single unchecked
-    // retry let a rejected premise ship anyway (twin custody-clause-at-a-ford sagas), and the
-    // same-role guard trusted MODEL-reported loreId — a slate name copied without its id slipped
-    // the fence (one coined foreman obstacled THREE concurrent sagas). Now: engine resolves
-    // loreIds by name first, every draft is re-validated, and a stubborn duplicate cast member
-    // is mechanically recast with a fresh name.
-    {
-      // the PREMISE CLASH reads premise words only — see premiseFingerprint()
-      const premiseWords = premiseFingerprint(lead.region, [genesisInput.location ?? '', focal.name, ...this.roster().map(m => m.name)]);
-      const loreByName = new Map(Object.values(this.state.lore.nodes)
-        .filter(n => n.kind === 'character' && n.active).map(n => [n.name, n.id]));
-      // canonical person key: lore id when the world knows them, else the bare name — BOTH the
-      // live casts and the draft resolve the same way (a coined cast member has no loreId in her
-      // OWN bible, so an id-only check let one heir client two sagas born a cycle apart)
-      const personKey = (x: { name: string; loreId?: string }) => x.loreId ?? loreByName.get(x.name) ?? x.name;
-      // live chains AND the last few closed ones — one rescue NPC once cliented 5 of 6
-      // sequential sagas (the live-only window let her straight back in each time).
-      // 2026-07-12: a LIVE chain's cast is fenced in EVERY role (one gaoler anchored all three
-      // concurrent sagas by rotating roles); recent-closed chains fence same-role client/obstacle
-      // only, so recurring faces stay possible over TIME, never in parallel.
-      const liveAny = new Set(this.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending')
-        .flatMap(c => c.bible.cast.map(personKey)));
-      const recentRole = new Set(this.state.chains.slice(-3)
-        .flatMap(c => c.bible.cast.filter(x => x.role === 'client' || x.role === 'obstacle').map(x => `${x.role}:${personKey(x)}`)));
-      // keyed off the ROSTER, not the slate — soldiers are filtered out of the slate now, but
-      // the model can still coin a matching name; the guard must keep seeing them
-      const soldierKeys = new Set(this.roster().flatMap(m => [m.id, m.name]));
-      const issues = (d: typeof g): { why: string; hard?: boolean; dup?: (typeof g.cast)[number] } | null => {
-        for (const m of d.cast) if (!m.loreId && loreByName.has(m.name)) m.loreId = loreByName.get(m.name);
-        const kw = premiseWords(d);
-        const hits = (c: Chain) => { let hit = 0; premiseWords(c.bible, c.region).forEach(w => { if (kw.has(w)) hit++ }); return hit };
-        // a LIVE chain's premise clashes at a LOWER bar — the player holds both stories at
-        // once (37017: two concurrent foundling-escorted-to-a-rite sagas passed the recent bar);
-        // the LAST TWO chains regardless of state too (39019: back-to-back dies-forgery sagas)
-        const live = [...this.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending'), ...this.state.chains.slice(-2)];
-        const clashChain = this.state.chains.slice(-5).find(c => hits(c) >= PREMISE_CLASH.recent) ?? live.find(c => hits(c) >= PREMISE_CLASH.live);
-        // quoted LEAN into the re-roll's avoid note — the rich text (arc + tensions) in avoid is an
-        // attractor (see `avoid` above)
-        const clash = clashChain && `${clashChain.bible.title} — ${clashChain.bible.kernel}`;
-        // dispute-shape monoculture: campaigns converge on ONE settling device (42022: seven
-        // oath/judgment-at-a-tree sagas). When the draft AND 2+ recent chains settle by
-        // ceremony, the draft must settle its matter another way
-        const CEREMONY = /\b(oath|judgment|judgement|pledge|rite|moot|ceremon|vow|sworn|swear)\w*/i;
-        const draftCeremony = CEREMONY.test(`${d.kernel} ${d.arc.join(' ')} ${d.goal}`);
-        const ceremonyMono = draftCeremony && avoidRich.filter(a => CEREMONY.test(a)).length >= 2;
-        // custody-of-the-departed guard (mechanical — the outOfReach flag alone was ignored:
-        // a SOLD entertainer re-appeared "in your cells" three cycles later)
-        const goneNames = slate.filter(s => s.outOfReach).map(s => s.name);
-        const custodyGhost = goneNames.find(n => d.situation.includes(n) && /\b(cells?|custody|held at the fort|in your keeping)\b/i.test(d.situation));
-        // same-CLIENT guard (mechanical — the prompt rule alone left one lore client running
-        // three sagas at once); obstacles too — concurrent sagas once shared ONE coined villain
-        const clientDup = d.cast.find(x => x.name !== focal.name &&
-          (liveAny.has(personKey(x)) || ((x.role === 'client' || x.role === 'obstacle') && recentRole.has(`${x.role}:${personKey(x)}`))));
-        // the saga is ABOUT the focal — a bible without them strands the care beat, the role
-        // forcing, and the finale steering (29010: a vault saga shipped with its focal absent)
-        const focalMissing = !d.cast.some(x => x.loreId === focal.id || x.name === focal.name);
-        // soldiers are CONTEXT, never cast (sole exception: the focal) — the prompt fence alone
-        // let a merc ship as another saga's salvage claimant (32012: Koralla)
-        const soldierCast = d.cast.find(x => x.loreId !== focal.id && x.name !== focal.name &&
-          ((x.loreId && soldierKeys.has(x.loreId)) || soldierKeys.has(x.name)));
-        // capitalization marks a proper noun only MID-sentence — a capitalized word opening a
-        // step OR any later sentence is just English (guardlab 81001: sentence-start imperatives
-        // "Beat", "Force", "Defeat" fired the conjured lint on 3/12 clean arcs — every false
-        // fire burned ~74s and the seed)
-        const properTokens = (s: string) => new Set(
-          s.split(/(?<=[.!?])\s+/).flatMap(f => f.replace(/^\S+\s*/, '').match(/\b[A-Z][a-z]{2,}\b/g) ?? []));
-        // parked arc: a place token staged in 3+ steps means the beats replay one scene
-        // (34014: three defend-the-hearing-at-the-oak beats; the ARC SHAPE rule alone failed).
-        const castTok = new Set(d.cast.flatMap(x => x.name.split(/\s+/)));
-        const tokSteps = new Map<string, number>();
-        for (const step of d.arc) for (const tok of properTokens(step))
-          if (!castTok.has(tok)) tokSteps.set(tok, (tokSteps.get(tok) ?? 0) + 1);
-        const parked = [...tokSteps.entries()].find(([, n]) => n >= 3)?.[0];
-        // BIBLE.md: step 1 = take the job, goal NOT done here — "arc kills the beat-1-completes-
-        // goal rewind" is a VALIDATED property that regressed (37017 predator, 38018 granary,
-        // 41021 singer all delivered/settled at beat 1 and un-happened later)
-        const step1Delivers = /\b(deliver|hand (over|him|her|it|the)|bring .{0,40} (back )?to\b|present .{0,30} to\b|return .{0,30} to\b)/i.test(d.arc[0] ?? '');
-        // a step that merely confirms what is already known is a null job (41021: "establish
-        // that the singer's binding feather is missing" — told to the player two cards earlier)
-        const nullStep = d.arc.find(s => /\b(confirm|verify|establish that|learn whether)\b/i.test(s));
-        // arc CONSERVATION (lab batch I: 6/8 arcs conjured places/tools mid-chain): a step's
-        // ERRAND half may only touch what the goal, the cast, or an EARLIER step introduced —
-        // the yield half is where new things legitimately enter (they are the discoveries)
-        let conjured: string | undefined;
-        for (let i = 1; i < d.arc.length && !conjured; i++) {
-          const errand = d.arc[i]!.split('→')[0]!;
-          const prior = `${d.goal} ${d.arc.slice(0, i).join(' ')}`;
-          for (const tok of properTokens(errand)) {
-            if (!castTok.has(tok) && !prior.includes(tok)) { conjured = `"${tok}" (step ${i + 1})`; break; }
-          }
-        }
-        // settle-as-contracted (saga batch N: 3/8 arcs end off-contract — the hired thing lands
-        // at a fresh meeting-place, not where the hire pointed). Where the hire delivers HOME —
-        // to the fort/your keeping or to the client themselves — the last step must NOT invent an
-        // external delivery-place: the fort is ground the company already holds (37017 quay for
-        // "the fort's cells"). Detected only for home-delivery goals; external-destination hires
-        // (a named tent/crossing the client sends the party to) are legitimate and left alone.
-        const lastStep = d.arc[d.arc.length - 1] ?? '';
-        const goalHome = /\b(fort|the cells|our (keeping|hall|cells))\b/i.test(d.goal)
-          || /\b(to|into) (me|my (keeping|custody)|the client|us)\b/i.test(d.goal);
-        // a FRESH place (not the goal, cast, or any earlier step — same conservation test as
-        // conjured) that the last step delivers to, when the hire is a home-delivery: the model
-        // invents a meeting-scene instead of coming back to the fort it already holds
-        const priorToLast = `${d.goal} ${d.arc.slice(0, -1).join(' ')}`;
-        const offContractPlace = goalHome && !/\bthe fort\b/i.test(lastStep)
-          ? [...properTokens(lastStep)].find(t => !castTok.has(t) && !priorToLast.includes(t))
-          : undefined;
-        // a declared OBSTACLE that never appears in any arc step is dead cast — the chain has no
-        // antagonist and reads as a pure fetch (batch R: Rolon, Celarion; batch Q: Oxel — all
-        // absent). Checks NAME presence, not behaviour (a helpful "obstacle" is too fuzzy to lint).
-        const obstacleEntry = d.cast.find(x => x.role === 'obstacle');
-        const obstacleAbsent = obstacleEntry && !d.arc.some(s =>
-          new RegExp(`\\b${obstacleEntry.name.split(/\s+/)[0]!.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(s));
-        // dup RIDES ALONG whatever why is reported: an early clash-return once masked a live-chain
-        // dup from the post-retry mechanical recast (29010: Nurisea obstacled two live sagas).
-        // HARD defects (checked first so a soft return can't mask them) are the ones the engine
-        // cannot ship: a bible without its focal, a custody contradiction, a premise the player
-        // is already playing. Everything else is soft — log-only, see the verdict below.
-        if (focalMissing) return { hard: true, why: `your rejected draft's cast is missing ${focal.name} — the saga is ABOUT them; they must be a cast entry`, dup: clientDup };
-        if (custodyGhost) return { hard: true, why: `your rejected draft placed ${custodyGhost} in the company's custody — they passed out of the company's reach and are FREE in the world; rebuild the saga around where they actually stand`, dup: clientDup };
-        if (clash) return { hard: true, why: `your rejected draft "${d.title} — ${d.kernel}" repeats "${clash}" — invent a saga with a different prize, a different wrongdoer, and different ground`, dup: clientDup };
-        if (soldierCast) return { why: `your rejected draft cast ${soldierCast.name} — one of the company's own soldiers — as ${soldierCast.role}; soldiers are context, never cast members: a DIFFERENT person (or no one) takes that part`, dup: soldierCast };
-        if (parked) return { why: `your rejected draft's arc parks at ${parked} — three or more steps stage the same ground; each step must move to NEW ground or a new claimant, and only the last may return to bring the matter to a head`, dup: clientDup };
-        if (step1Delivers) return { why: `your rejected draft's FIRST arc step already performs a delivery or handover — the goal is NOT done at step 1: step 1 is taking the job plus a first leg of field work, and every delivery belongs to a later step`, dup: clientDup };
-        if (nullStep) return { why: `your rejected draft's arc contains a step that merely confirms or verifies something ("${nullStep}") — a null job; every step must CHANGE the situation: gain ground, gain leverage, or raise the stakes`, dup: clientDup };
-        // 91001 read: 5 mid-arc cards asserted artifacts no record established — every one
-        // traceable to a step naming its OWN yield-object inside the errand half ("force a
-        // bone map" before any map is known). stripYields can't fix an errand-half leak.
-        const yieldInErrand = d.arc.map(s => {
-          const halves = s.split(/→ yields:/i);
-          if (halves.length < 2) return null;
-          const toks = (t: string) => t.toLowerCase().replace(/[^a-z' ]/g, ' ').split(/\s+/).filter(w => w.length > 4);
-          const err = new Set(toks(halves[0]!));
-          const hits = [...new Set(toks(halves[1]!))].filter(w => err.has(w));
-          return hits.length >= 2 ? hits.slice(0, 3).join(', ') : null;
-        }).find(Boolean);
-        if (yieldInErrand) return { why: `your rejected draft's arc names a step's own yield ("${yieldInErrand}") inside its errand half — the errand says only what the party DOES and where; the thing found lives after "→ yields:" alone`, dup: clientDup };
-        if (ceremonyMono) return { why: `your rejected draft settles its matter with an oath, judgment, or ceremony — as the player's recent sagas already did; settle THIS matter by an entirely different means (a chase, a trade, a siege, an escape, a betrayal exposed, a debt collected — anything but a gathering that swears or judges)`, dup: clientDup };
-        if (offContractPlace) return { why: `your rejected draft's LAST step delivers the hired thing to "${offContractPlace}" — but the hire brings it HOME (to the fort or to the client in hand); the closing step settles AT THE FORT the company already holds, never at a fresh meeting-place invented for the ending`, dup: clientDup };
-        if (obstacleAbsent) return { why: `your rejected draft names ${obstacleEntry!.name} as the obstacle, yet they appear in NO arc step — the one who stands in the company's way must actively BLOCK a step (guard the prize, refuse, fight, or flee) in the step where the company meets them; write them into that step or give the part to no one`, dup: clientDup };
-        if (conjured) return { why: `your rejected draft's arc touches ${conjured} that no earlier step yielded and neither the goal nor the cast introduced — every place, person, and tool a step USES must come from the hire, the goal, or an earlier step's yield (new things enter only as a step's own "→ yields:")`, dup: clientDup };
-        if (clientDup) return { why: `your rejected draft used ${clientDup.name} as ${clientDup.role} — they are already bound up in a running saga; this one needs a different person in that part entirely`, dup: clientDup };
-        return null;
-      };
-      // GUARD VERDICT (guardlab 81001/82001 + blind judge, 2026-07-17): re-rolling on
-      // story-SHAPE defects is a net NEGATIVE — fire rate 58-67%, +50s mean latency, and
-      // blind-judged re-rolled bibles LOST to the drafts they replaced 5/7 (mean 5.3 vs 6.0):
-      // the avoid-note nag degrades the second draft ("never nag a cheap model"). Shape lints
-      // are LOG-ONLY telemetry now. One re-roll survives for HARD defects the engine cannot
-      // ship (focal missing breaks the care beat and finale steering; custody ghost contradicts
-      // world state; premise clash duplicates a saga the player is playing — and burning the
-      // seed IS the mechanical fix for a clash). Duplicate cast stays free: mechanical recast.
-      let issue = issues(g);
-      if (issue?.hard) {
-        this.log('dev', `saga draft rejected (one re-roll): ${issue.why.slice(0, 120)}…`);
-        const reseed = pin ? pin.spark : isPersonal && process.env.PERSONAL_SEED !== '0'
-          ? (seeds => seeds.find(x => x !== genesisInput.seed) ?? genesisInput.seed)(this.personalSeeds(focal))
-          : sampleSeed(this.rng);
-        g = await this.ai.genesis({ ...genesisInput, seed: reseed, avoid: [...avoid, issue.why] });
-        issue = issues(g);
-      }
-      if (issue) this.log('dev', `saga draft lint (${issue.hard ? 'HARD, shipping anyway' : 'log-only'}): ${issue.why.slice(0, 120)}…`);
-      // recast a stubborn duplicate client/obstacle as a FRESH person — a new villain beats
-      // the same face fronting a fourth concurrent saga. The rename must be COMPLETE: reach
-      // the bible's free text (33013: a recast client lived on in situation/arc and the beat
-      // writer resurrected him) and never collide with a name already in play
-      // (33013: the rolled name duplicated the same bible's client — two cast both "Rels")
-      if (issue?.dup) recastMember(issue.dup);
-    }
-    // persist write-back (guarded); new places become lore nodes
-    for (const p of g.newPlaces.slice(0, 3)) {
-      const id = freshId('place-');
-      // sentence-safe clamp — a blurb ending mid-phrase ("hidden in a ring of") invites later
-      // writers to invent the completion; prefer a whole-sentence cut, else word-safe
-      const b = p.blurb.length > 120
-        ? (c => { const d = c.lastIndexOf('. '); return d > 60 ? c.slice(0, d + 1) : c.replace(/\s+\S*$/, '') })(p.blurb.slice(0, 120))
-        : p.blurb;
-      this.state.lore.nodes[id] = { id, kind: 'place', name: p.name || rollPlaceName(this.rng), blurb: b, identity: b, active: true, createdCycle: this.state.cycle };
-    }
-    guardEdges(this.state.lore, modelEdges(g.newEdges), this.state.cycle, () => freshId('e'));
-    // §4b NAME GUARD: the AI never invents character names. Known-cast entries keep their
-    // lore-node names; NEW cast entries must use engine-rolled names (assignedNames, in order).
-    {
-      const legal = new Set<string>([focal.name, ...slate.map(x => x.name), ...assignedNames, ...recastNames]);
-      let next = 0;
-      const ROLES = ['client', 'companion', 'quarry', 'obstacle', 'ally', 'prize'];
-      for (const member of g.cast) {
-        member.name = member.name.replace(/\s*\([^)]*\)\s*$/, '');   // strip echoed "(a man's name)" notes
-        // role fence: genesis once leaked its input KIND ("captive") into cast.role, and the
-        // beat writer branches the care beat on role — clamp out-of-enum values
-        if (!ROLES.includes(member.role)) member.role = member.name === focal.name ? 'quarry' : 'ally';
-        if (member.loreId === focal.id) {
-          // the focal's id pins the focal's NAME (a bible once dressed the focal's entry in a
-          // slate neighbor's name over the focal's own id — the wrong name was "legal", so it
-          // slipped the fence and broke role forcing + introducedNames downstream)
-          member.name = focal.name;
-        } else if (member.loreId && this.state.lore.nodes[member.loreId]) {
-          member.name = this.state.lore.nodes[member.loreId]!.name;   // canon wins
-        } else if (!legal.has(member.name)) {
-          // never deal a name another cast member already bears (the Serrin² collision)
-          const used = (n: string | undefined) => !!n && g.cast.some(m2 => m2 !== member && m2.name === n);
-          let replacement = assignedNames[next++];
-          while (used(replacement)) replacement = assignedNames[next++];
-          for (let i = 0; (!replacement || used(replacement)) && i < 8; i++) replacement = rollName(this.rng, this.rng.weighted(races));
-          member.name = replacement ?? member.name;
-        }
-      }
-    }
-    // FINAL SWEEP (38018: Nurov obstacled TWO live sagas despite the liveAny fence — whatever
-    // path admits them, no cast member may share a live chain's cast in ANY role, ever)
-    {
-      const liveChains = this.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending');
-      const liveKeys = new Set(liveChains.flatMap(c => c.bible.cast.flatMap(m => [m.loreId ?? '', m.name].filter(Boolean))));
-      for (const m of g.cast) {
-        if (m.name === focal.name || m.loreId === focal.id) continue;
-        if (liveKeys.has(m.name) || (m.loreId && liveKeys.has(m.loreId))) recastMember(m, liveKeys);
-      }
-      // a live chain's cast may not haunt this bible's TEXT either (40020: one bible's TWIST
-      // read "Algar's hound" — a ferryman from a concurrent saga who wasn't even in this cast)
-      const escRe3 = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const ownNames = new Set(g.cast.flatMap(m => m.name.split(/\s+/)));
-      for (const c of liveChains) for (const other of c.bible.cast) {
-        for (const n of new Set([other.name.trim(), other.name.trim().split(/\s+/)[0]!])) {
-          if (n.length < 3 || ownNames.has(n)) continue;
-          const rx = new RegExp(`\\b${escRe3(n)}('s)?\\b`, 'g');
-          const rep = (_: string, p?: string) => p ? "another party's" : 'another party';
-          g.situation = g.situation.replace(rx, rep); g.goal = g.goal.replace(rx, rep);
-          g.arc = g.arc.map(s => s.replace(rx, rep)); g.tensions = g.tensions.map(s => s.replace(rx, rep));
-          g.openDirections = g.openDirections.map(s => s.replace(rx, rep));
-          if (typeof g.twistReveal === 'string') g.twistReveal = g.twistReveal.replace(rx, rep);
-        }
-      }
-    }
-    // ENGINE BELTS on the bible (R28: prompt rules alone kept leaking):
-    // (a) the banned prop must not ride bible fields into every downstream card — scrub it;
-    // (b) a thing-prize saga's focal labeled "prize" reads as a person-deliverable under a
-    //     goods envelope AND flips the care-beat bucket — remap to quarry.
-    const scrub = (s: string) => s.replace(/\b(ledger|manifest|registry|record-book)s?\b/gi, 'charter');
-    g.kernel = scrub(g.kernel); g.situation = scrub(g.situation); g.goal = scrub(g.goal);
-    g.arc = g.arc.map(scrub); g.tensions = g.tensions.map(scrub); g.openDirections = g.openDirections.map(scrub);
-    for (const m of g.cast) { m.who = scrub(m.who); m.want = scrub(m.want) }
-    if (eco.kind === 'gold-hoard' || isPersonal) {
-      const f = g.cast.find(m => m.name === focal.name);
-      if (f?.role === 'prize') f.role = 'quarry';
-    }
-    // CAST-SLOT INTEGRITY (2026-07-11 — judges found recycled slate names bound into the
-    // quarry/prize slot of sagas that starred someone else, in 4+ bibles per campaign):
-    // the FOCAL owns the central role; any other holder is demoted to a supporting one.
-    {
-      const centralRole = eco.kind === 'recruit' ? 'prize' : 'quarry';
-      const focalEntry = g.cast.find(m => m.name === focal.name);
-      if (focalEntry && !isPersonal && !['client'].includes(focalEntry.role)) focalEntry.role = centralRole;
-      // development sagas are about the company's OWN (#357/#360 evidence: a focal merc labeled
-      // 'quarry' steers the finale to close around the wrong person, as if hunting one's own)
-      if (focalEntry && isPersonal && ['quarry', 'prize', 'obstacle'].includes(focalEntry.role)) focalEntry.role = 'companion';
-      for (const m of g.cast) {
-        if (m !== focalEntry && (m.role === 'quarry' || m.role === 'prize')) m.role = 'obstacle';
-      }
-    }
-    // Coined cast are NOT persisted here. LORE.md §10 puts story-NPC write-back at saga CLOSE —
-    // met-only, capped 2/saga, each with one memory edge — and this genesis pass used to pre-empt
-    // it, recording every cast member unmet, uncapped and EDGELESS. An edgeless node can never
-    // decay (decayPass retires edges, not nodes) and carries no weight for RECURRING_CAST §3's
-    // reuse, so the graph filled with people who could neither be forgotten nor come back.
-    // Live-chain cast are absent from the slate meanwhile, which LORE.md §10 states is intended.
     const chain: Chain = {
       id: freshId('chain-'), kind: eco.kind, isPersonal, focalId: focal.id,
-      castIdentity: Object.fromEntries(assigned.map(a => [a.name, { sex: a.gender as 'male' | 'female', race: a.race }])),
       level: lead.level, rarity: lead.rarity, region: lead.region,
       expectedBeats: eco.beats, payoff: eco.payoff, bank: 0, cyclesSpent: 0,
       failureBudget: eco.failureBudget, failures: 0, beatIndex: 0,
-      bible: {
-        title: g.title, kernel: g.kernel, cast: g.cast, situation: g.situation, goal: g.goal,
-        arc: g.arc, twist: g.twistReveal, tensions: g.tensions, openDirections: g.openDirections,
-        stakeIfLost: g.stakeIfLost,
-        // rolled ONCE at hiring and kept, so a re-offered beat 1 tells the same arrival twice
-        arrival: sampleArrival(this.rng),
-      },
-      // player-facing story state starts from the APPARENT goal — the bible's situation and
-      // directions are the hidden truth and must never seed a surface the UIs display. The
-      // taking-up framing keeps beat-1 writers from posing the whole errand (R22: a bare goal
-      // as currentSituation read as "things already stand at the goal")
-      // "has just taken this up" contradicted beat 1's own definition (the taking-up IS beat 1)
-      // no goal text here — the goal rides in its own bible field, and printing it twice made
-      // the exact sentence a paste-magnet for the beat-1 writer (verifier, 33013 render)
-      story: {
-        currentSituation: 'The matter has just come before the company; nothing has been done yet.',
-        // RECURRING_CAST §5: the reveal cadence is per-chain, so a face the company has known for
-        // three sagas was being staged as a stranger — 7 of 16 returning-face cards did not name
-        // them at all ("find any trace of the missing priest", of someone the player has a defining
-        // memory with). They ARE introduced: seeding these two lists is what isMet(), scrubUnmet()
-        // and the beat writer's naming rule all already read.
-        knownToPlayer: returningFace
-          ? [returningFace.record
-              ? `${returningFace.name} and the company have history: ${returningFace.record}`
-              : `The company has dealt with ${returningFace.name} before.`]
-          : [],
-        openThreads: [], actorStates: {},
-        // a personal saga's focal is the company's OWN soldier — the player knows them, so the card
-        // must never introduce them like a stranger ("A peasant scout, Keesa, came down from higher
-        // ground…" — live, 2026-09-25). PERSONAL_CARD=0 restores the old input for A/B.
-        introducedNames: returningFace ? [returningFace.name]
-          : isPersonal && process.env.PERSONAL_CARD !== '0' ? [focal.name] : [],
-      },
       state: 'active', createdCycle: this.state.cycle,
       ...(pin ? { lab: { fixture: pin.id, path: pin.path, N: pin.N, log: [] } } : {}),
     };
+    // THE DEAL (the who, the seed, the places), synchronous
+    const host = this.sagaHost();
+    const pins: flow.DealPins = {};
+    if (isPersonal) {
+      const s = this.personalSeedOf(focal, chain.region, live.ids);
+      pins.personalSeed = s.seed;
+      if (s.person) pins.seedPerson = s.person;
+    } else {
+      if (known) { const m = this.faceMemory(focal.id, chain.region); if (m) pins.focalMemory = m }
+      if (!pins.focalMemory) pins.returningClient = this.returningClient(focal.id, chain.region, live.ids);
+    }
+    const rec = flow.deal(host, chain, lead, focal, pins);
+    for (const p of rec.world.places) this.notePlace(p);
     focal.chainIds.push(chain.id);
     this.state.chains.push(chain);
-    this.log('chain', `A story begins: ${g.title}`);
-    return this.generateChainBeat(chain, lead);
+    try {
+      const plan = await flow.plan(host, chain);
+      this.log('chain', `A story begins: ${plan.title}`);
+      return await this.sagaStep(chain, lead);
+    } catch (e) {
+      // the pursuit failed and its lead stays on the board (TEMPO P4): the saga it was writing never began
+      this.state.chains = this.state.chains.filter(c => c !== chain);
+      focal.chainIds = focal.chainIds.filter(id => id !== chain.id);
+      throw e;
+    }
   }
 
-  private async generateChainBeat(chain: Chain, lead: Lead): Promise<Quest> {
-    const isFinale = finaleReady(chain);
-    // finales are ALWAYS one slot per approach (3 mutex plans); the AI is told the true shape.
-    // Beats obey the fillability guard: never more slots than the roster has soldiers.
-    const n = isFinale ? 3 : Math.max(1, Math.min(slotCount(this.rng, 'investigate', chain.rarity), this.roster().length));
-    const sideLootV = isFinale ? 0 : beatSideLoot(this.rng, chain);
+  /** the saga's next card (one already on offer comes back verbatim, D15) and the quest built around it */
+  private async sagaStep(chain: Chain, lead: Lead): Promise<Quest> {
+    // the game's own gate decides when the finale comes (finaleReady): reached early — the setbacks spent, or the stall
+    // guard's merc-cycles — it is the last chance (D14), and the jobs never reached drop off the road
+    const rec = chain.saga!;
+    if (!rec.lastchance && finaleReady(chain) && !flow.posOf(rec).finale) rec.lastchance = true;
+    const out = await flow.card(this.sagaHost(), chain);
+    return this.sagaQuest(chain, lead, out);
+  }
+
+  /** a saga card's quest: today's slot count, side loot, relic chance, difficulty caps and gravity, the asks from the
+   *  job's type (D1); the finale one place per way, each its own plan, the gold road leaning easy (D2) */
+  private sagaQuest(chain: Chain, lead: Lead, out: flow.SagaCardOut): Quest {
+    const rec = chain.saga!, plan = rec.plan!, pos = out.pos;
     const focal = this.card(chain.focalId);
-    // two-part lore prompting (LORE.md): selector picks who gets full dossiers, THEN the writer
-    // receives the relevant lore — beats carry world memory, not just the frozen bible
-    // another LIVE chain's cast is invisible to this chain's writer — Nurov entered a second
-    // saga through the lore feed and led war bands there while under the first saga's escort
-    const otherLiveCast = new Set(this.state.chains
-      .filter(c2 => c2.id !== chain.id && (c2.state === 'active' || c2.state === 'finale-pending'))
-      .flatMap(c2 => c2.bible.cast.flatMap(m => [m.loreId ?? '', m.name].filter(Boolean))));
-    const inCast = (e: { id: string; name: string }) => chain.bible.cast.some(m => m.loreId === e.id || m.name === e.name);
-    const relevantLore = await this.buildLoreSlate(chain.focalId, 'who needs full dossiers for this saga step', e =>
-      !otherLiveCast.has(e.id) && !otherLiveCast.has(e.name)
-      // same never-use fence as genesis: soldiers reach a beat card only when the BIBLE binds
-      // them (focal / cast entry); the rest of the roster is copy-bait, not context
-      && (!e.companySoldier || e.id === chain.focalId || inCast(e))
-      // a cast member's lore entry that adds NO flag is a byte-duplicate of bible.cast
-      // (context-free audit: same person described twice in one payload) — drop it. The FOCAL
-      // is exempt: their lore identity carries the tags/sex the writer has no other source
-      // for (bible cast entries hold who/want only — dropping it left a named focal sexless)
-      && (e.id === chain.focalId || !!e.companySoldier || !!e.companyCaptive || !!e.atTheFort || !!e.outOfReach || !inCast(e)));
-    // 🛠 2026-07-10 (reverses the earlier arrive-FRESH ruling): a lapsed unmarched beat is
-    // re-offered VERBATIM from cache — a re-rendered "fresh telling" drifted settled facts
-    // (a mute girl became talkative between two renders of the same step)
-    const cached = this.cachedBeatOut.get(chain.id);
-    const isRepose = !isFinale && chain.lastGeneratedBeat === chain.beatIndex + 1;
-    // reveal cadence enforced mechanically (§2 — prompts alone failed at 4-person casts):
-    // a cast member neither met yet, named by THIS step, focal, nor the client is flagged
-    // offstage — the writer may not name them, so later beats introduce them on their own turn
-    const dealtStep = isFinale ? chain.bible.arc[chain.bible.arc.length - 1]!
-      : chain.bible.arc[Math.min(chain.beatIndex, chain.bible.arc.length - 1)]!;
-    // the CARD writer never sees a step's "→ yields:" answer — handing it the yield made
-    // cards name the find before the party looked (lab batch C, 4/6); the RESOLVER keeps
-    // the full step because it must deliver that yield
-    const stripYields = (s?: string) => (s ?? '').replace(/\s*→ yields:.*$/i, '');
-    // BEAT 1's step opens "Take the job / Accept the hire and <errand>" — that lead clause is
-    // engine framing (the card is the board POSTING, read BEFORE the company accepts). Handed to
-    // the writer it gets narrated as done ("You accepted the hire and rode out", batch P 4/6);
-    // strip it so only the field errand remains and the writer renders a job TO DO, not one begun.
-    const isBeat1 = chain.beatIndex === 0 && !isFinale;
-    const stripTakeJob = (s: string) => s
-      .replace(/^\s*(?:at [^.,]+,\s*)?(?:take|accept)\b[^.]*?\b(?:hire|job)\b[^.]*?(?:\.\s+|,\s+|\s+and\s+)/i, '')
-      .replace(/^(\w)/, (_m, c: string) => c.toUpperCase());
-    // genesis writes beat-1 steps with "<the place/person> the hire named / the client named /
-    // she named" — engine framing to withhold the name at hiring. The writer echoes it as a seam
-    // ("The hire sent you to…", batch Q) — strip the qualifier so only the plain noun remains.
-    const stripHireFraming = (s: string) => s
-      .replace(/,?\s+(?:the (?:hire|client)|s?he|they)\s+named\b/gi, '')
-      // "using only what X knows" is genesis literalising the internal "hire-knowledge only"
-      // rule; the writer echoed it as prose ("asks you to use only what he knows", batch S)
-      .replace(/,?\s+using only (?:what [^,.]+? knows|[^,.]+?'s (?:information|knowledge|word|lead))/gi, '');
-    const cardStep = isBeat1 ? stripHireFraming(stripTakeJob(stripYields(dealtStep))) : stripYields(dealtStep);
-    // BEAT 1's card knows only what the HIRE knows: its met-gate uses the goal alone —
-    // genesis packs discovery names into step 1's errand text, and trusting stepText there
-    // dumped the cast roster onto beat-1 cards (lab batch M: 6/8 leaked via this door)
-    const stagedRaw = this.stageBible(chain, chain.beatIndex === 0 && !isFinale ? '' : dealtStep, chain.beatIndex === 0 && !isFinale);
-    // mid-saga CARD writers lose bible.situation entirely (lab batch E: every leak class —
-    // twists, yields, later beats — drew from that well; the omission pattern is the proven
-    // fix). The kernel keeps the premise; goal/cast/record carry everything a briefing knows.
-    // Finale writers and resolvers keep the full truth.
-    // beat writers get a MINIMAL, card-safe feed (lab batches E-G: every leak drew from a
-    // bible field that holds whole-story knowledge — situation, kernel, later arc steps,
-    // tensions, openDirections; each was closed by OMISSION, the session's one reliably
-    // winning move). The client's open telling is composed from card-safe fields only:
-    // the goal (already player-known by design) and the client's own want.
-    const stagedBible = {
-      ...stagedRaw,
-      ...(isFinale
-        ? { arc: (stagedRaw.arc as string[]).map(stripYields) }
-        : {
-          // beats carry the LEAN bible only (context-free audit 2026-07-17: one payload held
-          // the same sentence ×4). kernel/tensions/openDirections: dead fields. arc: arcStep
-          // deals the step. situation: duplicated goal byte-for-byte since the round-1
-          // hand-the-telling-clean fix — the goal alone IS the client's telling for a beat.
-          // twist: whole-story knowledge, never a beat's to see.
-          kernel: undefined,
-          // the saga TITLE is dead to a beat writer (its own `title` must be about THIS step) and
-          // it leaks: a live bible titled "The Reluctant Heir" hands the writer the twist for free
-          title: undefined,
-          // both are dealt at the top level of the payload; a second copy inside the bible is a
-          // byte-duplicate a cold reader has to reconcile, and it ignored both
-          stakeIfLost: undefined,
-          arrival: undefined,
-          tensions: undefined,
-          openDirections: undefined,
-          arc: undefined,
-          situation: undefined,
-          twist: undefined,
-        }),
-    };
-    const wqInput = ({
-      // beats serve the BIBLE's story, not a rolled job type (a random archetype fought the saga);
-      // the landmark gate is for one-off variety — a saga anchored at the landmark must name it
-      kind: (isFinale ? 'finale' : 'beat') as 'finale' | 'beat',
-      // beats see the landmark ONLY when this saga's bible actually uses it (else it re-tempts drift)
-      location: this.locationLine(chain.region, !!REGION[chain.region]?.landmark && JSON.stringify(chain.bible).includes(REGION[chain.region]!.landmark!), false),
-      // rarity's only stated job on a saga card was "permission to run long", and the length
-      // budget is now fixed — nine blind writer-reports called it dead and ignored it
-      level: chain.level, slotCount: n,
-      // the person's NAME, never engine words — "custody of the focal" once printed on a card
-      // world-worded AND rotated — any fixed string stamps (models echo DATA fields:
-      // 'side loot' ×4, then its replacement ×5; rotation breaks the stamp)
-      rewardEnvelope: isFinale
-        ? `${this.card(chain.focalId)?.name ?? 'the central person'} — likely ${chain.isPersonal ? 'the matter settled, the soldier stays' : chain.kind === 'gold-hoard' ? 'their treasure' : chain.kind}`
-        // FULL in-voice sentences, not gists: the writer is told to reword these, but cheap
-        // models paste the DATA verbatim (batch O: "pay as agreed…" ended a card lowercase) — so
-        // a paste must itself read as a clean card sentence (§8 input-shaping over nagging)
-        // CLAUSE-shaped, because the writer is now told to ride the pay on a sentence doing
-        // other work — the old pool was whole sentences, and a dealt string gets pasted WHOLE
-        // ("A warden watches the chest and will resist anyone who opens it, and the pay is fixed,
-        // and what else the job shakes loose the company keeps." — live, 2026-08-27)
-        // a personal saga has no client (NOCLIENT, measured) — so no FEE: "the fee is as agreed"
-        // on a clientless card invents the hirer the genesis was told does not exist
-        : chain.isPersonal && process.env.PERSONAL_CARD !== '0' ? this.rng.pick([
-            'nobody pays for this one — what the road turns up is the company\'s',
-            'there is no fee in it, only what the company hauls back',
-            'no coin is owed on this, but what the work shakes loose rides home',
-          ])
-        : this.rng.pick([
-            'the pay is the agreed coin, and what the road turns up',
-            'the pay is honest coin, and any small spoils besides',
-            'the fee is as agreed, and the company keeps what it hauls back',
-            'the coin comes at the finish, with the pick of what the job turns up',
-            'the pay is plain coin, and the road\'s yield goes to the company',
-            'the fee is fixed, and what else shakes loose the company keeps',
-            'the coin comes when it is done, and anything carried home is the company\'s',
-            'the fee is as agreed, and any spoils ride home with it',
-          ]),
-      // R1 sell-the-stake (designer ruling 2026-07-18, STAKE=1 lab flag): beat 1 tells the boss
-      // what the WHOLE matter is rumored to be worth — engine-known kind + payoff band, dealt as
-      // a paste-clean rumor sentence (sticky-string law); rumor-toned so a later slip breaks no promise
-      // SHIPPED default (batch I blind A/B: stake 5.5 vs control 4.25; boss_pull yes 5-0):
-      // STAKE=0 restores stake-less beat-1 cards
-      ...(process.env.STAKE !== '0' && chain.beatIndex === 0 && !isFinale && !chain.bible.stakeIfLost
-        ? { stake: this.stakeGloss(chain, focal?.character?.role === 'merc' ? focal.name : undefined) }
-        : {}),
-      // beats get NO opening spark (🛠 2026-07-10): a random spark fought the saga — the card
-      // opens from the story state, and beat 1 from how the bible says the matter arrived.
-      // BEAT 1 gets no place suggestion either: its ground is already named by arcStep or by
-      // relevantLore, the bible's geography outranks the suggestion anyway, and the one-place
-      // budget is spent — 3/3 blind writers dropped it unused and asked why it was dealt.
-      ...(isBeat1 ? {} : { placeNameSuggestions: [this.freshPlaceName(chain.region)] }),
-      // ─── BEAT 1's OWN FACTS (prosebench/ROUND2_3: the three questions cards lose) ───
-      ...(isBeat1 ? {
-        // WHY. Nine writer-reports lost this question; the one handed a written stake answered it
-        // and said so: "the one question cards usually lose is the one the input handed me pre-written."
-        // scrubbed like every other dealt string: genesis writes stakes that name the quarry
-        // ("If Alyva is not returned…"), and a dealt name is a PASTED name (L19)
-        stakeIfLost: chain.bible.stakeIfLost ? this.scrubUnmet(chain, chain.bible.stakeIfLost) : undefined,
-        // HOW IT REACHED THE FORT — invented by 6/6 writers before it was dealt
-        // …except on a personal saga: nobody arrives, the soldier already lives here, and a dealt
-        // arrival ("came down from higher ground") stamps them as a visitor (L19)
-        arrival: chain.isPersonal && process.env.PERSONAL_CARD !== '0' ? undefined : chain.bible.arrival,
-        // WHY IT TAKES ARMED STRANGERS — what the client openly knows stands against them. The
-        // reveal cadence keeps the obstacle's NAME and identity off the card; what they will DO
-        // about this matter is the client's own knowledge and belongs on the first card.
-        knownObstacle: (o => {
-          if (!o?.want) return undefined;
-          const want = this.scrubUnmet(chain, o.want);
-          if (/another party/.test(want)) return undefined;   // the scrub fired — say nothing
-          return `${o.trade || 'a stranger'} · ${want.replace(/^to\s+/, '')}`;
-        })(chain.bible.cast.find(m => m.role === 'obstacle') ?? chain.bible.cast.find(m => m.role === 'quarry')),
-        // the CARE MOMENT, dealt rather than derived from a tag word
-        ...(chain.bible.cast.some(m => m.role === 'client') ? { tell: sampleTell(this.rng) } : { noClient: true }),
-      } : {}),
-      // roster dealt ONLY when the focal is the company's own (the one case a saga card may
-      // name a soldier) — otherwise it's never-use data, pure copy-bait (context-free audit)
-      ...(focal?.character?.role === 'merc'
-        ? { rosterNames: this.rosterForWriters().names, rosterPronouns: this.rosterForWriters().pronouns }
-        : {}),
-      lastBeatOutcome: chain.lastGeneratedBeat === chain.beatIndex + 1
-        ? `${chain.story.lastBeatOutcome ?? ''} This same step was posed before and went untaken — pose it AFRESH in a new telling, but the SAME places and people: the world did not move while the company sat.`.trim()
-        : chain.story.lastBeatOutcome,
-      // paired A/B 88001: on failure-heavy seeds BOTH arms bridged failed beats by asserting
-      // the failed step's planned yield (badge/summons-stone/remains materialized). The engine
-      // KNOWS the outcome — deal the flag so the system can raise a prominent conditional gate
-      lastStepFailed: /ended in FAILURE/.test(chain.story.lastBeatOutcome ?? ''),
-      // beat 1: the canned "matter just came before the company, nothing done" status is echo-bait
-      // (batch O pasted it verbatim into 3/6 cards) and adds nothing the BEAT 1 branch doesn't say —
-      // blank it so the writer opens from the client's telling, not a stock scaffolding line
-      bible: stagedBible,
-      // beat 1 has no record yet — an all-empty storyState scaffold is pure parse-load
-      storyState: chain.beatIndex === 0 && !isFinale ? undefined
-        : focal?.character?.role === 'merc' ? this.deSoldier(chain.story, [focal.name])
-        : this.deSoldier(chain.story),
-      relevantLore,
-      // beat 1's lore is trimmed to the ground this step actually stands on: a second entry is
-      // always a later step's ground, and `relationPhrase` reads the same on every entry, so it
-      // discriminates nothing — 3/3 blind writers could not tell what it wanted of them
-      ...(isBeat1 ? { relevantLore: relevantLore.slice(0, 1).map(({ relationPhrase: _rp, ...e }) => e) } : {}),
-      focalDossier: (d => d.includes('\n') ? d : undefined)(this.dossier(chain.focalId)),
-      // expectedBeats deliberately NOT sent to the card writer: the system never explains it,
-      // and the total arc length is whole-story knowledge a beat card must not lean on
-      beatIndex: chain.beatIndex + 1,
-      // the ONE step this card covers, dealt verbatim — writers fumbled indexing arc[beat-1]
-      // and scoped beat 1 to the whole goal
-      arcStep: cardStep,
-      // focalName only when the staged bible still carries the name — an unmet focal whose
-      // identity is the saga's discovery must not re-enter through this side door
-      // focalName only when the staged bible still carries the name AND the focal is the
-      // company's own soldier — otherwise the goal already names them and the field is inert
-      // ("focalName changed nothing about my writing" — 3/3 blind writers)
-      focalName: focal?.character?.role === 'merc' && `${JSON.stringify(stagedBible)} ${cardStep}`.includes(focal.name.split(' ')[0]!) ? focal.name : undefined,
-      // runtime truth, not genesis-time: a focal HIRED mid-saga is the company's own now
-      focalIsMerc: focal?.character?.role === 'merc',
-    });
-    const out = this.capitalizeCard(this.stripJobEcho(isRepose && cached && cached.beat === chain.beatIndex + 1 ? cached.out : await this.ai.writeQuest(wqInput)));
-    // COLD-READER GATE REMOVED (reviewlab 83001/84001 + blind judge, 2026-07-17): the review
-    // roundtrip cost ~5.5s per card and its fixNotes rewrites made cards WORSE (pre-rewrite won
-    // 6/9, mean 7.44 vs 7.11) — same nag-degradation as the genesis guard. The dup-restatement
-    // lint also over-fired (situation and job line naturally share words: 10/12 cards). Lint is
-    // LOG-ONLY telemetry now; fix defect classes at the prompt, never by re-generation.
-    for (const flaw of this.lintCard(out)) this.log('dev', `saga card lint (log-only): ${flaw}`);
-    if (!isFinale) this.cachedBeatOut.set(chain.id, { beat: chain.beatIndex + 1, out });
-    // QUESTS §6: middle-beat side-loot = gold OR a relic among it (was always bare gold)
-    const specs: RewardSpec[] = isFinale ? [] : [{ kind: 'gold' as const, value: sideLootV }];
-    let beatRewardCards: Card[] = [];
-    if (!isFinale && sideLootV > 40 && this.rng.chance(0.35)) {
-      specs[0] = { kind: 'gold', value: Math.round(sideLootV * 0.4) };
-      const relicSpec: RewardSpec = { kind: 'relic', value: Math.round(sideLootV * 0.6) };
-      specs.push(relicSpec);
-      beatRewardCards = materializeReward(this.rng, relicSpec, chain.level, chain.region);
+    let slots: QuestSlot[];
+    let approaches: ApproachGroup[] | undefined;
+    const specs: RewardSpec[] = [];
+    let rewardCards: Card[] = [];
+    let sideLootV = 0;
+    if (pos.finale) {
+      const ways = flow.approaches(rec);
+      // finales are ALWAYS one slot per approach (mutex plans, QUESTS §9) and every place is open — as today
+      slots = this.buildSlots(ways.length, chain.level, chain.rarity, 'investigate', flow.asks('showdown', ways.length, chain.isPersonal, false, ways.map(w => w.way)))
+        .map((s, i) => ({
+          ...s, requirement: { kind: 'open' as const }, groupId: ways[i]!.id,
+          // QUESTS §9: each PLAN carries its own difficulty — the cash-out road leans easy
+          test: { ...s.test, difficulty: ways[i]!.rewardKind === 'gold' && this.rng.chance(0.7) ? 'standard' as const : rollDifficulty(this.rng, chain.rarity, this.state.fort.ghTier) },
+        }));
+      approaches = ways.map(w => ({ id: w.id, label: w.label, rewardKind: w.rewardKind, way: w.way }));
+      chain.state = 'finale-pending';
+    } else {
+      // beats obey the fillability guard: never more slots than the roster has soldiers
+      const n = Math.max(1, Math.min(slotCount(this.rng, 'investigate', chain.rarity), this.roster().length));
+      sideLootV = beatSideLoot(this.rng, chain);
+      // QUESTS §6: middle-beat side-loot = gold OR a relic among it
+      specs.push({ kind: 'gold', value: sideLootV });
+      if (sideLootV > 40 && this.rng.chance(0.35)) {
+        specs[0] = { kind: 'gold', value: Math.round(sideLootV * 0.4) };
+        const relicSpec: RewardSpec = { kind: 'relic', value: Math.round(sideLootV * 0.6) };
+        specs.push(relicSpec);
+        rewardCards = materializeReward(this.rng, relicSpec, chain.level, chain.region);
+      }
+      const e = plan.episodes[pos.job - 1]!;
+      // beat pacing (QUESTS §8-B): beat 1 is the low-stakes CARE moment — cap its difficulty at standard; beat 2 still
+      // escalating — cap at hard; then free
+      const cap = pos.job <= 1 ? 'standard' as const : pos.job === 2 ? 'hard' as const : undefined;
+      // a personal saga pins its soldier to slot 0 when the job's people include them (D1 — today's rule, now from data)
+      slots = this.buildSlots(n, chain.level, chain.rarity, 'investigate', flow.asks(e.type, n, chain.isPersonal, e.people.includes(chain.focalId)), cap,
+        chain.isPersonal && focal?.character?.role === 'merc' ? focal.id : undefined);
     }
-    // beat pacing (QUESTS §8-B): beat 1 is the low-stakes CARE moment — cap its
-    // difficulty at standard; beat 2 still escalating — cap at hard; then free
-    const beatNo = chain.beatIndex + 1;
-    const cap = isFinale ? undefined : beatNo <= 1 ? 'standard' as const : beatNo === 2 ? 'hard' as const : undefined;
-    chain.lastGeneratedBeat = chain.beatIndex + 1;
-    const quest: Quest = {
-      id: freshId('q'), leadId: lead.id, title: out.title, situation: out.situation, job: out.job,
+    return {
+      id: freshId('q'), leadId: lead.id, title: out.title, situation: out.prose, job: out.job,
       gravity: sampleGravity(this.rng, chain.rarity, 'saga'),
       level: chain.level, rarity: chain.rarity, region: chain.region, archetype: lead.archetype,
-      chainId: chain.id, beatIndex: chain.beatIndex + 1, isFinale,
-      slots: this.buildSlots(n, chain.level, chain.rarity, 'investigate', out.ask, cap,
-        chain.isPersonal && focal?.character?.role === 'merc' ? focal.id : undefined),
-      rewardSpecs: specs, rewardCards: beatRewardCards, sideLootV,
+      chainId: chain.id, beatIndex: pos.job, isFinale: pos.finale,
+      saga: {
+        rows: out.rows, logFirst: out.logFirst, matter: out.matter, pos,
+        part: pos.finale ? null : pos.job, of: rec.world.N, again: !pos.finale && pos.attempt > 1, lastchance: pos.finale && rec.lastchance,
+        setbacks: chain.failures, budget: chain.failureBudget,
+      },
+      ...(approaches ? { approaches } : {}),
+      slots, rewardSpecs: specs, rewardCards, sideLootV,
       state: 'open', createdCycle: this.state.cycle,
     };
-    if (isFinale) {
-      // mutex approach-groups (QUESTS §9). If the AI omitted them, synthesize the
-      // canonical trio — a finale must NEVER be an unbranched multi-slot wall.
-      const raw = out.approaches?.length ? out.approaches : [
-        { label: 'Win them over', rewardKind: 'recruit', attribute: 'cha', favored: ['social'] },
-        { label: 'Subdue them', rewardKind: 'captive', attribute: 'str', favored: ['melee', 'intimidation'] },
-        { label: 'Cash out', rewardKind: 'gold', attribute: 'int', favored: ['roguery'] },
-      ];
-      quest.approaches = raw.map((a, i) => ({
-        id: `g${i}`, label: a.label,
-        // a label promising RELEASE on a keep-kind plan lies to the player ("Yield Ysard" ended
-        // "Ysard is yours — captive") — the verb wins over the declared kind
-        rewardKind: (/\b(free|release|yield|hand (?:him|her|them) over|let .{0,12} go|slip .{0,16} free)\b/i.test(a.label)
-          ? 'gold'
-          : (['recruit', 'captive', 'gold'].includes(a.rewardKind) ? a.rewardKind : 'gold')) as 'recruit' | 'captive' | 'gold',
-      }));
-      // exactly ONE slot per approach — each group is its own manning plan
-      const template = quest.slots[0]!;
-      quest.slots = raw.map((a, i) => {
-        const attr = a.attribute.toLowerCase();
-        const attributes = (['str', 'dex', 'int', 'cha', 'con'].includes(attr) ? [attr] : template.test.attributes) as Attribute[];
-        const favored = a.favored.map(f => parseAiTag(f)?.concept).filter((c): c is string => !!c);
-        // QUESTS §9: each PLAN carries its own difficulty — the cash-out road leans easy
-        // (one cloned roll made every branch identical; an easy gold exit could never occur)
-        const difficulty = quest.approaches![i]!.rewardKind === 'gold' && this.rng.chance(0.7)
-          ? 'standard' as const : rollDifficulty(this.rng, chain.rarity, this.state.fort.ghTier);
-        return {
-          requirement: { kind: 'open' as const },
-          test: { ...template.test, attributes, favored, difficulty, clashing: template.test.clashing.filter(c => !favored.includes(c)) },
-          groupId: `g${i}`, filledBy: null,
-        };
-      });
-      chain.state = 'finale-pending';
-    }
-    return quest;
   }
 
   chooseApproach(questId: string, groupId: string): { ok: boolean; msg: string } {
@@ -3193,37 +2668,11 @@ export class Game {
     slot.filledBy = null;
   }
 
-  /** THE PEOPLE ON THIS MATTER — the saga's cast as the player may see them, for the quest
-   *  screen's held cards. Gated on the SAME met() the card writer uses, so this surface can
-   *  never show a face the card deliberately withheld. Designer ruling 2026-08-28: an unmet
-   *  person is not shown at all — SHOW_UNMET_CAST brings the face-down card back. */
-  static SHOW_UNMET_CAST = false;
-  questCast(questId: string): { name: string; trade: string; role: string; who: string; met: boolean; tags?: string }[] {
+  /** ON THIS MATTER — the people this saga card calls by name, as "name — label", for the quest screen's held cards
+   *  and the CLI's line (onThisMatter, computed when the card was dealt — a person the card withholds is never here) */
+  questCast(questId: string): { id: string; name: string; label: string }[] {
     const q = this.state.quests.find(x => x.id === questId);
-    const chain = q?.chainId ? this.state.chains.find(c => c.id === q.chainId) : undefined;
-    if (!q || !chain) return [];
-    // what THIS card has already put on the page counts as met, on top of the record
-    const step = `${q.situation} ${q.job}`;
-    const ROLE: Record<string, string> = {
-      client: 'the one asking', quarry: 'the one wanted', prize: 'the one wanted',
-      obstacle: 'stands against', ally: 'may help', companion: 'rides with you',
-    };
-    return chain.bible.cast
-      .map(m => {
-        // Only cast who EXIST as engine cards have traits — that is the focal, and (on a personal
-        // saga) a soldier of your own. Secondaries are bible prose until they materialize
-        // (GENERATION_FLOW: secondaries materialize lazily, only when actually acquired).
-        // Designer 2026-08-28: "if your entire goal is to recruit someone surely you want to see
-        // their traits so you are motivated?" — so the tags show. Their WORTH does not: that is
-        // the deferred reward, and ECONOMY §7.1b keeps a reward a rumour rather than an invoice.
-        const card = m.loreId ? this.card(m.loreId) : undefined;
-        return {
-          name: m.name, trade: m.trade ?? '', role: ROLE[m.role] ?? m.role, who: m.who,
-          met: m.role === 'client' || this.isMet(chain, m.name, step),
-          tags: card ? renderTags(card.tags) : undefined,
-        };
-      })
-      .filter(m => m.met || Game.SHOW_UNMET_CAST);
+    return (q?.saga?.matter ?? []).map(m => ({ ...m }));
   }
 
   /** MAN A QUEST, greedily. Score every (slot, soldier) pair, take the best pair whose halves
@@ -3459,7 +2908,9 @@ export class Game {
       // "REWARD: Keesa" read as an offer to recruit someone standing in the yard (playtest 2026-09-25)
       if (chain?.isPersonal && focal) parts.unshift(`${focal.name}'s matter, settled`);
       else {
-        const named = !!focal && !!chain && this.isMet(chain, focal.name, `${q.situation} ${q.job}`);
+        // named only once the player has read the name (the saga's Knowing — the gate every card obeys)
+        const fe = chain?.saga?.plan?.cast.find(p => p.focal);
+        const named = !!focal && !!fe && knowingOf(chain!.saga!).named.has(fe.id);
         parts.unshift(named ? focal!.name : 'the one at the heart of it');
       }
     }
@@ -3471,14 +2922,16 @@ export class Game {
     return chain && !q.isFinale ? `${now} · and the saga still owes` : now;
   }
 
-  /** what choosing this finale plan does to the person at its heart — '' on a personal saga, whose
-   *  every plan ends the same way (the soldier stays; the season pays out). Both UIs print it after
-   *  the plan's label; "→ recruit" on your own soldier's finale offered to hire someone you have. */
+  /** what choosing this finale plan does, as the short fate fact both UIs print after the plan's label ("joins the
+   *  company", "held in your cells", "coin; goes free", personal "their matter settled" — STORYTELLER §2.6). The plan's
+   *  way decides it; the reward warning reads the kind (approachRewardWarn) */
   approachOutcome(questId: string, approachId: string): string {
     const q = this.state.quests.find(x => x.id === questId);
-    const chain = q?.chainId ? this.state.chains.find(c => c.id === q.chainId) : undefined;
-    if (!q || chain?.isPersonal) return '';
-    return q.approaches?.find(a => a.id === approachId)?.rewardKind ?? '';
+    const a = q?.approaches?.find(x => x.id === approachId);
+    if (!q || !a?.way) return '';
+    const chain = q.chainId ? this.state.chains.find(c => c.id === q.chainId) : undefined;
+    const fe = chain?.saga?.plan?.cast.find(p => p.focal);
+    return a.way === 'gold' && fe && helped(fe) ? 'coin; goes their way' : WAY_ENDING[a.way];
   }
 
   /** raw odds — ALWAYS visible (QUESTS §3); the Oracle adds computed %. `band` is the engine's
@@ -3532,8 +2985,12 @@ export class Game {
   }
   /** one finale approach's warning ('brings a captive · no Dungeon — they will be handed off'), or null */
   approachRewardWarn(questId: string, approachId: string): string | null {
-    const kind = this.approachOutcome(questId, approachId);
-    return kind ? this.rewardWarnFor([kind as RewardKindTag]) : null;
+    const q = this.state.quests.find(x => x.id === questId);
+    const a = q?.approaches?.find(x => x.id === approachId);
+    const chain = q?.chainId ? this.state.chains.find(c => c.id === q.chainId) : undefined;
+    // a personal finale settles the soldier's own matter whichever plan wins — it brings no one to keep
+    if (!a || chain?.isPersonal) return null;
+    return this.rewardWarnFor([a.rewardKind]);
   }
   /** what the fort cannot hold of what these rewards bring — the one rule behind both warnings */
   private rewardWarnFor(kinds: RewardKindTag[]): string | null {
@@ -3604,7 +3061,7 @@ export class Game {
     for (const l of this.leadsGoingCold()) {
       const chain = l.chainInfo.kind === 'continues' ? this.state.chains.find(c => c.id === (l.chainInfo as { chainId: string }).chainId) : undefined;
       const b = leadBand(l);
-      out.push({ key: l.id, questId: null, title: chain ? chain.bible.title : l.title ?? `${l.archetype} in ${REGION[l.region]?.name ?? l.region}`,
+      out.push({ key: l.id, questId: null, title: chain ? this.sagaTitle(chain) : l.title ?? `${l.archetype} in ${REGION[l.region]?.name ?? l.region}`,
         why: 'lead-lapses', filled: 0, of: 0, lapsesNow: true, target: { screen: 'leads' },
         text: chain ? `the saga slips this END unless its lead is pursued (${l.id})` : `a lead worth ${b.label} goes cold this END (${l.id})` });
     }
@@ -3930,17 +3387,25 @@ export class Game {
     if (ready.length === 0) report.push('A quiet cycle — no one marched.');
     const resolutions: Resolution[] = [];
     const questBlocks = new Map<string, string[]>();
+    const sagaHost = this.sagaHost();
     for (const q of ready) {
       const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
       const party = active.map(s => this.card(s.filledBy!)!);
       const rolled = this.forceOutcome(q, resolvePooled(this.rng, active.map(s => ({ unit: this.card(s.filledBy!)!, test: s.test }))));
       const delivery = computeDelivery(this.rng, q, rolled.outcome);
       let fate: FinaleFate | undefined;
-      if (q.isFinale && q.chainId) {
-        const chain = st.chains.find(c => c.id === q.chainId);
-        if (chain) fate = finaleFate(this.rng, chain, rolled.outcome);
-      }
-      resolutions.push({ quest: q, outcome: rolled.outcome, delivery, party, fate, rolled });
+      const chain = q.chainId ? st.chains.find(c => c.id === q.chainId) : undefined;
+      if (q.isFinale && chain) fate = finaleFate(this.rng, chain, rolled.outcome);
+      // a saga quest's report facts are decided HERE, synchronously, in id order: who decides (D5), the hurt (D3, on the
+      // main rng), the finale's Outcome sentence (D18). Only the writing runs later, beside every other report
+      const saga = q.saga && chain?.saga?.plan ? {
+        pos: q.saga.pos,
+        inn: flow.reportIn(sagaHost, chain, q.saga.pos, q.situation, {
+          outcome: rolled.outcome, party, tests: active.map(s => s.test), gravity: q.gravity ?? 'a small, everyday job',
+          way: q.approaches?.find(a => a.id === q.chosenApproach)?.way, fate,
+        }),
+      } : undefined;
+      resolutions.push({ quest: q, outcome: rolled.outcome, delivery, party, fate, rolled, ...(saga ? { saga } : {}) });
       // This quest's slot on the screen, held open in id order until its own call lands. The
       // first two lines are EXACTLY what applyResolution re-pushes, so the card the player is
       // re-reading does not move when the report replaces the placeholder — and the card is the
@@ -3967,8 +3432,8 @@ export class Game {
     const preLeads = this.preMintedLeads = new Map<string, Lead[]>();
     for (const r of resolutions) if (r.delivery.leadGrants.length)
       preLeads.set(r.quest.id, r.delivery.leadGrants.map(b => this.freshLead('reward', b)));
-    // 2) ONE batched AI call for all resolutions
-    const aiInputs: ResolveQuestInput[] = resolutions.map(r => ({
+    // 2) ONE batched AI call for the one-offs; each saga report is its own call (the v4 storyteller), all in parallel
+    const aiInputs: ResolveQuestInput[] = resolutions.filter(r => !r.saga).map(r => ({
       questId: r.quest.id, title: r.quest.title, situation: r.quest.situation, job: r.quest.job, gravity: r.quest.gravity,
       rarity: r.quest.rarity, outcome: r.outcome,
       // habits reach the narrator only ~40% of the time — a habit not shown cannot become a
@@ -3982,7 +3447,7 @@ export class Game {
       deliveredSummary: this.describeDelivery(r),
       // what a one-off PARTIAL costs, rolled by the engine (🛠 a wound 1 time in 3): QUESTS §105 —
       // injury comes typically on failure, "occasionally a minor one on a costly partial"
-      partialCost: r.outcome === 'partial' && !r.quest.chainId
+      partialCost: r.outcome === 'partial'
         // ONE WORD, never a sentence: a dealt phrase is pasted whole ("…raise alarm. goodwill —
         // someone there now holds it against the company.") — L19
         ? (this.rng.chance(0.33) ? 'wound' : this.rng.pick(['gear', 'time', 'goodwill', 'finish']))
@@ -3992,39 +3457,7 @@ export class Game {
       earnedLead: (ls => ls?.length ? ls.map(l => LEAD_WORD[l.archetype] ?? 'paid work').join('; ') : undefined)(preLeads.get(r.quest.id)),
       // beat variant (engine-dealt, no RNG): how this job turns — physical / wits / social
       sceneMode: this.sceneModeFor(r.quest),
-      // a finale's delivered PERSON is the focal — give them an id here so the narrator can
-      // flesh them from the saga's own fiction and tie edges to them (they had no entry before)
-      deliveredCharacters: [
-        ...r.delivery.cards.filter(c => c.character).map(c => ({ id: c.id, name: c.name, tags: renderTags(c.tags) })),
-        ...(r.quest.isFinale && r.fate && r.fate.fate !== 'slipped'
-          ? (f => f ? [{ id: f.id, name: f.name, tags: renderTags(f.tags) }] : [])(
-              this.card(this.state.chains.find(c => c.id === r.quest.chainId)?.focalId ?? ''))
-          : []),
-      ],
-      chainContext: r.quest.chainId ? {
-        // the resolver gets the STAGED bible too — unmet cast cannot debut in a report
-        // the resolver's met-text includes the FULL dealt step (yields intact) so it may
-        // NAME what this step's yield reveals — the card posed the question, the report answers
-        bible: (c => c ? this.stageBible(c, `${r.quest.situation} ${r.quest.job} ${(r.quest.beatIndex ? c.bible.arc[Math.min(r.quest.beatIndex - 1, c.bible.arc.length - 1)] : '') ?? ''}`, r.quest.beatIndex === 1 && !r.quest.isFinale) : undefined)(this.state.chains.find(c => c.id === r.quest.chainId)),
-        storyState: (c => c ? this.deSoldier(c.story, [...r.party.map(p => p.name), ...(c.isPersonal ? [this.card(c.focalId)?.name ?? ''] : [])]) : undefined)(this.state.chains.find(c => c.id === r.quest.chainId)),
-        isFinale: !!r.quest.isFinale,
-        // the ONE step this job covers — resolutions overreached even when the card was scoped
-        arcStep: (c => c && r.quest.beatIndex
-          ? c.bible.arc[Math.min(r.quest.beatIndex - 1, c.bible.arc.length - 1)] : undefined
-        )(this.state.chains.find(c => c.id === r.quest.chainId)),
-        // later steps dealt as a CONCRETE ban list — the abstract "no later step's work"
-        // rule kept failing (37017: beat 1 killed the saga's predator; 38018: beat 2 spoke
-        // the finale's pledge and opened the granary)
-        stepsNotYet: (c => c && r.quest.beatIndex && !r.quest.isFinale
-          ? c.bible.arc.slice(r.quest.beatIndex) : undefined
-        )(this.state.chains.find(c => c.id === r.quest.chainId)),
-        focalName: (c => c ? this.card(c.focalId)?.name : undefined)(this.state.chains.find(c => c.id === r.quest.chainId)),
-        // the fate reaches the narrator as a plain SENTENCE (the raw token "clean" read as an
-        // adjective and collided with 'success = done clean'; the climax must not be a guess)
-        fate: r.fate ? this.fateSentence(r) : undefined,
-        approach: r.quest.approaches?.find(a => a.id === r.quest.chosenApproach)?.label,
-        rejectedApproaches: r.quest.approaches?.filter(a => a.id !== r.quest.chosenApproach).map(a => a.label),
-      } : undefined,
+      deliveredCharacters: r.delivery.cards.filter(c => c.character).map(c => ({ id: c.id, name: c.name, tags: renderTags(c.tags) })),
     }));
     // 3) apply engine effects + AI outputs; lore write-backs AFTER all (collected first)
     const pendingEdges: { from: string; to: string; type: string; blurb: string; importance: number }[] = [];
@@ -4035,31 +3468,41 @@ export class Game {
     // error is CARRIED and re-thrown after the await. Silently losing a quest (and stranding its
     // party in a deleted quest's slot) is the one outcome this must never have.
     let arriveError: unknown;
-    const arrive = (out: ResolveQuestOut) => {
-      const r = byQuest.get(out.questId), block = questBlocks.get(out.questId);
-      if (!r || !block || applied.has(out.questId)) return;
-      applied.add(out.questId);   // set BEFORE, so a half-applied quest is never applied twice
+    /** one quest's report lands: a one-off's resolver output, or a saga's report */
+    const land = (questId: string, out?: ResolveQuestOut, rep?: SagaReport) => {
+      const r = byQuest.get(questId), block = questBlocks.get(questId);
+      if (!r || !block || applied.has(questId)) return;
+      applied.add(questId);   // set BEFORE, so a half-applied quest is never applied twice
       block.length = 0;   // applyResolution re-pushes the title line itself
       try {
-        this.applyResolution(r, out, block, pendingEdges);
-        this.reckoning?.landed.add(out.questId);
+        this.applyResolution(r, out, block, pendingEdges, rep);
+        this.reckoning?.landed.add(questId);
       } catch (e) {
         arriveError ??= e;
         block.push(`— ${r.quest.title} (${r.quest.id})`, '⚠ this report could not be applied.');
       }
     };
+    const arrive = (out: ResolveQuestOut) => land(out.questId, out);
     // engine effects therefore land in ARRIVAL order, not id order (TEMPO I1: replay
-    // determinism explicitly not required); the TELLING order stays id order — that is the blocks
-    const aiOuts = aiInputs.length ? await this.ai.resolve(aiInputs, arrive) : [];
-    // defensive: a quest the callback never reached still resolves (undefined out = engine truth)
+    // determinism explicitly not required); the TELLING order stays id order — that is the blocks.
+    // The one-offs' batch and every saga report run together and settle into the same reckoning
+    const oneOffs = aiInputs.length ? this.ai.resolve(aiInputs, arrive) : Promise.resolve([] as ResolveQuestOut[]);
+    const sagas = Promise.all(resolutions.filter(r => r.saga).map(async r => land(r.quest.id, undefined, await flow.writeSagaReport(sagaHost, r.saga!.inn.call))));
+    const [o1, o2] = await Promise.allSettled([oneOffs, sagas]);
+    const aiOuts = o1.status === 'fulfilled' ? o1.value : [];
+    // defensive: a quest the callback never reached still resolves (undefined out = engine truth; a saga's the floor)
     for (const r of resolutions) {
       if (applied.has(r.quest.id)) continue;
+      if (o1.status === 'rejected' && !r.saga) continue;   // the batch threw: re-thrown below, as before
       applied.add(r.quest.id);
       const block = questBlocks.get(r.quest.id)!;
       block.length = 0;
-      this.applyResolution(r, aiOuts.find(o => o.questId === r.quest.id), block, pendingEdges);
+      this.applyResolution(r, aiOuts.find(o => o.questId === r.quest.id), block, pendingEdges,
+        r.saga ? mockReport(r.saga.inn.call.payload, r.saga.inn.call.flags) : undefined);
       this.reckoning?.landed.add(r.quest.id);
     }
+    if (o1.status === 'rejected') throw o1.reason;
+    if (o2.status === 'rejected') throw o2.reason;
     if (arriveError) throw arriveError;   // loud, as it was before the callback existed
     // COLD-READER GATE on saga reports REMOVED (reviewlab 84001 + blind judge, 2026-07-17):
     // the redo made reports WORSE in 6/7 fired cases (pre-redo mean 7.29 vs shipped 6.14) at
@@ -4081,7 +3524,7 @@ export class Game {
     // paid — they wait ("Brugrim drank up and left" turned a won saga into a debt and nothing)
     for (const s of st.tavern.filter(s => s.expiresAtCycle <= st.cycle && !s.prepaid)) {
       const c = this.card(s.cardId);
-      if (c) { this.ensureLoreNode(c); c.location = HELD('lore'); this.noteCustodyChange(c.id, `${c.name} moved on — no longer at the fort`); report.push(`${c.name} drank up and left the tavern.`) }
+      if (c) { this.ensureLoreNode(c); c.location = HELD('lore'); report.push(`${c.name} drank up and left the tavern.`) }
     }
     st.tavern = st.tavern.filter(s => s.expiresAtCycle > st.cycle || s.prepaid);
     // 🛠 2026-07-10: a timed-out captive is never a pure loss — the company hands them off at
@@ -4094,7 +3537,6 @@ export class Game {
         this.ensureLoreNode(c); c.location = HELD('lore');
         this.addGold(pay);
         guardEdges(st.lore, [{ from: c.id, to: c.id, type: 'party-to', blurb: 'handed off by the company when their holding lapsed — no longer at the fort', importance: 0.7 }], st.cycle, () => freshId('e'));
-        this.noteCustodyChange(c.id, `${c.name} was handed off — no longer in the company's hands`);
         this.log('sell', `${c.name} handed off at the quick price (holding lapsed).`);
         report.push(`⛓ Time ran out on ${c.name} — handed off at the quick price. 💰 +${pay}g (a ransom before the clock pays better).`);
         this.cycleAcc?.handedOff.push({ id: c.id, name: c.name, gold: pay });
@@ -4174,14 +3616,9 @@ export class Game {
       if (focal && !chain.isPersonal && focal.location.kind === 'held' && focal.location.state === 'limbo') {
         focal.location = HELD('lore');
         this.ensureLoreNode(focal);
-        st.leads.push({
-          id: freshId('lead-'), rarity: chain.rarity === 'common' ? 'uncommon' : 'rare',
-          level: chain.level, region: chain.region, archetype: 'investigate',
-          chainInfo: { kind: 'starts-new' }, expiresAtCycle: null,
-          source: 'sequel', title: `${focal.name} resurfaces, someday`, focalId: focal.id,
-        });
+        st.leads.push(this.sequelLead(chain, focal));
       }
-      report.push(`🕮 The company let "${chain.bible.title}" lapse — ${focal?.name ?? 'its center'} passes out of reach, for now.`);
+      report.push(`🕮 The company let "${this.sagaTitle(chain)}" lapse — ${focal?.name ?? 'its center'} passes out of reach, for now.`);
     }
     // a RESERVED lead survives its own expiry: the quest it is being turned into must have a lead
     // to consume when it lands (I6). endCycle drains first, so this only fires on a path that
@@ -4364,20 +3801,16 @@ export class Game {
           if (focal && !chain.isPersonal && focal.location.kind === 'held' && (focal.location as { state?: string }).state === 'limbo') {
             focal.location = HELD('lore');
             this.ensureLoreNode(focal);
-            this.state.leads.push({
-              id: freshId('lead-'), rarity: chain.rarity === 'common' ? 'uncommon' : 'rare',
-              level: chain.level, region: chain.region, archetype: 'investigate',
-              chainInfo: { kind: 'starts-new' }, expiresAtCycle: null,
-              source: 'sequel', title: `${focal.name} resurfaces, someday`, focalId: focal.id,
-            });
+            this.state.leads.push(this.sequelLead(chain, focal));
           }
-          report.push(`🕮 "${chain.bible.title}" was left untaken three times — the matter passes out of reach, for now.`);
+          report.push(`🕮 "${this.sagaTitle(chain)}" was left untaken three times — the matter passes out of reach, for now.`);
         } else {
+          // the card on offer comes back verbatim when its lead is pursued again (D15)
           this.state.leads.push({
             id: freshId('lead-'), rarity: chain.rarity, level: chain.level, region: chain.region,
-            archetype: 'investigate', chainInfo: { kind: 'continues', chainId: chain.id, hook: chain.story.currentSituation },
+            archetype: 'investigate', chainInfo: { kind: 'continues', chainId: chain.id, hook: chain.saga?.latest ?? '' },
             expiresAtCycle: this.state.cycle + LEAD_TTL + CONTINUATION_TTL_BONUS, source: 'continuation',
-            title: `${chain.bible.title} — the thread dangles`,
+            title: `${this.sagaTitle(chain)} — the thread dangles`,
           });
         }
       }
@@ -4403,46 +3836,8 @@ export class Game {
     return active.length > 0 && active.every(s => s.filledBy);   // ALL party slots filled (no partial sends)
   }
 
-  /** custody changes must reach the STORY STATE of every saga the person anchors — a finale
-   *  card once staged "your captive Heleis" three cycles after she was ransomed away */
-  private noteCustodyChange(cardId: string, fact: string) {
-    for (const ch of this.state.chains.filter(c =>
-      (c.state === 'active' || c.state === 'finale-pending') && c.focalId === cardId)) {
-      ch.story.knownToPlayer.push(`SETTLED: ${fact}`);
-    }
-  }
-
-  /** the finale fate, told as a plain SENTENCE the narrator can land on — the raw token
-   *  ("clean") read as an adjective and collided with 'success = done clean' */
-  private fateSentence(r: Resolution): string {
-    const chain = this.state.chains.find(c => c.id === r.quest.chainId);
-    const focal = chain ? this.card(chain.focalId) : undefined;
-    const name = focal?.name ?? 'the central person';
-    // a focal ALREADY on the roster never "slips away" — that sentence once ran on the
-    // company's own scout while he stood in the yard
-    if (focal?.character?.role === 'merc') {
-      return r.fate!.fate === 'slipped'
-        ? `the matter around ${name} slips out of reach — nothing comes of it this time; ${name} stays with the company`
-        : `the matter closes around ${name}, who already stands with the company`;
-    }
-    const kind = r.quest.approaches?.find(a => a.id === r.quest.chosenApproach)?.rewardKind ?? 'gold';
-    if (r.fate!.fate === 'slipped') return `${name} gets away — the company comes away with nothing this time (a road back will exist)`;
-    // the VOID overlay must reach the narrator too — "He will ride with the company" shipped one
-    // line above "the season ran too thin to keep him"
-    if (chain && focal && kind !== 'gold' && chain.bank < focal.value * KEEP_THRESHOLD) {
-      return `the season ran too thin to keep ${name} — they pass out of the company's reach, for now, and the company takes what coin the affair yielded`;
-    }
-    const ending = kind === 'recruit' ? `${name} ends this saga siding with the company and will ride with it from here`
-      : kind === 'captive' ? `${name} ends this saga held, in the company's hands`
-      : `${name} passes out of the company's reach, and the company is paid for the whole affair`;
-    return r.fate!.fate === 'saddled' ? `${ending} — but at a visibly worse bargain than hoped` : ending;
-  }
-
+  /** a one-off's delivery, named for its narrator (a saga's report is dealt its own facts by the flow) */
   private describeDelivery(r: Resolution): string {
-    if (r.quest.isFinale && r.fate && r.quest.chainId) {
-      // ONE source of truth with chainContext.fate — two phrasings of the ending diverged
-      return this.fateSentence(r);
-    }
     if (r.outcome === 'failure') return 'they return with empty hands (say what was lost, in-fiction)';
     // the person's REAL fate is engine-decided — deal it, or prose promises "they may stay"
     // while the engine line says "moves on" (both shipped on one card)
@@ -4468,9 +3863,11 @@ export class Game {
 
   private applyResolution(
     r: Resolution,
-    out: { before: string; turn?: string; turnActor?: string; speech?: { who: string; says: string }[]; after: string; injuries: { characterId: string; band: InjuryBand; cause?: string | null }[]; fleshed: { characterId: string; who: string; backstory: string; quirks: string[] }[]; edges: { from: string; to: string; type: string; blurb: string; importance: number }[]; storyUpdate?: { currentSituation: string; newlyRevealed: string[]; openThreads: string[]; sagaSettled?: boolean } } | undefined,
+    out: { before: string; turn?: string; turnActor?: string; speech?: { who: string; says: string }[]; after: string; injuries: { characterId: string; band: InjuryBand; cause?: string | null }[]; fleshed: { characterId: string; who: string; backstory: string; quirks: string[] }[]; edges: { from: string; to: string; type: string; blurb: string; importance: number }[] } | undefined,
     report: string[],
     pendingEdges: { from: string; to: string; type: string; blurb: string; importance: number }[],
+    /** a saga quest's report (the v4 storyteller): its prose; the hurt was decided in the roll loop (r.saga) */
+    sagaRep?: SagaReport,
   ) {
     const st = this.state;
     const q = r.quest;
@@ -4507,6 +3904,17 @@ export class Game {
         salience: 0.3, core: false, active: true, lastCycle: this.state.cycle,
         blurb: `marched together — ${q.title}`,
       });
+    }
+    // a saga's injuries were rolled by the engine before the report was written (D3: rollHurt under today's guard — a
+    // success never wounds, a partial at most lightly), and the report was dealt them: band → tiers on the main rng
+    if (r.saga) for (const h of r.saga.inn.hurt) {
+      const merc = r.party.find(p => p.name === h.name);
+      if (!merc?.character) continue;
+      const band = HURT_BAND[h.how];
+      const tiers = rollInjuryTiers(this.rng, band);
+      merc.character.injuryTiers += tiers;
+      this.cycleAcc?.wounds.push({ id: merc.id, name: merc.name, tiers });
+      say(`🩸 ${merc.name} is wounded (${band}, ${tiers} tier${tiers === 1 ? '' : 's'}).`);
     }
     // injuries: AI-judged band → engine tiers (decoupled channel). ENGINE GUARD (§11/F5):
     // success → none; partial → at most a minor one; failure → any band.
@@ -4626,11 +4034,13 @@ export class Game {
     // lore edges from the AI (validated later in one pass)
     pendingEdges.push(...modelEdges(out?.edges));
     // narrate in the fiction's own order — setup, THEN the dice, THEN the outcome
-    // (QUESTS §7: before-roll blind → after-roll sighted; the DICE are always shown, DESIGN §5)
+    // (QUESTS §7: before-roll blind → after-roll sighted; the DICE are always shown, DESIGN §5).
+    // A saga card echoes its prose only — never its quest log (D17: the placeholder and this block start alike)
     report.push(`— ${q.title} (${q.id})`);
     if (q.situation) report.push(`「${q.situation}」`);
     const bubbles = process.env.SPEECH_ANCHORS === '1' && out?.speech?.length ? out.speech : null;
-    if (out) report.push(...(bubbles ? this.renderWithBubbles(out.before, bubbles) : [out.before]));
+    if (sagaRep) report.push(sagaRep.before);
+    else if (out) report.push(...(bubbles ? this.renderWithBubbles(out.before, bubbles) : [out.before]));
     report.push(r.rolled.totalCoins === 0
       ? `⚄ [${r.outcome.toUpperCase()}] · the party had no usable dice for this work (needed ${r.rolled.totalBar.toFixed(1)})`
       // the partial mark on the line itself — "11 heads vs bar 17.3" read as a miss, yet it was a
@@ -4640,17 +4050,16 @@ export class Game {
     // ask — attribute value, favored/clash, injury — via the engine's own explainCoins
     if (coinTerms.length) report.push(`   ${coinTerms.join('  ·  ')}`);
     // beat variant: the engine assembles the strip's turn caption + speech around its dice line
-    if (out?.turn) report.push(`▸ ${out.turnActor ?? '—'} — ${out.turn}`);
-    if (!bubbles) for (const s of out?.speech ?? []) report.push(`  ${s.who}: "${s.says}"`);
-    if (out) report.push(...(bubbles ? this.renderWithBubbles(out.after, bubbles) : [out.after]));
+    if (sagaRep) report.push(sagaRep.after);
+    else {
+      if (out?.turn) report.push(`▸ ${out.turnActor ?? '—'} — ${out.turn}`);
+      if (!bubbles) for (const s of out?.speech ?? []) report.push(`  ${s.who}: "${s.says}"`);
+      if (out) report.push(...(bubbles ? this.renderWithBubbles(out.after, bubbles) : [out.after]));
+    }
     report.push(...after);
     this.log('resolve', `${q.title}: ${r.outcome}`, q.id);
-    // chain advancement
-    if (q.chainId) {
-      const chain = st.chains.find(c => c.id === q.chainId);
-      if (chain) this.noteIntroduced(chain, [q.situation, q.job, out?.before ?? '', out?.turn ?? '', (out?.speech ?? []).map(s => s.says).join(' '), out?.after ?? ''].join('\n'));
-      this.advanceChain(q, r, out?.storyUpdate, report, r.fate, out?.after);
-    }
+    // the saga moves on (its 📖 line, then the next lead or the finale's settlement)
+    if (q.chainId && r.saga && sagaRep) this.advanceChain(q, r, sagaRep, report);
     st.quests = st.quests.filter(x => x.state !== 'resolved');
   }
 
@@ -4698,23 +4107,8 @@ export class Game {
   }
 
 
-  /** roster as the writers see it — names + a SEPARATE pronoun map ("Uneneth (she)" inline got
-   *  copied verbatim into prose; a map is metadata the model won't quote) */
-  /** deterministic saga-card lint (§0 lever 1) — each hit becomes a fixNote for the rewrite pass */
-  /** NEAR-VERBATIM job-echo strip (§0 lever 1, no extra AI call): drop a situation sentence
-   *  that essentially IS the job line. Bidirectional ≥0.85 only — the 0.7 one-way lint
-   *  over-fired (situation and job naturally share words); dropping a whole sentence is the
-   *  proven safe mechanical move. Never touches a card with fewer than 2 sentences. */
-  /** A card that opens lowercase is a rendering defect the player sees before any prose —
-   *  measured 2/10 on a live sweep ("an elven apiarist, Nithonda, stands in the yard…"). The
-   *  engine owns the first character; no prompt rule is needed for a one-line deterministic fix. */
-  private capitalizeCard<T extends { situation: string; title: string }>(out: T): T {
-    const up = (t: string) => t
-      .replace(/^\s*([a-z])/, (_m, c: string) => c.toUpperCase())
-      .replace(/([.!?]["'\u201d]?\s+)([a-z])/g, (_m, sep: string, c: string) => sep + c.toUpperCase());
-    return { ...out, situation: up(out.situation), title: up(out.title) };
-  }
-
+  /** NEAR-VERBATIM job-echo strip (§0 lever 1, no extra AI call): drop a situation sentence that essentially IS the
+   *  job line. Bidirectional ≥0.85 only; never touches a card with fewer than 2 sentences. */
   private stripJobEcho<T extends { situation: string; job: string }>(out: T): T {
     const words = (s: string) => s.toLowerCase().replace(/[^a-z ]/g, ' ').split(/\s+/)
       .filter(w => w.length > 3).map(w => w.replace(/s$/, ''));
@@ -4733,83 +4127,20 @@ export class Game {
     return { ...out, situation: kept.join(' ') };
   }
 
-  private lintCard(out: { situation: string; job: string }): string[] {
-    const d: string[] = [];
-    // suffix-normalized so "grove's"/"knows" match "grove"/"know"
-    const words = (s: string) => s.toLowerCase().replace(/[^a-z ]/g, ' ').split(/\s+/)
-      .filter(w => w.length > 3).map(w => w.replace(/s$/, ''));
-    const jw = new Set(words(out.job));
-    const sents = out.situation.split(/(?<=[.!?])\s+/);
-    // single sentences AND adjacent pairs: batch Y evaded the per-sentence check by splitting
-    // the restatement across two neighboring sentences
-    const windows = [...sents, ...sents.slice(1).map((s, i) => `${sents[i]} ${s}`)];
-    const dup = jw.size >= 4 && windows.some(win => {
-      const overlap = new Set(words(win).filter(w => jw.has(w)));
-      return overlap.size >= jw.size * 0.7;
-    });
-    if (dup) d.push('the situation restates the job line nearly word-for-word — the body tells the MATTER; the job line alone carries the errand');
-    if (/\b(your task is|this step is|the hire)\b/i.test(`${out.situation} ${out.job}`))
-      d.push('scaffold voice on the card ("your task is", "this step is", "the hire") — say the errand as the outcome wanted, in world words');
-    return d;
-  }
-
-  /** Strip the company's own soldiers out of the story record handed to a CARD writer. The
-   *  resolver names them (it must — they fought), the record keeps those sentences, and the next
-   *  card reads them and stages a soldier by name. The roster is never card material unless the
-   *  saga is ABOUT one of them. */
-  /** the saga record with the company's soldiers written as "the party" — every soldier but those
-   *  in `keep`. A soldier who held something at one step is not there at the next unless sent:
-   *  "Keesa holds the button" reached a finale's report whose only soldier was Tun-Zeeus, and Keesa
-   *  walked into the scene (playtest 2026-09-25). */
-  private deSoldier<T>(story: T, keep: string[] = []): T {
-    const names = this.rosterForWriters().names.filter(n => !keep.includes(n));
-    if (!names.length) return story;
-    const esc = (x: string) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const re = new RegExp(`\\b(?:${names.flatMap(n => [esc(n), esc(n.split(/\s+/)[0]!)]).join('|')})('s)?\\b`, 'g');
-    return JSON.parse(JSON.stringify(story).replace(re, (_m, pos: string) => pos ? "the party's" : 'the party')) as T;
-  }
-
-  private rosterForWriters(): { names: string[]; pronouns: Record<string, string> } {
-    const pronouns: Record<string, string> = {};
-    const names = this.roster().map(m => {
-      pronouns[m.name] = m.tags.find(t => t.concept === 'female') ? 'she' : m.tags.find(t => t.concept === 'male') ? 'he' : 'they';
-      return m.name;
-    });
-    return { names, pronouns };
-  }
-
-  /** LORE.md recall → selector → labeled slate: what the world remembers around a focal.
-   *  Shared by genesis AND every beat/finale (§4 tiering: dossiers for the picked few, blurbs for the rest). */
-  /** the spark for a soldier's OWN saga: the strongest thing the world remembers about them,
-   *  else the backstory they were fleshed with. Never the generic what-if pool — that is what
-   *  turned a personal saga into somebody else's ransom job. */
-  /** every spark a soldier's own saga could start from, strongest first — a retry takes the next
-   *  one. The genesis re-roll burned the seed with sampleSeed(), so a personal saga whose first
-   *  draft was rejected came back built on a GENERIC what-if ("a debt sold three times over") and
-   *  copied the saga already running (Felawen's past became Keesa's tally, playtest 2026-09-25). */
-  private personalSeeds(merc: Card): string[] {
-    const first = this.personalSeed(merc);
-    const back = merc.character?.origin ? undefined : merc.character?.backstory;   // job-born: not their past
-    const sentences = back ? back.split(/(?<=[.!?])\s+/).filter(x => x.length > 20) : [];
-    const edges = this.state.lore.edges
-      .filter(e => e.active && !!e.blurb && (e.from === merc.id || e.to === merc.id))
-      .filter(e => this.card(e.from === merc.id ? e.to : e.from)?.character?.role !== 'merc')
-      .map(e => e.blurb!);
-    return [...new Set([first, ...edges, ...sentences])];
-  }
-
-  private personalSeed(merc: Card): string {
-    // A seed may only name people the SAGA CAN CAST. Genesis is dealt no company soldier but the
-    // focal (the slate filter above) and is told assignedNames are the only names it may coin —
-    // so an edge pointing at a fellow soldier hands it a name it cannot use, and it silently
-    // coins a stranger in their place. Worse, the premise is incoherent anyway: you cannot ride
-    // out to find someone who is standing in your own yard. Skip those edges. (2026-08-31)
+  /** the edges a soldier's own saga could start from, strongest first — never one to a fellow soldier: a seed may only
+   *  name people the saga can cast, and you cannot ride out to find someone standing in your own yard (2026-08-31) */
+  private personalEdges(merc: Card): RelEdge[] {
     const inTheCompany = (id: string) => this.card(id)?.character?.role === 'merc';
-    const mine = this.state.lore.edges
+    return this.state.lore.edges
       .filter(e => e.active && !!e.blurb && (e.from === merc.id || e.to === merc.id))
       .filter(e => !inTheCompany(e.from === merc.id ? e.to : e.from))
       .sort((a, b) => (Number(b.core) - Number(a.core)) || (b.salience - a.salience));
-    if (mine[0]?.blurb) return mine[0].blurb;
+  }
+  /** the spark for a soldier's OWN saga (D12): the strongest thing the world remembers about them, else the past they
+   *  were fleshed with. Never a generic theme — that is what turned a personal saga into somebody else's ransom job */
+  private personalSeed(merc: Card): string {
+    const top = this.personalEdges(merc)[0];
+    if (top?.blurb) return top.blurb;
     // A soldier the company WON (rescued, hired, turned) has a backstory written at the moment it
     // found them — "they found Tun-Zeeus pressed to the mill shutter…" — which is the company's own
     // history, not their past. Seeded from it, a personal saga set out to learn "who led him away"
@@ -4824,52 +4155,6 @@ export class Game {
     return `something ${merc.name} left unfinished before the company`;
   }
 
-  /** the lore slate: everyone recall surfaces around the focal, flagged, then the selector picks who
-   *  gets a full dossier. `admit` is the CALLER's fence (soldiers, other sagas' cast…), applied BEFORE
-   *  the pick — a candidate the caller will drop must never take one of the selector's few picks
-   *  (both writers' pickers spent 3 of 4 on the company's own soldiers, which the beat path then
-   *  dropped, leaving one dossier) */
-  private async buildLoreSlate(focalId: string, purpose: string, admit: (e: { id: string; name: string; companySoldier?: true; companyCaptive?: true; atTheFort?: true; outOfReach?: true }) => boolean = () => true) {
-    const wildcardPool = Object.values(this.state.lore.nodes).filter(n => n.active && n.id !== focalId).map(n => n.id);
-    const wildcards = this.rng.shuffle([...wildcardPool]).slice(0, 3);
-    const candidates = recall(this.state.lore, focalId, this.state.cycle, wildcards);
-    const entries = candidates.map(c => {
-      const card = this.card(c.node.id);
-      const role = card?.character?.role;
-      // anyone physically AT the fort (tavern guest, staged) must not be cast as an off-site
-      // faction leader — a tavern guest was once written leading a hamlet while she waited
-      const atTheFort = !!card && card.location.kind === 'held' &&
-        ['roster', 'staged', 'inventory'].includes((card.location as { state?: string }).state ?? '');
-      // the MIRROR fence: someone who passed out of play ("Ulfgash slipped past…") was re-cast
-      // "in your cells" 19 cycles later — flag them gone
-      const outOfReach = !!card && card.location.kind === 'held' &&
-        (card.location as { state?: string }).state === 'lore';
-      // a soldier/captive's company relation OVERRIDES a "thematic wildcard" phrase — the two
-      // contradicted. Guarded like the flags below: a saga focal handed over at its finale keeps
-      // role 'captive' while out in the world, and was dealt outOfReach AND "held in the company's
-      // cells" in one entry — the writer took the phrase (playtest 2026-09-25, no dungeon built)
-      const relationPhrase = outOfReach ? c.relationPhrase
-        : role === 'merc' ? "one of the company's own soldiers"
-        : role === 'captive' ? "held in the company's cells" : c.relationPhrase;
-      return { c, e: {
-        id: c.node.id, name: c.node.name, blurb: c.node.blurb, relationPhrase,
-        companySoldier: role === 'merc' || undefined,
-        companyCaptive: role === 'captive' && !outOfReach || undefined,
-        atTheFort: atTheFort || undefined,
-        outOfReach: outOfReach || undefined,
-      } };
-    }).filter(x => admit(x.e));
-    const picked = entries.length > 8
-      ? await this.ai.select({ purpose, candidates: entries.map(({ c }) => ({ id: c.node.id, name: c.node.name, blurb: c.node.blurb, relationPhrase: c.relationPhrase })), max: 4 })
-      : entries.map(x => x.e.id);
-    return entries.map(({ e }) => {
-      // a dossier that is just "name — tags" adds nothing over the blurb — send only fuller ones
-      const d = picked.includes(e.id) ? this.dossier(e.id) : '';
-      return { ...e, dossier: d.includes('\n') ? d : undefined };
-    });
-  }
-
-  /** the location line the writer sees — the landmark gate works by OMISSION (a shown token gets used) */
   /** sentence-safe clamp for lore blurbs — a blurb cut mid-phrase ("speaks with a charter's")
    *  reaches later prompts as a dangling fragment the writer must stay consistent with */
   private clampBlurb(t: string, max = 120): string {
@@ -4883,189 +4168,74 @@ export class Game {
   private lastLandmarkDeal: Record<string, number> = {};
   /** recently dealt opening-spark cores (recency reroll) */
   private recentSparks: string[] = [];
-  /** last generated beat card per chain — lapsed unmarched beats re-offer VERBATIM (🛠) */
-  private cachedBeatOut = new Map<string, { beat: number; out: QuestWriteOut }>();
-  /** known-cast sagas served so far (§21-3 cadence: ~2 per GH tier, pool-gated) */
-  /** RECURRING_CAST §7 🛠 — the coining-rate dial. P(a new face) = θ/(θ+N), so θ is the cast size
-   *  at which coining and reusing are equally likely. 3 = a dominant nemesis · 4 = a lead plus a
-   *  supporting cast · 8 = a wide world with softer recurrence. */
-  private knownCastSagas = 0;
 
+  /** the location line a one-off's writer sees — the landmark gate works by OMISSION (a shown token gets used) */
   private locationLine(region: string, landmarkAllowed: boolean, anchorOk = true): string {
     const r = REGION[region]!;
-    // a rotating named anchor gives the region proper nouns besides its one landmark —
-    // NOT dealt to saga beats (their geography comes from the bible; a random anchor fought it)
+    // a rotating named anchor gives the region proper nouns besides its one landmark
     const anchor = anchorOk && r.anchors && this.rng.chance(0.5) ? ` Known ground: ${this.rng.pick(r.anchors)}.` : '';
     return `${r.name} — ${landmarkAllowed ? r.seed : (r.seedPlain ?? r.seed)}${anchor}`;
   }
 
-  /** a "fresh place" suggestion must never re-deal the region's own landmark (seed/ban-collision class) */
   /** recent toponym stems — the combinatorial pool dealt Hawbrook/Hawhollow/Hawgate and three
-   *  Mill- villages in one run; same-stem places blur into one another for the reader */
+   *  Mill- villages in one run; same-stem places blur into one another for the reader. One window for
+   *  the one-offs' suggestions and the sagas' dealt places (D11) */
   private recentPlaceStems: string[] = [];
-
-  /** reveal-cadence staging (shared by the beat writer AND the resolver — 37017: "Watkyn"
-   *  debuted in a resolution): cast the player hasn't met is passed WITHOUT their name, and
-   *  the name is scrubbed from every bible string, so an unmet person CANNOT be named. */
-  /** Replace every UNMET cast member's name with "another party" — the same gate stageBible
-   *  uses, exposed so beat 1 can deal an offstage pressure's WANT without dealing their identity. */
-  /** Has the player actually MET this person? The one definition — the beat writer's staging,
-   *  the dealt-string scrub and the quest screen's cast all ask this, and they must agree. */
-  private isMet(chain: Chain, name: string, stepText = ''): boolean {
-    const words = name.toLowerCase().split(/[^a-z]+/).filter(w => w.length > 2);
-    const seen = [stepText, chain.bible.goal, ...(chain.story.introducedNames ?? [])].join(' ').toLowerCase();
-    return words.some(w => seen.includes(w));
+  /** a place name still resting: its stem not dealt lately, and its LAST word not twice — prefix stems alone let
+   *  "Mossway Hollow / Coalward Hollow / Linden Hollow / Marepen Hollow" template a whole campaign (45025) */
+  private placeRested(p: string): boolean {
+    const tail = p.split(/\s+/).pop()!.toLowerCase();
+    return !this.recentPlaceStems.includes(p.slice(0, 4).toLowerCase()) && this.recentPlaceStems.filter(t => t === `tail:${tail}`).length < 2;
   }
-
-  private scrubUnmet(chain: Chain, text: string, stepText = ''): string {
-    const met = (name: string) => this.isMet(chain, name, stepText);
-    const escRe = (x: string) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    return chain.bible.cast.filter(m => !(m.role === 'client' || met(m.name))).reduce((t, m) => {
-      for (const n of new Set([m.name.trim(), m.name.trim().split(/\s+/)[0]!]))
-        t = t.replace(new RegExp(`\\b${escRe(n)}('s)?\\b`, 'g'), (_, pos) => pos ? "another party's" : 'another party');
-      return t;
-    }, text);
+  private notePlace(p: string): void {
+    this.recentPlaceStems.push(p.slice(0, 4).toLowerCase(), `tail:${p.split(/\s+/).pop()!.toLowerCase()}`);
+    while (this.recentPlaceStems.length > 48) this.recentPlaceStems.shift();
   }
-
-  private stageBible(chain: Chain, stepText: string, withholdTwist = false) {
-    // the focal is NOT unconditionally met (lab batch H: when discovering the focal's identity IS
-    // the mystery, the old exemption pre-named them on beat 1) — they count as met only where the
-    // goal, the step text, or the record names them
-    const met = (name: string) => this.isMet(chain, name, stepText);
-    const offstageCast = chain.bible.cast.filter(m => !(m.role === 'client' || met(m.name)));
-    // beat 1 never sees the twist (40020: a beat-1 card printed the chain's twist verbatim,
-    // pre-spoiling the finale — withholding beats instructing)
-    if (offstageCast.length === 0) return withholdTwist ? { ...chain.bible, twist: null } : chain.bible;
-    const escRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const scrub = (s: string) => offstageCast.reduce((t, m) => {
-      for (const n of new Set([m.name.trim(), m.name.trim().split(/\s+/)[0]!]))
-        t = t.replace(new RegExp(`\\b${escRe(n)}('s)?\\b`, 'g'), (_, p) => p ? "another party's" : 'another party');
-      return t;
-    }, s);
-    return {
-      ...chain.bible,
-      kernel: scrub(chain.bible.kernel),
-      situation: scrub(chain.bible.situation),
-      goal: scrub(chain.bible.goal),
-      arc: chain.bible.arc.map(scrub),
-      tensions: chain.bible.tensions.map(scrub),
-      openDirections: chain.bible.openDirections.map(scrub),
-      twist: withholdTwist ? null : typeof chain.bible.twist === 'string' ? scrub(chain.bible.twist) : chain.bible.twist,
-      // offstage cast pass ROLE ONLY — who/want carry the future person's identity and desire,
-      // which the writer voices through an invented witness to spoil them (batch R: Telare
-      // "remembers a wandering lizardman smith", the step-2 prize). Omission is the fix.
-      // Retained entries get SCRUBBED who/want too — an offstage focal's name once leaked
-      // through the client's want ("to receive Udara…") while her own entry was nameless.
-      // TRADE survives the scrub where who/want cannot: it is one common noun, carries no
-      // identity, and is the only thing that makes "shows nameless by trade" performable. Three
-      // blind writers, given {role, offstage: true}, each had to invent the entire danger.
-      cast: chain.bible.cast.map((m): unknown => offstageCast.includes(m)
-        ? { role: m.role, offstage: true, ...(m.trade ? { trade: m.trade } : {}) }
-        : { ...m, loreId: undefined, who: scrub(m.who), want: scrub(m.want) }),
-    };
-  }
-
+  /** a "fresh place" suggestion must never re-deal the region's own landmark (seed/ban-collision class) */
   private freshPlaceName(region: string): string {
     const banned = REGION[region]?.landmark;
-    const stem = (s: string) => s.slice(0, 4).toLowerCase();
-    // anti-repeat covers the LAST word too — prefix stems alone let "Mossway Hollow /
-    // Coalward Hollow / Linden Hollow / Marepen Hollow" template a whole campaign (45025)
-    const tail = (s: string) => s.split(/\s+/).pop()!.toLowerCase();
     let p = rollPlaceName(this.rng);
-    for (let i = 0; i < 12 && (p === banned || this.recentPlaceStems.includes(stem(p)) || this.recentPlaceStems.filter(t => t === `tail:${tail(p)}`).length >= 2); i++)
-      p = rollPlaceName(this.rng);
-    this.recentPlaceStems.push(stem(p), `tail:${tail(p)}`);
-    while (this.recentPlaceStems.length > 48) this.recentPlaceStems.shift();
+    for (let i = 0; i < 12 && (p === banned || !this.placeRested(p)); i++) p = rollPlaceName(this.rng);
+    this.notePlace(p);
     return p;
   }
 
-  /** orient-once (STORY_GEN_STATE): a bible-cast name that has appeared in player-facing text is "met" —
-   *  the next beat's writer uses their bare name instead of re-orienting them */
-  private noteIntroduced(chain: Chain, text: string) {
-    const seen = (chain.story.introducedNames ??= []);
-    for (const c of chain.bible.cast) {
-      const given = c.name.split(' ')[0]!;
-      if (given.length > 2 && !seen.includes(c.name) && text.includes(given)) seen.push(c.name);
-    }
-  }
-
-  private advanceChain(q: Quest, r: { outcome: Outcome; party: Card[] }, storyUpdate: { currentSituation: string; newlyRevealed: string[]; openThreads: string[]; actorUpdates?: Record<string, string> | null; sagaSettled?: boolean } | undefined, report: string[], fate?: FinaleFate, afterText?: string) {
+  /** a saga quest's report landed. The bank moves as it always has (bankBeat — a failed job is re-posed, the setbacks
+   *  and the stall guard bring the last chance); then the flow takes the report (Knowing, what is banked, the SagaLine,
+   *  the next card's opening) and the 📖 line says where the saga stands. A finale goes to settleFinale unchanged */
+  private advanceChain(q: Quest, r: Resolution, rep: SagaReport, report: string[]) {
     const st = this.state;
     const chain = st.chains.find(c => c.id === q.chainId);
-    if (!chain) return;
-    // the settled record: what the player actually read — judges caught the beat writer
-    // un-settling objects (a recovered polehead re-buried two beats later) when it only saw
-    // abstract ledgers; concrete prior text is what the model actually honors
-    if (afterText) {
-      (chain.story.history ??= []).push(`beat ${q.beatIndex ?? chain.beatIndex} (${r.outcome}): ${afterText}`);
-      while (chain.story.history!.length > 8) chain.story.history!.shift();
+    if (!chain?.saga?.plan || !r.saga) return;
+    const host = this.sagaHost();
+    const a = { outcome: r.outcome, party: r.party, hurt: r.saga.inn.hurt };
+    // whose deed decided it rides on the chronicle line (the memory edge at the saga's close reads it, §2.6)
+    const decided = () => { const l = chain.saga!.lines[chain.saga!.lines.length - 1]; if (l && r.outcome !== 'failure') l.decides = r.saga!.inn.decides };
+    if (q.isFinale) {
+      const after = flow.afterReport(host, chain, r.saga.pos, a, rep);
+      decided();
+      report.push(after.book);
+      return this.settleFinale(q, chain, r, report, r.fate);
     }
-    if (storyUpdate) {
-      chain.story.currentSituation = storyUpdate.currentSituation;
-      // dedupe near-identical facts (the same fact stored 3× invited the AI to re-stage the event)
-      const stem = (s: string) => s.toLowerCase().replace(/[^a-z ]/g, '').split(' ').slice(0, 8).join(' ');
-      for (const f of storyUpdate.newlyRevealed) {
-        if (!chain.story.knownToPlayer.some(k => stem(k) === stem(f))) chain.story.knownToPlayer.push(f);
-      }
-      chain.story.openThreads = storyUpdate.openThreads.slice(0, 5);
-      // QUESTS §11 WHEREABOUTS ledger — single-location truth per person/object; the next
-      // writer and resolver treat it as authoritative (42022: a recovered mould was re-found
-      // in the antagonist's dagger because prose history alone didn't pin locations)
-      for (const [k, v] of Object.entries(storyUpdate.actorUpdates ?? {})) {
-        if (typeof v === 'string' && v.trim()) chain.story.actorStates[k] = v.trim().slice(0, 160);
-      }
-      const keys = Object.keys(chain.story.actorStates);
-      for (const k of keys.slice(0, Math.max(0, keys.length - 14))) delete chain.story.actorStates[k];
-      // AI judges the matter settled → engine gates: the NEXT step becomes the finale (no filler beats)
-      if (storyUpdate.sagaSettled && !q.isFinale) chain.settled = true;
-    }
-    chain.story.lastBeatOutcome =
-      `beat ${q.beatIndex ?? chain.beatIndex} ended in ${r.outcome.toUpperCase()}: ${storyUpdate?.currentSituation ?? chain.story.currentSituation}`;
-    // a failed beat re-poses the SAME step (see bankBeat) — the cached card and the repose
-    // marker describe a world before the failure; both must go so the next card is written
-    // FRESH from the failure's aftermath
-    if (r.outcome === 'failure') { this.cachedBeatOut.delete(chain.id); chain.lastGeneratedBeat = 0; }
-    if (q.isFinale) return this.settleFinale(q, chain, r, report, fate);
-    const bankBefore = chain.bank;
     // side-loot deducts what was actually DELIVERED — a partial pays out half the loot,
     // so the bank is docked half (it was docked the full budget for half the goods)
     bankBeat(chain, r.party.length, r.outcome, (q.sideLootV ?? 0) * (r.outcome === 'partial' ? 0.5 : 1));
-    const delta = Math.round(chain.bank - bankBefore);
-    const focal = this.card(chain.focalId);
-    // continuation lead (cached title, zero AI)
+    const after = flow.afterReport(host, chain, r.saga.pos, a, rep);
+    decided();
+    const rec = chain.saga, plan = rec.plan!;
+    const next = flow.posOf(rec);
+    // continuation lead (the next card's title, zero AI); its hook is what the next card opens on
     st.leads.push({
       id: freshId('lead-'), rarity: chain.rarity, level: chain.level, region: chain.region,
-      archetype: 'investigate', chainInfo: { kind: 'continues', chainId: chain.id, hook: chain.story.currentSituation },
+      archetype: 'investigate', chainInfo: { kind: 'continues', chainId: chain.id, hook: rec.latest },
       expiresAtCycle: st.cycle + LEAD_TTL + CONTINUATION_TTL_BONUS, source: 'continuation',
-      title: `${chain.bible.title} — ${finaleReady(chain) ? 'the reckoning nears' : 'the story continues'}`,
+      title: `${plan.title} — ${next.finale ? plan.showdown.title : plan.episodes[next.job - 1]!.title}`,
     });
-    // company-ledger diction — "bank/beat/season/remains at the center" read as engine
-    // jargon at the story's emotional beats (41021 judge, class 5)
-    // the focal is named ONLY once the cards have introduced them (46026: "Ungrien stays at
-    // the heart of it" told the player a total stranger anchored their chain)
-    const focalMet = !!focal && (chain.story.introducedNames ?? []).includes(focal.name);
-    // ECONOMY §7.1b: the bank reads as a BAND and the projected payoff is not shown at all — this
-    // line was still printing "129g earned toward this matter's ~262g worth" after questReward and
-    // the chains tab were fixed, which is the one number the designer most wanted hidden.
-    const sofar = coinBand(chain.bank);
-    // a failed beat spends one of the saga's setbacks — said HERE, at the moment it happens (it
-    // showed only as a pip on the next quest page)
-    const failed = r.outcome === 'failure';
-    if (failed) this.cycleAcc?.setbacks.push({ chainId: chain.id, title: chain.bible.title, failures: chain.failures, budget: chain.failureBudget });
-    const setback = !failed ? ''
-      : chain.failures >= chain.failureBudget ? ` A setback — ${chain.failures} of ${chain.failureBudget}; the setbacks are spent, so the last chance comes next.`
-      : ` A setback — ${chain.failures} of ${chain.failureBudget}${chain.failures === chain.failureBudget - 1 ? '; one more and it comes to a last chance' : ''}.`;
-    report.push(`📖 ${chain.bible.title}: ${sofar ? `${sofar} set aside so far` : 'nothing set aside yet'}${delta > 0 ? ', and today added to it' : ''}${finaleReady(chain) && !(failed && chain.failures >= chain.failureBudget) ? ' — it now comes to a head' : ''}.${setback}${focalMet ? ` ${focal!.name} stays at the heart of it.` : ''}`);
+    // a failed job spends one of the saga's setbacks — the tally says so at the moment it happens
+    if (r.outcome === 'failure') this.cycleAcc?.setbacks.push({ chainId: chain.id, title: plan.title, failures: chain.failures, budget: chain.failureBudget });
+    report.push(after.book);
   }
 
-  /** LORE §1 story-NPC write-back (built 2026-07-18): when a saga closes, coined cast the
-   *  player actually MET persist as lore-only nodes — the world remembers faces. Cap 2/saga
-   *  (client > obstacle > ally) guards the slate. The memory edge anchors them to the FOCAL —
-   *  recall is edge-driven, an unanchored node is unreachable — at salience 0.5, never core,
-   *  so standard decay forgets them in ~45 cycles unless a later saga re-touches them.
-   *  Persisted at CLOSE, not genesis-time (§3.3 literal): live-chain cast are slate-excluded
-   *  anyway, and close-time avoids offstage spoilers + abandoned-saga clutter. Recurrence
-   *  rides existing channels: slate reuse + §21-3 known-cast promotion (starved until now). */
   /** SPEECH_ANCHORS display split: prose paragraph → alternating narration blocks and
    *  [Speaker] "line" bubbles, cut at the sentences carrying the model's own listed quotes.
    *  Deterministic; any quote that doesn't anchor verbatim leaves its sentence untouched. */
@@ -5099,71 +4269,50 @@ export class Game {
     return out;
   }
 
-  /** R1 sell-the-stake: the whole matter's worth as ONE rumor sentence — kind × payoff band,
-   *  sex-neutral, paste-clean (the writer may paste it verbatim and the card still reads) */
-  private stakeGloss(chain: Chain, focalMercName?: string): string {
-    const rich = chain.payoff >= 300;
-    // personal sagas: the stake is the company's own soldier — NAMED (batch I: anonymous gloss =
-    // pasted boilerplate) and POOLED (batch J: a single string stamped by its 3rd appearance;
-    // name said twice read clunky → name ONCE). Chain-id-keyed pick: rotation without touching
-    // the seeded RNG stream.
-    if (chain.isPersonal) {
-      if (!focalMercName) return 'Seeing this matter through would leave one of the company\'s own steadier for good.';
-      const pool = [
-        `This matter is ${focalMercName}'s own; settling it would steady the soldier for good.`,
-        `${focalMercName} has more than wages riding on this one.`,
-        `Old business of ${focalMercName}'s lives in this matter — ending it would end more than a contract.`,
-        `The company would get more than coin out of this: it would get ${focalMercName} back whole.`,
-      ];
-      return pool[(parseInt(chain.id.replace(/\D/g, '') || '0', 10)) % pool.length]!;
-    }
-    const table: Record<string, [string, string]> = {
-      recruit: [
-        'Word runs that the one at the heart of this would be worth a place on any roster.',
-        'Word runs that the one at the heart of this is worth more than a season of common hires.',
-      ],
-      captive: [
-        'They say the one at the heart of this would fetch a proper ransom in the right hands.',
-        'They say the one at the heart of this would fetch a ransom worth a season of contracts.',
-      ],
-      'gold-hoard': [
-        'The matter smells of a payout worth a string of small jobs.',
-        'The matter smells of a payout worth a season of small jobs.',
-      ],
-    };
-    return (table[chain.kind] ?? table['gold-hoard']!)[rich ? 1 : 0]!;
-  }
-
+  /** LORE §1 story-NPC write-back, at saga CLOSE (STORYTELLER §2.6): at most two met people who are not the focal
+   *  (the one who asked > the one in the way > anyone else) are kept by the world. A coined person becomes a lore node
+   *  (blurb = their label; sex and race as the deal rolled them); a returning face already is one. Each gets a memory
+   *  edge to the focal by seat (client party-to, opponent rival-of; their last line in the chronicle; 0.5) and one to
+   *  the soldier whose deed decided a job they were in (client saved-by, opponent rival-of; that line; 0.5) — so a face
+   *  that returns can remember who dragged them out. Every blurb is a line the player read */
   private persistMetCast(chain: Chain) {
-    const met = new Set(chain.story.introducedNames ?? []);
-    const focalName = this.card(chain.focalId)?.name;
-    const prio: Record<string, number> = { client: 0, obstacle: 1, ally: 2 };
-    // cap BEFORE the collision filter: the top-2 slots are fixed by role, never back-filled
-    // on a re-entry (a collided name means the world already holds that memory)
-    const picked = chain.bible.cast
-      .filter(m => !m.loreId && m.name && met.has(m.name) && m.name !== focalName)
-      .sort((a, b) => (prio[a.role] ?? 3) - (prio[b.role] ?? 3))
-      .slice(0, 2)
-      .filter(m => !this.state.cards.some(c => c.name === m.name)
-        // name checked against ALL nodes incl. inactive — a remembered name is never re-dealt
-        && !Object.values(this.state.lore.nodes).some(nd => nd.name === m.name));
-    for (const m of picked) {
-      const id = freshId('lore-');
-      // sentence-safe clamp (newPlaces pattern): a blurb cut mid-phrase invites invented completions
-      const b = m.who.length > 120
-        ? (c => { const d = c.lastIndexOf('. '); return d > 60 ? c.slice(0, d + 1) : c.replace(/\s+\S*$/, '') })(m.who.slice(0, 120))
-        : m.who;
-      const who = chain.castIdentity?.[m.name];
-      this.state.lore.nodes[id] = { id, kind: 'character', name: m.name, blurb: b, identity: b,
-        ...(who ? { sex: who.sex, race: who.race } : {}), active: true, createdCycle: this.state.cycle };
-      guardEdges(this.state.lore, [{
-        from: id, to: chain.focalId,
-        type: m.role === 'obstacle' ? 'rival-of' : 'party-to',
-        blurb: `${m.role === 'obstacle' ? 'stood against the company' : m.role === 'client' ? 'hired the company' : 'stood with the company'} in the matter of "${chain.bible.title}"`,
-        importance: 0.5,
-      }], this.state.cycle, () => freshId('e'), chain.id);
+    const rec = chain.saga, plan = rec?.plan;
+    if (!rec || !plan) return;
+    const met = new Set(rec.knowing.met);
+    const N = rec.world.N;
+    const SEAT: Record<string, number> = { client: 0, opponent: 1, other: 2 };
+    const inLine = (l: { n: number }, id: string) => (l.n >= N ? plan.showdown : plan.episodes[l.n - 1])?.people.includes(id) ?? false;
+    const kept: string[] = [];
+    // cap BEFORE the collision filter: the top-2 places are fixed by seat, never back-filled
+    const picked = plan.cast
+      .filter(p => !p.focal && p.seat !== 'soldier' && met.has(p.id) && !this.card(p.id))
+      .sort((a, b) => (SEAT[a.seat] ?? 3) - (SEAT[b.seat] ?? 3))
+      .slice(0, 2);
+    for (const p of picked) {
+      let id = p.id;
+      if (!(p.memory && this.state.lore.nodes[p.id])) {
+        // a coined person: a remembered name is never re-dealt to someone else
+        if (this.state.cards.some(c => c.name === p.name) || Object.values(this.state.lore.nodes).some(nd => nd.name === p.name)) continue;
+        id = freshId('lore-');
+        const blurb = p.label.replace(/^./, ch => ch.toUpperCase());
+        this.state.lore.nodes[id] = { id, kind: 'character', name: p.name, blurb, identity: blurb, sex: p.sex, race: p.race, active: true, createdCycle: this.state.cycle };
+      }
+      const theirs = rec.lines.filter(l => inLine(l, p.id));
+      const last = theirs[theirs.length - 1] ?? rec.lines[rec.lines.length - 1];
+      const edges: { from: string; to: string; type: string; blurb: string; importance: number }[] = [];
+      if (last) edges.push({ from: id, to: chain.focalId, type: p.seat === 'opponent' ? 'rival-of' : 'party-to', blurb: last.text, importance: 0.5 });
+      const deed = [...theirs].reverse().find(l => l.decides && l.outcome !== 'failure');
+      const soldier = deed ? this.roster().find(m => m.name === deed.decides) ?? this.state.cards.find(c => c.character && c.name === deed.decides) : undefined;
+      if (deed && soldier) {
+        this.ensureLoreNode(soldier);
+        edges.push({ from: id, to: soldier.id, type: p.seat === 'opponent' ? 'rival-of' : 'saved-by', blurb: deed.text, importance: 0.5 });
+      }
+      const fc = this.card(chain.focalId);
+      if (fc) this.ensureLoreNode(fc);
+      guardEdges(this.state.lore, edges, this.state.cycle, () => freshId('e'), chain.id);
+      kept.push(p.name);
     }
-    if (picked.length) this.log('chain', `The world remembers ${picked.map(m => m.name).join(' and ')}.`);
+    if (kept.length) this.log('chain', `The world remembers ${kept.join(' and ')}.`);
   }
 
   private settleFinale(q: Quest, chain: Chain, r: { outcome: Outcome; party: Card[] }, report: string[], precomputed?: FinaleFate) {
@@ -5194,7 +4343,7 @@ export class Game {
       st.leads.push(sequel);
       // the WORLD must remember the slip — a later saga once staged a slipped focal "held in
       // your cells" because her lore node never recorded that she got away
-      if (focal) guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `at large — slipped the company when "${chain.bible.title}" ended; in no one's custody`, importance: 0.8 }], st.cycle, () => freshId('e'));
+      if (focal) guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `at large — slipped the company when "${this.sagaTitle(chain)}" ended; in no one's custody`, importance: 0.8 }], st.cycle, () => freshId('e'));
       report.push(`💨 ${focal?.name ?? 'The prize'} slips away — for now, and what was set aside is lost. A road back exists (${fate.sequelRarity} sequel lead).`);
       return;
     }
@@ -5204,7 +4353,7 @@ export class Game {
       // personal finale: bank crystallizes as gold + pinned CORE memory (no new character)
       const surplus = cashValue(chain.bank);
       this.addGold(surplus);
-      guardEdges(st.lore, [{ from: chain.focalId, to: chain.focalId, type: 'scarred-by', blurb: `came through ${chain.bible.title}`, importance: 0.9 }], st.cycle, () => freshId('e'));
+      guardEdges(st.lore, [{ from: chain.focalId, to: chain.focalId, type: 'scarred-by', blurb: `came through ${this.sagaTitle(chain)}`, importance: 0.9 }], st.cycle, () => freshId('e'));
       report.push(`🏅 ${focal?.name}'s story closes: +${surplus}g and a mark that stays.`);
       return;
     }
@@ -5223,7 +4372,7 @@ export class Game {
         source: 'sequel', title: `${focal.name} resurfaces, someday`, focalId: focal.id,
       });
       report.push(`💨 The work earned too little to keep ${focal.name} — the affair pays 💰 +${pay}g and they pass out of reach, for now. A road back exists.`);
-      guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `the saga ${chain.bible.title} ended with ${focal.name} out of reach`, importance: 0.85 }], st.cycle, () => freshId('e'));
+      guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `the saga ${this.sagaTitle(chain)} ended with ${focal.name} out of reach`, importance: 0.85 }], st.cycle, () => freshId('e'));
       return;
     }
     if (kind === 'gold') {
@@ -5269,7 +4418,7 @@ export class Game {
     }
     // the ARRANGEMENT joins the memory — dossiers once missed that a focal ended as a paid
     // informer because only the outcome word was recorded
-    guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `the saga ${chain.bible.title} ended ${fate.fate}${approach ? ` — the company's way: ${approach.label}` : ''}`, importance: 0.85 }], st.cycle, () => freshId('e'));
+    guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `the saga ${this.sagaTitle(chain)} ended ${fate.fate}${approach ? ` — the company's way: ${approach.label}` : ''}`, importance: 0.85 }], st.cycle, () => freshId('e'));
   }
 
   /** give who/backstory/quirks to any owned/staged character that lacks them (ONE batched call) */
@@ -5287,25 +4436,28 @@ export class Game {
     if (!needs.length) return;
     try {
       const outs = await this.ai.flesh(needs.map(c => {
-        // the locked rule (BIBLE/DESIGN): deep history is written at delivery and must FIT the
-        // genesis saga that produced this person — the focal IS who that story was about
-        const genesis = st.chains.find(ch => ch.focalId === c.id && !ch.isPersonal);
+        // the locked rule (DESIGN): deep history is written at delivery and must FIT the saga that
+        // produced this person — the focal IS who that story was about
+        const origin = st.chains.find(ch => ch.focalId === c.id && !ch.isPersonal);
+        const plan = origin?.saga?.plan;
         return {
           characterId: c.id, name: c.name, tags: renderTags(c.tags),
           role: c.character!.role,
           quest: c.character!.origin,
-          context: genesis
-            ? (genesis.state === 'slipped'
-              ? `the person the saga "${genesis.bible.title}" is about — they slipped through the company's fingers once already`
-              : `the person the saga "${genesis.bible.title}" was about — the company spent a season on that story to reach them`)
+          context: origin
+            ? (origin.state === 'slipped'
+              ? `the person the saga "${this.sagaTitle(origin)}" is about — they slipped through the company's fingers once already`
+              : `the person the saga "${this.sagaTitle(origin)}" was about — the company spent a season on that story to reach them`)
             : c.character!.role === 'merc'
               ? (st.cycle <= 2 ? 'a founding member of the company' : 'a sword the company took on')
               : c.character!.role === 'captive' ? 'a captive taken on a quest' : 'someone the road washed up at the gate',
-          saga: genesis ? {
-            title: genesis.bible.title,
-            kernel: genesis.bible.kernel,
-            situation: genesis.story.currentSituation,
-            want: genesis.bible.cast.find(e => e.name === c.name)?.want ?? null,
+          // the saga they were at the heart of: its answer is who they turned out to be (the question, while the finale
+          // that brings it out is still unplayed), its last line where it ended
+          saga: plan ? {
+            title: plan.title,
+            kernel: origin!.saga!.lines.some(l => l.n >= origin!.saga!.world.N) ? plan.answer : plan.question,
+            situation: origin!.saga!.lines[origin!.saga!.lines.length - 1]?.text ?? origin!.saga!.card1,
+            want: plan.cast.find(e => e.id === c.id)?.want ?? null,
           } : undefined,
           // cross-batch quirk dedup — "tilts head when listening" landed on 4 people
           avoidQuirks: st.cards.flatMap(x => x.character?.quirks ?? []).slice(-20),

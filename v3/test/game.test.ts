@@ -72,7 +72,7 @@ describe('game loop (mock AI)', () => {
     expect(g.state.log.length).toBeGreaterThan(3);
   });
 
-  it('chains: a starts-new lead builds a bible around a focal and banks beats', async () => {
+  it('chains: a starts-new lead deals and plans a saga around a focal and banks beats', async () => {
     const g = newGame(13);
     g.build('map-room');
     const chainLead = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new' && l.source !== 'personal');
@@ -80,10 +80,15 @@ describe('game loop (mock AI)', () => {
     await g.pursue(chainLead!.id);
     expect(g.state.chains).toHaveLength(1);
     const chain = g.state.chains[0]!;
-    expect(chain.bible.cast.length).toBeGreaterThanOrEqual(2);
+    expect(chain.saga!.plan!.cast.length).toBeGreaterThanOrEqual(2);
+    expect(chain.saga!.plan!.cast.find(p => p.focal)!.id).toBe(chain.focalId);
     expect(g.card(chain.focalId)).toBeDefined();          // focal exists (ALWAYS — §2)
     const q = g.state.quests[0]!;
     expect(q.chainId).toBe(chain.id);
+    // card 1: the plan's first job, its prose, and the quest log the engine rendered
+    expect(q.title).toBe(chain.saga!.plan!.episodes[0]!.title);
+    expect(q.situation).toBe(chain.saga!.card1);
+    expect(q.saga).toMatchObject({ part: 1, of: chain.expectedBeats, logFirst: true, again: false });
     // resolve the beat with everyone
     for (let s = 0; s < q.slots.length; s++) {
       const free = g.roster().find(m => m.location.kind === 'held');

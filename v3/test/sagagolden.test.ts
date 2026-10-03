@@ -159,8 +159,6 @@ function chainOf(g: Gold, w: SagaWorld): Chain {
     id: `chain-${g.id}`, kind: w.kind === 'gold' ? 'gold-hoard' : w.kind, isPersonal: w.personal, focalId: w.focalId, level: w.level,
     rarity: g.world.rarity as Chain['rarity'], region: w.region, expectedBeats: w.N, payoff: 0, bank: 0, cyclesSpent: 0,
     failureBudget: Math.max(2, Math.ceil(w.N / 2)), failures: 0, beatIndex: 0,
-    bible: { title: '', kernel: '', cast: [], situation: '', goal: '', arc: [], twist: null, tensions: [], openDirections: [] },
-    story: { currentSituation: '', knownToPlayer: [], openThreads: [], actorStates: {} },
     state: 'active', createdCycle: 0, saga: flow.newRecord(w),
   };
 }

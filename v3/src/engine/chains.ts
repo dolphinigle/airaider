@@ -11,43 +11,10 @@ import type { Outcome } from './roll.js';
 import type { ChainLab } from './lab.js';
 import type { SagaRecord } from './saga.js';
 
-export interface BibleCastEntry { name: string; trade?: string; who: string; want: string; role: string; loreId?: string }
-
-export interface Bible {
-  title: string;
-  kernel: string;              // the one-line collision of seed × slate
-  cast: BibleCastEntry[];      // LEAN (BIBLE.md): one line + want + role
-  situation: string;
-  goal: string;
-  arc: string[];               // ROUGH step guide, never prescriptive beat prose
-  twist: string | null;        // engine-rolled 30%
-  tensions: string[];
-  openDirections: string[];
-  /** what the client says BREAKS if the saga fails — beat 1's WHY (see prosebench/ROUND2_3) */
-  stakeIfLost?: string;
-  /** engine-rolled at hiring: HOW this matter reached the fort (the one-off `intake` channel,
-   *  which sagas never got). All six blind writers invented it, both rounds. */
-  arrival?: string;
-}
-
-export interface ChainStoryState {
-  currentSituation: string;
-  knownToPlayer: string[];
-  openThreads: string[];
-  actorStates: Record<string, string>;
-  lastBeatOutcome?: string;   // "beat N ended in X: <what changed>" — feeds the next beat's writer
-  introducedNames?: string[]; // bible-cast names the player-facing text already introduced (orient ONCE)
-  history?: string[];         // every beat's player-visible after-text — the SETTLED record the next
-                              // writer must not contradict (abstract ledgers alone were ignored)
-}
-
 export interface Chain {
   id: string;
   kind: ChainKind;             // generation-time suggestion; finale disposition is free (§2)
   isPersonal: boolean;         // main chain: focal = the joining merc
-  /** the sex and race each coined cast name was rolled with (keyed by name) — carried onto the
-   *  lore node when the saga closes, so a returning face keeps them */
-  castIdentity?: Record<string, { sex: 'male' | 'female'; race: string }>;
   focalId: string;             // the focal card (limbo until delivered; personal: the merc)
   level: number;
   rarity: Rarity;
@@ -59,17 +26,14 @@ export interface Chain {
   failureBudget: number;       // failures allowed before a forced last-chance finale
   failures: number;
   beatIndex: number;           // beats resolved so far
-  bible: Bible;
-  story: ChainStoryState;
-  settled?: boolean;           // resolver judged the matter settled mid-saga → next step is the finale
-  lastGeneratedBeat?: number;  // a re-posed (lapsed) step re-offers VERBATIM from cache (🛠 2026-07-10)
   reOffers?: number;           // lapse counter — 3 unmarched offers of a beat slips the chain (2026-07-11)
   state: 'active' | 'finale-pending' | 'done' | 'slipped';
   createdCycle: number;
   /** SAGA LAB only (docs/STORYTELLER.md §5.0): the fixture and its forced rolls — absent in play */
   lab?: ChainLab;
-  /** the v4 storyteller's record (docs/STORYTELLER.md; Phase 2): world, plan, Knowing, road, lines. Unset until the saga
-   *  flow is wired into the game (Step 5a); `bible` and `story` stay until Step 5b */
+  /** the v4 storyteller's record (docs/STORYTELLER.md; src/game/sagaflow.ts): world, plan, Knowing, road, lines. Set by
+   *  the deal, in the pursuit's synchronous prefix; the plan lands on it before the chain's first card. (Saves written
+   *  before v4 are not supported — they are cleared at ship.) */
   saga?: SagaRecord;
 }
 
@@ -115,10 +79,6 @@ export function bankBeat(chain: Chain, partySize: number, outcome: Outcome, side
 
 /** the climax gate is on merc-cycles SPENT (§8 solidity rule c); failures force a last chance */
 export function finaleReady(chain: Chain): boolean {
-  // settled = the resolver judged the central matter essentially done mid-saga (an AI overshoot
-  // once completed a saga at beat 1 and the engine commissioned two beats of nothing) —
-  // AI judges, engine gates: the NEXT step becomes the finale instead of filler
-  if (chain.settled) return true;
   // the LAST arc step IS the finale: beats consume steps 1..N-1 only. (Running beats to N and
   // THEN firing a finale re-staged the climax — the figurine was opened before the moot twice.)
   if (chain.beatIndex >= chain.expectedBeats - 1) return true;

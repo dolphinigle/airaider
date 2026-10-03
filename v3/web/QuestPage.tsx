@@ -5,7 +5,7 @@
 // auto / approach / abandon. Every verdict shown here is the engine's: the POOLED quest band
 // (odds.band) for the roll, a strong/fair/weak colour for one soldier at one place (R2).
 import React, { useEffect, useRef, useState } from 'react';
-import { activeSlots, Silhouette, CardFace, shortTitle } from './ui';
+import { activeSlots, Silhouette, CardFace, shortTitle, QuestLog, questKind } from './ui';
 import { BAND_WORD, BAND_ORDER, bandCls, strengthCls, STRENGTH_WORD, coinBadge, type Band } from './band';
 import { ConfirmButton } from './fx';
 
@@ -126,15 +126,15 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
               <span className="lbl">On this matter</span>
               <div className="heldrow">{q.cast.map((c: any, i: number) => {
                 const own = s.roster.find((m: any) => m.name === c.name);
-                return own ? <div className="heldone" key={i}><CardFace c={own} small title={`${own.name} — one of yours, held to this matter`} /><span className="hwho">one of yours · {c.role}</span></div> : (
-                <div className="heldone" key={i}>
-                  <button className="hc" onClick={() => readCast(c)} aria-label={`${c.name} — read their card`}>
+                // the people this card calls by name (the engine's ON THIS MATTER): name — label
+                return own ? <div className="heldone" key={c.id ?? i}><CardFace c={own} small title={`${own.name} — one of yours, held to this matter`} /><span className="hwho">one of yours</span></div> : (
+                <div className="heldone" key={c.id ?? i}>
+                  <button className="hc" onClick={() => readCast(c)} aria-label={`${c.name}, ${c.label} — read their card`}>
                     <span className="clasp l" /><span className="clasp r" />
                     <span className="nm">{c.name}</span>
                     <span className="mono">{c.name.split(/\s+/).map((w: string) => w[0]).slice(0, 2).join('')}</span>
-                    <span className="rl">{c.role}</span>
+                    <span className="rl">{c.label}</span>
                   </button>
-                  <span className="hwho">{c.trade || ''}</span>
                 </div>)})}
               </div>
             </div>
@@ -210,7 +210,7 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
         <div className="wh">
           <div className="whtop">
             <button className="back" onClick={back}>← Map <span>Esc</span></button>
-            <span className="kind">{q.isFinale ? 'Saga finale' : q.chainId ? `Saga · beat ${q.beat}` : q.faucet ? 'Standing post' : 'One-off job'} · {q.region}</span>
+            <span className="kind">{questKind(q)} · {q.region}</span>
           </div>
           <div className="titlerow">
             <h1>{q.title}</h1>
@@ -225,9 +225,15 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
           <span className="meta">{q.rarity} · level {q.level} · {act.length || '—'} to send</span>
         </div>
         <div className="body">
+          {/* a saga card: the quest log the engine rendered, part of the card — above the prose on every R5 card (logFirst);
+              the road's ▶ row and the prose carry the job, so a saga card has no errand row */}
+          {q.saga?.logFirst && <QuestLog rows={q.saga.rows} />}
           <p className="sit">{q.situation}</p>
-          <div className="hr" />
-          <div className="lineh"><span className="lk">The errand</span><span className="lv">{q.job}</span></div>
+          {q.saga && !q.saga.logFirst && <QuestLog rows={q.saga.rows} />}
+          {!q.saga && <>
+            <div className="hr" />
+            <div className="lineh"><span className="lk">The errand</span><span className="lv">{q.job}</span></div>
+          </>}
         </div>
         <div className={'btns' + (arming ? ' arming' : '')}>
           {arming && <div className="consequence" role="alert">{q.abandonText}</div>}
@@ -246,19 +252,20 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
   );
 }
 
-/** the saga's stakes in one strip (Game.chainViews): beat pips, progress, setbacks, what is set aside */
+/** the saga's stakes in one strip (Game.chainViews): part pips, progress, setbacks, what is set aside */
 function SagaStrip({ c, q }: { c: any; q: any }) {
-  const now = Math.max(1, q.beat ?? c.beat + 1);           // this quest's step, 1-based
-  const total = Math.max(c.expectedBeats ?? now, now);
+  const total = Math.max(1, q.saga?.of ?? c.of ?? 1);
+  const now = q.isFinale ? total : Math.max(1, Math.min(total, q.saga?.part ?? c.part ?? 1));   // this card's part, 1-based
   const budget = Math.max(0, c.failureBudget ?? 0);
   const prog = c.effortTarget ? Math.min(1, (c.effort ?? 0) / c.effortTarget) : 0;
+  const where = q.isFinale ? `the finale${q.saga?.lastchance ? ' · the last chance' : ''}` : `part ${now} of ${total}${q.saga?.again ? ' (again)' : ''}`;
   return (
     <div className="saga" aria-label="The saga">
-      <span className="sg-t" title={c.goal ?? ''}>{c.title}</span>
-      <span className="sg-i" title={`beat ${now} of about ${c.expectedBeats}`}>
+      <span className="sg-t" title={c.card1 ?? ''}>{c.title}</span>
+      <span className="sg-i" title={where}>
         <span className="pips">{Array.from({ length: total }, (_, i) =>
           <i key={i} className={i < now - 1 ? 'done' : i === now - 1 ? (q.isFinale ? 'now fin' : 'now') : ''} />)}</span>
-        {q.isFinale ? 'the finale' : `beat ${now} of ~${c.expectedBeats}`}
+        {where}
       </span>
       <span className="sg-i" title={`progress ${Math.round(c.effort ?? 0)} of ~${Math.round(c.effortTarget ?? 0)} (soldier-cycles spent on it)`}>
         <span className="eff"><i style={{ width: `${prog * 100}%` }} /></span>progress

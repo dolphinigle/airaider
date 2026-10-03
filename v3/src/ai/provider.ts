@@ -16,21 +16,16 @@ export interface AskSlotOut {
   mustBeFocal?: boolean;          // personal sagas: this slot is THEIR story — pin the focal merc
 }
 
-// ---- ① one-off quest dress / chain-beat quest-writer -----------------------------------
+// ---- ① the one-off quest writer (sagas are the v4 storyteller's: ⑥ below) ------------------------
 
 export interface QuestWriteInput {
-  kind: 'one-off' | 'beat' | 'finale';
-  archetype?: string;            // one-offs only — beats serve the bible's story instead
+  kind: 'one-off';
+  archetype?: string;
   location: string;              // "Western Forests — old-growth elven woods; Thornhollow at their heart"
   level: number;
-  rarity?: string;               // one-offs only — on a saga beat its sole stated job was
-                                 // "permission to run long", and the budget is fixed now
+  rarity?: string;
   slotCount: number;
   rewardEnvelope: string;        // "a captive and coin" — the engine's kind list, no numbers
-  stake?: string;                // beat 1 only (R1 sell-the-stake): what the WHOLE matter is rumored to be worth to the company — paste-clean, rumor-toned, no numbers
-  // ── beat 1's own dealt facts (prosebench/ROUND2_3 — the questions cards lose) ──
-  stakeIfLost?: string;          // what the client says BREAKS if the saga fails: beat 1's WHY
-  arrival?: string;              // two atoms: how this reached the fort, and the client's manner
   /** HOW this job gets done this time — one word, combined with KEYWORDS by the writer */
   method?: string;
   /** a concrete obstacle the card can SHOW: who stands in the way and what they do about it */
@@ -43,40 +38,18 @@ export interface QuestWriteInput {
   hiring?: boolean;
   /** what KIND OF TURN this story takes — orthogonal to the archetype and the keywords */
   shape?: string;
-  knownObstacle?: string;        // what the client openly knows stands against them — never a name
-  tell?: string;                 // one physical habit the client has while talking: the CARE MOMENT
-  noClient?: boolean;            // this saga has no outside client — nobody hired the company
-  keywords?: string[];           // one-offs: §5 sampler (1 BOND + 1 TIE + 1-2 WILDCARDS)
-  opening?: { spark: string };   // one-offs only — arrival SPARK, time folded in ("a friar, a plea — at dusk"): a standalone time field taught cards to open "At dusk, ...".
-                                 // Beats get NO spark: a random spark fought the saga (a cart from nowhere).
+  keywords?: string[];           // §5 sampler (1 BOND + 1 TIE + 1-2 WILDCARDS)
+  opening?: { spark: string };   // arrival SPARK, time folded in ("a friar, a plea — at dusk"): a standalone time field taught cards to open "At dusk, ...".
                                  // The landmark gate is enforced by OMISSION: a card that may not name the
                                  // landmark simply never sees it in `location` (a shown token gets used).
-  intake?: string;               // one-offs: engine-rolled FACT of how word reached the company (quarryTags
+  intake?: string;               // engine-rolled FACT of how word reached the company (quarryTags
                                  // pattern — the POV-lock otherwise makes "a messenger arrives" the model's
                                  // only epistemic device; ~92% of cards opened on one)
-  gravity?: string;              // one-offs: engine-rolled weight of the matter ("a small, everyday job" … "a grave affair")
-  rewardItems?: string[];        // one-offs: the pre-rolled prize objects — fiction naming the prize must use these
+  gravity?: string;              // engine-rolled weight of the matter ("a small, everyday job" … "a grave affair")
+  rewardItems?: string[];        // the pre-rolled prize objects — fiction naming the prize must use these
   placeNameSuggestions?: string[]; // engine-rolled fresh place names (variety fuel)
-  rosterNames?: string[];        // the player's own soldiers — NEVER card NPCs
-  rosterPronouns?: Record<string, string>;  // name → she/he/they (separate map: inline "(she)" got copied into prose)
-  lastBeatOutcome?: string;      // beats: what the previous beat's resolution changed
-  lastStepFailed?: boolean;      // beats: previous step FAILED — its planned yield was never won
-  // chain context (beat/finale)
-  bible?: unknown;               // the Bible object (hidden truth)
-  storyState?: unknown;          // chain story-so-far
-  // two-part lore prompting (LORE.md): the selector already picked who gets full dossiers;
-  // the writer receives the world's relevant memory around this saga
-  relevantLore?: { id: string; name: string; blurb: string; relationPhrase?: string; companySoldier?: boolean; companyCaptive?: boolean; atTheFort?: boolean; outOfReach?: boolean; dossier?: string }[];
-  focalDossier?: string;         // what the world currently remembers of the focal (evolves each cycle)
-  fixNotes?: string[];           // cold-reader gate: defects found in the rejected previous draft
-  beatIndex?: number; expectedBeats?: number;
-  arcStep?: string;              // the ONE arc step this card covers, dealt verbatim (models
-                                 // fumbled indexing arc[beat-1] themselves — beat 1 cards scoped
-                                 // to the whole GOAL and later beats had to retcon)
-  focalName?: string;
-  focalIsMerc?: boolean;         // personal saga: the focal is one of the player's own soldiers
-  framedCharacter?: { name: string; tags: string; pronoun?: string; dossier?: string; lastSeen?: string; partial?: boolean } | null;  // one-offs: the person to frame (pronoun explicit; lastSeen = a returning person's story so far; partial = identity only — the writer SHAPES them via quarryTags, §4 pattern-B)
-  avoid?: string[];              // one-offs: recent card titles+jobs — do not re-deal the same premise
+  framedCharacter?: { name: string; tags: string; pronoun?: string; dossier?: string; lastSeen?: string; partial?: boolean } | null;  // the person to frame (pronoun explicit; lastSeen = a returning person's story so far; partial = identity only — the writer SHAPES them via quarryTags, §4 pattern-B)
+  avoid?: string[];              // recent card titles+jobs — do not re-deal the same premise
 }
 
 export interface QuestWriteOut {
@@ -85,43 +58,6 @@ export interface QuestWriteOut {
   job: string;                   // the job stated plainly
   ask: AskSlotOut[];             // one per slot (engine already fixed the count)
   quarryTags?: string[];         // §4 pattern-B: ≤3 vocab words shaping a partial framedCharacter (AI = type; engine = tier)
-  approaches?: { label: string; rewardKind: string; attribute: string; favored: string[] }[]; // finale mutex groups
-}
-
-// ---- ② genesis (bible + write-back folded in — ONE call) ---------------------------------
-
-export interface GenesisInput {
-  seed: string;                  // the Polti-anchored what-if spark
-  keywords: string[];
-  location: string;              // the land's name + anchor facts, one field
-  rarity: string; stakes: 'low' | 'mid' | 'high';
-  tone: string;                  // engine-picked, weighted toward lighter (BIBLE tone knob)
-  avoid?: string[];              // recent saga titles+kernels — steer away from repeats; omitted when none
-  focal: { id: string; name: string; tags: string; dossier?: string; isExistingMerc: boolean };  // dossier only when it adds lines beyond the blurb
-  kind: string;                  // likely fate (recruit/captive/gold-hoard)
-  twist: boolean;                // engine-rolled 30%
-  expectedBeats: number;         // the arc must have exactly this many steps (chain shape is engine-rolled)
-  slate?: { id: string; name: string; blurb: string; relationPhrase: string; companySoldier?: boolean; companyCaptive?: boolean; atTheFort?: boolean; outOfReach?: boolean; dossier?: string }[];  // omitted when empty
-  assignedNames: string[];       // pre-rolled names for any NEW cast the AI coins (§4b)
-  /** a personal saga: no client should exist at all — the soldier's own past is the reason */
-  noClientWanted?: boolean;
-}
-
-export interface GenesisOut {
-  title: string;
-  kernel: string;
-  cast: { name: string; trade?: string; who: string; want: string; role: string; loreId?: string }[];
-  situation: string;
-  goal: string;
-  stakeIfLost?: string;
-  arc: string[];
-  twistReveal: string | null;
-  tensions: string[];
-  openDirections: string[];
-  // write-back (persisted, guarded)
-  relevantIds: string[];
-  newPlaces: { name: string; blurb: string }[];
-  newEdges: { from: string; to: string; type: string; blurb: string; importance: number }[];
 }
 
 // ---- ③ batched resolution ------------------------------------------------------------------
@@ -141,19 +77,6 @@ export interface ResolveQuestInput {
   partialCost?: string;          // engine-rolled: what a PARTIAL costs (a wound only sometimes — QUESTS §105)
   earnedLead?: string;           // the work an earned lead turns out to be (pre-minted), so the report can name it
   deliveredCharacters: { id: string; name: string; tags: string }[]; // to flesh (who/backstory)
-  chainContext?: {
-    bible: unknown; storyState: unknown; isFinale: boolean;
-    arcStep?: string;                // the ONE arc step this job covers — the report may not
-                                     // complete later steps (resolutions overreached even when
-                                     // the card was scoped)
-    stepsNotYet?: string[];          // the plan's LATER steps, dealt as a concrete ban list —
-                                     // their work/prizes/targets may not land in this report
-                                     // (the abstract rule alone kept failing at low effort)
-    focalName?: string;              // the saga's central person, named explicitly
-    fate?: string;                   // finale: what becomes of them — a plain SENTENCE, never a token
-    approach?: string;               // finale: the plan the player CHOSE (a contract)
-    rejectedApproaches?: string[];   // finale: the plans NOT taken (their actions may not appear)
-  };
   fixNotes?: string[];               // cold-reader gate: defects found in the rejected previous report
   sceneMode?: 'physical' | 'wits' | 'social';   // beat variant: how this job turns (engine-dealt)
 }
@@ -168,7 +91,6 @@ export interface ResolveQuestOut {
   injuries: { characterId: string; band: 'none' | 'low' | 'med' | 'high'; cause?: string | null }[];
   fleshed: { characterId: string; who: string; backstory: string; quirks: string[] }[];
   edges: { from: string; to: string; type: string; blurb: string; importance: number }[];
-  storyUpdate?: { currentSituation: string; newlyRevealed: string[]; openThreads: string[]; sagaSettled?: boolean };
 }
 
 // ---- ③b flesh (batched; who/backstory/quirks for characters that lack them) -------------------
@@ -187,11 +109,11 @@ export interface FleshInput {
     situation: string;       // the card the player read when they took the job
     job: string;             // the errand as the board stated it
   };
-  saga?: {                   // set when this person is a chain's focal: backstory must FIT this story
+  saga?: {                   // set when this person is a saga's focal: backstory must FIT this story
     title: string;
-    kernel: string;          // the one-line collision the saga is built on
-    situation: string;       // where the story stands now
-    want: string | null;     // what the bible says they want
+    kernel: string;          // what the saga turned on: its answer once the finale is played, else its question
+    situation: string;       // where the story stands now (its last chronicle line)
+    want: string | null;     // what the plan says they want
   };
   avoidQuirks?: string[];    // habits living characters already own — same tic on 4 people reads
                              // as a copy-paste world
@@ -248,7 +170,7 @@ export interface SagaCall {
 /** one record per AI call — the GUI's ai-log tab and the debugging trail */
 export interface AiCallRecord {
   n: number;                 // call ordinal
-  purpose: string;           // writeQuest / genesis / resolve / flesh / themeRoll / select
+  purpose: string;           // writeQuest / resolve / flesh / themeRoll / select / plan / outline / card / report
   template?: string;         // a saga call: its template (plan / outline / card / report)
   flags?: string[];          // a saga call: the template flags it rendered with
   model: string;
@@ -289,7 +211,6 @@ export interface AiProvider {
   /** the direction every writer call follows from now on (null = none) */
   setDirection?(d: CampaignDirection | null): void;
   writeQuest(input: QuestWriteInput): Promise<QuestWriteOut>;
-  genesis(input: GenesisInput): Promise<GenesisOut>;
   /** ONE batched call (parallel inside). `onEach` fires as each quest's call settles — the
    *  reckoning is read WHILE it is written, so a finished report never waits on a slow one */
   resolve(inputs: ResolveQuestInput[], onEach?: (out: ResolveQuestOut) => void): Promise<ResolveQuestOut[]>;
@@ -298,17 +219,6 @@ export interface AiProvider {
   select(input: SelectorInput): Promise<string[]>;
   /** the v4 saga storyteller's one call: schema-parsed JSON; throws on a transport failure (after the one retry) */
   sagaCall(c: SagaCall): Promise<unknown>;
-  /** cold-reader gate: a zero-context read of one player-facing text — the defects it returns
-   *  feed ONE guided rewrite (the judge-loop plateau traced to ~1-2 unparseable/ungrounded
-   *  sentences per chain, each capping a chain's readability) */
-  review(input: ReviewInput): Promise<ReviewOut>;
   usage(): AiUsage;
   callLog(): AiCallRecord[];
 }
-
-export interface ReviewInput {
-  text: string;                          // the player-facing text to cold-read
-  whereabouts?: Record<string, string>;  // authoritative object/person locations (contradiction check)
-  known?: string[];                      // names/facts the player has already met
-}
-export interface ReviewOut { ok: boolean; defects: string[] }

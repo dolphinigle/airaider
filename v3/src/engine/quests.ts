@@ -12,6 +12,7 @@ import { tierOf, CONCEPT, T } from './tags.js';
 import type { Attribute, Rank } from './tags.js';
 import { type SlotTest, type DifficultyName, type Outcome } from './roll.js';
 import type { LabFixture } from './lab.js';
+import type { LogRow, Matter, SagaPos, Way } from './saga.js';
 
 // ---- leads (QUESTS §1) -----------------------------------------------------------------
 
@@ -167,7 +168,21 @@ export interface QuestSlot {
 }
 
 
-export interface ApproachGroup { id: string; label: string; rewardKind: 'recruit' | 'captive' | 'gold' }
+/** a finale plan: its label (the saga plan's), the reward kind settleFinale reads, and the way it ends (D2) */
+export interface ApproachGroup { id: string; label: string; rewardKind: 'recruit' | 'captive' | 'gold'; way?: Way }
+
+/** a saga card's screen beyond its prose (the v4 storyteller): the quest log rows the engine rendered (both UIs print
+ *  them above the prose — `logFirst`), the people the card calls by name, and where the card sits in its saga */
+export interface QuestSaga {
+  rows: LogRow[]; logFirst: boolean; matter: Matter[];
+  /** the job this card poses and which try (the finale's job is N) */
+  pos: SagaPos;
+  /** "part n of N": n is null on the finale */
+  part: number | null; of: number;
+  /** a failed job posed again · the finale the setbacks (or the stall guard) brought */
+  again: boolean; lastchance: boolean;
+  setbacks: number; budget: number;
+}
 
 export interface Quest {
   id: string;
@@ -186,6 +201,8 @@ export interface Quest {
   archetype: Archetype;
   chainId?: string;
   beatIndex?: number;              // chains: which beat this is
+  /** saga cards only: the quest log and the card's place in its saga */
+  saga?: QuestSaga;
   isFinale?: boolean;
   approaches?: ApproachGroup[];    // finale only; player picks ONE group
   chosenApproach?: string;

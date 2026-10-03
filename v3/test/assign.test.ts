@@ -5,6 +5,7 @@ import { Game } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
 import { coins } from '../src/engine/roll.js';
 import type { Quest } from '../src/engine/quests.js';
+import { logLines } from '../src/ai/storyteller.js';
 
 /** a game with a manned-up roster and at least one open quest */
 async function staged(seed = 9101) {
@@ -141,28 +142,24 @@ describe('autoAssign', () => {
 });
 
 describe('questCast', () => {
-  it('is empty for a one-off and shows only met people for a saga', async () => {
+  it('is empty for a one-off; a saga card lists the people it calls by name, as name and label', async () => {
     const g = await staged();
+    let sagas = 0;
     for (const q of openQuests(g)) {
       const cast = g.questCast(q.id);
       if (!q.chainId) { expect(cast).toEqual([]); continue }
-      expect(cast.every(c => c.met)).toBe(true);            // the ruling: unmet are not shown
-      expect(cast.every(c => !!c.name)).toBe(true);
-      expect(cast.every(c => !['client', 'quarry', 'obstacle', 'prize', 'ally'].includes(c.role))).toBe(true);
+      sagas++;
+      expect(cast).toEqual(q.saga!.matter);
+      for (const c of cast) { expect(c.name).toBeTruthy(); expect(c.label).toBeTruthy(); expect(c.label).not.toMatch(/^an? /) }
     }
+    expect(sagas).toBeGreaterThan(0);
   });
 
   it('never shows a person the card itself withheld', async () => {
     const g = await staged();
     for (const q of openQuests(g).filter(q => q.chainId)) {
-      const chain = g.state.chains.find(c => c.id === q.chainId)!;
-      const shown = g.questCast(q.id).map(c => c.name);
-      const text = `${q.situation} ${q.job} ${chain.bible.goal}`.toLowerCase();
-      for (const name of shown) {
-        const first = name.split(/\s+/)[0]!.toLowerCase();
-        const isClient = chain.bible.cast.find(m => m.name === name)?.role === 'client';
-        expect(isClient || text.includes(first)).toBe(true);
-      }
+      const shown = `${logLines(q.saga!.rows).join('\n')}\n${q.situation}`;
+      for (const c of g.questCast(q.id)) expect(shown).toContain(c.name.split(/\s+/)[0]!);
     }
   });
 });

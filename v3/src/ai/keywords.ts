@@ -574,50 +574,6 @@ export function sampleOpening(rng: Rng, opts?: { gentle?: boolean; channel?: Int
   return { spark: atoms.join(' · '), sparkCore: core, landmarkAllowed: rng.chance(0.15), channel, intake: rng.pick(INTAKE_FACT[channel]) };
 }
 
-/** SAGA ARRIVAL — how the client brought this to the fort, as two atoms the writer combines.
- *  Every one of six blind Opus writers invented this, both rounds, and named it the single
- *  most-invented thing on a beat-1 card. The one-off `intake` channel has dealt it for months;
- *  sagas never got it. Atoms, never authored phrases (the seed-list law): a fixed string stamps.
- *  Measured value: the two live sentences on the best v3 card were the dealt `arrival` and `tell`
- *  — "the dealt facts outperformed my writing everywhere they existed." */
-const ARRIVAL_HOW = [
-  'came to the fort themselves', 'sent a rider ahead and came behind it', 'came in with the day\'s callers',
-  'sent a servant with a token and followed', 'was waiting at first light', 'came up with the last carts',
-  'came on foot, having walked it', 'sent word twice before coming', 'arrived out of the weather',
-  'came in the night and would not wait for morning', 'came behind a letter that said less',
-  'walked in with the market crowd', 'came back a second time', 'was let in past the hour',
-  'came down from higher ground', 'turned up with the tally-carts', 'crossed the river to get here',
-  'was brought as far as the gate and came the rest alone', 'came in wet through',
-];
-const ARRIVAL_MANNER = [
-  'would not sit down', 'had the coin counted before speaking', 'kept looking back down the road',
-  'asked for the boss by name', 'brought no one with them', 'spoke low, and only to the boss',
-  'would not give a reason until the door was shut', 'was in a hurry and did not hide it',
-  'had rehearsed it', 'said the whole of it standing', 'named a price before being asked',
-  'would give only half a reason', 'wanted it settled the same day', 'apologised for the hour',
-  'had the whole of it written out', 'refused food and drink', 'asked what the company had lost lately',
-  'would not name the place until the terms were set',
-];
-/** ONE physical habit the client has while they talk — the CARE MOMENT, dealt instead of derived.
- *  Three writers reported deriving a human moment from a tag word ("calculating") guarantees
- *  invention; the one who was handed a tell called it the best line on his card. */
-const CLIENT_TELL = [
-  'counts the soldiers in the yard while talking', 'watches your hands, not your face',
-  'keeps turning something over in one palm', 'will not look at the door',
-  'stops talking whenever anyone walks past', 'keeps one hand on the door frame',
-  'will not take the chair offered', 'turns a ring around one finger',
-  'wipes their hands on their coat, over and over',
-  'laughs in the wrong place', 'goes quiet when the person they want is named', 'stands too close',
-  'keeps a hand flat on the table', 'looks at the door before answering',
-  'holds their gloves and does not put them on',
-  'rubs a thumb along a scar without noticing', 'keeps their back to the wall',
-  'sets things straight while talking',
-];
-export function sampleArrival(rng: Rng): string {
-  return `${rng.pick(ARRIVAL_HOW)} · ${rng.pick(ARRIVAL_MANNER)}`;
-}
-export function sampleTell(rng: Rng): string { return rng.pick(CLIENT_TELL) }
-
 /** one-off gravity — not every job is dire (v2's per-card register knob, rarity-weighted).
  *  Engine-rolled seed: most common jobs are small; rare ones lean grave. */
 // Gravity sets tone AND the length budget, so it decides how heavy a job READS. It used to be
@@ -656,65 +612,13 @@ export function sampleKeywordsLight(rng: Rng): string[] {
   return [r < 0.45 ? rng.pick(BOND) : r < 0.8 ? rng.pick(TIE) : rng.pick(WILDCARD_NOUNS)];
 }
 
-/** saga tone, weighted toward lighter (BIBLE.md tone knob; PLAYER_PREFERENCES shift is a later 🛠)
+/** saga tone, weighted toward lighter (the v4 deal's tone roll when a theme brings none — engine/saga.ts dealSaga)
  *  2026-07-10: BIBLE.md's adventurous/tense added to the pool (doc list ∪ impl list) */
 const TONES: [string, number][] = [
   ['slice-of-life', 2], ['wry', 3], ['warm', 2], ['bittersweet', 2],
   ['adventurous', 2], ['tense', 1.5], ['grim', 1.5], ['dark', 1],
 ];
 export function pickTone(rng: Rng): string { return rng.weighted(TONES) }
-
-/** seed sparks for chain genesis (Polti-anchored what-ifs, weighted by region later 🛠)
- *  These are the ONE list that is SUPPOSED to be premise-shaped — a genesis needs a what-if.
- *  🛠 2026-07-12 re-balanced by CONFLICT TYPE: the old pool skewed legal-ritual (wills, claims,
- *  rites, witnesses) and a judged campaign grew FIVE witnessed-rite sagas from it — the seed
- *  mix, not the writer, was the monoculture. Now spread over rescue/hunt/heist/betrayal/love/
- *  revenge/survival/identity/crime/uncanny/power; append-to-grow keeps the balance. */
-const SEEDS = [
-  // rescue & captivity
-  'a ransom paid to the wrong hands', 'a hostage both sides would rather forget',
-  'a kidnapping staged to look like a running-away', 'an heir who does not want to be found',
-  // hunt & beast
-  'a beast that only hunts the guilty', 'a predator that has learned to follow funerals',
-  'something in the millpond that takes lambs and dogs but never fish',
-  // heist & theft
-  'a vault key split among three enemies who now need each other',
-  'a theft the victim refuses to admit happened',
-  // betrayal & war
-  'an old victory that was really a massacre', 'a garrison sold to raiders by its own paymaster',
-  'a truce that holds only while one old man lives', 'a siege that ended too quietly',
-  'a deserter who knows where the bodies are',
-  // love & kinship
-  'a betrothal that would end a feud', 'a marriage sworn to end a war neither side stopped',
-  'a love letter delivered twenty years late', 'a foundling raised under someone else’s name',
-  // revenge
-  'a widow buying, one by one, the men who burned her farm',
-  'an exile come home richer than the lord who banished them',
-  // survival & land
-  'a village that must move before the water rises and cannot agree where',
-  'a winter road kept open by feeding something at the pass',
-  'a granary full the year everyone starved', 'a village that pays two masters and can afford neither',
-  // identity & secrets
-  'a dead man seen buying horses at three fairs', 'a list of names the respectable would kill to burn',
-  'an oath kept long after it should have broken',
-  // crime & coin
-  'a debt sold three times over', 'a smuggler’s route that moves more than goods',
-  'a counterfeiter whose fakes are better than the mint’s coin', 'a bridge toll that funds something worse',
-  // uncanny
-  'a saint’s bones that will not stay buried', 'a cure that works only while its price is paid',
-  'a road that was safe until someone made it safer', 'a relic that two shrines both claim',
-  // power & law (capped — this shape once owned the pool)
-  'a will that frees the wrong people', 'two heirs, one seal, and no witnesses',
-  'a border stone moved by night, a little each year',
-  // performance & voice
-  'a caged singer whose songs start riots',
-  // wagers
-  'a wager between lords paid in other people’s lives',
-  'a healer who chooses who is worth saving',
-];
-export function sampleSeed(rng: Rng): string { return rng.pick(SEEDS) }
-
-
 
 /** ── the OBSTACLE atoms (N10 redesign) ────────────────────────────────────────────────────────
  *  Two cold readers rejected `method` because a one-word adverb of success has nowhere to land: the

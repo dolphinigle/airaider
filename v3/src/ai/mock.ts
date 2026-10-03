@@ -3,7 +3,7 @@
 
 import { Rng } from '../engine/rng.js';
 import type {
-  AiProvider, AiUsage, QuestWriteInput, QuestWriteOut, GenesisInput, GenesisOut,
+  AiProvider, AiUsage, QuestWriteInput, QuestWriteOut,
   ResolveQuestInput, ResolveQuestOut, ThemeRollInput, ThemeRollOut, SelectorInput,
   FleshInput, FleshOut, SagaCall,
 } from './provider.js';
@@ -76,9 +76,7 @@ export class MockProvider implements AiProvider {
     await this.lag();
     const kw = (input.keywords ?? []).slice(0, 2).join(', ');
     const arch = input.archetype ?? 'investigate';
-    const title = input.kind === 'finale'
-      ? `The Reckoning: ${input.focalName ?? 'the end of it'}`
-      : `${cap(arch)} — ${kw || input.location.split(' — ')[0]}`;
+    const title = `${cap(arch)} — ${kw || input.location.split(' — ')[0]}`;
     const situation = (this.rng.pick(SITS)).replace('{region}', input.location.split(' — ')[0]!) +
       (input.framedCharacter ? ` They speak of one ${input.framedCharacter.name} — ${input.framedCharacter.tags}.` : '') +
       (kw ? ` (${kw} figure in it.)` : '');
@@ -90,45 +88,7 @@ export class MockProvider implements AiProvider {
     };
     // §4 pattern-B: shape a partial quarry (type from the "AI", tier left to the engine)
     if (input.framedCharacter?.partial) out.quarryTags = [this.rng.pick(['soldier', 'criminal (high)', 'hunter', 'beautiful (mid)'])];
-    if (input.kind === 'finale') {
-      out.approaches = [
-        { label: 'Win them over', rewardKind: 'recruit', attribute: 'cha', favored: ['social'] },
-        { label: 'Subdue them', rewardKind: 'captive', attribute: 'str', favored: ['melee', 'intimidation'] },
-        { label: 'Sell what you know', rewardKind: 'gold', attribute: 'int', favored: ['roguery'] },
-      ];
-    }
     return out;
-  }
-
-  async genesis(input: GenesisInput): Promise<GenesisOut> {
-    const t0 = Date.now();
-    return this.logCall('genesis', input, await this.genesisInner(input), t0);
-  }
-  private async genesisInner(input: GenesisInput): Promise<GenesisOut> {
-    this.tick();
-    await this.lag(5);   // the real genesis is the 50-66s outlier
-    const f = input.focal.name;
-    const extraName = input.assignedNames[0] ?? 'a stranger';
-    const slate = input.slate ?? [];
-    const known = slate[0];
-    return {
-      title: `The ${cap(this.rng.pick(['debt', 'oath', 'road', 'price', 'shadow']))} of ${f}`,
-      kernel: `${f} is the key to ${input.seed}`,
-      cast: [
-        { name: f, who: `the one this is all about (${input.focal.tags})`, want: 'what they lost back', role: 'focal' },
-        { name: extraName, who: 'a go-between with a stake of their own', want: 'to come out ahead', role: 'broker' },
-        ...(known ? [{ name: known.name, who: known.blurb, want: 'old business settled', role: 'complication', loreId: known.id }] : []),
-      ],
-      situation: `Out in ${input.location.split(' — ')[0]}, ${input.seed} — and ${f} stands at the middle of it.`,
-      goal: `Resolve what binds ${f} — likely ending as ${input.kind}.`,
-      arc: ['a thread surfaces', 'the price becomes clear', 'sides must be chosen', 'the reckoning'],
-      twistReveal: input.twist ? `${extraName} serves someone unseen.` : null,
-      tensions: [`${f} vs what they owe`, `${extraName} plays both sides`],
-      openDirections: [`follow the thread of ${f}`, 'let it lie and see who comes knocking'],
-      relevantIds: slate.slice(0, 2).map(s => s.id),
-      newPlaces: [],
-      newEdges: known ? [{ from: known.id, to: known.id, type: 'party-to', blurb: 'drawn into the affair', importance: 0.4 }] : [],
-    };
   }
 
   async resolve(inputs: ResolveQuestInput[], onEach?: (out: ResolveQuestOut) => void): Promise<ResolveQuestOut[]> {
@@ -183,11 +143,6 @@ export class MockProvider implements AiProvider {
     return {
       questId: q.questId, before, after, injuries, fleshed,
       edges: edges.filter(e => e.from !== e.to),
-      storyUpdate: q.chainContext ? {
-        currentSituation: q.outcome === 'failure' ? 'The trail cools; doors close.' : 'The next thread is in hand.',
-        newlyRevealed: q.outcome !== 'failure' ? ['another layer of the affair'] : [],
-        openThreads: ['what the broker is not saying'],
-      } : undefined,
     };
   }
 
@@ -238,11 +193,6 @@ export class MockProvider implements AiProvider {
       system: renderSaga(c.template, c.flags, c.vars), user: JSON.stringify(c.payload), output: JSON.stringify(out),
     });
     return out;
-  }
-
-  async review(): Promise<{ ok: boolean; defects: string[] }> {
-    this.tick();
-    return { ok: true, defects: [] };   // mock text is deterministic — nothing to gate
   }
 }
 

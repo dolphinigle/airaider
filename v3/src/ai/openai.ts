@@ -1,4 +1,4 @@
-// OpenAI provider — gpt-5-mini (writer/genesis/resolution/theme), gpt-5-nano (selector).
+// OpenAI provider — the three tiers below (plan · writer · nano); the saga storyteller's one template-keyed call.
 // Every response zod-validated; the engine canonicalizes tags and guards names/edges.
 // Key from OPENAI_API_KEY via ../.env or ~/.airaider/openai.env (never printed/committed).
 // Transport 'claude' (AIRAIDER_AI=claude / --claude): the same prompts through the headless Claude CLI on
@@ -11,8 +11,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
 import type {
-  AiProvider, AiUsage, AiCallRecord, QuestWriteInput, QuestWriteOut, GenesisInput, GenesisOut,
-  ResolveQuestInput, ResolveQuestOut, ThemeRollInput, ThemeRollOut, SelectorInput, ReviewInput, ReviewOut,
+  AiProvider, AiUsage, AiCallRecord, QuestWriteInput, QuestWriteOut,
+  ResolveQuestInput, ResolveQuestOut, ThemeRollInput, ThemeRollOut, SelectorInput,
   FleshInput, FleshOut, CampaignDirection, DirectionRead } from './provider.js';
 import { appendCallLog } from './calllog.js';
 import { runClaude, claudeOptsFor, claudePool } from './claudecli.js';
@@ -21,7 +21,7 @@ import { renderSaga } from './prompts/saga/render.js';
 
 // THREE TIERS (designer 2026-10-03: "use diff model for the 'harder' part like generating saga"; "replace all
 // gpt-5-mini"; "move everything to luna"). 🛠 each is env-overridable for A/B:
-//   PLAN   — the saga's genesis, the hardest call (once per saga): GPT-6 Sol
+//   PLAN   — the saga's plan, the hardest call (once per saga): GPT-6 Sol
 //   WRITER — everything the player reads (cards, reports, flesh): GPT-6 Luna — beat gpt-5-mini blind at ¼ the
 //            cost on the same prompts (scripts/sagalab/modelcmp/RESULT4.md)
 //   NANO   — the mechanical tier (ids, picks): GPT-6 Luna too ("move everything to luna" — gpt-5-nano was cheaper
@@ -174,41 +174,6 @@ const zQuestWrite = z.object({
   job: zProse(240),
   ask: z.array(zAsk).default([]),
   quarryTags: z.array(z.string()).nullish().transform(v => v ?? undefined),
-  approaches: z.array(z.object({
-    label: z.string(), rewardKind: z.string().default('gold'),
-    attribute: z.string().default('cha'), favored: zStrArr,
-  })).nullish(),
-});
-const zGenesis = z.object({
-  title: zProse(90),
-  kernel: zProse(320),
-  cast: z.array(z.object({
-    name: z.string(), who: zProse(240), want: zProseD(200),
-    // one word, so an UNMET cast member can still show on a card as what they are: stageBible
-    // strips who/want from offstage entries (they carry identity), which left the beat writer
-    // with {role, offstage} — a role word and a boolean. Three blind Opus writers all reported
-    // the same thing: "an offstage cast member with no trade cannot show nameless by trade;
-    // the rule is written for a redacted field, but the field is empty, not redacted."
-    trade: z.string().default(''),
-    role: z.string().default(''), loreId: z.string().nullish(),
-  })).default([]),
-  // WHAT BREAKS if the saga fails, in the client's own claim. Nine blind writer-reports across
-  // three rounds lost the same question — "why does this matter" — and named this field twice,
-  // unprompted: "`because` is a MOTIVE, and a motive is not a stake". Dealt to beat 1, it is the
-  // first thing that has ever answered it from a dealt fact instead of an invented withholding.
-  stakeIfLost: zProseD(260),
-  situation: zProse(1100),
-  goal: zProseD(400),
-  arc: zStrArr,
-  twistReveal: z.string().nullish(),
-  tensions: zStrArr,
-  openDirections: zStrArr,
-  relevantIds: zStrArr,
-  newPlaces: z.array(z.object({ name: z.string(), blurb: z.string().default('') })).default([]),
-  newEdges: z.array(z.object({
-    from: z.string(), to: z.string(), type: z.string(),
-    blurb: z.string().default(''), importance: zImportance,
-  })).default([]),
 });
 const zResolveOne = z.object({
   questId: z.string(),
@@ -233,15 +198,6 @@ const zResolveOne = z.object({
     from: z.string(), to: z.string(), type: z.string(),
     blurb: z.string().default(''), importance: zImportance,
   })).default([]),
-  storyUpdate: z.object({
-    currentSituation: z.string().transform(desemi),
-    newlyRevealed: zStrArr,
-    openThreads: zStrArr,
-    // QUESTS §11 actorUpdates — the WHEREABOUTS ledger (single-location truth per person/object)
-    actorUpdates: z.record(z.string()).nullish(),
-    sagaSettled: z.union([z.boolean(), z.string(), z.null()]).nullish()
-      .transform(v => typeof v === 'string' ? ['true', 'yes'].includes(v.toLowerCase()) : v ?? undefined),
-  }).nullish(),
 });
 const zFleshBatch = z.object({
   people: z.array(z.object({
@@ -253,7 +209,6 @@ const zFleshBatch = z.object({
 });
 const zTheme = z.object({ wants: zStrArr, flavorLine: z.string().default('') });
 const zSelect = z.object({ ids: zStrArr });
-const zReview = z.object({ ok: z.union([z.boolean(), z.string()]).transform(v => v === true || v === 'true'), defects: zStrArr });
 
 // ---- shared rules blocks ---------------------------------------------------------------------
 
@@ -418,54 +373,6 @@ function oneOffSystem(input: QuestWriteInput): string {
   ].filter(Boolean).join('\n');
 }
 
-function sagaSystem(input: QuestWriteInput): string {
-  return [
-    '═══ THE JOB ═══\nYou write the NEXT card of an ongoing SAGA in a dark-fantasy mercenary-fort GAME. The player is the company BOSS at the fort; the card is a short briefing TO them ("you"): what has just changed in a matter they are already working, and what this step\'s errand is. They read it once and pick which soldiers to SEND — the boss never goes. GAME WRITING, not literature: every sentence gives the player something to use; a mood-only sentence is cut. Plain everyday words; short sentences, mostly one clause, no semicolons. Open on a person doing something in this matter — never on a description of the land.',
-    // the RECORD paragraph renders only once a record EXISTS — at beat 1 it described fields
-    // the payload doesn't carry (context-free audit 2026-07-17: rules about absent data)
-    (input.beatIndex && input.beatIndex > 1) || input.kind === 'finale' || input.lastBeatOutcome
-      ? '═══ THE RECORD (hard constraints) ═══\nstoryState.history = the saga\'s prior reports, oldest first — the settled truth: an object rests where the last report left it, people and places keep their exact names, finished work is never re-posed. storyState.actorStates = WHEREABOUTS, the single authoritative truth of where each person and object rests — the card may not place them elsewhere or re-take what the company holds. knownToPlayer entries are immovable. introducedNames = people already met (bare name; orient everyone else once). lastBeatOutcome = what the previous step changed: open on the situation it created; between steps the world moves ONLY as it says (a step reported UNTAKEN is re-posed afresh — the world did not move). Where the bible disagrees with the record, the RECORD wins — and a yield the reports never actually won (a failed or unreached step\'s) is still UNKNOWN to everyone: build only on what the record delivered.'
-      : '',
-    input.lastStepFailed
-      ? '═══ THE LAST STEP FAILED ═══\nIts planned yield was NEVER WON: the thing it sought is still unfound, unheld, unknown — this card may not carry, use, name, or assert it. Open on the failure\'s aftermath and work only with what the record actually holds, or find ANOTHER way toward the goal.'
-      : '',
-    '═══ THE STEP ═══\narcStep = the ONE step this card covers — the job is THIS step, nothing more; when the record shows its work already done or its target gone, derive the job from what genuinely remains (the loose end, the handover, the settlement); a name or fact inside arcStep that the record never actually established is the plan\'s foreknowledge — the card poses it as a question or rumor, never asserts it as known. '
-      + ((input.bible as { situation?: string } | undefined)?.situation
-        ? 'bible.situation carries THE CLIENT\'S OPEN TELLING — that is card material; the truth beyond it stays hidden until the party finds it. bible.goal = the engagement, known from beat 1: state it in ONE plain sentence; only the finale settles it.'
-        : 'bible.goal = the whole engagement, known from beat 1 — card material, but never a sentence of its own when the client\'s own want already says it; the truth beyond it stays hidden until the party finds it, and only the finale settles it.')
-      + '',
-    '═══ NAMES & PLACES ═══\nCast roles: client hires and pays · quarry or prize is what the saga is FOR · obstacle wants the opposite · ally helps at a price · companion travels with it. A NAME IS FOR SOMEONE ALREADY KNOWN. The card NEVER opens on a name: its first words say what someone IS. Every person arrives that way — what they are, in your own words, carrying "a" or "an" — and their name follows in that SAME sentence, set off by a comma, carrying no article of its own. ONE EXCEPTION, and it OUTRANKS this rule: anyone in introducedNames' + (input.focalIsMerc && process.env.PERSONAL_CARD !== '0' ? ' or rosterNames (the company\'s OWN soldiers)' : '') + ' is someone the company has already dealt with — they are not introduced at all. No article, no trade, no describing them to a boss who already knows them: they arrive by NAME, and what places them is the HISTORY in knownToPlayer, said as the thing that happened between them and the company. This binds the person the job is ABOUT as hard as the one who brings it: they too arrive as what they are, out of their own `who`' + (input.focalIsMerc && process.env.PERSONAL_CARD !== '0' ? ' — unless they are one of the company\'s own soldiers, who arrive by bare name' : '') + '. Whatever you call someone the first time is what you call them every time after, and a person introduced without their name never acquires one later on this card. Name people ONLY from bible.cast' + (input.focalIsMerc ? ', rosterNames,' : '') + ' or relevantLore. A cast entry with offstage: true has NO name — it shows by its trade alone. '
-      + (input.storyState ? 'Beyond introducedNames and the goal/arcStep\'s own names, introduce' : 'Beyond the goal/arcStep\'s own names, introduce')
-      + ' at most TWO people and ONE place by name. location = the land this saga sits in, and its facts are true here — never its phrasing, and never a sentence of scene-setting. Soldiers stay out of card prose' + (input.focalIsMerc ? ' (sole exception: the focal)' : '') + ' and are never PINNED to a place or errand — where each soldier goes is the player\'s assignment alone. The bible\'s geography outranks placeNameSuggestions; a place never wears a person\'s name; the bible\'s coinages are notes — render them in your own plain words.'
-      + (input.relevantLore?.some(l => l.companySoldier || l.companyCaptive || l.atTheFort || l.outOfReach)
-        ? ' relevantLore flags: companySoldier = the player\'s own; companyCaptive = in the cells (NO ONE ELSE is in custody); atTheFort = at the fort right now; outOfReach = free in the world, never at the fort or in custody.' : '')
-      + (input.focalName && input.focalDossier ? ' The focal\'s SEX comes from their tags — never flip a pronoun' + (input.focalIsMerc ? '; a focal who is a soldier lives at the fort, goes only where the player sends them, never hires or pays the company, and is never promised as a payment or prize' : '') + '.' : ''),
-    input.kind === 'beat' ? (input.beatIndex === 1 ? '═══ THIS STEP ═══\n' : '═══ THIS MID-SAGA STEP ═══\n' + 'Never the saga\'s goal; the objective differs materially from the previous job (new ground, new claimant, new leverage, or raised stakes) and its obstacle is a NEW CLASS of trouble — never the last one re-armed or renamed. The job is WINNABLE: success is a change the party can force, never another person\'s free choice, never an outcome the card forecloses. A pressure an earlier card announced either ACTS here or is dropped. Delivery to the client is later work: a mid-step finds, secures, or opens the way, never ends with the prize delivered. ') + 'rewardEnvelope = this step\'s modest pay — set it down as a clause hung on the sentence that says what the client WANTS — never a sentence of its own, and never announced with a label; when this step\'s objective is a PERSON, the card may promise that person-outcome. Each ask entry MAY add mustBeFocal: true — ONLY when focalIsMerc is true and this step stages that soldier\'s own matter in person; in doubt, omit.' + (input.beatIndex === 1 ? '\nBEAT 1: the player\'s FIRST sight of the saga — a cold reader gets the hook and its WHY, ' + (input.noClient && process.env.PERSONAL_CARD !== '0' ? 'whose matter it is' : 'the hire') + ', and this errand, NOTHING of the road beyond. This card is the board POSTING read BEFORE the job is taken: write the matter and this first errand as work still TO DO — never narrate the company accepting the job, riding out, or arriving. ' + (input.noClient ? 'NOBODY hired the company: this is the company\'s own business. Open on the thing itself, and never invent someone to hire you. ' : 'Open on the CLIENT and `arrival` — two atoms giving how this reached the fort and how they carried themselves; combine them in your own words, never quote them. `arrival` and `clientTell` describe the CLIENT and no one else. `clientTell` is one thing the client does with their body while talking — set it beside something they SAY, never beside the pay, and let it do the work a temperament word would. ') + (input.stakeIfLost ? '`stakeIfLost` is the card\'s WHY — what BREAKS if this fails, said as their claim, never as settled truth. Give it its own sentence: a want said louder is not a why. ' : '') + (input.knownObstacle ? 'OPPOSES is two atoms — a trade, and what that person means to do about this matter. NEVER print the label itself, only what it holds. Build your own sentence from them and never quote them; give the person no name, and never say aloud that this is why soldiers are needed — the reader draws that themselves; it is why the work takes armed strangers rather than a runner. ' : '') + 'Never name "the hire" or "the job" as an actor. (Later cards carry no character business.)' : '') : '',
-    input.kind === 'finale' ? '═══ THE FINALE ═══\nThe arc\'s LAST step: the matter comes to a head. It opens from the RECORD as it stands — what earlier steps did STAYS done, and what they never won stays UNWON: an object or person the record never recovered is still wherever the record last placed them, never already on this card\'s ground; when the record shows the work complete, stage the SETTLEMENT (the handover, the payment, the reckoning), never a re-run. It stands on ground and people the player has SEEN and puts knownToPlayer facts to USE. It never reframes the focal against the saga\'s telling — a protected person stays protected — unless a REVEALED twist says otherwise; a twist the player never met is REVEALED here (the truth comes out at the end, never quietly dies).\nPLANS: slotCount counts mutually exclusive PLANS — the company sends soldiers down ONE. Output approaches with EXACTLY slotCount entries and ask with the SAME count in the SAME order (ask[i] = plan i\'s test: same attribute, favored echoing the plan\'s; no clashing or requiredTag). ALL plans settle the same central person (focalName), each testing a different attribute. rewardKind = what the COMPANY nets: recruit = they join; captive = the company holds them; gold = they pass out of the company\'s hands for value. Offer only kinds the saga\'s telling can honor; when focalIsMerc is true no plan trades or targets the soldier — each settles the MATTER. A label promises ONLY what its rewardKind delivers (captive reads seize/hold, gold reads sell/collect, recruit reads win over) — never a fate no kind grants, never a handover on a captive plan; labels are field orders in plain words naming only people the situation grounds. The situation presents the matter at its head and may sketch the choice in one sentence; the labels carry the fork. rewardEnvelope names the central prize and DEFAULT ending — the plans decide what lands.' : '',
-    input.fixNotes?.length ? 'fixNotes = defects a zero-context reader found in your REJECTED previous draft: write a fresh card with none of them.' : '',
-    TAGS_NOTE,
-    NUMBER_BAN,
-    tagVocab(false),
-    `═══ YOUR OUTPUT — respond as JSON: {title, situation, job, ask: [{attribute, extraAttribute?, favored, clashing, requiredTag?${input.kind === 'beat' ? ', mustBeFocal?' : ''}}]${input.kind === 'finale' ? ', approaches: [{label, rewardKind, attribute, favored}]' : ''}} ═══`,
-    '- title: short and concrete, about THIS step.',
-    '- situation: THE card. 4-7 short sentences, and a HARD CEILING OF EIGHTY WORDS — a limit, never a target; a card that says everything in sixty is the better card. Shape: the person and what they are after, SHOWN — never announced → why it matters to them → this step\'s task as the outcome wanted → what stands against it → pay in a CLAUSE, named in the world\'s words (the client\'s coin, goods off the dead), never echoing an instruction or field name. ONE FACT PER SENTENCE. WHEN IT WILL NOT ALL FIT, keep in this order and drop the rest: who wants it and what they are \u2192 what breaks if it fails \u2192 this errand \u2192 who stands against it \u2192 the pay \u2192 the client\'s own manner. The card TELLS the boss where the matter stands; it never orders them about — the task is named as the outcome wanted, never as an instruction to the reader. Name a thing by what it IS and what is wrong with it before any word about what it is made of or looks like. State intent and rumor, never a named person\'s scripted future action; risk lines are flowing prose, never a labeled clause.',
-    '- job (ONE terse line): THIS step\'s errand for the boss\'s lists — never the saga\'s final delivery, never a name the situation did not introduce; a find-or-learn task poses the QUESTION, never the answer.',
-    ASK_SPEC,
-    '═══ ABOVE ALL (write now) ═══\n1. Every sentence parses ONE way and is understood on one skim — subject and verb early.\n2. Stage ONLY the dealt step: later grounds, later finds, and people nobody has heard of yet stay off the card entirely — but on beat 1 whoever already stands in the way of this matter belongs on the card, in plain words' + (input.storyState ? '; the RECORD and WHEREABOUTS are law, and what the record has NOT established the card poses as a question or rumor, never as fact' : '') + '.\n3. First use of any person, place, or thing — the client included' + (input.focalIsMerc && process.env.PERSONAL_CARD !== '0' ? ', the company\'s own soldiers excepted (they arrive by bare name)' : '') + ' — comes in a FULL sentence where they DO something in this matter, and carries what they ARE; a person keeps ONE designation throughout, never re-entering under a new label. A card whose reader cannot say ' + (input.noClient && process.env.PERSONAL_CARD !== '0' ? 'whose matter this is' : 'who hires them') + ', what the matter is, WHY IT MATTERS, and why it takes armed strangers has failed — and of those four the why is the one cards lose.\n4. Every word in favored, clashing, or requiredTag is copied EXACTLY from TAG VOCABULARY; period diction; never echo an instruction or field name ("step", "plan", "focal", "beat", "arc", "the hire", "the goal", "the change", and the role words "client", "quarry", "obstacle", "prize", "ally", "companion" never appear on a card); the account-book is BANNED as a plot object.\n' + (input.stake && !input.stakeIfLost ? '5. The card CLOSES on stake (given in the user message) — as given or reworded, word reaching the fort of what the whole matter is worth to the company; never a number, never a certainty, and it stands WITH the pay sentence as one close, never a pile of separate closers.\n' : '') + 'Respond as the JSON object specified above — nothing else.',
-  ].filter(Boolean).join('\n');
-}
-
-
-
-// ── resolve system prompts (§0: self-contained per shape, rules once, critical at end) ──────
-
-// ── prose-style lab (prosebench 2026-07-18): PROSE_VARIANT = '' | exemplar | stack | diet ──
-// Bench baseline 4-6 ("clear but dead"); judges' unanimous defects: nobody speaks, monotone
-// chains, receipt endings; designer's 4th class: uncanny staged as furniture (the druid ring).
-// Research (arxiv 2509.14543 a.o.): in-voice exemplar > rules; rule budget ~3-6; ban
-// constructions as positives. Variants isolate: exemplar alone / exemplar+rules / rules alone.
-// SHIPPED DEFAULT = 'diet' (the V3 config): prosebench head-to-head winner 6.3 vs 5.3 (r4),
-// vs 4.5 old prompts. Set PROSE_VARIANT=v0 for the legacy style block; other variants = lab lineage.
 const PROSE_VARIANT = process.env.PROSE_VARIANT ?? 'diet';
 // ── dialogue-framing lab (2026-07-19): CARD_VARIANT=dlg frames the card as the bearer's own
 // first-person words; PROSE_VARIANT=dlg turns resolutions into script-format scenes. Both are
@@ -719,24 +626,6 @@ const oneOffResolveSystem = (q: ResolveQuestInput, shape = rollShape()) => {
   ].filter(Boolean).join('\n');
 };
 
-function sagaResolveSystem(q: ResolveQuestInput): string {
-  const finale = !!q.chainContext?.isFinale;
-  const shape = rollShape();
-  const beat = PROSE_VARIANT === 'beat';
-  return [
-    resolveCoreHead(),
-    resolveInputs(q),
-    '═══ THE SAGA STEP ═══\nThis job is ONE STEP of a longer saga. The report performs chainContext.arcStep and nothing else. When arcStep ends in "→ yields: …", that is what a SUCCESS delivers, shown concretely (a partial delivers it dearly or in part; a failure withholds it). stepsNotYet = later steps — their work, prizes, and targets may not land or resolve here, however big the roll (a big roll is THIS step done exceptionally well). ' + (finale ? '' : 'The saga\'s goal stays unachieved whatever the dice said; when a success as written would settle it, complete the JOB while the larger matter visibly stays open. ') + 'What a resolution settles STAYS settled; storyState is the PAST — never re-staged, and this report never repeats a prior report\'s event sequence (a second attempt goes DIFFERENTLY). storyState.actorStates = WHEREABOUTS, the single truth of where each person and object rests: the report starts them there; only on-screen action moves them' + (PROSE_VARIANT === 'r2' || PROSE_VARIANT === 'r3' || PROSE_VARIANT === 'r4' ? ' — retold in your OWN words: a whereabouts phrase pasted into prose reads as nonsense' : '') + '. A focal who is a company soldier is never handed into custody. ONLY this party\'s soldiers appear; between jobs every soldier returns to the fort — no report leaves one posted or holding something in the field. bible = the hidden truth (the STATE outranks its plan).',
-    finale ? '═══ THE FINALE ═══\nThe ENGINE decides every disposition — who joins, leaves, dies, owns: narrate what was delivered as given. chainContext.fate = what becomes of the central person; it COMPOSES with the outcome: the job\'s own objective resolves on screen FIRST, the fate lands after, never instead. End the person exactly on the fate in the fiction\'s own words' + (PROSE_VARIANT === 'r2' || PROSE_VARIANT === 'r3' || PROSE_VARIANT === 'r4' ? ' — the fate lands as an EVENT someone could watch, never a status line' : '') + (PROSE_VARIANT === 'r3' || PROSE_VARIANT === 'r4' ? ', and the central person gets one line or visible reaction of their OWN before the end' : '') + ': kept WITH the company = the report ends with them back with the company; sent OUT = they leave into the arrangement, never escaping or kept after all. chainContext.approach = the plan the company CHOSE, a CONTRACT: the first after-sentence shows it executed by its own terms, every action its label names happens or fails on screen, and a failure fails THE CHOSEN plan; each rejectedApproaches plan\'s distinctive route, trick, or prop may not appear. The report ACCOUNTS for every named captive, prize, and open obligation still live in storyState — kept, returned, lost, or written off, each in a clause.' : '',
-    TAGS_NOTE, NUMBER_BAN, EDGE_TYPES_LINE,
-    beat ? BEAT_OUTPUT(finale) : RESOLVE_OUTPUT(finale),
-    '- storyUpdate: its truth SCALES with the outcome (success = the full new fact; partial = part, bought dear; failure = nothing concrete). currentSituation states concretely what changed — who holds what, who moved where — names spelled exactly as earlier text spelled them. actorUpdates = the WHEREABOUTS ledger: {"name": "where they now are / who holds it"} — record this step\'s own key object and every person it moved, found, secured, or placed, each name spelled exactly; the NEXT step is pinned to what you write here, so anything you leave out can drift to a wrong place. newlyRevealed = only facts NOT already in storyState. openThreads = the saga\'s live loose ends, replacing the old list. sagaSettled = true ONLY if the central matter is essentially settled with nothing real left to do' + (finale ? '' : ' (the game then brings the saga to its head next step)') + '.',
-    proseStack(shape, q.sceneMode),
-    beat ? BEAT_ANCHOR : resolveAnchor(shape),
-    'Respond as JSON matching: {questId, before, ' + (beat ? 'turn, turnActor, speech:[{who,says}], ' : '') + 'after, injuries:[{characterId, band: STRICTLY "low"|"med"|"high", cause}], fleshed:' + (q.deliveredCharacters?.length ? '[{characterId,who,backstory,quirks}]' : ' [] (no one was handed over)') + ', edges:[{from,to,type,blurb,importance}], storyUpdate:{currentSituation, newlyRevealed:[strings], openThreads:[strings], actorUpdates:{name: "one line"}, sagaSettled: boolean}}',
-  ].filter(Boolean).join('\n');
-}
-
 /** the writer's TRANSPORT. 'openai' = production (and the default real AI). 'claude' = the designer's
  *  FREE playtest transport: the same prompts, byte for byte, sent through the headless Claude CLI on the
  *  Claude subscription (claudecli.ts; designer 2026-10-02 — production stays GPT) */
@@ -757,7 +646,7 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
   // the player's campaign direction (Settings): appended to every WRITER call's system prompt, and
   // only when set — with none, every prompt is byte-for-byte what it was
   let direction: CampaignDirection | null = null;
-  const DIRECTED = new Set(['writeQuest', 'genesis', 'resolve', 'flesh', 'themeRoll']);
+  const DIRECTED = new Set(['writeQuest', 'resolve', 'flesh', 'themeRoll']);
   const directionBlock = (d: CampaignDirection) => `\n\nCAMPAIGN DIRECTION — the player chose this for their game. Let it shape the tone, `
     + `the setting details and who appears, within everything above. Never quote it or name it.\n${d.guidance}`
     + (d.avoid.length ? `\nKeep out of the story: ${d.avoid.join('; ')}.` : '');
@@ -780,7 +669,7 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
     let rawOut: string | undefined;
     // the tier comes from the PURPOSE, never from model equality: tiers may share a model (all GPT-6 Luna today),
     // and the Claude transport still has to send the mechanical calls to Haiku and the rest to Sonnet
-    const tier = extra.tier ?? (NANO_PURPOSES.has(purpose) ? 'nano' : purpose === 'genesis' ? 'plan' : 'writer');
+    const tier = extra.tier ?? (NANO_PURPOSES.has(purpose) ? 'nano' : 'writer');
     const tierEffort = effort ?? (tier === 'nano' ? 'minimal' : 'low');
     const claudeOpts = transport === 'claude' ? claudeOptsFor(tier, tierEffort) : null;
     const logFull = () => appendCallLog({
@@ -896,45 +785,28 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
     callLog: () => [...records],
 
     async writeQuest(input: QuestWriteInput): Promise<QuestWriteOut> {
-      // §0 + 2026-07-13 research ruling: TWO self-contained prompts (one-off / saga) — the old
-      // shared-prompt-plus-override ("THIS BLOCK WINS") shipped a contradiction small models
-      // can't arbitrate; every rule stated ONCE; output spec + critical rules at the END.
-      const system = (input.kind === 'one-off' ? oneOffSystem(input) : sagaSystem(input));
+      // §0 + 2026-07-13 research ruling: a self-contained prompt — every rule stated ONCE; output spec + critical rules at
+      // the END. (Sagas are written by the v4 storyteller, sagaCall below.)
+      const system = oneOffSystem(input);
       // a ROUTINE card is dealt only what it can spend. level/rarity/gravity/rewardEnvelope exist
       // for it only to be told to ignore them, and a cold reader counted that as a third of the
       // prompt spent introducing dead fields (2026-08-27).
-      const routine = input.kind === 'one-off' && !!input.gravity?.startsWith('a small');
+      const routine = !!input.gravity?.startsWith('a small');
 
       const user = JSON.stringify({
         archetype: input.archetype, location: input.location, method: input.method, obstacle: input.obstacle,
         selfDirected: input.selfDirected, shape: input.shape,
         // level was explained to the writer but never SENT — the verifier caught the model
         // hunting for a field that wasn't there (weight-class calibration silently dead)
-        // level dealt to one-offs only — the saga system never explains it (context-free audit)
         ...(routine ? { slotCount: input.slotCount } : {
-          rarity: input.rarity, level: input.kind === 'one-off' ? input.level : undefined,
+          rarity: input.rarity, level: input.level,
           slotCount: input.slotCount, rewardEnvelope: input.rewardEnvelope, gravity: input.gravity,
         }),
-        stake: input.stake,
-        // ── beat 1's dealt facts (prosebench/ROUND2_3) ──
-        stakeIfLost: input.stakeIfLost, arrival: input.arrival,
-        // named for what it IS on the card, not for what the engine calls it: a field name that
-        // reads like card-speak gets pasted as a label ("Known obstacles are that scavengers…")
-        OPPOSES: input.knownObstacle, clientTell: input.tell, noClient: input.noClient || undefined,
         KEYWORDS: input.keywords?.join(' · ') || undefined,
         rewardItems: input.rewardItems?.length ? input.rewardItems : undefined,
         placeNameSuggestions: input.placeNameSuggestions,
-        rosterNames: input.rosterNames,
-        rosterPronouns: input.rosterPronouns,
-        lastBeatOutcome: input.lastBeatOutcome,
         framedCharacter: input.framedCharacter ?? undefined,
         avoid: input.avoid?.length ? input.avoid : undefined,
-        bible: input.bible, storyState: input.storyState,
-        relevantLore: input.relevantLore?.length ? input.relevantLore : undefined,
-        focalDossier: input.focalDossier,
-        fixNotes: input.fixNotes?.length ? input.fixNotes : undefined,
-        beat: input.beatIndex, expectedBeats: input.expectedBeats, arcStep: input.arcStep, focalName: input.focalName,
-        focalIsMerc: input.focalIsMerc,
         opening: input.opening,
         intake: input.intake,
       });
@@ -943,44 +815,10 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
       const out = await callR('writeQuest', WRITER_MODEL, system, user, zQuestWrite);
       return {
         ...out,
-        approaches: out.approaches ?? undefined,
         ask: out.ask.map(a => ({
           ...a, extraAttribute: a.extraAttribute ?? null,
           requirementTag: a.requiredTag ?? null, mustBeFocal: a.mustBeFocal ?? false,
         })),
-      };
-    },
-
-    async genesis(input: GenesisInput): Promise<GenesisOut> {
-      const system = [
-        'You are the writers\'-room for a saga in a dark-fantasy mercenary-fort game: the player runs a mercenary company for profit and takes this saga\'s jobs one at a time. Build the hidden BIBLE — the settled truth behind the whole saga, told plainly. COMMIT TO THE TRUTH: nothing "unknown" in the bible; every fact has a cause. Invent the WORLD\'s past freely — never the COMPANY\'s (the slate and dossiers hold ALL company history that exists). The saga is a QUEST the company takes for gain; the player is a participant, never a spectator.',
-        '═══ THE ARC — the story\'s spine ═══\nA SIMPLE, LINEAR story a tired player could retell in one breath, written as a CAUSAL CHAIN of EXACTLY expectedBeats steps. Each step: "<one errand at one place, using the previous step\'s yield> → yields: <the ONE thing found, learned, or changed that the next step uses>". Step 1 REACHES the first ground the client named and turns up the first lead: its errand half names ONLY what the client itself knows, and its yield POINTS onward (a fact, a sighting, an object that leads on) — whatever the kind, step 1 LOCATES or gains access; it never grabs. Every person and place the saga discovers enters as some step\'s yield, never before. Every earlier step changes the SITUATION — new ground, a barrier down, fresh leverage — and leaves the prize still to win. The last step is the arc\'s HARDEST: the CAST\'s own opposing entry stands in it and is beaten, bought, or outwitted THERE — never already overcome at an earlier step, never replaced by a new opponent invented for the ending; a final step of bare travel, pickup, or unopposed handover is mis-scoped. No two steps share a place or a person-outcome. Anyone the arc names must be in cast (or stay nameless by trade).',
-        '═══ TRUTH vs SURFACE ═══\nsituation = the true state of things told straight — but it HIDES the twist and never hides what the JOB is. goal = what the company believes it is working toward across the WHOLE saga, never just step 1\'s errand — stated plainly in the THIRD person (never I, we, or our — the sentence gets pasted into briefings): only what the client knows at hiring — no attribution prefix, no option branches, and NEVER a name, place, or fact that a later step exists to discover (those live only in their steps\' yields). twistReveal = the one fact that recontextualizes the goal, built to surface at a MIDDLE step. Give every opposing pressure a FACE in the cast — a threat no beat can stage drains every beat. stakeIfLost = what the client says BREAKS if the saga fails — a thing lost, in ONE sentence, carrying the MECHANISM by which the prize\'s absence causes it. A want said louder is not a stake, and neither is a standing or a good name: the loss must be a thing a stranger can picture going. With no outside client, it is what the FORT loses. Alternatives live in openDirections.',
-        '═══ CAST — STRICTLY 1-3, each with a part the arc actually gives them ═══\ntrade = the ONE plain word a stranger would use for them — how they earn, guard, or serve, drawn from THIS saga\'s own ground and never a word this message already used. It is how they show on a card before the company has met them. who = ONE plain sentence: station or origin plus one hook — never a metaphor, never an echo of tag words. want = the want itself as a to-infinitive or noun phrase (no subject prefix): ONE concrete human thing that could be handed over, done, or stopped — never an abstraction; an obstacle\'s want OPPOSES the goal, and in the step the company meets them they COST it something — refuse, exact a price, fight, guard, or flee — never a mere signpost who hands over a clue. role = exactly one of client / companion / quarry / obstacle / ally / prize — "prize" only for a person who IS the prize (a focal who holds a thing-prize is quarry). At least ONE entry stands AGAINST the goal — an obstacle, or a quarry who resists; a saga nobody contests is flat. Never pad with coined companions: the player\'s soldiers fill that role and are never cast entries (sole exception: a saga about one of them).',
-        'YOUR INPUTS: seed = the what-if spark — collide it with the people given into a one-line KERNEL of pure story (never restate keywords, tone, or stakes inside it). keywords = motifs, not a checklist. tone = the whole saga\'s register. stakes and rarity = how weighty; size the drama. location = the land and its anchors — never lift its phrasing; set most sagas AWAY from any landmark, coining small places. focal = who the saga is ABOUT — always a cast entry, carrying loreId = focal.id' + (input.focal.dossier ? '; their dossier outranks their blurb' : '') + '. kind = the likely ENDING — recruit: they may join the company (role usually prize); captive: they may end in its cells (quarry); gold-hoard: the prize is a treasure they are the key to (quarry); development: THE SEED IS THAT SOLDIER\'S OWN PAST, not a spark to collide with them — the saga is ABOUT it, and the soldier is the reason it exists rather than a hand along for it.' + (input.noClientWanted ? ' NOBODY HIRES THE COMPANY FOR THIS: there is NO client in the cast and no fee. The past came to the soldier, and the company acts on its own account — what breaks if it fails is what the FORT loses. A client turns their story into somebody else\'s errand with their name in it.' : '') + ' A matter from one of the company\'s OWN soldiers\' past comes TO them at the fort — the soldier lives at the fort and marches with the company, never staged dwelling or ailing elsewhere, and ends still the company\'s own (companion).',
-        // slate/avoid rules render only when those inputs carry entries — inert rules about
-        // absent data are pure parse-load for a cold model (context-free audit 2026-07-17)
-        input.slate?.length ? 'slate = people the world knows. Reuse before coining — a reused person keeps their SIDE, never clients two sagas at once, and dark history with the company (fled it, robbed it) is carried plainly in situation. Existing people carry their id as loreId; coined people omit it. Flags: companySoldier = context, never cast (sole exception above); companyCaptive = in the cells, and NO ONE ELSE is in custody; atTheFort = at the fort now, never staged elsewhere; outOfReach = free in the world, never at the fort or in custody.' : '',
-        input.avoid?.length ? 'avoid = the player\'s recent sagas: differ from EVERY entry in premise, central object, places, devices, and how the matter is contested and settled. A [SETTLED: …] tail is finished history — never re-staged as upcoming, never contradicted.' : '',
-        'assignedNames = the ONLY names for coined people, sex-marked: match both ways, order free, the marks never output. newPlaces = coined places, never sharing a first syllable with the landmark or any place this message names; each blurb one plain sentence under fifteen words. Titles are concrete ACTION-titles, never a poetic two-noun. ' + (process.env.LAWWORDS !== '1' ? 'Law and custom speak in period words, never modern ones.' : 'Law and claims speak in period words — rights, pledges, sworn witness.') + ' One prop is BANNED anywhere in the bible: the account-book — ledger, manifest, registry, record-book by any name. Never echo these instructions or field names in prose — "the hire" is instruction-speak: arc steps and situation call the client by NAME; no semicolons — split into two sentences.',
-        NUMBER_BAN,
-        EDGE_TYPES_LINE,
-        TAGS_NOTE,
-        'Respond as JSON: {title, kernel, cast:[{name, trade, who, want, role, loreId?}], situation, goal, stakeIfLost, arc:[expectedBeats short step strings], twistReveal, tensions:[2-4 short strings: obstacles along the road to the goal], openDirections:[1 string: a pressure that unfolds with or without the company], relevantIds:[every slate/focal id you used anywhere — a simple checksum of reuse], newPlaces:[{name,blurb}], newEdges:[{from,to,type,blurb,importance}]}.',
-        input.slate?.length ? 'newEdges = NEW history between EXISTING people only (ids from slate/focal): blurb one line, importance a NUMBER 0-1 (0.8+ = defining). Coined-cast ties live in the bible itself — an empty array is often right. A tie touching a company soldier grows only from hooks their dossier already holds.'
-          : 'newEdges: leave it [] — this saga has no existing people to tie.',
-        // recency anchor (§0)
-        '═══ ABOVE ALL (write now) ═══\n1. The arc is a SIMPLE causal chain: each step uses the previous step\'s yield and ends "→ yields: …" (except the last); the thing to be found appears only AFTER "→ yields:", never in the errand half — and the goal\'s own prize is taken, freed, or delivered ONLY at the last step, never grabbed by an earlier one. The goal never says where the prize now RESTS (finding that is the arc\'s work), and the last step delivers exactly the settlement the goal states — same prize, same receiver, the prize in its hands ONLY through earlier steps\' yields, never asserted into them.\n2. NOTHING ENTERS FROM NOWHERE: every person, place, and object a step touches comes from the client, that step\'s own named ground, or an earlier step\'s yield — a rescuer, key, or destination that first appears in the step that needs it is a broken story.\n3. The LAST step settles the engagement AS CONTRACTED, at the ground the client named. With an outside client in cast, the prize reaches THEM, no one else — they receive what they hired for or visibly lose it, and an arc step never refuses them (when the truth turns against the client, the last step PRESENTS that reckoning; it does not decide it). With no outside client, the matter settles home in the company\'s keeping AT THE FORT. Either way the ending stands on named ground — never a fresh meeting-place invented for it — and the focal\'s ending (kind) rides WITH the settlement, never instead of it.\n4. When there IS a twist, situation HIDES it and twistReveal ALONE carries it; no twist means twistReveal is null and situation is the whole plain truth.\nRespond as the JSON object specified above — nothing else.',
-      ].join('\n');
-      // 🛠 genesis stays at MEDIUM. The 39019/40020 A/B (zero gain) was on CARDS/RESOLVE; genesis
-      // is different — it does the causal-chain reasoning, and a LOW A/B (batch S medium vs batch T
-      // low, 2026-07-14) measured ARC 7→6 and CARD 8→6.5 (step-1-fulfils-goal, unused yields, twist
-      // self-contradiction all appeared at LOW). Effort matters HERE; keep MEDIUM despite the latency.
-      const out = await callR('genesis', PLAN_MODEL, system, JSON.stringify(input), zGenesis, 'medium');
-      return {
-        ...out,
-        twistReveal: out.twistReveal ?? null,
-        cast: out.cast.map(c => ({ ...c, loreId: c.loreId ?? undefined })),
       };
     },
 
@@ -990,10 +828,9 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
       const emit = (out: ResolveQuestOut) => {
         try { onEach?.(out) } catch (e) { console.error('[ai] resolve onEach threw:', (e as Error).message?.slice(0, 300)) }
       };
-      // one batched call per quest, fired in parallel (the cycle's single reckoning);
-      // §0: two self-contained prompts (one-off / saga) — no arbitration clauses, rules
-      // stated once, output spec + critical rules at the END
-      const pick = (q: ResolveQuestInput) => q.chainContext ? sagaResolveSystem(q) : oneOffResolveSystem(q);
+      // one batched call per quest, fired in parallel (the cycle's single reckoning); a self-contained prompt — rules
+      // stated once, output spec + critical rules at the END. (A saga's reports are the storyteller's, sagaCall below.)
+      const pick = (q: ResolveQuestInput) => oneOffResolveSystem(q);
       // sceneMode is engine-computed unconditionally but only the beat prompt explains it — keep
       // it OUT of the user JSON otherwise (an unexplained field to a non-beat cold model)
       const userJson = (q: ResolveQuestInput) => {
@@ -1003,7 +840,7 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
           ...(partialCost && process.env.PCOST !== '0' ? { partialCost } : {}) };
         // a routine report is never told what gravity or rarity are for, because there is nothing
         // for it to do with them — the prompt it got is already the one they chose (2026-08-27)
-        if (!q.chainContext && q.gravity?.startsWith('a small')) {
+        if (q.gravity?.startsWith('a small')) {
           const { gravity, rarity, ...lean } = rest;
           return JSON.stringify(lean);
         }
@@ -1016,7 +853,7 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
           if (process.env.AI_DEBUG) console.error(`[ai] resolve fallback for ${q.questId}:`, (e as Error).message?.slice(0, 500));
           return fallbackResolve(q);
         }).then(o => {
-          const out: ResolveQuestOut = { ...o, storyUpdate: o.storyUpdate ?? undefined };
+          const out: ResolveQuestOut = o;
           emit(out);
           return out;
         })));
@@ -1081,18 +918,6 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
     async sagaCall(c: SagaCall): Promise<unknown> {
       return callR(c.template, c.tier === 'plan' ? PLAN_MODEL : WRITER_MODEL, renderSaga(c.template, c.flags, c.vars), JSON.stringify(c.payload),
         c.schema, c.effort, { tier: c.tier, template: c.template, flags: c.flags });
-    },
-    async review(input: ReviewInput): Promise<ReviewOut> {
-      const system = [
-        'You are a tired player skimming ONE piece of quest text once. You run a mercenary company from your fort: "you", "the company", "the fort", your soldiers, and pay/loot phrasing are ALWAYS known to you. Report ONLY defects of these three kinds:',
-        '1) UNPARSEABLE: a sentence that does not parse one way on one read (garden path, a pronoun with two plausible antecedents, self-contradiction within the text, word salad).',
-        '2) UNGROUNDED: a name or invented term whose KIND you cannot even tell — not a person vs place vs thing question the sentence itself answers. A name whose sentence makes its kind and part plain (a place ridden through, a person who hires or blocks you) is grounded enough; so is anything on the KNOWN list.',
-        '3) LEDGER BREAK: a REAL contradiction of the WHEREABOUTS list — an object or person placed with a DIFFERENT holder or place than it says, or re-taking what it says is already held. A rewording of the same holder/place is NOT a break.',
-        'Judge like a player, not an editor: flag only what would actually stop or mislead you mid-read. Style, tone, length, and mild oddness pass. Quote each defective phrase.',
-        'Respond as JSON: {ok: true|false, defects: ["<kind>: <quoted phrase> — <why in a few words>", ... at most 3]}. ok=true with [] when nothing would stop you.',
-      ].join('\n');
-      const out = await call('review', WRITER_MODEL, system, JSON.stringify(input), zReview);
-      return { ok: !!out.ok && out.defects.length === 0, defects: out.defects.slice(0, 3) };
     },
   };
 }

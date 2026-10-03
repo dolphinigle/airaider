@@ -1,69 +1,79 @@
-// LORE §1 story-NPC write-back: coined cast the player MET persist at saga close (cap 2,
-// client > obstacle > ally, edge-anchored to the focal); unmet / existing / colliding don't.
+// LORE §1 story-NPC write-back at saga close (STORYTELLER §2.6): at most two MET people who are not the focal persist
+// (the one who asked > the one in the way > anyone else). A coined person becomes a lore node (blurb = label, the deal's
+// sex and race); a returning face already is one. Each gets an edge to the focal by seat and one to the soldier whose
+// deed decided a job they were in. Unmet, colliding or already-known names add no node.
 import { describe, it, expect } from 'vitest';
 import { Game } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
+import type { CastEntry } from '../src/engine/saga.js';
 
-function fakeChain(over: Record<string, unknown> = {}) {
+const person = (id: string, name: string, seat: CastEntry['seat'], label: string, o: Partial<CastEntry> = {}): CastEntry =>
+  ({ id, name, sex: 'male', race: 'human', seat, focal: false, part: 'x', known: seat === 'client', label, want: '', ...o });
+
+function fakeChain(soldier: string, o: { met?: string[]; returning?: boolean } = {}) {
+  const cast = [
+    person('p1', 'Aldo', 'client', 'a miller of the ford', { want: 'his mill back' }),
+    person('cX', 'Focal', 'opponent', 'a warden', { focal: true }),
+    person(o.returning ? 'lore-old' : 'p2', 'Bren', 'other', 'a guide of the high paths', o.returning ? { memory: 'Bren once hid the company.', where: 'in the hills' } : {}),
+    person('p3', 'Cira', 'other', 'a hermit'),
+    person('p4', 'Dun', 'other', 'a ferryman'),
+  ];
+  const ep = (n: number, people: string[]) => ({ n, type: 'find' as const, title: `Job ${n}`, job: 'j', people, trouble: { who: 'w', carry: 'c', will: 'v' }, why: '' });
   return {
-    id: 'chain-t', focalId: 'cX', state: 'done',
-    bible: {
-      title: 'The Test Matter',
-      cast: [
-        { name: 'Aldo', who: 'A miller of the ford who owes half his season.', want: 'x', role: 'client' },
-        { name: 'Bren', who: 'A warden who guards the pass gate.', want: 'y', role: 'obstacle' },
-        { name: 'Cira', who: 'A guide of the high paths.', want: 'z', role: 'ally' },
-        { name: 'Dun', who: 'Never met on any card.', want: 'w', role: 'ally' },
+    id: 'chain-t', focalId: 'cX', state: 'done', isPersonal: false,
+    saga: {
+      v: 4, world: { N: 3, cast }, fallback: false,
+      knowing: { met: o.met ?? ['p1', 'cX', o.returning ? 'lore-old' : 'p2', 'p3'], named: [], seen: [] },
+      plan: { title: 'The Test Matter', question: 'q', answer: 'a', cast, episodes: [ep(1, ['p1']), ep(2, ['p3'])], showdown: ep(3, ['cX', o.returning ? 'lore-old' : 'p2']), options: [] },
+      lines: [
+        { n: 1, attempt: 1, outcome: 'success', party: [soldier], text: `${soldier} dragged Aldo out of the river.`, hurt: [], decides: soldier },
+        { n: 2, attempt: 2, outcome: 'failure', party: [soldier], text: 'The hermit would not come down.', hurt: [] },
+        { n: 3, attempt: 3, outcome: 'success', party: [soldier], text: 'The guide led the company round the warden.', hurt: [], decides: soldier },
       ],
     },
-    story: { introducedNames: ['Aldo', 'Bren', 'Cira'] },
-    ...over,
   };
 }
 
-function gameWithFocalNode(seed: number) {
-  const g = new Game(new MockProvider(seed), seed) as unknown as {
-    persistMetCast(c: unknown): void;
-    state: { lore: { nodes: Record<string, unknown>; edges: { to: string; type: string; blurb: string; salience: number; core: boolean }[] } };
-  };
+function game(seed: number) {
+  const g = new Game(new MockProvider(seed), seed);
   g.state.lore.nodes['cX'] = { id: 'cX', kind: 'character', name: 'Focal', blurb: 'f', identity: 'f', active: true, createdCycle: 0 };
-  return g;
+  const soldier = g.roster()[0]!;
+  return { g, soldier, persist: (c: unknown) => (g as unknown as { persistMetCast(c: unknown): void }).persistMetCast(c) };
 }
+const nodeNamed = (g: Game, name: string) => Object.values(g.state.lore.nodes).find(n => n.name === name);
 
 describe('met-cast persistence (LORE §1 story NPCs)', () => {
-  it('persists met coined cast at cap 2 with role-typed edges to the focal', () => {
-    const g = gameWithFocalNode(1);
-    g.persistMetCast(fakeChain());
-    const names = Object.values(g.state.lore.nodes).map(n => (n as { name: string }).name);
-    expect(names).toContain('Aldo');
-    expect(names).toContain('Bren');
-    expect(names).not.toContain('Cira');   // cap 2: client + obstacle outrank ally
-    expect(names).not.toContain('Dun');    // never met
-    const edges = g.state.lore.edges.filter(e => e.to === 'cX');
-    expect(edges).toHaveLength(2);
-    const bren = edges.find(e => e.blurb.includes('against'))!;
-    expect(bren.type).toBe('rival-of');
-    expect(edges.every(e => e.salience <= 0.6 && !e.core)).toBe(true);   // decays, never pinned
+  it('keeps two met people by seat, with edges to the focal and to the soldier whose deed decided their job', () => {
+    const { g, soldier, persist } = game(1);
+    persist(fakeChain(soldier.name));
+    const aldo = nodeNamed(g, 'Aldo')!, bren = nodeNamed(g, 'Bren')!;
+    expect(aldo).toMatchObject({ blurb: 'A miller of the ford', sex: 'male', race: 'human' });
+    expect(bren).toBeDefined();
+    expect(nodeNamed(g, 'Cira')).toBeUndefined();   // cap 2: the client and the first other outrank her
+    expect(nodeNamed(g, 'Dun')).toBeUndefined();    // never met
+    const edges = (id: string) => g.state.lore.edges.filter(e => e.from === id);
+    expect(edges(aldo.id).map(e => [e.to, e.type])).toEqual([['cX', 'party-to'], [soldier.id, 'saved-by']]);
+    expect(edges(aldo.id).every(e => e.blurb === `${soldier.name} dragged Aldo out of the river.`)).toBe(true);
+    expect(edges(bren.id).find(e => e.to === 'cX')!.blurb).toBe('The guide led the company round the warden.');
+    expect(g.state.lore.edges.every(e => e.salience <= 0.6 && !e.core)).toBe(true);   // decays, never pinned
   });
 
-  it('skips loreId-carrying cast and names already in the graph (even inactive)', () => {
-    const g = gameWithFocalNode(2);
-    g.state.lore.nodes['old'] = { id: 'old', kind: 'character', name: 'Aldo', blurb: 'o', identity: 'o', active: false, createdCycle: 0 };
+  it('a returning face is not minted again; a name the world already holds (even inactive) is never re-dealt', () => {
+    const { g, soldier, persist } = game(2);
+    g.state.lore.nodes['lore-old'] = { id: 'lore-old', kind: 'character', name: 'Bren', blurb: 'b', identity: 'b', active: true, createdCycle: 0 };
+    g.state.lore.nodes['tomb'] = { id: 'tomb', kind: 'character', name: 'Aldo', blurb: 'o', identity: 'o', active: false, createdCycle: 0 };
     const before = new Set(Object.keys(g.state.lore.nodes));
-    const ch = fakeChain();
-    (ch.bible.cast[1] as { loreId?: string }).loreId = 'someone';   // Bren = existing person, not coined
-    g.persistMetCast(ch);
-    const added = Object.entries(g.state.lore.nodes)
-      .filter(([id]) => !before.has(id))
-      .map(([, n]) => (n as { name: string }).name);
-    expect(added).toEqual(['Cira']);   // Aldo name-collides (inactive tombstone), Bren existing, Dun unmet
+    persist(fakeChain(soldier.name, { returning: true }));
+    expect(Object.keys(g.state.lore.nodes).filter(id => !before.has(id))).toEqual([]);
+    expect(g.state.lore.edges.some(e => e.from === 'lore-old' && e.to === 'cX')).toBe(true);
   });
 
   it('is idempotent — a second call adds nothing', () => {
-    const g = gameWithFocalNode(3);
-    g.persistMetCast(fakeChain());
-    const count = Object.keys(g.state.lore.nodes).length;
-    g.persistMetCast(fakeChain());
-    expect(Object.keys(g.state.lore.nodes)).toHaveLength(count);
+    const { g, soldier, persist } = game(3);
+    persist(fakeChain(soldier.name));
+    const nodes = Object.keys(g.state.lore.nodes).length, edges = g.state.lore.edges.length;
+    persist(fakeChain(soldier.name));
+    expect(Object.keys(g.state.lore.nodes)).toHaveLength(nodes);
+    expect(g.state.lore.edges).toHaveLength(edges);
   });
 });

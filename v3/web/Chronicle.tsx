@@ -1,7 +1,7 @@
 // THE CHRONICLE — sagas, people & places, the log, the AI ledger; and the reckoning page.
 import { sfx } from './sfx';
 import React, { useEffect, useRef, useState } from 'react';
-import { type S, gateOf, useKeyScroll } from './ui';
+import { type S, gateOf, useKeyScroll, QuestLog } from './ui';
 
 export function Chronicle({ s, openQuest, openLeads }: { s: S; openQuest?: (id: string) => void; openLeads?: () => void }) {
   const [tab, setTab] = useState<'sagas' | 'lore' | 'log' | 'ai'>('sagas');
@@ -35,19 +35,36 @@ function SagaNext({ c, openQuest, openLeads }: { c: any; openQuest?: (id: string
     : <span className="sagago idle">{c.next}</span>;
 }
 
+const SO_FAR_MARK: Record<string, string> = { success: '✓', partial: '~', failure: '✗' };
+const HURT_BAND: Record<string, string> = { lightly: 'light', badly: 'serious', gravely: 'grave' };
+/** the sagas as the chronicle shows them (Game.chainViews — the CLI's `chain <id>` prints the same, in this order):
+ *  the quest log as it stands, card 1, the likely end and the economy, So far, the answer once the finale is played,
+ *  the people the player has seen (by name only once their name was read) */
 function Chains({ s, openQuest, openLeads }: { s: S; openQuest?: (id: string) => void; openLeads?: () => void }) {
   if (!s.chains.length) return <p className="empty">No sagas yet — pursue a lead marked “new saga”.</p>;
   // live sagas first (newest first within each), as the CLI lists them
   const order = s.chains.slice().reverse().sort((a: any, b: any) => Number(b.live ?? false) - Number(a.live ?? false));
   return <div className="sagas">{order.map((c: any) => (
     <article className={'sagacard ' + c.state} key={c.id}>
-      <h3>{c.title} <small>{c.state === 'done' ? 'finished' : c.state === 'slipped' ? 'slipped away' : c.state === 'finale-pending' ? 'at its finale' : `${c.beat} of ~${c.expectedBeats} beats done`}{c.personal ? ' · personal' : ''}</small></h3>
+      <h3>{c.title} <small>{c.state === 'done' ? 'finished' : c.state === 'slipped' ? 'slipped away' : c.state === 'finale-pending' ? 'at its finale' : `part ${c.part} of ${c.of}`}{c.personal ? ' · personal' : ''}</small></h3>
       {c.live && <SagaNext c={c} openQuest={openQuest} openLeads={openLeads} />}
-      <p className="goal">{c.goal}</p>
-      <p className="p">{c.situation}</p>
-      <div className="meta"><span>likely end: {c.fate}</span><span>set aside: {c.bank || '—'}</span><span>progress {Math.round(c.effort)} / ~{Math.round(c.effortTarget)}</span><span>setbacks {c.failures} / {c.failureBudget}</span></div>
-      {c.known.length > 0 && <p className="p dimp">known: {c.known.join(' · ')}</p>}
-      {c.met.length > 0 && <ul className="met">{c.met.map((p: any) => <li key={p.name}><b>{p.name}</b> — {p.who}</li>)}</ul>}
+      <QuestLog rows={c.rows} />
+      {c.card1 && <p className="p card1">{c.card1}</p>}
+      <div className="meta"><span>likely end: {c.likely}</span><span>set aside: {c.bank || '—'}</span><span>progress {Math.round(c.effort)} / ~{Math.round(c.effortTarget)}</span><span>setbacks {c.failures} / {c.failureBudget}</span></div>
+      <div className="sofar">
+        <span className="sk">So far</span>
+        {(c.lines ?? []).length === 0 ? <p className="p dimp">Nothing played yet.</p>
+          : <ol>{c.lines.map((l: any, i: number) => (
+            <li key={i} className={'sf ' + l.outcome}>
+              <span className="sfn">{l.n}</span><span className="sfm" role="img" aria-label={l.outcome}>{SO_FAR_MARK[l.outcome] ?? '·'}</span>
+              <span className="sft"><b>{l.party.join(', ')}</b> — {l.text}{l.hurt?.length > 0 && <span className="sfh"> · {l.hurt.map((h: any) => `${h.name} hurt (${HURT_BAND[h.how] ?? h.how})`).join(', ')}</span>}</span>
+            </li>))}</ol>}
+      </div>
+      {c.answer && <p className="p answer"><b>The answer:</b> {c.answer}</p>}
+      {(c.people ?? []).length > 0 && <div className="people">
+        <span className="sk">People</span>
+        <ul className="met">{c.people.map((p: any) => <li key={p.id}>{p.name ? <><b>{p.name}</b> — {p.label}</> : p.label}</li>)}</ul>
+      </div>}
     </article>))}</div>;
 }
 
@@ -93,6 +110,8 @@ function lineClass(l: string): string {
   if (l.startsWith('   ')) return 'r-coins';
   if (l.startsWith('▸')) return 'r-turn';
   if (l.startsWith('✎')) return 'r-pending';
+  // a saga's 📖 line (where the story stands, and what just happened) is the story's own voice, never loot or news
+  if (l.startsWith('📖 ')) return 'r-book';
   if (/^(\p{Extended_Pictographic}|[✦⚑†])/u.test(l)) return 'r-news';
   return 'r-prose';
 }

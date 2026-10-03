@@ -5,7 +5,7 @@ import { describe, it, expect } from 'vitest';
 import { Game } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
 import { auditGame } from '../src/game/audit.js';
-import type { QuestWriteInput, QuestWriteOut, GenesisInput, GenesisOut } from '../src/ai/provider.js';
+import type { QuestWriteInput, QuestWriteOut, SagaCall } from '../src/ai/provider.js';
 
 /** the mock, slow on purpose (I13), counting how many calls are open at once */
 class CountingMock extends MockProvider {
@@ -17,7 +17,8 @@ class CountingMock extends MockProvider {
     try { return await f() } finally { this.live-- }
   }
   override writeQuest(i: QuestWriteInput): Promise<QuestWriteOut> { return this.track(() => super.writeQuest(i)) }
-  override genesis(i: GenesisInput): Promise<GenesisOut> { return this.track(() => super.genesis(i)) }
+  // a saga's card 1 and its road ahead are one generation written side by side (R5): the road rides with its card
+  override sagaCall(c: SagaCall): Promise<unknown> { return c.template === 'outline' ? super.sagaCall(c) : this.track(() => super.sagaCall(c)) }
 }
 
 /** blows up the first N card writes, then behaves */

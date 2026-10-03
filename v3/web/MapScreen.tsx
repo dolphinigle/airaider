@@ -404,7 +404,7 @@ function Tip({ s, q, tipRef }: { s: S; q: any; tipRef: React.RefObject<HTMLDivEl
   };
   return (
     <div className="tip" ref={tipRef}>
-      <div className="k">{q.isFinale ? 'Saga finale' : q.chainId ? `Saga · beat ${q.beat}` : q.faucet ? 'Standing post' : 'One-off job'} · {q.rarity} · level {q.level} · {q.region}</div>
+      <div className="k">{q.isFinale ? 'Saga finale' : q.chainId ? `Saga · part ${q.saga?.part ?? '?'}` : q.faucet ? 'Standing post' : 'One-off job'} · {q.rarity} · level {q.level} · {q.region}</div>
       <div className="t">{q.title}</div>
       <div className="j">{clip(q.job, 220)}</div>
       <div className="rows">

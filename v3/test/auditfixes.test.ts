@@ -5,7 +5,6 @@ import { MockProvider } from '../src/ai/mock.js';
 import { auditGame } from '../src/game/audit.js';
 import { HELD, mintStackable, freshId } from '../src/engine/cards.js';
 import { hasTag } from '../src/engine/tags.js';
-import type { GenesisInput, GenesisOut } from '../src/ai/provider.js';
 
 function richGame(seed = 51): Game {
   const g = new Game(new MockProvider(seed), seed);
@@ -60,30 +59,7 @@ describe('audit-fix regressions', () => {
     }
   });
 
-  it('#33 name guard: AI-invented cast names are replaced with engine-rolled ones', async () => {
-    const g = richGame(57);
-    g.build('map-room'); g.build('lead-room');
-    // a naughty provider that invents names
-    const naughty = Object.create(g.ai) as typeof g.ai;
-    naughty.genesis = async (input: GenesisInput): Promise<GenesisOut> => ({
-      title: 'The Test', kernel: 'k', situation: 's', goal: 'g',
-      cast: [
-        { name: input.focal.name, who: 'the focal', want: 'w', role: 'focal' },
-        { name: 'Zanzibar McInvented', who: 'a fraud', want: 'w', role: 'broker' },
-        { name: 'Lord Fakename III', who: 'another fraud', want: 'w', role: 'villain' },
-      ],
-      arc: [], twistReveal: null, tensions: [], openDirections: ['a', 'b'],
-      relevantIds: [], newPlaces: [], newEdges: [],
-    });
-    (g as { ai: typeof g.ai }).ai = naughty;
-    const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new' && l.source !== 'personal')!;
-    await g.pursue(story.id);
-    const chain = g.state.chains[0]!;
-    const names = chain.bible.cast.map(c => c.name);
-    expect(names).not.toContain('Zanzibar McInvented');
-    expect(names).not.toContain('Lord Fakename III');
-    expect(names[0]).toBe(g.card(chain.focalId)!.name);   // focal keeps the engine name
-  });
+  // #33 (the AI never names the cast) lives in planvalidate.test.ts: the cast is dealt, the plan only labels it
 
   it('#34 Outskirts: all 4 spine keys open it; Underdeep is NOT a key', () => {
     const g = richGame(59);
@@ -197,7 +173,7 @@ describe('audit-fix regressions', () => {
       // the bank; staging re-charged it); captives and full-roster recruits still stage.
       // Either way they are fleshed with a backstory grown from the saga.
       expect([HELD('staged'), HELD('roster')]).toContainEqual(focal.location);
-      expect(focal.character!.backstory ?? '').toContain(chain.bible.title);
+      expect(focal.character!.backstory ?? '').toContain(chain.saga!.plan!.title);
     }
   });
 

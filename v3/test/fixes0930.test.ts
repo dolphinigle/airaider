@@ -207,13 +207,13 @@ describe('END warns for everything that goes at this END (end-guard-misses-go-co
   it("a saga's continuation lead going cold is warned", async () => {
     const g = new Game(new MockProvider(77), 77);
     g.build('map-room'); g.pursueAll(); await g.drain();
-    const chain = g.state.chains.find(c => c.state === 'active');
-    if (!chain) return;
+    const chain = g.state.chains.find(c => c.state === 'active')!;
+    expect(chain).toBeDefined();
     g.state.quests = g.state.quests.filter(q => q.chainId !== chain.id);
     g.state.leads.push({ id: freshId('lead-'), rarity: 'common', level: 1, region: 'forests', archetype: 'investigate',
       chainInfo: { kind: 'continues', chainId: chain.id, hook: '' }, expiresAtCycle: g.state.cycle + 1, source: 'continuation', title: 'x' });
     const w = g.endWarnings().find(x => x.why === 'lead-lapses')!;
-    expect(w.title).toBe(chain.bible.title);
+    expect(w.title).toBe(chain.saga!.plan!.title);
     expect(w.text).toMatch(/slips this END/);
   });
   it('a part-filled standing-post quest goes cold (not "won\'t march"); an empty one is silent', async () => {
@@ -353,8 +353,8 @@ describe('a finale recruit joins when the roster has room (finale-recruit-self-c
   it('one free place: the focal joins, not the tavern', async () => {
     const g = new Game(new MockProvider(77), 77);
     g.build('map-room'); g.pursueAll(); await g.drain();
-    const chain = g.state.chains.find(c => !c.isPersonal);
-    if (!chain) return;
+    const chain = g.state.chains.find(c => !c.isPersonal)!;
+    expect(chain).toBeDefined();
     const focal = g.card(chain.focalId)!;
     focal.location = HELD('limbo');
     // fill the roster to capacity − 1
@@ -418,14 +418,16 @@ describe('the tally counts each loss once, and every kind of loss (tally-double-
   it('a failed saga beat says the setback, and the tally counts it', async () => {
     const g = new Game(new MockProvider(77), 77);
     g.build('map-room'); g.pursueAll(); await g.drain();
-    const chain = g.state.chains.find(c => c.state === 'active');
-    if (!chain) return;
+    const chain = g.state.chains.find(c => c.state === 'active')!;
+    expect(chain).toBeDefined();
+    const q = g.state.quests.find(x => x.chainId === chain.id && x.state === 'open')!;
     chain.failures = 0;
     const report: string[] = [];
     (g as unknown as { cycleAcc: unknown }).cycleAcc = { wounds: [], tamed: [], lapsed: [], stalled: [], leadsCold: [], handedOff: [], setbacks: [] };
     (g as unknown as { advanceChain: (...a: unknown[]) => void }).advanceChain(
-      { id: 'qx', title: 'x', chainId: chain.id, beatIndex: 1, isFinale: false, sideLootV: 0 }, { outcome: 'failure', party: [] }, undefined, report);
-    expect(report.join(' ')).toMatch(new RegExp(`A setback — 1 of ${chain.failureBudget}`));
+      q, { quest: q, outcome: 'failure', party: [], saga: { pos: q.saga!.pos, inn: { hurt: [], decides: '', lowest: '' } } },
+      { before: 'They went.', after: 'The gate held.', summary: 'The gate held against them.' }, report);
+    expect(report.join(' ')).toMatch(new RegExp(`a setback — 1 of ${chain.failureBudget}`));
     expect((g as unknown as { cycleAcc: { setbacks: unknown[] } }).cycleAcc.setbacks).toHaveLength(1);
   });
 });

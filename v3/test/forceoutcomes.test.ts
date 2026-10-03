@@ -122,10 +122,10 @@ describe('lab saga pins', () => {
     const seen: { spark: string; focal: string; tags: string; N: number; kind: string; beats: number }[] = [];
     for (const seed of [3, 4]) {
       const sparks: string[] = [];
-      const orig = MockProvider.prototype.genesis;
-      vi.spyOn(MockProvider.prototype, 'genesis').mockImplementation(async function (this: MockProvider, input) {
-        sparks.push(input.seed);
-        return orig.call(this, input);
+      const orig = MockProvider.prototype.sagaCall;
+      vi.spyOn(MockProvider.prototype, 'sagaCall').mockImplementation(async function (this: MockProvider, c) {
+        if (c.template === 'plan') sparks.push(String(c.payload.seed));
+        return orig.call(this, c);
       });
       seedIdCounter(1);
       const g = new Game(new MockProvider(seed), seed);

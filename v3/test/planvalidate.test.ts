@@ -42,6 +42,16 @@ describe('validatePlan — a clean plan', () => {
   });
 });
 
+describe('validatePlan — the cast is the deal\'s (audit #33: the AI never names a person)', () => {
+  it('a plan that renames someone or coins a new person keeps the dealt people, by the engine\'s names', () => {
+    const r = raw();
+    r.cast = [{ id: 'p1', label: 'a human miller', name: 'Zanzibar McInvented' }, { id: 'zz', label: 'a fraud', name: 'Lord Fakename III' }, { id: 'c9', label: 'a wolfkin hunter' }];
+    const v = ok(r);
+    expect(v.plan!.cast.map(c => [c.id, c.name])).toEqual([['p1', 'Mira Fairweather'], ['c9', 'Rautio Greypelt']]);
+    expect(JSON.stringify(v.plan)).not.toMatch(/Zanzibar|Fakename/);
+  });
+});
+
 describe('validatePlan — the repairs (mechanical, silent)', () => {
   const repaired = (mut: (r: Record<string, any>) => void, note: RegExp, c = ctx()) => {
     const r = raw(); mut(r);

@@ -286,3 +286,37 @@ export function FixButton({ s, fix, quick, go, solid, lead }: {
   </>;
 }
 
+
+/** a quest's kind in words — one rule for the quest page, the map's hover and anywhere else that names it:
+ *  a saga card is "Saga · part n of N" (again) or "Saga finale" (· the last chance), from the engine's q.saga */
+export function questKind(q: any): string {
+  const sg = q.saga;
+  if (q.isFinale) return `Saga finale${sg?.lastchance ? ' · the last chance' : ''}`;
+  if (q.chainId) return sg ? `Saga · part ${sg.part} of ${sg.of}${sg.again ? ' (again)' : ''}` : 'Saga';
+  return q.faucet ? 'Standing post' : 'One-off job';
+}
+
+/** the road marks, in words for a screen reader (the glyph is what the eye reads) */
+const ROAD_MARK: Record<string, [string, string]> = { '✓': ['won', 'done'], '✗': ['lost', 'lost'], '▶': ['now', 'this job'], '·': ['ahead', 'ahead'] };
+/** THE QUEST LOG (the v4 storyteller): the rows the ENGINE rendered for a saga card or the chronicle — who the company
+ *  acts for, the road ahead, what is known and held, the open question. The CLI prints the very same rows in the same
+ *  order (cli/format.ts, logLines). Plain rows, part of the card: a bold lead word, then the text; the road's marks in a
+ *  fixed gutter (✓ won · ✗ lost · ▶ this job · · ahead). Horizontal text only (docs/UI.md G6) */
+export function QuestLog({ rows }: { rows?: any[] | null }) {
+  if (!rows?.length) return null;
+  return <div className="qlog" aria-label="Quest log">{rows.map((r: any, i: number) => {
+    switch (r.kind) {
+      case 'for': return <p key={i} className="ql-line"><b>For:</b> {r.text}</p>;
+      case 'road': return <p key={i} className="ql-head"><b>Road ahead:</b></p>;
+      case 'roadrow': {
+        const [cls, word] = ROAD_MARK[r.mark ?? '·'] ?? ROAD_MARK['·']!;
+        return <p key={i} className={'ql-road ' + cls}><span className="mk" role="img" aria-label={word}>{r.mark ?? '·'}</span><span className="tx">{r.text}</span></p>;
+      }
+      case 'known': return <p key={i} className="ql-head"><b>Known:</b></p>;
+      case 'knownrow': return <p key={i} className="ql-sub">{r.text}</p>;
+      case 'held': return <p key={i} className="ql-line"><b>Held:</b> {r.text}</p>;
+      case 'open': return <p key={i} className="ql-line ql-open"><b>Open question:</b> {r.text}</p>;
+      default: return null;
+    }
+  })}</div>;
+}

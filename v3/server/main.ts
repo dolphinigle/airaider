@@ -305,6 +305,11 @@ function stateView() {
         id: q.id, title: q.title, situation: q.situation, job: q.job,
         level: q.level, rarity: q.rarity, region: REGION[q.region]!.name, regionId: q.region, archetype: q.archetype,
         chainId: q.chainId ?? null, beat: q.beatIndex ?? null, isFinale: !!q.isFinale,
+        // a saga card's screen beyond its prose (the v4 storyteller): the quest log rows the engine rendered
+        // ({kind: for|road|roadrow|known|knownrow|held|open, mark?, text}), logFirst (rows above the prose), where the card
+        // sits (part n of N, again, the last chance, setbacks) — the CLI prints the same rows (cli/format questDetail).
+        // The server builds no saga text
+        saga: q.saga ?? null,
         ready: game.isReady(q.id),
         // warn: that ending's own reward warning · switchLoss: what switching to it sends back (confirm on it)
         approaches: q.approaches?.map(a => ({ ...a, outcome: game.approachOutcome(q.id, a.id), warn: game.approachRewardWarn(q.id, a.id),
@@ -315,6 +320,7 @@ function stateView() {
         abandonText: game.abandonConsequence(q.id), // the two-step abandon confirm's consequence line
         // {coins,bar,success,partial,precision, band: pooled verdict once manned | null, partialAt, filled, of}
         odds: o,
+        // ON THIS MATTER: the people this saga card calls by name — [{id, name, label}]
         cast: game.questCast(q.id),
         // a card the player will not read is a dead slot: abandoning returns the LEAD so the
         // job can be written again, once a cycle
@@ -346,7 +352,8 @@ function stateView() {
         createdCycle: q.createdCycle,
       };
     }),
-    // one view for both UIs — the saga as the company knows it (Game.chainViews)
+    // one view for both UIs — the saga as the company knows it (Game.chainViews): the quest log rows as they stand,
+    // card 1, So far, the answer once the finale is played, the people seen, plus the economy fields
     chains: game.chainViews(),
     lore: Object.values(st.lore.nodes).map(n => ({
       id: n.id, name: n.name, kind: n.kind, blurb: n.blurb, active: n.active,

@@ -44,8 +44,6 @@ export function sagaChain(g: Game, o: { N: number; personal: boolean; kind?: Cha
   const chain: Chain = {
     id: o.id ?? `ch-${g.state.chains.length + 1}`, kind: o.kind ?? 'captive', isPersonal: o.personal, focalId: focal.id, level: 2, rarity: 'common',
     region, expectedBeats: o.N, payoff: 300, bank: 0, cyclesSpent: 0, failureBudget: Math.max(2, Math.ceil(o.N / 2)), failures: 0, beatIndex: 0,
-    bible: { title: '', kernel: '', cast: [], situation: '', goal: '', arc: [], twist: null, tensions: [], openDirections: [] },
-    story: { currentSituation: '', knownToPlayer: [], openThreads: [], actorStates: {} },
     state: 'active', createdCycle: g.state.cycle,
   };
   g.state.chains.push(chain);

@@ -75,7 +75,7 @@ export function CardSheet({ s, id, cast, doAct, quick, close, openQuest, openRoo
             {!c.portrait && <span className="emblem" aria-hidden="true">{emblem}</span>}
             <div className="hname">
               <h1>{c.name}</h1>
-              {(ch?.who || c.who) && <p className="who">{ch?.who ?? c.who}</p>}
+              {kind !== 'cast' && (ch?.who || c.who) && <p className="who">{ch?.who ?? c.who}</p>}
               {!c.portrait && caption && <p className="dimp small capline0">{caption}</p>}
             </div>
             <button className="x" onClick={close} aria-label="Close">✕</button>
@@ -147,7 +147,7 @@ export function CardSheet({ s, id, cast, doAct, quick, close, openQuest, openRoo
             <p className="p">A debt. Unpaid debts draw collectors — a hostile lead appears.</p>
             <div className="acts"><button className="btn solid" onClick={() => doThen('settle', c.id)}>Settle · {c.settleCost}g</button></div>
           </>}
-          {kind === 'cast' && <p className="p dimp">{c.trade ? `${c.trade} · ` : ''}{c.role}</p>}
+          {kind === 'cast' && <p className="p">{c.label}</p>}
         </div>
       </section>
     </div>

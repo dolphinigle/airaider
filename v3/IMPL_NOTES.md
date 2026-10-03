@@ -1758,3 +1758,12 @@ Lab-only flags and dev commands (registered here per STORYTELLER §4.4; none cha
 | `ailog json <file>` | the whole call log (AIRAIDER_CALL_LOG's) as one JSON array | CLI only |
 
 Pipeline (`scripts/sagalab/`): `drive.ts` (plays the real CLI) → `extract.ts` (one file per text) → `mech.ts` (M12–M17, paste rate, §D.3) → `judge_gpt.ts` (gpt-5 J1 progressive / J3 / J4) + Opus seats from `judge/*.md` → `score.ts` (§1.1 table, bootstrap CIs, REPORT.md). Fixtures: `fixtures/{A,B}/`, 12 each on 6 seeds. Runs land in `runs/` (gitignored).
+
+## Storyteller Phase 2 Step 5b — scripts still on the deleted saga path (2026-10-03; nothing deleted, awaiting Fable's go)
+
+The old saga path (genesis, beat/finale `writeQuest`, `chainContext` resolves, `bible`/`story` on Chain, `review`,
+`premiseFingerprint`) is gone from `src/`. These `scripts/` (not typechecked) still reference it and will not run as-is:
+`aicampaign.ts`, `aismoke.ts`, `autoplay.ts`, `campaignread.ts`, `capturebeat1.ts`, `cardlab.ts`, `_castlab.ts`,
+`_genesisbatch.ts`, `_genesisdump.ts`, `guardlab.ts`, `introlab.ts`, `_lightresolve.ts`, `_personalab.ts`,
+`_personalcheck.ts`, `promptlab.ts`, `realplay.ts`, `reviewlab.ts`, `uidump.ts`, and the lab's `sagalab/mech.ts` (lab file,
+untouched). `_ab_old_keywords.ts` keeps its own copies of the deleted arrival/tell/seed pools.

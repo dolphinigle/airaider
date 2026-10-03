@@ -10,6 +10,7 @@ import { REGION } from '../src/engine/regions.js';
 import { cardType, stackKind, isLiability } from '../src/engine/cards.js';
 import { slotThreshold, coins, explainCoins, coinsWhy, slotStrength, BAND_TEXT } from '../src/engine/roll.js';
 import { xpNeeded } from '../src/engine/growth.js';
+import { logLines, matterLine } from '../src/ai/storyteller.js';
 
 const pct = (x: number | null) => x === null ? '—' : `${Math.round(x * 100)}%`;
 
@@ -328,7 +329,7 @@ export const render = {
       const kinds = kindsLine(g.questRewardKinds(q.id));
       const warn = g.questRewardWarn(q.id);
       const due = g.questIsFaucet(q) ? '↻ this cycle' : `c${g.questLapsesAt(q)}${g.questStallAt(q) !== null ? ' (stalled)' : ''}${g.questUrgent(q) ? '!' : ''}`;
-      return `${q.id.padEnd(5)} ${q.title.slice(0, 30).padEnd(30)} L${q.level} ${(tokens || '—').padEnd(16)} ${odds.padEnd(26)} ${kinds.padEnd(22)} ${due.padEnd(12)}${q.isFinale ? ' 🎬' : q.chainId ? ` 📖${q.beatIndex}` : ''}${warn ? `  ⚠ ${warn}` : ''}`;
+      return `${q.id.padEnd(5)} ${q.title.slice(0, 30).padEnd(30)} L${q.level} ${(tokens || '—').padEnd(16)} ${odds.padEnd(26)} ${kinds.padEnd(22)} ${due.padEnd(12)}${q.isFinale ? ' 🎬 finale' : q.saga ? ` 📖 part ${q.saga.part}${q.saga.again ? ' (again)' : ''}` : ''}${warn ? `  ⚠ ${warn}` : ''}`;
     }).join('\n') + (g.canReroll()
       ? "\n(a card you will not read is not a dead end: 'abandon <id>' puts the lead back — once a cycle)"
       : "\n(a lead has already been taken back up this cycle — 'abandon <id>' now spends the card)");
@@ -337,24 +338,31 @@ export const render = {
   questDetail(g: Game, id: string): string {
     const q = g.state.quests.find(x => x.id === id);
     if (!q) return 'no such quest';
-    const cast = g.questCast(q.id);
-    const lines = [
-      `═══ ${q.title} ═══  (${q.id}, L${q.level} ${q.rarity}, ${REGION[q.region]!.name}, ${g.questIsFaucet(q) ? 'goes cold at the end of this cycle — the post will put up another' : `lapses c${g.questLapsesAt(q)}${g.questStallAt(q) !== null ? ` — set aside then unless it marches (it has failed to march ${q.stalls ?? 0}×)` : ''}`})`,
+    const due = g.questIsFaucet(q) ? 'goes cold at the end of this cycle — the post will put up another' : `lapses c${g.questLapsesAt(q)}${g.questStallAt(q) !== null ? ` — set aside then unless it marches (it has failed to march ${q.stalls ?? 0}×)` : ''}`;
+    const tail = `(${q.id}, L${q.level} ${q.rarity}, ${REGION[q.region]!.name}, ${due})`;
+    const reward = `REWARD: ${g.questReward(q.id)}  [${kindsLine(g.questRewardKinds(q.id))}]${(w => w ? `  ⚠ ${w}` : '')(g.questRewardWarn(q.id))}`;
+    const sg = q.saga;
+    const lines = sg ? (() => {
+      // a saga card: the quest log the engine rendered (the GUI's rows), the prose, the people it names — the same
+      // order the quest page uses; no errand line (the road's ▶ row and the prose carry the job)
+      const c = g.chainViews().find(x => x.id === q.chainId);
+      const log = logLines(sg.rows);
+      const matter = matterLine(g.questCast(q.id));
+      const where = sg.part === null ? `the finale${sg.lastchance ? ' · the last chance' : ''}` : `part ${sg.part} of ${sg.of}${sg.again ? ' (again)' : ''}`;
+      return [
+        `═══ ${q.title} · ${c?.title ?? 'a saga'} ═══  ${tail}`,
+        ...(sg.logFirst ? [...log, '', q.situation] : [q.situation, '', ...log]),
+        ...(matter ? [matter] : []),
+        reward,
+        `SAGA: ${where} · setbacks ${sg.setbacks} of ${sg.budget}`,
+      ];
+    })() : [
+      `═══ ${q.title} ═══  ${tail}`,
       q.situation,
-      // held to this matter: readable, never movable — the text form of the bracketed cards
-      ...(cast.length ? ['ON THIS MATTER (held here — you can read them, not move them):',
-        ...cast.map(c => `  ⊟ ${c.name}${c.trade ? `, ${c.trade}` : ''} — ${c.role}\n      ${c.who}${c.tags ? `\n      ${c.tags}` : ''}`)] : []),
       // parity with the GUI's writ: THE ERRAND is the job line (QUESTS 2026-07-06 (a) — the situation
-      // is the card, the job its ledger line). The CLI never printed it, so a text-UI player read
-      // "a woodcutter saw someone in a woman's cloak slip toward the gate" with no job at all.
+      // is the card, the job its ledger line)
       ...(q.job ? [`ERRAND: ${q.job}`] : []),
-      `REWARD: ${g.questReward(q.id)}  [${kindsLine(g.questRewardKinds(q.id))}]${(w => w ? `  ⚠ ${w}` : '')(g.questRewardWarn(q.id))}`,
-      ...(() => {
-        const c = q.chainId ? g.chainViews().find(x => x.id === q.chainId) : undefined;
-        // this quest's step, 1-based (the GUI's saga strip and kind line say the same)
-        const step = q.isFinale ? 'the finale' : `beat ${q.beatIndex ?? (c?.beat ?? 0) + 1} of ~${c?.expectedBeats}`;
-        return c ? [`SAGA: ${c.title} · ${step} · progress ${c.effort.toFixed(0)}/${c.effortTarget.toFixed(0)} · setbacks ${c.failures} of ${c.failureBudget} · set aside ${c.bank || '—'}`] : [];
-      })(),
+      reward,
     ];
     if (q.approaches) {
       lines.push(`APPROACHES (pick one)${q.chosenApproach ? ` — chosen: ${q.chosenApproach}` : ''}:`);
@@ -435,21 +443,24 @@ export const render = {
     const where = (c: ReturnType<Game['chainViews']>[number]) =>
       ` → ${c.next}${c.questId ? ` ('quest ${c.questId}')` : c.leadId && c.next === 'a lead to pursue' ? ` ('pursue ${c.leadId}')` : ''}`;
     return [...g.chainViews()].sort((a, b) => Number(b.live) - Number(a.live)).map(c =>
-      `${c.id.padEnd(9)} ${c.title.slice(0, 36).padEnd(36)} ${c.state.padEnd(14)} beat ${pips(c.beat, c.expectedBeats)} ${c.beat}/${c.expectedBeats} · progress ${c.effort.toFixed(0)}/${c.effortTarget.toFixed(0)} · setbacks ${pips(c.failures, c.failureBudget, '✗', '·')} · ${(c.bank || '—')}${c.focal ? ` · focal: ${c.focal}` : ''}${where(c)}`,
+      `${c.id.padEnd(9)} ${c.title.slice(0, 36).padEnd(36)} ${c.state.padEnd(14)} part ${pips(c.part, c.of)} ${c.part}/${c.of} · progress ${c.effort.toFixed(0)}/${c.effortTarget.toFixed(0)} · setbacks ${pips(c.failures, c.failureBudget, '✗', '·')} · ${(c.bank || '—')}${c.focal ? ` · ${c.focal}` : ''}${where(c)}`,
     ).join('\n') || '(no stories yet — pursue a ✦STORY lead)';
   },
 
+  /** the saga as the chronicle shows it (the GUI's Sagas tab, same rows, same order): the quest log as it stands, card
+   *  1, the likely end and the economy, So far, the answer once the finale is played, the people seen */
   chainDetail(g: Game, id: string): string {
     const c = g.chainViews().find(x => x.id === id);
     if (!c) return 'no such chain';
     return [
       `═══ ${c.title} ═══ (${c.state})${c.personal ? ' — personal' : ''}`,
-      `goal: ${c.goal}`,
-      `${c.focal ? `focal: ${c.focal} · ` : ''}likely end: ${c.fate} · set aside so far ${c.bank || '—'} · progress ${c.effort.toFixed(0)} of ~${c.effortTarget.toFixed(0)} · setbacks ${c.failures} of ${c.failureBudget} before it slips away`,
-      `now: ${c.situation}`,
-      c.known.length ? `known: ${c.known.join(' · ')}` : '',
-      ...c.met.map(p => `  ${p.name}: ${p.who}`),
-    ].filter(Boolean).join('\n');
+      ...logLines(c.rows),
+      c.card1,
+      `likely end: ${c.likely} · setbacks ${c.failures} of ${c.failureBudget} · set aside ${c.bank || '—'} · progress ${c.effort.toFixed(0)} of ~${c.effortTarget.toFixed(0)}`,
+      'So far:', ...(c.soFar.length ? c.soFar : ['  (nothing played yet)']),
+      ...(c.answer ? [`The answer: ${c.answer}`] : []),
+      ...(c.people.length ? ['People:', ...c.people.map(p => p.name ? `  ${p.name} — ${p.label}` : `  ${p.label}`)] : []),
+    ].filter(x => x !== '').join('\n');
   },
 
   lore(g: Game, id: string): string {

@@ -8,11 +8,11 @@ import { describe, it, expect } from 'vitest';
 import { Game } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
 import { guardEdges } from '../src/engine/lore.js';
-import type { GenesisInput, GenesisOut } from '../src/ai/provider.js';
+import type { SagaCall } from '../src/ai/provider.js';
 
 class SeedSpy extends MockProvider {
   seeds: string[] = [];
-  override genesis(i: GenesisInput): Promise<GenesisOut> { this.seeds.push(i.seed); return super.genesis(i) }
+  override sagaCall(c: SagaCall): Promise<unknown> { if (c.template === 'plan') this.seeds.push(String(c.payload.seed)); return super.sagaCall(c) }
 }
 
 /** a personal chain for roster[0], with one lore edge to `to` */
@@ -48,22 +48,20 @@ describe('personal saga seed', () => {
   });
 });
 
-// The genesis re-roll (one, for HARD defects) burned the seed with sampleSeed(): a personal saga
-// whose first draft was rejected came back on a generic what-if and copied the live saga.
-class DropFocalOnce extends MockProvider {
-  seeds: string[] = [];
+// A plan with a hard defect earns ONE plain re-draw on the same input (STORYTELLER §2.7) — never a new seed: the old
+// genesis re-roll burned the seed, so a personal saga came back on a generic what-if and copied the live saga.
+class BrokenPlanOnce extends SeedSpy {
   private first = true;
-  override async genesis(i: GenesisInput): Promise<GenesisOut> {
-    this.seeds.push(i.seed);
-    const out = await super.genesis(i);
-    if (this.first) { this.first = false; return { ...out, cast: out.cast.filter(c => c.loreId !== i.focal.id && c.name !== i.focal.name) } }
+  override async sagaCall(c: SagaCall): Promise<unknown> {
+    const out = await super.sagaCall(c);
+    if (c.template === 'plan' && this.first) { this.first = false; return { ...(out as object), episodes: [] } }
     return out;
   }
 }
 
-describe('a personal saga re-rolled for a hard defect', () => {
-  it('re-rolls on another piece of the soldier\'s own past, never a generic seed', async () => {
-    const ai = new DropFocalOnce();
+describe('a personal saga re-drawn for a hard defect', () => {
+  it('re-draws on the same piece of the soldier\'s own past', async () => {
+    const ai = new BrokenPlanOnce();
     const g = new Game(ai, 268);
     g.build('map-room'); g.build('lead-room');
     const merc = g.roster()[0]!;
@@ -72,8 +70,31 @@ describe('a personal saga re-rolled for a hard defect', () => {
     (g as unknown as { spawnPersonalChainLead(m: unknown): void }).spawnPersonalChainLead(merc);
     await g.pursue(g.state.leads.find(l => l.source === 'personal')!.id);
     expect(ai.seeds.length).toBe(2);
-    expect(ai.seeds[1]).not.toBe(ai.seeds[0]);
-    expect(merc.character!.backstory).toContain(ai.seeds[1]!);
+    expect(ai.seeds[1]).toBe(ai.seeds[0]);
+    expect(merc.character!.backstory).toContain(ai.seeds[0]!);
+    expect(g.state.chains[0]!.saga!.fallback).toBe(false);
+  });
+});
+
+describe('D10: the person a personal seed came from takes a seat', () => {
+  async function seated(type: string) {
+    const g = new Game(new MockProvider(268), 268);
+    g.build('map-room'); g.build('lead-room');
+    const merc = g.roster()[0]!;
+    g.ensureLoreNode(merc);
+    g.state.lore.nodes['npc-x'] = { id: 'npc-x', kind: 'character', name: 'Arver Stonefield', sex: 'male', race: 'human',
+      blurb: 'a merchant', identity: '', active: true, createdCycle: 1 };
+    guardEdges(g.state.lore, [{ from: merc.id, to: 'npc-x', type, blurb: `${merc.name} left Arver at a crossing and has never said why`, importance: 0.9 }], 1, () => 'e1');
+    (g as unknown as { spawnPersonalChainLead(m: unknown): void }).spawnPersonalChainLead(merc);
+    await g.pursue(g.state.leads.find(l => l.source === 'personal')!.id);
+    return g.state.chains[0]!.saga!.world.cast.find(p => p.id === 'npc-x');
+  }
+  it('known, with the edge as their memory; a rival-type edge seats them in the way', async () => {
+    const rival = await seated('betrayed-by');
+    expect(rival).toMatchObject({ name: 'Arver Stonefield', seat: 'opponent', known: true });
+    expect(rival!.memory).toContain('at a crossing');
+    const other = await seated('owes');
+    expect(other).toMatchObject({ seat: 'other', known: true });
   });
 });
 

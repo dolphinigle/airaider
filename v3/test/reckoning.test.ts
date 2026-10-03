@@ -5,7 +5,8 @@
 import { describe, it, expect } from 'vitest';
 import { Game } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
-import type { ResolveQuestInput, ResolveQuestOut } from '../src/ai/provider.js';
+import type { ResolveQuestInput, ResolveQuestOut, SagaCall } from '../src/ai/provider.js';
+import { logLines } from '../src/ai/storyteller.js';
 
 /** a provider whose resolutions land at staggered times, LAST quest first — the out-of-order
  *  arrival a real provider produces and the plain mock (instant, in submission order) cannot */
@@ -103,5 +104,44 @@ describe('the reckoning is readable while it is written', () => {
     const fired: string[] = [];
     await m.resolve(inputs, o => fired.push(o.questId));
     expect(fired).toEqual(['q3', 'q1', 'q2']);
+  });
+
+  it('a saga report and a one-off land in the same reckoning, each in its own slot, whatever order they arrive in', async () => {
+    // the saga's report call is the slow one, so the one-off lands first
+    class SlowSaga extends MockProvider {
+      override async sagaCall(c: SagaCall): Promise<unknown> {
+        if (c.template === 'report') await new Promise(r => setTimeout(r, 60));
+        return super.sagaCall(c);
+      }
+    }
+    const g = new Game(new SlowSaga(4343), 4343);
+    g.build('map-room'); g.build('lead-room');
+    // the lab hook stands up a fort that can field a saga and a one-off at once (four soldiers)
+    const lead = g.labSaga({ id: 'R01', seed: 1, path: 'clean', spark: 'a border stone moved by night', N: 3, kind: 'captive', personal: false, twist: false,
+      focal: { name: 'Rautio', sex: 'male', race: 'human', seed: 1104, value: 150 }, level: 2, rarity: 'uncommon' }).leadId!;
+    expect((await g.pursue(lead)).ok).toBe(true);
+    const saga = g.state.quests.find(q => q.chainId)!;
+    g.state.leads.push({ id: 'lead-one', rarity: 'common', level: 1, region: 'forests', archetype: 'contract', chainInfo: { kind: 'none' }, expiresAtCycle: 99, source: 'starter' });
+    expect((await g.pursue('lead-one')).ok).toBe(true);
+    const one = g.state.quests.find(q => !q.chainId)!;
+    for (const q of [saga, one]) for (let s = 0; s < q.slots.length; s++) {
+      const free = g.roster().find(m => m.location.kind === 'held');
+      if (free) g.assign(q.id, s, free.id);
+    }
+    expect(marching(g)).toBe(2);
+    const seen: string[][] = [];
+    const poll = setInterval(() => { const v = g.reckoningView(); if (v) seen.push([...v.lines]) }, 5);
+    const report = await g.endCycle();
+    clearInterval(poll);
+    // the one-off was readable while the saga's slot still held its placeholder
+    expect(seen.some(v => v.some(l => l.startsWith('✎')) && v.filter(l => l.startsWith('⚄')).length === 1)).toBe(true);
+    // telling order: id order; the saga's block starts as its placeholder did (title, the card's prose) and never echoes the log
+    const ids = [saga.id, one.id].sort((a, b) => a.localeCompare(b));
+    expect(report.filter(l => l.startsWith('— ')).map(l => l.match(/\(([^)]+)\)$/)?.[1])).toEqual(ids);
+    const at = report.indexOf(`— ${saga.title} (${saga.id})`);
+    expect(report[at + 1]).toBe(`「${saga.situation}」`);
+    for (const row of logLines(saga.saga!.rows)) if (row.trim().length > 12) expect(report).not.toContain(row);
+    expect(report.some(l => l.startsWith(`📖 ${g.state.chains[0]!.saga!.plan!.title}: `))).toBe(true);
+    expect(report.some(l => l.startsWith('✎'))).toBe(false);
   });
 });
