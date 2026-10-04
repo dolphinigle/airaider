@@ -20,26 +20,42 @@
 // PIPELINE arms (engine/saga.ts PipeArm, North Star 8): kit+pick plus one input-pipeline change each, every one played on
 // A2's own dealt worlds (REPLAY), so the only difference from A2 / A2b is the arm:
 //   B2  one      the pick chooses one keyword, told so; the plan gets only it
-//   C1  core     after the pick, a small core call writes the want, the question, the answer and who is against; the plan
-//                gets them as fixed facts and writes no question or answer
 //   C2  grafts   R6's class fixes: the road prints the plan's own why per later job (no outline call; a flagged why leaves
-//                the title), the card's hope goes to its report, engine finale buttons, the gold way paid
+//                the title), the card's hope goes to its report, engine finale buttons, the gold way paid (since the
+//                build default, 2026-10-04: its money on its button only; the story tells the person going free)
 //   C3  sides    the plan writes each person's side; cards and reports get it for the people present
+//   D1  reads    C2, and the card after a won job reads the report's one-sentence summary (the text the player just read),
+//                not the plan's forecast `win`; no prompt change
+//   D2  fixes    C2 and the verifiers' class fixes (pipeline-round report §3.1, then the D-arm verifier; engine/saga.ts
+//                PipeArm): the report's hope, clue, secret and own words; the finale card's stake; one finale result
+//                sentence; a card's trouble as one phrase; the plan's edges, loss and trouble `with`
+//   (C1 core — a call fixing the want, question and answer before the plan — was removed, a measured loss; its runs stay)
 //
-//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A2c|A3|A4|B1|B2|C1|C2|C3|all, or <arm>_g<N> = a further generation] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
-//        [--slots F6_3,F1_1] [--writer sonnet|haiku|openai] [--mock] [--pool 6] [--run seed1] [--force]
+//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A2c|A3|A4|B1|B2|C2|C3|D1|D2|all, or <arm>_g<N> = a further generation] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
+//        [--slots F6_3,F1_1] [--writer sonnet|haiku|openai] [--mock] [--pool 6] [--run seed1|seed2] [--force]
 //   npx tsx scripts/sagalab/seedlab.ts --stats [--run seed1]     spend and latency per call kind over the run's folders
 //   npx tsx scripts/sagalab/seedlab.ts --check [--run seed1]     which saga folders are missing or incomplete
-//   npx tsx scripts/sagalab/seedlab.ts --render --arm B2,C1,C2,C3 --slots F6_3 [--mock] [--run seed1]
+//   npx tsx scripts/sagalab/seedlab.ts --render --arm D1,D2 --slots F6_3 [--out _d_rendered] [--mock] [--run seed1]
 //        every NEW or CHANGED prompt variant a pipeline arm sent (one call per template + flag set), its system prompt and
-//        its real payload, into runs/<run>/_pipeline_rendered/ (cleared first) for the context-free verifier
+//        its real payload, into runs/<run>/<out>/ (default _pipeline_rendered; cleared first) for the context-free verifier
 //
 // The world of a slot is the probe's: the base fixture's game (seed, fort, roster), its focal from the fixture's own seed
 // (a personal fixture's soldier), N, kind, a personal saga's past (the base spark), F5's returning client. The story rng
 // is seeded per slot and the same in every arm (each arm then deals its own way from it); the play rng — parties, the ⚄
-// line, gravity, wounds — is the same in every arm too. Outcomes follow the probe's paths: draws 1–2 clean (a personal
-// fixture: personal), draw 3 bumpy (lastchance when N = 2); the finale plays the likely way (g0), as R5 did. F1's pinned
-// seed is NOT pinned: the seed is what the arms test, and the game deals A0 a theme for every saga.
+// line, gravity, wounds — is the same in every arm too. Outcomes follow the probe's paths, by the draw's place in its
+// run's three: the first two clean (a personal fixture: personal), the third bumpy (lastchance when N = 2); the finale
+// plays the likely way (g0), as R5 did. F1's pinned seed is NOT pinned: the seed is what the arms test, and the game deals
+// A0 a theme for every saga.
+//
+// THE RUNS (`--run`; each its own 24 slots, runs/<run>/<arm>/<fixture>_<draw>/):
+//   seed1  draws 1–3 (F1_1 … F8_3): every arm so far was built and judged here. The pipeline arms and A2b/A2c replay A2's
+//          deals (REPLAY)
+//   seed2  draws 4–6 (F1_4 … F8_6): the OUT-OF-SAMPLE check — the same 8 base worlds (the fixture's game, focal, N, kind,
+//          personal past, F5's returning client) with NEW deals (situation, keywords, client, supporting cast, tone,
+//          places: the story rng is keyed by the draw) and new soldiers and dice, on seed1's path mix (draws 4–5 like 1–2,
+//          draw 6 like 3). Every kit+pick arm (A2, C2, D1, D2, …) shares each slot's deal: the first one generated there
+//          writes it to runs/seed2/_deals/<slot>.json, and every later one replays it. Name generations <arm>_g<N>:
+//            npx tsx scripts/sagalab/seedlab.ts --run seed2 --arm A2_g1,C2_g1   → runs/seed2/A2_g1/, runs/seed2/C2_g1/
 //
 // The writer: the game's provider — sonnet / haiku on the Claude CLI transport (the subscription; list price kept for
 // information), openai = production GPT tiers (plan GPT-6 Sol, the rest GPT-6 Luna). --mock: the floor, free.
@@ -96,14 +112,14 @@ if (!MOCK && WRITER !== 'openai') {
 
 export const ARMS: Record<string, SeedArm> = {
   A0: 'themes', A1: 'kit', A2: 'kit+pick', A2b: 'kit+pick', A2c: 'kit+pick', A3: 'kit+pick+situation', A4: 'kit+pick+premise', B1: 'kit+pick+cast',
-  B2: 'kit+pick', C1: 'kit+pick', C2: 'kit+pick', C3: 'kit+pick',
+  B2: 'kit+pick', C2: 'kit+pick', C3: 'kit+pick', D1: 'kit+pick', D2: 'kit+pick',
 };
-/** the pipeline arms: kit+pick's seed, one pipeline change each (the host's pipeArm) */
-export const PIPES: Record<string, PipeArm> = { B2: 'one', C1: 'core', C2: 'grafts', C3: 'sides' };
-/** an arm that plays another arm's deals: each slot's dealt world is read back from that arm's plan.json (the noise
- *  control: a later change to the deal — the supporting trades — cannot move its inputs; the pipeline arms: the arm is the
- *  only difference) */
-const REPLAY: Record<string, string> = { A2b: 'A2', A2c: 'A2', B2: 'A2', C1: 'A2', C2: 'A2', C3: 'A2' };
+/** the pipeline arms: kit+pick's seed, one pipeline change each (the host's pipeArm; D1 and D2 carry C2's too) */
+export const PIPES: Record<string, PipeArm> = { B2: 'one', C2: 'grafts', C3: 'sides', D1: 'reads', D2: 'fixes' };
+/** seed1: an arm that plays another arm's deals — each slot's dealt world is read back from that arm's plan.json (the
+ *  noise control: a later change to the deal — the supporting trades — cannot move its inputs; the pipeline arms: the arm
+ *  is the only difference). A later run shares its own deals instead (`SHARED_DEALS`) */
+const REPLAY: Record<string, string> = { A2b: 'A2', A2c: 'A2', B2: 'A2', C2: 'A2', C3: 'A2', D1: 'A2', D2: 'A2' };
 /** a further generation of an arm (the power rule): `<arm>_g<N>` plays `<arm>` exactly — its seed, pipe and replayed deals — into
  *  its own folder, runs/<run>/<arm>_g<N>/ */
 const gen = (armId: string) => armId.replace(/_g\d+$/, '');
@@ -122,18 +138,45 @@ const ALL_FX: ProbeFixture[] = fs.readdirSync(path.join(LAB, 'fixtures/P')).filt
   .sort((a, b) => Number(a.slice(1, -5)) - Number(b.slice(1, -5))).map(f => readJson<ProbeFixture>(path.join(LAB, 'fixtures/P', f)));
 const baseOf = (id: string): LabFixture => readJson<LabFixture>(path.join(LAB, 'fixtures', id[0]!, `${id}.json`));
 const wantFx = opt('fixtures') && opt('fixtures') !== 'all' ? opt('fixtures')!.split(',') : ALL_FX.map(f => f.id);
-const DRAWS: number[] = opt('draw') ? opt('draw')!.split(',').map(Number) : Array.from({ length: Number(opt('draws') ?? 3) }, (_, i) => i + 1);
+/** each run's first draw (THE RUNS above): seed1 draws 1–3, seed2 — the out-of-sample slots — draws 4–6; any other run 1–3 */
+const RUN_DRAW0: Record<string, number> = { seed1: 1, seed2: 4 };
+const DRAW0 = RUN_DRAW0[RUN] ?? 1;
+const DRAWS: number[] = opt('draw') ? opt('draw')!.split(',').map(Number) : Array.from({ length: Number(opt('draws') ?? 3) }, (_, i) => DRAW0 + i);
 const SLOTS = opt('slots')?.split(',').map(s => s.trim()).filter(Boolean);
 const PLAY: { fx: ProbeFixture; d: number }[] = SLOTS
   ? SLOTS.map(sl => { const [f, d] = sl.split('_'); const fx = ALL_FX.find(x => x.id === f); if (!fx || !(Number(d) >= 1)) { console.error(`bad slot: ${sl}`); process.exit(2) } return { fx, d: Number(d) } })
   : DRAWS.flatMap(d => ALL_FX.filter(f => wantFx.includes(f.id)).map(fx => ({ fx, d })));
-const pathOf = (fx: ProbeFixture, d: number): LabPath => d < 3 ? (fx.personal ? 'personal' : 'clean') : fx.N >= 3 ? 'bumpy' : 'lastchance';
+/** a draw's path by its place in its run's three (draws 1, 2 / 4, 5 clean or personal; 3 / 6 bumpy or lastchance) */
+const pathOf = (fx: ProbeFixture, d: number): LabPath => (d - 1) % 3 < 2 ? (fx.personal ? 'personal' : 'clean') : fx.N >= 3 ? 'bumpy' : 'lastchance';
 const armDir = (arm: string) => path.join(LAB, 'runs', RUN, `${MOCK ? 'mock-' : ''}${arm}`);
+/** a run past seed1 shares each slot's deal among its kit+pick arms: the first one generated there writes it here, and
+ *  every later one replays it (the mock floor keeps its own) */
+const SHARED_DEALS = RUN !== 'seed1';
+const dealsDir = path.join(LAB, 'runs', RUN, MOCK ? '_deals-mock' : '_deals');
 
-/** the dealt world of another arm's saga in the same slot, in place of this deal's (REPLAY). The slot's own facts — the
- *  focal, N, kind, region, level — must agree; returns the fields that differed from this deal */
-function replayDeal(sagaRec: SagaRecord, from: string, slot: string): string[] {
-  const src = readJson<{ dealt: { seed: SagaWorld['seed']; tone: string; kit: SagaWorld['kit'] | null; cast?: SagaWorld['cast'] }; engine: { cast: SagaWorld['cast']; stake: string; shape: SagaWorld['shape']; places: string[]; land: string; region: string; N: number; kind: SagaWorld['kind']; focal: { id: string } } }>(path.join(armDir(from), slot, 'plan.json'));
+/** a slot's dealt world as plan.json (and a shared deal) records it */
+interface DealSrc { dealt: { seed: SagaWorld['seed']; tone: string; kit: SagaWorld['kit'] | null; cast?: SagaWorld['cast'] }; engine: { cast: SagaWorld['cast']; stake: string; shape: SagaWorld['shape']; places: string[]; land: string; region: string; N: number; kind: SagaWorld['kind']; focal: { id: string } } }
+/** where this arm's deal comes from, if it replays one: seed1 — REPLAY's arm (its plan.json in the slot); a later run — the
+ *  run's shared deal for the slot, written from this arm's own deal when it is the first kit+pick arm there */
+function dealSource(armId: string, slot: string, w: SagaWorld): { from: string; src: DealSrc } | undefined {
+  if (!SHARED_DEALS) { const from = REPLAY[gen(armId)]; return from ? { from, src: readJson<DealSrc>(path.join(armDir(from), slot, 'plan.json')) } : undefined }
+  if (ARMS[gen(armId)] !== 'kit+pick') return undefined;
+  const file = path.join(dealsDir, `${slot}.json`);
+  if (!fs.existsSync(file)) {
+    fs.mkdirSync(dealsDir, { recursive: true });
+    const src: DealSrc & { first: string } = {
+      first: armId, dealt: { seed: w.seed, tone: w.tone, kit: w.kit ?? null, cast: w.cast },
+      engine: { cast: w.cast, stake: w.stake, shape: w.shape, places: w.places, land: w.land, region: w.region, N: w.N, kind: w.kind, focal: { id: w.focalId } },
+    };
+    fs.writeFileSync(file, JSON.stringify(src, null, 2));
+  }
+  const src = readJson<DealSrc & { first: string }>(file);
+  return { from: `${path.relative(path.join(LAB, 'runs', RUN), file)} (first dealt by ${src.first})`, src };
+}
+
+/** the dealt world of another saga in the same slot, in place of this deal's (REPLAY, or a run's shared deal). The slot's
+ *  own facts — the focal, N, kind, region, level — must agree; returns the fields that differed from this deal */
+function replayDeal(sagaRec: SagaRecord, from: string, src: DealSrc, slot: string): string[] {
   const w = sagaRec.world, e = src.engine;
   if (e.focal.id !== w.focalId || e.N !== w.N || e.kind !== w.kind || e.region !== w.region) throw new Error(`${slot}: ${from}'s world is another slot's`);
   const kit = src.dealt.kit ? { arm: src.dealt.kit.arm, situations: src.dealt.kit.situations, keywords: src.dealt.kit.keywords } : undefined;
@@ -277,11 +320,12 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
 
   // the deal (synchronous), then the kit's pick and premise and the plan
   const sagaRec = flow.deal(host, chain, undefined, focal, pins);
-  const replayed = REPLAY[gen(armId)] ? { from: REPLAY[gen(armId)]!, differed: replayDeal(sagaRec, REPLAY[gen(armId)]!, id) } : undefined;
+  const source = dealSource(armId, id, sagaRec.world);
+  const replayed = source ? { from: source.from, differed: replayDeal(sagaRec, source.from, source.src, id) } : undefined;
   const world0 = JSON.parse(JSON.stringify(sagaRec.world)) as typeof sagaRec.world;   // as dealt, before the pick
   const t0 = Date.now();
   const plan = await flow.plan(host, chain);
-  const planMs = rec.calls.filter(c => ['pick', 'premise', 'core', 'plan'].includes(c.purpose)).reduce((s, c) => s + c.durationMs, 0);
+  const planMs = rec.calls.filter(c => ['pick', 'premise', 'plan'].includes(c.purpose)).reduce((s, c) => s + c.durationMs, 0);
 
   fs.rmSync(dir, { recursive: true, force: true });
   fs.mkdirSync(dir, { recursive: true });
@@ -382,7 +426,7 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
     // what the dealer dealt (before the pick), then what the pick and premise made of it, and the seed the plan got
     dealt: { seed: world0.seed, tone: world0.tone, kit: world0.kit ?? null, cast: world0.cast }, ...(replayed ? { replayed } : {}),
     kit: final.world.kit ?? null, seedToPlan: seed,
-    pick: io('pick')[0] ?? null, premise: io('premise')[0] ?? null, ...(PIPES[gen(armId)] === 'core' ? { core: io('core')[0] ?? null } : {}),
+    pick: io('pick')[0] ?? null, premise: io('premise')[0] ?? null,
     planInput: (io('plan').at(-1)?.input) ?? null, rawPlan: io('plan').at(-1)?.output ?? null, plan, planCalls: callOf('plan').length,
     outline: io('outline')[0] ?? null, road: final.road, hopes: final.hopes,
     validation: { defects: [], redraws: Math.max(0, callOf('plan').length - 1), fallback: final.fallback },
@@ -490,16 +534,22 @@ function stats() {
 /** what each pipeline arm changed in what a call is sent (the verifier reads exactly these): a template and flag set */
 const CHANGED: Record<PipeArm, (c: { template: string; flags: string[] }) => boolean> = {
   one: c => c.template === 'pick' && c.flags.includes('count'),
-  core: c => c.template === 'core' || (c.template === 'plan' && c.flags.includes('core')),
   // the plan (no options, an answer free of the endings, the paid gold way); every later card (its why is now the plan's own);
   // a report with the card's hope; the finale report (the paid gold fate)
   grafts: c => (c.template === 'plan' && c.flags.includes('grafts')) || (c.template === 'card' && !c.flags.includes('first'))
     || (c.template === 'report' && (c.flags.includes('hope') || c.flags.includes('answer'))),
   sides: c => (c.template === 'plan' && c.flags.includes('sides')) || (['card', 'report'].includes(c.template) && c.flags.includes('side')),
+  // a card that opens on what happened last (after a won job, now the report's summary; the prompt is C2's)
+  reads: c => c.template === 'card' && c.flags.includes('latest'),
+  // every plan, card and report it sends carries its `fixes` lines (the plan's edge, loss and trouble; a card's trouble phrase
+  // and the finale's stake; the report's hope, clue, secret, own words and the finale's one result sentence)
+  fixes: c => c.flags.includes('fixes'),
 };
 /** --render: the new or changed prompt variants of the selected pipeline arms, one file per call */
 function render() {
-  const out = path.join(LAB, 'runs', RUN, '_pipeline_rendered');
+  const name = opt('out') ?? '_pipeline_rendered';
+  if (!/^_[\w-]+$/.test(name)) { console.error(`--out: ${name} must be one folder name starting with "_" (a run's arm folders do not)`); process.exit(2) }
+  const out = path.join(LAB, 'runs', RUN, name);
   fs.rmSync(out, { recursive: true, force: true });
   fs.mkdirSync(out, { recursive: true });
   const index: string[] = [`# ${RUN} · the pipeline arms' new or changed prompt variants${MOCK ? ' (mock floor)' : ''}`, '',

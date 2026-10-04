@@ -34,7 +34,7 @@ import {
   type Chain, type FinaleFate,
 } from '../engine/chains.js';
 import {
-  newGraph, renderDossier, decayPass, guardEdges, modelEdges, chronicleOf, addEdge, touchEdge, edgeCount, effectiveSalience,
+  newGraph, renderDossier, decayPass, guardEdges, modelEdges, chronicleOf, addEdge, touchEdge, edgeCount, effectiveSalience, madeInPlay,
   type LoreGraph, type LoreNode, type RelEdge,
 } from '../engine/lore.js';
 import { rollName, rollPlaceName } from '../engine/names.js';
@@ -46,7 +46,7 @@ import type { AiProvider, ResolveQuestInput, ResolveQuestOut, AskSlotOut, Campai
 import { prefPick, chainPayoff, type TraitPrefs } from '../engine/economy.js';
 import { labFixtureProblems, nextLabOutcome, forceRoll, type LabFixture } from '../engine/lab.js';
 import {
-  hashStr, castableClients, pickClientFace, recentFaces, helped, HURT_BAND, WAY_ENDING, OPPONENT_EDGES,
+  hashStr, castableClients, pickClientFace, recentFaces, helped, HURT_BAND, WAY_ENDING, OPPONENT_EDGES, DEALT_TRADES,
   type FaceCandidate, type Face, type SagaPos, type CastEntry,
 } from '../engine/saga.js';
 import { raceOf, sexOf } from '../engine/plainwords.js';
@@ -2296,6 +2296,7 @@ export class Game {
       log: (kind, text) => this.log(kind, text),
       // the roster, the lore, the recent NPC window, near-misses — and every live saga's cast
       takenName: n => live.names.has(n) || this.nameTooSimilar(n),
+      takenTrade: t => live.trades.has(t),
       noteNpcName: n => { this.recentNpcNames.push(n); while (this.recentNpcNames.length > 60) this.recentNpcNames.shift() },
       npcPrefs: () => this.prefsFor('npc'),
       placeOk: p => this.placeRested(p),
@@ -2305,10 +2306,14 @@ export class Game {
   }
   /** a saga's title wherever the game prints one */
   private sagaTitle(c: Chain): string { return c.saga?.plan?.title ?? 'a saga' }
-  /** the people of every saga still in play, by id and by name — the live-saga cast fence */
-  private liveSagaCast(): { ids: Set<string>; names: Set<string> } {
-    const cast = this.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending').flatMap(c => c.saga?.world.cast ?? []);
-    return { ids: new Set(cast.map(p => p.id)), names: new Set(cast.map(p => p.name)) };
+  /** the people of every saga still in play, by id, by name and by trade — the live-saga cast fence. A trade is the
+   *  dealt one or, for one dealt none, any dealt trade its plan label carries ("a lizardfolk horse dealer") */
+  private liveSagaCast(): { ids: Set<string>; names: Set<string>; trades: Set<string> } {
+    const live = this.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending');
+    const cast = live.flatMap(c => c.saga?.world.cast ?? []);
+    const labels = live.flatMap(c => c.saga?.plan?.cast.map(p => p.label.toLowerCase()) ?? []);
+    const trades = new Set([...cast.flatMap(p => p.trade ? [p.trade] : []), ...DEALT_TRADES.filter(t => labels.some(l => new RegExp(`\\b${t}\\b`).test(l)))]);
+    return { ids: new Set(cast.map(p => p.id)), names: new Set(cast.map(p => p.name)), trades };
   }
   /** "in the Western Forests" — where a returning face is, as far as the company knows */
   private regionIn(region: string): string {
@@ -2321,7 +2326,7 @@ export class Game {
     const cyc = this.state.cycle;
     return this.state.lore.edges
       .filter(e => e.active && !!e.blurb.trim() && (e.from === id || e.to === id)
-        && (e.from === e.to || !!e.sourceChainId || this.card(e.from === id ? e.to : e.from)?.character?.role === 'merc'))
+        && (madeInPlay(e) || this.card(e.from === id ? e.to : e.from)?.character?.role === 'merc'))
       .sort((a, b) => Number(b.core) - Number(a.core) || effectiveSalience(b, cyc) - effectiveSalience(a, cyc))[0];
   }
   /** a returning focal's memory and where they are (D9), or nothing when the player holds no memory of them */
@@ -3514,7 +3519,7 @@ export class Game {
       deliveredCharacters: r.delivery.cards.filter(c => c.character).map(c => ({ id: c.id, name: c.name, tags: renderTags(c.tags) })),
     }));
     // 3) apply engine effects + AI outputs; lore write-backs AFTER all (collected first)
-    const pendingEdges: { from: string; to: string; type: string; blurb: string; importance: number }[] = [];
+    const pendingEdges: { from: string; to: string; type: string; blurb: string; importance: number; sourceQuestId?: string }[] = [];
     const byQuest = new Map(resolutions.map(r => [r.quest.id, r]));
     const applied = new Set<string>();
     // a throw inside applyResolution used to escape doEndCycle and surface as `engine error:` —
@@ -3919,7 +3924,7 @@ export class Game {
     r: Resolution,
     out: { before: string; turn?: string; turnActor?: string; speech?: { who: string; says: string }[]; after: string; injuries: { characterId: string; band: InjuryBand; cause?: string | null }[]; fleshed: { characterId: string; who: string; backstory: string; quirks: string[] }[]; edges: { from: string; to: string; type: string; blurb: string; importance: number }[] } | undefined,
     report: string[],
-    pendingEdges: { from: string; to: string; type: string; blurb: string; importance: number }[],
+    pendingEdges: { from: string; to: string; type: string; blurb: string; importance: number; sourceQuestId?: string }[],
     /** a saga quest's report (the v4 storyteller): its prose; the hurt was decided in the roll loop (r.saga) */
     sagaRep?: SagaReport,
   ) {
@@ -4086,7 +4091,7 @@ export class Game {
         : `🧭 The sweep turns up ${extra} more lead(s) — they wait on a Lead room to be read.`);
     }
     // lore edges from the AI (validated later in one pass)
-    pendingEdges.push(...modelEdges(out?.edges));
+    pendingEdges.push(...modelEdges(out?.edges).map(e => ({ ...e, sourceQuestId: q.id })));
     // narrate in the fiction's own order — setup, THEN the dice, THEN the outcome
     // (QUESTS §7: before-roll blind → after-roll sighted; the DICE are always shown, DESIGN §5).
     // A saga card echoes its prose only — never its quest log (D17: the placeholder and this block start alike)
@@ -4182,16 +4187,19 @@ export class Game {
   }
 
   /** the edges a soldier's own saga could start from, strongest first — never one to a fellow soldier: a seed may only
-   *  name people the saga can cast, and you cannot ride out to find someone standing in your own yard (2026-08-31) */
+   *  name people the saga can cast, and you cannot ride out to find someone standing in your own yard (2026-08-31). Never
+   *  a memory the company's play made (`madeInPlay`): the saga is told as their past, and a company saga's deed seeded
+   *  as one was retold as an old wrong, against that saga's own answer — its person seated as "knows the past" */
   private personalEdges(merc: Card): RelEdge[] {
     const inTheCompany = (id: string) => this.card(id)?.character?.role === 'merc';
     return this.state.lore.edges
-      .filter(e => e.active && !!e.blurb && (e.from === merc.id || e.to === merc.id))
+      .filter(e => e.active && !!e.blurb && (e.from === merc.id || e.to === merc.id) && !madeInPlay(e))
       .filter(e => !inTheCompany(e.from === merc.id ? e.to : e.from))
       .sort((a, b) => (Number(b.core) - Number(a.core)) || (b.salience - a.salience));
   }
-  /** the spark for a soldier's OWN saga (D12): the strongest thing the world remembers about them, else the past they
-   *  were fleshed with. Never a generic theme — that is what turned a personal saga into somebody else's ransom job */
+  /** the spark for a soldier's OWN saga (D12): the strongest thing the world remembers of them from before the company
+   *  (`personalEdges`), else the past they were fleshed with. Never a generic theme — that is what turned a personal saga
+   *  into somebody else's ransom job */
   private personalSeed(merc: Card): string {
     const top = this.personalEdges(merc)[0];
     if (top?.blurb) return top.blurb;
@@ -4475,7 +4483,9 @@ export class Game {
     }
     // the ARRANGEMENT joins the memory — dossiers once missed that a focal ended as a paid
     // informer because only the outcome word was recorded
-    guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `the saga ${this.sagaTitle(chain)} ended ${fate.fate}${approach ? ` — the company's way: ${approach.label}` : ''}`, importance: 0.85 }], st.cycle, () => freshId('e'));
+    // (a later saga's writer reads it as a memory: the deed as the story tells it, the gold way's money left on its button)
+    const way = approach && (approach.way && chain.saga?.plan ? flow.toldLabel(chain.saga, { way: approach.way, label: approach.label }) : approach.label);
+    guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `the saga ${this.sagaTitle(chain)} ended ${fate.fate}${way ? ` — the company's way: ${way}` : ''}`, importance: 0.85 }], st.cycle, () => freshId('e'));
   }
 
   /** give who/backstory/quirks to any owned/staged character that lacks them (ONE batched call) */

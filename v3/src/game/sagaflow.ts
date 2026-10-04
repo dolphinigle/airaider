@@ -17,14 +17,14 @@ import type { Lead } from '../engine/quests.js';
 import { coins, type Outcome, type SlotTest } from '../engine/roll.js';
 import { KEEP_THRESHOLD, type TraitPrefs } from '../engine/economy.js';
 import {
-  dealSaga, castSaga, rollHurt, clampHurt, helped, EPISODE_TESTS, WAY_TESTS, WAY_REWARD, HOW_BAND, SEED_ARM,
+  dealSaga, castSaga, rollHurt, clampHurt, helped, piped, EPISODE_TESTS, WAY_TESTS, WAY_REWARD, HOW_BAND, SEED_ARM, PIPE_ARM,
   type SagaRecord, type SeedArm, type PipeArm, type SagaWorld, type SagaPlan, type SagaPos, type LogRow, type Matter, type Hurt, type Cost, type Way,
   type EpisodeType, type CastEntry, type Face, type EpisodeTest,
 } from '../engine/saga.js';
 import {
   newKnowing, newState, planSaga, seedSteps, writeOutline, writeCard, writeReport, firstCardPayload, laterCardPayload, reportPayload,
   questLog, logLines, noteDelivered, forLineShown, onThisMatter, jobWhy, roadLines, roadHopes, mockOutline, bank, triedLine,
-  revealLint, choiceTarget, fateSentence, knowingOf, keepKnowing, roadOf, toNullable, PRONOUN, graftRoad,
+  revealLint, choiceTarget, fateSentence, knowingOf, keepKnowing, roadOf, toNullable, PRONOUN, graftRoad, toldOption,
   type ReportCall,
 } from '../ai/storyteller.js';
 import type { AiProvider, AskSlotOut } from '../ai/provider.js';
@@ -40,6 +40,8 @@ export interface SagaHost {
   log(kind: string, text: string): void;
   /** a name already in use or too close to one (roster, lore, recent NPC names, nameTooSimilar) */
   takenName(n: string): boolean;
+  /** a trade someone in another live saga already has (engine/saga.ts CastInput.takenTrade) */
+  takenTrade?(t: string): boolean;
   /** a coined name the world now holds (the recent-NPC window) */
   noteNpcName(n: string): void;
   /** the npc trait preferences (Settings) for the coined people */
@@ -48,7 +50,8 @@ export interface SagaHost {
   placeOk?(p: string): boolean;
   /** the seed arm to deal (North Star 7); absent: the build's SEED_ARM. The seed lab names one */
   seedArm?(): SeedArm;
-  /** a lab pipeline arm on top of the seed (engine/saga.ts PipeArm); absent: the build's pipeline. The seed lab names one */
+  /** the pipeline arm on top of the seed (engine/saga.ts PipeArm); absent: the build's PIPE_ARM. The seed lab names one,
+   *  or none (undefined: R5's pipeline, its A arms) */
   pipeArm?(): PipeArm | undefined;
   // the predicates settleFinale reads, for the Outcome line (sagaFate)
   hasRoom(type: string): boolean;
@@ -78,6 +81,7 @@ export function deal(host: SagaHost, chain: Chain, lead: Pick<Lead, 'lab'> | und
   const d = dealSaga(host.storyRng, host.state.recentThemeIds, { personal, personalSeed: pins.personalSeed, spark: lead?.lab?.spark, ...(arm !== 'themes' ? { arm } : {}) });
   const c = castSaga(host.storyRng, {
     focal, personal, region: chain.region, shape: d.shape, taken: n => host.takenName(n), prefs: host.npcPrefs?.(),
+    ...(host.takenTrade ? { takenTrade: (t: string) => host.takenTrade!(t) } : {}),
     focalMemory: pins.focalMemory, returningClient: pins.returningClient, seedPerson: pins.seedPerson, placeOk: host.placeOk ? p => host.placeOk!(p) : undefined,
     ...(d.kit ? { kit: { support: d.support ?? 0 } } : {}),
   });
@@ -87,7 +91,7 @@ export function deal(host: SagaHost, chain: Chain, lead: Pick<Lead, 'lab'> | und
     focalId: focal.id, cast: c.cast, stake: d.stake, places: c.places, land: c.land, seed: d.seed, tone: d.tone,
     region: chain.region, level: chain.level, ...(d.kit ? { kit: d.kit } : {}),
   };
-  const pipe = host.pipeArm?.();
+  const pipe = host.pipeArm ? host.pipeArm() : PIPE_ARM;
   if (pipe) world.pipe = pipe;
   const rec = newRecord(world);
   chain.saga = rec;
@@ -157,9 +161,9 @@ export async function card(host: SagaHost, chain: Chain): Promise<SagaCardOut> {
   const direction = host.direction();
   const retry = pos.attempt > 1;
   const cc = first ? firstCardPayload(plan, w, k, direction)
-    : laterCardPayload(plan, e, rec.latest, k, { finale: pos.finale, lastchance: rec.lastchance, retry, direction, why: jobWhy(plan, pos.finale ? w.N : pos.job, rec.hopes) });
+    : laterCardPayload(plan, e, rec.latest, k, { finale: pos.finale, lastchance: rec.lastchance, retry, direction, why: jobWhy(plan, pos.finale ? w.N : pos.job, rec.hopes), fixes: piped(w, 'fixes') });
   let prose: string;
-  if (first && w.pipe === 'grafts') {
+  if (first && piped(w, 'grafts')) {
     // pipe arm grafts (R6, F1): no outline call — the road and each later job's hope are the plan's own whys, a flagged
     // one kept off the screen (its row the title alone)
     prose = await writeCard(host.ai, cc, log);
@@ -245,14 +249,19 @@ export function reportCall(host: Pick<SagaHost, 'direction'>, chain: Chain, pos:
   f: { party: Card[]; decides: string; outcome: Outcome; hurt: Hurt[]; cost?: Cost; option?: { way: Way; label: string }; fate?: string; gravity: string }): ReportCall {
   const rec = recOf(chain), plan = planOf(rec);
   const e = pos.finale ? plan.showdown : plan.episodes[pos.job - 1]!;
+  // the chosen button's deed as the story tells it: the gold way's money stays on the button (toldOption)
+  const option = f.option && { way: f.option.way, label: toldLabel(rec, f.option) };
   // pipe arm grafts (R6, F1): a middle job's report is dealt the hope its card was dealt (the card's promise)
-  const hope = rec.world.pipe === 'grafts' && !pos.finale ? jobWhy(plan, pos.job, rec.hopes) : undefined;
+  const hope = piped(rec.world, 'grafts') && !pos.finale ? jobWhy(plan, pos.job, rec.hopes) : undefined;
   return reportPayload({
-    plan, e, card: prose, party: f.party, decides: f.decides, outcome: f.outcome, finale: pos.finale, hurt: f.hurt, cost: f.cost, option: f.option, fate: f.fate,
+    plan, e, card: prose, party: f.party, decides: f.decides, outcome: f.outcome, finale: pos.finale, hurt: f.hurt, cost: f.cost, option, fate: f.fate,
     k: knowingOf(rec), gravity: f.gravity, direction: host.direction(), state: { learned: [...rec.state.learned], held: [...rec.state.held] },
-    ...(hope ? { hope } : {}),
+    ...(hope ? { hope } : {}), ...(piped(rec.world, 'fixes') ? { fixes: { places: rec.world.places } } : {}),
   });
 }
+/** a finale button's deed as the writer and the story's own lines get it (storyteller toldOption): the report's `plan`,
+ *  the memory the saga leaves. The button itself keeps its label */
+export const toldLabel = (rec: SagaRecord, o: { way: Way; label: string }): string => toldOption(o, planOf(rec).cast, piped(rec.world, 'grafts'));
 /** the report writer (or its floor) */
 export const writeSagaReport = (host: SagaHost, call: ReportCall) => writeReport(host.ai, call, (kind, t) => host.log(kind, t));
 
@@ -290,8 +299,9 @@ export function afterReport(host: SagaHost, chain: Chain, pos: SagaPos, a: { out
     : pos.job + 1 > N - 1 || rec.lastchance ? 'it now comes to a head' : 'the story moves on';
   if (pos.finale) { const rl = revealLint(plan, w, rep.after); if (rl) host.log('dev', `saga reveal lint (log-only): ${rl}`) }
   // (R4 verify) the next card opens on what happened last: a won job's `win`; a failed try's summary; a last-chance
-  // finale's job and what stopped it
-  rec.latest = wonMiddle && e.win ? e.win : failedJob && !rec.lastchance ? rep.summary : tried;
+  // finale's job and what stopped it. Pipe arm reads (D1): a won job's summary too — the text the player just read, never
+  // the plan's forecast of it (written before play, often with no doer, so the card invented one)
+  rec.latest = wonMiddle && e.win && !piped(w, 'reads') ? e.win : failedJob && !rec.lastchance ? rep.summary : tried;
   delete rec.cache;
   return { status, book: `📖 ${plan.title}: ${status}. ${rep.summary}`, tried };
 }
@@ -311,8 +321,9 @@ export interface FateFacts {
   rosterRoom: boolean;
   /** a captive: a Dungeon, and a free cell */
   dungeon: boolean; cellRoom: boolean;
-  /** pipe arm grafts (R6, F2): the gold way is paid, never a treasure taken */
-  paid?: boolean;
+  /** pipe arm grafts: the gold way is told as the person going free — no treasure (R6, F2), its money on the button only
+   *  (designer 2026-10-04) */
+  freeGold?: boolean;
 }
 /** the facts settleFinale reads, read the same way */
 export function fateFacts(host: SagaHost, chain: Chain, way: Way, outcome: Outcome, fate?: FinaleFate): FateFacts {
@@ -326,7 +337,7 @@ export function fateFacts(host: SagaHost, chain: Chain, way: Way, outcome: Outco
     void: !!focalCard && kind !== 'gold' && chain.bank < focalCard.value * KEEP_THRESHOLD,
     rosterRoom: host.roster().filter(m => m.id !== chain.focalId).length < host.rosterCapacity(),
     dungeon: host.hasRoom('dungeon'), cellRoom: host.captiveCount() < host.captiveCapacity(),
-    ...(recOf(chain).world.pipe === 'grafts' ? { paid: true } : {}),
+    ...(piped(recOf(chain).world, 'grafts') ? { freeGold: true } : {}),
   };
 }
 /** the Outcome sentence: the lab's wording (fateSentence) wherever settleFinale does what the lab assumed, and a plain fact
@@ -342,7 +353,7 @@ export function sagaFate(x: FateFacts): string {
   if (x.personal || x.focalIsMerc) return `The matter closes around ${name}, who already stands with the company.`;
   const kind = WAY_REWARD[x.way];
   if (x.void) return `The work earned too little to keep ${name}, who passes out of the company's reach, for now.`;
-  if (kind === 'gold') return fateSentence('gold', x.outcome, x.focal, x.target, x.paid);
+  if (kind === 'gold') return fateSentence('gold', x.outcome, x.focal, x.target, x.freeGold);
   if (kind === 'recruit') return x.rosterRoom ? fateSentence('recruit', x.outcome, x.focal, x.target) : `${name} is won over, but the roster is full, so ${he.sub} waits at the tavern.`;
   if (!x.dungeon) return `${name} is taken, but the fort has no Dungeon to hold ${he.obj}.`;
   if (!x.cellRoom) return `${name} is taken, but the fort's cells are full.`;
@@ -352,6 +363,10 @@ export function sagaFate(x: FateFacts): string {
 // ─── views (read-only: they never write Knowing) ───────────────────────────────────────────────
 
 const LIKELY: Record<string, string> = { recruit: 'they may join the company', captive: 'they may end in your cells', gold: 'their treasure may pay out', talk: "a soldier's past to settle" };
+/** pipe arm grafts: the gold way's likely end as its story tells it (FREE_GOLD / FREE_HELPED_GOLD) — no treasure, no money:
+ *  the money is the finale button's alone (designer 2026-10-04) */
+const LIKELY_FREE = 'they may go their way';
+const likelyOf = (w: SagaWorld) => w.personal ? LIKELY.talk! : w.kind === 'gold' && piped(w, 'grafts') ? LIKELY_FREE : LIKELY[w.kind]!;
 const MARK: Record<Outcome, string> = { success: '✓', partial: '~', failure: '✗' };
 /** one row of So far, as both UIs print it: `n` is the job's number, or "finale" — the finale is no job number (a skipped
  *  job left "1, 2, 2, 4") */
@@ -386,7 +401,7 @@ export function chronicle(chain: Chain): Chronicle | null {
   return {
     title: plan.title, state: !rec.lines.length && !rec.card1 ? 'planned' : finale ? (finale === 'lost' ? 'slipped' : 'done') : gone ? 'slipped' : 'active',
     rows, card1: rec.card1,
-    likely: LIKELY[rec.world.personal ? 'talk' : rec.world.kind]!,
+    likely: likelyOf(rec.world),
     ...(fin ? { ending: rec.ending ?? fin.text } : gone ? { ending: 'it slipped away before its finale' } : {}),
     setbacks: { failures: chain.failures, budget: chain.failureBudget },
     lines: rec.lines.map(l => ({ ...l, party: [...l.party], hurt: l.hurt.map(h => ({ ...h })) })),

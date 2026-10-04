@@ -13,9 +13,9 @@ import type { Card } from '../engine/cards.js';
 import type { Outcome } from '../engine/roll.js';
 import { RACE_WORD, an, manWoman, soldierIs } from '../engine/plainwords.js';
 import {
-  TYPES, JOB_TYPES, WAY_ENDING, WAY_ATTR, NUMBER_WORD, helped, wayMeans, wayWord, wayOf, partOf, waysOf, hashStr, seedOf, seedText,
+  TYPES, JOB_TYPES, WAY_ENDING, WAY_ATTR, NUMBER_WORD, FREE_WAY, helped, wayMeans, wayWord, wayOf, partOf, waysOf, hashStr, seedOf, seedText,
   type JobType, type Way, type SagaPerson, type Trouble, type Episode, type CastEntry, type SagaPlan, type SagaState,
-  type SagaWorld, type Hurt, type Cost, type LogRow, type SagaRecord, type SagaCore, keepPicked,
+  type SagaWorld, type Hurt, type Cost, type LogRow, type SagaRecord, keepPicked, piped,
 } from '../engine/saga.js';
 import { renderSaga, wordCount, type SagaTemplate } from './prompts/saga/render.js';
 import { PICKS, CASTS, KIT_DEAL } from '../engine/seedkit.js';
@@ -42,15 +42,14 @@ export function planPayload(ctx: PlanCtx): { payload: Record<string, unknown>; f
   if (seed.keywords) flags.push('keywords');
   if (seed.premise) flags.push('premise');
   if (w.cast.some(p => p.part === '')) flags.push('support');
-  // a lab pipe arm (engine/saga.ts PipeArm): core's fixed facts (the plan writes no question or answer of its own); grafts'
-  // engine buttons, paid gold way and an answer that need not fit every ending; sides' side per person
-  const core = w.pipe === 'core' ? w.kit?.core : undefined;
-  if (core) flags.push('core');
-  if (w.pipe === 'grafts') flags.push('grafts');
-  if (w.pipe === 'sides') flags.push('sides');
+  // a pipe arm (engine/saga.ts PipeArm): grafts' engine buttons, money-free gold way and an answer that need not fit every
+  // ending (the build's; D1 and D2 ride on it); sides' side per person
+  if (piped(w, 'grafts')) flags.push('grafts');
+  if (piped(w, 'sides')) flags.push('sides');
+  // pipe arm fixes (D2): each edge beats the showdown's trouble, the loss is what that trouble takes, the trouble's `with`
+  if (piped(w, 'fixes')) flags.push('fixes');
   const payload: Record<string, unknown> = { seed: seed.text };
   if (seed.keywords) payload.keywords = seed.keywords;
-  if (core) payload.core = { want: core.want, question: core.question, answer: core.answer, against: core.against };
   payload.jobs = NUMBER_WORD[w.N - 1];
   payload.types = JOB_TYPES.map(t => ({ type: t, do: TYPES[t].do, kind: TYPES[t].kind }));
   // (R4 verify) everyone's race reaches the plan: the lean asker had none, and the label rule "what a stranger sees" made
@@ -67,8 +66,10 @@ export function planPayload(ctx: PlanCtx): { payload: Record<string, unknown>; f
     };
   });
   const ways = waysOf(w), isHelped = helped(focalOf(w));
+  // (grafts) the gold way reaches the plan as the end the person meets, by name and gloss: its money is the button's alone
+  const freeGold = piped(w, 'grafts'), named = (v: Way) => freeGold && v === 'gold' ? FREE_WAY : v;
   payload.ending = w.personal ? { about: w.focalId, likely: wayWord(ways[0]!), ways: ways.map(wayWord) }
-    : { about: w.focalId, likely: ways[0], ways: ways.map(v => ({ way: v, means: wayMeans(v, isHelped, w.pipe === 'grafts') })) };
+    : { about: w.focalId, likely: named(ways[0]!), ways: ways.map(v => ({ way: named(v), means: wayMeans(v, isHelped, freeGold) })) };
   payload.land = w.land;
   payload.places = w.places;
   payload.tone = w.tone;
@@ -80,7 +81,9 @@ export function planPayload(ctx: PlanCtx): { payload: Record<string, unknown>; f
 // ─── the plan: schema, repairs, defects (§2.7) ──────────────────────────────────────────────────
 
 const zs = z.union([z.string(), z.number()]).transform(String).optional().catch(undefined);
-export const zTrouble = z.object({ who: zs, carry: zs, will: zs }).partial().optional().catch(undefined);
+/** `with`: pipe arm fixes (D2) asks for what they fight with under that key (a "carry" key drew things nobody carries: "a
+ *  laden ship"); it fills `carry` */
+export const zTrouble = z.object({ who: zs, carry: zs, with: zs, will: zs }).partial().optional().catch(undefined);
 /** an edge as written: a plain line (in job order), or an object naming its job ({"job": 2, "helps": "…"}) */
 export const zEdge = z.union([z.string(), z.object({ job: z.any().optional(), n: z.any().optional(), helps: zs, edge: zs, how: zs }).passthrough()]);
 export const zEp = z.object({
@@ -176,7 +179,7 @@ export function validatePlan(raw: unknown, ctx: PlanCtx): { plan: SagaPlan | nul
     if (actFor && !want) defects.push(`missing want for ${p.id}`);
     if (p.seat === 'soldier' && !past) defects.push('missing soldier past');
     // pipe arm sides: whose side they are on, and why (a missing one is no defect: the person then has none)
-    const side = w.pipe === 'sides' ? got?.side?.trim() || undefined : undefined;
+    const side = piped(w, 'sides') ? got?.side?.trim() || undefined : undefined;
     return { ...p, label, want: actFor ? want || cannedWant(p, w.stake) : '', ...(past ? { past } : {}), ...(side ? { side } : {}) };
   });
   // a personal saga's soldier is in every job's people, for the prose (the lab's pickParty sent them on every job); the
@@ -191,7 +194,7 @@ export function validatePlan(raw: unknown, ctx: PlanCtx): { plan: SagaPlan | nul
   };
   const trouble = (t: z.infer<typeof zTrouble>, where: string): Trouble => {
     if (!t?.who?.trim()) defects.push(`missing trouble in ${where}`);
-    return { who: t?.who?.trim() ?? '', carry: t?.carry?.trim() ?? '', will: t?.will?.trim() ?? '' };
+    return { who: t?.who?.trim() ?? '', carry: (t?.carry ?? t?.with)?.trim() ?? '', will: t?.will?.trim() ?? '' };
   };
   const want = w.N - 1;
   const eps = (o.episodes ?? []);
@@ -228,7 +231,7 @@ export function validatePlan(raw: unknown, ctx: PlanCtx): { plan: SagaPlan | nul
   const ways = waysOf(w);
   // pipe arm grafts (R6, F2): the ENGINE owns the ending buttons, one template per way about the person the ending decides
   // by label, so a button cannot name a secret (option spoilers 8 → 0 in R6); the plan writes none
-  const engineButtons = w.pipe === 'grafts';
+  const engineButtons = piped(w, 'grafts');
   // a way written into `label` and the line into `way` is swapped back; a way-like word stuck before
   // the line ("Enlist: the craftsman accepts…", "Bind — seize her…") goes, as the button shows the ending
   const opts = (engineButtons ? [] : o.options ?? []).map(x => {
@@ -247,10 +250,8 @@ export function validatePlan(raw: unknown, ctx: PlanCtx): { plan: SagaPlan | nul
     if (!got) repairs.push(`canned option label for ${way}`);
     return { way, label: got || cannedOption(way, cast) };
   });
-  // pipe arm core: the question and the answer are the core call's, written first; the plan writes neither
-  const core = w.pipe === 'core' ? w.kit?.core : undefined;
   const plan: SagaPlan = {
-    title: need(o.title, 'title'), question: need(core?.question ?? o.question, 'question'), answer: need(core?.answer ?? o.answer, 'answer'),
+    title: need(o.title, 'title'), question: need(o.question, 'question'), answer: need(o.answer, 'answer'),
     cast, episodes, showdown, options,
   };
   // a cast id in prose ("c12 prowls the slope", "p1's home") becomes the person: their name once known, else
@@ -302,6 +303,17 @@ export function validatePlan(raw: unknown, ctx: PlanCtx): { plan: SagaPlan | nul
     }
     for (const o of plan.options) o.label = unRole(o.label, 'options');
     for (const c of plan.cast) if (c.side) c.side = unRole(c.side, `${c.id} side`);
+  }
+  // (pipe arm fixes, D2) the company is the player's own: plan text that hands it to the one it acts for ("take her company
+  // to the island") read in a report's hope as that person's men. Their possessive (name, or the pronoun of their sex) goes
+  if (actFor && piped(w, 'fixes')) {
+    const own = [...nameParts(actFor).map(x => `${esc(x)}['’]s`), PRONOUN[actFor.sex].pos, 'their'].join('|');
+    const OWNED = new RegExp(`\\b(?:${own})\\s+company\\b`, 'i');
+    const unOwn = (t: string, where: string) => OWNED.test(t) ? (repairs.push(`owned company in ${where}`), t.replace(new RegExp(OWNED.source, 'gi'), 'the company')) : t;
+    for (const e of [...plan.episodes, plan.showdown]) {
+      for (const k of ['job', 'why', 'win', 'gain', 'learn', 'settles', 'lose'] as const) if (e[k]) e[k] = unOwn(e[k]!, `episode ${e.n}`);
+      if (e.edge) e.edge = e.edge.map(x => unOwn(x, `episode ${e.n}`));
+    }
   }
   for (const c of plan.cast) c.label = c.label.trim();
   // an unmet name the model somehow wrote goes back to its label (it saw no such name)
@@ -359,7 +371,8 @@ export const theLabel = (label: string) => `the ${label.split(',')[0]!.replace(/
 const refOf = (p: SagaPerson & { label: string }) => p.known ? p.name : theLabel(p.label);
 export const PRONOUN = { male: { sub: 'he', obj: 'him', pos: 'his' }, female: { sub: 'she', obj: 'her', pos: 'her' } } as const;
 /** an ending button: the floor's (and a missing label's) stand-in; pipe arm grafts's every button (`paid`: R6's gold, which
- *  presupposes no treasure — the person is cornered and pays to go free) */
+ *  presupposes no treasure — the person is cornered and pays to go free). The button is the one place the gold way's
+ *  money shows (designer 2026-10-04); the writer and the story's own lines get the deed as `toldOption` words it */
 export function cannedOption(way: Way, cast: CastEntry[], paid = false): string {
   const f = cast.find(p => p.focal)!, opp = cast.find(p => p.seat === 'opponent')!;
   const who = refOf(f), o = refOf(opp);
@@ -370,6 +383,14 @@ export function cannedOption(way: Way, cast: CastEntry[], paid = false): string 
     gold, talk: `Talk it out with ${o}`, fight: `Fight it out with ${o}`,
     sneak: `Slip past ${o}'s guards and settle it unseen`,
   }[way];
+}
+/** the deed a finale button stands for, as the writer and the story's own lines get it (the report's `plan`, the memory the
+ *  saga leaves): the button's label, but the gold way's money stays on its button (designer 2026-10-04) — told, the person
+ *  goes free and nothing is paid. `freeGold`: pipe arm grafts (its buttons are cannedOption's); else the label as written */
+export function toldOption(o: { way: Way; label: string }, cast: CastEntry[], freeGold: boolean): string {
+  if (!freeGold || o.way !== 'gold') return o.label;
+  const f = cast.find(p => p.focal)!, he = PRONOUN[f.sex];
+  return helped(f) ? `Let ${refOf(f)} go ${he.pos} way` : `Corner ${refOf(f)}, then let ${he.obj} go`;
 }
 /** what the one who asked wants, and what is settled for them, from the dealt stake: the floor's
  *  (and a missing want's) stand-in, concrete per saga instead of one canned line for every saga */
@@ -488,7 +509,7 @@ export function planLint(plan: SagaPlan, w: SagaWorld, seed = seedText(w)): stri
   for (const e of [...plan.episodes, plan.showdown]) for (const f of ['who', 'carry', 'will'] as const) if (long(e.trouble[f], 6)) out.push(`episode ${e.n} trouble.${f} past 6 words`);
   if (long(plan.showdown.lose, 8) || /\b(?:loses?|lost)\b|^if\b/i.test(plan.showdown.lose ?? '')) out.push('lose past a few words');
   for (const c of plan.cast) if (long(c.past, 8)) out.push(`${c.id} past past a few words`);
-  if (w.pipe === 'sides') for (const c of plan.cast) if (c.seat !== 'soldier') { if (!c.side) out.push(`${c.id} has no side`); else if (long(c.side, 8)) out.push(`${c.id} side past 8 words`) }
+  if (piped(w, 'sides')) for (const c of plan.cast) if (c.seat !== 'soldier') { if (!c.side) out.push(`${c.id} has no side`); else if (long(c.side, 8)) out.push(`${c.id} side past 8 words`) }
   // (R2, S2) a gain is a few words; a gain that is the person the ending decides is held before the showdown
   const target = choiceTarget(plan);
   for (const e of plan.episodes) {
@@ -497,6 +518,15 @@ export function planLint(plan: SagaPlan, w: SagaWorld, seed = seedText(w)): stri
     if (e.gain && own && new RegExp(`\\b(?:${own})\\b(?!['’]s)`, 'i').test(e.gain)) out.push(`episode ${e.n} gain is the person in ending`);
   }
   (plan.showdown.edge ?? []).forEach((x, i) => { if (long(x, 14)) out.push(`edge ${i + 1} past a few words`) });
+  // (pipe arm fixes, D2) each edge beats the showdown's trouble, and the loss is what that trouble takes: an edge that
+  // shares no word with the showdown's job or trouble, or a loss none with its trouble, had to be invented in the finale
+  if (piped(w, 'fixes')) {
+    const sd = plan.showdown, roots = (t: string) => new Set(words4(t).filter(x => !STOP.has(x)).map(root));
+    const meets = (a: string, b: Set<string>) => [...roots(a)].some(x => b.has(x));
+    const scene = roots(`${sd.job} ${sd.trouble.who} ${sd.trouble.carry} ${sd.trouble.will}`);
+    (sd.edge ?? []).forEach((x, i) => { if (x && !meets(x, scene)) out.push(`edge ${i + 1} names nothing of the showdown's job or trouble`) });
+    if (sd.lose && !meets(sd.lose, roots(`${sd.trouble.who} ${sd.trouble.will}`))) out.push('lose shares nothing with the showdown\'s trouble');
+  }
   if (/\bif\b/i.test(plan.showdown.settles ?? '')) out.push('settles says "if"');
   // the showdown's trouble should be someone in cast, by label
   if (!plan.cast.some(p => p.seat !== 'soldier' && mentions(plan.showdown.trouble.who, p))) out.push('showdown trouble names nobody in cast');
@@ -616,6 +646,14 @@ export const openQuestion = (q: string) => {
   return m ? m[1]! : q.trim();
 };
 
+/** (pipe arm fixes, D2) the trouble as a card receives it: ONE phrase, never three labelled parts — {who, carry, will}
+ *  came back as three stock sentences on nearly every card ("X. They carry Y. They will Z.", ledger law 6b) */
+export function troublePhrase(t: Trouble, will: boolean): string {
+  const arms = bare(t.carry).replace(/^(?:with|carrying|armed with)\s+/i, '');
+  const act = will ? bare(t.will).replace(/^(?:they\s+)?will\s+/i, '') : '';
+  return `${bare(t.who)}${arms ? ` with ${arms}` : ''}${act ? `, who will ${act}` : ''}`;
+}
+
 export function firstCardPayload(plan: SagaPlan, w: SagaWorld, k: Knowing, direction?: string): CardCall {
   const e = plan.episodes[0] ?? plan.showdown;
   const client = clientOf(plan);
@@ -630,8 +668,9 @@ export function firstCardPayload(plan: SagaPlan, w: SagaWorld, k: Knowing, direc
   const memory = mine?.memory ? String(mine.memory) : undefined;
   if (mine) delete mine.memory;
   const premise = { who: displayName(client, k), wants: wantPhrase(client.want), ...(past ? { past } : {}), ...(memory ? { memory } : {}), unknown: openQuestion(plan.question) };
-  // (R5, P5) the trouble without `will`, as on the finale (R3, W4)
-  const trouble = { who: e.trouble.who, carry: e.trouble.carry };
+  // (R5, P5) the trouble without `will`, as on the finale (R3, W4); pipe arm fixes, as one phrase
+  const fixes = piped(w, 'fixes');
+  const trouble = fixes ? troublePhrase(e.trouble, false) : { who: e.trouble.who, carry: e.trouble.carry };
   const flags = ['first'];
   if (e.why) flags.push('why');
   if (past) flags.push('personal');
@@ -639,17 +678,20 @@ export function firstCardPayload(plan: SagaPlan, w: SagaWorld, k: Knowing, direc
   if (names.some(n => n.memory)) flags.push('memory');
   flags.push(...entryFlags(names));
   if (direction) flags.push('direction');
+  if (fixes) flags.push('fixes');
   return { payload: { premise, job: e.job, ...(e.why ? { why: e.why } : {}), trouble, names, ...(direction ? { direction } : {}) }, flags, vars: { MAX: 70 } };
 }
 
 /** (R4, Q2) a later card is a scene: what happened last, the job and why it matters, who is in the way. The bookkeeping
- *  is the quest log's (`questLog`). Kept: latest or retry, job, why, trouble, names; `lose` only at a last chance */
-export function laterCardPayload(plan: SagaPlan, e: Episode, latest: string, k: Knowing, o: { finale: boolean; lastchance: boolean; retry?: boolean; direction?: string; why?: string }): CardCall {
+ *  is the quest log's (`questLog`). Kept: latest or retry, job, why, trouble, names; `lose` only at a last chance. Pipe arm
+ *  fixes (D2): `lose` on every finale (the finale card had no stake), whose names keep the one who loses it, and the
+ *  trouble as one phrase (`troublePhrase`) */
+export function laterCardPayload(plan: SagaPlan, e: Episode, latest: string, k: Knowing, o: { finale: boolean; lastchance: boolean; retry?: boolean; direction?: string; why?: string; fixes?: boolean }): CardCall {
   const client = clientOf(plan), target = choiceTarget(plan);
   // (R5 verify 2) the job's hope from its one owner (`jobWhy`); the finale none
   const why = o.finale ? undefined : o.why?.trim() || undefined;
-  const always = o.finale ? [target.id] : [];
-  const lose = o.finale && o.lastchance && e.lose ? { who: callName(client, k), loses: e.lose } : undefined;
+  const lose = o.finale && (o.lastchance || o.fixes) && e.lose ? { who: callName(client, k), loses: e.lose } : undefined;
+  const always = o.finale ? [target.id, ...(lose && o.fixes && client.id !== target.id ? [client.id] : [])] : [];
   const planText = `${e.job} ${why ?? ''} ${JSON.stringify(e.trouble)}`;
   // (R4 verify) the finale's PLANS buttons name people too, so a named entry they call by label keeps it
   const shown = o.finale ? plan.options.map(x => x.label).join(' ') : '';
@@ -664,10 +706,12 @@ export function laterCardPayload(plan: SagaPlan, e: Episode, latest: string, k: 
   // (R5 verify) a retry deals only what stopped the last try (the job is under `job`)
   const payload: Record<string, unknown> = { ...(o.retry ? { retry: latest } : { latest }), job: e.job, ...(why ? { why } : {}) };
   if (why) flags.push('why');
-  // (R3, W4; R5 verify, verify 2) the trouble's `will` on a later card or finale with neither a retry nor `lose`
-  const will = !lose && !o.retry ? e.trouble.will : '';
-  payload.trouble = will ? { who: e.trouble.who, carry: e.trouble.carry, will } : { who: e.trouble.who, carry: e.trouble.carry };
+  // (R3, W4; R5 verify, verify 2) the trouble's `will` on a later card or finale with neither a retry nor a last chance's
+  // `lose` (the showdown's will is its sharpest threat: a finale's stake, D2, keeps it)
+  const will = !(lose && o.lastchance) && !o.retry ? e.trouble.will : '';
+  payload.trouble = o.fixes ? troublePhrase(e.trouble, !!will) : will ? { who: e.trouble.who, carry: e.trouble.carry, will } : { who: e.trouble.who, carry: e.trouble.carry };
   if (will) flags.push('will');
+  if (o.fixes) flags.push('fixes');
   // `lose` carries its owner: a bare "his livelihood" read as the one the plans decide about, flipping the stakes
   if (lose) payload.lose = lose;
   payload.names = names;
@@ -845,14 +889,27 @@ export function whyFlags(plan: SagaPlan, w: SagaWorld, seed = seedText(w)): stri
  *  pronoun or their label opens on how the log names them; anything else continues "<who> hopes" */
 export const planHope = (why: string, plan: SagaPlan, who: string): string => {
   const c = clientOf(plan);
-  const parts = nameParts(c).map(esc).join('|');
+  // the whole name first, longest first: name parts skip a coined name's particles, so "Vyell the Quiet" lost only "Vyell"
+  // and read "<who> hopes the Quiet can…"
+  const whole = [...new Set([c.name, who].map(x => x.trim()).filter(x => x.includes(' ')))].sort((a, b) => b.length - a.length).map(esc);
+  const parts = [...whole.map(x => x.replace(/\\ /g, '\\s+')), ...nameParts(c).map(esc)].join('|');
   const noun = headNoun(c.label);
-  const subj = new RegExp(`^(?:${parts ? `(?:(?:${parts})\\s+)+|` : ''}(?:he|she|they)\\s+${noun.length > 2 ? `|the\\s+(?:[\\w'-]+\\s+){0,2}?${esc(noun)}\\s+` : ''})(?=[a-z])`, 'i');
+  const who0 = `(?:${parts ? `(?:(?:${parts})\\s+)+|` : ''}(?:he|she|they)\\s+${noun.length > 2 ? `|the\\s+(?:[\\w'-]+\\s+){0,2}?${esc(noun)}\\s+` : ''})`;
+  const subj = new RegExp(`^${who0}(?=[a-z])`, 'i');
   const t0 = bare(why).replace(subj, '');
   // mid-sentence now: a capital goes unless it opens a name or a place the plan's jobs use mid-sentence
-  const w0 = (t0.split(/\s+/)[0] ?? '').replace(/['’]s$/, '');
-  const proper = /^\p{Lu}/u.test(w0) && (plan.cast.some(p => nameParts(p).includes(w0)) || [...plan.episodes, plan.showdown].some(e => new RegExp(`\\S\\s+${esc(w0)}\\b`).test(e.job)));
-  const t = (proper ? t0 : lc1(t0)).replace(/^(?:hope|hoping)\b/, 'hopes');
+  const midSentence = (x: string) => {
+    const w0 = (x.split(/\s+/)[0] ?? '').replace(/['’]s$/, '');
+    const proper = /^\p{Lu}/u.test(w0) && (plan.cast.some(p => nameParts(p).includes(w0)) || [...plan.episodes, plan.showdown].some(e => new RegExp(`\\S\\s+${esc(w0)}\\b`).test(e.job)));
+    return proper ? x : lc1(x);
+  };
+  // a phrase fronted before the asker's own clause ("With the boat, Donglanel can follow the mare") read "<who> hopes with
+  // the boat, Donglanel can follow…", the asker twice: it takes "that", and the asker inside becomes a pronoun. Not when
+  // the why already opens on the asker's verb ("hopes that once she has the key, she can…"): "<who> hopes that hopes that…"
+  const VERB = /^(?:hopes?|hoping|can|could|may|might|will|would|wants?|needs?)\b/i;
+  const front = VERB.test(t0) ? null : t0.match(new RegExp(`^([^,]{2,60}),\\s+${who0}((?:hopes|can|could|may|might|will|would|wants?|needs?)\\b.*)$`, 'i'));
+  if (front) return sentence(`${who} hopes that ${midSentence(front[1]!)}, ${PRONOUN[c.sex].sub} ${front[2]}`);
+  const t = midSentence(t0).replace(/^(?:hope|hoping)\b/, 'hopes');
   return sentence(`${who} ${/^(?:hopes|can|could|may|might|will|would|wants?|needs?)\b/.test(t) ? t : `hopes ${t}`}`);
 };
 /** pipe arm grafts: the road and each job's hope from the PLAN'S OWN whys — the one who knows the story — never from a call
@@ -959,10 +1016,13 @@ export function reportPayload(a: {
   state: SagaState;
   /** pipe arm grafts (R6, F1): the hope this job's card was dealt — a won job's report keeps that promise or shows why not */
   hope?: string;
+  /** pipe arm fixes (D2): the verifier's report fixes (the `fixes` lines; the finale's result as one sentence, `oneResult`) */
+  fixes?: { places: readonly string[] };
 }): ReportCall {
   const { plan, e, k } = a;
   const failedJob = a.outcome === 'failure' && !a.finale;
-  const result = failedJob ? undefined : a.finale ? `${a.fate} ${a.outcome === 'failure' ? lossSentence(plan) : e.settles}` : e.win;
+  const settled = a.outcome === 'failure' ? lossSentence(plan) : e.settles ?? '';
+  const result = failedJob ? undefined : a.finale ? (a.fixes ? oneResult(a.fate ?? '', settled, plan, a.fixes.places) : `${a.fate} ${settled}`) : e.win;
   // a won middle job brings its gain home and its learn to light (R2, S1/S2); a failed one neither
   const won = !a.finale && !failedJob;
   // people: those PRESENT in this job, never a soldier sent. (R3 verify) Presence is the plan's own list, the one the
@@ -1001,6 +1061,7 @@ export function reportPayload(a: {
   // the answer travels with the question it answers; it comes out inside `after`, in time order
   if (a.finale) { payload.answer = { question: plan.question, secret: plan.answer }; flags.push('answer') }
   if (a.direction) { payload.direction = a.direction; flags.push('direction') }
+  if (a.fixes) flags.push('fixes');
   flags.push(...(failedJob ? ['failure', 'stopped'] : ['moved']));
   // `after`'s room grows with what it must show beyond the deciding moment
   const shows = a.hurt.length + (a.cost ? 1 : 0) + (payload.brought ? 1 : 0) + (payload.clue ? 1 : 0);
@@ -1009,13 +1070,21 @@ export function reportPayload(a: {
   return { payload, flags, vars: { B, A: a.finale ? A0 + 10 * Math.max(0, finaleShows - 2) : Math.min(140, A0 + 15 * shows) } };
 }
 
+/** (pipe arm fixes, D2) the finale's way and what it settles as ONE result sentence ("Muvulrea is taken to the fort's
+ *  cells, and Patty gets the ring back."): the summary is one sentence, and it could not be when its source was two */
+export function oneResult(fate: string, settled: string, plan: SagaPlan, places: readonly string[]): string {
+  const a = bare(fate), b = bare(settled);
+  if (!a || !b) return sentence(a || b);
+  return `${a}, and ${leadsWithName(b, plan, places) ? b : lc1(b)}.`;
+}
 /** the lab's fate fact for the finale's `result` and the button ending (§2.6); the game's Outcome line merges it with
  *  every branch settleFinale can take (sagaflow.ts sagaFate) */
-export function fateSentence(way: Way, outcome: Outcome, focal: CastEntry, target?: CastEntry, paid = false): string {
+export function fateSentence(way: Way, outcome: Outcome, focal: CastEntry, target?: CastEntry, freeGold = false): string {
   const t = target?.name ?? 'the one in the way';
   if (outcome === 'failure') return focal.seat === 'soldier' ? `${t} still stands in ${focal.name}'s way.` : `${focal.name} slips out of the company's reach, for now.`;
-  // (pipe arm grafts, R6 F2) the gold way is paid, never a treasure taken
-  const gold = paid ? (helped(focal) ? `${focal.name} pays the company and goes ${PRONOUN[focal.sex].pos} way.` : `${focal.name} is cornered and pays the company to go free.`)
+  // (pipe arm grafts) the gold way as the story tells it: never a treasure taken (R6 F2), and no money — that shows on its
+  // finale button only (designer 2026-10-04); the same ending as the plan's gloss (FREE_GOLD) and the report's plan
+  const gold = freeGold ? (helped(focal) ? `${focal.name} goes ${PRONOUN[focal.sex].pos} way.` : `${focal.name} is cornered, then let go.`)
     : helped(focal) ? `${focal.name} shares ${PRONOUN[focal.sex].pos} treasure with the company and goes ${PRONOUN[focal.sex].pos} way.` : `The company takes ${focal.name}'s treasure, and ${PRONOUN[focal.sex].sub} goes free.`;
   return {
     recruit: `${focal.name} joins the company.`, captive: `${focal.name} is taken to the fort's cells.`,
@@ -1121,7 +1190,7 @@ export function mockPlan(ctx: PlanCtx, seedKey: string): Record<string, unknown>
   return {
     title, question: cap(ans.question(o, cRef)), answer: cap(ans.answer(o, cRef)),
     // (pipe arm sides) each one's side, from their seat
-    cast: w.cast.filter(p => p.seat !== 'soldier').map(p => ({ id: p.id, label: label(p), ...(w.pipe === 'sides' ? { side: p.seat === 'client' ? `${cHe.pos} own; ${cHe.sub} wants help` : p.focal || p.seat === 'opponent' ? `against ${cName}, for ${PRONOUN[p.sex].pos} own gain` : 'nobody yet; keeps out of it' } : {}) })),
+    cast: w.cast.filter(p => p.seat !== 'soldier').map(p => ({ id: p.id, label: label(p), ...(piped(w, 'sides') ? { side: p.seat === 'client' ? `${cHe.pos} own; ${cHe.sub} wants help` : p.focal || p.seat === 'opponent' ? `against ${cName}, for ${PRONOUN[p.sex].pos} own gain` : 'nobody yet; keeps out of it' } : {}) })),
     ...(w.personal ? { soldier: { want: cannedWant(client, w.stake), past: 'an old wrong left behind' } } : { asker: { want: cannedWant(client, w.stake) } }),
     episodes,
     showdown: {
@@ -1145,10 +1214,11 @@ function mockRef(who: string, names: Entry[]): string {
 }
 
 export function mockCard(payload: Record<string, unknown>, flags: string[]): { card: string } {
-  const t = payload.trouble as Trouble;
+  const t = payload.trouble as Trouble | string;
   const job = String(payload.job);
   const names = (payload.names ?? []) as Entry[];
-  const troubleLine = t.will ? `${cap(t.who)} with ${t.carry} will ${t.will}.` : `Against you: ${t.who}, with ${t.carry}.`;   // card 1, a retry and a last-chance finale: no will
+  // card 1, a retry and a last-chance finale: no will; pipe arm fixes deals the trouble as one phrase
+  const troubleLine = typeof t === 'string' ? `Against you: ${sentence(t)}` : t.will ? `${cap(t.who)} with ${t.carry} will ${t.will}.` : `Against you: ${t.who}, with ${t.carry}.`;
   const why = sentence(String(payload.why ?? ''));
   if (flags.includes('first')) {
     // (R5, P5) card 1 tells its premise: who needs you and what they want, a personal past, what nobody knows
@@ -1264,7 +1334,7 @@ export function pickPayload(w: SagaWorld): { payload: Record<string, unknown>; f
 }
 /** how many keywords the plan gets when an arm keeps fewer than kit+pick does: kit+pick+cast's (KIT_DEAL.cast.keep), pipe
  *  arm one's (KIT_DEAL.one); kit+pick itself none — its pick is told "one to three", and the build keeps them all */
-export const pickKeep = (w: SagaWorld): number | undefined => w.pipe === 'one' ? KIT_DEAL.one : offeredPeople(w).length ? KIT_DEAL.cast.keep : undefined;
+export const pickKeep = (w: SagaWorld): number | undefined => piped(w, 'one') ? KIT_DEAL.one : offeredPeople(w).length ? KIT_DEAL.cast.keep : undefined;
 const zStrs = z.union([z.array(z.union([z.string(), z.number()]).transform(String)), z.string().transform(x => x.split(/[,;]/))]).optional().catch(undefined);
 /** one person, or the first of a list */
 const zOne = z.union([z.string(), z.number(), z.null(), z.array(z.union([z.string(), z.number()]))]).transform(x => x === null ? undefined : String(Array.isArray(x) ? x[0] ?? '' : x)).optional().catch(undefined);
@@ -1337,46 +1407,6 @@ export function mockPremise(payload: Record<string, unknown>): { premise: string
     `${cap(desc(end))} stands in the way, for reasons of their own.`,
     kw ? `Nobody yet knows what the ${kw} has to do with it.` : 'Nobody yet knows why.',
   ] };
-}
-
-/** pipe arm core: what the core call sees — the picked inputs (the situation or the past, the keywords, the tone), the
- *  setting (land, places: a core blind to it set C1's forest saga at sea, and the plan had to invent an islet), and the
- *  cast, named only where known, the one the last job decides about marked `last` (never an id: the core is prose). A4's
- *  premise marked them "the end decides their fate", and 17 of 24 premises echoed it; the core's gloss says it in story
- *  terms (whom the company faces at the end) and keeps their fate out of the want, as the plan's own rule does */
-export function corePayload(w: SagaWorld): { payload: Record<string, unknown>; flags: string[] } {
-  const k = w.kit!;
-  const s = seedOf({ seed: w.seed, kit: { ...k, premise: undefined } });
-  const flags: string[] = [];
-  const payload: Record<string, unknown> = {};
-  if (!k.situations.length) { flags.push('personal'); payload.past = w.seed.text } else payload.situation = s.text;
-  payload.keywords = s.keywords ?? [];
-  payload.tone = w.tone;
-  payload.land = w.land;
-  payload.places = w.places;
-  const last = w.personal ? w.cast.find(p => p.seat === 'opponent')?.id : w.focalId;
-  payload.cast = w.cast.map(p => {
-    const part = partOf(p);
-    return {
-      ...(p.known ? { name: p.name } : {}), sex: manWoman(p.sex), race: RACE_WORD[p.race] ?? p.race,
-      ...(p.trade ? { trade: p.trade } : {}), ...(part ? { part } : {}), ...(p.id === last ? { last: true } : {}),
-    };
-  });
-  return { payload, flags };
-}
-export const zCoreOut = z.object({ want: zs, question: zs, answer: zs, against: zs }).passthrough();
-/** the floor's core, from the payload alone: who asks and what for, an old debt behind the one the last job is about */
-export function mockCore(payload: Record<string, unknown>): SagaCore {
-  const cast = payload.cast as Record<string, string | boolean>[];
-  const desc = (p: Record<string, string | boolean>) => p.name ? String(p.name) : `the ${p.race} ${p.trade ?? p.sex}`;
-  const asks = cast.find(p => p.part && !p.last) ?? cast[0]!, last = cast.find(p => p.last) ?? cast[cast.length - 1]!;
-  const a = desc(asks), l = desc(last);
-  return {
-    want: payload.past ? `${cap(a)} wants to set right an old wrong, because it still weighs on them.` : `${cap(a)} wants help to ${String(payload.situation)}, because nobody else will give it.`,
-    question: `Nobody knows why ${l} stands in the way.`,
-    answer: `${cap(l)} is owed an old debt by ${a}'s family, and means to be paid in full.`,
-    against: `${cap(l)} stands in the way, to collect that old debt.`,
-  };
 }
 
 // ─── the typed calls (Step 3): one template-keyed provider call each, the floor on any failure ─
@@ -1467,29 +1497,13 @@ export async function writePremise(ai: AiProvider, w: SagaWorld, log: Log = () =
   if (!lines.length) { log('dev', 'saga premise: the writer failed, the floor stood in'); return { premise: mockPremise(payload).premise, floor: true } }
   return { premise: lines, floor: false };
 }
-/** the core (pipe arm core): one call on the PLAN tier at medium effort — it takes the plan's hardest decision, the answer —
- *  single-shot; a field it leaves out is the floor's (a dev line), and a failed call the floor's core */
-export async function writeCore(ai: AiProvider, w: SagaWorld, log: Log = () => {}): Promise<{ core: SagaCore; floor: boolean }> {
-  const { payload, flags } = corePayload(w);
-  const floor = mockCore(payload);
-  let out: z.infer<typeof zCoreOut> | null = null;
-  try { out = await ai.sagaCall({ template: 'core', flags, vars: {}, payload, tier: 'plan', effort: 'medium', schema: zCoreOut, floor: () => floor }) as z.infer<typeof zCoreOut> }
-  catch (e) { log('dev', `saga core: the call failed (${(e as Error).message?.slice(0, 120)})`) }
-  const keys = ['want', 'question', 'answer', 'against'] as const;
-  const got = Object.fromEntries(keys.flatMap(x => out?.[x]?.trim() ? [[x, out[x]!.trim()]] : [])) as Partial<SagaCore>;
-  const missing = keys.filter(x => !got[x]);
-  if (missing.length === keys.length) { log('dev', 'saga core: the writer failed, the floor stood in'); return { core: floor, floor: true } }
-  if (missing.length) log('dev', `saga core: no ${missing.join(', ')} — the floor stood in for it`);
-  return { core: { ...floor, ...got }, floor: false };
-}
 /** a kit arm's steps before the plan, each run once (their results stay on the world, so a re-planned saga reuses them):
- *  deal → pick → premise or core → plan */
+ *  deal → pick → premise → plan */
 export async function seedSteps(ai: AiProvider, w: SagaWorld, log: Log = () => {}): Promise<void> {
   const k = w.kit;
   if (!k) return;
   if (PICKS.has(k.arm) && !k.picked) { k.picked = await pickSeed(ai, w, log); keepPicked(w) }
   if (k.arm === 'kit+pick+premise' && !k.premise) { const r = await writePremise(ai, w, log); k.premise = r.premise; if (r.floor) k.premiseFloor = true }
-  if (w.pipe === 'core' && !k.core) { const r = await writeCore(ai, w, log); k.core = r.core; if (r.floor) k.coreFloor = true }
 }
 
 /** the system prompt a saga call sends (the call log and the golden test read it) */

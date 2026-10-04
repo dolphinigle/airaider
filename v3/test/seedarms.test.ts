@@ -5,9 +5,9 @@
 import { describe, it, expect } from 'vitest';
 import { Rng } from '../src/engine/rng.js';
 import { seedIdCounter } from '../src/engine/cards.js';
-import { dealSaga, castSaga, seedOf, seedPending, keepPicked, SEED_ARM, KIT_CLIENT_PART, PIPE_ARMS, type SeedArm, type SagaPlan, type SagaWorld } from '../src/engine/saga.js';
+import { dealSaga, castSaga, seedOf, seedPending, keepPicked, piped, SEED_ARM, KIT_CLIENT_PART, PIPE_ARMS, PIPE_ARM, type SeedArm, type SagaPlan, type SagaWorld } from '../src/engine/saga.js';
 import { dealKit, KIT, KIT_DEAL, SEED_ARMS } from '../src/engine/seedkit.js';
-import { planPayload, pickPayload, premisePayload, readPick, mockPick, seedSteps, cannedOption, clientOf, whyFlags, planHope, graftRoad, newKnowing, newState, questLog, logLines, laterCardPayload } from '../src/ai/storyteller.js';
+import { planPayload, pickPayload, premisePayload, readPick, mockPick, seedSteps, cannedOption, clientOf, whyFlags, planHope, graftRoad, newKnowing, newState, questLog, logLines, laterCardPayload, oneResult, troublePhrase, validatePlan, planLint } from '../src/ai/storyteller.js';
 import type { AiProvider, SagaCall } from '../src/ai/provider.js';
 import { newGame, sagaChain, playSaga, hostFor } from './sagaharness.js';
 import { renderSaga } from '../src/ai/prompts/saga/render.js';
@@ -105,6 +105,18 @@ describe('the kit cast', () => {
     expect(support.has('mercenary captain')).toBe(false);
     expect(support.size).toBeGreaterThan(30);
     expect(opp.has('mercenary captain')).toBe(true);
+  });
+  it('a trade someone in another live saga has is never dealt again, while any other is free', () => {
+    seedIdCounter(1);
+    const { g } = newGame(9);
+    const { focal } = sagaChain(g, { N: 3, personal: false });
+    const region = g.activeRegions()[0]!;
+    const held = new Set(['horse dealer', 'toll-keeper', 'miller', 'weaver', 'reeve']);
+    for (let i = 0; i < 200; i++) {
+      const sup = castSaga(new Rng(i), { focal, personal: false, region, shape: 'heist', taken: () => false, takenTrade: t => held.has(t), kit: { support: 4 } }).cast.slice(2);
+      for (const p of sup) expect(held.has(p.trade!)).toBe(false);
+      expect(held.has(castSaga(new Rng(i), { focal: g.roster()[0]!, personal: true, region, shape: 'heist', taken: () => false, takenTrade: t => held.has(t) }).cast[1]!.trade!)).toBe(false);
+    }
   });
 });
 
@@ -219,17 +231,22 @@ describe('every seed arm plays a saga to its end on the floor', () => {
   });
 });
 
-// ─── the lab's PIPELINE arms (engine/saga.ts PipeArm; scripts/sagalab/seedlab.ts B2/C1/C2/C3): kit+pick plus one change
-// each, never set by the build ────────────────────────────────────────────────────────────────────
+// ─── the lab's PIPELINE arms (engine/saga.ts PipeArm; scripts/sagalab/seedlab.ts B2/C2/C3/D1/D2): kit+pick plus one change
+// each (D1 and D2: C2 plus one), never set by the build ────────────────────────────────────────────────────────────────────
 
 describe('pipeline arms on the floor', () => {
-  it('the build deals no pipe arm', () => {
+  it('the build deals grafts (designer 2026-10-04); a host naming none deals R5\'s pipeline (the seed lab\'s A arms)', () => {
     seedIdCounter(1);
     const { g } = newGame(21);
     const { chain, focal } = sagaChain(g, { N: 3, personal: false });
     deal(hostFor(g), chain, undefined, focal);
+    expect(PIPE_ARM).toBe('grafts');
+    expect(chain.saga!.world.pipe).toBe('grafts');
+    expect(chain.saga!.world.kit!.arm).toBe('kit+pick');
+    deal({ ...hostFor(g), pipeArm: () => undefined }, chain, undefined, focal);
     expect(chain.saga!.world.pipe).toBeUndefined();
-    expect(PIPE_ARMS).toEqual(['one', 'core', 'grafts', 'sides']);
+    expect(PIPE_ARMS).toEqual(['one', 'grafts', 'sides', 'reads', 'fixes']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'grafts'))).toEqual(['grafts', 'reads', 'fixes']);
   });
   for (const pipe of PIPE_ARMS) for (const personal of [false, true]) it(`${pipe} · ${personal ? 'personal' : 'hired'}: plays to its end, on kit+pick`, async () => {
     seedIdCounter(1);
@@ -247,30 +264,44 @@ describe('pipeline arms on the floor', () => {
     expect(pick.flags.includes('count')).toBe(pipe === 'one');
     if (pipe === 'one') expect(pick.vars).toEqual({ KEEP: 'one keyword' });
     expect(w.kit!.picked!.keywords).toHaveLength(pipe === 'one' ? 1 : 2);
-    expect(t.includes('outline')).toBe(pipe !== 'grafts');
-    expect(t.filter(x => x === 'core').length).toBe(pipe === 'core' ? 1 : 0);
+    expect(t.includes('outline')).toBe(!piped(w, 'grafts'));
+    expect(t.slice(0, 2)).toEqual(['pick', 'plan']);
     const planCall = ai.calls.find(c => c.template === 'plan')!;
     // every key an arm's call carries has a line in its prompt (the payload lint, for the arms' new keys and lines)
     for (const c of ai.calls) for (const key of Object.keys(c.payload)) expect(renderSaga(c.template, c.flags, c.vars), `${c.template} ${key}`).toMatch(new RegExp(`\\b${key}\\b`));
-    if (pipe === 'core') {
-      // the core comes after the pick and before the plan, and the plan's question and answer are the core's
-      expect(t.slice(0, 3)).toEqual(['pick', 'core', 'plan']);
-      expect(planCall.flags).toContain('core');
-      expect(planCall.payload.core).toEqual(w.kit!.core);
-      expect(plan.question).toBe(w.kit!.core!.question);
-      expect(plan.answer).toBe(w.kit!.core!.answer);
-      const core = ai.calls.find(c => c.template === 'core')!;
-      expect(core.tier).toBe('plan');
-      // the core knows the setting it writes for (C1's, blind to it, set a forest saga at sea)
-      expect(core.payload.land).toBe(w.land);
-      expect(core.payload.places).toEqual(w.places);
-      expect(JSON.stringify(core.payload)).not.toMatch(new RegExp(`"${focal.id}"`));
-    }
-    if (pipe === 'grafts') {
-      // the buttons are the engine's; the gold way is paid, never a treasure
+    const cardCalls = ai.calls.filter(c => c.template === 'card'), reportCalls = ai.calls.filter(c => c.template === 'report');
+    expect(cardCalls.length).toBe(p.cards.length);
+    // the card after a won job opens on the report's summary (reads, D1) or on the plan's forecast `win` (every other arm)
+    let differs = 0;
+    p.reports.forEach((r, i) => {
+      if (r.pos.finale || r.outcome === 'failure') return;
+      const next = cardCalls[i + 1]!, win = plan.episodes[r.pos.job - 1]!.win;
+      expect(next.payload.latest).toBe(pipe === 'reads' ? r.rep.summary : win);
+      if (r.rep.summary !== win) differs++;
+    });
+    expect(differs).toBeGreaterThan(0);
+    // the finale card's stake: on every finale with fixes (D2), beside the trouble's will; else only at a last chance
+    const fin = cardCalls[cardCalls.length - 1]!;
+    expect(fin.flags).toContain('finale');
+    expect(fin.flags.includes('lastchance')).toBe(false);
+    expect(fin.flags.includes('lose')).toBe(pipe === 'fixes');
+    expect(!!fin.payload.lose).toBe(pipe === 'fixes');
+    expect(fin.flags).toContain('will');
+    // the finale's result: ONE sentence with fixes (the way, then what it settles), two sentences in every other arm
+    const finRep = reportCalls[reportCalls.length - 1]!;
+    expect(finRep.flags).toContain('answer');
+    expect(String(finRep.payload.result).match(/[.!?](?=\s|$)/g)).toHaveLength(pipe === 'fixes' ? 1 : 2);
+    expect(reportCalls.every(c => c.flags.includes('fixes') === (pipe === 'fixes'))).toBe(true);
+    // fixes (D2): every call it sends carries its lines; a card's trouble is one phrase; the finale's names keep who loses
+    expect([planCall, ...cardCalls].every(c => c.flags.includes('fixes') === (pipe === 'fixes'))).toBe(true);
+    expect(cardCalls.every(c => (typeof c.payload.trouble === 'string') === (pipe === 'fixes'))).toBe(true);
+    if (pipe === 'fixes') expect((fin.payload.names as { name?: string }[]).some(n => n.name === clientOf(plan).name)).toBe(true);
+    if (piped(w, 'grafts')) {
+      // the buttons are the engine's; the gold way is never a treasure, and its money is on its button only (designer
+      // 2026-10-04): the plan's gloss tells the person going free
       expect(planCall.flags).toContain('grafts');
       const ending = planCall.payload.ending as { ways: { way: string; means: string }[] | string[] };
-      if (!personal) expect(JSON.stringify(ending)).not.toMatch(/treasure/);
+      if (!personal) expect(JSON.stringify(ending)).not.toMatch(/treasure|\bpa(?:y|ys|id)\b|\bcoin|\bgold\b/i);
       for (const o of plan.options) expect(o.label).toBe(cannedOption(o.way, plan.cast, true));
       // the road prints the plan's own why per later job; each won middle job's report gets the hope its card was dealt
       const later = ai.calls.filter(c => c.template === 'card' && c.flags.includes('later'));
@@ -302,6 +333,61 @@ describe('pipeline arms on the floor', () => {
       expect((sides(seen).payload.names as Record<string, unknown>[]).some(e => e.side)).toBe(false);
       expect(sides(seen).flags).not.toContain('side');
     } else expect(plan.cast.every(c => c.side === undefined)).toBe(true);
+  });
+});
+
+describe('pipeline arm fixes: the card\'s trouble as one phrase', () => {
+  it('joins who, with what and what they will do; a part the plan wrote twice goes', () => {
+    const t = { who: 'The merchant\'s dock guards', carry: 'cudgels and a harbor chain', will: 'drive off any stranger asking questions' };
+    expect(troublePhrase(t, true)).toBe('The merchant\'s dock guards with cudgels and a harbor chain, who will drive off any stranger asking questions');
+    expect(troublePhrase(t, false)).toBe('The merchant\'s dock guards with cudgels and a harbor chain');
+    expect(troublePhrase({ who: 'a bear', carry: 'with teeth and claws', will: 'will maul anyone near.' }, true)).toBe('a bear with teeth and claws, who will maul anyone near');
+    expect(troublePhrase({ who: 'outlaws', carry: '', will: 'they will shoot' }, true)).toBe('outlaws, who will shoot');
+  });
+});
+
+describe('pipeline arm fixes: the plan\'s own repairs and lints', () => {
+  it('the trouble\'s `with` fills carry; the company keeps no owner but the player; an edge or loss off the showdown\'s trouble is logged', () => {
+    seedIdCounter(1);
+    const { g } = newGame(31);
+    const { chain, focal } = sagaChain(g, { N: 3, personal: false });
+    const w = deal(hostFor(g), chain, undefined, focal).world;
+    w.pipe = 'fixes';
+    const client = w.cast.find(p => p.seat === 'client')!, target = w.cast.find(p => p.id === w.focalId)!;
+    const pos = client.sex === 'female' ? 'her' : 'his';
+    const ep = (n: number) => ({ type: n === 1 ? 'find' : 'sneak', title: `Job ${n}`, job: `Find the boat at ${w.places[0]}`, why: `${client.name} hopes the fisher will take ${pos} company to the island.`, people: [target.id],
+      trouble: { who: 'dock guards', with: 'cudgels', will: 'drive off strangers' }, win: 'The fisher is found.', gain: 'the fisher\'s boat', learn: 'Boats leave by night.' });
+    const raw = { title: 'T', question: 'Nobody knows why.', answer: 'Because.', cast: w.cast.map(p => ({ id: p.id, label: `a ${p.race} ${p.trade ?? 'farmer'}` })), asker: { want: 'win the race' },
+      episodes: [ep(1), ep(2)], showdown: { title: 'S', job: `Catch the ${target.trade ?? 'thief'} at the shore`, people: [target.id], trouble: { who: 'hired guards', with: 'swords', will: 'sail off with the cargo' }, edge: ['The boat gets the company to the shore', 'A song is sung'], settles: `${client.name} wins.`, lose: 'her good name' } };
+    const v = validatePlan(raw, { w, avoid: [] } as never);
+    expect(v.plan).not.toBeNull();
+    expect(v.plan!.episodes[0]!.trouble.carry).toBe('cudgels');
+    expect(v.plan!.showdown.trouble.carry).toBe('swords');
+    expect(v.plan!.episodes[0]!.why).toBe(`${client.name} hopes the fisher will take the company to the island.`);
+    expect(v.repairs.some(r => r.startsWith('owned company'))).toBe(true);
+    const lint = planLint(v.plan!, w);
+    expect(lint).toContain('edge 2 names nothing of the showdown\'s job or trouble');
+    expect(lint.some(l => l.startsWith('edge 1 names nothing'))).toBe(false);
+    expect(lint).toContain('lose shares nothing with the showdown\'s trouble');
+    // the build's plan: no `fixes` repairs or lints
+    delete w.pipe;
+    const b = validatePlan(raw, { w, avoid: [] } as never);
+    expect(b.plan!.episodes[0]!.why).toContain(`${pos} company`);
+    expect(planLint(b.plan!, w).some(l => /names nothing|shares nothing/.test(l))).toBe(false);
+  });
+});
+
+describe('pipeline arm fixes: the finale\'s result as one sentence', () => {
+  const cast = [
+    { id: 'p1', name: 'Patty Reed', sex: 'female', race: 'human', seat: 'client', focal: false, part: 'asks for help', known: true, label: 'a human widow', want: 'take back the ring' },
+    { id: 'f1', name: 'Muvulrea', sex: 'female', race: 'elf', seat: 'opponent', focal: true, part: '', known: false, label: 'an elf wanderer', want: '' },
+  ] as SagaPlan['cast'];
+  const plan = { cast } as SagaPlan;
+  it('joins the way and what it settles; a name or a place keeps its capital', () => {
+    expect(oneResult("Muvulrea is taken to the fort's cells.", 'Patty gets the ring back.', plan, [])).toBe("Muvulrea is taken to the fort's cells, and Patty gets the ring back.");
+    expect(oneResult("Muvulrea slips out of the company's reach, for now.", 'The forest is felled.', plan, [])).toBe("Muvulrea slips out of the company's reach, for now, and the forest is felled.");
+    expect(oneResult('Muvulrea joins the company.', 'Greymere is safe again.', plan, ['Greymere'])).toBe('Muvulrea joins the company, and Greymere is safe again.');
+    expect(oneResult('Muvulrea joins the company.', '', plan, [])).toBe('Muvulrea joins the company.');
   });
 });
 
@@ -342,6 +428,23 @@ describe('pipeline arm grafts: the plan\'s own why on the road', () => {
     expect(planHope('He can then follow her trail.', p, 'Flodoard Coalgate')).toBe('Flodoard Coalgate can then follow her trail.');
     expect(planHope('The petitioner hopes to read it', p, 'Flodoard Coalgate')).toBe('Flodoard Coalgate hopes to read it.');
     expect(planHope('To learn where the boy went.', p, 'Flodoard Coalgate')).toBe('Flodoard Coalgate hopes to learn where the boy went.');
+    // a phrase fronted before the asker's own clause takes "that", and the asker inside becomes a pronoun
+    expect(planHope('With the boat, Flodoard can follow the mare across the water.', p, 'Flodoard Coalgate')).toBe('Flodoard Coalgate hopes that with the boat, he can follow the mare across the water.');
+    expect(planHope('Once Muvulrea talks, he will know where the boy went', p, 'Flodoard Coalgate')).toBe('Flodoard Coalgate hopes that once Muvulrea talks, he will know where the boy went.');
+    // ...and a fronted phrase before someone else's clause stays as it was
+    expect(planHope('With the map, the company can reach the oak.', p, 'Flodoard Coalgate')).toBe('Flodoard Coalgate hopes with the map, the company can reach the oak.');
+    // a why already governed by the asker's verb is not a fronted phrase
+    expect(planHope('Flodoard hopes that once he has the key, he can open the chest.', p, 'Flodoard Coalgate')).toBe('Flodoard Coalgate hopes that once he has the key, he can open the chest.');
+    expect(planHope('Hoping that with the key, he can open the chest.', p, 'Flodoard Coalgate')).toBe('Flodoard Coalgate hopes that with the key, he can open the chest.');
+  });
+  it('a name with particles or an epithet goes whole as the subject', () => {
+    for (const name of ['Vyell the Quiet', 'Ariald of the Marches']) {
+      const p = plan(['a', 'b', 'c']);
+      p.cast[0]!.name = name;
+      expect(planHope(`${name} can then keep his inn safe.`, p, name)).toBe(`${name} can then keep his inn safe.`);
+      expect(planHope(`${name} hopes the men will leave.`, p, name)).toBe(`${name} hopes the men will leave.`);
+      expect(planHope(`With the boat, ${name} can follow the mare.`, p, name)).toBe(`${name} hopes that with the boat, he can follow the mare.`);
+    }
   });
   it('a flagged why leaves its road row to the title, and its card and report no hope', () => {
     const p = plan(['Flodoard hopes she saw which way his son went.', 'Flodoard hopes the ledger shows who was hanged.', 'Flodoard hopes the bronze lantern lights the way.']);

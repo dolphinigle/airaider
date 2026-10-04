@@ -15,8 +15,8 @@ class SeedSpy extends MockProvider {
   override sagaCall(c: SagaCall): Promise<unknown> { if (c.template === 'plan') this.seeds.push(String(c.payload.seed)); return super.sagaCall(c) }
 }
 
-/** a personal chain for roster[0], with one lore edge to `to` */
-async function seedFor(to: 'merc' | 'npc'): Promise<string> {
+/** a personal chain for roster[0], with one lore edge to `to`; `made`: the play that made it (a saga, a quest, the engine) */
+async function seedFor(to: 'merc' | 'npc', made?: 'saga' | 'quest' | 'self'): Promise<string> {
   const ai = new SeedSpy();
   const g = new Game(ai, 268);
   g.build('map-room'); g.build('lead-room');
@@ -29,8 +29,9 @@ async function seedFor(to: 'merc' | 'npc'): Promise<string> {
     g.state.lore.nodes[otherId] = { id: otherId, kind: 'character', name: 'Arver Stonefield',
       blurb: 'a merchant the fort has dealt with', identity: '', active: true, createdCycle: 1 };
   }
-  guardEdges(g.state.lore, [{ from: merc.id, to: otherId, type: 'betrayed-by',
-    blurb: `${merc.name} left them at a crossing and has never said why`, importance: 0.9 }], 1, () => 'e1');
+  guardEdges(g.state.lore, [{ from: merc.id, to: made === 'self' ? merc.id : otherId, type: 'betrayed-by',
+    blurb: `${merc.name} left them at a crossing and has never said why`, importance: 0.9, ...(made === 'quest' ? { sourceQuestId: 'q-1' } : {}) }],
+    1, () => 'e1', made === 'saga' ? 'chain-1' : undefined);
   (g as unknown as { spawnPersonalChainLead(m: unknown): void }).spawnPersonalChainLead(merc);
   const lead = g.state.leads.find(l => l.source === 'personal')!;
   await g.pursue(lead.id);
@@ -45,6 +46,10 @@ describe('personal saga seed', () => {
   it('never seeds from an edge pointing at a fellow soldier', async () => {
     // the ONLY edge is merc-to-merc, so it must fall back rather than name someone uncastable
     expect(await seedFor('merc')).not.toContain('at a crossing');
+  });
+
+  it('never seeds from a memory the company\'s play made: the saga is told as the soldier\'s past', async () => {
+    for (const made of ['saga', 'quest', 'self'] as const) expect(await seedFor('npc', made), made).not.toContain('at a crossing');
   });
 });
 

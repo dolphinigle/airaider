@@ -39,8 +39,17 @@ export interface RelEdge {
   active: boolean;          // soft-delete: inactive = hidden from AI, player-readable
   lastCycle: number;
   blurb: string;            // one-liner ("deserted his unit at the ford")
+  /** the saga, or the one-off quest, whose play made this memory (`madeInPlay`) */
   sourceChainId?: string;
+  sourceQuestId?: string;
 }
+
+/** a memory the company's own play made: one a saga or a quest left, the engine's line about someone (a self-edge), or
+ *  soldiers marching together. Never someone's past from before the company — a soldier's own saga is told as that past,
+ *  and a saga's deed seeded as it was retold as an old wrong ("hanged for salting the orchard"), against the answer the
+ *  company had already found */
+export const madeInPlay = (e: Pick<RelEdge, 'from' | 'to' | 'type' | 'sourceChainId' | 'sourceQuestId'>): boolean =>
+  e.from === e.to || !!e.sourceChainId || !!e.sourceQuestId || e.type === 'served-with';
 
 export const DECAY = 0.97;
 export const SALIENCE_FLOOR = 0.12;   // below → flip inactive (GC-to-inactive, never delete)
@@ -174,7 +183,7 @@ export function modelEdges<T extends { from: string; to: string }>(proposed: T[]
 
 /** persist AI-emitted edges, guarded: both endpoints must resolve; type must be in the enum */
 export function guardEdges(g: LoreGraph, proposed: {
-  from: string; to: string; type: string; blurb: string; importance: number;
+  from: string; to: string; type: string; blurb: string; importance: number; sourceQuestId?: string;
 }[], cycle: number, idGen: () => string, sourceChainId?: string): RelEdge[] {
   const ok: RelEdge[] = [];
   for (const p of proposed) {
@@ -188,14 +197,15 @@ export function guardEdges(g: LoreGraph, proposed: {
       ((e.from === p.from && e.to === p.to) || (e.from === p.to && e.to === p.from)));
     if (dup) {
       touchEdge(dup, cycle, importance * 0.3);
-      if (p.blurb.length > dup.blurb.length) dup.blurb = p.blurb.slice(0, 160);
+      // the line it now carries is this one's, and so is where it was made
+      if (p.blurb.length > dup.blurb.length) Object.assign(dup, { blurb: p.blurb.slice(0, 160) }, sourceChainId ? { sourceChainId } : {}, p.sourceQuestId ? { sourceQuestId: p.sourceQuestId } : {});
       if (importance >= CORE_IMPORTANCE) dup.core = true;
       continue;
     }
     const e: RelEdge = {
       id: idGen(), from: p.from, to: p.to, type: p.type as EdgeType,
       salience: Math.max(0.3, importance), core: importance >= CORE_IMPORTANCE,
-      active: true, lastCycle: cycle, blurb: p.blurb.slice(0, 160), sourceChainId,
+      active: true, lastCycle: cycle, blurb: p.blurb.slice(0, 160), sourceChainId, ...(p.sourceQuestId ? { sourceQuestId: p.sourceQuestId } : {}),
     };
     addEdge(g, e);
     ok.push(e);

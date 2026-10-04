@@ -1,31 +1,34 @@
 // The v4 saga flow (src/game/sagaflow.ts) played end to end against a fake host on a real game world, with the mock's
-// floor as the writer: N 2–6, personal and not, every lab path — a failure re-posed, a last chance — to the finale.
+// floor as the writer: N 2–6, personal and not, every lab path — a failure re-posed, a last chance — to the finale. Each
+// on the build's pipeline (PIPE_ARM, grafts) and on R5's, which every saga dealt before grafts shipped still plays.
 import { describe, it, expect } from 'vitest';
 import { seedIdCounter } from '../src/engine/cards.js';
 import { LAB_MIN_N, type LabPath } from '../src/engine/lab.js';
 import { coins } from '../src/engine/roll.js';
-import { clampHurt, WAY_TESTS } from '../src/engine/saga.js';
+import { clampHurt, WAY_TESTS, PIPE_ARM } from '../src/engine/saga.js';
 import * as flow from '../src/game/sagaflow.js';
 import { newGame, sagaChain, playSaga, hostFor } from './sagaharness.js';
 
 const PATHS: LabPath[] = ['clean', 'bumpy', 'failing', 'lastchance'];
 
 describe('saga flow — every path to the finale', () => {
-  for (const personal of [false, true]) for (let N = 2; N <= 6; N++) for (const path of personal ? [...PATHS, 'personal' as const] : PATHS) {
+  for (const r5 of [false, true]) for (const personal of [false, true]) for (let N = 2; N <= 6; N++) for (const path of personal ? [...PATHS, 'personal' as const] : PATHS) {
     if (N < LAB_MIN_N[path]) continue;
-    it(`${personal ? 'personal' : 'hired'} N=${N} ${path}`, async () => {
+    it(`${r5 ? 'R5 pipeline · ' : ''}${personal ? 'personal' : 'hired'} N=${N} ${path}`, async () => {
       seedIdCounter(1);
       const { g, ai } = newGame(100 + N * 10 + PATHS.indexOf(path as LabPath) + (personal ? 5 : 0));
       const { chain, focal } = sagaChain(g, { N, personal });
-      const p = await playSaga(g, chain, path, focal);
+      const p = await playSaga(g, chain, path, focal, undefined, r5 ? { pipeArm: () => undefined } : {});
       const rec = chain.saga!;
       const plan = rec.plan!;
+      expect(rec.world.pipe).toBe(r5 ? undefined : PIPE_ARM);
       expect(rec.fallback).toBe(false);
       expect(plan.episodes).toHaveLength(N - 1);
-      // the calls: one plan; an outline only with 2+ jobs before the finale; a card and a report per attempt
+      // the calls: one plan; an outline only on R5's pipeline with 2+ jobs before the finale (the build's road is the
+      // plan's own whys); a card and a report per attempt
       const n = (t: string) => ai.calls.filter(c => c.template === t).length;
       expect(n('plan')).toBe(1);
-      expect(n('outline')).toBe(N - 1 >= 2 ? 1 : 0);
+      expect(n('outline')).toBe(r5 && N - 1 >= 2 ? 1 : 0);
       expect(n('card')).toBe(p.cards.length);
       expect(n('report')).toBe(p.reports.length);
       expect(ai.calls.find(c => c.template === 'plan')!.tier).toBe('plan');

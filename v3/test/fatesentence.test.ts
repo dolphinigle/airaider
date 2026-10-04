@@ -13,6 +13,8 @@ import { newGame, sagaChain, hostFor } from './sagaharness.js';
 
 interface Case {
   name: string; personal?: boolean; way: Way; outcome: Outcome; bank?: number;
+  /** dealt on R5's pipeline (a saga from before grafts shipped), not the build's */
+  r5?: boolean;
   setup?: (g: Game, focalId: string) => void;
   says: RegExp;
   /** what settleFinale left: the focal's role and where they are */
@@ -34,8 +36,11 @@ const CASES: Case[] = [
   { name: 'personal, slipped', personal: true, way: 'talk', outcome: 'failure', says: /still stands in .*'s way\.$/, then: { role: 'merc', at: 'roster', chain: 'slipped' } },
   { name: 'the focal joined mid-saga', way: 'recruit', outcome: 'success', setup: makeMerc, says: /who already stands with the company\.$/, then: { role: 'merc', at: 'roster', chain: 'done' } },
   { name: 'void: too thin a season to keep them', way: 'captive', outcome: 'success', bank: 1, says: /earned too little to keep/, then: { at: 'lore', chain: 'done' } },
-  { name: 'gold', way: 'gold', outcome: 'success', says: /^The company takes .*'s treasure, and (he|she) goes free\.$/, then: { at: 'lore', chain: 'done' } },
-  { name: 'gold on a thin bank is never void', way: 'gold', outcome: 'partial', bank: 1, says: /treasure/, then: { at: 'lore', chain: 'done' } },
+  // the build (grafts): the story tells the person going free; the money is the finale button's alone (designer 2026-10-04)
+  { name: 'gold', way: 'gold', outcome: 'success', says: /^[^.]* (is cornered, then let go|goes (his|her) way)\.$/, then: { at: 'lore', chain: 'done' } },
+  { name: 'gold on a thin bank is never void', way: 'gold', outcome: 'partial', bank: 1, says: /^[^.]* (is cornered, then let go|goes (his|her) way)\.$/, then: { at: 'lore', chain: 'done' } },
+  { name: 'R5 pipeline: gold', r5: true, way: 'gold', outcome: 'success', says: /^The company takes .*'s treasure, and (he|she) goes free\.$/, then: { at: 'lore', chain: 'done' } },
+  { name: 'R5 pipeline: gold on a thin bank is never void', r5: true, way: 'gold', outcome: 'partial', bank: 1, says: /treasure/, then: { at: 'lore', chain: 'done' } },
   { name: 'recruit, room on the roster', way: 'recruit', outcome: 'success', setup: g => Object.assign(g, { rosterCapacity: () => 99 }), says: /joins the company\.$/, then: { role: 'merc', at: 'roster', chain: 'done' } },
   { name: 'recruit, the roster full', way: 'recruit', outcome: 'success', setup: g => Object.assign(g, { rosterCapacity: () => 0 }), says: /the roster is full, so (he|she) waits at the tavern\.$/, then: { role: 'npc', at: 'staged-tavern', chain: 'done' } },
   { name: 'captive, a Dungeon with room', way: 'captive', outcome: 'success', setup: dungeon(4, 0), says: /is taken to the fort's cells\.$/, then: { role: 'captive', at: 'staged-holding', chain: 'done' } },
@@ -48,7 +53,7 @@ describe('sagaFate — the Outcome line agrees with settleFinale, branch by bran
     seedIdCounter(1);
     const { g } = newGame(400 + CASES.indexOf(c));
     const { chain, focal } = sagaChain(g, { N: 3, personal: !!c.personal, kind: c.way === 'gold' ? 'gold-hoard' : c.way === 'recruit' ? 'recruit' : 'captive' });
-    const host = hostFor(g);
+    const host = c.r5 ? { ...hostFor(g), pipeArm: () => undefined } : hostFor(g);
     flow.deal(host, chain, undefined, focal);
     await flow.plan(host, chain);
     chain.bank = c.bank ?? focal.value * 2;
@@ -56,6 +61,7 @@ describe('sagaFate — the Outcome line agrees with settleFinale, branch by bran
     const fate = fateOf(c.outcome);
     const line = flow.sagaFate(flow.fateFacts(host, chain, c.way, c.outcome, fate));
     expect(line).toMatch(c.says);
+    if (!c.r5) expect(line).not.toMatch(/\bpa(?:y|ys|id)\b|\bcoin|treasure/i);
     // the same game, settled by the real thing
     const q = { approaches: [{ id: 'g0', label: 'the plan', rewardKind: WAY_REWARD[c.way] }], chosenApproach: 'g0' } as unknown as Quest;
     const report: string[] = [];

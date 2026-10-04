@@ -33,16 +33,34 @@ export type { SeedArm } from './seedkit.js';
  *  purely random keywords (scripts/sagalab/reports/2026-10-04-seed-arms.md). A host may name another (SagaHost.seedArm:
  *  the lab; the golden parity test pins 'themes', the R5 lab's seed) */
 export const SEED_ARM: SeedArm = 'kit+pick';
-/** a lab PIPELINE arm on top of kit+pick (North Star 8: shape what the AI is given, split the work into small steps;
- *  scripts/sagalab/seedlab.ts B2/C1/C2/C3). The build sets none: absent, the pipeline is the shipped one, byte for byte.
+/** a PIPELINE arm on top of kit+pick (North Star 8: shape what the AI is given, split the work into small steps;
+ *  scripts/sagalab/seedlab.ts B2/C2/C3/D1/D2). The build deals PIPE_ARM; absent, the pipeline is R5's, byte for byte (the
+ *  golden parity, the seed lab's A arms, and every saga dealt before grafts shipped).
  *   one     B2  the pick chooses one keyword, told so; the plan gets only it (one object to follow)
- *   core    C1  after the pick, a small core call writes the want, the question, the ANSWER and who is against (answer
- *               first); the plan gets them as fixed facts and writes no question or answer of its own
  *   grafts  C2  R6's class fixes: the road prints the plan's own why per later job (no outline call; a flagged why leaves
  *               the title), the card's hope goes to its report, the finale buttons are the engine's, the gold way is paid
- *   sides   C3  the plan writes each person's side (whose side, and why); cards and reports get it for the people present */
-export type PipeArm = 'one' | 'core' | 'grafts' | 'sides';
-export const PIPE_ARMS: readonly PipeArm[] = ['one', 'core', 'grafts', 'sides'];
+ *               on its button only (designer 2026-10-04: the story tells the person going free — `freeGold`)
+ *   sides   C3  the plan writes each person's side (whose side, and why); cards and reports get it for the people present
+ *   reads   D1  grafts, and a card after a won job reads the report's summary (the text the player just read), never the
+ *               plan's forecast `win`: every text is given the last text the player read
+ *   fixes   D2  grafts, and the verifiers' class fixes (pipeline-round report §3.1, then the D-arm verifier): the report's
+ *               hope shows only what result, brought and clue leave unmet, as still hoped for; every fact in the writer's
+ *               own words, a clue with nothing added, the secret said, shown or found against a known fact; every finale
+ *               card gets the stake (`lose`) and keeps its owner in names; the finale's way and settles are ONE result
+ *               sentence; a card's trouble is one phrase, never three labelled parts; the plan's edges beat the showdown's
+ *               trouble, its loss is what that trouble takes, its trouble says what they fight `with`; the company has no
+ *               other owner in plan text
+ *  (C1 `core` — a call fixing the want, question and answer before the plan — was removed: a measured loss, follow 26–116) */
+export type PipeArm = 'one' | 'grafts' | 'sides' | 'reads' | 'fixes';
+export const PIPE_ARMS: readonly PipeArm[] = ['one', 'grafts', 'sides', 'reads', 'fixes'];
+/** the changes each pipe arm carries, by the arm that brought each in: D1 and D2 are C2 plus one change each */
+const PIPE_PARTS: Record<PipeArm, readonly PipeArm[]> = { one: ['one'], grafts: ['grafts'], sides: ['sides'], reads: ['grafts', 'reads'], fixes: ['grafts', 'fixes'] };
+/** whether a dealt world's pipe arm carries `part` */
+export const piped = (w: Pick<SagaWorld, 'pipe'>, part: PipeArm): boolean => !!w.pipe && PIPE_PARTS[w.pipe].includes(part);
+/** the pipeline this build ships (designer 2026-10-04): C2 grafts, ahead on follow in all three generations (83–61) and on
+ *  keep beyond the noise floor (93–51) — scripts/sagalab/reports/2026-10-04-pipeline-round.md §3.1. A host may name
+ *  another, or none (SagaHost.pipeArm: the seed lab) */
+export const PIPE_ARM: PipeArm = 'grafts';
 
 // ─── shapes, job types, ways (§2.4.1) ──────────────────────────────────────────────────────────
 
@@ -103,10 +121,15 @@ export const helped = (p: Pick<SagaPerson, 'seat' | 'part'>) => p.seat === 'othe
 // each names its subject: "they end in its cells" was read as the soldiers ("Blunder into the manor's laws, are arrested")
 export const WAY_MEANS: Record<'recruit' | 'captive' | 'gold', string> = { recruit: 'that person joins the company', captive: "that person ends in the company's cells", gold: "the company takes that person's treasure" };
 export const HELPED_GOLD = 'that person shares their treasure with the company and goes their way';
-/** (pipe arm grafts, R6 F2) the gold way presupposes no treasure: a treasure in the gloss made stock "buried hoard" answers */
-export const PAID_GOLD = 'that person pays the company to go free';
-export const PAID_HELPED_GOLD = 'that person pays the company and goes their way';
-export const wayMeans = (v: Way, isHelped: boolean, paid = false) => v === 'gold' && paid ? (isHelped ? PAID_HELPED_GOLD : PAID_GOLD)
+/** (pipe arm grafts) the gold way as the story tells it: no treasure (R6 F2: a treasure in the gloss made stock "buried
+ *  hoard" answers) and no money — the money is the finale button's alone (designer 2026-10-04: pasted payment was in 15
+ *  of 18 gold finales, and clashed with "no pay"). The ending the person meets, nothing the company takes */
+export const FREE_GOLD = 'that person is cornered, then let go';
+export const FREE_HELPED_GOLD = 'that person goes their way';
+/** (pipe arm grafts) the gold way's name as the plan reads it: the reward's word ("gold") is money too. Like WAY_WORD, never
+ *  a job type name ("free" is "break someone out" in the same payload's types) */
+export const FREE_WAY = 'let go';
+export const wayMeans = (v: Way, isHelped: boolean, freeGold = false) => v === 'gold' && freeGold ? (isHelped ? FREE_HELPED_GOLD : FREE_GOLD)
   : v === 'gold' && isHelped ? HELPED_GOLD : WAY_MEANS[v as keyof typeof WAY_MEANS];
 export const WAY_ATTR: Record<Way, string> = { recruit: 'CHA', captive: 'STR', gold: 'INT', talk: 'CHA', fight: 'STR', sneak: 'DEX' };
 /** a personal saga's ways are HOW it is settled, so the plan gets words that are not job type names */
@@ -140,6 +163,8 @@ const COMPANY_TRADES = new Set(['mercenary captain']);
 const SUPPORT_TRADES = ['miller', 'weaver', 'shepherd', 'beekeeper', 'ferryman', 'brewer', 'woodcutter', 'potter', 'fisher',
   'innkeeper', 'carter', 'herbalist', 'mason', 'tanner', 'widow', 'farmer', 'smith', 'peddler', 'charcoal-burner', 'midwife',
   'goatherd', 'trapper', 'baker', 'thatcher', 'healer', 'fowler', 'tinker', 'cooper', ...POWER_TRADES.filter(t => !COMPANY_TRADES.has(t))];
+/** every trade the deal coins (the live-saga trade fence reads them off the plans' labels) */
+export const DEALT_TRADES: readonly string[] = [...new Set([...SUPPORT_TRADES, ...POWER_TRADES])];
 
 /** one source per feeling: a theme labelled with a feeling passes it on; otherwise the engine's tone roll */
 export const TONE_FROM_THEME: Record<string, string> = { funny: 'wry', tender: 'warm', grim: 'grim', tense: 'tense' };
@@ -191,12 +216,9 @@ export interface SagaWorld {
   region: string; level: number;
   /** a kit arm's seed (North Star 7): absent on the theme arm */
   kit?: SagaKit;
-  /** a lab pipeline arm (PipeArm): absent in the build */
+  /** the pipeline arm (PipeArm): the build deals PIPE_ARM; absent, R5's pipeline */
   pipe?: PipeArm;
 }
-/** pipe arm core: the facts the plan is built on, written first (the want and why, the question, the answer, who is
- *  against and why); the plan takes the question and answer as they are */
-export interface SagaCore { want: string; question: string; answer: string; against: string }
 /** a kit arm's seed: what the dealer dealt, then what the pick and premise calls made of it (filled before the plan) */
 export interface SagaKit {
   arm: Exclude<SeedArm, 'themes'>;
@@ -208,8 +230,6 @@ export interface SagaKit {
   /** kit+pick+premise: the premise call's sentences (who wants what and why; what stands in the way and why; what nobody
    *  knows yet) — the plan's seed */
   premise?: string[]; premiseFloor?: boolean;
-  /** pipe arm core: the core call's facts; `coreFloor`: the call failed and the floor's stood in */
-  core?: SagaCore; coreFloor?: boolean;
 }
 /** the seed as the plan receives it: the theme or a personal past; a kit arm's situation and keywords (the picked ones
  *  once the pick call has run); a premise arm's premise, alone */
@@ -229,8 +249,8 @@ export function keepPicked(w: SagaWorld): void {
   const keep = w.kit.picked.person;
   w.cast = w.cast.filter(p => p.seat !== 'support' || p.id === keep);
 }
-/** whether a kit arm still waits on its pick, premise or core call before the plan */
-export const seedPending = (w: Pick<SagaWorld, 'kit' | 'pipe'>): boolean => !!w.kit && ((PICKS.has(w.kit.arm) && !w.kit.picked) || (w.kit.arm === 'kit+pick+premise' && !w.kit.premise) || (w.pipe === 'core' && !w.kit.core));
+/** whether a kit arm still waits on its pick or premise call before the plan */
+export const seedPending = (w: Pick<SagaWorld, 'kit'>): boolean => !!w.kit && ((PICKS.has(w.kit.arm) && !w.kit.picked) || (w.kit.arm === 'kit+pick+premise' && !w.kit.premise));
 /** one attempt as the chronicle keeps it. `decides`: whose deed decided a job that was not failed (the game sets it after
  *  the report lands; the memory edge to the deciding soldier reads it at the saga's close, §2.6) */
 export interface SagaLine { n: number; attempt: number; outcome: Outcome; party: string[]; text: string; hurt: Hurt[]; decides?: string }
@@ -322,6 +342,8 @@ export interface CastInput {
   focal: Card; personal: boolean; region: string; shape: ShapeId;
   /** a name already in use or too close to one (roster, lore, recent NPC names) */
   taken: (name: string) => boolean;
+  /** a trade someone in another live saga already has: two horse dealers on the board at once are one to the player */
+  takenTrade?: (trade: string) => boolean;
   /** the player's npc trait preferences (Settings): steer the coined people's sex and race */
   prefs?: TraitPrefs;
   /** D9: the focal is a returning or sequel face the player knows — named from card 1, with their past with you */
@@ -353,10 +375,12 @@ export function castSaga(storyRng: Rng, a: CastInput): SagaCast {
     const race = prefPick(storyRng, races.map(r => r[0]), a.prefs, m => races.find(r => r[0] === m)![1]);
     let name = rollName(storyRng, race, sex);
     for (let i = 0; i < 12 && taken(name); i++) name = rollName(storyRng, race, sex);
-    const trades = trade === true ? POWER_TRADES : trade || [];
+    const fits = (trade === true ? POWER_TRADES : trade || []).filter(t => (TRADE_SEX[t] ?? sex) === sex);
+    const free = fits.filter(t => !a.takenTrade?.(t));
+    const trades = free.length ? free : fits;
     return {
       id: `p${++n}`, name, sex, race, seat, focal: false, part,
-      ...(trades.length ? { trade: storyRng.pick(trades.filter(t => (TRADE_SEX[t] ?? sex) === sex)) } : {}),
+      ...(trades.length ? { trade: storyRng.pick(trades) } : {}),
       known: seat === 'client',
     };
   };
