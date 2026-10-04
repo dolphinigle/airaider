@@ -6,6 +6,8 @@ import { MockProvider } from '../src/ai/mock.js';
 import { coins } from '../src/engine/roll.js';
 import type { Quest } from '../src/engine/quests.js';
 import { logLines } from '../src/ai/storyteller.js';
+import type { SagaCall } from '../src/ai/provider.js';
+import { seedIdCounter } from '../src/engine/cards.js';
 
 /** a game with a manned-up roster and at least one open quest */
 async function staged(seed = 9101) {
@@ -17,6 +19,17 @@ async function staged(seed = 9101) {
     await g.endCycle();
   }
   return g;
+}
+/** the mock, but each saga card it writes names the person the ending decides (the focal), as a writer does once the
+ *  story has met them */
+class NamesFocal extends MockProvider {
+  g!: Game;
+  override async sagaCall(c: SagaCall): Promise<unknown> {
+    const out = await super.sagaCall(c) as { card?: string };
+    if (c.template !== 'card') return out;
+    const focal = this.g.card(this.g.state.chains.at(-1)!.focalId)!;
+    return { ...out, card: `${out.card} ${focal.name} waits.` };
+  }
 }
 const openQuests = (g: Game) => g.state.quests.filter(q => q.state === 'open');
 const activeSlots = (q: Quest) => q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
@@ -149,10 +162,38 @@ describe('questCast', () => {
       const cast = g.questCast(q.id);
       if (!q.chainId) { expect(cast).toEqual([]); continue }
       sagas++;
-      expect(cast).toEqual(q.saga!.matter);
+      expect(cast.map(({ cardId: _, ...m }) => m)).toEqual(q.saga!.matter);
       for (const c of cast) { expect(c.name).toBeTruthy(); expect(c.label).toBeTruthy(); expect(c.label).not.toMatch(/^an? /) }
     }
     expect(sagas).toBeGreaterThan(0);
+  });
+
+  it('a person the card names who is a real card (the focal) carries that card; the people the story coined do not', async () => {
+    seedIdCounter(1);
+    const ai = new NamesFocal(7);
+    const g = ai.g = new Game(ai, 7);
+    g.build('map-room');
+    const { questId } = await g.pursue(g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new')!.id);
+    const q = g.state.quests.find(x => x.id === questId)!;
+    const focal = g.card(g.state.chains.find(c => c.id === q.chainId)!.focalId)!;
+    const cast = g.questCast(q.id);
+    expect(cast.find(c => c.name === focal.name)?.cardId).toBe(focal.id);
+    expect(focal.tags.length).toBeGreaterThan(0);
+    // the client the plan coined is a name and a label only
+    expect(cast.filter(c => c.name !== focal.name).length).toBeGreaterThan(0);
+    for (const c of cast.filter(c => c.name !== focal.name)) expect(c.cardId).toBeUndefined();
+  });
+
+  it('the soldier of a personal saga, named on the card, carries their roster card', async () => {
+    seedIdCounter(1);
+    const g = new Game(new MockProvider(31), 31);
+    g.build('map-room');
+    g.build('lead-room');
+    const merc = g.roster()[0]!;
+    g.state.leads.push({ id: 'lead-p', rarity: 'uncommon', level: merc.character!.level, region: g.activeRegions()[0]!, archetype: 'investigate',
+      chainInfo: { kind: 'starts-new' }, expiresAtCycle: g.state.cycle + 12, source: 'personal', title: `${merc.name}'s past stirs`, personalMercId: merc.id });
+    const { questId } = await g.pursue('lead-p');
+    expect(g.questCast(questId!).find(c => c.name === merc.name)?.cardId).toBe(merc.id);
   });
 
   it('never shows a person the card itself withheld', async () => {

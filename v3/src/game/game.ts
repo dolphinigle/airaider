@@ -2693,10 +2693,15 @@ export class Game {
   }
 
   /** ON THIS MATTER — the people this saga card calls by name, as "name — label", for the quest screen's held cards
-   *  and the CLI's line (onThisMatter, computed when the card was dealt — a person the card withholds is never here) */
-  questCast(questId: string): { id: string; name: string; label: string }[] {
+   *  and the CLI's line (onThisMatter, computed when the card was dealt — a person the card withholds is never here).
+   *  A person the deal seated from a real Card (the focal, a soldier, a returning face: their cast id IS the card id)
+   *  carries `cardId`, so both UIs can show that card; the people the plan coined (p1, p2…) have no card */
+  questCast(questId: string): { id: string; name: string; label: string; cardId?: string }[] {
     const q = this.state.quests.find(x => x.id === questId);
-    return (q?.saga?.matter ?? []).map(m => ({ ...m }));
+    return (q?.saga?.matter ?? []).map(m => {
+      const c = this.card(m.id);
+      return { ...m, ...(c?.character && c.name === m.name ? { cardId: c.id } : {}) };
+    });
   }
 
   /** MAN A QUEST, greedily. Score every (slot, soldier) pair, take the best pair whose halves

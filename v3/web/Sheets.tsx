@@ -149,7 +149,7 @@ export function CardSheet({ s, id, cast, doAct, quick, close, openQuest, openRoo
             <p className="p">A debt. Unpaid debts draw collectors — a hostile lead appears.</p>
             <div className="acts"><button className="btn solid" onClick={() => doThen('settle', c.id)}>Settle · {c.settleCost}g</button></div>
           </>}
-          {kind === 'cast' && <p className="p">{c.label}</p>}
+          {kind === 'cast' && <p className="p">{c.label}{ch ? ` · L${ch.level}` : ''}{c.stars > 0 ? ` · ${Math.min(5, c.stars)}★` : ''}</p>}
         </div>
       </section>
     </div>

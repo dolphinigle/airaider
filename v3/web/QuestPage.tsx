@@ -125,9 +125,11 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
             <div className="held">
               <span className="lbl">On this matter</span>
               <div className="heldrow">{q.cast.map((c: any, i: number) => {
-                const own = s.roster.find((m: any) => m.name === c.name);
-                // the people this card calls by name (the engine's ON THIS MATTER): name — label
-                return own ? <div className="heldone" key={c.id ?? i}><CardFace c={own} small title={`${own.name} — one of yours, held to this matter`} /><span className="hwho">one of yours</span></div> : (
+                const own = c.cardId ? s.roster.find((m: any) => m.id === c.cardId) : null;
+                // the people this card calls by name (the engine's ON THIS MATTER): name — label. One with a real card
+                // (the focal, a soldier) shows that card; a person the story coined is a held name
+                return own ? <div className="heldone" key={c.id ?? i}><CardFace c={own} small onClick={() => openCard(own.id)} title={`${own.name} — one of yours, held to this matter`} /><span className="hwho">one of yours</span></div>
+                : c.card ? <div className="heldone" key={c.id ?? i}><CardFace c={c.card} small onClick={() => readCast({ ...c.card, label: c.label })} title={`${c.name} — ${c.label} — read their card`} /><span className="hwho">{c.label}</span></div> : (
                 <div className="heldone" key={c.id ?? i}>
                   <button className="hc" onClick={() => readCast(c)} aria-label={`${c.name}, ${c.label} — read their card`}>
                     <span className="clasp l" /><span className="clasp r" />

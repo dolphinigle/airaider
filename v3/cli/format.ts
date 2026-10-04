@@ -7,7 +7,7 @@ import { ROOM_TYPE } from '../src/engine/fort.js';
 import { unitWorth, unitStars, unitPeak } from '../src/engine/economy.js';
 import { leadBand } from '../src/engine/quests.js';
 import { REGION } from '../src/engine/regions.js';
-import { cardType, stackKind, isLiability } from '../src/engine/cards.js';
+import { cardType, stackKind, isLiability, type Card } from '../src/engine/cards.js';
 import { slotThreshold, coins, explainCoins, coinsWhy, slotStrength, BAND_TEXT } from '../src/engine/roll.js';
 import { xpNeeded } from '../src/engine/growth.js';
 import { logLines, matterLine } from '../src/ai/storyteller.js';
@@ -68,6 +68,12 @@ const seenLeads = new Set<string>();
  *  a dud, so it can never show this. */
 const mark = (c: { tags: { concept: string; tier?: number }[]; value: number }) =>
   `${('★'.repeat(unitStars(c as never)) || '·').padEnd(4)} ${String(unitWorth(c as never)).padStart(5)}g`;
+/** a person ON THIS MATTER who is a real card: what the quest page's card face and sheet show — name — label · level,
+ *  stars · tags */
+const castCardLine = (label: string, c: Card) => {
+  const st = Math.min(5, unitStars(c));
+  return `  ${c.name} — ${label} · L${c.character?.level ?? '?'}${st > 0 ? ` ${'★'.repeat(st)}` : ''} · ${renderTags(c.tags)}`;
+};
 
 export const render = {
   welcome(g: Game): string {
@@ -361,7 +367,10 @@ export const render = {
       // order the quest page uses; no errand line (the road's ▶ row and the prose carry the job)
       const c = g.chainViews().find(x => x.id === q.chainId);
       const log = logLines(sg.rows);
-      const matter = matterLine(g.questCast(q.id));
+      const cast = g.questCast(q.id);
+      const matter = matterLine(cast);
+      // the quest page shows a person with a real card (the focal, a soldier) AS that card: what it is, under the line
+      const cards = cast.flatMap(m => { const k = m.cardId ? g.card(m.cardId) : undefined; return k ? [castCardLine(m.label, k)] : [] });
       const where = sg.part === null ? `the finale${sg.lastchance ? ' · the last chance' : ''}` : `part ${sg.part} of ${sg.of}${sg.again ? ' (again)' : ''}`;
       // the web's saga strip, in the same order: this card's part among the saga's, the setbacks, what is set aside
       const now = sg.part ?? sg.of;
@@ -370,7 +379,7 @@ export const render = {
       return [
         `═══ ${q.title} · ${c?.title ?? 'a saga'} ═══  ${tail}`,
         ...(sg.logFirst ? [...log, ...gap, q.situation] : [q.situation, ...gap, ...log]),
-        ...(matter ? [matter] : []),
+        ...(matter ? [matter, ...cards] : []),
         reward,
         strip,
       ];

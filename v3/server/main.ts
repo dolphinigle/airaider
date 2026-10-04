@@ -320,8 +320,14 @@ function stateView() {
         abandonText: game.abandonConsequence(q.id), // the two-step abandon confirm's consequence line
         // {coins,bar,success,partial,precision, band: pooled verdict once manned | null, partialAt, filled, of}
         odds: o,
-        // ON THIS MATTER: the people this saga card calls by name — [{id, name, label}]
-        cast: game.questCast(q.id),
+        // ON THIS MATTER: the people this saga card calls by name — [{id, name, label, cardId?, card?}]; a person with a
+        // real card (the focal, a soldier) carries what it IS — tags, stars, level — never where it sits (no RAW chip
+        // on someone you do not hold). The CLI prints the same (cli/format questDetail)
+        cast: game.questCast(q.id).map(c => {
+          const k = c.cardId ? game.card(c.cardId) : undefined;
+          return k ? { ...c, card: { id: k.id, name: k.name, tags: renderTags(k.tags), stars: unitStars(k),
+            character: k.character ? { role: k.character.role, level: k.character.level, who: k.character.who ?? null } : null } } : c;
+        }),
         // a card the player will not read is a dead slot: abandoning returns the LEAD so the
         // job can be written again, once a cycle
         canReroll: !q.chainId && game.canReroll(),
