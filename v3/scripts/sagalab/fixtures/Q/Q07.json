@@ -1,0 +1,23 @@
+{
+  "id": "Q07",
+  "set": "Q",
+  "seed": 207,
+  "path": "personal",
+  "spark": "Marta deserted her company at the siege of a river fort, and the captain who had trusted her was captured and never ransomed",
+  "focal": {
+    "name": "Marta of the Marches",
+    "sex": "female",
+    "race": "human",
+    "seed": 2107,
+    "value": 150,
+    "who": "A hard-eyed human soldier who keeps her own watch.",
+    "backstory": "Marta of the Marches slipped away from her company on the third night of a siege at a river fort. The captain who had trusted her with the gate was taken, and no one ever paid his ransom."
+  },
+  "N": 5,
+  "kind": "recruit",
+  "personal": true,
+  "twist": false,
+  "level": 2,
+  "rarity": "uncommon",
+  "note": "personal set pers1 (round T, North Star item 0): one of 8 company soldiers with a varied one-line past (the spark = the backstory's first sentence, as the game's personalSeed reads it)"
+}

@@ -3,7 +3,7 @@
 import { describe, it, expect } from 'vitest';
 import { seedIdCounter } from '../src/engine/cards.js';
 import type { SagaWorld } from '../src/engine/saga.js';
-import { validatePlan, mockPlan, planSaga, type PlanCtx } from '../src/ai/storyteller.js';
+import { validatePlan, mockPlan, planSaga, questLog, logLines, newKnowing, newState, type PlanCtx } from '../src/ai/storyteller.js';
 import type { AiProvider, SagaCall } from '../src/ai/provider.js';
 import * as flow from '../src/game/sagaflow.js';
 import { newGame, sagaChain, hostFor } from './sagaharness.js';
@@ -104,6 +104,38 @@ describe('validatePlan — the repairs (mechanical, silent)', () => {
   it('extra edges are cut; an edge naming its job goes to that job', () => {
     const p = repaired(r => { r.showdown.edge = [{ job: 2, helps: 'the woodmen guard the road' }, 'the map shows the back way', 'one too many'] }, /1 extra edge\(s\) cut/);
     expect(p.showdown.edge).toEqual(['the map shows the back way', 'the woodmen guard the road']);
+  });
+});
+
+describe('validatePlan — a name is one unit with its particles (byname class: "an of the human woman")', () => {
+  // seed1 G0_g1 F8_1: the client "Autonoe of the Ford" came back in her own label; the parts went and "of the" stayed
+  const byname = (o: Partial<SagaWorld> = {}) => ctx({ cast: [
+    { id: 'p1', name: 'Autonoe of the Ford', sex: 'female', race: 'human', seat: 'client', focal: false, part: 'asks for help', known: true },
+    { id: 'c9', name: 'Vyell the Quiet', sex: 'male', race: 'wolfman', seat: 'opponent', focal: true, part: 'stands in the way', trade: 'hunter', known: false },
+    { id: 'p2', name: 'Kritias Ashworth', sex: 'male', race: 'human', seat: 'support', focal: false, part: '', trade: 'reeve', known: false },
+  ], ...o });
+  it('a byname in a label goes whole, particles included: the For line reads plainly', () => {
+    const r = raw();
+    r.cast = [{ id: 'p1', label: 'Autonoe of the Ford, human woman who asks for help' }, { id: 'c9', label: 'Vyell the Quiet, a wolfkin hunter' }, { id: 'p2', label: 'a human reeve' }];
+    const c = byname();
+    const v = ok(r, c);
+    expect(v.plan!.cast.map(x => x.label)).toEqual(['human woman', 'a wolfkin hunter', 'a human reeve']);
+    expect(v.repairs.join(' | ')).toMatch(/name stripped from p1/);
+    const k = newKnowing(v.plan!.cast);
+    const forLine = logLines(questLog(v.plan!, k, newState(), { lines: null, done: new Map() }, { forLine: true, open: false }))[0]!;
+    expect(forLine).toBe('For: Autonoe of the Ford, a human woman, who wants to get the chapel bell back.');
+    expect(JSON.stringify(v.plan!.cast)).not.toMatch(/\b(?:an? )?of the (?:human|wolfkin)/);
+  });
+  it('an unmet name in plan text becomes ONE label, whole or a byname part with its particles', () => {
+    const r = raw();
+    r.episodes[0].job = 'Track Vyell the Quiet through Ashbrook.';
+    r.episodes[1].job = 'Win Kritias Ashworth over at Coldwell.';
+    r.episodes[1].win = 'Ashworth takes the company\'s side; the Quiet one flees.';
+    r.cast = [{ id: 'p1', label: 'a human miller' }, { id: 'c9', label: 'a wolfkin hunter' }, { id: 'p2', label: 'a human reeve' }];
+    const v = ok(r, byname());
+    expect(v.plan!.episodes[0]!.job).toBe('Track a wolfkin hunter through Ashbrook.');
+    expect(v.plan!.episodes[1]!.job).toBe('Win a human reeve over at Coldwell.');
+    expect(v.plan!.episodes[1]!.win).not.toMatch(/a human reeve a human reeve|Ashworth/);
   });
 });
 

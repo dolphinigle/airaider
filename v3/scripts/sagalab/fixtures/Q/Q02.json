@@ -1,0 +1,23 @@
+{
+  "id": "Q02",
+  "set": "Q",
+  "seed": 202,
+  "path": "personal",
+  "spark": "Gruk ran from the high pass when raiders came for his clan's herd, and his young cousin held it alone and died",
+  "focal": {
+    "name": "Gruk Ironjaw",
+    "sex": "male",
+    "race": "wolfman",
+    "seed": 2102,
+    "value": 150,
+    "who": "A big wolfman who flinches at horn calls.",
+    "backstory": "Gruk Ironjaw was set to hold the high pass with his young cousin when raiders came for the clan's herd. He ran; his cousin stayed, and the clan buried him with the herd lost."
+  },
+  "N": 4,
+  "kind": "recruit",
+  "personal": true,
+  "twist": false,
+  "level": 2,
+  "rarity": "uncommon",
+  "note": "personal set pers1 (round T, North Star item 0): one of 8 company soldiers with a varied one-line past (the spark = the backstory's first sentence, as the game's personalSeed reads it)"
+}

@@ -4439,6 +4439,13 @@ export class Game {
    *  (`personalEdges`), else the past they were fleshed with. Never a generic theme — that is what turned a personal saga
    *  into somebody else's ransom job */
   private personalSeed(merc: Card): string {
+    // a soldier an earlier personal saga changed (saga pipe arm past): their backstory, then what that saga made of them —
+    // never the old wrong alone, as if nothing had happened
+    const grown = merc.character?.grown;
+    if (grown?.length) return `${merc.character?.backstory?.trim() || this.personalSeedBase(merc)} ${grown.join(' ')}`;
+    return this.personalSeedBase(merc);
+  }
+  private personalSeedBase(merc: Card): string {
     const top = this.personalEdges(merc)[0];
     if (top?.blurb) return top.blurb;
     // A soldier the company WON (rescued, hired, turned) has a backstory written at the moment it
@@ -4656,7 +4663,12 @@ export class Game {
       // personal finale: bank crystallizes as gold + pinned CORE memory (no new character)
       const surplus = cashValue(chain.bank);
       this.addGold(surplus);
-      guardEdges(st.lore, [{ from: chain.focalId, to: chain.focalId, type: 'scarred-by', blurb: `came through ${this.sagaTitle(chain)}`, importance: 0.9 }], st.cycle, () => freshId('e'));
+      // (saga pipe arm past, a lab arm: engine/saga.ts PipeArm) the soldier's change, as the engine's one dossier line, is the
+      // memory the saga leaves — their sheet shows it in both UIs — and it is kept on them to seed their next personal saga
+      // (personalSeed). Every other saga leaves "came through <title>"
+      const grown = chain.saga?.grown;
+      if (grown && focal?.character) focal.character.grown = [...(focal.character.grown ?? []), grown];
+      guardEdges(st.lore, [{ from: chain.focalId, to: chain.focalId, type: 'scarred-by', blurb: grown ? this.clampBlurb(grown, 160) : `came through ${this.sagaTitle(chain)}`, importance: 0.9 }], st.cycle, () => freshId('e'));
       report.push(`🏅 ${focal?.name}'s story closes: +${surplus}g and a mark that stays.`);
       return;
     }

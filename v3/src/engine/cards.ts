@@ -36,6 +36,9 @@ export interface CharacterData {
    *  normally writes them at delivery; this is what the fallback flesh pass has to work from when
    *  it doesn't (2026-08-27: without it a rescued shrine novice was given a courtesan's past). */
   origin?: { title: string; situation: string; job: string };
+  /** what their own sagas made of them: one engine-written dossier line per personal saga that changed them (saga pipe arm
+   *  past, SagaRecord.grown) — read back as the seed of their next personal saga, after the backstory */
+  grown?: string[];
 }
 
 export interface Card {

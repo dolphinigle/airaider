@@ -17,15 +17,15 @@ import type { Lead } from '../engine/quests.js';
 import { coins, type Outcome, type SlotTest } from '../engine/roll.js';
 import { KEEP_THRESHOLD, type TraitPrefs } from '../engine/economy.js';
 import {
-  dealSaga, castSaga, rollHurt, clampHurt, helped, piped, EPISODE_TESTS, WAY_TESTS, WAY_REWARD, HOW_BAND, SEED_ARM, PIPE_ARM,
+  dealSaga, castSaga, rollHurt, clampHurt, helped, piped, looksOf, EPISODE_TESTS, WAY_TESTS, WAY_REWARD, HOW_BAND, SEED_ARM, PIPE_ARM,
   type SagaRecord, type SeedArm, type PipeArm, type SagaWorld, type SagaPlan, type SagaPos, type LogRow, type Matter, type Hurt, type Cost, type Way,
-  type EpisodeType, type CastEntry, type Face, type EpisodeTest,
+  type EpisodeType, type CastEntry, type Face, type EpisodeTest, type Episode,
 } from '../engine/saga.js';
 import {
   newKnowing, newState, planSaga, seedSteps, writeOutline, writeCard, writeReport, firstCardPayload, laterCardPayload, reportPayload,
   questLog, logLines, noteDelivered, forLineShown, onThisMatter, jobWhy, roadLines, roadHopes, mockOutline, bank, triedLine,
   revealLint, choiceTarget, fateSentence, knowingOf, keepKnowing, roadOf, toNullable, PRONOUN, graftRoad, toldOption,
-  writeLate, cardWhy,
+  writeLate, cardWhy, grownLine, cardHope, withLead, mentions,
   type ReportCall,
 } from '../ai/storyteller.js';
 import type { AiProvider, AskSlotOut } from '../ai/provider.js';
@@ -75,6 +75,19 @@ export const playedPlan = (rec: SagaRecord): SagaPlan => {
   const plan = planOf(rec), l = rec.late;
   return l ? { ...plan, showdown: { ...plan.showdown, job: l.job, trouble: { ...l.trouble }, lose: l.lose } } : plan;
 };
+
+/** (pipe arm weight, TB) someone the plan puts in this job, met in person for the first time — never the one the company
+ *  acts for, a face already known, anyone a report already named, or anyone in a job already played — with how they look
+ *  (looksOf). The first such, in the plan's own order; none: no meeting here. `card`: as a card meets them — never one its
+ *  job already names (verify: "win over the moneylender … There you meet the moneylender"); the report meets them instead */
+export function firstMeet(rec: SagaRecord, plan: SagaPlan, e: Episode, finale: boolean, card = false): { id: string; looks: string } | undefined {
+  const k = knowingOf(rec), N = rec.world.N;
+  const before = new Set(rec.lines.flatMap(l => (l.n >= N ? plan.showdown : plan.episodes[l.n - 1])?.people ?? []));
+  const here = finale ? [...e.people, choiceTarget(plan).id] : e.people;
+  const p = here.map(id => plan.cast.find(c => c.id === id))
+    .find((c): c is CastEntry => !!c && c.seat !== 'client' && c.seat !== 'soldier' && !c.known && !k.met.has(c.id) && !before.has(c.id) && !(card && mentions(e.job, c)));
+  return p ? { id: p.id, looks: looksOf(p) } : undefined;
+}
 
 // ─── deal (synchronous: runs in runPursue's prefix, so two queued pursues never share a theme or a name) ─
 
@@ -171,8 +184,15 @@ export async function card(host: SagaHost, chain: Chain): Promise<SagaCardOut> {
   const e = pos.finale ? played.showdown : plan.episodes[pos.job - 1]!;
   const direction = host.direction();
   const retry = pos.attempt > 1;
+  // round T (engine/saga.ts PipeArm): room's caps; weight's sizes, and a later card's first in-person meeting (`firstMeet`)
+  const weight = piped(w, 'weight');
+  const meet = weight && !first && !pos.finale && !retry ? firstMeet(rec, plan, e, false, true) : undefined;
+  // round T's shared fixes (clean): a middle job's hope checked when its card comes (`cardHope`), labels and names in the fields
+  const clean = piped(w, 'clean'), n = pos.finale ? w.N : pos.job;
   const cc = first ? firstCardPayload(plan, w, k, direction)
-    : laterCardPayload(played, e, rec.latest, k, { finale: pos.finale, lastchance: rec.lastchance, retry, direction, why: cardWhy(plan, pos.finale ? w.N : pos.job, rec.hopes), fixes: piped(w, 'fixes') });
+    : laterCardPayload(played, e, rec.latest, k, { finale: pos.finale, lastchance: rec.lastchance, retry, direction, fixes: piped(w, 'fixes'),
+      why: clean ? withLead(n <= plan.episodes.length ? plan.episodes[n - 1]?.lead : undefined, cardHope(plan, w, n, rec.hopes, k)) : cardWhy(plan, n, rec.hopes),
+      ...(piped(w, 'room') ? { room: true } : {}), ...(weight ? { weight: true, ...(meet ? { meet } : {}) } : {}), ...(clean ? { clean: true } : {}) });
   let prose: string;
   if (first && piped(w, 'grafts')) {
     // pipe arm grafts (R6, F1): no outline call — the road and each later job's hope are the plan's own whys, a flagged
@@ -264,12 +284,27 @@ export function reportCall(host: Pick<SagaHost, 'direction'>, chain: Chain, pos:
   // the chosen button's deed as the story tells it: the gold way's money stays on the button (toldOption)
   const option = f.option && { way: f.option.way, label: toldLabel(rec, f.option) };
   // pipe arm grafts (R6, F1): a middle job's report is dealt the hope its card was dealt (the card's promise)
-  const hope = piped(rec.world, 'grafts') && !pos.finale ? jobWhy(plan, pos.job, rec.hopes) : undefined;
+  // (pipe arm clean) the hope its card was dealt, checked when that card came (`cardHope`)
+  const clean = piped(rec.world, 'clean');
+  const hope = piped(rec.world, 'grafts') && !pos.finale ? clean ? cardHope(plan, rec.world, pos.job, rec.hopes, knowingOf(rec)) : jobWhy(plan, pos.job, rec.hopes) : undefined;
+  // round T: room, weight (+ a first in-person meeting here — none again for the one this job's card met, verify: the report
+  // repeated the card's looks word for word), voice, lore (its payoff), past (the soldier's change)
+  const w = rec.world;
+  const cardMet = piped(w, 'weight') && !pos.finale && pos.job > 1 && pos.attempt === 1 ? firstMeet(rec, plan, e, false, true) : undefined;
+  const meet = piped(w, 'weight') ? firstMeet(rec, plan, e, pos.finale) : undefined;
+  const t = {
+    ...(piped(w, 'room') ? { room: true } : {}),
+    ...(piped(w, 'weight') ? { weight: true, ...(meet && meet.id !== cardMet?.id ? { meet } : {}) } : {}),
+    ...(piped(w, 'voice') ? { voice: true } : {}),
+    ...(piped(w, 'lore') && plan.lore ? { lore: plan.lore } : {}),
+    ...((c => w.personal && piped(w, 'past') && c ? { change: c } : {})(plan.cast.find(p => p.seat === 'soldier')?.change)),
+  };
   return reportPayload({
     plan, e, card: prose, party: f.party, decides: f.decides, outcome: f.outcome, finale: pos.finale, hurt: f.hurt, cost: f.cost, option, fate: f.fate,
     k: knowingOf(rec), gravity: f.gravity, direction: host.direction(), state: { learned: [...rec.state.learned], held: [...rec.state.held] },
     ...(hope ? { hope } : {}), ...(piped(rec.world, 'fixes') ? { fixes: { places: rec.world.places } } : {}),
     ...(piped(rec.world, 'narrow') ? { narrow: true } : {}),
+    ...(Object.keys(t).length ? { t } : {}), ...(clean ? { clean: true } : {}),
   });
 }
 /** a finale button's deed as the writer and the story's own lines get it (storyteller toldOption): the report's `plan`,
@@ -296,6 +331,9 @@ export function afterReport(host: SagaHost, chain: Chain, pos: SagaPos, a: { out
   rec.lines.push({ n: pos.finale ? N : pos.job, attempt: rec.lines.length + 1, outcome: a.outcome, party: a.party.map(p => p.name), text: tried, hurt: a.hurt });
   // how it ended, in the finale's Outcome sentence (sagaFate — every branch settleFinale takes): the views' "ending"
   if (pos.finale && a.fate) rec.ending = a.fate;
+  // (pipe arm past, PP) a personal finale not lost leaves the soldier ONE dossier line, from the plan's change (the game keeps
+  // it on the soldier and seeds their next personal saga with it)
+  if (pos.finale && a.outcome !== 'failure' && w.personal && piped(w, 'past')) { const g = grownLine(plan); if (g) rec.grown = g }
   const wonMiddle = !pos.finale && a.outcome !== 'failure';
   const failures = chain.failures, budget = chain.failureBudget;
   if (!pos.finale) {

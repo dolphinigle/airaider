@@ -1,0 +1,23 @@
+{
+  "id": "Q06",
+  "set": "Q",
+  "seed": 206,
+  "path": "personal",
+  "spark": "Faelor gave false witness at a lord's court for a purse of silver, and an innocent smith was hanged on his word",
+  "focal": {
+    "name": "Faelor",
+    "sex": "male",
+    "race": "elf",
+    "seed": 2106,
+    "value": 150,
+    "who": "An elf with a fine voice who no longer sings.",
+    "backstory": "Faelor was the court singer at a river lord's hall when a smith stood accused of theft. Paid by the real thief, he swore he saw the smith do it, and the smith was hanged."
+  },
+  "N": 4,
+  "kind": "recruit",
+  "personal": true,
+  "twist": false,
+  "level": 2,
+  "rarity": "uncommon",
+  "note": "personal set pers1 (round T, North Star item 0): one of 8 company soldiers with a varied one-line past (the spark = the backstory's first sentence, as the game's personalSeed reads it)"
+}

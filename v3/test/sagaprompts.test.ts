@@ -14,7 +14,10 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
   // the seed arms (North Star 7; engine/seedkit.ts): none (themes), a kit's keywords, a premise; with a kit cast, `support`
   // the lab's pipe arms (engine/saga.ts PipeArm) ride on kit+pick: grafts (C2, and D1, D2, E1–E3, F1–F3 on it) · sides; fixes
   // (D2), trail (E2), line (F1) and link (F3) on grafts, line and link together (FX)
-  plan: [[], ['keywords', 'support'], ['premise', 'support'], ...['grafts', 'sides'].map(pipe => ['keywords', 'support', pipe]), ...['fixes', 'trail', 'line', 'link'].map(pipe => ['keywords', 'support', 'grafts', pipe]), ['keywords', 'support', 'grafts', 'line', 'link']].flatMap(seed => [['notrade'], []].flatMap(cast => subsets(['personal', 'memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, ...seed], vars: {} })))),
+  // round T (TA–TD, TP, PP) on grafts, one change each: voice, lore, page, past (past only reaches a personal plan); and the
+  // standalone clean arm (the verifier's shared fixes, in no round-T arm)
+  plan: [[], ['keywords', 'support'], ['premise', 'support'], ...['grafts', 'sides'].map(pipe => ['keywords', 'support', pipe]), ...['fixes', 'trail', 'line', 'link'].map(pipe => ['keywords', 'support', 'grafts', pipe]), ['keywords', 'support', 'grafts', 'line', 'link'],
+    ...[['clean'], ['voice'], ['lore'], ['page'], ['past']].map(arm => ['keywords', 'support', 'grafts', ...arm])].flatMap(seed => [['notrade'], []].flatMap(cast => subsets(['personal', 'memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, ...seed], vars: {} })))),
   // (pipe arm sides: a plan with sides deals no parts, so `side` never meets `part`; pipe arm fixes, D2, on any card: `lose`
   // on every finale, beside `will` but at a last chance)
   card: ['first', 'later', 'finale'].flatMap(pos => subsets(['memory', 'direction', 'intro', 'part', 'side', ...(pos === 'first' ? ['personal', 'returning'] : []), ...(pos === 'finale' ? ['lastchance', 'lose'] : []),
@@ -22,7 +25,16 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
     .filter(s => !(s.includes('latest') && s.includes('retry')) && !(pos === 'finale' && s.includes('retry')) && (!s.includes('lastchance') || s.includes('lose')) && !(s.includes('personal') && s.includes('returning')))
     .filter(s => !(s.includes('will') && (s.includes('retry') || s.includes('lastchance'))) && !(s.includes('side') && s.includes('part')))
     // pipe arm line (F1): the trouble is one sentence — never beside fixes' phrase or a `will` part
-    .flatMap(extra => [extra, [...extra, 'fixes'], ...(extra.includes('will') ? [] : [[...extra, 'line']])]).map(extra => ({ flags: [pos, ...extra], vars: { MAX: pos === 'finale' ? 90 : 70 } }))),
+    .flatMap(extra => [extra, [...extra, 'fixes'], ...(extra.includes('will') ? [] : [[...extra, 'line']])])
+    // round T, on grafts alone (never with fixes or line): card 1's quoted line (voice: of the want, or a personal past), its
+    // lore, a personal past in two sentences; a later card's first meeting (weight; never a retry)
+    // (round T rides on kit+pick: a hired kit card names nobody by part, and a returning face is never on a personal saga, so
+    // `part` and `returning` never meet there)
+    // (clean: the standalone arm of the verifier's shared fixes, in no round-T arm)
+    .flatMap(extra => extra.includes('fixes') || extra.includes('line') || extra.includes('side') || (extra.includes('part') && extra.includes('returning')) ? [extra] : pos === 'first'
+      ? [extra, [...extra, 'clean'], [...extra, 'says'], [...extra, 'lore'], ...(extra.includes('personal') ? [[...extra, 'past']] : [])]
+      : pos === 'later' && !extra.includes('retry') ? [extra, [...extra, 'clean'], [...extra, 'meet']] : [extra, [...extra, 'clean']])
+    .map(extra => ({ flags: [pos, ...extra], vars: { MAX: pos === 'finale' ? 90 : 70 } }))),
   outline: [{ flags: [], vars: {} }],
   // pipe arm late (E1): the finale written after play
   showdown: [{ flags: [], vars: {} }],
@@ -40,7 +52,13 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
     .filter(s => !(s.some(f => ['clue', 'brought', 'hope'].includes(f)) && s.some(f => ['answer', 'option', 'edge'].includes(f))))
     .filter(s => !s.includes('known') || s.includes('have'))
     .filter(s => s.includes('answer') ? !s.includes('have') || s.includes('edge') : !s.includes('edge'))
-    .flatMap(s => s.includes('side') ? [s] : [s, [...s, 'fixes']]).flatMap(s =>
+    .flatMap(s => s.includes('side') ? [s] : [s, [...s, 'fixes']])
+    // round T, on grafts alone (never with fixes or side): weight's `meet`; voice's witness (a won clue) and teller (the finale);
+    // lore's payoff and past's change (the finale), each alone
+    // the standalone clean arm (labels everywhere, `away` for the named but absent; the hope never restated, the cost in the
+    // deciding moment, known facts laid out or said, no wound or price in the summary) — never with narrow
+    .flatMap(s => s.includes('fixes') || s.includes('side') || s.includes('narrow') ? [s] : [s, ...[['clean'], ...(s.includes('people') ? [['clean', 'away']] : []), ...(s.includes('intro') ? [['meet']] : []), ...(s.includes('clue') ? [['witness']] : []),
+      ...(s.includes('answer') ? [['teller'], ['lore'], ['change']] : [])].map(arm => [...s, ...arm])]).flatMap(s =>
     [['moved'], ...(s.some(f => ['decides', 'result', 'clue', 'brought'].includes(f)) ? [] : [['failure', 'stopped']])].map(end => ({ flags: ['saga', ...s, ...end], vars: { B: 60, A: 140 } }))),
 };
 

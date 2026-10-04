@@ -1,0 +1,23 @@
+{
+  "id": "Q08",
+  "set": "Q",
+  "seed": 208,
+  "path": "personal",
+  "spark": "Yrsa was sold as a child by her own father to settle a gambling debt, and never learned why he did it",
+  "focal": {
+    "name": "Yrsa Greypelt",
+    "sex": "female",
+    "race": "wolfman",
+    "seed": 2108,
+    "value": 150,
+    "who": "A wolfman tracker who trusts no bargain.",
+    "backstory": "Yrsa Greypelt was nine when her father sold her to a caravan master to settle a gambling debt. She escaped two winters later and never found out why he did it, or where he went."
+  },
+  "N": 3,
+  "kind": "recruit",
+  "personal": true,
+  "twist": false,
+  "level": 2,
+  "rarity": "uncommon",
+  "note": "personal set pers1 (round T, North Star item 0): one of 8 company soldiers with a varied one-line past (the spark = the backstory's first sentence, as the game's personalSeed reads it)"
+}

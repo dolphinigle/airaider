@@ -1,0 +1,23 @@
+{
+  "id": "Q01",
+  "set": "Q",
+  "seed": 201,
+  "path": "personal",
+  "spark": "Hessa ran from her own wedding with the dowry silver, and her betrothed's family was shamed and left in debt",
+  "focal": {
+    "name": "Hessa Thatcher",
+    "sex": "female",
+    "race": "human",
+    "seed": 2101,
+    "value": 150,
+    "who": "A sharp-tongued human archer who never talks about home.",
+    "backstory": "Hessa Thatcher ran from her own wedding at dawn with the dowry silver sewn into her cloak. Her betrothed's family was shamed before the whole valley and sold their mill to cover the debt."
+  },
+  "N": 3,
+  "kind": "recruit",
+  "personal": true,
+  "twist": false,
+  "level": 2,
+  "rarity": "uncommon",
+  "note": "personal set pers1 (round T, North Star item 0): one of 8 company soldiers with a varied one-line past (the spark = the backstory's first sentence, as the game's personalSeed reads it)"
+}

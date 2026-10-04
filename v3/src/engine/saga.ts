@@ -87,15 +87,73 @@ export const SEED_ARM: SeedArm = 'kit+pick';
  *               a lead built from a learn, read as "before that job": later whys leaned on earlier learns or named their
  *               own gains, and whyFlags blanked them)
  *   fx      FX  grafts + line + plain + link
+ *  ROUND T (the Sultan texture/pacing study, reports/2026-10-04-sultan-pacing-study.md §3; round E §4.2), each grafts + ONE
+ *  change, so each is judged against G0's / PG0's draws already on disk (one change per arm, study §3 common frame):
+ *   clean   —   NOT in any round-T arm: the context-free verifier's fixes to the shared pipeline (19 defects G0 has too), a
+ *               standalone lab arm (grafts + clean) for a later round against G0. What it changes — inputs, never a
+ *               rule pile (each prompt line it adds cut or merged another):
+ *               · every person a card or report deals carries a label, every time (a met one's role word; the one the company
+ *                 acts for "who asked the company for help"); a report adds whom its result names as there, and whom any other
+ *                 dealt text names as `away` (stateless writers coined roles for bare names: "Donglanel, the eldest of them")
+ *               · a met person's name replaces "the <label>" in the fields a card or report is dealt (`namedIn`: one name per
+ *                 person — "Benjamund … the merchant's camp" read as two men)
+ *               · a middle card's why is checked when its card comes, not on card 1's road: only a later learn or the answer
+ *                 blanks it there (`cardHope`; a road-blanked why left the job with no reason and the asker out of the card)
+ *               · a report's soldiers: the decider's traits and trade only (every soldier acted out every trait in every report)
+ *               · plan: each field is read alone (name or cast label before any he/she, matching their sex); the seed's someone
+ *                 is a cast member; episode 1's job meets the person in ending face to face; "shown before play" sits on the
+ *                 episodes line, not at the end; a gain is a noun phrase
+ *               · plan (verify 2): a cast label is race and trade only; a win is told as done (cards and reports tell it in the
+ *                 past: a present-tense win as `latest` came out half-converted); settles and the showdown's job fit every
+ *                 way in ending (an edge may assume its job won: the engine drops a gain not held)
+ *               · card: no advice or orders; report: the hope never restated (what result and clue miss of it shown), the
+ *                 cost paid in the deciding moment, known facts laid out or said (never a soldier's
+ *                 thoughts), no wound or price in the summary; at the finale no `plan` beside the result (its fate)
+ *   room    TA  caps only (§3a, the length control): card 110, finale card 140; before 50/70/100; after 70/135/210, +20 per
+ *               thing shown, ceiling 210 (the finale +15 per thing past two). Same payloads, same prompts
+ *   weight  TB  each part's size dealt by the ENGINE with the content that fills it (§3b, b-E): a retry card 35, a later card
+ *               45 — 100 where someone the plan puts in the job is met in person for the first time, dealt `meet` (who, and
+ *               how they look: two appearance atoms the engine deals off the name, `looksOf` — never their traits, which were
+ *               pasted as an appositive; in a report the looks ride in the label, "short, ink-stained human merchant": a field of their own beside label and name was pasted as an appositive and the label lost) — card 1 70, the finale card 50; a card's cap never under its data plus a margin (a
+ *               35-word cap on 57 dealt words dropped facts or overran); a report's before 40 (70 with a `meet`), a failed
+ *               job with no wound 25 / 40, the finale 60 / 180 +10 per thing past two; gravity no longer sets the before. A
+ *               meeting is told once: none on a card whose job already names the person, and none again in the report of a
+ *               card that told it
+ *   voice   TC  one quoted line where a person with a stake speaks (§3c), never a script: card 1's `says` — the line itself,
+ *               written by the plan (first person, of the want; on a personal saga of the past), beside the narrated
+ *               want/past, never in their place (a card writer told to make a bare infinitive "one quoted line of feeling"
+ *               stamped "I want so badly to…"; a quote in place of the want left the want untold); a won job's clue said by someone it met who could know it, in their own words (`clue.by`: a person the gain holds, else the
+ *               one a talk or catch job is done to; never in a sneak job; nobody fits: found or seen); the
+ *               finale's secret said by the person in ending (`answer.teller`, one or two short quoted sentences). +15 words
+ *               where a line is dealt
+ *   lore    TD  one plan-written local-lore fact (§3d; the plan may leave it empty): told on card 1 (cap 95), and the finale
+ *               report shows what it turned out to be (+20). The last job's learn proves it (job 1's spent it at once), never the answer (lore the answer proved
+ *               was the answer in disguise, printed on card 1), and its "shown before play" sits on the lore field itself
+ *   page    TP  "the page first" (round E §4.2): the plan writes in dependency order, one call — the question; the jobs as
+ *               the player sees them, each with its why, whom it meets and what it `turns_up`; the answer made only of
+ *               those and the asker; each job's clue from what it turned up (one per job, none for the showdown); the finale.
+ *               The engine copies clues[i] into job i's learn (the why stays in the episode, ahead of the clues: shown
+ *               before play, a why written after them leaked one). Log-only checks (`pageChecks`): the answer names only people a job meets; each
+ *               learn names something its job turns up
+ *   past    PP  a personal saga's past and change (North Star item 0): the plan writes `past` as two plain sentences (what
+ *               happened and at what event or season — when as a count of years broke "no numbers" — who was hurt, what the soldier still carries), told plainly on card 1 (cap 90), and
+ *               `change` (how the soldier must be different by the end, from their past or traits), shown happening in the
+ *               finale report (+20); at a finale not lost the engine writes ONE dossier line from it (`grownLine`,
+ *               SagaRecord.grown) — the game keeps it on the soldier (character.grown, their sheet's memory) and seeds
+ *               their next personal saga with the backstory + that line
  *  (C1 `core` — a call fixing the want, question and answer before the plan — was removed: a measured loss, follow 26–116) */
-export type PipeArm = 'one' | 'grafts' | 'sides' | 'reads' | 'fixes' | 'late' | 'trail' | 'narrow' | 'line' | 'plain' | 'link' | 'fx';
-export const PIPE_ARMS: readonly PipeArm[] = ['one', 'grafts', 'sides', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx'];
+export type PipeArm = 'one' | 'grafts' | 'sides' | 'reads' | 'fixes' | 'late' | 'trail' | 'narrow' | 'line' | 'plain' | 'link' | 'fx'
+  | 'room' | 'weight' | 'voice' | 'lore' | 'page' | 'past' | 'clean';
+export const PIPE_ARMS: readonly PipeArm[] = ['one', 'grafts', 'sides', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx',
+  'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean'];
 /** the changes each pipe arm carries, by the arm that brought each in: D1, D2, E1–E3 and F1–F3 are C2 plus one change each;
  *  FX is C2 plus all of round F */
 const PIPE_PARTS: Record<PipeArm, readonly PipeArm[]> = {
   one: ['one'], grafts: ['grafts'], sides: ['sides'], reads: ['grafts', 'reads'], fixes: ['grafts', 'fixes'],
   late: ['grafts', 'late'], trail: ['grafts', 'trail'], narrow: ['grafts', 'narrow'],
   line: ['grafts', 'line'], plain: ['grafts', 'plain'], link: ['grafts', 'link'], fx: ['grafts', 'line', 'plain', 'link'],
+  room: ['grafts', 'room'], weight: ['grafts', 'weight'], voice: ['grafts', 'voice'], lore: ['grafts', 'lore'],
+  page: ['grafts', 'page'], past: ['grafts', 'past'], clean: ['grafts', 'clean'],
 };
 /** whether a dealt world's pipe arm carries `part` */
 export const piped = (w: Pick<SagaWorld, 'pipe'>, part: PipeArm): boolean => !!w.pipe && PIPE_PARTS[w.pipe].includes(part);
@@ -246,11 +304,18 @@ export const troubleWho = (t: Trouble): string => t.line ?? t.who;
  *  line). gain / learn: a middle job's — what the company holds after a win, and the piece toward the answer the win
  *  brings out. edge: the showdown's — one per middle job, in job order: how holding that job's gain helps here. lead: pipe
  *  arm link (F3) — the fact that points the company to this job, one the player has by its card */
-export interface Episode { n: number; type: EpisodeType; title: string; job: string; people: string[]; trouble: Trouble; win?: string; gain?: string; learn?: string; why: string; settles?: string; lose?: string; edge?: string[]; lead?: string }
+export interface Episode { n: number; type: EpisodeType; title: string; job: string; people: string[]; trouble: Trouble; win?: string; gain?: string; learn?: string; why: string; settles?: string; lose?: string; edge?: string[]; lead?: string;
+  /** pipe arm page (TP): what the job turns up, as the plan wrote it before the answer */
+  turnsUp?: string }
 /** past: a personal saga's soldier only, the old wrong in a few words. side: pipe arm sides only — whose side they are
  *  on, and why, as the plan wrote it */
-export interface CastEntry extends SagaPerson { label: string; want: string; past?: string; side?: string }
-export interface SagaPlan { title: string; question: string; answer: string; cast: CastEntry[]; episodes: Episode[]; showdown: Episode; options: { way: Way; label: string }[] }
+export interface CastEntry extends SagaPerson { label: string; want: string; past?: string; side?: string;
+  /** pipe arm past (PP): a personal saga's soldier only — how they must be different by the end, a done fact naming them */
+  change?: string;
+  /** pipe arm voice (TC): the one the company acts for only — the line card 1 quotes, first person, as the plan wrote it */
+  says?: string }
+/** lore: pipe arm lore (TD) — one thing people here say or do, as hearsay ('' or absent: the plan wrote none) */
+export interface SagaPlan { title: string; question: string; answer: string; cast: CastEntry[]; episodes: Episode[]; showdown: Episode; options: { way: Way; label: string }[]; lore?: string }
 /** pipe arm late (E1): the finale's own fields, written from where the story stands when the finale comes — they replace
  *  the plan's showdown job, trouble and lose (no why: a finale's is the For line's want, R5 verify 2) */
 export interface LateShowdown { job: string; trouble: Trouble; lose: string }
@@ -346,6 +411,8 @@ export interface SagaRecord {
   /** pipe arm late (E1): the finale as written after play, once the finale comes; null: the call failed and the plan's
    *  showdown stands; absent: not yet written (or another arm) */
   late?: LateShowdown | null;
+  /** pipe arm past (PP): the engine's one dossier line for the soldier, written when the finale is not lost (`grownLine`) */
+  grown?: string;
   /** the card on offer, re-offered verbatim while unmarched (D15); cleared by every report */
   cache?: { pos: SagaPos; title: string; prose: string; job: string; rows: LogRow[]; matter: Matter[] };
 }
@@ -570,3 +637,17 @@ export function clampHurt(outcome: Outcome, hurt: Hurt[]): Hurt[] {
 export const HURT_BAND: Record<Hurt['how'], 'low' | 'med' | 'high'> = { lightly: 'low', badly: 'med', gravely: 'high' };
 /** the band word the report and chronicle print beside a hurt */
 export const HOW_BAND: Record<Hurt['how'], string> = { lightly: 'light', badly: 'serious', gravely: 'grave' };
+
+// ─── pipe arm weight (TB): how a person looks when the company first meets them ─────────────────
+
+/** atoms that combine (one of each), all things a stranger SEES: a body, and a mark on them or what they wear. The engine
+ *  deals them, never the writer. (verify) Never their traits ("shrewd, serious", "clumsy, sociable"): a personality dealt as
+ *  looks was pasted as an appositive, and the report then said it again */
+const LOOK_BODY = ['tall', 'short', 'stout', 'thin', 'broad', 'stooped', 'scarred', 'weathered', 'grey-haired', 'red-faced', 'young', 'bony'];
+const LOOK_MARK = ['ink-stained', 'mud-spattered', 'ring-heavy', 'patched', 'soot-smudged', 'bald', 'one-eyed', 'freckled', 'gap-toothed', 'pock-marked', 'sun-browned', 'limping'];
+/** (pipe arm weight) how a person looks when met: one body and one mark dealt off a hash of their name — no rng draw, so
+ *  every deal stays the same */
+export function looksOf(p: Pick<SagaPerson, 'name'>): string {
+  const h = hashStr(`looks:${p.name}`);
+  return `${LOOK_BODY[h % LOOK_BODY.length]}, ${LOOK_MARK[(h >>> 8) % LOOK_MARK.length]}`;
+}

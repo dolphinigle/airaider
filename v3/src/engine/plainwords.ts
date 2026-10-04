@@ -40,6 +40,9 @@ export const topSkill = (c: Card) => [...c.tags].filter(t => groupOfTag(t.concep
  *  report's `soldiers[].is` (they named the same soldier "wanderer" and "a cook"). The top skill's noun, else the
  *  background word */
 export const soldierTrade = (c: Card) => { const s = topSkill(c); return s ? SKILL_NOUN[s]!.replace(/^an? /, '') : backgroundOf(c) ?? 'wanderer' };
+/** a soldier's race and sex alone: "a human man" — (saga pipe arm clean) a report's soldier who does not decide the job: every
+ *  soldier's traits and trade on every report were each acted out every time ("Malene talked low…" in three reports) */
+export const soldierKind = (c: Card): string => an(`${RACE_WORD[raceOf(c)] ?? raceOf(c)} ${manWoman(sexOf(c))}`);
 /** a soldier as the report meets them: "a human man, hot-headed, a brawler" (§2.9.3) */
 export function soldierIs(c: Card): string {
   const w = plainWords(c, 1)[0];

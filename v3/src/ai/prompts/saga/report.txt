@@ -3,26 +3,27 @@ Write the report of one job in a fantasy game about a mercenary company.
 The data:
 - card: what the player just read. job: its task.
 - soldiers: who went, what each is like.[[decides]] decides: whose deed wins it.[[/decides]]
-[[people]]- people: who else is there, by name.[[intro]] intro: new to the player; first mention gives label and name.[[/intro]][[part]] part: their side, shown, not stated.[[/part]][[side]] side: their side, shown on first appearance.[[/side]]
+[[people]]- people: who else is there, by name.[[intro]] intro: new[[!meet]] to the player[[/!meet]]; first mention gives label and name.[[/intro]][[part]] part: their side, shown, not stated.[[/part]][[side]] side: their side, shown on first appearance.[[/side]][[away]] away: named, not there.[[/away]]
 [[!failure]]- outcome: success, partial (done, at a price), or failure.[[result]] result: what came of it.[[/result]]
 [[option]]- plan: what the soldiers do, shown in after[[!fixes]], in your own words[[/!fixes]].
 [[hurt]]- hurt: [[hurtprice]]the price paid: [[/hurtprice]]who is hurt, how badly; show each taking it.
-[[cost]]- cost: the price; show it paid.
+[[cost]]- cost: [[!clean]]the price; show it paid[[/!clean]][[clean]]paid in the deciding moment[[/clean]].
 [[brought]]- brought: who or what the company now holds; show each gained.
-[[clue]]- clue: a fact this win brings out; show it found, seen or said, [[!fixes]]plainly, and nothing past it[[/!fixes]][[fixes]]adding nothing to it[[/fixes]].
-[[hope]]- hope: [[!fixes]][[!narrow]]the card's hope, limited by result and clue; show shortfalls.[[/!narrow]][[narrow]]what result, brought and clue miss, show as still hoped.[[/narrow]][[/!fixes]][[fixes]]unless result, brought or clue meets it, show it still hoped for.[[/fixes]]
+[[clue]][[!witness]]- clue: a fact this win brings out; show it found, seen or said, [[!fixes]]plainly, and nothing past it[[/!fixes]][[fixes]]adding nothing to it[[/fixes]].[[/!witness]]
+[[witness]]- clue: what this win brings out; by: who says it, quoted, in their own words, nothing past it.
+[[hope]]- hope: [[!fixes]][[!narrow]][[!clean]]the card's hope, limited by result and clue; show shortfalls.[[/!clean]][[clean]]the card's hope; show, never tell, what result and clue miss.[[/clean]][[/!narrow]][[narrow]]what result, brought and clue miss, show as still hoped.[[/narrow]][[/!fixes]][[fixes]]unless result, brought or clue meets it, show it still hoped for.[[/fixes]]
 [[known]]- known: what earlier jobs found; never shown as new.
-[[have]]- have: what the company holds, never in enemy hands[[edge]]; helps: its use; show each used[[/edge]][[!edge]]; use it only where it helps this job[[/!edge]].
-[[answer]]- answer: the question and its secret.
+[[have]]- have: what the company holds, never in enemy hands[[edge]]; helps: its use; show each used[[/edge]][[!edge]]; use it only where it helps[[!clean]] this job[[/!clean]][[/!edge]].
+[[answer]]- answer: the question and its secret.[[teller]] teller: who says the secret.[[/teller]][[lore]] lore: the first card's hearsay; show what it turned out to be.[[/lore]][[change]] change: how the soldier is different now; show it happen.[[/change]]
 [[direction]]- direction: the player's wish for the telling only.
 
 Write:
 - before: at most {{B}} words. The soldiers meet what stands in their way, short of the goal, never repeating the card. No hint of how it goes.
-[[!failure]]- after: at most {{A}} words. The deciding moment, then what [[result]]result says [[/result]]came of it[[!fixes]], in your own words[[/!fixes]]; nothing else changes.[[answer]] [[!fixes]]The secret comes out within it, in time order: said, seen or found[[known]], built from known[[/known]].[[/!fixes]][[fixes]]Someone says, shows or finds the secret[[known]], pointing to a fact from known[[/known]].[[/fixes]][[/answer]] End on something seen, done or said that shows the change.
+[[!failure]]- after: at most {{A}} words. The deciding moment, then what [[result]]result says [[/result]]came of it[[!fixes]], in your own words[[/!fixes]]; nothing else changes.[[answer]] [[!teller]][[!fixes]]The secret comes out within it[[!clean]], in time order[[/!clean]]: said, seen or found[[known]][[!clean]], built from known[[/!clean]][[clean]]; known facts are laid out or said, never thought[[/clean]][[/known]].[[/!fixes]][[fixes]]Someone says, shows or finds the secret[[known]], pointing to a fact from known[[/known]].[[/fixes]][[/!teller]][[teller]]The teller says the secret in [[!clean]]one quoted line, their own words[[/!clean]][[clean]]their own words, one or two short quoted sentences[[/clean]][[known]][[!clean]], built from known[[/!clean]][[clean]]; known facts are laid out or said, never thought[[/clean]][[/known]].[[/teller]][[/answer]] End on something seen, done or said that shows the change.
 [[failure]]- after: at most {{A}} words. What stood in the way beats them, and the job is not done; nothing else changes. End on something seen, done or said.
-[[moved]]- summary: one sentence, at most 25 words: what the company did and the result[[clue]], not the clue[[/clue]]; no wound (shown beside it). Name no soldier[[personal]] but the one whose past this story is[[/personal]]; say the company.
-[[stopped]]- summary: one sentence, at most 25 words: what stopped the company, no wound (shown beside it). Name no soldier[[personal]] but the one whose past this story is[[/personal]]; say the company.
+[[moved]]- summary: one sentence, at most 25 words: what the company did and the result[[clue]], not the clue[[/clue]]; no wound[[!clean]] (shown beside it)[[/!clean]][[clean]] or price[[/clean]]. Name no soldier[[personal]] but the one whose past this story is[[/personal]]; say the company.
+[[stopped]]- summary: one sentence, at most 25 words: what stopped the company, no wound[[!clean]] (shown beside it)[[/!clean]][[clean]] or price[[/clean]]. Name no soldier[[personal]] but the one whose past this story is[[/personal]]; say the company.
 
-Past tense, third person, [[fixes]]your own [[/fixes]]plain words, short complete sentences, in the order things happened. Invent no names. No numbers, nothing modern, no pay.
+Past tense, third person, [[fixes]]your own [[/fixes]]plain words, short complete sentences, in [[!clean]]the order things happened[[/!clean]][[clean]]time order[[/clean]]. Invent no names. No numbers, nothing modern, no pay.
 
 Reply with JSON only: {"before": "text", "after": "text"[[saga]], "summary": "text"[[/saga]]}

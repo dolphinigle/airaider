@@ -1,0 +1,23 @@
+{
+  "id": "Q05",
+  "set": "Q",
+  "seed": 205,
+  "path": "personal",
+  "spark": "Bran took the blame for his brother's killing of a reeve's son, and was branded and driven out of Millbrook",
+  "focal": {
+    "name": "Bran Redhand",
+    "sex": "male",
+    "race": "human",
+    "seed": 2105,
+    "value": 150,
+    "who": "A branded human with steady hands and a short temper.",
+    "backstory": "Bran Redhand's younger brother killed a reeve's son in a tavern brawl at Millbrook. Bran took the blame to spare him, and was branded on the hand and driven out."
+  },
+  "N": 3,
+  "kind": "recruit",
+  "personal": true,
+  "twist": false,
+  "level": 2,
+  "rarity": "uncommon",
+  "note": "personal set pers1 (round T, North Star item 0): one of 8 company soldiers with a varied one-line past (the spark = the backstory's first sentence, as the game's personalSeed reads it)"
+}

@@ -59,14 +59,35 @@
 //                next biggest source after the trouble object — class 3 is 14% but a fifth of it is writer padding and its
 //                sources are the engine's ending person and the finale's measured-out why)
 //   FX  fx       F1 + F2 + F3
+//   ROUND T (engine/saga.ts PipeArm room/weight/voice/lore/page; reports/2026-10-04-sultan-pacing-study.md §3, round E §4.2):
+//   the game default (grafts) plus one change each, on A2's deals; run as generations TA_g1 … (runs/seed1/TA_g1/):
+//   TA  room     the caps only (§3a, the length control): card 110 / finale 140; before 50/70/100; after 70/135/210
+//   TB  weight   each part's size dealt by the engine with what fills it (§3b, b-E): retry card 35, later 45, a first in-person
+//                meeting 100 with how that person looks (`meet`; a report: their entry's `looks`, before 70), card 1 70, finale
+//                card 50; a failed job with no wound 25 / 40; the finale report 60 / 180
+//   TC  voice    one quoted line where a person with a stake speaks (§3c): card 1's asker of their want (a personal soldier of
+//                their past) in place of the narrated sentence; a won clue said by a person there; the finale's secret said by
+//                the person in ending
+//   TD  lore     one plan-written local-lore fact (§3d; the plan may leave it empty), in card 1's premise, paid off in the finale
+//   TP  page     the page first (round E §4.2): the plan writes the question, then the jobs as the player sees them (whom each
+//                meets, what it turns up), then the answer made only of those, the clues and the hopes, then the finale
+//   THE PERSONAL SET (--run pers1; fixtures/PS S1–S8 on fixtures/Q: 8 company soldiers with varied one-line pasts × draws 1–3,
+//   draws 1–2 the personal path, 3 the bumpy one; every arm shares each slot's deal, runs/pers1/_deals/):
+//   PG0 the game default on personal sagas, as the game deals it (the incumbent)
+//   PP  past     the default + past and change (North Star item 0): the plan writes the past as two plain sentences (card 1
+//                tells it) and what must change in the soldier (the finale shows it); the engine writes one dossier line
+//                (dossier.md, plan.json `grown`; the game keeps it on the soldier and seeds their next personal saga with it)
 //
-//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A2c|A3|A4|B1|B2|C2|C3|D1|D2|G0|E1|E2|E3|F1|F2|F3|FX|all, or <arm>_g<N> = a further generation] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
-//        [--slots F6_3,F1_1] [--writer sonnet|haiku|openai] [--mock] [--pool 6] [--run seed1|seed2] [--force]
+//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A2c|A3|A4|B1|B2|C2|C3|D1|D2|G0|E1|E2|E3|F1|F2|F3|FX|TA|TB|TC|TD|TP|PG0|PP|all, or <arm>_g<N> = a further generation] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
+//        [--slots F6_3,F1_1] [--writer sonnet|haiku|openai] [--mock] [--pool 6] [--run seed1|seed2|pers1] [--force]
+//   (PG0 and PP play only the personal set, --run pers1; every other arm only the probe set)
 //   npx tsx scripts/sagalab/seedlab.ts --stats [--run seed1]     spend and latency per call kind over the run's folders
 //   npx tsx scripts/sagalab/seedlab.ts --check [--run seed1]     which saga folders are missing or incomplete
 //   npx tsx scripts/sagalab/seedlab.ts --render --arm E1,E2,E3 --slots F6_3 [--out _e_rendered] [--mock] [--run seed1]
-//        every NEW or CHANGED prompt variant a pipeline arm sent (one call per template + flag set), its system prompt and
-//        its real payload, into runs/<run>/<out>/ (default _pipeline_rendered; cleared first) for the context-free verifier
+//        [--outrun seed1] [--append]
+//        every NEW or CHANGED prompt variant a pipeline arm sent (one call per template + flag set, once per arm across the
+//        slots), its system prompt and its real payload, into runs/<outrun or run>/<out>/ (default _pipeline_rendered;
+//        cleared first, unless --append: then the variants already there are skipped) for the context-free verifier
 //
 // The world of a slot is the probe's: the base fixture's game (seed, fort, roster), its focal from the fixture's own seed
 // (a personal fixture's soldier), N, kind, a personal saga's past (the base spark), F5's returning client. The story rng
@@ -79,6 +100,8 @@
 // THE RUNS (`--run`; each its own 24 slots, runs/<run>/<arm>/<fixture>_<draw>/):
 //   seed1  draws 1–3 (F1_1 … F8_3): every arm so far was built and judged here. The pipeline arms and A2b/A2c replay A2's
 //          deals (REPLAY)
+//   pers1  the PERSONAL SET (fixtures/PS, draws 1–3: S1_1 … S8_3): personal sagas only, for the personal-saga arms (PG0, PP);
+//          its arms share each slot's deal as seed2's do
 //   seed2  draws 4–6 (F1_4 … F8_6): the OUT-OF-SAMPLE check — the same 8 base worlds (the fixture's game, focal, N, kind,
 //          personal past, F5's returning client) with NEW deals (situation, keywords, client, supporting cast, tone,
 //          places: the story rng is keyed by the draw) and new soldiers and dice, on seed1's path mix (draws 4–5 like 1–2,
@@ -114,7 +137,7 @@ import type { Outcome, SlotTest } from '../../src/engine/roll.js';
 import type { Attribute } from '../../src/engine/tags.js';
 import { renderTags } from '../../src/engine/tags.js';
 import { hashStr, seedOf, SEED_ARM, PIPE_ARM, type SeedArm, type PipeArm, type Face, type Hurt, type SagaRecord, type SagaWorld, type SagaPlan } from '../../src/engine/saga.js';
-import { logLines, matterLine, buttonLine } from '../../src/ai/storyteller.js';
+import { logLines, matterLine, buttonLine, pageChecks } from '../../src/ai/storyteller.js';
 import * as flow from '../../src/game/sagaflow.js';
 import type { TextRec } from './extract.js';
 import { glossEchoes, cardStamps } from './mech.js';
@@ -144,24 +167,34 @@ export const ARMS: Record<string, SeedArm> = {
   B2: 'kit+pick', C2: 'kit+pick', C3: 'kit+pick', D1: 'kit+pick', D2: 'kit+pick',
   G0: SEED_ARM, E1: 'kit+pick', E2: 'kit+pick', E3: 'kit+pick',
   F1: 'kit+pick', F2: 'kit+pick', F3: 'kit+pick', FX: 'kit+pick',
+  TA: 'kit+pick', TB: 'kit+pick', TC: 'kit+pick', TD: 'kit+pick', TP: 'kit+pick',
+  PG0: SEED_ARM, PP: 'kit+pick',
 };
 /** the pipeline arms: kit+pick's seed, one pipeline change each (the host's pipeArm; D1, D2 and E1–E3 carry C2's too). G0's is
  *  the build's PIPE_ARM, recorded here for the folder's labels; its host names none */
-export const PIPES: Record<string, PipeArm> = { B2: 'one', C2: 'grafts', C3: 'sides', D1: 'reads', D2: 'fixes', G0: PIPE_ARM, E1: 'late', E2: 'trail', E3: 'narrow', F1: 'line', F2: 'plain', F3: 'link', FX: 'fx' };
+export const PIPES: Record<string, PipeArm> = { B2: 'one', C2: 'grafts', C3: 'sides', D1: 'reads', D2: 'fixes', G0: PIPE_ARM, E1: 'late', E2: 'trail', E3: 'narrow', F1: 'line', F2: 'plain', F3: 'link', FX: 'fx',
+  TA: 'room', TB: 'weight', TC: 'voice', TD: 'lore', TP: 'page', PG0: PIPE_ARM, PP: 'past' };
 /** an arm played exactly as the game deals it: its host names no seed or pipe arm (the build's defaults stand) */
-const AS_THE_GAME = new Set(['G0']);
+const AS_THE_GAME = new Set(['G0', 'PG0']);
+/** the personal set's arms: they play only --run pers1, and that run plays only them */
+const PERSONAL_ARMS = new Set(['PG0', 'PP']);
 /** seed1: an arm that plays another arm's deals — each slot's dealt world is read back from that arm's plan.json (the
  *  noise control: a later change to the deal — the supporting trades — cannot move its inputs; the pipeline arms: the arm
  *  is the only difference). A later run shares its own deals instead (`SHARED_DEALS`) */
-const REPLAY: Record<string, string> = { A2b: 'A2', A2c: 'A2', B2: 'A2', C2: 'A2', C3: 'A2', D1: 'A2', D2: 'A2', G0: 'A2', E1: 'A2', E2: 'A2', E3: 'A2', F1: 'A2', F2: 'A2', F3: 'A2', FX: 'A2' };
+const REPLAY: Record<string, string> = { A2b: 'A2', A2c: 'A2', B2: 'A2', C2: 'A2', C3: 'A2', D1: 'A2', D2: 'A2', G0: 'A2', E1: 'A2', E2: 'A2', E3: 'A2', F1: 'A2', F2: 'A2', F3: 'A2', FX: 'A2',
+  TA: 'A2', TB: 'A2', TC: 'A2', TD: 'A2', TP: 'A2' };
 /** a further generation of an arm (the power rule): `<arm>_g<N>` plays `<arm>` exactly — its seed, pipe and replayed deals — into
  *  its own folder, runs/<run>/<arm>_g<N>/ */
 const gen = (armId: string) => armId.replace(/_g\d+$/, '');
 const armArg = opt('arm') ?? 'all';
-const ARM_IDS = armArg === 'all' ? Object.keys(ARMS) : armArg.split(',').map(s => s.trim());
+/** the personal set (pers1) plays only its own arms; every other run only the others */
+const PERSONAL_RUN = RUN === 'pers1';
+const ARM_IDS = armArg === 'all' ? Object.keys(ARMS).filter(a => PERSONAL_ARMS.has(a) === PERSONAL_RUN) : armArg.split(',').map(s => s.trim());
 for (const a of ARM_IDS) if (!ARMS[gen(a)]) { console.error(`--arm: ${a} is not one of ${Object.keys(ARMS).join('/')}`); process.exit(2) }
-// G0 replays A2's kit+pick deals: a build that deals another seed is no longer what those deals were dealt for
-if (ARM_IDS.some(a => gen(a) === 'G0') && SEED_ARM !== 'kit+pick') { console.error(`--arm G0: the build now deals ${SEED_ARM}, but G0 replays A2's kit+pick deals`); process.exit(2) }
+for (const a of ARM_IDS) if (PERSONAL_ARMS.has(gen(a)) !== PERSONAL_RUN) { console.error(`--arm ${a}: ${PERSONAL_RUN ? 'the personal set (pers1) plays only PG0 and PP' : 'PG0 and PP play only the personal set (--run pers1)'}`); process.exit(2) }
+// G0 replays A2's kit+pick deals: a build that deals another seed is no longer what those deals were dealt for (PG0 shares the
+// personal set's kit+pick deals with PP)
+if (ARM_IDS.some(a => ['G0', 'PG0'].includes(gen(a))) && SEED_ARM !== 'kit+pick') { console.error(`--arm G0/PG0: the build now deals ${SEED_ARM}, but G0 replays A2's kit+pick deals (PG0 shares PP's)`); process.exit(2) }
 
 // ─── fixtures and slots ────────────────────────────────────────────────────────────────────────
 
@@ -170,8 +203,10 @@ interface ProbeFixture {
   returning?: { seat: 'client'; name: string; sex: 'male' | 'female'; race: string; trade?: string; memory: string; where: string };
 }
 const readJson = <T>(p: string): T => JSON.parse(fs.readFileSync(p, 'utf8')) as T;
-const ALL_FX: ProbeFixture[] = fs.readdirSync(path.join(LAB, 'fixtures/P')).filter(f => /^F\d+\.json$/.test(f))
-  .sort((a, b) => Number(a.slice(1, -5)) - Number(b.slice(1, -5))).map(f => readJson<ProbeFixture>(path.join(LAB, 'fixtures/P', f)));
+/** each run's probe fixtures: the personal set its own (fixtures/PS: S1–S8, personal sagas on fixtures/Q), every other run P */
+const FX_DIR = PERSONAL_RUN ? 'fixtures/PS' : 'fixtures/P';
+const ALL_FX: ProbeFixture[] = fs.readdirSync(path.join(LAB, FX_DIR)).filter(f => /^[FS]\d+\.json$/.test(f))
+  .sort((a, b) => Number(a.slice(1, -5)) - Number(b.slice(1, -5))).map(f => readJson<ProbeFixture>(path.join(LAB, FX_DIR, f)));
 const baseOf = (id: string): LabFixture => readJson<LabFixture>(path.join(LAB, 'fixtures', id[0]!, `${id}.json`));
 const wantFx = opt('fixtures') && opt('fixtures') !== 'all' ? opt('fixtures')!.split(',') : ALL_FX.map(f => f.id);
 /** each run's first draw (THE RUNS above): seed1 draws 1–3, seed2 — the out-of-sample slots — draws 4–6; any other run 1–3 */
@@ -470,12 +505,18 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
     outline: io('outline')[0] ?? null, road: final.road, hopes: final.hopes,
     // round E: E1's finale as written after play (null: the call failed; absent: another arm), and its call
     ...(final.late !== undefined ? { late: final.late, showdownCall: io('showdown')[0] ?? null } : {}),
+    // round T: TP's log-only checks (the answer names only people a job meets; each learn names what its job turns up — the
+    // first runs on every arm's plan, for the rate); PP's dossier line (absent: none written)
+    pageChecks: pageChecks(plan), ...(final.grown !== undefined ? { grown: final.grown } : {}),
     validation: { defects: [], redraws: Math.max(0, callOf('plan').length - 1), fallback: final.fallback },
     dev, textLint, lines: final.lines, banked: final.state, knowing: final.knowing, ending: final.ending ?? null,
     cost, latency: { planMs, card1Ms, calls: rec.calls.map(c => ({ purpose: c.purpose, ms: c.durationMs })) },
   }, null, 2));
+  // (PP) the soldier's sheet after the saga: the one dossier line the engine wrote (never in order.txt: the judges read the
+  // saga as played, and this is the soldier's sheet, not the quest)
+  if (final.grown) fs.writeFileSync(path.join(dir, 'dossier.md'), `${focal.name} — dossier, after the saga:\n- ${final.grown}\n`);
   const meta = {
-    fixture: { id, set: 'P', seed: base.seed, path: path_, N, kind: fx.kind, personal: fx.personal, probe: fx.id, draw: d },
+    fixture: { id, set: PERSONAL_RUN ? 'PS' : 'P', seed: base.seed, path: path_, N, kind: fx.kind, personal: fx.personal, probe: fx.id, draw: d },
     run: `${RUN}/${path.basename(path.dirname(dir))}`, chainId: chain.id, chainState: chain.state, seedArm: final.world.kit?.arm ?? arm, ...(final.world.pipe ? { pipe: final.world.pipe } : {}),
     attempts, order, complete: problems.length === 0, problems,
   };
@@ -617,40 +658,56 @@ const CHANGED: Record<PipeArm, (c: { template: string; flags: string[] }) => boo
   plain: c => c.template === 'pick' || c.template === 'plan',
   link: c => (c.template === 'plan' && c.flags.includes('link')) || (c.template === 'card' && c.flags.includes('why')),
   fx: c => ['pick', 'plan'].includes(c.template) || (c.template === 'card' && (c.flags.includes('line') || c.flags.includes('why'))),
+  // round T. room: every card and report (their caps); weight: every card and report (their sizes; a first meeting's `meet` /
+  // `looks`); voice: card 1's line, a witnessed clue, the finale's teller; lore: the plan, card 1, the finale report; page: the
+  // plan; past: the personal plan, card 1, the finale report's change
+  room: c => c.template === 'card' || c.template === 'report',
+  weight: c => c.template === 'card' || c.template === 'report',
+  voice: c => c.flags.some(f => ['says', 'witness', 'teller'].includes(f)),
+  lore: c => c.flags.includes('lore'),
+  page: c => c.template === 'plan' && c.flags.includes('page'),
+  past: c => c.flags.includes('past') || c.flags.includes('change'),
 };
 /** --render: the new or changed prompt variants of the selected pipeline arms, one file per call */
 function render() {
   const name = opt('out') ?? '_pipeline_rendered';
   if (!/^_[\w-]+$/.test(name)) { console.error(`--out: ${name} must be one folder name starting with "_" (a run's arm folders do not)`); process.exit(2) }
-  const out = path.join(LAB, 'runs', RUN, name);
-  fs.rmSync(out, { recursive: true, force: true });
+  const outRun = opt('outrun') ?? RUN, APPEND = flag('append');
+  if (!/^[\w-]+$/.test(outRun)) { console.error(`--outrun: ${outRun} must be a run name`); process.exit(2) }
+  const out = path.join(LAB, 'runs', outRun, name), indexFile = path.join(out, 'INDEX.md');
+  if (!APPEND) fs.rmSync(out, { recursive: true, force: true });
   fs.mkdirSync(out, { recursive: true });
-  const index: string[] = [`# ${RUN} · the pipeline arms' new or changed prompt variants${MOCK ? ' (mock floor)' : ''}`, '',
-    'One file per template + flag set a pipeline arm sent: the system prompt as rendered, then the user message (the payload) as sent.', '',
-    '| file | arm | slot | template | flags | call |', '|---|---|---|---|---|---|'];
+  const header = [`# ${outRun} · the pipeline arms' new or changed prompt variants`, '',
+    'One file per template + flag set a pipeline arm sent (once per arm, the first slot that sent it): the system prompt as rendered, then the user message (the payload) as sent.', '',
+    '| file | run | arm | slot | template | flags | call |', '|---|---|---|---|---|---|---|'];
+  const old = APPEND && fs.existsSync(indexFile) ? fs.readFileSync(indexFile, 'utf8').split('\n').filter(l => l.startsWith('| ') && !l.startsWith('| file') ) : [];
+  const index: string[] = [...header, ...old];
+  // a variant already rendered for an arm (this pass, or an earlier --append pass) is not rendered again
+  const seen = new Set(old.map(l => l.split('|').map(x => x.trim())).map(c => `${c[3]}|${c[5]}|${c[6]}`));
+  let added = 0;
   for (const armId of ARM_IDS) {
     const pipe = PIPES[gen(armId)];
     if (!pipe) { console.log(`${armId}: not a pipeline arm — skipped`); continue }
     for (const { fx, d } of PLAY) {
       const slot = `${fx.id}_${d}`, file = path.join(armDir(armId), slot, 'calls.jsonl');
       if (!fs.existsSync(file)) { console.log(`${armId} ${slot}: no calls.jsonl — skipped`); continue }
-      const seen = new Set<string>();
       for (const c of fs.readFileSync(file, 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l) as CallRec)) {
-        const key = `${c.template}|${c.flags.join(',')}`;
+        const key = `${armId}|${c.template}|${c.flags.join(', ')}`;
         if (!CHANGED[pipe](c) || seen.has(key)) continue;
         seen.add(key);
-        const name = `${armId}_${slot}_${c.template}_${String(c.n).padStart(2, '0')}.md`;
+        added++;
+        const name = `${MOCK ? 'mock-' : ''}${armId}_${slot}_${c.template}_${String(c.n).padStart(2, '0')}.md`;
         fs.writeFileSync(path.join(out, name), [
-          `# ${armId} (pipe ${pipe}) · ${slot} · ${c.template} · call ${c.n}`, '', `flags: ${c.flags.join(', ') || '(none)'}`, '',
+          `# ${armId} (pipe ${pipe}) · ${RUN}${MOCK ? ' (mock floor: the payload is the engine\'s, the plan text the floor\'s)' : ''} · ${slot} · ${c.template} · call ${c.n}`, '', `flags: ${c.flags.join(', ') || '(none)'}`, '',
           '## system prompt', '', '```text', c.system, '```', '', '## user message (the payload as sent)', '', '```json', JSON.stringify(JSON.parse(c.user), null, 2), '```', '',
           ...(c.output ? ['## the reply', '', '```json', JSON.stringify(JSON.parse(c.output), null, 2), '```', ''] : []),
         ].join('\n'));
-        index.push(`| ${name} | ${armId} | ${slot} | ${c.template} | ${c.flags.join(', ')} | ${c.n} |`);
+        index.push(`| ${name} | ${RUN}${MOCK ? ' (mock)' : ''} | ${armId} | ${slot} | ${c.template} | ${c.flags.join(', ')} | ${c.n} |`);
       }
     }
   }
-  fs.writeFileSync(path.join(out, 'INDEX.md'), index.join('\n') + '\n');
-  console.log(`${index.length - 6} variants → ${path.relative(V3, out)}`);
+  fs.writeFileSync(indexFile, index.join('\n') + '\n');
+  console.log(`${added} variants added (${index.length - header.length} in all) → ${path.relative(V3, out)}`);
 }
 
 /** every selected arm × slot: present and complete? */

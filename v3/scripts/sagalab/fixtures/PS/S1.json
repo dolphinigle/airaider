@@ -1,0 +1,8 @@
+{
+ "id": "S1",
+ "base": "Q01",
+ "N": 3,
+ "kind": "recruit",
+ "personal": true,
+ "note": "personal set pers1: the seed is the soldier's own past (the base fixture's spark), as F2's; draws 1-2 play the personal path (S, P, S…; finale S), draw 3 the bumpy one"
+}

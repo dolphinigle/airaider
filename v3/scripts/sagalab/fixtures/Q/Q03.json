@@ -1,0 +1,23 @@
+{
+  "id": "Q03",
+  "set": "Q",
+  "seed": 203,
+  "path": "personal",
+  "spark": "Ilwen brewed the draught that nearly killed her grove's elder, and let her own teacher take the blame and the exile",
+  "focal": {
+    "name": "Ilwen",
+    "sex": "female",
+    "race": "elf",
+    "seed": 2103,
+    "value": 150,
+    "who": "A quiet elf herbalist who brews for no one but herself.",
+    "backstory": "Ilwen brewed a draught meant to make her grove's elder sleep through a council vote, and it nearly killed him. She said nothing when her teacher was blamed and sent into exile."
+  },
+  "N": 3,
+  "kind": "recruit",
+  "personal": true,
+  "twist": false,
+  "level": 2,
+  "rarity": "uncommon",
+  "note": "personal set pers1 (round T, North Star item 0): one of 8 company soldiers with a varied one-line past (the spark = the backstory's first sentence, as the game's personalSeed reads it)"
+}
