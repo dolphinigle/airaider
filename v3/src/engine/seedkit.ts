@@ -30,7 +30,8 @@ export const KIT: Record<KitPool | 'situations' | 'qualities', readonly string[]
 };
 /** 🛠 the deal's knobs */
 export const KIT_DEAL = {
-  /** a thing takes a quality in front of it about 1 in 3 ("a cracked bell") */
+  /** a thing takes a quality in front of it about 1 in 3 ("a cracked bell"); pipe arm plain (F2) strips it again before the
+   *  pick (`plainKeywords`: the draws stay the same, so every other field deals alike) */
   quality: 1 / 3,
   /** the uncanny comes into about 1 saga in 5 */
   uncanny: 0.2,
@@ -64,6 +65,15 @@ const atoms = (rng: Rng, pool: AtomPool, n: number, have: string[]): string[] =>
   for (let i = 0; out.length < n && i < n * 8; i++) { const a = atom(rng, pool); if (!have.includes(a) && !out.includes(a)) out.push(a) }
   return out;
 };
+
+/** (pipe arm plain, F2) a thing as dealt with no quality glued on (a quality + a thing is a compound only the dealer made):
+ *  any other atom as it is */
+export const plainAtom = (x: string): string => {
+  const q = KIT.qualities.find(y => x.startsWith(`${y} `));
+  return q && KIT.things.includes(x.slice(q.length + 1)) ? x.slice(q.length + 1) : x;
+};
+/** (pipe arm plain, F2) the keywords with the qualities gone, in deal order; a thing dealt twice is kept once */
+export const plainKeywords = (xs: readonly string[]): string[] => [...new Set(xs.map(plainAtom))];
 
 /** ONE deal of the kit, every draw on the rng: the situation(s), then the keywords. `kit` deals 1–3 atoms, each from a
  *  different pool, the uncanny taking one of them about 1 saga in 5; a pick arm deals the whole offer (KIT_DEAL.offer),

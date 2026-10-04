@@ -25,6 +25,7 @@ import {
   newKnowing, newState, planSaga, seedSteps, writeOutline, writeCard, writeReport, firstCardPayload, laterCardPayload, reportPayload,
   questLog, logLines, noteDelivered, forLineShown, onThisMatter, jobWhy, roadLines, roadHopes, mockOutline, bank, triedLine,
   revealLint, choiceTarget, fateSentence, knowingOf, keepKnowing, roadOf, toNullable, PRONOUN, graftRoad, toldOption,
+  writeLate, cardWhy,
   type ReportCall,
 } from '../ai/storyteller.js';
 import type { AiProvider, AskSlotOut } from '../ai/provider.js';
@@ -68,6 +69,12 @@ export const directionText = (d?: { guidance: string; avoid: string[] } | null):
 };
 const recOf = (chain: Chain): SagaRecord => { if (!chain.saga) throw new Error(`chain ${chain.id} has no saga record`); return chain.saga };
 const planOf = (rec: SagaRecord): SagaPlan => { if (!rec.plan) throw new Error('the saga has no plan yet'); return rec.plan };
+/** the plan as the finale plays it: pipe arm late (E1) puts the showdown written after play in place of the plan's pre-play
+ *  job, trouble and loss (its title, people, edges and settles stay the plan's); every other saga, the plan itself */
+export const playedPlan = (rec: SagaRecord): SagaPlan => {
+  const plan = planOf(rec), l = rec.late;
+  return l ? { ...plan, showdown: { ...plan.showdown, job: l.job, trouble: { ...l.trouble }, lose: l.lose } } : plan;
+};
 
 // ─── deal (synchronous: runs in runPursue's prefix, so two queued pursues never share a theme or a name) ─
 
@@ -157,11 +164,15 @@ export async function card(host: SagaHost, chain: Chain): Promise<SagaCardOut> {
   const first = rec.card1 === '';
   // (R5 verify) from card 2 the log's For line names and labels the one the company acts for above the prose
   if (!first) forLineShown(plan, k);
-  const e = pos.finale ? plan.showdown : plan.episodes[pos.job - 1]!;
+  // pipe arm late (E1): the finale is written now, from where the story stands (once; a failed call leaves the plan's)
+  if (pos.finale && piped(w, 'late') && rec.late === undefined)
+    rec.late = await writeLate(host.ai, plan, w, rec.state, k, rec.lines.at(-1)?.text ?? rec.latest, log);
+  const played = playedPlan(rec);
+  const e = pos.finale ? played.showdown : plan.episodes[pos.job - 1]!;
   const direction = host.direction();
   const retry = pos.attempt > 1;
   const cc = first ? firstCardPayload(plan, w, k, direction)
-    : laterCardPayload(plan, e, rec.latest, k, { finale: pos.finale, lastchance: rec.lastchance, retry, direction, why: jobWhy(plan, pos.finale ? w.N : pos.job, rec.hopes), fixes: piped(w, 'fixes') });
+    : laterCardPayload(played, e, rec.latest, k, { finale: pos.finale, lastchance: rec.lastchance, retry, direction, why: cardWhy(plan, pos.finale ? w.N : pos.job, rec.hopes), fixes: piped(w, 'fixes') });
   let prose: string;
   if (first && piped(w, 'grafts')) {
     // pipe arm grafts (R6, F1): no outline call — the road and each later job's hope are the plan's own whys, a flagged
@@ -247,7 +258,8 @@ export function reportIn(host: SagaHost, chain: Chain, pos: SagaPos, prose: stri
 /** the report payload from facts already decided (reportIn decides them; the golden test feeds the lab's) */
 export function reportCall(host: Pick<SagaHost, 'direction'>, chain: Chain, pos: SagaPos, prose: string,
   f: { party: Card[]; decides: string; outcome: Outcome; hurt: Hurt[]; cost?: Cost; option?: { way: Way; label: string }; fate?: string; gravity: string }): ReportCall {
-  const rec = recOf(chain), plan = planOf(rec);
+  // pipe arm late (E1): the finale's job, trouble and loss as written after play
+  const rec = recOf(chain), plan = playedPlan(rec);
   const e = pos.finale ? plan.showdown : plan.episodes[pos.job - 1]!;
   // the chosen button's deed as the story tells it: the gold way's money stays on the button (toldOption)
   const option = f.option && { way: f.option.way, label: toldLabel(rec, f.option) };
@@ -257,6 +269,7 @@ export function reportCall(host: Pick<SagaHost, 'direction'>, chain: Chain, pos:
     plan, e, card: prose, party: f.party, decides: f.decides, outcome: f.outcome, finale: pos.finale, hurt: f.hurt, cost: f.cost, option, fate: f.fate,
     k: knowingOf(rec), gravity: f.gravity, direction: host.direction(), state: { learned: [...rec.state.learned], held: [...rec.state.held] },
     ...(hope ? { hope } : {}), ...(piped(rec.world, 'fixes') ? { fixes: { places: rec.world.places } } : {}),
+    ...(piped(rec.world, 'narrow') ? { narrow: true } : {}),
   });
 }
 /** a finale button's deed as the writer and the story's own lines get it (storyteller toldOption): the report's `plan`,

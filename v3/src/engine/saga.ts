@@ -50,11 +50,53 @@ export const SEED_ARM: SeedArm = 'kit+pick';
  *               sentence; a card's trouble is one phrase, never three labelled parts; the plan's edges beat the showdown's
  *               trouble, its loss is what that trouble takes, its trouble says what they fight `with`; the company has no
  *               other owner in plan text
+ *   late    E1  grafts, and the finale's job, trouble and loss are written AFTER play — a small showdown call when the
+ *               finale comes (the last middle job won, or the last chance), from the question and answer, the person the
+ *               ending decides and its ways, what the company holds (each with the use the plan's edge gives it, which the
+ *               finale report shows used) and knows, and what happened last. The finale card and report use them instead of
+ *               the plan's pre-play showdown (round D §3.1: a third of the contradictions are a later card restating that
+ *               forecast after play overturned it); settles, edges and buttons stay the plan's, and the finale card still
+ *               has no why (R5 verify 2). The call failed: the plan's showdown stands
+ *   trail   E2  grafts, and the plan writes the clues in order (`trail`, one per middle job; together they leave the
+ *               answer's why to the showdown) right after the question and answer — output order is a lever; the engine
+ *               copies trail[i] into job i's learn, so they cannot diverge; a win never repeats its clue (the win is the
+ *               report's result and the next card's latest: a clue in it reached the player three times)
+ *   narrow  E3  grafts, and D2's report hope alone (its part (a): won-job shortfall lines 17 → 5 of 192): what result,
+ *               brought and clue miss, show as still hoped — D2's line said in 10 words (its 12 overran the report budget
+ *               without D2's other cuts), never "show shortfalls"
+ *   line    F1  grafts, and the trouble as ONE sentence the plan writes — who stands in the way, what they will do, and why
+ *               — in place of the {who, carry, will} atoms (law 6b: three labelled items came back as three stock sentences,
+ *               "They carry X", 24% of the reader-throwing sentences in 72 default sagas). Each job type is dealt who stands
+ *               against it (`AGAINST`: a talk job's is the one to win over, for a reason of their own), in place of "armed
+ *               people or a beast" for every job (filler foes, talk targets written up as armed). Every card gets the whole
+ *               line, card 1 too (it lost `will` in R5), but a retry: its retry line is what that trouble did, one fact
+ *               told twice (the default leaves out `will` there for the same reason). The card glosses it as a noun, "the
+ *               obstacle" ("who stands in the way" came back as its own sentence, "He stands in your way."), and its cap
+ *               follows its data (`capFor`, R6 verify: the finale's 90 words of room split the one line back into stock
+ *               sentences and invented filler)
+ *   plain   F2  grafts, and the keyword deal never glues a quality onto a thing (a compound only the dealer made, which
+ *               the plan then forces in as a definite thing to explain): the qualities leave the deal before the pick sees
+ *               it (seedkit plainKeywords)
+ *   link    F3  grafts, and the plan writes each job's `lead` FIRST — the fact that points the company to this job's place or
+ *               person, one the player has by then (job 1: something the one who asked knows; later: the last job's
+ *               learn) — so each job is chained to what came before (output order is a lever). The lead says why THIS person or
+ *               place; the why stays the hope, still with only what the job names (so a road row on card 1 never leans on
+ *               a lead's later fact), minus "for a thing or person, what they can then do" (odd-logic hopes). The job's own
+ *               card gets lead + hope as its one why; the road (card 1, before any learn) keeps the hope alone. Titles, jobs,
+ *               whys and troubles "show before any job is played" and never use a gain either ("shown before play", beside
+ *               a lead built from a learn, read as "before that job": later whys leaned on earlier learns or named their
+ *               own gains, and whyFlags blanked them)
+ *   fx      FX  grafts + line + plain + link
  *  (C1 `core` — a call fixing the want, question and answer before the plan — was removed: a measured loss, follow 26–116) */
-export type PipeArm = 'one' | 'grafts' | 'sides' | 'reads' | 'fixes';
-export const PIPE_ARMS: readonly PipeArm[] = ['one', 'grafts', 'sides', 'reads', 'fixes'];
-/** the changes each pipe arm carries, by the arm that brought each in: D1 and D2 are C2 plus one change each */
-const PIPE_PARTS: Record<PipeArm, readonly PipeArm[]> = { one: ['one'], grafts: ['grafts'], sides: ['sides'], reads: ['grafts', 'reads'], fixes: ['grafts', 'fixes'] };
+export type PipeArm = 'one' | 'grafts' | 'sides' | 'reads' | 'fixes' | 'late' | 'trail' | 'narrow' | 'line' | 'plain' | 'link' | 'fx';
+export const PIPE_ARMS: readonly PipeArm[] = ['one', 'grafts', 'sides', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx'];
+/** the changes each pipe arm carries, by the arm that brought each in: D1, D2, E1–E3 and F1–F3 are C2 plus one change each;
+ *  FX is C2 plus all of round F */
+const PIPE_PARTS: Record<PipeArm, readonly PipeArm[]> = {
+  one: ['one'], grafts: ['grafts'], sides: ['sides'], reads: ['grafts', 'reads'], fixes: ['grafts', 'fixes'],
+  late: ['grafts', 'late'], trail: ['grafts', 'trail'], narrow: ['grafts', 'narrow'],
+  line: ['grafts', 'line'], plain: ['grafts', 'plain'], link: ['grafts', 'link'], fx: ['grafts', 'line', 'plain', 'link'],
+};
 /** whether a dealt world's pipe arm carries `part` */
 export const piped = (w: Pick<SagaWorld, 'pipe'>, part: PipeArm): boolean => !!w.pipe && PIPE_PARTS[w.pipe].includes(part);
 /** the pipeline this build ships (designer 2026-10-04): C2 grafts, ahead on follow in all three generations (83–61) and on
@@ -106,6 +148,14 @@ export const TYPES: Record<JobType, { do: string; kind: string }> = {
   escort: { do: 'bring someone through danger', kind: 'someone arrives safe' },
 };
 export const JOB_TYPES = Object.keys(TYPES) as JobType[];
+/** (pipe arm line, F1) who stands against each job type, dealt with the types: the plan's one-line trouble names them, so a
+ *  job's obstacle fits what the soldiers do there (one rule for every job, "armed people or a beast", made talk and find
+ *  targets armed foes and gave filler foes to jobs that had none) */
+export const AGAINST: Record<JobType, string> = {
+  fight: 'armed people', guard: 'the attackers', catch: 'the one who runs', hunt: 'the beast', sneak: 'whoever keeps watch',
+  free: 'the captors', find: 'whoever or whatever keeps it hidden', talk: 'the one to win over, for a reason of their own',
+  escort: 'whoever or whatever waits on the way',
+};
 
 export const WAY_ENDING: Record<Way, string> = {
   recruit: 'joins the company', captive: 'held in your cells', gold: 'coin; goes free',
@@ -187,15 +237,23 @@ export interface SagaPerson {
   known: boolean;
   memory?: string; where?: string;
 }
-export interface Trouble { who: string; carry: string; will: string }
+/** line: pipe arm line (F1) — the trouble as ONE sentence (who, what they will do, and why); who, carry and will are then
+ *  empty, and every reader takes the line (`troubleWho`) */
+export interface Trouble { who: string; carry: string; will: string; line?: string }
+/** the trouble's words that say who stands in the way: the line (F1), else `who` */
+export const troubleWho = (t: Trouble): string => t.line ?? t.who;
 /** why: what the one who asked hopes this job gets them (only job 1's prints; a later job's card prints its outline
  *  line). gain / learn: a middle job's — what the company holds after a win, and the piece toward the answer the win
- *  brings out. edge: the showdown's — one per middle job, in job order: how holding that job's gain helps here */
-export interface Episode { n: number; type: EpisodeType; title: string; job: string; people: string[]; trouble: Trouble; win?: string; gain?: string; learn?: string; why: string; settles?: string; lose?: string; edge?: string[] }
+ *  brings out. edge: the showdown's — one per middle job, in job order: how holding that job's gain helps here. lead: pipe
+ *  arm link (F3) — the fact that points the company to this job, one the player has by its card */
+export interface Episode { n: number; type: EpisodeType; title: string; job: string; people: string[]; trouble: Trouble; win?: string; gain?: string; learn?: string; why: string; settles?: string; lose?: string; edge?: string[]; lead?: string }
 /** past: a personal saga's soldier only, the old wrong in a few words. side: pipe arm sides only — whose side they are
  *  on, and why, as the plan wrote it */
 export interface CastEntry extends SagaPerson { label: string; want: string; past?: string; side?: string }
 export interface SagaPlan { title: string; question: string; answer: string; cast: CastEntry[]; episodes: Episode[]; showdown: Episode; options: { way: Way; label: string }[] }
+/** pipe arm late (E1): the finale's own fields, written from where the story stands when the finale comes — they replace
+ *  the plan's showdown job, trouble and lose (no why: a finale's is the For line's want, R5 verify 2) */
+export interface LateShowdown { job: string; trouble: Trouble; lose: string }
 
 /** what the saga has banked so far: `learned` = the learns of won middle jobs, in order; `held` = the numbers of won
  *  middle jobs, whose gains the company holds. Only a win banks */
@@ -285,6 +343,9 @@ export interface SagaRecord {
   lines: SagaLine[];
   /** how the saga ended: the finale's Outcome sentence (sagaflow.sagaFate), set when its report lands */
   ending?: string;
+  /** pipe arm late (E1): the finale as written after play, once the finale comes; null: the call failed and the plan's
+   *  showdown stands; absent: not yet written (or another arm) */
+  late?: LateShowdown | null;
   /** the card on offer, re-offered verbatim while unmarched (D15); cleared by every report */
   cache?: { pos: SagaPos; title: string; prose: string; job: string; rows: LogRow[]; matter: Matter[] };
 }

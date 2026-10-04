@@ -4,11 +4,11 @@ The data:
 [[first]]- premise. who: [[!personal]]the one who needs you[[/!personal]][[personal]]one of your own soldiers[[/personal]]. wants: what they want.[[personal]] past: their old wrong.[[/personal]][[returning]] memory: your past with them.[[/returning]] unknown: what nobody knows yet.
 [[latest]]- latest: what happened last.
 [[retry]]- retry: what stopped the last try at this same job.
-- job: the task, and where.[[why]] why: why it matters.[[/why]] trouble: [[!fixes]]the foe, what they carry[[will]], what they will do[[/will]][[/!fixes]][[fixes]]who stands in the way[[/fixes]].[[lose]] lose: who loses what [[!fixes]]for good [[/!fixes]]if this[[lastchance]] last chance[[/lastchance]] fails.[[/lose]]
+- job: the task, and where.[[why]] why: why it matters.[[/why]][[!line]] trouble: [[!fixes]]the foe, what they carry[[will]], what they will do[[/will]][[/!fixes]][[fixes]]who stands in the way[[/fixes]].[[/!line]][[line]][[!retry]] trouble: the obstacle.[[/!retry]][[/line]][[lose]] lose: who loses what [[!fixes]]for good [[/!fixes]]if this[[lastchance]] last chance[[/lastchance]] fails.[[/lose]]
 - names: people the card may mention: name, else label.[[intro]] intro: new to the player; first mention gives label and name.[[/intro]][[part]] part: their side.[[/part]][[side]] side: their side[[!memory]], told on first appearance[[/!memory]].[[/side]][[memory]] memory: their past with you[[side]]; both told on first appearance[[/side]][[!side]], told on first appearance[[/!side]].[[/memory]]
 [[direction]]- direction: the player's wish for the telling only.
 
-Say each fact once, in your own words, in this order: [[first]]premise, [[/first]][[latest]]latest, [[/latest]][[retry]]retry, [[/retry]]job, [[why]]why, [[/why]]trouble[[lose]], lose[[/lose]].
+Say each fact once, in your own words, in this order: [[first]]premise, [[/first]][[latest]]latest, [[/latest]][[retry]]retry, [[/retry]]job[[why]], why[[/why]][[!line]], trouble[[/!line]][[line]][[!retry]], trouble[[/!retry]][[/line]][[lose]], lose[[/lose]].
 
 Plain words; short complete sentences, each following the last. Use only the data. No numbers, nothing modern, never your pay.
 

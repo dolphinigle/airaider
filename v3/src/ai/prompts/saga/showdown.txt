@@ -1,0 +1,7 @@
+Write a fantasy story's last job from where it stands.
+
+The data: mystery: question, secret. people: asker: whom the company serves; ending: whose fate it decides. ways: possible endings. places. now: what the company holds and each one's use, knows, saw last.
+
+Shown before play: none of the secret beyond known; take or find nothing held or known again.
+
+JSON only: {"job": "verb, the ending person, a place; fits every way", "trouble": {"who": "≤6 words", "with": "≤6 words", "will": "≤6 words"}, "lose": "few words: the asker's loss if it fails"}

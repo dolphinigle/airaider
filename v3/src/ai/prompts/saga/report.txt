@@ -10,7 +10,7 @@ The data:
 [[cost]]- cost: the price; show it paid.
 [[brought]]- brought: who or what the company now holds; show each gained.
 [[clue]]- clue: a fact this win brings out; show it found, seen or said, [[!fixes]]plainly, and nothing past it[[/!fixes]][[fixes]]adding nothing to it[[/fixes]].
-[[hope]]- hope: [[!fixes]]the card's hope, limited by result and clue; show shortfalls.[[/!fixes]][[fixes]]unless result, brought or clue meets it, show it still hoped for.[[/fixes]]
+[[hope]]- hope: [[!fixes]][[!narrow]]the card's hope, limited by result and clue; show shortfalls.[[/!narrow]][[narrow]]what result, brought and clue miss, show as still hoped.[[/narrow]][[/!fixes]][[fixes]]unless result, brought or clue meets it, show it still hoped for.[[/fixes]]
 [[known]]- known: what earlier jobs found; never shown as new.
 [[have]]- have: what the company holds, never in enemy hands[[edge]]; helps: its use; show each used[[/edge]][[!edge]]; use it only where it helps this job[[/!edge]].
 [[answer]]- answer: the question and its secret.

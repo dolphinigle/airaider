@@ -12,22 +12,27 @@ const subsets = <T,>(xs: T[]): T[][] => xs.reduce<T[][]>((acc, x) => acc.concat(
 
 const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, string | number> }[]> = {
   // the seed arms (North Star 7; engine/seedkit.ts): none (themes), a kit's keywords, a premise; with a kit cast, `support`
-  // the lab's pipe arms (engine/saga.ts PipeArm) ride on kit+pick: grafts (C2, and D1 and D2 on it) · sides; fixes (D2) on grafts
-  plan: [[], ['keywords', 'support'], ['premise', 'support'], ...['grafts', 'sides'].map(pipe => ['keywords', 'support', pipe]), ['keywords', 'support', 'grafts', 'fixes']].flatMap(seed => [['notrade'], []].flatMap(cast => subsets(['personal', 'memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, ...seed], vars: {} })))),
+  // the lab's pipe arms (engine/saga.ts PipeArm) ride on kit+pick: grafts (C2, and D1, D2, E1–E3, F1–F3 on it) · sides; fixes
+  // (D2), trail (E2), line (F1) and link (F3) on grafts, line and link together (FX)
+  plan: [[], ['keywords', 'support'], ['premise', 'support'], ...['grafts', 'sides'].map(pipe => ['keywords', 'support', pipe]), ...['fixes', 'trail', 'line', 'link'].map(pipe => ['keywords', 'support', 'grafts', pipe]), ['keywords', 'support', 'grafts', 'line', 'link']].flatMap(seed => [['notrade'], []].flatMap(cast => subsets(['personal', 'memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, ...seed], vars: {} })))),
   // (pipe arm sides: a plan with sides deals no parts, so `side` never meets `part`; pipe arm fixes, D2, on any card: `lose`
   // on every finale, beside `will` but at a last chance)
   card: ['first', 'later', 'finale'].flatMap(pos => subsets(['memory', 'direction', 'intro', 'part', 'side', ...(pos === 'first' ? ['personal', 'returning'] : []), ...(pos === 'finale' ? ['lastchance', 'lose'] : []),
     ...(pos !== 'first' ? ['latest', 'retry', 'will'] : []), ...(pos !== 'finale' ? ['why'] : [])])
     .filter(s => !(s.includes('latest') && s.includes('retry')) && !(pos === 'finale' && s.includes('retry')) && (!s.includes('lastchance') || s.includes('lose')) && !(s.includes('personal') && s.includes('returning')))
     .filter(s => !(s.includes('will') && (s.includes('retry') || s.includes('lastchance'))) && !(s.includes('side') && s.includes('part')))
-    .flatMap(extra => [extra, [...extra, 'fixes']]).map(extra => ({ flags: [pos, ...extra], vars: { MAX: pos === 'finale' ? 90 : 70 } }))),
+    // pipe arm line (F1): the trouble is one sentence — never beside fixes' phrase or a `will` part
+    .flatMap(extra => [extra, [...extra, 'fixes'], ...(extra.includes('will') ? [] : [[...extra, 'line']])]).map(extra => ({ flags: [pos, ...extra], vars: { MAX: pos === 'finale' ? 90 : 70 } }))),
   outline: [{ flags: [], vars: {} }],
+  // pipe arm late (E1): the finale written after play
+  showdown: [{ flags: [], vars: {} }],
   // count: the pick is told how many keywords the plan gets (kit+pick+cast with its people; pipe arm one without)
   pick: [[], ['situations'], ['personal'], ['people', 'count'], ['people', 'count', 'personal'], ['count'], ['count', 'personal']].map(flags => ({ flags, vars: (flags.includes('count') ? { KEEP: 'two keywords' } : {}) as Record<string, string> })),
   premise: [[], ['personal']].map(flags => ({ flags, vars: {} })),
-  // hope: pipe arm grafts, a won middle job's (with clue/brought, never the finale's answer/option/edge); side: pipe arm sides;
-  // fixes: pipe arm fixes (D2, on grafts: never with sides), on every report
-  report: subsets(['people', 'personal', 'decides', 'result', 'option', 'hurt', 'cost', 'hurtprice', 'brought', 'clue', 'hope', 'known', 'have', 'edge', 'answer', 'direction', 'intro', 'part', 'side'])
+  // hope: pipe arm grafts, a won middle job's (with clue/brought, never the finale's answer/option/edge); narrow (E3, D2) only
+  // with it; side: pipe arm sides; fixes: pipe arm fixes (D2, on grafts: never with sides), on every report
+  report: subsets(['people', 'personal', 'decides', 'result', 'option', 'hurt', 'cost', 'hurtprice', 'brought', 'clue', 'hope', 'narrow', 'known', 'have', 'edge', 'answer', 'direction', 'intro', 'part', 'side'])
+    .filter(s => !s.includes('narrow') || s.includes('hope'))
     .filter(s => s.includes('people') || !s.some(f => f === 'intro' || f === 'part' || f === 'side'))
     .filter(s => !(s.includes('side') && s.includes('part')) && !(s.includes('side') && s.includes('hope')))
     .filter(s => !s.includes('hope') || (s.some(f => ['clue', 'brought'].includes(f)) && s.includes('decides')))
@@ -111,7 +116,7 @@ describe('saga prompt budget (the shipped R5 templates)', () => {
   });
   it('the templates are the measured ones, and never the lab\'s working copies', () => {
     const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), '../src/ai/prompts/saga');
-    expect(fs.readdirSync(dir).filter(f => f.endsWith('.txt')).sort()).toEqual(['card.txt', 'outline.txt', 'pick.txt', 'plan.txt', 'premise.txt', 'report.txt']);
+    expect(fs.readdirSync(dir).filter(f => f.endsWith('.txt')).sort()).toEqual(['card.txt', 'outline.txt', 'pick.txt', 'plan.txt', 'premise.txt', 'report.txt', 'showdown.txt']);
     // (byte identity with the lab at the tag is held by test/sagagolden.test.ts, which renders every recorded variant)
   });
 });
