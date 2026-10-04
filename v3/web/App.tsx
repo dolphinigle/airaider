@@ -27,7 +27,7 @@ const NAV: [Screen, string, string][] = [
 /** a next step's target.screen values that live on the fort screen (the Fort nav dot counts them) */
 const FORT_TARGETS = new Set(['fort', 'room', 'build', 'holding', 'tavern']);
 const STEP_GLYPH: Record<string, string> = {
-  build: '⚒', approach: '♛', man: '⚔', pursue: '✎', holding: '⛓', hire: '✚', gh: '▲', setin: '✦', rack: '⛓', addplace: '+', end: '▸',
+  build: '⚒', approach: '♛', march: '🔒', man: '⚔', pursue: '✎', holding: '⛓', hire: '✚', gh: '▲', setin: '✦', rack: '⛓', addplace: '+', end: '▸',
 };
 
 const HAND_KEY = 'airaider.hand.folded';
@@ -288,6 +288,10 @@ export function App() {
     nEnding && `${nEnding} need${nEnding === 1 ? 's' : ''} an ending`, nHand && `${nHand} handed off`, nLeave && `${nLeave} leave${nLeave === 1 ? 's' : ''} the tavern`].filter(Boolean).join(' · ');
   const marching: number = s.marching ?? 0;
   const sealReady = !busy && !warns.length && marching > 0;
+  // jobs only their lock fills, waiting for the word (Game.waitingForWord): the seal NAMES them — information, never
+  // part of its confirm (the CLI's END prints the same list)
+  const waiting: any[] = s.waitingForWord ?? [];
+  const waitTxt = waiting.length ? `🔒 ${waiting.length} await${waiting.length === 1 ? 's' : ''} your word` : '';
 
   // THE GREAT HALL GOAL — always in the header: the next tier, prestige toward it, what it opens
   const gh = s.gh ?? { tier: s.ghTier, next: s.ghNeed ? s.ghTier + 1 : null, need: s.ghNeed, have: s.prestige, cost: s.ghCost, ready: false, block: null, unlocks: [] };
@@ -405,12 +409,21 @@ export function App() {
       {/* THE SEAL — END CYCLE. With warnings (R5) the first click arms it and says what END would
           leave behind; the second ends the cycle. Nothing at risk: one click. */}
       <div className={'sealbox' + (sealArmed ? ' armed' : '')} onMouseEnter={() => setSealHover(true)} onMouseLeave={() => setSealHover(false)}>
-        {warns.length > 0 && (sealArmed || sealHover) && <div className="sealwarns" role="status">
-          <span className="lbl">{sealArmed ? 'Click again to END anyway — this leaves behind:' : 'END would leave behind:'}</span>
-          {warns.map(w => (
-            <button key={w.key ?? w.questId} onClick={() => goTarget(w.target ?? { screen: 'quest', questId: w.questId })}>
-              <b>{w.title}</b><span className={w.lapsesNow ? 'cold' : ''}>{w.text}</span>
-            </button>))}
+        {(warns.length > 0 || waiting.length > 0) && (sealArmed || sealHover) && <div className={'sealwarns' + (warns.length ? '' : ' info')} role="status">
+          {warns.length > 0 && <>
+            <span className="lbl">{sealArmed ? 'Click again to END anyway — this leaves behind:' : 'END would leave behind:'}</span>
+            {warns.map(w => (
+              <button key={w.key ?? w.questId} onClick={() => goTarget(w.target ?? { screen: 'quest', questId: w.questId })}>
+                <b>{w.title}</b><span className={w.lapsesNow ? 'cold' : ''}>{w.text}</span>
+              </button>))}
+          </>}
+          {waiting.length > 0 && <>
+            <span className="lbl wait">Waiting for your word — {waiting.length === 1 ? 'it stays' : 'they stay'} home this END:</span>
+            {waiting.map(w => (
+              <button key={`word-${w.questId}`} onClick={() => goTarget({ screen: 'quest', questId: w.questId })}>
+                <b>{w.title}</b><span className="wait">only the lock fills it — March sends it</span>
+              </button>))}
+          </>}
         </div>}
         <ConfirmButton className={'seal' + (sealReady ? ' ready' : '')} disabled={busy} needsConfirm={warns.length > 0} ms={4000}
           onArm={setSealArmed} onConfirm={endCycle}
@@ -425,8 +438,8 @@ export function App() {
             {/* a long sum would overrun the seal: its count here, each one in the list beside it */}
             <span className="b">{warnSum.length > 14 ? `${warns.length} left behind` : warnSum}</span>
           </>} />
-        <div className={'sealwarn' + (warns.length ? ' sw-warn' : sealReady ? ' sw-ok' : '')} title={warns.length ? warnSum : undefined}>
-          {warns.length ? `⚑ ${warnSum}` : sealReady ? 'all set' : ''}
+        <div className={'sealwarn' + (warns.length ? ' sw-warn' : sealReady ? ' sw-ok' : waiting.length ? ' sw-wait' : '')} title={warns.length ? warnSum : waitTxt || undefined}>
+          {warns.length ? `⚑ ${warnSum}` : sealReady ? `all set${waitTxt ? ` · ${waitTxt}` : ''}` : waitTxt}
         </div>
       </div>
 

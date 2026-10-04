@@ -145,6 +145,11 @@ kbd.key { display: inline-block; font: 500 11px/14px var(--mono); padding: 0 4px
 .sealwarns b { font: 600 14px var(--serif); color: #f3e9d2; }
 .sealwarns span { font: 400 11.5px var(--mono); color: var(--part); }
 .sealwarns span.cold { color: #ff9d90; }
+/* the jobs waiting for the march word: information, not a warning — gold, as the lock */
+.sealwarns.info { border-color: #8a6529; background: #1d1812; }
+.sealwarns .lbl.wait, .sealwarns span.wait { color: #f1d38c; }
+.sealwarns button + .lbl.wait { margin-top: 6px; }
+.sealwarn.sw-wait { color: #f1d38c; }
 /* the hand folded to a strip: the seal becomes a pill in it, its warning beside it */
 .app.handmin .sealbox { width: auto; flex-direction: row-reverse; align-items: center; justify-content: flex-start; gap: 10px; }
 .app.handmin .seal { width: auto; height: 32px; border-radius: 16px; flex-direction: row; gap: 6px; padding: 0 16px; }

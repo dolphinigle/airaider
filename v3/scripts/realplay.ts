@@ -114,6 +114,8 @@ for (let c = 0; c < cycles; c++) {
     }
     const o = g.questOdds(q.id);
     if (o.coins > 0 && o.coins < o.bar * 0.7 && !q.isFinale) { g.abandon(q.id); say(`  (abandoned — thin odds)`) }
+    // only its lock fills it: it waits for the player's word (March) — this player gives it
+    else if (g.marchWord(q.id) === 'waiting') say(`  MARCH: ${g.setMarchWord(q.id, true).msg}`);
   }
   const report = await g.endCycle();
   for (const line of report) say(`  ${line}`);

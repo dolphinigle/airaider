@@ -103,6 +103,7 @@ export const render = {
       '        auto [qId|all]   — man a quest (or every quest) with the best fit going',
       '        send <qId> <mercId> [slot] — into that place (swapping its holder) or their best free one',
       '        abandon <qId> — says what it costs; abandon! <qId> (or repeat it) to do it',
+      '        march <qId> · hold <qId> — a job only its lock fills waits for your word: march sends it at END, hold keeps it home',
       'QUEUE   jobs · wait · cancel <jobId> · inflight <n>   (pursue returns at once; cards arrive later)',
       'PEOPLE  hire <id> · accept <id> · ransom <id> · sell <id> · settle <id> · interrogate <id> · heal <id>',
       '        (on the rack, or on show earning prestige: ransom! / sell! — it says what is lost)',
@@ -128,7 +129,8 @@ export const render = {
       `roster ${g.roster().length}/${g.rosterCapacity()} · captives ${g.captives().length}/${g.captiveCapacity()}${g.captiveCapacity() ? ` (${CAPTIVE_COUNT_NOTE})` : ''}${g.state.holding.length ? ` · ${g.state.holding.length} in holding ('holding')` : ''} · regions: ${g.activeRegions().map(r => REGION[r]?.name ?? r).join(', ')}`,
       `leads ${g.visibleLeads().length}${unseen ? ` (${unseen} unseen — 'leads')` : ''} · open quests ${g.state.quests.filter(q => q.state === 'open').length} · live chains ${g.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending').length}`,
       this.jobsBrief(g),
-      (n => `marching at END: ${n ? `${n} part${n === 1 ? 'y' : 'ies'}` : 'nobody'}${(w => w ? ` · ${w} warning${w === 1 ? '' : 's'} ('end' lists them)` : '')(g.endWarnings().length)}`)(g.marching()),
+      (n => `marching at END: ${n ? `${n} part${n === 1 ? 'y' : 'ies'}` : 'nobody'}${(w => w ? ` · ${w} warning${w === 1 ? '' : 's'} ('end' lists them)` : '')(g.endWarnings().length)}` +
+        g.waitingForWord().map(x => ` · ${x.questId} waiting for your word ('march ${x.questId}')`).join(''))(g.marching()),
       ...g.nextSteps().slice(0, 3).map((st, i) => `${i ? '      ' : 'next: '}${stepLine(st)}`),
     ].filter(Boolean).join('\n');
   },
@@ -136,6 +138,12 @@ export const render = {
   /** R4: the whole next-steps list */
   nextSteps(g: Game): string {
     return ['NEXT (most pressing first):', ...g.nextSteps().map(st => `  ${stepLine(st)}`)].join('\n');
+  },
+
+  /** the jobs only their lock fills that wait for your word — END prints them as information (the seal's list) */
+  waitingForWord(g: Game): string | null {
+    const w = g.waitingForWord();
+    return w.length ? ['Waiting for your word — these stay home this END:', ...w.map(x => `  ${x.questId.padEnd(6)} ${x.title} — 'march ${x.questId}' sends it`)].join('\n') : null;
   },
 
   /** R5: what END would lose — printed before 'end!' is asked for */
@@ -347,7 +355,9 @@ export const render = {
       // one token per place — the attribute it tests; ◼ once manned
       const tokens = active.map(s => `${s.filledBy ? '◼' : '◻'}${s.test.attributes.map(a => a.toUpperCase()).join('+')}`).join(' ');
       const o = g.questOdds(q.id);
+      const word = g.marchWord(q.id);
       const odds = q.approaches && !q.chosenApproach ? 'choose an approach'
+        : word === 'waiting' ? 'waiting for your word'
         : o.band ? `ready · ${BAND_TEXT[o.band]}${o.success !== null ? ` ${pct(o.success)}` : ''}`
         : `${o.filled}/${o.of} placed`;
       const kinds = kindsLine(g.questRewardKinds(q.id));
@@ -442,6 +452,10 @@ export const render = {
     } else {
       lines.push('ODDS: choose an approach first (each branch rolls its own test)');
     }
+    // THE MARCH WORD — the quest page's notice and its March / Hold
+    const word = g.marchWord(q.id);
+    if (word === 'waiting') lines.push(`🔒 WAITING FOR YOUR WORD — only its lock fills it, so it stays home at END: 'march ${q.id}' sends it`);
+    if (word === 'given') lines.push(`🔒 YOUR WORD IS GIVEN — it marches at the next END: 'hold ${q.id}' keeps it home`);
     lines.push(`(abandon: ${g.abandonConsequence(q.id)})`);
     return lines.join('\n');
   },

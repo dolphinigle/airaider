@@ -80,6 +80,9 @@
 .helps .hit, .hurts .hit { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 .helps .hit { color: #c9f0bf; } .hurts .hit { color: #ffb8ad; }
 .reqline { font: 500 11.5px var(--mono); color: #f0b3a9; text-align: center; }
+/* THE MARCH WORD under the places: a job only its lock fills waits for the player (gold, as the lock chip) */
+.marchword { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; padding: 6px 10px; border-radius: 5px; border: 1px solid #8a6529; background: #1d1812; color: #f1d38c; font: 500 12px/1.4 var(--mono); text-align: center; }
+.marchword.given { border-color: #4f6b3c; color: #cfe6bf; }
 
 /* ── the roll: the engine's pooled band, pinned to the scene's foot ── */
 .gauge { position: sticky; bottom: 0; z-index: 4; margin: auto -26px 0; padding: 12px 26px 14px; display: flex; flex-direction: column; gap: 8px; background: #12201b; border-top: 1px solid #2c4a42; box-shadow: 0 -8px 16px rgba(10,18,15,.7); }

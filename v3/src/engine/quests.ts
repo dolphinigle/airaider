@@ -212,6 +212,9 @@ export interface Quest {
   sideLootV?: number;              // chain beats: small engine-set side-loot budget
   liabilityId?: string;            // collector quests: winning settles this liability
   stalls?: number;                 // consecutive cycles part-staffed but unmarched (3 → set aside)
+  /** the player's word to march a job that only its must-be lock fills (QUESTS §3 🔒, Game.setMarchWord) — such a job
+   *  waits for it. Absent = not given; a re-posted card (a retry) is a new quest, so it starts without it */
+  marchWord?: true;
   state: 'open' | 'resolved';
   createdCycle: number;
 }

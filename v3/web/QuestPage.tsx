@@ -30,9 +30,14 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
   const act = activeSlots(q);
   const filled = act.filter((x: any) => x.filledBy).length;
   const choose = !!q.approaches && !q.chosenApproach;
-  const ready = !choose && act.length > 0 && filled === act.length;
+  const full = !choose && act.length > 0 && filled === act.length;
+  // the engine's verdict (Game.isReady): every place filled — and, when only the lock fills them, the player's word given
+  const ready = !!q.ready;
+  // THE MARCH WORD (Game.marchWord): 'waiting' | 'given' | null — the CLI's march / hold toggle the same
+  const word: 'waiting' | 'given' | null = q.march ?? null;
   const o = q.odds ?? {};
-  const band: Band | null = ready ? (o.band ?? null) : null;
+  // a full party has its roll even while it waits for the word — the odds are what the word is given on
+  const band: Band | null = full ? (o.band ?? null) : null;
   const pct = o.success != null && band ? ` · ~${Math.round(o.success * 100)}%` : '';
   // a standing post renews every cycle — not a loss, never red (the map says the same); a quest set
   // aside by the stall rule says so; the red threshold is the engine's (lapseUrgent)
@@ -75,7 +80,7 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
 
   const verdict = choose ? 'Pick how it ends first — each way tests something different.'
     : filled === 0 ? 'Nobody is placed yet.'
-    : !ready ? `${act.length - filled} still to place — the verdict comes when every place is filled.`
+    : !full ? `${act.length - filled} still to place — the verdict comes when every place is filled.`
     : 'Every place is filled.';
 
   return (
@@ -189,6 +194,13 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
                   {req && <div className="reqline">{sl.locked ? '🔒' : '⚑'} {sl.requirement}</div>}
                 </div>);
             })}</div>
+            {/* THE MARCH WORD, under the places whose lock line it answers: a job only its lock fills waits for the player */}
+            {word && <div className={'marchword ' + word} role="status">
+              <span>{word === 'waiting' ? '🔒 Only the lock fills this job — it stays home until you give the word.' : '🔒 Your word is given — it marches when the cycle ends.'}</span>
+              <button className={'btn sm' + (word === 'waiting' ? ' solid' : '')} onClick={() => quick(word === 'waiting' ? 'march' : 'hold', q.id)}
+                title={word === 'waiting' ? 'send it at the next END' : 'keep it home — it waits for your word again'}>
+                {word === 'waiting' ? 'March' : 'Hold'}</button>
+            </div>}
           </div>}
         </div>
 
@@ -242,14 +254,16 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
         </div>
         <div className={'btns' + (arming ? ' arming' : '')}>
           {arming && <div className="consequence" role="alert">{q.abandonText}</div>}
-          <button className="btn" onClick={() => quick('auto', q.id)} disabled={choose}>Auto-assign</button>
+          <button className="btn" onClick={() => quick('auto', q.id)} disabled={choose || !!word}
+            title={word ? 'every place is filled by its lock — the March / Hold above is the choice here' : undefined}>Auto-assign</button>
           <button className="btn ghost" disabled={filled === 0 || clearing}
             onClick={async () => { setClearing(true); try { await quick('clear', q.id) } finally { setClearing(false) } }}>Clear</button>
           <ConfirmButton className="btn ghost" title={q.abandonText}
             label={q.canReroll ? 'Set aside ↺' : 'Abandon'} armedLabel={q.canReroll ? 'Set aside? Click again' : 'Abandon? Click again'}
             onArm={setArming} onConfirm={() => { doAct('abandon', q.id); back() }} />
-          <span className={'ok ' + (ready ? bandCls(band) || 'lit' : 'off')} title={ready ? 'marches when the cycle ends' : undefined}>
-            {ready ? (band === 'hopeless' ? 'Marches to fail' : band ? `Marches · ${BAND_WORD[band]}` : 'Marches') : choose ? 'Pick how it ends' : `Place ${act.length - filled} more`}
+          <span className={'ok ' + (ready ? bandCls(band) || 'lit' : 'off')} title={ready ? 'marches when the cycle ends' : word === 'waiting' ? 'only the lock fills it — March sends it' : undefined}>
+            {ready ? (band === 'hopeless' ? 'Marches to fail' : band ? `Marches · ${BAND_WORD[band]}` : 'Marches') : choose ? 'Pick how it ends'
+              : word === 'waiting' ? 'Waits for your word' : `Place ${act.length - filled} more`}
           </span>
         </div>
       </article>

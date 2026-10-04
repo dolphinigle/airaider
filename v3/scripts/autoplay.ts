@@ -202,7 +202,7 @@ for (let c = 0; c < cycles; c++) {
       if (pSuccess < 0.25 && !q.isFinale) {  // don't send suicide parties
         g.abandon(q.id);
         say(`c${g.state.cycle}: abandoned ${q.title} (odds too thin)`);
-      }
+      } else if (g.marchWord(q.id) === 'waiting') g.setMarchWord(q.id, true);  // only its lock fills it: it waits for the player's word — give it
     } else if (active.some(s => !s.filledBy) && fit().length === 0 && active.filter(s => s.filledBy).length === 0) {
       g.abandon(q.id); // can't man it at all — free the board
     }

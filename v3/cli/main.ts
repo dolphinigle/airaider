@@ -368,6 +368,9 @@ async function exec(game: Game, line: string): Promise<boolean> {
     case 'fit': console.log(render.fit(game, rest[0] ?? '', rest[1])); break;
     case 'unassign': say(game.unassign(rest[0]!, slotAt(questOf(rest[0]), Number(rest[1])))); break;
     case 'clear': say(game.clearQuest(rest[0]!)); break;
+    // THE MARCH WORD: a job only its must-be lock fills waits for it (the quest page's and the board's March / Hold)
+    case 'march': say(game.setMarchWord(rest[0]!, true)); break;
+    case 'hold': say(game.setMarchWord(rest[0]!, false)); break;
     case 'approach': {
       // switching a manned plan sends its party back — the quest page confirms on the same line
       const loss = game.approachSwitchLoss(rest[0]!, rest[1]!);
@@ -406,6 +409,9 @@ async function exec(game: Game, line: string): Promise<boolean> {
     case 'end': {
       // R5: END with something to lose prints it and waits for 'end!' (or 'end' again)
       const w = game.endWarnings();
+      // the jobs waiting for your word stay home — said every time, as information (never part of the confirm)
+      const waiting = render.waitingForWord(game);
+      if (waiting) console.log(waiting);
       if (w.length && !guard(render.endWarnings(w), 'end!')) break;
       const b = render.jobsBrief(game);
       if (b) { console.log(`${b} — the cycle waits for the map table…`); await game.drain(); announceJobs(game) }

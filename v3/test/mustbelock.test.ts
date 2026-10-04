@@ -139,7 +139,7 @@ describe('the must-be lock', () => {
     expect(g.sendTo(oneOff(g).id, soldier.id, 0).ok).toBe(false);
   });
 
-  it('a job the lock alone fills marches at the next END (the game\'s own rule) — the notice says so, warn-toned; so does one that breaks a ready party', async () => {
+  it('a job the lock alone fills waits for the word — the notice says so; one that breaks a ready party or fills one the player started is warn-toned', async () => {
     const { g } = await board();
     const [a, b] = open(g).filter(x => !x.chainId && !x.approaches);
     a!.slots.splice(1); b!.slots.splice(1);
@@ -147,15 +147,23 @@ describe('the must-be lock', () => {
     expect(g.sendTo(b!.id, x.id, 0).ok).toBe(true);
     expect(g.isReady(b!.id)).toBe(true);
     const [n] = pin(g, a!, 0, x.id);
-    expect(n).toEqual({ warn: true, line: `🔒 ${x.name} is locked to ${a!.title}: its place names them — taken off ${b!.title} (now 0 of 1 placed, it won't march). That fills every place: it marches at the next END unless you set it aside.` });
-    expect(g.isReady(a!.id)).toBe(true);
-    await g.endCycle();
-    expect(a!.state).toBe('resolved');
-    expect(x.location).toEqual(HELD('roster'));
-    // a partial fill that breaks nothing is plain news
+    expect(n).toEqual({ warn: true, line: `🔒 ${x.name} is locked to ${a!.title}: its place names them — taken off ${b!.title} (now 0 of 1 placed, it won't march). That fills every place, but it waits for your word: 'march' sends it at the next END.` });
+    expect(g.isReady(a!.id)).toBe(false);
+    expect(g.marchWord(a!.id)).toBe('waiting');
+    // a partial fill that breaks nothing is plain news (on another job — the waiting one set aside)
+    g.abandon(a!.id);
     const c = oneOff(g, 2), y = g.roster()[2] ?? g.roster()[0]!;
     for (const q of open(g)) g.clearQuest(q.id);
     expect(pin(g, c, 0, y.id)).toEqual([{ warn: false, line: expect.stringMatching(/Set it aside to use them elsewhere\.$/) }]);
+    // a lock that fills the last place of a party the player started: that party marches as usual, and the notice says so
+    const { g: h } = await board();
+    const d = oneOff(h, 2);
+    d.slots.splice(2);
+    const [p, z] = [h.roster()[0]!, h.roster()[1]!];
+    expect(h.sendTo(d.id, p.id, 1).ok).toBe(true);
+    expect(pin(h, d, 0, z.id)).toEqual([{ warn: true, line: expect.stringMatching(/That fills every place: it marches at the next END unless you set it aside\.$/) }]);
+    expect(h.isReady(d.id)).toBe(true);
+    expect(h.marchWord(d.id)).toBeNull();
   });
 
   it('a soldier waiting locked in heals as one waiting in the hand (a lock is no deployment)', async () => {
@@ -269,5 +277,131 @@ describe('the must-be lock', () => {
     expect(g.setInRoom(room.id, soldier.id).ok).toBe(false);
     expect(g.roomPlacementsFor(soldier.id)).toEqual([]);
     expect(job.slots[0]!.filledBy).toBe(soldier.id);
+  });
+});
+
+// THE MARCH WORD (designer ruling 2026-10-04, option b — QUESTS §3 'slot requirements'): "A job filled ONLY by its lock waits
+// for the player: it does not march until the player confirms it (a 'march' toggle in both UIs); a job the player has placed
+// anyone in marches as usual."
+describe('the march word', () => {
+  /** a one-place job only the lock fills, with nothing else on the board */
+  async function waiting(seed = 31) {
+    const { g } = await board(seed);
+    const q = oneOff(g, 1);
+    q.slots.splice(1);
+    for (const o of open(g)) if (o !== q) g.abandon(o.id);
+    const x = g.roster()[1]!;
+    pin(g, q, 0, x.id);
+    return { g, q, x };
+  }
+
+  it('waits by default: it stays home at END as an empty job would (no stall, no warning), and END names it', async () => {
+    const { g, q, x } = await waiting();
+    expect(g.marchWord(q.id)).toBe('waiting');
+    expect(g.isReady(q.id)).toBe(false);
+    expect(g.marching()).toBe(0);
+    expect(g.waitingForWord()).toEqual([{ questId: q.id, title: q.title }]);
+    expect(g.endWarnings().some(w => w.questId === q.id)).toBe(false);      // information, not a confirm
+    expect(g.nextSteps().find(st => st.kind === 'march')).toMatchObject({ act: { type: 'march', args: [q.id], cli: `march ${q.id}` } });
+    expect(g.nextSteps().some(st => st.kind === 'man')).toBe(false);          // full: it waits for the word, not for hands
+    expect(g.questStallAt(q)).toBeNull();
+    for (let i = 0; i < STALL_LIMIT + 1; i++) await g.endCycle();
+    expect(q.state).toBe('open');
+    expect(q.stalls ?? 0).toBe(0);
+    expect(q.slots[0]!.filledBy).toBe(x.id);
+  });
+
+  it('march: the job marches at the next END', async () => {
+    const { g, q, x } = await waiting();
+    const r = g.setMarchWord(q.id, true);
+    expect(r).toMatchObject({ ok: true, msg: expect.stringMatching(new RegExp(`^Your word is given: ${q.title} marches at the next END`)) });
+    expect(g.marchWord(q.id)).toBe('given');
+    expect(g.isReady(q.id)).toBe(true);
+    expect(g.marching()).toBe(1);
+    expect(g.waitingForWord()).toEqual([]);
+    expect(g.setMarchWord(q.id, true)).toMatchObject({ ok: false, msg: expect.stringMatching(/already given/) });
+    await g.endCycle();
+    expect(q.state).toBe('resolved');
+    expect(x.location).toEqual(HELD('roster'));
+  });
+
+  it('hold: it waits again', async () => {
+    const { g, q } = await waiting();
+    g.setMarchWord(q.id, true);
+    expect(g.setMarchWord(q.id, false)).toMatchObject({ ok: true, msg: expect.stringMatching(/waits for your word again/) });
+    expect(g.marchWord(q.id)).toBe('waiting');
+    expect(g.isReady(q.id)).toBe(false);
+    expect(g.setMarchWord(q.id, false)).toMatchObject({ ok: false, msg: expect.stringMatching(/already waits for your word/) });
+    await g.endCycle();
+    expect(q.state).toBe('open');
+  });
+
+  it('Auto never gives the word: it points at it, and auto-fill counts the job apart — not ready, no marching odds', async () => {
+    const { g } = await board();
+    const q = oneOff(g, 1);
+    q.slots.splice(1);
+    pin(g, q, 0, g.roster()[1]!.id);
+    expect(g.autoAssign(q.id)).toMatchObject({ ok: false, placed: 0, msg: expect.stringMatching(/waits for your word/) });
+    const r = g.autoAssignAll();
+    const ready = Number(/(\d+) quests? ready/.exec(r.msg)?.[1] ?? 0);
+    expect(ready).toBe(g.marching());                                          // 'ready' = what marches at END
+    expect(r.msg).toContain(`waits for your word: ${q.title}`);
+    expect(r.msg.split(' · poor odds:')[1] ?? '').not.toContain(q.title);
+    expect(g.marchWord(q.id)).toBe('waiting');                               // still the player's to give
+    g.setMarchWord(q.id, true);
+    expect(g.autoAssign(q.id)).toMatchObject({ ok: true, msg: 'already manned' });
+  });
+
+  it('a job the player has placed anyone in marches as usual — no word asked, none to give', async () => {
+    const { g } = await board();
+    const q = oneOff(g, 2);
+    q.slots.splice(2);
+    for (const o of open(g)) if (o !== q) g.abandon(o.id);
+    const x = g.roster()[1]!, mate = g.roster().find(m => m.id !== x.id)!;
+    pin(g, q, 0, x.id);
+    expect(g.marchWord(q.id)).toBeNull();                                   // a place still open: nothing to give a word on
+    expect(g.setMarchWord(q.id, true)).toMatchObject({ ok: false, msg: expect.stringMatching(/can't march yet — every place must be filled \(1 of 2 placed\)/) });
+    expect(g.sendTo(q.id, mate.id, 1).ok).toBe(true);
+    expect(g.marchWord(q.id)).toBeNull();
+    expect(g.isReady(q.id)).toBe(true);
+    expect(g.setMarchWord(q.id, true)).toMatchObject({ ok: false, msg: expect.stringMatching(/needs no word — you placed its party/) });
+    await g.endCycle();
+    expect(q.state).toBe('resolved');
+  });
+
+  it('save/load keeps the word (and a job still waiting still waits)', async () => {
+    const { g, q } = await waiting();
+    g.setMarchWord(q.id, true);
+    const back = Game.load(new MockProvider(31), g.save());
+    expect(back.marchWord(q.id)).toBe('given');
+    expect(back.isReady(q.id)).toBe(true);
+    back.setMarchWord(q.id, false);
+    const again = Game.load(new MockProvider(31), back.save());
+    expect(again.marchWord(q.id)).toBe('waiting');
+    expect(again.isReady(q.id)).toBe(false);
+  });
+
+  it('a re-posted card (the retry after a failed march) starts without the word', async () => {
+    const { g, soldier, job } = await locked();
+    job.slots.splice(1);
+    for (const o of open(g)) if (o !== job) g.abandon(o.id);
+    expect(g.marchWord(job.id)).toBe('waiting');
+    g.setMarchWord(job.id, true);
+    for (const s of job.slots) s.test = { ...s.test, difficulty: 'extreme', level: 99 };   // no party clears this bar
+    await g.endCycle();
+    expect(job.state).toBe('resolved');
+    const lead = g.state.leads.find(l => l.chainInfo.kind === 'continues' && (l.chainInfo as { chainId: string }).chainId === job.chainId)!;
+    expect(lead).toBeTruthy();
+    const r = await g.pursue(lead.id);
+    const retry = g.state.quests.find(q => q.id === r.questId)!;
+    expect(retry.id).not.toBe(job.id);
+    expect(retry.chainId).toBe(job.chainId);
+    expect(retry.saga?.again).toBe(true);
+    expect(retry.marchWord).toBeUndefined();
+    // the soldier its place names is locked in again — and, once only the lock fills it, it waits for the word anew
+    expect(retry.slots[0]!.filledBy).toBe(soldier.id);
+    for (const s of retry.slots.slice(1)) if (s.filledBy) g.unassign(retry.id, retry.slots.indexOf(s));
+    retry.slots.splice(1);
+    expect(g.marchWord(retry.id)).toBe('waiting');
   });
 });

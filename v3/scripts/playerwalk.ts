@@ -59,9 +59,9 @@ function questCard(q: Quest) {
     }
   });
   const o = g.questOdds(q.id);
-  const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
-  const ready = active.length > 0 && active.every(s => s.filledBy);
-  P(`   └ ${q.approaches && !q.chosenApproach ? 'ODDS: pick an approach first' : !ready ? '⏸ will not march — every slot must be filled' : `ODDS: ${o.coins} coins vs bar ${o.bar.toFixed(1)}`}${o.success !== null ? ` → success ${Math.round(o.success * 100)}%` : ' (build an Oracle for %)'}`);
+  // readiness is the game's own (isReady — every place filled AND, for a job only its lock fills, the player's word)
+  const ready = g.isReady(q.id), word = g.marchWord(q.id);
+  P(`   └ ${q.approaches && !q.chosenApproach ? 'ODDS: pick an approach first' : word === 'waiting' ? '🔒 waits for your word — only its lock fills it' : !ready ? '⏸ will not march — every slot must be filled' : `ODDS: ${o.coins} coins vs bar ${o.bar.toFixed(1)}`}${o.success !== null ? ` → success ${Math.round(o.success * 100)}%` : ' (build an Oracle for %)'}`);
 }
 
 async function main() {
@@ -146,6 +146,8 @@ async function main() {
         const r = g.assign(q.id, i, bm.id);
         if (!r.ok) P(`   (assign ${bm.name} → slot ${i} REFUSED: ${r.msg})`);
       }
+      // a job only its lock fills waits for the player's word (the March button) — this player gives it
+      if (g.marchWord(q.id) === 'waiting') P(`   (March → ${g.setMarchWord(q.id, true).msg})`);
       questCard(q);
     }
 

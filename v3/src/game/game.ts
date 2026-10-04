@@ -188,7 +188,7 @@ export interface EndWarning {
 /** one concrete thing to do next (Game.nextSteps). `act` = one click does it: a POST /api/action
  *  {type, args} for the web, the typed command `cli` for the text UI; `block` = why it can't run yet */
 export interface NextStep {
-  kind: 'build' | 'approach' | 'man' | 'pursue' | 'holding' | 'hire' | 'gh' | 'setin' | 'rack' | 'addplace' | 'end';
+  kind: 'build' | 'approach' | 'march' | 'man' | 'pursue' | 'holding' | 'hire' | 'gh' | 'setin' | 'rack' | 'addplace' | 'end';
   text: string;
   detail: string | null;
   target: { screen: 'map' | 'leads' | 'quest' | 'fort' | 'room' | 'build' | 'holding' | 'tavern'; questId?: string; roomId?: string; type?: string; cardId?: string };
@@ -2591,6 +2591,8 @@ export class Game {
     const q = this.state.quests.find(x => x.id === questId);
     if (!q?.approaches) return { ok: false, msg: 'not a branched quest' };
     if (!q.approaches.some(a => a.id === groupId)) return { ok: false, msg: 'no such approach' };
+    // the march word is for the plan in play (THE MARCH WORD) — another plan waits for its own
+    if (q.chosenApproach !== groupId) delete q.marchWord;
     q.chosenApproach = groupId;
     const sentBack: string[] = [];
     for (const s of q.slots) if (s.groupId !== groupId && s.filledBy) {
@@ -2661,8 +2663,13 @@ export class Game {
   //  · A lock is not a party the player parked: the stall rule, the stand-down and END's "won't march" warning count
   //    only the places the PLAYER filled (staffed), and a soldier waiting locked in rests and heals as one waiting in the
   //    hand did (healingPass) — between marches the lock moves where they stand, nothing they get.
-  //  · A FULL PARTY MARCHES (the game's own rule, unchanged): a job whose every place the lock fills is ready, and marches
-  //    at the next END — the notice says so, warn-toned, as does one that takes them off a party that was ready.
+  //  · THE MARCH WORD (designer ruling 2026-10-04, option b): a job the lock ALONE fills — every place filled, none by the
+  //    player — waits for the player: it marches only once they give their word (q.marchWord, saved on the quest; the
+  //    'march' toggle in both UIs, setMarchWord). A job the player has placed anyone in marches as usual (isCommitted).
+  //    Waiting, it is an empty job to every other rule (the stall rule, the stand-down, END's warnings), as above; END
+  //    names it, as information only (waitingForWord). The word is for the plan in play: a finale's plan switched drops
+  //    it, and a re-posted card is a new quest without it. The notice says which: it marches, or it waits for the word —
+  //    warn-toned only when the lock changed what marches (filled a party the player had started, broke a ready one).
   //  · Rooms never take soldiers (roomRefusal), so a locked soldier can never be set in one either.
 
   /** the must-be places naming this soldier on open quests, in posting order (only places in play — a finale's chosen
@@ -2752,15 +2759,60 @@ export class Game {
         }
         s.filledBy = m.id;
         m.location = { kind: 'quest', questId: q.id, slot: idx };
-        const full = this.isCommitted(q);
-        const line = `🔒 ${m.name} is locked to ${q.title}: its place names them${off}. ${full
+        const marches = this.isCommitted(q), waits = this.marchWordOf(q) === 'waiting';
+        const line = `🔒 ${m.name} is locked to ${q.title}: its place names them${off}. ${marches
           ? 'That fills every place: it marches at the next END unless you set it aside.'
+          : waits ? "That fills every place, but it waits for your word: 'march' sends it at the next END."
           : 'Set it aside to use them elsewhere.'}`;
-        notes.push({ line, warn: full || off.includes("won't march") });
+        notes.push({ line, warn: marches || off.includes("won't march") });
         this.log('lock', line, q.id);
       });
     }
     return notes;
+  }
+
+  /** THE MARCH WORD of a job (see above): 'waiting' = the lock alone fills every place and no word is given (it stays
+   *  home at END); 'given' = the same job with the word given (it marches); null = the word does not apply (a place still
+   *  open, or the player placed someone — that party marches as usual). Both UIs show and toggle THIS. */
+  marchWord(questId: string): 'waiting' | 'given' | null {
+    const q = this.state.quests.find(x => x.id === questId && x.state === 'open');
+    return q ? this.marchWordOf(q) : null;
+  }
+  private marchWordOf(q: Quest): 'waiting' | 'given' | null {
+    if (!this.allFilled(q) || this.staffed(q) > 0) return null;
+    return q.marchWord ? 'given' : 'waiting';
+  }
+  /** the player's word on a job only its lock fills — `on` gives it (the job marches at the next END), off takes it back
+   *  (it waits again). The CLI's `march` / `hold`, the quest page's and the board's March / Hold. */
+  setMarchWord(questId: string, on: boolean): { ok: boolean; msg: string; warn?: boolean } {
+    const q = this.state.quests.find(x => x.id === questId && x.state === 'open');
+    if (!q) return { ok: false, msg: 'no such open quest' };
+    const word = this.marchWordOf(q);
+    if (!word) {
+      if (q.approaches && !q.chosenApproach) return { ok: false, msg: `${q.title}: pick how it ends first` };
+      if (!this.allFilled(q)) {
+        const a = this.activeSlots(q);
+        return { ok: false, msg: `${q.title} can't march yet — every place must be filled (${a.filter(s => s.filledBy).length} of ${a.length} placed)` };
+      }
+      // the player placed someone: the word is not theirs to give or take — the party marches as usual
+      return { ok: false, msg: `${q.title} needs no word — you placed its party, so it marches at the next END (clear them to keep it home)` };
+    }
+    if (on) {
+      if (word === 'given') return { ok: false, msg: `your word is already given — ${q.title} marches at the next END` };
+      q.marchWord = true;
+      const band = this.questOdds(q.id).band;
+      this.log('lock', `the word is given: ${q.title} marches`, q.id);
+      return { ok: true, msg: `Your word is given: ${q.title} marches at the next END${band ? ` — the party: ${BAND_TEXT[band]}` : ''} ('hold' keeps it home)`,
+        ...(band === 'long' || band === 'hopeless' ? { warn: true } : {}) };
+    }
+    if (word === 'waiting') return { ok: false, msg: `${q.title} already waits for your word — it stays home at END` };
+    delete q.marchWord;
+    this.log('lock', `the word is taken back: ${q.title} waits`, q.id);
+    return { ok: true, msg: `${q.title} waits for your word again — it stays home at END ('march' sends it)` };
+  }
+  /** the jobs only their lock fills that wait for the word — END names them, as information (they stay home) */
+  waitingForWord(): { questId: string; title: string }[] {
+    return this.state.quests.filter(q => q.state === 'open' && this.marchWordOf(q) === 'waiting').map(q => ({ questId: q.id, title: q.title }));
   }
 
   // ---- assignment -----------------------------------------------------------------------------------
@@ -2869,6 +2921,10 @@ export class Game {
     // recruit vs captive vs cash-out is a STORY choice. Auto must not make it silently.
     if (q.approaches && !q.chosenApproach)
       return { ok: false, msg: 'pick an approach first — that choice is yours', placed: 0 };
+    // a job only its lock fills has no empty place, but it does not march either: Auto never gives the word for the
+    // player (that confirmation is theirs — the march word, above), so it says so instead of a green 'already manned'
+    if (this.marchWordOf(q) === 'waiting')
+      return { ok: false, msg: `every place is filled by its lock — it waits for your word ('march' sends it)`, placed: 0 };
     const plan = this.autoPlan(q);
     if (!plan.empty) return { ok: true, msg: 'already manned', placed: 0 };
     if (!plan.pairs.length) return { ok: false, msg: 'nobody free fits this', placed: 0 };
@@ -3045,16 +3101,20 @@ export class Game {
       if (got) { placed += got; kept++ }
     }
     const n = (x: number, one: string, many = one + 's') => `${x} ${x === 1 ? one : many}`;
-    const ready = open.length - short.length;
+    // 'ready' = what MARCHES at END (isCommitted) — a job only its lock fills is full but waits for the word, so it is
+    // named apart, never counted ready, and its odds are no marching party's
+    const marches = open.filter(q => this.isCommitted(q));
+    const waiting = open.filter(q => this.marchWordOf(q) === 'waiting');
     const shortTail = short.length ? ` · short: ${short.slice(0, 3).join('; ')}${short.length > 3 ? ` (+${short.length - 3})` : ''}` : '';
+    const waitTail = waiting.length ? ` · waits for your word: ${waiting.slice(0, 3).map(q => q.title).join('; ')}${waiting.length > 3 ? ` (+${waiting.length - 3})` : ''}` : '';
     // a manned party that marches into a poor verdict is worth a second look before END
-    const poor = open.map(q => ({ q, b: this.questOdds(q.id).band })).filter(x => x.b === 'long' || x.b === 'hopeless');
+    const poor = marches.map(q => ({ q, b: this.questOdds(q.id).band })).filter(x => x.b === 'long' || x.b === 'hopeless');
     const poorTail = poor.length ? ` · poor odds: ${poor.slice(0, 3).map(x => `${x.q.title} (${BAND_TEXT[x.b!]})`).join('; ')}` : '';
     return {
       ok: placed > 0,
       msg: placed
-        ? `${n(placed, 'soldier')} placed on ${n(kept, 'quest')} · ${n(ready, 'quest')} ready${shortTail}${poorTail}`
-        : `nobody free fits anything${shortTail}${poorTail}`,
+        ? `${n(placed, 'soldier')} placed on ${n(kept, 'quest')} · ${n(marches.length, 'quest')} ready${shortTail}${waitTail}${poorTail}`
+        : `nobody free fits anything${shortTail}${waitTail}${poorTail}`,
       placed,
       ...(poor.length ? { warn: true } : {}),
     };
@@ -3258,6 +3318,7 @@ export class Game {
       } else if (lapsesNow) {
         out.push({ ...base, why: 'lapses', text: faucet
           ? `goes cold this END — ${filled} of ${of} placed walk back; the post will put up another`
+          : this.marchWordOf(q) === 'waiting' ? "goes cold this END — it waits for your word ('march' sends it)"
           : `goes cold this END — ${filled ? `${filled} of ${of} placed` : 'nobody placed'}${this.questStallAt(q) !== null ? ` (it has failed to march ${q.stalls ?? 0} time${(q.stalls ?? 0) === 1 ? '' : 's'})` : ''}` });
       } else if (this.staffed(q) > 0) {   // the stall rule's own test: a lock alone is no half-sent party
         out.push({ ...base, why: 'short', text: `won't march — ${filled} of ${of} placed` });
@@ -3317,11 +3378,18 @@ export class Game {
       steps.push({ kind: 'approach', text: `Choose how "${q.title}" ends`, detail: `${q.approaches!.length} ways to end it`, urgent: true,
         target: { screen: 'quest', questId: q.id }, act: null });
     }
+    // 2b) a job only its lock fills waits for the player's word (THE MARCH WORD) — one click gives it
+    for (const q of open.filter(x => this.marchWordOf(x) === 'waiting')) {
+      steps.push({ kind: 'march', text: `"${q.title}" waits for your word`, detail: 'only its lock fills it — it stays home until you say march',
+        urgent: this.questLapsesAt(q) <= st.cycle + 1, target: { screen: 'quest', questId: q.id },
+        act: { type: 'march', args: [q.id], label: 'March', cli: `march ${q.id}`, block: null } });
+    }
     // 3) quests nobody is marching on, while soldiers stand idle — only those the idle soldiers
     //    can FULLY man get an Auto button (a half-manned party does not march; the button was a
     //    dead click every cycle when none could be)
     const idle = this.roster().filter(m => m.location.kind === 'held').length;
-    const unmanned = open.filter(q => !(q.approaches && !q.chosenApproach) && !this.isCommitted(q));
+    // (a job only its lock fills is full — it waits for the word, step 2b, not for hands)
+    const unmanned = open.filter(q => !(q.approaches && !q.chosenApproach) && !this.isCommitted(q) && !this.marchWordOf(q));
     const fillable = idle ? unmanned.filter(q => this.canFullyMan(q.id)) : [];
     const goesCold = (q: Quest) => (!this.questIsFaucet(q) || this.activeSlots(q).some(s => s.filledBy)) && this.questLapsesAt(q) <= st.cycle + 1;
     if (fillable.length) {
@@ -4048,14 +4116,21 @@ export class Game {
   }
 
   /** every active place filled — the party marches at END (the view's `ready`; a finale with no
-   *  approach chosen has no active places, so it is never ready) */
+   *  approach chosen has no active places, so it is never ready; a job only its lock fills is ready once the
+   *  player's word is given — THE MARCH WORD) */
   isReady(questId: string): boolean {
     const q = this.state.quests.find(x => x.id === questId);
     return !!q && q.state === 'open' && this.isCommitted(q);
   }
+  /** ALL party slots filled (no partial sends) — and, when the must-be lock alone fills them, the player's word given
+   *  (THE MARCH WORD, above settleLocks): a job only its lock fills waits for it */
   private isCommitted(q: Quest): boolean {
-    const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
-    return active.length > 0 && active.every(s => s.filledBy);   // ALL party slots filled (no partial sends)
+    return this.allFilled(q) && (!!q.marchWord || this.staffed(q) > 0);
+  }
+  /** every active place filled (a finale with no approach chosen has none) */
+  private allFilled(q: Quest): boolean {
+    const active = this.activeSlots(q);
+    return active.length > 0 && active.every(s => s.filledBy);
   }
 
   /** a one-off's delivery, named for its narrator (a saga's report is dealt its own facts by the flow) */

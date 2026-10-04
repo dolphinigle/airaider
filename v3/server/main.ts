@@ -182,6 +182,9 @@ function stateView() {
     endWarnings: game.endWarnings(),
     nobodyMarches: game.nobodyMarches(),
     marching: game.marching(),       // parties that march at this END
+    // jobs only their must-be lock fills, waiting for the player's word ({questId,title}[]) — the seal names them as
+    // information, never a confirm (the CLI's END prints the same)
+    waitingForWord: game.waitingForWord(),
     // R4 — the next-steps scroll: {kind,text,detail,target:{screen,questId?,roomId?,type?,cardId?},urgent,
     // act:{type,args,label,cli,block}|null}[] — act.type/args is a POST /api/action as-is
     nextSteps: game.nextSteps(placementsOf),
@@ -314,6 +317,9 @@ function stateView() {
         // The server builds no saga text
         saga: q.saga ?? null,
         ready: game.isReady(q.id),
+        // THE MARCH WORD: 'waiting' = only its lock fills it and it stays home until the player says march; 'given' = the
+        // word is given (it marches); null = the word does not apply — the quest page and the board toggle it (CLI march/hold)
+        march: game.marchWord(q.id),
         // warn: that ending's own reward warning · switchLoss: what switching to it sends back (confirm on it)
         approaches: q.approaches?.map(a => ({ ...a, outcome: game.approachOutcome(q.id, a.id), warn: game.approachRewardWarn(q.id, a.id),
           switchLoss: game.approachSwitchLoss(q.id, a.id) })) ?? null, chosenApproach: q.chosenApproach ?? null,
@@ -503,6 +509,8 @@ async function handleAction(body: { type: string; args: (string | number)[] }) {
     case 'clear': result = game.clearQuest(s(a[0])); break;
     case 'approach': result = game.chooseApproach(s(a[0]), s(a[1])); break;
     case 'abandon': result = game.abandon(s(a[0])); break;
+    case 'march': result = game.setMarchWord(s(a[0]), true); break;
+    case 'hold': result = game.setMarchWord(s(a[0]), false); break;
     case 'hire': result = game.hire(s(a[0])); break;
     case 'accept': result = game.acceptCaptive(s(a[0])); break;
     case 'ransom': result = game.ransom(s(a[0])); break;

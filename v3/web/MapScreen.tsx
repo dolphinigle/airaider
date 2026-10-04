@@ -23,12 +23,15 @@ const bandTone = (b: Band | null | undefined): Tone => BAND_TONE[bandCls(b)] ?? 
 const finaleOpen = (q: any) => !!q.approaches && !q.chosenApproach;
 // every place of the chosen approach filled — the engine's own verdict (Game.isReady)
 const manned = (q: any): boolean => !!q.ready;
+// only its must-be lock fills it and the player's word is not given (Game.marchWord) — it stays home
+const waitsWord = (q: any): boolean => q.march === 'waiting';
 const lapseIn = (s: S, q: any) => Math.max(0, q.lapsesAtCycle - s.cycle);
 
 /** the marker chip: [text, tone, shows the clock]. Red only for a REAL loss (the engine's
  *  lapseUrgent); a standing post renews every cycle, so it is a neutral '↻ daily'. */
 function chipOf(s: S, q: any): [string, Tone, boolean] {
   if (finaleOpen(q)) return ['choose an ending', 'amber', false];
+  if (waitsWord(q)) return ['awaits your word', 'amber', false];
   if (manned(q)) { const b = q.odds?.band as Band | null; return [b ? `ready · ${BAND_WORD[b]}` : 'ready', bandTone(b), false] }
   if (q.faucet) return ['↻ daily', 'teal', false];
   const left = lapseIn(s, q);
@@ -37,6 +40,7 @@ function chipOf(s: S, q: any): [string, Tone, boolean] {
 /** the board row's status words (same verdicts as the chip, longer words) */
 function statusOf(s: S, q: any): [string, Tone | ''] {
   if (finaleOpen(q)) return ['finale · pick how it ends', 'amber'];
+  if (waitsWord(q)) return ['🔒 waiting for your word', 'amber'];
   if (manned(q)) { const b = q.odds?.band as Band | null; return [b ? `ready · ${BAND_WORD[b]}` : 'ready', bandTone(b)] }
   if (q.faucet) return ['renews each cycle', 'dim'];
   const left = lapseIn(s, q);
@@ -425,6 +429,7 @@ function Tip({ s, q, tipRef }: { s: S; q: any; tipRef: React.RefObject<HTMLDivEl
         {cast.length > 0 && <><span>On it</span><b>{cast.join(', ')}</b></>}
       </div>
       <div className="foot">{choose ? 'A finale: open it and pick how it ends.'
+        : waitsWord(q) ? 'Only the lock fills it — it waits for your word (March on the board or the quest) · click to open'
         : filled < act.length ? 'Drag a soldier here, or open it and Auto · click to open'
         : 'Manned — it marches at END · click to open'}</div>
     </div>
@@ -451,7 +456,10 @@ function QuestList({ s, doAct, open, hover, setHover, isNew, pops, goFort, toLea
             <Toks s={s} q={q} chip={false} pops={pops} />
           </span>
         </button>
+        {/* THE MARCH WORD on the board: a job only its lock fills — March gives the word, Hold takes it back (CLI march / hold) */}
         {choose ? <button className="btn" onClick={() => open(q.id)}>Choose</button>
+          : q.march === 'waiting' ? <button className="btn solid" onClick={() => doAct('march', q.id)} title="send it at the next END">March</button>
+          : q.march === 'given' ? <button className="btn" onClick={() => doAct('hold', q.id)} title="keep it home — it waits for your word again">Hold</button>
           : !ready && <button className="btn" onClick={() => doAct('auto', q.id)}>Auto</button>}
       </div>
     );
