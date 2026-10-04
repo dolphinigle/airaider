@@ -91,6 +91,8 @@ export function CardSheet({ s, id, cast, doAct, quick, close, openQuest, openRoo
           {kind === 'roster' && <>
             <div className="blk">
               <span className="lbl">Send them to — their best free place on each quest</span>
+              {/* the must-be lock (engine lockOf — the CLI's merc/fit print the same line) */}
+              {c.lock && <p className="p lockp">🔒 Locked to <b>{c.lock.title}</b> — the place there names them. Set that quest aside to use them elsewhere.</p>}
               {(c.placements ?? []).length === 0 && <p className="p dimp">No open place for them right now.</p>}
               {(c.placements ?? []).map((p: any) => {
                 const here = p.here ?? (c.location?.kind === 'quest' && c.location.questId === p.questId);

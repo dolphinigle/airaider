@@ -142,11 +142,15 @@ export function App() {
     seenSeq.current = Math.max(seenSeq.current, ...fresh.map(j => j.seq ?? 0));
     const done = fresh.filter(j => j.state === 'done'), failed = fresh.filter(j => j.state === 'failed');
     const failTxt = failed.length ? ` · ✗ ${failed.map(j => j.title).join(', ')} — the writing failed; the lead is still there` : '';
+    // what a landing did beyond the card (a soldier its must-be place locked in — Job.note, the CLI prints it too)
+    const noteTxt = done.filter(j => j.note).map(j => ` · ${j.note}`).join('');
+    // a landing that changed what marches at END (Job.warn — a party the lock filled or broke) takes the warn tone, as a send does
+    const landTone = done.some(j => j.warn) ? 'warn' : 'ok';
     if (done.length === 1 && done[0].questId) {
       const j = done[0];
-      sfx('notify'); say(`✦ ${j.questTitle ?? j.title} is on the map${failTxt}`, 'ok', 7000, { label: 'Open', run: () => openQuest(j.questId) });
+      sfx('notify'); say(`✦ ${j.questTitle ?? j.title} is on the map${noteTxt}${failTxt}`, landTone, noteTxt ? 10000 : 7000, { label: 'Open', run: () => openQuest(j.questId) });
     } else if (done.length > 1) {
-      sfx('notify'); say(`✦ ${done.length} new quests are on the map: ${done.map(j => j.questTitle ?? j.title).join(' · ')}${failTxt}`, 'ok', 7000,
+      sfx('notify'); say(`✦ ${done.length} new quests are on the map: ${done.map(j => j.questTitle ?? j.title).join(' · ')}${noteTxt}${failTxt}`, landTone, noteTxt ? 10000 : 7000,
         { label: 'Open', run: () => { setBoardTab('quests'); go('map') } });
     } else if (failed.length) {
       say(failTxt.slice(3), 'bad', 7000);

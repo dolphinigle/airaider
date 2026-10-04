@@ -106,6 +106,9 @@ function announceJobs(game: Game): number {
     arrivalSeen = Math.max(arrivalSeen, j.seq ?? 0);
     if (j.state === 'done') {
       console.log(`\n✔ ${j.questTitle ?? j.title} — the card is ready${j.questId ? ` (${j.questId})` : ''}.`);
+      // what the landing did beyond the card (a soldier its must-be place locked in) — the GUI's arrival toast says the same,
+      // ⚠ when it changed what marches at END (Job.warn — the toast's warn tone; `say` marks a warn reply the same way)
+      if (j.note) console.log(j.warn ? `⚠ ${j.note}` : j.note);
       if (j.questId) console.log(render.questDetail(game, j.questId));
     } else if (j.state === 'failed') {
       console.log(`\n✗ ${j.title} — could not be written: ${j.error ?? 'no reason given'}. The lead is still on the board.`);

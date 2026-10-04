@@ -118,13 +118,15 @@ export function Hand({ s, q, armed, pick, drag, setDrag, openDrawer, drawer, mod
     const soldier = c.character?.role === 'merc';
     if (isHolding(s, c)) return { note: c.deadline, more: `in holding · ${c.deadline ?? ''}`, rank: -500 };
     const on = soldier ? where(s, c) : null;
-    const away = on ? `→ ${shortTitle(on.title)}` : undefined;
-    const awayFull = on ? `placed on ${on.title}` : undefined;
+    // a soldier the must-be lock holds says so (the engine's lock — the CLI roster's "🔒 locked to")
+    const away = on ? `${c.lock ? '🔒' : '→'} ${shortTitle(on.title)}` : undefined;
+    const awayFull = on ? (c.lock ? `locked to ${on.title} — the place there names them; set that quest aside to use them elsewhere` : `placed on ${on.title}`) : undefined;
     if (soldier && slot) {
       const f = slot.fits.find((x: any) => x.id === c.id);
       if (!f) return { here: true, note: 'here', rank: -2000 };                       // the one in this place
-      if (f.from?.questId === q.id) return { here: true, note: `here · ${q.slots[f.from.idx]?.attr ?? 'another'}`, more: `here, in the ${q.slots[f.from.idx]?.attr ?? 'other'} place`, rank: -1500 };
+      // the engine's refusal comes first — a soldier elsewhere on this quest it will not move (the lock) says why, as the CLI does
       if (f.blocked) return { block: shortReason(f.blocked), more: f.blocked, rank: -1000 + f.coins };
+      if (f.from?.questId === q.id) return { here: true, note: `here · ${q.slots[f.from.idx]?.attr ?? 'another'}`, more: `here, in the ${q.slots[f.from.idx]?.attr ?? 'other'} place`, rank: -1500 };
       return { badge: coinBadge(f.coins, f.strength), badgeCls: strengthCls(f.strength), why: f.why,
         note: f.from ? `leaves ${shortTitle(f.from.title)}` : undefined, more: f.from ? `moves from ${f.from.title}` : undefined, rank: f.coins };
     }
@@ -279,7 +281,7 @@ export function Inventory({ s, close, pick, modal }: { s: S; close: () => void; 
   const forms: Record<string, any[]> = {};
   for (const r of relics) (forms[formOf(r.tags)] ??= []).push(r);
   const grid = (cards: any[]) => <div className="grid">{cards.map(c =>
-    <CardFace key={c.id} c={c} small onClick={() => pick(c)} note={c.location?.kind === 'quest' ? '→ ' + shortTitle(where(s, c)?.title ?? '')
+    <CardFace key={c.id} c={c} small onClick={() => pick(c)} note={c.location?.kind === 'quest' ? (c.lock ? '🔒 ' : '→ ') + shortTitle(where(s, c)?.title ?? '')
       : isHolding(s, c) ? c.deadline : undefined} />)}</div>;
   const total = s.roster.length + allCaptives.length + s.relics.length + s.liabilities.length;
   const shown = (b: Bag, n: number, all: number) => sec(b) && (t ? n > 0 : all > 0);

@@ -256,6 +256,9 @@ function stateView() {
       xpNeeded: xpNeeded(m.character!.level),
       // their best FREE place on every open quest: {questId,title,idx,attr,coins,bar,strength,here}
       placements: game.placementsFor(m.id),
+      // the must-be lock (QUESTS §3 🔒): {questId,title,idx} of the place that holds them, or null — the hand, the drawer
+      // and the sheet say "locked to"; the CLI's roster/merc/fit print the same
+      lock: game.lockOf(m.id),
       // the wound's cost on every roll, in coins (0 when unhurt)
       woundPenalty: game.woundPenalty(m.id),
       // their own bedroom, if any (for the cap line)
@@ -337,9 +340,12 @@ function stateView() {
         lapseStalled: game.questStallAt(q) !== null, lapseUrgent: game.questUrgent(q),
         slots: q.slots.map((s, i) => ({
           idx: i, groupId: s.groupId ?? null,
+          // a must-be place says its lock in plain words (Game.placeLock — the CLI's slot line prints the same);
+          // locked = the soldier here is locked in (no send-back, no drag away)
           requirement: s.requirement.kind === 'must-be'
-            ? `must be ${game.card(s.requirement.cardId)?.name ?? '?'}`
+            ? game.placeLock(q.id, i)!.note
             : s.requirement.kind === 'must-have' ? `needs ${s.requirement.concept}${s.requirement.minRank ? ` (${s.requirement.minRank}+)` : ''}` : null,
+          locked: !!game.placeLock(q.id, i)?.locked,
           test: { ...s.test, bar: slotThreshold(s.test) },
           attr: s.test.attributes.map(a => a.toUpperCase()).join('+'),
           filledBy: s.filledBy ? game.card(s.filledBy)!.name : null, filledId: s.filledBy,

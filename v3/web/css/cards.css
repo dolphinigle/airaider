@@ -208,6 +208,7 @@
 .sheet .focus { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
 .sheet .focus .lbl { margin-right: 4px; }
 .sheet .focus .dimp { font: 400 11.5px var(--mono); margin-left: 4px; }
+.sheet .lockp { color: #f1d38c; }   /* the must-be lock line: gold, as the lock chip */
 .sheet .capline { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .sheet .capline .capwarn { height: auto; min-height: 24px; padding: 3px 9px; }
 .xpb i.capd { background: #b3453a; }

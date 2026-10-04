@@ -71,6 +71,8 @@
 .sendback { position: absolute; bottom: 26px; right: -25px; z-index: 5; width: 28px; height: 28px; border-radius: 50%; background: #1d1812; border: 1px solid #8a6529; color: #f1d38c; font: 600 13px/1 var(--mono); display: flex; align-items: center; justify-content: center; opacity: .8; box-shadow: 0 1px 4px rgba(0,0,0,.6); }
 .seat:hover .sendback, .sendback:focus-visible { opacity: 1; }
 .sendback:hover { background: #3a1c19; border-color: var(--bad); color: #ffd9d2; }
+/* a soldier locked in by a must-be place: the lock sits where the ✕ would — a sign, not a button */
+.sendback.lockd, .sendback.lockd:hover { opacity: 1; cursor: default; background: #1d1812; border-color: #8a6529; color: #f1d38c; font-size: 12px; }
 .niche .test { font: 500 12px var(--mono); color: #e7dcc3; display: flex; gap: 10px; }
 .niche .test span { color: var(--text-dim); }
 .helps { font: 400 11.5px var(--mono); color: #9fcf97; text-align: center; }

@@ -245,7 +245,9 @@ export const render = {
     return g.roster().map(m => {
       const ch = m.character!;
       const a = ch.attrs;
-      const busy = m.location.kind === 'quest' ? ` ⚔ on ${m.location.questId}` : '';
+      // the must-be lock says so: the GUI hand's "🔒 <quest>" note
+      const lock = g.lockOf(m.id);
+      const busy = lock ? ` 🔒 locked to ${lock.questId} (${lock.title})` : m.location.kind === 'quest' ? ` ⚔ on ${m.location.questId}` : '';
       const injury = ch.injuryTiers > 0 ? ` 🩸${ch.injuryTiers}(~${g.healEta(m).cycles}c)` : '';
       const cap = g.capOf(m.id);
       return `${m.id.padEnd(5)} ${m.name.padEnd(22)} L${ch.level}/${cap}${ch.level >= cap ? '⛔CAP' : ''} S${a.str.toFixed(0)} D${a.dex.toFixed(0)} I${a.int.toFixed(0)} C${a.cha.toFixed(0)} N${a.con.toFixed(0)} ${mark(m)}${injury}${busy}\n      ${renderTags(m.tags)}`;
@@ -256,9 +258,12 @@ export const render = {
     const m = g.card(id);
     if (!m?.character) return 'no such merc';
     const ch = m.character;
+    const lock = g.lockOf(m.id);
     return [
       `${m.name} — L${ch.level} (cap ${g.capOf(m.id)}) ${ch.role} · xp ${ch.xp}/${xpNeeded(ch.level)} to L${ch.level + 1}` +
       (ch.injuryTiers > 0 ? ` · 🩸${ch.injuryTiers}: −${g.woundPenalty(m.id)} on every roll (~${g.healEta(m).cycles}c ${g.healEta(m).viaInfirmary ? 'infirmary' : 'rest — build an Infirmary'}${g.hasRoom('hospital') ? ', or pay-heal' : ''})` : ''),
+      // the GUI sheet's lock line
+      lock ? `🔒 locked to ${lock.title} (${lock.questId}) — the place there names them; set that quest aside to use them elsewhere` : '',
       (() => {
         const bed = g.state.fort.rooms.find(r => ROOM_TYPE[r.type]!.benefit === 'cap' && r.ownerId === m.id);
         return bed ? `bedroom (${bed.id}): ${g.roomEffect(bed)} — fill it to raise the cap`
@@ -416,7 +421,8 @@ export const render = {
       const bar = slotThreshold(t).toFixed(1);
       const merc = s.filledBy ? g.card(s.filledBy) : null;
       const c = merc ? ` ← ${merc.name} (${explainCoins(merc, t)}, ${slotStrength(coins(merc, t), slotThreshold(t))}${(w => w ? ` · ${w}` : '')(whyLine(coinsWhy(merc, t)))})` : '';
-      const req = s.requirement.kind === 'must-be' ? ` ⚑ must be ${g.card(s.requirement.cardId)?.name ?? '?'}`
+      // a must-be place says its lock (Game.placeLock — the quest page's place line)
+      const req = s.requirement.kind === 'must-be' ? (pl => ` ${pl.locked ? '🔒' : '⚑'} ${pl.note}`)(g.placeLock(q.id, i)!)
         : s.requirement.kind === 'must-have' ? ` ⚑ needs ${s.requirement.concept}${s.requirement.minRank ? ` (${s.requirement.minRank}+)` : ''}` : '';
       lines.push(`  slot ${no}: tests ${t.attributes.join('+').toUpperCase()} (${t.difficulty}, bar ${bar})${t.favored.length ? ` favors ${t.favored.join(',')}` : ''}${t.clashing.length ? ` clashes ${t.clashing.join(',')}` : ''}${req}${c}`);
       if (!merc) {
@@ -549,6 +555,8 @@ export const render = {
     const m = g.card(id);
     if (!m) return 'no such card';
     if (m.character?.role === 'merc') {
+      const lock = g.lockOf(id);
+      if (lock) return `${m.name} is 🔒 locked to ${lock.title} (${lock.questId}) — the place there names them; set that quest aside to use them elsewhere`;
       const rows = g.placementsFor(id);
       if (!rows.length) return `${m.name}: no open place on any quest (a finale needs its approach picked first)`;
       // coins flipped and heads needed are different units ("15c vs 11.5" read as a pass): the

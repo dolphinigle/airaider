@@ -60,14 +60,24 @@ export interface LogEntry { cycle: number; kind: string; text: string; questId?:
 // closing the game; the lead comes back). The UIs render the "being worked" state off jobs().
 export type JobState = 'queued' | 'running' | 'done' | 'failed';
 /** `seq` = settle order (1, 2, …) once done or failed — a surface announces every job with a seq
- *  above the last it announced (Game.arrivals); `questTitle` = the card that landed */
-export interface Job { id: string; leadId: string; title: string; state: JobState; questId?: string; questTitle?: string; error?: string; seq?: number }
+ *  above the last it announced (Game.arrivals); `questTitle` = the card that landed; `note` = what its landing did
+ *  beyond the card (a soldier the card's must-be place locked in — both UIs print it with the arrival); `warn` = that
+ *  landing changed what marches at END without the player's hand (the GUI's warn tone, as a send that breaks a party) */
+export interface Job { id: string; leadId: string; title: string; state: JobState; questId?: string; questTitle?: string; error?: string; seq?: number; note?: string; warn?: boolean }
+/** one notice of the must-be lock taking hold (Game.settleLocks): the line, and whether it changed what marches at END
+ *  without the player's hand — a party it filled, or one it took the soldier off while ready */
+export interface LockNote { line: string; warn: boolean }
+/** the lock's notices as one reply's fields: the line(s) both UIs print, and the warn tone if any changed what marches */
+function lockSaid(notes: LockNote[]): { note?: string; warn?: boolean } {
+  if (!notes.length) return {};
+  return { note: notes.map(n => n.line).join(' · '), ...(notes.some(n => n.warn) ? { warn: true } : {}) };
+}
 interface JobRec {
   job: Job;
   lead: Lead;
   settled: Promise<void>;          // resolves when the job leaves queued/running — never rejects
   settle: () => void;
-  result?: { ok: boolean; msg: string; questId?: string };
+  result?: { ok: boolean; msg: string; questId?: string; note?: string; warn?: boolean };
   thrown?: unknown;                // what pursue() must re-throw to behave exactly as it did
 }
 
@@ -295,6 +305,9 @@ export class Game {
       this.rng = new Rng(loaded.rngState);
       this.storyRng = new Rng(loaded.storyRngState ?? hashStr(`story:${loaded.seed}`));
       seedIdCounter(loaded.idCounter);
+      // the lock is read from the saved placements, so a save keeps it as it stood; this only repairs a save from before
+      // the lock (a must-be soldier left in the hand or on another quest) — the notice goes to the log
+      this.settleLocks();
     } else {
       this.rng = new Rng(seed);
       this.storyRng = new Rng(hashStr(`story:${seed}`));
@@ -1620,7 +1633,7 @@ export class Game {
    *  baselines, realplay/autoplay and the CLI's batch mode all drive. It becomes a job like any
    *  other pursuit, but starts IMMEDIATELY — cap or no cap — so a scripted caller can never
    *  deadlock behind queued player work. */
-  async pursue(leadId: string): Promise<{ ok: boolean; msg: string; questId?: string }> {
+  async pursue(leadId: string): Promise<{ ok: boolean; msg: string; questId?: string; note?: string; warn?: boolean }> {
     const res = this.reservePursue(leadId);
     if (!res.lead) return { ok: false, msg: res.msg };
     const rec = this.addJob(res.lead);
@@ -1786,7 +1799,7 @@ export class Game {
 
   /** the async half. Spends NOTHING until the quest exists (P3): a throw anywhere above leaves the
    *  lead on the board, so pursuing it again IS the retry (P4). */
-  private async runPursue(lead: Lead): Promise<{ ok: boolean; msg: string; questId?: string }> {
+  private async runPursue(lead: Lead): Promise<{ ok: boolean; msg: string; questId?: string; note?: string; warn?: boolean }> {
     let quest: Quest;
     if (lead.chainInfo.kind === 'continues') {
       const chain = this.state.chains.find(c => c.id === (lead.chainInfo as { chainId: string }).chainId);
@@ -1801,11 +1814,13 @@ export class Game {
     // Only for ONE-OFFS: a saga beat's lead belongs to the chain, not to the player's choice.
     if (!quest.chainId) quest.fromLead = { ...lead };
     this.state.quests.push(quest);
+    // a must-be place locks its soldier in the moment the card lands — off whatever quest they stood on mid-cycle
+    const locked = this.settleLocks();
     // consume the lead — only repeatable faucets (lead-hunts, recruiting posts) stay standing
     if (lead.expiresAtCycle !== null || (lead.archetype !== 'lead-hunt' && lead.source !== 'recruiting')) {
       this.state.leads = this.state.leads.filter(l => l.id !== lead.id);
     }
-    return { ok: true, msg: `Quest generated: ${quest.title}`, questId: quest.id };
+    return { ok: true, msg: `Quest generated: ${quest.title}`, questId: quest.id, ...lockSaid(locked) };
   }
 
   private addJob(lead: Lead): JobRec {
@@ -1840,7 +1855,8 @@ export class Game {
     try {
       rec.result = await this.runPursue(rec.lead);
       rec.job.state = rec.result.ok ? 'done' : 'failed';
-      if (rec.result.ok) rec.job.questId = rec.result.questId; else rec.job.error = rec.result.msg;
+      if (rec.result.ok) { rec.job.questId = rec.result.questId; if (rec.result.note) rec.job.note = rec.result.note; if (rec.result.warn) rec.job.warn = true }
+      else rec.job.error = rec.result.msg;
     } catch (e) {
       // P4: the failure is the job's, not the game's — nothing escapes into enqueuePursue's caller
       rec.job.state = 'failed';
@@ -2571,7 +2587,7 @@ export class Game {
     };
   }
 
-  chooseApproach(questId: string, groupId: string): { ok: boolean; msg: string } {
+  chooseApproach(questId: string, groupId: string): { ok: boolean; msg: string; warn?: boolean } {
     const q = this.state.quests.find(x => x.id === questId);
     if (!q?.approaches) return { ok: false, msg: 'not a branched quest' };
     if (!q.approaches.some(a => a.id === groupId)) return { ok: false, msg: 'no such approach' };
@@ -2582,7 +2598,10 @@ export class Game {
       this.doUnassign(q, s);
     }
     const label = q.approaches.find(a => a.id === groupId)!.label;
-    return { ok: true, msg: `Approach: ${label}${sentBack.length ? ` — ${sentBack.join(', ')} sent back to the hand` : ''}` };
+    // a plan's must-be place locks in once it is the plan in play (and one left behind frees its soldier for another)
+    const locked = this.settleLocks();
+    return { ok: true, msg: `Approach: ${label}${sentBack.length ? ` — ${sentBack.join(', ')} sent back to the hand` : ''}${locked.length ? ` · ${lockSaid(locked).note}` : ''}`,
+      ...(lockSaid(locked).warn ? { warn: true } : {}) };
   }
   /** what switching this finale to another approach throws away — the soldiers placed on the
    *  current one go back to the hand. Said BEFORE the click (both UIs confirm on it); null = free. */
@@ -2613,9 +2632,135 @@ export class Game {
   clearQuest(questId: string): { ok: boolean; msg: string } {
     const q = this.state.quests.find(x => x.id === questId && x.state === 'open');
     if (!q) return { ok: false, msg: 'no such open quest' };
-    const names = q.slots.filter(s => s.filledBy).map(s => this.card(s.filledBy!)?.name ?? '?');
-    for (const s of q.slots) if (s.filledBy) this.doUnassign(q, s);
-    return { ok: true, msg: names.length ? `${names.join(', ')} back in the hand` : 'nobody was placed' };
+    // a soldier locked in stays (the must-be lock) — Clear empties only what the player placed
+    const locked = q.slots.map((_, i) => this.lockedIn(q, i));
+    const kept = q.slots.filter((_, i) => locked[i]).map(s => this.card(s.filledBy!)?.name ?? '?');
+    const names = q.slots.filter((s, i) => s.filledBy && !locked[i]).map(s => this.card(s.filledBy!)?.name ?? '?');
+    q.slots.forEach((s, i) => { if (s.filledBy && !locked[i]) this.doUnassign(q, s) });
+    const stays = kept.length ? `${kept.join(', ')} stay${kept.length === 1 ? 's' : ''} — locked in: this quest's place names them (set the quest aside to free them)` : '';
+    if (!names.length && stays) return { ok: false, msg: stays };
+    return { ok: true, msg: names.length ? `${names.join(', ')} back in the hand${stays ? ` · ${stays}` : ''}` : 'nobody was placed' };
+  }
+
+  // ---- THE LOCK (QUESTS §3 🔒 "must-be LOCKS the card in", designer 2026-10-04) --------------------------------
+  // A must-be place does not merely REQUIRE its soldier: while its quest is open the soldier STANDS in that place and
+  // can be sent to no other quest or room. The lock is no saved state of its own — it is read from the must-be places
+  // and the placements, which are saved — so a save/load keeps it exactly, and no two surfaces can disagree about it.
+  //  · WHOSE: the open quests' ACTIVE must-be places naming the soldier, in posting order (state.quests is appended as
+  //    cards land). The first posted keeps them — and a place that already holds them keeps them, so the lock never
+  //    bounces a soldier between two quests that both name them (a finale's plans switched and switched back). The
+  //    other place waits, saying whose they are, and takes them the moment that quest is done (settleLocks).
+  //  · WHO: only a soldier who could stand in the place at all (a roster soldier, idle or on a quest). One who is not
+  //    with the company is locked nowhere; the place stays empty and says so.
+  //  · A WOUND is no exception: the hurt may march (a penalty, never a bar — canTake), so a wounded soldier stays
+  //    locked in; to keep them from marching, the player sets the quest aside.
+  //  · THE WAY OUT is the game's own, unchanged: set the quest aside (abandon — a saga step keeps its consequences:
+  //    a continuation lead, or the slip on the third time) or let it lapse. Either frees them.
+  //  · Placing is automatic (settleLocks): when a card lands (off any quest they stood on mid-cycle — said plainly in the
+  //    arrival's note), when a quest that held them is done or set aside, when a finale's plan changes, and on load.
+  //  · A lock is not a party the player parked: the stall rule, the stand-down and END's "won't march" warning count
+  //    only the places the PLAYER filled (staffed), and a soldier waiting locked in rests and heals as one waiting in the
+  //    hand did (healingPass) — between marches the lock moves where they stand, nothing they get.
+  //  · A FULL PARTY MARCHES (the game's own rule, unchanged): a job whose every place the lock fills is ready, and marches
+  //    at the next END — the notice says so, warn-toned, as does one that takes them off a party that was ready.
+  //  · Rooms never take soldiers (roomRefusal), so a locked soldier can never be set in one either.
+
+  /** the must-be places naming this soldier on open quests, in posting order (only places in play — a finale's chosen
+   *  plan's own) */
+  private lockClaims(cardId: string): { q: Quest; idx: number }[] {
+    const out: { q: Quest; idx: number }[] = [];
+    for (const q of this.state.quests) {
+      if (q.state !== 'open') continue;
+      const active = this.activeSlots(q);
+      q.slots.forEach((s, idx) => { if (s.requirement.kind === 'must-be' && s.requirement.cardId === cardId && active.includes(s)) out.push({ q, idx }) });
+    }
+    return out;
+  }
+  /** THE LOCK of one soldier: the must-be place they are locked to, or null (see above) */
+  lockOf(cardId: string): { questId: string; title: string; idx: number } | null {
+    const m = this.card(cardId);
+    return m ? this.lockFor(m) : null;
+  }
+  /** a soldier who could stand in a quest place at all: on the roster, idle or on a quest (canTake's own test) */
+  private inCompany(m: Card): boolean {
+    return m.character?.role === 'merc' && (m.location.kind === 'quest' || (m.location.kind === 'held' && m.location.state === 'roster'));
+  }
+  private lockFor(m: Card): { questId: string; title: string; idx: number } | null {
+    if (!this.inCompany(m)) return null;
+    const claims = this.lockClaims(m.id);
+    const win = claims.find(c => c.q.slots[c.idx]!.filledBy === m.id) ?? claims[0];
+    return win ? { questId: win.q.id, title: win.q.title, idx: win.idx } : null;
+  }
+  /** is the soldier in this place locked in it? */
+  private lockedIn(q: Quest, idx: number): boolean {
+    const id = q.slots[idx]?.filledBy;
+    const lock = id ? this.lockOf(id) : null;
+    return !!lock && lock.questId === q.id && lock.idx === idx;
+  }
+  /** a soldier standing where their lock holds them (not marching anywhere the player sent them) — see above */
+  private waitsLocked(c: Card): boolean {
+    const l = c.location;
+    if (l.kind !== 'quest') return false;
+    const q = this.state.quests.find(x => x.id === l.questId);
+    return !!q && this.lockedIn(q, l.slot);
+  }
+  /** the active places the PLAYER filled — a soldier locked in is not one (see above) */
+  private staffed(q: Quest): number {
+    return this.activeSlots(q).filter(s => s.filledBy && !this.lockedIn(q, q.slots.indexOf(s))).length;
+  }
+  /** a must-be place as both UIs show it: whom it names, whether they are locked in HERE, and the line in plain words
+   *  (the GUI's place and the CLI's slot line print `note`; null for any other place) */
+  placeLock(questId: string, idx: number): { cardId: string; name: string; locked: boolean; note: string } | null {
+    const q = this.state.quests.find(x => x.id === questId);
+    const s = q?.slots[idx];
+    if (!q || s?.requirement.kind !== 'must-be') return null;
+    const id = s.requirement.cardId, m = this.card(id), name = m?.name ?? 'someone';
+    const lock = m ? this.lockFor(m) : null;
+    const base = { cardId: id, name, locked: false };
+    if (lock && lock.questId === q.id && lock.idx === idx)
+      return { ...base, locked: true, note: `locked in — this place names ${name}; set the quest aside to free them` };
+    if (lock) return { ...base, note: `must be ${name} — already locked to ${lock.title}; this place waits until that quest is done` };
+    if (!m || !this.inCompany(m)) return { ...base, note: `must be ${name} — not with the company, so nobody can take this place` };
+    return { ...base, note: `must be ${name}` };
+  }
+  /** a move the lock refuses, in the player's words (canTake's reason — its first clause is the hand's short form) */
+  private lockRefusal(m: Card, lock: { questId: string; title: string; idx: number }, questId: string): string {
+    const q = this.state.quests.find(x => x.id === lock.questId)!;
+    return lock.questId === questId
+      ? `locked to ${this.placeName(q, lock.idx)} here — that place names ${m.name}`
+      : `locked to ${lock.title} — its place names ${m.name}; set that quest aside to use them elsewhere`;
+  }
+  /** PUT EVERY LOCKED SOLDIER IN THEIR PLACE — off any other quest place they stand on — and say so, one notice each.
+   *  Idempotent; every path that posts a card or frees a soldier a waiting must-be place names calls it (see above). */
+  settleLocks(): LockNote[] {
+    const notes: LockNote[] = [];
+    for (const q of this.state.quests) {
+      if (q.state !== 'open') continue;
+      q.slots.forEach((s, idx) => {
+        if (s.requirement.kind !== 'must-be' || s.filledBy) return;
+        const m = this.card(s.requirement.cardId);
+        const lock = m ? this.lockFor(m) : null;
+        if (!m || !lock || lock.questId !== q.id || lock.idx !== idx) return;
+        let off = '';
+        const loc = m.location;
+        const fq = loc.kind === 'quest' ? this.state.quests.find(x => x.id === loc.questId) : undefined;
+        if (fq && loc.kind === 'quest' && fq.slots[loc.slot]?.filledBy === m.id) {
+          const wasReady = fq.id !== q.id && this.isCommitted(fq);
+          this.doUnassign(fq, fq.slots[loc.slot]!);
+          const a = this.activeSlots(fq), n = a.filter(x => x.filledBy).length;
+          off = fq.id === q.id ? '' : ` — taken off ${fq.title} (now ${n} of ${a.length} placed${wasReady ? ", it won't march" : ''})`;
+        }
+        s.filledBy = m.id;
+        m.location = { kind: 'quest', questId: q.id, slot: idx };
+        const full = this.isCommitted(q);
+        const line = `🔒 ${m.name} is locked to ${q.title}: its place names them${off}. ${full
+          ? 'That fills every place: it marches at the next END unless you set it aside.'
+          : 'Set it aside to use them elsewhere.'}`;
+        notes.push({ line, warn: full || off.includes("won't march") });
+        this.log('lock', line, q.id);
+      });
+    }
+    return notes;
   }
 
   // ---- assignment -----------------------------------------------------------------------------------
@@ -2623,8 +2768,8 @@ export class Game {
   /** THE ONE LEGALITY PREDICATE for putting a soldier in a quest place — null when legal, else the
    *  reason in the player's words. Every placement path (assign, sendTo, autoAssign, placementsFor,
    *  the views' fits) asks THIS, so no two surfaces can disagree about who may go where.
-   *  It deliberately does NOT refuse a soldier committed elsewhere (sending MOVES them) nor a place
-   *  someone else holds (sendTo SWAPS them) — assign() is the strict primitive that does. */
+   *  It deliberately does NOT refuse a soldier committed elsewhere (sending MOVES them) — unless the must-be LOCK holds
+   *  them there — nor a place someone else holds (sendTo SWAPS them) — assign() is the strict primitive that does. */
   canTake(questId: string, slotIdx: number, mercId: string, opts: { ignoreApproach?: boolean } = {}): string | null {
     const q = this.state.quests.find(x => x.id === questId);
     if (!q || q.state !== 'open') return 'no such quest';
@@ -2633,6 +2778,9 @@ export class Game {
     if (m.location.kind !== 'quest' && !(m.location.kind === 'held' && m.location.state === 'roster')) return 'not on your roster';
     const slot = q.slots[slotIdx];
     if (!slot) return 'no such place';
+    // the must-be lock: a soldier locked to a place goes nowhere else (and a place waiting on them takes them only once free)
+    const lock = this.lockFor(m);
+    if (lock && (lock.questId !== questId || lock.idx !== slotIdx)) return this.lockRefusal(m, lock, questId);
     if (slot.requirement.kind === 'must-be' && slot.requirement.cardId !== mercId)
       return `this place names ${this.card(slot.requirement.cardId)?.name ?? 'someone else'}`;
     if (slot.requirement.kind === 'must-have' && !queryMatches(m.tags, { match: slot.requirement.concept, minRank: slot.requirement.minRank }))
@@ -2683,6 +2831,7 @@ export class Game {
     const slot = q?.slots[slotIdx];
     if (!q || !slot?.filledBy) return { ok: false, msg: 'nothing to unassign' };
     const name = this.card(slot.filledBy)?.name ?? 'they';
+    if (this.lockedIn(q, slotIdx)) return { ok: false, msg: `${name} is locked in — this place names them; set the quest aside to free them` };
     this.doUnassign(q, slot);
     return { ok: true, msg: `${name} back in the hand` };
   }
@@ -3110,7 +3259,7 @@ export class Game {
         out.push({ ...base, why: 'lapses', text: faucet
           ? `goes cold this END — ${filled} of ${of} placed walk back; the post will put up another`
           : `goes cold this END — ${filled ? `${filled} of ${of} placed` : 'nobody placed'}${this.questStallAt(q) !== null ? ` (it has failed to march ${q.stalls ?? 0} time${(q.stalls ?? 0) === 1 ? '' : 's'})` : ''}` });
-      } else if (filled > 0) {
+      } else if (this.staffed(q) > 0) {   // the stall rule's own test: a lock alone is no half-sent party
         out.push({ ...base, why: 'short', text: `won't march — ${filled} of ${of} placed` });
       }
     }
@@ -3435,7 +3584,8 @@ export class Game {
     for (const q of st.quests.filter(x => x.state === 'open' && !this.isCommitted(x))) {
       const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
       const filled = active.filter(s => s.filledBy).length;
-      if (filled === 0) { q.stalls = 0; continue }
+      // only what the PLAYER placed stalls a quest — a soldier its must-be place locked in is not a party left parked
+      if (this.staffed(q) === 0) { q.stalls = 0; continue }
       // a quest this END's expiry pass takes anyway is reported ONCE, as gone cold — not also as
       // "did not march" (the tally counted one lost quest twice)
       if (st.cycle - q.createdCycle >= this.questTtl(q)) continue;
@@ -3614,12 +3764,13 @@ export class Game {
     for (const q of st.quests.filter(q => q.state === 'open')) {
       const active = q.slots.filter(s => !q.approaches || s.groupId === q.chosenApproach);
       const empty = active.filter(s => !s.filledBy).length;
-      const parked = active.filter(s => s.filledBy).length;
+      // the party the PLAYER parked — a soldier locked in by a must-be place stays where the lock holds them
+      const parked = this.staffed(q);
       if (!parked || !empty) continue;
       const freeFit = this.roster().filter(m => m.location.kind === 'held' && m.character!.injuryTiers < 4).length;
       if (freeFit < empty) {
         for (const s of active) {
-          if (!s.filledBy) continue;
+          if (!s.filledBy || this.lockedIn(q, q.slots.indexOf(s))) continue;
           const m = this.card(s.filledBy);
           if (m) m.location = HELD('roster');
           s.filledBy = null;
@@ -3634,6 +3785,9 @@ export class Game {
       this.abandonQuest(q, report);
     }
     st.quests = st.quests.filter(q => q.state === 'open');
+    // 5a) the must-be lock: a soldier freed this END (their quest marched, lapsed or was set aside) whom another open
+    // quest's must-be place names goes into it now — said in the fort news
+    report.push(...this.settleLocks().map(n => n.line));
 
     // 5b) peril echoes come due: the person left behind resurfaces as a rescue lead
     for (const echo of [...st.pendingEchoes]) {
@@ -3791,7 +3945,7 @@ export class Game {
    *  from the placement NOW: nobody placed resets the count at END. */
   questStallAt(q: Quest): number | null {
     if (q.isFinale || q.state !== 'open' || this.isCommitted(q)) return null;
-    if (!this.activeSlots(q).some(s => s.filledBy)) return null;
+    if (!this.staffed(q)) return null;   // doEndCycle's own test: a lock alone is not a stall
     const at = this.state.cycle + Math.max(1, STALL_LIMIT - (q.stalls ?? 0));
     return at < q.createdCycle + this.questTtl(q) ? at : null;
   }
@@ -3802,7 +3956,7 @@ export class Game {
   /** a faucet quest is not lost when it goes — the post that wrote it is still standing */
   questIsFaucet(q: Quest): boolean { return q.fromLead?.expiresAtCycle === null }
 
-  abandon(questId: string): { ok: boolean; msg: string } {
+  abandon(questId: string): { ok: boolean; msg: string; warn?: boolean } {
     const q = this.state.quests.find(x => x.id === questId && x.state === 'open');
     if (!q) return { ok: false, msg: 'no such open quest' };
     // A card the player will not read is a dead slot on the board. Abandoning returns the LEAD so
@@ -3815,6 +3969,10 @@ export class Game {
     const said: string[] = [];
     this.abandonQuest(q, said);
     this.state.quests = this.state.quests.filter(x => x !== q);
+    // a soldier this quest held locked is free — unless another open quest's must-be place names them (it takes them now)
+    const settled = lockSaid(this.settleLocks());
+    const locked = settled.note ? ` · ${settled.note}` : '';
+    const lw = settled.warn ? { warn: true } : {};
     if (!reroll) {
       // the reply says what abandonQuest actually DID to the saga (a continuation lead, or a slip)
       const why = q.chainId ? (chainOut === 'continues' ? ' — the thread dangles: a continuation lead is back on the board'
@@ -3823,12 +3981,12 @@ export class Game {
         : !lead ? ''
         : !this.canReroll() ? ' — the lead is spent; a lead can only be taken up again once a cycle'
         : '';
-      return { ok: true, msg: `${q.title} abandoned${why}` };
+      return { ok: true, msg: `${q.title} abandoned${why}${locked}`, ...lw };
     }
     this.state.leads.push(lead!);
     this.state.lastRerollCycle = this.state.cycle;
     this.log('leads', `The company set aside "${q.title}" — the ${lead!.archetype} is back on the map table.`);
-    return { ok: true, msg: `${q.title} set aside — the lead is back on the map table, to be taken up again` };
+    return { ok: true, msg: `${q.title} set aside — the lead is back on the map table, to be taken up again${locked}`, ...lw };
   }
 
   /** what setting a saga step aside does to its saga — the SAME branch abandonQuest takes, so the
@@ -4586,7 +4744,7 @@ export class Game {
     const rate = infirmary ? infirmaryHealRate(this.comfort(infirmary)) : REST_HEAL_PER_CYCLE;
     for (const c of this.state.cards) {
       if (!c.character || c.character.injuryTiers <= 0) continue;
-      if (c.location.kind === 'quest') continue;    // deployed units don't heal
+      if (c.location.kind === 'quest' && !this.waitsLocked(c)) continue;    // deployed units don't heal (a lock is no deployment)
       healTick(c.character as never, rate);
     }
   }

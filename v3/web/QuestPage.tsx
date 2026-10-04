@@ -168,12 +168,15 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
                     onDrop={e => drop(e, sl.idx)}>
                     {m
                       ? <div className="seat" key={sl.filledId}>
+                          {/* a soldier the must-be lock holds (engine placeLock): no send-back, no drag away — the place says why */}
                           <CardFace c={m} small badge={coinBadge(sl.filledCoins, sl.filledStrength)} badgeCls={strengthCls(sl.filledStrength)} why={sl.filledWhy}
-                            title={`${m.name} — ${STRENGTH_WORD[sl.filledStrength as 'strong'] ?? ''} here (${sl.filledExplain ?? ''})\n${openCard ? 'click to read their card · ' : ''}drag to another place to swap · ✕ sends them back`}
-                            onClick={() => openCard ? openCard(m.id) : quick('unassign', q.id, sl.idx)}
-                            onDragStart={e => { e.dataTransfer.setData('text/plain', m.id); e.dataTransfer.effectAllowed = 'move'; setDrag(m.id) }}
+                            title={`${m.name} — ${STRENGTH_WORD[sl.filledStrength as 'strong'] ?? ''} here (${sl.filledExplain ?? ''})\n${sl.locked ? `🔒 ${sl.requirement}` : `${openCard ? 'click to read their card · ' : ''}drag to another place to swap · ✕ sends them back`}`}
+                            onClick={() => openCard ? openCard(m.id) : sl.locked ? undefined : quick('unassign', q.id, sl.idx)}
+                            onDragStart={sl.locked ? undefined : e => { e.dataTransfer.setData('text/plain', m.id); e.dataTransfer.effectAllowed = 'move'; setDrag(m.id) }}
                             onDragEnd={() => { setDrag(null); setOver(null) }} />
-                          <button className="sendback" onClick={() => quick('unassign', q.id, sl.idx)} aria-label={`Send ${m.name} back to the hand`} title="send back to the hand">✕</button>
+                          {sl.locked
+                            ? <span className="sendback lockd" role="img" aria-label={`${m.name} is locked in`} title={sl.requirement}>🔒</span>
+                            : <button className="sendback" onClick={() => quick('unassign', q.id, sl.idx)} aria-label={`Send ${m.name} back to the hand`} title="send back to the hand">✕</button>}
                         </div>
                       : <button className="empty" onClick={() => setArmed(armed === sl.idx ? null : sl.idx)} aria-label={`Place ${act.indexOf(sl) + 1}: ${attrOf(sl)}`}>
                           <Silhouette size={56} /></button>}
@@ -183,7 +186,7 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
                     <React.Fragment key={t}>{i > 0 && ' · '}<span className={hit(t, why?.plus) ? 'hit' : ''}>{t}</span></React.Fragment>)}</div>}
                   {sl.test.clashing.length > 0 && <div className="hurts">hurts: {sl.test.clashing.map((t: string, i: number) =>
                     <React.Fragment key={t}>{i > 0 && ' · '}<span className={hit(t, why?.minus) ? 'hit' : ''}>{t}</span></React.Fragment>)}</div>}
-                  {req && <div className="reqline">⚑ {sl.requirement}</div>}
+                  {req && <div className="reqline">{sl.locked ? '🔒' : '⚑'} {sl.requirement}</div>}
                 </div>);
             })}</div>
           </div>}
