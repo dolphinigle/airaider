@@ -8,7 +8,7 @@ The data:
 - cast: its people.
 [[!people]]- keywords: things it could use.[[/!people]][[people]]- keywords, people: what it could use.[[/people]]
 
-[[!people]]Choose[[situations]] the one situation and[[/situations]] the one to three keywords that best fit [[situations]]the cast, the tone and each other[[/situations]][[!situations]]the [[!personal]]situation[[/!personal]][[personal]]past[[/personal]], the tone and the cast[[/!situations]] in one clear story. Copy each exactly.
-[[people]]Choose, best first, the keywords that fit the [[!personal]]situation[[/!personal]][[personal]]past[[/personal]], tone and cast in one clear story, and from people the one it needs, or none. Copy each exactly.
+[[!count]]Choose[[situations]] the one situation and[[/situations]] the one to three keywords that best fit [[situations]]the cast, the tone and each other[[/situations]][[!situations]]the [[!personal]]situation[[/!personal]][[personal]]past[[/personal]], the tone and the cast[[/!situations]] in one clear story. Copy each exactly.
+[[count]]Choose the {{KEEP}} best fitting the [[!personal]]situation[[/!personal]][[personal]]past[[/personal]], tone and cast, together in one clear story[[people]], and from people the one it needs, or none[[/people]]. Copy each exactly.
 
 Reply with JSON only: {[[situations]]"situation": "one of situations", [[/situations]]"keywords": ["one of keywords"][[people]], "person": "one of people, or none"[[/people]]}

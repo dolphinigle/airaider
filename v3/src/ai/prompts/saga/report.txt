@@ -3,13 +3,14 @@ Write the report of one job in a fantasy game about a mercenary company.
 The data:
 - card: what the player just read. job: its task.
 - soldiers: who went, what each is like.[[decides]] decides: whose deed wins it.[[/decides]]
-[[people]]- people: who else is there, by name.[[intro]] intro: new to the player; first mention gives label and name.[[/intro]][[part]] part: their side, shown, not stated.[[/part]]
+[[people]]- people: who else is there, by name.[[intro]] intro: new to the player; first mention gives label and name.[[/intro]][[part]] part: their side, shown, not stated.[[/part]][[side]] side: their side, shown on first appearance.[[/side]]
 [[!failure]]- outcome: success, partial (done, at a price), or failure.[[result]] result: what came of it.[[/result]]
 [[option]]- plan: what the soldiers do, shown in after, in your own words.
 [[hurt]]- hurt: [[hurtprice]]the price paid: [[/hurtprice]]who is hurt, how badly; show each taking it.
 [[cost]]- cost: the price; show it paid.
 [[brought]]- brought: who or what the company now holds; show each gained.
 [[clue]]- clue: a fact this win brings out; show it found, seen or said, plainly, and nothing past it.
+[[hope]]- hope: the card's hope, limited by result and clue; show shortfalls.
 [[known]]- known: what earlier jobs found; never shown as new.
 [[have]]- have: what the company holds, never in enemy hands[[edge]]; helps: its use; show each used[[/edge]][[!edge]]; use it only where it helps this job[[/!edge]].
 [[answer]]- answer: the question and its secret.

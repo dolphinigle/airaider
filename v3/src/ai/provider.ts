@@ -158,7 +158,7 @@ export interface AiUsage {
  *  message and returns the schema-parsed JSON. The player's direction rides in the payload (§2.8.5), never in the
  *  system prompt, so a saga system prompt is byte-stable per flag set */
 export interface SagaCall {
-  template: SagaTemplate; flags: string[]; vars: Record<string, number>;
+  template: SagaTemplate; flags: string[]; vars: Record<string, string | number>;
   payload: Record<string, unknown>;
   /** which model tier: the plan call is the hardest (PLAN), everything the player reads is the WRITER's */
   tier: 'plan' | 'writer'; effort: 'low' | 'medium';

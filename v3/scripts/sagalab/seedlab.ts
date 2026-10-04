@@ -10,15 +10,29 @@
 //                            build's default since seed1)
 //   A2b kit+pick             A2 again on A2's own deals (each slot's dealt world read back from A2's plan.json): the
 //                            noise floor — different text, the same inputs
+//   A2c kit+pick             A2 a third time on A2's deals (the power rule: >= 3 generations per arm)
 //   A3  kit+pick+situation   as A2 with three situations; the pick also chooses the situation
 //   A4  kit+pick+premise     A2, then a small premise call writes three sentences — the plan's seed
 //   B1  kit+pick+cast        A2's deal with 3–4 supporting people; the same pick keeps the 0–1 its story needs (the plan
-//                            never sees the rest) and ranks its keywords (the plan gets the top two)
+//                            never sees the rest) and chooses the two keywords the plan gets (measured when it only
+//                            ranked them, the plan keeping the top two)
 //
-//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A3|A4|B1|all] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
+// PIPELINE arms (engine/saga.ts PipeArm, North Star 8): kit+pick plus one input-pipeline change each, every one played on
+// A2's own dealt worlds (REPLAY), so the only difference from A2 / A2b is the arm:
+//   B2  one      the pick chooses one keyword, told so; the plan gets only it
+//   C1  core     after the pick, a small core call writes the want, the question, the answer and who is against; the plan
+//                gets them as fixed facts and writes no question or answer
+//   C2  grafts   R6's class fixes: the road prints the plan's own why per later job (no outline call; a flagged why leaves
+//                the title), the card's hope goes to its report, engine finale buttons, the gold way paid
+//   C3  sides    the plan writes each person's side; cards and reports get it for the people present
+//
+//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A2c|A3|A4|B1|B2|C1|C2|C3|all, or <arm>_g<N> = a further generation] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
 //        [--slots F6_3,F1_1] [--writer sonnet|haiku|openai] [--mock] [--pool 6] [--run seed1] [--force]
 //   npx tsx scripts/sagalab/seedlab.ts --stats [--run seed1]     spend and latency per call kind over the run's folders
 //   npx tsx scripts/sagalab/seedlab.ts --check [--run seed1]     which saga folders are missing or incomplete
+//   npx tsx scripts/sagalab/seedlab.ts --render --arm B2,C1,C2,C3 --slots F6_3 [--mock] [--run seed1]
+//        every NEW or CHANGED prompt variant a pipeline arm sent (one call per template + flag set), its system prompt and
+//        its real payload, into runs/<run>/_pipeline_rendered/ (cleared first) for the context-free verifier
 //
 // The world of a slot is the probe's: the base fixture's game (seed, fort, roster), its focal from the fixture's own seed
 // (a personal fixture's soldier), N, kind, a personal saga's past (the base spark), F5's returning client. The story rng
@@ -54,7 +68,7 @@ import { labOutcome, type LabFixture, type LabPath } from '../../src/engine/lab.
 import type { Outcome, SlotTest } from '../../src/engine/roll.js';
 import type { Attribute } from '../../src/engine/tags.js';
 import { renderTags } from '../../src/engine/tags.js';
-import { hashStr, seedOf, type SeedArm, type Face, type Hurt, type SagaRecord, type SagaWorld } from '../../src/engine/saga.js';
+import { hashStr, seedOf, type SeedArm, type PipeArm, type Face, type Hurt, type SagaRecord, type SagaWorld } from '../../src/engine/saga.js';
 import { logLines, matterLine, buttonLine } from '../../src/ai/storyteller.js';
 import * as flow from '../../src/game/sagaflow.js';
 import type { TextRec } from './extract.js';
@@ -80,13 +94,22 @@ if (!MOCK && WRITER !== 'openai') {
   delete process.env.AIRAIDER_CLAUDE_PLAN;
 }
 
-export const ARMS: Record<string, SeedArm> = { A0: 'themes', A1: 'kit', A2: 'kit+pick', A2b: 'kit+pick', A3: 'kit+pick+situation', A4: 'kit+pick+premise', B1: 'kit+pick+cast' };
+export const ARMS: Record<string, SeedArm> = {
+  A0: 'themes', A1: 'kit', A2: 'kit+pick', A2b: 'kit+pick', A2c: 'kit+pick', A3: 'kit+pick+situation', A4: 'kit+pick+premise', B1: 'kit+pick+cast',
+  B2: 'kit+pick', C1: 'kit+pick', C2: 'kit+pick', C3: 'kit+pick',
+};
+/** the pipeline arms: kit+pick's seed, one pipeline change each (the host's pipeArm) */
+export const PIPES: Record<string, PipeArm> = { B2: 'one', C1: 'core', C2: 'grafts', C3: 'sides' };
 /** an arm that plays another arm's deals: each slot's dealt world is read back from that arm's plan.json (the noise
- *  control: a later change to the deal — the supporting trades — cannot move its inputs) */
-const REPLAY: Record<string, string> = { A2b: 'A2' };
+ *  control: a later change to the deal — the supporting trades — cannot move its inputs; the pipeline arms: the arm is the
+ *  only difference) */
+const REPLAY: Record<string, string> = { A2b: 'A2', A2c: 'A2', B2: 'A2', C1: 'A2', C2: 'A2', C3: 'A2' };
+/** a further generation of an arm (the power rule): `<arm>_g<N>` plays `<arm>` exactly — its seed, pipe and replayed deals — into
+ *  its own folder, runs/<run>/<arm>_g<N>/ */
+const gen = (armId: string) => armId.replace(/_g\d+$/, '');
 const armArg = opt('arm') ?? 'all';
 const ARM_IDS = armArg === 'all' ? Object.keys(ARMS) : armArg.split(',').map(s => s.trim());
-for (const a of ARM_IDS) if (!ARMS[a]) { console.error(`--arm: ${a} is not one of ${Object.keys(ARMS).join('/')}`); process.exit(2) }
+for (const a of ARM_IDS) if (!ARMS[gen(a)]) { console.error(`--arm: ${a} is not one of ${Object.keys(ARMS).join('/')}`); process.exit(2) }
 
 // ─── fixtures and slots ────────────────────────────────────────────────────────────────────────
 
@@ -229,7 +252,7 @@ const words = (s: string | undefined) => (s ?? '').split(/\s+/).filter(Boolean).
 interface Row { id: string; path: string; N: number; outcomes: string; files: number; complete: boolean; problems: string[]; cost: number; card1Ms: number; title: string; seed: string; keywords: string; dev: string[] }
 
 async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string): Promise<Row> {
-  const arm = ARMS[armId]!, id = `${fx.id}_${d}`, path_ = pathOf(fx, d);
+  const arm = ARMS[gen(armId)]!, id = `${fx.id}_${d}`, path_ = pathOf(fx, d);
   const w = buildWorld(fx, d);
   const { game, chain, focal, base } = w;
   const N = fx.N, budget = chain.failureBudget;
@@ -246,6 +269,7 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
     hasRoom: t => game.hasRoom(t), rosterCapacity: () => game.rosterCapacity(),
     captiveCount: () => game.captives().length, captiveCapacity: () => game.captiveCapacity(),
     seedArm: () => arm,
+    pipeArm: () => PIPES[gen(armId)],
   };
   const pins: flow.DealPins = {};
   if (fx.personal) pins.personalSeed = base.spark;
@@ -253,11 +277,11 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
 
   // the deal (synchronous), then the kit's pick and premise and the plan
   const sagaRec = flow.deal(host, chain, undefined, focal, pins);
-  const replayed = REPLAY[armId] ? { from: REPLAY[armId]!, differed: replayDeal(sagaRec, REPLAY[armId]!, id) } : undefined;
+  const replayed = REPLAY[gen(armId)] ? { from: REPLAY[gen(armId)]!, differed: replayDeal(sagaRec, REPLAY[gen(armId)]!, id) } : undefined;
   const world0 = JSON.parse(JSON.stringify(sagaRec.world)) as typeof sagaRec.world;   // as dealt, before the pick
   const t0 = Date.now();
   const plan = await flow.plan(host, chain);
-  const planMs = rec.calls.filter(c => ['pick', 'premise', 'plan'].includes(c.purpose)).reduce((s, c) => s + c.durationMs, 0);
+  const planMs = rec.calls.filter(c => ['pick', 'premise', 'core', 'plan'].includes(c.purpose)).reduce((s, c) => s + c.durationMs, 0);
 
   fs.rmSync(dir, { recursive: true, force: true });
   fs.mkdirSync(dir, { recursive: true });
@@ -349,7 +373,7 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
   fs.writeFileSync(path.join(dir, 'calls.jsonl'), rec.calls.map(c => JSON.stringify(c)).join('\n') + '\n');
   fs.writeFileSync(path.join(dir, 'plan.json'), JSON.stringify({
     // probe.arm / probe.seed: the fields mech.ts reads (the built storyteller is R5's L · labels · lean)
-    probe: { fixture: fx, base: base.id, arm: { structure: 'L', names: 'labels', cast: 'lean', seed: armId, seedArm: arm }, armKey: armId, draw: d, path: path_, seed: { text: seed.text, ...(seed.keywords ? { keywords: seed.keywords } : {}) }, tone: final.world.tone, mock: MOCK, writer: MOCK ? 'mock' : WRITER },
+    probe: { fixture: fx, base: base.id, arm: { structure: 'L', names: 'labels', cast: 'lean', seed: armId, seedArm: arm, ...(PIPES[gen(armId)] ? { pipe: PIPES[gen(armId)] } : {}) }, armKey: armId, draw: d, path: path_, seed: { text: seed.text, ...(seed.keywords ? { keywords: seed.keywords } : {}) }, tone: final.world.tone, mock: MOCK, writer: MOCK ? 'mock' : WRITER },
     engine: {
       cast: final.world.cast, stake: final.world.stake, shape: final.world.shape, places: final.world.places, land: final.world.land, region: final.world.region, N, kind: final.world.kind,
       focal: { id: focal.id, name: focal.name, tags: renderTags(focal.tags) },
@@ -358,7 +382,7 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
     // what the dealer dealt (before the pick), then what the pick and premise made of it, and the seed the plan got
     dealt: { seed: world0.seed, tone: world0.tone, kit: world0.kit ?? null, cast: world0.cast }, ...(replayed ? { replayed } : {}),
     kit: final.world.kit ?? null, seedToPlan: seed,
-    pick: io('pick')[0] ?? null, premise: io('premise')[0] ?? null,
+    pick: io('pick')[0] ?? null, premise: io('premise')[0] ?? null, ...(PIPES[gen(armId)] === 'core' ? { core: io('core')[0] ?? null } : {}),
     planInput: (io('plan').at(-1)?.input) ?? null, rawPlan: io('plan').at(-1)?.output ?? null, plan, planCalls: callOf('plan').length,
     outline: io('outline')[0] ?? null, road: final.road, hopes: final.hopes,
     validation: { defects: [], redraws: Math.max(0, callOf('plan').length - 1), fallback: final.fallback },
@@ -367,7 +391,7 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
   }, null, 2));
   const meta = {
     fixture: { id, set: 'P', seed: base.seed, path: path_, N, kind: fx.kind, personal: fx.personal, probe: fx.id, draw: d },
-    run: `${RUN}/${path.basename(path.dirname(dir))}`, chainId: chain.id, chainState: chain.state, seedArm: arm,
+    run: `${RUN}/${path.basename(path.dirname(dir))}`, chainId: chain.id, chainState: chain.state, seedArm: arm, ...(PIPES[gen(armId)] ? { pipe: PIPES[gen(armId)] } : {}),
     attempts, order, complete: problems.length === 0, problems,
   };
   fs.writeFileSync(path.join(dir, 'meta.json'), JSON.stringify(meta, null, 2));
@@ -388,6 +412,7 @@ const complete = (dir: string) => { try { return (readJson<{ complete: boolean }
 async function main() {
   if (flag('stats')) return stats();
   if (flag('check')) return check();
+  if (flag('render')) return render();
   if (!PLAY.length) { console.error('no slots selected'); process.exit(2) }
   // every arm's slots in one queue, interleaved slot by slot (so a stop part-way leaves every arm about as far along)
   const jobs: { armId: string; fx: ProbeFixture; d: number; dir: string }[] = [];
@@ -425,7 +450,7 @@ function writeIndex(armId: string) {
     return `| ${id} | ${p.plan.title} | ${p.seedToPlan.text.replace(/\|/g, '/')}${p.seedToPlan.keywords ? ` · ${p.seedToPlan.keywords.join(', ')}` : ''} | ${m.fixture.path} | ${m.fixture.N} | ${m.attempts.map(a => a.outcome[0]!.toUpperCase()).join('')} | ${m.complete ? '✓' : `✗ ${m.problems.join('; ')}`} | ${lint} | ${p.cost.toFixed(4)} | ${(p.latency.card1Ms / 1000).toFixed(1)}s |`;
   });
   fs.writeFileSync(path.join(dir, 'INDEX.md'), [
-    `# ${RUN} · ${MOCK ? 'mock floor · ' : ''}seed arm ${armId} (${ARMS[armId]}) · the game's storyteller (src/game/sagaflow.ts)`, '',
+    `# ${RUN} · ${MOCK ? 'mock floor · ' : ''}seed arm ${armId} (${ARMS[gen(armId)]}${PIPES[gen(armId)] ? ` + pipe ${PIPES[gen(armId)]}` : ''}) · the game's storyteller (src/game/sagaflow.ts)`, '',
     '| saga | title | seed to the plan | path | N | outcomes | complete | lint lines | $ list | card 1 after |',
     '|---|---|---|---|---|---|---|---|---|---|', ...rows, '',
   ].join('\n'));
@@ -460,6 +485,49 @@ function stats() {
   }
   fs.writeFileSync(path.join(root, 'STATS.md'), lines.join('\n'));
   console.log(lines.join('\n'));
+}
+
+/** what each pipeline arm changed in what a call is sent (the verifier reads exactly these): a template and flag set */
+const CHANGED: Record<PipeArm, (c: { template: string; flags: string[] }) => boolean> = {
+  one: c => c.template === 'pick' && c.flags.includes('count'),
+  core: c => c.template === 'core' || (c.template === 'plan' && c.flags.includes('core')),
+  // the plan (no options, an answer free of the endings, the paid gold way); every later card (its why is now the plan's own);
+  // a report with the card's hope; the finale report (the paid gold fate)
+  grafts: c => (c.template === 'plan' && c.flags.includes('grafts')) || (c.template === 'card' && !c.flags.includes('first'))
+    || (c.template === 'report' && (c.flags.includes('hope') || c.flags.includes('answer'))),
+  sides: c => (c.template === 'plan' && c.flags.includes('sides')) || (['card', 'report'].includes(c.template) && c.flags.includes('side')),
+};
+/** --render: the new or changed prompt variants of the selected pipeline arms, one file per call */
+function render() {
+  const out = path.join(LAB, 'runs', RUN, '_pipeline_rendered');
+  fs.rmSync(out, { recursive: true, force: true });
+  fs.mkdirSync(out, { recursive: true });
+  const index: string[] = [`# ${RUN} · the pipeline arms' new or changed prompt variants${MOCK ? ' (mock floor)' : ''}`, '',
+    'One file per template + flag set a pipeline arm sent: the system prompt as rendered, then the user message (the payload) as sent.', '',
+    '| file | arm | slot | template | flags | call |', '|---|---|---|---|---|---|'];
+  for (const armId of ARM_IDS) {
+    const pipe = PIPES[gen(armId)];
+    if (!pipe) { console.log(`${armId}: not a pipeline arm — skipped`); continue }
+    for (const { fx, d } of PLAY) {
+      const slot = `${fx.id}_${d}`, file = path.join(armDir(armId), slot, 'calls.jsonl');
+      if (!fs.existsSync(file)) { console.log(`${armId} ${slot}: no calls.jsonl — skipped`); continue }
+      const seen = new Set<string>();
+      for (const c of fs.readFileSync(file, 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l) as CallRec)) {
+        const key = `${c.template}|${c.flags.join(',')}`;
+        if (!CHANGED[pipe](c) || seen.has(key)) continue;
+        seen.add(key);
+        const name = `${armId}_${slot}_${c.template}_${String(c.n).padStart(2, '0')}.md`;
+        fs.writeFileSync(path.join(out, name), [
+          `# ${armId} (pipe ${pipe}) · ${slot} · ${c.template} · call ${c.n}`, '', `flags: ${c.flags.join(', ') || '(none)'}`, '',
+          '## system prompt', '', '```text', c.system, '```', '', '## user message (the payload as sent)', '', '```json', JSON.stringify(JSON.parse(c.user), null, 2), '```', '',
+          ...(c.output ? ['## the reply', '', '```json', JSON.stringify(JSON.parse(c.output), null, 2), '```', ''] : []),
+        ].join('\n'));
+        index.push(`| ${name} | ${armId} | ${slot} | ${c.template} | ${c.flags.join(', ')} | ${c.n} |`);
+      }
+    }
+  }
+  fs.writeFileSync(path.join(out, 'INDEX.md'), index.join('\n') + '\n');
+  console.log(`${index.length - 6} variants → ${path.relative(V3, out)}`);
 }
 
 /** every selected arm × slot: present and complete? */

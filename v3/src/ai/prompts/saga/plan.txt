@@ -1,9 +1,10 @@
-You plan a story for a fantasy game about a mercenary company.[[personal]] The story is the past of the company's soldier in cast; nobody hires the company.[[/personal]]
+You plan a story for a fantasy [[!sides]]game about a mercenary company[[/!sides]][[sides]]mercenary game[[/sides]].[[personal]] The story is the past of the company's soldier in cast; nobody hires the company.[[/personal]]
 
 The data:
 [[!premise]]- seed: the idea under the story, never pasted.
 [[premise]]- seed: how the story starts; build on it, never paste it.
 [[keywords]]- keywords: use each where it matters.
+[[core]]- core: fixed facts to build on, never changed: want, and why; question; answer, the truth; against, who stands in the way, and why.
 [[shape]]- shape: the kind of story.[[episodes]] episodes: the jobs before the showdown, in order: what the soldiers do, the kind of win.[[/episodes]]
 [[types]]- jobs: how many before the showdown. types: what soldiers do, the kind of win.
 - cast: the people; traits: what they are like.[[notrade]] One with no trade gets one that fits the seed.[[/notrade]] [[!support]]Use them all as the seed's people; add nobody who matters unless the seed has them.[[/!support]][[support]]Use [[!personal]]the asker and the person in ending[[/!personal]][[personal]]those with a part[[/personal]], others only as needed; add nobody who matters.[[/support]] Name only those given a name; the rest by label.[[memory]] memory, where: their past with the company, where they are now; use both.[[/memory]]
@@ -16,18 +17,18 @@ The data:
 [[avoid]]- avoid: recent stories; differ in pattern, not only names.
 
 Write:
-- cast: [[personal]]except the soldier, [[/personal]]a label: their race and trade; no name.
+- cast: [[personal]]except the soldier, [[/personal]]a label: [[!sides]]their race and trade; no name.[[/!sides]][[sides]]race and trade, no name; side: for or against [[!personal]]the asker[[/!personal]][[personal]]the soldier[[/personal]], and why.[[/sides]]
 - [[!personal]]asker[[/!personal]][[personal]]soldier[[/personal]]: want, printed after "wants to": verb first, naming who or what[[!personal]]; never what becomes of the person in ending[[/!personal]].[[personal]] past: the old wrong, naming who was wronged.[[/personal]]
-- question: one sentence starting "Nobody knows": the hidden thing the player most wants to know, not the ending. answer: who or what, and why, in a sentence or two: surprising, not in the seed, no new person, fitting every way in ending and settles.
+[[!core]]- question: one sentence starting "Nobody knows": the hidden thing the player most wants to know, not the ending. answer: who or what, and why, in a sentence or two: surprising, not in the seed, no new person[[!grafts]], fitting every way in ending and settles[[/!grafts]].
 - episodes, in order. job: a verb, whom or what, and one place. why: what [[!personal]]the one who asked[[/!personal]][[personal]]the soldier[[/personal]] hopes this job gets them, a step short of their want, with only what the job names: for a thing or person, what they can then do; word or proof only as a hope ("hopes …"). people: ids of those there in person[[!personal]]; episode 1 includes the person in ending[[/!personal]]; ids nowhere else. trouble: who stands in the way (by label if in cast; armed people or a beast), with what, what they will do. win: what success changes, naming who or what. gain: a thing, captive or ally the company then holds[[!personal]], never the person in ending[[/!personal]]. learn: a plain fact the win brings out, clear on its own, that narrows the answer, never naming what the question asks for; the showdown keeps the last piece.
 - showdown: job, people, trouble as above[[!personal]]; its job names the person in ending[[/!personal]]. edge: how each job's gain, in order, helps here. settles: a done fact, no "if": how [[!personal]]the one who asked[[/!personal]][[personal]]the soldier[[/personal]] gets their want. All these fit every way in ending, even after failed jobs. lose: what [[!personal]]the one who asked[[/!personal]][[personal]]the soldier[[/personal]] loses for good if the company fails.
-- options: per way in ending, what the soldiers do, verb first.
+[[!grafts]]- options: per way in ending, what the soldiers do, verb first.
 
-Titles, jobs, whys and troubles, the showdown's too, are shown before play: never a learn or the answer.
+Titles, jobs, whys[[!sides]] and troubles[[/!sides]][[sides]], troubles, sides[[/sides]], the showdown's too, are shown before play: never a learn or the answer.
 
-A story that works: one person wants one thing badly, someone stands in the way, each for a plain human reason.
+A story that works: one person wants one thing badly, someone stands in the way[[!sides]], each for a plain human reason[[/!sides]].
 
 Plain words, third person; no numbers, nothing modern, no pay. The company never met anyone in cast[[personal]] but its own soldier[[/personal]][[memory]][[personal]] and[[/personal]][[!personal]] but[[/!personal]] the one with a memory[[/memory]]; only the company lives at its fort.
 
 Reply with JSON only:
-{"title": "few plain words", "cast": [{"id": "cast id", "label": "text"}], [[!personal]]"asker"[[/!personal]][[personal]]"soldier"[[/personal]]: {"want": "verb first, few words"[[personal]], "past": "≤8 words"[[/personal]]}, "question": "text", "answer": "text", "episodes": [{[[types]]"type": "from types", [[/types]]"title": "few words", "job": "text", "why": "one sentence", "people": ["cast id"], "trouble": {"who": "≤6 words", "carry": "≤6 words", "will": "≤6 words"}, "win": "text", "gain": "few words", "learn": "text"}], "showdown": {"title": "few words", "job": "text", "people": ["cast id"], "trouble": {"who": "≤6 words", "carry": "≤6 words", "will": "≤6 words"}, "edge": ["few words"], "settles": "one sentence", "lose": "few words"}, "options": [{"way": "from ending ways", "label": "at most 12 words"}]}
+{"title": "few plain words", "cast": [{"id": "cast id", "label": "text"[[sides]], "side": "≤8 words"[[/sides]]}], [[!personal]]"asker"[[/!personal]][[personal]]"soldier"[[/personal]]: {"want": "verb first, few words"[[personal]], "past": "≤8 words"[[/personal]]}, [[!core]]"question": "text", "answer": "text", [[/!core]]"episodes": [{[[types]]"type": "from types", [[/types]]"title": "few words", "job": "text", "why": "one sentence", "people": ["cast id"], "trouble": {"who": "≤6 words", "carry": "≤6 words", "will": "≤6 words"}, "win": "text", "gain": "few words", "learn": "text"}], "showdown": {"title": "few words", "job": "text", "people": ["cast id"], "trouble": {"who": "≤6 words", "carry": "≤6 words", "will": "≤6 words"}, "edge": ["few words"], "settles": "one sentence", "lose": "few words"}[[!grafts]], "options": [{"way": "from ending ways", "label": "at most 12 words"}][[/!grafts]]}

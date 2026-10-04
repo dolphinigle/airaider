@@ -1,0 +1,9 @@
+Write the core of a fantasy mercenary story[[personal]], a soldier's past[[/personal]].
+
+The data:
+- [[!personal]]situation[[/!personal]][[personal]]past[[/personal]], keywords, tone, land, places: what to build on.
+- cast: the only people; name only the named. last: whom the company faces at the end[[!personal]]; their fate is never the want[[/!personal]].
+
+The company does the work[[personal]]; nobody hires it[[/personal]].
+
+Reply with JSON only, a sentence each: {"want": "who wants what, why", "question": "one hidden thing: Nobody knows …", "answer": "the surprising truth: who or what, and why", "against": "shown before play: who blocks the want, and why; none of the answer"}

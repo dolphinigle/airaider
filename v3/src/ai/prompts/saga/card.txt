@@ -5,7 +5,7 @@ The data:
 [[latest]]- latest: what happened last.
 [[retry]]- retry: what stopped the last try at this same job.
 - job: the task, and where.[[why]] why: why it matters.[[/why]] trouble: the foe, what they carry[[will]], what they will do[[/will]].[[lose]] lose: who loses what for good if this last chance fails.[[/lose]]
-- names: people the card may mention: name, else label.[[intro]] intro: new to the player; first mention gives label and name.[[/intro]][[part]] part: their side.[[/part]][[memory]] memory: their past with you, told on first appearance.[[/memory]]
+- names: people the card may mention: name, else label.[[intro]] intro: new to the player; first mention gives label and name.[[/intro]][[part]] part: their side.[[/part]][[side]] side: their side[[!memory]], told on first appearance[[/!memory]].[[/side]][[memory]] memory: their past with you[[side]]; both told on first appearance[[/side]][[!side]], told on first appearance[[/!side]].[[/memory]]
 [[direction]]- direction: the player's wish for the telling only.
 
 Say each fact once, in your own words, in this order: [[first]]premise, [[/first]][[latest]]latest, [[/latest]][[retry]]retry, [[/retry]]job, [[why]]why, [[/why]]trouble[[lose]], lose[[/lose]].

@@ -10,8 +10,8 @@
 //   kit+pick+situation   as kit+pick, but 3 situations; the pick also chooses the situation
 //   kit+pick+premise     kit+pick, then a small premise call writes the story's start in three sentences (the plan's seed)
 //   kit+pick+cast        kit+pick, "deal plenty, keep few" for people too: 3–4 supporting people, the same pick call keeps
-//                        the 0–1 its story needs (the plan never sees the rest) and ranks its keywords (the plan gets the
-//                        top two)
+//                        the 0–1 its story needs (the plan never sees the rest) and chooses the two keywords the plan
+//                        gets (measured when it only ranked them, the plan keeping the top two)
 
 import type { Rng } from './rng.js';
 import raw from './data/seedkit.json';
@@ -40,9 +40,12 @@ export const KIT_DEAL = {
   situations: 3,
   /** the most keywords the plan gets from a pick: the first the pick names */
   keep: 3,
-  /** kit+pick+cast: deal plenty, keep few — 3–4 supporting people coined, of whom the pick keeps at most one; the pick
-   *  names its keywords best first and the plan gets the top two (a third was the one forced in, seed-arms report N1) */
+  /** kit+pick+cast: deal plenty, keep few — 3–4 supporting people coined, of whom the pick keeps at most one; the plan
+   *  gets two keywords (a third was the one forced in, seed-arms report N1), and the pick is told so (B1 was measured on a
+   *  pick told only to rank them: it ranked seven of ten) */
   cast: { support: [3, 4] as const, keep: 2 },
+  /** pipe arm one (B2): the pick chooses the one keyword the plan gets */
+  one: 1,
 };
 const BASE_POOLS: Exclude<KitPool, 'uncanny'>[] = ['things', 'creatures', 'places', 'occasions'];
 

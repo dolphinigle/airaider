@@ -33,6 +33,16 @@ export type { SeedArm } from './seedkit.js';
  *  purely random keywords (scripts/sagalab/reports/2026-10-04-seed-arms.md). A host may name another (SagaHost.seedArm:
  *  the lab; the golden parity test pins 'themes', the R5 lab's seed) */
 export const SEED_ARM: SeedArm = 'kit+pick';
+/** a lab PIPELINE arm on top of kit+pick (North Star 8: shape what the AI is given, split the work into small steps;
+ *  scripts/sagalab/seedlab.ts B2/C1/C2/C3). The build sets none: absent, the pipeline is the shipped one, byte for byte.
+ *   one     B2  the pick chooses one keyword, told so; the plan gets only it (one object to follow)
+ *   core    C1  after the pick, a small core call writes the want, the question, the ANSWER and who is against (answer
+ *               first); the plan gets them as fixed facts and writes no question or answer of its own
+ *   grafts  C2  R6's class fixes: the road prints the plan's own why per later job (no outline call; a flagged why leaves
+ *               the title), the card's hope goes to its report, the finale buttons are the engine's, the gold way is paid
+ *   sides   C3  the plan writes each person's side (whose side, and why); cards and reports get it for the people present */
+export type PipeArm = 'one' | 'core' | 'grafts' | 'sides';
+export const PIPE_ARMS: readonly PipeArm[] = ['one', 'core', 'grafts', 'sides'];
 
 // ─── shapes, job types, ways (§2.4.1) ──────────────────────────────────────────────────────────
 
@@ -93,7 +103,11 @@ export const helped = (p: Pick<SagaPerson, 'seat' | 'part'>) => p.seat === 'othe
 // each names its subject: "they end in its cells" was read as the soldiers ("Blunder into the manor's laws, are arrested")
 export const WAY_MEANS: Record<'recruit' | 'captive' | 'gold', string> = { recruit: 'that person joins the company', captive: "that person ends in the company's cells", gold: "the company takes that person's treasure" };
 export const HELPED_GOLD = 'that person shares their treasure with the company and goes their way';
-export const wayMeans = (v: Way, isHelped: boolean) => v === 'gold' && isHelped ? HELPED_GOLD : WAY_MEANS[v as keyof typeof WAY_MEANS];
+/** (pipe arm grafts, R6 F2) the gold way presupposes no treasure: a treasure in the gloss made stock "buried hoard" answers */
+export const PAID_GOLD = 'that person pays the company to go free';
+export const PAID_HELPED_GOLD = 'that person pays the company and goes their way';
+export const wayMeans = (v: Way, isHelped: boolean, paid = false) => v === 'gold' && paid ? (isHelped ? PAID_HELPED_GOLD : PAID_GOLD)
+  : v === 'gold' && isHelped ? HELPED_GOLD : WAY_MEANS[v as keyof typeof WAY_MEANS];
 export const WAY_ATTR: Record<Way, string> = { recruit: 'CHA', captive: 'STR', gold: 'INT', talk: 'CHA', fight: 'STR', sneak: 'DEX' };
 /** a personal saga's ways are HOW it is settled, so the plan gets words that are not job type names */
 export const WAY_WORD: Partial<Record<Way, string>> = { talk: 'words', fight: 'force', sneak: 'stealth' };
@@ -153,8 +167,9 @@ export interface Trouble { who: string; carry: string; will: string }
  *  line). gain / learn: a middle job's — what the company holds after a win, and the piece toward the answer the win
  *  brings out. edge: the showdown's — one per middle job, in job order: how holding that job's gain helps here */
 export interface Episode { n: number; type: EpisodeType; title: string; job: string; people: string[]; trouble: Trouble; win?: string; gain?: string; learn?: string; why: string; settles?: string; lose?: string; edge?: string[] }
-/** past: a personal saga's soldier only, the old wrong in a few words */
-export interface CastEntry extends SagaPerson { label: string; want: string; past?: string }
+/** past: a personal saga's soldier only, the old wrong in a few words. side: pipe arm sides only — whose side they are
+ *  on, and why, as the plan wrote it */
+export interface CastEntry extends SagaPerson { label: string; want: string; past?: string; side?: string }
 export interface SagaPlan { title: string; question: string; answer: string; cast: CastEntry[]; episodes: Episode[]; showdown: Episode; options: { way: Way; label: string }[] }
 
 /** what the saga has banked so far: `learned` = the learns of won middle jobs, in order; `held` = the numbers of won
@@ -176,7 +191,12 @@ export interface SagaWorld {
   region: string; level: number;
   /** a kit arm's seed (North Star 7): absent on the theme arm */
   kit?: SagaKit;
+  /** a lab pipeline arm (PipeArm): absent in the build */
+  pipe?: PipeArm;
 }
+/** pipe arm core: the facts the plan is built on, written first (the want and why, the question, the answer, who is
+ *  against and why); the plan takes the question and answer as they are */
+export interface SagaCore { want: string; question: string; answer: string; against: string }
 /** a kit arm's seed: what the dealer dealt, then what the pick and premise calls made of it (filled before the plan) */
 export interface SagaKit {
   arm: Exclude<SeedArm, 'themes'>;
@@ -188,6 +208,8 @@ export interface SagaKit {
   /** kit+pick+premise: the premise call's sentences (who wants what and why; what stands in the way and why; what nobody
    *  knows yet) — the plan's seed */
   premise?: string[]; premiseFloor?: boolean;
+  /** pipe arm core: the core call's facts; `coreFloor`: the call failed and the floor's stood in */
+  core?: SagaCore; coreFloor?: boolean;
 }
 /** the seed as the plan receives it: the theme or a personal past; a kit arm's situation and keywords (the picked ones
  *  once the pick call has run); a premise arm's premise, alone */
@@ -207,8 +229,8 @@ export function keepPicked(w: SagaWorld): void {
   const keep = w.kit.picked.person;
   w.cast = w.cast.filter(p => p.seat !== 'support' || p.id === keep);
 }
-/** whether a kit arm still waits on its pick or premise call before the plan */
-export const seedPending = (w: Pick<SagaWorld, 'kit'>): boolean => !!w.kit && ((PICKS.has(w.kit.arm) && !w.kit.picked) || (w.kit.arm === 'kit+pick+premise' && !w.kit.premise));
+/** whether a kit arm still waits on its pick, premise or core call before the plan */
+export const seedPending = (w: Pick<SagaWorld, 'kit' | 'pipe'>): boolean => !!w.kit && ((PICKS.has(w.kit.arm) && !w.kit.picked) || (w.kit.arm === 'kit+pick+premise' && !w.kit.premise) || (w.pipe === 'core' && !w.kit.core));
 /** one attempt as the chronicle keeps it. `decides`: whose deed decided a job that was not failed (the game sets it after
  *  the report lands; the memory edge to the deciding soldier reads it at the saga's close, §2.6) */
 export interface SagaLine { n: number; attempt: number; outcome: Outcome; party: string[]; text: string; hurt: Hurt[]; decides?: string }

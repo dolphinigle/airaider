@@ -5,11 +5,12 @@
 import { describe, it, expect } from 'vitest';
 import { Rng } from '../src/engine/rng.js';
 import { seedIdCounter } from '../src/engine/cards.js';
-import { dealSaga, castSaga, seedOf, seedPending, keepPicked, SEED_ARM, KIT_CLIENT_PART, type SeedArm } from '../src/engine/saga.js';
+import { dealSaga, castSaga, seedOf, seedPending, keepPicked, SEED_ARM, KIT_CLIENT_PART, PIPE_ARMS, type SeedArm, type SagaPlan, type SagaWorld } from '../src/engine/saga.js';
 import { dealKit, KIT, KIT_DEAL, SEED_ARMS } from '../src/engine/seedkit.js';
-import { planPayload, pickPayload, premisePayload, readPick, mockPick, seedSteps } from '../src/ai/storyteller.js';
+import { planPayload, pickPayload, premisePayload, readPick, mockPick, seedSteps, cannedOption, clientOf, whyFlags, planHope, graftRoad, newKnowing, newState, questLog, logLines, laterCardPayload } from '../src/ai/storyteller.js';
 import type { AiProvider, SagaCall } from '../src/ai/provider.js';
 import { newGame, sagaChain, playSaga, hostFor } from './sagaharness.js';
+import { renderSaga } from '../src/ai/prompts/saga/render.js';
 import { deal } from '../src/game/sagaflow.js';
 
 const POOLS = ['things', 'creatures', 'places', 'occasions', 'uncanny'] as const;
@@ -215,5 +216,140 @@ describe('every seed arm plays a saga to its end on the floor', () => {
     expect(templates.filter(t => t === 'premise').length).toBe(arm === 'kit+pick+premise' ? 1 : 0);
     if (arm === 'kit+pick+situation' && !personal) expect(rec.world.kit!.situations).toContain(rec.world.kit!.picked!.situation);
     expect(JSON.parse(JSON.stringify(rec))).toEqual(rec);
+  });
+});
+
+// ─── the lab's PIPELINE arms (engine/saga.ts PipeArm; scripts/sagalab/seedlab.ts B2/C1/C2/C3): kit+pick plus one change
+// each, never set by the build ────────────────────────────────────────────────────────────────────
+
+describe('pipeline arms on the floor', () => {
+  it('the build deals no pipe arm', () => {
+    seedIdCounter(1);
+    const { g } = newGame(21);
+    const { chain, focal } = sagaChain(g, { N: 3, personal: false });
+    deal(hostFor(g), chain, undefined, focal);
+    expect(chain.saga!.world.pipe).toBeUndefined();
+    expect(PIPE_ARMS).toEqual(['one', 'core', 'grafts', 'sides']);
+  });
+  for (const pipe of PIPE_ARMS) for (const personal of [false, true]) it(`${pipe} · ${personal ? 'personal' : 'hired'}: plays to its end, on kit+pick`, async () => {
+    seedIdCounter(1);
+    const { g, ai } = newGame(21);
+    const { chain, focal } = sagaChain(g, { N: 4, personal });
+    const p = await playSaga(g, chain, personal ? 'personal' : 'bumpy', focal, undefined, { pipeArm: () => pipe });
+    const rec = chain.saga!, w = rec.world, plan = rec.plan!;
+    expect(rec.fallback).toBe(false);
+    expect(w.pipe).toBe(pipe);
+    expect(w.kit!.arm).toBe('kit+pick');
+    expect(p.cards[p.cards.length - 1]!.pos.finale).toBe(true);
+    expect(JSON.parse(JSON.stringify(rec))).toEqual(rec);
+    const t = ai.calls.map(c => c.template);
+    const pick = ai.calls.find(c => c.template === 'pick')!;
+    expect(pick.flags.includes('count')).toBe(pipe === 'one');
+    if (pipe === 'one') expect(pick.vars).toEqual({ KEEP: 'one keyword' });
+    expect(w.kit!.picked!.keywords).toHaveLength(pipe === 'one' ? 1 : 2);
+    expect(t.includes('outline')).toBe(pipe !== 'grafts');
+    expect(t.filter(x => x === 'core').length).toBe(pipe === 'core' ? 1 : 0);
+    const planCall = ai.calls.find(c => c.template === 'plan')!;
+    // every key an arm's call carries has a line in its prompt (the payload lint, for the arms' new keys and lines)
+    for (const c of ai.calls) for (const key of Object.keys(c.payload)) expect(renderSaga(c.template, c.flags, c.vars), `${c.template} ${key}`).toMatch(new RegExp(`\\b${key}\\b`));
+    if (pipe === 'core') {
+      // the core comes after the pick and before the plan, and the plan's question and answer are the core's
+      expect(t.slice(0, 3)).toEqual(['pick', 'core', 'plan']);
+      expect(planCall.flags).toContain('core');
+      expect(planCall.payload.core).toEqual(w.kit!.core);
+      expect(plan.question).toBe(w.kit!.core!.question);
+      expect(plan.answer).toBe(w.kit!.core!.answer);
+      const core = ai.calls.find(c => c.template === 'core')!;
+      expect(core.tier).toBe('plan');
+      // the core knows the setting it writes for (C1's, blind to it, set a forest saga at sea)
+      expect(core.payload.land).toBe(w.land);
+      expect(core.payload.places).toEqual(w.places);
+      expect(JSON.stringify(core.payload)).not.toMatch(new RegExp(`"${focal.id}"`));
+    }
+    if (pipe === 'grafts') {
+      // the buttons are the engine's; the gold way is paid, never a treasure
+      expect(planCall.flags).toContain('grafts');
+      const ending = planCall.payload.ending as { ways: { way: string; means: string }[] | string[] };
+      if (!personal) expect(JSON.stringify(ending)).not.toMatch(/treasure/);
+      for (const o of plan.options) expect(o.label).toBe(cannedOption(o.way, plan.cast, true));
+      // the road prints the plan's own why per later job; each won middle job's report gets the hope its card was dealt
+      const later = ai.calls.filter(c => c.template === 'card' && c.flags.includes('later'));
+      const reports = ai.calls.filter(c => c.template === 'report');
+      expect(reports.some(r => r.flags.includes('hope'))).toBe(true);
+      for (const r of reports.filter(x => x.flags.includes('hope'))) {
+        const job = String(r.payload.job);
+        const n = plan.episodes.findIndex(e => e.job === job) + 1;
+        expect(r.payload.hope).toBe(n === 1 ? plan.episodes[0]!.why : rec.hopes![n - 1]);
+        if (n > 1) expect(later.some(c => c.payload.job === job && c.payload.why === r.payload.hope)).toBe(true);
+      }
+      expect(rec.road!.slice(1).every((l, i) => l === null || l.endsWith(rec.hopes![i + 1]!))).toBe(true);
+    }
+    if (pipe === 'sides') {
+      expect(planCall.flags).toContain('sides');
+      const others = plan.cast.filter(c => c.seat !== 'soldier' && c.id !== clientOf(plan).id);
+      expect(others.every(c => !!c.side)).toBe(true);
+      // cards and reports carry each present person's side, never a part, and never the one the company acts for
+      const entries = ai.calls.filter(c => c.template === 'card' || c.template === 'report')
+        .flatMap(c => ((c.payload.names ?? c.payload.people ?? []) as Record<string, unknown>[]).map(e => ({ e, flags: c.flags })));
+      expect(entries.some(x => x.e.side)).toBe(true);
+      for (const x of entries) { expect(x.e.part).toBeUndefined(); expect(x.flags).not.toContain('part'); if (x.e.side) expect(x.flags).toContain('side') }
+      expect(entries.filter(x => x.e.name === clientOf(plan).name).every(x => !x.e.side)).toBe(true);
+      // a side is told on a person's first appearance, as a memory is: never dealt once a text has shown them
+      const sides = (k: ReturnType<typeof newKnowing>) => laterCardPayload(plan, plan.showdown, 'The raid is beaten back.', k, { finale: true, lastchance: false });
+      const fresh = sides(newKnowing(plan.cast)), seen = newKnowing(plan.cast);
+      for (const c of plan.cast) seen.seen.add(c.id);
+      expect((fresh.payload.names as Record<string, unknown>[]).some(e => e.side)).toBe(true);
+      expect((sides(seen).payload.names as Record<string, unknown>[]).some(e => e.side)).toBe(false);
+      expect(sides(seen).flags).not.toContain('side');
+    } else expect(plan.cast.every(c => c.side === undefined)).toBe(true);
+  });
+});
+
+describe('pipeline arm one: the pick\'s top keyword', () => {
+  it('readPick keeps only the first the pick named', () => {
+    const k = { arm: 'kit+pick' as const, situations: ['rescue someone'], keywords: ['lantern', 'mill', 'goose'] };
+    const payload = { situation: 'rescue someone', keywords: k.keywords };
+    expect(readPick({ keywords: ['goose', 'mill'] }, k, payload, KIT_DEAL.one)).toEqual({ keywords: ['goose'], dropped: [], floor: false });
+    expect(readPick(null, k, payload, KIT_DEAL.one).keywords).toEqual(['lantern']);
+    // no override: kit+pick's keep, as shipped
+    expect(readPick({ keywords: ['goose', 'mill'] }, k, payload).keywords).toEqual(['goose', 'mill']);
+  });
+});
+
+describe('pipeline arm grafts: the plan\'s own why on the road', () => {
+  const plan = (whys: string[], extra: Partial<SagaPlan> = {}): SagaPlan => ({
+    title: 'The Hollow Oak', question: 'Nobody knows why the boy walked into the forest.', answer: 'The boy saw the reeve hang the wrong man, and the wanderer hid him from the reeve.',
+    cast: [
+      { id: 'p1', name: 'Flodoard Coalgate', sex: 'male', race: 'human', seat: 'client', focal: false, part: 'asks for help', known: true, label: 'a human petitioner', want: 'find his missing son' },
+      { id: 'f1', name: 'Muvulrea', sex: 'female', race: 'elf', seat: 'opponent', focal: true, part: '', known: false, label: 'an elf wanderer', want: '' },
+    ],
+    episodes: whys.map((why, i) => ({ n: i + 1, type: 'find' as const, title: `Job ${i + 1}`, job: ['Track down the wanderer\'s camp near Greymere', 'Steal the hanging ledger from the hall at Millshaw', 'Find the old mill on the moor'][i]!, people: [], trouble: { who: 'outlaws', carry: 'bows', will: 'shoot' }, win: 'done', gain: ['a map of her trail', 'the hanging ledger', 'a bronze lantern'][i]!, learn: ['A candle burns by a struck-out name in her camp.', 'The last hanging is struck out with a candle mark.', 'The reeve paid the hangman twice.'][i]!, why })),
+    showdown: { n: 4, type: 'showdown', title: 'The Oak', job: 'Catch the wanderer at the oak', people: ['f1'], trouble: { who: 'the elf wanderer', carry: 'a longbow', will: 'fight' }, why: '', settles: 'He finds his son.', lose: 'his son', edge: ['', '', ''] },
+    options: [], ...extra,
+  });
+  const w = { seed: { id: null, text: 'find someone who is missing' }, kit: { arm: 'kit+pick' as const, situations: ['find someone who is missing'], keywords: ['gallows', 'crow', 'candle'], picked: { keywords: ['gallows', 'crow', 'candle'] } }, places: ['Greymere', 'Millshaw', 'Hawbourne'], land: 'the Western Forests', cast: [] } as unknown as SagaWorld;
+  it('flags a why that names its gain, tells a learn, or says two answer words; one answer word passes', () => {
+    const f = whyFlags(plan(['Flodoard hopes she saw which way his son went.', 'Flodoard hopes the ledger shows who was hanged.', 'Flodoard hopes the bronze lantern lights the way.']), w);
+    expect(f[1]).toEqual([]);   // "ledger" and "hanged" are the job's own words
+    expect(f[2]!.join()).toMatch(/names its gain \(bronze, lantern\)/);
+    expect(whyFlags(plan(['x', 'Flodoard hopes the reeve paid the hangman twice.', 'y']), w)[1]!.join()).toMatch(/tells learn 3/);
+    expect(whyFlags(plan(['x', 'Flodoard hopes the wanderer will speak.', 'y']), w)[1]).toEqual([]);
+    expect(whyFlags(plan(['x', 'Flodoard hopes to learn why the reeve chose the wrong man.', 'y']), w)[1]!.join()).toMatch(/answer words \(reeve, wrong\)/);
+  });
+  it('the engine owns the subject of each hope', () => {
+    const p = plan(['a', 'b', 'c']);
+    expect(planHope('Flodoard hopes the ledger shows who was hanged.', p, 'Flodoard Coalgate')).toBe('Flodoard Coalgate hopes the ledger shows who was hanged.');
+    expect(planHope('He can then follow her trail.', p, 'Flodoard Coalgate')).toBe('Flodoard Coalgate can then follow her trail.');
+    expect(planHope('The petitioner hopes to read it', p, 'Flodoard Coalgate')).toBe('Flodoard Coalgate hopes to read it.');
+    expect(planHope('To learn where the boy went.', p, 'Flodoard Coalgate')).toBe('Flodoard Coalgate hopes to learn where the boy went.');
+  });
+  it('a flagged why leaves its road row to the title, and its card and report no hope', () => {
+    const p = plan(['Flodoard hopes she saw which way his son went.', 'Flodoard hopes the ledger shows who was hanged.', 'Flodoard hopes the bronze lantern lights the way.']);
+    const k = newKnowing(p.cast);
+    const g = graftRoad(p, w, k);
+    expect(g.hopes).toEqual([null, 'Flodoard Coalgate hopes the ledger shows who was hanged.', null]);
+    expect(g.road).toEqual([null, 'Steal the hanging ledger from the hall at Millshaw. Flodoard Coalgate hopes the ledger shows who was hanged.', null]);
+    const rows = logLines(questLog(p, k, newState(), { lines: g.road, done: new Map(), at: 1 }, { forLine: false, open: false }));
+    expect(rows).toEqual(['Road ahead:', '  ▶ Job 1', `  · ${g.road[1]}`, '  · Job 3', '  · Finale']);
   });
 });

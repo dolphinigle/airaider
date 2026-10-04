@@ -10,21 +10,28 @@ import { renderSaga, wordCount, SAGA_WORD_BUDGET, type SagaTemplate } from '../s
 
 const subsets = <T,>(xs: T[]): T[][] => xs.reduce<T[][]>((acc, x) => acc.concat(acc.map(a => [...a, x])), [[]]);
 
-const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, number> }[]> = {
+const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, string | number> }[]> = {
   // the seed arms (North Star 7; engine/seedkit.ts): none (themes), a kit's keywords, a premise; with a kit cast, `support`
-  plan: [[], ['keywords', 'support'], ['premise', 'support']].flatMap(seed => [['notrade'], []].flatMap(cast => subsets(['personal', 'memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, ...seed], vars: {} })))),
-  card: ['first', 'later', 'finale'].flatMap(pos => subsets(['memory', 'direction', 'intro', 'part', ...(pos === 'first' ? ['personal', 'returning'] : []), ...(pos === 'finale' ? ['lastchance', 'lose'] : []),
+  // the lab's pipe arms (engine/saga.ts PipeArm) ride on kit+pick: core · grafts · sides
+  plan: [[], ['keywords', 'support'], ['premise', 'support'], ...['core', 'grafts', 'sides'].map(pipe => ['keywords', 'support', pipe])].flatMap(seed => [['notrade'], []].flatMap(cast => subsets(['personal', 'memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, ...seed], vars: {} })))),
+  // (pipe arm sides: a plan with sides deals no parts, so `side` never meets `part`)
+  card: ['first', 'later', 'finale'].flatMap(pos => subsets(['memory', 'direction', 'intro', 'part', 'side', ...(pos === 'first' ? ['personal', 'returning'] : []), ...(pos === 'finale' ? ['lastchance', 'lose'] : []),
     ...(pos !== 'first' ? ['latest', 'retry', 'will'] : []), ...(pos !== 'finale' ? ['why'] : [])])
     .filter(s => !(s.includes('latest') && s.includes('retry')) && !(pos === 'finale' && s.includes('retry')) && s.includes('lastchance') === s.includes('lose') && !(s.includes('personal') && s.includes('returning')))
-    .filter(s => !(s.includes('will') && (s.includes('retry') || s.includes('lose'))))
+    .filter(s => !(s.includes('will') && (s.includes('retry') || s.includes('lose'))) && !(s.includes('side') && s.includes('part')))
     .map(extra => ({ flags: [pos, ...extra], vars: { MAX: pos === 'finale' ? 90 : 70 } }))),
   outline: [{ flags: [], vars: {} }],
-  pick: [[], ['situations'], ['personal'], ['people'], ['people', 'personal']].map(flags => ({ flags, vars: {} })),
+  // count: the pick is told how many keywords the plan gets (kit+pick+cast with its people; pipe arm one without)
+  pick: [[], ['situations'], ['personal'], ['people', 'count'], ['people', 'count', 'personal'], ['count'], ['count', 'personal']].map(flags => ({ flags, vars: (flags.includes('count') ? { KEEP: 'two keywords' } : {}) as Record<string, string> })),
   premise: [[], ['personal']].map(flags => ({ flags, vars: {} })),
-  report: subsets(['people', 'personal', 'decides', 'result', 'option', 'hurt', 'cost', 'hurtprice', 'brought', 'clue', 'known', 'have', 'edge', 'answer', 'direction', 'intro', 'part'])
-    .filter(s => s.includes('people') || !s.some(f => f === 'intro' || f === 'part'))
+  core: [[], ['personal']].map(flags => ({ flags, vars: {} })),
+  // hope: pipe arm grafts, a won middle job's (with clue/brought, never the finale's answer/option/edge); side: pipe arm sides
+  report: subsets(['people', 'personal', 'decides', 'result', 'option', 'hurt', 'cost', 'hurtprice', 'brought', 'clue', 'hope', 'known', 'have', 'edge', 'answer', 'direction', 'intro', 'part', 'side'])
+    .filter(s => s.includes('people') || !s.some(f => f === 'intro' || f === 'part' || f === 'side'))
+    .filter(s => !(s.includes('side') && s.includes('part')) && !(s.includes('side') && s.includes('hope')))
+    .filter(s => !s.includes('hope') || (s.some(f => ['clue', 'brought'].includes(f)) && s.includes('decides')))
     .filter(s => !s.includes('hurtprice') || (s.includes('hurt') && !s.includes('cost')))
-    .filter(s => !(s.some(f => ['clue', 'brought'].includes(f)) && s.some(f => ['answer', 'option', 'edge'].includes(f))))
+    .filter(s => !(s.some(f => ['clue', 'brought', 'hope'].includes(f)) && s.some(f => ['answer', 'option', 'edge'].includes(f))))
     .filter(s => !s.includes('known') || s.includes('have'))
     .filter(s => s.includes('answer') ? !s.includes('have') || s.includes('edge') : !s.includes('edge')).flatMap(s =>
     [['moved'], ...(s.some(f => ['decides', 'result', 'clue', 'brought'].includes(f)) ? [] : [['failure', 'stopped']])].map(end => ({ flags: ['saga', ...s, ...end], vars: { B: 60, A: 140 } }))),
@@ -52,9 +59,11 @@ describe('saga prompt budget (the shipped R5 templates)', () => {
     expect(renderSaga('pick', [])).not.toMatch(/situations|past/);
     expect(renderSaga('pick', ['situations'])).toContain('"situation": "one of situations"');
     expect(renderSaga('pick', ['personal'])).toContain('- past:');
-    expect(renderSaga('pick', [])).not.toMatch(/keywords, people|best first|"person"/);
-    expect(renderSaga('pick', ['people'])).toContain('"person": "one of people, or none"');
-    expect(renderSaga('pick', ['people'])).toContain('Choose, best first,');
+    expect(renderSaga('pick', [])).not.toMatch(/keywords, people|best fitting|"person"/);
+    expect(renderSaga('pick', ['people', 'count'], { KEEP: 'two keywords' })).toContain('"person": "one of people, or none"');
+    expect(renderSaga('pick', ['people', 'count'], { KEEP: 'two keywords' })).toContain('Choose the two keywords best fitting the situation, tone and cast, together in one clear story, and from people');
+    expect(renderSaga('pick', ['count'], { KEEP: 'one keyword' })).toContain('Choose the one keyword best fitting the situation, tone and cast, together in one clear story. Copy each exactly.');
+    expect(renderSaga('pick', ['count'], { KEEP: 'one keyword' })).not.toMatch(/keywords, people|person|one to three/);
   });
   it('a rule about absent data never reaches the model', () => {
     expect(renderSaga('card', ['later', 'memory'], { MAX: 70 })).toContain('memory:');
@@ -68,7 +77,7 @@ describe('saga prompt budget (the shipped R5 templates)', () => {
   });
   it('the templates are the measured ones, and never the lab\'s working copies', () => {
     const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), '../src/ai/prompts/saga');
-    expect(fs.readdirSync(dir).filter(f => f.endsWith('.txt')).sort()).toEqual(['card.txt', 'outline.txt', 'pick.txt', 'plan.txt', 'premise.txt', 'report.txt']);
+    expect(fs.readdirSync(dir).filter(f => f.endsWith('.txt')).sort()).toEqual(['card.txt', 'core.txt', 'outline.txt', 'pick.txt', 'plan.txt', 'premise.txt', 'report.txt']);
     // (byte identity with the lab at the tag is held by test/sagagolden.test.ts, which renders every recorded variant)
   });
 });
