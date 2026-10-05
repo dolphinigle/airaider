@@ -167,6 +167,21 @@
 .rslot .rx:hover .xl, .rslot .rx:focus-visible .xl { display: inline; }
 .rslot .rx.is-armed { top: 0; left: 0; right: auto; width: 100%; height: 100%; border-radius: 7px; padding: 8px; background: rgba(58,24,20,.96); border-color: var(--bad); color: #ffd9d2; font: 500 11.5px var(--mono); line-height: 1.35; text-align: center; white-space: normal; }
 .rslot .rx.is-armed b { color: #fff; font-weight: 700; }
+/* WHY an item earns what it does (Game.slotWhy / roomWhy, designer 2026-10-06) — horizontal text, checked on --rack */
+.fwhy-room { display: flex; flex-direction: column; gap: 3px; margin-top: 2px; }
+.fwhy-room p { font: 400 12px/1.45 var(--mono); color: #cfc6b2; }              /* ~11:1 on #13171a */
+.fwhy-chip { max-width: 100%; font: 500 11px/1.3 var(--mono); text-align: center; color: #b9e0ae; }   /* full: ~11:1 */
+.fwhy-chip.fwhy-half { color: #f1d38c; }                                           /* ~12:1 */
+.fwhy-chip.fwhy-none { color: #c9b9a6; }                                           /* ~9:1 */
+.fwhy-blk { gap: 8px; }
+.fwhy-item { display: flex; flex-direction: column; gap: 3px; padding: 7px 10px; border: 1px solid #2e2620; border-radius: 5px; background: #1a1612; }
+.fwhy-name { display: flex; gap: 10px; align-items: baseline; }
+.fwhy-open { min-height: 28px; font-size: 14px; color: #ece3cf; text-align: left; }
+.fwhy-open:hover { color: var(--brass-hi); }
+.fwhy-name b { font: 600 12px var(--mono); }
+.fwhy-name b.fwhy-gain { color: #b9e0ae; }
+.fwhy-name b.fwhy-tiny { color: #c9b9a6; }
+.fwhy-item p { font: 400 12px/1.45 var(--mono); color: #d8d0bf; }             /* ~12:1 on #1a1612 */
 /* a rack's countdown */
 .rclock { display: flex; flex-direction: column; align-items: center; gap: 3px; }
 .rclock .ct { font: 500 11.5px var(--mono); color: #f1d38c; text-align: center; line-height: 1.3; }

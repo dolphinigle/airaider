@@ -51,7 +51,9 @@ only strong / fair / weak (`slotStrength`), with why-chips (`+roguery`, `−play
 - **Drag a soldier over the map** → every marker shows their best place, coins and strength (and the quest they
   would leave); **drop** →
   `Game.sendTo` (their best free place there; moves them off another quest). CLI: `send <q> <merc>`.
-- **Card sheet → "Send them to"** lists their best place on every quest (`Game.placementsFor`). CLI: `fit <merc>`.
+- **The soldier's sheet lists no quest places** (designer 2026-10-06: the "Send them to" block is gone — the map drag and
+  the quest page place soldiers). It keeps their must-be lock line (`🔒 Locked to <quest>`, up top with level and wounds).
+  The explicit CLI `fit <merc>` still lists their best place on every quest (`Game.placementsFor`).
 - Quest page: click a place then a card, or drag onto a niche — both `sendTo(q, merc, slot)`: moves a soldier off
   another quest, and a taken niche SWAPS. Auto (`autoAssign`); board Auto-fill every quest (`autoAssignAll`). Clicking a
   card with nothing armed sends them to their best place on the open quest. Finale approaches show their facts.
@@ -65,6 +67,13 @@ only strong / fair / weak (`slotStrength`), with why-chips (`+roguery`, `−play
 - The rack shows a countdown; taking a captive off wipes breaking progress, behind a two-step confirm; racks never
   swap. The **Dungeon panel is the prisoner hub**: Holding → Cells → Rack → Tamed → On show, with engine price quotes.
 - Rooms still start with 0 places; every room shows a ghost `Add a place · Ng`.
+- **Why an item earns its share** (designer 2026-10-06: "when an item placed into something gets 4.8 prestige, the reason
+  why somewhere I can see"): `Game.slotWhy(room, idx)` / `Game.roomWhy(room)`, read from the score's own parts (the tag
+  that matched and how — full / half / none, `fillDetail`; the mate next door; the room's base and ceiling). The room
+  panel says the room's half under its effect (what it wants, where it stands against its ceiling, the neighbour bonus),
+  a chip under each item (`full match · curio (low)`), and a "Why each earns" block with each item's own lines; a card
+  on show says them on its sheet; the set-in result ends `· why: …`. CLI: `room <id>` (the room's lines, then each
+  item's under its place), `fit <card>` (all of them, under its head), `setin` (the same result).
 
 ## 4c · The turn
 

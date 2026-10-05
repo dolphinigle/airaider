@@ -8,12 +8,12 @@ import {
   type Card, type GrownEntry, type Location, HELD, cardType, stackKind, isLiability, freshId, seedIdCounter,
   idCounter, mintStackable, sameStack,
 } from '../engine/cards.js';
-import { T, renderTags, parseAiTag, CONCEPT, CONCEPTS, GROUPS, validateTags, type Attribute, hasTag, bandWindow, type TagInstance } from '../engine/tags.js';
+import { T, renderTags, parseAiTag, CONCEPT, CONCEPTS, GROUPS, validateTags, type Attribute, hasTag, bandWindow, rankOf, type TagInstance } from '../engine/tags.js';
 import {
   newFort, ROOM_TYPE, ROOM_TYPES, buildCost, upgradeCost, renovateCost, ghUpgradeCost,
   excavateCost, maxSlotsAtTier, nextSlotTier, GH_THRESHOLDS, roomComfort, globalPrestige, capFromComfort,
   canSlot, slotAccepts, defaultWants, breakDuration, marketSellRate, ransomRate, oraclePrecision,
-  BUNK_ROSTER_SLOTS, BUNK_CAP_FLOOR, ENDGAME_BAND_LIFT,
+  BUNK_ROSTER_SLOTS, BUNK_CAP_FLOOR, ENDGAME_BAND_LIFT, roomBand, roomMate, ADJACENCY_MULT,
   type FortState, type Room,
 } from '../engine/fort.js';
 import { infirmaryHealRate, healTick, rollInjuryTiers, payHealCost, REST_HEAL_PER_CYCLE, type InjuryBand } from '../engine/injury.js';
@@ -38,7 +38,7 @@ import {
   type LoreGraph, type LoreNode, type RelEdge,
 } from '../engine/lore.js';
 import { rollName, rollPlaceName } from '../engine/names.js';
-import { hasClash, queryMatches, fillScore, acceptsCard } from '../engine/overlap.js';
+import { hasClash, queryMatches, fillScore, fillDetail, acceptsCard, BAND_SCORE, GROUP_FIT } from '../engine/overlap.js';
 import { questXp, grantXp, rollBase, rollGrowthLean, growToLevel } from '../engine/growth.js';
 import { coins, PARTIAL_FRAC, slotThreshold, resolvePooled, odds, U, DIFFICULTY_ORDER, explainCoins, oddsBand, slotStrength, coinsWhy, INJURY_FRAC, BAND_TEXT, type SlotTest, type Outcome, type QuestRollResult, type Band, type Strength, type CoinsWhy } from '../engine/roll.js';
 import { sampleKeywords, sampleKeywordsLight, sampleOpening, sampleGravity, sampleObstacle, sampleShape } from '../ai/keywords.js';
@@ -73,6 +73,25 @@ function lockSaid(notes: LockNote[]): { note?: string; warn?: boolean } {
   if (!notes.length) return {};
   return { note: notes.map(n => n.line).join(' · '), ...(notes.some(n => n.warn) ? { warn: true } : {}) };
 }
+/** a tag as the why lines name it — the word the card's tag chips show, with its rank ('curio (low)', 'fire (high)') */
+const tagWord = (t: TagInstance) => `${t.concept.replace(/^r-/, '')}${(CONCEPT[t.concept]?.depth ?? 1) > 1 ? ` (${rankOf(t.concept, t.tier ?? 1)})` : ''}`;
+/** a room want as the why lines name it (the relic-trait prefix dropped, as on a tag) */
+const wantWord = (w: string) => w.replace(/^r-/, '');
+// The why lines' RULE words, built from the engine's own constants (overlap.ts BAND_SCORE / GROUP_FIT, fort.ts
+// ADJACENCY_MULT) — a tuned number re-words the line instead of leaving it stating the old rule.
+/** how a tag's rank scales its score: 'each rank higher counts double' (BAND_SCORE ×2 a step), else the scores themselves */
+export const RANK_RULE = ((): string => {
+  const steps = BAND_SCORE.slice(1).map((v, i) => v / BAND_SCORE[i]!);
+  const k = steps[0]!;
+  if (!steps.every(x => x === k)) return `its rank counts ${BAND_SCORE.join(' / ')}, lowest to highest`;
+  return `each rank higher counts ${k === 2 ? 'double' : k === 3 ? 'triple' : `×${k}`}`;
+})();
+/** what a group (kind-of) match is worth against an exact one: 'half an exact match' (GROUP_FIT) */
+export const GROUP_RULE = GROUP_FIT === 0.5 ? 'half an exact match' : `${Math.round(GROUP_FIT * 100)}% of an exact match`;
+/** the mate-pair bonus as a share: '20%' (ADJACENCY_MULT) */
+export const MATE_BONUS = `${Math.round((ADJACENCY_MULT - 1) * 100)}%`;
+/** the mate-pair bonus, said the same by slotWhy and roomWhy */
+const mateLine = (mate: string) => `The ${mate} next door makes every item here count ${MATE_BONUS} more.`;
 interface JobRec {
   job: Job;
   lead: Lead;
@@ -170,6 +189,14 @@ export interface RoomPlacement {
                                // 'heals ×1.2 · −2.7 prestige' · the reason
   badge: string;               // the SHORT signed version for a card badge: 'tamed by c29' · '−2.1 prestige' · 'heals ×1.2'
   tone: 'good' | 'bad' | 'neutral';   // the badge's colour: what the move does to the fort (a prestige loss is bad)
+}
+/** WHY a placed item earns what it does (Game.slotWhy) — the plain words behind its "+N ✦" */
+export interface SlotWhy {
+  fit: 'full' | 'half' | 'none';   // how its best tag meets the room's wants
+  chip: string;                    // the caption under the card: 'full match · curio (low)' · 'no match'
+  short: string;                   // one clause for the set-in result: 'full match on its curio (low) tag, and it switched on the room's base'
+  lines: string[];                 // 2–4 plain lines: the match, the base (only item), the neighbour, the fill vs the ceiling
+  own: number;                     // how many leading lines are this item's own (the rest are the room's — roomWhy says them once)
 }
 export type CaptiveState = 'raw' | 'breaking' | 'tamed' | 'onShow';
 
@@ -1257,7 +1284,9 @@ export class Game {
       ? `prestige ${plan.prestigeBefore.toFixed(1)} → ${pAfter.toFixed(1)}`
       : `${effBefore || 'nothing'} → ${this.roomEffect(room)}`;
     const warn = pAfter < plan.prestigeBefore - 1e-9;
-    return { ok: true, msg: `${card.name} set in the ${rt.name}${swapLine} — ${change}`, ...(warn ? { warn } : {}) };
+    // the short WHY rides on the result (the GUI toast and the CLI print this msg)
+    const why = this.slotWhy(room.id, plan.idx);
+    return { ok: true, msg: `${card.name} set in the ${rt.name}${swapLine} — ${change}${why ? ` · why: ${why.short}` : ''}`, ...(warn ? { warn } : {}) };
   }
 
   /** what emptying one place would cost: prestige lost, and the room's effect after */
@@ -1267,6 +1296,88 @@ export class Game {
     const before = this.prestigeOf(room);
     const [after, eff] = this.previewSlots([room], () => { room.slots[slotIdx] = null }, () => [this.prestigeOf(room), this.roomEffect(room)] as const);
     return { prestige: Math.max(0, before - after), effectAfter: eff };
+  }
+
+  /** a comfort room's [base, ceiling] — the band its comfort climbs (a bedroom's ceiling lifts with an endgame key) */
+  private comfortBand(room: Room): [number, number] {
+    const [min, max] = roomBand(room);
+    return [min, max + (ROOM_TYPE[room.type]!.benefit === 'cap' && this.endgameLiftActive() ? ENDGAME_BAND_LIFT : 0)];
+  }
+
+  /** WHY a placed item earns what it does — the plain words behind its "+N ✦" (designer 2026-10-06:
+   *  "when an item placed into something gets 4.8 prestige, the reason why somewhere I can see").
+   *  Read from the score's own parts (fillDetail = the tag that scored and how, roomMate = the
+   *  neighbour bonus, the room's band, slotShare), so the words cannot drift from the number.
+   *  Prestige and function rooms; null for racks, rooms with no effect and empty places. The room
+   *  panel (under each item + its why block), the CLI `room <id>`, and setInRoom's result. */
+  slotWhy(roomId: string, slotIdx: number): SlotWhy | null {
+    const room = this.room(roomId);
+    const id = room?.slots[slotIdx];
+    const card = id ? this.card(id) : undefined;
+    if (!room || !card) return null;
+    const kind = this.roomKind(room);
+    if (kind !== 'prestige' && kind !== 'function') return null;
+    const name = ROOM_TYPE[room.type]!.name;
+    const wants = this.effectiveWants(room);
+    const d = fillDetail(card.tags, wants);
+    const tag = d.tag ? tagWord(d.tag) : '', want = d.want ? wantWord(d.want) : '';
+    const lines = [d.fit === 'full' ? `Full match: its ${tag} tag is one of the ${name}'s wants — ${RANK_RULE}.`
+      : d.fit === 'half' ? `Half match: its ${tag} tag is a kind of “${want}”, which the ${name} wants — ${GROUP_RULE}.`
+      : d.fit === 'nowants' ? `The ${name} wants nothing yet, so every item counts the least — restyle it to give it wants.`
+      : `No match: none of its tags is one the ${name} wants (${wants.map(w => wantWord(w.match)).join(', ')}) — it counts the least an item can.`];
+    // the base (the band's floor) is earned by whichever item is in the room — the only item's share carries it
+    const only = room.slots.filter(Boolean).length === 1;
+    const [min, max] = this.comfortBand(room);
+    const share = this.slotShare(roomId, slotIdx);
+    // a function room's effect can swallow an item whole (the bunk floor under a bedroom's cap, the Oracle's coarse
+    // band): the why then says the item changes nothing yet — never a base the before→after shows did not happen
+    const eff = this.roomEffect(room);
+    const moves = kind === 'prestige' || (share?.effectAfter ?? eff) !== eff;
+    if (kind === 'prestige') {
+      if (only) lines.push(`It is the room's only item, so it also switches on the room's base: ${min.toFixed(1)} of its ${(share?.prestige ?? 0).toFixed(1)} ✦.`);
+    } else if (!moves) lines.push(`It does not change the room yet — ${eff} with or without it.`);
+    else if (only) lines.push(`It is the room's only item, so it also switches the room's base on — without it, ${share!.effectAfter}.`);
+    const own = lines.length;
+    // the room's half (the room panel and the CLI room view print it once, at the room's head — roomWhy)
+    const mate = roomMate(this.state.fort, room);
+    const mateName = mate ? ROOM_TYPE[mate.type]!.name : '';
+    if (mate) lines.push(mateLine(mateName));
+    const c = this.comfort(room);
+    lines.push(kind === 'prestige'
+      ? `Each further item adds less as the room fills — the ${name} is at ${c.toFixed(1)} of a ${max} ✦ ceiling.`
+      : `Each further item adds less as the room fills — ${this.roomEffect(room, c)} now, ${this.roomEffect(room, max)} at best.`);
+    const short = (d.fit === 'full' ? `full match on its ${tag} tag` : d.fit === 'half' ? `half match — its ${tag} tag is a kind of “${want}”`
+      : `no match with what the ${name} wants`) + (!moves ? `, not yet enough to change the room` : only ? `, and it switched on the room's base` : '')
+      + (mate ? `; the ${mateName} next door adds ${MATE_BONUS}` : '');
+    return { fit: d.fit === 'nowants' ? 'none' : d.fit, chip: d.fit === 'full' || d.fit === 'half' ? `${d.fit} match · ${tag}` : 'no match', short, lines, own };
+  }
+
+  /** the room-level half of the why: what it wants, where it stands against its base and ceiling,
+   *  its neighbour bonus — the room panel's head and the CLI `room <id>`, printed once above the
+   *  items' own lines (slotWhy.lines up to `own`). [] for racks and rooms with no effect. */
+  roomWhy(roomId: string): string[] {
+    const room = this.room(roomId);
+    const kind = room ? this.roomKind(room) : null;
+    if (!room || (kind !== 'prestige' && kind !== 'function')) return [];
+    const rt = ROOM_TYPE[room.type]!;
+    const wants = this.effectiveWants(room).map(w => wantWord(w.match));
+    const [min, max] = this.comfortBand(room);
+    const empty = room.slots.every(x => !x);
+    const c = this.comfort(room);
+    const lines = [wants.length ? `Wants: ${wants.join(', ')} — an item earns by its best matching tag; ${RANK_RULE}.`
+      : 'Wants nothing yet — every item counts the least; restyle it to give it wants.'];
+    lines.push(kind === 'prestige'
+      ? (empty ? `Empty — the first item switches on a ${min.toFixed(1)} ✦ base; each further item adds less, toward a ${max} ✦ ceiling.`
+        : `At ${c.toFixed(1)} of a ${max} ✦ ceiling — the first item switched on a ${min.toFixed(1)} ✦ base; each further item adds less.`)
+      // the base named only where it shows: a bedroom's base sits under the bunk floor, the Oracle's under its exact line
+      : `${empty ? 'Empty' : `Now ${this.roomEffect(room, c)}`}, at best ${this.roomEffect(room, max)} — ${this.roomEffect(room, min) !== this.roomEffect(room, 0)
+        ? 'the first item switches its base on; each further item adds less' : 'items add less and less as the room fills'}.`);
+    if (rt.mates?.length) {
+      const mate = roomMate(this.state.fort, room);
+      lines.push(mate ? mateLine(ROOM_TYPE[mate.type]!.name)
+        : `A ${rt.mates.map(m => ROOM_TYPE[m]?.name ?? m).join(' or ')} built next door would make every item here count ${MATE_BONUS} more.`);
+    }
+    return lines;
   }
 
   /** take a card out of a room place, back to the hand — saying honestly what it cost. Off a rack

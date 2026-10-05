@@ -195,11 +195,6 @@
 .quirk { font-style: italic; color: #a99f8e; }
 .bond { font-size: 13.5px; line-height: 1.4; color: #d8d0bf; padding: 5px 0; border-bottom: 1px solid #2a231c; }
 .bond b { color: #f1e6cc; } .bond .r { font: 400 11.5px var(--mono); color: var(--brass-hi); }
-.sq { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 7px 10px; border: 1px solid #2e2620; border-radius: 5px; background: #1a1612; }
-.sq .q { min-height: 28px; text-align: left; font-size: 14px; color: #ece3cf; }
-.sq .q span { font: 400 11px var(--mono); color: var(--text-faint); }
-.sq .c { height: 20px; padding: 0 7px; border-radius: 10px; font: 600 11px var(--mono); color: #0b0d0f; display: flex; align-items: center; }
-.sq .here { font: 500 11px var(--mono); color: #9fcf97; }
 .acts { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding-top: 6px; border-top: 1px solid #2e2620; }
 .acts .dimp { font: 400 11.5px var(--mono); }
 
@@ -209,6 +204,10 @@
 .sheet .focus .lbl { margin-right: 4px; }
 .sheet .focus .dimp { font: 400 11.5px var(--mono); margin-left: 4px; }
 .sheet .lockp { color: #f1d38c; }   /* the must-be lock line: gold, as the lock chip */
+.sheet .lockp .lockq { font: inherit; font-weight: 700; color: #f6e2ae; text-decoration: underline; text-underline-offset: 3px; }
+/* a card on show: why it earns what it does there (Game.slotWhy) — under its "here" row */
+.sheet .fwhy-sheet { display: flex; flex-direction: column; gap: 3px; padding: 6px 10px 2px 50px; }
+.sheet .fwhy-sheet p { font: 400 12px/1.45 var(--mono); color: #d8d0bf; }     /* ~12:1 on #16120f */
 .sheet .capline { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .sheet .capline .capwarn { height: auto; min-height: 24px; padding: 3px 9px; }
 .xpb i.capd { background: #b3453a; }

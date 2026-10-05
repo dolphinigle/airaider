@@ -1,9 +1,15 @@
 // WHAT EACH ROOM DOES, in plain words — the build list's one line per room. One table read by
 // both UIs (server buildable/rooms + cli buildable), so the GUI and the text UI cannot disagree.
-// Numbers here restate engine curves (fort.ts / injury.ts); if a curve moves, this line moves.
+// Numbers here are READ from the engine curves (fort.ts / injury.ts) at the room's empty and best comfort —
+// the same curves Game.roomEffect / roomWhy print, so the line under a room's name cannot promise another "best".
 
-import { ROOM_TYPE, type RoomType } from '../engine/fort.js';
+import { ROOM_TYPE, typeBand, marketSellRate, ransomRate, breakDuration, type RoomType } from '../engine/fort.js';
+import { infirmaryHealRate, REST_HEAL_PER_CYCLE } from '../engine/injury.js';
 import { REGION } from '../engine/regions.js';
+
+/** the comfort a room type's effect climbs to: its band's ceiling (an empty room sits at 0) */
+const best = (typeId: string) => typeBand(typeId)[1];
+const pct = (r: number) => `${Math.round(r * 100)}%`;
 
 const DESC: Record<string, string> = {
   'map-room': 'Opens the map, so quests can be taken on.',
@@ -21,11 +27,11 @@ const DESC: Record<string, string> = {
   'dungeon-cell': 'Room for three more captives.',
   'bedroom': 'One soldier’s own room. The more comfortable it is, the higher its owner can level.',
   'bunkroom': 'Beds for five soldiers.',
-  'infirmary': 'Wounds heal faster — up to four times as fast when the room is comfortable.',
+  'infirmary': `Wounds heal faster — up to ${(infirmaryHealRate(best('infirmary')) / REST_HEAL_PER_CYCLE).toFixed(1)} times as fast when the room is comfortable.`,
   'hospital': 'Pay gold to heal a wound at once.',
-  'market': 'Relics sell for more: from half their worth up to seven tenths.',
-  'ransom-office': 'Ransoms pay more: from six tenths of a captive’s worth up to eight.',
-  'torture-chamber': 'Breaks captives to obedience — five cycles, two when comfortable.',
+  'market': `Relics sell for more: from ${pct(marketSellRate(0))} of their worth up to ${pct(marketSellRate(best('market')))}.`,
+  'ransom-office': `Ransoms pay more: from ${pct(ransomRate(0))} of a captive’s worth up to ${pct(ransomRate(best('ransom-office')))}.`,
+  'torture-chamber': `Breaks captives to obedience — ${breakDuration(0)} cycles, ${breakDuration(best('torture-chamber'))} when comfortable.`,
   'interrogation': 'Pay to question a captive; each one yields a lead.',
   'oracle': 'Shows the odds on every quest — exact once the room is comfortable.',
   'great-hall': 'The heart of the hold. Raising it opens new rooms and regions; it takes prestige and gold.',

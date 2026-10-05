@@ -186,17 +186,26 @@ export interface FortState {
 }
 
 export function roomBand(room: Room): [number, number] {
-  const t = ROOM_TYPE[room.type]!;
+  return typeBand(room.type);
+}
+/** a room type's comfort band [base, ceiling] — what roomBand reads (and the build list's "up to" lines) */
+export function typeBand(typeId: string): [number, number] {
+  const t = ROOM_TYPE[typeId]!;
   if (t.benefit === 'cap') return BEDROOM_BAND;
   return BANDS[t.archetype ?? 'std'];
 }
 
-function adjacencyMult(fort: FortState, room: Room): number {
+/** the mate-pair bonus: every fit in a room with its mate next door counts this much more */
+export const ADJACENCY_MULT = 1.2;
+/** the room's mate built in a cell beside it (the one adjacencyMult reads), or null */
+export function roomMate(fort: FortState, room: Room): Room | null {
   const t = ROOM_TYPE[room.type]!;
-  if (!t.mates?.length) return 1;
-  const near = fort.rooms.filter(r =>
-    Math.abs(r.cell.floor - room.cell.floor) + Math.abs(r.cell.col - room.cell.col) === 1);
-  return near.some(r => t.mates!.includes(r.type)) ? 1.2 : 1;
+  if (!t.mates?.length) return null;
+  return fort.rooms.find(r => t.mates!.includes(r.type)
+    && Math.abs(r.cell.floor - room.cell.floor) + Math.abs(r.cell.col - room.cell.col) === 1) ?? null;
+}
+function adjacencyMult(fort: FortState, room: Room): number {
+  return roomMate(fort, room) ? ADJACENCY_MULT : 1;
 }
 
 /**

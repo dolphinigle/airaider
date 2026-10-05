@@ -1,11 +1,12 @@
 // A CARD, OPENED — soldier, captive, relic, debt, tavern hire, holding, or a quest's held cast.
-// Every button is an engine action. "Send them to" reads Game.placementsFor (the CLI's `fit <merc>`);
-// "Set them in" reads Game.roomPlacementsFor (the CLI's `fit <captive|relic>` + `setin`). Prices,
-// refusals and fixes are the engine's quotes/blocks — nothing here re-derives a rule.
+// Every button is an engine action. A soldier's sheet lists no quest places (designer 2026-10-06 —
+// the map drag, the quest page and the CLI's `fit <merc>` do that); it keeps their must-be lock.
+// "Set them in" reads Game.roomPlacementsFor (the CLI's `fit <captive|relic>` + `setin`); a card on
+// show says why it earns what it does (Game.slotWhy). Prices, refusals and fixes are the engine's
+// quotes/blocks — nothing here re-derives a rule.
 import { sfx } from './sfx';
 import React, { useEffect, useRef } from 'react';
-import { type S, Tags, Silhouette, Glyph, RoomIcon, FixButton, cardStatus, formOf, cap1, FORM_ONE, shortTitle, useKeyScroll } from './ui';
-import { strengthCls, STRENGTH_WORD } from './band';
+import { type S, Tags, Silhouette, Glyph, RoomIcon, FixButton, cardStatus, formOf, cap1, FORM_ONE, useKeyScroll } from './ui';
 import { ConfirmButton } from './fx';
 
 const ATTRS: [string, string][] = [['str', 'STR'], ['dex', 'DEX'], ['int', 'INT'], ['cha', 'CHA'], ['con', 'CON']];
@@ -81,7 +82,7 @@ export function CardSheet({ s, id, cast, doAct, quick, close, openQuest, openRoo
             <button className="x" onClick={close} aria-label="Close">✕</button>
           </div>
 
-          {kind === 'roster' && <RosterTop s={s} c={c} doAct={doAct} go={go} />}
+          {kind === 'roster' && <RosterTop s={s} c={c} doAct={doAct} go={go} openQuest={openQuest} />}
           {(kind === 'captive' || kind === 'relic') && <SetTop s={s} c={c} kind={kind} quick={quick} fix={fix} />}
 
           {(kind === 'roster' || kind === 'tavern' || kind === 'holding') && <Attrs ch={ch} />}
@@ -89,23 +90,6 @@ export function CardSheet({ s, id, cast, doAct, quick, close, openQuest, openRoo
           {c.tags && <div className="blk"><span className="lbl">{kind === 'relic' || kind === 'captive' ? 'Tags — what rooms look for' : 'Tags — what quests look for'}</span><Tags tags={c.tags} /></div>}
 
           {kind === 'roster' && <>
-            <div className="blk">
-              <span className="lbl">Send them to — their best free place on each quest</span>
-              {/* the must-be lock (engine lockOf — the CLI's merc/fit print the same line) */}
-              {c.lock && <p className="p lockp">🔒 Locked to <b>{c.lock.title}</b> — the place there names them. Set that quest aside to use them elsewhere.</p>}
-              {(c.placements ?? []).length === 0 && <p className="p dimp">No open place for them right now.</p>}
-              {(c.placements ?? []).map((p: any) => {
-                const here = p.here ?? (c.location?.kind === 'quest' && c.location.questId === p.questId);
-                return (
-                  <div className="sq" key={p.questId}>
-                    <button className="q" onClick={() => openQuest(p.questId)}>{p.title} <span>· {p.attr} place</span></button>
-                    {/* coins flipped vs heads needed are different units ("9 / 7" read as a pass): show the engine's word */}
-                    <span className={'c ' + strengthCls(p.strength)} title={`${Math.round(p.coins)} coins to flip here · ${p.bar.toFixed(1)} heads needed`}>{Math.round(p.coins)}c · {STRENGTH_WORD[p.strength as 'strong'] ?? '?'}</span>
-                    {here ? <span className="here">sent</span>
-                      : <button className="btn sm" onClick={() => quick('send', p.questId, c.id)} title={p.from ? `leaves ${p.from.title}` : undefined}>{p.from ? `Move · leaves ${shortTitle(p.from.title)}` : 'Send'}</button>}
-                  </div>);
-              })}
-            </div>
             {/* the living dossier (STORY_ENGINE §4): who they are now, what marked them, who matters — the CLI's `merc` prints the same lines */}
             {(c.living ?? []).length > 0 && <div className="blk">
               <span className="lbl">Story so far</span>
@@ -164,10 +148,12 @@ export function CardSheet({ s, id, cast, doAct, quick, close, openQuest, openRoo
 }
 
 /** level, xp, focus (short — it sits up top), and the specific cap and wound lines */
-function RosterTop({ s, c, doAct, go }: { s: S; c: any; doAct: any; go: (screen: string, id: string | null) => void }) {
+function RosterTop({ s, c, doAct, go, openQuest }: { s: S; c: any; doAct: any; go: (screen: string, id: string | null) => void; openQuest: (id: string) => void }) {
   const ch = c.character;
   const capped = ch.level >= c.cap;
   return <>
+    {/* the must-be lock (engine lockOf — the CLI's roster/merc/fit print the same line): status, up top with level and wounds */}
+    {c.lock && <p className="p lockp">🔒 Locked to <button className="lockq" onClick={() => openQuest(c.lock.questId)}>{c.lock.title}</button> — the place there names them. Set that quest aside to use them elsewhere.</p>}
     <div className="lvl">
       <span>Level <b>{ch.level}</b></span>
       <span className="xpb"><i className={capped ? 'capd' : ''} style={{ width: `${Math.min(100, ch.xp / Math.max(1, c.xpNeeded) * 100)}%` }} /></span>
@@ -239,6 +225,9 @@ function SetList({ s, c, quick, fix }: { s: S; c: any; quick: any; fix: (f: any,
   for (const p of rows.filter(p => !p.ok && !p.here && !p.fix)) grouped.set(p.reason ?? p.label, [...(grouped.get(p.reason ?? p.label) ?? []), p.roomName]);
   if (!rows.length && !onShow) return null;
   const share = slotItem?.prestigeShare ? ` · −${slotItem.prestigeShare} ✦` : '';
+  // why it earns that here, whole (Game.slotWhy — the CLI's `fit <card>` prints the same lines under its head)
+  const why: string[] = slotItem?.why?.lines ?? [];
+  const whyBlk = why.length > 0 && <div className="fwhy-sheet">{why.map((l, i) => <p key={i}>{l}</p>)}</div>;
   return <div className="blk setin">
     <span className="lbl">Set them in — every room that could take them</span>
     {here.map(p => <div className="sr is-here" key={'h' + p.roomId}>
@@ -247,11 +236,13 @@ function SetList({ s, c, quick, fix }: { s: S; c: any; quick: any; fix: (f: any,
         ? <ConfirmButton className="btn sm" label="Take off the rack" armedLabel={`Take off? ${c.rackLoss}`} onConfirm={() => quick('unslot', room.id, idx)} />
         : <button className="btn sm ghost" onClick={() => quick('unslot', room.id, idx)}>Take out{share}</button>)}
     </div>)}
+    {here.length > 0 && whyBlk}
     {onShow && !here.length && room && idx >= 0 && <div className="sr is-here">
       <span className="ri"><RoomIcon type={room.type} size={22} /></span><span className="rn">{room.name}</span><span className="rl">here</span>
       {c.rackLoss ? <ConfirmButton className="btn sm" label="Take off the rack" armedLabel={`Take off? ${c.rackLoss}`} onConfirm={() => quick('unslot', room.id, idx)} />
         : <button className="btn sm ghost" onClick={() => quick('unslot', room.id, idx)}>Take out{share}</button>}
     </div>}
+    {onShow && !here.length && room && idx >= 0 && whyBlk}
     {ok.map((p, i) => <div className={'sr is-ok' + (p.tone === 'bad' ? ' loses' : '')} key={'o' + p.roomId}>
       <span className="ri"><RoomIcon type={p.roomType} size={22} /></span><span className="rn">{p.roomName}</span>
       <span className="rl">{p.label}</span>

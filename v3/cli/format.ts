@@ -228,7 +228,11 @@ export const render = {
     }
     if (t.species === 'comfort') {
       const wants = g.effectiveWants(r);
-      lines.push(`  comfort ${g.comfort(r).toFixed(1)} · wants: ${wants.map(w => w.match).join(', ') || '(none — renovate to set a theme)'} · takes ${kind === 'rack' ? 'raw captives' : 'relics & tamed captives'}`);
+      // WHY items earn what they do (Game.roomWhy / slotWhy — the GUI room panel's head and the line under each item):
+      // the room's half once (it names the wants), then each item's own lines under its place
+      const why = g.roomWhy(r.id);
+      lines.push(`  comfort ${g.comfort(r).toFixed(1)} · ${why.length ? '' : `wants: ${wants.map(w => w.match).join(', ') || '(none — renovate to set a theme)'} · `}takes ${kind === 'rack' ? 'raw captives' : 'relics & tamed captives'}`);
+      lines.push(...why.map(l => `  ${l}`));
       r.slots.forEach((s, i) => {
         const c = s ? g.card(s) : null;
         if (!c) { lines.push(`  place ${i}: (empty)`); return }
@@ -237,6 +241,8 @@ export const render = {
         const tail = brk ? ` (tamed by cycle ${brk.doneAtCycle}, ${brk.doneAtCycle - g.state.cycle} left — unslot! loses it)`
           : share ? ` (${share.prestige > 0.05 ? `−${share.prestige.toFixed(1)} prestige` : `→ ${share.effectAfter}`} if taken out)` : '';
         lines.push(`  place ${i}: ${c.name}${tail} [${renderTags(c.tags)}]`);
+        const sw = g.slotWhy(r.id, i);
+        if (sw) lines.push(...sw.lines.slice(0, sw.own).map(l => `      ${l}`));
       });
       const add = g.addPlaceFix(r);
       if (!r.slots.length) lines.push(`  (no places yet)${fixLine(add)}`);
@@ -598,7 +604,9 @@ export const render = {
     if (!rows.length) return `${m.name}: nothing to set in a room (soldiers go on quests; stores stay stored)`;
     const s = g.captiveState(id);
     const head = s ? `${m.name} — ${s.state === 'breaking' ? `on the rack, tamed c${s.doneAt}` : s.state === 'onShow' ? `on show in the ${s.whereName}` : s.state}` : `${m.name}${g.whereName(id) ? ` — on show in the ${g.whereName(id)}` : ''}`;
-    return `${head} — where it could go:\n` + rows.map(r =>
+    // on show: why it earns what it does there, whole (Game.slotWhy — the GUI sheet's "here" row says the same)
+    const why = m.location.kind === 'room' ? g.slotWhy(m.location.roomId, m.location.slot)?.lines ?? [] : [];
+    return `${head}${why.length ? `${why.map(l => `\n  ${l}`).join('')}\nwhere it could go:` : ' — where it could go:'}\n` + rows.map(r =>
       `  ${r.ok ? '✓' : '✗'} ${(r.roomId ?? '—').padEnd(9)} ${r.roomName.padEnd(22)} ${r.ok ? r.label : `${r.reason}${fixLine(r.fix as never)}`}`,
     ).join('\n') + (rows.some(r => r.ok) ? `\n  setin ${id} <roomId> [idx]` : '');
   },

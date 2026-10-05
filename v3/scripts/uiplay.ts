@@ -572,7 +572,7 @@ if (q) {
 // ── the sheet ──
 await (await page.$('.hand .card.soldier'))?.click(); await sleep(500);
 check(await count(page, '.sheet .attrs .at') === 5, 'clicking a card opens their sheet with 5 attributes');
-check(await count(page, '.sheet .sq') >= 0, 'the sheet lists where they could go');
+check(!/Send them to/.test(await text(page, '.sheet')), 'the soldier sheet lists no quest places (designer 2026-10-06 — the map drag and the quest page do)');
 await shot(page, '05-sheet');
 await page.keyboard.press('Escape'); await sleep(300);
 check(await count(page, '.sheet') === 0, 'Esc closes the sheet');

@@ -460,7 +460,11 @@ function RoomPanel({ s, room, doAct, quick, openCard, setSel, drag, setDrag, dra
       {/* the way back and the room's name stay stuck on top while its panel scrolls */}
       <div className="rdh"><button className="btn sm" onClick={back}>✕ Close</button><h2 title={room.name}>{room.name}{room.style ? ` · ${room.style}` : ''}</h2></div>
       <div className="t"><span className="ic big"><RoomIcon type={room.type} size={40} /></span>
-        <div className="tb"><div className="k">{roomLine(s, room)}</div><p className="p">{room.desc}</p></div></div>
+        <div className="tb"><div className="k">{roomLine(s, room)}</div><p className="p">{room.desc}</p>
+          {/* WHY its items earn what they do — the room's half (Game.roomWhy: its wants, base and ceiling, the neighbour
+              bonus); the CLI room view prints the same lines */}
+          {(room.why ?? []).length > 0 && <div className="fwhy-room">{room.why.map((l: string, i: number) => <p key={i}>{l}</p>)}</div>}
+        </div></div>
 
       {room.type === 'great-hall' && (g?.next ? <div className="blk ghp">
         <span className="lbl">Raise to Tier {g.next}</span>
@@ -509,6 +513,8 @@ function RoomPanel({ s, room, doAct, quick, openCard, setSel, drag, setDrag, dra
                     onClick={() => openCard(x.id)}
                     onDragStart={e => { e.dataTransfer.setData('text/plain', x.id); e.dataTransfer.effectAllowed = 'move'; setDrag(x.id) }}
                     onDragEnd={() => setDrag(null)} />
+                  {/* how it meets the room's wants, under the card (Game.slotWhy chip: 'full match · curio (low)') */}
+                  {!rack && x.why && <span className={'fwhy-chip fwhy-' + x.why.fit}>{x.why.chip}</span>}
                   {rack && <RackClock s={s} doneAt={x.doneAtCycle} total={x.breakTotal} />}
                   {!rack && x.shareEffect && room.kind === 'function' && <span className="rclock"><span className="ct">without: {x.shareEffect}</span></span>}
                   <ConfirmButton className={'rx' + (rack ? ' rackx' : '')} needsConfirm={rack}
@@ -537,6 +543,17 @@ function RoomPanel({ s, room, doAct, quick, openCard, setSel, drag, setDrag, dra
         </div>
       </div>}
 
+      {/* WHY each item earns what it does — its own lines (Game.slotWhy lines[0..own); the room's half is said at the
+          head). The CLI room view prints the same lines under each place. */}
+      {!rack && room.slots.some((x: any) => x?.why) && <div className="blk fwhy-blk">
+        <span className="lbl">{room.kind === 'prestige' ? 'Why each earns' : 'Why each helps'}</span>
+        {room.slots.map((x: any, i: number) => x?.why && <div key={i} className="fwhy-item">
+          <div className="fwhy-name"><button className="fwhy-open" onClick={() => openCard(x.id)}>{x.name}</button>
+            {room.kind === 'prestige' && <b className={x.prestigeShare > 0 ? 'fwhy-gain' : 'fwhy-tiny'}>{x.prestigeShare > 0 ? `+${x.prestigeShare} ✦` : 'under 0.1 ✦'}</b>}</div>
+          {x.why.lines.slice(0, x.why.own).map((l: string, j: number) => <p key={j}>{l}</p>)}
+        </div>)}
+      </div>}
+
       {room.kind && okFits.length > 0 && <div className="blk cands"><span className="lbl">Could go here — best first</span>
         {(showAll ? okFits : okFits.slice(0, 5)).map(f => <div key={f.id} className={'cand' + (f.tone === 'bad' ? ' loses' : '')}>
           <button className="cn" onClick={() => openCard(f.id)}>{f.name}</button>
@@ -546,7 +563,8 @@ function RoomPanel({ s, room, doAct, quick, openCard, setSel, drag, setDrag, dra
         {okFits.length > 5 && <button className="link" onClick={() => setShowAll(v => !v)}>{showAll ? 'fewer' : `all ${okFits.length}`}</button>}
       </div>}
       {room.kind && refusedWhy.length > 0 && <p className="refused">Can’t go here: {refusedWhy.map(([w, n]) => `${w} (${n})`).join(' · ')}</p>}
-      {room.wants.length > 0 && <div className="blk"><span className="lbl">It wants</span><Tags tags={room.wants.join('; ')} /></div>}
+      {/* a room with a why says its wants at the head; a rack keeps its wants here */}
+      {room.wants.length > 0 && !(room.why ?? []).length && <div className="blk"><span className="lbl">It wants</span><Tags tags={room.wants.join('; ')} /></div>}
 
       {room.renovateCost && <div className="acts"><span className="restyle">Restyle ({room.renovateCost}g{room.renovateBlock ? ` — ${room.renovateBlock}` : ''}):
         {['human', 'elven', 'wolfkin', 'lizardkin', 'ancient', 'exotic'].map(st => <button key={st} className="btn sm ghost" disabled={!!room.renovateBlock}

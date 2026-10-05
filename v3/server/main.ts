@@ -215,6 +215,9 @@ function stateView() {
           // racks: how many cycles a captive put on now would take to break
           breakCycles: kind === 'rack' ? breakDuration(game.comfort(r)) : null,
           wants: game.effectiveWants(r).map(w => w.match),
+          // WHY its items earn what they do, the room's half (Game.roomWhy — the CLI room view prints the same lines):
+          // what it wants, where it stands against its base and ceiling, the neighbour bonus. [] for racks/gates
+          why: game.roomWhy(r.id),
           owner: r.ownerId === 'you' ? 'you' : r.ownerId ? game.card(r.ownerId)?.name ?? r.ownerId : null,
           upgradeCost: rt.species === 'comfort' && r.slots.length < maxSlotsAtTier(st.fort.ghTier) ? upgradeCost(rt, r.slots.length) : null,
           // why "Add a place" can't run: 'short 26g' | 'max 2 places at GH T3' | null
@@ -238,6 +241,9 @@ function stateView() {
               // what taking it out costs: prestige lost (0 for function rooms) and the effect after
               prestigeShare: share ? Math.round(share.prestige * 10) / 10 : 0,
               shareEffect: share?.effectAfter ?? null,
+              // WHY it earns that share (Game.slotWhy): {fit, chip, short, lines, own} | null — the chip under the card,
+              // its own lines (lines[0..own)) in the panel's why block, all of them on its sheet; the CLI prints the same
+              why: game.slotWhy(r.id, i),
               // non-null on a rack: the two-step confirm's text ('breaking lost (was due c29)')
               rackLoss: game.rackLoss(s),
             };

@@ -74,12 +74,13 @@ export function App() {
   const modal = !!sheet;
   useEffect(() => { refresh() }, [refresh]);
   // every action result is a toast — top centre, click-through (bar its Open button), replaced by the next one
-  const say = (msg: string, tone: Tone = 'ok', ms = 4000, open?: Toast['open']) => {
+  // a toast stays long enough to READ: 4s, longer for a long line (a set-in result carries its why) — ~60ms a character, ≤10s
+  const say = (msg: string, tone: Tone = 'ok', ms?: number, open?: Toast['open']) => {
     if (!msg) return;
     const id = Date.now() + Math.random();
     setToast({ id, msg, tone, open });
     clearTimeout(toastTimer.current);
-    toastTimer.current = window.setTimeout(() => setToast(t => t?.id === id ? null : t), ms);
+    toastTimer.current = window.setTimeout(() => setToast(t => t?.id === id ? null : t), ms ?? Math.min(10000, Math.max(4000, msg.length * 60)));
   };
 
   // actions that can hit the AI (renovate) poll the state while they run
