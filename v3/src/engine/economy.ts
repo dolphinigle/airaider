@@ -3,7 +3,7 @@
 
 import type { Rng } from './rng.js';
 import {
-  CONCEPTS, CONCEPT, GROUPS, tagValue, tagsValue, maxTier, RACE_BODY_BIAS, rankOf,
+  CONCEPTS, CONCEPT, GROUPS, tagValue, tagsValue, maxTier, RACE_BODY_BIAS, rankOf, genderFits,
   type TagInstance, type Domain, type Rank,
 } from './tags.js';
 import { freshId, HELD, mintStackable, type Card, type CharRole } from './cards.js';
@@ -194,13 +194,15 @@ export function generateCard(rng: Rng, opts: GenOptions): Card {
     const c = CONCEPT[pick]!;
     place({ concept: pick, tier: c.depth > 1 ? rollTier(rng, pick, ceiling, opts.targetV) : undefined });
   }
+  // a required tag placed before the gender rolled ("flat" proposed for a man) leaves once the gender is known
+  for (let i = tags.length - 1; i >= 0; i--) if (!genderFits(CONCEPT[tags[i]!.concept], owned)) { owned.delete(tags[i]!.concept); tags.splice(i, 1) }
 
   // ECONOMY §4 step 4 — jackpot-with-catch: seed a FLAW first; the budget loop then overshoots
   // the positives to compensate, so the bundle still nets targetV (stronger lines, one catch)
   if (opts.jackpotChance && rng.chance(opts.jackpotChance)) {
     const negs = pool.rollable.filter(r => {
       const c2 = CONCEPT[r.id]!;
-      return c2.negative && !owned.has(r.id) && !(c2.opposite && owned.has(c2.opposite)) && !blockedGroups.has(c2.group);
+      return c2.negative && !owned.has(r.id) && !(c2.opposite && owned.has(c2.opposite)) && !blockedGroups.has(c2.group) && genderFits(c2, owned);
     });
     if (negs.length) {
       const id = rng.pick(negs.map(n => n.id));
@@ -227,6 +229,7 @@ export function generateCard(rng: Rng, opts: GenOptions): Card {
       if (owned.has(r.id)) return false;
       if (c.opposite && owned.has(c.opposite)) return false;
       if (blockedGroups.has(c.group)) return false;
+      if (!genderFits(c, owned)) return false;
       if (excluded.has(r.id)) return false;
       if (opts.maxSkills !== undefined && c.group === 'skill' && skillCount >= opts.maxSkills) return false;
       return true;

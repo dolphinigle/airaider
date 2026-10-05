@@ -77,4 +77,19 @@ describe('economy', () => {
     expect(c.tags.some(t => t.concept === 'nosuchtag')).toBe(false);
     expect(validateTags(c.tags)).toEqual([]);
   });
+
+  it('a gendered body tag only lands on its gender — "flat" is a woman\'s figure, never a man\'s (designer 2026-10-05)', () => {
+    let women = 0;
+    for (let seed = 1; seed <= 1500; seed++) {
+      // every fifth card is asked for "flat" (an AI-proposed required tag), placed before its gender rolls
+      const c = generateCard(new Rng(seed), { domain: 'character', targetV: 60 + (seed % 7) * 30, contentLevel: 1 + (seed % 10), jackpotChance: 0.08,
+        ...(seed % 5 === 0 ? { required: [{ concept: 'flat' }] } : {}) });
+      const has = (x: string) => c.tags.some(t => t.concept === x);
+      expect(has('flat') && !has('female')).toBe(false);
+      if (has('flat')) women++;
+      expect(validateTags(c.tags)).toEqual([]);
+    }
+    expect(women).toBeGreaterThan(0);
+    expect(validateTags([{ concept: 'character' }, { concept: 'male' }, { concept: 'flat' }])).toEqual(['flat on a card that is not female']);
+  });
 });

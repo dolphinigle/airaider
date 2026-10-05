@@ -26,6 +26,7 @@ export interface TagConcept {
   appearOdds?: number;     // base chance to roll in generation (free/at-most-1 groups)
   domainOverride?: Domain; // concept-level domain override (high-born = character-only, W8)
   statAttr?: Attribute;    // body stat tag feeds this attribute (W4 revamp)
+  gender?: 'male' | 'female'; // only ever on a card of this gender (flat = a woman's figure)
 }
 
 // ---- groups ------------------------------------------------------------------
@@ -96,7 +97,7 @@ export const CONCEPTS: TagConcept[] = [
   ...pair(C('beautiful', 'body', 20, { statAttr: 'cha' }), C('ugly', 'body', 4, { statAttr: 'cha', negative: true })),
   ...pair(C('tough', 'body', 20, { statAttr: 'con' }), C('sickly', 'body', 4, { statAttr: 'con', negative: true })),
   ...pair(C('tall', 'body', 6, { zeroValue: true }), C('short', 'body', 6, { zeroValue: true })),
-  ...pair(C('endowed', 'body', 16), C('flat', 'body', 4, { negative: true })),
+  ...pair(C('endowed', 'body', 16), C('flat', 'body', 4, { negative: true, gender: 'female' })),
 
   // W6/W7 skill — 16 skills, uniform depth 20, per-skill growth
   C('melee', 'skill', 20, { growth: G_APEX }), C('ranged', 'skill', 20, { growth: G_APEX }),
@@ -264,6 +265,10 @@ export const RACE_BODY_BIAS: Record<string, Partial<Record<string, number>>> = {
 
 // ---- mutex/validation ---------------------------------------------------------------
 
+/** whether a gendered concept (TagConcept.gender) may sit on a card owning these concepts: only when the card is that
+ *  gender (a card with no gender tag — a relic — never takes one) */
+export const genderFits = (c: TagConcept | undefined, owned: ReadonlySet<string>): boolean => !c?.gender || owned.has(c.gender);
+
 /** enforce pickPolicy + opposite pairs; returns violations (empty = valid) */
 export function validateTags(tags: TagInstance[]): string[] {
   const errs: string[] = [];
@@ -284,5 +289,6 @@ export function validateTags(tags: TagInstance[]): string[] {
     const opp = CONCEPT[t.concept]?.opposite;
     if (opp && owned.has(opp)) errs.push(`opposites coexist: ${t.concept} + ${opp}`);
   }
+  for (const t of tags) if (!genderFits(CONCEPT[t.concept], owned)) errs.push(`${t.concept} on a card that is not ${CONCEPT[t.concept]!.gender}`);
   return errs;
 }
