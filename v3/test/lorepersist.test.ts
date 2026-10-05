@@ -58,6 +58,21 @@ describe('met-cast persistence (LORE §1 story NPCs)', () => {
     expect(g.state.lore.edges.every(e => e.salience <= 0.6 && !e.core)).toBe(true);   // decays, never pinned
   });
 
+  it("a soldier's own saga (the soldier whose deed it was is the focal): a line shows once on their sheet, never under both ties", () => {
+    const { g, soldier, persist } = game(1);
+    g.ensureLoreNode(soldier);
+    const c = fakeChain(soldier.name);
+    Object.assign(c, { focalId: soldier.id, isPersonal: true });
+    persist(c);
+    const aldo = nodeNamed(g, 'Aldo')!, bren = nodeNamed(g, 'Bren')!;
+    const tie = (id: string) => g.state.lore.edges.filter(e => e.from === id && e.to === soldier.id);
+    // their one line was the deed: one memory, the deed's
+    expect(tie(aldo.id).map(e => [e.type, e.blurb])).toEqual([['saved-by', `${soldier.name} dragged Aldo out of the river.`]]);
+    expect(tie(bren.id).map(e => [e.type, e.blurb])).toEqual([['saved-by', 'The guide led the company round the warden.']]);
+    const sheet = g.dossier(soldier.id, { player: true }).split('\n');
+    expect(sheet.filter(l => l.includes('dragged Aldo out of the river'))).toHaveLength(1);
+  });
+
   it('a returning face is not minted again; a name the world already holds (even inactive) is never re-dealt', () => {
     const { g, soldier, persist } = game(2);
     g.state.lore.nodes['lore-old'] = { id: 'lore-old', kind: 'character', name: 'Bren', blurb: 'b', identity: 'b', active: true, createdCycle: 0 };

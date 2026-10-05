@@ -1,6 +1,6 @@
 // The v4 saga flow (src/game/sagaflow.ts) played end to end against a fake host on a real game world, with the mock's
 // floor as the writer: N 2–6, personal and not, every lab path — a failure re-posed, a last chance — to the finale. Each
-// on the build's pipeline (PIPE_ARM, grafts) and on R5's, which every saga dealt before grafts shipped still plays.
+// on PIPE_ARM (grafts, a host that names no pipe arm) and on R5's, which every saga dealt before grafts shipped still plays.
 import { describe, it, expect } from 'vitest';
 import { seedIdCounter } from '../src/engine/cards.js';
 import { LAB_MIN_N, type LabPath } from '../src/engine/lab.js';

@@ -30,10 +30,11 @@
 //                PipeArm): the report's hope, clue, secret and own words; the finale card's stake; one finale result
 //                sentence; a card's trouble as one phrase; the plan's edges, loss and trouble `with`
 //   (C1 core — a call fixing the want, question and answer before the plan — was removed, a measured loss; its runs stay)
-//   G0  the GAME DEFAULT as the game deals it now: the host names no seed or pipe arm, so the build's SEED_ARM and PIPE_ARM
-//       stand (today kit+pick + grafts — C2 with the shipped fixes: gold money on the button only, no doubled hopes), on
-//       A2's deals. The incumbent every round-E arm is read against
-//   ROUND E (engine/saga.ts PipeArm late/trail/narrow): the game default (grafts) plus one change each, on A2's deals:
+//   G0  the BUILD DEFAULT, a host naming no seed or pipe arm: the build's SEED_ARM and PIPE_ARM stand (kit+pick + grafts —
+//       C2 with the shipped fixes: gold money on the button only, no doubled hopes), on A2's deals. The incumbent rounds E,
+//       F and T were read against. NOT the game's pipeline since 2026-10-05: the game's host deals GAME_PIPE by saga type
+//       (TC on hired sagas, PP on personal ones), so a round read against the game reads against TC / PP
+//   ROUND E (engine/saga.ts PipeArm late/trail/narrow): the build default (grafts, G0) plus one change each, on A2's deals:
 //   E1  late     the finale written AFTER play: when the finale comes (the last middle job won, or the last chance) a small
 //                showdown call (plan tier, low effort) writes its job, trouble and loss from the question and answer, the
 //                person the ending decides and its ways, what the company holds (each with its edge's use) and knows, and
@@ -44,7 +45,7 @@
 //                never repeats its clue
 //   E3  narrow   D2's report hope alone: what result, brought and clue miss, show as still hoped (never "show shortfalls")
 //   ROUND F (engine/saga.ts PipeArm line/plain/link/fx; the reader-throwing-sentence diagnosis of 72 G0 sagas, by source
-//   class): the game default (grafts) plus one INPUT change each, on A2's deals — what the writer is given, never a rule:
+//   class): the build default (grafts, G0) plus one INPUT change each, on A2's deals — what the writer is given, never a rule:
 //   F1  line     the trouble as ONE sentence the plan writes (who stands against the job, what they will do, and why), each
 //                job type dealt who stands against it (a talk job: the one to win over, for a reason of their own), in place
 //                of the {who, carry, will} atoms and "armed people or a beast" for every job; every card gets the whole
@@ -60,7 +61,7 @@
 //                sources are the engine's ending person and the finale's measured-out why)
 //   FX  fx       F1 + F2 + F3
 //   ROUND T (engine/saga.ts PipeArm room/weight/voice/lore/page; reports/2026-10-04-sultan-pacing-study.md §3, round E §4.2):
-//   the game default (grafts) plus one change each, on A2's deals; run as generations TA_g1 … (runs/seed1/TA_g1/):
+//   the build default (grafts, G0) plus one change each, on A2's deals; run as generations TA_g1 … (runs/seed1/TA_g1/):
 //   TA  room     the caps only (§3a, the length control): card 110 / finale 140; before 50/70/100; after 70/135/210
 //   TB  weight   each part's size dealt by the engine with what fills it (§3b, b-E): retry card 35, later 45, a first in-person
 //                meeting 100 with how that person looks (`meet`; a report: their entry's `looks`, before 70), card 1 70, finale
@@ -73,14 +74,23 @@
 //                meets, what it turns up), then the answer made only of those, the clues and the hopes, then the finale
 //   THE PERSONAL SET (--run pers1; fixtures/PS S1–S8 on fixtures/Q: 8 company soldiers with varied one-line pasts × draws 1–3,
 //   draws 1–2 the personal path, 3 the bumpy one; every arm shares each slot's deal, runs/pers1/_deals/):
-//   PG0 the game default on personal sagas, as the game deals it (the incumbent)
+//   PG0 the build default on personal sagas, a host naming no arm (C2 grafts; round T's incumbent — the game now deals PP)
 //   PP  past     the default + past and change (North Star item 0): the plan writes the past as two plain sentences (card 1
 //                tells it) and what must change in the soldier (the finale shows it); the engine writes one dossier line
 //                (dossier.md, plan.json `grown`; the game keeps it on the soldier and seeds their next personal saga with it)
+//   THE STACK ROUND (texture-round report §7.4; engine/saga.ts PipeArm voice+line / past+voice / voice+clean): a SHIPPED arm
+//   plus one change, judged against that arm's draws on disk (TC_g1–g3 on seed1, PP_g1–g3 on pers1), the same deals:
+//   S1  voice+line   TC + round F's line (the trouble as ONE plain sentence the plan writes — who, what they will do, why —
+//                    in place of the who/carry/will atoms; each job type dealt who stands against it), and (motive) the
+//                    sentence's reason only where the seed or cast already gives one (round F's forced motives); A2's deals
+//   S2  past+voice   PP + voice on a personal saga: card 1 quotes the soldier saying their past's first sentence IN PLACE of
+//                    its narration (the rest narrated; the plan is PP's own, the engine splits its past), and the finale's
+//                    secret is said by the person in ending (TC's teller; no quoted clue); pers1's shared deals
+//   S3  voice+clean  TC + clean (the context-free verifier's shared-pipeline fixes, engine/saga.ts PipeArm clean); A2's deals
 //
-//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A2c|A3|A4|B1|B2|C2|C3|D1|D2|G0|E1|E2|E3|F1|F2|F3|FX|TA|TB|TC|TD|TP|PG0|PP|all, or <arm>_g<N> = a further generation] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
+//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A2c|A3|A4|B1|B2|C2|C3|D1|D2|G0|E1|E2|E3|F1|F2|F3|FX|TA|TB|TC|TD|TP|PG0|PP|S1|S2|S3|all, or <arm>_g<N> = a further generation] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
 //        [--slots F6_3,F1_1] [--writer sonnet|haiku|openai] [--mock] [--pool 6] [--run seed1|seed2|pers1] [--force]
-//   (PG0 and PP play only the personal set, --run pers1; every other arm only the probe set)
+//   (PG0, PP and S2 play only the personal set, --run pers1; every other arm only the probe set)
 //   npx tsx scripts/sagalab/seedlab.ts --stats [--run seed1]     spend and latency per call kind over the run's folders
 //   npx tsx scripts/sagalab/seedlab.ts --check [--run seed1]     which saga folders are missing or incomplete
 //   npx tsx scripts/sagalab/seedlab.ts --render --arm E1,E2,E3 --slots F6_3 [--out _e_rendered] [--mock] [--run seed1]
@@ -169,20 +179,22 @@ export const ARMS: Record<string, SeedArm> = {
   F1: 'kit+pick', F2: 'kit+pick', F3: 'kit+pick', FX: 'kit+pick',
   TA: 'kit+pick', TB: 'kit+pick', TC: 'kit+pick', TD: 'kit+pick', TP: 'kit+pick',
   PG0: SEED_ARM, PP: 'kit+pick',
+  S1: 'kit+pick', S2: 'kit+pick', S3: 'kit+pick',
 };
 /** the pipeline arms: kit+pick's seed, one pipeline change each (the host's pipeArm; D1, D2 and E1–E3 carry C2's too). G0's is
  *  the build's PIPE_ARM, recorded here for the folder's labels; its host names none */
 export const PIPES: Record<string, PipeArm> = { B2: 'one', C2: 'grafts', C3: 'sides', D1: 'reads', D2: 'fixes', G0: PIPE_ARM, E1: 'late', E2: 'trail', E3: 'narrow', F1: 'line', F2: 'plain', F3: 'link', FX: 'fx',
-  TA: 'room', TB: 'weight', TC: 'voice', TD: 'lore', TP: 'page', PG0: PIPE_ARM, PP: 'past' };
-/** an arm played exactly as the game deals it: its host names no seed or pipe arm (the build's defaults stand) */
-const AS_THE_GAME = new Set(['G0', 'PG0']);
+  TA: 'room', TB: 'weight', TC: 'voice', TD: 'lore', TP: 'page', PG0: PIPE_ARM, PP: 'past', S1: 'voice+line', S2: 'past+voice', S3: 'voice+clean' };
+/** an arm whose host names no seed or pipe arm: the build's SEED_ARM and PIPE_ARM stand (C2 grafts). Not the game's own
+ *  pipeline since 2026-10-05 (engine/saga.ts GAME_PIPE: TC hired, PP personal) */
+const BUILD_DEFAULT = new Set(['G0', 'PG0']);
 /** the personal set's arms: they play only --run pers1, and that run plays only them */
-const PERSONAL_ARMS = new Set(['PG0', 'PP']);
+const PERSONAL_ARMS = new Set(['PG0', 'PP', 'S2']);
 /** seed1: an arm that plays another arm's deals — each slot's dealt world is read back from that arm's plan.json (the
  *  noise control: a later change to the deal — the supporting trades — cannot move its inputs; the pipeline arms: the arm
  *  is the only difference). A later run shares its own deals instead (`SHARED_DEALS`) */
 const REPLAY: Record<string, string> = { A2b: 'A2', A2c: 'A2', B2: 'A2', C2: 'A2', C3: 'A2', D1: 'A2', D2: 'A2', G0: 'A2', E1: 'A2', E2: 'A2', E3: 'A2', F1: 'A2', F2: 'A2', F3: 'A2', FX: 'A2',
-  TA: 'A2', TB: 'A2', TC: 'A2', TD: 'A2', TP: 'A2' };
+  TA: 'A2', TB: 'A2', TC: 'A2', TD: 'A2', TP: 'A2', S1: 'A2', S3: 'A2' };
 /** a further generation of an arm (the power rule): `<arm>_g<N>` plays `<arm>` exactly — its seed, pipe and replayed deals — into
  *  its own folder, runs/<run>/<arm>_g<N>/ */
 const gen = (armId: string) => armId.replace(/_g\d+$/, '');
@@ -191,7 +203,7 @@ const armArg = opt('arm') ?? 'all';
 const PERSONAL_RUN = RUN === 'pers1';
 const ARM_IDS = armArg === 'all' ? Object.keys(ARMS).filter(a => PERSONAL_ARMS.has(a) === PERSONAL_RUN) : armArg.split(',').map(s => s.trim());
 for (const a of ARM_IDS) if (!ARMS[gen(a)]) { console.error(`--arm: ${a} is not one of ${Object.keys(ARMS).join('/')}`); process.exit(2) }
-for (const a of ARM_IDS) if (PERSONAL_ARMS.has(gen(a)) !== PERSONAL_RUN) { console.error(`--arm ${a}: ${PERSONAL_RUN ? 'the personal set (pers1) plays only PG0 and PP' : 'PG0 and PP play only the personal set (--run pers1)'}`); process.exit(2) }
+for (const a of ARM_IDS) if (PERSONAL_ARMS.has(gen(a)) !== PERSONAL_RUN) { console.error(`--arm ${a}: ${PERSONAL_RUN ? 'the personal set (pers1) plays only PG0, PP and S2' : 'PG0, PP and S2 play only the personal set (--run pers1)'}`); process.exit(2) }
 // G0 replays A2's kit+pick deals: a build that deals another seed is no longer what those deals were dealt for (PG0 shares the
 // personal set's kit+pick deals with PP)
 if (ARM_IDS.some(a => ['G0', 'PG0'].includes(gen(a))) && SEED_ARM !== 'kit+pick') { console.error(`--arm G0/PG0: the build now deals ${SEED_ARM}, but G0 replays A2's kit+pick deals (PG0 shares PP's)`); process.exit(2) }
@@ -382,8 +394,8 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
     noteNpcName: () => {},
     hasRoom: t => game.hasRoom(t), rosterCapacity: () => game.rosterCapacity(),
     captiveCount: () => game.captives().length, captiveCapacity: () => game.captiveCapacity(),
-    // G0: the build's own arms, as the game deals them; every other arm names its own
-    ...(AS_THE_GAME.has(gen(armId)) ? {} : { seedArm: () => arm, pipeArm: () => PIPES[gen(armId)] }),
+    // G0 / PG0: the build's own arms (a host naming none); every other arm names its own
+    ...(BUILD_DEFAULT.has(gen(armId)) ? {} : { seedArm: () => arm, pipeArm: () => PIPES[gen(armId)] }),
   };
   const pins: flow.DealPins = {};
   if (fx.personal) pins.personalSeed = base.spark;
@@ -491,7 +503,7 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
   fs.writeFileSync(path.join(dir, 'calls.jsonl'), rec.calls.map(c => JSON.stringify(c)).join('\n') + '\n');
   fs.writeFileSync(path.join(dir, 'plan.json'), JSON.stringify({
     // probe.arm / probe.seed: the fields mech.ts reads (the built storyteller is R5's L · labels · lean)
-    probe: { fixture: fx, base: base.id, arm: { structure: 'L', names: 'labels', cast: 'lean', seed: armId, seedArm: final.world.kit?.arm ?? arm, ...(final.world.pipe ? { pipe: final.world.pipe } : {}), ...(AS_THE_GAME.has(gen(armId)) ? { asTheGame: true } : {}) }, armKey: armId, draw: d, path: path_, seed: { text: seed.text, ...(seed.keywords ? { keywords: seed.keywords } : {}) }, tone: final.world.tone, mock: MOCK, writer: MOCK ? 'mock' : WRITER },
+    probe: { fixture: fx, base: base.id, arm: { structure: 'L', names: 'labels', cast: 'lean', seed: armId, seedArm: final.world.kit?.arm ?? arm, ...(final.world.pipe ? { pipe: final.world.pipe } : {}), ...(BUILD_DEFAULT.has(gen(armId)) ? { buildDefault: true } : {}) }, armKey: armId, draw: d, path: path_, seed: { text: seed.text, ...(seed.keywords ? { keywords: seed.keywords } : {}) }, tone: final.world.tone, mock: MOCK, writer: MOCK ? 'mock' : WRITER },
     engine: {
       cast: final.world.cast, stake: final.world.stake, shape: final.world.shape, places: final.world.places, land: final.world.land, region: final.world.region, N, kind: final.world.kind,
       focal: { id: focal.id, name: focal.name, tags: renderTags(focal.tags) },
@@ -597,7 +609,7 @@ function writeIndex(armId: string) {
     return `| ${id} | ${p.plan.title} | ${p.seedToPlan.text.replace(/\|/g, '/')}${p.seedToPlan.keywords ? ` · ${p.seedToPlan.keywords.join(', ')}` : ''} | ${m.fixture.path} | ${m.fixture.N} | ${m.attempts.map(a => a.outcome[0]!.toUpperCase()).join('')} | ${m.complete ? '✓' : `✗ ${m.problems.join('; ')}`} | ${lint} | ${p.cost.toFixed(4)} | ${(p.latency.card1Ms / 1000).toFixed(1)}s |`;
   });
   fs.writeFileSync(path.join(dir, 'INDEX.md'), [
-    `# ${RUN} · ${MOCK ? 'mock floor · ' : ''}seed arm ${armId} (${ARMS[gen(armId)]}${PIPES[gen(armId)] ? ` + pipe ${PIPES[gen(armId)]}` : ''}${AS_THE_GAME.has(gen(armId)) ? ', as the game deals it' : ''}) · the game's storyteller (src/game/sagaflow.ts)`, '',
+    `# ${RUN} · ${MOCK ? 'mock floor · ' : ''}seed arm ${armId} (${ARMS[gen(armId)]}${PIPES[gen(armId)] ? ` + pipe ${PIPES[gen(armId)]}` : ''}${BUILD_DEFAULT.has(gen(armId)) ? ', the build default (a host naming no arm)' : ''}) · the game's storyteller (src/game/sagaflow.ts)`, '',
     '| saga | title | seed to the plan | path | N | outcomes | complete | lint lines | $ list | card 1 after |',
     '|---|---|---|---|---|---|---|---|---|---|', ...rows, '',
   ].join('\n'));
@@ -667,6 +679,14 @@ const CHANGED: Record<PipeArm, (c: { template: string; flags: string[] }) => boo
   lore: c => c.flags.includes('lore'),
   page: c => c.template === 'plan' && c.flags.includes('page'),
   past: c => c.flags.includes('past') || c.flags.includes('change'),
+  // the standalone clean arm: every plan, card and report it sends carries its `clean` lines
+  clean: c => c.flags.includes('clean'),
+  // the stack round, against its shipped arm. S1 (voice+line): the plan (the line, its sourced why) and every card (the line
+  // beside card 1's quoted line); S2 (past+voice): card 1 (the quoted first sentence of the past) and the finale report (the
+  // secret said by whoever there could know it, `anyteller`, beside the change); S3 (voice+clean): every call clean touches
+  'voice+line': c => c.flags.includes('line') || c.flags.includes('motive'),
+  'past+voice': c => c.flags.includes('quote') || c.flags.includes('teller') || c.flags.includes('anyteller'),
+  'voice+clean': c => c.flags.includes('clean'),
 };
 /** --render: the new or changed prompt variants of the selected pipeline arms, one file per call */
 function render() {

@@ -5,7 +5,7 @@
 
 import { Rng, type RngState } from '../engine/rng.js';
 import {
-  type Card, type Location, HELD, cardType, stackKind, isLiability, freshId, seedIdCounter,
+  type Card, type GrownEntry, type Location, HELD, cardType, stackKind, isLiability, freshId, seedIdCounter,
   idCounter, mintStackable, sameStack,
 } from '../engine/cards.js';
 import { T, renderTags, parseAiTag, CONCEPT, CONCEPTS, GROUPS, validateTags, type Attribute, hasTag, bandWindow, type TagInstance } from '../engine/tags.js';
@@ -46,7 +46,7 @@ import type { AiProvider, ResolveQuestInput, ResolveQuestOut, AskSlotOut, Campai
 import { prefPick, chainPayoff, type TraitPrefs } from '../engine/economy.js';
 import { labFixtureProblems, nextLabOutcome, forceRoll, type LabFixture } from '../engine/lab.js';
 import {
-  hashStr, castableClients, pickClientFace, recentFaces, helped, HURT_BAND, WAY_ENDING, OPPONENT_EDGES, DEALT_TRADES,
+  hashStr, castableClients, pickClientFace, recentFaces, helped, HURT_BAND, WAY_ENDING, OPPONENT_EDGES, DEALT_TRADES, GAME_PIPE,
   type FaceCandidate, type Face, type SagaPos, type CastEntry,
 } from '../engine/saga.js';
 import { raceOf, sexOf } from '../engine/plainwords.js';
@@ -2318,6 +2318,9 @@ export class Game {
       placeOk: p => this.placeRested(p),
       hasRoom: t => this.hasRoom(t), rosterCapacity: () => this.rosterCapacity(),
       captiveCount: () => this.captives().length, captiveCapacity: () => this.captiveCapacity(),
+      // the pipeline by saga type (engine/saga.ts GAME_PIPE): a soldier's own saga PP, every other TC. A saga keeps the
+      // pipe it was dealt (SagaWorld.pipe), so one begun before this shipped plays on as it began
+      pipeArm: chain => GAME_PIPE[chain.isPersonal ? 'personal' : 'other'],
     };
   }
   /** a saga's title wherever the game prints one */
@@ -4439,11 +4442,14 @@ export class Game {
    *  (`personalEdges`), else the past they were fleshed with. Never a generic theme — that is what turned a personal saga
    *  into somebody else's ransom job */
   private personalSeed(merc: Card): string {
-    // a soldier an earlier personal saga changed (saga pipe arm past): their backstory, then what that saga made of them —
-    // never the old wrong alone, as if nothing had happened
-    const grown = merc.character?.grown;
-    if (grown?.length) return `${merc.character?.backstory?.trim() || this.personalSeedBase(merc)} ${grown.join(' ')}`;
-    return this.personalSeedBase(merc);
+    // a soldier an earlier personal saga changed (saga pipe arm past): the seed that saga was dealt, the past it told, then
+    // what it made of them — the past the change resolves, on the base it was told from. Never the old wrong alone, as if
+    // nothing had happened, and never the full backstory (a soldier the company won: its own history, personalSeedBase)
+    const last = merc.character?.grown?.at(-1) as GrownEntry | string | undefined;
+    if (!last) return this.personalSeedBase(merc);
+    // (a save from before entries: the line alone)
+    if (typeof last === 'string') return `${this.personalSeedBase(merc)} ${last}`;
+    return [last.seed, last.past, last.line].filter(Boolean).join(' ');
   }
   private personalSeedBase(merc: Card): string {
     const top = this.personalEdges(merc)[0];
@@ -4605,14 +4611,19 @@ export class Game {
         this.state.lore.nodes[id] = { id, kind: 'character', name: p.name, blurb, identity: blurb, sex: p.sex, race: p.race, active: true, createdCycle: this.state.cycle };
       }
       const theirs = rec.lines.filter(l => inLine(l, p.id));
-      const last = theirs[theirs.length - 1] ?? rec.lines[rec.lines.length - 1];
+      const deed = [...theirs].reverse().find(l => l.decides && l.outcome !== 'failure');
+      const soldier = deed ? this.roster().find(m => m.name === deed.decides) ?? this.state.cards.find(c => c.character && c.name === deed.decides) : undefined;
+      // the soldier whose deed it was IS the focal (their own saga): both ties land on one sheet, so a line is told on one of
+      // them only — the deed on the deed's tie (below), the focal's tie their other last line, or none (the same line under
+      // both showed twice on the soldier's sheet, word for word)
+      const sameSheet = !!soldier && soldier.id === chain.focalId;
+      const rest = sameSheet ? theirs.filter(l => l !== deed) : theirs;
+      const last = rest[rest.length - 1] ?? (theirs.length ? undefined : rec.lines[rec.lines.length - 1]);
       const edges: { from: string; to: string; type: string; blurb: string; importance: number }[] = [];
       // a saga that closed before any report has no line to remember them by: the memory is their part in the matter,
       // under the title the player read (the pre-v4 edge) — never a remembered person with no memory at all
       const part = p.seat === 'opponent' ? 'stood against the company' : p.seat === 'client' ? 'asked the company for help' : 'was caught up';
-      edges.push({ from: id, to: chain.focalId, type: p.seat === 'opponent' ? 'rival-of' : 'party-to', blurb: last?.text ?? `${part} in the matter of "${plan.title}"`, importance: 0.5 });
-      const deed = [...theirs].reverse().find(l => l.decides && l.outcome !== 'failure');
-      const soldier = deed ? this.roster().find(m => m.name === deed.decides) ?? this.state.cards.find(c => c.character && c.name === deed.decides) : undefined;
+      if (last || !sameSheet) edges.push({ from: id, to: chain.focalId, type: p.seat === 'opponent' ? 'rival-of' : 'party-to', blurb: last?.text ?? `${part} in the matter of "${plan.title}"`, importance: 0.5 });
       if (deed && soldier) {
         this.ensureLoreNode(soldier);
         edges.push({ from: id, to: soldier.id, type: p.seat === 'opponent' ? 'rival-of' : 'saved-by', blurb: deed.text, importance: 0.5 });
@@ -4663,12 +4674,19 @@ export class Game {
       // personal finale: bank crystallizes as gold + pinned CORE memory (no new character)
       const surplus = cashValue(chain.bank);
       this.addGold(surplus);
-      // (saga pipe arm past, a lab arm: engine/saga.ts PipeArm) the soldier's change, as the engine's one dossier line, is the
-      // memory the saga leaves — their sheet shows it in both UIs — and it is kept on them to seed their next personal saga
-      // (personalSeed). Every other saga leaves "came through <title>"
+      // (pipe arm past, the game's personal pipeline: engine/saga.ts GAME_PIPE) the soldier's change, as the engine's one
+      // dossier line, is the memory the saga leaves — their sheet shows it in both UIs — and it is kept on them to seed their
+      // next personal saga (personalSeed), beside the seed this saga was dealt and the past it told (the past the change
+      // resolves). A saga with no such line (its plan wrote no change, or it was dealt before PP shipped) leaves "came
+      // through <title>". Either is this saga's own memory, a new fact beside any earlier saga's (`fresh`), never merged
       const grown = chain.saga?.grown;
-      if (grown && focal?.character) focal.character.grown = [...(focal.character.grown ?? []), grown];
-      guardEdges(st.lore, [{ from: chain.focalId, to: chain.focalId, type: 'scarred-by', blurb: grown ? this.clampBlurb(grown, 160) : `came through ${this.sagaTitle(chain)}`, importance: 0.9 }], st.cycle, () => freshId('e'));
+      if (grown && focal?.character) {
+        const past = chain.saga!.plan?.cast.find(p => p.seat === 'soldier')?.past?.trim();
+        const entry: GrownEntry = { seed: chain.saga!.world.seed.text, ...(past ? { past: /[.!?]$/.test(past) ? past : `${past}.` } : {}), line: grown };
+        focal.character.grown = [...(focal.character.grown ?? []), entry];
+      }
+      guardEdges(st.lore, [{ from: chain.focalId, to: chain.focalId, type: 'scarred-by', importance: 0.9, fresh: true,
+        blurb: grown ? this.clampBlurb(grown, 160) : `came through ${this.sagaTitle(chain)}` }], st.cycle, () => freshId('e'));
       report.push(`🏅 ${focal?.name}'s story closes: +${surplus}g and a mark that stays.`);
       return;
     }

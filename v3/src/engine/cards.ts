@@ -19,6 +19,9 @@ export interface AttrVector { str: number; dex: number; int: number; cha: number
 
 export type Focus = { kind: 'none' } | { kind: 'single'; attr: Attribute } | { kind: 'dual'; a: Attribute; b: Attribute };
 
+/** what one personal saga made of its soldier (CharacterData.grown) */
+export interface GrownEntry { seed: string; past?: string; line: string }
+
 export interface CharacterData {
   role: CharRole;
   level: number;
@@ -36,9 +39,10 @@ export interface CharacterData {
    *  normally writes them at delivery; this is what the fallback flesh pass has to work from when
    *  it doesn't (2026-08-27: without it a rescued shrine novice was given a courtesan's past). */
   origin?: { title: string; situation: string; job: string };
-  /** what their own sagas made of them: one engine-written dossier line per personal saga that changed them (saga pipe arm
-   *  past, SagaRecord.grown) — read back as the seed of their next personal saga, after the backstory */
-  grown?: string[];
+  /** what their own sagas made of them, one entry per personal saga that changed them (saga pipe arm past): the seed that
+   *  saga was dealt, the past it told (the plan's `past`) and its engine-written dossier line (SagaRecord.grown, the change).
+   *  The last entry, whole, seeds their next personal saga (game.ts personalSeed) */
+  grown?: GrownEntry[];
 }
 
 export interface Card {

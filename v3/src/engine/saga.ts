@@ -34,8 +34,8 @@ export type { SeedArm } from './seedkit.js';
  *  the lab; the golden parity test pins 'themes', the R5 lab's seed) */
 export const SEED_ARM: SeedArm = 'kit+pick';
 /** a PIPELINE arm on top of kit+pick (North Star 8: shape what the AI is given, split the work into small steps;
- *  scripts/sagalab/seedlab.ts B2/C2/C3/D1/D2). The build deals PIPE_ARM; absent, the pipeline is R5's, byte for byte (the
- *  golden parity, the seed lab's A arms, and every saga dealt before grafts shipped).
+ *  scripts/sagalab/seedlab.ts B2/C2/C3/D1/D2). The game deals GAME_PIPE by saga type, a host naming none PIPE_ARM; absent,
+ *  the pipeline is R5's, byte for byte (the golden parity, the seed lab's A arms, and every saga dealt before grafts shipped).
  *   one     B2  the pick chooses one keyword, told so; the plan gets only it (one object to follow)
  *   grafts  C2  R6's class fixes: the road prints the plan's own why per later job (no outline call; a flagged why leaves
  *               the title), the card's hope goes to its report, the finale buttons are the engine's, the gold way is paid
@@ -109,6 +109,18 @@ export const SEED_ARM: SeedArm = 'kit+pick';
  *               · card: no advice or orders; report: the hope never restated (what result and clue miss of it shown), the
  *                 cost paid in the deciding moment, known facts laid out or said (never a soldier's
  *                 thoughts), no wound or price in the summary; at the finale no `plan` beside the result (its fate)
+ *               · (verify 3, the stack round's S3) the trouble: each type dealt who stands against it (`AGAINST`, as line;
+ *                 "armed people or a beast" made talk jobs fights), asked as who / `with` / will, and every card gets it as
+ *                 ONE phrase (`troublePhrase`; three parts came back "They carry X. They will Y.", "carry … a hunting dog");
+ *                 a met person's role is the whole trade, definite (`roleOf`: "the guild master", never "a master" — an
+ *                 indefinite read as an introduction, pasted as an appositive on every card); latest, retry, a premise's
+ *                 want and unknown, and what a report brought name people as every other field does; a last chance's stake
+ *                 keeps its owner in names; the cost is its owner's own thing (`ownCost`: a bare "horse" lamed the held
+ *                 racehorse); the job is "the task asked of you", no advice (card 1 narrated it as done); a learn is what the
+ *                 soldiers find, see or hear there (a watcher's sighting in a sneak job was never shown, then "known"); the
+ *                 seed's people are in the cast, or added if none fits (the seed's "someone" patch, and a personal seed's
+ *                 brother the plan could not add); the hope glossed plainly; on a personal saga the secret is said by whoever
+ *                 there could know it (`anyteller`, as S2)
  *   room    TA  caps only (§3a, the length control): card 110, finale card 140; before 50/70/100; after 70/135/210, +20 per
  *               thing shown, ceiling 210 (the finale +15 per thing past two). Same payloads, same prompts
  *   weight  TB  each part's size dealt by the ENGINE with the content that fills it (§3b, b-E): a retry card 35, a later card
@@ -139,28 +151,56 @@ export const SEED_ARM: SeedArm = 'kit+pick';
  *               happened and at what event or season — when as a count of years broke "no numbers" — who was hurt, what the soldier still carries), told plainly on card 1 (cap 90), and
  *               `change` (how the soldier must be different by the end, from their past or traits), shown happening in the
  *               finale report (+20); at a finale not lost the engine writes ONE dossier line from it (`grownLine`,
- *               SagaRecord.grown) — the game keeps it on the soldier (character.grown, their sheet's memory) and seeds
- *               their next personal saga with the backstory + that line
+ *               SagaRecord.grown) — the game keeps it on the soldier (their sheet's memory; character.grown, beside the
+ *               seed the saga was dealt and the past it told) and seeds their next personal saga with seed + past + line
+ *  STACK ROUND (texture-round report §7.4; seedlab S1–S3), each a shipped arm plus ONE more change, judged against that arm:
+ *   voice+line   S1  TC + F1's line, and (motive) the line's why only where the seed or cast already gives one: F1's
+ *                    trouble sentence had to give every foe a reason, so the plan invented one (forced or from nowhere, marked
+ *                    44 → 92: "…for they are paid by the hive") or borrowed the hidden answer's — a mandate with no source
+ *   past+voice   S2  PP + voice's card-1 line and finale teller (no quoted clue): (quote) the soldier says their past's first
+ *                    sentence, quoted, IN PLACE of its narration — the engine splits the plan's past, the card quotes the first
+ *                    sentence and narrates the rest, never both (round F: two card-1 additions overload the ~70-word card; one
+ *                    fact, one owner). The plan is PP's own: a plan-written line (voice's `says`) overran the plan budget, PP
+ *                    sitting at it. (verify) The card quotes the plan's third-person sentence in the first person ("their old
+ *                    wrong, quoted, first person"; the rest "what followed"), and the finale's secret is said by whoever there
+ *                    could know it — nobody named (`anyteller`): a personal secret is often the soldier's own reason, which the
+ *                    one in their way cannot know ("you hid it, and you were too ashamed"); "built from known" is gone (the
+ *                    secret is new beyond known)
+ *   voice+clean  S3  TC + clean (the verifier's shared fixes above)
  *  (C1 `core` — a call fixing the want, question and answer before the plan — was removed: a measured loss, follow 26–116) */
 export type PipeArm = 'one' | 'grafts' | 'sides' | 'reads' | 'fixes' | 'late' | 'trail' | 'narrow' | 'line' | 'plain' | 'link' | 'fx'
-  | 'room' | 'weight' | 'voice' | 'lore' | 'page' | 'past' | 'clean';
+  | 'room' | 'weight' | 'voice' | 'lore' | 'page' | 'past' | 'clean' | 'voice+line' | 'past+voice' | 'voice+clean';
 export const PIPE_ARMS: readonly PipeArm[] = ['one', 'grafts', 'sides', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx',
-  'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean'];
+  'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean'];
+/** the pieces an arm is made of: an arm's own change, or a piece of one — voice (TC) is three lines, each its own piece
+ *  (`says` card 1's line, `witness` a won clue said by someone met, `teller` the finale's secret said), so an arm can take some;
+ *  `quote` and `motive` are the stack round's (S2's quoted first sentence of the past, in place of its narration; S1's sourced
+ *  why) */
+export type PipePart = Exclude<PipeArm, 'voice' | 'voice+line' | 'past+voice' | 'voice+clean'> | 'says' | 'witness' | 'teller' | 'quote' | 'motive';
+const VOICE: readonly PipePart[] = ['says', 'witness', 'teller'];
 /** the changes each pipe arm carries, by the arm that brought each in: D1, D2, E1–E3 and F1–F3 are C2 plus one change each;
- *  FX is C2 plus all of round F */
-const PIPE_PARTS: Record<PipeArm, readonly PipeArm[]> = {
+ *  FX is C2 plus all of round F; the stack arms a shipped arm plus one change */
+const PIPE_PARTS: Record<PipeArm, readonly PipePart[]> = {
   one: ['one'], grafts: ['grafts'], sides: ['sides'], reads: ['grafts', 'reads'], fixes: ['grafts', 'fixes'],
   late: ['grafts', 'late'], trail: ['grafts', 'trail'], narrow: ['grafts', 'narrow'],
   line: ['grafts', 'line'], plain: ['grafts', 'plain'], link: ['grafts', 'link'], fx: ['grafts', 'line', 'plain', 'link'],
-  room: ['grafts', 'room'], weight: ['grafts', 'weight'], voice: ['grafts', 'voice'], lore: ['grafts', 'lore'],
+  room: ['grafts', 'room'], weight: ['grafts', 'weight'], voice: ['grafts', ...VOICE], lore: ['grafts', 'lore'],
   page: ['grafts', 'page'], past: ['grafts', 'past'], clean: ['grafts', 'clean'],
+  'voice+line': ['grafts', ...VOICE, 'line', 'motive'], 'past+voice': ['grafts', 'past', 'teller', 'quote'],
+  'voice+clean': ['grafts', ...VOICE, 'clean'],
 };
 /** whether a dealt world's pipe arm carries `part` */
-export const piped = (w: Pick<SagaWorld, 'pipe'>, part: PipeArm): boolean => !!w.pipe && PIPE_PARTS[w.pipe].includes(part);
-/** the pipeline this build ships (designer 2026-10-04): C2 grafts, ahead on follow in all three generations (83–61) and on
- *  keep beyond the noise floor (93–51) — scripts/sagalab/reports/2026-10-04-pipeline-round.md §3.1. A host may name
- *  another, or none (SagaHost.pipeArm: the seed lab) */
+export const piped = (w: Pick<SagaWorld, 'pipe'>, part: PipePart): boolean => !!w.pipe && PIPE_PARTS[w.pipe].includes(part);
+/** the pipeline of a host that names none (designer 2026-10-04): C2 grafts, ahead on follow in all three generations (83–61)
+ *  and on keep beyond the noise floor (93–51) — scripts/sagalab/reports/2026-10-04-pipeline-round.md §3.1. The seed lab's
+ *  G0 and PG0 play it, so they keep meaning this default; the GAME's host names its own per saga (GAME_PIPE) */
 export const PIPE_ARM: PipeArm = 'grafts';
+/** the pipeline the GAME deals, by saga type (designer 2026-10-05: build what wins; both measured in round T —
+ *  scripts/sagalab/reports/2026-10-04-texture-round.md §7): a personal saga plays PP (`past`: grafts + the soldier's past
+ *  and change, the change kept on them as a dossier line that seeds their next personal saga), every other saga TC
+ *  (`voice`: grafts + the asker's own line on card 1, quoted clues, the secret spoken). Each saga type gets exactly the one
+ *  change it was measured with (PP + voice on one card 1 is untested). game.ts sagaHost reads it */
+export const GAME_PIPE: Readonly<Record<'personal' | 'other', PipeArm>> = { personal: 'past', other: 'voice' };
 
 // ─── shapes, job types, ways (§2.4.1) ──────────────────────────────────────────────────────────
 
@@ -339,7 +379,7 @@ export interface SagaWorld {
   region: string; level: number;
   /** a kit arm's seed (North Star 7): absent on the theme arm */
   kit?: SagaKit;
-  /** the pipeline arm (PipeArm): the build deals PIPE_ARM; absent, R5's pipeline */
+  /** the pipeline arm (PipeArm): the game deals GAME_PIPE by saga type, a host naming none PIPE_ARM; absent, R5's pipeline */
   pipe?: PipeArm;
 }
 /** a kit arm's seed: what the dealer dealt, then what the pick and premise calls made of it (filled before the plan) */

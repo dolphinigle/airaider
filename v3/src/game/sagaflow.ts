@@ -24,7 +24,7 @@ import {
 import {
   newKnowing, newState, planSaga, seedSteps, writeOutline, writeCard, writeReport, firstCardPayload, laterCardPayload, reportPayload,
   questLog, logLines, noteDelivered, forLineShown, onThisMatter, jobWhy, roadLines, roadHopes, mockOutline, bank, triedLine,
-  revealLint, choiceTarget, fateSentence, knowingOf, keepKnowing, roadOf, toNullable, PRONOUN, graftRoad, toldOption,
+  revealLint, choiceTarget, fateSentence, knowingOf, keepKnowing, roadOf, toNullable, PRONOUN, graftRoad, toldOption, cannedOption,
   writeLate, cardWhy, grownLine, cardHope, withLead, mentions,
   type ReportCall,
 } from '../ai/storyteller.js';
@@ -51,9 +51,9 @@ export interface SagaHost {
   placeOk?(p: string): boolean;
   /** the seed arm to deal (North Star 7); absent: the build's SEED_ARM. The seed lab names one */
   seedArm?(): SeedArm;
-  /** the pipeline arm on top of the seed (engine/saga.ts PipeArm); absent: the build's PIPE_ARM. The seed lab names one,
-   *  or none (undefined: R5's pipeline, its A arms) */
-  pipeArm?(): PipeArm | undefined;
+  /** the pipeline arm on top of the seed (engine/saga.ts PipeArm), per saga; absent: PIPE_ARM. The game's host picks one
+   *  by saga type (GAME_PIPE); the seed lab names one, or none (undefined: R5's pipeline, its A arms) */
+  pipeArm?(chain: Chain): PipeArm | undefined;
   // the predicates settleFinale reads, for the Outcome line (sagaFate)
   hasRoom(type: string): boolean;
   rosterCapacity(): number;
@@ -111,7 +111,7 @@ export function deal(host: SagaHost, chain: Chain, lead: Pick<Lead, 'lab'> | und
     focalId: focal.id, cast: c.cast, stake: d.stake, places: c.places, land: c.land, seed: d.seed, tone: d.tone,
     region: chain.region, level: chain.level, ...(d.kit ? { kit: d.kit } : {}),
   };
-  const pipe = host.pipeArm ? host.pipeArm() : PIPE_ARM;
+  const pipe = host.pipeArm ? host.pipeArm(chain) : PIPE_ARM;
   if (pipe) world.pipe = pipe;
   const rec = newRecord(world);
   chain.saga = rec;
@@ -168,7 +168,7 @@ export function posOf(rec: SagaRecord): SagaPos {
 export async function card(host: SagaHost, chain: Chain): Promise<SagaCardOut> {
   const rec = recOf(chain), plan = planOf(rec), w = rec.world;
   const pos = posOf(rec);
-  const options = pos.finale ? plan.options.map(o => ({ ...o })) : undefined;
+  const options = pos.finale ? buttons(rec) : undefined;
   const c = rec.cache;
   if (c && c.pos.job === pos.job && c.pos.finale === pos.finale && c.pos.attempt === pos.attempt)
     return { title: c.title, prose: c.prose, job: c.job, rows: c.rows, logFirst: true, matter: c.matter, pos, ...(options ? { options } : {}) };
@@ -241,7 +241,21 @@ export function asks(type: EpisodeType, n: number, personal: boolean, soldierInJ
 export const pinsSoldier = (rec: SagaRecord, n: number): boolean => rec.world.personal && (rec.ownJobs ?? []).includes(n);
 /** D2: the finale's approach groups from the plan's ways: the plan's label, the way's reward kind and its test */
 export function approaches(rec: SagaRecord): { id: string; label: string; rewardKind: 'recruit' | 'captive' | 'gold'; way: Way; test: EpisodeTest }[] {
-  return planOf(rec).options.map((o, i) => ({ id: `g${i}`, label: o.label, rewardKind: WAY_REWARD[o.way], way: o.way, test: WAY_TESTS[o.way] }));
+  return buttons(rec).map((o, i) => ({ id: `g${i}`, label: o.label, rewardKind: WAY_REWARD[o.way], way: o.way, test: WAY_TESTS[o.way] }));
+}
+/** the plan's cast as engine lines name them now: anyone the player has met by name (Knowing `met`) is called by it, as a
+ *  face known from the start is (storyteller refOf) — never "the human noble" for someone the reports already named */
+const castNow = (rec: SagaRecord): CastEntry[] => {
+  const k = knowingOf(rec);
+  return planOf(rec).cast.map(p => !p.known && k.met.has(p.id) ? { ...p, known: true } : p);
+};
+/** the ending buttons as the player reads them, and as the report and the memory tell the one chosen: pipe arm grafts's
+ *  are the engine's (cannedOption), rendered from where the story stands (`castNow`); any other arm's as the plan wrote them */
+export function buttons(rec: SagaRecord): { way: Way; label: string }[] {
+  const plan = planOf(rec);
+  if (!piped(rec.world, 'grafts')) return plan.options.map(o => ({ ...o }));
+  const cast = castNow(rec);
+  return plan.options.map(o => ({ way: o.way, label: cannedOption(o.way, cast, true) }));
 }
 
 /** what the reckoning rolled for one saga quest (the game's real party and dice) */
@@ -266,11 +280,12 @@ export interface ReportIn { call: ReportCall; hurt: Hurt[]; cost?: Cost; decides
 /** a saga quest's report payload, at the reckoning, synchronously in the roll loop: who decides (D5), the hurt (D3, on the
  *  main rng), the fate line (D18). The writer call (`writeSagaReport`) runs after, in parallel with the others */
 export function reportIn(host: SagaHost, chain: Chain, pos: SagaPos, prose: string, roll: SagaRoll): ReportIn {
-  const plan = planOf(recOf(chain));
   const { decides, lowest } = decidesOf(roll.party, roll.tests);
   const r = rollHurt(host.rng, roll.outcome, roll.party, lowest);
   const hurt = clampHurt(roll.outcome, r.hurt);
-  const option = pos.finale ? plan.options.find(o => o.way === roll.way) ?? plan.options[0] : undefined;
+  // the button chosen, as the player read it
+  const ways = pos.finale ? buttons(recOf(chain)) : [];
+  const option = pos.finale ? ways.find(o => o.way === roll.way) ?? ways[0] : undefined;
   const fate = pos.finale && option ? sagaFate(fateFacts(host, chain, option.way, roll.outcome, roll.fate)) : undefined;
   const call = reportCall(host, chain, pos, prose, { party: roll.party, decides, outcome: roll.outcome, hurt, cost: r.cost, option, fate, gravity: roll.gravity });
   return { call, hurt, ...(r.cost ? { cost: r.cost } : {}), decides, lowest, ...(option ? { option } : {}), ...(fate ? { fate } : {}) };
@@ -295,7 +310,8 @@ export function reportCall(host: Pick<SagaHost, 'direction'>, chain: Chain, pos:
   const t = {
     ...(piped(w, 'room') ? { room: true } : {}),
     ...(piped(w, 'weight') ? { weight: true, ...(meet && meet.id !== cardMet?.id ? { meet } : {}) } : {}),
-    ...(piped(w, 'voice') ? { voice: true } : {}),
+    // (teller) on a personal saga with the past told (S2) or clean, nobody named: whoever there could know the secret says it
+    ...(piped(w, 'witness') ? { witness: true } : {}), ...(piped(w, 'teller') ? { teller: w.personal && (piped(w, 'past') || clean) ? 'any' as const : true } : {}),
     ...(piped(w, 'lore') && plan.lore ? { lore: plan.lore } : {}),
     ...((c => w.personal && piped(w, 'past') && c ? { change: c } : {})(plan.cast.find(p => p.seat === 'soldier')?.change)),
   };
@@ -309,7 +325,7 @@ export function reportCall(host: Pick<SagaHost, 'direction'>, chain: Chain, pos:
 }
 /** a finale button's deed as the writer and the story's own lines get it (storyteller toldOption): the report's `plan`,
  *  the memory the saga leaves. The button itself keeps its label */
-export const toldLabel = (rec: SagaRecord, o: { way: Way; label: string }): string => toldOption(o, planOf(rec).cast, piped(rec.world, 'grafts'));
+export const toldLabel = (rec: SagaRecord, o: { way: Way; label: string }): string => toldOption(o, castNow(rec), piped(rec.world, 'grafts'));
 /** the report writer (or its floor) */
 export const writeSagaReport = (host: SagaHost, call: ReportCall) => writeReport(host.ai, call, (kind, t) => host.log(kind, t));
 

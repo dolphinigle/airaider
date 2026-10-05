@@ -16,8 +16,11 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
   // (D2), trail (E2), line (F1) and link (F3) on grafts, line and link together (FX)
   // round T (TA–TD, TP, PP) on grafts, one change each: voice, lore, page, past (past only reaches a personal plan); and the
   // standalone clean arm (the verifier's shared fixes, in no round-T arm)
-  plan: [[], ['keywords', 'support'], ['premise', 'support'], ...['grafts', 'sides'].map(pipe => ['keywords', 'support', pipe]), ...['fixes', 'trail', 'line', 'link'].map(pipe => ['keywords', 'support', 'grafts', pipe]), ['keywords', 'support', 'grafts', 'line', 'link'],
-    ...[['clean'], ['voice'], ['lore'], ['page'], ['past']].map(arm => ['keywords', 'support', 'grafts', ...arm])].flatMap(seed => [['notrade'], []].flatMap(cast => subsets(['personal', 'memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, ...seed], vars: {} })))),
+  plan: [[], ['keywords', 'support'], ['premise', 'support'], ...['grafts', 'sides'].map(pipe => ['keywords', 'support', pipe]), ...[['fixes', 'with'], ['trail'], ['line', 'against'], ['link']].map(pipe => ['keywords', 'support', 'grafts', ...pipe]), ['keywords', 'support', 'grafts', 'line', 'against', 'link'],
+    // (clean deals each type's `against` and asks the trouble's `with`, as line and fixes do)
+    ...[['clean', 'against', 'with'], ['voice'], ['lore'], ['page'], ['past']].map(arm => ['keywords', 'support', 'grafts', ...arm]),
+    // the stack round: TC + line with its sourced why (motive, S1); TC + clean (S3). S2's plan is PP's own
+    ...[['voice', 'line', 'against', 'motive'], ['voice', 'clean', 'against', 'with']].map(arm => ['keywords', 'support', 'grafts', ...arm])].flatMap(seed => [['notrade'], []].flatMap(cast => subsets(['personal', 'memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, ...seed], vars: {} })))),
   // (pipe arm sides: a plan with sides deals no parts, so `side` never meets `part`; pipe arm fixes, D2, on any card: `lose`
   // on every finale, beside `will` but at a last chance)
   card: ['first', 'later', 'finale'].flatMap(pos => subsets(['memory', 'direction', 'intro', 'part', 'side', ...(pos === 'first' ? ['personal', 'returning'] : []), ...(pos === 'finale' ? ['lastchance', 'lose'] : []),
@@ -31,8 +34,11 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
     // (round T rides on kit+pick: a hired kit card names nobody by part, and a returning face is never on a personal saga, so
     // `part` and `returning` never meet there)
     // (clean: the standalone arm of the verifier's shared fixes, in no round-T arm)
-    .flatMap(extra => extra.includes('fixes') || extra.includes('line') || extra.includes('side') || (extra.includes('part') && extra.includes('returning')) ? [extra] : pos === 'first'
-      ? [extra, [...extra, 'clean'], [...extra, 'says'], [...extra, 'lore'], ...(extra.includes('personal') ? [[...extra, 'past']] : [])]
+    // (the stack round: card 1's line beside line's trouble sentence, S1, or clean, S3; a personal past's first sentence said as
+    // the line, the rest narrated or none left, S2)
+    .flatMap(extra => extra.includes('line') && pos === 'first' && !extra.includes('fixes') && !extra.includes('side') ? [extra, [...extra, 'says']]
+      : extra.includes('fixes') || extra.includes('line') || extra.includes('side') || (extra.includes('part') && extra.includes('returning')) ? [extra] : pos === 'first'
+      ? [extra, [...extra, 'clean'], [...extra, 'says'], [...extra, 'clean', 'says'], [...extra, 'lore'], ...(extra.includes('personal') ? [[...extra, 'past'], [...extra, 'says', 'quote', 'past'], [...extra, 'says', 'quote']] : [])]
       : pos === 'later' && !extra.includes('retry') ? [extra, [...extra, 'clean'], [...extra, 'meet']] : [extra, [...extra, 'clean']])
     .map(extra => ({ flags: [pos, ...extra], vars: { MAX: pos === 'finale' ? 90 : 70 } }))),
   outline: [{ flags: [], vars: {} }],
@@ -58,7 +64,7 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
     // the standalone clean arm (labels everywhere, `away` for the named but absent; the hope never restated, the cost in the
     // deciding moment, known facts laid out or said, no wound or price in the summary) — never with narrow
     .flatMap(s => s.includes('fixes') || s.includes('side') || s.includes('narrow') ? [s] : [s, ...[['clean'], ...(s.includes('people') ? [['clean', 'away']] : []), ...(s.includes('intro') ? [['meet']] : []), ...(s.includes('clue') ? [['witness']] : []),
-      ...(s.includes('answer') ? [['teller'], ['lore'], ['change']] : [])].map(arm => [...s, ...arm])]).flatMap(s =>
+      ...(s.includes('answer') ? [['teller'], ['lore'], ['change'], ['clean', 'teller'], ['anyteller'], ['anyteller', 'change'], ['clean', 'anyteller']] : []), ...(s.includes('clue') ? [['clean', 'witness']] : [])].map(arm => [...s, ...arm])]).flatMap(s =>
     [['moved'], ...(s.some(f => ['decides', 'result', 'clue', 'brought'].includes(f)) ? [] : [['failure', 'stopped']])].map(end => ({ flags: ['saga', ...s, ...end], vars: { B: 60, A: 140 } }))),
 };
 
@@ -124,7 +130,8 @@ describe('saga prompt budget (the shipped R5 templates)', () => {
     expect(renderSaga('card', ['finale', 'latest', 'will', 'lose', 'fixes'], { MAX: 90 })).toContain('- job: the task, and where. trouble: who stands in the way. lose: who loses what if this fails.');
     expect(renderSaga('card', ['later', 'latest', 'why', 'will', 'fixes'], { MAX: 70 })).not.toMatch(/carry|what they will do/);
     // the plan: each edge beats the showdown's trouble, the loss is what that trouble takes, the trouble says `with`
-    const plan = renderSaga('plan', ['types', 'keywords', 'support', 'grafts', 'fixes']), plain = renderSaga('plan', ['types', 'keywords', 'support', 'grafts']);
+    // (the plan payload sends `with` beside fixes)
+    const plan = renderSaga('plan', ['types', 'keywords', 'support', 'grafts', 'fixes', 'with']), plain = renderSaga('plan', ['types', 'keywords', 'support', 'grafts']);
     expect(plan).toContain('edge: for each job\'s gain, in order, how it helps beat the trouble here.');
     expect(plan).toContain('loses for good if the trouble here does what they will.');
     expect(plan.match(/"with": "≤6 words"/g)).toHaveLength(2);

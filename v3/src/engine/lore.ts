@@ -181,9 +181,11 @@ export function modelEdges<T extends { from: string; to: string }>(proposed: T[]
   return (proposed ?? []).filter(e => e.from !== e.to);
 }
 
-/** persist AI-emitted edges, guarded: both endpoints must resolve; type must be in the enum */
+/** persist AI-emitted edges, guarded: both endpoints must resolve; type must be in the enum. `fresh`: a NEW fact the
+ *  engine wrote (the memory a saga leaves its own soldier) — appended as its own memory, never merged into an older edge
+ *  of the same tie (a soldier's second saga memory merged into the first: dropped from their sheet, or overwriting it) */
 export function guardEdges(g: LoreGraph, proposed: {
-  from: string; to: string; type: string; blurb: string; importance: number; sourceQuestId?: string;
+  from: string; to: string; type: string; blurb: string; importance: number; sourceQuestId?: string; fresh?: boolean;
 }[], cycle: number, idGen: () => string, sourceChainId?: string): RelEdge[] {
   const ok: RelEdge[] = [];
   for (const p of proposed) {
@@ -193,7 +195,7 @@ export function guardEdges(g: LoreGraph, proposed: {
     // DEDUP: an active edge with the same (from,to,type) is the SAME memory retold —
     // refresh it (touch + best blurb) instead of stacking near-copies (LORE §2 append
     // is for NEW facts; a repeated fact re-anchors salience)
-    const dup = g.edges.find(e => e.active && e.type === p.type &&
+    const dup = !p.fresh && g.edges.find(e => e.active && e.type === p.type &&
       ((e.from === p.from && e.to === p.to) || (e.from === p.to && e.to === p.from)));
     if (dup) {
       touchEdge(dup, cycle, importance * 0.3);
