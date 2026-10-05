@@ -75,6 +75,32 @@ Once signed, this is the saga spec and wins over the sections in §4.6, whose **
      - **RF, the retry reads the failure: (a) held, (b) dropped.** (a): the failed job's report is dealt that the people, things and place the job names still stand. (b): the retry card gets only the failure and the job, and its report gets no hope. Contradictions after a failure, out of 27 failures each: TC 6, HP 4, RF 2 (both soft; hard ones 4 → 0). On F3_3, TC and HP staked the barn on the first job in 5 sagas, and 4 contradicted it (7 in all); RF did so once and kept it standing. On RF's 24 draw-3 sagas: follow held 7–9, keep 15–6, S10 −0.33 [−0.69, +0.04]. The retry cards got barer (84 against 102 words), one invented an asker, and failures read as repeats. (b) is redundant once the target stands. (a) alone needs one cheap draw-3 run; if it holds, (a) ships on both pipes. Watch (a)'s stamp: "stayed hidden" / "was still…" 7 against 1.
    - **Measurement law (round H): a J3 margin of ±10 held can come from the incumbent's draw alone.** On draws 1–2, RF sends TC's exact prompts. That fresh TC generation, judged against TC_g1–g3 over 48 slots, went follow 15–24 and keep 25–13 held, yet S10 moved only +0.01 [−0.27, +0.29]. So S1's keep 39–20 and HP's +10/+11 sit inside the A/A swing. TC_g1–g3 is a strong-follow, weak-keep draw, which is why every arm judged against it won keep. Trust S10 paired inside one batch, and J3 only against two incumbent draws. S10 levels still shift by batch (TC 6.03 / 6.19 / 6.35), while test-retest is r = 0.83–0.86.
    - **PLATEAU (the stack round and round H, North Star 4):** save fa86555 as the state. The next change is bigger: build the recurring personal arc (North Star 0: the living dossier and chain B), and for hired sagas *deal* the asker a past instead of asking the plan for one.
+   - **Built (recurring arc, 2026-10-05, uncommitted):**
+     - **The living dossier** (`engine/dossier.ts`, no AI call; at most 6 lines): Now, then marks, then Earlier, then People. It is refreshed whenever a saga closes and shown with the same lines in the GUI sheet and the CLI `merc`.
+     - **Chain B:** a soldier whose last personal saga ended done and changed them gets a next chapter after 6 cycles. The 25% drip and one-personal-lead rule stagger it.
+     - **What chain B's plan gets:** a dealt kit situation as its new matter, plus `now` (the dossier's Now). It never gets the marks or the old wrong.
+   - **Did not (inputs to chain B):**
+     - The old wrong sent as `history`: 8 of 8 real chain Bs retold it, 3 nearly word for word.
+     - The settled marks sent in the seed: 4 of 8 reopened them.
+     - **Principle (B1, a third time):** the plan builds on whatever it is handed about the soldier.
+   - **Measured, chain B (CB; 3 generations × 24 pers1 slots; one S10 batch with chain A = PP and PG0):**
+     - S10: CB − PP −0.64 [−0.87, −0.41] (worse in 46 of 72 pairs); CB − PG0 +0.15 [−0.11, +0.41].
+     - Read beside chain A: a new matter 24 yes / 36 partly / 12 no; grows out of the change 9 / 38 / 25; followable 20 / 52 / 0.
+     - Chain B reads at the old personal default's level, not chain A's. Enabled anyway: the designer ruled yes, and it is never unfollowable.
+     - **Why:** the Now is chain A's change, written as the old flaw undone ("stopped running"), and it is chain B's only personal item.
+       - The change copies the Now (11 of 72 word for word). The overlap tracks the builds-on read: 0.34 / 0.40 / 0.56.
+       - 40 of 72 pasts invent a second old wrong of the same shape.
+       - Card 1 resets the change ("She joked, as always").
+       - "The change goes further" in the prompt did not move it (L12).
+     - **What works:** the 8 that succeed hand the change a new person to act on.
+     - **Next:** deal chain B's personal item (a returning person from chain A, or a trait it tests), and send the Now to the writers only — `reports/2026-10-05-recurring-arcs.md`.
+   - **Measurement law (recurring arc):** the word-overlap retelling lint (`retellShare`) is blind. It scored 0.04–0.30 on all 72, while the readers called 48 retold or half-retold. Retelling is by shape (the same flaw, beat and question), not by words. Log the change-vs-Now overlap instead.
+   - **Not shipped: RF(a) alone (RFA, against TC).**
+     - Hard retry contradictions fell 4 → 2, all in one saga, and all contradictions 8 → 4.
+     - The class left: the barn was taken, not destroyed. `stands` covers existence, not possession.
+     - S10 −0.12 [−0.54, +0.31]. Round H's RF, with part (b), was −0.33, so (b) was the dip.
+     - It fails the pre-registered "hard ≈ 0". Next: widen the fact to "still standing and within the company's reach", then one cheap rerun.
+   - **Kept: the cost owner** (a defect fix on both game pipes). A partial's cost is one engine phrase naming its owner ("the company's own horse, lamed"). Real chain-B partials: 0 of 66 given to the wrong owner, against PP's 1 of 66 ("A guard's horse bolted… lamed its leg"). The voice pipe's version is not yet seen on real text.
    - **Did not:** prompt-wording rounds (each one only moved the stock sentence somewhere else — R2→R3→R4); `why` as an action (invented uses); the answer written last (clues before an answer existed); an outline call blind to the plan (detour jobs); "the secret in pieces" (the reason went unsaid); engine ledger lines under reports the writer never saw (contradictions); the landmark as a dealt place (every saga's hub); name-substitution heuristics; "the answer must fit every ending" (stock buried-hoard answers); the theme library (too specific, brings its own people). Older: re-rolls, rewrite loops and AI-verifies-AI gates (net negative — single-shot ruling); keyword-mix variety arms on the old storyteller (null).
 
 ## D. The designer's answers (2026-10-01) — they amend everything below

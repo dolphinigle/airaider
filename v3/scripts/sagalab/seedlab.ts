@@ -98,10 +98,27 @@
 //                      names, and its place, still stand (and, when it is posed again, that it is); a retry's card loses the
 //                      plan's pre-play why and trouble (the failure's summary names what stopped them) and its report the
 //                      hope. Only the draw-3 slots (bumpy / lastchance) fail; on draws 1–2 RF plays TC's prompts
+//   RECURRING PERSONAL ARCS (North Star 0, designer 2026-10-05; round H §6) and round H's held part (a):
+//   RFA voice+stands   RF part (a) ALONE on TC as measured: a failed middle job's report is dealt that whoever and whatever
+//                      the job names, and its place, still stand; the retry keeps TC's card (why, trouble) and report (hope).
+//                      No cost fix (`owncost`), so it differs from TC_g1–g3 on disk by `stands` alone. A2's deals; it plays
+//                      only the draw-3 slots, where jobs fail (F1_3 … F8_3; any other slot selected is skipped)
+//   CB  past + history chain B (--run pers1, generations only: CB_g<N>): each slot's SAME soldier, their chain A taken from
+//                      PP_g<N>/<slot> (its plan's past and change, the growth line, the finale line) — kept on the soldier as
+//                      the game keeps it (character.grown) and composed into their living dossier (engine/dossier.ts, the
+//                      game's own functions; no lore in the lab, so no People line). Chain B is dealt anew (the story rng
+//                      keyed apart from chain A's) and seeded as the game seeds a next chapter: a dealt situation as the
+//                      seed, its new matter, and the dossier's Now beside it (`now`: livingSeed, no settled marks — sent
+//                      them, 4 of 8 CB_g1 plans reopened the settled matter); the settled past (`history`) is kept for the log-only
+//                      retelling lint, never sent (handed it, 8 of 8 real chain Bs retold it: runs/_superseded/pers1/
+//                      CB_history_g1). Writes the saga in the judge format, plus prev.md (chain A's card 1 and
+//                      finale report: the retelling check — NOT in order.txt, not read as the saga) and dossier.md (the
+//                      dossier before chain B, its history, and the dossier after). A slot whose chain A left no growth line
+//                      (its finale lost, or no change written) has no chain B: it FAILS, logged, and --check lists it missing
 //
-//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A2c|A3|A4|B1|B2|C2|C3|D1|D2|G0|E1|E2|E3|F1|F2|F3|FX|TA|TB|TC|TD|TP|PG0|PP|S1|S2|S3|HP|RF|all, or <arm>_g<N> = a further generation] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
+//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A2c|A3|A4|B1|B2|C2|C3|D1|D2|G0|E1|E2|E3|F1|F2|F3|FX|TA|TB|TC|TD|TP|PG0|PP|S1|S2|S3|HP|RF|RFA|CB_g<N>|all, or <arm>_g<N> = a further generation] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
 //        [--slots F6_3,F1_1] [--writer sonnet|haiku|openai] [--mock] [--pool 6] [--run seed1|seed2|pers1] [--force]
-//   (PG0, PP and S2 play only the personal set, --run pers1; every other arm only the probe set)
+//   (PG0, PP, S2 and CB play only the personal set, --run pers1; every other arm only the probe set)
 //   npx tsx scripts/sagalab/seedlab.ts --stats [--run seed1]     spend and latency per call kind over the run's folders
 //   npx tsx scripts/sagalab/seedlab.ts --check [--run seed1]     which saga folders are missing or incomplete
 //   npx tsx scripts/sagalab/seedlab.ts --render --arm E1,E2,E3 --slots F6_3 [--out _e_rendered] [--mock] [--run seed1]
@@ -158,7 +175,9 @@ import type { Outcome, SlotTest } from '../../src/engine/roll.js';
 import type { Attribute } from '../../src/engine/tags.js';
 import { renderTags } from '../../src/engine/tags.js';
 import { hashStr, seedOf, SEED_ARM, PIPE_ARM, type SeedArm, type PipeArm, type Face, type Hurt, type SagaRecord, type SagaWorld, type SagaPlan } from '../../src/engine/saga.js';
-import { logLines, matterLine, buttonLine, pageChecks } from '../../src/ai/storyteller.js';
+import { logLines, matterLine, buttonLine, pageChecks, retellShare } from '../../src/ai/storyteller.js';
+import { composeLiving, livingLines, livingSeed, historyOf, type LifeMark } from '../../src/engine/dossier.js';
+import type { GrownEntry } from '../../src/engine/cards.js';
 import * as flow from '../../src/game/sagaflow.js';
 import type { TextRec } from './extract.js';
 import { glossEchoes, cardStamps } from './mech.js';
@@ -191,32 +210,40 @@ export const ARMS: Record<string, SeedArm> = {
   TA: 'kit+pick', TB: 'kit+pick', TC: 'kit+pick', TD: 'kit+pick', TP: 'kit+pick',
   PG0: SEED_ARM, PP: 'kit+pick',
   S1: 'kit+pick', S2: 'kit+pick', S3: 'kit+pick',
-  HP: 'kit+pick', RF: 'kit+pick',
+  HP: 'kit+pick', RF: 'kit+pick', RFA: 'kit+pick', CB: 'kit+pick',
 };
 /** the pipeline arms: kit+pick's seed, one pipeline change each (the host's pipeArm; D1, D2 and E1–E3 carry C2's too). G0's is
  *  the build's PIPE_ARM, recorded here for the folder's labels; its host names none */
 export const PIPES: Record<string, PipeArm> = { B2: 'one', C2: 'grafts', C3: 'sides', D1: 'reads', D2: 'fixes', G0: PIPE_ARM, E1: 'late', E2: 'trail', E3: 'narrow', F1: 'line', F2: 'plain', F3: 'link', FX: 'fx',
   TA: 'room', TB: 'weight', TC: 'voice', TD: 'lore', TP: 'page', PG0: PIPE_ARM, PP: 'past', S1: 'voice+line', S2: 'past+voice', S3: 'voice+clean',
-  HP: 'voice+asker', RF: 'voice+setback' };
+  HP: 'voice+asker', RF: 'voice+setback', RFA: 'voice+stands', CB: 'past' };
 /** an arm whose host names no seed or pipe arm: the build's SEED_ARM and PIPE_ARM stand (C2 grafts). Not the game's own
  *  pipeline since 2026-10-05 (engine/saga.ts GAME_PIPE: TC hired, PP personal) */
 const BUILD_DEFAULT = new Set(['G0', 'PG0']);
 /** the personal set's arms: they play only --run pers1, and that run plays only them */
-const PERSONAL_ARMS = new Set(['PG0', 'PP', 'S2']);
+const PERSONAL_ARMS = new Set(['PG0', 'PP', 'S2', 'CB']);
+/** chain B (North Star 0): seeded from PP_g<N>'s chain A in the same slot, dealt its own deal (never the run's shared one) */
+const CHAIN_B = new Set(['CB']);
+/** an arm that changes only the failure path plays only the draw-3 slots (bumpy / lastchance): on draws 1–2 it would send the
+ *  incumbent's exact prompts (RFA) */
+const DRAW3_ONLY = new Set(['RFA']);
+const plays = (armId: string, d: number) => !DRAW3_ONLY.has(gen(armId)) || (d - 1) % 3 === 2;
 /** seed1: an arm that plays another arm's deals — each slot's dealt world is read back from that arm's plan.json (the
  *  noise control: a later change to the deal — the supporting trades — cannot move its inputs; the pipeline arms: the arm
  *  is the only difference). A later run shares its own deals instead (`SHARED_DEALS`) */
 const REPLAY: Record<string, string> = { A2b: 'A2', A2c: 'A2', B2: 'A2', C2: 'A2', C3: 'A2', D1: 'A2', D2: 'A2', G0: 'A2', E1: 'A2', E2: 'A2', E3: 'A2', F1: 'A2', F2: 'A2', F3: 'A2', FX: 'A2',
-  TA: 'A2', TB: 'A2', TC: 'A2', TD: 'A2', TP: 'A2', S1: 'A2', S3: 'A2', HP: 'A2', RF: 'A2' };
+  TA: 'A2', TB: 'A2', TC: 'A2', TD: 'A2', TP: 'A2', S1: 'A2', S3: 'A2', HP: 'A2', RF: 'A2', RFA: 'A2' };
 /** a further generation of an arm (the power rule): `<arm>_g<N>` plays `<arm>` exactly — its seed, pipe and replayed deals — into
  *  its own folder, runs/<run>/<arm>_g<N>/ */
 const gen = (armId: string) => armId.replace(/_g\d+$/, '');
 const armArg = opt('arm') ?? 'all';
 /** the personal set (pers1) plays only its own arms; every other run only the others */
 const PERSONAL_RUN = RUN === 'pers1';
-const ARM_IDS = armArg === 'all' ? Object.keys(ARMS).filter(a => PERSONAL_ARMS.has(a) === PERSONAL_RUN) : armArg.split(',').map(s => s.trim());
+const ARM_IDS = armArg === 'all' ? Object.keys(ARMS).filter(a => PERSONAL_ARMS.has(a) === PERSONAL_RUN && !CHAIN_B.has(a)) : armArg.split(',').map(s => s.trim());
 for (const a of ARM_IDS) if (!ARMS[gen(a)]) { console.error(`--arm: ${a} is not one of ${Object.keys(ARMS).join('/')}`); process.exit(2) }
-for (const a of ARM_IDS) if (PERSONAL_ARMS.has(gen(a)) !== PERSONAL_RUN) { console.error(`--arm ${a}: ${PERSONAL_RUN ? 'the personal set (pers1) plays only PG0, PP and S2' : 'PG0, PP and S2 play only the personal set (--run pers1)'}`); process.exit(2) }
+for (const a of ARM_IDS) if (PERSONAL_ARMS.has(gen(a)) !== PERSONAL_RUN) { console.error(`--arm ${a}: ${PERSONAL_RUN ? 'the personal set (pers1) plays only PG0, PP, S2 and CB' : 'PG0, PP, S2 and CB play only the personal set (--run pers1)'}`); process.exit(2) }
+// chain B reads chain A from the PP generation of the same number: CB_g2 ← PP_g2
+for (const a of ARM_IDS) if (CHAIN_B.has(gen(a)) && !/_g\d+$/.test(a)) { console.error(`--arm ${a}: chain B runs as generations, CB_g<N>, each seeded from PP_g<N>`); process.exit(2) }
 // G0 replays A2's kit+pick deals: a build that deals another seed is no longer what those deals were dealt for (PG0 shares the
 // personal set's kit+pick deals with PP)
 if (ARM_IDS.some(a => ['G0', 'PG0'].includes(gen(a))) && SEED_ARM !== 'kit+pick') { console.error(`--arm G0/PG0: the build now deals ${SEED_ARM}, but G0 replays A2's kit+pick deals (PG0 shares PP's)`); process.exit(2) }
@@ -255,6 +282,7 @@ interface DealSrc { dealt: { seed: SagaWorld['seed']; tone: string; kit: SagaWor
 /** where this arm's deal comes from, if it replays one: seed1 — REPLAY's arm (its plan.json in the slot); a later run — the
  *  run's shared deal for the slot, written from this arm's own deal when it is the first kit+pick arm there */
 function dealSource(armId: string, slot: string, w: SagaWorld): { from: string; src: DealSrc } | undefined {
+  if (CHAIN_B.has(gen(armId))) return undefined;
   if (!SHARED_DEALS) { const from = REPLAY[gen(armId)]; return from ? { from, src: readJson<DealSrc>(path.join(armDir(from), slot, 'plan.json')) } : undefined }
   if (ARMS[gen(armId)] !== 'kit+pick') return undefined;
   const file = path.join(dealsDir, `${slot}.json`);
@@ -390,17 +418,43 @@ const words = (s: string | undefined) => (s ?? '').split(/\s+/).filter(Boolean).
 
 interface Row { id: string; path: string; N: number; outcomes: string; files: number; complete: boolean; problems: string[]; cost: number; card1Ms: number; title: string; seed: string; keywords: string; dev: string[] }
 
+/** (CB) a soldier's chain A as chain B reads it — PP_g<N>'s saga in the same slot — kept on the soldier as the game keeps it
+ *  (game.ts settleFinale: the grown entry) and composed into their living dossier with the game's own functions
+ *  (engine/dossier.ts); prev.md's text (chain A's card 1 and finale report) */
+interface ChainA { from: string; entry: GrownEntry; marks: LifeMark[]; dossier: NonNullable<ReturnType<typeof composeLiving>>; history: string; prev: string }
+function chainAOf(armId: string, slot: string, focal: Card): ChainA {
+  const dir = path.join(armDir(armId.replace(/^CB/, 'PP')), slot), from = path.relative(path.join(LAB, 'runs'), dir);
+  const p = readJson<{ plan: SagaPlan; grown?: string; seedToPlan: { text: string }; lines: SagaRecord['lines']; engine: { N: number } }>(path.join(dir, 'plan.json'));
+  if (!p.grown) throw new Error(`${slot}: chain A (${from}) left no growth line (its finale lost, or no change written) — no chain B`);
+  const past = p.plan.cast.find(c => c.seat === 'soldier')?.past?.trim();
+  const entry: GrownEntry = { seed: p.seedToPlan.text, ...(past ? { past: /[.!?]$/.test(past) ? past : `${past}.` } : {}), line: p.grown, title: p.plan.title, chainId: `${from}`, cycle: 0 };
+  const fin = p.lines.find(l => l.n >= p.engine.N);
+  const text = fin?.text ?? 'it slipped away before its finale';
+  const marks: LifeMark[] = [{ title: p.plan.title, kind: 'own', text, people: p.plan.cast.filter(c => c.seat !== 'soldier').map(c => ({ name: c.name, label: c.label })) }];
+  const dossier = composeLiving({ name: focal.name, who: focal.character!.who, grown: [entry], marks, people: [], cycle: 0 })!;
+  focal.character!.grown = [entry];
+  focal.character!.living = dossier;
+  const meta = readJson<{ attempts: { k: number; isFinale: boolean }[] }>(path.join(dir, 'meta.json'));
+  const finK = meta.attempts.find(a => a.isFinale)?.k;
+  const prev = [`# ${focal.name}'s chain A (${from}) — for the retelling check only; NOT part of the saga the readers judge`, '',
+    '## chain A, card 1', '', fs.readFileSync(path.join(dir, 'card_1.md'), 'utf8').trim(), '',
+    '## chain A, the finale report', '', finK ? fs.readFileSync(path.join(dir, `report_${finK}.md`), 'utf8').trim() : '(none)', ''].join('\n');
+  return { from, entry, marks, dossier, history: historyOf([entry])!, prev };
+}
+
 async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string): Promise<Row> {
   const arm = ARMS[gen(armId)]!, id = `${fx.id}_${d}`, path_ = pathOf(fx, d);
   const w = buildWorld(fx, d);
   const { game, chain, focal, base } = w;
+  // (CB) chain B: the same soldier, carrying their chain A; dealt anew (its own story rng)
+  const chainA = CHAIN_B.has(gen(armId)) ? chainAOf(armId, id, focal) : undefined;
   const N = fx.N, budget = chain.failureBudget;
   const prov = providerFor(base.seed);
   const rec = new Recorder(prov.ai, prov.name);
   const dev: string[] = [];
   const play = new Rng(hashStr(`seedlab:play:${fx.id}:${d}:${path_}`));   // the same in every arm
   const host: flow.SagaHost = {
-    rng: play, storyRng: new Rng(hashStr(`seedlab:story:${fx.id}:${d}`)), ai: rec.asProvider(), state: game.state,
+    rng: play, storyRng: new Rng(hashStr(`seedlab:story:${fx.id}:${d}${chainA ? ':chainB' : ''}`)), ai: rec.asProvider(), state: game.state,
     card: cid => game.card(cid), roster: () => game.roster(), direction: () => undefined,
     log: (k, t) => dev.push(`${k}: ${t}`),
     takenName: n => game.state.cards.some(c => c.character && c.name === n),
@@ -411,7 +465,9 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
     ...(BUILD_DEFAULT.has(gen(armId)) ? {} : { seedArm: () => arm, pipeArm: () => PIPES[gen(armId)] }),
   };
   const pins: flow.DealPins = {};
-  if (fx.personal) pins.personalSeed = base.spark;
+  // (CB) as the game seeds a next chapter (game.ts personalSeedOf): the living dossier, and the settled past as history
+  if (fx.personal) pins.personalSeed = chainA ? livingSeed(chainA.dossier) : base.spark;
+  if (chainA) pins.history = chainA.history;
   if (fx.returning) { const r = fx.returning; pins.returningClient = { id: 'n1', name: r.name, sex: r.sex, race: r.race, memory: r.memory, where: r.where, ...(r.trade ? { trade: r.trade } : {}) } satisfies Face }
 
   // the deal (synchronous), then the kit's pick and premise and the plan
@@ -516,7 +572,7 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
   fs.writeFileSync(path.join(dir, 'calls.jsonl'), rec.calls.map(c => JSON.stringify(c)).join('\n') + '\n');
   fs.writeFileSync(path.join(dir, 'plan.json'), JSON.stringify({
     // probe.arm / probe.seed: the fields mech.ts reads (the built storyteller is R5's L · labels · lean)
-    probe: { fixture: fx, base: base.id, arm: { structure: 'L', names: 'labels', cast: 'lean', seed: armId, seedArm: final.world.kit?.arm ?? arm, ...(final.world.pipe ? { pipe: final.world.pipe } : {}), ...(BUILD_DEFAULT.has(gen(armId)) ? { buildDefault: true } : {}) }, armKey: armId, draw: d, path: path_, seed: { text: seed.text, ...(seed.keywords ? { keywords: seed.keywords } : {}) }, tone: final.world.tone, mock: MOCK, writer: MOCK ? 'mock' : WRITER },
+    probe: { fixture: fx, base: base.id, arm: { structure: 'L', names: 'labels', cast: 'lean', seed: armId, seedArm: final.world.kit?.arm ?? arm, ...(final.world.pipe ? { pipe: final.world.pipe } : {}), ...(BUILD_DEFAULT.has(gen(armId)) ? { buildDefault: true } : {}) }, armKey: armId, draw: d, path: path_, seed: { text: seed.text, ...(seed.now ? { now: seed.now } : {}), ...(seed.keywords ? { keywords: seed.keywords } : {}) }, tone: final.world.tone, mock: MOCK, writer: MOCK ? 'mock' : WRITER },
     engine: {
       cast: final.world.cast, stake: final.world.stake, shape: final.world.shape, places: final.world.places, land: final.world.land, region: final.world.region, N, kind: final.world.kind,
       focal: { id: focal.id, name: focal.name, tags: renderTags(focal.tags) },
@@ -533,13 +589,26 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
     // round T: TP's log-only checks (the answer names only people a job meets; each learn names what its job turns up — the
     // first runs on every arm's plan, for the rate); PP's dossier line (absent: none written)
     pageChecks: pageChecks(plan), ...(final.grown !== undefined ? { grown: final.grown } : {}),
+    // (CB) the chain A it was seeded from: where, the grown entry, the dossier as the seed, the history
+    // (the retelling lint's share — log-only telemetry: how much of chain B's new past chain A's past already said)
+    ...(chainA ? { chainA: { from: chainA.from, grown: chainA.entry, dossierBefore: livingLines(chainA.dossier), history: chainA.history, retell: retellShare(plan, final.world) ?? null } } : {}),
     validation: { defects: [], redraws: Math.max(0, callOf('plan').length - 1), fallback: final.fallback },
     dev, textLint, lines: final.lines, banked: final.state, knowing: final.knowing, ending: final.ending ?? null,
     cost, latency: { planMs, card1Ms, calls: rec.calls.map(c => ({ purpose: c.purpose, ms: c.durationMs })) },
   }, null, 2));
   // (PP) the soldier's sheet after the saga: the one dossier line the engine wrote (never in order.txt: the judges read the
   // saga as played, and this is the soldier's sheet, not the quest)
-  if (final.grown) fs.writeFileSync(path.join(dir, 'dossier.md'), `${focal.name} — dossier, after the saga:\n- ${final.grown}\n`);
+  if (chainA) {
+    // (CB) the living dossier before chain B (its seed) and its history, then after: chain B's own line and ending on top
+    const pastB = plan.cast.find(c => c.seat === 'soldier')?.past?.trim();
+    const entryB: GrownEntry | undefined = final.grown ? { seed: final.world.seed.text, ...(pastB ? { past: pastB } : {}), line: final.grown, title: plan.title, chainId: chain.id, cycle: 1 } : undefined;
+    const finB = final.lines.find(l => l.n >= N);
+    const textB = finB?.text ?? 'it slipped away before its finale';
+    const after = composeLiving({ name: focal.name, who: focal.character!.who, grown: [chainA.entry, ...(entryB ? [entryB] : [])], marks: [{ title: plan.title, kind: 'own', text: textB, people: plan.cast.filter(c => c.seat !== 'soldier').map(c => ({ name: c.name, label: c.label })) }, ...chainA.marks], people: [], cycle: 1 })!;
+    fs.writeFileSync(path.join(dir, 'dossier.md'), [`${focal.name} — the living dossier before chain B (its seed):`, ...livingLines(chainA.dossier), '',
+      `history (the old wrong chain A settled): ${chainA.history}`, '', 'after chain B:', ...livingLines(after), ''].join('\n'));
+    fs.writeFileSync(path.join(dir, 'prev.md'), chainA.prev);
+  } else if (final.grown) fs.writeFileSync(path.join(dir, 'dossier.md'), `${focal.name} — dossier, after the saga:\n- ${final.grown}\n`);
   const meta = {
     fixture: { id, set: PERSONAL_RUN ? 'PS' : 'P', seed: base.seed, path: path_, N, kind: fx.kind, personal: fx.personal, probe: fx.id, draw: d },
     run: `${RUN}/${path.basename(path.dirname(dir))}`, chainId: chain.id, chainState: chain.state, seedArm: final.world.kit?.arm ?? arm, ...(final.world.pipe ? { pipe: final.world.pipe } : {}),
@@ -548,7 +617,7 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
   fs.writeFileSync(path.join(dir, 'meta.json'), JSON.stringify(meta, null, 2));
   return {
     id, path: path_, N, outcomes: attempts.map(a => (a.outcome ?? '?')[0]!.toUpperCase()).join(''), files: order.length,
-    complete: problems.length === 0, problems, cost, card1Ms, title: plan.title, seed: seed.text, keywords: (seed.keywords ?? []).join(', '), dev,
+    complete: problems.length === 0, problems, cost, card1Ms, title: plan.title, seed: seed.now ? `${seed.text} · now: ${seed.now}` : seed.text, keywords: (seed.keywords ?? []).join(', '), dev,
   };
 }
 
@@ -589,6 +658,7 @@ async function main() {
   // every arm's slots in one queue, interleaved slot by slot (so a stop part-way leaves every arm about as far along)
   const jobs: { armId: string; fx: ProbeFixture; d: number; dir: string }[] = [];
   for (const { fx, d } of PLAY) for (const armId of ARM_IDS) {
+    if (!plays(armId, d)) continue;
     const dir = path.join(armDir(armId), `${fx.id}_${d}`);
     if (!FORCE && complete(dir)) { console.log(`[${armId} ${fx.id}_${d}] complete — skipped (--force to redo)`); continue }
     jobs.push({ armId, fx, d, dir });
@@ -706,6 +776,14 @@ const CHANGED: Record<PipeArm, (c: { template: string; flags: string[] }) => boo
   'voice+asker': c => c.flags.includes('askerpast'),
   'voice+setback': c => c.flags.includes('stands') || c.flags.includes('setback')
     || (c.template === 'report' && !['hope', 'failure', 'answer'].some(f => c.flags.includes(f))),
+  // RFA: a failed middle job's report (`stands`); nothing else changed
+  'voice+stands': c => c.flags.includes('stands'),
+};
+/** an arm whose new variants are not its pipe's (CHANGED): chain B on PP — the pick's, the plan's and card 1's `next` (who the
+ *  soldier is now, the dealt situation), and a report with a cost (the cost fix: one phrase naming its owner — the payload
+ *  changes, not the prompt) */
+const CHANGED_ARM: Record<string, (c: { template: string; flags: string[] }) => boolean> = {
+  CB: c => c.flags.includes('next') || (c.template === 'report' && c.flags.includes('cost')),
 };
 /** --render: the new or changed prompt variants of the selected pipeline arms, one file per call */
 function render() {
@@ -732,7 +810,7 @@ function render() {
       if (!fs.existsSync(file)) { console.log(`${armId} ${slot}: no calls.jsonl — skipped`); continue }
       for (const c of fs.readFileSync(file, 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l) as CallRec)) {
         const key = `${armId}|${c.template}|${c.flags.join(', ')}`;
-        if (!CHANGED[pipe](c) || seen.has(key)) continue;
+        if (!(CHANGED_ARM[gen(armId)] ?? CHANGED[pipe])(c) || seen.has(key)) continue;
         seen.add(key);
         added++;
         const name = `${MOCK ? 'mock-' : ''}${armId}_${slot}_${c.template}_${String(c.n).padStart(2, '0')}.md`;
@@ -754,7 +832,8 @@ function check() {
   let bad = 0;
   for (const armId of ARM_IDS) {
     const missing: string[] = [], incomplete: string[] = [];
-    for (const { fx, d } of PLAY) {
+    const mine = PLAY.filter(x => plays(armId, x.d));
+    for (const { fx, d } of mine) {
       const dir = path.join(armDir(armId), `${fx.id}_${d}`);
       if (!fs.existsSync(path.join(dir, 'meta.json'))) missing.push(`${fx.id}_${d}`);
       else if (!complete(dir)) incomplete.push(`${fx.id}_${d}`);
@@ -765,7 +844,7 @@ function check() {
       }
     }
     bad += missing.length + incomplete.length;
-    console.log(`${armId}: ${PLAY.length - missing.length - incomplete.length}/${PLAY.length} complete${missing.length ? ` · missing ${missing.join(' ')}` : ''}${incomplete.length ? ` · incomplete ${incomplete.join(' ')}` : ''}`);
+    console.log(`${armId}: ${mine.length - missing.length - incomplete.length}/${mine.length} complete${missing.length ? ` · missing ${missing.join(' ')}` : ''}${incomplete.length ? ` · incomplete ${incomplete.join(' ')}` : ''}`);
   }
   if (bad) process.exitCode = 1;
 }

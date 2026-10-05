@@ -91,14 +91,16 @@ export function firstMeet(rec: SagaRecord, plan: SagaPlan, e: Episode, finale: b
 
 // ─── deal (synchronous: runs in runPursue's prefix, so two queued pursues never share a theme or a name) ─
 
-/** what the game chose before the deal: a personal saga's seed, and the known faces (D9, D10) */
-export interface DealPins { personalSeed?: string; focalMemory?: { memory: string; where: string }; returningClient?: Face; seedPerson?: Face & { rival: boolean } }
+/** what the game chose before the deal: a personal saga's seed, and the known faces (D9, D10). `history`: a soldier's NEXT
+ *  personal saga (chain B, C…) — the old wrong their last chapter settled (engine/dossier.ts `historyOf`); its seed is then
+ *  a dealt situation, and `personalSeed` their living dossier's Now beside it (`now`) */
+export interface DealPins { personalSeed?: string; history?: string; focalMemory?: { memory: string; where: string }; returningClient?: Face; seedPerson?: Face & { rival: boolean } }
 
 export function deal(host: SagaHost, chain: Chain, lead: Pick<Lead, 'lab'> | undefined, focal: Card, pins: DealPins = {}): SagaRecord {
   const personal = chain.isPersonal;
   host.state.recentThemeIds ??= [];
   const arm = host.seedArm?.() ?? SEED_ARM;
-  const d = dealSaga(host.storyRng, host.state.recentThemeIds, { personal, personalSeed: pins.personalSeed, spark: lead?.lab?.spark, ...(arm !== 'themes' ? { arm } : {}) });
+  const d = dealSaga(host.storyRng, host.state.recentThemeIds, { personal, personalSeed: pins.personalSeed, spark: lead?.lab?.spark, ...(arm !== 'themes' ? { arm } : {}), ...(personal && pins.history ? { next: true } : {}) });
   const c = castSaga(host.storyRng, {
     focal, personal, region: chain.region, shape: d.shape, taken: n => host.takenName(n), prefs: host.npcPrefs?.(),
     ...(host.takenTrade ? { takenTrade: (t: string) => host.takenTrade!(t) } : {}),
@@ -110,6 +112,7 @@ export function deal(host: SagaHost, chain: Chain, lead: Pick<Lead, 'lab'> | und
     personal, N: chain.expectedBeats, kind: chain.kind === 'gold-hoard' ? 'gold' : chain.kind, shape: d.shape,
     focalId: focal.id, cast: c.cast, stake: d.stake, places: c.places, land: c.land, seed: d.seed, tone: d.tone,
     region: chain.region, level: chain.level, ...(d.kit ? { kit: d.kit } : {}),
+    ...(personal && pins.history ? { history: pins.history } : {}),
   };
   const pipe = host.pipeArm ? host.pipeArm(chain) : PIPE_ARM;
   if (pipe) world.pipe = pipe;
@@ -306,8 +309,9 @@ export function reportCall(host: Pick<SagaHost, 'direction'>, chain: Chain, pos:
   // (pipe arm clean) the hope its card was dealt, checked when that card came (`cardHope`)
   // (pipe arm voice+setback, RF) a retry's card was dealt no hope, so neither is its report (the card it reads tells the failure:
   // dealt again as `last`, the summary came back a copy of it); a failed middle job's report, that the job still stands
+  // (pipe arm voice+stands, RFA) RF's part (a) alone: the failed job's report is dealt `stands`; the retry stays TC's
   const clean = piped(rec.world, 'clean'), setback = piped(rec.world, 'setback') && !pos.finale;
-  const stands = setback && f.outcome === 'failure' ? standsFact(triedAgain(chain, f.party.length)) : undefined;
+  const stands = (setback || (piped(rec.world, 'stands') && !pos.finale)) && f.outcome === 'failure' ? standsFact(triedAgain(chain, f.party.length)) : undefined;
   const hope = piped(rec.world, 'grafts') && !pos.finale && !(setback && pos.attempt > 1) ? clean ? cardHope(plan, rec.world, pos.job, rec.hopes, knowingOf(rec)) : jobWhy(plan, pos.job, rec.hopes) : undefined;
   // round T: room, weight (+ a first in-person meeting here — none again for the one this job's card met, verify: the report
   // repeated the card's looks word for word), voice, lore (its payoff), past (the soldier's change)
@@ -331,6 +335,8 @@ export function reportCall(host: Pick<SagaHost, 'direction'>, chain: Chain, pos:
     ...(piped(rec.world, 'narrow') ? { narrow: true } : {}),
     ...(Object.keys(t).length ? { t } : {}), ...(clean ? { clean: true } : {}),
     ...(stands ? { stands } : {}),
+    // (owncost, the game's pipes: round H §5) a partial's cost as one phrase naming its owner
+    ...(piped(rec.world, 'owncost') ? { ownCost: true } : {}),
   });
 }
 /** (pipe arm voice+setback, RF) whether a failed middle job is posed again: the failure bankBeat is about to count and the party's

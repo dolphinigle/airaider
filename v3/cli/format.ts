@@ -283,6 +283,8 @@ export const render = {
       `focus: ${ch.focus.kind === 'none' ? 'none (generalist growth)' : ch.focus.kind === 'single' ? `${ch.focus.attr.toUpperCase()} (one GREAT stat)` : `${ch.focus.a.toUpperCase()}+${ch.focus.b.toUpperCase()} (two GOOD)`} · who: ${ch.who ?? '—'}`,
       ch.backstory ? `backstory: ${ch.backstory}` : '',
       ch.quirks?.length ? `quirks: ${ch.quirks.join('; ')}` : '',
+      // the living dossier (STORY_ENGINE §4) — the GUI sheet's "Story so far", the same lines
+      (l => l.length ? `story so far:\n${l.map(x => `  ${x}`).join('\n')}` : '')(g.livingLines(m.id)),
       `dossier:\n${g.dossier(m.id, { player: true }) || '  (no memories yet)'}`,
     ].filter(Boolean).join('\n');
   },

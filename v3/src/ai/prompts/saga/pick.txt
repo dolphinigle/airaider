@@ -4,11 +4,12 @@ The data:
 [[!situations]][[!personal]]- situation: what the story is about.[[/!personal]]
 [[situations]]- situations: what the story could be about.
 [[personal]]- past: a company soldier's old wrong, the story's root.
+[[next]]- now: who the company soldier at its heart is now.
 - tone: how it should feel.
 - cast: its people.
 [[!people]]- keywords: things it could use.[[/!people]][[people]]- keywords, people: what it could use.[[/people]]
 
-[[!count]]Choose[[situations]] the one situation and[[/situations]] the one to three keywords that best fit [[situations]]the cast, the tone and each other[[/situations]][[!situations]]the [[!personal]]situation[[/!personal]][[personal]]past[[/personal]], the tone and the cast[[/!situations]] in one clear story. Copy each exactly.
+[[!count]]Choose[[situations]] the one situation and[[/situations]] the one to three keywords that best fit [[situations]]the cast, the tone and each other[[/situations]][[!situations]]the [[!personal]]situation[[/!personal]][[personal]]past[[/personal]],[[next]] the soldier,[[/next]] the tone and the cast[[/!situations]] in one clear story. Copy each exactly.
 [[count]]Choose the {{KEEP}} best fitting the [[!personal]]situation[[/!personal]][[personal]]past[[/personal]], tone and cast, together in one clear story[[people]], and from people the one it needs, or none[[/people]]. Copy each exactly.
 
 Reply with JSON only: {[[situations]]"situation": "one of situations", [[/situations]]"keywords": ["one of keywords"][[people]], "person": "one of people, or none"[[/people]]}

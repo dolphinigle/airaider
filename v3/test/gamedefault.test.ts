@@ -215,27 +215,64 @@ describe('the game default, a soldier\'s own saga: PP (past + change), to the fi
     const seed1 = String(planCall.payload.seed);
     expect(seed1).toBe(rec.world.seed.text);
     expect(seed1).not.toContain(history);
-    // kept on the soldier: the seed it was told from, the past it told (what the change resolves), the line
-    expect(merc.character!.grown).toEqual([{ seed: seed1, past: soldier.past, line }]);
+    // kept on the soldier: the seed it was told from, the past it told (what the change resolves), the line, whence and when
+    expect(merc.character!.grown).toEqual([{ seed: seed1, past: soldier.past, line, title: plan.title, chainId: first.chain.id, cycle: first.chain.endedCycle }]);
     // shown: the sheet's memories (the GUI soldier sheet reads this dossier from the server) and the CLI's `merc`
     expect(g.dossier(merc.id, { player: true }).split('\n')).toContain(`- ${line} (defining memory)`);
     expect(render.merc(g, merc.id)).toContain(`- ${line}`);
     expect(g.dossier(merc.id, { player: true })).not.toContain('came through');
+    // the living dossier (STORY_ENGINE §4), refreshed as the saga closed: who they are now (the change), their own saga's
+    // ending — the same lines in the CLI's `merc` and the GUI sheet (the server sends Game.livingLines)
+    const change = line.replace(`After ${plan.title}: `, '');
+    const living1 = g.livingLines(merc.id);
+    expect(living1[0]).toBe(`Now: ${change}`);
+    expect(living1.some(l => l.startsWith(`- ${plan.title}, `) && l.includes('own matter'))).toBe(true);
+    expect(living1.length).toBeLessThanOrEqual(6);
+    expect(render.merc(g, merc.id)).toContain(`story so far:\n${living1.map(l => `  ${l}`).join('\n')}`);
 
-    // the next personal saga: on the same base the first was told from, the past it told, then that line — never the
-    // company's history the full backstory holds
+    // the NEXT personal saga (chain B): seeded from the living dossier — who they became — with a DEALT situation as its new
+    // matter; the old wrong it settled is kept on the world (the retelling lint) but never sent; never the company's history
     const second = await personalSaga(g, ai, merc);
-    const seed = String(second.calls.find(c => c.template === 'plan')!.payload.seed);
-    expect(seed).toBe(`${seed1} ${soldier.past} ${line}`);
-    expect(seed).not.toContain(history);
+    const planB = second.calls.find(c => c.template === 'plan')!;
+    expect(planB.flags).toContain('next');
+    expect(planB.flags).not.toContain('history');
+    expect(planB.payload.history).toBeUndefined();
+    // the seed is the dealt situation, its new matter
+    expect(second.chain.saga!.world.kit!.situations).toContain(planB.payload.seed);
+    expect(planB.payload.situation).toBeUndefined();
+    for (const c of second.calls.filter(x => x.template === 'plan' || x.template === 'pick')) expect(JSON.stringify(c.payload)).not.toContain(soldier.past!);
+    // beside it, `now`: who they became — the dossier's Now, naming no stranger (chain A's people by label, unless chain B
+    // seats one) — and never the settled chapter (no mark: its title or ending, sent, was rebuilt)
+    const nowB = String(planB.payload.now).split('\n');
+    const seated = second.chain.saga!.world.cast.find(p => p.memory)?.name;
+    expect(living1[0]!.startsWith('Now: ')).toBe(true);
+    if (!seated) expect(nowB).toEqual([living1[0]!.slice('Now: '.length)]);
+    expect(nowB.filter(l => l.startsWith('- '))).toHaveLength(0);
+    expect(String(planB.payload.now)).not.toContain(plan.title);
+    for (const p of plan.cast.filter(p => p.seat !== 'soldier' && p.name !== seated)) expect(nowB.join('\n')).not.toContain(p.name);
+    expect(String(planB.payload.now)).not.toContain(history);
+    expect(second.calls.find(c => c.template === 'pick')!.flags).toContain('next');
+    expect(second.calls.find(c => c.template === 'card' && c.flags.includes('first'))!.flags).toContain('next');
     expect(second.chain.saga!.world.pipe).toBe(GAME_PIPE.personal);
-    // its own line is a new memory beside the first, never merged into it: both on the sheet, both seed the third
+    expect(second.chain.saga!.world.history).toBe(soldier.past);
+    // its own line is a new memory beside the first, never merged into it: both on the sheet; the dossier's now is the second
     expect(second.chain.state).toBe('done');
     const line2 = second.chain.saga!.grown!;
     expect(line2).not.toBe(line);
     const past2 = second.chain.saga!.plan!.cast.find(p => p.seat === 'soldier')!.past!;
     expect(merc.character!.grown!.map(x => x.line)).toEqual([line, line2]);
     for (const l of [line, line2]) expect(render.merc(g, merc.id)).toContain(`- ${l}`);
-    expect((g as unknown as { personalSeed(m: Card): string }).personalSeed(merc)).toBe(`${seed} ${past2} ${line2}`);
+    const living2 = g.livingLines(merc.id);
+    expect(living2[0]).toBe(`Now: ${line2.replace(`After ${second.chain.saga!.plan!.title}: `, '')}`);
+    expect(living2.filter(l => l.includes('own matter'))).toHaveLength(2);
+    // chain C: the history is what chain B settled
+    const third = (g as unknown as { personalSeedOf(m: Card, r: string, ids: Set<string>): { seed: string; history?: string } }).personalSeedOf(merc, second.chain.region, new Set());
+    expect(third.history).toBe(past2);
+    // its now: the dossier's Now (chain B's change), naming only the one person who matters that the saga can seat; no mark
+    const seedLines = third.seed.split('\n'), people = seedLines.filter(l => l.startsWith('People: '));
+    expect(seedLines.filter(l => !l.startsWith('People: '))).toHaveLength(1);
+    expect(seedLines.some(l => l.includes('own matter'))).toBe(false);
+    expect(people.length).toBeLessThanOrEqual(1);
+    if (people[0]) expect(people[0].split('; ')).toHaveLength(1);
   });
 });

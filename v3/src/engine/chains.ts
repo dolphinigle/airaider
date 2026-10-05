@@ -29,6 +29,8 @@ export interface Chain {
   reOffers?: number;           // lapse counter — 3 unmarched offers of a beat slips the chain (2026-07-11)
   state: 'active' | 'finale-pending' | 'done' | 'slipped';
   createdCycle: number;
+  /** the cycle it ended (done or slipped; saves from 2026-10-05 on): the living dossier's order, a next chapter's cooldown */
+  endedCycle?: number;
   /** SAGA LAB only (docs/STORYTELLER.md §5.0): the fixture and its forced rolls — absent in play */
   lab?: ChainLab;
   /** the v4 storyteller's record (docs/STORYTELLER.md; src/game/sagaflow.ts): world, plan, Knowing, road, lines. Set by

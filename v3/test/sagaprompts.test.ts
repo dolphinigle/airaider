@@ -22,7 +22,9 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
     // the stack round: TC + line with its sourced why (motive, S1); TC + clean (S3). S2's plan is PP's own
     ...[['voice', 'line', 'against', 'motive'], ['voice', 'clean', 'against', 'with']].map(arm => ['keywords', 'support', 'grafts', ...arm])].flatMap(seed => [['notrade'], []].flatMap(cast => subsets(['personal', 'memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, ...seed], vars: {} })))).concat(
     // round H: HP's hired asker's past and change, in place of TC's line (never on a personal plan: that one is TC's). RF's plan is TC's
-    [['notrade'], []].flatMap(cast => subsets(['memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, 'keywords', 'support', 'grafts', 'askerpast'], vars: {} })))),
+    [['notrade'], []].flatMap(cast => subsets(['memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, 'keywords', 'support', 'grafts', 'askerpast'], vars: {} }))),
+    // a soldier's NEXT personal saga (chain B, C…) on PP: the seed is who they are now, the dealt situation its new matter
+    [['notrade'], []].flatMap(cast => subsets(['memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, 'personal', 'keywords', 'support', 'grafts', 'past', 'next'], vars: {} })))),
   // (pipe arm sides: a plan with sides deals no parts, so `side` never meets `part`; pipe arm fixes, D2, on any card: `lose`
   // on every finale, beside `will` but at a last chance)
   card: ['first', 'later', 'finale'].flatMap(pos => subsets(['memory', 'direction', 'intro', 'part', 'side', ...(pos === 'first' ? ['personal', 'returning'] : []), ...(pos === 'finale' ? ['lastchance', 'lose'] : []),
@@ -40,7 +42,7 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
     // the line, the rest narrated or none left, S2)
     .flatMap(extra => extra.includes('line') && pos === 'first' && !extra.includes('fixes') && !extra.includes('side') ? [extra, [...extra, 'says']]
       : extra.includes('fixes') || extra.includes('line') || extra.includes('side') || (extra.includes('part') && extra.includes('returning')) ? [extra] : pos === 'first'
-      ? [extra, [...extra, 'clean'], [...extra, 'says'], [...extra, 'clean', 'says'], [...extra, 'lore'], ...(extra.includes('personal') ? [[...extra, 'past'], [...extra, 'says', 'quote', 'past'], [...extra, 'says', 'quote']] : [[...extra, 'askerpast']])]
+      ? [extra, [...extra, 'clean'], [...extra, 'says'], [...extra, 'clean', 'says'], [...extra, 'lore'], ...(extra.includes('personal') ? [[...extra, 'past'], [...extra, 'past', 'next'], [...extra, 'says', 'quote', 'past'], [...extra, 'says', 'quote']] : [[...extra, 'askerpast']])]
       : pos === 'later' && !extra.includes('retry') ? [extra, [...extra, 'clean'], [...extra, 'meet']]
       // (round H, RF on TC: a retry framed by the failure alone — no why, no trouble)
       : pos === 'later' && !extra.includes('why') ? [extra, [...extra, 'clean'], [...extra, 'setback']] : [extra, [...extra, 'clean']])
@@ -49,7 +51,7 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
   // pipe arm late (E1): the finale written after play
   showdown: [{ flags: [], vars: {} }],
   // count: the pick is told how many keywords the plan gets (kit+pick+cast with its people; pipe arm one without)
-  pick: [[], ['situations'], ['personal'], ['people', 'count'], ['people', 'count', 'personal'], ['count'], ['count', 'personal']].map(flags => ({ flags, vars: (flags.includes('count') ? { KEEP: 'two keywords' } : {}) as Record<string, string> })),
+  pick: [[], ['situations'], ['personal'], ['next'], ['people', 'count'], ['people', 'count', 'personal'], ['count'], ['count', 'personal']].map(flags => ({ flags, vars: (flags.includes('count') ? { KEEP: 'two keywords' } : {}) as Record<string, string> })),
   premise: [[], ['personal']].map(flags => ({ flags, vars: {} })),
   // hope: pipe arm grafts, a won middle job's (with clue/brought, never the finale's answer/option/edge); narrow (E3, D2) only
   // with it; side: pipe arm sides; fixes: pipe arm fixes (D2, on grafts: never with sides), on every report

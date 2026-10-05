@@ -46,11 +46,12 @@ import type { AiProvider, ResolveQuestInput, ResolveQuestOut, AskSlotOut, Campai
 import { prefPick, chainPayoff, type TraitPrefs } from '../engine/economy.js';
 import { labFixtureProblems, nextLabOutcome, forceRoll, type LabFixture } from '../engine/lab.js';
 import {
-  hashStr, castableClients, pickClientFace, recentFaces, helped, HURT_BAND, WAY_ENDING, OPPONENT_EDGES, DEALT_TRADES, GAME_PIPE,
+  hashStr, castableClients, pickClientFace, recentFaces, helped, HURT_BAND, HOW_BAND, WAY_ENDING, OPPONENT_EDGES, DEALT_TRADES, GAME_PIPE,
   type FaceCandidate, type Face, type SagaPos, type CastEntry,
 } from '../engine/saga.js';
 import { raceOf, sexOf } from '../engine/plainwords.js';
 import { knowingOf, mockReport } from '../ai/storyteller.js';
+import { composeLiving, livingLines, livingSeed, historyOf, type LifeMark, type LifePerson } from '../engine/dossier.js';
 import * as flow from './sagaflow.js';
 
 export interface LogEntry { cycle: number; kind: string; text: string; questId?: string }
@@ -269,6 +270,9 @@ export interface GameState {
 export const RECKONINGS_KEPT = 12;
 
 const CAST_THETA = Number(process.env.CAST_THETA ?? 4);
+/** 🛠 cycles after a soldier's personal saga is settled before their NEXT chapter may come (North Star 0; then the drip's own
+ *  25% a cycle and one personal lead on the board at a time stagger it across soldiers) */
+export const PERSONAL_CHAPTER_COOLDOWN = 6;
 
 /** a quirk is a habit PHRASE ("counts the doors twice") that the dossier joins with '; ' — a writer that
  *  hands back sentences ("Counts the doors.") read "doors.; Coughs…" in every dossier after. One shape
@@ -2169,12 +2173,13 @@ export class Game {
 
   // ---- chains -----------------------------------------------------------------------------------------
 
-  private spawnPersonalChainLead(merc: Card) {
+  /** a soldier's own saga as a lead. `next`: their NEXT chapter (chain B, C…: an earlier personal saga changed them) */
+  private spawnPersonalChainLead(merc: Card, next = false) {
     const lead: Lead = {
       id: freshId('lead-'), rarity: 'uncommon', level: Math.max(1, merc.character!.level),
       region: this.activeRegions()[0]!, archetype: 'investigate',
       chainInfo: { kind: 'starts-new' }, expiresAtCycle: this.state.cycle + LEAD_TTL * 2,
-      source: 'personal', title: `${merc.name}'s past stirs`,
+      source: 'personal', title: next ? `${merc.name}'s next chapter` : `${merc.name}'s past stirs`,
     };
     lead.personalMercId = merc.id;
     this.state.leads.push(lead);
@@ -2385,7 +2390,12 @@ export class Game {
   }
   /** a personal saga's seed (D12) and, when it came from an edge to a castable lore person, that person (D10): known,
    *  their memory the edge's line; a rival-type edge seats them in the way instead of a coined opponent */
-  private personalSeedOf(merc: Card, region: string, liveIds: Set<string>): { seed: string; person?: Face & { rival: boolean } } {
+  private personalSeedOf(merc: Card, region: string, liveIds: Set<string>): { seed: string; history?: string; person?: Face & { rival: boolean } } {
+    // their NEXT chapter (chain B, C…; North Star 0): an earlier personal saga changed them, so the deal's situation is the seed,
+    // its new matter, and their living dossier's Now rides beside it (who they became: livingSeed); `history`, the old wrong it settled, rides on the world
+    // for the retelling lint only — never the seed, never sent
+    const history = historyOf(merc.character?.grown);
+    if (history) return { ...this.nextChapterSeed(merc, region, liveIds), history };
     const seed = this.personalSeed(merc);
     const e = this.personalEdges(merc)[0];
     if (!e || e.blurb !== seed || e.from === e.to) return { seed };
@@ -2502,6 +2512,7 @@ export class Game {
     if (isPersonal) {
       const s = this.personalSeedOf(focal, chain.region, live.ids);
       pins.personalSeed = s.seed;
+      if (s.history) pins.history = s.history;
       if (s.person) pins.seedPerson = s.person;
     } else {
       if (known) { const m = this.faceMemory(focal.id, chain.region); if (m) pins.focalMemory = m }
@@ -3901,6 +3912,7 @@ export class Game {
       if (!chain || (chain.state !== 'active' && chain.state !== 'finale-pending')) continue;
       chain.state = 'slipped'; chain.bank = 0;
       this.persistMetCast(chain);
+      this.sagaClosed(chain);
       const focal = this.card(chain.focalId);
       if (focal && !chain.isPersonal && focal.location.kind === 'held' && focal.location.state === 'limbo') {
         focal.location = HELD('lore');
@@ -4090,6 +4102,7 @@ export class Game {
         if (chain.reOffers >= 3) {
           chain.state = 'slipped'; chain.bank = 0;
           this.persistMetCast(chain);
+          this.sagaClosed(chain);
           const focal = this.card(chain.focalId);
           if (focal && !chain.isPersonal && focal.location.kind === 'held' && (focal.location as { state?: string }).state === 'limbo') {
             focal.location = HELD('lore');
@@ -4442,14 +4455,104 @@ export class Game {
    *  (`personalEdges`), else the past they were fleshed with. Never a generic theme — that is what turned a personal saga
    *  into somebody else's ransom job */
   private personalSeed(merc: Card): string {
-    // a soldier an earlier personal saga changed (saga pipe arm past): the seed that saga was dealt, the past it told, then
-    // what it made of them — the past the change resolves, on the base it was told from. Never the old wrong alone, as if
-    // nothing had happened, and never the full backstory (a soldier the company won: its own history, personalSeedBase)
+    // (a save from before entries kept the line alone: it seeds on the base it was told from)
     const last = merc.character?.grown?.at(-1) as GrownEntry | string | undefined;
-    if (!last) return this.personalSeedBase(merc);
-    // (a save from before entries: the line alone)
     if (typeof last === 'string') return `${this.personalSeedBase(merc)} ${last}`;
-    return [last.seed, last.past, last.line].filter(Boolean).join(' ');
+    return this.personalSeedBase(merc);
+  }
+  /** a NEXT personal saga's `now`: the living dossier's Now (refreshed now if a save never had one; no settled mark), naming only the
+   *  person who matters that the saga can seat — the first castable one, seated as D10 seats a seed's person (known, their
+   *  memory the tie's line; a rival-type tie in the way) */
+  private nextChapterSeed(merc: Card, region: string, liveIds: Set<string>): { seed: string; person?: Face & { rival: boolean } } {
+    if (!merc.character!.living) this.refreshLiving(merc);
+    const d = merc.character!.living;
+    if (!d) return { seed: this.personalSeedBase(merc) };
+    const cands = this.faceCandidates(region, liveIds), recent = recentFaces(this.state.chains);
+    for (const p of d.people) {
+      const c = cands.find(x => x.id === p.id);
+      if (!c || c.companySoldier || c.companyCaptive || c.atTheFort || c.outOfReach || c.staged || recent.includes(c.id)) continue;
+      const e = this.tieOf(merc.id, p.id);
+      if (!e) continue;
+      return { seed: livingSeed(d, p.id), person: { id: c.id, name: c.name, sex: c.sex, race: c.race, memory: e.blurb, where: c.where, rival: OPPONENT_EDGES.has(e.type) } };
+    }
+    return { seed: livingSeed(d) };
+  }
+  /** the strongest active tie between two people (either direction) */
+  private tieOf(a: string, b: string): RelEdge | undefined {
+    const cyc = this.state.cycle;
+    return this.state.lore.edges.filter(e => e.active && !!e.blurb.trim() && ((e.from === a && e.to === b) || (e.from === b && e.to === a)))
+      .sort((x, y) => Number(y.core) - Number(x.core) || effectiveSalience(y, cyc) - effectiveSalience(x, cyc))[0];
+  }
+
+  // ---- the living dossier (STORY_ENGINE §4; engine/dossier.ts) ---------------------------------
+
+  /** a saga ended (done or slipped, however): when, and every soldier it marked gets their living dossier refreshed — its
+   *  own soldier, whoever decided a job, whoever was hurt, whoever a memory it left touches */
+  private sagaClosed(chain: Chain): void {
+    chain.endedCycle ??= this.state.cycle;
+    const rec = chain.saga;
+    const names = new Set([...(rec?.lines ?? []).flatMap(l => [...(l.decides && l.outcome !== 'failure' ? [l.decides] : []), ...l.hurt.map(h => h.name)])]);
+    const touched = new Set(this.state.lore.edges.filter(e => e.sourceChainId === chain.id).flatMap(e => [e.from, e.to]));
+    for (const m of this.state.cards) {
+      if (m.character?.role !== 'merc') continue;
+      if (chain.focalId === m.id || names.has(m.name) || touched.has(m.id)) this.refreshLiving(m);
+    }
+  }
+  /** compose a soldier's living dossier afresh from what the game holds (bounded: engine/dossier.ts) */
+  private refreshLiving(m: Card): void {
+    const ch = m.character;
+    if (!ch) return;
+    const d = composeLiving({ name: m.name, who: ch.who, grown: ch.grown?.filter((g): g is GrownEntry => typeof g !== 'string'), marks: this.lifeMarks(m), people: this.lifePeople(m), cycle: this.state.cycle });
+    if (d) ch.living = d; else delete ch.living;
+  }
+  /** the events that marked a soldier, newest first: each ended saga they were part of, once — their own saga's ending line,
+   *  the ending of a hired saga that was about them (the one that brought them in), else the last job they decided, else the
+   *  job they were worst hurt in. Every text a chronicle line the player read */
+  private lifeMarks(m: Card): LifeMark[] {
+    const ended = this.state.chains.filter(c => (c.state === 'done' || c.state === 'slipped') && c.saga?.plan)
+      .sort((a, b) => (b.endedCycle ?? b.createdCycle) - (a.endedCycle ?? a.createdCycle));
+    const ORDER: Record<string, number> = { gravely: 3, badly: 2, lightly: 1 };
+    const out: LifeMark[] = [];
+    for (const c of ended) {
+      const rec = c.saga!, title = rec.plan!.title, N = rec.world.N;
+      // the seed's form of a line: that saga's people by label (a seed names only people the next saga can cast)
+      const others = rec.plan!.cast.filter(p => p.seat !== 'soldier' && p.id !== m.id);
+      const mark = (kind: LifeMark['kind'], text: string, band?: string): LifeMark => ({ title, kind, text, people: others.map(p => ({ name: p.name, label: p.label })), ...(band ? { band } : {}) });
+      if (c.focalId === m.id) {
+        const fin = rec.lines.find(l => l.n >= N);
+        out.push(mark(c.isPersonal ? 'own' : 'about', fin?.text ?? 'it slipped away before its finale'));
+        continue;
+      }
+      const deed = [...rec.lines].reverse().find(l => l.decides === m.name && l.outcome !== 'failure');
+      if (deed) { out.push(mark('deed', deed.text)); continue }
+      const hurts = rec.lines.flatMap(l => l.hurt.filter(h => h.name === m.name).map(h => ({ l, h })));
+      const worst = hurts.sort((a, b) => (ORDER[b.h.how] ?? 0) - (ORDER[a.h.how] ?? 0))[0];
+      if (worst) out.push(mark('hurt', worst.l.text, HOW_BAND[worst.h.how]));
+    }
+    return out;
+  }
+  /** the people who matter to a soldier, strongest first: lore ties to someone outside the company (never themself, never a
+   *  fellow soldier, never merely marching together) */
+  private lifePeople(m: Card): LifePerson[] {
+    const cyc = this.state.cycle, seen = new Set<string>(), out: LifePerson[] = [];
+    const edges = this.state.lore.edges.filter(e => e.active && e.from !== e.to && (e.from === m.id || e.to === m.id) && e.type !== 'served-with')
+      .sort((a, b) => Number(b.core) - Number(a.core) || effectiveSalience(b, cyc) - effectiveSalience(a, cyc));
+    for (const e of edges) {
+      const id = e.from === m.id ? e.to : e.from;
+      const nd = this.state.lore.nodes[id];
+      if (seen.has(id) || !nd || nd.kind !== 'character' || this.card(id)?.character?.role === 'merc') continue;
+      seen.add(id);
+      const first = (nd.blurb ?? '').split(/(?<=[.!?])\s/)[0]!.replace(/[.!?]+$/, '').trim();
+      // a label mid-sentence: "Elf moneylender", "A smuggler" read lower-case after the name
+      const label = (first.length > 60 ? first.slice(0, 60).replace(/\s+\S*$/, '') : first).replace(/^(?:An?|The)\s+/, w => w.toLowerCase()).replace(/^(\p{Lu})(?=\p{Ll}+\b(?!\s+\p{Lu}))/u, c => c.toLowerCase()) || 'someone they know';
+      out.push({ id, name: nd.name, label, tie: e.type });
+    }
+    return out;
+  }
+  /** a soldier's living dossier as both UIs print it (none yet: []) */
+  livingLines(id: string): string[] {
+    const d = this.card(id)?.character?.living;
+    return d ? livingLines(d) : [];
   }
   private personalSeedBase(merc: Card): string {
     const top = this.personalEdges(merc)[0];
@@ -4528,7 +4631,9 @@ export class Game {
       const after = flow.afterReport(host, chain, r.saga.pos, a, rep);
       decided();
       report.push(after.book);
-      return this.settleFinale(q, chain, r, report, r.fate);
+      this.settleFinale(q, chain, r, report, r.fate);
+      this.sagaClosed(chain);
+      return;
     }
     // side-loot deducts what was actually DELIVERED — a partial pays out half the loot,
     // so the bank is docked half (it was docked the full budget for half the goods)
@@ -4682,7 +4787,8 @@ export class Game {
       const grown = chain.saga?.grown;
       if (grown && focal?.character) {
         const past = chain.saga!.plan?.cast.find(p => p.seat === 'soldier')?.past?.trim();
-        const entry: GrownEntry = { seed: chain.saga!.world.seed.text, ...(past ? { past: /[.!?]$/.test(past) ? past : `${past}.` } : {}), line: grown };
+        const entry: GrownEntry = { seed: chain.saga!.world.seed.text, ...(past ? { past: /[.!?]$/.test(past) ? past : `${past}.` } : {}), line: grown,
+          title: this.sagaTitle(chain), chainId: chain.id, cycle: st.cycle };
         focal.character.grown = [...(focal.character.grown ?? []), entry];
       }
       guardEdges(st.lore, [{ from: chain.focalId, to: chain.focalId, type: 'scarred-by', importance: 0.9, fresh: true,
@@ -4838,10 +4944,29 @@ export class Game {
     const unstoried = this.roster().find(m =>
       !st.chains.some(c => c.isPersonal && c.focalId === m.id) &&
       !st.leads.some(l => l.personalMercId === m.id));
-    if (!unstoried) return;
+    // (North Star 0, designer 2026-10-05: STORY_ENGINE §4's recurring personal arc, A → B → C) a soldier whose last personal saga
+    // was settled and changed them gets their NEXT chapter, after the cooldown — a first one waits ahead of any next one, the
+    // longest-waiting next one first, never two open per soldier
+    const next = unstoried ? undefined : this.roster().map(m => ({ m, since: this.nextChapterSince(m) }))
+      .filter((x): x is { m: Card; since: number } => x.since !== undefined && st.cycle - x.since >= PERSONAL_CHAPTER_COOLDOWN)
+      .sort((a, b) => a.since - b.since)[0]?.m;
+    const who = unstoried ?? next;
+    if (!who) return;
     if (!this.rng.chance(0.25)) return;   // staggered, not a flood
-    this.spawnPersonalChainLead(unstoried);
-    this.log('leads', `${unstoried.name}'s past stirs — a personal thread appears.`);
+    this.spawnPersonalChainLead(who, who === next);
+    this.log('leads', who === next ? `${who.name}'s story goes on — a new personal thread appears.` : `${who.name}'s past stirs — a personal thread appears.`);
+  }
+  /** when a soldier's last personal saga ended, if it may now lead to their next chapter: every personal saga of theirs over,
+   *  the last one settled ('done') and changed them (its grown entry), no personal lead of theirs on the board */
+  private nextChapterSince(m: Card): number | undefined {
+    const st = this.state;
+    const own = st.chains.filter(c => c.isPersonal && c.focalId === m.id);
+    const last = own.at(-1);
+    if (!last || last.state !== 'done' || own.some(c => c.state !== 'done' && c.state !== 'slipped')) return undefined;
+    if (st.leads.some(l => l.personalMercId === m.id)) return undefined;
+    const g = m.character?.grown?.at(-1) as GrownEntry | string | undefined;
+    if (!g || typeof g === 'string' || (g.chainId !== undefined && g.chainId !== last.id)) return undefined;
+    return last.endedCycle ?? g.cycle ?? last.createdCycle;
   }
 
   private healingPass() {

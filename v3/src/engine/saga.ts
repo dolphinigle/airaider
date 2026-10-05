@@ -152,7 +152,12 @@ export const SEED_ARM: SeedArm = 'kit+pick';
  *               `change` (how the soldier must be different by the end, from their past or traits), shown happening in the
  *               finale report (+20); at a finale not lost the engine writes ONE dossier line from it (`grownLine`,
  *               SagaRecord.grown) — the game keeps it on the soldier (their sheet's memory; character.grown, beside the
- *               seed the saga was dealt and the past it told) and seeds their next personal saga with seed + past + line
+ *               seed the saga was dealt and the past it told). Their NEXT personal saga (chain B, C…) has a DEALT situation as
+ *               its seed, its new matter, and their living dossier's Now beside it (`now`, engine/dossier.ts livingSeed:
+ *               who they became, done; the change goes further; no settled mark is sent) — the pick's, plan's and card
+ *               1's `next` lines: its past is a new event that draws who they became into the matter; the
+ *               settled old wrong (SagaWorld.history) feeds only the log-only retelling lint — handed to the plan, 8 of 8 real
+ *               chain Bs retold it. A first personal saga's prompts are byte-identical
  *  STACK ROUND (texture-round report §7.4; seedlab S1–S3), each a shipped arm plus ONE more change, judged against that arm:
  *   voice+line   S1  TC + F1's line, and (motive) the line's why only where the seed or cast already gives one: F1's
  *                    trouble sentence had to give every foe a reason, so the plan invented one (forced or from nowhere, marked
@@ -183,16 +188,25 @@ export const SEED_ARM: SeedArm = 'kit+pick';
  *                      job: its card no why and no trouble (both written before play; the summary names what stopped them,
  *                      and with the trouble too the foe came twice), its cap sized to what is left (`capFor`), its report no
  *                      hope (the card it reads tells the failure: a `last` dealt again beside it came back as the summary)
+ *   voice+stands   RFA RF part (a) alone on TC as measured (TC_g1–g3, before the cost fix below): a failed middle job's report
+ *                      is dealt `stands`; the retry keeps TC's card and report (round H §3: part (b) was redundant once the target
+ *                      stands, and the likely source of the slice's S10 dip). No `owncost`, so the arm differs from the TC on
+ *                      disk by `stands` alone
+ *  THE COST FIX (round H §5, a defect in the default): `owncost` — a partial's cost dealt as ONE phrase naming its owner
+ *  (`costPhrase`, from clean's `ownCost`: "the company's own horse, lamed"); the {what, how, whose} atoms let the writer give
+ *  the company's lamed horse to the enemy. Carried by the game's two pipes (voice, past)
  *  (C1 `core` — a call fixing the want, question and answer before the plan — was removed: a measured loss, follow 26–116) */
 export type PipeArm = 'one' | 'grafts' | 'sides' | 'reads' | 'fixes' | 'late' | 'trail' | 'narrow' | 'line' | 'plain' | 'link' | 'fx'
-  | 'room' | 'weight' | 'voice' | 'lore' | 'page' | 'past' | 'clean' | 'voice+line' | 'past+voice' | 'voice+clean' | 'voice+asker' | 'voice+setback';
+  | 'room' | 'weight' | 'voice' | 'lore' | 'page' | 'past' | 'clean' | 'voice+line' | 'past+voice' | 'voice+clean' | 'voice+asker' | 'voice+setback'
+  | 'voice+stands';
 export const PIPE_ARMS: readonly PipeArm[] = ['one', 'grafts', 'sides', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx',
-  'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback'];
+  'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands'];
 /** the pieces an arm is made of: an arm's own change, or a piece of one — voice (TC) is three lines, each its own piece
  *  (`says` card 1's line, `witness` a won clue said by someone met, `teller` the finale's secret said), so an arm can take some;
  *  `quote` and `motive` are the stack round's (S2's quoted first sentence of the past, in place of its narration; S1's sourced
- *  why); `asker` and `setback` round H's (HP's asker past and change; RF's failure facts) */
-export type PipePart = Exclude<PipeArm, 'voice' | 'voice+line' | 'past+voice' | 'voice+clean' | 'voice+asker' | 'voice+setback'> | 'says' | 'witness' | 'teller' | 'quote' | 'motive' | 'asker' | 'setback';
+ *  why); `asker` and `setback` round H's (HP's asker past and change; RF's failure facts, both parts); `stands` RF's part (a)
+ *  alone (RFA); `owncost` the cost fix (a partial's cost as one phrase naming its owner) */
+export type PipePart = Exclude<PipeArm, 'voice' | 'voice+line' | 'past+voice' | 'voice+clean' | 'voice+asker' | 'voice+setback' | 'voice+stands'> | 'says' | 'witness' | 'teller' | 'quote' | 'motive' | 'asker' | 'setback' | 'stands' | 'owncost';
 const VOICE: readonly PipePart[] = ['says', 'witness', 'teller'];
 /** the changes each pipe arm carries, by the arm that brought each in: D1, D2, E1–E3 and F1–F3 are C2 plus one change each;
  *  FX is C2 plus all of round F; the stack arms a shipped arm plus one change */
@@ -200,12 +214,16 @@ const PIPE_PARTS: Record<PipeArm, readonly PipePart[]> = {
   one: ['one'], grafts: ['grafts'], sides: ['sides'], reads: ['grafts', 'reads'], fixes: ['grafts', 'fixes'],
   late: ['grafts', 'late'], trail: ['grafts', 'trail'], narrow: ['grafts', 'narrow'],
   line: ['grafts', 'line'], plain: ['grafts', 'plain'], link: ['grafts', 'link'], fx: ['grafts', 'line', 'plain', 'link'],
-  room: ['grafts', 'room'], weight: ['grafts', 'weight'], voice: ['grafts', ...VOICE], lore: ['grafts', 'lore'],
-  page: ['grafts', 'page'], past: ['grafts', 'past'], clean: ['grafts', 'clean'],
+  // (voice, past: the game's two pipes, GAME_PIPE) the cost fix, `owncost` (round H §5) — a lab TC/PP generated from here on
+  // carries it; the TC_g1–g3 / PP_g1–g3 on disk do not
+  room: ['grafts', 'room'], weight: ['grafts', 'weight'], voice: ['grafts', ...VOICE, 'owncost'], lore: ['grafts', 'lore'],
+  page: ['grafts', 'page'], past: ['grafts', 'past', 'owncost'], clean: ['grafts', 'clean'],
   'voice+line': ['grafts', ...VOICE, 'line', 'motive'], 'past+voice': ['grafts', 'past', 'teller', 'quote'],
   'voice+clean': ['grafts', ...VOICE, 'clean'],
   // (HP keeps `says`: on a hired saga the asker's past stands in its place, on a personal one — no hired asker — it is TC's line)
   'voice+asker': ['grafts', ...VOICE, 'asker'], 'voice+setback': ['grafts', ...VOICE, 'setback'],
+  // (RFA) RF part (a) alone, on TC as measured — no `owncost`, so the arm differs from TC_g1–g3 by `stands` alone
+  'voice+stands': ['grafts', ...VOICE, 'stands'],
 };
 /** whether a dealt world's pipe arm carries `part` */
 export const piped = (w: Pick<SagaWorld, 'pipe'>, part: PipePart): boolean => !!w.pipe && PIPE_PARTS[w.pipe].includes(part);
@@ -404,6 +422,11 @@ export interface SagaWorld {
   kit?: SagaKit;
   /** the pipeline arm (PipeArm): the game deals GAME_PIPE by saga type, a host naming none PIPE_ARM; absent, R5's pipeline */
   pipe?: PipeArm;
+  /** a soldier's NEXT personal saga (chain B, C…; STORY_ENGINE §4, North Star 0): the old wrong their last chapter settled
+   *  (engine/dossier.ts `historyOf`). Its seed is then a dealt situation, its new matter, with their living dossier's
+   *  Now beside it (who they became); the history itself is never sent to a writer (handed it, 8 of 8 real chain Bs retold it, 3 word for word) —
+   *  it feeds the log-only retelling lint (storyteller planLint). Absent on a first personal saga and on every hired one */
+  history?: string;
 }
 /** a kit arm's seed: what the dealer dealt, then what the pick and premise calls made of it (filled before the plan) */
 export interface SagaKit {
@@ -417,17 +440,27 @@ export interface SagaKit {
    *  knows yet) — the plan's seed */
   premise?: string[]; premiseFloor?: boolean;
 }
+/** a soldier's NEXT personal saga (chain B, C…): an earlier personal saga changed them (`history` dealt) */
+export const nextChapter = (w: Partial<Pick<SagaWorld, 'personal' | 'history'>>): boolean => !!w.personal && !!w.history;
 /** the seed as the plan receives it: the theme or a personal past; a kit arm's situation and keywords (the picked ones
- *  once the pick call has run); a premise arm's premise, alone */
-export function seedOf(w: Pick<SagaWorld, 'seed' | 'kit'>): { text: string; keywords?: string[]; premise?: true } {
+ *  once the pick call has run); a premise arm's premise, alone. A NEXT chapter: the dealt situation is the seed — its new
+ *  matter, as a hired saga's is — and who the soldier already is (their living dossier's Now: dossier.ts livingSeed) rides
+ *  beside it as `now`, a done fact the change steps beyond. Sent as the seed itself, the settled chapter was the story's
+ *  material: chain B rebuilt its people and things, and its change pasted the Now (CB_g1, 4 of 8 and 8 of 8) */
+export function seedOf(w: Pick<SagaWorld, 'seed' | 'kit'> & Partial<Pick<SagaWorld, 'personal' | 'history'>>): { text: string; keywords?: string[]; premise?: true; now?: string } {
   const k = w.kit;
   if (!k) return { text: w.seed.text };
   if (k.premise?.length) return { text: k.premise.join(' '), premise: true };
   const keywords = k.picked?.keywords ?? k.keywords;
-  return { text: k.picked?.situation ?? k.situations[0] ?? w.seed.text, ...(keywords.length ? { keywords } : {}) };
+  const situation = k.picked?.situation ?? k.situations[0];
+  if (nextChapter(w) && situation) return { text: situation, now: w.seed.text, ...(keywords.length ? { keywords } : {}) };
+  return { text: situation ?? w.seed.text, ...(keywords.length ? { keywords } : {}) };
 }
 /** every word the seed dealt, for the log-only lints (a seed word in the plan is no stray, no answer leak) */
-export const seedText = (w: Pick<SagaWorld, 'seed' | 'kit'>): string => { const s = seedOf(w); return s.keywords ? `${s.text} ${s.keywords.join(' ')}` : s.text };
+export const seedText = (w: Pick<SagaWorld, 'seed' | 'kit'> & Partial<Pick<SagaWorld, 'personal' | 'history'>>): string => {
+  const s = seedOf(w);
+  return [s.text, s.now, ...(s.keywords ?? [])].filter(Boolean).join(' ');
+};
 /** kit+pick+cast, once picked: the cast keeps only the supporting person the pick kept — the plan, the cards, the reports
  *  and the chronicle never see the others (the one who asks and the person the ending decides are never supporting) */
 export function keepPicked(w: SagaWorld): void {
@@ -491,7 +524,7 @@ export interface SagaDeal {
  *  personal saga's own past; a lab fixture's spark), the tone (a theme's feeling, else the tone roll), the shape (read
  *  only for the client's part and the floor's stake) and the stake. Pushes a dealt theme id onto `recentThemeIds`,
  *  trimmed to the no-repeat window. Every draw is on `storyRng` */
-export function dealSaga(storyRng: Rng, recentThemeIds: string[], a: { personal: boolean; personalSeed?: string; spark?: string; arm?: SeedArm }): SagaDeal {
+export function dealSaga(storyRng: Rng, recentThemeIds: string[], a: { personal: boolean; personalSeed?: string; spark?: string; arm?: SeedArm; next?: boolean }): SagaDeal {
   if (a.arm && a.arm !== 'themes') return dealKitSaga(storyRng, a.arm, a);
   let seed: SagaDeal['seed'];
   let themeTone: string | undefined;
@@ -513,9 +546,11 @@ export function dealSaga(storyRng: Rng, recentThemeIds: string[], a: { personal:
  *  person the ending decides; kit+pick+cast 3–4, of whom its pick keeps at most one), the tone roll (no theme brings
  *  one), the shape (read only for the floor's stake) and the stake. A personal saga's seed stays its own past; a lab
  *  spark still wins. Every draw on `storyRng`, one per field in every arm (so arms that deal alike draw alike) */
-function dealKitSaga(storyRng: Rng, arm: Exclude<SeedArm, 'themes'>, a: { personal: boolean; personalSeed?: string; spark?: string }): SagaDeal {
+function dealKitSaga(storyRng: Rng, arm: Exclude<SeedArm, 'themes'>, a: { personal: boolean; personalSeed?: string; spark?: string; next?: boolean }): SagaDeal {
   const personal = a.personal && !!a.personalSeed;
-  const k = dealKit(storyRng, arm, personal);
+  // (a NEXT chapter, chain B, C…) the new matter is DEALT, as a hired saga's is — a situation beside the keywords; the seed
+  // stays who the soldier is now (round CB: handed only the settled wrong, 8 of 8 real chain Bs wrote it again)
+  const k = dealKit(storyRng, arm, personal && !a.next);
   const [lo, hi] = KIT_DEAL.cast.support;
   const support = CASTS.has(arm) ? storyRng.range(lo, hi) : storyRng.int(3);
   const seed = { id: null, text: a.spark ?? (personal ? a.personalSeed! : k.situations[0]!) };

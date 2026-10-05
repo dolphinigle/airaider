@@ -255,6 +255,8 @@ function stateView() {
     excavateBlock: game.gold() < excavateCost(st.fort.cells.length) ? `short ${excavateCost(st.fort.cells.length) - game.gold()}g` : null,
     roster: game.roster().map(m => ({
       ...cardView(m), cap: game.capOf(m.id), dossier: game.dossier(m.id, { player: true }),
+      // the living dossier (STORY_ENGINE §4): who they are now, what marked them, who matters — the CLI's `merc` prints the same lines
+      living: game.livingLines(m.id),
       healEta: m.character!.injuryTiers > 0 ? game.healEta(m) : null,
       xpNeeded: xpNeeded(m.character!.level),
       // their best FREE place on every open quest: {questId,title,idx,attr,coins,bar,strength,here}

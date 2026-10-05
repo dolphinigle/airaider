@@ -106,6 +106,11 @@ export function CardSheet({ s, id, cast, doAct, quick, close, openQuest, openRoo
                   </div>);
               })}
             </div>
+            {/* the living dossier (STORY_ENGINE §4): who they are now, what marked them, who matters — the CLI's `merc` prints the same lines */}
+            {(c.living ?? []).length > 0 && <div className="blk">
+              <span className="lbl">Story so far</span>
+              {c.living.map((t: string, i: number) => <p className="p" key={'l' + i}>{t}</p>)}
+            </div>}
             <div className="two">
               <div className="blk">
                 <span className="lbl">Their story</span>

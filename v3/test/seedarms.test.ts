@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import { Rng } from '../src/engine/rng.js';
 import { seedIdCounter } from '../src/engine/cards.js';
-import { dealSaga, castSaga, seedOf, seedPending, keepPicked, piped, SEED_ARM, KIT_CLIENT_PART, PIPE_ARMS, PIPE_ARM, type SeedArm, type SagaPlan, type SagaWorld } from '../src/engine/saga.js';
+import { dealSaga, castSaga, seedOf, seedPending, keepPicked, piped, SEED_ARM, KIT_CLIENT_PART, PIPE_ARMS, PIPE_ARM, GAME_PIPE, type SeedArm, type SagaPlan, type SagaWorld } from '../src/engine/saga.js';
 import { dealKit, KIT, KIT_DEAL, SEED_ARMS, plainAtom, plainKeywords } from '../src/engine/seedkit.js';
 import { planPayload, pickPayload, premisePayload, readPick, mockPick, seedSteps, cannedOption, clientOf, whyFlags, planHope, graftRoad, newKnowing, newState, questLog, logLines, laterCardPayload, oneResult, troublePhrase, validatePlan, planLint, haveOf, readLate, choiceTarget, mockPlan, cardWhy, capFor, pageChecks, grownLine, dealtWords, namedIn, roleOf, ownCost } from '../src/ai/storyteller.js';
 import type { AiProvider, SagaCall } from '../src/ai/provider.js';
@@ -251,8 +251,8 @@ describe('pipeline arms on the floor', () => {
     expect(chain.saga!.world.kit!.arm).toBe('kit+pick');
     deal({ ...hostFor(g), pipeArm: () => undefined }, chain, undefined, focal);
     expect(chain.saga!.world.pipe).toBeUndefined();
-    expect(PIPE_ARMS).toEqual(['one', 'grafts', 'sides', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx', 'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback']);
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'grafts'))).toEqual(['grafts', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx', 'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback']);
+    expect(PIPE_ARMS).toEqual(['one', 'grafts', 'sides', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx', 'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'grafts'))).toEqual(['grafts', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx', 'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands']);
     // round T: each arm is grafts plus its own change, and no other round-T arm carries it (judged against G0's draws on disk);
     // the verifier's shared fixes (clean) ride on no round-T arm. The stack round (S1–S3): a shipped arm plus one change
     for (const part of ['room', 'weight', 'lore', 'page'] as const) expect(PIPE_ARMS.filter(p => piped({ pipe: p }, part))).toEqual([part]);
@@ -261,13 +261,17 @@ describe('pipeline arms on the floor', () => {
     // voice (TC) is three pieces: card 1's line (the plan's), a won clue's witness, the finale's teller; S2 takes the teller, and
     // its card-1 line is the past's own first sentence (quote)
     // (round H: HP keeps `says` for a personal saga, whose soldier has no hired asker's past to stand in its place)
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'says'))).toEqual(['voice', 'voice+line', 'voice+clean', 'voice+asker', 'voice+setback']);
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'teller'))).toEqual(['voice', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback']);
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'witness'))).toEqual(['voice', 'voice+line', 'voice+clean', 'voice+asker', 'voice+setback']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'says'))).toEqual(['voice', 'voice+line', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'teller'))).toEqual(['voice', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'witness'))).toEqual(['voice', 'voice+line', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands']);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'quote'))).toEqual(['past+voice']);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'motive'))).toEqual(['voice+line']);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'asker'))).toEqual(['voice+asker']);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'setback'))).toEqual(['voice+setback']);
+    // RFA: RF part (a) alone, on TC as measured (no cost fix); the cost fix rides on the game's two pipes only
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'stands'))).toEqual(['voice+stands']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'owncost'))).toEqual(['voice', 'past']);
+    expect([GAME_PIPE.personal, GAME_PIPE.other].every(p => piped({ pipe: p }, 'owncost'))).toBe(true);
     // each E arm is grafts plus its own change, and no other arm carries it; each F arm too, and FX carries all three
     for (const part of ['late', 'trail', 'narrow'] as const) expect(PIPE_ARMS.filter(p => piped({ pipe: p }, part))).toEqual([part]);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'line'))).toEqual(['line', 'fx', 'voice+line']);
@@ -978,12 +982,17 @@ describe('round T (Sultan texture/pacing; the page first; personal past + change
     (g as unknown as { settleFinale: (q: unknown, c: unknown, r: unknown, rep: string[], f: unknown) => void }).settleFinale({ id: 'q-test' }, chain, { outcome: 'success', party: [focal] }, report, { fate: 'clean' });
     // kept on the soldier: the seed the saga was dealt, the past it told (the past the change resolves) and the line
     const past = chain.saga!.plan!.cast.find(p => p.seat === 'soldier')!.past!;
-    expect(focal.character!.grown).toEqual([{ seed: chain.saga!.world.seed.text, past, line }]);
+    expect(focal.character!.grown).toEqual([{ seed: chain.saga!.world.seed.text, past, line, title: chain.saga!.plan!.title, chainId: chain.id, cycle: g.state.cycle }]);
     // the sheet's own memories (the CLI's `merc` dossier and the GUI sheet read the same lines)
     expect(g.dossier(focal.id, { player: true })).toContain(`- ${line}`);
     expect(g.dossier(focal.id, { player: true })).not.toContain('came through');
-    // the next personal saga's seed: what this one was told from, the past it told, then what it made of them
-    expect((g as unknown as { personalSeed: (m: unknown) => string }).personalSeed(focal)).toBe(`${chain.saga!.world.seed.text} ${past} ${line}`);
+    // the next personal saga (chain B): seeded from the living dossier's Now, who they became (no settled marks), and dealt
+    // the settled past as history
+    const next = (g as unknown as { personalSeedOf: (m: unknown, r: string, ids: Set<string>) => { seed: string; history?: string } }).personalSeedOf(focal, chain.region, new Set());
+    expect(next.history).toBe(past);
+    expect(next.seed.split('\n')[0]).toBe(line.replace(`After ${chain.saga!.plan!.title}: `, ''));
+    expect(next.seed).not.toContain(chain.saga!.plan!.title);
+    expect(next.seed).not.toContain(past);
     // a later saga that closes on this soldier with no line of its own (its plan wrote no change) leaves its own memory beside
     // the growth line — a new fact, never merged into it (dropped, or written over it)
     delete chain.saga!.grown;

@@ -19,8 +19,10 @@ export interface AttrVector { str: number; dex: number; int: number; cha: number
 
 export type Focus = { kind: 'none' } | { kind: 'single'; attr: Attribute } | { kind: 'dual'; a: Attribute; b: Attribute };
 
-/** what one personal saga made of its soldier (CharacterData.grown) */
-export interface GrownEntry { seed: string; past?: string; line: string }
+/** what one personal saga made of its soldier (CharacterData.grown): the seed it was dealt, the past it told, its dossier
+ *  line (the change). `title`, `chainId`, `cycle` (saves from 2026-10-05 on): the saga it came from, and when — the living
+ *  dossier's "now" reads the line without its title, and the next chapter's cooldown counts from `cycle` */
+export interface GrownEntry { seed: string; past?: string; line: string; title?: string; chainId?: string; cycle?: number }
 
 export interface CharacterData {
   role: CharRole;
@@ -43,6 +45,10 @@ export interface CharacterData {
    *  saga was dealt, the past it told (the plan's `past`) and its engine-written dossier line (SagaRecord.grown, the change).
    *  The last entry, whole, seeds their next personal saga (game.ts personalSeed) */
   grown?: GrownEntry[];
+  /** the LIVING DOSSIER (STORY_ENGINE §4, North Star 0): who they are now, the events that marked them, the people who matter
+   *  to them — bounded, engine-composed (engine/dossier.ts) and refreshed when a saga they were part of resolves. Both UIs
+   *  show it; it seeds their next personal saga */
+  living?: import('./dossier.js').LivingDossier;
 }
 
 export interface Card {
