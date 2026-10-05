@@ -1,16 +1,20 @@
 // The recurring personal arc (docs/STORYTELLER.md North Star 0, designer 2026-10-05; STORY_ENGINE §4, §8): the bounded
 // LIVING DOSSIER (engine/dossier.ts) refreshed as sagas close, chain B, C… offered after a settled personal saga and a
 // cooldown, seeded from the dossier with a DEALT situation as its new matter (the `next` lines; the settled wrong is kept on the
-// world for the log-only retelling lint, never sent — handed it, 8 of 8 real chain Bs retold it; a first personal saga's
-// prompts are untouched). Plus round H's two default-path changes: the partial's cost as ONE phrase naming its
+// world as the chain-B marker, never sent — handed it, 8 of 8 real chain Bs retold it; a first personal saga's prompts are
+// untouched; the log-only lint reads the change against the Now). Plus round H's two default-path changes: the partial's cost as ONE phrase naming its
 // owner (`owncost`, the game's pipes), and RFA (RF part (a) alone on TC).
 import { describe, it, expect } from 'vitest';
 import { Game, PERSONAL_CHAPTER_COOLDOWN } from '../src/game/game.js';
 import { seedIdCounter, type Card } from '../src/engine/cards.js';
 import type { Chain } from '../src/engine/chains.js';
 import { composeLiving, livingLines, livingSeed, historyOf, nowOf, unnamed, LIVING_MAX_LINES, type LifeMark } from '../src/engine/dossier.js';
-import { piped, GAME_PIPE, COSTS, type Cost } from '../src/engine/saga.js';
-import { costPhrase, reportPayload, retellShare, RETELL_SHARE } from '../src/ai/storyteller.js';
+import { piped, partOf, castSaga, GAME_PIPE, COSTS, RETURNER_PART, type Cost, type Face } from '../src/engine/saga.js';
+import { Rng } from '../src/engine/rng.js';
+import { testedTraits, traitsOf } from '../src/engine/plainwords.js';
+import { costPhrase, reportPayload, changeNowShare, CHANGE_NOW_SHARE, standing } from '../src/ai/storyteller.js';
+import { standsFact } from '../src/game/sagaflow.js';
+import type { SagaPlan, Episode } from '../src/engine/saga.js';
 import { renderSaga } from '../src/ai/prompts/saga/render.js';
 import { render } from '../cli/format.js';
 import { newGame, sagaChain, playSaga } from './sagaharness.js';
@@ -255,12 +259,13 @@ describe('the next chapter: a dealt matter, the settled wrong never sent', () =>
     const soldier = p.cast.find(c => c.seat === 'soldier')!;
     expect(soldier.past).toContain(w.kit!.picked?.situation ?? w.kit!.situations[0]!);
     for (const t of [soldier.past, soldier.change, p.question, p.answer, p.showdown.settles]) expect(t).not.toMatch(/old wrong|run(ning)? from/);
-    // the log-only lint: a new past made of the settled one is flagged, a new matter is not
-    soldier.past = 'At the spring fair Ismenios left his friend to drown, and he still hears the bell.';
-    expect(retellShare(p, w)).toBeGreaterThan(0.8);
-    soldier.past = 'A widow at the ferry asks Ismenios to guard her son on the flooded road. He knows that river.';
-    expect(retellShare(p, w)!).toBeLessThan(RETELL_SHARE);
-    expect(retellShare(p, { personal: true })).toBeUndefined();
+    // the log-only lint: a change that copies who they already were (the Now) is flagged, a change that goes elsewhere is not;
+    // their own name is no shared word
+    soldier.change = 'Ismenios dives in, now and always.';
+    expect(changeNowShare(p, w)).toBeGreaterThanOrEqual(CHANGE_NOW_SHARE);
+    soldier.change = 'Ismenios trusts the widow with the ferry and lets her steer.';
+    expect(changeNowShare(p, w)!).toBeLessThan(CHANGE_NOW_SHARE);
+    expect(changeNowShare(p, { ...w, history: undefined })).toBeUndefined();
   });
 });
 
@@ -271,5 +276,178 @@ describe('unnamed: a name beside its own trade is one person', () => {
     expect(unnamed('Benjamund, the old moneylender, fled.', people)).toBe('The human moneylender fled.');
     expect(unnamed('The Mill burned; the mill stood.', [{ name: 'Mill', label: 'a ghost' }])).toBe('The ghost burned; the mill stood.');
     expect(unnamed('They met the miller and Benjamund.', people)).toBe('They met the miller and the human moneylender.');
+  });
+});
+
+describe('chain B\'s inputs (CBR, CBT; lab arms): the Now to no call, the event, one dealt item', () => {
+  const history = 'At the spring fair Ismenios left his friend to drown. He still hears the bell.';
+  const now = 'Ismenios dives in now, whoever is in the water.';
+  /** one chain B on `pipe`, played to its end on the mock; `seat`: a tied face from their last chapter (D10) */
+  async function chainB(pipe: 'past' | 'past+return' | 'past+trait', seat?: Face & { rival: boolean }) {
+    seedIdCounter(1);
+    const { g, ai } = newGame(21);
+    const { chain, focal } = sagaChain(g, { N: 3, personal: true });
+    const p = await playSaga(g, chain, 'personal', focal, undefined, { pipeArm: () => pipe }, { personalSeed: now, history, ...(seat ? { seedPerson: seat } : {}) });
+    return { g, ai, chain, focal, p, w: chain.saga!.world };
+  }
+  const face: Face & { rival: boolean } = { id: 'lore-9', name: 'Aeta Nightrunner', sex: 'female', race: 'wolfman', trade: 'potter', memory: 'The company won over the moneylender, and Ismenios carried the potter home.', where: 'in the Western Forests', rival: false };
+  it('the deal is CB\'s own; CBT adds the trait it tests, drawn after it, from the soldier\'s card', async () => {
+    const cb = await chainB('past'), cbt = await chainB('past+trait'), cbr = await chainB('past+return');
+    for (const x of [cbt, cbr]) {
+      expect(x.w.kit!.situations).toEqual(cb.w.kit!.situations);
+      expect(x.w.kit!.keywords).toEqual(cb.w.kit!.keywords);
+      expect(x.w.places).toEqual(cb.w.places);
+      // (a situation taking "someone" with nobody to fill it adds one person, after the rest)
+      expect(x.w.cast.map(c => c.name).slice(0, cb.w.cast.length)).toEqual(cb.w.cast.map(c => c.name));
+    }
+    expect(cb.w.tests).toBeUndefined();
+    expect(cbr.w.tests).toBeUndefined();
+    expect(testedTraits(cbt.focal)).toContain(cbt.w.tests);
+    // the tested trait leads the soldier's traits (the card's own first two could miss it); CB's stay the card's
+    const me = cbt.w.cast.find(c => c.seat === 'soldier')!;
+    expect(me.traits!.split(', ')[0]).toBe(cbt.w.tests);
+    expect(me.traits!.split(', ').length).toBeLessThanOrEqual(2);
+    expect(cb.w.cast.find(c => c.seat === 'soldier')!.traits).toBe(traitsOf(cb.focal));
+  });
+  it('a situation that takes "someone" deals a person to fill it, after every other draw; never on a hired saga or a filled seat', () => {
+    seedIdCounter(1);
+    const { g } = newGame(9);
+    const { focal, chain } = sagaChain(g, { N: 3, personal: true });
+    const base = { focal, personal: true, region: chain.region, shape: 'heist' as const, taken: () => false };
+    const bare = castSaga(new Rng(5), base), filled = castSaga(new Rng(5), { ...base, someone: true });
+    expect(filled.places).toEqual(bare.places);
+    expect(filled.cast.slice(0, bare.cast.length)).toEqual(bare.cast);
+    expect(filled.cast).toHaveLength(bare.cast.length + 1);
+    expect(filled.cast.at(-1)).toMatchObject({ seat: 'support', part: '' });
+    expect(castSaga(new Rng(5), { ...base, someone: true, kit: { support: 1 } }).cast.filter(c => c.seat === 'support')).toHaveLength(1);
+    expect(castSaga(new Rng(5), { ...base, someone: true, seedPerson: { ...face, rival: false } }).cast.filter(c => c.seat === 'support')).toHaveLength(0);
+    expect(castSaga(new Rng(5), { ...base, personal: false, someone: true }).cast.filter(c => c.seat === 'support')).toHaveLength(0);
+  });
+  it('the plan and the pick never get the Now; the plan gets the soldier\'s event (and CBT its trait); CB keeps its own', async () => {
+    const cb = await chainB('past');
+    expect(cb.ai.calls.find(c => c.template === 'plan')!.payload.now).toBe(now);
+    expect(cb.ai.calls.find(c => c.template === 'pick')!.flags).toEqual(['next']);
+    for (const pipe of ['past+return', 'past+trait'] as const) {
+      const { ai, chain, w } = await chainB(pipe);
+      const pick = ai.calls.find(c => c.template === 'pick')!, plan = ai.calls.find(c => c.template === 'plan')!;
+      expect(pick.flags).not.toContain('next');
+      expect(plan.flags).toEqual(expect.arrayContaining(['next', 'event']));
+      expect(plan.flags.includes('tests')).toBe(pipe === 'past+trait');
+      expect(plan.payload.tests).toBe(pipe === 'past+trait' ? w.tests : undefined);
+      for (const c of [pick, plan]) expect(JSON.stringify(c.payload)).not.toContain('dives in');
+      const sys = renderSaga('plan', plan.flags);
+      expect(sys).toContain('event: two plain sentences: what just happened, at what season, that pulls the soldier in.');
+      expect(sys).toContain('"event": "two sentences"');
+      expect(sys).not.toMatch(/now:|"past"|past:|who they became/);
+      expect(sys.includes('tests: the soldier\'s trait it puts to the test.')).toBe(pipe === 'past+trait');
+      // the plan's event is the matter card 1 tells (kept where a past is)
+      expect(chain.saga!.plan!.cast.find(c => c.seat === 'soldier')!.past).toMatch(/^This season at /);
+      for (const c of ai.calls) expect(JSON.stringify(c.payload)).not.toContain('left his friend to drown');
+    }
+  });
+  it('card 1 tells the event, never who they became; no report gets the Now; the reports call them the one whose story this is', async () => {
+    const { ai, w } = await chainB('past+trait');
+    const card1 = ai.calls.find(c => c.template === 'card')!;
+    expect(card1.flags).toEqual(expect.arrayContaining(['next', 'event']));
+    expect(card1.flags).not.toContain('now');
+    const premise = card1.payload.premise as Record<string, string>;
+    expect(premise.now).toBeUndefined();
+    expect(premise.event).toMatch(/^This season at /);
+    expect(premise.past).toBeUndefined();
+    expect(renderSaga('card', card1.flags, card1.vars)).toContain('who: one of your own soldiers. wants: what they want. event: what just drew them in.');
+    expect(card1.vars.MAX).toBe(90);
+    for (const c of ai.calls) expect(JSON.stringify(c.payload)).not.toContain('dives in');
+    const reports = ai.calls.filter(c => c.template === 'report');
+    for (const r of reports) {
+      const own = (r.payload.soldiers as { is: string; became?: string }[])[0]!;
+      expect(own.is).toMatch(/, whose story this is$/);
+      // (CBT) their trait word is the tested trait, wherever the report shows their traits
+      expect(own.is).toContain(`, ${w.tests}, `);
+      expect(own.became).toBeUndefined();
+      expect(r.flags).toContain('next');
+      expect(r.flags).not.toContain('now');
+      expect(renderSaga('report', r.flags, r.vars)).toContain('Name no soldier but the one whose story this is');
+      expect(renderSaga('report', r.flags, r.vars)).toContain('- soldiers: who went, what each is like.');
+    }
+    // the default's chain B (CB) is untouched: whose past this story is, and no became
+    const cb = await chainB('past');
+    for (const r of cb.ai.calls.filter(c => c.template === 'report')) {
+      expect((r.payload.soldiers as { is: string }[])[0]!.is).toMatch(/, whose past this story is$/);
+      expect(r.flags).not.toContain('next');
+      expect(JSON.stringify(r.payload)).not.toContain('became');
+    }
+    expect(cb.ai.calls.find(c => c.template === 'card')!.flags).not.toContain('event');
+  });
+  it('CBR: the person from their last chapter asks the soldier for help, with their memory and their role word; the game\'s tied face keeps its part', async () => {
+    const { ai, w } = await chainB('past+return', face);
+    const seated = w.cast.find(c => c.id === 'lore-9')!;
+    expect(seated).toMatchObject({ seat: 'other', part: RETURNER_PART, memory: face.memory, known: true });
+    expect(partOf(seated)).toBe(RETURNER_PART);
+    expect(RETURNER_PART).toBe('asks the soldier for help');
+    // named from the start (known there), never an intro: their role word rides on every entry that has them
+    const entries = ai.calls.filter(c => c.template === 'report' || c.template === 'card').flatMap(c => [...((c.payload.people ?? []) as Record<string, unknown>[]), ...((c.payload.names ?? []) as Record<string, unknown>[])]).filter(x => x.name === face.name);
+    expect(entries.length).toBeGreaterThan(0);
+    for (const x of entries) { expect(x.label).toBe('a potter'); expect(x.intro).toBeUndefined() }
+    for (const x of entries.filter(x => x.part)) expect(x.part).toMatch(/^asks \S.* for help$/);
+    const plan = ai.calls.find(c => c.template === 'plan')!;
+    expect(plan.flags).toContain('memory');
+    expect((plan.payload.cast as { id: string; part?: string; memory?: string }[]).find(c => c.id === 'lore-9')).toMatchObject({ part: RETURNER_PART, memory: face.memory, where: face.where });
+    // the default's chain B seats the same tied face as before: "knows the soldier's past"; a rival is never re-parted
+    expect((await chainB('past', face)).w.cast.find(c => c.id === 'lore-9')!.part).toBe("knows the soldier's past");
+    expect((await chainB('past+return', { ...face, rival: true })).w.cast.find(c => c.id === 'lore-9')!).toMatchObject({ seat: 'opponent', part: 'stands in the way' });
+  });
+  it('the change-vs-Now lint runs on every chain B (the plan never saw the Now on CBR/CBT)', async () => {
+    for (const pipe of ['past', 'past+trait'] as const) {
+      const { chain, w } = await chainB(pipe);
+      expect(changeNowShare(chain.saga!.plan!, w)).toBeTypeOf('number');
+    }
+  });
+});
+
+describe('testedTraits: what a next chapter may test', () => {
+  it('personality words and quirks first, else body and standing words', () => {
+    const card = (concepts: string[], quirks?: string[]) => ({ tags: concepts.map(concept => ({ concept })), character: { quirks } }) as unknown as Card;
+    expect(testedTraits(card(['muscular', 'hotheaded', 'greedy', 'chaste'], ['hums when nervous.']))).toEqual(['hot-headed', 'greedy', 'hums when nervous']);
+    expect(testedTraits(card(['muscular', 'tall']))).toEqual(['strong', 'tall']);
+    expect(testedTraits(card([]))).toEqual([]);
+  });
+});
+
+describe('RFW: RFA with its fact widened', () => {
+  it('what stands, by name: the job\'s people (but the soldiers sent), then its place as the job says it', () => {
+    const plan = { cast: [{ id: 'p1', name: 'Eraldil', label: 'elf horse-breeder', seat: 'client', sex: 'female', race: 'elf' }, { id: 'p2', name: 'Eussorus', label: 'human merchant', seat: 'support', sex: 'male', race: 'human' }] } as unknown as SagaPlan;
+    const e = { job: 'Drive off the raiders creeping toward the barn at Greydale', people: ['p1', 'p2'], trouble: { who: 'raiders on stolen horses', carry: 'clubs', will: '' } } as unknown as Episode;
+    const xs = standing(plan, e, [], ['Greydale', 'Thornholt', 'Ashby']);
+    expect(xs).toEqual(['Eraldil', 'Eussorus', 'the barn at Greydale']);
+    expect(standsFact(true, xs)).toBe("Eraldil, Eussorus, the barn at Greydale and whatever else the job names, all still within the company's reach, for the company tries this job again");
+    expect(standing(plan, { ...e, job: 'Hold Thornholt', people: [] } as unknown as Episode, [], ['Greydale', 'Thornholt'])).toEqual(['Thornholt']);
+    // a verb between "the" and the place is no thing standing there: the bare place (the merchant the job names is there)
+    expect(standing(plan, { ...e, job: 'Break the prisoner the merchant keeps out of Thornholt', people: [] } as unknown as Episode, [], ['Thornholt'])).toEqual(['Eussorus', 'Thornholt']);
+    expect(standing(plan, e, ['Eussorus'], ['Greydale'])).toEqual(['Eraldil', 'the barn at Greydale']);
+    expect(standsFact(false, ['Thornholt'])).toBe("Thornholt and whatever else the job names, all still within the company's reach");
+    // nothing the engine can name: the rule's words, still within reach; RFA's fact unchanged
+    expect(standsFact(false, [])).toBe("whoever and whatever the job names, and its place, all still within the company's reach");
+    expect(standsFact(true)).toBe('whoever and whatever the job names, and its place, for the company tries this job again');
+  });
+  it('a failed middle job\'s report is dealt that all of it is still within the company\'s reach; RFA\'s fact unchanged', async () => {
+    for (const pipe of ['voice+reach', 'voice+stands'] as const) {
+      seedIdCounter(1);
+      const { g, ai } = newGame(21);
+      const { chain, focal } = sagaChain(g, { N: 4, personal: false });
+      await playSaga(g, chain, 'bumpy', focal, undefined, { pipeArm: () => pipe });
+      const failed = ai.calls.filter(c => c.template === 'report' && c.flags.includes('failure'));
+      expect(failed.length).toBeGreaterThan(0);
+      for (const c of failed) {
+        expect(c.flags).toContain('stands');
+        // RFW: what stands by name (the job's people, its place as the job says it), all still within reach; RFA's rule words
+        if (pipe === 'voice+reach') {
+          expect(String(c.payload.stands)).not.toMatch(/^whoever/);
+          expect(String(c.payload.stands)).toContain(' and whatever else the job names, all still');
+          expect(String(c.payload.stands)).toMatch(/still within the company's reach(?:, for the company tries this job again)?$/);
+        } else expect(String(c.payload.stands)).toMatch(/^whoever and whatever the job names, and its place(?:, for the company tries this job again)?$/);
+      }
+      const cost = ai.calls.find(c => c.template === 'report' && c.payload.cost !== undefined);
+      if (cost) expect(typeof cost.payload.cost).toBe('object');
+    }
   });
 });

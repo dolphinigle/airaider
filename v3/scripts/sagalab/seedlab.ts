@@ -115,10 +115,31 @@
 //                      finale report: the retelling check — NOT in order.txt, not read as the saga) and dossier.md (the
 //                      dossier before chain B, its history, and the dossier after). A slot whose chain A left no growth line
 //                      (its finale lost, or no change written) has no chain B: it FAILS, logged, and --check lists it missing
+//   CHAIN B's INPUTS (recurring-arcs report §1.6; engine/saga.ts PipeArm past+return / past+trait), each CB_g<N>'s exact deal
+//   (the same story rng; the game's chain B stays CB) plus the shared class fix `event`: NO call gets the Now (the plan, the
+//   pick, card 1, the finale — a fact a writer gets that the plan never built on is pasted as a dead-end line or re-settles the
+//   old wrong); the soldier's card-1 field is their `event` (what just happened that pulls them in), never a `past`; a report
+//   calls them the one "whose story this is"; a situation that takes "someone" with nobody to fill it is dealt one more
+//   supporting person (after every other draw). Then ONE dealt personal item each:
+//   CBR past+return    a person from that soldier's chain A — PP_g<N>/<slot>'s cast standing in for the lore: someone the
+//                      chain met in a job (never the one resolved against, the person in its ending; never one it held
+//                      captive) whom a chronicle line names, the first in cast order — seated as the game seats a tied face
+//                      (D10: known; their memory the LAST line naming them, chain A's other people by label), with the part
+//                      "asks the soldier for help", their role word on every entry. A chain A with nobody else named plays
+//                      the shared fix alone (plan.json chainA.returner: null, with why)
+//   CBT past+trait     one of the soldier's traits or quirks from their card (engine/plainwords.ts testedTraits; drawn after
+//                      the deal, so the rest is CB's), dealt to the plan as `tests`; the change comes from it; it leads the
+//                      soldier's cast traits and is their trait word in every report
+//   Log-only on all three: chain B's change-vs-Now overlap (storyteller changeNowShare; plan.json chainA.changeNow), which
+//   replaces the blind past-vs-history retellShare
+//   RFW voice+reach    RFA widened (recurring-arcs report §2): the failed job's report is dealt what still stands BY NAME —
+//                      the job's people and its place as the job says it ("Eraldil, Eussorus and the barn at Greydale") — all
+//                      still within the company's reach (the class left: the place taken, not destroyed). No cost fix, as RFA, so it differs from RFA by the fact's words alone. A2's
+//                      deals; only the draw-3 slots
 //
-//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A2c|A3|A4|B1|B2|C2|C3|D1|D2|G0|E1|E2|E3|F1|F2|F3|FX|TA|TB|TC|TD|TP|PG0|PP|S1|S2|S3|HP|RF|RFA|CB_g<N>|all, or <arm>_g<N> = a further generation] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
+//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A2c|A3|A4|B1|B2|C2|C3|D1|D2|G0|E1|E2|E3|F1|F2|F3|FX|TA|TB|TC|TD|TP|PG0|PP|S1|S2|S3|HP|RF|RFA|RFW|CB_g<N>|CBR_g<N>|CBT_g<N>|all, or <arm>_g<N> = a further generation] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
 //        [--slots F6_3,F1_1] [--writer sonnet|haiku|openai] [--mock] [--pool 6] [--run seed1|seed2|pers1] [--force]
-//   (PG0, PP, S2 and CB play only the personal set, --run pers1; every other arm only the probe set)
+//   (PG0, PP, S2, CB, CBR and CBT play only the personal set, --run pers1; every other arm only the probe set)
 //   npx tsx scripts/sagalab/seedlab.ts --stats [--run seed1]     spend and latency per call kind over the run's folders
 //   npx tsx scripts/sagalab/seedlab.ts --check [--run seed1]     which saga folders are missing or incomplete
 //   npx tsx scripts/sagalab/seedlab.ts --render --arm E1,E2,E3 --slots F6_3 [--out _e_rendered] [--mock] [--run seed1]
@@ -175,8 +196,9 @@ import type { Outcome, SlotTest } from '../../src/engine/roll.js';
 import type { Attribute } from '../../src/engine/tags.js';
 import { renderTags } from '../../src/engine/tags.js';
 import { hashStr, seedOf, SEED_ARM, PIPE_ARM, type SeedArm, type PipeArm, type Face, type Hurt, type SagaRecord, type SagaWorld, type SagaPlan } from '../../src/engine/saga.js';
-import { logLines, matterLine, buttonLine, pageChecks, retellShare } from '../../src/ai/storyteller.js';
-import { composeLiving, livingLines, livingSeed, historyOf, type LifeMark } from '../../src/engine/dossier.js';
+import { logLines, matterLine, buttonLine, pageChecks, changeNowShare, mentions } from '../../src/ai/storyteller.js';
+import { REGION } from '../../src/engine/regions.js';
+import { composeLiving, livingLines, livingSeed, historyOf, unnamed, type LifeMark } from '../../src/engine/dossier.js';
 import type { GrownEntry } from '../../src/engine/cards.js';
 import * as flow from '../../src/game/sagaflow.js';
 import type { TextRec } from './extract.js';
@@ -211,28 +233,30 @@ export const ARMS: Record<string, SeedArm> = {
   PG0: SEED_ARM, PP: 'kit+pick',
   S1: 'kit+pick', S2: 'kit+pick', S3: 'kit+pick',
   HP: 'kit+pick', RF: 'kit+pick', RFA: 'kit+pick', CB: 'kit+pick',
+  CBR: 'kit+pick', CBT: 'kit+pick', RFW: 'kit+pick',
 };
 /** the pipeline arms: kit+pick's seed, one pipeline change each (the host's pipeArm; D1, D2 and E1–E3 carry C2's too). G0's is
  *  the build's PIPE_ARM, recorded here for the folder's labels; its host names none */
 export const PIPES: Record<string, PipeArm> = { B2: 'one', C2: 'grafts', C3: 'sides', D1: 'reads', D2: 'fixes', G0: PIPE_ARM, E1: 'late', E2: 'trail', E3: 'narrow', F1: 'line', F2: 'plain', F3: 'link', FX: 'fx',
   TA: 'room', TB: 'weight', TC: 'voice', TD: 'lore', TP: 'page', PG0: PIPE_ARM, PP: 'past', S1: 'voice+line', S2: 'past+voice', S3: 'voice+clean',
-  HP: 'voice+asker', RF: 'voice+setback', RFA: 'voice+stands', CB: 'past' };
+  HP: 'voice+asker', RF: 'voice+setback', RFA: 'voice+stands', CB: 'past', CBR: 'past+return', CBT: 'past+trait', RFW: 'voice+reach' };
 /** an arm whose host names no seed or pipe arm: the build's SEED_ARM and PIPE_ARM stand (C2 grafts). Not the game's own
  *  pipeline since 2026-10-05 (engine/saga.ts GAME_PIPE: TC hired, PP personal) */
 const BUILD_DEFAULT = new Set(['G0', 'PG0']);
 /** the personal set's arms: they play only --run pers1, and that run plays only them */
-const PERSONAL_ARMS = new Set(['PG0', 'PP', 'S2', 'CB']);
-/** chain B (North Star 0): seeded from PP_g<N>'s chain A in the same slot, dealt its own deal (never the run's shared one) */
-const CHAIN_B = new Set(['CB']);
+const PERSONAL_ARMS = new Set(['PG0', 'PP', 'S2', 'CB', 'CBR', 'CBT']);
+/** chain B (North Star 0): seeded from PP_g<N>'s chain A in the same slot, dealt its own deal (never the run's shared one;
+ *  CBR and CBT deal exactly what CB deals in the slot — the same story rng — then their own item) */
+const CHAIN_B = new Set(['CB', 'CBR', 'CBT']);
 /** an arm that changes only the failure path plays only the draw-3 slots (bumpy / lastchance): on draws 1–2 it would send the
  *  incumbent's exact prompts (RFA) */
-const DRAW3_ONLY = new Set(['RFA']);
+const DRAW3_ONLY = new Set(['RFA', 'RFW']);
 const plays = (armId: string, d: number) => !DRAW3_ONLY.has(gen(armId)) || (d - 1) % 3 === 2;
 /** seed1: an arm that plays another arm's deals — each slot's dealt world is read back from that arm's plan.json (the
  *  noise control: a later change to the deal — the supporting trades — cannot move its inputs; the pipeline arms: the arm
  *  is the only difference). A later run shares its own deals instead (`SHARED_DEALS`) */
 const REPLAY: Record<string, string> = { A2b: 'A2', A2c: 'A2', B2: 'A2', C2: 'A2', C3: 'A2', D1: 'A2', D2: 'A2', G0: 'A2', E1: 'A2', E2: 'A2', E3: 'A2', F1: 'A2', F2: 'A2', F3: 'A2', FX: 'A2',
-  TA: 'A2', TB: 'A2', TC: 'A2', TD: 'A2', TP: 'A2', S1: 'A2', S3: 'A2', HP: 'A2', RF: 'A2', RFA: 'A2' };
+  TA: 'A2', TB: 'A2', TC: 'A2', TD: 'A2', TP: 'A2', S1: 'A2', S3: 'A2', HP: 'A2', RF: 'A2', RFA: 'A2', RFW: 'A2' };
 /** a further generation of an arm (the power rule): `<arm>_g<N>` plays `<arm>` exactly — its seed, pipe and replayed deals — into
  *  its own folder, runs/<run>/<arm>_g<N>/ */
 const gen = (armId: string) => armId.replace(/_g\d+$/, '');
@@ -241,9 +265,9 @@ const armArg = opt('arm') ?? 'all';
 const PERSONAL_RUN = RUN === 'pers1';
 const ARM_IDS = armArg === 'all' ? Object.keys(ARMS).filter(a => PERSONAL_ARMS.has(a) === PERSONAL_RUN && !CHAIN_B.has(a)) : armArg.split(',').map(s => s.trim());
 for (const a of ARM_IDS) if (!ARMS[gen(a)]) { console.error(`--arm: ${a} is not one of ${Object.keys(ARMS).join('/')}`); process.exit(2) }
-for (const a of ARM_IDS) if (PERSONAL_ARMS.has(gen(a)) !== PERSONAL_RUN) { console.error(`--arm ${a}: ${PERSONAL_RUN ? 'the personal set (pers1) plays only PG0, PP, S2 and CB' : 'PG0, PP, S2 and CB play only the personal set (--run pers1)'}`); process.exit(2) }
-// chain B reads chain A from the PP generation of the same number: CB_g2 ← PP_g2
-for (const a of ARM_IDS) if (CHAIN_B.has(gen(a)) && !/_g\d+$/.test(a)) { console.error(`--arm ${a}: chain B runs as generations, CB_g<N>, each seeded from PP_g<N>`); process.exit(2) }
+for (const a of ARM_IDS) if (PERSONAL_ARMS.has(gen(a)) !== PERSONAL_RUN) { console.error(`--arm ${a}: ${PERSONAL_RUN ? 'the personal set (pers1) plays only PG0, PP, S2, CB, CBR and CBT' : 'PG0, PP, S2, CB, CBR and CBT play only the personal set (--run pers1)'}`); process.exit(2) }
+// chain B reads chain A from the PP generation of the same number: CB_g2 ← PP_g2 (CBR_g2, CBT_g2 too)
+for (const a of ARM_IDS) if (CHAIN_B.has(gen(a)) && !/_g\d+$/.test(a)) { console.error(`--arm ${a}: chain B runs as generations, ${gen(a)}_g<N>, each seeded from PP_g<N>`); process.exit(2) }
 // G0 replays A2's kit+pick deals: a build that deals another seed is no longer what those deals were dealt for (PG0 shares the
 // personal set's kit+pick deals with PP)
 if (ARM_IDS.some(a => ['G0', 'PG0'].includes(gen(a))) && SEED_ARM !== 'kit+pick') { console.error(`--arm G0/PG0: the build now deals ${SEED_ARM}, but G0 replays A2's kit+pick deals (PG0 shares PP's)`); process.exit(2) }
@@ -421,10 +445,43 @@ interface Row { id: string; path: string; N: number; outcomes: string; files: nu
 /** (CB) a soldier's chain A as chain B reads it — PP_g<N>'s saga in the same slot — kept on the soldier as the game keeps it
  *  (game.ts settleFinale: the grown entry) and composed into their living dossier with the game's own functions
  *  (engine/dossier.ts); prev.md's text (chain A's card 1 and finale report) */
-interface ChainA { from: string; entry: GrownEntry; marks: LifeMark[]; dossier: NonNullable<ReturnType<typeof composeLiving>>; history: string; prev: string }
+interface ChainA { from: string; entry: GrownEntry; marks: LifeMark[]; dossier: NonNullable<ReturnType<typeof composeLiving>>; history: string; prev: string;
+  /** (CBR) the person from chain A who asks the soldier for help, seated as the game seats a tied face; null: nobody fits (why) */
+  returner?: { face: Face; from: string } | { face: null; why: string } }
+interface ChainAPlan { plan: SagaPlan; grown?: string; seedToPlan: { text: string }; lines: SagaRecord['lines']; engine: { N: number; region: string }; knowing: { met: string[] }; banked: { held: number[] } }
+/** (CBR) the lab's stand-in for the lore's tied face (game.ts persistMetCast + nextChapterSeed): a person chain A's company met
+ *  in a job — never the one its ending decided (resolved against), never one the company held captive — whom a chronicle
+ *  line names (by name or their label's head noun), the first in cast order. Their memory is the LAST line that names them:
+ *  their own part, a line the player read. (persistMetCast's rule — the last line of a job they were in — handed Rhene the
+ *  finale's line, about the abbot and the soldier's father, with nothing of hers in it: the plan could use only the old matter,
+ *  and the card hung it on the soldier. The game's tied faces keep that rule while the experiment runs.) Chain A's other people
+ *  by label (a seed names only people the saga can cast: dossier.ts `unnamed`); where they are, the region as the game says it
+ *  (game.ts regionIn) */
+function returnerOf(p: ChainAPlan): { face: Face; from: string } | { face: null; why: string } {
+  const plan = p.plan, met = new Set(p.knowing.met);
+  const eps = [...plan.episodes, plan.showdown];
+  const against = plan.cast.find(c => c.seat === 'opponent');
+  const held = p.banked.held.map(n => plan.episodes[n - 1]?.gain ?? '');
+  const esc = (x: string) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const captive = (c: SagaPlan['cast'][number]) => {
+    const parts = c.name.split(/\s+/).filter(x => x.length > 2 && /^\p{Lu}/u.test(x)).map(esc);
+    const head = esc(c.label.trim().split(/\s+/).at(-1)!.toLowerCase());
+    const rx = new RegExp(`\\b(?:${[...parts, `${head}s?`].join('|')})\\b(?!['’])`, 'iu');
+    return held.some(g => rx.test(g) && /\b(?:captive|prisoner|bound)\b/i.test(g));
+  };
+  const fit = plan.cast.filter(x => x.seat !== 'soldier' && x.id !== against?.id && met.has(x.id) && eps.some(e => e.people.includes(x.id)) && !captive(x));
+  const named = (x: SagaPlan['cast'][number]) => [...p.lines].reverse().find(l => mentions(l.text, x));
+  const c = fit.find(x => named(x));
+  if (!c) return { face: null, why: plan.cast.length <= 2 ? 'chain A cast nobody but the soldier and the one its ending decided' : fit.length ? 'no chronicle line of chain A names anyone else it met in a job' : 'chain A met nobody else in a job but someone it held captive' };
+  const line = named(c)!;
+  const others = plan.cast.filter(x => x.seat !== 'soldier' && x.id !== c.id).map(x => ({ name: x.name, label: x.label }));
+  const reg = REGION[p.engine.region]?.name ?? p.engine.region;
+  const face: Face = { id: `lore-${c.id}`, name: c.name, sex: c.sex, race: c.race, memory: unnamed(line.text, others), where: `in ${reg.startsWith('The ') ? reg.replace(/^The/, 'the') : `the ${reg}`}`, ...(c.trade ? { trade: c.trade } : {}) };
+  return { face, from: `${c.id} (${c.label}), chain A line ${line.n}` };
+}
 function chainAOf(armId: string, slot: string, focal: Card): ChainA {
-  const dir = path.join(armDir(armId.replace(/^CB/, 'PP')), slot), from = path.relative(path.join(LAB, 'runs'), dir);
-  const p = readJson<{ plan: SagaPlan; grown?: string; seedToPlan: { text: string }; lines: SagaRecord['lines']; engine: { N: number } }>(path.join(dir, 'plan.json'));
+  const dir = path.join(armDir(armId.replace(/^CB[RT]?(?=_g)/, 'PP')), slot), from = path.relative(path.join(LAB, 'runs'), dir);
+  const p = readJson<ChainAPlan>(path.join(dir, 'plan.json'));
   if (!p.grown) throw new Error(`${slot}: chain A (${from}) left no growth line (its finale lost, or no change written) — no chain B`);
   const past = p.plan.cast.find(c => c.seat === 'soldier')?.past?.trim();
   const entry: GrownEntry = { seed: p.seedToPlan.text, ...(past ? { past: /[.!?]$/.test(past) ? past : `${past}.` } : {}), line: p.grown, title: p.plan.title, chainId: `${from}`, cycle: 0 };
@@ -439,7 +496,7 @@ function chainAOf(armId: string, slot: string, focal: Card): ChainA {
   const prev = [`# ${focal.name}'s chain A (${from}) — for the retelling check only; NOT part of the saga the readers judge`, '',
     '## chain A, card 1', '', fs.readFileSync(path.join(dir, 'card_1.md'), 'utf8').trim(), '',
     '## chain A, the finale report', '', finK ? fs.readFileSync(path.join(dir, `report_${finK}.md`), 'utf8').trim() : '(none)', ''].join('\n');
-  return { from, entry, marks, dossier, history: historyOf([entry])!, prev };
+  return { from, entry, marks, dossier, history: historyOf([entry])!, prev, ...(gen(armId) === 'CBR' ? { returner: returnerOf(p) } : {}) };
 }
 
 async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string): Promise<Row> {
@@ -468,6 +525,9 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
   // (CB) as the game seeds a next chapter (game.ts personalSeedOf): the living dossier, and the settled past as history
   if (fx.personal) pins.personalSeed = chainA ? livingSeed(chainA.dossier) : base.spark;
   if (chainA) pins.history = chainA.history;
+  // (CBR) the person from chain A, seated as the game seats a tied face (D10: known, their memory); the deal gives them the part
+  // "asks the soldier for help" (sagaflow deal, pipe arm past+return)
+  if (chainA?.returner?.face) pins.seedPerson = { ...chainA.returner.face, rival: false };
   if (fx.returning) { const r = fx.returning; pins.returningClient = { id: 'n1', name: r.name, sex: r.sex, race: r.race, memory: r.memory, where: r.where, ...(r.trade ? { trade: r.trade } : {}) } satisfies Face }
 
   // the deal (synchronous), then the kit's pick and premise and the plan
@@ -591,7 +651,10 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
     pageChecks: pageChecks(plan), ...(final.grown !== undefined ? { grown: final.grown } : {}),
     // (CB) the chain A it was seeded from: where, the grown entry, the dossier as the seed, the history
     // (the retelling lint's share — log-only telemetry: how much of chain B's new past chain A's past already said)
-    ...(chainA ? { chainA: { from: chainA.from, grown: chainA.entry, dossierBefore: livingLines(chainA.dossier), history: chainA.history, retell: retellShare(plan, final.world) ?? null } } : {}),
+    // (CBR) the returning person (null: nobody fit, why); (CBT) the dealt trait; changeNow: the change-vs-Now overlap (log-only)
+    ...(chainA ? { chainA: { from: chainA.from, grown: chainA.entry, dossierBefore: livingLines(chainA.dossier), history: chainA.history, changeNow: changeNowShare(plan, final.world) ?? null,
+      ...(chainA.returner ? { returner: chainA.returner.face ? { ...chainA.returner.face, from: chainA.returner.from } : { face: null, why: chainA.returner.why } } : {}),
+      ...(final.world.tests !== undefined ? { tests: final.world.tests } : {}) } } : {}),
     validation: { defects: [], redraws: Math.max(0, callOf('plan').length - 1), fallback: final.fallback },
     dev, textLint, lines: final.lines, banked: final.state, knowing: final.knowing, ending: final.ending ?? null,
     cost, latency: { planMs, card1Ms, calls: rec.calls.map(c => ({ purpose: c.purpose, ms: c.durationMs })) },
@@ -778,12 +841,20 @@ const CHANGED: Record<PipeArm, (c: { template: string; flags: string[] }) => boo
     || (c.template === 'report' && !['hope', 'failure', 'answer'].some(f => c.flags.includes(f))),
   // RFA: a failed middle job's report (`stands`); nothing else changed
   'voice+stands': c => c.flags.includes('stands'),
+  // CBR, CBT: their own map (CHANGED_ARM); RFW: a failed middle job's report (`stands`, its fact widened)
+  'past+return': c => c.flags.includes('event') || c.flags.includes('next'), 'past+trait': c => c.flags.includes('event') || c.flags.includes('next'),
+  'voice+reach': c => c.flags.includes('stands'),
 };
 /** an arm whose new variants are not its pipe's (CHANGED): chain B on PP — the pick's, the plan's and card 1's `next` (who the
  *  soldier is now, the dealt situation), and a report with a cost (the cost fix: one phrase naming its owner — the payload
  *  changes, not the prompt) */
 const CHANGED_ARM: Record<string, (c: { template: string; flags: string[] }) => boolean> = {
   CB: c => c.flags.includes('next') || (c.template === 'report' && c.flags.includes('cost')),
+  // chain B's shared fix against CB: the pick (no `now`), the plan (`event`, CBT's `tests`, CBR's seated person: `memory`), card
+  // 1 (`event`), every report (whose story this is: `next`), and a card naming CBR's person (their memory, told on first
+  // appearance)
+  CBR: c => c.template === 'pick' || c.flags.includes('next') || c.flags.includes('event') || c.flags.includes('memory'),
+  CBT: c => c.template === 'pick' || c.flags.includes('next') || c.flags.includes('event'),
 };
 /** --render: the new or changed prompt variants of the selected pipeline arms, one file per call */
 function render() {

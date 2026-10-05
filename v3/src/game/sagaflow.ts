@@ -16,8 +16,10 @@ import { finaleReady } from '../engine/chains.js';
 import type { Lead } from '../engine/quests.js';
 import { coins, type Outcome, type SlotTest } from '../engine/roll.js';
 import { KEEP_THRESHOLD, type TraitPrefs } from '../engine/economy.js';
+import { testedTraits } from '../engine/plainwords.js';
 import {
   dealSaga, castSaga, rollHurt, clampHurt, helped, piped, askerPast, looksOf, EPISODE_TESTS, WAY_TESTS, WAY_REWARD, HOW_BAND, SEED_ARM, PIPE_ARM,
+  RETURNER_PART, nextChapter,
   type SagaRecord, type SeedArm, type PipeArm, type SagaWorld, type SagaPlan, type SagaPos, type LogRow, type Matter, type Hurt, type Cost, type Way,
   type EpisodeType, type CastEntry, type Face, type EpisodeTest, type Episode,
 } from '../engine/saga.js';
@@ -25,7 +27,7 @@ import {
   newKnowing, newState, planSaga, seedSteps, writeOutline, writeCard, writeReport, firstCardPayload, laterCardPayload, reportPayload,
   questLog, logLines, noteDelivered, forLineShown, onThisMatter, jobWhy, roadLines, roadHopes, mockOutline, bank, triedLine,
   revealLint, choiceTarget, fateSentence, knowingOf, keepKnowing, roadOf, toNullable, PRONOUN, graftRoad, toldOption, cannedOption,
-  writeLate, cardWhy, grownLine, cardHope, withLead, mentions,
+  writeLate, cardWhy, grownLine, cardHope, withLead, mentions, standing,
   type ReportCall,
 } from '../ai/storyteller.js';
 import type { AiProvider, AskSlotOut } from '../ai/provider.js';
@@ -100,22 +102,38 @@ export function deal(host: SagaHost, chain: Chain, lead: Pick<Lead, 'lab'> | und
   const personal = chain.isPersonal;
   host.state.recentThemeIds ??= [];
   const arm = host.seedArm?.() ?? SEED_ARM;
-  const d = dealSaga(host.storyRng, host.state.recentThemeIds, { personal, personalSeed: pins.personalSeed, spark: lead?.lab?.spark, ...(arm !== 'themes' ? { arm } : {}), ...(personal && pins.history ? { next: true } : {}) });
+  const pipe = host.pipeArm ? host.pipeArm(chain) : PIPE_ARM;
+  const next = personal && !!pins.history;
+  const d = dealSaga(host.storyRng, host.state.recentThemeIds, { personal, personalSeed: pins.personalSeed, spark: lead?.lab?.spark, ...(arm !== 'themes' ? { arm } : {}), ...(next ? { next: true } : {}) });
+  // (pipe arm past+return, CBR) the person a NEXT chapter seats from the soldier's last one asks the soldier for help
+  const seedPerson = pins.seedPerson && next && !pins.seedPerson.rival && piped({ pipe }, 'returner') ? { ...pins.seedPerson, part: RETURNER_PART } : pins.seedPerson;
+  // (pipe arm event) a NEXT chapter whose dealt situation takes a person is dealt one (castSaga `someone`)
+  const someone = next && piped({ pipe }, 'event') && !!d.kit?.situations.some(x => /\bsomeone\b/i.test(x));
   const c = castSaga(host.storyRng, {
     focal, personal, region: chain.region, shape: d.shape, taken: n => host.takenName(n), prefs: host.npcPrefs?.(),
     ...(host.takenTrade ? { takenTrade: (t: string) => host.takenTrade!(t) } : {}),
-    focalMemory: pins.focalMemory, returningClient: pins.returningClient, seedPerson: pins.seedPerson, placeOk: host.placeOk ? p => host.placeOk!(p) : undefined,
-    ...(d.kit ? { kit: { support: d.support ?? 0 } } : {}),
+    focalMemory: pins.focalMemory, returningClient: pins.returningClient, seedPerson, placeOk: host.placeOk ? p => host.placeOk!(p) : undefined,
+    ...(d.kit ? { kit: { support: d.support ?? 0 } } : {}), ...(someone ? { someone } : {}),
   });
   for (const p of c.cast) if (!p.focal && !p.memory) host.noteNpcName(p.name);
   const world: SagaWorld = {
     personal, N: chain.expectedBeats, kind: chain.kind === 'gold-hoard' ? 'gold' : chain.kind, shape: d.shape,
     focalId: focal.id, cast: c.cast, stake: d.stake, places: c.places, land: c.land, seed: d.seed, tone: d.tone,
     region: chain.region, level: chain.level, ...(d.kit ? { kit: d.kit } : {}),
-    ...(personal && pins.history ? { history: pins.history } : {}),
+    ...(next ? { history: pins.history } : {}),
   };
-  const pipe = host.pipeArm ? host.pipeArm(chain) : PIPE_ARM;
   if (pipe) world.pipe = pipe;
+  // (pipe arm past+trait, CBT) a NEXT chapter's dealt item: the trait or quirk of the soldier's its matter tests — drawn after
+  // every other draw of the deal, so the rest of it is CB's own. It leads the soldier's traits (the plan's cast entry shows the
+  // card's first two words, which could miss it: the change was built on a trait the player never saw)
+  if (next && piped(world, 'trait')) {
+    const xs = testedTraits(focal);
+    if (xs.length) {
+      const t = world.tests = host.storyRng.pick(xs);
+      const me = world.cast.find(p => p.seat === 'soldier');
+      if (me) me.traits = [t, ...(me.traits ?? '').split(', ').filter(x => x && x !== t)].slice(0, 2).join(', ');
+    }
+  }
   const rec = newRecord(world);
   chain.saga = rec;
   return rec;
@@ -311,7 +329,10 @@ export function reportCall(host: Pick<SagaHost, 'direction'>, chain: Chain, pos:
   // dealt again as `last`, the summary came back a copy of it); a failed middle job's report, that the job still stands
   // (pipe arm voice+stands, RFA) RF's part (a) alone: the failed job's report is dealt `stands`; the retry stays TC's
   const clean = piped(rec.world, 'clean'), setback = piped(rec.world, 'setback') && !pos.finale;
-  const stands = (setback || (piped(rec.world, 'stands') && !pos.finale)) && f.outcome === 'failure' ? standsFact(triedAgain(chain, f.party.length)) : undefined;
+  // (pipe arm voice+reach, RFW) the fact widened — all of it still within the company's reach (RFA's held what exists, not who
+  // holds it) — and concrete: the job's people and place by name (`standing`)
+  const reach = piped(rec.world, 'reach') ? standing(plan, e, f.party.map(s => s.name), rec.world.places) : undefined;
+  const stands = (setback || (piped(rec.world, 'stands') && !pos.finale)) && f.outcome === 'failure' ? standsFact(triedAgain(chain, f.party.length), reach) : undefined;
   const hope = piped(rec.world, 'grafts') && !pos.finale && !(setback && pos.attempt > 1) ? clean ? cardHope(plan, rec.world, pos.job, rec.hopes, knowingOf(rec)) : jobWhy(plan, pos.job, rec.hopes) : undefined;
   // round T: room, weight (+ a first in-person meeting here — none again for the one this job's card met, verify: the report
   // repeated the card's looks word for word), voice, lore (its payoff), past (the soldier's change)
@@ -337,6 +358,9 @@ export function reportCall(host: Pick<SagaHost, 'direction'>, chain: Chain, pos:
     ...(stands ? { stands } : {}),
     // (owncost, the game's pipes: round H §5) a partial's cost as one phrase naming its owner
     ...(piped(rec.world, 'owncost') ? { ownCost: true } : {}),
+    // (pipe arm event, CBR / CBT: a NEXT chapter) the soldier is the one whose story this is (never "whose past"); (past+trait)
+    // their trait word is the one the plan was dealt to test
+    ...(nextChapter(w) && piped(w, 'event') ? { story: { ...(w.tests ? { tests: w.tests } : {}) } } : {}),
   });
 }
 /** (pipe arm voice+setback, RF) whether a failed middle job is posed again: the failure bankBeat is about to count and the party's
@@ -345,9 +369,16 @@ export function reportCall(host: Pick<SagaHost, 'direction'>, chain: Chain, pos:
 export const triedAgain = (chain: Chain, partySize: number): boolean =>
   !finaleReady({ ...chain, failures: chain.failures + 1, cyclesSpent: chain.cyclesSpent + partySize });
 /** (pipe arm voice+setback, RF) the fact a failed middle job's report is dealt: the job's people, things and place still stand —
- *  and, when the job is posed again, that it is (the playtest's failure burned the forge the retry then had to hold) */
-export const standsFact = (again: boolean): string =>
-  `whoever and whatever the job names, and its place${again ? ', for the company tries this job again' : ''}`;
+ *  and, when the job is posed again, that it is (the playtest's failure burned the forge the retry then had to hold). `reach`
+ *  (voice+reach, RFW): what the job left standing BY NAME (storyteller `standing`: its people, its place), then the things it
+ *  names that the engine cannot ("whatever else the job names": the prisoner, the mare), all still within the company's reach
+ *  — RFA's fact kept the barn standing but let the raiders take it, and its rule words alone came back as a rule, never a
+ *  fact. A job with nobody and nowhere the engine can name keeps the rule's words */
+export const standsFact = (again: boolean, reach?: readonly string[]): string => {
+  const xs = reach?.length ? [...reach, 'whatever else the job names'] : undefined;
+  const what = xs ? `${xs.slice(0, -1).join(', ')} and ${xs.at(-1)}` : 'whoever and whatever the job names, and its place';
+  return `${what}${reach ? ", all still within the company's reach" : ''}${again ? ', for the company tries this job again' : ''}`;
+};
 /** a finale button's deed as the writer and the story's own lines get it (storyteller toldOption): the report's `plan`,
  *  the memory the saga leaves. The button itself keeps its label */
 export const toldLabel = (rec: SagaRecord, o: { way: Way; label: string }): string => toldOption(o, castNow(rec), piped(rec.world, 'grafts'));

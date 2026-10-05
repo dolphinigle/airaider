@@ -24,7 +24,9 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
     // round H: HP's hired asker's past and change, in place of TC's line (never on a personal plan: that one is TC's). RF's plan is TC's
     [['notrade'], []].flatMap(cast => subsets(['memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, 'keywords', 'support', 'grafts', 'askerpast'], vars: {} }))),
     // a soldier's NEXT personal saga (chain B, C…) on PP: the seed is who they are now, the dealt situation its new matter
-    [['notrade'], []].flatMap(cast => subsets(['memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, 'personal', 'keywords', 'support', 'grafts', 'past', 'next'], vars: {} })))),
+    [['notrade'], []].flatMap(cast => subsets(['memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, 'personal', 'keywords', 'support', 'grafts', 'past', 'next'], vars: {} }))),
+    // chain B's inputs (CBR, CBT): the soldier's event, no now; CBT's dealt trait (CBR's seated person is the memory flag)
+    [['notrade'], []].flatMap(cast => subsets(['memory', 'direction', 'avoid', 'tests']).map(extra => ({ flags: ['types', ...cast, ...extra, 'personal', 'keywords', 'support', 'grafts', 'past', 'next', 'event'], vars: {} })))),
   // (pipe arm sides: a plan with sides deals no parts, so `side` never meets `part`; pipe arm fixes, D2, on any card: `lose`
   // on every finale, beside `will` but at a last chance)
   card: ['first', 'later', 'finale'].flatMap(pos => subsets(['memory', 'direction', 'intro', 'part', 'side', ...(pos === 'first' ? ['personal', 'returning'] : []), ...(pos === 'finale' ? ['lastchance', 'lose'] : []),
@@ -42,7 +44,7 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
     // the line, the rest narrated or none left, S2)
     .flatMap(extra => extra.includes('line') && pos === 'first' && !extra.includes('fixes') && !extra.includes('side') ? [extra, [...extra, 'says']]
       : extra.includes('fixes') || extra.includes('line') || extra.includes('side') || (extra.includes('part') && extra.includes('returning')) ? [extra] : pos === 'first'
-      ? [extra, [...extra, 'clean'], [...extra, 'says'], [...extra, 'clean', 'says'], [...extra, 'lore'], ...(extra.includes('personal') ? [[...extra, 'past'], [...extra, 'past', 'next'], [...extra, 'says', 'quote', 'past'], [...extra, 'says', 'quote']] : [[...extra, 'askerpast']])]
+      ? [extra, [...extra, 'clean'], [...extra, 'says'], [...extra, 'clean', 'says'], [...extra, 'lore'], ...(extra.includes('personal') ? [[...extra, 'past'], [...extra, 'past', 'next'], [...extra, 'past', 'next', 'event'], [...extra, 'says', 'quote', 'past'], [...extra, 'says', 'quote']] : [[...extra, 'askerpast']])]
       : pos === 'later' && !extra.includes('retry') ? [extra, [...extra, 'clean'], [...extra, 'meet']]
       // (round H, RF on TC: a retry framed by the failure alone — no why, no trouble)
       : pos === 'later' && !extra.includes('why') ? [extra, [...extra, 'clean'], [...extra, 'setback']] : [extra, [...extra, 'clean']])
@@ -73,7 +75,11 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
       ...(s.includes('answer') ? [['teller'], ['lore'], ['change'], ['clean', 'teller'], ['anyteller'], ['anyteller', 'change'], ['clean', 'anyteller'], ...(s.includes('personal') ? [] : [['teller', 'change', 'askerpast']])] : []), ...(s.includes('clue') ? [['clean', 'witness']] : [])].map(arm => [...s, ...arm])]).flatMap(s =>
     [['moved'], ...(s.some(f => ['decides', 'result', 'clue', 'brought'].includes(f)) ? [] : [['failure', 'stopped']])].map(end => ({ flags: ['saga', ...s, ...end], vars: { B: 60, A: 140 } })))
     // round H, RF on TC (never with fixes or clean): a failed middle job's `stands` (a won retry's report is TC's with no hope)
-    .flatMap(v => !v.flags.includes('failure') || v.flags.some(f => ['fixes', 'clean', 'side', 'answer'].includes(f)) ? [v] : [v, { ...v, flags: [...v.flags, 'stands'] }]),
+    .flatMap(v => !v.flags.includes('failure') || v.flags.some(f => ['fixes', 'clean', 'side', 'answer'].includes(f)) ? [v] : [v, { ...v, flags: [...v.flags, 'stands'] }])
+    // chain B's inputs (CBR, CBT, on PP): the one whose story this is (`next`)
+    // (PP's flags only: no lore, teller, witness, meet or asker's past rides on the personal pipe)
+    .flatMap(v => !v.flags.includes('personal') || v.flags.some(f => ['fixes', 'clean', 'side', 'lore', 'teller', 'anyteller', 'witness', 'meet', 'askerpast', 'stands'].includes(f)) ? [v]
+      : [v, { ...v, flags: [...v.flags, 'next'] }]),
 };
 
 describe('saga prompt budget (the shipped R5 templates)', () => {

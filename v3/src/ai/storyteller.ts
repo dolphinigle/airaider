@@ -15,7 +15,7 @@ import { RACE_WORD, an, manWoman, soldierIs, soldierKind } from '../engine/plain
 import {
   TYPES, JOB_TYPES, WAY_ENDING, WAY_ATTR, NUMBER_WORD, FREE_WAY, helped, wayMeans, wayWord, wayOf, partOf, waysOf, hashStr, seedOf, seedText,
   type JobType, type Way, type SagaPerson, type Trouble, type Episode, type CastEntry, type SagaPlan, type SagaState,
-  type SagaWorld, type Hurt, type Cost, type LogRow, type SagaRecord, type LateShowdown, keepPicked, piped, askerPast, AGAINST, troubleWho, nextChapter,
+  type SagaWorld, type Hurt, type Cost, type LogRow, type SagaRecord, type LateShowdown, keepPicked, piped, askerPast, AGAINST, troubleWho, nextChapter, nextNow, RETURNER_PART,
 } from '../engine/saga.js';
 import { renderSaga, wordCount, type SagaTemplate } from './prompts/saga/render.js';
 import { PICKS, CASTS, KIT_DEAL, plainKeywords } from '../engine/seedkit.js';
@@ -66,6 +66,13 @@ export function planPayload(ctx: PlanCtx): { payload: Record<string, unknown>; f
   // The settled wrong (w.history) is never sent: handed it as `history` ("never retold"), 8 of 8 real chain Bs retold it
   const next = w.personal && piped(w, 'past') && !!seed.now;
   if (next) flags.push('next');
+  // (pipe arm event, CBR / CBT) the plan no longer gets `now` (handed it as its only personal item, chain B built on chain A's
+  // change — the old flaw undone — and copied it); the soldier's card-1 field is their `event`, never a `past`. (trait, CBT)
+  // the dealt trait it tests; (returner, CBR) the person from their last chapter rides in the cast, with their memory
+  const event = next && piped(w, 'event');
+  if (event) flags.push('event');
+  const tests = event && piped(w, 'trait') && w.tests ? w.tests : undefined;
+  if (tests) flags.push('tests');
   // round T's shared fixes (clean: each field read alone, the seed's people in the cast, shown-before-play on the episodes
   // line); voice (TC): the plan writes card 1's quoted line
   const clean = piped(w, 'clean');
@@ -79,7 +86,7 @@ export function planPayload(ctx: PlanCtx): { payload: Record<string, unknown>; f
   const against = line || clean;
   if (against) flags.push('against');
   if (piped(w, 'fixes') || clean) flags.push('with');
-  const payload: Record<string, unknown> = { seed: seed.text, ...(next ? { now: seed.now } : {}) };
+  const payload: Record<string, unknown> = { seed: seed.text, ...(next && !event ? { now: seed.now } : {}), ...(tests ? { tests } : {}) };
   if (seed.keywords) payload.keywords = seed.keywords;
   payload.jobs = NUMBER_WORD[w.N - 1];
   payload.types = JOB_TYPES.map(t => ({ type: t, do: TYPES[t].do, kind: TYPES[t].kind, ...(against ? { against: AGAINST[t] } : {}) }));
@@ -139,7 +146,7 @@ export const zPlanOut = z.object({
   /** the one the company acts for, in an object of their own: `asker` (want), or on a personal saga
    *  `soldier` (want, past) */
   asker: z.object({ want: zs, says: zs, past: zs, change: zs }).partial().passthrough().optional().catch(undefined),
-  soldier: z.object({ want: zs, past: zs, change: zs, says: zs }).partial().passthrough().optional().catch(undefined),
+  soldier: z.object({ want: zs, past: zs, event: zs, change: zs, says: zs }).partial().passthrough().optional().catch(undefined),
   episodes: z.array(zEp).optional().catch(undefined),
   showdown: zEp.optional().catch(undefined),
   options: z.array(z.object({ way: zs, label: zs }).passthrough()).optional().catch(undefined),
@@ -220,7 +227,9 @@ export function validatePlan(raw: unknown, ctx: PlanCtx): { plan: SagaPlan | nul
     const mine = p.seat === 'soldier' ? o.soldier : p.seat === 'client' ? o.asker : undefined;
     // (voice+asker, HP) a hired asker's past too (a missing one is no defect: card 1 then narrates the want alone)
     const hiredPast = p.seat === 'client' && askerPast(w);
-    const past = p.seat === 'soldier' ? o.soldier?.past?.trim() || got?.past?.trim() || undefined : hiredPast ? o.asker?.past?.trim() || got?.past?.trim() || undefined : undefined;
+    // (pipe arm event, CBR / CBT: a NEXT chapter) the soldier's `event` is the matter card 1 tells, kept where a past is
+    const told = p.seat === 'soldier' && nextChapter(w) && piped(w, 'event') ? o.soldier?.event?.trim() || o.soldier?.past?.trim() : o.soldier?.past?.trim();
+    const past = p.seat === 'soldier' ? told || got?.past?.trim() || undefined : hiredPast ? o.asker?.past?.trim() || got?.past?.trim() || undefined : undefined;
     let want = actFor ? mine?.want?.trim() || got?.want?.trim() : undefined;
     // a want that restates its own subject ("Indure wants the merchant stopped") printed as "wants: Indure
     // wants…": the subject goes when it is this person (name, label or pronoun)
@@ -541,15 +550,20 @@ export function revealLint(plan: SagaPlan, w: SagaWorld, after: string, seed = s
 }
 
 /** §2.7 log-only telemetry: nothing here re-rolls anything */
-/** 🛠 (log-only) the share of a next chapter's new past found in the settled one that marks it a retelling */
-export const RETELL_SHARE = 0.4;
-/** (a NEXT chapter) how much of the soldier's new past the settled past already said: the share of its content words (stems)
- *  that the history has. None on any other saga */
-export function retellShare(plan: SagaPlan, w: Pick<SagaWorld, 'personal' | 'history'>): number | undefined {
-  if (!nextChapter(w)) return undefined;
-  const past = plan.cast.find(p => p.seat === 'soldier')?.past ?? '';
-  const mine = [...new Set(contentWords(past).map(stem))], old = new Set(contentWords(w.history!).map(stem));
-  return mine.length ? mine.filter(x => old.has(x)).length / mine.length : undefined;
+/** 🛠 (log-only) the share of a next chapter's change found in the Now that marks it a copy (recurring-arcs report §1.4: 29 of
+ *  72 CB changes reached half; the overlap tracked the readers' "grows out of the change", 0.34 / 0.40 / 0.56) */
+export const CHANGE_NOW_SHARE = 0.5;
+/** (a NEXT chapter, log-only telemetry) how much of the soldier's change who they already were says: the share of the change's
+ *  content words (stems) the Now has, their own name left out. It replaces the old past-vs-history overlap, which was blind
+ *  (0.04–0.30 on all 72 CB plans while the readers called 48 retold: the retelling is by shape, not words). None on any other
+ *  saga, or with no change or no Now */
+export function changeNowShare(plan: SagaPlan, w: Pick<SagaWorld, 'seed' | 'kit'> & Partial<Pick<SagaWorld, 'personal' | 'history'>>): number | undefined {
+  const now = nextChapter(w) ? nextNow(w) : undefined;
+  const soldier = plan.cast.find(p => p.seat === 'soldier');
+  if (!now || !soldier?.change) return undefined;
+  const own = new Set(nameParts(soldier).map(x => stem(x.toLowerCase())));
+  const mine = [...new Set(contentWords(soldier.change).map(stem))].filter(x => !own.has(x)), had = new Set(contentWords(now).map(stem));
+  return mine.length ? mine.filter(x => had.has(x)).length / mine.length : undefined;
 }
 export function planLint(plan: SagaPlan, w: SagaWorld, seed = seedText(w)): string[] {
   const out: string[] = [];
@@ -563,10 +577,10 @@ export function planLint(plan: SagaPlan, w: SagaWorld, seed = seedText(w)): stri
   const stray = [...new Set(fields.flatMap(f => f.split(/[.!?:;"]\s*/).flatMap(s => s.trim().split(/\s+/).slice(1)))
     .map(t => t.replace(/[^A-Za-z'-]/g, '').replace(/'s$/, '')).filter(t => /^[A-Z][a-z]{2,}/.test(t) && !known.has(t) && !skip.has(t)))];
   if (stray.length) out.push(`stray capitalised: ${stray.join(', ')}`);
-  // (a NEXT chapter, chain B, C…; log-only telemetry) the soldier's new past retelling the wrong their last chapter settled:
-  // the share of its content words the settled past already had (round CB: handed that past, 8 of 8 retold it)
-  const retold = retellShare(plan, w);
-  if (retold !== undefined && retold >= RETELL_SHARE) out.push(`retells the settled past: ${Math.round(retold * 100)}% of the new past's words`);
+  // (a NEXT chapter, chain B, C…; log-only telemetry) the soldier's change copying who they already were (round CB: 11 of 72
+  // changes were the Now word for word)
+  const copied = changeNowShare(plan, w);
+  if (copied !== undefined && copied >= CHANGE_NOW_SHARE) out.push(`change copies the Now: ${Math.round(copied * 100)}% of its words`);
   const { answerWords, plainStems } = answerKeys(plan, w, seed);
   // lose, every printed why and the want of the one the company acts for reach a card before any learn, so all count as
   // early. (R2) A word an earlier job's learn already brought to light is no leak where it prints after that win
@@ -752,7 +766,11 @@ const entry = (p: CastEntry, k: Knowing, view: 'card' | 'report', dealt: string,
   // every entry, every time: the writer has no memory, and a bare name was given a role it coined ("Donglanel Brightwater,
   // the eldest of them"); in a report — which has no For line — the one the company acts for says so. Clean's role is the
   // whole trade, definite (`roleOf`)
-  const role = intro || p.seat === 'soldier' ? labelOf(p, view) : clean ? roleOf(p) : saysLabel(dealt, p) ? an(headNoun(p.label)) : undefined;
+  // (pipe arm past+return, CBR) the person from the soldier's last chapter is named from the start (known there), so no entry
+  // was ever an intro and a dealt text that never said their label left a bare name ("Auge Harrow") the writer could not
+  // place: their role word rides on every entry. (The default's returning faces, D9 / D10, share the class — not changed
+  // while the experiment runs)
+  const role = intro || p.seat === 'soldier' ? labelOf(p, view) : clean ? roleOf(p) : saysLabel(dealt, p) || p.part === RETURNER_PART ? an(headNoun(p.label)) : undefined;
   const label = role && clean && view === 'report' && p.seat === 'client' ? `${role}, who asked the company for help` : role;
   return { name: p.name, ...(label ? { label } : {}), sex: manWoman(p.sex), ...(intro ? { intro: true } : {}) };
 };
@@ -874,7 +892,11 @@ export function firstCardPayload(plan: SagaPlan, w: SagaWorld, k: Knowing, direc
   if (mine) delete mine.memory;
   // pipe arm lore (TD): what people here say, told on card 1 as part of its premise (the plan may have none)
   const lore = piped(w, 'lore') && plan.lore ? plan.lore : undefined;
-  const premise = { who: displayName(client, k), wants: nm(wantPhrase(client.want)), ...(quote ? { says } : {}), ...(past ? { past: nm(past) } : {}), ...(says && !quote ? { says } : {}), ...(memory ? { memory } : {}), unknown: nm(openQuestion(plan.question)), ...(lore ? { lore } : {}) };
+  // (pipe arm event, CBR / CBT: a NEXT chapter) the soldier's event (what just happened that pulls them in), in place of a past.
+  // Never who they became (the Now): no writer gets a fact the plan did not build on — dealt it beside the event, card 1 pasted
+  // it as a line leading nowhere ("She is a woman never simply thrown away"), and the finale re-settled the old wrong with it
+  const event = !!told && nextChapter(w) && piped(w, 'past') && piped(w, 'event') && !quote;
+  const premise = { who: displayName(client, k), wants: nm(wantPhrase(client.want)), ...(quote ? { says } : {}), ...(past ? { [event ? 'event' : 'past']: nm(past) } : {}), ...(says && !quote ? { says } : {}), ...(memory ? { memory } : {}), unknown: nm(openQuestion(plan.question)), ...(lore ? { lore } : {}) };
   // (R5, P5) the trouble without `will`, as on the finale (R3, W4); pipe arm fixes, as one phrase; pipe arm line (F1), the
   // plan's whole sentence (its will and why included)
   // (clean) one phrase too: {who, carry} came back as two stock sentences on every card ("X stand in your way. They carry Y.")
@@ -892,6 +914,7 @@ export function firstCardPayload(plan: SagaPlan, w: SagaWorld, k: Knowing, direc
   if (pastArm && past) flags.push('past');
   // (chain B, C…) the past the plan wrote is what in who they are now draws them in, never an old wrong
   if (pastArm && past && nextChapter(w) && !quote) flags.push('next');
+  if (event && past) flags.push('event');
   if (memory) flags.push('returning');
   if (names.some(n => n.memory)) flags.push('memory');
   flags.push(...entryFlags(names));
@@ -1414,6 +1437,10 @@ export function reportPayload(a: {
   stands?: string;
   /** (owncost, the game's pipes) a partial's cost as one phrase naming its owner (`costPhrase`) */
   ownCost?: boolean;
+  /** (pipe arm event, CBR / CBT: a NEXT chapter) the soldier is the one "whose story this is", never "whose past"; `tests`
+   *  (past+trait, CBT) the trait the plan was dealt to test, as their `is` trait word (the card's first word could be another:
+   *  the plan built the change on a trait no report showed) */
+  story?: { tests?: string };
 }): ReportCall {
   const { plan, e, k } = a;
   const failedJob = a.outcome === 'failure' && !a.finale;
@@ -1446,8 +1473,10 @@ export function reportPayload(a: {
   // (pipe arm clean) a met person's name in place of "the <label>" in every field (`namedIn`); only the decider's traits and
   // trade (a failed job's: nobody's)
   const nm = (x: string) => clean ? namedIn(x, plan, k) : x;
-  const isOf = (s: Card) => clean && (a.outcome === 'failure' || s.name !== a.decides) ? soldierKind(s) : soldierIs(s);
-  const payload: Record<string, unknown> = { card: a.card, job: nm(e.job), soldiers: a.party.map(s => ({ name: s.name, is: `${isOf(s)}${ownSent && s.id === own!.id ? ', whose past this story is' : ''}` })) };
+  const story = ownSent ? a.story : undefined;
+  const isOf = (s: Card) => clean && (a.outcome === 'failure' || s.name !== a.decides) ? soldierKind(s) : soldierIs(s, s.id === own?.id ? story?.tests : undefined);
+  const payload: Record<string, unknown> = { card: a.card, job: nm(e.job), soldiers: a.party.map(s => ({ name: s.name, is: `${isOf(s)}${ownSent && s.id === own!.id ? story ? ', whose story this is' : ', whose past this story is' : ''}` })) };
+  if (story) flags.push('next');
   if (a.outcome !== 'failure') { payload.decides = a.decides; flags.push('decides') }
   const here = inJob(plan, e, a.finale), client = clientOf(plan);
   // (R4 verify) the text this report is dealt, for whose label a named entry still needs
@@ -1526,6 +1555,19 @@ export function reportPayload(a: {
   // a dealt quoted line +15 (voice), the lore's payoff and the soldier's change +20 each
   A += (witness || teller || anyTeller ? 15 : 0) + (lore ? 20 : 0) + (change ? 20 : 0);
   return { payload, flags, vars: { B, A } };
+}
+
+/** (pipe arm voice+reach, RFW) what a failed job leaves standing, by name, for its report's `stands`: whoever is there in it
+ *  but the soldiers sent, by name (as the report's own people entries give them: a report is where strangers are met), then
+ *  its place as the job says it ("the barn at Greydale"; the bare place name when more than a short noun stands before it).
+ *  Empty when the engine can name neither */
+export function standing(plan: SagaPlan, e: Episode, party: readonly string[], places: readonly string[]): string[] {
+  const there = `${e.job} ${troubleWho(e.trouble)}`;
+  const ids = [...new Set([...e.people, ...plan.cast.filter(p => placesThere(there, p)).map(p => p.id)])];
+  const who = ids.map(id => plan.cast.find(p => p.id === id)).filter((p): p is CastEntry => !!p && p.seat !== 'soldier' && !party.includes(p.name)).map(p => p.name);
+  const place = places.find(pl => new RegExp(`\\b${esc(pl)}\\b`).test(e.job));
+  const at = place && (e.job.match(new RegExp(`\\bthe\\s+(?:(?!the\\b)[\\w'-]+\\s+){0,2}?(?:at|of|in|near|by|outside|beyond)\\s+${esc(place)}\\b`, 'i'))?.[0] ?? place);
+  return [...who, ...(at ? [at.replace(/^The\b/, 'the')] : [])];
 }
 
 /** (pipe arm voice, TC) who says a won job's clue: someone the job met who could know it — a person its gain holds (a captive
@@ -1677,7 +1719,7 @@ export function mockPlan(ctx: PlanCtx, seedKey: string): Record<string, unknown>
     // (pipe arm past, PP) the past as two plain sentences and the change the saga makes in the soldier
     // (pipe arm voice, TC) card 1's line, first person, of the want (personal: of the past)
     ...(w.personal ? { soldier: { want: cannedWant(client, w.stake), ...(piped(w, 'past')
-      ? next ? { past: `This season at ${w.places[0]}, ${client.name} is asked to ${seedOf(w).text}. ${cap(o)} stands in the way.`, change: `${client.name} takes up another's cause as ${cHe.pos} own.` }
+      ? next ? { [piped(w, 'event') ? 'event' : 'past']: `This season at ${w.places[0]}, ${client.name} is asked to ${seedOf(w).text}. ${cap(o)} stands in the way.`, change: `${client.name} takes up another's cause as ${cHe.pos} own.` }
         : { past: `Years ago ${client.name} left an old wrong behind, and someone was hurt by it. ${cap(cHe.sub)} still carries it.`, change: `${client.name} stops running from the old wrong.` }
       : { past: 'an old wrong left behind' }), ...(piped(w, 'says') ? { says: 'I left it behind once, and I have not slept well since.' } : {}) } }
       // (pipe arm voice+asker, HP) a hired asker's past and change, in place of the line (never their past with the company: a
@@ -1721,7 +1763,9 @@ export function mockCard(payload: Record<string, unknown>, flags: string[]): { c
     // (pipe arm voice) the asker's own line in place of the narrated want or past; (lore) what people here say, last
     // (stack S2, quote) the past's first sentence said, then the rest narrated
     const quoted = flags.includes('quote') && p.says ? ` "${cap(bare(p.says))}," ${sub} says.${p.past ? ` ${sentence(p.past)}` : ''}` : '';
-    const premise = `${who} needs you${p.wants ? `, and ${sub} wants ${p.wants}` : ''}.${quoted}${p.past && !quoted ? flags.includes('next') ? ` ${sentence(p.past)}` : ` ${cap(sub)} has a past: ${bare(p.past)}.` : ''}${p.memory ? ` ${sentence(p.memory)}` : ''} Nobody knows ${p.unknown}.`;
+    // (pipe arm event) the event that pulls them in, in place of a past
+    const told = p.event ? ` ${sentence(p.event)}` : p.past && !quoted ? flags.includes('next') ? ` ${sentence(p.past)}` : ` ${cap(sub)} has a past: ${bare(p.past)}.` : '';
+    const premise = `${who} needs you${p.wants ? `, and ${sub} wants ${p.wants}` : ''}.${quoted}${told}${p.memory ? ` ${sentence(p.memory)}` : ''} Nobody knows ${p.unknown}.`;
     const said = p.says && !quoted ? `"${cap(bare(p.says))}," ${sub} says.` : '';
     const lore = p.lore ? `They say: ${sentence(p.lore)}` : '';
     return { card: [`${premise}${memories(names)}`, said, job, why, troubleLine, lore].filter(Boolean).join(' ') };
@@ -1841,7 +1885,9 @@ export function pickPayload(w: SagaWorld): { payload: Record<string, unknown>; f
   else if (k.situations.length > 1) { flags.push('situations'); payload.situations = k.situations }
   else payload.situation = k.situations[0];
   // (chain B, C…) the dealt situation is the story, and who the soldier at its heart is now (never an old wrong) beside it
-  if (nextChapter(w) && k.situations.length) { flags.push('next'); payload.now = w.seed.text }
+  // (pipe arm event, CBR / CBT) none: the Now goes to the writers only — a keyword picked to fit it is material the plan builds
+  // on (B1), the old flaw again
+  if (nextChapter(w) && k.situations.length && !piped(w, 'event')) { flags.push('next'); payload.now = w.seed.text }
   payload.tone = w.tone;
   const offered = offeredPeople(w);
   payload.cast = w.cast.filter(p => !offered.includes(p)).map(castLine);

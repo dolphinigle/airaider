@@ -43,9 +43,10 @@ export const soldierTrade = (c: Card) => { const s = topSkill(c); return s ? SKI
 /** a soldier's race and sex alone: "a human man" — (saga pipe arm clean) a report's soldier who does not decide the job: every
  *  soldier's traits and trade on every report were each acted out every time ("Malene talked low…" in three reports) */
 export const soldierKind = (c: Card): string => an(`${RACE_WORD[raceOf(c)] ?? raceOf(c)} ${manWoman(sexOf(c))}`);
-/** a soldier as the report meets them: "a human man, hot-headed, a brawler" (§2.9.3) */
-export function soldierIs(c: Card): string {
-  const w = plainWords(c, 1)[0];
+/** a soldier as the report meets them: "a human man, hot-headed, a brawler" (§2.9.3); `trait` in place of the card's first
+ *  word (saga pipe arm past+trait: the trait the plan was dealt to test) */
+export function soldierIs(c: Card, trait?: string): string {
+  const w = trait ?? plainWords(c, 1)[0];
   return [an(`${RACE_WORD[raceOf(c)] ?? raceOf(c)} ${manWoman(sexOf(c))}`), w, an(soldierTrade(c))].filter(Boolean).join(', ');
 }
 /** a focal card's trade for the plan, on its own key like a coined person's: the plan's label ends in
@@ -55,3 +56,12 @@ export const tradeOf = (c: Card) => { const s = topSkill(c); return backgroundOf
  *  race, the list was copied whole into the label the plan builds from race and trade ("thin, slow-witted human hunter"),
  *  and the comma cut left "thin" */
 export const traitsOf = (c: Card) => plainWords(c, 2).join(', ') || undefined;
+/** (saga pipe arm past+trait, CBT) what a NEXT personal saga may test in its soldier: their personality traits as plain words
+ *  (all of them, not only the two a cast entry shows) and their quirks, both as the card has them; with neither, their body
+ *  and standing words. One is DEALT (sagaflow deal: `world.tests`), so the matter tests something the player can see on the
+ *  card — never a flaw the plan invents (a plan asked for a past wrote the premise again: round H's HP) */
+export function testedTraits(c: Card): string[] {
+  const mind = c.tags.filter(t => groupOfTag(t.concept) === 'personality').map(t => TRAIT_WORD[t.concept]).filter((w): w is string => !!w);
+  const quirks = (c.character?.quirks ?? []).map(q => q.trim().replace(/[.!]+$/, '')).filter(Boolean);
+  return mind.length || quirks.length ? [...mind, ...quirks] : plainWords(c, 9);
+}

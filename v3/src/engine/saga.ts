@@ -192,21 +192,44 @@ export const SEED_ARM: SeedArm = 'kit+pick';
  *                      is dealt `stands`; the retry keeps TC's card and report (round H §3: part (b) was redundant once the target
  *                      stands, and the likely source of the slice's S10 dip). No `owncost`, so the arm differs from the TC on
  *                      disk by `stands` alone
+ *  CHAIN B's INPUTS (recurring-arcs report §1.6; lab arms CBR, CBT on pers1 — the game's chain B stays CB, `past`): CB's plan
+ *  was handed the Now (chain A's change, written as the old flaw undone) as its only personal item and built on it (the change
+ *  copied it, 40 of 72 pasts reached back). Shared, `event`: NO call gets the Now (the plan, the pick, card 1 and the finale's
+ *  writer alike — dealt to a writer the plan never built on, card 1 pasted it as a dead-end line and the finale re-settled the
+ *  old wrong with it: one fact, one author, the plan); the plan's card-1 field is the soldier's `event` (what just happened
+ *  that pulls them in), never a `past` (the key pulled 40 of 72 back into backstory); a report calls them the one "whose
+ *  story this is"; a situation that takes a person ("hide someone") is dealt one (`someone`). Then ONE new personal item:
+ *   past+return  CBR `returner`: a person from their chain A (STORY_ENGINE §111: a finished chain's thread + a cast member
+ *                    seeds the next) — never the one resolved against — seated as D10 seats a seed's person (known, their
+ *                    memory a line of the old saga that names them), with the part `RETURNER_PART`: they ask the soldier for
+ *                    help; their role word on every entry
+ *   past+trait   CBT `trait`: one of the soldier's traits or quirks from their card (`testedTraits`), dealt after the cast
+ *                    (`world.tests`): the matter tests it, the change comes from it, and it leads the soldier's traits in the
+ *                    plan and is their trait word in every report (where the card's own two could miss it)
+ *  RF WIDENED (recurring-arcs report §2): RFA's `stands` covered what exists, not who holds it (the barn taken, then "held
+ *  again"):
+ *   voice+reach  RFW `reach`: RFA with the fact widened and made concrete — the job's people by name and its place as the job
+ *                    says it ("Eraldil, Eussorus and the barn at Greydale"), all still within the company's reach (`standsFact`;
+ *                    the rule's own words, "whoever and whatever the job names", came back as a rule, never a fact). No
+ *                    `owncost`, so it differs from RFA by the fact's words alone
  *  THE COST FIX (round H §5, a defect in the default): `owncost` — a partial's cost dealt as ONE phrase naming its owner
  *  (`costPhrase`, from clean's `ownCost`: "the company's own horse, lamed"); the {what, how, whose} atoms let the writer give
  *  the company's lamed horse to the enemy. Carried by the game's two pipes (voice, past)
  *  (C1 `core` — a call fixing the want, question and answer before the plan — was removed: a measured loss, follow 26–116) */
 export type PipeArm = 'one' | 'grafts' | 'sides' | 'reads' | 'fixes' | 'late' | 'trail' | 'narrow' | 'line' | 'plain' | 'link' | 'fx'
   | 'room' | 'weight' | 'voice' | 'lore' | 'page' | 'past' | 'clean' | 'voice+line' | 'past+voice' | 'voice+clean' | 'voice+asker' | 'voice+setback'
-  | 'voice+stands';
+  | 'voice+stands' | 'past+return' | 'past+trait' | 'voice+reach';
 export const PIPE_ARMS: readonly PipeArm[] = ['one', 'grafts', 'sides', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx',
-  'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands'];
+  'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands',
+  'past+return', 'past+trait', 'voice+reach'];
 /** the pieces an arm is made of: an arm's own change, or a piece of one — voice (TC) is three lines, each its own piece
  *  (`says` card 1's line, `witness` a won clue said by someone met, `teller` the finale's secret said), so an arm can take some;
  *  `quote` and `motive` are the stack round's (S2's quoted first sentence of the past, in place of its narration; S1's sourced
  *  why); `asker` and `setback` round H's (HP's asker past and change; RF's failure facts, both parts); `stands` RF's part (a)
- *  alone (RFA); `owncost` the cost fix (a partial's cost as one phrase naming its owner) */
-export type PipePart = Exclude<PipeArm, 'voice' | 'voice+line' | 'past+voice' | 'voice+clean' | 'voice+asker' | 'voice+setback' | 'voice+stands'> | 'says' | 'witness' | 'teller' | 'quote' | 'motive' | 'asker' | 'setback' | 'stands' | 'owncost';
+ *  alone (RFA); `owncost` the cost fix (a partial's cost as one phrase naming its owner); `event`, `returner`, `trait` chain B's
+ *  inputs (CBR, CBT); `reach` RFA's fact widened (RFW) */
+export type PipePart = Exclude<PipeArm, 'voice' | 'voice+line' | 'past+voice' | 'voice+clean' | 'voice+asker' | 'voice+setback' | 'voice+stands' | 'past+return' | 'past+trait' | 'voice+reach'>
+  | 'says' | 'witness' | 'teller' | 'quote' | 'motive' | 'asker' | 'setback' | 'stands' | 'owncost' | 'event' | 'returner' | 'trait' | 'reach';
 const VOICE: readonly PipePart[] = ['says', 'witness', 'teller'];
 /** the changes each pipe arm carries, by the arm that brought each in: D1, D2, E1–E3 and F1–F3 are C2 plus one change each;
  *  FX is C2 plus all of round F; the stack arms a shipped arm plus one change */
@@ -214,16 +237,21 @@ const PIPE_PARTS: Record<PipeArm, readonly PipePart[]> = {
   one: ['one'], grafts: ['grafts'], sides: ['sides'], reads: ['grafts', 'reads'], fixes: ['grafts', 'fixes'],
   late: ['grafts', 'late'], trail: ['grafts', 'trail'], narrow: ['grafts', 'narrow'],
   line: ['grafts', 'line'], plain: ['grafts', 'plain'], link: ['grafts', 'link'], fx: ['grafts', 'line', 'plain', 'link'],
-  // (voice, past: the game's two pipes, GAME_PIPE) the cost fix, `owncost` (round H §5) — a lab TC/PP generated from here on
-  // carries it; the TC_g1–g3 / PP_g1–g3 on disk do not
-  room: ['grafts', 'room'], weight: ['grafts', 'weight'], voice: ['grafts', ...VOICE, 'owncost'], lore: ['grafts', 'lore'],
-  page: ['grafts', 'page'], past: ['grafts', 'past', 'owncost'], clean: ['grafts', 'clean'],
+  // (voice, past: the game's two pipes, GAME_PIPE) the cost fix, `owncost` (round H §5), and RFW's failure fact, `stands` +
+  // `reach` (chain-B round §2.4: hard contradictions inside the retry 4 → 0) — a lab TC/PP generated from here on carries
+  // both; the TC_g1–g3 / PP_g1–g3 on disk carry neither
+  room: ['grafts', 'room'], weight: ['grafts', 'weight'], voice: ['grafts', ...VOICE, 'owncost', 'stands', 'reach'], lore: ['grafts', 'lore'],
+  page: ['grafts', 'page'], past: ['grafts', 'past', 'owncost', 'stands', 'reach'], clean: ['grafts', 'clean'],
   'voice+line': ['grafts', ...VOICE, 'line', 'motive'], 'past+voice': ['grafts', 'past', 'teller', 'quote'],
   'voice+clean': ['grafts', ...VOICE, 'clean'],
   // (HP keeps `says`: on a hired saga the asker's past stands in its place, on a personal one — no hired asker — it is TC's line)
   'voice+asker': ['grafts', ...VOICE, 'asker'], 'voice+setback': ['grafts', ...VOICE, 'setback'],
   // (RFA) RF part (a) alone, on TC as measured — no `owncost`, so the arm differs from TC_g1–g3 by `stands` alone
   'voice+stands': ['grafts', ...VOICE, 'stands'],
+  // (CBR, CBT) the game's personal pipe (PP, with its cost fix: CB_g1–g3 carry it) plus chain B's shared input fix and one item
+  'past+return': ['grafts', 'past', 'owncost', 'event', 'returner'], 'past+trait': ['grafts', 'past', 'owncost', 'event', 'trait'],
+  // (RFW) RFA with its fact widened — no `owncost`, as RFA
+  'voice+reach': ['grafts', ...VOICE, 'stands', 'reach'],
 };
 /** whether a dealt world's pipe arm carries `part` */
 export const piped = (w: Pick<SagaWorld, 'pipe'>, part: PipePart): boolean => !!w.pipe && PIPE_PARTS[w.pipe].includes(part);
@@ -264,12 +292,16 @@ export const SHAPES: Record<ShapeId, { parts: [string, string, string]; A: JobTy
 };
 export const SHAPE_IDS = Object.keys(SHAPES) as ShapeId[];
 export const PERSONAL_PARTS: [string, string, string] = ["one of the company's soldiers", 'stands in the way', "knows the soldier's past"];
+/** (pipe arm past+return, CBR) the part of a person from the soldier's last chapter seated in their next, in place of "knows
+ *  the soldier's past" (which points the story at the settled one): a side a stateless writer can show. ("brings the soldier
+ *  the new matter" was pipeline words: the finale's writer acted it out as a bundle pressed into her hands, never explained) */
+export const RETURNER_PART = 'asks the soldier for help';
 /** the loose arm deals no shape, so its parts say only where someone stands, never their seat in a
  *  shape; still a concrete part for everyone (a vague one left the model guessing who opposes whom) */
 export const LOOSE_PARTS: Partial<Record<Seat, string>> = { opponent: 'stands in the way', other: 'is caught between the two sides' };
 /** the part a person plays, as the plan and every report receive it. A kit arm deals its supporting cast (the person the
  *  ending decides among them) with none (''): no text gets a part for them, the plan decides what each is to the story */
-export const partOf = (p: SagaPerson): string => p.part === '' ? '' : !PERSONAL_PARTS.includes(p.part) ? LOOSE_PARTS[p.seat] ?? p.part : p.part;
+export const partOf = (p: SagaPerson): string => p.part === '' ? '' : !PERSONAL_PARTS.includes(p.part) && p.part !== RETURNER_PART ? LOOSE_PARTS[p.seat] ?? p.part : p.part;
 /** a kit arm's client: the part says only that they ask (the shape's part, "lost something", could fight the situation) */
 export const KIT_CLIENT_PART = 'asks for help';
 
@@ -427,6 +459,9 @@ export interface SagaWorld {
    *  Now beside it (who they became); the history itself is never sent to a writer (handed it, 8 of 8 real chain Bs retold it, 3 word for word) —
    *  it feeds the log-only retelling lint (storyteller planLint). Absent on a first personal saga and on every hired one */
   history?: string;
+  /** (pipe arm past+trait, CBT) a NEXT chapter's dealt item: the soldier's trait or quirk its matter tests (`testedTraits`,
+   *  dealt after the cast) */
+  tests?: string;
 }
 /** a kit arm's seed: what the dealer dealt, then what the pick and premise calls made of it (filled before the plan) */
 export interface SagaKit {
@@ -442,6 +477,12 @@ export interface SagaKit {
 }
 /** a soldier's NEXT personal saga (chain B, C…): an earlier personal saga changed them (`history` dealt) */
 export const nextChapter = (w: Partial<Pick<SagaWorld, 'personal' | 'history'>>): boolean => !!w.personal && !!w.history;
+/** (chain B, C…) who the soldier became: their living dossier's Now line (the seed beside the dealt situation, without the
+ *  People line a seated face adds), as the log-only change-vs-Now lint reads it. None on any other saga */
+export const nextNow = (w: Pick<SagaWorld, 'seed' | 'kit'> & Partial<Pick<SagaWorld, 'personal' | 'history'>>): string | undefined => {
+  const now = seedOf(w).now?.split('\n')[0]?.trim();
+  return now || undefined;
+};
 /** the seed as the plan receives it: the theme or a personal past; a kit arm's situation and keywords (the picked ones
  *  once the pick call has run); a premise arm's premise, alone. A NEXT chapter: the dealt situation is the seed — its new
  *  matter, as a hired saga's is — and who the soldier already is (their living dossier's Now: dossier.ts livingSeed) rides
@@ -576,13 +617,18 @@ export interface CastInput {
   focalMemory?: { memory: string; where: string };
   /** D9: a known face reused in the client seat (the host picks it: `pickClientFace`) */
   returningClient?: Face;
-  /** D10: the person a personal saga's seed came from; `rival` (a rival-type edge) puts them in the opponent seat */
-  seedPerson?: Face & { rival: boolean };
+  /** D10: the person a personal saga's seed came from; `rival` (a rival-type edge) puts them in the opponent seat; `part`
+   *  (pipe arm past+return) the part they are seated with, in place of "knows the soldier's past" */
+  seedPerson?: Face & { rival: boolean; part?: string };
   /** a place name the host still wants rested (the game's anti-repeat over recent sagas) */
   placeOk?: (place: string) => boolean;
   /** a kit arm (North Star 7): the client's part says only that they ask; the person the ending decides has no part; and
    *  `support` more people are coined with none (name, sex, race, trade) — the plan decides what each is to the story */
   kit?: { support: number };
+  /** (pipe arm event, a NEXT chapter) the dealt situation takes a person ("hide someone"): a personal cast with nobody but the
+   *  soldier and the one in the way coins one supporting person, after the places (so every other draw stays the deal's own).
+   *  With none, the plan folded the "someone" onto the soldier ("hide herself from the baron's rope") */
+  someone?: boolean;
 }
 export interface SagaCast { cast: SagaPerson[]; places: string[]; land: string }
 
@@ -618,7 +664,7 @@ export function castSaga(storyRng: Rng, a: CastInput): SagaCast {
     cast.push({ id: f.id, name: f.name, sex: sexOf(f), race: raceOf(f), seat: 'soldier', focal: true, part: PERSONAL_PARTS[0], trade: soldierTrade(f), traits: traitsOf(f), known: true });
     const sp = a.seedPerson;
     cast.push(sp?.rival ? face(sp, 'opponent', PERSONAL_PARTS[1]) : coin('opponent', PERSONAL_PARTS[1], true));
-    if (sp && !sp.rival) cast.push(face(sp, 'other', PERSONAL_PARTS[2]));
+    if (sp && !sp.rival) cast.push(face(sp, 'other', sp.part ?? PERSONAL_PARTS[2]));
   } else {
     const part = a.kit ? KIT_CLIENT_PART : SHAPES[a.shape].parts[0];
     // at most one returning face a saga (§2.4.2): a focal the player already knows leaves the client seat to a stranger
@@ -638,6 +684,7 @@ export function castSaga(storyRng: Rng, a: CastInput): SagaCast {
     const p = rollPlaceName(storyRng);
     if (p !== reg.landmark && !places.some(q => q.slice(0, 4) === p.slice(0, 4)) && (a.placeOk?.(p) ?? true)) places.push(p);
   }
+  if (a.someone && a.personal && !cast.some(p => p.seat === 'other' || p.seat === 'support')) cast.push(coin('support', '', SUPPORT_TRADES.filter(t => !cast.some(p => p.trade === t))));
   const plain = (reg.seedPlain ?? reg.seed).replace(/\.$/, '');
   const land = `${reg.name.startsWith('The ') ? reg.name.replace(/^The/, 'the') : `the ${reg.name}`}, ${plain[0]!.toLowerCase()}${plain.slice(1)}`;
   return { cast, places, land };

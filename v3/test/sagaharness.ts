@@ -65,9 +65,9 @@ const testOf = (a: { attribute: string; favored: string[]; clashing: string[] })
   ({ attributes: [a.attribute.toLowerCase() as Attribute], favored: a.favored, clashing: a.clashing, difficulty: 'standard', level: 2 });
 
 /** play one saga to its finale on a lab path; `beforeCard` may inspect the record before each card */
-export async function playSaga(g: Game, chain: Chain, path: LabPath, focal: Card, beforeCard?: (pos: SagaPos) => void, hostExtra: Partial<flow.SagaHost> = {}): Promise<Played> {
+export async function playSaga(g: Game, chain: Chain, path: LabPath, focal: Card, beforeCard?: (pos: SagaPos) => void, hostExtra: Partial<flow.SagaHost> = {}, pins: flow.DealPins = {}): Promise<Played> {
   const host = { ...hostFor(g), ...hostExtra };
-  flow.deal(host, chain, undefined, focal);
+  flow.deal(host, chain, undefined, focal, pins);
   await flow.plan(host, chain);
   const played: Played = { cards: [], reports: [] };
   let attempt = 0;
