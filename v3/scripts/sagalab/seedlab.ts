@@ -136,10 +136,26 @@
 //                      the job's people and its place as the job says it ("Eraldil, Eussorus and the barn at Greydale") — all
 //                      still within the company's reach (the class left: the place taken, not destroyed). No cost fix, as RFA, so it differs from RFA by the fact's words alone. A2's
 //                      deals; only the draw-3 slots
+//   SO FAR (designer 2026-10-05: "hide the saga things like the [For / Road ahead / Known / Held / Open question] part? it
+//   kinda breaks immersion. you can show the past quests though"; engine/saga.ts pipe part `sofar`): the game's two pipes now
+//   show NO forward quest log on a saga card — from card 2, "So far" and one row per part played (✓ / ✗, title, the line its
+//   report left); card 1 none — and Knowing follows what is shown (no For line names the asker). So a TC or PP generated from
+//   here on carries `sofar` (the TC/PP folders on disk carry the forward log). Each pair differs by the log alone:
+//   NV  voice        the game's hired pipe as it ships (TC + cost fix + RFW + So far); A2's deals, all three draws
+//   LV  voice+log    the control: exactly NV's parts minus `sofar` (the forward log, as the game showed it before); A2's deals
+//   NP  past         the game's personal pipe as it ships (PP + cost fix + RFW + So far); --run pers1, its shared deals
+//   LP  past+log     the control: exactly NP's parts minus `sofar`; --run pers1, its shared deals
+//   THE TROUBLE LINE ON THE GAME'S PIPES (designer 2026-10-05: "They will turn strangers back and raise the camp. -- still have
+//   weird sentences like this"): the game pipes still deal each trouble as {who, carry, will} notes, which come back as one
+//   stock sentence each ("Her scouts carry longbows and hunting knives. They will turn strangers back and raise the camp.",
+//   law 6b). Round F's line (the plan writes the trouble as ONE sentence) removed the class on G0; S1 (TC + line) was dropped
+//   as keep-only. Each arm below is a game pipe as it ships plus line + S1's motive, so it differs from NV / NP by the line alone:
+//   NT  voice+trouble  NV + line + motive; A2's deals, all three draws
+//   PT  past+trouble   NP + line + motive; --run pers1, its shared deals
 //
-//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A2c|A3|A4|B1|B2|C2|C3|D1|D2|G0|E1|E2|E3|F1|F2|F3|FX|TA|TB|TC|TD|TP|PG0|PP|S1|S2|S3|HP|RF|RFA|RFW|CB_g<N>|CBR_g<N>|CBT_g<N>|all, or <arm>_g<N> = a further generation] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
+//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A2c|A3|A4|B1|B2|C2|C3|D1|D2|G0|E1|E2|E3|F1|F2|F3|FX|TA|TB|TC|TD|TP|PG0|PP|S1|S2|S3|HP|RF|RFA|RFW|CB_g<N>|CBR_g<N>|CBT_g<N>|NV|LV|NP|LP|NT|PT|all, or <arm>_g<N> = a further generation] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
 //        [--slots F6_3,F1_1] [--writer sonnet|haiku|openai] [--mock] [--pool 6] [--run seed1|seed2|pers1] [--force]
-//   (PG0, PP, S2, CB, CBR and CBT play only the personal set, --run pers1; every other arm only the probe set)
+//   (PG0, PP, S2, CB, CBR, CBT, NP, LP and PT play only the personal set, --run pers1; every other arm only the probe set)
 //   npx tsx scripts/sagalab/seedlab.ts --stats [--run seed1]     spend and latency per call kind over the run's folders
 //   npx tsx scripts/sagalab/seedlab.ts --check [--run seed1]     which saga folders are missing or incomplete
 //   npx tsx scripts/sagalab/seedlab.ts --render --arm E1,E2,E3 --slots F6_3 [--out _e_rendered] [--mock] [--run seed1]
@@ -234,17 +250,23 @@ export const ARMS: Record<string, SeedArm> = {
   S1: 'kit+pick', S2: 'kit+pick', S3: 'kit+pick',
   HP: 'kit+pick', RF: 'kit+pick', RFA: 'kit+pick', CB: 'kit+pick',
   CBR: 'kit+pick', CBT: 'kit+pick', RFW: 'kit+pick',
+  NV: 'kit+pick', LV: 'kit+pick', NP: 'kit+pick', LP: 'kit+pick', NT: 'kit+pick', PT: 'kit+pick',
 };
 /** the pipeline arms: kit+pick's seed, one pipeline change each (the host's pipeArm; D1, D2 and E1–E3 carry C2's too). G0's is
  *  the build's PIPE_ARM, recorded here for the folder's labels; its host names none */
 export const PIPES: Record<string, PipeArm> = { B2: 'one', C2: 'grafts', C3: 'sides', D1: 'reads', D2: 'fixes', G0: PIPE_ARM, E1: 'late', E2: 'trail', E3: 'narrow', F1: 'line', F2: 'plain', F3: 'link', FX: 'fx',
   TA: 'room', TB: 'weight', TC: 'voice', TD: 'lore', TP: 'page', PG0: PIPE_ARM, PP: 'past', S1: 'voice+line', S2: 'past+voice', S3: 'voice+clean',
-  HP: 'voice+asker', RF: 'voice+setback', RFA: 'voice+stands', CB: 'past', CBR: 'past+return', CBT: 'past+trait', RFW: 'voice+reach' };
+  HP: 'voice+asker', RF: 'voice+setback', RFA: 'voice+stands', CB: 'past', CBR: 'past+return', CBT: 'past+trait', RFW: 'voice+reach',
+  // the So far pair (2026-10-05): TC, PP, CB and NV / NP generated from here on carry `sofar` (the game's pipes); LV / LP are
+  // the same pipes with the forward quest log
+  NV: 'voice', LV: 'voice+log', NP: 'past', LP: 'past+log',
+  // the trouble line on the game's pipes (2026-10-05): NT / PT are NV / NP plus line + motive
+  NT: 'voice+trouble', PT: 'past+trouble' };
 /** an arm whose host names no seed or pipe arm: the build's SEED_ARM and PIPE_ARM stand (C2 grafts). Not the game's own
  *  pipeline since 2026-10-05 (engine/saga.ts GAME_PIPE: TC hired, PP personal) */
 const BUILD_DEFAULT = new Set(['G0', 'PG0']);
 /** the personal set's arms: they play only --run pers1, and that run plays only them */
-const PERSONAL_ARMS = new Set(['PG0', 'PP', 'S2', 'CB', 'CBR', 'CBT']);
+const PERSONAL_ARMS = new Set(['PG0', 'PP', 'S2', 'CB', 'CBR', 'CBT', 'NP', 'LP', 'PT']);
 /** chain B (North Star 0): seeded from PP_g<N>'s chain A in the same slot, dealt its own deal (never the run's shared one;
  *  CBR and CBT deal exactly what CB deals in the slot — the same story rng — then their own item) */
 const CHAIN_B = new Set(['CB', 'CBR', 'CBT']);
@@ -256,7 +278,7 @@ const plays = (armId: string, d: number) => !DRAW3_ONLY.has(gen(armId)) || (d - 
  *  noise control: a later change to the deal — the supporting trades — cannot move its inputs; the pipeline arms: the arm
  *  is the only difference). A later run shares its own deals instead (`SHARED_DEALS`) */
 const REPLAY: Record<string, string> = { A2b: 'A2', A2c: 'A2', B2: 'A2', C2: 'A2', C3: 'A2', D1: 'A2', D2: 'A2', G0: 'A2', E1: 'A2', E2: 'A2', E3: 'A2', F1: 'A2', F2: 'A2', F3: 'A2', FX: 'A2',
-  TA: 'A2', TB: 'A2', TC: 'A2', TD: 'A2', TP: 'A2', S1: 'A2', S3: 'A2', HP: 'A2', RF: 'A2', RFA: 'A2', RFW: 'A2' };
+  TA: 'A2', TB: 'A2', TC: 'A2', TD: 'A2', TP: 'A2', S1: 'A2', S3: 'A2', HP: 'A2', RF: 'A2', RFA: 'A2', RFW: 'A2', NV: 'A2', LV: 'A2', NT: 'A2' };
 /** a further generation of an arm (the power rule): `<arm>_g<N>` plays `<arm>` exactly — its seed, pipe and replayed deals — into
  *  its own folder, runs/<run>/<arm>_g<N>/ */
 const gen = (armId: string) => armId.replace(/_g\d+$/, '');
@@ -265,7 +287,7 @@ const armArg = opt('arm') ?? 'all';
 const PERSONAL_RUN = RUN === 'pers1';
 const ARM_IDS = armArg === 'all' ? Object.keys(ARMS).filter(a => PERSONAL_ARMS.has(a) === PERSONAL_RUN && !CHAIN_B.has(a)) : armArg.split(',').map(s => s.trim());
 for (const a of ARM_IDS) if (!ARMS[gen(a)]) { console.error(`--arm: ${a} is not one of ${Object.keys(ARMS).join('/')}`); process.exit(2) }
-for (const a of ARM_IDS) if (PERSONAL_ARMS.has(gen(a)) !== PERSONAL_RUN) { console.error(`--arm ${a}: ${PERSONAL_RUN ? 'the personal set (pers1) plays only PG0, PP, S2, CB, CBR and CBT' : 'PG0, PP, S2, CB, CBR and CBT play only the personal set (--run pers1)'}`); process.exit(2) }
+for (const a of ARM_IDS) if (PERSONAL_ARMS.has(gen(a)) !== PERSONAL_RUN) { const ps = [...PERSONAL_ARMS].join(', '); console.error(`--arm ${a}: ${PERSONAL_RUN ? `the personal set (pers1) plays only ${ps}` : `${ps} play only the personal set (--run pers1)`}`); process.exit(2) }
 // chain B reads chain A from the PP generation of the same number: CB_g2 ← PP_g2 (CBR_g2, CBT_g2 too)
 for (const a of ARM_IDS) if (CHAIN_B.has(gen(a)) && !/_g\d+$/.test(a)) { console.error(`--arm ${a}: chain B runs as generations, ${gen(a)}_g<N>, each seeded from PP_g<N>`); process.exit(2) }
 // G0 replays A2's kit+pick deals: a build that deals another seed is no longer what those deals were dealt for (PG0 shares the
@@ -793,6 +815,10 @@ function stats() {
 }
 
 /** what each pipeline arm changed in what a call is sent (the verifier reads exactly these): a template and flag set */
+/** TC's and PP's own variants (voice: card 1's line, a witnessed clue, the finale's teller; past: the personal plan, card 1,
+ *  the finale report's change) — shared by the game's pipes and their So far controls */
+const VOICE_PARTS = (c: { flags: string[] }) => c.flags.some(f => ['says', 'witness', 'teller'].includes(f));
+const PAST_PARTS = (c: { flags: string[] }) => c.flags.includes('past') || c.flags.includes('change');
 const CHANGED: Record<PipeArm, (c: { template: string; flags: string[] }) => boolean> = {
   one: c => c.template === 'pick' && c.flags.includes('count'),
   // the plan (no options, an answer free of the endings, the paid gold way); every later card (its why is now the plan's own);
@@ -821,10 +847,10 @@ const CHANGED: Record<PipeArm, (c: { template: string; flags: string[] }) => boo
   // plan; past: the personal plan, card 1, the finale report's change
   room: c => c.template === 'card' || c.template === 'report',
   weight: c => c.template === 'card' || c.template === 'report',
-  voice: c => c.flags.some(f => ['says', 'witness', 'teller'].includes(f)),
+  voice: c => VOICE_PARTS(c),
   lore: c => c.flags.includes('lore'),
   page: c => c.template === 'plan' && c.flags.includes('page'),
-  past: c => c.flags.includes('past') || c.flags.includes('change'),
+  past: c => PAST_PARTS(c),
   // the standalone clean arm: every plan, card and report it sends carries its `clean` lines
   clean: c => c.flags.includes('clean'),
   // the stack round, against its shipped arm. S1 (voice+line): the plan (the line, its sourced why) and every card (the line
@@ -844,6 +870,12 @@ const CHANGED: Record<PipeArm, (c: { template: string; flags: string[] }) => boo
   // CBR, CBT: their own map (CHANGED_ARM); RFW: a failed middle job's report (`stands`, its fact widened)
   'past+return': c => c.flags.includes('event') || c.flags.includes('next'), 'past+trait': c => c.flags.includes('event') || c.flags.includes('next'),
   'voice+reach': c => c.flags.includes('stands'),
+  // the So far controls (LV, LP): the game's pipe with the forward log — exactly its pipe's predicate (NV, NP are voice and
+  // past); the pair's own selection is CHANGED_ARM's
+  'voice+log': c => VOICE_PARTS(c), 'past+log': c => PAST_PARTS(c),
+  // NT, PT (the trouble line on the game's pipes): the plan and every card dealt the line (S1's selection)
+  'voice+trouble': c => c.flags.includes('line') || c.flags.includes('motive'),
+  'past+trouble': c => c.flags.includes('line') || c.flags.includes('motive'),
 };
 /** an arm whose new variants are not its pipe's (CHANGED): chain B on PP — the pick's, the plan's and card 1's `next` (who the
  *  soldier is now, the dealt situation), and a report with a cost (the cost fix: one phrase naming its owner — the payload
@@ -855,6 +887,11 @@ const CHANGED_ARM: Record<string, (c: { template: string; flags: string[] }) => 
   // appearance)
   CBR: c => c.template === 'pick' || c.flags.includes('next') || c.flags.includes('event') || c.flags.includes('memory'),
   CBT: c => c.template === 'pick' || c.flags.includes('next') || c.flags.includes('event'),
+  // the So far pair (NV vs LV, NP vs LP): `sofar` changes no prompt, only what a card shows and so what Knowing counts as
+  // shown (no For line names the asker; no Known / road rows name anyone). It reaches a payload only through a names entry
+  // told on first appearance — its intro, part, side or memory — on a call after card 1. The same selection for both arms
+  ...Object.fromEntries(['NV', 'LV', 'NP', 'LP'].map(a => [a, (c: { template: string; flags: string[] }) =>
+    (c.template === 'card' || c.template === 'report') && !c.flags.includes('first') && c.flags.some(f => ['intro', 'part', 'side', 'memory'].includes(f))])),
 };
 /** --render: the new or changed prompt variants of the selected pipeline arms, one file per call */
 function render() {

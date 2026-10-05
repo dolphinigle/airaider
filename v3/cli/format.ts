@@ -380,8 +380,9 @@ export const render = {
     const reward = `REWARD: ${g.questReward(q.id)}${kinds ? `  [${kinds}]` : ''}${(w => w ? `  ⚠ ${w}` : '')(g.questRewardWarn(q.id))}`;
     const sg = q.saga;
     const lines = sg ? (() => {
-      // a saga card: the quest log the engine rendered (the GUI's rows), the prose, the people it names — the same
-      // order the quest page uses; no errand line (the road's ▶ row and the prose carry the job)
+      // a saga card: the quest log the engine rendered (the GUI's rows: on the game's pipes "So far:" and one "  ✓ Title —
+      // line" per part played before the last, which the prose opens on — none on cards 1–2), the prose, the people it names — the same order the quest page uses; no
+      // errand line (the prose carries the job)
       const c = g.chainViews().find(x => x.id === q.chainId);
       const log = logLines(sg.rows);
       const cast = g.questCast(q.id);
@@ -498,7 +499,8 @@ export const render = {
     ).join('\n') || '(no stories yet — pursue a ✦STORY lead)';
   },
 
-  /** the saga as the chronicle shows it (the GUI's Sagas tab, same rows, same order): the quest log as it stands, card
+  /** the saga as the chronicle shows it (the GUI's Sagas tab, same rows, same order): the quest log as it stands (none on
+   *  the game's pipes, designer 2026-10-05), card
    *  1 (set off from the log, as on a card), the likely end — how it ended, once it is over — and the economy, So far,
    *  the answer once the finale is played, the people seen */
   chainDetail(g: Game, id: string): string {

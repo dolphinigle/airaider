@@ -19,8 +19,9 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
   plan: [[], ['keywords', 'support'], ['premise', 'support'], ...['grafts', 'sides'].map(pipe => ['keywords', 'support', pipe]), ...[['fixes', 'with'], ['trail'], ['line', 'against'], ['link']].map(pipe => ['keywords', 'support', 'grafts', ...pipe]), ['keywords', 'support', 'grafts', 'line', 'against', 'link'],
     // (clean deals each type's `against` and asks the trouble's `with`, as line and fixes do)
     ...[['clean', 'against', 'with'], ['voice'], ['lore'], ['page'], ['past']].map(arm => ['keywords', 'support', 'grafts', ...arm]),
-    // the stack round: TC + line with its sourced why (motive, S1); TC + clean (S3). S2's plan is PP's own
-    ...[['voice', 'line', 'against', 'motive'], ['voice', 'clean', 'against', 'with']].map(arm => ['keywords', 'support', 'grafts', ...arm])].flatMap(seed => [['notrade'], []].flatMap(cast => subsets(['personal', 'memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, ...seed], vars: {} })))).concat(
+    // the stack round: TC + line with its sourced why (motive, S1); TC + clean (S3). S2's plan is PP's own. (NT's plan is S1's;
+    // PT's is PP's with S1's line: the trouble line on the game's pipes, 2026-10-05)
+    ...[['voice', 'line', 'against', 'motive'], ['voice', 'clean', 'against', 'with'], ['past', 'line', 'against', 'motive']].map(arm => ['keywords', 'support', 'grafts', ...arm])].flatMap(seed => [['notrade'], []].flatMap(cast => subsets(['personal', 'memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, ...seed], vars: {} })))).concat(
     // round H: HP's hired asker's past and change, in place of TC's line (never on a personal plan: that one is TC's). RF's plan is TC's
     [['notrade'], []].flatMap(cast => subsets(['memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, 'keywords', 'support', 'grafts', 'askerpast'], vars: {} }))),
     // a soldier's NEXT personal saga (chain B, C…) on PP: the seed is who they are now, the dealt situation its new matter
@@ -42,7 +43,8 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
     // (clean: the standalone arm of the verifier's shared fixes, in no round-T arm)
     // (the stack round: card 1's line beside line's trouble sentence, S1, or clean, S3; a personal past's first sentence said as
     // the line, the rest narrated or none left, S2)
-    .flatMap(extra => extra.includes('line') && pos === 'first' && !extra.includes('fixes') && !extra.includes('side') ? [extra, [...extra, 'says']]
+    // (PT: a personal past in two sentences beside line's trouble sentence)
+    .flatMap(extra => extra.includes('line') && pos === 'first' && !extra.includes('fixes') && !extra.includes('side') ? [extra, [...extra, 'says'], ...(extra.includes('personal') ? [[...extra, 'past']] : [])]
       : extra.includes('fixes') || extra.includes('line') || extra.includes('side') || (extra.includes('part') && extra.includes('returning')) ? [extra] : pos === 'first'
       ? [extra, [...extra, 'clean'], [...extra, 'says'], [...extra, 'clean', 'says'], [...extra, 'lore'], ...(extra.includes('personal') ? [[...extra, 'past'], [...extra, 'past', 'next'], [...extra, 'past', 'next', 'event'], [...extra, 'says', 'quote', 'past'], [...extra, 'says', 'quote']] : [[...extra, 'askerpast']])]
       : pos === 'later' && !extra.includes('retry') ? [extra, [...extra, 'clean'], [...extra, 'meet']]

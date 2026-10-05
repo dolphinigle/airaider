@@ -314,8 +314,9 @@ function stateView() {
         level: q.level, rarity: q.rarity, region: REGION[q.region]!.name, regionId: q.region, archetype: q.archetype,
         chainId: q.chainId ?? null, beat: q.beatIndex ?? null, isFinale: !!q.isFinale,
         // a saga card's screen beyond its prose (the v4 storyteller): the quest log rows the engine rendered
-        // ({kind: for|road|roadrow|known|knownrow|held|open, mark?, text}), logFirst (rows above the prose), where the card
-        // sits (part n of N, again, the last chance, setbacks) — the CLI prints the same rows (cli/format questDetail).
+        // ({kind: for|road|roadrow|known|knownrow|held|open|sofar|sofarrow, mark?, title?, text}), logFirst (rows above the
+        // prose), where the card sits (part n of N, again, the last chance, setbacks) — the CLI prints the same rows
+        // (cli/format questDetail).
         // The server builds no saga text
         saga: q.saga ?? null,
         ready: game.isReady(q.id),

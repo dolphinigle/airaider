@@ -25,7 +25,7 @@ import {
 } from '../engine/saga.js';
 import {
   newKnowing, newState, planSaga, seedSteps, writeOutline, writeCard, writeReport, firstCardPayload, laterCardPayload, reportPayload,
-  questLog, logLines, noteDelivered, forLineShown, onThisMatter, jobWhy, roadLines, roadHopes, mockOutline, bank, triedLine,
+  questLog, soFarLog, logLines, noteDelivered, forLineShown, onThisMatter, jobWhy, roadLines, roadHopes, mockOutline, bank, triedLine,
   revealLint, choiceTarget, fateSentence, knowingOf, keepKnowing, roadOf, toNullable, PRONOUN, graftRoad, toldOption, cannedOption,
   writeLate, cardWhy, grownLine, cardHope, withLead, mentions, standing,
   type ReportCall,
@@ -184,8 +184,9 @@ export function posOf(rec: SagaRecord): SagaPos {
 }
 
 /** the next card. Card 1 runs beside the outline call (R5: the road ahead) and is the only card with no For line and no
- *  Open question (its prose tells the premise). Knowing changes here and at a report's arrival only (D20). A card already
- *  on offer comes back verbatim (D15) */
+ *  Open question (its prose tells the premise). Pipe part sofar (the game's pipes, designer 2026-10-05): no forward log on
+ *  any card — the So far rows (`soFarLog`: the parts before the last, which the prose opens on), none on cards 1–2. Knowing changes here and at a report's arrival only
+ *  (D20), from what the card shows. A card already on offer comes back verbatim (D15) */
 export async function card(host: SagaHost, chain: Chain): Promise<SagaCardOut> {
   const rec = recOf(chain), plan = planOf(rec), w = rec.world;
   const pos = posOf(rec);
@@ -196,8 +197,10 @@ export async function card(host: SagaHost, chain: Chain): Promise<SagaCardOut> {
   const log = (kind: string, t: string) => host.log(kind, t);
   const k = knowingOf(rec);
   const first = rec.card1 === '';
+  // (pipe part sofar) the card shows only what was played, never the forward log: no For line, so nobody is named by one
+  const sofar = piped(w, 'sofar');
   // (R5 verify) from card 2 the log's For line names and labels the one the company acts for above the prose
-  if (!first) forLineShown(plan, k);
+  if (!first && !sofar) forLineShown(plan, k);
   // pipe arm late (E1): the finale is written now, from where the story stands (once; a failed call leaves the plan's)
   if (pos.finale && piped(w, 'late') && rec.late === undefined)
     rec.late = await writeLate(host.ai, plan, w, rec.state, k, rec.lines.at(-1)?.text ?? rec.latest, log);
@@ -239,8 +242,10 @@ export async function card(host: SagaHost, chain: Chain): Promise<SagaCardOut> {
       rec.hopes = toNullable(roadHopes(plan, got, k));
     }
   } else prose = await writeCard(host.ai, cc, log);
-  // (R4, Q1) the quest log, rendered by the engine from data above the prose
-  const rows = questLog(plan, k, rec.state, roadOf(rec, pos.finale ? w.N : pos.job, !pos.finale && retry), { forLine: !first, open: !first }, w.places);
+  // (R4, Q1) the quest log, rendered by the engine from data above the prose; (sofar) the So far rows in its place. What
+  // the card delivers — and so what Knowing and ON THIS MATTER read — is exactly the rows shown and the prose
+  const rows = sofar ? soFarLog(played, rec.lines)
+    : questLog(plan, k, rec.state, roadOf(rec, pos.finale ? w.N : pos.job, !pos.finale && retry), { forLine: !first, open: !first }, w.places);
   const shown = `${logLines(rows).join('\n')}\n${prose}`;
   noteDelivered(shown, plan, k, false);
   keepKnowing(rec, k);
@@ -248,6 +253,22 @@ export async function card(host: SagaHost, chain: Chain): Promise<SagaCardOut> {
   if (first) rec.card1 = prose;
   rec.cache = { pos, title: e.title, prose, job: e.job, rows, matter };
   return { title: e.title, prose, job: e.job, rows, logFirst: true, matter, pos, ...(options ? { options } : {}) };
+}
+
+/** (pipe part sofar) the rows and ON THIS MATTER of the card on offer, as card() renders them now. A quest stores its rows
+ *  at birth (D15: the card comes back verbatim), so a save written under an older rule — the forward log, before
+ *  2026-10-05 — would show that log until the card is played; Game.load re-renders it from here. The So far rows are a view
+ *  of the lines before the card, which do not move while it is on offer. Null: no saga, a pipe without `sofar` (its rows
+ *  stay as written), or `pos` not the card on offer (its lines have moved on, or the finale was played). Knowing is left as the old card left it */
+export function refreshRows(chain: Chain, pos: SagaPos, prose: string): { rows: LogRow[]; matter: Matter[] } | null {
+  const rec = chain.saga;
+  if (!rec?.plan || !piped(rec.world, 'sofar') || rec.lines.some(l => l.n >= rec.world.N)) return null;
+  const now = posOf(rec);
+  if (now.job !== pos.job || now.finale !== pos.finale || now.attempt !== pos.attempt) return null;
+  const rows = soFarLog(playedPlan(rec), rec.lines);
+  const matter = onThisMatter(planOf(rec), `${logLines(rows).join('\n')}\n${prose}`);
+  if (rec.cache) { rec.cache.rows = rows; rec.cache.matter = matter }
+  return { rows, matter };
 }
 
 // ─── the mechanics the plan's §3 defaults hand the flow ────────────────────────────────────────
@@ -400,7 +421,9 @@ export function afterReport(host: SagaHost, chain: Chain, pos: SagaPos, a: { out
   // (R5 verify) a failed job's summary is only what stopped the company; the chronicle puts the job in front of it
   const failedJob = !pos.finale && a.outcome === 'failure';
   const tried = failedJob ? triedLine(e.job, rep.summary, plan, w) : rep.summary;
-  rec.lines.push({ n: pos.finale ? N : pos.job, attempt: rec.lines.length + 1, outcome: a.outcome, party: a.party.map(p => p.name), text: tried, hurt: a.hurt });
+  // (the So far rows read the summary itself: the row's title already names the job)
+  rec.lines.push({ n: pos.finale ? N : pos.job, attempt: rec.lines.length + 1, outcome: a.outcome, party: a.party.map(p => p.name), text: tried, hurt: a.hurt,
+    ...(tried !== rep.summary && rep.summary.trim() ? { summary: rep.summary } : {}) });
   // how it ended, in the finale's Outcome sentence (sagaFate — every branch settleFinale takes): the views' "ending"
   if (pos.finale && a.fate) rec.ending = a.fate;
   // (pipe arm past, PP) a personal finale not lost leaves the soldier ONE dossier line, from the plan's change (the game keeps
@@ -507,7 +530,9 @@ export interface Chronicle {
   people: { id: string; name?: string; label: string }[];
 }
 /** the saga as the chronicle shows it: the quest log as it stands (For line on; the open question until the finale),
- *  card 1, the likely end, So far, the answer once played, the people seen */
+ *  card 1, the likely end, So far, the answer once played, the people seen. Pipe part sofar (the game's pipes, designer
+ *  2026-10-05): no forward log here either — the player sees it nowhere (the Sagas tab and the CLI `chain` print these
+ *  rows); the chronicle's own So far is the past quests the ruling keeps */
 export function chronicle(chain: Chain): Chronicle | null {
   const rec = chain.saga;
   if (!rec?.plan) return null;
@@ -520,7 +545,7 @@ export function chronicle(chain: Chain): Chronicle | null {
   const gone = !finale && chain.state === 'slipped';
   // the finale is next (every job won, or the last chance): a job never reached is no longer ahead
   const at = !finale && !gone && (rec.lastchance || posOf(rec).finale) ? N : undefined;
-  const rows = questLog(plan, k, rec.state, roadOf(rec, at, false, finale), { forLine: true, open: !finale }, rec.world.places);
+  const rows = piped(rec.world, 'sofar') ? [] : questLog(plan, k, rec.state, roadOf(rec, at, false, finale), { forLine: true, open: !finale }, rec.world.places);
   return {
     title: plan.title, state: !rec.lines.length && !rec.card1 ? 'planned' : finale ? (finale === 'lost' ? 'slipped' : 'done') : gone ? 'slipped' : 'active',
     rows, card1: rec.card1,

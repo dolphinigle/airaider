@@ -242,8 +242,9 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
           <span className="meta">{q.rarity} · level {q.level} · {act.length || '—'} to send</span>
         </div>
         <div className="body">
-          {/* a saga card: the quest log the engine rendered, part of the card — above the prose on every R5 card (logFirst);
-              the road's ▶ row and the prose carry the job, so a saga card has no errand row */}
+          {/* a saga card: the quest log the engine rendered, part of the card — above the prose on every R5 card (logFirst):
+              on the game's pipes So far, the parts played before the last (the prose opens on it; none on cards 1–2); the
+              prose carries the job, so a saga card has no errand row */}
           {q.saga?.logFirst && <QuestLog rows={q.saga.rows} />}
           <p className="sit">{q.situation}</p>
           {q.saga && !q.saga.logFirst && <QuestLog rows={q.saga.rows} />}

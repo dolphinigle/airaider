@@ -379,6 +379,11 @@ export class Game {
       // a trait is never favored AND clashing on one test (generation filters it since 2026-09-25;
       // saves written before that still carry finale plans like 'helps: social · hurts: social')
       for (const s of q.slots ?? []) s.test.clashing = (s.test.clashing ?? []).filter(c => !s.test.favored.includes(c));
+      // a saga card's rows are stored at its birth: one on offer in a save written before the So far log (2026-10-05) still
+      // holds the forward log — re-render it as the card would be now (sagaflow refreshRows; a pipe without `sofar` keeps its own)
+      const chain = q.saga && q.state === 'open' ? (st.chains ?? []).find(c => c.id === q.chainId) : undefined;
+      const fresh = chain && flow.refreshRows(chain, q.saga!.pos, q.situation);
+      if (fresh) { q.saga!.rows = fresh.rows; q.saga!.matter = fresh.matter }
     }
   }
 

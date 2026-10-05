@@ -251,39 +251,50 @@ describe('pipeline arms on the floor', () => {
     expect(chain.saga!.world.kit!.arm).toBe('kit+pick');
     deal({ ...hostFor(g), pipeArm: () => undefined }, chain, undefined, focal);
     expect(chain.saga!.world.pipe).toBeUndefined();
-    expect(PIPE_ARMS).toEqual(['one', 'grafts', 'sides', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx', 'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'past+return', 'past+trait', 'voice+reach']);
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'grafts'))).toEqual(['grafts', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx', 'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'past+return', 'past+trait', 'voice+reach']);
+    expect(PIPE_ARMS).toEqual(['one', 'grafts', 'sides', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx', 'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'past+return', 'past+trait', 'voice+reach', 'voice+log', 'past+log', 'voice+trouble', 'past+trouble']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'grafts'))).toEqual(['grafts', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx', 'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'past+return', 'past+trait', 'voice+reach', 'voice+log', 'past+log', 'voice+trouble', 'past+trouble']);
     // round T: each arm is grafts plus its own change, and no other round-T arm carries it (judged against G0's draws on disk);
     // the verifier's shared fixes (clean) ride on no round-T arm. The stack round (S1–S3): a shipped arm plus one change
     for (const part of ['room', 'weight', 'lore', 'page'] as const) expect(PIPE_ARMS.filter(p => piped({ pipe: p }, part))).toEqual([part]);
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'past'))).toEqual(['past', 'past+voice', 'past+return', 'past+trait']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'past'))).toEqual(['past', 'past+voice', 'past+return', 'past+trait', 'past+log', 'past+trouble']);
     // chain B's inputs (CBR, CBT): the game's personal pipe (cost fix included) plus the shared `event` and one dealt item each
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'event'))).toEqual(['past+return', 'past+trait']);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'returner'))).toEqual(['past+return']);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'trait'))).toEqual(['past+trait']);
     expect([GAME_PIPE.personal, GAME_PIPE.other].some(p => ['event', 'returner', 'trait'].some(x => piped({ pipe: p }, x as 'event')))).toBe(false);
     // RFW shipped (chain-B round §2.4): both game pipes deal a failed job's report the widened fact
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'reach'))).toEqual(['voice', 'past', 'voice+reach']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'reach'))).toEqual(['voice', 'past', 'voice+reach', 'voice+log', 'past+log', 'voice+trouble', 'past+trouble']);
     expect([GAME_PIPE.personal, GAME_PIPE.other].every(p => piped({ pipe: p }, 'stands') && piped({ pipe: p }, 'reach'))).toBe(true);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'clean'))).toEqual(['clean', 'voice+clean']);
     // voice (TC) is three pieces: card 1's line (the plan's), a won clue's witness, the finale's teller; S2 takes the teller, and
     // its card-1 line is the past's own first sentence (quote)
     // (round H: HP keeps `says` for a personal saga, whose soldier has no hired asker's past to stand in its place)
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'says'))).toEqual(['voice', 'voice+line', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'voice+reach']);
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'teller'))).toEqual(['voice', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'voice+reach']);
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'witness'))).toEqual(['voice', 'voice+line', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'voice+reach']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'says'))).toEqual(['voice', 'voice+line', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'voice+reach', 'voice+log', 'voice+trouble']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'teller'))).toEqual(['voice', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'voice+reach', 'voice+log', 'voice+trouble']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'witness'))).toEqual(['voice', 'voice+line', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'voice+reach', 'voice+log', 'voice+trouble']);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'quote'))).toEqual(['past+voice']);
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'motive'))).toEqual(['voice+line']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'motive'))).toEqual(['voice+line', 'voice+trouble', 'past+trouble']);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'asker'))).toEqual(['voice+asker']);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'setback'))).toEqual(['voice+setback']);
     // RFA: RF part (a) alone, on TC as measured (no cost fix); RFW (its fact widened) shipped on the game's two pipes; the cost
     // fix rides on the game's two pipes only
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'stands'))).toEqual(['voice', 'past', 'voice+stands', 'voice+reach']);
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'owncost'))).toEqual(['voice', 'past', 'past+return', 'past+trait']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'stands'))).toEqual(['voice', 'past', 'voice+stands', 'voice+reach', 'voice+log', 'past+log', 'voice+trouble', 'past+trouble']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'owncost'))).toEqual(['voice', 'past', 'past+return', 'past+trait', 'voice+log', 'past+log', 'voice+trouble', 'past+trouble']);
     expect([GAME_PIPE.personal, GAME_PIPE.other].every(p => piped({ pipe: p }, 'owncost'))).toBe(true);
+    // the So far log (designer 2026-10-05) rides on the game's two pipes only; the lab's controls (LV, LP) are exactly those
+    // pipes minus it, so NV vs LV and NP vs LP differ by the log alone
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'sofar'))).toEqual(['voice', 'past', 'voice+trouble', 'past+trouble']);
+    const parts = ['one', 'grafts', 'sides', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx', 'room', 'weight', 'lore', 'page', 'past',
+      'clean', 'says', 'witness', 'teller', 'quote', 'motive', 'asker', 'setback', 'stands', 'owncost', 'event', 'returner', 'trait', 'reach', 'sofar'] as const;
+    for (const [game, log] of [['voice', 'voice+log'], ['past', 'past+log']] as const)
+      expect(parts.filter(x => piped({ pipe: log }, x))).toEqual(parts.filter(x => x !== 'sofar' && piped({ pipe: game }, x)));
+    // the trouble line on the game's pipes (NT, PT; lab only): exactly the shipped pipe plus line + motive
+    for (const [game, arm] of [['voice', 'voice+trouble'], ['past', 'past+trouble']] as const)
+      expect(parts.filter(x => piped({ pipe: arm }, x))).toEqual(parts.filter(x => ['line', 'motive'].includes(x) || piped({ pipe: game }, x)));
+    expect([GAME_PIPE.personal, GAME_PIPE.other].some(p => piped({ pipe: p }, 'line'))).toBe(false);
     // each E arm is grafts plus its own change, and no other arm carries it; each F arm too, and FX carries all three
     for (const part of ['late', 'trail', 'narrow'] as const) expect(PIPE_ARMS.filter(p => piped({ pipe: p }, part))).toEqual([part]);
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'line'))).toEqual(['line', 'fx', 'voice+line']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'line'))).toEqual(['line', 'fx', 'voice+line', 'voice+trouble', 'past+trouble']);
     for (const part of ['plain', 'link'] as const) expect(PIPE_ARMS.filter(p => piped({ pipe: p }, part))).toEqual([part, 'fx']);
   });
   for (const pipe of PIPE_ARMS) for (const personal of [false, true]) it(`${pipe} · ${personal ? 'personal' : 'hired'}: plays to its end, on kit+pick`, async () => {

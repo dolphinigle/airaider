@@ -215,33 +215,54 @@ export const SEED_ARM: SeedArm = 'kit+pick';
  *  THE COST FIX (round H §5, a defect in the default): `owncost` — a partial's cost dealt as ONE phrase naming its owner
  *  (`costPhrase`, from clean's `ownCost`: "the company's own horse, lamed"); the {what, how, whose} atoms let the writer give
  *  the company's lamed horse to the enemy. Carried by the game's two pipes (voice, past)
+ *  SO FAR (designer 2026-10-05: "hide the saga things like the [For / Road ahead / Known / Held / Open question] part? it
+ *  kinda breaks immersion. you can show the past quests though"): `sofar` — a saga card shows NO forward quest log (no For
+ *  row, no Road ahead — neither ▶ nor the · rows nor the Finale row — no Known, no Held, no Open question), and neither does
+ *  the chronicle (the Sagas tab, the CLI `chain`: its own So far list stays). A card shows "So far", one row per part played
+ *  before the last one, in order (a failed try its own row): ✓ / ✗, the part's title, and the summary its report left
+ *  (storyteller `soFarLog`). The last part is the prose's (every later card opens on it, `latest` / `retry`), so card 1 and
+ *  card 2 show none. Party names and wounds stay off the rows. A save's card on offer is re-rendered on load (sagaflow
+ *  `refreshRows`). Knowing follows what is shown: no For line, so the one the company acts for is named only by a text that
+ *  says them (`forLineShown` is not run). The road and the hopes are still computed beside card 1 (the cards' and reports'
+ *  hopes read them). No prompt changes. Carried by the game's two pipes (voice, past); the lab's
+ *  controls `voice+log` / `past+log` are exactly those pipes minus `sofar` (seedlab NV vs LV, NP vs LP: the log alone)
+ *  THE TROUBLE LINE ON THE GAME'S PIPES (designer 2026-10-05: *"They will turn strangers back and raise the camp." — still
+ *  have weird sentences like this*): `voice+trouble` / `past+trouble` — the game's pipe as it ships plus round F's `line`
+ *  (the plan writes each trouble as ONE sentence in place of the {who, carry, will} notes, law 6b) with S1's `motive`. Lab
+ *  arms only (seedlab NT vs NV, PT vs NP); not shipped
  *  (C1 `core` — a call fixing the want, question and answer before the plan — was removed: a measured loss, follow 26–116) */
 export type PipeArm = 'one' | 'grafts' | 'sides' | 'reads' | 'fixes' | 'late' | 'trail' | 'narrow' | 'line' | 'plain' | 'link' | 'fx'
   | 'room' | 'weight' | 'voice' | 'lore' | 'page' | 'past' | 'clean' | 'voice+line' | 'past+voice' | 'voice+clean' | 'voice+asker' | 'voice+setback'
-  | 'voice+stands' | 'past+return' | 'past+trait' | 'voice+reach';
+  | 'voice+stands' | 'past+return' | 'past+trait' | 'voice+reach' | 'voice+log' | 'past+log' | 'voice+trouble' | 'past+trouble';
 export const PIPE_ARMS: readonly PipeArm[] = ['one', 'grafts', 'sides', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx',
   'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands',
-  'past+return', 'past+trait', 'voice+reach'];
+  'past+return', 'past+trait', 'voice+reach', 'voice+log', 'past+log', 'voice+trouble', 'past+trouble'];
 /** the pieces an arm is made of: an arm's own change, or a piece of one — voice (TC) is three lines, each its own piece
  *  (`says` card 1's line, `witness` a won clue said by someone met, `teller` the finale's secret said), so an arm can take some;
  *  `quote` and `motive` are the stack round's (S2's quoted first sentence of the past, in place of its narration; S1's sourced
  *  why); `asker` and `setback` round H's (HP's asker past and change; RF's failure facts, both parts); `stands` RF's part (a)
  *  alone (RFA); `owncost` the cost fix (a partial's cost as one phrase naming its owner); `event`, `returner`, `trait` chain B's
- *  inputs (CBR, CBT); `reach` RFA's fact widened (RFW) */
-export type PipePart = Exclude<PipeArm, 'voice' | 'voice+line' | 'past+voice' | 'voice+clean' | 'voice+asker' | 'voice+setback' | 'voice+stands' | 'past+return' | 'past+trait' | 'voice+reach'>
-  | 'says' | 'witness' | 'teller' | 'quote' | 'motive' | 'asker' | 'setback' | 'stands' | 'owncost' | 'event' | 'returner' | 'trait' | 'reach';
+ *  inputs (CBR, CBT); `reach` RFA's fact widened (RFW); `sofar` a card's So far rows in place of the forward quest log */
+export type PipePart = Exclude<PipeArm, 'voice' | 'voice+line' | 'past+voice' | 'voice+clean' | 'voice+asker' | 'voice+setback' | 'voice+stands' | 'past+return' | 'past+trait' | 'voice+reach' | 'voice+log' | 'past+log' | 'voice+trouble' | 'past+trouble'>
+  | 'says' | 'witness' | 'teller' | 'quote' | 'motive' | 'asker' | 'setback' | 'stands' | 'owncost' | 'event' | 'returner' | 'trait' | 'reach' | 'sofar';
 const VOICE: readonly PipePart[] = ['says', 'witness', 'teller'];
+/** the game's two pipes (GAME_PIPE): TC and PP with the cost fix, RFW's failure fact and the So far log */
+const VOICE_PIPE: readonly PipePart[] = ['grafts', ...VOICE, 'owncost', 'stands', 'reach', 'sofar'];
+const PAST_PIPE: readonly PipePart[] = ['grafts', 'past', 'owncost', 'stands', 'reach', 'sofar'];
+/** a game pipe with the forward quest log (the lab's controls, voice+log / past+log): exactly its parts minus `sofar` */
+const withLog = (parts: readonly PipePart[]): readonly PipePart[] => parts.filter(p => p !== 'sofar');
 /** the changes each pipe arm carries, by the arm that brought each in: D1, D2, E1–E3 and F1–F3 are C2 plus one change each;
  *  FX is C2 plus all of round F; the stack arms a shipped arm plus one change */
 const PIPE_PARTS: Record<PipeArm, readonly PipePart[]> = {
   one: ['one'], grafts: ['grafts'], sides: ['sides'], reads: ['grafts', 'reads'], fixes: ['grafts', 'fixes'],
   late: ['grafts', 'late'], trail: ['grafts', 'trail'], narrow: ['grafts', 'narrow'],
   line: ['grafts', 'line'], plain: ['grafts', 'plain'], link: ['grafts', 'link'], fx: ['grafts', 'line', 'plain', 'link'],
-  // (voice, past: the game's two pipes, GAME_PIPE) the cost fix, `owncost` (round H §5), and RFW's failure fact, `stands` +
-  // `reach` (chain-B round §2.4: hard contradictions inside the retry 4 → 0) — a lab TC/PP generated from here on carries
-  // both; the TC_g1–g3 / PP_g1–g3 on disk carry neither
-  room: ['grafts', 'room'], weight: ['grafts', 'weight'], voice: ['grafts', ...VOICE, 'owncost', 'stands', 'reach'], lore: ['grafts', 'lore'],
-  page: ['grafts', 'page'], past: ['grafts', 'past', 'owncost', 'stands', 'reach'], clean: ['grafts', 'clean'],
+  // (voice, past: the game's two pipes, GAME_PIPE) the cost fix, `owncost` (round H §5), RFW's failure fact, `stands` +
+  // `reach` (chain-B round §2.4: hard contradictions inside the retry 4 → 0), and the So far log, `sofar` (designer
+  // 2026-10-05) — a lab TC/PP generated from here on carries all three; the TC_g1–g3 / PP_g1–g3 on disk carry none, and the
+  // TC/PP generated between RFW and `sofar` carry the forward log (as voice+log / past+log do)
+  room: ['grafts', 'room'], weight: ['grafts', 'weight'], voice: VOICE_PIPE, lore: ['grafts', 'lore'],
+  page: ['grafts', 'page'], past: PAST_PIPE, clean: ['grafts', 'clean'],
   'voice+line': ['grafts', ...VOICE, 'line', 'motive'], 'past+voice': ['grafts', 'past', 'teller', 'quote'],
   'voice+clean': ['grafts', ...VOICE, 'clean'],
   // (HP keeps `says`: on a hired saga the asker's past stands in its place, on a personal one — no hired asker — it is TC's line)
@@ -252,6 +273,12 @@ const PIPE_PARTS: Record<PipeArm, readonly PipePart[]> = {
   'past+return': ['grafts', 'past', 'owncost', 'event', 'returner'], 'past+trait': ['grafts', 'past', 'owncost', 'event', 'trait'],
   // (RFW) RFA with its fact widened — no `owncost`, as RFA
   'voice+reach': ['grafts', ...VOICE, 'stands', 'reach'],
+  // (LV, LP) the lab's controls for the So far log: the game's pipe with the forward quest log, so NV vs LV and NP vs LP
+  // differ by the log alone
+  'voice+log': withLog(VOICE_PIPE), 'past+log': withLog(PAST_PIPE),
+  // (NT, PT) the trouble as the plan's one sentence on the game's pipe as it ships: round F's line with S1's motive (a reason
+  // only where the seed or cast gives one), so NT vs NV and PT vs NP differ by the line alone
+  'voice+trouble': [...VOICE_PIPE, 'line', 'motive'], 'past+trouble': [...PAST_PIPE, 'line', 'motive'],
 };
 /** whether a dealt world's pipe arm carries `part` */
 export const piped = (w: Pick<SagaWorld, 'pipe'>, part: PipePart): boolean => !!w.pipe && PIPE_PARTS[w.pipe].includes(part);
@@ -268,6 +295,7 @@ export const PIPE_ARM: PipeArm = 'grafts';
  *  (`voice`: grafts + the asker's own line on card 1, quoted clues, the secret spoken). Each saga type gets exactly the one
  *  change it was measured with (PP + voice on one card 1 is untested). game.ts sagaHost reads it */
 export const GAME_PIPE: Readonly<Record<'personal' | 'other', PipeArm>> = { personal: 'past', other: 'voice' };
+// (both pipes also carry the cost fix, RFW's failure fact and, from 2026-10-05, the So far log in place of the forward log)
 
 // ─── shapes, job types, ways (§2.4.1) ──────────────────────────────────────────────────────────
 
@@ -512,10 +540,14 @@ export function keepPicked(w: SagaWorld): void {
 /** whether a kit arm still waits on its pick or premise call before the plan */
 export const seedPending = (w: Pick<SagaWorld, 'kit'>): boolean => !!w.kit && ((PICKS.has(w.kit.arm) && !w.kit.picked) || (w.kit.arm === 'kit+pick+premise' && !w.kit.premise));
 /** one attempt as the chronicle keeps it. `decides`: whose deed decided a job that was not failed (the game sets it after
- *  the report lands; the memory edge to the deciding soldier reads it at the saga's close, §2.6) */
-export interface SagaLine { n: number; attempt: number; outcome: Outcome; party: string[]; text: string; hurt: Hurt[]; decides?: string }
-/** one row of the quest log as the engine renders it (the GUI gets the structure, the CLI the lab's text) */
-export type LogRow = { kind: 'for' | 'road' | 'roadrow' | 'known' | 'knownrow' | 'held' | 'open'; mark?: '▶' | '✓' | '✗' | '·'; text: string };
+ *  the report lands; the memory edge to the deciding soldier reads it at the saga's close, §2.6). `summary`: the report's
+ *  own summary (its 📖 line) where `text` is not it — a failed middle job, whose text puts the job in front (triedLine); the
+ *  So far rows read it beside the job's title, which already names the job. Absent (and in saves before 2026-10-05): text */
+export interface SagaLine { n: number; attempt: number; outcome: Outcome; party: string[]; text: string; hurt: Hurt[]; decides?: string; summary?: string }
+/** one row of the quest log as the engine renders it (the GUI gets the structure, the CLI the lab's text). `sofar` /
+ *  `sofarrow` (pipe part sofar): the So far header, then one row per part played — its mark, its `title`, and in `text` the
+ *  line its report left */
+export type LogRow = { kind: 'for' | 'road' | 'roadrow' | 'known' | 'knownrow' | 'held' | 'open' | 'sofar' | 'sofarrow'; mark?: '▶' | '✓' | '✗' | '·'; text: string; title?: string };
 /** ON THIS MATTER: a person the card calls by name (label without its article) */
 export interface Matter { id: string; name: string; label: string }
 /** where a card sits in the saga: the job it poses (the finale's is N), whether it is the finale, which try at the job */

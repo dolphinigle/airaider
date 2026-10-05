@@ -15,7 +15,7 @@ import { RACE_WORD, an, manWoman, soldierIs, soldierKind } from '../engine/plain
 import {
   TYPES, JOB_TYPES, WAY_ENDING, WAY_ATTR, NUMBER_WORD, FREE_WAY, helped, wayMeans, wayWord, wayOf, partOf, waysOf, hashStr, seedOf, seedText,
   type JobType, type Way, type SagaPerson, type Trouble, type Episode, type CastEntry, type SagaPlan, type SagaState,
-  type SagaWorld, type Hurt, type Cost, type LogRow, type SagaRecord, type LateShowdown, keepPicked, piped, askerPast, AGAINST, troubleWho, nextChapter, nextNow, RETURNER_PART,
+  type SagaWorld, type Hurt, type Cost, type LogRow, type SagaRecord, type SagaLine, type LateShowdown, keepPicked, piped, askerPast, AGAINST, troubleWho, nextChapter, nextNow, RETURNER_PART,
 } from '../engine/saga.js';
 import { renderSaga, wordCount, type SagaTemplate } from './prompts/saga/render.js';
 import { PICKS, CASTS, KIT_DEAL, plainKeywords } from '../engine/seedkit.js';
@@ -715,7 +715,8 @@ export interface Knowing { met: Set<string>; named: Set<string>; seen: Set<strin
 /** a person as a card or report receives them: name, label, sex, and `intro` / `memory` / `part` */
 type Entry = Record<string, string | boolean>;
 /** named from the start: the company's own soldier and a returning face. (R5 verify) Not the one the company acts for:
- *  card 1 brings them in by name and label (`intro`); from card 2 the For line does (`forLineShown`) */
+ *  card 1 brings them in by name and label (`intro`); from card 2 the For line does (`forLineShown`) — except on a pipe
+ *  with `sofar` (the game's pipes, 2026-10-05), whose cards print no For line: there only a text that says them does */
 export const newKnowing = (cast: SagaPerson[]): Knowing => ({ met: new Set(cast.filter(p => p.known).map(p => p.id)), named: new Set(cast.filter(p => p.seat === 'soldier' || p.memory).map(p => p.id)), seen: new Set() });
 /** (R5 verify) a card whose log prints the For line has introduced the one the company acts for by name and label */
 export const forLineShown = (plan: SagaPlan, k: Knowing) => { k.named.add(clientOf(plan).id); k.seen.add(clientOf(plan).id) };
@@ -1075,12 +1076,30 @@ export function questLog(plan: SagaPlan, k: Knowing, state: SagaState, road: Roa
   if (show.open) out.push({ kind: 'open', text: openQuestion(plan.question) });
   return out;
 }
+/** (pipe part sofar; designer 2026-10-05) the card's log in place of the forward quest log: "So far", then one row per
+ *  part played BEFORE the last one, in order — a failed try is its own row — with ✓ (won; a partial is a win) or ✗, the
+ *  part's title, and the summary its report left (its 📖 line: SagaLine.summary, else text — never a failed job's chronicle
+ *  text, which puts the job in front of it beside a title that already names the job). The last part played is the
+ *  prose's: every later card is dealt it (`latest` / `retry`) and opens on it, so one owner per fact — a row for it told
+ *  the same result twice, back to back, the row in the report's third person over the prose's second (NV F3_3). Nothing
+ *  ahead, nothing known or held, no question; no party, no wounds (the report showed them). Nothing before the last part
+ *  (card 1, card 2): no rows at all */
+export function soFarLog(plan: SagaPlan, lines: readonly SagaLine[]): LogRow[] {
+  const before = lines.slice(0, -1);
+  if (!before.length) return [];
+  const N = plan.episodes.length + 1;
+  return [{ kind: 'sofar', text: 'So far' }, ...before.map((l): LogRow => ({
+    kind: 'sofarrow', mark: l.outcome === 'failure' ? '✗' : '✓',
+    title: l.n >= N ? plan.showdown.title : plan.episodes[l.n - 1]?.title ?? '', text: l.summary ?? l.text,
+  }))];
+}
 /** whether a text opens on a proper name: someone in the cast, or a place the engine dealt */
 const leadsWithName = (t: string, plan: SagaPlan, places: readonly string[]) => {
   const w0 = (t.trim().split(/\s+/)[0] ?? '').replace(/['’]s$/, '').replace(/[^\p{L}'-]/gu, '');
   return plan.cast.some(p => nameParts(p).includes(w0)) || places.some(pl => pl.split(/\s+/)[0] === w0);
 };
-/** the quest log as the lab printed it (the CLI's text; byte-identical to scripts/sagalab at storyteller-build-src) */
+/** the quest log as the lab printed it (the CLI's text; byte-identical to scripts/sagalab at storyteller-build-src); the So
+ *  far rows (pipe part sofar) as "So far:" then "  ✓ Title — line" */
 export function logLines(rows: LogRow[]): string[] {
   return rows.map(r => {
     switch (r.kind) {
@@ -1091,6 +1110,8 @@ export function logLines(rows: LogRow[]): string[] {
       case 'knownrow': return `  ${r.text}`;
       case 'held': return `Held: ${r.text}`;
       case 'open': return `Open question: ${r.text}`;
+      case 'sofar': return 'So far:';
+      case 'sofarrow': return `  ${r.mark ?? '✓'} ${r.title ? `${r.title} — ` : ''}${r.text}`;
     }
   });
 }

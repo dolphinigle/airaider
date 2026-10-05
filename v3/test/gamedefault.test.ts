@@ -12,10 +12,11 @@ import { PIPE_ARM, GAME_PIPE, SEED_ARM, WAY_ENDING, FREE_WAY, helped, wayMeans, 
 import type { Card } from '../src/engine/cards.js';
 import type { Chain } from '../src/engine/chains.js';
 import type { LabFixture } from '../src/engine/lab.js';
-import { cannedOption, toldOption, fateSentence, clientOf, grownLine } from '../src/ai/storyteller.js';
+import { cannedOption, toldOption, fateSentence, clientOf, grownLine, knowingOf, laterCardPayload } from '../src/ai/storyteller.js';
+import type { SagaCall } from '../src/ai/provider.js';
 import * as flow from '../src/game/sagaflow.js';
 import { render } from '../cli/format.js';
-import { RecordingMock } from './sagaharness.js';
+import { RecordingMock, newGame, sagaChain, playSaga } from './sagaharness.js';
 
 /** the gold way's money as a writer would paste it */
 const MONEY = /\bpa(?:y|ys|id|ying)\b|\bcoins?\b|\btreasure\b/i;
@@ -274,5 +275,87 @@ describe('the game default, a soldier\'s own saga: PP (past + change), to the fi
     expect(seedLines.some(l => l.includes('own matter'))).toBe(false);
     expect(people.length).toBeLessThanOrEqual(1);
     if (people[0]) expect(people[0].split('; ')).toHaveLength(1);
+  });
+});
+
+/** the mock, its cards and reports never saying the names in `scrub` — a writer that never names someone, so whatever names
+ *  them on a card can only be the engine's own rows */
+class NamelessMock extends RecordingMock {
+  scrub: string[] = [];
+  override async sagaCall(c: SagaCall): Promise<unknown> {
+    const out = await super.sagaCall(c);
+    if (!this.scrub.length || !['card', 'report'].includes(c.template)) return out;
+    let t = JSON.stringify(out);
+    for (const n of this.scrub) t = t.replace(new RegExp(`\\b${n}\\b`, 'g'), 'someone');
+    return JSON.parse(t);
+  }
+}
+
+describe('the game default shows So far, never the forward quest log (designer 2026-10-05: the log "kinda breaks immersion")', () => {
+  for (const personal of [false, true]) it(`${personal ? 'personal (PP)' : 'hired (TC)'}: cards 1–2 no rows; every later card one row per part played before the last (the prose's), a failed try its own`, async () => {
+    seedIdCounter(1);
+    const { g } = newGame(personal ? 61 : 67);
+    const { chain, focal } = sagaChain(g, { N: 4, personal });
+    const pipe = GAME_PIPE[personal ? 'personal' : 'other'];
+    const p = await playSaga(g, chain, 'bumpy', focal, undefined, { pipeArm: () => pipe });
+    const rec = chain.saga!, plan = rec.plan!;
+    expect(rec.world.pipe).toBe(pipe);
+    expect(p.cards[0]!.out.rows).toEqual([]);
+    expect(p.cards[1]!.out.rows).toEqual([]);
+    for (const [i, c] of p.cards.entries()) {
+      if (i < 2) continue;
+      // no For, no Road ahead (no ▶, no · row, no Finale row), no Known, no Held, no Open question: So far, then each part
+      // played before the last — its mark, its title, the summary its report left (the 📖 line); never the party or the wounds.
+      // The last part is the prose's (one owner per fact: every later card is dealt it as latest or retry)
+      expect(c.out.rows.every(r => r.kind === 'sofar' || r.kind === 'sofarrow')).toBe(true);
+      expect(c.log).toEqual(['So far:', ...p.reports.slice(0, i - 1).map(r =>
+        `  ${r.outcome === 'failure' ? '✗' : '✓'} ${r.pos.finale ? plan.showdown.title : plan.episodes[r.pos.job - 1]!.title} — ${r.rep.summary}`)]);
+    }
+    // a failed job's row is its report's summary: the chronicle's text puts the job in front, which the row's title already says
+    const failed = rec.lines.find(l => l.outcome === 'failure')!;
+    expect(failed.summary).toBeTruthy();
+    expect(failed.text).toMatch(/^The company tried to /);
+    expect(p.cards.at(-1)!.log.some(l => l.includes('The company tried to '))).toBe(false);
+    // the bumpy path fails a job: that try is its own ✗ row, and the retry's row follows it under the same title
+    const last = p.cards.at(-1)!.log;
+    const lost = last.findIndex(l => l.startsWith('  ✗ '));
+    expect(lost).toBeGreaterThan(0);
+    const title = (l: string) => l.slice(4, l.indexOf(' — '));
+    expect(last.slice(lost + 1).some(l => title(l) === title(last[lost]!))).toBe(true);
+    // nor does the chronicle show it (the Sagas tab, the CLI's chain view): no rows; its own So far keeps every part played
+    const ch = flow.chronicle(chain)!;
+    expect(ch.rows).toEqual([]);
+    expect(ch.soFar).toHaveLength(rec.lines.length);
+  });
+
+  it('knowing follows what is shown: no hidden For line names the one who asked (the forward log, voice+log, still does)', async () => {
+    for (const pipe of ['voice', 'voice+log'] as const) {
+      seedIdCounter(1);
+      const ai = new NamelessMock(71);
+      const g = new Game(ai, 71);
+      const { chain, focal } = sagaChain(g, { N: 4, personal: false });
+      let named3: string[] | undefined;
+      const p = await playSaga(g, chain, 'clean', focal, pos => {
+        const rec = chain.saga!;
+        if (!ai.scrub.length) ai.scrub = clientOf(rec.plan!).name.split(/\s+/).filter(x => x.length > 2);
+        if (pos.job === 3 && !pos.finale) named3 = [...rec.knowing.named];
+      }, { pipeArm: () => pipe });
+      const rec = chain.saga!, plan = rec.plan!, client = clientOf(plan);
+      const log = pipe === 'voice';
+      expect(named3).toBeDefined();
+      // card 2 under the game's pipe shows no For line, so nothing on it named the asker (the writer never did): they stay
+      // un-named, and ON THIS MATTER (what the card names) leaves them out; the forward log's For line names them
+      expect(p.cards[1]!.log.some(l => l.startsWith('For: '))).toBe(!log);
+      expect(named3!.includes(client.id)).toBe(!log);
+      expect(p.cards[1]!.out.matter.some(m => m.id === client.id)).toBe(!log);
+      // so a later card that deals them still introduces them (label and name), as card 1 was meant to
+      const e = plan.episodes[2]!;
+      const cc = laterCardPayload(plan, { ...e, job: `${e.job}, for ${client.name}` }, rec.latest, knowingOf(rec), { finale: false, lastchance: false });
+      const entry = (cc.payload.names as Record<string, unknown>[]).find(n => n.name === client.name)!;
+      expect(entry.intro).toBe(log ? true : undefined);
+      if (log) expect(entry.label).toBeTruthy();
+      // the chronicle likewise: the forward log only on the control
+      expect(flow.chronicle(chain)!.rows.some(r => r.kind === 'for')).toBe(!log);
+    }
   });
 });

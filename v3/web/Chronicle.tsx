@@ -36,7 +36,7 @@ function SagaNext({ c, openQuest, openLeads }: { c: any; openQuest?: (id: string
 }
 
 /** the sagas as the chronicle shows them (Game.chainViews — the CLI's `chain <id>` prints the same, in this order):
- *  the quest log as it stands, card 1, the likely end (how it ended, once over) and the economy, So far (the engine's
+ *  the quest log as it stands (none on the game's pipes, designer 2026-10-05), card 1, the likely end (how it ended, once over) and the economy, So far (the engine's
  *  rows: the job's number or "finale", the mark, the party, the line, who was hurt), the answer once the finale is
  *  played, the people the player has seen (by name only once their name was read) */
 function Chains({ s, openQuest, openLeads }: { s: S; openQuest?: (id: string) => void; openLeads?: () => void }) {

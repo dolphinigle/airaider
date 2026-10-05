@@ -296,12 +296,18 @@ export function questKind(q: any): string {
   return q.faucet ? 'Standing post' : 'One-off job';
 }
 
-/** the road marks, in words for a screen reader (the glyph is what the eye reads) */
-const ROAD_MARK: Record<string, [string, string]> = { '✓': ['won', 'done'], '✗': ['lost', 'lost'], '▶': ['now', 'this job'], '·': ['ahead', 'ahead'] };
-/** THE QUEST LOG (the v4 storyteller): the rows the ENGINE rendered for a saga card or the chronicle — who the company
- *  acts for, the road ahead, what is known and held, the open question. The CLI prints the very same rows in the same
- *  order (cli/format.ts, logLines). Plain rows, part of the card: a bold lead word, then the text; the road's marks in a
- *  fixed gutter (✓ won · ✗ lost · ▶ this job · · ahead). Horizontal text only (docs/UI.md G6) */
+/** the road marks: each one's class (every class in the ql- namespace — a bare one collided with map.css's global .mk,
+ *  002725a) and its words for a screen reader (the glyph is what the eye reads) */
+const ROAD_MARK: Record<string, [string, string]> = { '✓': ['ql-won', 'done'], '✗': ['ql-lost', 'lost'], '▶': ['ql-now', 'this job'], '·': ['ql-ahead', 'ahead'] };
+/** So far's marks: a part played and won (a partial is a win), or a try that failed */
+const PAST_MARK: Record<string, [string, string]> = { '✓': ['ql-won', 'done'], '✗': ['ql-lost', 'failed'] };
+/** THE QUEST LOG (the v4 storyteller): the rows the ENGINE rendered for a saga card or the chronicle. On a saga card of the
+ *  game's pipes, So far — one row per part played before the last (the prose opens on that one), in order: its mark, its
+ *  title, the line its report left (none on cards 1–2); the game's pipes give the chronicle no rows (its own So far list
+ *  stands). A saga on an older pipe: the forward log — who the company acts for, the road ahead, what is known and held,
+ *  the open question. The CLI prints the very same rows in the same order (cli/format.ts, logLines).
+ *  Plain rows, part of the card: a bold lead word, then the text; the marks in a fixed gutter (✓ won · ✗ lost · ▶ this job ·
+ *  · ahead). Horizontal text only (docs/UI.md G6) */
 export function QuestLog({ rows }: { rows?: any[] | null }) {
   if (!rows?.length) return null;
   return <div className="qlog" aria-label="Quest log">{rows.map((r: any, i: number) => {
@@ -316,6 +322,11 @@ export function QuestLog({ rows }: { rows?: any[] | null }) {
       case 'knownrow': return <p key={i} className="ql-sub">{r.text}</p>;
       case 'held': return <p key={i} className="ql-line"><b>Held:</b> {r.text}</p>;
       case 'open': return <p key={i} className="ql-line ql-open"><b>Open question:</b> {r.text}</p>;
+      case 'sofar': return <p key={i} className="ql-head"><b>So far:</b></p>;
+      case 'sofarrow': {
+        const [cls, word] = PAST_MARK[r.mark ?? '✓'] ?? PAST_MARK['✓']!;
+        return <p key={i} className={'ql-road ql-past ' + cls}><span className="ql-mk" role="img" aria-label={word}>{r.mark ?? '✓'}</span><span className="ql-tx">{r.title ? <><span className="ql-ti">{r.title}</span> — </> : null}{r.text}</span></p>;
+      }
       default: return null;
     }
   })}</div>;
