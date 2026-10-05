@@ -67,7 +67,7 @@
 /* the painted bust (2:3, chest-up, the head near the top): the card shows a head-and-shoulders window
    (object-view-box) centred on the eyes-to-mouth band, so however short the picture gets, it is the face */
 .card .pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 14%; }
-@supports (object-view-box: inset(0)) { .card .pic img { object-view-box: inset(4% 18% 54% 18%); object-position: 50% 50%; } }
+@supports (object-view-box: inset(0)) { .card .pic img { object-view-box: inset(1% 9% 53% 9%); object-position: 50% 22%; } }
 .card .paint { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: repeating-linear-gradient(90deg, #cfc5ad 0 2px, #d6ccb5 2px 5px); color: #857a64; }
 .card .paint svg { flex: none; max-height: 70%; width: auto; }
 .card .paint em { font: 500 11px var(--cond); font-style: normal; color: #4b4238; }
