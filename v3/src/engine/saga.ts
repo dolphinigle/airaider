@@ -167,16 +167,32 @@ export const SEED_ARM: SeedArm = 'kit+pick';
  *                    one in their way cannot know ("you hid it, and you were too ashamed"); "built from known" is gone (the
  *                    secret is new beyond known)
  *   voice+clean  S3  TC + clean (the verifier's shared fixes above)
+ *  ROUND H (ship-and-stack report §5.4–5.5; seedlab HP, RF), each TC plus ONE change, judged against TC's draws on disk:
+ *   voice+asker    HP  round T's principle (a person's own wrong handed to the writer as an item) carried to hired sagas: the
+ *                      plan writes the asker's `past` (two plain sentences: what happened to them that makes this want theirs)
+ *                      and `change` (a done fact naming them), and card 1 tells the past IN PLACE of TC's quoted `says` line —
+ *                      one card-1 addition, so TC's cap (round F: two overload card 1); the quoted clue and the spoken secret
+ *                      stay; the finale report not lost shows the change, the asker there to show it. No dossier line (the
+ *                      asker is no soldier). A personal saga has no hired asker, so it plays TC (`askerPast`). (verify) A
+ *                      returning asker's past is never their past with the company: card 1 tells the memory too
+ *   voice+setback  RF  a failure's facts handed to the texts after it (the playtest's retry contradiction, 2 of 2 setbacks:
+ *                      the failure report burned the forge, the retry held it and its report kept it "dark and whole"): a
+ *                      failed middle job's report is dealt, as a fact, that whoever and whatever the job names, and its place,
+ *                      still stand (`stands`; when the engine will pose it again, that it is tried again); and a retry — the
+ *                      same job posed again — is dealt the failure's summary in place of the plan's pre-play framing of the
+ *                      job: its card no why and no trouble (both written before play; the summary names what stopped them,
+ *                      and with the trouble too the foe came twice), its cap sized to what is left (`capFor`), its report no
+ *                      hope (the card it reads tells the failure: a `last` dealt again beside it came back as the summary)
  *  (C1 `core` — a call fixing the want, question and answer before the plan — was removed: a measured loss, follow 26–116) */
 export type PipeArm = 'one' | 'grafts' | 'sides' | 'reads' | 'fixes' | 'late' | 'trail' | 'narrow' | 'line' | 'plain' | 'link' | 'fx'
-  | 'room' | 'weight' | 'voice' | 'lore' | 'page' | 'past' | 'clean' | 'voice+line' | 'past+voice' | 'voice+clean';
+  | 'room' | 'weight' | 'voice' | 'lore' | 'page' | 'past' | 'clean' | 'voice+line' | 'past+voice' | 'voice+clean' | 'voice+asker' | 'voice+setback';
 export const PIPE_ARMS: readonly PipeArm[] = ['one', 'grafts', 'sides', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx',
-  'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean'];
+  'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback'];
 /** the pieces an arm is made of: an arm's own change, or a piece of one — voice (TC) is three lines, each its own piece
  *  (`says` card 1's line, `witness` a won clue said by someone met, `teller` the finale's secret said), so an arm can take some;
  *  `quote` and `motive` are the stack round's (S2's quoted first sentence of the past, in place of its narration; S1's sourced
- *  why) */
-export type PipePart = Exclude<PipeArm, 'voice' | 'voice+line' | 'past+voice' | 'voice+clean'> | 'says' | 'witness' | 'teller' | 'quote' | 'motive';
+ *  why); `asker` and `setback` round H's (HP's asker past and change; RF's failure facts) */
+export type PipePart = Exclude<PipeArm, 'voice' | 'voice+line' | 'past+voice' | 'voice+clean' | 'voice+asker' | 'voice+setback'> | 'says' | 'witness' | 'teller' | 'quote' | 'motive' | 'asker' | 'setback';
 const VOICE: readonly PipePart[] = ['says', 'witness', 'teller'];
 /** the changes each pipe arm carries, by the arm that brought each in: D1, D2, E1–E3 and F1–F3 are C2 plus one change each;
  *  FX is C2 plus all of round F; the stack arms a shipped arm plus one change */
@@ -188,9 +204,14 @@ const PIPE_PARTS: Record<PipeArm, readonly PipePart[]> = {
   page: ['grafts', 'page'], past: ['grafts', 'past'], clean: ['grafts', 'clean'],
   'voice+line': ['grafts', ...VOICE, 'line', 'motive'], 'past+voice': ['grafts', 'past', 'teller', 'quote'],
   'voice+clean': ['grafts', ...VOICE, 'clean'],
+  // (HP keeps `says`: on a hired saga the asker's past stands in its place, on a personal one — no hired asker — it is TC's line)
+  'voice+asker': ['grafts', ...VOICE, 'asker'], 'voice+setback': ['grafts', ...VOICE, 'setback'],
 };
 /** whether a dealt world's pipe arm carries `part` */
 export const piped = (w: Pick<SagaWorld, 'pipe'>, part: PipePart): boolean => !!w.pipe && PIPE_PARTS[w.pipe].includes(part);
+/** (pipe arm voice+asker, HP) whether the plan writes the asker's past and change, card 1 telling the past in place of `says`:
+ *  only a hired saga's asker — a personal saga's soldier has their own past (PP's, or TC's line of it) */
+export const askerPast = (w: Pick<SagaWorld, 'pipe' | 'personal'>): boolean => !w.personal && piped(w, 'asker');
 /** the pipeline of a host that names none (designer 2026-10-04): C2 grafts, ahead on follow in all three generations (83–61)
  *  and on keep beyond the noise floor (93–51) — scripts/sagalab/reports/2026-10-04-pipeline-round.md §3.1. The seed lab's
  *  G0 and PG0 play it, so they keep meaning this default; the GAME's host names its own per saga (GAME_PIPE) */
@@ -347,10 +368,12 @@ export const troubleWho = (t: Trouble): string => t.line ?? t.who;
 export interface Episode { n: number; type: EpisodeType; title: string; job: string; people: string[]; trouble: Trouble; win?: string; gain?: string; learn?: string; why: string; settles?: string; lose?: string; edge?: string[]; lead?: string;
   /** pipe arm page (TP): what the job turns up, as the plan wrote it before the answer */
   turnsUp?: string }
-/** past: a personal saga's soldier only, the old wrong in a few words. side: pipe arm sides only — whose side they are
+/** past: a personal saga's soldier only, the old wrong in a few words (pipe arm voice+asker, HP: also a hired saga's asker,
+ *  two plain sentences — what happened to them that makes this want theirs). side: pipe arm sides only — whose side they are
  *  on, and why, as the plan wrote it */
 export interface CastEntry extends SagaPerson { label: string; want: string; past?: string; side?: string;
-  /** pipe arm past (PP): a personal saga's soldier only — how they must be different by the end, a done fact naming them */
+  /** pipe arm past (PP): a personal saga's soldier only — how they must be different by the end, a done fact naming them
+   *  (pipe arm voice+asker, HP: a hired saga's asker's, the same) */
   change?: string;
   /** pipe arm voice (TC): the one the company acts for only — the line card 1 quotes, first person, as the plan wrote it */
   says?: string }

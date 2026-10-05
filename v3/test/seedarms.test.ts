@@ -11,7 +11,7 @@ import { planPayload, pickPayload, premisePayload, readPick, mockPick, seedSteps
 import type { AiProvider, SagaCall } from '../src/ai/provider.js';
 import { newGame, sagaChain, playSaga, hostFor } from './sagaharness.js';
 import { renderSaga, sagaTemplate } from '../src/ai/prompts/saga/render.js';
-import { deal } from '../src/game/sagaflow.js';
+import { deal, standsFact } from '../src/game/sagaflow.js';
 
 const POOLS = ['things', 'creatures', 'places', 'occasions', 'uncanny'] as const;
 const poolOf = (x: string) => POOLS.find(p => KIT[p].includes(x) || (p === 'things' && KIT.qualities.some(q => x.startsWith(`${q} `) && KIT.things.includes(x.slice(q.length + 1)))));
@@ -251,8 +251,8 @@ describe('pipeline arms on the floor', () => {
     expect(chain.saga!.world.kit!.arm).toBe('kit+pick');
     deal({ ...hostFor(g), pipeArm: () => undefined }, chain, undefined, focal);
     expect(chain.saga!.world.pipe).toBeUndefined();
-    expect(PIPE_ARMS).toEqual(['one', 'grafts', 'sides', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx', 'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean']);
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'grafts'))).toEqual(['grafts', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx', 'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean']);
+    expect(PIPE_ARMS).toEqual(['one', 'grafts', 'sides', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx', 'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'grafts'))).toEqual(['grafts', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx', 'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback']);
     // round T: each arm is grafts plus its own change, and no other round-T arm carries it (judged against G0's draws on disk);
     // the verifier's shared fixes (clean) ride on no round-T arm. The stack round (S1–S3): a shipped arm plus one change
     for (const part of ['room', 'weight', 'lore', 'page'] as const) expect(PIPE_ARMS.filter(p => piped({ pipe: p }, part))).toEqual([part]);
@@ -260,11 +260,14 @@ describe('pipeline arms on the floor', () => {
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'clean'))).toEqual(['clean', 'voice+clean']);
     // voice (TC) is three pieces: card 1's line (the plan's), a won clue's witness, the finale's teller; S2 takes the teller, and
     // its card-1 line is the past's own first sentence (quote)
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'says'))).toEqual(['voice', 'voice+line', 'voice+clean']);
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'teller'))).toEqual(['voice', 'voice+line', 'past+voice', 'voice+clean']);
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'witness'))).toEqual(['voice', 'voice+line', 'voice+clean']);
+    // (round H: HP keeps `says` for a personal saga, whose soldier has no hired asker's past to stand in its place)
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'says'))).toEqual(['voice', 'voice+line', 'voice+clean', 'voice+asker', 'voice+setback']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'teller'))).toEqual(['voice', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'witness'))).toEqual(['voice', 'voice+line', 'voice+clean', 'voice+asker', 'voice+setback']);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'quote'))).toEqual(['past+voice']);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'motive'))).toEqual(['voice+line']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'asker'))).toEqual(['voice+asker']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'setback'))).toEqual(['voice+setback']);
     // each E arm is grafts plus its own change, and no other arm carries it; each F arm too, and FX carries all three
     for (const part of ['late', 'trail', 'narrow'] as const) expect(PIPE_ARMS.filter(p => piped({ pipe: p }, part))).toEqual([part]);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'line'))).toEqual(['line', 'fx', 'voice+line']);
@@ -1118,5 +1121,98 @@ describe('the stack round (S1–S3): a shipped arm plus one change, each against
     expect(ownCost({ what: 'horse', how: 'lamed', whose: 'the company' })).toEqual({ what: "the company's own horse", how: 'lamed' });
     expect(ownCost({ what: 'goodwill', how: 'lost', whose: 'the locals' })).toEqual({ what: "the locals' goodwill", how: 'lost' });
     expect(ownCost({ what: 'sword', how: 'broken', whose: 'Nicholina' })).toEqual({ what: "Nicholina's sword", how: 'broken' });
+  });
+});
+
+describe('round H (HP, RF): TC plus one change, each against TC', () => {
+  const play = async (pipe: string, personal: boolean, path: 'bumpy' | 'personal' | 'lastchance' = personal ? 'personal' : 'bumpy', N = 4) => {
+    seedIdCounter(1);
+    const { g, ai } = newGame(21);
+    const { chain, focal } = sagaChain(g, { N, personal });
+    await playSaga(g, chain, path, focal, undefined, { pipeArm: () => pipe as never });
+    const cards = ai.calls.filter(c => c.template === 'card'), reports = ai.calls.filter(c => c.template === 'report');
+    return { rec: chain.saga!, plan: chain.saga!.plan!, planCall: ai.calls.find(c => c.template === 'plan')!, cards, reports };
+  };
+  it('HP voice+asker: a hired asker\'s past and change in place of TC\'s line; card 1 tells the past at TC\'s cap; the finale shows the change, the asker there', async () => {
+    const t = await play('voice+asker', false), tc = await play('voice', false);
+    expect([...t.planCall.flags].sort()).toEqual([...tc.planCall.flags.filter(f => f !== 'voice'), 'askerpast'].sort());
+    const sys = renderSaga('plan', t.planCall.flags, t.planCall.vars);
+    expect(sys).toContain('past: two plain sentences: what happened to them that makes this want theirs. change: how they end up different; a done fact naming them.');
+    // a returning asker: the past is never their memory (card 1 tells both), and "use both" — which gave the memory the past as
+    // its only target — is gone (TC keeps it)
+    const mem = renderSaga('plan', [...t.planCall.flags, 'memory'], t.planCall.vars), tcMem = renderSaga('plan', [...tc.planCall.flags, 'memory'], tc.planCall.vars);
+    expect(mem).toContain('what happened to them that makes this want theirs, not their memory.');
+    expect(mem).toContain('memory, where: their past with the company, where they are now.');
+    expect(tcMem).toContain('where they are now; use both.');
+    expect(sys).toContain('Titles, jobs, whys, troubles and past, the showdown\'s too, are shown before play');
+    expect(sys).not.toMatch(/says:|"says"/);
+    const asker = clientOf(t.plan);
+    expect(asker.past).toBeTruthy();
+    expect(asker.change).toBeTruthy();
+    expect(asker.says).toBeUndefined();
+    // card 1: the past told in place of the quoted line; the card does not grow
+    const c1 = t.cards[0]!, premise = c1.payload.premise as Record<string, string>;
+    expect(c1.flags).toContain('askerpast');
+    expect(c1.flags).not.toContain('says');
+    expect(premise.past).toBe(asker.past);
+    expect('says' in premise).toBe(false);
+    expect(Object.keys(premise)).toEqual(['who', 'wants', 'past', 'unknown']);
+    expect(c1.vars.MAX).toBe(tc.cards[0]!.vars.MAX);
+    expect(renderSaga('card', c1.flags, c1.vars)).toContain('wants: what they want. past: what happened to them. unknown:');
+    // the quoted clue and the spoken secret stay; the finale not lost shows the change, the asker among its people; no dossier line
+    expect(t.reports.some(r => r.flags.includes('witness'))).toBe(tc.reports.some(r => r.flags.includes('witness')));
+    const fin = t.reports.at(-1)!;
+    expect(fin.flags).toEqual(expect.arrayContaining(['teller', 'change', 'askerpast']));
+    expect(fin.payload.change).toBe(asker.change);
+    expect((fin.payload.people as { name?: string }[]).some(p => p.name === asker.name)).toBe(true);
+    expect(renderSaga('report', fin.flags, fin.vars)).toContain('change: how the one who asked is different now; show it happen.');
+    expect(fin.vars.A).toBe(Number(tc.reports.at(-1)!.vars.A) + 20);
+    expect(t.rec.grown).toBeUndefined();
+    // the asker's past is shown on card 1: the plan lint reads it as early (an answer word there is a leak)
+    expect(planLint({ ...t.plan, cast: t.plan.cast.map(c => c.id === asker.id ? { ...c, past: `${asker.past} ${t.plan.answer}` } : c) }, t.rec.world).some(l => l.startsWith('answer words before the finale'))).toBe(true);
+    // a personal saga has no hired asker: it plays TC
+    const own = await play('voice+asker', true), ownTc = await play('voice', true);
+    expect(own.planCall.flags).toEqual(ownTc.planCall.flags);
+    expect(own.cards.map(c => c.flags)).toEqual(ownTc.cards.map(c => c.flags));
+    expect(own.reports.map(r => r.flags)).toEqual(ownTc.reports.map(r => r.flags));
+  });
+  it('RF voice+setback: a failed job\'s report is dealt that the job still stands; a retry is framed by the failure, never the plan\'s hope', async () => {
+    const t = await play('voice+setback', false), tc = await play('voice', false);
+    expect(t.planCall.flags).toEqual(tc.planCall.flags);
+    // bumpy: job 2 fails, then is tried again — its failure report says so
+    const failed = t.reports.filter(r => r.flags.includes('failure'));
+    expect(failed).toHaveLength(1);
+    expect(failed[0]!.flags).toContain('stands');
+    expect(failed[0]!.payload.stands).toBe(standsFact(true));
+    expect(renderSaga('report', failed[0]!.flags, failed[0]!.vars)).toContain('- stands: what still stands when it ends.');
+    expect(tc.reports.some(r => 'stands' in r.payload || 'last' in r.payload)).toBe(false);
+    // the retry card: the failure's summary alone — no why, no trouble (TC's retry card has the plan's hope and trouble: the
+    // summary already names what stopped them), its cap sized to what is left
+    const ri = t.cards.findIndex(c => c.flags.includes('retry'));
+    const retry = t.cards[ri]!, tcRetry = tc.cards.find(c => c.flags.includes('retry'))!;
+    expect(Object.keys(retry.payload)).toEqual(['retry', 'job', 'names']);
+    expect(retry.flags).toContain('setback');
+    expect(retry.flags).not.toContain('why');
+    expect('why' in tcRetry.payload && 'trouble' in tcRetry.payload).toBe(true);
+    expect(retry.payload.retry).toBe(tcRetry.payload.retry);
+    expect(retry.vars.MAX).toBe(capFor(retry.payload, 70));
+    expect(retry.vars.MAX).toBeLessThan(Number(tcRetry.vars.MAX));
+    const rsys = renderSaga('card', retry.flags, retry.vars);
+    expect(rsys).not.toMatch(/trouble/);
+    expect(rsys).toContain('in this order: retry, job.');
+    // ...and its report: no hope (its card was dealt none; the card it reads tells the failure, so nothing deals it again)
+    const rr = t.reports[ri]!;
+    expect(rr.flags).not.toContain('hope');
+    expect(Object.keys(rr.payload).filter(x => x === 'hope' || x === 'last')).toEqual([]);
+    expect(tc.reports[ri]!.flags).toContain('hope');
+    expect(rr.flags).toEqual(tc.reports[ri]!.flags.filter(f => f !== 'hope'));
+    // every other card as TC's
+    t.cards.forEach((c, i) => { if (i !== ri) expect(c.flags).toEqual(tc.cards[i]!.flags) });
+    // the last chance (N 2): the setbacks spent, a failed job is not tried again — it still stands, nothing more is said
+    const lc = await play('voice+setback', false, 'lastchance', 2);
+    const lcFailed = lc.reports.filter(r => r.flags.includes('failure') && !r.flags.includes('answer'));
+    expect(lcFailed.map(r => r.payload.stands)).toEqual([standsFact(true), standsFact(false)]);
+    expect(lc.reports.some(r => 'last' in r.payload)).toBe(false);
+    expect(standsFact(false)).not.toMatch(/again/);
   });
 });

@@ -12,9 +12,10 @@ The data:
 [[clue]][[!witness]]- clue: a fact this win brings out; show it found, seen or said, [[!fixes]]plainly, and nothing past it[[/!fixes]][[fixes]]adding nothing to it[[/fixes]].[[/!witness]]
 [[witness]]- clue: what this win brings out; by: who says it, quoted, in their own words, nothing past it.
 [[hope]]- hope: [[!fixes]][[!narrow]][[!clean]]the card's hope, limited by result and clue; show shortfalls.[[/!clean]][[clean]]what the card hoped for; show any of it still missing.[[/clean]][[/!narrow]][[narrow]]what result, brought and clue miss, show as still hoped.[[/narrow]][[/!fixes]][[fixes]]unless result, brought or clue meets it, show it still hoped for.[[/fixes]]
+[[stands]]- stands: what still stands when it ends.
 [[known]]- known: what earlier jobs found; never shown as new.
 [[have]]- have: what the company holds, never in enemy hands[[edge]]; helps: its use; show each used[[/edge]][[!edge]]; use it only where it helps[[!clean]] this job[[/!clean]][[/!edge]].
-[[answer]]- answer: the question and its secret.[[teller]] teller: who says the secret.[[/teller]][[lore]] lore: the first card's hearsay; show what it turned out to be.[[/lore]][[change]] change: how the soldier is different now; show it happen.[[/change]]
+[[answer]]- answer: the question and its secret.[[teller]] teller: who says the secret.[[/teller]][[lore]] lore: the first card's hearsay; show what it turned out to be.[[/lore]][[change]] change: how [[!askerpast]]the soldier[[/!askerpast]][[askerpast]]the one who asked[[/askerpast]] is different now; show it happen.[[/change]]
 [[direction]]- direction: the player's wish for the telling only.
 
 Write:

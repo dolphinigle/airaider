@@ -87,8 +87,19 @@
 //                    its narration (the rest narrated; the plan is PP's own, the engine splits its past), and the finale's
 //                    secret is said by the person in ending (TC's teller; no quoted clue); pers1's shared deals
 //   S3  voice+clean  TC + clean (the context-free verifier's shared-pipeline fixes, engine/saga.ts PipeArm clean); A2's deals
+//   ROUND H (ship-and-stack report §5.4–5.5; engine/saga.ts PipeArm voice+asker / voice+setback): TC plus one change, judged
+//   against TC_g1–g3 on disk, A2's deals:
+//   HP  voice+asker    round T's principle on hired sagas: the plan writes the asker's past (two plain sentences: what happened
+//                      to them that makes this want theirs) and change; card 1 tells the past IN PLACE of TC's quoted line (TC's
+//                      cap); the quoted clue and the spoken secret stay; the finale not lost shows the change. No dossier line.
+//                      SCORED ON THE 21 NON-PERSONAL SLOTS ONLY (F1, F3–F8 × 3): the game plays PP on a personal saga, and on
+//                      seed1's personal F2 slots HP has no hired asker, so it plays TC there (generated so the folders match)
+//   RF  voice+setback  the retry reads the failure: a failed middle job's report is dealt that whoever and whatever the job
+//                      names, and its place, still stand (and, when it is posed again, that it is); a retry's card loses the
+//                      plan's pre-play why and trouble (the failure's summary names what stopped them) and its report the
+//                      hope. Only the draw-3 slots (bumpy / lastchance) fail; on draws 1–2 RF plays TC's prompts
 //
-//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A2c|A3|A4|B1|B2|C2|C3|D1|D2|G0|E1|E2|E3|F1|F2|F3|FX|TA|TB|TC|TD|TP|PG0|PP|S1|S2|S3|all, or <arm>_g<N> = a further generation] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
+//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A2c|A3|A4|B1|B2|C2|C3|D1|D2|G0|E1|E2|E3|F1|F2|F3|FX|TA|TB|TC|TD|TP|PG0|PP|S1|S2|S3|HP|RF|all, or <arm>_g<N> = a further generation] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
 //        [--slots F6_3,F1_1] [--writer sonnet|haiku|openai] [--mock] [--pool 6] [--run seed1|seed2|pers1] [--force]
 //   (PG0, PP and S2 play only the personal set, --run pers1; every other arm only the probe set)
 //   npx tsx scripts/sagalab/seedlab.ts --stats [--run seed1]     spend and latency per call kind over the run's folders
@@ -180,11 +191,13 @@ export const ARMS: Record<string, SeedArm> = {
   TA: 'kit+pick', TB: 'kit+pick', TC: 'kit+pick', TD: 'kit+pick', TP: 'kit+pick',
   PG0: SEED_ARM, PP: 'kit+pick',
   S1: 'kit+pick', S2: 'kit+pick', S3: 'kit+pick',
+  HP: 'kit+pick', RF: 'kit+pick',
 };
 /** the pipeline arms: kit+pick's seed, one pipeline change each (the host's pipeArm; D1, D2 and E1–E3 carry C2's too). G0's is
  *  the build's PIPE_ARM, recorded here for the folder's labels; its host names none */
 export const PIPES: Record<string, PipeArm> = { B2: 'one', C2: 'grafts', C3: 'sides', D1: 'reads', D2: 'fixes', G0: PIPE_ARM, E1: 'late', E2: 'trail', E3: 'narrow', F1: 'line', F2: 'plain', F3: 'link', FX: 'fx',
-  TA: 'room', TB: 'weight', TC: 'voice', TD: 'lore', TP: 'page', PG0: PIPE_ARM, PP: 'past', S1: 'voice+line', S2: 'past+voice', S3: 'voice+clean' };
+  TA: 'room', TB: 'weight', TC: 'voice', TD: 'lore', TP: 'page', PG0: PIPE_ARM, PP: 'past', S1: 'voice+line', S2: 'past+voice', S3: 'voice+clean',
+  HP: 'voice+asker', RF: 'voice+setback' };
 /** an arm whose host names no seed or pipe arm: the build's SEED_ARM and PIPE_ARM stand (C2 grafts). Not the game's own
  *  pipeline since 2026-10-05 (engine/saga.ts GAME_PIPE: TC hired, PP personal) */
 const BUILD_DEFAULT = new Set(['G0', 'PG0']);
@@ -194,7 +207,7 @@ const PERSONAL_ARMS = new Set(['PG0', 'PP', 'S2']);
  *  noise control: a later change to the deal — the supporting trades — cannot move its inputs; the pipeline arms: the arm
  *  is the only difference). A later run shares its own deals instead (`SHARED_DEALS`) */
 const REPLAY: Record<string, string> = { A2b: 'A2', A2c: 'A2', B2: 'A2', C2: 'A2', C3: 'A2', D1: 'A2', D2: 'A2', G0: 'A2', E1: 'A2', E2: 'A2', E3: 'A2', F1: 'A2', F2: 'A2', F3: 'A2', FX: 'A2',
-  TA: 'A2', TB: 'A2', TC: 'A2', TD: 'A2', TP: 'A2', S1: 'A2', S3: 'A2' };
+  TA: 'A2', TB: 'A2', TC: 'A2', TD: 'A2', TP: 'A2', S1: 'A2', S3: 'A2', HP: 'A2', RF: 'A2' };
 /** a further generation of an arm (the power rule): `<arm>_g<N>` plays `<arm>` exactly — its seed, pipe and replayed deals — into
  *  its own folder, runs/<run>/<arm>_g<N>/ */
 const gen = (armId: string) => armId.replace(/_g\d+$/, '');
@@ -687,6 +700,12 @@ const CHANGED: Record<PipeArm, (c: { template: string; flags: string[] }) => boo
   'voice+line': c => c.flags.includes('line') || c.flags.includes('motive'),
   'past+voice': c => c.flags.includes('quote') || c.flags.includes('teller') || c.flags.includes('anyteller'),
   'voice+clean': c => c.flags.includes('clean'),
+  // round H, against TC. HP (voice+asker): the hired plan (the asker's past and change), card 1 (the past in place of the line),
+  // the finale report (the change); RF (voice+setback): a failed job's report (`stands`), a retry's card (no why or trouble,
+  // `setback`) and a won middle report with no hope (a retry's)
+  'voice+asker': c => c.flags.includes('askerpast'),
+  'voice+setback': c => c.flags.includes('stands') || c.flags.includes('setback')
+    || (c.template === 'report' && !['hope', 'failure', 'answer'].some(f => c.flags.includes(f))),
 };
 /** --render: the new or changed prompt variants of the selected pipeline arms, one file per call */
 function render() {

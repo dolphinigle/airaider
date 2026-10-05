@@ -20,7 +20,9 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
     // (clean deals each type's `against` and asks the trouble's `with`, as line and fixes do)
     ...[['clean', 'against', 'with'], ['voice'], ['lore'], ['page'], ['past']].map(arm => ['keywords', 'support', 'grafts', ...arm]),
     // the stack round: TC + line with its sourced why (motive, S1); TC + clean (S3). S2's plan is PP's own
-    ...[['voice', 'line', 'against', 'motive'], ['voice', 'clean', 'against', 'with']].map(arm => ['keywords', 'support', 'grafts', ...arm])].flatMap(seed => [['notrade'], []].flatMap(cast => subsets(['personal', 'memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, ...seed], vars: {} })))),
+    ...[['voice', 'line', 'against', 'motive'], ['voice', 'clean', 'against', 'with']].map(arm => ['keywords', 'support', 'grafts', ...arm])].flatMap(seed => [['notrade'], []].flatMap(cast => subsets(['personal', 'memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, ...seed], vars: {} })))).concat(
+    // round H: HP's hired asker's past and change, in place of TC's line (never on a personal plan: that one is TC's). RF's plan is TC's
+    [['notrade'], []].flatMap(cast => subsets(['memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, 'keywords', 'support', 'grafts', 'askerpast'], vars: {} })))),
   // (pipe arm sides: a plan with sides deals no parts, so `side` never meets `part`; pipe arm fixes, D2, on any card: `lose`
   // on every finale, beside `will` but at a last chance)
   card: ['first', 'later', 'finale'].flatMap(pos => subsets(['memory', 'direction', 'intro', 'part', 'side', ...(pos === 'first' ? ['personal', 'returning'] : []), ...(pos === 'finale' ? ['lastchance', 'lose'] : []),
@@ -38,8 +40,10 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
     // the line, the rest narrated or none left, S2)
     .flatMap(extra => extra.includes('line') && pos === 'first' && !extra.includes('fixes') && !extra.includes('side') ? [extra, [...extra, 'says']]
       : extra.includes('fixes') || extra.includes('line') || extra.includes('side') || (extra.includes('part') && extra.includes('returning')) ? [extra] : pos === 'first'
-      ? [extra, [...extra, 'clean'], [...extra, 'says'], [...extra, 'clean', 'says'], [...extra, 'lore'], ...(extra.includes('personal') ? [[...extra, 'past'], [...extra, 'says', 'quote', 'past'], [...extra, 'says', 'quote']] : [])]
-      : pos === 'later' && !extra.includes('retry') ? [extra, [...extra, 'clean'], [...extra, 'meet']] : [extra, [...extra, 'clean']])
+      ? [extra, [...extra, 'clean'], [...extra, 'says'], [...extra, 'clean', 'says'], [...extra, 'lore'], ...(extra.includes('personal') ? [[...extra, 'past'], [...extra, 'says', 'quote', 'past'], [...extra, 'says', 'quote']] : [[...extra, 'askerpast']])]
+      : pos === 'later' && !extra.includes('retry') ? [extra, [...extra, 'clean'], [...extra, 'meet']]
+      // (round H, RF on TC: a retry framed by the failure alone — no why, no trouble)
+      : pos === 'later' && !extra.includes('why') ? [extra, [...extra, 'clean'], [...extra, 'setback']] : [extra, [...extra, 'clean']])
     .map(extra => ({ flags: [pos, ...extra], vars: { MAX: pos === 'finale' ? 90 : 70 } }))),
   outline: [{ flags: [], vars: {} }],
   // pipe arm late (E1): the finale written after play
@@ -64,8 +68,10 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
     // the standalone clean arm (labels everywhere, `away` for the named but absent; the hope never restated, the cost in the
     // deciding moment, known facts laid out or said, no wound or price in the summary) — never with narrow
     .flatMap(s => s.includes('fixes') || s.includes('side') || s.includes('narrow') ? [s] : [s, ...[['clean'], ...(s.includes('people') ? [['clean', 'away']] : []), ...(s.includes('intro') ? [['meet']] : []), ...(s.includes('clue') ? [['witness']] : []),
-      ...(s.includes('answer') ? [['teller'], ['lore'], ['change'], ['clean', 'teller'], ['anyteller'], ['anyteller', 'change'], ['clean', 'anyteller']] : []), ...(s.includes('clue') ? [['clean', 'witness']] : [])].map(arm => [...s, ...arm])]).flatMap(s =>
-    [['moved'], ...(s.some(f => ['decides', 'result', 'clue', 'brought'].includes(f)) ? [] : [['failure', 'stopped']])].map(end => ({ flags: ['saga', ...s, ...end], vars: { B: 60, A: 140 } }))),
+      ...(s.includes('answer') ? [['teller'], ['lore'], ['change'], ['clean', 'teller'], ['anyteller'], ['anyteller', 'change'], ['clean', 'anyteller'], ...(s.includes('personal') ? [] : [['teller', 'change', 'askerpast']])] : []), ...(s.includes('clue') ? [['clean', 'witness']] : [])].map(arm => [...s, ...arm])]).flatMap(s =>
+    [['moved'], ...(s.some(f => ['decides', 'result', 'clue', 'brought'].includes(f)) ? [] : [['failure', 'stopped']])].map(end => ({ flags: ['saga', ...s, ...end], vars: { B: 60, A: 140 } })))
+    // round H, RF on TC (never with fixes or clean): a failed middle job's `stands` (a won retry's report is TC's with no hope)
+    .flatMap(v => !v.flags.includes('failure') || v.flags.some(f => ['fixes', 'clean', 'side', 'answer'].includes(f)) ? [v] : [v, { ...v, flags: [...v.flags, 'stands'] }]),
 };
 
 describe('saga prompt budget (the shipped R5 templates)', () => {

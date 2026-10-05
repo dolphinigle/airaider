@@ -17,7 +17,7 @@ import type { Lead } from '../engine/quests.js';
 import { coins, type Outcome, type SlotTest } from '../engine/roll.js';
 import { KEEP_THRESHOLD, type TraitPrefs } from '../engine/economy.js';
 import {
-  dealSaga, castSaga, rollHurt, clampHurt, helped, piped, looksOf, EPISODE_TESTS, WAY_TESTS, WAY_REWARD, HOW_BAND, SEED_ARM, PIPE_ARM,
+  dealSaga, castSaga, rollHurt, clampHurt, helped, piped, askerPast, looksOf, EPISODE_TESTS, WAY_TESTS, WAY_REWARD, HOW_BAND, SEED_ARM, PIPE_ARM,
   type SagaRecord, type SeedArm, type PipeArm, type SagaWorld, type SagaPlan, type SagaPos, type LogRow, type Matter, type Hurt, type Cost, type Way,
   type EpisodeType, type CastEntry, type Face, type EpisodeTest, type Episode,
 } from '../engine/saga.js';
@@ -189,10 +189,14 @@ export async function card(host: SagaHost, chain: Chain): Promise<SagaCardOut> {
   const meet = weight && !first && !pos.finale && !retry ? firstMeet(rec, plan, e, false, true) : undefined;
   // round T's shared fixes (clean): a middle job's hope checked when its card comes (`cardHope`), labels and names in the fields
   const clean = piped(w, 'clean'), n = pos.finale ? w.N : pos.job;
+  // (pipe arm voice+setback, RF) a retry is framed by how the last try ended (`retry`) alone, never by the plan's pre-play
+  // framing of the job: no hope, no trouble (the retry names what stopped them)
+  const setbackRetry = retry && piped(w, 'setback');
   const cc = first ? firstCardPayload(plan, w, k, direction)
     : laterCardPayload(played, e, rec.latest, k, { finale: pos.finale, lastchance: rec.lastchance, retry, direction, fixes: piped(w, 'fixes'),
-      why: clean ? withLead(n <= plan.episodes.length ? plan.episodes[n - 1]?.lead : undefined, cardHope(plan, w, n, rec.hopes, k)) : cardWhy(plan, n, rec.hopes),
-      ...(piped(w, 'room') ? { room: true } : {}), ...(weight ? { weight: true, ...(meet ? { meet } : {}) } : {}), ...(clean ? { clean: true } : {}) });
+      why: setbackRetry ? undefined : clean ? withLead(n <= plan.episodes.length ? plan.episodes[n - 1]?.lead : undefined, cardHope(plan, w, n, rec.hopes, k)) : cardWhy(plan, n, rec.hopes),
+      ...(piped(w, 'room') ? { room: true } : {}), ...(weight ? { weight: true, ...(meet ? { meet } : {}) } : {}), ...(clean ? { clean: true } : {}),
+      ...(setbackRetry ? { setback: true } : {}) });
   let prose: string;
   if (first && piped(w, 'grafts')) {
     // pipe arm grafts (R6, F1): no outline call — the road and each later job's hope are the plan's own whys, a flagged
@@ -300,8 +304,11 @@ export function reportCall(host: Pick<SagaHost, 'direction'>, chain: Chain, pos:
   const option = f.option && { way: f.option.way, label: toldLabel(rec, f.option) };
   // pipe arm grafts (R6, F1): a middle job's report is dealt the hope its card was dealt (the card's promise)
   // (pipe arm clean) the hope its card was dealt, checked when that card came (`cardHope`)
-  const clean = piped(rec.world, 'clean');
-  const hope = piped(rec.world, 'grafts') && !pos.finale ? clean ? cardHope(plan, rec.world, pos.job, rec.hopes, knowingOf(rec)) : jobWhy(plan, pos.job, rec.hopes) : undefined;
+  // (pipe arm voice+setback, RF) a retry's card was dealt no hope, so neither is its report (the card it reads tells the failure:
+  // dealt again as `last`, the summary came back a copy of it); a failed middle job's report, that the job still stands
+  const clean = piped(rec.world, 'clean'), setback = piped(rec.world, 'setback') && !pos.finale;
+  const stands = setback && f.outcome === 'failure' ? standsFact(triedAgain(chain, f.party.length)) : undefined;
+  const hope = piped(rec.world, 'grafts') && !pos.finale && !(setback && pos.attempt > 1) ? clean ? cardHope(plan, rec.world, pos.job, rec.hopes, knowingOf(rec)) : jobWhy(plan, pos.job, rec.hopes) : undefined;
   // round T: room, weight (+ a first in-person meeting here — none again for the one this job's card met, verify: the report
   // repeated the card's looks word for word), voice, lore (its payoff), past (the soldier's change)
   const w = rec.world;
@@ -314,6 +321,8 @@ export function reportCall(host: Pick<SagaHost, 'direction'>, chain: Chain, pos:
     ...(piped(w, 'witness') ? { witness: true } : {}), ...(piped(w, 'teller') ? { teller: w.personal && (piped(w, 'past') || clean) ? 'any' as const : true } : {}),
     ...(piped(w, 'lore') && plan.lore ? { lore: plan.lore } : {}),
     ...((c => w.personal && piped(w, 'past') && c ? { change: c } : {})(plan.cast.find(p => p.seat === 'soldier')?.change)),
+    // (voice+asker, HP) a hired asker's change, shown at a finale not lost
+    ...((c => askerPast(w) && c ? { change: c } : {})(plan.cast.find(p => p.seat === 'client')?.change)),
   };
   return reportPayload({
     plan, e, card: prose, party: f.party, decides: f.decides, outcome: f.outcome, finale: pos.finale, hurt: f.hurt, cost: f.cost, option, fate: f.fate,
@@ -321,8 +330,18 @@ export function reportCall(host: Pick<SagaHost, 'direction'>, chain: Chain, pos:
     ...(hope ? { hope } : {}), ...(piped(rec.world, 'fixes') ? { fixes: { places: rec.world.places } } : {}),
     ...(piped(rec.world, 'narrow') ? { narrow: true } : {}),
     ...(Object.keys(t).length ? { t } : {}), ...(clean ? { clean: true } : {}),
+    ...(stands ? { stands } : {}),
   });
 }
+/** (pipe arm voice+setback, RF) whether a failed middle job is posed again: the failure bankBeat is about to count and the party's
+ *  cycles, read against finaleReady (the setbacks spent, or the stall guard: afterReport then deals the last chance). Read at
+ *  reportIn, BEFORE bankBeat — the game's reckoning and the lab's both write the report payload first */
+export const triedAgain = (chain: Chain, partySize: number): boolean =>
+  !finaleReady({ ...chain, failures: chain.failures + 1, cyclesSpent: chain.cyclesSpent + partySize });
+/** (pipe arm voice+setback, RF) the fact a failed middle job's report is dealt: the job's people, things and place still stand —
+ *  and, when the job is posed again, that it is (the playtest's failure burned the forge the retry then had to hold) */
+export const standsFact = (again: boolean): string =>
+  `whoever and whatever the job names, and its place${again ? ', for the company tries this job again' : ''}`;
 /** a finale button's deed as the writer and the story's own lines get it (storyteller toldOption): the report's `plan`,
  *  the memory the saga leaves. The button itself keeps its label */
 export const toldLabel = (rec: SagaRecord, o: { way: Way; label: string }): string => toldOption(o, castNow(rec), piped(rec.world, 'grafts'));
