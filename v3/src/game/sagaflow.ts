@@ -27,7 +27,7 @@ import {
   newKnowing, newState, planSaga, seedSteps, writeOutline, writeCard, writeReport, firstCardPayload, laterCardPayload, reportPayload,
   questLog, soFarLog, logLines, noteDelivered, forLineShown, onThisMatter, jobWhy, roadLines, roadHopes, mockOutline, bank, triedLine,
   revealLint, choiceTarget, fateSentence, knowingOf, keepKnowing, roadOf, toNullable, PRONOUN, graftRoad, toldOption, cannedOption,
-  writeLate, cardWhy, grownLine, cardHope, withLead, mentions, standing,
+  writeLate, cardWhy, grownLine, cardHope, withLead, mentions, standing, wantWhy, withLatest,
   type ReportCall,
 } from '../ai/storyteller.js';
 import type { AiProvider, AskSlotOut } from '../ai/provider.js';
@@ -216,11 +216,21 @@ export async function card(host: SagaHost, chain: Chain): Promise<SagaCardOut> {
   // (pipe arm voice+setback, RF) a retry is framed by how the last try ended (`retry`) alone, never by the plan's pre-play
   // framing of the job: no hope, no trouble (the retry names what stopped them)
   const setbackRetry = retry && piped(w, 'setback');
+  // (pipe part want, NW) with no For line on the card, every later card's one why carries its content — whom the job is for, by
+  // name and label, and their want — with the job's hope folded in after it (`wantWhy`); the hope judged when its card comes
+  // (`cardHope`: no road shows it on card 1, so a why kept off there for naming its own gain prints on its own card); a why
+  // with no hope is told before the job (`wantFirst`). Link under want (NWL): the lead — what the last learn says of this job's
+  // person or place — is part of what happened last, so it rides in `latest`, before the job, never after it in the why
+  // (verify: the clue came after its conclusion); never on a retry (the job's first card told it); the finale's only after
+  // the last job was won (its learn found)
+  const want = !first && piped(w, 'want');
+  const hope = want && !setbackRetry ? cardHope(plan, w, n, rec.hopes, k) : undefined;
+  const lead = want && piped(w, 'link') && !retry && (!pos.finale || rec.done[plan.episodes.length] === 'won') ? e.lead?.trim() : undefined;
   const cc = first ? firstCardPayload(plan, w, k, direction)
-    : laterCardPayload(played, e, rec.latest, k, { finale: pos.finale, lastchance: rec.lastchance, retry, direction, fixes: piped(w, 'fixes'),
-      why: setbackRetry ? undefined : clean ? withLead(n <= plan.episodes.length ? plan.episodes[n - 1]?.lead : undefined, cardHope(plan, w, n, rec.hopes, k)) : cardWhy(plan, n, rec.hopes),
+    : laterCardPayload(played, e, withLatest(rec.latest, lead), k, { finale: pos.finale, lastchance: rec.lastchance, retry, direction, fixes: piped(w, 'fixes'),
+      why: setbackRetry ? undefined : want ? wantWhy(plan, k, hope) : clean ? withLead(n <= plan.episodes.length ? plan.episodes[n - 1]?.lead : undefined, cardHope(plan, w, n, rec.hopes, k)) : cardWhy(plan, n, rec.hopes),
       ...(piped(w, 'room') ? { room: true } : {}), ...(weight ? { weight: true, ...(meet ? { meet } : {}) } : {}), ...(clean ? { clean: true } : {}),
-      ...(setbackRetry ? { setback: true } : {}) });
+      ...(setbackRetry ? { setback: true } : {}), ...(want && !hope ? { wantFirst: true } : {}) });
   let prose: string;
   if (first && piped(w, 'grafts')) {
     // pipe arm grafts (R6, F1): no outline call — the road and each later job's hope are the plan's own whys, a flagged
@@ -354,7 +364,7 @@ export function reportCall(host: Pick<SagaHost, 'direction'>, chain: Chain, pos:
   // holds it) — and concrete: the job's people and place by name (`standing`)
   const reach = piped(rec.world, 'reach') ? standing(plan, e, f.party.map(s => s.name), rec.world.places) : undefined;
   const stands = (setback || (piped(rec.world, 'stands') && !pos.finale)) && f.outcome === 'failure' ? standsFact(triedAgain(chain, f.party.length), reach) : undefined;
-  const hope = piped(rec.world, 'grafts') && !pos.finale && !(setback && pos.attempt > 1) ? clean ? cardHope(plan, rec.world, pos.job, rec.hopes, knowingOf(rec)) : jobWhy(plan, pos.job, rec.hopes) : undefined;
+  const hope = piped(rec.world, 'grafts') && !pos.finale && !(setback && pos.attempt > 1) ? clean || piped(rec.world, 'want') ? cardHope(plan, rec.world, pos.job, rec.hopes, knowingOf(rec)) : jobWhy(plan, pos.job, rec.hopes) : undefined;
   // round T: room, weight (+ a first in-person meeting here — none again for the one this job's card met, verify: the report
   // repeated the card's looks word for word), voice, lore (its payoff), past (the soldier's change)
   const w = rec.world;

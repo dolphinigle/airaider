@@ -152,17 +152,33 @@
 //   as keep-only. Each arm below is a game pipe as it ships plus line + S1's motive, so it differs from NV / NP by the line alone:
 //   NT  voice+trouble  NV + line + motive; A2's deals, all three draws
 //   PT  past+trouble   NP + line + motive; --run pers1, its shared deals
+//   WHOM IT IS FOR, WITHOUT THE LOG (saga-panel report 2026-10-05 §6; engine/saga.ts pipe part `want`): with no For line and no
+//   road, hired sagas lost followability (later jobs arrive cold; the finale stops saying whom the job is for). Input-side —
+//   the log stays gone. Each arm is a game pipe as it ships plus one part, so NW vs NV differs by `want` alone, NWL vs NW by
+//   `link` alone:
+//   NW  voice+want       NV + want: every later card's one why opens on the For line's content — whom the job is for, by
+//                        name and label, and their want — with the job's hope folded in after it; the hope judged when its
+//                        card comes (no road shows it on card 1); a why with no hope (the finale; a hope that would tell its
+//                        own learn) told before the job. A2's deals, all three draws
+//   NWL voice+want+link  NW + round F's link: the plan writes a lead (what the last learn says of the job's person or place)
+//                        for each later job AND the showdown; it rides in the card's `latest` after the win, before the job
+//                        (never on a retry; the finale's only after the last job was won). No lead on card 1, which carries
+//                        TC's line already (engine/saga.ts cardOneLead); A2's deals, all three draws
+//   PW  past+want        NP + want (the soldier whose story this is); --run pers1, its shared deals (built, not yet run).
+//                        No PWL: PP's plan is at its word budget, so link cannot land on it without cutting a PP line
 //
-//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A2c|A3|A4|B1|B2|C2|C3|D1|D2|G0|E1|E2|E3|F1|F2|F3|FX|TA|TB|TC|TD|TP|PG0|PP|S1|S2|S3|HP|RF|RFA|RFW|CB_g<N>|CBR_g<N>|CBT_g<N>|NV|LV|NP|LP|NT|PT|all, or <arm>_g<N> = a further generation] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
+//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A2c|A3|A4|B1|B2|C2|C3|D1|D2|G0|E1|E2|E3|F1|F2|F3|FX|TA|TB|TC|TD|TP|PG0|PP|S1|S2|S3|HP|RF|RFA|RFW|CB_g<N>|CBR_g<N>|CBT_g<N>|NV|LV|NP|LP|NT|PT|NW|NWL|PW|all, or <arm>_g<N> = a further generation] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
 //        [--slots F6_3,F1_1] [--writer sonnet|haiku|openai] [--mock] [--pool 6] [--run seed1|seed2|pers1] [--force]
-//   (PG0, PP, S2, CB, CBR, CBT, NP, LP and PT play only the personal set, --run pers1; every other arm only the probe set)
+//   (PG0, PP, S2, CB, CBR, CBT, NP, LP, PT and PW play only the personal set, --run pers1; every other arm only the probe set)
 //   npx tsx scripts/sagalab/seedlab.ts --stats [--run seed1]     spend and latency per call kind over the run's folders
 //   npx tsx scripts/sagalab/seedlab.ts --check [--run seed1]     which saga folders are missing or incomplete
 //   npx tsx scripts/sagalab/seedlab.ts --render --arm E1,E2,E3 --slots F6_3 [--out _e_rendered] [--mock] [--run seed1]
 //        [--outrun seed1] [--append]
 //        every NEW or CHANGED prompt variant a pipeline arm sent (one call per template + flag set, once per arm across the
 //        slots), its system prompt and its real payload, into runs/<outrun or run>/<out>/ (default _pipeline_rendered;
-//        cleared first, unless --append: then the variants already there are skipped) for the context-free verifier
+//        cleared first, unless --append: then the variants already there are skipped) for the context-free verifier.
+//        --cards: instead, one later card of each KIND per arm — the finale, a middle job with its hope, a middle job whose
+//        hope the engine withheld (plan.json `hopes`; a retry is skipped) — whatever the arm's pipe (NV vs NW vs NWL)
 //
 // The world of a slot is the probe's: the base fixture's game (seed, fort, roster), its focal from the fixture's own seed
 // (a personal fixture's soldier), N, kind, a personal saga's past (the base spark), F5's returning client. The story rng
@@ -251,6 +267,7 @@ export const ARMS: Record<string, SeedArm> = {
   HP: 'kit+pick', RF: 'kit+pick', RFA: 'kit+pick', CB: 'kit+pick',
   CBR: 'kit+pick', CBT: 'kit+pick', RFW: 'kit+pick',
   NV: 'kit+pick', LV: 'kit+pick', NP: 'kit+pick', LP: 'kit+pick', NT: 'kit+pick', PT: 'kit+pick',
+  NW: 'kit+pick', NWL: 'kit+pick', PW: 'kit+pick',
 };
 /** the pipeline arms: kit+pick's seed, one pipeline change each (the host's pipeArm; D1, D2 and E1–E3 carry C2's too). G0's is
  *  the build's PIPE_ARM, recorded here for the folder's labels; its host names none */
@@ -261,12 +278,14 @@ export const PIPES: Record<string, PipeArm> = { B2: 'one', C2: 'grafts', C3: 'si
   // the same pipes with the forward quest log
   NV: 'voice', LV: 'voice+log', NP: 'past', LP: 'past+log',
   // the trouble line on the game's pipes (2026-10-05): NT / PT are NV / NP plus line + motive
-  NT: 'voice+trouble', PT: 'past+trouble' };
+  NT: 'voice+trouble', PT: 'past+trouble',
+  // whom it is for, without the log (saga-panel report §6): NW / NWL are NV plus want (+ link); PW is NP plus want
+  NW: 'voice+want', NWL: 'voice+want+link', PW: 'past+want' };
 /** an arm whose host names no seed or pipe arm: the build's SEED_ARM and PIPE_ARM stand (C2 grafts). Not the game's own
  *  pipeline since 2026-10-05 (engine/saga.ts GAME_PIPE: TC hired, PP personal) */
 const BUILD_DEFAULT = new Set(['G0', 'PG0']);
 /** the personal set's arms: they play only --run pers1, and that run plays only them */
-const PERSONAL_ARMS = new Set(['PG0', 'PP', 'S2', 'CB', 'CBR', 'CBT', 'NP', 'LP', 'PT']);
+const PERSONAL_ARMS = new Set(['PG0', 'PP', 'S2', 'CB', 'CBR', 'CBT', 'NP', 'LP', 'PT', 'PW']);
 /** chain B (North Star 0): seeded from PP_g<N>'s chain A in the same slot, dealt its own deal (never the run's shared one;
  *  CBR and CBT deal exactly what CB deals in the slot — the same story rng — then their own item) */
 const CHAIN_B = new Set(['CB', 'CBR', 'CBT']);
@@ -278,7 +297,7 @@ const plays = (armId: string, d: number) => !DRAW3_ONLY.has(gen(armId)) || (d - 
  *  noise control: a later change to the deal — the supporting trades — cannot move its inputs; the pipeline arms: the arm
  *  is the only difference). A later run shares its own deals instead (`SHARED_DEALS`) */
 const REPLAY: Record<string, string> = { A2b: 'A2', A2c: 'A2', B2: 'A2', C2: 'A2', C3: 'A2', D1: 'A2', D2: 'A2', G0: 'A2', E1: 'A2', E2: 'A2', E3: 'A2', F1: 'A2', F2: 'A2', F3: 'A2', FX: 'A2',
-  TA: 'A2', TB: 'A2', TC: 'A2', TD: 'A2', TP: 'A2', S1: 'A2', S3: 'A2', HP: 'A2', RF: 'A2', RFA: 'A2', RFW: 'A2', NV: 'A2', LV: 'A2', NT: 'A2' };
+  TA: 'A2', TB: 'A2', TC: 'A2', TD: 'A2', TP: 'A2', S1: 'A2', S3: 'A2', HP: 'A2', RF: 'A2', RFA: 'A2', RFW: 'A2', NV: 'A2', LV: 'A2', NT: 'A2', NW: 'A2', NWL: 'A2' };
 /** a further generation of an arm (the power rule): `<arm>_g<N>` plays `<arm>` exactly — its seed, pipe and replayed deals — into
  *  its own folder, runs/<run>/<arm>_g<N>/ */
 const gen = (armId: string) => armId.replace(/_g\d+$/, '');
@@ -876,6 +895,10 @@ const CHANGED: Record<PipeArm, (c: { template: string; flags: string[] }) => boo
   // NT, PT (the trouble line on the game's pipes): the plan and every card dealt the line (S1's selection)
   'voice+trouble': c => c.flags.includes('line') || c.flags.includes('motive'),
   'past+trouble': c => c.flags.includes('line') || c.flags.includes('motive'),
+  // NW, PW (want): every later card (its why opens on whom the job is for and their want; --render --cards picks one of each
+  // kind); NWL (+ link): the plan (its leads, the showdown's too) and every later card (the lead in `latest`)
+  'voice+want': c => c.template === 'card' && !c.flags.includes('first'), 'past+want': c => c.template === 'card' && !c.flags.includes('first'),
+  'voice+want+link': c => (c.template === 'plan' && c.flags.includes('link')) || (c.template === 'card' && !c.flags.includes('first')),
 };
 /** an arm whose new variants are not its pipe's (CHANGED): chain B on PP — the pick's, the plan's and card 1's `next` (who the
  *  soldier is now, the dealt situation), and a report with a cost (the cost fix: one phrase naming its owner — the payload
@@ -893,6 +916,23 @@ const CHANGED_ARM: Record<string, (c: { template: string; flags: string[] }) => 
   ...Object.fromEntries(['NV', 'LV', 'NP', 'LP'].map(a => [a, (c: { template: string; flags: string[] }) =>
     (c.template === 'card' || c.template === 'report') && !c.flags.includes('first') && c.flags.some(f => ['intro', 'part', 'side', 'memory'].includes(f))])),
 };
+/** (--render --cards) the kinds of later card a saga sent: the finale; a middle job's card with its hope (`hope`), with a hope
+ *  the road check (card 1, plan.json `hopes`) kept off but its own card printed (`restored`, pipe part want), or with none
+ *  (`withheld`: no why, or the want alone, `wantfirst`). Card 1 and a retry have no kind */
+type CardKind = 'finale' | 'hope' | 'restored' | 'withheld';
+const KIND_SAYS: Record<CardKind, string> = { finale: 'the finale', hope: 'a middle job with its hope', restored: 'a middle job whose hope the road kept off, printed at its own card', withheld: 'a middle job whose hope was withheld' };
+function cardKinds(planFile: string): (c: CallRec) => CardKind | undefined {
+  const p = readJson<{ plan: SagaPlan; hopes?: (string | null)[] | null }>(planFile);
+  return c => {
+    if (c.template !== 'card' || c.flags.includes('first') || c.flags.includes('retry')) return undefined;
+    if (c.flags.includes('finale')) return 'finale';
+    const job = (JSON.parse(c.user) as { job?: string }).job;
+    const n = p.plan.episodes.findIndex(e => e.job === job) + 1;
+    if (n < 2) return undefined;
+    if (!c.flags.includes('why') || c.flags.includes('wantfirst')) return 'withheld';
+    return p.hopes?.[n - 1] ? 'hope' : 'restored';
+  };
+}
 /** --render: the new or changed prompt variants of the selected pipeline arms, one file per call */
 function render() {
   const name = opt('out') ?? '_pipeline_rendered';
@@ -910,24 +950,28 @@ function render() {
   // a variant already rendered for an arm (this pass, or an earlier --append pass) is not rendered again
   const seen = new Set(old.map(l => l.split('|').map(x => x.trim())).map(c => `${c[3]}|${c[5]}|${c[6]}`));
   let added = 0;
+  // --cards: one later card of each kind per arm, whatever its pipe (the kind, not the flags, is the key)
+  const CARDS = flag('cards');
   for (const armId of ARM_IDS) {
     const pipe = PIPES[gen(armId)];
     if (!pipe) { console.log(`${armId}: not a pipeline arm — skipped`); continue }
     for (const { fx, d } of PLAY) {
       const slot = `${fx.id}_${d}`, file = path.join(armDir(armId), slot, 'calls.jsonl');
       if (!fs.existsSync(file)) { console.log(`${armId} ${slot}: no calls.jsonl — skipped`); continue }
+      const kindOf = CARDS ? cardKinds(path.join(armDir(armId), slot, 'plan.json')) : undefined;
       for (const c of fs.readFileSync(file, 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l) as CallRec)) {
-        const key = `${armId}|${c.template}|${c.flags.join(', ')}`;
-        if (!(CHANGED_ARM[gen(armId)] ?? CHANGED[pipe])(c) || seen.has(key)) continue;
+        const kind = kindOf?.(c);
+        const key = kindOf ? `${armId}|card|${kind}` : `${armId}|${c.template}|${c.flags.join(', ')}`;
+        if ((kindOf ? !kind : !(CHANGED_ARM[gen(armId)] ?? CHANGED[pipe])(c)) || seen.has(key)) continue;
         seen.add(key);
         added++;
-        const name = `${MOCK ? 'mock-' : ''}${armId}_${slot}_${c.template}_${String(c.n).padStart(2, '0')}.md`;
+        const name = `${MOCK ? 'mock-' : ''}${armId}_${slot}_${c.template}${kind ? `-${kind}` : ''}_${String(c.n).padStart(2, '0')}.md`;
         fs.writeFileSync(path.join(out, name), [
-          `# ${armId} (pipe ${pipe}) · ${RUN}${MOCK ? ' (mock floor: the payload is the engine\'s, the plan text the floor\'s)' : ''} · ${slot} · ${c.template} · call ${c.n}`, '', `flags: ${c.flags.join(', ') || '(none)'}`, '',
+          `# ${armId} (pipe ${pipe}) · ${RUN}${MOCK ? ' (mock floor: the payload is the engine\'s, the plan text the floor\'s)' : ''} · ${slot} · ${c.template}${kind ? ` (${KIND_SAYS[kind]})` : ''} · call ${c.n}`, '', `flags: ${c.flags.join(', ') || '(none)'}`, '',
           '## system prompt', '', '```text', c.system, '```', '', '## user message (the payload as sent)', '', '```json', JSON.stringify(JSON.parse(c.user), null, 2), '```', '',
           ...(c.output ? ['## the reply', '', '```json', JSON.stringify(JSON.parse(c.output), null, 2), '```', ''] : []),
         ].join('\n'));
-        index.push(`| ${name} | ${RUN}${MOCK ? ' (mock)' : ''} | ${armId} | ${slot} | ${c.template} | ${c.flags.join(', ')} | ${c.n} |`);
+        index.push(`| ${name} | ${RUN}${MOCK ? ' (mock)' : ''} | ${armId} | ${slot} | ${kind ? `card (${kind})` : c.template} | ${c.flags.join(', ')} | ${c.n} |`);
       }
     }
   }

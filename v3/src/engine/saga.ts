@@ -230,21 +230,44 @@ export const SEED_ARM: SeedArm = 'kit+pick';
  *  have weird sentences like this*): `voice+trouble` / `past+trouble` — the game's pipe as it ships plus round F's `line`
  *  (the plan writes each trouble as ONE sentence in place of the {who, carry, will} notes, law 6b) with S1's `motive`. Lab
  *  arms only (seedlab NT vs NV, PT vs NP); not shipped
+ *  WHOM IT IS FOR, WITHOUT THE LOG (saga-panel report 2026-10-05 §6: with no For line and no road, hired sagas lost
+ *  followability — later jobs arrive cold, and the finale stops saying whom the job is for). Input-side, the log stays gone:
+ *   voice+want       NW  `want` — every later card's ONE why opens on the For line's content: the one the company acts for,
+ *                        by name and label, and their want (`askerWant`; a personal saga: the soldier whose story this is),
+ *                        the job's hope folded in after it (`wantWhy`: "…, and hopes …"), never a field of its own (law 6b).
+ *                        The hope is judged when its card comes (`cardHope`): with no road, card 1 never prints it, so a why
+ *                        the road check kept off for naming its own gain prints on its own card. A why with no hope (the
+ *                        finale; a hope that would tell its own learn) is told BEFORE the job (card flag `wantfirst`): a want
+ *                        does not depend on the job, a hope does. The name reaches the card's names, so ON THIS MATTER keeps
+ *                        them. Plan and card 1 unchanged (verify 2026-10-06: hope cards named whom but never the stake; the
+ *                        finale named "the brother's bond" before saying whose brother)
+ *   voice+want+link  NWL NW plus round F's `link` (F3): the plan writes a lead — what the last learn says of the job's person
+ *                        or place — for each later job AND the showdown (`midlead`), dealt in the card's `latest` after the
+ *                        win (`withLatest`), before the job: what was learned last, the clue before its conclusion (verify:
+ *                        folded into the why, after the job, it told the clue after the job that followed from it, and the
+ *                        finale had none). Never on a retry (the job's first card told it); the finale's only after the last
+ *                        job was won (its learn found). No lead on card 1, which already carries TC's quoted line
+ *                        (`cardOneLead`: round F, two card-1 additions overload it); the plan prompt stays at its 620
+ *   past+want        PW  `want` on the personal pipe (--run pers1; built, not yet measured). No past+want+link: PP's plan
+ *                        sits at its budget (620 words), so link cannot land there without cutting one of PP's own lines
  *  (C1 `core` — a call fixing the want, question and answer before the plan — was removed: a measured loss, follow 26–116) */
 export type PipeArm = 'one' | 'grafts' | 'sides' | 'reads' | 'fixes' | 'late' | 'trail' | 'narrow' | 'line' | 'plain' | 'link' | 'fx'
   | 'room' | 'weight' | 'voice' | 'lore' | 'page' | 'past' | 'clean' | 'voice+line' | 'past+voice' | 'voice+clean' | 'voice+asker' | 'voice+setback'
-  | 'voice+stands' | 'past+return' | 'past+trait' | 'voice+reach' | 'voice+log' | 'past+log' | 'voice+trouble' | 'past+trouble';
+  | 'voice+stands' | 'past+return' | 'past+trait' | 'voice+reach' | 'voice+log' | 'past+log' | 'voice+trouble' | 'past+trouble'
+  | 'voice+want' | 'voice+want+link' | 'past+want';
 export const PIPE_ARMS: readonly PipeArm[] = ['one', 'grafts', 'sides', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx',
   'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands',
-  'past+return', 'past+trait', 'voice+reach', 'voice+log', 'past+log', 'voice+trouble', 'past+trouble'];
+  'past+return', 'past+trait', 'voice+reach', 'voice+log', 'past+log', 'voice+trouble', 'past+trouble', 'voice+want', 'voice+want+link', 'past+want'];
 /** the pieces an arm is made of: an arm's own change, or a piece of one — voice (TC) is three lines, each its own piece
  *  (`says` card 1's line, `witness` a won clue said by someone met, `teller` the finale's secret said), so an arm can take some;
  *  `quote` and `motive` are the stack round's (S2's quoted first sentence of the past, in place of its narration; S1's sourced
  *  why); `asker` and `setback` round H's (HP's asker past and change; RF's failure facts, both parts); `stands` RF's part (a)
  *  alone (RFA); `owncost` the cost fix (a partial's cost as one phrase naming its owner); `event`, `returner`, `trait` chain B's
- *  inputs (CBR, CBT); `reach` RFA's fact widened (RFW); `sofar` a card's So far rows in place of the forward quest log */
-export type PipePart = Exclude<PipeArm, 'voice' | 'voice+line' | 'past+voice' | 'voice+clean' | 'voice+asker' | 'voice+setback' | 'voice+stands' | 'past+return' | 'past+trait' | 'voice+reach' | 'voice+log' | 'past+log' | 'voice+trouble' | 'past+trouble'>
-  | 'says' | 'witness' | 'teller' | 'quote' | 'motive' | 'asker' | 'setback' | 'stands' | 'owncost' | 'event' | 'returner' | 'trait' | 'reach' | 'sofar';
+ *  inputs (CBR, CBT); `reach` RFA's fact widened (RFW); `sofar` a card's So far rows in place of the forward quest log; `want`
+ *  the asker's name and want as the why of a card with no hope of its own (NW) */
+export type PipePart = Exclude<PipeArm, 'voice' | 'voice+line' | 'past+voice' | 'voice+clean' | 'voice+asker' | 'voice+setback' | 'voice+stands' | 'past+return' | 'past+trait' | 'voice+reach' | 'voice+log' | 'past+log' | 'voice+trouble' | 'past+trouble'
+  | 'voice+want' | 'voice+want+link' | 'past+want'>
+  | 'says' | 'witness' | 'teller' | 'quote' | 'motive' | 'asker' | 'setback' | 'stands' | 'owncost' | 'event' | 'returner' | 'trait' | 'reach' | 'sofar' | 'want';
 const VOICE: readonly PipePart[] = ['says', 'witness', 'teller'];
 /** the game's two pipes (GAME_PIPE): TC and PP with the cost fix, RFW's failure fact and the So far log */
 const VOICE_PIPE: readonly PipePart[] = ['grafts', ...VOICE, 'owncost', 'stands', 'reach', 'sofar'];
@@ -279,12 +302,20 @@ const PIPE_PARTS: Record<PipeArm, readonly PipePart[]> = {
   // (NT, PT) the trouble as the plan's one sentence on the game's pipe as it ships: round F's line with S1's motive (a reason
   // only where the seed or cast gives one), so NT vs NV and PT vs NP differ by the line alone
   'voice+trouble': [...VOICE_PIPE, 'line', 'motive'], 'past+trouble': [...PAST_PIPE, 'line', 'motive'],
+  // (NW, NWL; PW) whom the job is for, dealt to a card with no hope of its own — on the game's pipe as it ships, so NW vs NV
+  // differs by `want` alone and NWL vs NW by `link` alone (its lead on the middle jobs only, `cardOneLead`)
+  'voice+want': [...VOICE_PIPE, 'want'], 'voice+want+link': [...VOICE_PIPE, 'want', 'link'], 'past+want': [...PAST_PIPE, 'want'],
 };
 /** whether a dealt world's pipe arm carries `part` */
 export const piped = (w: Pick<SagaWorld, 'pipe'>, part: PipePart): boolean => !!w.pipe && PIPE_PARTS[w.pipe].includes(part);
 /** (pipe arm voice+asker, HP) whether the plan writes the asker's past and change, card 1 telling the past in place of `says`:
  *  only a hired saga's asker — a personal saga's soldier has their own past (PP's, or TC's line of it) */
 export const askerPast = (w: Pick<SagaWorld, 'pipe' | 'personal'>): boolean => !w.personal && piped(w, 'asker');
+/** (pipe part link) whether card 1 gets its job's lead: only when card 1 carries no addition of its pipe's own — a quoted line
+ *  (`says`, TC) or a told past (PP). Round F: two card-1 additions overload the ~70-word card ("one fact, one owner"; FX's
+ *  card 1 was flat), so on the game's pipes (NWL) the lead goes to the later jobs and the showdown, and the plan writes none
+ *  for episode 1 (`midlead`) — which also keeps the plan prompt in its budget (link on voice: 636 of 620 words) */
+export const cardOneLead = (w: Pick<SagaWorld, 'pipe' | 'personal'>): boolean => piped(w, 'link') && !piped(w, 'says') && !(w.personal && piped(w, 'past'));
 /** the pipeline of a host that names none (designer 2026-10-04): C2 grafts, ahead on follow in all three generations (83–61)
  *  and on keep beyond the noise floor (93–51) — scripts/sagalab/reports/2026-10-04-pipeline-round.md §3.1. The seed lab's
  *  G0 and PG0 play it, so they keep meaning this default; the GAME's host names its own per saga (GAME_PIPE) */

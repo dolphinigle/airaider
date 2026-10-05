@@ -15,7 +15,7 @@ import { RACE_WORD, an, manWoman, soldierIs, soldierKind } from '../engine/plain
 import {
   TYPES, JOB_TYPES, WAY_ENDING, WAY_ATTR, NUMBER_WORD, FREE_WAY, helped, wayMeans, wayWord, wayOf, partOf, waysOf, hashStr, seedOf, seedText,
   type JobType, type Way, type SagaPerson, type Trouble, type Episode, type CastEntry, type SagaPlan, type SagaState,
-  type SagaWorld, type Hurt, type Cost, type LogRow, type SagaRecord, type SagaLine, type LateShowdown, keepPicked, piped, askerPast, AGAINST, troubleWho, nextChapter, nextNow, RETURNER_PART,
+  type SagaWorld, type Hurt, type Cost, type LogRow, type SagaRecord, type SagaLine, type LateShowdown, keepPicked, piped, askerPast, AGAINST, troubleWho, nextChapter, nextNow, RETURNER_PART, cardOneLead,
 } from '../engine/saga.js';
 import { renderSaga, wordCount, type SagaTemplate } from './prompts/saga/render.js';
 import { PICKS, CASTS, KIT_DEAL, plainKeywords } from '../engine/seedkit.js';
@@ -56,6 +56,8 @@ export function planPayload(ctx: PlanCtx): { payload: Record<string, unknown>; f
   // (stack S1, motive) the line's why only where the seed or cast already gives one: a why every foe must have was invented
   if (line && piped(w, 'motive')) flags.push('motive');
   if (piped(w, 'link')) flags.push('link');
+  // (NWL) a card 1 that carries its pipe's own addition gets no lead: the plan writes leads for the later jobs and the showdown
+  if (piped(w, 'link') && !cardOneLead(w)) flags.push('midlead');
   // round T: lore (TD) one local-lore fact; page (TP) the page first; past (PP) a personal saga's past in two plain sentences
   // and the change in the soldier
   if (piped(w, 'lore')) flags.push('lore');
@@ -314,7 +316,8 @@ export function validatePlan(raw: unknown, ctx: PlanCtx): { plan: SagaPlan | nul
       people: people(e.people, `episode ${i + 1}`, i + 1), trouble: trouble(e.trouble, `episode ${i + 1}`),
       win: need(e.win, `episode ${i + 1} win`), gain: need(e.gain, `episode ${i + 1} gain`), learn: need(learnOf(e, i), `episode ${i + 1} learn`),
       why: need(e.why, `episode ${i + 1} why`),
-      ...(linked ? (e.lead?.trim() ? { lead: e.lead.trim() } : (repairs.push(`episode ${i + 1}: no lead`), {})) : {}),
+      // (midlead, NWL) none for episode 1: card 1 carries its pipe's own addition (a lead written anyway is never shown, so dropped)
+      ...(linked && (i > 0 || cardOneLead(w)) ? (e.lead?.trim() ? { lead: e.lead.trim() } : (repairs.push(`episode ${i + 1}: no lead`), {})) : {}),
       // (page) what it turns up: a missing one is no defect (its check then has nothing to read)
       ...(page && e.turns_up?.trim() ? { turnsUp: e.turns_up.trim() } : {}),
     };
@@ -327,6 +330,9 @@ export function validatePlan(raw: unknown, ctx: PlanCtx): { plan: SagaPlan | nul
     // printed it two rows under the log's For line (3 of 3 real runs); `settles` says how the want is met
     people: people(sd?.people, 'showdown'), trouble: trouble(sd?.trouble, 'showdown'), why: '',
     settles: need(sd?.settles, 'settles'), lose: need(sd?.lose, 'lose'), edge: edgesOf(sd?.edge, want, repairs, defects),
+    // (midlead, NWL) the showdown's lead too: every later card is dealt its link, the finale included (verify 2026-10-06: a
+    // finale with none jumped "Now you go to Harrowlea" past the fact that made the magistrate the target)
+    ...(linked && !cardOneLead(w) && want > 0 ? (sd?.lead?.trim() ? { lead: sd.lead.trim() } : (repairs.push('showdown: no lead'), {})) : {}),
   };
   // a bare stake word as the loss ("a livelihood": whose? what?) was printed as is on card 1 and the last
   // chance; it becomes the stake's own concrete form for the one the company acts for ("his livelihood")
@@ -572,7 +578,7 @@ export function planLint(plan: SagaPlan, w: SagaWorld, seed = seedText(w)): stri
   const skip = new Set(plan.cast.flatMap(p => [p.trade ?? '', p.traits ?? '', p.label].join(' ').split(/\W+/)));
   // the answer, learns, gains and edges too (R2): an answer naming someone not in cast printed or was dropped
   const fields = [plan.question, plan.answer, ...plan.episodes.flatMap(e => [e.job, e.trouble.who, e.trouble.carry, e.trouble.will, e.trouble.line ?? '', e.lead ?? '', e.win ?? '', e.gain ?? '', e.learn ?? '', e.why]),
-    plan.showdown.job, plan.showdown.settles ?? '', plan.showdown.lose ?? '', ...(plan.showdown.edge ?? [])];
+    plan.showdown.job, plan.showdown.lead ?? '', plan.showdown.settles ?? '', plan.showdown.lose ?? '', ...(plan.showdown.edge ?? [])];
   // a capital that does not open a sentence and names nobody and nowhere the engine dealt
   const stray = [...new Set(fields.flatMap(f => f.split(/[.!?:;"]\s*/).flatMap(s => s.trim().split(/\s+/).slice(1)))
     .map(t => t.replace(/[^A-Za-z'-]/g, '').replace(/'s$/, '')).filter(t => /^[A-Z][a-z]{2,}/.test(t) && !known.has(t) && !skip.has(t)))];
@@ -600,6 +606,7 @@ export function planLint(plan: SagaPlan, w: SagaWorld, seed = seedText(w)): stri
     ...leakIn((plan.showdown.edge ?? []).join(' '), learnt(plan.episodes.length)),
     // (pipe arms line, link) a job's one-line trouble and its lead print on its own card, after the learns before it
     ...plan.episodes.flatMap((e, i) => [...leakIn(e.trouble.line ?? '', learnt(i)), ...leakIn(e.lead ?? '', learnt(i))]),
+    ...leakIn(plan.showdown.lead ?? '', learnt(plan.episodes.length)),
   ])];
   if (leak.length) out.push(`answer words before the finale: ${leak.join(', ')}`);
   // (R2, S1/S6) a learn is hidden until its own win: its words in its own card's why spoil it; a learn that holds most of
@@ -646,12 +653,24 @@ export function planLint(plan: SagaPlan, w: SagaWorld, seed = seedText(w)): stri
     if (e.trouble.line !== undefined) { if (long(e.trouble.line, 20)) out.push(`episode ${e.n} trouble line past 20 words`); continue }
     for (const f of ['who', 'carry', 'will'] as const) if (long(e.trouble[f], 6)) out.push(`episode ${e.n} trouble.${f} past 6 words`);
   }
-  // (pipe arm link, F3) a later job's lead follows the last job's learn: one that shares no word with it chains nothing
-  plan.episodes.forEach((e, i) => {
+  // (pipe arm link, F3) a later job's lead follows the last job's learn: one that shares no word with it chains nothing (the
+  // showdown's too, midlead)
+  [...plan.episodes, plan.showdown].forEach((e, i) => {
     if (i === 0 || !e.lead) return;
     const prev = new Set(words4(plan.episodes[i - 1]!.learn ?? '').filter(x => !STOP.has(x)).map(root));
     if (!words4(e.lead).some(x => prev.has(root(x)))) out.push(`episode ${e.n} lead shares nothing with learn ${i}`);
   });
+  // one fact, one owner (verify 2026-10-06): a job that tells its own trouble's deed is told twice on its card ("hold the
+  // tannery against men who mean to burn its books" beside "they will burn the tannery's tally books")
+  for (const e of [...plan.episodes, plan.showdown]) {
+    if (e.trouble.line !== undefined) continue;
+    const will = [...new Set(contentWords(e.trouble.will).map(stem))], job = new Set(contentWords(e.job).map(stem));
+    if (will.length >= 2 && will.filter(x => job.has(x)).length * 3 >= will.length * 2) out.push(`episode ${e.n} job tells its trouble's will`);
+  }
+  // a dealt keyword is a thing, person or place the jobs use (a job, trouble, lead or gain): one only in a win, learn or title
+  // is a figure of speech the card copies ("a seed of doubt takes root")
+  const used = new Set([...plan.episodes, plan.showdown].flatMap(e => contentWords(`${e.job} ${e.trouble.who} ${e.trouble.carry} ${e.trouble.will} ${e.trouble.line ?? ''} ${e.lead ?? ''} ${e.gain ?? ''}`)).map(stem));
+  for (const kw of seedOf(w).keywords ?? []) { const ks = contentWords(kw).map(stem); if (ks.length && !ks.some(x => used.has(x))) out.push(`keyword in no job, trouble, lead or gain: ${kw}`) }
   if (long(plan.showdown.lose, 8) || /\b(?:loses?|lost)\b|^if\b/i.test(plan.showdown.lose ?? '')) out.push('lose past a few words');
   // (pipe arm past) the past is two plain sentences, and the soldier has a change to show; (voice+asker, HP) a hired asker's too
   const told = (c: CastEntry) => c.seat === 'soldier' ? piped(w, 'past') : c.seat === 'client' && askerPast(w);
@@ -880,8 +899,9 @@ export function firstCardPayload(plan: SagaPlan, w: SagaWorld, k: Knowing, direc
   const hired = askerPast(w) && client.past ? client.past : undefined;
   const says = quote ? firstSentence(told!) : piped(w, 'says') && !askerPast(w) ? client.says : undefined;
   const past = quote ? told!.slice(says!.length).trim() || undefined : told ?? hired;
-  // pipe arm link (F3): the job's lead and its hope, as its ONE why
-  const why = withLead(e.lead, e.why) ?? '';
+  // pipe arm link (F3): the job's lead and its hope, as its ONE why — only on a card 1 with no addition of its pipe's own
+  // (`cardOneLead`; NWL's card 1 has TC's line)
+  const why = withLead(cardOneLead(w) ? e.lead : undefined, e.why) ?? '';
   const clean = piped(w, 'clean');
   // (pipe arm clean) a met person (a returning face) by name in every field but a quote, as their names entry calls them
   const nm = (x: string) => clean ? namedIn(x, plan, k) : x;
@@ -944,11 +964,16 @@ export function laterCardPayload(plan: SagaPlan, e: Episode, latest: string, k: 
   /** pipe arm voice+setback (RF): a retry is framed by how the last try ended alone — no trouble either (the retry names what
    *  stopped them: the foe came twice, "Say each fact once" could not be met and the card ended on "they still carry their
    *  bows"), its cap sized to what is left (`capFor`, as line's trouble-less retry) */
-  setback?: boolean }): CardCall {
+  setback?: boolean;
+  /** (pipe part want, NW) the why is the asker's want alone (no hope): told BEFORE the job — a want does not depend on the job,
+   *  a hope does (verify: a showdown job naming "the brother's bond" came before the why that said whose brother) */
+  wantFirst?: boolean }): CardCall {
   const client = clientOf(plan), target = choiceTarget(plan);
-  // (R5 verify 2) the job's hope from its one owner (`jobWhy`); the finale none — its why is the For line's want (E1's late
-  // showdown wrote one, and the finale card restated that want: it writes none now)
-  const why = o.finale ? undefined : o.why?.trim() || undefined;
+  // (R5 verify 2) the job's hope from its one owner (`jobWhy`); the finale none — its why was the For line's want (E1's late
+  // showdown wrote one, and the finale card restated that want: it writes none now). (pipe part want, NW) with no For line,
+  // the flow deals the finale that want as its why (`wantWhy`), so the why is whatever the caller deals
+  const why = o.why?.trim() || undefined;
+  const wantFirst = !!why && !!o.wantFirst;
   const lose = o.finale && (o.lastchance || o.fixes) && e.lose ? { who: callName(client, k), loses: e.lose } : undefined;
   // a dealt `lose` keeps its owner in names (fixes; clean: a last chance named someone the card had no label for)
   const always = o.finale ? [target.id, ...(lose && (o.fixes || o.clean) && client.id !== target.id ? [client.id] : [])] : [];
@@ -969,8 +994,9 @@ export function laterCardPayload(plan: SagaPlan, e: Episode, latest: string, k: 
   if (lose) flags.push('lose');
   if (o.direction) flags.push('direction');
   // (R5 verify) a retry deals only what stopped the last try (the job is under `job`)
-  const payload: Record<string, unknown> = { ...(o.retry ? { retry: latest } : { latest }), job: e.job, ...(why ? { why } : {}) };
+  const payload: Record<string, unknown> = { ...(o.retry ? { retry: latest } : { latest }), ...(wantFirst ? { why } : {}), job: e.job, ...(why ? { why } : {}) };
   if (why) flags.push('why');
+  if (wantFirst) flags.push('wantfirst');
   if (meetP) { payload.meet = { who: displayName(meetP, k), looks: o.meet!.looks }; flags.push('meet') }
   // (R3, W4; R5 verify, verify 2) the trouble's `will` on a later card or finale with neither a retry nor a last chance's
   // `lose` (the showdown's will is its sharpest threat: a finale's stake, D2, keeps it)
@@ -1051,7 +1077,7 @@ export const wantPhrase = (want: string) => {
  *  bare "Finale" until it is played, then its title */
 export function questLog(plan: SagaPlan, k: Knowing, state: SagaState, road: RoadState, show: { forLine: boolean; open: boolean }, places: readonly string[] = []): LogRow[] {
   const client = clientOf(plan);
-  const out: LogRow[] = show.forLine ? [{ kind: 'for', text: `${displayName(client, k)}, ${client.seat === 'soldier' ? labelOf(client, 'card') : aLabel(client.label)}, who wants ${wantPhrase(client.want)}.` }] : [];
+  const out: LogRow[] = show.forLine ? [{ kind: 'for', text: `${forWho(plan, k)}, who wants ${wantPhrase(client.want)}.` }] : [];
   const N = plan.episodes.length + 1;
   if (road.lines && N - 1 >= 2) {
     out.push({ kind: 'road', text: 'Road ahead' });
@@ -1176,10 +1202,39 @@ export const jobWhy = (plan: SagaPlan, n: number, hopes: readonly (string | unde
  *  other is missing (a flagged hope leaves the lead, not a job with no reason) */
 export const withLead = (lead: string | undefined, why: string | undefined): string | undefined =>
   lead?.trim() ? `${sentence(lead)}${why?.trim() ? ` ${why.trim()}` : ''}` : why;
-/** the why a middle job's card is dealt: its hope (`jobWhy`), led by its lead under pipe arm link. The road and the report
- *  keep the hope alone (the road is on card 1, before the learns a lead may build on) */
+/** (link under want, NWL) a later card's `latest` with its lead after it: what happened last, then what the last learn says
+ *  of this job's person or place — one item, told before the job (the clue before its conclusion) */
+export const withLatest = (latest: string, lead: string | undefined): string =>
+  lead?.trim() ? [latest, lead].filter(x => x.trim()).map(sentence).join(' ') : latest;
+/** the why a later card is dealt: its hope (`jobWhy`), led by its lead under pipe arm link. The road and the report keep the
+ *  hope alone (the road is on card 1, before the learns a lead may build on) */
 export const cardWhy = (plan: SagaPlan, n: number, hopes: readonly (string | undefined | null)[] | null): string | undefined =>
   withLead(n <= plan.episodes.length ? plan.episodes[n - 1]?.lead : undefined, jobWhy(plan, n, hopes));
+/** the For line's subject: the one the company acts for by name and label ("Jervaise Greyfell, one of your soldiers") */
+export const forWho = (plan: SagaPlan, k: Knowing): string => {
+  const c = clientOf(plan);
+  return `${displayName(c, k)}, ${c.seat === 'soldier' ? labelOf(c, 'card') : aLabel(c.label)}`;
+};
+/** (pipe part want, NW) the For line's content as a sentence: whom the job is for, by name and label, and their want — on a
+ *  personal saga the soldier whose story this is. With no For line (pipe part sofar), the finale named whom the job is for
+ *  in 17 of 48 hired sagas and no card said the want (saga-panel report §4.2) */
+export const askerWant = (plan: SagaPlan, k: Knowing): string | undefined => {
+  const want = clientOf(plan).want?.trim();
+  return want ? `${forWho(plan, k)}, wants ${wantPhrase(want)}.` : undefined;
+};
+/** (pipe part want, NW) a later card's ONE why with no For line: the For line's content (`askerWant`), the job's hope folded in
+ *  after it ("…, and hopes …") — one item, never a sentence of its own (law 6b). A hope already carrying the want (half its
+ *  words) keeps its own words, the label set after the name. None of either: none. Verify (2026-10-06): a hope card dealt the
+ *  local hope alone named whom the job is for but never what they are after ("speak for her brother": what is wrong with
+ *  him?), the stake the For line had shown on every card */
+export const wantWhy = (plan: SagaPlan, k: Knowing, hope: string | undefined): string | undefined => {
+  const c = clientOf(plan), want = askerWant(plan, k);
+  if (!want || !hope) return want ?? hope;
+  const who = displayName(c, k), rest = hope.startsWith(`${who} `) ? hope.slice(who.length + 1) : undefined;
+  if (!rest) return `${want} ${hope}`;
+  const mine = [...new Set(contentWords(c.want).map(stem))], had = new Set(contentWords(hope).map(stem));
+  return mine.length && mine.filter(x => had.has(x)).length * 2 >= mine.length ? `${forWho(plan, k)}, ${rest}` : `${want.replace(/\.$/, '')}, and ${rest}`;
+};
 // ─── pipe arm grafts: the plan's own why on the road (R6, F1) ─────────────────────────────────────
 
 /** a word's root, for "already shown" (R6 verify: "firing" under the want "fire one last kiln") */
@@ -1197,7 +1252,7 @@ export function whyFlags(plan: SagaPlan, w: SagaWorld, seed = seedText(w), at?: 
   const t1 = plan.episodes[0]?.trouble;
   // (voice+asker, HP) card 1 tells a hired asker's past too
   const asker = clientOf(plan), hiredPast = asker.seat === 'client' && asker.past ? [asker.past] : [];
-  const cardOne = [...plan.episodes.map(e => e.job), asker.want, ...hiredPast, ...(t1 ? [t1.who, t1.carry, t1.will, t1.line ?? '', plan.episodes[0]!.lead ?? ''] : [])].flatMap(words4);
+  const cardOne = [...plan.episodes.map(e => e.job), asker.want, ...hiredPast, ...(t1 ? [t1.who, t1.carry, t1.will, t1.line ?? '', cardOneLead(w) ? plan.episodes[0]!.lead ?? '' : ''] : [])].flatMap(words4);
   const shownAll = new Set(cardOne.map(root));
   const plainRoots = new Set(plainWords.map(root));
   // the tail of a compound card 1 or the seed says ("hall" under "guildhall")
@@ -1750,7 +1805,8 @@ export function mockPlan(ctx: PlanCtx, seedKey: string): Record<string, unknown>
     episodes: jobs,
     showdown: {
       // its job names the person in ending (the PLANS buttons decide them), as the plan's must
-      title: `The Reckoning at ${last}`, job: focalP.seat === 'opponent' || w.personal ? `Face ${o} at ${last}.` : `Face ${o} and ${the(label(focalP))} at ${last}.`,
+      title: `The Reckoning at ${last}`, ...(linked && !cardOneLead(w) && types.length ? { lead: `What the company found last points to ${last}.` } : {}),
+      job: focalP.seat === 'opponent' || w.personal ? `Face ${o} at ${last}.` : `Face ${o} and ${the(label(focalP))} at ${last}.`,
       people: w.cast.filter(p => p.seat !== 'client').map(p => p.id),
       trouble: oneLine ? `${cap(o)} and ${oHe.pos} last men will hold their ground, for they have nowhere left to run.` : { who: `${o} and ${oHe.pos} last men`, carry: 'swords', will: 'hold their ground' },
       edge: types.map((ty, i) => TYPE_EDGE[ty](w.places[i % w.places.length]!, o)),

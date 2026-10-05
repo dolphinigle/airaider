@@ -21,7 +21,9 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
     ...[['clean', 'against', 'with'], ['voice'], ['lore'], ['page'], ['past']].map(arm => ['keywords', 'support', 'grafts', ...arm]),
     // the stack round: TC + line with its sourced why (motive, S1); TC + clean (S3). S2's plan is PP's own. (NT's plan is S1's;
     // PT's is PP's with S1's line: the trouble line on the game's pipes, 2026-10-05)
-    ...[['voice', 'line', 'against', 'motive'], ['voice', 'clean', 'against', 'with'], ['past', 'line', 'against', 'motive']].map(arm => ['keywords', 'support', 'grafts', ...arm])].flatMap(seed => [['notrade'], []].flatMap(cast => subsets(['personal', 'memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, ...seed], vars: {} })))).concat(
+    // (NWL: link on the game's voice pipe, its leads for the later jobs and the showdown, none for card 1's job, midlead,
+    // 2026-10-06 — NW / PW change no plan)
+    ...[['voice', 'line', 'against', 'motive'], ['voice', 'clean', 'against', 'with'], ['past', 'line', 'against', 'motive'], ['voice', 'link', 'midlead']].map(arm => ['keywords', 'support', 'grafts', ...arm])].flatMap(seed => [['notrade'], []].flatMap(cast => subsets(['personal', 'memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, ...seed], vars: {} })))).concat(
     // round H: HP's hired asker's past and change, in place of TC's line (never on a personal plan: that one is TC's). RF's plan is TC's
     [['notrade'], []].flatMap(cast => subsets(['memory', 'direction', 'avoid']).map(extra => ({ flags: ['types', ...cast, ...extra, 'keywords', 'support', 'grafts', 'askerpast'], vars: {} }))),
     // a soldier's NEXT personal saga (chain B, C…) on PP: the seed is who they are now, the dealt situation its new matter
@@ -29,9 +31,9 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
     // chain B's inputs (CBR, CBT): the soldier's event, no now; CBT's dealt trait (CBR's seated person is the memory flag)
     [['notrade'], []].flatMap(cast => subsets(['memory', 'direction', 'avoid', 'tests']).map(extra => ({ flags: ['types', ...cast, ...extra, 'personal', 'keywords', 'support', 'grafts', 'past', 'next', 'event'], vars: {} })))),
   // (pipe arm sides: a plan with sides deals no parts, so `side` never meets `part`; pipe arm fixes, D2, on any card: `lose`
-  // on every finale, beside `will` but at a last chance)
+  // on every finale, beside `will` but at a last chance; pipe part want, NW: a finale's why, whom the job is for)
   card: ['first', 'later', 'finale'].flatMap(pos => subsets(['memory', 'direction', 'intro', 'part', 'side', ...(pos === 'first' ? ['personal', 'returning'] : []), ...(pos === 'finale' ? ['lastchance', 'lose'] : []),
-    ...(pos !== 'first' ? ['latest', 'retry', 'will'] : []), ...(pos !== 'finale' ? ['why'] : [])])
+    ...(pos !== 'first' ? ['latest', 'retry', 'will'] : []), 'why'])
     .filter(s => !(s.includes('latest') && s.includes('retry')) && !(pos === 'finale' && s.includes('retry')) && (!s.includes('lastchance') || s.includes('lose')) && !(s.includes('personal') && s.includes('returning')))
     .filter(s => !(s.includes('will') && (s.includes('retry') || s.includes('lastchance'))) && !(s.includes('side') && s.includes('part')))
     // pipe arm line (F1): the trouble is one sentence — never beside fixes' phrase or a `will` part
@@ -50,6 +52,8 @@ const variants: Record<SagaTemplate, { flags: string[]; vars: Record<string, str
       : pos === 'later' && !extra.includes('retry') ? [extra, [...extra, 'clean'], [...extra, 'meet']]
       // (round H, RF on TC: a retry framed by the failure alone — no why, no trouble)
       : pos === 'later' && !extra.includes('why') ? [extra, [...extra, 'clean'], [...extra, 'setback']] : [extra, [...extra, 'clean']])
+    // (pipe part want, NW: a why that is the want alone — no hope — told before the job)
+    .flatMap(extra => pos !== 'first' && extra.includes('why') && !extra.includes('clean') ? [extra, [...extra, 'wantfirst']] : [extra])
     .map(extra => ({ flags: [pos, ...extra], vars: { MAX: pos === 'finale' ? 90 : 70 } }))),
   outline: [{ flags: [], vars: {} }],
   // pipe arm late (E1): the finale written after play

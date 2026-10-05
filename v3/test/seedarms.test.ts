@@ -7,7 +7,7 @@ import { Rng } from '../src/engine/rng.js';
 import { seedIdCounter } from '../src/engine/cards.js';
 import { dealSaga, castSaga, seedOf, seedPending, keepPicked, piped, SEED_ARM, KIT_CLIENT_PART, PIPE_ARMS, PIPE_ARM, GAME_PIPE, type SeedArm, type SagaPlan, type SagaWorld } from '../src/engine/saga.js';
 import { dealKit, KIT, KIT_DEAL, SEED_ARMS, plainAtom, plainKeywords } from '../src/engine/seedkit.js';
-import { planPayload, pickPayload, premisePayload, readPick, mockPick, seedSteps, cannedOption, clientOf, whyFlags, planHope, graftRoad, newKnowing, newState, questLog, logLines, laterCardPayload, oneResult, troublePhrase, validatePlan, planLint, haveOf, readLate, choiceTarget, mockPlan, cardWhy, capFor, pageChecks, grownLine, dealtWords, namedIn, roleOf, ownCost } from '../src/ai/storyteller.js';
+import { planPayload, pickPayload, premisePayload, readPick, mockPick, seedSteps, cannedOption, clientOf, whyFlags, planHope, graftRoad, newKnowing, newState, questLog, logLines, laterCardPayload, oneResult, troublePhrase, validatePlan, planLint, haveOf, readLate, choiceTarget, mockPlan, cardWhy, capFor, pageChecks, grownLine, dealtWords, namedIn, roleOf, ownCost, askerWant, withLead, wantPhrase, knowingOf, wantWhy, withLatest, forWho } from '../src/ai/storyteller.js';
 import type { AiProvider, SagaCall } from '../src/ai/provider.js';
 import { newGame, sagaChain, playSaga, hostFor } from './sagaharness.js';
 import { renderSaga, sagaTemplate } from '../src/ai/prompts/saga/render.js';
@@ -251,51 +251,57 @@ describe('pipeline arms on the floor', () => {
     expect(chain.saga!.world.kit!.arm).toBe('kit+pick');
     deal({ ...hostFor(g), pipeArm: () => undefined }, chain, undefined, focal);
     expect(chain.saga!.world.pipe).toBeUndefined();
-    expect(PIPE_ARMS).toEqual(['one', 'grafts', 'sides', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx', 'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'past+return', 'past+trait', 'voice+reach', 'voice+log', 'past+log', 'voice+trouble', 'past+trouble']);
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'grafts'))).toEqual(['grafts', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx', 'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'past+return', 'past+trait', 'voice+reach', 'voice+log', 'past+log', 'voice+trouble', 'past+trouble']);
+    expect(PIPE_ARMS).toEqual(['one', 'grafts', 'sides', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx', 'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'past+return', 'past+trait', 'voice+reach', 'voice+log', 'past+log', 'voice+trouble', 'past+trouble', 'voice+want', 'voice+want+link', 'past+want']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'grafts'))).toEqual(['grafts', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx', 'room', 'weight', 'voice', 'lore', 'page', 'past', 'clean', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'past+return', 'past+trait', 'voice+reach', 'voice+log', 'past+log', 'voice+trouble', 'past+trouble', 'voice+want', 'voice+want+link', 'past+want']);
     // round T: each arm is grafts plus its own change, and no other round-T arm carries it (judged against G0's draws on disk);
     // the verifier's shared fixes (clean) ride on no round-T arm. The stack round (S1–S3): a shipped arm plus one change
     for (const part of ['room', 'weight', 'lore', 'page'] as const) expect(PIPE_ARMS.filter(p => piped({ pipe: p }, part))).toEqual([part]);
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'past'))).toEqual(['past', 'past+voice', 'past+return', 'past+trait', 'past+log', 'past+trouble']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'past'))).toEqual(['past', 'past+voice', 'past+return', 'past+trait', 'past+log', 'past+trouble', 'past+want']);
     // chain B's inputs (CBR, CBT): the game's personal pipe (cost fix included) plus the shared `event` and one dealt item each
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'event'))).toEqual(['past+return', 'past+trait']);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'returner'))).toEqual(['past+return']);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'trait'))).toEqual(['past+trait']);
     expect([GAME_PIPE.personal, GAME_PIPE.other].some(p => ['event', 'returner', 'trait'].some(x => piped({ pipe: p }, x as 'event')))).toBe(false);
     // RFW shipped (chain-B round §2.4): both game pipes deal a failed job's report the widened fact
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'reach'))).toEqual(['voice', 'past', 'voice+reach', 'voice+log', 'past+log', 'voice+trouble', 'past+trouble']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'reach'))).toEqual(['voice', 'past', 'voice+reach', 'voice+log', 'past+log', 'voice+trouble', 'past+trouble', 'voice+want', 'voice+want+link', 'past+want']);
     expect([GAME_PIPE.personal, GAME_PIPE.other].every(p => piped({ pipe: p }, 'stands') && piped({ pipe: p }, 'reach'))).toBe(true);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'clean'))).toEqual(['clean', 'voice+clean']);
     // voice (TC) is three pieces: card 1's line (the plan's), a won clue's witness, the finale's teller; S2 takes the teller, and
     // its card-1 line is the past's own first sentence (quote)
     // (round H: HP keeps `says` for a personal saga, whose soldier has no hired asker's past to stand in its place)
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'says'))).toEqual(['voice', 'voice+line', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'voice+reach', 'voice+log', 'voice+trouble']);
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'teller'))).toEqual(['voice', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'voice+reach', 'voice+log', 'voice+trouble']);
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'witness'))).toEqual(['voice', 'voice+line', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'voice+reach', 'voice+log', 'voice+trouble']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'says'))).toEqual(['voice', 'voice+line', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'voice+reach', 'voice+log', 'voice+trouble', 'voice+want', 'voice+want+link']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'teller'))).toEqual(['voice', 'voice+line', 'past+voice', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'voice+reach', 'voice+log', 'voice+trouble', 'voice+want', 'voice+want+link']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'witness'))).toEqual(['voice', 'voice+line', 'voice+clean', 'voice+asker', 'voice+setback', 'voice+stands', 'voice+reach', 'voice+log', 'voice+trouble', 'voice+want', 'voice+want+link']);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'quote'))).toEqual(['past+voice']);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'motive'))).toEqual(['voice+line', 'voice+trouble', 'past+trouble']);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'asker'))).toEqual(['voice+asker']);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'setback'))).toEqual(['voice+setback']);
     // RFA: RF part (a) alone, on TC as measured (no cost fix); RFW (its fact widened) shipped on the game's two pipes; the cost
     // fix rides on the game's two pipes only
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'stands'))).toEqual(['voice', 'past', 'voice+stands', 'voice+reach', 'voice+log', 'past+log', 'voice+trouble', 'past+trouble']);
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'owncost'))).toEqual(['voice', 'past', 'past+return', 'past+trait', 'voice+log', 'past+log', 'voice+trouble', 'past+trouble']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'stands'))).toEqual(['voice', 'past', 'voice+stands', 'voice+reach', 'voice+log', 'past+log', 'voice+trouble', 'past+trouble', 'voice+want', 'voice+want+link', 'past+want']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'owncost'))).toEqual(['voice', 'past', 'past+return', 'past+trait', 'voice+log', 'past+log', 'voice+trouble', 'past+trouble', 'voice+want', 'voice+want+link', 'past+want']);
     expect([GAME_PIPE.personal, GAME_PIPE.other].every(p => piped({ pipe: p }, 'owncost'))).toBe(true);
     // the So far log (designer 2026-10-05) rides on the game's two pipes only; the lab's controls (LV, LP) are exactly those
     // pipes minus it, so NV vs LV and NP vs LP differ by the log alone
-    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'sofar'))).toEqual(['voice', 'past', 'voice+trouble', 'past+trouble']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'sofar'))).toEqual(['voice', 'past', 'voice+trouble', 'past+trouble', 'voice+want', 'voice+want+link', 'past+want']);
     const parts = ['one', 'grafts', 'sides', 'reads', 'fixes', 'late', 'trail', 'narrow', 'line', 'plain', 'link', 'fx', 'room', 'weight', 'lore', 'page', 'past',
-      'clean', 'says', 'witness', 'teller', 'quote', 'motive', 'asker', 'setback', 'stands', 'owncost', 'event', 'returner', 'trait', 'reach', 'sofar'] as const;
+      'clean', 'says', 'witness', 'teller', 'quote', 'motive', 'asker', 'setback', 'stands', 'owncost', 'event', 'returner', 'trait', 'reach', 'sofar', 'want'] as const;
     for (const [game, log] of [['voice', 'voice+log'], ['past', 'past+log']] as const)
       expect(parts.filter(x => piped({ pipe: log }, x))).toEqual(parts.filter(x => x !== 'sofar' && piped({ pipe: game }, x)));
     // the trouble line on the game's pipes (NT, PT; lab only): exactly the shipped pipe plus line + motive
     for (const [game, arm] of [['voice', 'voice+trouble'], ['past', 'past+trouble']] as const)
       expect(parts.filter(x => piped({ pipe: arm }, x))).toEqual(parts.filter(x => ['line', 'motive'].includes(x) || piped({ pipe: game }, x)));
     expect([GAME_PIPE.personal, GAME_PIPE.other].some(p => piped({ pipe: p }, 'line'))).toBe(false);
+    // whom it is for, without the log (NW, NWL; PW; lab only): the shipped pipe plus want, and plus link
+    for (const [game, want] of [['voice', 'voice+want'], ['past', 'past+want']] as const)
+      expect(parts.filter(x => piped({ pipe: want }, x))).toEqual(parts.filter(x => x === 'want' || piped({ pipe: game }, x)));
+    expect(parts.filter(x => piped({ pipe: 'voice+want+link' }, x))).toEqual(parts.filter(x => x === 'link' || piped({ pipe: 'voice+want' }, x)));
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'want'))).toEqual(['voice+want', 'voice+want+link', 'past+want']);
     // each E arm is grafts plus its own change, and no other arm carries it; each F arm too, and FX carries all three
     for (const part of ['late', 'trail', 'narrow'] as const) expect(PIPE_ARMS.filter(p => piped({ pipe: p }, part))).toEqual([part]);
     expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'line'))).toEqual(['line', 'fx', 'voice+line', 'voice+trouble', 'past+trouble']);
-    for (const part of ['plain', 'link'] as const) expect(PIPE_ARMS.filter(p => piped({ pipe: p }, part))).toEqual([part, 'fx']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'plain'))).toEqual(['plain', 'fx']);
+    expect(PIPE_ARMS.filter(p => piped({ pipe: p }, 'link'))).toEqual(['link', 'fx', 'voice+want+link']);
   });
   for (const pipe of PIPE_ARMS) for (const personal of [false, true]) it(`${pipe} · ${personal ? 'personal' : 'hired'}: plays to its end, on kit+pick`, async () => {
     seedIdCounter(1);
@@ -327,7 +333,9 @@ describe('pipeline arms on the floor', () => {
     p.reports.forEach((r, i) => {
       if (r.pos.finale || r.outcome === 'failure') return;
       const next = cardCalls[i + 1]!, win = plan.episodes[r.pos.job - 1]!.win;
-      expect(next.payload.latest).toBe(pipe === 'reads' ? r.rep.summary : piped(w, 'clean') ? namedIn(win ?? '', plan, metIn(next)) : win);
+      // (link under want, NWL: the next job's lead after it — the showdown's too, the last job won)
+      const nextLead = piped(w, 'want') && piped(w, 'link') && !next.flags.includes('retry') ? (next.flags.includes('finale') ? plan.showdown : plan.episodes[r.pos.job])?.lead : undefined;
+      expect(next.payload.latest).toBe(pipe === 'reads' ? r.rep.summary : piped(w, 'clean') ? namedIn(win ?? '', plan, metIn(next)) : withLatest(win!, nextLead));
       if (r.rep.summary !== win) differs++;
     });
     expect(differs).toBeGreaterThan(0);
@@ -368,8 +376,11 @@ describe('pipeline arms on the floor', () => {
         // (pipe arm clean: a why the road kept off is checked again when its card comes, and a met person's name replaces
         // their label — the report's hope is the card's why, below)
         if (!piped(w, 'clean')) expect(r.payload.hope).toBe(n === 1 ? plan.episodes[0]!.why : rec.hopes![n - 1]);
-        // (pipe arm link, F3: the card's why is the job's lead, then that same hope)
-        if (n > 1) expect(later.some(c => c.payload.job === job && (piped(w, 'link') ? String(c.payload.why).endsWith(` ${String(r.payload.hope)}`) : c.payload.why === r.payload.hope))).toBe(true);
+        // (pipe arm link, F3: the card's why is the job's lead, then that same hope; pipe part want, NW: whom the job is for and
+        // their want, then that hope after its subject — the lead, NWL, rides in `latest`)
+        const hopeTail = String(r.payload.hope).slice(clientOf(plan).name.length);
+        if (n > 1) expect(later.some(c => c.payload.job === job && (piped(w, 'want') ? String(c.payload.why).endsWith(hopeTail) && String(c.payload.why).startsWith(`${clientOf(plan).name}, `)
+          : piped(w, 'link') ? String(c.payload.why).endsWith(` ${String(r.payload.hope)}`) : c.payload.why === r.payload.hope))).toBe(true);
       }
       expect(rec.road!.slice(1).every((l, i) => l === null || l.endsWith(rec.hopes![i + 1]!))).toBe(true);
     }
@@ -1245,5 +1256,130 @@ describe('round H (HP, RF): TC plus one change, each against TC', () => {
     expect(lcFailed.map(r => r.payload.stands)).toEqual([standsFact(true), standsFact(false)]);
     expect(lc.reports.some(r => 'last' in r.payload)).toBe(false);
     expect(standsFact(false)).not.toMatch(/again/);
+  });
+});
+
+// ─── whom it is for, without the log (saga-panel report 2026-10-05 §6; seedlab NW, NWL; PW): input-side ─────────────────
+
+describe('pipe part want: every later card says whom the job is for and their want (the For line\'s content) in its one why', () => {
+  /** job 3's hope kept off the ROAD (as graftRoad does at card 1); `spoil`: job 3's why also tells its own learn, so it stays
+   *  off at its own card too */
+  const play = async (pipe: string, personal: boolean, path: 'clean' | 'bumpy' | 'lastchance' = 'clean', spoil = false) => {
+    seedIdCounter(1);
+    const { g, ai } = newGame(21);
+    const { chain, focal } = sagaChain(g, { N: 4, personal });
+    const p = await playSaga(g, chain, personal && path === 'clean' ? 'personal' : path, focal, pos => {
+      const r = chain.saga!;
+      if (pos.job === 2 && r.hopes) r.hopes[2] = null;
+      if (spoil && pos.job === 3 && !pos.finale) { const e = r.plan!.episodes[2]!; e.why = `${clientOf(r.plan!).name} hopes to learn that ${e.learn!.replace(/^\w/, x => x.toLowerCase())}` }
+    }, { pipeArm: () => pipe as never });
+    const sent = (c: SagaCall) => ({ template: c.template, flags: c.flags, vars: c.vars, payload: c.payload });
+    return { p, rec: chain.saga!, cards: ai.calls.filter(c => c.template === 'card').map(sent), reports: ai.calls.filter(c => c.template === 'report').map(sent), plans: ai.calls.filter(c => c.template === 'plan').map(sent) };
+  };
+  const byJob = <T extends { flags: string[]; payload: Record<string, unknown> }>(cs: T[], pl: SagaPlan) => cs.slice(1).map(c => ({ c, n: c.flags.includes('finale') ? 4 : pl.episodes.findIndex(e => e.job === c.payload.job) + 1 }));
+
+  for (const [game, personal] of [['voice', false], ['voice', true], ['past', true]] as const) it(`${game}+want · ${personal ? 'personal' : 'hired'}: the want leads every later why, a hope folded after it; a hope is judged at its own card; a want alone comes before the job`, async () => {
+    const base = await play(game, personal), nw = await play(`${game}+want`, personal);
+    const plan = nw.rec.plan!, client = clientOf(plan), k = knowingOf(nw.rec), want = askerWant(plan, k)!;
+    expect(want).toBe(`${forWho(plan, k)}, wants ${wantPhrase(client.want)}.`);
+    expect(forWho(plan, k)).toMatch(new RegExp(`^${client.name}, ${personal ? 'one of your soldiers$' : 'an? '}`));
+    // the plan and card 1 are the shipped pipe's, byte for byte (want changes no plan and no card 1)
+    expect(nw.plans).toEqual(base.plans);
+    expect(nw.cards[0]).toEqual(base.cards[0]);
+    expect(byJob(nw.cards, plan).map(x => x.n)).toEqual([2, 3, 4]);
+    for (const { c, n } of byJob(nw.cards, plan)) {
+      const was = base.cards.find(b => b.payload.job === c.payload.job)!;
+      expect(c.payload.latest).toBe(was.payload.latest);
+      expect(c.payload.trouble).toEqual(was.payload.trouble);
+      // whom the job is for, by name and label, opens the one why; the name reaches the card's names
+      expect(String(c.payload.why).startsWith(`${forWho(plan, k)}, `)).toBe(true);
+      expect((c.payload.names as { name?: string }[]).some(x => x.name === client.name)).toBe(true);
+      if (n === 2) expect(c.payload.why).toBe(wantWhy(plan, k, nw.rec.hopes![1]!));
+      // job 3: kept off the road, but nothing at its own card keeps it off — the hope prints there (the base, on the road's
+      // verdict, had no why at all), and its report keeps that promise
+      if (n === 3) {
+        expect(was.payload.why).toBeUndefined();
+        const hope = planHope(plan.episodes[2]!.why, plan, client.name);
+        expect(c.payload.why).toBe(wantWhy(plan, k, hope));
+        expect(nw.reports.find(r => r.payload.job === c.payload.job && r.flags.includes('hope'))?.payload.hope).toBe(hope);
+      }
+      if (n <= 3) { expect(c.flags).not.toContain('wantfirst'); expect(Object.keys(c.payload).indexOf('job')).toBeLessThan(Object.keys(c.payload).indexOf('why')) }
+      // the finale: the want alone, told before the job (a want does not depend on the job; a hope does)
+      if (n === 4) {
+        expect(was.payload.why).toBeUndefined();
+        expect(c.payload.why).toBe(want);
+        expect(c.flags.filter(f => f !== 'why' && f !== 'wantfirst')).toEqual(was.flags);
+        expect(Object.keys(c.payload).slice(0, 3)).toEqual(['latest', 'why', 'job']);
+        expect(renderSaga('card', c.flags, c.vars)).toContain('in this order: latest, why, job, trouble.');
+      }
+      expect(c.vars).toEqual(was.vars);
+    }
+    expect(nw.p.cards.at(-1)!.out.matter.some(m => m.id === client.id)).toBe(true);
+  });
+
+  it('a hope that would tell its own learn stays off its own card too: the want alone, before the job', async () => {
+    const nw = await play('voice+want', false, 'clean', true);
+    const plan = nw.rec.plan!, k = knowingOf(nw.rec);
+    expect(whyFlags(plan, nw.rec.world, undefined, 3)[2]!.length).toBeGreaterThan(0);
+    const c = byJob(nw.cards, plan).find(x => x.n === 3)!.c;
+    expect(c.payload.why).toBe(askerWant(plan, k));
+    expect(c.flags).toContain('wantfirst');
+    expect(nw.reports.some(r => r.payload.job === c.payload.job && r.flags.includes('hope'))).toBe(false);
+  });
+
+  it('wantWhy: one item — the want, then the hope after its subject; a hope carrying the want keeps its words, the label after the name', () => {
+    const plan = { cast: [{ id: 'p1', name: 'Ada Reed', sex: 'female', race: 'human', seat: 'client', focal: false, part: '', known: true, label: 'human miller', want: 'keep her mill from the baron' }] } as SagaPlan;
+    const k = newKnowing(plan.cast);
+    expect(wantWhy(plan, k, undefined)).toBe('Ada Reed, a human miller, wants to keep her mill from the baron.');
+    expect(wantWhy(plan, k, 'Ada Reed hopes the clerk will say who forged the deed.')).toBe('Ada Reed, a human miller, wants to keep her mill from the baron, and hopes the clerk will say who forged the deed.');
+    expect(wantWhy(plan, k, 'Ada Reed hopes the deed keeps her mill from the baron.')).toBe('Ada Reed, a human miller, hopes the deed keeps her mill from the baron.');
+    expect(wantWhy({ cast: [{ ...plan.cast[0]!, want: '' }] } as SagaPlan, k, 'Ada Reed hopes so.')).toBe('Ada Reed hopes so.');
+  });
+
+  for (const personal of [false, true]) it(`voice+want+link · ${personal ? 'personal' : 'hired'}: the plan writes a lead for each later job, the showdown too; it rides in latest, before the job, never in the why`, async () => {
+    const nw = await play('voice+want', personal), nwl = await play('voice+want+link', personal);
+    const lp = nwl.rec.plan!, k = knowingOf(nwl.rec);
+    expect([...nwl.plans[0]!.flags].sort()).toEqual([...nw.plans[0]!.flags, 'link', 'midlead'].sort());
+    const prompt = renderSaga('plan', nwl.plans[0]!.flags, {});
+    expect(prompt).toContain("lead: (episode 2 on) what the last learn says of this job's person or place. job:");
+    expect(prompt).toContain('- showdown: lead, job, people, trouble as above');
+    expect(prompt).toContain('"showdown": {"title": "few words", "lead": "text", "job": "text"');
+    // no lead on card 1 (one card-1 addition: TC's quoted line); every later job and the showdown have one
+    expect(lp.episodes[0]!.lead).toBeUndefined();
+    expect([...lp.episodes.slice(1), lp.showdown].every(e => !!e.lead)).toBe(true);
+    expect(nwl.cards[0]!.flags).toEqual(nw.cards[0]!.flags);
+    expect(nwl.cards[0]!.payload.why).toBe(lp.episodes[0]!.why);
+    for (const { c, n } of byJob(nwl.cards, lp)) {
+      const e = n === 4 ? lp.showdown : lp.episodes[n - 1]!;
+      expect(c.payload.latest).toBe(withLatest(lp.episodes[n - 2]!.win!, e.lead));
+      expect(String(c.payload.why)).not.toContain(e.lead!);
+      expect(c.payload.why).toBe(n === 4 ? askerWant(lp, k) : wantWhy(lp, k, n === 2 ? nwl.rec.hopes![1]! : planHope(lp.episodes[2]!.why, lp, clientOf(lp).name)));
+    }
+  });
+
+  it('voice+want+link: no lead on a retry (the job\'s first card told it), nor on a finale after the last job was lost', async () => {
+    const bumpy = await play('voice+want+link', false, 'bumpy');
+    const retries = bumpy.cards.filter(c => c.flags.includes('retry'));
+    expect(retries.length).toBeGreaterThan(0);
+    for (const c of retries) { expect(c.payload.retry).toBeDefined(); expect(String(c.payload.retry)).not.toMatch(/What the company found last/) }
+    const lc = await play('voice+want+link', false, 'lastchance');
+    const fin = lc.cards.at(-1)!;
+    expect(fin.flags).toContain('finale');
+    expect(lc.rec.done[lc.rec.plan!.episodes.length]).not.toBe('won');
+    expect(String(fin.payload.latest)).not.toContain(lc.rec.plan!.showdown.lead!);
+  });
+
+  it('plan lints (log-only): a job telling its own trouble\'s will; a dealt keyword in no job, trouble, lead or gain', async () => {
+    const nw = await play('voice+want', false);
+    const plan = structuredClone(nw.rec.plan!), w = nw.rec.world;
+    const e = plan.episodes[1]!;
+    e.trouble = { ...e.trouble, will: 'burn the tannery tally books' };
+    e.job = 'Hold the tannery against men who would burn its tally books';
+    expect(planLint(plan, w)).toContain('episode 2 job tells its trouble\'s will');
+    const kw = { ...w, kit: { ...w.kit!, keywords: ['lantern'], ...(w.kit!.picked ? { picked: { ...w.kit!.picked, keywords: ['lantern'] } } : {}) } } as SagaWorld;
+    expect(seedOf(kw).keywords).toEqual(['lantern']);
+    expect(planLint(plan, kw)).toContain('keyword in no job, trouble, lead or gain: lantern');
+    plan.showdown.job = `${plan.showdown.job} by lantern light`;
+    expect(planLint(plan, kw)).not.toContain('keyword in no job, trouble, lead or gain: lantern');
   });
 });
