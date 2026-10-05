@@ -310,7 +310,7 @@ export function QuestLog({ rows }: { rows?: any[] | null }) {
       case 'road': return <p key={i} className="ql-head"><b>Road ahead:</b></p>;
       case 'roadrow': {
         const [cls, word] = ROAD_MARK[r.mark ?? '·'] ?? ROAD_MARK['·']!;
-        return <p key={i} className={'ql-road ' + cls}><span className="mk" role="img" aria-label={word}>{r.mark ?? '·'}</span><span className="tx">{r.text}</span></p>;
+        return <p key={i} className={'ql-road ' + cls}><span className="ql-mk" role="img" aria-label={word}>{r.mark ?? '·'}</span><span className="ql-tx">{r.text}</span></p>;
       }
       case 'known': return <p key={i} className="ql-head"><b>Known:</b></p>;
       case 'knownrow': return <p key={i} className="ql-sub">{r.text}</p>;

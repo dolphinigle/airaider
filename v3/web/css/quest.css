@@ -147,14 +147,14 @@
 .qlog .ql-head:first-child, .qlog .ql-open:first-child { margin-top: 0; }
 .qlog .ql-sub { padding-left: 1.6em; }
 .qlog .ql-road { display: grid; grid-template-columns: 1.6em minmax(0, 1fr); align-items: baseline; }
-.qlog .ql-road .mk { text-align: center; font-weight: 700; }
-.qlog .ql-road.done .mk { color: #8fc285; }
-.qlog .ql-road.lost .mk { color: #d98b80; }
-.qlog .ql-road.lost .tx { color: #b5ad9d; }
-.qlog .ql-road.now .mk { color: #e2b85f; }
-.qlog .ql-road.now .tx { color: #ecd9ae; font-weight: 600; }
-.qlog .ql-road.ahead .mk { color: #a7aeb5; }
-.qlog .ql-road.ahead .tx { color: #c4bcab; }
+.qlog .ql-road .ql-mk { text-align: center; font-weight: 700; }
+.qlog .ql-road.done .ql-mk { color: #8fc285; }
+.qlog .ql-road.lost .ql-mk { color: #d98b80; }
+.qlog .ql-road.lost .ql-tx { color: #b5ad9d; }
+.qlog .ql-road.now .ql-mk { color: #e2b85f; }
+.qlog .ql-road.now .ql-tx { color: #ecd9ae; font-weight: 600; }
+.qlog .ql-road.ahead .ql-mk { color: #a7aeb5; }
+.qlog .ql-road.ahead .ql-tx { color: #c4bcab; }
 .hr { height: 1px; background: #2e2620; }
 .lineh { display: flex; flex-direction: column; gap: 3px; }
 .lk { font: 500 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-faint); }
