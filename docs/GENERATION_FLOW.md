@@ -1826,8 +1826,9 @@ liabilities=negative stackables; tier-ceiling not stored ilvl) → CARDS ✅.**
 
 ## §22 — MERCENARY BACKSTORY & LEVEL CAP ✅ designer rulings 2026-10-11
 
-1. **The backstory is written at recruit** 🔒, not "short", as a separate **past saga** record linked to the mercenary: the past plus its **open threads** (told or secret), which live in that saga. The living dossier stays short and only summarizes the "so far", linking to saga records for anything long. → STORY_ENGINE §4.
+1. **The backstory is written at recruit** 🔒, not "short", as the mercenary's **arc** (a saga of sagas, not playable): the past plus its **open threads** (told or secret, in ladder order), which live in the arc. The living dossier stays short and only summarizes the "so far", linking to saga records for anything long. → STORY_ENGINE §4.
 2. **Level cap = min(backstory cap, bedroom cap)** 🔒. The bedroom cap is unchanged (`3 + 0.9 × comfort`). The backstory cap rises each time the mercenary's own personal saga ("opening up") resolves one of the backstory's open threads. → CARDS §Level, GAME_STATE, FORT, DESIGN.
 3. **After the backstory cap is maxed** 🔒, further personal sagas play as ordinary sagas and only **rarely** give the mercenary something permanent (🟡 what: undecided).
 4. **The full backstory is fed only where the mercenary is highly relevant** 🔒 (their own opening-up saga); elsewhere the blurb or the dossier. → STORY_ENGINE §4.
-5. 🟡 open: the opening-up trigger; thread count; new threads from resolved sagas; the backstory cap's numbers.
+5. **Hierarchy arc → saga → quest** 🔒. Each thread carries its status (open / resolved / changed) and a link to the saga that took it up; each personal saga links back to its thread; the backstory cap is computed from resolved threads. Hired/client sagas and one-off quests stand alone. → STORY_ENGINE §4.
+6. 🟡 open: the opening-up trigger; thread count; new threads from resolved sagas; the backstory cap's numbers.

@@ -45,7 +45,7 @@ New faces from uncommon quests **persist in the pool** (survivors, notable NPCs,
 
 A character's depth comes from the chains they've lived through — but you can't feed all their chains into a new quest's prompt (token blowout). So the record stores a **distillation**, and the chains keep refilling it:
 
-- **Stable identity** (born at acquisition; ~never rewritten; *cacheable*): tags (= personality), `who`, AI-generated quirks; the backstory itself lives in a linked **past saga** (below).
+- **Stable identity** (born at acquisition; ~never rewritten; *cacheable*): tags (= personality), `who`, AI-generated quirks; the backstory itself lives in the mercenary's linked **arc** (below).
 - **Living dossier** (updated as chains resolve; **bounded**): the distilled significant events, relationships, and current situation — *which is just the compact summary of the chains they're in*, their main chain plus appearances in others'. Not a separate psychological model.
 
 **Token discipline at generation time:**
@@ -56,8 +56,10 @@ A character's depth comes from the chains they've lived through — but you can'
 ### Characters are story-seeds
 A character is self-contained from birth, so the AI can grow a **new** story about them later. When a merc joins, a **main chain** is generated for them (their personal arc), seeded by their record. When that story resolves, it distills back into the dossier, so their *next* chain reads a richer them. This is the recurring-personal-arc engine — the core of attachment. It rides the existing genesis "collision" mechanism (pick the character a spark lands hardest on; anchor the chain to them).
 
-### The mercenary's backstory and "opening up" (designer 2026-10-11; GENERATION_FLOW §22)
-- **Written once, at recruit, as a separate PAST SAGA record linked to the mercenary** (a saga lore node, like every saga): the mercenary's past, plus its **open threads**: matters left unfinished (who is involved, what is unresolved), each either told (they admit it) or secret (it comes out only when they open up). The threads live in that saga, not in the living dossier.
+### The mercenary's arc, backstory and "opening up" (designer 2026-10-11; GENERATION_FLOW §22)
+- **Hierarchy: arc → saga → quest.** An **arc** is a saga of sagas: one per mercenary (later maybe recurring NPCs or world arcs). It is not playable (no quests). A **saga** is one playable story; a personal saga serves one open thread of an arc. A **quest** is one job. Not every saga has an arc (hired/client sagas stand alone) and not every quest has a saga (one-offs stand alone).
+- **The arc holds:** the past (the backstory), the people from it, and the **open threads** in ladder order (told → secret, small → deep); each thread carries its status (open / resolved / changed) and a link to the saga that took it up; each personal saga links back to its thread. The **backstory cap** is computed from the resolved threads (nothing stored).
+- **The arc is written once, at recruit:** the mercenary's past, plus its **open threads**: matters left unfinished (who is involved, what is unresolved), each either told (they admit it) or secret (it comes out only when they open up). The threads live in the arc, not in the living dossier. Later, only links and thread statuses are added.
 - **The living dossier stays short** (LORE §2: a bounded, engine-rendered summary; `engine/dossier.ts`, at most 6 lines): who they are now, the marks (each a saga's title + one line, linking to that saga's record), the people who matter. Anything long (a past, a whole saga) is a separate saga record the dossier links to; the dossier only summarizes the "so far".
 - **Opening up:** over time a mercenary opens up to you and gets a personal mini saga grown from ONE open thread, which resolves it or part of it. They go on every quest of it (must-be, STORYTELLER). Each resolved thread raises their **backstory cap**; their **level cap = min(backstory cap, bedroom cap)** (CARDS §Level). Once every thread is resolved the backstory cap is maxed; later personal sagas play as ordinary sagas and only **rarely** give the mercenary something permanent (🟡 what: undecided).
 - **Only the chosen OPEN thread is sent** as the saga's matter; resolved threads are never sent as a seed (handed a settled matter, the plan retells it: STORYTELLER chain-B measurement, 8 of 8).
@@ -116,7 +118,7 @@ Why it matters: the buildup makes you *feel* the stakes you gambled on; the visi
 
 - **Everything is a chain.** A common quest is a 1-beat chain with no follow-up; rarer ones run longer and spawn sequels. There is no separate "chain vs quest" category for the player.
 - **Organic length.** A story continues only while the player keeps pursuing its "continue" leads; it ends when it's spent or the player lets it lapse. The engine never forces a beat count.
-- **Recurrence & sagas** — the standout magic from v1: a finished chain's loose thread + a cast member seeds the next chain; the dead stay named; a freed captive returns chains later as a witness; a merc's arc runs A → B → C, each richer. This is where attachment compounds. Lift it directly.
+- **Recurrence & sagas** (a mercenary's arc: §4, arc → saga → quest) — the standout magic from v1: a finished chain's loose thread + a cast member seeds the next chain; the dead stay named; a freed captive returns chains later as a witness; a merc's arc runs A → B → C, each richer. This is where attachment compounds. Lift it directly.
 
 ---
 
