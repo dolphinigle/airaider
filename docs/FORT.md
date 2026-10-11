@@ -35,7 +35,7 @@ Each comfort room's number drives its **single** benefit channel (no double-dipp
 | Room family | benefit = f(comfort) |
 |---|---|
 | **Theme rooms** (Dining hall, Gallery, Menagerie, Kitchen, Smithy, …) | **+global PRESTIGE** — exclusively; they are the only prestige generators (plus a small Hospital contribution) |
-| **Bedroom** (one type; owner = you or a merc) | the **owner's level cap** = `3 + 0.9 × comfort`; normal band max ≈ **45 → cap ~40**; **endgame buildings raise the band ≈ +10 → cap ~50** |
+| **Bedroom** (one type; owner = you or a merc) | the **owner's bedroom cap** = `3 + 0.9 × comfort`; normal band max ≈ **45 → cap ~40**; **endgame buildings raise the band ≈ +10 → cap ~50**. A merc's level cap = min(backstory cap, bedroom cap) (CARDS §Level, designer 2026-10-11) |
 | **Functional rooms** (Infirmary, Market, Ransom office, Torture chamber, Interrogation, Oracle, Hospital) | their **unique bonus** (heal speed, prices, break speed, leads, odds precision; Hospital also grants pay-gold instant heal on build) |
 
 **GLOBAL PRESTIGE = Σ theme-room comfort.** Its only job: **permission** — it gates the **Great Hall tier ladder**, and the Great Hall tier gates everything else:

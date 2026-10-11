@@ -33,7 +33,7 @@ Every comfort room computes **one number (comfort)** from its slotted cards, dri
 
 | Room | comfort drives | feeds global prestige? |
 |---|---|---|
-| **Bedroom** (owner = you or a merc) | **that owner's level cap** (`3 + 0.9×comfort`) | **No** |
+| **Bedroom** (owner = you or a merc) | **that owner's bedroom cap** (`3 + 0.9×comfort`); a merc's level cap = min(backstory cap, bedroom cap) (CARDS §Level) | **No** |
 | **Theme rooms** | **+global prestige** | that *is* their benefit |
 | **Functional rooms** | their unique bonus (heal speed, prices, …) | No (Hospital: small) |
 
@@ -46,8 +46,8 @@ Every comfort room computes **one number (comfort)** from its slotted cards, dri
 ## 4. Merc power 🔒-shape 🛠-numbers
 
 - **Attributes → coins** (the roll, GENERATION_FLOW §10).
-- **Level → grows attributes** (per growth vector + player FOCUS). **Quest-XP** levels a merc toward the cap set by *their own bedroom's* comfort (normal band max ≈45 → cap ~40; endgame buildings → cap ~50). 🟡 XP curve tuned at impl (~40 cycles/level mid-game per the pacing sim).
-- **Cap-downgrade**: above a lowered cap → keep level, can't grow. **Cap-binding must be loudly visible** (UI).
+- **Level → grows attributes** (per growth vector + player FOCUS). **Quest-XP** levels a merc toward their **level cap = min(backstory cap, bedroom cap)** (designer 2026-10-11; GENERATION_FLOW §22): the bedroom cap set by *their own bedroom's* comfort (normal band max ≈45 → cap ~40; endgame buildings → cap ~50), and the backstory cap raised by resolving their backstory's open threads (STORY_ENGINE §4). 🟡 XP curve tuned at impl (~40 cycles/level mid-game per the pacing sim).
+- **Cap-downgrade**: above a lowered cap → keep level, can't grow. **Cap-binding must be loudly visible** (UI), including **which** cap binds (bedroom or backstory).
 
 ---
 

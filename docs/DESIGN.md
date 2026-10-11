@@ -115,7 +115,7 @@ The differentiator. In the Resolution Phase, each quest's outcome is written so 
 
 > **Authoritative detail: [GAME_STATE.md](GAME_STATE.md)** (comfort→benefit, the progression spiral, staging) + [FORT.md](FORT.md). This section is the summary.
 
-The persistent base. It grows; it never resets. Every comfort room computes **one number (comfort)** from its slotted cards → **one typed benefit**: a bedroom → its owner's level cap; **theme rooms → global PRESTIGE** (the master clock — it gates the **Great Hall tier ladder**, which unlocks rooms, upgrade depth, and regions); functional rooms → their unique bonus. **Gold is the cost, prestige the permission.** Rooms start with zero CardSlots; **upgrades add slots.** Detail: [FORT.md](FORT.md).
+The persistent base. It grows; it never resets. Every comfort room computes **one number (comfort)** from its slotted cards → **one typed benefit**: a bedroom → its owner's level cap (with the merc's backstory cap: the lower of the two binds, CARDS §Level); **theme rooms → global PRESTIGE** (the master clock — it gates the **Great Hall tier ladder**, which unlocks rooms, upgrade depth, and regions); functional rooms → their unique bonus. **Gold is the cost, prestige the permission.** Rooms start with zero CardSlots; **upgrades add slots.** Detail: [FORT.md](FORT.md).
 
 ### 8.1 Captives — dual-use loot
 Quests produce **captives** carrying tags. Per captive you choose:

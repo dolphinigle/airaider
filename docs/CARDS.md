@@ -56,7 +56,7 @@ Mercenaries, captives, and NPCs are all `type:character`, distinguished by `role
 - **Tags** — identity + fit + the loot dopamine. **Personality IS tags.** Plus AI-generated **quirks**.
 - **Attributes** — five scalars: **Strength · Dexterity · Intelligence · Charisma · Constitution** → the **coin count** (the only thing that generates dice).
 - **Growth (replaces "talents")** — a fixed-sum **base** vector (random distribution = birth lean; flat L1 floor) + a fixed-sum **growth** vector reshaped by the player-assigned **FOCUS** (single → one GREAT stat · dual → two GOOD · none → generalist). No rolled talents. Past growth is **banked** (re-focus only reshapes future levels → per-merc history persists). 🛠 reshape/renormalization algorithm at impl. (Detail: GENERATION_FLOW §10.)
-- **Level** — grown by quest-XP toward a cap = **`3 + 0.9 × comfort(their own bedroom)`** (normal bedroom band max ≈ 45 → **cap ~40**; region **endgame buildings raise the band ≈ +10 → cap ~50**). Items feed power *only* through this channel, never the roll.
+- **Level** — grown by quest-XP toward their **level cap = min(backstory cap, bedroom cap)** (designer 2026-10-11; GENERATION_FLOW §22). **Bedroom cap** = **`3 + 0.9 × comfort(their own bedroom)`** (normal bedroom band max ≈ 45 → **cap ~40**; region **endgame buildings raise the band ≈ +10 → cap ~50**). **Backstory cap** = rises each time their own personal saga resolves one of their backstory's open threads (STORY_ENGINE §4); once every thread is resolved it is maxed and no longer binds. 🟡 its start, steps and the thread count: tuned at impl. Items feed power *only* through this channel, never the roll.
 - **who + backstory** — AI-written at acquisition, fitting the tags.
 - **Chains / dossier** — the sagas a character passes through are its **living dossier** (no separate psychological model; see GENERATION_FLOW §14).
 
@@ -83,7 +83,7 @@ Items are **`type:relic`** — **tags only: no attributes, no level-growth, no s
 
 Every room computes **ONE number — its "comfort"** — a saturating band over the slotted cards' `overlap` fit vs the room's theme. Comfort drives the room's **ONE typed benefit** (no double-dipping):
 - **Theme rooms** → **+global PRESTIGE** — the progression currency, exclusively theirs to generate;
-- a **bedroom** → its **owner merc's level cap** (and nothing else);
+- a **bedroom** → its **owner merc's bedroom cap** (and nothing else; the merc's level cap = min(backstory cap, bedroom cap), §Level);
 - **functional rooms** → their **unique bonus** (infirmary heal speed, market prices, torture-chamber break speed, oracle odds-precision…) — *not* prestige (Hospital: small exception).
 
 **Prestige is the master clock**: it gates room **unlocks AND upgrades** (gold is the cost, prestige is the permission), quantized by the **Great Hall's tiers** (each tier = an act that unlocks the next batch of buildings). A room starts with **zero CardSlots**; each upgrade adds one. A theme room is a **concrete type** (Dining hall, Gallery, Menagerie…) plus a **player-applied STYLE** (renovation, gold): the AI rolls type+style into a wanted-tag set **once**; the engine scores deterministically forever after.

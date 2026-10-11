@@ -45,7 +45,7 @@ New faces from uncommon quests **persist in the pool** (survivors, notable NPCs,
 
 A character's depth comes from the chains they've lived through — but you can't feed all their chains into a new quest's prompt (token blowout). So the record stores a **distillation**, and the chains keep refilling it:
 
-- **Stable identity** (born at acquisition; ~never rewritten; *cacheable*): tags (= personality), `who`, short backstory, AI-generated quirks.
+- **Stable identity** (born at acquisition; ~never rewritten; *cacheable*): tags (= personality), `who`, backstory (below), AI-generated quirks.
 - **Living dossier** (updated as chains resolve; **bounded**): the distilled significant events, relationships, and current situation — *which is just the compact summary of the chains they're in*, their main chain plus appearances in others'. Not a separate psychological model.
 
 **Token discipline at generation time:**
@@ -55,6 +55,13 @@ A character's depth comes from the chains they've lived through — but you can'
 
 ### Characters are story-seeds
 A character is self-contained from birth, so the AI can grow a **new** story about them later. When a merc joins, a **main chain** is generated for them (their personal arc), seeded by their record. When that story resolves, it distills back into the dossier, so their *next* chain reads a richer them. This is the recurring-personal-arc engine — the core of attachment. It rides the existing genesis "collision" mechanism (pick the character a spark lands hardest on; anchor the chain to them).
+
+### The mercenary's backstory and "opening up" (designer 2026-10-11; GENERATION_FLOW §22)
+- **Written once, at recruit** (part of the stable identity): the mercenary's past, plus its **open threads**: matters left unfinished (who is involved, what is unresolved), each either told (they admit it) or secret (it comes out only when they open up).
+- **Opening up:** over time a mercenary opens up to you and gets a personal mini saga grown from ONE open thread, which resolves it or part of it. They go on every quest of it (must-be, STORYTELLER). Each resolved thread raises their **backstory cap**; their **level cap = min(backstory cap, bedroom cap)** (CARDS §Level). Once every thread is resolved the backstory cap is maxed; later personal sagas play as ordinary sagas and only **rarely** give the mercenary something permanent (🟡 what: undecided).
+- **Only the chosen OPEN thread is sent** as the saga's matter; resolved threads are never sent as a seed (handed a settled matter, the plan retells it: STORYTELLER chain-B measurement, 8 of 8).
+- **Feeding by relevance** (token discipline; the engine decides, no AI call): merely named (casting pool, one-offs) → the one-line blurb · in the quest party or a side character in another saga → + the living dossier (bounded; it carries marks such as wounds) · **their own opening-up saga → + the FULL backstory and the chosen thread**. The full backstory is never fed anywhere else.
+- 🟡 open: what triggers opening up; how many threads; whether a resolved saga may add new threads; the backstory cap's start and steps.
 
 ---
 
