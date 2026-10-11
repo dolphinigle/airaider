@@ -50,7 +50,7 @@ A character's depth comes from the chains they've lived through — but you can'
 
 **Token discipline at generation time:**
 - Always feed the **stable identity** for the relevant pool — small and prompt-cacheable.
-- Feed the **dossier** only for the ~3–4 characters the lore selector picks (LORE §3).
+- Feed the **dossier** (the short version) only for the characters the chapter plan's picker picks (LORE §3).
 - Feed only a **one-line surface** for the wider "casting pool" the AI picks supporting roles from.
 
 ### Characters are story-seeds
@@ -63,7 +63,7 @@ A character is self-contained from birth, so the AI can grow a **new** story abo
 - **The living dossier stays short** (LORE §2: a bounded, engine-rendered summary; `engine/dossier.ts`, at most 6 lines): who they are now, the marks (each a chapter's title + one line, linking to that chapter's record), the people who matter. Anything long (a past, a whole chapter) is a separate chapter record the dossier links to; the dossier only summarizes the "so far".
 - **Opening up:** over time a mercenary opens up to you and gets a personal mini chapter grown from ONE open thread, which resolves it or part of it. They go on every quest of it (must-be, STORYTELLER). Each resolved thread raises their **backstory cap**; their **level cap = min(backstory cap, bedroom cap)** (CARDS §Level). Once every thread is resolved the backstory cap is maxed; later personal chapters play as ordinary chapters and only **rarely** give the mercenary something permanent (🟡 what: undecided).
 - **Only the chosen OPEN thread is sent** as the chapter's matter; resolved threads are never sent as a seed (handed a settled matter, the plan retells it: STORYTELLER chain-B measurement, 8 of 8).
-- **Feeding by relevance** (token discipline; the engine decides, no AI call): merely named (casting pool, one-offs) → the one-line blurb · in the quest party or a side character in another chapter → + the living dossier (bounded; it carries marks such as wounds) · **their own opening-up chapter → + the FULL backstory and the chosen thread**. The full backstory is never fed anywhere else.
+- **Feeding by relevance** (token discipline; the role sets the ceiling, the plan's picker chooses within it, LORE §3): merely named (casting pool, one-offs) → the one-line blurb · picked into a chapter plan → + the living dossier (the short version) · **their own opening-up chapter → + the FULL backstory (the arc, the full text) and the chosen thread**. The full backstory is never fed anywhere else. **Quest writers get no lore dump** (LORE §3b): only their part of the plan, plus each assigned mercenary's Now line and fresh marks (known only after the plan was written).
 - 🟡 open: what triggers opening up; how many threads; whether a resolved chapter may add new threads; the backstory cap's start and steps.
 
 ---
