@@ -51,7 +51,23 @@ interface Gold {
   end: { endLog: string[]; chain: string; failures: number; budget: number };
 }
 const FIXTURES = fs.readdirSync(DIR).filter(f => f.endsWith('.json')).sort();
-const load = (f: string) => JSON.parse(fs.readFileSync(path.join(DIR, f), 'utf8')) as Gold;
+//   D7 — the company's people are "mercenaries", never "soldiers" (designer 2026-10-09: the word confused the AI). The
+//        engine's own words swap (the personal part, the soldier's label, the For line, a rendered system prompt); a
+//        key keeps its word (the plan's `"soldier"` reply field, the report's `soldiers` payload field), and every
+//        model-written line stays as recorded
+const MERC_FIX: [RegExp, string][] = [
+  [/one of the company's soldiers/g, "one of the company's mercenaries"],
+  [/"(label|asker)":"([^"]*?)one of your soldiers"/g, '"$1":"$2one of your mercenaries"'],
+  [/For: ([^,"\\]+), one of your soldiers,/g, 'For: $1, one of your mercenaries,'],
+  [/ — (\w+) soldier\b/g, ' — $1 mercenary'], [/"label":"a (\w+) soldier"/g, '"label":"a $1 mercenary"'],
+  [/a soldier's past to settle/g, "a mercenary's past to settle"],
+];
+const mercSystem = (s: string) => s.replace(/\b([Ss])oldier(s?)\b/g, (m, c: string, pl: string, at: number) =>
+  s[at - 1] === '"' || (s.slice(at - 2, at) === '- ' && s[at + m.length] === ':' && (at < 3 || s[at - 3] === '\n')) ? m
+    : `${c === 'S' ? 'M' : 'm'}ercenar${pl ? 'ies' : 'y'}`);
+const fixSystems = (o: unknown): unknown => Array.isArray(o) ? o.map(fixSystems) : o && typeof o === 'object'
+  ? Object.fromEntries(Object.entries(o).map(([k, v]) => [k, k === 'system' && typeof v === 'string' ? mercSystem(v) : fixSystems(v)])) : o;
+const load = (f: string) => fixSystems(JSON.parse(MERC_FIX.reduce((t, [a, b]) => t.replace(a, b), fs.readFileSync(path.join(DIR, f), 'utf8')))) as Gold;
 const worldOf = (g: Gold): SagaWorld => ({
   personal: g.world.personal, N: g.world.N, kind: g.world.kind, shape: g.world.shape, focalId: g.world.focalId,
   cast: g.world.cast, stake: g.world.stake, places: g.world.places, land: g.world.land,

@@ -50,7 +50,7 @@ const portraitsOn = picked.kind !== 'mock' && process.env.AIRAIDER_PORTRAITS !==
   && (() => { try { return !!loadKey() } catch { return false } })();
 console.log(`[server] ${banner}`);
 if (picked.kind !== 'mock') console.log(`[server] portraits: ${portraitsOn
-  ? `ON — OpenAI images, ≈ half a US cent per recruited soldier${picked.kind === 'claude' ? ' (billed to OpenAI even on the Claude transport)' : ''}; AIRAIDER_PORTRAITS=0 turns them off`
+  ? `ON — OpenAI images, ≈ half a US cent per recruited mercenary${picked.kind === 'claude' ? ' (billed to OpenAI even on the Claude transport)' : ''}; AIRAIDER_PORTRAITS=0 turns them off`
   : process.env.AIRAIDER_PORTRAITS === '0' ? 'off (AIRAIDER_PORTRAITS=0)' : 'off (no OPENAI_API_KEY found)'}`);
 
 let game: Game;

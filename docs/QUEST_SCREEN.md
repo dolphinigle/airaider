@@ -11,7 +11,7 @@ The approved look is `docs/proto/muster.html` (variant G). Every step of the bui
 **G1 — A quest is its own page.** You open it, read the writ, decide, and leave. Not a block in a
 scrolling list.
 
-**G2 — You place soldiers by dragging cards from a hand that is always on screen — and never ONLY
+**G2 — You place mercenaries by dragging cards from a hand that is always on screen — and never ONLY
 by dragging.** Every place a drag works, a click works too. (Sultan ships drag, right-click
 quick-place, and keyboard filtering; forcing the drag is the single easiest way to make this
 annoying.)
@@ -44,7 +44,7 @@ existing saves still load.
 ## 2 · NON-GOALS (say no to these)
 
 - Rebuilding the fort, roster, or reckoning screens. Only the quest surface.
-- New art or per-location illustration. The design exists *because* we have none. *(Superseded 2026-09-29: soldier portraits and room icons are in — see `UI.md`.)*
+- New art or per-location illustration. The design exists *because* we have none. *(Superseded 2026-09-29: mercenary portraits and room icons are in — see `UI.md`.)*
 - The plain-language slot line (*"Someone who can read the ground"*) — **Phase 4, deliberately.** It
   needs either a new AI output field, which risks the prompt just stabilised, or an engine phrase
   table, which will stamp exactly as L19/L20 predict. It ships as its own measured change.
@@ -59,8 +59,8 @@ existing saves still load.
 | **Unmet cast** | Not shown at all. The rack holds only people the player has met. | Designer: *"the unrevealed ones shouldnt be in the quest list imo."* Kept behind a one-line flag in case the face-down card is wanted back. |
 | **Oracle** | Coins-vs-bar and the plain-language odds line are always visible; the needle and the **%** appear only with an Oracle. | Preserves the existing progression (`questOdds().precision`). Auto-assign stays free — it reads only coins, which are already on screen. |
 | **Approaches** | `autoAssign` REFUSES when no approach is chosen. | Recruit vs captive vs cash-out is a story decision. Auto must not make it silently. |
-| **Injury** | A penalty, not a bar. | The engine lets a wounded soldier march; that is the player's call. Auto merely prefers not to. |
-| **Ordering** | `autoAssignAll` takes most-constrained quests first (`must-be`/`must-have`), then soonest to lapse. | One soldier can only be on one quest, so order decides who gets the good people. |
+| **Injury** | A penalty, not a bar. | The engine lets a wounded mercenary march; that is the player's call. Auto merely prefers not to. |
+| **Ordering** | `autoAssignAll` takes most-constrained quests first (`must-be`/`must-have`), then soonest to lapse. | One mercenary can only be on one quest, so order decides who gets the good people. |
 
 ---
 

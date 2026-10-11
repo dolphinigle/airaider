@@ -195,7 +195,7 @@ export function validatePlan(raw: unknown, ctx: PlanCtx): { plan: SagaPlan | nul
     }
     // the company's own soldier is asked for no label (cards and reports call them "one of your
     // soldiers"); theirs only feeds the mention match, so it is the engine's, silently
-    if (!label && p.seat === 'soldier') label = an(`${RACE_WORD[p.race] ?? p.race} soldier`);
+    if (!label && p.seat === 'soldier') label = an(`${RACE_WORD[p.race] ?? p.race} mercenary`);
     // (R5 verify) a label is race and trade: a trait word the engine dealt goes (it came back as a fixed epithet in every
     // job, trouble and card, "the clumsy scholar"), and with it the comma list it led ("thin, slow-witted human hunter"
     // was cut at its comma to "thin")
@@ -408,8 +408,16 @@ export function validatePlan(raw: unknown, ctx: PlanCtx): { plan: SagaPlan | nul
   // saga "the soldier") written into plan text that a card prints becomes that person, as a cast id does
   const actFor = cast.find(p => p.seat === 'client' || p.seat === 'soldier');
   if (actFor) {
-    const ROLE = actFor.seat === 'soldier' ? /\bthe soldier\b(?!s)/i : /\b(?:the asker|the one who asked)\b/i;
-    const unRole = (t: string, where: string) => ROLE.test(t) ? (repairs.push(`role word in ${where}`), t.replace(new RegExp(ROLE.source, 'gi'), ref(actFor)).replace(/(^|[.!?]\s+)the /g, (_m, x: string) => `${x}The `)) : t;
+    const ROLE = actFor.seat === 'soldier' ? /\bthe (?:soldier|mercenary)\b(?!s)/i : /\b(?:the asker|the one who asked)\b/i;
+    // "mercenary" also heads a dealt trade ("mercenary captain"): a role word that runs on into another cast label's
+    // next word is that person, not the one the company acts for
+    const nextWord = (s: string, i: number) => /^\s+([a-z-]+)/i.exec(s.slice(i))?.[1]?.toLowerCase();
+    const heads = new Set(cast.filter(p => p !== actFor).flatMap(p => [...(p.label ?? '').matchAll(/\b(soldier|mercenary)\s+([a-z-]+)/gi)].map(m => `${m[1]!.toLowerCase()} ${m[2]!.toLowerCase()}`)));
+    const mine = (m: string, at: number, t: string) => !heads.has(`${m.slice(4).toLowerCase()} ${nextWord(t, at + m.length)}`);
+    const unRole = (t: string, where: string) => {
+      const out = t.replace(new RegExp(ROLE.source, 'gi'), (m: string, at: number) => mine(m, at, t) ? ref(actFor) : m);
+      return out === t ? t : (repairs.push(`role word in ${where}`), out.replace(/(^|[.!?]\s+)the /g, (_m, x: string) => `${x}The `));
+    };
     plan.question = unRole(plan.question, 'question'); plan.answer = unRole(plan.answer, 'answer');
     for (const e of [...plan.episodes, plan.showdown]) {
       e.job = unRole(e.job, `episode ${e.n}`);
@@ -768,7 +776,7 @@ const callName = (p: CastEntry, k: Knowing) => mayName(p, k) ? p.name : theLabel
 
 /** An entry carries the sex and `intro` for the one the player meets here. The label goes only where it does work
  *  (R4 verify): on an `intro`; on a name the dealt text calls by its label; and on the company's own soldier */
-const labelOf = (p: CastEntry, view: 'card' | 'report') => p.seat !== 'soldier' ? p.label : view === 'card' ? 'one of your soldiers' : "one of the company's soldiers";
+const labelOf = (p: CastEntry, view: 'card' | 'report') => p.seat !== 'soldier' ? p.label : view === 'card' ? 'one of your mercenaries' : "one of the company's mercenaries";
 /** (pipe arm clean) a met person's role as their entry gives it: the WHOLE label minus race, article and any clause after it,
  *  definite — the form of someone already known. The label's last word alone cut "guild master" to "a master" (beside
  *  dealt text saying "the guild master"), and an indefinite role read as an introduction, pasted as an appositive on every
@@ -1445,7 +1453,7 @@ export function assertsKnowing(text: string): string | null {
 /** a part as a card or report receives it: one that points at the company's soldier names them */
 const partIn = (p: CastEntry, plan: SagaPlan) => {
   const soldier = plan.cast.find(c => c.seat === 'soldier');
-  return soldier ? partOf(p).replace(/\bthe soldier\b/g, soldier.name) : partOf(p);
+  return soldier ? partOf(p).replace(/\bthe (?:soldier|mercenary)\b/g, soldier.name) : partOf(p);
 };
 
 /** §2.5 names filter: only the people the dealt text refers to, plus the ones the card must carry (the one it acts for,
@@ -1748,7 +1756,7 @@ export function mockPlan(ctx: PlanCtx, seedKey: string): Record<string, unknown>
   const { w } = ctx;
   const rng = new Rng(hashStr(seedKey));
   // the lean arm's asker has no trade: the floor cannot coin one from the seed, so "a local woman"
-  const label = (p: SagaPerson) => p.seat === 'soldier' ? an(`${RACE_WORD[p.race] ?? p.race} soldier`) : an(p.trade ?? `local ${manWoman(p.sex)}`);
+  const label = (p: SagaPerson) => p.seat === 'soldier' ? an(`${RACE_WORD[p.race] ?? p.race} mercenary`) : an(p.trade ?? `local ${manWoman(p.sex)}`);
   const opp = w.cast.find(p => p.seat === 'opponent')!, client = w.cast.find(p => p.seat === 'client' || p.seat === 'soldier')!;
   const focalP = w.cast.find(p => p.focal)!;
   const types: JobType[] = rng.shuffle([...JOB_TYPES]).slice(0, w.N - 1);
@@ -1894,7 +1902,7 @@ export function mockReport(payload: Record<string, unknown>, flags: string[]): {
 
 /** a summary whose own subject is the company ("the company was stopped…", "your soldiers found…", "we…"): the try's
  *  "The company tried to …" already says who acted, so it never runs on into it after a "but" */
-const COMPANY_SUBJECT = /^(?:the company(?:['’]s\s+[a-z]+)?|(?:your|our) (?:soldiers|party|company|band)|we)\b/i;
+const COMPANY_SUBJECT = /^(?:the company(?:['’]s\s+[a-z]+)?|(?:your|our) (?:soldiers|mercenaries|party|company|band)|we)\b/i;
 /** (R5 verify) a failed try as the chronicle and a last-chance finale's `latest` tell it: the job, then what stopped it.
  *  A summary that opens on the company as its subject keeps that subject in a sentence of its own (a "but" join read
  *  "The company tried to …, but the company was stopped when …") */

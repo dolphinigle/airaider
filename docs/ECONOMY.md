@@ -186,7 +186,7 @@ more.
 | ≤ 400 | a season's pay |
 | > 400 | more than a season's pay |
 
-A soldier's pay is the reader's own yardstick, and the register avoids colliding with the lead
+A mercenary's pay is the reader's own yardstick, and the register avoids colliding with the lead
 band's purse/chest/fortune — §7.2 took the same care over its rungs. Thresholds sit near
 `V_base(1)`, `V_base(4)`, `V_base(8)` and one stride past.
 
@@ -237,7 +237,7 @@ Four rungs, deliberately **not** reusing `common/uncommon/rare` (collides with t
 rarity) nor `low/mid/high/legendary` (the §9b format-lock describes a *trait's* intensity, and §8
 reserves "legendary" for tiers 13–16, 13k–92k — a lead bonus never reaches it). The ★ glyph mirrors
 `unitStars` on purpose: it answers the same question — *how far above par is this, for its level* —
-so a player who has read the marker on a soldier reads a lead for free. `1.0` is the teachable
+so a player who has read the marker on a mercenary reads a lead for free. `1.0` is the teachable
 landmark: **a fortune is when the lead is worth more than the quest it opens.**
 
 🛠 **Thresholds are a knob, and they were set from PLAY, not from a simulation.** The first cut

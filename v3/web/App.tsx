@@ -351,7 +351,7 @@ export function App() {
                 </button>))}
             </div>}
           </span>
-          <span title={`Soldiers: ${s.roster.length} of ${s.rosterCap}`}><span className="lg">Soldiers </span><span className="sh">⚔ </span><b>{s.roster.length}</b>/{s.rosterCap}</span>
+          <span title={`Mercenaries: ${s.roster.length} of ${s.rosterCap}`}><span className="lg">Mercenaries </span><span className="sh">⚔ </span><b>{s.roster.length}</b>/{s.rosterCap}</span>
           {s.captiveCap > 0 && <span title="Captives — counts captives in the cells, on the rack or on show; holding does not count until you take them"><span className="lg">Captives </span><span className="sh">⛓ </span><b>{s.captives.length}</b>/{s.captiveCap}</span>}
           {/* the AI's cost (and how many quests it writes at once) — one small chip, the control in its popover */}
           <span className="aiwrap val" onMouseLeave={() => setAiOpen(false)}>

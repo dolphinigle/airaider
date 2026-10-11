@@ -333,7 +333,7 @@ interface Job { w: World; arm: Arm; draw: Draw; dir: string; id: string; avoid?:
 interface Row { id: string; path: string; N: number; outcomes: string; files: number; complete: boolean; problems: string[]; defects: string[]; redraws: number; fallback: boolean; lint: string[]; cost: number; planMs: number; card1Ms: number; title: string; question: string; seed?: string; tone?: string; card1?: string }
 const words = (s: string | undefined) => (s ?? '').split(/\s+/).filter(Boolean).length;
 const HOW_BAND: Record<Hurt['how'], string> = { lightly: 'light', badly: 'serious', gravely: 'grave' };
-const LIKELY: Record<string, string> = { recruit: 'they may join the company', captive: 'they may end in your cells', gold: 'they may pay to go free', talk: "a soldier's past to settle" };
+const LIKELY: Record<string, string> = { recruit: 'they may join the company', captive: 'they may end in your cells', gold: 'they may pay to go free', talk: "a mercenary's past to settle" };
 
 async function runSaga(job: Job): Promise<Row> {
   const { w, arm, draw } = job;
@@ -663,7 +663,7 @@ async function main() {
       // R6 verify 2: a report with someone named but not at the job (`away`); a personal plan whose cast holds the one the
       // soldier's past wronged
       ['a report with an away entry (R6 verify 2)', (_k, c) => c.purpose === 'report' && c.flags.includes('away')],
-      ['a personal plan with the wronged one in cast (R6 verify 2)', (_k, c) => c.purpose === 'plan' && c.flags.includes('personal') && /"part":"(?:was wronged by the soldier|the soldier's )/.test(c.user)],
+      ['a personal plan with the wronged one in cast (R6 verify 2)', (_k, c) => c.purpose === 'plan' && c.flags.includes('personal') && /"part":"(?:was wronged by the (?:soldier|mercenary)|the (?:soldier|mercenary)'s )/.test(c.user)],
       ['a retry card (S5)', cardWith('retry')],
       ['a card whose log has a road ahead (Q1)', (_k, c) => c.purpose === 'card' && !!c.shown?.includes('Road ahead:')],
       ['a card whose log has known facts and held gains (Q1)', (_k, c) => c.purpose === 'card' && !!c.shown?.includes('\nKnown:') && !!c.shown?.includes('\nHeld:')],

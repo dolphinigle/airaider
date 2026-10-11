@@ -53,13 +53,13 @@ export const SHAPES: Record<ShapeId, { parts: [string, string, string]; A: JobTy
   heist: { parts: ['was wronged', 'holds what is not theirs', "works inside the holder's house"], A: ['find', 'talk', 'sneak', 'fight', 'catch'], B: ['talk', 'find', 'guard', 'sneak', 'catch'] },
   beast: { parts: ['asks for help', 'keeps the beast', 'knows the beast'], A: ['find', 'hunt', 'guard', 'talk', 'hunt'], B: ['guard', 'find', 'hunt', 'catch', 'fight'] },
 };
-const PERSONAL_PARTS: [string, string, string] = ["one of the company's soldiers", 'stands in the way', "knows the soldier's past"];
+const PERSONAL_PARTS: [string, string, string] = ["one of the company's mercenaries", 'stands in the way', "knows the mercenary's past"];
 /** (R6 verify 2) a personal saga's wronged one, cast by the engine when the soldier's past names them (`ProbeFixture.wronged`):
  *  the seed's brother was the want, the question, the answer and both edges of a real plan, yet had no cast id, so no writer
  *  ever had his sex or label, nor could deal him present at the showdown about him. Their part says the tie when the past has
  *  one ("the soldier's brother"): with "was wronged by the soldier" and a trade label alone, a Sonnet finale met "Exaduis, a
  *  charcoal-burner" by the wall and then freed "Jervaise's brother" as a second man */
-const wrongedPart = (kin?: string) => kin ? `the soldier's ${kin}` : 'was wronged by the soldier';
+const wrongedPart = (kin?: string) => kin ? `the mercenary's ${kin}` : 'was wronged by the mercenary';
 /** the loose arm deals no shape, so its parts say only where someone stands, never their seat in a
  *  shape; still a concrete part for everyone (a vague one left the model guessing who opposes whom) */
 const LOOSE_PARTS: Partial<Record<Seat, string>> = { opponent: 'stands in the way', other: 'is caught between the two sides' };
@@ -156,7 +156,7 @@ const POWER_TRADES = ['reeve', 'moneylender', 'steward', 'landlord', 'bandit chi
 
 // plain words for a card's tags (the Phase-2 `plainWords(card)` stand-in, §2.4.2)
 const BACKGROUND_WORD: Record<string, string> = {
-  ruler: 'noble', soldier: 'soldier', criminal: 'outlaw', priest: 'priest', mystic: 'mystic', artisan: 'artisan',
+  ruler: 'noble', soldier: 'mercenary', criminal: 'outlaw', priest: 'priest', mystic: 'mystic', artisan: 'artisan',
   adventurer: 'wanderer', entertainer: 'entertainer', merchant: 'merchant', scholar: 'scholar', courtesan: 'courtesan',
   sailor: 'sailor', slave: 'freed slave', hunter: 'hunter', peasant: 'peasant', servant: 'servant',
 };
@@ -531,7 +531,7 @@ export function validatePlan(raw: unknown, ctx: PlanCtx): { plan: SagaPlan | nul
     }
     // the company's own soldier is asked for no label (cards and reports call them "one of your
     // soldiers"); theirs only feeds the mention match, so it is the engine's, silently
-    if (!label && p.seat === 'soldier') label = an(`${RACE_WORD[p.race] ?? p.race} soldier`);
+    if (!label && p.seat === 'soldier') label = an(`${RACE_WORD[p.race] ?? p.race} mercenary`);
     // (R5 verify) a label is race and trade: a trait word the engine dealt goes (it came back as a fixed epithet in every
     // job, trouble and card, "the clumsy scholar"), and with it the comma list it led ("thin, slow-witted human hunter"
     // was cut at its comma to "thin")
@@ -692,8 +692,16 @@ export function validatePlan(raw: unknown, ctx: PlanCtx): { plan: SagaPlan | nul
   // saga "the soldier") written into plan text that a card prints becomes that person, as a cast id does
   const actFor = cast.find(p => p.seat === 'client' || p.seat === 'soldier');
   if (actFor) {
-    const ROLE = actFor.seat === 'soldier' ? /\bthe soldier\b(?!s)/i : /\b(?:the asker|the one who asked)\b/i;
-    const unRole = (t: string, where: string) => ROLE.test(t) ? (repairs.push(`role word in ${where}`), t.replace(new RegExp(ROLE.source, 'gi'), ref(actFor)).replace(/(^|[.!?]\s+)the /g, (_m, x: string) => `${x}The `)) : t;
+    const ROLE = actFor.seat === 'soldier' ? /\bthe (?:soldier|mercenary)\b(?!s)/i : /\b(?:the asker|the one who asked)\b/i;
+    // "mercenary" also heads a dealt trade ("mercenary captain"): a role word that runs on into another cast label's
+    // next word is that person, not the one the company acts for
+    const nextWord = (s: string, i: number) => /^\s+([a-z-]+)/i.exec(s.slice(i))?.[1]?.toLowerCase();
+    const heads = new Set(cast.filter(p => p !== actFor).flatMap(p => [...(p.label ?? '').matchAll(/\b(soldier|mercenary)\s+([a-z-]+)/gi)].map(m => `${m[1]!.toLowerCase()} ${m[2]!.toLowerCase()}`)));
+    const mine = (m: string, at: number, t: string) => !heads.has(`${m.slice(4).toLowerCase()} ${nextWord(t, at + m.length)}`);
+    const unRole = (t: string, where: string) => {
+      const out = t.replace(new RegExp(ROLE.source, 'gi'), (m: string, at: number) => mine(m, at, t) ? ref(actFor) : m);
+      return out === t ? t : (repairs.push(`role word in ${where}`), out.replace(/(^|[.!?]\s+)the /g, (_m, x: string) => `${x}The `));
+    };
     plan.question = unRole(plan.question, 'question'); plan.answer = unRole(plan.answer, 'answer');
     for (const e of [...plan.episodes, plan.showdown]) {
       e.job = unRole(e.job, `episode ${e.n}`);
@@ -1026,7 +1034,7 @@ const callName = (p: CastEntry, arm: Arm, k: Knowing) => mayName(p, arm, k) && (
 // (R7 verify) a tie (a personal saga's wronged kin) is who they are, so it travels with the label and is stated where the label
 // is: dealt as their `part` under "shown, not stated", "Jervaise Greyfell's brother" came back as "Exaduis, a villager", and
 // nothing on screen said he was her brother
-const labelOf = (p: CastEntry, view: 'card' | 'report') => p.seat !== 'soldier' ? (p.tie ? `${p.label}, ${p.tie}` : p.label) : view === 'card' ? 'one of your soldiers' : "one of the company's soldiers";
+const labelOf = (p: CastEntry, view: 'card' | 'report') => p.seat !== 'soldier' ? (p.tie ? `${p.label}, ${p.tie}` : p.label) : view === 'card' ? 'one of your mercenaries' : "one of the company's mercenaries";
 const entry = (p: CastEntry, k: Knowing, view: 'card' | 'report', dealt: string): Entry => {
   const intro = !k.named.has(p.id);
   // a met person's label ties a role word to the name, so it is that role word alone ("a merchant"): the full label is
@@ -1556,7 +1564,7 @@ const partIn = (p: CastEntry, plan: SagaPlan, arm: Arm) => {
   const soldier = plan.cast.find(c => c.seat === 'soldier');
   // (R7 verify) a kin's part is their side, the tie being in their label (`labelOf`)
   const part = p.tie ? wrongedPart() : partOf(p, arm);
-  return soldier ? part.replace(/\bthe soldier\b/g, soldier.name) : part;
+  return soldier ? part.replace(/\bthe (?:soldier|mercenary)\b/g, soldier.name) : part;
 };
 
 /** §2.5 names filter: only the people the dealt text refers to (an unreferenced entry gave "Odo is an
@@ -1930,7 +1938,7 @@ export function mockPlan(ctx: PlanCtx): Record<string, unknown> {
   const rng = new Rng(hashStr(`mockplan:${w.fx.id}:${ctx.draw.n}:${armKey(arm)}`));
   // the lean arm's asker has no trade: the floor cannot coin one from the seed, so "a villager" (traits are never a label, R5
   // verify; R6 verify 2: "a local woman" was cut to its role word "a local" where an entry carries that alone)
-  const label = (p: Person) => p.seat === 'soldier' ? an(`${RACE_WORD[p.race] ?? p.race} soldier`) : an(p.trade ?? 'villager');
+  const label = (p: Person) => p.seat === 'soldier' ? an(`${RACE_WORD[p.race] ?? p.race} mercenary`) : an(p.trade ?? 'villager');
   const opp = w.cast.find(p => p.seat === 'opponent')!, client = w.cast.find(p => p.seat === 'client' || p.seat === 'soldier')!;
   const focalP = w.cast.find(p => p.focal)!;
   // (R6, F6) the gain kinds the engine dealt; arm S's types are dealt to fit them, and on the other arms the floor picks a

@@ -8,7 +8,7 @@ import { seedIdCounter, HELD } from '../src/engine/cards.js';
 import type { Lead, Quest } from '../src/engine/quests.js';
 import type { SagaCall } from '../src/ai/provider.js';
 
-const SOLDIER_PART = "one of the company's soldiers";
+const SOLDIER_PART = "one of the company's mercenaries";
 /** the mock, but its plan writes the soldier into job 1's people — the plan staging their own matter in person, which
  *  pins them to the job's first place (the mock's own plan never does) */
 class SoldierInJob1 extends MockProvider {

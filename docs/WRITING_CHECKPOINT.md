@@ -93,7 +93,7 @@ A resolution at the current bar:
 
 **Investigated and dismissed:** a crude scan suggested 11/12 resolutions used a definite noun phrase
 absent from their lead-in. Hand-checking showed these are false positives — props staged by the CARD
-(which the resolve prompt permits), a soldier's own weapon, or nouns introduced in the same sentence.
+(which the resolve prompt permits), a mercenary's own weapon, or nouns introduced in the same sentence.
 One genuine instance was found (a spear appearing unstaged). **Not systemic; deliberately NOT patched**
 — an instance-patch is forbidden by §8, and this session has already paid twice for chasing a defect
 before checking that it was real and that it discriminated.
@@ -102,7 +102,7 @@ before checking that it was real and that it discriminated.
 - [ ] **Port §12 to `sagaSystem()`** — saga cards are the campaign spine and have none of it.
 - [ ] **Apply the resolution findings** — measured gap: *we narrate procedure, the reference narrates
       consequence*. Their results fan out (a reputation, a strained tie, a court complaint); ours stop
-      when the soldier walks out of frame. Likely needs a dealt consequence fact (see §5).
+      when the mercenary walks out of frame. Likely needs a dealt consequence fact (see §5).
 - [ ] **Dogfood via CLI** (`npm run cli -- --ai`), read every call type, iterate.
 - [ ] Then hand to the designer for GUI playtest.
 

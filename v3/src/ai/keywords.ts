@@ -487,7 +487,7 @@ const SPARK_WHO = ['a courier', 'a shepherd', 'a widow', 'a child', 'a friar', '
   'a tenant farmer', 'a miller', 'a fisherman', 'a gravedigger', 'a tinker', 'a midwife',
   'a stableboy', 'a nun', 'a woodcutter', 'a horse trader', 'a hired guard',
   'a runaway servant', 'a village elder', 'a hunter', 'a washerwoman', 'a swineherd',
-  'one of your own soldiers', 'a petitioner', 'a drunk', 'an apprentice', 'a shipmaster'];
+  'one of your own mercenaries', 'a petitioner', 'a drunk', 'an apprentice', 'a shipmaster'];
 const SPARK_WHAT = ['a letter', 'a plea', 'a summons', 'a warrant', 'a rumor', 'a bounty',
   'a token', 'a name', 'a warning', 'an offer', 'a grievance', 'a tale', 'a demand',
   'a debt', 'a map', 'a confession', 'a gift', 'a threat', 'a question', 'an invitation',
@@ -506,7 +506,7 @@ const SPARK_WHERE = ['on the ridge', 'at the ford', 'on the mill road', 'by the 
   'at the tree line', 'at the crossroads', 'in the south pasture', 'by the old bridge',
   'on the quarry track', 'near the churchyard', 'at the mill race', 'below the walls',
   'on the cart road', 'in the lower fields', 'by the kilns', 'at the boundary stone'];
-const PATROL_SPARKS = ['a returning patrol saw it', 'one of your soldiers heard it on the road back',
+const PATROL_SPARKS = ['a returning patrol saw it', 'one of your mercenaries heard it on the road back',
   'the wood-detail came back full of talk', 'your forager marked the spot and hurried home',
   'the night watch marked fires on the far ridge', 'a scout\'s report, two days stale'];
 const TALK_SPARKS = ['talk at the market', 'a quarrel overheard at the mill',
@@ -535,7 +535,7 @@ const INTAKE_FACT: Record<IntakeChannel, string[]> = {
   patrol: ['the company\'s own people came back with it', 'it came home with the last patrol',
     'one of your own crossed it in the field', 'your own people walked into it',
     'it was picked up in the course of the company\'s rounds', 'the company found it while out on other business',
-    'it followed your soldiers home'],
+    'it followed your mercenaries home'],
   talk: ['it was picked up from common talk in the country nearby', 'the countryside is talking of it',
     'it is the story every visitor tells this week', 'it drifted in with ordinary gossip',
     'half the district has a version of it', 'it came secondhand, thirdhand, and then again',

@@ -2,7 +2,7 @@ You write how a fantasy mercenary story starts.
 
 The data:
 [[!personal]]- situation: what it is about.
-[[personal]]- past: a company soldier's old wrong, the story's root.
+[[personal]]- past: a company mercenary's old wrong, the story's root.
 - keywords: use each.
 - tone: how it feels.
 - cast: its people; name only those given a name. ending: the end decides their fate.

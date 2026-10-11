@@ -402,7 +402,7 @@ function Tip({ s, q, tipRef }: { s: S; q: any; tipRef: React.RefObject<HTMLDivEl
   const best = (x: any) => {
     const f = (x.fits ?? []).find((f: any) => !f.blocked && !named.has(f.id)) ?? (x.fits ?? []).find((f: any) => !f.blocked);
     if (f) named.add(f.id);
-    if (!f) return <span className="tone-red">nobody can — {x.fits?.[0]?.blocked ?? 'no soldiers'}</span>;
+    if (!f) return <span className="tone-red">nobody can — {x.fits?.[0]?.blocked ?? 'no mercenaries'}</span>;
     return <>open — <span className={'tone-' + (STRENGTH_TONE[strengthCls(f.strength)] ?? 'dark')}>{f.name.split(' ')[0]} {Math.round(f.coins)}c · {f.strength}</span>
       {f.from ? <span className="dimp"> (on {clip(f.from.title, 22)})</span> : null}</>;
   };
@@ -430,7 +430,7 @@ function Tip({ s, q, tipRef }: { s: S; q: any; tipRef: React.RefObject<HTMLDivEl
       </div>
       <div className="foot">{choose ? 'A finale: open it and pick how it ends.'
         : waitsWord(q) ? 'Only the lock fills it — it waits for your word (March on the board or the quest) · click to open'
-        : filled < act.length ? 'Drag a soldier here, or open it and Auto · click to open'
+        : filled < act.length ? 'Drag a mercenary here, or open it and Auto · click to open'
         : 'Manned — it marches at END · click to open'}</div>
     </div>
   );

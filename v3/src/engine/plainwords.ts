@@ -7,7 +7,7 @@ import { CONCEPT } from './tags.js';
 import type { Card } from './cards.js';
 
 export const BACKGROUND_WORD: Record<string, string> = {
-  ruler: 'noble', soldier: 'soldier', criminal: 'outlaw', priest: 'priest', mystic: 'mystic', artisan: 'artisan',
+  ruler: 'noble', soldier: 'mercenary', criminal: 'outlaw', priest: 'priest', mystic: 'mystic', artisan: 'artisan',
   adventurer: 'wanderer', entertainer: 'entertainer', merchant: 'merchant', scholar: 'scholar', courtesan: 'courtesan',
   sailor: 'sailor', slave: 'freed slave', hunter: 'hunter', peasant: 'peasant', servant: 'servant',
 };

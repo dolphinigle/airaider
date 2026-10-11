@@ -133,13 +133,13 @@ describe('the next chapter\'s prompts: gated, a first personal saga byte-identic
   const base = ['types', 'personal', 'keywords', 'support', 'grafts', 'past'];
   it('the plan: the dealt situation as the seed, who they became beside it (now), a new event as the past — only with next', () => {
     const a = renderSaga('plan', base), b = renderSaga('plan', [...base, 'next']);
-    expect(a).toContain("The story is the past of the company's soldier in cast");
-    expect(a).toContain("- seed: the soldier's old wrong, which past retells.");
+    expect(a).toContain("The story is the past of the company's mercenary in cast");
+    expect(a).toContain("- seed: the mercenary's old wrong, which past retells.");
     expect(a).toContain('- ending: whose old matter the showdown settles.');
-    expect(a).toContain('past: two plain sentences a stranger follows: what happened, at what event or season, who was hurt, what the soldier still carries.');
+    expect(a).toContain('past: two plain sentences a stranger follows: what happened, at what event or season, who was hurt, what the mercenary still carries.');
     expect(a).not.toMatch(/situation|now:|new matter|new event/);
-    expect(b).toContain("The story is about the company's soldier in cast");
-    expect(b).toContain('- seed: the new matter, never pasted. now: who the soldier became; the change goes further.');
+    expect(b).toContain("The story is about the company's mercenary in cast");
+    expect(b).toContain('- seed: the new matter, never pasted. now: who the mercenary became; the change goes further.');
     expect(b).toContain('- ending: whose matter the showdown settles.');
     expect(b).toContain('past: two plain sentences: a new event, at what season, that draws who they became into the matter.');
     // the seed is the new matter, so the cast line's "the seed's people" are its people, never the settled chapter's
@@ -149,10 +149,10 @@ describe('the next chapter\'s prompts: gated, a first personal saga byte-identic
   it('card 1 and the pick', () => {
     expect(renderSaga('card', ['first', 'personal', 'past'], { MAX: 90 })).toContain('past: their old wrong, told plainly, nothing added.');
     expect(renderSaga('card', ['first', 'personal', 'past', 'next'], { MAX: 90 })).toContain('past: their new matter, told plainly, nothing added.');
-    expect(renderSaga('pick', ['personal'])).toContain("- past: a company soldier's old wrong, the story's root.");
-    expect(renderSaga('pick', ['personal'])).not.toMatch(/now:|the soldier,/);
-    expect(renderSaga('pick', ['next'])).toContain('- situation: what the story is about.\n- now: who the company soldier at its heart is now.');
-    expect(renderSaga('pick', ['next'])).toContain('best fit the situation, the soldier, the tone and the cast');
+    expect(renderSaga('pick', ['personal'])).toContain("- past: a company mercenary's old wrong, the story's root.");
+    expect(renderSaga('pick', ['personal'])).not.toMatch(/now:|the mercenary,/);
+    expect(renderSaga('pick', ['next'])).toContain('- situation: what the story is about.\n- now: who the company mercenary at its heart is now.');
+    expect(renderSaga('pick', ['next'])).toContain('best fit the situation, the mercenary, the tone and the cast');
     expect(renderSaga('pick', ['next'])).not.toContain('old wrong');
   });
 });
@@ -336,10 +336,10 @@ describe('chain B\'s inputs (CBR, CBT; lab arms): the Now to no call, the event,
       expect(plan.payload.tests).toBe(pipe === 'past+trait' ? w.tests : undefined);
       for (const c of [pick, plan]) expect(JSON.stringify(c.payload)).not.toContain('dives in');
       const sys = renderSaga('plan', plan.flags);
-      expect(sys).toContain('event: two plain sentences: what just happened, at what season, that pulls the soldier in.');
+      expect(sys).toContain('event: two plain sentences: what just happened, at what season, that pulls the mercenary in.');
       expect(sys).toContain('"event": "two sentences"');
       expect(sys).not.toMatch(/now:|"past"|past:|who they became/);
-      expect(sys.includes('tests: the soldier\'s trait it puts to the test.')).toBe(pipe === 'past+trait');
+      expect(sys.includes('tests: the mercenary\'s trait it puts to the test.')).toBe(pipe === 'past+trait');
       // the plan's event is the matter card 1 tells (kept where a past is)
       expect(chain.saga!.plan!.cast.find(c => c.seat === 'soldier')!.past).toMatch(/^This season at /);
       for (const c of ai.calls) expect(JSON.stringify(c.payload)).not.toContain('left his friend to drown');
@@ -354,7 +354,7 @@ describe('chain B\'s inputs (CBR, CBT; lab arms): the Now to no call, the event,
     expect(premise.now).toBeUndefined();
     expect(premise.event).toMatch(/^This season at /);
     expect(premise.past).toBeUndefined();
-    expect(renderSaga('card', card1.flags, card1.vars)).toContain('who: one of your own soldiers. wants: what they want. event: what just drew them in.');
+    expect(renderSaga('card', card1.flags, card1.vars)).toContain('who: one of your own mercenaries. wants: what they want. event: what just drew them in.');
     expect(card1.vars.MAX).toBe(90);
     for (const c of ai.calls) expect(JSON.stringify(c.payload)).not.toContain('dives in');
     const reports = ai.calls.filter(c => c.template === 'report');
@@ -366,7 +366,7 @@ describe('chain B\'s inputs (CBR, CBT; lab arms): the Now to no call, the event,
       expect(own.became).toBeUndefined();
       expect(r.flags).toContain('next');
       expect(r.flags).not.toContain('now');
-      expect(renderSaga('report', r.flags, r.vars)).toContain('Name no soldier but the one whose story this is');
+      expect(renderSaga('report', r.flags, r.vars)).toContain('Name no mercenary but the one whose story this is');
       expect(renderSaga('report', r.flags, r.vars)).toContain('- soldiers: who went, what each is like.');
     }
     // the default's chain B (CB) is untouched: whose past this story is, and no became
@@ -383,7 +383,7 @@ describe('chain B\'s inputs (CBR, CBT; lab arms): the Now to no call, the event,
     const seated = w.cast.find(c => c.id === 'lore-9')!;
     expect(seated).toMatchObject({ seat: 'other', part: RETURNER_PART, memory: face.memory, known: true });
     expect(partOf(seated)).toBe(RETURNER_PART);
-    expect(RETURNER_PART).toBe('asks the soldier for help');
+    expect(RETURNER_PART).toBe('asks the mercenary for help');
     // named from the start (known there), never an intro: their role word rides on every entry that has them
     const entries = ai.calls.filter(c => c.template === 'report' || c.template === 'card').flatMap(c => [...((c.payload.people ?? []) as Record<string, unknown>[]), ...((c.payload.names ?? []) as Record<string, unknown>[])]).filter(x => x.name === face.name);
     expect(entries.length).toBeGreaterThan(0);
@@ -393,7 +393,7 @@ describe('chain B\'s inputs (CBR, CBT; lab arms): the Now to no call, the event,
     expect(plan.flags).toContain('memory');
     expect((plan.payload.cast as { id: string; part?: string; memory?: string }[]).find(c => c.id === 'lore-9')).toMatchObject({ part: RETURNER_PART, memory: face.memory, where: face.where });
     // the default's chain B seats the same tied face as before: "knows the soldier's past"; a rival is never re-parted
-    expect((await chainB('past', face)).w.cast.find(c => c.id === 'lore-9')!.part).toBe("knows the soldier's past");
+    expect((await chainB('past', face)).w.cast.find(c => c.id === 'lore-9')!.part).toBe("knows the mercenary's past");
     expect((await chainB('past+return', { ...face, rival: true })).w.cast.find(c => c.id === 'lore-9')!).toMatchObject({ seat: 'opponent', part: 'stands in the way' });
   });
   it('the change-vs-Now lint runs on every chain B (the plan never saw the Now on CBR/CBT)', async () => {

@@ -350,11 +350,11 @@ export const SHAPES: Record<ShapeId, { parts: [string, string, string]; A: JobTy
   beast: { parts: ['asks for help', 'keeps the beast', 'knows the beast'], A: ['find', 'hunt', 'guard', 'talk', 'hunt'], B: ['guard', 'find', 'hunt', 'catch', 'fight'] },
 };
 export const SHAPE_IDS = Object.keys(SHAPES) as ShapeId[];
-export const PERSONAL_PARTS: [string, string, string] = ["one of the company's soldiers", 'stands in the way', "knows the soldier's past"];
+export const PERSONAL_PARTS: [string, string, string] = ["one of the company's mercenaries", 'stands in the way', "knows the mercenary's past"];
 /** (pipe arm past+return, CBR) the part of a person from the soldier's last chapter seated in their next, in place of "knows
  *  the soldier's past" (which points the story at the settled one): a side a stateless writer can show. ("brings the soldier
  *  the new matter" was pipeline words: the finale's writer acted it out as a bundle pressed into her hands, never explained) */
-export const RETURNER_PART = 'asks the soldier for help';
+export const RETURNER_PART = 'asks the mercenary for help';
 /** the loose arm deals no shape, so its parts say only where someone stands, never their seat in a
  *  shape; still a concrete part for everyone (a vague one left the model guessing who opposes whom) */
 export const LOOSE_PARTS: Partial<Record<Seat, string>> = { opponent: 'stands in the way', other: 'is caught between the two sides' };

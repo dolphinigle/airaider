@@ -12,7 +12,7 @@ import { validatePlan, triedLine, logLines } from '../src/ai/storyteller.js';
 import * as flow from '../src/game/sagaflow.js';
 import { newGame, sagaChain, hostFor, playSaga } from './sagaharness.js';
 
-const SOLDIER_PART = "one of the company's soldiers";
+const SOLDIER_PART = "one of the company's mercenaries";
 
 /** a personal saga's lead for the first soldier, as the game posts one (read at a Lead room) */
 function personalLead(g: Game): Lead {

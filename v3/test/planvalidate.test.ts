@@ -74,7 +74,7 @@ describe('validatePlan — the repairs (mechanical, silent)', () => {
   it('unknown ids leave a job\'s people', () => expect(repaired(r => { r.episodes[0].people = ['c9', 'zz'] }, /unknown ids dropped from episode 1/).episodes[0]!.people).toEqual(['c9']));
   it('a personal saga\'s soldier is in every job', () => {
     const c = ctx({ personal: true, cast: [
-      { id: 'c3', name: 'Jervaise Greyfell', sex: 'female', race: 'human', seat: 'soldier', focal: true, part: "one of the company's soldiers", trade: 'cook', known: true },
+      { id: 'c3', name: 'Jervaise Greyfell', sex: 'female', race: 'human', seat: 'soldier', focal: true, part: "one of the company's mercenaries", trade: 'cook', known: true },
       { id: 'p1', name: 'Jofstrom', sex: 'male', race: 'wolfman', seat: 'opponent', focal: false, part: 'stands in the way', trade: 'slaver', known: false },
     ], focalId: 'c3' });
     const r = raw(); delete r.asker; r.soldier = { want: 'free her brother', past: 'left her brother bound' };
@@ -86,7 +86,7 @@ describe('validatePlan — the repairs (mechanical, silent)', () => {
     // the personal ways come back by the words the plan was given
     expect(v.plan!.options.map(o => o.way)).toEqual(['talk', 'fight', 'sneak']);
     expect(v.plan!.cast[0]!.past).toBe('left her brother bound');
-    expect(v.plan!.cast[0]!.label).toBe('a human soldier');
+    expect(v.plan!.cast[0]!.label).toBe('a human mercenary');
   });
   it('extra episodes are cut', () => expect(repaired(r => { r.episodes.push({ ...r.episodes[1] }) }, /1 extra episode\(s\) cut/).episodes).toHaveLength(2));
   it('a type not on the list becomes the first unused one', () => expect(repaired(r => { r.episodes[1].type = 'parley' }, /episode 2: type "parley" → fight/).episodes[1]!.type).toBe('fight'));
@@ -153,7 +153,7 @@ describe('validatePlan — the hard defects (one plain re-draw, then the floor)'
   it('no settles, no lose', () => { broken(r => { delete r.showdown.settles }, /missing settles/); broken(r => { delete r.showdown.lose }, /missing lose/) });
   it('a held thing with no edge', () => broken(r => { r.showdown.edge = ['the map shows the back way'] }, /missing edge for episode 2/));
   it('a personal saga with no past', () => broken(r => { delete r.asker; r.soldier = { want: 'free him' } }, /missing soldier past/, ctx({ personal: true, focalId: 'c3', cast: [
-    { id: 'c3', name: 'Jervaise', sex: 'female', race: 'human', seat: 'soldier', focal: true, part: "one of the company's soldiers", known: true },
+    { id: 'c3', name: 'Jervaise', sex: 'female', race: 'human', seat: 'soldier', focal: true, part: "one of the company's mercenaries", known: true },
     { id: 'p1', name: 'Jofstrom', sex: 'male', race: 'wolfman', seat: 'opponent', focal: false, part: 'stands in the way', trade: 'slaver', known: false },
   ] })));
 });

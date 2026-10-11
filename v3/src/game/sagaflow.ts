@@ -518,7 +518,7 @@ export function sagaFate(x: FateFacts): string {
 
 // ─── views (read-only: they never write Knowing) ───────────────────────────────────────────────
 
-const LIKELY: Record<string, string> = { recruit: 'they may join the company', captive: 'they may end in your cells', gold: 'their treasure may pay out', talk: "a soldier's past to settle" };
+const LIKELY: Record<string, string> = { recruit: 'they may join the company', captive: 'they may end in your cells', gold: 'their treasure may pay out', talk: "a mercenary's past to settle" };
 /** pipe arm grafts: the gold way's likely end as its story tells it (FREE_GOLD / FREE_HELPED_GOLD) — no treasure, no money:
  *  the money is the finale button's alone (designer 2026-10-04) */
 const LIKELY_FREE = 'they may go their way';

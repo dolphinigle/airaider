@@ -214,7 +214,7 @@ optimized for gpt-5 at the Steam/monetization stretch. Code: `v3/src/ai/claudecl
 - The meter: `costUsd` stays 0 (the subscription is not billed per call); the API list price rides along as
   `listCostUsd` in the call record and `AIRAIDER_CALL_LOG`, for information.
 - Portraits stay OpenAI images (Claude has no image model) — on with claude too, ≈ half a US cent per recruited
-  soldier; `AIRAIDER_PORTRAITS=0` turns them off (and with no OpenAI key they are off; the roster says so).
+  mercenary; `AIRAIDER_PORTRAITS=0` turns them off (and with no OpenAI key they are off; the roster says so).
 - The ONE byte the transport adds: the CLI reads stdin as typed input, so a user message opening with `/` would
   run as a slash command or skill (`/cost …` returned the account's usage with no model call). Such a message
   goes out with one leading space. Only the player's own direction text can open with `/`; every other game

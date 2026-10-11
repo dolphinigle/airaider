@@ -21,13 +21,13 @@ Everything below serves those two and nothing else.
 *(this doc is read by people and agents with no context; these are used throughout)*
 
 **Cycle** — one turn. **Fort phase** — the part of a cycle where the player builds, hires, slots
-cards into rooms, pursues leads and assigns soldiers to quests. **Reckoning** — the part after
+cards into rooms, pursues leads and assigns mercenaries to quests. **Reckoning** — the part after
 END CYCLE, where committed quests resolve and the report is read. **Lead** — a cheap engine-made
 prospect on the lead board. **Pursue** — spend a lead to have the AI write the actual **quest card**.
 **Saga (chain)** — a multi-quest story; its first card costs a **genesis** call (the hidden bible),
 each later card is a **beat**. **One-off** — a standalone quest, one call. **Flesh** — the call that
 gives a person their who/backstory/quirks. **Marching** — a quest with every slot filled, which
-therefore resolves this reckoning. **The roll** — each sent soldier contributes **coins**; they are
+therefore resolves this reckoning. **The roll** — each sent mercenary contributes **coins**; they are
 flipped against a **bar**, and the **heads** decide success / partial / failure. *Call names used
 below:* `writeQuest` (the quest card), `genesis` (a saga's hidden bible), `resolve` (one quest's
 report), `flesh`, `themeRoll` (a room's style), `select` (a lore picker).
@@ -116,7 +116,7 @@ with extra machinery. **Whatever paces the reveal, it cannot be the model's outp
 
 ### 2c. The fort phase is thin — the queue alone will not fill a genesis
 *(`v3/scripts/_fortdepth.ts`, mock provider, two seeds, counting what the player can actually click
-right now: builds and upgrades compete for one purse, an assignment needs a free soldier)*
+right now: builds and upgrades compete for one purse, an assignment needs a free mercenary)*
 
 ```
 cycle:      0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15

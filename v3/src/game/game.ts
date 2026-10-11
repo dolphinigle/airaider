@@ -914,7 +914,7 @@ export class Game {
     return !(rt.benefit === 'cap' && (!room.ownerId || room.ownerId === 'you'));
   }
   private noEffectReason(room: Room): string {
-    return ROOM_TYPE[room.type]!.benefit === 'cap' ? 'your own bedroom has no effect yet — only a soldier’s bedroom raises a cap' : 'no effect';
+    return ROOM_TYPE[room.type]!.benefit === 'cap' ? 'your own bedroom has no effect yet — only a mercenary’s bedroom raises a cap' : 'no effect';
   }
   /** at the tier's slot depth: which tier gives MORE places (nextSlotTier), in the player's words */
   private maxPlacesReason(room: Room): string {
@@ -1038,7 +1038,7 @@ export class Game {
     const kind = this.roomKind(room);
     if (!kind) return rt.species === 'capacity' ? 'cells hold captives by themselves — accepted captives already count here'
       : rt.species === 'comfort' ? this.noEffectReason(room) : `the ${rt.name} has no places`;
-    if (card.character && card.character.role !== 'captive') return 'soldiers never staff rooms';
+    if (card.character && card.character.role !== 'captive') return 'mercenaries never staff rooms';
     if (kind === 'rack') {
       if (card.character?.role !== 'captive') return 'captives only';
       if (hasTag(card.tags, 'obedient')) return 'raw captives only — already tamed';
@@ -1237,7 +1237,7 @@ export class Game {
       .filter(c => (c.character?.role === 'captive' || cardType(c) === 'relic') && c.location.kind !== 'quest' && this.isOwned(c))
       .filter(c => !(c.location.kind === 'room' && c.location.roomId === roomId))
       .map(c => ({ ...this.planRoomMove(room, c, undefined, p), cardId: c.id, name: c.name }))
-      .filter(r => r.reason !== 'soldiers never staff rooms')
+      .filter(r => r.reason !== 'mercenaries never staff rooms')
       .sort((a, b) => Number(b.ok) - Number(a.ok) || b.gain - a.gain || (b.comfortAfter - b.comfortBefore) - (a.comfortAfter - a.comfortBefore));
   }
 
@@ -1552,7 +1552,7 @@ export class Game {
     const cost = this.hireQuote(cardId);
     if (cost === null) return { reason: 'not at the tavern', fix: null };
     const n = this.roster().length, cap = this.rosterCapacity();
-    if (n >= cap) return { reason: `roster full ${n}/${cap} — a soldier's own bedroom adds one`, fix: { screen: 'build', id: 'bedroom', label: 'Build a bedroom for a soldier' } };
+    if (n >= cap) return { reason: `roster full ${n}/${cap} — a mercenary's own bedroom adds one`, fix: { screen: 'build', id: 'bedroom', label: 'Build a bedroom for a mercenary' } };
     if (this.gold() < cost) return { reason: `costs ${cost}g (short ${cost - this.gold()}g)`, fix: null };
     return null;
   }
@@ -2956,7 +2956,7 @@ export class Game {
     const q = this.state.quests.find(x => x.id === questId);
     if (!q || q.state !== 'open') return 'no such quest';
     const m = this.card(mercId);
-    if (!m?.character || m.character.role !== 'merc') return 'only soldiers go on quests';
+    if (!m?.character || m.character.role !== 'merc') return 'only mercenaries go on quests';
     if (m.location.kind !== 'quest' && !(m.location.kind === 'held' && m.location.state === 'roster')) return 'not on your roster';
     const slot = q.slots[slotIdx];
     if (!slot) return 'no such place';
@@ -3163,7 +3163,7 @@ export class Game {
     if (!q) return { ok: false, msg: 'no such quest' };
     if (q.approaches && !q.chosenApproach) return { ok: false, msg: 'pick an approach first' };
     const m = this.card(cardId);
-    if (!m?.character || m.character.role !== 'merc') return { ok: false, msg: 'only soldiers go on quests' };
+    if (!m?.character || m.character.role !== 'merc') return { ok: false, msg: 'only mercenaries go on quests' };
     let idx = slotIdx;
     if (idx === undefined || !Number.isFinite(idx)) {
       const p = this.placementsFor(cardId).find(x => x.questId === questId);
@@ -3243,7 +3243,7 @@ export class Game {
     return {
       ok: placed > 0,
       msg: placed
-        ? `${n(placed, 'soldier')} placed on ${n(kept, 'quest')} · ${n(marches.length, 'quest')} ready${shortTail}${waitTail}${poorTail}`
+        ? `${n(placed, 'mercenary', 'mercenaries')} placed on ${n(kept, 'quest')} · ${n(marches.length, 'quest')} ready${shortTail}${waitTail}${poorTail}`
         : `nobody free fits anything${shortTail}${waitTail}${poorTail}`,
       placed,
       ...(poor.length ? { warn: true } : {}),
@@ -3407,7 +3407,7 @@ export class Game {
     const q = this.state.quests.find(x => x.id === questId && x.state === 'open');
     if (!q) return 'no such open quest';
     const party = q.slots.filter(s => s.filledBy).length;
-    const back = party ? ` ${party === 1 ? 'The soldier goes' : party === 2 ? 'Both soldiers go' : `All ${party} soldiers go`} back to the hand.` : '';
+    const back = party ? ` ${party === 1 ? 'The mercenary goes' : party === 2 ? 'Both mercenaries go' : `All ${party} mercenaries go`} back to the hand.` : '';
     if (q.chainId) {
       const out = this.abandonChainOutcome(q);
       return out === 'continues' ? `A saga step: the card is gone, the thread dangles — a continuation lead returns to the board.${back}`
@@ -3524,7 +3524,7 @@ export class Game {
     const goesCold = (q: Quest) => (!this.questIsFaucet(q) || this.activeSlots(q).some(s => s.filledBy)) && this.questLapsesAt(q) <= st.cycle + 1;
     if (fillable.length) {
       const cold = fillable.filter(goesCold).length;
-      const idleTxt = `${idle} soldier${idle === 1 ? '' : 's'} idle${cold ? ` · ${cold} go${cold === 1 ? 'es' : ''} cold this END` : ''}`;
+      const idleTxt = `${idle} mercenar${idle === 1 ? 'y' : 'ies'} idle${cold ? ` · ${cold} go${cold === 1 ? 'es' : ''} cold this END` : ''}`;
       if (fillable.length === 1) {
         const q = fillable[0]!, a = this.activeSlots(q);
         steps.push({ kind: 'man', text: `Man "${q.title}"`, detail: `${a.filter(s => s.filledBy).length} of ${a.length} placed · ${idleTxt}`, urgent: cold > 0,
@@ -3536,7 +3536,7 @@ export class Game {
     } else if (idle && unmanned.length) {
       // soldiers idle, quests open, and no quest they can fill: say so (no button — nothing to click)
       steps.push({ kind: 'man', text: `${unmanned.length} quest${unmanned.length === 1 ? '' : 's'} the idle can't fully man`,
-        detail: `${idle} soldier${idle === 1 ? '' : 's'} idle — each quest needs more hands or a better fit`, urgent: false,
+        detail: `${idle} mercenar${idle === 1 ? 'y' : 'ies'} idle — each quest needs more hands or a better fit`, urgent: false,
         target: { screen: 'map' }, act: null });
     }
     // 4) leads the map table could be writing

@@ -118,7 +118,7 @@ describe('storyteller prompt budget', () => {
     expect(render('card', ['first', 'why'], { MAX: 70 })).toContain('trouble: the foe, with what.');
     expect(render('card', ['later', 'latest', 'why', 'will'], { MAX: 70 })).toContain('trouble: the foe, with what, what they will do.');
     for (const v of variants.card) expect(render('card', v.flags, v.vars), v.flags.join(',')).not.toMatch(/opposes you/);
-    expect(render('card', ['first', 'personal'], { MAX: 70 })).toMatch(/- premise\. who: one of your own soldiers\. wants: what they want\. past: their old wrong\. problem: what went wrong\./);
+    expect(render('card', ['first', 'personal'], { MAX: 70 })).toMatch(/- premise\. who: one of your own mercenaries\. wants: what they want\. past: their old wrong\. problem: what went wrong\./);
     // R7 (R3): card 1 tells what went wrong (the plan's "Nobody knows why <clause>" as a plain clause, `problemOf`) and no
     // longer what nobody knows: the log's Open question line carries the question from card 1 on (R6 dropped it in 6 of 24)
     for (const v of variants.card) expect(render('card', v.flags, v.vars), v.flags.join(',')).not.toMatch(/unknown|nobody knows/i);
@@ -196,7 +196,7 @@ describe('storyteller prompt budget', () => {
     // hopes Keep …" or was dropped from the road), and whose use a won thing or person serves ("what they can then do" read as
     // the thing's or the person's)
     expect(plan).toMatch(/why: what the one who asked hopes for from this job, printed after "<name> hopes", so starting "to" or "that": a step short of their want, with only what the job names; for a thing or person won, what it lets the one who asked do\./);
-    expect(render('plan', ['types', 'personal'], PV)).toContain('for a thing or person won, what it lets the soldier do.');
+    expect(render('plan', ['types', 'personal'], PV)).toContain('for a thing or person won, what it lets the mercenary do.');
     expect(plan).not.toContain('word or proof');
     expect(plan).toContain('- showdown: job, people, trouble as above;');
     expect(plan).toMatch(/"showdown": \{"title": "few words", "job": "text", "people"/);
@@ -268,7 +268,7 @@ describe('storyteller prompt budget', () => {
     expect(plan).toContain('gain: what the company then holds, of the kind dealt, never the person in ending.');
     expect(render('plan', ['types', 'personal'], PV)).toContain('gain: what the company then holds, of the kind dealt.');
     expect(plan).toContain("gains: the kind of each job's gain, in order.");
-    expect(render('plan', ['shape', 'episodes'], PV)).toContain('episodes: the jobs before the showdown, in order: what the soldiers do, the kind of win, the kind of gain.');
+    expect(render('plan', ['shape', 'episodes'], PV)).toContain('episodes: the jobs before the showdown, in order: what the mercenaries do, the kind of win, the kind of gain.');
     // R6 (F2): the ENGINE writes the ending buttons (templates per way, the decided person by label), so no option can name
     // the secret (option spoilers 8 in R5, 7 of them gold, N19); the plan writes none
     for (const v of variants.plan) expect(render('plan', v.flags, v.vars), v.flags.join(',')).not.toMatch(/options|"label": "at most/);
@@ -335,11 +335,11 @@ describe('storyteller prompt budget', () => {
     expect(render('report', ['saga', 'moved'], { B: 60, A: 140 })).not.toMatch(/what is different|clue/);
     expect(render('report', ['saga', 'moved', 'people'], { B: 60, A: 140 })).toContain('people: who else is there');
     const fo = render('report', ['saga', 'moved', 'decides', 'option', 'answer'], { B: 60, A: 140 });
-    expect(fo).toMatch(/decides: whose deed wins it[\s\S]*plan: what the soldiers do, shown in after/);
+    expect(fo).toMatch(/decides: whose deed wins it[\s\S]*plan: what the mercenaries do, shown in after/);
     expect(fo).not.toMatch(/settles it|chosen|choice/);
     // R7 verify: a won finale's plan is carried out (the Outcome line under the report says it happened; a Sonnet finale showed the
     // plan meant, then dropped, over the reveal); a lost one's is only what they do
-    expect(render('report', ['saga', 'moved', 'decides', 'option', 'carried', 'answer'], { B: 60, A: 140 })).toContain('- plan: what the soldiers carry out, shown in after, in your own words.');
+    expect(render('report', ['saga', 'moved', 'decides', 'option', 'carried', 'answer'], { B: 60, A: 140 })).toContain('- plan: what the mercenaries carry out, shown in after, in your own words.');
     // R4 verify: a label is built from the data alone, their trade and at most one trait word ("what a stranger sees" made
     // the writer coin looks and a race the engine never dealt: "pale elf grove singer" for a human), never a name
     // R5 verify: race and trade only; a trait word in the label became a fixed epithet in every job, trouble and card
@@ -379,7 +379,7 @@ describe('storyteller prompt budget', () => {
     expect(render('card', ['later', 'latest', 'intro'], { MAX: 70 })).toContain('intro: new to the player; first mention gives label and name.');
     // R4 verify 2: before stops short of the job's goal (for a find or catch job, arriving IS the goal: before did the
     // job, then the failure contradicted it)
-    expect(render('report', ['saga', 'failure', 'stopped'], { B: 60, A: 140 })).toContain('- before: at most 60 words. The soldiers meet what stands in their way, short of the goal, never repeating the card.');
+    expect(render('report', ['saga', 'failure', 'stopped'], { B: 60, A: 140 })).toContain('- before: at most 60 words. The mercenaries meet what stands in their way, short of the goal, never repeating the card.');
     // R5 verify: a failed job's summary is only what stopped the company: the retry card is dealt it as `retry`, and "what
     // the company tried and what stopped it" put the job on the card twice (the chronicle puts the job in front)
     // R5 verify 2: "no wound" says why (the wound is printed beside the summary): a partial whose price is the wound took its

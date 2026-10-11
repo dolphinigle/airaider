@@ -231,7 +231,7 @@ const tagVocab = (withQuarry: boolean) => '════ TAG VOCABULARY ═══
   + (withQuarry ? '\nquarryTags ALONE may also use — TRADES: ruler, soldier, criminal, priest, mystic, artisan, adventurer, entertainer, merchant, scholar, courtesan, sailor, slave, hunter, peasant, servant. BODY: muscular, scrawny, nimble, clumsy, clever, dull, beautiful, ugly, tough, sickly.' : '')
   + '\n════════════════════════';
 
-const ASK_SPEC = '- ask: EXACTLY slotCount entries — one per soldier the job needs. What these DO: the player fills each slot from their own roster, and favored/clashing shift that soldier\'s odds up or down — they never bar anyone. requiredTag DOES bar: no soldier without it can take the slot, so a tag the player owns nobody with strands the card. attribute (str|dex|int|cha|con): what the test truly demands — force→str, stealth or speed→dex, wits→int, parley→cha, endurance→con; extraAttribute (same five) only when the work is genuinely two-natured. favored (ARRAY of 1-3 TAG VOCABULARY words): traits that help. clashing (ARRAY of 0-2, same list): traits that hurt.\n- requiredTag (rare — at most ONE slot per card, most cards none): one TAG VOCABULARY word the job truly DEMANDS; may carry a rank — "word (low|mid|high)" — when mere dabbling won\'t do.';
+const ASK_SPEC = '- ask: EXACTLY slotCount entries — one per mercenary the job needs. What these DO: the player fills each slot from their own roster, and favored/clashing shift that mercenary\'s odds up or down — they never bar anyone. requiredTag DOES bar: no mercenary without it can take the slot, so a tag the player owns nobody with strands the card. attribute (str|dex|int|cha|con): what the test truly demands — force→str, stealth or speed→dex, wits→int, parley→cha, endurance→con; extraAttribute (same five) only when the work is genuinely two-natured. favored (ARRAY of 1-3 TAG VOCABULARY words): traits that help. clashing (ARRAY of 0-2, same list): traits that hurt.\n- requiredTag (rare — at most ONE slot per card, most cards none): one TAG VOCABULARY word the job truly DEMANDS; may carry a rank — "word (low|mid|high)" — when mere dabbling won\'t do.';
 
 /** Only the archetype ACTUALLY dealt reaches the model. The old line defined all eight (77 words,
  *  ~68 of them about jobs not in play) — dead mass for a cheap model (§0) and seven concrete
@@ -267,7 +267,7 @@ function oneOffLightSystem(input: QuestWriteInput): string {
     input.obstacle ? '- obstacle: WHO stands in the way and what they do about it. This is a fact somebody could see, so BUILD THE SENTENCE ON IT — it is what makes this job different from the last one of its kind. Say it in your own words; the person is a station, never a name.' : '',
     input.method ? '- method: HOW the work gets done this time. Bend the job toward it and put it in your own words — never write the word itself.' : '',
     input.keywords?.length && input.hiring && process.env.HIRE2 !== '0' ? '- KEYWORDS: a single seed word. Let it colour WHY this person would come now, and never write the word itself.' :     input.keywords?.length && input.scouting && process.env.SCOUT !== '0' ? '- KEYWORDS: a single seed word. Let it colour what the talkers grumble about, and never write the word itself.' : input.keywords?.length ? '- KEYWORDS: a single seed word. It is there to make this job different from the last one — let it suggest what has gone wrong, and never write the word itself. Where it has more than one sense, any sense will do; pick one and commit.' : '',
-    '- archetype: the shape of the work. slotCount: how many soldiers go — write EXACTLY that many ask entries.',
+    '- archetype: the shape of the work. slotCount: how many mercenaries go — write EXACTLY that many ask entries.',
     archetypeLine(input.archetype),
     input.framedCharacter ? '- framedCharacter: the person this job is about, given by TAGS. On this card they have no name — call them by station or relation (the miller\'s son, a hired man, the widow). They are named later, in the report, when the company reaches them.' : '',
     input.avoid?.length ? '- avoid: the player\'s recent cards. Different trouble, different props.' : '',
@@ -314,9 +314,9 @@ function oneOffLightSystem(input: QuestWriteInput): string {
     // …and its own errand: JOB2's "where the job is to find something out, it ASKS the question"
     // turned every scouting errand into a manhunt ("find which speaker bragged of the knifing")
     (input.hiring && process.env.HIRE2 !== '0'
-      ? '- job (ONE terse line, under twelve words): what the soldier offers to sign them on — never a fight, a capture or a rescue.'
+      ? '- job (ONE terse line, under twelve words): what the mercenary offers to sign them on — never a fight, a capture or a rescue.'
       : input.scouting && process.env.SCOUT !== '0'
-      ? '- job (ONE terse line): what the soldier does THERE to hear of work — sit with whoever talks, stand a round, ask who is hiring. Never someone or something to find: nobody yet knows what the work will be.'
+      ? '- job (ONE terse line): what the mercenary does THERE to hear of work — sit with whoever talks, stand a round, ask who is hiring. Never someone or something to find: nobody yet knows what the work will be.'
       : process.env.SEEN2 !== '0' && errandOf(input.archetype as never)
       ? '- job (ONE terse line, under twelve words, ONE action): ' + errandOf(input.archetype as never) + '.'
       : process.env.JOB2 !== '0'
@@ -339,7 +339,7 @@ function oneOffSystem(input: QuestWriteInput): string {
   // the register, so the two prompts never have to arbitrate between themselves
   if (input.gravity?.startsWith('a small')) return oneOffLightSystem(input);
   return [
-    '═══ THE JOB ═══\nYou write ONE job card for a dark-fantasy mercenary-fort GAME. The player is the company BOSS at the fort; ' + (VOICED_ONE_OFF ? 'the card is the matter arriving in a VOICE — the words of whoever or whatever brought it to the fort, set down for the boss: what is wrong, what they want done, what it pays.' : 'the card is a short briefing TO them ("you"): what came in, what the job is, what it pays.') + ' They read it once and pick which soldiers to SEND — the boss never goes, and the job has not started. The card speaks TO the boss as \'you\'; the company is never \'we\', \'us\' or \'our\'.' + (input.selfDirected ? ' NOBODY BROUGHT THIS IN. There is no client, no messenger and no grievance: the company is going out to LOOK, and the card says where it means to go and what it expects to find there. Never invent someone to hire you.' : ' Only what has reached the fort goes on the card.') + ' GAME WRITING, not literature: every sentence gives the player something to use; a mood-only sentence is cut. Plain everyday words a farmhand would say; short sentences, mostly one clause, no semicolons. People stay NAMELESS BY TRADE — a name appears only when this message hands you one, and only for someone the job centers on. Introduce each person by WHAT THEY ARE TO THE OTHERS IN THE MATTER — who they serve, who they answer to, who they belong to — never by a bare word for a class of person standing alone.',
+    '═══ THE JOB ═══\nYou write ONE job card for a dark-fantasy mercenary-fort GAME. The player is the company BOSS at the fort; ' + (VOICED_ONE_OFF ? 'the card is the matter arriving in a VOICE — the words of whoever or whatever brought it to the fort, set down for the boss: what is wrong, what they want done, what it pays.' : 'the card is a short briefing TO them ("you"): what came in, what the job is, what it pays.') + ' They read it once and pick which mercenaries to SEND — the boss never goes, and the job has not started. The card speaks TO the boss as \'you\'; the company is never \'we\', \'us\' or \'our\'.' + (input.selfDirected ? ' NOBODY BROUGHT THIS IN. There is no client, no messenger and no grievance: the company is going out to LOOK, and the card says where it means to go and what it expects to find there. Never invent someone to hire you.' : ' Only what has reached the fort goes on the card.') + ' GAME WRITING, not literature: every sentence gives the player something to use; a mood-only sentence is cut. Plain everyday words a farmhand would say; short sentences, mostly one clause, no semicolons. People stay NAMELESS BY TRADE — a name appears only when this message hands you one, and only for someone the job centers on. Introduce each person by WHAT THEY ARE TO THE OTHERS IN THE MATTER — who they serve, who they answer to, who they belong to — never by a bare word for a class of person standing alone.',
     '═══ YOUR INPUTS ═══',
     '- location: the land and its anchor facts. A named landmark may be used bare (never with an epithet); other places come from placeNameSuggestions or coined small places of the land.',
     input.intake ? '- intake: HOW this matter reached the company — a settled FACT: the opening must agree with it, but most cards need NO sentence for it; never quote its wording.' : '',
@@ -348,7 +348,7 @@ function oneOffSystem(input: QuestWriteInput): string {
     input.obstacle ? '- obstacle: WHO stands in the way and what they do about it — a fact somebody could see. Build on it: it is what makes this job different from the last one of its kind. Your own words; the person is a station, never a name.' : '',
     input.method ? '- method: HOW the work gets done this time. Bend the job toward it and write it in your own words — never write the word itself.' : '',
     input.keywords?.length ? '- KEYWORDS: sparks for the world, each LABELLED by what kind of seed it is (bond / happening / thing / quality) — use what serves and drop the rest. A label tells you where its word belongs; two of them never become one name or thing. NEVER print a label itself — only the word after it may reach the card. Rebuild phrasing in your own words; a modern word is rendered as its period idea. A feeling word colors what happens — never an adjective stapled onto a person.' : '',
-    '- rarity: how uncommon the work is. level: the weight-class of the work — high level means matters worthy of veterans. slotCount: how many soldiers.',
+    '- rarity: how uncommon the work is. level: the weight-class of the work — high level means matters worthy of veterans. slotCount: how many mercenaries.',
     input.gravity ? '- gravity: sets TONE and the card\'s HARD WORD CEILING, which is a limit and never a target — a small everyday job: NO MORE THAN 25 WORDS, and one sentence is a perfectly good card; a serious matter: no more than 40; a grave affair: no more than 60. Coming in well under is always better than reaching it. Small jobs read brisk, serious matters straight, only a grave affair reads heavy; when a keyword pulls against it, gravity wins.' : '',
     '- rewardEnvelope: the payout\'s shape — the fiction makes it plausible and the pay plain (they work for PAY, never a payoff-free plea). Goods beyond the pay stay UNNAMED on the card (what the job turns up is the report\'s to tell); no talk of stores or inventories.'
       + (/person/.test(input.rewardEnvelope) ? ' The promised person\'s claim stands on its OWN footing (they have nowhere to return, choose to come, owe a debt, or are lawfully taken): no payer "hands", "grants", or "lets keep" a person they do not hold.' : ''),
@@ -394,7 +394,7 @@ const VOICE_EXEMPLARS = [
 ];
 let exemplarTick = 0;
 
-const RESOLVE_HEAD_FRAME = 'You narrate the result of a job a mercenary company\'s soldiers were SENT on, in a dark-fantasy low-medieval world. The OUTCOME is already decided and given to you. The reader is the company\'s boss, who stayed at the fort: narrate the sent party in third person — never "you" in the field. The job\'s CARD is printed directly above your text and the player has just read it: never re-tell what it already said — begin where it left off, and let its own people, places and hook carry through into what happens next.\n';
+const RESOLVE_HEAD_FRAME = 'You narrate the result of a job a company\'s mercenaries were SENT on, in a dark-fantasy low-medieval world. The OUTCOME is already decided and given to you. The reader is the company\'s boss, who stayed at the fort: narrate the sent party in third person — never "you" in the field. The job\'s CARD is printed directly above your text and the player has just read it: never re-tell what it already said — begin where it left off, and let its own people, places and hook carry through into what happens next.\n';
 const RESOLVE_STYLE_DIET = 'Entries in a game session log, read once between dice rolls. Past tense. Plain words, real events, no ornament — every sentence earns its place by what happens in it.';
 const RESOLVE_STYLE_BEAT = 'The report is a BEAT STRIP the game deals out in pieces around its own dice line: your "before", then the game shows the dice, then your "turn" caption and any speech, then your "after". Write each piece to be read alone in its slot. Plain words, real events, no ornament.';
 const RESOLVE_STYLE_DLG = 'Entries in a game session log, read once between dice rolls. Past tense for the telling. The report is a PLAYED SCENE, set down line by line: every line opens with its teller in square brackets — [Narrator] for act and ground, a person\'s NAME for words they speak aloud (the spoken words alone, never "he said"). Narrator lines: plain words, real events, no ornament. Speech lines: a breath each, in the speaker\'s own diction, doing what narration cannot. Every rule below that speaks of sentences binds the [Narrator] lines; "before" ends on a [Narrator] line; the bracketed tags stand outside every word count.';
@@ -403,7 +403,7 @@ const RESOLVE_STYLE_DLG = 'Entries in a game session log, read once between dice
 // a demonstrative quote — a per-call prompt cannot see the last report's shape, so the ENGINE
 // rotates the demanded shape (rotation precedent: pay-gloss pools). Pairs rotate together.
 const SHAPE_ROTATION: [string, string][] = [
-  ['Open "before" on the ground itself — what the place shows before any soldier is named.',
+  ['Open "before" on the ground itself — what the place shows before any mercenary is named.',
    'The LAST sentence of "after" is someone doing one last concrete thing — never a tally of goods, never what it all meant.'],
   ['Open "before" on the person or thing that will resist — the party arrives to find it already there.',
    'The LAST sentence of "after" is an IMAGE — a thing seen, still or in motion; never a tally of goods, never what it all meant.'],
@@ -415,7 +415,7 @@ const SHAPE_ROTATION: [string, string][] = [
 // co-prime axes (openers 4 × closers 5 × speech 3, cycle 60) so adjacent reports never share
 // a shape and the one-quote-per-report cadence breaks. Style atomization: axes combine.
 const R3_OPENERS = [
-  'Open "before" on the ground itself — what the place shows before any soldier is named.',
+  'Open "before" on the ground itself — what the place shows before any mercenary is named.',
   'Open "before" on the person or thing that will resist — the party arrives to find it already there.',
   'Open "before" on the party in motion, already at the place.',
   'Open "before" on the first thing HEARD or the first thing that MOVES.',
@@ -442,7 +442,7 @@ function resolveCoreHead(): string {
       + VOICE_EXEMPLARS[exemplarTick++ % VOICE_EXEMPLARS.length];
   }
   if (PROSE_VARIANT === 'diet' || PROSE_VARIANT === 'r2') return RESOLVE_HEAD_FRAME + RESOLVE_STYLE_DIET;
-  return RESOLVE_HEAD_FRAME + 'GAME WRITING, not literature: entries in a game session log, read once between dice rolls. Past tense. Plain everyday English; short sentences; no semicolons; no similes. Every sentence changes the picture of the job — progress, a setback, a cost, a gain, a fact learned; a sentence of soldiers merely moving or handling gear is cut, and so is a mood-only sentence.';
+  return RESOLVE_HEAD_FRAME + 'GAME WRITING, not literature: entries in a game session log, read once between dice rolls. Past tense. Plain everyday English; short sentences; no semicolons; no similes. Every sentence changes the picture of the job — progress, a setback, a cost, a gain, a fact learned; a sentence of mercenaries merely moving or handling gear is cut, and so is a mood-only sentence.';
 }
 
 // the rule stack: rhythm, one spoken line, load-bearing strangeness (+r2: on-screen
@@ -455,7 +455,7 @@ function proseStack(shape: string[] | null, sceneMode?: 'physical' | 'wits' | 's
     ? 'Vary the [Narrator] lines\' length — let one run long where cause links to effect, and keep the shortest for the moment that matters.'
     : 'Vary sentence length — let one sentence run long where cause links to effect, and keep the shortest for the moment that matters; never three sentences of the same length in a row.';
   const speech = PROSE_VARIANT === 'dlg'
-    ? 'Break narrator runs with a voice where anyone on stage can speak — never three [Narrator] lines running then; a lone soldier gets no invented listener, and a silent scene may run all [Narrator]. The ground moves between exchanges.'
+    ? 'Break narrator runs with a voice where anyone on stage can speak — never three [Narrator] lines running then; a lone mercenary gets no invented listener, and a silent scene may run all [Narrator]. The ground moves between exchanges.'
     : PROSE_VARIANT === 'r3' && shape?.[2]
     ? shape[2]
     : PROSE_VARIANT === 'r4'
@@ -490,7 +490,7 @@ function proseStack(shape: string[] | null, sceneMode?: 'physical' | 'wits' | 's
 const resolveInputs = (q: ResolveQuestInput) => [
   '═══ YOUR INPUTS ═══',
   '- outcome: success = the job done clean — the JOB AS WRITTEN, no more and no less: everything the job line asked for lands, and never take or finish what it only asked to find or scout. partial = done at a COST you must show. failure = the job NOT done; a consequence lands.',
-  '- party: the soldiers sent, COMPLETE (one soldier means ALONE — no "the others"; every member comes home with the party). Pronouns come from tags — a "female" tag is she/her in every clause. A member\'s dossier memory may surface ONLY when the scene calls it up — one touch per person at most, most reports need none, expressed as a NEW action; an invented memory reads true once and false forever. Party members are never the culprit of their own job.',
+  '- party: the mercenaries sent, COMPLETE (one mercenary means ALONE — no "the others"; every member comes home with the party). Pronouns come from tags — a "female" tag is she/her in every clause. A member\'s dossier memory may surface ONLY when the scene calls it up — one touch per person at most, most reports need none, expressed as a NEW action; an invented memory reads true once and false forever. Party members are never the culprit of their own job.',
   '- sceneFacet: one facet you MAY take a single concrete detail from (never write the field\'s name or wording); when it fits nothing in this job, ignore it.',
   // the loot rules are the longest paragraph here, and with coin no longer dealt (NOCOIN) most
   // reports have NO loot — a cold reader called them dead weight crowding out the rules that apply
@@ -595,7 +595,7 @@ const oneOffLightResolveSystem = (q: ResolveQuestInput): string => {
   // is routine work, it usually leaves no mark, and only the company's own people can be an end.
   canBond
     ? '- edges: BOTH ends must be an id from party — nobody else in this scene has one. Routine work rarely leaves a mark: [] is the normal answer, and 1 is the most a job like this ever earns. blurb one line; importance a NUMBER 0-1 (0.3 routine, 0.9 defining).'
-    : '- edges: always [] — one soldier went out alone, and an edge joins two of the company\'s own.',
+    : '- edges: always [] — one mercenary went out alone, and an edge joins two of the company\'s own.',
   q.deliveredCharacters?.length
     ? '- fleshed: one entry per deliveredCharacters id — this is the ONLY call that knows how they came into the company\'s hands, so their who/backstory must belong to THIS job.'
     : '- fleshed: [] — nobody is handed over on this job.',
@@ -767,7 +767,7 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
         '  (a bare genre like "dark fantasy" becomes what that means for the writing: tone, events, atmosphere). Add nothing',
         '  the player did not ask for. Leave out trait wishes — the lists below carry them. Empty string if they gave none.',
         '- npcPrefer / npcAvoid: TRAITS the player wants more of / never for the people the company MEETS (clients, villains,',
-        '  captives, strangers). recruitPrefer / recruitAvoid: the same for people who JOIN the company as soldiers.',
+        '  captives, strangers). recruitPrefer / recruitAvoid: the same for people who JOIN the company as mercenaries.',
         '  A wish about "characters" or "everyone" goes in both. Use ONLY ids from this vocabulary (group: ids):',
         ...Object.entries(vocab).map(([g, ids]) => `    ${g}: ${ids.join(', ')}`),
         '  Empty lists when the player says nothing about traits.',
@@ -875,7 +875,7 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
     async flesh(inputs: FleshInput[]): Promise<FleshOut[]> {
       if (!inputs.length) return [];
       const system = [
-        'You breathe life into characters of a dark-fantasy mercenary company. Each person comes with: name (use as-is), tags, role = what they are to the company (merc = one of its own soldiers, captive = held in its cells, hireling = staff), and context = how they came to the fort — let role and context shape the telling. The tags fix the person\'s SEX and STATION: "female" is she/her and "male" is he/him in every clause, whatever the name\'s sound; who/backstory keep whatever standing the tags and saga (when given) establish — never demote a story\'s central figure to background staff. For EACH person, write:',
+        'You breathe life into characters of a dark-fantasy mercenary company. Each person comes with: name (use as-is), tags, role = what they are to the company (merc = one of its own mercenaries, captive = held in its cells, hireling = staff), and context = how they came to the fort — let role and context shape the telling. The tags fix the person\'s SEX and STATION: "female" is she/her and "male" is he/him in every clause, whatever the name\'s sound; who/backstory keep whatever standing the tags and saga (when given) establish — never demote a story\'s central figure to background staff. For EACH person, write:',
         TAGS_NOTE,
         NUMBER_BAN,
         '(Spans and ages told in words are fine; prices, pay, and tallies stay banned.)',

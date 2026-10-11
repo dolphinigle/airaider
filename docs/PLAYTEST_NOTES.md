@@ -25,7 +25,7 @@ The oddness the designer is pointing at: a *generic sweep for rumours* is being 
 
 **Open questions for triage:** should a lead-hunt bypass card generation entirely (a mechanical
 action with no AI call)? Or keep a card but a deliberately generic one? What does it cost the player
-— does it still take soldiers and a cycle? And does the answer change now that routine one-offs are
+— does it still take mercenaries and a cycle? And does the answer change now that routine one-offs are
 one sentence anyway?
 
 ---
@@ -305,7 +305,7 @@ harness, that is the trap.
 Found while building the rarity marker (2026-08-27), not reported from play.
 
 The marker measures a person's SUBSTANCE — what their tags are worth — against a typical person of
-their level. Both starting soldiers come out at the bottom of the scale, and the marker is right:
+their level. Both starting mercenaries come out at the bottom of the scale, and the marker is right:
 
 ```
 Ixidor Blackbrook   L2   substance 11.4   worth 17g   typical for L2 ≈ 36g   ratio 0.47
@@ -580,14 +580,14 @@ correctly story wise? it doesnt seem to involve the past guy?"*
 Two independent causes, both fixed and both measured (3 arms × 10 sagas, 2 blind judges, r 0.97):
 
 1. **The seed was random.** `seed: sampleSeed(this.rng)` was dealt unconditionally, so a personal
-   chain got a generic what-if that outranked the soldier. Live save proof: the chain *"Paid to the
+   chain got a generic what-if that outranked the mercenary. Live save proof: the chain *"Paid to the
    Wrong Hands"* matches the seed-pool entry `a ransom paid to the wrong hands` verbatim, with the
    focal mercenary demoted to `companion` and the man from his lore edge recast as a generic
    obstacle. Now `personalSeed(merc)` deals his highest-salience active lore edge (falling back to
    the first sentence of his backstory). Aboutness 2.5 → 5.1.
 
 2. **Genesis asks for a job, and a job has a hirer.** Fixing the seed was not enough — 8/10 sagas
-   still opened with a client hiring the company and the soldier's past as an appended clause. A
+   still opened with a client hiring the company and the mercenary's past as an appended clause. A
    personal saga now tells genesis there is NO client: the past came to him, the company acts on
    its own account, and the stake is what the FORT loses. Aboutness 5.1 → **7.9**, soldier-as-
    protagonist 2/10 → **10/10**, prose unchanged.
@@ -598,12 +598,12 @@ is being demoted, look for the slot that outranks it rather than adding emphasis
 ### N11b — the past's OTHER person was being re-invented (FIXED)
 
 Found by reading six shipped-config sagas rather than trusting the N11 score. All six were
-correctly about the soldier — but given the past *"Biddy left Arver behind at a crossing"*, the
+correctly about the mercenary — but given the past *"Biddy left Arver behind at a crossing"*, the
 saga went looking for **Duryn Fernbrook**. Three of the four pasts that named a second person
 replaced them with a coined stranger.
 
-Cause: `game.ts` strips every company soldier but the focal from the genesis slate, and genesis is
-told `assignedNames` are the only names it may coin. A seed naming a fellow soldier therefore hands
+Cause: `game.ts` strips every company mercenary but the focal from the genesis slate, and genesis is
+told `assignedNames` are the only names it may coin. A seed naming a fellow mercenary therefore hands
 it a name it has no permission to use, and it quietly invents someone else. The premise was broken
 anyway — you cannot ride out to find someone standing in your own yard.
 
@@ -689,7 +689,7 @@ hands"*) — the example actions in the errand line are copied. Removing them ma
 lists and scored worse. For a card the scouting post offers every cycle, a steady errand with a
 varying grumble is arguably right; flagged, not ruled.
 
-### N11c — a personal saga introduced the company's own soldier as a stranger (FIXED)
+### N11c — a personal saga introduced the company's own mercenary as a stranger (FIXED)
 
 Live, 2026-09-25: *"A peasant scout, Keesa, came down from higher ground and said the whole of it
 standing … the fee is as agreed."* Keesa lives in the fort. Three dealt strings contradicted the
@@ -701,9 +701,9 @@ saga the genesis wrote, each pasted where it landed (L19):
    no-fee pool ("nobody pays for this one — what the road turns up is the company's").
 3. the naming rule — "the card never opens on a name; every person arrives as what they are" —
    exempted only `introducedNames`, which beat 1 never receives. The exemption now also covers
-   `rosterNames` (the company's own soldiers) whenever the focal is a merc.
+   `rosterNames` (the company's own mercenaries) whenever the focal is a merc.
 
-Eight sagas each, before → after: visitor arrivals 4/8 → 0/8, fee language 8/8 → 0/8, soldier
+Eight sagas each, before → after: visitor arrivals 4/8 → 0/8, fee language 8/8 → 0/8, mercenary
 introduced like a stranger 5/8 → 1/8. After: *"Renee, who once left a man at a crossing and will
 not say why, is returning to Ashroot Crossing to look where she left Arver Stonefield."*
 PERSONAL_CARD=0 restores the old inputs.
@@ -738,7 +738,7 @@ mystery (*"find and hire a healer to treat the sick hunter's son"*). Same L32 tr
 situation form only allows found / missing / stopped openers.
 
 A hire card now has its own form: someone worth hiring, seen at what they do well, and why they
-would JOIN now (nothing wrong, nobody in trouble); its errand is what the soldier offers to sign
+would JOIN now (nothing wrong, nobody in trouble); its errand is what the mercenary offers to sign
 them on. Like the scouting run it always takes the routine register (the voiced heavy card kept
 turning hires into rescues). 10 cards per arm, 2 blind judges:
 
@@ -811,7 +811,7 @@ Once dropped wounds were fixed (N-series, 2026-09-25) the wounds the prose narra
 STICK — and the prose narrates one on nearly every partial. Forced-partial A/B, same cards:
 **20/20** (and 13/13 in the first round) partial reports listed a wound. QUESTS §105 says injury
 comes "typically on failure … occasionally a minor one on a costly partial"; each partial wound
-benches a soldier ~4 cycles.
+benches a mercenary ~4 cycles.
 
 The engine now rolls what a one-off partial costs (🛠 wound 1 in 3; else gear, time, goodwill or a
 rough finish) and deals it as ONE word (`partialCost`); the report shows that price happening.

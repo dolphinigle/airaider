@@ -63,7 +63,7 @@ when the *story* knows best (is there loot here? does this step branch?).
 ## 3a. The player is a MERCENARY BOSS who wants GAIN — every job must answer "what's in it for us?"
 *(2026-07-18 R1 "sell the stake", blind-benched +1.25 and boss-pull 5-0: beat-1 SAGA cards close on an
 engine-dealt `stake` rumor line — the WHOLE matter's worth in world words from the chain envelope
-(recruit/ransom/hoard by payoff band; personal sagas NAME the soldier — an anonymous "one of our own…
+(recruit/ransom/hoard by payoff band; personal sagas NAME the mercenary — an anonymous "one of our own…
 them" judged as pasted boilerplate). Rumor-toned so a slip breaks no promise; the demand lives as
 conditional rule 5 in END position — buried mid-paragraph it fired ~50%, end-position 6/6.)*
 
@@ -201,7 +201,7 @@ Remaining targets (not yet implemented):
   one rite. Verbatim (translated): *"[s3.name] draws and looses, and is still a step slower than the
   griffin's talons"* versus *"[s3.name]'s eye and hand are quick: the arrow blinds its left eye."*
 - **The pre-roll text ends on a LEAN, never a resolution** — an aphorism trailing off, a craving, or
-  the sent soldier rising to commit by name. Then the dice.
+  the sent mercenary rising to commit by name. Then the dice.
 - **The person the card kept anonymous is NAMED in the result.** This confirms anonymity-by-omission
   (§4b) and tells us where the name belongs: the resolver names them at the moment they matter.
 - **The last line delivers a FEELING or points FORWARD, never a fact** — a win undercut by a worry, a

@@ -729,7 +729,7 @@ describe('pipeline arm line (F1): the trouble as one sentence', () => {
     const base = ['types', 'keywords', 'support', 'grafts'];
     // (the plan payload sends `against` with line: who stands against each type)
     const plan = renderSaga('plan', [...base, 'line', 'against']), plain = renderSaga('plan', base);
-    expect(plan).toContain('types: what soldiers do, the kind of win, who stands against it.');
+    expect(plan).toContain('types: what mercenaries do, the kind of win, who stands against it.');
     expect(plan).toContain('trouble: one sentence: who stands against this job (from its type; by label if in cast), what they will do, and why.');
     expect(plan.match(/"trouble": "≤20 words"/g)).toHaveLength(2);
     expect(plan).not.toMatch(/armed people or a beast|"carry"|"will": /);
@@ -835,7 +835,7 @@ describe('pipeline arm link (F3): each job\'s lead first', () => {
     expect(plan).toContain('a step short of their want, with only what the job names; word or proof only as a hope');
     expect(plan).not.toContain('what they can then do');
     expect(renderSaga('plan', base)).toContain('with only what the job names: for a thing or person, what they can then do;');
-    expect(renderSaga('plan', [...base, 'link', 'personal'])).toContain('something the soldier knows');
+    expect(renderSaga('plan', [...base, 'link', 'personal'])).toContain('something the mercenary knows');
     // what card 1 shows is shown before ANY job (beside a lead built from a learn, "before play" read as "before that job")
     expect(plan).toContain('the showdown\'s too, show before any job is played: never a learn, a gain or the answer.');
     expect(renderSaga('plan', base)).toContain('the showdown\'s too, are shown before play: never a learn or the answer.');
@@ -1132,7 +1132,7 @@ describe('the stack round (S1–S3): a shipped arm plus one change, each against
     expect((t.planCall.payload.types as { against?: string }[]).every(x => !!x.against)).toBe(true);
     const sys = renderSaga('plan', t.planCall.flags, t.planCall.vars);
     expect(sys).toContain('trouble: who stands against it (from its type), with what, what they will do.');
-    expect(sys).toContain('learn: a plain fact the soldiers find, see or hear there,');
+    expect(sys).toContain('learn: a plain fact the mercenaries find, see or hear there,');
     expect(sys).toContain("the seed's people are among them, or added if none fits; add nobody else who matters.");
     expect(sys).not.toMatch(/armed people or a beast|"carry"|someone is one of them/);
     // every card: the trouble is ONE phrase (three labelled parts came back as "They carry X. They will Y."), the job a task
@@ -1146,7 +1146,7 @@ describe('the stack round (S1–S3): a shipped arm plus one change, each against
       const met = { met: new Set(t.plan.cast.filter(q => (c.payload.names as { name?: string }[]).some(n => n.name === q.name)).map(q => q.id)), named: new Set<string>(), seen: new Set<string>() };
       for (const key of ['latest', 'retry', 'job', 'why', 'trouble'] as const) if (typeof c.payload[key] === 'string') expect(namedIn(c.payload[key] as string, t.plan, met), key).toBe(c.payload[key]);
       // a met person's role: the whole trade, definite — never an introduction's indefinite, never the label's last word alone
-      for (const n of c.payload.names as Record<string, unknown>[]) if (n.name && !n.intro && n.label !== 'one of your soldiers') expect(n.label).toBe(roleOf(t.plan.cast.find(q => q.name === n.name)!));
+      for (const n of c.payload.names as Record<string, unknown>[]) if (n.name && !n.intro && n.label !== 'one of your mercenaries') expect(n.label).toBe(roleOf(t.plan.cast.find(q => q.name === n.name)!));
     }
   });
   it('clean\'s small pieces: a role in full and definite; a cost its owner\'s own; a last chance\'s stake keeps its owner in names', () => {
@@ -1282,7 +1282,7 @@ describe('pipe part want: every later card says whom the job is for and their wa
     const base = await play(game, personal), nw = await play(`${game}+want`, personal);
     const plan = nw.rec.plan!, client = clientOf(plan), k = knowingOf(nw.rec), want = askerWant(plan, k)!;
     expect(want).toBe(`${forWho(plan, k)}, wants ${wantPhrase(client.want)}.`);
-    expect(forWho(plan, k)).toMatch(new RegExp(`^${client.name}, ${personal ? 'one of your soldiers$' : 'an? '}`));
+    expect(forWho(plan, k)).toMatch(new RegExp(`^${client.name}, ${personal ? 'one of your mercenaries$' : 'an? '}`));
     // the plan and card 1 are the shipped pipe's, byte for byte (want changes no plan and no card 1)
     expect(nw.plans).toEqual(base.plans);
     expect(nw.cards[0]).toEqual(base.cards[0]);

@@ -2,7 +2,7 @@
 
 **Status: built 2026-09-29 (prototype).** Designer brief: *"UI very similar to Sultan's Game … quests as
 points on a MAP, hover shows info, click opens the detail; a quest-list sidebar; better tabs; build with
-room icons that say what each room does; IMAGES for characters (cheapest, only for soldiers you recruit,
+room icons that say what each room does; IMAGES for characters (cheapest, only for mercenaries you recruit,
 only after recruitment); the card hand at the bottom, draggable, able to hold very many cards; keep the
 QoL for deciding who goes where."* Mockups: the claude.ai canvas "Airaider UI mockups". Reference corpus:
 Sultan's Game map/rite/hand screens (researched 2026-09-29). Code: `v3/web/`.
@@ -33,14 +33,14 @@ sheet**. The reckoning stays its own page (TEMPO P10).
 
 ## 3 · The hand — the Sultan card strip
 
-- Always on screen. Four **bags**: Soldiers · Captives · Relics · Stores (keys 1–4). In the fort a **selected
+- Always on screen. Four **bags**: Mercenaries · Captives · Relics · Stores (keys 1–4). In the fort a **selected
   room arms the hand**: it switches to the bag that fills that room, dims what the room refuses and badges what it would
   gain; a 0-place room shows `Add a place · Ng` in the hand bar. Captive cards carry a state chip (RAW / RACK cN / TAMED /
   ON SHOW · room); relics on show say where.
 - Overflow squeezes into **slivers** (hover to peek); **All cards** (B) opens the drawer: search, bag
   filter, relics filed into **folders by kind** that fan out, stackables as one card with a count.
 - Card face: name, portrait, level, wound chip, where they're placed. Numbers appear only when they help
-  decide: an armed place badges every soldier with their coins there, sorted best first, with the reason
+  decide: an armed place badges every mercenary with their coins there, sorted best first, with the reason
   (`+ roguery`, `− playful`, `wound −2`).
 
 ## 4 · Who goes where (the QoL that must survive)
@@ -48,13 +48,13 @@ sheet**. The reckoning stays its own page (TEMPO P10).
 Every path is ONE engine call both UIs make (G5). Words, not coin arithmetic: the pooled quest shows the engine's
 5-word band (likely / coin-flip / a partial at best / long shot / hopeless — `oddsBand`), single places and cards show
 only strong / fair / weak (`slotStrength`), with why-chips (`+roguery`, `−playful`, `wound −N`).
-- **Drag a soldier over the map** → every marker shows their best place, coins and strength (and the quest they
+- **Drag a mercenary over the map** → every marker shows their best place, coins and strength (and the quest they
   would leave); **drop** →
   `Game.sendTo` (their best free place there; moves them off another quest). CLI: `send <q> <merc>`.
-- **The soldier's sheet lists no quest places** (designer 2026-10-06: the "Send them to" block is gone — the map drag and
-  the quest page place soldiers). It keeps their must-be lock line (`🔒 Locked to <quest>`, up top with level and wounds).
+- **The mercenary's sheet lists no quest places** (designer 2026-10-06: the "Send them to" block is gone — the map drag and
+  the quest page place mercenaries). It keeps their must-be lock line (`🔒 Locked to <quest>`, up top with level and wounds).
   The explicit CLI `fit <merc>` still lists their best place on every quest (`Game.placementsFor`).
-- Quest page: click a place then a card, or drag onto a niche — both `sendTo(q, merc, slot)`: moves a soldier off
+- Quest page: click a place then a card, or drag onto a niche — both `sendTo(q, merc, slot)`: moves a mercenary off
   another quest, and a taken niche SWAPS. Auto (`autoAssign`); board Auto-fill every quest (`autoAssignAll`). Clicking a
   card with nothing armed sends them to their best place on the open quest. Finale approaches show their facts.
 
@@ -90,9 +90,9 @@ only strong / fair / weak (`slotStrength`), with why-chips (`+roguery`, `−play
 
 - Painted by `gpt-image-2.5-sunburst`, quality low (~half a US cent; 158 output tokens), in the ../mahjong reference
   style (refined anime, flat two-tone cel shading, chest-up bust, transparent ground; the prompt is built from the
-  soldier's traits and leans attractive — designer 2026-09-30). Cache is versioned (`.v2.webp`), so a style change
+  mercenary's traits and leans attractive — designer 2026-09-30). Cache is versioned (`.v2.webp`), so a style change
   repaints. **Only for
-  roster soldiers, only once they are on the roster** (founders count — they are on the roster). Never
+  roster mercenaries, only once they are on the roster** (founders count — they are on the roster). Never
   tavern candidates, captives or quest cast (cast show initials). Cached per save in
   `saves/portraits/<save>/`. Real AI only; `AIRAIDER_PORTRAITS=0` turns it off. `server/portraits.ts`.
 - UI-only: the engine never reads a portrait. The text UI shows no picture — that is the one
@@ -144,7 +144,7 @@ Added by the 2026-09-30 audit fixes (doc gaps — confirm or overturn):
    build list says so; no bag says "build X first"; holding works without a Holding cell.
 10. The END guard also covers a saga's continuation lead going cold, a lead carrying money going cold, a captive handed
     off from holding and a hireable tavern guest leaving. "Nobody marches while soldiers idle" is NOT guarded.
-11. Auto on a quest the idle soldiers cannot fully man places nobody (Auto-fill-all already undid such placements).
+11. Auto on a quest the idle mercenaries cannot fully man places nobody (Auto-fill-all already undid such placements).
 12. A move into a free place that LOSES prestige is allowed, labelled with the loss (only a full room's swap must gain).
 13. The scroll names a prestige room to build when the Great Hall waits on prestige and none stands; no Tavern hint.
 

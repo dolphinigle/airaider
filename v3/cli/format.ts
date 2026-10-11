@@ -94,7 +94,7 @@ export const render = {
       'BUILD   build <type> [ownerId] [F,C] · upgrade <roomId> · renovate <roomId> <style>',
       '        excavate · gh   (styles: human elven wolfkin lizardkin ancient exotic)',
       'ROOMS   setin <cardId> <roomId> [idx] — set a relic / captive in a room (best free place, or a swap that gains)',
-      '        fit <cardId> — where it could go: a soldier on every quest, a captive or relic in every room',
+      '        fit <cardId> — where it could go: a mercenary on every quest, a captive or relic in every room',
       '        fit <cardId> <roomId> — that room place by place (an occupied place swaps: what it costs)',
       '        unslot <roomId> <idx> (off a rack: unslot! — breaking is lost) · slot <roomId> <idx> <cardId>',
       '        focus <mercId> single|dual|none <attr> [attr2]',
@@ -601,7 +601,7 @@ export const render = {
     }
     // captives and relics: every room (the fort drag's glow and the sheet's "Set them in")
     const rows = g.roomPlacementsFor(id);
-    if (!rows.length) return `${m.name}: nothing to set in a room (soldiers go on quests; stores stay stored)`;
+    if (!rows.length) return `${m.name}: nothing to set in a room (mercenaries go on quests; stores stay stored)`;
     const s = g.captiveState(id);
     const head = s ? `${m.name} — ${s.state === 'breaking' ? `on the rack, tamed c${s.doneAt}` : s.state === 'onShow' ? `on show in the ${s.whereName}` : s.state}` : `${m.name}${g.whereName(id) ? ` — on show in the ${g.whereName(id)}` : ''}`;
     // on show: why it earns what it does there, whole (Game.slotWhy — the GUI sheet's "here" row says the same)

@@ -198,13 +198,13 @@ export function Hand({ s, q, armed, pick, drag, setDrag, openDrawer, drawer, mod
       onDragEnd={() => setDrag(null)} />;
   };
 
-  const labels: [Bag, string][] = [['soldiers', 'Soldiers'], ['captives', 'Captives'], ['relics', 'Relics'], ['stores', 'Stores']];
+  const labels: [Bag, string][] = [['soldiers', 'Mercenaries'], ['captives', 'Captives'], ['relics', 'Relics'], ['stores', 'Stores']];
   const hint = shared && q && !(q.approaches && !q.chosenApproach) ? `${shared[0]!.toUpperCase()}${shared.slice(1)} — every card here.`
     : slot ? `Sorted for the ${slot.test.attributes.join('+').toUpperCase()} place — best first. Click a card to place it.`
     : q && q.approaches && !q.chosenApproach ? 'Pick how it ends first — then the hand sorts itself for it.'
     : q ? 'Best for this quest first. Click a card to send them to their best place here.'
     : room && fortMode && (bag === 'captives' || bag === 'relics') ? roomHint(room)
-    : bag === 'soldiers' ? 'Drag a soldier onto a quest on the map · click a card to read it'
+    : bag === 'soldiers' ? 'Drag a mercenary onto a quest on the map · click a card to read it'
     : fortMode && bag === 'captives' ? 'Raw captives go on a rack, tamed ones on show — click a room to arm the hand, or drag onto one'
     : fortMode && bag === 'relics' ? 'Relics on show raise prestige — click a room to arm the hand, or drag onto one'
     : bag === 'captives' || bag === 'relics' ? 'Click a card to read it and set it in a room' : '';
@@ -290,7 +290,7 @@ export function Inventory({ s, close, pick, modal }: { s: S; close: () => void; 
     <section className="drawer" aria-label="Every card">
       <div className="dnav">
         <div className="h">EVERY CARD</div>
-        {([['all', 'All', total], ['soldiers', 'Soldiers', s.roster.length], ['captives', 'Captives', allCaptives.length],
+        {([['all', 'All', total], ['soldiers', 'Mercenaries', s.roster.length], ['captives', 'Captives', allCaptives.length],
           ['relics', 'Relics', s.relics.length], ['stores', 'Stores', s.liabilities.length]] as const).map(([b, l, n]) =>
           <button key={b} className={'bag' + (bag === b ? ' on' : '')} onClick={() => setBag(b as any)}>{l}<span className="c">{n}</span></button>)}
         <p className="keys">0 all · 1–4 bags · Esc closes</p>
@@ -310,7 +310,7 @@ export function Inventory({ s, close, pick, modal }: { s: S; close: () => void; 
           {nothing && <p className="empty">Nothing matches “{text}”.</p>}
           {/* the sections flow side by side on a wide window (each as wide as its cards need) */}
           <div className="dgroups">
-          {shown('soldiers', roster.length, s.roster.length) && <div className="dgroup"><div className="dsec">Soldiers <span>{t ? `${roster.length} of ${s.roster.length}` : roster.length}</span></div>{grid(roster)}</div>}
+          {shown('soldiers', roster.length, s.roster.length) && <div className="dgroup"><div className="dsec">Mercenaries <span>{t ? `${roster.length} of ${s.roster.length}` : roster.length}</span></div>{grid(roster)}</div>}
           {shown('captives', captives.length, allCaptives.length) && <div className="dgroup"><div className="dsec">Captives <span>{t ? `${captives.length} of ${allCaptives.length}` : captives.length}</span></div>{grid(captives)}</div>}
           {shown('relics', relics.length, s.relics.length) && <div className="dgroup">
             <div className="dsec">Relics <span>{relics.length}{t ? ` of ${s.relics.length}` : ''} in {Object.keys(forms).length} folder{Object.keys(forms).length === 1 ? '' : 's'}</span></div>

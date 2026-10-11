@@ -140,7 +140,7 @@ describe('saga prompt budget (the shipped R5 templates)', () => {
     expect(renderSaga('report', fin, { B: 60, A: 140 })).toContain('The secret comes out within it, in time order:');
     const fixedFin = renderSaga('report', [...fin, 'known', 'have', 'edge', 'fixes'], { B: 60, A: 140 });
     expect(fixedFin).toContain('nothing else changes. Someone says, shows or finds the secret, pointing to a fact from known. End on');
-    expect(fixedFin).toContain('- plan: what the soldiers do, shown in after.');
+    expect(fixedFin).toContain('- plan: what the mercenaries do, shown in after.');
     expect(fixedFin.match(/\bown\b/g)).toHaveLength(1);
     expect(fixedFin).not.toMatch(/time order|built from/);
     // a finale's stake: "this last chance" only at a last chance (the build's one case, byte for byte)
