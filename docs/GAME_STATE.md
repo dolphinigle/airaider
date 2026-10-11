@@ -9,7 +9,7 @@
 Everything you own — mercs, captives, relics, stackables (gold/debt) — is a **Card** (`type` tag: character / relic / stackable; §7.1), stored uniformly. The save is:
 - the **card collection** — each card's `location` is a **CardSlot reference** when slotted (`room:<id>#1` / `quest:<id>#2`), else a holding state (roster / inventory / staged / limbo — limbo = generated but not yet owned, e.g. a chain focal pre-acquisition);
 - **gold** (a stackable card, shown as a counter), the **fort** (cells + rooms + their CardSlots + upgrade levels + stored theme-tags), the **lead board**, **active chains**, the **Great Hall tier**, **unlocked regions**, and the **RNG state** (persisted, not re-derived);
-- the **lore graph** ([LORE.md](LORE.md)): nodes' blurbs/dossiers + memory-edges — **append-only with an `active` flag; nothing is ever hard-deleted** (inactive = hidden from AI context, still player-readable in the Chronicle).
+- the **lore graph** ([LORE.md](LORE.md)): nodes' living documents (LORE §1b) + memory-edges — **append-only with an `active` flag; nothing is ever hard-deleted** (inactive = hidden from AI context, still player-readable in the Chronicle).
 
 **Comfort/prestige are computed live, never stored** — recomputed on any card move; free rearrange. **Cards are never attached to cards** — only rooms and quests have CardSlots. A character's gear lives in its owned bedroom; an **injury is intrinsic tiered state** on the character (GENERATION_FLOW §11), not a card or tag.
 
@@ -18,7 +18,7 @@ Everything you own — mercs, captives, relics, stackables (gold/debt) — is a 
 ## 2. Determinism — the three producers of saved state 🔒
 
 1. **Engine (seeded RNG + fixed mappings)** — dice outcomes, reward *values* (generated at quest birth), XP/gold/prestige math, band→tier conversions. Reproducible from the seed.
-2. **AI: creative + bounded categorical picks** — bibles, narration, memory-edges (+ per-edge blurbs; the engine renders dossiers from them), room theme-tags, reward **kind**/label, injury **severity band**. **All saved as concrete fields.** The AI never emits a raw number — it picks a category; the engine prices it. (Sole exemption: the validated per-edge importance score 0–1, §14 — it feeds salience only, never economy/dice.)
+2. **AI: creative + bounded categorical picks** — bibles, narration, memory-edges (+ per-edge blurbs), living-document rewrites (LORE §1b), room theme-tags, reward **kind**/label, injury **severity band**. **All saved as concrete fields.** The AI never emits a raw number — it picks a category; the engine prices it. (Sole exemption: the validated per-edge importance score 0–1, §14 — it feeds salience only, never economy/dice.)
 3. **AI: pickers** (e.g. the lore selector "which candidates need full text?") — **discarded**; their only effect is the creative call's output, which is saved.
 
 **Reload re-runs NO AI call** — every AI effect is baked into the save. "Determinism" = engine math is seeded; AI outputs are persisted; nothing is re-derived.
