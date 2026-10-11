@@ -1,5 +1,5 @@
-// The saga storyteller's prompt templates as the GAME ships them (docs/STORYTELLER.md §2.8): one .txt per call beside
-// this file, copied verbatim from the saga lab at tag `storyteller-build-src` (R5: plan · outline · card · report). The
+// The chapter storyteller's prompt templates as the GAME ships them (docs/STORYTELLER.md §2.8): one .txt per call beside
+// this file, copied verbatim from the chapter lab at tag `storyteller-build-src` (R5: plan · outline · card · report). The
 // lab keeps its own copies in src/ai/prompts/*.txt, which it goes on editing; these are the measured ones.
 //   [[x]] at the start of a line   the line is kept only when x is on
 //   [[x]]…[[/x]] inside a line     the span is kept only when x is on
@@ -13,16 +13,16 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 /** pick, premise: a kit seed arm's small steps before the plan (North Star 7–8; engine/seedkit.ts). showdown: pipe arm
- *  late's (E1) finale, written after play (engine/saga.ts PipeArm) */
-export type SagaTemplate = 'plan' | 'card' | 'report' | 'outline' | 'pick' | 'premise' | 'showdown';
+ *  late's (E1) finale, written after play (engine/chapter.ts PipeArm) */
+export type ChapterTemplate = 'plan' | 'card' | 'report' | 'outline' | 'pick' | 'premise' | 'showdown';
 /** §2.8.7: a rule cannot land without cutting another — every variant, all its lines on, skeleton included (R5's budgets;
  *  the seed lab's two small calls at most 80; the pick 85, as kit+pick+cast's names two things, its keywords and a person;
  *  a new small prompt at most 90) */
-export const SAGA_WORD_BUDGET: Record<SagaTemplate, number> = { plan: 620, card: 160, report: 310, outline: 115, pick: 85, premise: 80, showdown: 90 };
+export const CHAPTER_WORD_BUDGET: Record<ChapterTemplate, number> = { plan: 620, card: 160, report: 310, outline: 115, pick: 85, premise: 80, showdown: 90 };
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
-const cache = new Map<SagaTemplate, string>();
-export function sagaTemplate(name: SagaTemplate): string {
+const cache = new Map<ChapterTemplate, string>();
+export function chapterTemplate(name: ChapterTemplate): string {
   let t = cache.get(name);
   if (t === undefined) { t = fs.readFileSync(path.join(DIR, `${name}.txt`), 'utf8'); cache.set(name, t) }
   return t;
@@ -48,5 +48,5 @@ export function renderTemplate(tpl: string, on: Iterable<string>, vars: Record<s
   return s;
 }
 
-export const renderSaga = (name: SagaTemplate, on: Iterable<string>, vars?: Record<string, string | number>) => renderTemplate(sagaTemplate(name), on, vars);
+export const renderChapter = (name: ChapterTemplate, on: Iterable<string>, vars?: Record<string, string | number>) => renderTemplate(chapterTemplate(name), on, vars);
 export const wordCount = (s: string) => s.split(/\s+/).filter(Boolean).length;

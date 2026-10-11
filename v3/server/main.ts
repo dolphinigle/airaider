@@ -319,12 +319,12 @@ function stateView() {
         id: q.id, title: q.title, situation: q.situation, job: q.job,
         level: q.level, rarity: q.rarity, region: REGION[q.region]!.name, regionId: q.region, archetype: q.archetype,
         chainId: q.chainId ?? null, beat: q.beatIndex ?? null, isFinale: !!q.isFinale,
-        // a saga card's screen beyond its prose (the v4 storyteller): the quest log rows the engine rendered
+        // a chapter card's screen beyond its prose (the v4 storyteller): the quest log rows the engine rendered
         // ({kind: for|road|roadrow|known|knownrow|held|open|sofar|sofarrow, mark?, title?, text}), logFirst (rows above the
         // prose), where the card sits (part n of N, again, the last chance, setbacks) — the CLI prints the same rows
         // (cli/format questDetail).
-        // The server builds no saga text
-        saga: q.saga ?? null,
+        // The server builds no chapter text
+        chapter: q.chapter ?? null,
         ready: game.isReady(q.id),
         // THE MARCH WORD: 'waiting' = only its lock fills it and it stays home until the player says march; 'given' = the
         // word is given (it marches); null = the word does not apply — the quest page and the board toggle it (CLI march/hold)
@@ -338,7 +338,7 @@ function stateView() {
         abandonText: game.abandonConsequence(q.id), // the two-step abandon confirm's consequence line
         // {coins,bar,success,partial,precision, band: pooled verdict once manned | null, partialAt, filled, of}
         odds: o,
-        // ON THIS MATTER: the people this saga card calls by name — [{id, name, label, cardId?, card?}]; a person with a
+        // ON THIS MATTER: the people this chapter card calls by name — [{id, name, label, cardId?, card?}]; a person with a
         // real card (the focal, a soldier) carries what it IS — tags, stars, level — never where it sits (no RAW chip
         // on someone you do not hold). The CLI prints the same (cli/format questDetail)
         cast: game.questCast(q.id).map(c => {
@@ -379,7 +379,7 @@ function stateView() {
         createdCycle: q.createdCycle,
       };
     }),
-    // one view for both UIs — the saga as the company knows it (Game.chainViews): the quest log rows as they stand,
+    // one view for both UIs — the chapter as the company knows it (Game.chainViews): the quest log rows as they stand,
     // card 1, So far, the answer once the finale is played, the people seen, plus the economy fields
     chains: game.chainViews(),
     lore: Object.values(st.lore.nodes).map(n => ({

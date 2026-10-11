@@ -20,7 +20,7 @@ const variants: Record<'plan' | 'card' | 'report', { flags: string[]; vars: Reco
   // R4: on later cards what is known, held and still open, and whom the company acts for, are the engine's quest log,
   // never the card's, and whose fate the finale settles is the buttons' (R4 verify); `lose` comes only at a last
   // chance. R3 verify 2: `intro` / `part` only when some entry in names carries one
-  // R5 verify: `returning` puts a returning asker's past with you in card 1's premise (no personal saga has one)
+  // R5 verify: `returning` puts a returning asker's past with you in card 1's premise (no personal chapter has one)
   // R5 verify 2: `why` the job's hope, from its one owner (job 1: the plan's why; a later job: its road line), never on the
   // finale (the showdown's why was the For line's want); `will` the trouble's deed, on a later card or finale with neither a
   // retry (the stopper was that deed) nor `lose` (the deed restated the loss)
@@ -155,7 +155,7 @@ describe('storyteller prompt budget', () => {
     // rule; and the secret is said only by someone in people (a soldier on no earlier job announced a fact nobody had found)
     const fk = render('report', ['saga', 'moved', 'people', 'answer', 'known', 'have', 'edge'], { B: 60, A: 140 });
     // R7 (R0): R5's reveal again, its reason said plainly: R6's "in pieces …, never as one line, never retold" left the reason
-    // unsaid in about 12 sagas (N23: question answered 100% → 79%); and known is never shown as new at the finale too (N28: two
+    // unsaid in about 12 chapters (N23: question answered 100% → 79%); and known is never shown as new at the finale too (N28: two
     // finales found an old clue again as new once R6 verify 2 dropped it there)
     expect(fk).toContain('The secret comes out within it, in time order, built from known: said by one in people, seen or found, its reason said plainly.');
     expect(fk).not.toMatch(/in pieces|never as one line|never retold/);
@@ -283,7 +283,7 @@ describe('storyteller prompt budget', () => {
     expect(plan).toContain('"trouble": {"who": "≤6 words", "with": "≤6 words", "will": "≤6 words"}');
     // R7 (R2): "by label if in cast" folded into one naming rule for people and places (below)
     expect(plan).toContain('trouble: who stands in the way (armed people or a beast), with what, what they will do.');
-    // R7 (R2): one town plus the region's landmark are dealt; every other place is told by what it is (a saga carried about nine
+    // R7 (R2): one town plus the region's landmark are dealt; every other place is told by what it is (a chapter carried about nine
     // invented proper nouns: soldiers, people, three towns)
     // R7 verify 2: people by trade (a label shortened to its race, "drag the elf off", is no reference the engine can name)
     expect(plan).toContain('Use no name the data does not give: people by trade, places by what they are.');

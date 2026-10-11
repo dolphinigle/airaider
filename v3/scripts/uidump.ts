@@ -1,4 +1,4 @@
-// Dump ONE real saga quest + the roster + the saga's cast, as JSON, to design the quest screen
+// Dump ONE real chapter quest + the roster + the chapter's cast, as JSON, to design the quest screen
 // against real generated prose and real numbers rather than lorem ipsum.
 // Usage: npx tsx scripts/uidump.ts [seed] [out]
 import * as fs from 'node:fs';
@@ -24,7 +24,7 @@ for (let c = 0; c < 8 && !q; c++) {
   }
   if (!q) await g.endCycle();
 }
-if (!q) { console.error('no saga quest'); process.exit(1) }
+if (!q) { console.error('no chapter quest'); process.exit(1) }
 const roster = g.roster().filter(m => m.location.kind === 'held').map(m => ({
   id: m.id, name: m.name, level: m.character!.level, tags: renderTags(m.tags),
   worth: Math.round(unitWorth(m)), stars: unitStars(m),

@@ -1,12 +1,12 @@
-// SAGA LAB — the scorer (docs/STORYTELLER.md §1.1). Aggregates every seat of one ARM (one run or
-// several, e.g. set A + set B of the baseline) into the §1.1 table, with bootstrap 95% CIs over sagas:
+// CHAPTER LAB — the scorer (docs/STORYTELLER.md §1.1). Aggregates every seat of one ARM (one run or
+// several, e.g. set A + set B of the baseline) into the §1.1 table, with bootstrap 95% CIs over chapters:
 //
-//   npx tsx scripts/sagalab/score.ts --runs A_RUN[,B_RUN] [--label base] [--out RUN]
-//   npx tsx scripts/sagalab/score.ts --pair X_RUN,Y_RUN      (paired: arm X − arm Y, e.g. probe2/L_lean,probe2/L_full)
-//   either mode: --m5 j1_sonnet picks M5's second seat (default: the first alongside seat a saga has)
+//   npx tsx scripts/chapterlab/score.ts --runs A_RUN[,B_RUN] [--label base] [--out RUN]
+//   npx tsx scripts/chapterlab/score.ts --pair X_RUN,Y_RUN      (paired: arm X − arm Y, e.g. probe2/L_lean,probe2/L_full)
+//   either mode: --m5 j1_sonnet picks M5's second seat (default: the first alongside seat a chapter has)
 //
-// Reads, per run: sagas/*/meta.json · mech.json (run mech.ts first) · judge/j1_*/<saga>.json ·
-// judge/j2_*/<saga>.json · judge/j3_*/vs_*/<saga>.json · judge/j4_*/*.json, and <saga>/j2_strict.json
+// Reads, per run: chapters/*/meta.json · mech.json (run mech.ts first) · judge/j1_*/<chapter>.json ·
+// judge/j2_*/<chapter>.json · judge/j3_*/vs_*/<chapter>.json · judge/j4_*/*.json, and <chapter>/j2_strict.json
 // (a J2 re-grade on the strict rubric, e.g. of the frozen base: rows M1s, which never touch the rows
 // the frozen baseline score.json was made from). A seat that has not run shows as —. Writes REPORT.md
 // (and score.json) into the first run's folder (or --out).
@@ -15,7 +15,7 @@
 // seed, only the writing differs). Per metric, X − Y with a PAIRED bootstrap CI (resampling slots, both
 // arms together), over the slots where both arms have data. Writes PAIRED_vs_<Y>.md/.json into X.
 //
-// A CI is the 2.5–97.5 percentile of 2,000 resamples of the SAGAS (seeded, so a re-run prints the
+// A CI is the 2.5–97.5 percentile of 2,000 resamples of the CHAPTERS (seeded, so a re-run prints the
 // same numbers). Ratio metrics resample numerator and denominator together.
 //
 // Calibration (Phase 0 findings, docs/STORYTELLER.md §5.0):
@@ -26,15 +26,15 @@
 //      Never compare them across runs read by a different mix of seats.
 //   J3 (M10) scores only ORDER-BALANCED pairs: each pair read in both orders, a pick counts only when
 //      it holds in both. A single-order read is shown, never scored.
-// A run folder holds its sagas under sagas/ (drive runs) or directly (probe runs).
+// A run folder holds its chapters under chapters/ (drive runs) or directly (probe runs).
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { SagaMech } from './mech.js';
+import type { ChapterMech } from './mech.js';
 
 const V3 = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const LAB = path.join(V3, 'scripts/sagalab');
+const LAB = path.join(V3, 'scripts/chapterlab');
 const argv = process.argv.slice(2);
 const opt = (name: string): string | undefined => { const i = argv.indexOf(`--${name}`); return i >= 0 ? argv[i + 1] : undefined };
 
@@ -42,12 +42,12 @@ type J = Record<string, unknown>;
 const readJson = <T = J>(p: string): T | null => { try { return JSON.parse(fs.readFileSync(p, 'utf8')) as T } catch { return null } };
 const dirs = (p: string) => fs.existsSync(p) ? fs.readdirSync(p).filter(f => fs.statSync(path.join(p, f)).isDirectory()) : [];
 const files = (p: string) => fs.existsSync(p) ? fs.readdirSync(p).filter(f => f.endsWith('.json')) : [];
-/** where a run keeps its saga folders: sagas/ for drive runs, the run folder itself for probe runs */
-const sagaRoot = (runDir: string) => fs.existsSync(path.join(runDir, 'sagas')) ? path.join(runDir, 'sagas') : runDir;
+/** where a run keeps its chapter folders: chapters/ for drive runs, the run folder itself for probe runs */
+const chapterRoot = (runDir: string) => fs.existsSync(path.join(runDir, 'sagas')) ? path.join(runDir, 'sagas') : runDir;
 /** the primary J1 seat for taste scores (Phase-0 calibration), and the seats reported alongside it */
 const PRIMARY_J1 = 'j1_opus';
 const ALONGSIDE_J1 = ['j1_gpt5', 'j1_sonnet'];
-/** M5's second seat (the primary is always the first): --m5 SEAT, else the first alongside seat the saga has.
+/** M5's second seat (the primary is always the first): --m5 SEAT, else the first alongside seat the chapter has.
  *  Named, never folder order, so a paired run compares the same two seats on both arms. */
 const M5_SEAT = opt('m5');
 
@@ -65,16 +65,16 @@ interface J2 {
   continuity_errors?: unknown[];
 }
 
-/** one saga's raw material, every seat that ran on it; j2strict = <saga>/j2_strict.json when present */
-interface Saga { run: string; id: string; j1: J1[]; j2: J2[]; j2strict: J2 | null; mech: SagaMech | null }
+/** one chapter's raw material, every seat that ran on it; j2strict = <chapter>/j2_strict.json when present */
+interface Chapter { run: string; id: string; j1: J1[]; j2: J2[]; j2strict: J2 | null; mech: ChapterMech | null }
 
-/** a per-saga [numerator, denominator] (den 0 = no data on this saga) */
-type Frac = (s: Saga) => [number, number];
+/** a per-chapter [numerator, denominator] (den 0 = no data on this chapter) */
+type Frac = (s: Chapter) => [number, number];
 
 function mulberry32(a: number) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296 } }
 
-function estimate(sagas: Saga[], f: Frac, B = 2000): { value: number | null; lo: number | null; hi: number | null; n: number; den: number } {
-  const parts = sagas.map(f).filter(([, d]) => d > 0);
+function estimate(chapters: Chapter[], f: Frac, B = 2000): { value: number | null; lo: number | null; hi: number | null; n: number; den: number } {
+  const parts = chapters.map(f).filter(([, d]) => d > 0);
   const den = parts.reduce((s, [, d]) => s + d, 0);
   if (!parts.length || !den) return { value: null, lo: null, hi: null, n: 0, den: 0 };
   const value = parts.reduce((s, [x]) => s + x, 0) / den;
@@ -99,8 +99,8 @@ const avgOver = (vals: (number | undefined)[]): [number, number] => { const v = 
  *  or a path under runs/), one file per order. */
 interface J3Read { saga: string; firstShown: string | null; keep: string | null; follow: string | null }
 function j3Reads(r: J, self: string, other: string, file: string): J3Read[] {
-  const saga = String(r.saga ?? file.split('.')[0]);
-  if (Array.isArray(r.reads)) return (r.reads as J[]).flatMap(x => j3Reads({ ...x, saga }, self, other, file));
+  const chapter = String(r.saga ?? file.split('.')[0]);
+  if (Array.isArray(r.reads)) return (r.reads as J[]).flatMap(x => j3Reads({ ...x, saga: chapter }, self, other, file));
   const a = (r.answer ?? r) as J;
   const names = [self, other].sort((p, q) => q.length - p.length);
   const runOf = (folder: unknown): string | null => {
@@ -113,29 +113,29 @@ function j3Reads(r: J, self: string, other: string, file: string): J3Read[] {
   const pick = (v: unknown) => v === 'X' ? x : v === 'Y' ? y : null;
   const known = (v: unknown) => typeof v === 'string' && names.includes(v) ? v : null;
   return [{
-    saga, firstShown: known(r.firstShown) ?? x,
+    saga: chapter, firstShown: known(r.firstShown) ?? x,
     keep: known(r.keep) ?? pick(a.rather_keep_playing), follow: known(r.follow) ?? pick(a.follow_more_easily),
   }];
 }
 interface J3Set { dir: string; self: string; other: string; reads: J3Read[] }
 
-function load(runs: string[]): { sagas: Saga[]; j3: J3Set[]; j4: J[]; mech: J[] } {
-  const sagas: Saga[] = [];
+function load(runs: string[]): { chapters: Chapter[]; j3: J3Set[]; j4: J[]; mech: J[] } {
+  const chapters: Chapter[] = [];
   const j3: J3Set[] = [];
   const j4: J[] = [];
   const mech: J[] = [];
   for (const run of runs) {
     const rd = path.join(LAB, 'runs', run);
-    const m = readJson<{ perSaga: SagaMech[]; aggregate: J }>(path.join(rd, 'mech.json'));
+    const m = readJson<{ perSaga: ChapterMech[]; aggregate: J }>(path.join(rd, 'mech.json'));
     if (m) mech.push(m.aggregate);
     const judge = path.join(rd, 'judge');
     const seats = dirs(judge);
-    const root = sagaRoot(rd);
+    const root = chapterRoot(rd);
     for (const id of dirs(root).filter(d => fs.existsSync(path.join(root, d, 'meta.json'))).sort()) {
       // the seat is the folder the file sits in, whatever the file calls itself
       const seatFiles = <T extends { seat: string }>(pre: string) => seats.filter(s => s.startsWith(pre))
         .map(s => { const x = readJson<T>(path.join(judge, s, `${id}.json`)); return x ? { ...x, seat: s } : null }).filter((x): x is T => !!x);
-      sagas.push({
+      chapters.push({
         run, id,
         j1: seatFiles<J1>('j1_'),
         j2: seatFiles<J2>('j2_'),
@@ -152,10 +152,10 @@ function load(runs: string[]): { sagas: Saga[]; j3: J3Set[]; j4: J[]; mech: J[] 
     }
     for (const s of seats.filter(s => s.startsWith('j4_'))) for (const f of files(path.join(judge, s))) { const x = readJson(path.join(judge, s, f)); if (x) j4.push(x) }
   }
-  return { sagas, j3, j4, mech };
+  return { chapters, j3, j4, mech };
 }
 
-/** M1 per saga: cards × graded seats.
+/** M1 per chapter: cards × graded seats.
  *   parts — all three parts graded `true` (the §5.0 strict rule: J2 grades a part the card leaves
  *           unclear as "unclear", never `true`). On a legacy boolean-only J2 file this is the lenient
  *           reading, so it is never compared across rubric versions.
@@ -164,7 +164,7 @@ function load(runs: string[]): { sagas: Saga[]; j3: J3Set[]; j4: J[]; mech: J[] 
  *           Stricter than `parts` on the new rubric (it also fails "why: unclear" outside the 3 parts).
  *   lax   — every part `true` or "unclear" (watch only).
  *  The mode is chosen per ROW, never guessed per file: an all-`true` grade looks the same in both rubrics. */
-function m1(s: Saga, mode: 'parts' | 'said' | 'lax'): [number, number] {
+function m1(s: Chapter, mode: 'parts' | 'said' | 'lax'): [number, number] {
   let x = 0, d = 0;
   for (const j2 of s.j2) for (const c of j2.cards ?? []) for (const [seat, g] of Object.entries(c.paraphrase_right ?? {})) {
     const parts = [g.who_wants_what, g.what_to_do, g.who_in_way];
@@ -176,12 +176,12 @@ function m1(s: Saga, mode: 'parts' | 'said' | 'lax'): [number, number] {
   return [x, d];
 }
 /** the same, on card 1 only (§5.2: card 1 three ways) */
-const m1Card1 = (s: Saga, mode: 'parts' | 'said'): [number, number] =>
+const m1Card1 = (s: Chapter, mode: 'parts' | 'said'): [number, number] =>
   m1({ ...s, j2: s.j2.map(j => ({ ...j, cards: (j.cards ?? []).filter(c => c.text === 'card_1.md') })) }, mode);
 
 /** the taste scores of ONE J1 seat (the primary seat's rows carry the §1.1 ids) */
 function tasteMetrics(seat: string, sfx: string): Metric[] {
-  const of = (s: Saga) => s.j1.filter(j => j.seat === seat);
+  const of = (s: Chapter) => s.j1.filter(j => j.seat === seat);
   const who = sfx ? `${seat} alongside` : `${seat}, primary`;
   return [
     { id: `M2${sfx}`, name: `Follow, felt (J1 ease 0–10, cards; ${who})`, fmt: 'num', target: sfx ? '—' : 'G3 ≥ base+1.0, above floor · G2 ≥ base', f: s => avgOver(of(s).flatMap(j => cardsOf(j).map(t => t.ease))) },
@@ -194,7 +194,7 @@ function tasteMetrics(seat: string, sfx: string): Metric[] {
   ];
 }
 
-/** the §1.1 metrics that live on sagas — each a Frac, so every one gets the same bootstrap */
+/** the §1.1 metrics that live on chapters — each a Frac, so every one gets the same bootstrap */
 interface Metric { id: string; name: string; f: Frac; fmt: 'pct' | 'num' | 'usd' | 'sec'; target: string; note?: string }
 const METRICS: Metric[] = [
   { id: 'M1', name: 'Follow, objective, STRICT (J2 parts 3/3 `true`; "unclear" = not followed; new rubric only)', fmt: 'pct', target: 'G3 ≥ 90% & ≥ min(base+15pp, 97%) · G2 ≥ 85%', f: s => m1(s, 'parts') },
@@ -203,7 +203,7 @@ const METRICS: Metric[] = [
   { id: 'M1-said c1', name: 'M1-said on card 1 only (base 25%)', fmt: 'pct', target: '—', f: s => m1Card1(s, 'said') },
   // the frozen base was graded on the old boolean rubric; a strict re-grade sits beside it as its own file,
   // so M1 and M1-said above stay exactly as the frozen score.json computed them
-  { id: 'M1s', name: 'M1 strict from a J2 strict re-grade (<saga>/j2_strict.json; for the frozen base: compare with a probe\'s M1)', fmt: 'pct', target: 'not below base (G1)', f: s => s.j2strict ? m1({ ...s, j2: [s.j2strict] }, 'parts') : [0, 0] },
+  { id: 'M1s', name: 'M1 strict from a J2 strict re-grade (<chapter>/j2_strict.json; for the frozen base: compare with a probe\'s M1)', fmt: 'pct', target: 'not below base (G1)', f: s => s.j2strict ? m1({ ...s, j2: [s.j2strict] }, 'parts') : [0, 0] },
   { id: 'M1s c1', name: 'M1s on card 1 only', fmt: 'pct', target: '—', f: s => s.j2strict ? m1Card1({ ...s, j2: [s.j2strict] }, 'parts') : [0, 0] },
   { id: 'M1-lax', name: 'Follow, objective, lenient ("unclear" on a part the card never says = right)', fmt: 'pct', target: '(watch only)', f: s => m1(s, 'lax') },
   ...tasteMetrics(PRIMARY_J1, ''),
@@ -234,23 +234,23 @@ const METRICS: Metric[] = [
   } },
   { id: 'M8', name: 'Question answered (J2)', fmt: 'pct', target: '100%', f: s => { const v = s.j2.map(j => j.question_answered).filter(x => typeof x === 'boolean'); return [v.filter(Boolean).length, v.length] } },
   { id: 'M9', name: 'Answer NOT guessable from card 1 (J2)', fmt: 'pct', target: '≥ 60%', f: s => { const v = s.j2.map(j => j.answer_guessable_from_card1).filter(x => typeof x === 'boolean'); return [v.filter(x => !x).length, v.length] } },
-  { id: 'M11', name: 'Continuity errors per saga (J2)', fmt: 'num', target: 'G3 ≤ 0.3 · G2 ≤ 0.5', f: s => s.j2.length ? [s.j2.reduce((a, j) => a + (j.continuity_errors?.length ?? 0), 0), s.j2.length] : [0, 0] },
-  { id: 'M12a', name: 'Spoilers per saga (J2)', fmt: 'num', target: '0', f: s => s.j2.length ? [s.j2.reduce((a, j) => a + [...(j.cards ?? []), ...(j.reports ?? [])].filter(t => nonEmpty(t.spoiler)).length, 0), s.j2.length] : [0, 0] },
-  { id: 'M12b', name: 'Unmet-name leaks per saga (J2)', fmt: 'num', target: '0', f: s => s.j2.length ? [s.j2.reduce((a, j) => a + (j.cards ?? []).reduce((b, c) => b + (c.unmet_names?.length ?? 0), 0), 0), s.j2.length] : [0, 0] },
-  { id: 'M12c', name: 'Unmet-name leaks per saga (code)', fmt: 'num', target: '0', f: s => s.mech ? [s.mech.unmetNameLeaks.length, 1] : [0, 0] },
-  { id: 'M12d', name: 'Soldier names on cards per saga (code)', fmt: 'num', target: '0', f: s => s.mech ? [s.mech.soldierNamesOnCards.length, 1] : [0, 0] },
+  { id: 'M11', name: 'Continuity errors per chapter (J2)', fmt: 'num', target: 'G3 ≤ 0.3 · G2 ≤ 0.5', f: s => s.j2.length ? [s.j2.reduce((a, j) => a + (j.continuity_errors?.length ?? 0), 0), s.j2.length] : [0, 0] },
+  { id: 'M12a', name: 'Spoilers per chapter (J2)', fmt: 'num', target: '0', f: s => s.j2.length ? [s.j2.reduce((a, j) => a + [...(j.cards ?? []), ...(j.reports ?? [])].filter(t => nonEmpty(t.spoiler)).length, 0), s.j2.length] : [0, 0] },
+  { id: 'M12b', name: 'Unmet-name leaks per chapter (J2)', fmt: 'num', target: '0', f: s => s.j2.length ? [s.j2.reduce((a, j) => a + (j.cards ?? []).reduce((b, c) => b + (c.unmet_names?.length ?? 0), 0), 0), s.j2.length] : [0, 0] },
+  { id: 'M12c', name: 'Unmet-name leaks per chapter (code)', fmt: 'num', target: '0', f: s => s.mech ? [s.mech.unmetNameLeaks.length, 1] : [0, 0] },
+  { id: 'M12d', name: 'Soldier names on cards per chapter (code)', fmt: 'num', target: '0', f: s => s.mech ? [s.mech.soldierNamesOnCards.length, 1] : [0, 0] },
   { id: 'M13', name: 'Paperwork jobs (J2)', fmt: 'pct', target: '≤ 1 in 8', f: s => {
     const c = s.j2.flatMap(j => (j.cards ?? []).filter(x => x.job_type !== 'showdown'));
     return [c.filter(x => x.paperwork || x.job_type === 'paperwork').length, c.length];
   } },
-  { id: 'ES', name: 'Engine-speak quotes per saga (J2)', fmt: 'num', target: '—', f: s => s.j2.length ? [s.j2.reduce((a, j) => a + [...(j.cards ?? []), ...(j.reports ?? [])].reduce((b, t) => b + (t.engine_speak?.length ?? 0), 0), 0), s.j2.length] : [0, 0] },
-  { id: 'PW', name: 'Part-word labels per saga (J2)', fmt: 'num', target: '—', f: s => s.j2.length ? [s.j2.reduce((a, j) => a + [...(j.cards ?? []), ...(j.reports ?? [])].reduce((b, t) => b + (t.part_word_labels?.length ?? 0), 0), 0), s.j2.length] : [0, 0] },
+  { id: 'ES', name: 'Engine-speak quotes per chapter (J2)', fmt: 'num', target: '—', f: s => s.j2.length ? [s.j2.reduce((a, j) => a + [...(j.cards ?? []), ...(j.reports ?? [])].reduce((b, t) => b + (t.engine_speak?.length ?? 0), 0), 0), s.j2.length] : [0, 0] },
+  { id: 'PW', name: 'Part-word labels per chapter (J2)', fmt: 'num', target: '—', f: s => s.j2.length ? [s.j2.reduce((a, j) => a + [...(j.cards ?? []), ...(j.reports ?? [])].reduce((b, t) => b + (t.part_word_labels?.length ?? 0), 0), 0), s.j2.length] : [0, 0] },
   { id: 'M14b', name: 'Cards ending on "?" (code)', fmt: 'pct', target: '≤ 25%', f: s => s.mech ? [s.mech.questionEndings, s.mech.cards] : [0, 0] },
   { id: 'M15a', name: 'Caps held, raw output (code)', fmt: 'pct', target: '≥ 95%', f: s => s.mech ? [s.mech.capsHeld, s.mech.capsChecked] : [0, 0] },
   { id: 'M15b', name: 'Hard failures per attempt (code)', fmt: 'pct', target: '≤ 2%', f: s => s.mech ? [s.mech.hardFailures, s.mech.attempts] : [0, 0] },
-  { id: 'M16a', name: 'Cost per saga (saga calls)', fmt: 'usd', target: '≤ $0.035, never above base', f: s => s.mech ? [s.mech.costSaga, 1] : [0, 0] },
+  { id: 'M16a', name: 'Cost per chapter (chapter calls)', fmt: 'usd', target: '≤ $0.035, never above base', f: s => s.mech ? [s.mech.costSaga, 1] : [0, 0] },
   { id: 'M16b', name: 'Cost per beat', fmt: 'usd', target: '≤ $0.005', f: s => s.mech ? [s.mech.costSaga, s.mech.attempts] : [0, 0] },
-  { id: 'M17a', name: 'Latency pursue→card 1, the saga written (mean)', fmt: 'sec', target: 'G5 p50 ≤ 15 s · G2 ≤ base', note: 'p50 in the mechanical block', f: s => s.mech ? [(s.mech.pursueFirstMs ?? []).reduce((a, b) => a + b, 0), (s.mech.pursueFirstMs ?? []).length] : [0, 0] },
+  { id: 'M17a', name: 'Latency pursue→card 1, the chapter written (mean)', fmt: 'sec', target: 'G5 p50 ≤ 15 s · G2 ≤ base', note: 'p50 in the mechanical block', f: s => s.mech ? [(s.mech.pursueFirstMs ?? []).reduce((a, b) => a + b, 0), (s.mech.pursueFirstMs ?? []).length] : [0, 0] },
   { id: 'M17a′', name: 'Latency pursue→a later card (mean)', fmt: 'sec', target: 'G2 ≤ base', f: s => s.mech ? [(s.mech.pursueLaterMs ?? []).reduce((a, b) => a + b, 0), (s.mech.pursueLaterMs ?? []).length] : [0, 0] },
   { id: 'M17b', name: 'Latency card call (mean)', fmt: 'sec', target: 'G5 p50 ≤ 5 s', f: s => s.mech ? [s.mech.cardMs.reduce((a, b) => a + b, 0), s.mech.cardMs.length] : [0, 0] },
   { id: 'M17c', name: 'Latency report call (mean)', fmt: 'sec', target: 'G5 p50 ≤ 6 s', f: s => s.mech ? [s.mech.reportMs.reduce((a, b) => a + b, 0), s.mech.reportMs.length] : [0, 0] },
@@ -275,7 +275,7 @@ const PAIRED_IDS = ['M1', 'M1c1', 'M5', 'M2', 'M2·gpt5', 'M2·sonnet', 'M3', 'M
 
 /** arm X − arm Y over the fixture_draw slots both played, with a paired bootstrap 95% CI */
 function paired(x: string, y: string) {
-  const ax = new Map(load([x]).sagas.map(s => [s.id, s])), ay = new Map(load([y]).sagas.map(s => [s.id, s]));
+  const ax = new Map(load([x]).chapters.map(s => [s.id, s])), ay = new Map(load([y]).chapters.map(s => [s.id, s]));
   const slots = [...ax.keys()].filter(id => ay.has(id)).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
   if (!slots.length) { console.log(`no fixture_draw folder is in both ${x} and ${y}`); process.exit(2) }
   const ratio = (ps: [number, number][]) => { const d = ps.reduce((t, p) => t + p[1], 0); return d ? ps.reduce((t, p) => t + p[0], 0) / d : NaN };
@@ -317,15 +317,15 @@ function main() {
   const pair = opt('pair')?.split(',').map(s => s.trim()).filter(Boolean);
   if (pair) { if (pair.length !== 2) { console.log('usage: --pair X_RUN,Y_RUN'); process.exit(2) } return paired(pair[0]!, pair[1]!) }
   const runs = (opt('runs') ?? opt('run') ?? '').split(',').map(s => s.trim()).filter(Boolean);
-  if (!runs.length) { console.log('usage: npx tsx scripts/sagalab/score.ts --runs A_RUN[,B_RUN] [--label base] [--out RUN]'); process.exit(2) }
+  if (!runs.length) { console.log('usage: npx tsx scripts/chapterlab/score.ts --runs A_RUN[,B_RUN] [--label base] [--out RUN]'); process.exit(2) }
   const label = opt('label') ?? runs.join('+');
-  const { sagas, j3, j4, mech } = load(runs);
-  const seatsSeen = [...new Set(sagas.flatMap(s => [...s.j1.map(j => j.seat), ...s.j2.map(j => j.seat)]))].sort();
-  const rows = METRICS.map(m => ({ m, e: estimate(sagas, m.f) }));
+  const { chapters, j3, j4, mech } = load(runs);
+  const seatsSeen = [...new Set(chapters.flatMap(s => [...s.j1.map(j => j.seat), ...s.j2.map(j => j.seat)]))].sort();
+  const rows = METRICS.map(m => ({ m, e: estimate(chapters, m.f) }));
   const out: string[] = [
-    `# Saga lab — ${label}`, '',
-    `Runs: ${runs.join(', ')} · ${sagas.length} sagas · seats: ${seatsSeen.join(', ') || 'none yet'} · J3 sets: ${j3.length} · J4 series: ${j4.length}`,
-    `CIs: bootstrap 95% over sagas (2,000 resamples, seeded). n = sagas with data.`,
+    `# Chapter lab — ${label}`, '',
+    `Runs: ${runs.join(', ')} · ${chapters.length} chapters · seats: ${seatsSeen.join(', ') || 'none yet'} · J3 sets: ${j3.length} · J4 series: ${j4.length}`,
+    `CIs: bootstrap 95% over chapters (2,000 resamples, seeded). n = chapters with data.`,
     `Taste scores (M2, M3, M3b, M4) are the ${PRIMARY_J1} seat's; ${ALONGSIDE_J1.join(', ')} rows sit alongside. Compare them only with runs read by the same seats. M1 is strict ("unclear" = not followed).`, '',
     '## §1.1 table', '',
     '| # | metric | value | 95% CI | n | target |', '|---|---|---|---|---|---|',
@@ -339,9 +339,9 @@ function main() {
   else {
     out.push('| set | pairs read in both orders / all | kept = this run, both orders | followed = this run, both orders | keep / follow held across orders | kept = shown first (all reads) | followed = shown first (all reads) |', '|---|---|---|---|---|---|---|');
     for (const s of j3) {
-      const bySaga = new Map<string, J3Read[]>();
-      for (const r of s.reads) bySaga.set(r.saga, [...(bySaga.get(r.saga) ?? []), r]);
-      const pairs = [...bySaga.values()];
+      const byChapter = new Map<string, J3Read[]>();
+      for (const r of s.reads) byChapter.set(r.saga, [...(byChapter.get(r.saga) ?? []), r]);
+      const pairs = [...byChapter.values()];
       const balanced = pairs.filter(rs => rs.some(r => r.firstShown === s.self) && rs.some(r => r.firstShown === s.other));
       const held = (rs: J3Read[], k: 'keep' | 'follow') => rs.every(r => r[k] && r[k] === rs[0]![k]) ? rs[0]![k] : null;
       const nb = balanced.length;
@@ -365,11 +365,11 @@ function main() {
     }
   }
 
-  // §D.3 spread — J2's categories across sagas, and the mechanical repetition block
+  // §D.3 spread — J2's categories across chapters, and the mechanical repetition block
   out.push('', '## §D.3 — spread and mechanical repetition', '');
-  const qc = entropyOf(sagas.flatMap(s => s.j2.map(j => j.question_category ?? '')).filter(Boolean));
-  const ac = entropyOf(sagas.flatMap(s => s.j2.map(j => j.answer_category ?? '')).filter(Boolean));
-  const jt = entropyOf(sagas.flatMap(s => s.j2.flatMap(j => (j.cards ?? []).map(c => c.job_type ?? '')).filter(t => t && t !== 'showdown')));
+  const qc = entropyOf(chapters.flatMap(s => s.j2.map(j => j.question_category ?? '')).filter(Boolean));
+  const ac = entropyOf(chapters.flatMap(s => s.j2.map(j => j.answer_category ?? '')).filter(Boolean));
+  const jt = entropyOf(chapters.flatMap(s => s.j2.flatMap(j => (j.cards ?? []).map(c => c.job_type ?? '')).filter(t => t && t !== 'showdown')));
   out.push(`- question categories (J2): ${qc.distinct} distinct, ${qc.bits.toFixed(2)} bits — ${qc.top || '—'}`);
   out.push(`- answer categories (J2): ${ac.distinct} distinct, ${ac.bits.toFixed(2)} bits — ${ac.top || '—'}`);
   out.push(`- job types (J2): ${jt.distinct} distinct, ${jt.bits.toFixed(2)} bits — ${jt.top || '—'}`);
@@ -379,7 +379,7 @@ function main() {
     out.push(`- mech (${runs[i]}): card-1 trigram Jaccard mean ${n('D3_card1TrigramJaccard_mean')?.toFixed(3) ?? '—'} (max ${n('D3_card1TrigramJaccard_max')?.toFixed(3) ?? '—'}) · titles sharing a word ${p('D3_titleWordReuseShare')} ${(m.D3_titleWordsReused as string[] | undefined)?.slice(0, 6).join(' ') ?? ''} · distinct job sequences ${p('D3_jobSeqDistinctShare')} · job-type entropy ${n('D3_jobTypeEntropyBits')?.toFixed(2) ?? '—'} bits · top opening stamp ${m.D3_topOpeningStamp ?? '—'} · M14 shared openers ${p('M14_sharedOpenerShare')} · M17 pursue→card p50 ${n('M17_pursueToCard_p50') == null ? '—' : `${(n('M17_pursueToCard_p50')! / 1000).toFixed(1)}s`} · card/report call p50 ${n('M17_card_p50') == null ? '—' : `${(n('M17_card_p50')! / 1000).toFixed(1)}s`}/${n('M17_report_p50') == null ? '—' : `${(n('M17_report_p50')! / 1000).toFixed(1)}s`}`);
   }
   if (!mech.length) out.push('- mech: — (run `mech.ts --run NAME` first)');
-  out.push('', `Seats per saga: ${sagas.map(s => `${s.id} j1×${s.j1.length} j2×${s.j2.length}`).join(' · ')}`, '');
+  out.push('', `Seats per chapter: ${chapters.map(s => `${s.id} j1×${s.j1.length} j2×${s.j2.length}`).join(' · ')}`, '');
 
   const dest = path.join(LAB, 'runs', opt('out') ?? runs[0]!);
   fs.writeFileSync(path.join(dest, 'REPORT.md'), out.join('\n'));

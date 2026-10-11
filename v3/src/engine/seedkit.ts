@@ -1,9 +1,9 @@
-// THE SEED KIT (docs/STORYTELLER.md North Star 7, designer 2026-10-04): the saga seed as ONE generic situation + a few
+// THE SEED KIT (docs/STORYTELLER.md North Star 7, designer 2026-10-04): the chapter seed as ONE generic situation + a few
 // random keyword atoms + the dealt cast, in place of a finished theme from themes.json ("too specific, and it doesn't even
 // make sense"). Pure: the caller passes the rng (storyRng in play). The pools are data/seedkit.json, hand-curated; a pool
 // grows by editing the file, never by a prompt rule (CHEAP_MODEL_PROMPTING L12: variety comes only from a dealt mandate).
 //
-// The seed arms the lab compares (scripts/sagalab/seedlab.ts); the game ships `SEED_ARM` (engine/saga.ts):
+// The seed arms the lab compares (scripts/chapterlab/seedlab.ts); the game ships `SEED_ARM` (engine/chapter.ts):
 //   themes               today's: a theme from the library
 //   kit                  one situation + 1–3 keywords, each from a different pool
 //   kit+pick             one situation + ~10 keywords; a small pick call keeps the 1–3 that fit one clear story
@@ -33,7 +33,7 @@ export const KIT_DEAL = {
   /** a thing takes a quality in front of it about 1 in 3 ("a cracked bell"); pipe arm plain (F2) strips it again before the
    *  pick (`plainKeywords`: the draws stay the same, so every other field deals alike) */
   quality: 1 / 3,
-  /** the uncanny comes into about 1 saga in 5 */
+  /** the uncanny comes into about 1 chapter in 5 */
   uncanny: 0.2,
   /** the pick arms' offer, spread across the pools (10 atoms; + 1 uncanny on an uncanny deal) */
   offer: { things: 3, creatures: 2, places: 3, occasions: 2 } as Record<Exclude<KitPool, 'uncanny'>, number>,
@@ -50,7 +50,7 @@ export const KIT_DEAL = {
 };
 const BASE_POOLS: Exclude<KitPool, 'uncanny'>[] = ['things', 'creatures', 'places', 'occasions'];
 
-/** what the dealer dealt for one saga: the situation(s) (none on a personal saga, whose own past is its seed) and the
+/** what the dealer dealt for one chapter: the situation(s) (none on a personal chapter, whose own past is its seed) and the
  *  keyword atoms */
 export interface KitDeal { situations: string[]; keywords: string[] }
 
@@ -76,8 +76,8 @@ export const plainAtom = (x: string): string => {
 export const plainKeywords = (xs: readonly string[]): string[] => [...new Set(xs.map(plainAtom))];
 
 /** ONE deal of the kit, every draw on the rng: the situation(s), then the keywords. `kit` deals 1–3 atoms, each from a
- *  different pool, the uncanny taking one of them about 1 saga in 5; a pick arm deals the whole offer (KIT_DEAL.offer),
- *  shuffled so no pool sits first. A personal saga deals no situation (its seed is the soldier's own past) */
+ *  different pool, the uncanny taking one of them about 1 chapter in 5; a pick arm deals the whole offer (KIT_DEAL.offer),
+ *  shuffled so no pool sits first. A personal chapter deals no situation (its seed is the soldier's own past) */
 export function dealKit(rng: Rng, arm: Exclude<SeedArm, 'themes'>, personal: boolean): KitDeal {
   const situations = personal ? [] : arm === 'kit+pick+situation' ? atoms(rng, 'situations', KIT_DEAL.situations, []) : [rng.pick(KIT.situations)];
   const keywords: string[] = [];

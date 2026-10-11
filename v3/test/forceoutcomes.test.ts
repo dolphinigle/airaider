@@ -1,6 +1,6 @@
-// SAGA LAB (docs/STORYTELLER.md §5.0): AIRAIDER_FORCE_OUTCOMES and the `lab saga` pins.
-//  1. unset, the hook is a NO-OP: a mock campaign — lab saga included — ends in the byte-identical
-//     state it reaches with the hook replaced by the identity (and set, a game with no lab saga
+// CHAPTER LAB (docs/STORYTELLER.md §5.0): AIRAIDER_FORCE_OUTCOMES and the `lab chapter` pins.
+//  1. unset, the hook is a NO-OP: a mock campaign — lab chapter included — ends in the byte-identical
+//     state it reaches with the hook replaced by the identity (and set, a game with no lab chapter
 //     is untouched too)
 //  2. set, each §5.0 path plays its rule, and the dice heads always agree with the forced verdict
 //  3. a fixture reproduces its spark, focal, N and kind whatever game it lands in
@@ -22,12 +22,12 @@ const fixture = (over: Partial<LabFixture>): LabFixture => ({
 const hash = (g: Game) => createHash('sha256').update(g.save()).digest('hex');
 
 /** an ordinary mock campaign: board built, a lead taken whenever fewer than two quests are open,
- *  every quest manned (first approach on finales), END — with an optional lab saga riding along */
+ *  every quest manned (first approach on finales), END — with an optional lab chapter riding along */
 async function campaign(seed: number, fx?: LabFixture, cycles = 16): Promise<Game> {
   seedIdCounter(1);
   const g = new Game(new MockProvider(seed), seed);
   g.build('map-room'); g.build('lead-room');
-  if (fx) expect(g.labSaga(fx).ok).toBe(true);
+  if (fx) expect(g.labChapter(fx).ok).toBe(true);
   for (let c = 0; c < cycles; c++) {
     for (const row of g.leadBoard()) {
       if (g.state.quests.filter(q => q.state === 'open').length >= 2) break;
@@ -42,11 +42,11 @@ async function campaign(seed: number, fx?: LabFixture, cycles = 16): Promise<Gam
   return g;
 }
 
-/** play ONE lab saga to its end the way the driver does; returns its reckoning verdicts */
+/** play ONE lab chapter to its end the way the driver does; returns its reckoning verdicts */
 async function playLab(fx: LabFixture, seed = 5): Promise<{ g: Game; metas: ReckonMeta[] }> {
   seedIdCounter(1);
   const g = new Game(new MockProvider(seed), seed);
-  expect(g.labSaga(fx).ok).toBe(true);
+  expect(g.labChapter(fx).ok).toBe(true);
   const metas: ReckonMeta[] = [];
   for (let c = 0; c < 40; c++) {
     const chain = g.state.chains.find(ch => ch.lab?.fixture === fx.id);
@@ -71,7 +71,7 @@ async function playLab(fx: LabFixture, seed = 5): Promise<{ g: Game; metas: Reck
 afterEach(() => { delete process.env.AIRAIDER_FORCE_OUTCOMES; vi.restoreAllMocks() });
 
 describe('AIRAIDER_FORCE_OUTCOMES', () => {
-  it('unset: the hook is a no-op — same state as the identity, lab saga and all', async () => {
+  it('unset: the hook is a no-op — same state as the identity, lab chapter and all', async () => {
     delete process.env.AIRAIDER_FORCE_OUTCOMES;
     const fx = fixture({ path: 'bumpy' });
     const real = hash(await campaign(21, fx));
@@ -81,7 +81,7 @@ describe('AIRAIDER_FORCE_OUTCOMES', () => {
     expect(identity).toBe(real);
   });
 
-  it('set, a game without a lab saga is untouched', async () => {
+  it('set, a game without a lab chapter is untouched', async () => {
     delete process.env.AIRAIDER_FORCE_OUTCOMES;
     const plain = hash(await campaign(33));
     process.env.AIRAIDER_FORCE_OUTCOMES = '1';
@@ -117,20 +117,20 @@ describe('AIRAIDER_FORCE_OUTCOMES', () => {
   }
 });
 
-describe('lab saga pins', () => {
+describe('lab chapter pins', () => {
   it('a fixture reproduces spark, focal, N and kind in any game', async () => {
     const seen: { spark: string; focal: string; tags: string; N: number; kind: string; beats: number }[] = [];
     for (const seed of [3, 4]) {
       const sparks: string[] = [];
-      const orig = MockProvider.prototype.sagaCall;
-      vi.spyOn(MockProvider.prototype, 'sagaCall').mockImplementation(async function (this: MockProvider, c) {
+      const orig = MockProvider.prototype.chapterCall;
+      vi.spyOn(MockProvider.prototype, 'chapterCall').mockImplementation(async function (this: MockProvider, c) {
         if (c.template === 'plan') sparks.push(String(c.payload.seed));
         return orig.call(this, c);
       });
       seedIdCounter(1);
       const g = new Game(new MockProvider(seed), seed);
       const fx = fixture({ kind: 'gold-hoard', N: 4, twist: true });
-      const lead = g.labSaga(fx).leadId!;
+      const lead = g.labChapter(fx).leadId!;
       await g.pursue(lead);
       const chain = g.state.chains[0]!;
       const focal = g.card(chain.focalId)!;
@@ -145,7 +145,7 @@ describe('lab saga pins', () => {
     seedIdCounter(1);
     const g = new Game(new MockProvider(8), 8);
     const fx = fixture({ path: 'personal', personal: true, kind: 'recruit', focal: { name: 'Hronolf', sex: 'male', race: 'wolfman', seed: 1106, backstory: 'He left the pack.', who: 'A wolfman.' } });
-    await g.pursue(g.labSaga(fx).leadId!);
+    await g.pursue(g.labChapter(fx).leadId!);
     const chain = g.state.chains[0]!;
     const focal = g.card(chain.focalId)!;
     expect(chain.isPersonal).toBe(true);
@@ -156,7 +156,7 @@ describe('lab saga pins', () => {
 
   it('refuses a fixture the path rules cannot play', () => {
     const g = new Game(new MockProvider(1), 1);
-    expect(g.labSaga(fixture({ path: 'bumpy', N: 2 })).ok).toBe(false);
-    expect(g.labSaga(fixture({ path: 'clean', personal: true })).ok).toBe(false);
+    expect(g.labChapter(fixture({ path: 'bumpy', N: 2 })).ok).toBe(false);
+    expect(g.labChapter(fixture({ path: 'clean', personal: true })).ok).toBe(false);
   });
 });

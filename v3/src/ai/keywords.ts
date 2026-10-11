@@ -546,7 +546,7 @@ const INTAKE_FACT: Record<IntakeChannel, string[]> = {
     'the notice has weathered a season already'],
 };
 
-// a saga's CARE beat must not open on blood or menace
+// a chapter's CARE beat must not open on blood or menace
 const GRIM = /wounded|creditor|warrant|bounty|debt|rival|confession|graves|burned|barred|beacon|threat|accusation/;
 const OPENING_TIMES = ['at first light', 'mid-morning', 'at noon', 'late afternoon', 'at dusk',
   'after dark', 'in the small hours', 'in the rain', 'in fog', 'on market day'];
@@ -579,10 +579,10 @@ export function sampleOpening(rng: Rng, opts?: { gentle?: boolean; channel?: Int
 // Gravity sets tone AND the length budget, so it decides how heavy a job READS. It used to be
 // rolled from rarity alone, which meant a routine one-off had a ~57% chance of being commissioned
 // as a serious matter — measured 2026-08-27 across 145 quest blocks, one-off reports came out
-// LONGER than saga steps (median 53w vs 26w). The designer, after a playtest: "reading one off
-// quests become tiring after a while." A one-off is WORK; a saga is the story. They now roll from
+// LONGER than chapter steps (median 53w vs 26w). The designer, after a playtest: "reading one off
+// quests become tiring after a while." A one-off is WORK; a chapter is the story. They now roll from
 // different tables, which is the dealt-fact lever rather than another rule nobody reads.
-const GRAVITY_SAGA: Record<string, [string, number][]> = {
+const GRAVITY_CHAPTER: Record<string, [string, number][]> = {
   common: [['a small, everyday job', 5], ['a serious matter', 4], ['a grave affair', 1]],
   uncommon: [['a small, everyday job', 2], ['a serious matter', 5], ['a grave affair', 3]],
   rare: [['a serious matter', 2], ['a grave affair', 3]],
@@ -592,8 +592,8 @@ const GRAVITY_ONE_OFF: Record<string, [string, number][]> = {
   uncommon: [['a small, everyday job', 6], ['a serious matter', 3], ['a grave affair', 1]],
   rare: [['a small, everyday job', 2], ['a serious matter', 5], ['a grave affair', 3]],
 };
-export function sampleGravity(rng: Rng, rarity: string, kind: 'one-off' | 'saga' = 'saga'): string {
-  const t = kind === 'one-off' ? GRAVITY_ONE_OFF : GRAVITY_SAGA;
+export function sampleGravity(rng: Rng, rarity: string, kind: 'one-off' | 'chapter' = 'chapter'): string {
+  const t = kind === 'one-off' ? GRAVITY_ONE_OFF : GRAVITY_CHAPTER;
   return rng.weighted(t[rarity] ?? t.common!);
 }
 
@@ -612,7 +612,7 @@ export function sampleKeywordsLight(rng: Rng): string[] {
   return [r < 0.45 ? rng.pick(BOND) : r < 0.8 ? rng.pick(TIE) : rng.pick(WILDCARD_NOUNS)];
 }
 
-/** saga tone, weighted toward lighter (the v4 deal's tone roll when a theme brings none — engine/saga.ts dealSaga)
+/** chapter tone, weighted toward lighter (the v4 deal's tone roll when a theme brings none — engine/chapter.ts dealChapter)
  *  2026-07-10: BIBLE.md's adventurous/tense added to the pool (doc list ∪ impl list) */
 const TONES: [string, number][] = [
   ['slice-of-life', 2], ['wry', 3], ['warm', 2], ['bittersweet', 2],

@@ -79,7 +79,7 @@ way to see — all of them *rendering*, all of them invisible to a test that cou
    page the block fills under its own title, in a stream it has to say whose report this is.
 
 Then five real-AI cycles through the CLI covered every shape the reckoning has: two quests landing
-apart, a single quest with a flesh tail, a `⏸` stall line in the head block, a saga beat, an injury,
+apart, a single quest with a flesh tail, a `⏸` stall line in the head block, a chapter beat, an injury,
 a level-up, a relic, a failure, and a finale with approaches and a fate. All correct.
 
 ## 6. Testing must not touch what the designer is playing

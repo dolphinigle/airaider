@@ -78,7 +78,7 @@ for (let i = 0; i < 14; i++) {
 say(`\n════ CHAIN ENDED: ${chain.state} ════`);
 const focal = g.card(chain.focalId);
 say(`focal ${focal?.name}: location ${JSON.stringify(focal?.location)}`);
-say(`\nDOSSIERS AFTER THE SAGA:`);
+say(`\nDOSSIERS AFTER THE CHAPTER:`);
 for (const m of g.roster()) say(g.dossier(m.id) + '\n');
 if (focal) say(g.dossier(focal.id));
 const u = g.ai.usage();

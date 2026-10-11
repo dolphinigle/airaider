@@ -1,11 +1,11 @@
-// THE SAGA STORYTELLER v4 — engine side (docs/STORYTELLER.md §2.3–§2.6; Phase 2 build plan Step 1). Types, tables and
-// the deal/cast of one saga, all pure and seeded from the persisted `storyRng`, so the main rng (mechanics) never moves
-// on a story draw. Ported from the saga lab at tag `storyteller-build-src` (= R5, scripts/sagalab/v4lab.ts); where this
+// THE CHAPTER STORYTELLER v4 — engine side (docs/STORYTELLER.md §2.3–§2.6; Phase 2 build plan Step 1). Types, tables and
+// the deal/cast of one chapter, all pure and seeded from the persisted `storyRng`, so the main rng (mechanics) never moves
+// on a story draw. Ported from the chapter lab at tag `storyteller-build-src` (= R5, scripts/chapterlab/v4lab.ts); where this
 // file and STORYTELLER.md §2 disagree, the lab code is the spec. The build is one lab arm, fixed: structure L (the plan
 // picks job types), names `labels` (strangers by label until met), cast `lean` (the one who asks + the person the ending
 // decides, plus the personal soldier or a returning face) — `ARM` below.
 //
-// JSON-safe throughout: a SagaRecord lives on the chain in the save (the lab's Sets and Maps are arrays and records).
+// JSON-safe throughout: a ChapterRecord lives on the chain in the save (the lab's Sets and Maps are arrays and records).
 
 import type { Rng } from './rng.js';
 import type { Card } from './cards.js';
@@ -26,16 +26,16 @@ export type NamesArm = 'labels' | 'named';
 export type CastArm = 'full' | 'lean';
 export interface Arm { structure: Structure; names: NamesArm; cast: CastArm }
 /** the measured checkpoint (R5): loose structure, strangers by label, lean cast — the only arm this build carries (the
- *  lab's other branches were pruned after the golden diff, test/sagagolden.test.ts) */
+ *  lab's other branches were pruned after the golden diff, test/chaptergolden.test.ts) */
 export const ARM: Arm = { structure: 'L', names: 'labels', cast: 'lean' };
 export type { SeedArm } from './seedkit.js';
 /** the seed arm this build ships (North Star 7): kit+pick, the seed lab's follow winner over the theme library and over
- *  purely random keywords (scripts/sagalab/reports/2026-10-04-seed-arms.md). A host may name another (SagaHost.seedArm:
+ *  purely random keywords (scripts/chapterlab/reports/2026-10-04-seed-arms.md). A host may name another (ChapterHost.seedArm:
  *  the lab; the golden parity test pins 'themes', the R5 lab's seed) */
 export const SEED_ARM: SeedArm = 'kit+pick';
 /** a PIPELINE arm on top of kit+pick (North Star 8: shape what the AI is given, split the work into small steps;
- *  scripts/sagalab/seedlab.ts B2/C2/C3/D1/D2). The game deals GAME_PIPE by saga type, a host naming none PIPE_ARM; absent,
- *  the pipeline is R5's, byte for byte (the golden parity, the seed lab's A arms, and every saga dealt before grafts shipped).
+ *  scripts/chapterlab/seedlab.ts B2/C2/C3/D1/D2). The game deals GAME_PIPE by chapter type, a host naming none PIPE_ARM; absent,
+ *  the pipeline is R5's, byte for byte (the golden parity, the seed lab's A arms, and every chapter dealt before grafts shipped).
  *   one     B2  the pick chooses one keyword, told so; the plan gets only it (one object to follow)
  *   grafts  C2  R6's class fixes: the road prints the plan's own why per later job (no outline call; a flagged why leaves
  *               the title), the card's hope goes to its report, the finale buttons are the engine's, the gold way is paid
@@ -66,7 +66,7 @@ export const SEED_ARM: SeedArm = 'kit+pick';
  *               without D2's other cuts), never "show shortfalls"
  *   line    F1  grafts, and the trouble as ONE sentence the plan writes — who stands in the way, what they will do, and why
  *               — in place of the {who, carry, will} atoms (law 6b: three labelled items came back as three stock sentences,
- *               "They carry X", 24% of the reader-throwing sentences in 72 default sagas). Each job type is dealt who stands
+ *               "They carry X", 24% of the reader-throwing sentences in 72 default chapters). Each job type is dealt who stands
  *               against it (`AGAINST`: a talk job's is the one to win over, for a reason of their own), in place of "armed
  *               people or a beast" for every job (filler foes, talk targets written up as armed). Every card gets the whole
  *               line, card 1 too (it lost `will` in R5), but a retry: its retry line is what that trouble did, one fact
@@ -119,7 +119,7 @@ export const SEED_ARM: SeedArm = 'kit+pick';
  *                 racehorse); the job is "the task asked of you", no advice (card 1 narrated it as done); a learn is what the
  *                 soldiers find, see or hear there (a watcher's sighting in a sneak job was never shown, then "known"); the
  *                 seed's people are in the cast, or added if none fits (the seed's "someone" patch, and a personal seed's
- *                 brother the plan could not add); the hope glossed plainly; on a personal saga the secret is said by whoever
+ *                 brother the plan could not add); the hope glossed plainly; on a personal chapter the secret is said by whoever
  *                 there could know it (`anyteller`, as S2)
  *   room    TA  caps only (§3a, the length control): card 110, finale card 140; before 50/70/100; after 70/135/210, +20 per
  *               thing shown, ceiling 210 (the finale +15 per thing past two). Same payloads, same prompts
@@ -132,7 +132,7 @@ export const SEED_ARM: SeedArm = 'kit+pick';
  *               meeting is told once: none on a card whose job already names the person, and none again in the report of a
  *               card that told it
  *   voice   TC  one quoted line where a person with a stake speaks (§3c), never a script: card 1's `says` — the line itself,
- *               written by the plan (first person, of the want; on a personal saga of the past), beside the narrated
+ *               written by the plan (first person, of the want; on a personal chapter of the past), beside the narrated
  *               want/past, never in their place (a card writer told to make a bare infinitive "one quoted line of feeling"
  *               stamped "I want so badly to…"; a quote in place of the want left the want untold); a won job's clue said by someone it met who could know it, in their own words (`clue.by`: a person the gain holds, else the
  *               one a talk or catch job is done to; never in a sneak job; nobody fits: found or seen); the
@@ -147,17 +147,17 @@ export const SEED_ARM: SeedArm = 'kit+pick';
  *               The engine copies clues[i] into job i's learn (the why stays in the episode, ahead of the clues: shown
  *               before play, a why written after them leaked one). Log-only checks (`pageChecks`): the answer names only people a job meets; each
  *               learn names something its job turns up
- *   past    PP  a personal saga's past and change (North Star item 0): the plan writes `past` as two plain sentences (what
+ *   past    PP  a personal chapter's past and change (North Star item 0): the plan writes `past` as two plain sentences (what
  *               happened and at what event or season — when as a count of years broke "no numbers" — who was hurt, what the soldier still carries), told plainly on card 1 (cap 90), and
  *               `change` (how the soldier must be different by the end, from their past or traits), shown happening in the
  *               finale report (+20); at a finale not lost the engine writes ONE dossier line from it (`grownLine`,
- *               SagaRecord.grown) — the game keeps it on the soldier (their sheet's memory; character.grown, beside the
- *               seed the saga was dealt and the past it told). Their NEXT personal saga (chain B, C…) has a DEALT situation as
+ *               ChapterRecord.grown) — the game keeps it on the soldier (their sheet's memory; character.grown, beside the
+ *               seed the chapter was dealt and the past it told). Their NEXT personal chapter (chain B, C…) has a DEALT situation as
  *               its seed, its new matter, and their living dossier's Now beside it (`now`, engine/dossier.ts livingSeed:
  *               who they became, done; the change goes further; no settled mark is sent) — the pick's, plan's and card
  *               1's `next` lines: its past is a new event that draws who they became into the matter; the
- *               settled old wrong (SagaWorld.history) feeds only the log-only retelling lint — handed to the plan, 8 of 8 real
- *               chain Bs retold it. A first personal saga's prompts are byte-identical
+ *               settled old wrong (ChapterWorld.history) feeds only the log-only retelling lint — handed to the plan, 8 of 8 real
+ *               chain Bs retold it. A first personal chapter's prompts are byte-identical
  *  STACK ROUND (texture-round report §7.4; seedlab S1–S3), each a shipped arm plus ONE more change, judged against that arm:
  *   voice+line   S1  TC + F1's line, and (motive) the line's why only where the seed or cast already gives one: F1's
  *                    trouble sentence had to give every foe a reason, so the plan invented one (forced or from nowhere, marked
@@ -173,12 +173,12 @@ export const SEED_ARM: SeedArm = 'kit+pick';
  *                    secret is new beyond known)
  *   voice+clean  S3  TC + clean (the verifier's shared fixes above)
  *  ROUND H (ship-and-stack report §5.4–5.5; seedlab HP, RF), each TC plus ONE change, judged against TC's draws on disk:
- *   voice+asker    HP  round T's principle (a person's own wrong handed to the writer as an item) carried to hired sagas: the
+ *   voice+asker    HP  round T's principle (a person's own wrong handed to the writer as an item) carried to hired chapters: the
  *                      plan writes the asker's `past` (two plain sentences: what happened to them that makes this want theirs)
  *                      and `change` (a done fact naming them), and card 1 tells the past IN PLACE of TC's quoted `says` line —
  *                      one card-1 addition, so TC's cap (round F: two overload card 1); the quoted clue and the spoken secret
  *                      stay; the finale report not lost shows the change, the asker there to show it. No dossier line (the
- *                      asker is no soldier). A personal saga has no hired asker, so it plays TC (`askerPast`). (verify) A
+ *                      asker is no soldier). A personal chapter has no hired asker, so it plays TC (`askerPast`). (verify) A
  *                      returning asker's past is never their past with the company: card 1 tells the memory too
  *   voice+setback  RF  a failure's facts handed to the texts after it (the playtest's retry contradiction, 2 of 2 setbacks:
  *                      the failure report burned the forge, the retry held it and its report kept it "dark and whole"): a
@@ -201,7 +201,7 @@ export const SEED_ARM: SeedArm = 'kit+pick';
  *  story this is"; a situation that takes a person ("hide someone") is dealt one (`someone`). Then ONE new personal item:
  *   past+return  CBR `returner`: a person from their chain A (STORY_ENGINE §111: a finished chain's thread + a cast member
  *                    seeds the next) — never the one resolved against — seated as D10 seats a seed's person (known, their
- *                    memory a line of the old saga that names them), with the part `RETURNER_PART`: they ask the soldier for
+ *                    memory a line of the old chapter that names them), with the part `RETURNER_PART`: they ask the soldier for
  *                    help; their role word on every entry
  *   past+trait   CBT `trait`: one of the soldier's traits or quirks from their card (`testedTraits`), dealt after the cast
  *                    (`world.tests`): the matter tests it, the change comes from it, and it leads the soldier's traits in the
@@ -215,13 +215,13 @@ export const SEED_ARM: SeedArm = 'kit+pick';
  *  THE COST FIX (round H §5, a defect in the default): `owncost` — a partial's cost dealt as ONE phrase naming its owner
  *  (`costPhrase`, from clean's `ownCost`: "the company's own horse, lamed"); the {what, how, whose} atoms let the writer give
  *  the company's lamed horse to the enemy. Carried by the game's two pipes (voice, past)
- *  SO FAR (designer 2026-10-05: "hide the saga things like the [For / Road ahead / Known / Held / Open question] part? it
- *  kinda breaks immersion. you can show the past quests though"): `sofar` — a saga card shows NO forward quest log (no For
+ *  SO FAR (designer 2026-10-05: "hide the chapter things like the [For / Road ahead / Known / Held / Open question] part? it
+ *  kinda breaks immersion. you can show the past quests though"): `sofar` — a chapter card shows NO forward quest log (no For
  *  row, no Road ahead — neither ▶ nor the · rows nor the Finale row — no Known, no Held, no Open question), and neither does
- *  the chronicle (the Sagas tab, the CLI `chain`: its own So far list stays). A card shows "So far", one row per part played
+ *  the chronicle (the Chapters tab, the CLI `chain`: its own So far list stays). A card shows "So far", one row per part played
  *  before the last one, in order (a failed try its own row): ✓ / ✗, the part's title, and the summary its report left
  *  (storyteller `soFarLog`). The last part is the prose's (every later card opens on it, `latest` / `retry`), so card 1 and
- *  card 2 show none. Party names and wounds stay off the rows. A save's card on offer is re-rendered on load (sagaflow
+ *  card 2 show none. Party names and wounds stay off the rows. A save's card on offer is re-rendered on load (chapterflow
  *  `refreshRows`). Knowing follows what is shown: no For line, so the one the company acts for is named only by a text that
  *  says them (`forLineShown` is not run). The road and the hopes are still computed beside card 1 (the cards' and reports'
  *  hopes read them). No prompt changes. Carried by the game's two pipes (voice, past); the lab's
@@ -230,10 +230,10 @@ export const SEED_ARM: SeedArm = 'kit+pick';
  *  have weird sentences like this*): `voice+trouble` / `past+trouble` — the game's pipe as it ships plus round F's `line`
  *  (the plan writes each trouble as ONE sentence in place of the {who, carry, will} notes, law 6b) with S1's `motive`. Lab
  *  arms only (seedlab NT vs NV, PT vs NP); not shipped
- *  WHOM IT IS FOR, WITHOUT THE LOG (saga-panel report 2026-10-05 §6: with no For line and no road, hired sagas lost
+ *  WHOM IT IS FOR, WITHOUT THE LOG (chapter-panel report 2026-10-05 §6: with no For line and no road, hired chapters lost
  *  followability — later jobs arrive cold, and the finale stops saying whom the job is for). Input-side, the log stays gone:
  *   voice+want       NW  `want` — every later card's ONE why opens on the For line's content: the one the company acts for,
- *                        by name and label, and their want (`askerWant`; a personal saga: the soldier whose story this is),
+ *                        by name and label, and their want (`askerWant`; a personal chapter: the soldier whose story this is),
  *                        the job's hope folded in after it (`wantWhy`: "…, and hopes …"), never a field of its own (law 6b).
  *                        The hope is judged when its card comes (`cardHope`): with no road, card 1 never prints it, so a why
  *                        the road check kept off for naming its own gain prints on its own card. A why with no hope (the
@@ -288,7 +288,7 @@ const PIPE_PARTS: Record<PipeArm, readonly PipePart[]> = {
   page: ['grafts', 'page'], past: PAST_PIPE, clean: ['grafts', 'clean'],
   'voice+line': ['grafts', ...VOICE, 'line', 'motive'], 'past+voice': ['grafts', 'past', 'teller', 'quote'],
   'voice+clean': ['grafts', ...VOICE, 'clean'],
-  // (HP keeps `says`: on a hired saga the asker's past stands in its place, on a personal one — no hired asker — it is TC's line)
+  // (HP keeps `says`: on a hired chapter the asker's past stands in its place, on a personal one — no hired asker — it is TC's line)
   'voice+asker': ['grafts', ...VOICE, 'asker'], 'voice+setback': ['grafts', ...VOICE, 'setback'],
   // (RFA) RF part (a) alone, on TC as measured — no `owncost`, so the arm differs from TC_g1–g3 by `stands` alone
   'voice+stands': ['grafts', ...VOICE, 'stands'],
@@ -307,24 +307,24 @@ const PIPE_PARTS: Record<PipeArm, readonly PipePart[]> = {
   'voice+want': [...VOICE_PIPE, 'want'], 'voice+want+link': [...VOICE_PIPE, 'want', 'link'], 'past+want': [...PAST_PIPE, 'want'],
 };
 /** whether a dealt world's pipe arm carries `part` */
-export const piped = (w: Pick<SagaWorld, 'pipe'>, part: PipePart): boolean => !!w.pipe && PIPE_PARTS[w.pipe].includes(part);
+export const piped = (w: Pick<ChapterWorld, 'pipe'>, part: PipePart): boolean => !!w.pipe && PIPE_PARTS[w.pipe].includes(part);
 /** (pipe arm voice+asker, HP) whether the plan writes the asker's past and change, card 1 telling the past in place of `says`:
- *  only a hired saga's asker — a personal saga's soldier has their own past (PP's, or TC's line of it) */
-export const askerPast = (w: Pick<SagaWorld, 'pipe' | 'personal'>): boolean => !w.personal && piped(w, 'asker');
+ *  only a hired chapter's asker — a personal chapter's soldier has their own past (PP's, or TC's line of it) */
+export const askerPast = (w: Pick<ChapterWorld, 'pipe' | 'personal'>): boolean => !w.personal && piped(w, 'asker');
 /** (pipe part link) whether card 1 gets its job's lead: only when card 1 carries no addition of its pipe's own — a quoted line
  *  (`says`, TC) or a told past (PP). Round F: two card-1 additions overload the ~70-word card ("one fact, one owner"; FX's
  *  card 1 was flat), so on the game's pipes (NWL) the lead goes to the later jobs and the showdown, and the plan writes none
  *  for episode 1 (`midlead`) — which also keeps the plan prompt in its budget (link on voice: 636 of 620 words) */
-export const cardOneLead = (w: Pick<SagaWorld, 'pipe' | 'personal'>): boolean => piped(w, 'link') && !piped(w, 'says') && !(w.personal && piped(w, 'past'));
+export const cardOneLead = (w: Pick<ChapterWorld, 'pipe' | 'personal'>): boolean => piped(w, 'link') && !piped(w, 'says') && !(w.personal && piped(w, 'past'));
 /** the pipeline of a host that names none (designer 2026-10-04): C2 grafts, ahead on follow in all three generations (83–61)
- *  and on keep beyond the noise floor (93–51) — scripts/sagalab/reports/2026-10-04-pipeline-round.md §3.1. The seed lab's
- *  G0 and PG0 play it, so they keep meaning this default; the GAME's host names its own per saga (GAME_PIPE) */
+ *  and on keep beyond the noise floor (93–51) — scripts/chapterlab/reports/2026-10-04-pipeline-round.md §3.1. The seed lab's
+ *  G0 and PG0 play it, so they keep meaning this default; the GAME's host names its own per chapter (GAME_PIPE) */
 export const PIPE_ARM: PipeArm = 'grafts';
-/** the pipeline the GAME deals, by saga type (designer 2026-10-05: build what wins; both measured in round T —
- *  scripts/sagalab/reports/2026-10-04-texture-round.md §7): a personal saga plays PP (`past`: grafts + the soldier's past
- *  and change, the change kept on them as a dossier line that seeds their next personal saga), every other saga TC
- *  (`voice`: grafts + the asker's own line on card 1, quoted clues, the secret spoken). Each saga type gets exactly the one
- *  change it was measured with (PP + voice on one card 1 is untested). game.ts sagaHost reads it */
+/** the pipeline the GAME deals, by chapter type (designer 2026-10-05: build what wins; both measured in round T —
+ *  scripts/chapterlab/reports/2026-10-04-texture-round.md §7): a personal chapter plays PP (`past`: grafts + the soldier's past
+ *  and change, the change kept on them as a dossier line that seeds their next personal chapter), every other chapter TC
+ *  (`voice`: grafts + the asker's own line on card 1, quoted clues, the secret spoken). Each chapter type gets exactly the one
+ *  change it was measured with (PP + voice on one card 1 is untested). game.ts chapterHost reads it */
 export const GAME_PIPE: Readonly<Record<'personal' | 'other', PipeArm>> = { personal: 'past', other: 'voice' };
 // (both pipes also carry the cost fix, RFW's failure fact and, from 2026-10-05, the So far log in place of the forward log)
 
@@ -360,7 +360,7 @@ export const RETURNER_PART = 'asks the mercenary for help';
 export const LOOSE_PARTS: Partial<Record<Seat, string>> = { opponent: 'stands in the way', other: 'is caught between the two sides' };
 /** the part a person plays, as the plan and every report receive it. A kit arm deals its supporting cast (the person the
  *  ending decides among them) with none (''): no text gets a part for them, the plan decides what each is to the story */
-export const partOf = (p: SagaPerson): string => p.part === '' ? '' : !PERSONAL_PARTS.includes(p.part) && p.part !== RETURNER_PART ? LOOSE_PARTS[p.seat] ?? p.part : p.part;
+export const partOf = (p: ChapterPerson): string => p.part === '' ? '' : !PERSONAL_PARTS.includes(p.part) && p.part !== RETURNER_PART ? LOOSE_PARTS[p.seat] ?? p.part : p.part;
 /** a kit arm's client: the part says only that they ask (the shape's part, "lost something", could fight the situation) */
 export const KIT_CLIENT_PART = 'asks for help';
 
@@ -394,7 +394,7 @@ export const WAY_ENDING: Record<Way, string> = {
  *  rob the person it had just brought through, so they are dealt only the ways that fit (`waysOf`),
  *  and gold means a share they give */
 const SIDES_WITH_OPPONENT = new Set(['serves the one in the way']);
-export const helped = (p: Pick<SagaPerson, 'seat' | 'part'>) => p.seat === 'other' && !SIDES_WITH_OPPONENT.has(p.part);
+export const helped = (p: Pick<ChapterPerson, 'seat' | 'part'>) => p.seat === 'other' && !SIDES_WITH_OPPONENT.has(p.part);
 /** what each non-personal way means, dealt with the ways (a gloss for a way not dealt never reaches the model) */
 // each names its subject: "they end in its cells" was read as the soldiers ("Blunder into the manor's laws, are arrested")
 export const WAY_MEANS: Record<'recruit' | 'captive' | 'gold', string> = { recruit: 'that person joins the company', captive: "that person ends in the company's cells", gold: "the company takes that person's treasure" };
@@ -410,7 +410,7 @@ export const FREE_WAY = 'let go';
 export const wayMeans = (v: Way, isHelped: boolean, freeGold = false) => v === 'gold' && freeGold ? (isHelped ? FREE_HELPED_GOLD : FREE_GOLD)
   : v === 'gold' && isHelped ? HELPED_GOLD : WAY_MEANS[v as keyof typeof WAY_MEANS];
 export const WAY_ATTR: Record<Way, string> = { recruit: 'CHA', captive: 'STR', gold: 'INT', talk: 'CHA', fight: 'STR', sneak: 'DEX' };
-/** a personal saga's ways are HOW it is settled, so the plan gets words that are not job type names */
+/** a personal chapter's ways are HOW it is settled, so the plan gets words that are not job type names */
 export const WAY_WORD: Partial<Record<Way, string>> = { talk: 'words', fight: 'force', sneak: 'stealth' };
 export const wayWord = (v: Way) => WAY_WORD[v] ?? v;
 export const wayOf = (word: string): string => (Object.entries(WAY_WORD).find(([, x]) => x === word)?.[0]) ?? word;
@@ -427,21 +427,21 @@ export const STAKES: Record<ShapeId | 'personal', [string, number][]> = {
   personal: [['someone loved', 3], ['a good name', 2], ['a promise', 2], ['a life', 1]],
 };
 
-/** a personal saga's coined opponent gets a trade from the lab's power pool (the measured text: a personal plan was
+/** a personal chapter's coined opponent gets a trade from the lab's power pool (the measured text: a personal plan was
  *  dealt "slaver", "moneylender"…); trades that name a sex go only to that sex */
 const POWER_TRADES = ['reeve', 'moneylender', 'steward', 'landlord', 'bandit chief', 'toll-keeper', 'tax collector',
   'hedge knight', 'guild master', 'smuggler', 'forester', 'slaver', 'mercenary captain', 'magistrate', 'horse dealer',
   'abbot', 'poacher', 'cattle baron'];
 const TRADE_SEX: Record<string, 'male' | 'female'> = { widow: 'female', midwife: 'female' };
 /** the company's own trade: as a supporting person it reads as the company's double (the client hires them instead,
- *  seed-arms report N3); as a personal saga's opponent it stays, a rival of the soldier's own kind */
+ *  seed-arms report N3); as a personal chapter's opponent it stays, a rival of the soldier's own kind */
 const COMPANY_TRADES = new Set(['mercenary captain']);
 /** a kit arm's supporting people: folk and power trades alike (the lab's FOLK_TRADES + POWER_TRADES) — nobody is dealt as
  *  a friend or a foe, the plan decides */
 const SUPPORT_TRADES = ['miller', 'weaver', 'shepherd', 'beekeeper', 'ferryman', 'brewer', 'woodcutter', 'potter', 'fisher',
   'innkeeper', 'carter', 'herbalist', 'mason', 'tanner', 'widow', 'farmer', 'smith', 'peddler', 'charcoal-burner', 'midwife',
   'goatherd', 'trapper', 'baker', 'thatcher', 'healer', 'fowler', 'tinker', 'cooper', ...POWER_TRADES.filter(t => !COMPANY_TRADES.has(t))];
-/** every trade the deal coins (the live-saga trade fence reads them off the plans' labels) */
+/** every trade the deal coins (the live-chapter trade fence reads them off the plans' labels) */
 export const DEALT_TRADES: readonly string[] = [...new Set([...SUPPORT_TRADES, ...POWER_TRADES])];
 
 /** one source per feeling: a theme labelled with a feeling passes it on; otherwise the engine's tone roll */
@@ -457,7 +457,7 @@ export function hashStr(s: string): number {
 
 // ─── the people and the plan ───────────────────────────────────────────────────────────────────
 
-export interface SagaPerson {
+export interface ChapterPerson {
   id: string; name: string; sex: 'male' | 'female'; race: string;
   seat: Seat; focal: boolean; part: string;
   trade?: string; traits?: string;
@@ -477,55 +477,55 @@ export const troubleWho = (t: Trouble): string => t.line ?? t.who;
 export interface Episode { n: number; type: EpisodeType; title: string; job: string; people: string[]; trouble: Trouble; win?: string; gain?: string; learn?: string; why: string; settles?: string; lose?: string; edge?: string[]; lead?: string;
   /** pipe arm page (TP): what the job turns up, as the plan wrote it before the answer */
   turnsUp?: string }
-/** past: a personal saga's soldier only, the old wrong in a few words (pipe arm voice+asker, HP: also a hired saga's asker,
+/** past: a personal chapter's soldier only, the old wrong in a few words (pipe arm voice+asker, HP: also a hired chapter's asker,
  *  two plain sentences — what happened to them that makes this want theirs). side: pipe arm sides only — whose side they are
  *  on, and why, as the plan wrote it */
-export interface CastEntry extends SagaPerson { label: string; want: string; past?: string; side?: string;
-  /** pipe arm past (PP): a personal saga's soldier only — how they must be different by the end, a done fact naming them
-   *  (pipe arm voice+asker, HP: a hired saga's asker's, the same) */
+export interface CastEntry extends ChapterPerson { label: string; want: string; past?: string; side?: string;
+  /** pipe arm past (PP): a personal chapter's soldier only — how they must be different by the end, a done fact naming them
+   *  (pipe arm voice+asker, HP: a hired chapter's asker's, the same) */
   change?: string;
   /** pipe arm voice (TC): the one the company acts for only — the line card 1 quotes, first person, as the plan wrote it */
   says?: string }
 /** lore: pipe arm lore (TD) — one thing people here say or do, as hearsay ('' or absent: the plan wrote none) */
-export interface SagaPlan { title: string; question: string; answer: string; cast: CastEntry[]; episodes: Episode[]; showdown: Episode; options: { way: Way; label: string }[]; lore?: string }
+export interface ChapterPlan { title: string; question: string; answer: string; cast: CastEntry[]; episodes: Episode[]; showdown: Episode; options: { way: Way; label: string }[]; lore?: string }
 /** pipe arm late (E1): the finale's own fields, written from where the story stands when the finale comes — they replace
  *  the plan's showdown job, trouble and lose (no why: a finale's is the For line's want, R5 verify 2) */
 export interface LateShowdown { job: string; trouble: Trouble; lose: string }
 
-/** what the saga has banked so far: `learned` = the learns of won middle jobs, in order; `held` = the numbers of won
+/** what the chapter has banked so far: `learned` = the learns of won middle jobs, in order; `held` = the numbers of won
  *  middle jobs, whose gains the company holds. Only a win banks */
-export interface SagaState { learned: string[]; held: number[] }
+export interface ChapterState { learned: string[]; held: number[] }
 export interface Hurt { name: string; how: 'lightly' | 'badly' | 'gravely' }
 /** a partial's price: atoms the writer realises; `whose` names who pays it */
 export interface Cost { what: string; how: string; whose?: string }
 
-// ─── the persisted record (Chain.saga) ─────────────────────────────────────────────────────────
+// ─── the persisted record (Chain.chapter) ─────────────────────────────────────────────────────────
 
 /** everything the engine dealt before the plan call (the lab's World + Draw, as data) */
-export interface SagaWorld {
+export interface ChapterWorld {
   personal: boolean; N: number; kind: 'recruit' | 'captive' | 'gold';
   /** read for two things only (D13): the client's part and the floor's stake */
   shape: ShapeId;
-  focalId: string; cast: SagaPerson[]; stake: string; places: string[]; land: string;
+  focalId: string; cast: ChapterPerson[]; stake: string; places: string[]; land: string;
   seed: { id: string | null; text: string }; tone: string;
   region: string; level: number;
   /** a kit arm's seed (North Star 7): absent on the theme arm */
-  kit?: SagaKit;
-  /** the pipeline arm (PipeArm): the game deals GAME_PIPE by saga type, a host naming none PIPE_ARM; absent, R5's pipeline */
+  kit?: ChapterKit;
+  /** the pipeline arm (PipeArm): the game deals GAME_PIPE by chapter type, a host naming none PIPE_ARM; absent, R5's pipeline */
   pipe?: PipeArm;
-  /** a soldier's NEXT personal saga (chain B, C…; STORY_ENGINE §4, North Star 0): the old wrong their last chapter settled
+  /** a soldier's NEXT personal chapter (chain B, C…; STORY_ENGINE §4, North Star 0): the old wrong their last chapter settled
    *  (engine/dossier.ts `historyOf`). Its seed is then a dealt situation, its new matter, with their living dossier's
    *  Now beside it (who they became); the history itself is never sent to a writer (handed it, 8 of 8 real chain Bs retold it, 3 word for word) —
-   *  it feeds the log-only retelling lint (storyteller planLint). Absent on a first personal saga and on every hired one */
+   *  it feeds the log-only retelling lint (storyteller planLint). Absent on a first personal chapter and on every hired one */
   history?: string;
   /** (pipe arm past+trait, CBT) a NEXT chapter's dealt item: the soldier's trait or quirk its matter tests (`testedTraits`,
    *  dealt after the cast) */
   tests?: string;
 }
 /** a kit arm's seed: what the dealer dealt, then what the pick and premise calls made of it (filled before the plan) */
-export interface SagaKit {
+export interface ChapterKit {
   arm: Exclude<SeedArm, 'themes'>;
-  /** dealt: the situation(s) (none on a personal saga, whose seed is the soldier's past) and the keyword atoms */
+  /** dealt: the situation(s) (none on a personal chapter, whose seed is the soldier's past) and the keyword atoms */
   situations: string[]; keywords: string[];
   /** the pick call's choice (kit+pick arms); `floor`: the call failed and the floor's choice stood in. kit+pick+cast:
    *  `person`, the id of the one supporting person the pick kept (none: it kept nobody) */
@@ -534,20 +534,20 @@ export interface SagaKit {
    *  knows yet) — the plan's seed */
   premise?: string[]; premiseFloor?: boolean;
 }
-/** a soldier's NEXT personal saga (chain B, C…): an earlier personal saga changed them (`history` dealt) */
-export const nextChapter = (w: Partial<Pick<SagaWorld, 'personal' | 'history'>>): boolean => !!w.personal && !!w.history;
+/** a soldier's NEXT personal chapter (chain B, C…): an earlier personal chapter changed them (`history` dealt) */
+export const nextChapter = (w: Partial<Pick<ChapterWorld, 'personal' | 'history'>>): boolean => !!w.personal && !!w.history;
 /** (chain B, C…) who the soldier became: their living dossier's Now line (the seed beside the dealt situation, without the
- *  People line a seated face adds), as the log-only change-vs-Now lint reads it. None on any other saga */
-export const nextNow = (w: Pick<SagaWorld, 'seed' | 'kit'> & Partial<Pick<SagaWorld, 'personal' | 'history'>>): string | undefined => {
+ *  People line a seated face adds), as the log-only change-vs-Now lint reads it. None on any other chapter */
+export const nextNow = (w: Pick<ChapterWorld, 'seed' | 'kit'> & Partial<Pick<ChapterWorld, 'personal' | 'history'>>): string | undefined => {
   const now = seedOf(w).now?.split('\n')[0]?.trim();
   return now || undefined;
 };
 /** the seed as the plan receives it: the theme or a personal past; a kit arm's situation and keywords (the picked ones
  *  once the pick call has run); a premise arm's premise, alone. A NEXT chapter: the dealt situation is the seed — its new
- *  matter, as a hired saga's is — and who the soldier already is (their living dossier's Now: dossier.ts livingSeed) rides
+ *  matter, as a hired chapter's is — and who the soldier already is (their living dossier's Now: dossier.ts livingSeed) rides
  *  beside it as `now`, a done fact the change steps beyond. Sent as the seed itself, the settled chapter was the story's
  *  material: chain B rebuilt its people and things, and its change pasted the Now (CB_g1, 4 of 8 and 8 of 8) */
-export function seedOf(w: Pick<SagaWorld, 'seed' | 'kit'> & Partial<Pick<SagaWorld, 'personal' | 'history'>>): { text: string; keywords?: string[]; premise?: true; now?: string } {
+export function seedOf(w: Pick<ChapterWorld, 'seed' | 'kit'> & Partial<Pick<ChapterWorld, 'personal' | 'history'>>): { text: string; keywords?: string[]; premise?: true; now?: string } {
   const k = w.kit;
   if (!k) return { text: w.seed.text };
   if (k.premise?.length) return { text: k.premise.join(' '), premise: true };
@@ -557,45 +557,45 @@ export function seedOf(w: Pick<SagaWorld, 'seed' | 'kit'> & Partial<Pick<SagaWor
   return { text: situation ?? w.seed.text, ...(keywords.length ? { keywords } : {}) };
 }
 /** every word the seed dealt, for the log-only lints (a seed word in the plan is no stray, no answer leak) */
-export const seedText = (w: Pick<SagaWorld, 'seed' | 'kit'> & Partial<Pick<SagaWorld, 'personal' | 'history'>>): string => {
+export const seedText = (w: Pick<ChapterWorld, 'seed' | 'kit'> & Partial<Pick<ChapterWorld, 'personal' | 'history'>>): string => {
   const s = seedOf(w);
   return [s.text, s.now, ...(s.keywords ?? [])].filter(Boolean).join(' ');
 };
 /** kit+pick+cast, once picked: the cast keeps only the supporting person the pick kept — the plan, the cards, the reports
  *  and the chronicle never see the others (the one who asks and the person the ending decides are never supporting) */
-export function keepPicked(w: SagaWorld): void {
+export function keepPicked(w: ChapterWorld): void {
   if (!w.kit?.picked || !CASTS.has(w.kit.arm)) return;
   const keep = w.kit.picked.person;
   w.cast = w.cast.filter(p => p.seat !== 'support' || p.id === keep);
 }
 /** whether a kit arm still waits on its pick or premise call before the plan */
-export const seedPending = (w: Pick<SagaWorld, 'kit'>): boolean => !!w.kit && ((PICKS.has(w.kit.arm) && !w.kit.picked) || (w.kit.arm === 'kit+pick+premise' && !w.kit.premise));
+export const seedPending = (w: Pick<ChapterWorld, 'kit'>): boolean => !!w.kit && ((PICKS.has(w.kit.arm) && !w.kit.picked) || (w.kit.arm === 'kit+pick+premise' && !w.kit.premise));
 /** one attempt as the chronicle keeps it. `decides`: whose deed decided a job that was not failed (the game sets it after
- *  the report lands; the memory edge to the deciding soldier reads it at the saga's close, §2.6). `summary`: the report's
+ *  the report lands; the memory edge to the deciding soldier reads it at the chapter's close, §2.6). `summary`: the report's
  *  own summary (its 📖 line) where `text` is not it — a failed middle job, whose text puts the job in front (triedLine); the
  *  So far rows read it beside the job's title, which already names the job. Absent (and in saves before 2026-10-05): text */
-export interface SagaLine { n: number; attempt: number; outcome: Outcome; party: string[]; text: string; hurt: Hurt[]; decides?: string; summary?: string }
+export interface ChapterLine { n: number; attempt: number; outcome: Outcome; party: string[]; text: string; hurt: Hurt[]; decides?: string; summary?: string }
 /** one row of the quest log as the engine renders it (the GUI gets the structure, the CLI the lab's text). `sofar` /
  *  `sofarrow` (pipe part sofar): the So far header, then one row per part played — its mark, its `title`, and in `text` the
  *  line its report left */
 export type LogRow = { kind: 'for' | 'road' | 'roadrow' | 'known' | 'knownrow' | 'held' | 'open' | 'sofar' | 'sofarrow'; mark?: '▶' | '✓' | '✗' | '·'; text: string; title?: string };
 /** ON THIS MATTER: a person the card calls by name (label without its article) */
 export interface Matter { id: string; name: string; label: string }
-/** where a card sits in the saga: the job it poses (the finale's is N), whether it is the finale, which try at the job */
-export interface SagaPos { job: number; finale: boolean; attempt: number }
-export interface SagaRecord {
+/** where a card sits in the chapter: the job it poses (the finale's is N), whether it is the finale, which try at the job */
+export interface ChapterPos { job: number; finale: boolean; attempt: number }
+export interface ChapterRecord {
   v: 4;
-  world: SagaWorld;
+  world: ChapterWorld;
   /** null until the plan call lands */
-  plan: SagaPlan | null;
-  /** a personal saga: the middle jobs whose people the plan itself wrote the soldier into (validatePlan `ownJobs`, before
+  plan: ChapterPlan | null;
+  /** a personal chapter: the middle jobs whose people the plan itself wrote the soldier into (validatePlan `ownJobs`, before
    *  the repair adds them everywhere) — the only jobs that pin the soldier to a place. Absent in saves before 2026-10-03:
    *  no pin */
   ownJobs?: number[];
   /** the floor's plan stood in */
   fallback: boolean;
   knowing: { met: string[]; named: string[]; seen: string[] };
-  state: SagaState;
+  state: ChapterState;
   /** R5: each job's hope as its card is dealt it (outline lines through roadHopes); null before card 1 or with < 2 jobs */
   hopes: (string | null)[] | null;
   /** R5: the road's line per job before the finale (roadLines), computed once beside card 1 */
@@ -605,8 +605,8 @@ export interface SagaRecord {
   latest: string; lastchance: boolean;
   /** card 1's prose ('' until it is written) */
   card1: string;
-  lines: SagaLine[];
-  /** how the saga ended: the finale's Outcome sentence (sagaflow.sagaFate), set when its report lands */
+  lines: ChapterLine[];
+  /** how the chapter ended: the finale's Outcome sentence (chapterflow.chapterFate), set when its report lands */
   ending?: string;
   /** pipe arm late (E1): the finale as written after play, once the finale comes; null: the call failed and the plan's
    *  showdown stands; absent: not yet written (or another arm) */
@@ -614,23 +614,23 @@ export interface SagaRecord {
   /** pipe arm past (PP): the engine's one dossier line for the soldier, written when the finale is not lost (`grownLine`) */
   grown?: string;
   /** the card on offer, re-offered verbatim while unmarched (D15); cleared by every report */
-  cache?: { pos: SagaPos; title: string; prose: string; job: string; rows: LogRow[]; matter: Matter[] };
+  cache?: { pos: ChapterPos; title: string; prose: string; job: string; rows: LogRow[]; matter: Matter[] };
 }
 
 // ─── the deal (D12, D13) ───────────────────────────────────────────────────────────────────────
 
-export interface SagaDeal {
+export interface ChapterDeal {
   seed: { id: string | null; text: string }; tone: string; shape: ShapeId; stake: string;
   /** a kit arm: what the kit dealt, and how many supporting people the cast coins beside the person the ending decides */
-  kit?: SagaKit; support?: number;
+  kit?: ChapterKit; support?: number;
 }
-/** ONE dealer for a saga's story inputs (§D): the seed (a theme from the library, never repeated within the window; a
- *  personal saga's own past; a lab fixture's spark), the tone (a theme's feeling, else the tone roll), the shape (read
+/** ONE dealer for a chapter's story inputs (§D): the seed (a theme from the library, never repeated within the window; a
+ *  personal chapter's own past; a lab fixture's spark), the tone (a theme's feeling, else the tone roll), the shape (read
  *  only for the client's part and the floor's stake) and the stake. Pushes a dealt theme id onto `recentThemeIds`,
  *  trimmed to the no-repeat window. Every draw is on `storyRng` */
-export function dealSaga(storyRng: Rng, recentThemeIds: string[], a: { personal: boolean; personalSeed?: string; spark?: string; arm?: SeedArm; next?: boolean }): SagaDeal {
-  if (a.arm && a.arm !== 'themes') return dealKitSaga(storyRng, a.arm, a);
-  let seed: SagaDeal['seed'];
+export function dealChapter(storyRng: Rng, recentThemeIds: string[], a: { personal: boolean; personalSeed?: string; spark?: string; arm?: SeedArm; next?: boolean }): ChapterDeal {
+  if (a.arm && a.arm !== 'themes') return dealKitChapter(storyRng, a.arm, a);
+  let seed: ChapterDeal['seed'];
   let themeTone: string | undefined;
   if (a.spark) seed = { id: null, text: a.spark };
   else if (a.personal && a.personalSeed) seed = { id: null, text: a.personalSeed };
@@ -648,11 +648,11 @@ export function dealSaga(storyRng: Rng, recentThemeIds: string[], a: { personal:
 }
 /** a kit arm's deal (North Star 7): the kit (situation(s), keywords), the supporting cast's size (0–2 coined beside the
  *  person the ending decides; kit+pick+cast 3–4, of whom its pick keeps at most one), the tone roll (no theme brings
- *  one), the shape (read only for the floor's stake) and the stake. A personal saga's seed stays its own past; a lab
+ *  one), the shape (read only for the floor's stake) and the stake. A personal chapter's seed stays its own past; a lab
  *  spark still wins. Every draw on `storyRng`, one per field in every arm (so arms that deal alike draw alike) */
-function dealKitSaga(storyRng: Rng, arm: Exclude<SeedArm, 'themes'>, a: { personal: boolean; personalSeed?: string; spark?: string; next?: boolean }): SagaDeal {
+function dealKitChapter(storyRng: Rng, arm: Exclude<SeedArm, 'themes'>, a: { personal: boolean; personalSeed?: string; spark?: string; next?: boolean }): ChapterDeal {
   const personal = a.personal && !!a.personalSeed;
-  // (a NEXT chapter, chain B, C…) the new matter is DEALT, as a hired saga's is — a situation beside the keywords; the seed
+  // (a NEXT chapter, chain B, C…) the new matter is DEALT, as a hired chapter's is — a situation beside the keywords; the seed
   // stays who the soldier is now (round CB: handed only the settled wrong, 8 of 8 real chain Bs wrote it again)
   const k = dealKit(storyRng, arm, personal && !a.next);
   const [lo, hi] = KIT_DEAL.cast.support;
@@ -672,7 +672,7 @@ export interface CastInput {
   focal: Card; personal: boolean; region: string; shape: ShapeId;
   /** a name already in use or too close to one (roster, lore, recent NPC names) */
   taken: (name: string) => boolean;
-  /** a trade someone in another live saga already has: two horse dealers on the board at once are one to the player */
+  /** a trade someone in another live chapter already has: two horse dealers on the board at once are one to the player */
   takenTrade?: (trade: string) => boolean;
   /** the player's npc trait preferences (Settings): steer the coined people's sex and race */
   prefs?: TraitPrefs;
@@ -680,10 +680,10 @@ export interface CastInput {
   focalMemory?: { memory: string; where: string };
   /** D9: a known face reused in the client seat (the host picks it: `pickClientFace`) */
   returningClient?: Face;
-  /** D10: the person a personal saga's seed came from; `rival` (a rival-type edge) puts them in the opponent seat; `part`
+  /** D10: the person a personal chapter's seed came from; `rival` (a rival-type edge) puts them in the opponent seat; `part`
    *  (pipe arm past+return) the part they are seated with, in place of "knows the soldier's past" */
   seedPerson?: Face & { rival: boolean; part?: string };
-  /** a place name the host still wants rested (the game's anti-repeat over recent sagas) */
+  /** a place name the host still wants rested (the game's anti-repeat over recent chapters) */
   placeOk?: (place: string) => boolean;
   /** a kit arm (North Star 7): the client's part says only that they ask; the person the ending decides has no part; and
    *  `support` more people are coined with none (name, sex, race, trade) — the plan decides what each is to the story */
@@ -693,19 +693,19 @@ export interface CastInput {
    *  With none, the plan folded the "someone" onto the soldier ("hide herself from the baron's rope") */
   someone?: boolean;
 }
-export interface SagaCast { cast: SagaPerson[]; places: string[]; land: string }
+export interface ChapterCast { cast: ChapterPerson[]; places: string[]; land: string }
 
 /** the lean cast, built directly: the one who asks (name, sex, race; no trade — the plan coins one off the seed) and the
- *  person the ending decides, who stands in the way; on a personal saga the soldier and a coined opponent instead. A
+ *  person the ending decides, who stands in the way; on a personal chapter the soldier and a coined opponent instead. A
  *  returning face fills the client seat (D9) and a personal seed's person a seat of their own (D10). Then three places
  *  (never the landmark; distinct stems) and the land in plain words. Every draw on `storyRng`, in seat order */
-export function castSaga(storyRng: Rng, a: CastInput): SagaCast {
+export function castChapter(storyRng: Rng, a: CastInput): ChapterCast {
   const reg = REGION[a.region]!;
   const races = Object.entries(reg.poolWeights) as [string, number][];
   let n = 0;
   // a kit cast coins up to six strangers, so a name already in this cast is taken too (the theme arm's two never met)
   const taken = a.kit ? (name: string) => a.taken(name) || cast.some(p => p.name === name) : a.taken;
-  const coin = (seat: Seat, part: string, trade: boolean | readonly string[]): SagaPerson => {
+  const coin = (seat: Seat, part: string, trade: boolean | readonly string[]): ChapterPerson => {
     const sex = prefPick(storyRng, ['male', 'female'], a.prefs) as 'male' | 'female';
     const race = prefPick(storyRng, races.map(r => r[0]), a.prefs, m => races.find(r => r[0] === m)![1]);
     let name = rollName(storyRng, race, sex);
@@ -719,10 +719,10 @@ export function castSaga(storyRng: Rng, a: CastInput): SagaCast {
       known: seat === 'client',
     };
   };
-  const face = (f: Face, seat: Seat, part: string): SagaPerson =>
+  const face = (f: Face, seat: Seat, part: string): ChapterPerson =>
     ({ id: f.id, name: f.name, sex: f.sex, race: f.race, seat, focal: false, part, ...(f.trade ? { trade: f.trade } : {}), known: true, memory: f.memory, where: f.where });
   const f = a.focal;
-  const cast: SagaPerson[] = [];
+  const cast: ChapterPerson[] = [];
   if (a.personal) {
     cast.push({ id: f.id, name: f.name, sex: sexOf(f), race: raceOf(f), seat: 'soldier', focal: true, part: PERSONAL_PARTS[0], trade: soldierTrade(f), traits: traitsOf(f), known: true });
     const sp = a.seedPerson;
@@ -730,7 +730,7 @@ export function castSaga(storyRng: Rng, a: CastInput): SagaCast {
     if (sp && !sp.rival) cast.push(face(sp, 'other', sp.part ?? PERSONAL_PARTS[2]));
   } else {
     const part = a.kit ? KIT_CLIENT_PART : SHAPES[a.shape].parts[0];
-    // at most one returning face a saga (§2.4.2): a focal the player already knows leaves the client seat to a stranger
+    // at most one returning face a chapter (§2.4.2): a focal the player already knows leaves the client seat to a stranger
     const back = a.focalMemory ? undefined : a.returningClient;
     cast.push(back ? face(back, 'client', part) : coin('client', part, false));
     // (the seat stays 'opponent' on a kit arm: the engine's own lines need one; the part, which the writers read, is none)
@@ -754,7 +754,7 @@ export function castSaga(storyRng: Rng, a: CastInput): SagaCast {
 }
 
 /** the ways the finale can end (personal: how the soldier's matter is settled), the likely one first */
-export const waysOf = (w: Pick<SagaWorld, 'personal' | 'kind' | 'cast'>): Way[] => w.personal ? ['talk', 'fight', 'sneak']
+export const waysOf = (w: Pick<ChapterWorld, 'personal' | 'kind' | 'cast'>): Way[] => w.personal ? ['talk', 'fight', 'sneak']
   : [w.kind, ...(['captive', 'recruit', 'gold'] as Way[]).filter(k => k !== w.kind && !(k === 'captive' && helped(w.cast.find(p => p.focal)!)))];
 
 // ─── returning faces (D9; §2.4.2 fences) ───────────────────────────────────────────────────────
@@ -767,17 +767,17 @@ export interface FaceCandidate extends Face {
 /** a returning face's seat follows their strongest edge to the company (§2.4.2) */
 export const CLIENT_EDGES = new Set(['party-to', 'saved-by', 'bonded-by', 'owes']);
 export const OPPONENT_EDGES = new Set(['rival-of', 'captive-of', 'betrayed-by']);
-/** how many sagas a used face sits out (the villain snowball) */
+/** how many chapters a used face sits out (the villain snowball) */
 export const FACE_COOLDOWN = 2;
-/** the faces that took a seat in the last `FACE_COOLDOWN` sagas */
-export const recentFaces = (chains: readonly { saga?: SagaRecord }[]): string[] =>
-  chains.filter(c => c.saga).slice(-FACE_COOLDOWN).flatMap(c => c.saga!.world.cast.filter(p => p.memory && !p.focal).map(p => p.id));
+/** the faces that took a seat in the last `FACE_COOLDOWN` chapters */
+export const recentFaces = (chains: readonly { chapter?: ChapterRecord }[]): string[] =>
+  chains.filter(c => c.chapter).slice(-FACE_COOLDOWN).flatMap(c => c.chapter!.world.cast.filter(p => p.memory && !p.focal).map(p => p.id));
 /** the faces that may fill the client seat: none on the roster, staged, in the cells, at the fort or out of reach; none
- *  used in the last two sagas; a client-type edge; a memory the player read */
+ *  used in the last two chapters; a client-type edge; a memory the player read */
 export const castableClients = (cands: readonly FaceCandidate[], recent: readonly string[]): FaceCandidate[] =>
   cands.filter(c => !c.companySoldier && !c.companyCaptive && !c.atTheFort && !c.outOfReach && !c.staged && !recent.includes(c.id)
     && CLIENT_EDGES.has(c.edgeType) && !!c.memory.trim());
-/** P(a new face) = θ/(θ+N) (RECURRING_CAST §3); a reuse is weighted by edge count. At most one returning face per saga:
+/** P(a new face) = θ/(θ+N) (RECURRING_CAST §3); a reuse is weighted by edge count. At most one returning face per chapter:
  *  the caller seats only what this returns */
 export function pickClientFace(storyRng: Rng, eligible: readonly FaceCandidate[], theta: number): FaceCandidate | undefined {
   const N = eligible.length;
@@ -802,7 +802,7 @@ export const EPISODE_TESTS: Record<JobType, [EpisodeTest, EpisodeTest]> = {
   talk: [{ attribute: 'CHA', favored: ['social', 'performance'], clashing: ['hotheaded'] }, { attribute: 'CHA', favored: ['leadership', 'social'], clashing: ['intimidation'] }],
   escort: [{ attribute: 'CON', favored: ['nature', 'melee'], clashing: [] }, { attribute: 'STR', favored: ['melee', 'ranged'], clashing: [] }],
 };
-/** D2: each finale way's test — today's trio (CHA social · STR melee+intimidation · INT roguery); a personal saga's
+/** D2: each finale way's test — today's trio (CHA social · STR melee+intimidation · INT roguery); a personal chapter's
  *  talk CHA social · fight STR melee · sneak DEX roguery. One slot per way */
 export const WAY_TESTS: Record<Way, EpisodeTest> = {
   recruit: { attribute: 'CHA', favored: ['social'], clashing: [] },
@@ -812,7 +812,7 @@ export const WAY_TESTS: Record<Way, EpisodeTest> = {
   fight: { attribute: 'STR', favored: ['melee'], clashing: [] },
   sneak: { attribute: 'DEX', favored: ['roguery'], clashing: [] },
 };
-/** D2: the reward kind each way's button carries. A personal saga's settleFinale ignores the kind; sneak → gold keeps
+/** D2: the reward kind each way's button carries. A personal chapter's settleFinale ignores the kind; sneak → gold keeps
  *  one easy gold road (the gold plan's 70% standard difficulty) */
 export const WAY_REWARD: Record<Way, 'recruit' | 'captive' | 'gold'> = { recruit: 'recruit', captive: 'captive', gold: 'gold', talk: 'recruit', fight: 'captive', sneak: 'gold' };
 
@@ -855,7 +855,7 @@ const LOOK_BODY = ['tall', 'short', 'stout', 'thin', 'broad', 'stooped', 'scarre
 const LOOK_MARK = ['ink-stained', 'mud-spattered', 'ring-heavy', 'patched', 'soot-smudged', 'bald', 'one-eyed', 'freckled', 'gap-toothed', 'pock-marked', 'sun-browned', 'limping'];
 /** (pipe arm weight) how a person looks when met: one body and one mark dealt off a hash of their name — no rng draw, so
  *  every deal stays the same */
-export function looksOf(p: Pick<SagaPerson, 'name'>): string {
+export function looksOf(p: Pick<ChapterPerson, 'name'>): string {
   const h = hashStr(`looks:${p.name}`);
   return `${LOOK_BODY[h % LOOK_BODY.length]}, ${LOOK_MARK[(h >>> 8) % LOOK_MARK.length]}`;
 }

@@ -1,14 +1,14 @@
-// SAGA LAB — the driver (docs/STORYTELLER.md §5.0). Plays lab sagas through the REAL text UI
+// CHAPTER LAB — the driver (docs/STORYTELLER.md §5.0). Plays lab chapters through the REAL text UI
 // (docs/DOGFOODING.md): it spawns `cli/main.ts`, pipes ONE command at a time and reads until the
 // dev `mark` echo, so every text a judge later reads is exactly what the CLI printed.
 //
-//   npx tsx scripts/sagalab/drive.ts --set A [--ai] [--fixtures A01,A02] [--run NAME]
+//   npx tsx scripts/chapterlab/drive.ts --set A [--ai] [--fixtures A01,A02] [--run NAME]
 //                                    [--parallel N] [--max-cycles 45] [--oneoffs]
 //
 // Per fixture: a fresh CLI on the fixture's seed (AIRAIDER_FORCE_OUTCOMES=1, AIRAIDER_CALL_LOG set)
-// → `lab saga <fixture>` → pursue → wait → quest → approach (finale, per the fixture's kind) →
-// auto → end! → reckoning … until the saga closes or 45 cycles; then chain, chains, save, ailog json.
-// Only the lab saga and its continuations are pursued (one-offs only with --oneoffs).
+// → `lab chapter <fixture>` → pursue → wait → quest → approach (finale, per the fixture's kind) →
+// auto → end! → reckoning … until the chapter closes or 45 cycles; then chain, chains, save, ailog json.
+// Only the lab chapter and its continuations are pursued (one-offs only with --oneoffs).
 //
 // Writes runs/<run>/drive/<fixture>/: transcript.jsonl (every command: tag, out, t0, t1),
 // stdout.log (the raw stream), calls.jsonl (every AI call), ailog.json, save.json, drive.json.
@@ -21,7 +21,7 @@ import { fileURLToPath } from 'node:url';
 import type { LabFixture } from '../../src/engine/lab.js';
 
 const V3 = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const LAB = path.join(V3, 'scripts/sagalab');
+const LAB = path.join(V3, 'scripts/chapterlab');
 
 const argv = process.argv.slice(2);
 const opt = (name: string): string | undefined => { const i = argv.indexOf(`--${name}`); return i >= 0 ? argv[i + 1] : undefined };
@@ -143,8 +143,8 @@ export async function driveOne(fxPath: string, run: string, o: { ai: boolean; ma
   const say = (s: string) => console.log(`[${fx.id}] ${s}`);
   try {
     await send('', 'boot');
-    const granted = await send(`lab saga ${fxPath}`, 'grant');
-    if (!granted.includes('✓ lab saga')) throw new Error(`grant refused: ${granted}`);
+    const granted = await send(`lab chapter ${fxPath}`, 'grant');
+    if (!granted.includes('✓ lab chapter')) throw new Error(`grant refused: ${granted}`);
     const seen = new Set<string>();
     let pursueFails = 0, stalls = 0;
     for (;;) {
@@ -152,7 +152,7 @@ export async function driveOne(fxPath: string, run: string, o: { ai: boolean; ma
       const chain = st.chains.find(c => c.lab?.fixture === fx.id);
       if (chain) { sum.chainId = chain.id; sum.chainState = chain.state }
       if (chain && (chain.state === 'done' || chain.state === 'slipped')) { sum.closed = true; break }
-      if (sum.cycles >= o.maxCycles) { sum.problems.push(`the saga did not close within ${o.maxCycles} cycles`); break }
+      if (sum.cycles >= o.maxCycles) { sum.problems.push(`the chapter did not close within ${o.maxCycles} cycles`); break }
       const q = chain ? st.quests.find(x => x.chainId === chain.id) : undefined;
       if (q) {
         // a finale's plan is chosen FIRST, so its card is read the way the player saw it once the
@@ -188,8 +188,8 @@ export async function driveOne(fxPath: string, run: string, o: { ai: boolean; ma
         }
         continue;
       }
-      if (!chain) throw new Error('the lab lead is gone and no saga began');
-      // nothing on the board for the saga this cycle — let the cycle turn
+      if (!chain) throw new Error('the lab lead is gone and no chapter began');
+      // nothing on the board for the chapter this cycle — let the cycle turn
       if (o.oneoffs) await playOneOffs(send, st, chain.id);
       await send('end!', 'end');
       sum.cycles++;
@@ -221,7 +221,7 @@ export async function driveOne(fxPath: string, run: string, o: { ai: boolean; ma
   return sum;
 }
 
-/** --oneoffs: take up every other lead too and man what can be manned (the lab saga stays first) */
+/** --oneoffs: take up every other lead too and man what can be manned (the lab chapter stays first) */
 async function playOneOffs(send: (cmd: string, tag?: string) => Promise<string>, st: LabState, chainId: string | null) {
   const others = st.leads.filter(l => l.kind === 'none' && l.chainId !== chainId && !l.lab);
   for (const l of others) await send(`pursue ${l.id}`, 'oneoff-pursue');
@@ -233,7 +233,7 @@ async function main() {
   const set = opt('set');
   const only = opt('fixtures')?.split(',').map(s => s.trim()).filter(Boolean);
   if (!set && !only) {
-    console.log('usage: npx tsx scripts/sagalab/drive.ts --set A|B [--fixtures A01,A02] [--ai] [--run NAME] [--parallel N] [--max-cycles 45] [--oneoffs]');
+    console.log('usage: npx tsx scripts/chapterlab/drive.ts --set A|B [--fixtures A01,A02] [--ai] [--run NAME] [--parallel N] [--max-cycles 45] [--oneoffs]');
     process.exit(2);
   }
   const ai = flag('ai');
@@ -260,7 +260,7 @@ async function main() {
     for (let f = queue.shift(); f; f = queue.shift()) results.push(await driveOne(f, run, o));
   }));
   const closed = results.filter(r => r.closed).length;
-  console.log(`\n${closed}/${results.length} sagas closed. Next: npx tsx scripts/sagalab/extract.ts --run ${run}`);
+  console.log(`\n${closed}/${results.length} chapters closed. Next: npx tsx scripts/chapterlab/extract.ts --run ${run}`);
   process.exit(closed === results.length ? 0 : 1);
 }
 

@@ -62,7 +62,7 @@ gold → builds/upgrades/renovates (prestige is the permission, gold the cost)
 higher regions → higher-band loot → every room re-fillable better → …
 ```
 
-The marriage: the mechanical grind (prestige tiers) is what **unlocks the rare, known-cast sagas** — the min-max engine buys access to the story engine.
+The marriage: the mechanical grind (prestige tiers) is what **unlocks the rare, known-cast chapters** — the min-max engine buys access to the story engine.
 
 ---
 

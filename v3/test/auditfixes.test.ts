@@ -144,7 +144,7 @@ describe('audit-fix regressions', () => {
     }
   });
 
-  it('focal backstory is tied to the genesis saga and written the cycle they are staged', async () => {
+  it('focal backstory is tied to the genesis chapter and written the cycle they are staged', async () => {
     const g = richGame(67);
     g.build('map-room'); g.build('lead-room');
     const story = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new' && l.source !== 'personal')!;
@@ -171,9 +171,9 @@ describe('audit-fix regressions', () => {
       const focal = g.card(chain.focalId)!;
       // a won recruit JOINS CLEAN when the roster has room (2026-07-10 — the mark was paid by
       // the bank; staging re-charged it); captives and full-roster recruits still stage.
-      // Either way they are fleshed with a backstory grown from the saga.
+      // Either way they are fleshed with a backstory grown from the chapter.
       expect([HELD('staged'), HELD('roster')]).toContainEqual(focal.location);
-      expect(focal.character!.backstory ?? '').toContain(chain.saga!.plan!.title);
+      expect(focal.character!.backstory ?? '').toContain(chain.chapter!.plan!.title);
     }
   });
 

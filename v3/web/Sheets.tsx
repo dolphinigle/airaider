@@ -100,7 +100,7 @@ export function CardSheet({ s, id, cast, doAct, quick, close, openQuest, openRoo
                 <span className="lbl">Their story</span>
                 {ch.backstory && <p className="p">{ch.backstory}</p>}
                 {ch.quirks?.length > 0 && <p className="p quirk">{ch.quirks.join(' · ')}</p>}
-                {/* a memory of their own (a saga they came through) — the CLI's dossier prints the same lines */}
+                {/* a memory of their own (a chapter they came through) — the CLI's dossier prints the same lines */}
                 {ownMemories(c.dossier).map((t, i) => <p className="p" key={'m' + i}>{t}</p>)}
               </div>
               <div className="blk">

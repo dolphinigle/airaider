@@ -5,7 +5,7 @@ import { describe, it, expect } from 'vitest';
 import { Game } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
 import { auditGame } from '../src/game/audit.js';
-import type { QuestWriteInput, QuestWriteOut, SagaCall } from '../src/ai/provider.js';
+import type { QuestWriteInput, QuestWriteOut, ChapterCall } from '../src/ai/provider.js';
 
 /** the mock, slow on purpose (I13), counting how many calls are open at once */
 class CountingMock extends MockProvider {
@@ -17,8 +17,8 @@ class CountingMock extends MockProvider {
     try { return await f() } finally { this.live-- }
   }
   override writeQuest(i: QuestWriteInput): Promise<QuestWriteOut> { return this.track(() => super.writeQuest(i)) }
-  // a saga's card 1 and its road ahead are one generation written side by side (R5): the road rides with its card
-  override sagaCall(c: SagaCall): Promise<unknown> { return c.template === 'outline' ? super.sagaCall(c) : this.track(() => super.sagaCall(c)) }
+  // a chapter's card 1 and its road ahead are one generation written side by side (R5): the road rides with its card
+  override chapterCall(c: ChapterCall): Promise<unknown> { return c.template === 'outline' ? super.chapterCall(c) : this.track(() => super.chapterCall(c)) }
 }
 
 /** blows up the first N card writes, then behaves */
@@ -35,7 +35,7 @@ function fresh(ai: MockProvider): Game {
   g.build('map-room'); g.build('lead-room');
   return g;
 }
-/** the day-0 board's plain one-offs (the third starter lead starts a saga) */
+/** the day-0 board's plain one-offs (the third starter lead starts a chapter) */
 const oneOffs = (g: Game) => g.visibleLeads().filter(l => l.chainInfo.kind === 'none');
 
 describe('pursuit queue', () => {

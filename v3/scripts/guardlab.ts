@@ -42,7 +42,7 @@ async function one(i: number) {
   }
   if (!lead) return { seed, skip: true as const };
   await g.pursue(lead.id);
-  const rejections = g.state.log.filter(l => l.text.includes('saga draft rejected')).map(l => l.text);
+  const rejections = g.state.log.filter(l => l.text.includes('chapter draft rejected')).map(l => l.text);
   const shippedFlawed = g.state.log.some(l => l.text.includes('still flawed'));
   return { seed, skip: false as const, drafts, rejections, shippedFlawed, cost: g.ai.usage().costUsd };
 }

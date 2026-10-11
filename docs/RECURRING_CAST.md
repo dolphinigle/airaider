@@ -18,7 +18,7 @@ still arrives. Not thirty names met once each.
 
 ## 2. What is wrong today (measured 2026-08-28)
 
-- A saga brings back a known face **~0.14 times per campaign** — about once in seven campaigns.
+- A chapter brings back a known face **~0.14 times per campaign** — about once in seven campaigns.
 - When it does, it picks **uniformly** over every character ever recorded, so a given person's
   chance is 1/N and falls as the world fills. This is the designer's "each unit reappear chance
   becomes tiny".
@@ -31,7 +31,7 @@ still arrives. Not thirty names met once each.
 1. **The chance of coining a NEW person falls as the cast grows.** A sliding chance, never a hard
    cap — the world must stay able to surprise. `P(new) = θ / (θ + N)`.
 2. **Reuse is weighted proportionally by EDGE COUNT** — how many matters that person has already
-   been part of. Someone in three of your sagas is three times likelier than someone in one.
+   been part of. Someone in three of your chapters is three times likelier than someone in one.
 
 **No hard deletion, and no eviction.** 🔒 Nothing is pruned; the list simply stops needing to grow.
 (LORE.md's soft-delete rule stands: nothing is ever hard-deleted, and the Chronicle keeps everything.)
@@ -42,7 +42,7 @@ edge → rule 2 favours that person next time. That bootstrap is the whole desig
 
 ## 4. The blocker this must fix on the way
 
-`LORE.md` §10 specifies story-NPC write-back at saga CLOSE: met-only, **cap 2/saga**, each with one
+`LORE.md` §10 specifies story-NPC write-back at chapter CLOSE: met-only, **cap 2/chapter**, each with one
 memory edge. That code exists (`game.ts:3130`) and never runs: a second write-back at
 `game.ts:1575` fires first at GENESIS, records **every** cast member — unmet, uncapped, **and with
 no edge** — and the close-time path then skips them on its name check. Deleting the genesis
@@ -53,7 +53,7 @@ person has edges.**
 
 > *"also need to note in story whether you already know someone or not i think then?"*
 
-A returning face is worth nothing if the card introduces them as a stranger. When a saga reuses
+A returning face is worth nothing if the card introduces them as a stranger. When a chapter reuses
 someone, the prose must land as recognition — the known-new contract inverted: a person the player
 has met is **already definite**, and re-introducing them ("a widow, Maldea") reads as amnesia.
 The engine knows which it is; the writer must be told, and the card must show it.
@@ -61,8 +61,8 @@ The engine knows which it is; the writer must be told, and the card must show it
 ## 6. What "achieved" means
 
 Mechanical (simulate):
-- cast size grows **sub-linearly** in sagas played — no cap needed to make that true;
-- a campaign of ~12 sagas produces **one face in 4+ of them** and a supporting cast of 3–4;
+- cast size grows **sub-linearly** in chapters played — no cap needed to make that true;
+- a campaign of ~12 chapters produces **one face in 4+ of them** and a supporting cast of 3–4;
 - the top face's chance of being the next return is **~25%**, not 1/N;
 - **zero** edgeless character nodes.
 
@@ -75,7 +75,7 @@ Felt (read real AI output):
 
 - **θ** — the coining-rate dial. 3 = a dominant nemesis · 4 = a lead plus a supporting cast ·
   8 = a wide world, softer recurrence. 🛠 tune by play.
-- **Scarcity is a separate problem.** At ~2.4 sagas per campaign this machinery gets ~5 slots to
+- **Scarcity is a separate problem.** At ~2.4 chapters per campaign this machinery gets ~5 slots to
   work with, so it reads right in a long game and barely registers in a short one. Seeding the
   world with faces at creation is the candidate fix; unruled.
 - Whether one-off quests should contribute faces at all (currently they contribute none, by the
@@ -86,31 +86,31 @@ Felt (read real AI output):
 
 ## 8. Measured — the mechanism works (2026-08-29)
 
-Three parallel real-AI campaigns, 12 sagas each (`v3/scripts/_castlab.ts`; the mock cannot test
+Three parallel real-AI campaigns, 12 chapters each (`v3/scripts/_castlab.ts`; the mock cannot test
 this — see §9):
 
 | | c1 | c2 | c3 |
 |---|---|---|---|
-| sagas featuring a face the player already knows | 5/12 | 6/12 | 5/12 |
+| chapters featuring a face the player already knows | 5/12 | 6/12 | 5/12 |
 | final reuse pool | 4 | 8 | 8 |
 | edgeless nodes | 0 | 0 | 0 |
 
-**~44% of sagas now return to a known face**, against an effective 0% before. `P(new)` walks down
+**~44% of chapters now return to a known face**, against an effective 0% before. `P(new)` walks down
 as designed — 100% → 80% → 67% → 44% → 40% over one campaign — the pool grows sub-linearly, and
 nothing is ever deleted. §6's mechanical bar is met.
 
 The history accumulates and reads as a world, not a ledger:
 
-> **Belknar of the Pass** — focal of one saga; three ties, two of them defining; later resurfaces
+> **Belknar of the Pass** — focal of one chapter; three ties, two of them defining; later resurfaces
 > as *"rival-of — stood against the company in the matter of 'The Cage Singer'"*.
 > **Kymme Ashworth** — *"sold by Nahikari to cover a market debt before the company took Nahikari
-> into custody"* (defining), carried across sagas.
+> into custody"* (defining), carried across chapters.
 
 Place names recur on their own too — "Hollowfall" anchors several stories in one campaign.
 
 ### The two guards that hid all of this
 
-The rules were correct and measured **0 reuses in 14 real-AI sagas**, because two twin-name guards
+The rules were correct and measured **0 reuses in 14 real-AI chapters**, because two twin-name guards
 (the focal similarity guard, and a second inside `addCard`) rerolled every promoted focal into a
 stranger: a face the world knows is IN the lorebook, which is exactly what `nameTooSimilar()` reads
 as a collision. The lore node had already been remapped onto the card id, so node and card then
@@ -123,22 +123,22 @@ pool turned a 46-minute debug loop into a 3-second one.
 
 ## 9. Still open — §5 is NOT met
 
-**7 of 16 returning-face sagas never name the person at all.** The player holds a defining memory
+**7 of 16 returning-face chapters never name the person at all.** The player holds a defining memory
 with Kymme Ashworth; the card says *"the chapel must have its priest returned… find any trace of the
 missing priest."* Not Kymme — "the missing priest".
 
 Cause: the reveal-cadence gate (`isMet`) is **per-chain**. The focal has not been introduced *in
-this saga*, so the writer withholds them — right for a stranger, exactly wrong for someone the
+this chapter*, so the writer withholds them — right for a stranger, exactly wrong for someone the
 company has history with. The engine knows which case it is and never tells the writer.
 
 ## §10 — §5 measured at beat 1: the wrong beat (2026-09-25)
 
 A parallel harness (`scripts/_knownface2.ts`, 20 worlds per arm, each holding six known faces with
-real memories) judged only returning-face sagas' FIRST card. The returning face appeared on 5/24
+real memories) judged only returning-face chapters' FIRST card. The returning face appeared on 5/24
 cards in total and `KNOWN_FACE=1` changed nothing (2/12 vs 3/12). That is the arc working as
-designed — step 1 LOCATES the person the saga is about, so they are legitimately offstage on beat 1
+designed — step 1 LOCATES the person the chapter is about, so they are legitimately offstage on beat 1
 (the same metric error §8 already names). §5 has to be judged at the beat where the face first
-appears, which needs sagas played through several beats. Still open; `KNOWN_FACE` stays off.
+appears, which needs chapters played through several beats. Still open; `KNOWN_FACE` stays off.
 
 One real defect surfaced: a known face whose lore node carries neither sex nor race nor pronouns
 ("A widow who holds the burned grange") came back as a wolfman. New nodes now record both

@@ -1,10 +1,10 @@
-// THE CHRONICLE — sagas, people & places, the log, the AI ledger; and the reckoning page.
+// THE CHRONICLE — chapters, people & places, the log, the AI ledger; and the reckoning page.
 import { sfx } from './sfx';
 import React, { useEffect, useRef, useState } from 'react';
 import { type S, gateOf, useKeyScroll, QuestLog } from './ui';
 
 export function Chronicle({ s, openQuest, openLeads }: { s: S; openQuest?: (id: string) => void; openLeads?: () => void }) {
-  const [tab, setTab] = useState<'sagas' | 'lore' | 'log' | 'ai'>('sagas');
+  const [tab, setTab] = useState<'chapters' | 'lore' | 'log' | 'ai'>('chapters');
   const lore = gateOf(s, 'lore');
   const body = useRef<HTMLDivElement>(null);
   useKeyScroll(body);
@@ -12,11 +12,11 @@ export function Chronicle({ s, openQuest, openLeads }: { s: S; openQuest?: (id: 
   return (
     <div className="chronicle">
       <div className="ctabs" role="tablist">
-        {([['sagas', 'Sagas'], ['lore', 'People & places'], ['log', 'Log'], ['ai', 'AI ledger']] as const).map(([k, l]) =>
+        {([['chapters', 'Chapters'], ['lore', 'People & places'], ['log', 'Log'], ['ai', 'AI ledger']] as const).map(([k, l]) =>
           <button key={k} role="tab" className={tab === k ? 'on' : ''} onClick={() => setTab(k)}>{l}</button>)}
       </div>
       <div className="cbody" ref={body} tabIndex={-1}>
-        {tab === 'sagas' && <Chains s={s} openQuest={openQuest} openLeads={openLeads} />}
+        {tab === 'chapters' && <Chains s={s} openQuest={openQuest} openLeads={openLeads} />}
         {tab === 'lore' && (lore && !lore.open ? <p className="empty">Build a <b>{lore.need}</b> to keep the lore.</p> : <Lore s={s} />)}
         {tab === 'log' && <pre className="log">{s.log.map((l: any) => `c${l.cycle} [${l.kind}] ${l.text}`).join('\n')}</pre>}
         {tab === 'ai' && <AiLog s={s} />}
@@ -25,28 +25,28 @@ export function Chronicle({ s, openQuest, openLeads }: { s: S; openQuest?: (id: 
   );
 }
 
-/** the saga's next move, as the engine names it (chainViews().next — the CLI's `chains` column):
+/** the chapter's next move, as the engine names it (chainViews().next — the CLI's `chains` column):
  *  on the map / choose the ending → its quest; a lead to pursue → the Leads tab */
-function SagaNext({ c, openQuest, openLeads }: { c: any; openQuest?: (id: string) => void; openLeads?: () => void }) {
+function ChapterNext({ c, openQuest, openLeads }: { c: any; openQuest?: (id: string) => void; openLeads?: () => void }) {
   if (!c.next) return null;
   const to = c.questId && openQuest ? () => openQuest(c.questId) : c.leadId && openLeads ? openLeads : null;
   return to
-    ? <button className={'sagago' + (c.next === 'choose the ending' ? ' hot' : '')} onClick={to}>→ {c.next}</button>
-    : <span className="sagago idle">{c.next}</span>;
+    ? <button className={'chaptergo' + (c.next === 'choose the ending' ? ' hot' : '')} onClick={to}>→ {c.next}</button>
+    : <span className="chaptergo idle">{c.next}</span>;
 }
 
-/** the sagas as the chronicle shows them (Game.chainViews — the CLI's `chain <id>` prints the same, in this order):
+/** the chapters as the chronicle shows them (Game.chainViews — the CLI's `chain <id>` prints the same, in this order):
  *  the quest log as it stands (none on the game's pipes, designer 2026-10-05), card 1, the likely end (how it ended, once over) and the economy, So far (the engine's
  *  rows: the job's number or "finale", the mark, the party, the line, who was hurt), the answer once the finale is
  *  played, the people the player has seen (by name only once their name was read) */
 function Chains({ s, openQuest, openLeads }: { s: S; openQuest?: (id: string) => void; openLeads?: () => void }) {
-  if (!s.chains.length) return <p className="empty">No sagas yet — pursue a lead marked “new saga”.</p>;
-  // live sagas first (newest first within each), as the CLI lists them
+  if (!s.chains.length) return <p className="empty">No chapters yet — pursue a lead marked “new chapter”.</p>;
+  // live chapters first (newest first within each), as the CLI lists them
   const order = s.chains.slice().reverse().sort((a: any, b: any) => Number(b.live ?? false) - Number(a.live ?? false));
-  return <div className="sagas">{order.map((c: any) => (
-    <article className={'sagacard ' + c.state} key={c.id}>
+  return <div className="chapters">{order.map((c: any) => (
+    <article className={'chaptercard ' + c.state} key={c.id}>
       <h3>{c.title} <small>{c.state === 'done' ? 'finished' : c.state === 'slipped' ? 'slipped away' : c.state === 'finale-pending' ? 'at its finale' : `part ${c.part} of ${c.of}`}{c.personal ? ' · personal' : ''}</small></h3>
-      {c.live && <SagaNext c={c} openQuest={openQuest} openLeads={openLeads} />}
+      {c.live && <ChapterNext c={c} openQuest={openQuest} openLeads={openLeads} />}
       <QuestLog rows={c.rows} />
       {c.card1 && <p className="p card1">{c.card1}</p>}
       <div className="meta"><span>{c.endLine}</span><span>set aside: {c.bank || '—'}</span><span>setbacks {c.failures} / {c.failureBudget}</span></div>
@@ -109,7 +109,7 @@ function lineClass(l: string): string {
   if (l.startsWith('   ')) return 'r-coins';
   if (l.startsWith('▸')) return 'r-turn';
   if (l.startsWith('✎')) return 'r-pending';
-  // a saga's 📖 line (where the story stands, and what just happened) is the story's own voice, never loot or news
+  // a chapter's 📖 line (where the story stands, and what just happened) is the story's own voice, never loot or news
   if (l.startsWith('📖 ')) return 'r-book';
   if (/^(\p{Extended_Pictographic}|[✦⚑†])/u.test(l)) return 'r-news';
   return 'r-prose';
@@ -239,7 +239,7 @@ function Tally({ sum, openRoom, openCard, openLeads, openHolding, cardExists, ro
   if (sum.lapsed?.length) chips.push({ k: 'z', text: `${sum.lapsed.length} went cold`, tone: 'bad', title: sum.lapsed.join(' · ') });
   if (sum.stalled?.length) chips.push({ k: 's', text: `${sum.stalled.length} did not march`, tone: 'bad', title: sum.stalled.join(' · ') });
   if (sum.leadsCold?.length) chips.push({ k: 'q', text: `${sum.leadsCold.length} lead${sum.leadsCold.length === 1 ? '' : 's'} lost`, tone: 'bad', title: sum.leadsCold.join(' · ') });
-  // the losses the tally used to fold into gold: captives handed off, debts taken on, saga setbacks
+  // the losses the tally used to fold into gold: captives handed off, debts taken on, chapter setbacks
   if (sum.handedOff?.length) chips.push({ k: 'h', text: `⛓ ${names(sum.handedOff)} handed off`, tone: 'bad', title: sum.handedOff.map((h: any) => `${h.name} +${h.gold}g`).join(' · ') });
   // the engine's words (Game.debtText — the CLI tally prints the same); an archive older than them keeps its old chip
   for (const d of sum.debts ?? []) chips.push({ k: 'd' + d.id, text: d.text ?? `⚠ ${d.amount}g debt`, tone: 'bad', go: card(d.id), title: 'unsettled, it draws collectors — settle it from its card' });

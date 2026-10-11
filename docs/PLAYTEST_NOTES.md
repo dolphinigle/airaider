@@ -30,13 +30,13 @@ one sentence anyway?
 
 ---
 
-## N2 ✅ Saga cards use their people with no introduction — from the very first card
+## N2 ✅ Chapter cards use their people with no introduction — from the very first card
 
 > *"for quest chains: the game uses the characters without introduction even at start (pls find the
 > corresponding quest chain and quest: 'look the ford over for Adeliza'). no context so no idea
 > whats going on"*
 
-**Found it.** `chain-53` — *"Three Fragments at the Ford"*, a captive saga, beat 1 of ~4, quest `q54`,
+**Found it.** `chain-53` — *"Three Fragments at the Ford"*, a captive chapter, beat 1 of ~4, quest `q54`,
 gravity *a grave affair*. Live in the designer's game (seed 230593368, cycle 5).
 
 **The card as the player read it:**
@@ -64,7 +64,7 @@ kernel  — "Ermina hires the company to seize Adeliza. The hunt draws out three
 So this is not a generation gap — it is an introduction gap. Both `who` lines are one clause each
 and would have fixed the card.
 
-**There is already a rule that this card breaks** (saga card prompt, ABOVE ALL rule 3): *"First use
+**There is already a rule that this card breaks** (chapter card prompt, ABOVE ALL rule 3): *"First use
 of any person, place, or thing — the client included — is introduced by a FULL sentence in which they
 DO something in this matter… a card whose reader cannot say who hires them, what the matter is, why
 it matters, and why it takes hired steel has failed."* The rule exists and did not fire.
@@ -124,35 +124,35 @@ over-stressing the article rule; and the card switching to an unintroduced name 
   atmosphere. Not built.
 
 
-## N3 🆕 A saga's next beat should generate itself, not go back to the lead board
+## N3 🆕 A chapter's next beat should generate itself, not go back to the lead board
 
 > *"for quest chains, i think just auto generate the next quest, no need to git back to lead board."*
 > *"(asynchronously, of course)"*
 
 **Today:** finishing a beat pushes a **continuation lead** onto the board (`⛓CONT — the story
-continues`). The player must go to Leads and pursue it to get the next card. So a running saga costs
+continues`). The player must go to Leads and pursue it to get the next card. So a running chapter costs
 a lead-board trip and a pursue click per beat.
 
 **Wanted:** the next beat writes itself when the previous one resolves, and lands on the quests
 board — through the queue built for `G1`, so nothing blocks.
 
 **The thing triage has to answer first:** the continuation lead is currently doing a **second job** —
-it is how a saga ENDS when the player isn't interested. Letting it expire slips the chain
+it is how a chapter ENDS when the player isn't interested. Letting it expire slips the chain
 (`game.ts:2155`), and re-offering the same beat three times slips it too (`reOffers >= 3`,
 `game.ts:2237`). Both exist because a beat card was once re-offered 28 times over 90 cycles. If the
-next beat simply appears, **there is no longer a way to decline a saga by ignoring it** — so the
+next beat simply appears, **there is no longer a way to decline a chapter by ignoring it** — so the
 design needs a replacement: abandon the quest? a stated "let it go"? does a beat still lapse on its
 own TTL?
 
 **Other open questions:**
 - **Cost and pacing.** Auto-generation fires a `writeQuest` per resolved beat with nobody asking for
-  it. Three live sagas = three calls every reckoning, on the player's bill. Acceptable? Does it
+  it. Three live chapters = three calls every reckoning, on the player's bill. Acceptable? Does it
   respect the in-flight cap, or jump the queue?
 - **When exactly?** During the reckoning that resolved the previous beat (so the card is waiting when
   the player returns to the fort), or at the start of the next fort phase?
-- Does this apply to the FIRST beat too, or only continuations? (Starting a saga is the 50–66s
+- Does this apply to the FIRST beat too, or only continuations? (Starting a chapter is the 50–66s
   genesis, which is a different problem — see `TEMPO.md`.)
-- Does the quests board need to show that a saga beat arrived, the way `P6` announces a pursued card?
+- Does the quests board need to show that a chapter beat arrived, the way `P6` announces a pursued card?
 
 ## N4 ✅ A recruit's story doesn't match where they were recruited from
 
@@ -252,8 +252,8 @@ DELIVERED  Kinburga — female; human; roguery (low); servant (low); nimble (low
 
 A shrine novice arrives as a nimble servant with light fingers. No `priest`, no `mystic`.
 
-**The contrast that proves the mechanism is otherwise sound** — the SAGA path still works, because a
-saga's cast is authored in the bible:
+**The contrast that proves the mechanism is otherwise sound** — the CHAPTER path still works, because a
+chapter's cast is authored in the bible:
 
 ```
 BIBLE      Adeliza — "An entertainer and light-finger who has been moving through the Western Forests."
@@ -286,7 +286,7 @@ differs): **2.85 ± 0.26 → 4.38 ± 0.26, +1.53 ± 0.37 (~4σ)**. Zero 5s befor
 2. The resolver fleshes whoever it hands over (the `fleshed: always []` contradiction).
 3. `FleshInput.quest` + `character.origin` — a delivered person remembers the job, so the fallback
    path is no longer forced to invent. This is the structural gap the designer spotted; it mirrors
-   the `saga` block that already existed for genesis focals.
+   the `chapter` block that already existed for genesis focals.
 4. **Tag echo stripped in the engine, not banned in the prompt.** The prompt already forbade
    echoing its own wording; banning the *label* just moved the echo — it came back as
    `(human. Male. Ranged (low). Instinctive)` at the head of the who-line. The detector now tests
@@ -397,7 +397,7 @@ which forced a victim onto every card — so an archetype where the **company** 
 back inverted (`press-ganging` was written as a *rescue from* a press-gang). The first sentence may
 now name what is simply THERE to be taken.
 
-## N7 — 🔴 CONFIRMED CLASS · a saga beat-1 card pastes its dealt atoms raw (2026-08-28)
+## N7 — 🔴 CONFIRMED CLASS · a chapter beat-1 card pastes its dealt atoms raw (2026-08-28)
 
 One card in an 8-cycle real-AI CLI campaign (seed 9310):
 
@@ -405,7 +405,7 @@ One card in an 8-cycle real-AI CLI campaign (seed 9310):
 > standing**."*
 
 The introduction is correct (N2's fix holding); the predicate is not English. One instance, one
-seed, on the saga path — recorded, not yet measured. Worth a targeted sample of beat-1 openers
+seed, on the chapter path — recorded, not yet measured. Worth a targeted sample of beat-1 openers
 before touching anything: a single bad sentence is not yet a class.
 
 **Update, same day — it is a class.** Two further real-AI campaigns produced it again, and the
@@ -455,7 +455,7 @@ which any of those changes touched:
    the theft, then pays to undo it"*, *"valuables already stripped, and the job is to retrieve the
    valuables"*. Judge, unprompted: *"hard defects, not quibbles."* The rule is already in
    `ABOVE ALL`, so wording and position are both spent — the untried lever is INPUT SHAPING. A
-   one-off is dealt no client and no opposition (a saga beat gets `OPPOSES` and a client tell), so
+   one-off is dealt no client and no opposition (a chapter beat gets `OPPOSES` and a client tell), so
    the writer invents both parties and collapses them into one. That is the experiment to run.
 3. **The pay clause is where cards go wrong.** *"Appositive name-drops and boilerplate reward
    wording bury a decent hook under repeated proper nouns."* Worth testing: the card need not carry
@@ -572,12 +572,12 @@ built from atoms — a station plus a refusal — not authored whole.
 - The situation rule is stated verbatim twice (spec + ABOVE ALL #1); the naming rule three times.
 - LIGHT's three worked examples are sticky enough that both readers predicted the same cards.
 
-## N11 — personal sagas were somebody else's errand (FIXED, measured)
+## N11 — personal chapters were somebody else's errand (FIXED, measured)
 
 Designer, 2026-08-30: *"the 'past stirs' quest (personal quest chains) seems to be not working
 correctly story wise? it doesnt seem to involve the past guy?"*
 
-Two independent causes, both fixed and both measured (3 arms × 10 sagas, 2 blind judges, r 0.97):
+Two independent causes, both fixed and both measured (3 arms × 10 chapters, 2 blind judges, r 0.97):
 
 1. **The seed was random.** `seed: sampleSeed(this.rng)` was dealt unconditionally, so a personal
    chain got a generic what-if that outranked the mercenary. Live save proof: the chain *"Paid to the
@@ -586,9 +586,9 @@ Two independent causes, both fixed and both measured (3 arms × 10 sagas, 2 blin
    obstacle. Now `personalSeed(merc)` deals his highest-salience active lore edge (falling back to
    the first sentence of his backstory). Aboutness 2.5 → 5.1.
 
-2. **Genesis asks for a job, and a job has a hirer.** Fixing the seed was not enough — 8/10 sagas
+2. **Genesis asks for a job, and a job has a hirer.** Fixing the seed was not enough — 8/10 chapters
    still opened with a client hiring the company and the mercenary's past as an appended clause. A
-   personal saga now tells genesis there is NO client: the past came to him, the company acts on
+   personal chapter now tells genesis there is NO client: the past came to him, the company acts on
    its own account, and the stake is what the FORT loses. Aboutness 5.1 → **7.9**, soldier-as-
    protagonist 2/10 → **10/10**, prose unchanged.
 
@@ -597,9 +597,9 @@ is being demoted, look for the slot that outranks it rather than adding emphasis
 
 ### N11b — the past's OTHER person was being re-invented (FIXED)
 
-Found by reading six shipped-config sagas rather than trusting the N11 score. All six were
+Found by reading six shipped-config chapters rather than trusting the N11 score. All six were
 correctly about the mercenary — but given the past *"Biddy left Arver behind at a crossing"*, the
-saga went looking for **Duryn Fernbrook**. Three of the four pasts that named a second person
+chapter went looking for **Duryn Fernbrook**. Three of the four pasts that named a second person
 replaced them with a coined stranger.
 
 Cause: `game.ts` strips every company mercenary but the focal from the genesis slate, and genesis is
@@ -611,7 +611,7 @@ Fix: `personalSeed` skips edges whose other endpoint is still in the company. Re
 pointing at NPCs: 4/4 named people now reach the cast under their real names, twice as the arc's
 opposing entry (*"A merchant, Arver Stonefield, refuses return and will claim theft"*).
 
-The class: **a seed may only name people the saga can cast.** Any dealt string that names someone
+The class: **a seed may only name people the chapter can cast.** Any dealt string that names someone
 the writer is forbidden to use produces a silent substitution, not an error.
 
 ## N12 — the routine report grabbed the reward instead of doing the job (FIXED, measured)
@@ -689,21 +689,21 @@ hands"*) — the example actions in the errand line are copied. Removing them ma
 lists and scored worse. For a card the scouting post offers every cycle, a steady errand with a
 varying grumble is arguably right; flagged, not ruled.
 
-### N11c — a personal saga introduced the company's own mercenary as a stranger (FIXED)
+### N11c — a personal chapter introduced the company's own mercenary as a stranger (FIXED)
 
 Live, 2026-09-25: *"A peasant scout, Keesa, came down from higher ground and said the whole of it
 standing … the fee is as agreed."* Keesa lives in the fort. Three dealt strings contradicted the
-saga the genesis wrote, each pasted where it landed (L19):
+chapter the genesis wrote, each pasted where it landed (L19):
 
-1. `arrival` ("came down from higher ground") — a client's arrival, dealt to a saga with no client.
-   Not dealt to personal sagas.
-2. the pay line ("the fee is as agreed") — invents the hirer NOCLIENT removed. Personal sagas get a
+1. `arrival` ("came down from higher ground") — a client's arrival, dealt to a chapter with no client.
+   Not dealt to personal chapters.
+2. the pay line ("the fee is as agreed") — invents the hirer NOCLIENT removed. Personal chapters get a
    no-fee pool ("nobody pays for this one — what the road turns up is the company's").
 3. the naming rule — "the card never opens on a name; every person arrives as what they are" —
    exempted only `introducedNames`, which beat 1 never receives. The exemption now also covers
    `rosterNames` (the company's own mercenaries) whenever the focal is a merc.
 
-Eight sagas each, before → after: visitor arrivals 4/8 → 0/8, fee language 8/8 → 0/8, mercenary
+Eight chapters each, before → after: visitor arrivals 4/8 → 0/8, fee language 8/8 → 0/8, mercenary
 introduced like a stranger 5/8 → 1/8. After: *"Renee, who once left a man at a crossing and will
 not say why, is returning to Ashroot Crossing to look where she left Arver Stonefield."*
 PERSONAL_CARD=0 restores the old inputs.
@@ -779,12 +779,12 @@ Prose flat (5.53 → 5.38 in the last round, +0.3 in the first). The first surve
 zeroes did not replicate at n=6 — small samples are noisy here. Remaining hunt misses are HEAVY
 (voiced) cards, which the light-register opener does not reach.
 
-### N16 — every saga leaned on "pledge" (FIXED, measured)
+### N16 — every chapter leaned on "pledge" (FIXED, measured)
 
-In a 26-cycle campaign all 6 sagas mention "pledge" 4-13 times (pledged hoard, household pledge,
+In a 26-cycle campaign all 6 chapters mention "pledge" 4-13 times (pledged hoard, household pledge,
 bond-pledge, pledged chest…). The genesis prompt carried a worked example list — *"Law and claims
 speak in period words — rights, pledges, sworn witness"* — and a listed example is a stamp (L20).
-Now *"Law and custom speak in period words, never modern ones."* 10 fresh sagas per arm on paired
+Now *"Law and custom speak in period words, never modern ones."* 10 fresh chapters per arm on paired
 seeds: "pledge" 6/10 → 3/10, "sworn" 3/10 → 0/10; the stories are otherwise the same stories.
 LAWWORDS=1 restores. (In a live campaign the recurring villain's own `who` — "presses ancient
 household claims on village pledges" — keeps some of it alive; that is the character, not a stamp.)
@@ -824,7 +824,7 @@ holds it against the company.") — L19; one-word atoms fixed it.
 | engine-rolled price | 7/20 (exactly the rolled ones) | 14/20 | 16/20 | 4.80 |
 
 Known cost: a bloodless partial reads a little less plainly as partial (the dice line still says
-[PARTIAL]). PCOST=0 restores. Sagas are untouched (their stakes carry their own costs).
+[PARTIAL]). PCOST=0 restores. Chapters are untouched (their stakes carry their own costs).
 
 ### N10 addendum — the SHAPE arm, judged at last (2026-09-25): mixed, not shipped
 

@@ -20,7 +20,7 @@
 .mk .ros { position: absolute; left: -21px; top: -21px; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #2a1a08;
   background: radial-gradient(circle at 40% 35%, #f1d38c, #c9973f 60%, #8a6529); box-shadow: 0 0 0 3px #3a2410, 0 0 0 4px #e2b85f, 0 3px 8px rgba(0,0,0,.7); }
 .mk .ros svg { pointer-events: none; }
-.mk.is-saga .ros { box-shadow: 0 0 0 3px #10302d, 0 0 0 5px #5fb3a9, 0 3px 8px rgba(0,0,0,.7); }
+.mk.is-chapter .ros { box-shadow: 0 0 0 3px #10302d, 0 0 0 5px #5fb3a9, 0 3px 8px rgba(0,0,0,.7); }
 .mk .ros:hover, .mk.hot .ros, .mk.drop .ros { box-shadow: 0 0 0 3px #3a2410, 0 0 0 5px #ffe3a0, 0 0 18px rgba(255,214,120,.7); }
 .mk.home .ros { width: 48px; height: 48px; left: -24px; top: -24px; background: radial-gradient(circle at 40% 35%, #9fd0c8, #3d8c86 60%, #1f4f4b); color: #07201e; }
 /* the name banner: one line, capped (the full title is in the tip); click = open */
@@ -95,7 +95,7 @@
 .row { display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: center; padding: 6px 12px 6px 14px; border-bottom: 1px solid var(--line-2); }
 .row:hover, .row.hot { background: var(--rack-2); }
 .row .g { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--brass); color: #2a1a08; }
-.row .g.is-saga { box-shadow: 0 0 0 2px #5fb3a9; }
+.row .g.is-chapter { box-shadow: 0 0 0 2px #5fb3a9; }
 .row .g.lead { background: #e7dcc3; color: #3b2f22; }
 .row .open { text-align: left; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .row .tt { font-size: 14.5px; font-weight: 600; color: #ece3cf; line-height: 1.2; }
@@ -109,7 +109,7 @@
 .boardtabs button { position: relative; }
 .boardtabs .unseen { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; margin-left: 6px; border-radius: 9px; background: #c9412f; color: #fff; font: 700 11px var(--mono); letter-spacing: 0; vertical-align: 2px; }
 .newmark { font: 700 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #fff; background: #c9412f; border-radius: 2px; padding: 0 4px; margin-left: 7px; font-style: normal; vertical-align: 2px; }
-.row .g.lead.is-saga { box-shadow: 0 0 0 2px #5fb3a9; }
+.row .g.lead.is-chapter { box-shadow: 0 0 0 2px #5fb3a9; }
 .row.lead.fresh { background: #1c1a14; }
 .board .row .why { font: 400 11px var(--mono); color: #c9ad80; margin-top: 3px; }
 .row .ss .toks { gap: 3px; }

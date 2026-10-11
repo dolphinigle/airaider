@@ -16,7 +16,7 @@ by dragging.** Every place a drag works, a click works too. (Sultan ships drag, 
 quick-place, and keyboard filtering; forcing the drag is the single easiest way to make this
 annoying.)
 
-**G3 — The saga's own people are already on the board, held in place.** Readable, never movable —
+**G3 — The chapter's own people are already on the board, held in place.** Readable, never movable —
 Sultan's "involved" cards, held down with brackets. They are how the player meets a face instead of
 only reading a name.
 
@@ -34,7 +34,7 @@ background come from the same token set on every surface. Both rules exist becau
 them and was rejected on sight.
 
 **G7 — It holds across the real range of content.** A one-sentence routine card *and* a five-sentence
-saga beat. One slot and four. With approaches and without. Zero cast and three.
+chapter beat. One slot and four. With approaches and without. Zero cast and three.
 
 **G8 — Nothing regresses.** The writing work stays where it was measured, the suite stays green,
 existing saves still load.
@@ -90,7 +90,7 @@ existing saves still load.
 
 - **M1** `npm test` green, plus `test/assign.test.ts`.
 - **M2** a real-AI CLI campaign in which every quest is manned by `auto` alone, no `assign` typed.
-- **M3** screenshots of the real page at three content shapes (one-sentence one-off · saga beat ·
+- **M3** screenshots of the real page at three content shapes (one-sentence one-off · chapter beat ·
   finale with approaches), read and judged.
 - **M4** the beat-1 writing numbers unchanged from `docs/CARD_GOLD_STANDARD.md`.
 

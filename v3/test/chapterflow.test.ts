@@ -1,25 +1,25 @@
-// The v4 saga flow (src/game/sagaflow.ts) played end to end against a fake host on a real game world, with the mock's
+// The v4 chapter flow (src/game/chapterflow.ts) played end to end against a fake host on a real game world, with the mock's
 // floor as the writer: N 2–6, personal and not, every lab path — a failure re-posed, a last chance — to the finale. Each
-// on PIPE_ARM (grafts, a host that names no pipe arm) and on R5's, which every saga dealt before grafts shipped still plays.
+// on PIPE_ARM (grafts, a host that names no pipe arm) and on R5's, which every chapter dealt before grafts shipped still plays.
 import { describe, it, expect } from 'vitest';
 import { seedIdCounter } from '../src/engine/cards.js';
 import { LAB_MIN_N, type LabPath } from '../src/engine/lab.js';
 import { coins } from '../src/engine/roll.js';
-import { clampHurt, WAY_TESTS, PIPE_ARM } from '../src/engine/saga.js';
-import * as flow from '../src/game/sagaflow.js';
-import { newGame, sagaChain, playSaga, hostFor } from './sagaharness.js';
+import { clampHurt, WAY_TESTS, PIPE_ARM } from '../src/engine/chapter.js';
+import * as flow from '../src/game/chapterflow.js';
+import { newGame, chapterChain, playChapter, hostFor } from './chapterharness.js';
 
 const PATHS: LabPath[] = ['clean', 'bumpy', 'failing', 'lastchance'];
 
-describe('saga flow — every path to the finale', () => {
+describe('chapter flow — every path to the finale', () => {
   for (const r5 of [false, true]) for (const personal of [false, true]) for (let N = 2; N <= 6; N++) for (const path of personal ? [...PATHS, 'personal' as const] : PATHS) {
     if (N < LAB_MIN_N[path]) continue;
     it(`${r5 ? 'R5 pipeline · ' : ''}${personal ? 'personal' : 'hired'} N=${N} ${path}`, async () => {
       seedIdCounter(1);
       const { g, ai } = newGame(100 + N * 10 + PATHS.indexOf(path as LabPath) + (personal ? 5 : 0));
-      const { chain, focal } = sagaChain(g, { N, personal });
-      const p = await playSaga(g, chain, path, focal, undefined, r5 ? { pipeArm: () => undefined } : {});
-      const rec = chain.saga!;
+      const { chain, focal } = chapterChain(g, { N, personal });
+      const p = await playChapter(g, chain, path, focal, undefined, r5 ? { pipeArm: () => undefined } : {});
+      const rec = chain.chapter!;
       const plan = rec.plan!;
       expect(rec.world.pipe).toBe(r5 ? undefined : PIPE_ARM);
       expect(rec.fallback).toBe(false);
@@ -41,10 +41,10 @@ describe('saga flow — every path to the finale', () => {
         expect(c.log.some(l => l.startsWith('Open question: '))).toBe(i > 0);
         if (N - 1 >= 2) expect(c.log).toContain('Road ahead:');
         else expect(c.log).not.toContain('Road ahead:');
-        // a re-posed job says so on its own row (a saga with one job before the finale has no road)
+        // a re-posed job says so on its own row (a chapter with one job before the finale has no road)
         if (N - 1 >= 2 && !c.pos.finale && c.pos.attempt > 1) expect(c.log.some(l => /^ {2}▶ .* \(again\)$/.test(l))).toBe(true);
       }
-      // the saga ends on its finale, with the plans
+      // the chapter ends on its finale, with the plans
       const last = p.cards[p.cards.length - 1]!;
       expect(last.pos.finale).toBe(true);
       expect(last.out.options?.map(o => o.way)).toEqual(personal ? ['talk', 'fight', 'sneak'] : flow.approaches(rec).map(a => a.way));
@@ -61,7 +61,7 @@ describe('saga flow — every path to the finale', () => {
       const failures = p.reports.filter(r => !r.pos.finale && r.outcome === 'failure').length;
       expect(rec.lastchance).toBe(failures >= chain.failureBudget);
       if (rec.lastchance) expect(ai.calls.filter(c => c.template === 'card').pop()!.flags).toContain('lastchance');
-      // the 📖 line: the saga's title, its status, the summary
+      // the 📖 line: the chapter's title, its status, the summary
       for (const r of p.reports) expect(r.book.startsWith(`📖 ${plan.title}: `)).toBe(true);
       expect(p.reports[p.reports.length - 1]!.book).toMatch(/: (it is settled|it slips away, for now)\. /);
       // the finale report carries the answer; a failed middle job carries no result, no decides
@@ -86,29 +86,29 @@ describe('saga flow — every path to the finale', () => {
   }
 });
 
-describe('saga flow — pieces', () => {
+describe('chapter flow — pieces', () => {
   it('a card on offer comes back verbatim, and the views never move Knowing', async () => {
     seedIdCounter(1);
     const { g, ai } = newGame(77);
-    const { chain, focal } = sagaChain(g, { N: 3, personal: false });
+    const { chain, focal } = chapterChain(g, { N: 3, personal: false });
     const host = hostFor(g);
     flow.deal(host, chain, undefined, focal);
-    // mid-saga: no answer, the open question still shown
+    // mid-chapter: no answer, the open question still shown
     await flow.plan(host, chain);
     const a = await flow.card(host, chain);
-    const k = JSON.stringify(chain.saga!.knowing);
+    const k = JSON.stringify(chain.chapter!.knowing);
     const b = await flow.card(host, chain);
     expect(b).toEqual(a);
     expect(ai.calls.filter(c => c.template === 'card')).toHaveLength(1);
-    expect(JSON.stringify(chain.saga!.knowing)).toBe(k);
+    expect(JSON.stringify(chain.chapter!.knowing)).toBe(k);
     const c = flow.chronicle(chain)!;
     expect(c.state).toBe('active');
     expect(c.answer).toBeUndefined();
     expect(c.rows.some(r => r.kind === 'open')).toBe(true);
-    expect(JSON.stringify(chain.saga!.knowing)).toBe(k);
+    expect(JSON.stringify(chain.chapter!.knowing)).toBe(k);
   });
 
-  it('D1: asks come from the job type, option i % 2; a personal saga pins its soldier to slot 0 when they are in the job', () => {
+  it('D1: asks come from the job type, option i % 2; a personal chapter pins its soldier to slot 0 when they are in the job', () => {
     const a = flow.asks('sneak', 3, false, false);
     expect(a.map(x => x.attribute)).toEqual(['DEX', 'DEX', 'DEX']);
     expect(a[0]!.favored).toEqual(['roguery', 'nature']);
@@ -127,11 +127,11 @@ describe('saga flow — pieces', () => {
     seedIdCounter(1);
     for (const personal of [false, true]) {
       const { g } = newGame(31);
-      const { chain, focal } = sagaChain(g, { N: 3, personal, kind: 'recruit' });
+      const { chain, focal } = chapterChain(g, { N: 3, personal, kind: 'recruit' });
       const host = hostFor(g);
       flow.deal(host, chain, undefined, focal);
       await flow.plan(host, chain);
-      const ap = flow.approaches(chain.saga!);
+      const ap = flow.approaches(chain.chapter!);
       expect(ap.map(x => x.id)).toEqual(['g0', 'g1', 'g2']);
       if (personal) expect(ap.map(x => [x.way, x.rewardKind])).toEqual([['talk', 'recruit'], ['fight', 'captive'], ['sneak', 'gold']]);
       else {
@@ -166,7 +166,7 @@ describe('saga flow — pieces', () => {
   it('D14: the stall guard brings the last chance too', async () => {
     seedIdCounter(1);
     const { g } = newGame(12);
-    const { chain, focal } = sagaChain(g, { N: 5, personal: false });
+    const { chain, focal } = chapterChain(g, { N: 5, personal: false });
     const host = hostFor(g);
     flow.deal(host, chain, undefined, focal);
     await flow.plan(host, chain);
@@ -174,8 +174,8 @@ describe('saga flow — pieces', () => {
     chain.cyclesSpent = chain.expectedBeats * 3;   // the merc-cycles the stall guard counts
     chain.beatIndex = 1;
     flow.afterReport(host, chain, out.pos, { outcome: 'success', party: g.roster().slice(0, 2), hurt: [] }, { before: 'b', after: 'a', summary: 's' });
-    expect(chain.saga!.lastchance).toBe(true);
-    expect(flow.posOf(chain.saga!).finale).toBe(true);
+    expect(chain.chapter!.lastchance).toBe(true);
+    expect(flow.posOf(chain.chapter!).finale).toBe(true);
     const fin = await flow.card(host, chain);
     expect(fin.pos.finale).toBe(true);
     // the jobs never reached drop off the road; the won one keeps its tick

@@ -1,4 +1,4 @@
-// INTRO LAB — can a cheap model hold the known-new contract on a saga's first card?
+// INTRO LAB — can a cheap model hold the known-new contract on a chapter's first card?
 //
 // The defect (PLAYTEST_NOTES N2): beat-1 cards open on proper nouns the player has never met.
 // Linguistically that is a presupposition failure — a proper noun is a DEFINITE reference, and a

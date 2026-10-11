@@ -109,8 +109,8 @@ for (let c = 0; c < cycles; c++) {
     const r = await g.pursue(lead.id);
     if (r.ok && r.questId) {
       const q = g.state.quests.find(x => x.id === r.questId)!;
-      // saga cards carry no meaningful archetype (beats serve the bible) — the label lied
-      // ("[hunt · beat 1]" → "[investigate · FINALE]" read as a mid-saga family flip)
+      // chapter cards carry no meaningful archetype (beats serve the bible) — the label lied
+      // ("[hunt · beat 1]" → "[investigate · FINALE]" read as a mid-chapter family flip)
       say(`\nc${g.state.cycle} ▶ CARD [${q.rarity}${q.chainId ? ` · ${q.isFinale ? 'FINALE' : `beat ${q.beatIndex}`}` : ` ${q.archetype}`}] ${q.title}`);
       say(`  (roster now: ${g.roster().map(m => m.name).join(', ')})`);
       say(`  ${q.situation}`);

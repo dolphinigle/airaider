@@ -1,6 +1,6 @@
 // A wound must be SHOWN in the report to be applied — but "shown" cannot mean "quoted verbatim",
 // because cheap models paraphrase their own sentence when they cite it (playtest 2026-09-25: both
-// saga wounds were dropped, and the story said the soldier bled while the engine said they were fine).
+// chapter wounds were dropped, and the story said the soldier bled while the engine said they were fine).
 import { describe, it, expect } from 'vitest';
 import { causeShown } from '../src/game/game.js';
 

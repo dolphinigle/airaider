@@ -6,21 +6,21 @@ import { Game, STALL_LIMIT, type LockNote } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
 import { seedIdCounter, HELD } from '../src/engine/cards.js';
 import type { Lead, Quest } from '../src/engine/quests.js';
-import type { SagaCall } from '../src/ai/provider.js';
+import type { ChapterCall } from '../src/ai/provider.js';
 
 const SOLDIER_PART = "one of the company's mercenaries";
 /** the mock, but its plan writes the soldier into job 1's people — the plan staging their own matter in person, which
  *  pins them to the job's first place (the mock's own plan never does) */
 class SoldierInJob1 extends MockProvider {
-  override async sagaCall(c: SagaCall): Promise<unknown> {
-    const out = await super.sagaCall(c) as Record<string, any>;
+  override async chapterCall(c: ChapterCall): Promise<unknown> {
+    const out = await super.chapterCall(c) as Record<string, any>;
     if (c.template !== 'plan') return out;
     const soldier = (c.payload.cast as { id: string; part: string }[]).find(p => p.part === SOLDIER_PART);
     if (soldier) out.episodes[0].people = [soldier.id, ...out.episodes[0].people];
     return out;
   }
 }
-/** a personal saga's lead for the first soldier, as the game posts one */
+/** a personal chapter's lead for the first soldier, as the game posts one */
 function personalLead(g: Game): Lead {
   if (!g.hasRoom('lead-room')) g.build('lead-room');
   const merc = g.roster()[0]!;
@@ -31,7 +31,7 @@ function personalLead(g: Game): Lead {
 }
 const open = (g: Game) => g.state.quests.filter(q => q.state === 'open');
 
-/** a game with the starter one-offs on the board and a personal saga lead ready to pursue (not yet pursued) */
+/** a game with the starter one-offs on the board and a personal chapter lead ready to pursue (not yet pursued) */
 async function board(seed = 31) {
   seedIdCounter(1);
   const g = new Game(new SoldierInJob1(seed), seed);
@@ -41,14 +41,14 @@ async function board(seed = 31) {
   const soldier = g.roster()[0]!;
   return { g, lead, soldier };
 }
-/** …and the personal saga's first job landed: its first place names the soldier */
+/** …and the personal chapter's first job landed: its first place names the soldier */
 async function locked(seed = 31) {
   const b = await board(seed);
   const r = await b.g.pursue(b.lead.id);
   const job = b.g.state.quests.find(q => q.id === r.questId)!;
   return { ...b, job, r };
 }
-/** a plain one-off (no saga, no standing post) with at least `n` places — places are added by hand when the deal
+/** a plain one-off (no chapter, no standing post) with at least `n` places — places are added by hand when the deal
  *  gave fewer, so the tests never hinge on a seed's slot roll */
 function oneOff(g: Game, n = 2): Quest {
   const q = open(g).find(x => !x.chainId && !x.approaches && x.fromLead?.expiresAtCycle !== null)!;
@@ -206,7 +206,7 @@ describe('the must-be lock', () => {
     expect(g.lockOf(x.id)).toMatchObject({ questId: b!.id });
   });
 
-  it('setting a saga step aside frees the soldier — and keeps its consequence (the thread dangles)', async () => {
+  it('setting a chapter step aside frees the soldier — and keeps its consequence (the thread dangles)', async () => {
     const { g, soldier, job } = await locked();
     const r = g.abandon(job.id);
     expect(r.msg).toMatch(/the thread dangles/);
@@ -396,7 +396,7 @@ describe('the march word', () => {
     const retry = g.state.quests.find(q => q.id === r.questId)!;
     expect(retry.id).not.toBe(job.id);
     expect(retry.chainId).toBe(job.chainId);
-    expect(retry.saga?.again).toBe(true);
+    expect(retry.chapter?.again).toBe(true);
     expect(retry.marchWord).toBeUndefined();
     // the soldier its place names is locked in again — and, once only the lock fills it, it waits for the word anew
     expect(retry.slots[0]!.filledBy).toBe(soldier.id);

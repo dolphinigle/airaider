@@ -1,5 +1,5 @@
 // Render FULL prompts (system + user, exactly as sent) for the context-free verifier gate:
-// one scouting (lead-hunt) card and one personal-saga beat-1 card.
+// one scouting (lead-hunt) card and one personal-chapter beat-1 card.
 import * as fs from 'node:fs';
 import { Game } from '../src/game/game.js';
 import { makeOpenAiProvider } from '../src/ai/openai.js';

@@ -1,5 +1,5 @@
 {
-  "_note": "DRAFT 2026-10-04 for designer review. Replaces themes.json as the saga seed slot: ONE generic situation + 1-3 keyword atoms + the dealt cast (the client + 1-3 potential supporting cast). Hand-curated: concrete, easy to picture, fantasy-plain, no modern words, no paperwork.",
+  "_note": "DRAFT 2026-10-04 for designer review. Replaces themes.json as the chapter seed slot: ONE generic situation + 1-3 keyword atoms + the dealt cast (the client + 1-3 potential supporting cast). Hand-curated: concrete, easy to picture, fantasy-plain, no modern words, no paperwork.",
   "situations": [
     "rescue someone",
     "get back something stolen",

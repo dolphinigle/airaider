@@ -1,5 +1,5 @@
 // AIRAIDER_CALL_LOG=<file> — every AI call, whole, one JSON line each (docs/STORYTELLER.md §5.1:
-// the saga lab's instrument). The in-memory ring behind the GUI's ai tab keeps 120 records with the
+// the chapter lab's instrument). The in-memory ring behind the GUI's ai tab keeps 120 records with the
 // user prompt cut at 20k chars; this keeps everything: full system and user prompt, the raw output,
 // tokens, latency. Logging only — unset, nothing is written and nothing else changes.
 
@@ -11,8 +11,8 @@ export interface CallLogLine {
   provider: 'openai' | 'claude' | 'mock';
   n: number;                 // the provider's call ordinal
   purpose: string;           // writeQuest / resolve / flesh / select / themeRoll / direction / plan / outline / card / report
-  template?: string;         // a saga call (v4 storyteller): its template — mech.ts and drive.ts read real game runs by it
-  flags?: string[];          // a saga call: the template flags, sorted
+  template?: string;         // a chapter call (v4 storyteller): its template — mech.ts and drive.ts read real game runs by it
+  flags?: string[];          // a chapter call: the template flags, sorted
   model: string;
   effort?: string;
   durationMs: number;

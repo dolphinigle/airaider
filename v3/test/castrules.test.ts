@@ -1,10 +1,10 @@
-// The cast rules (docs/STORYTELLER.md §2.4.2, build plan D9): who may come back into a saga's client seat — the lore
-// slate's location fences, the two-saga cooldown, a client-type edge, a memory the player read — how often (P(new) =
-// θ/(θ+N), reuse weighted by edges), at most one returning face a saga; and the theme dealer's no-repeat window.
+// The cast rules (docs/STORYTELLER.md §2.4.2, build plan D9): who may come back into a chapter's client seat — the lore
+// slate's location fences, the two-chapter cooldown, a client-type edge, a memory the player read — how often (P(new) =
+// θ/(θ+N), reuse weighted by edges), at most one returning face a chapter; and the theme dealer's no-repeat window.
 import { describe, it, expect } from 'vitest';
 import { Rng } from '../src/engine/rng.js';
 import { THEME_NO_REPEAT } from '../src/engine/themes.js';
-import { castableClients, pickClientFace, recentFaces, dealSaga, FACE_COOLDOWN, type FaceCandidate, type SagaRecord } from '../src/engine/saga.js';
+import { castableClients, pickClientFace, recentFaces, dealChapter, FACE_COOLDOWN, type FaceCandidate, type ChapterRecord } from '../src/engine/chapter.js';
 
 const face = (id: string, o: Partial<FaceCandidate> = {}): FaceCandidate =>
   ({ id, name: `Name ${id}`, sex: 'female', race: 'human', memory: 'The company saved her mill.', where: 'at the mill', edgeType: 'saved-by', edges: 1, ...o });
@@ -14,7 +14,7 @@ describe('castableClients — the fences', () => {
     const cands = [face('a'), face('b', { companySoldier: true }), face('c', { companyCaptive: true }), face('d', { atTheFort: true }), face('e', { outOfReach: true }), face('f', { staged: true })];
     expect(castableClients(cands, []).map(c => c.id)).toEqual(['a']);
   });
-  it('rests a face used in the last two sagas', () => {
+  it('rests a face used in the last two chapters', () => {
     expect(castableClients([face('a'), face('b')], ['a']).map(c => c.id)).toEqual(['b']);
   });
   it('only a client-type edge to the company seats a face as the client; a face with no memory the player read is a stranger', () => {
@@ -24,8 +24,8 @@ describe('castableClients — the fences', () => {
 });
 
 describe('recentFaces — the cooldown window', () => {
-  const rec = (ids: string[]) => ({ saga: { world: { cast: ids.map(id => ({ id, memory: 'm', focal: false })) } } as unknown as SagaRecord });
-  it(`the faces seated in the last ${FACE_COOLDOWN} sagas (not the focal, not a coined stranger)`, () => {
+  const rec = (ids: string[]) => ({ chapter: { world: { cast: ids.map(id => ({ id, memory: 'm', focal: false })) } } as unknown as ChapterRecord });
+  it(`the faces seated in the last ${FACE_COOLDOWN} chapters (not the focal, not a coined stranger)`, () => {
     const chains = [rec(['x']), {}, rec(['y']), rec(['z'])];
     expect(recentFaces(chains)).toEqual(['y', 'z']);
   });
@@ -57,7 +57,7 @@ describe('the theme dealer', () => {
   it(`never repeats a theme within ${THEME_NO_REPEAT} deals (and the window it keeps never grows past that)`, () => {
     const rng = new Rng(99), recent: string[] = [], dealt: string[] = [];
     for (let i = 0; i < 300; i++) {
-      const d = dealSaga(rng, recent, { personal: false });
+      const d = dealChapter(rng, recent, { personal: false });
       dealt.push(d.seed.id!);
       expect(recent.length).toBeLessThanOrEqual(THEME_NO_REPEAT);
     }

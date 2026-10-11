@@ -1,8 +1,8 @@
-// RECURRING_CAST §5 A/B. A world that ALREADY has history is injected, so most sagas return to a
-// known face immediately and the prose can be compared without playing twelve sagas first.
+// RECURRING_CAST §5 A/B. A world that ALREADY has history is injected, so most chapters return to a
+// known face immediately and the prose can be compared without playing twelve chapters first.
 // KNOWN_FACE=0 → the old behaviour (the reveal gate is per-chain, so a known face is staged as a
 // stranger). Default → the chain opens knowing them.
-// Usage: OUT=<file> npx tsx scripts/_knownface.ts [sagas] [seed]
+// Usage: OUT=<file> npx tsx scripts/_knownface.ts [chapters] [seed]
 import * as fs from 'node:fs';
 import { Game } from '../src/game/game.js';
 import { makeOpenAiProvider } from '../src/ai/openai.js';
@@ -51,7 +51,7 @@ for (let k = 1; k <= WANT; k++) {
   if (!r.ok || !r.questId) continue;
   const chain = g.state.chains[g.state.chains.length - 1]!;
   const focal = g.card(chain.focalId);
-  if (!focal || !known.has(focal.name)) continue;      // only returning-face sagas are the subject
+  if (!focal || !known.has(focal.name)) continue;      // only returning-face chapters are the subject
   returning++;
   const q = g.state.quests.find(x => x.id === r.questId)!;
   const named = q.situation.includes(focal.name.split(' ')[0]!);
@@ -62,5 +62,5 @@ for (let k = 1; k <= WANT; k++) {
   say(`JOB   : ${q.job}`);
   g.autoAssignAll(); await g.endCycle();
 }
-say(`\nRESULT: ${returning} returning-face sagas · named on the card: ${namedOnCard}/${returning} · $${g.ai.usage().costUsd.toFixed(2)}`);
+say(`\nRESULT: ${returning} returning-face chapters · named on the card: ${namedOnCard}/${returning} · $${g.ai.usage().costUsd.toFixed(2)}`);
 fs.writeFileSync(process.env.OUT ?? '/home/irvan/.claude/jobs/80974e3b/tmp/kf.md', out.join('\n'));

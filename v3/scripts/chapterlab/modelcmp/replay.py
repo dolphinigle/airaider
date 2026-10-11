@@ -6,7 +6,7 @@ import json, glob, os, random, subprocess, sys, time, re, tempfile
 from concurrent.futures import ThreadPoolExecutor
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-P1 = '/home/irvan/airaider/v3/scripts/sagalab/runs/probe1'
+P1 = '/home/irvan/airaider/v3/scripts/chapterlab/runs/probe1'
 CW = os.path.join(HERE, 'cw'); os.makedirs(CW, exist_ok=True)
 NOMCP = os.path.join(CW, 'nomcp.json'); open(NOMCP, 'w').write('{"mcpServers":{}}')
 MODELS = sys.argv[1].split(',') if len(sys.argv) > 1 else ['haiku', 'sonnet']

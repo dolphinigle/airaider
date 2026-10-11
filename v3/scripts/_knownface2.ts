@@ -1,5 +1,5 @@
 // RECURRING_CAST §5 A/B, parallel: N independent worlds, each already holding six known faces, each
-// opening ONE saga — only returning-face sagas are kept, and only beat 1's card is read.
+// opening ONE chapter — only returning-face chapters are kept, and only beat 1's card is read.
 // Usage: OUT=<md> KEY=<json> ARM=<label> npx tsx scripts/_knownface2.ts [worlds] [seed]
 import * as fs from 'node:fs';
 import { Game } from '../src/game/game.js';

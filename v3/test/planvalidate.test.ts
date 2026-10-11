@@ -1,14 +1,14 @@
 // The plan's validation (src/ai/storyteller.ts validatePlan, STORYTELLER §2.7): every mechanical repair, every hard
-// defect (one plain re-draw, then the floor), and the floor's own plan validating clean for every shape of saga.
+// defect (one plain re-draw, then the floor), and the floor's own plan validating clean for every shape of chapter.
 import { describe, it, expect } from 'vitest';
 import { seedIdCounter } from '../src/engine/cards.js';
-import type { SagaWorld } from '../src/engine/saga.js';
-import { validatePlan, mockPlan, planSaga, questLog, logLines, newKnowing, newState, type PlanCtx } from '../src/ai/storyteller.js';
-import type { AiProvider, SagaCall } from '../src/ai/provider.js';
-import * as flow from '../src/game/sagaflow.js';
-import { newGame, sagaChain, hostFor } from './sagaharness.js';
+import type { ChapterWorld } from '../src/engine/chapter.js';
+import { validatePlan, mockPlan, planChapter, questLog, logLines, newKnowing, newState, type PlanCtx } from '../src/ai/storyteller.js';
+import type { AiProvider, ChapterCall } from '../src/ai/provider.js';
+import * as flow from '../src/game/chapterflow.js';
+import { newGame, chapterChain, hostFor } from './chapterharness.js';
 
-const world = (o: Partial<SagaWorld> = {}): SagaWorld => ({
+const world = (o: Partial<ChapterWorld> = {}): ChapterWorld => ({
   personal: false, N: 3, kind: 'captive', shape: 'heist', focalId: 'c9',
   cast: [
     { id: 'p1', name: 'Mira Fairweather', sex: 'female', race: 'human', seat: 'client', focal: false, part: 'was wronged', known: true },
@@ -17,7 +17,7 @@ const world = (o: Partial<SagaWorld> = {}): SagaWorld => ({
   stake: 'a livelihood', places: ['Ashbrook', 'Coldwell', 'Dunmere'], land: 'the Western Forests, old-growth elven forests west of the fort',
   seed: { id: 'th-x', text: 'a bell taken from a chapel' }, tone: 'tense', region: 'western-forests', level: 2, ...o,
 });
-const ctx = (o: Partial<SagaWorld> = {}): PlanCtx => ({ w: world(o) });
+const ctx = (o: Partial<ChapterWorld> = {}): PlanCtx => ({ w: world(o) });
 const raw = (): Record<string, any> => ({
   title: 'The Stolen Bell', question: 'Nobody knows why the hunter took the bell.', answer: 'The hunter hid the bell so the bandits could not ring their signal.',
   cast: [{ id: 'p1', label: 'a human miller' }, { id: 'c9', label: 'a wolfkin hunter' }],
@@ -72,7 +72,7 @@ describe('validatePlan — the repairs (mechanical, silent)', () => {
     expect(ok(r).plan!.cast[0]!.want).toBe('get the bell back');
   });
   it('unknown ids leave a job\'s people', () => expect(repaired(r => { r.episodes[0].people = ['c9', 'zz'] }, /unknown ids dropped from episode 1/).episodes[0]!.people).toEqual(['c9']));
-  it('a personal saga\'s soldier is in every job', () => {
+  it('a personal chapter\'s soldier is in every job', () => {
     const c = ctx({ personal: true, cast: [
       { id: 'c3', name: 'Jervaise Greyfell', sex: 'female', race: 'human', seat: 'soldier', focal: true, part: "one of the company's mercenaries", trade: 'cook', known: true },
       { id: 'p1', name: 'Jofstrom', sex: 'male', race: 'wolfman', seat: 'opponent', focal: false, part: 'stands in the way', trade: 'slaver', known: false },
@@ -109,7 +109,7 @@ describe('validatePlan — the repairs (mechanical, silent)', () => {
 
 describe('validatePlan — a name is one unit with its particles (byname class: "an of the human woman")', () => {
   // seed1 G0_g1 F8_1: the client "Autonoe of the Ford" came back in her own label; the parts went and "of the" stayed
-  const byname = (o: Partial<SagaWorld> = {}) => ctx({ cast: [
+  const byname = (o: Partial<ChapterWorld> = {}) => ctx({ cast: [
     { id: 'p1', name: 'Autonoe of the Ford', sex: 'female', race: 'human', seat: 'client', focal: false, part: 'asks for help', known: true },
     { id: 'c9', name: 'Vyell the Quiet', sex: 'male', race: 'wolfman', seat: 'opponent', focal: true, part: 'stands in the way', trade: 'hunter', known: false },
     { id: 'p2', name: 'Kritias Ashworth', sex: 'male', race: 'human', seat: 'support', focal: false, part: '', trade: 'reeve', known: false },
@@ -152,18 +152,18 @@ describe('validatePlan — the hard defects (one plain re-draw, then the floor)'
   it('no showdown', () => broken(r => { delete r.showdown }, /missing showdown/));
   it('no settles, no lose', () => { broken(r => { delete r.showdown.settles }, /missing settles/); broken(r => { delete r.showdown.lose }, /missing lose/) });
   it('a held thing with no edge', () => broken(r => { r.showdown.edge = ['the map shows the back way'] }, /missing edge for episode 2/));
-  it('a personal saga with no past', () => broken(r => { delete r.asker; r.soldier = { want: 'free him' } }, /missing soldier past/, ctx({ personal: true, focalId: 'c3', cast: [
+  it('a personal chapter with no past', () => broken(r => { delete r.asker; r.soldier = { want: 'free him' } }, /missing soldier past/, ctx({ personal: true, focalId: 'c3', cast: [
     { id: 'c3', name: 'Jervaise', sex: 'female', race: 'human', seat: 'soldier', focal: true, part: "one of the company's mercenaries", known: true },
     { id: 'p1', name: 'Jofstrom', sex: 'male', race: 'wolfman', seat: 'opponent', focal: false, part: 'stands in the way', trade: 'slaver', known: false },
   ] })));
 });
 
-describe('planSaga — at most two calls, then the floor', () => {
+describe('planChapter — at most two calls, then the floor', () => {
   it('a defect earns one re-draw; a second defect brings the floor (logged)', async () => {
-    const calls: SagaCall[] = [];
-    const bad = { async sagaCall(c: SagaCall) { calls.push(c); return { title: 'Half a plan' } } } as unknown as AiProvider;
+    const calls: ChapterCall[] = [];
+    const bad = { async chapterCall(c: ChapterCall) { calls.push(c); return { title: 'Half a plan' } } } as unknown as AiProvider;
     const dev: string[] = [];
-    const r = await planSaga(bad, ctx(), 'chain-x', (_k, t) => dev.push(t));
+    const r = await planChapter(bad, ctx(), 'chain-x', (_k, t) => dev.push(t));
     expect(calls).toHaveLength(2);
     expect(calls.every(c => c.tier === 'plan' && c.effort === 'medium')).toBe(true);
     expect(r.fallback).toBe(true);
@@ -172,8 +172,8 @@ describe('planSaga — at most two calls, then the floor', () => {
   });
   it('a thrown call counts as a failed draw', async () => {
     let n = 0;
-    const flaky = { async sagaCall() { if (n++ === 0) throw new Error('timeout'); return raw() } } as unknown as AiProvider;
-    const r = await planSaga(flaky, ctx(), 'chain-x');
+    const flaky = { async chapterCall() { if (n++ === 0) throw new Error('timeout'); return raw() } } as unknown as AiProvider;
+    const r = await planChapter(flaky, ctx(), 'chain-x');
     expect(r.fallback).toBe(false);
     expect(r.plan.title).toBe('The Stolen Bell');
   });
@@ -183,7 +183,7 @@ describe('the floor\'s plan validates clean: N 2–6 × personal × kind', () =>
   for (let N = 2; N <= 6; N++) for (const personal of [false, true]) for (const kind of ['recruit', 'captive', 'gold-hoard'] as const) it(`N=${N} ${personal ? 'personal' : 'hired'} ${kind}`, () => {
     seedIdCounter(1);
     const { g } = newGame(50 + N);
-    const { chain, focal } = sagaChain(g, { N, personal, kind });
+    const { chain, focal } = chapterChain(g, { N, personal, kind });
     const rec = flow.deal(hostFor(g), chain, undefined, focal);
     const v = validatePlan(mockPlan({ w: rec.world }, chain.id), { w: rec.world });
     expect(v.defects).toEqual([]);

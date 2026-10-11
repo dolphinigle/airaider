@@ -120,7 +120,7 @@
 .questpage .loot::before { content: '✦'; margin-right: 5px; color: var(--brass-hi); font-size: 11px; }
 .questpage .owed { font: 400 11.5px var(--mono); color: #b8ab8f; font-style: italic; }
 .questpage .rwarn { height: 22px; padding: 0 8px; border-radius: 3px; background: #3d2a10; border: 1px solid #b07a24; color: #ffd48a; font: 500 11px var(--mono); display: flex; align-items: center; }
-.questpage .saga { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 14px; padding: 7px 10px; border-radius: 5px; background: #0f1a18; border: 1px solid #2b4a44; font: 400 11.5px var(--mono); color: #b9cfc8; }
+.questpage .chapter { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 14px; padding: 7px 10px; border-radius: 5px; background: #0f1a18; border: 1px solid #2b4a44; font: 400 11.5px var(--mono); color: #b9cfc8; }
 .questpage .sg-t { color: #7fd1c6; font-weight: 600; }
 .questpage .sg-i { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .questpage .sg-i b { color: #e7dcc3; font-weight: 500; }
@@ -137,8 +137,8 @@
 .questpage .meta { font: 400 12px var(--mono); color: var(--text-faint); }
 .writ .body { padding: 12px 26px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; flex: 1; }
 .questpage .sit { font-size: 16.5px; line-height: 1.62; color: #dcd3c1; max-width: 64ch; }
-/* THE QUEST LOG — the rows the engine renders on a saga card (So far: the parts played) and, for a saga on an older pipe,
-   in the chronicle's Sagas tab (the forward log): part of the card, plain, horizontal, body-size. A bold lead word, then the text; the marks sit in a
+/* THE QUEST LOG — the rows the engine renders on a chapter card (So far: the parts played) and, for a chapter on an older pipe,
+   in the chronicle's Chapters tab (the forward log): part of the card, plain, horizontal, body-size. A bold lead word, then the text; the marks sit in a
    fixed gutter. Every class in the ql- namespace (a bare .mk collided with map.css, 002725a). Contrast on the writ's
    #141110 (and this block's #18140f): text 11.9:1 · lead words 13.2 · ✓ 8.9 · ✗ 6.9 · ▶ 9.8 · ahead mark 8.2, text 9.7 ·
    a lost row's text 8.2 · a So far title 13.2 */

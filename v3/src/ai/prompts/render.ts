@@ -7,7 +7,7 @@
 // A rule about absent data never reaches the model: the caller turns a flag on only when the
 // payload carries the field it explains.
 //
-// Phase 1: the saga lab's probe renders these; nothing in the game does yet (Phase 2b).
+// Phase 1: the chapter lab's probe renders these; nothing in the game does yet (Phase 2b).
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';

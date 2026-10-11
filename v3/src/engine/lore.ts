@@ -13,7 +13,7 @@ export const EDGE_TYPES: EdgeType[] = [
   'loves', 'fears', 'defeated', 'freed-by', 'party-to',
 ];
 
-export type NodeKind = 'character' | 'relic' | 'place' | 'faction' | 'saga';
+export type NodeKind = 'character' | 'relic' | 'place' | 'faction' | 'chapter';
 
 export interface LoreNode {
   id: string;               // characters/relics share the Card id (one object, one id)
@@ -39,14 +39,14 @@ export interface RelEdge {
   active: boolean;          // soft-delete: inactive = hidden from AI, player-readable
   lastCycle: number;
   blurb: string;            // one-liner ("deserted his unit at the ford")
-  /** the saga, or the one-off quest, whose play made this memory (`madeInPlay`) */
+  /** the chapter, or the one-off quest, whose play made this memory (`madeInPlay`) */
   sourceChainId?: string;
   sourceQuestId?: string;
 }
 
-/** a memory the company's own play made: one a saga or a quest left, the engine's line about someone (a self-edge), or
- *  soldiers marching together. Never someone's past from before the company — a soldier's own saga is told as that past,
- *  and a saga's deed seeded as it was retold as an old wrong ("hanged for salting the orchard"), against the answer the
+/** a memory the company's own play made: one a chapter or a quest left, the engine's line about someone (a self-edge), or
+ *  soldiers marching together. Never someone's past from before the company — a soldier's own chapter is told as that past,
+ *  and a chapter's deed seeded as it was retold as an old wrong ("hanged for salting the orchard"), against the answer the
  *  company had already found */
 export const madeInPlay = (e: Pick<RelEdge, 'from' | 'to' | 'type' | 'sourceChainId' | 'sourceQuestId'>): boolean =>
   e.from === e.to || !!e.sourceChainId || !!e.sourceQuestId || e.type === 'served-with';
@@ -150,7 +150,7 @@ export function renderDossier(g: LoreGraph, id: string, cycle: number,
     .slice(0, DOSSIER_TOP_K)
     .map(e => {
       const other = g.nodes[e.from === id ? e.to : e.from]?.name ?? '?';
-      // a memory of their own (an engine-written self edge: a saga they came through, a slip, a hand-off) ties them to
+      // a memory of their own (an engine-written self edge: a chapter they came through, a slip, a hand-off) ties them to
       // nobody else: the player reads it as the memory alone, never "Serlon Reed (scarred-by) — came through …" under
       // Serlon Reed's own name. (The AI-fed dossier keeps its old form: `player` is set by the UIs only)
       if (extras?.player && e.from === e.to) return `- ${e.blurb}${e.core ? ' (defining memory)' : ''}`;
@@ -174,7 +174,7 @@ export function chronicleOf(g: LoreGraph, id: string): RelEdge[] {
 // ---- write-back guards (LORE §3.3) ----------------------------------------------------------
 
 /** the edges a MODEL proposes, minus any that tie a person to themself — the engine writes self edges
- *  on purpose (a saga memory, a hand-off), so guardEdges must keep accepting them; a model's self edge
+ *  on purpose (a chapter memory, a hand-off), so guardEdges must keep accepting them; a model's self edge
  *  is filler (a solo party left no second id: "c11 party-to c11 — placeholder" sat in a dossier and
  *  rode into the finale prompts) */
 export function modelEdges<T extends { from: string; to: string }>(proposed: T[] | undefined): T[] {
@@ -182,8 +182,8 @@ export function modelEdges<T extends { from: string; to: string }>(proposed: T[]
 }
 
 /** persist AI-emitted edges, guarded: both endpoints must resolve; type must be in the enum. `fresh`: a NEW fact the
- *  engine wrote (the memory a saga leaves its own soldier) — appended as its own memory, never merged into an older edge
- *  of the same tie (a soldier's second saga memory merged into the first: dropped from their sheet, or overwriting it) */
+ *  engine wrote (the memory a chapter leaves its own soldier) — appended as its own memory, never merged into an older edge
+ *  of the same tie (a soldier's second chapter memory merged into the first: dropped from their sheet, or overwriting it) */
 export function guardEdges(g: LoreGraph, proposed: {
   from: string; to: string; type: string; blurb: string; importance: number; sourceQuestId?: string; fresh?: boolean;
 }[], cycle: number, idGen: () => string, sourceChainId?: string): RelEdge[] {

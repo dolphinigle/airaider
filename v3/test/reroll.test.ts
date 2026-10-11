@@ -56,15 +56,15 @@ describe('abandoning a quest returns its lead', () => {
     expect(g.canReroll()).toBe(true);
   });
 
-  it('a saga beat has no lead to return to', async () => {
+  it('a chapter beat has no lead to return to', async () => {
     const g = new Game(new MockProvider(9), 9);
     g.build('map-room');
     g.state.leads.push({ ...lead('lead-s'), rarity: 'uncommon', chainInfo: { kind: 'starts-new' } });
     const r = await g.pursue('lead-s');
     const out = g.abandon(r.questId!);
     expect(out.ok).toBe(true);
-    // the ORIGINAL lead is not restored — a saga step is not a card you re-roll. (A sequel lead
-    // may appear instead: that is §21-4a's road back after a saga slips, a different mechanism.)
+    // the ORIGINAL lead is not restored — a chapter step is not a card you re-roll. (A sequel lead
+    // may appear instead: that is §21-4a's road back after a chapter slips, a different mechanism.)
     expect(g.state.leads.some(l => l.id === 'lead-s')).toBe(false);
     expect(g.canReroll()).toBe(true);            // and it did not spend the cycle's re-roll
   });

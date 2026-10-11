@@ -1,4 +1,4 @@
-// A QUEST, OPENED (docs/QUEST_SCREEN.md G1–G3, docs/UI.md §4). Left: the saga's own people held in
+// A QUEST, OPENED (docs/QUEST_SCREEN.md G1–G3, docs/UI.md §4). Left: the chapter's own people held in
 // brass clasps, the ways a finale can end, and the places to fill as niches over the roll. Right: the
 // written quest. Every placement is ONE engine call the CLI also makes: a niche drop or a card click
 // is `send <q> <merc> [slot]` (moves a committed soldier, swaps an occupied niche), plus unassign /
@@ -74,7 +74,7 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
     if (id) quick('send', q.id, id, idx);
   };
 
-  // the pay as loot chips: rewardEnvelope is 'a relic + a lead + a month's pay · and the saga still owes'
+  // the pay as loot chips: rewardEnvelope is 'a relic + a lead + a month's pay · and the chapter still owes'
   const [payNow, ...payTail] = String(q.rewardEnvelope ?? '').split(' · ');
   const loot = (payNow ?? '').split(' + ').filter(Boolean);
 
@@ -238,17 +238,17 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
             {payTail.length > 0 && <span className="owed">{payTail.join(' · ')}</span>}
             {q.rewardWarn && <span className="rwarn" title="what the quest brings versus what the fort can hold">⚠ {q.rewardWarn}</span>}
           </div>
-          {chain && <SagaStrip c={chain} q={q} />}
+          {chain && <ChapterStrip c={chain} q={q} />}
           <span className="meta">{q.rarity} · level {q.level} · {act.length || '—'} to send</span>
         </div>
         <div className="body">
-          {/* a saga card: the quest log the engine rendered, part of the card — above the prose on every R5 card (logFirst):
+          {/* a chapter card: the quest log the engine rendered, part of the card — above the prose on every R5 card (logFirst):
               on the game's pipes So far, the parts played before the last (the prose opens on it; none on cards 1–2); the
-              prose carries the job, so a saga card has no errand row */}
-          {q.saga?.logFirst && <QuestLog rows={q.saga.rows} />}
+              prose carries the job, so a chapter card has no errand row */}
+          {q.chapter?.logFirst && <QuestLog rows={q.chapter.rows} />}
           <p className="sit">{q.situation}</p>
-          {q.saga && !q.saga.logFirst && <QuestLog rows={q.saga.rows} />}
-          {!q.saga && <>
+          {q.chapter && !q.chapter.logFirst && <QuestLog rows={q.chapter.rows} />}
+          {!q.chapter && <>
             <div className="hr" />
             <div className="lineh"><span className="lk">The errand</span><span className="lv">{q.job}</span></div>
           </>}
@@ -272,15 +272,15 @@ export function QuestPage({ s, q, doAct, quick, armed, setArmed, back, readCast,
   );
 }
 
-/** the saga's stakes in one strip (Game.chainViews; the CLI's SAGA line says the same, in this order): part pips — the
- *  saga's one measure of how far along it is — setbacks, what is set aside */
-function SagaStrip({ c, q }: { c: any; q: any }) {
-  const total = Math.max(1, q.saga?.of ?? c.of ?? 1);
-  const now = q.isFinale ? total : Math.max(1, Math.min(total, q.saga?.part ?? c.part ?? 1));   // this card's part, 1-based
+/** the chapter's stakes in one strip (Game.chainViews; the CLI's CHAPTER line says the same, in this order): part pips — the
+ *  chapter's one measure of how far along it is — setbacks, what is set aside */
+function ChapterStrip({ c, q }: { c: any; q: any }) {
+  const total = Math.max(1, q.chapter?.of ?? c.of ?? 1);
+  const now = q.isFinale ? total : Math.max(1, Math.min(total, q.chapter?.part ?? c.part ?? 1));   // this card's part, 1-based
   const budget = Math.max(0, c.failureBudget ?? 0);
-  const where = q.isFinale ? `the finale${q.saga?.lastchance ? ' · the last chance' : ''}` : `part ${now} of ${total}${q.saga?.again ? ' (again)' : ''}`;
+  const where = q.isFinale ? `the finale${q.chapter?.lastchance ? ' · the last chance' : ''}` : `part ${now} of ${total}${q.chapter?.again ? ' (again)' : ''}`;
   return (
-    <div className="saga" aria-label="The saga">
+    <div className="chapter" aria-label="The chapter">
       <span className="sg-t" title={c.card1 ?? ''}>{c.title}</span>
       <span className="sg-i" title={where}>
         <span className="pips">{Array.from({ length: total }, (_, i) =>
@@ -288,7 +288,7 @@ function SagaStrip({ c, q }: { c: any; q: any }) {
         {where}
       </span>
       {budget > 0 && <span className={'sg-i' + (c.failures >= budget - 1 && c.failures > 0 ? ' hot' : '')}
-        title={`${budget} setbacks and the saga is forced to its last chance`}>
+        title={`${budget} setbacks and the chapter is forced to its last chance`}>
         <span className="pips sb">{Array.from({ length: budget }, (_, i) =>
           <i key={i} className={(i < c.failures ? 'hit' : '') + (i === budget - 1 ? ' last' : '')} />)}</span>
         setbacks {c.failures} of {budget}

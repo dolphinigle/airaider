@@ -1,9 +1,9 @@
-// SAGA LAB — the mechanical measures (docs/STORYTELLER.md §1.1 M12–M17, §5.0 paste rate, §D.3
+// CHAPTER LAB — the mechanical measures (docs/STORYTELLER.md §1.1 M12–M17, §5.0 paste rate, §D.3
 // repetition). Code only, no judges:
 //
-//   npx tsx scripts/sagalab/mech.ts --run NAME        → runs/NAME/mech.json + mech.md
+//   npx tsx scripts/chapterlab/mech.ts --run NAME        → runs/NAME/mech.json + mech.md
 //
-// Per saga (score.ts bootstraps over these):
+// Per chapter (score.ts bootstraps over these):
 //   M12 code  unmet-name leaks (a cast name first seen on a CARD, not the client or the company's own
 //             soldier) · soldier names on cards · answer-word leaks (the hidden twist's own words on a
 //             card or report before the finale report)
@@ -11,24 +11,24 @@
 //   M15       caps held (raw model output vs the prompt's own word caps) · hard failures (a card that
 //             could not be written, a report that is the fallback) · soft errors (a call that failed
 //             and was retried)
-//   M16       cost per saga and per beat (the saga's own calls: genesis, select, writeQuest, resolve)
+//   M16       cost per chapter and per beat (the chapter's own calls: genesis, select, writeQuest, resolve)
 //   M17       latency: pursue→card as the driver timed it; genesis, card, report call times
 //   paste     share of card words inside a 4-word span of the call's own input JSON
-// Across the run (§D.3): card-1 trigram overlap between sagas · title-word reuse · job-type sequence
+// Across the run (§D.3): card-1 trigram overlap between chapters · title-word reuse · job-type sequence
 // spread · opening-sentence stamps.
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { CallLogLine } from '../../src/ai/calllog.js';
-import type { TextRec, SagaMeta } from './extract.js';
+import type { TextRec, ChapterMeta } from './extract.js';
 import type { DriveSummary } from './drive.js';
 
 const V3 = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const LAB = path.join(V3, 'scripts/sagalab');
+const LAB = path.join(V3, 'scripts/chapterlab');
 
-/** the caps each arm's prompts set — the baseline's are today's (openai.ts): saga card ≤ 80 words;
- *  saga report before/after by gravity 22/45 · 40/90 · 60/140 (a finale takes the grave budget) */
+/** the caps each arm's prompts set — the baseline's are today's (openai.ts): chapter card ≤ 80 words;
+ *  chapter report before/after by gravity 22/45 · 40/90 · 60/140 (a finale takes the grave budget) */
 export const CAPS = {
   base: {
     card: () => 80,
@@ -36,7 +36,7 @@ export const CAPS = {
       finale || gravity?.startsWith('a grave') ? [60, 140] : gravity?.startsWith('a serious') ? [40, 90] : [22, 45],
   },
 };
-const SAGA_PURPOSES = new Set(['genesis', 'select', 'writeQuest', 'resolve', 'review']);
+const CHAPTER_PURPOSES = new Set(['genesis', 'select', 'writeQuest', 'resolve', 'review']);
 const STOP = new Set('the a an of to in that and who for with on at by from their its his her they them into over under is are was were be been has have had this these those your you it as or but not no so if then than when what which where while there here out up all one two'.split(' '));
 
 const words = (s: string) => (s.toLowerCase().match(/[a-z][a-z'’-]*/g) ?? []);
@@ -70,7 +70,7 @@ export function jobType(errand: string, finale: boolean): string {
 
 interface Plan { fixture: { id: string; personal: boolean; spark: string }; chain: { bible: { title: string; kernel: string; twist: string | null; cast: { name: string; role: string }[] } } | null; focal: { name: string } | null }
 
-export interface SagaMech {
+export interface ChapterMech {
   id: string; attempts: number; complete: boolean;
   cards: number; reports: number;
   unmetNameLeaks: string[]; soldierNamesOnCards: string[]; answerWordLeaks: string[];
@@ -82,11 +82,11 @@ export interface SagaMech {
   pasteBeat1: number | null; pasteAll: number | null;
   card1: string; title: string; jobSeq: string[]; paperworkJobs: number; jobs: number;
   cardWords: number[]; beforeWords: number[]; afterWords: number[];
-  /** (R3) probe sagas only: prompt-gloss runs printed in card and report prose, per text (`card_3: this job decides`) */
+  /** (R3) probe chapters only: prompt-gloss runs printed in card and report prose, per text (`card_3: this job decides`) */
   glossEchoes?: string[];
-  /** (R5 verify 2) probe sagas only: per card stamp, the cards whose prose carries it (`cardStamps`) */
+  /** (R5 verify 2) probe chapters only: per card stamp, the cards whose prose carries it (`cardStamps`) */
   cardStamps?: Record<string, number>;
-  /** (R7, R5) probe sagas only, log-only readability rows (`readability`) */
+  /** (R7, R5) probe chapters only, log-only readability rows (`readability`) */
   read?: Readability;
 }
 
@@ -174,10 +174,10 @@ export function glossEchoes(system: string, user: string, output: string): strin
   return [...new Set(out)];
 }
 
-export function sagaMech(runDir: string, id: string): SagaMech {
+export function chapterMech(runDir: string, id: string): ChapterMech {
   const sd = path.join(runDir, 'sagas', id);
   const texts = JSON.parse(fs.readFileSync(path.join(sd, 'texts.json'), 'utf8')) as TextRec[];
-  const meta = JSON.parse(fs.readFileSync(path.join(sd, 'meta.json'), 'utf8')) as SagaMeta;
+  const meta = JSON.parse(fs.readFileSync(path.join(sd, 'meta.json'), 'utf8')) as ChapterMeta;
   const plan = fs.existsSync(path.join(sd, 'plan.json')) ? JSON.parse(fs.readFileSync(path.join(sd, 'plan.json'), 'utf8')) as Plan : null;
   const calls = readJsonl<CallLogLine>(path.join(sd, 'calls.jsonl'));
   const drive = JSON.parse(fs.readFileSync(path.join(runDir, 'drive', id, 'drive.json'), 'utf8')) as DriveSummary;
@@ -236,8 +236,8 @@ export function sagaMech(runDir: string, id: string): SagaMech {
   const hardFailures = drive.pursues.filter(p => !p.ok).length + meta.problems.filter(p => /fallback text/.test(p)).length;
 
   // M16 / M17
-  const sagaCalls = calls.filter(x => SAGA_PURPOSES.has(x.purpose));
-  const costSaga = sagaCalls.reduce((s, x) => s + x.costUsd, 0);
+  const chapterCalls = calls.filter(x => CHAPTER_PURPOSES.has(x.purpose));
+  const costSaga = chapterCalls.reduce((s, x) => s + x.costUsd, 0);
   const costAll = calls.reduce((s, x) => s + x.costUsd, 0);
   const ms = (p: string) => calls.filter(x => x.ok && x.purpose === p).map(x => x.durationMs);
 
@@ -248,7 +248,7 @@ export function sagaMech(runDir: string, id: string): SagaMech {
   }).filter(p => p.rate !== null) as { beat: unknown; rate: number }[];
   const mean = (xs: number[]) => xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null;
 
-  // jobs: one per saga step (a re-posed card repeats its step)
+  // jobs: one per chapter step (a re-posed card repeats its step)
   const steps = new Map<string, TextRec>();
   for (const c of cards) { const key = String(c.beat ?? c.k); if (!steps.has(key)) steps.set(key, c) }
   const jobSeq = [...steps.values()].map(c => jobType(c.errand ?? '', c.isFinale));
@@ -261,7 +261,7 @@ export function sagaMech(runDir: string, id: string): SagaMech {
     hardFailures, softErrors,
     costSaga, costAll, costPerBeat: meta.attempts.length ? costSaga / meta.attempts.length : 0,
     pursueMs: drive.pursues.filter(p => p.ok).map(p => p.ms),
-    // the first pursuit writes the saga (genesis + card 1); the rest are continuation cards
+    // the first pursuit writes the chapter (genesis + card 1); the rest are continuation cards
     pursueFirstMs: drive.pursues.filter(p => p.ok).slice(0, 1).map(p => p.ms),
     pursueLaterMs: drive.pursues.filter(p => p.ok).slice(1).map(p => p.ms), genesisMs: ms('genesis'), cardMs: ms('writeQuest'), reportMs: ms('resolve'),
     pasteBeat1: mean(pastes.filter(p => p.beat === 1).map(p => p.rate)), pasteAll: mean(pastes.map(p => p.rate)),
@@ -270,7 +270,7 @@ export function sagaMech(runDir: string, id: string): SagaMech {
   };
 }
 
-/** a probe saga's plan.json (probe.ts): the engine side, the validated plan, and what the probe logged */
+/** a probe chapter's plan.json (probe.ts): the engine side, the validated plan, and what the probe logged */
 interface ProbePlanFile {
   // card1: Phase 1 runs only (R1 dropped the pitch arm: card 1 is always the `first` call); cast: R1 runs (full | lean)
   probe: { arm: { structure: string; names: string; card1?: string; cast?: string }; seed: { text: string } };
@@ -282,7 +282,7 @@ interface ProbePlanFile {
 }
 type ProbeCall = CallLogLine & { template?: string; flags?: string[] };
 
-/** the same measures on a PROBE saga (probe.ts, §5.2): v4 calls are plan · card · report, and each call's
+/** the same measures on a PROBE chapter (probe.ts, §5.2): v4 calls are plan · card · report, and each call's
  *  own system prompt states its caps, so caps are read from the prompt that asked */
 /** (R5 verify 2) log-only: the card stamps counted round to round and not fixed (§D: repetition is watch-only; R3 N9:
  *  rewording a gloss only moves its stamp). The order list's seams ("Now you", "you must", the trouble opener) and the
@@ -293,10 +293,10 @@ export const CARD_STAMPS: [string, RegExp][] = [
 ];
 export const cardStamps = (prose: string): string[] => CARD_STAMPS.filter(([, rx]) => rx.test(prose)).map(([k]) => k);
 
-export function sagaMechProbe(runDir: string, id: string): SagaMech {
+export function chapterMechProbe(runDir: string, id: string): ChapterMech {
   const sd = path.join(runDir, id);
   const texts = JSON.parse(fs.readFileSync(path.join(sd, 'texts.json'), 'utf8')) as TextRec[];
-  const meta = JSON.parse(fs.readFileSync(path.join(sd, 'meta.json'), 'utf8')) as SagaMeta;
+  const meta = JSON.parse(fs.readFileSync(path.join(sd, 'meta.json'), 'utf8')) as ChapterMeta;
   const pf = JSON.parse(fs.readFileSync(path.join(sd, 'plan.json'), 'utf8')) as ProbePlanFile;
   const calls = readJsonl<ProbeCall>(path.join(sd, 'calls.jsonl'));
   const cards = texts.filter(t => t.kind === 'card'), reports = texts.filter(t => t.kind === 'report');
@@ -387,8 +387,8 @@ export function sagaMechProbe(runDir: string, id: string): SagaMech {
   };
 }
 
-/** (R7, R5) the readability rows across a run (probe sagas only) */
-function readAgg(per: SagaMech[]) {
+/** (R7, R5) the readability rows across a run (probe chapters only) */
+function readAgg(per: ChapterMech[]) {
   const rs = per.map(p => p.read).filter((x): x is Readability => !!x);
   const all = <K extends keyof Readability>(k: K) => rs.flatMap(r => r[k] as number[]);
   const mean = (xs: number[]) => xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null;
@@ -406,26 +406,26 @@ function readAgg(per: SagaMech[]) {
 }
 
 export function runMech(runDir: string) {
-  // a drive run keeps its sagas under sagas/; a probe run (probe.ts) keeps them in the run folder itself
+  // a drive run keeps its chapters under chapters/; a probe run (probe.ts) keeps them in the run folder itself
   const probe = !fs.existsSync(path.join(runDir, 'sagas'));
   const root = probe ? runDir : path.join(runDir, 'sagas');
   const ids = fs.readdirSync(root).filter(f => fs.existsSync(path.join(root, f, 'texts.json'))).sort();
-  const per = ids.map(id => probe ? sagaMechProbe(runDir, id) : sagaMech(runDir, id));
+  const per = ids.map(id => probe ? chapterMechProbe(runDir, id) : chapterMech(runDir, id));
   const allOpeners = per.flatMap(p => p.cardOpeners.filter(Boolean));
   const openerCount = new Map<string, number>();
   for (const o of allOpeners) openerCount.set(o, (openerCount.get(o) ?? 0) + 1);
   const sharedOpeners = allOpeners.filter(o => openerCount.get(o)! > 1).length;
   const nCards = per.reduce((s, p) => s + p.cards, 0);
 
-  // §D.3 — card-1 trigram overlap between sagas
+  // §D.3 — card-1 trigram overlap between chapters
   const tri = per.map(p => new Set(grams(words(p.card1), 3)));
   const pairs: number[] = [];
   for (let i = 0; i < tri.length; i++) for (let j = i + 1; j < tri.length; j++) pairs.push(jaccard(tri[i]!, tri[j]!));
   // title-word reuse
   const titleWords = per.map(p => new Set(words(p.title).filter(w => w.length >= 4 && !STOP.has(w))));
-  const wordSagas = new Map<string, number>();
-  titleWords.forEach(ws => ws.forEach(w => wordSagas.set(w, (wordSagas.get(w) ?? 0) + 1)));
-  const reusedTitles = titleWords.filter(ws => [...ws].some(w => wordSagas.get(w)! > 1)).length;
+  const wordChapters = new Map<string, number>();
+  titleWords.forEach(ws => ws.forEach(w => wordChapters.set(w, (wordChapters.get(w) ?? 0) + 1)));
+  const reusedTitles = titleWords.filter(ws => [...ws].some(w => wordChapters.get(w)! > 1)).length;
   // job-type sequences
   const seqs = per.map(p => p.jobSeq.join('>'));
   const seqCount = new Map<string, number>(); seqs.forEach(s => seqCount.set(s, (seqCount.get(s) ?? 0) + 1));
@@ -435,7 +435,7 @@ export function runMech(runDir: string) {
   const stamps = new Map<string, number>(); per.map(p => stamp(p.card1)).filter(Boolean).forEach(s => stamps.set(s, (stamps.get(s) ?? 0) + 1));
   const topStamp = [...stamps.entries()].sort((a, b) => b[1] - a[1])[0];
 
-  const flat = (f: (p: SagaMech) => number[]) => per.flatMap(f);
+  const flat = (f: (p: ChapterMech) => number[]) => per.flatMap(f);
   const agg = {
     sagas: per.length, complete: per.filter(p => p.complete).length, cards: nCards, reports: per.reduce((s, p) => s + p.reports, 0),
     M12_unmetNameLeaks: per.reduce((s, p) => s + p.unmetNameLeaks.length, 0),
@@ -458,7 +458,7 @@ export function runMech(runDir: string) {
     D3_card1TrigramJaccard_mean: pairs.length ? pairs.reduce((a, b) => a + b, 0) / pairs.length : null,
     D3_card1TrigramJaccard_max: pairs.length ? Math.max(...pairs) : null,
     D3_titleWordReuseShare: per.length ? reusedTitles / per.length : null,
-    D3_titleWordsReused: [...wordSagas.entries()].filter(([, n]) => n > 1).sort((a, b) => b[1] - a[1]).map(([w, n]) => `${w}×${n}`),
+    D3_titleWordsReused: [...wordChapters.entries()].filter(([, n]) => n > 1).sort((a, b) => b[1] - a[1]).map(([w, n]) => `${w}×${n}`),
     D3_jobSeqDistinctShare: per.length ? seqCount.size / per.length : null,
     D3_jobTypeEntropyBits: entropy([...typeCount.values()]),
     D3_jobTypes: Object.fromEntries([...typeCount.entries()].sort((a, b) => b[1] - a[1])),
@@ -478,7 +478,7 @@ export function runMech(runDir: string) {
 function main() {
   const i = process.argv.indexOf('--run');
   const run = i >= 0 ? process.argv[i + 1] : undefined;
-  if (!run) { console.log('usage: npx tsx scripts/sagalab/mech.ts --run NAME'); process.exit(2) }
+  if (!run) { console.log('usage: npx tsx scripts/chapterlab/mech.ts --run NAME'); process.exit(2) }
   const runDir = path.join(LAB, 'runs', run);
   const m = runMech(runDir);
   fs.writeFileSync(path.join(runDir, 'mech.json'), JSON.stringify(m, null, 2));
@@ -487,20 +487,20 @@ function main() {
   const sec = (x: number | null) => x === null ? '—' : `${(x / 1000).toFixed(1)}s`;
   const md = [
     `# ${run} — mechanical measures`, '',
-    `${a.sagas} sagas (${a.complete} complete), ${a.cards} cards, ${a.reports} reports.`, '',
+    `${a.sagas} chapters (${a.complete} complete), ${a.cards} cards, ${a.reports} reports.`, '',
     '| measure | value |', '|---|---|',
     `| M12 unmet-name leaks (code) | ${a.M12_unmetNameLeaks} |`,
     `| M12 soldier names on cards | ${a.M12_soldierNamesOnCards} |`,
-    `| M12 sagas leaking ≥2 twist words before the finale | ${a.M12_answerWordLeakSagas} |`,
+    `| M12 chapters leaking ≥2 twist words before the finale | ${a.M12_answerWordLeakSagas} |`,
     `| M14 cards sharing an opening trigram | ${pct(a.M14_sharedOpenerShare)} |`,
     `| M14 cards ending on "?" | ${pct(a.M14_questionEndingShare)} |`,
     `| M15 caps held (raw output) | ${pct(a.M15_capsHeld)} |`,
     `| M15 hard failures per attempt | ${pct(a.M15_hardFailureRate)} |`,
     `| M15 soft errors (failed calls, retried) | ${a.M15_softErrors} |`,
-    `| M16 cost per saga (saga calls) | ${usd(a.M16_costPerSagaMean)} |`,
+    `| M16 cost per chapter (chapter calls) | ${usd(a.M16_costPerSagaMean)} |`,
     `| M16 cost per beat | ${usd(a.M16_costPerBeatMean)} |`,
     `| M17 pursue→card p50 / p90 (all) | ${sec(a.M17_pursueToCard_p50)} / ${sec(a.M17_pursueToCard_p90)} |`,
-    `| M17 pursue→card 1 (the saga's writing) · → a later card, p50 | ${sec(a.M17_pursueToCard1_p50)} · ${sec(a.M17_pursueToLaterCard_p50)} |`,
+    `| M17 pursue→card 1 (the chapter's writing) · → a later card, p50 | ${sec(a.M17_pursueToCard1_p50)} · ${sec(a.M17_pursueToLaterCard_p50)} |`,
     `| M17 genesis · card · report call p50 | ${sec(a.M17_genesis_p50)} · ${sec(a.M17_card_p50)} · ${sec(a.M17_report_p50)} |`,
     `| paste rate beat 1 / all cards | ${pct(a.paste_beat1)} / ${pct(a.paste_all)} |`,
     `| words: card · before · after (median, shown) | ${a.words_card_median ?? '—'} · ${a.words_before_median ?? '—'} · ${a.words_after_median ?? '—'} |`,
@@ -515,7 +515,7 @@ function main() {
     ...(a.RD_sentences ? [
       `| RD words per sentence, mean · sentences over 20 words (R7; log-only) | ${a.RD_wordsPerSentence?.toFixed(1) ?? '—'} · ${pct(a.RD_longShare)} (${a.RD_long} of ${a.RD_sentences}) |`,
       `| RD proper nouns per card · per report, mean (people and places by name) | ${a.RD_namesPerCard?.toFixed(2) ?? '—'} · ${a.RD_namesPerReport?.toFixed(2) ?? '—'} |`,
-      `| RD invented proper nouns per card · per report, mean · per saga (distinct) | ${a.RD_inventedPerCard?.toFixed(2) ?? '—'} · ${a.RD_inventedPerReport?.toFixed(2) ?? '—'} · ${a.RD_inventedPerSaga?.toFixed(2) ?? '—'} ${a.RD_inventedTop.join(' ')} |`,
+      `| RD invented proper nouns per card · per report, mean · per chapter (distinct) | ${a.RD_inventedPerCard?.toFixed(2) ?? '—'} · ${a.RD_inventedPerReport?.toFixed(2) ?? '—'} · ${a.RD_inventedPerSaga?.toFixed(2) ?? '—'} ${a.RD_inventedTop.join(' ')} |`,
       `| RD words on screen per card (log + prose), median: all · card 1 · middle · finale | ${a.RD_screenCard ?? '—'} · ${a.RD_screenCard1 ?? '—'} · ${a.RD_screenMiddle ?? '—'} · ${a.RD_screenFinale ?? '—'} |`,
       `| RD words on screen per report (prose + ledger), median | ${a.RD_screenReport ?? '—'} |`,
     ] : []),

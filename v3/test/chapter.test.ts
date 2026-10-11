@@ -1,4 +1,4 @@
-// The v4 saga engine (src/engine/saga.ts): the deal, the lean cast, the persisted record, and the asks the engine owns.
+// The v4 chapter engine (src/engine/chapter.ts): the deal, the lean cast, the persisted record, and the asks the engine owns.
 import { describe, it, expect } from 'vitest';
 import { Rng } from '../src/engine/rng.js';
 import { seedIdCounter } from '../src/engine/cards.js';
@@ -8,10 +8,10 @@ import { REGION } from '../src/engine/regions.js';
 import { THEMES } from '../src/engine/themes.js';
 import { soldierTrade, tradeOf, traitsOf } from '../src/engine/plainwords.js';
 import {
-  dealSaga, castSaga, SHAPES, SHAPE_IDS, PERSONAL_PARTS, STAKES, TONE_FROM_THEME, EPISODE_TESTS, WAY_TESTS, JOB_TYPES, waysOf, ARM,
-} from '../src/engine/saga.js';
-import * as flow from '../src/game/sagaflow.js';
-import { newGame, sagaChain, hostFor } from './sagaharness.js';
+  dealChapter, castChapter, SHAPES, SHAPE_IDS, PERSONAL_PARTS, STAKES, TONE_FROM_THEME, EPISODE_TESTS, WAY_TESTS, JOB_TYPES, waysOf, ARM,
+} from '../src/engine/chapter.js';
+import * as flow from '../src/game/chapterflow.js';
+import { newGame, chapterChain, hostFor } from './chapterharness.js';
 
 const FAVOR_OK = (c: string) => CONCEPT[c]?.group === 'skill' || CONCEPT[c]?.group === 'personality' || ['tall', 'short', 'endowed', 'flat'].includes(c);
 
@@ -19,11 +19,11 @@ describe('the build is one arm', () => {
   it('loose structure, strangers by label, the lean cast', () => expect(ARM).toEqual({ structure: 'L', names: 'labels', cast: 'lean' }));
 });
 
-describe('dealSaga — one dealer for the story inputs', () => {
+describe('dealChapter — one dealer for the story inputs', () => {
   it('deals a theme, its feeling as the tone when it has one, a shape and a stake; the theme joins the window', () => {
     const recent: string[] = [];
     for (let i = 0; i < 40; i++) {
-      const d = dealSaga(new Rng(i), recent, { personal: false });
+      const d = dealChapter(new Rng(i), recent, { personal: false });
       const t = THEMES.find(x => x.id === d.seed.id)!;
       expect(d.seed.text).toBe(t.theme);
       expect(recent[recent.length - 1]).toBe(t.id);
@@ -32,24 +32,24 @@ describe('dealSaga — one dealer for the story inputs', () => {
       expect(STAKES[d.shape].map(s => s[0])).toContain(d.stake);
     }
   });
-  it('a personal saga takes its own past as the seed (no theme dealt); a lab spark wins over both', () => {
+  it('a personal chapter takes its own past as the seed (no theme dealt); a lab spark wins over both', () => {
     const recent: string[] = [];
-    const p = dealSaga(new Rng(3), recent, { personal: true, personalSeed: 'she left her brother bound to a debt' });
+    const p = dealChapter(new Rng(3), recent, { personal: true, personalSeed: 'she left her brother bound to a debt' });
     expect(p.seed).toEqual({ id: null, text: 'she left her brother bound to a debt' });
     expect(STAKES.personal.map(s => s[0])).toContain(p.stake);
     expect(recent).toEqual([]);
-    expect(dealSaga(new Rng(3), recent, { personal: true, personalSeed: 'x', spark: 'the fixture spark' }).seed.text).toBe('the fixture spark');
+    expect(dealChapter(new Rng(3), recent, { personal: true, personalSeed: 'x', spark: 'the fixture spark' }).seed.text).toBe('the fixture spark');
   });
 });
 
-describe('castSaga — the lean cast', () => {
+describe('castChapter — the lean cast', () => {
   const region = 'western-forests';
   for (const personal of [false, true]) for (const kind of ['recruit', 'captive', 'gold'] as const) it(`${personal ? 'personal' : 'hired'} · ${kind}`, () => {
     seedIdCounter(1);
     const { g } = newGame(9);
-    const { focal } = sagaChain(g, { N: 3, personal, kind: kind === 'gold' ? 'gold-hoard' : kind });
+    const { focal } = chapterChain(g, { N: 3, personal, kind: kind === 'gold' ? 'gold-hoard' : kind });
     const reg = REGION[g.activeRegions()[0]!] ? g.activeRegions()[0]! : region;
-    const c = castSaga(new Rng(5), { focal, personal, region: reg, shape: 'heist', taken: () => false });
+    const c = castChapter(new Rng(5), { focal, personal, region: reg, shape: 'heist', taken: () => false });
     expect(c.cast).toHaveLength(2);
     if (personal) {
       const [s, o] = c.cast;
@@ -78,11 +78,11 @@ describe('castSaga — the lean cast', () => {
   it('never coins a taken name; honours a place the game still rests', () => {
     seedIdCounter(1);
     const { g } = newGame(9);
-    const { focal } = sagaChain(g, { N: 3, personal: false });
+    const { focal } = chapterChain(g, { N: 3, personal: false });
     const reg = g.activeRegions()[0]!;
-    const free = castSaga(new Rng(11), { focal, personal: false, region: reg, shape: 'feud', taken: () => false });
+    const free = castChapter(new Rng(11), { focal, personal: false, region: reg, shape: 'feud', taken: () => false });
     const name = free.cast[0]!.name;
-    const again = castSaga(new Rng(11), { focal, personal: false, region: reg, shape: 'feud', taken: n => n === name, placeOk: p => p !== free.places[0] });
+    const again = castChapter(new Rng(11), { focal, personal: false, region: reg, shape: 'feud', taken: n => n === name, placeOk: p => p !== free.places[0] });
     expect(again.cast[0]!.name).not.toBe(name);
     expect(again.places).not.toContain(free.places[0]);
   });
@@ -90,12 +90,12 @@ describe('castSaga — the lean cast', () => {
   it('D9: a known focal is named, with their past with you; at most one returning face (the client is then a stranger)', () => {
     seedIdCounter(1);
     const { g } = newGame(9);
-    const { focal } = sagaChain(g, { N: 3, personal: false });
+    const { focal } = chapterChain(g, { N: 3, personal: false });
     const reg = g.activeRegions()[0]!;
     const face = { id: 'lore-1', name: 'Harl Greyfell', sex: 'male' as const, race: 'human', memory: 'The company pulled him out of a burning mill.', where: 'at the ford' };
-    const back = castSaga(new Rng(2), { focal, personal: false, region: reg, shape: 'rescue', taken: () => false, returningClient: face });
+    const back = castChapter(new Rng(2), { focal, personal: false, region: reg, shape: 'rescue', taken: () => false, returningClient: face });
     expect(back.cast[0]).toMatchObject({ id: 'lore-1', seat: 'client', known: true, memory: face.memory, where: face.where });
-    const both = castSaga(new Rng(2), { focal, personal: false, region: reg, shape: 'rescue', taken: () => false, returningClient: face, focalMemory: { memory: 'Sold you a lame horse.', where: 'in the hills' } });
+    const both = castChapter(new Rng(2), { focal, personal: false, region: reg, shape: 'rescue', taken: () => false, returningClient: face, focalMemory: { memory: 'Sold you a lame horse.', where: 'in the hills' } });
     expect(both.cast[1]).toMatchObject({ focal: true, known: true, memory: 'Sold you a lame horse.', where: 'in the hills', seat: 'opponent' });
     expect(both.cast[0]!.id).not.toBe('lore-1');
     expect(both.cast.filter(p => p.memory)).toHaveLength(1);
@@ -104,32 +104,32 @@ describe('castSaga — the lean cast', () => {
   it('D10: a personal seed\'s person takes a seat — the opponent\'s on a rival edge, a third seat otherwise', () => {
     seedIdCounter(1);
     const { g } = newGame(9);
-    const { focal } = sagaChain(g, { N: 3, personal: true });
+    const { focal } = chapterChain(g, { N: 3, personal: true });
     const reg = g.activeRegions()[0]!;
     const kin = { id: 'lore-2', name: 'Odo Reed', sex: 'male' as const, race: 'human', memory: 'Her brother, left behind.', where: 'in a debt-master\'s yard' };
-    const third = castSaga(new Rng(4), { focal, personal: true, region: reg, shape: 'rescue', taken: () => false, seedPerson: { ...kin, rival: false } });
+    const third = castChapter(new Rng(4), { focal, personal: true, region: reg, shape: 'rescue', taken: () => false, seedPerson: { ...kin, rival: false } });
     expect(third.cast.map(p => p.seat)).toEqual(['soldier', 'opponent', 'other']);
     expect(third.cast[2]).toMatchObject({ id: 'lore-2', part: PERSONAL_PARTS[2], known: true });
-    const rival = castSaga(new Rng(4), { focal, personal: true, region: reg, shape: 'rescue', taken: () => false, seedPerson: { ...kin, rival: true } });
+    const rival = castChapter(new Rng(4), { focal, personal: true, region: reg, shape: 'rescue', taken: () => false, seedPerson: { ...kin, rival: true } });
     expect(rival.cast.map(p => p.seat)).toEqual(['soldier', 'opponent']);
     expect(rival.cast[1]).toMatchObject({ id: 'lore-2', part: PERSONAL_PARTS[1], known: true });
   });
 });
 
-describe('the saga record', () => {
+describe('the chapter record', () => {
   it('survives a JSON round trip at every stage', async () => {
     seedIdCounter(1);
     const { g } = newGame(21);
-    const { chain, focal } = sagaChain(g, { N: 4, personal: false });
+    const { chain, focal } = chapterChain(g, { N: 4, personal: false });
     const host = hostFor(g);
     const rec = flow.deal(host, chain, undefined, focal);
     expect(JSON.parse(JSON.stringify(rec))).toEqual(rec);
     await flow.plan(host, chain);
     await flow.card(host, chain);
-    expect(JSON.parse(JSON.stringify(chain.saga))).toEqual(chain.saga);
+    expect(JSON.parse(JSON.stringify(chain.chapter))).toEqual(chain.chapter);
     // and a reloaded record plays on exactly as the live one does
-    const copy = { ...chain, saga: JSON.parse(JSON.stringify(chain.saga)) };
-    expect(flow.posOf(copy.saga)).toEqual(flow.posOf(chain.saga!));
+    const copy = { ...chain, chapter: JSON.parse(JSON.stringify(chain.chapter)) };
+    expect(flow.posOf(copy.chapter)).toEqual(flow.posOf(chain.chapter!));
     expect(flow.chronicle(copy)).toEqual(flow.chronicle(chain));
   });
 });

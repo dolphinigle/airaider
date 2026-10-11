@@ -1,4 +1,4 @@
-# GENERATION_FLOW.md — how a saga/quest is generated (the canonical pipeline)
+# GENERATION_FLOW.md — how a chapter/quest is generated (the canonical pipeline)
 
 **Status: decision log COMPLETE (2026-07-03; design finalized through §21) — being finalized item-by-item with the designer.**
 Supersedes the scattered flow descriptions; QUESTS.md §"reward-first" 🔒 is the governing rule.
@@ -109,7 +109,7 @@ At genesis: `E[payoff] = expectedBeats × SLOTS_PER_BEAT × vBase(level) × rari
 - CORE KIND rolled from an EXTENDABLE weighted table — prototype set: `recruit / captive /
   gold-hoard` (relic/artifact deferred → §7). Twist DECOUPLED from kind (independent rolls).
 - UNIT SHARE: ROLLED range (~55–85%) when the kind is a unit; focal target = share × E[payoff].
-- GOLD IS SUPPLEMENTARY (designer): the saga promises E[payoff]; the unit covers its MARKED
+- GOLD IS SUPPLEMENTARY (designer): the chapter promises E[payoff]; the unit covers its MARKED
   value; gold = E[payoff] − unit-marked. ("Quest worth 1000g, unit marked 800g → 200g gold.")
 - MARKED VALUE (designer, §2.5): a unit generated at target T is MARKED as worth T regardless
   of what the tags actually rolled (the roll's variance is the gamble — a great roll is a
@@ -120,8 +120,8 @@ At genesis: `E[payoff] = expectedBeats × SLOTS_PER_BEAT × vBase(level) × rari
   DISPOSITION freely; mid-quest choices remain method-only. Value is INVARIANT under
   disposition (marked value doesn't change when a captive becomes a recruit) — choices change
   what you DO with the prize, never what it's worth.
-- Focal character ALWAYS exists (story seed 🔒) even for gold-hoard sagas (they're the person
-  the saga is about, e.g. the hoard's guardian — finale choices may still take them instead).
+- Focal character ALWAYS exists (story seed 🔒) even for gold-hoard chapters (they're the person
+  the chapter is about, e.g. the hoard's guardian — finale choices may still take them instead).
 
 ## §3 Unit generation at a target value ✅ (built, commit 653f9b3)
 Tags roll INDEPENDENTLY (identity preserved); a wealth parameter (Monte-Carlo-bisected against
@@ -171,11 +171,11 @@ ARCHITECTURE — fine TIERS (engine) / coarse BANDS (AI):
   concept; the engine rolls the exact tier within the band ("AI proposes quality, engine
   decides magnitude" — PROMPT_RULES §3 applied to tags).
 
-THE CURVE (economy-anchored; vBase 30→448/day, sagas 144→15k, 100-day campaign ≈ 37k gross):
+THE CURVE (economy-anchored; vBase 30→448/day, chapters 144→15k, 100-day campaign ≈ 37k gross):
   value(t) = 6 × 1.9^(t−1)        depth 20 → t20 ≈ 1.19M ("the Mirror")
   t1–4    6·11·22·41        trait texture (commons land 25–80 — no economy shock)
-  t5–8    79·149·284·540    standout skills; uncommon-saga focals
-  t9–12   1.0k–7.0k         rare-saga prizes
+  t5–8    79·149·284·540    standout skills; uncommon-chapter focals
+  t9–12   1.0k–7.0k         rare-chapter prizes
   t13–16  13k–92k           legendary territory and beyond
   t17–20  174k–1.19M        mythic / trophy class
 - WHY 20 (not 12/15): ratio ×1.9/tier = a drift tick DOUBLES (usable growth grain);
@@ -207,7 +207,7 @@ Deep LOW-UTILITY lines (Kind, Lineage, Renown) are first-class: the living saint
 hostage / Mona-Lisa relic all roll naturally.
 
 TIER DRIFT — designed, **NOT IN PROTOTYPE** (designer 2026-06-12): characters' tag tiers can
-tick ±1 from life events (training, saga stamps, hardship; ×÷1.9 value); relics never change.
+tick ±1 from life events (training, chapter stamps, hardship; ×÷1.9 value); relics never change.
 Recorded for the post-prototype growth system.
 
 LEGIBILITY = PER-TAG RARITY BORDERS (designer; replaces the unit-level badge, which is OUT):
@@ -1248,12 +1248,12 @@ grounding), 2026-06-16.
   outputs persisted, nothing re-derived on reload.)
 
 ### CONFIRMED decisions (2026-06-16)
-1. ✅ **Unified `LoreNode` base** — characters/relics/places/factions/sagas share one shape (extends
+1. ✅ **Unified `LoreNode` base** — characters/relics/places/factions/chapters share one shape (extends
    CARDS.md "everything is a Card"). **Lore is a LAYER over entities, not a separate store**: a
    character is ONE object = gameplay Card + LoreNode (same id, two views). Some nodes are lore-only
    (places, factions, dead NPCs).
    ```
-   LoreNode { id, type(character|relic|place|faction|saga),
+   LoreNode { id, type(character|relic|place|faction|chapter),
               blurb,    // SHORT ≤~25 tok, byte-stable, prompt-cacheable
               dossier,  // LONG — evolving living record
               edges[],  // typed relations
@@ -1797,11 +1797,11 @@ checklist (GAME_STATE/QUESTS/ECONOMY/LORE/TAGS + CARDS/FORT §18-§20 retouch) �
    `lead` against 1.000 for every other kind). Resolution: a lead's own worth is ZERO and the
    reserved value rides on it as a **carried bonus**, added to the quest's budget when pursued —
    strictly orthogonal to how that quest plays. Not yet implemented.
-3. **Known-cast cadence 🛠 (derived, verify in playtest):** target ≈ **2 known-cast saga geneses per
+3. **Known-cast cadence 🛠 (derived, verify in playtest):** target ≈ **2 known-cast chapter geneses per
    GH tier** (~every 60 cycles ≈ 3h; ~0.5% of quests — apex-scarce), gated on a recurrable pool ≥ ~8;
    continuation beats carry faces between. Rarity weights derived from this target at impl.
 4a. **Finale failure = TIME, never permanence (ruled 2026-07-03, extends §21.1):** a failed chain
-   finale forfeits the BANK (the time sting — a saga's worth of merc-days) and the focal **slips away
+   finale forfeits the BANK (the time sting — a chapter's worth of merc-days) and the focal **slips away
    FOR NOW** — they exit to the lore graph (alive, remembered, findable) and a **sequel/redemption
    lead** (rarity-priced) can bring them back into reach. The AI may instead deliver them in a WORST
    form (bitter captive, debt-saddled) when the fiction supports it. **Permanent character loss is
@@ -1826,9 +1826,9 @@ liabilities=negative stackables; tier-ceiling not stored ilvl) → CARDS ✅.**
 
 ## §22 — MERCENARY BACKSTORY & LEVEL CAP ✅ designer rulings 2026-10-11
 
-1. **The backstory is written at recruit** 🔒, not "short", as the mercenary's **arc** (a saga of sagas, not playable): the past plus its **open threads** (told or secret, in ladder order), which live in the arc. The living dossier stays short and only summarizes the "so far", linking to saga records for anything long. → STORY_ENGINE §4.
-2. **Level cap = min(backstory cap, bedroom cap)** 🔒. The bedroom cap is unchanged (`3 + 0.9 × comfort`). The backstory cap rises each time the mercenary's own personal saga ("opening up") resolves one of the backstory's open threads. → CARDS §Level, GAME_STATE, FORT, DESIGN.
-3. **After the backstory cap is maxed** 🔒, further personal sagas play as ordinary sagas and only **rarely** give the mercenary something permanent (🟡 what: undecided).
-4. **The full backstory is fed only where the mercenary is highly relevant** 🔒 (their own opening-up saga); elsewhere the blurb or the dossier. → STORY_ENGINE §4.
-5. **Hierarchy arc → saga → quest** 🔒. Each thread carries its status (open / resolved / changed) and a link to the saga that took it up; each personal saga links back to its thread; the backstory cap is computed from resolved threads. Hired/client sagas and one-off quests stand alone. "Arc" is the general name (mercenary arcs now; NPC/world arcs later). **In prompts: arc → chapter → quest** (a chapter = a saga in code; each chapter ends with its own resolution, only the final one resolves the arc); never "an arc made of sagas". → STORY_ENGINE §4.
-6. 🟡 open: the opening-up trigger; thread count; new threads from resolved sagas; the backstory cap's numbers.
+1. **The backstory is written at recruit** 🔒, not "short", as the mercenary's **arc** (a story made of chapters, not playable): the past plus its **open threads** (told or secret, in ladder order), which live in the arc. The living dossier stays short and only summarizes the "so far", linking to chapter records for anything long. → STORY_ENGINE §4.
+2. **Level cap = min(backstory cap, bedroom cap)** 🔒. The bedroom cap is unchanged (`3 + 0.9 × comfort`). The backstory cap rises each time the mercenary's own personal chapter ("opening up") resolves one of the backstory's open threads. → CARDS §Level, GAME_STATE, FORT, DESIGN.
+3. **After the backstory cap is maxed** 🔒, further personal chapters play as ordinary chapters and only **rarely** give the mercenary something permanent (🟡 what: undecided).
+4. **The full backstory is fed only where the mercenary is highly relevant** 🔒 (their own opening-up chapter); elsewhere the blurb or the dossier. → STORY_ENGINE §4.
+5. **Hierarchy arc → chapter → quest** 🔒. Each thread carries its status (open / resolved / changed) and a link to the chapter that took it up; each personal chapter links back to its thread; the backstory cap is computed from resolved threads. Hired/client chapters and one-off quests stand alone. "Arc" is the general name (mercenary arcs now; NPC/world arcs later). **In prompts** 🔒: a prompt that generates a standalone chapter still says **"saga"** (e.g. "A saga is like the backbone of a novel"); only the prompt that writes a mercenary's arc says "arc" and "chapter" ("an arc … split into chapters"; each chapter ends with its own resolution, only the final one resolves the arc); never "an arc made of sagas". → STORY_ENGINE §4.
+6. 🟡 open: the opening-up trigger; thread count; new threads from resolved chapters; the backstory cap's numbers.

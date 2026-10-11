@@ -160,7 +160,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;tex
 .row .s{font-size:13.5px;color:var(--text-dim);line-height:1.5}
 .row .tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
   color:var(--text-faint);margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}
-.row .tag .saga{color:var(--brass)}
+.row .tag .chapter{color:var(--brass)}
 .pips{display:flex;gap:5px;align-items:center}
 .pip{width:15px;height:21px;border-radius:2px;border:1px dashed var(--iron-dim);background:rgba(0,0,0,.3)}
 .pip.req{border-color:color-mix(in srgb,var(--blood) 55%,transparent)}
@@ -209,7 +209,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;tex
    verbatim from a real campaign log — one sentence each, which is what routine cards actually
    look like, and the reason the quest screen has to survive a nearly empty writ. */
 const QUESTS = [
-  { id:"q16", title:"Search a warden-stone", rarity:"uncommon", level:2, beat:1, lapses:8, saga:"The Warden's Stones",
+  { id:"q16", title:"Search a warden-stone", rarity:"uncommon", level:2, beat:1, lapses:8, chapter:"The Warden's Stones",
     situation:"A ridgetop warden sworn to the stones, Pylenor Greyfell, came back a second time and keeps turning something over in one palm. He says his sworn right to tend the ridgeline will be lost, allowing rival bands to seize its harvest. A young elven priest wanting to leave the ridgetop, Sanaso Brightwater, is who he names. He wants you to search a warden-stone on the ridgeline for signs of Sanaso Brightwater, the coin comes at the finish, with the pick of what the job turns up. Pylenor warns a hunter will extract a price for returning Sanaso or profit from keeping her hidden.",
     job:"Search a ridgeline warden-stone for signs of Sanaso Brightwater.",
     reward:"Coin at the finish, and the pick of what the job turns up.",
@@ -225,13 +225,13 @@ const QUESTS = [
            who:"The warden says a hunter will want paying for her — or will keep her hidden and profit by it.",
            why:"You have not met them. Their card turns face up when you do."}],
     coins:[[6,8],[5,7],[11,6],[9,7],[13,5],[2,9],[4,1],[5,10]] },
-  { id:"q9", title:"Marked Outlaw Hunt", rarity:"common", level:1, lapses:5, saga:null,
+  { id:"q9", title:"Marked Outlaw Hunt", rarity:"common", level:1, lapses:5, chapter:null,
     situation:"A notice lists a wanted hand whose tracks lead into the old-growth. The hunters refuse to go deeper.",
     job:"Follow the tracks into the old-growth and take the wanted hand.",
     reward:"The bounty as posted.",
     slots:[{idx:0,asks:"Someone who can follow a trail",attr:"INT",bar:1.5,favored:["nature","ranged"],clashing:["hotheaded"]}],
     cast:[], coins:[[5],[7],[9],[11],[4],[3],[2],[8]] },
-  { id:"q11", title:"Rescue at Lodge", rarity:"common", level:2, lapses:6, saga:null,
+  { id:"q11", title:"Rescue at Lodge", rarity:"common", level:2, lapses:6, chapter:null,
     situation:"An elf hunter was taken near the old glade and held inside a timber lodge by armed hands.",
     job:"Get the hunter out of the lodge alive.",
     reward:"Coin from the hunter's people, and what the lodge holds.",
@@ -348,7 +348,7 @@ function boardView(){
           <div class="t">${esc(q.title)}</div>
           <div class="s">${esc(clip(q.situation,150))}</div>
           <div class="tag"><span>${q.rarity} · level ${q.level}</span>
-            ${q.saga?`<span class="saga">${esc(q.saga)} · beat ${q.beat}</span>`:`<span>one-off</span>`}
+            ${q.chapter?`<span class="chapter">${esc(q.chapter)} · beat ${q.beat}</span>`:`<span>one-off</span>`}
             <span>lapses in ${q.lapses}</span></div>
         </button>
         <div class="side">
@@ -369,7 +369,7 @@ function questView(){
       <div class="paper writ" style="margin-top:12px">
         <h1>${esc(q.title)}</h1>
         <div class="meta"><span>${q.rarity} · level ${q.level}</span>
-          ${q.saga?`<span>${esc(q.saga)} · beat ${q.beat}</span>`:`<span>one-off</span>`}
+          ${q.chapter?`<span>${esc(q.chapter)} · beat ${q.beat}</span>`:`<span>one-off</span>`}
           <span>lapses in ${q.lapses} cycles</span></div>
         <p>${esc(q.situation)}</p>
         <div class="errand"><b>THE ERRAND</b> ${esc(q.job)}<br><b>THE PAY</b> ${esc(q.reward)}</div>

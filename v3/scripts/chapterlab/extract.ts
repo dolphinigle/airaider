@@ -1,9 +1,9 @@
-// SAGA LAB — the extractor (docs/STORYTELLER.md §5.0). Turns each drive into one transcript folder
-// per saga, ONE FILE PER TEXT in reading order, for readers who open them one at a time:
+// CHAPTER LAB — the extractor (docs/STORYTELLER.md §5.0). Turns each drive into one transcript folder
+// per chapter, ONE FILE PER TEXT in reading order, for readers who open them one at a time:
 //
-//   npx tsx scripts/sagalab/extract.ts --run NAME
+//   npx tsx scripts/chapterlab/extract.ts --run NAME
 //
-// runs/NAME/sagas/<fixture>/
+// runs/NAME/chapters/<fixture>/
 //   card_1.md, report_1.md, card_2.md, report_2.md, …   one per attempt: the card as `quest <id>`
 //                                                      printed it, the report as `reckoning` printed it
 //   chain.md       the chain view (`chain <id>`) — today's chronicle
@@ -19,9 +19,9 @@
 // The report lines come from the engine's own reckoning record (`lab state`) and are CHECKED
 // against the printed `reckoning`, so a text that was not printed can never reach a judge.
 //
-// Completeness: every attempt has a card and a report with a ⚄ line and prose around it; the saga
+// Completeness: every attempt has a card and a report with a ⚄ line and prose around it; the chapter
 // closed; a finale card carries its plans; the forced outcomes follow the fixture's path; no
-// report is the resolver's fallback. Exit 1 when any saga fails it.
+// report is the resolver's fallback. Exit 1 when any chapter fails it.
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -31,19 +31,19 @@ import { renderTags } from '../../src/engine/tags.js';
 import type { TranscriptEntry, DriveSummary } from './drive.js';
 
 const V3 = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const LAB = path.join(V3, 'scripts/sagalab');
+const LAB = path.join(V3, 'scripts/chapterlab');
 
 export interface TextRec {
   file: string; kind: 'card' | 'report'; k: number; questId: string; isFinale: boolean;
   title: string;
-  beat?: number | 'finale';                                         // the saga step (card's SAGA line)
+  beat?: number | 'finale';                                         // the chapter step (card's CHAPTER line)
   prose?: string; errand?: string; approaches?: string[];          // card
   before?: string; after?: string; outcome?: string; diceLine?: string;   // report
   truth?: string;                                                   // probe finale report: the answer in one plain sentence (R3: for the chronicle, not printed)
   log?: string;                                                     // probe card (R4): the engine's quest log printed above the prose
   ledger?: string;                                                  // probe report (R7): the engine's ledger lines printed under the prose
 }
-export interface SagaMeta {
+export interface ChapterMeta {
   fixture: LabFixture; run: string; chainId: string | null; chainState: string | null;
   attempts: { k: number; questId: string; isFinale: boolean; outcome: string | null }[];
   order: string[]; complete: boolean; problems: string[];
@@ -62,7 +62,7 @@ export function cardText(out: string): { md: string; title: string; prose: strin
   if (head < 0) return null;
   const title = lines[head]!.replace(/^═══ (.*?) ═══.*$/, '$1');
   const keep: string[] = [`═══ ${title} ═══`];
-  const MARK = /^(ON THIS MATTER|ERRAND:|REWARD:|SAGA:|APPROACHES)/;
+  const MARK = /^(ON THIS MATTER|ERRAND:|REWARD:|CHAPTER:|SAGA:|APPROACHES)/;
   const prose: string[] = [];
   let i = head + 1;
   for (; i < lines.length && !MARK.test(lines[i]!); i++) {
@@ -80,8 +80,8 @@ export function cardText(out: string): { md: string; title: string; prose: strin
     if (/^[▶ ] \[g\d+\]/.test(l)) approaches.push(l.slice(2));
     keep.push(l);
   }
-  const sagaLine = keep.find(l => l.startsWith('SAGA:')) ?? '';
-  const beat = /· the finale ·/.test(sagaLine) ? 'finale' as const : Number(sagaLine.match(/· beat (\d+) of/)?.[1]) || undefined;
+  const chapterLine = keep.find(l => l.startsWith('CHAPTER:') || l.startsWith('SAGA:')) ?? '';
+  const beat = /· the finale ·/.test(chapterLine) ? 'finale' as const : Number(chapterLine.match(/· beat (\d+) of/)?.[1]) || undefined;
   return { md: keep.join('\n') + '\n', title, prose: prose.join('\n').trim(), errand, approaches, beat };
 }
 
@@ -112,7 +112,7 @@ function readJsonl<T>(p: string): T[] {
   return fs.readFileSync(p, 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l) as T);
 }
 
-export function extractSaga(runDir: string, fxId: string): SagaMeta {
+export function extractChapter(runDir: string, fxId: string): ChapterMeta {
   const d = path.join(runDir, 'drive', fxId);
   const sum = JSON.parse(fs.readFileSync(path.join(d, 'drive.json'), 'utf8')) as DriveSummary;
   const fx = sum.fixture;
@@ -123,7 +123,7 @@ export function extractSaga(runDir: string, fxId: string): SagaMeta {
   const problems: string[] = [...sum.problems];
   const texts: TextRec[] = [];
   const order: string[] = [];
-  const attempts: SagaMeta['attempts'] = [];
+  const attempts: ChapterMeta['attempts'] = [];
   const chainId = sum.chainId;
 
   // walk the transcript: each first `quest` view is a card; each `reckoning` the report of the
@@ -209,11 +209,11 @@ export function extractSaga(runDir: string, fxId: string): SagaMeta {
   else problems.push('no calls.jsonl');
 
   const cards = texts.filter(t => t.kind === 'card').length, reports = texts.filter(t => t.kind === 'report').length;
-  if (!sum.closed) problems.push('the saga did not close');
+  if (!sum.closed) problems.push('the chapter did not close');
   if (cards !== reports) problems.push(`${cards} cards but ${reports} reports`);
   if (!texts.some(t => t.kind === 'card' && t.isFinale)) problems.push('no finale card');
 
-  const meta: SagaMeta = { fixture: fx, run: sum.run, chainId, chainState: sum.chainState, attempts, order, complete: problems.length === 0, problems };
+  const meta: ChapterMeta = { fixture: fx, run: sum.run, chainId, chainState: sum.chainState, attempts, order, complete: problems.length === 0, problems };
   fs.writeFileSync(path.join(out, 'order.txt'), order.join('\n') + '\n');
   fs.writeFileSync(path.join(out, 'texts.json'), JSON.stringify(texts, null, 2));
   fs.writeFileSync(path.join(out, 'meta.json'), JSON.stringify(meta, null, 2));
@@ -223,13 +223,13 @@ export function extractSaga(runDir: string, fxId: string): SagaMeta {
 function main() {
   const i = process.argv.indexOf('--run');
   const run = i >= 0 ? process.argv[i + 1] : undefined;
-  if (!run) { console.log('usage: npx tsx scripts/sagalab/extract.ts --run NAME'); process.exit(2) }
+  if (!run) { console.log('usage: npx tsx scripts/chapterlab/extract.ts --run NAME'); process.exit(2) }
   const runDir = path.join(LAB, 'runs', run);
   const ids = fs.readdirSync(path.join(runDir, 'drive')).filter(f => fs.existsSync(path.join(runDir, 'drive', f, 'drive.json'))).sort();
-  const metas = ids.map(id => extractSaga(runDir, id));
+  const metas = ids.map(id => extractChapter(runDir, id));
   const rows = metas.map(m => `| ${m.fixture.id} | ${m.fixture.path} | N${m.fixture.N} | ${m.fixture.personal ? 'personal' : m.fixture.kind} | ${m.chainState ?? '—'} | ${m.attempts.map(a => (a.outcome ?? '?')[0]!.toUpperCase()).join('')} | ${m.order.length} | ${m.complete ? '✓' : `✗ ${m.problems.join('; ')}`} |`);
   fs.writeFileSync(path.join(runDir, 'sagas', 'INDEX.md'), [
-    `# ${run} — sagas`, '', '| saga | path | N | kind | end | outcomes | files | complete |', '|---|---|---|---|---|---|---|---|', ...rows, '',
+    `# ${run} — chapters`, '', '| chapter | path | N | kind | end | outcomes | files | complete |', '|---|---|---|---|---|---|---|---|', ...rows, '',
   ].join('\n'));
   const bad = metas.filter(m => !m.complete);
   for (const m of metas) console.log(`${m.fixture.id}: ${m.complete ? 'complete' : 'INCOMPLETE'} — ${m.attempts.length} attempts (${m.attempts.map(a => (a.outcome ?? '?')[0]!.toUpperCase()).join('')}), ${m.order.length} files${m.problems.length ? `\n  ${m.problems.join('\n  ')}` : ''}`);

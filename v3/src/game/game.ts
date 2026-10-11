@@ -47,12 +47,12 @@ import { prefPick, chainPayoff, type TraitPrefs } from '../engine/economy.js';
 import { labFixtureProblems, nextLabOutcome, forceRoll, type LabFixture } from '../engine/lab.js';
 import {
   hashStr, castableClients, pickClientFace, recentFaces, helped, HURT_BAND, HOW_BAND, WAY_ENDING, OPPONENT_EDGES, DEALT_TRADES, GAME_PIPE,
-  type FaceCandidate, type Face, type SagaPos, type CastEntry,
-} from '../engine/saga.js';
+  type FaceCandidate, type Face, type ChapterPos, type CastEntry,
+} from '../engine/chapter.js';
 import { raceOf, sexOf } from '../engine/plainwords.js';
 import { knowingOf, mockReport } from '../ai/storyteller.js';
 import { composeLiving, livingLines, livingSeed, historyOf, type LifeMark, type LifePerson } from '../engine/dossier.js';
-import * as flow from './sagaflow.js';
+import * as flow from './chapterflow.js';
 
 export interface LogEntry { cycle: number; kind: string; text: string; questId?: string }
 
@@ -121,11 +121,11 @@ interface Resolution {
   party: Card[];
   fate?: FinaleFate;   // finales: decided BEFORE narration (P11)
   rolled: QuestRollResult;   // the dice, shown in the reveal (loss must be OWNED — DESIGN §5)
-  /** a saga quest: where its card sat, and the report facts the flow decided in the roll loop (hurt, decides, fate) */
-  saga?: { pos: SagaPos; inn: flow.ReportIn };
+  /** a chapter quest: where its card sat, and the report facts the flow decided in the roll loop (hurt, decides, fate) */
+  chapter?: { pos: ChapterPos; inn: flow.ReportIn };
 }
-/** a saga quest's report as its writer (or the floor) returned it */
-type SagaReport = { before: string; after: string; summary: string };
+/** a chapter quest's report as its writer (or the floor) returned it */
+type ChapterReport = { before: string; after: string; summary: string };
 /** startCycle = when they went on (older saves: absent) — the rack's progress is doneAt−start, never
  *  the room's CURRENT duration, which moves whenever the rack's contents do */
 export interface Breaking { cardId: string; roomId: string; doneAtCycle: number; startCycle?: number }
@@ -201,7 +201,7 @@ export interface SlotWhy {
 export type CaptiveState = 'raw' | 'breaking' | 'tamed' | 'onShow';
 
 /** R5: what END would throw away (Game.endWarnings) — the seal's confirm and the CLI's `end!`.
- *  Quests (cold / short / no ending), a saga's continuation lead or a lead worth money going cold,
+ *  Quests (cold / short / no ending), a chapter's continuation lead or a lead worth money going cold,
  *  a captive handed off from holding, a hireable guest leaving the tavern. */
 export interface EndWarning {
   key: string;                  // unique per warning (quest id, lead id, card id)
@@ -251,7 +251,7 @@ export interface CycleSummary {
   leadsCold: string[];                             // leads that went cold
   handedOff?: { id: string; name: string; gold: number }[];   // captives whose holding ran out (older archives: absent)
   debts?: { id: string; name: string; amount: number; text?: string }[];     // debts taken on this cycle (older archives: absent; text: Game.debtText)
-  setbacks?: { chainId: string; title: string; failures: number; budget: number }[];   // saga beats that failed
+  setbacks?: { chainId: string; title: string; failures: number; budget: number }[];   // chapter beats that failed
 }
 export interface ReckoningRecord { cycle: number; lines: string[]; meta: ReckonMeta[]; summary: CycleSummary | null }
 
@@ -287,7 +287,7 @@ export interface GameState {
   reckonings?: { cycle: number; lines: string[]; meta?: ReckonMeta[]; summary?: CycleSummary }[];
   /** the cycle a lead was last put back by abandoning its quest — the re-roll is once a cycle */
   lastRerollCycle?: number;
-  /** the STORY rng (docs/STORYTELLER.md §2.4): every saga story draw (seed, tone, cast, places) runs on it, so the main
+  /** the STORY rng (docs/STORYTELLER.md §2.4): every chapter story draw (seed, tone, cast, places) runs on it, so the main
    *  rng — mechanics — never moves on one. Absent in older saves: seeded from the game seed on load */
   storyRngState?: RngState;
   /** the theme ids dealt so far, newest last (the no-repeat window, themes.ts THEME_NO_REPEAT) */
@@ -297,7 +297,7 @@ export interface GameState {
 export const RECKONINGS_KEPT = 12;
 
 const CAST_THETA = Number(process.env.CAST_THETA ?? 4);
-/** 🛠 cycles after a soldier's personal saga is settled before their NEXT chapter may come (North Star 0; then the drip's own
+/** 🛠 cycles after a soldier's personal chapter is settled before their NEXT chapter may come (North Star 0; then the drip's own
  *  25% a cycle and one personal lead on the board at a time stagger it across soldiers) */
 export const PERSONAL_CHAPTER_COOLDOWN = 6;
 
@@ -324,7 +324,7 @@ const LEAD_WORD: Partial<Record<string, string>> = {
 export class Game {
   state: GameState;
   rng: Rng;
-  /** story draws only (seed, tone, cast, places — engine/saga.ts); persisted beside the main rng */
+  /** story draws only (seed, tone, cast, places — engine/chapter.ts); persisted beside the main rng */
   storyRng: Rng;
   ai: AiProvider;
 
@@ -368,7 +368,7 @@ export class Game {
     return g;
   }
 
-  /** the road back to a focal who slipped out of reach (§21-4a): a standing sequel lead that starts a new saga about them */
+  /** the road back to a focal who slipped out of reach (§21-4a): a standing sequel lead that starts a new chapter about them */
   private sequelLead(chain: Chain, focal: Card, rarity: Rarity = chain.rarity === 'common' ? 'uncommon' : 'rare'): Lead {
     return {
       id: freshId('lead-'), rarity, level: chain.level, region: chain.region, archetype: 'investigate',
@@ -395,33 +395,33 @@ export class Game {
     // lint telemetry is the developer's, not the player's log (kind 'dev'); older saves logged it
     // under 'chain'
     for (const l of st.log ?? []) {
-      if (l.kind === 'chain' && /^(saga card lint|saga draft |card body echoed)/.test(l.text)) l.kind = 'dev';
+      if (l.kind === 'chain' && /^(chapter card lint|chapter draft |card body echoed)/.test(l.text)) l.kind = 'dev';
     }
-    // a save taken while a saga was being planned or its card 1 written (the server autosaves mid-pursuit) holds a chain
+    // a save taken while a chapter was being planned or its card 1 written (the server autosaves mid-pursuit) holds a chain
     // that never began: no quest will ever come of it, and its lead is still on the board — pursuing it again starts afresh
-    for (const c of (st.chains ?? []).filter(c => c.saga && !Game.sagaBegun(c, st))) Game.unbegin(st, c);
+    for (const c of (st.chains ?? []).filter(c => c.chapter && !Game.chapterBegun(c, st))) Game.unbegin(st, c);
     const byId = new Map((st.cards ?? []).map(c => [c.id, c]));
     for (const q of st.quests ?? []) {
       q.rewardCards = (q.rewardCards ?? []).map(c => byId.get(c.id) ?? c);
       // a trait is never favored AND clashing on one test (generation filters it since 2026-09-25;
       // saves written before that still carry finale plans like 'helps: social · hurts: social')
       for (const s of q.slots ?? []) s.test.clashing = (s.test.clashing ?? []).filter(c => !s.test.favored.includes(c));
-      // a saga card's rows are stored at its birth: one on offer in a save written before the So far log (2026-10-05) still
-      // holds the forward log — re-render it as the card would be now (sagaflow refreshRows; a pipe without `sofar` keeps its own)
-      const chain = q.saga && q.state === 'open' ? (st.chains ?? []).find(c => c.id === q.chainId) : undefined;
-      const fresh = chain && flow.refreshRows(chain, q.saga!.pos, q.situation);
-      if (fresh) { q.saga!.rows = fresh.rows; q.saga!.matter = fresh.matter }
+      // a chapter card's rows are stored at its birth: one on offer in a save written before the So far log (2026-10-05) still
+      // holds the forward log — re-render it as the card would be now (chapterflow refreshRows; a pipe without `sofar` keeps its own)
+      const chain = q.chapter && q.state === 'open' ? (st.chains ?? []).find(c => c.id === q.chainId) : undefined;
+      const fresh = chain && flow.refreshRows(chain, q.chapter!.pos, q.situation);
+      if (fresh) { q.chapter!.rows = fresh.rows; q.chapter!.matter = fresh.matter }
     }
   }
 
-  /** a saga has begun once its card 1 is written (the pursuit's quest is pushed right after); one with no plan, or a plan
+  /** a chapter has begun once its card 1 is written (the pursuit's quest is pushed right after); one with no plan, or a plan
    *  but no card 1 and no quest, is a pursuit still in flight — or, in a save, one that died with the process */
-  private static sagaBegun(c: Chain, st: GameState): boolean {
-    return !!c.saga?.plan && (!!c.saga.card1 || (st.quests ?? []).some(q => q.chainId === c.id));
+  private static chapterBegun(c: Chain, st: GameState): boolean {
+    return !!c.chapter?.plan && (!!c.chapter.card1 || (st.quests ?? []).some(q => q.chainId === c.id));
   }
-  /** take back a saga that never began: the chain goes, the focal's chain list forgets it, and a focal held in limbo for
-   *  it returns to the lore (where a sequel or a promoted face came from). Its dealt names are free again (the live-saga
-   *  cast fence reads the chains). A personal saga's soldier stays on the roster */
+  /** take back a chapter that never began: the chain goes, the focal's chain list forgets it, and a focal held in limbo for
+   *  it returns to the lore (where a sequel or a promoted face came from). Its dealt names are free again (the live-chapter
+   *  cast fence reads the chains). A personal chapter's soldier stays on the roster */
   private static unbegin(st: GameState, chain: Chain): void {
     st.chains = st.chains.filter(c => c !== chain);
     const focal = (st.cards ?? []).find(c => c.id === chain.focalId);
@@ -523,7 +523,7 @@ export class Game {
       if (mate) { mate.qty = (mate.qty ?? 0) + (c.qty ?? 0); return }
     }
     // §4b corollary: two characters must never share a name — NOR near-twin names
-    // (a colliding "Fenlin" merged NPC and soldier; twin focals "Pellthil"/"Pellnith" read as one saga twice)
+    // (a colliding "Fenlin" merged NPC and soldier; twin focals "Pellthil"/"Pellnith" read as one chapter twice)
     if (c.character && !keepName) {
       const race = c.tags.find(t => ['human', 'elf', 'wolfman', 'lizardman'].includes(t.concept))?.concept ?? 'human';
       for (let i = 0; i < 12 && this.nameTooSimilar(c.name); i++)
@@ -671,32 +671,32 @@ export class Game {
       { ...(card?.character ? { who: card.character.who, quirks: opts?.habits === false ? undefined : card.character.quirks } : {}), ...(opts?.player ? { player: true } : {}) });
   }
   chronicle(id: string) { return chronicleOf(this.state.lore, id) }
-  /** A saga as the COMPANY knows it — the one view both UIs render (the CLI's `chains`/`chain`, the GUI's saga strip and
-   *  chronicle). The plan is hidden truth: the view is the saga flow's chronicle (sagaflow.chronicle) — the quest log as
+  /** A chapter as the COMPANY knows it — the one view both UIs render (the CLI's `chains`/`chain`, the GUI's chapter strip and
+   *  chronicle). The plan is hidden truth: the view is the chapter flow's chronicle (chapterflow.chronicle) — the quest log as
    *  it stands, card 1, So far, the answer once the finale is played, and the people the player has seen, by name only
-   *  once their name was read — plus the economy fields. A saga still being planned, or whose card 1 is still being
+   *  once their name was read — plus the economy fields. A chapter still being planned, or whose card 1 is still being
    *  written, is not shown (its lead's job is). */
   chainViews() {
-    return this.state.chains.filter(c => c.saga?.plan && c.saga.card1).map(c => {
+    return this.state.chains.filter(c => c.chapter?.plan && c.chapter.card1).map(c => {
       const ch = flow.chronicle(c)!;
-      const rec = c.saga!;
+      const rec = c.chapter!;
       const done = c.state === 'done' || c.state === 'slipped';
       return {
         id: c.id, title: ch.title, state: c.state, kind: c.kind, personal: c.isPersonal,
-        // the likely ending in the player's words, while the saga is live; how it ended, once it is over
+        // the likely ending in the player's words, while the chapter is live; how it ended, once it is over
         likely: ch.likely, ending: ch.ending ?? null, endLine: flow.endLine(ch),
-        // "part n of N": the job on offer (or next); the finale's is N — the saga's one measure of how far along it is
+        // "part n of N": the job on offer (or next); the finale's is N — the chapter's one measure of how far along it is
         part: done ? rec.world.N : flow.posOf(rec).job, of: rec.world.N,
         bank: coinBand(c.bank),
         failures: c.failures, failureBudget: c.failureBudget,
         rows: ch.rows, card1: ch.card1, lines: ch.lines, soFar: ch.soFar,
         answer: ch.answer, people: ch.people,
-        // the saga strip's link back into play: its step on the map, or the lead that continues it
+        // the chapter strip's link back into play: its step on the map, or the lead that continues it
         ...this.chainNext(c),
       };
     });
   }
-  /** where a saga stands in play — its open quest, the lead that continues it, and one word for
+  /** where a chapter stands in play — its open quest, the lead that continues it, and one word for
    *  what the player does next ('choose the ending' · 'on the map' · 'being written' · 'a lead to
    *  pursue' · 'waiting for word' · 'finished' · 'slipped away') */
   private chainNext(c: Chain): { questId: string | null; leadId: string | null; next: string; live: boolean } {
@@ -1730,9 +1730,9 @@ export class Game {
     // the recruiting faucet PAUSES while the tavern queue is already deep (🛠 2026-07-11:
     // ~50 rescuees walked out unhired in one long campaign — dead "may join" promises)
     const paused = (l: Lead) => l.source === 'recruiting' && this.state.tavern.length >= 3;
-    // A saga the player already took is not news from the board — its next step must never hide
+    // A chapter the player already took is not news from the board — its next step must never hide
     // behind the Lead room. It did: the day-0 packet deals a ✦STORY lead pre-Lead-room, beat 1
-    // resolved, and beat 2's continuation sat invisible, so the saga silently stalled for the ~14
+    // resolved, and beat 2's continuation sat invisible, so the chapter silently stalled for the ~14
     // cycles the median opening takes to build one (playtest 2026-09-25).
     if (!this.hasRoom('lead-room'))
       return this.state.leads.filter(l => !paused(l) && (l.source === 'starter' || l.source === 'reward'
@@ -1742,7 +1742,7 @@ export class Game {
 
   /** leads the player has EARNED but cannot read until a Lead room stands — the gate is the design
    *  (FORT §5), silence about it was not: a lead-hunt printed "🧭 The sweep pays: 2 new lead(s)"
-   *  twice and the player saw nothing, and a new hire's personal saga sat unseen (playtest 2026-09-25) */
+   *  twice and the player saw nothing, and a new hire's personal chapter sat unseen (playtest 2026-09-25) */
   leadsAwaitingLeadRoom(): number {
     if (!this.hasRoom('map-room') || this.hasRoom('lead-room')) return 0;
     const shown = new Set(this.visibleLeads().map(l => l.id));
@@ -1839,7 +1839,7 @@ export class Game {
       if (this.state.quests.some(q => q.chainId === chain.id && q.state === 'open'))
         return { msg: 'that story already has an open quest' };
       // a beat still being WRITTEN is not yet an open quest — same guard, extended to work in
-      // flight: two concurrent beats of one saga would race its record and its card cache
+      // flight: two concurrent beats of one chapter would race its record and its card cache
       if (this.state.leads.some(l => l.id !== lead.id && this.reserved.has(l.id)
         && l.chainInfo.kind === 'continues' && (l.chainInfo as { chainId: string }).chainId === chain.id))
         return { msg: 'that story already has a step being written' };
@@ -1856,7 +1856,7 @@ export class Game {
     return { reason: g.msg, fix: on ? { screen: 'map', id: on, label: 'Open the quest on the map' } : null };
   }
 
-  /** the open quest this lead's quest already is (standing posts and saga continuations), or null */
+  /** the open quest this lead's quest already is (standing posts and chapter continuations), or null */
   private leadOnBoard(leadId: string): string | null {
     const lead = this.state.leads.find(l => l.id === leadId);
     if (!lead) return null;
@@ -1874,7 +1874,7 @@ export class Game {
     return this.state.unlockedRegions.length ? [...this.state.unlockedRegions] : ['forests'];
   }
 
-  /** THE LEADS BOARD in play order: saga continuations, then new stories, then what goes cold
+  /** THE LEADS BOARD in play order: chapter continuations, then new stories, then what goes cold
    *  soonest, then standing posts — each with its block (null = pursuable), the quest it is
    *  already on the map as, and the map table's work on it */
   leadBoard(): { lead: Lead; blocked: string | null; onBoard: string | null; working: 'queued' | 'running' | null }[] {
@@ -1923,15 +1923,15 @@ export class Game {
     let quest: Quest;
     if (lead.chainInfo.kind === 'continues') {
       const chain = this.state.chains.find(c => c.id === (lead.chainInfo as { chainId: string }).chainId);
-      if (!chain?.saga?.plan) return { ok: false, msg: 'the chain is gone' };
-      quest = await this.sagaStep(chain, lead);
+      if (!chain?.chapter?.plan) return { ok: false, msg: 'the chain is gone' };
+      quest = await this.chapterStep(chain, lead);
     } else if (lead.chainInfo.kind === 'starts-new') {
-      quest = await this.startSaga(lead);
+      quest = await this.startChapter(lead);
     } else {
       quest = await this.generateOneOff(lead);
     }
     // keep the lead whole on the quest so abandoning can put it back (a re-roll, not a dead end).
-    // Only for ONE-OFFS: a saga beat's lead belongs to the chain, not to the player's choice.
+    // Only for ONE-OFFS: a chapter beat's lead belongs to the chain, not to the player's choice.
     if (!quest.chainId) quest.fromLead = { ...lead };
     this.state.quests.push(quest);
     // a must-be place locks its soldier in the moment the card lands — off whatever quest they stood on mid-cycle
@@ -2225,7 +2225,7 @@ export class Game {
       // the kept thing, deliver-and-keep, prophetic loot. Omission is the class kill: cards
       // never name prizes; the RESOLVER names them at discovery via deliveredSummary.)
       // roster deliberately NOT dealt to one-offs (2026-07-16): its only rule was "never use
-      // these" — pure copy-bait for a cheap model. Saga cards still get it (focalIsMerc).
+      // these" — pure copy-bait for a cheap model. Chapter cards still get it (focalIsMerc).
       // A NAME ONLY WHEN THE PLAYER ALREADY KNOWS IT. Anonymity-by-omission (2026-07-06) kept
       // one-off FOLK nameless but let the quarry keep theirs, and that one name was enough to
       // gravitate a routine card. On a small job the quarry is now a station too — except on an
@@ -2289,7 +2289,7 @@ export class Game {
 
   // ---- chains -----------------------------------------------------------------------------------------
 
-  /** a soldier's own saga as a lead. `next`: their NEXT chapter (chain B, C…: an earlier personal saga changed them) */
+  /** a soldier's own chapter as a lead. `next`: their NEXT chapter (chain B, C…: an earlier personal chapter changed them) */
   private spawnPersonalChainLead(merc: Card, next = false) {
     const lead: Lead = {
       id: freshId('lead-'), rarity: 'uncommon', level: Math.max(1, merc.character!.level),
@@ -2301,13 +2301,13 @@ export class Game {
     this.state.leads.push(lead);
   }
 
-  // ---- SAGA LAB (docs/STORYTELLER.md §5.0) — dev tooling, reached only through the CLI's hidden
+  // ---- CHAPTER LAB (docs/STORYTELLER.md §5.0) — dev tooling, reached only through the CLI's hidden
   // `lab` commands and the AIRAIDER_FORCE_OUTCOMES flag. Nothing here runs in play.
 
-  /** post a fixture's pinned ✦STORY lead. The fort is made able to run the saga to any ending —
+  /** post a fixture's pinned ✦STORY lead. The fort is made able to run the chapter to any ending —
    *  the board, a Lead room, a Tavern and cells for the finale's person, four soldiers — without
-   *  a single AI call, so everything up to the saga's deal stays identical across arms. */
-  labSaga(fx: LabFixture): { ok: boolean; msg: string; leadId?: string } {
+   *  a single AI call, so everything up to the chapter's deal stays identical across arms. */
+  labChapter(fx: LabFixture): { ok: boolean; msg: string; leadId?: string } {
     const bad = labFixtureProblems(fx);
     if (bad.length) return { ok: false, msg: `bad fixture: ${bad.join('; ')}` };
     const level = fx.level ?? 2;
@@ -2329,7 +2329,7 @@ export class Game {
       lead.personalMercId = merc.id;
     }
     this.state.leads.push(lead);
-    return { ok: true, msg: `lab saga ${fx.id} (${fx.path}, N${fx.N}, ${fx.personal ? 'personal' : fx.kind}) posted: ${lead.id}`, leadId: lead.id };
+    return { ok: true, msg: `lab chapter ${fx.id} (${fx.path}, N${fx.N}, ${fx.personal ? 'personal' : fx.kind}) posted: ${lead.id}`, leadId: lead.id };
   }
 
   /** the lab's standing fort: rooms placed directly (no build side effects, no gold), and the
@@ -2376,7 +2376,7 @@ export class Game {
     eco.twist = pin.twist;
   }
 
-  /** AIRAIDER_FORCE_OUTCOMES — the ONE place a lab run bends the dice. A lab saga's quest gets its
+  /** AIRAIDER_FORCE_OUTCOMES — the ONE place a lab run bends the dice. A lab chapter's quest gets its
    *  fixture path's outcome (engine/lab.ts) and the heads to match, so the ⚄ line agrees. Unset —
    *  every game that is not a lab run — it returns the roll untouched: no rng, no state. */
   private forceOutcome(q: Quest, rolled: QuestRollResult): QuestRollResult {
@@ -2389,7 +2389,7 @@ export class Game {
     return forceRoll(rolled, outcome);
   }
 
-  /** one JSON line for the lab driver: where every saga, quest, lead and job stands, and the last
+  /** one JSON line for the lab driver: where every chapter, quest, lead and job stands, and the last
    *  reckoning's lines per quest — the very lines `reckoning` prints, so a transcript is cut per
    *  report without guessing where a block ends (the extractor checks them against the print) */
   labState() {
@@ -2397,7 +2397,7 @@ export class Game {
     return {
       lab: 1, cycle: this.state.cycle, roster: this.roster().length,
       chains: this.state.chains.map(c => ({
-        id: c.id, title: this.sagaTitle(c), state: c.state, beat: c.beatIndex, expectedBeats: c.expectedBeats,
+        id: c.id, title: this.chapterTitle(c), state: c.state, beat: c.beatIndex, expectedBeats: c.expectedBeats,
         failures: c.failures, failureBudget: c.failureBudget, lab: c.lab ?? null,
       })),
       quests: this.state.quests.filter(q => q.state === 'open').map(q => ({
@@ -2417,21 +2417,21 @@ export class Game {
     };
   }
 
-  // ---- sagas: the v4 storyteller (docs/STORYTELLER.md; src/game/sagaflow.ts) -----------------------------
+  // ---- chapters: the v4 storyteller (docs/STORYTELLER.md; src/game/chapterflow.ts) -----------------------------
   // The engine keeps every number it always had — the economy roll, the focal, slot counts, difficulty and its caps,
   // the fillability guard, side loot and relics, the bank, the failure budget, the stall guard, the finale's fates and
   // settleFinale. The flow owns what the story says, plus the few mechanics the build plan's §3 defaults hand it: asks
   // by job type (D1), the finale's ways (D2), injuries by rollHurt under today's guard (D3), who decides a job (D5).
 
-  /** the saga flow's view of the game */
-  private sagaHost(): flow.SagaHost {
-    const live = this.liveSagaCast();
+  /** the chapter flow's view of the game */
+  private chapterHost(): flow.ChapterHost {
+    const live = this.liveChapterCast();
     return {
       rng: this.rng, storyRng: this.storyRng, ai: this.ai, state: this.state,
       card: id => this.card(id), roster: () => this.roster(),
       direction: () => flow.directionText(this.state.direction),
       log: (kind, text) => this.log(kind, text),
-      // the roster, the lore, the recent NPC window, near-misses — and every live saga's cast
+      // the roster, the lore, the recent NPC window, near-misses — and every live chapter's cast
       takenName: n => live.names.has(n) || this.nameTooSimilar(n),
       takenTrade: t => live.trades.has(t),
       noteNpcName: n => { this.recentNpcNames.push(n); while (this.recentNpcNames.length > 60) this.recentNpcNames.shift() },
@@ -2439,19 +2439,19 @@ export class Game {
       placeOk: p => this.placeRested(p),
       hasRoom: t => this.hasRoom(t), rosterCapacity: () => this.rosterCapacity(),
       captiveCount: () => this.captives().length, captiveCapacity: () => this.captiveCapacity(),
-      // the pipeline by saga type (engine/saga.ts GAME_PIPE): a soldier's own saga PP, every other TC. A saga keeps the
-      // pipe it was dealt (SagaWorld.pipe), so one begun before this shipped plays on as it began
+      // the pipeline by chapter type (engine/chapter.ts GAME_PIPE): a soldier's own chapter PP, every other TC. A chapter keeps the
+      // pipe it was dealt (ChapterWorld.pipe), so one begun before this shipped plays on as it began
       pipeArm: chain => GAME_PIPE[chain.isPersonal ? 'personal' : 'other'],
     };
   }
-  /** a saga's title wherever the game prints one */
-  private sagaTitle(c: Chain): string { return c.saga?.plan?.title ?? 'a saga' }
-  /** the people of every saga still in play, by id, by name and by trade — the live-saga cast fence. A trade is the
+  /** a chapter's title wherever the game prints one */
+  private chapterTitle(c: Chain, none = 'a chapter'): string { return c.chapter?.plan?.title ?? none }
+  /** the people of every chapter still in play, by id, by name and by trade — the live-chapter cast fence. A trade is the
    *  dealt one or, for one dealt none, any dealt trade its plan label carries ("a lizardfolk horse dealer") */
-  private liveSagaCast(): { ids: Set<string>; names: Set<string>; trades: Set<string> } {
+  private liveChapterCast(): { ids: Set<string>; names: Set<string>; trades: Set<string> } {
     const live = this.state.chains.filter(c => c.state === 'active' || c.state === 'finale-pending');
-    const cast = live.flatMap(c => c.saga?.world.cast ?? []);
-    const labels = live.flatMap(c => c.saga?.plan?.cast.map(p => p.label.toLowerCase()) ?? []);
+    const cast = live.flatMap(c => c.chapter?.world.cast ?? []);
+    const labels = live.flatMap(c => c.chapter?.plan?.cast.map(p => p.label.toLowerCase()) ?? []);
     const trades = new Set([...cast.flatMap(p => p.trade ? [p.trade] : []), ...DEALT_TRADES.filter(t => labels.some(l => new RegExp(`\\b${t}\\b`).test(l)))]);
     return { ids: new Set(cast.map(p => p.id)), names: new Set(cast.map(p => p.name)), trades };
   }
@@ -2461,7 +2461,7 @@ export class Game {
     return `in ${n.startsWith('The ') ? n.replace(/^The/, 'the') : `the ${n}`}`;
   }
   /** a person's strongest memory WITH the company (D9): an engine-written line about them and the company, an edge a
-   *  saga left, or one to a soldier — every one a line the player read */
+   *  chapter left, or one to a soldier — every one a line the player read */
   private companyEdge(id: string): RelEdge | undefined {
     const cyc = this.state.cycle;
     return this.state.lore.edges
@@ -2474,7 +2474,7 @@ export class Game {
     const e = this.companyEdge(id);
     return e ? { memory: e.blurb, where: this.regionIn(region) } : undefined;
   }
-  /** every lore face as a saga seat would see it: where it stands (the slate's old fences) and its strongest company
+  /** every lore face as a chapter seat would see it: where it stands (the slate's old fences) and its strongest company
    *  edge. A face with no recorded sex is left out — the cast never guesses one */
   private faceCandidates(region: string, liveIds: Set<string>): FaceCandidate[] {
     const out: FaceCandidate[] = [];
@@ -2499,15 +2499,15 @@ export class Game {
     return out;
   }
   /** D9: the client seat reuses a fenced lore face with a client-type edge at P(new) = θ/(θ+N), at most one returning
-   *  face a saga, two sagas' cooldown — else the deal coins a stranger */
+   *  face a chapter, two chapters' cooldown — else the deal coins a stranger */
   private returningClient(focalId: string, region: string, liveIds: Set<string>): Face | undefined {
     const eligible = castableClients(this.faceCandidates(region, liveIds).filter(c => c.id !== focalId), recentFaces(this.state.chains));
     return pickClientFace(this.storyRng, eligible, CAST_THETA);
   }
-  /** a personal saga's seed (D12) and, when it came from an edge to a castable lore person, that person (D10): known,
+  /** a personal chapter's seed (D12) and, when it came from an edge to a castable lore person, that person (D10): known,
    *  their memory the edge's line; a rival-type edge seats them in the way instead of a coined opponent */
   private personalSeedOf(merc: Card, region: string, liveIds: Set<string>): { seed: string; history?: string; person?: Face & { rival: boolean } } {
-    // their NEXT chapter (chain B, C…; North Star 0): an earlier personal saga changed them, so the deal's situation is the seed,
+    // their NEXT chapter (chain B, C…; North Star 0): an earlier personal chapter changed them, so the deal's situation is the seed,
     // its new matter, and their living dossier's Now rides beside it (who they became: livingSeed); `history`, the old wrong it settled, rides on the world
     // for the retelling lint only — never the seed, never sent
     const history = historyOf(merc.character?.grown);
@@ -2521,11 +2521,11 @@ export class Game {
     return { seed, person: { id: c.id, name: c.name, sex: c.sex, race: c.race, memory: e.blurb, where: c.where, rival: OPPONENT_EDGES.has(e.type) } };
   }
 
-  /** A saga lead pursued. The focal FIRST (§2): personal → the soldier; a sequel → the one who slipped away; a lab
+  /** A chapter lead pursued. The focal FIRST (§2): personal → the soldier; a sequel → the one who slipped away; a lab
    *  fixture's person; else, sometimes, a face the world already knows (lore promotion), or a new one at the payoff
    *  value. Then the deal — synchronous, in the pursuit's prefix, so two pursuits at once never share a theme, a name or
    *  a returning face (TEMPO I3) — then the plan, and card 1 beside the road ahead. */
-  private async startSaga(lead: Lead): Promise<Quest> {
+  private async startChapter(lead: Lead): Promise<Quest> {
     const personalMercId = lead.personalMercId;
     const returning = lead.focalId ? this.card(lead.focalId) : undefined;
     // a sequel whose focal has since become YOUR merc = a personal chain about them
@@ -2533,10 +2533,10 @@ export class Game {
     const returningIsMerc = returning?.character?.role === 'merc';
     const isPersonal = (!!personalMercId && !!this.card(personalMercId)) || returningIsMerc;
     const eco = newChainEconomy(this.rng, lead.level, lead.rarity, lead.bonus ?? 0);
-    // SAGA LAB (docs/STORYTELLER.md §5.0): a lab lead's pins win over what the roll dealt
+    // CHAPTER LAB (docs/STORYTELLER.md §5.0): a lab lead's pins win over what the roll dealt
     const pin = lead.lab;
     if (pin) this.applyLabPins(eco, pin, lead);
-    const live = this.liveSagaCast();
+    const live = this.liveChapterCast();
     let focal: Card;
     /** the focal is a face the player already knows (D9): a sequel's, or a lore face promoted to a card */
     let known = false;
@@ -2561,10 +2561,10 @@ export class Game {
         return f ? f.tags.filter(t => ['skill', 'body', 'standing'].includes(CONCEPT[t.concept]?.group ?? ''))
           .map(t => t.concept) : [];
       });
-      // §21-3 known-cast cadence + LORE §1 lazy promotion (built 2026-07-10): some sagas return
+      // §21-3 known-cast cadence + LORE §1 lazy promotion (built 2026-07-10): some chapters return
       // to a FACE THE WORLD ALREADY KNOWS — a lore-only coined person gets a full Card rolled
       // here, and their lore node (memories, ties) is remapped onto it so their story follows.
-      // Never someone already in a live saga's cast (the live-saga fence)
+      // Never someone already in a live chapter's cast (the live-chapter fence)
       const loreCast = Object.values(this.state.lore.nodes).filter(nd =>
         nd.active && nd.kind === 'character' && !this.card(nd.id) && !this.state.cards.some(c => c.name === nd.name) && !live.ids.has(nd.id));
       // RECURRING_CAST §3 🔒 — two rules, replacing a >=3 gate, a per-tier cap and a flat 35%:
@@ -2601,7 +2601,7 @@ export class Game {
           { excludeConcepts: recentFocalTags, maxSkills: 2, prefs: this.prefsFor('npc') })[0]!;
       }
       // focal names skipped the similarity guard — two unrelated "Hessossk Scale-of-Bronze"s
-      // anchored back-to-back sagas. But a PROMOTED focal is a face the world already knows, so
+      // anchored back-to-back chapters. But a PROMOTED focal is a face the world already knows, so
       // their name is IN the lorebook by definition and the guard read that as a collision and
       // rerolled them into a stranger — silently undoing every reuse (measured: the branch fired
       // 17 times in 30 and produced 0 returning faces). The guard is for coincidence, not for a
@@ -2623,7 +2623,7 @@ export class Game {
       ...(pin ? { lab: { fixture: pin.id, path: pin.path, N: pin.N, log: [] } } : {}),
     };
     // THE DEAL (the who, the seed, the places), synchronous
-    const host = this.sagaHost();
+    const host = this.chapterHost();
     const pins: flow.DealPins = {};
     if (isPersonal) {
       const s = this.personalSeedOf(focal, chain.region, live.ids);
@@ -2641,28 +2641,28 @@ export class Game {
     try {
       const plan = await flow.plan(host, chain);
       this.log('chain', `A story begins: ${plan.title}`);
-      return await this.sagaStep(chain, lead);
+      return await this.chapterStep(chain, lead);
     } catch (e) {
-      // the pursuit failed and its lead stays on the board (TEMPO P4): the saga it was writing never began
+      // the pursuit failed and its lead stays on the board (TEMPO P4): the chapter it was writing never began
       Game.unbegin(this.state, chain);
       throw e;
     }
   }
 
-  /** the saga's next card (one already on offer comes back verbatim, D15) and the quest built around it */
-  private async sagaStep(chain: Chain, lead: Lead): Promise<Quest> {
+  /** the chapter's next card (one already on offer comes back verbatim, D15) and the quest built around it */
+  private async chapterStep(chain: Chain, lead: Lead): Promise<Quest> {
     // the game's own gate decides when the finale comes (finaleReady): reached early — the setbacks spent, or the stall
     // guard's merc-cycles — it is the last chance (D14), and the jobs never reached drop off the road
-    const rec = chain.saga!;
+    const rec = chain.chapter!;
     if (!rec.lastchance && finaleReady(chain) && !flow.posOf(rec).finale) rec.lastchance = true;
-    const out = await flow.card(this.sagaHost(), chain);
-    return this.sagaQuest(chain, lead, out);
+    const out = await flow.card(this.chapterHost(), chain);
+    return this.chapterQuest(chain, lead, out);
   }
 
-  /** a saga card's quest: today's slot count, side loot, relic chance, difficulty caps and gravity, the asks from the
+  /** a chapter card's quest: today's slot count, side loot, relic chance, difficulty caps and gravity, the asks from the
    *  job's type (D1); the finale one place per way, each its own plan, the gold road leaning easy (D2) */
-  private sagaQuest(chain: Chain, lead: Lead, out: flow.SagaCardOut): Quest {
-    const rec = chain.saga!, plan = rec.plan!, pos = out.pos;
+  private chapterQuest(chain: Chain, lead: Lead, out: flow.ChapterCardOut): Quest {
+    const rec = chain.chapter!, plan = rec.plan!, pos = out.pos;
     const focal = this.card(chain.focalId);
     let slots: QuestSlot[];
     let approaches: ApproachGroup[] | undefined;
@@ -2696,17 +2696,17 @@ export class Game {
       // beat pacing (QUESTS §8-B): beat 1 is the low-stakes CARE moment — cap its difficulty at standard; beat 2 still
       // escalating — cap at hard; then free
       const cap = pos.job <= 1 ? 'standard' as const : pos.job === 2 ? 'hard' as const : undefined;
-      // a personal saga pins its soldier to slot 0 only on a job the plan itself put them in (D1 — the pre-v4 rule: the
+      // a personal chapter pins its soldier to slot 0 only on a job the plan itself put them in (D1 — the pre-v4 rule: the
       // step stages their own matter in person); the repair that adds them to every job's people is for the prose only
       slots = this.buildSlots(n, chain.level, chain.rarity, 'investigate', flow.asks(e.type, n, chain.isPersonal, flow.pinsSoldier(rec, pos.job)), cap,
         chain.isPersonal && focal?.character?.role === 'merc' ? focal.id : undefined);
     }
     return {
       id: freshId('q'), leadId: lead.id, title: out.title, situation: out.prose, job: out.job,
-      gravity: sampleGravity(this.rng, chain.rarity, 'saga'),
+      gravity: sampleGravity(this.rng, chain.rarity, 'chapter'),
       level: chain.level, rarity: chain.rarity, region: chain.region, archetype: lead.archetype,
       chainId: chain.id, beatIndex: pos.job, isFinale: pos.finale,
-      saga: {
+      chapter: {
         rows: out.rows, logFirst: out.logFirst, matter: out.matter, pos,
         part: pos.finale ? null : pos.job, of: rec.world.N, again: !pos.finale && pos.attempt > 1, lastchance: pos.finale && rec.lastchance,
         setbacks: chain.failures, budget: chain.failureBudget,
@@ -2786,7 +2786,7 @@ export class Game {
   //    with the company is locked nowhere; the place stays empty and says so.
   //  · A WOUND is no exception: the hurt may march (a penalty, never a bar — canTake), so a wounded soldier stays
   //    locked in; to keep them from marching, the player sets the quest aside.
-  //  · THE WAY OUT is the game's own, unchanged: set the quest aside (abandon — a saga step keeps its consequences:
+  //  · THE WAY OUT is the game's own, unchanged: set the quest aside (abandon — a chapter step keeps its consequences:
   //    a continuation lead, or the slip on the third time) or let it lapse. Either frees them.
   //  · Placing is automatic (settleLocks): when a card lands (off any quest they stood on mid-cycle — said plainly in the
   //    arrival's note), when a quest that held them is done or set aside, when a finale's plan changes, and on load.
@@ -3023,13 +3023,13 @@ export class Game {
     slot.filledBy = null;
   }
 
-  /** ON THIS MATTER — the people this saga card calls by name, as "name — label", for the quest screen's held cards
+  /** ON THIS MATTER — the people this chapter card calls by name, as "name — label", for the quest screen's held cards
    *  and the CLI's line (onThisMatter, computed when the card was dealt — a person the card withholds is never here).
    *  A person the deal seated from a real Card (the focal, a soldier, a returning face: their cast id IS the card id)
    *  carries `cardId`, so both UIs can show that card; the people the plan coined (p1, p2…) have no card */
   questCast(questId: string): { id: string; name: string; label: string; cardId?: string }[] {
     const q = this.state.quests.find(x => x.id === questId);
-    return (q?.saga?.matter ?? []).map(m => {
+    return (q?.chapter?.matter ?? []).map(m => {
       const c = this.card(m.id);
       return { ...m, ...(c?.character && c.name === m.name ? { cardId: c.id } : {}) };
     });
@@ -3254,7 +3254,7 @@ export class Game {
    *  engine's own numbers, which the game states plainly everywhere else). One implementation, so
    *  the board, the quest page and the text UI can never disagree about what a job is worth.
    *
-   *  A saga BEAT names both halves: the side loot it pays now, and what the whole matter comes to
+   *  A chapter BEAT names both halves: the side loot it pays now, and what the whole matter comes to
    *  — that second number is the reason to take the next beat, and a beat that only advertises its
    *  loot undersells itself badly. A FINALE pays the person at the centre, named only once the
    *  player has met them (the same gate the card writer uses). */
@@ -3276,27 +3276,27 @@ export class Game {
       // "REWARD: Keesa" read as an offer to recruit someone standing in the yard (playtest 2026-09-25)
       if (chain?.isPersonal && focal) parts.unshift(`${focal.name}'s matter, settled`);
       else {
-        // named only once the player has read the name (the saga's Knowing — the gate every card obeys)
-        const fe = chain?.saga?.plan?.cast.find(p => p.focal);
-        const named = !!focal && !!fe && knowingOf(chain!.saga!).named.has(fe.id);
+        // named only once the player has read the name (the chapter's Knowing — the gate every card obeys)
+        const fe = chain?.chapter?.plan?.cast.find(p => p.focal);
+        const named = !!focal && !!fe && knowingOf(chain!.chapter!).named.has(fe.id);
         parts.unshift(this.finaleBrings(q, chain, named ? focal!.name : 'the one at the heart of it'));
       }
     }
     const now = parts.join(' + ') || 'side loot';
-    // A mid-saga beat NEVER advertises the ending's payout. That number is the deferred reward and
+    // A mid-chapter beat NEVER advertises the ending's payout. That number is the deferred reward and
     // the player is not meant to hold it (REWARD_BANK §5 sanctions only `bank` — "spoils so far" —
     // and PROMPT_RULES forbids surfacing banked-payoff text). What a beat honestly promises is that
-    // the saga is still owed something.
-    return chain && !q.isFinale ? `${now} · and the saga still owes` : now;
+    // the chapter is still owed something.
+    return chain && !q.isFinale ? `${now} · and the chapter still owes` : now;
   }
 
   /** what a (non-personal) finale brings the company: the person at its centre — until a plan is chosen that lets them go.
-   *  Read the way settleFinale reads it (sagaflow.fateFacts): the gold plan pays out what was set aside and they go free;
+   *  Read the way settleFinale reads it (chapterflow.fateFacts): the gold plan pays out what was set aside and they go free;
    *  a keep plan on a bank too thin to keep them (the void) pays salvage coin and they slip away */
   private finaleBrings(q: Quest, chain: Chain | undefined, who: string): string {
     const a = q.approaches?.find(x => x.id === q.chosenApproach);
-    if (!a?.way || !chain?.saga?.plan) return who;
-    const f = flow.fateFacts(this.sagaHost(), chain, a.way, 'success');
+    if (!a?.way || !chain?.chapter?.plan) return who;
+    const f = flow.fateFacts(this.chapterHost(), chain, a.way, 'success');
     if (f.focalIsMerc) return who;
     const coin = coinBand(chain.bank);
     if (a.rewardKind === 'gold') return `what was set aside, in coin${coin ? ` (${coin})` : ''}`;
@@ -3312,7 +3312,7 @@ export class Game {
     const a = q?.approaches?.find(x => x.id === approachId);
     if (!q || !a?.way) return '';
     const chain = q.chainId ? this.state.chains.find(c => c.id === q.chainId) : undefined;
-    const fe = chain?.saga?.plan?.cast.find(p => p.focal);
+    const fe = chain?.chapter?.plan?.cast.find(p => p.focal);
     return a.way === 'gold' && fe && helped(fe) ? 'coin; goes their way' : WAY_ENDING[a.way];
   }
 
@@ -3410,9 +3410,9 @@ export class Game {
     const back = party ? ` ${party === 1 ? 'The mercenary goes' : party === 2 ? 'Both mercenaries go' : `All ${party} mercenaries go`} back to the hand.` : '';
     if (q.chainId) {
       const out = this.abandonChainOutcome(q);
-      return out === 'continues' ? `A saga step: the card is gone, the thread dangles — a continuation lead returns to the board.${back}`
-        : out === 'slips' ? `A saga step: this step has now been left untaken three times — the saga slips out of reach${this.state.chains.find(c => c.id === q.chainId)?.state === 'finale-pending' ? ', finale and all' : ''}.${back}`
-        : `A saga step whose story is already over — nothing comes back.${back}`;
+      return out === 'continues' ? `A chapter step: the card is gone, the thread dangles — a continuation lead returns to the board.${back}`
+        : out === 'slips' ? `A chapter step: this step has now been left untaken three times — the chapter slips out of reach${this.state.chains.find(c => c.id === q.chainId)?.state === 'finale-pending' ? ', finale and all' : ''}.${back}`
+        : `A chapter step whose story is already over — nothing comes back.${back}`;
     }
     if (!q.fromLead) return `The card is gone for good.${back}`;
     if (this.state.leads.some(l => l.id === q.fromLead!.id)) return `The card is gone; its post is still standing.${back}`;
@@ -3429,7 +3429,7 @@ export class Game {
    *  a finale with no approach; a quest that goes cold at this END (its TTL, or the stall rule —
    *  both read questLapsesAt); a part-filled quest that will not march; a part-filled STANDING-POST
    *  quest (its placement walks back when the post's quest goes; an empty one is no loss, the post
-   *  writes another); a saga's continuation lead, or a lead worth money, going cold; a captive handed
+   *  writes another); a chapter's continuation lead, or a lead worth money, going cold; a captive handed
    *  off from holding; a hireable guest leaving the tavern. The predicates are doEndCycle's own. */
   endWarnings(): EndWarning[] {
     const next = this.state.cycle + 1;
@@ -3457,9 +3457,9 @@ export class Game {
     for (const l of this.leadsGoingCold()) {
       const chain = l.chainInfo.kind === 'continues' ? this.state.chains.find(c => c.id === (l.chainInfo as { chainId: string }).chainId) : undefined;
       const b = leadBand(l);
-      out.push({ key: l.id, questId: null, title: chain ? this.sagaTitle(chain) : l.title ?? `${l.archetype} in ${REGION[l.region]?.name ?? l.region}`,
+      out.push({ key: l.id, questId: null, title: chain ? this.chapterTitle(chain) : l.title ?? `${l.archetype} in ${REGION[l.region]?.name ?? l.region}`,
         why: 'lead-lapses', filled: 0, of: 0, lapsesNow: true, target: { screen: 'leads' },
-        text: chain ? `the saga slips this END unless its lead is pursued (${l.id})` : `a lead worth ${b.label} goes cold this END (${l.id})` });
+        text: chain ? `the chapter slips this END unless its lead is pursued (${l.id})` : `a lead worth ${b.label} goes cold this END (${l.id})` });
     }
     for (const h of this.state.holding.filter(x => x.expiresAtCycle <= next)) {
       const c = this.card(h.cardId);
@@ -3475,8 +3475,8 @@ export class Game {
     }
     return out;
   }
-  /** leads the player could pursue that go cold at this END AND are a real loss: a saga's
-   *  continuation (the saga slips) or a lead carrying money (leadBand ≥ 2 — the reckoning names
+  /** leads the player could pursue that go cold at this END AND are a real loss: a chapter's
+   *  continuation (the chapter slips) or a lead carrying money (leadBand ≥ 2 — the reckoning names
    *  those as lost; an unbanded lead lapses quietly, as it always has) */
   private leadsGoingCold(): Lead[] {
     const next = this.state.cycle + 1;
@@ -3543,7 +3543,7 @@ export class Game {
     const pursuable = this.leadBoard().filter(r => !r.blocked);
     if (pursuable.length) {
       const cold = pursuable.filter(r => r.lead.expiresAtCycle !== null && r.lead.expiresAtCycle <= st.cycle + 1).length;
-      // urgent only for a REAL loss (the END guard's own predicate: a saga's lead, a lead with money in it)
+      // urgent only for a REAL loss (the END guard's own predicate: a chapter's lead, a lead with money in it)
       const loss = this.leadsGoingCold().length > 0;
       const one = pursuable[0]!.lead;
       const title = one.title ?? `${one.archetype} in ${REGION[one.region]?.name ?? one.region}`;
@@ -3778,7 +3778,7 @@ export class Game {
     const ready = st.quests.filter(q => q.state === 'open' && this.isCommitted(q)).sort((a, b) => a.id.localeCompare(b.id));
     // a partially-staffed quest silently NOT marching was invisible — say it plainly, but a
     // quest stalled 3 cycles running is SET ASIDE (the same ⏸ line printed ten cycles straight
-    // while a saga froze; a lapsed chain beat respawns its lead — the story waits)
+    // while a chapter froze; a lapsed chain beat respawns its lead — the story waits)
     for (const q of st.quests.filter(x => x.state === 'open' && !this.isCommitted(x))) {
       const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
       const filled = active.filter(s => s.filledBy).length;
@@ -3799,7 +3799,7 @@ export class Game {
     if (ready.length === 0) report.push('A quiet cycle — no one marched.');
     const resolutions: Resolution[] = [];
     const questBlocks = new Map<string, string[]>();
-    const sagaHost = this.sagaHost();
+    const chapterHost = this.chapterHost();
     for (const q of ready) {
       const active = q.approaches ? q.slots.filter(s => s.groupId === q.chosenApproach) : q.slots;
       const party = active.map(s => this.card(s.filledBy!)!);
@@ -3808,16 +3808,16 @@ export class Game {
       let fate: FinaleFate | undefined;
       const chain = q.chainId ? st.chains.find(c => c.id === q.chainId) : undefined;
       if (q.isFinale && chain) fate = finaleFate(this.rng, chain, rolled.outcome);
-      // a saga quest's report facts are decided HERE, synchronously, in id order: who decides (D5), the hurt (D3, on the
+      // a chapter quest's report facts are decided HERE, synchronously, in id order: who decides (D5), the hurt (D3, on the
       // main rng), the finale's Outcome sentence (D18). Only the writing runs later, beside every other report
-      const saga = q.saga && chain?.saga?.plan ? {
-        pos: q.saga.pos,
-        inn: flow.reportIn(sagaHost, chain, q.saga.pos, q.situation, {
+      const chapter = q.chapter && chain?.chapter?.plan ? {
+        pos: q.chapter.pos,
+        inn: flow.reportIn(chapterHost, chain, q.chapter.pos, q.situation, {
           outcome: rolled.outcome, party, tests: active.map(s => s.test), gravity: q.gravity ?? 'a small, everyday job',
           way: q.approaches?.find(a => a.id === q.chosenApproach)?.way, fate,
         }),
       } : undefined;
-      resolutions.push({ quest: q, outcome: rolled.outcome, delivery, party, fate, rolled, ...(saga ? { saga } : {}) });
+      resolutions.push({ quest: q, outcome: rolled.outcome, delivery, party, fate, rolled, ...(chapter ? { chapter } : {}) });
       // This quest's slot on the screen, held open in id order until its own call lands. The
       // first two lines are EXACTLY what applyResolution re-pushes, so the card the player is
       // re-reading does not move when the report replaces the placeholder — and the card is the
@@ -3844,8 +3844,8 @@ export class Game {
     const preLeads = this.preMintedLeads = new Map<string, Lead[]>();
     for (const r of resolutions) if (r.delivery.leadGrants.length)
       preLeads.set(r.quest.id, r.delivery.leadGrants.map(b => this.freshLead('reward', b)));
-    // 2) ONE batched AI call for the one-offs; each saga report is its own call (the v4 storyteller), all in parallel
-    const aiInputs: ResolveQuestInput[] = resolutions.filter(r => !r.saga).map(r => ({
+    // 2) ONE batched AI call for the one-offs; each chapter report is its own call (the v4 storyteller), all in parallel
+    const aiInputs: ResolveQuestInput[] = resolutions.filter(r => !r.chapter).map(r => ({
       questId: r.quest.id, title: r.quest.title, situation: r.quest.situation, job: r.quest.job, gravity: r.quest.gravity,
       rarity: r.quest.rarity, outcome: r.outcome,
       // habits reach the narrator only ~40% of the time — a habit not shown cannot become a
@@ -3880,8 +3880,8 @@ export class Game {
     // error is CARRIED and re-thrown after the await. Silently losing a quest (and stranding its
     // party in a deleted quest's slot) is the one outcome this must never have.
     let arriveError: unknown;
-    /** one quest's report lands: a one-off's resolver output, or a saga's report */
-    const land = (questId: string, out?: ResolveQuestOut, rep?: SagaReport) => {
+    /** one quest's report lands: a one-off's resolver output, or a chapter's report */
+    const land = (questId: string, out?: ResolveQuestOut, rep?: ChapterReport) => {
       const r = byQuest.get(questId), block = questBlocks.get(questId);
       if (!r || !block || applied.has(questId)) return;
       applied.add(questId);   // set BEFORE, so a half-applied quest is never applied twice
@@ -3897,28 +3897,28 @@ export class Game {
     const arrive = (out: ResolveQuestOut) => land(out.questId, out);
     // engine effects therefore land in ARRIVAL order, not id order (TEMPO I1: replay
     // determinism explicitly not required); the TELLING order stays id order — that is the blocks.
-    // The one-offs' batch and every saga report run together and settle into the same reckoning
+    // The one-offs' batch and every chapter report run together and settle into the same reckoning
     const oneOffs = aiInputs.length ? this.ai.resolve(aiInputs, arrive) : Promise.resolve([] as ResolveQuestOut[]);
-    const sagas = Promise.all(resolutions.filter(r => r.saga).map(async r => land(r.quest.id, undefined, await flow.writeSagaReport(sagaHost, r.saga!.inn.call))));
-    const [o1, o2] = await Promise.allSettled([oneOffs, sagas]);
+    const chapters = Promise.all(resolutions.filter(r => r.chapter).map(async r => land(r.quest.id, undefined, await flow.writeChapterReport(chapterHost, r.chapter!.inn.call))));
+    const [o1, o2] = await Promise.allSettled([oneOffs, chapters]);
     const aiOuts = o1.status === 'fulfilled' ? o1.value : [];
-    // defensive: a quest the callback never reached still resolves (undefined out = engine truth; a saga's the floor)
+    // defensive: a quest the callback never reached still resolves (undefined out = engine truth; a chapter's the floor)
     for (const r of resolutions) {
       if (applied.has(r.quest.id)) continue;
-      if (o1.status === 'rejected' && !r.saga) continue;   // the batch threw: re-thrown below, as before
+      if (o1.status === 'rejected' && !r.chapter) continue;   // the batch threw: re-thrown below, as before
       applied.add(r.quest.id);
       const block = questBlocks.get(r.quest.id)!;
       block.length = 0;
       this.applyResolution(r, aiOuts.find(o => o.questId === r.quest.id), block, pendingEdges,
-        r.saga ? mockReport(r.saga.inn.call.payload, r.saga.inn.call.flags) : undefined);
+        r.chapter ? mockReport(r.chapter.inn.call.payload, r.chapter.inn.call.flags) : undefined);
       this.reckoning?.landed.add(r.quest.id);
     }
     if (o1.status === 'rejected') throw o1.reason;
     if (o2.status === 'rejected') throw o2.reason;
     if (arriveError) throw arriveError;   // loud, as it was before the callback existed
-    // COLD-READER GATE on saga reports REMOVED (reviewlab 84001 + blind judge, 2026-07-17):
+    // COLD-READER GATE on chapter reports REMOVED (reviewlab 84001 + blind judge, 2026-07-17):
     // the redo made reports WORSE in 6/7 fired cases (pre-redo mean 7.29 vs shipped 6.14) at
-    // ~5.5s review + ~15s redo on 58-67% of saga resolutions — the strongest nag-degradation
+    // ~5.5s review + ~15s redo on 58-67% of chapter resolutions — the strongest nag-degradation
     // measurement of the three gates. Report-defect classes (ledger breaks, ambiguous
     // antecedents) get fixed at the resolve prompt instead.
 
@@ -3933,7 +3933,7 @@ export class Game {
     this.breakingPass(report);
     // staged people who time out LEAVE — to the lore graph, never orphaned in 'staged'.
     // A PREPAID guest (a won finale prize waiting on roster room) never walks: the mark was
-    // paid — they wait ("Brugrim drank up and left" turned a won saga into a debt and nothing)
+    // paid — they wait ("Brugrim drank up and left" turned a won chapter into a debt and nothing)
     for (const s of st.tavern.filter(s => s.expiresAtCycle <= st.cycle && !s.prepaid)) {
       const c = this.card(s.cardId);
       if (c) { this.ensureLoreNode(c); c.location = HELD('lore'); report.push(`${c.name} drank up and left the tavern.`) }
@@ -4028,14 +4028,14 @@ export class Game {
       if (!chain || (chain.state !== 'active' && chain.state !== 'finale-pending')) continue;
       chain.state = 'slipped'; chain.bank = 0;
       this.persistMetCast(chain);
-      this.sagaClosed(chain);
+      this.chapterClosed(chain);
       const focal = this.card(chain.focalId);
       if (focal && !chain.isPersonal && focal.location.kind === 'held' && focal.location.state === 'limbo') {
         focal.location = HELD('lore');
         this.ensureLoreNode(focal);
         st.leads.push(this.sequelLead(chain, focal));
       }
-      report.push(`🕮 The company let "${this.sagaTitle(chain)}" lapse — ${focal?.name ?? 'its center'} passes out of reach, for now.`);
+      report.push(`🕮 The company let "${this.chapterTitle(chain)}" lapse — ${focal?.name ?? 'its center'} passes out of reach, for now.`);
     }
     // a RESERVED lead survives its own expiry: the quest it is being turned into must have a lead
     // to consume when it lands (I6). endCycle drains first, so this only fires on a path that
@@ -4173,9 +4173,9 @@ export class Game {
     const locked = settled.note ? ` · ${settled.note}` : '';
     const lw = settled.warn ? { warn: true } : {};
     if (!reroll) {
-      // the reply says what abandonQuest actually DID to the saga (a continuation lead, or a slip)
+      // the reply says what abandonQuest actually DID to the chapter (a continuation lead, or a slip)
       const why = q.chainId ? (chainOut === 'continues' ? ' — the thread dangles: a continuation lead is back on the board'
-          : chainOut === 'slips' ? ` — ${said.find(l => l.startsWith('🕮'))?.replace(/^🕮 /, '') ?? 'the saga slips out of reach'}`
+          : chainOut === 'slips' ? ` — ${said.find(l => l.startsWith('🕮'))?.replace(/^🕮 /, '') ?? 'the chapter slips out of reach'}`
           : ' — its story was already over')
         : !lead ? ''
         : !this.canReroll() ? ' — the lead is spent; a lead can only be taken up again once a cycle'
@@ -4188,7 +4188,7 @@ export class Game {
     return { ok: true, msg: `${q.title} set aside — the lead is back on the map table, to be taken up again${locked}`, ...lw };
   }
 
-  /** what setting a saga step aside does to its saga — the SAME branch abandonQuest takes, so the
+  /** what setting a chapter step aside does to its chapter — the SAME branch abandonQuest takes, so the
    *  confirm can never promise what the engine will not give */
   private abandonChainOutcome(q: Quest): 'continues' | 'slips' | 'none' {
     const chain = q.chainId ? this.state.chains.find(c => c.id === q.chainId) : undefined;
@@ -4218,21 +4218,21 @@ export class Game {
         if (chain.reOffers >= 3) {
           chain.state = 'slipped'; chain.bank = 0;
           this.persistMetCast(chain);
-          this.sagaClosed(chain);
+          this.chapterClosed(chain);
           const focal = this.card(chain.focalId);
           if (focal && !chain.isPersonal && focal.location.kind === 'held' && (focal.location as { state?: string }).state === 'limbo') {
             focal.location = HELD('lore');
             this.ensureLoreNode(focal);
             this.state.leads.push(this.sequelLead(chain, focal));
           }
-          report.push(`🕮 "${this.sagaTitle(chain)}" was left untaken three times — the matter passes out of reach, for now.`);
+          report.push(`🕮 "${this.chapterTitle(chain)}" was left untaken three times — the matter passes out of reach, for now.`);
         } else {
           // the card on offer comes back verbatim when its lead is pursued again (D15)
           this.state.leads.push({
             id: freshId('lead-'), rarity: chain.rarity, level: chain.level, region: chain.region,
-            archetype: 'investigate', chainInfo: { kind: 'continues', chainId: chain.id, hook: chain.saga?.latest ?? '' },
+            archetype: 'investigate', chainInfo: { kind: 'continues', chainId: chain.id, hook: chain.chapter?.latest ?? '' },
             expiresAtCycle: this.state.cycle + LEAD_TTL + CONTINUATION_TTL_BONUS, source: 'continuation',
-            title: `${this.sagaTitle(chain)} — the thread dangles`,
+            title: `${this.chapterTitle(chain)} — the thread dangles`,
           });
         }
       }
@@ -4265,7 +4265,7 @@ export class Game {
     return active.length > 0 && active.every(s => s.filledBy);
   }
 
-  /** a one-off's delivery, named for its narrator (a saga's report is dealt its own facts by the flow) */
+  /** a one-off's delivery, named for its narrator (a chapter's report is dealt its own facts by the flow) */
   private describeDelivery(r: Resolution): string {
     if (r.outcome === 'failure') return 'they return with empty hands (say what was lost, in-fiction)';
     // the person's REAL fate is engine-decided — deal it, or prose promises "they may stay"
@@ -4295,8 +4295,8 @@ export class Game {
     out: { before: string; turn?: string; turnActor?: string; speech?: { who: string; says: string }[]; after: string; injuries: { characterId: string; band: InjuryBand; cause?: string | null }[]; fleshed: { characterId: string; who: string; backstory: string; quirks: string[] }[]; edges: { from: string; to: string; type: string; blurb: string; importance: number }[] } | undefined,
     report: string[],
     pendingEdges: { from: string; to: string; type: string; blurb: string; importance: number; sourceQuestId?: string }[],
-    /** a saga quest's report (the v4 storyteller): its prose; the hurt was decided in the roll loop (r.saga) */
-    sagaRep?: SagaReport,
+    /** a chapter quest's report (the v4 storyteller): its prose; the hurt was decided in the roll loop (r.chapter) */
+    chapterRep?: ChapterReport,
   ) {
     const st = this.state;
     const q = r.quest;
@@ -4334,9 +4334,9 @@ export class Game {
         blurb: `marched together — ${q.title}`,
       });
     }
-    // a saga's injuries were rolled by the engine before the report was written (D3: rollHurt under today's guard — a
+    // a chapter's injuries were rolled by the engine before the report was written (D3: rollHurt under today's guard — a
     // success never wounds, a partial at most lightly), and the report was dealt them: band → tiers on the main rng
-    if (r.saga) for (const h of r.saga.inn.hurt) {
+    if (r.chapter) for (const h of r.chapter.inn.hurt) {
       const merc = r.party.find(p => p.name === h.name);
       if (!merc?.character) continue;
       const band = HURT_BAND[h.how];
@@ -4464,11 +4464,11 @@ export class Game {
     pendingEdges.push(...modelEdges(out?.edges).map(e => ({ ...e, sourceQuestId: q.id })));
     // narrate in the fiction's own order — setup, THEN the dice, THEN the outcome
     // (QUESTS §7: before-roll blind → after-roll sighted; the DICE are always shown, DESIGN §5).
-    // A saga card echoes its prose only — never its quest log (D17: the placeholder and this block start alike)
+    // A chapter card echoes its prose only — never its quest log (D17: the placeholder and this block start alike)
     report.push(`— ${q.title} (${q.id})`);
     if (q.situation) report.push(`「${q.situation}」`);
     const bubbles = process.env.SPEECH_ANCHORS === '1' && out?.speech?.length ? out.speech : null;
-    if (sagaRep) report.push(sagaRep.before);
+    if (chapterRep) report.push(chapterRep.before);
     else if (out) report.push(...(bubbles ? this.renderWithBubbles(out.before, bubbles) : [out.before]));
     report.push(r.rolled.totalCoins === 0
       ? `⚄ [${r.outcome.toUpperCase()}] · the party had no usable dice for this work (needed ${r.rolled.totalBar.toFixed(1)})`
@@ -4479,7 +4479,7 @@ export class Game {
     // ask — attribute value, favored/clash, injury — via the engine's own explainCoins
     if (coinTerms.length) report.push(`   ${coinTerms.join('  ·  ')}`);
     // beat variant: the engine assembles the strip's turn caption + speech around its dice line
-    if (sagaRep) report.push(sagaRep.after);
+    if (chapterRep) report.push(chapterRep.after);
     else {
       if (out?.turn) report.push(`▸ ${out.turnActor ?? '—'} — ${out.turn}`);
       if (!bubbles) for (const s of out?.speech ?? []) report.push(`  ${s.who}: "${s.says}"`);
@@ -4487,8 +4487,8 @@ export class Game {
     }
     report.push(...after);
     this.log('resolve', `${q.title}: ${r.outcome}`, q.id);
-    // the saga moves on (its 📖 line, then the next lead or the finale's settlement)
-    if (q.chainId && r.saga && sagaRep) this.advanceChain(q, r, sagaRep, report);
+    // the chapter moves on (its 📖 line, then the next lead or the finale's settlement)
+    if (q.chainId && r.chapter && chapterRep) this.advanceChain(q, r, chapterRep, report);
     st.quests = st.quests.filter(x => x.state !== 'resolved');
   }
 
@@ -4528,7 +4528,7 @@ export class Game {
     const pre3 = g.slice(0, 3);
     const crowd = this.state.cards.filter(x => x.character && given(x.name).slice(0, 3) === pre3).length;
     if (crowd >= 2) return true;
-    // lore-only people count too — a coined saga warlord "Grakjaw" was re-rolled as a
+    // lore-only people count too — a coined chapter warlord "Grakjaw" was re-rolled as a
     // one-off rescue victim, one name wearing two opposite characters
     return this.state.cards.some(x => x.character && hit(x.name))
       || this.recentNpcNames.some(hit)
@@ -4556,10 +4556,10 @@ export class Game {
     return { ...out, situation: kept.join(' ') };
   }
 
-  /** the edges a soldier's own saga could start from, strongest first — never one to a fellow soldier: a seed may only
-   *  name people the saga can cast, and you cannot ride out to find someone standing in your own yard (2026-08-31). Never
-   *  a memory the company's play made (`madeInPlay`): the saga is told as their past, and a company saga's deed seeded
-   *  as one was retold as an old wrong, against that saga's own answer — its person seated as "knows the past" */
+  /** the edges a soldier's own chapter could start from, strongest first — never one to a fellow soldier: a seed may only
+   *  name people the chapter can cast, and you cannot ride out to find someone standing in your own yard (2026-08-31). Never
+   *  a memory the company's play made (`madeInPlay`): the chapter is told as their past, and a company chapter's deed seeded
+   *  as one was retold as an old wrong, against that chapter's own answer — its person seated as "knows the past" */
   private personalEdges(merc: Card): RelEdge[] {
     const inTheCompany = (id: string) => this.card(id)?.character?.role === 'merc';
     return this.state.lore.edges
@@ -4567,8 +4567,8 @@ export class Game {
       .filter(e => !inTheCompany(e.from === merc.id ? e.to : e.from))
       .sort((a, b) => (Number(b.core) - Number(a.core)) || (b.salience - a.salience));
   }
-  /** the spark for a soldier's OWN saga (D12): the strongest thing the world remembers of them from before the company
-   *  (`personalEdges`), else the past they were fleshed with. Never a generic theme — that is what turned a personal saga
+  /** the spark for a soldier's OWN chapter (D12): the strongest thing the world remembers of them from before the company
+   *  (`personalEdges`), else the past they were fleshed with. Never a generic theme — that is what turned a personal chapter
    *  into somebody else's ransom job */
   private personalSeed(merc: Card): string {
     // (a save from before entries kept the line alone: it seeds on the base it was told from)
@@ -4576,8 +4576,8 @@ export class Game {
     if (typeof last === 'string') return `${this.personalSeedBase(merc)} ${last}`;
     return this.personalSeedBase(merc);
   }
-  /** a NEXT personal saga's `now`: the living dossier's Now (refreshed now if a save never had one; no settled mark), naming only the
-   *  person who matters that the saga can seat — the first castable one, seated as D10 seats a seed's person (known, their
+  /** a NEXT personal chapter's `now`: the living dossier's Now (refreshed now if a save never had one; no settled mark), naming only the
+   *  person who matters that the chapter can seat — the first castable one, seated as D10 seats a seed's person (known, their
    *  memory the tie's line; a rival-type tie in the way) */
   private nextChapterSeed(merc: Card, region: string, liveIds: Set<string>): { seed: string; person?: Face & { rival: boolean } } {
     if (!merc.character!.living) this.refreshLiving(merc);
@@ -4602,11 +4602,11 @@ export class Game {
 
   // ---- the living dossier (STORY_ENGINE §4; engine/dossier.ts) ---------------------------------
 
-  /** a saga ended (done or slipped, however): when, and every soldier it marked gets their living dossier refreshed — its
+  /** a chapter ended (done or slipped, however): when, and every soldier it marked gets their living dossier refreshed — its
    *  own soldier, whoever decided a job, whoever was hurt, whoever a memory it left touches */
-  private sagaClosed(chain: Chain): void {
+  private chapterClosed(chain: Chain): void {
     chain.endedCycle ??= this.state.cycle;
-    const rec = chain.saga;
+    const rec = chain.chapter;
     const names = new Set([...(rec?.lines ?? []).flatMap(l => [...(l.decides && l.outcome !== 'failure' ? [l.decides] : []), ...l.hurt.map(h => h.name)])]);
     const touched = new Set(this.state.lore.edges.filter(e => e.sourceChainId === chain.id).flatMap(e => [e.from, e.to]));
     for (const m of this.state.cards) {
@@ -4621,17 +4621,17 @@ export class Game {
     const d = composeLiving({ name: m.name, who: ch.who, grown: ch.grown?.filter((g): g is GrownEntry => typeof g !== 'string'), marks: this.lifeMarks(m), people: this.lifePeople(m), cycle: this.state.cycle });
     if (d) ch.living = d; else delete ch.living;
   }
-  /** the events that marked a soldier, newest first: each ended saga they were part of, once — their own saga's ending line,
-   *  the ending of a hired saga that was about them (the one that brought them in), else the last job they decided, else the
+  /** the events that marked a soldier, newest first: each ended chapter they were part of, once — their own chapter's ending line,
+   *  the ending of a hired chapter that was about them (the one that brought them in), else the last job they decided, else the
    *  job they were worst hurt in. Every text a chronicle line the player read */
   private lifeMarks(m: Card): LifeMark[] {
-    const ended = this.state.chains.filter(c => (c.state === 'done' || c.state === 'slipped') && c.saga?.plan)
+    const ended = this.state.chains.filter(c => (c.state === 'done' || c.state === 'slipped') && c.chapter?.plan)
       .sort((a, b) => (b.endedCycle ?? b.createdCycle) - (a.endedCycle ?? a.createdCycle));
     const ORDER: Record<string, number> = { gravely: 3, badly: 2, lightly: 1 };
     const out: LifeMark[] = [];
     for (const c of ended) {
-      const rec = c.saga!, title = rec.plan!.title, N = rec.world.N;
-      // the seed's form of a line: that saga's people by label (a seed names only people the next saga can cast)
+      const rec = c.chapter!, title = rec.plan!.title, N = rec.world.N;
+      // the seed's form of a line: that chapter's people by label (a seed names only people the next chapter can cast)
       const others = rec.plan!.cast.filter(p => p.seat !== 'soldier' && p.id !== m.id);
       const mark = (kind: LifeMark['kind'], text: string, band?: string): LifeMark => ({ title, kind, text, people: others.map(p => ({ name: p.name, label: p.label })), ...(band ? { band } : {}) });
       if (c.focalId === m.id) {
@@ -4675,7 +4675,7 @@ export class Game {
     if (top?.blurb) return top.blurb;
     // A soldier the company WON (rescued, hired, turned) has a backstory written at the moment it
     // found them — "they found Tun-Zeeus pressed to the mill shutter…" — which is the company's own
-    // history, not their past. Seeded from it, a personal saga set out to learn "who led him away"
+    // history, not their past. Seeded from it, a personal chapter set out to learn "who led him away"
     // (the company did) (playtest 2026-09-25). Their past is who they were: use that.
     const who = merc.character?.who;
     if (merc.character?.origin && who) return `${merc.name}'s life before the company — ${who}`;
@@ -4711,7 +4711,7 @@ export class Game {
 
   /** recent toponym stems — the combinatorial pool dealt Hawbrook/Hawhollow/Hawgate and three
    *  Mill- villages in one run; same-stem places blur into one another for the reader. One window for
-   *  the one-offs' suggestions and the sagas' dealt places (D11) */
+   *  the one-offs' suggestions and the chapters' dealt places (D11) */
   private recentPlaceStems: string[] = [];
   /** a place name still resting: its stem not dealt lately, and its LAST word not twice — prefix stems alone let
    *  "Mossway Hollow / Coalward Hollow / Linden Hollow / Marepen Hollow" template a whole campaign (45025) */
@@ -4732,31 +4732,31 @@ export class Game {
     return p;
   }
 
-  /** a saga quest's report landed. The bank moves as it always has (bankBeat — a failed job is re-posed, the setbacks
-   *  and the stall guard bring the last chance); then the flow takes the report (Knowing, what is banked, the SagaLine,
-   *  the next card's opening) and the 📖 line says where the saga stands. A finale goes to settleFinale unchanged */
-  private advanceChain(q: Quest, r: Resolution, rep: SagaReport, report: string[]) {
+  /** a chapter quest's report landed. The bank moves as it always has (bankBeat — a failed job is re-posed, the setbacks
+   *  and the stall guard bring the last chance); then the flow takes the report (Knowing, what is banked, the ChapterLine,
+   *  the next card's opening) and the 📖 line says where the chapter stands. A finale goes to settleFinale unchanged */
+  private advanceChain(q: Quest, r: Resolution, rep: ChapterReport, report: string[]) {
     const st = this.state;
     const chain = st.chains.find(c => c.id === q.chainId);
-    if (!chain?.saga?.plan || !r.saga) return;
-    const host = this.sagaHost();
-    const a = { outcome: r.outcome, party: r.party, hurt: r.saga.inn.hurt, fate: r.saga.inn.fate };
-    // whose deed decided it rides on the chronicle line (the memory edge at the saga's close reads it, §2.6)
-    const decided = () => { const l = chain.saga!.lines[chain.saga!.lines.length - 1]; if (l && r.outcome !== 'failure') l.decides = r.saga!.inn.decides };
+    if (!chain?.chapter?.plan || !r.chapter) return;
+    const host = this.chapterHost();
+    const a = { outcome: r.outcome, party: r.party, hurt: r.chapter.inn.hurt, fate: r.chapter.inn.fate };
+    // whose deed decided it rides on the chronicle line (the memory edge at the chapter's close reads it, §2.6)
+    const decided = () => { const l = chain.chapter!.lines[chain.chapter!.lines.length - 1]; if (l && r.outcome !== 'failure') l.decides = r.chapter!.inn.decides };
     if (q.isFinale) {
-      const after = flow.afterReport(host, chain, r.saga.pos, a, rep);
+      const after = flow.afterReport(host, chain, r.chapter.pos, a, rep);
       decided();
       report.push(after.book);
       this.settleFinale(q, chain, r, report, r.fate);
-      this.sagaClosed(chain);
+      this.chapterClosed(chain);
       return;
     }
     // side-loot deducts what was actually DELIVERED — a partial pays out half the loot,
     // so the bank is docked half (it was docked the full budget for half the goods)
     bankBeat(chain, r.party.length, r.outcome, (q.sideLootV ?? 0) * (r.outcome === 'partial' ? 0.5 : 1));
-    const after = flow.afterReport(host, chain, r.saga.pos, a, rep);
+    const after = flow.afterReport(host, chain, r.chapter.pos, a, rep);
     decided();
-    const rec = chain.saga, plan = rec.plan!;
+    const rec = chain.chapter, plan = rec.plan!;
     const next = flow.posOf(rec);
     // continuation lead (the next card's title, zero AI); its hook is what the next card opens on
     st.leads.push({
@@ -4765,7 +4765,7 @@ export class Game {
       expiresAtCycle: st.cycle + LEAD_TTL + CONTINUATION_TTL_BONUS, source: 'continuation',
       title: `${plan.title} — ${next.finale ? plan.showdown.title : plan.episodes[next.job - 1]!.title}`,
     });
-    // a failed job spends one of the saga's setbacks — the tally says so at the moment it happens
+    // a failed job spends one of the chapter's setbacks — the tally says so at the moment it happens
     if (r.outcome === 'failure') this.cycleAcc?.setbacks.push({ chainId: chain.id, title: plan.title, failures: chain.failures, budget: chain.failureBudget });
     report.push(after.book);
   }
@@ -4803,14 +4803,14 @@ export class Game {
     return out;
   }
 
-  /** LORE §1 story-NPC write-back, at saga CLOSE (STORYTELLER §2.6): at most two met people who are not the focal
+  /** LORE §1 story-NPC write-back, at chapter CLOSE (STORYTELLER §2.6): at most two met people who are not the focal
    *  (the one who asked > the one in the way > anyone else) are kept by the world. A coined person becomes a lore node
    *  (blurb = their label; sex and race as the deal rolled them); a returning face already is one. Each gets a memory
    *  edge to the focal by seat (client party-to, opponent rival-of; their last line in the chronicle; 0.5) and one to
    *  the soldier whose deed decided a job they were in (client saved-by, opponent rival-of; that line; 0.5) — so a face
    *  that returns can remember who dragged them out. Every blurb is a line the player read */
   private persistMetCast(chain: Chain) {
-    const rec = chain.saga, plan = rec?.plan;
+    const rec = chain.chapter, plan = rec?.plan;
     if (!rec || !plan) return;
     const met = new Set(rec.knowing.met);
     const N = rec.world.N;
@@ -4834,14 +4834,14 @@ export class Game {
       const theirs = rec.lines.filter(l => inLine(l, p.id));
       const deed = [...theirs].reverse().find(l => l.decides && l.outcome !== 'failure');
       const soldier = deed ? this.roster().find(m => m.name === deed.decides) ?? this.state.cards.find(c => c.character && c.name === deed.decides) : undefined;
-      // the soldier whose deed it was IS the focal (their own saga): both ties land on one sheet, so a line is told on one of
+      // the soldier whose deed it was IS the focal (their own chapter): both ties land on one sheet, so a line is told on one of
       // them only — the deed on the deed's tie (below), the focal's tie their other last line, or none (the same line under
       // both showed twice on the soldier's sheet, word for word)
       const sameSheet = !!soldier && soldier.id === chain.focalId;
       const rest = sameSheet ? theirs.filter(l => l !== deed) : theirs;
       const last = rest[rest.length - 1] ?? (theirs.length ? undefined : rec.lines[rec.lines.length - 1]);
       const edges: { from: string; to: string; type: string; blurb: string; importance: number }[] = [];
-      // a saga that closed before any report has no line to remember them by: the memory is their part in the matter,
+      // a chapter that closed before any report has no line to remember them by: the memory is their part in the matter,
       // under the title the player read (the pre-v4 edge) — never a remembered person with no memory at all
       const part = p.seat === 'opponent' ? 'stood against the company' : p.seat === 'client' ? 'asked the company for help' : 'was caught up';
       if (last || !sameSheet) edges.push({ from: id, to: chain.focalId, type: p.seat === 'opponent' ? 'rival-of' : 'party-to', blurb: last?.text ?? `${part} in the matter of "${plan.title}"`, importance: 0.5 });
@@ -4864,7 +4864,7 @@ export class Game {
     // the fate was decided BEFORE the AI narrated (P11); recompute only as a fallback
     const fate = precomputed ?? finaleFate(this.rng, chain, r.outcome);
     const approach = q.approaches?.find(a => a.id === q.chosenApproach);
-    // a focal who JOINED the company mid-saga (hired from the tavern, delivered earlier) makes
+    // a focal who JOINED the company mid-chapter (hired from the tavern, delivered earlier) makes
     // this a personal-style close — never re-dispose of your own soldier ("Marric recruited
     // twice"; "Zaxesh slips away" while on the roster)
     const focalIsOwnMerc = focal?.character?.role === 'merc';
@@ -4883,9 +4883,9 @@ export class Game {
         focalId: focal?.id,   // §21-4a: the road back leads to the SAME person
       };
       st.leads.push(sequel);
-      // the WORLD must remember the slip — a later saga once staged a slipped focal "held in
+      // the WORLD must remember the slip — a later chapter once staged a slipped focal "held in
       // your cells" because her lore node never recorded that she got away
-      if (focal) guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `at large — slipped the company when "${this.sagaTitle(chain)}" ended; in no one's custody`, importance: 0.8 }], st.cycle, () => freshId('e'));
+      if (focal) guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `at large — slipped the company when "${this.chapterTitle(chain)}" ended; in no one's custody`, importance: 0.8 }], st.cycle, () => freshId('e'));
       report.push(`💨 ${focal?.name ?? 'The prize'} slips away — for now, and what was set aside is lost. A road back exists (${fate.sequelRarity} sequel lead).`);
       return;
     }
@@ -4895,20 +4895,20 @@ export class Game {
       // personal finale: bank crystallizes as gold + pinned CORE memory (no new character)
       const surplus = cashValue(chain.bank);
       this.addGold(surplus);
-      // (pipe arm past, the game's personal pipeline: engine/saga.ts GAME_PIPE) the soldier's change, as the engine's one
-      // dossier line, is the memory the saga leaves — their sheet shows it in both UIs — and it is kept on them to seed their
-      // next personal saga (personalSeed), beside the seed this saga was dealt and the past it told (the past the change
-      // resolves). A saga with no such line (its plan wrote no change, or it was dealt before PP shipped) leaves "came
-      // through <title>". Either is this saga's own memory, a new fact beside any earlier saga's (`fresh`), never merged
-      const grown = chain.saga?.grown;
+      // (pipe arm past, the game's personal pipeline: engine/chapter.ts GAME_PIPE) the soldier's change, as the engine's one
+      // dossier line, is the memory the chapter leaves — their sheet shows it in both UIs — and it is kept on them to seed their
+      // next personal chapter (personalSeed), beside the seed this chapter was dealt and the past it told (the past the change
+      // resolves). A chapter with no such line (its plan wrote no change, or it was dealt before PP shipped) leaves "came
+      // through <title>". Either is this chapter's own memory, a new fact beside any earlier chapter's (`fresh`), never merged
+      const grown = chain.chapter?.grown;
       if (grown && focal?.character) {
-        const past = chain.saga!.plan?.cast.find(p => p.seat === 'soldier')?.past?.trim();
-        const entry: GrownEntry = { seed: chain.saga!.world.seed.text, ...(past ? { past: /[.!?]$/.test(past) ? past : `${past}.` } : {}), line: grown,
-          title: this.sagaTitle(chain), chainId: chain.id, cycle: st.cycle };
+        const past = chain.chapter!.plan?.cast.find(p => p.seat === 'soldier')?.past?.trim();
+        const entry: GrownEntry = { seed: chain.chapter!.world.seed.text, ...(past ? { past: /[.!?]$/.test(past) ? past : `${past}.` } : {}), line: grown,
+          title: this.chapterTitle(chain), chainId: chain.id, cycle: st.cycle };
         focal.character.grown = [...(focal.character.grown ?? []), entry];
       }
       guardEdges(st.lore, [{ from: chain.focalId, to: chain.focalId, type: 'scarred-by', importance: 0.9, fresh: true,
-        blurb: grown ? this.clampBlurb(grown, 160) : `came through ${this.sagaTitle(chain)}` }], st.cycle, () => freshId('e'));
+        blurb: grown ? this.clampBlurb(grown, 160) : `came through ${this.chapterTitle(chain)}` }], st.cycle, () => freshId('e'));
       report.push(`🏅 ${focal?.name}'s story closes: +${surplus}g and a mark that stays.`);
       return;
     }
@@ -4927,7 +4927,8 @@ export class Game {
         source: 'sequel', title: `${focal.name} resurfaces, someday`, focalId: focal.id,
       });
       report.push(`💨 The work earned too little to keep ${focal.name} — the affair pays 💰 +${pay}g and they pass out of reach, for now. A road back exists.`);
-      guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `the saga ${this.sagaTitle(chain)} ended with ${focal.name} out of reach`, importance: 0.85 }], st.cycle, () => freshId('e'));
+      // the blurb is AI-facing (later writers read it as a memory), so it says "saga", never "chapter"
+      guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `the saga ${this.chapterTitle(chain, 'a saga')} ended with ${focal.name} out of reach`, importance: 0.85 }], st.cycle, () => freshId('e'));
       return;
     }
     if (kind === 'gold') {
@@ -4973,9 +4974,10 @@ export class Game {
     }
     // the ARRANGEMENT joins the memory — dossiers once missed that a focal ended as a paid
     // informer because only the outcome word was recorded
-    // (a later saga's writer reads it as a memory: the deed as the story tells it, the gold way's money left on its button)
-    const way = approach && (approach.way && chain.saga?.plan ? flow.toldLabel(chain.saga, { way: approach.way, label: approach.label }) : approach.label);
-    guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `the saga ${this.sagaTitle(chain)} ended ${fate.fate}${way ? ` — the company's way: ${way}` : ''}`, importance: 0.85 }], st.cycle, () => freshId('e'));
+    // (a later chapter's writer reads it as a memory: the deed as the story tells it, the gold way's money left on its button)
+    const way = approach && (approach.way && chain.chapter?.plan ? flow.toldLabel(chain.chapter, { way: approach.way, label: approach.label }) : approach.label);
+    // the blurb is AI-facing (later writers read it as a memory), so it says "saga", never "chapter"
+    guardEdges(st.lore, [{ from: focal.id, to: focal.id, type: 'party-to', blurb: `the saga ${this.chapterTitle(chain, 'a saga')} ended ${fate.fate}${way ? ` — the company's way: ${way}` : ''}`, importance: 0.85 }], st.cycle, () => freshId('e'));
   }
 
   /** give who/backstory/quirks to any owned/staged character that lacks them (ONE batched call) */
@@ -4993,27 +4995,28 @@ export class Game {
     if (!needs.length) return;
     try {
       const outs = await this.ai.flesh(needs.map(c => {
-        // the locked rule (DESIGN): deep history is written at delivery and must FIT the saga that
+        // the locked rule (DESIGN): deep history is written at delivery and must FIT the chapter that
         // produced this person — the focal IS who that story was about
         const origin = st.chains.find(ch => ch.focalId === c.id && !ch.isPersonal);
-        const plan = origin?.saga?.plan;
+        const plan = origin?.chapter?.plan;
         return {
           characterId: c.id, name: c.name, tags: renderTags(c.tags),
           role: c.character!.role,
           quest: c.character!.origin,
           context: origin
             ? (origin.state === 'slipped'
-              ? `the person the saga "${this.sagaTitle(origin)}" is about — they slipped through the company's fingers once already`
-              : `the person the saga "${this.sagaTitle(origin)}" was about — the company spent a season on that story to reach them`)
+              ? `the person the saga "${this.chapterTitle(origin, 'a saga')}" is about — they slipped through the company's fingers once already`
+              : `the person the saga "${this.chapterTitle(origin, 'a saga')}" was about — the company spent a season on that story to reach them`)
             : c.character!.role === 'merc'
               ? (st.cycle <= 2 ? 'a founding member of the company' : 'a sword the company took on')
               : c.character!.role === 'captive' ? 'a captive taken on a quest' : 'someone the road washed up at the gate',
-          // the saga they were at the heart of: its answer is who they turned out to be (the question, while the finale
+          // the chapter they were at the heart of: its answer is who they turned out to be (the question, while the finale
           // that brings it out is still unplayed), its last line where it ended
+          // the key is AI-facing: the flesh prompt names this field `saga`
           saga: plan ? {
             title: plan.title,
-            kernel: origin!.saga!.lines.some(l => l.n >= origin!.saga!.world.N) ? plan.answer : plan.question,
-            situation: origin!.saga!.lines[origin!.saga!.lines.length - 1]?.text ?? origin!.saga!.card1,
+            kernel: origin!.chapter!.lines.some(l => l.n >= origin!.chapter!.world.N) ? plan.answer : plan.question,
+            situation: origin!.chapter!.lines[origin!.chapter!.lines.length - 1]?.text ?? origin!.chapter!.card1,
             // only the one the company acts for has a want (validatePlan leaves everyone else's ''): none is null, never ''
             want: plan.cast.find(e => e.id === c.id)?.want || null,
           } : undefined,
@@ -5049,10 +5052,10 @@ export class Game {
 
   private personalChainDrip(): void {
     const st = this.state;
-    // cycle gate 10→3 (2026-07-18): founders now START here — first personal saga lands
+    // cycle gate 10→3 (2026-07-18): founders now START here — first personal chapter lands
     // ~cycle 5 in expectation (0.25/cycle), the rest staggered behind the one-pending gate
     if (!this.hasRoom('lead-room') || st.cycle < 3) return;
-    // founders' sagas STRICTLY wait for roster slack — with 2 mercs a personal chain
+    // founders' chapters STRICTLY wait for roster slack — with 2 mercs a personal chain
     // monopolizes the whole company and starves the economy (dogfood-proven trap)
     if (this.roster().length < 3) return;
     const pendingPersonal = st.leads.some(l => l.source === 'personal');
@@ -5060,7 +5063,7 @@ export class Game {
     const unstoried = this.roster().find(m =>
       !st.chains.some(c => c.isPersonal && c.focalId === m.id) &&
       !st.leads.some(l => l.personalMercId === m.id));
-    // (North Star 0, designer 2026-10-05: STORY_ENGINE §4's recurring personal arc, A → B → C) a soldier whose last personal saga
+    // (North Star 0, designer 2026-10-05: STORY_ENGINE §4's recurring personal arc, A → B → C) a soldier whose last personal chapter
     // was settled and changed them gets their NEXT chapter, after the cooldown — a first one waits ahead of any next one, the
     // longest-waiting next one first, never two open per soldier
     const next = unstoried ? undefined : this.roster().map(m => ({ m, since: this.nextChapterSince(m) }))
@@ -5072,7 +5075,7 @@ export class Game {
     this.spawnPersonalChainLead(who, who === next);
     this.log('leads', who === next ? `${who.name}'s story goes on — a new personal thread appears.` : `${who.name}'s past stirs — a personal thread appears.`);
   }
-  /** when a soldier's last personal saga ended, if it may now lead to their next chapter: every personal saga of theirs over,
+  /** when a soldier's last personal chapter ended, if it may now lead to their next chapter: every personal chapter of theirs over,
    *  the last one settled ('done') and changed them (its grown entry), no personal lead of theirs on the board */
   private nextChapterSince(m: Card): number | undefined {
     const st = this.state;
@@ -5117,7 +5120,7 @@ export { renderTags, ROOM_TYPE, REGION, REGIONS, GH_THRESHOLDS, U };
 /** Is this wound actually SHOWN in the after-text? The check was a verbatim 25-character prefix,
  *  and cheap models paraphrase their own sentence when they cite it: "cut across the thigh BY a
  *  sentry's short spear" against prose reading "cut HER across the thigh WITH a short spear" was
- *  dropped, so the report said she bled and the engine said she was fine (both saga wounds in a
+ *  dropped, so the report said she bled and the engine said she was fine (both chapter wounds in a
  *  2026-09-25 playtest). Word overlap keeps the guard's purpose — an uncited wound is invented —
  *  without demanding the model quote itself exactly. */
 /** no cited phrase: is a wound shown on THIS soldier anyway? Solo — any wound sentence (the harmed

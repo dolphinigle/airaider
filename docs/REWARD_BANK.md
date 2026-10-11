@@ -32,7 +32,7 @@ focal character, worth many merc-cycles) **must accrue over the beats and pay at
   `immediateReward` — true only when the beat physically hands over loot now (raid/loot/seize/crack a
   chest), false for meet/scout/travel/talk/escort. The engine still **always banks a floor** of every
   beat (`BALANCE.minDeferShare = 0.4`): an immediate beat pays `60%` as gold now and banks `40%`; a
-  deferred beat banks 100%. So the saga always builds a finale payoff (the focal stays affordable), and
+  deferred beat banks 100%. So the chapter always builds a finale payoff (the focal stays affordable), and
   immediate loot taken en route is **locked in** (only the deferred bank rides on the finale). No
   premium — deferring's upside is the *character*, not a multiplier.
 - Income-neutral vs one-offs: a chain banks the same per-merc-cycle as N one-offs would pay; it only
@@ -88,7 +88,7 @@ most beats). That's intended.
     `crystallizeFinale` per §3. `handleFinaleFate` → bank-driven; personal → + bank gold.
   - `recordBeat`: drop arc success-gating; set `lastFailed`; middle failure `failsSpent++` → maybe
     `lastChance`; keep finale→done + sequel-on-non-failure.
-- **web/App.tsx** (light): show `chain.bank` on a saga / in the result ("spoils so far"); show a
+- **web/App.tsx** (light): show `chain.bank` on a chapter / in the result ("spoils so far"); show a
   "LAST CHANCE" flag on the finale. (Nice-to-have.)
 - **docs**: fold §2–§4 into ECONOMY.md (chain accrual) + QUESTS.md (chain reward + off-rails).
 
@@ -98,7 +98,7 @@ most beats). That's intended.
 no crash, gold sane, finales pay) · `npm run conformance` (focal still fleshed/delivered; sequel on
 finale). Plus `_exp_bank.ts`: force outcome patterns (all-success, mixed, budget-blown last-chance,
 finale-fail) and print bank accrual + crystallization to confirm the math. Then a short real-AI read
-(2–3 sagas) for the new consequence/last-chance prose.
+(2–3 chapters) for the new consequence/last-chance prose.
 
 ## 7. Edge cases simulated
 

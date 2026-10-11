@@ -35,7 +35,7 @@ export interface ArchetypeDef {
    *  frame otherwise says "what came in… only what has reached the fort goes on the card", which
    *  forces the writer to invent an arrival, and an invented arrival is a grievance, and a
    *  grievance is a mystery. That is why lead-hunt cards read as investigations however the gloss
-   *  is worded (N10). The saga path has had this branch as `noClient` all along. */
+   *  is worded (N10). The chapter path has had this branch as `noClient` all along. */
   selfDirected?: boolean;
   /** a writer-facing CONSTRAINT for this kind of work, rendered as its own sentence. It is kept
    *  out of `gloss` on purpose: the gloss is DATA describing the job, and a prohibition parked

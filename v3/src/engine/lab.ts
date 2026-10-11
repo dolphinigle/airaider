@@ -1,6 +1,6 @@
-// SAGA LAB (docs/STORYTELLER.md §5.0) — lab-only engine pieces: the fixture's pins and the
+// CHAPTER LAB (docs/STORYTELLER.md §5.0) — lab-only engine pieces: the fixture's pins and the
 // outcome rules a lab run forces. Pure; nothing here runs in play. A game only ever meets these
-// through the CLI's hidden `lab saga` command and the AIRAIDER_FORCE_OUTCOMES flag.
+// through the CLI's hidden `lab chapter` command and the AIRAIDER_FORCE_OUTCOMES flag.
 
 import type { ChainKind, Rarity } from './economy.js';
 import { PARTIAL_FRAC, type Outcome, type QuestRollResult } from './roll.js';
@@ -12,7 +12,7 @@ export const LAB_PATHS: readonly LabPath[] = ['clean', 'bumpy', 'failing', 'last
 /** the smallest N each path's rule can run on */
 export const LAB_MIN_N: Record<LabPath, number> = { clean: 2, bumpy: 3, failing: 3, lastchance: 2, personal: 3 };
 
-/** a lab fixture: what one saga pins so two arms can later be matched. `seed` is the game seed the
+/** a lab fixture: what one chapter pins so two arms can later be matched. `seed` is the game seed the
  *  driver starts the CLI with; everything not pinned here rolls from the game as it always does. */
 export interface LabFixture {
   id: string;
@@ -20,7 +20,7 @@ export interface LabFixture {
   seed: number;
   path: LabPath;
   spark: string;
-  /** the saga's central person as a card spec — built from its OWN seed, so the same person comes
+  /** the chapter's central person as a card spec — built from its OWN seed, so the same person comes
    *  back whatever state the game is in. A personal fixture makes them one of the company's soldiers. */
   focal: {
     name: string; sex: 'male' | 'female'; race: string; seed: number;
@@ -67,8 +67,8 @@ export function labFixtureProblems(fx: Partial<LabFixture>): string[] {
   return out;
 }
 
-/** §5.0's path rules. `job` = the saga step this attempt is on (1-based), `tryOnJob` = which try
- *  at that step, `attempt` = which non-finale attempt of the saga (both 1-based). */
+/** §5.0's path rules. `job` = the chapter step this attempt is on (1-based), `tryOnJob` = which try
+ *  at that step, `attempt` = which non-finale attempt of the chapter (both 1-based). */
 export function labOutcome(path: LabPath, a: { isFinale: boolean; job: number; tryOnJob: number; attempt: number }): Outcome {
   switch (path) {
     case 'clean': return 'success';

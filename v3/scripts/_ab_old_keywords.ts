@@ -449,7 +449,7 @@ const INTAKE_FACT: Record<IntakeChannel, string[]> = {
   notice: ['it stands promised in public writing', 'it is posted for any taker', 'the offer has hung unclaimed a while'],
 };
 
-// a saga's CARE beat must not open on blood or menace
+// a chapter's CARE beat must not open on blood or menace
 const GRIM = /wounded|creditor|warrant|bounty|debt|rival|confession|graves|blood/;
 const OPENING_TIMES = ['at first light', 'mid-morning', 'at noon', 'late afternoon', 'at dusk', 'after dark', 'in the small hours'];
 export function sampleOpening(rng: Rng, opts?: { gentle?: boolean; channel?: IntakeChannel }):
@@ -479,7 +479,7 @@ export function sampleGravity(rng: Rng, rarity: string): string {
   return rng.weighted(GRAVITY[rarity] ?? GRAVITY.common!);
 }
 
-/** saga tone, weighted toward lighter (BIBLE.md tone knob; PLAYER_PREFERENCES shift is a later 🛠)
+/** chapter tone, weighted toward lighter (BIBLE.md tone knob; PLAYER_PREFERENCES shift is a later 🛠)
  *  2026-07-10: BIBLE.md's adventurous/tense added to the pool (doc list ∪ impl list) */
 const TONES: [string, number][] = [
   ['slice-of-life', 2], ['wry', 3], ['warm', 2], ['bittersweet', 2],

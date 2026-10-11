@@ -1,4 +1,4 @@
-// A/B for the personal-saga seed. Is the saga ABOUT the soldier whose past it is, or a generic
+// A/B for the personal-chapter seed. Is the chapter ABOUT the soldier whose past it is, or a generic
 // premise with them attached? PERSONAL_SEED=0 gives the old behaviour.
 import * as fs from 'node:fs';
 import { Game } from '../src/game/game.js';
@@ -13,7 +13,7 @@ for (let k = 0; k < N; k++) {
   g.build('map-room'); g.build('lead-room');
   const merc = g.roster()[0]!;
   g.ensureLoreNode(merc);
-  // the other party is an NPC OUT IN THE WORLD, not a fellow soldier — a saga cannot send you to
+  // the other party is an NPC OUT IN THE WORLD, not a fellow soldier — a chapter cannot send you to
   // find someone standing in your own yard, and genesis is dealt no company soldier but the focal
   const NPCS = ['Nevil Ashgate', 'Arver Stonefield', 'Amflisia Longshanks', 'Varasa Quill'];
   const other = { id: `npc-${k}`, name: NPCS[k % NPCS.length]! };

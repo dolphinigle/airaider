@@ -1,4 +1,4 @@
-// The finale's Outcome line (sagaflow.ts sagaFate, D18): ONE function, every branch settleFinale can take — checked
+// The finale's Outcome line (chapterflow.ts chapterFate, D18): ONE function, every branch settleFinale can take — checked
 // against what settleFinale ACTUALLY does to the same game (the focal's role and place afterwards).
 import { describe, it, expect } from 'vitest';
 import { seedIdCounter } from '../src/engine/cards.js';
@@ -6,14 +6,14 @@ import { HELD } from '../src/engine/cards.js';
 import type { FinaleFate } from '../src/engine/chains.js';
 import type { Quest } from '../src/engine/quests.js';
 import type { Outcome } from '../src/engine/roll.js';
-import { WAY_REWARD, type Way } from '../src/engine/saga.js';
+import { WAY_REWARD, type Way } from '../src/engine/chapter.js';
 import type { Game } from '../src/game/game.js';
-import * as flow from '../src/game/sagaflow.js';
-import { newGame, sagaChain, hostFor } from './sagaharness.js';
+import * as flow from '../src/game/chapterflow.js';
+import { newGame, chapterChain, hostFor } from './chapterharness.js';
 
 interface Case {
   name: string; personal?: boolean; way: Way; outcome: Outcome; bank?: number;
-  /** dealt on R5's pipeline (a saga from before grafts shipped), not the build's */
+  /** dealt on R5's pipeline (a chapter from before grafts shipped), not the build's */
   r5?: boolean;
   setup?: (g: Game, focalId: string) => void;
   says: RegExp;
@@ -34,7 +34,7 @@ const CASES: Case[] = [
   { name: 'personal, settled by force', personal: true, way: 'fight', outcome: 'partial', says: /is beaten in a fight\.$/, then: { role: 'merc', at: 'roster', chain: 'done' } },
   { name: 'personal, settled unseen', personal: true, way: 'sneak', outcome: 'success', says: /^The company slips past .* unseen\.$/, then: { role: 'merc', at: 'roster', chain: 'done' } },
   { name: 'personal, slipped', personal: true, way: 'talk', outcome: 'failure', says: /still stands in .*'s way\.$/, then: { role: 'merc', at: 'roster', chain: 'slipped' } },
-  { name: 'the focal joined mid-saga', way: 'recruit', outcome: 'success', setup: makeMerc, says: /who already stands with the company\.$/, then: { role: 'merc', at: 'roster', chain: 'done' } },
+  { name: 'the focal joined mid-chapter', way: 'recruit', outcome: 'success', setup: makeMerc, says: /who already stands with the company\.$/, then: { role: 'merc', at: 'roster', chain: 'done' } },
   { name: 'void: too thin a season to keep them', way: 'captive', outcome: 'success', bank: 1, says: /earned too little to keep/, then: { at: 'lore', chain: 'done' } },
   // the build (grafts): the story tells the person going free; the money is the finale button's alone (designer 2026-10-04)
   { name: 'gold', way: 'gold', outcome: 'success', says: /^[^.]* (is cornered, then let go|goes (his|her) way)\.$/, then: { at: 'lore', chain: 'done' } },
@@ -48,18 +48,18 @@ const CASES: Case[] = [
   { name: 'captive, the cells full', way: 'captive', outcome: 'partial', setup: dungeon(1, 1), says: /cells are full\.$/, then: { role: 'captive', at: 'staged-holding', chain: 'done' } },
 ];
 
-describe('sagaFate — the Outcome line agrees with settleFinale, branch by branch', () => {
+describe('chapterFate — the Outcome line agrees with settleFinale, branch by branch', () => {
   for (const c of CASES) it(c.name, async () => {
     seedIdCounter(1);
     const { g } = newGame(400 + CASES.indexOf(c));
-    const { chain, focal } = sagaChain(g, { N: 3, personal: !!c.personal, kind: c.way === 'gold' ? 'gold-hoard' : c.way === 'recruit' ? 'recruit' : 'captive' });
+    const { chain, focal } = chapterChain(g, { N: 3, personal: !!c.personal, kind: c.way === 'gold' ? 'gold-hoard' : c.way === 'recruit' ? 'recruit' : 'captive' });
     const host = c.r5 ? { ...hostFor(g), pipeArm: () => undefined } : hostFor(g);
     flow.deal(host, chain, undefined, focal);
     await flow.plan(host, chain);
     chain.bank = c.bank ?? focal.value * 2;
     c.setup?.(g, focal.id);
     const fate = fateOf(c.outcome);
-    const line = flow.sagaFate(flow.fateFacts(host, chain, c.way, c.outcome, fate));
+    const line = flow.chapterFate(flow.fateFacts(host, chain, c.way, c.outcome, fate));
     expect(line).toMatch(c.says);
     if (!c.r5) expect(line).not.toMatch(/\bpa(?:y|ys|id)\b|\bcoin|treasure/i);
     // the same game, settled by the real thing

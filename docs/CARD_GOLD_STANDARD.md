@@ -1,4 +1,4 @@
-# ⛳ THE GOLD STANDARD — what a saga's FIRST card must be
+# ⛳ THE GOLD STANDARD — what a chapter's FIRST card must be
 
 **Status: the target, drafted 2026-08-27.** Everything in the intro-coherence work is measured
 against this page. If an iteration does not move a card toward it, the iteration failed.
@@ -7,7 +7,7 @@ against this page. If an iteration does not move a card toward it, the iteration
 
 ## THE GOAL, in one sentence
 
-> **A player who knows nothing must finish the first card of a saga knowing who wants something,
+> **A player who knows nothing must finish the first card of a chapter knowing who wants something,
 > what they want, why it matters, why it takes hired steel — and wanting to find out the rest.**
 
 The last clause matters as much as the first four. A card that is merely legible is not the goal.
@@ -53,7 +53,7 @@ Two more from the same corpus, same shape:
    *"Someone swore…"*. A proper noun is a definite reference and presupposes acquaintance the reader
    does not have (the known-new contract — see `prosebench/INTRO_COHERENCE.md` §1).
 3. **Nobody the player has not met is NAMED.** Names arrive in the resolution, when the company
-   reaches them. This is the one-off anonymity ruling extended to sagas.
+   reaches them. This is the one-off anonymity ruling extended to chapters.
 4. **The person is placed by their RELATION to the matter and to you** — never a bare category.
    *"A servant of theirs, who had worked for over twenty years"* (PROMPT_RULES §12), not *"a
    servant"*.
@@ -83,7 +83,7 @@ Harness: `v3/scripts/introlab.ts`.
 
 ## THE WORKED TARGET, for a bible we actually generated
 
-`chain-69 "The Wheel's Bargain"` — the saga live in the designer's game. Its genesis holds:
+`chain-69 "The Wheel's Bargain"` — the chapter live in the designer's game. Its genesis holds:
 
 ```
 client    a retired border reeve who kept watch on the forest road
@@ -160,4 +160,4 @@ Written down so the iteration cannot quietly drift:
   not the goal, being understood is.
 - **Prose that scores 4/4 and reads like a form.** The seventh property is not measured by the four
   questions — read the cards.
-- **Losing the saga.** The card must still perform its ONE arc step and leak no twist.
+- **Losing the chapter.** The card must still perform its ONE arc step and leak no twist.

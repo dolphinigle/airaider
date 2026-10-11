@@ -1,5 +1,5 @@
 // REVIEW LAB — measures the cold-reader gate's value: fire rate, latency cost, and judge-ready
-// pre/post-rewrite pairs, for BOTH gates (beat card + saga resolution), through the real path.
+// pre/post-rewrite pairs, for BOTH gates (beat card + chapter resolution), through the real path.
 // Usage: npx tsx scripts/reviewlab.ts [runs] [seedBase] [outfile]
 import * as fs from 'node:fs';
 import { Game } from '../src/game/game.js';
@@ -51,7 +51,7 @@ async function one(i: number) {
   if (!lead) return { seed, skip: true as const };
   const r = await g.pursue(lead.id);
   const q = g.state.quests.find(x => x.id === r.questId);
-  // fill slots with whoever fits so the cycle resolves the saga beat (exercises the report gate)
+  // fill slots with whoever fits so the cycle resolves the chapter beat (exercises the report gate)
   let resolved = false;
   if (q) {
     const roster = g.roster();

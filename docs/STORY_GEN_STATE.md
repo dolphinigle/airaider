@@ -21,16 +21,16 @@
   hand a name or register as a SPARK and let the AI adapt it to gender/race. Keep starter recurrence
   untouched (the seed governs only NEW invented names). [User: deferred; do after off-rails.]
 
-## The pipeline (one saga)
+## The pipeline (one chapter)
 
-1. **Lead pursued** → engine rolls a **focal character** first (tags = the seed of who the saga is about),
+1. **Lead pursued** → engine rolls a **focal character** first (tags = the seed of who the chapter is about),
    role `npc` until the finale decides their fate.
 2. **`genesis(GenesisInput)`** → the **bible**: hidden TRUTH (situation), a **cast** with why-ladders
    (cause→cause→bedrock), `wants`/`feels`/optional `conceals`, **tensions**, **open directions**
    (active/ambient). Narrative-tier model (`gpt-5-mini`), bounded `max_completion_tokens: 4000` (cannot
    run rogue; retries on empty, falls back to mock). The bible is HIDDEN from the player.
 3. **`chainBeat(ChainBeatInput)`** per beat → the player-facing quest (`situation`, `job`, `ask`, …).
-4. **assign mercs → `endDay` → `outcome(...)`** narration → **`recordBeat`** advances the saga.
+4. **assign mercs → `endDay` → `outcome(...)`** narration → **`recordBeat`** advances the chapter.
 
 ### What the engine hands genesis ALONGSIDE the focal's tags (the core architectural insight)
 
@@ -44,17 +44,17 @@ that decorrelate the story from the tags. (`GenesisInput`):
   PARTICIPANT. Beats each STEP toward the goal; beat 1 makes the job + reason clear; chainBeat gets the
   player-POV. Titles are now actions ("Escort Bren Tholl to the Old Sluice").
 - **`tone`** — engine-set register (`pickTone`, weighted toward lighter: slice-of-life / wry / bittersweet
-  / adventurous / tense / dark) so not every saga is grim.
+  / adventurous / tense / dark) so not every chapter is grim.
 - **Focal skills capped at 2** (`GenSpec.maxSkills`; global stays 3 for value-packing).
 - **`seed`** — a few random **THEME keywords** (`core/seeds.ts` `pickThemes`: one BOND + one TIE + one
   FLAVOUR, e.g. "love, debt, a curse"). The engine hands raw sparks; genesis FUSES them into the
   focal's life. Experiment-validated to beat a concrete premise: keywords keep the focal's tags central
   and read far less "canned", with huge combinatorial variety. (Replaced the old `PREMISES` list.)
-- **`place`** — a concrete **SETTING** (`core/seeds.ts` `PLACES`). Stops every saga reading "a fen-hamlet".
+- **`place`** — a concrete **SETTING** (`core/seeds.ts` `PLACES`). Stops every chapter reading "a fen-hamlet".
 - **`poolCast`** — a sample of existing world characters (mercs/captives) the bible MAY weave in as
   SECONDARY people. Wires up the long-dormant `QUEST_BIBLE.md §4` "reuse the pool first" → recurrence =
-  attachment. Tuned to ≤1–2 per saga so a small early pool doesn't concentrate.
-- **`avoid`** — recent saga titles + premise snippets, to steer away from repeats.
+  attachment. Tuned to ≤1–2 per chapter so a small early pool doesn't concentrate.
+- **`avoid`** — recent chapter titles + premise snippets, to steer away from repeats.
 
 ### What the engine controls in each beat (NOT left to the AI)
 
@@ -62,7 +62,7 @@ that decorrelate the story from the tags. (`GenesisInput`):
 - **Beat 1** centers the **focal** (engine passes their name) in a small human moment — UNLESS the focal
   is the hidden wrongdoer, then a victim/kin/bystander. Never the faceless client.
 - **Mid beats** advance the **bible's OWN tensions/directions** and keep its CENTRAL TRUTH live — NOT a
-  fixed verb-arc (a fixed arc flattened every saga into the same crime procedural). A dramatic-function
+  fixed verb-arc (a fixed arc flattened every chapter into the same crime procedural). A dramatic-function
   rotation (`SCENE_KINDS`) + "different verb than prior beats, never chase the same object" gives variety
   without re-padding.
 - **Finale** = the reckoning that pays off the central truth. Engine gates the WINDOW (merc-cycles ≥
@@ -76,9 +76,9 @@ that decorrelate the story from the tags. (`GenesisInput`):
 
 - **Length** capped (resolved 4–5 typical, 0 slogs). Cap is the load-bearing lever; rotation kills
   *repetition* but not length. (Experiment: rotation-only still ran to 15 beats; +cap → max 6.)
-- **No within-saga padding**: ≤2 of any verb per saga, no chasing one object across beats.
+- **No within-chapter padding**: ≤2 of any verb per chapter, no chasing one object across beats.
 - **Beat 1 = focal attachment**, not the client.
-- **No reflexive death**: many sagas have no corpse; `midSaga` flag forbids killing/capturing named cast
+- **No reflexive death**: many chapters have no corpse; `midSaga` flag forbids killing/capturing named cast
   in a non-finale beat (a failure is a SETBACK).
 - **gate-bundle cliché** — the explicit BAN was REMOVED (a brittle negative patch); the engine-rotated
   opening MODE (a positive seed: a specific arrival each beat) keeps it at 0 occurrences on its own.

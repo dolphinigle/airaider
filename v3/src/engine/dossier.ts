@@ -1,17 +1,17 @@
 // THE LIVING DOSSIER (docs/STORY_ENGINE.md §4; docs/STORYTELLER.md North Star 0, designer 2026-10-05): a soldier carries a
-// BOUNDED dossier — who they are now, the events that marked them, the people who matter to them — refreshed when a saga
-// they were part of resolves (their own personal saga, and sagas where they decided a job or were hurt; the people a saga
+// BOUNDED dossier — who they are now, the events that marked them, the people who matter to them — refreshed when a chapter
+// they were part of resolves (their own personal chapter, and chapters where they decided a job or were hurt; the people a chapter
 // left them come in through the lore). Engine-composed from what the game already stores, every line one the player read:
-// their last change (character.grown), the chronicle lines where they acted (SagaRecord.lines), lore edges. No AI call.
-// Both UIs show it (the GUI soldier sheet, the CLI's `merc`), and it seeds their NEXT personal saga (chain B, C…): a dealt
-// situation is that saga's seed, its new matter (engine/saga.ts dealSaga `next`), and the dossier's Now — who they became —
-// rides beside it (`livingSeed`). Only the Now and the person the saga seats: the marks are settled chapters, and the plan
+// their last change (character.grown), the chronicle lines where they acted (ChapterRecord.lines), lore edges. No AI call.
+// Both UIs show it (the GUI soldier sheet, the CLI's `merc`), and it seeds their NEXT personal chapter (chain B, C…): a dealt
+// situation is that chapter's seed, its new matter (engine/chapter.ts dealChapter `next`), and the dossier's Now — who they became —
+// rides beside it (`livingSeed`). Only the Now and the person the chapter seats: the marks are settled chapters, and the plan
 // builds on whatever it is handed — sent them as its seed, 4 of 8 chain Bs reopened the settled matter (its goat, its
 // crime, its lie: runs/pers1/CB_g1). The old wrong their last chapter settled (`historyOf`) rides on the world for the
 // log-only retelling lint and is never sent: handed it as `history` ("never retold"), 8 of 8 real chain Bs retold it, 3
 // word for word (runs/_superseded/pers1/CB_history_g1).
 //
-// Pure: the game (game.ts refreshLiving) and the seed lab (scripts/sagalab/seedlab.ts, arm CB) call the same functions.
+// Pure: the game (game.ts refreshLiving) and the seed lab (scripts/chapterlab/seedlab.ts, arm CB) call the same functions.
 
 import type { GrownEntry } from './cards.js';
 
@@ -20,12 +20,12 @@ export const LIVING_MAX_LINES = 6;
 /** 🛠 the people who matter, at most */
 export const LIVING_PEOPLE = 2;
 
-/** a saga's person as a seed may call them: by label, unless the next saga seats them (`unnamed`) */
+/** a chapter's person as a seed may call them: by label, unless the next chapter seats them (`unnamed`) */
 export interface Stranger { name: string; label: string }
-/** one resolved saga as it marked a soldier: their own saga's ending line (`own`), the ending of the saga that was about them
- *  before they joined (`about`: the hired saga that brought them in), the job they decided, or the job they were hurt in
- *  (`band`: the wound's band word). `text` is the chronicle line the player read; `people` that saga's cast but the
- *  soldier — the next chapter's seed calls them by label (a seed may only name people the next saga can cast) */
+/** one resolved chapter as it marked a soldier: their own chapter's ending line (`own`), the ending of the chapter that was about them
+ *  before they joined (`about`: the hired chapter that brought them in), the job they decided, or the job they were hurt in
+ *  (`band`: the wound's band word). `text` is the chronicle line the player read; `people` that chapter's cast but the
+ *  soldier — the next chapter's seed calls them by label (a seed may only name people the next chapter can cast) */
 export interface LifeMark { title: string; kind: 'own' | 'about' | 'deed' | 'hurt'; text: string; band?: string; people?: readonly Stranger[] }
 /** someone who matters to them: a lore face by id, how it is called, and the tie (an edge type) */
 export interface LifePerson { id: string; name: string; label: string; tie: string }
@@ -35,7 +35,7 @@ export interface LivingDossier {
   now?: string;
   /** the events that marked them, newest first, as the sheet prints them */
   marks: string[];
-  /** the people the shown marks' sagas had (not the soldier): the next chapter's seed calls them by label (`livingSeed`) */
+  /** the people the shown marks' chapters had (not the soldier): the next chapter's seed calls them by label (`livingSeed`) */
   strangers?: Stranger[];
   /** older marks, condensed to their titles */
   earlier?: string;
@@ -50,8 +50,8 @@ const sentence = (s: string) => { const t = s.trim(); return t ? `${t[0]!.toUppe
 const firstName = (name: string) => name.trim().split(/\s+/)[0] ?? name;
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-/** a saga's people by label, not name ("the elf moneylender"), in a line the next chapter's seed tells: a seed may only name
- *  people the saga can cast (game.ts personalEdges), and a named stranger the plan cannot seat is invented anew. The whole
+/** a chapter's people by label, not name ("the elf moneylender"), in a line the next chapter's seed tells: a seed may only name
+ *  people the chapter can cast (game.ts personalEdges), and a named stranger the plan cannot seat is invented anew. The whole
  *  name, then its first word alone; a sentence (or a mark's text, after its colon) opened by one keeps its capital */
 export function unnamed(text: string, people: readonly { name: string; label: string }[]): string {
   let t = text;
@@ -75,7 +75,7 @@ const TIE: Record<string, string> = {
 };
 export const tieWord = (type: string): string => TIE[type] ?? 'a shared matter';
 
-/** who they are now: the change of their last personal saga, read without "After <title>: " (grownLine's frame) */
+/** who they are now: the change of their last personal chapter, read without "After <title>: " (grownLine's frame) */
 export function nowOf(grown: readonly GrownEntry[] | undefined, who: string | undefined): string | undefined {
   const last = grown?.at(-1);
   if (last) {
@@ -90,7 +90,7 @@ export function nowOf(grown: readonly GrownEntry[] | undefined, who: string | un
 export function markLine(m: LifeMark, name: string): string {
   const first = firstName(name);
   if (m.kind === 'own') return `${m.title}, ${first}'s own matter: ${sentence(m.text)}`;
-  if (m.kind === 'about') return `${m.title}, the saga about ${first}: ${sentence(m.text)}`;
+  if (m.kind === 'about') return `${m.title}, the chapter about ${first}: ${sentence(m.text)}`;
   if (m.kind === 'deed') return `${m.title}: ${bare(m.text)} — ${first} decided it.`;
   return `${m.title}: ${bare(m.text)} — ${first} was hurt${m.band ? ` (${m.band})` : ''}.`;
 }
@@ -128,9 +128,9 @@ export function livingLines(d: LivingDossier, people: readonly LifePerson[] = d.
   ];
 }
 
-/** a NEXT personal saga's `now` (chain B, C…; the plan's and pick's, beside the dealt situation): who they became — the
- *  dossier's Now, and the People line naming only the person the saga seats (`seated`; a seed may only name people the saga
- *  can cast, so anyone else its sagas had is called by label). Never the marks: settled chapters, sent as material, were
+/** a NEXT personal chapter's `now` (chain B, C…; the plan's and pick's, beside the dealt situation): who they became — the
+ *  dossier's Now, and the People line naming only the person the chapter seats (`seated`; a seed may only name people the chapter
+ *  can cast, so anyone else its chapters had is called by label). Never the marks: settled chapters, sent as material, were
  *  rebuilt (their people, things and outcome reopened) */
 export function livingSeed(d: LivingDossier, seated?: string): string {
   const keep = d.people.filter(p => p.id === seated);
@@ -141,8 +141,8 @@ export function livingSeed(d: LivingDossier, seated?: string): string {
   ].join('\n');
 }
 
-/** a NEXT personal saga's `history` (SagaWorld.history; the retelling lint's reference, never sent): the old wrong their last
- *  chapter settled — the past it told (else the seed it was told from). None before any personal saga changed them */
+/** a NEXT personal chapter's `history` (ChapterWorld.history; the retelling lint's reference, never sent): the old wrong their last
+ *  chapter settled — the past it told (else the seed it was told from). None before any personal chapter changed them */
 export function historyOf(grown: readonly GrownEntry[] | undefined): string | undefined {
   const last = grown?.at(-1);
   const h = last?.past?.trim() || last?.seed?.trim();

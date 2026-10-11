@@ -1,4 +1,4 @@
-// OpenAI provider — the three tiers below (plan · writer · nano); the saga storyteller's one template-keyed call.
+// OpenAI provider — the three tiers below (plan · writer · nano); the chapter storyteller's one template-keyed call.
 // Every response zod-validated; the engine canonicalizes tags and guards names/edges.
 // Key from OPENAI_API_KEY via ../.env or ~/.airaider/openai.env (never printed/committed).
 // Transport 'claude' (AIRAIDER_AI=claude / --claude): the same prompts through the headless Claude CLI on
@@ -16,14 +16,14 @@ import type {
   FleshInput, FleshOut, CampaignDirection, DirectionRead } from './provider.js';
 import { appendCallLog } from './calllog.js';
 import { runClaude, claudeOptsFor, claudePool } from './claudecli.js';
-import type { SagaCall } from './provider.js';
-import { renderSaga } from './prompts/saga/render.js';
+import type { ChapterCall } from './provider.js';
+import { renderChapter } from './prompts/chapter/render.js';
 
 // THREE TIERS (designer 2026-10-03: "use diff model for the 'harder' part like generating saga"; "replace all
 // gpt-5-mini"; "move everything to luna"). 🛠 each is env-overridable for A/B:
-//   PLAN   — the saga's plan, the hardest call (once per saga): GPT-6 Sol
+//   PLAN   — the chapter's plan, the hardest call (once per chapter): GPT-6 Sol
 //   WRITER — everything the player reads (cards, reports, flesh): GPT-6 Luna — beat gpt-5-mini blind at ¼ the
-//            cost on the same prompts (scripts/sagalab/modelcmp/RESULT4.md)
+//            cost on the same prompts (scripts/chapterlab/modelcmp/RESULT4.md)
 //   NANO   — the mechanical tier (ids, picks): GPT-6 Luna too ("move everything to luna" — gpt-5-nano was cheaper
 //            by well under a cent a playthrough; one model family, better instruction-following)
 const PLAN_MODEL = process.env.AIRAIDER_PLAN_MODEL || 'gpt-6-sol';
@@ -378,8 +378,8 @@ const PROSE_VARIANT = process.env.PROSE_VARIANT ?? 'diet';
 // first-person words; PROSE_VARIANT=dlg turns resolutions into script-format scenes. Both are
 // bench variants — unset = shipped behavior.
 const CARD_VARIANT = process.env.CARD_VARIANT ?? 'dlg';
-/** ONE-OFFS ONLY. The saga voice-break class (a recurring client narrating himself in third
- *  person across mid-saga re-grounding) is unfixed — prosebench/DIALOGUE_AB.md §failure classes. */
+/** ONE-OFFS ONLY. The chapter voice-break class (a recurring client narrating himself in third
+ *  person across mid-chapter re-grounding) is unfixed — prosebench/DIALOGUE_AB.md §failure classes. */
 const VOICED_ONE_OFF = CARD_VARIANT === 'dlg';
 /** heavy-card lab (2026-08-28): NOPAY drops the card's pay clause — the engine already prints a
  *  banded reward on its own line in BOTH UIs (ECONOMY §7.1b), and three blind judges named
@@ -567,7 +567,7 @@ function rollShape(): string[] | null {
  *  step needs; on a job the company does between the matters that mean something, the arrival is
  *  filler and the reader has read twenty of them. One beat in, one beat out (designer, 2026-08-27).
  *  The craft stack (rhythm, speech, scene-mode, the rotated closer) is deliberately absent: it is
- *  what makes a saga step worth reading and what makes a routine one exhausting. */
+ *  what makes a chapter step worth reading and what makes a routine one exhausting. */
 const oneOffLightResolveSystem = (q: ResolveQuestInput): string => {
   const canBond = q.party.length > 1;   // both ends of an edge must be a soldier who was there
   return [
@@ -612,7 +612,7 @@ const oneOffLightResolveSystem = (q: ResolveQuestInput): string => {
 
 const oneOffResolveSystem = (q: ResolveQuestInput, shape = rollShape()) => {
   // a small job is ROUTINE work and gets the one-beat report; serious and grave one-offs keep the
-  // full craft stack, which is what the saga steps use
+  // full craft stack, which is what the chapter steps use
   if (q.gravity?.startsWith('a small') && PROSE_VARIANT !== 'beat') return oneOffLightResolveSystem(q);
   const beat = PROSE_VARIANT === 'beat';
   return [
@@ -651,8 +651,8 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
     + `the setting details and who appears, within everything above. Never quote it or name it.\n${d.guidance}`
     + (d.avoid.length ? `\nKeep out of the story: ${d.avoid.join('; ')}.` : '');
 
-  /** `extra.tier` names the call's tier outright (the saga calls: the plan on PLAN, the rest on WRITER); without it the
-   *  tier is read off the purpose. `template` / `flags` label a saga call in the logs */
+  /** `extra.tier` names the call's tier outright (the chapter calls: the plan on PLAN, the rest on WRITER); without it the
+   *  tier is read off the purpose. `template` / `flags` label a chapter call in the logs */
   type Extra = { tier?: 'plan' | 'writer' | 'nano'; template?: string; flags?: string[] };
   async function call<S extends z.ZodTypeAny>(purpose: string, model: string, system0: string, user: string, schema: S, effort?: 'minimal' | 'low' | 'medium', extra: Extra = {}): Promise<z.output<S>> {
     const system = direction && DIRECTED.has(purpose) ? system0 + directionBlock(direction) : system0;
@@ -786,7 +786,7 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
 
     async writeQuest(input: QuestWriteInput): Promise<QuestWriteOut> {
       // §0 + 2026-07-13 research ruling: a self-contained prompt — every rule stated ONCE; output spec + critical rules at
-      // the END. (Sagas are written by the v4 storyteller, sagaCall below.)
+      // the END. (Chapters are written by the v4 storyteller, chapterCall below.)
       const system = oneOffSystem(input);
       // a ROUTINE card is dealt only what it can spend. level/rarity/gravity/rewardEnvelope exist
       // for it only to be told to ignore them, and a cold reader counted that as a third of the
@@ -829,7 +829,7 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
         try { onEach?.(out) } catch (e) { console.error('[ai] resolve onEach threw:', (e as Error).message?.slice(0, 300)) }
       };
       // one batched call per quest, fired in parallel (the cycle's single reckoning); a self-contained prompt — rules
-      // stated once, output spec + critical rules at the END. (A saga's reports are the storyteller's, sagaCall below.)
+      // stated once, output spec + critical rules at the END. (A chapter's reports are the storyteller's, chapterCall below.)
       const pick = (q: ResolveQuestInput) => oneOffResolveSystem(q);
       // sceneMode is engine-computed unconditionally but only the beat prompt explains it — keep
       // it OUT of the user JSON otherwise (an unexplained field to a non-beat cold model)
@@ -911,12 +911,12 @@ export function makeOpenAiProvider(opts: { transport?: WriterTransport } = {}): 
       return out.ids.filter(id => legal.has(id.replace(/^id=/, ''))).slice(0, input.max);
     },
 
-    /** the v4 saga storyteller (Phase 2 Step 3): the template rendered as measured, the payload sent verbatim (no
+    /** the v4 chapter storyteller (Phase 2 Step 3): the template rendered as measured, the payload sent verbatim (no
      *  zProse/desemi: the lab measured raw text), the tier named outright — the plan on PLAN (Sol; on the Claude
      *  transport AIRAIDER_CLAUDE_PLAN at medium), card/outline/report on WRITER. Not in DIRECTED: the direction rides in
-     *  the payload, so a saga system prompt is byte-stable */
-    async sagaCall(c: SagaCall): Promise<unknown> {
-      return callR(c.template, c.tier === 'plan' ? PLAN_MODEL : WRITER_MODEL, renderSaga(c.template, c.flags, c.vars), JSON.stringify(c.payload),
+     *  the payload, so a chapter system prompt is byte-stable */
+    async chapterCall(c: ChapterCall): Promise<unknown> {
+      return callR(c.template, c.tier === 'plan' ? PLAN_MODEL : WRITER_MODEL, renderChapter(c.template, c.flags, c.vars), JSON.stringify(c.payload),
         c.schema, c.effort, { tier: c.tier, template: c.template, flags: c.flags });
     },
   };

@@ -1,7 +1,7 @@
-// SAGA LAB — the SEED LAB (docs/STORYTELLER.md North Star 7–9). Plays the 24 probe slots (fixtures/P F1..F8 × draws
-// 1–3) under five SEED ARMS through the GAME's own storyteller — src/game/sagaflow.ts deal → plan → card → report, the
+// CHAPTER LAB — the SEED LAB (docs/STORYTELLER.md North Star 7–9). Plays the 24 probe slots (fixtures/P F1..F8 × draws
+// 1–3) under five SEED ARMS through the GAME's own storyteller — src/game/chapterflow.ts deal → plan → card → report, the
 // shipped prompts and repairs (never the lab's v4lab.ts) — so a winning arm ships by changing one default
-// (engine/saga.ts SEED_ARM):
+// (engine/chapter.ts SEED_ARM):
 //
 //   A0  themes               the theme library, the lean cast (R5's seed)
 //   A1  kit                  one situation + 1–3 keyword atoms (each from a different pool); the client + 1–3 supporting
@@ -17,7 +17,7 @@
 //                            never sees the rest) and chooses the two keywords the plan gets (measured when it only
 //                            ranked them, the plan keeping the top two)
 //
-// PIPELINE arms (engine/saga.ts PipeArm, North Star 8): kit+pick plus one input-pipeline change each, every one played on
+// PIPELINE arms (engine/chapter.ts PipeArm, North Star 8): kit+pick plus one input-pipeline change each, every one played on
 // A2's own dealt worlds (REPLAY), so the only difference from A2 / A2b is the arm:
 //   B2  one      the pick chooses one keyword, told so; the plan gets only it
 //   C2  grafts   R6's class fixes: the road prints the plan's own why per later job (no outline call; a flagged why leaves
@@ -26,15 +26,15 @@
 //   C3  sides    the plan writes each person's side; cards and reports get it for the people present
 //   D1  reads    C2, and the card after a won job reads the report's one-sentence summary (the text the player just read),
 //                not the plan's forecast `win`; no prompt change
-//   D2  fixes    C2 and the verifiers' class fixes (pipeline-round report §3.1, then the D-arm verifier; engine/saga.ts
+//   D2  fixes    C2 and the verifiers' class fixes (pipeline-round report §3.1, then the D-arm verifier; engine/chapter.ts
 //                PipeArm): the report's hope, clue, secret and own words; the finale card's stake; one finale result
 //                sentence; a card's trouble as one phrase; the plan's edges, loss and trouble `with`
 //   (C1 core — a call fixing the want, question and answer before the plan — was removed, a measured loss; its runs stay)
 //   G0  the BUILD DEFAULT, a host naming no seed or pipe arm: the build's SEED_ARM and PIPE_ARM stand (kit+pick + grafts —
 //       C2 with the shipped fixes: gold money on the button only, no doubled hopes), on A2's deals. The incumbent rounds E,
-//       F and T were read against. NOT the game's pipeline since 2026-10-05: the game's host deals GAME_PIPE by saga type
-//       (TC on hired sagas, PP on personal ones), so a round read against the game reads against TC / PP
-//   ROUND E (engine/saga.ts PipeArm late/trail/narrow): the build default (grafts, G0) plus one change each, on A2's deals:
+//       F and T were read against. NOT the game's pipeline since 2026-10-05: the game's host deals GAME_PIPE by chapter type
+//       (TC on hired chapters, PP on personal ones), so a round read against the game reads against TC / PP
+//   ROUND E (engine/chapter.ts PipeArm late/trail/narrow): the build default (grafts, G0) plus one change each, on A2's deals:
 //   E1  late     the finale written AFTER play: when the finale comes (the last middle job won, or the last chance) a small
 //                showdown call (plan tier, low effort) writes its job, trouble and loss from the question and answer, the
 //                person the ending decides and its ways, what the company holds (each with its edge's use) and knows, and
@@ -44,7 +44,7 @@
 //                showdown) right after the question and answer; the engine copies trail[i] into job i's learn, and a win
 //                never repeats its clue
 //   E3  narrow   D2's report hope alone: what result, brought and clue miss, show as still hoped (never "show shortfalls")
-//   ROUND F (engine/saga.ts PipeArm line/plain/link/fx; the reader-throwing-sentence diagnosis of 72 G0 sagas, by source
+//   ROUND F (engine/chapter.ts PipeArm line/plain/link/fx; the reader-throwing-sentence diagnosis of 72 G0 chapters, by source
 //   class): the build default (grafts, G0) plus one INPUT change each, on A2's deals — what the writer is given, never a rule:
 //   F1  line     the trouble as ONE sentence the plan writes (who stands against the job, what they will do, and why), each
 //                job type dealt who stands against it (a talk job: the one to win over, for a reason of their own), in place
@@ -60,7 +60,7 @@
 //                next biggest source after the trouble object — class 3 is 14% but a fifth of it is writer padding and its
 //                sources are the engine's ending person and the finale's measured-out why)
 //   FX  fx       F1 + F2 + F3
-//   ROUND T (engine/saga.ts PipeArm room/weight/voice/lore/page; reports/2026-10-04-sultan-pacing-study.md §3, round E §4.2):
+//   ROUND T (engine/chapter.ts PipeArm room/weight/voice/lore/page; reports/2026-10-04-sultan-pacing-study.md §3, round E §4.2):
 //   the build default (grafts, G0) plus one change each, on A2's deals; run as generations TA_g1 … (runs/seed1/TA_g1/):
 //   TA  room     the caps only (§3a, the length control): card 110 / finale 140; before 50/70/100; after 70/135/210
 //   TB  weight   each part's size dealt by the engine with what fills it (§3b, b-E): retry card 35, later 45, a first in-person
@@ -74,25 +74,25 @@
 //                meets, what it turns up), then the answer made only of those, the clues and the hopes, then the finale
 //   THE PERSONAL SET (--run pers1; fixtures/PS S1–S8 on fixtures/Q: 8 company soldiers with varied one-line pasts × draws 1–3,
 //   draws 1–2 the personal path, 3 the bumpy one; every arm shares each slot's deal, runs/pers1/_deals/):
-//   PG0 the build default on personal sagas, a host naming no arm (C2 grafts; round T's incumbent — the game now deals PP)
+//   PG0 the build default on personal chapters, a host naming no arm (C2 grafts; round T's incumbent — the game now deals PP)
 //   PP  past     the default + past and change (North Star item 0): the plan writes the past as two plain sentences (card 1
 //                tells it) and what must change in the soldier (the finale shows it); the engine writes one dossier line
-//                (dossier.md, plan.json `grown`; the game keeps it on the soldier and seeds their next personal saga with it)
-//   THE STACK ROUND (texture-round report §7.4; engine/saga.ts PipeArm voice+line / past+voice / voice+clean): a SHIPPED arm
+//                (dossier.md, plan.json `grown`; the game keeps it on the soldier and seeds their next personal chapter with it)
+//   THE STACK ROUND (texture-round report §7.4; engine/chapter.ts PipeArm voice+line / past+voice / voice+clean): a SHIPPED arm
 //   plus one change, judged against that arm's draws on disk (TC_g1–g3 on seed1, PP_g1–g3 on pers1), the same deals:
 //   S1  voice+line   TC + round F's line (the trouble as ONE plain sentence the plan writes — who, what they will do, why —
 //                    in place of the who/carry/will atoms; each job type dealt who stands against it), and (motive) the
 //                    sentence's reason only where the seed or cast already gives one (round F's forced motives); A2's deals
-//   S2  past+voice   PP + voice on a personal saga: card 1 quotes the soldier saying their past's first sentence IN PLACE of
+//   S2  past+voice   PP + voice on a personal chapter: card 1 quotes the soldier saying their past's first sentence IN PLACE of
 //                    its narration (the rest narrated; the plan is PP's own, the engine splits its past), and the finale's
 //                    secret is said by the person in ending (TC's teller; no quoted clue); pers1's shared deals
-//   S3  voice+clean  TC + clean (the context-free verifier's shared-pipeline fixes, engine/saga.ts PipeArm clean); A2's deals
-//   ROUND H (ship-and-stack report §5.4–5.5; engine/saga.ts PipeArm voice+asker / voice+setback): TC plus one change, judged
+//   S3  voice+clean  TC + clean (the context-free verifier's shared-pipeline fixes, engine/chapter.ts PipeArm clean); A2's deals
+//   ROUND H (ship-and-stack report §5.4–5.5; engine/chapter.ts PipeArm voice+asker / voice+setback): TC plus one change, judged
 //   against TC_g1–g3 on disk, A2's deals:
-//   HP  voice+asker    round T's principle on hired sagas: the plan writes the asker's past (two plain sentences: what happened
+//   HP  voice+asker    round T's principle on hired chapters: the plan writes the asker's past (two plain sentences: what happened
 //                      to them that makes this want theirs) and change; card 1 tells the past IN PLACE of TC's quoted line (TC's
 //                      cap); the quoted clue and the spoken secret stay; the finale not lost shows the change. No dossier line.
-//                      SCORED ON THE 21 NON-PERSONAL SLOTS ONLY (F1, F3–F8 × 3): the game plays PP on a personal saga, and on
+//                      SCORED ON THE 21 NON-PERSONAL SLOTS ONLY (F1, F3–F8 × 3): the game plays PP on a personal chapter, and on
 //                      seed1's personal F2 slots HP has no hired asker, so it plays TC there (generated so the folders match)
 //   RF  voice+setback  the retry reads the failure: a failed middle job's report is dealt that whoever and whatever the job
 //                      names, and its place, still stand (and, when it is posed again, that it is); a retry's card loses the
@@ -111,11 +111,11 @@
 //                      seed, its new matter, and the dossier's Now beside it (`now`: livingSeed, no settled marks — sent
 //                      them, 4 of 8 CB_g1 plans reopened the settled matter); the settled past (`history`) is kept for the log-only
 //                      retelling lint, never sent (handed it, 8 of 8 real chain Bs retold it: runs/_superseded/pers1/
-//                      CB_history_g1). Writes the saga in the judge format, plus prev.md (chain A's card 1 and
-//                      finale report: the retelling check — NOT in order.txt, not read as the saga) and dossier.md (the
+//                      CB_history_g1). Writes the chapter in the judge format, plus prev.md (chain A's card 1 and
+//                      finale report: the retelling check — NOT in order.txt, not read as the chapter) and dossier.md (the
 //                      dossier before chain B, its history, and the dossier after). A slot whose chain A left no growth line
 //                      (its finale lost, or no change written) has no chain B: it FAILS, logged, and --check lists it missing
-//   CHAIN B's INPUTS (recurring-arcs report §1.6; engine/saga.ts PipeArm past+return / past+trait), each CB_g<N>'s exact deal
+//   CHAIN B's INPUTS (recurring-arcs report §1.6; engine/chapter.ts PipeArm past+return / past+trait), each CB_g<N>'s exact deal
 //   (the same story rng; the game's chain B stays CB) plus the shared class fix `event`: NO call gets the Now (the plan, the
 //   pick, card 1, the finale — a fact a writer gets that the plan never built on is pasted as a dead-end line or re-settles the
 //   old wrong); the soldier's card-1 field is their `event` (what just happened that pulls them in), never a `past`; a report
@@ -136,9 +136,9 @@
 //                      the job's people and its place as the job says it ("Eraldil, Eussorus and the barn at Greydale") — all
 //                      still within the company's reach (the class left: the place taken, not destroyed). No cost fix, as RFA, so it differs from RFA by the fact's words alone. A2's
 //                      deals; only the draw-3 slots
-//   SO FAR (designer 2026-10-05: "hide the saga things like the [For / Road ahead / Known / Held / Open question] part? it
-//   kinda breaks immersion. you can show the past quests though"; engine/saga.ts pipe part `sofar`): the game's two pipes now
-//   show NO forward quest log on a saga card — from card 2, "So far" and one row per part played (✓ / ✗, title, the line its
+//   SO FAR (designer 2026-10-05: "hide the chapter things like the [For / Road ahead / Known / Held / Open question] part? it
+//   kinda breaks immersion. you can show the past quests though"; engine/chapter.ts pipe part `sofar`): the game's two pipes now
+//   show NO forward quest log on a chapter card — from card 2, "So far" and one row per part played (✓ / ✗, title, the line its
 //   report left); card 1 none — and Knowing follows what is shown (no For line names the asker). So a TC or PP generated from
 //   here on carries `sofar` (the TC/PP folders on disk carry the forward log). Each pair differs by the log alone:
 //   NV  voice        the game's hired pipe as it ships (TC + cost fix + RFW + So far); A2's deals, all three draws
@@ -152,8 +152,8 @@
 //   as keep-only. Each arm below is a game pipe as it ships plus line + S1's motive, so it differs from NV / NP by the line alone:
 //   NT  voice+trouble  NV + line + motive; A2's deals, all three draws
 //   PT  past+trouble   NP + line + motive; --run pers1, its shared deals
-//   WHOM IT IS FOR, WITHOUT THE LOG (saga-panel report 2026-10-05 §6; engine/saga.ts pipe part `want`): with no For line and no
-//   road, hired sagas lost followability (later jobs arrive cold; the finale stops saying whom the job is for). Input-side —
+//   WHOM IT IS FOR, WITHOUT THE LOG (chapter-panel report 2026-10-05 §6; engine/chapter.ts pipe part `want`): with no For line and no
+//   road, hired chapters lost followability (later jobs arrive cold; the finale stops saying whom the job is for). Input-side —
 //   the log stays gone. Each arm is a game pipe as it ships plus one part, so NW vs NV differs by `want` alone, NWL vs NW by
 //   `link` alone:
 //   NW  voice+want       NV + want: every later card's one why opens on the For line's content — whom the job is for, by
@@ -163,16 +163,16 @@
 //   NWL voice+want+link  NW + round F's link: the plan writes a lead (what the last learn says of the job's person or place)
 //                        for each later job AND the showdown; it rides in the card's `latest` after the win, before the job
 //                        (never on a retry; the finale's only after the last job was won). No lead on card 1, which carries
-//                        TC's line already (engine/saga.ts cardOneLead); A2's deals, all three draws
+//                        TC's line already (engine/chapter.ts cardOneLead); A2's deals, all three draws
 //   PW  past+want        NP + want (the soldier whose story this is); --run pers1, its shared deals (built, not yet run).
 //                        No PWL: PP's plan is at its word budget, so link cannot land on it without cutting a PP line
 //
-//   npx tsx scripts/sagalab/seedlab.ts [--arm A0|A1|A2|A2b|A2c|A3|A4|B1|B2|C2|C3|D1|D2|G0|E1|E2|E3|F1|F2|F3|FX|TA|TB|TC|TD|TP|PG0|PP|S1|S2|S3|HP|RF|RFA|RFW|CB_g<N>|CBR_g<N>|CBT_g<N>|NV|LV|NP|LP|NT|PT|NW|NWL|PW|all, or <arm>_g<N> = a further generation] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
+//   npx tsx scripts/chapterlab/seedlab.ts [--arm A0|A1|A2|A2b|A2c|A3|A4|B1|B2|C2|C3|D1|D2|G0|E1|E2|E3|F1|F2|F3|FX|TA|TB|TC|TD|TP|PG0|PP|S1|S2|S3|HP|RF|RFA|RFW|CB_g<N>|CBR_g<N>|CBT_g<N>|NV|LV|NP|LP|NT|PT|NW|NWL|PW|all, or <arm>_g<N> = a further generation] [--fixtures F1,F6|all] [--draws 3 | --draw 1,3]
 //        [--slots F6_3,F1_1] [--writer sonnet|haiku|openai] [--mock] [--pool 6] [--run seed1|seed2|pers1] [--force]
 //   (PG0, PP, S2, CB, CBR, CBT, NP, LP, PT and PW play only the personal set, --run pers1; every other arm only the probe set)
-//   npx tsx scripts/sagalab/seedlab.ts --stats [--run seed1]     spend and latency per call kind over the run's folders
-//   npx tsx scripts/sagalab/seedlab.ts --check [--run seed1]     which saga folders are missing or incomplete
-//   npx tsx scripts/sagalab/seedlab.ts --render --arm E1,E2,E3 --slots F6_3 [--out _e_rendered] [--mock] [--run seed1]
+//   npx tsx scripts/chapterlab/seedlab.ts --stats [--run seed1]     spend and latency per call kind over the run's folders
+//   npx tsx scripts/chapterlab/seedlab.ts --check [--run seed1]     which chapter folders are missing or incomplete
+//   npx tsx scripts/chapterlab/seedlab.ts --render --arm E1,E2,E3 --slots F6_3 [--out _e_rendered] [--mock] [--run seed1]
 //        [--outrun seed1] [--append]
 //        every NEW or CHANGED prompt variant a pipeline arm sent (one call per template + flag set, once per arm across the
 //        slots), its system prompt and its real payload, into runs/<outrun or run>/<out>/ (default _pipeline_rendered;
@@ -181,29 +181,29 @@
 //        hope the engine withheld (plan.json `hopes`; a retry is skipped) — whatever the arm's pipe (NV vs NW vs NWL)
 //
 // The world of a slot is the probe's: the base fixture's game (seed, fort, roster), its focal from the fixture's own seed
-// (a personal fixture's soldier), N, kind, a personal saga's past (the base spark), F5's returning client. The story rng
+// (a personal fixture's soldier), N, kind, a personal chapter's past (the base spark), F5's returning client. The story rng
 // is seeded per slot and the same in every arm (each arm then deals its own way from it); the play rng — parties, the ⚄
 // line, gravity, wounds — is the same in every arm too. Outcomes follow the probe's paths, by the draw's place in its
 // run's three: the first two clean (a personal fixture: personal), the third bumpy (lastchance when N = 2); the finale
 // plays the likely way (g0), as R5 did. F1's pinned seed is NOT pinned: the seed is what the arms test, and the game deals
-// A0 a theme for every saga.
+// A0 a theme for every chapter.
 //
 // THE RUNS (`--run`; each its own 24 slots, runs/<run>/<arm>/<fixture>_<draw>/):
 //   seed1  draws 1–3 (F1_1 … F8_3): every arm so far was built and judged here. The pipeline arms and A2b/A2c replay A2's
 //          deals (REPLAY)
-//   pers1  the PERSONAL SET (fixtures/PS, draws 1–3: S1_1 … S8_3): personal sagas only, for the personal-saga arms (PG0, PP);
+//   pers1  the PERSONAL SET (fixtures/PS, draws 1–3: S1_1 … S8_3): personal chapters only, for the personal-chapter arms (PG0, PP);
 //          its arms share each slot's deal as seed2's do
 //   seed2  draws 4–6 (F1_4 … F8_6): the OUT-OF-SAMPLE check — the same 8 base worlds (the fixture's game, focal, N, kind,
 //          personal past, F5's returning client) with NEW deals (situation, keywords, client, supporting cast, tone,
 //          places: the story rng is keyed by the draw) and new soldiers and dice, on seed1's path mix (draws 4–5 like 1–2,
 //          draw 6 like 3). Every kit+pick arm (A2, C2, D1, D2, …) shares each slot's deal: the first one generated there
 //          writes it to runs/seed2/_deals/<slot>.json, and every later one replays it. Name generations <arm>_g<N>:
-//            npx tsx scripts/sagalab/seedlab.ts --run seed2 --arm A2_g1,C2_g1   → runs/seed2/A2_g1/, runs/seed2/C2_g1/
+//            npx tsx scripts/chapterlab/seedlab.ts --run seed2 --arm A2_g1,C2_g1   → runs/seed2/A2_g1/, runs/seed2/C2_g1/
 //
 // The writer: the game's provider — sonnet / haiku on the Claude CLI transport (the subscription; list price kept for
 // information), openai = production GPT tiers (plan GPT-6 Sol, the rest GPT-6 Luna). --mock: the floor, free.
 //
-// Writes each saga in the folder format the judges read (judge_gpt.ts, mech.ts, score.ts; the R5 probe's layout):
+// Writes each chapter in the folder format the judges read (judge_gpt.ts, mech.ts, score.ts; the R5 probe's layout):
 //   runs/<run>/<arm>/<fixture>_<draw>/   (mock: runs/<run>/mock-<arm>/…)
 //     card_k.md (the quest log as the player sees it, the prose, ON THIS MATTER, the footer, the PLANS) · report_k.md ·
 //     chain.md (the game's chronicle) · order.txt · texts.json · plan.json (the dealt inputs, the pick and premise
@@ -216,8 +216,8 @@ import { fileURLToPath } from 'node:url';
 import { Game } from '../../src/game/game.js';
 import { MockProvider } from '../../src/ai/mock.js';
 import { makeOpenAiProvider } from '../../src/ai/openai.js';
-import { renderSaga } from '../../src/ai/prompts/saga/render.js';
-import type { AiProvider, AiCallRecord, SagaCall } from '../../src/ai/provider.js';
+import { renderChapter } from '../../src/ai/prompts/chapter/render.js';
+import type { AiProvider, AiCallRecord, ChapterCall } from '../../src/ai/provider.js';
 import { sampleGravity } from '../../src/ai/keywords.js';
 import { Rng } from '../../src/engine/rng.js';
 import { HELD, seedIdCounter, type Card } from '../../src/engine/cards.js';
@@ -227,17 +227,17 @@ import { labOutcome, type LabFixture, type LabPath } from '../../src/engine/lab.
 import type { Outcome, SlotTest } from '../../src/engine/roll.js';
 import type { Attribute } from '../../src/engine/tags.js';
 import { renderTags } from '../../src/engine/tags.js';
-import { hashStr, seedOf, SEED_ARM, PIPE_ARM, type SeedArm, type PipeArm, type Face, type Hurt, type SagaRecord, type SagaWorld, type SagaPlan } from '../../src/engine/saga.js';
+import { hashStr, seedOf, SEED_ARM, PIPE_ARM, type SeedArm, type PipeArm, type Face, type Hurt, type ChapterRecord, type ChapterWorld, type ChapterPlan } from '../../src/engine/chapter.js';
 import { logLines, matterLine, buttonLine, pageChecks, changeNowShare, mentions } from '../../src/ai/storyteller.js';
 import { REGION } from '../../src/engine/regions.js';
 import { composeLiving, livingLines, livingSeed, historyOf, unnamed, type LifeMark } from '../../src/engine/dossier.js';
 import type { GrownEntry } from '../../src/engine/cards.js';
-import * as flow from '../../src/game/sagaflow.js';
+import * as flow from '../../src/game/chapterflow.js';
 import type { TextRec } from './extract.js';
 import { glossEchoes, cardStamps } from './mech.js';
 
 const V3 = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const LAB = path.join(V3, 'scripts/sagalab');
+const LAB = path.join(V3, 'scripts/chapterlab');
 process.chdir(V3);   // loadKey looks beside the package
 
 const argv = process.argv.slice(2);
@@ -249,7 +249,7 @@ type Writer = 'openai' | 'sonnet' | 'haiku';
 const WRITER = (opt('writer') ?? 'sonnet') as Writer;
 if (!['openai', 'sonnet', 'haiku'].includes(WRITER)) { console.error(`--writer: ${WRITER} is not one of openai/sonnet/haiku`); process.exit(2) }
 const POOL = Math.max(1, Number(opt('pool') ?? (MOCK ? 8 : 6)));
-// the Claude transport's CLI pool is module-level and read per call: one pool for every saga in flight
+// the Claude transport's CLI pool is module-level and read per call: one pool for every chapter in flight
 if (!MOCK && WRITER !== 'openai') {
   process.env.AIRAIDER_CLAUDE_POOL = String(POOL);
   process.env.AIRAIDER_CLAUDE_WRITER = WRITER;
@@ -279,10 +279,10 @@ export const PIPES: Record<string, PipeArm> = { B2: 'one', C2: 'grafts', C3: 'si
   NV: 'voice', LV: 'voice+log', NP: 'past', LP: 'past+log',
   // the trouble line on the game's pipes (2026-10-05): NT / PT are NV / NP plus line + motive
   NT: 'voice+trouble', PT: 'past+trouble',
-  // whom it is for, without the log (saga-panel report §6): NW / NWL are NV plus want (+ link); PW is NP plus want
+  // whom it is for, without the log (chapter-panel report §6): NW / NWL are NV plus want (+ link); PW is NP plus want
   NW: 'voice+want', NWL: 'voice+want+link', PW: 'past+want' };
 /** an arm whose host names no seed or pipe arm: the build's SEED_ARM and PIPE_ARM stand (C2 grafts). Not the game's own
- *  pipeline since 2026-10-05 (engine/saga.ts GAME_PIPE: TC hired, PP personal) */
+ *  pipeline since 2026-10-05 (engine/chapter.ts GAME_PIPE: TC hired, PP personal) */
 const BUILD_DEFAULT = new Set(['G0', 'PG0']);
 /** the personal set's arms: they play only --run pers1, and that run plays only them */
 const PERSONAL_ARMS = new Set(['PG0', 'PP', 'S2', 'CB', 'CBR', 'CBT', 'NP', 'LP', 'PT', 'PW']);
@@ -320,7 +320,7 @@ interface ProbeFixture {
   returning?: { seat: 'client'; name: string; sex: 'male' | 'female'; race: string; trade?: string; memory: string; where: string };
 }
 const readJson = <T>(p: string): T => JSON.parse(fs.readFileSync(p, 'utf8')) as T;
-/** each run's probe fixtures: the personal set its own (fixtures/PS: S1–S8, personal sagas on fixtures/Q), every other run P */
+/** each run's probe fixtures: the personal set its own (fixtures/PS: S1–S8, personal chapters on fixtures/Q), every other run P */
 const FX_DIR = PERSONAL_RUN ? 'fixtures/PS' : 'fixtures/P';
 const ALL_FX: ProbeFixture[] = fs.readdirSync(path.join(LAB, FX_DIR)).filter(f => /^[FS]\d+\.json$/.test(f))
   .sort((a, b) => Number(a.slice(1, -5)) - Number(b.slice(1, -5))).map(f => readJson<ProbeFixture>(path.join(LAB, FX_DIR, f)));
@@ -343,10 +343,10 @@ const SHARED_DEALS = RUN !== 'seed1';
 const dealsDir = path.join(LAB, 'runs', RUN, MOCK ? '_deals-mock' : '_deals');
 
 /** a slot's dealt world as plan.json (and a shared deal) records it */
-interface DealSrc { dealt: { seed: SagaWorld['seed']; tone: string; kit: SagaWorld['kit'] | null; cast?: SagaWorld['cast'] }; engine: { cast: SagaWorld['cast']; stake: string; shape: SagaWorld['shape']; places: string[]; land: string; region: string; N: number; kind: SagaWorld['kind']; focal: { id: string } } }
+interface DealSrc { dealt: { seed: ChapterWorld['seed']; tone: string; kit: ChapterWorld['kit'] | null; cast?: ChapterWorld['cast'] }; engine: { cast: ChapterWorld['cast']; stake: string; shape: ChapterWorld['shape']; places: string[]; land: string; region: string; N: number; kind: ChapterWorld['kind']; focal: { id: string } } }
 /** where this arm's deal comes from, if it replays one: seed1 — REPLAY's arm (its plan.json in the slot); a later run — the
  *  run's shared deal for the slot, written from this arm's own deal when it is the first kit+pick arm there */
-function dealSource(armId: string, slot: string, w: SagaWorld): { from: string; src: DealSrc } | undefined {
+function dealSource(armId: string, slot: string, w: ChapterWorld): { from: string; src: DealSrc } | undefined {
   if (CHAIN_B.has(gen(armId))) return undefined;
   if (!SHARED_DEALS) { const from = REPLAY[gen(armId)]; return from ? { from, src: readJson<DealSrc>(path.join(armDir(from), slot, 'plan.json')) } : undefined }
   if (ARMS[gen(armId)] !== 'kit+pick') return undefined;
@@ -363,16 +363,16 @@ function dealSource(armId: string, slot: string, w: SagaWorld): { from: string; 
   return { from: `${path.relative(path.join(LAB, 'runs', RUN), file)} (first dealt by ${src.first})`, src };
 }
 
-/** the dealt world of another saga in the same slot, in place of this deal's (REPLAY, or a run's shared deal). The slot's
+/** the dealt world of another chapter in the same slot, in place of this deal's (REPLAY, or a run's shared deal). The slot's
  *  own facts — the focal, N, kind, region, level — must agree; returns the fields that differed from this deal */
-function replayDeal(sagaRec: SagaRecord, from: string, src: DealSrc, slot: string): string[] {
-  const w = sagaRec.world, e = src.engine;
+function replayDeal(chapterRec: ChapterRecord, from: string, src: DealSrc, slot: string): string[] {
+  const w = chapterRec.world, e = src.engine;
   if (e.focal.id !== w.focalId || e.N !== w.N || e.kind !== w.kind || e.region !== w.region) throw new Error(`${slot}: ${from}'s world is another slot's`);
   const kit = src.dealt.kit ? { arm: src.dealt.kit.arm, situations: src.dealt.kit.situations, keywords: src.dealt.kit.keywords } : undefined;
-  const dealt: SagaWorld = { ...w, cast: src.dealt.cast ?? e.cast, stake: e.stake, shape: e.shape, places: e.places, land: e.land, seed: src.dealt.seed, tone: src.dealt.tone, ...(kit ? { kit } : {}) };
+  const dealt: ChapterWorld = { ...w, cast: src.dealt.cast ?? e.cast, stake: e.stake, shape: e.shape, places: e.places, land: e.land, seed: src.dealt.seed, tone: src.dealt.tone, ...(kit ? { kit } : {}) };
   if (!kit) delete dealt.kit;
-  const diff = (Object.keys(dealt) as (keyof SagaWorld)[]).filter(k => JSON.stringify(dealt[k]) !== JSON.stringify(w[k]));
-  Object.assign(sagaRec, flow.newRecord(JSON.parse(JSON.stringify(dealt)) as SagaWorld));
+  const diff = (Object.keys(dealt) as (keyof ChapterWorld)[]).filter(k => JSON.stringify(dealt[k]) !== JSON.stringify(w[k]));
+  Object.assign(chapterRec, flow.newRecord(JSON.parse(JSON.stringify(dealt)) as ChapterWorld));
   return diff;
 }
 
@@ -384,7 +384,7 @@ function buildWorld(fx: ProbeFixture, d: number): World {
   const base = baseOf(fx.base);
   seedIdCounter(1);
   const game = new Game(new MockProvider(base.seed), base.seed);
-  const posted = game.labSaga(base);
+  const posted = game.labChapter(base);
   if (!posted.ok) throw new Error(`${fx.id}: ${posted.msg}`);
   const lead = game.state.leads.find(l => l.id === posted.leadId)!;
   game.state.leads = game.state.leads.filter(l => l !== lead);
@@ -408,7 +408,7 @@ function buildWorld(fx: ProbeFixture, d: number): World {
   return { game, chain, focal, base, region, level };
 }
 
-// ─── the writer: the game's provider, every saga call recorded whole ──────────────────────────
+// ─── the writer: the game's provider, every chapter call recorded whole ──────────────────────────
 
 interface CallRec {
   t: string; n: number; provider: string; purpose: string; template: string; flags: string[]; model: string; effort?: string;
@@ -416,7 +416,7 @@ interface CallRec {
   /** list price (the Claude transport's subscription calls are not billed; this is what the API would charge) */
   costUsd: number; ok: boolean; error?: string; system: string; user: string; output?: string; tries: number;
 }
-/** a provider that hands each saga call to the game's provider and records it, with the inner provider's own attempts
+/** a provider that hands each chapter call to the game's provider and records it, with the inner provider's own attempts
  *  (tokens, price, model; a retry is a second attempt of the same call) */
 class Recorder {
   calls: CallRec[] = [];
@@ -424,13 +424,13 @@ class Recorder {
   constructor(private inner: AiProvider, private provider: string) {}
   asProvider(): AiProvider {
     const self = this;
-    return new Proxy(this.inner, { get(t, k) { return k === 'sagaCall' ? (c: SagaCall) => self.sagaCall(c) : Reflect.get(t, k) } });
+    return new Proxy(this.inner, { get(t, k) { return k === 'chapterCall' ? (c: ChapterCall) => self.chapterCall(c) : Reflect.get(t, k) } });
   }
-  async sagaCall(c: SagaCall): Promise<unknown> {
-    const system = renderSaga(c.template, c.flags, c.vars), user = JSON.stringify(c.payload);
+  async chapterCall(c: ChapterCall): Promise<unknown> {
+    const system = renderChapter(c.template, c.flags, c.vars), user = JSON.stringify(c.payload);
     const t0 = Date.now(), t = new Date().toISOString();
     let out: unknown, err: Error | undefined;
-    try { out = await this.inner.sagaCall(c) } catch (e) { err = e as Error }
+    try { out = await this.inner.chapterCall(c) } catch (e) { err = e as Error }
     const tries = this.attemptsOf(c.template, user);
     const sum = (f: (r: AiCallRecord) => number) => tries.reduce((s, r) => s + f(r), 0);
     this.calls.push({
@@ -456,14 +456,14 @@ function providerFor(seed: number): { ai: AiProvider; name: string } {
 
 // ─── the play: parties, the ⚄ line ──────────────────────────────────────────────────────────────
 
-/** two soldiers on a job, three at the finale; a personal saga's soldier always goes, first. Off the play rng only, so
+/** two soldiers on a job, three at the finale; a personal chapter's soldier always goes, first. Off the play rng only, so
  *  every arm sends the same soldiers */
 function pickParty(rng: Rng, w: World, finale: boolean): Card[] {
   const size = finale ? 3 : 2;
   const pool = rng.shuffle(w.game.roster().filter(c => c.id !== w.focal.id));
   return w.chain.isPersonal ? [w.focal, ...pool.slice(0, size - 1)] : pool.slice(0, size);
 }
-/** the R5 probe's ⚄ line: a roll that agrees with the forced outcome (decides/lowest are the game's, sagaflow.decidesOf) */
+/** the R5 probe's ⚄ line: a roll that agrees with the forced outcome (decides/lowest are the game's, chapterflow.decidesOf) */
 function diceLine(rng: Rng, party: Card[], outcome: Outcome): string {
   const coins = party.map(() => 2 + rng.int(3));
   const C = coins.reduce((s, c) => s + c, 0);
@@ -479,24 +479,24 @@ const testOf = (a: { attribute: string; favored: string[]; clashing: string[] },
 const HOW_BAND: Record<Hurt['how'], string> = { lightly: 'light', badly: 'serious', gravely: 'grave' };
 const words = (s: string | undefined) => (s ?? '').split(/\s+/).filter(Boolean).length;
 
-// ─── one saga ───────────────────────────────────────────────────────────────────────────────────
+// ─── one chapter ───────────────────────────────────────────────────────────────────────────────────
 
 interface Row { id: string; path: string; N: number; outcomes: string; files: number; complete: boolean; problems: string[]; cost: number; card1Ms: number; title: string; seed: string; keywords: string; dev: string[] }
 
-/** (CB) a soldier's chain A as chain B reads it — PP_g<N>'s saga in the same slot — kept on the soldier as the game keeps it
+/** (CB) a soldier's chain A as chain B reads it — PP_g<N>'s chapter in the same slot — kept on the soldier as the game keeps it
  *  (game.ts settleFinale: the grown entry) and composed into their living dossier with the game's own functions
  *  (engine/dossier.ts); prev.md's text (chain A's card 1 and finale report) */
 interface ChainA { from: string; entry: GrownEntry; marks: LifeMark[]; dossier: NonNullable<ReturnType<typeof composeLiving>>; history: string; prev: string;
   /** (CBR) the person from chain A who asks the soldier for help, seated as the game seats a tied face; null: nobody fits (why) */
   returner?: { face: Face; from: string } | { face: null; why: string } }
-interface ChainAPlan { plan: SagaPlan; grown?: string; seedToPlan: { text: string }; lines: SagaRecord['lines']; engine: { N: number; region: string }; knowing: { met: string[] }; banked: { held: number[] } }
+interface ChainAPlan { plan: ChapterPlan; grown?: string; seedToPlan: { text: string }; lines: ChapterRecord['lines']; engine: { N: number; region: string }; knowing: { met: string[] }; banked: { held: number[] } }
 /** (CBR) the lab's stand-in for the lore's tied face (game.ts persistMetCast + nextChapterSeed): a person chain A's company met
  *  in a job — never the one its ending decided (resolved against), never one the company held captive — whom a chronicle
  *  line names (by name or their label's head noun), the first in cast order. Their memory is the LAST line that names them:
  *  their own part, a line the player read. (persistMetCast's rule — the last line of a job they were in — handed Rhene the
  *  finale's line, about the abbot and the soldier's father, with nothing of hers in it: the plan could use only the old matter,
  *  and the card hung it on the soldier. The game's tied faces keep that rule while the experiment runs.) Chain A's other people
- *  by label (a seed names only people the saga can cast: dossier.ts `unnamed`); where they are, the region as the game says it
+ *  by label (a seed names only people the chapter can cast: dossier.ts `unnamed`); where they are, the region as the game says it
  *  (game.ts regionIn) */
 function returnerOf(p: ChainAPlan): { face: Face; from: string } | { face: null; why: string } {
   const plan = p.plan, met = new Set(p.knowing.met);
@@ -504,14 +504,14 @@ function returnerOf(p: ChainAPlan): { face: Face; from: string } | { face: null;
   const against = plan.cast.find(c => c.seat === 'opponent');
   const held = p.banked.held.map(n => plan.episodes[n - 1]?.gain ?? '');
   const esc = (x: string) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const captive = (c: SagaPlan['cast'][number]) => {
+  const captive = (c: ChapterPlan['cast'][number]) => {
     const parts = c.name.split(/\s+/).filter(x => x.length > 2 && /^\p{Lu}/u.test(x)).map(esc);
     const head = esc(c.label.trim().split(/\s+/).at(-1)!.toLowerCase());
     const rx = new RegExp(`\\b(?:${[...parts, `${head}s?`].join('|')})\\b(?!['’])`, 'iu');
     return held.some(g => rx.test(g) && /\b(?:captive|prisoner|bound)\b/i.test(g));
   };
   const fit = plan.cast.filter(x => x.seat !== 'soldier' && x.id !== against?.id && met.has(x.id) && eps.some(e => e.people.includes(x.id)) && !captive(x));
-  const named = (x: SagaPlan['cast'][number]) => [...p.lines].reverse().find(l => mentions(l.text, x));
+  const named = (x: ChapterPlan['cast'][number]) => [...p.lines].reverse().find(l => mentions(l.text, x));
   const c = fit.find(x => named(x));
   if (!c) return { face: null, why: plan.cast.length <= 2 ? 'chain A cast nobody but the soldier and the one its ending decided' : fit.length ? 'no chronicle line of chain A names anyone else it met in a job' : 'chain A met nobody else in a job but someone it held captive' };
   const line = named(c)!;
@@ -534,13 +534,13 @@ function chainAOf(armId: string, slot: string, focal: Card): ChainA {
   focal.character!.living = dossier;
   const meta = readJson<{ attempts: { k: number; isFinale: boolean }[] }>(path.join(dir, 'meta.json'));
   const finK = meta.attempts.find(a => a.isFinale)?.k;
-  const prev = [`# ${focal.name}'s chain A (${from}) — for the retelling check only; NOT part of the saga the readers judge`, '',
+  const prev = [`# ${focal.name}'s chain A (${from}) — for the retelling check only; NOT part of the chapter the readers judge`, '',
     '## chain A, card 1', '', fs.readFileSync(path.join(dir, 'card_1.md'), 'utf8').trim(), '',
     '## chain A, the finale report', '', finK ? fs.readFileSync(path.join(dir, `report_${finK}.md`), 'utf8').trim() : '(none)', ''].join('\n');
   return { from, entry, marks, dossier, history: historyOf([entry])!, prev, ...(gen(armId) === 'CBR' ? { returner: returnerOf(p) } : {}) };
 }
 
-async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string): Promise<Row> {
+async function runChapter(armId: string, fx: ProbeFixture, d: number, dir: string): Promise<Row> {
   const arm = ARMS[gen(armId)]!, id = `${fx.id}_${d}`, path_ = pathOf(fx, d);
   const w = buildWorld(fx, d);
   const { game, chain, focal, base } = w;
@@ -551,7 +551,7 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
   const rec = new Recorder(prov.ai, prov.name);
   const dev: string[] = [];
   const play = new Rng(hashStr(`seedlab:play:${fx.id}:${d}:${path_}`));   // the same in every arm
-  const host: flow.SagaHost = {
+  const host: flow.ChapterHost = {
     rng: play, storyRng: new Rng(hashStr(`seedlab:story:${fx.id}:${d}${chainA ? ':chainB' : ''}`)), ai: rec.asProvider(), state: game.state,
     card: cid => game.card(cid), roster: () => game.roster(), direction: () => undefined,
     log: (k, t) => dev.push(`${k}: ${t}`),
@@ -567,15 +567,15 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
   if (fx.personal) pins.personalSeed = chainA ? livingSeed(chainA.dossier) : base.spark;
   if (chainA) pins.history = chainA.history;
   // (CBR) the person from chain A, seated as the game seats a tied face (D10: known, their memory); the deal gives them the part
-  // "asks the soldier for help" (sagaflow deal, pipe arm past+return)
+  // "asks the soldier for help" (chapterflow deal, pipe arm past+return)
   if (chainA?.returner?.face) pins.seedPerson = { ...chainA.returner.face, rival: false };
   if (fx.returning) { const r = fx.returning; pins.returningClient = { id: 'n1', name: r.name, sex: r.sex, race: r.race, memory: r.memory, where: r.where, ...(r.trade ? { trade: r.trade } : {}) } satisfies Face }
 
   // the deal (synchronous), then the kit's pick and premise and the plan
-  const sagaRec = flow.deal(host, chain, undefined, focal, pins);
-  const source = dealSource(armId, id, sagaRec.world);
-  const replayed = source ? { from: source.from, differed: replayDeal(sagaRec, source.from, source.src, id) } : undefined;
-  const world0 = JSON.parse(JSON.stringify(sagaRec.world)) as typeof sagaRec.world;   // as dealt, before the pick
+  const chapterRec = flow.deal(host, chain, undefined, focal, pins);
+  const source = dealSource(armId, id, chapterRec.world);
+  const replayed = source ? { from: source.from, differed: replayDeal(chapterRec, source.from, source.src, id) } : undefined;
+  const world0 = JSON.parse(JSON.stringify(chapterRec.world)) as typeof chapterRec.world;   // as dealt, before the pick
   const t0 = Date.now();
   const plan = await flow.plan(host, chain);
   const planMs = rec.calls.filter(c => ['pick', 'premise', 'plan'].includes(c.purpose)).reduce((s, c) => s + c.durationMs, 0);
@@ -585,10 +585,10 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
   const texts: TextRec[] = [], order: string[] = [], problems: string[] = [];
   const attempts: { k: number; questId: string; isFinale: boolean; outcome: string | null }[] = [];
   let attempt = 0, kk = 0, card1Ms = 0;
-  const helpedFocal = () => flow.focalHelped(chain.saga!);
+  const helpedFocal = () => flow.focalHelped(chain.chapter!);
   for (; ;) {
     const out = await flow.card(host, chain);
-    const r = chain.saga!;
+    const r = chain.chapter!;
     const { pos } = out;
     kk++;
     if (kk === 1) card1Ms = Date.now() - t0;
@@ -617,14 +617,14 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
     const outcome = labOutcome(path_, { isFinale: pos.finale, job: pos.job, tryOnJob: pos.attempt, attempt });
     const party = pickParty(play, w, pos.finale);
     const dice = diceLine(play, party, outcome);
-    const gravity = sampleGravity(play, base.rarity ?? 'common', 'saga');
+    const gravity = sampleGravity(play, base.rarity ?? 'common', 'chapter');
     const ways = pos.finale ? flow.approaches(r).map(a => a.way) : [];
     const asks = flow.asks(e.type, party.length, chain.isPersonal, !pos.finale && flow.pinsSoldier(r, pos.job), ways);
     const tests = pos.finale ? party.map(() => testOf(flow.approaches(r)[0]!.test, w.level)) : party.map((_m, j) => testOf(asks[j % asks.length]!, w.level));
     const fate: FinaleFate | undefined = pos.finale ? (outcome === 'success' ? { fate: 'clean' } : outcome === 'partial' ? { fate: 'saddled' } : { fate: 'slipped', sequelRarity: 'uncommon' }) : undefined;
     const inn = flow.reportIn(host, chain, pos, out.prose, { outcome, party, tests, gravity, ...(pos.finale ? { way: ways[0], fate } : {}) });
     attempts.push({ k: kk, questId, isFinale: pos.finale, outcome });
-    const rep = await flow.writeSagaReport(host, inn.call);
+    const rep = await flow.writeChapterReport(host, inn.call);
     bankBeat(chain, party.length, outcome, 0);
     const after = flow.afterReport(host, chain, pos, { outcome, party, hurt: inn.hurt, ...(inn.fate ? { fate: inn.fate } : {}) }, rep);
     const repMd = [
@@ -637,9 +637,9 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
     order.push(repFile);
     texts.push({ file: repFile, kind: 'report', k: kk, questId, isFinale: pos.finale, title: e.title, before: rep.before, after: rep.after, outcome, diceLine: dice });
     if (pos.finale) { chain.state = outcome === 'failure' ? 'slipped' : 'done'; break }
-    if (kk > 20) { problems.push('runaway saga (> 20 attempts)'); break }
+    if (kk > 20) { problems.push('runaway chapter (> 20 attempts)'); break }
   }
-  const final = chain.saga!;
+  const final = chain.chapter!;
   fs.writeFileSync(path.join(dir, 'chain.md'), flow.chronicleText(flow.chronicle(chain)!).join('\n') + '\n');
   order.push('chain.md');
 
@@ -700,8 +700,8 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
     dev, textLint, lines: final.lines, banked: final.state, knowing: final.knowing, ending: final.ending ?? null,
     cost, latency: { planMs, card1Ms, calls: rec.calls.map(c => ({ purpose: c.purpose, ms: c.durationMs })) },
   }, null, 2));
-  // (PP) the soldier's sheet after the saga: the one dossier line the engine wrote (never in order.txt: the judges read the
-  // saga as played, and this is the soldier's sheet, not the quest)
+  // (PP) the soldier's sheet after the chapter: the one dossier line the engine wrote (never in order.txt: the judges read the
+  // chapter as played, and this is the soldier's sheet, not the quest)
   if (chainA) {
     // (CB) the living dossier before chain B (its seed) and its history, then after: chain B's own line and ending on top
     const pastB = plan.cast.find(c => c.seat === 'soldier')?.past?.trim();
@@ -712,7 +712,7 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
     fs.writeFileSync(path.join(dir, 'dossier.md'), [`${focal.name} — the living dossier before chain B (its seed):`, ...livingLines(chainA.dossier), '',
       `history (the old wrong chain A settled): ${chainA.history}`, '', 'after chain B:', ...livingLines(after), ''].join('\n'));
     fs.writeFileSync(path.join(dir, 'prev.md'), chainA.prev);
-  } else if (final.grown) fs.writeFileSync(path.join(dir, 'dossier.md'), `${focal.name} — dossier, after the saga:\n- ${final.grown}\n`);
+  } else if (final.grown) fs.writeFileSync(path.join(dir, 'dossier.md'), `${focal.name} — dossier, after the chapter:\n- ${final.grown}\n`);
   const meta = {
     fixture: { id, set: PERSONAL_RUN ? 'PS' : 'P', seed: base.seed, path: path_, N, kind: fx.kind, personal: fx.personal, probe: fx.id, draw: d },
     run: `${RUN}/${path.basename(path.dirname(dir))}`, chainId: chain.id, chainState: chain.state, seedArm: final.world.kit?.arm ?? arm, ...(final.world.pipe ? { pipe: final.world.pipe } : {}),
@@ -730,7 +730,7 @@ async function runSaga(armId: string, fx: ProbeFixture, d: number, dir: string):
  *  of the gain ("shame him with the ledger") matches too, so compare the rate between arms, never read one line as a fault */
 const ECHO_STOP = new Set('that this with from their them they what when where which will would have been into onto upon over under about after before there here some only than then also each every other another your yours company'.split(' '));
 const echoRoot = (x: string) => x.replace(/(?<!s)s$/, '').slice(0, 6);
-function heldEcho(plan: SagaPlan, held: number[], card: Record<string, unknown>, places: readonly string[]): string[] {
+function heldEcho(plan: ChapterPlan, held: number[], card: Record<string, unknown>, places: readonly string[]): string[] {
   const t = card.trouble as string | { who?: string; carry?: string; will?: string } | undefined;
   const lose = card.lose as { loses?: string } | undefined;
   const text = [String(card.job ?? ''), typeof t === 'string' ? t : `${t?.carry ?? ''} ${t?.will ?? ''}`, lose?.loses ?? ''].join(' ').toLowerCase();
@@ -772,7 +772,7 @@ async function main() {
   await pool(jobs, POOL, async j => {
     const tag = `[${j.armId} ${j.fx.id}_${j.d}]`;
     try {
-      const row = await runSaga(j.armId, j.fx, j.d, j.dir);
+      const row = await runChapter(j.armId, j.fx, j.d, j.dir);
       (rows.get(j.armId) ?? rows.set(j.armId, []).get(j.armId)!).push(row);
       total += row.cost;
       console.log(`${tag} ${row.outcomes} · ${row.files} files · ${row.complete ? 'complete' : `INCOMPLETE: ${row.problems.join('; ')}`} · $${row.cost.toFixed(4)} list · card 1 after ${(row.card1Ms / 1000).toFixed(1)}s · seed: ${row.seed}${row.keywords ? ` + ${row.keywords}` : ''}`);
@@ -784,7 +784,7 @@ async function main() {
   console.log(`total: $${total.toFixed(4)} (list price) → ${path.relative(V3, path.join(LAB, 'runs', RUN))}`);
 }
 
-/** INDEX.md over every saga folder the arm has (this pass's and earlier ones) */
+/** INDEX.md over every chapter folder the arm has (this pass's and earlier ones) */
 function writeIndex(armId: string) {
   const dir = armDir(armId);
   if (!fs.existsSync(dir)) return;
@@ -796,8 +796,8 @@ function writeIndex(armId: string) {
     return `| ${id} | ${p.plan.title} | ${p.seedToPlan.text.replace(/\|/g, '/')}${p.seedToPlan.keywords ? ` · ${p.seedToPlan.keywords.join(', ')}` : ''} | ${m.fixture.path} | ${m.fixture.N} | ${m.attempts.map(a => a.outcome[0]!.toUpperCase()).join('')} | ${m.complete ? '✓' : `✗ ${m.problems.join('; ')}`} | ${lint} | ${p.cost.toFixed(4)} | ${(p.latency.card1Ms / 1000).toFixed(1)}s |`;
   });
   fs.writeFileSync(path.join(dir, 'INDEX.md'), [
-    `# ${RUN} · ${MOCK ? 'mock floor · ' : ''}seed arm ${armId} (${ARMS[gen(armId)]}${PIPES[gen(armId)] ? ` + pipe ${PIPES[gen(armId)]}` : ''}${BUILD_DEFAULT.has(gen(armId)) ? ', the build default (a host naming no arm)' : ''}) · the game's storyteller (src/game/sagaflow.ts)`, '',
-    '| saga | title | seed to the plan | path | N | outcomes | complete | lint lines | $ list | card 1 after |',
+    `# ${RUN} · ${MOCK ? 'mock floor · ' : ''}seed arm ${armId} (${ARMS[gen(armId)]}${PIPES[gen(armId)] ? ` + pipe ${PIPES[gen(armId)]}` : ''}${BUILD_DEFAULT.has(gen(armId)) ? ', the build default (a host naming no arm)' : ''}) · the game's storyteller (src/game/chapterflow.ts)`, '',
+    '| chapter | title | seed to the plan | path | N | outcomes | complete | lint lines | $ list | card 1 after |',
     '|---|---|---|---|---|---|---|---|---|---|', ...rows, '',
   ].join('\n'));
 }
@@ -806,7 +806,7 @@ function writeIndex(armId: string) {
 function stats() {
   const root = path.join(LAB, 'runs', RUN);
   const out: Record<string, Record<string, { n: number; ms: number[]; cost: number; tries: number; fails: number }>> = {};
-  const sagaCost: Record<string, number[]> = {}, card1: Record<string, number[]> = {};
+  const chapterCost: Record<string, number[]> = {}, card1: Record<string, number[]> = {};
   for (const arm of fs.readdirSync(root).filter(f => fs.statSync(path.join(root, f)).isDirectory() && !f.startsWith('_')).sort()) {
     for (const id of fs.readdirSync(path.join(root, arm)).filter(f => fs.existsSync(path.join(root, arm, f, 'calls.jsonl')))) {
       const calls = fs.readFileSync(path.join(root, arm, id, 'calls.jsonl'), 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l) as CallRec);
@@ -816,7 +816,7 @@ function stats() {
           s.n++; s.ms.push(c.durationMs); s.cost += c.costUsd; s.tries += c.tries ?? 1; if (!c.ok) s.fails++;
         }
       }
-      (sagaCost[arm] ??= []).push(calls.reduce((s, c) => s + c.costUsd, 0));
+      (chapterCost[arm] ??= []).push(calls.reduce((s, c) => s + c.costUsd, 0));
       try { (card1[arm] ??= []).push(readJson<{ latency: { card1Ms: number } }>(path.join(root, arm, id, 'plan.json')).latency.card1Ms) } catch { /* no plan.json */ }
     }
   }
@@ -824,7 +824,7 @@ function stats() {
   const sec = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
   const lines: string[] = [`# ${RUN} — spend (list price) and latency per call kind`, ''];
   for (const [arm, kinds] of Object.entries(out)) {
-    lines.push(`## ${arm}${sagaCost[arm] ? ` · ${sagaCost[arm]!.length} sagas · $${(sagaCost[arm]!.reduce((a, b) => a + b, 0)).toFixed(3)} total, $${(sagaCost[arm]!.reduce((a, b) => a + b, 0) / sagaCost[arm]!.length).toFixed(4)}/saga · card 1 after p50 ${sec(pct(card1[arm] ?? [], 0.5))}` : ''}`, '',
+    lines.push(`## ${arm}${chapterCost[arm] ? ` · ${chapterCost[arm]!.length} chapters · $${(chapterCost[arm]!.reduce((a, b) => a + b, 0)).toFixed(3)} total, $${(chapterCost[arm]!.reduce((a, b) => a + b, 0) / chapterCost[arm]!.length).toFixed(4)}/chapter · card 1 after p50 ${sec(pct(card1[arm] ?? [], 0.5))}` : ''}`, '',
       '| call | n | tries | failed | p50 | p90 | $ total | $ per call |', '|---|---|---|---|---|---|---|---|');
     for (const [k, s] of Object.entries(kinds).sort()) lines.push(`| ${k} | ${s.n} | ${s.tries} | ${s.fails} | ${sec(pct(s.ms, 0.5))} | ${sec(pct(s.ms, 0.9))} | ${s.cost.toFixed(3)} | ${(s.cost / s.n).toFixed(4)} |`);
     lines.push('');
@@ -916,13 +916,13 @@ const CHANGED_ARM: Record<string, (c: { template: string; flags: string[] }) => 
   ...Object.fromEntries(['NV', 'LV', 'NP', 'LP'].map(a => [a, (c: { template: string; flags: string[] }) =>
     (c.template === 'card' || c.template === 'report') && !c.flags.includes('first') && c.flags.some(f => ['intro', 'part', 'side', 'memory'].includes(f))])),
 };
-/** (--render --cards) the kinds of later card a saga sent: the finale; a middle job's card with its hope (`hope`), with a hope
+/** (--render --cards) the kinds of later card a chapter sent: the finale; a middle job's card with its hope (`hope`), with a hope
  *  the road check (card 1, plan.json `hopes`) kept off but its own card printed (`restored`, pipe part want), or with none
  *  (`withheld`: no why, or the want alone, `wantfirst`). Card 1 and a retry have no kind */
 type CardKind = 'finale' | 'hope' | 'restored' | 'withheld';
 const KIND_SAYS: Record<CardKind, string> = { finale: 'the finale', hope: 'a middle job with its hope', restored: 'a middle job whose hope the road kept off, printed at its own card', withheld: 'a middle job whose hope was withheld' };
 function cardKinds(planFile: string): (c: CallRec) => CardKind | undefined {
-  const p = readJson<{ plan: SagaPlan; hopes?: (string | null)[] | null }>(planFile);
+  const p = readJson<{ plan: ChapterPlan; hopes?: (string | null)[] | null }>(planFile);
   return c => {
     if (c.template !== 'card' || c.flags.includes('first') || c.flags.includes('retry')) return undefined;
     if (c.flags.includes('finale')) return 'finale';

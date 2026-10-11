@@ -1,4 +1,4 @@
-// The saga theme dealer (docs/STORYTELLER.md §D.2): one pure function, no repeat within 50 deals,
+// The chapter theme dealer (docs/STORYTELLER.md §D.2): one pure function, no repeat within 50 deals,
 // tones and scales dealt evenly although the library is uneven.
 import { describe, it, expect } from 'vitest';
 import { Rng } from '../src/engine/rng.js';

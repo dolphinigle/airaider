@@ -1,22 +1,22 @@
-// A personal saga's seed may only name people the saga CAN CAST. Genesis is dealt no company
+// A personal chapter's seed may only name people the chapter CAN CAST. Genesis is dealt no company
 // soldier but the focal, and assignedNames are the only names it may coin — so an edge pointing
 // at a fellow soldier hands it a name it has no permission to use, and it silently invents a
-// stranger in their place (measured 2026-08-31: "Biddy left Arver at a crossing" produced a saga
+// stranger in their place (measured 2026-08-31: "Biddy left Arver at a crossing" produced a chapter
 // about finding "Duryn Fernbrook"). The premise is incoherent regardless: you cannot ride out to
 // find someone standing in your own yard.
 import { describe, it, expect } from 'vitest';
 import { Game } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
 import { guardEdges } from '../src/engine/lore.js';
-import type { SagaCall } from '../src/ai/provider.js';
+import type { ChapterCall } from '../src/ai/provider.js';
 
 class SeedSpy extends MockProvider {
   seeds: string[] = [];
-  override sagaCall(c: SagaCall): Promise<unknown> { if (c.template === 'plan') this.seeds.push(String(c.payload.seed)); return super.sagaCall(c) }
+  override chapterCall(c: ChapterCall): Promise<unknown> { if (c.template === 'plan') this.seeds.push(String(c.payload.seed)); return super.chapterCall(c) }
 }
 
-/** a personal chain for roster[0], with one lore edge to `to`; `made`: the play that made it (a saga, a quest, the engine) */
-async function seedFor(to: 'merc' | 'npc', made?: 'saga' | 'quest' | 'self'): Promise<string> {
+/** a personal chain for roster[0], with one lore edge to `to`; `made`: the play that made it (a chapter, a quest, the engine) */
+async function seedFor(to: 'merc' | 'npc', made?: 'chapter' | 'quest' | 'self'): Promise<string> {
   const ai = new SeedSpy();
   const g = new Game(ai, 268);
   g.build('map-room'); g.build('lead-room');
@@ -31,14 +31,14 @@ async function seedFor(to: 'merc' | 'npc', made?: 'saga' | 'quest' | 'self'): Pr
   }
   guardEdges(g.state.lore, [{ from: merc.id, to: made === 'self' ? merc.id : otherId, type: 'betrayed-by',
     blurb: `${merc.name} left them at a crossing and has never said why`, importance: 0.9, ...(made === 'quest' ? { sourceQuestId: 'q-1' } : {}) }],
-    1, () => 'e1', made === 'saga' ? 'chain-1' : undefined);
+    1, () => 'e1', made === 'chapter' ? 'chain-1' : undefined);
   (g as unknown as { spawnPersonalChainLead(m: unknown): void }).spawnPersonalChainLead(merc);
   const lead = g.state.leads.find(l => l.source === 'personal')!;
   await g.pursue(lead.id);
   return ai.seeds.at(-1)!;
 }
 
-describe('personal saga seed', () => {
+describe('personal chapter seed', () => {
   it('uses a lore edge that points OUT of the company', async () => {
     expect(await seedFor('npc')).toContain('at a crossing');
   });
@@ -48,23 +48,23 @@ describe('personal saga seed', () => {
     expect(await seedFor('merc')).not.toContain('at a crossing');
   });
 
-  it('never seeds from a memory the company\'s play made: the saga is told as the soldier\'s past', async () => {
-    for (const made of ['saga', 'quest', 'self'] as const) expect(await seedFor('npc', made), made).not.toContain('at a crossing');
+  it('never seeds from a memory the company\'s play made: the chapter is told as the soldier\'s past', async () => {
+    for (const made of ['chapter', 'quest', 'self'] as const) expect(await seedFor('npc', made), made).not.toContain('at a crossing');
   });
 });
 
 // A plan with a hard defect earns ONE plain re-draw on the same input (STORYTELLER §2.7) — never a new seed: the old
-// genesis re-roll burned the seed, so a personal saga came back on a generic what-if and copied the live saga.
+// genesis re-roll burned the seed, so a personal chapter came back on a generic what-if and copied the live chapter.
 class BrokenPlanOnce extends SeedSpy {
   private first = true;
-  override async sagaCall(c: SagaCall): Promise<unknown> {
-    const out = await super.sagaCall(c);
+  override async chapterCall(c: ChapterCall): Promise<unknown> {
+    const out = await super.chapterCall(c);
     if (c.template === 'plan' && this.first) { this.first = false; return { ...(out as object), episodes: [] } }
     return out;
   }
 }
 
-describe('a personal saga re-drawn for a hard defect', () => {
+describe('a personal chapter re-drawn for a hard defect', () => {
   it('re-draws on the same piece of the soldier\'s own past', async () => {
     const ai = new BrokenPlanOnce();
     const g = new Game(ai, 268);
@@ -77,7 +77,7 @@ describe('a personal saga re-drawn for a hard defect', () => {
     expect(ai.seeds.length).toBe(2);
     expect(ai.seeds[1]).toBe(ai.seeds[0]);
     expect(merc.character!.backstory).toContain(ai.seeds[0]!);
-    expect(g.state.chains[0]!.saga!.fallback).toBe(false);
+    expect(g.state.chains[0]!.chapter!.fallback).toBe(false);
   });
 });
 
@@ -92,7 +92,7 @@ describe('D10: the person a personal seed came from takes a seat', () => {
     guardEdges(g.state.lore, [{ from: merc.id, to: 'npc-x', type, blurb: `${merc.name} left Arver at a crossing and has never said why`, importance: 0.9 }], 1, () => 'e1');
     (g as unknown as { spawnPersonalChainLead(m: unknown): void }).spawnPersonalChainLead(merc);
     await g.pursue(g.state.leads.find(l => l.source === 'personal')!.id);
-    return g.state.chains[0]!.saga!.world.cast.find(p => p.id === 'npc-x');
+    return g.state.chains[0]!.chapter!.world.cast.find(p => p.id === 'npc-x');
   }
   it('known, with the edge as their memory; a rival-type edge seats them in the way', async () => {
     const rival = await seated('betrayed-by');
@@ -103,7 +103,7 @@ describe('D10: the person a personal seed came from takes a seat', () => {
   });
 });
 
-describe('a personal saga for a soldier the company won', () => {
+describe('a personal chapter for a soldier the company won', () => {
   it('is seeded from who they were, not from the job that brought them in', async () => {
     const ai = new SeedSpy();
     const g = new Game(ai, 268);

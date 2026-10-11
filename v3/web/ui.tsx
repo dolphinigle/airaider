@@ -288,11 +288,11 @@ export function FixButton({ s, fix, quick, go, solid, lead }: {
 
 
 /** a quest's kind in words — one rule for the quest page, the map's hover and anywhere else that names it:
- *  a saga card is "Saga · part n of N" (again) or "Saga finale" (· the last chance), from the engine's q.saga */
+ *  a chapter card is "Chapter · part n of N" (again) or "Chapter finale" (· the last chance), from the engine's q.chapter */
 export function questKind(q: any): string {
-  const sg = q.saga;
-  if (q.isFinale) return `Saga finale${sg?.lastchance ? ' · the last chance' : ''}`;
-  if (q.chainId) return sg ? `Saga · part ${sg.part} of ${sg.of}${sg.again ? ' (again)' : ''}` : 'Saga';
+  const sg = q.chapter;
+  if (q.isFinale) return `Chapter finale${sg?.lastchance ? ' · the last chance' : ''}`;
+  if (q.chainId) return sg ? `Chapter · part ${sg.part} of ${sg.of}${sg.again ? ' (again)' : ''}` : 'Chapter';
   return q.faucet ? 'Standing post' : 'One-off job';
 }
 
@@ -301,10 +301,10 @@ export function questKind(q: any): string {
 const ROAD_MARK: Record<string, [string, string]> = { '✓': ['ql-won', 'done'], '✗': ['ql-lost', 'lost'], '▶': ['ql-now', 'this job'], '·': ['ql-ahead', 'ahead'] };
 /** So far's marks: a part played and won (a partial is a win), or a try that failed */
 const PAST_MARK: Record<string, [string, string]> = { '✓': ['ql-won', 'done'], '✗': ['ql-lost', 'failed'] };
-/** THE QUEST LOG (the v4 storyteller): the rows the ENGINE rendered for a saga card or the chronicle. On a saga card of the
+/** THE QUEST LOG (the v4 storyteller): the rows the ENGINE rendered for a chapter card or the chronicle. On a chapter card of the
  *  game's pipes, So far — one row per part played before the last (the prose opens on that one), in order: its mark, its
  *  title, the line its report left (none on cards 1–2); the game's pipes give the chronicle no rows (its own So far list
- *  stands). A saga on an older pipe: the forward log — who the company acts for, the road ahead, what is known and held,
+ *  stands). A chapter on an older pipe: the forward log — who the company acts for, the road ahead, what is known and held,
  *  the open question. The CLI prints the very same rows in the same order (cli/format.ts, logLines).
  *  Plain rows, part of the card: a bold lead word, then the text; the marks in a fixed gutter (✓ won · ✗ lost · ▶ this job ·
  *  · ahead). Horizontal text only (docs/UI.md G6) */

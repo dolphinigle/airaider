@@ -6,7 +6,7 @@ of probe4/L_lean_sonnet. Read-only on the run; writes only under this folder.
 import json, os, re, subprocess, sys, time, tempfile, shutil, statistics
 from concurrent.futures import ThreadPoolExecutor
 
-RUN = '/home/irvan/airaider/v3/scripts/sagalab/runs/probe4/L_lean_sonnet'
+RUN = '/home/irvan/airaider/v3/scripts/chapterlab/runs/probe4/L_lean_sonnet'
 OUT = os.path.dirname(os.path.abspath(__file__))
 CW = os.path.join(OUT, 'cw')          # empty cwd outside the repo
 OJ = os.path.join(OUT, 'outlines.json')

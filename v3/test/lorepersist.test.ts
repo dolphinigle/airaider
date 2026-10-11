@@ -1,11 +1,11 @@
-// LORE §1 story-NPC write-back at saga close (STORYTELLER §2.6): at most two MET people who are not the focal persist
+// LORE §1 story-NPC write-back at chapter close (STORYTELLER §2.6): at most two MET people who are not the focal persist
 // (the one who asked > the one in the way > anyone else). A coined person becomes a lore node (blurb = label, the deal's
 // sex and race); a returning face already is one. Each gets an edge to the focal by seat and one to the soldier whose
 // deed decided a job they were in. Unmet, colliding or already-known names add no node.
 import { describe, it, expect } from 'vitest';
 import { Game } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
-import type { CastEntry } from '../src/engine/saga.js';
+import type { CastEntry } from '../src/engine/chapter.js';
 
 const person = (id: string, name: string, seat: CastEntry['seat'], label: string, o: Partial<CastEntry> = {}): CastEntry =>
   ({ id, name, sex: 'male', race: 'human', seat, focal: false, part: 'x', known: seat === 'client', label, want: '', ...o });
@@ -21,7 +21,7 @@ function fakeChain(soldier: string, o: { met?: string[]; returning?: boolean } =
   const ep = (n: number, people: string[]) => ({ n, type: 'find' as const, title: `Job ${n}`, job: 'j', people, trouble: { who: 'w', carry: 'c', will: 'v' }, why: '' });
   return {
     id: 'chain-t', focalId: 'cX', state: 'done', isPersonal: false,
-    saga: {
+    chapter: {
       v: 4, world: { N: 3, cast }, fallback: false,
       knowing: { met: o.met ?? ['p1', 'cX', o.returning ? 'lore-old' : 'p2', 'p3'], named: [], seen: [] },
       plan: { title: 'The Test Matter', question: 'q', answer: 'a', cast, episodes: [ep(1, ['p1']), ep(2, ['p3'])], showdown: ep(3, ['cX', o.returning ? 'lore-old' : 'p2']), options: [] },
@@ -58,7 +58,7 @@ describe('met-cast persistence (LORE §1 story NPCs)', () => {
     expect(g.state.lore.edges.every(e => e.salience <= 0.6 && !e.core)).toBe(true);   // decays, never pinned
   });
 
-  it("a soldier's own saga (the soldier whose deed it was is the focal): a line shows once on their sheet, never under both ties", () => {
+  it("a soldier's own chapter (the soldier whose deed it was is the focal): a line shows once on their sheet, never under both ties", () => {
     const { g, soldier, persist } = game(1);
     g.ensureLoreNode(soldier);
     const c = fakeChain(soldier.name);

@@ -1,12 +1,12 @@
 // Soak the lead-bonus paths that a short run never reaches: leads EARNED with a band, banded
-// leads going COLD, a banded lead opening a SAGA, and whether bonuses drift over a long game.
+// leads going COLD, a banded lead opening a CHAPTER, and whether bonuses drift over a long game.
 import { Game } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
 import { leadBand, expectedSlots } from '../src/engine/quests.js';
 import { vBase, RARITY_MULT } from '../src/engine/economy.js';
 const ratios: number[] = [];
 
-const seen = { earned: 0, cold: 0, saga: 0, pursued: 0 };
+const seen = { earned: 0, cold: 0, chapter: 0, pursued: 0 };
 const bands = [0, 0, 0, 0, 0];      // pursued
 const granted = [0, 0, 0, 0, 0];    // every lead the game handed out
 const lines: string[] = [];
@@ -18,7 +18,7 @@ for (const seed of [3, 17, 55, 108, 900]) {
     for (const l of [...g.visibleLeads()]) {
       if (g.state.quests.filter(q => q.state === 'open').length >= 3) break;
       const b = leadBand(l);
-      if (b.band) { seen.pursued++; bands[b.band]!++; if (l.chainInfo.kind === 'starts-new') seen.saga++ }
+      if (b.band) { seen.pursued++; bands[b.band]!++; if (l.chainInfo.kind === 'starts-new') seen.chapter++ }
       await g.pursue(l.id);
     }
     g.autoAssignAll();
@@ -41,7 +41,7 @@ for (const seed of [3, 17, 55, 108, 900]) {
     if ((l.bonus ?? 0) > 100000) lines.push(`  !! ABSURD bonus on ${l.id}: ${l.bonus}`);
   }
 }
-console.log(`earned messages ${seen.earned} · cold messages ${seen.cold} · banded leads pursued ${seen.pursued} (${seen.saga} of them sagas)`);
+console.log(`earned messages ${seen.earned} · cold messages ${seen.cold} · banded leads pursued ${seen.pursued} (${seen.chapter} of them chapters)`);
 console.log(`bands pursued: 1★ ${bands[1]} · 2★ ${bands[2]} · 3★ ${bands[3]} · 4★ ${bands[4]}`);
 const gt = granted.reduce((a, b) => a + b, 0), gb = granted.slice(1).reduce((a, b) => a + b, 0);
 console.log(`EVERY lead the game handed out (${gt}): unbanded ${granted[0]} · 1★ ${granted[1]} · 2★ ${granted[2]} · 3★ ${granted[3]} · 4★ ${granted[4]}`);

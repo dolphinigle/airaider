@@ -1,6 +1,6 @@
-// Plain words for a card's tags (docs/STORYTELLER.md §2.4.2) — what the saga storyteller's calls say about a person:
-// their race, sex, a trait or two and a trade, never the engine's tag ids. Ported line for line from the saga lab at
-// tag `storyteller-build-src` (scripts/sagalab/v4lab.ts, R5): the shipped text is the text that was measured.
+// Plain words for a card's tags (docs/STORYTELLER.md §2.4.2) — what the chapter storyteller's calls say about a person:
+// their race, sex, a trait or two and a trade, never the engine's tag ids. Ported line for line from the chapter lab at
+// tag `storyteller-build-src` (scripts/chapterlab/v4lab.ts, R5): the shipped text is the text that was measured.
 // Pure.
 
 import { CONCEPT } from './tags.js';
@@ -36,15 +36,15 @@ export function plainWords(c: Card, n: number): string[] {
 export const backgroundOf = (c: Card) => c.tags.map(t => BACKGROUND_WORD[t.concept]).find(Boolean);
 export const topSkill = (c: Card) => [...c.tags].filter(t => groupOfTag(t.concept) === 'skill' && SKILL_NOUN[t.concept])
   .sort((a, b) => (b.tier ?? 1) - (a.tier ?? 1))[0]?.concept;
-/** a soldier's trade, ONE source for every call: the plan's cast entry for a personal saga's soldier and every
+/** a soldier's trade, ONE source for every call: the plan's cast entry for a personal chapter's soldier and every
  *  report's `soldiers[].is` (they named the same soldier "wanderer" and "a cook"). The top skill's noun, else the
  *  background word */
 export const soldierTrade = (c: Card) => { const s = topSkill(c); return s ? SKILL_NOUN[s]!.replace(/^an? /, '') : backgroundOf(c) ?? 'wanderer' };
-/** a soldier's race and sex alone: "a human man" — (saga pipe arm clean) a report's soldier who does not decide the job: every
+/** a soldier's race and sex alone: "a human man" — (chapter pipe arm clean) a report's soldier who does not decide the job: every
  *  soldier's traits and trade on every report were each acted out every time ("Malene talked low…" in three reports) */
 export const soldierKind = (c: Card): string => an(`${RACE_WORD[raceOf(c)] ?? raceOf(c)} ${manWoman(sexOf(c))}`);
 /** a soldier as the report meets them: "a human man, hot-headed, a brawler" (§2.9.3); `trait` in place of the card's first
- *  word (saga pipe arm past+trait: the trait the plan was dealt to test) */
+ *  word (chapter pipe arm past+trait: the trait the plan was dealt to test) */
 export function soldierIs(c: Card, trait?: string): string {
   const w = trait ?? plainWords(c, 1)[0];
   return [an(`${RACE_WORD[raceOf(c)] ?? raceOf(c)} ${manWoman(sexOf(c))}`), w, an(soldierTrade(c))].filter(Boolean).join(', ');
@@ -56,9 +56,9 @@ export const tradeOf = (c: Card) => { const s = topSkill(c); return backgroundOf
  *  race, the list was copied whole into the label the plan builds from race and trade ("thin, slow-witted human hunter"),
  *  and the comma cut left "thin" */
 export const traitsOf = (c: Card) => plainWords(c, 2).join(', ') || undefined;
-/** (saga pipe arm past+trait, CBT) what a NEXT personal saga may test in its soldier: their personality traits as plain words
+/** (chapter pipe arm past+trait, CBT) what a NEXT personal chapter may test in its soldier: their personality traits as plain words
  *  (all of them, not only the two a cast entry shows) and their quirks, both as the card has them; with neither, their body
- *  and standing words. One is DEALT (sagaflow deal: `world.tests`), so the matter tests something the player can see on the
+ *  and standing words. One is DEALT (chapterflow deal: `world.tests`), so the matter tests something the player can see on the
  *  card — never a flaw the plan invents (a plan asked for a past wrote the premise again: round H's HP) */
 export function testedTraits(c: Card): string[] {
   const mind = c.tags.filter(t => groupOfTag(t.concept) === 'personality').map(t => TRAIT_WORD[t.concept]).filter((w): w is string => !!w);

@@ -1,7 +1,7 @@
 // The recurring personal arc (docs/STORYTELLER.md North Star 0, designer 2026-10-05; STORY_ENGINE §4, §8): the bounded
-// LIVING DOSSIER (engine/dossier.ts) refreshed as sagas close, chain B, C… offered after a settled personal saga and a
+// LIVING DOSSIER (engine/dossier.ts) refreshed as chapters close, chain B, C… offered after a settled personal chapter and a
 // cooldown, seeded from the dossier with a DEALT situation as its new matter (the `next` lines; the settled wrong is kept on the
-// world as the chain-B marker, never sent — handed it, 8 of 8 real chain Bs retold it; a first personal saga's prompts are
+// world as the chain-B marker, never sent — handed it, 8 of 8 real chain Bs retold it; a first personal chapter's prompts are
 // untouched; the log-only lint reads the change against the Now). Plus round H's two default-path changes: the partial's cost as ONE phrase naming its
 // owner (`owncost`, the game's pipes), and RFA (RF part (a) alone on TC).
 import { describe, it, expect } from 'vitest';
@@ -9,17 +9,17 @@ import { Game, PERSONAL_CHAPTER_COOLDOWN } from '../src/game/game.js';
 import { seedIdCounter, type Card } from '../src/engine/cards.js';
 import type { Chain } from '../src/engine/chains.js';
 import { composeLiving, livingLines, livingSeed, historyOf, nowOf, unnamed, LIVING_MAX_LINES, type LifeMark } from '../src/engine/dossier.js';
-import { piped, partOf, castSaga, GAME_PIPE, COSTS, RETURNER_PART, type Cost, type Face } from '../src/engine/saga.js';
+import { piped, partOf, castChapter, GAME_PIPE, COSTS, RETURNER_PART, type Cost, type Face } from '../src/engine/chapter.js';
 import { Rng } from '../src/engine/rng.js';
 import { testedTraits, traitsOf } from '../src/engine/plainwords.js';
 import { costPhrase, reportPayload, changeNowShare, CHANGE_NOW_SHARE, standing } from '../src/ai/storyteller.js';
-import { standsFact } from '../src/game/sagaflow.js';
-import type { SagaPlan, Episode } from '../src/engine/saga.js';
-import { renderSaga } from '../src/ai/prompts/saga/render.js';
+import { standsFact } from '../src/game/chapterflow.js';
+import type { ChapterPlan, Episode } from '../src/engine/chapter.js';
+import { renderChapter } from '../src/ai/prompts/chapter/render.js';
 import { render } from '../cli/format.js';
-import { newGame, sagaChain, playSaga } from './sagaharness.js';
+import { newGame, chapterChain, playChapter } from './chapterharness.js';
 
-const marks = (n: number): LifeMark[] => Array.from({ length: n }, (_, i) => ({ title: `Saga ${n - i}`, kind: i % 2 ? 'deed' : 'hurt', text: `The company did thing ${n - i}.`, band: 'light' }));
+const marks = (n: number): LifeMark[] => Array.from({ length: n }, (_, i) => ({ title: `Chapter ${n - i}`, kind: i % 2 ? 'deed' : 'hurt', text: `The company did thing ${n - i}.`, band: 'light' }));
 
 describe('the living dossier: bounded, engine-composed', () => {
   it('now is the last change without its title frame, else their card line', () => {
@@ -41,10 +41,10 @@ describe('the living dossier: bounded, engine-composed', () => {
     }
     const d = composeLiving({ name: 'Burl Ash', marks: marks(9), people, cycle: 9 })!;
     expect(d.earlier).toBeTruthy();
-    expect(livingLines(d).filter(l => l.startsWith('- '))[0]).toBe('- Saga 9: The company did thing 9 — Burl was hurt (light).');
+    expect(livingLines(d).filter(l => l.startsWith('- '))[0]).toBe('- Chapter 9: The company did thing 9 — Burl was hurt (light).');
     expect(livingLines(d).at(-1)).toBe('People: P1, elf trader — a rival; P2, elf trader — a rival.');
   });
-  it('the next chapter\'s seed names only the person the saga seats; history is the settled past', () => {
+  it('the next chapter\'s seed names only the person the chapter seats; history is the settled past', () => {
     const d = composeLiving({ name: 'Burl', who: 'x', marks: marks(1), people: [{ id: 'a', name: 'Ann', label: 'potter', tie: 'saved-by' }, { id: 'b', name: 'Bo', label: 'smith', tie: 'rival-of' }], cycle: 1 })!;
     expect(livingSeed(d)).not.toContain('People');
     expect(livingSeed(d, 'b')).toContain('People: Bo, smith — a rival.');
@@ -53,27 +53,27 @@ describe('the living dossier: bounded, engine-composed', () => {
     expect(historyOf([{ seed: 'old seed', line: 'l' }])).toBe('old seed');
     expect(historyOf([])).toBeUndefined();
   });
-  it('a hired saga a soldier decided a job in marks their dossier when it closes (both UIs print the same lines)', async () => {
+  it('a hired chapter a soldier decided a job in marks their dossier when it closes (both UIs print the same lines)', async () => {
     seedIdCounter(1);
     const { g } = newGame(21);
-    const { chain, focal } = sagaChain(g, { N: 3, personal: false });
-    await playSaga(g, chain, 'clean', focal, undefined, { pipeArm: () => GAME_PIPE.other });
-    const line = chain.saga!.lines[0]!;
+    const { chain, focal } = chapterChain(g, { N: 3, personal: false });
+    await playChapter(g, chain, 'clean', focal, undefined, { pipeArm: () => GAME_PIPE.other });
+    const line = chain.chapter!.lines[0]!;
     const doer = g.roster()[0]!;
     line.decides = doer.name;
-    (g as unknown as { sagaClosed(c: Chain): void }).sagaClosed(chain);
+    (g as unknown as { chapterClosed(c: Chain): void }).chapterClosed(chain);
     expect(chain.endedCycle).toBe(g.state.cycle);
     const lines = g.livingLines(doer.id);
-    expect(lines.some(l => l.startsWith(`- ${chain.saga!.plan!.title}: `) && l.includes(`${doer.name.split(' ')[0]} decided it.`))).toBe(true);
+    expect(lines.some(l => l.startsWith(`- ${chain.chapter!.plan!.title}: `) && l.includes(`${doer.name.split(' ')[0]} decided it.`))).toBe(true);
     expect(render.merc(g, doer.id)).toContain(`story so far:\n${lines.map(l => `  ${l}`).join('\n')}`);
-    // a soldier the saga never marked gets none
-    const other = g.roster().find(m => m.id !== doer.id && !chain.saga!.lines.some(l => l.decides === m.name || l.hurt.some(h => h.name === m.name)));
+    // a soldier the chapter never marked gets none
+    const other = g.roster().find(m => m.id !== doer.id && !chain.chapter!.lines.some(l => l.decides === m.name || l.hurt.some(h => h.name === m.name)));
     if (other) expect(g.livingLines(other.id)).toEqual([]);
   });
 });
 
 describe('chain B, C…: the next chapter', () => {
-  /** a roster of three, roster[0] with one settled personal saga that changed them, ended at cycle 4 */
+  /** a roster of three, roster[0] with one settled personal chapter that changed them, ended at cycle 4 */
   function settled(): { g: Game; merc: Card; chain: Chain } {
     seedIdCounter(1);
     const { g } = newGame(31);
@@ -85,7 +85,7 @@ describe('chain B, C…: the next chapter', () => {
     merc.character!.grown = [{ seed: 'he left a friend to drown', past: 'He left a friend to drown at the spring fair. He still hears it.', line: 'After The Drowning: he dives in now.', title: 'The Drowning', chainId: 'ch-a', cycle: 4 }];
     return { g, merc, chain };
   }
-  /** every other soldier storied too: a personal saga that slipped (no next chapter for them) */
+  /** every other soldier storied too: a personal chapter that slipped (no next chapter for them) */
   function othersStoried(g: Game, chain: Chain): void {
     for (const m of g.roster().slice(1)) g.state.chains.push({ ...chain, id: `ch-${m.id}`, focalId: m.id, state: 'slipped' });
   }
@@ -106,21 +106,21 @@ describe('chain B, C…: the next chapter', () => {
     drip(g);
     expect(g.state.leads.filter(l => l.source === 'personal')).toHaveLength(1);
   });
-  it('a soldier who never had a personal saga goes first; a slipped or unchanged last saga gives no next chapter', () => {
+  it('a soldier who never had a personal chapter goes first; a slipped or unchanged last chapter gives no next chapter', () => {
     const { g, merc, chain } = settled();
     g.rng.chance = () => true;
     g.state.cycle = 30;
     // roster[1] never had one: theirs comes first
     drip(g);
     expect(g.state.leads.find(l => l.source === 'personal')!.personalMercId).toBe(g.roster()[1]!.id);
-    // with every soldier storied: a slipped last saga, or one that wrote no change, leads nowhere
+    // with every soldier storied: a slipped last chapter, or one that wrote no change, leads nowhere
     g.state.leads = [];
     othersStoried(g, chain);
     chain.state = 'slipped';
     drip(g);
     expect(g.state.leads.some(l => l.source === 'personal')).toBe(false);
     chain.state = 'done';
-    merc.character!.grown![0]!.chainId = 'some-older-saga';
+    merc.character!.grown![0]!.chainId = 'some-older-chapter';
     drip(g);
     expect(g.state.leads.some(l => l.source === 'personal')).toBe(false);
     merc.character!.grown![0]!.chainId = 'ch-a';
@@ -129,10 +129,10 @@ describe('chain B, C…: the next chapter', () => {
   });
 });
 
-describe('the next chapter\'s prompts: gated, a first personal saga byte-identical', () => {
+describe('the next chapter\'s prompts: gated, a first personal chapter byte-identical', () => {
   const base = ['types', 'personal', 'keywords', 'support', 'grafts', 'past'];
   it('the plan: the dealt situation as the seed, who they became beside it (now), a new event as the past — only with next', () => {
-    const a = renderSaga('plan', base), b = renderSaga('plan', [...base, 'next']);
+    const a = renderChapter('plan', base), b = renderChapter('plan', [...base, 'next']);
     expect(a).toContain("The story is the past of the company's mercenary in cast");
     expect(a).toContain("- seed: the mercenary's old wrong, which past retells.");
     expect(a).toContain('- ending: whose old matter the showdown settles.');
@@ -143,17 +143,17 @@ describe('the next chapter\'s prompts: gated, a first personal saga byte-identic
     expect(b).toContain('- ending: whose matter the showdown settles.');
     expect(b).toContain('past: two plain sentences: a new event, at what season, that draws who they became into the matter.');
     // the seed is the new matter, so the cast line's "the seed's people" are its people, never the settled chapter's
-    expect(renderSaga('plan', [...base.filter(f => f !== 'support'), 'next'])).toContain("Use them all as the seed's people");
+    expect(renderChapter('plan', [...base.filter(f => f !== 'support'), 'next'])).toContain("Use them all as the seed's people");
     expect(b).not.toMatch(/old wrong|history|situation/);
   });
   it('card 1 and the pick', () => {
-    expect(renderSaga('card', ['first', 'personal', 'past'], { MAX: 90 })).toContain('past: their old wrong, told plainly, nothing added.');
-    expect(renderSaga('card', ['first', 'personal', 'past', 'next'], { MAX: 90 })).toContain('past: their new matter, told plainly, nothing added.');
-    expect(renderSaga('pick', ['personal'])).toContain("- past: a company mercenary's old wrong, the story's root.");
-    expect(renderSaga('pick', ['personal'])).not.toMatch(/now:|the mercenary,/);
-    expect(renderSaga('pick', ['next'])).toContain('- situation: what the story is about.\n- now: who the company mercenary at its heart is now.');
-    expect(renderSaga('pick', ['next'])).toContain('best fit the situation, the mercenary, the tone and the cast');
-    expect(renderSaga('pick', ['next'])).not.toContain('old wrong');
+    expect(renderChapter('card', ['first', 'personal', 'past'], { MAX: 90 })).toContain('past: their old wrong, told plainly, nothing added.');
+    expect(renderChapter('card', ['first', 'personal', 'past', 'next'], { MAX: 90 })).toContain('past: their new matter, told plainly, nothing added.');
+    expect(renderChapter('pick', ['personal'])).toContain("- past: a company mercenary's old wrong, the story's root.");
+    expect(renderChapter('pick', ['personal'])).not.toMatch(/now:|the mercenary,/);
+    expect(renderChapter('pick', ['next'])).toContain('- situation: what the story is about.\n- now: who the company mercenary at its heart is now.');
+    expect(renderChapter('pick', ['next'])).toContain('best fit the situation, the mercenary, the tone and the cast');
+    expect(renderChapter('pick', ['next'])).not.toContain('old wrong');
   });
 });
 
@@ -172,8 +172,8 @@ describe('the cost fix (round H §5): one phrase naming its owner, in the game\'
     for (const pipe of ['voice', 'past', 'grafts', 'voice+stands'] as const) for (const seed of [21, 22, 23, 24, 25, 26]) {
       seedIdCounter(1);
       const { g, ai } = newGame(seed);
-      const { chain, focal } = sagaChain(g, { N: 3, personal: pipe === 'past' });
-      await playSaga(g, chain, pipe === 'past' ? 'personal' : 'bumpy', focal, undefined, { pipeArm: () => pipe });
+      const { chain, focal } = chapterChain(g, { N: 3, personal: pipe === 'past' });
+      await playChapter(g, chain, pipe === 'past' ? 'personal' : 'bumpy', focal, undefined, { pipeArm: () => pipe });
       const withCost = ai.calls.filter(c => c.template === 'report' && c.payload.cost !== undefined);
       for (const c of withCost) { const t = typeof c.payload.cost as 'string' | 'object'; seen[t]++; expect(t, pipe).toBe(piped({ pipe }, 'owncost') ? 'string' : 'object') }
     }
@@ -191,8 +191,8 @@ describe('RFA: RF part (a) alone, on TC', () => {
   it('a failed middle job\'s report is dealt that the job still stands; the retry keeps TC\'s card (why, trouble) and report (hope)', async () => {
     seedIdCounter(1);
     const { g, ai } = newGame(21);
-    const { chain, focal } = sagaChain(g, { N: 4, personal: false });
-    await playSaga(g, chain, 'bumpy', focal, undefined, { pipeArm: () => 'voice+stands' });
+    const { chain, focal } = chapterChain(g, { N: 4, personal: false });
+    await playChapter(g, chain, 'bumpy', focal, undefined, { pipeArm: () => 'voice+stands' });
     const reports = ai.calls.filter(c => c.template === 'report');
     const failed = reports.filter(c => c.flags.includes('failure'));
     expect(failed.length).toBeGreaterThan(0);
@@ -209,7 +209,7 @@ describe('RFA: RF part (a) alone, on TC', () => {
 });
 
 describe('the next chapter\'s now: who they became, no settled chapter, no stranger', () => {
-  it('the Now alone (a saga\'s people by label), and the People line only for the one seated; the sheet keeps it all', () => {
+  it('the Now alone (a chapter\'s people by label), and the People line only for the one seated; the sheet keeps it all', () => {
     const people = [{ name: 'Azareth Vell', label: 'elf moneylender' }, { name: 'Aeta', label: 'a wolfkin potter' }];
     expect(unnamed("Azareth Vell tore the note. Azareth's ledger lay open, and Aeta smiled.", people)).toBe("The elf moneylender tore the note. The elf moneylender's ledger lay open, and the wolfkin potter smiled.");
     expect(unnamed('The company talked Azareth round.', people)).toBe('The company talked the elf moneylender round.');
@@ -229,19 +229,19 @@ describe('the next chapter: a dealt matter, the settled wrong never sent', () =>
   it('the deal adds a situation only to a next chapter; the plan and pick get the dossier, the situation, and no history; the retelling lint reads it', async () => {
     seedIdCounter(1);
     const { g, ai } = newGame(21);
-    const { chain, focal } = sagaChain(g, { N: 3, personal: true });
+    const { chain, focal } = chapterChain(g, { N: 3, personal: true });
     const history = 'At the spring fair Ismenios left his friend to drown. He still hears the bell.';
-    await playSaga(g, chain, 'personal', focal, undefined, { pipeArm: () => 'past' });
+    await playChapter(g, chain, 'personal', focal, undefined, { pipeArm: () => 'past' });
     const first = ai.calls.find(c => c.template === 'plan')!;
     expect(first.flags).not.toContain('next');
     // chain B: the same soldier, the dossier as the seed and the settled past as history (as game.ts deals it)
     seedIdCounter(1);
     const b = newGame(21);
-    const cb = sagaChain(b.g, { N: 3, personal: true });
-    const host = { ...(await import('./sagaharness.js')).hostFor(b.g), pipeArm: () => 'past' as const };
-    const flow = await import('../src/game/sagaflow.js');
+    const cb = chapterChain(b.g, { N: 3, personal: true });
+    const host = { ...(await import('./chapterharness.js')).hostFor(b.g), pipeArm: () => 'past' as const };
+    const flow = await import('../src/game/chapterflow.js');
     flow.deal(host, cb.chain, undefined, cb.focal, { personalSeed: 'Ismenios dives in now.', history });
-    const w = cb.chain.saga!.world;
+    const w = cb.chain.chapter!.world;
     expect(w.history).toBe(history);
     expect(w.kit!.situations).toHaveLength(1);
     await flow.plan(host, cb.chain);
@@ -255,7 +255,7 @@ describe('the next chapter: a dealt matter, the settled wrong never sent', () =>
     for (const c of b.ai.calls) expect(JSON.stringify(c.payload)).not.toContain('left his friend to drown');
     // the floor (the plan the game falls back to) plays the dealt matter too, never the settled wrong: its past is the new
     // event, its change no echo of the old one, its showdown settles the situation's stake
-    const p = cb.chain.saga!.plan!;
+    const p = cb.chain.chapter!.plan!;
     const soldier = p.cast.find(c => c.seat === 'soldier')!;
     expect(soldier.past).toContain(w.kit!.picked?.situation ?? w.kit!.situations[0]!);
     for (const t of [soldier.past, soldier.change, p.question, p.answer, p.showdown.settles]) expect(t).not.toMatch(/old wrong|run(ning)? from/);
@@ -286,9 +286,9 @@ describe('chain B\'s inputs (CBR, CBT; lab arms): the Now to no call, the event,
   async function chainB(pipe: 'past' | 'past+return' | 'past+trait', seat?: Face & { rival: boolean }) {
     seedIdCounter(1);
     const { g, ai } = newGame(21);
-    const { chain, focal } = sagaChain(g, { N: 3, personal: true });
-    const p = await playSaga(g, chain, 'personal', focal, undefined, { pipeArm: () => pipe }, { personalSeed: now, history, ...(seat ? { seedPerson: seat } : {}) });
-    return { g, ai, chain, focal, p, w: chain.saga!.world };
+    const { chain, focal } = chapterChain(g, { N: 3, personal: true });
+    const p = await playChapter(g, chain, 'personal', focal, undefined, { pipeArm: () => pipe }, { personalSeed: now, history, ...(seat ? { seedPerson: seat } : {}) });
+    return { g, ai, chain, focal, p, w: chain.chapter!.world };
   }
   const face: Face & { rival: boolean } = { id: 'lore-9', name: 'Aeta Nightrunner', sex: 'female', race: 'wolfman', trade: 'potter', memory: 'The company won over the moneylender, and Ismenios carried the potter home.', where: 'in the Western Forests', rival: false };
   it('the deal is CB\'s own; CBT adds the trait it tests, drawn after it, from the soldier\'s card', async () => {
@@ -309,19 +309,19 @@ describe('chain B\'s inputs (CBR, CBT; lab arms): the Now to no call, the event,
     expect(me.traits!.split(', ').length).toBeLessThanOrEqual(2);
     expect(cb.w.cast.find(c => c.seat === 'soldier')!.traits).toBe(traitsOf(cb.focal));
   });
-  it('a situation that takes "someone" deals a person to fill it, after every other draw; never on a hired saga or a filled seat', () => {
+  it('a situation that takes "someone" deals a person to fill it, after every other draw; never on a hired chapter or a filled seat', () => {
     seedIdCounter(1);
     const { g } = newGame(9);
-    const { focal, chain } = sagaChain(g, { N: 3, personal: true });
+    const { focal, chain } = chapterChain(g, { N: 3, personal: true });
     const base = { focal, personal: true, region: chain.region, shape: 'heist' as const, taken: () => false };
-    const bare = castSaga(new Rng(5), base), filled = castSaga(new Rng(5), { ...base, someone: true });
+    const bare = castChapter(new Rng(5), base), filled = castChapter(new Rng(5), { ...base, someone: true });
     expect(filled.places).toEqual(bare.places);
     expect(filled.cast.slice(0, bare.cast.length)).toEqual(bare.cast);
     expect(filled.cast).toHaveLength(bare.cast.length + 1);
     expect(filled.cast.at(-1)).toMatchObject({ seat: 'support', part: '' });
-    expect(castSaga(new Rng(5), { ...base, someone: true, kit: { support: 1 } }).cast.filter(c => c.seat === 'support')).toHaveLength(1);
-    expect(castSaga(new Rng(5), { ...base, someone: true, seedPerson: { ...face, rival: false } }).cast.filter(c => c.seat === 'support')).toHaveLength(0);
-    expect(castSaga(new Rng(5), { ...base, personal: false, someone: true }).cast.filter(c => c.seat === 'support')).toHaveLength(0);
+    expect(castChapter(new Rng(5), { ...base, someone: true, kit: { support: 1 } }).cast.filter(c => c.seat === 'support')).toHaveLength(1);
+    expect(castChapter(new Rng(5), { ...base, someone: true, seedPerson: { ...face, rival: false } }).cast.filter(c => c.seat === 'support')).toHaveLength(0);
+    expect(castChapter(new Rng(5), { ...base, personal: false, someone: true }).cast.filter(c => c.seat === 'support')).toHaveLength(0);
   });
   it('the plan and the pick never get the Now; the plan gets the soldier\'s event (and CBT its trait); CB keeps its own', async () => {
     const cb = await chainB('past');
@@ -335,13 +335,13 @@ describe('chain B\'s inputs (CBR, CBT; lab arms): the Now to no call, the event,
       expect(plan.flags.includes('tests')).toBe(pipe === 'past+trait');
       expect(plan.payload.tests).toBe(pipe === 'past+trait' ? w.tests : undefined);
       for (const c of [pick, plan]) expect(JSON.stringify(c.payload)).not.toContain('dives in');
-      const sys = renderSaga('plan', plan.flags);
+      const sys = renderChapter('plan', plan.flags);
       expect(sys).toContain('event: two plain sentences: what just happened, at what season, that pulls the mercenary in.');
       expect(sys).toContain('"event": "two sentences"');
       expect(sys).not.toMatch(/now:|"past"|past:|who they became/);
       expect(sys.includes('tests: the mercenary\'s trait it puts to the test.')).toBe(pipe === 'past+trait');
       // the plan's event is the matter card 1 tells (kept where a past is)
-      expect(chain.saga!.plan!.cast.find(c => c.seat === 'soldier')!.past).toMatch(/^This season at /);
+      expect(chain.chapter!.plan!.cast.find(c => c.seat === 'soldier')!.past).toMatch(/^This season at /);
       for (const c of ai.calls) expect(JSON.stringify(c.payload)).not.toContain('left his friend to drown');
     }
   });
@@ -354,7 +354,7 @@ describe('chain B\'s inputs (CBR, CBT; lab arms): the Now to no call, the event,
     expect(premise.now).toBeUndefined();
     expect(premise.event).toMatch(/^This season at /);
     expect(premise.past).toBeUndefined();
-    expect(renderSaga('card', card1.flags, card1.vars)).toContain('who: one of your own mercenaries. wants: what they want. event: what just drew them in.');
+    expect(renderChapter('card', card1.flags, card1.vars)).toContain('who: one of your own mercenaries. wants: what they want. event: what just drew them in.');
     expect(card1.vars.MAX).toBe(90);
     for (const c of ai.calls) expect(JSON.stringify(c.payload)).not.toContain('dives in');
     const reports = ai.calls.filter(c => c.template === 'report');
@@ -366,8 +366,8 @@ describe('chain B\'s inputs (CBR, CBT; lab arms): the Now to no call, the event,
       expect(own.became).toBeUndefined();
       expect(r.flags).toContain('next');
       expect(r.flags).not.toContain('now');
-      expect(renderSaga('report', r.flags, r.vars)).toContain('Name no mercenary but the one whose story this is');
-      expect(renderSaga('report', r.flags, r.vars)).toContain('- soldiers: who went, what each is like.');
+      expect(renderChapter('report', r.flags, r.vars)).toContain('Name no mercenary but the one whose story this is');
+      expect(renderChapter('report', r.flags, r.vars)).toContain('- soldiers: who went, what each is like.');
     }
     // the default's chain B (CB) is untouched: whose past this story is, and no became
     const cb = await chainB('past');
@@ -399,7 +399,7 @@ describe('chain B\'s inputs (CBR, CBT; lab arms): the Now to no call, the event,
   it('the change-vs-Now lint runs on every chain B (the plan never saw the Now on CBR/CBT)', async () => {
     for (const pipe of ['past', 'past+trait'] as const) {
       const { chain, w } = await chainB(pipe);
-      expect(changeNowShare(chain.saga!.plan!, w)).toBeTypeOf('number');
+      expect(changeNowShare(chain.chapter!.plan!, w)).toBeTypeOf('number');
     }
   });
 });
@@ -415,7 +415,7 @@ describe('testedTraits: what a next chapter may test', () => {
 
 describe('RFW: RFA with its fact widened', () => {
   it('what stands, by name: the job\'s people (but the soldiers sent), then its place as the job says it', () => {
-    const plan = { cast: [{ id: 'p1', name: 'Eraldil', label: 'elf horse-breeder', seat: 'client', sex: 'female', race: 'elf' }, { id: 'p2', name: 'Eussorus', label: 'human merchant', seat: 'support', sex: 'male', race: 'human' }] } as unknown as SagaPlan;
+    const plan = { cast: [{ id: 'p1', name: 'Eraldil', label: 'elf horse-breeder', seat: 'client', sex: 'female', race: 'elf' }, { id: 'p2', name: 'Eussorus', label: 'human merchant', seat: 'support', sex: 'male', race: 'human' }] } as unknown as ChapterPlan;
     const e = { job: 'Drive off the raiders creeping toward the barn at Greydale', people: ['p1', 'p2'], trouble: { who: 'raiders on stolen horses', carry: 'clubs', will: '' } } as unknown as Episode;
     const xs = standing(plan, e, [], ['Greydale', 'Thornholt', 'Ashby']);
     expect(xs).toEqual(['Eraldil', 'Eussorus', 'the barn at Greydale']);
@@ -433,8 +433,8 @@ describe('RFW: RFA with its fact widened', () => {
     for (const pipe of ['voice+reach', 'voice+stands'] as const) {
       seedIdCounter(1);
       const { g, ai } = newGame(21);
-      const { chain, focal } = sagaChain(g, { N: 4, personal: false });
-      await playSaga(g, chain, 'bumpy', focal, undefined, { pipeArm: () => pipe });
+      const { chain, focal } = chapterChain(g, { N: 4, personal: false });
+      await playChapter(g, chain, 'bumpy', focal, undefined, { pipeArm: () => pipe });
       const failed = ai.calls.filter(c => c.template === 'report' && c.flags.includes('failure'));
       expect(failed.length).toBeGreaterThan(0);
       for (const c of failed) {

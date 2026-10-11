@@ -1,9 +1,9 @@
-// Saga theme seeds — docs/STORYTELLER.md §D (designer 2026-10-01): the plan call takes a DEALT seed
+// Chapter theme seeds — docs/STORYTELLER.md §D (designer 2026-10-01): the plan call takes a DEALT seed
 // from day one, chosen through ONE dealer function. Repetition is fixed later by editing
 // data/themes.json (see data/THEMES.md) or this dealer — never by a prompt rule, never by a redesign.
 // Pure: the caller passes the rng (storyRng in play) and the ids it has dealt so far.
 //
-// Phase 1: lab-only (scripts/sagalab/probe.ts). Nothing in the game calls this yet.
+// Phase 1: lab-only (scripts/chapterlab/probe.ts). Nothing in the game calls this yet.
 
 import type { Rng } from './rng.js';
 import raw from './data/themes.json';

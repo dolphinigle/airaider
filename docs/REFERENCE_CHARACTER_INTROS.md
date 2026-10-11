@@ -186,7 +186,7 @@ Consistent across all 22. Mahir is the long end at four.
 
 ## WHAT THIS SAYS ABOUT OUR PROBLEM (`PLAYTEST_NOTES` N2)
 
-Our saga cards fail because they are asked to do a job Sultan's Game never asks of a quest: introduce
+Our chapter cards fail because they are asked to do a job Sultan's Game never asks of a quest: introduce
 strangers **and** set a task, in one card, in ~60 words. Sultan pays for its clean quest text with a
 separate character card and a role-epithet field.
 
@@ -195,5 +195,5 @@ Three options follow, and they are a design choice, not a prompt fix:
 - **A.** Give people a card of their own — closest to the reference, biggest build.
 - **B.** Give every cast member a ROLE-EPITHET the engine deals and the card must use on first
   mention ("the reeve", "the wandering healer"), so placing costs a phrase instead of a sentence.
-- **C.** Name nobody the player has not met — the one-off ruling extended to sagas. Cheapest, and it
+- **C.** Name nobody the player has not met — the one-off ruling extended to chapters. Cheapest, and it
   makes the first card readable, but it gives up the recurring-name texture Sultan gets for free.

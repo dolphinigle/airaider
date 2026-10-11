@@ -345,7 +345,7 @@ export function MapScreen({ s, doAct, quick, queueAct, openQuest, drag, setDrag,
           const target = !!drag && dropOn === q.id;
           const fresh = isNew(q);
           return (
-            <div key={q.id} className={'mk' + (hover === q.id && !drag ? ' hot' : '') + (target ? ' drop' : '') + (q.chainId ? ' is-saga' : '')
+            <div key={q.id} className={'mk' + (hover === q.id && !drag ? ' hot' : '') + (target ? ' drop' : '') + (q.chainId ? ' is-chapter' : '')
               + (drag && !fit ? ' dim' : '') + (fresh ? ' arrive' : '')}
               style={{ left: sp.x, top: sp.y }} data-q={q.id}
               onMouseEnter={() => setHover(q.id)} onMouseLeave={() => setHover(h => h === q.id ? null : h)}
@@ -442,13 +442,13 @@ function QuestList({ s, doAct, open, hover, setHover, isNew, pops, goFort, toLea
     <div className="boardhead"><button className="btn solid" onClick={goFort}>Go to the fort</button></div></div>;
   if (!s.quests.length) return <div className="list"><p className="empty">No quests out. A lead becomes a quest once you pursue it.</p>
     {s.leads.length > 0 && <div className="boardhead"><button className="btn solid" onClick={toLeads}>To the leads ({s.leads.length}) →</button></div>}</div>;
-  const sagas = s.quests.filter((q: any) => q.chainId), jobs = s.quests.filter((q: any) => !q.chainId);
+  const chapters = s.quests.filter((q: any) => q.chainId), jobs = s.quests.filter((q: any) => !q.chainId);
   const row = (q: any) => {
     const choose = finaleOpen(q), ready = !choose && manned(q);
     const [text, tone] = statusOf(s, q);
     return (
       <div key={q.id} data-q={q.id} className={'row' + (hover === q.id ? ' hot' : '')} onMouseEnter={() => setHover(q.id)} onMouseLeave={() => setHover((h: string | null) => h === q.id ? null : h)}>
-        <span className={'g' + (q.chainId ? ' is-saga' : '')}><Glyph name={glyphOf(q.archetype, q.isFinale)} size={15} /></span>
+        <span className={'g' + (q.chainId ? ' is-chapter' : '')}><Glyph name={glyphOf(q.archetype, q.isFinale)} size={15} /></span>
         <button className="open" onClick={() => open(q.id)}>
           <span className="tt">{q.title}{isNew(q) && <span className="newmark">new</span>}</span>
           <span className="ss">
@@ -468,8 +468,8 @@ function QuestList({ s, doAct, open, hover, setHover, isNew, pops, goFort, toLea
     <>
       <div className="boardhead"><button className="btn solid" onClick={() => doAct('autoall')}>Auto-fill every quest</button></div>
       <div className="list">
-        {sagas.length > 0 && <div className="sec">Sagas</div>}
-        {sagas.map(row)}
+        {chapters.length > 0 && <div className="sec">Chapters</div>}
+        {chapters.map(row)}
         {jobs.length > 0 && <div className="sec">Jobs</div>}
         {jobs.map(row)}
       </div>
@@ -498,12 +498,12 @@ function LeadList({ s, queueAct, openQuest, fresh }: any) {
           const job = jobs.find(j => j.leadId === l.id && (j.state === 'queued' || j.state === 'running'));
           const working = job?.state ?? l.working;
           const cold = l.expires == null ? null : l.expires - s.cycle;
-          const saga = l.chain === 'starts-new' || l.chain === 'continues';
+          const chapter = l.chain === 'starts-new' || l.chain === 'continues';
           return (
             <div key={l.id} data-lead={l.id} className={'row lead' + (fresh.has(l.id) ? ' fresh' : '')}>
-              <span className={'g lead' + (saga ? ' is-saga' : '')}><Glyph name={glyphOf(l.archetype)} size={14} /></span>
+              <span className={'g lead' + (chapter ? ' is-chapter' : '')}><Glyph name={glyphOf(l.archetype)} size={14} /></span>
               <div>
-                <div className="tt">{leadLabel(l)}{l.chain === 'starts-new' ? <span className="badge2">new saga</span> : l.chain === 'continues' ? <span className="badge2">continues</span> : null}
+                <div className="tt">{leadLabel(l)}{l.chain === 'starts-new' ? <span className="badge2">new chapter</span> : l.chain === 'continues' ? <span className="badge2">continues</span> : null}
                   {fresh.has(l.id) && <span className="newmark">new</span>}</div>
                 <div className="ss">
                   <span style={{ color: RARITY[l.rarity] }}>{l.rarity}</span><span>L{l.level}</span><span>{l.region}</span>

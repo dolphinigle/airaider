@@ -31,7 +31,7 @@
 
 > 🛠 2026-07-10: hunt/investigate softened from always-relic to 65% relic / else gold or gold+lead —
 > with escort/raid relic chances on top, ~half of ALL one-offs read as fetch-the-object (readers'
-> premise-monotony consensus). Mid-saga beat side-loot may also roll a relic (35%), per QUESTS §6's
+> premise-monotony consensus). Mid-chapter beat side-loot may also roll a relic (35%), per QUESTS §6's
 > "gold/stackables/relics". Designer review pending.
 
 ---
@@ -66,13 +66,13 @@ Three things worth acting on, none yet acted on:
    pushes another, because it never checks whether the bundle already has one. Under §7.1 that is
    two separately-banded leads off one quest. The lottery's value should thicken the existing lead.
 
-**Leads are a ONE-OFF reward only** — every `kind: 'lead'` lives in `splitOneOff`. A saga beat pays
+**Leads are a ONE-OFF reward only** — every `kind: 'lead'` lives in `splitOneOff`. A chapter beat pays
 gold, or gold + a relic at 35%; a finale pays the bank. Correct as it stands: a chain already mints
 its own continuation lead, so loot-granting another would open an unrelated thread mid-story.
 
-### 6.1 What a SAGA actually pays — measured 2026-08-28 📏
+### 6.1 What a CHAPTER actually pays — measured 2026-08-28 📏
 
-A saga has no archetype split at all (`v3/scripts/_chainshape.ts`; level 3, party of 2, all beats
+A chapter has no archetype split at all (`v3/scripts/_chainshape.ts`; level 3, party of 2, all beats
 succeeding):
 
 | rarity | beats | payoff | focal mark | side-loot total | bank |
@@ -86,12 +86,12 @@ focal's *tag substance* — what they are good at, what they ransom for. What th
 **the bank**, and §2's value-invariance means the three finale dispositions pay the same total:
 cash-out is `round(bank)`; recruiting is the person (marked `focal.value`) plus `bank − focal.value`.
 
-So: **every saga is ABOUT a person (🔒 §2 story seed, gold-hoard sagas included), and none forces
+So: **every chapter is ABOUT a person (🔒 §2 story seed, gold-hoard chapters included), and none forces
 you to TAKE one.** `gold-hoard` as a kind only frames the bible.
 
-📏 **Side loot is nearly invisible while you play.** 15g a beat on a common saga against a beat that
+📏 **Side loot is nearly invisible while you play.** 15g a beat on a common chapter against a beat that
 banks 109 — ~14% of what the beat earns, and the only thing actually delivered before the finale.
-Mid-saga beats feel like they pay almost nothing because they nearly do. 🛠 If saga pacing ever feels
+Mid-chapter beats feel like they pay almost nothing because they nearly do. 🛠 If chapter pacing ever feels
 flat mid-story, `beatSideLoot`'s `0.2–0.5` band is the lever.
 
 ## 4. `generateCard(targetV, ceiling, required[])` 🔒 🛠
@@ -159,7 +159,7 @@ Because it enters *before* the split, it flows through `splitOneOff` naturally �
 lead yields a **better captive**, not merely more coin. Nothing in the AI's inputs changes: the
 writer sees the same `rewardEnvelope` shape it always did, so **this design touches no prompt.**
 
-For a saga lead (`chainInfo: starts-new`) the bonus is added to `chainPayoff` — the "quest" is the
+For a chapter lead (`chainInfo: starts-new`) the bonus is added to `chainPayoff` — the "quest" is the
 whole chain — so it surfaces as a better focal character at the finale rather than as coin today.
 
 **The bonus shares the reward's fate** (§5 🔒: fixed at birth, the roll only scales down): a partial
@@ -190,10 +190,10 @@ A mercenary's pay is the reader's own yardstick, and the register avoids collidi
 band's purse/chest/fortune — §7.2 took the same care over its rungs. Thresholds sit near
 `V_base(1)`, `V_base(4)`, `V_base(8)` and one stride past.
 
-**The DEFERRED reward is not banded — it is hidden.** A mid-saga beat used to close with
+**The DEFERRED reward is not banded — it is hidden.** A mid-chapter beat used to close with
 `~262g when it's done`, a straight projection of `chain.payoff`. That is the number the player is
 most not meant to hold: REWARD_BANK §5 sanctions showing only `bank` ("spoils so far") and
-PROMPT_RULES forbids surfacing banked-payoff text at all. A beat now says only that *the saga still
+PROMPT_RULES forbids surfacing banked-payoff text at all. A beat now says only that *the chapter still
 owes*, `chain.payoff` is not sent to the web client in the first place, and `bank` renders through
 the same band.
 
@@ -212,10 +212,10 @@ baseV(lead) = V_base(level) × rarityMult[rarity] × expectedSlots(archetype, ra
 band        = bonus ÷ baseV
 ```
 
-**The divisor is the quest this lead ACTUALLY opens.** A `starts-new` lead opens a saga, not a
-one-off, and a saga is worth two to five times as much — so pricing its bonus against a one-off
+**The divisor is the quest this lead ACTUALLY opens.** A `starts-new` lead opens a chapter, not a
+one-off, and a chapter is worth two to five times as much — so pricing its bonus against a one-off
 overstated the band by a rung or two, and made the top rung tell a lie: no chain 4★ ever exceeded
-0.67 of the saga it opened, against a rung that MEANS "worth more than the quest" (measured
+0.67 of the chapter it opened, against a rung that MEANS "worth more than the quest" (measured
 2026-08-28; ~12% of banded leads are chain leads, ~15% once rares appear at higher GH tiers).
 `expectedBeats` is the midpoint of `rollChainShape`'s range per rarity (2.5 / 3.5 / 5), so the
 band is still figured at display time without knowing the shape the pursue roll will pick.

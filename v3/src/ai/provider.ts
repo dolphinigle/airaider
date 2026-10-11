@@ -5,7 +5,7 @@
 // picker outputs (the selector) are discarded after use.
 
 import type { z } from 'zod';
-import type { SagaTemplate } from './prompts/saga/render.js';
+import type { ChapterTemplate } from './prompts/chapter/render.js';
 
 export interface AskSlotOut {
   attribute: string;             // primary tested attribute (engine validates)
@@ -13,10 +13,10 @@ export interface AskSlotOut {
   favored: string[];             // favored skill/tag words (engine canonicalizes)
   clashing: string[];
   requirementTag?: string | null; // must-have <tag> (rare; AI-authored, engine-guarded)
-  mustBeFocal?: boolean;          // personal sagas: this slot is THEIR story — pin the focal merc
+  mustBeFocal?: boolean;          // personal chapters: this slot is THEIR story — pin the focal merc
 }
 
-// ---- ① the one-off quest writer (sagas are the v4 storyteller's: ⑥ below) ------------------------
+// ---- ① the one-off quest writer (chapters are the v4 storyteller's: ⑥ below) ------------------------
 
 export interface QuestWriteInput {
   kind: 'one-off';
@@ -100,7 +100,7 @@ export interface FleshInput {
   name: string;              // engine-rolled — use as-is (§4b)
   tags: string;              // rendered tag line
   role: string;              // merc / captive / hireling
-  context: string;           // how they came to the fort ("founding member", "won at the finale of <saga>")
+  context: string;           // how they came to the fort ("founding member", "won at the finale of <chapter>")
   /** set when this person came out of a QUEST — the fallback flesh path otherwise knows only a
    *  four-string `context` and can do nothing but invent an origin. Mirrors `saga` below, which
    *  was added for exactly this reason on the genesis-focal path (2026-08-27) */
@@ -109,9 +109,10 @@ export interface FleshInput {
     situation: string;       // the card the player read when they took the job
     job: string;             // the errand as the board stated it
   };
-  saga?: {                   // set when this person is a saga's focal: backstory must FIT this story
+  saga?: {                      // set when this person is a chapter's focal: backstory must FIT this story. The key stays
+                             // `saga`: it is AI-facing (the flesh prompt names the field)
     title: string;
-    kernel: string;          // what the saga turned on: its answer once the finale is played, else its question
+    kernel: string;          // what the chapter turned on: its answer once the finale is played, else its question
     situation: string;       // where the story stands now (its last chronicle line)
     want: string | null;     // what the plan says they want
   };
@@ -151,14 +152,14 @@ export interface AiUsage {
   listCostUsd?: number;          // claude transport only: what it would have cost at API list price (information)
 }
 
-// ---- ⑥ the v4 saga storyteller (docs/STORYTELLER.md; Phase 2 Step 3) ---------------------------
+// ---- ⑥ the v4 chapter storyteller (docs/STORYTELLER.md; Phase 2 Step 3) ---------------------------
 
-/** ONE template-keyed call for every saga text (plan · outline · card · report). The engine builds the payload and the
+/** ONE template-keyed call for every chapter text (plan · outline · card · report). The engine builds the payload and the
  *  template flags (src/ai/storyteller.ts); the provider renders the template, sends the payload verbatim as the user
  *  message and returns the schema-parsed JSON. The player's direction rides in the payload (§2.8.5), never in the
- *  system prompt, so a saga system prompt is byte-stable per flag set */
-export interface SagaCall {
-  template: SagaTemplate; flags: string[]; vars: Record<string, string | number>;
+ *  system prompt, so a chapter system prompt is byte-stable per flag set */
+export interface ChapterCall {
+  template: ChapterTemplate; flags: string[]; vars: Record<string, string | number>;
   payload: Record<string, unknown>;
   /** which model tier: the plan call is the hardest (PLAN), everything the player reads is the WRITER's */
   tier: 'plan' | 'writer'; effort: 'low' | 'medium';
@@ -171,8 +172,8 @@ export interface SagaCall {
 export interface AiCallRecord {
   n: number;                 // call ordinal
   purpose: string;           // writeQuest / resolve / flesh / themeRoll / select / plan / outline / card / report
-  template?: string;         // a saga call: its template (plan / outline / card / report)
-  flags?: string[];          // a saga call: the template flags it rendered with
+  template?: string;         // a chapter call: its template (plan / outline / card / report)
+  flags?: string[];          // a chapter call: the template flags it rendered with
   model: string;
   durationMs: number;
   inputTokens: number;
@@ -217,8 +218,8 @@ export interface AiProvider {
   flesh(inputs: FleshInput[]): Promise<FleshOut[]>;                  // ONE batched call
   themeRoll(input: ThemeRollInput): Promise<ThemeRollOut>;
   select(input: SelectorInput): Promise<string[]>;
-  /** the v4 saga storyteller's one call: schema-parsed JSON; throws on a transport failure (after the one retry) */
-  sagaCall(c: SagaCall): Promise<unknown>;
+  /** the v4 chapter storyteller's one call: schema-parsed JSON; throws on a transport failure (after the one retry) */
+  chapterCall(c: ChapterCall): Promise<unknown>;
   usage(): AiUsage;
   callLog(): AiCallRecord[];
 }

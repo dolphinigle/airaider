@@ -1,6 +1,6 @@
 // The turn loop the UIs render (GUI pass 2026-09-30, package F2): the END guard's warnings (R5),
 // the next-steps list (R4), the reckoning's per-quest verdicts + the cycle tally (kept in the save),
-// arrivals by settle number, and where a saga stands in play.
+// arrivals by settle number, and where a chapter stands in play.
 import { describe, it, expect } from 'vitest';
 import { Game } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
@@ -285,7 +285,7 @@ describe('integration fixes (GUI pass 2026-09-30)', () => {
   });
 });
 
-describe('arrivals + sagas in play', () => {
+describe('arrivals + chapters in play', () => {
   it('every settled job is announced once, by settle number, with its quest', async () => {
     const g = new Game(new MockProvider(77), 77);
     g.build('map-room');
@@ -303,7 +303,7 @@ describe('arrivals + sagas in play', () => {
     expect(g.arrivals(g.arrivalSeq())).toEqual([]);
   });
 
-  it("a saga's view names its open quest, or the lead that continues it", async () => {
+  it("a chapter's view names its open quest, or the lead that continues it", async () => {
     const g = new Game(new MockProvider(77), 77);
     g.build('map-room');
     g.pursueAll();

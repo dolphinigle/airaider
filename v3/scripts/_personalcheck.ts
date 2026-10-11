@@ -1,4 +1,4 @@
-// Does a personal saga end up ABOUT the soldier? Real AI: give a merc a real past, spawn their
+// Does a personal chapter end up ABOUT the soldier? Real AI: give a merc a real past, spawn their
 // personal chain, and read what the writers'-room made of it.
 import { Game } from '../src/game/game.js';
 import { makeOpenAiProvider } from '../src/ai/openai.js';
@@ -7,7 +7,7 @@ const g = new Game(makeOpenAiProvider(), Number(process.argv[2] ?? 268));
 g.build('map-room'); g.build('lead-room');
 const merc = g.roster()[0]!;
 
-// a past worth a saga, as the game itself would have recorded it
+// a past worth a chapter, as the game itself would have recorded it
 const other = g.roster()[1]!;
 guardEdges(g.state.lore, [{ from: merc.id, to: other.id, type: 'saved-by',
   blurb: `${other.name} once tended ${merc.name}'s hunting wound in the woods and kept him from dying`,

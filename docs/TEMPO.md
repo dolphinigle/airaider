@@ -24,12 +24,12 @@ Everything below serves those two and nothing else.
 cards into rooms, pursues leads and assigns mercenaries to quests. **Reckoning** — the part after
 END CYCLE, where committed quests resolve and the report is read. **Lead** — a cheap engine-made
 prospect on the lead board. **Pursue** — spend a lead to have the AI write the actual **quest card**.
-**Saga (chain)** — a multi-quest story; its first card costs a **genesis** call (the hidden bible),
+**Chapter (chain)** — a multi-quest story; its first card costs a **genesis** call (the hidden bible),
 each later card is a **beat**. **One-off** — a standalone quest, one call. **Flesh** — the call that
 gives a person their who/backstory/quirks. **Marching** — a quest with every slot filled, which
 therefore resolves this reckoning. **The roll** — each sent mercenary contributes **coins**; they are
 flipped against a **bar**, and the **heads** decide success / partial / failure. *Call names used
-below:* `writeQuest` (the quest card), `genesis` (a saga's hidden bible), `resolve` (one quest's
+below:* `writeQuest` (the quest card), `genesis` (a chapter's hidden bible), `resolve` (one quest's
 report), `flesh`, `themeRoll` (a room's style), `select` (a lore picker).
 
 ---
@@ -63,8 +63,8 @@ heal, focus — is engine-only and returns in under a millisecond.
 | action | AI calls | measured | worst case |
 |---|---|---|---|
 | **pursue** a one-off lead | 1 `writeQuest` | **10s** median | ~17s |
-| **pursue** a saga **beat** | 1 `writeQuest` (0 when the beat is cached) | **6–14s** | ~17s |
-| **pursue** a **new saga** | 2: `genesis` → `writeQuest` | **51s and 66s** (n=2) | see below |
+| **pursue** a chapter **beat** | 1 `writeQuest` (0 when the beat is cached) | **6–14s** | ~17s |
+| **pursue** a **new chapter** | 2: `genesis` → `writeQuest` | **51s and 66s** (n=2) | see below |
 | **renovate** a room | 1 `themeRoll` (the small fast model) | not measured | — |
 | **END CYCLE** | 1 per marching quest, in parallel, + 1 `flesh` tail | **10s** median | **27s** |
 
@@ -125,7 +125,7 @@ clicks:     1    1    2    2    3    3    4    3    4    4    2    5    3    6  
 
 **One to seven meaningful clicks a cycle, median 3.** At a couple of seconds a click that is roughly
 **5–15 seconds of play per cycle** — against a 10s pursuit and a **50–66s genesis**. And cycle 0–2,
-where the board is thinnest, is exactly where a first saga is most likely to be started.
+where the board is thinnest, is exactly where a first chapter is most likely to be started.
 
 ⚠ **This is the finding that shapes everything.** A queue makes a 10s pursuit disappear into normal
 play. It does **not** make a 60s genesis disappear; it only stops the board lying about it. Filling
@@ -153,7 +153,7 @@ week — then as soon as the first one has result, output it in screen."*
 The one thing the measurements say these three do **not** cover, which is why it gets a line of its
 own rather than being buried:
 
-**⚠ The 50–66s saga genesis is not solved by any of them.** The fort phase holds 1–7 clicks a cycle
+**⚠ The 50–66s chapter genesis is not solved by any of them.** The fort phase holds 1–7 clicks a cycle
 (§2c), so there is nothing to fill that minute with; and on the ~70% of cycles that resolve a single
 quest, `G3` has nothing to interleave. Both need an answer that is not "queue it" — see `R3`, `R7`.
 
@@ -333,7 +333,7 @@ React client's exact state machine against a real server on top of it — see §
 it, not shortening it. *(This is why **the genesis problem** (§3) needs `R7` — the one place hiding is not enough.)*
 **N2.** Multi-user, multi-session, multi-device anything.
 **N3.** Work that continues while the app or tab is closed. The player-facing rule is: **do not close
-the tab mid-saga — the work is lost, the lead comes back.**
+the tab mid-chapter — the work is lost, the lead comes back.**
 **N4.** Real-time play. No *game* state changes because wall-clock time passed; only the delivery of
 work the player already asked for does.
 **N5.** Prettiness — no animation, typography or art goals here. Only tempo.
@@ -438,7 +438,7 @@ decision moves to assignment, where a decision already lives, and the game loses
 and a room upgrade raises N. That turns the throttle into progression, which is the only kind of cap
 a player enjoys. **Do not** answer it by cutting lead supply: the board carries **2 leads at cycle 1
 and 5–8 by cycle 10** (§2c's run), which is already the whole strategic surface. ⚠ Note the tension
-with `P8`: a late campaign with more sagas running competes for the same N, so the number has to
+with `P8`: a late campaign with more chapters running competes for the same N, so the number has to
 be raisable — which is why the designer ruled it adjustable.
 
 **R6 — Does the CLI get any of this? ✅ RULED 2026-08-26: YES — and this recommendation was WRONG.**
@@ -450,7 +450,7 @@ feature ships in the CLI too** — see `DOGFOODING.md`, which also records the b
 first run that the HTTP harness was structurally blind to.
 
 **R7 — May the machine write ahead of the click?** The only answer to **the genesis problem** (§3) that actually removes the
-minute: draft a saga's genesis when its lead appears, before the player pursues it. Costs money on leads never pursued (~$0.01 a genesis, against a board carrying 2–8 leads —
+minute: draft a chapter's genesis when its lead appears, before the player pursues it. Costs money on leads never pursued (~$0.01 a genesis, against a board carrying 2–8 leads —
 so the bill scales with what the board *offers*, not with what the player *does*). ⚠ And the
 invariant it breaks is **`I1`, not `I6`**: a speculative draft draws from `game.rng` for a lead that
 may never be pursued, so the campaign's random stream becomes a function of what the board showed.
@@ -505,7 +505,7 @@ to the pre-change baseline (`a4eae82` in a worktree): 261 quests (175 s / 65 p /
 
 **The CLI plays it too** (`DOGFOODING.md`). Five real-AI cycles through `npm run cli -- --ai`
 covered every shape the reckoning has — two quests landing 3.8s apart, a single quest with a 13.2s
-flesh tail, a `⏸` stall line in the head block, a saga beat, an injury, a level-up, a relic, a
+flesh tail, a `⏸` stall line in the head block, a chapter beat, an injury, a level-up, a relic, a
 failure, and a finale with approaches and a fate. The text UI renders the same feature: each quest's
 slot opens with its title and card, and its report is appended when it lands, stamped with the
 elapsed time. `R6` was ruled the wrong way at first and is corrected.

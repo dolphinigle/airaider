@@ -16,14 +16,14 @@ Every other QUEST_SCREEN goal (G1–G8) still holds.
 |---|---|
 | **Map** (home) | quests as markers on a woven map of the regions; the **board** sidebar (tabs: Quests · Leads) |
 | **Fort** | the hold in cross-section, drawn room icons; right panel = build list / the clicked room / tavern / holding |
-| **Chronicle** | sagas · people & places · log · AI ledger |
+| **Chronicle** | chapters · people & places · log · AI ledger |
 
 Roster, captives, items and people are no longer tabs: they are **bags in the hand** plus the **card
 sheet**. The reckoning stays its own page (TEMPO P10).
 
 ## 2 · The map
 
-- A quest is a marker (glyph = kind of work; teal ring = saga; crown = finale) with a name banner and a token
+- A quest is a marker (glyph = kind of work; teal ring = chapter; crown = finale) with a name banner and a token
   row: one attribute chip per place (solid once filled) and reward-kind icons (captive / recruit / relic / lead / gold).
   Its chip: lapse countdown (red at ≤2) · `ready · <band>` coloured by the engine's pooled odds band · `choose an ending`
   · `↻ daily` on standing posts. New arrivals drop in with a NEW ribbon.
@@ -142,7 +142,7 @@ Added by the 2026-09-30 audit fixes (doc gaps — confirm or overturn):
    bedroom gates YOUR level cap" is unbuilt. It takes no places and no planner ranks it.
 9. Mess hall, Storage and Holding cell have NO effect: their menus are never enforced (`menuGates` `locks:false`). The
    build list says so; no bag says "build X first"; holding works without a Holding cell.
-10. The END guard also covers a saga's continuation lead going cold, a lead carrying money going cold, a captive handed
+10. The END guard also covers a chapter's continuation lead going cold, a lead carrying money going cold, a captive handed
     off from holding and a hireable tavern guest leaving. "Nobody marches while soldiers idle" is NOT guarded.
 11. Auto on a quest the idle mercenaries cannot fully man places nobody (Auto-fill-all already undid such placements).
 12. A move into a free place that LOSES prestige is allowed, labelled with the loss (only a full room's swap must gain).

@@ -50,7 +50,7 @@ These are real shipped-pipeline output at the moment of sign-off. **This is the 
 | prompt | location | §12 applied? | evidence |
 |---|---|---|---|
 | **one-off card** | `src/ai/openai.ts` → `oneOffSystem()` | ✅ **YES** — all 6 markers present | commits `f325f13`, `9a499e4`; unseen-seed runs 79–88% lint-clean |
-| **saga card** | `src/ai/openai.ts` → `sagaSystem()` (3,178 words) | ❌ **NO** — 0 of 6 markers | never touched this round |
+| **chapter card** | `src/ai/openai.ts` → `chapterSystem()` (3,178 words) | ❌ **NO** — 0 of 6 markers | never touched this round |
 | **resolution** | `src/ai/openai.ts` → `RESOLVE_HEAD_FRAME` + resolve prompt | ❌ **NO** | never touched this round |
 | lab champion | `v3/scripts/prosebench/CHAMPION.txt` | research artifact — **separate prompt, not shipped** | see COORDINATOR_LOG |
 
@@ -74,13 +74,13 @@ hand. This surprised me once; do not be surprised again.
    L12 says variety cannot come from prompt text, L13 says its instances leak.
 
 ---
-## 3b. DOGFOOD RESULTS — 2026-08-25, after the saga port
+## 3b. DOGFOOD RESULTS — 2026-08-25, after the chapter port
 Three full AI campaigns to finale (`aicampaign.ts`) plus a full CLI loop with real AI
 (`npm run cli -- --ai --script <file>` — the CLI has a batch mode built for exactly this).
-**Every player-facing call type read clean: one-off cards, saga cards, lead-ins, resolutions,
+**Every player-facing call type read clean: one-off cards, chapter cards, lead-ins, resolutions,
 finale.** No drift found, so no all-prompt audit was triggered.
 
-Saga cards, before and after the port:
+Chapter cards, before and after the port:
 > *"Haeruana **is** a woman of the fort who brings a private grievance…"* (definition dump)
 > → *"Haeruana came to the longhouse and pressed her palm to your table. She speaks low and keeps
 > her hands tight on the hem of her cloak. The northern lean-to shows a sleeping bundle gone and
@@ -99,7 +99,7 @@ One genuine instance was found (a spear appearing unstaged). **Not systemic; del
 before checking that it was real and that it discriminated.
 
 ## 4. ⏭ REMAINING WORK — the checkpoint is NOT the finish line
-- [ ] **Port §12 to `sagaSystem()`** — saga cards are the campaign spine and have none of it.
+- [ ] **Port §12 to `chapterSystem()`** — chapter cards are the campaign spine and have none of it.
 - [ ] **Apply the resolution findings** — measured gap: *we narrate procedure, the reference narrates
       consequence*. Their results fan out (a reputation, a strained tie, a court complaint); ours stop
       when the mercenary walks out of frame. Likely needs a dealt consequence fact (see §5).
@@ -112,7 +112,7 @@ deliberately. Check here before editing a prompt.
 
 | looks like a win | why it is not |
 |---|---|
-| Making the saga pay a single clause | `rewardEnvelope` is a deliberately **paste-clean pre-shaped string pool** (`game.ts` ~1518) and the prompt mandates pasting it AS GIVEN. A prompt rule fighting it is a contradiction — the exact §0 failure. |
+| Making the chapter pay a single clause | `rewardEnvelope` is a deliberately **paste-clean pre-shaped string pool** (`game.ts` ~1518) and the prompt mandates pasting it AS GIVEN. A prompt rule fighting it is a contradiction — the exact §0 failure. |
 | Telling the writer to use only ONE keyword | `sampleKeywords` deals 3–4 atoms **on purpose**; pool MIX drives variety. The real defect was *welding* two atoms into one noun, fixed by labelling them by axis in the engine (L18). |
 | Turning on `SHAPE_ROTATION` for resolution closers | It is **lab lineage, measured NET-NEGATIVE** and deliberately not shipped — see commit `27eeb56`: *"Shipped default = diet+stack (4-rule ceiling measured; rotation and fix-stacks net-negative)."* It only fires under `PROSE_VARIANT=r2`; the shipped default is `diet`. |
 

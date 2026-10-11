@@ -3,7 +3,7 @@
 // GPT, which is far cheaper per call — optimise for gpt-5 at the Steam stretch). Only the TRANSPORT
 // changes: openai.ts hands this the same system + user text it would send to OpenAI.
 // Selected with AIRAIDER_AI=claude (server) / --claude (CLI). The lab's runner this grew out of:
-// scripts/sagalab/probe.ts (--writer sonnet|haiku).
+// scripts/chapterlab/probe.ts (--writer sonnet|haiku).
 
 import { spawn, spawnSync } from 'node:child_process';
 import * as fs from 'node:fs';

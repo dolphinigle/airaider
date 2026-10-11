@@ -1,7 +1,7 @@
 // WHICH AI IS LIVE — one picker shared by the GUI server and the text CLI, so every way to choose the AI
 // exists in both (docs/DOGFOODING.md parity):
 //   mock   (default) — deterministic, free, no key
-//   openai (AIRAIDER_AI=openai / --ai)     — PRODUCTION: GPT-6 Sol plans sagas, GPT-6 Luna does everything else;
+//   openai (AIRAIDER_AI=openai / --ai)     — PRODUCTION: GPT-6 Sol plans chapters, GPT-6 Luna does everything else;
 //          billed per call (openai.ts OPENAI_MODELS)
 //   claude (AIRAIDER_AI=claude or sonnet / --claude or --sonnet) — the designer's FREE PLAYTEST transport: the same
 //          prompts through the headless Claude CLI on the Claude subscription, Sonnet writing (designer 2026-10-02;
@@ -32,13 +32,13 @@ export function aiKindFrom(envValue: string | undefined, flags: { ai?: boolean; 
 /** the provider, plus the one line that says which AI is live. claude fails fast when the CLI is missing */
 export function makeAi(kind: AiKind, seed: number): { ai: AiProvider; banner: string } {
   if (kind === 'openai')
-    return { ai: makeOpenAiProvider(), banner: `AI: OpenAI — ${OPENAI_MODELS.plan} plans sagas, ${OPENAI_MODELS.writer} writes, ${OPENAI_MODELS.nano} mechanical tier (production; billed per call)` };
+    return { ai: makeOpenAiProvider(), banner: `AI: OpenAI — ${OPENAI_MODELS.plan} plans chapters, ${OPENAI_MODELS.writer} writes, ${OPENAI_MODELS.nano} mechanical tier (production; billed per call)` };
   if (kind === 'claude') {
     const version = assertClaudeCli();
     const p = claudeOptsFor('plan', 'medium'), w = claudeOptsFor('writer', 'low'), n = claudeOptsFor('nano', 'minimal');
     return { ai: makeOpenAiProvider({ transport: 'claude' }),
       banner: `AI: Claude via the claude CLI (${version || 'version unknown'}) on the subscription — FREE playtest transport, not production; `
-        + `${p.model === w.model ? `${w.model} plans and writes` : `${p.model} plans sagas, ${w.model} writes`}, ${n.model} mechanical tier; the same prompts as OpenAI` };
+        + `${p.model === w.model ? `${w.model} plans and writes` : `${p.model} plans chapters, ${w.model} writes`}, ${n.model} mechanical tier; the same prompts as OpenAI` };
   }
   return { ai: new MockProvider(seed), banner: 'AI: mock (deterministic; --ai / AIRAIDER_AI=openai for OpenAI, --sonnet / AIRAIDER_AI=sonnet for the free Claude playtest transport)' };
 }

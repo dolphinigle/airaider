@@ -1,11 +1,11 @@
-// A saga the player already took is not news from the board: its next step must reach them
+// A chapter the player already took is not news from the board: its next step must reach them
 // without the Lead room. The day-0 packet deals a ✦STORY lead pre-Lead-room; beat 1 resolved and
-// beat 2's continuation sat invisible, so the saga silently stalled (playtest 2026-09-25).
+// beat 2's continuation sat invisible, so the chapter silently stalled (playtest 2026-09-25).
 import { describe, it, expect } from 'vitest';
 import { Game } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
 
-describe('a saga continuation before the Lead room', () => {
+describe('a chapter continuation before the Lead room', () => {
   it('is visible and pursuable with only a Map room', async () => {
     const g = new Game(new MockProvider(11), 11);
     g.build('map-room');

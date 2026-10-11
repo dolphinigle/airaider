@@ -1,22 +1,22 @@
-// The game's own saga (designer 2026-10-04, docs/STORYTELLER.md North Star 5): the kit+pick seed and the C2 'grafts'
-// pipeline under the pipe arm the game's host deals by saga type (designer 2026-10-05, engine/saga.ts GAME_PIPE): a hired
-// saga TC (voice), a soldier's own saga PP (past + change + the dossier line that seeds their next one). Played through the
-// Game facade both UIs read, on the mock. Ruling 1 (the hired saga, to a gold finale): the gold way's money
+// The game's own chapter (designer 2026-10-04, docs/STORYTELLER.md North Star 5): the kit+pick seed and the C2 'grafts'
+// pipeline under the pipe arm the game's host deals by chapter type (designer 2026-10-05, engine/chapter.ts GAME_PIPE): a hired
+// chapter TC (voice), a soldier's own chapter PP (past + change + the dossier line that seeds their next one). Played through the
+// Game facade both UIs read, on the mock. Ruling 1 (the hired chapter, to a gold finale): the gold way's money
 // shows on its finale BUTTON only (the label and its fate fact) — never in a card, report, summary, fate sentence,
-// chronicle line, the memory the saga leaves, or any payload the writer sees. The engine's 💰 payout line stays: a game
+// chronicle line, the memory the chapter leaves, or any payload the writer sees. The engine's 💰 payout line stays: a game
 // line, not story text. Nothing about play changes: the gold way pays what it paid.
 import { describe, it, expect, afterEach } from 'vitest';
 import { Game } from '../src/game/game.js';
 import { seedIdCounter } from '../src/engine/cards.js';
-import { PIPE_ARM, GAME_PIPE, SEED_ARM, WAY_ENDING, FREE_WAY, helped, wayMeans, type CastEntry } from '../src/engine/saga.js';
+import { PIPE_ARM, GAME_PIPE, SEED_ARM, WAY_ENDING, FREE_WAY, helped, wayMeans, type CastEntry } from '../src/engine/chapter.js';
 import type { Card } from '../src/engine/cards.js';
 import type { Chain } from '../src/engine/chains.js';
 import type { LabFixture } from '../src/engine/lab.js';
 import { cannedOption, toldOption, fateSentence, clientOf, grownLine, knowingOf, laterCardPayload } from '../src/ai/storyteller.js';
-import type { SagaCall } from '../src/ai/provider.js';
-import * as flow from '../src/game/sagaflow.js';
+import type { ChapterCall } from '../src/ai/provider.js';
+import * as flow from '../src/game/chapterflow.js';
 import { render } from '../cli/format.js';
-import { RecordingMock, newGame, sagaChain, playSaga } from './sagaharness.js';
+import { RecordingMock, newGame, chapterChain, playChapter } from './chapterharness.js';
 
 /** the gold way's money as a writer would paste it */
 const MONEY = /\bpa(?:y|ys|id|ying)\b|\bcoins?\b|\btreasure\b/i;
@@ -27,12 +27,12 @@ const fixture = (over: Partial<LabFixture>): LabFixture => ({
   N: 3, kind: 'gold-hoard', personal: false, twist: false, level: 2, rarity: 'uncommon', ...over,
 });
 
-/** one saga played the way a player does — pursue its lead, man every quest, END — choosing the gold way at the finale */
+/** one chapter played the way a player does — pursue its lead, man every quest, END — choosing the gold way at the finale */
 async function goldFinale(seed: number, fx: LabFixture) {
   seedIdCounter(1);
   const ai = new RecordingMock(seed);
   const g = new Game(ai, seed);
-  expect(g.labSaga(fx).ok).toBe(true);
+  expect(g.labChapter(fx).ok).toBe(true);
   let button: { label: string; outcome: string } | undefined;
   const lines: string[] = [];
   for (let c = 0; c < 40; c++) {
@@ -62,20 +62,20 @@ async function goldFinale(seed: number, fx: LabFixture) {
 
 afterEach(() => { delete process.env.AIRAIDER_FORCE_OUTCOMES });
 
-describe('the game default, a hired saga: kit+pick + TC (voice), to a gold finale', () => {
+describe('the game default, a hired chapter: kit+pick + TC (voice), to a gold finale', () => {
   for (const fx of [fixture({}), fixture({ id: 'GD2', seed: 7, N: 4, kind: 'recruit', approach: 'gold' })]) it(`${fx.id} (N${fx.N}, ${fx.kind})`, async () => {
     process.env.AIRAIDER_FORCE_OUTCOMES = '1';
     const { g, ai, chain, button, lines } = await goldFinale(31, fx);
-    const rec = chain.saga!, plan = rec.plan!, w = rec.world;
+    const rec = chain.chapter!, plan = rec.plan!, w = rec.world;
     expect(SEED_ARM).toBe('kit+pick');
-    // the game's host deals by saga type; PIPE_ARM stays C2 for a host that names none (the lab's G0 / PG0)
+    // the game's host deals by chapter type; PIPE_ARM stays C2 for a host that names none (the lab's G0 / PG0)
     expect(GAME_PIPE).toEqual({ personal: 'past', other: 'voice' });
     expect(PIPE_ARM).toBe('grafts');
     expect(w.pipe).toBe(GAME_PIPE.other);
     expect(w.kit!.arm).toBe('kit+pick');
     expect(chain.state).toBe('done');
     // TC: card 1 is voiced — the asker's own line, as the plan wrote it, quoted in the prose the player reads (the
-    // chronicle's card 1 in both UIs: the GUI's Sagas tab, the CLI's chain view); never PP's past on a hired saga
+    // chronicle's card 1 in both UIs: the GUI's Chapters tab, the CLI's chain view); never PP's past on a hired chapter
     const planFlags = ai.calls.find(c => c.template === 'plan')!.flags;
     expect(planFlags).toContain('voice');
     expect(planFlags).not.toContain('past');
@@ -88,7 +88,7 @@ describe('the game default, a hired saga: kit+pick + TC (voice), to a gold final
     expect(rec.card1).toContain(quoted);
     expect(g.chainViews().find(v => v.id === chain.id)!.card1).toContain(quoted);
     expect(render.chainDetail(g, chain.id)).toContain(quoted);
-    // a hired saga leaves no dossier line
+    // a hired chapter leaves no dossier line
     expect(rec.grown).toBeUndefined();
     // the grafts pipeline: no outline call; the engine writes the buttons
     expect(ai.calls.some(c => c.template === 'outline')).toBe(false);
@@ -120,7 +120,7 @@ describe('the game default, a hired saga: kit+pick + TC (voice), to a gold final
     expect(fin.payload.plan).toBe(toldOption({ way: 'gold', label: button.label }, metCast, true));
     expect(String(fin.payload.plan)).not.toMatch(MONEY);
     expect(String(fin.payload.result)).not.toMatch(MONEY);
-    // the story: the fate sentence, the chronicle's ending line and So far, and the memory the saga leaves
+    // the story: the fate sentence, the chronicle's ending line and So far, and the memory the chapter leaves
     const view = g.chainViews().find(v => v.id === chain.id)!;
     expect(view.endLine).toBe(`ending: ${rec.ending}`);
     expect(rec.ending).toMatch(helped(focal) ? /goes (his|her) way\.$/ : /is cornered, then let go\.$/);
@@ -136,7 +136,7 @@ describe('the gold way, worded three ways', () => {
   it('the button pays; the writer and the story are told the person goes free — helped or not; R5 keeps its wording', async () => {
     process.env.AIRAIDER_FORCE_OUTCOMES = '1';
     const { chain } = await goldFinale(31, fixture({}));
-    const cast = chain.saga!.plan!.cast;
+    const cast = chain.chapter!.plan!.cast;
     const f = cast.find(p => p.focal)!;
     expect(helped(f)).toBe(false);
     for (const focal of [f, { ...f, seat: 'other', part: 'travels with the company' } as CastEntry]) {
@@ -158,9 +158,9 @@ describe('the gold way, worded three ways', () => {
   });
 });
 
-/** a soldier's own saga as the game spawns one (the personal lead) — pursued, every quest manned by a strong company, to
+/** a soldier's own chapter as the game spawns one (the personal lead) — pursued, every quest manned by a strong company, to
  *  its end; the calls it made */
-async function personalSaga(g: Game, ai: RecordingMock, merc: Card): Promise<{ chain: Chain; calls: RecordingMock['calls'] }> {
+async function personalChapter(g: Game, ai: RecordingMock, merc: Card): Promise<{ chain: Chain; calls: RecordingMock['calls'] }> {
   const n0 = ai.calls.length, before = new Set(g.state.chains.map(c => c.id));
   (g as unknown as { spawnPersonalChainLead(m: Card): void }).spawnPersonalChainLead(merc);
   await g.pursue(g.state.leads.find(l => l.source === 'personal' && l.personalMercId === merc.id)!.id);
@@ -181,21 +181,21 @@ async function personalSaga(g: Game, ai: RecordingMock, merc: Card): Promise<{ c
   return { chain, calls: ai.calls.slice(n0) };
 }
 
-describe('the game default, a soldier\'s own saga: PP (past + change), to the finale and into the next one', () => {
-  it('card 1 tells the past, the finale shows the change, the dossier line is shown in both UIs and seeds the next personal saga', async () => {
+describe('the game default, a soldier\'s own chapter: PP (past + change), to the finale and into the next one', () => {
+  it('card 1 tells the past, the finale shows the change, the dossier line is shown in both UIs and seeds the next personal chapter', async () => {
     seedIdCounter(1);
     const ai = new RecordingMock(11);
     const g = new Game(ai, 11);
     g.build('map-room'); g.build('lead-room');
     const merc = g.roster()[0]!;
     // a soldier the company WON: the backstory written when it found them is the company's own history, never their past
-    // (game.ts personalSeedBase, playtest 2026-09-25); their own saga is told from who they were
+    // (game.ts personalSeedBase, playtest 2026-09-25); their own chapter is told from who they were
     const history = `The company found ${merc.name} pressed to the mill shutter after the raiders led them away.`;
     Object.assign(merc.character!, { origin: { title: 'Ash Road', situation: 'raiders at the mill', job: 'free the miller' }, who: "a miller's child from the fens", backstory: history });
     g.ensureLoreNode(merc);
 
-    const first = await personalSaga(g, ai, merc);
-    const rec = first.chain.saga!, plan = rec.plan!;
+    const first = await personalChapter(g, ai, merc);
+    const rec = first.chain.chapter!, plan = rec.plan!;
     expect(rec.world.pipe).toBe(GAME_PIPE.personal);
     const planCall = first.calls.find(c => c.template === 'plan')!;
     expect(planCall.flags).toContain('past');
@@ -222,7 +222,7 @@ describe('the game default, a soldier\'s own saga: PP (past + change), to the fi
     expect(g.dossier(merc.id, { player: true }).split('\n')).toContain(`- ${line} (defining memory)`);
     expect(render.merc(g, merc.id)).toContain(`- ${line}`);
     expect(g.dossier(merc.id, { player: true })).not.toContain('came through');
-    // the living dossier (STORY_ENGINE §4), refreshed as the saga closed: who they are now (the change), their own saga's
+    // the living dossier (STORY_ENGINE §4), refreshed as the chapter closed: who they are now (the change), their own chapter's
     // ending — the same lines in the CLI's `merc` and the GUI sheet (the server sends Game.livingLines)
     const change = line.replace(`After ${plan.title}: `, '');
     const living1 = g.livingLines(merc.id);
@@ -231,21 +231,21 @@ describe('the game default, a soldier\'s own saga: PP (past + change), to the fi
     expect(living1.length).toBeLessThanOrEqual(6);
     expect(render.merc(g, merc.id)).toContain(`story so far:\n${living1.map(l => `  ${l}`).join('\n')}`);
 
-    // the NEXT personal saga (chain B): seeded from the living dossier — who they became — with a DEALT situation as its new
+    // the NEXT personal chapter (chain B): seeded from the living dossier — who they became — with a DEALT situation as its new
     // matter; the old wrong it settled is kept on the world (the retelling lint) but never sent; never the company's history
-    const second = await personalSaga(g, ai, merc);
+    const second = await personalChapter(g, ai, merc);
     const planB = second.calls.find(c => c.template === 'plan')!;
     expect(planB.flags).toContain('next');
     expect(planB.flags).not.toContain('history');
     expect(planB.payload.history).toBeUndefined();
     // the seed is the dealt situation, its new matter
-    expect(second.chain.saga!.world.kit!.situations).toContain(planB.payload.seed);
+    expect(second.chain.chapter!.world.kit!.situations).toContain(planB.payload.seed);
     expect(planB.payload.situation).toBeUndefined();
     for (const c of second.calls.filter(x => x.template === 'plan' || x.template === 'pick')) expect(JSON.stringify(c.payload)).not.toContain(soldier.past!);
     // beside it, `now`: who they became — the dossier's Now, naming no stranger (chain A's people by label, unless chain B
     // seats one) — and never the settled chapter (no mark: its title or ending, sent, was rebuilt)
     const nowB = String(planB.payload.now).split('\n');
-    const seated = second.chain.saga!.world.cast.find(p => p.memory)?.name;
+    const seated = second.chain.chapter!.world.cast.find(p => p.memory)?.name;
     expect(living1[0]!.startsWith('Now: ')).toBe(true);
     if (!seated) expect(nowB).toEqual([living1[0]!.slice('Now: '.length)]);
     expect(nowB.filter(l => l.startsWith('- '))).toHaveLength(0);
@@ -254,22 +254,22 @@ describe('the game default, a soldier\'s own saga: PP (past + change), to the fi
     expect(String(planB.payload.now)).not.toContain(history);
     expect(second.calls.find(c => c.template === 'pick')!.flags).toContain('next');
     expect(second.calls.find(c => c.template === 'card' && c.flags.includes('first'))!.flags).toContain('next');
-    expect(second.chain.saga!.world.pipe).toBe(GAME_PIPE.personal);
-    expect(second.chain.saga!.world.history).toBe(soldier.past);
+    expect(second.chain.chapter!.world.pipe).toBe(GAME_PIPE.personal);
+    expect(second.chain.chapter!.world.history).toBe(soldier.past);
     // its own line is a new memory beside the first, never merged into it: both on the sheet; the dossier's now is the second
     expect(second.chain.state).toBe('done');
-    const line2 = second.chain.saga!.grown!;
+    const line2 = second.chain.chapter!.grown!;
     expect(line2).not.toBe(line);
-    const past2 = second.chain.saga!.plan!.cast.find(p => p.seat === 'soldier')!.past!;
+    const past2 = second.chain.chapter!.plan!.cast.find(p => p.seat === 'soldier')!.past!;
     expect(merc.character!.grown!.map(x => x.line)).toEqual([line, line2]);
     for (const l of [line, line2]) expect(render.merc(g, merc.id)).toContain(`- ${l}`);
     const living2 = g.livingLines(merc.id);
-    expect(living2[0]).toBe(`Now: ${line2.replace(`After ${second.chain.saga!.plan!.title}: `, '')}`);
+    expect(living2[0]).toBe(`Now: ${line2.replace(`After ${second.chain.chapter!.plan!.title}: `, '')}`);
     expect(living2.filter(l => l.includes('own matter'))).toHaveLength(2);
     // chain C: the history is what chain B settled
     const third = (g as unknown as { personalSeedOf(m: Card, r: string, ids: Set<string>): { seed: string; history?: string } }).personalSeedOf(merc, second.chain.region, new Set());
     expect(third.history).toBe(past2);
-    // its now: the dossier's Now (chain B's change), naming only the one person who matters that the saga can seat; no mark
+    // its now: the dossier's Now (chain B's change), naming only the one person who matters that the chapter can seat; no mark
     const seedLines = third.seed.split('\n'), people = seedLines.filter(l => l.startsWith('People: '));
     expect(seedLines.filter(l => !l.startsWith('People: '))).toHaveLength(1);
     expect(seedLines.some(l => l.includes('own matter'))).toBe(false);
@@ -282,8 +282,8 @@ describe('the game default, a soldier\'s own saga: PP (past + change), to the fi
  *  them on a card can only be the engine's own rows */
 class NamelessMock extends RecordingMock {
   scrub: string[] = [];
-  override async sagaCall(c: SagaCall): Promise<unknown> {
-    const out = await super.sagaCall(c);
+  override async chapterCall(c: ChapterCall): Promise<unknown> {
+    const out = await super.chapterCall(c);
     if (!this.scrub.length || !['card', 'report'].includes(c.template)) return out;
     let t = JSON.stringify(out);
     for (const n of this.scrub) t = t.replace(new RegExp(`\\b${n}\\b`, 'g'), 'someone');
@@ -295,10 +295,10 @@ describe('the game default shows So far, never the forward quest log (designer 2
   for (const personal of [false, true]) it(`${personal ? 'personal (PP)' : 'hired (TC)'}: cards 1–2 no rows; every later card one row per part played before the last (the prose's), a failed try its own`, async () => {
     seedIdCounter(1);
     const { g } = newGame(personal ? 61 : 67);
-    const { chain, focal } = sagaChain(g, { N: 4, personal });
+    const { chain, focal } = chapterChain(g, { N: 4, personal });
     const pipe = GAME_PIPE[personal ? 'personal' : 'other'];
-    const p = await playSaga(g, chain, 'bumpy', focal, undefined, { pipeArm: () => pipe });
-    const rec = chain.saga!, plan = rec.plan!;
+    const p = await playChapter(g, chain, 'bumpy', focal, undefined, { pipeArm: () => pipe });
+    const rec = chain.chapter!, plan = rec.plan!;
     expect(rec.world.pipe).toBe(pipe);
     expect(p.cards[0]!.out.rows).toEqual([]);
     expect(p.cards[1]!.out.rows).toEqual([]);
@@ -322,7 +322,7 @@ describe('the game default shows So far, never the forward quest log (designer 2
     expect(lost).toBeGreaterThan(0);
     const title = (l: string) => l.slice(4, l.indexOf(' — '));
     expect(last.slice(lost + 1).some(l => title(l) === title(last[lost]!))).toBe(true);
-    // nor does the chronicle show it (the Sagas tab, the CLI's chain view): no rows; its own So far keeps every part played
+    // nor does the chronicle show it (the Chapters tab, the CLI's chain view): no rows; its own So far keeps every part played
     const ch = flow.chronicle(chain)!;
     expect(ch.rows).toEqual([]);
     expect(ch.soFar).toHaveLength(rec.lines.length);
@@ -333,14 +333,14 @@ describe('the game default shows So far, never the forward quest log (designer 2
       seedIdCounter(1);
       const ai = new NamelessMock(71);
       const g = new Game(ai, 71);
-      const { chain, focal } = sagaChain(g, { N: 4, personal: false });
+      const { chain, focal } = chapterChain(g, { N: 4, personal: false });
       let named3: string[] | undefined;
-      const p = await playSaga(g, chain, 'clean', focal, pos => {
-        const rec = chain.saga!;
+      const p = await playChapter(g, chain, 'clean', focal, pos => {
+        const rec = chain.chapter!;
         if (!ai.scrub.length) ai.scrub = clientOf(rec.plan!).name.split(/\s+/).filter(x => x.length > 2);
         if (pos.job === 3 && !pos.finale) named3 = [...rec.knowing.named];
       }, { pipeArm: () => pipe });
-      const rec = chain.saga!, plan = rec.plan!, client = clientOf(plan);
+      const rec = chain.chapter!, plan = rec.plan!, client = clientOf(plan);
       const log = pipe === 'voice';
       expect(named3).toBeDefined();
       // card 2 under the game's pipe shows no For line, so nothing on it named the asker (the writer never did): they stay

@@ -1,4 +1,4 @@
-// FAILGATE LAB — force saga-beat FAILURES (worst merc per slot) and read the NEXT beat
+// FAILGATE LAB — force chapter-beat FAILURES (worst merc per slot) and read the NEXT beat
 // card: does the LAST-STEP-FAILED gate hold (failed yield never carried/asserted)?
 // Usage: npx tsx scripts/failgate.ts [worlds] [seedBase] [outfile]
 import * as fs from 'node:fs';
@@ -21,7 +21,7 @@ async function main() {
       await g.endCycle();
       lead = g.visibleLeads().find(l => l.chainInfo.kind === 'starts-new');
     }
-    if (!lead) { out += `\n## world ${w + 1}: no saga lead\n`; continue; }
+    if (!lead) { out += `\n## world ${w + 1}: no chapter lead\n`; continue; }
     const r = await g.pursue(lead.id);
     if (!r.ok) { out += `\n## world ${w + 1}: pursue failed (${r.msg})\n`; continue; }
     out += `\n# world ${w + 1} (seed ${seedBase + w * 17})\n`;

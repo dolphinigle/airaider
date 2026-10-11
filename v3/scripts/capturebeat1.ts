@@ -1,6 +1,6 @@
-// Capture REAL beat-1 saga prompts as lab fixtures: the full rendered (system, user) pair the
+// Capture REAL beat-1 chapter prompts as lab fixtures: the full rendered (system, user) pair the
 // game sends, plus the un-staged bible behind it, plus what the model actually wrote.
-// One fixture per saga. Usage: npx tsx scripts/capturebeat1.ts [seed] [howMany]
+// One fixture per chapter. Usage: npx tsx scripts/capturebeat1.ts [seed] [howMany]
 import * as fs from 'node:fs';
 import { Game } from '../src/game/game.js';
 import { makeOpenAiProvider } from '../src/ai/openai.js';
@@ -16,7 +16,7 @@ let got = 0;
 for (let c = 0; c < 10 && got < want; c++) {
   for (const lead of [...g.visibleLeads()]) {
     if (got >= want) break;
-    if (!lead.chainInfo?.kind || lead.chainInfo.kind === 'none') continue;  // sagas only
+    if (!lead.chainInfo?.kind || lead.chainInfo.kind === 'none') continue;  // chapters only
     const before = g.ai.callLog().length;
     const r = await g.pursue(lead.id);
     if (!r.ok || !r.questId) continue;

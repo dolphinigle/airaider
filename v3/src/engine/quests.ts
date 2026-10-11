@@ -12,7 +12,7 @@ import { tierOf, CONCEPT, T } from './tags.js';
 import type { Attribute, Rank } from './tags.js';
 import { type SlotTest, type DifficultyName, type Outcome } from './roll.js';
 import type { LabFixture } from './lab.js';
-import type { LogRow, Matter, SagaPos, Way } from './saga.js';
+import type { LogRow, Matter, ChapterPos, Way } from './chapter.js';
 
 // ---- leads (QUESTS §1) -----------------------------------------------------------------
 
@@ -36,8 +36,8 @@ export interface Lead {
    *  A lead's own worth is zero — access is free; this is the premium riding on it. Absent on
    *  saves written before the design, which reads as 0. */
   bonus?: number;
-  /** SAGA LAB only (docs/STORYTELLER.md §5.0): the fixture this lead's genesis must use — posted by
-   *  the CLI's hidden `lab saga` command, never in play */
+  /** CHAPTER LAB only (docs/STORYTELLER.md §5.0): the fixture this lead's genesis must use — posted by
+   *  the CLI's hidden `lab chapter` command, never in play */
   lab?: LabFixture;
 }
 
@@ -85,7 +85,7 @@ export function rollFreshLead(rng: Rng, ctx: LeadRollCtx, idGen: () => string,
   const pool = boardPool(ctx);
   const fresh = pool.filter(a => !ctx.recentArchetypes?.includes(a));
   const archetype = rng.pick(fresh.length ? fresh : pool);
-  // 🛠 designer 2026-08-28: the saga rate should SCALE 4% → 10% across the Great Hall tiers.
+  // 🛠 designer 2026-08-28: the chapter rate should SCALE 4% → 10% across the Great Hall tiers.
   // These are per-RARITY, and the tier only decides which rarities exist (rollRarity), so the
   // blend is what the player feels: T1 common-only = 4.0% · T2 +uncommon = 7.8% · T3+ +rare =
   // 10.1%, and it saturates there because rares are only 5% of the pool. Rare stays ~2.3× uncommon
@@ -168,15 +168,15 @@ export interface QuestSlot {
 }
 
 
-/** a finale plan: its label (the saga plan's), the reward kind settleFinale reads, and the way it ends (D2) */
+/** a finale plan: its label (the chapter plan's), the reward kind settleFinale reads, and the way it ends (D2) */
 export interface ApproachGroup { id: string; label: string; rewardKind: 'recruit' | 'captive' | 'gold'; way?: Way }
 
-/** a saga card's screen beyond its prose (the v4 storyteller): the quest log rows the engine rendered (both UIs print
- *  them above the prose — `logFirst`), the people the card calls by name, and where the card sits in its saga */
-export interface QuestSaga {
+/** a chapter card's screen beyond its prose (the v4 storyteller): the quest log rows the engine rendered (both UIs print
+ *  them above the prose — `logFirst`), the people the card calls by name, and where the card sits in its chapter */
+export interface QuestChapter {
   rows: LogRow[]; logFirst: boolean; matter: Matter[];
   /** the job this card poses and which try (the finale's job is N) */
-  pos: SagaPos;
+  pos: ChapterPos;
   /** "part n of N": n is null on the finale */
   part: number | null; of: number;
   /** a failed job posed again · the finale the setbacks (or the stall guard) brought */
@@ -188,7 +188,7 @@ export interface Quest {
   id: string;
   leadId: string;
   /** the lead this quest was written from, kept whole so abandoning can PUT IT BACK — a card you
-   *  do not like is a re-roll, not a dead end. Absent on saga beats, which have no lead to return
+   *  do not like is a re-roll, not a dead end. Absent on chapter beats, which have no lead to return
    *  to, and on old saves. */
   fromLead?: Lead;
   title: string;
@@ -201,8 +201,8 @@ export interface Quest {
   archetype: Archetype;
   chainId?: string;
   beatIndex?: number;              // chains: which beat this is
-  /** saga cards only: the quest log and the card's place in its saga */
-  saga?: QuestSaga;
+  /** chapter cards only: the quest log and the card's place in its chapter */
+  chapter?: QuestChapter;
   isFinale?: boolean;
   approaches?: ApproachGroup[];    // finale only; player picks ONE group
   chosenApproach?: string;
@@ -273,10 +273,10 @@ export const LEAD_BAND_WORDS = ['a few coins more', 'a purse', 'a chest', 'a for
  *  at DISPLAY time (§7.2) without knowing the shape the pursue roll will pick. */
 const EXPECTED_BEATS: Record<Rarity, number> = { common: 2.5, uncommon: 3.5, rare: 5 };
 
-/** what the quest this lead opens is worth. A `starts-new` lead opens a SAGA, not a one-off, and
+/** what the quest this lead opens is worth. A `starts-new` lead opens a CHAPTER, not a one-off, and
  *  pricing its bonus against a one-off overstates the band by 2-5x — every 4★ on a chain lead was
  *  a promise the top rung's own landmark could not keep (measured 2026-08-28: no chain 4★ ever
- *  exceeded 0.67 of the saga it opened, against a rung that means "worth MORE than the quest").
+ *  exceeded 0.67 of the chapter it opened, against a rung that means "worth MORE than the quest").
  *  ~12-15% of banded leads are chain leads, rising with the GH tier as rares appear. */
 export function leadQuestWorth(lead: Lead): number {
   if (lead.chainInfo.kind === 'starts-new')
@@ -388,7 +388,7 @@ export function liabilityTriggers(rng: Rng, ageCycles: number): boolean {
 /** FALLBACK only — the AI writes the real ask from the card it just wrote (see buildSlots); this
  *  fires when it under-delivers entries. One default per reward PROFILE covers the whole pool,
  *  and it is where the magic skills finally get one-off work: nothing in the old eight-archetype
- *  table ever favoured magic-*, so a mage had no job outside a saga. */
+ *  table ever favoured magic-*, so a mage had no job outside a chapter. */
 const PROFILE_TESTS: Record<Profile, { attrs: Attribute[]; favored: string[]; clashing: string[] }[]> = {
   spoils: [{ attrs: ['str'], favored: ['melee', 'intimidation'], clashing: [] }, { attrs: ['dex'], favored: ['ranged', 'roguery'], clashing: [] }],
   bloody: [{ attrs: ['con'], favored: ['melee', 'leadership'], clashing: ['submissive'] }, { attrs: ['str'], favored: ['melee', 'intimidation'], clashing: ['hotheaded'] }],

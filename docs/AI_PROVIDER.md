@@ -121,11 +121,11 @@ For the production game, organize OpenAI calls by purpose. The gpt-5 family (rel
 
 | Tier | Default (OpenAI) | Env | Used by | Claude transport |
 |---|---|---|---|---|
-| **plan** — the hardest call, once per saga | `gpt-6-sol` ($2 / $10) | `AIRAIDER_PLAN_MODEL` | saga genesis (and the v4 plan call when it ships) | `AIRAIDER_CLAUDE_PLAN` (default = the writer) |
+| **plan** — the hardest call, once per chapter | `gpt-6-sol` ($2 / $10) | `AIRAIDER_PLAN_MODEL` | chapter genesis (and the v4 plan call when it ships) | `AIRAIDER_CLAUDE_PLAN` (default = the writer) |
 | **writer** — everything the player reads | `gpt-6-luna` ($0.10 / $0.50) | `AIRAIDER_WRITER_MODEL` | quest cards, reports, flesh, direction | `AIRAIDER_CLAUDE_WRITER` (sonnet) |
 | **nano** — mechanical (ids, picks) | `gpt-6-luna` (was gpt-5-nano) | `AIRAIDER_NANO_MODEL` | themeRoll, select | `AIRAIDER_CLAUDE_NANO` (haiku) |
 
-GPT-6 Luna beat gpt-5-mini blind on the same storyteller prompts at ¼ the cost (`v3/scripts/sagalab/modelcmp/RESULT4.md`);
+GPT-6 Luna beat gpt-5-mini blind on the same storyteller prompts at ¼ the cost (`v3/scripts/chapterlab/modelcmp/RESULT4.md`);
 The mechanical tier moved to Luna too (designer: "move everything to luna"): gpt-5-nano ($0.05 / $0.40) was cheaper by well under a cent per playthrough (~3 calls). Tiers are picked by call PURPOSE, never by model equality, so they can share a model while the Claude transport still sends mechanical calls to Haiku. GPT-6 has no `minimal` effort — it is sent as `low`. Measured on a
 2-cycle CLI run (2026-10-03): genesis on Sol 34 s / $0.032; Luna writes ~7 s / ~$0.0005 each. **Known Luna gap:** one voiced
 one-off card came back as the bracket alone (`"situation": "[a tenant farmer]"`) — the prompts were tuned on gpt-5-mini;
@@ -227,7 +227,7 @@ optimized for gpt-5 at the Steam/monetization stretch. Code: `v3/src/ai/claudecl
 **Reading a Claude playtest — Sonnet is not gpt-5-mini.** The prompts stay identical (ruling), so these model
 differences are KNOWN and stay unpatched on this transport; judge them on a GPT spot-check, never by a prompt
 edit made for Sonnet (measured on a 15-cycle Sonnet run vs the gpt-5-mini lab baselines, 2026-10-02):
-- **Length caps overshoot.** Saga cards: median 102 words, 12/14 over the 80-word ceiling (gpt-5-mini: median
+- **Length caps overshoot.** Chapter cards: median 102 words, 12/14 over the 80-word ceiling (gpt-5-mini: median
   82, 56% over). Also one-off cards (20-word cap, 5/12 over by 1-5), the voiced card's "3-5 short sentences"
   (one ran 9 sentences / 103 words), report `before` (7/9 over by 1-3), flesh backstory "2 sentences" (3 in 3/3;
   gpt: 147/152 at 2). Card-length and pacing judgments made on Claude need a GPT check.
@@ -235,7 +235,7 @@ edit made for Sonnet (measured on a 15-cycle Sonnet run vs the gpt-5-mini lab ba
 - **Screenplay dialogue:** 9/26 reports put spoken lines in their own paragraphs (`\n\n`; gpt: 0/139). The CLI
   keeps the stamp gutter for multi-line blocks; the GUI collapses them to one paragraph.
 - **Haiku on the mechanical tier** wraps every reply in a code fence and adds a "Reasoning:" essay (~200 output
-  tokens, 6-7 s per select vs ~1 s on gpt-5-nano); extraction copes, but a late saga beat waits ~6 s longer.
+  tokens, 6-7 s per select vs ~1 s on gpt-5-nano); extraction copes, but a late chapter beat waits ~6 s longer.
 
 ---
 
@@ -276,8 +276,8 @@ edit made for Sonnet (measured on a 15-cycle Sonnet run vs the gpt-5-mini lab ba
 | (today) | Use strict JSON Schema with embedded narrative field | Best balance of validation rigor and storytelling flexibility |
 | (today) | Build thin provider abstraction, skip LiteLLM | Avoid premature framework adoption |
 | 2026-10-02 | Ship a Claude *playtest transport* (`AIRAIDER_AI=claude` / `--claude`): the same prompts via the headless Claude CLI on the subscription (§6.1) | Designer: "the goal isn't production — production will use gpt since it's a LOT cheaper. It's so that my testings are free … At the final stretch (Steam / monetization) we optimize for gpt-5." |
-| 2026-10-03 | Three tiers: **plan = GPT-6 Sol** (saga genesis), **writer = GPT-6 Luna** (replaces gpt-5-mini everywhere), **nano = gpt-5-nano** (kept: cheaper than Luna). `AIRAIDER_AI=sonnet` / `--sonnet` / `npm run gui:sonnet` name the Claude transport | Designer: "replace all gpt-5-mini … if its cheaper might as well replace nano with it too"; "can we use like before where we use diff model for the 'harder' part like generating saga"; "do implement ai=sonnet option" |
-| 2026-10-03 | Mechanical tier → **GPT-6 Luna** too (production = Sol for the saga plan, Luna for everything else) | Designer: "move everything to luna" — nano's saving was < 1¢ per playthrough |
+| 2026-10-03 | Three tiers: **plan = GPT-6 Sol** (chapter genesis), **writer = GPT-6 Luna** (replaces gpt-5-mini everywhere), **nano = gpt-5-nano** (kept: cheaper than Luna). `AIRAIDER_AI=sonnet` / `--sonnet` / `npm run gui:sonnet` name the Claude transport | Designer: "replace all gpt-5-mini … if its cheaper might as well replace nano with it too"; "can we use like before where we use diff model for the 'harder' part like generating saga"; "do implement ai=sonnet option" |
+| 2026-10-03 | Mechanical tier → **GPT-6 Luna** too (production = Sol for the chapter plan, Luna for everything else) | Designer: "move everything to luna" — nano's saving was < 1¢ per playthrough |
 
 ---
 

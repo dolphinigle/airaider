@@ -428,17 +428,17 @@ async function exec(game: Game, line: string): Promise<boolean> {
       break;
     }
 
-    // ---- SAGA LAB dev commands (docs/STORYTELLER.md §5.0) — CLI-only by design, not in 'help'.
+    // ---- CHAPTER LAB dev commands (docs/STORYTELLER.md §5.0) — CLI-only by design, not in 'help'.
     // `mark <token>` echoes, so a driver piping one command at a time knows where its output ends
     case 'mark': console.log(`⟦mark ${arg}⟧`); break;
     case 'lab': {
-      if (rest[0] === 'saga' && rest[1]) {
+      if (rest[0] === 'chapter' && rest[1]) {
         const p = path.resolve(rest.slice(1).join(' '));
         let fx: unknown;
         try { fx = JSON.parse(fs.readFileSync(p, 'utf8')) } catch (e) { console.log(`✗ cannot read fixture ${p}: ${(e as Error).message}`); break }
-        say(game.labSaga(fx as never));
+        say(game.labChapter(fx as never));
       } else if (rest[0] === 'state') console.log(JSON.stringify(game.labState()));
-      else console.log('lab saga <fixture.json> · lab state');
+      else console.log('lab chapter <fixture.json> · lab state');
       break;
     }
 

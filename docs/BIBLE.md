@@ -16,14 +16,14 @@ engine injects independent seeds — this is the core architectural lesson:
 - **KEYWORD seeds** (§5 lock: ONE unlabeled `KEYWORDS:` field — 1 BOND + 1 TIE + 2 WILDCARDS drawn from THINGS/OCCASIONS/PEOPLE/UNCANNY/MOODS, e.g. "love, debt, a curse, salt") — a
   spark to FUSE, decorrelating the story's SHAPE from the tags. Beat keywords > a fixed premise list
   (cheap AI can't "be original" but it can fuse concrete sparks).
-- **PLACE** (`pickPlace`) — a concrete setting so sagas aren't all "a fen-hamlet".
+- **PLACE** (`pickPlace`) — a concrete setting so chapters aren't all "a fen-hamlet".
 - **TONE** (`pickTone`, weighted toward lighter — shifted by the PLAYER_PREFERENCES tone knob: slice-of-life / wry / bittersweet / adventurous / tense
-  / dark) so not every saga is grim. (🛠 2026-07-10: impl pool = this list ∪ warm/grim — union kept, both halves weighted lighter-leaning.)
+  / dark) so not every chapter is grim. (🛠 2026-07-10: impl pool = this list ∪ warm/grim — union kept, both halves weighted lighter-leaning.)
 - **TWIST** — engine-rolled ~30% (the AI NEVER decides; left alone it twisted 9/9). When set, the
   apparent goal is a misdirection.
 - **expectedBeats** — sizes the arc to the rarity (uncommon 4 … legendary 7).
 - **recurring poolCast** — supplied via LORE.md retrieval (relevance-ranked recall + selector, §14 — replaces the old random sample); the bible MAY weave in ≤1-2 as SECONDARY
-  people (recurrence = attachment); MANY sagas use none.
+  people (recurrence = attachment); MANY chapters use none.
 - **avoid** — recent titles + premise snippets, to steer away from repeats.
 - **focal tag exclusion** — recent focals' skill+body+standing tags excluded so the ARCHETYPE varies
   (not every focal a "beautiful scarred notorious wolf-witch"). FOCAL skills capped at 2.

@@ -11,7 +11,7 @@ import { cardType, stackKind, isLiability, type Card } from '../src/engine/cards
 import { slotThreshold, coins, explainCoins, coinsWhy, slotStrength, BAND_TEXT } from '../src/engine/roll.js';
 import { xpNeeded } from '../src/engine/growth.js';
 import { logLines, matterLine } from '../src/ai/storyteller.js';
-import { soFarLine } from '../src/game/sagaflow.js';
+import { soFarLine } from '../src/game/chapterflow.js';
 import type { Quest } from '../src/engine/quests.js';
 
 const pct = (x: number | null) => x === null ? '—' : `${Math.round(x * 100)}%`;
@@ -33,7 +33,7 @@ const stepLine = (st: NextStep) =>
 /** what the captive count counts — ONE phrase for every surface that shows it */
 export const CAPTIVE_COUNT_NOTE = 'counts captives in the cells, on the rack or on show — holding does not count until you take them';
 
-/** a row of pips: n of `of` lit ("●●○○" — a saga's parts; "✗✗·" — its setbacks) */
+/** a row of pips: n of `of` lit ("●●○○" — a chapter's parts; "✗✗·" — its setbacks) */
 const pips = (n: number, of: number, on = '●', off = '○') => on.repeat(Math.max(0, Math.min(n, of))) + off.repeat(Math.max(0, of - n));
 
 /** a quest's places as the player numbers them: the places in play — a chosen finale plan's own, counted from 0 within
@@ -108,7 +108,7 @@ export const render = {
       'PEOPLE  hire <id> · accept <id> · ransom <id> · sell <id> · settle <id> · interrogate <id> · heal <id>',
       '        (on the rack, or on show earning prestige: ransom! / sell! — it says what is lost)',
       'TURN    end   — commit the cycle: everything rolls, the AI narrates. When something would go cold (a quest,',
-      "        a saga's lead, a captive in holding, a guest at the tavern), a part-filled quest won't march or a",
+      "        a chapter's lead, a captive in holding, a guest at the tavern), a part-filled quest won't march or a",
       '        finale has no approach, it lists them: end! (or end again) to go on',
       '        next  — what to do next, most pressing first (status shows the top 3)',
       'SETTINGS direction [text|clear] — tell the AI storyteller your theme and trait wishes (e.g. "Dark fantasy; make the NPCs men")',
@@ -371,7 +371,7 @@ export const render = {
       const kinds = kindsLine(g.questRewardKinds(q.id));
       const warn = g.questRewardWarn(q.id);
       const due = g.questIsFaucet(q) ? '↻ this cycle' : `c${g.questLapsesAt(q)}${g.questStallAt(q) !== null ? ' (stalled)' : ''}${g.questUrgent(q) ? '!' : ''}`;
-      return `${q.id.padEnd(5)} ${q.title.slice(0, 30).padEnd(30)} L${q.level} ${(tokens || '—').padEnd(16)} ${odds.padEnd(26)} ${kinds.padEnd(22)} ${due.padEnd(12)}${q.isFinale ? ' 🎬 finale' : q.saga ? ` 📖 part ${q.saga.part}${q.saga.again ? ' (again)' : ''}` : ''}${warn ? `  ⚠ ${warn}` : ''}`;
+      return `${q.id.padEnd(5)} ${q.title.slice(0, 30).padEnd(30)} L${q.level} ${(tokens || '—').padEnd(16)} ${odds.padEnd(26)} ${kinds.padEnd(22)} ${due.padEnd(12)}${q.isFinale ? ' 🎬 finale' : q.chapter ? ` 📖 part ${q.chapter.part}${q.chapter.again ? ' (again)' : ''}` : ''}${warn ? `  ⚠ ${warn}` : ''}`;
     }).join('\n') + (g.canReroll()
       ? "\n(a card you will not read is not a dead end: 'abandon <id>' puts the lead back — once a cycle)"
       : "\n(a lead has already been taken back up this cycle — 'abandon <id>' now spends the card)");
@@ -384,9 +384,9 @@ export const render = {
     const tail = `(${q.id}, L${q.level} ${q.rarity}, ${REGION[q.region]!.name}, ${due})`;
     const kinds = kindsLine(g.questRewardKinds(q.id));
     const reward = `REWARD: ${g.questReward(q.id)}${kinds ? `  [${kinds}]` : ''}${(w => w ? `  ⚠ ${w}` : '')(g.questRewardWarn(q.id))}`;
-    const sg = q.saga;
+    const sg = q.chapter;
     const lines = sg ? (() => {
-      // a saga card: the quest log the engine rendered (the GUI's rows: on the game's pipes "So far:" and one "  ✓ Title —
+      // a chapter card: the quest log the engine rendered (the GUI's rows: on the game's pipes "So far:" and one "  ✓ Title —
       // line" per part played before the last, which the prose opens on — none on cards 1–2), the prose, the people it names — the same order the quest page uses; no
       // errand line (the prose carries the job)
       const c = g.chainViews().find(x => x.id === q.chainId);
@@ -396,12 +396,12 @@ export const render = {
       // the quest page shows a person with a real card (the focal, a soldier) AS that card: what it is, under the line
       const cards = cast.flatMap(m => { const k = m.cardId ? g.card(m.cardId) : undefined; return k ? [castCardLine(m.label, k)] : [] });
       const where = sg.part === null ? `the finale${sg.lastchance ? ' · the last chance' : ''}` : `part ${sg.part} of ${sg.of}${sg.again ? ' (again)' : ''}`;
-      // the web's saga strip, in the same order: this card's part among the saga's, the setbacks, what is set aside
+      // the web's chapter strip, in the same order: this card's part among the chapter's, the setbacks, what is set aside
       const now = sg.part ?? sg.of;
-      const strip = `SAGA: ${pips(now, sg.of)} ${where} · setbacks ${pips(sg.setbacks, sg.budget, '✗', '·')} ${sg.setbacks} of ${sg.budget} · set aside so far: ${c?.bank || 'nothing yet'}`;
+      const strip = `CHAPTER: ${pips(now, sg.of)} ${where} · setbacks ${pips(sg.setbacks, sg.budget, '✗', '·')} ${sg.setbacks} of ${sg.budget} · set aside so far: ${c?.bank || 'nothing yet'}`;
       const gap = log.length ? [''] : [];
       return [
-        `═══ ${q.title} · ${c?.title ?? 'a saga'} ═══  ${tail}`,
+        `═══ ${q.title} · ${c?.title ?? 'a chapter'} ═══  ${tail}`,
         ...(sg.logFirst ? [...log, ...gap, q.situation] : [q.situation, ...gap, ...log]),
         ...(matter ? [matter, ...cards] : []),
         reward,
@@ -496,8 +496,8 @@ export const render = {
   },
 
   chains(g: Game): string {
-    // live sagas first; each ends on where it stands in play (its quest, or the lead that continues it). How far along: part
-    // n of N, the saga's one measure (the web's Sagas tab)
+    // live chapters first; each ends on where it stands in play (its quest, or the lead that continues it). How far along: part
+    // n of N, the chapter's one measure (the web's Chapters tab)
     const where = (c: ReturnType<Game['chainViews']>[number]) =>
       ` → ${c.next}${c.questId ? ` ('quest ${c.questId}')` : c.leadId && c.next === 'a lead to pursue' ? ` ('pursue ${c.leadId}')` : ''}`;
     return [...g.chainViews()].sort((a, b) => Number(b.live) - Number(a.live)).map(c =>
@@ -505,7 +505,7 @@ export const render = {
     ).join('\n') || '(no stories yet — pursue a ✦STORY lead)';
   },
 
-  /** the saga as the chronicle shows it (the GUI's Sagas tab, same rows, same order): the quest log as it stands (none on
+  /** the chapter as the chronicle shows it (the GUI's Chapters tab, same rows, same order): the quest log as it stands (none on
    *  the game's pipes, designer 2026-10-05), card
    *  1 (set off from the log, as on a card), the likely end — how it ended, once it is over — and the economy, So far,
    *  the answer once the finale is played, the people seen */

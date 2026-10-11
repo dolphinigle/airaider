@@ -204,7 +204,7 @@ describe('END warns for everything that goes at this END (end-guard-misses-go-co
     expect(g.holdingDeadline(cap.id)).toBe('handed off in 3 cycles');
     expect(g.endWarnings().some(x => x.key === cap.id)).toBe(false);
   });
-  it("a saga's continuation lead going cold is warned", async () => {
+  it("a chapter's continuation lead going cold is warned", async () => {
     const g = new Game(new MockProvider(77), 77);
     g.build('map-room'); g.pursueAll(); await g.drain();
     const chain = g.state.chains.find(c => c.state === 'active')!;
@@ -213,7 +213,7 @@ describe('END warns for everything that goes at this END (end-guard-misses-go-co
     g.state.leads.push({ id: freshId('lead-'), rarity: 'common', level: 1, region: 'forests', archetype: 'investigate',
       chainInfo: { kind: 'continues', chainId: chain.id, hook: '' }, expiresAtCycle: g.state.cycle + 1, source: 'continuation', title: 'x' });
     const w = g.endWarnings().find(x => x.why === 'lead-lapses')!;
-    expect(w.title).toBe(chain.saga!.plan!.title);
+    expect(w.title).toBe(chain.chapter!.plan!.title);
     expect(w.text).toMatch(/slips this END/);
   });
   it('a part-filled standing-post quest goes cold (not "won\'t march"); an empty one is silent', async () => {
@@ -324,8 +324,8 @@ describe('room moves say what they do to prestige (move-preview-hides-prestige-l
   });
 });
 
-describe('abandoning a saga step says what the engine will do (abandon-confirm-lies)', () => {
-  it('a third untaken offer slips the saga — the confirm and the reply say so', async () => {
+describe('abandoning a chapter step says what the engine will do (abandon-confirm-lies)', () => {
+  it('a third untaken offer slips the chapter — the confirm and the reply say so', async () => {
     const g = new Game(new MockProvider(77), 77);
     g.build('map-room'); g.pursueAll(); await g.drain();
     const q = open(g).find(x => x.chainId && !x.isFinale);
@@ -415,7 +415,7 @@ describe('the tally counts each loss once, and every kind of loss (tally-double-
     expect(sum.handedOff?.map(h => h.id)).toEqual([cap.id]);
     expect(Game.tallyLine(sum)).toMatch(/handed off/);
   });
-  it('a failed saga beat says the setback, and the tally counts it', async () => {
+  it('a failed chapter beat says the setback, and the tally counts it', async () => {
     const g = new Game(new MockProvider(77), 77);
     g.build('map-room'); g.pursueAll(); await g.drain();
     const chain = g.state.chains.find(c => c.state === 'active')!;
@@ -425,7 +425,7 @@ describe('the tally counts each loss once, and every kind of loss (tally-double-
     const report: string[] = [];
     (g as unknown as { cycleAcc: unknown }).cycleAcc = { wounds: [], tamed: [], lapsed: [], stalled: [], leadsCold: [], handedOff: [], setbacks: [] };
     (g as unknown as { advanceChain: (...a: unknown[]) => void }).advanceChain(
-      q, { quest: q, outcome: 'failure', party: [], saga: { pos: q.saga!.pos, inn: { hurt: [], decides: '', lowest: '' } } },
+      q, { quest: q, outcome: 'failure', party: [], chapter: { pos: q.chapter!.pos, inn: { hurt: [], decides: '', lowest: '' } } },
       { before: 'They went.', after: 'The gate held.', summary: 'The gate held against them.' }, report);
     expect(report.join(' ')).toMatch(new RegExp(`a setback — 1 of ${chain.failureBudget}`));
     expect((g as unknown as { cycleAcc: { setbacks: unknown[] } }).cycleAcc.setbacks).toHaveLength(1);

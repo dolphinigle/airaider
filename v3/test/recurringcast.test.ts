@@ -22,7 +22,7 @@ function worldWithCast(seed: number) {
       blurb: 'a past matter', importance: 0.5 }], 1, () => `ea${t}`);
   return g;
 }
-const sagaLead = (): Lead => ({ id: 'RL', rarity: 'uncommon', level: 3, region: 'forests',
+const chapterLead = (): Lead => ({ id: 'RL', rarity: 'uncommon', level: 3, region: 'forests',
   archetype: 'investigate', chainInfo: { kind: 'starts-new' }, expiresAtCycle: null, source: 'reward' });
 
 describe('a returning face actually returns', () => {
@@ -30,7 +30,7 @@ describe('a returning face actually returns', () => {
     let reused = 0, total = 0;
     for (let s = 0; s < 30; s++) {
       const g = worldWithCast(s);
-      g.state.leads.push(sagaLead());
+      g.state.leads.push(chapterLead());
       const r = await g.pursue('RL');
       if (!r.ok) continue;
       total++;
@@ -50,7 +50,7 @@ describe('a returning face actually returns', () => {
     let checked = 0;
     for (let s = 0; s < 30 && checked < 3; s++) {
       const g = worldWithCast(s);
-      g.state.leads.push(sagaLead());
+      g.state.leads.push(chapterLead());
       const r = await g.pursue('RL');
       if (!r.ok) continue;
       const chain = g.state.chains[g.state.chains.length - 1]!;
@@ -68,7 +68,7 @@ describe('a returning face actually returns', () => {
     const picks: Record<string, number> = {};
     for (let s = 0; s < 60; s++) {
       const g = worldWithCast(s);
-      g.state.leads.push(sagaLead());
+      g.state.leads.push(chapterLead());
       const r = await g.pursue('RL');
       if (!r.ok) continue;
       const focal = g.card(g.state.chains[g.state.chains.length - 1]!.focalId);
@@ -102,7 +102,7 @@ describe('a returning face keeps who they were', () => {
     for (let s = 0; s < 30 && checked < 4; s++) {
       const g = worldWithCast(s);
       for (const n of Object.values(g.state.lore.nodes)) if (n.id.startsWith('lore-x')) n.sex = 'female';
-      g.state.leads.push(sagaLead());
+      g.state.leads.push(chapterLead());
       const r = await g.pursue('RL');
       if (!r.ok) continue;
       const focal = g.card(g.state.chains.at(-1)!.focalId);

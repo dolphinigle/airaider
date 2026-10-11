@@ -6,7 +6,7 @@ import { MockProvider } from '../src/ai/mock.js';
 import { coins } from '../src/engine/roll.js';
 import type { Quest } from '../src/engine/quests.js';
 import { logLines } from '../src/ai/storyteller.js';
-import type { SagaCall } from '../src/ai/provider.js';
+import type { ChapterCall } from '../src/ai/provider.js';
 import { seedIdCounter } from '../src/engine/cards.js';
 
 /** a game with a manned-up roster and at least one open quest */
@@ -20,12 +20,12 @@ async function staged(seed = 9101) {
   }
   return g;
 }
-/** the mock, but each saga card it writes names the person the ending decides (the focal), as a writer does once the
+/** the mock, but each chapter card it writes names the person the ending decides (the focal), as a writer does once the
  *  story has met them */
 class NamesFocal extends MockProvider {
   g!: Game;
-  override async sagaCall(c: SagaCall): Promise<unknown> {
-    const out = await super.sagaCall(c) as { card?: string };
+  override async chapterCall(c: ChapterCall): Promise<unknown> {
+    const out = await super.chapterCall(c) as { card?: string };
     if (c.template !== 'card') return out;
     const focal = this.g.card(this.g.state.chains.at(-1)!.focalId)!;
     return { ...out, card: `${out.card} ${focal.name} waits.` };
@@ -155,17 +155,17 @@ describe('autoAssign', () => {
 });
 
 describe('questCast', () => {
-  it('is empty for a one-off; a saga card lists the people it calls by name, as name and label', async () => {
+  it('is empty for a one-off; a chapter card lists the people it calls by name, as name and label', async () => {
     const g = await staged();
-    let sagas = 0;
+    let chapters = 0;
     for (const q of openQuests(g)) {
       const cast = g.questCast(q.id);
       if (!q.chainId) { expect(cast).toEqual([]); continue }
-      sagas++;
-      expect(cast.map(({ cardId: _, ...m }) => m)).toEqual(q.saga!.matter);
+      chapters++;
+      expect(cast.map(({ cardId: _, ...m }) => m)).toEqual(q.chapter!.matter);
       for (const c of cast) { expect(c.name).toBeTruthy(); expect(c.label).toBeTruthy(); expect(c.label).not.toMatch(/^an? /) }
     }
-    expect(sagas).toBeGreaterThan(0);
+    expect(chapters).toBeGreaterThan(0);
   });
 
   it('a person the card names who is a real card (the focal) carries that card; the people the story coined do not', async () => {
@@ -184,7 +184,7 @@ describe('questCast', () => {
     for (const c of cast.filter(c => c.name !== focal.name)) expect(c.cardId).toBeUndefined();
   });
 
-  it('the soldier of a personal saga, named on the card, carries their roster card', async () => {
+  it('the soldier of a personal chapter, named on the card, carries their roster card', async () => {
     seedIdCounter(1);
     const g = new Game(new MockProvider(31), 31);
     g.build('map-room');
@@ -199,7 +199,7 @@ describe('questCast', () => {
   it('never shows a person the card itself withheld', async () => {
     const g = await staged();
     for (const q of openQuests(g).filter(q => q.chainId)) {
-      const shown = `${logLines(q.saga!.rows).join('\n')}\n${q.situation}`;
+      const shown = `${logLines(q.chapter!.rows).join('\n')}\n${q.situation}`;
       for (const c of g.questCast(q.id)) expect(shown).toContain(c.name.split(/\s+/)[0]!);
     }
   });

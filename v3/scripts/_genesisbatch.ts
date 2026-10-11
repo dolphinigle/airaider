@@ -1,4 +1,4 @@
-// N fresh sagas (one per seed) — for counting what every bible leans on.
+// N fresh chapters (one per seed) — for counting what every bible leans on.
 // Usage: OUT=<json> npx tsx scripts/_genesisbatch.ts [n] [seed]
 import * as fs from 'node:fs';
 import { Game } from '../src/game/game.js';

@@ -61,9 +61,9 @@ A pure-engine roll is fine when fiction shouldn't drive it (twist %, failure bud
 when the *story* knows best (is there loot here? does this step branch?).
 
 ## 3a. The player is a MERCENARY BOSS who wants GAIN — every job must answer "what's in it for us?"
-*(2026-07-18 R1 "sell the stake", blind-benched +1.25 and boss-pull 5-0: beat-1 SAGA cards close on an
+*(2026-07-18 R1 "sell the stake", blind-benched +1.25 and boss-pull 5-0: beat-1 CHAPTER cards close on an
 engine-dealt `stake` rumor line — the WHOLE matter's worth in world words from the chain envelope
-(recruit/ransom/hoard by payoff band; personal sagas NAME the mercenary — an anonymous "one of our own…
+(recruit/ransom/hoard by payoff band; personal chapters NAME the mercenary — an anonymous "one of our own…
 them" judged as pasted boilerplate). Rumor-toned so a slip breaks no promise; the demand lives as
 conditional rule 5 in END position — buried mid-paragraph it fired ~50%, end-position 6/6.)*
 
@@ -121,7 +121,7 @@ Edit → **read real outputs** (run a `_exp_*` harness with the real AI, or `/pl
 not the diff → iterate. Offline gates (selftest/looptest/conformance) use the Mock narrator and only prove
 no *breakage*; they can't judge prose. See the **playtest** skill.
 
-## 10. Prose STYLE steering — the measured laws *(prosebench, 2026-07-18; designer-verified on sagas)*
+## 10. Prose STYLE steering — the measured laws *(prosebench, 2026-07-18; designer-verified on chapters)*
 How the reports went from "clear but dead" (4.5) to good (6.5–7, peaks 8) — all A/B'd blind on the
 anchored bench in `v3/scripts/prosebench/` (rubric + frozen anchors + judge protocol). These are LAWS
 for style edits; every one below was measured, most the expensive way.
@@ -155,7 +155,7 @@ for style edits; every one below was measured, most the expensive way.
 - **Known residuals are STRUCTURAL** (resistant to wording, don't re-try rules on them): finale
   fate-formula echo, deliveredSummary loot pastes, parley pivots summarized when the speech demand is
   scene-blind, same-ground chain monotony (arc-skeleton). 🟡 **One-off CARD briefings never got this
-  pass** (designer 2026-07-18: sagas good, one-offs lag) — the reference craft is Sultan's Game /
+  pass** (designer 2026-07-18: chapters good, one-offs lag) — the reference craft is Sultan's Game /
   Fort of Chains: every setup's LAST sentence is a vector at the player's decision; each card
   WITHHOLDS exactly one named thing; failure plays deadpan; restraint at the extremes.
 

@@ -1,15 +1,15 @@
-// Text-UI parity (docs/DOGFOODING.md; STORYTELLER Phase 2 Step 6): the CLI prints a saga card's quest log as exactly the
-// rows the server exposes (quests[].saga.rows — the engine renders them; neither UI builds saga text), in the same order
+// Text-UI parity (docs/DOGFOODING.md; STORYTELLER Phase 2 Step 6): the CLI prints a chapter card's quest log as exactly the
+// rows the server exposes (quests[].chapter.rows — the engine renders them; neither UI builds chapter text), in the same order
 // as the quest page: the log above the prose (logFirst; on the game's pipes So far, the parts played before the last),
-// ON THIS MATTER, REWARD, the SAGA line. The chain view prints the chronicle's rows (none on the game's pipes), card 1,
-// So far, the answer and the people the GUI's Sagas tab shows.
+// ON THIS MATTER, REWARD, the CHAPTER line. The chain view prints the chronicle's rows (none on the game's pipes), card 1,
+// So far, the answer and the people the GUI's Chapters tab shows.
 import { describe, it, expect } from 'vitest';
 import { Game } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
 import { seedIdCounter } from '../src/engine/cards.js';
 import { logLines, matterLine } from '../src/ai/storyteller.js';
 import { render } from '../cli/format.js';
-import { soFarLine } from '../src/game/sagaflow.js';
+import { soFarLine } from '../src/game/chapterflow.js';
 import { renderTags } from '../src/engine/tags.js';
 
 async function playTo(g: Game, cards: number) {
@@ -29,19 +29,19 @@ async function playTo(g: Game, cards: number) {
 }
 
 describe('the CLI prints the rows the server exposes', () => {
-  it('a later saga card: log above the prose, the people it names, the SAGA line; no errand', async () => {
+  it('a later chapter card: log above the prose, the people it names, the CHAPTER line; no errand', async () => {
     seedIdCounter(1);
     const g = new Game(new MockProvider(7), 7);
     const q = await playTo(g, 3);
     const out = render.questDetail(g, q.id).split('\n');
-    const log = logLines(q.saga!.rows);
+    const log = logLines(q.chapter!.rows);
     const chain = g.chainViews().find(c => c.id === q.chainId)!;
     // the game's pipes show no forward log (designer 2026-10-05): "So far:", then one "  ✓ Title — line" per part played
     // before the last (the prose opens on that one)
     expect(chain.lines.length).toBeGreaterThanOrEqual(2);
     expect(log.some(l => /^(For|Road ahead|Known|Held|Open question):/.test(l))).toBe(false);
-    expect(log).toEqual(['So far:', ...q.saga!.rows.slice(1).map(r => `  ${r.mark} ${r.title} — ${r.text}`)]);
-    expect(q.saga!.rows.slice(1).map(r => r.text)).toEqual(chain.lines.slice(0, -1).map(l => l.summary ?? l.text));
+    expect(log).toEqual(['So far:', ...q.chapter!.rows.slice(1).map(r => `  ${r.mark} ${r.title} — ${r.text}`)]);
+    expect(q.chapter!.rows.slice(1).map(r => r.text)).toEqual(chain.lines.slice(0, -1).map(l => l.summary ?? l.text));
     expect(log.slice(1).every(l => /^ {2}[✓✗] \S.* — \S/.test(l))).toBe(true);
     expect(out[0]).toBe(`═══ ${q.title} · ${chain.title} ═══  ${out[0]!.slice(out[0]!.indexOf('(q'))}`);
     expect(out.slice(1, 1 + log.length)).toEqual(log);
@@ -49,9 +49,9 @@ describe('the CLI prints the rows the server exposes', () => {
     expect(out[2 + log.length]).toBe(q.situation);
     const matter = matterLine(g.questCast(q.id));
     if (matter) expect(out[3 + log.length]).toBe(matter);
-    // the web's saga strip, in its order: this card's part (pips), the setbacks, what is set aside so far
+    // the web's chapter strip, in its order: this card's part (pips), the setbacks, what is set aside so far
     const pip = (n: number, of: number, on: string, off: string) => on.repeat(n) + off.repeat(of - n);
-    expect(out.find(l => l.startsWith('SAGA: '))).toBe(`SAGA: ${pip(q.saga!.part!, q.saga!.of, '●', '○')} part ${q.saga!.part} of ${q.saga!.of} · setbacks ${pip(q.saga!.setbacks, q.saga!.budget, '✗', '·')} ${q.saga!.setbacks} of ${q.saga!.budget} · set aside so far: ${chain.bank || 'nothing yet'}`);
+    expect(out.find(l => l.startsWith('CHAPTER: '))).toBe(`CHAPTER: ${pip(q.chapter!.part!, q.chapter!.of, '●', '○')} part ${q.chapter!.part} of ${q.chapter!.of} · setbacks ${pip(q.chapter!.setbacks, q.chapter!.budget, '✗', '·')} ${q.chapter!.setbacks} of ${q.chapter!.budget} · set aside so far: ${chain.bank || 'nothing yet'}`);
     expect(out.some(l => l.startsWith('ERRAND:'))).toBe(false);
   });
 
@@ -59,24 +59,24 @@ describe('the CLI prints the rows the server exposes', () => {
     seedIdCounter(1);
     const g = new Game(new MockProvider(7), 7);
     const q = await playTo(g, 3);
-    const want = q.saga!.rows;
+    const want = q.chapter!.rows;
     expect(want.length).toBeGreaterThan(0);
-    // the save as the old build wrote it: the card's stored rows (and the saga's cached card) the forward log
+    // the save as the old build wrote it: the card's stored rows (and the chapter's cached card) the forward log
     const old = [{ kind: 'for', text: 'Mara, a miller, who wants her mill back' }, { kind: 'road', text: 'Road ahead' }, { kind: 'open', text: 'who burned it' }];
     const st = JSON.parse(g.save());
     const sq = st.quests.find((x: { id: string }) => x.id === q.id);
-    sq.saga.rows = old; sq.saga.matter = [];
-    st.chains.find((c: { id: string }) => c.id === q.chainId).saga.cache.rows = old;
+    sq.chapter.rows = old; sq.chapter.matter = [];
+    st.chains.find((c: { id: string }) => c.id === q.chainId).chapter.cache.rows = old;
     const back = Game.load(new MockProvider(7), JSON.stringify(st));
     const bq = back.state.quests.find(x => x.id === q.id)!;
-    expect(bq.saga!.rows).toEqual(want);
-    expect(bq.saga!.matter).toEqual(q.saga!.matter);
-    expect(back.state.chains.find(c => c.id === q.chainId)!.saga!.cache!.rows).toEqual(want);
+    expect(bq.chapter!.rows).toEqual(want);
+    expect(bq.chapter!.matter).toEqual(q.chapter!.matter);
+    expect(back.state.chains.find(c => c.id === q.chainId)!.chapter!.cache!.rows).toEqual(want);
     expect(render.questDetail(back, q.id).split('\n').some(l => /^(For|Road ahead|Open question):/.test(l))).toBe(false);
-    // a saga on a pipe with the forward log keeps the rows it was written with
-    st.chains.find((c: { id: string }) => c.id === q.chainId).saga.world.pipe = 'voice+log';
+    // a chapter on a pipe with the forward log keeps the rows it was written with
+    st.chains.find((c: { id: string }) => c.id === q.chainId).chapter.world.pipe = 'voice+log';
     const ctl = Game.load(new MockProvider(7), JSON.stringify(st));
-    expect(ctl.state.quests.find(x => x.id === q.id)!.saga!.rows).toEqual(old);
+    expect(ctl.state.quests.find(x => x.id === q.id)!.chapter!.rows).toEqual(old);
   });
 
   it('ON THIS MATTER: a person who is a real card gets a line of what that card is, as the quest page shows it', async () => {

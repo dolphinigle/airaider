@@ -2,7 +2,7 @@
 import { Game } from '../src/game/game.js';
 import { MockProvider } from '../src/ai/mock.js';
 const RUNS = 8, CYCLES = 120;
-let nodes = 0, edgeless = 0, sagas = 0, reuses = 0, closed = 0, pool = 0; const states: string[] = [];
+let nodes = 0, edgeless = 0, chapters = 0, reuses = 0, closed = 0, pool = 0; const states: string[] = [];
 const appear: number[] = [];
 for (let s = 0; s < RUNS; s++) {
   const g = new Game(new MockProvider(s), s);
@@ -18,14 +18,14 @@ for (let s = 0; s < RUNS; s++) {
   pool += loreOnly.length;
   nodes += chars.length;
   edgeless += chars.filter(n => !g.state.lore.edges.some(e => e.from === n.id || e.to === n.id)).length;
-  sagas += g.state.chains.length;
-  reuses += (g as unknown as { knownCastSagas: number }).knownCastSagas;
+  chapters += g.state.chains.length;
+  reuses += (g as unknown as { knownCastChapters: number }).knownCastChapters;
   // how often each face is touched by an edge = how many matters they are in
   for (const n of chars) appear.push(g.state.lore.edges.filter(e => e.from === n.id || e.to === n.id).length);
 }
 const two = appear.filter(x => x >= 2).length, three = appear.filter(x => x >= 3).length;
 console.log(`${RUNS} campaigns x ${CYCLES} cycles · θ=${process.env.CAST_THETA ?? 4}`);
-console.log(`  sagas per campaign:        ${(sagas/RUNS).toFixed(1)}`);
+console.log(`  chapters per campaign:        ${(chapters/RUNS).toFixed(1)}`);
 console.log(`  known faces reused:        ${(reuses/RUNS).toFixed(1)} per campaign`);
 console.log(`  character nodes:           ${(nodes/RUNS).toFixed(1)} per campaign`);
 console.log(`  EDGELESS nodes:            ${(edgeless/RUNS).toFixed(1)}  (goal: 0)`);

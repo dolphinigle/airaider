@@ -1,5 +1,5 @@
 // Chains — QUESTS §6/§8, ECONOMY §5a, §21-4a. A chain is built around ONE focal
-// character (generated FIRST, at the saga's payoff value); beats bank merc-cycles;
+// character (generated FIRST, at the chapter's payoff value); beats bank merc-cycles;
 // the finale crystallizes the bank; failure = TIME (bank forfeit, focal slips away FOR NOW).
 
 import type { Rng } from './rng.js';
@@ -9,7 +9,7 @@ import {
 } from './economy.js';
 import type { Outcome } from './roll.js';
 import type { ChainLab } from './lab.js';
-import type { SagaRecord } from './saga.js';
+import type { ChapterRecord } from './chapter.js';
 
 export interface Chain {
   id: string;
@@ -31,19 +31,19 @@ export interface Chain {
   createdCycle: number;
   /** the cycle it ended (done or slipped; saves from 2026-10-05 on): the living dossier's order, a next chapter's cooldown */
   endedCycle?: number;
-  /** SAGA LAB only (docs/STORYTELLER.md §5.0): the fixture and its forced rolls — absent in play */
+  /** CHAPTER LAB only (docs/STORYTELLER.md §5.0): the fixture and its forced rolls — absent in play */
   lab?: ChainLab;
-  /** the v4 storyteller's record (docs/STORYTELLER.md; src/game/sagaflow.ts): world, plan, Knowing, road, lines. Set by
+  /** the v4 storyteller's record (docs/STORYTELLER.md; src/game/chapterflow.ts): world, plan, Knowing, road, lines. Set by
    *  the deal, in the pursuit's synchronous prefix; the plan lands on it before the chain's first card. (Saves written
    *  before v4 are not supported — they are cleared at ship.) */
-  saga?: SagaRecord;
+  chapter?: ChapterRecord;
 }
 
 export const TWIST_CHANCE = 0.30;
 
 export function rollChainShape(rng: Rng, rarity: Rarity): { beats: number; failureBudget: number } {
   const beats = rarity === 'rare' ? rng.range(4, 6) : rarity === 'uncommon' ? rng.range(3, 4) : rng.range(2, 3);
-  // a single stumble must never force the finale (fun-check); harder sagas still allow fewer
+  // a single stumble must never force the finale (fun-check); harder chapters still allow fewer
   return { beats, failureBudget: Math.max(2, Math.ceil(beats / 2)) };
 }
 
