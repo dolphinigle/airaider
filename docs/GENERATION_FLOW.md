@@ -1826,7 +1826,7 @@ liabilities=negative stackables; tier-ceiling not stored ilvl) → CARDS ✅.**
 
 ## §22 — MERCENARY BACKSTORY & LEVEL CAP ✅ designer rulings 2026-10-11
 
-1. **The backstory is written at recruit** 🔒, as part of the stable identity; not "short": the mercenary's past plus its **open threads** (told or secret). → STORY_ENGINE §4.
+1. **The backstory is written at recruit** 🔒, not "short", as a separate **past saga** record linked to the mercenary: the past plus its **open threads** (told or secret), which live in that saga. The living dossier stays short and only summarizes the "so far", linking to saga records for anything long. → STORY_ENGINE §4.
 2. **Level cap = min(backstory cap, bedroom cap)** 🔒. The bedroom cap is unchanged (`3 + 0.9 × comfort`). The backstory cap rises each time the mercenary's own personal saga ("opening up") resolves one of the backstory's open threads. → CARDS §Level, GAME_STATE, FORT, DESIGN.
 3. **After the backstory cap is maxed** 🔒, further personal sagas play as ordinary sagas and only **rarely** give the mercenary something permanent (🟡 what: undecided).
 4. **The full backstory is fed only where the mercenary is highly relevant** 🔒 (their own opening-up saga); elsewhere the blurb or the dossier. → STORY_ENGINE §4.
