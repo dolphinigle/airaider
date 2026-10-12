@@ -28,6 +28,10 @@ Every lore node has ONE living document: everything the game knows about it **ex
 **Replaces** (code): `who` → Blurb; `backstory` + `grown[]` + `living` (`engine/dossier.ts`, engine-rendered) → History + Brief. A chapter's own full text stays its **chapter record**.
 🟡 **Open**: a node touched only by one-offs never gets a chapter close (recommended: one batched rewrite at cycle end for nodes one-offs touched; or one-offs update edges only).
 
+## 1c. Terms 🔒 *(designer 2026-10-13)*
+
+A small authored **terms lorebook** (engine data): the game's unusual words that a model with no context would misread, each with a one-line plain definition (e.g. `wolfkin`: a people with wolf-like features who live as other people do and never change shape; `lizardfolk`). The engine **text-matches** every term against the rendered prompt (system + input) and defines **only the ones it uses**, in a `Terms:` block at the **top of the input**, so the system prompt stays byte-stable and cacheable. Why: with no definition, a model fused the race "wolfkin" with a dealt "werewolf" and redefined the race (lab 2026-10-12). Engine data never leaks internal words into prompts (e.g. region text said "wolfman packs": the prompt word is `wolfkin`).
+
 ## 2. How lore changes 🔒
 
 - **Salience & decay**: `effectiveSalience = base × 0.97^(cycle − lastCycle)`. **CORE memories (AI-flagged, importance ≥ ~0.8) are PINNED — never decay** *(required: under an event-flood, decay-all retained 0/9 defining memories; pinning 8/9)*. AI importance ratings are stable (std ~0.054, clean core/mid/trivia separation).
