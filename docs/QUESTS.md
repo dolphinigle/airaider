@@ -111,6 +111,7 @@ So you keep a hard-won focal character even on a *partial* — on a *failure* th
 
 **One-off vs chain:**
 - **One-off** — the engine rolls the reward, the AI dresses it (§2). Reward-first.
+- **Arc** (designer 2026-10-12) — a mercenary's arc is rewarded like a chain: its final reward is minted at arc creation and banked across the arc's chapters, crystallizing in the final chapter; the level-cap raise is priced in the value (STORY_ENGINE §4).
 - **Chain** — the **focal character generated at genesis IS the payoff**, and its value is **accrued over the beats as a merc-day bank** (ECONOMY §5a, [REWARD_BANK.md](REWARD_BANK.md)). Intermediate beats **bank** their merc-cycles toward the focal (each beat also carries a **small engine-set side-loot budget** — §6/§8; a failed beat banks 0 and drops no side-loot); the **finale crystallizes the bank** into the focal character **+ surplus gold**, the focal's **fate decided by the finale roll** (success = clean · partial = lesser/saddled · failure = **bank forfeited + the focal slips away for now** — sequel lead as the road back, §21-4a; permanent loss out of prototype). A bank short of the focal's value delivers them **with a debt**, or — if too thin — lets them **slip away** for salvage gold. A per-chain **failure budget** (harder = fewer) turns repeated stumbles into a forced **last-chance** finale rather than an endless retry.
 
 **Character rewards recurse** — a captive/recruit/promoted NPC runs character-generation, and if they become a merc fires the **main-chain** generation. A reward seeds the next story.
