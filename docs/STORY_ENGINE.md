@@ -45,7 +45,7 @@ New faces from uncommon quests **persist in the pool** (survivors, notable NPCs,
 
 A character's depth comes from the chains they've lived through — but you can't feed all their chains into a new quest's prompt (token blowout). So the record stores a **distillation**, and the chains keep refilling it:
 
-- **The living document** (LORE §1b, designer 2026-10-12): tags (= personality) and quirks from the card, plus **Identity** (fixed keys, very rarely rewritten), **Blurb** (≤~25 tokens, cacheable), **Brief** (the short version) and **History** (the bounded, told past summary), both AI-rewritten whole at each chapter close: *the compact summary of the chains they're in*. Not a separate psychological model. The backstory itself lives in the mercenary's linked **arc** (below).
+- **The living document** (LORE §1b, designer 2026-10-12): tags (= personality) and quirks from the card, plus **Identity** (fixed keys, very rarely rewritten), **Blurb** (≤~25 tokens, cacheable), **Brief** (the short version) and **History** (the bounded, told past summary), both AI-rewritten whole at each chapter close: *the compact summary of the chains they're in*. Not a separate psychological model. The backstory itself lives in the mercenary's linked **arc**, a story node (LORE §1b: Blurb and Brief told only, the full text only in their own arc and chapter calls).
 
 **Token discipline at generation time:**
 - Always feed the **stable identity** for the relevant pool — small and prompt-cacheable.
