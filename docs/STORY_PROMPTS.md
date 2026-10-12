@@ -20,14 +20,15 @@
 
 ## 0. Current best: the chapter plan and the arc WITH KNOWN LORE (2026-10-13)
 
-The §1 (P9) and §2 (A9 + RCSLR2) prompts, extended so the pickers see the world's **known** lore nodes (people, relics, places, earlier chapters, arcs; `LORE` §1, §1b, §3) and pick the ones they want to know more about, and the writers get those nodes' Briefs. **These texts supersede the §1 and §2 texts**; everything else in §1 and §2 (the dealing rules, the engine reward lines, the reply → storage table) still applies. Lab files: `pickP9L6.sys`, `storysagaP9L6.sys`, `arcpickA9L2.sys`, `arcstoryRCSLR2L2.sys`, runners in `lore/`.
+The §1 (P9) and §2 (A9 + RCSLR2) prompts, extended so the pickers see the world's **known** lore nodes (people, relics, places, earlier chapters, arcs; `LORE` §1, §1b, §3) and pick the ones they want to know more about, and the writers get those nodes' Briefs. **These texts supersede the §1 and §2 texts**; everything else in §1 and §2 (the dealing rules, the engine reward lines, the reply → storage table) still applies. Lab files: `pickP9L7.sys`, `storysagaP9L7.sys`, `arcpickA9L3.sys`, `arcstoryRCSLR2L3.sys`, runners in `lore/` (`labfinal.py` = a fresh run).
 
 **Engine rendering rules** (designer rulings 2026-10-12/13):
 - **Terms** (`LORE` §1c): the engine text-matches the terms lorebook against the rendered prompt (system + input) and puts a `Terms:` block **at the top of the input**, defining only the terms used. Current entries: `wolfkin: a people with wolf-like features (fur, a muzzle, keen senses), who live as other people do and never change shape` · `lizardfolk: a people with scales and lizard-like features, who live as other people do`. Region and engine text uses the prompt words, never internal ones ("wolfkin", not "wolfman").
 - **Picker input: one list per kind, each line tagged** `(known)` or `(new)` (tagged beat grouped "Known X / New X" sections on simplicity, with equal format errors and slightly more known use: 30 picker calls, 2026-10-13). A known person also carries their role: `(known, NPC)`, `(known, the company's mercenary)`, `(known, the company's captive)`. A known line = its card line + `: ` + its **Blurb** + `Tie: ` + the **blurb of its strongest active memory edge** to the company or its people (salience-ranked; the edge type never reaches the prompt; no edge → no Tie). One explanation line opens the lists: `Entries marked known are ones the company has met before, given here in short; entries marked new are not.`
 - **Which known entries are dealt**: recall (`LORE` §3) then a **random draw** of ~7 🛠 (chapter) or the mercenary's own edges + ~4 🛠 (arc), weighted by salience 🛠. Mercenaries appear only as known people (no separate mercenaries line; the arc's rare fellow mercenary is dealt as a known person).
 - **Name collisions**: fresh names never reuse a known node's surname (`nameTooSimilar()`, already in the game; a lab dealer without it let a fresh "Ashworth" be read as a known Ashworth's kin, 3 times).
-- **Writer input: grouped**, because the two groups take different instructions: `New people (keep the job; add a past or a want):` (arc: `keep their tie to the mercenary`) · `Known people (what has already happened with them is under Known):` (a known person shows no job: their Brief has it; arc: keeps the picked tie) · `Relic (new): …` / `Relic (known): …` · `Places:` each marked `(new)` / `(known)` · `Known (this has already happened):` the **Brief** of every known entry picked (in `known:`, `people:`, `relic:` or `places:`).
+- **Writer input: grouped**, because the two groups take different instructions: `New people (keep the job; add a past or a want):` (arc: `keep their tie to the mercenary`) · `Known people (what has already happened with them is under Known):` (a known person shows no job: their Brief has it; arc: keeps the picked tie) · `Relic (new): …` / `Relic (known): …` · `Places:` each marked `(new)` / `(known)` · `Known (this has already happened):` the **Brief** of every known entry picked (in `people:`, `relic:`, `places:` or `stories:`). There is no separate `known:` line (designer 2026-10-13: the combined lines pick known entries directly); earlier stories get their own `stories:` line (dealt only when earlier stories are dealt).
+- **The no-contradiction rule sits in the writer's "Your job" paragraph**, beside the seeds it governs (moved from the closing bullets, where it was easy to miss). The `Terms:` heading was kept over `Lore:` (3 v 3 arc writes, no difference in behavior; "Terms" says what the lines are, and "lore" already names the known-entry system).
 - **Rewards** name only NPCs or relics (never a company mercenary or captive): engine-validated.
 
 ### 0a. Chapter picker (P9 + lore)
@@ -38,13 +39,13 @@ In the game, the player is the captain of a mercenary company. The captain stays
 
 A saga is like the backbone of a novel: a longer tale about the people in it, often not about the player. Its purpose is to give the player a coherent and interesting sequence of stories to enjoy. The player's company gets drawn into it, whether hired or on its own, and helps resolve it, and the game will later turn the saga into quests that the player can accept for the company. If all the quests succeed, the company wins the saga ending reward: gold, a relic, an unwilling captive, a willing captive, or a new mercenary.
 
-Your job: choose what a saga will be made of. Another storyteller will write the saga from your choices. Choose from the lists given, so that the saga can make sense, be easy to follow, and be interesting. Some entries are known: the company has met them before, and each is given here only in short. Choose the known ones you want to know more about: the storyteller will be told what has already happened with them, so that the saga fits the world's past. They need not be at the saga's center. Copy names exactly. Reply in these lines, nothing else:
-known: the known entries you want to know more about for this saga, separated by ";"; or none
+Your job: choose what a saga will be made of. Another storyteller will write the saga from your choices. Choose from the lists given, so that the saga can make sense, be easy to follow, and be interesting. Some entries are known: the company has met them before, and each is given here only in short. For each known one you choose, the storyteller will be told what has already happened with it, so that the saga fits the world's past. Known ones need not be at the saga's center. Copy names exactly. Reply in these lines, nothing else:
 people: the one to three people the saga is about, known or new, each followed by " | " and their job in one or two words (a known one keeps the job given); separated by ";"
 relic: one relic, known or new, followed by " | " and its name (a known relic keeps its name); or none
 places: where the saga happens, one or two places from the place lists, known or new, separated by ";"
 trouble: what the saga is about, one trouble from the list
 reward: the saga ending reward, one from the list, then ": " and which of your people or your relic it is (nothing after gold)
+stories: the known earlier stories this saga grows out of, separated by ";"; or none
 words: one to three words for the saga to draw on
 ```
 
@@ -56,7 +57,7 @@ In the game, the player is the captain of a mercenary company. The captain stays
 
 A saga is like the backbone of a novel: a longer tale about the people in it, often not about the player. Its purpose is to give the player a coherent and interesting sequence of stories to enjoy. The player's company gets drawn into it, whether hired or on its own, and helps resolve it, and the game will later turn the saga into quests that the player can accept for the company. If all the quests succeed, the company wins the saga ending reward: gold, a relic, an unwilling captive, a willing captive, or a new mercenary.
 
-Your job: write the complete plot sketch of a saga. The player never reads it: its purpose is to allow writing a planned sequence of stories that are coherent and interesting to players. The game will later write quests from it, into around the number of quests given, so write plot, not prose, and do not split it into quests. To make it more interesting, the game has rolled some story seeds at random, given below. Work them in as inspiration: the NPCs can be heroes, villains, or anyone else the saga needs. Only the saga ending reward is fixed: the company earns it by its part in the saga, and wins nothing else.
+Your job: write the complete plot sketch of a saga. The player never reads it: its purpose is to allow writing a planned sequence of stories that are coherent and interesting to players. The game will later write quests from it, into around the number of quests given, so write plot, not prose, and do not split it into quests. To make it more interesting, the game has rolled some story seeds at random, given below. Work them in as inspiration: the NPCs can be heroes, villains, or anyone else the saga needs. Some are marked known: they have already happened in the game. Keep to what is said about them and add nothing that contradicts it; they need not be at the saga's center, and if one does not fit, leave it out. The new ones are yours to invent. Only the saga ending reward is fixed: the company earns it by its part in the saga, and wins nothing else.
 
 Write in plain and clear sentences that make sense and are easy to follow, in three steps:
 
@@ -77,7 +78,6 @@ How it should read:
 - Every step must make sense: say plainly how each thing happens, in an order a reader can follow. Nothing comes out of nowhere: no secret, lore, item or help appears when it is needed unless the saga showed it earlier.
 - Concrete: who does what, and why. No numbers.
 - Build the saga from the people given; invent others sparingly, only where the saga needs them.
-- New people, relics and places are yours to invent. Known ones are given so that the saga fits the world's past: keep to what is said about them, and add nothing that contradicts it. They need not be at the saga's center, and if one does not fit, leave it out entirely.
 - Traits (personality, looks, skills) appear only where they matter to what the saga is saying, shown through what people do; avoid the trait words themselves.
 ```
 
@@ -89,13 +89,13 @@ In the game, the player is the captain of a mercenary company. The captain stays
 
 An arc is the story of one mercenary, from their past to who they become. The game splits it into chapters, told over time as the mercenary opens up to the captain. Each chapter is played as several quests and ends with a resolution of its own: it settles one of the arc's unfinished matters, or part of one. Only the final chapter may resolve the whole arc, though it does not have to; after it, the game writes the mercenary a new arc. The player learns the mercenary's past only as they tell it: at first only what they would admit to anyone; the rest comes out in the chapters. Each chapter has a smaller reward of its own, set later. The arc's final reward is the one the company wins at the very end of the whole arc, when the final chapter succeeds: gold, a relic, an unwilling captive, a willing captive, or a new mercenary.
 
-Your job: choose what the arc of a mercenary who has just joined the company will be made of. Another storyteller will write the arc from your choices. Choose from the lists given, so that the arc can make sense, be easy to follow, and be interesting. Some entries are known: the company has met them before, and each is given here only in short. Choose the known ones you want to know more about: the storyteller will be told what has already happened with them, so that the arc fits the world's past. They need not be at the arc's center. Copy names exactly. Reply in these lines, nothing else:
+Your job: choose what the arc of a mercenary who has just joined the company will be made of. Another storyteller will write the arc from your choices. Choose from the lists given, so that the arc can make sense, be easy to follow, and be interesting. Some entries are known: the company has met them before, and each is given here only in short. For each known one you choose, the storyteller will be told what has already happened with it, so that the arc fits the world's past. Known ones need not be at the arc's center. Copy names exactly. Reply in these lines, nothing else:
 backstory: what kind of backstory the mercenary has, one from the list
-known: the known entries you want to know more about for this arc, separated by ";"; or none
 people: the one to three people from the mercenary's past, known or new, each followed by " | " and their tie to the mercenary in one to three words (not their traits); separated by ";"
 relic: one relic, known or new, followed by " | " and its name (a known relic keeps its name); or none
 places: where the mercenary's past happened, one or two places from the place lists, known or new, separated by ";"
 reward: the arc's final reward, one from the list, then ": " and which of your people or your relic it is (nothing after gold)
+stories: the known earlier stories the mercenary's past is tied to, separated by ";"; or none
 words: one to three words from the list for the arc to draw on
 ```
 
@@ -107,7 +107,7 @@ In the game, the player is the captain of a mercenary company. The captain stays
 
 An arc is the story of one mercenary, from their past to who they become. The game splits it into chapters, told over time as the mercenary opens up to the captain. Each chapter is played as several quests and ends with a resolution of its own: it settles one of the arc's unfinished matters, or part of one. Only the final chapter may resolve the whole arc, though it does not have to; after it, the game writes the mercenary a new arc. The player learns the mercenary's past only as they tell it: at first only what they would admit to anyone; the rest comes out in the chapters. Each chapter has a smaller reward of its own, set later. The arc's final reward is the one the company wins at the very end of the whole arc, when the final chapter succeeds: gold, a relic, an unwilling captive, a willing captive, or a new mercenary.
 
-Your job: write the arc of a mercenary who has just joined the company: their past, and the matters it left unfinished. The player never reads it: another storyteller will later write each chapter from it, one unfinished matter at a time, so write plot, not prose, and do not write the chapters. To make it more interesting, the game has rolled some story seeds at random, given below. Work them in as inspiration: the NPCs can be friends, family, enemies, or anyone else the arc needs. Only the arc's final reward is fixed: the company earns it in the final chapter. Leave the chapters' own rewards out: they are set later.
+Your job: write the arc of a mercenary who has just joined the company: their past, and the matters it left unfinished. The player never reads it: another storyteller will later write each chapter from it, one unfinished matter at a time, so write plot, not prose, and do not write the chapters. To make it more interesting, the game has rolled some story seeds at random, given below. Work them in as inspiration: the NPCs can be friends, family, enemies, or anyone else the arc needs. Some are marked known: they have already happened in the game. Keep to what is said about them and add nothing that contradicts it; they need not be at the arc's center, and if one does not fit, leave it out. The new ones are yours to invent. Only the arc's final reward is fixed: the company earns it in the final chapter. Leave the chapters' own rewards out: they are set later.
 
 Write in plain and clear sentences that make sense and are easy to follow, in six steps:
 
@@ -128,7 +128,6 @@ How it should read:
 - Every step must make sense: say plainly how each thing happens, in an order a reader can follow. Nothing comes out of nowhere: no secret, lore, item or help appears when it is needed unless the arc showed it earlier.
 - Concrete: who does what, and why. No numbers.
 - Build the arc from the people given; invent others sparingly, only where the arc needs them.
-- New people, relics and places are yours to invent. Known ones are given so that the arc fits the world's past: keep to what is said about them, and add nothing that contradicts it. They need not be at the arc's center, and if one does not fit, leave it out entirely.
 - Traits (personality, looks, skills) appear only where they matter to what the arc is saying, shown through what people do; avoid the trait words themselves.
 ```
 
