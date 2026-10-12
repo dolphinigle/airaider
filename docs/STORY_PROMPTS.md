@@ -18,7 +18,7 @@
 
 ---
 
-## 0. Current best: the chapter plan and the arc WITH KNOWN LORE (2026-10-13)
+## 0. Current best: the chapter plan and the arc WITH KNOWN LORE — checkpoint L7 (SAVED 2026-10-13; designer: "ok its decent. lets save it")
 
 The §1 (P9) and §2 (A9 + RCSLR2) prompts, extended so the pickers see the world's **known** lore nodes (people, relics, places, earlier chapters, arcs; `LORE` §1, §1b, §3) and pick the ones they want to know more about, and the writers get those nodes' Briefs. **These texts supersede the §1 and §2 texts**; everything else in §1 and §2 (the dealing rules, the engine reward lines, the reply → storage table) still applies. Lab files: `pickP9L7.sys`, `storysagaP9L7.sys`, `arcpickA9L3.sys`, `arcstoryRCSLR2L3.sys`, runners in `lore/` (`labfinal.py` = a fresh run).
 
@@ -130,6 +130,86 @@ How it should read:
 - Build the arc from the people given; invent others sparingly, only where the arc needs them.
 - Traits (personality, looks, skills) appear only where they matter to what the arc is saying, shown through what people do; avoid the trait words themselves.
 ```
+
+### 0e. Example (chapter, fresh deal; output "The Hound and the Gallows")
+Picker input (the engine's render; Terms text-matched):
+```
+Terms:
+- wolfkin: a people with wolf-like features (fur, a muzzle, keen senses), who live as other people do and never change shape.
+- lizardfolk: a people with scales and lizard-like features, who live as other people do.
+
+The saga takes place in the Western Forests, old-growth elven forests west of the company's fort.
+
+Entries marked known are ones the company has met before, given here in short; entries marked new are not.
+
+People:
+- Brannagh (known, the company's mercenary), a human woman, serious, tough, knows healing: the company's mercenary and healer. Tie: stitched Joreld's arm after the salt barge fight.
+- Galandir Thistledown (known, the company's mercenary), an elf man, calm, solitary, quick, a good shot: a former poacher who keeps to himself and shoots first.
+- Ithrandil (known, NPC), an elf man, proud, tough, a good shot: the poacher chief of Fernmoss, who walks with a limp since Galandir shot him. Tie: swore to pay Galandir back.
+- Fangilmir (new), an elf man, playful, quick, learned
+- Esmie (new), a human woman, meek, serious, clever, stealthy and light-fingered, famous
+- Sinyaruton (new), an elf man, generous, calm, thin, at home in the wild
+- Godleue (new), a human woman, playful, hot-headed, quick, a born leader
+- Lingonir Brightwater (new), an elf man, meek, solitary, thin, a smooth talker
+- Jilde Harrow (new), a human man, calm, playful, thin, at home in the wild, notorious
+- Silm-Kia (new), a lizardfolk woman, meek, quick, good with tools, famous
+
+Relics:
+- Bitterhorn (known), a horn, elven-made, cracked: taken from the poachers' camp at Fernmoss; it hangs in the fort's hall. Tie: the company keeps it.
+- a banner (new), wolfkin-made, beautiful, ornate
+- a shield (new), wolfkin-made, plain
+- a ring (new), foreign, fragile
+
+Places:
+- Fernmoss (known), a woodcutters' village: Ithrandil's poachers rule its woods; the company fought them there.
+- Cragbrook (new), a logging camp
+- Brambarrow (new), a hamlet, with a chapel
+- Woldgill (new), a river port, with a market
+
+Earlier stories:
+- The Weir at Brackenford (known), a saga the company played: it broke a toll-weir that a ferry family had built across the river, and the family swore never to carry the company again.
+- The Salt Barge (known), a saga the company played: it won back Odrun's stolen salt barge from Ithrandil's poachers at Fernmoss; Odrun paid only half.
+
+Troubles: get back something stolen; settle a quarrel; stop a wedding
+Saga ending rewards: a rare relic; an unwilling captive; a relic; a rare mercenary; a rare unwilling captive
+Words: cracked, changeling, idol, scarf, anniversary, farm, barrow, hound, potion, gallows
+```
+Picker reply:
+```
+people: Ithrandil | poacher chief; Galandir Thistledown | mercenary; Esmie | thief
+relic: Bitterhorn
+places: Fernmoss; Woldgill
+trouble: get back something stolen
+reward: a rare mercenary: Esmie
+stories: The Salt Barge
+words: cracked, hound, gallows
+```
+Storyteller input (built by the engine from the picks; Briefs of every known entry picked):
+```
+The saga takes place in the Western Forests, old-growth elven forests west of the company's fort.
+
+New people (keep the job; add a past or a want):
+- Esmie, a human woman, meek, serious, clever, stealthy and light-fingered, famous, thief
+Known people (what has already happened with them is under Known):
+- Ithrandil (NPC), an elf man, proud, tough, a good shot
+- Galandir Thistledown (the company's mercenary), an elf man, calm, solitary, quick, a good shot
+Relic (known): Bitterhorn, a horn, elven-made, cracked
+Places:
+- Fernmoss, a woodcutters' village (known)
+- Woldgill, a river port, with a market (new)
+Known (this has already happened):
+- The Salt Barge: Odrun Fairweather hired the company to win back her salt barge, stolen by Ithrandil's poachers and hidden in the Fernmoss reeds. The company tracked it, fought the poachers, and brought it back; Galandir shot Ithrandil, Joreld threw two poachers in the river, and the company took Sedd captive and the horn Bitterhorn. Odrun paid half, saying the salt was wet.
+- Ithrandil leads the poachers of Fernmoss. His men stole Odrun's salt barge and the company took it back; Galandir shot him in the leg, and he now limps. He blames Galandir more than the company, because they once poached the same woods as friends. He still holds the Fernmoss woods, and the woodcutters pay him to be left alone.
+- Galandir Thistledown, the company's archer, poached in the Western Forests before he joined. In the saga of the salt barge he shot Ithrandil, the poacher chief of Fernmoss, in the leg to end a standoff, and he has refused to go back to Fernmoss since. He trusts Joreld more than anyone else in the company.
+- Bitterhorn is an old elven hunting horn with a crack down its side. The company took it from Ithrandil's camp at Fernmoss when it won back the salt barge, and it hangs in the fort's hall. Ithrandil's poachers used it to call each other through the woods; Sedd flinches whenever someone touches it.
+- Fernmoss is a woodcutters' village at the edge of deep forest. Ithrandil's poachers hold the woods around it and take a share of every cut. The company fought them there to win back the salt barge.
+Trouble: get back something stolen
+Saga ending reward: Esmie, a human woman, meek, serious, clever, stealthy and light-fingered, famous, of rare worth, who joins the company as a mercenary at the end
+The saga revolves around Esmie, and must end with a strong, believable reason why they end up with the company.
+Words: cracked, hound, gallows
+Quests: around four
+```
+The storyteller replies with all three steps: Plot synopsis + Resolution, Key plot points, Detailed sketch, then Title (as P9).
 
 **Measured / observed** (STORY_QUALITY, "Known lore"): the pickers use known entries in most runs and leave them out when they don't fit; the writers keep to every Brief and build on it (a recruit chapter's loose end became an arc's spine; a captive at the fort changed a scene). Format fixes that came out of it, each for a class: `places:` "from the place lists" (the region was given as a place 9/9), `trouble:` "one trouble from the list" (a paragraph 3/3), every person carries a job, a known one keeps theirs (dropping it for known people made new ones lose theirs, 5/9). **Open:** a standalone chapter can settle something a mercenary's arc may own (it sees the arc's told Brief only); the deepest-secret "someone else paid" default; synopsis over its sentence cap; the reward pick is a person almost always.
 
