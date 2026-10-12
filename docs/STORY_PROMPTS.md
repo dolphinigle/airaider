@@ -209,7 +209,7 @@ The saga revolves around Esmie, and must end with a strong, believable reason wh
 Words: cracked, hound, gallows
 Quests: around four
 ```
-The storyteller replies with all three steps: Plot synopsis + Resolution, Key plot points, Detailed sketch, then Title (as P9).
+The storyteller replies with all three steps: Plot synopsis + Resolution, Key plot points, Detailed sketch, then Title (as P9). **The detailed sketch stays** (designer 2026-10-13: "quality first, we can optimize later"): it is the shared plan the quest writers each read their part of, so plants and payoffs are fixed before quest 1 is written (it ranked best with a blind Opus acting as the quest writer: rank 1.67, useful 8.0; STORY_QUALITY). It is ~2/3 of the plan's output tokens; the optimization to test later is a lighter sketch (plants and reveals only), not dropping it.
 
 **Measured / observed** (STORY_QUALITY, "Known lore"): the pickers use known entries in most runs and leave them out when they don't fit; the writers keep to every Brief and build on it (a recruit chapter's loose end became an arc's spine; a captive at the fort changed a scene). Format fixes that came out of it, each for a class: `places:` "from the place lists" (the region was given as a place 9/9), `trouble:` "one trouble from the list" (a paragraph 3/3), every person carries a job, a known one keeps theirs (dropping it for known people made new ones lose theirs, 5/9). **Open:** a standalone chapter can settle something a mercenary's arc may own (it sees the arc's told Brief only); the deepest-secret "someone else paid" default; synopsis over its sentence cap; the reward pick is a person almost always.
 
