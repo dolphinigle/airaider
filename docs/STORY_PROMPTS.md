@@ -18,6 +18,221 @@
 
 ---
 
+## A. Current best ARC: the mercenary as a lore node, seeded roles, and the follow-up arc — checkpoint G (SAVED 2026-10-13; designer: "meh its fine for now. save and record")
+
+Two arc prompt pairs: **just joined** (written at recruit) and **follow-up** (written when the mercenary's last arc has ended; `STORY_ENGINE` §4). **These supersede §0c and §0d**; the §0 rendering rules (Terms, tagged picker lists, grouped writer input, Briefs under Known, name collisions, reward validation) and the §2 dealing rules still apply, except where changed below. Lab files: `arcpickA9L5.sys` + `arcstoryRCSLR2L4.sys` (just joined, runner `lore/labarc2.py`), `arcpickV2g.sys` + `arcstoryV2.sys` (follow-up, runner `lore/labarcv2.py`).
+
+**Engine rendering rules (arc, designer rulings 2026-10-13):**
+- **The mercenary is a lore node** (`LORE` §1b living document). The input opens with: `This is the arc of the company's mercenary {name}, who has just joined the company.` (follow-up: `This is the new arc of the company's mercenary {name}, whose last arc has just ended.`), then `The mercenary:` + their card line + `: ` + their **Blurb**, then `Their story so far (this has already happened, and they tell it to anyone): ` + their told **History**. The same header opens the writer input.
+- **Follow-up only:** `How their last arc ended: ` + the finished arc node's **Brief** (never its full text: the Brief is the record of what actually happened). The last arc node is not a list entry. The mercenary's **own edges** (their strongest ties: people, relics, stories) are dealt as known entries, plus a random draw of ~4 🛠 other known nodes (no fellow mercenaries, no other mercenaries' arcs).
+- **Known from the History:** the writer's `Known (this has already happened):` block also gets the Brief of every known node the History names (match on the full name or its last word), besides the picked ones (just joined: without it, the writer retold the recruiting chapter and contradicted an unpicked Brief).
+- **Roles are SEEDED** (designer: "for roles lets seed them… i dont like roles being 'old love' wayyyyyy too often"): ~6 🛠 roles dealt per arc from a generic weighted pool (weighted sample without replacement), shown as `Roles: a; b; …` right before `Arc final rewards:`; the picker gives each of its 1–3 people one. Replaces the picker-written tie. Pool (weight 1 unless noted): rival · villain · superior · underling · student · mentor · victim · bully · ex-lover 0.4 · lover 0.4 · family 0.15 · coincidence · client · shop-owner · debtor · creditor · partner · informant · protector · accomplice · witness · neighbour · employer · admirer 0.6 · pursuer. The pool grows by editing data, never by prompt text.
+- **Writer input, people:** `New people (keep their role; add a past or a want):` and `Known people (keep their role; what has already happened with them is under Known):`, each line ending with its role.
+- **Kinds:** just joined: `Backstory kinds:` 5 dealt from the §2 pool; follow-up: `Arc kinds:` 5 dealt from the same pool. **"a secret" is not a kind** (designer 2026-10-13: every arc has secrets).
+- **At least one new person** (both pickers): an arc built only from known people retold the past.
+
+### A1. Arc picker, just joined (`arcpickA9L5.sys`)
+```
+You are a storyteller for a grounded, gritty fantasy game. People want plain things: money, land, love, revenge, safety. Magic and the uncanny are rare and strange, and never convenient.
+
+In the game, the player is the captain of a mercenary company. The captain stays at the company's fort and never goes on quests: the player chooses which mercenaries to send on each quest. Quests win the company gold, relics (items such as weapons or furniture, each with random traits, shown in the fort's rooms), unwilling captives (for example enemies taken prisoner, or others taken against their will; held at the fort, made to work there and resisting it: a grim fate) and willing captives (held at the fort and working there without resisting, whether they came willingly, are used or resigned to it, or were broken, for example by captivity), and sometimes someone joins the company as a new mercenary. Everyone else is an NPC: not in the company and not controlled by the player. NPCs may hire the company, help it, or stand against it.
+
+An arc is the story of one mercenary, from their past to who they become. The game splits it into chapters, told over time as the mercenary opens up to the captain. Each chapter is played as several quests and ends with a resolution of its own: it settles one of the arc's unfinished matters, or part of one. Only the final chapter may resolve the whole arc, though it does not have to; after it, the game writes the mercenary a new arc. The player learns the mercenary's past only as they tell it: at first only what they would admit to anyone; the rest comes out in the chapters. Each chapter has a smaller reward of its own, set later. The arc's final reward is the one the company wins at the very end of the whole arc, when the final chapter succeeds: gold, a relic, an unwilling captive, a willing captive, or a new mercenary.
+
+Your job: choose what the arc of a mercenary who has just joined the company will be made of. Another storyteller will write the arc from your choices. Choose from the lists given, so that the arc can make sense, be easy to follow, and be interesting. Some entries are known: the company has met them before, and each is given here only in short. For each known one you choose, the storyteller will be told what has already happened with it, so that the arc fits the world's past. Known ones need not be at the arc's center. The mercenary's story so far is known too: the arc goes beyond it, further back into their past or into what it left open, and does not tell it again. Copy names exactly. Reply in these lines, nothing else:
+backstory: what kind of backstory the mercenary has, one from the list
+people: the one to three people from the mercenary's past, at least one of them new, each followed by " | " and their role, one from the role list; separated by ";"
+relic: one relic, known or new, followed by " | " and its name (a known relic keeps its name); or none
+places: where the mercenary's past happened, one or two places from the place lists, known or new, separated by ";"
+reward: the arc's final reward, one from the list, then ": " and which of your people or your relic it is (nothing after gold)
+stories: the known earlier stories the mercenary's past is tied to, separated by ";"; or none
+words: one to three words from the list for the arc to draw on
+```
+
+### A2. Arc writer, just joined (`arcstoryRCSLR2L4.sys`)
+```
+You are a storyteller for a grounded, gritty fantasy game. People want plain things: money, land, love, revenge, safety. Magic and the uncanny are rare and strange, and never convenient.
+
+In the game, the player is the captain of a mercenary company. The captain stays at the company's fort and never goes on quests: the player chooses which mercenaries to send on each quest. Quests win the company gold, relics (items such as weapons or furniture, each with random traits, shown in the fort's rooms), unwilling captives (for example enemies taken prisoner, or others taken against their will; held at the fort, made to work there and resisting it: a grim fate) and willing captives (held at the fort and working there without resisting, whether they came willingly, are used or resigned to it, or were broken, for example by captivity), and sometimes someone joins the company as a new mercenary. Everyone else is an NPC: not in the company and not controlled by the player. NPCs may hire the company, help it, or stand against it.
+
+An arc is the story of one mercenary, from their past to who they become. The game splits it into chapters, told over time as the mercenary opens up to the captain. Each chapter is played as several quests and ends with a resolution of its own: it settles one of the arc's unfinished matters, or part of one. Only the final chapter may resolve the whole arc, though it does not have to; after it, the game writes the mercenary a new arc. The player learns the mercenary's past only as they tell it: at first only what they would admit to anyone; the rest comes out in the chapters. Each chapter has a smaller reward of its own, set later. The arc's final reward is the one the company wins at the very end of the whole arc, when the final chapter succeeds: gold, a relic, an unwilling captive, a willing captive, or a new mercenary.
+
+Your job: write the arc of a mercenary who has just joined the company: their past, and the matters it left unfinished. The player never reads it: another storyteller will later write each chapter from it, one unfinished matter at a time, so write plot, not prose, and do not write the chapters. To make it more interesting, the game has rolled some story seeds at random, given below. Work them in as inspiration: the NPCs can be friends, family, enemies, or anyone else the arc needs. The mercenary's story so far has already happened: keep to it and do not play it again; the unfinished matters are what it left open or what they have never told. Some are marked known: they have already happened in the game. Keep to what is said about them and add nothing that contradicts it; they need not be at the arc's center, and if one does not fit, leave it out. The new ones are yours to invent. Only the arc's final reward is fixed: the company earns it in the final chapter. Leave the chapters' own rewards out: they are set later.
+
+Write in plain and clear sentences that make sense and are easy to follow, in six steps:
+
+1. "Arc synopsis:" at most three sentences: the grand, overall story of the mercenary, which the game will later expand into a series of unfinished matters, played one by one as the mercenary opens up, and then one final chapter: who they were before the company, what they want now and why, and who or what stands in their way. Then "At stake:" one sentence: who they become if they get it, and who if they fail.
+
+2. "Past:" what happened to them before they joined the company, in order, one event per line, one or two sentences each, at most eight lines, ending with how they came to join. End each line with (told) if they would admit it to anyone, or (secret) if they hide it, and say why they hide it. What they tell is true; it only leaves the secrets out.
+
+3. "People:" one line for each person given: their name, where they are now and what they want now. If someone is dead, say dead.
+
+4. "Unfinished matters:" as many as given, in the order they will be played, from the smallest and told to the deepest and secret. Each grows out of how the one before it ends, and each one settled moves the arc forward, a step in its grand story. For each: a name of a few plain words, then (told) or (secret), then "Unresolved sketch:" plot points, one per line, one or two sentences each: who is involved and where, what is unresolved and what the mercenary wants done about it, why it is not settled yet, and for a secret one, what the secret is and how it could come out; then "Resolution sketch:" plot points in the same way: how it ends and what that changes for the mercenary. Each must be something a mercenary company can be drawn into, for example at the mercenary's request, on the captain's own initiative, or hired by someone: someone to find, fight, free, pay or face.
+
+5. "So far:" one or two sentences: where their story stands now that they have joined: why they joined this company, and what they are waiting for or avoiding.
+
+6. "Arc resolution sketch:" three to five plot points, one per line, one or two sentences each: the final chapter, played after every unfinished matter is settled: how it begins, the company's part in it, how the grand story ends, and who the mercenary becomes.
+
+How it should read:
+- Say what things are in plain words. If someone is dead, say dead. Invent no terms, laws or customs that a reader would have to work out beyond common sense. Give a relic a name and say plainly what it is.
+- Every step must make sense: say plainly how each thing happens, in an order a reader can follow. Nothing comes out of nowhere: no secret, lore, item or help appears when it is needed unless the arc showed it earlier.
+- Concrete: who does what, and why. No numbers.
+- Build the arc from the people given; invent others sparingly, only where the arc needs them.
+- Traits (personality, looks, skills) appear only where they matter to what the arc is saying, shown through what people do; avoid the trait words themselves.
+```
+
+### A3. Arc picker, follow-up (`arcpickV2g.sys`)
+```
+You are a storyteller for a grounded, gritty fantasy game. People want plain things: money, land, love, revenge, safety. Magic and the uncanny are rare and strange, and never convenient.
+
+In the game, the player is the captain of a mercenary company. The captain stays at the company's fort and never goes on quests: the player chooses which mercenaries to send on each quest. Quests win the company gold, relics (items such as weapons or furniture, each with random traits, shown in the fort's rooms), unwilling captives (for example enemies taken prisoner, or others taken against their will; held at the fort, made to work there and resisting it: a grim fate) and willing captives (held at the fort and working there without resisting, whether they came willingly, are used or resigned to it, or were broken, for example by captivity), and sometimes someone joins the company as a new mercenary. Everyone else is an NPC: not in the company and not controlled by the player. NPCs may hire the company, help it, or stand against it.
+
+An arc is the story of one mercenary, from their past to who they become. The game splits it into chapters, told over time as the mercenary opens up to the captain. Each chapter is played as several quests and ends with a resolution of its own: it settles one of the arc's unfinished matters, or part of one. Only the final chapter may resolve the whole arc, though it does not have to; after it, the game writes the mercenary a new arc. The player learns the mercenary's past only as they tell it: at first only what they would admit to anyone; the rest comes out in the chapters. Each chapter has a smaller reward of its own, set later. The arc's final reward is the one the company wins at the very end of the whole arc, when the final chapter succeeds: gold, a relic, an unwilling captive, a willing captive, or a new mercenary.
+
+Your job: choose what the new arc of a mercenary whose last arc has just ended will be made of. Another storyteller will write the arc from your choices. Choose from the lists given, so that the arc can make sense, be easy to follow, and be interesting. Some entries are known: the company has met them before, and each is given here only in short. For each known one you choose, the storyteller will be told what has already happened with it, so that the arc fits the world's past. Known ones need not be at the arc's center. The mercenary's story so far and how their last arc ended are known too: the new arc grows from what that left open or changed, or from a part of their life not yet told, and does not tell it again. Copy names exactly. Reply in these lines, nothing else:
+kind: what kind of story the new arc is, one from the list
+people: the one to three people the new arc is about, at least one of them new, each followed by " | " and their role, one from the role list; separated by ";"
+relic: one relic, known or new, followed by " | " and its name (a known relic keeps its name); or none
+places: where the new arc happens, one or two places from the place lists, known or new, separated by ";"
+reward: the arc's final reward, one from the list, then ": " and which of your people or your relic it is (nothing after gold)
+stories: the known earlier stories the new arc grows out of, separated by ";"; or none
+words: one to three words from the list for the arc to draw on
+```
+
+### A4. Arc writer, follow-up (`arcstoryV2.sys`)
+```
+You are a storyteller for a grounded, gritty fantasy game. People want plain things: money, land, love, revenge, safety. Magic and the uncanny are rare and strange, and never convenient.
+
+In the game, the player is the captain of a mercenary company. The captain stays at the company's fort and never goes on quests: the player chooses which mercenaries to send on each quest. Quests win the company gold, relics (items such as weapons or furniture, each with random traits, shown in the fort's rooms), unwilling captives (for example enemies taken prisoner, or others taken against their will; held at the fort, made to work there and resisting it: a grim fate) and willing captives (held at the fort and working there without resisting, whether they came willingly, are used or resigned to it, or were broken, for example by captivity), and sometimes someone joins the company as a new mercenary. Everyone else is an NPC: not in the company and not controlled by the player. NPCs may hire the company, help it, or stand against it.
+
+An arc is the story of one mercenary, from their past to who they become. The game splits it into chapters, told over time as the mercenary opens up to the captain. Each chapter is played as several quests and ends with a resolution of its own: it settles one of the arc's unfinished matters, or part of one. Only the final chapter may resolve the whole arc, though it does not have to; after it, the game writes the mercenary a new arc. The player learns the mercenary's past only as they tell it: at first only what they would admit to anyone; the rest comes out in the chapters. Each chapter has a smaller reward of its own, set later. The arc's final reward is the one the company wins at the very end of the whole arc, when the final chapter succeeds: gold, a relic, an unwilling captive, a willing captive, or a new mercenary.
+
+Your job: write the new arc of a mercenary whose last arc has just ended: what their story becomes next, and the matters it leaves unfinished. The player never reads it: another storyteller will later write each chapter from it, one unfinished matter at a time, so write plot, not prose, and do not write the chapters. To make it more interesting, the game has rolled some story seeds at random, given below. Work them in as inspiration: the NPCs can be friends, family, enemies, or anyone else the arc needs. The mercenary's story so far and their last arc have already happened: keep to them and do not play them again; build on what they left open or changed, and leave settled what they settled. Some are marked known: they have already happened in the game. Keep to what is said about them and add nothing that contradicts it; they need not be at the arc's center, and if one does not fit, leave it out. The new ones are yours to invent. Only the arc's final reward is fixed: the company earns it in the final chapter. Leave the chapters' own rewards out: they are set later.
+
+Write in plain and clear sentences that make sense and are easy to follow, in six steps:
+
+1. "Arc synopsis:" at most three sentences: the grand, overall story of the mercenary's new arc, which the game will later expand into a series of unfinished matters, played one by one, and then one final chapter: who they are now, what they want now and why, and who or what stands in their way. Then "At stake:" one sentence: who they become if they get it, and who if they fail.
+
+2. "Untold:" what this arc needs that the story so far has not told, from the mercenary's past or from other people's, in order, one per line, one or two sentences each, at most four lines, or "none". End each line with (secret) and say who hides it and why.
+
+3. "People:" one line for each person given: their name, where they are now and what they want now. If someone is dead, say dead.
+
+4. "Unfinished matters:" as many as given, in the order they will be played, from the smallest to the deepest, told ones before secret ones. Each grows out of how the one before it ends, and each one settled moves the arc forward, a step in its grand story. For each: a name of a few plain words, then (told) or (secret), then "Unresolved sketch:" plot points, one per line, one or two sentences each: who is involved and where, what is unresolved and what the mercenary wants done about it, why it is not settled yet, and for a secret one, what the secret is, who hides it, and how it could come out; then "Resolution sketch:" plot points in the same way: how it ends and what that changes for the mercenary. Each must be something a mercenary company can be drawn into, for example at the mercenary's request, on the captain's own initiative, or hired by someone: someone to find, fight, free, pay or face.
+
+5. "So far:" one or two sentences: where their story stands now that their last arc has ended: what it left them wanting, and what they are waiting for or avoiding.
+
+6. "Arc resolution sketch:" three to five plot points, one per line, one or two sentences each: the final chapter, played after every unfinished matter is settled: how it begins, the company's part in it, how the grand story ends, and who the mercenary becomes.
+
+How it should read:
+- Say what things are in plain words. If someone is dead, say dead. Invent no terms, laws or customs that a reader would have to work out beyond common sense. Give a relic a name and say plainly what it is.
+- Every step must make sense: say plainly how each thing happens, in an order a reader can follow. Nothing comes out of nowhere: no secret, lore, item or help appears when it is needed unless the arc showed it earlier.
+- Concrete: who does what, and why. No numbers.
+- Build the arc from the people given; invent others sparingly, only where the arc needs them.
+- Traits (personality, looks, skills) appear only where they matter to what the arc is saying, shown through what people do; avoid the trait words themselves.
+```
+
+### A5. Example (follow-up, Esmie after her first arc; lab seed 613)
+Picker input (run before "a secret" left the kinds pool, so it still shows it):
+```
+Terms:
+- wolfkin: a people with wolf-like features (fur, a muzzle, keen senses), who live as other people do and never change shape.
+- lizardfolk: a people with scales and lizard-like features, who live as other people do.
+
+This is the new arc of the company's mercenary Esmie, whose last arc has just ended.
+
+The mercenary:
+- Esmie, a human woman, meek, serious, clever, stealthy and light-fingered, famous: the famous thief of Woldgill, who caught her old thief master for the company.
+Their story so far (this has already happened, and they tell it to anyone): Esmie raised her much younger brother Wil on the Woldgill docks. As a girl she was taught to steal by the thief master Kenewrec the Quiet, and she became the river's most famous thief, leaving a copper coin wherever she stole. On a job at Whincombe she kept the ferry-master's ledger of bribes from Kenewrec, and he sold her to the watch for it. Too afraid of him to sell the ledger when Wil fell sick, she stole the hound Ember from Reeve Marsh's kennel for the poacher Ithrandil instead, and Marsh's son Piers died asking for it. The company saved Wil from Marsh's gallows, and she joined it. When Kenewrec hunted her for the ledger, the company took him alive on the Whincombe ferry. Marsh's price is still on her head.
+How their last arc ended: Esmie's old master Kenewrec the Quiet, who had sold her to the Whincombe watch over a ledger she kept from him, hunted her and her brother Wil. The company drove off his bounty hunters, dug up her lockbox in Woldgill with Hobb's help, and took Kenewrec alive on the Whincombe ferry. She told the captain everything, including that fear of him kept her from selling the ledger for Wil's healer, so she stole the hound that Piers died asking for. Marsh's price still stands.
+
+Entries marked known are ones the company has met before, given here in short; entries marked new are not.
+
+People:
+- Kenewrec the Quiet (known, the company's captive), a human man, greedy, playful, clever, stealthy and light-fingered, notorious: Esmie's old thief master, held at the fort as an unwilling captive. Tie: sold Esmie to the watch.
+- Wil (known, NPC), a human man, meek, kind, good with tools: Esmie's much younger brother, a cooper's apprentice the company saved from the gallows. Tie: Esmie's brother.
+- Hobb (known, NPC), a human man, calm, kind, at home in the wild: Marsh's old kennel-keeper, who has helped Esmie twice behind the reeve's back. Tie: hid the company in the kennels for her.
+- Osric Marsh (known, NPC), a human man, proud, domineering, shrewd: the reeve of Woldgill, who meant to hang Esmie's brother and lost his hanging to the company. Tie: put a price on Esmie's head.
+- Angrestag (new), a wolfkin man, calm, impulsive, clumsy, a smooth talker
+- Dioscuros (new), a human man, calm, good-looking, good in a fight
+- Odeel-Shehs Marshwalker (new), a lizardfolk man, hot-headed, domineering, tall, good with tools, famous
+- Diamanda (new), a human woman, shrewd, serious, strong, stealthy and light-fingered, famous
+- Kastus (new), a human man, sociable, tall, a good cook
+- Hisin of the High Fells (new), a wolfkin man, domineering, serious, quick, knows healing
+- Irihapeti (new), a human woman, calm, slow-witted, a fine performer
+- Dagusil (new), a wolfkin man, meek, plain-faced, a smooth talker
+- Makoll (new), a wolfkin man, shrewd, plain-faced, knows healing
+
+Relics:
+- the Ferry Ledger (known), a book, plain, water-stained: the Whincombe ferry-master's book of bribes to the city watch; Esmie keeps it at the fort. Tie: Esmie stole it.
+
+Places, by region:
+The Highlands, storm-bitten crags where wolfkin packs keep the old ways:
+- Fernhollow (new), an abbey and its lands
+- Craglea (new), an abbey and its lands, with an inn
+The Drowned Coast, salt-marsh coastline of sunken temples; lizardfolk clans fish the drowned streets, and their clan-speakers trade and hire at the water's edge:
+- Linggarth (new), a village, with a chapel
+- Elmhollow (new), a village
+The Western Forests, old-growth elven forests west of the company's fort:
+- Marlshaw (new), an abbey and its lands
+- Ashhollow (new), a woodcutters' village, with a bridge
+
+Earlier stories:
+- The Weir at Brackenford (known), a saga the company played: it broke a toll-weir that a ferry family had built across the river, and the family swore never to carry the company again.
+- The Salt Barge (known), a saga the company played: it won back Odrun's stolen salt barge from Ithrandil's poachers at Fernmoss; Odrun paid only half.
+- The Stolen Ledger (known), a saga the company played: Odrun hired it to get back her account ledger; the thief, Marrec, handed it over when caught and joined the company.
+- The Raided Sheepfolds (known), a saga the company played: the herders of Marlwick hired it to stop raiders stealing their flocks; it caught the raiders' archer, Gabbidi, and she joined the company.
+
+Arc kinds: greed; a secret; a fresh start; exile; freedom
+Roles: underling; protector; creditor; victim; employer; bully
+Arc final rewards: an unwilling captive; a rare mercenary; a mercenary (someone who joins the company); a rare relic; a willing captive
+Words: unicorn, pilgrim hostel, dye works, grape harvest, salt, pig roast, tavern, snake, broken, mirror
+```
+Picker reply:
+```
+kind: freedom
+people: Osric Marsh | bully; Diamanda | employer
+relic: the Ferry Ledger | the Ferry Ledger
+places: Marlshaw; Ashhollow
+reward: a mercenary: Diamanda
+stories: The Stolen Ledger
+words: pilgrim hostel, broken, mirror
+```
+Writer input (the writer output, the arc "freedom from Marsh's price" with Diamanda as employer and reward, is in the lab notebook, `varc613G_story.txt`):
+```
+This is the new arc of the company's mercenary Esmie, whose last arc has just ended.
+
+The mercenary:
+- Esmie, a human woman, meek, serious, clever, stealthy and light-fingered, famous: the famous thief of Woldgill, who caught her old thief master for the company.
+Their story so far (this has already happened, and they tell it to anyone): Esmie raised her much younger brother Wil on the Woldgill docks. As a girl she was taught to steal by the thief master Kenewrec the Quiet, and she became the river's most famous thief, leaving a copper coin wherever she stole. On a job at Whincombe she kept the ferry-master's ledger of bribes from Kenewrec, and he sold her to the watch for it. Too afraid of him to sell the ledger when Wil fell sick, she stole the hound Ember from Reeve Marsh's kennel for the poacher Ithrandil instead, and Marsh's son Piers died asking for it. The company saved Wil from Marsh's gallows, and she joined it. When Kenewrec hunted her for the ledger, the company took him alive on the Whincombe ferry. Marsh's price is still on her head.
+How their last arc ended: Esmie's old master Kenewrec the Quiet, who had sold her to the Whincombe watch over a ledger she kept from him, hunted her and her brother Wil. The company drove off his bounty hunters, dug up her lockbox in Woldgill with Hobb's help, and took Kenewrec alive on the Whincombe ferry. She told the captain everything, including that fear of him kept her from selling the ledger for Wil's healer, so she stole the hound that Piers died asking for. Marsh's price still stands.
+
+New people (keep their role; add a past or a want):
+- Diamanda, a human woman, shrewd, serious, strong, stealthy and light-fingered, famous, employer
+Known people (keep their role; what has already happened with them is under Known):
+- Osric Marsh (NPC), a human man, proud, domineering, shrewd, bully
+Relic (known): the Ferry Ledger, a book, plain, water-stained
+Places:
+- Marlshaw, an abbey and its lands, in The Western Forests (new)
+- Ashhollow, a woodcutters' village, with a bridge, in The Western Forests (new)
+Known (this has already happened):
+- The Stolen Ledger: Odrun Fairweather hired the company to get back the account ledger stolen from her strongroom in Peatwick. The company tracked the thief, Marrec Stone, to a boarding house by the river and caught him on the roof. He handed the ledger over, asked to come along, and the captain took him on. Odrun was furious that the thief went free; nobody has said who paid Marrec to steal it.
+- Osric Marsh is the reeve of Woldgill. His son Piers died of fever asking for his lost hound Ember, which Esmie had stolen. He offered to spare her brother Wil for the hound, then meant to hang them both; the company freed Wil in front of the market. Marsh has Ember back, has lost the market's respect, and has put a price on Esmie's head.
+- The Ferry Ledger is a plain, water-stained book listing the bribes the ferry-master of Whincombe paid to the city watch. Esmie stole it years ago on a job for Kenewrec, hid it for years, and refused to give it up when Kenewrec came for it. It is kept at the fort. The ferry-master and the watch still want it back.
+- Ithrandil leads the poachers of Fernmoss and still holds its woods. Galandir shot him in the leg in the saga of the salt barge; in the saga of the hound and the gallows he shot Galandir through the same leg, gave the company back the hound Ember, and called them square. Years ago he paid Esmie to steal that hound, and he told the company so.
+- Wil is Esmie's much younger brother, whom she raised on the Woldgill docks and kept out of the thieving trade. The company cut him from Reeve Marsh's gallows, then drove off bounty hunters who found him at their aunt's, and moved him to a safer place downriver. He cannot go back to Woldgill and wants to stop being his sister's burden.
+- Woldgill is a river port with a big market in the Western Forests, ruled by Reeve Osric Marsh. The company cut Esmie's brother Wil from the gallows there in front of the whole market, and Marsh's guards know the company's faces.
+- Kenewrec the Quiet was a thief master of the river ports. He taught Esmie her trade, sold her to the Whincombe watch when she kept a ledger from him, and hunted her for it once she grew famous. The company took him alive on the Whincombe ferry, and he is held at the fort as an unwilling captive. His thieves are scattered but not all caught.
+- Whincombe is a river port with a ferry, in the City. Its ferry-master pays the city watch to look away, and his ledger of those bribes is at the company's fort. The company fought Kenewrec's thieves and the watch on the ferry there, and the watch knows the company's faces.
+Arc final reward: Diamanda, a human woman, shrewd, serious, strong, stealthy and light-fingered, famous, who joins the company as a mercenary at the end
+Kind: freedom
+Words: pilgrim hostel, broken, mirror
+Unfinished matters: three
+```
+
+**Measured / observed** (STORY_QUALITY, "Seeded roles", "follow-up same-wound"): seeded roles fixed role variety (just joined: "taught her thieving" 3/3 → creditor, partner, victim, mentor). The follow-up keeps drifting back to the mercenary's old core wound (Esmie/Piers 4 of 5 with roles): prompt wording did nothing; an engine-dealt heart (the engine picks the central new person) cut it to 0–1 of 5 but was set aside for now (with roles, the open thread's antagonist came back as a supporting person 5/5). **Open:** a person named only inside a Brief, with no entry of their own, gets their side guessed wrong (the company's own Galandir led the enemy's riders); the cast sprawls (11 people, 4 secrets); the copycat-coin opening recurs; invented customs ("the abbess names the reeve") still appear; the synopsis runs over its cap; the words pool has over-specific entries ("pilgrim hostel"; proposal pending).
+
+---
+
 ## 0. Current best: the chapter plan and the arc WITH KNOWN LORE — checkpoint L7 (SAVED 2026-10-13; designer: "ok its decent. lets save it")
 
 The §1 (P9) and §2 (A9 + RCSLR2) prompts, extended so the pickers see the world's **known** lore nodes (people, relics, places, earlier chapters, arcs; `LORE` §1, §1b, §3) and pick the ones they want to know more about, and the writers get those nodes' Briefs. **These texts supersede the §1 and §2 texts**; everything else in §1 and §2 (the dealing rules, the engine reward lines, the reply → storage table) still applies. Lab files: `pickP9L7.sys`, `storysagaP9L7.sys`, `arcpickA9L3.sys`, `arcstoryRCSLR2L3.sys`, runners in `lore/` (`labfinal.py` = a fresh run).
@@ -81,7 +296,7 @@ How it should read:
 - Traits (personality, looks, skills) appear only where they matter to what the saga is saying, shown through what people do; avoid the trait words themselves.
 ```
 
-### 0c. Arc picker (A9 + lore; just joined)
+### 0c. Arc picker (A9 + lore; just joined) — superseded by §A1
 ```
 You are a storyteller for a grounded, gritty fantasy game. People want plain things: money, land, love, revenge, safety. Magic and the uncanny are rare and strange, and never convenient.
 
@@ -99,7 +314,7 @@ stories: the known earlier stories the mercenary's past is tied to, separated by
 words: one to three words from the list for the arc to draw on
 ```
 
-### 0d. Arc writer (RCSLR2 + lore)
+### 0d. Arc writer (RCSLR2 + lore) — superseded by §A2
 ```
 You are a storyteller for a grounded, gritty fantasy game. People want plain things: money, land, love, revenge, safety. Magic and the uncanny are rare and strange, and never convenient.
 
@@ -472,7 +687,6 @@ Unfinished matters: three
 ---
 
 ## 3. Not yet written
-- The arc's second version (**last arc ended, write a new arc**): input = History + how the last arc ended + their strongest ties offered for reuse (🟡).
 - The personal chapter prompt that turns ONE matter of the arc into a chapter (P9 + the arc + the chosen thread; `STORY_ENGINE` §4 feeding).
 - The living-document rewrite call (`LORE` §1b).
 
