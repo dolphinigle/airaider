@@ -85,6 +85,13 @@ story**. Don't let the bible read as a single quest or a vague mood piece.
 `the spoils`; titles like `The Weight of X`, `Whispers of X`; openers like "the dice fall/fate decides").
 Require concrete proper nouns. Keep the ban list — it earns its keep.
 
+> **Superseded for new prompts (designer ruling 2026-10-15): POSITIVE instructions, not ban lists.**
+> *"AVOID ban list and have POSITIVE instructions. you tend to banlist way too often."* Say the
+> behavior wanted ("say what you mean, using the literal phrase"), never a list of forbidden words or
+> "no X, no Y" piles: one tester's banned-phrase list made the output use MORE of the banned phrases,
+> and our own all-negative blocks produced telegraphese (§10). The token list above stays only where
+> it already ships; do not add new ones.
+
 ## 6. Length scales with stakes; give a HARD ceiling
 Resolution caps by rarity, **set from the reference band, not guessed** *(2026-07-18: Fort of Chains
 outcomes measured 60–250w from source, Sultan's "a couple short paragraphs"; our old caps sat at the
@@ -139,6 +146,14 @@ for style edits; every one below was measured, most the expensive way.
   stage (a wonder two hired guards could replace is furniture) · LAST sentence is an act, image, or
   spoken line — never a tally, never what it meant. The last-sentence rule sits in END position (§0);
   in short-form the final line dominates the read.
+- **Don't pile up rules to fix a voice** *(designer ruling 2026-10-15)*. In the quest-job lab, stacking
+  register rules ("plain words", "a notice", "terse facts", "no figures of speech", a word cap) never
+  made the jobs read well; a WORD CAP made the model cram every fact it had into the limit. When the
+  output reads wrong, first ask what INPUT is missing (a sample of the target voice, a style sheet
+  made from samples, a dealt fact) before writing a rule; length limits for prose are shapes ("one
+  line", "one or two sentences"), never word counts. Writers using Claude steer voice with 3–5 real
+  samples, or a style sheet the model writes from samples and the author edits (Sudowrite's "Match my
+  Style", Novelcrafter's style entries), not with rule lists.
 - **Exemplars underperform rules here** (+0.5 alone, nothing on top of rules) — contra the general
   literature; our register line + rules already carry the voice.
 - **Prompt-side shape rotation STAMPS**: 3 rotating molds = 3 visible stamps (half the reports ended
