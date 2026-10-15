@@ -7,7 +7,7 @@
 | What | Where | Committed? |
 |---|---|---|
 | Design (what an arc or chapter IS, rewards, feeding) | `STORY_ENGINE.md` §4, `LORE.md` §1b, `GENERATION_FLOW.md` §22, `QUESTS.md` §5 | yes |
-| **Current best prompt texts + input format + dealing rules** | **this file** (§0 = current texts, with known lore) | yes |
+| **Current best prompt texts + input format + dealing rules** | **this file** (§A = arc, §0 = chapter, §Q = quest) | yes |
 | Earlier saga checkpoints (P20, the personal pipeline, N, M, P4, P7), verbatim | this file, §4 | yes |
 | Lab notebook: every arm, score, rejected idea, run command | `docs/STORY_QUALITY.md` | no (local) |
 | Lab scripts, prompt files, raw outputs | `v3/scripts/_scratch/pre/` (`dealsaga.py`, `pickarc.py`, `runarc.py`, `*.sys`, `*.tpl`) | no (local) |
@@ -430,6 +430,117 @@ The storyteller replies with all three steps: Plot synopsis + Resolution, Key pl
 
 ---
 
+## Q. Current best QUEST writer — checkpoint JC (SAVED 2026-10-15; designer: "i think the quest job prompt is fine now. lets save record that first")
+
+One call per quest. It turns the chapter's plot sketch (§0b) into the NEXT quest only: a job for the company. The player sees the Title, the Job, the places (on the last quest, the 2–3 Ways and their places) and the Spoils; the challenge sketch is hidden and goes, with the job, the mercenaries sent, the dice and the plot sketch, to the report writer (not yet written, §3). Design: `QUESTS.md` §2/§7 (the AI authors each place's stat/helps/hinders/who; the engine owns the mercenary count and the difficulty). Writer at high effort.
+
+### Q1. Quest writer (`questJC.tpl`)
+The template carries stage flags, rendered by the engine before sending: `[[first]]…[[/first]]` is kept only on quest 1; `[[last]]…[[/last]]` only on the last quest; `[[!last]]…[[/!last]]` on every quest but the last; text outside the kept blocks is dropped and the flag tags themselves are removed. A middle quest keeps neither the first nor the last block. The five example notices are real game text (Bannerlord, Pillars of Eternity, Dragon's Dogma, a quest-hook table, Battle Brothers Legends), picked by the designer; kept verbatim, "afore" included.
+```
+You are a storyteller for a grounded, gritty fantasy game. People want plain things: money, land, love, revenge, safety. Magic and the uncanny are rare and strange, and never convenient.
+
+In the game, the player is the captain of a mercenary company. The captain stays at the company's fort and never goes on quests: the player chooses which mercenaries to send on each quest. Quests win the company gold, relics (items such as weapons or furniture, each with random traits, shown in the fort's rooms), unwilling captives (for example enemies taken prisoner, or others taken against their will; held at the fort, made to work there and resisting it: a grim fate) and willing captives (held at the fort and working there without resisting, whether they came willingly, are used or resigned to it, or were broken, for example by captivity), and sometimes someone joins the company as a new mercenary. Everyone else is an NPC: not in the company and not controlled by the player. NPCs may hire the company, help it, or stand against it.
+
+A saga is like the backbone of a novel: a longer tale about the people in it, often not about the player. Its purpose is to give the player a coherent and interesting sequence of stories to enjoy. The player's company gets drawn into it, whether hired or on its own, and helps resolve it, and the game will later turn the saga into quests that the player can accept for the company. If all the quests succeed, the company wins the saga ending reward: gold, a relic, an unwilling captive, a willing captive, or a new mercenary.
+
+Your job: write the next quest of a saga. A quest is a job for the company: something someone wants done, which the company is asked to do. The job is posted at the fort, the player reads it and chooses which mercenaries to send, the dice decide how it goes, and then another writer tells what happened, from the job, its challenge sketch, the mercenaries sent, the dice and the saga's plot sketch.
+
+The game gives you the saga's plot sketch, what the player already knows, the story so far (this saga's earlier quests, as the player read them), which quest to write, and how many mercenaries it takes. The plot sketch exists to make the saga's quests one coherent chain. The job is the next thing the company must do in it: it carries on from where the story so far ends and leaves the rest of the sketch for the quests still to come. Where the story so far differs from the sketch, the story so far is what happened. The sketch keeps no secrets, but the quests do: the player learns each thing only when the company does.
+[[first]]This is the first quest: its job starts where the sketch draws the company in.
+[[/first]][[last]]This is the last quest: its job ends the saga as the sketch does, even if the story so far has not reached every part of the sketch before it. The player chooses one of two or three ways to do it, and each way wins the company the saga ending reward.
+[[/last]]
+Write, in this order:
+
+Job: the job as a plain notice on the board: one or two sentences of what the job is about. There is no need to put all information there: a short briefing or teaser will do.
+  Notices on the board read like these, each about its own job:
+  - Brigands are disturbing travelers outside the town. Someone needs to hunt them down.
+  - Daroth Grimault, the fampyr, has been holding court in the Copperlane catacombs. The ducal palace wants him dealt with.
+  - An unspeakable beast has risen in the west. Go and cut it down with all haste, afore it descends on the capital!
+  - A guild contract reveals an illness spreading across a small settlement. Find and destroy the source.
+  - A trade caravan is coming from the south, lightly protected and high in value.
+Challenge sketch: not shown to the player: what the mercenaries will face in doing the job, and what it will take from them, in one or two sentences.
+[[!last]]Places: one line for each mercenary the job takes, saying what the game tests in whoever fills that place, from the challenge sketch:
+Place <n>: <stat> | helps: <traits> | hinders: <trait> | who: <who>
+[[/!last]][[last]]Ways: for each way, a line "Way <n>:" saying in a few plain words how the mercenaries do the job, shown to the player; then one line for each mercenary it takes, saying what the game tests in whoever fills that place, from the challenge sketch and the way:
+Place <n>: <stat> | helps: <traits> | hinders: <trait> | who: <who>
+[[/last]]  stat: strength, dexterity, intelligence, charisma or constitution: the game rolls the mercenary's dice from it.
+  helps: one or two traits from the list below: a mercenary who has one does better here.
+  hinders: one trait from the list below, or none: a mercenary who has it does worse here.
+  who: anyone; or "must have" and a trait from the list, when only such a mercenary could do it; or "must be" and a company mercenary, when the job cannot happen without them, and the game sends them for sure. The player chooses who goes, and the captain never goes.
+  The traits: calm, hot-headed, serious, playful, greedy, generous, solitary, sociable, lustful, chaste, domineering, meek, shrewd, impulsive, tall, short, well-endowed, flat-chested, good in a fight, a good shot, a born leader, a smooth talker, stealthy and light-fingered, learned, knows healing, good with tools, at home in the wild, a fine performer, frightening, a good cook, can work magic.
+[[!last]]Spoils: something the mercenaries can carry off if they win, that fits the job: some coin, or one thing; or none.
+[[/!last]]Title: a few plain words, shown on the quest.
+
+How it should read:
+- Plain words and short sentences that follow one another, with no figures of speech. If someone is dead, say dead. No numbers, no pay.
+```
+
+### Q2. Input (user message)
+```
+<the chapter's region line>
+
+The company's mercenaries in the sketch:        (only the company's mercenaries the plot sketch names; block dropped if none)
+- <merc line: name, people, sex, traits>
+What the player already knows:
+- <one line per known lore entry the chapter deal used; "- nothing about this saga's people" if none>
+Saga ending reward: <the reward line as dealt to the chapter>
+
+Plot sketch:
+<the chapter storyteller's full reply (§0b): synopsis, resolution, key plot points, detailed sketch, title>
+
+Story so far:
+Quest 1: <title>
+Job: <job>
+Report: <the report as the player read it, on one line>
+
+(…one block per earlier quest; "none: this is the first quest." on quest 1)
+
+Write quest <n> of <N>. It takes <k> mercenaries.        (last quest: "… Each way takes <k> mercenaries.")
+```
+Engine rules: N = the chapter's quest count; k = the engine's mercenary count for the quest (lab: 2). Lab artefact: the lab's story so far also carried a `Card:` line per quest (an old playthrough's offer); the game has no offer, so the block is Title, Job, Report.
+
+### Q3. Reply and parsing
+Fields in this order: `Job:`, `Challenge sketch:`, then `Places:` with `Place <n>: <stat> | helps: <traits> | hinders: <trait> | who: <who>` lines (last quest: `Way <n>: <how>` lines, each followed by its places), `Spoils:` (not on the last quest), `Title:`. Strip `**` before parsing (the model sometimes bolds the labels). Map trait phrases to the engine's trait ids; "none" for hinders/spoils = empty. `who`: `anyone` / `must have <trait>` / `must be <mercenary name>`.
+
+### Q4. Example (chapter "The Warden's Horn", lab tag fch701; Sonnet)
+Quest 1 of 4:
+```
+Job: A scholar of Elmgarth abbey has lost an old brass-ringed horn in Hawbrook. The tanner there swears thieves broke in and took it. The abbey wants it found.
+
+Challenge sketch: The tanner lies from fear, and the company must break his story. The village whispers that the horn is cursed, because his son fell sick with sores after touching it. The company must read the sickness and the ledger, get the truth out of the tanner, and learn where the horn went.
+
+Places:
+Place 1: intelligence | helps: shrewd, learned | hinders: hot-headed | who: anyone
+Place 2: charisma | helps: smooth talker, frightening | hinders: meek | who: anyone
+
+Spoils: none
+
+Title: The Tanner's Story
+```
+Quest 4 of 4 (last):
+```
+Job: Ithrandil waits at the foot of the Fernmoss watchtower at dawn with the Warden's Horn on his back. Get the horn and take him.
+
+Challenge sketch: Ithrandil is sick, thin and shaking, but his aim is still good, and he would rather die than be taken. The mercenaries must bring him down alive, keep the cracked horn from breaking, and guard against treachery from the tower and from Sariandi, who may run to it.
+
+Way 1: Galandir meets him bow against bow at dawn while another watches from the trees.
+Place 1: dexterity | helps: a good shot, calm | hinders: hot-headed | who: must be Galandir Thistledown
+Place 2: dexterity | helps: stealthy and light-fingered, a good shot | hinders: impulsive | who: anyone
+
+Way 2: Climb the wardens' back stair in the dark and take Ithrandil before dawn.
+Place 1: dexterity | helps: stealthy and light-fingered, at home in the wild | hinders: impulsive | who: anyone
+Place 2: strength | helps: good in a fight, frightening | hinders: meek | who: anyone
+
+Way 3: Talk Ithrandil down with the promise of the abbey's herbalist, and make him yield.
+Place 1: charisma | helps: a smooth talker, calm | hinders: hot-headed | who: anyone
+Place 2: intelligence | helps: knows healing, learned | hinders: impulsive | who: anyone
+
+Title: Bow Against Bow
+```
+Seen in it: "The tanner there swears thieves broke in" is the chapter plan's wording copied into the job; the class (reported claims and pledges from the plan) is logged as a chapter-prompt TODO in the lab notebook.
+
+---
+
 ## 1. Standalone chapter ("saga") plan — checkpoint P9 (2026-10-11)
 
 Two calls: **picker → storyteller**. Saved part: picker → synopsis + resolution → key plot points → detailed sketch.
@@ -687,6 +798,7 @@ Unfinished matters: three
 ---
 
 ## 3. Not yet written
+- The report writer (gets the job, its challenge sketch, the mercenaries sent, the dice result and the plot sketch; may differ by outcome and by first/middle/last quest).
 - The personal chapter prompt that turns ONE matter of the arc into a chapter (P9 + the arc + the chosen thread; `STORY_ENGINE` §4 feeding).
 - The living-document rewrite call (`LORE` §1b).
 
