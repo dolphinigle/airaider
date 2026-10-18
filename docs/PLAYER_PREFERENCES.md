@@ -94,6 +94,12 @@ This costs ~30 tokens and is paid once per AI call. Acceptable.
 - **Never gate content.** No "this preference unlocks legendary leads." Preferences are tone, not toggles.
 - **Never become a moral filter.** Players who want bleak grimdark can have it; players who want low-fantasy can have that too. Don't refuse legitimate combinations.
 
+## Company identity (planned) 🟡 *(designer, 2026-10-18)*
+
+The story prompts write from the company's side, and the company is not a band of do-gooders: what drives it is gold and power. It takes a job for what the job pays, and may side with whoever pays more, keep what it was told to return, or sell a captive, as readily as do right. The designer's ruling: "player is not necessarily a do gooder. Player motivation is gold / power. So not always have to write in a do gooder perspective."
+
+Planned: at the start of a game the player says what kind of company it is, as a short piece of **company lore** (who they are and what they live by: for example sellswords who work for any coin, deserters on the run, slavers, a free company with a code). It is lore, not an alignment setting. The engine feeds that line into the story prompts (arc, chapter, quest) so the sagas, the apparent reasons the company takes jobs and the choices offered fit that company. Until it exists, the prompts use the default above: grounded, gritty, a company out for gold and power.
+
 ## Open questions
 
 - **Per-call overrides?** Could individual quests or rooms override tone for a single beat (e.g. a "carnival" lead is briefly pulp even in a grimdark fort)? Consider after the prototype.
