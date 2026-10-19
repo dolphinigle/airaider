@@ -13,6 +13,7 @@
 | [experiments/](experiments/README.md) | every test, sim and playtest, numbered `E-NNNN`, with results |
 | [docs/README.md](docs/README.md) | the full map: what goes where |
 | `v4/` | the prototype (not started) |
+| `tools/` | repo tooling: `rec.mjs` numbers records, regenerates indexes, checks the maps |
 
 ## History
 

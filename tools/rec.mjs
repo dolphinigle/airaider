@@ -2,10 +2,11 @@
 // Records tool: create numbered decision/experiment records, regenerate the index tables, check consistency.
 //   node tools/rec.mjs decision "Title"      → docs/decisions/D-NNNN-slug.md
 //   node tools/rec.mjs experiment "Title"    → experiments/E-NNNN-slug/README.md
-//   node tools/rec.mjs index                 → rewrite the tables in docs/decisions/README.md and experiments/README.md
-//   node tools/rec.mjs check                 → validate fields, links and index freshness (exit 1 on problems)
+//   node tools/rec.mjs index                 → rewrite every generated table (decisions, experiments, design, reference)
+//   node tools/rec.mjs check                 → validate fields, links, index freshness, and that the maps name every folder
 import fs from 'node:fs';
 import path from 'node:path';
+import { execSync } from 'node:child_process';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const DEC = path.join(ROOT, 'docs/decisions');
@@ -94,19 +95,55 @@ function table(kind) {
   return ['| ID | Experiment | Type | Status | Verdict | Date |', '|---|---|---|---|---|---|', ...rows].join('\n');
 }
 
-function rendered(kind) {
-  const file = kind === 'D' ? path.join(DEC, 'README.md') : path.join(EXP, 'README.md');
+// Every generated table: the file it lives in (between <!-- index:start/end --> markers) and how to build it.
+const INDEXES = [
+  { file: path.join(DEC, 'README.md'), build: () => table('D') },
+  { file: path.join(EXP, 'README.md'), build: () => table('E') },
+  { file: path.join(ROOT, 'docs/design/README.md'), build: () => pages('docs/design') },
+  { file: path.join(ROOT, 'docs/reference/README.md'), build: () => pages('docs/reference') },
+];
+
+// A page's title is its H1; its summary is the first plain paragraph line after it.
+function pages(rel) {
+  const dir = path.join(ROOT, rel);
+  const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e =>
+    e.isDirectory() ? walk(path.join(d, e.name)) : e.name.endsWith('.md') && e.name !== 'README.md' ? [path.join(d, e.name)] : []);
+  const rows = walk(dir).sort().map(f => {
+    const lines = fs.readFileSync(f, 'utf8').split('\n');
+    const title = (lines.find(l => l.startsWith('# ')) || path.basename(f)).replace(/^# /, '');
+    const summary = lines.slice(lines.findIndex(l => l.startsWith('# ')) + 1)
+      .find(l => l.trim() && !/^(#|\||```|---|<!--)/.test(l)) || '';
+    const link = path.relative(dir, f);
+    return `| [${cell(title)}](${link}) | ${cell(summary.replace(/^>\s*/, '').slice(0, 160))} |`;
+  });
+  return rows.length ? ['| Page | Summary |', '|---|---|', ...rows].join('\n') : '_None yet._';
+}
+
+function rendered({ file, build }) {
   const text = fs.readFileSync(file, 'utf8');
   const next = text.replace(/<!-- index:start -->[\s\S]*<!-- index:end -->/,
-    `<!-- index:start -->\n${table(kind)}\n<!-- index:end -->`);
+    `<!-- index:start -->\n${build()}\n<!-- index:end -->`);
   return { file, text, next };
 }
 
 function index() {
-  for (const kind of ['D', 'E']) {
-    const { file, text, next } = rendered(kind);
+  for (const ix of INDEXES) {
+    const { file, text, next } = rendered(ix);
     if (next !== text) fs.writeFileSync(file, next);
   }
+}
+
+// The maps must name every folder: docs/README.md every folder in docs/, README.md every top-level folder.
+function mapProblems() {
+  const problems = [];
+  const docsMap = fs.readFileSync(path.join(ROOT, 'docs/README.md'), 'utf8');
+  for (const e of fs.readdirSync(path.join(ROOT, 'docs'), { withFileTypes: true }))
+    if (e.isDirectory() && !docsMap.includes(`${e.name}/`)) problems.push(`docs/${e.name}/ is not on the map in docs/README.md`);
+  const rootMap = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8');
+  const files = execSync('git ls-files --cached --others --exclude-standard', { cwd: ROOT, encoding: 'utf8' }).split('\n');
+  const tops = new Set(files.filter(f => f.includes('/') && !f.startsWith('.')).map(f => f.split('/')[0]));
+  for (const d of tops) if (!rootMap.includes(`${d}/`)) problems.push(`${d}/ is not listed in README.md`);
+  return problems;
 }
 
 function check() {
@@ -140,9 +177,12 @@ function check() {
         if (!fs.existsSync(path.join(ROOT, 'docs', p))) problems.push(`${file}: source ${p} not found under docs/`);
       }
     }
-    const { file, text, next } = rendered(kind);
+  }
+  for (const ix of INDEXES) {
+    const { file, text, next } = rendered(ix);
     if (next !== text) problems.push(`${path.relative(ROOT, file)}: index is stale (run: node tools/rec.mjs index)`);
   }
+  problems.push(...mapProblems());
   if (problems.length) { console.log(problems.join('\n')); process.exit(1); }
   console.log(`ok: ${ids.size} records`);
 }
@@ -159,7 +199,6 @@ async function stopHook() {
   let input = '';
   for await (const chunk of process.stdin) input += chunk;
   try { if (JSON.parse(input || '{}').stop_hook_active) return; } catch {}
-  const { execSync } = await import('node:child_process');
   const issues = [];
   try { execSync('node tools/rec.mjs check', { cwd: ROOT, stdio: 'pipe' }); }
   catch (e) { issues.push(String(e.stdout).trim()); }

@@ -44,6 +44,17 @@ Show the designer samples and results as you go (small loops). The record is wri
 
 The archive (`docs/archive/`, catalog in its README) is frozen v3 material, not v4 design. Design v4 from scratch first, then grab parts: write a v4 decision that restates the idea in v4 terms with `sources: [archive/v3/FILE.md §N]`. Never edit an archived file, and never cite one from design/ as the spec. The Stop hook flags archive edits.
 
+## Changing the structure
+
+The docs keep themselves current through `tools/rec.mjs`. The indexes for decisions, experiments, design/ and reference/ are generated, and `check` fails when any folder is missing from its map. When you add a new folder, a new kind of record, or a new generated index:
+
+1. Make sure it has a home that no existing row covers. Prefer a page inside an existing folder over a new folder.
+2. Add a row to the map in `docs/README.md` (for anything under docs/) or to `README.md` (for a top-level folder). Give it a `README.md` saying what goes there.
+3. If it is a new kind of record or a new generated table, teach `tools/rec.mjs`: add an entry to `INDEXES` (and `records()`/`check()` for a numbered kind), and put `<!-- index:start -->`/`<!-- index:end -->` markers in its README.
+4. Update this skill's table and the `CLAUDE.md` records list.
+5. A structural change is a decision: write one (`decided-by: claude` for layout and tooling) that amends or supersedes D-0001.
+6. `node tools/rec.mjs index && node tools/rec.mjs check`, then commit.
+
 ## End of session
 
 Rewrite `docs/NOW.md`: phase, next steps, open (proposed) decisions waiting on the designer. Run `node tools/rec.mjs check`, then commit.
