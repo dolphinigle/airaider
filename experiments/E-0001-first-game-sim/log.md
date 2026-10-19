@@ -36,3 +36,7 @@ ASSIGN ▸ Atlas, wolfkin
 
 [Send Atlas]  [Cancel]
 ```
+
+**Designer:** now ordinarily other games have "combat" here right
+
+**Claude (out of character):** Yes. Battle Brothers: turn-based tactical battle. RimWorld: real-time pawn fights. Darkest Dungeon: turn-based rounds. Dispatch-style games skip it: AC Brotherhood's assassin missions, Dragon Age Inquisition's war table, Fallout Shelter quests (one hidden roll, then a report). Three options for us: (1) real tactical combat; (2) one roll, then a report (war table, flat); (3) the quest plays out as a short chain of beats, each a visible roll that a merc's traits sway, with pushes and choices between rolls ("rolls coins often" without a combat engine). Recommended (3). Waiting on the designer.
