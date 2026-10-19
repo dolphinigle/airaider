@@ -55,3 +55,11 @@ ASSIGN ▸ Atlas, wolfkin
 - **E. Raise the stakes.** Before a roll you may bet more: Atlas risks an injury for double pay, or his life for the chief's head. (Gambling as the core verb.)
 - **F. Duel of reads.** Big moments become a short guessing game against the enemy (strike / feint / guard) with trait-weighted odds. (Rock-paper-scissors with dice.)
 Recommended first try: A, with D layered on (wager decisions plus a merc who surprises you). Waiting on the designer's pick.
+
+---
+
+**Designer:** so previously, going for engaging story doesnt work. so instead, we want a mechanic heavy game with ai only providing small story.
+
+`RULE:` mechanics-heavy game; AI provides only small story. Recorded as [D-0004](../../docs/decisions/D-0004-mechanics-carry-the-fun-ai-writes-only-small-story.md).
+
+**Claude (out of character):** Re-ranked the brainstorm by "fun with the text removed": B (coin pool) strongest, then A (push your luck), E (raise the stakes) and F (duel of reads). C leans on reading an outcome; D leans on story. Proposed first try: B + A, a coin pool spent across beats with a press-on-or-go-home choice between beats, and one AI line per beat.

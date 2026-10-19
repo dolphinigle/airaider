@@ -1,6 +1,6 @@
 # Vision (prototype v4)
 
-> Source: [D-0002](decisions/D-0002-v4-restart-squad-first.md). Rewrite this page only to match an accepted decision.
+> Sources: [D-0002](decisions/D-0002-v4-restart-squad-first.md), [D-0004](decisions/D-0004-mechanics-carry-the-fun-ai-writes-only-small-story.md). Rewrite this page only to match an accepted decision.
 
 ## In the designer's words (2026-10-19)
 
@@ -12,5 +12,6 @@
 - **Base building carries the squad.** The base exists to recruit, keep and strengthen the squad.
 - **Frequent chance moments.** Members of the squad face risky rolls often, and the player feels each one.
 - **Story serves play.** Text must be easy to read. Intricate plots and interlocking quests are not a goal.
+- **Mechanics carry the fun.** The game is mechanics-heavy; AI only adds small story on top of mechanical results (D-0004).
 
 Everything else is open. It gets settled through decisions, starting with a simulated play session ([NOW.md](NOW.md)).
