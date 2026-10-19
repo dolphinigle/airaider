@@ -10,13 +10,19 @@ Rules:
 
 ## Works
 
-_Nothing proven in v4 yet._
+- **Rolls that pay off a player decision.** Research: every loved chance game puts a choice before the roll (who, approach, spend); dice can replace combat this way. Not yet tested in v4. (E-0002)
+- **Visible odds and stakes on a named merc.** Research: the emotional core of XCOM, Darkest Dungeon, Battle Brothers; hidden math reads as cheating. (E-0002)
+- **Failure that leaves a mark.** Research: wounds, scars, quirks and deaths that stick to the person make failure content instead of dead air. (E-0002)
+- **Who you sent changes the event.** Research: trait-unlocked options (FTL, Dispatch) keep events fresh; trait-blind events wear out in a few runs. (E-0002)
 
 ## Doesn't work
 
 - **AI-written engaging story as the main source of fun.** v3 spent about a week on story pipelines (sagas, synopsis prompts, judge rounds) and the scorecard stayed near 6/10. (D-0002)
+- **Resolution with no player input during the quest.** Atlas's walk was watchable but flat; research names it the classic dispatch failure. (E-0001, E-0002)
+- **Foregone outcomes.** 3/3 wins at 65–80% felt like nothing was at stake; players read 80%+ as certain. (E-0001, E-0002)
 - **Intertwining quests as a goal.** Plot intricacy isn't what makes this game fun; the squad rolling coins is. (D-0002)
 
 ## Open
 
-- **What replaces combat?** Candidates A–F (push your luck, coin pool, plan-then-watch, merc with a will, raise the stakes, duel of reads) are being tried on the Atlas scenario; ranking by "fun with the text removed" favors B and A. (E-0001, D-0004)
+- **What replaces combat?** Research says dice can, if built from decisions around the rolls; which mix (push your luck, coin pool, push lever, trait-unlocked options, mid-walk stops) is most fun is still untested. (E-0001, E-0002, D-0004)
+- **Is choice around the roll enough ownership without tactics?** Tactics make a loss feel like your own fault; whether dice choices do that too is unproven. (E-0002)

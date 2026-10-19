@@ -100,3 +100,5 @@ QUEST COMPLETE  +40 crowns
 **Designer:** no i want to make it fun first. can you do a reesearch what other games do for this kind of "squad building" -- what makes the "deployment" fun? must it be actual gamepaly or will something like this kind of gambling works?
 
 Paused the sim for research: [E-0002](../E-0002-what-makes-squad-deployment-fun/).
+
+Research done ([E-0002](../E-0002-what-makes-squad-deployment-fun/), synthesis in [squad-deployment.md](../../docs/reference/squad-deployment.md)): dice can replace combat if every roll pays off a player decision. Run 1 hit four failure markers (no choice mid-walk, foregone outcome, free send, no lasting change). Sim resumes with those levers.
