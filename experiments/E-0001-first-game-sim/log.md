@@ -40,3 +40,18 @@ ASSIGN ▸ Atlas, wolfkin
 **Designer:** now ordinarily other games have "combat" here right
 
 **Claude (out of character):** Yes. Battle Brothers: turn-based tactical battle. RimWorld: real-time pawn fights. Darkest Dungeon: turn-based rounds. Dispatch-style games skip it: AC Brotherhood's assassin missions, Dragon Age Inquisition's war table, Fallout Shelter quests (one hidden roll, then a report). Three options for us: (1) real tactical combat; (2) one roll, then a report (war table, flat); (3) the quest plays out as a short chain of beats, each a visible roll that a merc's traits sway, with pushes and choices between rolls ("rolls coins often" without a combat engine). Recommended (3). Waiting on the designer.
+
+---
+
+**Designer:** like turn based, whatever. what would be a fun substitute -- thats the goal here. we shall brainstorm and try. pls save the scenario.
+
+`RULE:` the goal of this sim is a fun substitute for combat. Scenario saved to [scenario.md](scenario.md).
+
+**Claude (out of character), brainstorm of combat substitutes:**
+- **A. Push your luck.** The quest is 3–4 beats. Each beat is a roll. After each one: press on (more reward, more risk) or come home with what you have. Wounds stack. (Darkest Dungeon expeditions, blackjack.)
+- **B. Coin pool.** Traits are coins. Each beat demands heads; you choose which trait's coins to flip on which beat, and a spent trait is gone for the quest. (Sultan's Game, Dicey Dungeons.)
+- **C. Plan, then watch.** Before sending, pick an approach (night raid / frontal / parley / bait). It sets which traits count and what is at stake; the beats then roll on their own and you read them. (War table plus tactic.)
+- **D. The merc has a will.** At key beats the merc acts in character before you can stop him (gruff Atlas insults the bandit chief → a duel). You react: back him, or overrule him and pay for it. Rolls happen on his choices. (RimWorld's personalities.)
+- **E. Raise the stakes.** Before a roll you may bet more: Atlas risks an injury for double pay, or his life for the chief's head. (Gambling as the core verb.)
+- **F. Duel of reads.** Big moments become a short guessing game against the enemy (strike / feint / guard) with trait-weighted odds. (Rock-paper-scissors with dice.)
+Recommended first try: A, with D layered on (wager decisions plus a merc who surprises you). Waiting on the designer's pick.
