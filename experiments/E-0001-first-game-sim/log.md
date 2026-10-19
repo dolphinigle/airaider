@@ -67,3 +67,30 @@ Recommended first try: A, with D layered on (wager decisions plus a merc who sur
 **Designer (aside):** (pls make sure your data organizer remember what works vs what doesnt) (if it doesnt have that mechanism yet, code it first) (so whenever we comes up with anew idea, you can crosscheck w/ it)
 
 Built: `docs/findings.md` lessons ledger plus checks and the cross-check step ([D-0005](../../docs/decisions/D-0005-findings-ledger-what-works-what-doesn-t-cross-checked-against-every-new-idea.md)).
+
+---
+
+**Designer:** i can envision the ai writing simple stuffs like. "Atlas goes to the road..." "Suddenly a bear appears!" (roll coin with modifiers based on atlas passives) "Atlas defeated the bear! and continues his walk") (in real game we probably draw it cutely with sprites or smth)
+
+`RULE (candidate):` the quest plays as a walk; random encounters pop up; each is a coin roll modified by the merc's passives; the AI writes one line per moment; sprites in the real game.
+
+**Cross-check (findings.md):** fits D-0004 (small AI lines on mechanical results) and the "rolls coins often" goal; avoids the failed story-led approach. Open risk: no player choice during the walk (close to the "one roll, then a report" option judged flat earlier).
+
+**Game** (real rolls: `node -e` random 1–100, win if ≤ chance; chance = 50% + passives):
+```
+Atlas goes to the road...
+
+🐻 Suddenly a bear appears!
+   Strong +15 · Swords +15          chance 80%   rolled 67  ✔
+   Atlas wrestles the bear off the path and continues his walk.
+
+🏹 Arrows from the treeline! An ambush!
+   Smart +15                        chance 65%   rolled 53  ✔
+   Atlas smells them before he sees them and dives behind a cart.
+
+🗡 The bandit chief steps out, blade drawn.
+   Swords +15 · Gruff +10           chance 75%   rolled 56  ✔
+   One growl, three cuts. The chief flees and the road is clear.
+
+QUEST COMPLETE  +40 crowns
+```
