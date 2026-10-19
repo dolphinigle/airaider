@@ -1,0 +1,3 @@
+#!/bin/sh
+# Block commits that leave the records inconsistent (D-0001). Enabled by: git config core.hooksPath tools/githooks
+exec node "$(git rev-parse --show-toplevel)/tools/rec.mjs" check

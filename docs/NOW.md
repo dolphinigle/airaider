@@ -16,4 +16,6 @@
 
 ## Notes
 
+- Records system done (D-0001): `tools/rec.mjs`, the `records` skill, the SessionStart/Stop hooks and a git pre-commit hook (`git config core.hooksPath tools/githooks` on a fresh clone).
+
 - v3 is still playable from the sibling checkout `../airaider-v3` (tag `v3-final`).

@@ -31,7 +31,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Layout
 - `docs/`: vision, NOW, decisions, design, reference, archive
 - `experiments/`: one folder per test
-- `tools/rec.mjs`: records tool
+- `tools/rec.mjs`: records tool · `tools/githooks/`: pre-commit runs `rec.mjs check` (enable: `git config core.hooksPath tools/githooks`)
 - `v4/`: the prototype code (not started)
 - v3 code: tag `v3-final`, playable checkout at `../airaider-v3`
 
