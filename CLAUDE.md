@@ -2,45 +2,37 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project status
+- **Prototype v4 kickoff (2026-10-19).** A restart from scratch around the SQUAD: squad building on top of base building, frequent chance rolls, readable story (D-0002). v1–v3 are archived.
+- Start every session with **`docs/NOW.md`** (where we are), then `docs/vision.md`.
+- **Accepted decisions are law** (`docs/decisions/`). `docs/design/` is the living spec built from them, and code follows design/. If a case isn't covered, write a *proposed* decision for the designer; rulings stay with the designer.
+
+## Records: where everything goes
+**Record as you go, unprompted. The designer should never have to ask.** Use the **`records` skill** whenever you run a test, sim, playtest or lab, record a ruling, or end a session. Hooks back this up: SessionStart loads NOW.md, and Stop runs `rec.mjs check` and flags uncommitted records. The map is `docs/README.md`:
+- experiments → `experiments/E-NNNN-slug/` (record + scripts + samples; `raw/` gitignored)
+- decisions → `docs/decisions/D-NNNN-slug.md` (immutable once accepted; supersede, never edit)
+- current spec → `docs/design/` · status → `docs/NOW.md` · outside material → `docs/reference/` · old → `docs/archive/`
+- `node tools/rec.mjs decision|experiment "Title"` numbers new records; `node tools/rec.mjs check` before committing.
+
 ## Working style
 - **Be terse. Save tokens.** Short answers, minimal preamble, no recap of what you just did.
-- **Principles, not instance-patches.** In prompts and code alike, fix the CLASS, never bolt on the specific example that failed — examples are sticky, instance-patches brittle. Full rule: `docs/PROMPT_RULES.md` §8.
-- **Prompts are written for CHEAP models.** A rule buried in a long prompt does not exist for gpt-5-mini; adding a rule means merging or cutting another first. Full rule: `docs/PROMPT_RULES.md` §0.
-- **The text UI is how you playtest — keep it at PARITY.** You cannot drive a browser. `v3/cli/` is
-  the only surface you can actually play, and that is the entire reason it exists: same engine,
-  different UI. So **every player-facing feature ships in the CLI in the same session it ships in
-  the web GUI** — not "later", not "the CLI is the batch/reference surface". Never dogfood by
-  *simulating* a UI you cannot run (copying client logic into a test harness): a simulation can only
-  confirm what you already believed, and it is blind to rendering. Full rule + the failure that
-  taught it: `docs/DOGFOODING.md`.
-- **Division of labor (designer-ruled 2026-07-19): Fable plans, Opus codes.** Plans, code plans, prompt design, and judging/synthesis stay with Fable (the main session); manual coding tasks are delegated to Opus subagents, whose output Fable verifies.
+- **Principles, not instance-patches.** In prompts and code alike, fix the class, never bolt on the specific example that failed. Examples are sticky, and instance-patches are brittle.
+- **Positive instructions, no ban lists.** Say what to do; steer voice with samples.
+- **Prompts are written for cheap models.** A rule buried in a long prompt does not exist for a small model. Adding a rule means merging or cutting another first.
+- **You can't drive a browser.** Every player-facing surface must also be playable as text, so you can playtest by playing, never by simulating a UI you can't run.
+- **Division of labor (designer-ruled 2026-07-19): Fable plans, Opus codes.** Plans, prompt design and judging stay with the main session. Manual coding is delegated to Opus subagents, whose output is verified.
+- **The designer judges design, not code.** Keep engine constraints out of design discussions. The engine is Claude's to solve, and recorded as `decided-by: claude`.
+- Throwaway prototype: design-learning per hour beats robustness. Fun before balance.
 
-## Project status
-- Airaider is in the **PROTOTYPE V3 IMPLEMENTATION phase.** The design is FINALIZED and verified — build against `docs/`, don't redesign.
-- **Docs are law.** Read in `docs/README.md` order. `docs/GENERATION_FLOW.md` §1–§21 is the frozen decision log; every 🔒 in the other docs traces to it. If code and docs disagree, docs win; if a doc gap forces a decision, flag it to the user (rulings stay with the designer). Impl-time knobs are flagged 🛠/🟡 in-place.
-- The code is still a **throwaway prototype** — design-learning per hour > robustness. Fun before balance.
-- v1/v2 prototypes are deleted (git tag `v2-final` to recover).
+## Git (D-0003)
+`main` is the trunk. Stage files by name. Commit prefixes: `decision:` `exp:` `design:` `docs:` `v4:` `tools:`. Checkpoints are annotated tags `v4-<milestone>`. Never commit secrets, `raw/`, saves or logs.
 
 ## Layout
-- **`v3/`** — single npm package, TypeScript via `tsx` (no build step), Vite for web.
-  - `src/engine/` — pure deterministic game logic (seeded RNG; the engine owns EVERY number).
-  - `src/ai/` — the AI layer behind a provider interface (deterministic Mock vs real OpenAI, zod-validated). The AI owns flavor/story only; it never emits numbers (sole exemption: the lore salience score).
-  - `src/game/` — the Game facade both UIs consume.
-  - `cli/` — text UI (dogfooding) · `server/` + `web/` — Fastify API + React GUI.
-  - `test/` — vitest: engine invariants + §20 sim baselines.
-
-## Commands
-```bash
-cd v3
-npm run cli                   # text game (mock AI default; --ai for OpenAI; --sonnet (= --claude) = free playtest transport)
-npm run gui                   # server + web (AIRAIDER_AI=openai | sonnet; npm run gui:ai / gui:sonnet)
-npm test                      # vitest suite
-npm test -- -t "name"         # single test by pattern
-npm run typecheck             # tsc --noEmit
-```
-`--claude` / `AIRAIDER_AI=claude` = the designer's FREE playtest transport: the same prompts via the headless
-`claude` CLI on the Claude subscription (src/ai/claudecli.ts). Not production — production = GPT in three tiers
-(plan GPT-6 Sol · everything else GPT-6 Luna; docs/AI_PROVIDER.md), tuned at the Steam stretch. Portraits stay OpenAI images either way (`AIRAIDER_PORTRAITS=0` = off).
+- `docs/`: vision, NOW, decisions, design, reference, archive
+- `experiments/`: one folder per test
+- `tools/rec.mjs`: records tool
+- `v4/`: the prototype code (not started)
+- v3 code: tag `v3-final`, playable checkout at `../airaider-v3`
 
 ## Secrets
 `OPENAI_API_KEY` lives in `/home/irvan/airaider/.env` + `~/.airaider/openai.env` (gitignored). Read for dogfooding only; never print or commit.

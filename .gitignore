@@ -27,12 +27,16 @@ npm-debug.log*
 # Test coverage
 coverage/
 
-# Real-LLM transcripts: gitignored by default, but ONE per fixture may be force-added
-# (`git add -f`) so reviewers can SEE actual narrative output without rerunning.
-# Pattern below ignores by default; the curated samples are committed explicitly.
-v3/saves/
+v4/saves/
 
 logs/
 
 # transient Claude Code runtime locks
 .claude/scheduled_tasks.lock
+
+# Records (D-0001): bulk experiment output stays local; the record itself is committed
+experiments/*/raw/
+# v3 storyteller lab history: local only (designer rule)
+docs/archive/v3/STORY_QUALITY.md
+.claude/worktrees/
+.claude/settings.local.json

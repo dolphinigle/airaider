@@ -1,28 +1,19 @@
 # Airaider
 
-> A persistent, single-player, **AI-driven character-collection fort game**: collect characters you grow attached to, assign them to AI-generated quests, and live with what happens. The engine owns every number; the AI owns every story.
+> A game about **squad building on top of base building**: recruit a squad, grow it, send it out, and watch every risky roll. Think RimWorld or Battle Brothers. Prototype v4, restarted 2026-10-19.
 
-## Repo layout
+## Where things are
 
-- **[docs/](docs/README.md)** — the design. Finalized + verified to convergence (2026-07-03). `docs/GENERATION_FLOW.md` is the frozen decision log every 🔒 traces to.
-- **[v3/](v3/)** — prototype v3, built from scratch against the docs. Shared TypeScript core; text CLI (dogfooding) + web GUI (humans).
+| | |
+|---|---|
+| [docs/NOW.md](docs/NOW.md) | where the project stands: phase, next steps, open questions |
+| [docs/vision.md](docs/vision.md) | what the game is for |
+| [docs/decisions/](docs/decisions/README.md) | every decision and why, numbered `D-NNNN` |
+| [docs/design/](docs/design/README.md) | the current spec, built from the decisions |
+| [experiments/](experiments/README.md) | every test, sim and playtest, numbered `E-NNNN`, with results |
+| [docs/README.md](docs/README.md) | the full map: what goes where |
+| `v4/` | the prototype (not started) |
 
-Prototypes v1 (`prototype/`+`engine/`) and v2 (`app/`) are deleted — recover via git tag `v2-final`.
+## History
 
-## Run
-
-```bash
-cd v3
-npm install
-npm run cli          # text UI (dogfooding; mock AI by default)
-npm run gui          # server + web UI
-npm test             # engine invariants + sim baselines
-```
-
-Real AI needs `OPENAI_API_KEY` (via `.env`, never committed): `npm run cli -- --ai` / `npm run gui:ai`.
-Free playtests on a Claude subscription: `npm run cli -- --claude` / `npm run gui:claude` (the same prompts through
-the headless `claude` CLI — a playtest transport, not production; see [docs/AI_PROVIDER.md](docs/AI_PROVIDER.md) §6.1).
-
-## Status
-
-Prototype v3 under construction. The question it must answer: *is the marriage of the mechanical loop (min-max, fort, the roll) and the AI loop (individuated character stories) actually fun?*
+v1–v3 are archived: docs in [docs/archive/](docs/archive/README.md), code at tags `v2-final` and `v3-final`.
