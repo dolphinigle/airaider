@@ -23,4 +23,5 @@ New record: `node tools/rec.mjs experiment "slug title"`. The table below is gen
 | ID | Experiment | Type | Status | Verdict | Date |
 |---|---|---|---|---|---|
 | [E-0001](E-0001-first-game-sim/) | first game sim | sim | running |  | 2026-10-19 |
+| [E-0002](E-0002-what-makes-squad-deployment-fun/) | what makes squad deployment fun | research | running |  | 2026-10-19 |
 <!-- index:end -->
