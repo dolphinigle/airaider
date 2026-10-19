@@ -10,7 +10,7 @@ Every piece of knowledge has exactly one home. If you are about to write somethi
 | How a system works today (the spec the code is built from) | [design/](design/README.md) `<system>.md` | spec | rewritten; every rule cites the decision behind it |
 | A test, sim, playtest, prompt lab, judge round or research sweep | [../experiments/](../experiments/README.md) `E-NNNN-slug/` | experiment record + its files | append-only once done |
 | Outside material: other games, research, sample texts we study | [reference/](reference/README.md) | notes + sources | add freely |
-| Anything from v1–v3 | [archive/](archive/README.md) | frozen | never edited |
+| Anything from v1–v3 (marked ARCHIVED, not v4 design) | [archive/](archive/README.md) (catalog by topic) | frozen | never edited; reuse an idea through a v4 decision with `sources:` |
 
 ## The flow
 

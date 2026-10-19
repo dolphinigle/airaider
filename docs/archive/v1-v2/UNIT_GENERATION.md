@@ -1,3 +1,5 @@
+> 🗄 **ARCHIVED: PROTOTYPE v1/v2 DOC.** Superseded in 2026 (code: tag `v2-final`). This is **not v4 design and not law** ([D-0002](../../decisions/D-0002-v4-restart-squad-first.md)). Catalog: [archive/README.md](../../archive/README.md).
+
 > **⚠ SUPERSEDED / ARCHIVED (2026-07-02).** Kept for history. The tag system (20-tier, 4 bands, groups W1–W18) lives in GENERATION_FLOW.md §8–§9b; unit generation in §10 + ECONOMY.md §4; the bible design in QUEST_BIBLE.md.
 
 # UNIT_GENERATION.md — how a character's tags are rolled

@@ -1,3 +1,5 @@
+> 🗄 **ARCHIVED: PROTOTYPE v3 DOC.** Frozen 2026-10-19 (code: tag `v3-final`). This is **not v4 design and not law**. v4 is designed from scratch ([D-0002](../../decisions/D-0002-v4-restart-squad-first.md)). To reuse anything here, bring it in through a new v4 decision that cites this file. Words like "locked 🔒", "current", "canonical" or "v4" below belong to the v3 era. Catalog: [archive/README.md](../../archive/README.md).
+
 > **⚠ v2 IMPLEMENTATION SNAPSHOT (non-canonical).** State of the v2 code + learnings; the v3 canon is the README reading order + GENERATION_FLOW.
 
 # Story-generation — current implementation state & learnings

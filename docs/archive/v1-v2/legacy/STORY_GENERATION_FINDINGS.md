@@ -1,3 +1,5 @@
+> 🗄 **ARCHIVED: PROTOTYPE v1/v2 DOC.** Superseded in 2026 (code: tag `v2-final`). This is **not v4 design and not law** ([D-0002](../../../decisions/D-0002-v4-restart-squad-first.md)). Catalog: [archive/README.md](../../../archive/README.md).
+
 # Story Generation — Prototype Findings & Handover
 
 **Status:** Findings. Empirical results from the throwaway `storyGen` prototype, written as a HANDOVER for the next (stronger) AI that will build the real prototype. This doc is about *what was actually built and learned*, not design intent — for design intent read `QUEST_CHAINS.md`, `SAGAS.md`, and `CANONICAL_DESIGN.md`.

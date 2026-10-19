@@ -7,6 +7,7 @@ decided-by: claude
 supersedes: []
 superseded-by:
 evidence: []
+sources: []
 ---
 
 ## Context

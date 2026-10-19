@@ -1,3 +1,5 @@
+> 🗄 **ARCHIVED: PROTOTYPE v3 DOC.** Frozen 2026-10-19 (code: tag `v3-final`). This is **not v4 design and not law**. v4 is designed from scratch ([D-0002](../../decisions/D-0002-v4-restart-squad-first.md)). To reuse anything here, bring it in through a new v4 decision that cites this file. Words like "locked 🔒", "current", "canonical" or "v4" below belong to the v3 era. Catalog: [archive/README.md](../../archive/README.md).
+
 # Experiment log — getting a FEEL for bible generation (real AI)
 
 Runner: `prototype/src/storyGen/_expBibleFeel.ts` (real `buildBible` over the 18-char Mireford pool + seed bank). Full prompts/responses in `prototype/logs/llm-calls.jsonl`. Goal: read bibles as a reader, find what works / what's flat, iterate the prompt. **Don't over-spec.** Zoom out periodically.

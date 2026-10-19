@@ -1,3 +1,5 @@
+> 🗄 **ARCHIVED: PROTOTYPE v3 DOC.** Frozen 2026-10-19 (code: tag `v3-final`). This is **not v4 design and not law**. v4 is designed from scratch ([D-0002](../../decisions/D-0002-v4-restart-squad-first.md)). To reuse anything here, bring it in through a new v4 decision that cites this file. Words like "locked 🔒", "current", "canonical" or "v4" below belong to the v3 era. Catalog: [archive/README.md](../../archive/README.md).
+
 > **⚠ PARTIALLY SUPERSEDED (2026-07-03).** The BANK mechanism (accrual · crystallization · shortfall/debt · failure budget · last-chance) is canon — but details predating later locks are overridden: focal sizing = share×E[payoff] (GENERATION_FLOW §1–§2, replaces `maxCharValue`); no `risky` flag — injury is AI-judged & decoupled (F5); attribute names & the roll = §10. Also overridden: the old immediate/deferred 60/40 side-loot mechanism → per-beat engine-set side-loot budget (QUESTS §6); the personal-finale payoff → QUESTS §5. Treat QUESTS.md + ECONOMY.md as the entry points.
 
 # Reward bank, off-rails & last-chance — design + plan

@@ -1,3 +1,5 @@
+> 🗄 **ARCHIVED: PROTOTYPE v3 DOC.** Frozen 2026-10-19 (code: tag `v3-final`). This is **not v4 design and not law**. v4 is designed from scratch ([D-0002](../../decisions/D-0002-v4-restart-squad-first.md)). To reuse anything here, bring it in through a new v4 decision that cites this file. Words like "locked 🔒", "current", "canonical" or "v4" below belong to the v3 era. Catalog: [archive/README.md](../../archive/README.md).
+
 # Airaider — Design Docs
 
 Airaider is a persistent, single-player, **AI-driven character-collection fort game**: you collect characters you grow attached to, assign them to AI-generated quests, and live with what happens. These docs were rewritten from scratch for **prototype 2** (2026-06-02); the prior AI-Stronghold-remake design and the v1 story-chain prototype have been superseded (history is in git).

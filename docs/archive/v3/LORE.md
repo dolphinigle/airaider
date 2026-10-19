@@ -1,3 +1,5 @@
+> 🗄 **ARCHIVED: PROTOTYPE v3 DOC.** Frozen 2026-10-19 (code: tag `v3-final`). This is **not v4 design and not law**. v4 is designed from scratch ([D-0002](../../decisions/D-0002-v4-restart-squad-first.md)). To reuse anything here, bring it in through a new v4 decision that cites this file. Words like "locked 🔒", "current", "canonical" or "v4" below belong to the v3 era. Catalog: [archive/README.md](../../archive/README.md).
+
 # Lore — the World Graph & Context Retrieval
 
 **Status:** Canonical (validated by a 5-experiment campaign with controls, 2026-06-16; decisions in GENERATION_FLOW §14, §16). **PURPOSE = CONTINUITY**: recurring entities stay consistent with established canon (blind-tested: canon-consistency **1.00 with edge-context vs 0.55 without**). Regions' flavor layer + the "which lore feeds the AI" machinery. Conventions: 🔒 · 🛠 · 🟡.

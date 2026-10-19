@@ -1,3 +1,5 @@
+> 🗄 **ARCHIVED: PROTOTYPE v3 DOC.** Frozen 2026-10-19 (code: tag `v3-final`). This is **not v4 design and not law**. v4 is designed from scratch ([D-0002](../../decisions/D-0002-v4-restart-squad-first.md)). To reuse anything here, bring it in through a new v4 decision that cites this file. Words like "locked 🔒", "current", "canonical" or "v4" below belong to the v3 era. Catalog: [archive/README.md](../../archive/README.md).
+
 # 🔒 WRITING-QUALITY CHECKPOINT — LOCKED 2026-08-25
 > **DESIGNER SIGN-OFF: "i think the quality of writing is good now! That's VERY important."**
 > This file marks the state the writing was in when the designer approved it. **Do not regress past

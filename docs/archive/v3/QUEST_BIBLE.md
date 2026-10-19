@@ -1,3 +1,5 @@
+> 🗄 **ARCHIVED: PROTOTYPE v3 DOC.** Frozen 2026-10-19 (code: tag `v3-final`). This is **not v4 design and not law**. v4 is designed from scratch ([D-0002](../../decisions/D-0002-v4-restart-squad-first.md)). To reuse anything here, bring it in through a new v4 decision that cites this file. Words like "locked 🔒", "current", "canonical" or "v4" below belong to the v3 era. Catalog: [archive/README.md](../../archive/README.md).
+
 # Quest Bible
 
 **Status: canonical (2026-06-04; where BIBLE.md — the newer LOCKED 2026-06-06 spec — differs, BIBLE.md wins; `person.name` = engine-assigned per §4b).** The settled design for how a quest chain's *bible* is authored. Distilled from the validated `FOCUS_story_bible_system.md` work (the GENESIS→WHY-LADDER→ASSEMBLE pipeline that produced the GOLDEN sample `carried-the-fever`) + the implemented prompts in `storyGen` (`GENESIS_SYSTEM`, `BUILD_SYSTEM`). Read alongside [STORY_ENGINE.md](STORY_ENGINE.md) (the AI half); the tag vocabulary lives in GENERATION_FLOW §8–§9b (old TAGS.md archived).

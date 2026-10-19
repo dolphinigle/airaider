@@ -1,3 +1,5 @@
+> 🗄 **ARCHIVED: PROTOTYPE v1/v2 DOC.** Superseded in 2026 (code: tag `v2-final`). This is **not v4 design and not law** ([D-0002](../../../decisions/D-0002-v4-restart-squad-first.md)). Catalog: [archive/README.md](../../../archive/README.md).
+
 # Problem and Inheritance
 
 **Status:** Draft

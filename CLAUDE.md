@@ -11,7 +11,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Record as you go, unprompted. The designer should never have to ask.** Use the **`records` skill** whenever you run a test, sim, playtest or lab, record a ruling, or end a session. Hooks back this up: SessionStart loads NOW.md, and Stop runs `rec.mjs check` and flags uncommitted records. The map is `docs/README.md`:
 - experiments → `experiments/E-NNNN-slug/` (record + scripts + samples; `raw/` gitignored)
 - decisions → `docs/decisions/D-NNNN-slug.md` (immutable once accepted; supersede, never edit)
-- current spec → `docs/design/` · status → `docs/NOW.md` · outside material → `docs/reference/` · old → `docs/archive/`
+- current spec → `docs/design/` · status → `docs/NOW.md` · outside material → `docs/reference/`
+- v1–v3 docs → `docs/archive/` (frozen, ARCHIVED-bannered, NOT v4 design): design v4 from scratch, then reuse an idea only through a v4 decision with `sources:`
 - `node tools/rec.mjs decision|experiment "Title"` numbers new records; `node tools/rec.mjs check` before committing.
 
 ## Working style

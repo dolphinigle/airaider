@@ -40,6 +40,10 @@ Show the designer samples and results as you go (small loops). The record is wri
 
 "Save this" from the designer means: record it in its home (decision, design page or experiment), curated. Never blind-append to a log.
 
+## Reusing something from v1–v3
+
+The archive (`docs/archive/`, catalog in its README) is frozen v3 material, not v4 design. Design v4 from scratch first, then grab parts: write a v4 decision that restates the idea in v4 terms with `sources: [archive/v3/FILE.md §N]`. Never edit an archived file, and never cite one from design/ as the spec. The Stop hook flags archive edits.
+
 ## End of session
 
 Rewrite `docs/NOW.md`: phase, next steps, open (proposed) decisions waiting on the designer. Run `node tools/rec.mjs check`, then commit.

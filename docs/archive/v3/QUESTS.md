@@ -1,3 +1,5 @@
+> 🗄 **ARCHIVED: PROTOTYPE v3 DOC.** Frozen 2026-10-19 (code: tag `v3-final`). This is **not v4 design and not law**. v4 is designed from scratch ([D-0002](../../decisions/D-0002-v4-restart-squad-first.md)). To reuse anything here, bring it in through a new v4 decision that cites this file. Words like "locked 🔒", "current", "canonical" or "v4" below belong to the v3 era. Catalog: [archive/README.md](../../archive/README.md).
+
 # Lead & Quest Generation
 
 **Status:** Canonical (prototype-2, 2026-06-02). How opportunities appear, become AI quests, resolve, and pay out. This is the crucial core — the generation pipeline that keeps the two boards alive. Builds on [DESIGN.md](DESIGN.md) (the loop/boards), [CARDS.md](CARDS.md) (units/value), and [STORY_ENGINE.md](STORY_ENGINE.md) (the AI craft).

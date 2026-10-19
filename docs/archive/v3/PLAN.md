@@ -1,3 +1,5 @@
+> 🗄 **ARCHIVED: PROTOTYPE v3 DOC.** Frozen 2026-10-19 (code: tag `v3-final`). This is **not v4 design and not law**. v4 is designed from scratch ([D-0002](../../decisions/D-0002-v4-restart-squad-first.md)). To reuse anything here, bring it in through a new v4 decision that cites this file. Words like "locked 🔒", "current", "canonical" or "v4" below belong to the v3 era. Catalog: [archive/README.md](../../archive/README.md).
+
 # Prototype v3 — Implementation Plan
 
 Built against `docs/` (README order; GENERATION_FLOW §1–§21 = frozen decision log). Docs are law; doc gaps → flag to designer. Fun before balance; throwaway-quality code, but the ENGINE MATH must match the locked numbers exactly (they're sim-verified).

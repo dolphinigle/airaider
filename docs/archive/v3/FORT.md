@@ -1,3 +1,5 @@
+> 🗄 **ARCHIVED: PROTOTYPE v3 DOC.** Frozen 2026-10-19 (code: tag `v3-final`). This is **not v4 design and not law**. v4 is designed from scratch ([D-0002](../../decisions/D-0002-v4-restart-squad-first.md)). To reuse anything here, bring it in through a new v4 decision that cites this file. Words like "locked 🔒", "current", "canonical" or "v4" below belong to the v3 era. Catalog: [archive/README.md](../../archive/README.md).
+
 # The Fort — Structure, Rooms, Comfort & Prestige
 
 **Status:** Canonical. The fort is the **main progression view**: you slot cards into rooms, rooms produce **comfort**, comfort produces each room's **benefit**, and theme-room benefits are the **prestige** that drives the master clock. Builds on [CARDS.md](CARDS.md) (Card/CardSlot), [GAME_STATE.md](GAME_STATE.md), [ECONOMY.md](ECONOMY.md); decisions recorded in GENERATION_FLOW §12, §15, §18–§20. Conventions: 🔒 locked · 🛠 numbers tunable · 🟡 open.

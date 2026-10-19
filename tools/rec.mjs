@@ -135,6 +135,10 @@ function check() {
       if (!fm) continue;
       const refs = [...(fm.supersedes || []), ...(fm.evidence || []), ...(fm.decisions || []), fm['superseded-by']].filter(Boolean);
       for (const r of refs) if (!ids.has(r)) problems.push(`${file}: refers to unknown ${r}`);
+      for (const s of fm.sources || []) {
+        const p = s.split(/\s/)[0];
+        if (!fs.existsSync(path.join(ROOT, 'docs', p))) problems.push(`${file}: source ${p} not found under docs/`);
+      }
     }
     const { file, text, next } = rendered(kind);
     if (next !== text) problems.push(`${path.relative(ROOT, file)}: index is stale (run: node tools/rec.mjs index)`);
@@ -161,6 +165,8 @@ async function stopHook() {
   catch (e) { issues.push(String(e.stdout).trim()); }
   const dirty = execSync('git status --porcelain -- docs experiments tools', { cwd: ROOT, encoding: 'utf8' }).trim();
   if (dirty) issues.push(`uncommitted records:\n${dirty}`);
+  const archive = dirty.split('\n').filter(l => / docs\/archive\/(v3|v1-v2)\//.test(l) && !l.startsWith('??'));
+  if (archive.length) issues.push(`the archive is frozen; revert these edits and restate the idea in a v4 decision instead:\n${archive.join('\n')}`);
   if (issues.length) console.log(JSON.stringify({
     decision: 'block',
     reason: `Records need attention before stopping (records skill):\n${issues.join('\n')}\n` +

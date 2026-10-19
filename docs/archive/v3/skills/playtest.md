@@ -3,6 +3,9 @@ name: playtest
 description: Dogfood-playtest airaider by READING the AI prompts and the prose they produce — judging writing QUALITY and whether the PROMPT itself is the problem (jargon a stateless model can't parse, stale/conflicting guidance, sticky examples it copies, instructions it echoes verbatim, smells/tics, vague outcomes). Invariant assertions are only a no-breakage backstop. Use after ANY change to a narrator prompt (openaiNarrator.ts) or to story-gen / quests / rewards / chains.
 ---
 
+> 🗄 **ARCHIVED: PROTOTYPE v3 DOC.** Frozen 2026-10-19 (code: tag `v3-final`). This is **not v4 design and not law**. v4 is designed from scratch ([D-0002](../../../decisions/D-0002-v4-restart-squad-first.md)). To reuse anything here, bring it in through a new v4 decision that cites this file. Words like "locked 🔒", "current", "canonical" or "v4" below belong to the v3 era. Catalog: [archive/README.md](../../../archive/README.md).
+
+
 # Playtest airaider = read the prompts + read the prose
 
 Airaider's whole bet is *"is the AI-driven, character-driven quest fun to read?"* So playtesting is a

@@ -1,3 +1,5 @@
+> 🗄 **ARCHIVED: PROTOTYPE v1/v2 DOC.** Superseded in 2026 (code: tag `v2-final`). This is **not v4 design and not law** ([D-0002](../../../decisions/D-0002-v4-restart-squad-first.md)). Catalog: [archive/README.md](../../../archive/README.md).
+
 # Progression and Payoff
 
 > ⚠️ **PARTIALLY SUPERSEDED — see `CANONICAL_DESIGN.md` §3 (validated dopamine ladder) and §4 (loss-flavor taxonomy).**
