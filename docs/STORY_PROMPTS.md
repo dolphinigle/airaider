@@ -7,7 +7,7 @@
 | What | Where | Committed? |
 |---|---|---|
 | Design (what an arc or chapter IS, rewards, feeding) | `STORY_ENGINE.md` §4, `LORE.md` §1b, `GENERATION_FLOW.md` §22, `QUESTS.md` §5 | yes |
-| **Current best prompt texts + input format + dealing rules** | **this file** (§A = arc, §0 = chapter, §Q = quest) | yes |
+| **Current best prompt texts + input format + dealing rules** | **this file** (§A = arc, §0 = chapter, §S = chapter storyteller examples, §Q = quest) | yes |
 | Earlier saga checkpoints (P20, the personal pipeline, N, M, P4, P7), verbatim | this file, §4 | yes |
 | Lab notebook: every arm, score, rejected idea, run command | `docs/STORY_QUALITY.md` | no (local) |
 | Lab scripts, prompt files, raw outputs | `v3/scripts/_scratch/pre/` (`dealsaga.py`, `pickarc.py`, `runarc.py`, `*.sys`, `*.tpl`) | no (local) |
@@ -15,6 +15,40 @@
 **Keeping it.** When a checkpoint is saved, copy its prompt texts here **verbatim**, replacing the old ones (the history stays in STORY_QUALITY). **Implementing:** render the game's prompt and **diff it byte for byte** against the text here, then run the context-free verifier (a zero-context Opus reads the full rendered prompt; anything it guesses at is a defect). Lab prompts were run on Sonnet as a proxy; production runs GPT (`AI_PROVIDER.md`), so re-check on the production model before shipping. Effort: pickers at medium, writers at high.
 
 **Naming in prompts:** code says arc → chapter → quest. A prompt that writes a standalone chapter says **"saga"**; only the arc prompts say "arc" and "chapter" (`STORY_ENGINE` §4).
+
+---
+
+## S. Chapter storyteller EXAMPLES (synopsis + resolution) — SAVED 2026-10-19; designer: "i think the storyteller examples are good though, pls save them"
+
+Three examples given at the END of the chapter storyteller's input, after the deal, under the line `Examples of good synopses, for other sagas:` (all three, order shuffled per chapter). Each carries the pieces it was written from, so the storyteller sees how pieces become a synopsis. Reverse-engineered from Baldur's Gate 3 side quests and rewritten by the designer: (1) "Find Dribbles the Clown", (2) the designer's reframe of "Hunt the Devil" (the hunted man comes to the fort), (3) "Explore the Ruins". What they teach: natural reading order; a major turn marked plainly ("It turns out"); a plain, undramatized resolution; a choice ending where each way wins its own reward (GENERATION_FLOW §23); a resolution as a straight run of deeds; one word in each `Words:` line left unused, so the storyteller sees words may be ignored; words as broad atoms. The prompt around them is still in the lab (STORY_QUALITY); only the examples are saved.
+
+```
+Kind: Investigating a mystery
+Complication: The target is not what it seems
+Saga ending reward: gold, paid to the company at the end
+Words: circus, fake, harvest
+Synopsis: A famous circus troupe hires the company to play detective. Its star clown still performs as well as ever, but he has stopped speaking to anyone. It turns out the clown was murdered over a week ago, and his killer, a doppelganger monster that can wear anyone's face, has been playing him ever since.
+Resolution: When confronted, the doppelganger turns hostile, and the company kills it. The troupe pays the company in full once it sees the corpse as proof.
+Title: The Silent Clown
+===
+Kind: Bodyguarding someone
+Complication: A sinister bargain for power
+Saga ending rewards, one for each way it can end: the soldier, who joins the company as a mercenary at the end; a relic (the demon guards' gift), which the company keeps at the end
+Words: contract, demon, lighthouse
+Synopsis: One night a soldier comes to the company's fort asking for shelter, and offers everything he owns in exchange for safety. He is running from a band of demon guards: he once signed a blood contract with a demon, and they have come to collect him.
+Resolution: The company either shelters him and drives the demon guards off, and he joins the company as a recruit, or it hands him over, and the demon guards leave it a gift in thanks.
+Title: The Blood Contract
+===
+Kind: Exploring an abandoned place
+Complication: The way in is blocked
+Saga ending reward: a relic (the sword), which the company keeps at the end
+Words: wedding, chapel, crypt
+Synopsis: There are rumours that a valuable sword is hidden in a crypt beneath a ruined chapel. A bandit gang now lives in the chapel.
+Resolution: The company crosses the dangerous wilds to reach the chapel, sneaks past the bandits, finds its way into the crypt, survives its traps, and takes the sword.
+Title: The Chapel Crypt
+```
+
+The `===` lines only separate the examples in the lab file; the engine joins them with a blank line. Example 2's reward line (`Saga ending rewards, one for each way it can end: …`) is the per-way form; 🛠 the engine's real per-way reward line is not designed yet (GENERATION_FLOW §23), so this line follows it once it is.
 
 ---
 
