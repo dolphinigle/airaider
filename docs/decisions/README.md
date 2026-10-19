@@ -11,4 +11,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0002](D-0002-v4-restart-squad-first.md) | Prototype v4 restarts from scratch, around the squad | accepted | designer | 2026-10-19 |
 | [D-0003](D-0003-git-workflow.md) | One trunk (main), tags for checkpoints, nothing secret or bulky in git | accepted | claude | 2026-10-19 |
 | [D-0004](D-0004-mechanics-carry-the-fun-ai-writes-only-small-story.md) | Mechanics carry the fun, AI writes only small story | accepted | designer | 2026-10-19 |
+| [D-0005](D-0005-findings-ledger-what-works-what-doesn-t-cross-checked-agains.md) | Findings ledger: what works, what doesn't, cross-checked against every new idea | accepted | designer | 2026-10-19 |
 <!-- index:end -->

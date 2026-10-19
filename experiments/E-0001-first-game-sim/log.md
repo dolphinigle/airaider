@@ -63,3 +63,7 @@ Recommended first try: A, with D layered on (wager decisions plus a merc who sur
 `RULE:` mechanics-heavy game; AI provides only small story. Recorded as [D-0004](../../docs/decisions/D-0004-mechanics-carry-the-fun-ai-writes-only-small-story.md).
 
 **Claude (out of character):** Re-ranked the brainstorm by "fun with the text removed": B (coin pool) strongest, then A (push your luck), E (raise the stakes) and F (duel of reads). C leans on reading an outcome; D leans on story. Proposed first try: B + A, a coin pool spent across beats with a press-on-or-go-home choice between beats, and one AI line per beat.
+
+**Designer (aside):** (pls make sure your data organizer remember what works vs what doesnt) (if it doesnt have that mechanism yet, code it first) (so whenever we comes up with anew idea, you can crosscheck w/ it)
+
+Built: `docs/findings.md` lessons ledger plus checks and the cross-check step ([D-0005](../../docs/decisions/D-0005-findings-ledger-what-works-what-doesn-t-cross-checked-against-every-new-idea.md)).

@@ -12,18 +12,24 @@ The map is `docs/README.md`. In short:
 | test, sim, playtest, lab, judge round, research | `experiments/E-NNNN-slug/` (README.md = the record) |
 | a ruling or a choice, with its reason | `docs/decisions/D-NNNN-slug.md` |
 | how a system works now | `docs/design/<system>.md` (cites decisions) |
+| a lesson: what worked, what didn't, what's open | `docs/findings.md` (one cited bullet) |
 | phase, next steps, what waits on the designer | `docs/NOW.md` |
 | outside material (games, research, samples) | `docs/reference/` |
 | v1–v3 | `docs/archive/` (frozen, never edit) |
+
+## Cross-check every new idea
+
+Before proposing or trying any idea (the designer's or yours), read `docs/findings.md` and say in a line which lessons it touches: repeats something that failed, builds on something that worked, or answers an open question. The SessionStart hook prints the ledger, so it is always in context.
 
 ## Running an experiment
 
 1. `node tools/rec.mjs experiment "short title"` creates the folder and record, numbered.
 2. **Before running**, fill in `question` (frontmatter) and **Question** (why we ask, and what result would change our minds). Set `status: running`.
 3. Put everything that produces the result **in the folder**: scripts, prompts (verbatim), inputs, `key.json` for blind judging. Bulk output goes in `raw/`, which is gitignored. Copy the samples worth keeping into `samples/` or into the record.
-4. When done: write **Setup** (rerunnable: commit, seeds, models, n), **Result** (numbers + best samples), **Verdict**. Set `status: done`, a one-line `verdict`, and `decisions` if it proposed any.
-5. If the verdict should change the game, create a **proposed** decision (below) and list it in NOW.md. Never edit design/ from an experiment directly.
-6. `node tools/rec.mjs check`, then commit: `exp: E-NNNN <title>: <verdict>`.
+4. Whenever a lesson shows up (mid-run too), put it in `docs/findings.md` under Works / Doesn't work / Open, citing the experiment: `node tools/rec.mjs finding works|fails|open "Claim. Detail" E-NNNN`. Rewrite or move an existing bullet rather than duplicating it.
+5. When done: write **Setup** (rerunnable: commit, seeds, models, n), **Result** (numbers + best samples), **Verdict**. Set `status: done`, a one-line `verdict`, and `decisions` if it proposed any.
+6. If the verdict should change the game, create a **proposed** decision (below) and list it in NOW.md. Never edit design/ from an experiment directly.
+7. `node tools/rec.mjs check` (it fails if a finished experiment has no lesson in findings.md), then commit: `exp: E-NNNN <title>: <verdict>`.
 
 Show the designer samples and results as you go (small loops). The record is written for later readers, not instead of talking.
 
