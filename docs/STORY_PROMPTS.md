@@ -475,6 +475,8 @@ How it should read:
 - Plain words and short sentences that follow one another, with no figures of speech. If someone is dead, say dead. No numbers, no pay.
 ```
 
+> ⚠️ Superseded in part (designer 2026-10-19, GENERATION_FLOW §23): the last-quest line "each way wins the company the saga ending reward" is wrong; a choice ending may give each way its own reward. The template above stays as saved until the per-way reward input is designed.
+
 ### Q2. Input (user message)
 ```
 <the chapter's region line>

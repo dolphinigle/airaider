@@ -121,6 +121,7 @@ Why it matters: the buildup makes you *feel* the stakes you gambled on; the visi
 - **Everything is a chain.** A common quest is a 1-beat chain with no follow-up; rarer ones run longer and spawn sequels. There is no separate "chain vs quest" category for the player.
 - **Organic length.** A story continues only while the player keeps pursuing its "continue" leads; it ends when it's spent or the player lets it lapse. The engine never forces a beat count.
 - **Recurrence & chapters** (a mercenary's arc: §4, arc → chapter → quest) — the standout magic from v1: a finished chain's loose thread + a cast member seeds the next chain; the dead stay named; a freed captive returns chains later as a witness; a merc's arc runs A → B → C, each richer. This is where attachment compounds. Lift it directly.
+- **Choice endings** 🔒 (designer 2026-10-19, GENERATION_FLOW §23): when a chapter ends in a choice, each way may win a different reward (e.g. shelter the hunted soldier and he joins as a mercenary, or hand him over for the hunters' gift). 🟡 How the engine deals and prices the per-way rewards is open.
 
 ---
 
