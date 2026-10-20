@@ -147,3 +147,10 @@ QUEST FAILED  Atlas limps home, wounded. No reward.
 ```
 
 **Observations:** a 64% opener lost, and the wound rule (Claude's placeholder) dropped the next test to 31%: one bad flip decided the whole quest. The rolled tests (END + Survival twice) hit Atlas's weakest stat; with only one merc, the player saw it coming and could do nothing about it.
+
+---
+
+**Designer:** Writing not great. Bandits on the road! great -- then animation of coin flipping and bandits / atlas in pixel art or something -- yes quest have a "minimum success", harder = need success in more. Writing not great, should just be simpler. for eample Bandits on the road! Atlas took a cut! -- then engine tells its wounded. The second is decent. Ok first show me "atlas stat screen".
+
+`RULE:` simple lines, engine states the effect ([D-0007](../../docs/decisions/D-0007-quest-lines-are-one-simple-exclamation-the-engine-states-the-effect.md)). Quests have a minimum number of successes ([D-0008](../../docs/decisions/D-0008-quests-have-a-minimum-number-of-successes.md)).
+`DIRECTION (not yet ruled):` show each test as a coin-flip animation with the merc and the foe in pixel art.
