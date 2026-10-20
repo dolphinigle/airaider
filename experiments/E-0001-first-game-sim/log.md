@@ -271,3 +271,22 @@ Atlas's talents, rolled for real: **INT+ CON+**. (The flavor "strong" is gone; t
 | 3 | 64% → 89% | 55% → 69% | ~31 |
 
 Recommended one coin per level (plus talent flips): pools stay countable and quick to animate. Added to D-0011 (still proposed).
+
+---
+
+**Designer:** ok you DONT want enemis to flip coins. so the "challenges" have fixed thresholds (eg 2) and only you flip coins i think. How about three coins, BUT, you can gain AT MOST one coin per stat per level. Later on most quests will test two stats, RARELY three.
+
+`RULE:` fixed thresholds, only the merc flips; most quests test two stats ([D-0013](../../docs/decisions/D-0013-tests-have-fixed-thresholds-only-the-merc-flips.md)). Level up gives three coins, at most one per stat ([D-0014](../../docs/decisions/D-0014-level-up-gives-three-coins-at-most-one-per-stat.md)); D-0011 rejected. Talent role at level up proposed: [D-0015](../../docs/decisions/D-0015-talents-at-level-up-a-free-extra-coin-on-heads.md).
+
+Odds of reaching a threshold (from `coins.mjs need`):
+
+| coins | need 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| 2 | 75% | 25% | | | | |
+| 3 | 88% | 50% | 13% | | | |
+| 4 | 94% | 69% | 31% | 6% | | |
+| 5 | 97% | 81% | 50% | 19% | 3% | |
+| 6 | 98% | 89% | 66% | 34% | 11% | 2% |
+| 8 | 100% | 96% | 86% | 64% | 36% | 14% |
+| 10 | 100% | 99% | 95% | 83% | 62% | 38% |
+| 12 | 100% | 100% | 98% | 93% | 81% | 61% |

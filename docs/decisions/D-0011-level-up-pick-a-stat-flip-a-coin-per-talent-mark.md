@@ -1,7 +1,7 @@
 ---
 id: D-0011
 title: Level up: pick a stat, flip a coin per talent mark
-status: proposed
+status: rejected
 date: 2026-10-21
 decided-by: designer
 supersedes: []
@@ -43,3 +43,7 @@ Proposed by Claude:
 
 - **Battle Brothers style:** every stat rolls a random gain at level up, talents raise the floor, the player keeps three. Rich, but five numbers per level to weigh.
 - **Offer three stats:** the game offers three random stats (talents weighted), the player picks one. Simple, but less control.
+
+## Outcome
+
+Rejected 2026-10-21 in favor of D-0014. The designer's words: "How about three coins, BUT, you can gain AT MOST one coin per stat per level."
