@@ -404,3 +404,7 @@ Noted in findings: big pools are fine; coins flip together or in batches. Remove
 **Designer:** can you take a look at most DnD games what skills they have and ensure they all have here?
 
 Checked D&D 5e (and Baldur's Gate 3), Pathfinder 2e, Pathfinder: Kingmaker/WotR, Pillars of Eternity II and Divinity: Original Sin 2 ([reference/rpg-skill-lists.md](../../docs/reference/rpg-skill-lists.md)). One gap: perception / insight / investigation. Added a 17th core skill, **Awareness**; widened the others (Athletics takes acrobatics, Persuasion takes performance, Lore takes religion and streetwise, Medicine takes alchemy, Craft takes explosives). D-0021 updated, still proposed.
+
+**Designer:** what attrs do we have? only 5?
+
+**Claude (out of character):** Yes, five (D-0009, from v3): STR, DEX (agility and perception), INT, CHA, CON. D&D has six; the missing one is WIS, which in 5e drives Perception, Insight, Survival, Medicine and Animal Handling, so ours pair those with INT/CHA/CON. Offered a sixth stat, WIL or WIS (nerve, perception, resisting fear and curses), which fits dark fantasy; cost: growth spreads thinner (untalented stats ≈ 0.33/level instead of 0.42–0.5).
