@@ -338,3 +338,14 @@ dwarf STR+ DEX+ (3 runs)
   Lv12   STR 10 · DEX 13 · INT 7 · CHA 9 · CON 3
 ```
 Observations: two talents ≈ 2.5 coins/level, ++ = 2 coins/level but peaked; dump stats now creep to ~4–7 by Lv 12 (was 2), softening the endgame gap; the same talents give visibly different mercs.
+
+**Designer:** so roughly a talent++ unit has (level x 1) stat on the talent, a talent+ with two talents have (level x 0.78 or smth) on both talents?
+
+**Claude (out of character):** Yes. Exact expected gain per level under D-0016 (third coin skips stats raised this level), confirmed by 4000 runs of grow.mjs per build:
+
+| talents | each talented stat | each other stat | coins per level |
+|---|---|---|---|
+| STR++ | 1.00 | 0.25 | 2.0 |
+| STR+ DEX+ | 0.81 (½ + ¼ + 1⁄16) | 0.29 | 2.5 |
+
+Over 11 level-ups: ++ gives +11 on its stat, +2.75 on the rest; +/+ gives about +9 on each talent, +3.2 on the rest.
