@@ -290,3 +290,30 @@ Odds of reaching a threshold (from `coins.mjs need`):
 | 8 | 100% | 96% | 86% | 64% | 36% | 14% |
 | 10 | 100% | 99% | 95% | 83% | 62% | 38% |
 | 12 | 100% | 100% | 98% | 93% | 81% | 61% |
+
+---
+
+**Designer:** ok lets say level is like, "level 12" is around endgame. how is it looking there?
+
+**Claude (out of character), Lv 12 under D-0013/D-0014** (start ●● per stat + talent marks, 11 level-ups × 3 coins, max one per stat; skills and D-0015 left out):
+
+| build at Lv 12 | stats |
+|---|---|
+| specialist (same 3 stats every level) | three stats at 13–14, two stuck at ●● |
+| generalist (spread evenly) | all five around 8–9 |
+
+Odds (`coins.mjs need`):
+
+| one-stat test | need 5 | need 7 | need 9 | need 11 |
+|---|---|---|---|---|
+| dump stat, 2 coins | 0% | 0% | 0% | 0% |
+| generalist, 9 | 50% | 9% | 0% | 0% |
+| specialist, 14 | 91% | 60% | 21% | 3% |
+
+| two-stat test, pooled | need 10 | need 12 | need 14 | need 16 |
+|---|---|---|---|---|
+| one strong + one dump stat, 16 | 23% | 4% | 0% | 0% |
+| generalist, 18 | 41% | 12% | 2% | 0% |
+| specialist pair, 27 | 94% | 78% | 50% | 22% |
+
+Observations: (1) the gap is huge, a wrong merc auto-fails, so the right pick decides most tests; good for the squad puzzle, but the roll matters less. (2) Pools of 14–27 coins: each coin is worth about +10 points, and a test is a lot of coins to animate. (3) Talents as a start bonus only are +1 of 14 at Lv 12, negligible; D-0015's free-coin rule would add about +5 (+) to +8 (++) over a career.
