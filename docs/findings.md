@@ -26,4 +26,4 @@ Rules:
 
 - **What replaces combat?** Research says dice can, if built from decisions around the rolls; which mix (push your luck, coin pool, push lever, trait-unlocked options, mid-walk stops) is most fun is still untested. (E-0001, E-0002, D-0004)
 - **Is choice around the roll enough ownership without tactics?** Tactics make a loss feel like your own fault; whether dice choices do that too is unproven. (E-0002)
-- **Endgame spread.** At Lv 12 a specialist has stats of 13-14 next to dump stats of 2, so the wrong merc auto-fails and pools of 14-27 coins are long to animate; is the right pick deciding too much? (E-0001, D-0014)
+- **Endgame spread.** Under player-placed growth (D-0014) a Lv 12 specialist had 13–14 next to dump stats of 2, so the wrong merc auto-failed. Random three-coin growth (D-0018) lifts untalented stats to about 6–8; whether that gap feels right in play, and whether 14–27-coin pools are too long to animate, is untested. (E-0001, D-0014, D-0018)

@@ -22,6 +22,7 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0013](D-0013-tests-have-fixed-thresholds-only-the-merc-flips.md) | Tests have fixed thresholds; only the merc flips | accepted | designer | 2026-10-21 |
 | [D-0014](D-0014-level-up-gives-three-coins-at-most-one-per-stat.md) | Level up gives three coins, at most one per stat | superseded → D-0016 | designer | 2026-10-21 |
 | [D-0015](D-0015-talents-at-level-up-a-free-extra-coin-on-heads.md) | Talents at level up: a free extra coin on heads | rejected | designer | 2026-10-21 |
-| [D-0016](D-0016-stats-grow-at-random-led-by-talents-level-ups-unlock-skills.md) | Stats grow at random, led by talents; level ups unlock skills | accepted | designer | 2026-10-21 |
+| [D-0016](D-0016-stats-grow-at-random-led-by-talents-level-ups-unlock-skills.md) | Stats grow at random, led by talents; level ups unlock skills | superseded → D-0018 | designer | 2026-10-21 |
 | [D-0017](D-0017-skill-unlocks-every-3-levels-pick-1-of-2-rolled-at-recruitme.md) | Skill unlocks: every 3 levels, pick 1 of 2, rolled at recruitment | proposed | designer | 2026-10-21 |
+| [D-0018](D-0018-stat-growth-always-three-coins-per-level-led-by-talents.md) | Stat growth: always three coins per level, led by talents | accepted | designer | 2026-10-21 |
 <!-- index:end -->

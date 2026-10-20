@@ -358,3 +358,7 @@ Over 11 level-ups: ++ gives +11 on its stat, +2.75 on the rest; +/+ gives about 
 |---|---|---|---|
 | STR++ | 1.00 | 0.50 | 3 |
 | STR+ DEX+ | 0.875 | 0.42 | 3 |
+
+**Designer:** yea always 3 coins: missed roll goes to random stat sounds good
+
+`RULE:` always three coins per level ([D-0018](../../docs/decisions/D-0018-stat-growth-always-three-coins-per-level-led-by-talents.md), supersedes D-0016).

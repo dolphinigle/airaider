@@ -1,11 +1,11 @@
 ---
 id: D-0016
 title: Stats grow at random, led by talents; level ups unlock skills
-status: accepted
+status: superseded
 date: 2026-10-21
 decided-by: designer
 supersedes: [D-0010, D-0014]
-superseded-by:
+superseded-by: D-0018
 evidence: [E-0001]
 sources: []
 ---
