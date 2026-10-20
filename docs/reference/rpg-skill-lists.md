@@ -35,7 +35,7 @@ D&D's weapon, armor and tool proficiencies map to Melee, Ranged, Defense and Cra
 | | Diplomacy | Persuasion |
 | | Lore | Lore |
 | | Occultism | Lore, Dark Magic |
-| | Society | Lore |
+| | Society | Streetwise, Lore |
 | | Thievery | Roguery |
 | Pathfinder: Kingmaker / WotR | Mobility | Athletics |
 | | Use Magic Device | Lore |
@@ -44,7 +44,7 @@ D&D's weapon, armor and tool proficiencies map to Melee, Ranged, Defense and Cra
 | | Explosives | Craft |
 | | Mechanics | Roguery |
 | | Metaphysics | Lore |
-| | Streetwise | Lore |
+| | Streetwise | Streetwise |
 | Divinity: Original Sin 2 | Bartering | Bargaining |
 | | Loremaster | Lore |
 | | Sneaking | Stealth |

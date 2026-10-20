@@ -436,3 +436,7 @@ D-0021: + Warfare (tactics, formations, sieges, fortifications; INT, STR), read 
 **Designer:** should have something that covers banditry, crimes, and slavery
 
 D-0021: + Underworld (banditry, smuggling, extortion, slaving, black markets, bribes; CHA, STR) in Shadows. Name alternatives offered: Outlawry, Villainy. 24 cores.
+
+**Designer:** street smart needs one too. Villainy sounds good.
+
+D-0021: Underworld renamed Villainy; + Streetwise (rumors, finding people, city ways, local customs; PER, CHA), taking customs from Lore. 25 cores.
