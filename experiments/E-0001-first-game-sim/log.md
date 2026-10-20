@@ -349,3 +349,12 @@ Observations: two talents ≈ 2.5 coins/level, ++ = 2 coins/level but peaked; du
 | STR+ DEX+ | 0.81 (½ + ¼ + 1⁄16) | 0.29 | 2.5 |
 
 Over 11 level-ups: ++ gives +11 on its stat, +2.75 on the rest; +/+ gives about +9 on each talent, +3.2 on the rest.
+
+**Designer:** why is it less than 3 coins per level?
+
+**Claude (out of character):** Claude's reading of D-0016: a missed 50% roll loses its coin, and a ++ merc has no second talent to roll for, so 2–2.5 coins per level. If a missed roll (or the missing second talent) puts the coin on a random stat instead, every level gives 3 (`ALWAYS3=1 node grow.mjs`, 6000 runs):
+
+| talents | each talented stat | each other stat | coins per level |
+|---|---|---|---|
+| STR++ | 1.00 | 0.50 | 3 |
+| STR+ DEX+ | 0.875 | 0.42 | 3 |

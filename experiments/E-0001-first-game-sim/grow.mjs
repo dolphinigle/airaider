@@ -2,6 +2,7 @@
 //   level up = 1 coin on a random talent stat, then 50% a coin on the other talent stat (if any),
 //   then 1 coin on a random stat not raised this level. Start = ●● each + race bonus + 2 random coins.
 //   node grow.mjs <race> <talent> <talent> [levels=12] [runs=1]
+//   ALWAYS3=1 node grow.mjs …  → a missed 50% roll (or no second talent) puts that coin on a random stat instead
 const STATS = ['STR', 'DEX', 'INT', 'CHA', 'CON'];
 const RACE = { wolfkin: ['DEX'], human: [], dwarf: ['CON'], elf: ['INT'] };
 const pick = a => a[Math.floor(Math.random() * a.length)];
@@ -20,6 +21,7 @@ for (let r = 0; r < runs; r++) {
     up.push(first);
     const second = distinct.find(t => t !== first);
     if (second && Math.random() < 0.5) up.push(second);
+    else if (process.env.ALWAYS3) up.push(pick(STATS.filter(k => !up.includes(k))));
     up.push(pick(STATS.filter(k => !up.includes(k))));
     for (const k of up) s[k] += 1;
     log.push(`Lv${L}: ${up.join(' ')}`);
