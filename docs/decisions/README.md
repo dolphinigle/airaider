@@ -18,4 +18,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0009](D-0009-mercs-have-five-stats-and-leveled-skills.md) | Mercs have five stats and leveled skills | accepted | designer | 2026-10-20 |
 | [D-0010](D-0010-mercs-have-a-level-and-one-or-two-random-talents.md) | Mercs have a level and one or two random talents | accepted | designer | 2026-10-21 |
 | [D-0011](D-0011-level-up-pick-a-stat-flip-a-coin-per-talent-mark.md) | Level up: pick a stat, flip a coin per talent mark | proposed | designer | 2026-10-21 |
+| [D-0012](D-0012-xp-level-up-button-overflow-penalty-for-low-level-quests-ski.md) | XP: level-up button, overflow, penalty for low-level quests, skill XP | accepted | designer | 2026-10-21 |
 <!-- index:end -->

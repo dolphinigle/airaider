@@ -255,3 +255,19 @@ Atlas's talents, rolled for real: **INT+ CON+**. (The flavor "strong" is gone; t
    CHA  ●●       +1
    CON  ●●● +    +1, then flip ● for +1 more
 ```
+
+---
+
+**Designer:** so for level up definitely has a "button" to allow them to level up when they reach the exp threshold. ofc xp can "overflow" to next one. xp should be like in path of exile where your xp gain is severaly penalized if oging on lower level quests. SKILLS have their own exp i agree, sounds fun. so the "gacha" are the skills and traits the unit have at start yea? for level up, first ask if its better to have ONE, TWO, or THREE coins per level?
+
+`RULE:` level-up button, XP overflow, PoE-style penalty on lower-level quests, skill XP: [D-0012](../../docs/decisions/D-0012-xp-level-up-button-overflow-penalty-for-low-level-quests-ski.md).
+
+**Claude (out of character):** Yes, the recruit's roll is the gacha: talents, starting skills, personality traits (and race). Coins per level, odds from coins.mjs (opposed flips, ties to the merc):
+
+| coins per level | one level ahead at Lv1 | one level ahead at Lv10 | pool at Lv10 |
+|---|---|---|---|
+| 1 | 64% → 75% | 58% → 65% | ~13 |
+| 2 | 64% → 83% | 56% → 67% | ~22 |
+| 3 | 64% → 89% | 55% → 69% | ~31 |
+
+Recommended one coin per level (plus talent flips): pools stay countable and quick to animate. Added to D-0011 (still proposed).
