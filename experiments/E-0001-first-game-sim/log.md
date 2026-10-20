@@ -444,3 +444,7 @@ D-0021: Underworld renamed Villainy; + Streetwise (rumors, finding people, city 
 **Designer:** lore should be split to wordly lore vs magic lore (magic lore sounds like they know magic though can you figure out a good name for it)
 
 D-0021: Lore (history, languages, peoples, faiths, beasts; INT) and **Occult** (the hidden world: monsters, undead, curses, relics, how magic works; knowing, not casting; INT, CON). Alternatives offered: Arcana (reads as casting), Mysteries, Esoterica. 26 cores.
+
+**Designer:** maybe split to Science, History, and Magic lore?
+
+D-0021: Lore → **History** (the past, languages, peoples, faiths, heraldry; INT), **Science** (nature, beasts, stars, numbers, how things work; INT, PER), **Occult** for magic lore. 27 cores.

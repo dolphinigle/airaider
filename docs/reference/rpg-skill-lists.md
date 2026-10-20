@@ -11,16 +11,16 @@ The standard skill lists of D&D-family games, mapped onto our core skills (D-002
 | Arcana (INT) | Occult (knowing), Elemental Magic (casting) |
 | Athletics (STR) | Athletics |
 | Deception (CHA) | Deception |
-| History (INT) | Lore |
+| History (INT) | History |
 | Insight (WIS) | **Awareness** (added) |
 | Intimidation (CHA) | Intimidation |
 | Investigation (INT) | **Awareness** (added) |
 | Medicine (WIS) | Alchemy |
-| Nature (INT) | Survival |
+| Nature (INT) | Science (knowing), Survival (doing) |
 | Perception (WIS) | **Awareness** (added) |
 | Performance (CHA) | Performance |
 | Persuasion (CHA) | Persuasion |
-| Religion (INT) | Lore (knowing), Holy Magic (casting) |
+| Religion (INT) | History (knowing), Holy Magic (casting) |
 | Sleight of Hand (DEX) | Roguery |
 | Stealth (DEX) | Stealth |
 | Survival (WIS) | Survival |
@@ -33,9 +33,9 @@ D&D's weapon, armor and tool proficiencies map to Melee, Ranged, Defense and Cra
 |---|---|---|
 | Pathfinder 2e | Crafting | Craft |
 | | Diplomacy | Persuasion |
-| | Lore | Lore |
+| | Lore | History, Science or Occult, by subject |
 | | Occultism | Occult |
-| | Society | Streetwise, Lore |
+| | Society | Streetwise, History |
 | | Thievery | Roguery |
 | Pathfinder: Kingmaker / WotR | Mobility | Athletics |
 | | Use Magic Device | Occult |
@@ -46,7 +46,7 @@ D&D's weapon, armor and tool proficiencies map to Melee, Ranged, Defense and Cra
 | | Metaphysics | Occult |
 | | Streetwise | Streetwise |
 | Divinity: Original Sin 2 | Bartering | Bargaining |
-| | Loremaster | Lore |
+| | Loremaster | History, Science, Occult |
 | | Sneaking | Stealth |
 | | Thievery | Roguery |
 
