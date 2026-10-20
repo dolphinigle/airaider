@@ -197,3 +197,26 @@ No v4 stat docs exist yet; the stat set comes from the v3 archive (GENERATION_FL
 │   Wage 5 crowns/day · Quests 1 (0 won)               │
 └──────────────────────────────────────────────────────┘
 ```
+
+**Designer:** or rather just make the "skills" like the "stats" eg "swords (3 coins)
+
+`RULE:` skills are counted in coins, like stats (D-0009 updated, still proposed for the stat set).
+
+**Game:**
+```
+┌─ ATLAS ─────────────────────── wolfkin · sellsword ─┐
+│                                                      │
+│   STATS                     SKILLS                   │
+│   STR  ●●●   Strong         Swords  ●                │
+│   DEX  ●●                                            │
+│   INT  ●●●   Smart                                   │
+│   CHA  ●●                                            │
+│   CON  ●●                                            │
+│                                                      │
+│   TRAITS   Gruff   (+● to scare, −● to charm)        │
+│   CONDITION   🩸 Wounded  −● on every test · 2 days   │
+│                                                      │
+│   Wage 5 crowns/day · Quests 1 (0 won)               │
+└──────────────────────────────────────────────────────┘
+A test pays stat + skill: STR + Swords = ●●●● (−● wounded)
+```

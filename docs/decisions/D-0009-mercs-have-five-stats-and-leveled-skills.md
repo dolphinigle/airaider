@@ -16,11 +16,11 @@ The E-0001 stat screen showed four placeholder stats (STR, DEX, END, INT) and a 
 
 ## Decision
 
-The designer's words: "should have more stats, pls check docs v4. For skills should have level, eg sword lv1."
+The designer's words: "should have more stats, pls check docs v4. For skills should have level, eg sword lv1." Then: "or rather just make the 'skills' like the 'stats' eg 'swords (3 coins)'."
 
 - **Five stats**, taken from v3 (GENERATION_FLOW §10): **STR** strength · **DEX** dexterity (agility and perception) · **INT** intelligence · **CHA** charisma · **CON** constitution (endurance, toughness). *Proposed: the exact set.*
-- **Skills have levels** (Swords Lv1, Lv2, …). *Ruled.*
-- Coins for a test = the tested stat + the level of the matching skill. *Placeholder for the sim.*
+- **Skills work like stats**: each skill is a number of coins (Swords ●●● = 3 coins). *Ruled.*
+- Coins for a test = the tested stat's coins + the matching skill's coins. *Placeholder for the sim.*
 
 ## Consequences
 
