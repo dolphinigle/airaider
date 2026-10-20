@@ -424,3 +424,7 @@ D-0021 revised (still proposed): magic = Elemental, Holy, Dark (all rare); Thiev
 **Designer:** mele should be split betwen heavy weapons and light weapons i think
 
 D-0021: Melee → Heavy Weapons (STR, CON) and Light Weapons (DEX, PER). 21 cores, one over the 10–20 budget.
+
+**Designer:** Deception should b eadded
+
+D-0021: + Deception (lies, bluffs, disguises, cons; CHA, INT); Persuasion keeps charm and diplomacy. 22 cores.

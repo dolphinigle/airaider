@@ -10,7 +10,7 @@ The standard skill lists of D&D-family games, mapped onto our core skills (D-002
 | Animal Handling (WIS) | Beasts |
 | Arcana (INT) | Lore (knowing), Elemental Magic (casting) |
 | Athletics (STR) | Athletics |
-| Deception (CHA) | Persuasion |
+| Deception (CHA) | Deception |
 | History (INT) | Lore |
 | Insight (WIS) | **Awareness** (added) |
 | Intimidation (CHA) | Intimidation |
@@ -40,7 +40,7 @@ D&D's weapon, armor and tool proficiencies map to Melee, Ranged, Defense and Cra
 | Pathfinder: Kingmaker / WotR | Mobility | Athletics |
 | | Use Magic Device | Lore |
 | Pillars of Eternity II | Alchemy | Alchemy |
-| | Bluff | Persuasion |
+| | Bluff | Deception |
 | | Explosives | Craft |
 | | Mechanics | Roguery |
 | | Metaphysics | Lore |
