@@ -399,4 +399,8 @@ Noted in findings: big pools are fine; coins flip together or in batches. Remove
 
 **Designer:** skil unlock should be hidden. OK for skills, i want you to design 10-20 core skills (core skill is like "melee combat", "ranged combat" etc. Then the exact skill (like swords) is ai generated then mapped to one of the core skills). what do you think?
 
-`RULE:` skill unlocks hidden until the level up ([D-0020](../../docs/decisions/D-0020-skill-unlocks-every-3-levels-pick-1-of-2-hidden-until-the-le.md), supersedes D-0017). Core skills proposed: [D-0021](../../docs/decisions/D-0021-sixteen-core-skills-ai-names-the-exact-skill-and-maps-it-to-.md) (16 cores in 5 families; AI names the exact skill and maps it; only the core counts in tests).
+`RULE:` skill unlocks hidden until the level up ([D-0020](../../docs/decisions/D-0020-skill-unlocks-every-3-levels-pick-1-of-2-hidden-until-the-le.md), supersedes D-0017). Core skills proposed: [D-0021](../../docs/decisions/D-0021-seventeen-core-skills-ai-names-the-exact-skill-and-maps-it.md) (16 cores in 5 families, later 17; AI names the exact skill and maps it; only the core counts in tests).
+
+**Designer:** can you take a look at most DnD games what skills they have and ensure they all have here?
+
+Checked D&D 5e (and Baldur's Gate 3), Pathfinder 2e, Pathfinder: Kingmaker/WotR, Pillars of Eternity II and Divinity: Original Sin 2 ([reference/rpg-skill-lists.md](../../docs/reference/rpg-skill-lists.md)). One gap: perception / insight / investigation. Added a 17th core skill, **Awareness**; widened the others (Athletics takes acrobatics, Persuasion takes performance, Lore takes religion and streetwise, Medicine takes alchemy, Craft takes explosives). D-0021 updated, still proposed.
