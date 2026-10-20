@@ -362,3 +362,7 @@ Over 11 level-ups: ++ gives +11 on its stat, +2.75 on the rest; +/+ gives about 
 **Designer:** yea always 3 coins: missed roll goes to random stat sounds good
 
 `RULE:` always three coins per level ([D-0018](../../docs/decisions/D-0018-stat-growth-always-three-coins-per-level-led-by-talents.md), supersedes D-0016).
+
+**Designer:** long to animate doesnt matter, you can flip the coins together or in batch.
+
+Noted in findings: big pools are fine; coins flip together or in batches. Removed that worry from the endgame-spread question.
