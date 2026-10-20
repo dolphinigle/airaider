@@ -1,11 +1,11 @@
 ---
 id: D-0017
 title: Skill unlocks: every 3 levels, pick 1 of 2, rolled at recruitment
-status: accepted
+status: superseded
 date: 2026-10-21
 decided-by: designer
 supersedes: []
-superseded-by:
+superseded-by: D-0020
 evidence: [E-0001]
 sources: []
 ---

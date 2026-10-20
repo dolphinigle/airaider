@@ -394,3 +394,9 @@ Noted in findings: big pools are fine; coins flip together or in batches. Remove
 │   XP ▰▰▱▱▱ 2/5 · Wage 5/day · Quests 1 (0 won)       │
 └──────────────────────────────────────────────────────┘
 ```
+
+---
+
+**Designer:** skil unlock should be hidden. OK for skills, i want you to design 10-20 core skills (core skill is like "melee combat", "ranged combat" etc. Then the exact skill (like swords) is ai generated then mapped to one of the core skills). what do you think?
+
+`RULE:` skill unlocks hidden until the level up ([D-0020](../../docs/decisions/D-0020-skill-unlocks-every-3-levels-pick-1-of-2-hidden-until-the-le.md), supersedes D-0017). Core skills proposed: [D-0021](../../docs/decisions/D-0021-sixteen-core-skills-ai-names-the-exact-skill-and-maps-it-to-.md) (16 cores in 5 families; AI names the exact skill and maps it; only the core counts in tests).
