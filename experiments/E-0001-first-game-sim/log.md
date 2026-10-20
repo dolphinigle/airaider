@@ -428,3 +428,7 @@ D-0021: Melee → Heavy Weapons (STR, CON) and Light Weapons (DEX, PER). 21 core
 **Designer:** Deception should b eadded
 
 D-0021: + Deception (lies, bluffs, disguises, cons; CHA, INT); Persuasion keeps charm and diplomacy. 22 cores.
+
+**Designer:** should have Warfare.
+
+D-0021: + Warfare (tactics, formations, sieges, fortifications; INT, STR), read as military know-how rather than DOS2's melee-damage Warfare; Leadership narrows to inspiring and morale. 23 cores.
