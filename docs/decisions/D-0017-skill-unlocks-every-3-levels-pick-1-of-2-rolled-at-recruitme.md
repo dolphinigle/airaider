@@ -1,7 +1,7 @@
 ---
 id: D-0017
 title: Skill unlocks: every 3 levels, pick 1 of 2, rolled at recruitment
-status: proposed
+status: accepted
 date: 2026-10-21
 decided-by: designer
 supersedes: []
@@ -16,7 +16,7 @@ D-0016 moved the player's level-up choice to skills and left open how often and 
 
 ## Decision
 
-Proposed by Claude:
+Proposed by Claude; the designer accepted it: "skill unlock sounds good."
 
 - **Every 3 levels** (Lv 3, 6, 9, 12): four unlocks over a career, on top of the starting skills. Each unlock is an event, and skills, which have their own XP (D-0012), have time to grow.
 - **Pick 1 of 2.** Two options make a sharp trade-off and keep mercs distinct.

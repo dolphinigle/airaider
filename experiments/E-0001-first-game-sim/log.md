@@ -366,3 +366,31 @@ Over 11 level-ups: ++ gives +11 on its stat, +2.75 on the rest; +/+ gives about 
 **Designer:** long to animate doesnt matter, you can flip the coins together or in batch.
 
 Noted in findings: big pools are fine; coins flip together or in batches. Removed that worry from the endgame-spread question.
+
+---
+
+**Designer:** skill unlock sounds good. quests can test one, two, or even rarely three stats
+
+`RULE:` D-0017 accepted. A test pools one, two, or rarely three stats ([D-0019](../../docs/decisions/D-0019-a-test-pools-one-two-or-rarely-three-stats.md); pooling is Claude's reading).
+
+**Game:** Atlas rerolled under D-0009/D-0017/D-0018 (start from the earlier grow.mjs roll; talents INT+ CON+ kept; skill choices rolled now, wolfkin-weighted toward Survival, Tracking, Stealth):
+```
+┌─ ATLAS · Lv 1 ──────────────── wolfkin · sellsword ─┐
+│   STATS                     SKILLS                   │
+│   STR  ●●                   Swords  ●                │
+│   DEX  ●●●   (wolfkin)                               │
+│   INT  ●●    +                                       │
+│   CHA  ●●●                                           │
+│   CON  ●●●   +                                       │
+│                                                      │
+│   TRAITS   Gruff                                     │
+│   CONDITION   🩸 Wounded  −● on every test · 2 days   │
+│                                                      │
+│   SKILL UNLOCKS   Lv 3  Axes or Intimidate           │
+│                   Lv 6  Bows or Survival             │
+│                   Lv 9  Medicine or Persuade         │
+│                   Lv 12 Stealth or Tracking          │
+│                                                      │
+│   XP ▰▰▱▱▱ 2/5 · Wage 5/day · Quests 1 (0 won)       │
+└──────────────────────────────────────────────────────┘
+```

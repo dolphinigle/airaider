@@ -12,8 +12,7 @@
 
 ## Waiting on the designer
 
-- [D-0017](decisions/D-0017-skill-unlocks-every-3-levels-pick-1-of-2-rolled-at-recruitme.md) (proposed): skill unlocks every 3 levels, pick 1 of 2, rolled at recruitment.
-- D-0013 open point: does "a quest tests two stats" mean one test pools two stats, or a quest's tests span two stats?
+- Nothing right now.
 
 ## Notes
 
