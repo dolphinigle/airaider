@@ -48,7 +48,7 @@ How often each stat appears: STR 5 · DEX 6 · PER 8 · INT 8 · CHA 8 · CON 6.
 
 **Exact skills.** The AI writes the skill's name (and a few words of flavor) and picks its core skill from the list; the engine stores the mapping once and only ever reads the core skill. Examples: Swords → Light Weapons · Wolf-cleaver → Heavy Weapons · Wolf-tongue → Beasts · Grave-robbing → Roguery · Bone-setting → Alchemy · Tavern lies → Persuasion · Fence's eye → Bargaining.
 
-- The screen shows both: "Swords (Melee) ●".
+- The screen shows both: "Swords (Light Weapons) ●".
 - Only the core skill counts in a test; the exact name colors the line ("Atlas swings his sword").
 - A merc's unlock options (D-0020) come from cores they don't have yet, so every new skill widens them.
 
