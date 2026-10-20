@@ -317,3 +317,24 @@ Odds (`coins.mjs need`):
 | specialist pair, 27 | 94% | 78% | 50% | 22% |
 
 Observations: (1) the gap is huge, a wrong merc auto-fails, so the right pick decides most tests; good for the squad puzzle, but the roll matters less. (2) Pools of 14–27 coins: each coin is worth about +10 points, and a test is a lot of coins to animate. (3) Talents as a start bonus only are +1 of 14 at Lv 12, negligible; D-0015's free-coin rule would add about +5 (+) to +8 (++) over a career.
+
+---
+
+**Designer:** initial stats should be a little randomized, per race randomization. Eg atlas is wolfkin so naturally somewhat higher AGI. stat increase is randomized: one guaranteed on a random talent, then 50% chance on a second talent, if any, then third one is completely random. On level up instead, every (2? 3?) levels, you can pick another SKILL to unlock, one of two or three choices (these choices are rolled at character start or smth?).
+
+`RULE:` random, talent-led stat growth; race-biased starting stats; level-up choice is a skill ([D-0016](../../docs/decisions/D-0016-stats-grow-at-random-led-by-talents-level-ups-unlock-skills.md), supersedes D-0010 and D-0014; D-0015 rejected). Skill-unlock cadence proposed: [D-0017](../../docs/decisions/D-0017-skill-unlocks-every-3-levels-pick-1-of-2-rolled-at-recruitme.md). AGI = DEX in our five stats.
+
+Growth sim, real random ([grow.mjs](grow.mjs); placeholders: start ●● + race +1 + 2 random coins; the third coin skips stats raised this level):
+```
+wolfkin INT+ CON+ (Atlas, rerolled start)
+  start  STR 2 · DEX 3 · INT 2 · CHA 3 · CON 3
+  Lv12   STR 5 · DEX 8 · INT 9 · CHA 6 · CON 10  (total 38)
+human STR++
+  start  STR 2 · DEX 2 · INT 3 · CHA 2 · CON 3
+  Lv12   STR 13 · DEX 2 · INT 7 · CHA 7 · CON 5  (total 34)
+dwarf STR+ DEX+ (3 runs)
+  Lv12   STR 10 · DEX 11 · INT 6 · CHA 6 · CON 5
+  Lv12   STR 13 · DEX 13 · INT 6 · CHA 4 · CON 6
+  Lv12   STR 10 · DEX 13 · INT 7 · CHA 9 · CON 3
+```
+Observations: two talents ≈ 2.5 coins/level, ++ = 2 coins/level but peaked; dump stats now creep to ~4–7 by Lv 12 (was 2), softening the endgame gap; the same talents give visibly different mercs.

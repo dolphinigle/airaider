@@ -16,10 +16,12 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0007](D-0007-quest-lines-are-one-simple-exclamation-the-engine-states-the.md) | Quest lines are one simple exclamation; the engine states the effect | accepted | designer | 2026-10-20 |
 | [D-0008](D-0008-quests-have-a-minimum-number-of-successes.md) | Quests have a minimum number of successes | accepted | designer | 2026-10-20 |
 | [D-0009](D-0009-mercs-have-five-stats-and-leveled-skills.md) | Mercs have five stats and leveled skills | accepted | designer | 2026-10-20 |
-| [D-0010](D-0010-mercs-have-a-level-and-one-or-two-random-talents.md) | Mercs have a level and one or two random talents | accepted | designer | 2026-10-21 |
+| [D-0010](D-0010-mercs-have-a-level-and-one-or-two-random-talents.md) | Mercs have a level and one or two random talents | superseded → D-0016 | designer | 2026-10-21 |
 | [D-0011](D-0011-level-up-pick-a-stat-flip-a-coin-per-talent-mark.md) | Level up: pick a stat, flip a coin per talent mark | rejected | designer | 2026-10-21 |
 | [D-0012](D-0012-xp-level-up-button-overflow-penalty-for-low-level-quests-ski.md) | XP: level-up button, overflow, penalty for low-level quests, skill XP | accepted | designer | 2026-10-21 |
 | [D-0013](D-0013-tests-have-fixed-thresholds-only-the-merc-flips.md) | Tests have fixed thresholds; only the merc flips | accepted | designer | 2026-10-21 |
-| [D-0014](D-0014-level-up-gives-three-coins-at-most-one-per-stat.md) | Level up gives three coins, at most one per stat | accepted | designer | 2026-10-21 |
-| [D-0015](D-0015-talents-at-level-up-a-free-extra-coin-on-heads.md) | Talents at level up: a free extra coin on heads | proposed | designer | 2026-10-21 |
+| [D-0014](D-0014-level-up-gives-three-coins-at-most-one-per-stat.md) | Level up gives three coins, at most one per stat | superseded → D-0016 | designer | 2026-10-21 |
+| [D-0015](D-0015-talents-at-level-up-a-free-extra-coin-on-heads.md) | Talents at level up: a free extra coin on heads | rejected | designer | 2026-10-21 |
+| [D-0016](D-0016-stats-grow-at-random-led-by-talents-level-ups-unlock-skills.md) | Stats grow at random, led by talents; level ups unlock skills | accepted | designer | 2026-10-21 |
+| [D-0017](D-0017-skill-unlocks-every-3-levels-pick-1-of-2-rolled-at-recruitme.md) | Skill unlocks: every 3 levels, pick 1 of 2, rolled at recruitment | proposed | designer | 2026-10-21 |
 <!-- index:end -->

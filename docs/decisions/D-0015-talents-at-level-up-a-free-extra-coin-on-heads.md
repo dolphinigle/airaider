@@ -1,7 +1,7 @@
 ---
 id: D-0015
 title: Talents at level up: a free extra coin on heads
-status: proposed
+status: rejected
 date: 2026-10-21
 decided-by: designer
 supersedes: []
@@ -30,3 +30,7 @@ Proposed by Claude:
 
 - **Start bonus only:** talents add coins at creation and nothing after. Simplest, but talents fade as levels pile up.
 - **Talent raises the cap:** a ++ stat may take two coins per level. Breaks the D-0014 cap.
+
+## Outcome
+
+Rejected 2026-10-21: talents now drive random stat growth directly (D-0016).

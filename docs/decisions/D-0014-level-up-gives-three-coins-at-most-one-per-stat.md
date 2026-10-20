@@ -1,11 +1,11 @@
 ---
 id: D-0014
 title: Level up gives three coins, at most one per stat
-status: accepted
+status: superseded
 date: 2026-10-21
 decided-by: designer
 supersedes: []
-superseded-by:
+superseded-by: D-0016
 evidence: [E-0001]
 sources: []
 ---
