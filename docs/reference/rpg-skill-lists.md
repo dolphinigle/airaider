@@ -11,7 +11,7 @@ The standard skill lists of D&D-family games, mapped onto our core skills (D-002
 | Arcana (INT) | Arcane Lore (knowing), Elemental Magic (casting) |
 | Athletics (STR) | Athletics |
 | Deception (CHA) | Deception |
-| Civilization Lore (INT) | Civilization Lore |
+| History (INT) | Civilization Lore |
 | Insight (WIS) | **Awareness** (added) |
 | Intimidation (CHA) | Intimidation |
 | Investigation (INT) | **Awareness** (added) |
@@ -33,8 +33,8 @@ D&D's weapon, armor and tool proficiencies map to Melee, Ranged, Defense and Cra
 |---|---|---|
 | Pathfinder 2e | Crafting | Craft |
 | | Diplomacy | Persuasion |
-| | Lore | Civilization Lore, Science or Occult, by subject |
-| | Arcane Loreism | Arcane Lore |
+| | Lore | Civilization, Science or Arcane Lore, by subject |
+| | Occultism | Arcane Lore |
 | | Society | Streetwise, Civilization Lore |
 | | Thievery | Roguery |
 | Pathfinder: Kingmaker / WotR | Mobility | Athletics |
@@ -46,7 +46,7 @@ D&D's weapon, armor and tool proficiencies map to Melee, Ranged, Defense and Cra
 | | Metaphysics | Arcane Lore |
 | | Streetwise | Streetwise |
 | Divinity: Original Sin 2 | Bartering | Bargaining |
-| | Loremaster | Civilization Lore, Science, Occult |
+| | Loremaster | Civilization, Science and Arcane Lore |
 | | Sneaking | Stealth |
 | | Thievery | Roguery |
 
