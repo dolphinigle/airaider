@@ -8,19 +8,19 @@ The standard skill lists of D&D-family games, mapped onto our core skills (D-002
 |---|---|
 | Acrobatics (DEX) | Athletics |
 | Animal Handling (WIS) | Beasts |
-| Arcana (INT) | Occult (knowing), Elemental Magic (casting) |
+| Arcana (INT) | Arcane Lore (knowing), Elemental Magic (casting) |
 | Athletics (STR) | Athletics |
 | Deception (CHA) | Deception |
-| History (INT) | History |
+| Civilization Lore (INT) | Civilization Lore |
 | Insight (WIS) | **Awareness** (added) |
 | Intimidation (CHA) | Intimidation |
 | Investigation (INT) | **Awareness** (added) |
 | Medicine (WIS) | Alchemy |
-| Nature (INT) | Science (knowing), Survival (doing) |
+| Nature (INT) | Science Lore (knowing), Survival (doing) |
 | Perception (WIS) | **Awareness** (added) |
 | Performance (CHA) | Performance |
 | Persuasion (CHA) | Persuasion |
-| Religion (INT) | History (knowing), Holy Magic (casting) |
+| Religion (INT) | Civilization Lore (knowing), Holy Magic (casting) |
 | Sleight of Hand (DEX) | Roguery |
 | Stealth (DEX) | Stealth |
 | Survival (WIS) | Survival |
@@ -33,20 +33,20 @@ D&D's weapon, armor and tool proficiencies map to Melee, Ranged, Defense and Cra
 |---|---|---|
 | Pathfinder 2e | Crafting | Craft |
 | | Diplomacy | Persuasion |
-| | Lore | History, Science or Occult, by subject |
-| | Occultism | Occult |
-| | Society | Streetwise, History |
+| | Lore | Civilization Lore, Science or Occult, by subject |
+| | Arcane Loreism | Arcane Lore |
+| | Society | Streetwise, Civilization Lore |
 | | Thievery | Roguery |
 | Pathfinder: Kingmaker / WotR | Mobility | Athletics |
-| | Use Magic Device | Occult |
+| | Use Magic Device | Arcane Lore |
 | Pillars of Eternity II | Alchemy | Alchemy |
 | | Bluff | Deception |
 | | Explosives | Craft |
 | | Mechanics | Roguery |
-| | Metaphysics | Occult |
+| | Metaphysics | Arcane Lore |
 | | Streetwise | Streetwise |
 | Divinity: Original Sin 2 | Bartering | Bargaining |
-| | Loremaster | History, Science, Occult |
+| | Loremaster | Civilization Lore, Science, Occult |
 | | Sneaking | Stealth |
 | | Thievery | Roguery |
 

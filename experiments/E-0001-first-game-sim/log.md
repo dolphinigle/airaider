@@ -448,3 +448,7 @@ D-0021: Lore (history, languages, peoples, faiths, beasts; INT) and **Occult** (
 **Designer:** maybe split to Science, History, and Magic lore?
 
 D-0021: Lore → **History** (the past, languages, peoples, faiths, heraldry; INT), **Science** (nature, beasts, stars, numbers, how things work; INT, PER), **Occult** for magic lore. 27 cores.
+
+**Designer:** How about Civilization Lore, Science Lore, and Arcane Lore?
+
+D-0021: renamed to Civilization Lore, Science Lore, Arcane Lore.

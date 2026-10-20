@@ -12,7 +12,7 @@ sources: []
 
 ## Context
 
-Tests pair stats with a skill (D-0013, D-0019). The designer later asked to "add (rare) offensive magic and healing magic skills", then: "Deception should be added", "should have Warfare.", "should have something that covers banditry, crimes, and slavery", "street smart needs one too. Villainy sounds good.", "lore should be split to wordly lore vs magic lore (magic lore sounds like they know magic though can you figure out a good name for it)", "maybe split to Science, History, and Magic lore?", "mele should be split betwen heavy weapons and light weapons i think", and: "Magic how about: Elemental magic, holy magic, and dark magic? change thievery to roguery? talk should have bargaining or selling (basicaly making money?) medicine should be alchemy. there should be an art related thing, mabye performance?" The designer asked for a fixed set of core skills, with the exact skills AI-generated: "i want you to design 10-20 core skills (core skill is like 'melee combat', 'ranged combat' etc. Then the exact skill (like swords) is ai generated then mapped to one of the core skills)."
+Tests pair stats with a skill (D-0013, D-0019). The designer later asked to "add (rare) offensive magic and healing magic skills", then: "Deception should be added", "should have Warfare.", "should have something that covers banditry, crimes, and slavery", "street smart needs one too. Villainy sounds good.", "lore should be split to wordly lore vs magic lore (magic lore sounds like they know magic though can you figure out a good name for it)", "maybe split to Science, History, and Magic lore?", "How about Civilization Lore, Science Lore, and Arcane Lore?", "mele should be split betwen heavy weapons and light weapons i think", and: "Magic how about: Elemental magic, holy magic, and dark magic? change thievery to roguery? talk should have bargaining or selling (basicaly making money?) medicine should be alchemy. there should be an art related thing, mabye performance?" The designer asked for a fixed set of core skills, with the exact skills AI-generated: "i want you to design 10-20 core skills (core skill is like 'melee combat', 'ranged combat' etc. Then the exact skill (like swords) is ai generated then mapped to one of the core skills)."
 
 ## Decision
 
@@ -41,9 +41,9 @@ Proposed by Claude:
 | | **Intimidation** | threats, interrogation | CHA, STR |
 | | **Leadership** | inspiring, rallying, morale, keeping a crew together | CHA, CON |
 | | **Performance** | music, song, dance, acting, storytelling | CHA, DEX |
-| Knowing | **History** | the past, languages, peoples, faiths, heraldry | INT |
-| | **Science** | nature, beasts, stars, numbers, how things work | INT, PER |
-| | **Occult** | the hidden world: monsters, undead, curses, relics, how magic works (knowing, not casting) | INT, CON |
+| Knowing | **Civilization Lore** | the past, languages, peoples, faiths, heraldry | INT |
+| | **Science Lore** | nature, beasts, stars, numbers, how things work | INT, PER |
+| | **Arcane Lore** | the hidden world: monsters, undead, curses, relics, how magic works (knowing, not casting) | INT, CON |
 | | **Alchemy** | potions, poisons, remedies, bandaging | INT, PER |
 | | **Craft** | smithing, repairs, building, explosives | STR, INT |
 | Magic ✦ | **Elemental Magic** ✦ | fire, frost, lightning | INT, CON |
@@ -66,10 +66,9 @@ How often each stat appears: STR 7 · DEX 6 · PER 10 · INT 12 · CHA 11 · CON
 ## Options considered
 
 - **Exact skill matters too** (a test favoring Spears gives +1 to a Spears merc): more flavor, more rules. Can be added later.
-- **Natural Philosophy** as the name for Science: more period flavor, longer.
-- **Arcana, Mysteries or Esoterica** as the name for Occult: Arcana reads as spellcasting in most games; Occult means hidden knowledge (Pathfinder's Occultism is a knowledge skill).
+- **History, Science, Occult** as the names of the three lores: the designer chose Civilization Lore, Science Lore and Arcane Lore; the shared "Lore" marks all three as knowing, not casting.
 - **Underworld or Outlawry** as the name for Villainy: the designer picked Villainy.
-- **One Melee skill**: split into Heavy and Light Weapons by the designer. With Deception, Warfare, Villainy, Streetwise and Lore split into History, Science and Occult (designer) the list is at 27, over the 10–20 budget the designer first set.
+- **One Melee skill**: split into Heavy and Light Weapons by the designer. With Deception, Warfare, Villainy, Streetwise and Lore split into Civilization, Science and Arcane Lore (designer) the list is at 27, over the 10–20 budget the designer first set.
 - **Twenty-two cores, keeping Occult and Tracking**: over the 10–20 budget. Occult split into Lore (knowing the uncanny) and Dark Magic (curses, rituals); Tracking merged into Survival (trails, hunting), since Awareness already covers noticing.
 - **Nineteen cores with Battle Magic and Healing Magic, Medicine, Thievery**: the third draft, revised by the designer.
 - **Seventeen cores, without magic**: the second draft; the designer asked for rare offensive and healing magic.
