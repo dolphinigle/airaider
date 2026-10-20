@@ -154,3 +154,21 @@ QUEST FAILED  Atlas limps home, wounded. No reward.
 
 `RULE:` simple lines, engine states the effect ([D-0007](../../docs/decisions/D-0007-quest-lines-are-one-simple-exclamation-the-engine-states-the-effect.md)). Quests have a minimum number of successes ([D-0008](../../docs/decisions/D-0008-quests-have-a-minimum-number-of-successes.md)).
 `DIRECTION (not yet ruled):` show each test as a coin-flip animation with the merc and the foe in pixel art.
+
+**Game** (all numbers are Claude's placeholders; the wound carries over from run 2):
+```
+┌─ ATLAS ─────────────────────── wolfkin · sellsword ─┐
+│                                                      │
+│   STR  ●●●   Strong                                  │
+│   DEX  ●●                                            │
+│   END  ●●                                            │
+│   INT  ●●●   Smart                                   │
+│                                                      │
+│   SKILLS   Swords +●                                 │
+│   TRAITS   Gruff   (+● to scare, −● to charm)        │
+│                                                      │
+│   CONDITION   🩸 Wounded  −● on every test · 2 days   │
+│                                                      │
+│   Wage 5 crowns/day · Quests 1 (0 won)               │
+└──────────────────────────────────────────────────────┘
+```
