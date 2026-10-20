@@ -420,3 +420,7 @@ Proposed [D-0022](../../docs/decisions/D-0022-six-stats-per-joins-con-covers-wil
 **Designer:** Magic how about: Elemental magic, holy magic, and dark magic? change thievery to roguery? talk should have bargaining or selling (basicaly making money?) medicine should be alchemy. there should be an art related thing, mabye performance?
 
 D-0021 revised (still proposed): magic = Elemental, Holy, Dark (all rare); Thievery → Roguery; + Bargaining; Medicine → Alchemy; + Performance. To stay within 20, Claude merged Occult into Lore and Dark Magic, and Tracking into Survival.
+
+**Designer:** mele should be split betwen heavy weapons and light weapons i think
+
+D-0021: Melee → Heavy Weapons (STR, CON) and Light Weapons (DEX, PER). 21 cores, one over the 10–20 budget.

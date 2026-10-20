@@ -12,7 +12,7 @@
 
 ## Waiting on the designer
 
-- [D-0021](decisions/D-0021-core-skills-ai-names-the-exact-skill-and-maps-it-to-one.md) (proposed): core skills (twenty); the AI names exact skills and maps them.
+- [D-0021](decisions/D-0021-core-skills-ai-names-the-exact-skill-and-maps-it-to-one.md) (proposed): core skills (twenty-one); the AI names exact skills and maps them.
 
 ## Notes
 
