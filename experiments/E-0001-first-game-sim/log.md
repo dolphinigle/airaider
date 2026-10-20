@@ -399,7 +399,7 @@ Noted in findings: big pools are fine; coins flip together or in batches. Remove
 
 **Designer:** skil unlock should be hidden. OK for skills, i want you to design 10-20 core skills (core skill is like "melee combat", "ranged combat" etc. Then the exact skill (like swords) is ai generated then mapped to one of the core skills). what do you think?
 
-`RULE:` skill unlocks hidden until the level up ([D-0020](../../docs/decisions/D-0020-skill-unlocks-every-3-levels-pick-1-of-2-hidden-until-the-le.md), supersedes D-0017). Core skills proposed: [D-0021](../../docs/decisions/D-0021-seventeen-core-skills-ai-names-the-exact-skill-and-maps-it.md) (16 cores in 5 families, later 17; AI names the exact skill and maps it; only the core counts in tests).
+`RULE:` skill unlocks hidden until the level up ([D-0020](../../docs/decisions/D-0020-skill-unlocks-every-3-levels-pick-1-of-2-hidden-until-the-le.md), supersedes D-0017). Core skills proposed: [D-0021](../../docs/decisions/D-0021-nineteen-core-skills-ai-names-the-exact-skill-and-maps-it.md) (16 cores in 5 families, later 17; AI names the exact skill and maps it; only the core counts in tests).
 
 **Designer:** can you take a look at most DnD games what skills they have and ensure they all have here?
 
@@ -412,3 +412,7 @@ Checked D&D 5e (and Baldur's Gate 3), Pathfinder 2e, Pathfinder: Kingmaker/WotR,
 **Designer:** WIL is "CON" i think. how about PCP isntead?
 
 Proposed [D-0022](../../docs/decisions/D-0022-six-stats-per-joins-con-covers-willpower.md): six stats with PER (perception split out of DEX); CON covers willpower; abbreviation PER instead of PCP.
+
+**Designer:** ok try the skills again and the stats those skills are based on and show. also add (rare) offensive magic and healing magic skills
+
+`RULE:` D-0022 accepted (six stats with PER; supersedes D-0009). D-0021 now has 19 core skills with stat pairings, including rare Battle Magic and Healing Magic (still proposed).

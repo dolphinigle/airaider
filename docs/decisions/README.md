@@ -15,7 +15,7 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0006](D-0006-dark-fantasy-world-light-and-fast-paced-tone.md) | Dark fantasy world, light and fast-paced tone | accepted | designer | 2026-10-20 |
 | [D-0007](D-0007-quest-lines-are-one-simple-exclamation-the-engine-states-the.md) | Quest lines are one simple exclamation; the engine states the effect | accepted | designer | 2026-10-20 |
 | [D-0008](D-0008-quests-have-a-minimum-number-of-successes.md) | Quests have a minimum number of successes | accepted | designer | 2026-10-20 |
-| [D-0009](D-0009-mercs-have-five-stats-and-leveled-skills.md) | Mercs have five stats and leveled skills | accepted | designer | 2026-10-20 |
+| [D-0009](D-0009-mercs-have-five-stats-and-leveled-skills.md) | Mercs have five stats and leveled skills | superseded → D-0022 | designer | 2026-10-20 |
 | [D-0010](D-0010-mercs-have-a-level-and-one-or-two-random-talents.md) | Mercs have a level and one or two random talents | superseded → D-0016 | designer | 2026-10-21 |
 | [D-0011](D-0011-level-up-pick-a-stat-flip-a-coin-per-talent-mark.md) | Level up: pick a stat, flip a coin per talent mark | rejected | designer | 2026-10-21 |
 | [D-0012](D-0012-xp-level-up-button-overflow-penalty-for-low-level-quests-ski.md) | XP: level-up button, overflow, penalty for low-level quests, skill XP | accepted | designer | 2026-10-21 |
@@ -27,6 +27,6 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0018](D-0018-stat-growth-always-three-coins-per-level-led-by-talents.md) | Stat growth: always three coins per level, led by talents | accepted | designer | 2026-10-21 |
 | [D-0019](D-0019-a-test-pools-one-two-or-rarely-three-stats.md) | A test pools one, two, or rarely three stats | accepted | designer | 2026-10-21 |
 | [D-0020](D-0020-skill-unlocks-every-3-levels-pick-1-of-2-hidden-until-the-le.md) | Skill unlocks: every 3 levels, pick 1 of 2, hidden until the level up | accepted | designer | 2026-10-21 |
-| [D-0021](D-0021-seventeen-core-skills-ai-names-the-exact-skill-and-maps-it.md) | Seventeen core skills; AI names the exact skill and maps it to one | proposed | designer | 2026-10-21 |
-| [D-0022](D-0022-six-stats-per-joins-con-covers-willpower.md) | Six stats: PER joins, CON covers willpower | proposed | designer | 2026-10-21 |
+| [D-0021](D-0021-nineteen-core-skills-ai-names-the-exact-skill-and-maps-it.md) | Nineteen core skills; AI names the exact skill and maps it to one | proposed | designer | 2026-10-21 |
+| [D-0022](D-0022-six-stats-per-joins-con-covers-willpower.md) | Six stats: PER joins, CON covers willpower | accepted | designer | 2026-10-21 |
 <!-- index:end -->

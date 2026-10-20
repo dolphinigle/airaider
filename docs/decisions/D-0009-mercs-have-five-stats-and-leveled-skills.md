@@ -1,11 +1,11 @@
 ---
 id: D-0009
 title: Mercs have five stats and leveled skills
-status: accepted
+status: superseded
 date: 2026-10-20
 decided-by: designer
 supersedes: []
-superseded-by:
+superseded-by: D-0022
 evidence: [E-0001]
 sources: [archive/v3/GENERATION_FLOW.md §10, archive/v3/CARDS.md]
 ---

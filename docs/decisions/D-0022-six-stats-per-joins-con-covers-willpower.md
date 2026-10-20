@@ -1,7 +1,7 @@
 ---
 id: D-0022
 title: Six stats: PER joins, CON covers willpower
-status: proposed
+status: accepted
 date: 2026-10-21
 decided-by: designer
 supersedes: [D-0009]
@@ -21,7 +21,7 @@ The designer's words: "WIL is 'CON' i think. how about PCP isntead?"
 Restated in full (this replaces D-0009):
 - **Six stats:** **STR** strength · **DEX** agility, hands, reflexes · **PER** perception: noticing, aim, reading people · **INT** intelligence · **CHA** charisma · **CON** constitution: endurance, toughness **and willpower** (nerve, fear, curses).
 - Skills are counted in coins like stats (Swords ●●● = 3 coins), unchanged from D-0009.
-- Abbreviation **PER** (as in Fallout's SPECIAL), proposed by Claude in place of "PCP".
+- Abbreviation **PER** (as in Fallout's SPECIAL), in place of "PCP"; accepted with the decision ("ok").
 
 ## Consequences
 
