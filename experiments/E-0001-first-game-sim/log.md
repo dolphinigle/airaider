@@ -440,3 +440,7 @@ D-0021: + Underworld (banditry, smuggling, extortion, slaving, black markets, br
 **Designer:** street smart needs one too. Villainy sounds good.
 
 D-0021: Underworld renamed Villainy; + Streetwise (rumors, finding people, city ways, local customs; PER, CHA), taking customs from Lore. 25 cores.
+
+**Designer:** lore should be split to wordly lore vs magic lore (magic lore sounds like they know magic though can you figure out a good name for it)
+
+D-0021: Lore (history, languages, peoples, faiths, beasts; INT) and **Occult** (the hidden world: monsters, undead, curses, relics, how magic works; knowing, not casting; INT, CON). Alternatives offered: Arcana (reads as casting), Mysteries, Esoterica. 26 cores.

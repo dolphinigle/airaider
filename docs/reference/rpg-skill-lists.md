@@ -8,7 +8,7 @@ The standard skill lists of D&D-family games, mapped onto our core skills (D-002
 |---|---|
 | Acrobatics (DEX) | Athletics |
 | Animal Handling (WIS) | Beasts |
-| Arcana (INT) | Lore (knowing), Elemental Magic (casting) |
+| Arcana (INT) | Occult (knowing), Elemental Magic (casting) |
 | Athletics (STR) | Athletics |
 | Deception (CHA) | Deception |
 | History (INT) | Lore |
@@ -34,16 +34,16 @@ D&D's weapon, armor and tool proficiencies map to Melee, Ranged, Defense and Cra
 | Pathfinder 2e | Crafting | Craft |
 | | Diplomacy | Persuasion |
 | | Lore | Lore |
-| | Occultism | Lore, Dark Magic |
+| | Occultism | Occult |
 | | Society | Streetwise, Lore |
 | | Thievery | Roguery |
 | Pathfinder: Kingmaker / WotR | Mobility | Athletics |
-| | Use Magic Device | Lore |
+| | Use Magic Device | Occult |
 | Pillars of Eternity II | Alchemy | Alchemy |
 | | Bluff | Deception |
 | | Explosives | Craft |
 | | Mechanics | Roguery |
-| | Metaphysics | Lore |
+| | Metaphysics | Occult |
 | | Streetwise | Streetwise |
 | Divinity: Original Sin 2 | Bartering | Bargaining |
 | | Loremaster | Lore |
