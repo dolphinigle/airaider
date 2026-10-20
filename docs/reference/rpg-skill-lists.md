@@ -8,24 +8,24 @@ The standard skill lists of D&D-family games, mapped onto our core skills (D-002
 |---|---|
 | Acrobatics (DEX) | Athletics |
 | Animal Handling (WIS) | Beasts |
-| Arcana (INT) | Occult |
+| Arcana (INT) | Lore (knowing), Elemental Magic (casting) |
 | Athletics (STR) | Athletics |
 | Deception (CHA) | Persuasion |
 | History (INT) | Lore |
 | Insight (WIS) | **Awareness** (added) |
 | Intimidation (CHA) | Intimidation |
 | Investigation (INT) | **Awareness** (added) |
-| Medicine (WIS) | Medicine |
+| Medicine (WIS) | Alchemy |
 | Nature (INT) | Survival |
 | Perception (WIS) | **Awareness** (added) |
-| Performance (CHA) | Persuasion |
+| Performance (CHA) | Performance |
 | Persuasion (CHA) | Persuasion |
-| Religion (INT) | Lore |
-| Sleight of Hand (DEX) | Thievery |
+| Religion (INT) | Lore (knowing), Holy Magic (casting) |
+| Sleight of Hand (DEX) | Roguery |
 | Stealth (DEX) | Stealth |
 | Survival (WIS) | Survival |
 
-D&D's weapon, armor and tool proficiencies map to Melee, Ranged, Defense and Craft (thieves' tools → Thievery, herbalism kit → Medicine).
+D&D's weapon, armor and tool proficiencies map to Melee, Ranged, Defense and Craft (thieves' tools → Roguery, herbalism kit → Alchemy).
 
 ## Other games: skills not already covered above
 
@@ -34,21 +34,21 @@ D&D's weapon, armor and tool proficiencies map to Melee, Ranged, Defense and Cra
 | Pathfinder 2e | Crafting | Craft |
 | | Diplomacy | Persuasion |
 | | Lore | Lore |
-| | Occultism | Occult |
+| | Occultism | Lore, Dark Magic |
 | | Society | Lore |
-| | Thievery | Thievery |
+| | Thievery | Roguery |
 | Pathfinder: Kingmaker / WotR | Mobility | Athletics |
-| | Use Magic Device | Occult |
-| Pillars of Eternity II | Alchemy | Medicine |
+| | Use Magic Device | Lore |
+| Pillars of Eternity II | Alchemy | Alchemy |
 | | Bluff | Persuasion |
 | | Explosives | Craft |
-| | Mechanics | Thievery |
-| | Metaphysics | Occult |
+| | Mechanics | Roguery |
+| | Metaphysics | Lore |
 | | Streetwise | Lore |
-| Divinity: Original Sin 2 | Bartering | Persuasion |
+| Divinity: Original Sin 2 | Bartering | Bargaining |
 | | Loremaster | Lore |
 | | Sneaking | Stealth |
-| | Thievery | Thievery |
+| | Thievery | Roguery |
 
 ## What the check found
 
