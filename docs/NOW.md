@@ -12,7 +12,7 @@
 
 ## Waiting on the designer
 
-- Nothing right now.
+- [D-0021](decisions/D-0021-sixteen-core-skills-ai-names-the-exact-skill-and-maps-it-to-.md) (proposed): sixteen core skills; the AI names exact skills and maps them.
 
 ## Notes
 
