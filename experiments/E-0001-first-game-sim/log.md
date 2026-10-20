@@ -432,3 +432,7 @@ D-0021: + Deception (lies, bluffs, disguises, cons; CHA, INT); Persuasion keeps 
 **Designer:** should have Warfare.
 
 D-0021: + Warfare (tactics, formations, sieges, fortifications; INT, STR), read as military know-how rather than DOS2's melee-damage Warfare; Leadership narrows to inspiring and morale. 23 cores.
+
+**Designer:** should have something that covers banditry, crimes, and slavery
+
+D-0021: + Underworld (banditry, smuggling, extortion, slaving, black markets, bribes; CHA, STR) in Shadows. Name alternatives offered: Outlawry, Villainy. 24 cores.

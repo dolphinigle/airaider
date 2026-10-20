@@ -12,13 +12,13 @@ sources: []
 
 ## Context
 
-Tests pair stats with a skill (D-0013, D-0019). The designer later asked to "add (rare) offensive magic and healing magic skills", then: "Deception should be added", "should have Warfare.", "mele should be split betwen heavy weapons and light weapons i think", and: "Magic how about: Elemental magic, holy magic, and dark magic? change thievery to roguery? talk should have bargaining or selling (basicaly making money?) medicine should be alchemy. there should be an art related thing, mabye performance?" The designer asked for a fixed set of core skills, with the exact skills AI-generated: "i want you to design 10-20 core skills (core skill is like 'melee combat', 'ranged combat' etc. Then the exact skill (like swords) is ai generated then mapped to one of the core skills)."
+Tests pair stats with a skill (D-0013, D-0019). The designer later asked to "add (rare) offensive magic and healing magic skills", then: "Deception should be added", "should have Warfare.", "should have something that covers banditry, crimes, and slavery", "mele should be split betwen heavy weapons and light weapons i think", and: "Magic how about: Elemental magic, holy magic, and dark magic? change thievery to roguery? talk should have bargaining or selling (basicaly making money?) medicine should be alchemy. there should be an art related thing, mabye performance?" The designer asked for a fixed set of core skills, with the exact skills AI-generated: "i want you to design 10-20 core skills (core skill is like 'melee combat', 'ranged combat' etc. Then the exact skill (like swords) is ai generated then mapped to one of the core skills)."
 
 ## Decision
 
 Proposed by Claude:
 
-**Twenty-three core skills in six families**, checked against the D&D 5e, Pathfinder, Pillars of Eternity and Divinity skill lists so every common adventuring action has a home ([reference/rpg-skill-lists.md](../reference/rpg-skill-lists.md)). Each core skill has the stats its tests usually pool with it (six stats, D-0022); a quest may pair it differently. ✦ = rare: seldom rolled at recruitment or for an unlock (D-0020).
+**Twenty-four core skills in six families**, checked against the D&D 5e, Pathfinder, Pillars of Eternity and Divinity skill lists so every common adventuring action has a home ([reference/rpg-skill-lists.md](../reference/rpg-skill-lists.md)). Each core skill has the stats its tests usually pool with it (six stats, D-0022); a quest may pair it differently. ✦ = rare: seldom rolled at recruitment or for an unlock (D-0020).
 
 | family | core skill | covers | stats |
 |---|---|---|---|
@@ -33,6 +33,7 @@ Proposed by Claude:
 | | **Beasts** | riding, taming, handling animals | CHA, PER |
 | Shadows | **Stealth** | sneaking, hiding, ambushes | DEX, PER |
 | | **Roguery** | locks, pockets, traps, forgery | DEX, INT |
+| | **Underworld** | banditry, smuggling, extortion, slaving, black markets, knowing who to bribe | CHA, STR |
 | Talk | **Persuasion** | charm, diplomacy, winning people over | CHA, PER |
 | | **Deception** | lies, bluffs, disguises, cons | CHA, INT |
 | | **Bargaining** | haggling, selling, appraising: making money | CHA, INT |
@@ -46,7 +47,7 @@ Proposed by Claude:
 | | **Holy Magic** ✦ | healing, blessing, warding off the dead | CHA, CON |
 | | **Dark Magic** ✦ | curses, necromancy, draining life, pacts | INT, CHA |
 
-How often each stat appears: STR 6 · DEX 6 · PER 8 · INT 10 · CHA 9 · CON 6.
+How often each stat appears: STR 7 · DEX 6 · PER 8 · INT 10 · CHA 10 · CON 6.
 
 **Exact skills.** The AI writes the skill's name (and a few words of flavor) and picks its core skill from the list; the engine stores the mapping once and only ever reads the core skill. Examples: Swords → Light Weapons · Wolf-cleaver → Heavy Weapons · Wolf-tongue → Beasts · Grave-robbing → Roguery · Bone-setting → Alchemy · Tavern lies → Deception · Fence's eye → Bargaining.
 
@@ -56,13 +57,14 @@ How often each stat appears: STR 6 · DEX 6 · PER 8 · INT 10 · CHA 9 · CON 6
 
 ## Consequences
 
-- Mechanics stay on a fixed list the engine owns; the AI's job is a name plus a pick from 23, which suits cheap models (D-0004).
+- Mechanics stay on a fixed list the engine owns; the AI's job is a name plus a pick from 24, which suits cheap models (D-0004).
 - Craft and Leadership give the base and the squad layer hooks later.
 
 ## Options considered
 
 - **Exact skill matters too** (a test favoring Spears gives +1 to a Spears merc): more flavor, more rules. Can be added later.
-- **One Melee skill**: split into Heavy and Light Weapons by the designer. With Deception and Warfare (designer) the list is at 23, over the 10–20 budget the designer first set.
+- **Outlawry or Villainy** instead of the name Underworld: same skill; Underworld also covers the city side (fences, smugglers, slavers).
+- **One Melee skill**: split into Heavy and Light Weapons by the designer. With Deception, Warfare and Underworld (designer) the list is at 24, over the 10–20 budget the designer first set.
 - **Twenty-two cores, keeping Occult and Tracking**: over the 10–20 budget. Occult split into Lore (knowing the uncanny) and Dark Magic (curses, rituals); Tracking merged into Survival (trails, hunting), since Awareness already covers noticing.
 - **Nineteen cores with Battle Magic and Healing Magic, Medicine, Thievery**: the third draft, revised by the designer.
 - **Seventeen cores, without magic**: the second draft; the designer asked for rare offensive and healing magic.
