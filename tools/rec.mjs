@@ -182,6 +182,22 @@ function findingProblems(ids, exps) {
   return problems;
 }
 
+// Relative links in our own Markdown (not the frozen archive, not code blocks) must point at real files.
+function linkProblems() {
+  const problems = [];
+  const files = execSync('git ls-files --cached --others --exclude-standard -- "*.md"', { cwd: ROOT, encoding: 'utf8' })
+    .split('\n').filter(f => f && !f.startsWith('docs/archive/') && !f.startsWith('.claude/worktrees/'));
+  for (const f of files) {
+    const text = fs.readFileSync(path.join(ROOT, f), 'utf8').replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]*`/g, '');
+    for (const [, target] of text.matchAll(/\]\(([^)\s]+)\)/g)) {
+      if (/^([a-z]+:|#)/.test(target)) continue;
+      const p = path.resolve(path.dirname(path.join(ROOT, f)), decodeURI(target.split('#')[0]));
+      if (!fs.existsSync(p)) problems.push(`${f}: broken link ${target}`);
+    }
+  }
+  return problems;
+}
+
 // The maps must name every folder: docs/README.md every folder in docs/, README.md every top-level folder.
 function mapProblems() {
   const problems = [];
@@ -232,6 +248,7 @@ function check() {
     if (next !== text) problems.push(`${path.relative(ROOT, file)}: index is stale (run: node tools/rec.mjs index)`);
   }
   problems.push(...findingProblems(ids, records('E')));
+  problems.push(...linkProblems());
   problems.push(...mapProblems());
   if (problems.length) { console.log(problems.join('\n')); process.exit(1); }
   console.log(`ok: ${ids.size} records`);

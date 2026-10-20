@@ -66,7 +66,7 @@ Recommended first try: A, with D layered on (wager decisions plus a merc who sur
 
 **Designer (aside):** (pls make sure your data organizer remember what works vs what doesnt) (if it doesnt have that mechanism yet, code it first) (so whenever we comes up with anew idea, you can crosscheck w/ it)
 
-Built: `docs/findings.md` lessons ledger plus checks and the cross-check step ([D-0005](../../docs/decisions/D-0005-findings-ledger-what-works-what-doesn-t-cross-checked-against-every-new-idea.md)).
+Built: `docs/findings.md` lessons ledger plus checks and the cross-check step ([D-0005](../../docs/decisions/D-0005-findings-ledger-what-works-what-doesn-t-cross-checked-agains.md)).
 
 ---
 
@@ -152,7 +152,7 @@ QUEST FAILED  Atlas limps home, wounded. No reward.
 
 **Designer:** Writing not great. Bandits on the road! great -- then animation of coin flipping and bandits / atlas in pixel art or something -- yes quest have a "minimum success", harder = need success in more. Writing not great, should just be simpler. for eample Bandits on the road! Atlas took a cut! -- then engine tells its wounded. The second is decent. Ok first show me "atlas stat screen".
 
-`RULE:` simple lines, engine states the effect ([D-0007](../../docs/decisions/D-0007-quest-lines-are-one-simple-exclamation-the-engine-states-the-effect.md)). Quests have a minimum number of successes ([D-0008](../../docs/decisions/D-0008-quests-have-a-minimum-number-of-successes.md)).
+`RULE:` simple lines, engine states the effect ([D-0007](../../docs/decisions/D-0007-quest-lines-are-one-simple-exclamation-the-engine-states-the.md)). Quests have a minimum number of successes ([D-0008](../../docs/decisions/D-0008-quests-have-a-minimum-number-of-successes.md)).
 `DIRECTION (not yet ruled):` show each test as a coin-flip animation with the merc and the foe in pixel art.
 
 **Game** (all numbers are Claude's placeholders; the wound carries over from run 2):
@@ -219,4 +219,39 @@ No v4 stat docs exist yet; the stat set comes from the v3 archive (GENERATION_FL
 │   Wage 5 crowns/day · Quests 1 (0 won)               │
 └──────────────────────────────────────────────────────┘
 A test pays stat + skill: STR + Swords = ●●●● (−● wounded)
+```
+
+---
+
+**Designer:** oh yea i mean v3. ok sounds good. add LEVEL too. like Lv 1. and when they level up, add a "level up screen" that player can choose which attr they can increase in. remove the "strong/smart" thing, instead, add a "talented" to one or two stats, e.g., STR+ or STR++. The two stats are chosen randomly, can they can overlap (eg STR+ DEX+ or STR++ one). Propose a level up mechanism.
+
+`RULE:` D-0009 accepted (five stats, skills in coins). Level, random talents, level-up screen: [D-0010](../../docs/decisions/D-0010-mercs-have-a-level-and-one-or-two-random-talents.md). Level-up mechanism proposed: [D-0011](../../docs/decisions/D-0011-level-up-pick-a-stat-flip-a-coin-per-talent-mark.md).
+
+Atlas's talents, rolled for real: **INT+ CON+**. (The flavor "strong" is gone; the dice made him a tough thinker.)
+
+**Game:**
+```
+┌─ ATLAS · Lv 1 ──────────────── wolfkin · sellsword ─┐
+│                                                      │
+│   STATS                     SKILLS                   │
+│   STR  ●●                   Swords  ●                │
+│   DEX  ●●                                            │
+│   INT  ●●●  +                                        │
+│   CHA  ●●                                            │
+│   CON  ●●●  +                                        │
+│                                                      │
+│   TRAITS   Gruff   (+● to scare, −● to charm)        │
+│   CONDITION   🩸 Wounded  −● on every test · 2 days   │
+│                                                      │
+│   XP ▰▰▱▱▱ 2/5 to Lv 2 · Wage 5/day · Quests 1 (0 won)│
+└──────────────────────────────────────────────────────┘
+```
+```
+⭐ ATLAS reached Lv 2!  Train one stat:
+
+   STR  ●●       +1
+   DEX  ●●       +1
+   INT  ●●● +    +1, then flip ● for +1 more
+   CHA  ●●       +1
+   CON  ●●● +    +1, then flip ● for +1 more
 ```
