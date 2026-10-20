@@ -172,3 +172,28 @@ QUEST FAILED  Atlas limps home, wounded. No reward.
 │   Wage 5 crowns/day · Quests 1 (0 won)               │
 └──────────────────────────────────────────────────────┘
 ```
+
+---
+
+**Designer:** should have more stats, pls check docs v4. For skills should have level, eg sword lv1.
+
+No v4 stat docs exist yet; the stat set comes from the v3 archive (GENERATION_FLOW §10: STR, DEX, INT, CHA, CON). `RULE:` skills have levels. Proposed as [D-0009](../../docs/decisions/D-0009-mercs-have-five-stats-and-leveled-skills.md) (the five-stat set waits on the designer).
+
+**Game** (placeholders: coins = stat + skill level; skills level up with use):
+```
+┌─ ATLAS ─────────────────────── wolfkin · sellsword ─┐
+│                                                      │
+│   STR  ●●●   Strong                                  │
+│   DEX  ●●                                            │
+│   INT  ●●●   Smart                                   │
+│   CHA  ●●                                            │
+│   CON  ●●                                            │
+│                                                      │
+│   SKILLS   Swords Lv1  +●      ▰▱▱ 1/3 to Lv2        │
+│   TRAITS   Gruff   (+● to scare, −● to charm)        │
+│                                                      │
+│   CONDITION   🩸 Wounded  −● on every test · 2 days   │
+│                                                      │
+│   Wage 5 crowns/day · Quests 1 (0 won)               │
+└──────────────────────────────────────────────────────┘
+```

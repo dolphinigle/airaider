@@ -15,4 +15,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0006](D-0006-dark-fantasy-world-light-and-fast-paced-tone.md) | Dark fantasy world, light and fast-paced tone | accepted | designer | 2026-10-20 |
 | [D-0007](D-0007-quest-lines-are-one-simple-exclamation-the-engine-states-the.md) | Quest lines are one simple exclamation; the engine states the effect | accepted | designer | 2026-10-20 |
 | [D-0008](D-0008-quests-have-a-minimum-number-of-successes.md) | Quests have a minimum number of successes | accepted | designer | 2026-10-20 |
+| [D-0009](D-0009-mercs-have-five-stats-and-leveled-skills.md) | Mercs have five stats and leveled skills | proposed | designer | 2026-10-20 |
 <!-- index:end -->
