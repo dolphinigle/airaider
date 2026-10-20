@@ -108,3 +108,42 @@ Research done ([E-0002](../E-0002-what-makes-squad-deployment-fun/), synthesis i
 **Designer:** pls rmb the tone: world is dark fantasy but tone should be light / fast paced like the above.
 
 `RULE:` dark fantasy world, light and fast-paced tone, voice as in run 1. Recorded as [D-0006](../../docs/decisions/D-0006-dark-fantasy-world-light-and-fast-paced-tone.md).
+
+---
+
+**Designer:** OK lets use coins then, probably good and fun. So logically, for each quest, engine first rolls what kind of "tests" it will have. For example, on a guardign quest, a "STR + swords" test, then a "END + survival" test, then a "STR + swords" again. each has number of coins the enemies will flip. your coins is affected by STR and relevant traits. Lets try. First i saw the three tests, then i put Atlas in the quest, then click end day.
+
+`RULE:` coins. A quest is a sequence of **tests** the engine rolls up front; each test is a stat + skill (e.g. STR + Swords) with a number of **enemy coins**. The merc's coins come from the stat plus matching traits. Flow: see the tests → assign the merc → End Day → resolve.
+
+**Placeholders Claude filled in (not ruled):** stats from traits (Strong → STR 3, Smart → INT 3, others 2); a matching skill trait +1 coin; heads vs heads, ties go to the merc; a lost test wounds the merc (−1 coin for the rest of the quest); two losses fail the quest. Tests drawn at random from a small road pool; flips by [coins.mjs](coins.mjs) (real random).
+
+**Cross-check (findings.md):** builds on "rolls that pay off a player decision" and "visible odds" (assignment is the decision, coins and odds shown). Risk: decisions happen only before the quest ("no player input during the quest" is in Doesn't work).
+
+**Game:**
+```
+QUEST  Clear the Road                          2 days · 40 crowns
+  1. Bandits on the road        STR + Swords    foe ●●●●
+  2. A cold night in the woods  END + Survival  foe ●●●
+  3. Another cold night         END + Survival  foe ●●●
+
+ASSIGN ▸ Atlas  (STR 3 · INT 3 · END 2 · Swords)
+  1. ●●●● (STR 3 + Swords)  vs ●●●●   64%
+  2. ●●   (END 2)           vs ●●●    50%
+  3. ●●   (END 2)           vs ●●●    50%
+
+[End Day]
+```
+```
+DAY 1
+⚔ Bandits on the road!
+  Atlas ●○○○ 1   Bandits ●○●● 3   ✘
+  Three of them, one of him. He takes a cut across the ribs.  Atlas is WOUNDED (−1 coin)
+
+🌲 A cold night in the woods
+  Atlas ● 1   Cold ●○● 2   ✘
+  Bleeding and freezing, Atlas gives up before dawn.
+
+QUEST FAILED  Atlas limps home, wounded. No reward.
+```
+
+**Observations:** a 64% opener lost, and the wound rule (Claude's placeholder) dropped the next test to 31%: one bad flip decided the whole quest. The rolled tests (END + Survival twice) hit Atlas's weakest stat; with only one merc, the player saw it coming and could do nothing about it.
