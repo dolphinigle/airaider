@@ -26,4 +26,4 @@ Restated in full (this replaces D-0009):
 ## Consequences
 
 - Usual stat pairings in D-0021 shift: Awareness → PER, INT · Tracking → PER, INT · Ranged → DEX, PER · Survival → CON, PER.
-- With three coins per level (D-0018), an untalented stat grows about 0.38 per level instead of 0.42–0.5.
+- With three coins per level (D-0018), an untalented stat grows about 0.3–0.4 per level instead of 0.42–0.5.
