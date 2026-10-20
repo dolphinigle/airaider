@@ -1,6 +1,6 @@
 # Vision (prototype v4)
 
-> Sources: [D-0002](decisions/D-0002-v4-restart-squad-first.md), [D-0004](decisions/D-0004-mechanics-carry-the-fun-ai-writes-only-small-story.md). Rewrite this page only to match an accepted decision.
+> Sources: [D-0002](decisions/D-0002-v4-restart-squad-first.md), [D-0004](decisions/D-0004-mechanics-carry-the-fun-ai-writes-only-small-story.md), [D-0006](decisions/D-0006-dark-fantasy-world-light-and-fast-paced-tone.md). Rewrite this page only to match an accepted decision.
 
 ## In the designer's words (2026-10-19)
 
@@ -13,5 +13,6 @@
 - **Frequent chance moments.** Members of the squad face risky rolls often, and the player feels each one.
 - **Story serves play.** Text must be easy to read. Intricate plots and interlocking quests are not a goal.
 - **Mechanics carry the fun.** The game is mechanics-heavy; AI only adds small story on top of mechanical results (D-0004).
+- **Dark world, light voice.** A dark fantasy world told in a light, fast-paced tone: short punchy lines, one beat each (D-0006).
 
 Everything else is open. It gets settled through decisions, starting with a simulated play session ([NOW.md](NOW.md)).

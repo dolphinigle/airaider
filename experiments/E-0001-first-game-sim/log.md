@@ -102,3 +102,9 @@ QUEST COMPLETE  +40 crowns
 Paused the sim for research: [E-0002](../E-0002-what-makes-squad-deployment-fun/).
 
 Research done ([E-0002](../E-0002-what-makes-squad-deployment-fun/), synthesis in [squad-deployment.md](../../docs/reference/squad-deployment.md)): dice can replace combat if every roll pays off a player decision. Run 1 hit four failure markers (no choice mid-walk, foregone outcome, free send, no lasting change). Sim resumes with those levers.
+
+---
+
+**Designer:** pls rmb the tone: world is dark fantasy but tone should be light / fast paced like the above.
+
+`RULE:` dark fantasy world, light and fast-paced tone, voice as in run 1. Recorded as [D-0006](../../docs/decisions/D-0006-dark-fantasy-world-light-and-fast-paced-tone.md).
