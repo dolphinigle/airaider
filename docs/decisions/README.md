@@ -28,4 +28,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0019](D-0019-a-test-pools-one-two-or-rarely-three-stats.md) | A test pools one, two, or rarely three stats | accepted | designer | 2026-10-21 |
 | [D-0020](D-0020-skill-unlocks-every-3-levels-pick-1-of-2-hidden-until-the-le.md) | Skill unlocks: every 3 levels, pick 1 of 2, hidden until the level up | accepted | designer | 2026-10-21 |
 | [D-0021](D-0021-seventeen-core-skills-ai-names-the-exact-skill-and-maps-it.md) | Seventeen core skills; AI names the exact skill and maps it to one | proposed | designer | 2026-10-21 |
+| [D-0022](D-0022-six-stats-per-joins-con-covers-willpower.md) | Six stats: PER joins, CON covers willpower | proposed | designer | 2026-10-21 |
 <!-- index:end -->

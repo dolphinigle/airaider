@@ -408,3 +408,7 @@ Checked D&D 5e (and Baldur's Gate 3), Pathfinder 2e, Pathfinder: Kingmaker/WotR,
 **Designer:** what attrs do we have? only 5?
 
 **Claude (out of character):** Yes, five (D-0009, from v3): STR, DEX (agility and perception), INT, CHA, CON. D&D has six; the missing one is WIS, which in 5e drives Perception, Insight, Survival, Medicine and Animal Handling, so ours pair those with INT/CHA/CON. Offered a sixth stat, WIL or WIS (nerve, perception, resisting fear and curses), which fits dark fantasy; cost: growth spreads thinner (untalented stats ≈ 0.33/level instead of 0.42–0.5).
+
+**Designer:** WIL is "CON" i think. how about PCP isntead?
+
+Proposed [D-0022](../../docs/decisions/D-0022-six-stats-per-joins-con-covers-willpower.md): six stats with PER (perception split out of DEX); CON covers willpower; abbreviation PER instead of PCP.
