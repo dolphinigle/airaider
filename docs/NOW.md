@@ -2,7 +2,7 @@
 
 > The status board. Rewrite it at the end of every working session. History lives in git, decisions and experiments, not here.
 
-**Phase:** prototype v4 kickoff (started 2026-10-19). Blank slate: v3 is archived ([archive/](archive/README.md)), most v3 decisions are open again ([D-0002](decisions/D-0002-v4-restart-squad-first.md)).
+**Phase:** prototype v4 kickoff (started 2026-10-19). E-0001 (Claude plays the game, designer steers) is running: merc stats, coin tests and growth are taking shape (D-0007 to D-0018). Blank slate: v3 is archived ([archive/](archive/README.md)), most v3 decisions are open again ([D-0002](decisions/D-0002-v4-restart-squad-first.md)).
 
 ## Next
 
@@ -12,7 +12,8 @@
 
 ## Waiting on the designer
 
-- Nothing yet.
+- [D-0017](decisions/D-0017-skill-unlocks-every-3-levels-pick-1-of-2-rolled-at-recruitme.md) (proposed): skill unlocks every 3 levels, pick 1 of 2, rolled at recruitment.
+- D-0013 open point: does "a quest tests two stats" mean one test pools two stats, or a quest's tests span two stats?
 
 ## Notes
 
