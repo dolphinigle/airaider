@@ -46,3 +46,7 @@ Claude: skill flavor lines dropped (restates D-0023). Open: whether AI skin NAME
 Claude: mock 2 (skills-mock2/): base skills on a 2x3 grid with STA/MANA costs + modifiers; AI (Sonnet high) names each skill and picks 1-2 mods. Two variants: (a) free pick from all fitting mods, (b) engine deals 3 candidates weighted by the merc's skills.
 
 Claude: mock 2 done ([skills-mock2/cards.md](skills-mock2/cards.md)). Free picks pile on +damage (Heavy 9/40, Swift 6/40, nearly always 2 mods); dealt candidates spread picks and give more 1-mod skills. Names fit; two slips: "Wolf-Howl" again copies Atlas's exact skill; "Quick Slash" (Thrifty) promises speed it lacks.
+
+**Designer:** "3 is 3 damage PER heads."
+
+`RULE:` a skill's number is damage per heads; the merc's coin pool decides how many heads. Recorded in proposed D-0025 (battle skills).
