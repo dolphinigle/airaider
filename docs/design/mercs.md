@@ -107,7 +107,7 @@ What a merc does in a fight is an **ability**; a **skill** (Survival, Swords…)
   - rest in base buildings;
   - Leadership and Performance abilities;
   - personality traits, which set how fast it builds.
-- **No quirks.** Open: which stat the check flips; whether stress matters outside fights.
+- **No quirks.** The check flips **WIL** (D-0044). Open: whether stress matters outside fights.
 
 ## Upgrade items (D-0029)
 
