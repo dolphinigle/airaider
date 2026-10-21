@@ -1,11 +1,11 @@
 ---
 id: D-0028
 title: A merc rolls one new battle skill per level up and equips four
-status: accepted
+status: superseded
 date: 2026-10-21
 decided-by: designer
 supersedes: []
-superseded-by:
+superseded-by: D-0033
 evidence: [E-0004]
 sources: []
 ---

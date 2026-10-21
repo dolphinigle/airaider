@@ -34,8 +34,13 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0025](D-0025-battle-skills-are-base-skills-plus-engine-priced-modifiers-n.md) | Battle skills are base skills plus engine-priced modifiers, named by the AI | proposed | designer | 2026-10-21 |
 | [D-0026](D-0026-quests-resolve-through-autobattles-and-pure-coin-flip-skill-.md) | Quests resolve through autobattles and pure coin-flip skill checks | accepted | designer | 2026-10-21 |
 | [D-0027](D-0027-recruits-have-half-star-rarity-that-sets-their-modifier-odds.md) | Recruits have half-star rarity that sets their modifier odds | accepted | designer | 2026-10-21 |
-| [D-0028](D-0028-a-merc-rolls-one-new-battle-skill-per-level-up-and-equips-fo.md) | A merc rolls one new battle skill per level up and equips four | accepted | designer | 2026-10-21 |
+| [D-0028](D-0028-a-merc-rolls-one-new-battle-skill-per-level-up-and-equips-fo.md) | A merc rolls one new battle skill per level up and equips four | superseded → D-0033 | designer | 2026-10-21 |
 | [D-0029](D-0029-rare-items-raise-a-merc-s-star-or-reroll-their-seed-resettin.md) | Rare items raise a merc's star or reroll their seed, resetting their level | accepted | designer | 2026-10-21 |
 | [D-0030](D-0030-a-tactic-is-three-parts-condition-action-target.md) | "A tactic is three parts: condition, action, target" | accepted | designer | 2026-10-21 |
-| [D-0031](D-0031-names-for-the-two-kinds-of-skill.md) | Names for the two kinds of skill | proposed | designer | 2026-10-21 |
+| [D-0031](D-0031-names-for-the-two-kinds-of-skill.md) | Names for the two kinds of skill | accepted | designer | 2026-10-21 |
+| [D-0032](D-0032-a-reset-rerolls-only-the-level-up-seed-everything-else-stays.md) | A reset rerolls only the level-up seed; everything else stays | accepted | designer | 2026-10-21 |
+| [D-0033](D-0033-abilities-one-per-level-up-from-the-merc-s-skills-never-the-.md) | Abilities: one per level up from the merc's skills, never the same base twice, four equipped | accepted | designer | 2026-10-21 |
+| [D-0034](D-0034-tactic-parts-are-loot-no-gear-for-now.md) | Tactic parts are loot; no gear for now | accepted | designer | 2026-10-21 |
+| [D-0035](D-0035-mercs-start-with-two-skills-rarely-three-by-star-and-pick-a-.md) | Mercs start with two skills, rarely three by star, and pick a third of three at Lv 7 | proposed | designer | 2026-10-21 |
+| [D-0036](D-0036-passives-come-from-personality-traits.md) | Passives come from personality traits | proposed | designer | 2026-10-21 |
 <!-- index:end -->

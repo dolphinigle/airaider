@@ -1,7 +1,7 @@
 ---
 id: D-0031
 title: Names for the two kinds of skill
-status: proposed
+status: accepted
 date: 2026-10-21
 decided-by: designer
 supersedes: []
@@ -15,10 +15,12 @@ sources: []
 
 ## Decision
 
-Proposed: keep **Skills** for Survival, Swords and the rest (they are what a skill check tests), and call battle skills **Arts** ("Brann learned a new art: Twin Hew"). An art comes from a skill; a merc equips four arts.
+The designer: "i dislike Arts. How about Ability?"
+
+- **Skills**: Survival, Swords and the rest; what a skill check tests (design/mercs.md).
+- **Abilities**: what a merc does in a fight ("Brann learned a new ability: Twin Hew"). An ability comes from a skill.
 
 ## Options considered
 
-- Skills / **Techniques**: clear, but reads martial for spells.
-- Skills / **Moves**: light and plain, a bit gamey.
-- **Trades** / Skills: renames the 27 core skills instead, which churns D-0019 to D-0022.
+- Arts (Claude's first proposal): the designer disliked it.
+- Techniques, Moves, or renaming skills to Trades.

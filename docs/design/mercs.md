@@ -76,27 +76,30 @@ Two random draws over the six stats at recruitment. They may land on the same st
 
 Expected gain per level: a ++ stat +1.00 (others +0.5); two + stats about +0.875 each (others about +0.42), with five stats; slightly less on the others with six.
 
-**The player's choice is a skill** (D-0020): every 3 levels (Lv 3, 6, 9, 12) the merc unlocks a new skill, picking 1 of 2 options. The options are rolled at recruitment (weighted by race and background, from core skills the merc lacks) and stay hidden until that level up.
+**The player's choice is a skill** (D-0020; D-0035 proposes instead: start with two skills, rarely three by star, and pick 1 of 3 at Lv 7): every 3 levels (Lv 3, 6, 9, 12) the merc unlocks a new skill, picking 1 of 2 options. The options are rolled at recruitment (weighted by race and background, from core skills the merc lacks) and stay hidden until that level up.
 
 ## Rarity (D-0027)
 
-Every merc has a **rarity from 1★ to 5★ in half steps**, rolled at recruitment. For now it affects only modifiers: each battle skill the merc gets rolls 0–4 modifiers, more often at higher stars (four on about 0.1% of a 5★'s skills). Higher stars get more common as the game goes on. Working odds: E-0004 `halfstar.mjs`.
+Every merc has a **rarity from 1★ to 5★ in half steps**, rolled at recruitment. For now it affects only modifiers: each ability the merc gets rolls 0–4 modifiers, more often at higher stars (four on about 0.1% of a 5★'s skills). Higher stars get more common as the game goes on. Working odds: E-0004 `halfstar.mjs`.
 
-## Battle skills (D-0028)
+## Abilities (D-0031, D-0033)
 
-- **Every level up rolls one new battle skill**, with modifiers by star. The merc's skills decide which battle skills can come up.
-- A merc **equips four** battle skills.
-- A battle skill is a fixed base skill plus modifiers, named by the AI (D-0025, proposed). Their name is pending (D-0031, proposed: arts).
+What a merc does in a fight is an **ability**; a **skill** (Survival, Swords…) is what they know.
+
+- **Every level up rolls one new ability**, with modifiers by star, from the base abilities of the merc's skills. **Never the same base twice.**
+- A merc **equips four** abilities.
+- An ability is a fixed base plus modifiers, named by the AI (D-0025, proposed).
+- Proposed: passives are personality traits (D-0036).
 
 ## Upgrade items (D-0029)
 
 - A **star-up item** raises a merc's star. Very rare, probably also limited per game. It resets the merc's level and rerolls their seed.
 - A **reroll item** (like Path of Exile's Chaos Orb) rerolls the merc's seed, probably resetting their level too.
-- A merc's seed decides their random rolls.
+- A reset keeps everything (the **starting position**) except the **level-up seed**, which decides only what level ups roll (D-0032).
 
 ## The recruit's gacha
 
-Rolled when a merc is generated: race, rarity, starting stats, talents, starting skills, starting battle skills, personality traits, and the hidden skill-unlock options.
+Rolled when a merc is generated: race, rarity, starting stats, talents, starting skills, starting abilities, personality traits, and the hidden skill-unlock options.
 
 ## Open
 
