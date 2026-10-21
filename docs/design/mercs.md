@@ -91,6 +91,24 @@ What a merc does in a fight is an **ability**; a **skill** (Survival, Swords…)
 - An ability is a fixed base plus modifiers, named by the AI (D-0025, proposed).
 - **Passives are traits** (D-0036, D-0038, D-0039). Traits come in four kinds: **gender, race, personality and body** (tall, short, muscular, skinny), all part of the starting position. A passive never touches stat or skill coins; it works on other axes (damage %, speed, HP, targeting, recovery, upkeep, loot) (D-0040). Often a trade-off: "Wolfkin: +10% damage, −10% speed", "Stubborn: can't be stunned while above half HP".
 
+## Stress (D-0042)
+
+- Each merc has **stress from 0 to 100**, and it carries across quests.
+- **It rises** from:
+  - foe stress attacks;
+  - an ally dropping;
+  - heavy hits;
+  - failed skill checks;
+  - long quests.
+- **At 100** the merc flips a check:
+  - on a pass, **Resolve**, a strong buff for the rest of the fight;
+  - on a fail, a **Breakdown**: they act outside their tactics for the rest of the fight.
+- **It falls** with:
+  - rest in base buildings;
+  - Leadership and Performance abilities;
+  - personality traits, which set how fast it builds.
+- **No quirks.** Open: which stat the check flips; whether stress matters outside fights.
+
 ## Upgrade items (D-0029)
 
 - A **star-up item** sets a merc to a fixed star within a stated range ("turns a 2–3★ into a 4★"); none reaches 5★, so 5★ stays valuable (D-0037). Very rare, probably also limited per game. It resets the merc's level and rerolls their seed.
