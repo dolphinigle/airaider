@@ -19,6 +19,7 @@ The shape we use in playtests until the designer rules otherwise. Sources: E-000
 - **Foe families** each get one sharp twist that punishes a default setup (foe healer, armored undead, enraging boss, fire-immune imps).
 - **Re-equip at base**, between quests; tactics cover changes inside a quest; scouting or lore can reveal what's ahead.
 - **Balance:** parked; assume it works (designer).
+- **Trait effects:** parked ("we'll figure out the effect details later", designer, 2026-10-22). This covers race's stat bias (D-0018 vs D-0040), how gender traits differ, and whether every trait is a trade-off.
 
 ## Next
 

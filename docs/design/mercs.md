@@ -104,4 +104,4 @@ Rolled when a merc is generated: race, rarity, starting stats, talents, starting
 ## Open
 
 - Numbers: starting stat spread per race, XP curve and penalty curve, skill XP thresholds.
-- Each trait's passive effect (D-0036).
+- Each trait's passive effect, parked by the designer: also whether race keeps its stat bias, how gender traits differ, and whether every trait is a trade-off (D-0036 to D-0040).
