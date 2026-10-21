@@ -89,7 +89,7 @@ Every merc has a **rarity from 1★ to 5★ in half steps**, rolled at recruitme
 
 What a merc does in a fight is an **ability**; a **skill** (Survival, Swords…) is what they know.
 
-- Every merc's **first ability is a 0-cooldown attack**, civilians too (D-0049).
+- Every merc's **first ability is a 0-cooldown attack**, a normal ability: from their skills (most skills have one, e.g. Light Weapons' Double Attack) or, as a fallback, a **generic** attack anyone can get (Smash, Kick) (D-0050).
 - The player sees only the AI name, never the base (D-0048).
 - Only **fighting skills** give abilities (D-0046, proposed). Each has **about 10–20 base abilities**; weapon tags filter them (D-0045).
 - **Every level up gives one new ability**, with modifiers by star. The engine deals the AI a few random bases from the merc's fighting skills that fit their weapon; the AI picks one that fits the merc's theme and renames it. **Never the same base twice.**

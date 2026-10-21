@@ -1,11 +1,11 @@
 ---
 id: D-0049
 title: Every merc's first ability is a 0 cooldown attack
-status: accepted
+status: superseded
 date: 2026-10-22
 decided-by: designer
 supersedes: []
-superseded-by:
+superseded-by: D-0050
 evidence: []
 sources: []
 ---
