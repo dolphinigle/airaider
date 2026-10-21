@@ -11,8 +11,8 @@
 The shape we use in playtests until the designer rules otherwise. Sources: E-0003, D-0025 (proposed).
 
 - **Party:** about 4 mercs per quest (e.g. two warriors, a mage, a healer).
-- **Combat basics (D-0041, proposed):** Darkest Dungeon style ordered line (4 ranks, abilities state the ranks they're used from and reach, no corpses: units shift forward); speed coins re-flipped every round, everyone acts once, Haste/Slow; ability pool = stat + skill (two-skill abilities average them), damage per heads; cooldown + mana, mana refills only from abilities; guard abilities taunt or shield (party); damage-type weaknesses and statuses that raise damage taken; foes fixed. Waves happen automatically.
-- **Abilities:** fixed base abilities (damage type, grid target, stamina and mana cost) from the merc's core skills, plus engine-priced modifiers (Fiery, Stunning, Lasting…). The AI names each ability once and picks its rolled modifiers from engine-dealt candidates; names only, no lines. An ability's number is damage per heads (D-0025).
+- **Combat basics (D-0041, proposed):** Darkest Dungeon style ordered line (4 ranks, abilities state the ranks they're used from and reach, no corpses: units shift forward); speed coins re-flipped every round, everyone acts once, Haste/Slow; ability pool = stat + skill (two-skill abilities average them), damage per heads; cooldowns only, no mana; guard abilities taunt or shield (party); damage-type weaknesses and statuses that raise damage taken; foes fixed. Waves happen automatically.
+- **Abilities:** fixed base abilities (damage type, ranks used from and reached, cooldown) from the merc's core skills, plus engine-priced modifiers (Fiery, Stunning, Lasting…). The AI names each ability once and picks its rolled modifiers from engine-dealt candidates; names only, no lines. An ability's number is damage per heads (D-0025).
 - **Modifiers:** 0–4 per ability, odds by star (D-0027); about 30 should fit each base ability; about 5 base abilities per skill.
 - **Equip order:** the four equipped abilities sit in priority order S1–S4; on its turn a merc uses the first ready one.
 - **Tactics:** condition + action + target (D-0030), e.g. "an ally below 50% HP" + "use S4" + "the ally with the lowest HP". How many lines a merc gets is open. Best when foes have sharp twists.
@@ -23,12 +23,12 @@ The shape we use in playtests until the designer rules otherwise. Sources: E-000
 
 ## Next
 
-1. **Review attributes and skills with the designer:** the 6 stats (D-0022) and the 27 core skills, now that combat is a ranked line with speed, mana, stress and roles (tank, healer, reach). Check:
-   - what each stat does in a fight (speed, HP, mana, the stress check);
+1. **Review attributes and skills with the designer:** the 6 stats (D-0022) and the 27 core skills, now that combat is a ranked line with speed, stress and roles (tank, healer, reach). Check:
+   - what each stat does in a fight (speed, HP, the stress check);
    - which skills feed which abilities;
    - which skills only act outside fights.
    Mock it, get feedback.
-2. **Then abilities:** about 5 base abilities per battle-capable skill (D-0033), each with its used-from and reach ranks, cooldown and mana cost (D-0041). Start from E-0003 `skills-mock/fixed-list.md` and `skills-mock2/gen.mjs`.
+2. **Then abilities:** about 5 base abilities per battle-capable skill (D-0033), each with its used-from and reach ranks, and cooldown (D-0041). Start from E-0003 `skills-mock/fixed-list.md` and `skills-mock2/gen.mjs`.
 3. **Simulated playtest** (new experiment): Claude acts as the game on the working model, the designer says what the player does.
 4. Keep design/ and this working model current; start `v4/` only once the shape is settled.
 

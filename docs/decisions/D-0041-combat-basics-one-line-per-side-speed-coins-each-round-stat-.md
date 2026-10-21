@@ -27,13 +27,12 @@ The designer's words: "keep it simple and have it like in final fantasy, aka eve
 
 ## Added 2026-10-22 (designer)
 
-"skills dont cost stamina, they have COOLDOWN and MANA COST instead" · "guard can either TAUNT or shield, can even shield the party" · "some enemies are weak to certain damage types, some give status that increase damage from others".
+"skills dont cost stamina, they have COOLDOWN and MANA COST instead" (mana removed later the same day) · "guard can either TAUNT or shield, can even shield the party" · "some enemies are weak to certain damage types, some give status that increase damage from others".
 
-- **Costs:** an ability has a **cooldown** and a **mana cost**; there is no stamina.
+- **Costs:** an ability has a **cooldown** only. There is no stamina and no mana (designer, 2026-10-22: "remove mana. Darkest Dungeon doesnt have it.").
 - **Guard abilities** either **taunt** (foes hit the taunter) or **shield**, and a shield can cover the whole party.
 - **Interactions:** foes can be **weak to damage types**; some statuses make the target **take more damage** from others.
 - **Speed stays a coin flip every round** (designer: "we want speed here, its not a farming game, so strats are a bit more dynamic (instead of buff A, then A attack)"). Everyone acts once per round; there is no turn bar. **Haste** and **Slow** statuses shift a unit's speed.
-- **Mana doesn't refill**, except through abilities that grant mana (designer).
 - **Ranks only, for now:** there are no corpses; when a unit drops, the units behind it shift forward (designer: "no corpses i think, just Ranks for now"). Claude reads "just Ranks for now" to mean knockback and pull wait too.
 
 ## Open
@@ -44,7 +43,6 @@ The designer's words: "keep it simple and have it like in final fantasy, aka eve
   - Each foe has a fixed rule for choosing its target.
   - Round cap, then retreat.
   - Speed coins are DEX + Athletics.
-- Mana: the size of the pool and its source stat.
 - Line details, as proposed by Claude:
   - 4 ranks per side.
   - Each ability states **ranks it can be used from** and **ranks it reaches**.
