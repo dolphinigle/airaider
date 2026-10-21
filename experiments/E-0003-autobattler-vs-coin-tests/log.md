@@ -17,3 +17,7 @@ Claude: stopped the build, wrote [mocks.md](mocks.md) (A family, B Loop Hero spl
 Claude: E dropped. Findings refined: the failure is a fight no choice shaped, not watching itself; watching works when the build decides it.
 
 **Designer:** "limbus weakest thing is its battle system"
+
+**Designer:** "im leaning towards coin autobattle but in a way that player can ifnluence. for example, player can set a "party", e.g., 4 units, like two warrior, one mage, one healer. Then can manipulate how they use their skills, e.g., "if ally < 50 then use Skill 2" on the healer which skill 2is heal or something? pls experiment then rpeot"
+
+Claude: building a small party-autobattle sim (partysim.mjs): 4 mercs, coin flips, FF12-style rules per merc; test whether rules change outcomes and make fights close.

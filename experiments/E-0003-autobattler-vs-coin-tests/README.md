@@ -26,10 +26,17 @@ What would change our minds: if the sims show autobattle fights are no more deci
 2. [spec.md](spec.md): shared mercs, two scenarios, five candidate models (A family tests, B Loop Hero split, C coin autobattle, D tracks, E clash).
 3. A build-and-sim workflow was started and stopped on the designer's call ("dont build just 'mock' them to me then propose first"); nothing from it is kept.
 4. [mocks.md](mocks.md): paper mocks of all five on Atlas, shown to the designer with a proposal.
+5. Designer steered to a party coin autobattle with Dragon Age / Live A Hero-style tactics. [partysim.mjs](partysim.mjs): 4 mercs, only mercs flip (attacks: heads = damage; defense: armor coins block), ordered "if condition → skill" rules per role; 4 party makeups × 5 foe groups (road bandits, barrow skeletons + draining wight, wolf pack, ogre, cultists + foe healer). Foe HP calibrated per group so the classic party with simple rules wins ~50% (`calibrate`); `search` tries every rule combo from a small menu (n=500 per combo).
 
 ## Result
 
-The numbers and the key observations. Paste the best samples here, or keep them in `samples/`. Bulk output stays in `raw/` (gitignored).
+_Interim, 2026-10-21 (party sim)._ Full table: [samples/party-search.txt](samples/party-search.txt); fights: [samples/party-fights.md](samples/party-fights.md).
+
+- **Tactics carry the fight.** Classic party (2 warriors, mage, healer): median rule set 8-50% by foe, best 44-86%, worst 0-2%.
+- **The best rules change with the foe.** Mage: area first vs wolves and skeletons, single bolts vs the ogre, backline first vs the cult. Healer: always heal vs the ogre and wolves, heal below 25% vs the cult.
+- **Party makeup matters by foe.** vs cult: 3 warriors best 26%, 2 mages 100% (only ranged can reach the foe healer).
+- **Close wins happen.** Best rules vs ogre, seed 3: the ogre falls in round 12 with the tank at 1/12; simple rules on the same flips wipe the party.
+- **Problems.** About 40-60 lines per fight; wipes under bad rules; taunt never paid; with uniform foes one rule set won everywhere.
 
 ## Verdict
 

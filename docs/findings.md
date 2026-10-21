@@ -19,6 +19,8 @@ Rules:
 - **Knowledge feeds the next roll.** Lore that reveals a weakness or unlocks an approach is loved (PF2e weakness reveals, Darkest Dungeon provisions); a net-zero lore pass/fail is disliked. Research, untested in v4. (E-0003)
 - **Retreat always open, always priced, tiered.** Loop Hero 100/60/30, Darkest Dungeon's priced retreat; Darkest Dungeon II removing mid-fight retreat drew complaints. Research. (E-0003)
 - **Watching is fine when the build decides it.** Autobattlers (Loop Hero, Backpack Battles, Super Auto Pets, TFT) put every choice before the fight; the fight is the test of the build, and close fights are the payoff (designer: 'player only watch is fine as long as player can get the just right thing'). Untested in v4. (E-0003)
+- **Per-merc tactic rules make a watched fight the player's own.** Party coin autobattle sim: with foe strength calibrated so simple rules win about 50%, the best rule set wins 79-95% and the worst about 0%; the best wins are often close (Ogre falls in the last round, tank at 1 HP). (E-0003)
+- **Foes that punish default rules keep tactics a fresh decision.** In the sim the best rules changed by foe group (area attacks vs wolves and skeletons, single bolts vs the ogre, kill the foe healer first vs the cult) and party makeup swung results (3 warriors 26% vs the cult, 2 mages 100%). With uniform foes one rule set won everywhere. (E-0003)
 
 ## Doesn't work
 
@@ -34,3 +36,4 @@ Rules:
 - **What replaces combat?** Research says dice can, if built from decisions around the rolls; which mix (push your luck, coin pool, push lever, trait-unlocked options, mid-walk stops) is most fun is still untested. (E-0001, E-0002, D-0004)
 - **Is choice around the roll enough ownership without tactics?** Tactics make a loss feel like your own fault; whether dice choices do that too is unproven. (E-0002)
 - **Endgame spread.** Under player-placed growth (D-0014) a Lv 12 specialist had 13–14 next to dump stats of 2, so the wrong merc auto-failed. Random three-coin growth (D-0018) lifts untalented stats to about 6–8; whether that gap feels right in play is untested. (E-0001, D-0014, D-0018)
+- **Party autobattle readability and wipes.** A 4-merc fight prints about 40-60 lines; bad rules wipe the whole party. Needs a compressed view and a party retreat rule; taunt as built was never worth a turn. (E-0003)
