@@ -82,11 +82,12 @@ Expected gain per level: a ++ stat +1.00 (others +0.5); two + stats about +0.875
 
 Every merc has a **rarity from 1★ to 5★ in half steps**, rolled at recruitment. For now it affects only modifiers: each ability the merc gets rolls 0–4 modifiers, more often at higher stars (four on about 0.1% of a 5★'s skills). Higher stars get more common as the game goes on. Working odds: E-0004 `halfstar.mjs`.
 
-## Abilities (D-0031, D-0033)
+## Abilities (D-0031, D-0047)
 
 What a merc does in a fight is an **ability**; a **skill** (Survival, Swords…) is what they know.
 
-- **Every level up rolls one new ability**, with modifiers by star, from the base abilities of the merc's skills. **Never the same base twice.**
+- Only **fighting skills** give abilities (D-0046, proposed). Each has **about 10–20 base abilities**; weapon tags filter them (D-0045).
+- **Every level up gives one new ability**, with modifiers by star. The engine deals the AI a few random bases from the merc's fighting skills that fit their weapon; the AI picks one that fits the merc's theme and renames it. **Never the same base twice.**
 - A merc **equips four** abilities.
 - An ability is a fixed base plus modifiers, named by the AI (D-0025, proposed).
 - **Passives are traits** (D-0036, D-0038, D-0039). Traits come in four kinds: **gender, race, personality and body** (tall, short, muscular, skinny), all part of the starting position. A passive never touches stat or skill coins; it works on other axes (damage %, speed, HP, targeting, recovery, upkeep, loot) (D-0040). Often a trade-off: "Wolfkin: +10% damage, −10% speed", "Stubborn: can't be stunned while above half HP".

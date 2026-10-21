@@ -1,11 +1,11 @@
 ---
 id: D-0033
 title: Abilities: one per level up from the merc's skills, never the same base twice, four equipped
-status: accepted
+status: superseded
 date: 2026-10-21
 decided-by: designer
 supersedes: [D-0028]
-superseded-by:
+superseded-by: D-0047
 evidence: [E-0004]
 sources: []
 ---

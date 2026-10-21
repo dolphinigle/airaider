@@ -39,7 +39,7 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0030](D-0030-a-tactic-is-three-parts-condition-action-target.md) | "A tactic is three parts: condition, action, target" | accepted | designer | 2026-10-21 |
 | [D-0031](D-0031-names-for-the-two-kinds-of-skill.md) | Names for the two kinds of skill | accepted | designer | 2026-10-21 |
 | [D-0032](D-0032-a-reset-rerolls-only-the-level-up-seed-everything-else-stays.md) | A reset rerolls only the level-up seed; everything else stays | accepted | designer | 2026-10-21 |
-| [D-0033](D-0033-abilities-one-per-level-up-from-the-merc-s-skills-never-the-.md) | Abilities: one per level up from the merc's skills, never the same base twice, four equipped | accepted | designer | 2026-10-21 |
+| [D-0033](D-0033-abilities-one-per-level-up-from-the-merc-s-skills-never-the-.md) | Abilities: one per level up from the merc's skills, never the same base twice, four equipped | superseded → D-0047 | designer | 2026-10-21 |
 | [D-0034](D-0034-tactic-parts-are-loot-no-gear-for-now.md) | Tactic parts are loot; no gear for now | accepted | designer | 2026-10-21 |
 | [D-0035](D-0035-mercs-start-with-two-skills-rarely-three-by-star-and-pick-a-.md) | Mercs start with two skills, rarely three by star, and pick a third of three at Lv 7 | accepted | designer | 2026-10-22 |
 | [D-0036](D-0036-passives-come-from-personality-traits.md) | Passives come from personality traits | accepted | designer | 2026-10-22 |
@@ -53,4 +53,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0044](D-0044-six-stats-per-folds-into-dex-wil-takes-willpower-from-con.md) | "Six stats: PER folds into DEX, WIL takes willpower from CON" | accepted | designer | 2026-10-22 |
 | [D-0045](D-0045-unarmed-is-its-own-core-skill-no-medium-weapons-weapon-tags-.md) | Unarmed is its own core skill, no medium weapons, weapon tags filter base abilities | accepted | designer | 2026-10-22 |
 | [D-0046](D-0046-fighting-skills-the-core-skills-that-give-abilities.md) | "Fighting skills: the core skills that give abilities" | proposed | designer | 2026-10-22 |
+| [D-0047](D-0047-abilities-10-to-20-bases-per-fighting-skill-the-ai-picks-one.md) | "Abilities: 10 to 20 bases per fighting skill, the AI picks one of a few dealt and renames it" | accepted | designer | 2026-10-22 |
 <!-- index:end -->
