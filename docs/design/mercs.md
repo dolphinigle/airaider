@@ -89,7 +89,7 @@ What a merc does in a fight is an **ability**; a **skill** (Survival, Swords…)
 - **Every level up rolls one new ability**, with modifiers by star, from the base abilities of the merc's skills. **Never the same base twice.**
 - A merc **equips four** abilities.
 - An ability is a fixed base plus modifiers, named by the AI (D-0025, proposed).
-- **Passives are personality traits** (D-0036): one or two per merc, part of the starting position ("Stubborn: can't be stunned while above half HP").
+- **Passives are traits** (D-0036, D-0038): the merc's race plus one or two personality traits, all part of the starting position. Often a trade-off: "Wolfkin: +10% damage, −10% speed", "Stubborn: can't be stunned while above half HP".
 
 ## Upgrade items (D-0029)
 
