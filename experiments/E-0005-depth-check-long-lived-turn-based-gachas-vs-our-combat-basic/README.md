@@ -76,3 +76,11 @@ Ideas offered to the designer:
 - **A morale bar as a second way to win** (Legend of Keepers).
 
 Loop Hero's fight itself is shallow. Its depth comes from the build and from choosing what you face, which is the quest layer for us.
+
+### Round 3: beyond combat
+
+Ideas offered to the designer, 2026-10-22:
+- **Bonds between mercs.** From Darkest Dungeon 2 relationships, XCOM 2 bonds, Fire Emblem supports and RimWorld.
+- **Camping between waves.** From Darkest Dungeon: skills restore mana and stress at camp.
+- **Downed at 0 HP.** From Darkest Dungeon's Death's Door: a healer can bring the merc back, and each hit while downed worsens the injury.
+- **A risk dial per quest.** From Darkest Dungeon's torch: more loot for more stress and tougher foes.
