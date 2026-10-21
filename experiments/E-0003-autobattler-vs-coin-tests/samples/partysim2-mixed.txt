@@ -1,0 +1,12 @@
+Lv6 default                avg 42%  [road 31% · barrow 37% · wolves 34% · ogre 53% · cult 53%]
+Lv6 best order, no books   avg 77%  [road 85% · barrow 64% · wolves 92% · ogre 66% · cult 79%]
+      Brann:wall>cleave>chop  Atlas:lunge>slash>snarl  Mira:wave>bolt>staff  Oswin:heal>smite>mace
+Lv6 best order + books     avg 82%  [road 84% · barrow 72% · wolves 89% · ogre 73% · cult 93%]
+      Brann:cleave>chop>wall|opening→S3  Atlas:lunge>slash>snarl  Mira:wave>bolt>staff|opening→S2  Oswin:heal>smite>mace|healer→S2
+Lv6 re-slot per fight (bound)  avg 86%
+Lv12 default                avg 44%  [road 52% · barrow 47% · wolves 22% · ogre 54% · cult 43%]
+Lv12 best order, no books   avg 94%  [road 99% · barrow 89% · wolves 98% · ogre 88% · cult 97%]
+      Brann:cleave>chop>wall>expose  Atlas:lunge>slash>snarl>wind  Mira:wave>bolt>staff>focus  Oswin:heal>smite>bless>mace
+Lv12 best order + books     avg 95%  [road 96% · barrow 93% · wolves 98% · ogre 90% · cult 96%]
+      Brann:cleave>chop>wall>expose  Atlas:wind>lunge>slash>snarl|undead→S2,undead→S3  Mira:wave>bolt>staff>focus|crowd→S1,boss→S2  Oswin:heal>smite>bless>mace|undead→S3,opening→S2
+Lv12 re-slot per fight (bound)  avg 97%

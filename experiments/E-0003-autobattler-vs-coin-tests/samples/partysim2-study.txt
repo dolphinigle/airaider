@@ -1,0 +1,34 @@
+Lv1 road   default 46% · random median 2% (worst 0%) · best 51% close 9% inj 0.68
+      best: Brann:wall>chop  Atlas:lunge>slash  Mira:bolt>staff  Oswin:heal>mace
+Lv1 barrow default 53% · random median 18% (worst 6%) · best 61% close 67% inj 1.15
+      best: Brann:chop>wall  Atlas:lunge>slash  Mira:bolt>staff  Oswin:heal>mace
+Lv1 wolves default 60% · random median 9% (worst 0%) · best 64% close 25% inj 0.66
+      best: Brann:wall>chop  Atlas:lunge>slash  Mira:bolt>staff  Oswin:heal>mace
+Lv1 ogre   default 56% · random median 3% (worst 0%) · best 61% close 34% inj 0.81
+      best: Brann:wall>chop  Atlas:lunge>slash  Mira:bolt>staff  Oswin:heal>mace
+Lv1 cult   default 59% · random median 1% (worst 0%) · best 75% close 1% inj 0.01
+      best: Brann:chop>wall  Atlas:lunge>slash  Mira:bolt>staff  Oswin:heal>mace
+Lv6 road   default 27% · random median 12% (worst 0%) · best 88% close 11% inj 0.26
+      best: Brann:wall>cleave>chop|selfLow→S2  Atlas:lunge>slash>snarl  Mira:wave>bolt>staff  Oswin:heal>smite>mace
+Lv6 barrow default 40% · random median 24% (worst 0%) · best 73% close 62% inj 0.91
+      best: Brann:cleave>chop>wall  Atlas:lunge>slash>snarl  Mira:wave>bolt>staff|opening→S2  Oswin:heal>smite>mace|opening→S2
+Lv6 wolves default 34% · random median 17% (worst 0%) · best 88% close 22% inj 0.35
+      best: Brann:wall>cleave>chop  Atlas:lunge>slash>snarl|opening→S2  Mira:wave>bolt>staff  Oswin:heal>smite>mace
+Lv6 ogre   default 52% · random median 1% (worst 0%) · best 79% close 62% inj 1.01
+      best: Brann:chop>wall>cleave  Atlas:lunge>slash>snarl  Mira:bolt>wave>staff  Oswin:heal>smite>mace
+Lv6 cult   default 53% · random median 29% (worst 1%) · best 93% close 1% inj 0.01
+      best: Brann:cleave>chop>wall|opening→S2  Atlas:lunge>slash>snarl  Mira:wave>bolt>staff  Oswin:smite>mace>heal|allyLow→S3
+Lv12 road   default 56% · random median 28% (worst 0%) · best 99% close 10% inj 0.11
+      best: Brann:cleave>chop>wall>expose  Atlas:wind>lunge>slash>snarl  Mira:wave>bolt>staff>focus|opening→S2  Oswin:heal>smite>bless>mace
+Lv12 barrow default 51% · random median 8% (worst 0%) · best 96% close 27% inj 0.38
+      best: Brann:cleave>expose>chop>wall  Atlas:lunge>wind>slash>snarl  Mira:wave>bolt>staff>focus  Oswin:bless>smite>mace>heal
+Lv12 wolves default 24% · random median 33% (worst 0%) · best 99% close 22% inj 0.25
+      best: Brann:cleave>chop>wall>expose  Atlas:wind>lunge>slash>snarl  Mira:wave>staff>bolt>focus|lowMana→S4  Oswin:heal>smite>bless>mace
+Lv12 ogre   default 55% · random median 8% (worst 0%) · best 91% close 18% inj 0.25
+      best: Brann:chop>wall>cleave>expose|allyLow→S4  Atlas:lunge>wind>slash>snarl  Mira:bolt>wave>focus>staff  Oswin:heal>smite>bless>mace
+Lv12 cult   default 44% · random median 29% (worst 0%) · best 100% close 10% inj 0.10
+      best: Brann:cleave>chop>wall>expose|opening→S2  Atlas:lunge>slash>snarl>wind  Mira:wave>bolt>staff>focus|opening→S2  Oswin:smite>mace>heal>bless|opening→S2
+
+real	1m45,204s
+user	1m45,990s
+sys	0m0,240s

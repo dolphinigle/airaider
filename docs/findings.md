@@ -21,6 +21,7 @@ Rules:
 - **Watching is fine when the build decides it.** Autobattlers (Loop Hero, Backpack Battles, Super Auto Pets, TFT) put every choice before the fight; the fight is the test of the build, and close fights are the payoff (designer: 'player only watch is fine as long as player can get the just right thing'). Untested in v4. (E-0003)
 - **Per-merc tactic rules make a watched fight the player's own.** Party coin autobattle sim: with foe strength calibrated so simple rules win about 50%, the best rule set wins 79-95% and the worst about 0%; the best wins are often close (Ogre falls in the last round, tank at 1 HP). (E-0003)
 - **Foes that punish default rules keep tactics a fresh decision.** In the sim the best rules changed by foe group (area attacks vs wolves and skeletons, single bolts vs the ogre, kill the foe healer first vs the cult) and party makeup swung results (3 warriors 26% vs the cult, 2 mages 100%). With uniform foes one rule set won everywhere. (E-0003)
+- **Skill slots in priority order, auto-sorted, ramp well.** Sim v2: at Lv1 (2 skills) the auto-sorted default is within 5-16 points of the best setup, so no tactics are needed; at Lv6/Lv12 the best order wins 73-100% vs the default's 24-56%. (E-0003)
 
 ## Doesn't work
 
@@ -37,3 +38,4 @@ Rules:
 - **Is choice around the roll enough ownership without tactics?** Tactics make a loss feel like your own fault; whether dice choices do that too is unproven. (E-0002)
 - **Endgame spread.** Under player-placed growth (D-0014) a Lv 12 specialist had 13–14 next to dump stats of 2, so the wrong merc auto-failed. Random three-coin growth (D-0018) lifts untalented stats to about 6–8; whether that gap feels right in play is untested. (E-0001, D-0014, D-0018)
 - **Taunt as built was never worth a turn.** In the party sim, tanks did best just hitting; a tank tool needs teeth (free action, damage cut). Fight length is a pacing question now that fights are displayed (D-0023); wipes injure, not kill (D-0024). (E-0003, D-0023, D-0024)
+- **Tactic books only matter against sharp twists.** One good slot order covered a mixed quest at 94% (re-slotting per fight 97%; books +1). With sharp twists (blade-proof skeletons, an enraging ogre, fire-immune imps) books added +17 points on the skeleton fight. Books need foe families with twists a universal order can't answer; at Lv12 best setups near 95% also mean fights get solved without harder quests. (E-0003)

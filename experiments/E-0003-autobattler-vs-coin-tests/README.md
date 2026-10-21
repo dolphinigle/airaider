@@ -38,6 +38,14 @@ _Interim, 2026-10-21 (party sim)._ Full table: [samples/party-search.txt](sample
 - **Close wins happen.** Best rules vs ogre, seed 3: the ogre falls in round 12 with the tank at 1/12; simple rules on the same flips wipe the party.
 - **Problems.** About 40-60 lines per fight; wipes under bad rules; taunt never paid; with uniform foes one rule set won everywhere.
 
+_Sim v2 (designer: Live A Hero-style slots and lootable tactic books; fights displayed, D-0023; losing injures, D-0024)._ [partysim2.mjs](partysim2.mjs): skills come from core skills; a merc uses the first ready skill in S1-S4 order; books are "condition → S<k>" overrides; Lv1 = 2 skills/0 books, Lv6 = 3/1, Lv12 = 4/2. Default = auto-sorted (free basic attacks last). Best setups found by coordinate search, scored on held-out seeds. Output: [samples/partysim2-study.txt](samples/partysim2-study.txt), [samples/partysim2-mixed.txt](samples/partysim2-mixed.txt), [samples/partysim2-mixed-sharp.txt](samples/partysim2-mixed-sharp.txt).
+
+- **Ramp works.** Lv1: default 46-60%, best 51-75%. Lv6: default 27-53%, best 73-93%. Lv12: default 24-56%, best 91-100%.
+- **Basic attack in S1 blocks every other skill** (always ready): the first slotting lesson; the auto-sort default fixes it.
+- **Best order varies by foe** (mage area-first vs crowds, bolt-first vs ogre; healer smite-first vs cult, bless-first vs barrow).
+- **Books add little unless twists are sharp.** One loadout across all foes: Lv12 no books 94%, books 95%, re-slot per fight 97%. With sharp twists: no books 85% (barrow 49%), books 88% (barrow 66%), re-slot 90%.
+- **Solved at the top.** Best Lv12 setups reach 91-100% against default-calibrated foes; harder quests are needed to keep fights close.
+
 ## Verdict
 
 What we now believe, in a sentence or two. What it changes, and any decision it proposes.

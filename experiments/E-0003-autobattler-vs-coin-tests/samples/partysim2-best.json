@@ -1,0 +1,572 @@
+{
+ "1:road": [
+  {
+   "order": [
+    "wall",
+    "chop"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "lunge",
+    "slash"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "bolt",
+    "staff"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "heal",
+    "mace"
+   ],
+   "books": []
+  }
+ ],
+ "1:barrow": [
+  {
+   "order": [
+    "chop",
+    "wall"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "lunge",
+    "slash"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "bolt",
+    "staff"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "heal",
+    "mace"
+   ],
+   "books": []
+  }
+ ],
+ "1:wolves": [
+  {
+   "order": [
+    "wall",
+    "chop"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "lunge",
+    "slash"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "bolt",
+    "staff"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "heal",
+    "mace"
+   ],
+   "books": []
+  }
+ ],
+ "1:ogre": [
+  {
+   "order": [
+    "wall",
+    "chop"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "lunge",
+    "slash"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "bolt",
+    "staff"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "heal",
+    "mace"
+   ],
+   "books": []
+  }
+ ],
+ "1:cult": [
+  {
+   "order": [
+    "chop",
+    "wall"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "lunge",
+    "slash"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "bolt",
+    "staff"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "heal",
+    "mace"
+   ],
+   "books": []
+  }
+ ],
+ "6:road": [
+  {
+   "order": [
+    "wall",
+    "cleave",
+    "chop"
+   ],
+   "books": [
+    {
+     "book": "selfLow",
+     "slot": 1
+    }
+   ]
+  },
+  {
+   "order": [
+    "lunge",
+    "slash",
+    "snarl"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "wave",
+    "bolt",
+    "staff"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "heal",
+    "smite",
+    "mace"
+   ],
+   "books": []
+  }
+ ],
+ "6:barrow": [
+  {
+   "order": [
+    "cleave",
+    "chop",
+    "wall"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "lunge",
+    "slash",
+    "snarl"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "wave",
+    "bolt",
+    "staff"
+   ],
+   "books": [
+    {
+     "book": "opening",
+     "slot": 1
+    }
+   ]
+  },
+  {
+   "order": [
+    "heal",
+    "smite",
+    "mace"
+   ],
+   "books": [
+    {
+     "book": "opening",
+     "slot": 1
+    }
+   ]
+  }
+ ],
+ "6:wolves": [
+  {
+   "order": [
+    "wall",
+    "cleave",
+    "chop"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "lunge",
+    "slash",
+    "snarl"
+   ],
+   "books": [
+    {
+     "book": "opening",
+     "slot": 1
+    }
+   ]
+  },
+  {
+   "order": [
+    "wave",
+    "bolt",
+    "staff"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "heal",
+    "smite",
+    "mace"
+   ],
+   "books": []
+  }
+ ],
+ "6:ogre": [
+  {
+   "order": [
+    "chop",
+    "wall",
+    "cleave"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "lunge",
+    "slash",
+    "snarl"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "bolt",
+    "wave",
+    "staff"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "heal",
+    "smite",
+    "mace"
+   ],
+   "books": []
+  }
+ ],
+ "6:cult": [
+  {
+   "order": [
+    "cleave",
+    "chop",
+    "wall"
+   ],
+   "books": [
+    {
+     "book": "opening",
+     "slot": 1
+    }
+   ]
+  },
+  {
+   "order": [
+    "lunge",
+    "slash",
+    "snarl"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "wave",
+    "bolt",
+    "staff"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "smite",
+    "mace",
+    "heal"
+   ],
+   "books": [
+    {
+     "book": "allyLow",
+     "slot": 2
+    }
+   ]
+  }
+ ],
+ "12:road": [
+  {
+   "order": [
+    "cleave",
+    "chop",
+    "wall",
+    "expose"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "wind",
+    "lunge",
+    "slash",
+    "snarl"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "wave",
+    "bolt",
+    "staff",
+    "focus"
+   ],
+   "books": [
+    {
+     "book": "opening",
+     "slot": 1
+    }
+   ]
+  },
+  {
+   "order": [
+    "heal",
+    "smite",
+    "bless",
+    "mace"
+   ],
+   "books": []
+  }
+ ],
+ "12:barrow": [
+  {
+   "order": [
+    "cleave",
+    "expose",
+    "chop",
+    "wall"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "lunge",
+    "wind",
+    "slash",
+    "snarl"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "wave",
+    "bolt",
+    "staff",
+    "focus"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "bless",
+    "smite",
+    "mace",
+    "heal"
+   ],
+   "books": []
+  }
+ ],
+ "12:wolves": [
+  {
+   "order": [
+    "cleave",
+    "chop",
+    "wall",
+    "expose"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "wind",
+    "lunge",
+    "slash",
+    "snarl"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "wave",
+    "staff",
+    "bolt",
+    "focus"
+   ],
+   "books": [
+    {
+     "book": "lowMana",
+     "slot": 3
+    }
+   ]
+  },
+  {
+   "order": [
+    "heal",
+    "smite",
+    "bless",
+    "mace"
+   ],
+   "books": []
+  }
+ ],
+ "12:ogre": [
+  {
+   "order": [
+    "chop",
+    "wall",
+    "cleave",
+    "expose"
+   ],
+   "books": [
+    {
+     "book": "allyLow",
+     "slot": 3
+    }
+   ]
+  },
+  {
+   "order": [
+    "lunge",
+    "wind",
+    "slash",
+    "snarl"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "bolt",
+    "wave",
+    "focus",
+    "staff"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "heal",
+    "smite",
+    "bless",
+    "mace"
+   ],
+   "books": []
+  }
+ ],
+ "12:cult": [
+  {
+   "order": [
+    "cleave",
+    "chop",
+    "wall",
+    "expose"
+   ],
+   "books": [
+    {
+     "book": "opening",
+     "slot": 1
+    }
+   ]
+  },
+  {
+   "order": [
+    "lunge",
+    "slash",
+    "snarl",
+    "wind"
+   ],
+   "books": []
+  },
+  {
+   "order": [
+    "wave",
+    "bolt",
+    "staff",
+    "focus"
+   ],
+   "books": [
+    {
+     "book": "opening",
+     "slot": 1
+    }
+   ]
+  },
+  {
+   "order": [
+    "smite",
+    "mace",
+    "heal",
+    "bless"
+   ],
+   "books": [
+    {
+     "book": "opening",
+     "slot": 1
+    }
+   ]
+  }
+ ]
+}
