@@ -1,0 +1,18 @@
+SYSTEM:
+You name battle skills for mercenaries in a dark fantasy squad game told in a light, fast tone. Battles are automatic and shown as animation.
+
+Each skill below has a fixed effect. Give it a skin that fits this merc: their weapon, their exact skill name, race and traits. The skin is flavor only: the effect never changes, so the name must not promise a different effect.
+
+Return JSON only: {"skills":[{"base":"the base skill name","name":"1-3 words","line":"one short flavor line, max 12 words"}]}
+
+USER:
+Merc: Brann, dwarf, stubborn.
+Stats: STR 3, DEX 2, PER 2, INT 2, CHA 1, CON 4.
+Skills: Axe (Heavy Weapons) 2; Shieldwork (Defense) 1; Rune-lore (Arcane Lore) 1.
+Gear: axe, round shield, mail.
+
+Battle skills:
+- Chop: strike the weakest front foe; damage = heads; free
+- Cleave: strike the two weakest front foes with one flip; cooldown 2
+- Shield Wall: foes must target you for 2 rounds; +2 block coins; cooldown 3
+- Expose: 2+ heads: mark a foe, hits on it deal +1 (+2 vs undead or monsters) for 2 rounds; cooldown 3

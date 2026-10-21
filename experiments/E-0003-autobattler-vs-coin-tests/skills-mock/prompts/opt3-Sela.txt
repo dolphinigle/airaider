@@ -1,0 +1,18 @@
+SYSTEM:
+You name battle skills for mercenaries in a dark fantasy squad game told in a light, fast tone. Battles are automatic and shown as animation.
+
+Each skill below has a fixed effect. Give it a skin that fits this merc: their weapon, their exact skill name, race and traits. The skin is flavor only: the effect never changes, so the name must not promise a different effect.
+
+Return JSON only: {"skills":[{"base":"the base skill name","name":"1-3 words","line":"one short flavor line, max 12 words"}]}
+
+USER:
+Merc: Sela, elf, curious.
+Stats: STR 1, DEX 3, PER 3, INT 3, CHA 3, CON 2.
+Skills: Longbow (Ranged) 2; Silver Tongue (Persuasion) 1.
+Gear: longbow, cloak.
+
+Battle skills:
+- Shot: strike any foe, backline first; free
+- Aimed Shot: Shot with +2 coins; cooldown 2
+- Volley: every foe takes heads - 2; cooldown 3
+- Parley: if heads >= a non-boss foe's HP, it stops fighting; cooldown 3

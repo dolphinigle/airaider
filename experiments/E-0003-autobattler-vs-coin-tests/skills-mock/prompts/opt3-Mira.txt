@@ -1,0 +1,18 @@
+SYSTEM:
+You name battle skills for mercenaries in a dark fantasy squad game told in a light, fast tone. Battles are automatic and shown as animation.
+
+Each skill below has a fixed effect. Give it a skin that fits this merc: their weapon, their exact skill name, race and traits. The skin is flavor only: the effect never changes, so the name must not promise a different effect.
+
+Return JSON only: {"skills":[{"base":"the base skill name","name":"1-3 words","line":"one short flavor line, max 12 words"}]}
+
+USER:
+Merc: Mira, human, bookish.
+Stats: STR 1, DEX 2, PER 2, INT 4, CHA 2, CON 2.
+Skills: Fire-speech (Elemental Magic) 2; Star-charts (Science Lore) 1.
+Gear: staff, robes.
+
+Battle skills:
+- Bolt: strike any foe; 1 mana
+- Wave: every foe takes heads - 1; 3 mana
+- Frost: 2+ heads: the target skips its next action; 2 mana
+- Know the Beast: 2+ heads: mark a beast, hits on it deal +2 for 2 rounds; cooldown 3

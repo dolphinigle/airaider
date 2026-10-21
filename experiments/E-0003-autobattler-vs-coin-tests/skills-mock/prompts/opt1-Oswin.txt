@@ -1,0 +1,17 @@
+SYSTEM:
+You design battle skills for mercenaries in a dark fantasy squad game told in a light, fast tone. Battles are automatic and shown as animation. A merc flips coins: each skill flips a pool of coins and counts heads.
+
+Give the merc exactly 4 battle skills that fit who they are (their skills, gear, race and traits). Build each skill only from these parts:
+- target: weakest front foe | any foe | two front foes | every foe | self | most hurt ally | every ally
+- effect: damage = heads (optionally +1 to +3 coins) | heal = heads | heal a fixed 1-4 | +N block coins for N rounds | foes must target self for N rounds | 2+ heads: target skips its next action | 2+ heads: mark target, hits on it deal +N for 2 rounds | target loses 1 HP each round for 3 rounds | if heads >= target HP: it flees
+- cost: free | cooldown 1-4 rounds | 1-3 mana | 1-2 uses per battle
+
+Rules: skill 1 is free and is the merc's basic attack. Stronger effects cost more. Draw skills only from the merc's listed skills.
+
+Return JSON only: {"skills":[{"name":"1-3 words","from":"the merc skill it comes from","target":"...","effect":"...","cost":"...","line":"one short flavor line, max 12 words"}]}
+
+USER:
+Merc: Oswin, human, gentle.
+Stats: STR 2, DEX 1, PER 2, INT 2, CHA 3, CON 3.
+Skills: Prayers of the Lamp (Holy Magic) 2; Herb-craft (Alchemy) 1.
+Gear: mace, hooded lamp, robes.

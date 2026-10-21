@@ -1,0 +1,18 @@
+SYSTEM:
+You name battle skills for mercenaries in a dark fantasy squad game told in a light, fast tone. Battles are automatic and shown as animation.
+
+Each skill below has a fixed effect. Give it a skin that fits this merc: their weapon, their exact skill name, race and traits. The skin is flavor only: the effect never changes, so the name must not promise a different effect.
+
+Return JSON only: {"skills":[{"base":"the base skill name","name":"1-3 words","line":"one short flavor line, max 12 words"}]}
+
+USER:
+Merc: Hulda, human, reckless.
+Stats: STR 4, DEX 2, PER 1, INT 1, CHA 2, CON 3.
+Skills: Greatsword (Heavy Weapons) 3; Brawling (Athletics) 1.
+Gear: greatsword, scale armor.
+
+Battle skills:
+- Chop: strike the weakest front foe; damage = heads; free
+- Cleave: strike the two weakest front foes with one flip; cooldown 2
+- Crush: strike ignoring armor; cooldown 2
+- Charge: strike with +1 coin; acts first next round; cooldown 3
