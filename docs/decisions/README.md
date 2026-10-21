@@ -49,4 +49,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0040](D-0040-trait-passives-never-overlap-with-stats-or-skills.md) | Trait passives never overlap with stats or skills | accepted | designer | 2026-10-21 |
 | [D-0041](D-0041-combat-basics-one-line-per-side-speed-coins-each-round-stat-.md) | Combat basics: one line per side, speed coins each round, stat plus skill coins times base | proposed | designer | 2026-10-22 |
 | [D-0042](D-0042-stress-a-darkest-dungeon-style-bar-that-carries-across-quest.md) | "Stress: a Darkest Dungeon style bar that carries across quests" | accepted | designer | 2026-10-22 |
+| [D-0043](D-0043-fight-sprites-one-ai-painted-image-per-pose-as-in-darkest-du.md) | "Fight sprites: one AI-painted image per pose, as in Darkest Dungeon" | proposed | designer | 2026-10-22 |
 <!-- index:end -->
