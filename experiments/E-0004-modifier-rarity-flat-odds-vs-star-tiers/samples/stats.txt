@@ -1,0 +1,20 @@
+
+flat
+  mods per merc  0:2.6%  1:12.9%  2:26.3%  3:28.7%  4:18.7%  5+:10.7%
+  skills with any mod 59.9% · mercs whose best skill has 2 mods 30.4% · 3 mods 4.1%
+  over 40 recruits seen: ≥1 three-mod skill 81% of campaigns
+
+flatmerc
+  mods per merc  0:40.0%  1:50.0%  2:9.0%  3:1.0%  4:0.0%  5+:0.0%
+  skills with any mod 15.0% · mercs whose best skill has 2 mods 9.0% · 3 mods 1.0%
+  over 40 recruits seen: ≥1 three-mod skill 34% of campaigns
+
+starodds
+  mods per merc  0:27.2%  1:28.9%  2:19.3%  3:11.3%  4:6.3%  5+:6.9%
+  skills with any mod 36.0% · mercs whose best skill has 2 mods 12.1% · 3 mods 2.8%
+  over 40 recruits seen: ≥1 three-mod skill 68% of campaigns
+
+starcount
+  mods per merc  0:40.0%  1:30.1%  2:18.0%  3:8.9%  4:3.0%  5+:0.0%
+  skills with any mod 22.6% · mercs whose best skill has 2 mods 11.7% · 3 mods 1.1%
+  over 40 recruits seen: ≥1 three-mod skill 36% of campaigns

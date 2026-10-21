@@ -1,0 +1,124 @@
+TAVERN BOARD (flat)
+Oswin · elf · Ranged, Persuasion
+   S1  Shot  +Wide
+   S2  Volley  +Sundering
+   Lv6 Pierce  +Guarding
+   L12 Parley  +Swift
+
+Hulda · human · Holy Magic, Alchemy
+   S1  Heal  +Generous
+   S2  Smite  +Guarding +Holy   ◆◆
+   Lv6 Potion  +Thrifty
+   L12 Strike  +Icy
+
+Fenn · wolfkin · Light Weapons, Intimidation
+   S1  Strike  +Rallying
+   S2  Lunge
+   Lv6 Riposte  +Swift
+   L12 Snarl  +Rallying
+
+Ysolde · human · Elemental Magic, Science Lore
+   S1  Bolt
+   S2  Wave  +Fiery
+   Lv6 Know the Beast  +Lasting +Guarding   ◆◆
+   L12 Strike  +Fiery
+
+Atlas · human · Heavy Weapons, Athletics
+   S1  Strike
+   S2  Cleave  +Stunning
+   Lv6 Crush  +Thrifty
+   L12 Charge  +Thrifty +Sundering +Stunning   ◆◆◆
+
+TAVERN BOARD (flatmerc)
+Oswin · elf · Ranged, Persuasion
+   S1  Shot
+   S2  Volley  +Swift
+   Lv6 Pierce
+   L12 Parley
+
+Hulda · human · Elemental Magic, Science Lore
+   S1  Bolt
+   S2  Wave
+   Lv6 Know the Beast
+   L12 Strike  +Sundering
+
+Fenn · human · Heavy Weapons, Athletics
+   S1  Strike
+   S2  Cleave
+   Lv6 Crush  +Wide
+   L12 Charge
+
+Ysolde · elf · Ranged, Persuasion
+   S1  Shot
+   S2  Volley
+   Lv6 Pierce
+   L12 Parley  +Lasting
+
+Atlas · elf · Ranged, Persuasion
+   S1  Shot
+   S2  Volley
+   Lv6 Pierce
+   L12 Parley
+
+TAVERN BOARD (starodds)
+Oswin ★★☆☆☆ · elf · Ranged, Persuasion
+   S1  Shot
+   S2  Volley
+   Lv6 Pierce
+   L12 Parley  +Lasting
+
+Hulda ★☆☆☆☆ · human · Elemental Magic, Science Lore
+   S1  Bolt
+   S2  Wave
+   Lv6 Know the Beast
+   L12 Strike  +Guarding
+
+Fenn ★★☆☆☆ · human · Holy Magic, Alchemy
+   S1  Heal  +Generous
+   S2  Smite
+   Lv6 Potion
+   L12 Strike
+
+Ysolde ★☆☆☆☆ · elf · Ranged, Persuasion
+   S1  Shot
+   S2  Volley
+   Lv6 Pierce
+   L12 Parley
+
+Atlas ★☆☆☆☆ · human · Elemental Magic, Science Lore
+   S1  Bolt
+   S2  Wave
+   Lv6 Know the Beast  +Lasting
+   L12 Strike
+
+TAVERN BOARD (starcount)
+Oswin ★★☆☆☆ · elf · Ranged, Persuasion
+   S1  Shot
+   S2  Volley  +Swift
+   Lv6 Pierce
+   L12 Parley
+
+Hulda ★★★☆☆ · human · Elemental Magic, Science Lore
+   S1  Bolt
+   S2  Wave  +Holy
+   Lv6 Know the Beast
+   L12 Strike  +Sundering
+
+Fenn ★★☆☆☆ · human · Holy Magic, Alchemy
+   S1  Heal
+   S2  Smite
+   Lv6 Potion
+   L12 Strike  +Guarding
+
+Ysolde ★★☆☆☆ · human · Holy Magic, Alchemy
+   S1  Heal
+   S2  Smite
+   Lv6 Potion
+   L12 Strike  +Vampiric
+
+Atlas ★☆☆☆☆ · wolfkin · Light Weapons, Intimidation
+   S1  Strike
+   S2  Lunge
+   Lv6 Riposte
+   L12 Snarl
+

@@ -13,7 +13,7 @@ The shape we use in playtests until the designer rules otherwise. Sources: E-000
 - **Party:** about 4 mercs per quest (e.g. two warriors, a mage, a healer).
 - **Grid:** each side on a 2×3 grid, 3 frontline and 3 backline (as in Vagrus).
 - **Battle skills:** fixed base skills (damage type, grid target, stamina and mana cost) from the merc's core skills, plus engine-priced modifiers (Fiery, Stunning, Lasting…). The AI names each skill once and picks its rolled modifiers from engine-dealt candidates; names only, no lines. A skill's number is damage per heads (D-0025).
-- **Modifiers are rare** and part of the recruit's gacha: most skills roll none, two on one skill is rare, three rarer still (designer).
+- **Modifiers are rare** and part of the recruit's gacha: most skills roll none, two on one skill is rare, three rarer still (designer). How to roll them is under test in E-0004 (flat odds vs 1★–5★ stars); Claude's pick is stars that fix the mod count (★★★ = two mods).
 - **Upgrade item:** mercs should grow with the player; a really rare or limited item could upgrade a merc (e.g. add a modifier). Not designed yet.
 - **Slots:** skills sit in priority slots S1-S4; on its turn a merc uses the first ready one. 1-2 slots at first (no tactics needed), more as they level (Live A Hero style).
 - **Tactic books:** lootable "condition → use S*k*" overrides ("vs undead → S3", "low mana → S2"), slots unlocked by level. Best when foes have sharp twists; a book can drop from the foe family it answers.
@@ -23,12 +23,13 @@ The shape we use in playtests until the designer rules otherwise. Sources: E-000
 
 ## Next
 
-1. **Simulated playtest** (new experiment): Claude acts as the game on the working model, the designer says what the player does. Record every idea and ruling as it lands.
-2. Keep design/ and this working model current as rulings come in; start `v4/` only after the shape is settled.
+1. **E-0004 modifier rarity:** waiting on the designer's read.
+2. **Simulated playtest** (new experiment): Claude acts as the game on the working model, the designer says what the player does. Record every idea and ruling as it lands.
+3. Keep design/ and this working model current as rulings come in; start `v4/` only after the shape is settled.
 
 ## Waiting on the designer
 
-- Nothing; the next playtest starts when the designer is ready.
+- E-0004: which rarity scheme lands.
 
 ## Notes
 
