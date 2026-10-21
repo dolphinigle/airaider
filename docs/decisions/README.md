@@ -46,4 +46,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0037](D-0037-a-star-up-item-sets-a-merc-to-a-fixed-star-so-5-stars-stay-v.md) | A star-up item sets a merc to a fixed star, so 5 stars stay valuable | accepted | designer | 2026-10-21 |
 | [D-0038](D-0038-race-gives-a-passive-too-a-trade-off-like-the-trait-passives.md) | Race gives a passive too, a trade-off like the trait passives | accepted | designer | 2026-10-21 |
 | [D-0039](D-0039-traits-cover-gender-race-personality-and-body.md) | Traits cover gender, race, personality and body | accepted | designer | 2026-10-21 |
+| [D-0040](D-0040-trait-passives-never-overlap-with-stats-or-skills.md) | Trait passives never overlap with stats or skills | accepted | designer | 2026-10-21 |
 <!-- index:end -->

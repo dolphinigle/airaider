@@ -16,7 +16,7 @@ Passives come from traits (D-0036), race included (D-0038).
 
 ## Decision
 
-The designer: "traits cover gender, race, personality, some body stuff too like \"tall\" \"short\" \"muscular\" \"skinny\""
+The designer: "traits cover gender, race, personality, some body stuff too like "tall" "short" "muscular" "skinny""
 
 A merc's traits come in four kinds, each able to carry a passive:
 - **Gender**
