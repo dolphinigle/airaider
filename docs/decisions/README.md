@@ -51,4 +51,6 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0042](D-0042-stress-a-darkest-dungeon-style-bar-that-carries-across-quest.md) | "Stress: a Darkest Dungeon style bar that carries across quests" | accepted | designer | 2026-10-22 |
 | [D-0043](D-0043-fight-sprites-one-ai-painted-image-per-pose-as-in-darkest-du.md) | "Fight sprites: one AI-painted image per pose, as in Darkest Dungeon" | proposed | designer | 2026-10-22 |
 | [D-0044](D-0044-six-stats-per-folds-into-dex-wil-takes-willpower-from-con.md) | "Six stats: PER folds into DEX, WIL takes willpower from CON" | accepted | designer | 2026-10-22 |
+| [D-0045](D-0045-unarmed-is-its-own-core-skill-no-medium-weapons-weapon-tags-.md) | Unarmed is its own core skill, no medium weapons, weapon tags filter base abilities | accepted | designer | 2026-10-22 |
+| [D-0046](D-0046-fighting-skills-the-core-skills-that-give-abilities.md) | "Fighting skills: the core skills that give abilities" | proposed | designer | 2026-10-22 |
 <!-- index:end -->
