@@ -32,6 +32,8 @@ The designer's words: "keep it simple and have it like in final fantasy, aka eve
 - **Costs:** an ability has a **cooldown** and a **mana cost**; there is no stamina.
 - **Guard abilities** either **taunt** (foes hit the taunter) or **shield**, and a shield can cover the whole party.
 - **Interactions:** foes can be **weak to damage types**; some statuses make the target **take more damage** from others.
+- **Speed stays a coin flip every round** (designer: "we want speed here, its not a farming game, so strats are a bit more dynamic (instead of buff A, then A attack)"). Everyone acts once per round; there is no turn bar. **Haste** and **Slow** statuses shift a unit's speed.
+- **Mana doesn't refill**, except through abilities that grant mana (designer).
 
 ## Open
 
@@ -41,5 +43,4 @@ The designer's words: "keep it simple and have it like in final fantasy, aka eve
   - Each foe has a fixed rule for choosing its target.
   - Round cap, then retreat.
   - Speed coins are DEX + Athletics.
-- Mana: the size of the pool, its source stat, and whether it regenerates.
-- Speed control: E-0005 found that long-lived games give speed teeth (Haste and Slow, acting first).
+- Mana: the size of the pool and its source stat.

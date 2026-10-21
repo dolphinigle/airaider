@@ -39,3 +39,15 @@ Key observations:
 The core is proven deep enough. To close the gap, give speed teeth (statuses that shift it) and lean on weaknesses plus statuses that others read.
 
 Sources: pocketgamer.biz (SW 10th anniversary), pocketgamer.com (220M downloads), hellhades.com (Raid patch 4.30 skill instructions), gamepress.gg (Epic Seven basics), bluestacks.com (Raid auto AI).
+
+## Next
+
+Mechanics worth borrowing, offered to the designer on 2026-10-22:
+- Toughness break (Honkai: Star Rail).
+- Foe intents (Slay the Spire, and the charge-up turns of gacha bosses).
+- Waves, made harder by mana that doesn't refill.
+- Extra turn on a kill (Summoners War).
+- Cleanse and dispel.
+- Leader aura from the Leadership skill (Summoners War, Raid).
+- Reaction triggers: counter and retaliate.
+- One major status per unit (Pokémon).
