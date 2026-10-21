@@ -23,12 +23,13 @@ The shape we use in playtests until the designer rules otherwise. Sources: E-000
 
 ## Next
 
-1. **Simulated playtest** (new experiment): Claude acts as the game on the working model, the designer says what the player does. Record every idea and ruling as it lands.
-2. Keep design/ and this working model current as rulings come in; start `v4/` only after the shape is settled.
+1. **Review skills → base abilities with the designer** before any sim: about 5 base abilities per battle-capable skill (D-0033, D-0035), starting from E-0003 `skills-mock/fixed-list.md` and `skills-mock2/gen.mjs`. Mock the list, get feedback.
+2. **Simulated playtest** (new experiment): Claude acts as the game on the working model, the designer says what the player does. Record every idea and ruling as it lands.
+3. Keep design/ and this working model current as rulings come in; start `v4/` only after the shape is settled.
 
 ## Waiting on the designer
 
-- Nothing; the next playtest starts when the designer is ready.
+- Nothing; next session opens with the skills → abilities review.
 
 ## Notes
 
