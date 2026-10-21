@@ -2,18 +2,18 @@
 
 What a merc is made of (stats, skills, talents, level) and how they grow.
 
-## Stats (D-0022)
+## Stats (D-0044)
 
 Six stats, each a number of **coins**:
 
-| stat | covers |
-|---|---|
-| **STR** | strength |
-| **DEX** | agility, hands, reflexes |
-| **PER** | noticing, aim, reading people |
-| **INT** | intelligence |
-| **CHA** | charisma |
-| **CON** | endurance, toughness, willpower (nerve, fear, curses) |
+| stat | covers | in a fight |
+|---|---|---|
+| **STR** | strength | heavy melee |
+| **DEX** | agility, hands, reflexes, aim | **speed coins**; light weapons, ranged |
+| **INT** | intelligence | magic, lore |
+| **CHA** | charisma | holy magic, rallying, fear, songs |
+| **CON** | endurance, toughness | **max HP**; defense |
+| **WIL** | willpower: nerve, fear, curses, focus | the **stress check** (D-0042) |
 
 Starting stats are a little randomized, biased by **race**; a wolfkin leans DEX (D-0018).
 
@@ -30,31 +30,31 @@ The core skills, with the stats their tests usually pool with them (a quest may 
 | family | core skill | covers | stats |
 |---|---|---|---|
 | Fighting | **Heavy Weapons** | greatswords, axes, hammers, polearms | STR, CON |
-| | **Light Weapons** | swords, daggers, rapiers, brawling | DEX, PER |
-| | **Ranged** | bows, crossbows, slings, throwing | DEX, PER |
+| | **Light Weapons** | swords, daggers, rapiers, brawling | DEX, STR |
+| | **Ranged** | bows, crossbows, slings, throwing | DEX, STR |
 | | **Defense** | shields, armor, parrying, holding a line | CON, STR |
 | | **Athletics** | climbing, swimming, running, hauling, tumbling | STR, DEX |
 | | **Warfare** | tactics, formations, sieges, fortifications, battle plans | INT, STR |
-| Wilds | **Survival** | foraging, camping, weather, terrain, trails, hunting | CON, PER |
-| | **Awareness** | spotting ambushes, keeping watch, searching, reading people | PER, INT |
-| | **Beasts** | riding, taming, handling animals | CHA, PER |
-| Shadows | **Stealth** | sneaking, hiding, ambushes | DEX, PER |
+| Wilds | **Survival** | foraging, camping, weather, terrain, trails, hunting | CON, INT |
+| | **Awareness** | spotting ambushes, keeping watch, searching, reading people | DEX, INT |
+| | **Beasts** | riding, taming, handling animals | CHA, WIL |
+| Shadows | **Stealth** | sneaking, hiding, ambushes | DEX, INT |
 | | **Roguery** | locks, pockets, traps, forgery | DEX, INT |
 | | **Villainy** | banditry, smuggling, extortion, slaving, black markets, bribes | CHA, STR |
-| | **Streetwise** | rumors, finding people, city ways, local customs, who's who | PER, CHA |
-| Talk | **Persuasion** | charm, diplomacy, winning people over | CHA, PER |
+| | **Streetwise** | rumors, finding people, city ways, local customs, who's who | CHA, INT |
+| Talk | **Persuasion** | charm, diplomacy, winning people over | CHA, INT |
 | | **Deception** | lies, bluffs, disguises, cons | CHA, INT |
 | | **Bargaining** | haggling, selling, appraising: making money | CHA, INT |
 | | **Intimidation** | threats, interrogation | CHA, STR |
-| | **Leadership** | inspiring, rallying, morale, keeping a crew together | CHA, CON |
+| | **Leadership** | inspiring, rallying, morale, keeping a crew together | CHA, WIL |
 | | **Performance** | music, song, dance, acting, storytelling | CHA, DEX |
 | Knowing | **Civilization Lore** | the past, languages, peoples, faiths, heraldry | INT |
-| | **Science Lore** | nature, beasts, stars, numbers, how things work | INT, PER |
-| | **Arcane Lore** | the hidden world: monsters, undead, curses, relics, how magic works (knowing, not casting) | INT, CON |
-| | **Alchemy** | potions, poisons, remedies, bandaging | INT, PER |
+| | **Science Lore** | nature, beasts, stars, numbers, how things work | INT, DEX |
+| | **Arcane Lore** | the hidden world: monsters, undead, curses, relics, how magic works (knowing, not casting) | INT, WIL |
+| | **Alchemy** | potions, poisons, remedies, bandaging | INT, DEX |
 | | **Craft** | smithing, repairs, building, explosives | STR, INT |
-| Magic ✦ | **Elemental Magic** ✦ | fire, frost, lightning | INT, CON |
-| | **Holy Magic** ✦ | healing, blessing, warding off the dead | CHA, CON |
+| Magic ✦ | **Elemental Magic** ✦ | fire, frost, lightning | INT, WIL |
+| | **Holy Magic** ✦ | healing, blessing, warding off the dead | CHA, WIL |
 | | **Dark Magic** ✦ | curses, necromancy, draining life, pacts | INT, CHA |
 
 ## Talents (D-0018)

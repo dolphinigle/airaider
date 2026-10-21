@@ -23,7 +23,7 @@ The shape we use in playtests until the designer rules otherwise. Sources: E-000
 
 ## Next
 
-1. **Review attributes and skills with the designer:** the 6 stats (D-0022) and the 27 core skills, now that combat is a ranked line with speed, stress and roles (tank, healer, reach). Check:
+1. **Review attributes and skills with the designer:** the 6 stats (STR DEX INT CHA CON WIL, D-0044; PER folded into DEX and Awareness) and the 27 core skills, now that combat is a ranked line with speed, stress and roles (tank, healer, reach). Check:
    - what each stat does in a fight (speed, HP, the stress check);
    - which skills feed which abilities;
    - which skills only act outside fights.
@@ -43,7 +43,6 @@ The shape we use in playtests until the designer rules otherwise. Sources: E-000
   - downed at 0 HP;
   - a risk dial per quest;
   - a morale bar for foes.
-- **Stress:** which stat the check flips (Claude: CON).
 - **Sprites (D-0043)** are parked as a detail.
 
 ## Notes

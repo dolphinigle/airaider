@@ -28,7 +28,7 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0019](D-0019-a-test-pools-one-two-or-rarely-three-stats.md) | A test pools one, two, or rarely three stats | accepted | designer | 2026-10-21 |
 | [D-0020](D-0020-skill-unlocks-every-3-levels-pick-1-of-2-hidden-until-the-le.md) | Skill unlocks: every 3 levels, pick 1 of 2, hidden until the level up | superseded → D-0035 | designer | 2026-10-21 |
 | [D-0021](D-0021-core-skills-ai-names-the-exact-skill-and-maps-it-to-one.md) | Core skills; AI names the exact skill and maps it to one | accepted | designer | 2026-10-21 |
-| [D-0022](D-0022-six-stats-per-joins-con-covers-willpower.md) | Six stats: PER joins, CON covers willpower | accepted | designer | 2026-10-21 |
+| [D-0022](D-0022-six-stats-per-joins-con-covers-willpower.md) | Six stats: PER joins, CON covers willpower | superseded → D-0044 | designer | 2026-10-21 |
 | [D-0023](D-0023-fights-are-displayed-ai-writes-only-the-start-and-end-lines-.md) | Fights are displayed; AI writes only the start and end lines and the sprites | accepted | designer | 2026-10-21 |
 | [D-0024](D-0024-losing-a-fight-injures-never-kills.md) | Losing a fight injures, never kills | accepted | designer | 2026-10-21 |
 | [D-0025](D-0025-battle-skills-are-base-skills-plus-engine-priced-modifiers-n.md) | Battle skills are base skills plus engine-priced modifiers, named by the AI | proposed | designer | 2026-10-21 |
@@ -50,4 +50,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0041](D-0041-combat-basics-one-line-per-side-speed-coins-each-round-stat-.md) | Combat basics: one line per side, speed coins each round, stat plus skill coins times base | proposed | designer | 2026-10-22 |
 | [D-0042](D-0042-stress-a-darkest-dungeon-style-bar-that-carries-across-quest.md) | "Stress: a Darkest Dungeon style bar that carries across quests" | accepted | designer | 2026-10-22 |
 | [D-0043](D-0043-fight-sprites-one-ai-painted-image-per-pose-as-in-darkest-du.md) | "Fight sprites: one AI-painted image per pose, as in Darkest Dungeon" | proposed | designer | 2026-10-22 |
+| [D-0044](D-0044-six-stats-per-folds-into-dex-wil-takes-willpower-from-con.md) | "Six stats: PER folds into DEX, WIL takes willpower from CON" | accepted | designer | 2026-10-22 |
 <!-- index:end -->

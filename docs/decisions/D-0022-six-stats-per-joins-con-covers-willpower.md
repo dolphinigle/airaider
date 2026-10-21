@@ -1,11 +1,11 @@
 ---
 id: D-0022
 title: Six stats: PER joins, CON covers willpower
-status: accepted
+status: superseded
 date: 2026-10-21
 decided-by: designer
 supersedes: [D-0009]
-superseded-by:
+superseded-by: D-0044
 evidence: [E-0001]
 sources: [archive/v3/GENERATION_FLOW.md §10]
 ---
