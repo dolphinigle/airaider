@@ -62,3 +62,7 @@ Claude: balance parked; no more balance tuning in E-0003 mocks.
 **Designer:** "dont forge tthe goal -- right now we're brainstorming ideas that yous hould record. so that we get what the game should look like"
 
 Claude: NOW.md now holds a "Working model (brainstormed, not locked)" section; E-0001 and E-0003 closed.
+
+**Designer:** "btw MODS are rare. only rarely can mercs get a skill that rolls two mods, and even rarer three mods. this feeds into the "gacha" system for mercs, but we also want mercs to be able to grow with player so likel a rare item later that can "upgrade" mercs or something but needs to be really rare or limited or smth. but yea just info about the design."
+
+Claude: recorded in D-0025 (proposed) and the NOW working model.

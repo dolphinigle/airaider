@@ -22,7 +22,8 @@ The designer's words: "we have a list of skills, and a bunch of modifiers for it
 - **Base skills** are a fixed engine list. Each comes from a core skill and states a damage type, a target pattern on the grid, a stamina cost and a mana cost.
 - **Damage is per heads.** The merc flips their coin pool for the skill; each heads deals the skill's number ("Deal 3 PHYSICAL" = 3 per heads).
 - **Modifiers** are a fixed engine list. Each adds an effect and a cost; the engine computes the final skill.
-- **The AI** names each of a merc's skills and picks 1 or 2 modifiers for it, once, when the merc's skills are made. Names only: no flavor lines. Proposed by Claude: the engine deals the AI 3 fitting candidate modifiers per skill, weighted by the merc's skills, and the AI picks from those.
+- **Modifiers are rare** and part of the recruit's gacha. The designer's words: "MODS are rare. only rarely can mercs get a skill that rolls two mods, and even rarer three mods. this feeds into the \"gacha\" system for mercs". The engine rolls how many modifiers each skill gets.
+- **The AI** names each of a merc's skills and picks its rolled modifiers, once, when the merc's skills are made. Names only: no flavor lines. Proposed by Claude: the engine deals the AI 3 fitting candidate modifiers per skill, weighted by the merc's skills, and the AI picks from those.
 
 ## Status note
 
@@ -32,4 +33,5 @@ The designer said "ok sure" but also "the 2x3 grid etc stuff is not locked": thi
 
 - Balance stays in engine data; the AI only shapes and names.
 - Damage scales with coins, so foe HP is set in multiples of the per-heads numbers.
+- Growth: the designer wants mercs to grow with the player, e.g. a really rare or limited item that upgrades a merc (such as adding a modifier). Not designed yet.
 - Open: whether a modifier's damage (Fiery +1 FIRE) is per heads too (assumed yes); damage types and resistances; stamina and mana pools and regeneration; how slots and tactic books (E-0003) sit on top.

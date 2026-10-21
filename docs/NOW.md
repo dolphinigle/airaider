@@ -12,7 +12,9 @@ The shape we use in playtests until the designer rules otherwise. Sources: E-000
 
 - **Party:** about 4 mercs per quest (e.g. two warriors, a mage, a healer).
 - **Grid:** each side on a 2×3 grid, 3 frontline and 3 backline (as in Vagrus).
-- **Battle skills:** fixed base skills (damage type, grid target, stamina and mana cost) from the merc's core skills, plus 1-2 engine-priced modifiers (Fiery, Stunning, Lasting…). The AI names each skill once and picks its modifiers from engine-dealt candidates; names only, no lines. A skill's number is damage per heads (D-0025).
+- **Battle skills:** fixed base skills (damage type, grid target, stamina and mana cost) from the merc's core skills, plus engine-priced modifiers (Fiery, Stunning, Lasting…). The AI names each skill once and picks its rolled modifiers from engine-dealt candidates; names only, no lines. A skill's number is damage per heads (D-0025).
+- **Modifiers are rare** and part of the recruit's gacha: most skills roll none, two on one skill is rare, three rarer still (designer).
+- **Upgrade item:** mercs should grow with the player; a really rare or limited item could upgrade a merc (e.g. add a modifier). Not designed yet.
 - **Slots:** skills sit in priority slots S1-S4; on its turn a merc uses the first ready one. 1-2 slots at first (no tactics needed), more as they level (Live A Hero style).
 - **Tactic books:** lootable "condition → use S*k*" overrides ("vs undead → S3", "low mana → S2"), slots unlocked by level. Best when foes have sharp twists; a book can drop from the foe family it answers.
 - **Foe families** each get one sharp twist that punishes a default setup (foe healer, armored undead, enraging boss, fire-immune imps).
