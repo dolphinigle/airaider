@@ -24,7 +24,8 @@ How a quest plays out: autobattles and coin-flip skill checks, told in quick sim
 - A fight is **displayed** as animation, not read. The AI writes one line at its start and one at its end, plus the sprites (D-0023).
 - Losing a fight **injures**, never kills (D-0024).
 - A fight is an **autobattle**: the player sets the party up beforehand and the fight plays itself (D-0026).
-- Working model, not locked: a party on a 2×3 grid, skills in priority slots S1–S4, lootable tactic books, battle skills = base skills + priced modifiers named by the AI, damage per heads (D-0025 proposed; E-0003).
+- Each merc equips **four battle skills** (D-0028). A **tactic** has three slots: a condition, an action and a target (D-0030).
+- Working model, not locked: a party on a 2×3 grid, battle skills = base skills + priced modifiers named by the AI, damage per heads (D-0025 proposed; E-0003).
 
 ## Open
 

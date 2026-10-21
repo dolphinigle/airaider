@@ -33,4 +33,9 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0024](D-0024-losing-a-fight-injures-never-kills.md) | Losing a fight injures, never kills | accepted | designer | 2026-10-21 |
 | [D-0025](D-0025-battle-skills-are-base-skills-plus-engine-priced-modifiers-n.md) | Battle skills are base skills plus engine-priced modifiers, named by the AI | proposed | designer | 2026-10-21 |
 | [D-0026](D-0026-quests-resolve-through-autobattles-and-pure-coin-flip-skill-.md) | Quests resolve through autobattles and pure coin-flip skill checks | accepted | designer | 2026-10-21 |
+| [D-0027](D-0027-recruits-have-half-star-rarity-that-sets-their-modifier-odds.md) | Recruits have half-star rarity that sets their modifier odds | accepted | designer | 2026-10-21 |
+| [D-0028](D-0028-a-merc-rolls-one-new-battle-skill-per-level-up-and-equips-fo.md) | A merc rolls one new battle skill per level up and equips four | accepted | designer | 2026-10-21 |
+| [D-0029](D-0029-rare-items-raise-a-merc-s-star-or-reroll-their-seed-resettin.md) | Rare items raise a merc's star or reroll their seed, resetting their level | accepted | designer | 2026-10-21 |
+| [D-0030](D-0030-a-tactic-is-three-parts-condition-action-target.md) | "A tactic is three parts: condition, action, target" | accepted | designer | 2026-10-21 |
+| [D-0031](D-0031-names-for-the-two-kinds-of-skill.md) | Names for the two kinds of skill | proposed | designer | 2026-10-21 |
 <!-- index:end -->

@@ -2,11 +2,11 @@
 id: E-0004
 title: Modifier rarity: flat odds vs star tiers
 date: 2026-10-21
-status: running           # planned | running | done | abandoned
+status: done              # planned | running | done | abandoned
 type: sim                 # sim | playtest | lab | judge | research
 question: How should modifiers be rolled on recruits so they stay rare but make a pull exciting, flat odds or star tiers?
-verdict:                  # one line, filled in when done: the answer
-decisions: []             # decisions it led to or proposed, e.g. [D-0005]
+verdict: Stars, in half steps; the star sets each battle skill's modifier odds, capped at 4, and high stars get commoner as the game goes on (D-0027).
+decisions: [D-0027, D-0028, D-0029]             # decisions it led to or proposed, e.g. [D-0005]
 commit:                   # the commit or tag of the code it ran on, if any
 ---
 
@@ -47,6 +47,24 @@ Reading the boards as a player:
 
 Claude's read: starcount lands best; flatmerc is the plain fallback if stars feel too gacha. Open: mods should probably favour the merc's signature skills, and whether stars should say anything beyond mods.
 
+## Round 2: the designer's rulings
+
+The designer: "Stars: yes. and make it every half star so even more variance. Higher rarity units become mroe "common" as game progress. ... for now rarity only affect mods. lets cap mods at FOUR mods ... like 0.1% on a five star unit per skill", plus one new battle skill per level up, four equipped (D-0027, D-0028).
+
+`halfstar.mjs` (`stats 50000` → `samples/halfstar-stats.txt`; boards at game start and end and one 4★ career → `samples/halfstar-boards.txt`). Each battle skill rolls 0–4 mods by star (1★ 88/12/0/0/0 … 5★ 30/50/16/3.9/0.1, half stars average their neighbours). The recruit star mix slides from mostly 1–2★ at the start to mostly 2.5–4★ at the end. Careers are 2 start skills + 11 level ups = 13 battle skills.
+
+| star | skills with a mod | mods on the best 4 | has a 2-mod skill | 3+ | 4 |
+|---|---|---|---|---|---|
+| 1★ | 1.6 | 1.5 | 0% | 0% | 0% |
+| 2★ | 3.2 | 3.2 | 23% | 0% | 0% |
+| 3★ | 5.2 | 4.8 | 61% | 12% | 0% |
+| 4★ | 7.2 | 5.9 | 84% | 23% | 0.24% |
+| 5★ | 9.1 | 7.0 | 95% | 41% | 1.3% |
+
+- A four-mod skill turns up in about 1 of 80 full 5★ careers: very rare, as asked.
+- The star now promises every future roll, so it reads true even when a recruit shows two plain skills.
+- A merc's kit of 4 base skills repeats often over 13 level ups (one 4★ career rolled Strike four times). Each skill needs more base battle skills, or a repeat should be the hoped-for better copy.
+
 ## Verdict
 
-Pending the designer.
+Stars in half steps set each battle skill's modifier odds (cap 4, about 0.1% for four on a 5★), and high stars get commoner as the game goes on (D-0027). Mercs roll a battle skill per level and equip four (D-0028); rare items raise the star or reroll the seed (D-0029). Numbers are working values; balance is parked.

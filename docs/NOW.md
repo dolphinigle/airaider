@@ -4,7 +4,7 @@
 
 **Phase:** prototype v4, brainstorming what the game should look like (started 2026-10-19). Goal right now: shape the game through designer-led brainstorms and simulated playtests, **recording every idea** as it lands (decision if ruled, working model below if not). No code yet.
 
-**Locked so far:** mercs (stats, skills, talents, levels, growth: [design/mercs.md](design/mercs.md)); quests resolve through **autobattles + pure coin-flip skill checks** (D-0026), fights displayed with AI lines only before and after (D-0023), losing injures, never kills (D-0024): [design/quests.md](design/quests.md).
+**Locked so far:** mercs (stats, skills, talents, levels, growth: [design/mercs.md](design/mercs.md)); quests resolve through **autobattles + pure coin-flip skill checks** (D-0026), fights displayed with AI lines only before and after (D-0023), losing injures, never kills (D-0024): [design/quests.md](design/quests.md). Half-star rarity sets modifier odds (D-0027); a battle skill per level up, four equipped (D-0028); star-up and reroll items (D-0029); tactics are condition + action + target (D-0030).
 
 ## Working model (brainstormed, not locked)
 
@@ -13,23 +13,22 @@ The shape we use in playtests until the designer rules otherwise. Sources: E-000
 - **Party:** about 4 mercs per quest (e.g. two warriors, a mage, a healer).
 - **Grid:** each side on a 2×3 grid, 3 frontline and 3 backline (as in Vagrus).
 - **Battle skills:** fixed base skills (damage type, grid target, stamina and mana cost) from the merc's core skills, plus engine-priced modifiers (Fiery, Stunning, Lasting…). The AI names each skill once and picks its rolled modifiers from engine-dealt candidates; names only, no lines. A skill's number is damage per heads (D-0025).
-- **Modifiers are rare** and part of the recruit's gacha: most skills roll none, two on one skill is rare, three rarer still (designer). How to roll them is under test in E-0004 (flat odds vs 1★–5★ stars); Claude's pick is stars that fix the mod count (★★★ = two mods).
-- **Upgrade item:** mercs should grow with the player; a really rare or limited item could upgrade a merc (e.g. add a modifier). Not designed yet.
-- **Slots:** skills sit in priority slots S1-S4; on its turn a merc uses the first ready one. 1-2 slots at first (no tactics needed), more as they level (Live A Hero style).
-- **Tactic books:** lootable "condition → use S*k*" overrides ("vs undead → S3", "low mana → S2"), slots unlocked by level. Best when foes have sharp twists; a book can drop from the foe family it answers.
+- **Modifiers:** 0–4 per battle skill, odds by star (D-0027); about 30 should fit each base skill.
+- **Equip order:** the four equipped battle skills sit in priority order S1–S4; on its turn a merc uses the first ready one. Whether all four slots are open from Lv1 is open.
+- **Tactics:** condition + action + target (D-0030), e.g. "an ally below 50% HP" + "use S4" + "the ally with the lowest HP". Which parts are loot, and how many lines a merc gets, is open. Best when foes have sharp twists.
 - **Foe families** each get one sharp twist that punishes a default setup (foe healer, armored undead, enraging boss, fire-immune imps).
-- **Re-slot at base**, between quests; books cover changes inside a quest; scouting or lore can reveal what's ahead.
+- **Re-equip at base**, between quests; tactics cover changes inside a quest; scouting or lore can reveal what's ahead.
 - **Balance:** parked; assume it works (designer).
 
 ## Next
 
-1. **E-0004 modifier rarity:** waiting on the designer's read.
-2. **Simulated playtest** (new experiment): Claude acts as the game on the working model, the designer says what the player does. Record every idea and ruling as it lands.
-3. Keep design/ and this working model current as rulings come in; start `v4/` only after the shape is settled.
+1. **Simulated playtest** (new experiment): Claude acts as the game on the working model, the designer says what the player does. Record every idea and ruling as it lands.
+2. Keep design/ and this working model current as rulings come in; start `v4/` only after the shape is settled.
 
 ## Waiting on the designer
 
-- E-0004: which rarity scheme lands.
+- D-0031: the names for the two kinds of skill (proposed: skills and arts).
+- D-0029: star-up step (½★ or 1★) and what survives a reset.
 
 ## Notes
 

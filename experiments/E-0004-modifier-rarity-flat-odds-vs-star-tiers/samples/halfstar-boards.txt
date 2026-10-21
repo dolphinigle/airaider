@@ -1,0 +1,56 @@
+TAVERN BOARD (game progress 0%)
+Atlas ★★ · human · Elemental Magic, Science Lore
+   Bolt
+   Wave  +Swift
+
+Brann ★★★½ · wolfkin · Light Weapons, Intimidation
+   Strike
+   Lunge
+
+Fenn ★ · elf · Ranged, Persuasion
+   Shot
+   Volley
+
+Galla ★★★★★ · dwarf · Heavy Weapons, Defense, Arcane Lore
+   Strike
+   Cleave  +Guarding
+
+Ysolde ★★ · dwarf · Heavy Weapons, Defense, Arcane Lore
+   Strike
+   Cleave
+
+TAVERN BOARD (game progress 100%)
+Atlas ★★★ · human · Elemental Magic, Science Lore
+   Bolt
+   Wave  +Swift
+
+Brann ★★★★½ · wolfkin · Light Weapons, Intimidation
+   Strike
+   Lunge
+
+Fenn ★★ · elf · Ranged, Persuasion
+   Shot
+   Volley  +Swift
+
+Galla ★ · elf · Ranged, Persuasion
+   Shot
+   Volley
+
+Ysolde ★★★½ · dwarf · Heavy Weapons, Defense, Arcane Lore
+   Strike
+   Cleave
+
+Brann ★★★★ · human · Holy Magic, Alchemy
+   Lv1  Heal
+   Lv1  Smite  +Icy
+   Lv2  Strike  +Sundering
+   Lv3  Heal
+   Lv4  Potion
+   Lv5  Heal  +Generous
+   Lv6  Strike  +Heavy +Holy   ◆◆
+   Lv7  Smite  +Holy
+   Lv8  Strike  +Fiery
+   Lv9  Strike
+   Lv10 Strike  +Swift
+   Lv11 Potion
+   Lv12 Smite  +Fiery
