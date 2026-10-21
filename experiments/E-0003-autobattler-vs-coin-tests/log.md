@@ -26,3 +26,7 @@ Claude: building a small party-autobattle sim (partysim.mjs): 4 mercs, coin flip
 
 `RULE:` fights are displayed, AI writes only start/end lines and sprites (D-0023). Losing a fight injures, never kills (D-0024).
 Claude: sim v2 (partysim2.mjs): skills from core skills, S1-S4 priority order, tactic books as lootable conditional overrides, slots unlock with level.
+
+**Designer:** "so my question: did having battle make it more fun?"
+
+Claude: unknown. The sims measure proxies (decision leverage, close wins), not fun; nobody has played a fight as a player. Findings open bullet rewritten. Proposed next: a small playable, displayed fight for the designer to judge.
