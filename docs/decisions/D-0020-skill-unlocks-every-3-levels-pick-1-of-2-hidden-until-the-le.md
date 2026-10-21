@@ -1,11 +1,11 @@
 ---
 id: D-0020
 title: Skill unlocks: every 3 levels, pick 1 of 2, hidden until the level up
-status: accepted
+status: superseded
 date: 2026-10-21
 decided-by: designer
 supersedes: [D-0017]
-superseded-by:
+superseded-by: D-0035
 evidence: [E-0001]
 sources: []
 ---

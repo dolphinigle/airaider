@@ -76,7 +76,7 @@ Two random draws over the six stats at recruitment. They may land on the same st
 
 Expected gain per level: a ++ stat +1.00 (others +0.5); two + stats about +0.875 each (others about +0.42), with five stats; slightly less on the others with six.
 
-**The player's choice is a skill** (D-0020; D-0035 proposes instead: start with two skills, rarely three by star, and pick 1 of 3 at Lv 7): every 3 levels (Lv 3, 6, 9, 12) the merc unlocks a new skill, picking 1 of 2 options. The options are rolled at recruitment (weighted by race and background, from core skills the merc lacks) and stay hidden until that level up.
+**The player's choice is a skill** (D-0035): a merc **starts with two skills** (a third is rare, likelier at higher stars), and at **Lv 7** learns one more, **picking 1 of 3**, hidden until then. The options are rolled at recruitment (weighted by race and background, from skills the merc lacks).
 
 ## Rarity (D-0027)
 
@@ -89,11 +89,11 @@ What a merc does in a fight is an **ability**; a **skill** (Survival, Swords…)
 - **Every level up rolls one new ability**, with modifiers by star, from the base abilities of the merc's skills. **Never the same base twice.**
 - A merc **equips four** abilities.
 - An ability is a fixed base plus modifiers, named by the AI (D-0025, proposed).
-- Proposed: passives are personality traits (D-0036).
+- **Passives are personality traits** (D-0036): one or two per merc, part of the starting position ("Stubborn: can't be stunned while above half HP").
 
 ## Upgrade items (D-0029)
 
-- A **star-up item** raises a merc's star. Very rare, probably also limited per game. It resets the merc's level and rerolls their seed.
+- A **star-up item** sets a merc to a fixed star within a stated range ("turns a 2–3★ into a 4★"); none reaches 5★, so 5★ stays valuable (D-0037). Very rare, probably also limited per game. It resets the merc's level and rerolls their seed.
 - A **reroll item** (like Path of Exile's Chaos Orb) rerolls the merc's seed, probably resetting their level too.
 - A reset keeps everything (the **starting position**) except the **level-up seed**, which decides only what level ups roll (D-0032).
 
@@ -104,4 +104,4 @@ Rolled when a merc is generated: race, rarity, starting stats, talents, starting
 ## Open
 
 - Numbers: starting stat spread per race, XP curve and penalty curve, skill XP thresholds.
-- What personality traits (Gruff) do mechanically.
+- Each trait's passive effect (D-0036).

@@ -1,8 +1,8 @@
 ---
 id: D-0035
 title: Mercs start with two skills, rarely three by star, and pick a third of three at Lv 7
-status: proposed
-date: 2026-10-21
+status: accepted
+date: 2026-10-22
 decided-by: designer
 supersedes: [D-0020]
 superseded-by:
@@ -14,6 +14,8 @@ sources: []
 D-0020 unlocks a skill every 3 levels (pick 1 of 2). Skills now also decide which abilities a merc can learn (D-0033).
 
 ## Decision
+
+Accepted by the designer (2026-10-22): "yeah sounds good."
 
 The designer, proposing: "insetad of learning new skill every 6 levels, just have each unit start with two skills (rarely three, the rarity scales up with stars), then at level 7 learn a third one choice btween 3 or something? what do you think, is that more interestigng?"
 

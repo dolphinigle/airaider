@@ -1,8 +1,8 @@
 ---
 id: D-0036
 title: Passives come from personality traits
-status: proposed
-date: 2026-10-21
+status: accepted
+date: 2026-10-22
 decided-by: designer
 supersedes: []
 superseded-by:
@@ -15,7 +15,9 @@ The designer: "And also Passives -- so a unit can have like 4 abilities and 4 pa
 
 ## Decision
 
-Proposed by Claude: passives are **personality traits**, one or two per merc, rolled at recruitment (part of the starting position, D-0032). "Stubborn: can't be stunned while above half HP."
+Accepted by the designer (2026-10-22): "yeah sounds good."
+
+Proposed by Claude, accepted: passives are **personality traits**, one or two per merc, rolled at recruitment (part of the starting position, D-0032). "Stubborn: can't be stunned while above half HP."
 
 ## Consequences
 

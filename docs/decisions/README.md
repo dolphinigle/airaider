@@ -26,7 +26,7 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0017](D-0017-skill-unlocks-every-3-levels-pick-1-of-2-rolled-at-recruitme.md) | Skill unlocks: every 3 levels, pick 1 of 2, rolled at recruitment | superseded → D-0020 | designer | 2026-10-21 |
 | [D-0018](D-0018-stat-growth-always-three-coins-per-level-led-by-talents.md) | Stat growth: always three coins per level, led by talents | accepted | designer | 2026-10-21 |
 | [D-0019](D-0019-a-test-pools-one-two-or-rarely-three-stats.md) | A test pools one, two, or rarely three stats | accepted | designer | 2026-10-21 |
-| [D-0020](D-0020-skill-unlocks-every-3-levels-pick-1-of-2-hidden-until-the-le.md) | Skill unlocks: every 3 levels, pick 1 of 2, hidden until the level up | accepted | designer | 2026-10-21 |
+| [D-0020](D-0020-skill-unlocks-every-3-levels-pick-1-of-2-hidden-until-the-le.md) | Skill unlocks: every 3 levels, pick 1 of 2, hidden until the level up | superseded → D-0035 | designer | 2026-10-21 |
 | [D-0021](D-0021-core-skills-ai-names-the-exact-skill-and-maps-it-to-one.md) | Core skills; AI names the exact skill and maps it to one | accepted | designer | 2026-10-21 |
 | [D-0022](D-0022-six-stats-per-joins-con-covers-willpower.md) | Six stats: PER joins, CON covers willpower | accepted | designer | 2026-10-21 |
 | [D-0023](D-0023-fights-are-displayed-ai-writes-only-the-start-and-end-lines-.md) | Fights are displayed; AI writes only the start and end lines and the sprites | accepted | designer | 2026-10-21 |
@@ -41,6 +41,7 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0032](D-0032-a-reset-rerolls-only-the-level-up-seed-everything-else-stays.md) | A reset rerolls only the level-up seed; everything else stays | accepted | designer | 2026-10-21 |
 | [D-0033](D-0033-abilities-one-per-level-up-from-the-merc-s-skills-never-the-.md) | Abilities: one per level up from the merc's skills, never the same base twice, four equipped | accepted | designer | 2026-10-21 |
 | [D-0034](D-0034-tactic-parts-are-loot-no-gear-for-now.md) | Tactic parts are loot; no gear for now | accepted | designer | 2026-10-21 |
-| [D-0035](D-0035-mercs-start-with-two-skills-rarely-three-by-star-and-pick-a-.md) | Mercs start with two skills, rarely three by star, and pick a third of three at Lv 7 | proposed | designer | 2026-10-21 |
-| [D-0036](D-0036-passives-come-from-personality-traits.md) | Passives come from personality traits | proposed | designer | 2026-10-21 |
+| [D-0035](D-0035-mercs-start-with-two-skills-rarely-three-by-star-and-pick-a-.md) | Mercs start with two skills, rarely three by star, and pick a third of three at Lv 7 | accepted | designer | 2026-10-22 |
+| [D-0036](D-0036-passives-come-from-personality-traits.md) | Passives come from personality traits | accepted | designer | 2026-10-22 |
+| [D-0037](D-0037-a-star-up-item-sets-a-merc-to-a-fixed-star-so-5-stars-stay-v.md) | A star-up item sets a merc to a fixed star, so 5 stars stay valuable | accepted | designer | 2026-10-21 |
 <!-- index:end -->

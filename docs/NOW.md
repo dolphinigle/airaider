@@ -4,7 +4,7 @@
 
 **Phase:** prototype v4, brainstorming what the game should look like (started 2026-10-19). Goal right now: shape the game through designer-led brainstorms and simulated playtests, **recording every idea** as it lands (decision if ruled, working model below if not). No code yet.
 
-**Locked so far:** mercs (stats, skills, talents, levels, growth: [design/mercs.md](design/mercs.md)); quests resolve through **autobattles + pure coin-flip skill checks** (D-0026), fights displayed with AI lines only before and after (D-0023), losing injures, never kills (D-0024): [design/quests.md](design/quests.md). Half-star rarity sets modifier odds (D-0027); **abilities** (fight) vs **skills** (Survival…) (D-0031): one new ability per level up from the merc's skills, never the same base twice, four equipped (D-0033); star-up and reroll items reroll only the level-up seed (D-0029, D-0032); tactics are condition + action + target, parts are loot (D-0030, D-0034); no gear for now (D-0034).
+**Locked so far:** mercs (stats, skills, talents, levels, growth: [design/mercs.md](design/mercs.md)); quests resolve through **autobattles + pure coin-flip skill checks** (D-0026), fights displayed with AI lines only before and after (D-0023), losing injures, never kills (D-0024): [design/quests.md](design/quests.md). Half-star rarity sets modifier odds (D-0027); **abilities** (fight) vs **skills** (Survival…) (D-0031): one new ability per level up from the merc's skills, never the same base twice, four equipped (D-0033); star-up and reroll items reroll only the level-up seed (D-0029, D-0032), a star-up sets a fixed star below 5★ (D-0037); two starting skills, pick 1 of 3 at Lv 7 (D-0035); passives are traits (D-0036); tactics are condition + action + target, parts are loot (D-0030, D-0034); no gear for now (D-0034).
 
 ## Working model (brainstormed, not locked)
 
@@ -18,8 +18,6 @@ The shape we use in playtests until the designer rules otherwise. Sources: E-000
 - **Tactics:** condition + action + target (D-0030), e.g. "an ally below 50% HP" + "use S4" + "the ally with the lowest HP". How many lines a merc gets is open. Best when foes have sharp twists.
 - **Foe families** each get one sharp twist that punishes a default setup (foe healer, armored undead, enraging boss, fire-immune imps).
 - **Re-equip at base**, between quests; tactics cover changes inside a quest; scouting or lore can reveal what's ahead.
-- **Skills over a career** (D-0035, proposed): start with two, rarely three by star; pick 1 of 3 at Lv 7.
-- **Passives** (D-0036, proposed): personality traits, one or two per merc.
 - **Balance:** parked; assume it works (designer).
 
 ## Next
@@ -29,8 +27,7 @@ The shape we use in playtests until the designer rules otherwise. Sources: E-000
 
 ## Waiting on the designer
 
-- D-0035 (skills: two at start, pick 1 of 3 at Lv 7) and D-0036 (passives = traits).
-- D-0029: star-up step (½★ or 1★).
+- Nothing; the next playtest starts when the designer is ready.
 
 ## Notes
 
