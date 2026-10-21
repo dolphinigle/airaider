@@ -50,3 +50,7 @@ Claude: mock 2 done ([skills-mock2/cards.md](skills-mock2/cards.md)). Free picks
 **Designer:** "3 is 3 damage PER heads."
 
 `RULE:` a skill's number is damage per heads; the merc's coin pool decides how many heads. Recorded in proposed D-0025 (battle skills).
+
+**Designer:** "we'll figure out balance later" / "for now just assume it works"
+
+Claude: balance parked; no more balance tuning in E-0003 mocks.
