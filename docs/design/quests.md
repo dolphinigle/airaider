@@ -17,8 +17,14 @@ How a quest plays out: a short run of coin tests, told in quick simple lines.
 - Each test gets one simple line announcing it ("Bandits on the road!") and one for the result ("Atlas took a cut!"). The **engine** states the mechanical effect ("Atlas is WOUNDED"), never the prose (D-0007).
 - The AI writes only this small text; the fun is in the mechanics (D-0004).
 
+## Fights
+
+- A fight is **displayed** as animation, not read. The AI writes one line at its start and one at its end, plus the sprites (D-0023).
+- Losing a fight **injures**, never kills (D-0024).
+- How a fight plays out (party coin autobattle with skills and tactics) is being tested in E-0003.
+
 ## Open
 
-- What happens during a quest besides the tests (choices, push or retreat, fights): see [NOW.md](../NOW.md).
+- What happens during a quest besides the tests (choices, push or retreat), and the fight model: E-0003.
 - What failing a test or a quest costs (wounds, loot, death).
-- Presentation: coin-flip animation with pixel-art merc and foe (designer direction, not ruled).
+- Presentation: pixel-art sprites (AI-made, D-0023), coin-flip animation.

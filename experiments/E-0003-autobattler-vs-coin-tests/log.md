@@ -21,3 +21,8 @@ Claude: E dropped. Findings refined: the failure is a fight no choice shaped, no
 **Designer:** "im leaning towards coin autobattle but in a way that player can ifnluence. for example, player can set a "party", e.g., 4 units, like two warrior, one mage, one healer. Then can manipulate how they use their skills, e.g., "if ally < 50 then use Skill 2" on the healer which skill 2is heal or something? pls experiment then rpeot"
 
 Claude: building a small party-autobattle sim (partysim.mjs): 4 mercs, coin flips, FF12-style rules per merc; test whether rules change outcomes and make fights close.
+
+**Designer:** "yea the fight will be DISPLAYED not read. ai writing is just for start/end not mid fight and for generating the sprites. (2) loss != kill, just injured. (3) are the skills flexible for this? also the ruleset instead of dragon age "coding-like" style can you use something like live a hero "dragon and drop" skills? like for example, say each hero has 3-4 skills named S1, S2, S3, and S4 (initially only 1-2 unlock for ramp, so initially you dont need tactics). you can set which ones to be S1, S2, S3, S4. then as you level up it unlock slots and tactic slots, where you can put the "tactics". for example, against undead, use S3 or when low on mana, use S2 or things like that? the "tactic slots" are actually 'tactic books' and are lootables or something?""
+
+`RULE:` fights are displayed, AI writes only start/end lines and sprites (D-0023). Losing a fight injures, never kills (D-0024).
+Claude: sim v2 (partysim2.mjs): skills from core skills, S1-S4 priority order, tactic books as lootable conditional overrides, slots unlock with level.
