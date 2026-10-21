@@ -18,11 +18,12 @@ Abilities come from a merc's skills (D-0033), so the skill list decides who can 
 
 The designer's words: "the core fighting skills would be: heavy weapon, light weapon, ranged, defense, warfare (buffs/debuffs), animal companion (new, replaces beasts), stealth, leadership (buffs/debuffs), performance (buffs/debuffs), doctor (new, healing), alchemy (status effects), science (status effects), all magic ones?"
 
-- **Fighting skills, 16:**
+- **Fighting skills, 17:**
   - weapons: Heavy Weapons, Light Weapons, **Unarmed** (D-0045; added by Claude, it was missing from the list), Ranged;
   - Defense;
   - buffs and debuffs: Warfare, Leadership, Performance;
   - **Animal Companion** (new, replaces Beasts);
+  - **Villainy**, which is bounty-hunter skills (designer, 2026-10-22: "Villainy is a fighting skill. its basically bounty hunter skills");
   - Stealth;
   - **Doctor** (new, healing);
   - status effects: Alchemy, Science;
@@ -35,13 +36,15 @@ The designer's words: "the core fighting skills would be: heavy weapon, light we
   | Survival | second wind (small self heal), shrugging off damage over time |
   | Awareness | marking a foe, revealing hidden foes, going faster in round 1 |
   | Roguery | dirty tricks (Blind, Weak), caltrops |
-  | Villainy | cheap shots, a shakedown that gives more loot |
   | Intimidation | fear (Weak, a skipped turn), stressing foes |
   | Deception | feints, a decoy that pulls one hit, a disguise (can't be targeted for a round) |
   | Persuasion | calming (stress relief), talking a foe out of attacking for a turn |
   | Arcane Lore | exposing the weakness of undead and monsters, warding off curses |
-  | Craft | barricades (a shield), explosives, mending armor |
   | Streetwise, Bargaining, Civilization Lore | maybe none (a bribe that makes a hired foe flee?) |
+
+- **Craft changes** (designer: "I think we want to change Craft. Alchemy is already separate. Maybe Smithing and something else?"). Claude's proposal, not yet ruled: split it into two skills.
+  - **Smithing** covers weapons, armor and repairs. In fights: sharpen an ally's weapon (more damage), mend armor (a shield). At base: gear, once gear comes.
+  - **Engineering** covers building, machines, explosives and setting traps. In fights: bombs, caltrops, barricades. At base: construction.
 
 ## Open (Claude's flags)
 
