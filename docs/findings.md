@@ -15,6 +15,9 @@ Rules:
 - **Failure that leaves a mark.** Research: wounds, scars, quirks and deaths that stick to the person make failure content instead of dead air. (E-0002)
 - **Who you sent changes the event.** Research: trait-unlocked options (FTL, Dispatch) keep events fresh; trait-blind events wear out in a few runs. (E-0002)
 - **Big coin pools are fine.** Long animation is a non-issue: coins flip together or in batches (designer). (E-0001)
+- **Fights draw on the merc's own weapon, never a test that names one weapon core.** No surveyed game (Battle Brothers, Kenshi, Stoneshard, Limbus) asks for a single weapon skill; the wielded weapon picks it, and enemy tags (armored, undead, swarm) make cores matter as matchups, not gates. (E-0003)
+- **Knowledge feeds the next roll.** Lore that reveals a weakness or unlocks an approach is loved (PF2e weakness reveals, Darkest Dungeon provisions); a net-zero lore pass/fail is disliked. Research, untested in v4. (E-0003)
+- **Retreat always open, always priced, tiered.** Loop Hero 100/60/30, Darkest Dungeon's priced retreat; Darkest Dungeon II removing mid-fight retreat drew complaints. Research. (E-0003)
 
 ## Doesn't work
 
@@ -22,6 +25,7 @@ Rules:
 - **Resolution with no player input during the quest.** Atlas's walk was watchable but flat; research names it the classic dispatch failure. (E-0001, E-0002)
 - **Foregone outcomes.** 3/3 wins at 65–80% felt like nothing was at stake; players read 80%+ as certain. (E-0001, E-0002)
 - **Intertwining quests as a goal.** Plot intricacy isn't what makes this game fun; the squad rolling coins is. (D-0002)
+- **A separate minigame for talk.** Griftlands' parallel negotiation battle read as two different games and made the weaker mode a trap; tabletop and video successes keep one roll primitive and scale the structure to the stakes. Research. (E-0003)
 
 ## Open
 
