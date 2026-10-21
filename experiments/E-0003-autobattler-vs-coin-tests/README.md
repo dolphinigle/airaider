@@ -22,7 +22,10 @@ What would change our minds: if the sims show autobattle fights are no more deci
 
 ## Setup
 
-Exactly what was run, so someone else could rerun it: the build, scripts in this folder, prompts, models, seeds, sample size, judges.
+1. Research sweep (2026-10-21): five parallel web sweeps plus a completeness critic, Opus agents; reports in [samples/](samples/) (`research-*.md`; the critic's eight cross-report conclusions are the summary).
+2. [spec.md](spec.md): shared mercs, two scenarios, five candidate models (A family tests, B Loop Hero split, C coin autobattle, D tracks, E clash).
+3. A build-and-sim workflow was started and stopped on the designer's call ("dont build just 'mock' them to me then propose first"); nothing from it is kept.
+4. [mocks.md](mocks.md): paper mocks of all five on Atlas, shown to the designer with a proposal.
 
 ## Result
 
