@@ -27,11 +27,21 @@ The designer's words: "the core fighting skills would be: heavy weapon, light we
   - **Doctor** (new, healing);
   - status effects: Alchemy, Science;
   - magic: Elemental, Holy, Dark.
-- **The other core skills give no abilities.** They work in quests and skill checks only:
-  - Athletics, Survival, Awareness;
-  - Roguery, Villainy, Streetwise;
-  - Persuasion, Deception, Bargaining, Intimidation;
-  - Civilization Lore, Arcane Lore, Craft.
+- **The other core skills are minor fighting skills, not purely for quests** (designer: "some of the others are not PURE quest only. for example, athletics probably have something that allows them to move between ranks. theyre just less powerful skills"). They have fewer and weaker bases. Claude's niches, not yet ruled:
+
+  | skill | niche |
+  |---|---|
+  | Athletics | moving between ranks (dash, swap with an ally), dodge |
+  | Survival | second wind (small self heal), shrugging off damage over time |
+  | Awareness | marking a foe, revealing hidden foes, going faster in round 1 |
+  | Roguery | dirty tricks (Blind, Weak), caltrops |
+  | Villainy | cheap shots, a shakedown that gives more loot |
+  | Intimidation | fear (Weak, a skipped turn), stressing foes |
+  | Deception | feints, a decoy that pulls one hit, a disguise (can't be targeted for a round) |
+  | Persuasion | calming (stress relief), talking a foe out of attacking for a turn |
+  | Arcane Lore | exposing the weakness of undead and monsters, warding off curses |
+  | Craft | barricades (a shield), explosives, mending armor |
+  | Streetwise, Bargaining, Civilization Lore | maybe none (a bribe that makes a hired foe flee?) |
 
 ## Open (Claude's flags)
 
@@ -46,4 +56,5 @@ The designer's words: "the core fighting skills would be: heavy weapon, light we
   - Leadership: rallying, lowering stress, party buffs;
   - Performance: songs, Haste, distracting foes.
 - **Animal Companion:** the pet acts through the merc's abilities and takes no rank, as Darkest Dungeon's Houndmaster does. In quests it keeps Beasts' riding, taming and handling.
-- **Athletics** stays in the speed coins (DEX + Athletics), though it has no abilities.
+- Moving between ranks is back, through Athletics, as a merc moving themselves. Knockback and pull still wait (D-0041).
+- **Base counts:** minor skills get about 3–5 bases each. A merc built only on minor skills is a quest specialist who fights weakly, and their pool runs dry sooner.
