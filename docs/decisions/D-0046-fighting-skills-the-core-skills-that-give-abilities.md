@@ -46,18 +46,26 @@ The designer's words: "the core fighting skills would be: heavy weapon, light we
   - **Smithing** covers weapons, armor and repairs. In fights: sharpen an ally's weapon (more damage), mend armor (a shield). At base: gear, once gear comes.
   - **Engineering** covers building, machines, explosives and setting traps. In fights: bombs, caltrops, barricades. At base: construction.
 
-## Open (Claude's flags)
+## Rulings, 2026-10-22 (designer)
 
-- **A merc whose skills don't fight has no abilities.** A merc starting with Bargaining + Streetwise has an empty ability pool, and one fighting skill runs dry by about Lv 4 (5 bases, one per level). Options:
-  - every merc starts with at least one fighting skill;
-  - a shared basic pool;
-  - quest-only specialists who sit out fights.
-- **Doctor vs Alchemy:** bandaging and remedies move to Doctor. Alchemy keeps potions, poisons and bombs.
-- **Science:** what its status effects are (exposing weaknesses, smoke, flash?), and whether it is Science Lore renamed.
-- **Telling the buffers apart:**
-  - Warfare: marks, expose, formation;
-  - Leadership: rallying, lowering stress, party buffs;
-  - Performance: songs, Haste, distracting foes.
-- **Animal Companion:** the pet acts through the merc's abilities and takes no rank, as Darkest Dungeon's Houndmaster does. In quests it keeps Beasts' riding, taming and handling.
-- Moving between ranks is back, through Athletics, as a merc moving themselves. Knockback and pull still wait (D-0041).
-- **Base counts:** minor skills get about 3–5 bases each. A merc built only on minor skills is a quest specialist who fights weakly, and their pool runs dry sooner.
+- **Civilian mercs exist.** Not every merc has a fighting skill: "some are civilian mercs meant for more civilization quests."
+- **Doctor heals. Alchemy** keeps potions, poisons and flasks ("yes"). Explosives go to Engineering if Craft splits.
+- **Science** analyzes monsters and the like: it exposes weaknesses ("probably things like analyze monsters and stuffs").
+- **The support skills:**
+  - **Leadership** is mostly stress healing and team buffs.
+  - **Warfare** is mostly debuffing and **moving teammates and enemies around**.
+  - **Performance** is stress healing and buffs.
+- **Animal Companion** works like Darkest Dungeon's Houndmaster: the pet acts through the merc's abilities and takes no rank of its own.
+
+## Open
+
+- **A civilian dragged into a fight:** does every merc get a plain basic attack, or do they only guard?
+- **Leadership and Performance overlap** (both heal stress and buff). Claude's split:
+  - Leadership: party-wide auras and Resolve while the leader stands.
+  - Performance: songs that last a few turns, Haste, distracting foes.
+- **Science vs Arcane Lore**, since both analyze monsters. Claude's split:
+  - Science: beasts and constructs.
+  - Arcane Lore: undead, demons and curses.
+- **Craft split** into Smithing + Engineering (proposed above), and whether Science stays separate from Engineering.
+- **Villainy:** keep the name, or rename it Bounty Hunting.
+- Rank movement now comes from Athletics (moving yourself) and Warfare (moving others). This reopens the knockback and pull that D-0041 had set aside.
