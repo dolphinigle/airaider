@@ -18,14 +18,16 @@ Rules:
 - **Fights draw on the merc's own weapon, never a test that names one weapon core.** No surveyed game (Battle Brothers, Kenshi, Stoneshard, Limbus) asks for a single weapon skill; the wielded weapon picks it, and enemy tags (armored, undead, swarm) make cores matter as matchups, not gates. (E-0003)
 - **Knowledge feeds the next roll.** Lore that reveals a weakness or unlocks an approach is loved (PF2e weakness reveals, Darkest Dungeon provisions); a net-zero lore pass/fail is disliked. Research, untested in v4. (E-0003)
 - **Retreat always open, always priced, tiered.** Loop Hero 100/60/30, Darkest Dungeon's priced retreat; Darkest Dungeon II removing mid-fight retreat drew complaints. Research. (E-0003)
+- **Watching is fine when the build decides it.** Autobattlers (Loop Hero, Backpack Battles, Super Auto Pets, TFT) put every choice before the fight; the fight is the test of the build, and close fights are the payoff (designer: 'player only watch is fine as long as player can get the just right thing'). Untested in v4. (E-0003)
 
 ## Doesn't work
 
 - **AI-written engaging story as the main source of fun.** v3 spent about a week on story pipelines (sagas, synopsis prompts, judge rounds) and the scorecard stayed near 6/10. (D-0002)
-- **Resolution with no player input during the quest.** Atlas's walk was watchable but flat; research names it the classic dispatch failure. (E-0001, E-0002)
+- **Resolution that no player choice shaped.** Atlas's walk was watchable but flat: nothing he carried or chose changed the rolls. Research names it the classic dispatch failure. Watching itself is fine when the build decides the outcome (see Works). (E-0001, E-0002, E-0003)
 - **Foregone outcomes.** 3/3 wins at 65–80% felt like nothing was at stake; players read 80%+ as certain. (E-0001, E-0002)
 - **Intertwining quests as a goal.** Plot intricacy isn't what makes this game fun; the squad rolling coins is. (D-0002)
 - **A separate minigame for talk.** Griftlands' parallel negotiation battle read as two different games and made the weaker mode a trap; tabletop and video successes keep one roll primitive and scale the structure to the stakes. Research. (E-0003)
+- **Clash combat where both sides flip (Limbus Company style).** Number-heavy, brings foe coins back (D-0013), needs a move kit per merc; designer: 'clash bad'. (E-0003)
 
 ## Open
 
