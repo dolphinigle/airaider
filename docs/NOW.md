@@ -2,17 +2,17 @@
 
 > The status board. Rewrite it at the end of every working session. History lives in git, decisions and experiments, not here.
 
-**Phase:** prototype v4 kickoff (started 2026-10-19). E-0001 (Claude plays the game, designer steers) is running: merc stats, coin tests and growth are taking shape (D-0007 to D-0018). Blank slate: v3 is archived ([archive/](archive/README.md)), most v3 decisions are open again ([D-0002](decisions/D-0002-v4-restart-squad-first.md)).
+**Phase:** prototype v4 kickoff (started 2026-10-19). E-0001 (Claude plays the game, designer steers) is running. Settled so far: mercs (stats, skills, talents, levels, growth) and quest tests; see [design/mercs.md](design/mercs.md) and [design/quests.md](design/quests.md).
 
 ## Next
 
-1. **Simulate a good game, with Claude, before any code.** Play a session on paper to find what a fun squad-on-base loop looks like. This will be E-0001.
-2. Turn what the simulation shows into proposed decisions for the designer.
-3. Write design/ from the accepted ones, then start `v4/`.
+1. **Make quest gameplay more fun.** The designer has several options ready, including **Loop Hero-style autobattler fights**. Cross-check each against [findings.md](findings.md) and the deployment research ([reference/squad-deployment.md](reference/squad-deployment.md): a decision before each roll, failure that leaves a mark, who you sent changes the event).
+2. Keep playing E-0001 on the Atlas scenario with each option, then close it with a verdict.
+3. Write design/ from the accepted decisions as they land, then start `v4/`.
 
 ## Waiting on the designer
 
-- [D-0021](decisions/D-0021-core-skills-ai-names-the-exact-skill-and-maps-it-to-one.md) (proposed): core skills (twenty-seven); the AI names exact skills and maps them.
+- Nothing right now.
 
 ## Notes
 

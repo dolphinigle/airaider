@@ -6,7 +6,7 @@ status: running           # planned | running | done | abandoned
 type: sim                 # sim | playtest | lab | judge | research
 question: What does a fun squad-on-base session look like when Claude plays the game live and the designer steers it?
 verdict:                  # one line, filled in when done: the answer
-decisions: []             # decisions it led to or proposed, e.g. [D-0005]
+decisions: [D-0004, D-0005, D-0006, D-0007, D-0008, D-0012, D-0013, D-0018, D-0019, D-0020, D-0021, D-0022]
 commit: ebc79e2           # repo state at start; no v4 code exists
 ---
 
@@ -20,7 +20,14 @@ Paper sim in chat. Claude improvises the game state and rules under the designer
 
 ## Result
 
-_Running._
+_Running; interim, 2026-10-21._
+
+- Run 1: a walk with three trait-modified rolls, AI one-liners. Watchable but flat (3/3 wins, no choice during the walk). Led to the research in E-0002.
+- Run 2: coin tests (stat + skill vs foe coins). Atlas lost 0/2; one bad flip decided the quest. The designer then fixed the rules: thresholds instead of foe coins, minimum successes, simpler lines.
+- Mercs designed through play: six stats, 27 core skills with AI-named exact skills, random talents, random three-coin growth, hidden skill unlocks, PoE-style XP (D-0007 to D-0022; spec in docs/design/mercs.md, docs/design/quests.md).
+- Next in this experiment: gameplay options to make quests more fun (designer has several, including Loop Hero-style autobattler fights).
+
+Turn-by-turn record in [log.md](log.md); helper scripts [coins.mjs](coins.mjs) (odds, flips) and [grow.mjs](grow.mjs) (growth sim).
 
 ## Verdict
 

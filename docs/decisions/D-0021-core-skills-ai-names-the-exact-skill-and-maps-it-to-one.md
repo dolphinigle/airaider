@@ -1,7 +1,7 @@
 ---
 id: D-0021
 title: Core skills; AI names the exact skill and maps it to one
-status: proposed
+status: accepted
 date: 2026-10-21
 decided-by: designer
 supersedes: []

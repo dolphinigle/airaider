@@ -452,3 +452,9 @@ D-0021: Lore → **History** (the past, languages, peoples, faiths, heraldry; IN
 **Designer:** How about Civilization Lore, Science Lore, and Arcane Lore?
 
 D-0021: renamed to Civilization Lore, Science Lore, Arcane Lore.
+
+---
+
+**Designer:** ok save these first. then ready for /comapct. next: i have several options for the "gameplay" to make them mre fun, including autobattler fights like in lop her
+
+`RULE:` D-0021 accepted (27 core skills). Spec written: docs/design/mercs.md, docs/design/quests.md. Session paused here for /compact; next up: the designer's gameplay options, including Loop Hero-style autobattler fights.
