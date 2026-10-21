@@ -22,6 +22,7 @@ Rules:
 - **Per-merc tactic rules make a watched fight the player's own.** Party coin autobattle sim: with foe strength calibrated so simple rules win about 50%, the best rule set wins 79-95% and the worst about 0%; the best wins are often close (Ogre falls in the last round, tank at 1 HP). (E-0003)
 - **Foes that punish default rules keep tactics a fresh decision.** In the sim the best rules changed by foe group (area attacks vs wolves and skeletons, single bolts vs the ogre, kill the foe healer first vs the cult) and party makeup swung results (3 warriors 26% vs the cult, 2 mages 100%). With uniform foes one rule set won everywhere. (E-0003)
 - **Skill slots in priority order, auto-sorted, ramp well.** Sim v2: at Lv1 (2 skills) the auto-sorted default is within 5-16 points of the best setup, so no tactics are needed; at Lv6/Lv12 the best order wins 73-100% vs the default's 24-56%. (E-0003)
+- **Fixed battle skills with an AI skin (flavor only).** Same rules and balance for all (Cleave is Cleave), but Brann's reads 'Twin Hew' and Hulda's 'Reckless Reap'; a scholar mage's kit reads 'Ember Verse, Chapter of Cinders, Footnote of Frost'. Mock, untested in play. (E-0003)
 
 ## Doesn't work
 
@@ -31,6 +32,7 @@ Rules:
 - **Intertwining quests as a goal.** Plot intricacy isn't what makes this game fun; the squad rolling coins is. (D-0002)
 - **A separate minigame for talk.** Griftlands' parallel negotiation battle read as two different games and made the weaker mode a trap; tabletop and video successes keep one roll primitive and scale the structure to the stakes. Research. (E-0003)
 - **Clash combat where both sides flip (Limbus Company style).** Number-heavy, brings foe coins back (D-0013), needs a move kit per merc; designer: 'clash bad'. (E-0003)
+- **AI-generated battle-skill mechanics.** Even within a fixed parts list, Sonnet gave 5 of 6 mercs the same block skill, drew skills from the wrong source, priced a warrior's taunt in mana and swung power (whole-enemy stun at 2 mana). Unique skills per merc also stop the player learning what a skill does. Mock. (E-0003)
 
 ## Open
 
