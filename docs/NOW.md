@@ -4,7 +4,7 @@
 
 **Phase:** prototype v4, brainstorming what the game should look like (started 2026-10-19). Goal right now: shape the game through designer-led brainstorms and simulated playtests, **recording every idea** as it lands (decision if ruled, working model below if not). No code yet.
 
-**Locked so far:** mercs (stats, skills, talents, levels, growth: [design/mercs.md](design/mercs.md)); quests resolve through **autobattles + pure coin-flip skill checks** (D-0026), fights displayed with AI lines only before and after (D-0023), losing injures, never kills (D-0024): [design/quests.md](design/quests.md). Half-star rarity sets modifier odds (D-0027); **abilities** (fight) vs **skills** (Survival…) (D-0031): one new ability per level up from the merc's skills, never the same base twice, four equipped (D-0033); star-up and reroll items reroll only the level-up seed (D-0029, D-0032), a star-up sets a fixed star below 5★ (D-0037); two starting skills, pick 1 of 3 at Lv 7 (D-0035); passives are traits: gender, race, personality, body (Wolfkin +10% damage, −10% speed) (D-0036, D-0038, D-0039), never touching stat or skill coins (D-0040); tactics are condition + action + target, parts are loot (D-0030, D-0034); no gear for now, it comes eventually (D-0034); **stress** 0–100 carries across quests, at 100 Resolve or Breakdown, no quirks (D-0042).
+**Locked so far:** mercs (stats, skills, talents, levels, growth: [design/mercs.md](design/mercs.md)); quests resolve through **autobattles + pure coin-flip skill checks** (D-0026), fights displayed with AI lines only before and after (D-0023), losing injures, never kills (D-0024): [design/quests.md](design/quests.md). Half-star rarity sets modifier odds (D-0027); **abilities** (fight) vs **skills** (Survival…) (D-0031): one new ability per level up from the merc's skills, never the same base twice, four equipped (D-0033); star-up and reroll items reroll only the level-up seed (D-0029, D-0032), a star-up sets a fixed star below 5★ (D-0037); two starting skills, pick 1 of 3 at Lv 7 (D-0035); passives are traits: gender, race, personality, body (Wolfkin +10% damage, −10% speed) (D-0036, D-0038, D-0039), never touching stat or skill coins (D-0040); tactics are condition + action + target, parts are loot (D-0030, D-0034); no gear for now, it comes eventually (D-0034); **stress** 0–100 carries across quests, at 100 Resolve or Breakdown, no quirks (D-0042); fight sprites one image per pose, as in Darkest Dungeon (D-0043, proposed, parked as a detail).
 
 ## Working model (brainstormed, not locked)
 
@@ -23,13 +23,28 @@ The shape we use in playtests until the designer rules otherwise. Sources: E-000
 
 ## Next
 
-1. **Review skills → base abilities with the designer** before any sim: about 5 base abilities per battle-capable skill (D-0033, D-0035), starting from E-0003 `skills-mock/fixed-list.md` and `skills-mock2/gen.mjs`. Mock the list, get feedback.
-2. **Simulated playtest** (new experiment): Claude acts as the game on the working model, the designer says what the player does. Record every idea and ruling as it lands.
-3. Keep design/ and this working model current as rulings come in; start `v4/` only after the shape is settled.
+1. **Review attributes and skills with the designer:** the 6 stats (D-0022) and the 27 core skills, now that combat is a ranked line with speed, mana, stress and roles (tank, healer, reach). Check:
+   - what each stat does in a fight (speed, HP, mana, the stress check);
+   - which skills feed which abilities;
+   - which skills only act outside fights.
+   Mock it, get feedback.
+2. **Then abilities:** about 5 base abilities per battle-capable skill (D-0033), each with its used-from and reach ranks, cooldown and mana cost (D-0041). Start from E-0003 `skills-mock/fixed-list.md` and `skills-mock2/gen.mjs`.
+3. **Simulated playtest** (new experiment): Claude acts as the game on the working model, the designer says what the player does.
+4. Keep design/ and this working model current; start `v4/` only once the shape is settled.
 
 ## Waiting on the designer
 
-- Nothing; next session opens with the skills → abilities review.
+- **Accept D-0041** (combat basics)? Designer: "the system is decent now".
+- **Inspirations offered, not yet picked (E-0005):**
+  - party synergies on shared tags;
+  - triggers (start of fight, when hurt, ally down, on kill);
+  - bonds between mercs (Claude's pick);
+  - camping between waves (Claude's pick);
+  - downed at 0 HP;
+  - a risk dial per quest;
+  - a morale bar for foes.
+- **Stress:** which stat the check flips (Claude: CON).
+- **Sprites (D-0043)** are parked as a detail.
 
 ## Notes
 

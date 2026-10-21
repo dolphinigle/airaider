@@ -40,3 +40,7 @@ The designer's words: "the sprite system can also follow from darkest dungeon th
   - Tavern candidates get the idle pose only, or none.
 - **Engine risk (Claude's):** the same merc must look the same in every pose. The plan is to paint the idle pose first and use it as the reference image for the others. A small test is needed before relying on this.
 - The text UI shows pose names as text, so it stays at parity.
+
+## Status note
+
+Parked by the designer on 2026-10-22: "nah its details. images etc are details. lets go back and focus back on the key game designs." The direction stands; the pose set and the consistency test wait.
