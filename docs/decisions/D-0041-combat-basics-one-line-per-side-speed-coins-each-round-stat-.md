@@ -34,6 +34,7 @@ The designer's words: "keep it simple and have it like in final fantasy, aka eve
 - **Interactions:** foes can be **weak to damage types**; some statuses make the target **take more damage** from others.
 - **Speed stays a coin flip every round** (designer: "we want speed here, its not a farming game, so strats are a bit more dynamic (instead of buff A, then A attack)"). Everyone acts once per round; there is no turn bar. **Haste** and **Slow** statuses shift a unit's speed.
 - **Mana doesn't refill**, except through abilities that grant mana (designer).
+- **Ranks only, for now:** there are no corpses; when a unit drops, the units behind it shift forward (designer: "no corpses i think, just Ranks for now"). Claude reads "just Ranks for now" to mean knockback and pull wait too.
 
 ## Open
 
@@ -48,6 +49,5 @@ The designer's words: "keep it simple and have it like in final fantasy, aka eve
   - 4 ranks per side.
   - Each ability states **ranks it can be used from** and **ranks it reaches**.
   - Melee foes reach only the front, so tanks go front without needing a taunt.
-  - When a unit drops, the units behind it shift forward.
   - A merc with no ability usable from its rank steps toward a rank where one is.
-  - Knockback and pull exist as modifiers and foe twists.
+  - Later: knockback and pull as modifiers and foe twists.
