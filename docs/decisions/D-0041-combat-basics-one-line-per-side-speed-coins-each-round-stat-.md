@@ -18,7 +18,7 @@ The fight model so far was the D-0025 working model (2×3 grid, stamina and mana
 
 The designer's words: "keep it simple and have it like in final fantasy, aka everyone on a line instead of front line and back line" · "turn based, each turn everyone gets to move once by speed coin (eg a unit with 10 speed gets 10 coins, then flipped, the heads then sort by it) (enemies have fixed speed, in general enemies are fixed) (speed is determined by a combination of DEX and maybe some skills)" · "skills deal damage by flipping coins equal to e.g. STR + sword coins multiplied by the base damage. (a FIRE and SWORD skill will roll coins by the average of fire and sword?)" · damage, SHIELD ("damage shield on top of hp, absorbs damage"), heals, buffs, debuffs, damage over time.
 
-- **Formation:** each side stands on one line; there are no rows. This replaces the 2×3 grid of D-0025.
+- **Formation:** each side is one ordered line, as in Darkest Dungeon (designer, 2026-10-22: "i think we want darkest dungeon battle system then, a line, so that we can put healers at the back etc."). Position in the line matters: healers stand at the back. This replaces the 2×3 grid of D-0025.
 - **Rounds:** everyone acts once per round. At the start of the round each merc flips their speed coins, and the order sorts by heads. A foe's speed is a fixed number.
 - **Speed coins:** DEX, plus some skills (to be ruled).
 - **Ability pool:** the ability's stat plus its skill. An ability built on two skills uses the stat plus the average of the two skills. Each heads deals the base amount.
@@ -44,3 +44,10 @@ The designer's words: "keep it simple and have it like in final fantasy, aka eve
   - Round cap, then retreat.
   - Speed coins are DEX + Athletics.
 - Mana: the size of the pool and its source stat.
+- Line details, as proposed by Claude:
+  - 4 ranks per side.
+  - Each ability states **ranks it can be used from** and **ranks it reaches**.
+  - Melee foes reach only the front, so tanks go front without needing a taunt.
+  - When a unit drops, the units behind it shift forward.
+  - A merc with no ability usable from its rank steps toward a rank where one is.
+  - Knockback and pull exist as modifiers and foe twists.
