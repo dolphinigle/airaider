@@ -6,7 +6,7 @@ date: 2026-10-22
 decided-by: designer
 supersedes: []
 superseded-by:
-evidence: [E-0003]
+evidence: [E-0003, E-0005]
 sources: []
 ---
 
@@ -25,11 +25,21 @@ The designer's words: "keep it simple and have it like in final fantasy, aka eve
 - **Foes are fixed:** they don't flip (D-0013).
 - **Effect families:** damage, Shield (absorbs damage before HP), heal, buff, debuff, damage over time.
 
-## Open (Claude's depth review, 2026-10-22)
+## Added 2026-10-22 (designer)
 
-The depth review says this is enough as a base, with three gaps:
-- what makes the S1–S4 priority list matter (cooldowns or a resource);
-- who foes hit when there are no rows (targeting and taunt);
-- whether abilities interact with each other.
+"skills dont cost stamina, they have COOLDOWN and MANA COST instead" · "guard can either TAUNT or shield, can even shield the party" · "some enemies are weak to certain damage types, some give status that increase damage from others".
 
-See the reply in the session; it is to be folded in here once ruled.
+- **Costs:** an ability has a **cooldown** and a **mana cost**; there is no stamina.
+- **Guard abilities** either **taunt** (foes hit the taunter) or **shield**, and a shield can cover the whole party.
+- **Interactions:** foes can be **weak to damage types**; some statuses make the target **take more damage** from others.
+
+## Open
+
+- Claude's proposals, not yet ruled:
+  - Shield lasts until used up, capped at max HP.
+  - A debuff lands if heads reach a fixed number.
+  - Each foe has a fixed rule for choosing its target.
+  - Round cap, then retreat.
+  - Speed coins are DEX + Athletics.
+- Mana: the size of the pool, its source stat, and whether it regenerates.
+- Speed control: E-0005 found that long-lived games give speed teeth (Haste and Slow, acting first).

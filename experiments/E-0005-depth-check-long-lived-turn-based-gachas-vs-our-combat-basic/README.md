@@ -1,0 +1,41 @@
+---
+id: E-0005
+title: Depth check: long-lived turn-based gachas vs our combat basics
+date: 2026-10-22
+status: done
+type: research
+question: Do long-lived games run on a battle system like D-0041, and does it hold up for years?
+verdict: Yes. Summoners War, Raid, Epic Seven, Honkai Star Rail and Pokémon share the core (one line, speed order, cooldowns, weaknesses, buffs and debuffs, mostly played on auto). Two depth sources they have that we lack: controllable speed and gear.
+decisions: [D-0041]
+commit:
+---
+
+## Question
+
+The designer asked whether the D-0041 combat basics are deep enough, with long-lived games (probably gachas) as proof.
+
+## Setup
+
+Desk research: web searches plus known mechanics of Summoners War, Raid: Shadow Legends, Epic Seven, Honkai: Star Rail, Pokémon and Darkest Dungeon.
+
+## Result
+
+| game | since | shared with D-0041 | depth source we lack |
+|---|---|---|---|
+| Summoners War | 2014, $3B lifetime, ~220M downloads | no rows, speed order, cooldowns, buffs and debuffs, elements, PvE on auto | turn-bar control (speed buffs, push and pull), runes (gear) |
+| Raid: Shadow Legends | 2018 | same model; auto with per-skill orders "Opener / 1st / 2nd / 3rd / Don't use" (patch 4.30), which is our S1–S4 | gear; its default auto AI made many champions unusable until players could set priorities |
+| Epic Seven | 2018 | speed turn bar, cooldowns, element wheel, debuffs land by Effectiveness vs Resistance | readiness push and pull, gear |
+| Honkai: Star Rail | 2023 | one line per side, adjacency (Blast) targets, weakness types, shields, DoTs, auto | Toughness break (weakness hits break a foe), shared team skill points |
+| Pokémon | 1996 | speed order, four moves equipped, type chart, statuses | — (depth from types + status + build for 30 years) |
+| Darkest Dungeon | 2016 | speed plus a random roll every round | ranks (positions) |
+
+Key observations:
+- **In these games the depth sits in the build.** Players run PvE on auto. What they plan is team comp, speed and the kit.
+- **Speed is the stat everyone builds around** in SW and E7. A fast unit acts more often, and skills push or pull the turn bar.
+- **Gear (runes, artifacts) carries most of the long-term depth.** We have none for now (D-0034). Modifiers, skill picks, tactics and traits stand in for it.
+
+## Verdict
+
+The core is proven deep enough. To close the gap, give speed teeth (statuses that shift it) and lean on weaknesses plus statuses that others read.
+
+Sources: pocketgamer.biz (SW 10th anniversary), pocketgamer.com (220M downloads), hellhades.com (Raid patch 4.30 skill instructions), gamepress.gg (Epic Seven basics), bluestacks.com (Raid auto AI).
