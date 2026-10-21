@@ -54,3 +54,11 @@ Claude: mock 2 done ([skills-mock2/cards.md](skills-mock2/cards.md)). Free picks
 **Designer:** "we'll figure out balance later" / "for now just assume it works"
 
 Claude: balance parked; no more balance tuning in E-0003 mocks.
+
+**Designer:** "ok sure. the 2x3 grid etc stuff is not locke.d the LOCKED part i think is: Autobattler and skill checks. once done, ready for /compact then we'll simulate a playtest -- youll act as the game i tell u what player do"
+
+`RULE:` D-0026 accepted (autobattles + pure coin-flip skill checks). D-0025 stays proposed as the working model.
+
+**Designer:** "dont forge tthe goal -- right now we're brainstorming ideas that yous hould record. so that we get what the game should look like"
+
+Claude: NOW.md now holds a "Working model (brainstormed, not locked)" section; E-0001 and E-0003 closed.

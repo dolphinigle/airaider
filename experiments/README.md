@@ -22,7 +22,7 @@ New record: `node tools/rec.mjs experiment "slug title"`. The table below is gen
 <!-- index:start -->
 | ID | Experiment | Type | Status | Verdict | Date |
 |---|---|---|---|---|---|
-| [E-0001](E-0001-first-game-sim/) | first game sim | sim | running |  | 2026-10-19 |
+| [E-0001](E-0001-first-game-sim/) | first game sim | sim | done | A quest of plain coin tests feels flat; the session designed the mercs (D-0007 to D-0022) and led to E-0002 and E-0003, which replaced fights with autobattles (D-0026). | 2026-10-19 |
 | [E-0002](E-0002-what-makes-squad-deployment-fun/) | what makes squad deployment fun | research | done | Gambling-style resolution works if every roll pays off a player decision (who, approach, push, retreat); tactics only add puzzle mastery and felt ownership | 2026-10-19 |
-| [E-0003](E-0003-autobattler-vs-coin-tests/) | Quest gameplay: autobattler vs coin tests for combat and non-combat skills | sim | running |  | 2026-10-21 |
+| [E-0003](E-0003-autobattler-vs-coin-tests/) | Quest gameplay: autobattler vs coin tests for combat and non-combat skills | sim | done | Fights become a party coin autobattle the player sets up beforehand; everything else stays a pure coin-flip skill check (D-0026). Whether that is more fun needs a playtest. | 2026-10-21 |
 <!-- index:end -->

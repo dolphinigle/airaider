@@ -32,4 +32,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0023](D-0023-fights-are-displayed-ai-writes-only-the-start-and-end-lines-.md) | Fights are displayed; AI writes only the start and end lines and the sprites | accepted | designer | 2026-10-21 |
 | [D-0024](D-0024-losing-a-fight-injures-never-kills.md) | Losing a fight injures, never kills | accepted | designer | 2026-10-21 |
 | [D-0025](D-0025-battle-skills-are-base-skills-plus-engine-priced-modifiers-n.md) | Battle skills are base skills plus engine-priced modifiers, named by the AI | proposed | designer | 2026-10-21 |
+| [D-0026](D-0026-quests-resolve-through-autobattles-and-pure-coin-flip-skill-.md) | Quests resolve through autobattles and pure coin-flip skill checks | accepted | designer | 2026-10-21 |
 <!-- index:end -->

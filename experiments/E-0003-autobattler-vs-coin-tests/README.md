@@ -2,11 +2,11 @@
 id: E-0003
 title: Quest gameplay: autobattler vs coin tests for combat and non-combat skills
 date: 2026-10-21
-status: running
+status: done
 type: sim                 # research + sim
 question: Should quests resolve fights as a Loop Hero-style autobattle instead of coin tests, and should non-combat checks (lores, talk, stealth) use the same engine or a different one?
-verdict:                  # one line, filled in when done: the answer
-decisions: []             # decisions it led to or proposed, e.g. [D-0005]
+verdict: Fights become a party coin autobattle the player sets up beforehand; everything else stays a pure coin-flip skill check (D-0026). Whether that is more fun needs a playtest.
+decisions: [D-0023, D-0024, D-0025, D-0026]             # decisions it led to or proposed, e.g. [D-0005]
 commit:                   # the commit or tag of the code it ran on, if any
 ---
 
@@ -48,8 +48,10 @@ _Sim v2 (designer: Live A Hero-style slots and lootable tactic books; fights dis
 
 ## Verdict
 
-What we now believe, in a sentence or two. What it changes, and any decision it proposes.
+Fights work as a party coin autobattle: the player's setup (party, skill order, tactic books) decides the fight, the best setup changes by foe, and close wins happen. Non-combat stays a pure coin-flip check. Locked by the designer as D-0026; fights displayed with AI lines only before and after (D-0023); losing injures (D-0024); battle skills as base skills + priced modifiers named by the AI (D-0025, proposed working model). AI-generated mechanics and AI lines inside fights are out.
+
+Not shown: that it is fun. Every number here is a proxy; the next step is a simulated playtest with the designer as the player.
 
 ## Next
 
-Optional. The follow-up it suggests.
+Simulated playtest: Claude acts as the game on the working model (D-0025 + the partysim2 slot/book rules), the designer plays.

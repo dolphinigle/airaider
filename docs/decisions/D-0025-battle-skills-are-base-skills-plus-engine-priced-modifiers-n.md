@@ -24,6 +24,10 @@ The designer's words: "we have a list of skills, and a bunch of modifiers for it
 - **Modifiers** are a fixed engine list. Each adds an effect and a cost; the engine computes the final skill.
 - **The AI** names each of a merc's skills and picks 1 or 2 modifiers for it, once, when the merc's skills are made. Names only: no flavor lines. Proposed by Claude: the engine deals the AI 3 fitting candidate modifiers per skill, weighted by the merc's skills, and the AI picks from those.
 
+## Status note
+
+The designer said "ok sure" but also "the 2x3 grid etc stuff is not locked": this stays **proposed**, used as the working model for the next playtest (D-0026).
+
 ## Consequences
 
 - Balance stays in engine data; the AI only shapes and names.
