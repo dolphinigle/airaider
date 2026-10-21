@@ -50,12 +50,12 @@ The core skills (D-0021, D-0045, D-0046 proposed), with the stats their tests us
 | | **Leadership** | inspiring, rallying, morale, keeping a crew together | CHA, WIL |
 | | **Performance** | music, song, dance, acting, storytelling | CHA, DEX |
 | Knowing | **Civilization Lore** | the past, languages, peoples, faiths, heraldry | INT |
-| | **Science Lore** | nature, beasts, stars, numbers, how things work | INT, DEX |
-| | **Arcane Lore** | the hidden world: monsters, undead, curses, relics, how magic works (knowing, not casting) | INT, WIL |
+| | **Nature Lore** | plants, beasts, weather, stars, natural monsters | INT, DEX |
+| | **Arcane Lore** | the hidden world: undead, demons, curses, relics, how magic works (knowing, not casting) | INT, WIL |
 | | **Alchemy** | potions, poisons, flasks | INT, DEX |
 | | **Doctor** | healing, bandaging, surgery, remedies | INT, DEX |
 | | **Smithing** | weapons, armor, repairs | STR, DEX |
-| | **Engineering** | building, machines, explosives, setting traps | INT, STR |
+| | **Engineering** | building, machines, how things work, numbers, explosives, setting traps | INT, STR |
 | Magic ✦ | **Elemental Magic** ✦ | fire, frost, lightning | INT, WIL |
 | | **Holy Magic** ✦ | healing, blessing, warding off the dead | CHA, WIL |
 | | **Dark Magic** ✦ | curses, necromancy, draining life, pacts | INT, CHA |
