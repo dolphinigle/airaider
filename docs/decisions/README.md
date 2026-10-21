@@ -54,4 +54,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0045](D-0045-unarmed-is-its-own-core-skill-no-medium-weapons-weapon-tags-.md) | Unarmed is its own core skill, no medium weapons, weapon tags filter base abilities | accepted | designer | 2026-10-22 |
 | [D-0046](D-0046-fighting-skills-the-core-skills-that-give-abilities.md) | "Fighting skills: the core skills that give abilities" | proposed | designer | 2026-10-22 |
 | [D-0047](D-0047-abilities-10-to-20-bases-per-fighting-skill-the-ai-picks-one.md) | "Abilities: 10 to 20 bases per fighting skill, the AI picks one of a few dealt and renames it" | accepted | designer | 2026-10-22 |
+| [D-0048](D-0048-players-see-only-the-ai-name-of-an-ability-never-its-base.md) | Players see only the AI name of an ability, never its base | accepted | designer | 2026-10-22 |
 <!-- index:end -->
