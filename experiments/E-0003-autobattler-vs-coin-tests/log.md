@@ -36,3 +36,7 @@ Claude: unknown. The sims measure proxies (decision leverage, close wins), not f
 **Designer:** "ok lets try mocking with battles. for battle skills, try: (1) ai generated, (2) from a fixed list, (3) have a fixed list then ai can give it a "skin", e.g., a "Cleave" attack that aoe damage with sword, when used by a greatsword user, becomes Great Cleave for example."
 
 Claude: mock of three battle-skill sources (skills-mock/), real cheap-model calls for (1) and (3).
+
+**Designer:** "NO LINES. no ai stuff except BEFORE and AFTER battle, no mid fight ai lines too much work."
+
+Claude: skill flavor lines dropped (restates D-0023). Open: whether AI skin NAMES (made once at recruitment) stay, or skills keep fixed names.

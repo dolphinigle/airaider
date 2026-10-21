@@ -22,7 +22,7 @@ Rules:
 - **Per-merc tactic rules make a watched fight the player's own.** Party coin autobattle sim: with foe strength calibrated so simple rules win about 50%, the best rule set wins 79-95% and the worst about 0%; the best wins are often close (Ogre falls in the last round, tank at 1 HP). (E-0003)
 - **Foes that punish default rules keep tactics a fresh decision.** In the sim the best rules changed by foe group (area attacks vs wolves and skeletons, single bolts vs the ogre, kill the foe healer first vs the cult) and party makeup swung results (3 warriors 26% vs the cult, 2 mages 100%). With uniform foes one rule set won everywhere. (E-0003)
 - **Skill slots in priority order, auto-sorted, ramp well.** Sim v2: at Lv1 (2 skills) the auto-sorted default is within 5-16 points of the best setup, so no tactics are needed; at Lv6/Lv12 the best order wins 73-100% vs the default's 24-56%. (E-0003)
-- **Fixed battle skills with an AI skin (flavor only).** Same rules and balance for all (Cleave is Cleave), but Brann's reads 'Twin Hew' and Hulda's 'Reckless Reap'; a scholar mage's kit reads 'Ember Verse, Chapter of Cinders, Footnote of Frost'. Mock, untested in play. (E-0003)
+- **Fixed battle skills with an AI skin name.** Same rules and balance for all (Cleave is Cleave), but Brann's reads 'Twin Hew' and Hulda's 'Reckless Reap'; a scholar mage's kit reads 'Ember Verse, Chapter of Cinders, Footnote of Frost'. Names only: no AI lines in or about the fight besides its start and end (designer, D-0023). Mock, untested in play. (E-0003, D-0023)
 
 ## Doesn't work
 
