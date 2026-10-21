@@ -51,3 +51,28 @@ Mechanics worth borrowing, offered to the designer on 2026-10-22:
 - Leader aura from the Leadership skill (Summoners War, Raid).
 - Reaction triggers: counter and retaliate.
 - One major status per unit (Pokémon).
+
+Designer, 2026-10-22: "foe intent isnt relevant here though since we are autobattler. waves is automatic i think. look at the ones with autobattler, like Loop Hero." Gear: "we will have this... eventually".
+
+### Round 2: autobattlers only
+
+Games looked at:
+- Loop Hero
+- Super Auto Pets
+- Teamfight Tactics and Underlords
+- Backpack Battles and The Bazaar
+- AFK Arena
+- Legend of Keepers
+
+Ideas offered to the designer:
+- **Adjacency on the line** (Super Auto Pets: friend ahead and behind; Backpack Battles: adjacent items).
+- **Party synergies on shared tags** (Teamfight Tactics traits, Underlords alliances, AFK Arena factions).
+- **Triggers:**
+  - start of fight;
+  - when hurt;
+  - when an ally drops;
+  - on a kill.
+- **Stacks that grow over a quest's waves** (Super Auto Pets, Hearthstone Battlegrounds).
+- **A morale bar as a second way to win** (Legend of Keepers).
+
+Loop Hero's fight itself is shallow. Its depth comes from the build and from choosing what you face, which is the quest layer for us.
