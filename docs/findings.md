@@ -23,6 +23,7 @@ Rules:
 - **Foes that punish default rules keep tactics a fresh decision.** In the sim the best rules changed by foe group (area attacks vs wolves and skeletons, single bolts vs the ogre, kill the foe healer first vs the cult) and party makeup swung results (3 warriors 26% vs the cult, 2 mages 100%). With uniform foes one rule set won everywhere. (E-0003)
 - **Skill slots in priority order, auto-sorted, ramp well.** Sim v2: at Lv1 (2 skills) the auto-sorted default is within 5-16 points of the best setup, so no tactics are needed; at Lv6/Lv12 the best order wins 73-100% vs the default's 24-56%. (E-0003)
 - **Fixed battle skills with an AI skin name.** Same rules and balance for all (Cleave is Cleave), but Brann's reads 'Twin Hew' and Hulda's 'Reckless Reap'; a scholar mage's kit reads 'Ember Verse, Chapter of Cinders, Footnote of Frost'. Names only: no AI lines in or about the fight besides its start and end (designer, D-0023). Mock, untested in play. (E-0003, D-0023)
+- **Base skills + engine-priced modifiers, AI names them and picks mods from engine-dealt candidates.** The engine computes costs, so AI picks can't break balance, only shape it; themes landed (Oswin's Blessed Mace = Strike + Holy, Brann's Runic Mark = Expose + Lasting). Free picks piled on raw power (Heavy 9 and Swift 6 of 40 picks, two mods almost every time); dealing 3 candidates spread them out. Mock. (E-0003)
 
 ## Doesn't work
 

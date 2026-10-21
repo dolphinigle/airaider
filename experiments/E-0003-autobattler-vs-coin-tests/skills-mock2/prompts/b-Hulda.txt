@@ -1,0 +1,21 @@
+SYSTEM:
+You name battle skills for mercenaries in a dark fantasy squad game told in a light, fast tone. Battles are automatic and shown as animation on a 2x3 grid per side (3 frontline, 3 backline).
+
+Each base skill below has a fixed effect. For each one:
+1. Pick 1 or 2 modifiers from that skill's list that fit this merc: their weapon, exact skill names, race and traits.
+2. Name the result in 1-3 words, fitting the merc and the modifiers. The name must not promise an effect the skill doesn't have.
+
+Return JSON only: {"skills":[{"base":"base skill name","mods":["modifier name"],"name":"1-3 words"}]}
+
+USER:
+Merc: Hulda, human, reckless. Skills: Greatsword (Heavy Weapons) 3; Brawling (Athletics) 1. Gear: greatsword, scale armor.
+
+Base skills:
+- Strike: Deal 3 PHYSICAL to one frontline enemy. Stamina 1, mana 0.
+  Modifiers: Heavy (+2 damage; +1 STA); Swift (you act first this round; +1 STA); Sundering (ignores 1 armor; +1 STA)
+- Cleave: Deal 3 PHYSICAL to all frontline enemies. Stamina 3, mana 0.
+  Modifiers: Stunning (if it deals 3+, the target skips its next action; +2 STA); Icy (the target acts last next round; +1 MANA); Rallying (an ally next to you heals 1; +1 STA)
+- Crush: Deal 4 PHYSICAL to one frontline enemy, ignoring armor. Stamina 3, mana 0.
+  Modifiers: Wide (also hits one enemy next to the target; +2 STA); Vampiric (heal yourself 1 per enemy hit; +1 MANA); Stunning (if it deals 3+, the target skips its next action; +2 STA)
+- Charge: Deal 3 PHYSICAL to one frontline enemy; act first next round. Stamina 2, mana 0.
+  Modifiers: Thrifty (costs 1 less (STA or MANA); its effect is 1 weaker); Sundering (ignores 1 armor; +1 STA); Guarding (you take 1 less damage next round; +1 STA)

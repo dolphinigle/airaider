@@ -40,3 +40,9 @@ Claude: mock of three battle-skill sources (skills-mock/), real cheap-model call
 **Designer:** "NO LINES. no ai stuff except BEFORE and AFTER battle, no mid fight ai lines too much work."
 
 Claude: skill flavor lines dropped (restates D-0023). Open: whether AI skin NAMES (made once at recruitment) stay, or skills keep fixed names.
+
+**Designer:** "i like variation of C best though: how about this: we have a list of skills, and a bunch of modifiers for it. Then AI skin it and pick one or two modifiers. For example, Cleave: Deal 3 PHYSICAL to all frontline enemies (battle is on a 2x3 grid, 3 backline 3 frontline, see vagrus). Stamina cost: 3. Mana cost: 0. Mods: "Fiery": add 1 FIRE damage, 1 MANA cost, "Icy": ..., etc"
+
+Claude: mock 2 (skills-mock2/): base skills on a 2x3 grid with STA/MANA costs + modifiers; AI (Sonnet high) names each skill and picks 1-2 mods. Two variants: (a) free pick from all fitting mods, (b) engine deals 3 candidates weighted by the merc's skills.
+
+Claude: mock 2 done ([skills-mock2/cards.md](skills-mock2/cards.md)). Free picks pile on +damage (Heavy 9/40, Swift 6/40, nearly always 2 mods); dealt candidates spread picks and give more 1-mod skills. Names fit; two slips: "Wolf-Howl" again copies Atlas's exact skill; "Quick Slash" (Thrifty) promises speed it lacks.

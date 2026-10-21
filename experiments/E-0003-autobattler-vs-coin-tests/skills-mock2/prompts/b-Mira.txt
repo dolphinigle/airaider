@@ -1,0 +1,21 @@
+SYSTEM:
+You name battle skills for mercenaries in a dark fantasy squad game told in a light, fast tone. Battles are automatic and shown as animation on a 2x3 grid per side (3 frontline, 3 backline).
+
+Each base skill below has a fixed effect. For each one:
+1. Pick 1 or 2 modifiers from that skill's list that fit this merc: their weapon, exact skill names, race and traits.
+2. Name the result in 1-3 words, fitting the merc and the modifiers. The name must not promise an effect the skill doesn't have.
+
+Return JSON only: {"skills":[{"base":"base skill name","mods":["modifier name"],"name":"1-3 words"}]}
+
+USER:
+Merc: Mira, human, bookish. Skills: Fire-speech (Elemental Magic) 2; Star-charts (Science Lore) 1. Gear: staff, robes.
+
+Base skills:
+- Bolt: Deal 3 FIRE to any enemy. Stamina 0, mana 1.
+  Modifiers: Stunning (if it deals 3+, the target skips its next action; +2 STA); Fiery (+1 FIRE damage; +1 MANA); Icy (the target acts last next round; +1 MANA)
+- Wave: Deal 2 FIRE to all enemies. Stamina 0, mana 3.
+  Modifiers: Icy (the target acts last next round; +1 MANA); Heavy (+2 damage; +1 STA); Fiery (+1 FIRE damage; +1 MANA)
+- Know the Beast: One beast takes 2 more from every hit for 2 rounds. Stamina 1, mana 0.
+  Modifiers: Icy (the target acts last next round; +1 MANA); Lasting (the effect lasts 1 round longer; +1 MANA); Guarding (you take 1 less damage next round; +1 STA)
+- Strike: Deal 3 PHYSICAL to one frontline enemy. Stamina 1, mana 0.
+  Modifiers: Venomous (the target loses 1 HP each round for 3 rounds; +1 STA); Heavy (+2 damage; +1 STA); Thrifty (costs 1 less (STA or MANA); its effect is 1 weaker)
