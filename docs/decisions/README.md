@@ -45,4 +45,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0036](D-0036-passives-come-from-personality-traits.md) | Passives come from personality traits | accepted | designer | 2026-10-22 |
 | [D-0037](D-0037-a-star-up-item-sets-a-merc-to-a-fixed-star-so-5-stars-stay-v.md) | A star-up item sets a merc to a fixed star, so 5 stars stay valuable | accepted | designer | 2026-10-21 |
 | [D-0038](D-0038-race-gives-a-passive-too-a-trade-off-like-the-trait-passives.md) | Race gives a passive too, a trade-off like the trait passives | accepted | designer | 2026-10-21 |
+| [D-0039](D-0039-traits-cover-gender-race-personality-and-body.md) | Traits cover gender, race, personality and body | accepted | designer | 2026-10-21 |
 <!-- index:end -->
