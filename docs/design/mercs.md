@@ -25,19 +25,20 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 - Only the core skill counts in a test. The exact name colors the text ("Atlas swings his sword").
 - Skills have their **own XP** and level up separately from the merc (D-0012).
 
-The core skills, with the stats their tests usually pool with them (a quest may pair them differently). ✦ = rare: seldom rolled at recruitment or for an unlock.
+The core skills (D-0021, D-0045, D-0046 proposed), with the stats their tests usually pool with them (a quest may pair them differently). ✦ = rare: seldom rolled at recruitment or for an unlock.
 
 | family | core skill | covers | stats |
 |---|---|---|---|
 | Fighting | **Heavy Weapons** | greatswords, axes, hammers, polearms | STR, CON |
 | | **Light Weapons** | swords, daggers, rapiers, brawling | DEX, STR |
+| | **Unarmed** | fists, kicks, grapples, martial arts | DEX, STR |
 | | **Ranged** | bows, crossbows, slings, throwing | DEX, STR |
 | | **Defense** | shields, armor, parrying, holding a line | CON, STR |
 | | **Athletics** | climbing, swimming, running, hauling, tumbling | STR, DEX |
 | | **Warfare** | tactics, formations, sieges, fortifications, battle plans | INT, STR |
 | Wilds | **Survival** | foraging, camping, weather, terrain, trails, hunting | CON, INT |
 | | **Awareness** | spotting ambushes, keeping watch, searching, reading people | DEX, INT |
-| | **Beasts** | riding, taming, handling animals | CHA, WIL |
+| | **Animal Companion** | a fighting pet (like Darkest Dungeon's Houndmaster), riding, taming, handling animals | CHA, WIL |
 | Shadows | **Stealth** | sneaking, hiding, ambushes | DEX, INT |
 | | **Roguery** | locks, pockets, traps, forgery | DEX, INT |
 | | **Villainy** | banditry, smuggling, extortion, slaving, black markets, bribes | CHA, STR |
@@ -51,8 +52,10 @@ The core skills, with the stats their tests usually pool with them (a quest may 
 | Knowing | **Civilization Lore** | the past, languages, peoples, faiths, heraldry | INT |
 | | **Science Lore** | nature, beasts, stars, numbers, how things work | INT, DEX |
 | | **Arcane Lore** | the hidden world: monsters, undead, curses, relics, how magic works (knowing, not casting) | INT, WIL |
-| | **Alchemy** | potions, poisons, remedies, bandaging | INT, DEX |
-| | **Craft** | smithing, repairs, building, explosives | STR, INT |
+| | **Alchemy** | potions, poisons, flasks | INT, DEX |
+| | **Doctor** | healing, bandaging, surgery, remedies | INT, DEX |
+| | **Smithing** | weapons, armor, repairs | STR, DEX |
+| | **Engineering** | building, machines, explosives, setting traps | INT, STR |
 | Magic ✦ | **Elemental Magic** ✦ | fire, frost, lightning | INT, WIL |
 | | **Holy Magic** ✦ | healing, blessing, warding off the dead | CHA, WIL |
 | | **Dark Magic** ✦ | curses, necromancy, draining life, pacts | INT, CHA |

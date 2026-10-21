@@ -55,6 +55,7 @@ The designer's words: "the core fighting skills would be: heavy weapon, light we
   - **Leadership** is mostly stress healing and team buffs.
   - **Warfare** is mostly debuffing and **moving teammates and enemies around**.
   - **Performance** is stress healing and buffs.
+- **Craft splits into Smithing and Engineering** (designer: "Smithing and Engineering sounds good").
 - **Animal Companion** works like Darkest Dungeon's Houndmaster: the pet acts through the merc's abilities and takes no rank of its own.
 
 ## Open
@@ -66,6 +67,6 @@ The designer's words: "the core fighting skills would be: heavy weapon, light we
 - **Science vs Arcane Lore**, since both analyze monsters. Claude's split:
   - Science: beasts and constructs.
   - Arcane Lore: undead, demons and curses.
-- **Craft split** into Smithing + Engineering (proposed above), and whether Science stays separate from Engineering.
+- Whether Science stays separate from Engineering (both cover "how things work").
 - **Villainy:** keep the name, or rename it Bounty Hunting.
 - Rank movement now comes from Athletics (moving yourself) and Warfare (moving others). This reopens the knockback and pull that D-0041 had set aside.
