@@ -176,7 +176,7 @@ export const SKILLS = [
     id: 'Power at a price: the strongest curses, each paid in its own stress. Heals allies the same way.',
     strong: 'debuff (curses)', weak: 'heal allies (paid in stress), single damage (Chaos)',
     abilities: [
-      '1|Shadow Bolt|2–4|foe 1–3|90% Chaos||0 cd, low stress|kept',
+      '1|Shadow Bolt|2–4|foe 1–3|90% Chaos||0 cd, minimal stress|kept',
       '1|Curse of Weakness|2–4|any foe||strong Weakened|0 cd, low stress|kept',
       '1|Curse of Exposure|2–4|any foe||strong Exposed|0 cd, low stress|kept',
       '2|Curse of Marking|2–4|any foe||strong Mark|0 cd, low stress|new',

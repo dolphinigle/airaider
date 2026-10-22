@@ -382,7 +382,7 @@ Claude's first draft, replaced: Fire as the swarm mage; Frost as the turn-order 
 
 ### Magic model abilities (Claude's draft, 2026-10-22; cooldowns cut to heals and big effects)
 
-Stress costs for Dark are low / mid / high for now (the balancer sets them).
+Stress costs for Dark are low / mid / high for now (the balancer sets them). Shadow Bolt, the plain attack, costs **minimal** stress (designer, 2026-10-23).
 
 **Fire** (1–4)
 
