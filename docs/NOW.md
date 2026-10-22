@@ -63,12 +63,10 @@
 
 ## Next
 
-0. **Battle skills first, check skills later** (designer). Locked today: melee split (D-0063), Elemental split + PoE damage types (D-0070), coins = attribute + skill level, skill stars set XP gain (D-0069), defense (D-0066 → D-0070), trait stars (D-0068). Battle skills are now 19 (Warfare deleted, D-0073): see design/mercs.md. Open:
-   - **Most skills use one attribute, a few two** (D-0074; Villainy → Dirty Fighting). Open: the pairing draft in design/mercs.md.
-   - **Ability cadence** (Claude: skill levels 1, 3, 5, 7, 9).
-   - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances).
-   - Check skills: merges and stars later.
-1. **Check skills (later):** merges (Claude's earlier idea: Lore = three lores, Scouting = Survival + Awareness, Talk = Persuasion + Deception + Intimidation, Trade = Bargaining + Streetwise), quotas, stars.
+0. **Battle skills are settled** (2026-10-22): 19 skills with attribute pairings (D-0063, D-0070, D-0073, D-0074, D-0075; table in design/mercs.md). Coins = attribute + skill level (D-0069); defense and damage types (D-0070); Dark Magic costs stress (D-0072). Still open:
+   - **Ability cadence** (Claude: a new ability at skill levels 1, 3, 5, 7, 9).
+   - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances). Claude leans Darkest Dungeon.
+1. **NEXT SESSION STARTS HERE: fix the check (non-combat) skills** (designer: "next: fixing the non combat skills"). Current 14 in design/mercs.md (Athletics, Survival, Awareness, Roguery, Streetwise, Persuasion, Deception, Bargaining, Intimidation, Civilization Lore, Nature Lore, Arcane Lore, Engineering, Smithing). To settle: merges (Claude's earlier idea: Lore = three lores, Scouting = Survival + Awareness, Talk = Persuasion + Deception + Intimidation, Trade = Bargaining + Streetwise), attribute pairings (one, a few two), quota (working 2 per merc), what each does in check nodes (D-0057, D-0059). Stars set XP gain (D-0069).
 2. **Find the fun in a hand-played fight:** a text mock with placeholder abilities, then feedback.
 3. **Abilities:** 10–20 bases per fighting skill, each with ranks (used from, reaches), cooldown and weapon tags. Minor skills get 3–5. Start from E-0003 `skills-mock/fixed-list.md` and `skills-mock2/gen.mjs`.
 4. **Simulated playtest of a week** (a new experiment).
