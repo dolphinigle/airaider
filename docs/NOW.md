@@ -50,6 +50,7 @@
   - **Foes are fixed:** they never flip.
   - **Waves** happen automatically.
 - **Rank movement:** Athletics moves yourself; Warfare moves allies and foes.
+- **Combo bases** (Claude idea, offered 2026-10-22): a few bases need two skills (Heavy + Holy "Holy Smite"); only mercs with both are dealt them; the ability flips the two skills' average. Skill pairs feel like classes (Crusader = Heavy + Holy, Defense at Lv 7) without hard classes. E-0005 round 4: every Darkest Dungeon class maps to 1–2 of our skills.
 - **Modifiers:** 0–4 per ability by star (D-0027). Engine-priced; the AI picks from the candidates the engine deals (D-0025, proposed).
 - **Foe families** each have a sharp twist.
 - **Fight sprites:** one AI image per pose (D-0043, proposed, parked as a detail).
