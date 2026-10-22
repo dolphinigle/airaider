@@ -1,7 +1,7 @@
 ---
 id: D-0056
 title: "Mostly combat: civilization quests mostly gone, check skills merge"
-status: proposed
+status: accepted
 date: 2026-10-22
 decided-by: designer
 supersedes: []
@@ -18,7 +18,7 @@ Under the Darkest Dungeon campaign (D-0052), Claude asked whether skill checks s
 
 The designer's words: "i dont think we'll have civilization quests mostly anymore with this structure tho?"
 
-- **The game is mostly combat.** Quests are expeditions of fights. Civilization (all-check) quests are mostly gone.
+- **The game is mostly combat** (designer: "yea i mean mostly combat sounds good."). Quests are expeditions of fights. Civilization (all-check) quests are mostly gone.
 
 ## Open
 

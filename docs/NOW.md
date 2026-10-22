@@ -41,7 +41,9 @@ Designer: "first lets make this fun."
   - how new quests appear;
   - stopping steamrolling;
   - whether skill checks between fights stay.
-- **Now:** are skill checks a big part of the game, or is it mostly combat? If mostly combat, the check skills get merged.
+- **Now (D-0056, mostly combat):**
+  - civilians: base crew, or dropped?
+  - merging the 12 minor skills into 6.
 
 - **Accept D-0041** (combat basics)?
 - **Inspirations offered, not yet picked:**
