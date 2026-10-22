@@ -50,6 +50,7 @@
   - **Foes are fixed:** they never flip.
   - **Waves** happen automatically.
 - **Rank movement:** Athletics moves yourself; Warfare moves allies and foes.
+- **Battle vs check skills** (designer alternative, 2026-10-22, Claude leans yes): 3 battle skills (2 start + Lv 7 pick; only they give abilities) + 2 check skills (rolled from background, no abilities). Checks feed fights (Lore reveals weakness, Scouting avoids ambush, Thievery opens loot, Talk weakens a fight, Trade sells higher), per findings "knowledge feeds the next roll". Draft lists: battle 15 (Heavy, Light, Unarmed, Ranged, Defense, Warfare, Command, Animal Companion, Roguery, Villainy, Alchemy+Doctor, Engineering, Elemental, Holy, Dark); check 6 (Lore, Scouting, Talk, Trade, Thievery, Athletics). Civilians = check skills only. Drops D-0046's minor fighting tier.
 - **Combo bases** (Claude idea, offered 2026-10-22): a few bases need two skills (Heavy + Holy "Holy Smite"); only mercs with both are dealt them; the ability flips the two skills' average. Skill pairs feel like classes (Crusader = Heavy + Holy, Defense at Lv 7) without hard classes. E-0005 round 4: every Darkest Dungeon class maps to 1–2 of our skills.
 - **Modifiers:** 0–4 per ability by star (D-0027). Engine-priced; the AI picks from the candidates the engine deals (D-0025, proposed).
 - **Foe families** each have a sharp twist.
