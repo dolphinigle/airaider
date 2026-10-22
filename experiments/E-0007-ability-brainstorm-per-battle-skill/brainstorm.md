@@ -4,6 +4,8 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 
 **Writing conventions (designer, 2026-10-22):**
 - **Damage is a % of a standard hit** (Darkest Dungeon style): "yup sounds good lets use %. pls remember it." How % becomes coins (heads × base per head, D-0069) is settled in balance (step 2).
+- **Model abilities first** (designer, 2026-10-22): each skill gets a few model abilities that set its identity; the rest are filled in later. The designer lets Claude pick details ("just pick yourself, i dont have strong pref").
+- **Generic names**, because the AI replaces every name ("the names should be more generic").
 - **Statuses are written by name only** ("for status application like stun just say stun for now, lets figure out how they are applied later").
 
 ## Mods (designer, 2026-10-22)
@@ -22,16 +24,19 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 
 **Key abilities, in the designer's order:** Cleave, Overhead Smash, Sunder, and **Titanic Swing**, a rarer ability that hits three foes.
 
-Cards (designer-approved 2026-10-22, with the designer's changes: Overhead Smash is the default attack, foe rank 1 only, 110%, no cooldown, "balanced by the fact its only front line"):
+**Model abilities** (designer-approved cards 2026-10-22; Claude picked the stun, knockback and wind-up ones; generic names, the designer's names in brackets):
 
 | ability | rarity | ranks | damage | effect | cost |
 |---|---|---|---|---|---|
-| **Overhead Smash** | 1★ | 1–2 → foe 1 only | 110% | the default attack | 0 cd |
-| **Cleave** | 1★ | 1–2 → foe 1 and 2 | 60% each | hits both front foes | 0 cd (Claude, designer let Claude decide) |
-| **Sunder** | 2★ | 1–2 → 1–2 | 80% | Sundered: foe Physical defense down 3 rounds | cd 3 |
-| **Titanic Swing** | 4★ | 1 → foe 1, 2 and 3 | 70% each | Staggered next round (act last, take more damage) | cd 4 |
+| **Heavy Strike** (Overhead Smash) | 1★ | 1–2 → foe 1 only | 110% | the default attack | 0 cd |
+| **Cleave** | 1★ | 1–2 → foe 1 and 2 | 60% each | hits both front foes | 0 cd |
+| **Knockback Strike** | 1★ | 1–2 → foe 1–2 | 90% | knocks the foe back 1 rank | cd 1 |
+| **Sunder** | 2★ | 1–2 → 1–2 | 80% | Sundered | cd 3 |
+| **Stunning Blow** | 2★ | 1–2 → foe 1 | 70% | Stun | cd 2 |
+| **Wind-up** | 2★ | self | — | your next Two-handed attack deals 100% more damage | cd 3 |
+| **Wide Swing** (Titanic Swing) | 4★ | 1 → foe 1, 2 and 3 | 70% each | you are Staggered next round | cd 4 |
 
-Stun and knockback come from other Two-handed abilities, not yet designed (designer: "stun and knockback will be on different skill"). Cleave has no cooldown (Claude's call): with Overhead Smash, every turn asks focus (110% on one) or spread (60% on two).
+Every turn asks focus (Heavy Strike) or spread (Cleave), since both have no cooldown. Knockback Strike sends a dangerous foe back and brings the one behind into reach.
 
 Claude's first draft (the long list, kept for later picks):
 
@@ -127,3 +132,18 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 | conditional | | dmg | **Potent / Lingering** | its statuses are stronger / last a round longer | inflicts a status |
 
 **Rejected (designer, 2026-10-22):** Sweeping ("sweeping bad no"); Clash (merged into smooth Executing / Opening Blow); Mighty, Second Wind (replaced by Consistent), Savage, Bane of \<family\>, Exploiting, Giant-slayer, Piercing, Vengeful, Vanguard, First Strike, Momentum, Bloodthirsty, Focused, Coordinated ("the earlier ones are all rejected"); all the Path of Exile support gem translations (Purist, Steady, Festering, Smouldering, Bulwark, Finisher, Patient, Ruthless, Twin Charge, Alternating, Consuming, Bane of \\<status\\>, Charging, Rooted, Close Quarters / Far Shot, Outnumbered, Trophy; designer: "all in (2) are rejected"). Evasive ("we dont have evasion planned yet"); Taunting ("bad"); Carry-through, Shattering. Heal drafts rejected: the five single-status cures, Fortifying, Bedside, Lasting / Potent for buffs, Well-stocked. Echo merged into Double Strike ("echo should be same").
+
+## Polearm (STR)
+
+**Identity (Claude's draft):** the second-rank fighter. It strikes from ranks 2–3 over an ally's shoulder, reaches deep into the foe line, and pulls or pushes foes to set up the squad. Two-handed only knocks back; Polearm does both.
+
+**Model abilities (Claude's draft):**
+
+| ability | rarity | ranks | damage | effect | cost |
+|---|---|---|---|---|---|
+| **Thrust** | 1★ | 2–3 → foe 1–2 | 100% | the default attack | 0 cd |
+| **Deep Thrust** | 1★ | 2–3 → foe 3–4 | 80% | reaches the back ranks | cd 1 |
+| **Pull** | 1★ | 2–3 → foe 2–4 | 60% | pulls the foe forward 1 rank | cd 2 |
+| **Push** | 2★ | 2–3 → foe 1 | 70% | pushes the foe back 1 rank | cd 2 |
+| **Impale** | 2★ | 2–3 → foe 1–2 | 130% | Bleed | cd 3 |
+| **Sweep** | 3★ | 2–3 → foe 1 and 2 | 50% each | hits both front foes | cd 2 |
