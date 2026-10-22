@@ -387,7 +387,6 @@ export const SKILLS = [
       '2|Slow Heavy Empower|1–4|self||Empowered at 100%; you act last next round|0 cd|new',
       '2|Lengthen Next Statuses|1–4|self||your next action\'s statuses get +1 count|0 cd|new',
       '3|Repeat Next Action|1–4|self||your next action fires twice|cd 3|new',
-      '4|Reset Cooldowns|1–4|self||every cooldown you have ends|cd 4|new',
     ] },
   { name: 'Carousing', attr: 'CHA + CON', ranks: '1–4', role: 'self-sufficient; healer (weak)', state: 'new',
     id: 'Doping: one-time bottles for a big self buff, then a hangover. Some bottles hit or heal.',
