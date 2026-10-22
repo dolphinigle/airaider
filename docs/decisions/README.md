@@ -66,4 +66,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0057](D-0057-quests-are-a-sequence-of-nodes-combat-or-skill-check.md) | Quests are a sequence of nodes: combat or skill check | accepted | designer | 2026-10-22 |
 | [D-0058](D-0058-battle-skills-and-check-skills-are-separate-with-their-own-q.md) | Battle skills and check skills are separate with their own quotas | accepted | designer | 2026-10-22 |
 | [D-0059](D-0059-quest-preview-shows-the-fixed-node-line-some-nodes-hidden.md) | Quest preview shows the fixed node line, some nodes hidden | accepted | designer | 2026-10-22 |
+| [D-0060](D-0060-dark-magic-is-paid-in-hp-guns-are-ranged.md) | Dark Magic is paid in HP; guns are Ranged | accepted | designer | 2026-10-22 |
 <!-- index:end -->

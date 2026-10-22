@@ -36,7 +36,7 @@ The core skills (D-0021, D-0045, D-0058), with the stats their tests usually poo
 | Fighting | **Heavy Weapons** | greatswords, axes, hammers, polearms | STR, CON |
 | | **Light Weapons** | swords, daggers, rapiers, brawling | DEX, STR |
 | | **Unarmed** | fists, kicks, grapples, martial arts | DEX, STR |
-| | **Ranged** | bows, crossbows, slings, throwing | DEX, STR |
+| | **Ranged** | bows, crossbows, guns, slings, throwing (D-0060) | DEX, STR |
 | | **Defense** | shields, armor, parrying, holding a line | CON, STR |
 | | **Athletics** | climbing, swimming, running, hauling, tumbling | STR, DEX |
 | | **Warfare** | tactics, formations, sieges, fortifications, battle plans | INT, STR |
@@ -62,7 +62,7 @@ The core skills (D-0021, D-0045, D-0058), with the stats their tests usually poo
 | | **Engineering** | building, machines, how things work, numbers, explosives, setting traps | INT, STR |
 | Magic ✦ | **Elemental Magic** ✦ | fire, frost, lightning | INT, WIL |
 | | **Holy Magic** ✦ | healing, blessing, warding off the dead | CHA, WIL |
-| | **Dark Magic** ✦ | curses, necromancy, draining life, pacts | INT, CHA |
+| | **Dark Magic** ✦ | curses, necromancy, draining life, pacts; **its abilities cost HP** (D-0060) | INT, CHA |
 
 ## Talents (D-0018)
 

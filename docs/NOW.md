@@ -31,6 +31,7 @@
   - One new ability per level up. The AI picks one of a few dealt bases from the merc's fighting skills and renames it. Never the same base twice. Four equipped (D-0047).
   - 10–20 bases per fighting skill (D-0047).
   - Weapon tags filter bases; Unarmed is its own skill; no medium tier (D-0045).
+  - Dark Magic abilities cost HP; guns are a Ranged weapon tag (D-0060).
   - The first ability is always a 0-cooldown attack, with a generic fallback (Smash, Kick); generic bases also come up rarely later (D-0050, D-0051).
   - The player sees only the AI name (D-0048).
 - **Passives are traits:** gender, race, personality, body. They never touch coins (D-0036, D-0038–D-0040).
