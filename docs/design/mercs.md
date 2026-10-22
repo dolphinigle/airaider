@@ -56,8 +56,8 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 | **Leadership** | your side: party auras, Resolve, moving teammates, focus-fire orders (D-0073); rare, weak stress healing (D-0062) | CHA |
 | **Performance** | songs, Haste, distraction; rare, weak stress healing | DEX + CHA |
 | **Animal Companion** | a fighting pet, like the Houndmaster (no rank of its own) | CHA |
-| **Dirty Fighting** | (name maybe **Skullduggery**, designer) their side (was Villainy, D-0074): debuffs (blind, weaken), marks, yanking foes forward (D-0073) | STR + DEX (was DEX + CON; designer: Counter holds that row) |
-| **Counter** | (D-0097) counters, ripostes, punishing foes that hit you or a neighbor; archers shoot back | DEX + CON |
+| **Dirty Fighting** | (name maybe **Skullduggery**, designer) their side (was Villainy, D-0074): debuffs (blind, weaken), marks, yanking foes forward (D-0073) | STR + DEX (was DEX + CON; designer: Retaliation holds that row) |
+| **Retaliation** | (was Counter, D-0097; renamed by designer) counters, ripostes, punishing foes that hit you or a neighbor; archers shoot back | DEX + CON |
 | **Stealth** | hiding, ambush strikes | DEX |
 | **Doctor** | healing; limited uses per quest (D-0062) | INT |
 | **Alchemy** | potions, poisons, flasks; limited uses per quest | INT |
