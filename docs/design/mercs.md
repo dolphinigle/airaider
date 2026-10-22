@@ -2,7 +2,7 @@
 
 What a merc is made of (stats, skills, talents, level) and how they grow.
 
-## Stats (D-0044)
+## Stats (D-0079)
 
 Six stats, each a number of **coins**, about **10 → 20** over a career. Checks and attacks flip **attribute + skill level** (D-0069); statuses land on a separate skill flip. Foes scale by HP.
 
@@ -13,7 +13,7 @@ Six stats, each a number of **coins**, about **10 → 20** over a career. Checks
 | **INT** | intelligence | attack coins for its battle skills |
 | **CHA** | charisma | attack coins for its battle skills |
 | **CON** | endurance, toughness | **max HP** |
-| **WIL** | willpower: nerve, fear, curses, focus | the **stress check** (D-0042); stress builds slower (proposed) |
+| **LUK** | luck | no skills; raises the heads chance of **every coin** the merc flips, small per point (working: 50% at 10 → 55% at 20) |
 
 Starting stats are a little randomized, biased by **race**; a wolfkin leans DEX (D-0018).
 
@@ -31,7 +31,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 
 ### Battle skills (19)
 
-✦ = rare. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). Pairings are Claude's draft.
+✦ = rare. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). Pairings: D-0079.
 
 | skill | covers | attributes |
 |---|---|---|
@@ -52,8 +52,8 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 | **Fire Magic** ✦ | fire damage, burns (D-0070) | INT |
 | **Frost Magic** ✦ | frost damage, slows | INT |
 | **Lightning Magic** ✦ | lightning damage, chains | INT |
-| **Holy Magic** ✦ | healing, blessing, warding off the dead; deals mostly Physical | CHA + WIL |
-| **Dark Magic** ✦ | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | INT + WIL (designer) |
+| **Holy Magic** ✦ | healing, blessing, warding off the dead; deals mostly Physical | CHA |
+| **Dark Magic** ✦ | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | INT |
 
 **Damage types (D-0070):** Physical, Fire, Frost, Lightning, Chaos. Poison and bleed are statuses.
 
@@ -128,7 +128,7 @@ What a merc does in a fight is an **ability**; a **skill** (Survival, Swords…)
   - rest in base buildings;
   - Leadership and Performance abilities;
   - personality traits, which set how fast it builds.
-- **No quirks.** The check flips **WIL** (D-0044). Open: whether stress matters outside fights.
+- **No quirks.** **No stat touches stress** (D-0079: "stress is stress"). Open: what decides Resolve vs Breakdown at 100; whether stress matters outside fights.
 
 ## Upgrade items (D-0029)
 

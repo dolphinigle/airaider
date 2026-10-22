@@ -50,7 +50,7 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0041](D-0041-combat-basics-one-line-per-side-speed-coins-each-round-stat-.md) | Combat basics: one line per side, speed coins each round, stat plus skill coins times base | proposed | designer | 2026-10-22 |
 | [D-0042](D-0042-stress-a-darkest-dungeon-style-bar-that-carries-across-quest.md) | "Stress: a Darkest Dungeon style bar that carries across quests" | accepted | designer | 2026-10-22 |
 | [D-0043](D-0043-fight-sprites-one-ai-painted-image-per-pose-as-in-darkest-du.md) | "Fight sprites: one AI-painted image per pose, as in Darkest Dungeon" | proposed | designer | 2026-10-22 |
-| [D-0044](D-0044-six-stats-per-folds-into-dex-wil-takes-willpower-from-con.md) | "Six stats: PER folds into DEX, WIL takes willpower from CON" | accepted | designer | 2026-10-22 |
+| [D-0044](D-0044-six-stats-per-folds-into-dex-wil-takes-willpower-from-con.md) | "Six stats: PER folds into DEX, WIL takes willpower from CON" | superseded → D-0079 | designer | 2026-10-22 |
 | [D-0045](D-0045-unarmed-is-its-own-core-skill-no-medium-weapons-weapon-tags-.md) | Unarmed is its own core skill, no medium weapons, weapon tags filter base abilities | superseded → D-0063 | designer | 2026-10-22 |
 | [D-0046](D-0046-fighting-skills-the-core-skills-that-give-abilities.md) | "Fighting skills: the core skills that give abilities" | superseded → D-0058 | designer | 2026-10-22 |
 | [D-0047](D-0047-abilities-10-to-20-bases-per-fighting-skill-the-ai-picks-one.md) | "Abilities: 10 to 20 bases per fighting skill, the AI picks one of a few dealt and renames it" | superseded → D-0067 | designer | 2026-10-22 |
@@ -81,8 +81,9 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0072](D-0072-dark-magic-costs-stress-not-hp-and-does-not-drain-life.md) | Dark Magic costs stress, not HP, and does not drain life | accepted | designer | 2026-10-22 |
 | [D-0073](D-0073-warfare-is-deleted-leadership-works-on-your-side-dirty-fight.md) | Warfare is deleted; Leadership works on your side, Dirty Fighting on theirs | accepted | designer | 2026-10-22 |
 | [D-0074](D-0074-most-skills-use-one-attribute-a-few-use-two.md) | Most skills use one attribute; a few use two | accepted | designer | 2026-10-22 |
-| [D-0075](D-0075-battle-skill-attribute-pairings.md) | Battle skill attribute pairings | accepted | designer | 2026-10-22 |
+| [D-0075](D-0075-battle-skill-attribute-pairings.md) | Battle skill attribute pairings | superseded → D-0079 | designer | 2026-10-22 |
 | [D-0076](D-0076-keep-the-14-check-skills-three-per-merc.md) | Keep the 14 check skills, three per merc | superseded → D-0077 | designer | 2026-10-22 |
 | [D-0077](D-0077-check-skills-merge-to-nine-three-per-merc.md) | Check skills merge to nine, three per merc | accepted | designer | 2026-10-22 |
 | [D-0078](D-0078-check-skill-names-intimidation-and-craft.md) | Check skill names: Intimidation and Craft | accepted | designer | 2026-10-22 |
+| [D-0079](D-0079-wil-out-luk-in-luck-raises-every-coin-s-heads-odds.md) | WIL out, LUK in: luck raises every coin's heads odds | accepted | designer | 2026-10-22 |
 <!-- index:end -->

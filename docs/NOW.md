@@ -21,12 +21,12 @@
 - **Skill checks** are pure coin flips (D-0013): attribute + skill level (D-0069).
 
 ### Mercs ([design/mercs.md](design/mercs.md))
-- **Stats:** STR DEX INT CHA CON WIL (D-0044), about 10 → 20 over a career (D-0069). DEX gives speed coins, CON gives max HP, WIL is the stress check. Each skill uses one attribute, a few two (D-0074, D-0075).
+- **Stats:** STR DEX INT CHA CON LUK (D-0079), about 10 → 20 over a career (D-0069). DEX gives speed coins, CON gives max HP, LUK (no skills) raises every coin's heads chance a little. WIL is gone; no stat touches stress. Each skill uses one attribute, a few two (D-0074, D-0079).
 - **Stars** (D-0069): every skill has a star (1★–5★, half steps) that sets its XP gain and, for battle skills, its abilities' modifier odds; the merc's star makes high skill stars likelier.
 - **Upgrade items:** star-up and reroll reroll only the level-up seed (D-0029, D-0032). A star-up sets a fixed star below 5★ (D-0037).
 - **Skills:**
   - Two starting skills; pick 1 of 3 at Lv 7 (D-0035).
-  - **Battle skills** (19, give abilities; D-0075) and **check skills** (give none) are separate, with their own quotas: 3 battle (working) + 3 check (D-0077). Battle skills can be checked too. Civilians have check skills only; v3 captives, if they return, too (D-0058).
+  - **Battle skills** (19, give abilities; D-0079) and **check skills** (give none) are separate, with their own quotas: 3 battle (working) + 3 check (D-0077). Battle skills can be checked too. Civilians have check skills only; v3 captives, if they return, too (D-0058).
 - **Abilities:** fights use abilities; skills are what mercs know (D-0031).
   - A merc level up gives attributes only. **Some battle-skill level ups give a new ability** (working: skill levels 1, 3, 5, 7, 9): the AI picks one of a few dealt bases from that skill and renames it. Never the same base twice. Four equipped (D-0069).
   - 10–20 bases per battle skill (D-0069).
@@ -35,7 +35,7 @@
   - The first ability is always a 0-cooldown attack, with a generic fallback (Smash, Kick); generic bases also come up rarely later (D-0050, D-0051).
   - The player sees only the AI name (D-0048).
 - **Passives are traits:** gender, race, personality, body. They never touch coins (D-0036, D-0038–D-0040). Traits have stars; passives scale a little with them (D-0068; Claude: 5★ = 1.5×).
-- **Stress:** 0–100, carries across quests. At 100 the merc flips WIL: Resolve or Breakdown. No quirks (D-0042).
+- **Stress:** 0–100, carries across quests. At 100: Resolve or Breakdown, decided by no stat (D-0079; how is open). No quirks (D-0042).
 - **Tactics:** condition + action + target, and their parts are loot (D-0030, D-0034).
 - **Gear:** none for now; it comes eventually (D-0034).
 
@@ -63,7 +63,7 @@
 
 ## Next
 
-0. **Battle skills are settled** (2026-10-22): 19 skills with attribute pairings (D-0063, D-0070, D-0073, D-0074, D-0075; table in design/mercs.md). Coins = attribute + skill level (D-0069); defense and damage types (D-0070); Dark Magic costs stress (D-0072). Still open:
+0. **Battle skills are settled** (2026-10-22): 19 skills with attribute pairings (D-0063, D-0070, D-0073, D-0074, D-0079; table in design/mercs.md). Coins = attribute + skill level (D-0069); defense and damage types (D-0070); Dark Magic costs stress (D-0072). Still open:
    - **Ability cadence** (Claude: a new ability at skill levels 1, 3, 5, 7, 9).
    - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances). Claude leans Darkest Dungeon.
 1. **NEXT SESSION STARTS HERE: fix the check (non-combat) skills** (designer: "next: fixing the non combat skills"). Stars set XP gain (D-0069).
@@ -75,7 +75,7 @@
 
 ## Waiting on the designer
 
-- **Remove WIL?** (designer, 2026-10-22): leaning cut; PER judged redundant with DEX. Designer asked if 5 is decent, or add **LUK** (no skills, raises coin heads odds). E-0005 round 5: 4–6 is normal. Claude: 5 + LUK, small per point (heads 50% at LUK 10 → 55% at 20); LUK could also be the stress check. If WIL goes: Holy → CHA, Dark → INT.
+- **Stress at 100 without a stat** (D-0079): always Breakdown, a flat chance, or something else? Resolve stays?
 - **Check nodes** (D-0059 notes): one named skill per node; pass gives loot/buff/knowledge, fail costs; can Scouting reveal hidden nodes?
 - **Skill stress healing** is rare and weak; rest is the main relief (D-0062).
 - **To decide later** (D-0055):

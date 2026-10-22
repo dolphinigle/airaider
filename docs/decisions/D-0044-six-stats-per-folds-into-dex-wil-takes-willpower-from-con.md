@@ -1,11 +1,11 @@
 ---
 id: D-0044
 title: "Six stats: PER folds into DEX, WIL takes willpower from CON"
-status: accepted
+status: superseded 
 date: 2026-10-22
 decided-by: designer
 supersedes: [D-0022]
-superseded-by:
+superseded-by: D-0079
 evidence: []
 sources: []
 ---
