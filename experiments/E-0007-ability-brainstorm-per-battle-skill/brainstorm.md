@@ -100,7 +100,7 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 - **One damage type per ability.** An element mod **converts all of it** to another type and adds **more** damage (multiplicative, D-0082) on top.
 - **Scaling mods scale smoothly, never at a threshold.**
 - **Universal but conditional:** a mod fits any ability that meets its condition.
-- **Coin mods fit debuff abilities too**, since debuffs flip to land: there they change the landing chance (designer, 2026-10-22).
+- **Coin mods fit debuff abilities too**, since debuffs flip to land: there they change the landing chance (designer, 2026-10-22). **Accuracy stays limited:** only coin mods touch it (Lucky, Consistent, more coin mods later). Power mods never turn into landing chance on potency-less debuffs (designer: "no disagree, accuracy modifying mods on debuff must be limited").
 
 | family | limit | fits | mod | effect | notes |
 |---|---|---|---|---|---|
@@ -130,7 +130,7 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 | condition | | dmg | **Crushing** | more damage against shielded or armored foes | |
 | coins | none | both | **Lucky** | +5% heads chance (number open) | |
 | coins | | both | **Consistent** | reroll a bad flip once (under 20% heads) | |
-| coins | | both | **Gamble** | all coins land the same, all heads or all tails; +10% more power | |
+| coins | | dmg / heal | **Gamble** | all coins land the same, all heads or all tails; +10% more power | damage and heals only, "way too strong for accuracy" (designer) |
 | double-edged | none | both | **Reckless** | 15% more power; you take 15% more damage until your next turn | not rare |
 | double-edged | | both | **Wild / Unsteady / Fraught / Ponderous** | more power; random target / random step back or forward / gives you stress / you act last | rare |
 | double-edged | | dmg / heal | **Blood Price / Transfusion** | costs you HP; more power | rare |
@@ -176,6 +176,12 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 | **Yank** | 2★ | 1–2 → foe 2–3 | 50% | pulls the foe forward 1 rank | 0 cd |
 | **Kick Them Down** | 2★ | 1–2 → foe 1–2 | 60% | +40% more per debuff on the foe | 0 cd |
 | **Flashbang** | 4★ | 1–3 → foe 1–3 | — | Stun | 2 uses per quest (number Claude's) |
+
+**Flashbang's mods** (Stun has no potency, so no power or scaling mods, as on Bless; designer rulings 2026-10-22, the rest Claude's draft):
+- **Common:** an extra debuff (1: Blinding / Weakening / Exposing / Slowing / Marking, weak); a small status (Burning / Poisoning / Bleeding / Shocking / Chilling, flat ~10% of a standard hit, as Guarding on Bless); Heavy (knock back) or **Yanking** (Claude: pull forward 1 rank); Guarding, Advancing / Retreating, Swift; Reaching, Footwork; **Lucky, Consistent** (the landing chance).
+- **Rare:** Lingering (stun 2 turns, costs a use); **Dispelling** (Claude: removes every buff from the target, the mirror of Purifying); Soothing.
+- **Limited-use price** (Claude, to rule): where a mod would add cooldown, a limited-use ability loses a use instead.
+- **Out:** Gamble (damage and heals only); Cunning (Claude's easier-to-land-on-debuffed, rejected with accuracy-from-power); Double Strike (a second stun); Quick / Measured (no cooldown); Opportunist, Splitting; Well-stocked (rejected before).
 
 **No default attack** (designer: "dirty fighting shouldnt have a default attack. its not a WEAPON/MAGIC skill"). Low Blow removed.
 
