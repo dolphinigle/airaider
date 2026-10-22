@@ -48,7 +48,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 | **Shooting** | bows, crossbows, guns: back-rank sniper, long reach, aimed shots, volleys (D-0091) | DEX |
 | **Throwing** | knives, axes, javelins, slings: skirmisher from front or middle ranks, multi-throws, bleeds (D-0091) | STR + DEX |
 | **Defender** | shields, taunts, guarding, party shields (was Defense, designer) | CON |
-| **Fury** | the berserker (Hellion): burst self-buffs, huge hits that exhaust you after, war cries, kills feed it, stronger when hurt or paid in HP (D-0089) | STR + CON |
+| **Fury** âœ¦ | the berserker (Hellion): burst self-buffs, huge hits that exhaust you after, war cries, kills feed it, stronger when hurt or paid in HP (D-0089); rare (designer) | STR + CON |
 | **Grit** | the survivor (Leper): self-heal, shrug off statuses, survive a killing blow once, regen; keeps only itself alive (D-0089) | CON |
 | **Leadership** | your side: party auras, Resolve, moving teammates, focus-fire orders (D-0073); rare, weak stress healing (D-0062) | CHA |
 | **Performance** | songs, Haste, distraction; rare, weak stress healing | DEX + CHA |
