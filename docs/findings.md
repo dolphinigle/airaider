@@ -26,6 +26,7 @@ Rules:
 - **Base skills + engine-priced modifiers, AI names them and picks mods from engine-dealt candidates.** The engine computes costs, so AI picks can't break balance, only shape it; themes landed (Oswin's Blessed Mace = Strike + Holy, Brann's Runic Mark = Expose + Lasting). Free picks piled on raw power (Heavy 9 and Swift 6 of 40 picks, two mods almost every time); dealing 3 candidates spread them out. Mock. (E-0003)
 - **A star that sets the odds of every future roll.** Stars as a recruit's mod count read at a glance; once mercs roll a battle skill each level, a star that sets each roll's odds stays true over the whole career. Flat per-skill odds buried every merc in mods (97% had one). Sim, untested in play. (E-0004)
 - **Line formation + speed order + cooldowns + weaknesses + buffs and debuffs, played on auto, carries games for a decade.** Summoners War (2014, $3B), Raid (per-skill auto priority = our S1-S4), Epic Seven, Honkai Star Rail, Pokémon; their depth sits in the build, and speed control plus gear are their other big levers. Research. (E-0005)
+- **A high attribute base (10 to 20 over a career) removes zero rolls.** With 3 to 13 coins, threshold and armor models dealt nothing most of the time at low levels; at 10+ coins every model dealt damage on 95%+ of attacks (except a hit check against high defense) (E-0006)
 
 ## Doesn't work
 
@@ -36,6 +37,7 @@ Rules:
 - **A separate minigame for talk.** Griftlands' parallel negotiation battle read as two different games and made the weaker mode a trap; tabletop and video successes keep one roll primitive and scale the structure to the stakes. Research. (E-0003)
 - **Clash combat where both sides flip (Limbus Company style).** Number-heavy, brings foe coins back (D-0013), needs a move kit per merc; designer: 'clash bad'. (E-0003)
 - **AI-generated battle-skill mechanics.** Even within a fixed parts list, Sonnet gave 5 of 6 mercs the same block skill, drew skills from the wrong source, priced a warrior's taunt in mana and swung power (whole-enemy stun at 2 mana). Unique skills per merc also stop the player learning what a skill does. Mock. (E-0003)
+- **Threshold hit checks on coin pools cliff and waste heads.** One defense step cut a Lv1 merc's mean damage ~70% (7.5 to 2.1) while a Lv12 talented merc gained only 6% over an untalented one; % mitigation stayed linear and never locked a merc out (E-0006)
 
 ## Open
 
