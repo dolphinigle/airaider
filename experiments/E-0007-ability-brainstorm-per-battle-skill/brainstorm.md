@@ -241,7 +241,8 @@ Bless: 3–4 → any ally, Blessed until its next flip, 0 cd. On a buff ability,
 - **Guarding**: the target also gains a small shield (about 10% of a standard hit).
 - **Mending**: the target also heals a little (about 20% of a standard hit).
 - **Purifying**: also removes every negative status. **Rare** on buffs (common on heals).
-- Reused unchanged: scaling on your own HP or stress (Desperate, Fresh, Haunted, Serene), double-edged (Reckless; rare Wild, Fraught, Blood Price, Ponderous, Unique), Advancing / Retreating, Footwork, Swift, Soothing, Calming.
+- Reused unchanged: scaling on your own HP or stress (Desperate, Fresh, Haunted, Serene), double-edged (Reckless; rare Wild, Fraught, Blood Price, Ponderous, Unique), Advancing / Retreating, Swift, Soothing, Calming.
+- **Range mods** (designer: "add the range modifier stuffs"): **Footwork** (usable from 1 more rank: Bless from 2–4) and **Reaching** (reaches 1 rank further). Reaching fits only an ability whose reach is limited; Bless already reaches any ally (Claude).
 - **Echo** (designer: "probably add echo"): small chance to fire again, one repeat at most; it is Double Strike under its non-attack name (Claude: the repeat may pick a second ally).
 - **Rejected:** Spreading ("bad"); Triage / Comforting on buffs ("'stronger buff' makes no sense").
 - Dropped as not fitting: element, status, debuffs, Vampiric, Executing / Opening Blow, Opportunist, Crushing, Splitting, Quick / Measured, Composed.
