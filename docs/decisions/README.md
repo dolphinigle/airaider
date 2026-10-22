@@ -60,4 +60,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0051](D-0051-generic-bases-can-be-dealt-on-any-level-up-rarely.md) | Generic bases can be dealt on any level up, rarely | accepted | designer | 2026-10-22 |
 | [D-0052](D-0052-campaign-follows-darkest-dungeon-one-quest-a-week-the-rest-r.md) | "Campaign follows Darkest Dungeon: one quest a week, the rest recover, gold sinks" | accepted | designer | 2026-10-22 |
 | [D-0053](D-0053-fights-are-manual-by-default-some-later-quests-force-tactics.md) | Fights are manual by default; some later quests force tactics-run fights | accepted | designer | 2026-10-22 |
+| [D-0054](D-0054-time-pressure-through-quest-deadlines.md) | Time pressure through quest deadlines | proposed | designer | 2026-10-22 |
 <!-- index:end -->
