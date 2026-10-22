@@ -20,6 +20,96 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 
 - **Some ability bases are rarer** (the designer called Titanic Swing "a (rarer) skill"). Rarer bases are dealt to the AI less often, and the skill's star makes them likelier (designer: "1 STAR skills are common"). Claude reads this as rarity stars on ability bases (reading A). Whether skill types also have rarity (reading B) is unconfirmed.
 
+## Battle skill identities (Claude's draft, 2026-10-23; designer-set rows marked)
+
+One row per battle skill (29, D-0099). **Ranks** are the skill's range; each ability sets its own. **Attack** = has a default attack (weapon and magic skills only). Status names come from the effects list; new ones are marked (new).
+
+| skill | attr | ranks | damage / status | attack | role | does | doesn't |
+|---|---|---|---|---|---|---|---|
+| **Two-handed** (designer) | STR | 1–2 | Physical | ✓ | front damage | hits several front foes, knockback, Stun (cd), Sunder, after-effects (Staggered) | reach foe 3–4; defend; heal |
+| **Polearm** | STR | 2–3 | Physical / Bleed | ✓ | reach damage | strikes over an ally's shoulder, reaches foe 3–4, pulls and pushes, sweeps the two front foes | Stun; self-buffs; work from rank 1 or 4 |
+| **Weapon and Shield** | STR+CON | 1–2 | Physical | ✓ | tank | steady hits that also shield itself, Shield Bash (Stun, cd), brace for a big hit | protect others (Defender's); several foes; reach |
+| **Dual Wield** | DEX+STR | 1–2 | Physical / Bleed | ✓ | front damage | two or more light hits a turn, stacking Bleed, self Haste | Stun; moving foes; one big hit |
+| **Single Weapon** | STR+DEX | 1–3 | Physical | ✓ | front damage | the duelist: lunge (advance and strike), a Riposte stance, Exposed, crits on one foe | several foes; moving foes |
+| **Unarmed** | STR+DEX | 1–2 | Physical / Bleed (claws) | ✓ | front damage | combos (a follow-up hits harder on the foe it hit last turn), grapple (Slowed; a limited choke Stun), self-moves | reach foe 3–4; shields; armor break |
+| **Shooting** | DEX | 3–4 | Physical / Bleed | ✓ | reach damage | reaches any foe, big aimed shots, extra on Marked foes, a weak volley on all foes | anything from ranks 1–2; moves; Stun |
+| **Throwing** | STR+DEX | 2–3 | Physical / Bleed, Poison | ✓ | reach damage | several small throws at random foes, Bleed and Poison knives, a net (Slowed), reaches foe 2–4 | big single hits (Shooting's); rank 4; defense |
+| **Fire** (designer) | STR+INT | 1–4 | Fire / Burn | ✓ | reach damage | single and area damage, Burn, melee spells from ranks 1–2 | heal; shields; Stun |
+| **Frost** (designer) | DEX+INT | 2–4 | Frost / Chilled | ✓ | reach damage | single target, Chilled, shields on the caster | area damage; heal allies |
+| **Lightning** (designer) | INT | 3–4 | Lightning / Shocked | ✓ | reach damage | the biggest direct damage, chains across foes, Shocked | defense; heal; ranks 1–2 |
+| **Holy** (designer) | CHA | 1–4 | Physical | ✓ (weak) | healer | heals (cd), Bless, Purify, a weak shield, weak damage | big damage; debuffs |
+| **Dark** (designer) | CHA+CON | 2–4 | Chaos | ✓ | control | curses (debuffs), healing paid with stress, rare Chaos damage; costs stress | Poison; life drain (D-0072) |
+| **Defender** | CON | 1–2 | — | | tank | guards an ally (takes their hits), taunts, shields allies, braces | damage; heals |
+| **Berserk** | STR | 1–2 | Physical | | front damage | huge hits and front-line area (whirlwind), self Emboldened, war cries, stronger when hurt, pays HP, Staggered after, kills feed it | defend; help allies; reach |
+| **Executioner** | STR | 1–2 | Physical | | front damage | more damage the lower the foe's HP, a kill-outright blow under a threshold (limited), a kill refunds the turn | open on fresh foes; area; support |
+| **Survivor** | CON | 1–4 | — | | self-sustain | self-heal (cd), self Regen, cleanses itself, survives a killing blow once per quest | help allies; damage |
+| **Precision** | DEX | 1–4 | — | | ally support | Blessed on itself or allies, raises crit chance (D-0092) | damage; heals |
+| **Warfare** | STR+INT | 1–3 | Physical | | ally support | combined attack (an ally strikes with it), breaks foe shields, Sundered, lowers a foe's defense to one type (the resist-lowering home, D-0097) | heal; stress; area |
+| **Leadership** | CHA | 2–4 | — | | ally support | party Emboldened, moves allies (D-0073), focus-fire orders (Mark), Resolve, rare weak stress relief | damage; HP heals |
+| **Performance** | DEX+CHA | 2–4 | — | | ally support | Haste on allies, distracts foes (Slowed, Weakened), a Regen song, rare weak stress relief | damage; moves; big heals |
+| **Animal Companion** | CHA | 1–4 | Physical / Bleed | (open) | reach damage | the pet attacks any foe from any rank, guards an ally, marks prey (Mark) | the merc's own defense; heals |
+| **Dirty Fighting** (approved) | STR+DEX | 1–3 | Physical | | control | light hits carrying debuffs (Blinded, Weakened, Mark), yanks foes forward, a payoff blow on debuffed foes, one rare limited Stun | default attack; big damage |
+| **Retaliation** | DEX+CON | 1–3 | Physical | | tank | Riposte charges, counters when a neighbor is hit, a payback blow on the foe that hit it last | act first; area; heal |
+| **Stealth** | DEX | 1–3 | Physical | | front damage | hides (Hidden (new): can't be targeted until it acts), a big ambush strike from hiding, slips between ranks | protect allies; long fights |
+| **Doctor** | INT | 2–4 | — | | healer | big single heals, cures Bleed and Poison, Regen; limited uses per quest (D-0062) | damage; buffs |
+| **Alchemy** | INT | 2–4 | Fire, Chaos / Burn, Poison | | control | thrown flasks, all limited uses: Poison, fire bombs (area, Burn), acid (Sundered), smoke (Blinded), a healing potion | unlimited use; melee |
+| **Concentration** | INT | 1–4 | — | | self-empower | empowers its own next action: more power, cut a cooldown, repeat the last, act twice (rare), recover a use | effects of its own; help allies |
+| **Carousing** | CHA+CON | 1–3 | Fire / Burn (spit) | | self-empower | one-time bottles: big self-buffs then a hangover (Staggered), liquid courage (no stress gain), spit a burning spirit, share a flask (ally heal or buff) | repeat; ranged; dodge (no evasion yet) |
+
+### Distribution
+
+**By main role** (one each; 29):
+
+| role | # | skills |
+|---|---|---|
+| front damage | 7 | Two-handed, Dual Wield, Single Weapon, Unarmed, Berserk, Executioner, Stealth |
+| reach damage | 7 | Polearm, Shooting, Throwing, Fire, Frost, Lightning, Animal Companion |
+| tank | 3 | Weapon and Shield, Defender, Retaliation |
+| healer | 2 | Holy, Doctor |
+| ally support | 4 | Precision, Warfare, Leadership, Performance |
+| control | 3 | Dark, Dirty Fighting, Alchemy |
+| self-sustain / self-empower | 3 | Survivor, Concentration, Carousing |
+
+**By effect** (a skill counts once per effect it has at all):
+
+| effect | # | skills |
+|---|---|---|
+| default attack | 13 | the 8 weapons, the 5 magics |
+| no damage at all | 7 | Defender, Survivor, Precision, Leadership, Performance, Doctor, Concentration |
+| area damage (2+ foes) | 8 | Two-handed, Polearm, Shooting, Throwing, Fire, Lightning, Berserk, Alchemy |
+| Bleed | 6 | Polearm, Dual Wield, Unarmed, Shooting, Throwing, Animal Companion |
+| Burn | 3 | Fire, Alchemy, Carousing |
+| Poison | 2 | Throwing, Alchemy |
+| Chilled / Shocked | 1 / 1 | Frost / Lightning |
+| heals allies | 5 | Holy, Doctor (main); Alchemy, Dark, Carousing (side) |
+| heals only itself | 1 | Survivor |
+| Regen | 3 | Doctor, Performance, Survivor (self) |
+| cures statuses | 2 | Holy, Doctor (Survivor itself only) |
+| shields allies | 2 | Defender, Holy (weak) |
+| shields itself | 2 | Weapon and Shield, Frost |
+| guards / taunts | 2 | Defender, Animal Companion (pet guards) |
+| buffs allies | 6 | Holy, Precision, Warfare, Leadership, Performance, Carousing |
+| buffs itself | 7 | Dual Wield, Single Weapon, Berserk, Retaliation, Stealth, Concentration, Carousing |
+| debuffs (Mark aside) | 9 | Two-handed, Single Weapon, Unarmed, Throwing, Dark, Warfare, Performance, Dirty Fighting, Alchemy |
+| Mark | 3 | Leadership, Animal Companion, Dirty Fighting |
+| lowers foe defense | 3 | Two-handed (Sunder), Warfare, Alchemy (acid) |
+| Stun (always limited) | 4 | Two-handed, Weapon and Shield, Unarmed, Dirty Fighting |
+| moves foes | 3 | Two-handed, Polearm, Dirty Fighting (D-0073) |
+| moves allies | 1 | Leadership (D-0073) |
+| moves itself | 3 | Single Weapon, Unarmed, Stealth |
+| turn order (Haste, Slowed) | 4 | Dual Wield, Performance, Unarmed, Throwing |
+| counters | 2 | Single Weapon (one stance), Retaliation |
+| stress relief | 2 | Leadership, Performance (rare, weak); Carousing only stops gain |
+| pays a cost | 4 | Dark (stress), Berserk (HP), Two-handed and Carousing (after-effects) |
+| whole skill limited uses | 3 | Doctor, Alchemy, Carousing |
+
+**By rank** (skills usable from it): rank 1: 19 · rank 2: 27 · rank 3: 22 · rank 4: 14. Weapons at rank 4: Shooting only; a rank-4 merc's default attack comes from Shooting or a magic.
+
+**Observations:**
+- Only 2 main healers. With 3 random battle skills, about 1 merc in 5 has Holy or Doctor.
+- Chaos is rare on purpose: Dark, plus Poison from Throwing and Alchemy.
+- Open: does Animal Companion's pet attack count as a default attack (it acts like a weapon)? Is Hidden (Stealth) a new status? Unarmed and Animal Companion would like to move foes too, but D-0073 gives that to three skills. Carousing's dodge clashes with "no evasion yet".
+
 ## Two-handed (STR)
 
 **Identity (designer, 2026-10-22):** ranks 1–2; hits the foe front line; can hit several foes; knocks back; stuns; sunders; **after-effects**: big swings leave a self-debuff on the next turn. Not wind-ups (designer: "two handed theme shouldnt be wind up, its 'after effects'"; Wind-up removed).
