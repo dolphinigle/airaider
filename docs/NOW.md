@@ -21,7 +21,7 @@
 - **Skill checks** are pure coin flips (D-0013): attribute + skill level (D-0069).
 
 ### Mercs ([design/mercs.md](design/mercs.md))
-- **Stats:** STR DEX INT CHA CON LUK (D-0079), about 10 → 20 over a career (D-0069). Percent effects use Path of Exile *increased* (additive) and *more* (multiplicative) (D-0082). Passives (D-0081, counted from 10 = no effect, below 10 hurts): STR ±1% damage per point, DEX speed coins, INT XP of every kind, CHA quest gold, CON max HP, LUK (no skills) heads chance on every coin. WIL is gone; no stat touches stress. Each skill uses one attribute, a few two (D-0074, D-0084).
+- **Stats:** STR DEX INT CHA CON LUK (D-0084), about 10 → 20 over a career (D-0069). Percent effects use Path of Exile *increased* (additive) and *more* (multiplicative) (D-0082). Passives (D-0081, counted from 10 = no effect, below 10 hurts): STR 1% increased damage per point, DEX speed coins, INT 3% increased XP per point, CHA increased quest gold (summed over the squad), CON max HP, LUK (no skills) heads chance on every coin. WIL is gone; no stat touches stress. Each skill uses one attribute, a few two (D-0074, D-0084).
 - **Stars** (D-0069): every skill has a star (1★–5★, half steps) that sets its XP gain and, for battle skills, its abilities' modifier odds; the merc's star makes high skill stars likelier.
 - **Upgrade items:** star-up and reroll reroll only the level-up seed (D-0029, D-0032). A star-up sets a fixed star below 5★ (D-0037).
 - **Skills:**
@@ -35,7 +35,7 @@
   - The first ability is always a 0-cooldown attack, with a generic fallback (Smash, Kick); generic bases also come up rarely later (D-0050, D-0051).
   - The player sees only the AI name (D-0048).
 - **Passives are traits:** gender, race, personality, body. They never touch coins (D-0036, D-0038–D-0040). Traits have stars; passives scale a little with them (D-0068; Claude: 5★ = 1.5×).
-- **Stress:** 0–100, carries across quests. At 100: Resolve or Breakdown, decided by no stat (D-0079; how is open). No quirks (D-0042).
+- **Stress:** 0–100, carries across quests. At 100: Resolve or Breakdown, decided by no stat (D-0084; how is open). No quirks (D-0042).
 - **Tactics:** condition + action + target, and their parts are loot (D-0030, D-0034).
 - **Gear:** none for now; it comes eventually (D-0034).
 
@@ -77,7 +77,7 @@
 
 ## Waiting on the designer
 
-- **Stress at 100 without a stat** (D-0079): always Breakdown, a flat chance, or something else? Resolve stays?
+- **Stress at 100 without a stat** (D-0084): always Breakdown, a flat chance, or something else? Resolve stays?
 - **Check nodes** (D-0059 notes): one named skill per node; pass gives loot/buff/knowledge, fail costs; can Scouting reveal hidden nodes?
 - **Skill stress healing** is rare and weak; rest is the main relief (D-0062).
 - **To decide later** (D-0055):
