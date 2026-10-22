@@ -44,7 +44,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 | **Weapon and Shield** | one-handed weapon + shield: shield bash, block, shield wall, counter | STR + CON |
 | **Dual Wield** | two blades, two axes: multi-hits, bleeds | DEX + STR |
 | **Single Weapon** | one sword or rapier, free hand: lunge, riposte, crits (the duelist) | STR + DEX |
-| **Unarmed** | fists, kicks, grapples, martial arts, claws and bites (werewolves) | STR + DEX |
+| **Unarmed** | fists, kicks, grapples, martial arts, claws and bites (werewolves); **rank 1 against foe 1 only** (no weapon, no range): stuns, holds, knocks the front foe back to reach the next (E-0007, D-0101) | STR + DEX |
 | **Shooting** | bows, crossbows, guns: back-rank sniper, long reach, aimed shots, volleys (D-0091) | DEX |
 | **Throwing** | knives, axes, javelins, slings: skirmisher from front or middle ranks, multi-throws, bleeds (D-0091) | STR + DEX |
 | **Defender** | shields, taunts, guarding, party shields (was Defense, designer) | CON |
@@ -52,14 +52,14 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 | **Executioner** | (D-0097) the finisher: more damage the lower the foe's HP; Claude's draft also has kill-outright blows under a threshold, a kill refunding the turn or resetting a cooldown, and picking out the weakest foe in reach. Skins: Headsman, Butcher, Death Blow | STR |
 | **Survivor** | (was Grit, D-0097) the Leper: self-heal, shrug off statuses, survive a killing blow once, regen; keeps only itself alive (D-0089) | CON |
 | **Precision** | raises the heads chance of coin flips, self or allies, and so crits (D-0095) | DEX |
-| **Warfare** | back (D-0095); scope open (draft: combined attacks with an ally, breaking foe shields, formation tricks) | STR + INT |
-| **Leadership** | your side: party auras, Resolve, moving teammates, focus-fire orders (D-0073); rare, weak stress healing (D-0062) | CHA |
+| **Warfare** | back (D-0095): orders that **move allies between ranks** (D-0101), debuffs foes, some buffs | STR + INT |
+| **Leadership** | your side: party auras, Resolve, focus-fire orders; rare, weak stress healing (D-0062); doesn't move allies (D-0101) | CHA |
 | **Performance** | songs, Haste, distraction; rare, weak stress healing | DEX + CHA |
 | **Animal Companion** | a fighting pet, like the Houndmaster (no rank of its own) | CHA |
-| **Dirty Fighting** | their side (was Villainy, D-0074): debuffs (blind, weaken), marks, yanking foes forward (D-0073) | STR + DEX (D-0098) |
+| **Dirty Fighting** | their side (was Villainy, D-0074): debuffs (blind, weaken), marks, yanking foes forward (D-0101) | STR + DEX (D-0098) |
 | **Retaliation** | (was Counter, D-0098) counters, ripostes, punishing foes that hit you or a neighbor; archers shoot back | DEX + CON |
 | **Stealth** | hiding, ambush strikes | DEX |
-| **Doctor** | healing; limited uses per quest (D-0062) | INT |
+| **Doctor** | healing: single-target heals, Regen, cures, minor area heals; **some** abilities have limited uses (emergency kits, D-0062); Alchemy is the limited-use skill | INT |
 | **Alchemy** | potions, poisons, flasks; limited uses per quest | INT |
 | **Fire Magic** | fire damage, burns (D-0070) | STR + INT |
 | **Frost Magic** | frost damage, slows | DEX + INT |

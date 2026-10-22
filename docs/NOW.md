@@ -51,7 +51,7 @@
   - **Interactions:** damage-type weaknesses, and statuses that raise damage taken.
   - **Foes are fixed:** they never flip.
   - **Waves** happen automatically.
-- **Rank movement:** Leadership moves teammates; Two-handed, Polearm and Dirty Fighting move foes (D-0073, D-0090); self-moves are bases in battle skills.
+- **Rank movement** (D-0101): Warfare moves allies; Dirty Fighting and Unarmed move foes, Two-handed, Weapon and Shield and Polearm weakly; self-moves are bases in any battle skill.
 - **Combo bases** (Claude idea, offered 2026-10-22): a few bases need two skills (Two-handed + Holy "Holy Smite"); only mercs with both are dealt them; the ability flips the two skills' average. Skill pairs feel like classes (Crusader = Weapon and Shield + Holy, Defender at Lv 7) without hard classes. E-0005 round 4: every Darkest Dungeon class maps to 1–2 of our skills.
 - **Modifiers:** 0–4 per ability by the skill's star (D-0069). Engine-priced; the AI picks from the candidates the engine deals (D-0025, proposed).
 - **Foe families** each have a sharp twist.
@@ -69,7 +69,7 @@
       - Done: Two-handed, Holy and Dirty Fighting model abilities; the five magic identities and ranks; **the mod catalog is done** (designer, 2026-10-23: "we have all the mods proper"), covering damage, heal, buff (Bless) and debuff (Flashbang) abilities; the central effects list with count and potency.
       - **NEXT SESSION STARTS HERE: give every battle skill (29, D-0099) an identity**, the way the magics and Two-handed have one (ranks, damage/status, what it does, what it doesn't). Then model abilities for the rest (Polearm, Fire, Frost, Lightning and Dark drafts wait for review).
       - Conventions: damage as a % of a standard hit; generic names (the AI renames); **most abilities have no cooldown** (Darkest Dungeon), but heals, stuns and a few big effects do; **only weapon and magic skills have a default attack**; stuns are always limited (cooldown or uses per quest); debuffs flip coins to land, and only coin mods (Lucky, Consistent) touch that; the AI is offered about 10 random fitting common mods plus flipped-in rares.
-      - Open: Yanking (Claude's pull-forward mod); does the Stunning mod add +1 cd; heal fill-ins (ally-buff cost, who gets Guarding's shield) deferred. Batch into decisions later: the mod rules (D-0025 is still proposed), ally moves by mods vs D-0073, "no evasion yet" vs D-0070 dodge charges, no default attack on non-weapon/magic skills vs D-0050's first-ability rule (the generic fallback covers it).
+      - Open: Yanking (Claude's pull-forward mod); does the Stunning mod add +1 cd; heal fill-ins (ally-buff cost, who gets Guarding's shield) deferred. Batch into decisions later: the mod rules (D-0025 is still proposed), ally-moving mods (Rallying / Sheltering) vs D-0101, "no evasion yet" vs D-0070 dodge charges, no default attack on non-weapon/magic skills vs D-0050's first-ability rule (the generic fallback covers it).
    2. A balance frame: the damage formula, foe HP, target turns per fight, using Darkest Dungeon as the guide.
    3. Foe design, then a few mock foes, learning from Darkest Dungeon as closely as possible.
    4. Design the abilities with that balance.

@@ -27,16 +27,16 @@ Key identities come first; the strong / weak effect table is redone from them af
 | skill | key identity | source |
 |---|---|---|
 | **Two-handed** | big, strong, wide hits that leave a drawback on itself for its next turn. Weak: moving foes, Stun | designer; Stun kept from the approved model abilities |
-| **Polearm** | hits the back ranks from rank 2–3; many attacks also step itself forward for more damage, so it keeps working its way back into position | designer |
+| **Polearm** | hits the back ranks from rank 2–3; many attacks also step itself forward for more damage, so it keeps working its way back into position. Weak: push and pull foes (D-0101) | designer; foe moves Claude's fix |
 | **Weapon and Shield** | holds the line itself: taunts, shields itself and allies, defensive self-buffs. Weak: single-target damage, Stun, moving foes. No area at all | designer |
 | **Dual Wield** | big damage only while moving: it must keep shifting between ranks 1–2 to deal big damage, or go the Bleed route. Strong: Bleed, self-moves, strong attacks whose drawback is moving itself. Weak: area. Multi-hits are flavor (more damage) | designer |
-| **Single Weapon** | **fits anywhere** (designer: "flexibility so it can fit with the ones that want to move around, can fit with defenders"). Claude: the widest melee ranks (1–3); many bases change by the rank they are used from (a lunge that steps forward from rank 2–3, a parry strike from rank 1); a little of everything (self-move, self shield, riposte, reach), strong at none; no setup. Pairs with movers and with Defender alike | designer theme, Claude proposal |
-| **Unarmed** | open, two proposals (Claude). **A: strike first**: hits harder when it acts before its target this round, and carries the tools to get there (self Haste, a Slowed jab); pays off on the same turn, no setup. **B: grapple and throw**: grabs a foe (Grappled: can't move, deals less to the grappler) and throws foes (moves them; overlaps Dirty Fighting and needs D-0073 widened). Claude leans A | Claude |
+| **Single Weapon** | **fits anywhere** (designer: "flexibility so it can fit with the ones that want to move around, can fit with defenders"): the widest melee ranks (1–3); many bases change by the rank they are used from (a lunge that steps forward from rank 2–3, a parry strike from rank 1); a little of everything (self-move, self shield, riposte, reach), strong at none; no setup | designer theme, Claude proposal (approved) |
+| **Unarmed** | **no weapon, no range**: works only from rank 1 against foe 1. It can stun, hold (Grappled: can't move) and so on, but only the front foe; to hit anyone else it must **knock the front foe back** | designer |
 | **Shooting** | hits the back ranks hard; struggles against the front line or when moved out of position (ranks 3–4) | designer |
 | **Throwing** | the reverse of Shooting: many attacks move it between ranks while dealing damage | designer |
 | **Fire** | Burn, moderate direct damage, and odd utilities, such as cauterizing (cures Poison, Bleed and Burn, with a cost) | designer |
-| **Frost** | Path of Exile cold: **control and defense**. Chilled makes foes act later; a heavily Chilled foe can be Frozen (loses a turn; a limited stun); ice armor shields itself and Chills foes that hit it. Moderate damage, single target: the safe mage | Claude, from Path of Exile and the designer's earlier lines |
-| **Lightning** | Path of Exile lightning: **big hits that set up the team**. Shocked makes the foe take more damage from everyone, more the bigger the hit that Shocked it; hits arc to neighbouring foes. Optional, from Path of Exile: the widest damage spread (lowest lows, highest highs); the designer earlier chose "the biggest direct damage" over Claude's coin-swing draft, so this is offered, not assumed | Claude, from Path of Exile and the designer's earlier lines |
+| **Frost** | shields, Stun (Frozen: a heavily Chilled foe loses a turn; limited) and moderate damage; Chilled slows foes. Single target (from Path of Exile cold) | designer, on Claude's proposal |
+| **Lightning** | big hits that inflict Shocked (the foe takes more damage from everyone, more the bigger the hit that Shocked it); hits arc to neighbouring foes | designer, on Claude's proposal |
 | **Holy** | **the many**: heals that cover the whole squad, Blessed on allies, cures; weak shields and weak damage | Claude |
 | **Dark** | **power at a price**: the strongest curses and effects in the game, each paid in its own stress; it heals allies by taking stress itself. The stress-economy skill | Claude, from the designer's earlier lines |
 | **Defender** | the **bodyguard**: guards one ally (takes the hits aimed at them), shields allies, taunts | designer |
@@ -44,14 +44,14 @@ Key identities come first; the strong / weak effect table is redone from them af
 | **Executioner** | more damage the lower the foe's HP; some bonuses on killing blows | designer |
 | **Survivor** | self-sufficient: heals and buffs itself, plays as if alone; no team utility | designer |
 | **Precision** | self buffs (luck on its flips, crits); weak ally buffs | designer |
-| **Warfare** | orders: tells allies to move between ranks, debuffs foes, some buffs | designer |
-| **Leadership** | ally buffs; weak stress relief | designer |
+| **Warfare** | orders: **moves allies between ranks** (D-0101), debuffs foes, some buffs | designer |
+| **Leadership** | ally buffs; weak stress relief; doesn't move allies (D-0101) | designer |
 | **Performance** | buffs, Regen songs (heals), minor debuffs; weak stress relief | designer |
 | **Animal Companion** | no set identity: a very wide set of bases covering almost everything; the AI picks what fits the pet | designer |
 | **Dirty Fighting** | debuffs, moving foes around, marks | designer |
 | **Retaliation** | gains when it is hit, and hits back | designer |
 | **Stealth** | the reverse taunt: makes itself harder to target; Claude adds bigger hits while hidden | designer + Claude |
-| **Doctor** | single-target heals, Regen, cures, general healing; minor area heals | designer |
+| **Doctor** | single-target heals, Regen, cures, general healing; minor area heals. Not a limited-use skill; **some** abilities have limited uses (emergency kits) | designer |
 | **Alchemy** | limited uses are the point: few uses but potent healing, Poison damage and various debuffs | designer |
 | **Concentration** | self buffs | designer |
 | **Carousing** | limited-use self buffs, some limited-use damage and healing | designer |
@@ -62,14 +62,12 @@ Key identities come first; the strong / weak effect table is redone from them af
 - **Holy / Doctor / Alchemy:** Holy heals the many (squad-wide, steady); Doctor fixes the one (single target, Regen, cures); Alchemy bursts (potent, few uses).
 - **Weapon and Shield / Defender:** Weapon and Shield draws attacks onto itself (taunt) and survives them; Defender protects one ally (guard) and shields others, and fights least.
 - **Polearm / Dual Wield / Throwing**, the three movers: Polearm steps forward only, as it strikes; Dual Wield dances between ranks 1–2; Throwing roams ranks 2–4.
-- **Leadership / Performance / Warfare:** Leadership is offense and morale (Emboldened, focus fire, Resolve); Performance is tempo and upkeep (Haste, Regen, stress); Warfare is position (orders to move) and breaking foes.
+- **Leadership / Performance / Warfare:** Leadership is offense and morale (Emboldened, focus fire, Resolve); Performance is tempo and upkeep (Haste, Regen, stress); Warfare is position (moves allies) and debuffs.
 - **Precision / Concentration:** Precision buffs its flips (luck, crits); Concentration buffs its next action (more power, shorter cooldowns, repeats).
 
 **Clashes with records:**
-- Warfare moving allies vs D-0073 (Leadership moves teammates).
-- Polearm's foe moves (D-0073, D-0090) aren't in its new line: kept as weak?
-- Doctor "limited uses per quest" (D-0062) vs Alchemy owning limited uses.
-- New statuses: Grappled (Unarmed B), Frozen (Frost), Hidden (Stealth).
+- Resolved 2026-10-23: ally and foe movers (D-0101); Doctor has only some limited-use abilities (fits D-0062).
+- New statuses: Grappled (Unarmed), Frozen (Frost), Hidden (Stealth).
 
 **Rejected** (designer, 2026-10-23): Single Weapon as **the duel**; Unarmed **combos** ("combos doesnt work with turn based games, too many turns required to 'go online'"); Frost **build and shatter**. Principle (Claude's reading): no identity that needs several turns of setup before it pays off.
 

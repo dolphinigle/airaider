@@ -79,7 +79,7 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0070](D-0070-elemental-splits-into-fire-frost-lightning-damage-types-foll.md) | Elemental splits into Fire, Frost, Lightning; damage types follow Path of Exile | accepted | designer | 2026-10-22 |
 | [D-0071](D-0071-skills-use-two-attributes-villainy-becomes-dirty-fighting.md) | Skills use two attributes; Villainy becomes Dirty Fighting | superseded → D-0074 | designer | 2026-10-22 |
 | [D-0072](D-0072-dark-magic-costs-stress-not-hp-and-does-not-drain-life.md) | Dark Magic costs stress, not HP, and does not drain life | accepted | designer | 2026-10-22 |
-| [D-0073](D-0073-warfare-is-deleted-leadership-works-on-your-side-dirty-fight.md) | Warfare is deleted; Leadership works on your side, Dirty Fighting on theirs | accepted | designer | 2026-10-22 |
+| [D-0073](D-0073-warfare-is-deleted-leadership-works-on-your-side-dirty-fight.md) | Warfare is deleted; Leadership works on your side, Dirty Fighting on theirs | superseded → D-0101 | designer | 2026-10-22 |
 | [D-0074](D-0074-most-skills-use-one-attribute-a-few-use-two.md) | Most skills use one attribute; a few use two | accepted | designer | 2026-10-22 |
 | [D-0075](D-0075-battle-skill-attribute-pairings.md) | Battle skill attribute pairings | superseded → D-0079 | designer | 2026-10-22 |
 | [D-0076](D-0076-keep-the-14-check-skills-three-per-merc.md) | Keep the 14 check skills, three per merc | superseded → D-0077 | designer | 2026-10-22 |
@@ -107,4 +107,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0098](D-0098-skill-roster-round-five-concentration-retaliation-dirty-figh.md) | Skill roster round five: Concentration, Retaliation, Dirty Fighting to STR + DEX | superseded → D-0099 | designer | 2026-10-22 |
 | [D-0099](D-0099-skill-roster-round-six-carousing-roguery-renamed-thievery.md) | Skill roster round six: Carousing, Roguery renamed Thievery | accepted | designer | 2026-10-22 |
 | [D-0100](D-0100-which-battle-skills-can-be-checked.md) | Which battle skills can be checked | accepted | designer | 2026-10-22 |
+| [D-0101](D-0101-rank-movement-warfare-moves-allies-five-skills-move-foes.md) | Rank movement: Warfare moves allies, five skills move foes | accepted | designer | 2026-10-23 |
 <!-- index:end -->
