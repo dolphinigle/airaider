@@ -69,7 +69,7 @@ No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0077); names D-
 |---|---|---|
 | **Athletics** | climbing, swimming, running, hauling | STR |
 | **Survival** | foraging, camping, weather, terrain, trails | CON |
-| **Awareness** | spotting ambushes, keeping watch, searching | DEX (designer) |
+| **Perception** | spotting ambushes, keeping watch, searching (was Awareness, designer) | DEX (designer) |
 | **Roguery** | locks, pockets, traps, forgery | DEX |
 | **Streetwise** | rumors, finding people, city ways | CHA + INT (designer) |
 | **Persuasion** | charm, diplomacy, haggling, appraising (+ Bargaining) | CHA |
