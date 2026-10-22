@@ -101,7 +101,6 @@ export const SKILLS = [
       '2|Bleeding Shot|3–4|foe 2–4|70%|Bleed|0 cd|new',
       '2|Slowing Shot|3–4|foe 2–4|60%|Slowed|0 cd|new',
       '3|Ricochet Shot|3–4|foe 3–4|90%|bounces to the foe next to it for 60%|0 cd|new',
-      '4|Overwatch Shot|3–4|foe 2–4|100%|fires at the first foe that acts next round, before it acts|0 cd|new',
     ] },
   { name: 'Throwing', attr: 'STR + DEX', ranks: '1–3', role: 'reach damage', state: 'new',
     id: 'The reverse of Shooting: many throws move it between ranks 1–3 while dealing damage.',
