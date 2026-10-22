@@ -386,7 +386,6 @@ export const SKILLS = [
       '1|Cut Cooldowns|1–4|self||your other cooldowns drop by 2|0 cd|new',
       '2|Slow Heavy Empower|1–4|self||Empowered at 100%; you act last next round|0 cd|new',
       '2|Lengthen Next Statuses|1–4|self||your next action\'s statuses get +1 count|0 cd|new',
-      '2|Extend Next Reach|1–4|self||your next action is usable from any rank and reaches any target|0 cd|new',
       '3|Repeat Next Action|1–4|self||your next action fires twice|cd 3|new',
       '4|Reset Cooldowns|1–4|self||every cooldown you have ends|cd 4|new',
     ] },
