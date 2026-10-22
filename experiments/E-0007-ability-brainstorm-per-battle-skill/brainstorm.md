@@ -71,6 +71,8 @@ Weapon flavor via mods (Claude's draft): axe → bleed, hammer → stun and armo
 | **Heavy** | knock back 1 rank; 50% **reduced** damage (additive, D-0082; value for the balancer) | rarer |
 | **Stunning** | stun; 50% reduced damage | rarer |
 
+**How mods are picked (designer, 2026-10-22):** "the ai will be given all these mods then asked to pick several (depends on the number of mods rolled on the skill)". The engine rolls the count; the AI sees every mod that fits the ability and picks that many to suit the merc. This replaces Claude's D-0025 proposal of dealing 3 candidates. The engine still enforces the exclusive groups (one element).
+
 **Not universal:**
 - **Quick**: −1 cooldown. Good, but only for abilities with a cooldown (not Cleave).
 - **Splitting**: for most multi-target (cleave-type) abilities: with fewer targets, the damage condenses onto those left.
