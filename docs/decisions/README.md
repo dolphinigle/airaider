@@ -63,4 +63,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0054](D-0054-time-pressure-through-quest-deadlines.md) | Time pressure through quest deadlines | proposed | designer | 2026-10-22 |
 | [D-0055](D-0055-core-loop-a-week-is-pick-quest-pick-squad-go-loot-recover-up.md) | "Core loop: a week is pick quest, pick squad, go, loot, recover, upgrade" | proposed | designer | 2026-10-22 |
 | [D-0056](D-0056-mostly-combat-civilization-quests-mostly-gone-check-skills-m.md) | "Mostly combat: civilization quests mostly gone, check skills merge" | accepted | designer | 2026-10-22 |
+| [D-0057](D-0057-quests-are-a-sequence-of-nodes-combat-or-skill-check.md) | Quests are a sequence of nodes: combat or skill check | proposed | designer | 2026-10-22 |
 <!-- index:end -->
