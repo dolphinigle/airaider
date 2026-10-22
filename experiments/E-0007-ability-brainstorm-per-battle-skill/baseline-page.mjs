@@ -29,7 +29,7 @@ function row(a) {
   const tag = a.flags.find(f => FLAG[f]);
   return `<tr data-from="${span(a.from).join('')}" data-text="${esc((a.name + ' ' + a.effect + ' ' + a.target + ' ' + a.cost).toLowerCase())}">
   <td class="st">${stars(a.star)}</td>
-  <td class="nm"><span class="name">${esc(a.name)}</span>${a.flags.includes('default') ? '<span class="chip def">default attack</span>' : ''}</td>
+  <td class="nm"><span class="name">${esc(a.name)}</span></td>
   <td class="rk">${pips(a)}<span class="rtxt">${esc(a.from)} → ${esc(a.target)}</span></td>
   <td class="pw">${esc(a.power) || '<span class="dim">—</span>'}</td>
   <td class="ef">${esc(a.effect) || '<span class="dim">—</span>'}</td>
@@ -168,10 +168,10 @@ tr[hidden]{display:none}
 <nav aria-label="Skills">${nav}</nav>
 <main>
 <h1>Baseline abilities</h1>
-<p class="lede">A first full set for all 29 battle skills, built from the key identities in E-0007. It is for a rough review: is each skill roughly in shape? Numbers are placeholders until balance. Power is a % of a standard hit, and heals and shields use the same scale. Names are generic, since the AI renames every ability. Debuffs flip coins to land; mods sit on top of all of this.</p>
+<p class="lede">A first full set for all 29 battle skills, built from the key identities in E-0007. It is for a rough review: is each skill roughly in shape? Numbers are placeholders until balance. Power is a % of a standard hit, and heals and shields use the same scale. Names are generic and say what the ability does, so the AI can guess it when picking abilities for a merc; it reskins every name. Any 0-cooldown ability that deals damage can be a default attack. Debuffs flip coins to land; mods sit on top of all of this.</p>
 <ul class="facts"><li><b>${skills.length}</b> skills</li><li><b>${n}</b> abilities</li><li><b>${skills.filter(k => k.state === 'reviewed').length}</b> reviewed skills, a few abilities added</li><li><b>${skills.filter(k => k.state === 'redone').length}</b> drafts redone</li><li><b>${skills.filter(k => k.state === 'new').length}</b> new</li></ul>
 <div class="notes">
-<div class="box"><h4>Questions for you</h4><ol>${questions.map(q => `<li>${esc(q)}</li>`).join('')}</ol></div>
+<div class="box"><h4>Calls I made</h4><ol>${questions.map(q => `<li>${esc(q)}</li>`).join('')}</ol></div>
 <div class="box"><h4>Statuses not on the effects list yet</h4><table>${statuses.map(([s, what, who]) => `<tr><td>${esc(s)}</td><td>${esc(what)}</td><td>${esc(who)}</td></tr>`).join('')}</table></div>
 </div>
 <p class="legend"><span>${pips({ from: '1–2', target: 'foe 1–2' })}one foe at rank 1–2, used from your rank 1–2</span><span>${pips({ from: '1', target: 'foe 1, 2 and 3' })}hits all three</span><span>${pips({ from: '3–4', target: 'any ally' })}targets an ally</span><span>Your ranks run 4-3-2-1, facing the foe's 1-2-3-4.</span></p>

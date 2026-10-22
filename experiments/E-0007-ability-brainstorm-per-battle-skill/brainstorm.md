@@ -8,7 +8,9 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 - **Generic names**, because the AI replaces every name ("the names should be more generic").
 - **Most abilities have no cooldown** (designer, 2026-10-22: "you have been using cd way way too often. MOST skills shouldnt have cd… see darkest dungeon"). An ability is priced by its power, ranks, targets and after-effects. Cooldowns go on heals ("Mend should have CD") and a few big effects.
 - **Only weapon and magic skills have a default attack** (designer, 2026-10-22, on Dirty Fighting). Other battle skills carry none; a merc whose first ability would come from one gets the generic fallback attack (D-0050, D-0051; Claude's reading).
-- **A skill may have two default attacks** (designer, 2026-10-23: "you can have two default attacks in a skill"), e.g. Fire's front and back ones; the merc gets the one that fits its rank (Claude).
+- **A default attack is any ability with 0 cooldown that deals damage** (designer, 2026-10-23: "has 0 cooldown and deals damage. so for example Cleave can be a two handed default attack too"), so a skill can have several and none is marked.
+- **Names say what the ability does** (designer, 2026-10-23): generic, but descriptive enough that the AI can guess the ability when it picks abilities for a merc (it reskins every name), e.g. Heavy Advancing Lunge, Shield All Allies.
+- **Polearm pairs** (designer, 2026-10-23): players will likely pair two Polearm mercs for synergy; a step forward swaps them, so each lunge sets the partner up at rank 3.
 - **10–30 abilities per skill in the final game** (designer, 2026-10-23: "in real one we want to have 10-30 abilities"); D-0069 says 10–20. The baseline (~8 each) is a first cut.
 - **Statuses are written by name only** ("for status application like stun just say stun for now, lets figure out how they are applied later").
 
