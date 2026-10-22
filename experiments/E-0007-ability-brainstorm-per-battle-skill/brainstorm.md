@@ -31,6 +31,7 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 - **Survivor relieves its own stress** (designer, 2026-10-23: "survivor should have a self stress heal combined with self heal"): Steel Yourself heals and lowers its stress. **Survivor is the only skill that lowers its own stress** (designer): Leadership and Performance calm *other* allies only. Conflict to rule: the rare **Soothing** mod (lowers your stress) puts self stress relief on any skill.
 - **Warfare buffs the allies it moves** (designer, 2026-10-23: "warfare is completely underpowered. in addition to moving it should also buff the moved allies"). Rearrange Squad removed (designer: "unclear how to perofrm it well").
 - **Performance has a Regen-all song** (designer, 2026-10-23).
+- **Extra turn for an ally** (designer, 2026-10-23: "performance should have a FOUR or FIVE star skill that lets another ally act again, once per battle/quest. leadership too"): 5★, once per battle, in Performance and Leadership (Claude's picks: 5★, per battle).
 - **Guard is one to one** (designer, 2026-10-23: "guard is only one person guarded by one. one person cannot guard 2 at the same time"); Guard All Allies is out.
 - **No doubling** (designer, 2026-10-23: "doubling in general is bad because expo damage"): no ability doubles a status or a value; cash it in instead (Burst Bleed, Burst Poison, like Detonate Burn).
 

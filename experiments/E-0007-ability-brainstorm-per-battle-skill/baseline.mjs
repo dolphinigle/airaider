@@ -276,6 +276,7 @@ export const SKILLS = [
       '2|Embolden All Allies|1–4|all allies||Emboldened, 1 attack|cd 2|new',
       '2|Calm Ally|1–4|another ally||the ally loses a little stress|cd 1|new',
       '3|Brace All Allies|1–4|all allies||Braced|cd 2|new',
+      '5|Order Ally to Act Again|1–4|another ally||the ally takes another turn right after yours|1 use per battle|new',
       '4|Embolden and Calm All Allies|1–4|all allies||Emboldened; each other ally loses a little stress|cd 4|new',
     ] },
   { name: 'Performance', attr: 'DEX + CHA', ranks: '3–4', role: 'support; healer (weak)', state: 'new',
@@ -290,6 +291,7 @@ export const SKILLS = [
       '2|Regen All Allies|3–4|all allies||Regen|cd 3|new',
       '2|Calming Song|3–4|all other allies||each loses a little stress|cd 3|new',
       '3|Encore|3–4|any ally||the ally\'s cooldowns drop by 1|cd 2|new',
+      '5|Ally Acts Again|3–4|another ally||the ally takes another turn right after yours|1 use per battle|new',
       '4|Haste and Regen All Allies|3–4|all allies||Haste and Regen|cd 4|new',
     ] },
   { name: 'Animal Companion', attr: 'CHA', ranks: '1–4', role: 'flex', state: 'new',
@@ -437,7 +439,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       if (/cd [1-9]/.test(a.cost)) cd++; if (/use/.test(a.cost)) uses++; if (/^0 cd/.test(a.cost) && /%/.test(a.power) && !/heal|shield/.test(a.power)) def++;
     }
     console.log(`${skills.length} skills, ${n} abilities (${(n / skills.length).toFixed(1)} each)`);
-    console.log(`rarity 1★–4★: ${byStar.slice(1, 5).join(' / ')}  ·  with a cooldown ${cd}  ·  limited uses ${uses}  ·  0-cd attacks ${def}`);
+    console.log(`rarity 1★–5★: ${byStar.slice(1, 6).join(' / ')}  ·  with a cooldown ${cd}  ·  limited uses ${uses}  ·  0-cd attacks ${def}`);
     console.log('flags', byState);
   } else if (cmd === 'html') {
     const { render } = await import('./baseline-page.mjs');
