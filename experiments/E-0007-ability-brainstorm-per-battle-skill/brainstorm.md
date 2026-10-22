@@ -31,7 +31,7 @@ Cards (designer-approved 2026-10-22, with the designer's changes: Overhead Smash
 | **Sunder** | 2★ | 1–2 → 1–2 | 80% | Sundered: foe Physical defense down 3 rounds | cd 3 |
 | **Titanic Swing** | 4★ | 1 → foe 1, 2 and 3 | 70% each | Staggered next round (act last, take more damage) | cd 4 |
 
-Open: where knockback lives (Claude leans a "Heavy" mod); where stun lives now that Overhead Smash is the plain default.
+Stun and knockback come from other Two-handed abilities, not yet designed (designer: "stun and knockback will be on different skill"). Open: Cleave's cooldown.
 
 Claude's first draft (the long list, kept for later picks):
 
@@ -70,14 +70,14 @@ Weapon flavor via mods (Claude's draft): axe → bleed, hammer → stun and armo
 | element | 1 | converts all damage, + more damage | Fiery, Frosty, Charged, Dark, Brutal |
 | status | no limit | | Bleeding, Poisoning, Burning, Shocking, Chilling |
 | debuff | 1 | 50% reduced damage; single-target abilities only | Stunning, Heavy, Marking, (Exposing, Weakening, Hampering) |
-| buff | 1 | | Swift, (Evasive, Riposting) |
+| buff | 1 | | Swift, (Riposting) |
 | sustain | no limit | Vampiric rare | Guarding, Vampiric |
 | self-move | 1 | | Advancing, Retreating |
 | reach | no limit | | Reaching, Footwork |
 | scaling | no limit | smooth, no thresholds | Executing, Opening Blow, Desperate, Fresh, Haunted, Serene |
 | condition | no limit | | Opportunist, Crushing |
 | coins | no limit | | Lucky, Consistent, Gamble |
-| double-edged | no limit | all rare; each deals more damage | Wild, Unsteady, Blood Price, Fraught, Ponderous, Unique |
+| double-edged | no limit | each deals more power; all rare except Reckless | Reckless, Wild, Unsteady, Blood Price, Fraught, Ponderous, Unique |
 | other | no limit | | Double Strike (one repeat at most), Soothing (rare) |
 | conditional | no limit | only if the ability meets the condition | Quick, Measured, Splitting, Potent, Lingering, Composed |
 
@@ -94,7 +94,7 @@ Names in brackets are Claude's, placed without a ruling.
 | **Marking** | mark: allies deal more to it | dmg | |
 | **Exposing / Weakening / Hampering** | takes more damage / deals less / acts later | dmg | Claude's |
 | **Swift** | you act earlier next round | both | |
-| **Evasive / Riposting** | gain a dodge / riposte charge | both | Claude's; rarer |
+| **Riposting** | gain a riposte charge | both | Claude's; rarer |
 | **Guarding** | gain a shield worth 10% of the damage or healing done | both | on a heal, Claude leans the shield goes to the healed ally |
 | **Vampiric** | heal yourself for a small share of the damage | dmg | rare |
 | **Advancing / Retreating** | you step forward / back 1 rank | both | exclusive |
@@ -111,6 +111,7 @@ Names in brackets are Claude's, placed without a ruling.
 | **Lucky** | +5% heads chance (number open) | both | |
 | **Consistent** | reroll a bad flip once (under 20% heads) | both | designer's |
 | **Gamble** | all coins land the same, all heads or all tails; +10% more power | both | designer's |
+| **Reckless** | 15% more power; you take 15% more damage until your next turn | both | universal, not rare (designer) |
 | **Wild** | its target is picked at random | both | rare, more power |
 | **Unsteady** | moves you back or forward 1 rank at random | both | rare, more power |
 | **Blood Price** | costs you HP | both | rare, more power |
@@ -126,8 +127,4 @@ Names in brackets are Claude's, placed without a ruling.
 | **Lingering** | its statuses last a round longer | dmg | inflicts a status |
 | **Composed** | softens its self-debuff | both | has one |
 
-**Rejected (designer, 2026-10-22):** Sweeping ("sweeping bad no"); Clash (merged into smooth Executing / Opening Blow); Mighty, Second Wind (replaced by Consistent), Savage, Bane of \<family\>, Exploiting, Giant-slayer, Piercing, Vengeful, Vanguard, First Strike, Momentum, Bloodthirsty, Focused, Coordinated ("the earlier ones are all rejected"); all the Path of Exile support gem translations (Purist, Steady, Festering, Smouldering, Bulwark, Finisher, Patient, Ruthless, Twin Charge, Alternating, Consuming, Bane of \\<status\\>, Charging, Rooted, Close Quarters / Far Shot, Outnumbered, Trophy; designer: "all in (2) are rejected").
-
-**Not yet ruled (Claude's):**
-- Taunting: foes hit must target you next round.
-- Cleave-only: Carry-through, Shattering, Reckless.
+**Rejected (designer, 2026-10-22):** Sweeping ("sweeping bad no"); Clash (merged into smooth Executing / Opening Blow); Mighty, Second Wind (replaced by Consistent), Savage, Bane of \<family\>, Exploiting, Giant-slayer, Piercing, Vengeful, Vanguard, First Strike, Momentum, Bloodthirsty, Focused, Coordinated ("the earlier ones are all rejected"); all the Path of Exile support gem translations (Purist, Steady, Festering, Smouldering, Bulwark, Finisher, Patient, Ruthless, Twin Charge, Alternating, Consuming, Bane of \\<status\\>, Charging, Rooted, Close Quarters / Far Shot, Outnumbered, Trophy; designer: "all in (2) are rejected"). Evasive ("we dont have evasion planned yet"); Taunting ("bad"); Carry-through, Shattering.
