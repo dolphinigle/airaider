@@ -53,115 +53,74 @@ Abilities (Claude's draft, ranks: used from → reaches):
 
 Weapon flavor via mods (Claude's draft): axe → bleed, hammer → stun and armor break, sword → crit chance.
 
+### Effects list (central; designer: "centralize list of accepted buffs/debuffs, so when we say 'buff mod' just pick one from those")
+
+A mod or ability that says "a buff" or "a debuff" picks one entry from this list. Entries marked (Claude) are unruled.
+
+| kind | effect | what it does |
+|---|---|---|
+| damage status | **Bleed / Poison / Burn / Shocked / Chilled** | one per damage type: Physical / Chaos / Fire / Lightning / Frost; what each does is open |
+| debuff | **Stun** | loses its next turn (rarer) |
+| debuff | **Mark** | allies deal more to it |
+| debuff | **Sundered** | Physical defense down (Sunder) |
+| debuff | **Exposed** (Claude) | takes more damage |
+| debuff | **Weakened** (Claude) | deals less damage |
+| debuff | **Slowed** (Claude) | acts later next round |
+| self-debuff | **Staggered** | acts last next round and takes more damage (Titanic Swing) |
+| buff | **Haste** | acts earlier next round |
+| buff | **Emboldened** | its next attack deals more damage |
+| buff | **Blessed** | its next flip gets a better heads chance |
+| buff | **Riposte** (Claude) | a riposte charge |
+
+Not on the list: shields (sustain), regen (over time), knockback (a move). Dodge and evasion are not planned yet (designer).
+
 ### Mod catalog (designer rulings, 2026-10-22; curated, the current state)
 
 **How mods work:**
 - **The AI picks.** The engine rolls how many mods an ability gets; the AI sees every mod that fits and picks that many to suit the merc (designer: "the ai will be given all these mods then asked to pick several"). This replaces Claude's D-0025 idea of dealing 3 candidates.
 - **The cost depends on the ability.** On a 0-cooldown ability a mod is free and small, about **10% power** ("a good enough trade"). On an ability with a cooldown, a mod can cost something (such as +1 cd) and be stronger.
-- **One damage type per ability.** An element mod **converts all of it** to another type and adds **more** damage (multiplicative, D-0082) on top (designer: "keep it simple").
-- **Statuses: one per damage type.** Physical → Bleed, Chaos → Poison, Fire → Burn, Lightning → Shocked, Frost → Chilled.
-- **Scaling mods scale smoothly, never at a threshold** (designer, on Clash).
+- **Power** is damage on an attack and healing on a heal. **Fits**: dmg (damaging abilities), heal (healing abilities), both.
+- **One damage type per ability.** An element mod **converts all of it** to another type and adds **more** damage (multiplicative, D-0082) on top.
+- **Scaling mods scale smoothly, never at a threshold.**
 - **Universal but conditional:** a mod fits any ability that meets its condition.
 
-**Families and limits:**
+| family | limit | fits | mod | effect | notes |
+|---|---|---|---|---|---|
+| element | 1 | dmg | **Fiery / Frosty / Charged / Dark / Brutal** | the damage becomes Fire / Frost / Lightning / Chaos / Physical, + more damage | on an ability already of that type, only the more damage (Claude) |
+| status | none | dmg | **Bleeding / Poisoning / Burning / Shocking / Chilling** | inflicts that status, worth ~10% of the damage | statuses may get a slightly higher multiplier (balancer) |
+| debuff | 1 | dmg | **Debuffing** | inflicts one debuff from the effects list | 50% reduced damage; single-target abilities only |
+| debuff | | dmg | **Heavy** | knock the target back 1 rank | rarer; same costs |
+| ally buff | 1 | heal | **Hastening / Emboldening / Blessed** | gives the target Haste / Emboldened / Blessed | single target only; reduced healing (Claude: 50%, mirroring debuffs) |
+| self buff | 1 | both | **Swift** (or any buff from the list) | gives you a buff | |
+| cure | 1 | heal | **Purifying** | removes every negative status from the target | common; 50% reduced healing; single target only |
+| sustain | none | both | **Guarding** | a shield worth 10% of the damage or healing | on a heal, on the healed ally (Claude) |
+| sustain | | dmg | **Vampiric** | you heal a small share of the damage | rare |
+| sustain | | heal | **Empathic** | you also heal for a share of it | rare |
+| sustain | | heal | **Overflow** | 30% of healing past full HP becomes a shield | rare |
+| over time | none | heal | **Regenerating** | part of the heal comes later as regen, more in total | |
+| self-move | 1 | both | **Advancing / Retreating** | you step forward / back 1 rank | |
+| reach | none | both | **Reaching / Footwork** | reaches 1 rank further / usable from 1 more rank | |
+| scaling | none | dmg | **Executing / Opening Blow** | more the more HP the target has lost / has left | smooth |
+| scaling | | heal | **Triage** | more healing the more HP the target has lost | |
+| scaling | | heal | **Comforting** | more healing the more stress the target has | |
+| scaling | | both | **Desperate / Fresh** | more power the more HP you have lost / have left | Desperate is the higher % |
+| scaling | | both | **Haunted / Serene** | more power the more / less stress you have | |
+| condition | none | dmg | **Opportunist** | more damage on a foe with any status | ~15–20% |
+| condition | | heal | **Remedial** | more healing on an ally with any negative status | |
+| condition | | dmg | **Crushing** | more damage against shielded or armored foes | |
+| coins | none | both | **Lucky** | +5% heads chance (number open) | |
+| coins | | both | **Consistent** | reroll a bad flip once (under 20% heads) | |
+| coins | | both | **Gamble** | all coins land the same, all heads or all tails; +10% more power | |
+| double-edged | none | both | **Reckless** | 15% more power; you take 15% more damage until your next turn | not rare |
+| double-edged | | both | **Wild / Unsteady / Fraught / Ponderous** | more power; random target / random step back or forward / gives you stress / you act last | rare |
+| double-edged | | dmg / heal | **Blood Price / Transfusion** | costs you HP; more power | rare |
+| double-edged | | both | **Unique** | massively more power; uses drop one step (unlimited → once per battle → once per quest) | rare |
+| other | none | both | **Double Strike** | small chance to fire again (on a heal: heals again) | one repeat at most |
+| other | | both | **Soothing** | lowers your stress | rare |
+| other | | heal | **Calming** | lowers the target's stress a little | rare |
+| conditional | none | both | **Quick / Measured** | −1 cooldown / much more power, +1 cooldown | has a cooldown |
+| conditional | | both | **Splitting** | with fewer targets, the power condenses onto those left | hits several targets |
+| conditional | | both | **Composed** | softens its self-debuff | has one |
+| conditional | | dmg | **Potent / Lingering** | its statuses are stronger / last a round longer | inflicts a status |
 
-| family | per ability | other rules | mods |
-|---|---|---|---|
-| element | 1 | converts all damage, + more damage | Fiery, Frosty, Charged, Dark, Brutal |
-| status | no limit | | Bleeding, Poisoning, Burning, Shocking, Chilling |
-| debuff | 1 | 50% reduced damage; single-target abilities only | Stunning, Heavy, Marking, (Exposing, Weakening, Hampering) |
-| buff | 1 | | Swift, (Riposting) |
-| sustain | no limit | Vampiric rare | Guarding, Vampiric |
-| self-move | 1 | | Advancing, Retreating |
-| reach | no limit | | Reaching, Footwork |
-| scaling | no limit | smooth, no thresholds | Executing, Opening Blow, Desperate, Fresh, Haunted, Serene |
-| condition | no limit | | Opportunist, Crushing |
-| coins | no limit | | Lucky, Consistent, Gamble |
-| double-edged | no limit | each deals more power; all rare except Reckless | Reckless, Wild, Unsteady, Blood Price, Fraught, Ponderous, Unique |
-| other | no limit | | Double Strike (one repeat at most), Soothing (rare) |
-| conditional | no limit | only if the ability meets the condition | Quick, Measured, Splitting, Potent, Lingering, Composed |
-
-Names in brackets are Claude's, placed without a ruling.
-
-**Every mod.** "Power" means damage on an attack and healing on a heal (designer: "these are all for damaging skills… rewrod the ones that makes sense so it also covers for HEAL"). **Fits**: dmg = damaging abilities only; both = damaging and healing.
-
-| mod | effect | fits | notes |
-|---|---|---|---|
-| **Fiery / Frosty / Charged / Dark / Brutal** | the damage becomes Fire / Frost / Lightning / Chaos / Physical, and more damage | dmg | Claude's reading: on an ability already of that type, it only adds the more damage |
-| **Bleeding / Poisoning / Burning / Shocking / Chilling** | inflicts that status, worth ~10% of the damage | dmg | statuses may get a slightly higher multiplier (balancer) |
-| **Stunning** | stun | dmg | rarer |
-| **Heavy** | knock the target back 1 rank | dmg | rarer |
-| **Marking** | mark: allies deal more to it | dmg | |
-| **Exposing / Weakening / Hampering** | takes more damage / deals less / acts later | dmg | Claude's |
-| **Swift** | you act earlier next round | both | |
-| **Riposting** | gain a riposte charge | both | Claude's; rarer |
-| **Guarding** | gain a shield worth 10% of the damage or healing done | both | on a heal, Claude leans the shield goes to the healed ally |
-| **Vampiric** | heal yourself for a small share of the damage | dmg | rare |
-| **Advancing / Retreating** | you step forward / back 1 rank | both | exclusive |
-| **Reaching** | reaches 1 rank further (1–2 → 1–3) | both | |
-| **Footwork** | usable from 1 more rank (from 1–2 → 1–3) | both | |
-| **Executing** | more power the more HP the target has lost | both | smooth; a heal gives more to the badly hurt |
-| **Opening Blow** | more power the more HP the target has left | both | smooth; a heal tops up the barely hurt (Claude: weak on heals, maybe dmg only) |
-| **Desperate** | more power the more HP you have lost | both | higher % than Fresh ("having high hp is a lot easier") |
-| **Fresh** | more power the more HP you have left | both | |
-| **Haunted** | more power the more stress you have | both | |
-| **Serene** | more power the less stress you have | both | Claude's name |
-| **Opportunist** | more power on a target with any status | both | ~15–20%; a heal on an ally who is bleeding, stunned… |
-| **Crushing** | more damage against shielded or armored foes | dmg | |
-| **Lucky** | +5% heads chance (number open) | both | |
-| **Consistent** | reroll a bad flip once (under 20% heads) | both | designer's |
-| **Gamble** | all coins land the same, all heads or all tails; +10% more power | both | designer's |
-| **Reckless** | 15% more power; you take 15% more damage until your next turn | both | universal, not rare (designer) |
-| **Wild** | its target is picked at random | both | rare, more power |
-| **Unsteady** | moves you back or forward 1 rank at random | both | rare, more power |
-| **Blood Price** | costs you HP | both | rare, more power |
-| **Fraught** | gives you stress | both | rare, more power |
-| **Ponderous** | you act last | both | rare, more power |
-| **Unique** | massively more power; its uses drop one step: unlimited → once per battle, once per battle → once per quest | both | rare; Claude's rule (designer: "up to you") |
-| **Double Strike** | small chance to fire again | both | one repeat at most |
-| **Soothing** | lowers your stress when used | both | rare |
-| **Quick** | −1 cooldown | both | has a cooldown |
-| **Measured** | much more power, +1 cooldown | both | has a cooldown |
-| **Splitting** | with fewer targets, the power condenses onto those left | both | hits several targets |
-| **Potent** | its statuses are stronger | dmg | inflicts a status |
-| **Lingering** | its statuses last a round longer | dmg | inflicts a status |
-| **Composed** | softens its self-debuff | both | has one |
-
-**Rejected (designer, 2026-10-22):** Sweeping ("sweeping bad no"); Clash (merged into smooth Executing / Opening Blow); Mighty, Second Wind (replaced by Consistent), Savage, Bane of \<family\>, Exploiting, Giant-slayer, Piercing, Vengeful, Vanguard, First Strike, Momentum, Bloodthirsty, Focused, Coordinated ("the earlier ones are all rejected"); all the Path of Exile support gem translations (Purist, Steady, Festering, Smouldering, Bulwark, Finisher, Patient, Ruthless, Twin Charge, Alternating, Consuming, Bane of \\<status\\>, Charging, Rooted, Close Quarters / Far Shot, Outnumbered, Trophy; designer: "all in (2) are rejected"). Evasive ("we dont have evasion planned yet"); Taunting ("bad"); Carry-through, Shattering.
-
-### Heal mods (Claude's draft, 2026-10-22; designer asked for heal mods adapted from the damage list)
-
-Same rules as the damage mods: about 10% on a no-cooldown ability, the AI picks, smooth scaling. **Kind** says where each one comes from: *same* (as the damage mod), *adjusted* (a damage mod reshaped for heals), *new* (heals only).
-
-| family | per ability | mod | effect | kind |
-|---|---|---|---|---|
-| cure | no limit | **Staunching / Antidote / Cooling / Grounding / Warming** | also removes Bleed / Poison / Burn / Shocked / Chilled from the target | adjusted (from status mods) |
-| cure | | **Purifying** | removes every negative status | new, rare |
-| ally buff | 1; 50% reduced healing; single-target only | **Hastening** | the target acts earlier next round | adjusted (from debuffs) |
-| ally buff | | **Fortifying** | the target takes less damage until its next turn | adjusted |
-| ally buff | | **Emboldening** | the target's next attack deals more damage | adjusted |
-| ally buff | | **Blessed** | the target's next flip gets a better heads chance | adjusted (Lucky for an ally) |
-| self buff | 1 | **Swift / Riposting** | you act earlier next round / gain a riposte charge | same |
-| sustain | no limit | **Guarding** | the target also gains a shield worth 10% of the healing | same |
-| sustain | | **Overflow** | healing past full HP becomes a shield | new |
-| sustain | | **Empathic** | you also heal for a share of it | adjusted (from Vampiric), rare |
-| over time | no limit | **Regenerating** | part of the heal comes later as regen over a few rounds, more in total | new |
-| self-move | 1 | **Advancing / Retreating** | you step forward / back 1 rank | same |
-| reach | no limit | **Reaching / Footwork** | reaches one more ally rank / usable from one more rank | same |
-| scaling | no limit | **Triage** | more healing the more HP the target has lost | adjusted (from Executing) |
-| scaling | | **Comforting** | more healing the more stress the target has | new |
-| scaling | | **Desperate / Fresh** | more healing the more HP you have lost / have left | same |
-| scaling | | **Haunted / Serene** | more healing the more / less stress you have | same |
-| condition | no limit | **Remedial** | more healing on a target with any negative status | adjusted (from Opportunist) |
-| condition | | **Bedside** | more healing on an ally next to you | new |
-| coins | no limit | **Lucky / Consistent / Gamble** | as for damage | same |
-| double-edged | no limit | **Reckless** | 15% more healing; you take 15% more damage until your next turn | same |
-| double-edged | | **Wild / Unsteady / Ponderous / Fraught / Unique** | as for damage, with more healing | same, rare |
-| double-edged | | **Transfusion** | costs you HP; much more healing | adjusted (from Blood Price), rare |
-| other | no limit | **Echo** | small chance to heal again | adjusted (from Double Strike); one repeat at most |
-| other | | **Calming** | also lowers the target's stress a little | adjusted (from Soothing), rare (D-0062: skill stress healing is rare and weak) |
-| conditional | no limit | **Quick / Measured / Splitting / Composed** | as for damage | same |
-| conditional | | **Lasting / Potent** | its regen or ally buff lasts a round longer / is stronger | adjusted (from Lingering / Potent) |
-| conditional | | **Well-stocked** | +1 use per quest, less healing | new; abilities with per-quest uses (D-0062) |
-
-Dropped for heals: element, Crushing, Opening Blow (topping up the barely hurt is weak), status inflicting, Heavy, Stunning, Marking.
+**Rejected (designer, 2026-10-22):** Sweeping ("sweeping bad no"); Clash (merged into smooth Executing / Opening Blow); Mighty, Second Wind (replaced by Consistent), Savage, Bane of \<family\>, Exploiting, Giant-slayer, Piercing, Vengeful, Vanguard, First Strike, Momentum, Bloodthirsty, Focused, Coordinated ("the earlier ones are all rejected"); all the Path of Exile support gem translations (Purist, Steady, Festering, Smouldering, Bulwark, Finisher, Patient, Ruthless, Twin Charge, Alternating, Consuming, Bane of \\<status\\>, Charging, Rooted, Close Quarters / Far Shot, Outnumbered, Trophy; designer: "all in (2) are rejected"). Evasive ("we dont have evasion planned yet"); Taunting ("bad"); Carry-through, Shattering. Heal drafts rejected: the five single-status cures, Fortifying, Bedside, Lasting / Potent for buffs, Well-stocked. Echo merged into Double Strike ("echo should be same").
