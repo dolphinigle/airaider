@@ -4,14 +4,14 @@ What a merc is made of (stats, skills, talents, level) and how they grow.
 
 ## Stats (D-0044)
 
-Six stats, each a number of **coins**. They pool with skills in **skill checks**; in combat they work **only indirectly** (D-0064): abilities flip skill coins only.
+Six stats, each a number of **coins**, about **10 → 20** over a career (D-0065). They pool with skills in **skill checks**. In combat an **attack flips the attribute** its battle skill uses; each head deals the ability's base damage, which rises with skill level; statuses land on a separate skill flip (D-0065).
 
 | stat | covers | in a fight |
 |---|---|---|
-| **STR** | strength | physical damage +% (proposed) |
-| **DEX** | agility, hands, reflexes, aim | **speed coins** |
-| **INT** | intelligence | magic damage +%, longer statuses (proposed) |
-| **CHA** | charisma | healing and buffs +% (proposed) |
+| **STR** | strength | attack coins for its battle skills |
+| **DEX** | agility, hands, reflexes, aim | **speed coins**; attack coins for its battle skills |
+| **INT** | intelligence | attack coins for its battle skills |
+| **CHA** | charisma | attack coins for its battle skills |
 | **CON** | endurance, toughness | **max HP** |
 | **WIL** | willpower: nerve, fear, curses, focus | the **stress check** (D-0042); stress builds slower (proposed) |
 

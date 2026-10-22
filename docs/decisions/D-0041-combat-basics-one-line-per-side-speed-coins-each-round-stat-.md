@@ -21,7 +21,7 @@ The designer's words: "keep it simple and have it like in final fantasy, aka eve
 - **Formation:** each side is one ordered line, as in Darkest Dungeon (designer, 2026-10-22: "i think we want darkest dungeon battle system then, a line, so that we can put healers at the back etc."). Position in the line matters: healers stand at the back. This replaces the 2×3 grid of D-0025.
 - **Rounds:** everyone acts once per round. At the start of the round each merc flips their speed coins, and the order sorts by heads. A foe's speed is a fixed number.
 - **Speed coins:** DEX, plus some skills (to be ruled).
-- **Ability pool:** the ability's skill coins only; attributes work indirectly (D-0064). An ability built on two skills uses the average of the two skills. Each heads deals the base amount.
+- **Attacks:** see D-0065 (attribute coins × ability base, defense %, status on a skill flip).
 - **Foes are fixed:** they don't flip (D-0013).
 - **Effect families:** damage, Shield (absorbs damage before HP), heal, buff, debuff, damage over time.
 

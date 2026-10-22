@@ -44,7 +44,7 @@
 - **Combat basics** (D-0041, proposed, the designer called it "decent"):
   - **Formation:** a Darkest Dungeon line, 4 ranks per side. Abilities state the ranks they're used from and the ranks they reach. No corpses: units shift forward.
   - **Turn order:** speed coins re-flipped every round, everyone acts once. Haste and Slow change it.
-  - **Ability flips:** skill coins only (two-skill abilities average the two); attributes work indirectly (D-0064); damage = heads × base.
+  - **Attacks** (D-0065): flip the attribute; heads × ability base (rises with skill level); defense % per damage type; statuses on a skill flip.
   - **Costs:** cooldowns only; no mana, no stamina.
   - **Guard:** taunts, or shields (the shield can cover the party).
   - **Interactions:** damage-type weaknesses, and statuses that raise damage taken.
@@ -64,8 +64,7 @@
 ## Next
 
 0. **Battle skills first, check skills later** (designer). Open now:
-   - **Attributes stay for checks; in combat only indirectly** (D-0064: CON → HP). Abilities flip skill coins only. Open: Claude's hooks (STR phys dmg %, DEX speed, INT magic dmg % + status length, CHA heal/buff %, CON HP, WIL stress).
-   - **Damage coins:** designer asked if attribute coins for damage is too extreme, then: "just make the units all start with like 10 STR so that at max level they become 20 STR instead of going from 3 STR to 13 STR". Claude: yes to the flat curve (fewer zero rolls, endgame spread ~1.4x not 2.3x, less steamroll); then two flips per ability: attribute = amount (damage/heal/shield), skill = effect (status lands on a heads threshold); needs one attribute per battle skill; would supersede D-0064. Waiting on the designer.
+   - **Damage model locked** (D-0065, E-0006): attribute coins (10 → 20) × ability base (rises with skill level), foe defense % per type, status on a skill flip, foes scale by HP. Open: merc defense (shield? % per type? dodges?), damage types, attribute per battle skill.
    - **Melee split** (D-0063, proposed): Fast, Cleaving, Heavy, Long-reach.
    - **Elemental:** one skill with element tags (Claude) or split?
    - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances).
