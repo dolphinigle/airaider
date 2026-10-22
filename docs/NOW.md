@@ -64,7 +64,7 @@
 ## Next
 
 0. **Battle skills first, check skills later** (designer). Open now:
-   - **Attributes:** keep the six stats (D-0044) or not? Darkest Dungeon has none (designer: "unsure if we still want it").
+   - **Attributes stay** (designer: "we still want them because they are used for skill checks"). Open: do they affect combat? Options: A checks only; B derived only (CON HP, DEX speed, WIL stress); C one fixed stat per battle skill, ability flips skill + that stat, plus the B hooks (Claude recommends C: STR Cleaving/Heavy/Long-reach/Villainy; DEX Fast/Unarmed/Ranged/Stealth; INT Warfare/Doctor/Alchemy/Elemental; CHA Leadership/Performance/Holy/Animal Companion; CON Defense; WIL Dark).
    - **Melee split** (D-0063, proposed): Fast, Cleaving, Heavy, Long-reach.
    - **Elemental:** one skill with element tags (Claude) or split?
    - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances).
