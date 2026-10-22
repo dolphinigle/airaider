@@ -20,11 +20,11 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 
 ## Two-handed (STR)
 
-**Identity (designer, 2026-10-22):** ranks 1–2; hits the foe front line; can hit several foes; knocks back; stuns; winds up or takes a self-debuff the next turn; sunders.
+**Identity (designer, 2026-10-22):** ranks 1–2; hits the foe front line; can hit several foes; knocks back; stuns; sunders; **after-effects**: big swings leave a self-debuff on the next turn. Not wind-ups (designer: "two handed theme shouldnt be wind up, its 'after effects'"; Wind-up removed).
 
 **Key abilities, in the designer's order:** Cleave, Overhead Smash, Sunder, and **Titanic Swing**, a rarer ability that hits three foes.
 
-**Model abilities** (designer-approved cards 2026-10-22; Claude picked the stun, knockback and wind-up ones; generic names, the designer's names in brackets):
+**Model abilities** (designer-approved cards 2026-10-22; Claude picked the stun and knockback ones; generic names, the designer's names in brackets):
 
 | ability | rarity | ranks | damage | effect | cost |
 |---|---|---|---|---|---|
@@ -33,7 +33,6 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 | **Knockback Strike** | 1★ | 1–2 → foe 1–2 | 90% | knocks the foe back 1 rank | cd 1 |
 | **Sunder** | 2★ | 1–2 → 1–2 | 80% | Sundered | cd 3 |
 | **Stunning Blow** | 2★ | 1–2 → foe 1 | 70% | Stun | cd 2 |
-| **Wind-up** | 2★ | self | — | your next Two-handed attack deals 100% more damage | cd 3 |
 | **Wide Swing** (Titanic Swing) | 4★ | 1 → foe 1, 2 and 3 | 70% each | you are Staggered next round | cd 4 |
 
 Every turn asks focus (Heavy Strike) or spread (Cleave), since both have no cooldown. Knockback Strike sends a dangerous foe back and brings the one behind into reach.
