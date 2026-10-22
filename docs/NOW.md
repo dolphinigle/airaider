@@ -26,7 +26,7 @@
 - **Upgrade items:** star-up and reroll reroll only the level-up seed (D-0029, D-0032). A star-up sets a fixed star below 5★ (D-0037).
 - **Skills:**
   - Two starting skills; pick 1 of 3 at Lv 7 (D-0035).
-  - **Battle skills** (19, give abilities; D-0075) and **check skills** (give none) are separate, with their own quotas: working 3 battle + 2 check. Battle skills can be checked too. Civilians have check skills only; v3 captives, if they return, too (D-0058).
+  - **Battle skills** (19, give abilities; D-0075) and **check skills** (give none) are separate, with their own quotas: 3 battle (working) + 3 check (D-0076). Battle skills can be checked too. Civilians have check skills only; v3 captives, if they return, too (D-0058).
 - **Abilities:** fights use abilities; skills are what mercs know (D-0031).
   - A merc level up gives attributes only. **Some battle-skill level ups give a new ability** (working: skill levels 1, 3, 5, 7, 9): the AI picks one of a few dealt bases from that skill and renames it. Never the same base twice. Four equipped (D-0069).
   - 10–20 bases per battle skill (D-0069).
@@ -67,7 +67,7 @@
    - **Ability cadence** (Claude: a new ability at skill levels 1, 3, 5, 7, 9).
    - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances). Claude leans Darkest Dungeon.
 1. **NEXT SESSION STARTS HERE: fix the check (non-combat) skills** (designer: "next: fixing the non combat skills"). Current 14 in design/mercs.md (Athletics, Survival, Awareness, Roguery, Streetwise, Persuasion, Deception, Bargaining, Intimidation, Civilization Lore, Nature Lore, Arcane Lore, Engineering, Smithing). To settle: merges (Claude's earlier idea: Lore = three lores, Scouting = Survival + Awareness, Talk = Persuasion + Deception + Intimidation, Trade = Bargaining + Streetwise), attribute pairings (one, a few two), quota (working 2 per merc), what each does in check nodes (D-0057, D-0059). Stars set XP gain (D-0069).
-   - **Claude's draft (2026-10-22):** 14 → 8. Athletics STR; Survival CON (+ Nature Lore's camping side); Scouting WIL (Awareness, reveals ??? nodes); Thievery DEX (Roguery); Talk CHA (Persuasion + Deception + Intimidation); Trade CHA (Bargaining + Streetwise); Lore INT (three lores, shows foe weaknesses); Engineering INT (+ Smithing). Each also has a small use outside nodes. Nodes may also name battle skills (Doctor, Holy Magic). Player picks who flips.
+   - **Ruled (D-0076):** keep all 14, **3 check skills per merc** (Claude's 14 → 8 merge rejected). Still open: attribute pairings, when the 3 are gained, uses outside nodes, what each does in nodes.
 2. **Find the fun in a hand-played fight:** a text mock with placeholder abilities, then feedback.
 3. **Abilities:** 10–20 bases per battle skill, each with ranks (used from, reaches), cooldown, per-quest uses where fitting, and weapon tags (Ranged). Start from E-0003 `skills-mock/fixed-list.md` and `skills-mock2/gen.mjs`.
 4. **Simulated playtest of a week** (a new experiment).

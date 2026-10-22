@@ -25,7 +25,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 - Only the core skill counts in a test. The exact name colors the text ("Atlas swings his sword").
 - Skills have their **own XP** and level up separately from the merc (D-0012).
 
-**Two kinds (D-0058):** **battle skills** give abilities; **check skills** give none. Every skill can be checked (Doctor, Leadership too). Quotas (working): 3 battle skills (2 at the start, 1 at Lv 7) and 2 check skills. Civilians have check skills only.
+**Two kinds (D-0058):** **battle skills** give abilities; **check skills** give none. Every skill can be checked (Doctor, Leadership too). Quotas: 3 battle skills (2 at the start, 1 at Lv 7; working) and **3 check skills** (D-0076). Civilians have check skills only.
 
 **Coins (D-0069):** a check flips **attribute + skill level** if the merc has the skill, else the attribute alone (Survival check: DEX + Survival, or just DEX). An attack flips **its attribute + its battle skill's level**; each head deals the ability's base damage.
 
@@ -59,7 +59,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 
 ### Check skills (14)
 
-No abilities; flipped in check nodes (D-0059). Merges open (later).
+No abilities; flipped in check nodes (D-0059). The 14 stay unmerged; 3 per merc (D-0076).
 
 | skill | covers | usual attr |
 |---|---|---|

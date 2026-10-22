@@ -82,4 +82,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0073](D-0073-warfare-is-deleted-leadership-works-on-your-side-dirty-fight.md) | Warfare is deleted; Leadership works on your side, Dirty Fighting on theirs | accepted | designer | 2026-10-22 |
 | [D-0074](D-0074-most-skills-use-one-attribute-a-few-use-two.md) | Most skills use one attribute; a few use two | accepted | designer | 2026-10-22 |
 | [D-0075](D-0075-battle-skill-attribute-pairings.md) | Battle skill attribute pairings | accepted | designer | 2026-10-22 |
+| [D-0076](D-0076-keep-the-14-check-skills-three-per-merc.md) | Keep the 14 check skills, three per merc | accepted | designer | 2026-10-22 |
 <!-- index:end -->
