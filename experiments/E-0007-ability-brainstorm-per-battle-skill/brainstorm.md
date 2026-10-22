@@ -6,9 +6,30 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 
 - One **list of possible mods** ("fire damage mod" etc.), **tailored to each skill**: each skill takes the mods that fit it. The pool should be **"as big as we can"**.
 - Order: design a skill's abilities first, then decide which mods fit it.
-- Still open: whether mods also sit on skills or only on abilities (D-0025, D-0069: per ability); rarity stars on ability bases or on skill types.
+- Still open: whether mods also sit on skills or only on abilities (D-0025, D-0069: per ability).
+
+## Rarity (designer, 2026-10-22)
+
+- **Some ability bases are rarer** (the designer called Titanic Swing "a (rarer) skill"). Rarer bases are dealt to the AI less often, and the skill's star makes them likelier (designer: "1 STAR skills are common"). Claude reads this as rarity stars on ability bases (reading A). Whether skill types also have rarity (reading B) is unconfirmed.
 
 ## Two-handed (STR)
+
+**Identity (designer, 2026-10-22):** ranks 1–2; hits the foe front line; can hit several foes; knocks back; stuns; winds up or takes a self-debuff the next turn; sunders.
+
+**Key abilities, in the designer's order:** Cleave, Overhead Smash, Sunder, and **Titanic Swing**, a rarer ability that hits three foes.
+
+Claude's cards for the four (draft; damage relative to a standard single-target hit = 100%):
+
+| ability | rarity | ranks | damage | effect | cost |
+|---|---|---|---|---|---|
+| **Cleave** | 1★ | 1–2 → foe 1 and 2 | 60% each | the skill's basic: two foes every turn | 0 cd |
+| **Overhead Smash** | 1★ | 1 → 1–2 | 180% | stun (skill flip); wind-up: Slowed next round | cd 2 |
+| **Sunder** | 2★ | 1–2 → 1–2 | 80% | Sundered: foe Physical defense down 3 rounds | cd 3 |
+| **Titanic Swing** | 4★ | 1 → foe 1, 2 and 3 | 70% each | Staggered next round (act last, take more damage) | cd 4 |
+
+Open: Cleave as the basic (D-0050) or a single-target Heavy Swing; where knockback lives (Claude leans a "Heavy" mod).
+
+Claude's first draft (the long list, kept for later picks):
 
 **Identity (Claude's draft):** the heavy hitter at the front. Big blows, two foes at once, stuns, and knocking foes back. It pays with wind-ups and openings. The decision it brings: burst now, or control (stun, knockback) to break the foe line.
 
