@@ -29,12 +29,12 @@
   - **Battle skills** (18, give abilities) and **check skills** (give none) are separate, with their own quotas: working 3 battle + 2 check. Battle skills can be checked too. Civilians have check skills only; v3 captives, if they return, too (D-0058).
 - **Abilities:** fights use abilities; skills are what mercs know (D-0031).
   - A merc level up gives attributes only. **A battle-skill level up gives one new ability**: the AI picks one of a few dealt bases from that skill and renames it. Never the same base twice. Four equipped (D-0067).
-  - 10–20 bases per fighting skill (D-0047).
+  - 10–20 bases per battle skill (D-0067).
   - Weapon tags filter bases; Unarmed is its own skill; no medium tier (D-0045).
   - Dark Magic abilities cost HP; guns are a Ranged weapon tag (D-0060).
   - The first ability is always a 0-cooldown attack, with a generic fallback (Smash, Kick); generic bases also come up rarely later (D-0050, D-0051).
   - The player sees only the AI name (D-0048).
-- **Passives are traits:** gender, race, personality, body. They never touch coins (D-0036, D-0038–D-0040).
+- **Passives are traits:** gender, race, personality, body. They never touch coins (D-0036, D-0038–D-0040). Traits have stars; passives scale a little with them (D-0068; Claude: 5★ = 1.5×).
 - **Stress:** 0–100, carries across quests. At 100 the merc flips WIL: Resolve or Breakdown. No quirks (D-0042).
 - **Tactics:** condition + action + target, and their parts are loot (D-0030, D-0034).
 - **Gear:** none for now; it comes eventually (D-0034).
@@ -52,7 +52,7 @@
   - **Waves** happen automatically.
 - **Rank movement:** Athletics moves yourself; Warfare moves allies and foes.
 - **Combo bases** (Claude idea, offered 2026-10-22): a few bases need two skills (Heavy + Holy "Holy Smite"); only mercs with both are dealt them; the ability flips the two skills' average. Skill pairs feel like classes (Crusader = Heavy + Holy, Defense at Lv 7) without hard classes. E-0005 round 4: every Darkest Dungeon class maps to 1–2 of our skills.
-- **Modifiers:** 0–4 per ability by star (D-0027). Engine-priced; the AI picks from the candidates the engine deals (D-0025, proposed).
+- **Modifiers:** 0–4 per ability by the skill's star (D-0067). Engine-priced; the AI picks from the candidates the engine deals (D-0025, proposed).
 - **Foe families** each have a sharp twist.
 - **Fight sprites:** one AI image per pose (D-0043, proposed, parked as a detail).
 - **Parked:**

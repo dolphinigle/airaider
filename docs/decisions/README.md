@@ -74,4 +74,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0065](D-0065-damage-attribute-coins-times-ability-base-cut-by-defense-per.md) | Damage: attribute coins times ability base, cut by defense percent; foes scale by HP | accepted | designer | 2026-10-22 |
 | [D-0066](D-0066-merc-defense-shield-and-guard-percent-only-from-traits-no-mi.md) | Merc defense: shield and guard, percent only from traits; no misses; eight damage types | accepted | designer | 2026-10-22 |
 | [D-0067](D-0067-skills-level-up-to-grant-abilities-skills-have-stars-that-se.md) | Skills level up to grant abilities; skills have stars that set modifier odds | accepted | designer | 2026-10-22 |
+| [D-0068](D-0068-traits-have-stars-passives-scale-a-little-with-the-star.md) | Traits have stars; passives scale a little with the star | accepted | designer | 2026-10-22 |
 <!-- index:end -->
