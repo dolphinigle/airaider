@@ -114,3 +114,21 @@ Result: **every class maps to one or two of our skills**, the same shape as our 
 | Duelist (DD2) | Light, plus **stances** |
 
 Gaps are mechanics, not skills: shapeshift, HP-cost abilities, stances, guns (setting question). Our skills with no Darkest Dungeon class: Unarmed, Engineering, Lore as a fighting skill, mostly Elemental. Plague Doctor supports merging Doctor into Alchemy; Antiquarian is a model for civilians brought along for loot.
+
+### Round 5: how many attributes, and Luck
+
+The designer asked whether 5 attributes (WIL cut) is decent, and about a 6th, LUK, with no skills that raises coin heads odds. From Claude's knowledge, not re-checked online.
+
+| attributes | games |
+|---|---|
+| 0 (class stats only) | Darkest Dungeon, RimWorld (skills + traits), Wildermyth |
+| 3 | Path of Exile (STR DEX INT) |
+| 4 | Diablo 2, Mount & Blade Warband, Disco Elysium (4 attributes, 6 skills each) |
+| 5 | Stoneshard (STR AGL PER VIT WIL) |
+| 6 | D&D, Pathfinder, Baldur's Gate 3, Pillars of Eternity, Divinity OS2, Bannerlord, Shadowrun Returns, Ragnarok Online (with LUK) |
+| 7 | Fallout SPECIAL (with Luck) |
+| 8 | Battle Brothers (combat numbers, not attributes); Fire Emblem (with Luck) |
+
+- 4–6 is the normal range; 6 is the D&D habit, not a need. Games where stats grow on their own (not player-allocated) lean fewer: each stat must read on a recruit card.
+- Luck as a stat appears in Fallout (crits, random encounters), Fire Emblem (hit, dodge, crit dodge), Ragnarok Online (crits, perfect dodge). Common rep: a weird, loved stat; Fallout 4 Luck builds became a god stat when its effects stacked.
+- Lesson for us: a stat that touches every flip must stay small per point, or it beats every other stat.
