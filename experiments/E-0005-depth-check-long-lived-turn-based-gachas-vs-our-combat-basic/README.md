@@ -170,3 +170,24 @@ Patterns:
 - **CON with few or no skills is the tradition** (D&D, Pathfinder, Shadowrun): it is the HP stat. A thin CON is normal.
 - When CON has skills they are **drinking** (WFRP, Kingdom Come, D&D carousing saves), **endurance** (marching, toughness), **armor and blocking** (Elder Scrolls), **smithing and riding** (Bannerlord).
 - CHA + CON together: the D&D Sorcerer and Warlock (CHA casters who want CON); drinking with company (WFRP Consume Alcohol + Gossip).
+
+### Round 8: Fury (Hellion) and Grit (Leper)
+
+The designer saw no skill covers the Leper (self-heal) and liked both Fury and Grit. Darkest Dungeon kits from [darkestdungeon.wiki.gg/wiki/Leper](https://darkestdungeon.wiki.gg/wiki/Leper) and [/Hellion](https://darkestdungeon.wiki.gg/wiki/Hellion); other games from Claude's knowledge.
+
+**Leper (Grit):** highest HP and damage, low accuracy and speed, front rank only, strongest against bosses. Solemnity heals self (and a little stress); Withstand marks self + Protection + resist bleed, blight, debuff, move for the fight; Revenge: once per fight, big damage and crit up but more damage taken; Intimidate weakens a foe and speeds himself.
+
+**Hellion (Fury):** glaive berserker. Adrenaline Rush: self cure bleed/blight, tiny heal, big damage up; Breakthrough and Bleed Out: strong hits that leave her exhausted (her own damage and speed down for 3 rounds); Barbaric YAWP: stuns two foes, 3 uses per fight; If It Bleeds: bleed.
+
+| idea | elsewhere |
+|---|---|
+| Fury: burst self-buff | D&D Barbarian Rage (damage up, resist physical); WoW Fury Warrior Enrage |
+| Fury: pay later (exhaustion) | Hellion's self-debuffs; D&D Berserker Frenzy (extra attack, exhaustion after) |
+| Fury: kills feed it | Battle Brothers Berserk (action points on a kill), Killing Frenzy (damage up after a kill); Path of Exile Berserker Rage |
+| Fury: stronger when hurt / pay HP | Darkest Dungeon Flagellant; Diablo 2 Berserk (defense to zero) |
+| Grit: self-heal | Leper Solemnity; D&D Fighter Second Wind; WoW Blood DK Death Strike (heals by recent damage taken) |
+| Grit: survive a killing blow once | Battle Brothers Nine Lives; D&D Relentless Endurance; XCOM Sustain; Fire Emblem Miracle |
+| Grit: shrug off statuses | Leper Withstand; Battle Brothers Indomitable (halve damage, immune stun/knockback); Path of Exile Juggernaut |
+| Grit: regen | Fire Emblem Renewal; Pokémon Leftovers; Slay the Spire Burning Blood (heal after a fight) |
+
+Fit: Leper = Heavy + Grit; Hellion = Long-reach + Fury; Flagellant = Fast + Holy + Fury (closes round 4's HP-cost gap). Split from existing skills: Defender protects others (guard, taunt); Grit keeps only itself alive. Doctor heals others with per-quest uses; Grit heals only itself.
