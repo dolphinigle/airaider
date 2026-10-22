@@ -67,7 +67,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 | **Lightning Magic** | lightning damage, chains | INT |
 | **Holy Magic** | healing, blessing, warding off the dead; deals mostly Physical | CHA |
 | **Dark Magic** | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | CHA + CON |
-| **Carousing** | (D-0099) drinking; **all its abilities are one-time uses** (bottles, per quest): liquid courage (no stress gain for a few turns), drunken sway (dodge charges), spit a burning spirit (Fire), share a flask, a hangover after (Claude's draft). Skins: Tavern Brawler, Sailor's Grog, Dwarven Stout. Alchemy brews and throws; Carousing drinks and endures | CHA + CON |
+| **Carousing** | (D-0099) **doping** (designer): drink or take something for a big self-buff, then pay after (drink, war-mushrooms, stimulants, pain-killing herbs); **all its abilities are one-time uses** (bottles, per quest): liquid courage (no stress gain for a few turns), drunken sway (dodge charges), spit a burning spirit (Fire), share a flask, a hangover after (Claude's draft). Skins: Tavern Brawler, Sailor's Grog, Dwarven Stout, Berserker Mushrooms, War-Snuff, Combat Chems. Alchemy brews and throws; Carousing takes it and pushes through | CHA + CON |
 
 **Weapon skills are styles (D-0090). At most one per merc:** Two-handed, Polearm, Weapon and Shield, Dual Wield, Single Weapon, Unarmed, Shooting or Throwing (D-0091); the rest combine freely. Weapon flavor (axe, hammer, sword) comes from modifiers and the AI's pick and name. Attributes of the new ones: Claude's draft.
 
