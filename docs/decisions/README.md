@@ -83,10 +83,12 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0074](D-0074-most-skills-use-one-attribute-a-few-use-two.md) | Most skills use one attribute; a few use two | accepted | designer | 2026-10-22 |
 | [D-0075](D-0075-battle-skill-attribute-pairings.md) | Battle skill attribute pairings | superseded → D-0079 | designer | 2026-10-22 |
 | [D-0076](D-0076-keep-the-14-check-skills-three-per-merc.md) | Keep the 14 check skills, three per merc | superseded → D-0077 | designer | 2026-10-22 |
-| [D-0077](D-0077-check-skills-merge-to-nine-three-per-merc.md) | Check skills merge to nine, three per merc | accepted | designer | 2026-10-22 |
-| [D-0078](D-0078-check-skill-names-intimidation-and-craft.md) | Check skill names: Intimidation and Craft | accepted | designer | 2026-10-22 |
-| [D-0079](D-0079-wil-out-luk-in-luck-raises-every-coin-s-heads-odds.md) | WIL out, LUK in: luck raises every coin's heads odds | accepted | designer | 2026-10-22 |
+| [D-0077](D-0077-check-skills-merge-to-nine-three-per-merc.md) | Check skills merge to nine, three per merc | superseded → D-0083 | designer | 2026-10-22 |
+| [D-0078](D-0078-check-skill-names-intimidation-and-craft.md) | Check skill names: Intimidation and Craft | superseded → D-0083 | designer | 2026-10-22 |
+| [D-0079](D-0079-wil-out-luk-in-luck-raises-every-coin-s-heads-odds.md) | WIL out, LUK in: luck raises every coin's heads odds | superseded → D-0084 | designer | 2026-10-22 |
 | [D-0080](D-0080-attribute-passives.md) | Attribute passives | superseded → D-0081 | designer | 2026-10-22 |
 | [D-0081](D-0081-attribute-passives-count-from-a-baseline-of-10.md) | Attribute passives count from a baseline of 10 | accepted | designer | 2026-10-22 |
 | [D-0082](D-0082-percent-modifiers-use-path-of-exile-increased-and-more.md) | Percent modifiers use Path of Exile increased and more | accepted | designer | 2026-10-22 |
+| [D-0083](D-0083-check-skills-eleven-three-per-merc.md) | Check skills: eleven, three per merc | accepted | designer | 2026-10-22 |
+| [D-0084](D-0084-six-stats-and-every-skill-s-attributes.md) | Six stats and every skill's attributes | accepted | designer | 2026-10-22 |
 <!-- index:end -->

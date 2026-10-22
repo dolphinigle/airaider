@@ -2,7 +2,7 @@
 
 What a merc is made of (stats, skills, talents, level) and how they grow.
 
-## Stats (D-0079)
+## Stats (D-0084)
 
 **Percent effects use Path of Exile wording (D-0082):** *increased/reduced* add together into one multiplier; each *more/less* multiplies on its own. Final = base × (1 + Σ increased − Σ reduced) × Π(1 ± more/less).
 
@@ -14,7 +14,7 @@ Each stat also has a small **passive**, counted from **10 = no effect**: above h
 |---|---|---|---|
 | **STR** | strength | its battle and check skills | **1% increased damage per point above 10** (designer; reduced below), on all damage |
 | **DEX** | agility, hands, reflexes, aim | its battle and check skills | **speed coins** (turn order) |
-| **INT** | intelligence | its battle and check skills | **increased XP**, merc and every skill (**3% per point above 10**, designer: "its already a strong stat"; reduced below) |
+| **INT** | intelligence | its battle and check skills | **increased XP**, merc and every skill (**3% per point above 10**, D-0084; reduced below) |
 | **CHA** | charisma | its battle and check skills | **increased quest gold** (designer), **summed over the squad** (designer), each merc 1% per point from 10 (working; reduced below) |
 | **CON** | endurance, toughness | its battle and check skills | **max HP** |
 | **LUK** | luck | none | raises the heads chance of **every coin** (working 50% at 10, ±0.5% per point) |
@@ -35,7 +35,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 
 ### Battle skills (19)
 
-✦ = rare. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). Pairings: D-0079.
+✦ = rare. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). Pairings: D-0084 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
 
 | skill | covers | attributes |
 |---|---|---|
@@ -53,31 +53,31 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 | **Stealth** | hiding, ambush strikes | DEX |
 | **Doctor** | healing; limited uses per quest (D-0062) | INT |
 | **Alchemy** | potions, poisons, flasks; limited uses per quest | INT |
-| **Fire Magic** ✦ | fire damage, burns (D-0070) | INT |
-| **Frost Magic** ✦ | frost damage, slows | INT |
+| **Fire Magic** ✦ | fire damage, burns (D-0070) | STR + INT |
+| **Frost Magic** ✦ | frost damage, slows | DEX + INT |
 | **Lightning Magic** ✦ | lightning damage, chains | INT |
 | **Holy Magic** ✦ | healing, blessing, warding off the dead; deals mostly Physical | CHA |
-| **Dark Magic** ✦ | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | CON or INT + CON (designer, choosing) |
+| **Dark Magic** ✦ | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | CON |
 
 **Damage types (D-0070):** Physical, Fire, Frost, Lightning, Chaos. Poison and bleed are statuses.
 
-### Check skills (11, working)
+### Check skills (11)
 
-No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0077); names D-0078. Attributes: Claude's draft, open.
+No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0083). Attributes: D-0084.
 
-| skill | covers | draft attr |
+| skill | covers | attr |
 |---|---|---|
 | **Athletics** | climbing, swimming, running, hauling | STR |
 | **Survival** | foraging, camping, weather, terrain, trails | CON |
-| **Perception** | spotting ambushes, keeping watch, searching (was Awareness, designer) | DEX (designer) |
+| **Perception** | spotting ambushes, keeping watch, searching (was Awareness) | DEX |
 | **Roguery** | locks, pockets, traps, forgery | DEX |
-| **Streetwise** | rumors, finding people, city ways | CHA + INT (designer) |
+| **Streetwise** | rumors, finding people, city ways | CHA + INT |
 | **Persuasion** | charm, diplomacy, haggling, appraising (+ Bargaining) | CHA |
-| **Intimidation** | threats, interrogation, lies, bluffs, disguises (+ Deception) | STR + CHA (designer) |
+| **Intimidation** | threats, interrogation, lies, bluffs, disguises (+ Deception) | STR + CHA |
 | **Lore** | the past, peoples, faiths; plants, beasts, monsters; undead, demons, curses, relics (three lores merged) | INT |
-| **Smithing** | weapons, armor, repairs (Craft split again, designer) | STR + INT (designer) |
-| **Engineering** | building, machines, explosives, traps (back, designer) | INT (Claude) |
-| **Cooking** | camp meals, provisions, the base kitchen (designer, locked) | CON (designer) |
+| **Smithing** | weapons, armor, repairs | STR + INT |
+| **Engineering** | building, machines, explosives, traps | INT |
+| **Cooking** | camp meals, provisions, the base kitchen | CON |
 
 ## Talents (D-0018)
 
