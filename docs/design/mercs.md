@@ -6,16 +6,16 @@ What a merc is made of (stats, skills, talents, level) and how they grow.
 
 Six stats, each a number of **coins**, about **10 → 20** over a career. Checks and attacks flip **attribute + skill level** (D-0069); statuses land on a separate skill flip. Foes scale by HP.
 
-Each stat also has a small **passive** (D-0080):
+Each stat also has a small **passive**, counted from **10 = no effect**: above helps, below hurts (D-0081):
 
 | stat | covers | skills | passive |
 |---|---|---|---|
-| **STR** | strength | its battle and check skills | **+1% damage per point**, on all damage |
+| **STR** | strength | its battle and check skills | **±1% damage per point from 10**, on all damage |
 | **DEX** | agility, hands, reflexes, aim | its battle and check skills | **speed coins** (turn order) |
-| **INT** | intelligence | its battle and check skills | **more XP**, merc and every skill (working +1% per point) |
-| **CHA** | charisma | its battle and check skills | **more quest gold** (working +1% per point of the squad's highest CHA) |
+| **INT** | intelligence | its battle and check skills | **XP**, merc and every skill (working ±1% per point from 10) |
+| **CHA** | charisma | its battle and check skills | **quest gold** (working ±1% per point from 10, the squad's highest CHA) |
 | **CON** | endurance, toughness | its battle and check skills | **max HP** |
-| **LUK** | luck | none | raises the heads chance of **every coin** (working 50% at 10 → 55% at 20) |
+| **LUK** | luck | none | raises the heads chance of **every coin** (working 50% at 10, ±0.5% per point) |
 
 Starting stats are a little randomized, biased by **race**; a wolfkin leans DEX (D-0018).
 
