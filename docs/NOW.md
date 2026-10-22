@@ -26,7 +26,7 @@
 - **Upgrade items:** star-up and reroll reroll only the level-up seed (D-0029, D-0032). A star-up sets a fixed star below 5★ (D-0037).
 - **Skills:**
   - Two starting skills; pick 1 of 3 at Lv 7 (D-0035).
-  - **Battle skills** (29: 8 weapon + 21 others; D-0099) and **check skills** (give none) are separate, with their own quotas: 3 battle (working) + 3 check (D-0083). Battle skills can be checked too. Civilians have check skills only; v3 captives, if they return, too (D-0058).
+  - **Battle skills** (29: 8 weapon + 21 others; D-0099) and **check skills** (give none) are separate, with their own quotas: 3 battle (working) + 3 check (D-0083). 13 battle skills can be checked too (D-0100). Civilians have check skills only; v3 captives, if they return, too (D-0058).
 - **Abilities:** fights use abilities; skills are what mercs know (D-0031).
   - A merc level up gives attributes only. **Some battle-skill level ups give a new ability** (working: skill levels 1, 3, 5, 7, 9): the AI picks one of a few dealt bases from that skill and renames it. Never the same base twice. Four equipped (D-0069).
   - 10–20 bases per battle skill (D-0069).
