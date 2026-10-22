@@ -18,19 +18,19 @@
   - Played by hand: each merc's turn, the player picks the ability and the target. Some later quests force fights that run on tactics (D-0053, which replaces D-0026).
   - Shown with AI lines only before and after (D-0023).
   - Losing injures, never kills (D-0024).
-- **Skill checks** are pure coin flips (D-0013).
+- **Skill checks** are pure coin flips (D-0013): attribute + skill level (D-0069).
 
 ### Mercs ([design/mercs.md](design/mercs.md))
-- **Stats:** STR DEX INT CHA CON WIL (D-0044). DEX gives speed coins, CON gives max HP, WIL is the stress check.
+- **Stats:** STR DEX INT CHA CON WIL (D-0044), about 10 → 20 over a career (D-0069). DEX gives speed coins, CON gives max HP, WIL is the stress check. Each skill uses one attribute, a few two (D-0074, D-0075).
 - **Stars** (D-0069): every skill has a star (1★–5★, half steps) that sets its XP gain and, for battle skills, its abilities' modifier odds; the merc's star makes high skill stars likelier.
 - **Upgrade items:** star-up and reroll reroll only the level-up seed (D-0029, D-0032). A star-up sets a fixed star below 5★ (D-0037).
 - **Skills:**
   - Two starting skills; pick 1 of 3 at Lv 7 (D-0035).
-  - **Battle skills** (18, give abilities) and **check skills** (give none) are separate, with their own quotas: working 3 battle + 2 check. Battle skills can be checked too. Civilians have check skills only; v3 captives, if they return, too (D-0058).
+  - **Battle skills** (19, give abilities; D-0075) and **check skills** (give none) are separate, with their own quotas: working 3 battle + 2 check. Battle skills can be checked too. Civilians have check skills only; v3 captives, if they return, too (D-0058).
 - **Abilities:** fights use abilities; skills are what mercs know (D-0031).
   - A merc level up gives attributes only. **Some battle-skill level ups give a new ability** (working: skill levels 1, 3, 5, 7, 9): the AI picks one of a few dealt bases from that skill and renames it. Never the same base twice. Four equipped (D-0069).
   - 10–20 bases per battle skill (D-0069).
-  - Weapon tags filter bases; Unarmed is its own skill; no medium tier (D-0045).
+  - Melee splits into Fast, Cleaving, Heavy, Long-reach; Unarmed covers claws and bites; Ranged has weapon tags (D-0063).
   - Dark Magic abilities cost stress, no life drain; guns are a Ranged weapon tag (D-0072).
   - The first ability is always a 0-cooldown attack, with a generic fallback (Smash, Kick); generic bases also come up rarely later (D-0050, D-0051).
   - The player sees only the AI name (D-0048).
@@ -45,8 +45,8 @@
   - **Formation:** a Darkest Dungeon line, 4 ranks per side. Abilities state the ranks they're used from and the ranks they reach. No corpses: units shift forward.
   - **Turn order:** speed coins re-flipped every round, everyone acts once. Haste and Slow change it.
   - **Coins** (D-0069): checks and attacks flip attribute + skill level (attribute alone without the skill); heads × ability base; foe defense % per type (Physical, Fire, Frost, Lightning, Chaos, D-0070); statuses on a skill flip; foes scale by HP.
-  - **Costs:** cooldowns only; no mana, no stamina.
-  - **Guard:** taunts, or shields (the shield can cover the party).
+  - **Costs:** cooldowns; some abilities have per-quest uses (D-0062); Dark Magic costs stress (D-0072). No mana, no stamina.
+  - **Defense** (D-0070): mercs use shields, guard, buffs; % per type only from traits/gear; no misses, dodge is a charge.
   - **Interactions:** damage-type weaknesses, and statuses that raise damage taken.
   - **Foes are fixed:** they never flip.
   - **Waves** happen automatically.
@@ -68,7 +68,7 @@
    - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances). Claude leans Darkest Dungeon.
 1. **NEXT SESSION STARTS HERE: fix the check (non-combat) skills** (designer: "next: fixing the non combat skills"). Current 14 in design/mercs.md (Athletics, Survival, Awareness, Roguery, Streetwise, Persuasion, Deception, Bargaining, Intimidation, Civilization Lore, Nature Lore, Arcane Lore, Engineering, Smithing). To settle: merges (Claude's earlier idea: Lore = three lores, Scouting = Survival + Awareness, Talk = Persuasion + Deception + Intimidation, Trade = Bargaining + Streetwise), attribute pairings (one, a few two), quota (working 2 per merc), what each does in check nodes (D-0057, D-0059). Stars set XP gain (D-0069).
 2. **Find the fun in a hand-played fight:** a text mock with placeholder abilities, then feedback.
-3. **Abilities:** 10–20 bases per fighting skill, each with ranks (used from, reaches), cooldown and weapon tags. Minor skills get 3–5. Start from E-0003 `skills-mock/fixed-list.md` and `skills-mock2/gen.mjs`.
+3. **Abilities:** 10–20 bases per battle skill, each with ranks (used from, reaches), cooldown, per-quest uses where fitting, and weapon tags (Ranged). Start from E-0003 `skills-mock/fixed-list.md` and `skills-mock2/gen.mjs`.
 4. **Simulated playtest of a week** (a new experiment).
 5. Keep design/ and this page current. Start `v4/` only once the shape is settled.
 
@@ -76,11 +76,12 @@
 
 - Check-skill merges (later, Next 1).
 - **Check nodes** (D-0059 notes): one named skill per node; pass gives loot/buff/knowledge, fail costs; can Scouting reveal hidden nodes?
+- **Skill stress healing** is rare and weak; rest is the main relief (D-0062).
 - **To decide later** (D-0055):
   - where recruits come from (a coach, or quests);
   - how new quests appear;
   - how to stop steamrolling (experienced mercs on easy quests);
-  - whether skill checks between fights stay.
+  - ~~whether skill checks between fights stay~~ (yes: check nodes, D-0057).
 - **Later, from v3:** the relic system (probably) and the captive system (maybe). Each comes back only through a v4 decision with `sources:`.
 - **Accept D-0041** (combat basics)?
 - **Inspirations offered** (E-0005):
