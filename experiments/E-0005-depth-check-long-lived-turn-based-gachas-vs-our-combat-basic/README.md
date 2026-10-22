@@ -191,3 +191,24 @@ The designer saw no skill covers the Leper (self-heal) and liked both Fury and G
 | Grit: regen | Fire Emblem Renewal; Pokémon Leftovers; Slay the Spire Burning Blood (heal after a fight) |
 
 Fit: Leper = Heavy + Grit; Hellion = Long-reach + Fury; Flagellant = Fast + Holy + Fury (closes round 4's HP-cost gap). Split from existing skills: Defender protects others (guard, taunt); Grit keeps only itself alive. Doctor heals others with per-quest uses; Grit heals only itself.
+
+### Round 9: names for Fury and Grit, and other battle skills worth having
+
+The designer found "Fury" and "Grit" weird as skill names. From Claude's knowledge, not re-checked online.
+
+Our names mix roles (Defender, Doctor) and fields (Leadership, Stealth, Alchemy, X Magic).
+
+| for | names elsewhere |
+|---|---|
+| Fury (Hellion) | **Berserker** (Battle Brothers perk, Path of Exile ascendancy, D&D Path of the Berserker, Wartales class), Rage (D&D Barbarian), Frenzy, Bloodlust, Battle Rage |
+| Grit (Leper) | **Juggernaut** (Path of Exile ascendancy: unstoppable, hard to kill), **Toughness** (Kenshi skill), Fortitude (D&D save), Endurance (Warhammer skill), Stalwart, Resilience, Unbreakable, Second Wind (D&D Fighter) |
+
+Other battle skills seen in the genre that no current skill covers:
+
+| skill | what | seen in |
+|---|---|---|
+| Nature Magic | roots and entangle, thorns, poison, regrowth healing | D&D Druid, Pillars Druid, Wildermyth, Divinity Geomancer |
+| Blood Magic | spells paid in HP, life drain (Dark Magic has none, D-0072) | Path of Exile, Dragon Age Blood Mage, Divinity Necromancer |
+| Illusion (mind magic) | charm, confuse, sleep, foes hit each other | Elder Scrolls Illusion, D&D Enchanter, Pillars Cipher |
+| Duelist | riposte and counters, one-on-one, dodge | Darkest Dungeon 2 Duelist, Highwayman Riposte, Battle Brothers Riposte |
+| Hunter | traps on foe ranks, beast slaying, tracking marks | Battle Brothers Hunter background, Darkest Dungeon Bounty Hunter, D&D Ranger |
