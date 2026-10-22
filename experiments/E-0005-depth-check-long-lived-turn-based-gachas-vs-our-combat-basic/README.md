@@ -262,3 +262,13 @@ Designer rule: every single attribute gets two flex skills (not weapon, not magi
 **Candidates:** Manhandling (shove, hurl foes into foes, toss allies; ≈ the rejected Strongman), Power (mirror of Precision: worse flip, bigger hit; wind-ups, overkill spill), Earthshaker (slams, waves down the line, knockdown, aftershock), Juggernaut (armor as offense, unstoppable), Retaliation (counters, ripostes, punish hits on neighbors), Challenger (two-way duel lock), Executioner (≈ rejected Slayer), Conditioning (tempo, extra action; ≈ rejected Momentum), Arsenal (weapon swapping), Rend (≈ rejected Sundering).
 
 Sources: stoneshard.com/wiki (Warfare, Athletics, Armored Combat trees), commonsensegamer.com Wartales Brute and Warrior builds; the rest from known game knowledge (GW1 wiki was down).
+
+## Round 12: one more battle skill for CHA or CON (2026-10-22)
+
+Designer: CHA and CON are the lightest stats (weighted, weapon skills at half: INT 8.5, DEX 8, STR 7.25, CHA 6, CON 5.25); one of them gets a last battle skill. An Opus agent surveyed D&D 5e, PF2, Darkest Dungeon 1/2, Battle Brothers, WFRP, Kingdom Come, Pillars, DOS2, Wartales, Fire Emblem, Pokémon, Persona/SMT, Final Fantasy, Slay the Spire, Monster Train, Dragon Age, XCOM 2, Gloomhaven/Frosthaven, Octopath, Disco Elysium.
+
+**Uncovered themes, by how many sources have them:** charm / mind control (~10), martyr (pay own HP to heal, cleanse, shield allies; ~9), fear / morale breaking (~8), ally tempo (~8; fits Leadership/Performance or Bonds), pain fuels power (~7; near Berserk), verbal mockery (~7; Defender has taunts), oaths / vows (~6), drinking (~6), shapeshifting (~5), bonds / paired allies (~5), mid-fight parley (~4), plague-bearer (~3), talismans (~3).
+
+**Candidates:** CHA: Charm (skip turn, hit own neighbor; near rejected Illusion), Dread (fear: push back, flee, morale), Oathsworn (vow mid-fight, buffs if kept, stress if broken), Bonds (one bonded ally: swap, extra action, follow-ups). CON: Hard Drinking (bottles per quest: stress block, drunken sway dodge, spit fire, share a flask, hangover), Shapeshifting (beast forms), Pestilence (plague body, thin). CHA + CON: Martyrdom (Flagellant). Runners-up: Mockery, Talismans, Vampirism, Parley. No candidate adds a strong stress healer without breaking D-0062.
+
+Sources: darkestdungeon.wiki.gg (Flagellant, Jester, Houndmaster), battlebrothers.fandom.com Perks, kingdom-come-deliverance.fandom.com Drinking, 2e.aonprd.com Mysteries, rpgbot.net Oracle, pillarsofeternity2.wiki.fextralife.com Chanter, progameguides.com Wartales classes; the rest from known game knowledge.

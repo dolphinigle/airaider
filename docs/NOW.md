@@ -64,7 +64,7 @@
 
 ## Next
 
-0. **Roster complete** (D-0098): 28 battle skills (8 weapon + 20 others) + 11 check skills. Last in: Concentration (INT flex, empowers your next action); INT's flex pair is Alchemy + Concentration, Doctor is its role skill. Counter is Retaliation; Dirty Fighting is STR + DEX. Generic category names the AI skins; two flex skills per single attribute; no skill dedicated to lowering resistances (D-0097). **One more battle skill for CHA or CON** (designer; weighted load with weapon skills at half: INT 8.5, DEX 8, STR 7.25, CHA 6, CON 5.25). Research sweep running (E-0005 round 12).
+0. **Roster complete** (D-0098): 28 battle skills (8 weapon + 20 others) + 11 check skills. Last in: Concentration (INT flex, empowers your next action); INT's flex pair is Alchemy + Concentration, Doctor is its role skill. Counter is Retaliation; Dirty Fighting is STR + DEX. Generic category names the AI skins; two flex skills per single attribute; no skill dedicated to lowering resistances (D-0097). **One more battle skill for CHA or CON** (designer; weighted load with weapon skills at half: INT 8.5, DEX 8, STR 7.25, CHA 6, CON 5.25). Candidates in E-0005 round 12.
    - Also open: Warfare's scope (draft: combined attacks with an ally, breaking foe shields, formation tricks; Leadership keeps moving teammates and focus fire); Precision vs LUK (both raise heads chance).
    - From E-0005 round 10, to rule: Highwayman's blade + pistol vs one weapon skill; can bases outside D-0073's skills move foes; stress healing as a support role (ours is rare, weak).
 1. **Battle and check skills, still open:**
