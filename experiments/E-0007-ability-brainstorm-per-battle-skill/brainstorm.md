@@ -52,3 +52,24 @@ Abilities (Claude's draft, ranks: used from → reaches):
 - **Pommel Strike** · 1 → 1 · light hit, high stun chance, short cooldown · (Crusader Stunning Blow)
 
 Weapon flavor via mods (Claude's draft): axe → bleed, hammer → stun and armor break, sword → crit chance.
+
+### Cleave mods (Claude's draft, 2026-10-22)
+
+From the general list (fits most attacks):
+- **Fiery / Frosty / Shocking / Dark**: adds some Fire / Frost / Lightning / Chaos damage (or turns the hit into that type)
+- **Brutal**: more damage
+- **Bleeding** (axe): bleed on each foe hit
+- **Stunning** (hammer): stun
+- **Heavy**: knock back 1 rank
+- **Keen** (sword): higher crit chance
+- **Quick**: cooldown −1
+
+Tailored to Cleave (hits two):
+- **Splitting**: with only one foe in reach, it takes both hits (120%), which covers Cleave's weak spot
+- **Carry-through**: overkill damage on one foe spills onto the other
+- **Shattering**: Sundered on both foes, lighter or shorter than Sunder's
+- **Guarding Sweep**: gain a shield for each foe hit
+- **Taunting**: foes hit must target you next round (a taunt on a free hit, following the finding that taunt needs teeth)
+- **Reckless**: more damage; you take more damage until your next turn (fits the wind-up identity)
+
+Open: do mods carry a cost (D-0025 had Fiery cost mana, and mana is gone), or are they pure upgrades whose rarity is the price? Cleave's cooldown.
