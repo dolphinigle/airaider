@@ -75,7 +75,7 @@
 
 ## Waiting on the designer
 
-- **Attribute passives** (designer asked, 2026-10-22; survey E-0005 round 6). Locked: DEX speed coins, CON max HP, LUK heads chance. Claude's picks: STR carries more loot out of a quest; INT makes the statuses and buffs it applies last longer; CHA lowers the merc's weekly wage. Alts: STR resists stun/move, CON healing received, INT skill XP, CHA cheaper recruits, LUK better loot.
+- **Attribute passives** (2026-10-22; survey E-0005 round 6). Locked: DEX speed coins, CON max HP, LUK heads chance. Designer: **INT = XP gain** (merc or skill XP: open); CHA = more quest gold ("maybe"); STR = HP and delete CON ("leaning"). Claude: keep CON, since STR as damage + HP makes it every frontliner's best stat and kills the tank/bruiser recruit split; if CON goes, Defense and Heavy → STR, Survival → DEX or INT.
 - **Stress at 100 without a stat** (D-0079): always Breakdown, a flat chance, or something else? Resolve stays?
 - **Check nodes** (D-0059 notes): one named skill per node; pass gives loot/buff/knowledge, fail costs; can Scouting reveal hidden nodes?
 - **Skill stress healing** is rare and weak; rest is the main relief (D-0062).
