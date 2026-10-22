@@ -61,7 +61,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 
 **Damage types (D-0070):** Physical, Fire, Frost, Lightning, Chaos. Poison and bleed are statuses.
 
-### Check skills (10, working)
+### Check skills (11, working)
 
 No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0077); names D-0078. Attributes: Claude's draft, open.
 
@@ -76,6 +76,7 @@ No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0077); names D-
 | **Intimidation** | threats, interrogation, lies, bluffs, disguises (+ Deception) | CHA |
 | **Lore** | the past, peoples, faiths; plants, beasts, monsters; undead, demons, curses, relics (three lores merged) | INT |
 | **Smithing** | weapons, armor, repairs (Craft split again, designer) | STR + INT (designer) |
+| **Engineering** | building, machines, explosives, traps (back, designer) | INT (Claude) |
 | **Cooking** | camp meals, provisions, the base kitchen (designer, "maybe") | INT (Claude) |
 
 ## Talents (D-0018)
