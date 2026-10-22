@@ -110,7 +110,7 @@ Names in brackets are Claude's, placed without a ruling.
 | **Crushing** | more damage against shielded or armored foes | |
 | **Lucky** | +5% heads chance (number open) | |
 | **Consistent** | reroll a bad flip once (under 20% heads) | designer's |
-| **Gamble** | all coins land the same: all heads or all tails | designer's |
+| **Gamble** | all coins land the same: all heads or all tails; +10% more damage | designer's |
 | **Wild** | its target is picked at random | rare, more damage |
 | **Unsteady** | moves you back or forward 1 rank at random | rare, more damage |
 | **Blood Price** | costs you HP | rare, more damage |
