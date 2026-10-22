@@ -47,7 +47,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 | **Ranged** | bows, crossbows, guns, slings, throwing (weapon tags) | DEX |
 | **Defense** | shields, taunts, guarding, party shields | CON |
 | **Leadership** | your side: party auras, Resolve, moving teammates, focus-fire orders (D-0073); rare, weak stress healing (D-0062) | CHA |
-| **Performance** | songs, Haste, distraction; rare, weak stress healing | CHA |
+| **Performance** | songs, Haste, distraction; rare, weak stress healing | DEX + CHA (designer) |
 | **Animal Companion** | a fighting pet, like the Houndmaster (no rank of its own) | CHA |
 | **Dirty Fighting** | their side (was Villainy, D-0074): debuffs (blind, weaken), marks, yanking foes forward (D-0073) | DEX |
 | **Stealth** | hiding, ambush strikes | DEX |
@@ -68,14 +68,14 @@ No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0083). Attribut
 | skill | covers | attr |
 |---|---|---|
 | **Athletics** | climbing, swimming, running, hauling | STR |
-| **Survival** | foraging, camping, weather, terrain, trails | CON |
+| **Survival** | foraging, camping, weather, terrain, trails | DEX + CON (designer) |
 | **Perception** | spotting ambushes, keeping watch, searching (was Awareness) | DEX |
 | **Roguery** | locks, pockets, traps, forgery | DEX |
 | **Streetwise** | rumors, finding people, city ways | CHA + INT |
 | **Persuasion** | charm, diplomacy, haggling, appraising (+ Bargaining) | CHA |
 | **Intimidation** | threats, interrogation, lies, bluffs, disguises (+ Deception) | STR + CHA |
 | **Lore** | the past, peoples, faiths; plants, beasts, monsters; undead, demons, curses, relics (three lores merged) | INT |
-| **Smithing** | weapons, armor, repairs | STR + INT |
+| **Smithing** | weapons, armor, repairs | INT + CON (designer) |
 | **Engineering** | building, machines, explosives, traps | INT |
 | **Cooking** | camp meals, provisions, the base kitchen | CON |
 
