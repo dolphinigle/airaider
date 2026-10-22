@@ -73,8 +73,33 @@ Weapon flavor via mods (Claude's draft): axe → bleed, hammer → stun and armo
 
 **How mods are picked (designer, 2026-10-22):** "the ai will be given all these mods then asked to pick several (depends on the number of mods rolled on the skill)". The engine rolls the count; the AI sees every mod that fits the ability and picks that many to suit the merc. This replaces Claude's D-0025 proposal of dealing 3 candidates. The engine still enforces the exclusive groups (one element).
 
-**Not universal:**
-- **Quick**: −1 cooldown. Good, but only for abilities with a cooldown (not Cleave).
-- **Splitting**: for most multi-target (cleave-type) abilities: with fewer targets, the damage condenses onto those left.
+**More rulings (designer, 2026-10-22):**
+- **Mods that reduce damage are mutually exclusive** with each other (Heavy, Stunning).
+- **An ability can carry several status mods.**
+- **Quick and Splitting are universal but conditional**: they fit any ability that meets the condition (it has a cooldown; it hits several foes).
+- New: **Reaching**: reaches one rank further (foe 1–2 becomes 1–3). **Footwork** (Claude's name): usable from one more rank (from 1–2 becomes 1–3).
 
 Claude's Cleave-only ideas not yet ruled: Carry-through (overkill spills onto the other foe), Shattering (light Sundered on both), Taunting (foes hit must target you next round), Reckless (more damage; take more until your next turn).
+
+### More mod suggestions (Claude's draft, 2026-10-22)
+
+Universal:
+- **Marking**: marks the target; allies deal more to it (Darkest Dungeon Mark)
+- **Exposing**: the target takes more damage until its next turn
+- **Weakening**: the target deals less damage on its next turn
+- **Hampering**: the target acts later next round (speed down)
+- **Swift**: you act earlier next round (speed up)
+- **Piercing**: ignores some of the target's defense
+- **Bane of <family>**: more damage against one foe family (beasts, undead, cultists); the AI picks the family to fit the merc (foe twists make matchups matter, E-0003)
+- **Opportunist**: more damage against a foe that has any status
+- **Vampiric**: heal for a small share of the damage (Dark Magic has no life drain, D-0072; a mod may be fine, the designer rules)
+- **Evasive**: gain a dodge charge (rarer)
+- **Riposting**: gain a riposte charge (rarer)
+- **Taunting**: foes hit must target you next round
+- **Double Strike**: small chance to hit again (rarer)
+
+Conditional:
+- **Potent**: statuses this ability inflicts are stronger (it inflicts a status)
+- **Lingering**: those statuses last a round longer (it inflicts a status)
+- **Composed**: softens the ability's self-debuff (it has one, like Titanic Swing's Stagger)
+- **Sweeping**: a single-target ability also hits the next foe for a small share (it hits one foe)
