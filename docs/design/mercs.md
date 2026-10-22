@@ -59,7 +59,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 | **Holy Magic** ✦ | healing, blessing, warding off the dead; deals mostly Physical | CHA |
 | **Dark Magic** ✦ | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | CHA + CON |
 
-**One weapon skill per merc (D-0087):** Fast, Cleaving, Heavy, Long-reach Weapons or Unarmed; the rest combine freely. Whether Ranged counts is open.
+**At most one weapon skill per merc (D-0088):** Fast, Cleaving, Heavy, Long-reach Weapons, Unarmed or Ranged; the rest combine freely.
 
 **Damage types (D-0070):** Physical, Fire, Frost, Lightning, Chaos. Poison and bleed are statuses.
 

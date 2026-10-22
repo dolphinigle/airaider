@@ -68,7 +68,7 @@
    - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances). Claude leans Darkest Dungeon.
 1. **Check skills** (in progress 2026-10-22). Done: **11 check skills, 3 per merc** (D-0083): Athletics, Survival, Perception, Roguery, Streetwise, Persuasion, Intimidation, Lore, Smithing, Engineering, Cooking. **Every skill's attribute** (D-0086): Fire STR + INT, Frost DEX + INT, Lightning INT (Path of Exile); Dark Magic CHA + CON (pact-maker); Unarmed STR + DEX; Performance DEX + CHA; Survival DEX + CON; Smithing INT + CON; all ten pairs have a skill; CON thin by tradition (E-0005 round 7). Stats are STR DEX INT CHA CON LUK (WIL cut, LUK added); passives counted from 10 (D-0081): STR increased damage, INT 3% increased XP, CHA increased quest gold summed over the squad, CON HP, DEX speed, LUK heads chance; percents use Path of Exile increased/more (D-0082). Still open:
    - **New battle skills Fury (Hellion) and Grit (Leper)**: designer likes both (E-0005 round 8); attributes and scope open. Defense renamed **Defender**. Open idea: Drinking (CON check skill).
-   - **One weapon skill per merc** (D-0087). Open: does Ranged count (Claude: Ranged may pair with one melee)?
+   - **At most one weapon skill per merc**, Ranged included (D-0088).
    - when the 3 check skills are gained (all at recruitment, or 2 + 1 later);
    - uses outside check nodes (Perception reveals `???` nodes, Lore shows foe weaknesses, Persuasion prices, Cooking at the base kitchen);
    - what each does in check nodes (pass: loot, buff, knowledge; fail: stress, HP, harder next fight).
