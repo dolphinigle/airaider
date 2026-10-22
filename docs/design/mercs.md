@@ -2,7 +2,7 @@
 
 What a merc is made of (stats, skills, talents, level) and how they grow.
 
-## Stats (D-0086)
+## Stats (D-0096)
 
 **Percent effects use Path of Exile wording (D-0082):** *increased/reduced* add together into one multiplier; each *more/less* multiplies on its own. Final = base × (1 + Σ increased − Σ reduced) × Π(1 ± more/less).
 
@@ -14,7 +14,7 @@ Each stat also has a small **passive**, counted from **10 = no effect**: above h
 |---|---|---|---|
 | **STR** | strength | its battle and check skills | **1% increased damage per point above 10** (designer; reduced below), on all damage |
 | **DEX** | agility, hands, reflexes, aim | its battle and check skills | **speed coins** (turn order) |
-| **INT** | intelligence | its battle and check skills | **increased XP**, merc and every skill (**3% per point above 10**, D-0086; reduced below) |
+| **INT** | intelligence | its battle and check skills | **increased XP**, merc and every skill (**3% per point above 10**, D-0084; reduced below) |
 | **CHA** | charisma | its battle and check skills | **increased quest gold** (designer), **summed over the squad** (designer), each merc 1% per point from 10 (working; reduced below) |
 | **CON** | endurance, toughness | its battle and check skills | **max HP** |
 | **LUK** | luck | none (D-0095) | raises the heads chance of **every coin** (working 50% at 10, ±0.5% per point) |
@@ -33,9 +33,9 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 
 **Coins (D-0069):** a check flips **attribute + skill level** if the merc has the skill, else the attribute alone (Survival check: DEX + Survival, or just DEX). An attack flips **its attribute + its battle skill's level**; each head deals the ability's base damage.
 
-### Battle skills (25)
+### Battle skills (25: 8 weapon + 17 others, D-0096)
 
-**No skill is rare** (D-0093): rarity lives in stars. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). Pairings: D-0086 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
+**No skill is rare** (D-0093): rarity lives in stars. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). Pairings: D-0096 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
 
 | skill | covers | attributes |
 |---|---|---|
@@ -43,19 +43,19 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 | **Polearm** | spears, halberds: strike from ranks 2–3, reach deep, push and pull | STR |
 | **Weapon and Shield** | one-handed weapon + shield: shield bash, block, shield wall, counter | STR + CON |
 | **Dual Wield** | two blades, two axes: multi-hits, bleeds | DEX + STR |
-| **Single Weapon** | one sword or rapier, free hand: lunge, riposte, crits (the duelist) | STR + DEX (designer) |
+| **Single Weapon** | one sword or rapier, free hand: lunge, riposte, crits (the duelist) | STR + DEX |
 | **Unarmed** | fists, kicks, grapples, martial arts, claws and bites (werewolves) | STR + DEX |
 | **Shooting** | bows, crossbows, guns: back-rank sniper, long reach, aimed shots, volleys (D-0091) | DEX |
 | **Throwing** | knives, axes, javelins, slings: skirmisher from front or middle ranks, multi-throws, bleeds (D-0091) | STR + DEX |
 | **Defender** | shields, taunts, guarding, party shields (was Defense, designer) | CON |
-| **Berserk** | (was Fury, D-0095) the berserker (Hellion), physical AoE (whirlwind, rampage, trample): burst self-buffs, huge hits that exhaust you after, war cries, kills feed it, stronger when hurt or paid in HP (D-0089) | STR (designer) |
+| **Berserk** | (was Fury, D-0095) the berserker (Hellion), physical AoE (whirlwind, rampage, trample): burst self-buffs, huge hits that exhaust you after, war cries, kills feed it, stronger when hurt or paid in HP (D-0089) | STR |
 | **Grit** | the survivor (Leper): self-heal, shrug off statuses, survive a killing blow once, regen; keeps only itself alive (D-0089) | CON |
 | **Precision** | raises the heads chance of coin flips, self or allies, and so crits (D-0095) | DEX |
 | **Warfare** | back (D-0095); scope open (draft: combined attacks with an ally, breaking foe shields, formation tricks) | STR + INT |
 | **Leadership** | your side: party auras, Resolve, moving teammates, focus-fire orders (D-0073); rare, weak stress healing (D-0062) | CHA |
 | **Performance** | songs, Haste, distraction; rare, weak stress healing | DEX + CHA |
 | **Animal Companion** | a fighting pet, like the Houndmaster (no rank of its own) | CHA |
-| **Dirty Fighting** | their side (was Villainy, D-0074): debuffs (blind, weaken), marks, yanking foes forward (D-0073) | DEX + CON (designer) |
+| **Dirty Fighting** | their side (was Villainy, D-0074): debuffs (blind, weaken), marks, yanking foes forward (D-0073) | DEX + CON |
 | **Stealth** | hiding, ambush strikes | DEX |
 | **Doctor** | healing; limited uses per quest (D-0062) | INT |
 | **Alchemy** | potions, poisons, flasks; limited uses per quest | INT |
@@ -71,7 +71,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 
 ### Check skills (11)
 
-No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0083). Attributes: D-0086.
+No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0083). Attributes: D-0096.
 
 | skill | covers | attr |
 |---|---|---|
@@ -142,7 +142,7 @@ What a merc does in a fight is an **ability**; a **skill** (Survival, Swords…)
   - rest in base buildings;
   - Leadership and Performance abilities;
   - personality traits, which set how fast it builds.
-- **No quirks.** **No stat touches stress** (D-0086: "stress is stress"). Open: what decides Resolve vs Breakdown at 100; whether stress matters outside fights.
+- **No quirks.** **No stat touches stress** (D-0079: "stress is stress"). Open: what decides Resolve vs Breakdown at 100; whether stress matters outside fights.
 
 ## Upgrade items (D-0029)
 

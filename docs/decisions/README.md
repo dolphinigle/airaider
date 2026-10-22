@@ -92,7 +92,7 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0083](D-0083-check-skills-eleven-three-per-merc.md) | Check skills: eleven, three per merc | accepted | designer | 2026-10-22 |
 | [D-0084](D-0084-six-stats-and-every-skill-s-attributes.md) | Six stats and every skill's attributes | superseded → D-0086 | designer | 2026-10-22 |
 | [D-0085](D-0085-unarmed-is-str-dex.md) | Unarmed is STR + DEX | superseded → D-0086 | designer | 2026-10-22 |
-| [D-0086](D-0086-skill-attributes-round-two-every-attribute-pair-has-a-skill.md) | "Skill attributes, round two: every attribute pair has a skill" | accepted | designer | 2026-10-22 |
+| [D-0086](D-0086-skill-attributes-round-two-every-attribute-pair-has-a-skill.md) | "Skill attributes, round two: every attribute pair has a skill" | superseded → D-0096 | designer | 2026-10-22 |
 | [D-0087](D-0087-one-weapon-skill-per-merc.md) | One weapon skill per merc | superseded → D-0088 | designer | 2026-10-22 |
 | [D-0088](D-0088-one-weapon-skill-per-merc-ranged-included.md) | One weapon skill per merc, Ranged included | superseded → D-0090 | designer | 2026-10-22 |
 | [D-0089](D-0089-fury-and-grit-join-the-battle-skills.md) | Fury and Grit join the battle skills | accepted | designer | 2026-10-22 |
@@ -102,4 +102,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0093](D-0093-no-rare-skills-stars-carry-rarity.md) | No rare skills; stars carry rarity | accepted | designer | 2026-10-22 |
 | [D-0094](D-0094-fortune-the-coin-skill-uses-luk.md) | Fortune, the coin skill, uses LUK | superseded → D-0095 | designer | 2026-10-22 |
 | [D-0095](D-0095-fortune-out-fury-renamed-berserk-precision-and-warfare-in.md) | Fortune out; Fury renamed Berserk; Precision and Warfare in | accepted | designer | 2026-10-22 |
+| [D-0096](D-0096-skill-roster-and-attributes-round-three.md) | Skill roster and attributes, round three | accepted | designer | 2026-10-22 |
 <!-- index:end -->
