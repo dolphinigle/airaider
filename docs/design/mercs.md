@@ -73,7 +73,7 @@ No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0077); names D-
 | **Roguery** | locks, pockets, traps, forgery | DEX |
 | **Streetwise** | rumors, finding people, city ways | CHA + INT (designer) |
 | **Persuasion** | charm, diplomacy, haggling, appraising (+ Bargaining) | CHA |
-| **Intimidation** | threats, interrogation, lies, bluffs, disguises (+ Deception) | INT + CHA (designer) |
+| **Intimidation** | threats, interrogation, lies, bluffs, disguises (+ Deception) | STR + CHA (designer) |
 | **Lore** | the past, peoples, faiths; plants, beasts, monsters; undead, demons, curses, relics (three lores merged) | INT |
 | **Smithing** | weapons, armor, repairs (Craft split again, designer) | STR + INT (designer) |
 | **Engineering** | building, machines, explosives, traps (back, designer) | INT (Claude) |
