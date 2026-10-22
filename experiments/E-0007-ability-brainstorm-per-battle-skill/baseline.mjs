@@ -264,7 +264,6 @@ export const SKILLS = [
       '2|Order Fall Back|1–3|ally at rank 1–2|50% shield|the ally steps back 1 rank|0 cd|new',
       '2|Order Flank|1–3|any ally||the ally steps 1 rank, and gains Emboldened and Haste|cd 1|new',
       '3|Weaken All Foes|1–3|all foes||Weakened|cd 2|new',
-      '3|Rearrange Squad|1–3|all allies||rearrange your allies in any order; each ally that moved gains Haste|cd 3|new',
       '4|Haste All Allies|1–3|all allies||Haste|cd 3|new',
     ] },
   { name: 'Leadership', attr: 'CHA', ranks: '1–4', role: 'support', state: 'new',
