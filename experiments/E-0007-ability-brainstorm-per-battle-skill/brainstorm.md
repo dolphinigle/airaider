@@ -128,3 +128,40 @@ Names in brackets are Claude's, placed without a ruling.
 | **Composed** | softens its self-debuff | both | has one |
 
 **Rejected (designer, 2026-10-22):** Sweeping ("sweeping bad no"); Clash (merged into smooth Executing / Opening Blow); Mighty, Second Wind (replaced by Consistent), Savage, Bane of \<family\>, Exploiting, Giant-slayer, Piercing, Vengeful, Vanguard, First Strike, Momentum, Bloodthirsty, Focused, Coordinated ("the earlier ones are all rejected"); all the Path of Exile support gem translations (Purist, Steady, Festering, Smouldering, Bulwark, Finisher, Patient, Ruthless, Twin Charge, Alternating, Consuming, Bane of \\<status\\>, Charging, Rooted, Close Quarters / Far Shot, Outnumbered, Trophy; designer: "all in (2) are rejected"). Evasive ("we dont have evasion planned yet"); Taunting ("bad"); Carry-through, Shattering.
+
+### Heal mods (Claude's draft, 2026-10-22; designer asked for heal mods adapted from the damage list)
+
+Same rules as the damage mods: about 10% on a no-cooldown ability, the AI picks, smooth scaling. **Kind** says where each one comes from: *same* (as the damage mod), *adjusted* (a damage mod reshaped for heals), *new* (heals only).
+
+| family | per ability | mod | effect | kind |
+|---|---|---|---|---|
+| cure | no limit | **Staunching / Antidote / Cooling / Grounding / Warming** | also removes Bleed / Poison / Burn / Shocked / Chilled from the target | adjusted (from status mods) |
+| cure | | **Purifying** | removes every negative status | new, rare |
+| ally buff | 1; 50% reduced healing; single-target only | **Hastening** | the target acts earlier next round | adjusted (from debuffs) |
+| ally buff | | **Fortifying** | the target takes less damage until its next turn | adjusted |
+| ally buff | | **Emboldening** | the target's next attack deals more damage | adjusted |
+| ally buff | | **Blessed** | the target's next flip gets a better heads chance | adjusted (Lucky for an ally) |
+| self buff | 1 | **Swift / Riposting** | you act earlier next round / gain a riposte charge | same |
+| sustain | no limit | **Guarding** | the target also gains a shield worth 10% of the healing | same |
+| sustain | | **Overflow** | healing past full HP becomes a shield | new |
+| sustain | | **Empathic** | you also heal for a share of it | adjusted (from Vampiric), rare |
+| over time | no limit | **Regenerating** | part of the heal comes later as regen over a few rounds, more in total | new |
+| self-move | 1 | **Advancing / Retreating** | you step forward / back 1 rank | same |
+| reach | no limit | **Reaching / Footwork** | reaches one more ally rank / usable from one more rank | same |
+| scaling | no limit | **Triage** | more healing the more HP the target has lost | adjusted (from Executing) |
+| scaling | | **Comforting** | more healing the more stress the target has | new |
+| scaling | | **Desperate / Fresh** | more healing the more HP you have lost / have left | same |
+| scaling | | **Haunted / Serene** | more healing the more / less stress you have | same |
+| condition | no limit | **Remedial** | more healing on a target with any negative status | adjusted (from Opportunist) |
+| condition | | **Bedside** | more healing on an ally next to you | new |
+| coins | no limit | **Lucky / Consistent / Gamble** | as for damage | same |
+| double-edged | no limit | **Reckless** | 15% more healing; you take 15% more damage until your next turn | same |
+| double-edged | | **Wild / Unsteady / Ponderous / Fraught / Unique** | as for damage, with more healing | same, rare |
+| double-edged | | **Transfusion** | costs you HP; much more healing | adjusted (from Blood Price), rare |
+| other | no limit | **Echo** | small chance to heal again | adjusted (from Double Strike); one repeat at most |
+| other | | **Calming** | also lowers the target's stress a little | adjusted (from Soothing), rare (D-0062: skill stress healing is rare and weak) |
+| conditional | no limit | **Quick / Measured / Splitting / Composed** | as for damage | same |
+| conditional | | **Lasting / Potent** | its regen or ally buff lasts a round longer / is stronger | adjusted (from Lingering / Potent) |
+| conditional | | **Well-stocked** | +1 use per quest, less healing | new; abilities with per-quest uses (D-0062) |
+
+Dropped for heals: element, Crushing, Opening Blow (topping up the barely hurt is weak), status inflicting, Heavy, Stunning, Marking.
