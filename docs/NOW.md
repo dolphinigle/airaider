@@ -75,6 +75,7 @@
 
 ## Waiting on the designer
 
+- **Remove WIL?** (designer, thinking, 2026-10-22). WIL now does only the stress check plus halves of Holy and Dark. If cut: Holy → CHA, Dark → INT; the stress check becomes a flat chance (Darkest Dungeon style) raised by personality traits (Claude's pick), or flips CHA; level-up spreads 3 coins over 5 stats.
 - **Check nodes** (D-0059 notes): one named skill per node; pass gives loot/buff/knowledge, fail costs; can Scouting reveal hidden nodes?
 - **Skill stress healing** is rare and weak; rest is the main relief (D-0062).
 - **To decide later** (D-0055):
