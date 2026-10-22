@@ -151,7 +151,7 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 
 | magic | attr | ranks | damage / status | identity |
 |---|---|---|---|---|
-| **Fire** | STR + INT | 1–4 (designer) | Fire / Burn | a balance of single-target and area damage; Burn deals damage over time |
+| **Fire** | STR + INT | 1–4 (designer) | Fire / Burn | a balance of single-target and area damage; Burn deals damage over time; **some melee magic** (designer; fits STR + INT) |
 | **Frost** | DEX + INT | 3–4 | Frost / Chilled | single target; Chilled; shields on the caster |
 | **Lightning** | INT | 3–4 | Lightning / Shocked | the biggest direct damage; Shocked makes the next hit deal more; area damage by chaining |
 | **Holy** | CHA | 1–4 (designer) | Physical / none | healing, some buffs, a weak shield, weak damage; no bonus against undead ("holy is already stacked") |
