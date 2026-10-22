@@ -147,3 +147,26 @@ The designer asked what each attribute's passive should be (like CON giving HP),
 | LUK | crit chance (Fallout, Ragnarok, Divinity OS2 Wits); loot (Fallout, Dark Souls item discovery); perfect dodge (Ragnarok); a little on every roll (Oblivion) |
 
 Patterns: CON → HP and DEX → speed are near universal. STR's common side effect is carrying; INT's is learning or durations; CHA's lives outside fights (money, people); Luck touches crits and loot. Path of Exile gives each attribute one small defensive side effect (STR life, DEX evasion, INT energy shield).
+
+### Round 7: skills on CON and CHA in other games
+
+The designer asked what new skills could go on CON or CHA + CON, looking at D&D and others. From Claude's knowledge, not re-checked online.
+
+| game | CON-type stat's skills | CHA-type stat's skills |
+|---|---|---|
+| D&D 5e | **none** (CON = HP, concentration and endurance saves; drinking in carousing uses CON saves) | Deception, Intimidation, Performance, Persuasion; Warlock, Sorcerer, Paladin cast with CHA (Sorcerers want CON second) |
+| D&D 3.5 | Concentration (its only CON skill) | Bluff, Diplomacy, Intimidate, Perform, Handle Animal |
+| Pathfinder 1e/2e | none | as D&D |
+| Warhammer Fantasy RPG 4e | **Consume Alcohol**, Endurance (Toughness) | Charm, Entertain, Gossip, Haggle, Leadership, Bribery, Gamble (Fellowship) |
+| Kingdom Come: Deliverance | **Drinking** is its own skill | Speech |
+| Mount & Blade Bannerlord | Endurance: Riding, Athletics, **Smithing** | Social: Charm, Leadership, Trade |
+| Elder Scrolls (Morrowind, Oblivion) | Endurance: Heavy Armor, Blunt, Block, Spear | Personality: Speechcraft, Mercantile, Illusion |
+| Fallout 3 / New Vegas | Endurance: Unarmed (3), Survival (NV) | Speech, Barter |
+| Kenshi | Toughness (levels by taking hits) | none |
+| Cyberpunk 2077 | Body: Athletics, Annihilation, Street Brawler | (Cool: Stealth, Cold Blood) |
+| Shadowrun 5e | none | Con, Etiquette, Leadership, Negotiation, Intimidation, Animal Handling |
+
+Patterns:
+- **CON with few or no skills is the tradition** (D&D, Pathfinder, Shadowrun): it is the HP stat. A thin CON is normal.
+- When CON has skills they are **drinking** (WFRP, Kingdom Come, D&D carousing saves), **endurance** (marching, toughness), **armor and blocking** (Elder Scrolls), **smithing and riding** (Bannerlord).
+- CHA + CON together: the D&D Sorcerer and Warlock (CHA casters who want CON); drinking with company (WFRP Consume Alcohol + Gossip).
