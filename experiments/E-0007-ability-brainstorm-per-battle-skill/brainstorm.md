@@ -69,12 +69,13 @@ A mod or ability that says "a buff" or "a debuff" picks one entry from this list
 | damage status | **Bleed / Poison / Burn** | deals Physical / Chaos / Fire damage each round | damage per round | rounds |
 | damage status | **Shocked** | the next hit on it deals more (Lightning) | how much more | hits |
 | damage status | **Chilled** | Frost; what it does is open (Claude: acts later) | open | rounds |
-| debuff | **Stun** | loses its next turn (rarer); **always on a cooldown**; **single target only for now** (designer: "ground slam bad, dont have multi stun for now") | — | turns |
+| debuff | **Stun** | loses its next turn (rarer); **always limited**, by a cooldown or by uses per quest (Dirty Fighting's Flashbang, designer: "just limited use"); **single target only for now** (designer: "ground slam bad, dont have multi stun for now") | — | turns |
 | debuff | **Mark** | allies deal more to it | how much more | rounds |
 | debuff | **Sundered** | Physical defense down (Sunder) | how much down | rounds |
 | debuff | **Exposed** (Claude) | takes more damage | how much more | rounds |
 | debuff | **Weakened** (Claude) | deals less damage | how much less | rounds |
 | debuff | **Slowed** (Claude) | acts later | — | rounds |
+| debuff | **Blinded** (Claude) | each of its flips gets a fixed worse heads chance, the mirror of Blessed (no misses, D-0070) | — | flips |
 | self-debuff | **Staggered** | acts last and takes more damage (Wide Cleave) | how much more | rounds |
 | buff | **Haste** | acts earlier | — | rounds |
 | buff | **Emboldened** | its attacks deal more damage | how much more | attacks |
@@ -156,6 +157,24 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 | **Push** | 2★ | 2–3 → foe 1 | 70% | pushes the foe back 1 rank | 0 cd |
 | **Impale** | 2★ | 2–3 → foe 1–2 | 110% | Bleed | 0 cd |
 | **Sweep** | 3★ | 2–3 → foe 1 and 2 | 50% each | hits both front foes | 0 cd |
+
+## Dirty Fighting (STR + DEX)
+
+**Identity:** "their side" (D-0073, D-0098): what you do to the foe besides hitting it. Ranks 1–3, mostly reaching foe 1–2. Light damage carrying debuffs (Blinded, Weakened, Mark), yanking a foe forward, and a payoff blow on debuffed foes. **One rare stun, with limited uses** (designer: "it has a stun rarely, just one, like Flashbang or something… just limited use").
+
+**Model abilities (Claude's draft, 2026-10-22):**
+
+| ability | rarity | ranks | damage | effect | cost |
+|---|---|---|---|---|---|
+| **Low Blow** | 1★ | 1–2 → foe 1–2 | 90% | the default attack | 0 cd |
+| **Pocket Sand** | 1★ | 1–3 → foe 1–2 | 30% | Blinded | 0 cd |
+| **Hamstring** | 1★ | 1–2 → foe 1–2 | 50% | Weakened | 0 cd |
+| **Mark** | 2★ | 1–3 → any foe | — | Mark | 0 cd |
+| **Yank** | 2★ | 1–2 → foe 2–3 | 50% | pulls the foe forward 1 rank | 0 cd |
+| **Kick Them Down** | 2★ | 1–2 → foe 1–2 | 60% | +40% more per debuff on the foe | 0 cd |
+| **Flashbang** | 4★ | 1–3 → foe 1–3 | — | Stun | 2 uses per quest (number Claude's) |
+
+Every turn asks set up (a debuff) or cash in (Kick Them Down, an ally's big hit on a Marked foe). Yank pulls a back-rank caster into the front line's reach.
 
 ## The five magics, identities (designer, 2026-10-22)
 
