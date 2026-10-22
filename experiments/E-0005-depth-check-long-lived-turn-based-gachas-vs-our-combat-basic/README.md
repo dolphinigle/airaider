@@ -132,3 +132,18 @@ The designer asked whether 5 attributes (WIL cut) is decent, and about a 6th, LU
 - 4–6 is the normal range; 6 is the D&D habit, not a need. Games where stats grow on their own (not player-allocated) lean fewer: each stat must read on a recruit card.
 - Luck as a stat appears in Fallout (crits, random encounters), Fire Emblem (hit, dodge, crit dodge), Ragnarok Online (crits, perfect dodge). Common rep: a weird, loved stat; Fallout 4 Luck builds became a god stat when its effects stacked.
 - Lesson for us: a stat that touches every flip must stay small per point, or it beats every other stat.
+
+### Round 6: what attributes do besides skills (passives)
+
+The designer asked what each attribute's passive should be (like CON giving HP), from other games. From Claude's knowledge, not re-checked online.
+
+| attribute | passives seen elsewhere |
+|---|---|
+| STR | carry weight (Fallout, D&D, Ragnarok, Oblivion, Divinity OS2); extra HP (Mount & Blade, Path of Exile); melee damage % (Fallout, Path of Exile); grapple/jump (D&D) |
+| DEX | initiative/turn order (D&D, Pillars action speed, Ragnarok attack speed and cast time); accuracy (Path of Exile, Ragnarok, Diablo 2); evasion/dodge (Path of Exile, Ragnarok flee); block chance (Diablo 2) |
+| CON | max HP (nearly all); healing received (Ragnarok VIT); resist poison, stun, disease (Ragnarok, Stoneshard VIT); stamina (Dark Souls) |
+| INT | XP or skill points (Fallout, Mount & Blade); area size and effect duration (Pillars); mana (Path of Exile, Diablo 2); magic defense (Ragnarok) |
+| CHA | prices (Fallout, Oblivion); party or companion size (Mount & Blade, Fallout); NPC disposition (Oblivion) |
+| LUK | crit chance (Fallout, Ragnarok, Divinity OS2 Wits); loot (Fallout, Dark Souls item discovery); perfect dodge (Ragnarok); a little on every roll (Oblivion) |
+
+Patterns: CON → HP and DEX → speed are near universal. STR's common side effect is carrying; INT's is learning or durations; CHA's lives outside fights (money, people); Luck touches crits and loot. Path of Exile gives each attribute one small defensive side effect (STR life, DEX evasion, INT energy shield).
