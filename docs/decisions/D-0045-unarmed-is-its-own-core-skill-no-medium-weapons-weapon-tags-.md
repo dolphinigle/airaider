@@ -1,11 +1,11 @@
 ---
 id: D-0045
 title: Unarmed is its own core skill, no medium weapons, weapon tags filter base abilities
-status: accepted
+status: superseded
 date: 2026-10-22
 decided-by: designer
 supersedes: []
-superseded-by:
+superseded-by: D-0063
 evidence: []
 sources: []
 ---

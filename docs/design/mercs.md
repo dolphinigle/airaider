@@ -4,7 +4,7 @@ What a merc is made of (stats, skills, talents, level) and how they grow.
 
 ## Stats (D-0044)
 
-Six stats, each a number of **coins**, about **10 → 20** over a career (D-0065). They pool with skills in **skill checks**. In combat an **attack flips the attribute** its battle skill uses; each head deals the ability's base damage, which rises with skill level; statuses land on a separate skill flip (D-0065).
+Six stats, each a number of **coins**, about **10 → 20** over a career. Checks and attacks flip **attribute + skill level** (D-0069); statuses land on a separate skill flip. Foes scale by HP.
 
 | stat | covers | in a fight |
 |---|---|---|
@@ -25,44 +25,59 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 - Only the core skill counts in a test. The exact name colors the text ("Atlas swings his sword").
 - Skills have their **own XP** and level up separately from the merc (D-0012).
 
-**Two kinds (D-0058):** **battle skills** give abilities; **check skills** give none and are only flipped in skill checks. Battle skills can be checked too (Doctor, Leadership). Quotas (working): 3 battle skills (2 at the start, 1 at Lv 7) and 2 check skills. Civilians have check skills only.
+**Two kinds (D-0058):** **battle skills** give abilities; **check skills** give none. Every skill can be checked (Doctor, Leadership too). Quotas (working): 3 battle skills (2 at the start, 1 at Lv 7) and 2 check skills. Civilians have check skills only.
 
-Battle skills: Heavy, Light, Unarmed, Ranged, Defense, Warfare, Leadership, Performance, Animal Companion, Villainy, Stealth, Doctor, Alchemy, Nature Lore, Engineering, Elemental, Holy, Dark. Check skills: the rest. Merges are open.
+**Coins (D-0069):** a check flips **attribute + skill level** if the merc has the skill, else the attribute alone (Survival check: DEX + Survival, or just DEX). An attack flips **its attribute + its battle skill's level**; each head deals the ability's base damage.
 
-The core skills (D-0021, D-0045, D-0058), with the stats their tests usually pool with them (a quest may pair them differently). ✦ = rare: seldom rolled at recruitment or for an unlock.
+### Battle skills (20)
 
-| family | core skill | covers | stats |
-|---|---|---|---|
-| Fighting | **Heavy Weapons** | greatswords, axes, hammers, polearms | STR, CON |
-| | **Light Weapons** | swords, daggers, rapiers | DEX, STR |
-| | **Unarmed** | fists, kicks, grapples, martial arts, claws and bites (werewolves, beast fighters) (D-0061) | DEX, STR |
-| | **Ranged** | bows, crossbows, guns, slings, throwing (D-0060) | DEX, STR |
-| | **Defense** | shields, armor, parrying, holding a line | CON, STR |
-| | **Athletics** | climbing, swimming, running, hauling, tumbling | STR, DEX |
-| | **Warfare** | tactics, formations, sieges, fortifications, battle plans | INT, STR |
-| Wilds | **Survival** | foraging, camping, weather, terrain, trails, hunting | CON, INT |
-| | **Awareness** | spotting ambushes, keeping watch, searching, reading people | DEX, INT |
-| | **Animal Companion** | a fighting pet (like Darkest Dungeon's Houndmaster), riding, taming, handling animals | CHA, WIL |
-| Shadows | **Stealth** | sneaking, hiding, ambushes | DEX, INT |
-| | **Roguery** | locks, pockets, traps, forgery | DEX, INT |
-| | **Villainy** | banditry, smuggling, extortion, slaving, black markets, bribes | CHA, STR |
-| | **Streetwise** | rumors, finding people, city ways, local customs, who's who | CHA, INT |
-| Talk | **Persuasion** | charm, diplomacy, winning people over | CHA, INT |
-| | **Deception** | lies, bluffs, disguises, cons | CHA, INT |
-| | **Bargaining** | haggling, selling, appraising: making money | CHA, INT |
-| | **Intimidation** | threats, interrogation | CHA, STR |
-| | **Leadership** | inspiring, rallying, morale, keeping a crew together | CHA, WIL |
-| | **Performance** | music, song, dance, acting, storytelling | CHA, DEX |
-| Knowing | **Civilization Lore** | the past, languages, peoples, faiths, heraldry | INT |
-| | **Nature Lore** | plants, beasts, weather, stars, natural monsters | INT, DEX |
-| | **Arcane Lore** | the hidden world: undead, demons, curses, relics, how magic works (knowing, not casting) | INT, WIL |
-| | **Alchemy** | potions, poisons, flasks | INT, DEX |
-| | **Doctor** | healing, bandaging, surgery, remedies | INT, DEX |
-| | **Smithing** | weapons, armor, repairs | STR, DEX |
-| | **Engineering** | building, machines, how things work, numbers, explosives, setting traps | INT, STR |
-| Magic ✦ | **Elemental Magic** ✦ | fire, frost, lightning | INT, WIL |
-| | **Holy Magic** ✦ | healing, blessing, warding off the dead | CHA, WIL |
-| | **Dark Magic** ✦ | curses, necromancy, draining life, pacts; **its abilities cost HP** (D-0060) | INT, CHA |
+✦ = rare. "attr" = the attribute it attacks with (working, Claude's draft).
+
+| skill | covers | attr |
+|---|---|---|
+| **Fast Weapons** | swords, daggers, rapiers: multi-hits, bleeds, crits (D-0063) | DEX |
+| **Cleaving Weapons** | greatswords, axes: hits two adjacent foes | STR |
+| **Heavy Weapons** | hammers, clubs, maces: stuns, armor break, knockback | STR |
+| **Long-reach Weapons** | polearms, spears: strikes from rank 2–3, reaches deep | STR |
+| **Unarmed** | fists, kicks, grapples, martial arts, claws and bites (werewolves) | DEX |
+| **Ranged** | bows, crossbows, guns, slings, throwing (weapon tags) | DEX |
+| **Defense** | shields, taunts, guarding, party shields | CON |
+| **Warfare** | debuffs, moving teammates and foes | INT |
+| **Leadership** | party auras, Resolve; rare, weak stress healing (D-0062) | CHA |
+| **Performance** | songs, Haste, distraction; rare, weak stress healing | CHA |
+| **Animal Companion** | a fighting pet, like the Houndmaster (no rank of its own) | CHA |
+| **Villainy** | bounty hunter: marks, pulls, dirty fighting | STR |
+| **Stealth** | hiding, ambush strikes | DEX |
+| **Doctor** | healing; limited uses per quest (D-0062) | INT |
+| **Alchemy** | potions, poisons, flasks; limited uses per quest | INT |
+| **Fire Magic** ✦ | fire damage, burns (D-0070) | INT |
+| **Frost Magic** ✦ | frost damage, slows | INT |
+| **Lightning Magic** ✦ | lightning damage, chains | INT |
+| **Holy Magic** ✦ | healing, blessing, warding off the dead; deals mostly Physical | CHA |
+| **Dark Magic** ✦ | curses, necromancy, draining life; deals Chaos; **its abilities cost HP** (D-0060) | WIL |
+
+**Damage types (D-0070):** Physical, Fire, Frost, Lightning, Chaos. Poison and bleed are statuses.
+
+### Check skills (14)
+
+No abilities; flipped in check nodes (D-0059). Merges open (later).
+
+| skill | covers | usual attr |
+|---|---|---|
+| **Athletics** | climbing, swimming, running, hauling | STR, DEX |
+| **Survival** | foraging, camping, weather, terrain, trails | CON, INT |
+| **Awareness** | spotting ambushes, keeping watch, searching | DEX, INT |
+| **Roguery** | locks, pockets, traps, forgery | DEX |
+| **Streetwise** | rumors, finding people, city ways | CHA |
+| **Persuasion** | charm, diplomacy | CHA |
+| **Deception** | lies, bluffs, disguises | CHA |
+| **Bargaining** | haggling, appraising | CHA |
+| **Intimidation** | threats, interrogation | CHA, STR |
+| **Civilization Lore** | the past, languages, peoples, faiths | INT |
+| **Nature Lore** | plants, beasts, natural monsters (D-0062) | INT |
+| **Arcane Lore** | undead, demons, curses, relics | INT, WIL |
+| **Engineering** | building, machines, explosives, traps (D-0062) | INT |
+| **Smithing** | weapons, armor, repairs | STR |
 
 ## Talents (D-0018)
 
@@ -76,7 +91,7 @@ Two random draws over the six stats at recruitment. They may land on the same st
 
 ## Level up
 
-**A merc level up grants attributes only** (D-0067). **Stats grow at random: exactly three coins per level, at most one per stat** (D-0018):
+**A merc level up grants attributes only** (D-0069). **Stats grow at random: exactly three coins per level, at most one per stat** (D-0018):
 1. one coin on a random talented stat;
 2. one coin on the second talented stat with a 50% chance; on a miss, or with no second talented stat, it goes to a random stat;
 3. one coin on a random stat.
@@ -85,21 +100,20 @@ Expected gain per level: a ++ stat +1.00 (others +0.5); two + stats about +0.875
 
 **The player's choice is a skill** (D-0035): a merc **starts with two skills** (a third is rare, likelier at higher stars), and at **Lv 7** learns one more, **picking 1 of 3**, hidden until then. The options are rolled at recruitment (weighted by race and background, from skills the merc lacks).
 
-## Stars (D-0067)
+## Stars (D-0067, D-0069)
 
-- **Every skill has a star**, 1★–5★ in half steps (talent), battle and check skills alike. A battle skill's star sets its abilities' modifier odds: 0–4 modifiers, more at higher stars (four on about 0.1% of a 5★ skill's abilities). Working odds: E-0004 `halfstar.mjs`, now per skill.
+- **Every skill has a star**, 1★–5★ in half steps (talent), battle and check skills alike (D-0069). **The star sets the skill's XP gain** (how fast it levels). A battle skill's star also sets its abilities' modifier odds: 0–4 modifiers, more at higher stars (four on about 0.1% of a 5★ skill's abilities). Working odds: E-0004 `halfstar.mjs`, now per skill.
 - **A merc's star** (1★–5★, half steps, rolled at recruitment) makes their skills likelier to roll high stars. Higher stars get more common as the game goes on.
 - **Traits have stars too**; a trait's passive scales a little with its star (D-0068; working: 5★ = 1.5× the 1★ effect, upside only). Intent (designer): "just to make rare chase feels better not to force players to have to have them": a 1★ trait is fully playable.
-- Open: what a check skill's star does (Claude: growth speed).
 
-## Abilities (D-0031, D-0067)
+## Abilities (D-0031, D-0069)
 
 What a merc does in a fight is an **ability**; a **skill** (Survival, Swords…) is what they know.
 
 - Every merc's **first ability is a 0-cooldown attack**, a normal ability: from their skills (most skills have one, e.g. Light Weapons' Double Attack) or, as a fallback, a **generic** attack anyone can get (Smash, Kick) (D-0050); generic bases can also come up, rarely, on any level up (D-0051).
 - The player sees only the AI name, never the base (D-0048).
-- Only **battle skills** give abilities (D-0058). Each has **about 10–20 base abilities**; weapon tags filter them (D-0045).
-- **Every battle-skill level up gives one new ability** from that skill, with modifiers by the skill's star (D-0067). A merc level up gives attributes only. The engine deals the AI a few random bases from that skill that fit their weapon; the AI picks one that fits the merc's theme and renames it. **Never the same base twice.**
+- Only **battle skills** give abilities (D-0058). Each has **about 10–20 base abilities**; Ranged's weapon tags filter its bases (D-0063).
+- **Some battle-skill level ups give a new ability** from that skill, not every one (D-0069; working: skill levels 1, 3, 5, 7, 9), with modifiers by the skill's star. A merc level up gives attributes only. The engine deals the AI a few random bases from that skill that fit their weapon; the AI picks one that fits the merc's theme and renames it. **Never the same base twice.**
 - A merc **equips four** abilities.
 - An ability is a fixed base plus modifiers, named by the AI (D-0025, proposed).
 - **Passives are traits** (D-0036, D-0038, D-0039). Traits come in four kinds: **gender, race, personality and body** (tall, short, muscular, skinny), all part of the starting position. A passive never touches stat or skill coins; it works on other axes (damage %, speed, HP, targeting, recovery, upkeep, loot) (D-0040). Often a trade-off: "Wolfkin: +10% damage, −10% speed", "Stubborn: can't be stunned while above half HP".

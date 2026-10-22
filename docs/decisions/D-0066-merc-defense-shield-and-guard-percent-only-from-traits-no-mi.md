@@ -1,11 +1,11 @@
 ---
 id: D-0066
 title: Merc defense: shield and guard, percent only from traits; no misses; eight damage types
-status: accepted          # proposed | accepted | rejected | superseded
+status: superseded          # proposed | accepted | rejected | superseded
 date: 2026-10-22
 decided-by: designer      # designer (design: what the game does) | claude (implementation: how the engine does it)
 supersedes: []            # e.g. [D-0003]
-superseded-by:            # set when a later record replaces this one; the only edit allowed after acceptance
+superseded-by: D-0070
 evidence: [E-0006]
 sources: []               # archived ideas it brings back, e.g. [archive/v3/ECONOMY.md §3]
 ---

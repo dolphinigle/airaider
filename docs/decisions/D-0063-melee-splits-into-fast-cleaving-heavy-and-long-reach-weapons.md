@@ -1,7 +1,7 @@
 ---
 id: D-0063
 title: Melee splits into Fast, Cleaving, Heavy and Long-reach weapons
-status: proposed          # proposed | accepted | rejected | superseded
+status: accepted          # proposed | accepted | rejected | superseded
 date: 2026-10-22
 decided-by: designer      # designer (design: what the game does) | claude (implementation: how the engine does it)
 supersedes: [D-0045, D-0061] # e.g. [D-0003]
@@ -15,6 +15,9 @@ sources: []               # archived ideas it brings back, e.g. [archive/v3/ECON
 D-0045 had Heavy (two-handers) and Light (one-handers), with weapon tags (axe, hammer, polearm) filtering bases. D-0061 put swords in Light.
 
 ## Decision
+
+Accepted by the designer, 2026-10-22: "melee split good lets go."
+
 
 The designer, 2026-10-22: "how about Fast weapons (swords, daggers), Cleaving weapons (greatsword, axes), Heavy weapons (hammers, clubs), and Long-reach melee (polearms)? because their abilities likely differ this way."
 

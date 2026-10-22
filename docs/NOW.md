@@ -22,14 +22,14 @@
 
 ### Mercs ([design/mercs.md](design/mercs.md))
 - **Stats:** STR DEX INT CHA CON WIL (D-0044). DEX gives speed coins, CON gives max HP, WIL is the stress check.
-- **Stars** (D-0067): every skill has a star (1★–5★, half steps) that sets its abilities' modifier odds; the merc's star makes high skill stars likelier.
+- **Stars** (D-0069): every skill has a star (1★–5★, half steps) that sets its XP gain and, for battle skills, its abilities' modifier odds; the merc's star makes high skill stars likelier.
 - **Upgrade items:** star-up and reroll reroll only the level-up seed (D-0029, D-0032). A star-up sets a fixed star below 5★ (D-0037).
 - **Skills:**
   - Two starting skills; pick 1 of 3 at Lv 7 (D-0035).
   - **Battle skills** (18, give abilities) and **check skills** (give none) are separate, with their own quotas: working 3 battle + 2 check. Battle skills can be checked too. Civilians have check skills only; v3 captives, if they return, too (D-0058).
 - **Abilities:** fights use abilities; skills are what mercs know (D-0031).
-  - A merc level up gives attributes only. **A battle-skill level up gives one new ability**: the AI picks one of a few dealt bases from that skill and renames it. Never the same base twice. Four equipped (D-0067).
-  - 10–20 bases per battle skill (D-0067).
+  - A merc level up gives attributes only. **Some battle-skill level ups give a new ability** (working: skill levels 1, 3, 5, 7, 9): the AI picks one of a few dealt bases from that skill and renames it. Never the same base twice. Four equipped (D-0069).
+  - 10–20 bases per battle skill (D-0069).
   - Weapon tags filter bases; Unarmed is its own skill; no medium tier (D-0045).
   - Dark Magic abilities cost HP; guns are a Ranged weapon tag (D-0060).
   - The first ability is always a 0-cooldown attack, with a generic fallback (Smash, Kick); generic bases also come up rarely later (D-0050, D-0051).
@@ -44,7 +44,7 @@
 - **Combat basics** (D-0041, proposed, the designer called it "decent"):
   - **Formation:** a Darkest Dungeon line, 4 ranks per side. Abilities state the ranks they're used from and the ranks they reach. No corpses: units shift forward.
   - **Turn order:** speed coins re-flipped every round, everyone acts once. Haste and Slow change it.
-  - **Attacks** (D-0065): flip the attribute; heads × ability base (rises with skill level); defense % per damage type; statuses on a skill flip.
+  - **Coins** (D-0069): checks and attacks flip attribute + skill level (attribute alone without the skill); heads × ability base; foe defense % per type (Physical, Fire, Frost, Lightning, Chaos, D-0070); statuses on a skill flip; foes scale by HP.
   - **Costs:** cooldowns only; no mana, no stamina.
   - **Guard:** taunts, or shields (the shield can cover the party).
   - **Interactions:** damage-type weaknesses, and statuses that raise damage taken.
@@ -52,7 +52,7 @@
   - **Waves** happen automatically.
 - **Rank movement:** Athletics moves yourself; Warfare moves allies and foes.
 - **Combo bases** (Claude idea, offered 2026-10-22): a few bases need two skills (Heavy + Holy "Holy Smite"); only mercs with both are dealt them; the ability flips the two skills' average. Skill pairs feel like classes (Crusader = Heavy + Holy, Defense at Lv 7) without hard classes. E-0005 round 4: every Darkest Dungeon class maps to 1–2 of our skills.
-- **Modifiers:** 0–4 per ability by the skill's star (D-0067). Engine-priced; the AI picks from the candidates the engine deals (D-0025, proposed).
+- **Modifiers:** 0–4 per ability by the skill's star (D-0069). Engine-priced; the AI picks from the candidates the engine deals (D-0025, proposed).
 - **Foe families** each have a sharp twist.
 - **Fight sprites:** one AI image per pose (D-0043, proposed, parked as a detail).
 - **Parked:**
@@ -63,15 +63,11 @@
 
 ## Next
 
-0. **Battle skills first, check skills later** (designer). Open now:
-   - **Damage model locked** (D-0065, E-0006): attribute coins (10 → 20) × ability base (rises with skill level), foe defense % per type, status on a skill flip, foes scale by HP. Open: attribute per battle skill.
-   - **Defense locked** (D-0066): mercs defend with shield, guard and buffs; % per type only from traits/gear; no misses, dodge is a charge; 8 damage types (Slash, Pierce, Blunt, Fire, Frost, Lightning, Holy, Dark).
-   - **Skill stars** (D-0067) open: what a check skill's star does (Claude: growth speed); skill level = skill coins?
-   - **Melee split** (D-0063, proposed): Fast, Cleaving, Heavy, Long-reach.
-   - **Elemental:** one skill with element tags (Claude) or split?
+0. **Battle skills first, check skills later** (designer). Locked today: melee split (D-0063), Elemental split + PoE damage types (D-0070), coins = attribute + skill level, skill stars set XP gain (D-0069), defense (D-0066 → D-0070), trait stars (D-0068). Battle skills are now 20: see design/mercs.md. Open:
+   - **Attribute per battle skill** (Claude's draft in design/mercs.md).
+   - **Ability cadence** (Claude: skill levels 1, 3, 5, 7, 9).
    - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances).
-   - Ruled (D-0062): Nature Lore and Engineering leave combat; some abilities have per-quest uses (Alchemy, Doctor); stress healing in fights is rare and weak.
-
+   - Check skills: merges and stars later.
 1. **Skill merges (the current question).** The designer asked: "show me skills list lets see if we can merge stuffs". Claude's proposal, 30 → 20 skills:
    - **Strong merges:**
      - **Lore** = Nature Lore + Arcane Lore + Civilization Lore. Main fighting skill: analyzes any monster, exposes weaknesses.
