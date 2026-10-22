@@ -64,14 +64,14 @@
 
 ## Next
 
-0. **Roster complete** (D-0099): 29 battle skills (8 weapon + 21 others) + 11 check skills. Last in: Carousing (CHA + CON, drinking, all one-time-use abilities) and Concentration (INT flex, empowers your next action, D-0098); Roguery is Thievery. Generic category names the AI skins; two flex skills per single attribute; no skill dedicated to lowering resistances (D-0097).
+0. **NEXT SESSION STARTS HERE.** The skill roster is **done** (designer: "ok all good now"). Pick the next thread from item 1 (Claude suggests ability cadence + status model, then the fight mock in item 2). Roster (D-0099): 29 battle skills (8 weapon + 21 others) + 11 check skills. Last in: Carousing (CHA + CON, **doping**: take something for a big self-buff, pay after; all one-time-use abilities; designer note in design/mercs.md) and Concentration (INT flex, empowers your next action, D-0098); Roguery is Thievery. Generic category names the AI skins; two flex skills per single attribute; no skill dedicated to lowering resistances (D-0097).
    - Also open: Warfare's scope (draft: combined attacks with an ally, breaking foe shields, formation tricks; Leadership keeps moving teammates and focus fire); Precision vs LUK (both raise heads chance).
    - From E-0005 round 10, to rule: Highwayman's blade + pistol vs one weapon skill; can bases outside D-0073's skills move foes; stress healing as a support role (ours is rare, weak).
 1. **Battle and check skills, still open:**
    - **Ability cadence** (Claude: a new ability at skill levels 1, 3, 5, 7, 9).
    - **Status effects model:** Pokémon style or Darkest Dungeon style (Claude leans Darkest Dungeon).
    - **Crits** (D-0092): what sets crit chance (Claude: ~5% base, raised by abilities/modifiers; Precision); can checks crit (Claude: yes, bonus result).
-   - **Check skills** (D-0083, 11, 3 per merc): when the 3 are gained (Claude: all at recruitment); uses outside check nodes (Perception reveals `???` nodes, Lore shows foe weaknesses, Persuasion prices, Cooking at the base kitchen); what each does in check nodes (pass: loot, buff, knowledge; fail: stress, HP, harder next fight). Open idea: Drinking (CON check skill).
+   - **Check skills** (D-0083, 11, 3 per merc): when the 3 are gained (Claude: all at recruitment); uses outside check nodes (Perception reveals `???` nodes, Lore shows foe weaknesses, Persuasion prices, Cooking at the base kitchen); what each does in check nodes (pass: loot, buff, knowledge; fail: stress, HP, harder next fight).
 2. **Find the fun in a hand-played fight:** a text mock with placeholder abilities, then feedback.
 3. **Abilities:** 10–20 bases per battle skill, each with ranks (used from, reaches), cooldown, per-quest uses where fitting. Weapon flavor via modifiers (D-0090). Start from E-0003 `skills-mock/fixed-list.md` and `skills-mock2/gen.mjs`.
 4. **Simulated playtest of a week** (a new experiment).
