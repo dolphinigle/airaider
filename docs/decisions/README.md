@@ -58,6 +58,6 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0049](D-0049-every-merc-s-first-ability-is-a-0-cooldown-attack.md) | Every merc's first ability is a 0 cooldown attack | superseded → D-0050 | designer | 2026-10-22 |
 | [D-0050](D-0050-first-ability-is-a-0-cooldown-attack-drawn-from-the-merc-s-s.md) | "First ability is a 0 cooldown attack drawn from the merc's skills, or from generic attacks" | accepted | designer | 2026-10-22 |
 | [D-0051](D-0051-generic-bases-can-be-dealt-on-any-level-up-rarely.md) | Generic bases can be dealt on any level up, rarely | accepted | designer | 2026-10-22 |
-| [D-0052](D-0052-campaign-follows-darkest-dungeon-one-quest-a-week-the-rest-r.md) | "Campaign follows Darkest Dungeon: one quest a week, the rest recover, gold sinks" | proposed | designer | 2026-10-22 |
+| [D-0052](D-0052-campaign-follows-darkest-dungeon-one-quest-a-week-the-rest-r.md) | "Campaign follows Darkest Dungeon: one quest a week, the rest recover, gold sinks" | accepted | designer | 2026-10-22 |
 | [D-0053](D-0053-fights-are-manual-by-default-some-later-quests-force-tactics.md) | Fights are manual by default; some later quests force tactics-run fights | accepted | designer | 2026-10-22 |
 <!-- index:end -->

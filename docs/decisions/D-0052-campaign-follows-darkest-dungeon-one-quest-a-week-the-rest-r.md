@@ -1,7 +1,7 @@
 ---
 id: D-0052
 title: "Campaign follows Darkest Dungeon: one quest a week, the rest recover, gold sinks"
-status: proposed
+status: accepted
 date: 2026-10-22
 decided-by: designer
 supersedes: []
@@ -29,11 +29,18 @@ The designer's words: "i think we want to model this game more to Darkest Dungeo
   - early, 1–2 mercs and 1–2 battles;
   - later, 4 mercs and about 4 battles plus a boss.
 
+## Rulings, 2026-10-22 (designer)
+
+"nah just pick one quest per week for now. later you can pick two quests but most will be automated (aka you cant fight in it, theyll fight automatically). the question is how to nudge players into not grinding and get time pressure but this is for later. first lets make this fun."
+
+- **One quest per week for now.** There is no campaign clock yet.
+- **Later, two quests a week.** The second one is mostly automated: its fights run on tactics, with no manual play (D-0053).
+- **Anti-grind and time pressure are parked.** Fun comes first.
+
 ## Open (Claude's review, 2026-10-22)
 
 - **Pushing on or retreating between battles.** This is Darkest Dungeon's core tension, the player's one decision inside a quest. It is priced and always open (findings: retreat always open, always priced, tiered).
 - **Camping** in long quests (E-0005 round 3).
-- **The campaign clock:** what makes a week matter (quests that expire, threats that grow, a season or end date).
 - **Keeping coin flips frequent** (vision): a quest packs its battles with skill checks between them, so the fewer quests still carry many flips.
 - **Who goes:** each quest states how many mercs it takes, from 1 to 4.
 - **Recovery time:** injured mercs sit out a number of weeks unless gold speeds it up.

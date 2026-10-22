@@ -4,7 +4,7 @@
 
 **Phase:** prototype v4, brainstorming what the game should look like (started 2026-10-19). Goal right now: shape the game through designer-led brainstorms and simulated playtests, **recording every idea** as it lands (decision if ruled, working model below if not). No code yet.
 
-**Locked so far:** mercs (stats, skills, talents, levels, growth: [design/mercs.md](design/mercs.md)); quests resolve through **fights played by hand (some later quests force tactics) + pure coin-flip skill checks** (D-0053), fights displayed with AI lines only before and after (D-0023), losing injures, never kills (D-0024): [design/quests.md](design/quests.md). Half-star rarity sets modifier odds (D-0027); **abilities** (fight) vs **skills** (Survival…) (D-0031): one new ability per level up: the AI picks one of a few dealt bases from the merc's fighting skills and renames it, never the same base twice, four equipped; 10–20 bases per fighting skill (D-0047); unarmed is its own skill, weapon tags filter bases (D-0045); 18 fighting skills plus minor ones; civilians exist; Smithing + Engineering, Nature Lore (D-0046); first ability a 0-cd attack, generic fallback (D-0050, D-0051); players see only AI ability names (D-0048); stats STR DEX INT CHA CON WIL (D-0044); star-up and reroll items reroll only the level-up seed (D-0029, D-0032), a star-up sets a fixed star below 5★ (D-0037); two starting skills, pick 1 of 3 at Lv 7 (D-0035); passives are traits: gender, race, personality, body (Wolfkin +10% damage, −10% speed) (D-0036, D-0038, D-0039), never touching stat or skill coins (D-0040); tactics are condition + action + target, parts are loot (D-0030, D-0034); no gear for now, it comes eventually (D-0034); **stress** 0–100 carries across quests, at 100 Resolve or Breakdown, no quirks (D-0042); fight sprites one image per pose, as in Darkest Dungeon (D-0043, proposed, parked as a detail). **Campaign follows Darkest Dungeon (D-0052, proposed):** one quest a week, the rest recover; gold sinks are stress relief, injury healing, buildings, room-capped levels; quests grow from 1–2 mercs × 1–2 battles to 4 mercs × ~4 battles + boss.
+**Locked so far:** mercs (stats, skills, talents, levels, growth: [design/mercs.md](design/mercs.md)); quests resolve through **fights played by hand (some later quests force tactics) + pure coin-flip skill checks** (D-0053), fights displayed with AI lines only before and after (D-0023), losing injures, never kills (D-0024): [design/quests.md](design/quests.md). Half-star rarity sets modifier odds (D-0027); **abilities** (fight) vs **skills** (Survival…) (D-0031): one new ability per level up: the AI picks one of a few dealt bases from the merc's fighting skills and renames it, never the same base twice, four equipped; 10–20 bases per fighting skill (D-0047); unarmed is its own skill, weapon tags filter bases (D-0045); 18 fighting skills plus minor ones; civilians exist; Smithing + Engineering, Nature Lore (D-0046); first ability a 0-cd attack, generic fallback (D-0050, D-0051); players see only AI ability names (D-0048); stats STR DEX INT CHA CON WIL (D-0044); star-up and reroll items reroll only the level-up seed (D-0029, D-0032), a star-up sets a fixed star below 5★ (D-0037); two starting skills, pick 1 of 3 at Lv 7 (D-0035); passives are traits: gender, race, personality, body (Wolfkin +10% damage, −10% speed) (D-0036, D-0038, D-0039), never touching stat or skill coins (D-0040); tactics are condition + action + target, parts are loot (D-0030, D-0034); no gear for now, it comes eventually (D-0034); **stress** 0–100 carries across quests, at 100 Resolve or Breakdown, no quirks (D-0042); fight sprites one image per pose, as in Darkest Dungeon (D-0043, proposed, parked as a detail). **Campaign follows Darkest Dungeon (D-0052):** one quest a week (later a second, auto-fought one; anti-grind parked), the rest recover; gold sinks are stress relief, injury healing, buildings, room-capped levels; quests grow from 1–2 mercs × 1–2 battles to 4 mercs × ~4 battles + boss.
 
 ## Working model (brainstormed, not locked)
 
@@ -23,25 +23,27 @@ The shape we use in playtests until the designer rules otherwise. Sources: E-000
 
 ## Next
 
-1. **Review attributes and skills with the designer:** the 6 stats (STR DEX INT CHA CON WIL, D-0044; PER folded into DEX and Awareness) and the 27 core skills, now that combat is a ranked line with speed, stress and roles (tank, healer, reach). Check:
-   - what each stat does in a fight (speed, HP, the stress check);
-   - which skills feed which abilities;
-   - which skills only act outside fights.
-   Mock it, get feedback.
-2. **Then abilities:** 10–20 base abilities per fighting skill (D-0047, D-0046), each with its used-from and reach ranks, and cooldown (D-0041). Start from E-0003 `skills-mock/fixed-list.md` and `skills-mock2/gen.mjs`.
-3. **Simulated playtest** (new experiment): Claude acts as the game on the working model, the designer says what the player does.
-4. Keep design/ and this working model current; start `v4/` only once the shape is settled.
+Designer: "first lets make this fun."
+1. **Find the fun in a hand-played fight.** Mock a manual fight as text using placeholder abilities, then get feedback.
+2. **Abilities:** 10–20 base abilities per fighting skill (D-0047, D-0046), each with:
+   - the ranks it is used from and the ranks it reaches;
+   - a cooldown;
+   - weapon tags.
+
+   Minor skills get 3–5. Start from E-0003 `skills-mock/fixed-list.md` and `skills-mock2/gen.mjs`.
+3. **Simulated playtest** (new experiment) of a week: pick the quest and party, play the fights by hand, make the skill checks, then rest and spend gold.
+4. Keep design/ and this page current; start `v4/` only once the shape is settled.
 
 ## Waiting on the designer
 
-- **Accept D-0041** (combat basics)? Designer: "the system is decent now".
-- **Inspirations offered, not yet picked (E-0005):**
-  - party synergies on shared tags;
-  - triggers (start of fight, when hurt, ally down, on kill);
-  - bonds between mercs (Claude's pick);
-  - camping between waves (Claude's pick);
+- **Accept D-0041** (combat basics)?
+- **Inspirations offered, not yet picked:**
+  - push on or retreat between battles;
+  - camping in long quests;
+  - bonds between mercs;
   - downed at 0 HP;
-  - a risk dial per quest;
+  - party synergies;
+  - triggers;
   - a morale bar for foes.
 - **Sprites (D-0043)** are parked as a detail.
 
