@@ -1,7 +1,7 @@
 ---
 id: D-0046
 title: "Fighting skills: the core skills that give abilities"
-status: proposed
+status: accepted
 date: 2026-10-22
 decided-by: designer
 supersedes: []
@@ -18,7 +18,7 @@ Abilities come from a merc's skills (D-0033), so the skill list decides who can 
 
 The designer's words: "the core fighting skills would be: heavy weapon, light weapon, ranged, defense, warfare (buffs/debuffs), animal companion (new, replaces beasts), stealth, leadership (buffs/debuffs), performance (buffs/debuffs), doctor (new, healing), alchemy (status effects), science (status effects), all magic ones?"
 
-- **Fighting skills, 17:**
+- **Fighting skills, 18** (with Engineering, added below):
   - weapons: Heavy Weapons, Light Weapons, **Unarmed** (D-0045; added by Claude, it was missing from the list), Ranged;
   - Defense;
   - buffs and debuffs: Warfare, Leadership, Performance;
@@ -59,11 +59,10 @@ The designer's words: "the core fighting skills would be: heavy weapon, light we
 - **Science becomes Nature Lore** (designer: "Change science to nature lore then"). It covers plants, beasts, weather, stars and natural monsters, and in fights it analyzes them and exposes their weaknesses. "How things work" and numbers go to Engineering. Claude's split: Arcane Lore covers undead, demons and curses.
 - **Animal Companion** works like Darkest Dungeon's Houndmaster: the pet acts through the merc's abilities and takes no rank of its own.
 
-## Open
-
-- **A civilian dragged into a fight:** does every merc get a plain basic attack, or do they only guard?
-- **Leadership and Performance overlap** (both heal stress and buff). Claude's split:
-  - Leadership: party-wide auras and Resolve while the leader stands.
-  - Performance: songs that last a few turns, Haste, distracting foes.
-- **Villainy:** keep the name, or rename it Bounty Hunting.
-- Rank movement now comes from Athletics (moving yourself) and Warfare (moving others). This reopens the knockback and pull that D-0041 had set aside.
+- **"keep those"** (designer, 2026-10-22), on Claude's last three proposals:
+  - **Leadership** gives party-wide auras and Resolve; **Performance** gives songs that last a few turns, Haste and distraction.
+  - **Engineering** is a main fighting skill, and **Smithing** is a minor one.
+  - **Villainy** keeps its name.
+- A civilian in a fight uses a generic attack (D-0050, D-0051).
+- Rank movement comes from Athletics (moving yourself) and Warfare (moving others).
+- The minor-skill niches above are a working list, to be refined in the ability review.
