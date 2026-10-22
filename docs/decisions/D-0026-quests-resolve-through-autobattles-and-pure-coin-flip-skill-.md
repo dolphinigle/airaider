@@ -1,11 +1,11 @@
 ---
 id: D-0026
 title: Quests resolve through autobattles and pure coin-flip skill checks
-status: accepted
+status: superseded
 date: 2026-10-21
 decided-by: designer
 supersedes: []
-superseded-by:
+superseded-by: D-0053
 evidence: [E-0001, E-0002, E-0003]
 sources: []
 ---

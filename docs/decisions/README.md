@@ -32,7 +32,7 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0023](D-0023-fights-are-displayed-ai-writes-only-the-start-and-end-lines-.md) | Fights are displayed; AI writes only the start and end lines and the sprites | accepted | designer | 2026-10-21 |
 | [D-0024](D-0024-losing-a-fight-injures-never-kills.md) | Losing a fight injures, never kills | accepted | designer | 2026-10-21 |
 | [D-0025](D-0025-battle-skills-are-base-skills-plus-engine-priced-modifiers-n.md) | Battle skills are base skills plus engine-priced modifiers, named by the AI | proposed | designer | 2026-10-21 |
-| [D-0026](D-0026-quests-resolve-through-autobattles-and-pure-coin-flip-skill-.md) | Quests resolve through autobattles and pure coin-flip skill checks | accepted | designer | 2026-10-21 |
+| [D-0026](D-0026-quests-resolve-through-autobattles-and-pure-coin-flip-skill-.md) | Quests resolve through autobattles and pure coin-flip skill checks | superseded → D-0053 | designer | 2026-10-21 |
 | [D-0027](D-0027-recruits-have-half-star-rarity-that-sets-their-modifier-odds.md) | Recruits have half-star rarity that sets their modifier odds | accepted | designer | 2026-10-21 |
 | [D-0028](D-0028-a-merc-rolls-one-new-battle-skill-per-level-up-and-equips-fo.md) | A merc rolls one new battle skill per level up and equips four | superseded → D-0033 | designer | 2026-10-21 |
 | [D-0029](D-0029-rare-items-raise-a-merc-s-star-or-reroll-their-seed-resettin.md) | Rare items raise a merc's star or reroll their seed, resetting their level | accepted | designer | 2026-10-21 |
@@ -59,4 +59,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0050](D-0050-first-ability-is-a-0-cooldown-attack-drawn-from-the-merc-s-s.md) | "First ability is a 0 cooldown attack drawn from the merc's skills, or from generic attacks" | accepted | designer | 2026-10-22 |
 | [D-0051](D-0051-generic-bases-can-be-dealt-on-any-level-up-rarely.md) | Generic bases can be dealt on any level up, rarely | accepted | designer | 2026-10-22 |
 | [D-0052](D-0052-campaign-follows-darkest-dungeon-one-quest-a-week-the-rest-r.md) | "Campaign follows Darkest Dungeon: one quest a week, the rest recover, gold sinks" | proposed | designer | 2026-10-22 |
+| [D-0053](D-0053-fights-are-manual-by-default-some-later-quests-force-tactics.md) | Fights are manual by default; some later quests force tactics-run fights | accepted | designer | 2026-10-22 |
 <!-- index:end -->

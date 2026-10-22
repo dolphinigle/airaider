@@ -1,10 +1,10 @@
 # Quests
 
-How a quest plays out: autobattles and coin-flip skill checks, told in quick simple lines.
+How a quest plays out: fights and coin-flip skill checks, told in quick simple lines.
 
 ## Structure
 
-- A quest resolves through **autobattles** (fights) and **skill checks** (everything else) (D-0026).
+- A quest resolves through **fights** and **skill checks** (everything else) (D-0053).
 
 - A skill check is a **test** the engine rolls when the quest is made (seen in E-0001).
 - Each test names **one, two or rarely three stats** plus a core skill (D-0019, D-0021), and has a **fixed threshold**: the number of heads needed (D-0013).
@@ -23,7 +23,7 @@ How a quest plays out: autobattles and coin-flip skill checks, told in quick sim
 
 - A fight is **displayed** as animation, not read. The AI writes one line at its start and one at its end, plus the sprites (D-0023).
 - Losing a fight **injures**, never kills (D-0024).
-- A fight is an **autobattle**: the player sets the party up beforehand and the fight plays itself (D-0026).
+- A fight is **played by hand**: on each merc's turn the player picks the ability and the target. Some later quests disable manual play, so their fights run on the mercs' tactics (D-0053).
 - Each merc equips **four abilities** (D-0047). A **tactic** has three slots, a condition, an action and a target (D-0030), and its parts are loot (D-0034).
 - Working model, not locked: a party on a 2×3 grid, abilities = base abilities + priced modifiers named by the AI, damage per heads (D-0025 proposed; E-0003).
 
