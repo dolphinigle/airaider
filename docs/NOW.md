@@ -68,20 +68,7 @@
    - **Ability cadence** (Claude: skill levels 1, 3, 5, 7, 9).
    - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances).
    - Check skills: merges and stars later.
-1. **Skill merges (the current question).** The designer asked: "show me skills list lets see if we can merge stuffs". Claude's proposal, 30 → 20 skills:
-   - **Strong merges:**
-     - **Lore** = Nature Lore + Arcane Lore + Civilization Lore. Main fighting skill: analyzes any monster, exposes weaknesses.
-     - **Roguery** = Stealth + Roguery + Streetwise. Main fighting skill.
-     - **Scouting** = Survival + Awareness. Minor; reveals a quest's foes ahead of time.
-     - **Talk** = Persuasion + Deception + Bargaining. Minor.
-     - **Villainy** absorbs Intimidation.
-   - **Optional:**
-     - **Command** = Leadership + Performance (both "stress healing and buffs");
-     - **Alchemy** absorbs Doctor.
-
-     Both bring it to 18.
-   - **Kept:** Heavy, Light, Unarmed, Ranged, Defense, Warfare, Animal Companion, Villainy, Engineering, Elemental, Holy, Dark; minor Athletics and Smithing.
-   - **Also open:** civilians become base crew (RimWorld-style jobs) or get dropped.
+1. **Check skills (later):** merges (Claude's earlier idea: Lore = three lores, Scouting = Survival + Awareness, Talk = Persuasion + Deception + Intimidation, Trade = Bargaining + Streetwise), quotas, stars.
 2. **Find the fun in a hand-played fight:** a text mock with placeholder abilities, then feedback.
 3. **Abilities:** 10–20 bases per fighting skill, each with ranks (used from, reaches), cooldown and weapon tags. Minor skills get 3–5. Start from E-0003 `skills-mock/fixed-list.md` and `skills-mock2/gen.mjs`.
 4. **Simulated playtest of a week** (a new experiment).
@@ -89,7 +76,7 @@
 
 ## Waiting on the designer
 
-- The skill merges inside each list, and which list Nature Lore / Stealth / Athletics land in (Next 1).
+- Check-skill merges (later, Next 1).
 - **Check nodes** (D-0059 notes): one named skill per node; pass gives loot/buff/knowledge, fail costs; can Scouting reveal hidden nodes?
 - **To decide later** (D-0055):
   - where recruits come from (a coach, or quests);
