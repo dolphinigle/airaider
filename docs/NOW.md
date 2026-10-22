@@ -68,12 +68,11 @@
    - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances). Claude leans Darkest Dungeon.
 1. **Check skills** (in progress 2026-10-22). Done: **11 check skills, 3 per merc** (D-0083): Athletics, Survival, Perception, Roguery, Streetwise, Persuasion, Intimidation, Lore, Smithing, Engineering, Cooking. **Every skill's attribute** (D-0086): Fire STR + INT, Frost DEX + INT, Lightning INT (Path of Exile); Dark Magic CHA + CON (pact-maker); Unarmed STR + DEX; Performance DEX + CHA; Survival DEX + CON; Smithing INT + CON; all ten pairs have a skill; CON thin by tradition (E-0005 round 7). Stats are STR DEX INT CHA CON LUK (WIL cut, LUK added); passives counted from 10 (D-0081): STR increased damage, INT 3% increased XP, CHA increased quest gold summed over the squad, CON HP, DEX speed, LUK heads chance; percents use Path of Exile increased/more (D-0082). Still open:
    - **Fury** (STR + CON, Hellion) and **Grit** (CON, Leper) added: 21 battle skills (D-0089). Not taken yet: Nature Magic, Blood Magic, Illusion, Duelist, Hunter (E-0005 round 9). Defense renamed **Defender**. Open idea: Drinking (CON check skill). **Melee weapon skills are now styles** (D-0090): Two-handed, Polearm, Weapon and Shield, Dual Wield, Single Weapon, Unarmed; flavor from mods + AI pick. Ranged splits into **Shooting** (DEX) and **Throwing** (STR + DEX) (D-0091).
-   - **At most one weapon skill per merc**, Ranged included (D-0088).
    - when the 3 check skills are gained (all at recruitment, or 2 + 1 later);
    - uses outside check nodes (Perception reveals `???` nodes, Lore shows foe weaknesses, Persuasion prices, Cooking at the base kitchen);
    - what each does in check nodes (pass: loot, buff, knowledge; fail: stress, HP, harder next fight).
 2. **Find the fun in a hand-played fight:** a text mock with placeholder abilities, then feedback.
-3. **Abilities:** 10–20 bases per battle skill, each with ranks (used from, reaches), cooldown, per-quest uses where fitting, and weapon tags (Ranged). Start from E-0003 `skills-mock/fixed-list.md` and `skills-mock2/gen.mjs`.
+3. **Abilities:** 10–20 bases per battle skill, each with ranks (used from, reaches), cooldown, per-quest uses where fitting. Weapon flavor via modifiers (D-0090). Start from E-0003 `skills-mock/fixed-list.md` and `skills-mock2/gen.mjs`.
 4. **Simulated playtest of a week** (a new experiment).
 5. Keep design/ and this page current. Start `v4/` only once the shape is settled.
 

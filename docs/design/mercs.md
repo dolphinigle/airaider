@@ -118,7 +118,7 @@ What a merc does in a fight is an **ability**; a **skill** (Survival, Swords…)
 
 - Every merc's **first ability is a 0-cooldown attack**, a normal ability: from their skills (most skills have one, e.g. Light Weapons' Double Attack) or, as a fallback, a **generic** attack anyone can get (Smash, Kick) (D-0050); generic bases can also come up, rarely, on any level up (D-0051).
 - The player sees only the AI name, never the base (D-0048).
-- Only **battle skills** give abilities (D-0058). Each has **about 10–20 base abilities**; Ranged's weapon tags filter its bases (D-0063).
+- Only **battle skills** give abilities (D-0058). Each has **about 10–20 base abilities**; weapon flavor (axe, hammer, sword) comes from modifiers and the AI's pick (D-0090).
 - **Some battle-skill level ups give a new ability** from that skill, not every one (D-0069; working: skill levels 1, 3, 5, 7, 9), with modifiers by the skill's star. A merc level up gives attributes only. The engine deals the AI a few random bases from that skill that fit their weapon; the AI picks one that fits the merc's theme and renames it. **Never the same base twice.**
 - A merc **equips four** abilities.
 - An ability is a fixed base plus modifiers, named by the AI (D-0025, proposed).
