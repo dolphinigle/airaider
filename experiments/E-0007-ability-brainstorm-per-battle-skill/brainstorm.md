@@ -65,7 +65,7 @@ A mod or ability that says "a buff" or "a debuff" picks one entry from this list
 | kind | effect | what it does |
 |---|---|---|
 | damage status | **Bleed / Poison / Burn / Shocked / Chilled** | one per damage type: Physical / Chaos / Fire / Lightning / Frost; what each does is open |
-| debuff | **Stun** | loses its next turn (rarer) |
+| debuff | **Stun** | loses its next turn (rarer); **single target only for now**, no multi-foe stun (designer: "ground slam bad, dont have multi stun for now") |
 | debuff | **Mark** | allies deal more to it |
 | debuff | **Sundered** | Physical defense down (Sunder) |
 | debuff | **Exposed** (Claude) | takes more damage |
