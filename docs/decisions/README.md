@@ -91,4 +91,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0082](D-0082-percent-modifiers-use-path-of-exile-increased-and-more.md) | Percent modifiers use Path of Exile increased and more | accepted | designer | 2026-10-22 |
 | [D-0083](D-0083-check-skills-eleven-three-per-merc.md) | Check skills: eleven, three per merc | accepted | designer | 2026-10-22 |
 | [D-0084](D-0084-six-stats-and-every-skill-s-attributes.md) | Six stats and every skill's attributes | accepted | designer | 2026-10-22 |
+| [D-0085](D-0085-unarmed-is-str-dex.md) | Unarmed is STR + DEX | accepted | designer | 2026-10-22 |
 <!-- index:end -->

@@ -43,7 +43,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 | **Cleaving Weapons** | greatswords, axes: hits two adjacent foes | STR |
 | **Heavy Weapons** | hammers, clubs, maces: stuns, armor break, knockback (moves foes back) | STR + CON |
 | **Long-reach Weapons** | polearms, spears: strikes from rank 2â€“3, reaches deep, pushes and pulls | STR |
-| **Unarmed** | fists, kicks, grapples, martial arts, claws and bites (werewolves) | DEX |
+| **Unarmed** | fists, kicks, grapples, martial arts, claws and bites (werewolves) | STR + DEX (D-0085) |
 | **Ranged** | bows, crossbows, guns, slings, throwing (weapon tags) | DEX |
 | **Defense** | shields, taunts, guarding, party shields | CON |
 | **Leadership** | your side: party auras, Resolve, moving teammates, focus-fire orders (D-0073); rare, weak stress healing (D-0062) | CHA |
