@@ -143,9 +143,10 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 | conditional | | heal | **Splitting** (heal) | allies at full HP are skipped, and their share condenses onto the hurt ones | heals several allies (Claude's conversion of the area-only mod) |
 | conditional | | both | **Composed** | softens its self-debuff | has one |
 | conditional | | dmg | **Potent** | its statuses are stronger | inflicts a status |
+| conditional | none | both | **Well-stocked** | +1 use | has limited uses; rare (designer, 2026-10-22) |
 | conditional | | dmg | **Lingering** | its statuses get +1 count | inflicts a status; **rare, adds a lot of cooldown** (designer, like Lasting) |
 
-**Rejected (designer, 2026-10-22):** Sweeping ("sweeping bad no"); Clash (merged into smooth Executing / Opening Blow); Mighty, Second Wind (replaced by Consistent), Savage, Bane of \<family\>, Exploiting, Giant-slayer, Piercing, Vengeful, Vanguard, First Strike, Momentum, Bloodthirsty, Focused, Coordinated ("the earlier ones are all rejected"); all the Path of Exile support gem translations (Purist, Steady, Festering, Smouldering, Bulwark, Finisher, Patient, Ruthless, Twin Charge, Alternating, Consuming, Bane of \\<status\\>, Charging, Rooted, Close Quarters / Far Shot, Outnumbered, Trophy; designer: "all in (2) are rejected"). Evasive ("we dont have evasion planned yet"); Taunting ("bad"); Carry-through, Shattering. Heal drafts rejected: the five single-status cures, Fortifying, Bedside, Lasting / Potent for buffs, Well-stocked. Echo merged into Double Strike ("echo should be same").
+**Rejected (designer, 2026-10-22):** Sweeping ("sweeping bad no"); Clash (merged into smooth Executing / Opening Blow); Mighty, Second Wind (replaced by Consistent), Savage, Bane of \<family\>, Exploiting, Giant-slayer, Piercing, Vengeful, Vanguard, First Strike, Momentum, Bloodthirsty, Focused, Coordinated ("the earlier ones are all rejected"); all the Path of Exile support gem translations (Purist, Steady, Festering, Smouldering, Bulwark, Finisher, Patient, Ruthless, Twin Charge, Alternating, Consuming, Bane of \\<status\\>, Charging, Rooted, Close Quarters / Far Shot, Outnumbered, Trophy; designer: "all in (2) are rejected"). Evasive ("we dont have evasion planned yet"); Taunting ("bad"); Carry-through, Shattering. Heal drafts rejected: the five single-status cures, Fortifying, Bedside, Lasting / Potent for buffs, Well-stocked on heals (it came back as a rare +1 use on limited-use abilities). Echo merged into Double Strike ("echo should be same").
 
 ## Polearm (STR)
 
@@ -179,9 +180,9 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 
 **Flashbang's mods** (Stun has no potency, so no power or scaling mods, as on Bless; designer rulings 2026-10-22, the rest Claude's draft):
 - **Common:** an extra debuff (1: Blinding / Weakening / Exposing / Slowing / Marking, weak); a small status (Burning / Poisoning / Bleeding / Shocking / Chilling, flat ~10% of a standard hit, as Guarding on Bless); Heavy (knock back) or **Yanking** (Claude: pull forward 1 rank); Guarding, Advancing / Retreating, Swift; Reaching, Footwork; **Lucky, Consistent** (the landing chance).
-- **Rare:** Lingering (stun 2 turns, costs a use); **Dispelling** (Claude: removes every buff from the target, the mirror of Purifying); Soothing.
-- **Limited-use price** (Claude, to rule): where a mod would add cooldown, a limited-use ability loses a use instead.
-- **Out:** Gamble (damage and heals only); Cunning (Claude's easier-to-land-on-debuffed, rejected with accuracy-from-power); Double Strike (a second stun); Quick / Measured (no cooldown); Opportunist, Splitting; Well-stocked (rejected before).
+- **Rare:** **Well-stocked** (+1 use; designer: "add a (rare) +1 limited use"); Soothing.
+- **Cooldown-priced mods don't fit limited-use abilities** (designer: "mod add coldown instead doesnt work on limited use"), so Lingering is out here; Claude's idea of paying with a use instead is rejected.
+- **Out:** Dispelling (Claude's, "way too strong"); Lingering (adds cooldown); Gamble (damage and heals only); Cunning (Claude's easier-to-land-on-debuffed, rejected with accuracy-from-power); Double Strike (a second stun); Quick / Measured (no cooldown); Opportunist, Splitting.
 
 **No default attack** (designer: "dirty fighting shouldnt have a default attack. its not a WEAPON/MAGIC skill"). Low Blow removed.
 
