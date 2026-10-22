@@ -104,5 +104,6 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0095](D-0095-fortune-out-fury-renamed-berserk-precision-and-warfare-in.md) | Fortune out; Fury renamed Berserk; Precision and Warfare in | accepted | designer | 2026-10-22 |
 | [D-0096](D-0096-skill-roster-and-attributes-round-three.md) | Skill roster and attributes, round three | superseded → D-0097 | designer | 2026-10-22 |
 | [D-0097](D-0097-skill-roster-round-four-executioner-counter-survivor.md) | Skill roster round four: Executioner, Counter, Survivor | superseded → D-0098 | designer | 2026-10-22 |
-| [D-0098](D-0098-skill-roster-round-five-concentration-retaliation-dirty-figh.md) | Skill roster round five: Concentration, Retaliation, Dirty Fighting to STR + DEX | accepted | designer | 2026-10-22 |
+| [D-0098](D-0098-skill-roster-round-five-concentration-retaliation-dirty-figh.md) | Skill roster round five: Concentration, Retaliation, Dirty Fighting to STR + DEX | superseded → D-0099 | designer | 2026-10-22 |
+| [D-0099](D-0099-skill-roster-round-six-carousing-roguery-renamed-thievery.md) | Skill roster round six: Carousing, Roguery renamed Thievery | accepted | designer | 2026-10-22 |
 <!-- index:end -->

@@ -33,9 +33,9 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 
 **Coins (D-0069):** a check flips **attribute + skill level** if the merc has the skill, else the attribute alone (Survival check: DEX + Survival, or just DEX). An attack flips **its attribute + its battle skill's level**; each head deals the ability's base damage.
 
-### Battle skills (28: 8 weapon + 20 others, D-0098)
+### Battle skills (29: 8 weapon + 21 others, D-0099)
 
-**No skill is rare** (D-0093): rarity lives in stars. **Skill names are generic categories**; the AI skins each merc's exact name over them (a greatsword skill maps to Two-handed, D-0021). **Each single attribute gets two flex skills** (not weapon, not magic; D-0097): DEX Precision + Stealth, INT Alchemy + Concentration (Doctor is INT's role skill, D-0098), CHA Leadership + Animal Companion, CON Defender + Survivor, STR Berserk + Executioner. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). No skill is dedicated to lowering foe resistances; such effects are bases in other skills (D-0097). Pairings: D-0098 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
+**No skill is rare** (D-0093): rarity lives in stars. **Skill names are generic categories**; the AI skins each merc's exact name over them (a greatsword skill maps to Two-handed, D-0021). **Each single attribute gets two flex skills** (not weapon, not magic; D-0097): DEX Precision + Stealth, INT Alchemy + Concentration (Doctor is INT's role skill, D-0098), CHA Leadership + Animal Companion, CON Defender + Survivor, STR Berserk + Executioner. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). No skill is dedicated to lowering foe resistances; such effects are bases in other skills (D-0097). Pairings: D-0099 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
 
 | skill | covers | attributes |
 |---|---|---|
@@ -67,6 +67,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 | **Lightning Magic** | lightning damage, chains | INT |
 | **Holy Magic** | healing, blessing, warding off the dead; deals mostly Physical | CHA |
 | **Dark Magic** | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | CHA + CON |
+| **Carousing** | (D-0099) drinking; **all its abilities are one-time uses** (bottles, per quest): liquid courage (no stress gain for a few turns), drunken sway (dodge charges), spit a burning spirit (Fire), share a flask, a hangover after (Claude's draft). Skins: Tavern Brawler, Sailor's Grog, Dwarven Stout. Alchemy brews and throws; Carousing drinks and endures | CHA + CON |
 
 **Weapon skills are styles (D-0090). At most one per merc:** Two-handed, Polearm, Weapon and Shield, Dual Wield, Single Weapon, Unarmed, Shooting or Throwing (D-0091); the rest combine freely. Weapon flavor (axe, hammer, sword) comes from modifiers and the AI's pick and name. Attributes of the new ones: Claude's draft.
 
@@ -74,14 +75,14 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 
 ### Check skills (11)
 
-No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0083). Attributes: D-0098.
+No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0083). Attributes: D-0099.
 
 | skill | covers | attr |
 |---|---|---|
 | **Athletics** | climbing, swimming, running, hauling | STR |
 | **Survival** | foraging, camping, weather, terrain, trails | DEX + CON |
 | **Perception** | spotting ambushes, keeping watch, searching (was Awareness) | DEX |
-| **Roguery** | locks, pockets, traps, forgery | DEX |
+| **Thievery** | (was Roguery, D-0099) locks, pockets, traps, forgery | DEX |
 | **Streetwise** | rumors, finding people, city ways | CHA + INT |
 | **Persuasion** | charm, diplomacy, haggling, appraising (+ Bargaining) | CHA |
 | **Intimidation** | threats, interrogation, lies, bluffs, disguises (+ Deception) | STR + CHA |

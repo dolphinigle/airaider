@@ -21,12 +21,12 @@
 - **Skill checks** are pure coin flips (D-0013): attribute + skill level (D-0069).
 
 ### Mercs ([design/mercs.md](design/mercs.md))
-- **Stats:** STR DEX INT CHA CON LUK (D-0096), about 10 → 20 over a career (D-0069). Percent effects use Path of Exile *increased* (additive) and *more* (multiplicative) (D-0082). Passives (D-0081, counted from 10 = no effect, below 10 hurts): STR 1% increased damage per point, DEX speed coins, INT 3% increased XP per point, CHA increased quest gold (summed over the squad), CON max HP, LUK (no skills) heads chance on every coin. WIL is gone; no stat touches stress. Each skill uses one attribute, a few two (D-0074, D-0098).
+- **Stats:** STR DEX INT CHA CON LUK (D-0096), about 10 → 20 over a career (D-0069). Percent effects use Path of Exile *increased* (additive) and *more* (multiplicative) (D-0082). Passives (D-0081, counted from 10 = no effect, below 10 hurts): STR 1% increased damage per point, DEX speed coins, INT 3% increased XP per point, CHA increased quest gold (summed over the squad), CON max HP, LUK (no skills) heads chance on every coin. WIL is gone; no stat touches stress. Each skill uses one attribute, a few two (D-0074, D-0099).
 - **Stars** (D-0069): every skill has a star (1★–5★, half steps) that sets its XP gain and, for battle skills, its abilities' modifier odds; the merc's star makes high skill stars likelier.
 - **Upgrade items:** star-up and reroll reroll only the level-up seed (D-0029, D-0032). A star-up sets a fixed star below 5★ (D-0037).
 - **Skills:**
   - Two starting skills; pick 1 of 3 at Lv 7 (D-0035).
-  - **Battle skills** (28: 8 weapon + 20 others; D-0098) and **check skills** (give none) are separate, with their own quotas: 3 battle (working) + 3 check (D-0083). Battle skills can be checked too. Civilians have check skills only; v3 captives, if they return, too (D-0058).
+  - **Battle skills** (29: 8 weapon + 21 others; D-0099) and **check skills** (give none) are separate, with their own quotas: 3 battle (working) + 3 check (D-0083). Battle skills can be checked too. Civilians have check skills only; v3 captives, if they return, too (D-0058).
 - **Abilities:** fights use abilities; skills are what mercs know (D-0031).
   - A merc level up gives attributes only. **Some battle-skill level ups give a new ability** (working: skill levels 1, 3, 5, 7, 9): the AI picks one of a few dealt bases from that skill and renames it. Never the same base twice. Four equipped (D-0069).
   - 10–20 bases per battle skill (D-0069).
@@ -64,7 +64,7 @@
 
 ## Next
 
-0. **Roster complete** (D-0098): 28 battle skills (8 weapon + 20 others) + 11 check skills. Last in: Concentration (INT flex, empowers your next action); INT's flex pair is Alchemy + Concentration, Doctor is its role skill. Counter is Retaliation; Dirty Fighting is STR + DEX. Generic category names the AI skins; two flex skills per single attribute; no skill dedicated to lowering resistances (D-0097). **One more battle skill for CHA or CON** (designer; weighted load with weapon skills at half: INT 8.5, DEX 8, STR 7.25, CHA 6, CON 5.25). Candidates in E-0005 round 12.
+0. **Roster complete** (D-0099): 29 battle skills (8 weapon + 21 others) + 11 check skills. Last in: Carousing (CHA + CON, drinking, all one-time-use abilities) and Concentration (INT flex, empowers your next action, D-0098); Roguery is Thievery. Generic category names the AI skins; two flex skills per single attribute; no skill dedicated to lowering resistances (D-0097).
    - Also open: Warfare's scope (draft: combined attacks with an ally, breaking foe shields, formation tricks; Leadership keeps moving teammates and focus fire); Precision vs LUK (both raise heads chance).
    - From E-0005 round 10, to rule: Highwayman's blade + pistol vs one weapon skill; can bases outside D-0073's skills move foes; stress healing as a support role (ours is rare, weak).
 1. **Battle and check skills, still open:**
