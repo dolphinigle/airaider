@@ -1,4 +1,4 @@
-// E-0007 baseline abilities for all 29 battle skills (Claude's draft, 2026-10-23), from the key identities in brainstorm.md.
+// E-0007 baseline abilities for all 29 battle skills, plus the two blood skills (designer, 2026-10-23) (Claude's draft, 2026-10-23), from the key identities in brainstorm.md.
 // For a rough review, not final. Conventions as brainstorm.md: power is a % of a standard hit (heals and shields alike);
 // higher stars bring weirder effects, at most a little stronger than lower ones, never a bigger copy (designer);
 // a good rare base bends the skill's own core in one clear line that resolves now, like Detonate Burn (Claude's reading of the designer's pick);
@@ -405,6 +405,33 @@ export const SKILLS = [
       '3|Fire Breath|1–2|foe 1–2|100% Fire|Burn|1 use per quest|new',
       '4|All-Out Bender|1–4|self||Emboldened, Haste and Braced 3 rounds; then you lose your next turn|1 use per quest|new',
     ] },
+  { name: 'Beast Blood', attr: 'DEX + STR', ranks: '1–3', role: 'front damage', state: 'new',
+    id: 'Innate to beast races (wolfkin, catfolk, bearkin). The hunter: marks its prey, pounces forward onto it, bites to bleed it.',
+    strong: 'single damage, self move (pounce), Mark', weak: 'Bleed, Slowed, debuff (howl), Regen',
+    abilities: [
+      '1|Claw|1–2|foe 1–2|100%||0 cd|new',
+      '1|Bleeding Bite|1|foe 1|80%|Bleed|0 cd|new',
+      '1|Pounce|2–3|foe 1–2|120%|you step forward 1 rank|0 cd|new',
+      '1|Mark Prey|1–3|any foe||Mark|0 cd|new',
+      '2|Slowing Bite|1–2|foe 1–2|60%|Slowed|0 cd|new',
+      '2|Strike the Marked Prey|1–2|foe 1–2|80%|80% more against a Marked foe|0 cd|new',
+      '2|Beast Healing|1–3|self||Regen 3 rounds|cd 2|new',
+      '2|Weakening Howl|1–3|all foes||Weakened|cd 3|new',
+      '4|Pounce on the Marked Prey|2–3|any foe|110%|only the Marked foe, at any rank; you step forward 1 rank|0 cd|new',
+    ] },
+  { name: 'Ancient Blood', attr: 'CON', ranks: '1–3', role: 'front damage; tank (weak)', state: 'new',
+    id: 'Innate to old-blood races (dragonkin, giantkin). Breath in its bloodline\'s element, hard scales, a dreadful roar.',
+    strong: 'area damage (breath), the bloodline\'s status, self buff (scales)', weak: 'single damage, Stun, shield allies',
+    abilities: [
+      '1|Scaled Strike|1–2|foe 1–2|100%||0 cd|new',
+      '1|Short Breath|1–2|foe 1–2|80%, the bloodline\'s element|its status|0 cd|new',
+      '1|Hardened Scales|1–3|self||Braced 2 rounds|0 cd|new',
+      '2|Wide Breath|1–2|foe 1, 2 and 3|50% each, the bloodline\'s element|its status|cd 3|new',
+      '2|Long Breath|2–3|foe 3–4|70%, the bloodline\'s element|its status|0 cd|new',
+      '2|Wing Shelter|1–2|ally next to you|60% shield||cd 2|new',
+      '3|Stunning Roar|1–3|foe 1–2||Stun|cd 3|new',
+      '4|Any-Element Breath|1–2|foe 1 and 2|60% each, an element you pick each use|that element\'s status|cd 2|new',
+    ] },
 ];
 
 // statuses this draft uses that the effects list doesn't have yet (Claude's, unruled)
@@ -426,6 +453,8 @@ export const CALLS = [
   'Holy keeps a weak ally shield, front-rank only (Shield Ally, 1–2).',
   'Animal Companion\'s pet attacks count as a default attack like any 0-cd damage ability.',
   'Braced (takes less damage) goes on the effects list as a buff; D-0070 allows defense from buffs.',
+  'Beast Blood and Ancient Blood are two skills, not one (designer asked; Claude\'s call): the hunter and the old power are different identities, and one merged pool would blur like Animal Companion. Only races of that blood can have them (at start or as a Lv 7 option); at most one blood skill per merc. They are not weapon skills, so a wolfkin can claw and swing an axe.',
+  'Ancient Blood\'s element is set by the merc\'s bloodline: Fire (Burn), Frost (Chilled), Lightning (Shocked) or Chaos (Weakened). A red dragonkin breathes fire, a frost giant frost.',
   'Carousing\'s hangovers reuse Weakened and Slowed; All-Out Bender costs your next turn.',
 ];
 

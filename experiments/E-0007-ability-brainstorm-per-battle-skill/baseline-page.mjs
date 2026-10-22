@@ -56,6 +56,7 @@ function section(k) {
 const GROUPS = [
   ['Weapons', ['Two-handed', 'Polearm', 'Weapon and Shield', 'Dual Wield', 'Single Weapon', 'Unarmed', 'Shooting', 'Throwing']],
   ['Magic', ['Fire', 'Frost', 'Lightning', 'Holy', 'Dark']],
+  ['Blood skills', ['Beast Blood', 'Ancient Blood']],
   ['Other battle skills', null],
 ];
 
@@ -168,7 +169,7 @@ tr[hidden]{display:none}
 <nav aria-label="Skills">${nav}</nav>
 <main>
 <h1>Baseline abilities</h1>
-<p class="lede">A first full set for all 29 battle skills, built from the key identities in E-0007. It is for a rough review: is each skill roughly in shape? Numbers are placeholders until balance. Power is a % of a standard hit, and heals and shields use the same scale. Names are generic and say what the ability does, so the AI can guess it when picking abilities for a merc; it reskins every name. Any 0-cooldown ability that deals damage can be a default attack. Higher stars bring weirder effects, at most a little stronger than lower ones. Debuffs flip coins to land; mods sit on top of all of this.</p>
+<p class="lede">A first full set for all 29 battle skills, plus the two blood skills, built from the key identities in E-0007. It is for a rough review: is each skill roughly in shape? Numbers are placeholders until balance. Power is a % of a standard hit, and heals and shields use the same scale. Names are generic and say what the ability does, so the AI can guess it when picking abilities for a merc; it reskins every name. Any 0-cooldown ability that deals damage can be a default attack. Higher stars bring weirder effects, at most a little stronger than lower ones. Debuffs flip coins to land; mods sit on top of all of this.</p>
 <ul class="facts"><li><b>${skills.length}</b> skills</li><li><b>${n}</b> abilities</li><li><b>${skills.filter(k => k.state === 'reviewed').length}</b> reviewed skills, a few abilities added</li><li><b>${skills.filter(k => k.state === 'redone').length}</b> drafts redone</li><li><b>${skills.filter(k => k.state === 'new').length}</b> new</li></ul>
 <div class="notes">
 <div class="box"><h4>Calls I made</h4><ol>${questions.map(q => `<li>${esc(q)}</li>`).join('')}</ol></div>
