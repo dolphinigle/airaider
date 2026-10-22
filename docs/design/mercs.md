@@ -53,7 +53,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 | **Frost Magic** ✦ | frost damage, slows | INT |
 | **Lightning Magic** ✦ | lightning damage, chains | INT |
 | **Holy Magic** ✦ | healing, blessing, warding off the dead; deals mostly Physical | CHA + WIL |
-| **Dark Magic** ✦ | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | WIL |
+| **Dark Magic** ✦ | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | INT + WIL (designer) |
 
 **Damage types (D-0070):** Physical, Fire, Frost, Lightning, Chaos. Poison and bleed are statuses.
 
