@@ -2,6 +2,10 @@
 
 The goal is each skill's identity plus rough ability bases. Numbers come later (steps 2–4 in docs/NOW.md). Each entry is marked with who wrote it: designer, Claude's draft, or designer-approved.
 
+**Writing conventions (designer, 2026-10-22):**
+- **Damage is a % of a standard hit** (Darkest Dungeon style): "yup sounds good lets use %. pls remember it." How % becomes coins (heads × base per head, D-0069) is settled in balance (step 2).
+- **Statuses are written by name only** ("for status application like stun just say stun for now, lets figure out how they are applied later").
+
 ## Mods (designer, 2026-10-22)
 
 - One **list of possible mods** ("fire damage mod" etc.), **tailored to each skill**: each skill takes the mods that fit it. The pool should be **"as big as we can"**.
@@ -18,16 +22,16 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 
 **Key abilities, in the designer's order:** Cleave, Overhead Smash, Sunder, and **Titanic Swing**, a rarer ability that hits three foes.
 
-Claude's cards for the four (draft; damage relative to a standard single-target hit = 100%):
+Cards (designer-approved 2026-10-22, with the designer's changes: Overhead Smash is the default attack, foe rank 1 only, 110%, no cooldown, "balanced by the fact its only front line"):
 
 | ability | rarity | ranks | damage | effect | cost |
 |---|---|---|---|---|---|
-| **Cleave** | 1★ | 1–2 → foe 1 and 2 | 60% each | the skill's basic: two foes every turn | 0 cd |
-| **Overhead Smash** | 1★ | 1 → 1–2 | 180% | stun (skill flip); wind-up: Slowed next round | cd 2 |
+| **Overhead Smash** | 1★ | 1–2 → foe 1 only | 110% | the default attack | 0 cd |
+| **Cleave** | 1★ | 1–2 → foe 1 and 2 | 60% each | hits both front foes | cd open |
 | **Sunder** | 2★ | 1–2 → 1–2 | 80% | Sundered: foe Physical defense down 3 rounds | cd 3 |
 | **Titanic Swing** | 4★ | 1 → foe 1, 2 and 3 | 70% each | Staggered next round (act last, take more damage) | cd 4 |
 
-Open: Cleave as the basic (D-0050) or a single-target Heavy Swing; where knockback lives (Claude leans a "Heavy" mod).
+Open: where knockback lives (Claude leans a "Heavy" mod); where stun lives now that Overhead Smash is the plain default.
 
 Claude's first draft (the long list, kept for later picks):
 

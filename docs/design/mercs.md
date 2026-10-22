@@ -128,6 +128,7 @@ What a merc does in a fight is an **ability**; a **skill** (Survival, Swords…)
 - **Some battle-skill level ups give a new ability** from that skill, not every one (D-0069; working: skill levels 1, 3, 5, 7, 9), with modifiers by the skill's star. A merc level up gives attributes only. The engine deals the AI a few random bases from that skill that fit their weapon; the AI picks one that fits the merc's theme and renames it. **Never the same base twice.**
 - A merc **equips four** abilities.
 - An ability is a fixed base plus modifiers, named by the AI (D-0025, proposed).
+- **Ability damage is written as a % of a standard hit** (designer, 2026-10-22, Darkest Dungeon style; Cleave 60% on each of two foes). Statuses are named only for now; how they are applied is open. Brainstorm: E-0007 `brainstorm.md`.
 - **Passives are traits** (D-0036, D-0038, D-0039). Traits come in four kinds: **gender, race, personality and body** (tall, short, muscular, skinny), all part of the starting position. A passive never touches stat or skill coins; it works on other axes (damage %, speed, HP, targeting, recovery, upkeep, loot) (D-0040). Often a trade-off: "Wolfkin: 10% increased damage, 10% reduced speed", "Stubborn: can't be stunned while above half HP".
 
 ## Stress (D-0042)
