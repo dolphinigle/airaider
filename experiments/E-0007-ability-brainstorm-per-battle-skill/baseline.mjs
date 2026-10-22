@@ -412,7 +412,6 @@ export const NEW_STATUSES = [
 
 // questions this draft raises for the designer
 export const QUESTIONS = [
-  'Fire is rank-locked, so one default attack can\'t serve both a front and a back Fire merc. Draft: two defaults (Flame Touch from 1–2, Firebolt from 3–4); the merc gets the one that fits its rank.',
   'Polearm cycles 3 → 2 → 3: its big attacks step it forward from rank 3, and Recovering Jab steps it back from 2. Does that read as "working its way back into position"?',
   'Dark\'s default attack costs a little stress, like every Dark ability (D-0072). Keep that, or make the default free?',
   'Holy\'s weak ally shield (Sheltering Light) is front-rank only, after Ward was removed. Keep it?',
