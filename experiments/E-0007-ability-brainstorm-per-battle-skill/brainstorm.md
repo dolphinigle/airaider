@@ -20,85 +20,56 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 
 - **Some ability bases are rarer** (the designer called Titanic Swing "a (rarer) skill"). Rarer bases are dealt to the AI less often, and the skill's star makes them likelier (designer: "1 STAR skills are common"). Claude reads this as rarity stars on ability bases (reading A). Whether skill types also have rarity (reading B) is unconfirmed.
 
-## Battle skill identities (Claude's draft, 2026-10-23; designer-set rows marked)
+## Battle skill key identities (2026-10-23)
 
-One row per battle skill (29, D-0099). **Ranks** are the skill's range; each ability sets its own. **Attack** = has a default attack (weapon and magic skills only). **Strong** = the skill's core, on many of its bases; **weak** = one or two bases, or small. Effects use one shared vocabulary (counted in the distribution below), details in brackets. **S/W** = how many strong / weak effects.
+Key identities come first; the strong / weak effect table is redone from them afterwards. The designer gave suggestions ("my suggestions not necessarily the best, you can take as inspiration or you can suggest more"); **source** says whose line it is.
 
-| skill | attr | ranks | damage / status | attack | role | strong | weak | doesn't | S/W |
-|---|---|---|---|---|---|---|---|---|---|
-| **Two-handed** (designer) | STR | 1–2 | Physical | ✓ | front damage; pays after-effects (Staggered) | single damage, area damage (2–3 front foes), move foes (knockback), defense down (Sunder) | Stun (cd) | reach foe 3–4; defend; heal | 4/1 |
-| **Polearm** | STR | 2–3 | Physical / Bleed | ✓ | reach damage | single damage (reaches foe 3–4), move foes (pull, push) | area damage (sweep the 2 front foes), Bleed | Stun; self-buffs; rank 1 or 4 | 2/2 |
-| **Weapon and Shield** | STR+CON | 1–2 | Physical | ✓ | tank | self shield | single damage (steady), Stun (Shield Bash, cd) | protect others; several foes; reach | 1/2 |
-| **Dual Wield** | DEX+STR | 1–2 | Physical / Bleed | ✓ | front damage | single damage (2+ light hits a turn), Bleed (stacking) | self buff (Haste) | Stun; moving foes; one big hit | 2/1 |
-| **Single Weapon** | STR+DEX | 1–3 | Physical | ✓ | front damage | single damage (crits), self move (lunge) | counter (Riposte stance), debuff (Exposed) | several foes; moving foes | 2/2 |
-| **Unarmed** | STR+DEX | 1–2 | Physical / Bleed | ✓ | front damage | single damage (combos: harder on last turn's foe) | self move, debuff (grapple: Slowed), Stun (choke, limited), Bleed (claws) | reach foe 3–4; shields | 1/4 |
-| **Shooting** | DEX | 3–4 | Physical / Bleed | ✓ | reach damage | single damage (big aimed shots at any foe, extra on Marked) | area damage (volley), Bleed | anything from ranks 1–2; moves; Stun | 1/2 |
-| **Throwing** | STR+DEX | 2–3 | Physical / Bleed, Poison | ✓ | reach damage | area damage (several small throws at random foes), Bleed | Poison (knives), debuff (net: Slowed) | big single hits; rank 4; defense | 2/2 |
-| **Fire** (designer) | STR+INT | 1–4 | Fire / Burn | ✓ | reach damage | single damage (incl. melee spells from ranks 1–2), area damage, Burn | — | heal; shields; Stun | 3/0 |
-| **Frost** (designer) | DEX+INT | 2–4 | Frost / Chilled | ✓ | reach damage | single damage, Chilled, self shield | — | area damage; heal allies | 3/0 |
-| **Lightning** (designer) | INT | 3–4 | Lightning / Shocked | ✓ | reach damage | single damage (the biggest), area damage (chains), Shocked | — | defense; heal; ranks 1–2 | 3/0 |
-| **Holy** (designer) | CHA | 1–4 | Physical | ✓ | healer | heal allies (cd), ally buff (Bless), cure (Purify) | single damage, shield allies | big damage; debuffs | 3/2 |
-| **Dark** (designer) | CHA+CON | 2–4 | Chaos | ✓ | control; pays stress | debuff (curses, one on all foes) | single damage (Chaos), heal allies (paid with stress) | Poison; life drain (D-0072) | 1/2 |
-| **Defender** | CON | 1–2 | — | | tank | guard / taunt, shield allies | self shield (brace) | damage; heals | 2/1 |
-| **Berserk** | STR | 1–2 | Physical | | front damage; pays HP, after-effects | single damage (huge), area damage (whirlwind), self buff (war cries, stronger when hurt) | self-heal (kills feed it) | defend; help allies; reach | 3/1 |
-| **Executioner** | STR | 1–2 | Physical | | front damage | single damage (more the lower the foe's HP; a kill refunds the turn; a limited kill-outright blow) | — | fresh foes; area; support | 1/0 |
-| **Survivor** | CON | 1–4 | — | | self-sustain | self-heal (cd), Regen (itself), cure (itself), cheat death (once per quest) | — | help allies; damage | 4/0 |
-| **Precision** | DEX | 1–4 | — | | ally support | ally buff (Blessed) | self buff (crit chance, D-0092) | damage; heals | 1/1 |
-| **Warfare** | STR+INT | 1–3 | Physical | | ally support | defense down (breaks shields; lowers one damage type's defense, D-0097) | ally buff (combined attack), single damage | heal; stress; area | 1/2 |
-| **Leadership** | CHA | 2–4 | — | | ally support | ally buff (party Emboldened, Resolve), move allies (D-0073) | Mark (focus fire), stress relief | damage; HP heals | 2/2 |
-| **Performance** | DEX+CHA | 2–4 | — | | ally support | ally buff (Haste) | debuff (distract: Slowed, Weakened), Regen (a song), stress relief | damage; moves; big heals | 1/3 |
-| **Animal Companion** | CHA | 1–4 | Physical / Bleed | (open) | reach damage | single damage (the pet, any foe, from any rank) | guard (the pet), Mark, Bleed | the merc's own defense; heals | 1/3 |
-| **Dirty Fighting** (approved) | STR+DEX | 1–3 | Physical | | control | debuff (Blinded, Weakened), Mark | single damage (light; payoff blow on debuffed foes), move foes (yank), Stun (one rare, limited) | default attack; big damage | 2/3 |
-| **Retaliation** | DEX+CON | 1–3 | Physical | | tank | counter (Riposte charges, also when a neighbor is hit) | single damage (payback on the last attacker) | act first; area; heal | 1/1 |
-| **Stealth** | DEX | 1–3 | Physical | | front damage | single damage (ambush from hiding), hide (Hidden, new status) | self move (slip between ranks) | protect allies; long fights | 2/1 |
-| **Doctor** | INT | 2–4 | — | | healer; limited uses | heal allies (big single), cure (Bleed, Poison) | Regen | damage; buffs | 2/1 |
-| **Alchemy** | INT | 2–4 | Fire, Chaos / Burn, Poison | | control; limited uses | Poison, debuff (smoke: Blinded) | area damage (fire bomb), Burn, defense down (acid), heal allies (potion) | unlimited use; melee | 2/4 |
-| **Concentration** | INT | 1–4 | — | | self-empower | self buff (empowers its next action: more power, shorter cd, repeat, act twice, recover a use) | — | effects of its own; help allies | 1/0 |
-| **Carousing** | CHA+CON | 1–3 | Fire / Burn | | self-empower; one-time uses | self buff (big, then a hangover) | single damage (spit fire), Burn, heal allies (share a flask), stress relief (stops gain only) | repeat; ranged; dodge (no evasion yet) | 1/4 |
+| skill | key identity | source |
+|---|---|---|
+| **Two-handed** | big, strong, wide hits that leave a drawback on itself for its next turn. Weak: moving foes, Stun | designer; Stun kept from the approved model abilities |
+| **Polearm** | hits the back ranks from rank 2–3; many attacks also step itself forward for more damage, so it keeps working its way back into position | designer |
+| **Weapon and Shield** | holds the line itself: taunts, shields itself and allies, defensive self-buffs. Weak: single-target damage, Stun, moving foes. No area at all | designer |
+| **Dual Wield** | big damage only while moving: it must keep shifting between ranks 1–2 to deal big damage, or go the Bleed route. Strong: Bleed, self-moves, strong attacks whose drawback is moving itself. Weak: area. Multi-hits are flavor (more damage) | designer |
+| **Single Weapon** | the **duel**: it picks one foe (Dueled) and fights it one-on-one; against that foe it deals more, ripostes its attacks and crits more, and the foe is drawn to attack it. Weak away from its duel | Claude |
+| **Unarmed** | **combos**: cheap strikes build Momentum on itself, and finishers spend it on a big hit, a throw or a grapple (Stun). It rewards chaining Unarmed abilities turn after turn; a stun or a move breaks the chain | Claude |
+| **Shooting** | hits the back ranks hard; struggles against the front line or when moved out of position (ranks 3–4) | designer |
+| **Throwing** | the reverse of Shooting: many attacks move it between ranks while dealing damage | designer |
+| **Fire** | Burn, moderate direct damage, and odd utilities, such as cauterizing (cures Poison, Bleed and Burn, with a cost) | designer |
+| **Frost** | **build and shatter**: stacks Chilled on one foe (each stack slows it), then a shatter cashes the stacks in for a big hit; ice armor shields itself. Single target | Claude, from the designer's earlier lines |
+| **Lightning** | **burst from the back**: the biggest hits in the game, chaining to neighbouring foes; Shocked turns its hits into setup for allies (the next hit on the foe, anyone's, deals more). Nothing defensive; ranks 3–4 only | Claude, from the designer's earlier lines |
+| **Holy** | **the many**: heals that cover the whole squad, Blessed on allies, cures; weak shields and weak damage | Claude |
+| **Dark** | **power at a price**: the strongest curses and effects in the game, each paid in its own stress; it heals allies by taking stress itself. The stress-economy skill | Claude, from the designer's earlier lines |
+| **Defender** | the **bodyguard**: guards one ally (takes the hits aimed at them), shields allies, taunts | designer |
+| **Berserk** | takes risks for more damage | designer |
+| **Executioner** | more damage the lower the foe's HP; some bonuses on killing blows | designer |
+| **Survivor** | self-sufficient: heals and buffs itself, plays as if alone; no team utility | designer |
+| **Precision** | self buffs (luck on its flips, crits); weak ally buffs | designer |
+| **Warfare** | orders: tells allies to move between ranks, debuffs foes, some buffs | designer |
+| **Leadership** | ally buffs; weak stress relief | designer |
+| **Performance** | buffs, Regen songs (heals), minor debuffs; weak stress relief | designer |
+| **Animal Companion** | no set identity: a very wide set of bases covering almost everything; the AI picks what fits the pet | designer |
+| **Dirty Fighting** | debuffs, moving foes around, marks | designer |
+| **Retaliation** | gains when it is hit, and hits back | designer |
+| **Stealth** | the reverse taunt: makes itself harder to target; Claude adds bigger hits while hidden | designer + Claude |
+| **Doctor** | single-target heals, Regen, cures, general healing; minor area heals | designer |
+| **Alchemy** | limited uses are the point: few uses but potent healing, Poison damage and various debuffs | designer |
+| **Concentration** | self buffs | designer |
+| **Carousing** | limited-use self buffs, some limited-use damage and healing | designer |
 
-### Distribution (strong / weak)
+**Healing** (designer): main healers are **Alchemy, Doctor, Holy**; supplemented by **Dark, Carousing, Performance** (Performance heals through Regen).
 
-**By main role** (29): front damage 7 · reach damage 7 · tank 3 · healer 2 · ally support 4 · control 3 · self-sustain / self-empower 3.
+**Telling close skills apart** (Claude's proposals):
+- **Holy / Doctor / Alchemy:** Holy heals the many (squad-wide, steady); Doctor fixes the one (single target, Regen, cures); Alchemy bursts (potent, few uses).
+- **Weapon and Shield / Defender:** Weapon and Shield draws attacks onto itself (taunt) and survives them; Defender protects one ally (guard) and shields others, and fights least.
+- **Polearm / Dual Wield / Throwing**, the three movers: Polearm steps forward only, as it strikes; Dual Wield dances between ranks 1–2; Throwing roams ranks 2–4.
+- **Leadership / Performance / Warfare:** Leadership is offense and morale (Emboldened, focus fire, Resolve); Performance is tempo and upkeep (Haste, Regen, stress); Warfare is position (orders to move) and breaking foes.
+- **Precision / Concentration:** Precision buffs its flips (luck, crits); Concentration buffs its next action (more power, shorter cooldowns, repeats).
 
-| effect | strong | weak | strong in | weak in |
-|---|---|---|---|---|
-| single damage | 13 | 7 | Two-handed, Polearm, Dual Wield, Single Weapon, Unarmed, Shooting, Fire, Frost, Lightning, Berserk, Executioner, Animal Companion, Stealth | Weapon and Shield, Holy, Dark, Warfare, Dirty Fighting, Retaliation, Carousing |
-| area damage | 5 | 3 | Two-handed, Throwing, Fire, Lightning, Berserk | Polearm, Shooting, Alchemy |
-| Bleed | 2 | 4 | Dual Wield, Throwing | Polearm, Unarmed, Shooting, Animal Companion |
-| Burn | 1 | 2 | Fire | Alchemy, Carousing |
-| Poison | 1 | 1 | Alchemy | Throwing |
-| Chilled / Shocked | 1 / 1 | 0 | Frost / Lightning | |
-| heal allies | 2 | 3 | Holy, Doctor | Dark, Alchemy, Carousing |
-| self-heal | 1 | 1 | Survivor | Berserk |
-| Regen | 1 | 2 | Survivor (itself) | Doctor, Performance |
-| cure | 3 | 0 | Holy, Doctor, Survivor (itself) | |
-| shield allies | 1 | 1 | Defender | Holy |
-| self shield | 2 | 1 | Weapon and Shield, Frost | Defender |
-| guard / taunt | 1 | 1 | Defender | Animal Companion |
-| ally buff | 4 | 1 | Holy, Precision, Leadership, Performance | Warfare |
-| self buff | 3 | 2 | Berserk, Concentration, Carousing | Dual Wield, Precision |
-| debuff | 3 | 4 | Dark, Dirty Fighting, Alchemy | Single Weapon, Unarmed, Throwing, Performance |
-| Mark | 1 | 2 | Dirty Fighting | Leadership, Animal Companion |
-| defense down | 2 | 1 | Two-handed, Warfare | Alchemy |
-| Stun (always limited) | 0 | 4 | | Two-handed, Weapon and Shield, Unarmed, Dirty Fighting |
-| move foes | 2 | 1 | Two-handed, Polearm | Dirty Fighting |
-| move allies | 1 | 0 | Leadership | |
-| self move | 1 | 2 | Single Weapon | Unarmed, Stealth |
-| counter | 1 | 1 | Retaliation | Single Weapon |
-| stress relief | 0 | 3 | | Leadership, Performance, Carousing |
-| hide | 1 | 0 | Stealth | |
-| cheat death | 1 | 0 | Survivor | |
-| **total** | **55** | **47** | | |
-
-**Also:** default attack 13 (8 weapons, 5 magics) · no damage at all 7 (Defender, Survivor, Precision, Leadership, Performance, Doctor, Concentration) · pays a cost 4 (Dark stress, Berserk HP, Two-handed and Carousing after-effects) · whole skill limited uses 3 (Doctor, Alchemy, Carousing).
-
-**By rank** (skills usable from it): rank 1: 19 · rank 2: 27 · rank 3: 22 · rank 4: 14. Weapons at rank 4: Shooting only.
-
-**Observations:**
-- Damage is the bulk: 13 skills are strong at single damage. Healing is thin: 2 strong healers; with 3 random battle skills about 1 merc in 5 has Holy or Doctor.
-- Stun is weak everywhere, by the rule (always limited). Stress relief is weak everywhere (D-0062).
-- Thinnest skills: Executioner and Concentration (1 strong, 0 weak), specialists by design; mods add breadth.
-- Open: does Animal Companion's pet attack count as a default attack? Hidden as a new status? Unarmed and Animal Companion would like to move foes, but D-0073 gives that to three skills. Carousing's dodge vs "no evasion yet".
+**Clashes with records:**
+- Warfare moving allies vs D-0073 (Leadership moves teammates).
+- Polearm's foe moves (D-0073, D-0090) aren't in its new line: kept as weak?
+- Doctor "limited uses per quest" (D-0062) vs Alchemy owning limited uses.
+- New statuses: Dueled (Single Weapon), Momentum (Unarmed), Chilled stacks (Frost), Hidden (Stealth).
 
 ## Two-handed (STR)
 
