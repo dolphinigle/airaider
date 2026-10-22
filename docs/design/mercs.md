@@ -33,16 +33,17 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 
 **Coins (D-0069):** a check flips **attribute + skill level** if the merc has the skill, else the attribute alone (Survival check: DEX + Survival, or just DEX). An attack flips **its attribute + its battle skill's level**; each head deals the ability's base damage.
 
-### Battle skills (21)
+### Battle skills (22)
 
 ✦ = rare. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). Pairings: D-0086 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
 
 | skill | covers | attributes |
 |---|---|---|
-| **Fast Weapons** | swords, daggers, rapiers: multi-hits, bleeds, crits (D-0063) | DEX + STR |
-| **Cleaving Weapons** | greatswords, axes: hits two adjacent foes | STR |
-| **Heavy Weapons** | hammers, clubs, maces: stuns, armor break, knockback (moves foes back) | STR + CON |
-| **Long-reach Weapons** | polearms, spears: strikes from rank 2–3, reaches deep, pushes and pulls | STR |
+| **Two-handed** | greatswords, greataxes, warhammers: big swings, hit two foes, stun, armor break (D-0090) | STR |
+| **Polearm** | spears, halberds: strike from ranks 2–3, reach deep, push and pull | STR |
+| **Weapon and Shield** | one-handed weapon + shield: shield bash, block, shield wall, counter | STR + CON |
+| **Dual Wield** | two blades, two axes: multi-hits, bleeds | DEX + STR |
+| **Single Weapon** | one sword or rapier, free hand: lunge, riposte, crits (the duelist) | DEX |
 | **Unarmed** | fists, kicks, grapples, martial arts, claws and bites (werewolves) | STR + DEX |
 | **Ranged** | bows, crossbows, guns, slings, throwing (weapon tags) | DEX |
 | **Defender** | shields, taunts, guarding, party shields (was Defense, designer) | CON |
@@ -61,7 +62,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 | **Holy Magic** ✦ | healing, blessing, warding off the dead; deals mostly Physical | CHA |
 | **Dark Magic** ✦ | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | CHA + CON |
 
-**At most one weapon skill per merc (D-0088):** Fast, Cleaving, Heavy, Long-reach Weapons, Unarmed or Ranged; the rest combine freely.
+**Weapon skills are styles (D-0090). At most one per merc:** Two-handed, Polearm, Weapon and Shield, Dual Wield, Single Weapon, Unarmed or Ranged; the rest combine freely. Weapon flavor (axe, hammer, sword) comes from modifiers and the AI's pick and name. Attributes of the new ones: Claude's draft.
 
 **Damage types (D-0070):** Physical, Fire, Frost, Lightning, Chaos. Poison and bleed are statuses.
 

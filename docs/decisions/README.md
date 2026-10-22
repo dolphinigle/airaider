@@ -69,7 +69,7 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0060](D-0060-dark-magic-is-paid-in-hp-guns-are-ranged.md) | Dark Magic is paid in HP; guns are Ranged | superseded → D-0072 | designer | 2026-10-22 |
 | [D-0061](D-0061-unarmed-covers-claws-and-bites-shapeshifting-and-stances-dro.md) | Unarmed covers claws and bites; shapeshifting and stances dropped | superseded → D-0063 | designer | 2026-10-22 |
 | [D-0062](D-0062-nature-lore-and-engineering-leave-combat-per-quest-uses-stre.md) | Nature Lore and Engineering leave combat; per-quest uses; stress healing in fights is rare | accepted | designer | 2026-10-22 |
-| [D-0063](D-0063-melee-splits-into-fast-cleaving-heavy-and-long-reach-weapons.md) | Melee splits into Fast, Cleaving, Heavy and Long-reach weapons | accepted | designer | 2026-10-22 |
+| [D-0063](D-0063-melee-splits-into-fast-cleaving-heavy-and-long-reach-weapons.md) | Melee splits into Fast, Cleaving, Heavy and Long-reach weapons | superseded → D-0090 | designer | 2026-10-22 |
 | [D-0064](D-0064-attributes-affect-combat-only-indirectly.md) | Attributes affect combat only indirectly | superseded → D-0065 | designer | 2026-10-22 |
 | [D-0065](D-0065-damage-attribute-coins-times-ability-base-cut-by-defense-per.md) | Damage: attribute coins times ability base, cut by defense percent; foes scale by HP | superseded → D-0069 | designer | 2026-10-22 |
 | [D-0066](D-0066-merc-defense-shield-and-guard-percent-only-from-traits-no-mi.md) | Merc defense: shield and guard, percent only from traits; no misses; eight damage types | superseded → D-0070 | designer | 2026-10-22 |
@@ -94,6 +94,7 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0085](D-0085-unarmed-is-str-dex.md) | Unarmed is STR + DEX | superseded → D-0086 | designer | 2026-10-22 |
 | [D-0086](D-0086-skill-attributes-round-two-every-attribute-pair-has-a-skill.md) | "Skill attributes, round two: every attribute pair has a skill" | accepted | designer | 2026-10-22 |
 | [D-0087](D-0087-one-weapon-skill-per-merc.md) | One weapon skill per merc | superseded → D-0088 | designer | 2026-10-22 |
-| [D-0088](D-0088-one-weapon-skill-per-merc-ranged-included.md) | One weapon skill per merc, Ranged included | accepted | designer | 2026-10-22 |
+| [D-0088](D-0088-one-weapon-skill-per-merc-ranged-included.md) | One weapon skill per merc, Ranged included | superseded → D-0090 | designer | 2026-10-22 |
 | [D-0089](D-0089-fury-and-grit-join-the-battle-skills.md) | Fury and Grit join the battle skills | accepted | designer | 2026-10-22 |
+| [D-0090](D-0090-melee-weapon-skills-by-style.md) | Melee weapon skills by style | accepted | designer | 2026-10-22 |
 <!-- index:end -->
