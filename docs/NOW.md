@@ -64,12 +64,16 @@
 
 ## Next
 
-0. **NOW: toward a playtest-ready fight** (designer, 2026-10-22). Goal: learn whether the game is promising and fun; exact balance comes later. Four steps:
-   1. **(here)** Brainstorm abilities per battle skill **together, with designer samples**, to give each skill its identity and guide (E-0007 `brainstorm.md`).
+0. **NEXT SESSION STARTS HERE: toward a playtest-ready fight** (designer, 2026-10-22). Goal: learn whether the game is promising and fun; exact balance comes later. Four steps:
+   1. **(here)** Model abilities per battle skill, done together with the designer, plus the mod catalog. Everything lives in E-0007 `brainstorm.md` (the conventions at its top, the effects list, the mod catalog).
+      - Done: Two-handed's model abilities; the five magic identities and ranks; Holy's abilities; mods for damage, heal and buff abilities (Bless); the central effects list with count and potency.
+      - **Next: a skill with debuffs** (such as Dark Magic's Curse/Hex) to make debuff-ability mods. Then the rest of the skills' model abilities (Polearm, Fire, Frost, Lightning and Dark drafts wait for review).
+      - Conventions: damage as a % of a standard hit; generic names (the AI renames); **most abilities have no cooldown** (Darkest Dungeon), but heals, stuns and a few big effects do; the AI is offered about 10 random fitting common mods plus flipped-in rares.
+      - Open: does the Stunning mod add +1 cd; heal fill-ins (ally-buff cost, who gets Guarding's shield) deferred. Batch into decisions later: the mod rules (D-0025 is still proposed), ally moves by mods vs D-0073, "no evasion yet" vs D-0070 dodge charges.
    2. A balance frame: the damage formula, foe HP, target turns per fight, using Darkest Dungeon as the guide.
    3. Foe design, then a few mock foes, learning from Darkest Dungeon as closely as possible.
    4. Design the abilities with that balance.
-   - Roster done (D-0099); 13 battle skills can be checked (D-0100). Also open: Warfare's scope; Precision vs LUK; from E-0005 round 10: Highwayman blade + pistol, foe moves outside D-0073, stress healing.
+   - Roster done (D-0099); 13 battle skills can be checked (D-0100). Also open: Warfare's scope; Precision vs LUK; from E-0005 round 10: Highwayman blade + pistol, stress healing.
 1. **Battle and check skills, still open:**
    - **Ability cadence** (Claude: a new ability at skill levels 1, 3, 5, 7, 9).
    - **Status effects model:** Pokémon style or Darkest Dungeon style (Claude leans Darkest Dungeon).
