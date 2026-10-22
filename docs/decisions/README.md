@@ -84,4 +84,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0075](D-0075-battle-skill-attribute-pairings.md) | Battle skill attribute pairings | accepted | designer | 2026-10-22 |
 | [D-0076](D-0076-keep-the-14-check-skills-three-per-merc.md) | Keep the 14 check skills, three per merc | superseded → D-0077 | designer | 2026-10-22 |
 | [D-0077](D-0077-check-skills-merge-to-nine-three-per-merc.md) | Check skills merge to nine, three per merc | accepted | designer | 2026-10-22 |
+| [D-0078](D-0078-check-skill-names-intimidation-and-craft.md) | Check skill names: Intimidation and Craft | accepted | designer | 2026-10-22 |
 <!-- index:end -->

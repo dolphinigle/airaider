@@ -59,7 +59,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 
 ### Check skills (9)
 
-No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0077). Attributes: Claude's draft, open.
+No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0077); names D-0078. Attributes: Claude's draft, open.
 
 | skill | covers | draft attr |
 |---|---|---|
@@ -69,9 +69,9 @@ No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0077). Attribut
 | **Roguery** | locks, pockets, traps, forgery | DEX |
 | **Streetwise** | rumors, finding people, city ways | CHA |
 | **Persuasion** | charm, diplomacy, haggling, appraising (+ Bargaining) | CHA |
-| **Deception** | lies, bluffs, disguises, threats, interrogation (+ Intimidation) | CHA |
+| **Intimidation** | threats, interrogation, lies, bluffs, disguises (+ Deception) | CHA |
 | **Lore** | the past, peoples, faiths; plants, beasts, monsters; undead, demons, curses, relics (three lores merged) | INT |
-| **Engineering** | building, machines, explosives, traps; weapons, armor, repairs (+ Smithing) | INT |
+| **Craft** | building, machines, explosives, traps; weapons, armor, repairs (Engineering + Smithing) | INT |
 
 ## Talents (D-0018)
 
