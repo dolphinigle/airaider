@@ -74,10 +74,11 @@ Families at a glance:
 | element | 1 | | Fiery, Frosty, Charged, Dark, Brutal |
 | status | no limit | | Bleeding, Poisoning, Burning, Shocking, Chilling |
 | debuff | 1 | 50% reduced damage; single-target abilities only | Stunning, Heavy, Marking, (Exposing, Weakening, Hampering) |
-| buff | 1 | | Swift, (Guarding, Evasive, Riposting) |
+| buff | 1 | | Swift, (Evasive, Riposting) |
+| sustain | no limit (designer: shield "same family as vampiric", "they can stack no problem") | Vampiric rare | Guarding, Vampiric |
 | self-move | 1 | | Advancing, Retreating |
 | reach | no limit | | Reaching, Footwork |
-| other | no limit | Vampiric rare; Double Strike repeats once at most | Lucky, Vampiric, Double Strike |
+| other | no limit | Double Strike repeats once at most | Lucky, Double Strike |
 | conditional | no limit | only if the ability meets the condition | Quick, Splitting, Potent, Lingering, Composed |
 
 | family | mod | effect | rules |
@@ -90,13 +91,13 @@ Families at a glance:
 | debuff | **Marking** | mark: allies deal more to it | same |
 | debuff | **Exposing / Weakening / Hampering** (Claude's, likely in the family) | takes more damage / deals less / acts later | same |
 | buff | **Swift** | you act earlier next round | one buff |
-| buff | **Guarding** | shield worth 10% of the damage dealt | one buff (Claude puts it here) |
+| sustain | **Guarding** | shield worth 10% of the damage dealt | stacks with Vampiric |
 | buff | **Evasive / Riposting** (Claude's) | gain a dodge / riposte charge | one buff; rarer |
 | self-move | **Advancing / Retreating** (designer) | you step forward / back 1 rank | exclusive |
 | reach | **Reaching** | reaches 1 rank further (foe 1–2 → 1–3) | |
 | reach | **Footwork** | usable from 1 more rank (from 1–2 → 1–3) | |
 | other | **Lucky** | +5% heads chance (number open) | replaces Keen |
-| other | **Vampiric** | heal a small share of the damage | rare |
+| sustain | **Vampiric** | heal a small share of the damage | rare; stacks with Guarding |
 | other | **Double Strike** | small chance to hit again | at most one repeat |
 | conditional | **Quick** | −1 cooldown | has a cooldown |
 | conditional | **Splitting** | with fewer targets, damage condenses onto those left | hits several foes |
