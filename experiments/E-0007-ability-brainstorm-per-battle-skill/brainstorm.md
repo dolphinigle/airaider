@@ -44,17 +44,17 @@ The designer gave suggestions ("my suggestions not necessarily the best, you can
 | **Defender** | 1–2 | tank | the **bodyguard**: guards an ally, shields allies, taunts | guard, shield allies, taunt | self shield | damage; heals | | 3/1 | D |
 | **Berserk** | 1–4 | front damage | takes risks for more damage; self-buffs work from any rank (take 20% of its HP as damage and enter a berserk state) | single damage, area damage, self buff (berserk state) | self-heal (kills feed it) | defend; help allies | HP, risk | 3/1 | D |
 | **Executioner** | 1–3 | front damage | more damage the lower the foe's HP; bonuses on killing blows | single damage | self buff (on a kill) | fresh foes; support | | 1/1 | D |
-| **Survivor** | 1–4 | self-sufficient | self-sufficient: plays as if alone; no team utility | self-heal, self buff, Regen, cure (all on itself) | cheat death (once per quest) | **anything for allies** | | 4/1 | D |
+| **Survivor** | 1–4 | self-sufficient | self-sufficient: plays as if alone; no team utility | self-heal, self buff, Regen, cure (all on itself) | — | **anything for allies** | | 4/0 | D |
 | **Precision** | 1–4 | self-sufficient | self buffs (luck on its flips, crits); weak ally buffs | self buff | ally buff | damage; heals | | 1/1 | D |
 | **Warfare** | 1–3 | support; control | orders: moves allies between ranks, debuffs foes, some buffs | move allies, debuff | ally buff | heal | | 2/1 | D |
 | **Leadership** | 1–4 | support | ally buffs | ally buff | stress relief | damage; moving allies | | 1/1 | D |
 | **Performance** | 3–4 | support; healer (weak) | buffs, Regen songs, minor debuffs | ally buff | Regen, debuff, stress relief | damage; big heals; ranks 1–2 | | 1/3 | D |
 | **Animal Companion** | 1–4 | flex | **no set identity**: a very wide set of bases covering almost everything; the AI picks what fits the pet | — | almost everything (not counted below) | | | wide | D |
-| **Dirty Fighting** | 1–3 | control | debuffs, moving foes around, marks | debuff, move foes (yank), Mark | single damage (light), Stun (one rare) | default attack; big damage | | 3/2 | D |
+| **Dirty Fighting** | 1–3 | control | debuffs, moving foes around, marks | debuff (incl. Mark), move foes (yank) | single damage (light), Stun (one rare) | default attack; big damage | | 2/2 | D |
 | **Retaliation** | 1–3 | tank | gains when it is hit, and hits back | counter, self buff (when hit) | taunt (to get hit) | act first; area | | 2/1 | D; taunt C |
 | **Stealth** | 1–4 | reach damage | the reverse taunt: makes itself harder to target; bigger hits while hidden. Any rank, so snipers (Shooting) can use it | hide, single damage (from hiding) | self move | protect allies | | 2/1 | D+C |
-| **Doctor** | 2–4 | healer | single-target heals, Regen, cures, general healing; minor area heals | heal allies, Regen, cure | area heal | damage; buffs | some limited uses (kits) | 3/1 | D |
-| **Alchemy** | 3–4 | healer; control | limited uses are the point: few uses, but potent healing, Poison and debuffs | heal allies (potent), Poison, debuff | area damage (bombs) | unlimited use; ranks 1–2 | limited uses | 3/1 | D |
+| **Doctor** | 2–4 | healer | single-target heals, Regen, cures, general healing; minor area heals | heal allies, Regen, cure | area heal, Poison | damage; buffs | some limited uses (kits) | 3/2 | D |
+| **Alchemy** | 3–4 | healer; control | limited uses are the point: few uses, but potent healing, Poison and debuffs | heal allies (potent), Poison, debuff | area damage (bombs), Burn | unlimited use; ranks 1–2 | limited uses | 3/2 | D |
 | **Concentration** | 1–4 | self-sufficient | self buffs | self buff | — | effects of its own | | 1/0 | D |
 | **Carousing** | 1–4 | self-sufficient; healer (weak) | limited-use self buffs, some limited-use damage and healing | self buff | single damage, heal allies | repeat | limited uses; hangover | 1/2 | D |
 
@@ -65,8 +65,8 @@ The designer gave suggestions ("my suggestions not necessarily the best, you can
 | single damage | 12 | 6 | Two-handed, Polearm, Dual Wield, Unarmed, Shooting, Throwing, Fire, Frost, Lightning, Berserk, Executioner, Stealth | Weapon and Shield, Single Weapon, Holy, Dark, Dirty Fighting, Carousing |
 | area damage | 4 | 4 | Two-handed, Fire, Lightning, Berserk | Dual Wield, Shooting, Throwing, Alchemy |
 | Bleed | 1 | 3 | Dual Wield | Polearm, Shooting, Throwing |
-| Burn | 1 | 0 | Fire | |
-| Poison | 1 | 1 | Alchemy | Throwing |
+| Burn | 1 | 1 | Fire | Alchemy |
+| Poison | 1 | 2 | Alchemy | Throwing, Doctor |
 | Chilled / Shocked | 1 / 1 | 0 | Frost / Lightning | |
 | heal allies | 3 | 2 | Holy, Doctor, Alchemy | Dark, Carousing |
 | area heal | 1 | 1 | Holy | Doctor |
@@ -80,8 +80,7 @@ The designer gave suggestions ("my suggestions not necessarily the best, you can
 | hide (reverse taunt) | 1 | 0 | Stealth | |
 | ally buff | 3 | 2 | Holy, Leadership, Performance | Precision, Warfare |
 | self buff | 7 | 1 | Weapon and Shield, Berserk, Survivor, Precision, Retaliation, Concentration, Carousing | Executioner |
-| debuff | 4 | 2 | Dark, Warfare, Dirty Fighting, Alchemy | Two-handed, Performance |
-| Mark | 1 | 0 | Dirty Fighting | |
+| debuff (incl. Mark) | 4 | 2 | Dark, Warfare, Dirty Fighting, Alchemy | Two-handed, Performance |
 | Stun (always limited) | 2 | 3 | Unarmed, Frost | Two-handed, Weapon and Shield, Dirty Fighting |
 | hold (Grappled) | 1 | 0 | Unarmed | |
 | move foes | 2 | 3 | Unarmed, Dirty Fighting | Two-handed, Polearm, Weapon and Shield |
@@ -89,16 +88,15 @@ The designer gave suggestions ("my suggestions not necessarily the best, you can
 | self move | 3 | 2 | Polearm, Dual Wield, Throwing | Single Weapon, Stealth |
 | counter | 1 | 1 | Retaliation | Single Weapon |
 | stress relief | 0 | 2 | | Leadership, Performance |
-| cheat death | 0 | 1 | | Survivor |
-| **total** | **64** | **41** | | |
+| **total** | **63** | **42** | | |
 
 **Pays a cost:** self drawback 3 (Two-handed, Dual Wield, Carousing's hangover) · HP 1 (Berserk) · stress 1 (Dark) · limited uses 2 whole skills (Alchemy, Carousing) + some of Doctor's.
 
 ### Rank distribution (designer ranks, 2026-10-23)
 
-**Skill range vs ability ranks** (designer): a skill's range is where *some* of its abilities work; each ability is locked tighter. Fire is the strict one (each ability on a narrow pair), Holy looser; choosing abilities for the merc's rank is part of the build.
+**What a skill's range means** (designer, 2026-10-23): it says where **most** of its abilities sit, not all. "1–2" = the majority work from 1–2; a few may sit elsewhere. "1–4" = it has abilities at 1–2, at 3–4, or across 1–4, not that each works everywhere. Each ability has its own ranks. Fire is the strict one (each ability on a narrow pair, e.g. from 1–2 hitting foe 1–2, from 3–4 hitting foe 1–2), Holy looser; choosing abilities for the merc's rank is part of the build. Unarmed stays rank 1 only (designer).
 
-| rank | skills usable from it | # |
+| rank | skills with abilities there | # |
 |---|---|---|
 | 1 | Two-handed, Weapon and Shield, Dual Wield, Single Weapon, Unarmed, Throwing, Fire, Holy, Defender, Berserk, Executioner, Survivor, Precision, Warfare, Leadership, Animal Companion, Dirty Fighting, Retaliation, Stealth, Concentration, Carousing | 21 |
 | 2 | Two-handed, Polearm, Weapon and Shield, Dual Wield, Single Weapon, Throwing, Fire, Frost, Holy, Dark, Defender, Berserk, Executioner, Survivor, Precision, Warfare, Leadership, Animal Companion, Dirty Fighting, Retaliation, Stealth, Doctor, Concentration, Carousing | 24 |
@@ -107,12 +105,12 @@ The designer gave suggestions ("my suggestions not necessarily the best, you can
 
 | range | # | skills |
 |---|---|---|
-| front only (within 1–2) | 5 | Two-handed, Weapon and Shield, Dual Wield, Defender, Unarmed (rank 1 only) |
+| mostly front (1–2) | 5 | Two-handed, Weapon and Shield, Dual Wield, Defender, Unarmed (rank 1 only) |
 | mid (2–3) | 1 | Polearm |
 | 1–3 | 6 | Single Weapon, Throwing, Executioner, Warfare, Dirty Fighting, Retaliation |
 | 2–4 | 3 | Frost, Dark, Doctor |
-| back only (3–4) | 4 | Shooting, Lightning, Performance, Alchemy |
-| any (1–4) | 10 | Fire, Holy, Berserk, Survivor, Precision, Leadership, Animal Companion, Stealth, Concentration, Carousing |
+| mostly back (3–4) | 4 | Shooting, Lightning, Performance, Alchemy |
+| spread (1–4) | 10 | Fire, Holy, Berserk, Survivor, Precision, Leadership, Animal Companion, Stealth, Concentration, Carousing |
 
 Default attacks at rank 4: Shooting and the five magics. Berserk at ranks 3–4 has only its self-buffs.
 
@@ -172,7 +170,7 @@ A merc has 2 battle skills at the start and a 3rd at Lv 7, at most one weapon (D
 | Witch Doctor | Dark + Alchemy + Dirty Fighting | 3 | curses, flasks and dirty tricks; all three meet only at rank 3, a tight fit |
 | Skirmisher | Throwing + Stealth + Dirty Fighting | 1–3 | throws while moving, hides, debuffs |
 
-**Clashing pairs** (no shared rank, so the second skill is dead weight): Dual Wield + Performance (1–2 vs 3–4), Unarmed + Alchemy (1 vs 3–4), Weapon and Shield + Lightning (1–2 vs 3–4). Open: does the engine avoid dealing these, or is the bad roll part of the gacha?
+**Clashing pairs** (no shared main range, so the second skill gives only its few off-range abilities): Dual Wield + Performance (1–2 vs 3–4), Unarmed + Alchemy (1 vs 3–4), Weapon and Shield + Lightning (1–2 vs 3–4). Open: does the engine avoid dealing these, or is the bad roll part of the gacha?
 
 **Healing** (designer): main healers are **Alchemy, Doctor, Holy**; supplemented by **Dark, Carousing, Performance** (Performance heals through Regen).
 
@@ -182,6 +180,8 @@ A merc has 2 battle skills at the start and a 3rd at Lv 7, at most one weapon (D
 - **Polearm / Dual Wield / Throwing**, the three movers: Polearm steps forward only, as it strikes; Dual Wield dances between ranks 1–2; Throwing roams ranks 1–3.
 - **Leadership / Performance / Warfare:** Leadership is offense and morale (Emboldened, focus fire, Resolve); Performance is tempo and upkeep (Haste, Regen, stress); Warfare is position (moves allies) and debuffs.
 - **Precision / Concentration:** Precision buffs its flips (luck, crits); Concentration buffs its next action (more power, shorter cooldowns, repeats).
+
+**Cheat death is out of Survivor** (designer, 2026-10-23: "probably everyone will have it by default ala darkest dungeon"): likely a default for every merc, like Darkest Dungeon's Death's Door; not yet ruled.
 
 **Records:** ally and foe movers are D-0101; Doctor has only some limited-use abilities (fits D-0062). New statuses: Grappled (Unarmed), Frozen (Frost), Hidden (Stealth).
 
@@ -238,7 +238,7 @@ A mod or ability that says "a buff" or "a debuff" picks one entry from this list
 | damage status | **Shocked** | the next hit on it deals more (Lightning) | how much more | hits |
 | damage status | **Chilled** | Frost; what it does is open (Claude: acts later) | open | rounds |
 | debuff | **Stun** | loses its next turn (rarer); **always limited**, by a cooldown or by uses per quest (Dirty Fighting's Flashbang, designer: "just limited use"); **single target only for now** (designer: "ground slam bad, dont have multi stun for now") | — | turns |
-| debuff | **Mark** | allies deal more to it | how much more | rounds |
+| debuff | **Mark** | allies deal more to it; a debuff like any other, on several debuffers (Dirty Fighting, Dark, …; designer) | how much more | rounds |
 | debuff | **Sundered** | Physical defense down (Sunder) | how much down | rounds |
 | debuff | **Exposed** (Claude) | takes more damage | how much more | rounds |
 | debuff | **Weakened** (Claude) | deals less damage | how much less | rounds |
