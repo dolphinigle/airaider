@@ -35,4 +35,4 @@ How a quest plays out: fights and coin-flip skill checks, told in quick simple l
 
 ## Nodes (D-0057)
 
-A quest is a **straight line of nodes**, no forks. Each node is a **combat** or a **skill check** ("found a treasure box!"). Checks can use check skills, battle skills (D-0058) or stats. Working shape: a check node offers 2–3 approaches; a pass gives loot, a buff or knowledge for the next fight; a fail costs stress, HP, or makes the next fight harder.
+A quest is a **straight line of nodes**, no forks. Each node is a **combat** or a **skill check** ("found a treasure box!"). The line is **fixed** and the **quest preview shows it** (D-0059): `COMBAT – SURVIVAL – COMBAT – ??? – BOSS`. A check node names the skill it tests (any skill, battle or check, D-0058). **Some nodes are hidden** until reached. Working shape: a pass gives loot, a buff or knowledge for the next fight; a fail costs stress, HP, or makes the next fight harder.

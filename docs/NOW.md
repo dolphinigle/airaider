@@ -8,7 +8,7 @@
 
 ### The game
 - **Mostly combat** (D-0056). Civilization quests are mostly gone.
-- **A quest is a straight line of nodes**, each a combat or a skill check ("found a treasure box!"). No branching map (D-0057).
+- **A quest is a straight line of nodes**, each a combat or a skill check ("found a treasure box!"). No branching map (D-0057). The line is fixed and shown in the quest preview (`COMBAT – SURVIVAL – COMBAT – ??? – BOSS`); some nodes are hidden (D-0059).
 - **The campaign follows Darkest Dungeon** (D-0052):
   - One quest a week; later a second, auto-fought one.
   - Mercs who stay home recover.
@@ -84,7 +84,7 @@
 ## Waiting on the designer
 
 - The skill merges inside each list, and which list Nature Lore / Stealth / Athletics land in (Next 1).
-- **D-0057** node counts per quest size; Claude's check-node shape (2–3 approaches, pass gives loot/buff/knowledge, fail costs).
+- **Check nodes** (D-0059 notes): one named skill per node; pass gives loot/buff/knowledge, fail costs; can Scouting reveal hidden nodes?
 - **To decide later** (D-0055):
   - where recruits come from (a coach, or quests);
   - how new quests appear;
