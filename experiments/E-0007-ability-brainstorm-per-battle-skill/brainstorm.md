@@ -147,17 +147,16 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 | **Impale** | 2★ | 2–3 → foe 1–2 | 130% | Bleed | cd 3 |
 | **Sweep** | 3★ | 2–3 → foe 1 and 2 | 50% each | hits both front foes | cd 2 |
 
-## The five magics, identities (Claude's draft, 2026-10-22; designer: "lets design identities for all 5 magics first together")
+## The five magics, identities (designer, 2026-10-22)
 
-| magic | attr | ranks | damage / status | role | the decision it brings |
-|---|---|---|---|---|---|
-| **Fire** | STR + INT | 2–3 | Fire / Burn | the battle mage: hits groups, Burn ticks on many foes; strongest against swarms | spread Burn over many foes, or pile it on one |
-| **Frost** | DEX + INT | 3–4 | Frost / Chilled | control: Chilled foes act later, so it bends turn order; single-target lances and ice shields for allies | who acts first: slow the dangerous foe before it moves |
-| **Lightning** | INT | 3–4 | Lightning / Shocked | burst: hits jump between foes, the most coin-swingy magic; Shocked foes take more from the next hit | gamble on the swing, and set up the squad's next hit |
-| **Holy** | CHA | 2–4 | Physical / none | the priest: steady heals on cooldowns, shields, blessings; hits undead hard | heal now, or prevent damage with wards and blessings |
-| **Dark** | CHA + CON | 2–4 | Chaos / Poison | power at a price: every ability costs stress (D-0072); curses foes (Weakened, Exposed), Poison, pacts | how much stress to spend this fight |
+| magic | attr | ranks (Claude) | damage / status | identity |
+|---|---|---|---|---|
+| **Fire** | STR + INT | 2–3 | Fire / Burn | a balance of single-target and area damage; Burn deals damage over time |
+| **Frost** | DEX + INT | 3–4 | Frost / Chilled | single target; Chilled; shields on the caster |
+| **Lightning** | INT | 3–4 | Lightning / Shocked | the biggest direct damage; Shocked makes the next hit deal more; area damage by chaining |
+| **Holy** | CHA | 2–4 | Physical / none | healing, some buffs, a weak shield, weak damage; no bonus against undead ("holy is already stacked") |
+| **Dark** | CHA + CON | 2–4 | Chaos / none | self-stressing (D-0072), debuffs, a rare source of Chaos damage; **no Poison** |
 
-How they split the work:
-- **Fire vs Lightning (both damage):** Fire is wide and slow-burning (Burn over rounds); Lightning is sharp and swingy (big jumps now, Shocked for the next hit).
-- **Holy vs Doctor (both heal):** Holy heals on cooldowns, smaller and steady; Doctor heals in bursts with uses per quest (D-0062).
-- **Frost vs Dark (both weaken foes):** Frost controls when foes act; Dark weakens what they do.
+**Statuses by damage type, clarified** (designer: "poison deals chaos damage but not caused by chaos magic"): the status-per-type rule says which damage each status deals (Poison deals Chaos). It does not mean every source of that damage type inflicts it. Poison comes from other skills (Alchemy, Poisoning mods).
+
+Claude's first draft, replaced: Fire as the swarm mage; Frost as the turn-order controller; Lightning as the coin-swing gambler; Holy with an undead bonus; Dark with Poison.
