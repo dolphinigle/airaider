@@ -33,10 +33,10 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 | **Cleave** | 1★ | 1–2 → foe 1 and 2 | 60% each | hits both front foes | 0 cd |
 | **Knockback Strike** | 1★ | 1–2 → foe 1–2 | 90% | knocks the foe back 1 rank | 0 cd |
 | **Sunder** | 2★ | 1–2 → 1–2 | 80% | Sundered | 0 cd |
-| **Stunning Blow** | 2★ | 1–2 → foe 1 | 70% | Stun | 0 cd |
+| **Stunning Blow** | 2★ | 1–2 → foe 1 | 70% | Stun | cd 2 |
 | **Wide Cleave** (Titanic Swing) | 4★ | 1 → foe 1, 2 and 3 | 70% each | you are Staggered next round | cd 2 |
 
-Every turn asks focus (Heavy Strike) or spread (Cleave), since both have no cooldown. With Stunning Blow free every turn, a foe that was just stunned can't be stunned again on its next turn (Claude, after Darkest Dungeon's stun resist; to rule). Knockback Strike sends a dangerous foe back and brings the one behind into reach.
+Every turn asks focus (Heavy Strike) or spread (Cleave), since both have no cooldown. **Every stun has a cooldown** (designer: "stun must have cd"); resists come later. Knockback Strike sends a dangerous foe back and brings the one behind into reach.
 
 Claude's first draft (the long list, kept for later picks):
 
@@ -65,7 +65,7 @@ A mod or ability that says "a buff" or "a debuff" picks one entry from this list
 | kind | effect | what it does |
 |---|---|---|
 | damage status | **Bleed / Poison / Burn / Shocked / Chilled** | one per damage type: Physical / Chaos / Fire / Lightning / Frost; what each does is open |
-| debuff | **Stun** | loses its next turn (rarer); **single target only for now**, no multi-foe stun (designer: "ground slam bad, dont have multi stun for now") |
+| debuff | **Stun** | loses its next turn (rarer); **always on a cooldown**; **single target only for now**, no multi-foe stun (designer: "ground slam bad, dont have multi stun for now") |
 | debuff | **Mark** | allies deal more to it |
 | debuff | **Sundered** | Physical defense down (Sunder) |
 | debuff | **Exposed** (Claude) | takes more damage |
@@ -98,6 +98,7 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 | status | none | dmg | **Bleeding / Poisoning / Burning / Shocking / Chilling** | inflicts that status, worth ~10% of the damage | statuses may get a slightly higher multiplier (balancer) |
 | debuff | 1 | dmg | **Debuffing** | inflicts one debuff from the effects list | 50% reduced damage; single-target abilities only |
 | debuff | | dmg | **Heavy** | knock the target back 1 rank | rarer; same costs |
+| debuff | | dmg | **Stunning** (via Debuffing) | stun | stun needs a cooldown, so this adds +1 cd on a no-cooldown ability (Claude; to rule) |
 | ally buff | 1 | heal | **Hastening / Emboldening / Blessed** | gives the target Haste / Emboldened / Blessed | single target only; reduced healing (Claude: 50%, mirroring debuffs; deferred) |
 | self buff | 1 | both | **Swift** (or any buff from the list) | gives you a buff | |
 | cure | 1 | heal | **Purifying** | removes every negative status from the target | common; 50% reduced healing; single target only |
@@ -127,7 +128,8 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 | other | | both | **Soothing** | lowers your stress | rare |
 | other | | heal | **Calming** | lowers the target's stress a little | rare |
 | conditional | none | both | **Quick / Measured** | −1 cooldown / much more power, +1 cooldown | has a cooldown |
-| conditional | | both | **Splitting** | with fewer targets, the power condenses onto those left | hits several targets |
+| conditional | | dmg | **Splitting** | with fewer foes in reach, the damage condenses onto those left | hits several foes |
+| conditional | | heal | **Splitting** (heal) | allies at full HP are skipped, and their share condenses onto the hurt ones | heals several allies (Claude's conversion of the area-only mod) |
 | conditional | | both | **Composed** | softens its self-debuff | has one |
 | conditional | | dmg | **Potent / Lingering** | its statuses are stronger / last a round longer | inflicts a status |
 
@@ -224,3 +226,26 @@ A heal or shield % is measured like damage: 100% heals as much as a standard hit
 | Dark Mending | 2 | 2–4 → any ally | 120% heal | | 0 cd, mid stress |
 | Mass Curse | 3 | 2–4 → all foes | — | Weakened | cd 2, high stress |
 | Doom | 4 | 2–4 → any foe | 220% Chaos | | cd 2, high stress |
+
+### Buff mods, on Bless (Claude's draft, 2026-10-22)
+
+Bless: 3–4 → any ally, Blessed until its next flip, 0 cd. For a buff ability, **power is the buff's strength** (how much Blessed raises the heads chance). Mods that give a fixed amount (a shield, a heal) are measured against a standard hit.
+
+Reused (as for damage and heals):
+- **scaling**: Desperate / Fresh / Haunted / Serene (your HP or stress)
+- **double-edged**: Reckless, and the rare Wild (random ally), Fraught, Blood Price, Ponderous, Unique
+- **self-move and reach**: Advancing / Retreating, Footwork (usable from rank 2 too)
+- **self buff**: Swift
+- **other**: Double Strike (small chance to bless a second ally), Soothing, Calming
+
+Converted for buffs:
+- **Lasting**: the buff lasts one more flip
+- **Spreading**: also blesses the allies next to the target, weaker (the area version of a buff)
+- **Self-blessing**: you are blessed too
+- **Hastening / Emboldening** (ally buff family, 1): the target also gets Haste / Emboldened; weaker Blessed
+- **Guarding**: the target also gains a small shield (about 10% of a standard hit)
+- **Mending**: the target also heals a little (about 20% of a standard hit)
+- **Purifying**: also removes every negative status; weaker Blessed
+- **Triage / Comforting**: a stronger buff the more HP / stress the target has lost or gained
+
+Dropped for buffs: element, status, debuffs, Vampiric, Executing / Opening Blow, Opportunist, Crushing, Splitting (single target), Quick / Measured (no cooldown), Composed (no self-debuff). Coin mods (Lucky, Consistent, Gamble) fit only if a buff's strength is flipped, which is open.
