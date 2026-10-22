@@ -6,6 +6,7 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 - **Damage is a % of a standard hit** (Darkest Dungeon style): "yup sounds good lets use %. pls remember it." How % becomes coins (heads × base per head, D-0069) is settled in balance (step 2).
 - **Model abilities first** (designer, 2026-10-22): each skill gets a few model abilities that set its identity; the rest are filled in later. The designer lets Claude pick details ("just pick yourself, i dont have strong pref").
 - **Generic names**, because the AI replaces every name ("the names should be more generic").
+- **Most abilities have no cooldown** (designer, 2026-10-22: "you have been using cd way way too often. MOST skills shouldnt have cd… see darkest dungeon"). An ability is priced by its power, ranks, targets and after-effects. Cooldowns go on heals ("Mend should have CD") and a few big effects.
 - **Statuses are written by name only** ("for status application like stun just say stun for now, lets figure out how they are applied later").
 
 ## Mods (designer, 2026-10-22)
@@ -30,12 +31,12 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 |---|---|---|---|---|---|
 | **Heavy Strike** (Overhead Smash) | 1★ | 1–2 → foe 1 only | 110% | the default attack | 0 cd |
 | **Cleave** | 1★ | 1–2 → foe 1 and 2 | 60% each | hits both front foes | 0 cd |
-| **Knockback Strike** | 1★ | 1–2 → foe 1–2 | 90% | knocks the foe back 1 rank | cd 1 |
-| **Sunder** | 2★ | 1–2 → 1–2 | 80% | Sundered | cd 3 |
-| **Stunning Blow** | 2★ | 1–2 → foe 1 | 70% | Stun | cd 2 |
-| **Wide Cleave** (Titanic Swing) | 4★ | 1 → foe 1, 2 and 3 | 70% each | you are Staggered next round | cd 4 |
+| **Knockback Strike** | 1★ | 1–2 → foe 1–2 | 90% | knocks the foe back 1 rank | 0 cd |
+| **Sunder** | 2★ | 1–2 → 1–2 | 80% | Sundered | 0 cd |
+| **Stunning Blow** | 2★ | 1–2 → foe 1 | 70% | Stun | 0 cd |
+| **Wide Cleave** (Titanic Swing) | 4★ | 1 → foe 1, 2 and 3 | 70% each | you are Staggered next round | cd 2 |
 
-Every turn asks focus (Heavy Strike) or spread (Cleave), since both have no cooldown. Knockback Strike sends a dangerous foe back and brings the one behind into reach.
+Every turn asks focus (Heavy Strike) or spread (Cleave), since both have no cooldown. With Stunning Blow free every turn, a foe that was just stunned can't be stunned again on its next turn (Claude, after Darkest Dungeon's stun resist; to rule). Knockback Strike sends a dangerous foe back and brings the one behind into reach.
 
 Claude's first draft (the long list, kept for later picks):
 
@@ -141,11 +142,11 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 | ability | rarity | ranks | damage | effect | cost |
 |---|---|---|---|---|---|
 | **Thrust** | 1★ | 2–3 → foe 1–2 | 100% | the default attack | 0 cd |
-| **Deep Thrust** | 1★ | 2–3 → foe 3–4 | 80% | reaches the back ranks | cd 1 |
-| **Pull** | 1★ | 2–3 → foe 2–4 | 60% | pulls the foe forward 1 rank | cd 2 |
-| **Push** | 2★ | 2–3 → foe 1 | 70% | pushes the foe back 1 rank | cd 2 |
-| **Impale** | 2★ | 2–3 → foe 1–2 | 130% | Bleed | cd 3 |
-| **Sweep** | 3★ | 2–3 → foe 1 and 2 | 50% each | hits both front foes | cd 2 |
+| **Deep Thrust** | 1★ | 2–3 → foe 3–4 | 80% | reaches the back ranks | 0 cd |
+| **Pull** | 1★ | 2–3 → foe 2–4 | 60% | pulls the foe forward 1 rank | 0 cd |
+| **Push** | 2★ | 2–3 → foe 1 | 70% | pushes the foe back 1 rank | 0 cd |
+| **Impale** | 2★ | 2–3 → foe 1–2 | 110% | Bleed | 0 cd |
+| **Sweep** | 3★ | 2–3 → foe 1 and 2 | 50% each | hits both front foes | 0 cd |
 
 ## The five magics, identities (designer, 2026-10-22)
 
@@ -163,7 +164,7 @@ Ranks are a skill's range; each ability sets its own (designer: "really depends 
 
 Claude's first draft, replaced: Fire as the swarm mage; Frost as the turn-order controller; Lightning as the coin-swing gambler; Holy with an undead bonus; Dark with Poison.
 
-### Magic model abilities (Claude's draft, 2026-10-22)
+### Magic model abilities (Claude's draft, 2026-10-22; cooldowns cut to heals and big effects)
 
 Stress costs for Dark are low / mid / high for now (the balancer sets them).
 
@@ -172,55 +173,55 @@ Stress costs for Dark are low / mid / high for now (the balancer sets them).
 | ability | ★ | ranks | power | effect | cost |
 |---|---|---|---|---|---|
 | Firebolt | 1 | 2–4 → foe 1–3 | 100% | the default attack | 0 cd |
-| Flame Strike | 1 | 1–2 → foe 1 | 130% | melee; Burn | cd 1 |
-| Flame Wave | 2 | 1–2 → foe 1 and 2 | 60% each | melee; Burn | cd 2 |
-| Ignite | 2 | 2–4 → any foe | 40% | strong Burn | cd 2 |
-| Fireball | 3 | 2–4 → a foe and the foes next to it | 50% each | Burn | cd 3 |
-| Inferno | 4 | 2–4 → all foes | 40% each | Burn | cd 5 |
+| Flame Strike | 1 | 1–2 → foe 1 | 120% | melee; Burn | 0 cd |
+| Flame Wave | 2 | 1–2 → foe 1 and 2 | 60% each | melee; Burn | 0 cd |
+| Ignite | 2 | 2–4 → any foe | 40% | strong Burn | 0 cd |
+| Fireball | 3 | 2–4 → a foe and the foes next to it | 50% each | Burn | cd 2 |
+| Inferno | 4 | 2–4 → all foes | 40% each | Burn | cd 3 |
 
 **Frost** (2–4)
 
 | ability | ★ | ranks | power | effect | cost |
 |---|---|---|---|---|---|
 | Ice Shard | 1 | 2–4 → foe 1–3 | 100% | the default attack | 0 cd |
-| Chill | 1 | 2–4 → any foe | 50% | strong Chilled | cd 1 |
-| Ice Armor | 1 | self | 150% shield | | cd 3 |
-| Frost Lance | 2 | 3–4 → any foe | 130% | Chilled | cd 2 |
-| Shatter | 3 | 2–4 → any foe | 100% | 100% more against a Chilled foe; removes its Chilled | cd 2 |
-| Frost Barrier | 3 | self | 100% shield | foes that hit you are Chilled | cd 4 |
+| Chill | 1 | 2–4 → any foe | 50% | strong Chilled | 0 cd |
+| Frost Lance | 2 | 3–4 → any foe | 120% | Chilled | 0 cd |
+| Shatter | 3 | 2–4 → any foe | 100% | 100% more against a Chilled foe; removes its Chilled | 0 cd |
+| Ice Armor | 1 | self | 150% shield | | cd 2 |
+| Frost Barrier | 3 | self | 100% shield | foes that hit you are Chilled | cd 3 |
 
 **Lightning** (3–4)
 
 | ability | ★ | ranks | power | effect | cost |
 |---|---|---|---|---|---|
 | Spark | 1 | 3–4 → any foe | 110% | the default attack | 0 cd |
-| Static | 1 | 3–4 → any foe | 50% | Shocked | cd 1 |
-| Lightning Bolt | 2 | 3–4 → any foe | 160% | | cd 2 |
-| Chain Lightning | 2 | 3–4 → a foe, then 2 more | 80% / 60% / 40% | chains to random foes | cd 2 |
-| Thunderclap | 3 | 3–4 → all foes | 30% each | Shocked | cd 4 |
-| Overload | 4 | 3–4 → any foe | 250% | | cd 5 |
+| Static | 1 | 3–4 → any foe | 50% | Shocked | 0 cd |
+| Chain Lightning | 2 | 3–4 → a foe, then 2 more | 80% / 60% / 40% | chains to random foes | 0 cd |
+| Lightning Bolt | 2 | 3–4 → any foe | 160% | the big hit | cd 1 |
+| Thunderclap | 3 | 3–4 → all foes | 30% each | Shocked | cd 2 |
+| Overload | 4 | 3–4 → any foe | 250% | | cd 3 |
 
-**Holy** (1–4) (designer changes 2026-10-22: Smite 60%, "weak but flexible"; abilities needing concentration (Prayer, Bless) are back-rank only, 3–4; shield abilities are front-rank only, 1–2, "crusader ish", such as deal damage and shield yourself. Claude picked Mend at no cooldown and Bless for 2 rounds.)
+**Holy** (1–4) (designer changes 2026-10-22: Smite 60%, "weak but flexible"; abilities needing concentration (Prayer, Bless) are back-rank only, 3–4; shield abilities are front-rank only, 1–2, "crusader ish", such as deal damage and shield yourself; Mend has a cooldown, Shield Strike has none.)
 
 | ability | ★ | ranks | power | effect | cost |
 |---|---|---|---|---|---|
 | Smite | 1 | 1–4 → any foe | 60% | the default attack: weak but usable anywhere (Claude reads "usable on 1-4" as both ranks) | 0 cd |
-| Mend | 1 | 1–4 → any ally | 60% heal | steady healing every turn | 0 cd |
-| Shield Strike | 1 | 1–2 → foe 1–2 | 70% | you gain a shield | cd 1 |
-| Ward | 2 | 1–2 → any ally | 60% shield | | cd 2 |
-| Bless | 2 | 3–4 → any ally | — | Blessed for 2 rounds | cd 2 |
-| Purify | 2 | 1–4 → any ally | — | removes every negative status | cd 2 |
-| Prayer | 3 | 3–4 → all allies | 35% heal each | | cd 3 |
+| Shield Strike | 1 | 1–2 → foe 1–2 | 70% | you gain a shield | 0 cd |
+| Ward | 2 | 1–2 → any ally | 60% shield | | 0 cd |
+| Bless | 2 | 3–4 → any ally | — | Blessed until its next flip | 0 cd |
+| Purify | 2 | 1–4 → any ally | — | removes every negative status | 0 cd |
+| Mend | 1 | 1–4 → any ally | 100% heal | | cd 1 |
+| Prayer | 3 | 3–4 → all allies | 35% heal each | | cd 2 |
 
 A heal or shield % is measured like damage: 100% heals as much as a standard hit deals (Claude).
 
-**Dark** (2–4)
+**Dark** (2–4): stress is its price, so only the big two have cooldowns.
 
 | ability | ★ | ranks | power | effect | cost |
 |---|---|---|---|---|---|
 | Shadow Bolt | 1 | 2–4 → foe 1–3 | 100% Chaos | the default attack | 0 cd, low stress |
-| Curse | 1 | 2–4 → any foe | 40% Chaos | Weakened | cd 2, low stress |
-| Hex | 2 | 2–4 → any foe | 40% Chaos | Exposed | cd 2, low stress |
-| Dark Mending | 2 | 2–4 → any ally | 120% heal | | cd 1, mid stress |
-| Mass Curse | 3 | 2–4 → all foes | — | Weakened | cd 4, high stress |
-| Doom | 4 | 2–4 → any foe | 220% Chaos | | cd 4, high stress |
+| Curse | 1 | 2–4 → any foe | 40% Chaos | Weakened | 0 cd, low stress |
+| Hex | 2 | 2–4 → any foe | 40% Chaos | Exposed | 0 cd, low stress |
+| Dark Mending | 2 | 2–4 → any ally | 120% heal | | 0 cd, mid stress |
+| Mass Curse | 3 | 2–4 → all foes | — | Weakened | cd 2, high stress |
+| Doom | 4 | 2–4 → any foe | 220% Chaos | | cd 2, high stress |
