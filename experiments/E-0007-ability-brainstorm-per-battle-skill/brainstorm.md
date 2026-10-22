@@ -84,6 +84,8 @@ A mod or ability that says "a buff" or "a debuff" picks one entry from this list
 | buff | **Riposte** (Claude) | strikes back when hit | the riposte's damage | charges |
 | buff | **Regen** | heals each round, the opposite of Poison and Burn (designer) | healing per round | rounds |
 
+**Debuffs flip coins to land** (designer, 2026-10-22: "itll need to flip coins to land (the mech exactly hasnt been decided) so mods can touch this 'accuracy'"). Buffs don't flip for now.
+
 Not on the list: shields (sustain), knockback (a move). Dodge and evasion are not planned yet (designer).
 
 ### Mod catalog (designer rulings, 2026-10-22; curated, the current state)
@@ -98,6 +100,7 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 - **One damage type per ability.** An element mod **converts all of it** to another type and adds **more** damage (multiplicative, D-0082) on top.
 - **Scaling mods scale smoothly, never at a threshold.**
 - **Universal but conditional:** a mod fits any ability that meets its condition.
+- **Coin mods fit debuff abilities too**, since debuffs flip to land: there they change the landing chance (designer, 2026-10-22).
 
 | family | limit | fits | mod | effect | notes |
 |---|---|---|---|---|---|
