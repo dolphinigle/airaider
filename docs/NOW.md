@@ -21,7 +21,7 @@
 - **Skill checks** are pure coin flips (D-0013): attribute + skill level (D-0069).
 
 ### Mercs ([design/mercs.md](design/mercs.md))
-- **Stats:** STR DEX INT CHA CON LUK (D-0079), about 10 → 20 over a career (D-0069). DEX gives speed coins, CON gives max HP, LUK (no skills) raises every coin's heads chance a little. WIL is gone; no stat touches stress. Each skill uses one attribute, a few two (D-0074, D-0079).
+- **Stats:** STR DEX INT CHA CON LUK (D-0079), about 10 → 20 over a career (D-0069). Passives (D-0080): STR +1% damage per point, DEX speed coins, INT more XP of every kind, CHA more quest gold, CON max HP, LUK (no skills) a slightly higher heads chance on every coin. WIL is gone; no stat touches stress. Each skill uses one attribute, a few two (D-0074, D-0079).
 - **Stars** (D-0069): every skill has a star (1★–5★, half steps) that sets its XP gain and, for battle skills, its abilities' modifier odds; the merc's star makes high skill stars likelier.
 - **Upgrade items:** star-up and reroll reroll only the level-up seed (D-0029, D-0032). A star-up sets a fixed star below 5★ (D-0037).
 - **Skills:**
@@ -75,7 +75,6 @@
 
 ## Waiting on the designer
 
-- **Attribute passives** (2026-10-22; survey E-0005 round 6). Locked: DEX speed coins, CON max HP, LUK heads chance. Designer: **INT = XP gain** (merc or skill XP: open); CHA = more quest gold ("maybe"); STR = HP and delete CON ("leaning"). Claude: keep CON, since STR as damage + HP makes it every frontliner's best stat and kills the tank/bruiser recruit split; if CON goes, Defense and Heavy → STR, Survival → DEX or INT.
 - **Stress at 100 without a stat** (D-0079): always Breakdown, a flat chance, or something else? Resolve stays?
 - **Check nodes** (D-0059 notes): one named skill per node; pass gives loot/buff/knowledge, fail costs; can Scouting reveal hidden nodes?
 - **Skill stress healing** is rare and weak; rest is the main relief (D-0062).

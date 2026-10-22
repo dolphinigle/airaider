@@ -86,4 +86,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0077](D-0077-check-skills-merge-to-nine-three-per-merc.md) | Check skills merge to nine, three per merc | accepted | designer | 2026-10-22 |
 | [D-0078](D-0078-check-skill-names-intimidation-and-craft.md) | Check skill names: Intimidation and Craft | accepted | designer | 2026-10-22 |
 | [D-0079](D-0079-wil-out-luk-in-luck-raises-every-coin-s-heads-odds.md) | WIL out, LUK in: luck raises every coin's heads odds | accepted | designer | 2026-10-22 |
+| [D-0080](D-0080-attribute-passives.md) | Attribute passives | accepted | designer | 2026-10-22 |
 <!-- index:end -->
