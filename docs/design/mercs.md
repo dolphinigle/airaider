@@ -43,7 +43,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 | **Polearm** | spears, halberds: strike from ranks 2â€“3, reach deep, push and pull | STR |
 | **Weapon and Shield** | one-handed weapon + shield: shield bash, block, shield wall, counter | STR + CON |
 | **Dual Wield** | two blades, two axes: multi-hits, bleeds | DEX + STR |
-| **Single Weapon** | one sword or rapier, free hand: lunge, riposte, crits (the duelist) | DEX |
+| **Single Weapon** | one sword or rapier, free hand: lunge, riposte, crits (the duelist) | STR + DEX (designer) |
 | **Unarmed** | fists, kicks, grapples, martial arts, claws and bites (werewolves) | STR + DEX |
 | **Shooting** | bows, crossbows, guns: back-rank sniper, long reach, aimed shots, volleys (D-0091) | DEX |
 | **Throwing** | knives, axes, javelins, slings: skirmisher from front or middle ranks, multi-throws, bleeds (D-0091) | STR + DEX |
