@@ -80,8 +80,9 @@ A mod or ability that says "a buff" or "a debuff" picks one entry from this list
 | buff | **Emboldened** | its attacks deal more damage | how much more | attacks |
 | buff | **Blessed** | its flips get a better heads chance | how much better | flips |
 | buff | **Riposte** (Claude) | strikes back when hit | the riposte's damage | charges |
+| buff | **Regen** | heals each round, the opposite of Poison and Burn (designer) | healing per round | rounds |
 
-Not on the list: shields (sustain), regen (over time), knockback (a move). Dodge and evasion are not planned yet (designer).
+Not on the list: shields (sustain), knockback (a move). Dodge and evasion are not planned yet (designer).
 
 ### Mod catalog (designer rulings, 2026-10-22; curated, the current state)
 
@@ -135,7 +136,8 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 | conditional | | dmg | **Splitting** | with fewer foes in reach, the damage condenses onto those left | hits several foes |
 | conditional | | heal | **Splitting** (heal) | allies at full HP are skipped, and their share condenses onto the hurt ones | heals several allies (Claude's conversion of the area-only mod) |
 | conditional | | both | **Composed** | softens its self-debuff | has one |
-| conditional | | dmg | **Potent / Lingering** | its statuses are stronger / last a round longer | inflicts a status |
+| conditional | | dmg | **Potent** | its statuses are stronger | inflicts a status |
+| conditional | | dmg | **Lingering** | its statuses get +1 count | inflicts a status; **rare, adds a lot of cooldown** (designer, like Lasting) |
 
 **Rejected (designer, 2026-10-22):** Sweeping ("sweeping bad no"); Clash (merged into smooth Executing / Opening Blow); Mighty, Second Wind (replaced by Consistent), Savage, Bane of \<family\>, Exploiting, Giant-slayer, Piercing, Vengeful, Vanguard, First Strike, Momentum, Bloodthirsty, Focused, Coordinated ("the earlier ones are all rejected"); all the Path of Exile support gem translations (Purist, Steady, Festering, Smouldering, Bulwark, Finisher, Patient, Ruthless, Twin Charge, Alternating, Consuming, Bane of \\<status\\>, Charging, Rooted, Close Quarters / Far Shot, Outnumbered, Trophy; designer: "all in (2) are rejected"). Evasive ("we dont have evasion planned yet"); Taunting ("bad"); Carry-through, Shattering. Heal drafts rejected: the five single-status cures, Fortifying, Bedside, Lasting / Potent for buffs, Well-stocked. Echo merged into Double Strike ("echo should be same").
 
@@ -237,7 +239,7 @@ Bless: 3–4 → any ally, Blessed until its next flip, 0 cd. On a buff ability,
 
 - **Lasting**: +1 count. **Rare, and adds a lot of cooldown**: "EXTREMELY strong on skills that only give 1 count".
 - **Self-blessing**: you get the buff too. **Rare, and adds a lot of cooldown.**
-- **Hastening / Emboldening**: the target also gets Haste / Emboldened, under the heal rules (ally buff family, 1 per ability, single target, reduced power).
+- **Hastening / Emboldening / Regenerating**: the target also gets Haste / Emboldened / Regen, under the heal rules (ally buff family, 1 per ability, single target, reduced power).
 - **Guarding**: the target also gains a small shield (about 10% of a standard hit).
 - **Mending**: the target also heals a little (about 20% of a standard hit).
 - **Purifying**: also removes every negative status. **Rare** on buffs (common on heals).
@@ -246,4 +248,5 @@ Bless: 3–4 → any ally, Blessed until its next flip, 0 cd. On a buff ability,
 - **Echo** (designer: "probably add echo"): small chance to fire again, one repeat at most; it is Double Strike under its non-attack name (Claude: the repeat may pick a second ally).
 - **Rejected:** Spreading ("bad"); Triage / Comforting on buffs ("'stronger buff' makes no sense").
 - Dropped as not fitting: element, status, debuffs, Vampiric, Executing / Opening Blow, Opportunist, Crushing, Splitting, Quick / Measured, Composed.
-- Open: whether a buff's potency is flipped (if so, the coin mods fit); whether Lingering (+1 count on damage statuses) should also be rare with a cooldown cost, like Lasting.
+- **No coin flips on buffs, for now** (designer: "unsure what coin flip does for skills like this, maybe no coin flips"), so the coin mods don't fit buff abilities.
+- Lingering is rare and adds a lot of cooldown too (designer: "Lingering yes").
