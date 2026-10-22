@@ -46,6 +46,7 @@
   - **Turn order:** speed coins re-flipped every round, everyone acts once. Haste and Slow change it.
   - **Coins** (D-0069): checks and attacks flip attribute + skill level (attribute alone without the skill); heads × ability base; foe defense % per type (Physical, Fire, Frost, Lightning, Chaos, D-0070); statuses on a skill flip; foes scale by HP.
   - **Costs:** cooldowns; some abilities have per-quest uses (D-0062); Dark Magic costs stress (D-0072). No mana, no stamina.
+  - **Crits** (D-0092): a merc crit turns every coin heads (max damage); a foe crit is 1.5×. Crit chance source open.
   - **Defense** (D-0070): mercs use shields, guard, buffs; % per type only from traits/gear; no misses, dodge is a charge.
   - **Interactions:** damage-type weaknesses, and statuses that raise damage taken.
   - **Foes are fixed:** they never flip.

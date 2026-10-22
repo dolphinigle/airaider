@@ -98,4 +98,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0089](D-0089-fury-and-grit-join-the-battle-skills.md) | Fury and Grit join the battle skills | accepted | designer | 2026-10-22 |
 | [D-0090](D-0090-melee-weapon-skills-by-style.md) | Melee weapon skills by style | accepted | designer | 2026-10-22 |
 | [D-0091](D-0091-ranged-splits-into-shooting-and-throwing.md) | Ranged splits into Shooting and Throwing | accepted | designer | 2026-10-22 |
+| [D-0092](D-0092-crits-every-coin-heads-for-mercs-1-5x-for-foes.md) | Crits: every coin heads for mercs, 1.5x for foes | accepted | designer | 2026-10-22 |
 <!-- index:end -->
