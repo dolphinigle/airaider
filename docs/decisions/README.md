@@ -79,4 +79,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0070](D-0070-elemental-splits-into-fire-frost-lightning-damage-types-foll.md) | Elemental splits into Fire, Frost, Lightning; damage types follow Path of Exile | accepted | designer | 2026-10-22 |
 | [D-0071](D-0071-skills-use-two-attributes-villainy-becomes-dirty-fighting.md) | Skills use two attributes; Villainy becomes Dirty Fighting | accepted | designer | 2026-10-22 |
 | [D-0072](D-0072-dark-magic-costs-stress-not-hp-and-does-not-drain-life.md) | Dark Magic costs stress, not HP, and does not drain life | accepted | designer | 2026-10-22 |
+| [D-0073](D-0073-warfare-is-deleted-leadership-works-on-your-side-dirty-fight.md) | Warfare is deleted; Leadership works on your side, Dirty Fighting on theirs | accepted | designer | 2026-10-22 |
 <!-- index:end -->

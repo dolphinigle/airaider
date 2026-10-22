@@ -50,7 +50,7 @@
   - **Interactions:** damage-type weaknesses, and statuses that raise damage taken.
   - **Foes are fixed:** they never flip.
   - **Waves** happen automatically.
-- **Rank movement:** Athletics moves yourself; Warfare moves allies and foes.
+- **Rank movement:** Leadership moves teammates; Heavy, Long-reach and Dirty Fighting move foes (D-0073); self-moves are bases in battle skills.
 - **Combo bases** (Claude idea, offered 2026-10-22): a few bases need two skills (Heavy + Holy "Holy Smite"); only mercs with both are dealt them; the ability flips the two skills' average. Skill pairs feel like classes (Crusader = Heavy + Holy, Defense at Lv 7) without hard classes. E-0005 round 4: every Darkest Dungeon class maps to 1–2 of our skills.
 - **Modifiers:** 0–4 per ability by the skill's star (D-0069). Engine-priced; the AI picks from the candidates the engine deals (D-0025, proposed).
 - **Foe families** each have a sharp twist.
@@ -63,8 +63,8 @@
 
 ## Next
 
-0. **Battle skills first, check skills later** (designer). Locked today: melee split (D-0063), Elemental split + PoE damage types (D-0070), coins = attribute + skill level, skill stars set XP gain (D-0069), defense (D-0066 → D-0070), trait stars (D-0068). Battle skills are now 20: see design/mercs.md. Open:
-   - **Two attributes per skill** (D-0071; Villainy → Dirty Fighting). Open: average of the two (Claude), the pairing draft in design/mercs.md, delete Warfare?
+0. **Battle skills first, check skills later** (designer). Locked today: melee split (D-0063), Elemental split + PoE damage types (D-0070), coins = attribute + skill level, skill stars set XP gain (D-0069), defense (D-0066 → D-0070), trait stars (D-0068). Battle skills are now 19 (Warfare deleted, D-0073): see design/mercs.md. Open:
+   - **Two attributes per skill** (D-0071; Villainy → Dirty Fighting). Open: average of the two (Claude), the pairing draft in design/mercs.md.
    - **Ability cadence** (Claude: skill levels 1, 3, 5, 7, 9).
    - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances).
    - Check skills: merges and stars later.
