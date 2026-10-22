@@ -83,69 +83,51 @@ Weapon flavor via mods (Claude's draft): axe → bleed, hammer → stun and armo
 
 Names in brackets are Claude's, placed without a ruling.
 
-**Every mod:**
+**Every mod.** "Power" means damage on an attack and healing on a heal (designer: "these are all for damaging skills… rewrod the ones that makes sense so it also covers for HEAL"). **Fits**: dmg = damaging abilities only; both = damaging and healing.
 
-| mod | effect | notes |
-|---|---|---|
-| **Fiery / Frosty / Charged / Dark / Brutal** | the damage becomes Fire / Frost / Lightning / Chaos / Physical, and more damage | Claude's reading: on an ability already of that type, it only adds the more damage |
-| **Bleeding / Poisoning / Burning / Shocking / Chilling** | inflicts that status, worth ~10% of the damage | statuses may get a slightly higher multiplier (balancer) |
-| **Stunning** | stun | rarer |
-| **Heavy** | knock the target back 1 rank | rarer |
-| **Marking** | mark: allies deal more to it | |
-| **Exposing / Weakening / Hampering** | takes more damage / deals less / acts later | Claude's |
-| **Swift** | you act earlier next round | |
-| **Evasive / Riposting** | gain a dodge / riposte charge | Claude's; rarer |
-| **Guarding** | shield worth 10% of the damage dealt | |
-| **Vampiric** | heal a small share of the damage | rare |
-| **Advancing / Retreating** | you step forward / back 1 rank | exclusive |
-| **Reaching** | reaches 1 rank further (foe 1–2 → 1–3) | |
-| **Footwork** | usable from 1 more rank (from 1–2 → 1–3) | |
-| **Executing** | more damage the more HP the target has lost | smooth (was: below half HP, +20%) |
-| **Opening Blow** | more damage the more HP the target has left | smooth (was: full HP, +20%) |
-| **Desperate** | more damage the more HP you have lost | higher % than Fresh ("having high hp is a lot easier") |
-| **Fresh** | more damage the more HP you have left | |
-| **Haunted** | more damage the more stress you have | |
-| **Serene** | more damage the less stress you have | Claude's name |
-| **Opportunist** | more damage against a foe with any status | ~15–20% |
-| **Crushing** | more damage against shielded or armored foes | |
-| **Lucky** | +5% heads chance (number open) | |
-| **Consistent** | reroll a bad flip once (under 20% heads) | designer's |
-| **Gamble** | all coins land the same: all heads or all tails; +10% more damage | designer's |
-| **Wild** | its target is picked at random | rare, more damage |
-| **Unsteady** | moves you back or forward 1 rank at random | rare, more damage |
-| **Blood Price** | costs you HP | rare, more damage |
-| **Fraught** | gives you stress | rare, more damage |
-| **Ponderous** | you act last | rare, more damage |
-| **Unique** | massively more damage, but usable once per battle or per quest (open) | rare |
-| **Double Strike** | small chance to hit again | one repeat at most |
-| **Soothing** | lowers your stress when used | rare |
-| **Quick** | −1 cooldown | has a cooldown |
-| **Measured** | much more damage, +1 cooldown | has a cooldown |
-| **Splitting** | with fewer targets, damage condenses onto those left | hits several foes |
-| **Potent** | its statuses are stronger | inflicts a status |
-| **Lingering** | its statuses last a round longer | inflicts a status |
-| **Composed** | softens its self-debuff | has one |
+| mod | effect | fits | notes |
+|---|---|---|---|
+| **Fiery / Frosty / Charged / Dark / Brutal** | the damage becomes Fire / Frost / Lightning / Chaos / Physical, and more damage | dmg | Claude's reading: on an ability already of that type, it only adds the more damage |
+| **Bleeding / Poisoning / Burning / Shocking / Chilling** | inflicts that status, worth ~10% of the damage | dmg | statuses may get a slightly higher multiplier (balancer) |
+| **Stunning** | stun | dmg | rarer |
+| **Heavy** | knock the target back 1 rank | dmg | rarer |
+| **Marking** | mark: allies deal more to it | dmg | |
+| **Exposing / Weakening / Hampering** | takes more damage / deals less / acts later | dmg | Claude's |
+| **Swift** | you act earlier next round | both | |
+| **Evasive / Riposting** | gain a dodge / riposte charge | both | Claude's; rarer |
+| **Guarding** | gain a shield worth 10% of the damage or healing done | both | on a heal, Claude leans the shield goes to the healed ally |
+| **Vampiric** | heal yourself for a small share of the damage | dmg | rare |
+| **Advancing / Retreating** | you step forward / back 1 rank | both | exclusive |
+| **Reaching** | reaches 1 rank further (1–2 → 1–3) | both | |
+| **Footwork** | usable from 1 more rank (from 1–2 → 1–3) | both | |
+| **Executing** | more power the more HP the target has lost | both | smooth; a heal gives more to the badly hurt |
+| **Opening Blow** | more power the more HP the target has left | both | smooth; a heal tops up the barely hurt (Claude: weak on heals, maybe dmg only) |
+| **Desperate** | more power the more HP you have lost | both | higher % than Fresh ("having high hp is a lot easier") |
+| **Fresh** | more power the more HP you have left | both | |
+| **Haunted** | more power the more stress you have | both | |
+| **Serene** | more power the less stress you have | both | Claude's name |
+| **Opportunist** | more power on a target with any status | both | ~15–20%; a heal on an ally who is bleeding, stunned… |
+| **Crushing** | more damage against shielded or armored foes | dmg | |
+| **Lucky** | +5% heads chance (number open) | both | |
+| **Consistent** | reroll a bad flip once (under 20% heads) | both | designer's |
+| **Gamble** | all coins land the same, all heads or all tails; +10% more power | both | designer's |
+| **Wild** | its target is picked at random | both | rare, more power |
+| **Unsteady** | moves you back or forward 1 rank at random | both | rare, more power |
+| **Blood Price** | costs you HP | both | rare, more power |
+| **Fraught** | gives you stress | both | rare, more power |
+| **Ponderous** | you act last | both | rare, more power |
+| **Unique** | massively more power; its uses drop one step: unlimited → once per battle, once per battle → once per quest | both | rare; Claude's rule (designer: "up to you") |
+| **Double Strike** | small chance to fire again | both | one repeat at most |
+| **Soothing** | lowers your stress when used | both | rare |
+| **Quick** | −1 cooldown | both | has a cooldown |
+| **Measured** | much more power, +1 cooldown | both | has a cooldown |
+| **Splitting** | with fewer targets, the power condenses onto those left | both | hits several targets |
+| **Potent** | its statuses are stronger | dmg | inflicts a status |
+| **Lingering** | its statuses last a round longer | dmg | inflicts a status |
+| **Composed** | softens its self-debuff | both | has one |
 
-**Rejected (designer, 2026-10-22):** Sweeping ("sweeping bad no"); Clash (merged into smooth Executing / Opening Blow); Mighty, Second Wind (replaced by Consistent), Savage, Bane of \<family\>, Exploiting, Giant-slayer, Piercing, Vengeful, Vanguard, First Strike, Momentum, Bloodthirsty, Focused, Coordinated ("the earlier ones are all rejected").
+**Rejected (designer, 2026-10-22):** Sweeping ("sweeping bad no"); Clash (merged into smooth Executing / Opening Blow); Mighty, Second Wind (replaced by Consistent), Savage, Bane of \<family\>, Exploiting, Giant-slayer, Piercing, Vengeful, Vanguard, First Strike, Momentum, Bloodthirsty, Focused, Coordinated ("the earlier ones are all rejected"); all the Path of Exile support gem translations (Purist, Steady, Festering, Smouldering, Bulwark, Finisher, Patient, Ruthless, Twin Charge, Alternating, Consuming, Bane of \\<status\\>, Charging, Rooted, Close Quarters / Far Shot, Outnumbered, Trophy; designer: "all in (2) are rejected").
 
 **Not yet ruled (Claude's):**
-- From the Path of Exile support gems (PoE1 list on poedb, PoE2 list on mein-mmo; turn-based translations only):
-  - Purist (Brutality): more damage, no element or status mods.
-  - Steady (Controlled Destruction): more damage, can't crit.
-  - Festering (Deadly Poison): less hit damage, stronger statuses.
-  - Smouldering (Eternal Flame): statuses last longer but are weaker.
-  - Bulwark (Flesh Shield): deal less and take less until your next turn.
-  - Finisher (Combo Finisher): more for each other ability used since this one last fired.
-  - Patient (Unleash): more for each round unused, up to 3.
-  - Ruthless: every third use hits much harder.
-  - Twin Charge: two uses per cooldown.
-  - Alternating: more if your last ability came from a different skill.
-  - Consuming (Exploit Weakness): removes a status from the target for bonus damage.
-  - Bane of \<status\> (Hypothermia): more against one named status; can't inflict it.
-  - Charging: more if you changed rank since your last turn.
-  - Rooted (Stoicism): more for each round you stayed put.
-  - Close Quarters / Far Shot: more against the nearest / farthest ranks.
-  - Outnumbered (Defy): more for each foe beyond your side's count.
-  - Trophy (Behead): a kill takes one of the foe's buffs.
 - Taunting: foes hit must target you next round.
 - Cleave-only: Carry-through, Shattering, Reckless.
