@@ -25,7 +25,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 - Only the core skill counts in a test. The exact name colors the text ("Atlas swings his sword").
 - Skills have their **own XP** and level up separately from the merc (D-0012).
 
-**Two kinds (D-0058):** **battle skills** give abilities; **check skills** give none. Every skill can be checked (Doctor, Leadership too). Quotas: 3 battle skills (2 at the start, 1 at Lv 7; working) and **3 check skills** (D-0076). Civilians have check skills only.
+**Two kinds (D-0058):** **battle skills** give abilities; **check skills** give none. Every skill can be checked (Doctor, Leadership too). Quotas: 3 battle skills (2 at the start, 1 at Lv 7; working) and **3 check skills** (D-0077). Civilians have check skills only.
 
 **Coins (D-0069):** a check flips **attribute + skill level** if the merc has the skill, else the attribute alone (Survival check: DEX + Survival, or just DEX). An attack flips **its attribute + its battle skill's level**; each head deals the ability's base damage.
 
@@ -57,26 +57,21 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 
 **Damage types (D-0070):** Physical, Fire, Frost, Lightning, Chaos. Poison and bleed are statuses.
 
-### Check skills (14)
+### Check skills (9)
 
-No abilities; flipped in check nodes (D-0059). The 14 stay unmerged; 3 per merc (D-0076).
+No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0077). Attributes: Claude's draft, open.
 
-| skill | covers | usual attr |
+| skill | covers | draft attr |
 |---|---|---|
-| **Athletics** | climbing, swimming, running, hauling | STR, DEX |
-| **Survival** | foraging, camping, weather, terrain, trails | CON, INT |
-| **Awareness** | spotting ambushes, keeping watch, searching | DEX, INT |
+| **Athletics** | climbing, swimming, running, hauling | STR |
+| **Survival** | foraging, camping, weather, terrain, trails | CON |
+| **Awareness** | spotting ambushes, keeping watch, searching | WIL |
 | **Roguery** | locks, pockets, traps, forgery | DEX |
 | **Streetwise** | rumors, finding people, city ways | CHA |
-| **Persuasion** | charm, diplomacy | CHA |
-| **Deception** | lies, bluffs, disguises | CHA |
-| **Bargaining** | haggling, appraising | CHA |
-| **Intimidation** | threats, interrogation | CHA, STR |
-| **Civilization Lore** | the past, languages, peoples, faiths | INT |
-| **Nature Lore** | plants, beasts, natural monsters (D-0062) | INT |
-| **Arcane Lore** | undead, demons, curses, relics | INT, WIL |
-| **Engineering** | building, machines, explosives, traps (D-0062) | INT |
-| **Smithing** | weapons, armor, repairs | STR |
+| **Persuasion** | charm, diplomacy, haggling, appraising (+ Bargaining) | CHA |
+| **Deception** | lies, bluffs, disguises, threats, interrogation (+ Intimidation) | CHA |
+| **Lore** | the past, peoples, faiths; plants, beasts, monsters; undead, demons, curses, relics (three lores merged) | INT |
+| **Engineering** | building, machines, explosives, traps; weapons, armor, repairs (+ Smithing) | INT |
 
 ## Talents (D-0018)
 
