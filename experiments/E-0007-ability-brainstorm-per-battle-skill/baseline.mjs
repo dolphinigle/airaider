@@ -198,7 +198,7 @@ export const SKILLS = [
       '2|Shield Self and Taunt|1–2|self|60% shield|Taunting 1 round|cd 1|new',
       '2|Brace and Taunt|1–2|self||Taunting 2 rounds; Braced|cd 1|new',
       '3|Shield All Allies|1–2|all allies|30% shield each||cd 2|new',
-      '4|Guard All Allies|1|all allies||Guarded 1 round|cd 4|new',
+      '4|Hardening Guard|1–2|any ally||Guarded 2 rounds; each hit you take for it gives you a 20% shield|cd 2|new',
     ] },
   { name: 'Berserk', attr: 'STR', ranks: '1–4', role: 'front damage', state: 'new',
     id: 'Takes risks for more damage. Its self buffs work from any rank: pay 20% of your HP to enter Raging.',
@@ -404,7 +404,7 @@ export const SKILLS = [
 export const NEW_STATUSES = [
   ['Braced', 'takes less damage', 'Weapon and Shield, Defender, Survivor, Leadership, Retaliation, Carousing'],
   ['Taunting', 'foes in reach target you first', 'Weapon and Shield, Defender, Retaliation'],
-  ['Guarded', 'on an ally: you take the hits meant for it', 'Defender'],
+  ['Guarded', 'on an ally: you take the hits meant for it; one guard guards one ally at a time (designer)', 'Defender'],
   ['Raging', 'the berserk state: your attacks deal much more damage', 'Berserk'],
   ['Keen', 'your next attack crits more often', 'Precision'],
   ['Empowered', 'your next action has more power', 'Concentration'],
