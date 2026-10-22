@@ -455,7 +455,8 @@ export const CALLS = [
   'Holy keeps a weak ally shield, front-rank only (Shield Ally, 1–2).',
   'Animal Companion\'s pet attacks count as a default attack like any 0-cd damage ability.',
   'Braced (takes less damage) goes on the effects list as a buff; D-0070 allows defense from buffs.',
-  'Beast Blood and Ancient Blood are two skills, not one (designer asked; Claude\'s call): the hunter and the old power are different identities, and one merged pool would blur like Animal Companion. They are exclusive skills (designer): offered, never innate, and only to mercs of that blood or to shapeshifters (werewolves), as a starting skill or a Lv 7 option; at most one blood skill per merc. They are not weapon skills, so a wolfkin can claw and swing an axe.\n  'Ancient Blood\'s element is set by the merc\'s bloodline: Fire (Burn), Frost (Chilled), Lightning (Shocked) or Chaos (Weakened). A red dragonkin breathes fire, a frost giant frost.',
+  'Beast Blood and Ancient Blood are two skills, not one (designer asked; Claude\'s call): the hunter and the old power are different identities, and one merged pool would blur like Animal Companion. They are exclusive skills (designer): offered, never innate, and only to mercs of that blood or to shapeshifters (werewolves), as a starting skill or a Lv 7 option; at most one blood skill per merc. They are not weapon skills, so a wolfkin can claw and swing an axe.',
+  'Ancient Blood\'s element is set by the merc\'s bloodline: Fire (Burn), Frost (Chilled), Lightning (Shocked) or Chaos (Weakened). A red dragonkin breathes fire, a frost giant frost.',
   'Carousing\'s hangovers reuse Weakened and Slowed; All-Out Bender costs your next turn.',
 ];
 
