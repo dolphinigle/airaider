@@ -57,9 +57,9 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 | **Stealth** | hiding, ambush strikes | DEX |
 | **Doctor** | healing; limited uses per quest (D-0062) | INT |
 | **Alchemy** | potions, poisons, flasks; limited uses per quest | INT |
-| **Fire Magic** ✦ | fire damage, burns (D-0070) | STR + INT |
-| **Frost Magic** ✦ | frost damage, slows | DEX + INT |
-| **Lightning Magic** ✦ | lightning damage, chains | INT |
+| **Fire Magic** | fire damage, burns (D-0070); not rare (designer) | STR + INT |
+| **Frost Magic** | frost damage, slows | DEX + INT |
+| **Lightning Magic** | lightning damage, chains | INT |
 | **Holy Magic** ✦ | healing, blessing, warding off the dead; deals mostly Physical | CHA |
 | **Dark Magic** ✦ | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | CHA + CON |
 
