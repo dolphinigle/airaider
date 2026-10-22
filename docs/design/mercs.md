@@ -35,7 +35,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 
 ### Battle skills (23)
 
-âœ¦ = rare: **only Dark Magic** (designer, 2026-10-22). **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). Pairings: D-0086 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
+**No skill is rare** (D-0093): rarity lives in stars. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). Pairings: D-0086 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
 
 | skill | covers | attributes |
 |---|---|---|
@@ -61,7 +61,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 | **Frost Magic** | frost damage, slows | DEX + INT |
 | **Lightning Magic** | lightning damage, chains | INT |
 | **Holy Magic** | healing, blessing, warding off the dead; deals mostly Physical | CHA |
-| **Dark Magic** âœ¦ | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | CHA + CON |
+| **Dark Magic** | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | CHA + CON |
 
 **Weapon skills are styles (D-0090). At most one per merc:** Two-handed, Polearm, Weapon and Shield, Dual Wield, Single Weapon, Unarmed, Shooting or Throwing (D-0091); the rest combine freely. Weapon flavor (axe, hammer, sword) comes from modifiers and the AI's pick and name. Attributes of the new ones: Claude's draft.
 
