@@ -65,6 +65,7 @@
 
 0. **Battle skills first, check skills later** (designer). Open now:
    - **Attributes stay for checks; in combat only indirectly** (D-0064: CON → HP). Abilities flip skill coins only. Open: Claude's hooks (STR phys dmg %, DEX speed, INT magic dmg % + status length, CHA heal/buff %, CON HP, WIL stress).
+   - **Damage coins:** designer asked if attribute coins for damage is too extreme. Claude: not numerically, but it makes skills just keys and skill XP pointless in fights; keep skill coins = the flip (D-0064). Alternative to try in the mock: two flips (attribute = damage, skill = effect).
    - **Melee split** (D-0063, proposed): Fast, Cleaving, Heavy, Long-reach.
    - **Elemental:** one skill with element tags (Claude) or split?
    - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances).
