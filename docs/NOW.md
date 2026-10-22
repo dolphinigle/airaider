@@ -64,9 +64,12 @@
 
 ## Next
 
-0. **NEXT SESSION STARTS HERE.** The skill roster is **done** (designer: "ok all good now"). Pick the next thread from item 1 (Claude suggests ability cadence + status model, then the fight mock in item 2). Roster (D-0099): 29 battle skills (8 weapon + 21 others) + 11 check skills. Last in: Carousing (CHA + CON, **doping**: take something for a big self-buff, pay after; all one-time-use abilities; designer note in design/mercs.md) and Concentration (INT flex, empowers your next action, D-0098); Roguery is Thievery. Generic category names the AI skins; two flex skills per single attribute; no skill dedicated to lowering resistances (D-0097).
-   - Also open: Warfare's scope (draft: combined attacks with an ally, breaking foe shields, formation tricks; Leadership keeps moving teammates and focus fire); Precision vs LUK (both raise heads chance).
-   - From E-0005 round 10, to rule: Highwayman's blade + pistol vs one weapon skill; can bases outside D-0073's skills move foes; stress healing as a support role (ours is rare, weak).
+0. **NOW: toward a playtest-ready fight** (designer, 2026-10-22). Goal: learn whether the game is promising and fun; exact balance comes later. Four steps:
+   1. **(here)** Brainstorm abilities per battle skill **together, with designer samples**, to give each skill its identity and guide (E-0007 `brainstorm.md`).
+   2. A balance frame: the damage formula, foe HP, target turns per fight, using Darkest Dungeon as the guide.
+   3. Foe design, then a few mock foes, learning from Darkest Dungeon as closely as possible.
+   4. Design the abilities with that balance.
+   - Roster done (D-0099); 13 battle skills can be checked (D-0100). Also open: Warfare's scope; Precision vs LUK; from E-0005 round 10: Highwayman blade + pistol, foe moves outside D-0073, stress healing.
 1. **Battle and check skills, still open:**
    - **Ability cadence** (Claude: a new ability at skill levels 1, 3, 5, 7, 9).
    - **Status effects model:** Pokémon style or Darkest Dungeon style (Claude leans Darkest Dungeon).
