@@ -6,7 +6,7 @@ status: running           # planned | running | done | abandoned
 type: research            # sim | playtest | lab | judge | research
 question: What abilities could each of the 29 battle skills give, drawn from Darkest Dungeon and other games?
 verdict:                  # one line, filled in when done: the answer
-decisions: []             # decisions it led to or proposed, e.g. [D-0005]
+decisions: [D-0101]       # decisions it led to or proposed, e.g. [D-0005]
 commit:                   # the commit or tag of the code it ran on, if any
 ---
 
@@ -22,7 +22,12 @@ Done together with the designer, skill by skill, with designer samples (2026-10-
 
 ## Result
 
-(pending)
+So far (2026-10-23), all in `brainstorm.md`:
+- **Conventions:** damage as a % of a standard hit; few cooldowns; default attacks only on weapon and magic skills; stuns always limited; debuffs flip to land.
+- **Effects list** (count and potency) and the **mod catalog** (designer: "we have all the mods proper"). Mods are outside skill identities.
+- **Key identities for all 29 battle skills**, with ranks, main role, strong and weak effects, a distribution by effect, rank and role, and example two- and three-skill builds. Rejected identities: the Single Weapon duel, Unarmed combos ("too many turns required to 'go online'"), Frost build-and-shatter.
+- Model abilities: Two-handed, Holy, Dirty Fighting reviewed; Polearm, Fire, Frost, Lightning, Dark drafted.
+- **Plan change (designer, 2026-10-23):** the abilities are "decent enough that we can stop here". Step 4 (balance, then redo the abilities) is dropped for now. Last task here: baseline abilities for every battle skill, published as an Artifact for a rough review.
 
 ## Verdict
 
