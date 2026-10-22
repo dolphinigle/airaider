@@ -127,7 +127,7 @@ export const SKILLS = [
       '2|Back-Rank Fire Lash|2–3|foe 3–4|70%|Burn|0 cd|new',
       '2|Cauterize Wounds|1–4|any ally|20% Fire damage to the ally|removes Bleed, Poison and Burn|0 cd|new',
       '3|Fireball|3–4|foe 1, 2 and 3|50% each|Burn|cd 2|kept',
-      '4|Spreading Flames|3–4|foe 1–2|60%|Burn; when its Burn ends, it jumps to the foe next to it|0 cd|new',
+      '4|Detonate Burn|3–4|foe 1–2|30%|the foe takes all of its remaining Burn damage now, and the Burn ends|0 cd|new',
     ] },
   { name: 'Frost', attr: 'DEX + INT', ranks: '2–4', role: 'reach damage; control', state: 'redone',
     id: 'Shields itself, stuns (Frozen), moderate single-target damage; Chilled slows. No area.',
