@@ -201,13 +201,12 @@ Stress costs for Dark are low / mid / high for now (the balancer sets them).
 | Thunderclap | 3 | 3–4 → all foes | 30% each | Shocked | cd 2 |
 | Overload | 4 | 3–4 → any foe | 250% | | cd 3 |
 
-**Holy** (1–4) (designer changes 2026-10-22: Smite 60%, "weak but flexible"; abilities needing concentration (Prayer, Bless) are back-rank only, 3–4; shield abilities are front-rank only, 1–2, "crusader ish", such as deal damage and shield yourself; Mend has a cooldown, Shield Strike has none.)
+**Holy** (1–4) (designer changes 2026-10-22: Smite 60%, "weak but flexible"; abilities needing concentration (Prayer, Bless) are back-rank only, 3–4; shield abilities are front-rank only, 1–2, "crusader ish", such as deal damage and shield yourself; Mend has a cooldown, Shield Strike has none; Ward removed.)
 
 | ability | ★ | ranks | power | effect | cost |
 |---|---|---|---|---|---|
 | Smite | 1 | 1–4 → any foe | 60% | the default attack: weak but usable anywhere (Claude reads "usable on 1-4" as both ranks) | 0 cd |
 | Shield Strike | 1 | 1–2 → foe 1–2 | 70% | you gain a shield | 0 cd |
-| Ward | 2 | 1–2 → any ally | 60% shield | | 0 cd |
 | Bless | 2 | 3–4 → any ally | — | Blessed until its next flip | 0 cd |
 | Purify | 2 | 1–4 → any ally | — | removes every negative status | 0 cd |
 | Mend | 1 | 1–4 → any ally | 100% heal | | cd 1 |
