@@ -307,6 +307,7 @@ export const SKILLS = [
       '2|Pet Poison Attack|1–4|foe 1–2|50%|Poison|0 cd|new',
       '2|Pet Pulling Attack|1–4|foe 2–3|50%|pulls the foe forward 1 rank|0 cd|new',
       '2|Pet Heals Ally|1–4|ally next to you|60% heal||cd 2|new',
+      '2|Pet Comforts Ally|1–4|another ally||the ally loses a little stress|cd 2|new',
       '3|Pet Marks Foe|1–4|any foe||Mark|0 cd|new',
       '3|Pet Stunning Attack|1–4|foe 1|30%|Stun|cd 3|new',
       '4|Pet Three-Foe Attack|1–4|foe 1, 2 and 3|60% each||cd 2|new',

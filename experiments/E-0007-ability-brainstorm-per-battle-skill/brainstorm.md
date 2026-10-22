@@ -32,7 +32,7 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 - **Warfare buffs the allies it moves** (designer, 2026-10-23: "warfare is completely underpowered. in addition to moving it should also buff the moved allies"). Rearrange Squad removed (designer: "unclear how to perofrm it well").
 - **Performance has a Regen-all song** (designer, 2026-10-23).
 - **Extra turn for an ally** (designer, 2026-10-23: "performance should have a FOUR or FIVE star skill that lets another ally act again, once per battle/quest. leadership too"): 5★, once per battle, in Performance and Leadership (Claude's picks: 5★, per battle).
-- **Animal Companion names are generic by what the pet does** (designer, 2026-10-23: "pounce should be more generic, e.g., pet attack short range, pet attack mid range"), since the AI fits the pet: Pet Attack, Short / Mid Range; Pet Bleeding Attack; Pet Heals Ally.
+- **Animal Companion names are generic by what the pet does** (designer, 2026-10-23: "pounce should be more generic, e.g., pet attack short range, pet attack mid range"), since the AI fits the pet: Pet Attack, Short / Mid Range; Pet Bleeding Attack; Pet Heals Ally. A weak stress relief too (designer): Pet Comforts Ally, another ally only (Survivor alone lowers its own stress).
 - **Guard is one to one** (designer, 2026-10-23: "guard is only one person guarded by one. one person cannot guard 2 at the same time"); Guard All Allies is out.
 - **No doubling** (designer, 2026-10-23: "doubling in general is bad because expo damage"): no ability doubles a status or a value; cash it in instead (Burst Bleed, Burst Poison, like Detonate Burn).
 
