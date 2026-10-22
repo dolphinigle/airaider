@@ -31,30 +31,30 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 
 ### Battle skills (20)
 
-✦ = rare. "attr" = the attribute it attacks with (working, Claude's draft).
+✦ = rare. **Two attributes per skill** (D-0071); working: the flip uses their average + skill level. Pairings are Claude's draft, balanced so each attribute feeds 6–7 skills.
 
-| skill | covers | attr |
+| skill | covers | attributes |
 |---|---|---|
-| **Fast Weapons** | swords, daggers, rapiers: multi-hits, bleeds, crits (D-0063) | DEX |
-| **Cleaving Weapons** | greatswords, axes: hits two adjacent foes | STR |
-| **Heavy Weapons** | hammers, clubs, maces: stuns, armor break, knockback | STR |
-| **Long-reach Weapons** | polearms, spears: strikes from rank 2–3, reaches deep | STR |
-| **Unarmed** | fists, kicks, grapples, martial arts, claws and bites (werewolves) | DEX |
-| **Ranged** | bows, crossbows, guns, slings, throwing (weapon tags) | DEX |
-| **Defense** | shields, taunts, guarding, party shields | CON |
-| **Warfare** | debuffs, moving teammates and foes | INT |
-| **Leadership** | party auras, Resolve; rare, weak stress healing (D-0062) | CHA |
-| **Performance** | songs, Haste, distraction; rare, weak stress healing | CHA |
-| **Animal Companion** | a fighting pet, like the Houndmaster (no rank of its own) | CHA |
-| **Villainy** | bounty hunter: marks, pulls, dirty fighting | STR |
-| **Stealth** | hiding, ambush strikes | DEX |
-| **Doctor** | healing; limited uses per quest (D-0062) | INT |
-| **Alchemy** | potions, poisons, flasks; limited uses per quest | INT |
-| **Fire Magic** ✦ | fire damage, burns (D-0070) | INT |
-| **Frost Magic** ✦ | frost damage, slows | INT |
-| **Lightning Magic** ✦ | lightning damage, chains | INT |
-| **Holy Magic** ✦ | healing, blessing, warding off the dead; deals mostly Physical | CHA |
-| **Dark Magic** ✦ | curses, necromancy, draining life; deals Chaos; **its abilities cost HP** (D-0060) | WIL |
+| **Fast Weapons** | swords, daggers, rapiers: multi-hits, bleeds, crits (D-0063) | DEX + STR |
+| **Cleaving Weapons** | greatswords, axes: hits two adjacent foes | STR + CON |
+| **Heavy Weapons** | hammers, clubs, maces: stuns, armor break, knockback | STR + CON |
+| **Long-reach Weapons** | polearms, spears: strikes from rank 2–3, reaches deep | STR + CON |
+| **Unarmed** | fists, kicks, grapples, martial arts, claws and bites (werewolves) | DEX + STR |
+| **Ranged** | bows, crossbows, guns, slings, throwing (weapon tags) | DEX + WIL |
+| **Defense** | shields, taunts, guarding, party shields | CON + STR |
+| **Warfare** | debuffs, moving teammates and foes (deletion under discussion) | INT + STR |
+| **Leadership** | party auras, Resolve; rare, weak stress healing (D-0062) | CHA + WIL |
+| **Performance** | songs, Haste, distraction; rare, weak stress healing | CHA + DEX |
+| **Animal Companion** | a fighting pet, like the Houndmaster (no rank of its own) | CHA + CON |
+| **Dirty Fighting** | was Villainy (D-0071): marks, pulls, blinds, cheap shots | STR + CHA |
+| **Stealth** | hiding, ambush strikes | DEX + INT |
+| **Doctor** | healing; limited uses per quest (D-0062) | INT + CHA |
+| **Alchemy** | potions, poisons, flasks; limited uses per quest | INT + DEX |
+| **Fire Magic** ✦ | fire damage, burns (D-0070) | INT + WIL |
+| **Frost Magic** ✦ | frost damage, slows | INT + WIL |
+| **Lightning Magic** ✦ | lightning damage, chains | INT + DEX |
+| **Holy Magic** ✦ | healing, blessing, warding off the dead; deals mostly Physical | CHA + WIL |
+| **Dark Magic** ✦ | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | WIL + INT |
 
 **Damage types (D-0070):** Physical, Fire, Frost, Lightning, Chaos. Poison and bleed are statuses.
 

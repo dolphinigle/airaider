@@ -66,7 +66,7 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0057](D-0057-quests-are-a-sequence-of-nodes-combat-or-skill-check.md) | Quests are a sequence of nodes: combat or skill check | accepted | designer | 2026-10-22 |
 | [D-0058](D-0058-battle-skills-and-check-skills-are-separate-with-their-own-q.md) | Battle skills and check skills are separate with their own quotas | accepted | designer | 2026-10-22 |
 | [D-0059](D-0059-quest-preview-shows-the-fixed-node-line-some-nodes-hidden.md) | Quest preview shows the fixed node line, some nodes hidden | accepted | designer | 2026-10-22 |
-| [D-0060](D-0060-dark-magic-is-paid-in-hp-guns-are-ranged.md) | Dark Magic is paid in HP; guns are Ranged | accepted | designer | 2026-10-22 |
+| [D-0060](D-0060-dark-magic-is-paid-in-hp-guns-are-ranged.md) | Dark Magic is paid in HP; guns are Ranged | superseded → D-0072 | designer | 2026-10-22 |
 | [D-0061](D-0061-unarmed-covers-claws-and-bites-shapeshifting-and-stances-dro.md) | Unarmed covers claws and bites; shapeshifting and stances dropped | superseded → D-0063 | designer | 2026-10-22 |
 | [D-0062](D-0062-nature-lore-and-engineering-leave-combat-per-quest-uses-stre.md) | Nature Lore and Engineering leave combat; per-quest uses; stress healing in fights is rare | accepted | designer | 2026-10-22 |
 | [D-0063](D-0063-melee-splits-into-fast-cleaving-heavy-and-long-reach-weapons.md) | Melee splits into Fast, Cleaving, Heavy and Long-reach weapons | accepted | designer | 2026-10-22 |
@@ -77,4 +77,6 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0068](D-0068-traits-have-stars-passives-scale-a-little-with-the-star.md) | Traits have stars; passives scale a little with the star | accepted | designer | 2026-10-22 |
 | [D-0069](D-0069-coins-are-attribute-plus-skill-level-skill-stars-set-xp-gain.md) | Coins are attribute plus skill level; skill stars set XP gain; abilities come at some skill levels | accepted | designer | 2026-10-22 |
 | [D-0070](D-0070-elemental-splits-into-fire-frost-lightning-damage-types-foll.md) | Elemental splits into Fire, Frost, Lightning; damage types follow Path of Exile | accepted | designer | 2026-10-22 |
+| [D-0071](D-0071-skills-use-two-attributes-villainy-becomes-dirty-fighting.md) | Skills use two attributes; Villainy becomes Dirty Fighting | accepted | designer | 2026-10-22 |
+| [D-0072](D-0072-dark-magic-costs-stress-not-hp-and-does-not-drain-life.md) | Dark Magic costs stress, not HP, and does not drain life | accepted | designer | 2026-10-22 |
 <!-- index:end -->

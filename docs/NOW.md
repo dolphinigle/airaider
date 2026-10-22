@@ -31,7 +31,7 @@
   - A merc level up gives attributes only. **Some battle-skill level ups give a new ability** (working: skill levels 1, 3, 5, 7, 9): the AI picks one of a few dealt bases from that skill and renames it. Never the same base twice. Four equipped (D-0069).
   - 10–20 bases per battle skill (D-0069).
   - Weapon tags filter bases; Unarmed is its own skill; no medium tier (D-0045).
-  - Dark Magic abilities cost HP; guns are a Ranged weapon tag (D-0060).
+  - Dark Magic abilities cost stress, no life drain; guns are a Ranged weapon tag (D-0072).
   - The first ability is always a 0-cooldown attack, with a generic fallback (Smash, Kick); generic bases also come up rarely later (D-0050, D-0051).
   - The player sees only the AI name (D-0048).
 - **Passives are traits:** gender, race, personality, body. They never touch coins (D-0036, D-0038–D-0040). Traits have stars; passives scale a little with them (D-0068; Claude: 5★ = 1.5×).
@@ -64,7 +64,7 @@
 ## Next
 
 0. **Battle skills first, check skills later** (designer). Locked today: melee split (D-0063), Elemental split + PoE damage types (D-0070), coins = attribute + skill level, skill stars set XP gain (D-0069), defense (D-0066 → D-0070), trait stars (D-0068). Battle skills are now 20: see design/mercs.md. Open:
-   - **Attribute per battle skill** (Claude's draft in design/mercs.md).
+   - **Two attributes per skill** (D-0071; Villainy → Dirty Fighting). Open: average of the two (Claude), the pairing draft in design/mercs.md, delete Warfare?
    - **Ability cadence** (Claude: skill levels 1, 3, 5, 7, 9).
    - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances).
    - Check skills: merges and stars later.
