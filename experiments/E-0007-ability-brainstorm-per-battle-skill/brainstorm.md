@@ -62,20 +62,24 @@ Weapon flavor via mods (Claude's draft): axe → bleed, hammer → stun and armo
 
 A mod or ability that says "a buff" or "a debuff" picks one entry from this list. Entries marked (Claude) are unruled.
 
-| kind | effect | what it does |
-|---|---|---|
-| damage status | **Bleed / Poison / Burn / Shocked / Chilled** | one per damage type: Physical / Chaos / Fire / Lightning / Frost; what each does is open |
-| debuff | **Stun** | loses its next turn (rarer); **always on a cooldown**; **single target only for now**, no multi-foe stun (designer: "ground slam bad, dont have multi stun for now") |
-| debuff | **Mark** | allies deal more to it |
-| debuff | **Sundered** | Physical defense down (Sunder) |
-| debuff | **Exposed** (Claude) | takes more damage |
-| debuff | **Weakened** (Claude) | deals less damage |
-| debuff | **Slowed** (Claude) | acts later next round |
-| self-debuff | **Staggered** | acts last next round and takes more damage (Titanic Swing) |
-| buff | **Haste** | acts earlier next round |
-| buff | **Emboldened** | its next attack deals more damage |
-| buff | **Blessed** | its next flip gets a better heads chance |
-| buff | **Riposte** (Claude) | a riposte charge |
+**Count and potency** (designer, 2026-10-22): every buff and debuff has a **count** (how many rounds, hits or flips it lasts) and most have a **potency** (how strong it is), e.g. Poison potency 5, count 3. Some have count only. Which unit each count uses is Claude's draft.
+
+| kind | effect | what it does | potency | count |
+|---|---|---|---|---|
+| damage status | **Bleed / Poison / Burn** | deals Physical / Chaos / Fire damage each round | damage per round | rounds |
+| damage status | **Shocked** | the next hit on it deals more (Lightning) | how much more | hits |
+| damage status | **Chilled** | Frost; what it does is open (Claude: acts later) | open | rounds |
+| debuff | **Stun** | loses its next turn (rarer); **always on a cooldown**; **single target only for now** (designer: "ground slam bad, dont have multi stun for now") | — | turns |
+| debuff | **Mark** | allies deal more to it | how much more | rounds |
+| debuff | **Sundered** | Physical defense down (Sunder) | how much down | rounds |
+| debuff | **Exposed** (Claude) | takes more damage | how much more | rounds |
+| debuff | **Weakened** (Claude) | deals less damage | how much less | rounds |
+| debuff | **Slowed** (Claude) | acts later | — | rounds |
+| self-debuff | **Staggered** | acts last and takes more damage (Wide Cleave) | how much more | rounds |
+| buff | **Haste** | acts earlier | — | rounds |
+| buff | **Emboldened** | its attacks deal more damage | how much more | attacks |
+| buff | **Blessed** | its flips get a better heads chance | how much better | flips |
+| buff | **Riposte** (Claude) | strikes back when hit | the riposte's damage | charges |
 
 Not on the list: shields (sustain), regen (over time), knockback (a move). Dodge and evasion are not planned yet (designer).
 
@@ -227,25 +231,17 @@ A heal or shield % is measured like damage: 100% heals as much as a standard hit
 | Mass Curse | 3 | 2–4 → all foes | — | Weakened | cd 2, high stress |
 | Doom | 4 | 2–4 → any foe | 220% Chaos | | cd 2, high stress |
 
-### Buff mods, on Bless (Claude's draft, 2026-10-22)
+### Buff mods, on Bless (designer rulings, 2026-10-22)
 
-Bless: 3–4 → any ally, Blessed until its next flip, 0 cd. For a buff ability, **power is the buff's strength** (how much Blessed raises the heads chance). Mods that give a fixed amount (a shield, a heal) are measured against a standard hit.
+Bless: 3–4 → any ally, Blessed until its next flip, 0 cd. On a buff ability, **power is the buff's potency**.
 
-Reused (as for damage and heals):
-- **scaling**: Desperate / Fresh / Haunted / Serene (your HP or stress)
-- **double-edged**: Reckless, and the rare Wild (random ally), Fraught, Blood Price, Ponderous, Unique
-- **self-move and reach**: Advancing / Retreating, Footwork (usable from rank 2 too)
-- **self buff**: Swift
-- **other**: Double Strike (small chance to bless a second ally), Soothing, Calming
-
-Converted for buffs:
-- **Lasting**: the buff lasts one more flip
-- **Spreading**: also blesses the allies next to the target, weaker (the area version of a buff)
-- **Self-blessing**: you are blessed too
-- **Hastening / Emboldening** (ally buff family, 1): the target also gets Haste / Emboldened; weaker Blessed
-- **Guarding**: the target also gains a small shield (about 10% of a standard hit)
-- **Mending**: the target also heals a little (about 20% of a standard hit)
-- **Purifying**: also removes every negative status; weaker Blessed
-- **Triage / Comforting**: a stronger buff the more HP / stress the target has lost or gained
-
-Dropped for buffs: element, status, debuffs, Vampiric, Executing / Opening Blow, Opportunist, Crushing, Splitting (single target), Quick / Measured (no cooldown), Composed (no self-debuff). Coin mods (Lucky, Consistent, Gamble) fit only if a buff's strength is flipped, which is open.
+- **Lasting**: +1 count. **Rare, and adds a lot of cooldown**: "EXTREMELY strong on skills that only give 1 count".
+- **Self-blessing**: you get the buff too. **Rare, and adds a lot of cooldown.**
+- **Hastening / Emboldening**: the target also gets Haste / Emboldened, under the heal rules (ally buff family, 1 per ability, single target, reduced power).
+- **Guarding**: the target also gains a small shield (about 10% of a standard hit).
+- **Mending**: the target also heals a little (about 20% of a standard hit).
+- **Purifying**: also removes every negative status. **Rare** on buffs (common on heals).
+- Reused unchanged: scaling on your own HP or stress (Desperate, Fresh, Haunted, Serene), double-edged (Reckless; rare Wild, Fraught, Blood Price, Ponderous, Unique), Advancing / Retreating, Footwork, Swift, Double Strike (small chance to bless a second ally), Soothing, Calming.
+- **Rejected:** Spreading ("bad"); Triage / Comforting on buffs ("'stronger buff' makes no sense").
+- Dropped as not fitting: element, status, debuffs, Vampiric, Executing / Opening Blow, Opportunist, Crushing, Splitting, Quick / Measured, Composed.
+- Open: whether a buff's potency is flipped (if so, the coin mods fit); whether Lingering (+1 count on damage statuses) should also be rare with a cooldown cost, like Lasting.
