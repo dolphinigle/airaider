@@ -78,7 +78,7 @@ The designer gave suggestions ("my suggestions not necessarily the best, you can
 | **Concentration** | 1–4 | self-sufficient | self buffs | self buff | — | effects of its own | | 1/0 | D |
 | **Carousing** | 1–4 | self-sufficient; healer (weak) | limited-use self buffs, some limited-use damage and healing | self buff | single damage, heal allies | repeat | limited uses; hangover | 1/2 | D |
 | **Beast Blood** | 1–3 | front damage | **innate to beast races** (wolfkin, catfolk, bearkin): the hunter; marks its prey, pounces forward onto it, bites to bleed it | single damage, self move (pounce), Mark | Bleed, Slowed, debuff (howl), Regen | defend; help allies | | 3/4 | D (line), C |
-| **Ancient Blood** | 1–3 | front damage; tank (weak) | **innate to old-blood races** (dragonkin, giantkin): breath in its bloodline's element (Fire, Frost, Lightning or Chaos), hard scales, a dreadful roar | area damage (breath), the bloodline's status, self buff (scales) | single damage, Stun, shield allies | heal; reach from rank 4 | | 3/3 | D (line), C |
+| **Ancient Blood** | 1–3 | front damage; self-sufficient | **innate to old-blood races** (dragonkin, giantkin): breath in its bloodline's element (Fire, Frost, Lightning or Chaos), dragon blood that mends itself, hard skin, roars; **no strikes** (designer) | area damage (breath), the bloodline's status, self-heal (blood), self buff (skin) | Stun, cure (itself) | strikes; heal allies; reach from rank 4 | self-damage (Blood-Fed Breath) | 4/2 | D (line, INT + CON, blood, no strikes), C |
 
 ### Distribution (strong / weak; Animal Companion not counted)
 
