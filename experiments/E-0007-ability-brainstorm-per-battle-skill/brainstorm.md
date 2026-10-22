@@ -149,13 +149,15 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 
 ## The five magics, identities (designer, 2026-10-22)
 
-| magic | attr | ranks (Claude) | damage / status | identity |
+| magic | attr | ranks | damage / status | identity |
 |---|---|---|---|---|
-| **Fire** | STR + INT | 2–3 | Fire / Burn | a balance of single-target and area damage; Burn deals damage over time |
+| **Fire** | STR + INT | 1–4 (designer) | Fire / Burn | a balance of single-target and area damage; Burn deals damage over time |
 | **Frost** | DEX + INT | 3–4 | Frost / Chilled | single target; Chilled; shields on the caster |
 | **Lightning** | INT | 3–4 | Lightning / Shocked | the biggest direct damage; Shocked makes the next hit deal more; area damage by chaining |
-| **Holy** | CHA | 2–4 | Physical / none | healing, some buffs, a weak shield, weak damage; no bonus against undead ("holy is already stacked") |
+| **Holy** | CHA | 1–4 (designer) | Physical / none | healing, some buffs, a weak shield, weak damage; no bonus against undead ("holy is already stacked") |
 | **Dark** | CHA + CON | 2–4 | Chaos / none | self-stressing (D-0072), debuffs, **healing paid with stress**, a rare source of Chaos damage; **no Poison** |
+
+Ranks are a skill's range; each ability sets its own (designer: "really depends on the skills"). Frost, Lightning and Dark ranks are Claude's.
 
 **Statuses by damage type, clarified** (designer: "poison deals chaos damage but not caused by chaos magic"): the status-per-type rule says which damage each status deals (Poison deals Chaos). It does not mean every source of that damage type inflicts it. Poison comes from other skills (Alchemy, Poisoning mods).
 
