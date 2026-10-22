@@ -52,7 +52,7 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0043](D-0043-fight-sprites-one-ai-painted-image-per-pose-as-in-darkest-du.md) | "Fight sprites: one AI-painted image per pose, as in Darkest Dungeon" | proposed | designer | 2026-10-22 |
 | [D-0044](D-0044-six-stats-per-folds-into-dex-wil-takes-willpower-from-con.md) | "Six stats: PER folds into DEX, WIL takes willpower from CON" | accepted | designer | 2026-10-22 |
 | [D-0045](D-0045-unarmed-is-its-own-core-skill-no-medium-weapons-weapon-tags-.md) | Unarmed is its own core skill, no medium weapons, weapon tags filter base abilities | accepted | designer | 2026-10-22 |
-| [D-0046](D-0046-fighting-skills-the-core-skills-that-give-abilities.md) | "Fighting skills: the core skills that give abilities" | accepted | designer | 2026-10-22 |
+| [D-0046](D-0046-fighting-skills-the-core-skills-that-give-abilities.md) | "Fighting skills: the core skills that give abilities" | superseded → D-0058 | designer | 2026-10-22 |
 | [D-0047](D-0047-abilities-10-to-20-bases-per-fighting-skill-the-ai-picks-one.md) | "Abilities: 10 to 20 bases per fighting skill, the AI picks one of a few dealt and renames it" | accepted | designer | 2026-10-22 |
 | [D-0048](D-0048-players-see-only-the-ai-name-of-an-ability-never-its-base.md) | Players see only the AI name of an ability, never its base | accepted | designer | 2026-10-22 |
 | [D-0049](D-0049-every-merc-s-first-ability-is-a-0-cooldown-attack.md) | Every merc's first ability is a 0 cooldown attack | superseded → D-0050 | designer | 2026-10-22 |
@@ -63,5 +63,6 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0054](D-0054-time-pressure-through-quest-deadlines.md) | Time pressure through quest deadlines | proposed | designer | 2026-10-22 |
 | [D-0055](D-0055-core-loop-a-week-is-pick-quest-pick-squad-go-loot-recover-up.md) | "Core loop: a week is pick quest, pick squad, go, loot, recover, upgrade" | proposed | designer | 2026-10-22 |
 | [D-0056](D-0056-mostly-combat-civilization-quests-mostly-gone-check-skills-m.md) | "Mostly combat: civilization quests mostly gone, check skills merge" | accepted | designer | 2026-10-22 |
-| [D-0057](D-0057-quests-are-a-sequence-of-nodes-combat-or-skill-check.md) | Quests are a sequence of nodes: combat or skill check | proposed | designer | 2026-10-22 |
+| [D-0057](D-0057-quests-are-a-sequence-of-nodes-combat-or-skill-check.md) | Quests are a sequence of nodes: combat or skill check | accepted | designer | 2026-10-22 |
+| [D-0058](D-0058-battle-skills-and-check-skills-are-separate-with-their-own-q.md) | Battle skills and check skills are separate with their own quotas | accepted | designer | 2026-10-22 |
 <!-- index:end -->

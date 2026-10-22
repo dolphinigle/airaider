@@ -7,7 +7,8 @@
 ## Locked so far
 
 ### The game
-- **Mostly combat** (D-0056). Quests are runs of fights, and civilization quests are mostly gone.
+- **Mostly combat** (D-0056). Civilization quests are mostly gone.
+- **A quest is a straight line of nodes**, each a combat or a skill check ("found a treasure box!"). No branching map (D-0057).
 - **The campaign follows Darkest Dungeon** (D-0052):
   - One quest a week; later a second, auto-fought one.
   - Mercs who stay home recover.
@@ -25,8 +26,7 @@
 - **Upgrade items:** star-up and reroll reroll only the level-up seed (D-0029, D-0032). A star-up sets a fixed star below 5★ (D-0037).
 - **Skills:**
   - Two starting skills; pick 1 of 3 at Lv 7 (D-0035).
-  - 18 main fighting skills plus minor ones (D-0046).
-  - Civilians exist (D-0046), but their role is open after D-0056.
+  - **Battle skills** (18, give abilities) and **check skills** (give none) are separate, with their own quotas: working 3 battle + 2 check. Battle skills can be checked too. Civilians have check skills only; v3 captives, if they return, too (D-0058).
 - **Abilities:** fights use abilities; skills are what mercs know (D-0031).
   - One new ability per level up. The AI picks one of a few dealt bases from the merc's fighting skills and renames it. Never the same base twice. Four equipped (D-0047).
   - 10–20 bases per fighting skill (D-0047).
@@ -50,7 +50,6 @@
   - **Foes are fixed:** they never flip.
   - **Waves** happen automatically.
 - **Rank movement:** Athletics moves yourself; Warfare moves allies and foes.
-- **Battle vs check skills** (designer alternative, 2026-10-22, Claude leans yes): 3 battle skills (2 start + Lv 7 pick; only they give abilities) + 2 check skills (rolled from background, no abilities). Checks feed fights (Lore reveals weakness, Scouting avoids ambush, Thievery opens loot, Talk weakens a fight, Trade sells higher), per findings "knowledge feeds the next roll". Draft lists: battle 15 (Heavy, Light, Unarmed, Ranged, Defense, Warfare, Command, Animal Companion, Roguery, Villainy, Alchemy+Doctor, Engineering, Elemental, Holy, Dark); check 6 (Lore, Scouting, Talk, Trade, Thievery, Athletics). Civilians = check skills only. Drops D-0046's minor fighting tier.
 - **Combo bases** (Claude idea, offered 2026-10-22): a few bases need two skills (Heavy + Holy "Holy Smite"); only mercs with both are dealt them; the ability flips the two skills' average. Skill pairs feel like classes (Crusader = Heavy + Holy, Defense at Lv 7) without hard classes. E-0005 round 4: every Darkest Dungeon class maps to 1–2 of our skills.
 - **Modifiers:** 0–4 per ability by star (D-0027). Engine-priced; the AI picks from the candidates the engine deals (D-0025, proposed).
 - **Foe families** each have a sharp twist.
@@ -84,7 +83,8 @@
 
 ## Waiting on the designer
 
-- The skill merges and civilians (Next 1).
+- The skill merges inside each list, and which list Nature Lore / Stealth / Athletics land in (Next 1).
+- **D-0057** node counts per quest size; Claude's check-node shape (2–3 approaches, pass gives loot/buff/knowledge, fail costs).
 - **To decide later** (D-0055):
   - where recruits come from (a coach, or quests);
   - how new quests appear;

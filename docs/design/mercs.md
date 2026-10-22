@@ -25,7 +25,11 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 - Only the core skill counts in a test. The exact name colors the text ("Atlas swings his sword").
 - Skills have their **own XP** and level up separately from the merc (D-0012).
 
-The core skills (D-0021, D-0045, D-0046 proposed), with the stats their tests usually pool with them (a quest may pair them differently). ✦ = rare: seldom rolled at recruitment or for an unlock.
+**Two kinds (D-0058):** **battle skills** give abilities; **check skills** give none and are only flipped in skill checks. Battle skills can be checked too (Doctor, Leadership). Quotas (working): 3 battle skills (2 at the start, 1 at Lv 7) and 2 check skills. Civilians have check skills only.
+
+Battle skills: Heavy, Light, Unarmed, Ranged, Defense, Warfare, Leadership, Performance, Animal Companion, Villainy, Stealth, Doctor, Alchemy, Nature Lore, Engineering, Elemental, Holy, Dark. Check skills: the rest. Merges are open.
+
+The core skills (D-0021, D-0045, D-0058), with the stats their tests usually pool with them (a quest may pair them differently). ✦ = rare: seldom rolled at recruitment or for an unlock.
 
 | family | core skill | covers | stats |
 |---|---|---|---|
@@ -91,7 +95,7 @@ What a merc does in a fight is an **ability**; a **skill** (Survival, Swords…)
 
 - Every merc's **first ability is a 0-cooldown attack**, a normal ability: from their skills (most skills have one, e.g. Light Weapons' Double Attack) or, as a fallback, a **generic** attack anyone can get (Smash, Kick) (D-0050); generic bases can also come up, rarely, on any level up (D-0051).
 - The player sees only the AI name, never the base (D-0048).
-- Only **fighting skills** give abilities (D-0046, proposed). Each has **about 10–20 base abilities**; weapon tags filter them (D-0045).
+- Only **battle skills** give abilities (D-0058). Each has **about 10–20 base abilities**; weapon tags filter them (D-0045).
 - **Every level up gives one new ability**, with modifiers by star. The engine deals the AI a few random bases from the merc's fighting skills that fit their weapon; the AI picks one that fits the merc's theme and renames it. **Never the same base twice.**
 - A merc **equips four** abilities.
 - An ability is a fixed base plus modifiers, named by the AI (D-0025, proposed).

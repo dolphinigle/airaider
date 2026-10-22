@@ -32,3 +32,7 @@ How a quest plays out: fights and coin-flip skill checks, told in quick simple l
 - What happens during a quest besides the tests (choices, push or retreat), and the fight model: E-0003.
 - What failing a test or a quest costs (wounds, loot, death).
 - Presentation: pixel-art sprites (AI-made, D-0023), coin-flip animation.
+
+## Nodes (D-0057)
+
+A quest is a **straight line of nodes**, no forks. Each node is a **combat** or a **skill check** ("found a treasure box!"). Checks can use check skills, battle skills (D-0058) or stats. Working shape: a check node offers 2–3 approaches; a pass gives loot, a buff or knowledge for the next fight; a fail costs stress, HP, or makes the next fight harder.

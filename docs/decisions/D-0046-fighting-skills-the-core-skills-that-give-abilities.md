@@ -1,11 +1,11 @@
 ---
 id: D-0046
 title: "Fighting skills: the core skills that give abilities"
-status: accepted
+status: superseded
 date: 2026-10-22
 decided-by: designer
 supersedes: []
-superseded-by:
+superseded-by: D-0058
 evidence: []
 sources: []
 ---
