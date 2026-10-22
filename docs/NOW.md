@@ -36,6 +36,7 @@ Designer: "first lets make this fun."
 
 ## Waiting on the designer
 
+- **Later, from v3 (designer):** the **relic system**, probably, and maybe the **captive system**. Bring either back only through a v4 decision with `sources:`.
 - **To decide later (D-0055):**
   - where recruits come from (coach or quests);
   - how new quests appear;
