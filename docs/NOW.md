@@ -26,12 +26,12 @@
 - **Upgrade items:** star-up and reroll reroll only the level-up seed (D-0029, D-0032). A star-up sets a fixed star below 5★ (D-0037).
 - **Skills:**
   - Two starting skills; pick 1 of 3 at Lv 7 (D-0035).
-  - **Battle skills** (22, give abilities; D-0086, D-0089, D-0090) and **check skills** (give none) are separate, with their own quotas: 3 battle (working) + 3 check (D-0083). Battle skills can be checked too. Civilians have check skills only; v3 captives, if they return, too (D-0058).
+  - **Battle skills** (23, give abilities; D-0086, D-0089, D-0090, D-0091) and **check skills** (give none) are separate, with their own quotas: 3 battle (working) + 3 check (D-0083). Battle skills can be checked too. Civilians have check skills only; v3 captives, if they return, too (D-0058).
 - **Abilities:** fights use abilities; skills are what mercs know (D-0031).
   - A merc level up gives attributes only. **Some battle-skill level ups give a new ability** (working: skill levels 1, 3, 5, 7, 9): the AI picks one of a few dealt bases from that skill and renames it. Never the same base twice. Four equipped (D-0069).
   - 10–20 bases per battle skill (D-0069).
-  - Weapon skills are styles: Two-handed, Polearm, Weapon and Shield, Dual Wield, Single Weapon, Unarmed, Ranged; at most one per merc (D-0090).
-  - Dark Magic abilities cost stress, no life drain; guns are a Ranged weapon tag (D-0072).
+  - Weapon skills: Two-handed, Polearm, Weapon and Shield, Dual Wield, Single Weapon, Unarmed, Shooting, Throwing; at most one per merc (D-0090, D-0091).
+  - Dark Magic abilities cost stress, no life drain; guns are Shooting (D-0072, D-0091).
   - The first ability is always a 0-cooldown attack, with a generic fallback (Smash, Kick); generic bases also come up rarely later (D-0050, D-0051).
   - The player sees only the AI name (D-0048).
 - **Passives are traits:** gender, race, personality, body. They never touch coins (D-0036, D-0038–D-0040). Traits have stars; passives scale a little with them (D-0068; Claude: 5★ = 1.5×).
@@ -63,11 +63,11 @@
 
 ## Next
 
-0. **Battle skills are settled** (2026-10-22): 22 skills with attribute pairings (D-0063, D-0070, D-0073, D-0074, D-0086; table in design/mercs.md). Coins = attribute + skill level (D-0069); defense and damage types (D-0070); Dark Magic costs stress (D-0072). Still open:
+0. **Battle skills are settled** (2026-10-22): 23 skills with attribute pairings (D-0063, D-0070, D-0073, D-0074, D-0086; table in design/mercs.md). Coins = attribute + skill level (D-0069); defense and damage types (D-0070); Dark Magic costs stress (D-0072). Still open:
    - **Ability cadence** (Claude: a new ability at skill levels 1, 3, 5, 7, 9).
    - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances). Claude leans Darkest Dungeon.
 1. **Check skills** (in progress 2026-10-22). Done: **11 check skills, 3 per merc** (D-0083): Athletics, Survival, Perception, Roguery, Streetwise, Persuasion, Intimidation, Lore, Smithing, Engineering, Cooking. **Every skill's attribute** (D-0086): Fire STR + INT, Frost DEX + INT, Lightning INT (Path of Exile); Dark Magic CHA + CON (pact-maker); Unarmed STR + DEX; Performance DEX + CHA; Survival DEX + CON; Smithing INT + CON; all ten pairs have a skill; CON thin by tradition (E-0005 round 7). Stats are STR DEX INT CHA CON LUK (WIL cut, LUK added); passives counted from 10 (D-0081): STR increased damage, INT 3% increased XP, CHA increased quest gold summed over the squad, CON HP, DEX speed, LUK heads chance; percents use Path of Exile increased/more (D-0082). Still open:
-   - **Fury** (STR + CON, Hellion) and **Grit** (CON, Leper) added: 21 battle skills (D-0089). Not taken yet: Nature Magic, Blood Magic, Illusion, Duelist, Hunter (E-0005 round 9). Defense renamed **Defender**. Open idea: Drinking (CON check skill). **Melee weapon skills are now styles** (D-0090): Two-handed, Polearm, Weapon and Shield, Dual Wield, Single Weapon, Unarmed; flavor from mods + AI pick. Designer wants **two ranged skills** ("Ranged and Throwing?"): open.
+   - **Fury** (STR + CON, Hellion) and **Grit** (CON, Leper) added: 21 battle skills (D-0089). Not taken yet: Nature Magic, Blood Magic, Illusion, Duelist, Hunter (E-0005 round 9). Defense renamed **Defender**. Open idea: Drinking (CON check skill). **Melee weapon skills are now styles** (D-0090): Two-handed, Polearm, Weapon and Shield, Dual Wield, Single Weapon, Unarmed; flavor from mods + AI pick. Ranged splits into **Shooting** (DEX) and **Throwing** (STR + DEX) (D-0091).
    - **At most one weapon skill per merc**, Ranged included (D-0088).
    - when the 3 check skills are gained (all at recruitment, or 2 + 1 later);
    - uses outside check nodes (Perception reveals `???` nodes, Lore shows foe weaknesses, Persuasion prices, Cooking at the base kitchen);
