@@ -67,6 +67,19 @@ Weapon flavor via mods (Claude's draft): axe → bleed, hammer → stun and armo
   - several status mods may stack.
 - **Universal but conditional:** a mod fits any ability that meets its condition.
 
+Families at a glance:
+
+| family | per ability | also | mods |
+|---|---|---|---|
+| element | 1 | | Fiery, Frosty, Charged, Dark, Brutal |
+| status | no limit | | Bleeding, Poisoning, Burning, Shocking, Chilling |
+| debuff | 1 | 50% reduced damage; single-target abilities only | Stunning, Heavy, Marking, (Exposing, Weakening, Hampering) |
+| buff | 1 | | Swift, (Guarding, Evasive, Riposting) |
+| self-move | 1 | | Advancing, Retreating |
+| reach | no limit | | Reaching, Footwork |
+| other | no limit | Vampiric rare; Double Strike repeats once at most | Lucky, Vampiric, Double Strike |
+| conditional | no limit | only if the ability meets the condition | Quick, Splitting, Potent, Lingering, Composed |
+
 | family | mod | effect | rules |
 |---|---|---|---|
 | element | **Fiery / Frosty / Charged / Dark** | half the damage turns Fire / Frost / Lightning / Chaos, +10% damage | one element |
