@@ -67,7 +67,7 @@ No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0077); names D-
 | **Survival** | foraging, camping, weather, terrain, trails | CON |
 | **Awareness** | spotting ambushes, keeping watch, searching | WIL |
 | **Roguery** | locks, pockets, traps, forgery | DEX |
-| **Streetwise** | rumors, finding people, city ways | CHA |
+| **Streetwise** | rumors, finding people, city ways | CHA + INT (designer) |
 | **Persuasion** | charm, diplomacy, haggling, appraising (+ Bargaining) | CHA |
 | **Intimidation** | threats, interrogation, lies, bluffs, disguises (+ Deception) | CHA |
 | **Lore** | the past, peoples, faiths; plants, beasts, monsters; undead, demons, curses, relics (three lores merged) | INT |
