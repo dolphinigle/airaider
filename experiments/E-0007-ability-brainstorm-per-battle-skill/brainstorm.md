@@ -33,7 +33,7 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 | **Knockback Strike** | 1★ | 1–2 → foe 1–2 | 90% | knocks the foe back 1 rank | cd 1 |
 | **Sunder** | 2★ | 1–2 → 1–2 | 80% | Sundered | cd 3 |
 | **Stunning Blow** | 2★ | 1–2 → foe 1 | 70% | Stun | cd 2 |
-| **Wide Swing** (Titanic Swing) | 4★ | 1 → foe 1, 2 and 3 | 70% each | you are Staggered next round | cd 4 |
+| **Wide Cleave** (Titanic Swing) | 4★ | 1 → foe 1, 2 and 3 | 70% each | you are Staggered next round | cd 4 |
 
 Every turn asks focus (Heavy Strike) or spread (Cleave), since both have no cooldown. Knockback Strike sends a dangerous foe back and brings the one behind into reach.
 
