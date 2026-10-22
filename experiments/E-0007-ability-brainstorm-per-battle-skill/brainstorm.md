@@ -147,3 +147,55 @@ Timing:
 
 Team:
 - **Coordinated**: if an ally hit this target this round
+
+**Damage mod rulings (designer, 2026-10-22):**
+- **Consistent** (designer's): reroll the flip once if it came out badly (designer: "if less than 20% were tails"; Claude reads it as under 20% heads, to confirm).
+- **Executing** and **Opening Blow**: good, +20% each.
+- **Opportunist**: good, about 15–20%.
+- **Crushing**: good.
+- **Desperate** scales with HP lost; **Fresh** is its inverse and scales with HP left. The low-HP one gives the higher %, "since having high hp is a lot easier".
+- **Stress, both ways**: one scales up with stress (Haunted), one with low stress (Claude's name: Serene).
+- **Rare double-edged mods (designer's):** each deals more damage, and:
+  - **Wild**: changes its target at random;
+  - **Unsteady**: moves you back or forward 1 rank at random;
+  - **Blood Price**: costs you HP;
+  - **Fraught**: gives you stress;
+  - **Ponderous**: you act last (designer: "slow").
+- **Soothing** (designer's, rare): reduces your stress when used.
+- Not yet ruled: Mighty, Second Wind, Savage, Bane, Exploiting, Giant-slayer, Piercing, Vengeful, Vanguard, First Strike, Momentum, Bloodthirsty, Focused, Coordinated.
+
+### Path of Exile support gems as inspiration (Claude's draft, 2026-10-22)
+
+Sources: the PoE1 support list (poedb) and the PoE2 support list (mein-mmo overview); poewiki was blocked. Only turn-based translations are kept here; real-time ones (movement, cast speed, projectiles, totems) are dropped.
+
+Trade-offs ("more X, but"):
+- **Purist** (Brutality): more damage; the ability can't take element or status mods
+- **Steady** (Controlled Destruction): more damage; can't crit
+- **Measured** (Hourglass): much more damage; +1 cooldown (the designer's cost rule)
+- **Festering** (Deadly Poison, Deep Cuts): less hit damage; much stronger statuses
+- **Smouldering** (Eternal Flame): statuses last longer, weaker per round
+- **Bulwark** (Flesh Shield): you deal less and take less damage until your next turn
+- **Clash** (Zusammenstoß): more against foes with a high HP %, less against low
+
+Sequencing and charges:
+- **Finisher** (Combo Finisher): more for each other ability you used since this one last fired
+- **Patient** (Unleash): more for each round it went unused, up to 3
+- **Ruthless** (PoE1 Ruthless): every third use hits much harder
+- **Twin Charge** (Second Wind gem; needs a cooldown): two uses per cooldown
+- **Alternating** (Pursuit/Retreat): more if your last ability came from a different skill
+
+Status payoffs:
+- **Consuming** (Exploit Weakness, Drain Ailments, Biting Frost): removes one status from the target (Sundered, a mark, Burn) and deals bonus damage for it
+- **Bane of <status>** (Hypothermia, Bloodlust): more against foes with one named status (more vs Chilled), and the ability can't inflict it
+
+Position:
+- **Charging** (Momentum): more if you changed rank since your last turn
+- **Rooted** (Stoicism): more for each round you haven't moved, reset by moving
+- **Close Quarters / Far Shot**: more against the nearest / farthest foe ranks
+- **Outnumbered** (Defy): more for each foe beyond your side's count
+
+Kills:
+- **Trophy** (Behead): a kill steals one of the foe's buffs or traits for the rest of the fight
+
+Luck:
+- **Gamble** (Zufall): damage swings from much less to much more
