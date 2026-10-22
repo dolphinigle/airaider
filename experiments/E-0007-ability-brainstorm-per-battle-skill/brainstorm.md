@@ -46,7 +46,7 @@ The designer gave suggestions ("my suggestions not necessarily the best, you can
 | **Shooting** | 3–4 | reach damage | hits the back ranks hard; struggles against the front line or out of position | single damage | area damage (volley), Bleed | ranks 1–2; moves | | 1/2 | D |
 | **Throwing** | 1–3 | reach damage | the reverse of Shooting: many attacks move it between ranks while dealing damage | single damage, self move | area damage (multi-throw), Bleed, Poison | rank 4; defend | | 2/3 | D |
 | **Fire** | 1–4 (each ability locked) | reach damage | Burn, moderate direct damage, odd utilities (cauterize). **Restrictive positions**: each ability is locked to a narrow pair (from 1–2 hitting foe 1–2; from 3–4 hitting foe 1–2), so its abilities must be chosen for where the merc stands | single damage, area damage, Burn | cure (cauterize: Poison, Bleed, Burn, with a cost) | heal; shields | | 3/1 | D |
-| **Frost** | 2–4 | reach damage; control | shields, stuns, moderate damage; single target | single damage, Chilled (slows), self shield, Stun (Frozen) | — | area; heal | | 4/0 | D+C |
+| **Frost** | 2–4 | reach damage; control | shields, stuns, moderate damage; single target | single damage, Chilled (slows), self shield, Stun | — | area; heal | | 4/0 | D+C |
 | **Lightning** | 3–4 | reach damage | big hits that inflict Shocked; hits arc to neighbouring foes | single damage (the biggest), area damage (arcs), Shocked | — | defense; ranks 1–2 | | 3/0 | D+C |
 | **Holy** | 1–4 (looser locks) | healer | **the many**: squad-wide heals, Blessed on allies, cures. Rank locks like Fire's, but looser | heal allies, area heal, ally buff (Blessed), cure | shield allies, single damage | big damage; debuffs | | 4/2 | C |
 | **Dark** | 2–4 | control; healer (weak) | **power at a price**: the strongest curses and effects, each paid in its own stress; heals allies by taking stress | debuff (curses) | heal allies (paid in stress), single damage (Chaos) | Poison; life drain | stress | 1/2 | C, from D |
@@ -192,7 +192,7 @@ A merc has 2 battle skills at the start and a 3rd at Lv 7, at most one weapon (D
 
 **Cheat death is out of Survivor** (designer, 2026-10-23: "probably everyone will have it by default ala darkest dungeon"): likely a default for every merc, like Darkest Dungeon's Death's Door; not yet ruled.
 
-**Records:** ally and foe movers are D-0101; Doctor has only some limited-use abilities (fits D-0062). New statuses: Grappled (Unarmed), Frozen (Frost), Hidden (Stealth).
+**Records:** ally and foe movers are D-0101; Doctor has only some limited-use abilities (fits D-0062). New statuses: Grappled (Unarmed), Hidden (Stealth). **No Frozen** (designer, 2026-10-23: "we dont want frozen in the game"): Frost stuns with plain Stun.
 
 **Rejected** (designer, 2026-10-23): Single Weapon as **the duel**; Unarmed **combos** ("combos doesnt work with turn based games, too many turns required to 'go online'"); Frost **build and shatter**. Principle (Claude's reading): no identity that needs several turns of setup before it pays off.
 
