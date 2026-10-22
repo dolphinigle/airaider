@@ -2,10 +2,10 @@
 id: E-0007
 title: Ability brainstorm per battle skill
 date: 2026-10-22
-status: running           # planned | running | done | abandoned
+status: done              # planned | running | done | abandoned
 type: research            # sim | playtest | lab | judge | research
 question: What abilities could each of the 29 battle skills give, drawn from Darkest Dungeon and other games?
-verdict:                  # one line, filled in when done: the answer
+verdict: all 29 battle skills have key identities and a baseline set of ~8 abilities each (baseline.mjs), designer-approved as roughly in shape; numbers wait for a balance pass
 decisions: [D-0101]       # decisions it led to or proposed, e.g. [D-0005]
 commit:                   # the commit or tag of the code it ran on, if any
 ---
@@ -27,9 +27,9 @@ So far (2026-10-23), all in `brainstorm.md`:
 - **Effects list** (count and potency) and the **mod catalog** (designer: "we have all the mods proper"). Mods are outside skill identities.
 - **Key identities for all 29 battle skills**, with ranks, main role, strong and weak effects, a distribution by effect, rank and role, and example two- and three-skill builds. Rejected identities: the Single Weapon duel, Unarmed combos ("too many turns required to 'go online'"), Frost build-and-shatter.
 - Model abilities: Two-handed, Holy, Dirty Fighting reviewed; Polearm, Fire, Frost, Lightning, Dark drafted.
-- **Baseline abilities (Claude's draft, 2026-10-23):** 242 abilities for all 29 skills in `baseline.mjs` (data; `node baseline.mjs stats`, `node baseline.mjs html <out>` renders the review page via `baseline-page.mjs`). Published as Artifact https://claude.ai/artifact/7Uvbcxg9cHofHe2H5TjjyW for the designer's rough review. The five drafts were redone to the new identities; reviewed cards kept unchanged, a few added. It adds statuses Braced, Taunting, Guarded, Raging, Keen, Empowered (unruled) and Claude answered its open points (designer: "none are important"). Rulings in review: a default attack is any 0-cd damaging ability; names say what the ability does; Polearms pair up (listed on the page and in `baseline.mjs`).
+- **Baseline abilities (Claude's draft, 2026-10-23):** 242 abilities for all 29 skills in `baseline.mjs` (data; `node baseline.mjs stats`, `node baseline.mjs html <out>` renders the review page via `baseline-page.mjs`). Published as Artifact https://claude.ai/artifact/7Uvbcxg9cHofHe2H5TjjyW for the designer's rough review. The five drafts were redone to the new identities; reviewed cards kept unchanged, a few added. It adds statuses Braced, Taunting, Guarded, Raging, Keen, Empowered (unruled) and Claude answered its open points (designer: "none are important"). **Designer, 2026-10-23: "all done, they look good"** after a review round. Rulings in review: a default attack is any 0-cd damaging ability; names say what the ability does; Polearms pair up (listed on the page and in `baseline.mjs`).
 - **Plan change (designer, 2026-10-23):** the abilities are "decent enough that we can stop here". Step 4 (balance, then redo the abilities) is dropped for now. Last task here: baseline abilities for every battle skill, published as an Artifact for a rough review.
 
 ## Verdict
 
-(pending)
+All 29 battle skills have key identities (brainstorm.md) and a baseline set of about 8 abilities each (`baseline.mjs`, 248 bases), approved by the designer as roughly in shape ("all done, they look good"). Review rulings: descriptive generic names; a default attack is any 0-cd damaging ability; higher stars are weirder, not stronger (Detonate Burn is the model); no doubling; guard is one to one; no Frozen; Survivor alone lowers its own stress; Warfare buffs the allies it moves; Alchemy and Carousing default to 1 use per quest; no overwatch. Balance comes later.

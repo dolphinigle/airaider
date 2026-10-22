@@ -27,6 +27,8 @@ Rules:
 - **A star that sets the odds of every future roll.** Stars as a recruit's mod count read at a glance; once mercs roll a battle skill each level, a star that sets each roll's odds stays true over the whole career. Flat per-skill odds buried every merc in mods (97% had one). Sim, untested in play. (E-0004)
 - **Line formation + speed order + cooldowns + weaknesses + buffs and debuffs, played on auto, carries games for a decade.** Summoners War (2014, $3B), Raid (per-skill auto priority = our S1-S4), Epic Seven, Honkai Star Rail, Pokémon; their depth sits in the build, and speed control plus gear are their other big levers. Research. (E-0005)
 - **A high attribute base (10 to 20 over a career) removes zero rolls.** With 3 to 13 coins, threshold and armor models dealt nothing most of the time at low levels; at 10+ coins every model dealt damage on 95%+ of attacks (except a hit check against high defense) (E-0006)
+- **Rare ability bases that bend the skill's own core.** Detonate Burn (the foe takes all its remaining Burn now; the Burn ends) was the one 4★ the designer liked; it uses what the skill already does, in one clear line that resolves now. (E-0007)
+- **Ability names that say what they do.** Generic but descriptive (Heavy Advancing Lunge, Pet Attack, Short Range) so the AI can pick abilities for a merc before reskinning them. (E-0007)
 
 ## Doesn't work
 
@@ -38,6 +40,8 @@ Rules:
 - **Clash combat where both sides flip (Limbus Company style).** Number-heavy, brings foe coins back (D-0013), needs a move kit per merc; designer: 'clash bad'. (E-0003)
 - **AI-generated battle-skill mechanics.** Even within a fixed parts list, Sonnet gave 5 of 6 mercs the same block skill, drew skills from the wrong source, priced a warrior's taunt in mana and swung power (whole-enemy stun at 2 mana). Unique skills per merc also stop the player learning what a skill does. Mock. (E-0003)
 - **Threshold hit checks on coin pools cliff and waste heads.** One defense step cut a Lv1 merc's mean damage ~70% (7.5 to 2.1) while a Lv12 talented merc gained only 6% over an untalented one; % mitigation stayed linear and never locked a merc out (E-0006)
+- **Exotic rare abilities and bigger copies.** 16 weird 4★s (evened HP, borrowed abilities, decoys, overwatch, spreading flames) read as bad or unclear; 4★ versions at ~2× a 1★'s power were power creep. Higher stars should be weirder, at most a little stronger. Doubling a status or power compounds into exponential damage. (E-0007)
+- **Generic attacks on non-weapon skills.** Berserk's own swings left it unclear what the merc hits with (axe? sword? spell?); non-weapon skills should mostly buff the merc's weapon or spell attacks, with only a few attacks of their own. (E-0007)
 
 ## Open
 

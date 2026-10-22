@@ -65,8 +65,8 @@
 ## Next
 
 0. **NEXT SESSION STARTS HERE: the plan to a playtest** (designer, 2026-10-23; replaces the four steps of 2026-10-22: "the abilities you created are decent enough that we can stop here"; balance-then-redo-abilities is dropped for now):
-   1. **(in review) Baseline abilities for every battle skill (29)**: drafted 2026-10-23, 242 abilities in E-0007 `baseline.mjs`, Artifact https://claude.ai/artifact/7Uvbcxg9cHofHe2H5TjjyW; its open points Claude answered (designer: "none are important"); waiting on the designer's rough review. Some are too strong (designer: Shooting's Back-Rank Shot); a balance pass comes later. Brief:, from the key identities in E-0007 `brainstorm.md`. Put them in an **Artifact** and show the designer for a **rough review**; the goal is roughly in shape, not final. Keep the conventions at the top of `brainstorm.md` (damage as % of a standard hit; generic names; most abilities 0 cd, cooldowns on heals, stuns and big effects; default attacks only on weapon and magic skills; stuns always limited; debuffs flip to land; each ability sets its own ranks, a skill's range is where *most* sit). Reviewed so far: Two-handed, Holy, Dirty Fighting; drafts: Polearm, Fire, Frost, Lightning, Dark (redo to the new identities: Polearm steps forward, Frost shields + Frozen stun, Lightning big hits + Shocked, Fire rank-locked, Dark power at a price).
-   2. **Merc details:** level up, attributes, skill ups (cadence of new abilities, XP, stars).
+   1. **Done: baseline abilities for every battle skill (29)** (designer 2026-10-23: "all done, they look good"): E-0007 `baseline.mjs`, Artifact https://claude.ai/artifact/7Uvbcxg9cHofHe2H5TjjyW. Review rulings in E-0007 README; numbers wait for a balance pass.
+   2. **(next) Merc details:** level up, attributes, skill ups (cadence of new abilities, XP, stars).
    3. **Enemy design**, after Darkest Dungeon.
    4. **Playtest.**
    - Done (E-0007): conventions, effects list, mod catalog (mods are outside identities), key identities for all 29 skills with strong / weak effects, rank and role distributions, example builds; movers ruled (D-0101).
