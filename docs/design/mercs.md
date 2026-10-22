@@ -45,7 +45,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 | **Long-reach Weapons** | polearms, spears: strikes from rank 2â€“3, reaches deep, pushes and pulls | STR |
 | **Unarmed** | fists, kicks, grapples, martial arts, claws and bites (werewolves) | STR + DEX |
 | **Ranged** | bows, crossbows, guns, slings, throwing (weapon tags) | DEX |
-| **Defense** | shields, taunts, guarding, party shields | CON |
+| **Defender** | shields, taunts, guarding, party shields (was Defense, designer) | CON |
 | **Leadership** | your side: party auras, Resolve, moving teammates, focus-fire orders (D-0073); rare, weak stress healing (D-0062) | CHA |
 | **Performance** | songs, Haste, distraction; rare, weak stress healing | DEX + CHA |
 | **Animal Companion** | a fighting pet, like the Houndmaster (no rank of its own) | CHA |
