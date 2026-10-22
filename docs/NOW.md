@@ -71,7 +71,7 @@
    4. **Playtest.**
    - Done (E-0007): conventions, effects list, mod catalog (mods are outside identities), key identities for all 29 skills with strong / weak effects, rank and role distributions, example builds; movers ruled (D-0101).
    - Open from E-0007: Yanking (Claude's pull-forward mod); does the Stunning mod add +1 cd; heal fill-ins (ally-buff cost, who gets Guarding's shield); new statuses Grappled, Hidden (no Frozen, designer: Frost uses plain Stun); cheat death as a default for every merc (Death's Door; designer "probably"); Animal Companion's pet attack as a default attack; clashing skill pairs (deal them or not). Batch into decisions later: the mod rules (D-0025 still proposed), "no evasion yet" vs D-0070 dodge charges, no default attack on non-weapon/magic skills vs D-0050 (the generic fallback covers it).
-   - **Blood skills added** (designer, 2026-10-23): Beast Blood and Ancient Blood, innate to their races (Claude split the line in two; designer to confirm). Roster becomes 31 battle skills: supersede D-0099 once confirmed.
+   - **Blood skills added** (designer, 2026-10-23): Beast Blood and Ancient Blood, exclusive skills: offered only to their races and to shapeshifters (werewolves), never innate (Claude split the line in two; designer to confirm). Roster becomes 31 battle skills: supersede D-0099 once confirmed.
    - Roster done (D-0099); 13 battle skills can be checked (D-0100). Also open: Precision vs LUK; from E-0005 round 10: Highwayman blade + pistol, stress healing.
 1. **Battle and check skills, still open:**
    - **Ability cadence** (Claude: a new ability at skill levels 1, 3, 5, 7, 9).

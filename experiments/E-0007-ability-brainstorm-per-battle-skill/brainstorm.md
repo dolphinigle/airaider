@@ -40,7 +40,7 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 
 ## Battle skill key identities (2026-10-23)
 
-**Blood skills** (designer, 2026-10-23: "add a Beast Blood line -- this is for things like wolfkin, dragonkin innate skills, for example, Dragon Breath"; unsure whether one skill or two). Claude's call, open to the designer: two skills, Beast Blood and Ancient Blood, since the hunter and the old power are different identities. Only races of that blood can have them (at start or as a Lv 7 option), at most one per merc; not weapon skills.
+**Blood skills** (designer, 2026-10-23: "add a Beast Blood line -- this is for things like wolfkin, dragonkin innate skills, for example, Dragon Breath"; unsure whether one skill or two). Claude's call, open to the designer: two skills, Beast Blood and Ancient Blood, since the hunter and the old power are different identities. **Exclusive skills** (designer, 2026-10-23: "not innate to those races, but rather, OFFERED only to those and on others its for shapeshifters like wereowlves"): offered only to mercs of that blood or to shapeshifters, as a starting skill or a Lv 7 option, never innate. At most one per merc (Claude); not weapon skills.
 
 The designer gave suggestions ("my suggestions not necessarily the best, you can take as inspiration or you can suggest more"); **by** says whose line it is: D designer, C Claude, D+C Claude's proposal the designer took or Claude's fill-in to a designer line.
 
@@ -77,8 +77,8 @@ The designer gave suggestions ("my suggestions not necessarily the best, you can
 | **Alchemy** | 3–4 | healer; control | limited uses are the point: few uses, but potent healing, Poison and debuffs | heal allies (potent), Poison, debuff | area damage (bombs), Burn | unlimited use; ranks 1–2 | limited uses | 3/2 | D |
 | **Concentration** | 1–4 | self-sufficient | self buffs | self buff | — | effects of its own | | 1/0 | D |
 | **Carousing** | 1–4 | self-sufficient; healer (weak) | limited-use self buffs, some limited-use damage and healing | self buff | single damage, heal allies | repeat | limited uses; hangover | 1/2 | D |
-| **Beast Blood** | 1–3 | front damage | **innate to beast races** (wolfkin, catfolk, bearkin): the hunter; marks its prey, pounces forward onto it, bites to bleed it | single damage, self move (pounce), Mark | Bleed, Slowed, debuff (howl), Regen | defend; help allies | | 3/4 | D (line), C |
-| **Ancient Blood** | 1–3 | front damage; self-sufficient | **innate to old-blood races** (dragonkin, giantkin): breath in its bloodline's element (Fire, Frost, Lightning or Chaos), dragon blood that mends itself, hard skin, roars; **no strikes** (designer) | area damage (breath), the bloodline's status, self-heal (blood), self buff (skin) | Stun, cure (itself) | strikes; heal allies; reach from rank 4 | self-damage (Blood-Fed Breath) | 4/2 | D (line, INT + CON, blood, no strikes), C |
+| **Beast Blood** | 1–3 | front damage | **exclusive: offered only to beast races** (wolfkin, catfolk, bearkin) and shapeshifters (werewolves): the hunter; marks its prey, pounces forward onto it, bites to bleed it | single damage, self move (pounce), Mark | Bleed, Slowed, debuff (howl), Regen | defend; help allies | | 3/4 | D (line), C |
+| **Ancient Blood** | 1–3 | front damage; self-sufficient | **exclusive: offered only to old-blood races** (dragonkin, giantkin) and shapeshifters: breath in its bloodline's element (Fire, Frost, Lightning or Chaos), dragon blood that mends itself, hard skin, roars; **no strikes** (designer) | area damage (breath), the bloodline's status, self-heal (blood), self buff (skin) | Stun, cure (itself) | strikes; heal allies; reach from rank 4 | self-damage (Blood-Fed Breath) | 4/2 | D (line, INT + CON, blood, no strikes), C |
 
 ### Distribution (strong / weak; Animal Companion not counted)
 

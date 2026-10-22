@@ -406,7 +406,7 @@ export const SKILLS = [
       '4|All-Out Bender|1–4|self||Emboldened, Haste and Braced 3 rounds; then you lose your next turn|1 use per quest|new',
     ] },
   { name: 'Beast Blood', attr: 'DEX + STR', ranks: '1–3', role: 'front damage', state: 'new',
-    id: 'Innate to beast races (wolfkin, catfolk, bearkin). The hunter: marks its prey, pounces forward onto it, bites to bleed it.',
+    id: 'Exclusive: offered only to beast races (wolfkin, catfolk, bearkin) and to shapeshifters (werewolves). The hunter: marks its prey, pounces forward onto it, bites to bleed it.',
     strong: 'single damage, self move (pounce), Mark', weak: 'Bleed, Slowed, debuff (howl), Regen',
     abilities: [
       '1|Claw|1–2|foe 1–2|100%||0 cd|new',
@@ -420,7 +420,7 @@ export const SKILLS = [
       '4|Pounce on the Marked Prey|2–3|any foe|110%|only the Marked foe, at any rank; you step forward 1 rank|0 cd|new',
     ] },
   { name: 'Ancient Blood', attr: 'INT + CON', ranks: '1–3', role: 'front damage; self-sufficient', state: 'new',
-    id: 'Innate to old-blood races (dragonkin, giantkin). Breath in its bloodline\'s element, dragon blood that mends itself, hard skin, roars. No strikes.',
+    id: 'Exclusive: offered only to old-blood races (dragonkin, giantkin) and to shapeshifters (a man who turns dragon). Breath in its bloodline\'s element, dragon blood that mends itself, hard skin, roars. No strikes.',
     strong: 'area damage (breath), the bloodline\'s status, self-heal (blood), self buff (skin)', weak: 'Stun, cure (itself)',
     abilities: [
       '1|Short Breath|1–2|foe 1–2|80%, the bloodline\'s element|its status|0 cd|new',
@@ -455,8 +455,7 @@ export const CALLS = [
   'Holy keeps a weak ally shield, front-rank only (Shield Ally, 1–2).',
   'Animal Companion\'s pet attacks count as a default attack like any 0-cd damage ability.',
   'Braced (takes less damage) goes on the effects list as a buff; D-0070 allows defense from buffs.',
-  'Beast Blood and Ancient Blood are two skills, not one (designer asked; Claude\'s call): the hunter and the old power are different identities, and one merged pool would blur like Animal Companion. Only races of that blood can have them (at start or as a Lv 7 option); at most one blood skill per merc. They are not weapon skills, so a wolfkin can claw and swing an axe.',
-  'Ancient Blood\'s element is set by the merc\'s bloodline: Fire (Burn), Frost (Chilled), Lightning (Shocked) or Chaos (Weakened). A red dragonkin breathes fire, a frost giant frost.',
+  'Beast Blood and Ancient Blood are two skills, not one (designer asked; Claude\'s call): the hunter and the old power are different identities, and one merged pool would blur like Animal Companion. They are exclusive skills (designer): offered, never innate, and only to mercs of that blood or to shapeshifters (werewolves), as a starting skill or a Lv 7 option; at most one blood skill per merc. They are not weapon skills, so a wolfkin can claw and swing an axe.\n  'Ancient Blood\'s element is set by the merc\'s bloodline: Fire (Burn), Frost (Chilled), Lightning (Shocked) or Chaos (Weakened). A red dragonkin breathes fire, a frost giant frost.',
   'Carousing\'s hangovers reuse Weakened and Slowed; All-Out Bender costs your next turn.',
 ];
 
