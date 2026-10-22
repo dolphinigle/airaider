@@ -12,7 +12,7 @@ Each stat also has a small **passive**, counted from **10 = no effect**: above h
 
 | stat | covers | skills | passive |
 |---|---|---|---|
-| **STR** | strength | its battle and check skills | **1% increased damage per point above 10** (reduced below), on all damage |
+| **STR** | strength | its battle and check skills | **1% increased damage per point above 10** (designer; reduced below), on all damage |
 | **DEX** | agility, hands, reflexes, aim | its battle and check skills | **speed coins** (turn order) |
 | **INT** | intelligence | its battle and check skills | **increased XP**, merc and every skill (3–5% per point from 10, designer; working 3%; reduced below) |
 | **CHA** | charisma | its battle and check skills | **increased quest gold** (designer), **summed over the squad** (designer), each merc 1% per point from 10 (working; reduced below) |
