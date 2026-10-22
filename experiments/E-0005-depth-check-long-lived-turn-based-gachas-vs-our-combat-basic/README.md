@@ -212,3 +212,43 @@ Other battle skills seen in the genre that no current skill covers:
 | Illusion (mind magic) | charm, confuse, sleep, foes hit each other | Elder Scrolls Illusion, D&D Enchanter, Pillars Cipher |
 | Duelist | riposte and counters, one-on-one, dodge | Darkest Dungeon 2 Duelist, Highwayman Riposte, Battle Brothers Riposte |
 | Hunter | traps on foe ranks, beast slaying, tracking marks | Battle Brothers Hunter background, Darkest Dungeon Bounty Hunter, D&D Ranger |
+
+### Round 10: every Darkest Dungeon class on the current skills
+
+The designer asked to map every Darkest Dungeon class (DD1 + DLC, DD2 + DLC; 35 kits) onto the 23 battle skills (one weapon skill + others) and name what is missing. An Opus agent read each class's skills on [darkestdungeon.wiki.gg](https://darkestdungeon.wiki.gg) (DD1 rank details partly from knowledge).
+
+| class | our skills | fit |
+|---|---|---|
+| Abomination (DD1, DD2) | Unarmed + Fury (+ Alchemy or Dark Magic) | partial: the class is the shapeshift (dropped) |
+| Antiquarian | Alchemy + Leadership (+ Defender) | good |
+| Arbalest / Musketeer | Shooting + Doctor (+ Dirty Fighting) | good |
+| Bounty Hunter (DD1, DD2) | Throwing + Dirty Fighting (+ Defender) | good |
+| Crusader (DD1, DD2) | Two-handed + Holy (+ Defender) | good (greatsword, not shield) |
+| Duelist (DD1, DD2) | Single Weapon + Dirty Fighting or Leadership | partial: stances dropped |
+| Flagellant (DD1, DD2) | Dual Wield + Grit + Holy | **partial: martyr side missing** |
+| Grave Robber (DD1, DD2) | Throwing + Stealth (+ Alchemy) | good |
+| Hellion (DD1, DD2) | Polearm + Fury | good |
+| Highwayman (DD1, DD2) | Single Weapon + Dirty Fighting | **conflict: blade and pistol** |
+| Houndmaster | Animal Companion + Defender (+ Leadership) | good |
+| Jester (DD1, DD2) | Single Weapon + Performance | good |
+| Leper (DD1, DD2) | Two-handed + Grit (+ Fury) | good |
+| Man-at-Arms (DD1, DD2) | Weapon and Shield + Defender (+ Leadership) | good |
+| Occultist (DD1, DD2) | Single Weapon + Dark Magic | good |
+| Plague Doctor (DD1, DD2) | Alchemy + Doctor | good (per-quest uses may run dry) |
+| Runaway (DD1, DD2) | Fire Magic + Stealth (+ Doctor) | good (burning zone partial) |
+| Shieldbreaker | Polearm + Alchemy (+ Defender) | good |
+| Vestal (DD1, DD2) | Single Weapon + Holy (+ Defender) | good |
+
+Gaps:
+- **Martyr support** (Flagellant, Abomination's Absolution): pays own HP or stress to heal allies, takes allies' bleeds and stress onto himself, stronger near death. Grit is self-only, Holy and Doctor heal for free. Real hole.
+- **Ally tempo** (Jester's Encore, Duelist's Again!): give an ally an extra action or reset cooldowns. Fits Performance and Leadership bases.
+- **Effects on a rank** (Runaway's burning zone, Vestal's Consecrations): optional; muddied by ranks shifting with no corpses.
+- Fine to leave out: shapeshift, stances, corpses, torchlight, class stress outcomes.
+- Covered already: executes and bonuses vs marked/stunned (modifiers), riposte, self-harm for power (Fury), status detonation (Alchemy, Fire, Dirty Fighting bases).
+
+Conflicts with our rules:
+- Highwayman needs a blade and a pistol; one weapon skill per merc (D-0090). Option: Single Weapon gets a few off-hand pistol bases.
+- Foe movement in DD is spread wide (Shooting knockback, shield shoves, kicks, Dark pulls, Alchemy blasts); D-0073 gave it to Two-handed, Polearm, Dirty Fighting. Does that mean only them?
+- Stress healing in a fight is a main DD support role (Jester, Houndmaster, Crusader); ours is rare and weak (D-0062), so no merc is the stress healer.
+- Throwing-based classes (Grave Robber, Bounty Hunter) also stab in melee; Stealth and Dirty Fighting need some melee bases.
+- Holy burn (DD2 Crusader) vs burns under Fire.
