@@ -13,7 +13,7 @@ Each stat also has a small **passive**, counted from **10 = no effect**: above h
 | **STR** | strength | its battle and check skills | **±1% damage per point from 10**, on all damage |
 | **DEX** | agility, hands, reflexes, aim | its battle and check skills | **speed coins** (turn order) |
 | **INT** | intelligence | its battle and check skills | **XP**, merc and every skill (±3–5% per point from 10, designer; working 3%) |
-| **CHA** | charisma | its battle and check skills | **quest gold** (working ±1% per point from 10, the squad's highest CHA) |
+| **CHA** | charisma | its battle and check skills | **quest gold**: **summed over the squad** (designer), each merc ±1% per point from 10 (working) |
 | **CON** | endurance, toughness | its battle and check skills | **max HP** |
 | **LUK** | luck | none | raises the heads chance of **every coin** (working 50% at 10, ±0.5% per point) |
 
