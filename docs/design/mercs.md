@@ -31,24 +31,24 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 
 ### Battle skills (19)
 
-✦ = rare. **Two attributes per skill** (D-0071); working: the flip uses their average + skill level. Pairings are Claude's draft, balanced so each attribute feeds 6–7 skills (CON 5; it also gives HP).
+✦ = rare. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). Pairings are Claude's draft.
 
 | skill | covers | attributes |
 |---|---|---|
 | **Fast Weapons** | swords, daggers, rapiers: multi-hits, bleeds, crits (D-0063) | DEX + STR |
-| **Cleaving Weapons** | greatswords, axes: hits two adjacent foes | STR + CON |
+| **Cleaving Weapons** | greatswords, axes: hits two adjacent foes | STR |
 | **Heavy Weapons** | hammers, clubs, maces: stuns, armor break, knockback (moves foes back) | STR + CON |
-| **Long-reach Weapons** | polearms, spears: strikes from rank 2–3, reaches deep, pushes and pulls | STR + CON |
-| **Unarmed** | fists, kicks, grapples, martial arts, claws and bites (werewolves) | DEX + STR |
-| **Ranged** | bows, crossbows, guns, slings, throwing (weapon tags) | DEX + WIL |
-| **Defense** | shields, taunts, guarding, party shields | CON + STR |
-| **Leadership** | your side: party auras, Resolve, moving teammates, focus-fire orders (D-0073); rare, weak stress healing (D-0062) | CHA + WIL |
-| **Performance** | songs, Haste, distraction; rare, weak stress healing | CHA + DEX |
-| **Animal Companion** | a fighting pet, like the Houndmaster (no rank of its own) | CHA + CON |
-| **Dirty Fighting** | their side (was Villainy, D-0071): debuffs (blind, weaken), marks, yanking foes forward (D-0073) | STR + CHA |
-| **Stealth** | hiding, ambush strikes | DEX + INT |
-| **Doctor** | healing; limited uses per quest (D-0062) | INT + CHA |
-| **Alchemy** | potions, poisons, flasks; limited uses per quest | INT + DEX |
+| **Long-reach Weapons** | polearms, spears: strikes from rank 2–3, reaches deep, pushes and pulls | STR |
+| **Unarmed** | fists, kicks, grapples, martial arts, claws and bites (werewolves) | DEX |
+| **Ranged** | bows, crossbows, guns, slings, throwing (weapon tags) | DEX |
+| **Defense** | shields, taunts, guarding, party shields | CON |
+| **Leadership** | your side: party auras, Resolve, moving teammates, focus-fire orders (D-0073); rare, weak stress healing (D-0062) | CHA |
+| **Performance** | songs, Haste, distraction; rare, weak stress healing | CHA |
+| **Animal Companion** | a fighting pet, like the Houndmaster (no rank of its own) | CHA |
+| **Dirty Fighting** | their side (was Villainy, D-0074): debuffs (blind, weaken), marks, yanking foes forward (D-0073) | DEX |
+| **Stealth** | hiding, ambush strikes | DEX |
+| **Doctor** | healing; limited uses per quest (D-0062) | INT |
+| **Alchemy** | potions, poisons, flasks; limited uses per quest | INT |
 | **Fire Magic** ✦ | fire damage, burns (D-0070) | INT + WIL |
 | **Frost Magic** ✦ | frost damage, slows | INT + WIL |
 | **Lightning Magic** ✦ | lightning damage, chains | INT + DEX |

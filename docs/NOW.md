@@ -64,7 +64,7 @@
 ## Next
 
 0. **Battle skills first, check skills later** (designer). Locked today: melee split (D-0063), Elemental split + PoE damage types (D-0070), coins = attribute + skill level, skill stars set XP gain (D-0069), defense (D-0066 → D-0070), trait stars (D-0068). Battle skills are now 19 (Warfare deleted, D-0073): see design/mercs.md. Open:
-   - **Two attributes per skill** (D-0071; Villainy → Dirty Fighting). Open: average of the two (Claude), the pairing draft in design/mercs.md.
+   - **Most skills use one attribute, a few two** (D-0074; Villainy → Dirty Fighting). Open: the pairing draft in design/mercs.md.
    - **Ability cadence** (Claude: skill levels 1, 3, 5, 7, 9).
    - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances).
    - Check skills: merges and stars later.
