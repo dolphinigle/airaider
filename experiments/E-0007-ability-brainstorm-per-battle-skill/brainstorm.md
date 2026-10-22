@@ -14,7 +14,7 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 - **10–30 abilities per skill in the final game** (designer, 2026-10-23: "in real one we want to have 10-30 abilities"); D-0069 says 10–20. The baseline (~8 each) is a first cut.
 - **Statuses are written by name only** ("for status application like stun just say stun for now, lets figure out how they are applied later").
 
-**Baseline abilities for all 29 skills** (2026-10-23): `baseline.mjs`, the current set; the per-skill drafts below are its history.
+**Baseline abilities for all 29 skills** (2026-10-23): `baseline.mjs`, the current set; the per-skill drafts below are its history. Designer (2026-10-23): "some skills are too strong eg back rank shot, but thats fine balancing pass later"; numbers wait for a balance pass.
 
 ## Mods (designer, 2026-10-22)
 
