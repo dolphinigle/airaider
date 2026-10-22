@@ -2,6 +2,7 @@
 // For a rough review, not final. Conventions as brainstorm.md: power is a % of a standard hit (heals and shields alike);
 // higher stars bring weirder effects, at most a little stronger than lower ones, never a bigger copy (designer);
 // a good rare base bends the skill's own core in one clear line that resolves now, like Detonate Burn (Claude's reading of the designer's pick);
+// no doubling effects: doubling a status or power compounds into exponential damage (designer);
 // generic names that say what the ability does, so the AI can guess it when picking (it reskins every name);
 // any 0-cd ability that deals damage can serve as a default attack (designer), so none is marked; most abilities 0 cd; stuns always limited and single target; debuffs flip to land.
 // One ability per string:  star | name | from ranks | target | power | effect | cost | flags
@@ -63,7 +64,7 @@ export const SKILLS = [
       '2|Bleeding Cut|1–2|foe 1–2|90%|Bleed|0 cd|new',
       '3|Strike the Bleeding|1–2|foe 1–2|80%|50% more against a Bleeding foe|0 cd|new',
       '3|Spinning Slash and Step|1–2|foe 1 and 2|50% each|you step 1 rank, forward or back|0 cd|new',
-      '4|Deepen Wounds|1–2|foe 1–2|40%|doubles the foe\'s Bleed|0 cd|new',
+      '4|Burst Bleed|1–2|foe 1–2|30%|the foe takes all of its remaining Bleed damage now, and the Bleed ends|0 cd|new',
     ] },
   { name: 'Single Weapon', attr: 'STR + DEX', ranks: '1–3', role: 'flex', state: 'new',
     id: 'Fits anywhere: a little of everything, strong at none. Several abilities change with the rank they are used from. No setup.',
@@ -370,7 +371,7 @@ export const SKILLS = [
       '2|Fire Bomb|3–4|foe 1, 2 and 3|40% each|Burn|2 uses per quest|new',
       '3|Regen and Haste Potion|3–4|any ally||strong Regen and Haste|2 uses per quest|new',
       '3|Poison All Foes|3–4|all foes||Poison|1 use per quest|new',
-      '4|Concentrate Poison|3–4|foe 1–3||doubles the foe\'s Poison|2 uses per quest|new',
+      '4|Burst Poison|3–4|foe 1–3|30%|the foe takes all of its remaining Poison damage now, and the Poison ends|2 uses per quest|new',
     ] },
   { name: 'Concentration', attr: 'INT', ranks: '1–4', role: 'self-sufficient', state: 'new',
     id: 'Empowers its next action, whatever skill it comes from. No effects of its own.',
