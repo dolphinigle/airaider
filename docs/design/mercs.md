@@ -33,9 +33,9 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 
 **Coins (D-0069):** a check flips **attribute + skill level** if the merc has the skill, else the attribute alone (Survival check: DEX + Survival, or just DEX). An attack flips **its attribute + its battle skill's level**; each head deals the ability's base damage.
 
-### Battle skills (27: 8 weapon + 19 others, D-0097)
+### Battle skills (28: 8 weapon + 20 others, D-0098)
 
-**No skill is rare** (D-0093): rarity lives in stars. **Skill names are generic categories**; the AI skins each merc's exact name over them (a greatsword skill maps to Two-handed, D-0021). **Each single attribute gets two flex skills** (not weapon, not magic; D-0097): DEX Precision + Stealth, INT Doctor + Alchemy, CHA Leadership + Animal Companion, CON Defender + Survivor, STR Berserk + Executioner. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). No skill is dedicated to lowering foe resistances; such effects are bases in other skills (D-0097). Pairings: D-0097 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
+**No skill is rare** (D-0093): rarity lives in stars. **Skill names are generic categories**; the AI skins each merc's exact name over them (a greatsword skill maps to Two-handed, D-0021). **Each single attribute gets two flex skills** (not weapon, not magic; D-0097): DEX Precision + Stealth, INT Alchemy + Concentration (Doctor is INT's role skill, D-0098), CHA Leadership + Animal Companion, CON Defender + Survivor, STR Berserk + Executioner. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). No skill is dedicated to lowering foe resistances; such effects are bases in other skills (D-0097). Pairings: D-0098 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
 
 | skill | covers | attributes |
 |---|---|---|
@@ -56,13 +56,14 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 | **Leadership** | your side: party auras, Resolve, moving teammates, focus-fire orders (D-0073); rare, weak stress healing (D-0062) | CHA |
 | **Performance** | songs, Haste, distraction; rare, weak stress healing | DEX + CHA |
 | **Animal Companion** | a fighting pet, like the Houndmaster (no rank of its own) | CHA |
-| **Dirty Fighting** | (name maybe **Skullduggery**, designer) their side (was Villainy, D-0074): debuffs (blind, weaken), marks, yanking foes forward (D-0073) | STR + DEX (was DEX + CON; designer: Retaliation holds that row) |
-| **Retaliation** | (was Counter, D-0097; renamed by designer) counters, ripostes, punishing foes that hit you or a neighbor; archers shoot back | DEX + CON |
+| **Dirty Fighting** | their side (was Villainy, D-0074): debuffs (blind, weaken), marks, yanking foes forward (D-0073) | STR + DEX (D-0098) |
+| **Retaliation** | (was Counter, D-0098) counters, ripostes, punishing foes that hit you or a neighbor; archers shoot back | DEX + CON |
 | **Stealth** | hiding, ambush strikes | DEX |
 | **Doctor** | healing; limited uses per quest (D-0062) | INT |
 | **Alchemy** | potions, poisons, flasks; limited uses per quest | INT |
 | **Fire Magic** | fire damage, burns (D-0070) | STR + INT |
 | **Frost Magic** | frost damage, slows | DEX + INT |
+| **Concentration** | (D-0098) empowers your next action, any ability, weapon or spell: charge the next ability, cut a cooldown, repeat the last, act twice, recover a per-quest use (Claude's draft). Skins: Meditation, Monastic Training, Clear Mind | INT |
 | **Lightning Magic** | lightning damage, chains | INT |
 | **Holy Magic** | healing, blessing, warding off the dead; deals mostly Physical | CHA |
 | **Dark Magic** | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | CHA + CON |
@@ -73,7 +74,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 
 ### Check skills (11)
 
-No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0083). Attributes: D-0096.
+No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0083). Attributes: D-0098.
 
 | skill | covers | attr |
 |---|---|---|

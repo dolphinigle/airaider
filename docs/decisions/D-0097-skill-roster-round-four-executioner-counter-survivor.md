@@ -1,11 +1,11 @@
 ---
 id: D-0097
 title: Skill roster round four: Executioner, Counter, Survivor
-status: accepted          # proposed | accepted | rejected | superseded
+status: superseded          # proposed | accepted | rejected | superseded
 date: 2026-10-22
 decided-by: designer      # designer (design: what the game does) | claude (implementation: how the engine does it)
 supersedes: [D-0096]      # e.g. [D-0003]
-superseded-by:            # set when a later record replaces this one; the only edit allowed after acceptance
+superseded-by: D-0098     # set when a later record replaces this one; the only edit allowed after acceptance
 evidence: [E-0005]        # experiments behind it, e.g. [E-0002]
 sources: []               # archived ideas it brings back, e.g. [archive/v3/ECONOMY.md §3]
 ---
