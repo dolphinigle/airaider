@@ -119,7 +119,7 @@ export const SKILLS = [
     id: 'Burn and moderate damage, with odd utilities (cauterize). Each ability is locked to a narrow pair, so the merc\'s rank decides which to pick.',
     strong: 'single damage, area damage, Burn', weak: 'cure (cauterize, at a cost)',
     abilities: [
-      '1|Close Fire Strike|1–2|foe 1–2|100%|Burn|0 cd|new',
+      '1|Close Fire Spray|1–2|foe 1–2|100%|Burn|0 cd|new',
       '1|Fire Bolt|3–4|foe 1–2|90%|Burn|0 cd|kept',
       '1|Strong Burn|3–4|foe 3–4|40%|strong Burn|0 cd|kept',
       '2|Close Fire Sweep|1–2|foe 1 and 2|55% each|Burn|0 cd|kept',
