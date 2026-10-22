@@ -287,6 +287,7 @@ export const SKILLS = [
       '1|Regen Song|3–4|any ally||Regen|cd 1|new',
       '2|Slowing Note|3–4|any foe||Slowed|0 cd|new',
       '2|Haste All Allies|3–4|all allies||Haste|cd 2|new',
+      '2|Regen All Allies|3–4|all allies||Regen|cd 3|new',
       '2|Calming Song|3–4|all other allies||each loses a little stress|cd 3|new',
       '3|Encore|3–4|any ally||the ally\'s cooldowns drop by 1|cd 2|new',
       '4|Haste and Regen All Allies|3–4|all allies||Haste and Regen|cd 4|new',

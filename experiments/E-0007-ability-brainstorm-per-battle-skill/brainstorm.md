@@ -30,6 +30,7 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 - **Berserk is mostly self buffs** (designer, 2026-10-23: "berserk shouldnt have generic attacks -- ucnlear how you attack with axe? sword? magic? it can have a few but not this many. it should have a little bit of self heal"): its buffs power the merc's weapon or spell attacks; 3 attacks of its own; small self-heals (Bloodthirst, Catch Breath, Feeding Strike).
 - **Survivor relieves its own stress** (designer, 2026-10-23: "survivor should have a self stress heal combined with self heal"): Steel Yourself heals and lowers its stress. **Survivor is the only skill that lowers its own stress** (designer): Leadership and Performance calm *other* allies only. Conflict to rule: the rare **Soothing** mod (lowers your stress) puts self stress relief on any skill.
 - **Warfare buffs the allies it moves** (designer, 2026-10-23: "warfare is completely underpowered. in addition to moving it should also buff the moved allies"). Rearrange Squad removed (designer: "unclear how to perofrm it well").
+- **Performance has a Regen-all song** (designer, 2026-10-23).
 - **Guard is one to one** (designer, 2026-10-23: "guard is only one person guarded by one. one person cannot guard 2 at the same time"); Guard All Allies is out.
 - **No doubling** (designer, 2026-10-23: "doubling in general is bad because expo damage"): no ability doubles a status or a value; cash it in instead (Burst Bleed, Burst Poison, like Detonate Burn).
 
