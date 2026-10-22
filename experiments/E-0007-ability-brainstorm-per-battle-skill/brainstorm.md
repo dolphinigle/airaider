@@ -10,6 +10,8 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 - **Only weapon and magic skills have a default attack** (designer, 2026-10-22, on Dirty Fighting). Other battle skills carry none; a merc whose first ability would come from one gets the generic fallback attack (D-0050, D-0051; Claude's reading).
 - **Statuses are written by name only** ("for status application like stun just say stun for now, lets figure out how they are applied later").
 
+**Baseline abilities for all 29 skills** (2026-10-23): `baseline.mjs`, the current set; the per-skill drafts below are its history.
+
 ## Mods (designer, 2026-10-22)
 
 - One **list of possible mods** ("fire damage mod" etc.), **tailored to each skill**: each skill takes the mods that fit it. The pool should be **"as big as we can"**.
