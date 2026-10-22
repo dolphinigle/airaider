@@ -27,11 +27,11 @@ Cards (designer-approved 2026-10-22, with the designer's changes: Overhead Smash
 | ability | rarity | ranks | damage | effect | cost |
 |---|---|---|---|---|---|
 | **Overhead Smash** | 1★ | 1–2 → foe 1 only | 110% | the default attack | 0 cd |
-| **Cleave** | 1★ | 1–2 → foe 1 and 2 | 60% each | hits both front foes | cd open |
+| **Cleave** | 1★ | 1–2 → foe 1 and 2 | 60% each | hits both front foes | 0 cd (Claude, designer let Claude decide) |
 | **Sunder** | 2★ | 1–2 → 1–2 | 80% | Sundered: foe Physical defense down 3 rounds | cd 3 |
 | **Titanic Swing** | 4★ | 1 → foe 1, 2 and 3 | 70% each | Staggered next round (act last, take more damage) | cd 4 |
 
-Stun and knockback come from other Two-handed abilities, not yet designed (designer: "stun and knockback will be on different skill"). Open: Cleave's cooldown.
+Stun and knockback come from other Two-handed abilities, not yet designed (designer: "stun and knockback will be on different skill"). Cleave has no cooldown (Claude's call): with Overhead Smash, every turn asks focus (110% on one) or spread (60% on two).
 
 Claude's first draft (the long list, kept for later picks):
 
@@ -80,6 +80,7 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 
 **How mods work:**
 - **The AI picks.** The engine rolls how many mods an ability gets; the AI sees every mod that fits and picks that many to suit the merc (designer: "the ai will be given all these mods then asked to pick several"). This replaces Claude's D-0025 idea of dealing 3 candidates.
+- **Eligibility is automatic and rare mods are flipped in** (designer: "pick the 3 mods from all the eligible trait list PLUS some rare ones that were 'flipped' to be included in the selection"). Every common mod that fits the ability (by fits, limits and conditions) is offered; each rare mod gets its own flip to join the offer. No hand-tailoring per ability.
 - **The cost depends on the ability.** On a 0-cooldown ability a mod is free and small, about **10% power** ("a good enough trade"). On an ability with a cooldown, a mod can cost something (such as +1 cd) and be stronger.
 - **Power** is damage on an attack and healing on a heal. **Fits**: dmg (damaging abilities), heal (healing abilities), both.
 - **One damage type per ability.** An element mod **converts all of it** to another type and adds **more** damage (multiplicative, D-0082) on top.
