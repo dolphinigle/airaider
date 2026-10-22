@@ -7,6 +7,7 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 - **Model abilities first** (designer, 2026-10-22): each skill gets a few model abilities that set its identity; the rest are filled in later. The designer lets Claude pick details ("just pick yourself, i dont have strong pref").
 - **Generic names**, because the AI replaces every name ("the names should be more generic").
 - **Most abilities have no cooldown** (designer, 2026-10-22: "you have been using cd way way too often. MOST skills shouldnt have cd… see darkest dungeon"). An ability is priced by its power, ranks, targets and after-effects. Cooldowns go on heals ("Mend should have CD") and a few big effects.
+- **Only weapon and magic skills have a default attack** (designer, 2026-10-22, on Dirty Fighting). Other battle skills carry none; a merc whose first ability would come from one gets the generic fallback attack (D-0050, D-0051; Claude's reading).
 - **Statuses are written by name only** ("for status application like stun just say stun for now, lets figure out how they are applied later").
 
 ## Mods (designer, 2026-10-22)
@@ -166,13 +167,14 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 
 | ability | rarity | ranks | damage | effect | cost |
 |---|---|---|---|---|---|
-| **Low Blow** | 1★ | 1–2 → foe 1–2 | 90% | the default attack | 0 cd |
 | **Pocket Sand** | 1★ | 1–3 → foe 1–2 | 30% | Blinded | 0 cd |
 | **Hamstring** | 1★ | 1–2 → foe 1–2 | 50% | Weakened | 0 cd |
 | **Mark** | 2★ | 1–3 → any foe | — | Mark | 0 cd |
 | **Yank** | 2★ | 1–2 → foe 2–3 | 50% | pulls the foe forward 1 rank | 0 cd |
 | **Kick Them Down** | 2★ | 1–2 → foe 1–2 | 60% | +40% more per debuff on the foe | 0 cd |
 | **Flashbang** | 4★ | 1–3 → foe 1–3 | — | Stun | 2 uses per quest (number Claude's) |
+
+**No default attack** (designer: "dirty fighting shouldnt have a default attack. its not a WEAPON/MAGIC skill"). Low Blow removed.
 
 Every turn asks set up (a debuff) or cash in (Kick Them Down, an ally's big hit on a Marked foe). Yank pulls a back-rank caster into the front line's reach.
 
