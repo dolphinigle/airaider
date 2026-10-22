@@ -34,8 +34,8 @@ The core skills (D-0021, D-0045, D-0058), with the stats their tests usually poo
 | family | core skill | covers | stats |
 |---|---|---|---|
 | Fighting | **Heavy Weapons** | greatswords, axes, hammers, polearms | STR, CON |
-| | **Light Weapons** | swords, daggers, rapiers, brawling | DEX, STR |
-| | **Unarmed** | fists, kicks, grapples, martial arts | DEX, STR |
+| | **Light Weapons** | swords, daggers, rapiers | DEX, STR |
+| | **Unarmed** | fists, kicks, grapples, martial arts, claws and bites (werewolves, beast fighters) (D-0061) | DEX, STR |
 | | **Ranged** | bows, crossbows, guns, slings, throwing (D-0060) | DEX, STR |
 | | **Defense** | shields, armor, parrying, holding a line | CON, STR |
 | | **Athletics** | climbing, swimming, running, hauling, tumbling | STR, DEX |
