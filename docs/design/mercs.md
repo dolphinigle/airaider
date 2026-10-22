@@ -14,7 +14,7 @@ Each stat also has a small **passive**, counted from **10 = no effect**: above h
 |---|---|---|---|
 | **STR** | strength | its battle and check skills | **1% increased damage per point above 10** (designer; reduced below), on all damage |
 | **DEX** | agility, hands, reflexes, aim | its battle and check skills | **speed coins** (turn order) |
-| **INT** | intelligence | its battle and check skills | **increased XP**, merc and every skill (**5% per point above 10**, designer "for now"; reduced below) |
+| **INT** | intelligence | its battle and check skills | **increased XP**, merc and every skill (**3% per point above 10**, designer: "its already a strong stat"; reduced below) |
 | **CHA** | charisma | its battle and check skills | **increased quest gold** (designer), **summed over the squad** (designer), each merc 1% per point from 10 (working; reduced below) |
 | **CON** | endurance, toughness | its battle and check skills | **max HP** |
 | **LUK** | luck | none | raises the heads chance of **every coin** (working 50% at 10, ±0.5% per point) |
@@ -57,7 +57,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 | **Frost Magic** ✦ | frost damage, slows | INT |
 | **Lightning Magic** ✦ | lightning damage, chains | INT |
 | **Holy Magic** ✦ | healing, blessing, warding off the dead; deals mostly Physical | CHA |
-| **Dark Magic** ✦ | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | INT |
+| **Dark Magic** ✦ | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | CON or INT + CON (designer, choosing) |
 
 **Damage types (D-0070):** Physical, Fire, Frost, Lightning, Chaos. Poison and bleed are statuses.
 
