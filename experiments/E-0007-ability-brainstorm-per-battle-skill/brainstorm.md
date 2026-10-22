@@ -78,7 +78,7 @@ A mod or ability that says "a buff" or "a debuff" picks one entry from this list
 | self-debuff | **Staggered** | acts last and takes more damage (Wide Cleave) | how much more | rounds |
 | buff | **Haste** | acts earlier | — | rounds |
 | buff | **Emboldened** | its attacks deal more damage | how much more | attacks |
-| buff | **Blessed** | its flips get a better heads chance | how much better | flips |
+| buff | **Blessed** | each blessed flip gets a fixed better heads chance (designer: a counter of how many times the unit gets blessed with good luck) | — | flips |
 | buff | **Riposte** (Claude) | strikes back when hit | the riposte's damage | charges |
 | buff | **Regen** | heals each round, the opposite of Poison and Burn (designer) | healing per round | rounds |
 
@@ -238,7 +238,7 @@ A heal or shield % is measured like damage: 100% heals as much as a standard hit
 
 Bless: 3–4 → any ally, Blessed until its next flip, 0 cd. Buffs don't flip coins for now (designer: "maybe no coin flips").
 
-**Potency decides the pool** (designer): on a buff or debuff ability whose effect has potency, "more" raises the potency, so scaling and more-power mods fit. They are dropped only where the effect has **no potency**, like Bless ("the pool is small ONLY for skills like this"; Claude reads this as Blessed being count only, to confirm).
+**Potency decides the pool** (designer): on a buff or debuff ability whose effect has potency, "more" raises the potency, so scaling and more-power mods fit. They are dropped only where the effect has **no potency**, like Bless ("the pool is small ONLY for skills like this"); Blessed is count only.
 
 Bless's mods (10 common, 7 rare):
 - **Extra buff on the target** (1, single target, reduced power, as on heals): Hastening / Emboldening / Regenerating
