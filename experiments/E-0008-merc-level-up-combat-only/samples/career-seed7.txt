@@ -1,0 +1,13 @@
+lv  fights quests | STR DEX INT CHA CON LUK | coins this level | HP  speed | Two-handed coins  hit | new abilities
+1   0      0      | 11  11  9   10  11  10  | —                | 33  11    | 12               100% | Heavy Strike (1★), Strike the Marked Prey (2★)
+2   2      1      | 12  11  9   11  12  10  | STR CON CHA      | 36  11    | 14               118% | 
+3   5      3      | 13  12  9   11  13  10  | CON STR DEX      | 39  12    | 16               136% | Three-Foe Cleave (4★), Pounce (1★)
+4   9      5      | 14  12  10  11  13  11  | STR INT LUK      | 39  12    | 18               156% | 
+5   14     7      | 15  13  10  11  14  11  | STR CON DEX      | 42  13    | 20               175% | Knockback Strike (1★), Claw (1★)
+6   20     9      | 15  13  11  11  15  12  | CON LUK INT      | 45  13    | 21               186% | 
+7   27     11     | 16  14  11  11  16  12  | CON STR DEX      | 48  14    | 23               205% | Armor-Breaking Strike (2★), Bleeding Bite (1★), Cleanse Self (1★)
+8   35     13     | 16  15  12  11  17  12  | CON DEX INT      | 51  15    | 24               214% | 
+9   45     15     | 17  15  12  11  18  13  | STR CON LUK      | 54  15    | 26               236% | Cleave (1★), Slowing Bite (2★), Desperate Heal (3★)
+10  57     18     | 18  15  12  12  19  13  | CON STR CHA      | 57  15    | 28               257% | 
+11  71     21     | 18  15  12  13  20  14  | CON LUK CHA      | 60  15    | 28               259% | Steel Yourself (2★)
+12  87     25     | 19  15  12  14  21  14  | CON STR CHA      | 63  15    | 29               271% | 
