@@ -252,3 +252,13 @@ Conflicts with our rules:
 - Stress healing in a fight is a main DD support role (Jester, Houndmaster, Crusader); ours is rare and weak (D-0062), so no merc is the stress healer.
 - Throwing-based classes (Grave Robber, Bounty Hunter) also stab in melee; Stealth and Dirty Fighting need some melee bases.
 - Holy burn (DD2 Crusader) vs burns under Fire.
+
+## Round 11: a second STR flex skill (2026-10-22)
+
+Designer rule: every single attribute gets two flex skills (not weapon, not magic); STR has only Berserk. Rejected before this sweep: Sundering (heavy weapons only, belongs in Two-handed), Strongman, Slayer, Vanguard. An Opus agent surveyed D&D 5e, Pathfinder, Guild Wars 1 (Strength, Tactics), Stoneshard (Athletics, Warfare, Armored Combat), Battle Brothers, Darkest Dungeon, Path of Exile, DOS2 Warfare, Diablo, WFRP, Elder Scrolls, Gloomhaven, Wartales, Final Fantasy, Pillars, Wildermyth.
+
+**STR themes, by how many sources have them:** forced movement (~15), rage when hurt (~12, Berserk), war cries (~11), charges and leaps (~11), heavy armor / unstoppable (~9), counters and retaliation (~9), slams and shockwaves (~8), breaking armor and disarming (~8), power attacks (~7), executions (~7), stamina and tempo (~6), duels (~6), giant size (~3), weapon swapping (~3).
+
+**Candidates:** Manhandling (shove, hurl foes into foes, toss allies; ≈ the rejected Strongman), Power (mirror of Precision: worse flip, bigger hit; wind-ups, overkill spill), Earthshaker (slams, waves down the line, knockdown, aftershock), Juggernaut (armor as offense, unstoppable), Retaliation (counters, ripostes, punish hits on neighbors), Challenger (two-way duel lock), Executioner (≈ rejected Slayer), Conditioning (tempo, extra action; ≈ rejected Momentum), Arsenal (weapon swapping), Rend (≈ rejected Sundering).
+
+Sources: stoneshard.com/wiki (Warfare, Athletics, Armored Combat trees), commonsensegamer.com Wartales Brute and Warrior builds; the rest from known game knowledge (GW1 wiki was down).
