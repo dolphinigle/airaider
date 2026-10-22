@@ -152,12 +152,12 @@ Damage and heal mods are done for now (2026-10-22); the bits marked deferred wai
 | magic | attr | ranks | damage / status | identity |
 |---|---|---|---|---|
 | **Fire** | STR + INT | 1–4 (designer) | Fire / Burn | a balance of single-target and area damage; Burn deals damage over time; **some melee magic** (designer; fits STR + INT) |
-| **Frost** | DEX + INT | 3–4 | Frost / Chilled | single target; Chilled; shields on the caster |
-| **Lightning** | INT | 3–4 | Lightning / Shocked | the biggest direct damage; Shocked makes the next hit deal more; area damage by chaining |
+| **Frost** | DEX + INT | 2–4 (designer) | Frost / Chilled | single target; Chilled; shields on the caster |
+| **Lightning** | INT | 3–4 (designer) | Lightning / Shocked | the biggest direct damage; Shocked makes the next hit deal more; area damage by chaining |
 | **Holy** | CHA | 1–4 (designer) | Physical / none | healing, some buffs, a weak shield, weak damage; no bonus against undead ("holy is already stacked") |
-| **Dark** | CHA + CON | 2–4 | Chaos / none | self-stressing (D-0072), debuffs, **healing paid with stress**, a rare source of Chaos damage; **no Poison** |
+| **Dark** | CHA + CON | 2–4 (designer) | Chaos / none | self-stressing (D-0072), debuffs, **healing paid with stress**, a rare source of Chaos damage; **no Poison** |
 
-Ranks are a skill's range; each ability sets its own (designer: "really depends on the skills"). Frost, Lightning and Dark ranks are Claude's.
+Ranks are a skill's range; each ability sets its own (designer: "really depends on the skills").
 
 **Statuses by damage type, clarified** (designer: "poison deals chaos damage but not caused by chaos magic"): the status-per-type rule says which damage each status deals (Poison deals Chaos). It does not mean every source of that damage type inflicts it. Poison comes from other skills (Alchemy, Poisoning mods).
 
