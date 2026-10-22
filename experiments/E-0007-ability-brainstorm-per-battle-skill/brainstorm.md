@@ -76,6 +76,8 @@ Not on the list: shields (sustain), regen (over time), knockback (a move). Dodge
 
 ### Mod catalog (designer rulings, 2026-10-22; curated, the current state)
 
+Damage and heal mods are done for now (2026-10-22); the bits marked deferred wait for later.
+
 **How mods work:**
 - **The AI picks.** The engine rolls how many mods an ability gets; the AI sees every mod that fits and picks that many to suit the merc (designer: "the ai will be given all these mods then asked to pick several"). This replaces Claude's D-0025 idea of dealing 3 candidates.
 - **The cost depends on the ability.** On a 0-cooldown ability a mod is free and small, about **10% power** ("a good enough trade"). On an ability with a cooldown, a mod can cost something (such as +1 cd) and be stronger.
@@ -90,10 +92,10 @@ Not on the list: shields (sustain), regen (over time), knockback (a move). Dodge
 | status | none | dmg | **Bleeding / Poisoning / Burning / Shocking / Chilling** | inflicts that status, worth ~10% of the damage | statuses may get a slightly higher multiplier (balancer) |
 | debuff | 1 | dmg | **Debuffing** | inflicts one debuff from the effects list | 50% reduced damage; single-target abilities only |
 | debuff | | dmg | **Heavy** | knock the target back 1 rank | rarer; same costs |
-| ally buff | 1 | heal | **Hastening / Emboldening / Blessed** | gives the target Haste / Emboldened / Blessed | single target only; reduced healing (Claude: 50%, mirroring debuffs) |
+| ally buff | 1 | heal | **Hastening / Emboldening / Blessed** | gives the target Haste / Emboldened / Blessed | single target only; reduced healing (Claude: 50%, mirroring debuffs; deferred) |
 | self buff | 1 | both | **Swift** (or any buff from the list) | gives you a buff | |
 | cure | 1 | heal | **Purifying** | removes every negative status from the target | common; 50% reduced healing; single target only |
-| sustain | none | both | **Guarding** | a shield worth 10% of the damage or healing | on a heal, on the healed ally (Claude) |
+| sustain | none | both | **Guarding** | a shield worth 10% of the damage or healing | on a heal, on the healed ally (Claude; deferred) |
 | sustain | | dmg | **Vampiric** | you heal a small share of the damage | rare |
 | sustain | | heal | **Empathic** | you also heal for a share of it | rare |
 | sustain | | heal | **Overflow** | 30% of healing past full HP becomes a shield | rare |
