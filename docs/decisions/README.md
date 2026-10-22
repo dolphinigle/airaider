@@ -92,5 +92,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0083](D-0083-check-skills-eleven-three-per-merc.md) | Check skills: eleven, three per merc | accepted | designer | 2026-10-22 |
 | [D-0084](D-0084-six-stats-and-every-skill-s-attributes.md) | Six stats and every skill's attributes | superseded → D-0086 | designer | 2026-10-22 |
 | [D-0085](D-0085-unarmed-is-str-dex.md) | Unarmed is STR + DEX | superseded → D-0086 | designer | 2026-10-22 |
-| [D-0086](D-0086-skill-attributes-round-two-every-pair-but-one-has-a-skill.md) | Skill attributes, round two: every pair but one has a skill | accepted | designer | 2026-10-22 |
+| [D-0086](D-0086-skill-attributes-round-two-every-attribute-pair-has-a-skill.md) | "Skill attributes, round two: every attribute pair has a skill" | accepted | designer | 2026-10-22 |
 <!-- index:end -->

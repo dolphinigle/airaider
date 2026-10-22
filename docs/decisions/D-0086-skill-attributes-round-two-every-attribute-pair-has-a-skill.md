@@ -1,6 +1,6 @@
 ---
 id: D-0086
-title: Skill attributes, round two: every pair but one has a skill
+title: "Skill attributes, round two: every attribute pair has a skill"
 status: accepted          # proposed | accepted | rejected | superseded
 date: 2026-10-22
 decided-by: designer      # designer (design: what the game does) | claude (implementation: how the engine does it)
