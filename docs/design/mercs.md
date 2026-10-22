@@ -2,7 +2,7 @@
 
 What a merc is made of (stats, skills, talents, level) and how they grow.
 
-## Stats (D-0084)
+## Stats (D-0086)
 
 **Percent effects use Path of Exile wording (D-0082):** *increased/reduced* add together into one multiplier; each *more/less* multiplies on its own. Final = base × (1 + Σ increased − Σ reduced) × Π(1 ± more/less).
 
@@ -14,7 +14,7 @@ Each stat also has a small **passive**, counted from **10 = no effect**: above h
 |---|---|---|---|
 | **STR** | strength | its battle and check skills | **1% increased damage per point above 10** (designer; reduced below), on all damage |
 | **DEX** | agility, hands, reflexes, aim | its battle and check skills | **speed coins** (turn order) |
-| **INT** | intelligence | its battle and check skills | **increased XP**, merc and every skill (**3% per point above 10**, D-0084; reduced below) |
+| **INT** | intelligence | its battle and check skills | **increased XP**, merc and every skill (**3% per point above 10**, D-0086; reduced below) |
 | **CHA** | charisma | its battle and check skills | **increased quest gold** (designer), **summed over the squad** (designer), each merc 1% per point from 10 (working; reduced below) |
 | **CON** | endurance, toughness | its battle and check skills | **max HP** |
 | **LUK** | luck | none | raises the heads chance of **every coin** (working 50% at 10, ±0.5% per point) |
@@ -35,7 +35,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 
 ### Battle skills (19)
 
-✦ = rare. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). Pairings: D-0084 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
+✦ = rare. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). Pairings: D-0086 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
 
 | skill | covers | attributes |
 |---|---|---|
@@ -43,11 +43,11 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 | **Cleaving Weapons** | greatswords, axes: hits two adjacent foes | STR |
 | **Heavy Weapons** | hammers, clubs, maces: stuns, armor break, knockback (moves foes back) | STR + CON |
 | **Long-reach Weapons** | polearms, spears: strikes from rank 2–3, reaches deep, pushes and pulls | STR |
-| **Unarmed** | fists, kicks, grapples, martial arts, claws and bites (werewolves) | STR + DEX (D-0085) |
+| **Unarmed** | fists, kicks, grapples, martial arts, claws and bites (werewolves) | STR + DEX |
 | **Ranged** | bows, crossbows, guns, slings, throwing (weapon tags) | DEX |
 | **Defense** | shields, taunts, guarding, party shields | CON |
 | **Leadership** | your side: party auras, Resolve, moving teammates, focus-fire orders (D-0073); rare, weak stress healing (D-0062) | CHA |
-| **Performance** | songs, Haste, distraction; rare, weak stress healing | DEX + CHA (designer) |
+| **Performance** | songs, Haste, distraction; rare, weak stress healing | DEX + CHA |
 | **Animal Companion** | a fighting pet, like the Houndmaster (no rank of its own) | CHA |
 | **Dirty Fighting** | their side (was Villainy, D-0074): debuffs (blind, weaken), marks, yanking foes forward (D-0073) | DEX |
 | **Stealth** | hiding, ambush strikes | DEX |
@@ -57,25 +57,25 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 | **Frost Magic** ✦ | frost damage, slows | DEX + INT |
 | **Lightning Magic** ✦ | lightning damage, chains | INT |
 | **Holy Magic** ✦ | healing, blessing, warding off the dead; deals mostly Physical | CHA |
-| **Dark Magic** ✦ | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | CON |
+| **Dark Magic** ✦ | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | CHA + CON |
 
 **Damage types (D-0070):** Physical, Fire, Frost, Lightning, Chaos. Poison and bleed are statuses.
 
 ### Check skills (11)
 
-No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0083). Attributes: D-0084.
+No abilities; flipped in check nodes (D-0059). **3 per merc** (D-0083). Attributes: D-0086.
 
 | skill | covers | attr |
 |---|---|---|
 | **Athletics** | climbing, swimming, running, hauling | STR |
-| **Survival** | foraging, camping, weather, terrain, trails | DEX + CON (designer) |
+| **Survival** | foraging, camping, weather, terrain, trails | DEX + CON |
 | **Perception** | spotting ambushes, keeping watch, searching (was Awareness) | DEX |
 | **Roguery** | locks, pockets, traps, forgery | DEX |
 | **Streetwise** | rumors, finding people, city ways | CHA + INT |
 | **Persuasion** | charm, diplomacy, haggling, appraising (+ Bargaining) | CHA |
 | **Intimidation** | threats, interrogation, lies, bluffs, disguises (+ Deception) | STR + CHA |
 | **Lore** | the past, peoples, faiths; plants, beasts, monsters; undead, demons, curses, relics (three lores merged) | INT |
-| **Smithing** | weapons, armor, repairs | INT + CON (designer) |
+| **Smithing** | weapons, armor, repairs | INT + CON |
 | **Engineering** | building, machines, explosives, traps | INT |
 | **Cooking** | camp meals, provisions, the base kitchen | CON |
 
@@ -134,7 +134,7 @@ What a merc does in a fight is an **ability**; a **skill** (Survival, Swords…)
   - rest in base buildings;
   - Leadership and Performance abilities;
   - personality traits, which set how fast it builds.
-- **No quirks.** **No stat touches stress** (D-0084: "stress is stress"). Open: what decides Resolve vs Breakdown at 100; whether stress matters outside fights.
+- **No quirks.** **No stat touches stress** (D-0086: "stress is stress"). Open: what decides Resolve vs Breakdown at 100; whether stress matters outside fights.
 
 ## Upgrade items (D-0029)
 

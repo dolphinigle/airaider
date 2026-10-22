@@ -21,12 +21,12 @@
 - **Skill checks** are pure coin flips (D-0013): attribute + skill level (D-0069).
 
 ### Mercs ([design/mercs.md](design/mercs.md))
-- **Stats:** STR DEX INT CHA CON LUK (D-0084), about 10 → 20 over a career (D-0069). Percent effects use Path of Exile *increased* (additive) and *more* (multiplicative) (D-0082). Passives (D-0081, counted from 10 = no effect, below 10 hurts): STR 1% increased damage per point, DEX speed coins, INT 3% increased XP per point, CHA increased quest gold (summed over the squad), CON max HP, LUK (no skills) heads chance on every coin. WIL is gone; no stat touches stress. Each skill uses one attribute, a few two (D-0074, D-0084).
+- **Stats:** STR DEX INT CHA CON LUK (D-0086), about 10 → 20 over a career (D-0069). Percent effects use Path of Exile *increased* (additive) and *more* (multiplicative) (D-0082). Passives (D-0081, counted from 10 = no effect, below 10 hurts): STR 1% increased damage per point, DEX speed coins, INT 3% increased XP per point, CHA increased quest gold (summed over the squad), CON max HP, LUK (no skills) heads chance on every coin. WIL is gone; no stat touches stress. Each skill uses one attribute, a few two (D-0074, D-0086).
 - **Stars** (D-0069): every skill has a star (1★–5★, half steps) that sets its XP gain and, for battle skills, its abilities' modifier odds; the merc's star makes high skill stars likelier.
 - **Upgrade items:** star-up and reroll reroll only the level-up seed (D-0029, D-0032). A star-up sets a fixed star below 5★ (D-0037).
 - **Skills:**
   - Two starting skills; pick 1 of 3 at Lv 7 (D-0035).
-  - **Battle skills** (19, give abilities; D-0084) and **check skills** (give none) are separate, with their own quotas: 3 battle (working) + 3 check (D-0083). Battle skills can be checked too. Civilians have check skills only; v3 captives, if they return, too (D-0058).
+  - **Battle skills** (19, give abilities; D-0086) and **check skills** (give none) are separate, with their own quotas: 3 battle (working) + 3 check (D-0083). Battle skills can be checked too. Civilians have check skills only; v3 captives, if they return, too (D-0058).
 - **Abilities:** fights use abilities; skills are what mercs know (D-0031).
   - A merc level up gives attributes only. **Some battle-skill level ups give a new ability** (working: skill levels 1, 3, 5, 7, 9): the AI picks one of a few dealt bases from that skill and renames it. Never the same base twice. Four equipped (D-0069).
   - 10–20 bases per battle skill (D-0069).
@@ -35,7 +35,7 @@
   - The first ability is always a 0-cooldown attack, with a generic fallback (Smash, Kick); generic bases also come up rarely later (D-0050, D-0051).
   - The player sees only the AI name (D-0048).
 - **Passives are traits:** gender, race, personality, body. They never touch coins (D-0036, D-0038–D-0040). Traits have stars; passives scale a little with them (D-0068; Claude: 5★ = 1.5×).
-- **Stress:** 0–100, carries across quests. At 100: Resolve or Breakdown, decided by no stat (D-0084; how is open). No quirks (D-0042).
+- **Stress:** 0–100, carries across quests. At 100: Resolve or Breakdown, decided by no stat (D-0086; how is open). No quirks (D-0042).
 - **Tactics:** condition + action + target, and their parts are loot (D-0030, D-0034).
 - **Gear:** none for now; it comes eventually (D-0034).
 
@@ -63,10 +63,10 @@
 
 ## Next
 
-0. **Battle skills are settled** (2026-10-22): 19 skills with attribute pairings (D-0063, D-0070, D-0073, D-0074, D-0084; table in design/mercs.md). Coins = attribute + skill level (D-0069); defense and damage types (D-0070); Dark Magic costs stress (D-0072). Still open:
+0. **Battle skills are settled** (2026-10-22): 19 skills with attribute pairings (D-0063, D-0070, D-0073, D-0074, D-0086; table in design/mercs.md). Coins = attribute + skill level (D-0069); defense and damage types (D-0070); Dark Magic costs stress (D-0072). Still open:
    - **Ability cadence** (Claude: a new ability at skill levels 1, 3, 5, 7, 9).
    - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances). Claude leans Darkest Dungeon.
-1. **Check skills** (in progress 2026-10-22). Done: **11 check skills, 3 per merc** (D-0083): Athletics, Survival, Perception, Roguery, Streetwise, Persuasion, Intimidation, Lore, Smithing, Engineering, Cooking. **Every skill's attribute** (D-0084): Fire STR + INT, Frost DEX + INT, Lightning INT (Path of Exile), Dark Magic CON; Unarmed STR + DEX (D-0085). Then (designer, to record): Smithing INT + CON, Performance DEX + CHA, Survival DEX + CON, Holy stays CHA; looking for a CHA + CON skill. Designer likes Dark Magic CHA + CON but it thins CON; asked for new CON or CHA + CON skills first. Claude's ideas: **Carousing** (CHA + CON check: drinking contests, tavern nights, feasts), **Fury** (CON battle: HP-cost abilities, stronger at low HP; Darkest Dungeon Flagellant gap, E-0005 round 4), **Blood Magic** (CON battle: spells paid in HP, life drain, the mirror of Dark Magic's stress), **Labor** (CON check: digging, hauling, mining, base work). Survey (E-0005 round 7): CON with no skills is the tradition (D&D, Pathfinder); when it has them they are drinking (WFRP Consume Alcohol, Kingdom Come Drinking), endurance, armor/blocking, smithing (Bannerlord). Sorcerer/Warlock back Dark Magic CHA + CON. Stats are STR DEX INT CHA CON LUK (WIL cut, LUK added); passives counted from 10 (D-0081): STR increased damage, INT 3% increased XP, CHA increased quest gold summed over the squad, CON HP, DEX speed, LUK heads chance; percents use Path of Exile increased/more (D-0082). Still open:
+1. **Check skills** (in progress 2026-10-22). Done: **11 check skills, 3 per merc** (D-0083): Athletics, Survival, Perception, Roguery, Streetwise, Persuasion, Intimidation, Lore, Smithing, Engineering, Cooking. **Every skill's attribute** (D-0086): Fire STR + INT, Frost DEX + INT, Lightning INT (Path of Exile); Dark Magic CHA + CON (pact-maker); Unarmed STR + DEX; Performance DEX + CHA; Survival DEX + CON; Smithing INT + CON; all ten pairs have a skill; CON thin by tradition (E-0005 round 7). Stats are STR DEX INT CHA CON LUK (WIL cut, LUK added); passives counted from 10 (D-0081): STR increased damage, INT 3% increased XP, CHA increased quest gold summed over the squad, CON HP, DEX speed, LUK heads chance; percents use Path of Exile increased/more (D-0082). Still open:
    - when the 3 check skills are gained (all at recruitment, or 2 + 1 later);
    - uses outside check nodes (Perception reveals `???` nodes, Lore shows foe weaknesses, Persuasion prices, Cooking at the base kitchen);
    - what each does in check nodes (pass: loot, buff, knowledge; fail: stress, HP, harder next fight).
@@ -77,7 +77,7 @@
 
 ## Waiting on the designer
 
-- **Stress at 100 without a stat** (D-0084): always Breakdown, a flat chance, or something else? Resolve stays?
+- **Stress at 100 without a stat** (D-0086): always Breakdown, a flat chance, or something else? Resolve stays?
 - **Check nodes** (D-0059 notes): one named skill per node; pass gives loot/buff/knowledge, fail costs; can Scouting reveal hidden nodes?
 - **Skill stress healing** is rare and weak; rest is the main relief (D-0062).
 - **To decide later** (D-0055):
