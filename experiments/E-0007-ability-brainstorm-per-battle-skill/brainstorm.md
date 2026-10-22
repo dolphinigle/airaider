@@ -25,6 +25,7 @@ The goal is each skill's identity plus rough ability bases. Numbers come later (
 ## Rarity (designer, 2026-10-22)
 
 - **Some ability bases are rarer** (the designer called Titanic Swing "a (rarer) skill"). Rarer bases are dealt to the AI less often, and the skill's star makes them likelier (designer: "1 STAR skills are common"). Claude reads this as rarity stars on ability bases (reading A). Whether skill types also have rarity (reading B) is unconfirmed.
+- **Higher stars are weirder, not stronger** (designer, 2026-10-23: "dont make higher star skill power creep thei lower ones. higher star just usually have weirder effects… its fine to make them a little stronger than lower rarity just not like 2x"). A rare base may be a little stronger than common ones, never a bigger copy of one (the rejected example: a 4★ Polearm lunge at 220% beside the 1★ one at 130%).
 
 ## Battle skill key identities (2026-10-23)
 
