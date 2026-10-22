@@ -33,9 +33,9 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 
 **Coins (D-0069):** a check flips **attribute + skill level** if the merc has the skill, else the attribute alone (Survival check: DEX + Survival, or just DEX). An attack flips **its attribute + its battle skill's level**; each head deals the ability's base damage.
 
-### Battle skills (26: 8 weapon + 18 others, D-0096 + Executioner)
+### Battle skills (27: 8 weapon + 19 others, D-0097)
 
-**No skill is rare** (D-0093): rarity lives in stars. **Skill names are generic categories**; the AI skins each merc's exact name over them (a greatsword skill maps to Two-handed, D-0021). **Each single attribute gets two flex skills** (not weapon, not magic; designer): DEX Precision + Stealth, INT Doctor + Alchemy, CHA Leadership + Animal Companion, CON Defender + Survivor, STR Berserk + Executioner. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). Pairings: D-0096 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
+**No skill is rare** (D-0093): rarity lives in stars. **Skill names are generic categories**; the AI skins each merc's exact name over them (a greatsword skill maps to Two-handed, D-0021). **Each single attribute gets two flex skills** (not weapon, not magic; D-0097): DEX Precision + Stealth, INT Doctor + Alchemy, CHA Leadership + Animal Companion, CON Defender + Survivor, STR Berserk + Executioner. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). No skill is dedicated to lowering foe resistances; such effects are bases in other skills (D-0097). Pairings: D-0097 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
 
 | skill | covers | attributes |
 |---|---|---|
@@ -49,14 +49,15 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 | **Throwing** | knives, axes, javelins, slings: skirmisher from front or middle ranks, multi-throws, bleeds (D-0091) | STR + DEX |
 | **Defender** | shields, taunts, guarding, party shields (was Defense, designer) | CON |
 | **Berserk** | (was Fury, D-0095) the berserker (Hellion), physical AoE (whirlwind, rampage, trample): burst self-buffs, huge hits that exhaust you after, war cries, kills feed it, stronger when hurt or paid in HP (D-0089) | STR |
-| **Executioner** | (designer, E-0005 round 11) the finisher: more damage the lower the foe's HP; Claude's draft also has kill-outright blows under a threshold, a kill refunding the turn or resetting a cooldown, and picking out the weakest foe in reach. Skins: Headsman, Butcher, Death Blow | STR |
-| **Survivor** | (was Grit, designer) the Leper: self-heal, shrug off statuses, survive a killing blow once, regen; keeps only itself alive (D-0089) | CON |
+| **Executioner** | (D-0097) the finisher: more damage the lower the foe's HP; Claude's draft also has kill-outright blows under a threshold, a kill refunding the turn or resetting a cooldown, and picking out the weakest foe in reach. Skins: Headsman, Butcher, Death Blow | STR |
+| **Survivor** | (was Grit, D-0097) the Leper: self-heal, shrug off statuses, survive a killing blow once, regen; keeps only itself alive (D-0089) | CON |
 | **Precision** | raises the heads chance of coin flips, self or allies, and so crits (D-0095) | DEX |
 | **Warfare** | back (D-0095); scope open (draft: combined attacks with an ally, breaking foe shields, formation tricks) | STR + INT |
 | **Leadership** | your side: party auras, Resolve, moving teammates, focus-fire orders (D-0073); rare, weak stress healing (D-0062) | CHA |
 | **Performance** | songs, Haste, distraction; rare, weak stress healing | DEX + CHA |
 | **Animal Companion** | a fighting pet, like the Houndmaster (no rank of its own) | CHA |
 | **Dirty Fighting** | their side (was Villainy, D-0074): debuffs (blind, weaken), marks, yanking foes forward (D-0073) | DEX + CON |
+| **Counter** | (D-0097) counters, ripostes, punishing foes that hit you or a neighbor; archers shoot back | DEX + CON |
 | **Stealth** | hiding, ambush strikes | DEX |
 | **Doctor** | healing; limited uses per quest (D-0062) | INT |
 | **Alchemy** | potions, poisons, flasks; limited uses per quest | INT |

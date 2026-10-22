@@ -102,5 +102,6 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0093](D-0093-no-rare-skills-stars-carry-rarity.md) | No rare skills; stars carry rarity | accepted | designer | 2026-10-22 |
 | [D-0094](D-0094-fortune-the-coin-skill-uses-luk.md) | Fortune, the coin skill, uses LUK | superseded → D-0095 | designer | 2026-10-22 |
 | [D-0095](D-0095-fortune-out-fury-renamed-berserk-precision-and-warfare-in.md) | Fortune out; Fury renamed Berserk; Precision and Warfare in | accepted | designer | 2026-10-22 |
-| [D-0096](D-0096-skill-roster-and-attributes-round-three.md) | Skill roster and attributes, round three | accepted | designer | 2026-10-22 |
+| [D-0096](D-0096-skill-roster-and-attributes-round-three.md) | Skill roster and attributes, round three | superseded → D-0097 | designer | 2026-10-22 |
+| [D-0097](D-0097-skill-roster-round-four-executioner-counter-survivor.md) | Skill roster round four: Executioner, Counter, Survivor | accepted | designer | 2026-10-22 |
 <!-- index:end -->
