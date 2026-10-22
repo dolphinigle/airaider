@@ -35,7 +35,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 
 ### Battle skills (23)
 
-âœ¦ = rare. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). Pairings: D-0086 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
+âœ¦ = rare: **only Dark Magic** (designer, 2026-10-22). **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). Pairings: D-0086 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
 
 | skill | covers | attributes |
 |---|---|---|
@@ -48,7 +48,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 | **Shooting** | bows, crossbows, guns: back-rank sniper, long reach, aimed shots, volleys (D-0091) | DEX |
 | **Throwing** | knives, axes, javelins, slings: skirmisher from front or middle ranks, multi-throws, bleeds (D-0091) | STR + DEX |
 | **Defender** | shields, taunts, guarding, party shields (was Defense, designer) | CON |
-| **Fury** âœ¦ | the berserker (Hellion): burst self-buffs, huge hits that exhaust you after, war cries, kills feed it, stronger when hurt or paid in HP (D-0089); rare (designer) | STR + CON |
+| **Fury** | the berserker (Hellion): burst self-buffs, huge hits that exhaust you after, war cries, kills feed it, stronger when hurt or paid in HP (D-0089) | STR + CON |
 | **Grit** | the survivor (Leper): self-heal, shrug off statuses, survive a killing blow once, regen; keeps only itself alive (D-0089) | CON |
 | **Leadership** | your side: party auras, Resolve, moving teammates, focus-fire orders (D-0073); rare, weak stress healing (D-0062) | CHA |
 | **Performance** | songs, Haste, distraction; rare, weak stress healing | DEX + CHA |
@@ -57,7 +57,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 | **Stealth** | hiding, ambush strikes | DEX |
 | **Doctor** | healing; limited uses per quest (D-0062) | INT |
 | **Alchemy** | potions, poisons, flasks; limited uses per quest | INT |
-| **Fire Magic** | fire damage, burns (D-0070); not rare (designer) | STR + INT |
+| **Fire Magic** | fire damage, burns (D-0070) | STR + INT |
 | **Frost Magic** | frost damage, slows | DEX + INT |
 | **Lightning Magic** | lightning damage, chains | INT |
 | **Holy Magic** | healing, blessing, warding off the dead; deals mostly Physical | CHA |
