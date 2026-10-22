@@ -63,6 +63,13 @@
 
 ## Next
 
+0. **Battle skills first, check skills later** (designer). Open now:
+   - **Attributes:** keep the six stats (D-0044) or not? Darkest Dungeon has none (designer: "unsure if we still want it").
+   - **Melee split** (D-0063, proposed): Fast, Cleaving, Heavy, Long-reach.
+   - **Elemental:** one skill with element tags (Claude) or split?
+   - **To do: status effects model**, Pokémon style (one major status at a time) or Darkest Dungeon style (many stacking, durations, resistances).
+   - Ruled (D-0062): Nature Lore and Engineering leave combat; some abilities have per-quest uses (Alchemy, Doctor); stress healing in fights is rare and weak.
+
 1. **Skill merges (the current question).** The designer asked: "show me skills list lets see if we can merge stuffs". Claude's proposal, 30 → 20 skills:
    - **Strong merges:**
      - **Lore** = Nature Lore + Arcane Lore + Civilization Lore. Main fighting skill: analyzes any monster, exposes weaknesses.

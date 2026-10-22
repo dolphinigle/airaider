@@ -68,4 +68,6 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0059](D-0059-quest-preview-shows-the-fixed-node-line-some-nodes-hidden.md) | Quest preview shows the fixed node line, some nodes hidden | accepted | designer | 2026-10-22 |
 | [D-0060](D-0060-dark-magic-is-paid-in-hp-guns-are-ranged.md) | Dark Magic is paid in HP; guns are Ranged | accepted | designer | 2026-10-22 |
 | [D-0061](D-0061-unarmed-covers-claws-and-bites-shapeshifting-and-stances-dro.md) | Unarmed covers claws and bites; shapeshifting and stances dropped | accepted | designer | 2026-10-22 |
+| [D-0062](D-0062-nature-lore-and-engineering-leave-combat-per-quest-uses-stre.md) | Nature Lore and Engineering leave combat; per-quest uses; stress healing in fights is rare | accepted | designer | 2026-10-22 |
+| [D-0063](D-0063-melee-splits-into-fast-cleaving-heavy-and-long-reach-weapons.md) | Melee splits into Fast, Cleaving, Heavy and Long-reach weapons | proposed | designer | 2026-10-22 |
 <!-- index:end -->
