@@ -33,9 +33,9 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 
 **Coins (D-0069):** a check flips **attribute + skill level** if the merc has the skill, else the attribute alone (Survival check: DEX + Survival, or just DEX). An attack flips **its attribute + its battle skill's level**; each head deals the ability's base damage.
 
-### Battle skills (25: 8 weapon + 17 others, D-0096)
+### Battle skills (26: 8 weapon + 18 others, D-0096 + Executioner)
 
-**No skill is rare** (D-0093): rarity lives in stars. **Skill names are generic categories**; the AI skins each merc's exact name over them (a greatsword skill maps to Two-handed, D-0021). **Each single attribute gets two flex skills** (not weapon, not magic; designer): DEX Precision + Stealth, INT Doctor + Alchemy, CHA Leadership + Animal Companion, CON Defender + Survivor, STR Berserk + one to add. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). Pairings: D-0096 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
+**No skill is rare** (D-0093): rarity lives in stars. **Skill names are generic categories**; the AI skins each merc's exact name over them (a greatsword skill maps to Two-handed, D-0021). **Each single attribute gets two flex skills** (not weapon, not magic; designer): DEX Precision + Stealth, INT Doctor + Alchemy, CHA Leadership + Animal Companion, CON Defender + Survivor, STR Berserk + Executioner. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). Pairings: D-0096 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
 
 | skill | covers | attributes |
 |---|---|---|
@@ -49,6 +49,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 | **Throwing** | knives, axes, javelins, slings: skirmisher from front or middle ranks, multi-throws, bleeds (D-0091) | STR + DEX |
 | **Defender** | shields, taunts, guarding, party shields (was Defense, designer) | CON |
 | **Berserk** | (was Fury, D-0095) the berserker (Hellion), physical AoE (whirlwind, rampage, trample): burst self-buffs, huge hits that exhaust you after, war cries, kills feed it, stronger when hurt or paid in HP (D-0089) | STR |
+| **Executioner** | (designer, E-0005 round 11) the finisher: more damage the lower the foe's HP; Claude's draft also has kill-outright blows under a threshold, a kill refunding the turn or resetting a cooldown, and picking out the weakest foe in reach. Skins: Headsman, Butcher, Death Blow | STR |
 | **Survivor** | (was Grit, designer) the Leper: self-heal, shrug off statuses, survive a killing blow once, regen; keeps only itself alive (D-0089) | CON |
 | **Precision** | raises the heads chance of coin flips, self or allies, and so crits (D-0095) | DEX |
 | **Warfare** | back (D-0095); scope open (draft: combined attacks with an ally, breaking foe shields, formation tricks) | STR + INT |
