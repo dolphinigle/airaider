@@ -84,3 +84,33 @@ Ideas offered to the designer, 2026-10-22:
 - **Camping between waves.** From Darkest Dungeon: skills restore mana and stress at camp.
 - **Downed at 0 HP.** From Darkest Dungeon's Death's Door: a healer can bring the merc back, and each hit while downed worsens the injury.
 - **A risk dial per quest.** From Darkest Dungeon's torch: more loot for more stress and tougher foes.
+
+### Round 4: Darkest Dungeon classes vs our skills
+
+The designer asked whether our skills cover every Darkest Dungeon class (DD1 with DLC, DD2 with The Binding Blade). Rosters from [darkestdungeon.wiki.gg](https://darkestdungeon.wiki.gg/wiki/Heroes_(Darkest_Dungeon_II)) and [darkestdungeon.com](https://www.darkestdungeon.com/news/darkest-dungeon-ii-the-binding-blade-base-game-retail-release).
+
+Result: **every class maps to one or two of our skills**, the same shape as our two starting skills. Abomination is the one exception.
+
+| class | our skills |
+|---|---|
+| Abomination | Unarmed + Dark, plus **shapeshift (no home)** |
+| Antiquarian | Lore + Alchemy; brought along for extra loot |
+| Arbalest, Musketeer | Ranged + Doctor (bandage) / Leadership (flare) |
+| Bounty Hunter | Villainy (mark, pull, knockback) |
+| Crusader | Heavy + Holy |
+| Flagellant | Light + Holy, plus **abilities paid in HP, stronger at low HP** |
+| Grave Robber | Light + Roguery (Shadow Fade) |
+| Hellion | Heavy (polearm) |
+| Highwayman | Light + Ranged (pistol) |
+| Houndmaster | Animal Companion + Defense |
+| Jester | Light + Performance |
+| Leper | Heavy |
+| Man-at-Arms | Defense + Warfare |
+| Occultist | Dark |
+| Plague Doctor | Alchemy + Doctor |
+| Vestal | Holy |
+| Shieldbreaker | Light (spear) + Defense; attacks that pierce ranks |
+| Runaway (DD2) | Elemental (fire) + Defense |
+| Duelist (DD2) | Light, plus **stances** |
+
+Gaps are mechanics, not skills: shapeshift, HP-cost abilities, stances, guns (setting question). Our skills with no Darkest Dungeon class: Unarmed, Engineering, Lore as a fighting skill, mostly Elemental. Plague Doctor supports merging Doctor into Alchemy; Antiquarian is a model for civilians brought along for loot.
