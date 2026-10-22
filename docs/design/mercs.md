@@ -60,7 +60,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) �
 | **Fire Magic** | fire damage, burns (D-0070); not rare (designer) | STR + INT |
 | **Frost Magic** | frost damage, slows | DEX + INT |
 | **Lightning Magic** | lightning damage, chains | INT |
-| **Holy Magic** ✦ | healing, blessing, warding off the dead; deals mostly Physical | CHA |
+| **Holy Magic** | healing, blessing, warding off the dead; deals mostly Physical | CHA |
 | **Dark Magic** ✦ | curses, necromancy, pacts; deals Chaos; **its abilities cost stress** (D-0072) | CHA + CON |
 
 **Weapon skills are styles (D-0090). At most one per merc:** Two-handed, Polearm, Weapon and Shield, Dual Wield, Single Weapon, Unarmed, Shooting or Throwing (D-0091); the rest combine freely. Weapon flavor (axe, hammer, sword) comes from modifiers and the AI's pick and name. Attributes of the new ones: Claude's draft.
