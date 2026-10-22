@@ -2,52 +2,95 @@
 
 > The status board. Rewrite it at the end of every working session. History lives in git, decisions and experiments, not here.
 
-**Phase:** prototype v4, brainstorming what the game should look like (started 2026-10-19). Goal right now: shape the game through designer-led brainstorms and simulated playtests, **recording every idea** as it lands (decision if ruled, working model below if not). No code yet.
+**Phase:** prototype v4, brainstorming what the game should look like (started 2026-10-19). **Goal right now:** find the FUN and the core gameplay concepts through designer-led brainstorms. **Record every idea** as it lands: a decision if ruled, the working model below if not. No code yet. The designer said: "lets focus on FUN and core gameplay concepts first."
 
-**Locked so far:** mercs (stats, skills, talents, levels, growth: [design/mercs.md](design/mercs.md)); quests resolve through **fights played by hand (some later quests force tactics) + pure coin-flip skill checks** (D-0053), fights displayed with AI lines only before and after (D-0023), losing injures, never kills (D-0024): [design/quests.md](design/quests.md). Half-star rarity sets modifier odds (D-0027); **abilities** (fight) vs **skills** (Survival…) (D-0031): one new ability per level up: the AI picks one of a few dealt bases from the merc's fighting skills and renames it, never the same base twice, four equipped; 10–20 bases per fighting skill (D-0047); unarmed is its own skill, weapon tags filter bases (D-0045); 18 fighting skills plus minor ones; civilians exist; Smithing + Engineering, Nature Lore (D-0046); first ability a 0-cd attack, generic fallback (D-0050, D-0051); players see only AI ability names (D-0048); stats STR DEX INT CHA CON WIL (D-0044); star-up and reroll items reroll only the level-up seed (D-0029, D-0032), a star-up sets a fixed star below 5★ (D-0037); two starting skills, pick 1 of 3 at Lv 7 (D-0035); passives are traits: gender, race, personality, body (Wolfkin +10% damage, −10% speed) (D-0036, D-0038, D-0039), never touching stat or skill coins (D-0040); tactics are condition + action + target, parts are loot (D-0030, D-0034); no gear for now, it comes eventually (D-0034); **stress** 0–100 carries across quests, at 100 Resolve or Breakdown, no quirks (D-0042); fight sprites one image per pose, as in Darkest Dungeon (D-0043, proposed, parked as a detail). **Campaign follows Darkest Dungeon (D-0052):** one quest a week (later a second, auto-fought one; anti-grind parked), the rest recover; gold sinks are stress relief, injury healing, buildings, room-capped levels; quests grow from 1–2 mercs × 1–2 battles to 4 mercs × ~4 battles + boss.
+## Locked so far
 
-## Working model (brainstormed, not locked)
+### The game
+- **Mostly combat** (D-0056). Quests are runs of fights, and civilization quests are mostly gone.
+- **The campaign follows Darkest Dungeon** (D-0052):
+  - One quest a week; later a second, auto-fought one.
+  - Mercs who stay home recover.
+  - Gold sinks: stress relief, injury healing, buildings, and room-capped merc levels (v3 idea).
+  - Quests grow from 1–2 mercs × 1–2 battles to 4 mercs × ~4 battles + a boss.
+- **Fights:**
+  - Played by hand: each merc's turn, the player picks the ability and the target. Some later quests force fights that run on tactics (D-0053, which replaces D-0026).
+  - Shown with AI lines only before and after (D-0023).
+  - Losing injures, never kills (D-0024).
+- **Skill checks** are pure coin flips (D-0013).
 
-The shape we use in playtests until the designer rules otherwise. Sources: E-0003, D-0025 (proposed).
+### Mercs ([design/mercs.md](design/mercs.md))
+- **Stats:** STR DEX INT CHA CON WIL (D-0044). DEX gives speed coins, CON gives max HP, WIL is the stress check.
+- **Rarity:** half-star, sets modifier odds (D-0027).
+- **Upgrade items:** star-up and reroll reroll only the level-up seed (D-0029, D-0032). A star-up sets a fixed star below 5★ (D-0037).
+- **Skills:**
+  - Two starting skills; pick 1 of 3 at Lv 7 (D-0035).
+  - 18 main fighting skills plus minor ones (D-0046).
+  - Civilians exist (D-0046), but their role is open after D-0056.
+- **Abilities:** fights use abilities; skills are what mercs know (D-0031).
+  - One new ability per level up. The AI picks one of a few dealt bases from the merc's fighting skills and renames it. Never the same base twice. Four equipped (D-0047).
+  - 10–20 bases per fighting skill (D-0047).
+  - Weapon tags filter bases; Unarmed is its own skill; no medium tier (D-0045).
+  - The first ability is always a 0-cooldown attack, with a generic fallback (Smash, Kick); generic bases also come up rarely later (D-0050, D-0051).
+  - The player sees only the AI name (D-0048).
+- **Passives are traits:** gender, race, personality, body. They never touch coins (D-0036, D-0038–D-0040).
+- **Stress:** 0–100, carries across quests. At 100 the merc flips WIL: Resolve or Breakdown. No quirks (D-0042).
+- **Tactics:** condition + action + target, and their parts are loot (D-0030, D-0034).
+- **Gear:** none for now; it comes eventually (D-0034).
 
-- **Party:** about 4 mercs per quest (e.g. two warriors, a mage, a healer).
-- **Combat basics (D-0041, proposed):** Darkest Dungeon style ordered line (4 ranks, abilities state the ranks they're used from and reach, no corpses: units shift forward); speed coins re-flipped every round, everyone acts once, Haste/Slow; ability pool = stat + skill (two-skill abilities average them), damage per heads; cooldowns only, no mana; guard abilities taunt or shield (party); damage-type weaknesses and statuses that raise damage taken; foes fixed. Waves happen automatically.
-- **Abilities:** fixed base abilities (damage type, ranks used from and reached, cooldown) from the merc's core skills, plus engine-priced modifiers (Fiery, Stunning, Lasting…). The AI names each ability once and picks its rolled modifiers from engine-dealt candidates; names only, no lines. An ability's number is damage per heads (D-0025).
-- **Modifiers:** 0–4 per ability, odds by star (D-0027); about 30 should fit each base ability; about 5 base abilities per skill.
-- **Equip order:** the four equipped abilities sit in priority order S1–S4; on its turn a merc uses the first ready one.
-- **Tactics:** condition + action + target (D-0030), e.g. "an ally below 50% HP" + "use S4" + "the ally with the lowest HP". How many lines a merc gets is open. Best when foes have sharp twists.
-- **Foe families** each get one sharp twist that punishes a default setup (foe healer, armored undead, enraging boss, fire-immune imps).
-- **Re-equip at base**, between quests; tactics cover changes inside a quest; scouting or lore can reveal what's ahead.
-- **Balance:** parked; assume it works (designer).
-- **Trait effects:** parked ("we'll figure out the effect details later", designer, 2026-10-22). This covers race's stat bias (D-0018 vs D-0040), how gender traits differ, and whether every trait is a trade-off.
+## Working model (not locked)
+
+- **Combat basics** (D-0041, proposed, the designer called it "decent"):
+  - **Formation:** a Darkest Dungeon line, 4 ranks per side. Abilities state the ranks they're used from and the ranks they reach. No corpses: units shift forward.
+  - **Turn order:** speed coins re-flipped every round, everyone acts once. Haste and Slow change it.
+  - **Ability flips:** stat + skill coins (two-skill abilities average the two skills); damage = heads × base.
+  - **Costs:** cooldowns only; no mana, no stamina.
+  - **Guard:** taunts, or shields (the shield can cover the party).
+  - **Interactions:** damage-type weaknesses, and statuses that raise damage taken.
+  - **Foes are fixed:** they never flip.
+  - **Waves** happen automatically.
+- **Rank movement:** Athletics moves yourself; Warfare moves allies and foes.
+- **Modifiers:** 0–4 per ability by star (D-0027). Engine-priced; the AI picks from the candidates the engine deals (D-0025, proposed).
+- **Foe families** each have a sharp twist.
+- **Fight sprites:** one AI image per pose (D-0043, proposed, parked as a detail).
+- **Parked:**
+  - balance;
+  - trait effects;
+  - anti-grind (quest deadlines are the likely answer, D-0054);
+  - a long-term goal.
 
 ## Next
 
-Designer: "first lets make this fun."
-1. **Find the fun in a hand-played fight.** Mock a manual fight as text using placeholder abilities, then get feedback.
-2. **Abilities:** 10–20 base abilities per fighting skill (D-0047, D-0046), each with:
-   - the ranks it is used from and the ranks it reaches;
-   - a cooldown;
-   - weapon tags.
+1. **Skill merges (the current question).** The designer asked: "show me skills list lets see if we can merge stuffs". Claude's proposal, 30 → 20 skills:
+   - **Strong merges:**
+     - **Lore** = Nature Lore + Arcane Lore + Civilization Lore. Main fighting skill: analyzes any monster, exposes weaknesses.
+     - **Roguery** = Stealth + Roguery + Streetwise. Main fighting skill.
+     - **Scouting** = Survival + Awareness. Minor; reveals a quest's foes ahead of time.
+     - **Talk** = Persuasion + Deception + Bargaining. Minor.
+     - **Villainy** absorbs Intimidation.
+   - **Optional:**
+     - **Command** = Leadership + Performance (both "stress healing and buffs");
+     - **Alchemy** absorbs Doctor.
 
-   Minor skills get 3–5. Start from E-0003 `skills-mock/fixed-list.md` and `skills-mock2/gen.mjs`.
-3. **Simulated playtest** (new experiment) of a week: pick the quest and party, play the fights by hand, make the skill checks, then rest and spend gold.
-4. Keep design/ and this page current; start `v4/` only once the shape is settled.
+     Both bring it to 18.
+   - **Kept:** Heavy, Light, Unarmed, Ranged, Defense, Warfare, Animal Companion, Villainy, Engineering, Elemental, Holy, Dark; minor Athletics and Smithing.
+   - **Also open:** civilians become base crew (RimWorld-style jobs) or get dropped.
+2. **Find the fun in a hand-played fight:** a text mock with placeholder abilities, then feedback.
+3. **Abilities:** 10–20 bases per fighting skill, each with ranks (used from, reaches), cooldown and weapon tags. Minor skills get 3–5. Start from E-0003 `skills-mock/fixed-list.md` and `skills-mock2/gen.mjs`.
+4. **Simulated playtest of a week** (a new experiment).
+5. Keep design/ and this page current. Start `v4/` only once the shape is settled.
 
 ## Waiting on the designer
 
-- **Later, from v3 (designer):** the **relic system**, probably, and maybe the **captive system**. Bring either back only through a v4 decision with `sources:`.
-- **To decide later (D-0055):**
-  - where recruits come from (coach or quests);
+- The skill merges and civilians (Next 1).
+- **To decide later** (D-0055):
+  - where recruits come from (a coach, or quests);
   - how new quests appear;
-  - stopping steamrolling;
+  - how to stop steamrolling (experienced mercs on easy quests);
   - whether skill checks between fights stay.
-- **Now (D-0056, mostly combat):**
-  - civilians: base crew, or dropped?
-  - merging the 12 minor skills into 6.
-
+- **Later, from v3:** the relic system (probably) and the captive system (maybe). Each comes back only through a v4 decision with `sources:`.
 - **Accept D-0041** (combat basics)?
-- **Inspirations offered, not yet picked:**
+- **Inspirations offered** (E-0005):
   - push on or retreat between battles;
   - camping in long quests;
   - bonds between mercs;
@@ -55,11 +98,10 @@ Designer: "first lets make this fun."
   - party synergies;
   - triggers;
   - a morale bar for foes.
-- **Sprites (D-0043)** are parked as a detail.
 
 ## Notes
 
-- Lessons ledger `docs/findings.md` (D-0005): every new idea is cross-checked against it.
-- Records system done (D-0001): `tools/rec.mjs`, the `records` skill, the SessionStart/Stop hooks and a git pre-commit hook (`git config core.hooksPath tools/githooks` on a fresh clone).
-- Sims for reference: `experiments/E-0003-autobattler-vs-coin-tests/partysim2.mjs` (slots + books), skill mocks in `skills-mock2/`.
-- v3 is still playable from the sibling checkout `../airaider-v3` (tag `v3-final`).
+- **Lessons ledger** `docs/findings.md` (D-0005): cross-check every new idea against it.
+- **Records system:** `tools/rec.mjs`, the `records` skill, hooks, and a pre-commit hook. On a fresh clone run `git config core.hooksPath tools/githooks`.
+- **Reference sims:** E-0003 `partysim2.mjs`, `skills-mock2/`; E-0004 `halfstar.mjs` (rarity odds).
+- **v3** is playable at `../airaider-v3` (tag `v3-final`).
