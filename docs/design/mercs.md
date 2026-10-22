@@ -33,7 +33,7 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 
 **Coins (D-0069):** a check flips **attribute + skill level** if the merc has the skill, else the attribute alone (Survival check: DEX + Survival, or just DEX). An attack flips **its attribute + its battle skill's level**; each head deals the ability's base damage.
 
-### Battle skills (19)
+### Battle skills (21)
 
 âœ¦ = rare. **Most skills use one attribute, a few use two** (D-0074); a two-attribute skill flips their average + skill level (working). Pairings: D-0086 (Fire, Frost, Lightning follow Path of Exile: STR, DEX, INT).
 
@@ -46,6 +46,8 @@ A skill is also a number of coins, shown like a stat: "Swords (Light Weapons) â—
 | **Unarmed** | fists, kicks, grapples, martial arts, claws and bites (werewolves) | STR + DEX |
 | **Ranged** | bows, crossbows, guns, slings, throwing (weapon tags) | DEX |
 | **Defender** | shields, taunts, guarding, party shields (was Defense, designer) | CON |
+| **Fury** | the berserker (Hellion): burst self-buffs, huge hits that exhaust you after, war cries, kills feed it, stronger when hurt or paid in HP (D-0089) | STR + CON |
+| **Grit** | the survivor (Leper): self-heal, shrug off statuses, survive a killing blow once, regen; keeps only itself alive (D-0089) | CON |
 | **Leadership** | your side: party auras, Resolve, moving teammates, focus-fire orders (D-0073); rare, weak stress healing (D-0062) | CHA |
 | **Performance** | songs, Haste, distraction; rare, weak stress healing | DEX + CHA |
 | **Animal Companion** | a fighting pet, like the Houndmaster (no rank of its own) | CHA |

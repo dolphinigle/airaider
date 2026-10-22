@@ -95,4 +95,5 @@ New record: `node tools/rec.mjs decision "Title"`. The table below is generated 
 | [D-0086](D-0086-skill-attributes-round-two-every-attribute-pair-has-a-skill.md) | "Skill attributes, round two: every attribute pair has a skill" | accepted | designer | 2026-10-22 |
 | [D-0087](D-0087-one-weapon-skill-per-merc.md) | One weapon skill per merc | superseded → D-0088 | designer | 2026-10-22 |
 | [D-0088](D-0088-one-weapon-skill-per-merc-ranged-included.md) | One weapon skill per merc, Ranged included | accepted | designer | 2026-10-22 |
+| [D-0089](D-0089-fury-and-grit-join-the-battle-skills.md) | Fury and Grit join the battle skills | accepted | designer | 2026-10-22 |
 <!-- index:end -->
